@@ -1,0 +1,67 @@
+html{
+	color: white;
+	text-shadow: black 0 0 2px;
+	background: url('grid.png'),linear-gradient(#6c7989, #434b55) fixed;
+}
+#system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	border-radius: 8px;
+}
+#window>.dialog.popped{
+	background:url('wood2.png');
+	color:rgba(77, 60, 51,0.8);
+	text-shadow:none;
+}
+
+.player.unseen .equips:not(*:empty){
+	background: url('wood.png');
+	border-radius:4px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 2px 10px;
+}
+
+.popup.fire{
+	color: rgb(255,119,63);
+}
+.popup.thunder{
+	color: rgb(117,186,255);
+}
+.player,.card,.button,.dialog>.bar{
+	background: url('wood.jpg');
+}
+.control,#system>div>div{
+	background: url('wood2.jpg');
+	color:rgba(77, 60, 51,0.8);
+	text-shadow:none;
+	border-radius:4px;
+}
+.judges>div,.marks>div{
+	border-radius:4px;
+}
+#mebg{
+	background: url('wood.png');
+}
+.control,#system>div>div,.popup,.dialog>.bar{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 2px 10px;
+}
+#paused{
+	background-color: rgba(0,0,0,0.5);
+}
+.player.selectable{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 15px;
+}
+.glow{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
+}
+.glow2{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
+}
+.selected{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.8) 0 0 15px !important;
+}
+.card{
+	text-shadow:rgba(0,0,0,0.1) 0 0 1px;
+}
+.card{
+	color:rgb(77, 60, 51);
+	text-shadow:none;
+}
