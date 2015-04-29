@@ -1,33 +1,34 @@
 character.standard={
 	character:{
-		caocao:['male','wei',4,['hujia','jianxiong'],['zhu','fullskin']],
+		caocao:['male','wei',4,['hujia','jianxiong'],['zhu','fullskin','die_audio']],
 		simayi:['male','wei',3,['fankui','guicai'],['fullskin']],
-		xiahoudun:['male','wei',4,['ganglie'],['fullskin']],
-		zhangliao:['male','wei',4,['tuxi'],['fullskin']],
-		xuzhu:['male','wei',4,['luoyi'],['fullskin']],
-		guojia:['male','wei',3,['tiandu','yiji'],['fullskin']],
-		zhenji:['female','wei',3,['luoshen','qingguo'],['fullskin']],
-		liubei:['male','shu',4,['rende','jijiang'],['zhu','fullskin']],
-		guanyu:['male','shu',4,['wusheng'],['fullskin']],
-		zhangfei:['male','shu',4,['paoxiao'],['fullskin']],
-		zhugeliang:['male','shu',3,['guanxing','kongcheng'],['fullskin']],
-		zhaoyun:['male','shu',4,['longdan'],['fullskin']],
-		machao:['male','shu',4,['mashu','tieji'],['fullskin']],
-		huangyueying:['female','shu',3,['jizhi','qicai'],['fullskin']],
-		sunquan:['male','wu',4,['zhiheng','jiuyuan'],['zhu','fullskin']],
-		ganning:['male','wu',4,['qixi'],['fullskin']],
-		lvmeng:['male','wu',4,['keji'],['fullskin']],
-		huanggai:['male','wu',4,['kurou'],['fullskin']],
-		zhouyu:['male','wu',3,['yingzi','fanjian'],['fullskin']],
-		daqiao:['female','wu',3,['guose','liuli'],['fullskin']],
-		luxun:['male','wu',3,['qianxun','lianying'],['fullskin']],
-		sunshangxiang:['female','wu',3,['xiaoji','jieyin'],['fullskin']],
-		huatuo:['male','qun',3,['qingnang','jijiu'],['fullskin']],
-		lvbu:['male','qun',4,['wushuang'],['fullskin']],
-		diaochan:['female','qun',3,['lijian','biyue'],['fullskin']],
+		xiahoudun:['male','wei',4,['ganglie'],['fullskin','die_audio']],
+		zhangliao:['male','wei',4,['tuxi'],['fullskin','die_audio']],
+		xuzhu:['male','wei',4,['luoyi'],['fullskin','die_audio']],
+		guojia:['male','wei',3,['tiandu','yiji'],['fullskin','die_audio']],
+		zhenji:['female','wei',3,['luoshen','qingguo'],['fullskin','die_audio']],
+		liubei:['male','shu',4,['rende','jijiang'],['zhu','fullskin','die_audio']],
+		guanyu:['male','shu',4,['wusheng'],['fullskin','die_audio']],
+		zhangfei:['male','shu',4,['paoxiao'],['fullskin','die_audio']],
+		zhugeliang:['male','shu',3,['guanxing','kongcheng'],['fullskin','die_audio']],
+		zhaoyun:['male','shu',4,['longdan'],['fullskin','die_audio']],
+		machao:['male','shu',4,['mashu','tieji'],['fullskin','die_audio']],
+		huangyueying:['female','shu',3,['jizhi','qicai'],['fullskin','die_audio']],
+		sunquan:['male','wu',4,['zhiheng','jiuyuan'],['zhu','fullskin','die_audio']],
+		ganning:['male','wu',4,['qixi'],['fullskin','die_audio']],
+		lvmeng:['male','wu',4,['keji'],['fullskin','die_audio']],
+		huanggai:['male','wu',4,['kurou'],['fullskin','die_audio']],
+		zhouyu:['male','wu',3,['yingzi','fanjian'],['fullskin','die_audio']],
+		daqiao:['female','wu',3,['guose','liuli'],['fullskin','die_audio']],
+		luxun:['male','wu',3,['qianxun','lianying'],['fullskin','die_audio']],
+		sunshangxiang:['female','wu',3,['xiaoji','jieyin'],['fullskin','die_audio']],
+		huatuo:['male','qun',3,['qingnang','jijiu'],['fullskin','die_audio']],
+		lvbu:['male','qun',4,['wushuang'],['fullskin','die_audio']],
+		diaochan:['female','qun',3,['lijian','biyue'],['fullskin','die_audio']],
 	},
 	skill:{
 		hujia:{
+			audio:2,
 			unique:true,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
@@ -74,6 +75,7 @@ character.standard={
 			},
 		},
 		jianxiong:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
 				return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0])=='d';
@@ -93,6 +95,7 @@ character.standard={
 			}
 		},
 		fankui:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -120,6 +123,7 @@ character.standard={
 			}
 		},
 		guicai:{
+			audio:2,
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
@@ -165,6 +169,7 @@ character.standard={
 			}
 		},
 		ganglie:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
 				return (event.source!=undefined);
@@ -200,6 +205,7 @@ character.standard={
 			}
 		},
 		tuxi:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			direct:true,
 			content:function(){
@@ -239,6 +245,7 @@ character.standard={
 			}
 		},
 		luoyi:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
 				var i,cancel=true;
