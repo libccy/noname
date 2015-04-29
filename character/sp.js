@@ -2666,6 +2666,7 @@ character.sp={
 		jilei2:'鸡肋',
 		jilei_info:'每当你受到一次伤害，可以令伤害来源不能使用或打出其手牌直到回合结束',
 		danlao:'啖酪',
+		danlao_info:'当你成为一张指定了多个目标的锦囊牌的目标时，你可以取消之，并摸一张牌。',
 		gongao:'功獒',
 		zhuiji:'追击',
 		chouhai:'仇海',

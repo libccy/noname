@@ -2364,7 +2364,7 @@ character.swd={
 			// 	}
 			// },
 			filter:function(event,player){
-				return event.player!=player&&event.targets&&event.targets.length>1;
+				return event.player!=player&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1;
 			},
 			check:function(event,player){
 				return get.tag(event.card,'multineg')||ai.get.effect(player,event.card,event.player,player)<=0;
@@ -7722,7 +7722,7 @@ character.swd={
 		qimou:'奇谋',
 		qimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并立即使用之',
 		mufeng:'沐风',
-		mufeng_info:'当你成为一张指定了多个目标的卡牌的目标时，你可以取消之，并摸一张牌。',
+		mufeng_info:'当你成为一张指定了多个目标的锦囊牌的目标时，你可以取消之，并摸一张牌。',
 		lexue:'乐学',
 		lexue_info:'回合内，你随机获得制衡、集智、缔盟、驱虎中的一个技能；回合外，你随机获得遗计、急救、鬼道、反馈中的一个技能',
 		mingfu:'冥缚',
