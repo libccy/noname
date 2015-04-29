@@ -15,15 +15,12 @@ window.config={
 		theme:['woodden','music'],
 		card_font:['xiaozhuan','huangcao','caoshu','xingshu'],
 		double_hp:['hejiansan','pingjun','zuidazhi','zuixiaozhi','zonghe'],
-		image:{
-			// card:['default','white'],
-			character:['default'],
-			background:['default','huangyueying_bg','zhulian_bg',
-			'september_bg','xueji_bg','yinxiang_bg','chunhui_bg',
-			'grass_bg','huangtian_bg'],
-			background_filter:['default','blur','gray','sepia','invert','saturate','contrast','hue','brightness'],
-			dynamic_background:['none','round_dybg']
-		}
+
+		image_character:['default'],
+		image_background:['default','huangyueying_bg','zhulian_bg',
+		'september_bg','xueji_bg','yinxiang_bg','chunhui_bg',
+		'grass_bg','huangtian_bg'],
+		image_background_filter:['default','blur','gray','sepia','invert','saturate','contrast','hue','brightness'],
 	},
 	translate:{
 		identity:'身份',
@@ -148,13 +145,11 @@ window.config={
 		hejiansan:'相加',
 		zonghe:'总和',
 		xiangcheng:'相乘',
-		card_config:'卡牌图片包',
-		character_config:'角色头像',
-		card_font_config:'卡牌字体',
-		background_config:'游戏背景',
-		background_filter_config:'背景效果',
-		background_stretch_config:'背景拉伸',
-		dynamic_background_config:'动态背景',
+
+		image_character_config:'角色头像',
+		image_background_config:'游戏背景',
+		image_background_filter_config:'背景效果',
+
 		show_playerids_config:'显示身份按钮',
 		show_replay_config:'显示重来按钮',
 		show_pause_config:'显示暂停按钮',
@@ -197,11 +192,6 @@ window.config={
 	duration:500,
 	hoveration:1000,
 	cheat:false,
-	// change_choice:false,
-	// free_choose:true,
-	// change_card:false,
-	// change_identity:true,
-	// swap:true,
 
 	auto_skill:true,
 	auto_confirm:true,
@@ -214,13 +204,10 @@ window.config={
 
 	theme:'woodden',
 	layout:'newlayout',
-	image:{
-		// card:'default',
-		character:'default',
-		background:'default',
-		background_stretch:true,
-		dynamic_background:'none'
-	},
+
+	image_character:'default',
+	image_background:'default',
+
 	card_font:'xiaozhuan',
 	show_name:false,
 	show_replay:false,
