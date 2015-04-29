@@ -275,7 +275,7 @@ window.config={
 		guozhan:{
 			double_hp:'pingjun',
 			difficulty:'normal',
-			initshow_draw:0,
+			initshow_draw:2,
 			dierestart:true
 		}
 	},

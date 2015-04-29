@@ -730,8 +730,6 @@ mode.guozhan={
 		ai_identity:true,
 		revive:true,
 		double_hp:true,
-		// ban_weak:true,
-		// keep_max_hp:true,
 		difficulty:true,
 	},
 }

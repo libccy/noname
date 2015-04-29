@@ -151,82 +151,15 @@ window.play={};
 					lib.config.defaultcards=lib.config.cards.slice(0);
 				}
 				for(var i in config2){
-					switch(i){
-						case 'cheat':lib.config.cheat=config2[i];break;
-						case 'confirmtouch':lib.config.confirmtouch=config2[i];break;
-						case 'auto_skill':lib.config.auto_skill=config2[i];break;
-						case 'auto_confirm':lib.config.auto_confirm=config2[i];break;
-						case 'enable_drag':lib.config.enable_drag=config2[i];break;
-						case 'hover_all':lib.config.hover_all=config2[i];break;
-						case 'hover_handcard':lib.config.hover_handcard=config2[i];break;
-						case 'duration':lib.config.duration=config2[i];break;
-						case 'hoveration':lib.config.hoveration=config2[i];break;
-						case 'image_background':lib.config.image_background=config2[i];break;
-						case 'image_background_filter':lib.config.image_background_filter=config2[i];break;
-						case 'ui_zoom':lib.config.ui_zoom=config2[i];break;
-						case 'show_name':lib.config.show_name=config2[i];break;
-						case 'show_replay':lib.config.show_replay=config2[i];break;
-						case 'show_playerids':lib.config.show_playerids=config2[i];break;
-						case 'show_pause':lib.config.show_pause=config2[i];break;
-						case 'show_auto':lib.config.show_auto=config2[i];break;
-						case 'right_info':lib.config.right_info=config2[i];break;
-						case 'long_info':lib.config.long_info=config2[i];break;
-						case 'only_fullskin':lib.config.only_fullskin=config2[i];break;
-						case 'hide_card_image':lib.config.hide_card_image=config2[i];break;
-						case 'show_wuxie':lib.config.show_wuxie=config2[i];break;
-						case 'show_scrollbar':lib.config.show_scrollbar=config2[i];break;
-						case 'mousewheel':lib.config.mousewheel=config2[i];break;
-						case 'fold_card':lib.config.fold_card=config2[i];break;
-						case 'touchscreen':lib.config.touchscreen=config2[i];break;
-						case 'threed_card':lib.config.threed_card=config2[i];break;
-						case 'blur_ui':lib.config.blur_ui=config2[i];break;
-						case 'hide_history':lib.config.hide_history=config2[i];break;
-						case 'right_sidebar':lib.config.right_sidebar=config2[i];break;
-						case 'right_click':lib.config.right_click=config2[i];break;
-						case 'sort':lib.config.sort=config2[i];break;
-						case 'reverse_sort':lib.config.reverse_sort=config2[i];break;
-						case 'title':lib.config.title=config2[i];break;
-						case 'intro':lib.config.intro=config2[i];break;
-						case 'theme':lib.config.theme=config2[i];break;
-						case 'layout':lib.config.layout=config2[i];break;
 
-						case 'gameconfig':lib.config.gameconfig=config2[i];break;
-						case 'modeconfig':lib.config.modeconfig=config2[i];break;
-						case 'appearence':lib.config.appearence=config2[i];break;
-						case 'forbidlist':lib.config.forbidlist=config2[i];break;
-						case 'autoskilllist':lib.config.autoskilllist=config2[i];break;
-						default:
-						if(i.indexOf('_character')==i.length-10&&i.length>10){
-							if(config2[i]){
-								lib.config.characters.add(i.slice(0,i.indexOf('_character')));
-							}
-							else{
-								lib.config.characters.remove(i.slice(0,i.indexOf('_character')));
-							}
-						}
-						else if(i.indexOf('_card')==i.length-5&&i.length>5){
-							if(config2[i]){
-								lib.config.cards.add(i.slice(0,i.indexOf('_card')));
-							}
-							else{
-								lib.config.cards.remove(i.slice(0,i.indexOf('_card')));
-							}
-						}
-						if(i.indexOf('_play')==i.length-5&&i.length>5){
-							if(config2[i]){
-								lib.config.plays.add(i.slice(0,i.indexOf('_play')));
-							}
-							else{
-								lib.config.plays.remove(i.slice(0,i.indexOf('_play')));
-							}
-						}
-						else if(i.indexOf('_mode_config')!=-1&&i.substr(i.indexOf('_mode_config')+13)==lib.config.mode){
+						if(i.indexOf('_mode_config')!=-1&&i.substr(i.indexOf('_mode_config')+13)==lib.config.mode){
 							lib.config.mode_config[lib.config.mode][i.substr(0,i.indexOf('_mode_config'))]=config2[i];
 						}
 						else{
-
+							lib.config[i]=config2[i];
 						}
-					}
+
+
 				}
 				for(var i in lib.config.translate){
 					lib.translate[i]=lib.config.translate[i];
@@ -1818,7 +1751,7 @@ window.play={};
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
 						}
 						if(get.config('dierestart')&&lib.config.mode!='versus'){
-							ui.restart=ui.create.control('restart',function(){window.location.reload()});
+							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
 					if(player==game.me&&ui.auto){
@@ -4848,6 +4781,12 @@ window.play={};
 	};
 	var game={
 		version:0.912,
+		reload:function(){
+			if(_status){
+				_status.reloading=true;
+			}
+			window.location.reload();
+		},
 		update:function(func){
 			lib.updates.push(func);
 			if(lib.updates.length===1){
@@ -5103,12 +5042,10 @@ window.play={};
 			dialog.add(ui.create.div('.placeholder'));
 			dialog.add(ui.create.div('.placeholder'));
 			if(!ui.restart){
-				ui.restart=ui.create.control('restart',function(){window.location.reload()});
+				ui.restart=ui.create.control('restart',game.reload);
 			}
 			if(lib.storage.test){
-				setTimeout(function(){
-					window.location.reload();
-				},500);
+				setTimeout(game.reload,500);
 			}
 
 			if(ui.auto) ui.auto.hide();
@@ -5803,6 +5740,7 @@ window.play={};
 			if(lib.config.title) document.title=str;
 		},
 		save:function(key,value){
+			if(_status.reloading) return;
 			var config={};
 			if(arguments.length>0){
 				try{
@@ -5825,6 +5763,7 @@ window.play={};
 			localStorage.setItem(lib.configprefix+lib.config.mode,JSON.stringify(config));
 		},
 		updateSave:function(){
+			if(_status.reloading) return;
 			localStorage.setItem(lib.configprefix+lib.config.mode,JSON.stringify(lib.storage));
 		},
 		import:function(name,replace){
@@ -5896,6 +5835,7 @@ window.play={};
 			}
 		},
 		saveConfig:function(key,value,local){
+			if(_status.reloading) return;
 			var config;
 			try{
 				config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
@@ -6481,15 +6421,15 @@ window.play={};
 				var span2='<div style="width:20px;text-align:center;padding-right:0">·</div>';
 				newgame.push(ui.create.line((lib.config.mode=='identity'?span1:span2)+'身份模式',function(){
 					game.saveConfig('mode','identity');
-					window.location.reload();
+					game.reload();
 				}));
 				newgame.push(ui.create.line((lib.config.mode=='guozhan'?span1:span2)+'国战模式',function(){
 					game.saveConfig('mode','guozhan');
-					window.location.reload();
+					game.reload();
 				}));
 				newgame.push(ui.create.line((lib.config.mode=='versus'?span1:span2)+'对决模式',function(){
 					game.saveConfig('mode','versus');
-					window.location.reload();
+					game.reload();
 				}));
 
 				if(!lib.config.modeconfig&&!lib.config.gameconfig&&!lib.config.appearence){
@@ -6574,13 +6514,15 @@ window.play={};
 						modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
 						modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));
 					}
+					else if(Array.isArray(lib.config.current_mode[i])){
+						modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
+					}
 				}
 				if(lib.config.modeconfig){
 					for(i=0;i<modeconfig.length;i++){
 						ui.config.appendChild(modeconfig[i]);
 					}
 				}
-				// ui.config.appendChild(ui.create.div('.placeholder'));
 				var gameconfig=[];
 				gameconfig._configstr='gameconfig';
 				folditems.push(gameconfig);
@@ -6700,23 +6642,20 @@ window.play={};
 				reset_characterpack.innerHTML='恢复默认';
 				reset_characterpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 					if(_status.dragged) return;
+					game.saveConfig('characters',lib.config.defaultcharacters);
 					for(var i=0;i<characterpack.length;i++){
 						if(characterpack[i].link){
 							var pnme=characterpack[i].link.slice(0,characterpack[i].link.indexOf('_character'));
 							if(lib.config.defaultcharacters.contains(pnme)){
 								if(!characterpack[i].lastChild.classList.contains('on')){
 									characterpack[i].querySelector('.toggle').link=true;
-									game.saveConfig(characterpack[i].link,true);
 									characterpack[i].lastChild.classList.add('on');
-									// characterpack[i].lastChild.innerHTML='开';
 								}
 							}
 							else{
 								if(characterpack[i].lastChild.classList.contains('on')){
 									characterpack[i].querySelector('.toggle').link=false;
-									game.saveConfig(characterpack[i].link,false);
 									characterpack[i].lastChild.classList.remove('on');
-									// characterpack[i].lastChild.innerHTML='关';
 								}
 							}
 						}
@@ -6727,13 +6666,12 @@ window.play={};
 				all_characterpack.innerHTML='全部开启';
 				all_characterpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 					if(_status.dragged) return;
+					game.saveConfig('characters',lib.config.all.characters);
 					for(var i=0;i<characterpack.length;i++){
 						if(characterpack[i].link){
 							if(!characterpack[i].lastChild.classList.contains('on')){
 								characterpack[i].querySelector('.toggle').link=true;
-								game.saveConfig(characterpack[i].link,true);
 								characterpack[i].lastChild.classList.add('on');
-								// characterpack[i].lastChild.innerHTML='开';
 							}
 						}
 					}
@@ -6741,12 +6679,6 @@ window.play={};
 				});
 				characterpack.push(reset_characterpack);
 				characterpack.push(all_characterpack);
-				// if(lib.config.characterpack){
-				// 	for(i=0;i<characterpack.length;i++){
-				// 		ui.config.appendChild(characterpack[i]);
-				// 	}
-				// }
-				// ui.config.appendChild(ui.create.div('.placeholder'));
 
 				var cardpack=[];
 				folditems.push(cardpack);
@@ -6773,23 +6705,20 @@ window.play={};
 				reset_cardpack.innerHTML='恢复默认';
 				reset_cardpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 					if(_status.dragged) return;
+					game.saveConfig('cards',lib.config.defaultcards);
 					for(var i=0;i<cardpack.length;i++){
 						if(cardpack[i].link){
 							var pnme=cardpack[i].link.slice(0,cardpack[i].link.indexOf('_card'));
 							if(lib.config.defaultcards.contains(pnme)){
 								if(!cardpack[i].lastChild.classList.contains('on')){
 									cardpack[i].querySelector('.toggle').link=true;
-									game.saveConfig(cardpack[i].link,true);
 									cardpack[i].lastChild.classList.add('on');
-									// cardpack[i].lastChild.innerHTML='开';
 								}
 							}
 							else{
 								if(cardpack[i].lastChild.classList.contains('on')){
 									cardpack[i].querySelector('.toggle').link=false;
-									game.saveConfig(cardpack[i].link,false);
 									cardpack[i].lastChild.classList.remove('on');
-									// cardpack[i].lastChild.innerHTML='关';
 								}
 							}
 						}
@@ -6800,13 +6729,12 @@ window.play={};
 				all_cardpack.innerHTML='全部开启';
 				all_cardpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 					if(_status.dragged) return;
+					game.saveConfig('cards',lib.config.all.cards);
 					for(var i=0;i<cardpack.length;i++){
 						if(cardpack[i].link){
 							if(!cardpack[i].lastChild.classList.contains('on')){
 								cardpack[i].querySelector('.toggle').link=true;
-								game.saveConfig(cardpack[i].link,true);
 								cardpack[i].lastChild.classList.add('on');
-								// cardpack[i].lastChild.innerHTML='开';
 							}
 						}
 					}
@@ -6814,12 +6742,6 @@ window.play={};
 				});
 				cardpack.push(reset_cardpack);
 				cardpack.push(all_cardpack);
-				// if(lib.config.cardpack){
-				// 	for(i=0;i<cardpack.length;i++){
-				// 		ui.config.appendChild(cardpack[i]);
-				// 	}
-				// }
-				// ui.config.appendChild(ui.create.div('.placeholder'));
 
 				var playpack=[];
 				folditems.push(playpack);
@@ -6842,11 +6764,6 @@ window.play={};
 					node.link=plays[i]+'_play';
 					playpack[i]=node;
 				}
-				// if(lib.config.playpack){
-				// 	for(i=0;i<playpack.length;i++){
-				// 		ui.config.appendChild(playpack[i]);
-				// 	}
-				// }
 				ui.config.appendChild(ui.create.div('.placeholder'));
 
 				var cardlist=[];
@@ -7111,9 +7028,7 @@ window.play={};
 					if(_status.reset) localStorage.clear();
 					ui.arena.hide();
 					ui.config.hide();
-					setTimeout(function(){
-						window.location.reload();
-					},500);
+					setTimeout(game.reload,500);
 				});
 
 				if(lib.config.right_sidebar){
@@ -7124,7 +7039,7 @@ window.play={};
 					ui.system1=ui.create.div('#system1',ui.system);
 					ui.system2=ui.create.div('#system2',ui.system);
 				}
-				ui.replay=ui.create.system('重来',function(){window.location.reload()},true);
+				ui.replay=ui.create.system('重来',game.reload,true);
 				ui.pause=ui.create.system('暂停',ui.click.pause);
 				if(!lib.config.show_pause){
 					ui.pause.style.display='none';
@@ -7143,7 +7058,7 @@ window.play={};
 					var backtomouse=ui.create.system('返回鼠标模式');
 					backtomouse.addEventListener('click',function(){
 						game.saveConfig('touchscreen',false);
-						window.location.reload();
+						game.reload();
 					});
 					var keeptouch=ui.create.system('确认触屏');
 					keeptouch.addEventListener('touchend',function(){
@@ -8376,7 +8291,7 @@ window.play={};
 				},
 				player_number:function(num){
 					game.saveConfig('player_number',num,true);
-					window.location.reload();
+					game.reload();
 				},
 				auto_identity:function(bool){
 					game.saveConfig('auto_identity',bool,true);
@@ -8630,15 +8545,36 @@ window.play={};
 					if(!lib.config.title) document.title='无名杀';
 				},
 				characters:function(bool,node){
-					game.saveConfig(node.link,bool);
+					var name=node.link.slice(0,node.link.length-10);
+					if(bool){
+						lib.config.characters.add(name);
+					}
+					else{
+						lib.config.characters.remove(name);
+					}
+					game.saveConfig('characters',lib.config.characters);
 					ui.sidebarrestart.classList.add('thundertext');
 				},
 				cards:function(bool,node){
-					game.saveConfig(node.link,bool);
+					var name=node.link.slice(0,node.link.length-5);
+					if(bool){
+						lib.config.cards.add(name);
+					}
+					else{
+						lib.config.cards.remove(name);
+					}
+					game.saveConfig('cards',lib.config.cards);
 					ui.sidebarrestart.classList.add('thundertext');
 				},
 				plays:function(bool,node){
-					game.saveConfig(node.link,bool);
+					var name=node.link.slice(0,node.link.length-5);
+					if(bool){
+						lib.config.plays.add(name);
+					}
+					else{
+						lib.config.plays.remove(name);
+					}
+					game.saveConfig('plays',lib.config.plays);
 					ui.sidebarrestart.classList.add('thundertext');
 				},
 				forbid:function(bool,node){
@@ -10512,7 +10448,8 @@ window.play={};
 				}
 			}
 			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
-				window.location.reload();
+				_status.reloading=true;
+				game.reload();
 			}
 		};
 		window.onload=function(){
