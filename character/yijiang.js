@@ -2091,7 +2091,7 @@ character.yijiang={
 						var num=0;
 						var cards=player.get('h');
 						for(var i=0;i<cards.length;i++){
-							num+=ai.get.value(cards[i]);
+							num+=Math.max(0,ai.get.value(cards[i],player,'raw'));
 						}
 						num/=cards.length;
 						num*=Math.min(cards.length,player.hp);
@@ -3079,11 +3079,13 @@ character.yijiang={
 				"step 2"
 				if(result.bool){
 					player.storage.zyexin.remove(event.card);
-					player.$give(event.card,result.targets[0]);
+					game.delay();
 					if(get.type(event.card)=='equip'){
+						player.$give(event.card,result.targets[0]);
 						result.targets[0].equip(event.card);
 					}
 					else if(get.type(event.card)=='delay'){
+						player.$throw(event.card);
 						result.targets[0].addJudge(event.card);
 					}
 					player.logSkill('zpaiyi',result.targets);

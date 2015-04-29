@@ -130,6 +130,7 @@ window.config={
 		mode_config:'游戏模式',
 		player_number_config:'角色个数',
 		difficulty_config:'AI对人类态度',
+		initshow_draw_config:'首亮摸牌',
 		ai_strategy_config:'内奸策略',
 		ai_identity_config:'身份预知',
 		keep_max_hp_config:'锁定体力上限',
@@ -282,10 +283,13 @@ window.config={
 			},
 			show_identity:true,
 			difficulty:'normal',
+			dierestart:true
 		},
 		guozhan:{
 			double_hp:'pingjun',
 			difficulty:'normal',
+			initshow_draw:0,
+			dierestart:true
 		}
 	},
 

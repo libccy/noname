@@ -1548,6 +1548,7 @@ character.sp={
 				}
 			},
 			ai:{
+				threaten:0.8,
 				expose:0.1
 			}
 		},

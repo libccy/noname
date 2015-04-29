@@ -1269,17 +1269,11 @@ character.xianjian={
 		huimeng:{
 			trigger:{player:'recoverAfter'},
 			frequent:true,
-			// filter:function(event,player){
-			// 	if(event.cards){
-			// 		for(var i=0;i<event.cards.length;i++){
-			// 			if(get.color(event.cards[i])!='red') return false;
-			// 		}
-			// 		return true;
-			// 	}
-			// 	return false;
-			// },
 			content:function(){
 				player.draw(2);
+			},
+			ai:{
+				threaten:0.8
 			}
 		},
 		tianshe:{

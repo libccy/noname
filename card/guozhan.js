@@ -104,6 +104,11 @@ card.guozhan={
 				target.chooseToDiscard(2,'he',true).ai=ai.get.disvalue;
 			},
 			ai:{
+				wuxie:function(target,card,player,viewer){
+					if(lib.config.mode=='guozhan'){
+						return 0;
+					}
+				},
 				basic:{
 					useful:4,
 					value:4,

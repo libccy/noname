@@ -113,7 +113,7 @@ character.refresh={
 				}
 				"step 2"
 				if(result.bool){
-					player.logSkill('guicai');
+					player.logSkill('reguicai');
 					if(trigger.player.judging.clone) trigger.player.judging.clone.delete();
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];

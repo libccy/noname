@@ -421,6 +421,14 @@ mode.guozhan={
 					this.classList.remove('unseen2');
 					break;
 				}
+				var initdraw=get.config('initshow_draw');
+				if(!_status.initshown&&initdraw){
+					this.popup('首亮');
+					game.log(get.translation(this)+'首先明置武将，得到奖励');
+					game.log(get.translation(this)+'摸了'+get.cnNumber(initdraw)+'张牌');
+					this.draw(initdraw).log=false;
+					_status.initshown=true;
+				}
 				for(var i=0;i<skills.length;i++){
 					this.hiddenSkills.remove(skills[i]);
 					this.addSkill(skills[i]);
@@ -431,14 +439,44 @@ mode.guozhan={
 						next.player=this;
 						next.content=function(){
 							"step 0"
-							player.chooseBool('是否摸一张牌？');
+							player.chooseBool('你的武将有单独的阴阳鱼，是否摸一张牌？');
 							"step 1"
 							if(result.bool){
 								player.draw();
 							}
 						}
 					}
+					if(this.perfectPair()){
+						var next=game.createEvent('guozhanDraw');
+						next.player=this;
+						next.content=function(){
+							"step 0"
+							player.popup('珠联璧合');
+							game.log(get.translation(player)+'发动了【珠联璧合】');
+							if(player.hp==player.maxHp){
+								player.draw(2);
+								event.finish();
+							}
+							else{
+								player.chooseControl('draw_card','recover_hp',function(){
+									if(player.hp>=2||player.hp>=player.maxHp-1) return 'draw_card';
+									if(player.hp==2&&player.num('h')==0) return 'draw_card';
+									return 'recover_hp';
+								},ui.create.dialog('hidden','珠联璧合：选择一项奖励'));
+							}
+							"step 1"
+							if(result.control=='draw_card'){
+								player.draw(2);
+							}
+							else{
+								player.recover();
+							}
+						}
+					}
 				}
+			},
+			perfectPair:function(){
+				return false;
 			},
 			siege:function(player){
 				if(game.players.length==2) return false;
@@ -683,6 +721,7 @@ mode.guozhan={
 	},
 	config:{
 		player_number:true,
+		initshow_draw:true,
 		free_choose:true,
 		change_choice:true,
 		change_card:true,

@@ -1454,7 +1454,9 @@ window.play={};
 					ui.clear();
 				},
 				draw:function(){
-					game.log(get.translation(player)+'摸了'+get.cnNumber(num)+'张牌');
+					if(event.log!=false){
+						game.log(get.translation(player)+'摸了'+get.cnNumber(num)+'张牌');
+					}
 					var cards=get.cards(num);
 					if(event.animate!=false){
 						player.gain(cards,'draw');
@@ -5635,7 +5637,7 @@ window.play={};
 				"step 0"
 				var end=player;
 				do{
-					player.draw(num,false);
+					player.draw(num,false).log=false;
 					player=player.next;
 				}
 				while(player!=end);
@@ -5655,7 +5657,7 @@ window.play={};
 				game.pause();
 				"step 3"
 				if(event.bool){
-					game.me.lose(game.me.get('h'));
+					game.me.lose(game.me.get('h'))._triggered=null;
 				}
 				else{
 					event.dialog.close();
@@ -5664,7 +5666,7 @@ window.play={};
 				}
 				"step 4"
 				game.delay();
-				if(!game.me.skills.contains('yuling')) game.me.draw(num,false);
+				game.me.gain(get.cards(4))._triggered=null;
 				"step 5"
 				event.goto(2);
 			}
@@ -6532,6 +6534,9 @@ window.play={};
 				for(i in lib.config.current_mode){
 					if(i=='difficulty'&&lib.config.current_mode[i]==true){
 						modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.difficulty));
+					}
+					else if(i=='initshow_draw'&&lib.config.current_mode[i]==true){
+						modeconfig.push(ui.create.switcher('initshow_draw',[0,1,2],get.config('initshow_draw'),ui.click.sidebar.initshow_draw));
 					}
 					else if(i=='ai_strategy'&&lib.config.current_mode[i]==true){
 						modeconfig.push(ui.create.switcher('ai_strategy',
@@ -8469,6 +8474,9 @@ window.play={};
 				},
 				difficulty:function(bool){
 					game.saveConfig('difficulty',bool,true);
+				},
+				initshow_draw:function(bool){
+					game.saveConfig('initshow_draw',bool,true);
 				},
 				ai_strategy:function(strategy){
 					game.saveConfig('ai_strategy',strategy,true);
