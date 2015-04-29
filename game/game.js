@@ -1125,6 +1125,15 @@ window.play={};
 							player.checkShow(event.skill);
 						}
 					}
+					if(lib.config.background_audio&&lib.card[card.name].audio){
+						var sex=player.sex=='female'?'female':'male';
+						if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
+							game.playAudio('card',sex,card.name+'_'+card.nature);
+						}
+						else{
+							game.playAudio('card',sex,card.name);
+						}
+					}
 					if(event.animate!=false){
 						if(card.name=='wuxie'&&event.parent.source){
 							player.line(event.parent.source,'green');
@@ -1260,6 +1269,9 @@ window.play={};
 				useSkill:function(){
 					"step 0"
 					var info=get.info(event.skill);
+					if(lib.config.background_speak&&info.audio){
+						game.playAudio('skill',event.skill,Math.ceil(info.audio*Math.random()));
+					}
 					if(player.checkShow){
 						player.checkShow(event.skill);
 					}
@@ -1407,6 +1419,12 @@ window.play={};
 						game.log(get.translation(player)+'发动了'+get.translation(event.skill));
 						if(player.checkShow){
 							player.checkShow(event.skill);
+						}
+					}
+					if(event.parent.parent.parent.name=='useCard'){
+						if(lib.config.background_audio&&lib.card[card.name].audio){
+							var sex=player.sex=='female'?'female':'male';
+							game.playAudio('card',sex,card.name);
 						}
 					}
 					var str=get.translation(player)+'打出了';
@@ -1604,6 +1622,9 @@ window.play={};
 				},
 				damage:function(){
 					"step 0"
+					if(lib.config.background_audio){
+						game.playAudio('effect','damage_'+(player.sex==='female'?'female':'male'));
+					}
 					var str=get.translation(player)+'受到了';
 					if(source) str+='来自'+(source==player?'自己':get.translation(source)+'的');
 					str+=get.cnNumber(num)+'点';
@@ -1768,6 +1789,12 @@ window.play={};
 					game.players.remove(player);
 					game.dead.push(player);
 					if(player.dieAfter) player.dieAfter(source);
+					if(lib.config.background_speak){
+						if(lib.character[player.name]&&lib.character[player.name][4]&&
+						lib.character[player.name][4].contains('die_audio')){
+							game.playAudio('die',player.name)
+						}
+					}
 					if(player==game.me&&!_status.over){
 						ui.control.show();
 						if(get.config('swap')&&lib.config.mode!='versus'){
@@ -3349,6 +3376,10 @@ window.play={};
 					if(this.checkShow){
 						this.checkShow(name);
 					}
+					var info=lib.skill[name];
+					if(info&&lib.config.background_speak&&info.audio){
+						game.playAudio('skill',name,Math.ceil(info.audio*Math.random()));
+					}
 				},
 				unprompt:function(){
 					if(this.node.prompt){
@@ -4833,6 +4864,34 @@ window.play={};
 	};
 	var game={
 		version:0.912,
+		playAudio:function(){
+			var str='';
+			for(var i=0;i<arguments.length;i++){
+				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
+					str+='/'+arguments[i];
+				}
+			}
+			var audio=document.createElement('audio');
+			audio.autoplay=true;
+			audio.src='audio'+str+'.mp3';
+			audio.addEventListener('ended',function(){
+				this.remove();
+			});
+			document.body.appendChild(audio);
+		},
+		playBackgroundMusic:function(){
+			if(lib.config.background_music=='music_off'){
+				ui.backgroundMusic.src='';
+			}
+			else{
+				var music=lib.config.background_music;
+				if(music=='music_random'){
+					music=lib.config.all.background_music.randomGet('music_off','music_random',_status.currentMusic);
+				}
+				_status.currentMusic=music;
+				ui.backgroundMusic.src='audio/background/'+music+'.mp3';
+			}
+		},
 		reload:function(){
 			if(_status){
 				_status.reloading=true;
@@ -5535,8 +5594,8 @@ window.play={};
 				game.me.node.handcards1.delete();
 				game.me.node.handcards2.delete();
 				game.me=player;
-				ui.handcards1=player.node.handcards1.animate('start');
-				ui.handcards2=player.node.handcards2.animate('start');
+				ui.handcards1=player.node.handcards1.animate('start').fix();
+				ui.handcards2=player.node.handcards2.animate('start').fix();
 				ui.me.appendChild(ui.handcards1);
 				ui.me.appendChild(ui.handcards2);
 
@@ -5567,8 +5626,8 @@ window.play={};
 			game.me.node.handcards1.delete();
 			game.me.node.handcards2.delete();
 			game.me=player;
-			ui.handcards1=player.node.handcards1.animate('start');
-			ui.handcards2=player.node.handcards2.animate('start');
+			ui.handcards1=player.node.handcards1.animate('start').fix();
+			ui.handcards2=player.node.handcards2.animate('start').fix();
 			ui.me.appendChild(ui.handcards1);
 			ui.me.appendChild(ui.handcards2);
 			if(game.onSwapControl){
@@ -6393,6 +6452,12 @@ window.play={};
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena',ui.window);
+				ui.backgroundMusic=document.createElement('audio');
+				game.playBackgroundMusic();
+				ui.backgroundMusic.autoplay=true;
+				ui.backgroundMusic.addEventListener('ended',game.playBackgroundMusic);
+				ui.window.appendChild(ui.backgroundMusic);
+
 				ui.sidebar=ui.create.div('#sidebar');
 				ui.canvas=document.createElement('canvas');
 				ui.arena.appendChild(ui.canvas);
@@ -6591,8 +6656,8 @@ window.play={};
 						game.saveConfig('gameconfig',true);
 						unfold(this,gameconfig);
 					}
-
 				}));
+
 				gameconfig.push(ui.create.switcher('cheat',lib.config.cheat,ui.click.sidebar.cheat));
 				gameconfig.push(ui.create.switcher('auto_confirm',lib.config.auto_confirm,ui.click.sidebar.global));
 				gameconfig.push(ui.create.switcher('enable_drag',lib.config.enable_drag,ui.click.sidebar.global));
@@ -6609,6 +6674,12 @@ window.play={};
 				ui.handcardmousewheel=ui.create.switcher('mousewheel',lib.config.mousewheel,ui.click.sidebar.mousewheel);
 				if(lib.config.touchscreen) ui.handcardmousewheel.classList.add('disabled');
 				gameconfig.push(ui.handcardmousewheel);
+
+				gameconfig.push(ui.create.div('.placeholder'));
+				gameconfig.push(ui.create.switcher('background_music',lib.config.all.background_music,lib.config.background_music,ui.click.sidebar.background_music));
+				gameconfig.push(ui.create.switcher('background_audio',lib.config.background_audio,ui.click.sidebar.global));
+				gameconfig.push(ui.create.switcher('background_speak',lib.config.background_speak,ui.click.sidebar.global));
+				gameconfig.push(ui.create.div('.placeholder'));
 
 				if(lib.config.gameconfig){
 					for(i=0;i<gameconfig.length;i++){
@@ -8292,6 +8363,10 @@ window.play={};
 				global2:function(item){
 					game.saveConfig(this.name,item);
 					ui.sidebarrestart.classList.add('thundertext');
+				},
+				background_music:function(item){
+					game.saveConfig(this.name,item);
+					game.playBackgroundMusic();
 				},
 				cheat:function(bool){
 					if(lib.config.cheat&&bool==false){
