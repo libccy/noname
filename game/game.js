@@ -162,10 +162,7 @@ window.play={};
 						case 'duration':lib.config.duration=config2[i];break;
 						case 'hoveration':lib.config.hoveration=config2[i];break;
 						case 'character':lib.config.image.character=config2[i];break;
-						// case 'card':lib.config.image.card=config2[i];break;
-						// case 'card_font':lib.config.card_font=config2[i];break;
 						case 'background':lib.config.image.background=config2[i];break;
-						// case 'background_stretch':lib.config.image.background_stretch=config2[i];break;
 						case 'background_filter':lib.config.image.background_filter=config2[i];break;
 						case 'dynamic_background':lib.config.image.dynamic_background=config2[i];break;
 						case 'ui_zoom':lib.config.ui_zoom=config2[i];break;
@@ -181,7 +178,6 @@ window.play={};
 						case 'show_wuxie':lib.config.show_wuxie=config2[i];break;
 						case 'show_stat':lib.config.show_stat=config2[i];break;
 						case 'show_scrollbar':lib.config.show_scrollbar=config2[i];break;
-						// case 'handcard_scroll':lib.config.handcard_scroll=config2[i];break;
 						case 'mousewheel':lib.config.mousewheel=config2[i];break;
 						case 'fold_card':lib.config.fold_card=config2[i];break;
 						case 'touchscreen':lib.config.touchscreen=config2[i];break;
@@ -203,12 +199,8 @@ window.play={};
 						case 'gameconfig':lib.config.gameconfig=config2[i];break;
 						case 'modeconfig':lib.config.modeconfig=config2[i];break;
 						case 'appearence':lib.config.appearence=config2[i];break;
-						// case 'cardpack':lib.config.cardpack=config2[i];break;
-						// case 'characterpack':lib.config.characterpack=config2[i];break;
-						// case 'playpack':lib.config.playpack=config2[i];break;
 						case 'forbidlist':lib.config.forbidlist=config2[i];break;
 						case 'autoskilllist':lib.config.autoskilllist=config2[i];break;
-						// case 'forbidskill':lib.config.forbidskill=config2[i];break;
 						default:
 						if(i.indexOf('_character')==i.length-10&&i.length>10){
 							if(config2[i]){
@@ -236,6 +228,9 @@ window.play={};
 						}
 						else if(i.indexOf('_mode_config')!=-1&&i.substr(i.indexOf('_mode_config')+13)==lib.config.mode){
 							lib.config.mode_config[lib.config.mode][i.substr(0,i.indexOf('_mode_config'))]=config2[i];
+						}
+						else{
+
 						}
 					}
 				}
