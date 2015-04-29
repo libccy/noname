@@ -175,7 +175,6 @@ card.standard={
 			}
 		},
 		tao:{
-			audio:true,
 			fullskin:true,
 			type:'basic',
 			enable:function(card,player){
