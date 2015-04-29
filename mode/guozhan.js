@@ -638,6 +638,9 @@ mode.guozhan={
 				if(from.identity==toidentity){
 					if(get.totalPopulation(toidentity)+1<=get.population()/2) return 4+difficulty;
 				}
+				if(lib.character[from.name1][1]==toidentity){
+					if(get.totalPopulation(toidentity)+1<=get.population()/2) return 4+difficulty;
+				}
 				var groups=[];
 				for(var i=0;i<lib.group.length;i++){
 					groups.push(get.population(lib.group[i]));
@@ -671,8 +674,14 @@ mode.guozhan={
 				if(lib.character[from.name1][1]==to.identity){
 					if(get.totalPopulation(to.identity)+1<=get.population()/2) return 4+difficulty;
 				}
-
-				var att=ai.get.realAttitude(from,to.identity,difficulty);
+				var toidentity=to.identity;
+				if(toidentity=='unknown'){
+					toidentity=lib.character[to.name1][1];
+					if(get.population(toidentity)>=get.population()-2){
+						toidentity='ye';
+					}
+				}
+				var att=ai.get.realAttitude(from,toidentity,difficulty);
 				if(from.storage.zhibi&&from.storage.zhibi.contains(to)){
 					return att;
 				}
