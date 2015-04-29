@@ -57,6 +57,7 @@ card.standard={
 			}
 		},
 		sha:{
+			audio:true,
 			fullskin:true,
 			nature:['thunder','fire'],
 			type:'basic',
@@ -163,6 +164,7 @@ card.standard={
 			}
 		},
 		shan:{
+			audio:true,
 			fullskin:true,
 			type:'basic',
 			ai:{
@@ -173,6 +175,7 @@ card.standard={
 			}
 		},
 		tao:{
+			audio:true,
 			fullskin:true,
 			type:'basic',
 			enable:function(card,player){
@@ -382,6 +385,7 @@ card.standard={
 			skills:['qilin_skill']
 		},
 		wugu:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -441,6 +445,7 @@ card.standard={
 			}
 		},
 		taoyuan:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -469,6 +474,7 @@ card.standard={
 			}
 		},
 		nanman:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -519,6 +525,7 @@ card.standard={
 			}
 		},
 		wanjian:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -569,6 +576,7 @@ card.standard={
 			}
 		},
 		wuzhong:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -594,6 +602,7 @@ card.standard={
 			}
 		},
 		juedou:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -674,6 +683,7 @@ card.standard={
 			}
 		},
 		shunshou:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -729,6 +739,7 @@ card.standard={
 			}
 		},
 		guohe:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -775,6 +786,7 @@ card.standard={
 			}
 		},
 		jiedao:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -822,6 +834,7 @@ card.standard={
 			}
 		},
 		wuxie:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			ai:{
@@ -836,6 +849,7 @@ card.standard={
 			content:function(){},
 		},
 		lebu:{
+			audio:true,
 			fullskin:true,
 			type:'delay',
 			filterTarget:function(card,player,target){
@@ -872,6 +886,7 @@ card.standard={
 			}
 		},
 		shandian:{
+			audio:true,
 			fullskin:true,
 			type:'delay',
 			enable:function(card,player){

@@ -1,6 +1,7 @@
 card.extra={
 	card:{
 		jiu:{
+			audio:true,
 			fullskin:true,
 			type:"basic",
 			enable:true,
@@ -59,6 +60,7 @@ card.extra={
 			}
 		},
 		huogong:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -121,6 +123,7 @@ card.extra={
 			}
 		},
 		tiesuo:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -156,6 +159,7 @@ card.extra={
 			}
 		},
 		bingliang:{
+			audio:true,
 			fullskin:true,
 			type:'delay',
 			range:{global:1},
