@@ -321,7 +321,7 @@ character.diy={
 				return event.source!=undefined;
 			},
 			content:function(){
-				trigger.source.addSkill('benghuai');
+				trigger.source.loseMaxHp(true);
 			},
 			ai:{
 				threaten:function(player,target){
@@ -331,7 +331,7 @@ character.diy={
 					target:function(card,player,target,current){
 						if(target.hp<=1&&get.tag(card,'damage')){
 							if(player.skills.contains('jueqing')) return [1,-5];
-							return [1,0,0,-10];
+							return [1,0,0,-2];
 						}
 					}
 				}
@@ -774,7 +774,7 @@ character.diy={
 		honglian_info:'每当你受到来自其他角色的伤害，可以弃置伤害来源的所有红色牌',
 		jieyan_info:'出牌阶段限一次，你可以弃置一张红色手牌令场上所有角色受到一点火焰伤害',
 		diyguhuo_info:'锁定技，回合开始阶段，你摸两张牌，然后弃置区域内的两张牌',
-		diychanyuan_info:'锁定技，杀死你的角色获得技能【崩坏】',
+		diychanyuan_info:'锁定技，杀死你的角色失去一点体力上限',
 		zonghuo_info:'你可弃置一张牌将你即将造成的伤害变为火焰伤害',
 		shaoying_info:'每当你造成一次火焰伤害，可指定距离受伤害角色1以内的另一名角色，并展示牌堆顶的一张牌，若此牌为红色，该角色受到一点火焰伤害',
 		tiangong_info:'锁定技，你防止即将受到的雷电伤害，每当你造成一次雷电伤害，你摸一张牌',

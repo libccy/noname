@@ -434,17 +434,8 @@ mode.guozhan={
 					this.addSkill(skills[i]);
 				}
 				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
-					if((lib.character[this.name][2]+lib.character[this.name2][2])%2==1){
-						var next=game.createEvent('guozhanDraw');
-						next.player=this;
-						next.content=function(){
-							"step 0"
-							player.chooseBool('你的武将有单独的阴阳鱼，是否摸一张牌？');
-							"step 1"
-							if(result.bool){
-								player.draw();
-							}
-						}
+					if(this.singleHp){
+						this.doubleDraw();
 					}
 					if(this.perfectPair()){
 						var next=game.createEvent('guozhanDraw');

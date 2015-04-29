@@ -896,11 +896,7 @@ character.yijiang={
 					player.recover();
 				}
 				"step 2"
-				if(lib.config.mode!='guozhan'||player.maxHp>=4){
-					player.loseMaxHp();
-				}
-				if(player.hp>player.maxHp) player.hp=player.maxHp;
-				player.update();
+				player.loseMaxHp();
 				player.addSkill('paiyi');
 			}
 		},

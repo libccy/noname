@@ -240,9 +240,7 @@ character.refresh={
 				return false;
 			},
 			content:function(){
-				if(lib.config.mode!='guozhan'||player.maxHp>=4){
-					player.loseMaxHp();
-				}
+				player.loseMaxHp();
 				player.addSkill('gongxin');
 			}
 		},
@@ -938,9 +936,7 @@ character.refresh={
 			content:function(){
 				player.removeSkill('qianxin');
 				player.addSkill('jianyan');
-				if(lib.config.mode!='guozhan'||player.maxHp>=4){
-					player.loseMaxHp();
-				}
+				player.loseMaxHp();
 			}
 		},
 		jianyan:{

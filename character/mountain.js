@@ -65,9 +65,7 @@ character.mountain={
 					player.recover();
 				}
 				"step 2"
-				if(lib.config.mode!='guozhan'||player.maxHp>=4){
-					player.loseMaxHp();
-				}
+				player.loseMaxHp();
 				player.storage.zhiji=true;
 				if(player.hp>player.maxHp) player.hp=player.maxHp;
 				player.update();
@@ -472,9 +470,7 @@ character.mountain={
 				if(player.storage.tuntian) return player.storage.tuntian.length>=3&&!player.storage.zaoxian;
 			},
 			content:function(){
-				if(lib.config.mode!='guozhan'||player.maxHp>=4){
-					player.loseMaxHp();
-				}
+				player.loseMaxHp();
 				player.addSkill('jixi');
 				player.storage.zaoxian=true;
 			}
@@ -553,9 +549,7 @@ character.mountain={
 			priority:3,
 			group:'hunzi2',
 			content:function(){
-				if(lib.config.mode!='guozhan'||player.maxHp>=4){
-					player.loseMaxHp();
-				}
+				player.loseMaxHp();
 				if(player.hp>player.maxHp) player.loseHp();
 				player.addSkill('reyingzi');
 				delete player.tempSkills.yinghun;
@@ -793,36 +787,6 @@ character.mountain={
 				}
 			}
 		},
-		// fushen:{
-		// 	trigger:{player:'phaseBefore'},
-		// 	content:function(){
-		// 		"step 0"
-		// 		if(player.storage.fushen&&player.storage.fushen.classList.contains('dead')==false){
-		// 			if(player==game.me) game.swapPlayer(player.storage.fushen);
-		// 			else if(player.storage.fushen==game.me) game.swapPlayer(player);
-		// 			delete player.storage.fushen;
-		// 			event.finish();
-		// 		}
-		// 		else{
-		// 			player.chooseTarget(function(card,player,target){
-		// 				if(player==target) return false;
-		// 				return true;
-		// 			}).ai=function(){
-		// 				return -1;//1+Math.random();
-		// 			}
-		// 		}
-		// 		"step 1"
-		// 		if(result.bool){
-		// 			player.storage.fushen=result.targets[0];
-		// 			if(player==game.me){
-		// 				game.swapPlayer(result.targets[0]);
-		// 			}
-		// 			else if(result.targets[0]==game.me){
-		// 				game.swapPlayer(player);
-		// 			}
-		// 		}
-		// 	}
-		// },
 		huashen:{
 			unique:true,
 			forbid:['guozhan'],

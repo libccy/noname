@@ -1651,16 +1651,26 @@ window.play={};
 						player.dying(event);
 					}
 				},
+				doubleDraw:function(){
+					"step 0"
+					player.chooseBool('你的武将牌上有单独的阴阳鱼，是否摸一张牌？');
+					"step 1"
+					if(result.bool){
+						player.draw();
+					}
+				},
 				loseMaxHp:function(){
 					"step 0"
-					var forced=false;
-					for(var i=0;i<arguments.length;i++){
-						if(arguments[i]===true) forced=true;
-					}
 					game.log(get.translation(player)+'失去了'+get.cnNumber(num)+'点体力上限');
-					if(player.totalHp){
-						player.totalHp-=num;
-						player.maxHp=Math.floor(player.totalHp/2);
+					if(!event.forced&&typeof player.singleHp==='boolean'){
+						if(player.singleHp){
+							player.singleHp=false;
+							player.maxHp-=num-1;
+						}
+						else{
+							player.singleHp=true;
+							player.maxHp-=num;
+						}
 					}
 					else{
 						player.maxHp-=num;
@@ -1670,17 +1680,33 @@ window.play={};
 					if(player.maxHp<=0){
 						player.die();
 					}
+					"step 2"
+					if(!event.forced&&player.singleHp===true&&
+						!player.classList.contains('unseen')&&!player.classList.contains('unseen2')){
+						player.doubleDraw();
+					}
 				},
 				gainMaxHp:function(){
+					"step 0"
 					game.log(get.translation(player)+'获得了'+get.cnNumber(num)+'点体力上限');
-					if(player.totalHp){
-						player.totalHp+=num;
-						player.maxHp=Math.floor(player.totalHp/2);
+					if(typeof player.singleHp==='boolean'){
+						if(player.singleHp){
+							player.singleHp=false;
+							player.maxHp+=num;
+						}
+						else{
+							player.singleHp=true;
+							player.maxHp+=num-1;
+						}
 					}
 					else{
 						player.maxHp+=num;
 					}
 					player.update();
+					"step 1"
+					if(player.singleHp===true&&!player.classList.contains('unseen')&&!player.classList.contains('unseen2')){
+						player.doubleDraw();
+					}
 				},
 				changeHp:function(){
 					player.hp+=num;
@@ -1929,13 +1955,19 @@ window.play={};
 
 						this.node.avatar2.show();
 						this.name2=character2;
-						if(get.config('double_hp2')){
-							this.hp=get.config('double_hp2')(info[2],info2[2])
+						var hp1=info[2],hp2=info2[2];
+						switch(get.config('double_hp')){
+							case 'pingjun':{
+								this.maxHp=Math.floor((hp1+hp2)/2);
+								this.singleHp=((hp1+hp2)%2===1);
+								break;
+							}
+							case 'zuidazhi':this.maxHp=Math.max(hp1,hp2);break;
+							case 'zuixiaozhi':this.maxHp=Math.min(hp1,hp2);break;
+							case 'zonghe':this.maxHp=hp1+hp2;break;
+							default:this.maxHp=hp1+hp2-3;
 						}
-						else{
-							this.hp=info[2]+info2[2]-3;
-						}
-						this.maxHp=this.hp;
+						this.hp=this.maxHp;
 						this.node.count.classList.add('p2');
 						skills=skills.concat(info2[3]);
 					}
@@ -3133,6 +3165,12 @@ window.play={};
 					if(next.num<=0) _status.event.next.remove(next);
 					next.content=lib.element.playerproto.recover;
 				},
+				doubleDraw:function(){
+					var next=game.createEvent('doubleDraw');
+					next.player=this;
+					next.content=lib.element.playerproto.doubleDraw;
+					return next;
+				},
 				loseHp:function(num){
 					var next=game.createEvent('loseHp');
 					next.num=num;
@@ -3140,11 +3178,18 @@ window.play={};
 					if(next.num==undefined) next.num=1;
 					next.content=lib.element.playerproto.loseHp;
 				},
-				loseMaxHp:function(num){
+				loseMaxHp:function(){
 					var next=game.createEvent('loseMaxHp');
-					next.num=num;
 					next.player=this;
-					if(next.num==undefined) next.num=1;
+					next.num=1;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]==='number'){
+							next.num=arguments[i];
+						}
+						else if(typeof arguments[i]==='boolean'){
+							next.forced=arguments[i];
+						}
+					}
 					next.content=lib.element.playerproto.loseMaxHp;
 				},
 				gainMaxHp:function(num){
@@ -4329,7 +4374,14 @@ window.play={};
 				},
 				open:function(){
 					for(var i=0;i<ui.dialogs.length;i++){
-						if(ui.dialogs[i]==this) continue;
+						if(ui.dialogs[i]==this){
+							this.show();
+							this.refocus();
+							ui.dialogs.remove(this);
+							ui.dialogs.unshift(this);
+							ui.update();
+							return this;
+						}
 						if(ui.dialogs[i].static) ui.dialogs[i].unfocus();
 						else ui.dialogs[i].hide();
 					}
@@ -5564,6 +5616,9 @@ window.play={};
 				var end=player;
 				do{
 					player.draw(num,false).log=false;
+					if(player.singleHp===true&&!player.classList.contains('unseen')&&!player.classList.contains('unseen2')){
+						player.doubleDraw();
+					}
 					player=player.next;
 				}
 				while(player!=end);
@@ -9269,40 +9324,6 @@ window.play={};
 			}
 			return func;
 		},
-		doubleHp:function(hp){
-			var func;
-			if(hp=='pingjun'){
-				func=function(hp1,hp2){
-					return Math.floor((hp1+hp2)/2);
-				}
-			}
-			else if(hp=='hejiansan'){
-				func=function(hp1,hp2){
-					return hp1+hp2-3;
-				}
-			}
-			else if(hp=='zuidazhi'){
-				func=function(hp1,hp2){
-					return Math.max(hp1,hp2);
-				}
-			}
-			else if(hp=='zuixiaozhi'){
-				func=function(hp1,hp2){
-					return Math.min(hp1,hp2);
-				}
-			}
-			else if(hp=='zonghe'){
-				func=function(hp1,hp2){
-					return hp1+hp2;
-				}
-			}
-			else if(hp=='xiangcheng'){
-				func=function(hp1,hp2){
-					return hp1*hp2;
-				}
-			}
-			return func;
-		},
 		difficulty:function(){
 			switch(get.config('difficulty')){
 				case 'easy':return 1;
@@ -10647,7 +10668,6 @@ window.play={};
 				delete window.cheat;
 			}
 			lib.config.sort_card=get.sortCard(lib.config.sort);
-			lib.config.mode_config[lib.config.mode].double_hp2=get.doubleHp(get.config('double_hp'));
 			delete window.config;
 			delete window.mode;
 			delete window.card;

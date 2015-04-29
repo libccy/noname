@@ -833,7 +833,7 @@ character.gujian={
 				if(trigger.name=='die') num=2;
 				player.storage.zhaolu-=num;
 				if(player.storage.zhaolu<=0){
-					player.loseMaxHp();
+					player.loseMaxHp(true);
 					player.storage.zhaolu=Math.min(5,game.players.length);
 				}
 			},
