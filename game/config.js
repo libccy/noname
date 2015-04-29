@@ -21,6 +21,8 @@ window.config={
 		'september_bg','xueji_bg','yinxiang_bg','chunhui_bg',
 		'grass_bg','huangtian_bg'],
 		image_background_filter:['default','blur','gray','sepia','invert','saturate','contrast','hue','brightness'],
+		background_music:['music_default','music_diaochan','music_shezhan',
+			'music_danji','music_nizhan','music_jingshui','music_yaoshan','music_xingnian','music_off']
 	},
 	translate:{
 		identity:'身份',
@@ -69,6 +71,16 @@ window.config={
 		wuxing_play_config:'五行生克',
 		sanguozhi:'三国志',
 		online:'OL',
+		background_music_config:'背景音乐',
+		music_default:'默认',
+		music_diaochan:'貂蝉',
+		music_danji:'单骑',
+		music_shezhan:'舌战',
+		music_nizhan:'逆战',
+		music_yaoshan:'榣山',
+		music_jingshui:'静水',
+		music_xingnian:'星念',
+		music_off:'关闭',
 		blur:'模糊',
 		gray:'黑白',
 		sepia:'褪色',
@@ -200,6 +212,7 @@ window.config={
 	hover_all:true,
 	right_info:true,
 	long_info:true,
+	background_music:'music_default',
 
 
 	theme:'woodden',
