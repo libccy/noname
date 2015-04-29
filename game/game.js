@@ -161,10 +161,8 @@ window.play={};
 						case 'hover_handcard':lib.config.hover_handcard=config2[i];break;
 						case 'duration':lib.config.duration=config2[i];break;
 						case 'hoveration':lib.config.hoveration=config2[i];break;
-						case 'character':lib.config.image.character=config2[i];break;
-						case 'background':lib.config.image.background=config2[i];break;
-						case 'background_filter':lib.config.image.background_filter=config2[i];break;
-						case 'dynamic_background':lib.config.image.dynamic_background=config2[i];break;
+						case 'image_background':lib.config.image_background=config2[i];break;
+						case 'image_background_filter':lib.config.image_background_filter=config2[i];break;
 						case 'ui_zoom':lib.config.ui_zoom=config2[i];break;
 						case 'show_name':lib.config.show_name=config2[i];break;
 						case 'show_replay':lib.config.show_replay=config2[i];break;
@@ -176,21 +174,17 @@ window.play={};
 						case 'only_fullskin':lib.config.only_fullskin=config2[i];break;
 						case 'hide_card_image':lib.config.hide_card_image=config2[i];break;
 						case 'show_wuxie':lib.config.show_wuxie=config2[i];break;
-						case 'show_stat':lib.config.show_stat=config2[i];break;
 						case 'show_scrollbar':lib.config.show_scrollbar=config2[i];break;
 						case 'mousewheel':lib.config.mousewheel=config2[i];break;
 						case 'fold_card':lib.config.fold_card=config2[i];break;
 						case 'touchscreen':lib.config.touchscreen=config2[i];break;
 						case 'threed_card':lib.config.threed_card=config2[i];break;
 						case 'blur_ui':lib.config.blur_ui=config2[i];break;
-						case 'vertical_scroll':lib.config.vertical_scroll=config2[i];break;
 						case 'hide_history':lib.config.hide_history=config2[i];break;
 						case 'right_sidebar':lib.config.right_sidebar=config2[i];break;
 						case 'right_click':lib.config.right_click=config2[i];break;
 						case 'sort':lib.config.sort=config2[i];break;
 						case 'reverse_sort':lib.config.reverse_sort=config2[i];break;
-						case 'paused':lib.config.paused=config2[i];break;
-						case 'animation':lib.config.animation=config2[i];break;
 						case 'title':lib.config.title=config2[i];break;
 						case 'intro':lib.config.intro=config2[i];break;
 						case 'theme':lib.config.theme=config2[i];break;
@@ -245,7 +239,6 @@ window.play={};
 				ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout');
 				if(!lib.config.touchscreen){
 					if(lib.config.show_scrollbar) ui.css.scrollbar=lib.init.css('layout/default','scrollbar');
-					if(lib.config.vertical_scroll) lib.init.css('layout/default','vertical');
 				}
 				if(lib.config.fold_card) ui.css.fold=lib.init.css('layout/default','fold');
 				if(lib.config.threed_card) ui.css.threed=lib.init.css('layout/default','fold2');
@@ -1700,9 +1693,7 @@ window.play={};
 					}
 					player.changeHp(-num,false);
 					player.popup(-num,event.nature);
-					if(lib.config.animation){
-						player.$damage(source);
-					}
+					player.$damage(source);
 					event.trigger('damage');
 					"step 1"
 					if(player.hp<=0&&player.isAlive()){
@@ -1734,10 +1725,14 @@ window.play={};
 						if(arguments[i]===true) forced=true;
 					}
 					game.log(get.translation(player)+'失去了'+get.cnNumber(num)+'点体力上限');
-					if(!get.config('keep_max_hp')||forced){
-						player.maxHp-=num;
-						player.update();
+					if(player.totalHp){
+						player.totalHp-=num;
+						player.maxHp=Math.floor(player.totalHp/2);
 					}
+					else{
+						player.maxHp-=num;
+					}
+					player.update();
 					"step 1"
 					if(player.maxHp<=0){
 						player.die();
@@ -1745,10 +1740,14 @@ window.play={};
 				},
 				gainMaxHp:function(){
 					game.log(get.translation(player)+'获得了'+get.cnNumber(num)+'点体力上限');
-					if(!get.config('keep_max_hp')){
-						player.maxHp+=num;
-						player.update();
+					if(player.totalHp){
+						player.totalHp+=num;
+						player.maxHp=Math.floor(player.totalHp/2);
 					}
+					else{
+						player.maxHp+=num;
+					}
+					player.update();
 				},
 				changeHp:function(){
 					player.hp+=num;
@@ -1825,9 +1824,7 @@ window.play={};
 					if(player==game.me&&ui.auto){
 						ui.auto.hide();
 					}
-					if(lib.config.animation){
-						player.$die(source);
-					}
+					player.$die(source);
 				},
 				equip:function(){
 					"step 0"
@@ -3883,9 +3880,9 @@ window.play={};
 						ui.arena.appendChild(node);
 						node.hide();
 						node.style.transitionProperty='left,top,opacity';
-						if(lib.config.animation){
-							node.style.webkitTransform='rotate('+(Math.random()*16-8)+'deg)';
-						}
+
+						node.style.webkitTransform='rotate('+(Math.random()*16-8)+'deg)';
+
 						ui.arena.appendChild(node);
 						ui.refresh(node);
 						node.show();
@@ -4702,9 +4699,6 @@ window.play={};
 					}
 					player.ai.tempIgnore=[];
 					player.stat.push({card:{},skill:{}});
-					if(get.config('save_progress')&&game.saveProgress){
-						game.saveProgress(player);
-					}
 				},
 			},
 			_save:{
@@ -4967,7 +4961,7 @@ window.play={};
 			if(result===false) result='战斗失败';
 			if(result==undefined) result='战斗结束';
 			dialog=ui.create.dialog(result);
-			if(lib.config.show_stat){
+			if(true){
 				if(game.players.length){
 					table=document.createElement('table');
 					tr=document.createElement('tr');
@@ -5915,12 +5909,7 @@ window.play={};
 				key+='_mode_config_'+lib.config.mode;
 			}
 			else{
-				if(key=='character'||key=='background'||key=='background_stretch'||key=='background_filter'||key=='dynamic_background'){
-					lib.config.image[key]=value;
-				}
-				else{
-					lib.config[key]=value;
-				}
+				lib.config[key]=value;
 			}
 			config[key]=value;
 			localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
@@ -6296,7 +6285,6 @@ window.play={};
 					}
 					switcher.classList.add('onoff');
 					ui.create.div(ui.create.div(switcher));
-					// switcher.innerHTML=current?'开':'关';
 					switcher.link=current?true:false;
 					switcher.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.toggle);
 				}
@@ -6418,10 +6406,12 @@ window.play={};
 				lib.config.hide_history=false;
 				if(lib.config.right_sidebar) ui.sidebar.classList.add('right');
 				ui.config=ui.create.div('#sidebar2.content');
-				ui.config.listen(function(){_status.clicked=true;})
-				// var gamemode=ui.create.switcher('mode',lib.config.all.mode,lib.config.mode,ui.click.sidebar.mode);
-				// gamemode.classList.add('line2');
-				// ui.config.appendChild(gamemode);
+				ui.config.listen(function(){_status.clicked=true;});
+				ui.config.oncontextmenu=function(e){
+					e.stopPropagation();
+					return false;
+				};
+
 				ui.sidebar.ontouchstart=ui.click.touchStart;
 				ui.config.ontouchstart=ui.click.touchStart;
 				ui.sidebar.ontouchmove = ui.click.touchScroll;
@@ -6528,18 +6518,18 @@ window.play={};
 				}));
 				for(i in lib.config.current_mode){
 					if(i=='difficulty'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.difficulty));
+						modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.local));
 					}
 					else if(i=='initshow_draw'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('initshow_draw',[0,1,2],get.config('initshow_draw'),ui.click.sidebar.initshow_draw));
+						modeconfig.push(ui.create.switcher('initshow_draw',[0,1,2],get.config('initshow_draw'),ui.click.sidebar.local));
 					}
 					else if(i=='ai_strategy'&&lib.config.current_mode[i]==true){
 						modeconfig.push(ui.create.switcher('ai_strategy',
 							['ai_strategy_1','ai_strategy_2','ai_strategy_3','ai_strategy_4','ai_strategy_5','ai_strategy_6'],
-							get.config('ai_strategy'),ui.click.sidebar.ai_strategy));
+							get.config('ai_strategy'),ui.click.sidebar.local));
 					}
 					else if(i=='ai_identity'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('ai_identity',get.config('ai_identity'),ui.click.sidebar.ai_identity));
+						modeconfig.push(ui.create.switcher('ai_identity',get.config('ai_identity'),ui.click.sidebar.local));
 					}
 					else if(i=='auto_identity'&&lib.config.current_mode[i]==true){
 						modeconfig.push(ui.create.switcher('auto_identity',['一轮','两轮','三轮','关闭'],get.config('auto_identity'),ui.click.sidebar.auto_identity));
@@ -6548,16 +6538,16 @@ window.play={};
 						modeconfig.push(ui.create.switcher('player_number',[2,3,4,5,6,7,8],get.config('player_number'),ui.click.sidebar.player_number));
 					}
 					else if(i=='double_character'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('double_character',get.config('double_character'),ui.click.sidebar.double_character));
+						modeconfig.push(ui.create.switcher('double_character',get.config('double_character'),ui.click.sidebar.local2));
 					}
 					else if(i=='double_hp'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('double_hp',lib.config.all.double_hp,get.config('double_hp'),ui.click.sidebar.double_hp));
+						modeconfig.push(ui.create.switcher('double_hp',lib.config.all.double_hp,get.config('double_hp'),ui.click.sidebar.local2));
 					}
 					else if(i=='free_choose'&&lib.config.current_mode[i]==true){
 						modeconfig.push(ui.create.switcher('free_choose',get.config('free_choose'),ui.click.sidebar.free_choose));
 					}
 					else if(i=='change_card'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('change_card',get.config('change_card'),ui.click.sidebar.change_card));
+						modeconfig.push(ui.create.switcher('change_card',get.config('change_card'),ui.click.sidebar.local));
 					}
 					else if(i=='change_choice'&&lib.config.current_mode[i]==true){
 						modeconfig.push(ui.create.switcher('change_choice',get.config('change_choice'),ui.click.sidebar.change_choice));
@@ -6572,96 +6562,17 @@ window.play={};
 						modeconfig.push(ui.create.switcher('revive',get.config('revive'),ui.click.sidebar.revive));
 					}
 					else if(i=='dierestart'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('dierestart',get.config('dierestart'),ui.click.sidebar.dierestart));
-					}
-					else if(i=='keep_max_hp'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('keep_max_hp',get.config('keep_max_hp'),ui.click.sidebar.keep_max_hp));
+						modeconfig.push(ui.create.switcher('dierestart',get.config('dierestart'),ui.click.sidebar.local2));
 					}
 					else if(i=='ban_weak'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('ban_weak',get.config('ban_weak'),ui.click.sidebar.ban_weak));
+						modeconfig.push(ui.create.switcher('ban_weak',get.config('ban_weak'),ui.click.sidebar.local2));
 					}
 					else if(i=='enhance_zhu'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('enhance_zhu',get.config('enhance_zhu'),ui.click.sidebar.enhance_zhu));
+						modeconfig.push(ui.create.switcher('enhance_zhu',get.config('enhance_zhu'),ui.click.sidebar.local2));
 					}
 					else if(i=='strict_sort'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.strict_sort));
+						modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
 						modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));
-					}
-					else if(i=='save_progress'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('save_progress',get.config('save_progress'),ui.click.sidebar.save_progress));
-						var node=ui.create.div('.config');
-						modeconfig.push(node);
-						ui.create.div(node).innerHTML='清除进度';
-						node.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-							var node2=ui.create.div('.toggle',this).animate('start');
-							node2.innerHTML='已清除';
-							setTimeout(function(){node2.delete()},1000);
-							if(game.clearProgress){
-								game.clearProgress();
-							}
-							else{
-								game.save();
-							}
-						});
-						var node1=ui.create.div('.config');
-						modeconfig.push(node1);
-						ui.create.div(node1).innerHTML='导出进度';
-						var node2=ui.create.div('.config');
-						node2.contentEditable=true;
-						node2.style.backgroundColor='rgba(255,255,255,0.5';
-						var node3=ui.create.div('.config');
-						node3.contentEditable=true;
-						node3.style.backgroundColor='rgba(255,255,255,0.5';
-						node1.listen(function(){
-							if(this.clicked) return;
-							if(this.fold){
-								this.fold=false;
-								node2.delete();
-							}
-							else{
-								node2.innerHTML=lib.init.encode(localStorage.getItem(lib.configprefix+lib.config.mode));
-								this.clicked=true;
-								this.fold=true;
-								this.parentNode.insertBefore(node2.animate('start'),this.nextSibling);
-								var that=this;
-								setTimeout(function(){that.clicked=false},500);
-							}
-						});
-						var node4=ui.create.div('.config');
-						modeconfig.push(node4);
-						ui.create.div(node4).innerHTML='导入进度';
-						node4.listen(function(){
-							if(this.clicked) return;
-							if(this.fold){
-								this.fold=false;
-								node3.delete();
-								var modestorage;
-								try{
-									modestorage=JSON.parse(lib.init.decode(node3.innerHTML));
-									if(typeof modestorage!='object') throw('err');
-									if(game.minversion&&modestorage.version<game.minversion) throw('err');
-								}
-								catch(err){
-									return;
-								};
-								if(modestorage){
-									localStorage.setItem(lib.configprefix+lib.config.mode,JSON.stringify(modestorage));
-									lib.storage=modestorage;
-									window.location.reload();
-								}
-							}
-							else{
-								node3.innerHTML='';
-								this.clicked=true;
-								this.fold=true;
-								this.parentNode.insertBefore(node3.animate('start'),this.nextSibling);
-								var that=this;
-								setTimeout(function(){that.clicked=false},500);
-							}
-						});
-						node3.onkeydown=function(e){
-							if(e.keyCode==13) node4.click();
-						}
 					}
 				}
 				if(lib.config.modeconfig){
@@ -6686,27 +6597,22 @@ window.play={};
 
 				}));
 				gameconfig.push(ui.create.switcher('cheat',lib.config.cheat,ui.click.sidebar.cheat));
-				// gameconfig.push(ui.create.switcher('auto_skill',lib.config.auto_skill,ui.click.sidebar.auto_skill));
-				gameconfig.push(ui.create.switcher('auto_confirm',lib.config.auto_confirm,ui.click.sidebar.auto_confirm));
-				gameconfig.push(ui.create.switcher('enable_drag',lib.config.enable_drag,ui.click.sidebar.enable_drag));
-				gameconfig.push(ui.create.switcher('duration',[500,700,1000],lib.config.duration,ui.click.sidebar.duration));
-				gameconfig.push(ui.create.switcher('hoveration',[700,1000,1500],lib.config.hoveration,ui.click.sidebar.hoveration));
+				gameconfig.push(ui.create.switcher('auto_confirm',lib.config.auto_confirm,ui.click.sidebar.global));
+				gameconfig.push(ui.create.switcher('enable_drag',lib.config.enable_drag,ui.click.sidebar.global));
+				gameconfig.push(ui.create.switcher('duration',[500,700,1000],lib.config.duration,ui.click.sidebar.global));
+				gameconfig.push(ui.create.switcher('hoveration',[700,1000,1500],lib.config.hoveration,ui.click.sidebar.global));
 				gameconfig.push(ui.create.div('.placeholder'));
-				gameconfig.push(ui.create.switcher('right_click',['pause','config','auto'],lib.config.right_click,ui.click.sidebar.right_click));
-				gameconfig.push(ui.create.switcher('right_info',lib.config.right_info,ui.click.sidebar.right_info));
+				gameconfig.push(ui.create.switcher('right_click',['pause','config','auto'],lib.config.right_click,ui.click.sidebar.global));
+				gameconfig.push(ui.create.switcher('right_info',lib.config.right_info,ui.click.sidebar.global2));
 				gameconfig.push(ui.create.switcher('hover_all',lib.config.hover_all,ui.click.sidebar.hover_all));
-				ui.hoverhandcardconfig=ui.create.switcher('hover_handcard',lib.config.hover_handcard,ui.click.sidebar.hover_handcard);
+				ui.hoverhandcardconfig=ui.create.switcher('hover_handcard',lib.config.hover_handcard,ui.click.sidebar.global);
 				gameconfig.push(ui.hoverhandcardconfig);
 				if(!lib.config.hover_all) ui.hoverhandcardconfig.classList.add('disabled');
-				// gameconfig.push(ui.create.switcher('long_info',lib.config.long_info,ui.click.sidebar.long_info));
 				gameconfig.push(ui.create.switcher('touchscreen',lib.config.touchscreen,ui.click.sidebar.touchscreen));
 				ui.handcardmousewheel=ui.create.switcher('mousewheel',lib.config.mousewheel,ui.click.sidebar.mousewheel);
 				if(lib.config.touchscreen) ui.handcardmousewheel.classList.add('disabled');
 				gameconfig.push(ui.handcardmousewheel);
 
-				// var gameversion=ui.create.div('.config');
-				// gameconfig.push(gameversion);
-				// ui.create.div(gameversion).innerHTML='版本：'+lib.config.version;
 				if(lib.config.gameconfig){
 					for(i=0;i<gameconfig.length;i++){
 						ui.config.appendChild(gameconfig[i]);
@@ -6721,7 +6627,6 @@ window.play={};
 					default:ui.window.style.zoom=1;
 				}
 
-				// ui.config.appendChild(ui.create.div('.placeholder'));
 				var appearence=[];
 				appearence._configstr='appearence';
 				folditems.push(appearence);
@@ -6738,34 +6643,26 @@ window.play={};
 				}));
 				appearence.push(ui.create.switcher('theme',lib.config.all.theme,lib.config.theme,ui.click.sidebar.theme));
 				appearence.push(ui.create.switcher('layout',lib.config.all.layout,lib.config.layout,ui.click.sidebar.layout));
-				// appearence.push(ui.create.switcher('character',lib.config.all.image.character,lib.config.image.character,ui.click.sidebar.character));
-				appearence.push(ui.create.switcher('background',lib.config.all.image.background,lib.config.image.background,ui.click.sidebar.background));
-				appearence.push(ui.create.switcher('background_filter',lib.config.all.image.background_filter,lib.config.image.background_filter,ui.click.sidebar.background_filter));
-				// appearence.push(ui.create.switcher('background_stretch',lib.config.image.background_stretch,ui.click.sidebar.background_stretch));
-				// appearence.push(ui.create.switcher('dynamic_background',lib.config.all.image.dynamic_background,lib.config.image.dynamic_background,ui.click.sidebar.dynamic_background));
-				// appearence.push(ui.create.switcher('paused',lib.config.paused,ui.click.sidebar.paused));
+				appearence.push(ui.create.switcher('image_background',lib.config.all.image_background,lib.config.image_background,ui.click.sidebar.image_background));
+				appearence.push(ui.create.switcher('image_background_filter',lib.config.all.image_background_filter,lib.config.image_background_filter,ui.click.sidebar.image_background_filter));
 				appearence.push(ui.create.switcher('ui_zoom',['极小','很小','较小','原始','较大','很大'],lib.config.ui_zoom,ui.click.sidebar.ui_zoom));
 
 				appearence.push(ui.create.div('.placeholder'));
-				appearence.push(ui.create.switcher('only_fullskin',lib.config.only_fullskin,ui.click.sidebar.only_fullskin));
-				appearence.push(ui.create.switcher('hide_card_image',lib.config.hide_card_image,ui.click.sidebar.hide_card_image));
+				appearence.push(ui.create.switcher('only_fullskin',lib.config.only_fullskin,ui.click.sidebar.global2));
+				appearence.push(ui.create.switcher('hide_card_image',lib.config.hide_card_image,ui.click.sidebar.global2));
 				appearence.push(ui.create.switcher('show_name',lib.config.show_name,ui.click.sidebar.show_name));
 				appearence.push(ui.create.switcher('show_replay',lib.config.show_replay,ui.click.sidebar.show_replay));
 				appearence.push(ui.create.switcher('show_playerids',lib.config.show_playerids,ui.click.sidebar.show_playerids));
 				appearence.push(ui.create.switcher('show_pause',lib.config.show_pause,ui.click.sidebar.show_pause));
 				appearence.push(ui.create.switcher('show_auto',lib.config.show_auto,ui.click.sidebar.show_auto));
 				appearence.push(ui.create.switcher('show_wuxie',lib.config.show_wuxie,ui.click.sidebar.show_wuxie));
-				// appearence.push(ui.create.switcher('show_stat',lib.config.show_stat,ui.click.sidebar.show_stat));
 				appearence.push(ui.create.div('.placeholder'));
 				appearence.push(ui.create.switcher('title',lib.config.title,ui.click.sidebar.title));
 
-				// appearence.push(ui.create.switcher('show_scrollbar',lib.config.show_scrollbar,ui.click.sidebar.show_scrollbar));
-				// appearence.push(ui.create.switcher('handcard_scroll',[0,100,300,800],lib.config.handcard_scroll,ui.click.sidebar.handcard_scroll));
 				appearence.push(ui.create.switcher('fold_card',lib.config.fold_card,ui.click.sidebar.fold_card));
 				appearence.push(ui.create.switcher('threed_card',lib.config.threed_card,ui.click.sidebar.threed_card));
 				appearence.push(ui.create.switcher('blur_ui',lib.config.blur_ui,ui.click.sidebar.blur_ui));
-				// appearence.push(ui.create.switcher('animation',lib.config.animation,ui.click.sidebar.animation));
-				// appearence.push(ui.create.switcher('right_sidebar',lib.config.right_sidebar,ui.click.sidebar.right_sidebar));
+				appearence.push(ui.create.switcher('right_sidebar',lib.config.right_sidebar,ui.click.sidebar.right_sidebar));
 
 				// appearence.push(ui.create.div('.placeholder'));
 				// appearence.push(ui.create.switcher('intro',['⦿','☯','●','❖','✻','i'],lib.config.intro,ui.click.sidebar.intro));
@@ -7293,7 +7190,6 @@ window.play={};
 				setTimeout(function(){
 					_status.pausing=false;
 				},500);
-				if(!lib.config.paused) node.style.background='none';
 				if(lib.config.touchscreen){
 					setTimeout(function(){
 						node.addEventListener('touchend',ui.click.resume);
@@ -7923,13 +7819,11 @@ window.play={};
 				if(this.link){
 					this.link=false;
 					this.classList.remove('on');
-					// this.innerHTML='关';
 					if(this.additionalCommand) this.additionalCommand(false,this.parentNode);
 				}
 				else{
 					this.link=true;
 					this.classList.add('on');
-					// this.innerHTML='开';
 					if(this.additionalCommand) this.additionalCommand(true,this.parentNode);
 				}
 			},
@@ -7959,6 +7853,7 @@ window.play={};
 			},
 			choice:function(){
 				if(_status.dragged) return;
+				if(!_status.choosing) return;
 				_status.choosing.link=this.link;
 				_status.choosing.innerHTML=get.translation(this.link);
 				this.parentNode.parentNode.style.height='';
@@ -8338,13 +8233,15 @@ window.play={};
 				// ui.arena.classList.add('paused');
 				if(lib.config.right_sidebar) ui.arena.classList.add('left');
 				else ui.arena.classList.add('right');
-				ui.create.div("#click",ui.window).listen(ui.click.config2);
+				var configbg=ui.create.div("#click",ui.window);
+				configbg.listen(ui.click.config2);
+				configbg.oncontextmenu=ui.click.config2;
 				setTimeout(function(){
 					ui.config.animate('start');
 					ui.window.appendChild(ui.config);
 				},100);
 			},
-			config2:function(){
+			config2:function(e){
 				_status.clicked=true;
 				ui.system.show();
 				ui.arena.classList.remove('right');
@@ -8355,6 +8252,8 @@ window.play={};
 				if(_status.config2){
 					game.resume2();
 				}
+				e.stopPropagation();
+				return false;
 			},
 			swap:function(){
 				if(_status.dragged) return;
@@ -8410,6 +8309,20 @@ window.play={};
 				}
 			},
 			sidebar:{
+				local:function(item){
+					game.saveConfig(this.name,item,true);
+				},
+				local2:function(item){
+					game.saveConfig(this.name,item,true);
+					ui.sidebarrestart.classList.add('thundertext');
+				},
+				global:function(item){
+					game.saveConfig(this.name,item);
+				},
+				global2:function(item){
+					game.saveConfig(this.name,item);
+					ui.sidebarrestart.classList.add('thundertext');
+				},
 				cheat:function(bool){
 					if(lib.config.cheat&&bool==false){
 						lib.cheat=window.cheat;
@@ -8436,9 +8349,6 @@ window.play={};
 						delete ui.cheat2;
 					}
 				},
-				change_card:function(bool){
-					game.saveConfig('change_card',bool,true);
-				},
 				change_identity:function(bool){
 					game.saveConfig('change_identity',bool,true);
 					if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -8455,9 +8365,6 @@ window.play={};
 					}
 					ui.update();
 				},
-				save_progress:function(bool){
-					game.saveConfig('save_progress',bool,true);
-				},
 				change_choice:function(bool){
 					game.saveConfig('change_choice',bool,true);
 					if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -8467,26 +8374,9 @@ window.play={};
 						delete ui.cheat;
 					}
 				},
-				difficulty:function(bool){
-					game.saveConfig('difficulty',bool,true);
-				},
-				initshow_draw:function(bool){
-					game.saveConfig('initshow_draw',bool,true);
-				},
-				ai_strategy:function(strategy){
-					game.saveConfig('ai_strategy',strategy,true);
-				},
-				ai_identity:function(strategy){
-					game.saveConfig('ai_identity',strategy,true);
-				},
 				player_number:function(num){
 					game.saveConfig('player_number',num,true);
 					window.location.reload();
-				},
-				double_character:function(bool){
-					lib.config.mode_config[lib.config.mode].double_character=bool;
-					game.saveConfig('double_character',bool,true);
-					ui.sidebarrestart.classList.add('thundertext');
 				},
 				auto_identity:function(bool){
 					game.saveConfig('auto_identity',bool,true);
@@ -8502,10 +8392,6 @@ window.play={};
 						game.showIdentity();
 					}
 				},
-				double_hp:function(hp){
-					game.saveConfig('double_hp',hp,true);
-					ui.sidebarrestart.classList.add('thundertext');
-				},
 				swap:function(bool){
 					game.saveConfig('swap',bool,true);
 					if(get.config('swap')){
@@ -8517,20 +8403,6 @@ window.play={};
 						ui.swap.close();
 						delete ui.swap;
 					}
-				},
-				keep_max_hp:function(bool){
-					game.saveConfig('keep_max_hp',bool,true);
-				},
-				dierestart:function(bool){
-					game.saveConfig('dierestart',bool,true);
-				},
-				ban_weak:function(bool){
-					game.saveConfig('ban_weak',bool,true);
-					ui.sidebarrestart.classList.add('thundertext');
-				},
-				enhance_zhu:function(bool){
-					game.saveConfig('enhance_zhu',bool,true);
-					ui.sidebarrestart.classList.add('thundertext');
 				},
 				revive:function(bool){
 					game.saveConfig('revive',bool,true);
@@ -8544,29 +8416,11 @@ window.play={};
 						delete ui.revive;
 					}
 				},
-				auto_skill:function(bool){
-					game.saveConfig('auto_skill',bool);
-				},
-				auto_confirm:function(bool){
-					game.saveConfig('auto_confirm',bool);
-				},
-				enable_drag:function(bool){
-					game.saveConfig('enable_drag',bool);
-				},
-				hover_handcard:function(bool){
-					game.saveConfig('hover_handcard',bool);
-				},
 				hover_all:function(bool){
 					game.saveConfig('hover_all',bool);
 					if(!lib.config.hover_all) ui.hoverhandcardconfig.classList.add('disabled');
 					else ui.hoverhandcardconfig.classList.remove('disabled');
 					ui.sidebarrestart.classList.add('thundertext');
-				},
-				duration:function(time){
-					game.saveConfig('duration',time);
-				},
-				hoveration:function(time){
-					game.saveConfig('hoveration',time);
 				},
 				theme:function(theme){
 					game.saveConfig('theme',theme);
@@ -8588,61 +8442,39 @@ window.play={};
 						setTimeout(function(){layout.remove();ui.arena.show();},100);
 					},500);
 				},
-				character:function(character){
-					game.saveConfig('character',character);
-				},
-				background:function(background){
-					var animate=lib.config.image.background=='default';
-					game.saveConfig('background',background);
+				image_background:function(background){
+					var animate=lib.config.image_background=='default';
+					game.saveConfig('image_background',background);
 					ui.background.delete();
 					ui.background=ui.create.div('.background');
-					if(lib.config.image.background_filter){
-						switch (lib.config.image.background_filter){
-							case 'blur':ui.background.style.webkitFilter='blur(8px)';
-								ui.background.style.webkitTransform='scale(1.05)';break;
-							case 'gray':ui.background.style.webkitFilter='grayscale(1)';break;
-							case 'sepia':ui.background.style.webkitFilter='sepia(0.5)';break;
-							case 'invert':ui.background.style.webkitFilter='invert(1)';break;
-							case 'saturate':ui.background.style.webkitFilter='saturate(5)';break;
-							case 'contrast':ui.background.style.webkitFilter='contrast(1.4)';break;
-							case 'hue':ui.background.style.webkitFilter='hue-rotate(180deg)';break;
-							case 'brightness':ui.background.style.webkitFilter='brightness(5)';break;
-							default:ui.background.style.webkitFilter='';
-							ui.background.style.webkitTransform='';
-						}
+
+					switch (lib.config.image_background_filter){
+						case 'blur':ui.background.style.webkitFilter='blur(8px)';
+							ui.background.style.webkitTransform='scale(1.05)';break;
+						case 'gray':ui.background.style.webkitFilter='grayscale(1)';break;
+						case 'sepia':ui.background.style.webkitFilter='sepia(0.5)';break;
+						case 'invert':ui.background.style.webkitFilter='invert(1)';break;
+						case 'saturate':ui.background.style.webkitFilter='saturate(5)';break;
+						case 'contrast':ui.background.style.webkitFilter='contrast(1.4)';break;
+						case 'hue':ui.background.style.webkitFilter='hue-rotate(180deg)';break;
+						case 'brightness':ui.background.style.webkitFilter='brightness(5)';break;
+						default:ui.background.style.webkitFilter='';
+						ui.background.style.webkitTransform='';
 					}
+
 					document.body.insertBefore(ui.background,document.body.firstChild);
 					if(animate) ui.background.animate('start');
-					if(lib.config.image.background=='default'){
+					if(lib.config.image_background=='default'){
 						ui.background.style.backgroundImage="none";
 					}
 					else{
-						ui.background.style.backgroundImage="url('image/background/"+lib.config.image.background+".jpg')";
+						ui.background.style.backgroundImage="url('image/background/"+lib.config.image_background+".jpg')";
 					}
-					// if(lib.config.image.background_stretch){
-						ui.background.style.backgroundSize='cover';
-					// }
-					// else{
-					// 	ui.background.style.backgroundSize='';
-					// }
+					ui.background.style.backgroundSize='cover';
 				},
-				background_stretch:function(bool){
-					game.saveConfig('background_stretch',bool);
-					if(lib.config.image.background_stretch){
-						ui.background.style.backgroundSize='cover';
-					}
-					else{
-						ui.background.style.backgroundSize='';
-					}
-				},
-				background_filter:function(filter){
-					game.saveConfig('background_filter',filter);
-					ui.click.sidebar.background(lib.config.image.background);
-				},
-				dynamic_background:function(choice){
-					game.saveConfig('dynamic_background',choice);
-					if(choice=='none'&&ui.dynamicBackground) ui.dynamicBackground.hide();
-					else if(ui.dynamicBackground&&choice==ui.dynamicBackground.animation) ui.dynamicBackground.show();
+				image_background_filter:function(filter){
+					game.saveConfig('image_background_filter',filter);
+					ui.click.sidebar.image_background(lib.config.image_background);
 				},
 				ui_zoom:function(zoom){
 					game.saveConfig('ui_zoom',zoom);
@@ -8687,14 +8519,6 @@ window.play={};
 						ui.playerids.style.display='none';
 					}
 				},
-				only_fullskin:function(bool){
-					game.saveConfig('only_fullskin',bool);
-					ui.sidebarrestart.classList.add('thundertext');
-				},
-				hide_card_image:function(bool){
-					game.saveConfig('hide_card_image',bool);
-					ui.sidebarrestart.classList.add('thundertext');
-				},
 				show_auto:function(bool){
 					game.saveConfig('show_auto',bool);
 					if(lib.config.show_auto){
@@ -8703,14 +8527,6 @@ window.play={};
 					else{
 						ui.auto.style.display='none';
 					}
-				},
-				right_info:function(bool){
-					game.saveConfig('right_info',bool);
-					ui.sidebarrestart.classList.add('thundertext');
-				},
-				long_info:function(bool){
-					game.saveConfig('long_info',bool);
-					ui.sidebarrestart.classList.add('thundertext');
 				},
 				show_wuxie:function(bool){
 					game.saveConfig('show_wuxie',bool);
@@ -8731,9 +8547,6 @@ window.play={};
 						ui.pause.style.display='none';
 						ui.auto.style.marginLeft='';
 					}
-				},
-				show_stat:function(bool){
-					game.saveConfig('show_stat',bool);
 				},
 				show_scrollbar:function(bool){
 					game.saveConfig('show_scrollbar',bool);
@@ -8757,16 +8570,14 @@ window.play={};
 						game.me.node.handcards2.onmousewheel=null;
 					}
 				},
-				touchscreen:function(bool){
+				touchscreen:function (bool){
 					game.saveConfig('touchscreen',bool);
 					if(bool){
 						game.saveConfig('confirmtouch',false);
 						ui.handcardmousewheel.classList.add('disabled');
-						// ui.handcardmousewheel.style.display='none';
 					}
 					else{
 						ui.handcardmousewheel.classList.remove('disabled');
-						// ui.handcardmousewheel.style.display='';
 					}
 					ui.sidebarrestart.classList.add('thundertext');
 				},
@@ -8797,9 +8608,6 @@ window.play={};
 						ui.css.blur_ui.remove();
 					}
 				},
-				vertical_scroll:function(bool){
-					game.saveConfig('vertical_scroll',bool);
-				},
 				right_sidebar:function(bool){
 					game.saveConfig('right_sidebar',bool);
 					if(bool){
@@ -8817,32 +8625,9 @@ window.play={};
 						ui.system.appendChild(ui.system2);
 					}
 				},
-				paused:function(bool){
-					game.saveConfig('paused',bool);
-				},
 				title:function(bool){
 					game.saveConfig('title',bool);
 					if(!lib.config.title) document.title='无名杀';
-				},
-				animation:function(bool){
-					game.saveConfig('animation',bool);
-				},
-				intro:function(bool){
-					game.saveConfig('intro',bool);
-					var players=get.players(false,true);
-					for(var i=0;i<players.length;i++){
-						if(players[i].node.intro.innerHTML){
-							players[i].node.intro.innerHTML=lib.config.intro;
-						}
-					}
-				},
-				mode:function(mode){
-					game.saveConfig('mode',mode);
-					ui.arena.hide();
-					ui.config.hide();
-					setTimeout(function(){
-						window.location.reload();
-					},500);
 				},
 				characters:function(bool,node){
 					game.saveConfig(node.link,bool);
@@ -8871,9 +8656,6 @@ window.play={};
 						list.add(node.link);
 					}
 					game.saveConfig('autoskilllist',list);
-				},
-				right_click:function(func){
-					game.saveConfig('right_click',func);
 				},
 				sort:function(func){
 					game.saveConfig('sort',func);
@@ -8912,9 +8694,6 @@ window.play={};
 					for(i=0;i<cards2.length;i++){
 						game.me.node.handcards1.appendChild(cards2[i]);
 					}
-				},
-				strict_sort:function(bool){
-					game.saveConfig('strict_sort',bool,true);
 				}
 			},
 			rightplayer:function(e){
@@ -10391,7 +10170,7 @@ window.play={};
 		HTMLDivElement.prototype.setBackground=function(name,type){
 			var src;
 			if(type){
-				src='image/'+type+'/'+lib.config.image[type]+'/'+name+'.jpg';
+				src='image/'+type+'/default/'+name+'.jpg';
 			}
 			else{
 				src='image/'+name+'.jpg';
