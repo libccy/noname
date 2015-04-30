@@ -36,13 +36,17 @@ mode.versus={
 
 					ui.versusreplace=ui.create.system('换人',null,true);
 					ui.versushs=ui.create.system('手牌',null,true);
-					ui.versusreplace.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverReplace);
-					ui.versushs.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverHandcards);
+					lib.setPopped(ui.versusreplace,game.versusHoverReplace);
+					lib.setPopped(ui.versushs,game.versusHoverHandcards);
+					// ui.versusreplace.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverReplace);
+					// ui.versushs.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverHandcards);
 				}
 				_status.friendCount=ui.create.system('我方阵亡：'+get.cnNumber(0),null,true);
 				_status.enemyCount=ui.create.system('敌方阵亡：'+get.cnNumber(0),null,true);
-				_status.friendCount.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverFriend);
-				_status.enemyCount.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverEnemy);
+				lib.setPopped(_status.friendCount,game.versusHoverFriend);
+				lib.setPopped(_status.enemyCount,game.versusHoverEnemy);
+				// _status.friendCount.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverFriend);
+				// _status.enemyCount.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverEnemy);
 
 				if(lib.storage.zhu){
 					_status.currentSide=true;
@@ -628,18 +632,7 @@ mode.versus={
 			}
 		},
 		versusHoverEnemy:function(e){
-			if(this._uiintro){
-				return;
-			}
-			if(ui.versushover&&ui.versushover._uiintro){
-				ui.versushover._uiintro.delete();
-				delete ui.versushover._uiintro;
-			}
-			ui.versushover=this;
 			var uiintro=ui.create.dialog('hidden');
-			uiintro.classList.add('popped');
-			uiintro.classList.add('static');
-			this._uiintro=uiintro;
 
 			if(_status.enemyDied.length){
 				uiintro.add('已阵亡');
@@ -654,33 +647,10 @@ mode.versus={
 				uiintro.add('（无）')
 			}
 
-			ui.window.appendChild(uiintro);
-			uiintro.style.width='330px';
-			uiintro.style.height=Math.min(ui.window.offsetHeight-260,uiintro.content.scrollHeight)+'px';
-			uiintro.style.top='50px';
-			uiintro.style.left=(_status.enemyCount.parentNode.offsetLeft+_status.enemyCount.offsetLeft+
-				_status.enemyCount.offsetWidth-330)+'px';
-			uiintro.addEventListener(lib.config.touchscreen?'touchend':'mouseleave',function(){
-				if(_status.dragged) return;
-				this.delete();
-				setTimeout(function(){
-					delete _status.enemyCount._uiintro;
-				},500);
-			})
+			return uiintro;
 		},
 		versusHoverFriend:function(e){
-			if(this._uiintro){
-				return;
-			}
-			if(ui.versushover&&ui.versushover._uiintro){
-				ui.versushover._uiintro.delete();
-				delete ui.versushover._uiintro;
-			}
-			ui.versushover=this;
 			var uiintro=ui.create.dialog('hidden');
-			uiintro.classList.add('popped');
-			uiintro.classList.add('static');
-			this._uiintro=uiintro;
 
 			if(_status.friendDied.length){
 				uiintro.add('已阵亡');
@@ -695,32 +665,10 @@ mode.versus={
 				uiintro.add('（无）')
 			}
 
-			ui.window.appendChild(uiintro);
-			uiintro.style.width='330px';
-			uiintro.style.height=Math.min(ui.window.offsetHeight-260,uiintro.content.scrollHeight)+'px';
-			uiintro.style.top='50px';
-			uiintro.style.left=(_status.friendCount.parentNode.offsetLeft+_status.friendCount.offsetLeft+_status.friendCount.offsetWidth/2-165)+'px';
-			uiintro.addEventListener(lib.config.touchscreen?'touchend':'mouseleave',function(){
-				if(_status.dragged) return;
-				this.delete();
-				setTimeout(function(){
-					delete _status.friendCount._uiintro;
-				},500);
-			})
+			return uiintro;
 		},
 		versusHoverReplace:function(e){
-			if(this._uiintro){
-				return;
-			}
-			if(ui.versushover&&ui.versushover._uiintro){
-				ui.versushover._uiintro.delete();
-				delete ui.versushover._uiintro;
-			}
-			ui.versushover=this;
 			var uiintro=ui.create.dialog('hidden');
-			uiintro.classList.add('popped');
-			uiintro.classList.add('static');
-			this._uiintro=uiintro;
 
 			uiintro.add(ui.autoreplace);
 			var players=[];
@@ -735,32 +683,11 @@ mode.versus={
 				buttons[i].addEventListener(lib.config.touchscreen?'touchend':'click',game.versusClickToSwap);
 			}
 
-			ui.window.appendChild(uiintro);
-			uiintro.style.width='330px';
-			uiintro.style.height=Math.min(ui.window.offsetHeight-260,uiintro.content.scrollHeight)+'px';
-			uiintro.style.top='50px';
-			uiintro.style.left=(ui.versusreplace.parentNode.offsetLeft+ui.versusreplace.offsetLeft+ui.versusreplace.offsetWidth/2-165)+'px';
-			uiintro.addEventListener(lib.config.touchscreen?'touchend':'mouseleave',function(){
-				if(_status.dragged) return;
-				this.delete();
-				setTimeout(function(){
-					delete ui.versusreplace._uiintro;
-				},500);
-			})
+			return uiintro;
 		},
 		versusHoverHandcards:function(e){
-			if(this._uiintro){
-				return;
-			}
-			if(ui.versushover&&ui.versushover._uiintro){
-				ui.versushover._uiintro.delete();
-				delete ui.versushover._uiintro;
-			}
-			ui.versushover=this;
 			var uiintro=ui.create.dialog('hidden');
-			uiintro.classList.add('popped');
-			uiintro.classList.add('static');
-			this._uiintro=uiintro;
+
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
 					uiintro.add(get.translation(game.players[i]));
@@ -773,18 +700,8 @@ mode.versus={
 					}
 				}
 			}
-			ui.window.appendChild(uiintro);
-			uiintro.style.width='330px';
-			uiintro.style.height=Math.min(ui.window.offsetHeight-260,uiintro.content.scrollHeight)+'px';
-			uiintro.style.top='50px';
-			uiintro.style.left=(ui.versushs.parentNode.offsetLeft+ui.versushs.offsetLeft+ui.versushs.offsetWidth/2-165)+'px';
-			uiintro.addEventListener(lib.config.touchscreen?'touchend':'mouseleave',function(){
-				if(_status.dragged) return;
-				this.delete();
-				setTimeout(function(){
-					delete ui.versushs._uiintro;
-				},500);
-			})
+
+			return uiintro;
 		},
 		versusCheckEnemy:function(){
 			_status.clicked=true;

@@ -37,6 +37,11 @@ window.play={};
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中双指点击切换暂停<li>键盘快捷键<br>'+
 			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>'
 		},
+		setPopped:function(node,func,width){
+			node._poppedfunc=func;
+			node._poppedwidth=width;
+			node.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',ui.click.hoverpopped);
+		},
 		placePoppedDialog:function(dialog,e){
 			if(e.touches&&e.touches[0]){
 				e=e.touches[0];
@@ -4873,10 +4878,14 @@ window.play={};
 			}
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
+			audio.volume=lib.config.volumn_audio/8;
 			audio.src='audio'+str+'.mp3';
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
+			audio.onerror=function(){
+				this.remove();
+			};
 			document.body.appendChild(audio);
 		},
 		playBackgroundMusic:function(){
@@ -6453,10 +6462,13 @@ window.play={};
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena',ui.window);
 				ui.backgroundMusic=document.createElement('audio');
+				ui.backgroundMusic.volume=lib.config.volumn_background/8;
 				game.playBackgroundMusic();
 				ui.backgroundMusic.autoplay=true;
 				ui.backgroundMusic.addEventListener('ended',game.playBackgroundMusic);
 				ui.window.appendChild(ui.backgroundMusic);
+
+
 
 				ui.sidebar=ui.create.div('#sidebar');
 				ui.canvas=document.createElement('canvas');
@@ -6723,6 +6735,7 @@ window.play={};
 				appearence.push(ui.create.switcher('show_playerids',lib.config.show_playerids,ui.click.sidebar.show_playerids));
 				appearence.push(ui.create.switcher('show_pause',lib.config.show_pause,ui.click.sidebar.show_pause));
 				appearence.push(ui.create.switcher('show_auto',lib.config.show_auto,ui.click.sidebar.show_auto));
+				appearence.push(ui.create.switcher('show_volumn',lib.config.show_volumn,ui.click.sidebar.show_volumn));
 				appearence.push(ui.create.switcher('show_wuxie',lib.config.show_wuxie,ui.click.sidebar.show_wuxie));
 				appearence.push(ui.create.div('.placeholder'));
 				appearence.push(ui.create.switcher('title',lib.config.title,ui.click.sidebar.title));
@@ -7172,8 +7185,13 @@ window.play={};
 				}
 				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
+				ui.volumn=ui.create.system('音量');
+				lib.setPopped(ui.volumn,ui.click.volumn,200);
 				ui.auto=ui.create.system('托管',ui.click.auto);
 				if(lib.config.show_pause) ui.auto.style.marginLeft='10px';
+				if(!lib.config.show_volumn){
+					ui.volumn.style.display='none';
+				}
 				if(!lib.config.show_auto){
 					ui.auto.style.display='none';
 				}
@@ -7483,6 +7501,110 @@ window.play={};
 			},
 		},
 		click:{
+			volumn:function(){
+				var uiintro=ui.create.dialog('hidden');
+				uiintro.add('背景音乐');
+				var vol1=ui.create.div('.volumn');
+				uiintro.add(vol1);
+				for(var i=0;i<8;i++){
+					var span=document.createElement('span');
+					span.link=i+1;
+					span.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.volumn_background);
+					if(i<lib.config.volumn_background){
+						span.innerHTML='●';
+					}
+					else{
+						span.innerHTML='○';
+					}
+					vol1.appendChild(span);
+				}
+				uiintro.add('游戏音效');
+
+				var vol2=ui.create.div('.volumn');
+				uiintro.add(vol2);
+				for(var i=0;i<8;i++){
+					var span=document.createElement('span');
+					span.link=i+1;
+					span.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.volumn_audio);
+					if(i<lib.config.volumn_audio){
+						span.innerHTML='●';
+					}
+					else{
+						span.innerHTML='○';
+					}
+					vol2.appendChild(span);
+				}
+				uiintro.add(ui.create.div('.placeholder'));
+				return uiintro;
+			},
+			volumn_background:function(e){
+				if(_status.dragged) return;
+				game.saveConfig('volumn_background',this.link);
+				ui.backgroundMusic.volume=this.link/8;
+				for(var i=0;i<8;i++){
+					if(i<lib.config.volumn_background){
+						this.parentNode.childNodes[i].innerHTML='●';
+					}
+					else{
+						this.parentNode.childNodes[i].innerHTML='○';
+					}
+				}
+				e.stopPropagation();
+			},
+			volumn_audio:function(e){
+				if(_status.dragged) return;
+				game.saveConfig('volumn_audio',this.link);
+				for(var i=0;i<8;i++){
+					if(i<lib.config.volumn_audio){
+						this.parentNode.childNodes[i].innerHTML='●';
+					}
+					else{
+						this.parentNode.childNodes[i].innerHTML='○';
+					}
+				}
+				e.stopPropagation();
+			},
+			hoverpopped:function(){
+				if(this._uiintro){
+					return;
+				}
+				if(!this._poppedfunc){
+					return;
+				}
+				if(ui.currentpopped&&ui.currentpopped._uiintro){
+					ui.currentpopped._uiintro.delete();
+					delete ui.currentpopped._uiintro;
+				}
+				ui.currentpopped=this;
+				var uiintro=this._poppedfunc();
+				uiintro.classList.add('popped');
+				uiintro.classList.add('static');
+				this._uiintro=uiintro;
+
+				ui.window.appendChild(uiintro);
+				var width=this._poppedwidth||330;
+				uiintro.style.width=width+'px';
+				uiintro.style.height=Math.min(ui.window.offsetHeight-260,uiintro.content.scrollHeight)+'px';
+				uiintro.style.top='50px';
+				var left=this.parentNode.offsetLeft+this.offsetLeft+this.offsetWidth/2-width/2;
+				if(left<10){
+					left=10;
+				}
+				else if(left+width>ui.window.offsetWidth-10){
+					left=ui.window.offsetWidth-width-10;
+				}
+				uiintro.style.left=left+'px';
+				uiintro._poppedorigin=this;
+				uiintro.addEventListener(lib.config.touchscreen?'touchend':'mouseleave',ui.click.leavehoverpopped);
+			},
+			leavehoverpopped:function(){
+				if(_status.dragged) return;
+				this.delete();
+				var button=this._poppedorigin
+				setTimeout(function(){
+					delete button._uiintro;
+				},500);
+			},
 			dierevive:function(){
 				if(game.me.isDead()){
 					game.me.revive(1);
@@ -7840,6 +7962,10 @@ window.play={};
 							_status.event.custom.add.window();
 						}
 					}
+				}
+				if(ui.currentpopped&&ui.currentpopped._uiintro){
+					ui.currentpopped._uiintro.delete();
+					delete ui.currentpopped._uiintro;
 				}
 				if(_status.choosing){
 					if(_status.choosing.expand) _status.choosing.expand=false;
@@ -8239,6 +8365,7 @@ window.play={};
 				}
 			},
 			wuxie:function(){
+				if(this.classList.contains('hidden')) return;
 				this.classList.toggle('glow');
 				if(this.classList.contains('glow')&&
 				(_status.event.parent.name=='_wuxie1'||_status.event.parent.name=='_wuxie2')&&
@@ -8571,6 +8698,15 @@ window.play={};
 					}
 					else{
 						ui.auto.style.display='none';
+					}
+				},
+				show_volumn:function(bool){
+					game.saveConfig('show_volumn',bool);
+					if(lib.config.show_volumn){
+						ui.volumn.style.display='';
+					}
+					else{
+						ui.volumn.style.display='none';
 					}
 				},
 				show_wuxie:function(bool){

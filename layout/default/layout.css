@@ -43,6 +43,7 @@ body>.background.paused{-webkit-filter:blur(3px);}
 body>.background{z-index:-2}
 .popup{padding: 5px;}
 .removing,.hidden{opacity: 0 !important;}
+#system>div>div.hidden{opacity:0.5 !important;}
 .transparent{opacity:  0.3 !important;}
 .out{opacity: 0.3 !important;-webkit-filter:blur(3px)}
 .blur{-webkit-filter:blur(3px) !important;}
@@ -144,6 +145,13 @@ margin-bottom: 5px;
 	left:0;
 	margin-left: 20px;
 	display:inline-block;
+}
+.dialog .content>.volumn{
+	margin:0;
+}
+.dialog .content>.volumn>span{
+	margin-left:2px;
+	margin-right:2px;
 }
 .config{text-align: left;width: 90%;left: 5%;display: block;overflow: hidden;border-radius: 2px;}
 .config>div{text-align: left;left: 0;}
