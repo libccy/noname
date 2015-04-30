@@ -890,7 +890,7 @@ character.sp={
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
 				if(event.player==player||_status.currentPhase==player) return false;
-				// if(player.num('h')>=5) return false;
+				if(player.skills.contains('shenxian2')) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(get.type(event.cards[i])=='basic'){
 						return true;
@@ -904,11 +904,13 @@ character.sp={
 				if(trigger.delay==false) game.delay();
 				"step 1"
 				player.draw();
+				player.addTempSkill('shenxian2','phaseAfter');
 			},
 			ai:{
 				threaten:1.5
 			}
 		},
+		shenxian2:{},
 		qiangwu:{
 			enable:'phaseUse',
 			usable:1,
@@ -1022,7 +1024,7 @@ character.sp={
 			},
 		},
 		shengxi:{
-			trigger:{player:'phaseUseEnd'},
+			trigger:{player:'phaseDiscardBegin'},
 			frequent:true,
 			filter:function(event,player){
 				return !player.getStat('damage');
@@ -2714,12 +2716,12 @@ character.sp={
 		lirang_info:'你可以将你弃置的卡牌交给一名其他角色 ',
 		moukui_info:'当你使用【杀】指定一名角色为目标后，你可以选择一项：摸一张牌，或弃置其一张牌。若如此做，此【杀】被【闪】抵消时，该角色弃置你的一张牌。 ',
 		qiangwu_info:'出牌阶段，你可以进行一次判定。若如此做，则直到回合结束，你使用点数小于判定牌的 【杀】时不受距离限制，且你使用点数大于判定牌的【杀】时不计入出牌阶段的使用次数。',
-		shenxian_info:'你的回合外，每当有其他角色因弃置而失去牌时，若其中有基本牌，你可以摸一张牌。',
+		shenxian_info:'每名角色的回合限一次，你的回合外，每当有其他角色因弃置而失去牌时，若其中有基本牌，你可以摸一张牌。',
 		qiluan_info:'每当你杀死一名角色后，可以在回合结束时摸三张牌。',
 		zhendu_info:'其他角色的出牌阶段开始时，你可以弃置一张手牌，视为该角色使用一张【酒】，然后你对其造成一点伤害。',
 		shangyi_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后弃置其中的一张黑色牌',
 		shoucheng_info:'每当一名其他角色在其回合外失去最后的手牌时，你可令该角色摸一张牌。',
-		shengxi_info:'若你于出牌阶段未造成伤害，你可在此阶段结束时摸两张牌。',
+		shengxi_info:'若你于出牌阶段未造成伤害，你可在弃牌阶段开始时摸两张牌。',
 		hengzheng_info:'摸牌阶段开始时，若你的体力值为1或你没有手牌，你可以放弃摸牌，获得每名其他角色区域里的一张牌。',
 		yongjue_info:'每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之（每回合最多能以此法获得一张杀）',
 		cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色，令该角色获得技能【勇决】，然后翻面',

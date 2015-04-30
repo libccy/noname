@@ -641,8 +641,8 @@ mode.guozhan={
 	ai:{
 		get:{
 			realAttitude:function(from,toidentity,difficulty){
-				if(from.identity==toidentity){
-					if(get.totalPopulation(toidentity)+1<=get.population()/2) return 4+difficulty;
+				if(from.identity==toidentity&&toidentity!='ye'){
+					return 4+difficulty;
 				}
 				if(lib.character[from.name1][1]==toidentity){
 					if(get.totalPopulation(toidentity)+1<=get.population()/2) return 4+difficulty;

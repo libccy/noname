@@ -424,10 +424,7 @@ character.refresh={
 				"step 1"
 				if(result.bool){
 					player.logSkill('relianying',result.targets);
-					for(var i=0;i<result.targets.length;i++){
-						if(result.targets[i]!=player) result.targets[i].popup('relianying');
-						result.targets[i].draw();
-					}
+					game.asyncDraw(result.targets);
 				}
 			},
 			ai:{
