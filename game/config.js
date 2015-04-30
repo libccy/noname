@@ -22,7 +22,7 @@ window.config={
 		'grass_bg','huangtian_bg'],
 		image_background_filter:['default','blur','gray','sepia','invert','saturate','contrast','hue','brightness'],
 		background_music:['music_default','music_diaochan','music_shezhan',
-			'music_danji','music_nizhan','music_jingshui','music_yaoshan','music_xingnian','music_random','music_off']
+			'music_danji','music_random','music_off']
 	},
 	translate:{
 		identity:'身份',
