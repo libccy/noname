@@ -4863,6 +4863,7 @@ window.play={};
 			},
 		},
 		character:{},
+		perfectPair:{},
 		group:['wei','shu','wu','qun'],
 		nature:['fire','thunder','poison'],
 		linked:['fire','thunder'],

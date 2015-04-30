@@ -9,6 +9,9 @@ character.woods={
 		dongzhuo:['male','qun',8,['jiuchi','roulin','benghuai','baonue'],['zhu','fullskin']],
 		jiaxu:['male','qun',3,['luanwu','wansha','weimu'],['fullskin']],
 	},
+	perfectPair:{
+		menghuo:['zhurong']
+	},
 	skill:{
 		huoshou:{
 			locked:true,

@@ -26,6 +26,19 @@ character.standard={
 		lvbu:['male','qun',4,['wushuang'],['fullskin','die_audio']],
 		diaochan:['female','qun',3,['lijian','biyue'],['fullskin','die_audio']],
 	},
+	perfectPair:{
+		xiahoudun:['xiahouyuan'],
+		zhenji:['caopi'],
+		caocao:['xuzhu','dianwei'],
+		huangzhong:['weiyan'],
+		zhugeliang:['huangyueying'],
+		liubei:['guanyu','zhangfei','ganfuren'],
+		zhaoyun:['liushan'],
+		daqiao:['xiaoqiao'],
+		zhouyu:['huanggai','xiaoqiao'],
+		sunquan:['zhoutai'],
+		lvbu:['diaochan']
+	},
 	skill:{
 		hujia:{
 			audio:2,

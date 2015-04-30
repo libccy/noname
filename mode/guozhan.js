@@ -467,6 +467,12 @@ mode.guozhan={
 				}
 			},
 			perfectPair:function(){
+				if(lib.perfectPair[this.name1]&&lib.perfectPair[this.name1].contains(this.name2)){
+					return true;
+				}
+				if(lib.perfectPair[this.name2]&&lib.perfectPair[this.name2].contains(this.name1)){
+					return true;
+				}
 				return false;
 			},
 			siege:function(player){

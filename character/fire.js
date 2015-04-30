@@ -9,6 +9,10 @@ character.fire={
 		yuanshao:['male','qun',4,['luanji','xueyi'],['zhu','fullskin']],
 		pangde:['male','qun',4,['mashu','mengjin'],['fullskin']],
 	},
+	perfectPair:{
+		zhugeliangwolong:['pangtong'],
+		yuanshao:['yanwen']
+	},
 	skill:{
 		huoji:{
 			enable:'chooseToUse',
