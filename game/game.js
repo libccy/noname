@@ -1420,8 +1420,7 @@ window.play={};
 				},
 				respond:function(){
 					if(event.skill){
-						player.popup(event.skill);
-						game.log(get.translation(player)+'发动了'+get.translation(event.skill));
+						player.logSkill(event.skill);
 						if(player.checkShow){
 							player.checkShow(event.skill);
 						}
@@ -1800,6 +1799,9 @@ window.play={};
 							game.playAudio('die',player.name)
 						}
 					}
+					if(lib.config.background_audio){
+						game.playAudio('effect','die_'+(player.sex==='female'?'female':'male'));
+					}
 					if(player==game.me&&!_status.over){
 						ui.control.show();
 						if(get.config('swap')&&lib.config.mode!='versus'){
@@ -1829,6 +1831,9 @@ window.play={};
 					player.lose(player.get('e',{subtype:get.subtype(card)}),false);
 					"step 1"
 					card.fix();
+					if(lib.config.background_audio){
+						game.playAudio('effect',get.subtype(card));
+					}
 					var equipNum=get.equipNum(card);
 					var equipped=false;
 					for(var i=0;i<player.node.equips.childNodes.length;i++){
@@ -1858,6 +1863,9 @@ window.play={};
 					"step 0"
 					if(cards&&get.owner(cards[0])) get.owner(cards[0]).lose(cards);
 					"step 1"
+					if(lib.config.background_audio){
+						game.playAudio('effect','judge');
+					}
 					cards[0].fix();
 					var viewAs=typeof card=='string'?card:card.name;
 					if(!lib.card[viewAs]||!lib.card[viewAs].effect){
@@ -4887,7 +4895,7 @@ window.play={};
 			audio.onerror=function(){
 				this.remove();
 			};
-			document.body.appendChild(audio);
+			ui.window.appendChild(audio);
 		},
 		playBackgroundMusic:function(){
 			if(lib.config.background_music=='music_off'){
@@ -6479,7 +6487,18 @@ window.play={};
 				lib.config.hide_history=false;
 				if(lib.config.right_sidebar) ui.sidebar.classList.add('right');
 				ui.config=ui.create.div('#sidebar2.content');
-				ui.config.listen(function(){_status.clicked=true;});
+				ui.config.listen(function(e){
+					e.stopPropagation()
+					if(_status.choosing){
+						if(_status.choosing.expand) _status.choosing.expand=false;
+						else{
+							_status.choosing.parentNode.style.height='';
+							_status.choosing.nextSibling.delete();
+							_status.choosing.previousSibling.show();
+							delete _status.choosing;
+						}
+					}
+				});
 				ui.config.oncontextmenu=function(e){
 					e.stopPropagation();
 					return false;
@@ -6729,6 +6748,7 @@ window.play={};
 				appearence.push(ui.create.switcher('ui_zoom',['极小','很小','较小','原始','较大','很大'],lib.config.ui_zoom,ui.click.sidebar.ui_zoom));
 
 				appearence.push(ui.create.div('.placeholder'));
+				appearence.push(ui.create.switcher('auto_popped',lib.config.auto_popped,ui.click.sidebar.global));
 				appearence.push(ui.create.switcher('only_fullskin',lib.config.only_fullskin,ui.click.sidebar.global2));
 				appearence.push(ui.create.switcher('hide_card_image',lib.config.hide_card_image,ui.click.sidebar.global2));
 				appearence.push(ui.create.switcher('show_name',lib.config.show_name,ui.click.sidebar.show_name));
@@ -7180,16 +7200,22 @@ window.play={};
 					ui.system2=ui.create.div('#system2',ui.system);
 				}
 				ui.replay=ui.create.system('重来',game.reload,true);
-				ui.pause=ui.create.system('暂停',ui.click.pause);
+				ui.pause=ui.create.system('历史',ui.click.pause);
+				if(!lib.config.touchscreen){
+					lib.setPopped(ui.pause,ui.click.pausehistory,220);
+				}
 				if(!lib.config.show_pause){
 					ui.pause.style.display='none';
 				}
 				ui.config2=ui.create.system('选项',ui.click.config);
+				if(!lib.config.touchscreen){
+					lib.setPopped(ui.config2,ui.click.pauseconfig,220);
+				}
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
-				ui.volumn=ui.create.system('音量');
-				lib.setPopped(ui.volumn,ui.click.volumn,200);
 				ui.auto=ui.create.system('托管',ui.click.auto);
-				if(lib.config.show_pause) ui.auto.style.marginLeft='10px';
+				ui.volumn=ui.create.system('♫');
+				lib.setPopped(ui.volumn,ui.click.volumn,200);
+				// if(lib.config.show_pause) ui.auto.style.marginLeft='10px';
 				if(!lib.config.show_volumn){
 					ui.volumn.style.display='none';
 				}
@@ -7502,6 +7528,20 @@ window.play={};
 			},
 		},
 		click:{
+			pausehistory:function(){
+				if(!lib.config.auto_popped) return;
+				if(!ui.sidebar.childNodes.length) return;
+				var uiintro=ui.create.dialog('hidden');
+				uiintro.add(ui.sidebar);
+				return uiintro;
+			},
+			pauseconfig:function(){
+				if(!lib.config.auto_popped) return;
+				if(!ui.config.childNodes.length) return;
+				var uiintro=ui.create.dialog('hidden');
+				uiintro.add(ui.config);
+				return uiintro;
+			},
 			volumn:function(){
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.add('背景音乐');
@@ -7572,12 +7612,13 @@ window.play={};
 				if(!this._poppedfunc){
 					return;
 				}
+				var uiintro=this._poppedfunc();
+				if(!uiintro) return;
 				if(ui.currentpopped&&ui.currentpopped._uiintro){
 					ui.currentpopped._uiintro.delete();
 					delete ui.currentpopped._uiintro;
 				}
 				ui.currentpopped=this;
-				var uiintro=this._poppedfunc();
 				uiintro.classList.add('popped');
 				uiintro.classList.add('static');
 				this._uiintro=uiintro;
@@ -7967,15 +8008,6 @@ window.play={};
 				if(ui.currentpopped&&ui.currentpopped._uiintro){
 					ui.currentpopped._uiintro.delete();
 					delete ui.currentpopped._uiintro;
-				}
-				if(_status.choosing){
-					if(_status.choosing.expand) _status.choosing.expand=false;
-					else{
-						_status.choosing.parentNode.style.height='';
-						_status.choosing.nextSibling.delete();
-						_status.choosing.previousSibling.show();
-						delete _status.choosing;
-					}
 				}
 				if(_status.event.custom.add.window){
 					_status.event.custom.add.window();

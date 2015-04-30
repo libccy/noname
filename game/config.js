@@ -174,6 +174,7 @@ window.config={
 		show_auto_config:'显示托管按钮',
 		show_volumn_config:'显示音量按钮',
 		show_name_config:'显示角色名称',
+		auto_popped_config:'自动弹出菜单',
 		ui_zoom_config:'界面缩放',
 		show_stat_config:'显示战斗统计',
 		show_scrollbar_config:'显示滚动条',

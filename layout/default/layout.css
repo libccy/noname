@@ -33,6 +33,8 @@ table{table-layout: fixed;}
 #sidebar,#sidebar2{left: 0;top: 0;width: 200px;height: calc(100% - 40px);text-align: left;padding: 20px;overflow-y: scroll;z-index: 6;}
 #sidebar.right{left:calc(100% - 220px);}
 #sidebar.right,#sidebar2.right{left: calc(100% - 240px);}
+.dialog.popped #sidebar,
+.dialog.popped #sidebar2{padding:0;}
 #sidebar>div{margin: 10px;position: relative;display: block;min-height: 5px;}
 #scrollzone1{left: 0;}
 #scrollzone2{left: calc(50% - 140px);}
@@ -140,7 +142,7 @@ margin-bottom: 5px;
 .content>.placeholder.slim{margin:1px;}
 .content>.placeholder.removing{margin-top: -13px;}
 .content{display: block;width: 100%;}
-.dialog .content>.config{
+.dialog:not('.popped') .content>.config{
 	width:200px;
 	left:0;
 	margin-left: 20px;
