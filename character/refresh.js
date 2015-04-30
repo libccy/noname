@@ -1,26 +1,26 @@
 character.refresh={
 	character:{
-		re_caocao:['male','wei',4,['hujia','rejianxiong'],['zhu','fullskin','die_audio']],
-		re_simayi:['male','wei',3,['refankui','reguicai'],['fullskin','die_audio']],
-		re_guojia:['male','wei',3,['tiandu','reyiji'],['fullskin','die_audio']],
+		re_caocao:['male','wei',4,['hujia','rejianxiong'],['zhu','fullskin']],
+		re_simayi:['male','wei',3,['refankui','reguicai'],['fullskin']],
+		re_guojia:['male','wei',3,['tiandu','reyiji'],['fullskin']],
 		re_lidian:['male','wei',3,['xunxun','wangxi'],['fullskin']],
-		re_zhangliao:['male','wei',4,['retuxi'],['fullskin','die_audio']],
-		re_xuzhu:['male','wei',4,['reluoyi'],['fullskin','die_audio']],
-		re_xiahoudun:['male','wei',4,['reganglie','qingjian'],['fullskin','die_audio']],
-		re_zhangfei:['male','shu',4,['paoxiao','retishen'],['fullskin','die_audio']],
-		re_zhaoyun:['male','shu',4,['longdan','reyajiao'],['fullskin'],['fullskin','die_audio']],
-		re_guanyu:['male','shu',4,['wusheng','yijue'],['fullskin','die_audio']],
-		re_machao:['male','shu',4,['mashu','retieji'],['fullskin','die_audio']],
-		re_xushu:['male','shu',4,['zhuhai','qianxin'],['fullskin','die_audio']],
-		re_zhouyu:['male','wu',3,['reyingzi','refanjian'],['fullskin','die_audio']],
-		re_lvmeng:['male','wu',4,['keji','qinxue'],['fullskin','die_audio']],
-		re_ganning:['male','wu',4,['qixi','fenwei'],['fullskin','die_audio']],
-		re_luxun:['male','wu',3,['reqianxun','relianying'],['fullskin','die_audio']],
-		re_daqiao:['female','wu',3,['reguose','liuli'],['fullskin','die_audio']],
-		re_huanggai:['male','wu',4,['rekurou','zhaxiang'],['fullskin','die_audio']],
-		re_lvbu:['male','qun',5,['wushuang'],['fullskin','die_audio']],
+		re_zhangliao:['male','wei',4,['retuxi'],['fullskin']],
+		re_xuzhu:['male','wei',4,['reluoyi'],['fullskin']],
+		re_xiahoudun:['male','wei',4,['reganglie','qingjian'],['fullskin']],
+		re_zhangfei:['male','shu',4,['paoxiao','retishen'],['fullskin']],
+		re_zhaoyun:['male','shu',4,['longdan','reyajiao'],['fullskin'],['fullskin']],
+		re_guanyu:['male','shu',4,['wusheng','yijue'],['fullskin']],
+		re_machao:['male','shu',4,['mashu','retieji'],['fullskin']],
+		re_xushu:['male','shu',4,['zhuhai','qianxin'],['fullskin']],
+		re_zhouyu:['male','wu',3,['reyingzi','refanjian'],['fullskin']],
+		re_lvmeng:['male','wu',4,['keji','qinxue'],['fullskin']],
+		re_ganning:['male','wu',4,['qixi','fenwei'],['fullskin']],
+		re_luxun:['male','wu',3,['reqianxun','relianying'],['fullskin']],
+		re_daqiao:['female','wu',3,['reguose','liuli'],['fullskin']],
+		re_huanggai:['male','wu',4,['rekurou','zhaxiang'],['fullskin']],
+		re_lvbu:['male','qun',5,['wushuang'],['fullskin']],
 		re_gongsunzan:['male','qun',4,['qiaomeng','reyicong'],['fullskin']],
-		re_huatuo:['male','qun',3,['chulao','jijiu'],['fullskin','die_audio']],
+		re_huatuo:['male','qun',3,['chulao','jijiu'],['fullskin']],
 	},
 	skill:{
 		reqicai:{
@@ -59,7 +59,6 @@ character.refresh={
 			}
 		},
 		retuxi:{
-			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			direct:true,
 			content:function(){
@@ -85,7 +84,6 @@ character.refresh={
 			}
 		},
 		reguicai:{
-			audio:2,
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
@@ -129,7 +127,6 @@ character.refresh={
 			}
 		},
 		refankui:{
-			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -165,7 +162,6 @@ character.refresh={
 			}
 		},
 		reluoyi:{
-			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
 				if(player.num('h','sha')) return true;
@@ -550,7 +546,6 @@ character.refresh={
 			}
 		},
 		rejianxiong:{
-			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			content:function(){

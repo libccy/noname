@@ -74,6 +74,7 @@ window.config={
 		background_music_config:'背景音乐',
 		background_audio_config:'游戏音效',
 		background_speak_config:'人物配音',
+		background_ogg_config:'补全配音',
 		music_default:'默认',
 		music_diaochan:'貂蝉',
 		music_danji:'单骑',

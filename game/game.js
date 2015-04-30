@@ -1130,13 +1130,23 @@ window.play={};
 							player.checkShow(event.skill);
 						}
 					}
-					if(lib.config.background_audio&&lib.card[card.name].audio){
+					if(lib.config.background_audio){
 						var sex=player.sex=='female'?'female':'male';
-						if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
-							game.playAudio('card',sex,card.name+'_'+card.nature);
+						if(lib.card[card.name].audio){
+							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
+								game.playAudio('card',sex,card.name+'_'+card.nature);
+							}
+							else{
+								game.playAudio('card',sex,card.name);
+							}
 						}
 						else{
-							game.playAudio('card',sex,card.name);
+							if(lib.config.background_ogg){
+								game.playAudioOgg('card',sex,card.name);
+							}
+							else{
+								game.playAudio('card/default');
+							}
 						}
 					}
 					if(event.animate!=false){
@@ -1274,8 +1284,17 @@ window.play={};
 				useSkill:function(){
 					"step 0"
 					var info=get.info(event.skill);
-					if(lib.config.background_speak&&info.audio){
-						game.playAudio('skill',event.skill,Math.ceil(info.audio*Math.random()));
+					if(lib.config.background_speak&&!lib.skill.global.contains(event.skill)){
+						if(info.audio){
+							game.playAudio('skill',event.skill,Math.ceil(info.audio*Math.random()));
+						}
+						else if(lib.config.background_ogg){
+							game.playAudioOgg('skill',event.skill);
+						}
+						else{
+							game.playAudio('skill','default',
+							player.sex=='female'?'female':'male',Math.ceil(Math.random()*5));
+						}
 					}
 					if(player.checkShow){
 						player.checkShow(event.skill);
@@ -1392,6 +1411,9 @@ window.play={};
 					ui.clear();
 				},
 				draw:function(){
+					if(lib.config.background_audio){
+						game.playAudio('effect','draw');
+					}
 					if(event.log!=false){
 						game.log(get.translation(player)+'摸了'+get.cnNumber(num)+'张牌');
 					}
@@ -1406,6 +1428,9 @@ window.play={};
 				},
 				discard:function(){
 					"step 0"
+					if(lib.config.background_audio){
+						game.playAudio('effect','discard');
+					}
 					var str=get.translation(player)+'弃置了';
 					str+=get.translation(cards[0]);
 					for(var i=1;i<cards.length;i++){
@@ -1426,9 +1451,17 @@ window.play={};
 						}
 					}
 					if(event.parent.parent.parent.name=='useCard'){
-						if(lib.config.background_audio&&lib.card[card.name].audio){
+						if(lib.config.background_audio){
 							var sex=player.sex=='female'?'female':'male';
-							game.playAudio('card',sex,card.name);
+							if(lib.card[card.name].audio){
+								game.playAudio('card',sex,card.name);
+							}
+							else{
+								if(lib.config.background_ogg){
+									game.playAudioOgg('card',sex,card.name);
+								}
+								game.playAudio('card/default');
+							}
 						}
 					}
 					var str=get.translation(player)+'打出了';
@@ -1660,6 +1693,9 @@ window.play={};
 					}
 				},
 				recover:function(){
+					if(lib.config.background_audio){
+						game.playAudio('effect','recover');
+					}
 					if(num>player.maxHp-player.hp) num=player.maxHp-player.hp;
 					if(num>0){
 						player.changeHp(num);
@@ -1796,7 +1832,10 @@ window.play={};
 					if(lib.config.background_speak){
 						if(lib.character[player.name]&&lib.character[player.name][4]&&
 						lib.character[player.name][4].contains('die_audio')){
-							game.playAudio('die',player.name)
+							game.playAudio('die',player.name);
+						}
+						else if(lib.config.background_ogg){
+							game.playAudioOgg('die',player.name);
 						}
 					}
 					if(lib.config.background_audio){
@@ -3390,8 +3429,16 @@ window.play={};
 						this.checkShow(name);
 					}
 					var info=lib.skill[name];
-					if(info&&lib.config.background_speak&&info.audio){
-						game.playAudio('skill',name,Math.ceil(info.audio*Math.random()));
+					if(info&&lib.config.background_speak){
+						if(info.audio){
+							game.playAudio('skill',name,Math.ceil(info.audio*Math.random()));
+						}
+						else{
+							if(lib.config.background_ogg){
+								game.playAudioOgg('skill',name);
+							}
+							game.playAudio('skill','default',Math.ceil(Math.random()*5));
+						}
 					}
 				},
 				unprompt:function(){
@@ -4893,6 +4940,25 @@ window.play={};
 				this.remove();
 			});
 			audio.onerror=function(){
+				this.remove();
+			};
+			ui.window.appendChild(audio);
+		},
+		playAudioOgg:function(){
+			var str='';
+			for(var i=0;i<arguments.length;i++){
+				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
+					str+='/'+arguments[i];
+				}
+			}
+			var audio=document.createElement('audio');
+			audio.autoplay=true;
+			audio.volume=lib.config.volumn_audio/8;
+			audio.src='audio'+str+'.ogg';
+			audio.addEventListener('ended',function(){
+				this.remove();
+			});
+			audio.onerror=function(e){
 				this.remove();
 			};
 			ui.window.appendChild(audio);
@@ -6711,6 +6777,7 @@ window.play={};
 				gameconfig.push(ui.create.switcher('background_music',lib.config.all.background_music,lib.config.background_music,ui.click.sidebar.background_music));
 				gameconfig.push(ui.create.switcher('background_audio',lib.config.background_audio,ui.click.sidebar.global));
 				gameconfig.push(ui.create.switcher('background_speak',lib.config.background_speak,ui.click.sidebar.global));
+				gameconfig.push(ui.create.switcher('background_ogg',lib.config.background_ogg,ui.click.sidebar.global));
 				gameconfig.push(ui.create.div('.placeholder'));
 
 				if(lib.config.gameconfig){
@@ -7851,13 +7918,15 @@ window.play={};
 						if(e.path[i].classList.contains('selectable')&&
 							!e.path[i].classList.contains('selected')&&
 							!e.path[i].classList.contains('noclick')){
-							_status.mousedragging=e;
-							_status.mousedragorigin=e.path[i];
-							_status.mouseleft=false;
 							_status.clicked=false;
-							_status.selectionfull=false;
 							ui.click[itemtype].call(e.path[i]);
-							_status.multitarget=false;
+							if(e.path[i].classList.contains('selected')){
+								_status.mousedragging=e;
+								_status.mousedragorigin=e.path[i];
+								_status.mouseleft=false;
+								_status.selectionfull=false;
+								_status.multitarget=false;
+							}
 						}
 						return;
 					}
