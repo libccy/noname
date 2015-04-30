@@ -4954,7 +4954,7 @@ window.play={};
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			audio.src='audio'+str+'.ogg';
+			audio.src='audio-ogg'+str+'.ogg';
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
