@@ -171,11 +171,8 @@ character.swd={
 								if(player.identity=='unknown') return 0;
 								return get.population(player.identity)>=3?-1:0;
 							}
-							case 'versus':{
-								return -1;
-							}
 							default:{
-								return 0;
+								return -1;
 							}
 						}
 					},

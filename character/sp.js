@@ -953,7 +953,7 @@ character.sp={
 			content:function(){
 				"step 0"
 				var nono=(Math.abs(ai.get.attitude(player,trigger.player))<3);
-				player.chooseToDiscard('是否发动【鸩毒】？').ai=function(card){
+				player.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【鸩毒】？').ai=function(card){
 					if(nono) return -1;
 					if(ai.get.damageEffect(trigger.player,player,player)>0){
 						return 7-ai.get.useful(card);

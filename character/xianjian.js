@@ -1214,7 +1214,7 @@ character.xianjian={
 			check:function(event,player){
 				return ai.get.effect(player,event.card,event.player,player)<0
 			},
-			forbid:['versus'],
+			changeSeat:true,
 			trigger:{target:'useCardToBefore'},
 			content:function(){
 				if(trigger.player==player.next){
@@ -1241,7 +1241,7 @@ character.xianjian={
 		yujian:{
 			enable:'phaseUse',
 			usable:1,
-			forbid:['versus'],
+			changeSeat:true,
 			filterTarget:function(card,player,target){
 				return player!=target&&player.next!=target;
 			},

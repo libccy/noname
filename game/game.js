@@ -5651,8 +5651,9 @@ window.play={};
 				player1.dataset.position=player2.dataset.position;
 				player2.dataset.position=temp1;
 				game.arrangePlayers();
-				if(player1==game.me||player2==game.me){
-					pos=parseInt(game.me.dataset.position);
+				if(player1.dataset.position=='0'||player2.dataset.position=='0'){
+					pos=parseInt(player1.dataset.position);
+					if(pos==0) pos=parseInt(player2.dataset.position);
 					num=game.players.length+game.dead.length;
 					for(i=0;i<game.players.length;i++){
 						temp1=parseInt(game.players[i].dataset.position)-pos;

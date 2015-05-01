@@ -7,28 +7,10 @@ character.jiange={
         jg_xiahouyuan:['male','wei',4,['shensu','juechen'],['fullskin']],
         jg_caozhen:['male','wei',4,['chiying','jingfan'],['fullskin']],
         jg_zhanghe:['male','wei',4,['huodi','jueji'],['fullskin']],
-        jg_simayi:['male','wei',6,['xuanlei','sfanshi','konghun'],['fullskin']],
+        jg_simayi:['male','wei',5,['xuanlei','sfanshi','konghun'],['fullskin']],
     },
     skill:{
         sfanshi:{
-            init:function(player){
-                player.maxHp=Math.floor(game.players.length/2)+2;
-                player.hp=player.maxHp;
-                player.update();
-            },
-            trigger:{global:'dieAfter'},
-            forced:true,
-            content:function(){
-                player.maxHp=Math.floor(game.players.length/2)+2;
-                player.hp=Math.min(player.hp,player.maxHp);
-                player.update();
-            },
-            group:'sfanshi2',
-            ai:{
-                mingzhi:false
-            }
-        },
-        sfanshi2:{
             trigger:{player:'phaseEnd'},
             forced:true,
             check:function(){
@@ -48,7 +30,7 @@ character.jiange={
                 "step 0"
                 player.chooseTarget('是否发动【控魂】？',function(card,player,target){
                     return player!=target;
-                },[1,Math.floor(game.players.length/2)]).ai=function(target){
+                },[1,Math.floor((game.players.length-1)/2)]).ai=function(target){
                     return ai.get.damageEffect(target,player,player,'thunder')+1;
                 }
                 "step 1"
@@ -575,10 +557,9 @@ character.jiange={
         xuanlei:'玄雷',
         xuanlei_info:'锁定技，准备阶段，你令所有判定区内有牌的其他角色受到1点雷电伤害',
         sfanshi:'反噬',
-        sfanshi2:'反噬',
-        sfanshi_info:'锁定技，你的体力上限为场上存活角色数的一半+2（向下取整），结束阶段，你失去1点体力',
+        sfanshi_info:'锁定技，结束阶段，你失去1点体力',
         konghun:'控魂',
-        konghun_info:'出牌阶段开始时，若你的体力值不大于1（场上存活角色数不小于6时改为2），你可以对至多X名角色各造成1点雷电伤害，然后你恢复等量体力，X为场上存活角色数的一半（向下取整）',
+        konghun_info:'出牌阶段开始时，若你的体力值不大于1（场上存活角色数不小于6时改为2），你可以对至多X名角色各造成1点雷电伤害，然后你恢复等量体力，X为场上其他存活角色数的一半（向下取整）',
         jizhen_info:'结束阶段，你可以令所至多两名已受伤角色摸一张牌',
         // biantian2_info:'已获得大雾标记',
         // biantian3_info:'已获得狂风标记',

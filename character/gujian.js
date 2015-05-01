@@ -493,7 +493,7 @@ character.gujian={
 			}
 		},
 		xiuhua:{
-			forbid:['versus'],
+			changeSeat:true,
 			trigger:{player:'shaHit'},
 			filter:function(event,player){
 				return event.target!=player.previous;
@@ -580,7 +580,7 @@ character.gujian={
 		jizhan:{
 			enable:'phaseUse',
 			usable:1,
-			forbid:['versus'],
+			changeSeat:true,
 			filterTarget:function(card,player,target){
 				return player!=target&&player.next!=target&&player.canUse('sha',target,false);
 			},
@@ -602,7 +602,6 @@ character.gujian={
 			direct:true,
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
-				// if(event.skill=='qianjun') return false;
 				if(event.targets.length!=1) return false;
 				if(player.num('h',{type:'basic'})==player.num('h')) return false;
 				var target=event.targets[0];
@@ -619,6 +618,7 @@ character.gujian={
 				for(var i=0;i<game.players.length;i++){
 					if(player!=game.players[i]&&trigger.targets[0]!=game.players[i]&&get.distance(trigger.targets[0],game.players[i])<=1){
 						event.targets.push(game.players[i]);
+						game.players[i].classList.add('selected');
 					}
 				}
 				var num=0;
@@ -636,6 +636,7 @@ character.gujian={
 					player.logSkill('qianjun',targets);
 					for(var i=0;i<targets.length;i++){
 						trigger.targets.add(targets[i]);
+						targets[i].classList.add('selected');
 					}
 				}
 			}

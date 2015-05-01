@@ -25,7 +25,6 @@ mode.versus={
 				_status.round=0;
 				if(lib.storage.single_control){
 					lib.skill.global.push('versus_swap');
-					// ui.autoreplace=ui.create.system(lib.storage.autoreplaceinnerhtml||'自动切换',game.switchAutoreplace,true);
 					ui.autoreplace=ui.create.div('.caption.normal');
 					ui.autoreplace.innerHTML='<div class="underline">自动换人</div>';
 					ui.autoreplace.style.textAlign='center';
@@ -38,15 +37,11 @@ mode.versus={
 					ui.versushs=ui.create.system('手牌',null,true);
 					lib.setPopped(ui.versusreplace,game.versusHoverReplace);
 					lib.setPopped(ui.versushs,game.versusHoverHandcards);
-					// ui.versusreplace.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverReplace);
-					// ui.versushs.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverHandcards);
 				}
 				_status.friendCount=ui.create.system('我方阵亡：'+get.cnNumber(0),null,true);
 				_status.enemyCount=ui.create.system('敌方阵亡：'+get.cnNumber(0),null,true);
 				lib.setPopped(_status.friendCount,game.versusHoverFriend);
 				lib.setPopped(_status.enemyCount,game.versusHoverEnemy);
-				// _status.friendCount.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverFriend);
-				// _status.enemyCount.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',game.versusHoverEnemy);
 
 				if(lib.storage.zhu){
 					_status.currentSide=true;
@@ -70,7 +65,6 @@ mode.versus={
 					this.dialog.classList.add('noslide');
 					for(var i=0;i<this.dialog.buttons.length;i++) this.dialog.buttons[i].style.opacity=1;
 					this.dialog.add('选项');
-					// this.dialog.add(ui.create.div('.placeholder'));
 					this.dialog.versus_zhu=this.dialog.add(ui.create.switcher('versus_zhu',lib.storage.zhu)).querySelector('.toggle');
 					this.dialog.versus_only_zhu=this.dialog.add(ui.create.switcher('versus_only_zhu',lib.storage.only_zhu)).querySelector('.toggle');
 					this.dialog.versus_main_zhu=this.dialog.add(ui.create.switcher('versus_main_zhu',lib.storage.main_zhu)).querySelector('.toggle');
@@ -82,7 +76,6 @@ mode.versus={
 						this.dialog.versus_only_zhu.parentNode.classList.add('disabled');
 						this.dialog.versus_main_zhu.parentNode.classList.add('disabled');
 					}
-					// this.dialog.versus_replace=this.dialog.add(ui.create.switcher('versus_replace',lib.storage.replace)).querySelector('.toggle');
 					this.dialog.versus_assign_enemy=this.dialog.add(ui.create.switcher('versus_assign_enemy',lib.storage.assign_enemy)).querySelector('.toggle');
 					this.dialog.versus_random_seat=this.dialog.add(ui.create.switcher('versus_random_seat',lib.storage.random_seat)).querySelector('.toggle');
 					this.dialog.versus_noreplace_end=this.dialog.add(ui.create.switcher('versus_noreplace_end',lib.storage.noreplace_end)).querySelector('.toggle');
@@ -92,9 +85,6 @@ mode.versus={
 					this.dialog.versus_number=this.dialog.add(ui.create.switcher('versus_number',[1,2,3],lib.storage.number)).querySelector('.toggle');
 					this.dialog.replace_number=this.dialog.add(ui.create.switcher('replace_number',[0,1,2,3,4,5,7,9,17],lib.storage.replace_number)).querySelector('.toggle');
 					this.dialog.choice=this.dialog.add(ui.create.switcher('choice',[12,16,20,24,40,'∞'],lib.storage.choice)).querySelector('.toggle');
-
-					// this.dialog.add(ui.create.div('.placeholder'));
-					// this.dialog.add(ui.create.div('.placeholder'));
 				};
 				event.confirm=function(){
 					var dialog=event.dialog;
@@ -253,7 +243,6 @@ mode.versus={
 				event.custom.add.window=function(){
 					var dialog=_status.event.dialog;
 					if(_status.friend.length==_status.enemy.length&&_status.friend.length>=dialog.versus_number.link+dialog.replace_number.link){
-						// if(!ui.confirm) ui.confirm=ui.create.control('start',_status.event.confirm);
 						event.fill.firstChild.innerHTML='开始';
 						_status.choosefinished=true;
 					}
@@ -268,7 +257,6 @@ mode.versus={
 					}
 					game.save('only_zhu',dialog.versus_only_zhu.link);
 					game.save('main_zhu',dialog.versus_main_zhu.link);
-					// game.save('replace',dialog.versus_replace.link);
 					game.save('assign_enemy',dialog.versus_assign_enemy.link);
 					game.save('random_seat',dialog.versus_random_seat.link);
 					game.save('noreplace_end',dialog.versus_noreplace_end.link);
@@ -358,6 +346,14 @@ mode.versus={
 					}
 				}
 				else{
+					for(var i in lib.skill){
+						if(lib.skill[i].changeSeat){
+							lib.skill[i]={};
+							if(lib.translate[i+'_info']){
+								lib.translate[i+'_info']='固定位置时不可用';
+							}
+						}
+					}
 					for(i=0;i<position;i++){
 						game.friend.push(game.players[i-position+num*2]);
 					}
@@ -568,9 +564,6 @@ mode.versus={
 					game.onSwapControl();
 				}
 			}
-		},
-		swapSeat:function(){
-			;
 		},
 		versusClickToSwap:function(e){
 			if(_status.dragged) return;
@@ -898,7 +891,6 @@ mode.versus={
 		versus_only_zhu_config:'只当主将',
 		versus_die_stop_config:'死亡后终止结算',
 		versus_main_zhu_config:'主将死亡后结束',
-		versus_replace_config:'死亡后自动换人',
 		versus_assign_enemy_config:'指定对手',
 		versus_random_seat_config:'随机座位',
 		versus_noreplace_end_config:'无替补时结束',

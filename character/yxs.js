@@ -420,7 +420,7 @@ character.yxs={
 		qiandu:{
 			enable:'phaseUse',
 			usable:1,
-			forbid:['versus'],
+			changeSeat:true,
 			filterTarget:function(card,player,target){
 				return player!=target&&player.next!=target;
 			},
