@@ -584,7 +584,7 @@ mode.versus={
 				e.stopPropagation();
 			}
 			else{
-				game.modeSwapPlayer(this.link);
+				game.versusSwapControl(this.link);
 			}
 		},
 		versusCheckHandcards:function(){
@@ -838,7 +838,7 @@ mode.versus={
 				}
 			}
 		},
-		modeSwapPlayer:function(player){
+		versusSwapControl:function(player){
 			if(lib.storage.control_all){
 				game.swapControl(player);
 			}
@@ -928,20 +928,20 @@ mode.versus={
 				else{
 					if(ui.autoreplace.classList.contains('on')){
 						if(trigger.name!='phase'){
-							game.modeSwapPlayer(player);
+							game.versusSwapControl(player);
 							if(ui.dialog){
 								ui.dialog.style.display='';
 							}
 						}
 					}
 					else if(trigger.name=='phase'){
-						game.modeSwapPlayer(player);
+						game.versusSwapControl(player);
 					}
 					event.finish();
 				}
 				"step 1"
 				if(result.bool){
-					game.modeSwapPlayer(player);
+					game.versusSwapControl(player);
 					if(ui.dialog){
 						ui.dialog.style.display='';
 					}
