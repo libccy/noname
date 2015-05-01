@@ -980,22 +980,37 @@ character.sp={
 			trigger:{source:'dieAfter'},
 			forced:true,
 			priority:-10,
-			content:function(){
-				if(_status.currentPhase!=trigger.player){
-					player.addSkill('qiluan2')
-				}
-				else{
-					player.draw(3);
-				}
+			silent:true,
+			popup:false,
+			filter:function(event){
+				return _status.currentPhase!=event.player;
 			},
+			content:function(){
+				player.storage.qiluan=true;
+			},
+			group:['qiluan2','qiluan3']
 		},
 		qiluan2:{
 			trigger:{global:'phaseAfter'},
 			forced:true,
+			filter:function(event,player){
+				return player.storage.qiluan?true:false;
+			},
 			content:function(){
 				player.draw(3);
-				player.removeSkill('qiluan2');
+				player.storage.qiluan=false;
 			}
+		},
+		qiluan3:{
+			trigger:{source:'dieAfter'},
+			forced:true,
+			priority:-10,
+			filter:function(event){
+				return _status.currentPhase==event.player;
+			},
+			content:function(){
+				player.draw(3);
+			},
 		},
 		shangyi:{
 			enable:'phaseUse',

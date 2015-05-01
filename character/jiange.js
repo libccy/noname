@@ -424,12 +424,15 @@ character.jiange={
                         event.cards2.push(event.cards[i]);
                     }
                 }
-                if(event.cards2.length==0){
+                if(!event.isMine()){
                     player.showCards(event.cards);
-                    event.target=player;
+                }
+                "step 1"
+                if(event.cards2.length==0){
+                    event.finish();
                 }
                 else{
-                    var dialog=ui.create.dialog('将三张牌中的锦囊牌或装备牌交给一名角色');
+                    var dialog=ui.create.dialog('将三张牌中的锦囊牌或装备牌交给一名角色','hidden');
                     dialog.add(event.cards);
                     for(var i=0;i<dialog.buttons.length;i++){
                         if(event.cards2.contains(dialog.buttons[i].link)){
@@ -442,7 +445,7 @@ character.jiange={
                     var next=player.chooseTarget(true,dialog);
                     next.ai=function(target){
                         if(player.num('j','lebu')){
-                            if(target==player) return 0;
+                            if(target==player) return 0.1;
                         }
                         var att=ai.get.attitude(player,target);
                         if(player.num('h')>player.hp){
@@ -451,16 +454,13 @@ character.jiange={
                         if(target==player) return att+5;
                         return att;
                     }
-                    if(!event.isMine()){
-                        dialog.style.display='none';
-                    }
                 }
-                "step 1"
+                "step 2"
                 if(result&&result.targets&&result.targets.length){
                     event.target=result.targets[0];
                 }
                 if(event.cards2.length){
-                    event.target.gain(event.cards2,'gain');
+                    event.target.gain(event.cards2,'gain2');
                 }
             },
             ai:{

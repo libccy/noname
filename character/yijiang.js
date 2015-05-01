@@ -1001,6 +1001,7 @@ character.yijiang={
 		},
 		qieting:{
 			global:'qieting2',
+			globalSilent:true,
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
 				return event.player!=player&&!event.player.tempSkills['qieting3'];

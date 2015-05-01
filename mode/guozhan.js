@@ -303,6 +303,16 @@ mode.guozhan={
 							ifo.init(game.players[i]);
 							game.players[i].initedSkills.push(game.players[i].hiddenSkills[j]);
 						}
+						if(ifo.globalSilent){
+							if(typeof ifo.global=='string'){
+								lib.skill.global.add(ifo.global);
+							}
+							else{
+								for(var j=0;j<ifo.global.length;j++){
+									lib.skill.global.add(ifo.global[j]);
+								}
+							}
+						}
 					}
 				}
 				// ui.auto.show();
@@ -422,7 +432,7 @@ mode.guozhan={
 					break;
 				}
 				var initdraw=get.config('initshow_draw');
-				if(!_status.initshown&&initdraw){
+				if(!_status.initshown&&initdraw&&this.isAlive()){
 					this.popup('首亮');
 					game.log(get.translation(this)+'首先明置武将，得到奖励');
 					game.log(get.translation(this)+'摸了'+get.cnNumber(initdraw)+'张牌');

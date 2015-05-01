@@ -132,13 +132,16 @@ card.refresh={
 				var dialog=ui.create.dialog('木牛流马',player.get('e','5').cards);
 				var trigger=event.parent.parent;
 				player.chooseButton(dialog,function(button){
-					if(get.type(button.link)=='delay') return -1;
-					if(get.type(button.link)=='equip'){
-						var current=player.get('e',{subtype:get.subtype(button.link)})[0];
-						if(current&&ai.get.equipValue(current)>=ai.get.equipValue(button.link)) return -1;
-						return 1;
+					if(get.info(button.link).selectTarget==-1){
+						if(get.type(button.link)=='delay') return -1;
+						if(get.type(button.link)=='equip'){
+							var current=player.get('e',{subtype:get.subtype(button.link)})[0];
+							if(current&&ai.get.equipValue(current)>=ai.get.equipValue(button.link)) return -1;
+							return 1;
+						}
+						if(get.tag(button.link,'multitarget')) return -1;
+						if(button.link.name=='huoshaolianying') return -1;
 					}
-					if(get.tag(button.link,'multitarget')) return -1;
 					return 1;
 				}).filterButton=function(button){
 					return trigger.filterCard(button.link,player,trigger);
