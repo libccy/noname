@@ -6454,8 +6454,9 @@ window.play={};
 				if(control.childNodes.length){
 					var width=0;
 					for(i=0;i<control.childNodes.length;i++) width+=control.childNodes[i].offsetWidth;
-					control.hide();
-					setTimeout(function(){control.style.width=width+'px';control.show();},0);
+					ui.refresh(control);
+					control.style.width=width+'px';
+					control.style.opacity=1;
 				}
 				return control;
 			},
@@ -6514,17 +6515,8 @@ window.play={};
 					delete ui.skills;
 				}
 				if(skills==undefined||skills.length==0) return;
-				ui.skills=ui.create.control(ui.click.skill);
-				for(i=0;i<skills.length;i++){
-					ui.skills.add(skills[i]);
-				}
-				if(_status.event.isMine()){
-					var width=0;
-					for(var i=0;i<ui.skills.childNodes.length;i++) width+=ui.skills.childNodes[i].offsetWidth;
-					ui.skills.style.width=width+'px';
-					ui.skills.animate('start');
-				}
-				else{
+				ui.skills=ui.create.control(skills.concat([ui.click.skill]));
+				if(!_status.event.isMine()){
 					ui.skills.style.display='none';
 				}
 				ui.skills.skills=skills;

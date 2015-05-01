@@ -99,11 +99,11 @@ body>.background{z-index:-2}
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
 .equips>.card>.background{font-size: 36px;height: 36px;padding-top: 3px;}
-.judges>.card>.background,.marks>.card>.background{font-size: 20px;height: 20px;padding-top: 2px;}
+.judges>.card>.background,.marks>.card>.background{font-size: 20px;height: 20px;padding-top: 3px;}
 .button.card>.background{font-size: 68px;height: 68px;padding-top: 12px;}
 .card>.background{font-family:'xiaozhuan'}
 .card>.background.tight{letter-spacing: -0.2em}
-.marks>.card>.background.skillmark{font-family:'huangcao'}
+.marks>.card>.background.skillmark{font-family:'huangcao';padding-top:4px;}
 /*--------窗口--------*/
 .dialog{text-align: center;}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
@@ -177,7 +177,7 @@ margin-bottom: 5px;
 /*--------确认--------*/
 #control{text-align: center;z-index: 2;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);}
 .control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;margin-left: 4px;margin-right: 4px;}
-.control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;width: 0;}
+.control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;width: 0;opacity:0}
 .control>div{position: relative;padding: 3px;}
 /*--------角色--------*/
 .player{z-index: 4;width: 240px;height: 120px;}
