@@ -31,7 +31,10 @@ html{
 .selected{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.8) 0 0 15px !important;
 }
-.card:not(*:empty){
+.card{
+	color:white;
+}
+.card.fullskin,#arena>.card:not(*:empty){
 	color:rgb(77, 60, 51);
 	text-shadow:none;
 	background: url('wood3.png');

@@ -87,7 +87,6 @@ character.standard={
 			},
 		},
 		jianxiong:{
-
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
 				return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0])=='d';
@@ -107,7 +106,6 @@ character.standard={
 			}
 		},
 		fankui:{
-
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){

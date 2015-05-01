@@ -170,6 +170,7 @@ window.config={
 		show_replay_config:'显示重来按钮',
 		show_pause_config:'显示暂停按钮',
 		show_wuxie_config:'显示不询问无懈',
+		show_discardpile_config:'暂停时显示弃牌堆',
 		only_fullskin_config:'隐藏非全身皮肤',
 		hide_card_image_config:'隐藏卡牌背景图',
 		show_auto_config:'显示托管按钮',

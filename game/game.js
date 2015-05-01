@@ -1051,7 +1051,8 @@ window.play={};
 					for(var i=0;i<event.result.buttons.length;i++){
 						cards.push(event.result.buttons[i].link);
 					}
-					player.gain(cards);
+					target.lose(cards);
+					event.cards=cards;
 					var hs=[],oths=[];
 					for(var i=0;i<cards.length;i++){
 						if(get.position(cards[i])=='h'){
@@ -1064,10 +1065,17 @@ window.play={};
 					if(hs.length){
 						target.$give(hs.length,player);
 					}
-					else{
+					if(oths.length){
 						target.$give(oths,player);
 					}
-					game.delay();
+					"step 3"
+					if(player==game.me){
+						game.delay(2);
+					}
+					else{
+						game.delay();
+					}
+					player.gain(event.cards);
 				},
 				showHandcards:function(){
 					"step 0"
@@ -1486,7 +1494,7 @@ window.play={};
 					if(cards){
 						event.source=get.owner(cards[0]);
 						if(event.source){
-							event.source.lose(cards);
+							event.source.lose(cards,ui.special);
 						}
 					}
 					else{
@@ -2616,20 +2624,20 @@ window.play={};
 					else next.ai=function(card){
 						var player=get.owner(card);
 						var event=_status.event.parent;
+						var to=(player==event.player?event.target:event.player);
 						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
 						if(player==event.player){
-							if(event.small){
+							if(ai.get.attitude(player,to)>0&&event.small){
 								return -get.number(card)-ai.get.value(card)/2+addi;
 							}
 							return get.number(card)-ai.get.value(card)/2+addi;
 						}
-						if(ai.get.attitude(player,_status.event.parent.player)>0){
-							if(event.small){
-								return get.number(card)-ai.get.value(card)/2+addi;
+						else{
+							if(ai.get.attitude(player,to)>0&&!event.small){
+								return -get.number(card)-ai.get.value(card)/2+addi;
 							}
-							return -get.number(card)-ai.get.value(card)/2+addi;
+							return get.number(card)-ai.get.value(card)/2+addi;
 						}
-						return get.number(card)-ai.get.value(card)/2+addi;
 					}
 					next.content=lib.element.playerproto.chooseToCompare;
 					return next;
@@ -4377,8 +4385,8 @@ window.play={};
 									return;
 								}
 								if(!event.revealed&&!get.info(event.skill).forced){
-									if(game.versusSwapControl&&get.info(event.skill).direct&&player.isUnderControl()){
-										game.versusSwapControl(player);
+									if(get.info(event.skill).direct&&player.isUnderControl()){
+										game.modeSwapPlayer(player);
 										event._result={bool:true};
 									}
 									else if(get.info(event.skill).frequent&&!lib.config.autoskilllist.contains(event.skill)){
@@ -6825,6 +6833,7 @@ window.play={};
 				appearence.push(ui.create.switcher('show_auto',lib.config.show_auto,ui.click.sidebar.show_auto));
 				appearence.push(ui.create.switcher('show_volumn',lib.config.show_volumn,ui.click.sidebar.show_volumn));
 				appearence.push(ui.create.switcher('show_wuxie',lib.config.show_wuxie,ui.click.sidebar.show_wuxie));
+				appearence.push(ui.create.switcher('show_discardpile',lib.config.show_discardpile,ui.click.sidebar.global));
 				appearence.push(ui.create.div('.placeholder'));
 				appearence.push(ui.create.switcher('title',lib.config.title,ui.click.sidebar.title));
 
@@ -8538,10 +8547,12 @@ window.play={};
 				game.pause2();
 				var node=ui.create.pause().animate('start');
 				ui.sidebar3.innerHTML='';
-				for(var i=0;i<ui.discardPile.childNodes.length;i++){
-					var div=ui.create.div(ui.sidebar3);
-					div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
-					ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
+				if(lib.config.show_discardpile){
+					for(var i=0;i<ui.discardPile.childNodes.length;i++){
+						var div=ui.create.div(ui.sidebar3);
+						div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
+						ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
+					}
 				}
 				node.appendChild(ui.sidebar);
 				node.appendChild(ui.sidebar3);
