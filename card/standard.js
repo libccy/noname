@@ -693,16 +693,9 @@ card.standard={
 				return (target.num('hej')>0);
 			},
 			content:function(){
-				"step 0"
 				if(target.num('hej')){
-					player.choosePlayerCard(target,true);
+					player.gainPlayerCard('hej',target,true);
 				}
-				else{
-					event.finish();
-				}
-				"step 1"
-				player.gain(result.buttons[0].link);
-				target.$give(1,player);
 			},
 			ai:{
 				wuxie:function(target,card,player,viewer){
@@ -748,15 +741,9 @@ card.standard={
 				return (target.num('hej')>0);
 			},
 			content:function(){
-				"step 0"
 				if(target.num('hej')){
-					player.choosePlayerCard(target,true);
+					player.discardPlayerCard('hej',target,true);
 				}
-				else{
-					event.finish();
-				}
-				"step 1"
-				target.discard(result.buttons[0].link);
 			},
 			ai:{
 				basic:{
