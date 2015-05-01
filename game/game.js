@@ -1051,8 +1051,7 @@ window.play={};
 					for(var i=0;i<event.result.buttons.length;i++){
 						cards.push(event.result.buttons[i].link);
 					}
-					target.lose(cards,ui.special);
-					event.resultcards=cards;
+					player.gain(cards);
 					var hs=[],oths=[];
 					for(var i=0;i<cards.length;i++){
 						if(get.position(cards[i])=='h'){
@@ -1068,10 +1067,7 @@ window.play={};
 					else{
 						target.$give(oths,player);
 					}
-					"step 3"
-					game.delay(2);
-					"step 4"
-					player.gain(event.resultcards);
+					game.delay();
 				},
 				showHandcards:function(){
 					"step 0"
@@ -1490,7 +1486,7 @@ window.play={};
 					if(cards){
 						event.source=get.owner(cards[0]);
 						if(event.source){
-							event.source.lose(cards,ui.special);
+							event.source.lose(cards);
 						}
 					}
 					else{
@@ -2620,12 +2616,20 @@ window.play={};
 					else next.ai=function(card){
 						var player=get.owner(card);
 						var event=_status.event.parent;
-						var to=(player==event.player?event.target:event.player);
 						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
-						if(event.small&&ai.get.attitude(player,to)>0){
-							return -get.number(card)-ai.get.value(card)+addi;
+						if(player==event.player){
+							if(event.small){
+								return -get.number(card)-ai.get.value(card)/2+addi;
+							}
+							return get.number(card)-ai.get.value(card)/2+addi;
 						}
-						return get.number(card)-ai.get.value(card)+addi;
+						if(ai.get.attitude(player,_status.event.parent.player)>0){
+							if(event.small){
+								return get.number(card)-ai.get.value(card)/2+addi;
+							}
+							return -get.number(card)-ai.get.value(card)/2+addi;
+						}
+						return get.number(card)-ai.get.value(card)/2+addi;
 					}
 					next.content=lib.element.playerproto.chooseToCompare;
 					return next;
@@ -4373,8 +4377,8 @@ window.play={};
 									return;
 								}
 								if(!event.revealed&&!get.info(event.skill).forced){
-									if(get.info(event.skill).direct&&player.isUnderControl()){
-										game.modeSwapPlayer(player);
+									if(game.versusSwapControl&&get.info(event.skill).direct&&player.isUnderControl()){
+										game.versusSwapControl(player);
 										event._result={bool:true};
 									}
 									else if(get.info(event.skill).frequent&&!lib.config.autoskilllist.contains(event.skill)){
@@ -7721,12 +7725,11 @@ window.play={};
 					return;
 				}
 				var uiintro=this._poppedfunc();
+				if(!uiintro) return;
 				if(ui.currentpopped&&ui.currentpopped._uiintro){
 					ui.currentpopped._uiintro.delete();
 					delete ui.currentpopped._uiintro;
-					_status.currentpopped=null;
 				}
-				if(!uiintro) return;
 				ui.currentpopped=this;
 				uiintro.classList.add('popped');
 				uiintro.classList.add('static');
