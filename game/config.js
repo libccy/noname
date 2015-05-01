@@ -213,6 +213,7 @@ window.config={
 	volumn_background:8,
 	volumn_audio:8,
 
+	auto_popped:true,
 	auto_skill:true,
 	auto_confirm:true,
 	enable_drag:true,
@@ -250,7 +251,6 @@ window.config={
 	paused:false,
 	title:false,
 	right_sidebar:false,
-	hide_history:false,
 
 	modeconfig:false,
 	gameconfig:false,

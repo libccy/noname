@@ -362,7 +362,6 @@
 .card[data-position='0']{top:calc(100% - 130px);left:calc(50% - 52px);}
 .popup[data-position='0']{top:calc(100% - 206px);left:calc(50% - 61px);}
 #me,#mebg{top:calc(100% - 150px);}
-#control{top: calc(200% / 3 - 10px);}
 #handcards1,#handcards2{width: calc(50% - 95px);height: 127px;padding: 10px;}
 #handcards2{left: calc(50% + 75px);}
 .dialog{
@@ -378,7 +377,13 @@
 .dialog.removing{
 	top:auto;
 }
-#control{z-index:5}
+#control{
+	z-index:5;
+	top:auto;
+	bottom:190px;
+	width: calc(100% - 300px);
+	left:150px;
+}
 .popup{z-index:6}
 .dialog.scroll1,
 .dialog.scroll2{
@@ -393,6 +398,23 @@
 .dialog>.content-container{
 	height:100%;
 	top:0;
+}
+.newgame{
+	width:150px;
+	display:flex;
+}
+.newgame>div{
+	padding-left:5px;
+	padding-right:5px;
+	padding-top:3px;
+	padding-bottom:3px;
+	position:relative;
+	margin:auto;
+	border-radius:4px;
+}
+.bordered{
+	border:1px solid white;
+	box-shadow:black 0 0 2px;
 }
 
 @media screen and (min-width: 1150px) {

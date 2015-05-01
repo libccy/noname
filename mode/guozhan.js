@@ -9,7 +9,6 @@ mode.guozhan={
 				"step 1"
 				if(lib.storage.test){
 					_status.auto=true;
-					// ui.auto.innerHTML='手动';
 					ui.auto.classList.add('glow');
 				}
 				game.chooseCharacter();
@@ -21,7 +20,21 @@ mode.guozhan={
 					}
 					console.log(str);
 				}
-				var player=game.players[Math.floor(Math.random()*game.players.length)];
+				var player;
+				if(_status.cheat_seat){
+					var seat=_status.cheat_seat.link;
+					if(seat==0){
+						player=game.me;
+					}
+					else{
+						player=game.players[game.players.length-seat];
+					}
+					if(!player) player=game.me;
+					delete _status.cheat_seat;
+				}
+				else{
+					player=game.players[Math.floor(Math.random()*game.players.length)];
+				}
 				event.trigger('gameStart');
 				game.gameDraw(player);
 				if(get.config('ai_identity')){
@@ -30,6 +43,12 @@ mode.guozhan={
 				else{
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].ai.shown=0;
+					}
+				}
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
+					if(game.players[i]==game.me){
+						lib.translate[game.players[i].name]+='（你）';
 					}
 				}
 				game.phaseLoop(player);
@@ -82,7 +101,52 @@ mode.guozhan={
 			}
 			next.content=function(){
 				"step 0"
-				// ui.auto.hide();
+				var addSetting=function(dialog){
+					dialog.add('选择座位');
+					var seats=document.createElement('table');
+					seats.style.margin='0 auto';
+					seats.style.maxWidth='490px';
+					var tr=document.createElement('tr');
+					seats.appendChild(tr);
+					for(var i=1;i<=game.players.length;i++){
+						var td=document.createElement('td');
+						tr.appendChild(td);
+						td.style.width='40px';
+						td.style.fontSize='18px';
+						td.innerHTML=get.cnNumber(i,true);
+						td.link=i-1;
+						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+							if(_status.dragged) return;
+							if(_status.cheat_seat){
+								_status.cheat_seat.classList.remove('thundertext');
+							}
+							this.classList.add('thundertext');
+							_status.cheat_seat=this;
+						});
+					}
+					dialog.content.appendChild(seats);
+					if(game.me==game.zhu){
+						seats.previousSibling.style.display='none';
+						seats.style.display='none';
+					}
+
+					dialog.add(ui.create.div('.placeholder'));
+					dialog.add(ui.create.div('.placeholder'));
+					dialog.add(ui.create.div('.placeholder'));
+				};
+				var removeSetting=function(){
+					var dialog=_status.event.dialog;
+					if(dialog.querySelector('table')&&!get.config('change_identity')){
+						dialog.querySelector('table').previousSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').remove();
+					}
+				};
+				event.addSetting=addSetting;
+				event.removeSetting=removeSetting;
+
 				var i;
 				event.list=[];
 				for(i in lib.character){
@@ -99,6 +163,9 @@ mode.guozhan={
 				}
 				else{
 					var dialog=ui.create.dialog('选择角色',[list,'character']);
+					if(get.config('change_identity')){
+						addSetting(dialog);
+					}
 					var next=game.me.chooseButton(dialog,true,2);
 					next.filterButton=function(button){
 						if(ui.selected.buttons.length==0) return true;
@@ -286,7 +353,6 @@ mode.guozhan={
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].classList.add('unseen');
 					game.players[i].classList.add('unseen2');
-					// game.players[i].node.identity.style.background='none';
 					if(game.players[i]!=game.me){
 						game.players[i].node.identity.firstChild.innerHTML='猜';
 						game.players[i].node.identity.dataset.color='unknown';
@@ -295,7 +361,7 @@ mode.guozhan={
 					game.players[i].group='unknown';
 					game.players[i].sex='unknown';
 					game.players[i].name1=game.players[i].name;
-					game.players[i].name='unknown'+game.players[i].dataset.position;
+					game.players[i].name='unknown';
 					game.players[i].identity='unknown';
 					for(var j=0;j<game.players[i].hiddenSkills.length;j++){
 						var ifo=get.info(game.players[i].hiddenSkills[j]);
@@ -315,7 +381,6 @@ mode.guozhan={
 						}
 					}
 				}
-				// ui.auto.show();
 			}
 		},
 	},
@@ -338,6 +403,7 @@ mode.guozhan={
 		}
 	},
 	translate:{
+		change_identity_config:'自由选择座位',
 		guozhan_mode:'国战',
 		ye:'野',
 		unknown:'无名氏',
@@ -739,6 +805,7 @@ mode.guozhan={
 		player_number:true,
 		initshow_draw:true,
 		free_choose:true,
+		change_identity:true,
 		change_choice:true,
 		change_card:true,
 		swap:true,

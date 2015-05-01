@@ -134,6 +134,9 @@ card.extra={
 			},
 			chongzhu:true,
 			ai:{
+				wuxie:function(){
+					if(Math.random()<0.5) return 0;
+				},
 				basic:{
 					useful:4,
 					value:4,
@@ -144,7 +147,7 @@ card.extra={
 						if(target.classList.contains('linked')) return 1;
 						if(ai.get.attitude(player,target)>=0) return -1;
 						for(var i=0;i<game.players.length;i++){
-							if(ai.get.attitude(player,game.players[i])<0&&
+							if(ai.get.attitude(player,game.players[i])<=-1&&
 								game.players[i]!=target&&!game.players[i].isLinked()){
 								return -1;
 							}

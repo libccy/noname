@@ -62,3 +62,6 @@ html{
 	color:rgb(77, 60, 51);
 	text-shadow:none;
 }
+.bordered{
+	border:1px solid rgba(255, 255, 255,0.5);
+}

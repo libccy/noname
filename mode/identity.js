@@ -211,9 +211,10 @@ mode.identity={
 				var list3=[];
 				var identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
 				var addSetting=function(dialog){
-					dialog.add('更换身份');
+					dialog.add('选择身份');
 					var table=document.createElement('table');
 					table.style.margin='0 auto';
+					table.style.maxWidth='500px';
 					var tr=document.createElement('tr');
 					table.appendChild(tr);
 					var list=['random','zhu','zhong','nei','fan'];
@@ -223,6 +224,9 @@ mode.identity={
 						td.style.width='40px';
 						td.style.fontSize='18px';
 						td.link=list[i];
+						if(td.link===game.me.identity){
+							td.classList.add('thundertext');
+						}
 						td.innerHTML=get.translation(list[i]+'2');
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 							if(_status.dragged) return;
@@ -243,11 +247,63 @@ mode.identity={
 						});
 					}
 					dialog.content.appendChild(table);
+
+
+					dialog.add('选择座位');
+					var seats=document.createElement('table');
+					seats.style.margin='0 auto';
+					seats.style.maxWidth='490px';
+					var tr=document.createElement('tr');
+					seats.appendChild(tr);
+					for(var i=2;i<=game.players.length;i++){
+						var td=document.createElement('td');
+						tr.appendChild(td);
+						td.style.width='40px';
+						td.style.fontSize='18px';
+						td.innerHTML=get.cnNumber(i,true);
+						td.link=i-1;
+						if(get.distance(game.zhu,game.me,'absolute')===i-1){
+							td.classList.add('thundertext');
+						}
+						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+							if(_status.dragged) return;
+							if(get.distance(game.zhu,game.me,'absolute')==this.link) return;
+							var current=this.parentNode.querySelector('.thundertext');
+							if(current){
+								current.classList.remove('thundertext');
+							}
+							this.classList.add('thundertext');
+							for(var i=0;i<game.players.length;i++){
+								if(get.distance(game.players[i],game.me,'absolute')==this.link){
+									game.swapSeat(game.zhu,game.players[i],false);return;
+								}
+							}
+						});
+					}
+					dialog.content.appendChild(seats);
+					if(game.me==game.zhu){
+						seats.previousSibling.style.display='none';
+						seats.style.display='none';
+					}
+
 					dialog.add(ui.create.div('.placeholder'));
 					dialog.add(ui.create.div('.placeholder'));
 					dialog.add(ui.create.div('.placeholder'));
 				};
+				var removeSetting=function(){
+					var dialog=_status.event.dialog;
+					if(dialog.querySelector('table')&&!get.config('change_identity')){
+						dialog.querySelector('table').previousSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').remove();
+					}
+				};
 				event.addSetting=addSetting;
+				event.removeSetting=removeSetting;
 				event.list=[];
 				for(i=0;i<identityList.length;i++){
 					identityList.sort(lib.sort.random);
@@ -756,9 +812,9 @@ mode.identity={
 		ban_weak:true,
 		enhance_zhu:true,
 		free_choose:true,
+		change_identity:true,
 		change_choice:true,
 		change_card:true,
-		change_identity:true,
 		dierestart:true,
 		swap:true,
 		revive:true,

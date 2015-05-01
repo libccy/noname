@@ -37,9 +37,10 @@ window.play={};
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中双指点击切换暂停<li>键盘快捷键<br>'+
 			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>'
 		},
-		setPopped:function(node,func,width){
+		setPopped:function(node,func,width,height){
 			node._poppedfunc=func;
 			node._poppedwidth=width;
+			node._poppedheight=height;
 			node.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',ui.click.hoverpopped);
 		},
 		placePoppedDialog:function(dialog,e){
@@ -6538,15 +6539,14 @@ window.play={};
 
 
 				ui.sidebar=ui.create.div('#sidebar');
+				ui.sidebar3=ui.create.div('#sidebar3');
 				ui.canvas=document.createElement('canvas');
 				ui.arena.appendChild(ui.canvas);
 				ui.canvas.id='canvas';
 				ui.ctx=ui.canvas.getContext('2d');
-				lib.config.hide_history=false;
-				if(lib.config.right_sidebar) ui.sidebar.classList.add('right');
 				ui.config=ui.create.div('#sidebar2.content');
 				ui.config.listen(function(e){
-					e.stopPropagation()
+					e.stopPropagation();
 					if(_status.choosing){
 						if(_status.choosing.expand) _status.choosing.expand=false;
 						else{
@@ -6556,6 +6556,7 @@ window.play={};
 							delete _status.choosing;
 						}
 					}
+					return false;
 				});
 				ui.config.oncontextmenu=function(e){
 					e.stopPropagation();
@@ -6569,6 +6570,8 @@ window.play={};
 				ui.sidebar.style.WebkitOverflowScrolling='touch';
 				ui.config.style.WebkitOverflowScrolling='touch';
 				if(lib.config.right_sidebar){
+					ui.sidebar.classList.add('right');
+					ui.sidebar3.classList.add('left');
 					ui.config.classList.add('right');
 				}
 				var folditems=[];
@@ -7261,14 +7264,14 @@ window.play={};
 				ui.replay=ui.create.system('重来',game.reload,true);
 				ui.pause=ui.create.system('历史',ui.click.pause);
 				if(!lib.config.touchscreen){
-					lib.setPopped(ui.pause,ui.click.pausehistory,220);
+					lib.setPopped(ui.pause,ui.click.pausehistory,220,400);
 				}
 				if(!lib.config.show_pause){
 					ui.pause.style.display='none';
 				}
 				ui.config2=ui.create.system('选项',ui.click.config);
 				if(!lib.config.touchscreen){
-					lib.setPopped(ui.config2,ui.click.pauseconfig,220);
+					lib.setPopped(ui.config2,ui.click.pauseconfig,170);
 				}
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
 				ui.auto=ui.create.system('托管',ui.click.auto);
@@ -7349,9 +7352,14 @@ window.play={};
 				node2.innerHTML='已暂停';
 				node2.listen(function(){
 					_status.clicked=true;
-					lib.config.hide_history=!lib.config.hide_history;
-					if(lib.config.hide_history) ui.sidebar.hide();
-					else ui.sidebar.show();
+					if(ui.sidebar.classList.contains('hidden')){
+						ui.sidebar.show();
+						ui.sidebar3.show();
+					}
+					else{
+						ui.sidebar.hide();
+						ui.sidebar3.hide();
+					}
 				});
 				return node;
 			},
@@ -7591,6 +7599,7 @@ window.play={};
 				if(!lib.config.auto_popped) return;
 				if(!ui.sidebar.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
+				uiintro.style.maxHeight='400px';
 				uiintro.add(ui.sidebar);
 				return uiintro;
 			},
@@ -7598,7 +7607,18 @@ window.play={};
 				if(!lib.config.auto_popped) return;
 				if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
-				uiintro.add(ui.config);
+				var node=ui.create.div('.newgame');
+				var list=[['identity','身份'],['guozhan','国战'],['versus','对决']];
+				for(var i=0;i<list.length;i++){
+					var div=ui.create.div(list[i][0]==lib.config.mode?'.bordered':'',node);
+					div.innerHTML=list[i][1];
+					div.link=list[i][0];
+					div.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+						game.saveConfig('mode',this.link);
+						game.reload();
+					});
+				}
+				uiintro.add(node);
 				return uiintro;
 			},
 			volumn:function(){
@@ -7685,7 +7705,9 @@ window.play={};
 				ui.window.appendChild(uiintro);
 				var width=this._poppedwidth||330;
 				uiintro.style.width=width+'px';
-				uiintro.style.height=Math.min(ui.window.offsetHeight-260,uiintro.content.scrollHeight)+'px';
+
+				var height=this._poppedheight||uiintro.content.scrollHeight;
+				uiintro.style.height=Math.min(ui.window.offsetHeight-260,height)+'px';
 				uiintro.style.top='50px';
 				var left=this.parentNode.offsetLeft+this.offsetLeft+this.offsetWidth/2-width/2;
 				if(left<10){
@@ -8472,7 +8494,14 @@ window.play={};
 				ui.system.hide();
 				game.pause2();
 				var node=ui.create.pause().animate('start');
+				ui.sidebar3.innerHTML='';
+				for(var i=0;i<ui.discardPile.childNodes.length;i++){
+					var div=ui.create.div(ui.sidebar3);
+					div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
+					ui.sidebar3.insertBefore(div,ui.sidebar3.firstChild);
+				}
 				node.appendChild(ui.sidebar);
+				node.appendChild(ui.sidebar3);
 				ui.arena.classList.add('paused');
 			},
 			resume:function(e){
@@ -8622,13 +8651,7 @@ window.play={};
 					if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
 					else dialog=_status.event.dialog;
 					if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.parent.addSetting(dialog);
-					else if(dialog.querySelector('table')&&!get.config('change_identity')){
-						dialog.querySelector('table').previousSibling.remove();
-						dialog.querySelector('table').nextSibling.remove();
-						dialog.querySelector('table').nextSibling.remove();
-						dialog.querySelector('table').nextSibling.remove();
-						dialog.querySelector('table').remove();
-					}
+					else _status.event.parent.removeSetting(dialog);
 					ui.update();
 				},
 				change_choice:function(bool){
@@ -8888,6 +8911,7 @@ window.play={};
 					if(bool){
 						ui.config.classList.add('right');
 						ui.sidebar.classList.add('right');
+						ui.sidebar3.classList.add('left');
 						ui.arena.classList.add('left');
 						ui.arena.classList.remove('right');
 						ui.system.appendChild(ui.system1);
@@ -8895,6 +8919,7 @@ window.play={};
 					else{
 						ui.config.classList.remove('right');
 						ui.sidebar.classList.remove('right');
+						ui.sidebar3.classList.remove('left');
 						ui.arena.classList.add('right');
 						ui.arena.classList.remove('left');
 						ui.system.appendChild(ui.system2);
