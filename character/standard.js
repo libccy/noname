@@ -611,8 +611,8 @@ character.standard={
 			frequent:true,
 			content:function(){
 				"step 0"
-				if(player.underControl()){
-					game.swapPlayer(player);
+				if(player.isUnderControl()){
+					game.modeSwapPlayer(player);
 				}
 				if(event.isMine()){
 					ui.auto.hide();
