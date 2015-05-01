@@ -65,3 +65,13 @@ html{
 .bordered{
 	border:1px solid rgba(255, 255, 255,0.5);
 }
+
+.dialog.popped .config>.toggle.onoff>div{
+	border:1px solid rgba(77, 60, 51,0.8);
+	box-shadow: none;
+}
+.dialog.popped .config>.toggle.onoff>div>div{
+	background:rgba(77, 60, 51,0.8);
+	border:1px solid rgba(77, 60, 51,0);
+	box-shadow:none;
+}

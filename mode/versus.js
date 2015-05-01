@@ -385,7 +385,6 @@ mode.versus={
 					game.friend[i].side=_status.color;
 					game.enemy[i].side=!_status.color;
 					if(lib.storage.random_seat&&lib.storage.zhu){
-						// console.log(i,game.friend[i].dataset.position,game.enemy[i].dataset.position);
 						if(game.friendZhu==game.friend[i]){
 							game.friend[i].identity='zhu';
 							game.friend[i].setIdentity(_status.color+'Zhu');

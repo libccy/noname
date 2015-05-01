@@ -245,7 +245,7 @@ card.qimou={
 				targets[1].$give(event.num,targets[0]);
 			},
 			ai:{
-				order:9,
+				order:6.5,
 				tag:{
 					discard:1,
 					multitarget:1,

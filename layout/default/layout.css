@@ -442,7 +442,7 @@ div:hover>.intro{opacity: 1;}
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:4px;
 }
-.underline{
+.underline,.underlinenode{
 	padding:3px;
 	width:auto;
 	display:inline-block;
@@ -450,7 +450,7 @@ div:hover>.intro{opacity: 1;}
 	border-style:solid;
 	border-color:transparent;
 }
-.on>.underline{
+.on>.underline,.underlinenode.on{
 	border-color:rgb(0, 133, 255);
 }
 .config.underlined{
@@ -461,6 +461,16 @@ div:hover>.intro{opacity: 1;}
 	border-style:solid;
 	border-color:rgb(0, 133, 255);
 	padding-bottom:1px;
+}
+
+.newgame{
+	width:150px;
+	display:flex;
+}
+.newgame>div{
+	padding:3px;
+	position:relative;
+	margin:auto;
 }
 
 .player .identity{
@@ -577,18 +587,18 @@ div[data-nature='soil']{
 	opacity:0.4;
 }
 .config>.toggle.onoff>div>div{
-	width:10px;
-	height:10px;
+	width:8px;
+	height:8px;
 	border-radius:100%;
 	position:absolute;
 	left:1px;
 	top:1px;
 	background:white;
+	border:1px solid white;
 	box-shadow:black 0 0 2px;
 }
 .config>.toggle.onoff.on>div>div{
 	left:calc(100% - 11px);
-	/*background:rgb(117,186,255);*/
 }
 
 .firetext{

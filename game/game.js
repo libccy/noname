@@ -2616,19 +2616,20 @@ window.play={};
 					else next.ai=function(card){
 						var player=get.owner(card);
 						var event=_status.event.parent;
+						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
 						if(player==event.player){
 							if(event.small){
-								return -get.number(card)-ai.get.value(card)/2;
+								return -get.number(card)-ai.get.value(card)/2+addi;
 							}
-							return get.number(card)-ai.get.value(card)/2;
+							return get.number(card)-ai.get.value(card)/2+addi;
 						}
 						if(ai.get.attitude(player,_status.event.parent.player)>0){
 							if(event.small){
-								return get.number(card)-ai.get.value(card)/2;
+								return get.number(card)-ai.get.value(card)/2+addi;
 							}
-							return -get.number(card)-ai.get.value(card)/2;
+							return -get.number(card)-ai.get.value(card)/2+addi;
 						}
-						return get.number(card)-ai.get.value(card)/2;
+						return get.number(card)-ai.get.value(card)/2+addi;
 					}
 					next.content=lib.element.playerproto.chooseToCompare;
 					return next;
@@ -3781,9 +3782,12 @@ window.play={};
 				isIn:function(){
 					return this.classList.contains('dead')==false&&this.classList.contains('out')==false&&!this.removed;
 				},
-				underControl:function(){
-					return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
-						this!=game.me&&this.side==game.me.side
+				isUnderControl:function(){
+					if(lib.config.mode=='versus'){
+						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
+							this!=game.me&&this.side==game.me.side;
+					}
+					return false;
 				},
 				hasSkillTag:function(tag,hidden){
 					var skills=game.expandSkills(this.get('s',hidden));
@@ -4373,9 +4377,7 @@ window.play={};
 									return;
 								}
 								if(!event.revealed&&!get.info(event.skill).forced){
-									if(game.versusSwapControl&&get.info(event.skill).direct&&ui.autoreplace&&
-										ui.autoreplace.classList.contains('on')&&
-										player!=game.me&&player.side==game.me.side){
+									if(game.versusSwapControl&&get.info(event.skill).direct&&player.isUnderControl()){
 										game.versusSwapControl(player);
 										event._result={bool:true};
 									}
@@ -6544,9 +6546,11 @@ window.play={};
 				ui.arena.appendChild(ui.canvas);
 				ui.canvas.id='canvas';
 				ui.ctx=ui.canvas.getContext('2d');
+				ui.configbg=ui.create.div("#click");
+				ui.configbg.listen(ui.click.config2);
+				ui.configbg.oncontextmenu=ui.click.config2;
 				ui.config=ui.create.div('#sidebar2.content');
 				ui.config.listen(function(e){
-					e.stopPropagation();
 					if(_status.choosing){
 						if(_status.choosing.expand) _status.choosing.expand=false;
 						else{
@@ -6556,6 +6560,7 @@ window.play={};
 							delete _status.choosing;
 						}
 					}
+					_status.clicked=true;
 					return false;
 				});
 				ui.config.oncontextmenu=function(e){
@@ -7077,14 +7082,16 @@ window.play={};
 
 				var autoskill=[];
 				folditems.push(autoskill);
+				ui.autoskill=autoskill;
 				ui.config.appendChild(ui.create.line2('自动发动',function(){
 					if(this.clicked) return;
-					var sks;
-					if(game.me){
-						sks=game.expandSkills(game.me.get('s'));
-					}
-					else{
-						sks=[];
+					var sks=[];
+					if(game.players){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i]==game.me||game.players[i].isUnderControl()){
+								sks=sks.concat(game.expandSkills(game.players[i].get('s')));
+							}
+						}
 					}
 					for(var i=0;i<autoskill.length-1;i++){
 						if(!sks.contains(autoskill[i].link)){
@@ -7094,6 +7101,7 @@ window.play={};
 							autoskill[i].style.display='';
 						}
 					}
+					autoskillempty.classList.remove('underlined');
 					if(autoskill.fold){
 						autoskill.fold=false;
 						fold(autoskill);
@@ -7120,12 +7128,13 @@ window.play={};
 
 				var autoskillempty=ui.create.div('.config');
 				autoskillempty.listen(function(){
-					var sks;
-					if(game.me){
-						sks=game.expandSkills(game.me.get('s'));
-					}
-					else{
-						sks=[];
+					var sks=[];
+					if(game.players){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i]==game.me||game.players[i].isUnderControl()){
+								sks=sks.concat(game.expandSkills(game.players[i].get('s')));
+							}
+						}
 					}
 					if(this.classList.contains('underlined')){
 						this.classList.remove('underlined');
@@ -7610,7 +7619,7 @@ window.play={};
 				var node=ui.create.div('.newgame');
 				var list=[['identity','身份'],['guozhan','国战'],['versus','对决']];
 				for(var i=0;i<list.length;i++){
-					var div=ui.create.div(list[i][0]==lib.config.mode?'.bordered':'',node);
+					var div=ui.create.div(list[i][0]==lib.config.mode?'.underlinenode.on':'.underlinenode',node);
 					div.innerHTML=list[i][1];
 					div.link=list[i][0];
 					div.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
@@ -7619,6 +7628,30 @@ window.play={};
 					});
 				}
 				uiintro.add(node);
+
+				var auto=null;
+				var sks=[];
+				var autoskill=ui.autoskill;
+				if(game.players){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.me||game.players[i].isUnderControl()){
+							sks=sks.concat(game.expandSkills(game.players[i].get('s')));
+						}
+					}
+				}
+				for(var i=0;i<autoskill.length-1;i++){
+					if(sks.contains(autoskill[i].link)){
+						if(!auto){
+							auto=ui.create.div('.text');
+							auto.style.marginBottom=0;
+							auto.innerHTML='自动发动';
+							uiintro.add(auto);
+						}
+						autoskill[i].style.display='';
+						uiintro.add(autoskill[i]);
+					}
+				}
+
 				return uiintro;
 			},
 			volumn:function(){
@@ -8058,39 +8091,47 @@ window.play={};
 				if(_status.clicked){
 					_status.clicked=false;
 				}
-				else if(_status.editing){
-					if(_status.editing.innerHTML.length){
-						_status.editing.link=_status.editing.innerHTML;
+				else{
+					if(_status.editing){
+						if(_status.editing.innerHTML.length){
+							_status.editing.link=_status.editing.innerHTML;
+						}
+						_status.editing.innerHTML=get.translation(_status.editing.link);
+						delete _status.editing;
 					}
-					_status.editing.innerHTML=get.translation(_status.editing.link);
-					delete _status.editing;
-				}
-				else if(ui.intro){
-					ui.intro.close();
-					delete ui.intro;
-					ui.control.show();
-					game.resume2();
-				}
-				else if(_status.event.isMine()){
-					if(_status.event.custom.replace.window){
-						_status.event.custom.replace.window();
+					else if(ui.intro){
+						ui.intro.close();
+						delete ui.intro;
+						ui.control.show();
+						game.resume2();
 					}
-					else{
-						if(_status.event.skill&&_status.event.name=='chooseToUse'){
-							ui.click.cancel();
+					else if(_status.event.isMine()){
+						if(_status.event.custom.replace.window){
+							_status.event.custom.replace.window();
 						}
 						else{
-							game.uncheck();
-							game.check();
-						}
-						if(_status.event.custom.add.window){
-							_status.event.custom.add.window();
+							if(_status.event.skill&&_status.event.name=='chooseToUse'){
+								ui.click.cancel();
+							}
+							else{
+								game.uncheck();
+								game.check();
+							}
+							if(_status.event.custom.add.window){
+								_status.event.custom.add.window();
+							}
 						}
 					}
 				}
-				if(ui.currentpopped&&ui.currentpopped._uiintro){
-					ui.currentpopped._uiintro.delete();
-					delete ui.currentpopped._uiintro;
+				if(_status.tempunpop){
+					_status.tempunpop=false;
+				}
+				else{
+					if(ui.currentpopped&&ui.currentpopped._uiintro){
+						ui.currentpopped._uiintro.delete();
+						delete ui.currentpopped._uiintro;
+						delete ui.currentpopped;
+					}
 				}
 				if(_status.event.custom.add.window){
 					_status.event.custom.add.window();
@@ -8099,6 +8140,7 @@ window.play={};
 			toggle:function(){
 				if(_status.dragged) return;
 				if(this.parentNode.classList.contains('disabled')) return;
+				_status.tempunpop=true;
 				if(this.link){
 					this.link=false;
 					this.classList.remove('on');
@@ -8122,6 +8164,7 @@ window.play={};
 				if(_status.dragged) return;
 				if(_status.choosing) return;
 				_status.clicked=true;
+				_status.tempunpop=true;
 				this.previousSibling.hide();
 				var node=ui.create.div('.switcher',this.parentNode).animate('start');
 				for(var i=0;i<this.choice.length;i++){
@@ -8518,15 +8561,13 @@ window.play={};
 			config:function(){
 				if(_status.paused2) _status.config2=false;
 				else _status.config2=true;
+
 				_status.clicked=true;
 				game.pause2();
 				ui.system.hide();
-				// ui.arena.classList.add('paused');
 				if(lib.config.right_sidebar) ui.arena.classList.add('left');
 				else ui.arena.classList.add('right');
-				var configbg=ui.create.div("#click",ui.window);
-				configbg.listen(ui.click.config2);
-				configbg.oncontextmenu=ui.click.config2;
+				ui.window.appendChild(ui.configbg);
 				setTimeout(function(){
 					ui.config.animate('start');
 					ui.window.appendChild(ui.config);
