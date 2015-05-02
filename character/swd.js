@@ -4213,11 +4213,15 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				trigger.player.draw();
-				"step 1"
-				if(player.num('h')<trigger.player.num('h')){
-					player.draw();
+				if(trigger.player!=player&&trigger.player.num('h')>=player.num('h')){
+					game.asyncDraw([trigger.player,player]);
 				}
+				else{
+					trigger.player.draw();
+					event.finish();
+				}
+				"step 1"
+				game.delay();
 			},
 			ai:{
 				expose:0.2

@@ -209,6 +209,9 @@ mode.guozhan={
 							list=event.list.splice(0,7);
 							_status.event.dialog.close();
 							_status.event.dialog=ui.create.dialog('选择角色',[list,'character']);
+							if(get.config('change_identity')){
+								addSetting(_status.event.dialog);
+							}
 							game.uncheck();
 							game.check();
 						});

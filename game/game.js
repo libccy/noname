@@ -8861,7 +8861,7 @@ window.play={};
 				if(_status.config2){
 					game.resume2();
 				}
-				e.stopPropagation();
+				// e.stopPropagation();
 				return false;
 			},
 			swap:function(){

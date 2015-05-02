@@ -423,6 +423,9 @@ card.standard={
 				else document.getElementById('wugu').close();
 			},
 			ai:{
+				wuxie:function(){
+					if(Math.random()<0.5) return 0;
+				},
 				basic:{
 					order:3,
 					useful:1,
