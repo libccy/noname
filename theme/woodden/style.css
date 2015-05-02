@@ -25,6 +25,9 @@ html{
 .popup.thunder{
 	color: rgb(117,186,255);
 }
+.control .thundertext{
+	color: rgba(29, 63, 137, 1);
+}
 .player,.card,.button,.dialog>.bar{
 	background: url('wood.jpg');
 }

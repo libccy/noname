@@ -10,6 +10,7 @@ table{table-layout: fixed;}
 #arena.left{left:calc(10% - 240px);opacity: 0.6;}
 #arena.top{top:-100%;}
 #arena.paused{/*-webkit-filter:blur(3px);*/opacity:  0.3 !important;}
+#arena.paused2{opacity:  0.1 !important;}
 #arena>.poplayer{
 	width:100%;
 	height:100%;

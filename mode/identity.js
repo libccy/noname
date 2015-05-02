@@ -376,90 +376,7 @@ mode.identity={
 						game.check();
 					});
 				};
-				(function(){
-					var list=[];
-					var dialog;
-					var node=ui.create.div('.caption');
-					var namecapt=[];
-					var getCapt=function(str){
-						if(str.indexOf('_')==-1){
-							return str[0];
-						}
-						return str[str.indexOf('_')+1];
-					}
-					for(i in lib.character){
-						if(get.config('ban_weak')&&lib.config.forbidall.contains(i)) continue;
-						list.push(i);
-						if(namecapt.indexOf(getCapt(i))==-1){
-							namecapt.push(getCapt(i));
-						}
-					}
-					namecapt.sort(function(a,b){
-						return a>b?1:-1;
-					});
-					var clickCapt=function(){
-						if(_status.dragged) return;
-						dialog.currentcapt=this.link;
-						for(var i=0;i<dialog.buttons.length;i++){
-							if(dialog.buttons[i].capt!=dialog.currentcapt||
-							(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup)){
-								dialog.buttons[i].style.display='none';
-							}
-							else{
-								dialog.buttons[i].style.display='';
-							}
-						}
-					};
-					for(i=0;i<namecapt.length;i++){
-						var span=document.createElement('span');
-						span.innerHTML=' '+namecapt[i].toUpperCase()+' ';
-						span.link=namecapt[i];
-						span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
-						node.appendChild(span);
-					}
-					var groupSort=function(name){
-						if(lib.character[name][1]=='wei') return 0;
-						if(lib.character[name][1]=='shu') return 1;
-						if(lib.character[name][1]=='wu') return 2;
-						if(lib.character[name][1]=='qun') return 3;
-					}
-					list.sort(function(a,b){
-						var del=groupSort(a)-groupSort(b);
-						if(del!=0) return del;
-						var aa=a,bb=b;
-						if(a.indexOf('_')!=-1){
-							a=a.slice(a.indexOf('_')+1);
-						}
-						if(b.indexOf('_')!=-1){
-							b=b.slice(b.indexOf('_')+1);
-						}
-						if(a!=b){
-							return a>b?1:-1;
-						}
-						return aa>bb?1:-1;
-					});
-					if(lib.storage.hide_alphabet){
-						node.style.display='none';
-					}
-					dialog=ui.create.dialog('hidden','自由选将',node,[list,'character']);
-					dialog.add(ui.create.div('.placeholder'));
-					dialog.firstChild.firstChild.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-						if(_status.dragged) return;
-						if(node.style.display=='none'){
-							node.style.display='';
-							game.save('hide_alphabet',false);
-						}
-						else{
-							node.style.display='none';
-							game.save('hide_alphabet',true);
-						}
-					});
-					for(i=0;i<dialog.buttons.length;i++){
-						dialog.buttons[i].group=lib.character[dialog.buttons[i].link][1];
-						dialog.buttons[i].capt=getCapt(dialog.buttons[i].link);
-					}
-					_status.event.dialogxx=dialog;
-				}());
+				event.dialogxx=ui.create.characterDialog();
 				ui.create.cheat2=function(){
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){
@@ -475,27 +392,7 @@ mode.identity={
 							}
 						}
 						else{
-							ui.cheat2x=ui.create.control('全部','wei','shu','wu','qun',function(link){
-								if(link=='全部'){
-									ui.dialog.currentcapt='';
-									ui.dialog.currentgroup='';
-									for(var i=0;i<ui.dialog.buttons.length;i++){
-										ui.dialog.buttons[i].style.display='';
-									}
-								}
-								else{
-									ui.dialog.currentgroup=link;
-									for(var i=0;i<ui.dialog.buttons.length;i++){
-										if(ui.dialog.buttons[i].group!=link||
-										(ui.dialog.currentcapt&&ui.dialog.buttons[i].capt!=ui.dialog.currentcapt)){
-											ui.dialog.buttons[i].style.display='none';
-										}
-										else{
-											ui.dialog.buttons[i].style.display='';
-										}
-									}
-								}
-							});
+							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
 							this.backup=_status.event.dialog;
 							_status.event.dialog.close();
 							_status.event.dialog=_status.event.parent.dialogxx;

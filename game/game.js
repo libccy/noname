@@ -4475,7 +4475,7 @@ window.play={};
 					else{
 						var buttons=ui.create.div('.buttons',this.content);
 						if(zoom) buttons.classList.add('smallzoom');
-						this.buttons=this.buttons.concat(ui.create.buttons(item[0],item[1],buttons));
+						this.buttons=this.buttons.concat(ui.create.buttons(item[0],item[1],buttons,noclick));
 					}
 					ui.update();
 					return item;
@@ -6366,6 +6366,196 @@ window.play={};
 	            }
 	            return node;
 			},
+			groupControl:function(dialog){
+				return ui.create.control('wei','shu','wu','qun',function(link,node){
+					if(link=='全部'){
+						dialog.currentcapt='';
+						dialog.currentgroup='';
+						for(var i=0;i<dialog.buttons.length;i++){
+							dialog.buttons[i].style.display='';
+						}
+					}
+					else{
+						if(node.classList.contains('thundertext')){
+							dialog.currentgroup=null;
+							dialog.currentgroupnode=null;
+							node.classList.remove('thundertext');
+							for(var i=0;i<dialog.buttons.length;i++){
+								if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.currentcapt){
+									dialog.buttons[i].style.display='none';
+								}
+								else{
+									dialog.buttons[i].style.display='';
+								}
+							}
+						}
+						else{
+							if(dialog.currentgroupnode){
+								dialog.currentgroupnode.classList.remove('thundertext');
+							}
+							dialog.currentgroup=link;
+							dialog.currentgroupnode=node;
+							node.classList.add('thundertext');
+							for(var i=0;i<dialog.buttons.length;i++){
+								if(dialog.buttons[i].group!=link||
+								(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.currentcapt)){
+									dialog.buttons[i].style.display='none';
+								}
+								else{
+									dialog.buttons[i].style.display='';
+								}
+							}
+						}
+					}
+				});
+			},
+			cardDialog:function(){
+				var args=['thisiscard'];
+				for(var i=0;i<arguments.length;i++){
+					args.push(arguments[i]);
+				}
+				return ui.create.characterDialog.apply(this,args);
+			},
+			characterDialog:function(){
+				var filter,str,noclick,thisiscard;
+				for(var i=0;i<arguments.length;i++){
+					if(arguments[i]==='thisiscard'){
+						thisiscard=true;
+					}
+					else if(typeof arguments[i]==='string'){
+						str=arguments[i];
+					}
+					else if(typeof arguments[i]==='function'){
+						filter=arguments[i];
+					}
+					else if(typeof arguments[i]=='boolean'){
+						noclick=arguments[i];
+					}
+				}
+				var list=[];
+				var dialog;
+				var node=ui.create.div('.caption');
+				var namecapt=[];
+				var getCapt=function(str){
+					if(str.indexOf('_')==-1){
+						return str[0];
+					}
+					return str[str.indexOf('_')+1];
+				}
+				if(thisiscard){
+					for(var i in lib.card){
+						if(!lib.translate[i+'_info']) continue;
+						if(filter&&filter(i)) continue;
+						list.push(['',get.translation(lib.card[i].type),i]);
+						if(namecapt.indexOf(getCapt(i))==-1){
+							namecapt.push(getCapt(i));
+						}
+					}
+				}
+				else{
+					for(var i in lib.character){
+						if(filter&&filter(i)) continue;
+						list.push(i);
+						if(namecapt.indexOf(getCapt(i))==-1){
+							namecapt.push(getCapt(i));
+						}
+					}
+				}
+				namecapt.sort(function(a,b){
+					return a>b?1:-1;
+				});
+				var clickCapt=function(e){
+					if(_status.dragged) return;
+					if(this.classList.contains('thundertext')){
+						dialog.currentcapt=null;
+						dialog.currentcaptnode=null;
+						this.classList.remove('thundertext');
+						for(var i=0;i<dialog.buttons.length;i++){
+							if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
+								dialog.buttons[i].style.display='none';
+							}
+							else{
+								dialog.buttons[i].style.display='';
+							}
+						}
+					}
+					else{
+						if(dialog.currentcaptnode){
+							dialog.currentcaptnode.classList.remove('thundertext');
+						}
+						dialog.currentcapt=this.link;
+						dialog.currentcaptnode=this;
+						this.classList.add('thundertext');
+						for(var i=0;i<dialog.buttons.length;i++){
+							if(dialog.buttons[i].capt!=dialog.currentcapt||
+							(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup)){
+								dialog.buttons[i].style.display='none';
+							}
+							else{
+								dialog.buttons[i].style.display='';
+							}
+						}
+					}
+
+					e.stopPropagation();
+				};
+				for(i=0;i<namecapt.length;i++){
+					var span=document.createElement('span');
+					span.innerHTML=' '+namecapt[i].toUpperCase()+' ';
+					span.link=namecapt[i];
+					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+					node.appendChild(span);
+				}
+				var groupSort;
+				if(thisiscard){
+					groupSort=function(){return 0;};
+				}
+				else{
+					groupSort=function(name){
+						if(lib.character[name][1]=='wei') return 0;
+						if(lib.character[name][1]=='shu') return 1;
+						if(lib.character[name][1]=='wu') return 2;
+						if(lib.character[name][1]=='qun') return 3;
+					}
+				}
+				list.sort(function(a,b){
+					var del=groupSort(a)-groupSort(b);
+					if(del!=0) return del;
+					var aa=a,bb=b;
+					if(a.indexOf('_')!=-1){
+						a=a.slice(a.indexOf('_')+1);
+					}
+					if(b.indexOf('_')!=-1){
+						b=b.slice(b.indexOf('_')+1);
+					}
+					if(a!=b){
+						return a>b?1:-1;
+					}
+					return aa>bb?1:-1;
+				});
+				dialog=ui.create.dialog('hidden');
+				if(str){
+					dialog.add(str);
+				}
+				dialog.add(node);
+				if(thisiscard){
+					dialog.add([list,'vcard'],noclick);
+				}
+				else{
+					dialog.add([list,'character'],noclick);
+				}
+				dialog.add(ui.create.div('.placeholder'));
+				for(i=0;i<dialog.buttons.length;i++){
+					if(thisiscard){
+						dialog.buttons[i].capt=getCapt(dialog.buttons[i].link[2]);
+					}
+					else{
+						dialog.buttons[i].group=lib.character[dialog.buttons[i].link][1];
+						dialog.buttons[i].capt=getCapt(dialog.buttons[i].link);
+					}
+				}
+				return dialog;
+			},
 			dialog:function(){
 				var i;
 				var hidden=false;
@@ -7004,8 +7194,7 @@ window.play={};
 
 				var cardlist=[];
 				folditems.push(cardlist);
-				foldsubitems.push(cardlist);
-				ui.config.appendChild(ui.create.line2('卡牌信息',function(){
+				ui.config.appendChild(ui.create.line2('游戏资料',function(){
 					if(this.clicked) return;
 					if(cardlist.fold){
 						cardlist.fold=false;
@@ -7017,77 +7206,124 @@ window.play={};
 					}
 
 				}));
-				var cardinfo,cardinfo2;
-				var clickcardinfo=function(){
-					var node=this.parentNode.link;
-					if(node.classList.contains('hidden')){
-						node.show();
-						setTimeout(function(){
-							node.parentNode.style.height=(30+node.parentNode.lastChild.offsetHeight)+'px';
-						})
+				ui.cardviewdialog=(function(){
+					var dialog=ui.create.cardDialog(true);
+					dialog.style.height='calc(100% - 80px)';
+					dialog.style.top='40px';
+					var stopprop=function(e){e.stopPropagation();return false;};
+					var clickpop=function(){
+						this.delete();
+						if(dialog.popped==this) delete dialog.popped;
 					}
-					else{
-						node.hide();
-						node.parentNode.style.height='20px';
-					}
-				};
-				for(i in lib.card){
-					if(lib.translate[i+'_info']){
-						cardinfo=ui.create.line(get.translation(i),clickcardinfo);
-						cardinfo.style.height='20px';
-						cardinfo2=ui.create.div('.configinfo');
-						cardinfo2.innerHTML=get.translation(i+'_info');
-						cardinfo2.hide();
-						cardinfo.link=cardinfo2;
-						cardinfo.appendChild(cardinfo2);
-						cardlist.push(cardinfo);
-					}
-				}
-				// ui.config.appendChild(ui.create.div('.placeholder'));
+					var clickbutt=function(e){
+						if(dialog.popped){
+							dialog.popped.delete();
+							if(dialog.popped.node==this&&dialog.popped.parentNode){
+								delete dialog.popped;
+								return;
+							}
+						}
+						var uiintro=get.nodeintro(this);
+						uiintro.classList.add('popped');
+						uiintro.classList.add('static');
+						uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',clickpop);
+						ui.window.appendChild(uiintro);
+						lib.placePoppedDialog(uiintro,e);
 
-
-				if(false){
-					var characterlist=[];
-					folditems.push(characterlist);
-					ui.config.appendChild(ui.create.line2('角色一览',function(){
-						if(this.clicked) return;
-						if(characterlist.fold){
-							characterlist.fold=false;
-							fold(characterlist);
-						}
-						else{
-							characterlist.fold=true;
-							unfold(this,characterlist);
-						}
-
-					}));
-					var characterinfo,characterinfo2;
-					var clickcharacterinfo=function(){
-						var node=this.parentNode.link;
-						if(node.classList.contains('hidden')){
-							node.show();
-							setTimeout(function(){
-								node.parentNode.style.height=(30+node.parentNode.lastChild.offsetHeight)+'px';
-							})
-						}
-						else{
-							node.hide();
-							node.parentNode.style.height='20px';
-						}
+						dialog.popped=uiintro;
+						dialog.popped.node=this;
 					};
-					for(i in lib.character){
-						characterinfo=ui.create.line(get.translation(i),clickcharacterinfo);
-						characterinfo.style.height='20px';
-						characterinfo2=ui.create.div('.configinfo');
-						characterinfo2.innerHTML=get.intro(i);
-						characterinfo2.hide();
-						characterinfo.link=characterinfo2;
-						characterinfo.appendChild(characterinfo2);
-						characterlist.push(characterinfo);
+					for(var i=0;i<dialog.buttons.length;i++){
+						dialog.buttons[i].listen(clickbutt);
 					}
-				}
+					dialog.listen(stopprop);
+					dialog.oncontextmenu=stopprop;
+					dialog.origin='card';
+					dialog.style.zIndex=6;
+					dialog.classList.add('scroll1');
+					dialog.classList.add('scroll2');
+					return dialog;
+				}());
+				cardlist.push(ui.create.line('卡牌一览',function(){
+					if(ui.gameviewdialog){
+						if(ui.gameviewdialog.popped){
+							ui.gameviewdialog.popped.delete();
+							delete ui.gameviewdialog.popped;
+						}
+						ui.gameviewdialog.close();
+						ui.arena.classList.remove('paused2');
+						if(ui.gameviewdialog.origin=='card'){
+							this.classList.remove('thundertext');
+							delete ui.gameviewdialog;
+							return;
+						}
+					}
+					this.classList.add('thundertext');
+					ui.currentgameview=this;
+					this.parentNode.nextSibling.firstChild.classList.remove('thundertext');
+					ui.arena.classList.add('paused2');
+					ui.gameviewdialog=ui.cardviewdialog;
+					ui.configbg.appendChild(ui.cardviewdialog);
+				}));
+				ui.characterviewdialog=(function(){
+					var dialog=ui.create.characterDialog(true);
+					dialog.style.height='calc(100% - 80px)';
+					dialog.style.top='40px';
+					var stopprop=function(e){e.stopPropagation();return false;};
+					var clickpop=function(){
+						this.delete();
+						if(dialog.popped==this) delete dialog.popped;
+					}
+					var clickbutt=function(e){
+						if(dialog.popped){
+							dialog.popped.delete();
+							if(dialog.popped.node==this&&dialog.popped.parentNode){
+								delete dialog.popped;
+								return;
+							}
+						}
+						var uiintro=get.nodeintro(this);
+						uiintro.classList.add('popped');
+						uiintro.classList.add('static');
+						uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',clickpop);
+						ui.window.appendChild(uiintro);
+						lib.placePoppedDialog(uiintro,e);
 
-				// ui.config.appendChild(ui.create.div('.placeholder'));
+						dialog.popped=uiintro;
+						dialog.popped.node=this;
+					};
+					for(var i=0;i<dialog.buttons.length;i++){
+						dialog.buttons[i].listen(clickbutt);
+					}
+					dialog.listen(stopprop);
+					dialog.oncontextmenu=stopprop;
+					dialog.origin='character';
+					dialog.style.zIndex=6;
+					dialog.classList.add('scroll1');
+					dialog.classList.add('scroll2');
+					return dialog;
+				}());
+				cardlist.push(ui.create.line('武将一览',function(){
+					if(ui.gameviewdialog){
+						if(ui.gameviewdialog.popped){
+							ui.gameviewdialog.popped.delete();
+							delete ui.gameviewdialog.popped;
+						}
+						ui.gameviewdialog.close();
+						ui.arena.classList.remove('paused2');
+						if(ui.gameviewdialog.origin=='character'){
+							this.classList.remove('thundertext');
+							delete ui.gameviewdialog;
+							return;
+						}
+					}
+					this.classList.add('thundertext');
+					ui.currentgameview=this;
+					this.parentNode.previousSibling.firstChild.classList.remove('thundertext');
+					ui.arena.classList.add('paused2');
+					ui.gameviewdialog=ui.characterviewdialog;
+					ui.configbg.appendChild(ui.characterviewdialog);
+				}));
 
 				var autoskill=[];
 				folditems.push(autoskill);
@@ -7407,7 +7643,7 @@ window.play={};
 					break;
 
 					case 'vcard':
-					node=ui.create.card(position,'noclick').init(item);
+					node=ui.create.card(position,'noclick',noclick).init(item);
 					node.classList.add('button');
 					node.link=item;
 					break;
@@ -7435,14 +7671,16 @@ window.play={};
 							node.node.name.innerHTML+=name[i]+'<br/>';
 						}
 						node.node.intro.innerHTML=lib.config.intro;
-						if(lib.config.touchscreen){
-							lib.setLongPress(node,ui.click.intro);
-						}
-						if(lib.config.right_info){
-							node.oncontextmenu=ui.click.rightplayer;
-						}
-						if(lib.config.hover_all){
-							lib.setHover(node,ui.click.hoverplayer);
+						if(!noclick){
+							if(lib.config.touchscreen){
+								lib.setLongPress(node,ui.click.intro);
+							}
+							if(lib.config.right_info){
+								node.oncontextmenu=ui.click.rightplayer;
+							}
+							if(lib.config.hover_all){
+								lib.setHover(node,ui.click.hoverplayer);
+							}
 						}
 						node.node.group.innerHTML='<div>'+get.translation(lib.character[item][1])+'</div>';
 						node.node.group.style.backgroundColor=get.translation(lib.character[item][1]+'Color');
@@ -7571,7 +7809,7 @@ window.play={};
 				ui.me.appendChild(ui.handcards1);
 				ui.me.appendChild(ui.handcards2);
 			},
-			card:function(position,info){
+			card:function(position,info,noclick){
 				var node=ui.create.div('.card',position);
 				node.node={
 					image:ui.create.div('.image',node),
@@ -7585,14 +7823,16 @@ window.play={};
 					node[i]=lib.element.card[i];
 				}
 				node.node.intro.innerHTML=lib.config.intro;
-				if(lib.config.touchscreen){
-					lib.setLongPress(node,ui.click.intro);
-				}
-				if(lib.config.right_info){
-					node.oncontextmenu=ui.click.rightplayer;
-				}
-				if(lib.config.hover_all){
-					lib.setHover(node,ui.click.hoverplayer);
+				if(!noclick){
+					if(lib.config.touchscreen){
+						lib.setLongPress(node,ui.click.intro);
+					}
+					if(lib.config.right_info){
+						node.oncontextmenu=ui.click.rightplayer;
+					}
+					if(lib.config.hover_all){
+						lib.setHover(node,ui.click.hoverplayer);
+					}
 				}
 				node.storage={};
 				if(info!='noclick'){
@@ -8144,9 +8384,11 @@ window.play={};
 					_status.tempunpop=false;
 				}
 				else{
-					if(ui.currentpopped&&ui.currentpopped._uiintro){
-						ui.currentpopped._uiintro.delete();
-						delete ui.currentpopped._uiintro;
+					if(ui.currentpopped){
+						if(ui.currentpopped._uiintro){
+							ui.currentpopped._uiintro.delete();
+							delete ui.currentpopped._uiintro;
+						}
 						delete ui.currentpopped;
 					}
 				}
@@ -8507,6 +8749,7 @@ window.play={};
 				uiintro.addEventListener('click',clickintro);
 
 				game.pause2();
+				return uiintro;
 			},
 			intro2:function(){
 				if(ui.intro){
@@ -8602,13 +8845,23 @@ window.play={};
 				ui.system.show();
 				ui.arena.classList.remove('right');
 				ui.arena.classList.remove('left');
+				ui.arena.classList.remove('paused2');
 				// ui.arena.classList.remove('paused');
 				this.remove();
+				if(ui.gameviewdialog){
+					if(ui.gameviewdialog.popped){
+						ui.gameviewdialog.popped.delete();
+						delete ui.gameviewdialog.popped;
+					}
+					ui.gameviewdialog.close();
+					delete ui.gameviewdialog;
+					ui.currentgameview.classList.remove('thundertext');
+				}
 				ui.config.delete();
 				if(_status.config2){
 					game.resume2();
 				}
-				// e.stopPropagation();
+				e.stopPropagation();
 				return false;
 			},
 			swap:function(){
