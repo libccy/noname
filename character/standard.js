@@ -1047,15 +1047,18 @@ character.standard={
 						if(target.num('he')==0) return;
 						if(card.name!='sha') return;
 						var min=1;
+						var friend=ai.get.attitude(player,target)>0;
+						var vcard={name:'shacopy',nature:card.nature,suit:card.suit};
 						for(var i=0;i<game.players.length;i++){
 							if(player!=game.players[i]&&
 								ai.get.attitude(target,game.players[i])<0&&
 								target.canUse(card,game.players[i])){
-								if(min&&player.canUse(card,game.players[i])){
+								if(!friend) return 0;
+								if(ai.get.effect(game.players[i],vcard,player,player)>0){
+									if(!player.canUse(card,game.players[0])){
+										return [0,0.1];
+									}
 									min=0;
-								}
-								if(ai.get.effect(game.players[i],{name:'shacopy',nature:card.nature,suit:card.suit},player,player)>0){
-									return [0,0.1];
 								}
 							}
 						}

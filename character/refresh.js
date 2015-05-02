@@ -993,15 +993,16 @@ character.refresh={
 			position:'he',
 			filterCard:{suit:'diamond'},
 			filterTarget:function(card,player,target){
-				if(player!=target) return lib.filter.targetEnabled({name:'lebu'},player,target);
-				return target.num('j','lebu');
+				if(player==target) return false;
+				if(target.hasJudge('lebu')) return true;
+				return lib.filter.targetEnabled({name:'lebu'},player,target);
 			},
 			check:function(card){
 				return 7-ai.get.value(card);
 			},
 			content:function(){
-				if(target.num('j','lebu')){
-					target.discard(target.get('j','lebu',0));
+				if(target.hasJudge('lebu')){
+					target.discard(target.getJudge('lebu'));
 				}
 				else{
 					target.addJudge('lebu',cards);
@@ -1011,7 +1012,7 @@ character.refresh={
 			ai:{
 				result:{
 					target:function(player,target){
-						if(target.num('j','lebu')) return -ai.get.effect(target,{name:'lebu'},player,target);
+						if(target.hasJudge('lebu')) return -ai.get.effect(target,{name:'lebu'},player,target);
 						return ai.get.effect(target,{name:'lebu'},player,target);
 					}
 				},

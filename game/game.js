@@ -3814,6 +3814,15 @@ window.play={};
 					}
 					return false;
 				},
+				getJudge:function(name){
+					var judges=this.node.judges.childNodes;
+					for(var i=0;i<judges.length;i++){
+						if((judges[i].viewAs||judges[i].name)==name){
+							return judges[i];
+						}
+					}
+					return null;
+				},
 				$draw:function(num){
 					var cards,node;
 					if(get.itemtype(num)=='cards'){
@@ -6559,18 +6568,8 @@ window.play={};
 				ui.configbg.listen(ui.click.config2);
 				ui.configbg.oncontextmenu=ui.click.config2;
 				ui.config=ui.create.div('#sidebar2.content');
-				ui.config.listen(function(e){
-					if(_status.choosing){
-						if(_status.choosing.expand) _status.choosing.expand=false;
-						else{
-							_status.choosing.parentNode.style.height='';
-							_status.choosing.nextSibling.delete();
-							_status.choosing.previousSibling.show();
-							delete _status.choosing;
-						}
-					}
-					_status.clicked=true;
-					return false;
+				ui.config.listen(function(){
+					// _status.clicked=true;
 				});
 				ui.config.oncontextmenu=function(e){
 					e.stopPropagation();
@@ -8109,6 +8108,14 @@ window.play={};
 						_status.editing.innerHTML=get.translation(_status.editing.link);
 						delete _status.editing;
 					}
+					else if(_status.choosing){
+						if(!_status.choosing.expand){
+							_status.choosing.parentNode.style.height='';
+							_status.choosing.nextSibling.delete();
+							_status.choosing.previousSibling.show();
+							delete _status.choosing;
+						}
+					}
 					else if(ui.intro){
 						ui.intro.close();
 						delete ui.intro;
@@ -8185,7 +8192,12 @@ window.play={};
 				}
 				this.parentNode.style.height=(node.offsetHeight)+'px';
 				_status.choosing=this;
-				_status.choosing.expand=true;
+				if(!_status.choosing.expand){
+					_status.choosing.expand=true;
+					setTimeout(function(){
+						_status.choosing.expand=false;
+					},500);
+				}
 			},
 			choice:function(){
 				if(_status.dragged) return;
@@ -8596,7 +8608,7 @@ window.play={};
 				if(_status.config2){
 					game.resume2();
 				}
-				e.stopPropagation();
+				// e.stopPropagation();
 				return false;
 			},
 			swap:function(){
