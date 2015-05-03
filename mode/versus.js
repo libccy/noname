@@ -129,7 +129,7 @@ mode.versus={
 					list.sort(sortByGroup);
 				}
 				else{
-					list.sort(lib.sort.random);
+					list.randomSort();
 				}
 				_status.list=list;
 				var choice=(lib.storage.choice=='∞')?list.length:lib.storage.choice;
@@ -144,7 +144,7 @@ mode.versus={
 							list.sort(sortByGroup);
 						}
 						else{
-							list.sort(lib.sort.random);
+							list.randomSort();
 						}
 						event.dialog.close();
 						_status.friend.length=0;
@@ -160,7 +160,7 @@ mode.versus={
 					delete _status.choosefinished;
 					arguments[1].parentNode.close();
 					var buttons=_status.event.dialog.buttons.slice(0);
-					buttons.sort(lib.sort.random);
+					buttons.randomSort();
 					for(var i=0;i<buttons.length;i++){
 						if(buttons[i].classList.contains('glow')||buttons[i].classList.contains('selected')){
 							buttons.splice(i,1);i--;
@@ -553,7 +553,7 @@ mode.versus={
 				_status.friend.remove(event.character);
 				_status.enemy.remove(event.character);
 				source.revive();
-				source.uninit();
+				source.uninit(false);
 				source.init(event.character);
 				source.node.identity.dataset.color=get.translation(source.side+'Color');
 				source.draw(4);
@@ -808,7 +808,7 @@ mode.versus={
 			this.classList.toggle('on');
 			game.save('autoreplaceinnerhtml',this.classList.contains('on'));
 		},
-		onSwapControl:function(e){
+		onSwapControl:function(){
 			var name=game.me.name;
 			if(ui.fakeme&&ui.fakeme.current!=name){
 				ui.fakeme.current=name;
@@ -834,6 +834,7 @@ mode.versus={
 		modeSwapPlayer:function(player){
 			if(lib.storage.control_all){
 				game.swapControl(player);
+				game.onSwapControl();
 			}
 			else{
 				game.swapPlayer(player);
@@ -880,7 +881,6 @@ mode.versus={
 		},
 	},
 	translate:{
-		versus_mode:'对决',
 		trueZhu:"帅",
 		falseZhu:"将",
 		trueZhong:"兵",

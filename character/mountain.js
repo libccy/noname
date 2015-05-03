@@ -314,6 +314,7 @@ character.mountain={
 							for(var i=0;i<judges.length;i++){
 								if(!target.hasJudge(judges[i].viewAs||judges[i].name)) return true;
 							}
+							if(target.isMin()) return false;
 							if((from.get('e','1')&&!target.get('e','1'))||
 								(from.get('e','2')&&!target.get('e','2'))||
 								(from.get('e','3')&&!target.get('e','3'))||
@@ -645,6 +646,7 @@ character.mountain={
 				return 6-ai.get.value(card);
 			},
 			filterTarget:function(card,player,target){
+				if(target.isMin()) return false;
 				return player!=target&&!target.get('e',get.subtype(card)[5]);
 			},
 			content:function(){

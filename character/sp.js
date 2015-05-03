@@ -2480,6 +2480,7 @@ character.sp={
 			},
 			trigger:{player:'shaBefore'},
 			forced:true,
+			popup:false,
 			check:function(event,player){
 				return player.num('h','sha')>0;
 			},
@@ -2692,8 +2693,8 @@ character.sp={
 		guiming:'归命',
 		guiming_info:'主公技，其他吴势力角色于你的回合内视为已受伤的角色。',
 		chixin:'赤心',
-		chixin1:'赤杀',
-		chixin2:'赤闪',
+		chixin1:'赤心',
+		chixin2:'赤心',
 		chixin_info:'你可以将♦牌当【杀】或【闪】使用或打出。出牌阶段，你对你攻击范围内的每名角色均可使用一张【杀】。',
 		suiren:'随仁',
 		suiren_info:'限定技，准备阶段开始时，你可以失去技能“义从”，然后加1点体力上限并回复1点体力，再令一名角色摸三张牌。',

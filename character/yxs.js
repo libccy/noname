@@ -830,18 +830,15 @@ character.yxs={
 					var from=ui.selected.targets[0];
 					var judges=from.get('j');
 					for(var i=0;i<judges.length;i++){
-						if(judges[i].viewAs){
-							if(target.num('j',{name:judges[i].viewAs})==0&&
-							target.num('j',{viewAs:judges[i].viewAs})==0) return true;
-						}
-						else if(target.num('j',{name:judges[i].name})==0) return true;
+						if(!target.hasJudge(judges[i].viewAs||judges[i].name)) return true;
 					}
+					if(target.isMin()) return false;
 					if((from.get('e','1')&&!target.get('e','1'))||
 						(from.get('e','2')&&!target.get('e','2'))||
 						(from.get('e','3')&&!target.get('e','3'))||
 						(from.get('e','4')&&!target.get('e','4'))||
 						(from.get('e','5')&&!target.get('e','5'))) return true;
-						return false;
+					return false;
 				}
 				else{
 					return target.num('ej')>0;

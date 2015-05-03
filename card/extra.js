@@ -106,9 +106,12 @@ card.extra={
 				result:{
 					player:function(player){
 						var nh=player.num('h');
-						if(nh==2&&player.hp==1) return 0;
 						if(nh<=player.hp&&
-						_status.event.name=='chooseToUse'&&_status.event.filterCard({name:'huogong'})) return -10;
+						_status.event.name=='chooseToUse'&&
+						_status.event.filterCard({name:'huogong'})){
+							return -10;
+						}
+						return 0;
 					},
 					target:function(player,target){
 						if(target.skills.contains('huogong2')) return 0;

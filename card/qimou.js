@@ -116,6 +116,7 @@ card.qimou={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
+				if(target.isMin()) return false;
 				if(ui.selected.targets.length){
 					return target.get('e',{subtype:'equip5'}).length==0;
 				}

@@ -901,6 +901,7 @@ character.swd={
 		},
 		fuyan:{
 			trigger:{player:'damageEnd'},
+			frequent:true,
 			filter:function(event){
 				return event.num>0;
 			},
@@ -3952,7 +3953,7 @@ character.swd={
 			filter:function(event,player){
 				var content=player.storage.yishan;
 				for(var i=0;i<content.length;i++){
-					if(get.owner(content[i])!=player){
+					if(get.owner(content[i])!=player&&get.position(content[i])!='s'){
 						return true;
 					}
 				}
@@ -3964,7 +3965,7 @@ character.swd={
 			mark:true,
 			content:function(){
 				for(var i=0;i<player.storage.yishan.length;i++){
-					if(get.owner(player.storage.yishan[i])==player){
+					if(get.owner(player.storage.yishan[i])==player||get.position(player.storage.yishan[i])=='s'){
 						player.storage.yishan.splice(i,1);
 						i--;
 					}
@@ -3972,6 +3973,7 @@ character.swd={
 				var cards=player.storage.yishan.splice(0,2);
 				player.gain(cards);
 				player.$gain2(cards);
+				game.log(get.translation(player)+'获得了'+get.translation(cards));
 			},
 			ai:{
 				maixie:true,
@@ -3996,7 +3998,7 @@ character.swd={
 					dialog.add('<div class="text center">最近失去的牌</div>');
 					var cards=[];
 					for(var i=0;i<content.length;i++){
-						if(get.owner(content[i])!=player){
+						if(get.owner(content[i])!=player&&get.position(content[i])!='s'){
 							cards.push(content[i]);
 							if(cards.length>=4) break;
 						}
@@ -4012,7 +4014,7 @@ character.swd={
 					var str='最近失去的牌：';
 					var cards=[];
 					for(var i=0;i<content.length;i++){
-						if(get.owner(content[i])!=player){
+						if(get.owner(content[i])!=player&&get.position(content[i])!='s'){
 							cards.push(content[i]);
 							if(cards.length>=4) break;
 						}

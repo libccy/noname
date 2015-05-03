@@ -7,7 +7,7 @@ window.config={
 	forbidversus:['swd_kangnalishi'],
 	forbiddouble:['zhugedan','swd_kangnalishi','swd_nicole','dongzhuo','jg_simayi'],
 	all:{
-		mode:['identity','guozhan','versus'],
+		mode:['identity','guozhan','versus','stone'],
 		characters:['standard','wind','fire','woods','mountain','extra','sp','yijiang','refresh','guozhan','jiange','zhuogui','diy','yxs','swd','xswd','gujian','xianjian'],
 		cards:['standard','ex','extra','refresh','guozhan','zhenfa','qimou','yibao','shenbing','wanxiang','swd','shenqi','compensate'],
 		plays:['character','soldier','wuxing'],
@@ -28,6 +28,7 @@ window.config={
 		identity:'身份',
 		guozhan:'国战',
 		versus:'对决',
+		stone:'炉石',
 		changjing:'场景',
 		mowang:'魔王',
 		infinity:'无限',

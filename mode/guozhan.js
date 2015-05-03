@@ -156,7 +156,7 @@ mode.guozhan={
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);
 				}
-				event.list.sort(lib.sort.random);
+				event.list.randomSort();
 				var list=event.list.splice(0,7);
 				if(_status.auto){
 					event.ai(game.me,list);
@@ -205,7 +205,7 @@ mode.guozhan={
 					ui.create.cheat=function(){
 						ui.cheat=ui.create.control('更换',function(){
 							event.list=event.list.concat(list);
-							event.list.sort(lib.sort.random);
+							event.list.randomSort();
 							list=event.list.splice(0,7);
 							_status.event.dialog.close();
 							_status.event.dialog=ui.create.dialog('选择角色',[list,'character']);
@@ -299,7 +299,6 @@ mode.guozhan={
 	},
 	translate:{
 		change_identity_config:'自由选择座位',
-		guozhan_mode:'国战',
 		ye:'野',
 		unknown:'无名氏',
 		unknown0:'一号位',

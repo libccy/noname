@@ -2063,7 +2063,7 @@ character.yijiang={
 				"step 1"
 				if(result.bool){
 					lib.skill.qice2.viewAs={name:result.buttons[0].link[2]};
-					player.popup(result.buttons[0].link[2]);
+					// player.popup(result.buttons[0].link[2]);
 					event.parent.parent.backup('qice2');
 					event.parent.parent.step=0;
 					if(event.isMine()){

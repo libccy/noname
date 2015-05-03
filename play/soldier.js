@@ -1,4 +1,5 @@
 play.soldier={
+	mode:['identity','guozhan','versus'],
 	skill:{
 		soldier:{
 			group:['soldier2','soldier3'],

@@ -152,8 +152,7 @@ mode.identity={
 			next.ai=function(player,list,list2){
 				switch(player.identity){
 					case 'zhu':
-					for(var i=0;i<list2.length;i++)
-					list2.sort(lib.sort.random);
+					list2.randomSort();
 					var choice,choice2;
 					if(Math.random()-0.8<0&&list2.length){
 						choice=list2[0];
@@ -305,9 +304,7 @@ mode.identity={
 				event.addSetting=addSetting;
 				event.removeSetting=removeSetting;
 				event.list=[];
-				for(i=0;i<identityList.length;i++){
-					identityList.sort(lib.sort.random);
-				}
+				identityList.randomSort();
 				if(event.identity){
 					identityList.remove(event.identity);
 					identityList.unshift(event.identity);
@@ -337,8 +334,8 @@ mode.identity={
 						list3.push(i);
 					}
 				}
-				event.list.sort(lib.sort.random);
-				list3.sort(lib.sort.random);
+				event.list.randomSort();
+				list3.randomSort();
 				var num=get.config('choice')[game.me.identity];
 				if(game.zhu!=game.me){
 					event.ai(game.zhu,event.list,list2)
@@ -360,11 +357,11 @@ mode.identity={
 					ui.cheat=ui.create.control('更换',function(){
 						if(game.zhu!=game.me){
 							event.list=event.list.concat(list);
-							event.list.sort(lib.sort.random);
+							event.list.randomSort();
 							list=event.list.splice(0,num);
 						}
 						else{
-							list3.sort(lib.sort.random);
+							list3.randomSort();
 							list=list3.slice(0,num).concat(list2);
 						}
 						_status.event.dialog.close();
@@ -443,7 +440,6 @@ mode.identity={
 		},
 	},
 	translate:{
-		identity_mode:'身份',
 		zhu:"主",
 		zhong:"忠",
 		nei:"内",
@@ -701,7 +697,6 @@ mode.identity={
 			}
 		}
 	},
-	identity:[['zhu','zhong','nei','fan','cai'],['fan','zhong','nei','cai']],
 	config:{
 		player_number:true,
 		double_character:true,

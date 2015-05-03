@@ -1,4 +1,5 @@
 play.character={
+	mode:['identity','guozhan','versus'],
 	init:function(){
 		var list=[],list2=[];
 		var i,j,name;
@@ -9,7 +10,7 @@ play.character={
 			if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
 			list.push(i);
 		}
-		list.sort(lib.sort.random);
+		list.randomSort();
 		list=list.splice(0,Math.ceil(lib.card.list.length/20));
 		var suit=['heart','diamond','club','spade'];
 		for(i=0;i<list.length;i++){
