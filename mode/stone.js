@@ -199,6 +199,7 @@ mode.stone={
 				}
 			}
 			var totallength=lib.card.list.length/3;
+			var addedcardcount=Math.ceil(lib.card.list.length/80);
 			var suit=['heart','diamond','club','spade'];
 			for(i=0;i<totallength;i++){
 				var thisname=list.randomGet();
@@ -265,20 +266,23 @@ mode.stone={
 				lib.translate[name+'_info']=get.skillintro(thisname);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),name]);
 			}
-			var addedcardcount=Math.ceil(lib.card.list.length/80);
+
 			for(var i=0;i<addedcardcount;i++){
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'shengerpingdeng']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'weidi']);
+				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'konghunshi']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'emofengdi']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'hunyemolu']);
+				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'mindieyi']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'miefafu']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'liumangxingzhen']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'zuzhoumojie']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'yesushengxue']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'sanghunzhao']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'suoyanhuan']);
+				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'jintiao']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'zhaohunfan']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'fengraozhijiao']);
+			}
+			addedcardcount=Math.ceil(addedcardcount/2);
+			for(var i=0;i<addedcardcount;i++){
+				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'liumangxingzhen']);
+				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'dianhaishenzhu']);
+				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'yesushengxue']);
 			}
 			lib.card.list.randomSort();
 
@@ -436,6 +440,7 @@ mode.stone={
 	},
 	card:{
 		zhaohunfan:{
+			type:'stone',
 			fullskin:true,
 			enable:true,
 			stoneact:2,
@@ -462,7 +467,7 @@ mode.stone={
 				order:6
 			}
 		},
-		suoyanhuan:{
+		jintiao:{
 			type:'stone',
 			enable:true,
 			stoneact:2,
@@ -486,6 +491,7 @@ mode.stone={
 			}
 		},
 		liumangxingzhen:{
+			fullskin:true,
 			type:'stone',
 			enable:true,
 			filterTarget:function(card,player,target){
@@ -504,6 +510,7 @@ mode.stone={
 			}
 		},
 		shengerpingdeng:{
+			fullskin:true,
 			type:'stone',
 			enable:true,
 			stoneact:2,
@@ -526,6 +533,7 @@ mode.stone={
 			}
 		},
 		emofengdi:{
+			fullskin:true,
 			type:'stone',
 			enable:function(event,player){
 				return player.canAddFellow();
@@ -546,8 +554,9 @@ mode.stone={
 				}
 			}
 		},
-		weidi:{
+		konghunshi:{
 			type:'stone',
+			fullskin:true,
 			enable:function(event,player){
 				return player.canAddFellow();
 			},
@@ -559,7 +568,7 @@ mode.stone={
 				target.getLeader().removeFellow(target);
 				target.side=player.side;
 				player.addFellow(target);
-				target.addSkill('weidi_die');
+				target.addSkill('konghunshi_die');
 			},
 			ai:{
 				order:9,
@@ -568,7 +577,8 @@ mode.stone={
 				}
 			}
 		},
-		hunyemolu:{
+		mindieyi:{
+			fullskin:true,
 			type:'stone',
 			enable:true,
 			stoneact:3,
@@ -610,7 +620,8 @@ mode.stone={
 				}
 			}
 		},
-		zuzhoumojie:{
+		dianhaishenzhu:{
+			fullskin:true,
 			type:'stone',
 			enable:true,
 			stoneact:3,
@@ -619,6 +630,7 @@ mode.stone={
 			},
 			content:function(){
 				target.addSkill('chaofeng');
+				target.markSkill('chaofeng');
 				game.log(get.translation(target)+'获得了嘲讽');
 				target.popup('诅咒');
 			},
@@ -633,14 +645,15 @@ mode.stone={
 			}
 		},
 		yesushengxue:{
+			fullskin:true,
 			type:'stone',
 			enable:true,
 			stoneact:4,
 			filterTarget:function(card,player,target){
-				return target.isMin();
+				return target.isMin()&&target.maxHp<5;
 			},
 			content:function(){
-				target.gainMaxHp(2);
+				target.gainMaxHp(Math.min(2,5-target.maxHp));
 				target.recover(2);
 			},
 			ai:{
@@ -658,6 +671,7 @@ mode.stone={
 			filterTarget:function(card,player,target){
 				return target.isMin();
 			},
+			selectTarget:-1,
 			content:function(){
 				target.loseHp();
 			},
@@ -734,7 +748,7 @@ mode.stone={
 				}
 			}
 		},
-		weidi_die:{
+		konghunshi_die:{
 			trigger:{player:'phaseAfter'},
 			forced:true,
 			unique:true,
@@ -1218,28 +1232,28 @@ mode.stone={
 		stonecharacter:'随从',
 		shengerpingdeng:'生而平等',
 		shengerpingdeng_info:'将所有随从体力上限降为1',
-		emofengdi:'恶魔风笛',
+		emofengdi:'恶魔之眼',
 		emofengdi_info:'将一名敌方随从吸收为已方',
-		weidi:'苇笛',
-		weidi_info:'使一名敌方随从变为已方，并于下个回合结束后死亡',
-		weidi_die:'苇笛',
-		weidi_die_info:'下个回合结束后死亡',
-		hunyemolu:'魂野魔露',
-		hunyemolu_info:'将场上所有随从翻面',
+		konghunshi:'控魂石',
+		konghunshi_info:'使一名敌方随从变为已方，并于下个回合结束后死亡',
+		konghunshi_die:'控魂石',
+		konghunshi_die_info:'下个回合结束后死亡',
+		mindieyi:'冥蝶翼',
+		mindieyi_info:'将场上所有随从翻面',
 		miefafu:'灭法符',
 		miefafu_info:'将目标随从翻面',
 		liumangxingzhen:'六芒星阵',
 		liumangxingzhen_info:'令场上所有随从死亡',
-		zuzhoumojie:'诅咒魔戒',
-		zuzhoumojie_info:'令目标随从获得嘲讽',
+		dianhaishenzhu:'颠海神珠',
+		dianhaishenzhu_info:'令目标随从获得嘲讽',
 		chaofeng:'嘲讽',
 		chaofeng_info:'同阵营的无嘲讽角色不以能成为杀或决斗的目标',
 		yesushengxue:'耶稣圣血',
-		yesushengxue_info:'令一名随从增加两点体力上限并回复两点体力',
+		yesushengxue_info:'令一名随从增加两点体力上限（不能超过5）并回复两点体力',
 		sanghunzhao:'丧魂爪',
 		sanghunzhao_info:'令场上所有随从失去一点体力',
-		suoyanhuan:'锁炎环',
-		suoyanhuan_info:'弃置一名随从的所有牌，并令其体力上限减至1',
+		jintiao:'荆条',
+		jintiao_info:'弃置一名随从的所有牌，并令其体力上限减至1',
 		zhaohunfan:'招魂幡',
 		zhaohunfan_info:'令双方各一名随从立即死亡',
 		fengraozhijiao:'丰饶之角',
