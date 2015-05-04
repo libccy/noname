@@ -224,7 +224,7 @@ character.wind={
 				"step 1"
 				event.dialog.close();
 				for(var i=0;i<player.storage.buqu.length-1;i++){
-					if(get.number(event.card)==get.number(player.storage.buqu[i])) return;
+					if(get.number(event.card)&&get.number(event.card)==get.number(player.storage.buqu[i])) return;
 				}
 				trigger.untrigger();
 				trigger.finish();

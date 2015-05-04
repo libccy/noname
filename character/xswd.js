@@ -37,7 +37,7 @@ character.xswd={
 			swd_shaowei:['female','shu',3,['jianji','huangyu'],['fullskin']],
 
 			swd_youzhao:['male','shu',4,['longdan','yuchen'],['fullskin']],
-		swd_qingming:['male','shu',3,['mingfu','tianlun']],
+		// swd_qingming:['male','shu',3,['mingfu','tianlun']],
 			swd_shangzhang:['male','shu',4,['lianwu'],['fullskin']],
 			swd_situqiang:['female','shu',3,['qingnang','chulao'],['fullskin']],
 
@@ -47,6 +47,6 @@ character.xswd={
 			swd_zhanggao:['male','wei',4,['yicong','poxing'],['fullskin']],
 
 			swd_hupo:['male','wu',3,['dunxing','guiying'],['fullskin']],
-			swd_jiangziya:['male','wu',3,['xuanzhou','tianlun'],['fullskin']],
+			swd_jiangziya:['male','wu',3,['mingfu','tianlun'],['fullskin']],
 	},
 }

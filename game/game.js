@@ -4143,7 +4143,16 @@ window.play={};
 						this.node.info.style.opacity=lib.card[card[2]].opacity;
 						this.node.name.style.opacity=lib.card[card[2]].opacity;
 					}
-					this.node.info.innerHTML=get.translation(card[0])+' '+card[1];
+					if(lib.card[card[2]].modinfo){
+						this.node.info.innerHTML=lib.card[card[2]].modinfo;
+					}
+					else{
+						this.node.info.innerHTML=get.translation(card[0])+' '+card[1];
+					}
+					if(lib.card[card[2]].addinfo){
+						this.node.addinfo=ui.create.div('.addinfo',this);
+						this.node.addinfo.innerHTML=lib.card[card[2]].addinfo;
+					}
 					if(card[0]=='heart'||card[0]=='diamond'){
 						this.node.info.classList.add('red');
 					}
@@ -6472,6 +6481,7 @@ window.play={};
 				if(thisiscard){
 					groupSort=function(name){
 						if(lib.card[name[2]].type=='basic') return 0;
+						if(lib.card[name[2]].type=='stone') return 0.5;
 						if(lib.card[name[2]].type=='stonecharacter') return 1;
 						if(lib.card[name[2]].type=='trick') return 2;
 						if(lib.card[name[2]].type=='delay') return 3;
@@ -9702,7 +9712,7 @@ window.play={};
 			if(card.parentNode.id=='special') return 's';
 		},
 		translation:function(str,arg){
-			if(typeof str=='object'&&str.name){
+			if(str&&typeof str=='object'&&str.name){
 				var str2;
 				if(arg=='viewAs'&&str.viewAs){
 					str2=get.translation(str.viewAs);
@@ -9931,6 +9941,7 @@ window.play={};
 			if(sort=='type_sort'){
 				func=function(card){
 					if(get.type(card)=='basic') return 2;
+					if(get.type(card)=='stone') return 1.5;
 					if(get.type(card)=='stonecharacter') return 1;
 					if(get.type(card)=='trick') return -1;
 					if(get.type(card)=='delay') return -2;

@@ -27,6 +27,7 @@ character.woods={
 		huoshou1:{
 			trigger:{target:'useCardToBefore'},
 			forced:true,
+			priority:15,
 			filter:function(event,player){
 				return (event.card.name=='nanman');
 			},
@@ -107,6 +108,7 @@ character.woods={
 		juxiang1:{
 			trigger:{target:'useCardToBefore'},
 			forced:true,
+			priority:15,
 			filter:function(event,player){
 				return (event.card.name=='nanman');
 			},

@@ -100,6 +100,10 @@ body>.background{z-index:-2}
 	-webkit-transform:scale(0.8);
 	-webkit-transform-origin:top right;
 }
+.buttons .card.button>.addinfo{
+	-webkit-transform:scale(0.8);
+	-webkit-transform-origin:bottom left;
+}
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
 .equips>.card>.background{font-size: 36px;height: 36px;padding-top: 3px;}
@@ -283,18 +287,18 @@ margin-bottom: 5px;
 #arena.stone>.card[data-position='5']{top:calc(100% - 297px);left:8px;}
 #arena.stone>.popup[data-position='5']{top:calc(100% - 340px);left:8px;}
 
-#arena>.player.minskin[data-position='9']{top:10px;left:calc(100% - 120px);}
-#arena.stone>.card[data-position='9']{top:18px;left:calc(100% - 112px);}
-#arena.stone>.popup[data-position='9']{top:140px;left:calc(100% - 112px);}
+#arena>.player.minskin[data-position='9']{top:30px;left:calc(100% - 120px);}
+#arena.stone>.card[data-position='9']{top:38px;left:calc(100% - 112px);}
+#arena.stone>.popup[data-position='9']{top:160px;left:calc(100% - 112px);}
 #arena>.player.minskin[data-position='11']{top:10px;left:calc(100% - 260px);}
 #arena.stone>.card[data-position='11']{top:18px;left:calc(100% - 252px);}
 #arena.stone>.popup[data-position='11']{top:140px;left:calc(100% - 252px);}
 #arena>.player.minskin[data-position='10']{top:10px;left:140px;}
 #arena.stone>.card[data-position='10']{top:18px;left:148px;}
 #arena.stone>.popup[data-position='10']{top:140px;left:148px;}
-#arena>.player.minskin[data-position='8']{top:10px;left:0;}
-#arena.stone>.card[data-position='8']{top:18px;left:8px;}
-#arena.stone>.popup[data-position='8']{top:140px;left:8px;}
+#arena>.player.minskin[data-position='8']{top:30px;left:0;}
+#arena.stone>.card[data-position='8']{top:38px;left:8px;}
+#arena.stone>.popup[data-position='8']{top:160px;left:8px;}
 /*--------位置(8人)------*/
 [data-number='8']>.player[data-position='1']{top:calc(200% / 3 - 90px);left:calc(100% - 240px);}
 [data-number='8']>.player[data-position='2']{top:calc(100% / 3 - 40px);left:calc(100% - 240px);}
@@ -419,6 +423,7 @@ margin-bottom: 5px;
 #arena.selecting #me .card:not(.selectable)>.name,
 #arena.selecting #me .card:not(.selectable)>.name2,
 #arena.selecting #me .card:not(.selectable)>.info,
+#arena.selecting #me .card:not(.selectable)>.addinfo,
 #arena.selecting .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
 .dead,.likedead{opacity: 0.6;}
 .mark>.background{opacity: 1 !important;}
@@ -684,6 +689,10 @@ div[data-nature='soil']{
 .card .wunature{
 	top:74px;
 	right:6px;
+}
+.card .addinfo{
+	bottom:6px;
+	left:6px;
 }
 .button.card .wunature{
 	top:59px;

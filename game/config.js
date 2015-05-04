@@ -5,6 +5,7 @@ window.config={
 	forbidall:['caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu',
 	'xiahouyuan','huangzhong','weiyan','dianwei','gongsunzan'],
 	forbidversus:['swd_kangnalishi'],
+	forbidstone:['zhugedan','pal_xuanxiao'],
 	forbiddouble:['zhugedan','swd_kangnalishi','swd_nicole','dongzhuo','jg_simayi'],
 	all:{
 		mode:['identity','guozhan','versus','stone'],
@@ -277,7 +278,7 @@ window.config={
 			free_choose:true,
 			swap:true,
 			change_identity:true,
-			battle_number:1
+			battle_number:3
 		},
 		identity:{
 			identity:[

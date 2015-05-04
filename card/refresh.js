@@ -47,7 +47,7 @@ card.refresh={
 				players.sort(lib.sort.seat);
 				var choice=players[0];
 				player.chooseTarget('是否移动木牛流马？',function(card,player,target){
-					return player!=target&&!target.get('e','5');
+					return !target.isMin()&&player!=target&&!target.get('e','5');
 				}).ai=function(target){
 					return target==choice?1:-1;
 				};

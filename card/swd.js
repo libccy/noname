@@ -311,8 +311,8 @@ card.swd={
 				return (lib.filter.judge(card,player,target)&&player!=target);
 			},
 			judge:function(card){
-				if(get.color(card)=='red') return 0;
-				return -3;
+				if(get.color(card)=='black') return -3;
+				return 0;
 			},
 			effect:function(){
 				if(result.bool==false){
