@@ -142,7 +142,8 @@ window.config={
 		theme_config:'主题',
 		layout_config:'布局',
 		mode_config:'游戏模式',
-		player_number_config:'角色个数',
+		player_number_config:'游戏人数',
+		battle_number_config:'参战人数',
 		difficulty_config:'AI对人类态度',
 		initshow_draw_config:'首亮摸牌',
 		ai_strategy_config:'内奸策略',
@@ -276,6 +277,7 @@ window.config={
 			free_choose:true,
 			swap:true,
 			change_identity:true,
+			battle_number:1
 		},
 		identity:{
 			identity:[
@@ -302,7 +304,7 @@ window.config={
 			difficulty:'normal',
 			initshow_draw:2,
 			dierestart:true
-		}
+		},
 	},
 
 	game_intro:{

@@ -697,22 +697,8 @@ mode.identity={
 			}
 		}
 	},
-	config:{
-		player_number:true,
-		double_character:true,
-		double_hp:true,
-		ban_weak:true,
-		enhance_zhu:true,
-		free_choose:true,
-		change_identity:true,
-		change_choice:true,
-		change_card:true,
-		dierestart:true,
-		swap:true,
-		revive:true,
-		auto_identity:true,
-		ai_strategy:true,
-		ai_identity:true,
-		difficulty:true,
-	},
+	config:['player_number','double_character','double_hp',
+	'ban_weak','enhance_zhu','free_choose','change_identity',
+	'change_choice','change_card','dierestart','swap','revive',
+	'auto_identity','ai_strategy','ai_identity','difficulty']
 }

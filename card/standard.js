@@ -1191,7 +1191,8 @@ card.standard={
 						if(Math.abs(ai.get.attitude(_status.event.player,trigger.target))<3) return 0;
 						return -ai.get.effect(trigger.target,trigger.card,trigger.player,_status.event.player)*state;
 					},
-					source:event.source
+					source:event.source,
+					source2:event.source2
 				});
 				"step 2"
 				if(result.bool){

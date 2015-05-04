@@ -381,10 +381,17 @@ character.extra={
 				threaten:function(player,target){
 					if(target.hp==1) return 0.5;
 				},
-				result:{
+				effect:{
 					target:function(card,player,target,current){
 						if(target.hp<=1&&get.tag(card,'damage')){
 							if(player.skills.contains('jueqing')) return [1,-5];
+							var hasfriend=false;
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
+									hasfriend=true;break;
+								}
+							}
+							if(!hasfriend) return;
 							if(player.hp>2&&ai.get.attitude(player,target<=0)) return [0,2];
 							return [1,0,0,-player.hp];
 						}
@@ -820,6 +827,22 @@ character.extra={
 		longhun:{
 			group:['longhun1','longhun2','longhun3','longhun4'],
 			ai:{
+				skillTagFilter:function(player,tag){
+					switch(tag){
+						case 'respondSha':{
+							if(player.num('he',{suit:'diamond'})<Math.max(1,player.hp)) return false;
+							break;
+						}
+						case 'respondShan':{
+							if(player.num('he',{suit:'club'})<Math.max(1,player.hp)) return false;
+							break;
+						}
+						case 'save':{
+							if(player.num('he',{suit:'heart'})<Math.max(1,player.hp)) return false;
+							break;
+						}
+					}
+				},
 				maixie:true,
 				save:true,
 				respondSha:true,
@@ -879,9 +902,6 @@ character.extra={
 			enable:['chooseToUse','chooseToRespond'],
 			prompt:'将一张黑桃牌当无懈可击使用',
 			position:'he',
-			viewAsFilter:function(player){
-				return player.num('he',{color:'black'})>=player.hp;
-			},
 			check:function(card,event){
 				if(_status.event.player.hp>1) return 0;
 				return 7-ai.get.value(card);
@@ -891,7 +911,7 @@ character.extra={
 			},
 			viewAs:{name:'wuxie'},
 			viewAsFilter:function(player){
-				return player.num('he',{suit:'spade'})>0;
+				return player.num('he',{suit:'spade'})>=player.hp;
 			},
 			filterCard:function(card){
 				return get.suit(card)=='spade';

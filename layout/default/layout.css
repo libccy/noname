@@ -187,6 +187,8 @@ margin-bottom: 5px;
 /*--------角色--------*/
 .player{z-index: 4;width: 240px;height: 120px;}
 .player.minskin{width:120px;}
+.player.replaceme{-webkit-animation:replaceme 0.5s}
+.player.replaceenemy{-webkit-animation:replaceenemy 0.5s}
 .player>div{z-index: 2;}
 .player.dead,.player.likedead{z-index: 1;-webkit-filter:grayscale(1);}
 .player>.name{left: 18px;top:36px;}
@@ -267,7 +269,7 @@ margin-bottom: 5px;
 .linked>.count{right: 154px;}
 .acted>.identity{-webkit-transform:rotate(180deg);}
 
-/*--------位置(n人)------*/
+/*--------位置(炉石)------*/
 #arena.stone>.player.minskin[data-position='4']{top:calc(100% - 305px);left:calc(100% - 120px);}
 #arena.stone>.card[data-position='4']{top:calc(100% - 297px);left:calc(100% - 112px);}
 #arena.stone>.popup[data-position='4']{top:calc(100% - 340px);left:calc(100% - 112px);}
@@ -698,6 +700,8 @@ div[data-nature='soil']{
 @-webkit-keyframes equip_hover2{0% {}50% {opacity: 0.6}100%{opacity: 0.3}}
 @-webkit-keyframes dialog_start{from {opacity: 0;top:100px;}}
 @-webkit-keyframes dialog_start2{from {opacity: 0;-webkit-transform:scale(0.8);}}
+@-webkit-keyframes replaceme{from {opacity: 0;-webkit-transform:translateY(120px)}}
+@-webkit-keyframes replaceenemy{from {opacity: 0;-webkit-transform:translateY(-120px)}}
 @-webkit-keyframes drawing{0% {opacity: 0;left:calc(50% - 52px);top:calc(50% - 52px);}50%{opacity: 1}100%{opacity: 0}}
 @-webkit-keyframes card_start{from {opacity: 0;-webkit-transform:scale(0);}}
 @-webkit-keyframes card_start2{from {opacity: 0;-webkit-transform:scale(0);margin-left: -52px;margin-right: -52px;}}

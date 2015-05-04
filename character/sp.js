@@ -2546,6 +2546,13 @@ character.sp={
 			check:function(event,player){
 				return player.hp==1||(player.hp==2&&player.num('h')<=1);
 			},
+			filter:function(event,player){
+				return !player.storage.suiren;
+			},
+			intro:{
+				content:'limited',
+			},
+			mark:true,
 			direct:true,
 			content:function(){
 				"step 0"
@@ -2556,6 +2563,8 @@ character.sp={
 				}
 				"step 1"
 				if(result.bool){
+					player.storage.suiren=true;
+					player.unmarkSkill('suiren');
 					player.logSkill('suiren',result.targets);
 					player.removeSkill('yicong');
 					player.gainMaxHp();

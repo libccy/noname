@@ -1128,11 +1128,8 @@ window.play={};
 					"step 0"
 					player.lose(cards);
 					if(event.skill){
-						player.popup(event.skill);
+						player.logSkill(event.skill);
 						player.popup(event.card.name);
-						if(player.checkShow){
-							player.checkShow(event.skill);
-						}
 					}
 					if(lib.config.background_audio){
 						var sex=player.sex=='female'?'female':'male';
@@ -1155,7 +1152,7 @@ window.play={};
 					}
 					if(event.animate!=false){
 						if(card.name=='wuxie'&&event.parent.source){
-							player.line(event.parent.source,'green');
+							player.line(event.parent.source2||event.parent.source,'green');
 						}
 						else{
 							var config={};
@@ -1849,13 +1846,13 @@ window.play={};
 					}
 					if(player==game.me&&!_status.over){
 						ui.control.show();
-						if(get.config('swap')&&lib.config.mode!='versus'){
+						if(get.config('swap')&&lib.config.mode_choice.contains('swap')){
 							ui.swap=ui.create.control('换人',ui.click.dieswap);
 						}
-						if(get.config('revive')){
+						if(get.config('revive')&&lib.config.mode_choice.contains('revive')){
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
 						}
-						if(get.config('dierestart')&&lib.config.mode!='versus'){
+						if(get.config('dierestart')&&lib.config.mode_choice.contains('dierestart')){
 							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
@@ -3425,21 +3422,23 @@ window.play={};
 					this.skipList.add(name);
 				},
 				logSkill:function(name,targets,nature){
-					this.popup(name);
 					if(get.itemtype(targets)=='player') targets=[targets];
-					if(typeof targets=='object'&&targets.length){
-						var str=get.translation(this)+'对'+get.translation(targets[0]);
-						for(var i=1;i<targets.length;i++){
-							str+='、'+get.translation(targets[i]);
+					if(lib.translate[name]){
+						this.popup(name);
+						if(typeof targets=='object'&&targets.length){
+							var str=get.translation(this)+'对'+get.translation(targets[0]);
+							for(var i=1;i<targets.length;i++){
+								str+='、'+get.translation(targets[i]);
+							}
+							str+='发动了'+get.translation(name);
+							game.log(str);
 						}
-						str+='发动了'+get.translation(name);
-						game.log(str);
-						if(nature!=false){
-							this.line(targets,nature);
+						else{
+							game.log(get.translation(this)+'发动了'+get.translation(name));
 						}
 					}
-					else{
-						game.log(get.translation(this)+'发动了'+get.translation(name));
+					if(nature!=false){
+						this.line(targets,nature);
 					}
 					if(lib.skill[name]&&lib.skill[name].ai&&lib.skill[name].ai.expose!=undefined&&this.logAi){
 						this.logAi(lib.skill[name].ai.expose);
@@ -3478,7 +3477,7 @@ window.play={};
 						this.node.prompt=node;
 					}
 					node.dataset.position=this.dataset.position;
-					if(this.dataset.position==0||parseInt(this.dataset.position)==(game.players.length+game.dead.length)/2||
+					if(this.dataset.position==0||parseInt(this.dataset.position)==parseInt(ui.arena.dataset.number)/2||
 						typeof name2=='number'||this.classList.contains('minskin')){
 						node.innerHTML=name2;
 					}
@@ -3495,7 +3494,7 @@ window.play={};
 					var name2=get.translation(name);
 					var node=ui.create.div('.popup',ui.arena);
 					node.dataset.position=this.dataset.position;
-					if(this.dataset.position==0||parseInt(this.dataset.position)==(game.players.length+game.dead.length)/2||
+					if(this.dataset.position==0||parseInt(this.dataset.position)==parseInt(ui.arena.dataset.number)/2||
 						typeof name2=='number'||this.classList.contains('minskin')){
 						node.innerHTML=name2;
 					}
@@ -3813,7 +3812,11 @@ window.play={};
 					var skills=game.expandSkills(this.get('s',hidden));
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
-						if(info&&info.ai&&info.ai[tag]) return true;
+						if(info&&info.ai){
+							if(info.ai.skillTagFilter&&
+								info.ai.skillTagFilter(this,tag)===false) continue;
+							if(info.ai[tag]) return true;
+						}
 					}
 					return false;
 				},
@@ -3956,7 +3959,7 @@ window.play={};
 							this.$give(card[i],player,false);
 						}
 					}
-					else if(typeof card=='number'){
+					else if(typeof card=='number'&&card>=0){
 						if(log!=false){
 							game.log(get.translation(player)+'从'+get.translation(this)+'获得了'+get.cnNumber(card)+'张牌');
 						}
@@ -4304,12 +4307,21 @@ window.play={};
 				},
 				trigger:function(name){
 					var event=this;
-					var i,j,next,add;
+					var i,j,iwhile,next,add;
+					var totalPopulation=game.players.length+game.dead.length+1;
 					if(event.player&&event.player.removed) return;
 					if(!event.player&&name!='gameStart') return;
 					event._endTrigger=event.player||game.me;
-					while(event._endTrigger.isDead()){
-						event._endTrigger=event._endTrigger.next;
+					for(iwhile=0;iwhile<totalPopulation;iwhile++){
+						if(event._endTrigger.isDead()){
+							event._endTrigger=event._endTrigger.next;
+						}
+						else{
+							break;
+						}
+					}
+					if(event._endTrigger.isDead()){
+						event._endTrigger=game.players.randomGet();
 					}
 					var player=event._endTrigger;
 					var list=[],others=[];
@@ -4332,7 +4344,7 @@ window.play={};
 							}
 						}
 					}
-					do{
+					for(iwhile=0;iwhile<totalPopulation;iwhile++){
 						var skills=player.get('s',true).concat(lib.skill.global);
 						game.expandSkills(skills);
 						for(i=0;i<skills.length;i++){
@@ -4369,8 +4381,10 @@ window.play={};
 							}
 						}
 						player=player.next;
+						if(player==event._endTrigger){
+							break;
+						}
 					}
-					while(player!=event._endTrigger);
 					if(list.length){
 						list.sort(lib.sort.priority);
 						for(i=0;i<list.length;i++){
@@ -4550,7 +4564,7 @@ window.play={};
 					if(ui.skills==this) delete ui.skills;
 				},
 				replace:function(){
-					while(this.childNodes.length) this.childNodes[0].remove();
+					while(this.childNodes.length) this.firstChild.remove();
 					var i,controls;
 					if(get.objtype(arguments[0])=='array') controls=arguments[0];
 					else controls=arguments;
@@ -4698,7 +4712,11 @@ window.play={};
 			},
 			seat:function(a,b){
 				var player=lib.tempSortSeat||_status.event.player;
-				return get.distance(player,a,'absolute')-get.distance(player,b,'absolute');
+				var delta=get.distance(player,a,'absolute')-get.distance(player,b,'absolute');
+				if(delta) return delta;
+				delta=parseInt(a.dataset.position)-parseInt(b.dataset.position);
+				if(player.side==game.me.side) return delta;
+				return -delta;
 			},
 			position:function(a,b){
 				return parseInt(a.dataset.position)-parseInt(b.dataset.position);
@@ -4872,6 +4890,7 @@ window.play={};
 				enable:'phaseUse',
 				prompt:'弃置要重铸的牌并摸一张牌',
 				filter:function(event,player){
+					if(player.isMin()) return false;
 					return (player.get('h',function(card){
 						return get.info(card).chongzhu;
 					}).length);
@@ -5659,8 +5678,14 @@ window.play={};
 		},
 		swapSeat:function(player1,player2,prompt,behind){
 			if(behind){
-				while(player1.next!=player2){
-					game.swapSeat(player1,player1.next,false,false);
+				var totalPopulation=game.players.length+game.dead.length+1;
+				for(var iwhile=0;i<totalPopulation;i++){
+					if(player1.next!=player2){
+						game.swapSeat(player1,player1.next,false,false);
+					}
+					else{
+						break;
+					}
 				}
 				if(prompt!=false){
 					game.log(get.translation(player1)+'将座位移至'+get.translation(player2)+'后');
@@ -5993,74 +6018,6 @@ window.play={};
 		updateSave:function(){
 			if(_status.reloading) return;
 			localStorage.setItem(lib.configprefix+lib.config.mode,JSON.stringify(lib.storage));
-		},
-		import:function(name,replace){
-			var next=game.createEvent('import');
-			next.mode=name;
-			next.replace=replace;
-			next.content=function(){
-				"step 0"
-				window.mode={};
-				lib.init.js('mode',event.mode);
-				game.imported.add(event.mode);
-				"step 1"
-				if(window.mode[event.mode]==undefined){
-					game.delay(0.1);
-					event.redo();
-				}
-				"step 2"
-				var i,j,k;
-				var obj=window.mode[event.mode];
-				delete window.mode;
-				for(i in obj.element){
-					for(j in obj.element[i]){
-						if(lib.element[i][j]==undefined||event.replace) lib.element[i][j]=lib.init.eval(obj.element[i][j]);
-					}
-				}
-				for(i in obj.ai){
-					if(typeof obj.ai[i]=='object'){
-						if(ai[i]==undefined) ai[i]={};
-						for(j in obj.ai[i]){
-							if(ai[i][j]==undefined||event.replace) ai[i][j]=lib.init.eval(obj.ai[i][j]);
-						}
-					}
-					else{
-						if(ai[i]==undefined||event.replace) ai[i]=lib.init.eval(obj.ai[i]);
-					}
-				}
-				for(i in obj.ui){
-					if(typeof obj.ui[i]=='object'){
-						if(ui[i]==undefined) ui[i]={};
-						for(j in obj.ui[i]){
-							if(ui[i][j]==undefined||event.replace) ui[i][j]=lib.init.eval(obj.ui[i][j]);
-						}
-					}
-					else{
-						if(ui[i]==undefined||event.replace) ui[i]=lib.init.eval(obj.ui[i]);
-					}
-				}
-				for(i in obj.game){
-					if(game[i]==undefined||event.replace) game[i]=lib.init.eval(obj.game[i]);
-				}
-				for(i in obj.get){
-					if(get[i]==undefined||event.replace) get[i]=lib.init.eval(obj.get[i]);
-				}
-				for(i in obj.config){
-					if(lib.config.current_mode[i]==undefined||event.replace) lib.config.current_mode[i]=obj.config[i];
-				}
-				for(i in obj){
-					if(i=='element') continue;
-					if(i=='game') continue;
-					if(i=='get') continue;
-					if(i=='ai') continue;
-					if(i=='ui') continue;
-					if(i=='config') continue;
-					if(lib[i]==undefined||event.replace) lib[i]=(get.objtype(obj[i])=='array')?[]:{};
-					for(j in obj[i]){
-						if(lib[i][j]==undefined||event.replace) lib[i][j]=lib.init.eval(obj[i][j]);
-					}
-				}
-			}
 		},
 		saveConfig:function(key,value,local){
 			if(_status.reloading) return;
@@ -6883,67 +6840,63 @@ window.play={};
 						unfold(this,modeconfig);
 					}
 				}));
+				for(i=0;i<lib.config.current_mode.length;i++){
+					switch(lib.config.current_mode[i]){
+						case 'difficulty':
+							modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.local));break;
+						case 'initshow_draw':
+							modeconfig.push(ui.create.switcher('initshow_draw',[0,1,2],get.config('initshow_draw'),ui.click.sidebar.local));break;
+						case 'ai_strategy':
+							modeconfig.push(ui.create.switcher('ai_strategy',
+								['ai_strategy_1','ai_strategy_2','ai_strategy_3','ai_strategy_4','ai_strategy_5','ai_strategy_6'],
+								get.config('ai_strategy'),ui.click.sidebar.local));break;
+						case 'ai_identity':
+							modeconfig.push(ui.create.switcher('ai_identity',get.config('ai_identity'),ui.click.sidebar.local));break;
+						case 'auto_identity':
+							modeconfig.push(ui.create.switcher('auto_identity',['一轮','两轮','三轮','关闭'],get.config('auto_identity'),ui.click.sidebar.auto_identity));break;
+						case 'player_number':
+							modeconfig.push(ui.create.switcher('player_number',[2,3,4,5,6,7,8],get.config('player_number'),ui.click.sidebar.player_number));break;
+						case 'battle_number':
+							modeconfig.push(ui.create.switcher('battle_number',[1,2,3,5,8,16],get.config('battle_number'),ui.click.sidebar.battle_number));break;
+						case 'double_character':
+							modeconfig.push(ui.create.switcher('double_character',get.config('double_character'),ui.click.sidebar.local));break;
+						case 'double_hp':
+							modeconfig.push(ui.create.switcher('double_hp',lib.config.all.double_hp,get.config('double_hp'),ui.click.sidebar.local2));break;
+						case 'free_choose':
+							modeconfig.push(ui.create.switcher('free_choose',get.config('free_choose'),ui.click.sidebar.free_choose));break;
+						case 'change_card':
+							modeconfig.push(ui.create.switcher('change_card',get.config('change_card'),ui.click.sidebar.local));break;
+						case 'change_choice':
+							modeconfig.push(ui.create.switcher('change_choice',get.config('change_choice'),ui.click.sidebar.change_choice));break;
+						case 'change_identity':
+							modeconfig.push(ui.create.switcher('change_identity',get.config('change_identity'),ui.click.sidebar.change_identity));break;
+						case 'swap':
+							modeconfig.push(ui.create.switcher('swap',get.config('swap'),ui.click.sidebar.swap));break;
+						case 'revive':
+							modeconfig.push(ui.create.switcher('revive',get.config('revive'),ui.click.sidebar.revive));break;
+						case 'dierestart':
+							modeconfig.push(ui.create.switcher('dierestart',get.config('dierestart'),ui.click.sidebar.local2));break;
+						case 'ban_weak':
+							modeconfig.push(ui.create.switcher('ban_weak',get.config('ban_weak'),ui.click.sidebar.local2));break;
+						case 'enhance_zhu':
+							modeconfig.push(ui.create.switcher('enhance_zhu',get.config('enhance_zhu'),ui.click.sidebar.local2));break;
+						case 'strict_sort':
+							modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
+							modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));break;
+						default:
+							if(Array.isArray(lib.config.current_mode[i])){
+								modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
+							}
+					}
+				}
 				for(i in lib.config.current_mode){
 					if(i=='difficulty'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.local));
+
 					}
 					else if(i=='initshow_draw'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('initshow_draw',[0,1,2],get.config('initshow_draw'),ui.click.sidebar.local));
+
 					}
-					else if(i=='ai_strategy'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('ai_strategy',
-							['ai_strategy_1','ai_strategy_2','ai_strategy_3','ai_strategy_4','ai_strategy_5','ai_strategy_6'],
-							get.config('ai_strategy'),ui.click.sidebar.local));
-					}
-					else if(i=='ai_identity'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('ai_identity',get.config('ai_identity'),ui.click.sidebar.local));
-					}
-					else if(i=='auto_identity'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('auto_identity',['一轮','两轮','三轮','关闭'],get.config('auto_identity'),ui.click.sidebar.auto_identity));
-					}
-					else if(i=='player_number'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('player_number',[2,3,4,5,6,7,8],get.config('player_number'),ui.click.sidebar.player_number));
-					}
-					else if(i=='double_character'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('double_character',get.config('double_character'),ui.click.sidebar.local2));
-					}
-					else if(i=='double_hp'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('double_hp',lib.config.all.double_hp,get.config('double_hp'),ui.click.sidebar.local2));
-					}
-					else if(i=='free_choose'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('free_choose',get.config('free_choose'),ui.click.sidebar.free_choose));
-					}
-					else if(i=='change_card'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('change_card',get.config('change_card'),ui.click.sidebar.local));
-					}
-					else if(i=='change_choice'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('change_choice',get.config('change_choice'),ui.click.sidebar.change_choice));
-					}
-					else if(i=='change_identity'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('change_identity',get.config('change_identity'),ui.click.sidebar.change_identity));
-					}
-					else if(i=='swap'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('swap',get.config('swap'),ui.click.sidebar.swap));
-					}
-					else if(i=='revive'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('revive',get.config('revive'),ui.click.sidebar.revive));
-					}
-					else if(i=='dierestart'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('dierestart',get.config('dierestart'),ui.click.sidebar.local2));
-					}
-					else if(i=='ban_weak'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('ban_weak',get.config('ban_weak'),ui.click.sidebar.local2));
-					}
-					else if(i=='enhance_zhu'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('enhance_zhu',get.config('enhance_zhu'),ui.click.sidebar.local2));
-					}
-					else if(i=='strict_sort'&&lib.config.current_mode[i]==true){
-						modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
-						modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));
-					}
-					else if(Array.isArray(lib.config.current_mode[i])){
-						modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
-					}
+
 				}
 				if(lib.config.modeconfig){
 					for(i=0;i<modeconfig.length;i++){
@@ -8980,6 +8933,13 @@ window.play={};
 					else _status.event.parent.removeSetting(dialog);
 					ui.update();
 				},
+				battle_number:function(num){
+					game.saveConfig('battle_number',num,true);
+					if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+					if(_status.event.parent.changeDialog){
+						_status.event.parent.changeDialog();
+					}
+				},
 				change_choice:function(bool){
 					game.saveConfig('change_choice',bool,true);
 					if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -9544,7 +9504,7 @@ window.play={};
 		cards:function(num){
 			var list=[];
 			var card=false;
-			if(num==undefined) num=1;
+			if(typeof num!='number') num=1;
 			if(num==0) {card=true;num=1;}
 			while(num--){
 				if(ui.cardPile.hasChildNodes()==false){
@@ -9579,15 +9539,23 @@ window.play={};
 		},
 		distance:function(from,to,method){
 			if(from==to) return 0;
+			if(!game.players.contains(from)&&!game.dead.contains(from)) return Infinity;
+			if(!game.players.contains(to)&&!game.dead.contains(to)) return Infinity;
 			var player=from,m,n=1,i;
 			if(to.isMin()||from.isMin()){
 				if(method=='raw'||method=='pure') return 1;
 			}
 			else{
 				var length=game.players.length;
-				while(player.nextSeat!=to){
-					player=player.nextSeat;
-					if(player.isAlive()&&!player.isOut()&&!player.isMin()) n++;
+				var totalPopulation=game.players.length+game.dead.length+1;
+				for(var iwhile=0;iwhile<totalPopulation;i++){
+					if(player.nextSeat!=to){
+						player=player.nextSeat;
+						if(player.isAlive()&&!player.isOut()&&!player.isMin()) n++;
+					}
+					else{
+						break;
+					}
 				}
 				for(i=0;i<game.players.length;i++){
 					if(game.players[i].isOut()||game.players[i].isMin()) length--;
@@ -10324,7 +10292,8 @@ window.play={};
 				var event=_status.event;
 				var i,j,range,buttons,buttons2;
 				var ok=false,forced=event.forced;
-				while(1){
+				var iwhile=100;
+				while(iwhile--){
 					range=get.select(event.selectButton);
 					if(range[1]==-1){
 						j=0;
@@ -10363,7 +10332,8 @@ window.play={};
 				if(event.filterCard==undefined) return (check()>0);
 				var i,j,range,cards,cards2,skills,check,effect;
 				var ok=false,forced=event.forced;
-				while(1){
+				var iwhile=100;
+				while(iwhile--){
 					range=get.select(event.selectCard);
 					if(ui.selected.cards.length>=range[0]){
 						ok=true;
@@ -10421,7 +10391,8 @@ window.play={};
 				if(event.filterTarget==undefined) return (check()>0);
 				var i,j,range,targets,targets2,effect;
 				var ok=false,forced=event.forced;
-				while(1){
+				var iwhile=100;
+				while(iwhile--){
 					range=get.select(event.selectTarget);
 					if(range[1]==-1){
 						j=0;
@@ -11204,9 +11175,7 @@ window.play={};
 			for(i in mode[lib.config.mode].get){
 				get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
 			}
-			for(i in mode[lib.config.mode].config){
-				lib.config.current_mode[i]=mode[lib.config.mode].config[i];
-			}
+			lib.config.current_mode=mode[lib.config.mode].config||[];
 			lib.config.mode_choice=mode[lib.config.mode].config;
 			for(i in mode[lib.config.mode]){
 				if(i=='element') continue;
@@ -11302,8 +11271,8 @@ window.play={};
 				for(j in play[i].get){
 					get[j]=lib.init.eval(play[i].get[j]);
 				}
-				for(j in play[i].config){
-					lib.config.current_mode[j]=play[i].config[j];
+				if(play[i].config){
+					lib.config.current_mode=lib.config.current_mode.concat(play[i].config);
 				}
 				for(j in play[i]){
 					if(j=='mode'||j=='forbid'||j=='init'||j=='element'||j=='game'||j=='get'||j=='config'||j=='ui') continue;

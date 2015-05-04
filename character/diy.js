@@ -237,6 +237,9 @@ character.diy={
 				// }
 			},
 			ai:{
+				skillTagFilter:function(player){
+					if(player.storage.guihan) return false;
+				},
 				save:true,
 				result:{
 					player:4,

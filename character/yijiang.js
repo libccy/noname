@@ -1079,12 +1079,12 @@ character.yijiang={
 				"step 1"
 				if(result.bool){
 					var target=result.targets[0];
+					player.logSkill('qiuyuan',target);
 					event.target=target;
 					target.chooseCard({name:'shan'},'交给'+get.translation(player)+
 					'一张闪，或成为此杀的额外目标').ai=function(card){
 						return ai.get.attitude(target,player)>=0?1:-1;
 					}
-					player.logSkill('qiuyuan',target);
 					game.delay();
 				}
 				else{

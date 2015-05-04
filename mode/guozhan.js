@@ -695,18 +695,7 @@ mode.guozhan={
 			},
 		}
 	},
-	config:{
-		player_number:true,
-		initshow_draw:true,
-		free_choose:true,
-		change_identity:true,
-		change_choice:true,
-		change_card:true,
-		swap:true,
-		dierestart:true,
-		ai_identity:true,
-		revive:true,
-		double_hp:true,
-		difficulty:true,
-	},
+	config:['player_number','initshow_draw',
+	'free_choose','change_identity','change_choice','change_card',
+	'swap','dierestart','ai_identity','revive','double_hp','difficulty']
 }

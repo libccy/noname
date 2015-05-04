@@ -127,6 +127,9 @@ character.fire={
 				player.storage.niepan=true;
 			},
 			ai:{
+				skillTagFilter:function(player){
+					if(player.storage.niepan) return false;
+				},
 				save:true,
 				result:{
 					player:10

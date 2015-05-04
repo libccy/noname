@@ -1208,6 +1208,9 @@ character.swd={
 				}
 			},
 			ai:{
+				skillTagFilter:function(player){
+					if(player.storage.shouyin) return false;
+				},
 				expose:0.3,
 				save:true,
 				result:{
