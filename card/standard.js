@@ -199,8 +199,8 @@ card.standard={
 						if(target.num('h')<=target.hp&&target.hp>2) return 0;
 						if(target.hp<0&&target!=player&&target.identity!='zhu') return 0;
 						if(ai.get.attitude(player,target)<3) return 0;
+						var tri=_status.event.parent._trigger;
 						if(lib.config.mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
-							var tri=_status.event.parent._trigger;
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
 								var num=target.num('h','jiu')?1:0;
 								for(var i=0;i<game.players.length;i++){
@@ -211,6 +211,11 @@ card.standard={
 								}
 								return 0;
 							}
+						}
+						if(lib.config.mode=='stone'&&target.isMin()&&
+						player!=target&&tri&&tri.name=='dying'&&player.side==target.side&&
+						tri.source!=target.getEnemy()){
+							return 0;
 						}
 						return 2;
 					},

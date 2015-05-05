@@ -578,12 +578,14 @@ character.sp={
 				if(player.storage.zhoufu3.isAlive()){
 					player.storage.zhoufu3.gain(player.storage.zhoufu2);
 					player.$give(player.storage.zhoufu2,player.storage.zhoufu3);
-					player.removeSkill('zhoufu2');
-					delete player.storage.zhoufu2;
-					delete player.storage.zhoufu3;
 					game.delay();
 				}
-
+				else{
+					ui.discardPile.appendChild(player.storage.zhoufu2);
+				}
+				player.removeSkill('zhoufu2');
+				delete player.storage.zhoufu2;
+				delete player.storage.zhoufu3;
 			},
 		},
 		yingbin:{},

@@ -1052,6 +1052,9 @@ character.yijiang={
 				}
 				return false;
 			},
+			prompt:function(event){
+				return '是否对'+get.translation(event.player)+'发动【惴恐】？';
+			},
 			filter:function(event,player){
 				return player.hp<player.maxHp&&event.player!=player&&
 					player.num('h')>0&&event.player.num('h')>0;
@@ -2432,6 +2435,7 @@ character.yijiang={
 			usable:1,
 			selectTarget:2,
 			filterTarget:function(card,player,target){
+				if(target.isMin()) return false;
 				if(ui.selected.targets.length==0) return true;
 				if(ui.selected.targets[0].num('e')==0&&target.num('e')==0) return false;
 				return Math.abs(ui.selected.targets[0].num('e')-target.num('e'))<=player.maxHp-player.hp;

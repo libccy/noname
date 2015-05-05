@@ -334,6 +334,7 @@ card.swd={
 		yufulu:{
 			fullskin:true,
 			type:'equip',
+			chongzhu:true,
 			enable:function(card,player){
 				return player.sex=='female';
 			},

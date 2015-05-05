@@ -181,6 +181,7 @@ window.config={
 		show_name_config:'显示角色名称',
 		auto_popped_config:'自动弹出菜单',
 		ui_zoom_config:'界面缩放',
+		no_ios_zoom_config:'禁止触屏缩放',
 		show_stat_config:'显示战斗统计',
 		show_scrollbar_config:'显示滚动条',
 		mousewheel_config:'滚轮控制手牌',

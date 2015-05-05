@@ -240,6 +240,7 @@ character.refresh={
 				return false;
 			},
 			content:function(){
+				player.storage.qinxue=true;
 				player.loseMaxHp();
 				player.addSkill('gongxin');
 			}

@@ -106,10 +106,15 @@ card.extra={
 				result:{
 					player:function(player){
 						var nh=player.num('h');
-						if(nh<=player.hp&&
-						_status.event.name=='chooseToUse'&&
-						_status.event.filterCard({name:'huogong'})){
-							return -10;
+						if(nh<=player.hp&&_status.event.name=='chooseToUse'){
+							if(_status.event.filterCard({name:'huogong'})){
+								return -10;
+							}
+							if(_status.event.skill){
+								var viewAs=get.info(_status.event.skill).viewAs;
+								if(viewAs=='huogong') return -10;
+								if(viewAs&&viewAs.name=='huogong') return -10;
+							}
 						}
 						return 0;
 					},

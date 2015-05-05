@@ -562,6 +562,7 @@ character.extra={
 				"step 0"
 				player.chooseTarget('选择角色获得大雾标记',
 				[1,Math.min(game.players.length,player.storage.qixing.length)]).ai=function(target){
+					if(target.isMin()) return 0;
 					if(target.skills.contains('biantian2')) return 0;
 					var att=ai.get.attitude(player,target);
 					if(att>=5){

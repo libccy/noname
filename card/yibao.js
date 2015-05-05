@@ -287,8 +287,17 @@ card.yibao={
 				},
 				result:{
 					player:function(player,target){
-						if(player.num('h')<=Math.max(2,player.hp)&&
-						_status.event.name=='chooseToUse'&&_status.event.filterCard({name:'dujian'})) return -10;
+						if(player.num('h')<=Math.max(2,player.hp)&&_status.event.name=='chooseToUse'){
+							if(_status.event.filterCard({name:'dujian'})){
+								return -10;
+							}
+							if(_status.event.skill){
+								var viewAs=get.info(_status.event.skill).viewAs;
+								if(viewAs=='dujian') return -10;
+								if(viewAs&&viewAs.name=='dujian') return -10;
+							}
+						}
+						return 0;
 					},
 					target:-1.5
 				},

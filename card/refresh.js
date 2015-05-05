@@ -132,7 +132,7 @@ card.refresh={
 				var dialog=ui.create.dialog('木牛流马',player.get('e','5').cards);
 				var trigger=event.parent.parent;
 				player.chooseButton(dialog,function(button){
-					if(get.info(button.link).selectTarget==-1){
+					if(get.select(get.info(button.link).selectTarget)[1]==-1){
 						if(get.type(button.link)=='delay') return -1;
 						if(get.type(button.link)=='equip'){
 							var current=player.get('e',{subtype:get.subtype(button.link)})[0];

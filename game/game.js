@@ -29,7 +29,7 @@ window.play={};
 			frameId:0,
 		},
 		help:{
-			'关于':'无名杀 1.0.6<div class="dashedline"></div><ul><li>1L 先谢神上<li>图片等素材来自网(shén)络(shā)<li>bug反馈/建议欢迎来百度无名杀吧',
+			'关于':'无名杀 1.1.0<div class="dashedline"></div><ul><li>1L 先谢神上<li>图片等素材来自网(shén)络(shā)<li>bug反馈/建议欢迎来百度无名杀吧',
 			'选项帮助':'<ul><li>控制台命令：开启后可用浏览器控制台控制游戏<li>自动确认：开启后当候选目标仅有1个时点击目标无需再点击确定<li>悬停时间：弹出角色/卡牌介绍所需的等待时间<li>'+
 			'触屏模式：可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌：开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>隐藏非全身皮肤：在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法：为游戏增加不同玩法，开启后可在帮助中查看介绍'+
@@ -3314,6 +3314,7 @@ window.play={};
 					next.reason=reason;
 					if(reason) next.source=reason.source;
 					next.content=lib.element.playerproto.die;
+					return next;
 				},
 				revive:function(hp){
 					game.log(get.translation(this)+'复活');
@@ -5785,6 +5786,22 @@ window.play={};
 				game.me.node.handcards1.getElementsByClassName('removing').length)-1;
 			game.me.node.handcards2.dataset.number=Math.min(6,game.me.node.handcards2.childNodes.length-
 				game.me.node.handcards2.getElementsByClassName('removing').length)-1;
+
+			if(game.me.isAlive()){
+				if(ui.auto) ui.auto.show();
+				if(ui.revive){
+					ui.revive.close();
+					delete ui.revive;
+				}
+				if(ui.swap){
+					ui.swap.close();
+					delete ui.swap;
+				}
+				if(ui.restart){
+					ui.restart.close();
+					delete ui.restart;
+				}
+			}
 		},
 		phaseLoop:function(player){
 			var next=game.createEvent('phaseLoop');
@@ -6941,6 +6958,7 @@ window.play={};
 				gameconfig.push(ui.hoverhandcardconfig);
 				if(!lib.config.hover_all) ui.hoverhandcardconfig.classList.add('disabled');
 				gameconfig.push(ui.create.switcher('touchscreen',lib.config.touchscreen,ui.click.sidebar.touchscreen));
+				gameconfig.push(ui.create.switcher('no_ios_zoom',lib.config.no_ios_zoom,ui.click.sidebar.global));
 				ui.handcardmousewheel=ui.create.switcher('mousewheel',lib.config.mousewheel,ui.click.sidebar.mousewheel);
 				if(lib.config.touchscreen) ui.handcardmousewheel.classList.add('disabled');
 				gameconfig.push(ui.handcardmousewheel);
@@ -6964,6 +6982,12 @@ window.play={};
 					case '较大':ui.window.style.zoom=1.05;break;
 					case '很大':ui.window.style.zoom=1.1;break;
 					default:ui.window.style.zoom=1;
+				}
+				if(lib.config.no_ios_zoom){
+					var meta=document.createElement('meta');
+					meta.name='viewport';
+					meta.content="user-scalable=0";
+					document.head.appendChild(meta);
 				}
 
 				var appearence=[];
@@ -11338,6 +11362,6 @@ window.play={};
 			}
 		}
 		document.ontouchmove = function(e) {
-	    	e.preventDefault();
+			e.preventDefault();
 		};
 }());
