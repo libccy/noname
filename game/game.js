@@ -2078,7 +2078,7 @@ window.play={};
 					this.update();
 					return this;
 				},
-				uninit:function(stat){
+				uninit:function(){
 					var that=this;
 					this.node.avatar.hide();
 					this.node.count.hide();
@@ -2113,9 +2113,7 @@ window.play={};
 					this.hiddenSkills=[];
 					this.forbiddenSkills=[];
 					this.modeSkills=[];
-					if(stat!==false){
-						this.stat=[{card:{},skill:{}}];
-					}
+					this.stat=[{card:{},skill:{}}];
 					this.tempSkills={};
 					this.storage={};
 					this.marks={};
@@ -3830,6 +3828,14 @@ window.play={};
 					}
 					return false;
 				},
+				hasFriend:function(){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]!=this&&ai.get.attitude(game.players[i],this)>=0){
+							return true;
+						}
+					}
+					return false;
+				},
 				getJudge:function(name){
 					var judges=this.node.judges.childNodes;
 					for(var i=0;i<judges.length;i++){
@@ -5294,6 +5300,56 @@ window.play={};
 					dialog.add(ui.create.div('.placeholder'));
 					dialog.content.appendChild(table);
 				}
+				if(game.additionaldead&&game.additionaldead.length){
+					table=document.createElement('table');
+					table.style.opacity='0.5';
+					for(i=0;i<game.additionaldead.length;i++){
+						tr=document.createElement('tr');
+						td=document.createElement('td');
+						td.innerHTML=get.translation(game.additionaldead[i]);
+						tr.appendChild(td);
+						td=document.createElement('td');
+						num=0;
+						for(j=0;j<game.additionaldead[i].stat.length;j++){
+							if(game.additionaldead[i].stat[j].damage!=undefined) num+=game.additionaldead[i].stat[j].damage;
+						}
+						td.innerHTML=num;
+						tr.appendChild(td);
+						td=document.createElement('td');
+						num=0;
+						for(j=0;j<game.additionaldead[i].stat.length;j++){
+							if(game.additionaldead[i].stat[j].damaged!=undefined) num+=game.additionaldead[i].stat[j].damaged;
+						}
+						td.innerHTML=num;
+						tr.appendChild(td);
+						td=document.createElement('td');
+						num=0;
+						for(j=0;j<game.additionaldead[i].stat.length;j++){
+							if(game.additionaldead[i].stat[j].gain!=undefined) num+=game.additionaldead[i].stat[j].gain;
+						}
+						td.innerHTML=num;
+						tr.appendChild(td);
+						td=document.createElement('td');
+						num=0;
+						for(j=0;j<game.additionaldead[i].stat.length;j++){
+							for(k in game.additionaldead[i].stat[j].card){
+								num+=game.additionaldead[i].stat[j].card[k];
+							}
+						}
+						td.innerHTML=num;
+						tr.appendChild(td);
+						td=document.createElement('td');
+						num=0;
+						for(j=0;j<game.additionaldead[i].stat.length;j++){
+							if(game.additionaldead[i].stat[j].kill!=undefined) num+=game.additionaldead[i].stat[j].kill;
+						}
+						td.innerHTML=num;
+						tr.appendChild(td);
+						table.appendChild(tr);
+					}
+					dialog.add(ui.create.div('.placeholder'));
+					dialog.content.appendChild(table);
+				}
 			}
 			dialog.add(ui.create.div('.placeholder'));
 			dialog.add(ui.create.div('.placeholder'));
@@ -5689,7 +5745,7 @@ window.play={};
 		swapSeat:function(player1,player2,prompt,behind){
 			if(behind){
 				var totalPopulation=game.players.length+game.dead.length+1;
-				for(var iwhile=0;i<totalPopulation;i++){
+				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
 					if(player1.next!=player2){
 						game.swapSeat(player1,player1.next,false,false);
 					}
@@ -8332,6 +8388,7 @@ window.play={};
 			},
 			window:function(){
 				if(_status.dragged) return;
+				if(_status.reloading) return;
 				if(_status.clicked){
 					_status.clicked=false;
 				}
@@ -9582,7 +9639,7 @@ window.play={};
 			else{
 				var length=game.players.length;
 				var totalPopulation=game.players.length+game.dead.length+1;
-				for(var iwhile=0;iwhile<totalPopulation;i++){
+				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
 					if(player.nextSeat!=to){
 						player=player.nextSeat;
 						if(player.isAlive()&&!player.isOut()&&!player.isMin()) n++;

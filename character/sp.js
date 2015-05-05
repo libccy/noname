@@ -1190,6 +1190,7 @@ character.sp={
 				order:4,
 				result:{
 					target:function(player,target){
+						if(target.isMin()) return 0;
 						if(player.hp>1){
 							if(game.phaseNumber<game.players.length) return 0;
 							if(target.hp==1&&target.maxHp>2) return 0;
@@ -1483,7 +1484,7 @@ character.sp={
 			},
 			filterTarget:function(card,player,target){
 				if(_status.auto||player!=game.me){
-					if(ai.get.attitude(player,target)<0) return -1;
+					if(ai.get.attitude(player,target)<=0) return false;
 				}
 				return player!=target;
 			},
@@ -1512,7 +1513,7 @@ character.sp={
 						if(player.hp==2&&num<=1) return 1;
 						if(player.hp==3&&num==0) return 1;
 						if(player.hp>=3&&num>=3) return -10;
-						if(lib.config.mode!='versus'){
+						if(lib.config.mode=='identity'||lib.config.mode=='guozhan'){
 							for(var i=0;i<game.players.length;i++){
 								if(lib.config.mode=='identity'){
 									if(game.players[i].ai.shown<=0) return -10;
@@ -2162,6 +2163,7 @@ character.sp={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
+							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [0,1];
 						}
 						if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];

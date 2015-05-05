@@ -3069,7 +3069,9 @@ character.yijiang={
 						if(isjudge){
 							return !target.hasJudge(card.name);
 						}
-						return true;
+						else{
+							return !target.isMin();
+						}
 					}).ai=function(target){
 						return ai.get.effect(target,card,player,player);
 					}

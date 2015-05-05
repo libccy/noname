@@ -102,6 +102,7 @@ mode.stone={
 					else{
 						game.pause();
 						_status.deadfriend.push(this);
+						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
 							player.dataset.position=dead.dataset.position;
@@ -133,6 +134,7 @@ mode.stone={
 					else{
 						game.pause();
 						_status.deadenemy.push(this);
+						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
 							player.dataset.position=dead.dataset.position;
@@ -268,6 +270,7 @@ mode.stone={
 
 			_status.deadfriend=[];
 			_status.deadenemy=[];
+			game.additionaldead=[];
 		},
 		start:function(){
 			var next=game.createEvent('game',false);
@@ -281,8 +284,6 @@ mode.stone={
 				game.enemy=game.me.next;
 				game.chooseCharacter();
 				"step 2"
-				game.me.identity='zhu';
-				game.enemy.identity='zhu';
 				game.me.side=Math.random()<0.5;
 				game.enemy.side=!game.me.side;
 				game.gameDraw(game.me,2);
@@ -329,6 +330,7 @@ mode.stone={
 					return (get.config('double_character')?2:1)*get.config('battle_number');
 				};
 				next.custom.add.button=function(){
+					if(ui.cheat2&&ui.cheat2.backup) return;
 					_status.event.dialog.content.childNodes[0].innerHTML=
 					'按顺序选择出场角色'+(get.config('double_character')?'（双将）':'');
 					_status.event.dialog.content.childNodes[1].innerHTML=
@@ -472,8 +474,13 @@ mode.stone={
 				return true;
 			},
 			selectTarget:2,
+			multitarget:true,
+			multiline:true,
 			content:function(){
-				target.die();
+				targets.sort(lib.sort.seat);
+				for(var i=0;i<targets.length;i++){
+					targets[i].die();
+				}
 			},
 			ai:{
 				result:{
@@ -710,8 +717,14 @@ mode.stone={
 				return target.isMin();
 			},
 			selectTarget:-1,
+			multitarget:true,
+			multiline:true,
 			content:function(){
-				target.loseHp();
+				targets.sort(lib.sort.seat);
+				for(var i=0;i<targets.length;i++){
+					targets[i].loseHp();
+				}
+				ui.clear();
 			},
 			ai:{
 				order:9,
@@ -763,8 +776,8 @@ mode.stone={
 		stone_banxian:['male','qun',3,['stone_banxian'],['minskin','stone'],[3,0]],
 
 		stone_daogu:['female','qun',1,['stone_daogu'],['minskin','stone'],[1,2]],
-		stone_gongzhu:['female','wu',1,['shushen'],['minskin','stone'],[3,2]],
-		stone_genv:['female','wei',1,['jieyin'],['minskin','stone'],[2,2]],
+		stone_gongzhu:['female','wu',1,['shushen'],['minskin','stone'],[2,2]],
+		stone_genv:['female','wei',1,['jieyin'],['minskin','stone'],[1,2]],
 		stone_wunv:['female','qun',1,['biyue'],['minskin','stone'],[3,2]],
 		stone_huanghou:['female','qun',2,['stone_huanghou'],['minskin','stone'],[3,1]],
 		stone_feipin:['female','qun',1,['guixiu'],['minskin','stone'],[1,2]],
@@ -1356,7 +1369,14 @@ mode.stone={
 	ai:{
 		get:{
 			attitude:function(from,to){
-				return (to.identity=='zhu'?6:5)*(from.side==to.side?1:-1);
+				var num;
+				if(to.isMin()&&!to.skills.contains('chaofeng')){
+					num=5;
+				}
+				else{
+					num=6;
+				}
+				return num*(from.side==to.side?1:-1);
 			}
 		}
 	},
@@ -1370,6 +1390,6 @@ mode.stone={
 		'<li>牌堆中随机加入总量1/6的炉石牌，效果主要与随从有关，炉石牌根据强度不同可能会消耗额外的行动值'+
 		'<li>主将可重铸装备牌和随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
 		'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
-		'<li>主将或随从死亡后立即移出游戏，主将死亡后替补登场，无替补时游戏结束'
+		'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸2+X张牌，X为对方存活的随从数，无替补时游戏结束'
 	}
 }

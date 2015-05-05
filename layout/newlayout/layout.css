@@ -76,6 +76,9 @@
 	max-height:148px;
 	left:auto;
 }
+.player.minskin .judges{
+	top:14px;
+}
 .player .marks>div,
 .player .judges>div{
 	margin-right:0;

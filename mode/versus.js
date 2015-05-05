@@ -99,6 +99,7 @@ mode.versus={
 				ui.control.style.top='calc(100% - 30px)';
 				_status.friend=[];
 				_status.enemy=[];
+				game.additionaldead=[];
 				_status.color=Math.random()<0.5;
 				var i,list=[];
 				for(i in lib.character){
@@ -553,7 +554,11 @@ mode.versus={
 				_status.friend.remove(event.character);
 				_status.enemy.remove(event.character);
 				source.revive();
-				source.uninit(false);
+				game.additionaldead.push({
+					name:source.name,
+					stat:source.stat
+				});
+				source.uninit();
 				source.init(event.character);
 				source.node.identity.dataset.color=get.translation(source.side+'Color');
 				source.draw(4);
