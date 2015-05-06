@@ -2664,6 +2664,9 @@ character.yijiang={
 		yuce:{
 			trigger:{player:'damageAfter'},
 			direct:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
 			content:function(){
 				"step 0"
 				player.chooseToDiscard('是否发动御策？').ai=function(card){

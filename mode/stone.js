@@ -97,6 +97,7 @@ mode.stone={
 				var dead=this;
 				if(game.me.isDead()){
 					if(!_status.mylist.length){
+						_status.friendCount.innerHTML='我方兵力：'+get.cnNumber(0);
 						game.over(false);
 					}
 					else{
@@ -123,12 +124,14 @@ mode.stone={
 							game.arrangePlayers();
 							player.draw(2+game.enemy.countFellow(),false);
 							game.resume();
+							game.updateStatusCount();
 						},lib.config.duration);
 
 					}
 				}
 				else if(game.enemy.isDead()){
 					if(!_status.enemylist.length){
+						_status.enemyCount.innerHTML='敌方兵力：'+get.cnNumber(0);
 						game.over(true);
 					}
 					else{
@@ -154,6 +157,7 @@ mode.stone={
 							game.arrangePlayers();
 							player.draw(2+game.me.countFellow(),false);
 							game.resume();
+							game.updateStatusCount();
 						},lib.config.duration);
 					}
 				}
@@ -176,6 +180,10 @@ mode.stone={
 	game:{
 		reserveDead:true,
 		layoutFixed:true,
+		updateStatusCount:function(){
+			_status.friendCount.innerHTML='我方兵力：'+get.cnNumber(1+_status.mylist.length/(_status.double_character?2:1),true);
+			_status.enemyCount.innerHTML='敌方兵力：'+get.cnNumber(1+_status.enemylist.length/(_status.double_character?2:1),true);
+		},
 		stoneLoop:function(player){
 			var next=game.createEvent('phaseLoop');
 			next.player=player;
@@ -284,6 +292,36 @@ mode.stone={
 				game.enemy=game.me.next;
 				game.chooseCharacter();
 				"step 2"
+				_status.friendCount=ui.create.system('',null,true);
+				_status.enemyCount=ui.create.system('',null,true);
+				game.updateStatusCount();
+				lib.setPopped(_status.friendCount,function(){
+					var uiintro=ui.create.dialog('hidden');
+
+					if(_status.deadfriend.length){
+						uiintro.add('已阵亡');
+						uiintro.add([_status.deadfriend,'player']);
+					}
+
+					uiintro.add('未上场');
+					if(_status.mylist.length){
+						uiintro.add([_status.mylist,'character']);
+					}
+					else{
+						uiintro.add('（无）')
+					}
+
+					return uiintro;
+				});
+				lib.setPopped(_status.enemyCount,function(){
+					if(_status.deadenemy.length){
+						var uiintro=ui.create.dialog('hidden');
+						uiintro.add('已阵亡');
+						uiintro.add([_status.deadenemy,'player']);
+						return uiintro;
+					}
+				});
+
 				game.me.side=Math.random()<0.5;
 				game.enemy.side=!game.me.side;
 				game.gameDraw(game.me,2);
