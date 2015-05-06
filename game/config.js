@@ -279,7 +279,8 @@ window.config={
 			free_choose:true,
 			swap:true,
 			change_identity:true,
-			battle_number:3
+			battle_number:3,
+			double_hp:'pingjun',
 		},
 		identity:{
 			identity:[
@@ -302,7 +303,6 @@ window.config={
 			dierestart:true
 		},
 		guozhan:{
-			double_hp:'pingjun',
 			difficulty:'normal',
 			initshow_draw:2,
 			dierestart:true

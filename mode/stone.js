@@ -1380,7 +1380,7 @@ mode.stone={
 			}
 		}
 	},
-	config:['battle_number','double_character','ban_weak','free_choose','change_choice'],
+	config:['battle_number','double_character','double_hp','ban_weak','free_choose','change_choice'],
 	help:{
 		'炉石模式':'<ul><li>游戏流程类似1v1，场上有两名主将进行对抗'+
 		'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+

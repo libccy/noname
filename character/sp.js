@@ -21,6 +21,7 @@ character.sp={
 		re_yuanshu:['male','qun',4,['wangzun','tongji'],['fullskin']],
 		sp_caoren:['male','wei',4,['kuiwei','yanzheng'],['fullskin']],
 		zhangbao:['male','qun',3,['zhoufu','yingbin'],['fullskin']],
+		zhangliang:['male','qun',3,['fulu','fuji'],['fullskin']],
 		maliang:['male','shu',3,['xiemu','naman'],['fullskin']],
 		sp_pangtong:['male','qun',3,['manjuan','zuixiang'],['fullskin']],
 		zhugedan:['male','wei',4,['gongao','juyi'],['fullskin']],
@@ -29,6 +30,42 @@ character.sp={
 		sunhao:['male','wu',5,['canshi','chouhai'],['fullskin']],
 	},
 	skill:{
+		fuji:{
+			trigger:{global:'damageBegin'},
+			filter:function(event){
+				return event.source&&event.nature=='thunder';
+			},
+			check:function(event,player){
+				return ai.get.attitude(player,event.source)>0;
+			},
+			prompt:function(event){
+				return get.translation(event.source)+'即将对'+get.translation(event.player)+'造成伤害，是否发动【辅祭】？';
+			},
+			content:function(){
+				"step 0"
+				trigger.source.judge();
+				"step 1"
+				if(result.color=='black'){
+					trigger.num++;
+				}
+				else{
+					trigger.source.gain(result.card);
+					trigger.source.$gain2(result.card);
+				}
+			}
+		},
+		fulu:{
+			enable:'chooseToUse',
+			filterCard:function(card){
+				return card.name=='sha'&&!card.nature;
+			},
+			viewAs:{name:'sha',nature:'thunder'},
+			ai:{
+				order:function(){
+					return lib.card.sha.ai.order+0.1;
+				}
+			}
+		},
 		canshi:{
 			trigger:{player:'phaseDrawBefore'},
 			check:function(event,player){
@@ -536,7 +573,9 @@ character.sp={
 				target.storage.zhoufu3=player;
 				ui.special.appendChild(cards[0]);
 			},
-			check:function(card){return 3-ai.get.value(card)},
+			check:function(card){
+				return 3-ai.get.value(card)
+			},
 			ai:{
 				order:1,
 				result:{
@@ -2001,6 +2040,9 @@ character.sp={
 		bifa:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
 			content:function(){
 				"step 0"
 				for(var i=0;i<game.players.length;i++){
@@ -2597,6 +2639,7 @@ character.sp={
 		sunhao:'孙皓',
 		chengyu:'程昱',
 		simalang:'司马朗',
+		zhangliang:'张梁',
 		tianfeng:'田丰',
 		sp_pangtong:'庞统',
 		maliang:'马良',
@@ -2696,6 +2739,10 @@ character.sp={
 		taichen:'抬榇',
 		jilei:'鸡肋',
 		jilei2:'鸡肋',
+		fulu:'符箓',
+		fuji:'助祭',
+		fuji_info:'当一名角色造成雷电伤害时，你可以令其进行一次判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得此牌。',
+		fulu_info:'你可以将【杀】当雷【杀】使用。',
 		jilei_info:'每当你受到一次伤害，可以令伤害来源不能使用或打出其手牌直到回合结束',
 		danlao:'啖酪',
 		danlao_info:'当你成为一张指定了多个目标的锦囊牌的目标时，你可以取消之，并摸一张牌。',
