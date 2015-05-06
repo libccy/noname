@@ -154,6 +154,7 @@ card.extra={
 					target:function(player,target){
 						if(target.classList.contains('linked')) return 1;
 						if(ai.get.attitude(player,target)>=0) return -1;
+						if(player.isMin()) return -1;
 						for(var i=0;i<game.players.length;i++){
 							if(ai.get.attitude(player,game.players[i])<=-1&&
 								game.players[i]!=target&&!game.players[i].isLinked()){

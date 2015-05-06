@@ -784,7 +784,12 @@ mode.stone={
 		stone_yiji:['female','qun',1,['stone_yiji'],['minskin','stone'],[2,2]],
 	},
 	skill:{
-		chaofeng:{},
+		chaofeng:{
+			mark:true,
+			intro:{
+				content:'已获得嘲讽'
+			}
+		},
 		_chaofeng:{
 			mod:{
 				targetEnabled:function(card,player,target){
@@ -833,8 +838,21 @@ mode.stone={
 				if(result.bool){
 					event.chooser.line(result.targets[0]);
 					game.delay();
-					result.targets[0].loseHp();
+					result.targets[0].addSkill('stone_sanxian2');
 				}
+			}
+		},
+		stone_sanxian2:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			popup:false,
+			unique:true,
+			filter:function(event,player){
+				return player.skills.contains('stone_sanxian2');
+			},
+			content:function(){
+				player.loseHp();
+				player.removeSkill('stone_sanxian2');
 			}
 		},
 		stone_banxian:{
