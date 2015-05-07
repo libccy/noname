@@ -69,7 +69,7 @@ body>.background{z-index:-2}
 .background,.button,.avatar,.avatar2{transition-property: top,box-shadow,opacity,-webkit-transform;transition-duration:0.5s;}
 .intro{width: 20px;height: 20px;}
 /*--------卡牌--------*/
-.card{width: 104px;height: 104px;margin-top:8px;margin-left:8px;margin-right: 8px;position: relative;overflow: hidden;}
+.card{width: 104px;height: 104px;margin-top:8px;margin-left:4px;margin-right: 4px;position: relative;overflow: hidden;}
 .card>.info{right: 6px;top: 9px;white-space: nowrap;}
 .card>.name{top:9px;left: 6px;text-align: center;}
 .card>.name2{display:none;}
@@ -273,32 +273,6 @@ margin-bottom: 5px;
 .linked>.count{right: 154px;}
 .acted>.identity{-webkit-transform:rotate(180deg);}
 
-/*--------位置(炉石)------*/
-#arena.stone>.player.minskin[data-position='4']{top:calc(100% - 305px);left:calc(100% - 120px);}
-#arena.stone>.card[data-position='4']{top:calc(100% - 297px);left:calc(100% - 112px);}
-#arena.stone>.popup[data-position='4']{top:calc(100% - 340px);left:calc(100% - 112px);}
-#arena.stone>.player.minskin[data-position='6']{top:calc(100% - 305px);left:calc(100% - 260px);}
-#arena.stone>.card[data-position='6']{top:calc(100% - 297px);left:calc(100% - 252px);}
-#arena.stone>.popup[data-position='6']{top:calc(100% - 340px);left:calc(100% - 252px);}
-#arena.stone>.player.minskin[data-position='7']{top:calc(100% - 305px);left:140px;}
-#arena.stone>.card[data-position='7']{top:calc(100% - 297px);left:148px;}
-#arena.stone>.popup[data-position='7']{top:calc(100% - 340px);left:148px;}
-#arena.stone>.player.minskin[data-position='5']{top:calc(100% - 305px);left:0;}
-#arena.stone>.card[data-position='5']{top:calc(100% - 297px);left:8px;}
-#arena.stone>.popup[data-position='5']{top:calc(100% - 340px);left:8px;}
-
-#arena>.player.minskin[data-position='9']{top:30px;left:calc(100% - 120px);}
-#arena.stone>.card[data-position='9']{top:38px;left:calc(100% - 112px);}
-#arena.stone>.popup[data-position='9']{top:160px;left:calc(100% - 112px);}
-#arena>.player.minskin[data-position='11']{top:10px;left:calc(100% - 260px);}
-#arena.stone>.card[data-position='11']{top:18px;left:calc(100% - 252px);}
-#arena.stone>.popup[data-position='11']{top:140px;left:calc(100% - 252px);}
-#arena>.player.minskin[data-position='10']{top:10px;left:140px;}
-#arena.stone>.card[data-position='10']{top:18px;left:148px;}
-#arena.stone>.popup[data-position='10']{top:140px;left:148px;}
-#arena>.player.minskin[data-position='8']{top:30px;left:0;}
-#arena.stone>.card[data-position='8']{top:38px;left:8px;}
-#arena.stone>.popup[data-position='8']{top:160px;left:8px;}
 /*--------位置(8人)------*/
 [data-number='8']>.player[data-position='1']{top:calc(200% / 3 - 90px);left:calc(100% - 240px);}
 [data-number='8']>.player[data-position='2']{top:calc(100% / 3 - 40px);left:calc(100% - 240px);}

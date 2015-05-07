@@ -1,14 +1,14 @@
-#me>[data-number='3']>.card:not(.selected){margin-right: -30px;-webkit-transform:perspective(1000px) rotateY(30deg);}
-#me>[data-number='4']>.card:not(.selected){margin-right: -38px;-webkit-transform:perspective(1000px) rotateY(38deg);}
-#me>[data-number='5']>.card:not(.selected){margin-right: -45px;-webkit-transform:perspective(1000px) rotateY(45deg);}
+#me>[data-fold='1']>.card:not(.selected){margin-right: -30px;-webkit-transform:perspective(1000px) rotateY(30deg);}
+#me>[data-fold='2']>.card:not(.selected){margin-right: -38px;-webkit-transform:perspective(1000px) rotateY(38deg);}
+#me>[data-fold='3']>.card:not(.selected){margin-right: -45px;-webkit-transform:perspective(1000px) rotateY(45deg);}
 
-#me>[data-number='3']>.card:not(.selected):hover,
-#me>[data-number='4']>.card:not(.selected):hover,
-#me>[data-number='5']>.card:not(.selected):hover{margin-right: -8px;-webkit-transform:perspective(1000px) rotateY(0);}
+#me>[data-fold='1']>.card:not(.selected):hover,
+#me>[data-fold='2']>.card:not(.selected):hover,
+#me>[data-fold='3']>.card:not(.selected):hover{margin-right: -8px;-webkit-transform:perspective(1000px) rotateY(0);}
 
-#me>[data-number='3']>.card.start,
-#me>[data-number='4']>.card.start,
-#me>[data-number='5']>.card.start{-webkit-transform:none;}
+#me>[data-fold='1']>.card.start,
+#me>[data-fold='2']>.card.start,
+#me>[data-fold='3']>.card.start{-webkit-transform:none;}
 
 #me>div>.card:last-child{margin-right: -8px;}
 #me>div>.card.last{margin-right: -8px;}

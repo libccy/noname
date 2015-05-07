@@ -1011,8 +1011,5 @@ mode.versus={
 			},
 		}
 	},
-	config:{
-		change_choice:true,
-		ban_weak:true,
-	}
+	config:['change_choice','ban_weak']
 }

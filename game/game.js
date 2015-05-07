@@ -2196,10 +2196,7 @@ window.play={};
 					}
 					this.node.equips.dataset.number=this.num('e');
 					if(this==game.me){
-						this.node.handcards1.dataset.number=Math.min(6,this.node.handcards1.childNodes.length-
-							this.node.handcards1.getElementsByClassName('removing').length)-1;
-						this.node.handcards2.dataset.number=Math.min(6,this.node.handcards2.childNodes.length-
-							this.node.handcards2.getElementsByClassName('removing').length)-1;
+						ui.updateh();
 					}
 					if(this.updates){
 						for(var i=0;i<lib.element.player.updates.length;i++){
@@ -5807,11 +5804,7 @@ window.play={};
 				ui.me.appendChild(ui.handcards1);
 				ui.me.appendChild(ui.handcards2);
 
-				game.me.node.handcards1.dataset.number=Math.min(6,game.me.node.handcards1.childNodes.length-
-					game.me.node.handcards1.getElementsByClassName('removing').length)-1;
-				game.me.node.handcards2.dataset.number=Math.min(6,game.me.node.handcards2.childNodes.length-
-					game.me.node.handcards2.getElementsByClassName('removing').length)-1;
-
+				ui.updateh(true);
 			}
 			if(game.me.isAlive()){
 				if(ui.auto) ui.auto.show();
@@ -5838,10 +5831,7 @@ window.play={};
 			ui.handcards2=player.node.handcards2.animate('start').fix();
 			ui.me.appendChild(ui.handcards1);
 			ui.me.appendChild(ui.handcards2);
-			game.me.node.handcards1.dataset.number=Math.min(6,game.me.node.handcards1.childNodes.length-
-				game.me.node.handcards1.getElementsByClassName('removing').length)-1;
-			game.me.node.handcards2.dataset.number=Math.min(6,game.me.node.handcards2.childNodes.length-
-				game.me.node.handcards2.getElementsByClassName('removing').length)-1;
+			ui.updateh(true);
 
 			if(game.me.isAlive()){
 				if(ui.auto) ui.auto.show();
@@ -7860,6 +7850,7 @@ window.play={};
 				ui.handcards2=game.me.node.handcards2;
 				ui.me.appendChild(ui.handcards1);
 				ui.me.appendChild(ui.handcards2);
+				ui.updateh(true);
 			},
 			card:function(position,info,noclick){
 				var node=ui.create.div('.card',position);
@@ -9433,6 +9424,38 @@ window.play={};
 			}
 			for(i=0;i<nodes.length;i++){
 				if(!nodes[i].fixed) nodes[i].delete();
+			}
+		},
+		updatex:function(){
+			ui.update.apply(this,arguments);
+			ui.updateh(true);
+		},
+		updateh:function(compute){
+			if(compute){
+				game.me.node.handcards1._handcardsWidth=game.me.node.handcards1.offsetWidth;
+				game.me.node.handcards2._handcardsWidth=game.me.node.handcards2.offsetWidth;
+			}
+			ui.updatehx(game.me.node.handcards1);
+			ui.updatehx(game.me.node.handcards2);
+		},
+		updatehxx:function(node){
+			node.dataset.fold=Math.min(6,node.childElementCount-
+				node.getElementsByClassName('removing').length)-3;
+		},
+		updatehx:function(node){
+			var num=node.childElementCount-node.getElementsByClassName('removing').length;
+			var width=node._handcardsWidth;
+			if(num*78+40>=width){
+				node.dataset.fold=3;
+			}
+			else if(num*93+25>=width){
+				node.dataset.fold=2;
+			}
+			else if(num*112+6>=width){
+				node.dataset.fold=1;
+			}
+			else{
+				node.dataset.fold=0;
 			}
 		},
 		update:function(){
@@ -11208,7 +11231,7 @@ window.play={};
 			}
 		};
 		window.onload=function(){
-			document.body.onresize=ui.update;
+			document.body.onresize=ui.updatex;
 			if(lib.config.touchscreen){
 				document.body.addEventListener('touchstart',function(e){
 					this.startX=e.touches[0].clientX;

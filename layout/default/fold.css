@@ -1,10 +1,10 @@
-#me>[data-number='3']>.card:not(.selected){margin-right: -15px;}
-#me>[data-number='4']>.card:not(.selected){margin-right: -30px;}
-#me>[data-number='5']>.card:not(.selected){margin-right: -45px;}
+#me>[data-fold='1']>.card:not(.selected){margin-right: -15px;}
+#me>[data-fold='2']>.card:not(.selected){margin-right: -30px;}
+#me>[data-fold='3']>.card:not(.selected){margin-right: -45px;}
 
-#me>[data-number='3']>.card:not(.selected):hover,
-#me>[data-number='4']>.card:not(.selected):hover,
-#me>[data-number='5']>.card:not(.selected):hover{margin-right: 0;}
+#me>[data-fold='1']>.card:not(.selected):hover,
+#me>[data-fold='2']>.card:not(.selected):hover,
+#me>[data-fold='3']>.card:not(.selected):hover{margin-right: 0;}
 
 #me>div>.card:last-child{margin-right: 0 !important;}
 #me>div>.card.last{margin-right: 0 !important;}

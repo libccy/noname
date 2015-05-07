@@ -236,6 +236,9 @@ card.qimou={
 				}
 				"step 1"
 				if(targets[1].num('h')){
+					if(_status.auto&&targets[1]==game.me){
+						game.delay();
+					}
 					targets[1].chooseCard(true,event.num,'选择'+get.cnNumber(event.num)+'张手牌还给'+get.translation(targets[0])).ai=ai.get.disvalue;
 				}
 				else{

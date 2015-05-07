@@ -284,6 +284,7 @@ mode.stone={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				lib.init.css('layout/mode/','stone');
 				game.initStone();
 				game.prepareArena(2);
 				ui.arena.classList.add('stone');
