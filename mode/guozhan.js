@@ -204,6 +204,9 @@ mode.guozhan={
 					}
 					ui.create.cheat=function(){
 						ui.cheat=ui.create.control('更换',function(){
+							if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
+								return;
+							}
 							event.list=event.list.concat(list);
 							event.list.randomSort();
 							list=event.list.splice(0,7);

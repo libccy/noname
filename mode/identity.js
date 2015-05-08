@@ -355,6 +355,9 @@ mode.identity={
 				};
 				ui.create.cheat=function(){
 					ui.cheat=ui.create.control('更换',function(){
+						if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
+							return;
+						}
 						if(game.zhu!=game.me){
 							event.list=event.list.concat(list);
 							event.list.randomSort();

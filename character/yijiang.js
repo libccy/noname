@@ -3206,7 +3206,7 @@ character.yijiang={
 		xinjujian:'举荐',
 		luoying:'落英',
 		luoying1:'落英',
-		luoying2:'落英',
+		luoying2:'落英·判定',
 		jiushi:'酒诗',
 		jiushi1:'酒诗',
 		jiushi2:'酒诗',

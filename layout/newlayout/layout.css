@@ -19,6 +19,9 @@
 .player.minskin .hp{
 	left:86px;
 }
+.player.minskin .hp.longlong{
+	left:74px;
+}
 .player .avatar2{
 	width:52px;
 	height:52px;
@@ -76,7 +79,7 @@
 	max-height:148px;
 	left:auto;
 }
-.player.minskin .judges{
+.player.noidentity .judges{
 	top:14px;
 }
 .player .marks>div,
@@ -102,6 +105,10 @@
 	bottom:18px;
 	left:12px;
 	text-align:left;
+}
+.player.minskin .equips{
+	-webkit-transform:scale(0.73);
+	-webkit-transform-origin:bottom left;
 }
 .player .equips>.card{
 	position:relative;
@@ -281,6 +288,9 @@
 .player.linked .equips{
 	-webkit-transform:rotate(90deg) translate(-150px,-6px);
 	-webkit-transform-origin:bottom left;
+}
+.player.minskin.linked .equips{
+	-webkit-transform:rotate(90deg) translate(-90px,-6px) scale(0.73);
 }
 .player.linked div:not(.equips) .card,
 .player.linked .identity{

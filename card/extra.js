@@ -65,7 +65,7 @@ card.extra={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				if(player!=game.me&&player.num('h')<3) return false;
+				if(player!=game.me&&player.num('h')<2) return false;
 				return target.num('h')>0;
 			},
 			content:function(){

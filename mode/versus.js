@@ -58,10 +58,8 @@ mode.versus={
 			next.content=function(){
 				"step 0"
 				event.check=function(){
-					this.dialog.style.top='40px';
-					this.dialog.style.left='calc(5% + 60px)';
-					this.dialog.style.width='calc(90% - 120px)';
-					this.dialog.style.height='calc(100% - 80px)';
+					this.dialog.classList.add('fullwidth');
+					this.dialog.classList.add('fullheight');
 					this.dialog.classList.add('noslide');
 					for(var i=0;i<this.dialog.buttons.length;i++) this.dialog.buttons[i].style.opacity=1;
 					this.dialog.add('选项');
@@ -83,7 +81,7 @@ mode.versus={
 					this.dialog.versus_control_all=this.dialog.add(ui.create.switcher('versus_control_all',lib.storage.control_all)).querySelector('.toggle');
 					this.dialog.versus_die_stop=this.dialog.add(ui.create.switcher('versus_die_stop',lib.storage.die_stop)).querySelector('.toggle');
 					this.dialog.versus_number=this.dialog.add(ui.create.switcher('versus_number',[1,2,3],lib.storage.number)).querySelector('.toggle');
-					this.dialog.replace_number=this.dialog.add(ui.create.switcher('replace_number',[0,1,2,3,4,5,7,9,17],lib.storage.replace_number)).querySelector('.toggle');
+					this.dialog.replace_number=this.dialog.add(ui.create.switcher('replace_number',[0,1,2,3,5,7,9,17],lib.storage.replace_number)).querySelector('.toggle');
 					this.dialog.choice=this.dialog.add(ui.create.switcher('choice',[12,16,20,24,40,'∞'],lib.storage.choice)).querySelector('.toggle');
 				};
 				event.confirm=function(){

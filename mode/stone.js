@@ -106,6 +106,7 @@ mode.stone={
 						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
+							player.classList.add('noidentity');
 							player.dataset.position=dead.dataset.position;
 							player.side=dead.side;
 							player.actcharacterlist=dead.actcharacterlist;
@@ -140,6 +141,7 @@ mode.stone={
 						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
+							player.classList.add('noidentity');
 							player.dataset.position=dead.dataset.position;
 							player.side=dead.side;
 							player.actcharacterlist=dead.actcharacterlist;
@@ -179,7 +181,6 @@ mode.stone={
 	},
 	game:{
 		reserveDead:true,
-		layoutFixed:true,
 		updateStatusCount:function(){
 			_status.friendCount.innerHTML='我方兵力：'+get.cnNumber(1+_status.mylist.length/(_status.double_character?2:1),true);
 			_status.enemyCount.innerHTML='敌方兵力：'+get.cnNumber(1+_status.enemylist.length/(_status.double_character?2:1),true);
@@ -211,7 +212,7 @@ mode.stone={
 			}
 		},
 		initStone:function(){
-			var list=[];
+			var list=[],list2=[];
 			var i,j,name;
 			for(i in lib.character){
 				if(lib.character[i][4]&&lib.character[i][4].contains('minskin')&&lib.character[i][4].contains('stone')){
@@ -219,7 +220,12 @@ mode.stone={
 					lib.character[i][3].add('stoneshan');
 					lib.character[i][3].add('stonedraw');
 					name=i+'_stonecharacter';
-					list.push(name);
+					if(lib.character[i][5][0]<3){
+						list.push(name);
+					}
+					else{
+						list2.push(name);
+					}
 					lib.card[name]={
 						image:'character/default/'+i,
 						stoneact:lib.character[i][5][0]
@@ -231,16 +237,13 @@ mode.stone={
 					lib.translate[name+'_info']=get.skillintro(i);
 				}
 			}
-			var totallength=Math.ceil(lib.card.list.length/40);
 			var addedcardcount=Math.ceil(lib.card.list.length/80);
 			var addedcardcount2=Math.ceil(lib.card.list.length/160);
 			var suit=['heart','diamond','club','spade'];
-			while(totallength--){
+			while(addedcardcount--){
 				for(i=0;i<list.length;i++){
 					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),list[i]]);
 				}
-			}
-			while(addedcardcount--){
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'shengerpingdeng']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'konghunshi']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'emofengdi']);
@@ -253,6 +256,9 @@ mode.stone={
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'fengraozhijiao']);
 			}
 			while(addedcardcount2--){
+				for(i=0;i<list2.length;i++){
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),list2[i]]);
+				}
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'liumangxingzhen']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'dianhaishenzhu']);
 				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'yesushengxue']);
@@ -290,6 +296,9 @@ mode.stone={
 				ui.arena.classList.add('stone');
 				game.delay();
 				"step 1"
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].classList.add('noidentity');
+				}
 				game.enemy=game.me.next;
 				game.chooseCharacter();
 				"step 2"
@@ -376,6 +385,9 @@ mode.stone={
 					ui.selected.buttons.length+'/'+_status.event.selectButton();
 				};
 				event.changeDialog=function(){
+					if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
+						return;
+					}
 					list.randomSort();
 					_status.event.dialog.close();
 					_status.event.dialog=ui.create.dialog('按顺序选择出场角色'+(get.config('double_character')?'（双将）':''));

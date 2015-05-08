@@ -1,0 +1,100 @@
+#arena.chess{
+    width:100%;
+    height:100%;
+    left:0;
+    top:0;
+    transition:all 0s !important;
+}
+#arena.chess>#me,
+#arena.chess>#mebg{
+    bottom:0;
+    top:auto;
+    border-radius:0;
+}
+
+#chess-container{
+    width:100%;
+    height :calc(100% - 120px);
+    left:0;
+    top:0;
+    overflow:scroll;
+    text-align:center;
+}
+#chess{
+    margin-top:36px;
+    position:relative;
+}
+#arena .card.thrown{
+    z-index:4;
+}
+
+#handcards1{
+    height:120px;
+    padding:0;
+    top:calc(100% - 120px);
+    width:calc(100% - 240px);
+    left:120px;
+}
+#handcards2{
+    display:none;
+}
+#mebg,#me{
+    height:120px;
+}
+
+#system{
+    z-index:5;
+}
+#arena>.dialog{
+    width:400px;
+    height:240px;
+    left:calc(50% - 200px);
+    top:calc(50% - 120px);
+    background: rgba(0,0,0,0.2);
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
+	border-radius:8px;
+}
+#control{
+    top:calc(100% - 155px);
+}
+.fakeme{
+    width:120px;
+    height:120px;
+    border-radius:0px;
+    top:0;
+}
+.fakeme.avatar{
+    left:0;
+    background-size:cover;
+}
+.fakeme.player{
+    left:calc(100% - 120px);
+    overflow:scroll;
+    text-align:center;
+}
+.fakeme.player>div{
+    width:45px;
+    height:45px;
+    background-size:cover;
+    border-radius:4px;
+    position:relative;
+    left:0;
+    top:8px;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-bottom: 8px;
+}
+.fakeme.player>.dead{
+    -webkit-filter:grayscale(1);
+    opacity:0.5;
+}
+.card.drawing{
+    -webkit-animation: drawing2 1s;
+    -webkit-animation-fill-mode: forwards;
+}
+
+.player.playergrid{
+    background: rgba(0,0,0,0.2);
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
+	border-radius:8px;
+}

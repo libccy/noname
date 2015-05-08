@@ -116,6 +116,7 @@ body>.background{z-index:-2}
 .dialog{text-align: center;}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
 .dialog.fullheight{height:calc(100% - 80px) !important;top:40px !important}
+.dialog.fullwidth{left:calc(5% + 60px) !important;width:calc(90% - 120px) !important}
 .dialog{top:calc(100% / 3 - 100px / 3);left: calc(5% + 210px);}
 
 #window>.dialog.popped{
@@ -171,6 +172,7 @@ margin-bottom: 5px;
 .toggle{right: 16px;left: auto !important;min-width: 16px;text-align: right !important;}
 .switcher{width: 88%;position: relative;}
 .caption{padding-top: 8px;font-size: 20px;display: block;}
+.caption:only-child{padding-bottom:8px;}
 .caption:not(.normal)>div{text-align: left;display: block;width: 100%;}
 .caption>div{position: relative;}
 .caption>.text{font-size:16px;text-align:left}
@@ -485,7 +487,7 @@ div:hover>.intro{opacity: 1;}
 }
 
 .newgame{
-	width:170px;
+	width:calc(100% - 16px);
 	display:flex;
 }
 .newgame>div{
@@ -686,6 +688,7 @@ div[data-nature='soil']{
 @-webkit-keyframes replaceme{from {opacity: 0;-webkit-transform:translateY(120px)}}
 @-webkit-keyframes replaceenemy{from {opacity: 0;-webkit-transform:translateY(-120px)}}
 @-webkit-keyframes drawing{0% {opacity: 0;left:calc(50% - 52px);top:calc(50% - 52px);}50%{opacity: 1}100%{opacity: 0}}
+@-webkit-keyframes drawing2{0% {opacity: 0}50%{opacity: 1}100%{opacity: 0}}
 @-webkit-keyframes card_start{from {opacity: 0;-webkit-transform:scale(0);}}
 @-webkit-keyframes card_start2{from {opacity: 0;-webkit-transform:scale(0);margin-left: -52px;margin-right: -52px;}}
 @-webkit-keyframes card_judgestart{from {opacity: 0;-webkit-transform:scale(0) rotateY(-180deg) perspective(600px);}}

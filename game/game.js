@@ -175,6 +175,9 @@ window.play={};
 				lib.init.js('character',lib.config.all.characters);
 				lib.init.js('play',lib.config.plays);
 				ui.css={};
+				if(lib.config.mode=='chess'){
+					lib.config.layout='newlayout';
+				}
 				ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout');
 				if(!lib.config.touchscreen){
 					if(lib.config.show_scrollbar) ui.css.scrollbar=lib.init.css('layout/default','scrollbar');
@@ -350,17 +353,7 @@ window.play={};
 					if(player.node.judges.childElementCount){
 						event.card=player.node.judges.firstChild;
 						player.lose(event.card);
-						var clone=event.card.copy('thrown',ui.arena).animate('judgestart');
-						clone.style.opacity=0.6;
-						clone.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*50+'px)';
-						clone.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*40+'px)';
-						game.delay();
-						game.linexy([
-							clone.offsetLeft+clone.offsetWidth/2,
-							clone.offsetTop+clone.offsetHeight/2,
-							player.offsetLeft+player.offsetWidth/2,
-							player.offsetTop+player.offsetHeight/2
-						],{opacity:0.5,dashed:true});
+						player.$phaseJudge(event.card);
 						event.cancelled=false;
 						event.trigger('phaseJudge');
 					}
@@ -577,6 +570,7 @@ window.play={};
 								}
 							}
 							else if(get.itemtype(event.dialog)=='dialog'){
+								event.dialog.style.display='';
 								event.dialog.open();
 							}
 						}
@@ -673,6 +667,7 @@ window.play={};
 					"step 0"
 					if(event.dialog==undefined) event.dialog=ui.dialog;
 					if(event.isMine()){
+						event.dialog.style.display='';
 						event.dialog.open();
 					}
 					game.check();
@@ -1133,7 +1128,7 @@ window.play={};
 					}
 					if(lib.config.background_audio){
 						var sex=player.sex=='female'?'female':'male';
-						if(lib.card[card.name].audio){
+						if(lib.card[card.name].audio||lib.config.background_ogg){
 							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
 								game.playAudio('card',sex,card.name+'_'+card.nature);
 							}
@@ -1142,12 +1137,7 @@ window.play={};
 							}
 						}
 						else{
-							if(lib.config.background_ogg){
-								game.playAudioOgg('card',sex,card.name);
-							}
-							else{
-								game.playAudio('card/default');
-							}
+							game.playAudio('card/default');
 						}
 					}
 					if(event.animate!=false){
@@ -1290,7 +1280,7 @@ window.play={};
 							game.playAudio('skill',event.skill,Math.ceil(info.audio*Math.random()));
 						}
 						else if(lib.config.background_ogg){
-							game.playAudioOgg('skill',event.skill);
+							game.playAudio('skill',event.skill);
 						}
 						else{
 							game.playAudio('skill','default',
@@ -1454,13 +1444,10 @@ window.play={};
 					if(event.parent.parent.parent.name=='useCard'){
 						if(lib.config.background_audio){
 							var sex=player.sex=='female'?'female':'male';
-							if(lib.card[card.name].audio){
+							if(lib.card[card.name].audio||lib.config.background_ogg){
 								game.playAudio('card',sex,card.name);
 							}
 							else{
-								if(lib.config.background_ogg){
-									game.playAudioOgg('card',sex,card.name);
-								}
 								game.playAudio('card/default');
 							}
 						}
@@ -1512,7 +1499,12 @@ window.play={};
 						cards[num].animate('start');
 						if(lib.config.strict_sort){
 							j=0;
-							position=sort>0?player.node.handcards1:player.node.handcards2;
+							if(game.singleHandcard){
+								position=sort>0?player.node.handcards1:player.node.handcards2;
+							}
+							else{
+								position=player.node.handcards1;
+							}
 							for(j=0;j<position.childNodes.length;j++){
 								if(lib.config.reverse_sort){
 									if(sort<lib.config.sort_card(position.childNodes[j])) break;
@@ -1558,7 +1550,7 @@ window.play={};
 							}
 						}
 						else{
-							if(sort>0) frag1.appendChild(cards[num]);
+							if(game.singleHandcard||sort>0) frag1.appendChild(cards[num]);
 							else frag2.appendChild(cards[num]);
 						}
 					}
@@ -1838,7 +1830,7 @@ window.play={};
 							game.playAudio('die',player.name);
 						}
 						else if(lib.config.background_ogg){
-							game.playAudioOgg('die',player.name);
+							game.playAudio('die',player.name);
 						}
 					}
 					if(lib.config.background_audio){
@@ -1992,7 +1984,7 @@ window.play={};
 					var info=lib.character[character];
 					var skills=info[3];
 					this.skills.length=0;
-					if(lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){
+					if(!game.minskin&&lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){
 						this.classList.remove('minskin');
 						this.classList.add('fullskin');
 						this.node.avatar.style.backgroundImage='url("image/character/fullskin/'+character+'.jpg")';
@@ -2002,6 +1994,9 @@ window.play={};
 						this.node.avatar.setBackground(character,'character');
 						this.classList.remove('fullskin');
 						if(info[4]&&info[4].contains('minskin')){
+							this.classList.add('minskin');
+						}
+						else if(game.minskin){
 							this.classList.add('minskin');
 						}
 					}
@@ -2146,17 +2141,27 @@ window.play={};
 								hp.childNodes[i].classList.add('lost');
 							}
 						}
-						if(this.maxHp>9){
-							this.node.hp.classList.add('longlong');
+						if(this.classList.contains('minskin')){
+							if(this.maxHp>5){
+								this.node.hp.classList.add('longlong');
+							}
+							else{
+								this.node.hp.classList.remove('longlong');
+							}
 						}
 						else{
-							this.node.hp.classList.remove('longlong');
-						}
-						if(this.maxHp==9||this.maxHp>=17){
-							this.node.hp.classList.add('long');
-						}
-						else{
-							this.node.hp.classList.remove('long');
+							if(this.maxHp>9){
+								this.node.hp.classList.add('longlong');
+							}
+							else{
+								this.node.hp.classList.remove('longlong');
+							}
+							if(this.maxHp==9||this.maxHp>=17){
+								this.node.hp.classList.add('long');
+							}
+							else{
+								this.node.hp.classList.remove('long');
+							}
 						}
 					}
 
@@ -2232,7 +2237,7 @@ window.play={};
 							this.offsetTop+this.offsetHeight/2,
 							target.offsetLeft+target.offsetWidth/2,
 							target.offsetTop+target.offsetHeight/2
-						],config);
+						],config,true);
 					}
 				},
 				line2:function(targets,config){
@@ -3449,10 +3454,15 @@ window.play={};
 						}
 						else{
 							if(lib.config.background_ogg){
-								game.playAudioOgg('skill',name);
+								game.playAudio('skill',name);
 							}
-							game.playAudio('skill','default',Math.ceil(Math.random()*5));
+							else{
+								game.playAudio('skill','default',Math.ceil(Math.random()*5));
+							}
 						}
+					}
+					if(lib.config.mode=='chess'){
+						this.chessFocus();
 					}
 				},
 				unprompt:function(){
@@ -3469,7 +3479,7 @@ window.play={};
 						node.className='popup';
 					}
 					else{
-						node=ui.create.div('.popup',ui.arena);
+						node=ui.create.div('.popup',this.parentNode);
 						this.node.prompt=node;
 					}
 					node.dataset.position=this.dataset.position;
@@ -3488,7 +3498,7 @@ window.play={};
 				},
 				popup:function(name,className){
 					var name2=get.translation(name);
-					var node=ui.create.div('.popup',ui.arena);
+					var node=ui.create.div('.popup',this.parentNode);
 					node.dataset.position=this.dataset.position;
 					if(this.dataset.position==0||parseInt(this.dataset.position)==parseInt(ui.arena.dataset.number)/2||
 						typeof name2=='number'||this.classList.contains('minskin')){
@@ -3792,15 +3802,19 @@ window.play={};
 					return this.classList.contains('out');
 				},
 				isMin:function(){
-					return this.classList.contains('minskin');
+					return this.classList.contains('minskin')&&lib.config.mode!='chess';
 				},
 				isIn:function(){
 					return this.classList.contains('dead')==false&&this.classList.contains('out')==false&&!this.removed;
 				},
 				isUnderControl:function(){
+					if(this===game.me) return false;
 					if(lib.config.mode=='versus'){
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
-							this!=game.me&&this.side==game.me.side;
+							this.side==game.me.side;
+					}
+					else if(lib.config.mode=='chess'){
+						return this.side==game.me.side;
 					}
 					return false;
 				},
@@ -3861,7 +3875,7 @@ window.play={};
 					}
 					node.fixed=true;
 					node.dataset.position=this.dataset.position;
-					ui.arena.appendChild(node);
+					this.parentNode.appendChild(node);
 					setTimeout(function(){
 						node.remove();
 					},1000);
@@ -3884,7 +3898,6 @@ window.play={};
 					);
 					node1.classList.add('infohidden');
 					node1.style.webkitTransform='perspective(600px) rotateY(180deg) translateX(0)';
-					// ui.refresh(node1);
 					setTimeout(function(){
 						setTimeout(function(){
 							node1.style.transition='all ease-in 0.3s';
@@ -3903,7 +3916,6 @@ window.play={};
 						);
 						node2.classList.add('infohidden');
 						node2.style.webkitTransform='perspective(600px) rotateY(180deg) translateX(0)';
-						// ui.refresh(node2);
 						setTimeout(function(){
 							node2.style.transition='all ease-in 0.3s';
 							node2.style.webkitTransform='perspective(600px) rotateY(270deg) translateX(52px)';
@@ -3959,15 +3971,25 @@ window.play={};
 							}
 							game.log(str);
 						}
-						for(var i=0;i<card.length;i++){
-							this.$give(card[i],player,false);
+						if(this.$givemod){
+							this.$givemod(card,player);
+						}
+						else{
+							for(var i=0;i<card.length;i++){
+								this.$give(card[i],player,false);
+							}
 						}
 					}
 					else if(typeof card=='number'&&card>=0){
 						if(log!=false){
 							game.log(get.translation(player)+'从'+get.translation(this)+'获得了'+get.cnNumber(card)+'张牌');
 						}
-						while(card--) this.$give('',player,false);
+						if(this.$givemod){
+							this.$givemod(card,player);
+						}
+						else{
+							while(card--) this.$give('',player,false);
+						}
 					}
 					else{
 						if(log!=false){
@@ -3978,31 +4000,36 @@ window.play={};
 								game.log(get.translation(player)+'从'+get.translation(this)+'获得了一张牌');
 							}
 						}
-						var node;
-						if(get.itemtype(card)=='card'){
-							node=card.copy('card','thrown',false);
+						if(this.$givemod){
+							this.$givemod(card,player);
 						}
 						else{
-							node=ui.create.div('.card.thrown');
+							var node;
+							if(get.itemtype(card)=='card'){
+								node=card.copy('card','thrown',false);
+							}
+							else{
+								node=ui.create.div('.card.thrown');
+							}
+							node.dataset.position=this.dataset.position;
+							node.fixed=true;
+							node.hide();
+							node.style.transitionProperty='left,top,opacity';
+
+							node.style.webkitTransform='rotate('+(Math.random()*16-8)+'deg)';
+
+							ui.arena.appendChild(node);
+							ui.refresh(node);
+							node.show();
+							node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
+							node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
+
+							setTimeout(function(){
+								node.removeAttribute('style');
+								node.dataset.position=player.dataset.position;
+								node.delete();
+							},700);
 						}
-						node.dataset.position=this.dataset.position;
-						node.fixed=true;
-						ui.arena.appendChild(node);
-						node.hide();
-						node.style.transitionProperty='left,top,opacity';
-
-						node.style.webkitTransform='rotate('+(Math.random()*16-8)+'deg)';
-
-						ui.arena.appendChild(node);
-						ui.refresh(node);
-						node.show();
-						node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
-						node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
-						setTimeout(function(){
-							node.removeAttribute('style');
-							node.dataset.position=player.dataset.position;
-							node.delete();
-						},700);
 					}
 				},
 				$gain:function(card,log){
@@ -4014,43 +4041,58 @@ window.play={};
 							}
 							game.log(str);
 						}
-						for(var i=0;i<card.length;i++){
-							this.$gain(card[i],false);
+						if(this.$gainmod){
+							this.$gainmod(card);
+						}
+						else{
+							for(var i=0;i<card.length;i++){
+								this.$gain(card[i],false);
+							}
 						}
 					}
 					else if(typeof card=='number'&&card>1){
 						if(log!=false){
 							game.log(get.translation(this)+'获得了'+get.cnNumber(card)+'张牌');
 						}
-						for(var i=0;i<card;i++){
-							this.$gain(1,false);
+						if(this.$gainmod){
+							this.$gainmod(card);
+						}
+						else{
+							for(var i=0;i<card;i++){
+								this.$gain(1,false);
+							}
 						}
 					}
 					else{
 						if(get.itemtype(card)=='card'&&log!=false){
 							game.log(get.translation(this)+'获得了'+get.translation(card));
 						}
-						var node;
-						if(get.itemtype(card)=='card'){
-							node=card.copy('thrown',false);
+						if(this.$gainmod){
+							this.$gainmod(card);
 						}
 						else{
-							node=ui.create.div('.card.thrown');
-							node.moveTo=lib.element.card.moveTo;
+							var node;
+							if(get.itemtype(card)=='card'){
+								node=card.copy('thrown',false);
+							}
+							else{
+								node=ui.create.div('.card.thrown');
+								node.moveTo=lib.element.card.moveTo;
+							}
+							node.fixed=true;
+							node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
+							node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
+							node.style.webkitTransform='scale(0)';
+							var player=this;
+							node.hide();
+							ui.arena.appendChild(node);
+							ui.refresh(node);
+							node.show();
+							node.style.webkitTransform='';
+							setTimeout(function(){
+								node.moveTo(player).delete();
+							},700);
 						}
-						node.fixed=true;
-						node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
-						node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
-						node.style.webkitTransform='scale(0)';
-						var player=this;
-						node.hide();
-						ui.arena.appendChild(node);
-						ui.refresh(node);
-						node.show();
-						node.style.webkitTransform='';
-						setTimeout(function(){
-							node.moveTo(player).delete();
-						},700);
 					}
 				},
 				$gain2:function(cards,log){
@@ -4058,7 +4100,7 @@ window.play={};
 					else if(get.itemtype(cards)!='cards') return;
 					var list=[];
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].clone&&cards[i].clone.parentNode==ui.arena&&
+						if(cards[i].clone&&cards[i].clone.parentNode==this.parentNode&&
 							getComputedStyle(cards[0].clone).opacity){
 							cards[i].clone.moveTo(this).delete();
 						}
@@ -4112,6 +4154,20 @@ window.play={};
 					((Math.random()-0.5<0)?'rotateX(180deg)':'rotateY(180deg)');
 					this.queue(false);
 				},
+				$phaseJudge:function(card){
+					var clone=card.copy('thrown',ui.arena).animate('judgestart');
+					var player=this;
+					clone.style.opacity=0.6;
+					clone.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*50+'px)';
+					clone.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*40+'px)';
+					game.delay();
+					game.linexy([
+						clone.offsetLeft+clone.offsetWidth/2,
+						clone.offsetTop+clone.offsetHeight/2,
+						player.offsetLeft+player.offsetWidth/2,
+						player.offsetTop+player.offsetHeight/2
+					],{opacity:0.5,dashed:true});
+				}
 			},
 			card:{
 				init:function(card){
@@ -5102,7 +5158,7 @@ window.play={};
 			else if(color=='green'){
 				color=[141, 255, 216];
 			}
-			game.draw(function(time,ctx){
+			var drawfunc=function(time,ctx){
 				var current;
 				if(time<total/3){
 					ctx.strokeStyle='rgba('+color.toString()+','+opacity*(time/(total/3))+')';
@@ -5128,7 +5184,13 @@ window.play={};
 				ctx.moveTo(from[0],from[1]);
 				ctx.lineTo(current[0],current[1]);
 				ctx.stroke();
-			});
+			};
+			if(arguments[2]&&lib.config.mode=='chess'){
+				game.draw2(drawfunc);
+			}
+			else{
+				game.draw(drawfunc);
+			}
 		},
 		createEvent:function(name,trigger){
 			var next={
@@ -5586,8 +5648,14 @@ window.play={};
 					range=get.select(event.selectTarget);
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<game.players.length;i++){
+						var nochess=true;
+						if(lib.config.mode=='chess'){
+							if(player&&get.distance(player,game.players[i],'pure')>7){
+								nochess=false;
+							}
+						}
 						if(event.filterTarget(card,player,game.players[i])&&
-							(game.players[i].isOut()==false||event.includeOutTarget)){
+							(game.players[i].isOut()==false||event.includeOutTarget)&&nochess){
 							if(ui.selected.targets.length<range[1]){
 								game.players[i].classList.add('selectable');
 							}
@@ -5760,19 +5828,21 @@ window.play={};
 				player1.dataset.position=player2.dataset.position;
 				player2.dataset.position=temp1;
 				game.arrangePlayers();
-				if(player1.dataset.position=='0'||player2.dataset.position=='0'){
-					pos=parseInt(player1.dataset.position);
-					if(pos==0) pos=parseInt(player2.dataset.position);
-					num=game.players.length+game.dead.length;
-					for(i=0;i<game.players.length;i++){
-						temp1=parseInt(game.players[i].dataset.position)-pos;
-						if(temp1<0) temp1+=num;
-						game.players[i].dataset.position=temp1;
-					}
-					for(i=0;i<game.dead.length;i++){
-						temp1=parseInt(game.dead[i].dataset.position)-pos;
-						if(temp1<0) temp1+=num;
-						game.dead[i].dataset.position=temp1;
+				if(lib.config.mode!='chess'){
+					if(player1.dataset.position=='0'||player2.dataset.position=='0'){
+						pos=parseInt(player1.dataset.position);
+						if(pos==0) pos=parseInt(player2.dataset.position);
+						num=game.players.length+game.dead.length;
+						for(i=0;i<game.players.length;i++){
+							temp1=parseInt(game.players[i].dataset.position)-pos;
+							if(temp1<0) temp1+=num;
+							game.players[i].dataset.position=temp1;
+						}
+						for(i=0;i<game.dead.length;i++){
+							temp1=parseInt(game.dead[i].dataset.position)-pos;
+							if(temp1<0) temp1+=num;
+							game.dead[i].dataset.position=temp1;
+						}
 					}
 				}
 				if(prompt!=false){
@@ -6802,7 +6872,19 @@ window.play={};
 				ui.configbg.oncontextmenu=ui.click.config2;
 				ui.config=ui.create.div('#sidebar2.content');
 				ui.config.listen(function(){
-					// _status.clicked=true;
+					if(_status.reloading) return;
+					if(_status.choosing){
+						if(!_status.choosing.expand){
+							_status.choosing.parentNode.style.height='';
+							_status.choosing.nextSibling.delete();
+							_status.choosing.previousSibling.show();
+							delete _status.choosing;
+						}
+					}
+					_status.clicked=true;
+					if(ui.arena.classList.contains('selecting')){
+						game.check();
+					}
 				});
 				ui.config.oncontextmenu=function(e){
 					e.stopPropagation();
@@ -6930,7 +7012,14 @@ window.play={};
 						case 'player_number':
 							modeconfig.push(ui.create.switcher('player_number',[2,3,4,5,6,7,8],get.config('player_number'),ui.click.sidebar.player_number));break;
 						case 'battle_number':
-							modeconfig.push(ui.create.switcher('battle_number',[1,2,3,5,8,16],get.config('battle_number'),ui.click.sidebar.battle_number));break;
+							var battle_number;
+							if(lib.config.mode=='chess'){
+								battle_number=[2,3,4,6,8];
+							}
+							else{
+								battle_number=[1,2,3,5,8,16];
+							}
+							modeconfig.push(ui.create.switcher('battle_number',battle_number,get.config('battle_number'),ui.click.sidebar.battle_number));break;
 						case 'double_character':
 							modeconfig.push(ui.create.switcher('double_character',get.config('double_character'),ui.click.sidebar.local));break;
 						case 'double_hp':
@@ -7567,7 +7656,7 @@ window.play={};
 				}
 				ui.config2=ui.create.system('选项',ui.click.config);
 				if(!lib.config.touchscreen){
-					lib.setPopped(ui.config2,ui.click.pauseconfig,190);
+					lib.setPopped(ui.config2,ui.click.pauseconfig,170);
 				}
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
 				ui.auto=ui.create.system('托管',ui.click.auto);
@@ -7602,7 +7691,7 @@ window.play={};
 						_status.identityShown=true;
 					}
 				},true);
-				if(!lib.config.show_playerids||lib.config.mode=='versus'){
+				if(!lib.config.show_playerids||!game.showIdentity){
 					ui.playerids.style.display='none';
 				}
 				if(!lib.config.show_replay){
@@ -7818,6 +7907,9 @@ window.play={};
 				return node;
 			},
 			players:function(num){
+				if(num===0){
+					return;
+				}
 				if(num==undefined) num=lib.config.mode_config[lib.config.mode].player_number;
 				if(num==undefined) num=5;
 				for(var i=0;i<num;i++){
@@ -7845,12 +7937,14 @@ window.play={};
 			me:function(){
 				ui.mebg=ui.create.div('#mebg',ui.arena);
 				ui.me=ui.create.div('#me',ui.arena).animate('start');
-				game.me=game.players[0];
-				ui.handcards1=game.me.node.handcards1;
-				ui.handcards2=game.me.node.handcards2;
-				ui.me.appendChild(ui.handcards1);
-				ui.me.appendChild(ui.handcards2);
-				ui.updateh(true);
+				if(game.players.length){
+					game.me=game.players[0];
+					ui.handcards1=game.me.node.handcards1;
+					ui.handcards2=game.me.node.handcards2;
+					ui.me.appendChild(ui.handcards1);
+					ui.me.appendChild(ui.handcards2);
+					ui.updateh(true);
+				}
 			},
 			card:function(position,info,noclick){
 				var node=ui.create.div('.card',position);
@@ -7907,20 +8001,24 @@ window.play={};
 				if(!lib.config.auto_popped) return;
 				if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
-				var node=ui.create.div('.newgame');
-				for(var i=0;i<lib.config.all.mode.length;i++){
-					var thismode=lib.config.all.mode[i];
-					var div=ui.create.div(thismode==lib.config.mode?'.underlinenode.on':'.underlinenode',node);
-					div.innerHTML=lib.translate[thismode];
-					div.link=thismode;
-					div.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-						game.saveConfig('mode',this.link);
-						game.reload();
-					});
+				var rows=Math.ceil(lib.config.all.mode.length/3);
+				for(var k=0;k<rows;k++){
+					var node=ui.create.div('.newgame');
+					for(var i=0;i<3&&i+k*3<lib.config.all.mode.length;i++){
+						var thismode=lib.config.all.mode[i+k*3];
+						var div=ui.create.div(thismode==lib.config.mode?'.underlinenode.on':'.underlinenode',node);
+						div.innerHTML=lib.translate[thismode];
+						div.link=thismode;
+						div.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+							game.saveConfig('mode',this.link);
+							game.reload();
+						});
+					}
+					uiintro.add(node);
 				}
-				uiintro.add(node);
 
 				var auto=null;
+				var ng=null;
 				var sks=[];
 				var autoskill=ui.autoskill;
 				if(game.players){
@@ -7933,6 +8031,11 @@ window.play={};
 				for(var i=0;i<autoskill.length-1;i++){
 					if(sks.contains(autoskill[i].link)){
 						if(!auto){
+							ng=ui.create.div('.text');
+							ng.style.marginBottom=0;
+							ng.innerHTML='新游戏';
+							uiintro.content.insertBefore(ng,uiintro.content.firstChild);
+
 							auto=ui.create.div('.text');
 							auto.style.marginBottom=0;
 							auto.innerHTML='自动发动';
@@ -8115,6 +8218,7 @@ window.play={};
 				var node=_status.currentmouseenter;
 
 				if(_status.mousedragging){
+					e.preventDefault();
 					ui.canvas.width=ui.arena.offsetWidth;
 					ui.canvas.height=ui.arena.offsetHeight;
 					var ctx=ui.ctx;
@@ -8168,6 +8272,11 @@ window.play={};
 							var item=e.path[i];
 							var ex=e.x-ui.arena.offsetLeft;
 							var ey=e.y-ui.arena.offsetTop;
+							var exx=ex,eyy=ey;
+							if(lib.config.mode=='chess'){
+								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
+								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
+							}
 							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
 								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
 								if(item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
@@ -8179,7 +8288,7 @@ window.play={};
 									if(item.classList.contains('selected')){
 										if(notbefore){
 											_status.lastdragchange.push(item);
-											e.path[i]._lastdragchange=[ex,ey];
+											e.path[i]._lastdragchange=[exx,eyy];
 										}
 									}
 									else{
@@ -8236,6 +8345,15 @@ window.play={};
 							}
 						},hoveration);
 					}
+					if(_status.draggingdialog){
+						var ddialog=_status.draggingdialog;
+						if(ddialog._dragorigin&&ddialog._dragtransform){
+							var translate=ddialog._dragtransform.slice(0);
+							translate[0]+=e.x-ddialog._dragorigin.x;
+							translate[1]+=e.y-ddialog._dragorigin.y;
+							ddialog.style.webkitTransform='translate('+translate[0]+'px,'+translate[1]+'px)'
+						}
+					}
 				}
 			},
 			windowmousedown:function(e){
@@ -8245,6 +8363,21 @@ window.play={};
 				for(var i=0;i<dialogs.length;i++){
 					dialogs[i].delete();
 				}
+
+				for(var i=0;i<e.path.length;i++){
+					var itemtype=get.itemtype(e.path[i]);
+					if(itemtype=='button') break;
+					if(itemtype=='dialog'){
+						var ddialog=e.path[i];
+						_status.draggingdialog=ddialog;
+						ddialog._dragorigin=e;
+						if(!ddialog._dragtransform){
+							ddialog._dragtransform=[0,0];
+						}
+						return;
+					}
+				}
+
 				var evt=_status.event;
 				if(!lib.config.enable_drag) return;
 				if(!ui.arena.classList.contains('selecting')) return;
@@ -8271,6 +8404,17 @@ window.play={};
 				}
 			},
 			windowmouseup:function(e){
+				if(_status.draggingdialog){
+					var ddialog=_status.draggingdialog;
+					if(ddialog._dragorigin&&ddialog._dragtransform){
+						var translate=ddialog._dragtransform;
+						translate[0]+=e.x-ddialog._dragorigin.x;
+						translate[1]+=e.y-ddialog._dragorigin.y;
+						ddialog.style.webkitTransform='translate('+translate[0]+'px,'+translate[1]+'px)';
+						delete ddialog._dragorigin;
+					}
+					delete _status.draggingdialog;
+				}
 				if(e.button==2){
 					if(_status.mousedragging){
 						_status.mousedragging=null;
@@ -9003,6 +9147,10 @@ window.play={};
 					else if(ui.cheat2&&!get.config('free_choose')){
 						ui.cheat2.close();
 						delete ui.cheat2;
+						if(ui.cheat2x){
+							ui.cheat2x.close();
+							delete ui.cheat2;
+						}
 					}
 				},
 				change_identity:function(bool){
@@ -9091,13 +9239,15 @@ window.play={};
 				},
 				layout:function(layout){
 					game.saveConfig('layout',layout);
-					ui.arena.hide();
-					setTimeout(function(){
-						var layout=ui.css.layout;
-						ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
+					if(lib.config.mode!='chess'){
+						ui.arena.hide();
+						setTimeout(function(){
+							var layout=ui.css.layout;
+							ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
 
-						setTimeout(function(){layout.remove();ui.arena.show();},100);
-					},500);
+							setTimeout(function(){layout.remove();ui.arena.show();},100);
+						},500);
+					}
 				},
 				image_background:function(background){
 					var animate=lib.config.image_background=='default';
@@ -9355,12 +9505,14 @@ window.play={};
 						if(get.config('reverse_sort')) return lib.config.sort_card(a)-lib.config.sort_card(b);
 						return lib.config.sort_card(b)-lib.config.sort_card(a);
 					});
-					for(i=0;i<cards.length;i++){
-						if(lib.config.sort_card(cards[i])>0){
-							game.me.node.handcards1.appendChild(cards[i]);
-						}
-						else{
-							game.me.node.handcards2.appendChild(cards[i]);
+					if(!game.singleHandcard){
+						for(i=0;i<cards.length;i++){
+							if(lib.config.sort_card(cards[i])>0){
+								game.me.node.handcards1.appendChild(cards[i]);
+							}
+							else{
+								game.me.node.handcards2.appendChild(cards[i]);
+							}
 						}
 					}
 				},
@@ -9375,13 +9527,15 @@ window.play={};
 					for(i=0;i<game.me.node.handcards2.childNodes.length;i++){
 						cards2.unshift(game.me.node.handcards2.childNodes[i]);
 					}
-					var cards=game.me.num('h');
-					for(var i=0;i<cards.length;i++) cards[i].remove();
-					for(i=0;i<cards1.length;i++){
-						game.me.node.handcards2.appendChild(cards1[i]);
-					}
-					for(i=0;i<cards2.length;i++){
-						game.me.node.handcards1.appendChild(cards2[i]);
+					if(!game.singleHandcard){
+						var cards=game.me.num('h');
+						for(var i=0;i<cards.length;i++) cards[i].remove();
+						for(i=0;i<cards1.length;i++){
+							game.me.node.handcards2.appendChild(cards1[i]);
+						}
+						for(i=0;i<cards2.length;i++){
+							game.me.node.handcards1.appendChild(cards2[i]);
+						}
 					}
 				}
 			},
@@ -9431,6 +9585,7 @@ window.play={};
 			ui.updateh(true);
 		},
 		updateh:function(compute){
+			if(!game.me) return;
 			if(compute){
 				game.me.node.handcards1._handcardsWidth=game.me.node.handcards1.offsetWidth;
 				game.me.node.handcards2._handcardsWidth=game.me.node.handcards2.offsetWidth;
@@ -9463,6 +9618,14 @@ window.play={};
 				ui.updates[i]();
 			}
 			if(ui.dialog){
+				if(lib.config.mode=='chess'){
+					if(ui.dialog.content.offsetHeight<240){
+						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
+					}
+					else{
+						ui.dialog.style.height='';
+					}
+				}
 				if(ui.dialog.content.offsetHeight<=240||
 					ui.dialog.contentContainer.offsetHeight>=ui.dialog.content.offsetHeight){
 					ui.dialog.classList.remove('scroll1');
@@ -9656,8 +9819,15 @@ window.play={};
 			if(!game.players.contains(from)&&!game.dead.contains(from)) return Infinity;
 			if(!game.players.contains(to)&&!game.dead.contains(to)) return Infinity;
 			var player=from,m,n=1,i;
-			if(to.isMin()||from.isMin()){
-				if(method=='raw'||method=='pure') return 1;
+			var fxy,txy;
+			if(lib.config.mode=='chess'){
+				fxy=from.getXY();
+				txy=to.getXY();
+				n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
+				if(method=='raw'||method=='pure'||method=='absolute') return n;
+			}
+			else if(to.isMin()||from.isMin()){
+				if(method=='raw'||method=='pure'||method=='absolute') return 1;
 			}
 			else{
 				var length=game.players.length;
@@ -9678,7 +9848,7 @@ window.play={};
 				if(from.isDead()) length++;
 				if(to.isDead()) length++;
 				n=Math.min(n,length-n);
-				if(method=='pure') return n;
+				if(method=='raw'||method=='pure') return n;
 			}
 
 			n=game.checkMod(from,to,n,'globalFrom',from.get('s'));

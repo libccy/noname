@@ -24,13 +24,16 @@ character.jiange={
             trigger:{player:'phaseUseBegin'},
             direct:true,
             filter:function(event,player){
-                return player.hp<=Math.floor(game.players.length/3);
+                if(game.players.length>=6){
+                    return player.hp<=2;
+                }
+                return player.hp<=1;
             },
             content:function(){
                 "step 0"
                 player.chooseTarget('是否发动【控魂】？',function(card,player,target){
                     return player!=target;
-                },[1,Math.floor((game.players.length-1)/2)]).ai=function(target){
+                },[1,Math.min(4,Math.floor((game.players.length-1)/2))]).ai=function(target){
                     return ai.get.damageEffect(target,player,player,'thunder')+1;
                 }
                 "step 1"
@@ -559,7 +562,7 @@ character.jiange={
         sfanshi:'反噬',
         sfanshi_info:'锁定技，结束阶段，你失去1点体力',
         konghun:'控魂',
-        konghun_info:'出牌阶段开始时，若你的体力值不大于1（场上存活角色数不小于6时改为2），你可以对至多X名角色各造成1点雷电伤害，然后你恢复等量体力，X为场上其他存活角色数的一半（向下取整）',
+        konghun_info:'出牌阶段开始时，若你的体力值不大于1（场上存活角色数不小于6时改为2），你可以对至多X名角色各造成1点雷电伤害，然后你恢复等量体力，X为场上其他存活角色数的一半（向下取整且至多为4）',
         jizhen_info:'结束阶段，你可以令所至多两名已受伤角色摸一张牌',
         // biantian2_info:'已获得大雾标记',
         // biantian3_info:'已获得狂风标记',
