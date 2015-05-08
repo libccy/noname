@@ -27,6 +27,27 @@ mode.chess={
 			},
 		},
 		player:{
+			createRangeShadow:function(num,move){
+				num++;
+				var shadows=this.parentNode.getElementsByClassName('playergrid');
+				while(shadows.length){
+					shadows[0].remove();
+				}
+				for(var i=1-num;i<num;i++){
+					for(var j=1-num+Math.abs(i);j<num-Math.abs(i);j++){
+						if(this.movable(i,j)){
+							var grid=ui.create.playergrid(this,i,j);
+							if(move){
+								grid.listen(ui.click.playergrid);
+								ui.movegrids.push(grid);
+							}
+							else{
+								grid.classList.add('temp');
+							}
+						}
+					}
+				}
+			},
 			chooseToMove:function(num){
 				var next=game.createEvent('chooseToMove');
 				next.num=num||1;
@@ -147,7 +168,7 @@ mode.chess={
 				}
 				return false;
 			},
-			dieAfter:function(){
+			dieAfter:function(source){
 				var player=this;
 				delete lib.posmap[player.dataset.position];
 				setTimeout(function(){
@@ -155,13 +176,16 @@ mode.chess={
 				},500);
 				for(var i=0;i<ui.phasequeue.length;i++){
 					if(ui.phasequeue[i].link==player){
-						ui.phasequeue[i].classList.remove('glow2');
-						ui.phasequeue[i].classList.add('dead');
+						ui.phasequeue[i].remove();
+						ui.phasequeue.splice(i,1);
 						break;
 					}
 				}
 				for(var i=1;i<game.players.length;i++){
 					if(game.players[i].side!=game.players[0].side){
+						if(source&&source.side!=player.side){
+							source.draw();
+						}
 						return;
 					}
 				}
@@ -432,16 +456,18 @@ mode.chess={
 					}
 				};
 				if(event.isMine()){
-					game.pause();
-					ui.movegrids=[];
-					num++;
-					for(var i=1-num;i<num;i++){
-						for(var j=1-num+Math.abs(i);j<num-Math.abs(i);j++){
-							if(player.movable(i,j)){
-								ui.movegrids.push(ui.create.playergrid(player,i,j));
+					event.control=ui.create.control('取消',function(){
+						if(ui.movegrids){
+							while(ui.movegrids.length){
+								ui.movegrids.shift().delete();
 							}
 						}
-					}
+						event.result='cancelled';
+						game.resume();
+					});
+					game.pause();
+					ui.movegrids=[];
+					player.createRangeShadow(num,true);
 					for(var i=0;i<ui.movegrids.length;i++){
 						var grid=ui.movegrids[i];
 						if(game.isChessNeighbour(grid,player)) continue;
@@ -458,6 +484,10 @@ mode.chess={
 				if(event.moved){
 					game.delay();
 				}
+				if(event.control){
+					event.control.close();
+				}
+				ui.create.confirm();
 			}
 		}
 	},
@@ -592,7 +622,9 @@ mode.chess={
 					this._chessdrag=null;
 				});
 				ui.chess.addEventListener('mouseup',function(e){
-					this._chessdrag=null;
+					if(this._chessdrag){
+						this._chessdrag=null;
+					}
 				});
 				ui.chess.addEventListener('mousemove',function(e){
 					if(this._chessdrag){
@@ -681,13 +713,31 @@ mode.chess={
 
 					return uiintro;
 				});
+				var clearPrompt=function(){
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].unprompt();
+					}
+				};
+				ui.create.system('显示距离',function(){
+					if(!game.me.isAlive()) return;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]!=game.me){
+							var dist=get.distance(game.me,game.players[i],'pure');
+							if(dist>7){
+								game.players[i].popup('距离：'+dist,'thunder');
+							}
+							else{
+								game.players[i].popup('距离：'+dist);
+							}
+						}
+					}
+				},true);
 
 				ui.create.me();
 				ui.create.fakeme();
 				ui.create.cards();
 
 				ui.chessinfo=ui.create.div('.fakeme.player',ui.me);
-				ui.phasequeue=[];
 
 				game.finishCards();
 				game.arrangePlayers();
@@ -701,13 +751,28 @@ mode.chess={
 				}
 				game.gameDraw(p);
 				game.phaseLoop(p);
-				for(var i=0;i<game.players.length;i++){
-					var node=ui.create.div('.avatar',ui.chessinfo);
-					node.style.backgroundImage=p.node.avatar.style.backgroundImage;
-					node.link=p;
-					ui.phasequeue.push(node);
-					p=p.next;
+				game.setChessInfo(p);
+			}
+		},
+		setChessInfo:function(p){
+			ui.chessinfo.innerHTML='';
+			ui.phasequeue=[];
+			for(var i=0;i<game.players.length;i++){
+				var node=ui.create.div('.avatar',ui.chessinfo);
+				node.style.backgroundImage=p.node.avatar.style.backgroundImage;
+				node.link=p;
+				node.listen(game.clickChessInfo);
+				if(_status.currentPhase==p){
+					node.classList.add('glow2');
 				}
+				ui.phasequeue.push(node);
+				p=p.next;
+			}
+		},
+		clickChessInfo:function(e){
+			if(this.link.isAlive()){
+				this.link.chessFocus();
+				e.stopPropagation();
 			}
 		},
 		chooseCharacter:function(){
@@ -838,6 +903,18 @@ mode.chess={
 		}
 	},
 	skill:{
+		_noactpunish:{
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				return _status.currentPhase==player&&event.targets&&(event.targets.length>1||event.targets[0]!=player);
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.addTempSkill('noactpunish','phaseAfter');
+			}
+		},
+		noactpunish:{},
 		_phasequeue:{
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -862,7 +939,12 @@ mode.chess={
 			direct:true,
 			delay:false,
 			content:function(){
-				player.chooseToMove(2);
+				"step 0"
+				player.chooseToMove(player.skills.contains('noactpunish')?2:1);
+				"step 1"
+				if(result=='cancelled'){
+					player.getStat().skill._chessmove--;
+				}
 			},
 			ai:{
 				order:5,
@@ -870,11 +952,13 @@ mode.chess={
 					player:function(player){
 						var range=get.attackRange(player)>1;
 						var nh=player.num('h');
-						if(nh<=Math.min(3,player.hp)) return Math.random()-0.3;
-						else if(nh<=Math.min(3,player.hp)) return Math.random()-0.4;
 						if(!player.num('h','sha')&&
 						!player.num('h','shunshou')&&
-						!player.num('h','bingliang')) return Math.random()-0.5;
+						!player.num('h','bingliang')){
+							if(nh<=Math.min(3,player.hp)) return Math.random()-0.3;
+							else if(nh<=Math.min(2,player.hp)) return Math.random()-0.4;
+							return Math.random()-0.5;
+						}
 						var neighbour;
 						neighbour=player.getNeighbour(0,1);
 						if(neighbour&&neighbour.side!=player.side){
@@ -934,7 +1018,6 @@ mode.chess={
 		create:{
 			playergrid:function(player,x,y){
 				var node=ui.create.div('.player.minskin.playergrid',player.parentNode);
-				node.listen(ui.click.playergrid);
 				node.link=player;
 				node.dataset.position=player.getDataPos(x,y);
 				return node;
@@ -970,5 +1053,11 @@ mode.chess={
 		}
 	},
 	posmap:{},
+	help:{
+		'战棋模式':'<ul><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
+		'每人在出牌阶段有一次移动的机会，若一名角色在移动之前使用过指定其他角色为目标的牌，该回合可移动的最大距离为2，否则最大距离为1<li>'+
+		'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
+		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚'
+	},
 	config:['battle_number','ban_weak','free_choose','change_choice'],
 }

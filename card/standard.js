@@ -797,7 +797,9 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				targets[0].chooseToUse('对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',{name:'sha'},targets[1],-1);
+				targets[0].chooseToUse(
+					'对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
+					{name:'sha'},targets[1],-1).targetRequired=true;
 				"step 1"
 				if(result.bool==false){
 					player.gain(targets[0].get('e',{subtype:'equip1'}));
@@ -1140,11 +1142,7 @@ card.standard={
 				event.card=trigger.card;
 				"step 1"
 				if(ui.wuxie.classList.contains('glow')&&!_status.auto){
-					if(event.current==game.me){
-						event._result={bool:false};
-						return;
-					}
-					if(lib.config.mode=='versus'&&lib.storage.single_control&&event.current.side==game.me.side){
+					if(event.current==game.me||event.current.isUnderControl()){
 						event._result={bool:false};
 						return;
 					}
@@ -1231,11 +1229,7 @@ card.standard={
 				event.card=trigger.card;
 				"step 1"
 				if(ui.wuxie.classList.contains('glow')&&!_status.auto){
-					if(event.current==game.me){
-						event._result={bool:false};
-						return;
-					}
-					if(lib.config.mode=='versus'&&lib.storage.single_control&&event.current.side==game.me.side){
+					if(event.current==game.me||event.current.isUnderControl()){
 						event._result={bool:false};
 						return;
 					}

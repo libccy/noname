@@ -98,3 +98,6 @@
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 }
+.playergrid.temp{
+    opacity:0.3;
+}

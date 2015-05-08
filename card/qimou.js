@@ -293,7 +293,7 @@ card.qimou={
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
 					if(mod!='unchanged') return mod;
 					return true;
-				},trigger.player,-1).ai;
+				},trigger.player,-1).targetRequired=true;
 			}
 		},
 	},

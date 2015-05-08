@@ -274,7 +274,7 @@ character.yxs={
 			priority:11,
 			filter:function(event,player){
 				if(player.skills.contains('bolehuiyan4')) return false;
-				if(lib.config.mode=='versus'&&lib.storage.single_control&&event.target.side==player.side) return false;
+				if(event.target.isUnderControl()) return false;
 				return event.player!=player&&event.target!=player&&event.target.num('h')>0;
 			},
 			group:['bolehuiyan2','bolehuiyan3'],

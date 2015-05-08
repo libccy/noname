@@ -4928,6 +4928,7 @@ window.play={};
 							ai1:function(){return 1;},
 							ai2:ai.get.effect,
 							type:'dying',
+							targetRequired:true,
 							dying:event.dying
 						});
 					}
@@ -5683,6 +5684,9 @@ window.play={};
 						ok=false;
 						if(event.complexSelect) ok=false;
 					}
+					if(range[1]==-1&&ui.selected.targets.length==0&&event.targetRequired){
+						ok=false;
+					}
 				}
 				if(custom.add.target){
 					custom.add.target();
@@ -5759,6 +5763,14 @@ window.play={};
 		},
 		uncheck:function(){
 			var i,j;
+			if(false){
+				if(lib.config.mode=='chess'){
+					var shadows=ui.chessContainer.getElementsByClassName('playergrid temp');
+					while(shadows.length){
+						shadows[0].remove();
+					}
+				}
+			}
 			if(arguments.length==0){
 				while(document.getElementsByClassName('selectable').length>0){
 					document.getElementsByClassName('selectable')[0].classList.remove('selectable');
@@ -8689,6 +8701,21 @@ window.play={};
 					ui.selected.cards.add(this);
 				}
 				this.classList.toggle('selected');
+				if(false){
+					if(lib.config.mode=='chess'&&!_status.event.skill&&this.classList.contains('selected')&&
+					_status.event.isMine()&&_status.event.name=='chooseToUse'){
+						var player=_status.event.player;
+						var range=get.info(this).range;
+						if(range){
+							if(typeof range.attack==='number'){
+								player.createRangeShadow(get.attackRange(player)+range.attack-1);
+							}
+							else if(typeof range.global==='number'){
+								player.createRangeShadow(get.globalFrom(player)+range.global);
+							}
+						}
+					}
+				}
 				if(custom.add.card){
 					custom.add.card();
 				}
