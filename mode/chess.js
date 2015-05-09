@@ -79,6 +79,7 @@ mode.chess={
 			},
 			chessFocus:function(){
 				if(ui.chess._chessdrag) return;
+				if(_status.chessscrolling) return;
 				var player=this;
 				var dx=0,dy=0;
 
@@ -639,6 +640,30 @@ mode.chess={
 						delete _status.currentChessFocus;
 					}
 				});
+				ui.chessscroll1=ui.create.div('.chessscroll.left',ui.chessContainer);
+				ui.chessscroll2=ui.create.div('.chessscroll.right',ui.chessContainer);
+				var chessscroll=function(){
+					var direction=this.direction;
+					var speed=get.config('chessscroll_speed');
+					if(!speed) return;
+					var interval=setInterval(function(){
+						ui.chessContainer.scrollLeft+=speed*direction;
+					},16);
+					_status.chessscrolling=interval;
+				};
+				var leavescroll=function(){
+					if(_status.chessscrolling){
+						clearInterval(_status.chessscrolling);
+						delete _status.chessscrolling;
+					}
+				};
+				ui.chessscroll1.direction=-1;
+				ui.chessscroll1.addEventListener('mouseenter',chessscroll);
+				ui.chessscroll1.addEventListener('mouseleave',leavescroll);
+
+				ui.chessscroll2.direction=1;
+				ui.chessscroll2.addEventListener('mouseenter',chessscroll);
+				ui.chessscroll2.addEventListener('mouseleave',leavescroll);
 
 				for(var i=0;i<ui.chesswidth;i++){
 					for(var j=0;j<ui.chessheight;j++){
@@ -1013,6 +1038,7 @@ mode.chess={
 		trueColor:"zhu",
 		falseColor:"wei",
 		_chessmove:'移动',
+		chessscroll_speed_config:'边缘滚动速度'
 	},
 	ui:{
 		create:{
@@ -1059,5 +1085,13 @@ mode.chess={
 		'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
 		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚'
 	},
-	config:['battle_number','ban_weak','free_choose','change_choice'],
+	config:['battle_number','ban_weak','free_choose','change_choice',
+	function(lib,get,ui){
+		var current=get.config('chessscroll_speed');
+		if(typeof current!=='number'){
+			game.saveConfig('chessscroll_speed',20,true);
+			current=20;
+		}
+		return ui.create.switcher('chessscroll_speed',[0,10,20,30],10,ui.click.sidebar.local);
+	}],
 }

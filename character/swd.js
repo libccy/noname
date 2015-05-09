@@ -1456,43 +1456,46 @@ character.swd={
 			trigger:{player:'phaseBegin'},
 			group:'huanxing2',
 			direct:true,
-			filter:function(event,player){
-				return player.num('he')>0;
-			},
 			content:function(){
 				"step 0"
 				player.unmark(player.storage.huanxing+'_charactermark');
 				delete player.storage.huanxing;
 				delete player.additionalSkills.huanxing;
 				player.checkMarks();
-				player.chooseCardTarget({
-					prompt:'是否发动【幻形】？',
-					filterCard:true,
-					position:'he',
-					filterTarget:function(card,player,target){
-						if(target==player) return false;
-						if(target.sex!='male') return false;
-						var name=target.name.indexOf('unknown')==0?target.name2:target.name;
+				if(player.num('he')){
+					player.chooseCardTarget({
+						prompt:'是否发动【幻形】？',
+						filterCard:true,
+						position:'he',
+						filterTarget:function(card,player,target){
+							if(target==player) return false;
+							if(target.sex!='male') return false;
+							var name=target.name.indexOf('unknown')==0?target.name2:target.name;
 
-						var info=lib.character[name];
-						if(info){
-							var skills=info[3];
-							for(var j=0;j<skills.length;j++){
-								if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-									!lib.skill[skills[j]].unique&&!player.skills.contains(skills[j])){
-									return true;
+							var info=lib.character[name];
+							if(info){
+								var skills=info[3];
+								for(var j=0;j<skills.length;j++){
+									if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
+										!lib.skill[skills[j]].unique&&!player.skills.contains(skills[j])){
+										return true;
+									}
 								}
 							}
+							return false;
+						},
+						ai1:function(card){
+							return 7-ai.get.value(card);
+						},
+						ai2:function(target){
+							if(target.isMin()) return 0;
+							return 6-target.maxHp;
 						}
-						return false;
-					},
-					ai1:function(card){
-						return 7-ai.get.value(card);
-					},
-					ai2:function(target){
-						return 6-target.maxHp;
-					}
-				});
+					});
+				}
+				else{
+					event.finish();
+				}
 				"step 1"
 				if(result.bool){
 					player.discard(result.cards);
@@ -5133,10 +5136,9 @@ character.swd={
 			unique:true,
 			enable:'phaseUse',
 			priority:-9,
-			group:'tianshu2',
 			filterCard:{type:['trick','delay']},
 			filter:function(event,player){
-				return player.num('h',{type:'trick'})>0;
+				return player.num('h',{type:['trick','delay']})>0;
 			},
 			filterTarget:function(card,player,target){
 				var names=[];
@@ -5158,7 +5160,7 @@ character.swd={
 					return false;
 				}
 			},
-			createDialog:function(player,target){
+			createDialog:function(player,target,onlylist){
 				var names=[];
 				var list=[];
 				if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
@@ -5178,8 +5180,10 @@ character.swd={
 						}
 					}
 				}
+				if(onlylist) return list;
 				var dialog=ui.create.dialog();
 				dialog.add('选择获得一项技能');
+				_status.event.list=list;
 				var clickItem=function(){
 					_status.event._result=this.link;
 					game.resume();
@@ -5189,24 +5193,39 @@ character.swd={
 						var translation=get.translation(list[i])[0]+get.translation(list[i])[1];
 						var item=dialog.add('<div class="popup" style="width:50%;display:inline-block"><div class="skill">【'+
 						translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
-						item.addEventListener('click',clickItem);
-						item.link=list[i];
+						item.firstChild.addEventListener('click',clickItem);
+						item.firstChild.link=list[i];
 					}
 				}
 				dialog.add(ui.create.div('.placeholder'));
 				return dialog;
 			},
+			check:function(card){
+				return 5-ai.get.value(card);
+			},
 			content:function(){
 				"step 0"
-				ui.auto.hide();
-				event.dialog=lib.skill.tianshu.createDialog(player,target);
-				game.pause();
+				event.skillai=function(list){
+					return list.randomGet();
+				};
+				if(event.isMine()){
+					event.dialog=lib.skill.tianshu.createDialog(player,target);
+					event.switchToAuto=function(){
+						event._result=event.skillai(event.list);
+						game.resume();
+					};
+					game.pause();
+				}
+				else{
+					event._result=event.skillai(lib.skill.tianshu.createDialog(player,target,true));
+				}
 				"step 1"
 				if(player.storage.tianshu){
 					player.unmark(player.storage.tianshu+'_charactermark');
 				}
-				ui.auto.show();
-				event.dialog.close();
+				if(event.dialog){
+					event.dialog.close();
+				}
 				var link=result;
 				player.addSkill(link);
 				player.skills.remove(link);
@@ -5218,8 +5237,20 @@ character.swd={
 				});
 				player.storage.tianshu=target.name;
 				player.checkMarks();
+				player.addTempSkill('tianshu_ai','phaseAfter');
 			},
+			ai:{
+				order:1,
+				result:{
+					player:function(player){
+						if(player.skills.contains('tianshu_ai')) return 0;
+						if(player.num('h')>player.hp) return 1;
+						return 0;
+					}
+				}
+			}
 		},
+		tianshu_ai:{},
 		tianshu2:{
 			trigger:{player:'phaseBegin'},
 			direct:true,
@@ -7932,7 +7963,7 @@ character.swd={
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得双方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
-		tianshu_info:'回合开始阶段，你可以获得场上一名存活角色的一项技能；出牌阶段，你可以弃置一张锦囊牌，然后更换一项技能',
+		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，并获得场上一名存活角色的一项技能（再使用则会替换前一次获得的技能）',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',

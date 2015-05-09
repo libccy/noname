@@ -628,6 +628,7 @@ window.play={};
 
 						setTimeout(function(){
 							event.dialog=ui.create.dialog(get.translation(player.name)+'拼点成功');
+							event.dialog.classList.add('center');
 							player.popup('胜');
 							target.popup('负');
 							game.resume();
@@ -639,6 +640,7 @@ window.play={};
 							event.result.tie=true;
 							setTimeout(function(){
 								event.dialog=ui.create.dialog(get.translation(player.name)+'拼点失败');
+								event.dialog.classList.add('center');
 								player.popup('平');
 								target.popup('平');
 								game.resume();
@@ -647,6 +649,7 @@ window.play={};
 						else{
 							setTimeout(function(){
 								event.dialog=ui.create.dialog(get.translation(player.name)+'拼点失败');
+								event.dialog.classList.add('center');
 								player.popup('负');
 								target.popup('胜');
 								game.resume();
@@ -1934,6 +1937,7 @@ window.play={};
 					player.judging=get.cards()[0];
 					event.node=player.judging.copy('thrown','center',ui.arena).animate('start');
 					event.dialog=ui.create.dialog(get.translation(player)+'的'+event.judgestr+'判定');
+					event.dialog.classList.add('center');
 					game.log(get.translation(player)+'进行'+event.judgestr+'判定，亮出的判定牌为'+get.translation(player.judging));
 					game.delay(2);
 					event.trigger('judge');
@@ -7057,10 +7061,11 @@ window.play={};
 						case 'strict_sort':
 							modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
 							modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));break;
-						default:
-							if(Array.isArray(lib.config.current_mode[i])){
-								modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
+						default:{
+							if(typeof lib.config.current_mode[i]==='function'){
+								modeconfig.push(lib.config.current_mode[i](lib,get,ui));
 							}
+						}
 					}
 				}
 				for(i in lib.config.current_mode){
@@ -9646,11 +9651,13 @@ window.play={};
 			}
 			if(ui.dialog){
 				if(lib.config.mode=='chess'){
-					if(ui.dialog.content.offsetHeight<240){
+					if(ui.dialog.content.offsetHeight<240&&(!ui.dialog.buttons||!ui.dialog.buttons.length)){
 						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
+						ui.dialog.classList.add('slim');
 					}
 					else{
 						ui.dialog.style.height='';
+						ui.dialog.classList.remove('slim');
 					}
 				}
 				if(ui.dialog.content.offsetHeight<=240||
@@ -10813,6 +10820,18 @@ window.play={};
 			disvalue:function(card,player){
 				return -ai.get.value(card,player);
 			},
+			skillthreaten:function(skill,player,target){
+				if(!lib.skill[skill]) return 1;
+				if(!lib.skill[skill].ai) return 1;
+				var threaten=lib.skill[skill].ai.threaten;
+				if(typeof threaten=='number') return threaten;
+				if(typeof threaten=='function'){
+					player=player||_status.event.player;
+					target=target||player;
+					return threaten(player,target);
+				}
+				return 1;
+			},
 			order:function(item){
 				var aii=get.info(item).ai;
 				var order;
@@ -11016,6 +11035,7 @@ window.play={};
 			}
 		},
 	};
+	lib.init.init();
 		HTMLDivElement.prototype.animate=function(name){
 			this.classList.add(name);
 			var that=this;
@@ -11394,7 +11414,6 @@ window.play={};
 			console.log(str);
 			return aa+bb+cc+dd;
 		}
-		lib.init.init();
 		window.onkeydown=function(e){
 			if(e.keyCode==32){
 				var node=ui.window.querySelector('#paused');

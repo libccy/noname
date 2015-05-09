@@ -54,6 +54,9 @@
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 }
+#arena>.dialog.slim:not(.center){
+    top:40px;
+}
 #control{
     top:calc(100% - 155px);
 }
@@ -100,4 +103,17 @@
 }
 .playergrid.temp{
     opacity:0.3;
+}
+.chessscroll{
+    height:calc(100% - 162px);
+    width:20px;
+    top:42px;
+    z-index:1;
+    position:fixed;
+}
+.chessscroll.left{
+    left:0;
+}
+.chessscroll.right{
+    right:0;
 }

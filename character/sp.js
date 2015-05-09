@@ -2600,6 +2600,7 @@ character.sp={
 			},
 			mark:true,
 			direct:true,
+			unique:true,
 			content:function(){
 				"step 0"
 				var check=(player.hp==1||(player.hp==2&&player.num('h')<=1));
