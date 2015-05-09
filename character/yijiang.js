@@ -382,7 +382,7 @@ character.yijiang={
 					return -ai.get.attitude(player,target);
 				};
 				"step 2"
-				if(result.bool){
+				if(result.bool&&result.targets.length){
 					result.targets[0].storage.qianxi2=event.color;
 					result.targets[0].addSkill('qianxi2');
 					player.logSkill('qianxi',result.targets);

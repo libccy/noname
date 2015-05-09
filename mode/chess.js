@@ -1178,7 +1178,7 @@ mode.chess={
 			game.saveConfig('chessscroll_speed',20,true);
 			current=20;
 		}
-		return ui.create.switcher('chessscroll_speed',[0,10,20,30],10,ui.click.sidebar.local);
+		return ui.create.switcher('chessscroll_speed',[0,10,20,30],current,ui.click.sidebar.local);
 	},function(lib,get,ui){
 		var current=get.config('chess_character');
 		if(typeof current!=='boolean'){

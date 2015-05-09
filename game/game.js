@@ -8384,7 +8384,7 @@ window.play={};
 				for(var i=0;i<e.path.length;i++){
 					var itemtype=get.itemtype(e.path[i]);
 					if(itemtype=='button') break;
-					if(itemtype=='dialog'){
+					if(itemtype=='dialog'&&!e.path[i].classList.contains('popped')){
 						var ddialog=e.path[i];
 						_status.draggingdialog=ddialog;
 						ddialog._dragorigin=e;
