@@ -11528,7 +11528,7 @@ window.play={};
 					if(j=='character'&&!lib.config.characters.contains(i)) continue;
 					for(k in character[i][j]){
 						if(j=='character'){
-							if(lib.config.only_fullskin&&lib.config.layout=='newlayout'){
+							if(lib.config.only_fullskin&&lib.config.layout=='newlayout'&&lib.config.mode!='chess'){
 								if(!character[i][j][k][4]) continue;
 								if(!character[i][j][k][4].contains('fullskin')&&!character[i][j][k][4].contains('minskin')){
 									continue;

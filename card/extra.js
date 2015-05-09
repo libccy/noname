@@ -74,7 +74,11 @@ card.extra={
 					event.finish();
 					return;
 				}
-				target.chooseCard(true);
+				var rand=Math.random()<0.5;
+				target.chooseCard(true).ai=function(card){
+					if(rand) return Math.random();
+					return ai.get.value(card);
+				};
 				"step 1"
 				event.dialog=ui.create.dialog(get.translation(target.name)+'展示的手牌',result.cards);
 				event.card2=result.cards[0];

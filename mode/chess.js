@@ -581,6 +581,12 @@ mode.chess={
 						}
 					}
 				}
+				if(get.config('chess_character')){
+					for(var i in lib.chess_character){
+						lib.character[i]=lib.chess_character[i];
+					}
+				}
+				delete lib.chess_character;
 				lib.init.css('layout/mode','chess');
 				ui.chesssheet=document.createElement('style');
 				document.head.appendChild(ui.chesssheet);
@@ -1038,7 +1044,47 @@ mode.chess={
 		trueColor:"zhu",
 		falseColor:"wei",
 		_chessmove:'移动',
-		chessscroll_speed_config:'边缘滚动速度'
+		chessscroll_speed_config:'边缘滚动速度',
+		chess_character_config:'战棋武将',
+
+		chess_caocao:'曹操',
+		chess_xunyu:'荀彧',
+		chess_simayi:'司马懿',
+		chess_xiahoudun:'夏侯惇',
+		chess_dianwei:'典韦',
+		chess_xuzhu:'许褚',
+		chess_zhangliao:'张辽',
+		chess_jiaxu:'贾诩',
+
+		chess_liubei:'刘备',
+		chess_guanyu:'关羽',
+		chess_zhangfei:'张飞',
+		chess_zhaoyun:'赵云',
+		chess_machao:'马超',
+		chess_huangzhong:'黄忠',
+		chess_maliang:'马良',
+		chess_zhugeliang:'诸葛亮',
+
+		chess_sunquan:'孙权',
+		chess_zhouyu:'周瑜',
+		chess_lvmeng:'吕蒙',
+		chess_huanggai:'黄盖',
+		chess_lusu:'鲁肃',
+		chess_luxun:'陆逊',
+		chess_ganning:'甘宁',
+		chess_taishici:'太史慈',
+
+		chess_lvbu:'吕布',
+		chess_sunshangxiang:'孙尚香',
+		chess_diaochan:'貂蝉',
+		chess_huatuo:'华佗',
+		chess_zhangjiao:'张辽',
+		chess_menghuo:'孟获',
+
+		chess_dongzhuo:'董卓',
+		chess_jinchidiao:'金翅雕',
+		chess_beimingjukun:'北溟巨鲲',
+		chess_wuzhaojinlong:'五爪金龙',
 	},
 	ui:{
 		create:{
@@ -1078,6 +1124,46 @@ mode.chess={
 			}
 		}
 	},
+	chess_character:{
+		// chess_caocao:['male','wei',3,['']],
+		// chess_xunyu:['male','wei',3,['']],
+		// chess_simayi:['male','wei',3,['']],
+		// chess_xiahoudun:['male','wei',3,['']],
+		// chess_dianwei:['male','wei',3,['']],
+		// chess_xuzhu:['male','wei',3,['']],
+		// chess_zhangliao:['male','wei',3,['']],
+		// chess_jiaxu:['male','wei',3,['']],
+		//
+		// chess_liubei:['male','shu',3,['']],
+		// chess_guanyu:['male','shu',3,['']],
+		// chess_zhangfei:['male','shu',3,['']],
+		// chess_zhaoyun:['male','shu',3,['']],
+		// chess_machao:['male','shu',3,['']],
+		// chess_huangzhong:['male','shu',3,['']],
+		// chess_maliang:['male','shu',3,['']],
+		// chess_zhugeliang:['male','shu',3,['']],
+		//
+		// chess_sunquan:['male','wu',3,['']],
+		// chess_zhouyu:['male','wu',3,['']],
+		// chess_lvmeng:['male','wu',3,['']],
+		// chess_huanggai:['male','wu',3,['']],
+		// chess_lusu:['male','wu',3,['']],
+		// chess_luxun:['male','wu',3,['']],
+		// chess_ganning:['male','wu',3,['']],
+		// chess_taishici:['male','wu',3,['']],
+		//
+		// chess_lvbu:['male','qun',3,['']],
+		// chess_sunshangxiang:['male','qun',3,['']],
+		// chess_diaochan:['male','qun',3,['']],
+		// chess_huatuo:['male','qun',3,['']],
+		// chess_zhangjiao:['male','qun',3,['']],
+		// chess_menghuo:['male','qun',3,['']],
+		//
+		// chess_dongzhuo:['male','qun',3,['']],
+		// chess_jinchidiao:['male','qun',3,['']],
+		// chess_beimingjukun:['male','qun',3,['']],
+		// chess_wuzhaojinlong:['male','qun',3,['']],
+	},
 	posmap:{},
 	help:{
 		'战棋模式':'<ul><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
@@ -1093,5 +1179,12 @@ mode.chess={
 			current=20;
 		}
 		return ui.create.switcher('chessscroll_speed',[0,10,20,30],10,ui.click.sidebar.local);
+	},function(lib,get,ui){
+		var current=get.config('chess_character');
+		if(typeof current!=='boolean'){
+			game.saveConfig('chess_character',true);
+			current=true;
+		}
+		return ui.create.switcher('chess_character',current,ui.click.sidebar.local2);
 	}],
 }

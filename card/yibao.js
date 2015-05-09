@@ -256,7 +256,11 @@ card.yibao={
 				player.chooseCard(true);
 				"step 1"
 				event.card1=result.cards[0];
-				target.chooseCard(true);
+				var rand=Math.random()<0.5;
+				target.chooseCard(true).ai=function(card){
+					if(rand) return Math.random();
+					return ai.get.value(card);
+				};
 				"step 2"
 				event.card2=result.cards[0];
 				player.$compare(event.card1,target,event.card2);
