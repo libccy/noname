@@ -1122,7 +1122,7 @@ mode.chess={
 				player.chooseToMove(get.cardCount('sha',player),'是否发动【灵动】？');
 				"step 1"
 				if(result.bool){
-					player.logSkill('pianyi');
+					player.logSkill('lingdong');
 				}
 			}
 		},
@@ -1386,14 +1386,14 @@ mode.chess={
 		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚'
 	},
 	config:['battle_number','ban_weak','free_choose','change_choice',
-	function(lib,get,ui){
+	function(game,lib,get,ui){
 		var current=get.config('chess_character');
 		if(typeof current!=='boolean'){
 			game.saveConfig('chess_character',true);
 			current=true;
 		}
 		return ui.create.switcher('chess_character',current,ui.click.sidebar.local2);
-	},function(lib,get,ui){
+	},function(game,lib,get,ui){
 		var current=get.config('chessscroll_speed');
 		if(typeof current!=='number'){
 			game.saveConfig('chessscroll_speed',20,true);

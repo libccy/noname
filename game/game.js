@@ -7069,7 +7069,7 @@ window.play={};
 							modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));break;
 						default:{
 							if(typeof lib.config.current_mode[i]==='function'){
-								modeconfig.push(lib.config.current_mode[i](lib,get,ui));
+								modeconfig.push(lib.config.current_mode[i](game,lib,get,ui));
 							}
 						}
 					}
