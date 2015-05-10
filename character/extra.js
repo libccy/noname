@@ -4,7 +4,7 @@ character.extra={
 		shen_zhaoyun:['male','shu',2,['juejing','longhun'],['fullskin'],['fullskin']],
 		shen_zhugeliang:['male','shu',3,['qixing','kuangfeng','dawu'],['fullskin']],
 		shen_lvmeng:['male','wu',3,['shelie','gongxin'],['fullskin']],
-		shen_zhouyu:['male','wu',4,['yeyan','swdqinyin'],['fullskin']],
+		shen_zhouyu:['male','wu',4,['yeyan','qinyin'],['fullskin']],
 		shen_simayi:['male','wei',4,['renjie','sbaiyin','lianpo'],['fullskin']],
 		shen_caocao:['male','wei',3,['guixin','feiying'],['fullskin']],
 		shen_lvbu:['male','qun',5,['baonu','wuqian','shenfen'],['fullskin']],
@@ -755,75 +755,12 @@ character.extra={
 			}
 		},
 		qinyin:{
-			trigger:{player:'phaseEnd'},
-			filter:function(event,player){
-				return player.getStat('damage')>=2;
-			},
+			inherit:'swdqinyin',
+			trigger:{player:'phaseDiscardEnd'},
 			direct:true,
-			content:function(){
-				"step 0"
-				var recover=0,lose=0;
-				for(var i=0;i<game.players.length;i++){
-					if(!game.players[i].isOut()){
-						if(game.players[i].hp<game.players[i].maxHp){
-							if(ai.get.attitude(player,game.players[i])>0){
-								if(game.players[i].hp<2){
-									lose--;
-									recover+=0.5;
-								}
-								lose--;
-								recover++;
-							}
-							else if(ai.get.attitude(player,game.players[i])<0){
-								if(game.players[i].hp<2){
-									lose++;
-									recover-=0.5;
-								}
-								lose++;
-								recover--;
-							}
-						}
-						else{
-							if(ai.get.attitude(player,game.players[i])>0){
-								lose--;
-							}
-							else if(ai.get.attitude(player,game.players[i])<0){
-								lose++;
-							}
-						}
-					}
-				}
-				player.chooseControl('失去体力','回复体力','cancel').ai=function(){
-					if(lose>recover&&lose>0) return 0;
-					if(lose<recover&&recover>0) return 1;
-					return 2;
-				}
-				"step 1"
-				if(result.bool==false||result.control=='cancel'){
-					event.finish();
-				}
-				else{
-					player.logSkill('qinyin');
-					event.bool=(result.control=='回复体力');
-					event.num=0;
-					event.players=game.players.slice(0);
-				}
-				"step 2"
-				if(event.num<event.players.length){
-					var target=event.players[event.num];
-					if(event.bool){
-						target.recover();
-					}
-					else{
-						target.loseHp();
-					}
-					event.num++;
-					event.redo();
-				}
+			filter:function(event,player){
+				return event.cards&&event.cards.length>1
 			},
-			ai:{
-				expose:0.1,
-			}
 		},
 		longhun:{
 			group:['longhun1','longhun2','longhun3','longhun4'],
@@ -1120,7 +1057,7 @@ character.extra={
 		shelie_info:'摸牌阶段，你可以放弃摸牌，改为从牌堆顶亮出五张牌，你获得不同花色的牌各一张，将其余的牌置入弃牌堆。',
 		gongxin_info:'出牌阶段，你可以观看一名其他角色的手牌，并可以展示其中一张红桃牌，然后将其弃置或置于牌堆顶，每阶段限一次。',
 		guixin_info:'每当你受到1次伤害后，若至少一名其他角色的区域里有牌，你可以选择所有其他角色，获得这些角色区域里的一张牌，然后将你的武将牌翻面。',
-		qinyin_info:'回合结束阶段，若你于回合造成了超过2点伤害，你可以选择一项：1.令所有角色各回复1点体力；2.令所有角色各失去1点体力。每阶段限一次。',
+		qinyin_info:'每当你于弃牌阶段内因你的弃置而失去第X张手牌时（X至少为2），你可以选择一项：1.令所有角色各回复1点体力；2.令所有角色各失去1点体力。每阶段限一次。',
 		yeyan_info:'限定技，出牌阶段，你可以对一至三名角色造成至多共3点火焰伤害（你可以任意分配每名目标角色受到的伤害点数），若你将对一名角色分配2点或更多的火焰伤害，你须先弃置四张不同花色的手牌再失去3点体力。',
 		qixing:'七星',
 		qixing_bg:'星',

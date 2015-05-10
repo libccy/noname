@@ -546,7 +546,7 @@ card.swd={
 			skills:['sadengjinhuan'],
 			ai:{
 				basic:{
-					equipValue:6
+					equipValue:5.5
 				}
 			},
 		},

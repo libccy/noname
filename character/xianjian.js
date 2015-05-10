@@ -892,9 +892,9 @@ character.xianjian={
 			filter:function(event,player){
 				return _status.currentPhase!=player;
 			},
+			priority:101,
 			content:function(){
 				var cards=[];
-				// var max=player.hp<=2?3:2;
 				var max=Math.min(ui.cardPile.childNodes.length,lib.skill.longxi.max);
 				for(var i=0;i<max;i++){
 					var card=ui.cardPile.childNodes[i];

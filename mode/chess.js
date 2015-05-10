@@ -48,11 +48,12 @@ mode.chess={
 					}
 				}
 			},
-			chooseToMove:function(num){
+			chooseToMove:function(num,prompt){
 				var next=game.createEvent('chooseToMove');
 				next.num=num||1;
 				next.player=this;
 				next.content=lib.element.playerproto.chooseToMove;
+				next.prompt=prompt;
 				return next;
 			},
 			move:function(x,y){
@@ -457,15 +458,24 @@ mode.chess={
 					}
 				};
 				if(event.isMine()){
-					event.control=ui.create.control('取消',function(){
+					if(event.prompt){
+						event.dialog=ui.create.dialog(event.prompt);
+					}
+					var resume=function(){
 						if(ui.movegrids){
 							while(ui.movegrids.length){
 								ui.movegrids.shift().delete();
 							}
 						}
-						event.result='cancelled';
+						event.result={bool:false};
 						game.resume();
-					});
+					};
+					if(event.phasing){
+						event.custom.replace.confirm=resume;
+					}
+					else{
+						event.control=ui.create.control('取消',resume);
+					}
 					game.pause();
 					ui.movegrids=[];
 					player.createRangeShadow(num,true);
@@ -484,11 +494,22 @@ mode.chess={
 				"step 1"
 				if(event.moved){
 					game.delay();
+					event.result={
+						bool:true,
+						move:player.dataset.position
+					}
+				}
+				if(!event.result){
+					event.result={
+						bool:false
+					}
 				}
 				if(event.control){
 					event.control.close();
 				}
-				ui.create.confirm();
+				if(event.dialog){
+					event.dialog.close();
+				}
 			}
 		}
 	},
@@ -582,6 +603,7 @@ mode.chess={
 					}
 				}
 				if(get.config('chess_character')){
+					delete lib.character.swd_linyue;
 					for(var i in lib.chess_character){
 						lib.character[i]=lib.chess_character[i];
 					}
@@ -678,14 +700,8 @@ mode.chess={
 						'{left:'+(14+i*148)+'px;top:'+(14+j*148)+'px}',0);
 						ui.chesssheet.sheet.insertRule('#arena.chess #chess>.card'+pos+
 						'{left:'+(22+i*148)+'px;top:'+(22+j*148)+'px}',0);
-						if(j==ui.chessheight-1){
-							ui.chesssheet.sheet.insertRule('#arena.chess #chess>.popup'+pos+
-							'{left:'+(19+i*148)+'px;top:'+(-19+j*148)+'px}',0);
-						}
-						else{
-							ui.chesssheet.sheet.insertRule('#arena.chess #chess>.popup'+pos+
-							'{left:'+(19+i*148)+'px;top:'+(142+j*148)+'px}',0);
-						}
+						ui.chesssheet.sheet.insertRule('#arena.chess #chess>.popup'+pos+
+						'{left:'+(19+i*148)+'px;top:'+(142+j*148)+'px}',0);
 					}
 				}
 
@@ -754,12 +770,9 @@ mode.chess={
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=game.me){
 							var dist=get.distance(game.me,game.players[i],'pure');
-							if(dist>7){
-								game.players[i].popup('距离：'+dist,'thunder');
-							}
-							else{
-								game.players[i].popup('距离：'+dist);
-							}
+							var dist2=get.distance(game.me,game.players[i]);
+							var nature=dist>7?'thunder':'';
+							game.players[i].popup('距离：'+dist2+'/'+dist,nature);
 						}
 					}
 				},true);
@@ -786,6 +799,14 @@ mode.chess={
 			}
 		},
 		setChessInfo:function(p){
+			if(!p){
+				if(ui.phasequeue&&ui.phasequeue.length){
+					p=ui.phasequeue[0].link;
+				}
+				else{
+					p=game.me;
+				}
+			}
 			ui.chessinfo.innerHTML='';
 			ui.phasequeue=[];
 			for(var i=0;i<game.players.length;i++){
@@ -934,6 +955,177 @@ mode.chess={
 		}
 	},
 	skill:{
+		guanchuan:{
+			trigger:{player:'shaBefore'},
+			getTargets:function(player,target){
+				var targets=[];
+				var pxy=player.getXY();
+				var txy=target.getXY();
+				var dx=txy[0]-pxy[0];
+				var dy=txy[1]-pxy[1];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i]!=target){
+						var axy=game.players[i].getXY();
+						var dx2=axy[0]-pxy[0];
+						var dy2=axy[1]-pxy[1];
+						if(dx*dx2<0) continue;
+						if(dy*dy2<0) continue;
+						if(dx==0){
+							if(dx2==0){
+								targets.push(game.players[i]);
+							}
+						}
+						else if(dx2!=0){
+							if(dy2/dx2==dy/dx){
+								targets.push(game.players[i]);
+							}
+						}
+					}
+				}
+				return targets;
+			},
+			filter:function(event,player){
+				if(event.targets.length!=1) return false;
+				return lib.skill.guanchuan.getTargets(player,event.targets[0]).length>0;
+			},
+			check:function(event,player){
+				var targets=lib.skill.guanchuan.getTargets(player,event.targets[0]);
+				var eff=0;
+				for(var i=0;i<targets.length;i++){
+					eff+=ai.get.effect(targets[i],event.card,player,player);
+				}
+				return eff>0;
+			},
+			content:function(){
+				var targets=lib.skill.guanchuan.getTargets(player,trigger.targets[0]);
+				for(var i=0;i<targets.length;i++){
+					trigger.targets.push(targets[i]);
+				}
+				player.logSkill('guanchuan',targets);
+			}
+		},
+		sanjiansheji:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h','sha')>1&&lib.filter.filterCard({name:'sha'},player);
+			},
+			filterCard:{name:'sha'},
+			selectCard:2,
+			check:function(card){
+				var num=0;
+				var player=_status.event.player;
+				for(var i=0;i<game.players.length;i++){
+					if(lib.filter.targetEnabled({name:'sha'},player,game.players[i])&&
+					ai.get.effect(game.players[i],{name:'sha'},player)>0){
+						num++;
+						if(num>1) return 8-ai.get.value(card);
+					}
+				}
+				return 0;
+			},
+			selectTarget:[1,Infinity],
+			discard:false,
+			prepare:function(cards,player,targets){
+				player.$throw(cards);
+				player.line(targets);
+			},
+			filterTarget:function(card,player,target){
+				return lib.filter.targetEnabled({name:'sha'},player,target)&&
+				get.distance(player,target,'pure')<=5;
+			},
+			content:function(){
+				targets.sort(lib.sort.seat);
+				player.useCard({name:'sha'},cards,targets,'luanjian').animate=false;
+			},
+			multitarget:true,
+			ai:{
+				order:function(){
+					return lib.card.sha.ai.order+0.1;
+				},
+				result:{
+					target:function(player,target){
+						var added=false;
+						if(!player.skills.contains('unequip')){
+							added=true;
+							player.skills.push('unequip');
+						}
+						var eff=ai.get.effect(target,{name:'sha'},player,target);
+						if(added){
+							player.skills.remove('unequip');
+						}
+						return eff;
+					}
+				},
+				effect:{
+					player:function(card,player){
+						if(_status.currentPhase!=player) return;
+						if(card.name=='sha'&&player.num('h','sha')<2&&player.num('h')<=player.hp){
+							var num=0;
+							var player=_status.event.player;
+							for(var i=0;i<game.players.length;i++){
+								if(lib.filter.targetEnabled({name:'sha'},player,game.players[i])&&
+								ai.get.attitude(player,game.players[i])<0){
+									num++;
+									if(num>1) return [0,0,0,0];
+								}
+							}
+						}
+					}
+				},
+			}
+		},
+		zhiming:{
+			trigger:{source:'damageBegin'},
+			filter:function(event,player){
+				return get.distance(event.player,player,'attack')>1;
+			},
+			forced:true,
+			content:function(){
+				trigger.num++;
+			}
+		},
+		lianshe:{
+			mod:{
+				cardUsable:function(card,player,num){
+					if(card.name=='sha'){
+						return num+get.cardCount(true,player)-get.cardCount('sha',player);
+					}
+				},
+				attackFrom:function(from,to,distance){
+					return distance-1;
+				}
+			},
+		},
+		pianyi:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return !player.getStat('damage');
+			},
+			content:function(){
+				"step 0"
+				player.chooseToMove(1,'是否发动【翩仪】？');
+				"step 1"
+				if(result.bool){
+					player.logSkill('pianyi');
+				}
+			}
+		},
+		lingdong:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return get.cardCount('sha',player)>0;
+			},
+			content:function(){
+				"step 0"
+				player.chooseToMove(get.cardCount('sha',player),'是否发动【灵动】？');
+				"step 1"
+				if(result.bool){
+					player.logSkill('pianyi');
+				}
+			}
+		},
 		_noactpunish:{
 			trigger:{player:'useCard'},
 			filter:function(event,player){
@@ -969,11 +1161,14 @@ mode.chess={
 			usable:1,
 			direct:true,
 			delay:false,
+			preservecancel:true,
 			content:function(){
 				"step 0"
-				player.chooseToMove(player.skills.contains('noactpunish')?2:1);
+				var move=player.skills.contains('noactpunish')?2:1;
+				move=game.checkMod(player,move,'chessMove',player.get('s'));
+				player.chooseToMove(move).phasing=true;
 				"step 1"
-				if(result=='cancelled'){
+				if(!result.bool){
 					player.getStat().skill._chessmove--;
 				}
 			},
@@ -1021,7 +1216,7 @@ mode.chess={
 			popup:false,
 			filter:function(event,player){
 				if(event.autochoose&&event.autochoose()) return false;
-				return !_status.auto&&player.isUnderControl();
+				return player.isUnderControl();
 			},
 			content:function(){
 				game.modeSwapPlayer(player);
@@ -1046,6 +1241,7 @@ mode.chess={
 		_chessmove:'移动',
 		chessscroll_speed_config:'边缘滚动速度',
 		chess_character_config:'战棋武将',
+		only_chess_character_config:'只用战棋武将',
 
 		chess_caocao:'曹操',
 		chess_xunyu:'荀彧',
@@ -1085,6 +1281,19 @@ mode.chess={
 		chess_jinchidiao:'金翅雕',
 		chess_beimingjukun:'北溟巨鲲',
 		chess_wuzhaojinlong:'五爪金龙',
+
+		pianyi:'翩仪',
+		pianyi_info:'回合结束阶段，若你没有于本回合内造成伤害，你获得一次移动机会',
+		lingdong:'灵动',
+		lingdong_info:'回合结束阶段，你可以移动X个格，X为你回合内出杀的次数',
+		lianshe:'连射',
+		lianshe_info:'你的攻击范围+1；回合内，你回合内，每当你使用一张不是杀的牌，你可以额外使用一张杀',
+		zhiming:'致命',
+		zhiming_info:'锁定技，当你使用杀造成伤害时，若你不在目标的攻击范围内，此伤害+1',
+		sanjiansheji:'散箭',
+		sanjiansheji_info:'你可以将两张杀当杀使用，此杀可以指定距离你5格以内任意名目标',
+		guanchuan:'贯穿',
+		guanchuan_info:'当你使用杀指定惟一的目标后，可将攻击射线内的其他角色也加入目标',
 	},
 	ui:{
 		create:{
@@ -1113,6 +1322,10 @@ mode.chess={
 						ui.movegrids.shift().delete();
 					}
 				}
+				_status.event.result={
+					bool:true,
+					move:this.link.dataset.position
+				};
 				game.resume();
 			}
 		}
@@ -1131,7 +1344,7 @@ mode.chess={
 		// chess_xiahoudun:['male','wei',3,['']],
 		// chess_dianwei:['male','wei',3,['']],
 		// chess_xuzhu:['male','wei',3,['']],
-		// chess_zhangliao:['male','wei',3,['']],
+		chess_zhangliao:['male','wei',4,['gongji','zhiming']],
 		// chess_jiaxu:['male','wei',3,['']],
 		//
 		// chess_liubei:['male','shu',3,['']],
@@ -1139,27 +1352,28 @@ mode.chess={
 		// chess_zhangfei:['male','shu',3,['']],
 		// chess_zhaoyun:['male','shu',3,['']],
 		// chess_machao:['male','shu',3,['']],
-		// chess_huangzhong:['male','shu',3,['']],
+		chess_huangzhong:['male','shu',4,['sanjiansheji','liegong']],
 		// chess_maliang:['male','shu',3,['']],
 		// chess_zhugeliang:['male','shu',3,['']],
 		//
 		// chess_sunquan:['male','wu',3,['']],
-		// chess_zhouyu:['male','wu',3,['']],
+		// chess_zhouyu:['male','wu',3,['qinyin']],
 		// chess_lvmeng:['male','wu',3,['']],
 		// chess_huanggai:['male','wu',3,['']],
 		// chess_lusu:['male','wu',3,['']],
 		// chess_luxun:['male','wu',3,['']],
 		// chess_ganning:['male','wu',3,['']],
-		// chess_taishici:['male','wu',3,['']],
+		chess_taishici:['male','wu',4,['guanchuan','pojun']],
 		//
 		// chess_lvbu:['male','qun',3,['']],
-		// chess_sunshangxiang:['male','qun',3,['']],
-		// chess_diaochan:['male','qun',3,['']],
-		// chess_huatuo:['male','qun',3,['']],
+		chess_sunshangxiang:['female','wu',3,['lingdong','lianshe']],
+		chess_diaochan:['female','qun',3,['xingzhui','pianyi']],
+		chess_huatuo:['male','qun',3,['zhenjiu','mazui']],
 		// chess_zhangjiao:['male','qun',3,['']],
 		// chess_menghuo:['male','qun',3,['']],
 		//
 		// chess_dongzhuo:['male','qun',3,['']],
+		// chess_xingtian:['male','qun',3,['']],
 		// chess_jinchidiao:['male','qun',3,['']],
 		// chess_beimingjukun:['male','qun',3,['']],
 		// chess_wuzhaojinlong:['male','qun',3,['']],
@@ -1173,18 +1387,18 @@ mode.chess={
 	},
 	config:['battle_number','ban_weak','free_choose','change_choice',
 	function(lib,get,ui){
-		var current=get.config('chessscroll_speed');
-		if(typeof current!=='number'){
-			game.saveConfig('chessscroll_speed',20,true);
-			current=20;
-		}
-		return ui.create.switcher('chessscroll_speed',[0,10,20,30],current,ui.click.sidebar.local);
-	},function(lib,get,ui){
 		var current=get.config('chess_character');
 		if(typeof current!=='boolean'){
 			game.saveConfig('chess_character',true);
 			current=true;
 		}
 		return ui.create.switcher('chess_character',current,ui.click.sidebar.local2);
+	},function(lib,get,ui){
+		var current=get.config('chessscroll_speed');
+		if(typeof current!=='number'){
+			game.saveConfig('chessscroll_speed',20,true);
+			current=20;
+		}
+		return ui.create.switcher('chessscroll_speed',[0,10,20,30],current,ui.click.sidebar.local);
 	}],
 }

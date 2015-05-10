@@ -2844,7 +2844,8 @@ character.swd={
 						}
 					}
 				}
-				player.chooseControl('失去体力','回复体力','cancel').ai=function(){
+				player.chooseControl('失去体力','回复体力','cancel',
+				ui.create.dialog('是否发动【琴音】')).ai=function(){
 					// console.log(lose,recover);
 					if(lose>recover&&lose>0) return 0;
 					if(lose<recover&&recover>0) return 1;
@@ -2855,7 +2856,7 @@ character.swd={
 					event.finish();
 				}
 				else{
-					player.logSkill('swdqinyin');
+					player.logSkill(_status.event.name);
 					event.bool=(result.control=='回复体力');
 					event.num=0;
 					event.players=game.players.slice(0);
@@ -5160,6 +5161,7 @@ character.swd={
 					return false;
 				}
 			},
+			group:'tianshu_remove',
 			createDialog:function(player,target,onlylist){
 				var names=[];
 				var list=[];
@@ -5205,6 +5207,9 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
+				if(player.storage.tianshu){
+					player.unmark(player.storage.tianshu+'_charactermark');
+				}
 				event.skillai=function(list){
 					return list.randomGet();
 				};
@@ -5220,9 +5225,6 @@ character.swd={
 					event._result=event.skillai(lib.skill.tianshu.createDialog(player,target,true));
 				}
 				"step 1"
-				if(player.storage.tianshu){
-					player.unmark(player.storage.tianshu+'_charactermark');
-				}
 				if(event.dialog){
 					event.dialog.close();
 				}
@@ -5247,6 +5249,18 @@ character.swd={
 						if(player.num('h')>player.hp) return 1;
 						return 0;
 					}
+				}
+			}
+		},
+		tianshu_remove:{
+			trigger:{player:'phaseUseBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				if(player.storage.tianshu){
+					player.unmark(player.storage.tianshu+'_charactermark');
+					delete player.storage.tianshu;
+					delete player.additionalSkills.tianshu;
 				}
 			}
 		},
@@ -7963,7 +7977,7 @@ character.swd={
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得双方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
-		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，并获得场上一名存活角色的一项技能（再使用则会替换前一次获得的技能）',
+		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，并获得场上一名存活角色的一项技能直到你的下一回合开始（多次使用会替换前一次获得的技能）',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',

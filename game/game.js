@@ -5728,8 +5728,8 @@ window.play={};
 				ui.skills.close()
 			}
 			_status.multitarget=false;
+			var skillinfo=get.info(_status.event.skill);
 			if(_status.event.name=='chooseToUse'){
-				var skillinfo=get.info(_status.event.skill);
 				if(skillinfo&&skillinfo.multitarget&&!skillinfo.multiline){
 					_status.multitarget=true;
 				}
@@ -5745,7 +5745,11 @@ window.play={};
 			}
 			if(event.isMine()){
 				if(ok&&auto&&lib.config.auto_confirm&&(!_status.mousedragging||!_status.mouseleft)&&!_status.mousedown){
-					if(ui.confirm) ui.confirm.close();
+					if(ui.confirm){
+						if(!skillinfo||!skillinfo.preservecancel){
+							ui.confirm.close();
+						}
+					}
 					if(event.skillDialog==true) event.skillDialog=false;
 					ui.click.ok();
 					_status.mousedragging=null;
@@ -6632,6 +6636,7 @@ window.play={};
 						if(lib.card[name[2]].type=='basic') return 0;
 						if(lib.card[name[2]].type=='stone') return 0.5;
 						if(lib.card[name[2]].type=='stonecharacter') return 1;
+						if(lib.card[name[2]].type=='chess') return 1.5;
 						if(lib.card[name[2]].type=='trick') return 2;
 						if(lib.card[name[2]].type=='delay') return 3;
 						if(lib.card[name[2]].type=='equip') return 4;
@@ -6778,7 +6783,8 @@ window.play={};
 				var i,controls;
 				if(get.objtype(arguments[0])=='array') controls=arguments[0];
 				else controls=arguments;
-				var control=ui.create.div('.control',ui.control);
+				var control=ui.create.div('.control');
+				ui.control.insertBefore(control,ui.confirm);
 				for(i in lib.element.control){
 					control[i]=lib.element.control[i];
 				}
@@ -10249,8 +10255,9 @@ window.play={};
 			if(sort=='type_sort'){
 				func=function(card){
 					if(get.type(card)=='basic') return 2;
-					if(get.type(card)=='stone') return 1.5;
+					if(get.type(card)=='stone') return -0.5;
 					if(get.type(card)=='stonecharacter') return 1;
+					if(get.type(card)=='chess') return 1.5;
 					if(get.type(card)=='trick') return -1;
 					if(get.type(card)=='delay') return -2;
 					if(get.type(card)=='equip') return -3;

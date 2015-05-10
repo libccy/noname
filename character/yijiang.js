@@ -120,6 +120,7 @@ character.yijiang={
 			filterTarget:function(card,player,target){
 				return player!=target;
 			},
+			unique:true,
 			selectTarget:-1,
 			mark:true,
 			line:'fire',
