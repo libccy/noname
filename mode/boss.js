@@ -5,6 +5,7 @@ mode.boss={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				lib.init.css('layout/mode','boss')
 				ui.create.arena();
 				var dialog=ui.create.dialog('还没完工~');
 				dialog.style.height='52px';
@@ -17,5 +18,9 @@ mode.boss={
 				console.log(1);
 			}
 		}
-	}
+	},
+	character:{
+		boss_zuiqiangshenhua:['male','qun',8,['mashu','wushuang','baonu'],['boss']],
+		boss_baonuzhanshen:['male','qun',4,['mashu','wushuang','xiuluo','shenwei','shenji'],['boss']],
+	},
 }

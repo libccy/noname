@@ -418,7 +418,7 @@ character.mountain={
 				player.judge(function(card){
 					if(get.suit(card)=='heart') return -1;
 					return 1;
-				});
+				},ui.special);
 				"step 1"
 				if(result.bool){
 					result.card.goto(ui.special);

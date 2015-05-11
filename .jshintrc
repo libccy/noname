@@ -1,0 +1,18 @@
+{
+  "camelcase": true,
+  "eqeqeq": true,
+  "globalstrict": true,
+  "esnext": true,
+  "strict": true,
+  "newcap": false,
+  "browser": true,
+  "unused": true,
+  "loopfunc": true,
+  "noyield": true,
+  "quotmark": "single",
+  "devel": true,
+  "node":true,
+  "globals": {
+	  
+  }
+}

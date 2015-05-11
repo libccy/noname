@@ -1828,7 +1828,7 @@ window.play={};
 					game.dead.push(player);
 					if(player.dieAfter) player.dieAfter(source);
 					if(lib.config.background_speak){
-						if(lib.character[player.name]&&lib.character[player.name][4]&&
+						if(lib.character[player.name]&&
 						lib.character[player.name][4].contains('die_audio')){
 							game.playAudio('die',player.name);
 						}
@@ -1988,7 +1988,7 @@ window.play={};
 					var info=lib.character[character];
 					var skills=info[3];
 					this.skills.length=0;
-					if(!game.minskin&&lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){
+					if(!game.minskin&&lib.config.layout=='newlayout'&&info[4].contains('fullskin')){
 						this.classList.remove('minskin');
 						this.classList.add('fullskin');
 						this.node.avatar.style.backgroundImage='url("image/character/fullskin/'+character+'.jpg")';
@@ -1997,7 +1997,7 @@ window.play={};
 					else{
 						this.node.avatar.setBackground(character,'character');
 						this.classList.remove('fullskin');
-						if(info[4]&&info[4].contains('minskin')){
+						if(info[4].contains('minskin')){
 							this.classList.add('minskin');
 						}
 						else if(game.minskin){
@@ -6577,7 +6577,7 @@ window.play={};
 				}
 				else{
 					for(var i in lib.character){
-						if(lib.character[i][4]&&lib.character[i][4].contains('minskin')) continue;
+						if(lib.character[i][4].contains('minskin')) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
 						if(namecapt.indexOf(getCapt(i))==-1){
@@ -11535,8 +11535,10 @@ window.play={};
 					if(j=='character'&&!lib.config.characters.contains(i)) continue;
 					for(k in character[i][j]){
 						if(j=='character'){
+							if(!character[i][j][k][4]){
+								character[i][j][k][4]=[];
+							}
 							if(lib.config.only_fullskin&&lib.config.layout=='newlayout'&&lib.config.mode!='chess'){
-								if(!character[i][j][k][4]) continue;
 								if(!character[i][j][k][4].contains('fullskin')&&!character[i][j][k][4].contains('minskin')){
 									continue;
 								}

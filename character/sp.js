@@ -43,9 +43,10 @@ character.sp={
 			},
 			content:function(){
 				"step 0"
-				trigger.source.judge();
+				trigger.source.judge(ui.special);
 				"step 1"
 				if(result.color=='black'){
+					result.card.goto(ui.discardPile);
 					trigger.num++;
 				}
 				else{

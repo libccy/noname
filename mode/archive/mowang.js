@@ -27,7 +27,7 @@ mode.mowang={
 			inherit:'biyue'
 		},
 		baonu:{
-			trigger:{player:'damageEnd'},
+			trigger:{player:'changeHp'},
 			forced:true,
 			filter:function(event,player){
 				return player.hp<=4

@@ -6,7 +6,7 @@ window.config={
 	'xiahouyuan','huangzhong','weiyan','dianwei','gongsunzan'],
 	forbidversus:['swd_kangnalishi'],
 	forbidstone:['zhugedan','pal_xuanxiao'],
-	forbidchess:['hetaihou'],
+	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbiddouble:['zhugedan','swd_kangnalishi','swd_nicole','dongzhuo','jg_simayi'],
 	all:{
 		mode:['identity','guozhan','versus','boss','chess','stone'],
