@@ -19,6 +19,9 @@
 .player.minskin .hp{
 	left:86px;
 }
+.player.minskin .hp.text{
+	left:86px;
+}
 .player.minskin .hp.longlong{
 	left:74px;
 }
@@ -216,6 +219,13 @@
 	left: 116px;
 	z-index:3;
 	-webkit-transform:rotate(180deg);
+}
+.player .hp.text{
+	font-family:'huangcao';
+	font-size:22px;
+	-webkit-transform:none;
+	transition:all 0s;
+	left:114px;
 }
 .player .hp.long{
 	bottom:12px;

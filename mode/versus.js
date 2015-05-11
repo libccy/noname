@@ -1,3 +1,4 @@
+'use strict';
 mode.versus={
 	game:{
 		start:function(){
@@ -585,7 +586,6 @@ mode.versus={
 		},
 		versusCheckHandcards:function(){
 			_status.clicked=true;
-			var i,translation,intro,str;
 			if(ui.intro){
 				ui.intro.close();
 				if(ui.intro.source=='versusCheckHandcards'){
@@ -626,7 +626,7 @@ mode.versus={
 				}
 			}
 		},
-		versusHoverEnemy:function(e){
+		versusHoverEnemy:function(){
 			var uiintro=ui.create.dialog('hidden');
 
 			if(_status.enemyDied.length){
@@ -644,7 +644,7 @@ mode.versus={
 
 			return uiintro;
 		},
-		versusHoverFriend:function(e){
+		versusHoverFriend:function(){
 			var uiintro=ui.create.dialog('hidden');
 
 			if(_status.friendDied.length){
@@ -662,7 +662,7 @@ mode.versus={
 
 			return uiintro;
 		},
-		versusHoverReplace:function(e){
+		versusHoverReplace:function(){
 			var uiintro=ui.create.dialog('hidden');
 
 			uiintro.add(ui.autoreplace);
@@ -680,7 +680,7 @@ mode.versus={
 
 			return uiintro;
 		},
-		versusHoverHandcards:function(e){
+		versusHoverHandcards:function(){
 			var uiintro=ui.create.dialog('hidden');
 
 			for(var i=0;i<game.players.length;i++){
@@ -700,7 +700,6 @@ mode.versus={
 		},
 		versusCheckEnemy:function(){
 			_status.clicked=true;
-			var i,translation,intro,str;
 			if(ui.intro){
 				ui.intro.close();
 				if(ui.intro.source=='versusCheckEnemy'){
@@ -714,9 +713,6 @@ mode.versus={
 			ui.control.hide();
 			ui.intro=ui.create.dialog();
 			ui.intro.source='versusCheckEnemy';
-
-
-
 
 			if(_status.enemyDied.length){
 				ui.intro.add('已阵亡');
@@ -733,7 +729,6 @@ mode.versus={
 		},
 		versusCheckFriend:function(){
 			_status.clicked=true;
-			var i,translation,intro,str;
 			if(ui.intro){
 				ui.intro.close();
 				if(ui.intro.source=='versusCheckFriend'){
@@ -779,7 +774,6 @@ mode.versus={
 			}
 			else{
 				_status.clicked=true;
-				var i,translation,intro,str;
 				if(ui.intro){
 					ui.intro.close();
 					if(ui.intro.source==this.parentNode){

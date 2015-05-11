@@ -1,0 +1,65 @@
+#bosslist{
+    width:100%;
+    height:calc(50% + 200px);
+    text-align:center;
+    top:calc(50% - 200px);
+    white-space:nowrap;
+    z-index:1;
+}
+#bosslist.scroll{
+    overflow-x:scroll;
+}
+.bosspaused>#bosslist,
+.bosspaused>#control{
+    opacity:0.2 !important;
+}
+#bosslist>.player.bossshow{
+    opacity:1;
+    -webkit-animation:boss_start 0.5s;
+    -webkit-transform:none;
+}
+#bosslist>.player{
+    position:relative;
+    margin:10px;
+    left:0;
+    top:0;
+    width:180px;
+    height:216px;
+    opacity: 0;
+    transition: all 0.3s;
+    -webkit-transform:translateY(-200px);
+}
+#bosslist>.player:hover{
+    -webkit-transform:scale(1.1);
+}
+#bosslist>div:first-child,
+#bosslist>div:last-child{
+    width:20px;
+    position:relative;
+}
+#bosslist>.player>div:not(.hp):not(.identity):not(.avatar){
+    display:none !important;
+}
+#bosslist>.player>.identity{
+    left:16px;
+    top:20px;
+    line-height:24px;
+    white-space:normal;
+}
+#bosslist>.player>.hp{
+    top:22px;
+    left:144px;
+}
+#bosslist>.player>.avatar{
+    width:156px;
+    height:192px;
+}
+
+#control.bosslist{
+    top:calc(50% + 100px);
+}
+#control.bosslist>div{
+    transition:opacity 0.5s;
+}
+
+@-webkit-keyframes boss_start{from {opacity: 0;-webkit-transform:translateY(-200px);}}

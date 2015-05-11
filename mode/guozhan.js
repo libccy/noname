@@ -1,3 +1,4 @@
+'use strict';
 mode.guozhan={
 	game:{
 		start:function(){
@@ -56,7 +57,6 @@ mode.guozhan={
 		},
 		showIdentity:function(started){
 			if(game.phaseNumber==0&&!started) return;
-			var players=game.players.concat(game.dead);
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].showCharacter(2);
 			}
@@ -173,6 +173,7 @@ mode.guozhan={
 					};
 					next.switchToAuto=function(){
 						event.ai(game.me,list);
+						ui.arena.classList.remove('selecting');
 					};
 
 					event.dialogxx=ui.create.characterDialog();

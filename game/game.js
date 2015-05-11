@@ -132,6 +132,7 @@ window.play={};
 			init:function(){
 				lib.config={};
 				var config2;
+				var config=window.config;
 				for(var i in config){
 					lib.config[i]=lib.init.eval(config[i]);
 				}
@@ -175,7 +176,7 @@ window.play={};
 				lib.init.js('character',lib.config.all.characters);
 				lib.init.js('play',lib.config.plays);
 				ui.css={};
-				if(lib.config.mode=='chess'){
+				if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
 					lib.config.layout='newlayout';
 				}
 				ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout');
@@ -1991,8 +1992,12 @@ window.play={};
 					if(!game.minskin&&lib.config.layout=='newlayout'&&info[4].contains('fullskin')){
 						this.classList.remove('minskin');
 						this.classList.add('fullskin');
-						this.node.avatar.style.backgroundImage='url("image/character/fullskin/'+character+'.jpg")';
-						this.node.avatar.style.backgroundSize='cover';
+						if(lib.fakeavatar&&lib.fakeavatar[character]){
+							this.node.avatar.setBackground('character/fullskin/'+lib.fakeavatar[character]);
+						}
+						else{
+							this.node.avatar.setBackground('character/fullskin/'+character);
+						}
 					}
 					else{
 						this.node.avatar.setBackground(character,'character');
@@ -2012,7 +2017,6 @@ window.play={};
 					this.group=info[1];
 					this.hp=info[2];
 					this.maxHp=info[2];
-					// this.node.identity.style.backgroundColor=get.translation(this.group+'Color');
 					this.node.intro.innerHTML=lib.config.intro;
 					if(lib.config.touchscreen){
 						lib.setLongPress(this,ui.click.intro);
@@ -2036,8 +2040,12 @@ window.play={};
 
 						if(lib.config.layout=='newlayout'&&lib.config.only_fullskin){
 							this.classList.add('fullskin2');
-							this.node.avatar2.style.backgroundImage='url("image/character/fullskin/'+character2+'.jpg")';
-							this.node.avatar2.style.backgroundSize='cover';
+							if(lib.fakeavatar&&lib.fakeavatar[character2]){
+								this.node.avatar2.setBackground('character/fullskin/'+lib.fakeavatar[character2]);
+							}
+							else{
+								this.node.avatar2.setBackground('character/fullskin/'+character2);
+							}
 						}
 						else{
 							this.node.avatar2.setBackground(character2,'character');
@@ -2128,6 +2136,12 @@ window.play={};
 						hp.innerHTML=this.hp+'/'+this.maxHp;
 						hp.classList.add('text');
 					}
+					else if(lib.config.layout=='newlayout'&&
+					(this.maxHp>9||(this.maxHp>5&&this.classList.contains('minskin')))){
+						hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp;
+						hp.classList.add('text');
+						hp.classList.remove('long');
+					}
 					else{
 						hp.innerHTML='';
 						hp.classList.remove('text');
@@ -2145,38 +2159,24 @@ window.play={};
 								hp.childNodes[i].classList.add('lost');
 							}
 						}
-						if(this.classList.contains('minskin')){
-							if(this.maxHp>5){
-								this.node.hp.classList.add('longlong');
-							}
-							else{
-								this.node.hp.classList.remove('longlong');
-							}
+						if(this.maxHp==9){
+							hp.classList.add('long');
 						}
 						else{
-							if(this.maxHp>9){
-								this.node.hp.classList.add('longlong');
-							}
-							else{
-								this.node.hp.classList.remove('longlong');
-							}
-							if(this.maxHp==9||this.maxHp>=17){
-								this.node.hp.classList.add('long');
-							}
-							else{
-								this.node.hp.classList.remove('long');
-							}
+							hp.classList.remove('long');
 						}
 					}
-
-					if(this.hp>Math.round(this.maxHp/2)||this.hp===this.maxHp){
-						this.node.hp.dataset.condition='high';
+					if(this.hp==0){
+						hp.dataset.condition='';
+					}
+					else if(this.hp>Math.round(this.maxHp/2)||this.hp===this.maxHp){
+						hp.dataset.condition='high';
 					}
 					else if(this.hp>Math.floor(this.maxHp/3)){
-						this.node.hp.dataset.condition='mid';
+						hp.dataset.condition='mid';
 					}
 					else{
-						this.node.hp.dataset.condition='low';
+						hp.dataset.condition='low';
 					}
 
 					setTimeout(function(){
@@ -2529,6 +2529,7 @@ window.play={};
 				chooseToRespond:function(){
 					var next=game.createEvent('chooseToRespond');
 					next.player=this;
+					var filter;
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='number'){
 							next.selectCard=[arguments[i],arguments[i]];
@@ -2548,7 +2549,7 @@ window.play={};
 						}
 						else if(typeof arguments[i]=='object'){
 							next.filterCard=get.filter(arguments[i]);
-							var filter=arguments[i];
+							filter=arguments[i];
 						}
 						else if(arguments[i]=='nosource'){
 							next.nosource=true;
@@ -5112,6 +5113,10 @@ window.play={};
 			if(lib.updates.length===1){
 				game.run();
 			}
+			return func;
+		},
+		unupdate:function(func){
+			lib.updates.remove(func);
 		},
 		stop:function(){
 			cancelAnimationFrame(lib.status.frameId);
@@ -5682,6 +5687,20 @@ window.play={};
 						if(game.players[i].classList.contains('selected')){
 							game.players[i].classList.add('selectable');
 						}
+						if(game.players[i].instance){
+							if(game.players[i].classList.contains('selected')){
+								game.players[i].instance.classList.add('selected');
+							}
+							else{
+								game.players[i].instance.classList.remove('selected');
+							}
+							if(game.players[i].classList.contains('selectable')){
+								game.players[i].instance.classList.add('selectable');
+							}
+							else{
+								game.players[i].instance.classList.remove('selectable');
+							}
+						}
 					}
 					if(ui.selected.targets.length<range[0]){
 						if(!event.forced||get.selectableTargets().length)
@@ -5803,6 +5822,10 @@ window.play={};
 						for(j=0;j<game.players.length;j++){
 							game.players[j].classList.remove('selected');
 							game.players[j].classList.remove('selectable');
+							if(game.players[j].instance){
+								game.players[j].instance.classList.remove('selected');
+								game.players[j].instance.classList.remove('selectable');
+							}
 						}
 						ui.selected.targets.length=0;
 					}
@@ -6578,6 +6601,8 @@ window.play={};
 				else{
 					for(var i in lib.character){
 						if(lib.character[i][4].contains('minskin')) continue;
+						if(lib.character[i][4].contains('boss')) continue;
+						if(lib.character[i][4].contains('hiddenboss')) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
 						if(namecapt.indexOf(getCapt(i))==-1){
@@ -7068,7 +7093,10 @@ window.play={};
 							modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
 							modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));break;
 						default:{
-							if(typeof lib.config.current_mode[i]==='function'){
+							if(Array.isArray(lib.config.current_mode[i])){
+								modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
+							}
+							else if(typeof lib.config.current_mode[i]==='function'){
 								modeconfig.push(lib.config.current_mode[i](game,lib,get,ui));
 							}
 						}
@@ -7163,7 +7191,11 @@ window.play={};
 					}
 				}));
 				appearence.push(ui.create.switcher('theme',lib.config.all.theme,lib.config.theme,ui.click.sidebar.theme));
-				appearence.push(ui.create.switcher('layout',lib.config.all.layout,lib.config.layout,ui.click.sidebar.layout));
+				var layoutconfig=ui.create.switcher('layout',lib.config.all.layout,lib.config.layout,ui.click.sidebar.layout);
+				appearence.push(layoutconfig);
+				if(lib.config.layoutfixed.contains(lib.config.mode)){
+					layoutconfig.classList.add('disabled');
+				}
 				appearence.push(ui.create.switcher('image_background',lib.config.all.image_background,lib.config.image_background,ui.click.sidebar.image_background));
 				appearence.push(ui.create.switcher('image_background_filter',lib.config.all.image_background_filter,lib.config.image_background_filter,ui.click.sidebar.image_background_filter));
 				appearence.push(ui.create.switcher('ui_zoom',['极小','很小','较小','原始','较大','很大'],lib.config.ui_zoom,ui.click.sidebar.ui_zoom));
@@ -8631,6 +8663,7 @@ window.play={};
 			},
 			switcher:function(){
 				if(_status.dragged) return;
+				if(this.parentNode.classList.contains('disabled')) return;
 				if(_status.choosing) return;
 				_status.clicked=true;
 				_status.tempunpop=true;
@@ -9038,6 +9071,9 @@ window.play={};
 				node.appendChild(ui.sidebar);
 				node.appendChild(ui.sidebar3);
 				ui.arena.classList.add('paused');
+				if(game.onpause){
+					game.onpause();
+				}
 			},
 			resume:function(e){
 				if(_status.pausing) return;
@@ -9048,6 +9084,9 @@ window.play={};
 				ui.arena.classList.remove('paused');
 				game.resume2();
 				e.stopPropagation();
+				if(game.onresume){
+					game.onresume();
+				}
 				return false;
 			},
 			config:function(){
@@ -9064,6 +9103,9 @@ window.play={};
 					ui.config.animate('start');
 					ui.window.appendChild(ui.config);
 				},100);
+				if(game.onpause2){
+					game.onpause2();
+				}
 			},
 			config2:function(e){
 				_status.clicked=true;
@@ -9087,6 +9129,9 @@ window.play={};
 					game.resume2();
 				}
 				// e.stopPropagation();
+				if(game.onresume2){
+					game.onresume2();
+				}
 				return false;
 			},
 			swap:function(){
@@ -9096,30 +9141,30 @@ window.play={};
 				if(ui.auto) ui.auto.show();
 				game.swapPlayer(this);
 			},
-			mousewheel: function(e){
-				var evt = window.event || e;
+			mousewheel:function(evt){
 				var node=this;
-				var num=50;
+				var num=this._scrollnum||6;
+				var speed=this._scrollspeed||16;
 				clearInterval(node.interval);
 				if(evt.detail > 0 || evt.wheelDelta < 0){
 					node.interval=setInterval(function(){
-						if(num--&&Math.abs(node.scrollLeft+node.clientWidth-node.scrollWidth)>5){
-							node.scrollLeft +=2;
+						if(num--&&Math.abs(node.scrollLeft+node.clientWidth-node.scrollWidth)>0){
+							node.scrollLeft +=speed;
 						}
 						else{
 							clearInterval(node.interval);
 						}
-					},1);
+					},16);
 				}
 				else{
 					node.interval=setInterval(function(){
 						if(num--&&node.scrollLeft>0){
-							node.scrollLeft -=2;
+							node.scrollLeft -=speed;
 						}
 						else{
 							clearInterval(node.interval);
 						}
-					},1);
+					},16);
 				}
 			},
 			touchStart:function(e){
@@ -10062,17 +10107,17 @@ window.play={};
 			if(num<0||num>99) return num;
 			if(num<=10){
 				switch(num){
-					case 0:return '〇';break;
-					case 1:return '一';break;
-					case 2:return two?'二':'两';break;
-					case 3:return '三';break;
-					case 4:return '四';break;
-					case 5:return '五';break;
-					case 6:return '六';break;
-					case 7:return '七';break;
-					case 8:return '八';break;
-					case 9:return '九';break;
-					case 10:return '十';break;
+					case 0:return '〇';
+					case 1:return '一';
+					case 2:return two?'二':'两';
+					case 3:return '三';
+					case 4:return '四';
+					case 5:return '五';
+					case 6:return '六';
+					case 7:return '七';
+					case 8:return '八';
+					case 9:return '九';
+					case 10:return '十';
 				}
 			}
 			if(num<20){
@@ -10349,38 +10394,31 @@ window.play={};
 					if(content>0){
 						return '共有'+content+'个标记';
 					}
-					else{
-						return false;
-					}
+					return false;
 				}
 				case 'turn':{
 					if(content>0){
 						return '还剩'+content+'个回合';
 					}
-					else{
-						return false;
-					}
+					return false;
 				}
 				case 'time':{
 					if(content>0){
 						return '还剩'+content+'次';
 					}
-					else{
-						return false;
-					}
+					return false;
 				}
 				case 'limited':{
 					if(content){
 						return '已发动';
 					}
-					else{
-						return '未发动';
-					}
+					return '未发动';
 				}
 				case 'cardCount':{
 					if(typeof content=='object'&&typeof content.length=='number'){
 						return '共有'+get.cnNumber(content.length)+'张牌';
 					}
+					return false;
 				}
 				case 'card':case 'cards':{
 					if(get.itemtype(content)=='card'){
@@ -10393,16 +10431,13 @@ window.play={};
 						else{
 							dialog.add(content);
 						}
-						return false;
 					}
 					else{
 						if(content&&content.length){
 							return get.translation(content);
 						}
-						else{
-							return false;
-						}
 					}
+					return false;
 				}
 				case 'player':case 'players':{
 					if(get.itemtype(content)=='player'){
@@ -10421,9 +10456,7 @@ window.play={};
 						if(content&&content.length){
 							return get.translation(content);
 						}
-						else{
-							return false;
-						}
+						return false;
 					}
 				}
 				default:{

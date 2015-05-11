@@ -1,3 +1,4 @@
+'use strict';
 mode.identity={
 	game:{
 		start:function(){
@@ -58,7 +59,6 @@ mode.identity={
 			}
 		},
 		showIdentity:function(){
-			var players=game.players.concat(game.dead);
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].identityShown=true;
 				game.players[i].ai.shown=1;
@@ -575,19 +575,21 @@ mode.identity={
 							case 'zhong': return 6;
 							case 'nei':
 								if(game.players.length==2) return -10;
-								if(ai.get.situation()>1) return 0;
+								if(situation>1) return 0;
 								return Math.min(3,get.population('fan'));
 							case 'fan': return -4;
 						}
+						break;
 					case 'zhong':
 						switch(identity2){
 							case 'zhu': return 10;
 							case 'zhong': return get.population('fan')>0?4:-1;
 							case 'nei':
 								if(get.population('fan')==0) return -2;
-								return Math.min(3,-ai.get.situation());
+								return Math.min(3,-situation);
 							case 'fan': return -8;
 						}
+						break;
 					case 'nei':
 						if(identity2=='zhu'&&game.players.length==2) return -10;
 						var strategy=get.aiStrategy();
@@ -601,16 +603,16 @@ mode.identity={
 								if(strategy==6) return -1;
 								if(strategy==5) return 10;
 								if(to.hp<=0) return 10;
-								if(ai.get.situation()>1) num=0;
+								if(situation>1) num=0;
 								else num=get.population('fan')+Math.max(0,3-game.zhu.hp);
 								if(strategy==2) num--;
 								if(strategy==3) num++;
 								return num;
 							case 'zhong':
-								if(strategy==5) return Math.min(0,-ai.get.situation());
-								if(strategy==6) return Math.max(-1,-ai.get.situation());
+								if(strategy==5) return Math.min(0,-situation);
+								if(strategy==6) return Math.max(-1,-situation);
 								if(get.population('fan')==0) num=-5;
-								else if(ai.get.situation()<=0) num=0;
+								else if(situation<=0) num=0;
 								else if(game.zhu&&game.zhu.hp<2) num=0;
 								else if(game.zhu&&game.zhu.hp==2) num=-0.5
 								else num=-2;
@@ -622,27 +624,28 @@ mode.identity={
 								if(from.ai.friend.contains(to)) return 5;
 								return -1;
 							case 'fan':
-								if(strategy==5) return Math.max(-1,ai.get.situation());
-								if(strategy==6) return Math.min(0,ai.get.situation());
-								if((game.zhu&&game.zhu.hp<=2&&ai.get.situation()<=0)||ai.get.situation()<-1) num=-3;
-								else if(ai.get.situation()<0||get.population('zhong')==0) num=-2;
-								else if((game.zhu&&game.zhu.hp>4&&ai.get.situation()>0)||ai.get.situation()>1) num=1;
+								if(strategy==5) return Math.max(-1,situation);
+								if(strategy==6) return Math.min(0,situation);
+								if((game.zhu&&game.zhu.hp<=2&&situation<=0)||situation<-1) num=-3;
+								else if(situation<0||get.population('zhong')==0) num=-2;
+								else if((game.zhu&&game.zhu.hp>4&&situation>0)||situation>1) num=1;
 								else num=0;
 								if(strategy==2) num++;
 								if(strategy==3) num--;
 								return num;
 						}
+						break;
 					case 'fan':
 						switch(identity2){
 							case 'zhu':
-								if(ai.get.situation()==1) return -6;
-								if(ai.get.situation()>1) return -5;
+								if(situation==1) return -6;
+								if(situation>1) return -5;
 								return -10;
 							case 'zhong': return -7;
 							case 'nei':
 								if(get.population('zhong')==0) return -7;
 								if(game.zhu&&game.zhu.hp<=2) return -1;
-								return Math.min(3,ai.get.situation());
+								return Math.min(3,situation);
 							case 'fan': return 5;
 						}
 				}

@@ -87,6 +87,14 @@
     margin-left: 4px;
     margin-right: 4px;
     margin-bottom: 8px;
+    transition:box-shadow 0.5s;
+}
+
+.fakeme.player>.selectable{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 1) 0 0 5px, rgba(0, 133, 255, 1) 0 0 10px;
+}
+.fakeme.player>.selected{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(255, 0, 0, 1) 0 0 5px, rgba(255, 0, 0, 1) 0 0 10px !important;
 }
 .fakeme.player>.dead{
     -webkit-filter:grayscale(1);

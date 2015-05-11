@@ -259,6 +259,17 @@ margin-bottom: 5px;
 	border: 1px solid rgba(39, 79, 7, 1);
 	-webkit-filter: grayscale(1);
 }
+.hp.text[data-condition="low"]{
+	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px
+}
+.hp.text[data-condition="mid"]{
+	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px
+}
+.hp.text[data-condition="high"]{
+	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 10px
+}
+
+
 
 
 /*.hp>div{width: 6px;height: 6px;margin-left: 3px;position: relative;}*/
@@ -464,6 +475,11 @@ div:hover>.intro{opacity: 1;}
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:4px;
+}
+.shadowed{
+	background: rgba(0,0,0,0.2);
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
+	border-radius:8px;
 }
 .underline,.underlinenode{
 	padding:3px;
@@ -672,6 +688,31 @@ div[data-nature='soil']{
 }
 .button.card .wunature{
 	top:59px;
+}
+
+
+.player.selectable{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 15px;
+}
+.selected{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.8) 0 0 15px !important;
+}
+.glow{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
+}
+.glow2{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
+}
+
+.control.blue{
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+}
+.control.red{
+	background-image: linear-gradient(rgba(150, 47, 47, 1), rgba(132, 43, 43, 1));
+}
+.control.red,.control.blue{
+	color:white;
+	text-shadow:black 0 0 2px;
 }
 
 /*--------动画--------*/

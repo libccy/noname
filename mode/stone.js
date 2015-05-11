@@ -1064,7 +1064,7 @@ mode.stone={
 				event.chooser.chooseTarget('魏兵：弃置对方一名随从的所有牌',function(card,playerx,target){
 					return player.side!=target.side&&target.isMin()&&target.num('he')>0;
 				}).ai=function(target){
-					return 1;
+					return target.num('he');
 				};
 				player.line(event.chooser);
 				"step 1"

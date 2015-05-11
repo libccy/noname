@@ -433,7 +433,6 @@ mode.chess={
 							if(targets.length==0){
 								if(randomMove.length){
 									var list=randomMove.slice(0);
-									var randomMoved=false;
 									while(list.length){
 										var thismove=list.randomRemove();
 										if(player[thismove]()){
@@ -594,7 +593,7 @@ mode.chess={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
-				for(i in lib.skill){
+				for(var i in lib.skill){
 					if(lib.skill[i].changeSeat){
 						lib.skill[i]={};
 						if(lib.translate[i+'_info']){
@@ -647,10 +646,10 @@ mode.chess={
 					}
 					this._chessdrag=[e,this.parentNode.scrollLeft,this.parentNode.scrollTop];
 				});
-				ui.chess.addEventListener('mouseleave',function(e){
+				ui.chess.addEventListener('mouseleave',function(){
 					this._chessdrag=null;
 				});
-				ui.chess.addEventListener('mouseup',function(e){
+				ui.chess.addEventListener('mouseup',function(){
 					if(this._chessdrag){
 						this._chessdrag=null;
 					}
@@ -662,7 +661,7 @@ mode.chess={
 					}
 					e.preventDefault();
 				});
-				ui.chessContainer.addEventListener('mousewheel',function(e){
+				ui.chessContainer.addEventListener('mousewheel',function(){
 					if(_status.currentChessFocus){
 						clearInterval(_status.currentChessFocus);
 						delete _status.currentChessFocus;
@@ -742,7 +741,7 @@ mode.chess={
 					lib.posmap[enemy.dataset.position]=enemy;
 				}
 
-				lib.setPopped(ui.create.system('查看手牌',null,true),function(e){
+				lib.setPopped(ui.create.system('查看手牌',null,true),function(){
 					var uiintro=ui.create.dialog('hidden');
 
 					for(var i=0;i<game.players.length;i++){
@@ -760,11 +759,6 @@ mode.chess={
 
 					return uiintro;
 				});
-				var clearPrompt=function(){
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].unprompt();
-					}
-				};
 				ui.create.system('显示距离',function(){
 					if(!game.me.isAlive()) return;
 					for(var i=0;i<game.players.length;i++){
@@ -814,6 +808,7 @@ mode.chess={
 				node.style.backgroundImage=p.node.avatar.style.backgroundImage;
 				node.link=p;
 				node.listen(game.clickChessInfo);
+				p.instance=node;
 				if(_status.currentPhase==p){
 					node.classList.add('glow2');
 				}
@@ -824,6 +819,7 @@ mode.chess={
 		clickChessInfo:function(e){
 			if(this.link.isAlive()){
 				this.link.chessFocus();
+				ui.click.target.call(this.link,e);
 				e.stopPropagation();
 			}
 		},
