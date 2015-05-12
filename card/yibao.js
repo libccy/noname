@@ -266,6 +266,8 @@ card.yibao={
 				player.$compare(event.card1,target,event.card2);
 				game.delay(4);
 				"step 3"
+				game.log(get.translation(player)+'展示了'+get.translation(event.card1));
+				game.log(get.translation(target)+'展示了'+get.translation(event.card2));
 				if(get.color(event.card2)==get.color(event.card1)){
 					player.discard(event.card1).animate=false;
 					target.$gain2(event.card2);

@@ -306,6 +306,7 @@ character.yxs={
 					game.log(get.translation(player)+'预言'+result.control);
 					player.storage.bolehuiyan=result.control;
 					player.popup(result.control);
+					player.line(trigger.target,'green');
 					game.delay();
 				}
 			}

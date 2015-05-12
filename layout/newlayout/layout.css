@@ -463,6 +463,10 @@
 		width: 630px;
 		left: calc(50% - 315px);
 	}
+	.dialog.bosscharacter{
+		width: 735px;
+		left: calc(50% - 367.5px);
+	}
 	#arena.stone .dialog{
 		width: calc(90% - 440px);
 		left: calc(5% + 220px);

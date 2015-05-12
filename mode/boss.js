@@ -1,7 +1,27 @@
 'use strict';
 mode.boss={
+	element:{
+		player:{
+			dieAfter:function(){
+				if(this!=game.boss){
+					this.storage.boss_chongzheng=0;
+				}
+				if(this==game.boss||game.players.length==1){
+					game.checkResult();
+				}
+			}
+		}
+	},
 	game:{
 		reserveDead:true,
+		checkResult:function(){
+			if(game.boss==game.me){
+				game.over(game.boss.isAlive());
+			}
+			else{
+				game.over(!game.boss.isAlive());
+			}
+		},
 		start:function(){
 			var next=game.createEvent('game',false);
 			next.content=function(){
@@ -15,7 +35,10 @@ mode.boss={
 					}
 				}
 				lib.init.css('layout/mode','boss');
-				var bosslist=ui.create.div('#bosslist');
+				game.delay(0.1);
+				"step 1"
+				var bosslist=ui.create.div('#bosslist.hidden');
+				event.bosslist=bosslist;
 				if(!lib.config.touchscreen&&lib.config.mousewheel){
 					bosslist._scrollspeed=30;
 					bosslist._scrollnum=10;
@@ -44,6 +67,7 @@ mode.boss={
 				game.onresume2=onresume;
 				ui.create.div(bosslist);
 
+				event.current=null;
 				var list=[];
 				for(var i in lib.character){
 					var info=lib.character[i];
@@ -62,6 +86,12 @@ mode.boss={
 						player.setIdentity(player.name);
 						player.node.identity.dataset.color=info[5];
 						bosslistlinks[cfg]=player;
+						player.classList.add('bossplayer');
+
+						if(lib.storage.current==i){
+							event.current=player;
+							player.classList.add('highlight');
+						}
 
 						if(!get.config(cfg)){
 							player.style.display='none';
@@ -71,52 +101,843 @@ mode.boss={
 				ui.create.div(bosslist);
 				lib.translate.boss_pangtong='涅槃凤雏';
 				ui.create.arena();
-				var time=(ui.window.offsetWidth-30)/200;
-				ui.window.appendChild(ui.control);
+				ui.create.cards();
+				game.finishCards();
+				ui.arena.dataset.number=8;
 				ui.control.classList.add('bosslist');
 
 				ui.window.appendChild(bosslist);
-				var interval=setInterval(function(){
-					if(list.length){
-						list.shift().classList.add('bossshow');
+
+				setTimeout(function(){
+					if(event.current){
+						var left=event.current.offsetLeft-(ui.window.offsetWidth-180)/2;
+						if(bosslist.scrollLeft<left){
+							bosslist.scrollLeft=left;
+						}
+					}
+					bosslist.show();
+				},200);
+				game.me=ui.create.player();
+				game.chooseCharacter(function(target){
+					if(event.current){
+						event.current.classList.remove('highlight');
+					}
+					event.current=target;
+					game.save('current',target.name);
+					target.classList.add('highlight');
+				});
+				"step 2"
+				game.bossinfo=lib.boss.global;
+				for(var i in lib.boss[event.current.name]){
+					game.bossinfo[i]=lib.boss[event.current.name][i];
+				}
+				delete lib.boss;
+
+				setTimeout(function(){
+					ui.control.classList.remove('bosslist');
+				},500);
+				if(!event.current){
+					event.current=event.bosslist.childNodes[1];
+				}
+				var rect=event.current.getBoundingClientRect();
+				var boss=ui.create.player().init(event.current.name);
+				game.boss=boss;
+				boss.side=true;
+				boss.classList.add('bossplayer');
+				boss.classList.add('highlight');
+				boss.animate('bossing');
+				boss.node.hp.animate('start');
+				boss.style.left=(rect.left-ui.arena.offsetLeft)+'px';
+				boss.style.top=(rect.top-ui.arena.offsetTop)+'px';
+				boss.setIdentity('zhu');
+				for(var i=0;i<result.links.length;i++){
+					var player=ui.create.player(ui.arena).init(result.links[i]).animate('start');
+					player.setIdentity('cai');
+					player.side=false;
+					game.players.push(player);
+					if(result.boss){
+						player.dataset.position=(i+1)*2;
 					}
 					else{
-						clearInterval(interval);
+						player.dataset.position=i+1;
 					}
-				},500/time);
-				setTimeout(function(){
-					bosslist.classList.add('scroll');
-				},1000);
-				setTimeout(function(){
-					var control=ui.create.control('快速开始',function(){
-						control.hide();
-						bosslist.delete();
+				}
+				if(result.boss){
+					game.players.unshift(boss);
+					boss.dataset.position=0;
+				}
+				else{
+					game.players.push(boss);
+					boss.dataset.position=7;
+				}
+				ui.create.me();
+				if(game.me!==boss){
+					ui.fakeme=ui.create.div('.player',ui.arena);
+					ui.fakeme.dataset.position=0;
+					ui.fakeme.line=lib.element.player.line;
+					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
+					ui.refresh(ui.fakemebg);
+					game.onSwapControl();
+					ui.fakemebg.show();
+
+					lib.setPopped(ui.create.system('查看手牌',null,true),function(){
+						var uiintro=ui.create.dialog('hidden');
+
+						var players=game.players.concat(game.dead);
+						for(var i=0;i<players.length;i++){
+							if(players[i].side==game.me.side&&players[i]!=game.me){
+								uiintro.add(get.translation(players[i]));
+								var cards=players[i].get('h');
+								if(cards.length){
+									uiintro.add(cards,true);
+								}
+								else{
+									uiintro.add('（无）');
+								}
+							}
+						}
+
+						return uiintro;
 					});
-				},500);
-				game.pause();
+				}
+				lib.setPopped(ui.create.system('重整',null,true),function(){
+					var uiintro=ui.create.dialog('hidden');
+
+					uiintro.add('重整');
+					var table=ui.create.div('.bosschongzheng');
+
+					var tr,td,added=false;
+					for(var i=0;i<game.dead.length;i++){
+						if(typeof game.dead[i].storage.boss_chongzheng!=='number') continue;
+						added=true;
+						tr=ui.create.div(table);
+						td=ui.create.div(tr);
+						td.innerHTML=get.translation(game.dead[i]);
+						td=ui.create.div(tr);
+						td.innerHTML='剩余'+get.cnNumber(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
+					}
+
+					if(!added){
+						uiintro.add('<div class="text center">（无重整角色）</div>');
+						uiintro.add(ui.create.div('.placeholder.slim'))
+					}
+					else{
+						uiintro.add(table);
+					}
+
+					return uiintro;
+				},180);
+
+				ui.arena.appendChild(boss);
+				ui.refresh(boss);
+				boss.classList.remove('highlight');
+				boss.classList.remove('bossplayer');
+				boss.style.left='';
+				boss.style.top='';
+				boss.style.position='';
+
+				event.bosslist.delete();
+
+				game.arrangePlayers();
+				"step 3"
+				game.gameDraw(game.boss);
+				game.bossPhaseLoop();
 			}
-		}
+		},
+		bossPhaseLoop:function(){
+			var next=game.createEvent('phaseLoop');
+			next.player=game.boss;
+			_status.looped=true;
+			next.content=function(){
+				"step 0"
+				if(player.chongzheng){
+					player.chongzheng=false;
+				}
+				else if(player.isDead()){
+					if(player.hp<0) player.hp=0;
+					player.storage.boss_chongzheng++;
+					if(player.hp<player.maxHp){
+						player.hp++;
+						game.log(get.translation(player)+'回复了一点体力');
+					}
+					else{
+						var card=get.cards()[0];
+						var sort=lib.config.sort_card(card);
+						var position=sort>0?player.node.handcards1:player.node.handcards2;
+						card.fix();
+						card.animate('start');
+						position.insertBefore(card,position.firstChild);
+						player.$draw();
+						game.log(get.translation(player)+'摸了一张牌');
+					}
+					player.update();
+
+					if(player.storage.boss_chongzheng>=game.bossinfo.chongzheng){
+						player.revive();
+					}
+					if(game.bossinfo.loopType==2){
+						game.boss.chongzheng=true;
+					}
+				}
+				else{
+					player.phase();
+				}
+				"step 1"
+				if(game.bossinfo.loopType==2){
+					if(event.player==game.boss){
+						if(!_status.last||_status.last.nextSeat==game.boss){
+							event.player=game.boss.nextSeat;
+						}
+						else{
+							event.player=_status.last.nextSeat;
+						}
+					}
+					else{
+						_status.last=player;
+						event.player=game.boss;
+					}
+				}
+				else{
+					event.player=event.player.nextSeat;
+				}
+				event.goto(0);
+			}
+		},
+		onSwapControl:function(){
+			if(game.me==game.boss) return;
+			var name=game.me.name;
+			if(ui.fakeme&&ui.fakeme.current!=name){
+				ui.fakeme.current=name;
+				if(ui.versushighlight&&ui.versushighlight!=game.me){
+					ui.versushighlight.node.avatar.classList.remove('glow2');
+				}
+				ui.versushighlight=game.me;
+				game.me.node.avatar.classList.add('glow2');
+				game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
+
+				ui.fakemebg.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
+				ui.fakemebg.style.backgroundSize='cover';
+			}
+		},
+		modeSwapPlayer:function(player){
+			game.swapControl(player);
+			game.onSwapControl();
+		},
+		chooseCharacter:function(func){
+			var next=game.createEvent('chooseCharacter',false);
+			next.showConfig=true;
+			next.customreplacetarget=func;
+			next.ai=function(player,list){
+				if(get.config('double_character')){
+					player.init(list[0],list[1]);
+				}
+				else{
+					player.init(list[0]);
+				}
+			}
+			next.content=function(){
+				"step 0"
+				var i;
+				var list=[];
+				event.list=list;
+				for(i in lib.character){
+					if(lib.character[i][4].contains('minskin')) continue;
+					if(lib.character[i][4].contains('boss')) continue;
+					if(lib.character[i][4].contains('hiddenboss')) continue;
+					if(lib.config.forbidai.contains(i)) continue;
+					if(lib.config.forbidall.contains(i)) continue;
+					if(lib.config.forbidboss.contains(i)) continue;
+					if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
+					list.push(i);
+				}
+				list.randomSort();
+				var dialog=ui.create.dialog('选择参战角色','hidden');
+				ui.window.appendChild(dialog);
+				dialog.classList.add('bosscharacter');
+				dialog.add('0/3');
+				dialog.add([list.slice(0,20),'character']);
+				dialog.noopen=true;
+
+				var next=game.me.chooseButton(dialog,true);
+				next._triggered=null;
+				next.custom.replace.target=event.customreplacetarget;
+				next.selectButton=[3,3];
+				next.custom.add.button=function(){
+					if(ui.cheat2&&ui.cheat2.backup) return;
+					_status.event.dialog.content.childNodes[1].innerHTML=
+					ui.selected.buttons.length+'/3';
+				};
+				event.changeDialog=function(){
+					if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
+						return;
+					}
+					list.randomSort();
+					_status.event.dialog.close();
+					_status.event.dialog=ui.create.dialog('选择参战角色','hidden');
+					ui.window.appendChild(_status.event.dialog);
+					_status.event.dialog.classList.add('bosscharacter');
+					_status.event.dialog.add('0/3');
+					_status.event.dialog.add([list.slice(0,20),'character']);
+					game.uncheck();
+					game.check();
+				};
+				event.asboss=ui.create.control('应战',function(){
+					event.boss=true;
+					event.enemy=[];
+					for(var i=0;i<ui.selected.buttons.length;i++){
+						event.enemy.push(ui.selected.buttons[i].link);
+						event.list.remove(ui.selected.buttons[i].link);
+					}
+					while(event.enemy.length<3){
+						event.enemy.push(event.list.randomRemove());
+					}
+					game.uncheck();
+					if(ui.confirm){
+						ui.confirm.close();
+					}
+					game.resume();
+				});
+				ui.create.cheat=function(){
+					ui.cheat=ui.create.control('更换',event.changeDialog);
+				};
+				event.dialogxx=ui.create.characterDialog();
+				event.dialogxx.classList.add('bosscharacter');
+				ui.create.cheat2=function(){
+					ui.cheat2=ui.create.control('自由选将',function(){
+						if(this.dialog==_status.event.dialog){
+							this.dialog.close();
+							_status.event.dialog=this.backup;
+							ui.window.appendChild(this.backup);
+							delete this.backup;
+							game.uncheck();
+							game.check();
+							if(ui.cheat2x){
+								ui.cheat2x.close();
+								delete ui.cheat2x;
+							}
+						}
+						else{
+							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
+							this.backup=_status.event.dialog;
+							_status.event.dialog.close();
+							_status.event.dialog=_status.event.parent.dialogxx;
+							this.dialog=_status.event.dialog;
+							ui.window.appendChild(this.dialog);
+							game.uncheck();
+							game.check();
+						}
+					});
+				}
+				if(!ui.cheat&&get.config('change_choice'))
+				ui.create.cheat();
+				if(!ui.cheat2&&get.config('free_choose'))
+				ui.create.cheat2();
+				"step 1"
+				if(ui.cheat){
+					ui.cheat.close();
+					delete ui.cheat;
+				}
+				if(ui.cheat2){
+					ui.cheat2.close();
+					delete ui.cheat2;
+				}
+				if(ui.cheat2x){
+					ui.cheat2x.close();
+					delete ui.cheat2x;
+				}
+				event.asboss.close();
+				if(event.boss){
+					event.result={
+						boss:true,
+						links:event.enemy
+					};
+				}
+				else{
+					event.result={
+						boss:false,
+						links:result.links
+					};
+				}
+			}
+			return next;
+		},
+	},
+	boss:{
+		boss_caiwenji:{
+			loopType:2,
+			chongzheng:3
+		},
+		boss_pangtong:{
+			loopType:2
+		},
+		boss_zhenji:{
+			chongzheng:4,
+		},
+		boss_lvbu1:{
+			loopType:2
+		},
+		global:{
+			loopType:1,
+			chongzheng:6
+		},
 	},
 	character:{
-		boss_zhangchunhua:['female','shu',4,[],['fullskin','boss'],'wei'],
-		boss_zhenji:['female','shu',4,[],['fullskin','boss'],'wei'],
-		boss_liubei:['male','shu',4,[],['fullskin','boss'],'qun'],
-		boss_zhugeliang:['male','shu',4,[],['fullskin','boss'],'qun'],
-		boss_huangyueying:['female','shu',4,[],['fullskin','boss'],'wei'],
-		boss_pangtong:['male','shu',4,[],['fullskin','boss'],'zhu'],
-		boss_zhouyu:['male','wu',4,[],['fullskin','boss'],'zhu'],
-		boss_lvbu1:['male','qun',8,['mashu','wushuang','baonu'],['fullskin','boss'],'wei'],
-		boss_lvbu2:['male','qun',4,['mashu','wushuang','xiuluo','shenwei','shenji'],['fullskin','hiddenboss'],'qun'],
-		boss_caiwenji:['female','qun',8,[],['fullskin','boss'],'wei'],
+		boss_zhangchunhua:['female','wei',4,['jueqing','wuxin','shangshix'],['fullskin','boss'],'wei'],
+		boss_zhenji:['female','wei',4,['tashui','lingbo','jiaoxia','fanghua'],['fullskin','boss'],'wei'],
+		// boss_liubei:['male','shu',5,['lingfeng'],['fullskin','boss'],'qun'],
+		// boss_zhugeliang:['male','shu',4,[],['fullskin','boss'],'qun'],
+		boss_huangyueying:['female','shu',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['fullskin','boss'],'wei'],
+		boss_pangtong:['male','shu',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['fullskin','boss'],'zhu'],
+		boss_zhouyu:['male','wu',6,['huoshen','boss_honglian','boss_xianyin'],['fullskin','boss'],'zhu'],
+		boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['fullskin','boss'],'wei'],
+		boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['fullskin','hiddenboss'],'qun'],
+		boss_caiwenji:['female','qun',4,['tinqin','beige','boss_hujia','boss_guihan'],['fullskin','boss'],'wei'],
 		boss_zhangjiao:['male','qun',8,[],['fullskin','boss'],'shu'],
 		boss_zuoci:['male','qun',8,[],['fullskin','boss'],'shu'],
-		boss_yuji:['male','qun',8,[],['fullskin','boss'],'nei'],
+		// boss_yuji:['male','qun',8,[],['fullskin','boss'],'nei'],
 		boss_diaochan:['male','qun',8,[],['fullskin','boss'],'qun'],
 		boss_huatuo:['male','qun',8,[],['fullskin','boss'],'wu'],
 		boss_dongzhuo:['male','qun',8,[],['fullskin','boss'],'shu'],
-		boss_shuijing:['male','qun',8,[],['fullskin','boss'],'wei'],
+		// boss_shuijing:['male','qun',8,[],['fullskin','boss'],'wei'],
+	},
+	skill:{
+		tinqin:{
+			inherit:'manjuan'
+		},
+		boss_hujia:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				if(player.hp==player.maxHp) return false;
+				if(!player.num('he')) return false;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&!game.players[i].storage.boss_hujia){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				"step 0"
+				var next=player.chooseCardTarget({
+					position:'he',
+					filterTarget:function(card,player,target){
+						return player!=target&&!target.storage.boss_hujia;
+					},
+					filterCard:true,
+					ai1:function(card){
+						return ai.get.unuseful(card)+9;
+					},
+					ai2:function(target){
+						return Math.random();
+					},
+					prompt:'是否发动【胡笳】？'
+				});
+				"step 1"
+				if(result.bool){
+					var target=result.targets[0];
+					player.logSkill('boss_hujia',target);
+					if(target.disabledSkills.boss_hujia){
+						target.clearSkills();
+						target.storage.boss_hujia=true;
+						delete target.disabledSkills.boss_hujia;
+					}
+					else{
+						target.disabledSkills.boss_hujia=lib.character[target.name][3];
+					}
+					player.discard(result.cards);
+				}
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&!game.players[i].storage.boss_hujia){
+						event.finish();break;
+					}
+				}
+				"step 2"
+				player.draw(2);
+				if(player.hp<player.maxHp){
+					player.recover(player.maxHp-player.hp);
+				}
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player){
+						game.players[i].maxHp=1;
+						game.players[i].update();
+					}
+				}
+				game.bossinfo.loopType=1;
+			},
+			ai:{
+				expose:0.2,
+			}
+		},
+		boss_guihan:{},
+		huoshen:{
+			trigger:{player:'damageBefore'},
+			forced:true,
+			filter:function(event){
+				return event.nature=='fire';
+			},
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+				player.recover();
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'fireDamage')){
+							return [0,2];
+						}
+					}
+				}
+			},
+		},
+		boss_xianyin:{
+			trigger:{player:'loseEnd'},
+			frequent:true,
+			filter:function(event,player){
+				return _status.currentPhase!=player;
+			},
+			content:function(){
+				"step 0"
+				player.judge(function(card){
+					return get.color(card)=='red'?1:0;
+				});
+				"step 1"
+				if(result.bool){
+					player.chooseTarget(true,'选择一个目标令其失去一点体力',function(card,player,target){
+						return player!=target;
+					}).ai=function(target){
+						return Math.max(1,9-target.hp);
+					}
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.targets.length){
+					result.targets[0].loseHp();
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'loseCard')){
+							return [0.5,1];
+						}
+					}
+				}
+			}
+		},
+		boss_honglian:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				"step 0"
+				event.players=get.players(player);
+				event.players.remove(player);
+				event.num=0;
+				player.draw(2);
+				"step 1"
+				if(event.players.length){
+					event.players.shift().damage('fire');
+					event.redo();
+				}
+			},
+		},
+		boss_yuhuo:{
+			trigger:{player:'niepanAfter'},
+			forced:true,
+			content:function(){
+				player.addSkill('shenwei');
+				player.addSkill('zhuyu');
+				game.bossinfo.loopType=1;
+			}
+		},
+		boss_tianyu:{
+			inherit:'suoling'
+		},
+		boss_jizhi:{
+			trigger:{player:'useCard'},
+			frequent:true,
+			filter:function(event){
+				var type=get.type(event.card,'trick');
+				return (type=='trick'||type=='equip')&&event.cards[0]&&event.cards[0]==event.card;
+			},
+			content:function(){
+				var cards=get.cards();
+				player.gain(cards,'gain2');
+				game.log(get.translation(player)+'获得了'+get.translation(cards));
+			},
+			ai:{
+				threaten:1.4
+			}
+		},
+		boss_guiyin:{
+			inherit:'dunxing'
+		},
+		boss_gongshen:{
+			trigger:{global:'gameDrawAfter'},
+			forced:true,
+			content:function(){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player){
+						game.players[i].forcemin=true;
+					}
+				}
+			},
+			global:'boss_gongshen2'
+		},
+		boss_gongshen2:{
+			mod:{
+				cardEnabled:function(card,player){
+					if(player.isMin()){
+						if(get.type(card)=='equip') return false;
+					}
+				}
+			}
+		},
+		fanghua:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			unique:true,
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isTurnedOver()){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				"step 0"
+				event.players=get.players(player);
+				event.num=0;
+				for(var i=0;i<event.players.length;i++){
+					if(!event.players[i].isTurnedOver()){
+						event.players.splice(i--,1);
+					}
+				}
+				"step 1"
+				if(event.players.length){
+					event.players.shift().loseHp();
+					event.redo();
+				}
+			}
+		},
+		tashui:{
+			trigger:{player:['useCard','respondAfter']},
+			direct:true,
+			unique:true,
+			filter:function(event){
+				return get.color(event.card)=='black';
+			},
+			content:function(){
+				"step 0"
+				game.delay(0.5);
+				player.chooseTarget('是否发动【踏水】？',function(card,player,target){
+					return player!=target;
+				}).ai=function(target){
+					if(target.isTurnedOver()) return -1;
+					return 1;
+					return ai.get.damageEffect(target,player,player,'thunder');
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('tashui',result.targets,'thunder');
+					result.targets[0].turnOver();
+				}
+			},
+			ai:{
+				effect:{
+					player:function(card){
+						if(get.color(card)=='black'){
+							return [1,2];
+						}
+					}
+				}
+			}
+		},
+		shangshix:{
+			trigger:{player:['loseEnd','changeHp']},
+			forced:true,
+			unique:true,
+			filter:function(event,player){
+				return player.num('h')<4;
+			},
+			content:function(){
+				player.draw(4-player.num('h'));
+			},
+			group:'shangshix2',
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(card.name=='shunshou') return;
+						if(card.name=='guohe'){
+							if(!target.num('e')) return [0,1];
+						}
+						else if(get.tag(card,'loseCard')){
+							return [0,1];
+						}
+					}
+				}
+			}
+		},
+		shangshix2:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			unique:true,
+			filter:function(event,player){
+				return player.hp>1;
+			},
+			content:function(){
+				"step 0"
+				event.players=get.players(player);
+				event.num=0;
+				"step 1"
+				if(event.players.length){
+					event.players.shift().loseHp();
+					event.redo();
+				}
+			}
+		},
+		wuxin:{
+			inherit:'miles_xueyi',
+			group:'swd_wuxie'
+		},
+		shenwei:{
+			unique:true,
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			content:function(){
+				trigger.num+=Math.max(2,game.players.length-1);
+			},
+			mod:{
+				maxHandcard:function(player,current){
+					return current+Math.max(2,game.players.length-1);
+				}
+			}
+		},
+		shenji:{
+			unique:true,
+			mod:{
+				selectTarget:function(card,player,range){
+					if(card.name=='sha'||card.name=='juedou') range[1]=3;
+				},
+			}
+		},
+		boss_baonu:{
+			unique:true,
+			group:'boss_baonu2',
+			trigger:{player:'changeHp'},
+			forced:true,
+			priority:100,
+			filter:function(event,player){
+				return player.hp<=4
+			},
+			content:function(){
+				player.init('boss_lvbu2');
+				player.update();
+				ui.clear();
+				while(_status.event.name!='phaseLoop'){
+					_status.event=_status.event.parent;
+				}
+				for(var i=0;i<game.players.length;i++){
+					for(var j in game.players[i].tempSkills){
+						game.players[i].skills.remove(j);
+						delete game.players[i].tempSkills[j];
+					}
+				}
+				_status.paused=false;
+				_status.event.player=player;
+				_status.event.step=0;
+				game.bossinfo.loopType=1;
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'damage')||get.tag(card,'loseHp')){
+							if(player.hp==5){
+								if(game.players.length<4) return [0,5];
+								var num=0
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i]!=game.boss&&game.players[i].hp==1){
+										num++;
+									}
+								}
+								if(num>1) return [0,2];
+								if(num&&Math.random()<0.7) return [0,1];
+							}
+						}
+					}
+				}
+			}
+		},
+		boss_baonu2:{
+			trigger:{player:'gameDrawBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.draw(4,false);
+			}
+		},
+		_bossswap:{
+			trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
+			'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
+			'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
+			forced:true,
+			priority:100,
+			popup:false,
+			filter:function(event,player){
+				if(event.autochoose&&event.autochoose()) return false;
+				return player.isUnderControl();
+			},
+			content:function(){
+				game.modeSwapPlayer(player);
+			},
+		},
 	},
 	translate:{
+		tinqin:'听琴',
+		boss_guihan:'归汉',
+		boss_guihan_info:'觉醒技，当所有敌人失去技能后，你摸两张牌并将体力回复至体力上限，然后令所有敌人将体力上限减至1',
+		boss_hujia:'胡笳',
+		boss_hujia_info:'回合结束阶段，若你已受伤，可以弃置一张牌令一名其他角色的所有技能失效，若其所有技能已失效，改为令其失去所有技能',
+		boss_honglian:'红莲',
+		boss_honglian_info:'锁定技，回合结束阶段，你摸两张牌，并对所有敌人造成一点火焰伤害',
+		huoshen:'火神',
+		huoshen_info:'锁定技，你防止即将受到的火焰伤害，改为回复1点体力',
+		boss_xianyin:'仙音',
+		boss_xianyin_info:'每当你于回合外失去牌，你可以进行一次判定，若为红色，你令一名敌人失去一点体力',
+
+		boss_yuhuo:'浴火',
+		boss_yuhuo_info:'觉醒技，在你涅槃后，你获得技能【神威】、【朱羽】',
+		boss_tianyu:'天狱',
+
+		boss_jizhi:'集智',
+		boss_jizhi_info:'每当你使用一张锦囊牌或装备牌，你可以摸一张牌并展示之',
+		boss_guiyin:'归隐',
+		boss_guiyin_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
+		boss_gongshen:'工神',
+		boss_gongshen_info:'锁定技，除你之外的角色没有装备区，也不能重铸卡牌',
+
+		fanghua:'芳华',
+		fanghua_info:'回合结束阶段，你可以令所有已翻面角色流失一点体力',
+		tashui:'踏水',
+		tashui_info:'每当你使用或打出一张黑色牌，你可以令一名其他角色翻面',
+
+		wuxin:'无心',
+		wuxin_info:'锁定技，你防止即将受到的伤害，改为流失一点体力；你不能成为其他角色的延时锦囊的目标',
+		shangshix:'伤逝',
+		shangshix2:'伤逝',
+		shangshix_info:'锁定技，你的手牌数至少为4，回合结束阶段，若你的体力值大于1，你令场上所有角色流失一点体力',
+
+		shenwei:'神威',
+		shenwei_info:'锁定技，摸牌阶段，你额外摸X张牌，你的手牌上限+X，X为敌方存活角色个数且至少为2',
+		shenji:'神戟',
+		shenji:'你使用的杀或决斗可指定至多3名角色为目标',
+
+		zhu:'神',
+		cai:'盟',
 		boss_shuijing:'水镜先生',
 		boss_huangyueying:'奇智女杰',
 		boss_zhangchunhua:'冷血皇后',
@@ -136,5 +957,13 @@ mode.boss={
 		boss_luxun:'蹁跹君子',
 		boss_zhenji:'洛水仙子',
 		boss_diaochan:'绝代妖姬',
-	}
+	},
+	ai:{
+		get:{
+			attitude:function(from,to){
+				return 6*(from.side===to.side?1:-1);
+			}
+		}
+	},
+	config:['ban_weak','change_choice','free_choose','']
 }

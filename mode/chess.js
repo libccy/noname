@@ -780,6 +780,7 @@ mode.chess={
 				game.finishCards();
 				game.arrangePlayers();
 				"step 2"
+				ui.control.style.display='';
 				var p;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].side){
@@ -857,6 +858,7 @@ mode.chess={
 				ui.control.style.top='calc(100% - 30px)';
 
 				var next=game.me.chooseButton(dialog,true);
+				next._triggered=null;
 				next.selectButton=function(){
 					return (get.config('double_character')?2:1)*get.config('battle_number');
 				};
@@ -930,7 +932,7 @@ mode.chess={
 					ui.cheat2x.close();
 					delete ui.cheat2x;
 				}
-
+				ui.control.style.display='none';
 				ui.control.style.top='';
 				ui.control.style.transition='';
 

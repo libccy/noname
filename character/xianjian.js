@@ -434,6 +434,7 @@ character.xianjian={
 		},
 		wangyou3:{},
 		changnian:{
+			forbid:['boss'],
 			trigger:{player:'dieBegin'},
 			direct:true,
 			unique:true,

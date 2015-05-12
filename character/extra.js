@@ -490,7 +490,7 @@ character.extra={
 			intro:{
 				mark:function(dialog,content,player){
 					if(content&&content.length){
-						if(player==game.me){
+						if(player==game.me||player.isUnderControl()){
 							dialog.add(content);
 						}
 						else{
@@ -500,7 +500,7 @@ character.extra={
 				},
 				content:function(content,player){
 					if(content&&content.length){
-						if(player==game.me){
+						if(player==game.me||player.isUnderControl()){
 							return get.translation(content);
 						}
 						return '共有'+get.cnNumber(content.length)+'张星';
@@ -590,6 +590,9 @@ character.extra={
 				for(var i=0;i<result.links.length;i++){
 					player.storage.qixing.remove(result.links[i]);
 				}
+				if(player.storage.qixing.length==0){
+					player.unmarkSkill('qixing');
+				}
 				player.discard(result.links);
 			},
 			group:'dawu3'
@@ -665,6 +668,9 @@ character.extra={
 				"step 2"
 				for(var i=0;i<result.links.length;i++){
 					player.storage.qixing.remove(result.links[i]);
+				}
+				if(player.storage.qixing.length==0){
+					player.unmarkSkill('qixing');
 				}
 				player.discard(result.links);
 			},

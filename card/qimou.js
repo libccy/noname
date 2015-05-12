@@ -251,7 +251,7 @@ card.qimou={
 			ai:{
 				order:6.5,
 				tag:{
-					discard:1,
+					loseCard:1,
 					multitarget:1,
 					multineg:1
 				},

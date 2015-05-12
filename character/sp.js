@@ -314,7 +314,7 @@ character.sp={
 				if(cards.length){
 					var dialog;
 					if(event.isMine()){
-						dialog=ui.create.dialog('是否发动【漫卷】？');
+						dialog=ui.create.dialog('是否发动【'+get.translation(event.name)+'】？');
 						dialog.style.opacity='none';
 						dialog.add(cards);
 						for(var i=0;i<dialog.buttons.length;i++){
@@ -336,7 +336,7 @@ character.sp={
 				}
 				"step 2"
 				if(result.bool){
-					player.logSkill('manjuan');
+					player.logSkill(event.name);
 					game.log(get.translation(player)+'获得了'+get.translation(event.cards));
 					player.gain(event.cards,'gain2');
 				}

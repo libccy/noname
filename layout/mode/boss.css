@@ -3,63 +3,114 @@
     height:calc(50% + 200px);
     text-align:center;
     top:calc(50% - 200px);
+    top:60px;
     white-space:nowrap;
     z-index:1;
-}
-#bosslist.scroll{
     overflow-x:scroll;
 }
 .bosspaused>#bosslist,
-.bosspaused>#control{
+.bosspaused>#control,
+.bosspaused>.dialog.bosscharacter{
     opacity:0.2 !important;
 }
-#bosslist>.player.bossshow{
-    opacity:1;
-    -webkit-animation:boss_start 0.5s;
-    -webkit-transform:none;
-}
-#bosslist>.player{
-    position:relative;
-    margin:10px;
-    left:0;
-    top:0;
-    width:180px;
-    height:216px;
-    opacity: 0;
-    transition: all 0.3s;
-    -webkit-transform:translateY(-200px);
-}
-#bosslist>.player:hover{
-    -webkit-transform:scale(1.1);
+#bosslist.hidden>.player{
+    transition:all 0s;
 }
 #bosslist>div:first-child,
 #bosslist>div:last-child{
     width:20px;
     position:relative;
 }
-#bosslist>.player>div:not(.hp):not(.identity):not(.avatar){
+
+.player.bossplayer.bossing{
+    position:absolute;
+}
+.player.bossing .avatar{
+    transition:all 0.5s;
+}
+.player.bossplayer.highlight{
+    -webkit-transform:scale(1.1);
+    opacity:1;
+}
+#bosslist.removing>.player.bossplayer.highlight{
+    transition:all 0s;
+    opacity:0;
+}
+.player.bossplayer{
+    position:relative;
+    margin:10px;
+    left:0;
+    top:0;
+    width:180px;
+    height:216px;
+    transition: all 0.3s;
+    opacity:0.6;
+    -webkit-animation:game_start 0.5s;
+}
+.player.bossplayer>div:not(.hp):not(.identity):not(.avatar){
     display:none !important;
 }
-#bosslist>.player>.identity{
+.player.bossplayer>.identity{
     left:16px;
     top:20px;
     line-height:24px;
     white-space:normal;
 }
-#bosslist>.player>.hp{
+.player.bossplayer>.hp{
     top:22px;
     left:144px;
 }
-#bosslist>.player>.avatar{
+.player.bossplayer>.avatar{
     width:156px;
     height:192px;
 }
 
 #control.bosslist{
-    top:calc(50% + 100px);
-}
-#control.bosslist>div{
-    transition:opacity 0.5s;
+    top:calc(100% - 50px);
+    position:fixed;
 }
 
-@-webkit-keyframes boss_start{from {opacity: 0;-webkit-transform:translateY(-200px);}}
+.dialog.bosscharacter{
+    top:auto;
+    bottom:65px;
+    height:calc(100% - 383px);
+    background: rgba(0,0,0,0.2);
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
+	border-radius:8px;
+}
+
+.bosschongzheng{
+    width:calc(100% - 20px);
+    white-space:nowrap;
+    position:relative;
+}
+.bosschongzheng div{
+    position:relative;
+}
+.bosschongzheng>div{
+    width:100%;
+    display:block;
+    margin-bottom:5px;
+}
+.bosschongzheng>div>div:first-child{
+    text-align:left;
+    width:30%;
+}
+.bosschongzheng>div>div:last-child{
+    text-align:right;
+    width:70%;
+}
+
+@media screen and (min-height: 800px) {
+	.dialog.bosscharacter{
+		height:417px;
+        bottom:calc(50% - 335px);
+	}
+    #control.bosslist{
+        top:calc(50% + 350px);
+
+    }
+    #bosslist{
+        top:calc(40% - 260px);
+    }
+}

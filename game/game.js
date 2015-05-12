@@ -1797,10 +1797,9 @@ window.play={};
 					else{
 						game.log(get.translation(player)+'遇难')
 					}
-					var i;
 					event.cards=player.get('hej');
 					if(event.cards.length){
-						for(i=0;i<event.cards.length;i++){
+						for(var i=0;i<event.cards.length;i++){
 							event.cards[i].goto(ui.discardPile);
 						}
 						player.$throw(event.cards,1000);
@@ -1818,6 +1817,10 @@ window.play={};
 						while(player.node.marks.childNodes.length){
 							player.node.marks.firstChild.remove();
 						}
+					}
+					for(var i in player.tempSkills){
+						player.skills.remove(i);
+						delete player.tempSkills[i];
 					}
 					player.classList.add('dead');
 					player.classList.remove('turnedover');
@@ -3806,7 +3809,9 @@ window.play={};
 				isOut:function(){
 					return this.classList.contains('out');
 				},
-				isMin:function(){
+				isMin:function(distance){
+					if(distance&&lib.config.mode!='stone') return false;
+					if(this.forcemin) return true;
 					return this.classList.contains('minskin')&&lib.config.mode!='chess';
 				},
 				isIn:function(){
@@ -3818,7 +3823,7 @@ window.play={};
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==game.me.side;
 					}
-					else if(lib.config.mode=='chess'){
+					else if(lib.config.mode=='chess'||lib.config.mode=='boss'){
 						return this.side==game.me.side;
 					}
 					return false;
@@ -4386,17 +4391,11 @@ window.play={};
 					if(event.player&&event.player.removed) return;
 					if(!event.player&&name!='gameStart') return;
 					event._endTrigger=event.player||game.me;
-					for(iwhile=0;iwhile<totalPopulation;iwhile++){
-						if(event._endTrigger.isDead()){
-							event._endTrigger=event._endTrigger.next;
-						}
-						else{
-							break;
-						}
+
+					if(!game.players.contains(event._endTrigger)){
+						event._endTrigger=game.findNext(event._endTrigger);
 					}
-					if(event._endTrigger.isDead()){
-						event._endTrigger=game.players.randomGet();
-					}
+
 					var player=event._endTrigger;
 					var list=[],others=[];
 					for(i=0;i<game.players.length;i++){
@@ -4455,7 +4454,7 @@ window.play={};
 							}
 						}
 						player=player.next;
-						if(player==event._endTrigger){
+						if(!player||player==event._endTrigger){
 							break;
 						}
 					}
@@ -4584,6 +4583,7 @@ window.play={};
 					return this.add(item,noclick,true);
 				},
 				open:function(){
+					if(this.noopen) return;
 					for(var i=0;i<ui.dialogs.length;i++){
 						if(ui.dialogs[i]==this){
 							this.show();
@@ -5962,6 +5962,16 @@ window.play={};
 				}
 			}
 		},
+		findNext:function(player){
+			var players=get.players(lib.sort.position);
+			var position=parseInt(player.dataset.position);
+			for(var i=0;i<players.length;i++){
+				if(parseInt(players[i].dataset.position)>=position){
+					return players[i];
+				}
+			}
+			return players[0];
+		},
 		phaseLoop:function(player){
 			var next=game.createEvent('phaseLoop');
 			next.player=player;
@@ -5969,19 +5979,8 @@ window.play={};
 				"step 0"
 				player.phase();
 				"step 1"
-				var players,i;
-				if(game.players.contains(event.player.next)==false){
-					players=get.players(lib.sort.position);
-					if(parseInt(players[players.length-1].dataset.position)<parseInt(event.player.dataset.position)){
-						event.player=game.me;
-					}
-					else{
-						for(i=0;i<game.players.length;i++){
-							if(parseInt(game.players[i].dataset.position)>=parseInt(event.player.dataset.position)){
-								event.player=game.players[i];break;
-							}
-						}
-					}
+				if(!game.players.contains(event.player.next)){
+					event.player=game.findNext(event.player.next);
 				}
 				else{
 					event.player=event.player.next;
@@ -7098,6 +7097,9 @@ window.play={};
 							}
 							else if(typeof lib.config.current_mode[i]==='function'){
 								modeconfig.push(lib.config.current_mode[i](game,lib,get,ui));
+							}
+							else{
+								modeconfig.push(ui.create.div('.placeholder'));
 							}
 						}
 					}
@@ -8768,14 +8770,14 @@ window.play={};
 			player:function(){
 				return ui.click.target.apply(this,arguments);
 			},
-			target:function(){
+			target:function(e){
 				if(_status.dragged) return;
 				if(_status.clicked) return;
 				if(ui.intro) return;
 				_status.clicked=true;
 				var custom=_status.event.custom;
 				if(custom.replace.target){
-					custom.replace.target(this);
+					custom.replace.target(this,e);
 					return;
 				}
 				if(this.classList.contains('selectable')==false) return;
@@ -8792,28 +8794,30 @@ window.play={};
 				}
 				else{
 					ui.selected.targets.add(this);
-					var targetprompt=null;
-					if(_status.event.targetprompt){
-						targetprompt=_status.event.targetprompt;
-					}
-					else if(_status.event.skill&&!get.info(_status.event.skill).viewAs){
-						targetprompt=get.info(_status.event.skill).targetprompt;
-					}
-					else{
-						var currentcard=get.card();
-						if(currentcard){
-							targetprompt=get.info(currentcard).targetprompt;
+					if(_status.event.name=='chooseToUse'){
+						var targetprompt=null;
+						if(_status.event.targetprompt){
+							targetprompt=_status.event.targetprompt;
 						}
-					}
-					if(targetprompt){
-						if(Array.isArray(targetprompt)){
-							targetprompt=targetprompt[Math.min(targetprompt.length-1,ui.selected.targets.indexOf(this))];
+						else if(_status.event.skill&&!get.info(_status.event.skill).viewAs){
+							targetprompt=get.info(_status.event.skill).targetprompt;
 						}
-						else if(typeof targetprompt=='function'){
-							targetprompt=targetprompt(this);
+						else{
+							var currentcard=get.card();
+							if(currentcard){
+								targetprompt=get.info(currentcard).targetprompt;
+							}
 						}
-						if(targetprompt&&typeof targetprompt=='string'){
-							this.prompt(targetprompt);
+						if(targetprompt){
+							if(Array.isArray(targetprompt)){
+								targetprompt=targetprompt[Math.min(targetprompt.length-1,ui.selected.targets.indexOf(this))];
+							}
+							else if(typeof targetprompt=='function'){
+								targetprompt=targetprompt(this);
+							}
+							if(targetprompt&&typeof targetprompt=='string'){
+								this.prompt(targetprompt);
+							}
 						}
 					}
 					this.classList.add('selected');
@@ -9911,7 +9915,7 @@ window.play={};
 				n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
 				if(method=='raw'||method=='pure'||method=='absolute') return n;
 			}
-			else if(to.isMin()||from.isMin()){
+			else if(to.isMin(true)||from.isMin(true)){
 				if(method=='raw'||method=='pure'||method=='absolute') return 1;
 			}
 			else{
@@ -9920,14 +9924,14 @@ window.play={};
 				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
 					if(player.nextSeat!=to){
 						player=player.nextSeat;
-						if(player.isAlive()&&!player.isOut()&&!player.isMin()) n++;
+						if(player.isAlive()&&!player.isOut()&&!player.isMin(true)) n++;
 					}
 					else{
 						break;
 					}
 				}
 				for(i=0;i<game.players.length;i++){
-					if(game.players[i].isOut()||game.players[i].isMin()) length--;
+					if(game.players[i].isOut()||game.players[i].isMin(true)) length--;
 				}
 				if(method=='absolute') return n;
 				if(from.isDead()) length++;
@@ -11052,9 +11056,15 @@ window.play={};
 				if(player.get('e').contains(card)){
 					return ai.get.equipValue(card)/3;
 				}
-				if(player.num('h')==1) return 2;
-				if(player.num('h')==2) return 1.6;
-				return 1;
+				var nh=player.num('h');
+				switch(nh){
+					case 1:return 2;
+					case 2:return 1.6;
+					case 3:return 1;
+					case 4:return 0.8;
+					case 5:return 0.6;
+					default:return 0.4;
+				}
 			},
 			attitude2:function(to){
 				return ai.get.attitude(_status.event.player,to);

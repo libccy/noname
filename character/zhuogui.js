@@ -266,6 +266,15 @@ character.zhuogui={
         suoling:{
             trigger:{player:'phaseEnd'},
             forced:true,
+            filter:function(event,player){
+                if(player.isLinked()) return true;
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i]!=player&&!game.players[i].isLinked()){
+                        return true;
+                    }
+                }
+                return false;
+            },
             content:function(){
                 "step 0"
                 event.targets=game.players.slice(0);

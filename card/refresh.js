@@ -164,7 +164,7 @@ card.refresh={
 				order:4,
 				result:{
 					player:function(player){
-						if(player.tempSkills['muniu_skill8']) return 0;
+						if(player.skills.contains('muniu_skill8')) return 0;
 						if(_status.dying) return ai.get.attitude(player,_status.dying);
 						return 1;
 					}

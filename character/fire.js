@@ -192,7 +192,8 @@ character.fire={
 						}
 						return 0;
 					},
-					player:function(player){
+					player:function(player,target){
+						if(target.skills.contains('jueqing')) return -10;
 						var mn=1;
 						var hs=player.get('h');
 						for(var i=0;i<hs.length;i++){

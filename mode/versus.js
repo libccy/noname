@@ -307,12 +307,11 @@ mode.versus={
 
 				ui.auto.show();
 				ui.wuxie.show();
+				ui.control.style.display='none';
 				if(ui.cheat){
 					ui.cheat.close();
 					delete ui.cheat;
 				}
-				ui.control.style.top='';
-				ui.control.style.transition='';
 				delete _status.list;
 				var num=lib.storage.number;
 				ui.create.players(num*2);
@@ -420,6 +419,9 @@ mode.versus={
 					// game.enemy[i].node.identity.style.backgroundColor=get.translation(!_status.color+'Color');
 				}
 				"step 2"
+				ui.control.style.top='';
+				ui.control.style.display='';
+				ui.control.style.transition='';
 				var num=lib.storage.number;
 				if(result&&result.buttons){
 					var list=[];
