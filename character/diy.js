@@ -425,6 +425,8 @@ character.diy={
 				if(event.nature=='thunder') return true;
 			},
 			forced:true,
+			popup:false,
+			priority:1,
 			content:function(){
 				player.draw();
 			},

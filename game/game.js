@@ -1279,6 +1279,7 @@ window.play={};
 				useSkill:function(){
 					"step 0"
 					var info=get.info(event.skill);
+					event._skill=event.skill;
 					if(lib.config.background_speak&&!lib.skill.global.contains(event.skill)){
 						if(info.audio){
 							game.playAudio('skill',event.skill,Math.ceil(info.audio*Math.random()));
@@ -1346,8 +1347,14 @@ window.play={};
 					"step 1"
 					if(!event.skill){
 						console.log('error: no skill',get.translation(event.player),event.player.get('s'));
-						event.finish();
-						return;
+						if(event._skill){
+							event.skill=event._skill;
+							console.log(event._skill);
+						}
+						else{
+							event.finish();
+							return;
+						}
 					}
 					var info=get.info(event.skill);
 					if(targets[num]&&targets[num].isDead()||
@@ -3823,7 +3830,11 @@ window.play={};
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==game.me.side;
 					}
-					else if(lib.config.mode=='chess'||lib.config.mode=='boss'){
+					else if(lib.config.mode=='chess'){
+						return this.side==game.me.side;
+					}
+					else if(lib.config.mode=='boss'){
+						if(this.gonemad) return false;
 						return this.side==game.me.side;
 					}
 					return false;

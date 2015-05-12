@@ -2722,6 +2722,7 @@ character.yijiang={
 				player.storage.xiansi=[];
 			},
 			unique:true,
+			forceunique:true,
 			content:function(){
 				"step 0"
 				player.chooseTarget('是否发动陷嗣？',[1,2],function(card,player,target){

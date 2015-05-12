@@ -592,8 +592,16 @@ character.woods={
 			filter:function(event,player){
 				return !player.storage.luanwu;
 			},
+			init:function(player){
+				player.storage.luanwu=false;
+			},
+			mark:true,
+			intro:{
+				content:'limited'
+			},
 			content:function(){
 				"step 0"
+				player.unmarkSkill('luanwu')
 				player.storage.luanwu=true;
 				event.current=player.next;
 				"step 1"
@@ -610,7 +618,7 @@ character.woods={
 				if(result.bool==false) event.current.loseHp();
 				if(event.current.next!=player){
 					event.current=event.current.next;
-					game.delay();
+					game.delay(0.5);
 					event.goto(1);
 				}
 			},
