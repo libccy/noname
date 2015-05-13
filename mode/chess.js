@@ -1114,7 +1114,17 @@ mode.chess={
 					}
 				},
 				result:{
-					target:-10
+					target:function(){
+						var num=0;
+						for(var i=0;i<game.players.length;i++){
+							if(ai.get.attitude(player,game.players[i])<0){
+								num++;
+								if(num>1) break;
+							}
+						}
+						if(num<=1) return 0;
+						return -10;
+					}
 				}
 			},
 		},
