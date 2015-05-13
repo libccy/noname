@@ -1114,7 +1114,7 @@ mode.chess={
 					}
 				},
 				result:{
-					target:function(){
+					target:function(player){
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
 							if(ai.get.attitude(player,game.players[i])<0){
