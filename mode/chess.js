@@ -1573,7 +1573,7 @@ mode.chess={
 				"step 1"
 				if(event.players.length){
 					event.current=event.players.shift();
-					event.current.chooseCard('无上：交给'+get.translation(player)+'一张手牌',true);
+					event.current.chooseCard('神天并地：交给'+get.translation(player)+'一张手牌',true);
 				}
 				else{
 					event.finish();
