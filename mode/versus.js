@@ -15,6 +15,8 @@ mode.versus={
 				if(lib.storage.number==undefined) game.save('number',3);
 				if(lib.storage.replace_number==undefined) game.save('replace_number',3);
 				ui.create.arena();
+				ui.create.cards();
+				game.finishCards();
 				ui.auto.hide();
 				ui.wuxie.hide();
 				game.delay();
@@ -326,8 +328,6 @@ mode.versus={
 					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
 				}
 				ui.create.me();
-				ui.create.cards();
-				game.finishCards();
 				var position,i;
 				if(lib.storage.zhu&&lib.storage.only_zhu) position=Math.ceil(num/2)-1;
 				else position=Math.floor(Math.random()*num)

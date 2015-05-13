@@ -10,25 +10,6 @@ mode.boss={
 					game.checkResult();
 				}
 			},
-			goMad:function(){
-				this.mark('乱',{
-					name:'混乱',
-					content:'已进入混乱状态'
-				});
-				this.gonemad=true;
-				if(this==game.me){
-					if(this.next.side==this.side){
-						game.modeSwapPlayer(this.next);
-					}
-					else if(this.previous.side==this.side){
-						game.modeSwapPlayer(this.previous);
-					}
-					else{
-						this.die();
-					}
-				}
-				game.log(get.translation(this)+'进入混乱状态');
-			}
 		}
 	},
 	game:{
@@ -58,6 +39,8 @@ mode.boss={
 				"step 1"
 				var bosslist=ui.create.div('#bosslist.hidden');
 				event.bosslist=bosslist;
+				bosslist.ontouchmove = ui.click.touchScroll;
+				bosslist.style.WebkitOverflowScrolling='touch';
 				if(!lib.config.touchscreen&&lib.config.mousewheel){
 					bosslist._scrollspeed=30;
 					bosslist._scrollnum=10;
@@ -408,22 +391,6 @@ mode.boss={
 					game.uncheck();
 					game.check();
 				};
-				event.asboss=ui.create.control('应战',function(){
-					event.boss=true;
-					event.enemy=[];
-					for(var i=0;i<ui.selected.buttons.length;i++){
-						event.enemy.push(ui.selected.buttons[i].link);
-						event.list.remove(ui.selected.buttons[i].link);
-					}
-					while(event.enemy.length<3){
-						event.enemy.push(event.list.randomRemove());
-					}
-					game.uncheck();
-					if(ui.confirm){
-						ui.confirm.close();
-					}
-					game.resume();
-				});
 				ui.create.cheat=function(){
 					ui.cheat=ui.create.control('更换',event.changeDialog);
 				};
@@ -459,6 +426,23 @@ mode.boss={
 				ui.create.cheat();
 				if(!ui.cheat2&&get.config('free_choose'))
 				ui.create.cheat2();
+
+				event.asboss=ui.create.control('应战',function(){
+					event.boss=true;
+					event.enemy=[];
+					for(var i=0;i<ui.selected.buttons.length;i++){
+						event.enemy.push(ui.selected.buttons[i].link);
+						event.list.remove(ui.selected.buttons[i].link);
+					}
+					while(event.enemy.length<3){
+						event.enemy.push(event.list.randomRemove());
+					}
+					game.uncheck();
+					if(ui.confirm){
+						ui.confirm.close();
+					}
+					game.resume();
+				});
 				"step 1"
 				if(ui.cheat){
 					ui.cheat.close();
@@ -545,6 +529,7 @@ mode.boss={
 		boss_qiangzheng:{
 			trigger:{player:'phaseEnd'},
             forced:true,
+			unique:true,
             filter:function(event,player){
                 for(var i=0;i<game.players.length;i++){
                     if(game.players[i]!=player&&game.players[i].num('h')) return true;
@@ -627,10 +612,8 @@ mode.boss={
 			content:function(){
 				var players=game.players.concat(game.dead);
 				for(var i=0;i<players.length;i++){
-					if(players[i].gonemad){
-						delete players[i].gonemad;
-						players[i].unmark('乱');
-						game.log(get.translation(players[i])+'解除混乱状态');
+					if(players[i].isMad()){
+						players[i].unMad();
 					}
 				}
 			}
@@ -709,7 +692,7 @@ mode.boss={
 				player.hp=player.maxHp;
 				player.update();
 			},
-			group:['huanhua2','huanhua3','huanhua4'],
+			group:['huanhua3','huanhua4'],
 			ai:{
 				threaten:0.8,
 				effect:{
@@ -987,7 +970,6 @@ mode.boss={
 				"step 0"
 				event.players=get.players(player);
 				event.players.remove(player);
-				event.num=0;
 				player.draw(2);
 				"step 1"
 				if(event.players.length){
@@ -1037,16 +1019,6 @@ mode.boss={
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player){
 						game.players[i].forcemin=true;
-					}
-				}
-			},
-			global:'boss_gongshen2'
-		},
-		boss_gongshen2:{
-			mod:{
-				cardEnabled:function(card,player){
-					if(player.isMin()){
-						if(get.type(card)=='equip') return false;
 					}
 				}
 			}
@@ -1268,7 +1240,7 @@ mode.boss={
 		boss_wange:'笙歌',
 
 		huanhua:'幻化',
-		huanhua_info:'锁定技，游戏开始时，你获得其他角色的所有技能，体力上限变为其他角色之和；你没有摸牌阶段，其他角色于摸牌摸牌，或于弃牌阶段弃牌时，你摸或弃等量的牌',
+		huanhua_info:'锁定技，游戏开始时，你获得其他角色的所有技能，体力上限变为其他角色之和；其他角色于摸牌摸牌时，你摸等量的牌；其他角色于弃牌阶段弃牌时，你弃置等量的手牌',
 
 		jidian:'亟电',
 		jidian_info:'每当你造成一次伤害，可以指定距离受伤害角色1以内的一名其他角色进行判定，若结果为红色，该角色受到一点雷电伤害',
@@ -1296,7 +1268,7 @@ mode.boss={
 		boss_guiyin:'归隐',
 		boss_guiyin_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
 		boss_gongshen:'工神',
-		boss_gongshen_info:'锁定技，除你之外的角色没有装备区，也不能重铸卡牌',
+		boss_gongshen_info:'锁定技，除你之外的角色没有装备区',
 
 		fanghua:'芳华',
 		fanghua_info:'回合结束阶段，你可以令所有已翻面角色流失一点体力',
@@ -1342,10 +1314,10 @@ mode.boss={
 		get:{
 			attitude:function(from,to){
 				var t=(from.side===to.side?1:-1);
-				if(from.gonemad){
+				if(from.isMad()){
 					t=-t;
 				}
-				else if(to.gonemad){
+				else if(to.isMad()){
 					t=0;
 				}
 				return 6*t;

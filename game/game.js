@@ -302,6 +302,8 @@ window.play={};
 			qun:'群',
 			male:'男',
 			female:'女',
+			mad:'混乱',
+			mad_bg:'疯',
 			draw_card:'摸牌',
 			discard_card:'弃牌',
 			reset_character:'重置武将牌',
@@ -1508,96 +1510,41 @@ window.play={};
 						if(lib.config.reverse_sort) sort=-sort;
 						cards[num].fix();
 						cards[num].animate('start');
-						if(lib.config.strict_sort){
-							j=0;
-							if(game.singleHandcard){
-								position=sort>0?player.node.handcards1:player.node.handcards2;
-							}
-							else{
-								position=player.node.handcards1;
-							}
-							for(j=0;j<position.childNodes.length;j++){
-								if(lib.config.reverse_sort){
-									if(sort<lib.config.sort_card(position.childNodes[j])) break;
-								}
-								else{
-									if(sort>lib.config.sort_card(position.childNodes[j])) break;
-								}
-							}
-							if(event.animate=='draw'){
-								player.$draw();
-								(function(card,position){
-									setTimeout(function(){
-										position.insertBefore(card,position.childNodes[j]);
-									},500);
-								}(cards[num],position))
-							}
-							else if(event.animate=='draw2'){
-								player.$draw(cards[num]);
-								(function(card,position){
-									setTimeout(function(){
-										position.insertBefore(card,position.childNodes[j]);
-									},500);
-								}(cards[num],position))
-							}
-							else if(event.animate=='gain'){
-								player.$gain(cards[num]);
-								(function(card,position){
-									setTimeout(function(){
-										position.insertBefore(card,position.childNodes[j]);
-									},700);
-								}(cards[num],position))
-							}
-							else if(event.animate=='gain2'){
-								player.$gain2(cards[num]);
-								(function(card,position){
-									setTimeout(function(){
-										position.insertBefore(card,position.childNodes[j]);
-									},500);
-								}(cards[num],position))
-							}
-							else{
-								position.insertBefore(cards[num],position.childNodes[j]);
-							}
-						}
-						else{
-							if(game.singleHandcard||sort>0) frag1.appendChild(cards[num]);
-							else frag2.appendChild(cards[num]);
-						}
+
+						if(game.singleHandcard||sort>0) frag1.appendChild(cards[num]);
+						else frag2.appendChild(cards[num]);
 					}
-					if(!lib.config.strict_sort){
-						if(event.animate=='draw'){
-							player.$draw(cards.length);
-							game.delay(1,500);
-							setTimeout(function(){
-								player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-								player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
-								player.update();
-							},500);
-						}
-						else if(event.animate=='gain'){
-							player.$gain(cards);
-							game.delay(1,700);
-							setTimeout(function(){
-								player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-								player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
-								player.update();
-							},700);
-						}
-						else if(event.animate=='gain2'||event.animate=='draw2'){
-							player.$gain2(cards);
-							game.delay(1,500);
-							setTimeout(function(){
-								player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
-								player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
-								player.update();
-							},500);
-						}
-						else{
+					if(event.animate=='draw'){
+						player.$draw(cards.length);
+						game.delay(1,500);
+						setTimeout(function(){
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
 							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
 							player.update();
-						}
+						},500);
+					}
+					else if(event.animate=='gain'){
+						player.$gain(cards);
+						game.delay(1,700);
+						setTimeout(function(){
+							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
+							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+							player.update();
+						},700);
+					}
+					else if(event.animate=='gain2'||event.animate=='draw2'){
+						player.$gain2(cards);
+						game.delay(1,500);
+						setTimeout(function(){
+							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
+							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+							player.update();
+						},500);
+					}
+					else{
+						player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
+						player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
+						player.update();
 					}
 				},
 				lose:function(){
@@ -3160,6 +3107,19 @@ window.play={};
 					}
 					next.content=lib.element.playerproto.respond;
 				},
+				directgain:function(cards){
+					for(var i=0;i<cards.length;i++){
+						var sort=lib.config.sort_card(cards[i]);
+						if(game.singleHandcard||sort>0){
+							this.node.handcards1.appendChild(cards[i].animate('start'));
+						}
+						else{
+							this.node.handcards2.appendChild(cards[i].animate('start'));
+						}
+					}
+					this.update();
+					return this;
+				},
 				gain:function(){
 					var next=game.createEvent('gain');
 					next.player=this;
@@ -3364,6 +3324,17 @@ window.play={};
 							delete ui.restart;
 						}
 					}
+				},
+				isMad:function(){
+					return this.skills.contains('mad');
+				},
+				goMad:function(){
+					this.addSkill('mad');
+					game.log(get.translation(this)+'进入混乱状态');
+				},
+				unMad:function(){
+					this.removeSkill('mad');
+					game.log(get.translation(this)+'解除混乱状态');
 				},
 				equip:function(card){
 					var next=game.createEvent('equip');
@@ -3826,15 +3797,12 @@ window.play={};
 				},
 				isUnderControl:function(){
 					if(this===game.me) return false;
+					if(this.isMad()) return false;
 					if(lib.config.mode=='versus'){
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==game.me.side;
 					}
-					else if(lib.config.mode=='chess'){
-						return this.side==game.me.side;
-					}
-					else if(lib.config.mode=='boss'){
-						if(this.gonemad) return false;
+					else if(lib.config.mode=='chess'||lib.config.mode=='boss'){
 						return this.side==game.me.side;
 					}
 					return false;
@@ -4393,7 +4361,7 @@ window.play={};
 					delete this.skill;
 				},
 				isMine:function(){
-					return (this.player&&this.player==game.me&&!_status.auto);
+					return (this.player&&this.player==game.me&&!_status.auto&&!this.player.isMad());
 				},
 				trigger:function(name){
 					var event=this;
@@ -4829,6 +4797,13 @@ window.play={};
 			global:[],
 			storage:{},
 			unequip:{},
+			mad:{
+				mark:true,
+				intro:{
+					content:'已进入混乱状态',
+					name:'混乱'
+				}
+			},
 			_recoverCheck:{
 				trigger:{player:'recoverBefore'},
 				forced:true,
@@ -4972,11 +4947,20 @@ window.play={};
 					}
 				}
 			},
+			_ismin:{
+				mod:{
+					cardEnabled:function(card,player){
+						if(player.isMin()){
+							if(get.type(card)=='equip') return false;
+						}
+					}
+				}
+			},
 			_chongzhu:{
 				enable:'phaseUse',
 				prompt:'弃置要重铸的牌并摸一张牌',
 				filter:function(event,player){
-					if(player.isMin()) return false;
+					if(player.isMin()&&lib.config.mode=='stone') return false;
 					return (player.get('h',function(card){
 						return get.info(card).chongzhu;
 					}).length);
@@ -6008,7 +5992,7 @@ window.play={};
 				"step 0"
 				var end=player;
 				do{
-					player.draw(num,false).log=false;
+					player.directgain(get.cards(4));
 					if(player.singleHp===true&&!player.classList.contains('unseen')&&!player.classList.contains('unseen2')){
 						player.doubleDraw();
 					}
@@ -7858,8 +7842,14 @@ window.play={};
 							intro:ui.create.div('.intro',node),
 							group:ui.create.div('.identity',node)
 						}
-						for(var i =0;i<lib.character[item][2];i++){
-							ui.create.div('',node.node.hp);
+						if(lib.character[item][2]>14){
+							node.node.hp.innerHTML=lib.character[item][2];
+							node.node.hp.classList.add('text');
+						}
+						else{
+							for(var i =0;i<lib.character[item][2];i++){
+								ui.create.div('',node.node.hp);
+							}
 						}
 						if(!lib.config.show_name){
 							node.node.name.style.display='none';
@@ -8590,6 +8580,7 @@ window.play={};
 				}
 			},
 			window:function(){
+				var clicked=_status.clicked;
 				if(_status.dragged) return;
 				if(_status.reloading) return;
 				if(_status.clicked){
@@ -8629,9 +8620,6 @@ window.play={};
 								game.uncheck();
 								game.check();
 							}
-							if(_status.event.custom.add.window){
-								_status.event.custom.add.window();
-							}
 						}
 					}
 				}
@@ -8648,7 +8636,7 @@ window.play={};
 					}
 				}
 				if(_status.event.custom.add.window){
-					_status.event.custom.add.window();
+					_status.event.custom.add.window(clicked);
 				}
 			},
 			toggle:function(){
@@ -8713,6 +8701,7 @@ window.play={};
 			button:function(){
 				if(_status.dragged) return;
 				if(_status.clicked) return;
+				if(this.classList.contains('noclick')) return;
 				_status.clicked=true;
 				var custom=_status.event.custom;
 				if(custom.replace.button){

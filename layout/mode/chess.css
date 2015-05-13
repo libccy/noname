@@ -126,3 +126,6 @@
 .chessscroll.right{
     right:0;
 }
+.button.forbidden{
+    opacity:0.6
+}

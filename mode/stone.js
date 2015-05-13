@@ -1249,7 +1249,6 @@ mode.stone={
 			mod:{
 				cardEnabled:function(card,player){
 					if(player.isMin()){
-						if(get.type(card)=='equip') return false;
 						return;
 					}
 					if(_status.currentPhase!=player) return;
