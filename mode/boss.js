@@ -234,7 +234,12 @@ mode.boss={
 						td=ui.create.div(tr);
 						td.innerHTML=get.translation(game.dead[i]);
 						td=ui.create.div(tr);
-						td.innerHTML='剩余'+get.cnNumber(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
+						if(game.dead[i].maxHp>0){
+							td.innerHTML='剩余'+get.cnNumber(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
+						}
+						else{
+							td.innerHTML='无法重整'
+						}
 					}
 
 					if(!added){
@@ -276,25 +281,27 @@ mode.boss={
 				else if(player.isDead()){
 					if(player.hp<0) player.hp=0;
 					player.storage.boss_chongzheng++;
-					if(player.hp<player.maxHp){
-						player.hp++;
-						game.log(get.translation(player)+'回复了一点体力');
+					if(player.maxHp>0){
+						if(player.hp<player.maxHp){
+							player.hp++;
+							game.log(get.translation(player)+'回复了一点体力');
+						}
+						else{
+							var card=get.cards()[0];
+							var sort=lib.config.sort_card(card);
+							var position=sort>0?player.node.handcards1:player.node.handcards2;
+							card.fix();
+							card.animate('start');
+							position.insertBefore(card,position.firstChild);
+							player.$draw();
+							game.log(get.translation(player)+'摸了一张牌');
+						}
+						player.update();
+						if(player.storage.boss_chongzheng>=game.bossinfo.chongzheng){
+							player.revive();
+						}
 					}
-					else{
-						var card=get.cards()[0];
-						var sort=lib.config.sort_card(card);
-						var position=sort>0?player.node.handcards1:player.node.handcards2;
-						card.fix();
-						card.animate('start');
-						position.insertBefore(card,position.firstChild);
-						player.$draw();
-						game.log(get.translation(player)+'摸了一张牌');
-					}
-					player.update();
 
-					if(player.storage.boss_chongzheng>=game.bossinfo.chongzheng){
-						player.revive();
-					}
 					if(game.bossinfo.loopType==2){
 						game.boss.chongzheng=true;
 					}
@@ -488,7 +495,6 @@ mode.boss={
 		},
 		boss_caiwenji:{
 			loopType:2,
-			chongzheng:3
 		},
 		boss_pangtong:{
 			loopType:2
@@ -523,7 +529,7 @@ mode.boss={
 		boss_zhouyu:['male','wu',6,['huoshen','boss_honglian','boss_xianyin'],['fullskin','boss'],'zhu'],
 		boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['fullskin','boss'],'wei'],
 		boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['fullskin','hiddenboss'],'qun'],
-		boss_caiwenji:['female','qun',4,['tinqin','beige','boss_hujia','boss_guihan'],['fullskin','boss'],'wei'],
+		boss_caiwenji:['female','qun',4,['beige','boss_hujia','boss_guihan'],['fullskin','boss'],'wei'],
 		boss_zhangjiao:['male','qun',8,['diyleiji','guidao','tiangong','jidian'],['fullskin','boss'],'shu'],
 		boss_zuoci:['male','qun',0,['huanhua'],['fullskin','boss'],'shu'],
 		// boss_yuji:['male','qun',8,[],['fullskin','boss'],'nei'],
@@ -787,12 +793,7 @@ mode.boss={
 			filter:function(event,player){
 				if(player.hp==player.maxHp) return false;
 				if(!player.num('he')) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&!game.players[i].storage.boss_hujia){
-						return true;
-					}
-				}
-				return false;
+				return true;
 			},
 			content:function(){
 				"step 0"
@@ -816,38 +817,61 @@ mode.boss={
 					var target=result.targets[0];
 					player.logSkill('boss_hujia',target);
 					if(target.disabledSkills.boss_hujia){
-						target.clearSkills();
-						target.storage.boss_hujia=true;
-						delete target.disabledSkills.boss_hujia;
+						target.loseMaxHp();
 					}
 					else{
 						target.disabledSkills.boss_hujia=lib.character[target.name][3];
 					}
 					player.discard(result.cards);
 				}
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&!game.players[i].storage.boss_hujia){
-						event.finish();break;
-					}
-				}
-				"step 2"
-				player.draw(2);
-				if(player.hp<player.maxHp){
-					player.recover(player.maxHp-player.hp);
-				}
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player){
-						game.players[i].maxHp=1;
-						game.players[i].update();
-					}
-				}
-				game.bossinfo.loopType=1;
 			},
 			ai:{
 				expose:0.2,
 			}
 		},
-		boss_guihan:{},
+		boss_guihan:{
+			unique:true,
+			enable:'chooseToUse',
+			mark:true,
+			init:function(player){
+				player.storage.boss_guihan=false;
+			},
+			filter:function(event,player){
+				if(event.type!='dying') return false;
+				if(player!=_status.dying) return false;
+				if(player.storage.boss_guihan) return false;
+				return true;
+			},
+			content:function(){
+				"step 0"
+				player.removeSkill('boss_guihan');
+				player.recover(player.maxHp-player.hp);
+				player.storage.boss_guihan=true;
+				"step 1"
+				player.draw(4);
+				"step 2"
+				for(var i=0;i<game.players.length;i++){
+					delete game.players[i].disabledSkills.boss_hujia;
+				}
+				game.bossinfo.loopType=1;
+				player.removeSkill('beige');
+				player.removeSkill('boss_hujia');
+				player.addSkill('tinqin');
+				player.addSkill('boss_huixin');
+			},
+			ai:{
+				skillTagFilter:function(player){
+					if(player.storage.boss_guihan) return false;
+				},
+				save:true,
+				result:{
+					player:4,
+				},
+			},
+			intro:{
+				content:'limited'
+			}
+		},
 		huoshen:{
 			trigger:{player:'damageBefore'},
 			forced:true,
@@ -896,6 +920,35 @@ mode.boss={
 				"step 2"
 				if(result.targets.length){
 					result.targets[0].loseHp();
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card){
+						if(get.tag(card,'loseCard')){
+							return [0.5,1];
+						}
+					}
+				}
+			}
+		},
+		boss_huixin:{
+			trigger:{player:'loseEnd'},
+			frequent:true,
+			unique:true,
+			filter:function(event,player){
+				return _status.currentPhase!=player;
+			},
+			content:function(){
+				"step 0"
+				player.draw();
+				player.judge();
+				"step 1"
+				if(result.color=='black'){
+					_status.currentPhase.loseHp();
+				}
+				else{
+					player.recover();
 				}
 			},
 			ai:{
@@ -1222,9 +1275,11 @@ mode.boss={
 
 		tinqin:'听琴',
 		boss_guihan:'归汉',
-		boss_guihan_info:'觉醒技，当所有敌人失去技能后，你摸两张牌并将体力回复至体力上限，然后令所有敌人将体力上限减至1',
+		boss_guihan_info:'限定技，濒死阶段，你可以将体力回复至体力上限，摸4张牌，令所有敌人的技能恢复，并获得技能【听琴】、【蕙质】',
+		boss_huixin:'蕙质',
+		boss_huixin_info:'每当你于回合外失去牌，可以摸一张牌并进行一次判定，若为黑色，当前回合角色失去一点体力，否则你回复一点体力',
 		boss_hujia:'胡笳',
-		boss_hujia_info:'回合结束阶段，若你已受伤，可以弃置一张牌令一名其他角色的所有技能失效，若其所有技能已失效，改为令其失去所有技能',
+		boss_hujia_info:'回合结束阶段，若你已受伤，可以弃置一张牌令一名其他角色的所有技能失效，若其所有技能已失效，改为令其失去一点体力上限',
 		boss_honglian:'红莲',
 		boss_honglian_info:'锁定技，回合结束阶段，你摸两张牌，并对所有敌人造成一点火焰伤害',
 		huoshen:'火神',

@@ -1,3 +1,4 @@
+'use strict';
 card.ex={
 	card:{
 		hanbing:{
@@ -28,7 +29,7 @@ card.ex={
 		hanbing_skill:{
 			trigger:{player:'shaHit'},
 			direct:true,
-			filter:function(event,player){
+			filter:function(event){
 				return event.target.get('he').length>0;
 			},
 			content:function(){
@@ -42,10 +43,10 @@ card.ex={
 					if(eff<=0) return ai.get.buttonValue(button);
 					if(trigger.target.hp==1) return false;
 					if(player.skills.contains('jiu')||player.skills.contains('tianxianjiu')) return false;
-					if(ui.dialog.buttons.length<2) return -1;
+					if(_status.event.dialog.buttons.length<2) return -1;
 					var num=0;
-					for(var i=0;i<ui.dialog.buttons.length;i++){
-						if(ai.get.buttonValue(ui.dialog.buttons[i])>1.5) num++;
+					for(var i=0;i<_status.event.dialog.buttons.length;i++){
+						if(ai.get.buttonValue(_status.event.dialog.buttons[i])>1.5) num++;
 					}
 					if(num>=2) return ai.get.buttonValue(button)-1.5;
 				});
@@ -64,7 +65,7 @@ card.ex={
 			trigger:{target:'shaBefore'},
 			forced:true,
 			priority:6,
-			filter:function(event,player){
+			filter:function(event){
 				if(event.player.num('s','unequip')) return false;
 				return (event.card.name=='sha'&&get.color(event.card)=='black')
 			},

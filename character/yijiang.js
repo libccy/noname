@@ -1347,7 +1347,7 @@ character.yijiang={
 					event.finish();
 				}
 				"step 2"
-				if(result.bool){
+				if(result.bool&&result.targets.length){
 					game.log(get.translation(player)+'指定的出杀目标为'+get.translation(result.targets));
 					event.target.line(result.targets);
 					event.target.chooseToUse('对'+get.translation(result.targets)+'使用一张杀，或令'+get.translation(player)+'获得你的两张牌',{name:'sha'},result.targets[0],-1);
