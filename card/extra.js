@@ -309,6 +309,7 @@ card.extra={
 			},
 		},
 		guding_skill:{
+			audio:true,
 			trigger:{source:'damageBegin'},
 			filter:function(event){
 				if(event.card&&event.card.name=='sha'){
@@ -332,6 +333,7 @@ card.extra={
 			trigger:{target:'useCardToBefore'},
 			forced:true,
 			priority:6,
+			audio:true,
 			filter:function(event,player){
 				if(event.player.num('s','unequip')) return false;
 				if(event.card.name=='nanman') return true;
@@ -362,6 +364,7 @@ card.extra={
 			filter:function(event){
 				if(event.nature=='fire') return true;
 			},
+			audio:true,
 			forced:true,
 			content:function(){
 				trigger.num++;
@@ -396,6 +399,7 @@ card.extra={
 			filter:function(event,player){
 				if(event.card.name=='sha'&&!event.card.nature) return true;
 			},
+			audio:true,
 			check:function(event,player){
 				var att=ai.get.attitude(player,event.target);
 				if(event.target.hasSkillTag('nofire')){

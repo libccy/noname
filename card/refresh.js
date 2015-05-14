@@ -202,7 +202,8 @@ card.refresh={
 			filter:function(event,player){
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].name=='muniu'&&event.cards[i].original=='e'&&
-						player.skills.contains('muniu_skill6')==false) return true;
+						player.skills.contains('muniu_skill6')==false&&
+						get.position(event.cards[i])==='d') return true;
 				}
 				return false;
 			},

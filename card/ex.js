@@ -29,12 +29,13 @@ card.ex={
 		hanbing_skill:{
 			trigger:{player:'shaHit'},
 			direct:true,
+			audio:true,
 			filter:function(event){
 				return event.target.get('he').length>0;
 			},
 			content:function(){
 				"step 0"
-				player.choosePlayerCard('是否发动【寒冰剑】？','he',trigger.target,[1,2],function(button){
+				player.choosePlayerCard('是否发动【寒冰剑】？','he',trigger.target,Math.min(2,trigger.target.num('he')),function(button){
 					var eff=ai.get.damageEffect(trigger.target,player,player);
 					if(ai.get.attitude(player,trigger.target)>0){
 						if(eff>=0) return false;
@@ -55,7 +56,7 @@ card.ex={
 					trigger.untrigger();
 					var cards=[];
 					for(var i=0;i<result.buttons.length;i++) cards.push(result.buttons[i].link);
-					player.logSkill('hanbing');
+					player.logSkill('hanbing_skill');
 					trigger.unhurt=true;
 					trigger.target.discard(cards);
 				}
@@ -65,6 +66,7 @@ card.ex={
 			trigger:{target:'shaBefore'},
 			forced:true,
 			priority:6,
+			audio:true,
 			filter:function(event){
 				if(event.player.num('s','unequip')) return false;
 				return (event.card.name=='sha'&&get.color(event.card)=='black')

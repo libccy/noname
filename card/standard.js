@@ -987,6 +987,7 @@ card.standard={
 		cixiong_skill:{
 			trigger:{player:'shaBegin'},
 			priority:5,
+			audio:true,
 			filter:function(event,player){
 				if(player.sex=='male'&&event.target.sex=='female') return true;
 				if(player.sex=='female'&&event.target.sex=='male') return true;
@@ -1028,6 +1029,7 @@ card.standard={
 			selectCard:2,
 			position:'h',
 			viewAs:{name:'sha'},
+			audio:true,
 			prompt:'将两张手牌当杀使用或打出',
 			check:function(card){return 6-ai.get.useful(card)},
 			ai:{
@@ -1037,6 +1039,7 @@ card.standard={
 		guanshi_skill:{
 			trigger:{player:'shaMiss'},
 			direct:true,
+			audio:true,
 			filter:function(event,player){
 				return player.num('he')>2;
 			},
@@ -1058,7 +1061,7 @@ card.standard={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('guanshi');
+					player.logSkill('guanshi_skill');
 					trigger.untrigger();
 					trigger.trigger('shaHit');
 					trigger._result.bool=false;
@@ -1081,15 +1084,17 @@ card.standard={
 		},
 		qilin_skill:{
 			trigger:{player:'shaHit'},
-			popup:false,
 			filter:function(event,player){
 				return event.target.get('e',{subtype:['equip3','equip4']}).length>0
 			},
+			direct:true,
+			audio:true,
 			content:function(){
 				"step 0"
 				player.chooseButton(ui.create.dialog('选择要弃置的马',trigger.target.get('e',{subtype:['equip3','equip4']})));
 				"step 1"
 				if(result.bool){
+					player.logSkill('qilin_skill');
 					trigger.target.discard(result.buttons[0].link);
 				}
 			}
@@ -1101,6 +1106,7 @@ card.standard={
 				if(event.parent.player.num('s','unequip')) return false;
 				return true;
 			},
+			audio:true,
 			content:function(){
 				"step 0"
 				player.judge('bagua',function(card){return (get.color(card)=='red')?1.5:-0.5});

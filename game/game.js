@@ -1142,7 +1142,7 @@ window.play={};
 								game.playAudio('card',sex,card.name);
 							}
 						}
-						else{
+						else if(get.type(card)!='equip'){
 							game.playAudio('card/default');
 						}
 					}
@@ -1283,15 +1283,14 @@ window.play={};
 					var info=get.info(event.skill);
 					event._skill=event.skill;
 					if(lib.config.background_speak&&!lib.skill.global.contains(event.skill)){
-						if(info.audio){
-							game.playAudio('skill',event.skill,Math.ceil(info.audio*Math.random()));
+						if(typeof info.audio=='number'){
+							game.playAudio('skill',event.skill+Math.ceil(info.audio*Math.random()));
+						}
+						else if(info.audio){
+							game.playAudio('skill',event.skill);
 						}
 						else if(lib.config.background_ogg){
 							game.playAudio('skill',event.skill);
-						}
-						else{
-							game.playAudio('skill','default',
-							player.sex=='female'?'female':'male',Math.ceil(Math.random()*5));
 						}
 					}
 					if(player.checkShow){
@@ -1611,7 +1610,7 @@ window.play={};
 				damage:function(){
 					"step 0"
 					if(lib.config.background_audio){
-						game.playAudio('effect','damage_'+(player.sex==='female'?'female':'male'));
+						game.playAudio('effect','damage'+(num>1?'2':''));
 					}
 					var str=get.translation(player)+'受到了';
 					if(source) str+='来自'+(source==player?'自己':get.translation(source)+'的');
@@ -1655,6 +1654,9 @@ window.play={};
 				},
 				loseHp:function(){
 					"step 0"
+					if(lib.config.background_audio){
+						game.playAudio('effect','loseHp');
+					}
 					game.log(get.translation(player)+'失去了'+get.cnNumber(num)+'点体力')
 					player.changeHp(-num);
 					"step 1"
@@ -1793,9 +1795,9 @@ window.play={};
 						else if(lib.config.background_ogg){
 							game.playAudio('die',player.name);
 						}
-					}
-					if(lib.config.background_audio){
-						game.playAudio('effect','die_'+(player.sex==='female'?'female':'male'));
+						else if(lib.config.background_audio){
+							game.playAudio('effect','die_'+(player.sex==='female'?'female':'male'));
+						}
 					}
 					if(player==game.me&&!_status.over){
 						ui.control.show();
@@ -1816,7 +1818,7 @@ window.play={};
 				},
 				equip:function(){
 					"step 0"
-					if(get.owner(card)) get.owner(card).lose(card);
+					if(get.owner(card)) get.owner(card).lose(card,ui.special);
 
 					if(card.clone){
 						card.clone.moveTo(player,Math.random()<0.8?'flip':'rotate').delete();
@@ -1934,6 +1936,7 @@ window.play={};
 						game.log(get.translation(player)+'被连环');
 					}
 					player.classList.toggle('linked');
+					game.playAudio('effect','link');
 				},
 
 			},
@@ -3435,15 +3438,15 @@ window.play={};
 					}
 					var info=lib.skill[name];
 					if(info&&lib.config.background_speak){
-						if(info.audio){
-							game.playAudio('skill',name,Math.ceil(info.audio*Math.random()));
+						if(typeof info.audio==='number'){
+							game.playAudio('skill',name+Math.ceil(info.audio*Math.random()));
+						}
+						else if(info.audio){
+							game.playAudio('skill',name);
 						}
 						else{
 							if(lib.config.background_ogg){
 								game.playAudio('skill',name);
-							}
-							else{
-								game.playAudio('skill','default',Math.ceil(Math.random()*5));
 							}
 						}
 					}
@@ -5222,6 +5225,17 @@ window.play={};
 			_status.over=true;
 			ui.control.show();
 			ui.clear();
+			if(lib.config.background_audio){
+				if(result===true){
+					game.playAudio('effect','win');
+				}
+				else if(result===false){
+					game.playAudio('effect','lose');
+				}
+				else{
+					game.playAudio('effect','tie');
+				}
+			}
 			if(result===true) result='战斗胜利';
 			if(result===false) result='战斗失败';
 			if(result==undefined) result='战斗结束';

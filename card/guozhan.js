@@ -1,3 +1,4 @@
+'use strict';
 card.guozhan={
 	card:{
 		yuanjiao:{
@@ -104,7 +105,7 @@ card.guozhan={
 				target.chooseToDiscard(2,'he',true).ai=ai.get.disvalue;
 			},
 			ai:{
-				wuxie:function(target,card,player,viewer){
+				wuxie:function(){
 					if(lib.config.mode=='guozhan'){
 						return 0;
 					}
@@ -184,6 +185,7 @@ card.guozhan={
 			}
 		},
 		sanjian_skill:{
+			audio:true,
 			trigger:{source:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
@@ -213,7 +215,7 @@ card.guozhan={
 				});
 				"step 1"
 				if(result.bool){
-					player.logSkill('sanjian');
+					player.logSkill('sanjian_skill');
 					player.discard(result.cards);
 					result.targets[0].damage();
 				}

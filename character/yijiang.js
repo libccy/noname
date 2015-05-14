@@ -2445,8 +2445,8 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				event.cards=[targets[0].get('e'),targets[1].get('e')];
-				targets[0].lose(event.cards[0]);
-				targets[1].lose(event.cards[1]);
+				targets[0].lose(event.cards[0],ui.special);
+				targets[1].lose(event.cards[1],ui.special);
 				if(event.cards[0].length) targets[0].$give(event.cards[0],targets[1]);
 				if(event.cards[1].length) targets[1].$give(event.cards[1],targets[0]);
 				"step 1"
