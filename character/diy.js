@@ -15,7 +15,7 @@ character.diy={
 		diy_huangzhong:['male','shu',4,['liegong','fuli'],['fullskin']],
 		diy_weiyan:['male','shu',4,['diykuanggu'],['fullskin']],
 		diy_zhenji:['female','wei',3,['jiaoxia','yiesheng'],['fullskin']],
-		diy_menghuo:['male','shu',4,['huoshou','zaiqix'],['fullskin']],
+		// diy_menghuo:['male','shu',4,['huoshou','zaiqix'],['fullskin']],
 		re_huangyueying:['female','shu',3,['rejizhi','qicai'],['fullskin']],
 		old_zhonghui:['male','wei',3,['zzhenggong','zquanji','zbaijiang'],['fullskin']],
 	},

@@ -490,13 +490,13 @@ mode.boss={
 			loopType:2
 		},
 		boss_zuoci:{
-			chongzheng:3,
+			chongzheng:4,
 		},
 		boss_diaochan:{
-			chongzheng:3,
+			chongzheng:4,
 		},
 		boss_huatuo:{
-			chongzheng:3,
+			chongzheng:4,
 		},
 		global:{
 			loopType:1,
@@ -518,11 +518,20 @@ mode.boss={
 		boss_zuoci:['male','qun',0,['huanhua'],['fullskin','boss'],'shu'],
 		// boss_yuji:['male','qun',8,[],['fullskin','boss'],'nei'],
 		boss_diaochan:['female','qun',4,['fengwu','yunshen','lianji','boss_wange','yuehun'],['fullskin','boss'],'qun'],
-		boss_huatuo:['male','qun',6,['chulao','mazui','boss_shengshou','guizhen'],['fullskin','boss'],'wu'],
+		boss_huatuo:['male','qun',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['fullskin','boss'],'wu'],
 		boss_dongzhuo:['male','qun',20,['jiuchi','boss_qiangzheng','boss_baolin'],['fullskin','boss'],'shu'],
 		// boss_shuijing:['male','qun',8,[],['fullskin','boss'],'wei'],
 	},
 	skill:{
+		wuqin:{
+			trigger:{player:'phaseBegin'},
+			filter:function(event,player){
+				return player.num('h')==0;
+			},
+			content:function(){
+				player.draw(2)
+			}
+		},
 		boss_baolin:{
 			inherit:'juece',
 		},
@@ -1230,6 +1239,8 @@ mode.boss={
 		guizhen_info:'每当你失去最后一张手牌，你可以所有敌人失去全部手牌（不触发技能）',
 		boss_shengshou:'圣手',
 		boss_shengshou_info:'每当你使用一张牌，你可以进行一次判定，若为红色，你回复一点体力',
+		wuqin:'五禽戏',
+		wuqin_info:'回合开始阶段，若你没有手牌，可以摸两张牌',
 
 		boss_konghun:'控心',
 		boss_konghun_info:'回合结束阶段，你可以指定一名敌人令其进入混乱状态（不受对方控制，并将队友视为敌人）直到下一回合开始',

@@ -1,7 +1,7 @@
 window.config={
 	forbidai:['zuoci','caiwenji'],
 	forbidsingle:['huanggai','caoren','machao','pangde','yanwen','xiahoudun','xuzhu','luxun',
-	'xuhuang','yujin','xiaoqiao','daqiao','zhangjiao','menghuo','zhangbao'],
+	'xuhuang','yujin','xiaoqiao','daqiao','zhangjiao','zhangbao'],
 	forbidall:['caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu',
 	'xiahouyuan','huangzhong','weiyan','dianwei','gongsunzan'],
 	forbidversus:['swd_kangnalishi'],
