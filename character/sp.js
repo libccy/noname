@@ -1098,7 +1098,6 @@ character.sp={
 			filter:function(event,player){
 				if(event.player.num('h')) return false;
 				if(_status.currentPhase==event.player) return false;
-				if(event.player==player) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].original=='h') return true;
 				}

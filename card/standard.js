@@ -677,7 +677,7 @@ card.standard={
 							return 0;
 						}
 						if(target.num('h','sha')>player.num('h','sha')){
-							return -2;
+							if(Math.random()<0.5) return -2;
 						}
 						return -0.5;
 					}

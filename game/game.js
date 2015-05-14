@@ -1935,8 +1935,10 @@ window.play={};
 					else{
 						game.log(get.translation(player)+'被连环');
 					}
+					if(lib.config.background_audio){
+						game.playAudio('effect','link');
+					}
 					player.classList.toggle('linked');
-					game.playAudio('effect','link');
 				},
 
 			},

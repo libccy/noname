@@ -577,9 +577,13 @@ character.yijiang={
 		xiantu:{
 			unique:true,
 			gainnable:true,
+			forceunique:true,
 			trigger:{global:'phaseUseBegin'},
 			filter:function(event,player){
 				return event.player!=player&&player.num('h')>0;
+			},
+			prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【献图】？'
 			},
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)<5) return false;
