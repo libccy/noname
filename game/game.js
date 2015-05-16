@@ -8187,8 +8187,12 @@ window.play={};
 			},
 			volumn_background:function(e){
 				if(_status.dragged) return;
-				game.saveConfig('volumn_background',this.link);
-				ui.backgroundMusic.volume=this.link/8;
+				var volume=this.link;
+				if(volume===1&&lib.config.volumn_background===1){
+					volume=0;
+				}
+				game.saveConfig('volumn_background',volume);
+				ui.backgroundMusic.volume=volume/8;
 				for(var i=0;i<8;i++){
 					if(i<lib.config.volumn_background){
 						this.parentNode.childNodes[i].innerHTML='●';
@@ -8201,7 +8205,11 @@ window.play={};
 			},
 			volumn_audio:function(e){
 				if(_status.dragged) return;
-				game.saveConfig('volumn_audio',this.link);
+				var volume=this.link;
+				if(volume===1&&lib.config.volumn_audio===1){
+					volume=0;
+				}
+				game.saveConfig('volumn_audio',volume);
 				for(var i=0;i<8;i++){
 					if(i<lib.config.volumn_audio){
 						this.parentNode.childNodes[i].innerHTML='●';
