@@ -1004,7 +1004,7 @@ character.sp={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('zhendu');
+					player.logSkill('zhendu',trigger.player);
 					trigger.player.damage();
 				}
 				else{

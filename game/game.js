@@ -1318,6 +1318,9 @@ window.play={};
 						else if(info.line=='thunder'){
 							config.color='thunder';
 						}
+						else if(info.line===undefined){
+							config.color='green';
+						}
 						if(info.multitarget&&!info.multiline&&targets.length>1){
 							player.line2(targets,config);
 						}
@@ -3430,6 +3433,9 @@ window.play={};
 						}
 					}
 					if(nature!=false){
+						if(nature===undefined){
+							nature='green';
+						}
 						this.line(targets,nature);
 					}
 					if(lib.skill[name]&&lib.skill[name].ai&&lib.skill[name].ai.expose!=undefined&&this.logAi){

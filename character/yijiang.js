@@ -791,7 +791,7 @@ character.yijiang={
 					player.addSkill('chanhui2');
 					event.target=result.targets[0];
 					setTimeout(function(){
-						player.logSkill('chanhui',event.target,'green');
+						player.logSkill('chanhui',event.target);
 					},200);
 					event.target.chooseCard('交给'+get.translation(player)+'一张手牌，或成为'+
 					get.translation(trigger.card)+'的额外目标').ai=function(card){
