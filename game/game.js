@@ -5094,6 +5094,7 @@ window.play={};
 				}
 				else{
 					this.src=str+name+Math.ceil(Math.random()*2)+'.mp3';
+					this._changed=true;
 				}
 			};
 			ui.window.appendChild(audio);
