@@ -1290,7 +1290,7 @@ window.play={};
 							game.playAudio('skill',event.skill);
 						}
 						else if(lib.config.background_ogg){
-							game.playAudio('skill',event.skill);
+							game.playSkillAudio(event.skill);
 						}
 					}
 					if(player.checkShow){
@@ -3448,7 +3448,7 @@ window.play={};
 						}
 						else{
 							if(lib.config.background_ogg){
-								game.playAudio('skill',name);
+								game.playSkillAudio(name);
 							}
 						}
 					}
@@ -5053,9 +5053,13 @@ window.play={};
 		version:0.912,
 		playAudio:function(){
 			var str='';
+			var onerror=null;
 			for(var i=0;i<arguments.length;i++){
 				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
 					str+='/'+arguments[i];
+				}
+				else if(typeof arguments[i]==='function'){
+					onerror=arguments[i];
 				}
 			}
 			var audio=document.createElement('audio');
@@ -5066,26 +5070,31 @@ window.play={};
 				this.remove();
 			});
 			audio.onerror=function(){
-				this.remove();
+				if(onerror){
+					onerror.call(this);
+				}
+				else{
+					this.remove();
+				}
 			};
 			ui.window.appendChild(audio);
 		},
-		playAudioOgg:function(){
-			var str='';
-			for(var i=0;i<arguments.length;i++){
-				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
-					str+='/'+arguments[i];
-				}
-			}
+		playSkillAudio:function(name){
+			var str='audio/skill/';
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			audio.src='audio-ogg'+str+'.ogg';
+			audio.src=str+name+'.mp3';
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
-			audio.onerror=function(e){
-				this.remove();
+			audio.onerror=function(){
+				if(this._changed){
+					this.remove();
+				}
+				else{
+					this.src=str+name+Math.ceil(Math.random()*2)+'.mp3';
+				}
 			};
 			ui.window.appendChild(audio);
 		},
