@@ -5059,13 +5059,9 @@ window.play={};
 		version:0.912,
 		playAudio:function(){
 			var str='';
-			var onerror=null;
 			for(var i=0;i<arguments.length;i++){
 				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
 					str+='/'+arguments[i];
-				}
-				else if(typeof arguments[i]==='function'){
-					onerror=arguments[i];
 				}
 			}
 			var audio=document.createElement('audio');
@@ -5076,11 +5072,12 @@ window.play={};
 				this.remove();
 			});
 			audio.onerror=function(){
-				if(onerror){
-					onerror.call(this);
+				if(this._changed){
+					this.remove();
 				}
 				else{
-					this.remove();
+					this.src='audio'+str+'.ogg';
+					this._changed=true;
 				}
 			};
 			ui.window.appendChild(audio);
@@ -5094,13 +5091,27 @@ window.play={};
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
+			audio._changed=1;
 			audio.onerror=function(){
-				if(this._changed){
-					this.remove();
-				}
-				else{
-					this.src=str+name+Math.ceil(Math.random()*2)+'.mp3';
-					this._changed=true;
+				switch(this._changed){
+					case 1:{
+						audio.src=str+name+'.ogg';
+						this._changed=2;
+						break;
+					}
+					case 2:{
+						audio.src=str+name+Math.ceil(Math.random()*2)+'.mp3';
+						this._changed=3;
+						break;
+					}
+					case 3:{
+						audio.src=str+name+Math.ceil(Math.random()*2)+'.ogg';
+						this._changed=4;
+						break;
+					}
+					default:{
+						this.remove();
+					}
 				}
 			};
 			ui.window.appendChild(audio);
