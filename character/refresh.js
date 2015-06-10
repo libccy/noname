@@ -856,25 +856,28 @@ character.refresh={
 			usable:1,
 			filterCard:true,
 			check:function(card){
-				return 9-ai.get.value(card);
+				return 8-ai.get.value(card);
 			},
 			position:'he',
 			content:function(){
 				player.loseHp();
 			},
 			ai:{
-				order:9,
+				order:8,
 				result:{
 					player:function(player){
-						if(player.hp<=2) return 0;
-						if(player.num('h')+1<player.hp) return 1;
-						return  0;
+						if(player.hp<=2) return player.num('h')==0?1:0;
+						return player.num('h')<player.hp?1:0;
 					}
 				},
 				effect:function(card,player){
 					if(get.tag(card,'damage')){
 						if(player.skills.contains('jueqing')) return [1,1];
 						return 1.2;
+					}
+					if(get.tag(card,'loseHp')){
+						if(player.hp<=1) return;
+						return [0,0];
 					}
 				}
 			}

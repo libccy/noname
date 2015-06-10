@@ -2845,7 +2845,7 @@ character.swd={
 					}
 				}
 				player.chooseControl('失去体力','回复体力','cancel',
-				ui.create.dialog('是否发动【琴音】')).ai=function(){
+				ui.create.dialog('是否发动【琴音】','hidden')).ai=function(){
 					// console.log(lose,recover);
 					if(lose>recover&&lose>0) return 0;
 					if(lose<recover&&recover>0) return 1;
@@ -3545,44 +3545,6 @@ character.swd={
 				table.firstChild.firstChild.style.width='85px';
 				table.firstChild.childNodes[1].style.width='48px';
 				player.storage.kunlunjing3=table.outerHTML;
-			}
-		},
-		swdshelie:{
-			trigger:{player:'phaseDrawBefore'},
-			content:function(){
-				"step 0"
-				trigger.untrigger();
-				trigger.finish();
-				"step 1"
-				event.cards=get.cards(5);
-				if(event.isMine()==false){
-					event.dialog=ui.create.dialog('涉猎',event.cards);
-					game.delay(2);
-				}
-				"step 2"
-				if(event.dialog) event.dialog.close();
-				var dialog=ui.create.dialog('涉猎',event.cards);
-				player.chooseButton([0,5],dialog,true).filterButton=function(button){
-					for(var i=0;i<ui.selected.buttons.length;i++){
-						if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
-					}
-					return true;
-				}
-				"step 3"
-				var cards2=[];
-				for(var i=0;i<result.buttons.length;i++){
-					cards2.push(result.buttons[i].link);
-					cards.remove(result.buttons[i].link);
-				}
-				player.gain(cards2);
-				if(cards2.length) player.$gain(cards2);
-				for(var i=0;i<cards.length;i++){
-					ui.discardPile.appendChild(cards[i]);
-				}
-				game.delay(2);
-			},
-			ai:{
-				threaten:1.2
 			}
 		},
 		oldliaoyuan:{
@@ -5347,6 +5309,7 @@ character.swd={
 			frequent:true,
 			filter:function(event,player){
 				if(!event.cards) return false;
+				if(event.cards.length!=1) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(get.suit(event.cards[i])=='club') return true;
 				}
@@ -7919,7 +7882,6 @@ character.swd={
 		mailun32:'脉轮',
 		mailun41:'脉轮',
 		mailun42:'脉轮',
-		swdshelie:'涉猎',
 		kunlunjing:'镜界',
 		kunlunjing1:'镜界',
 		kunlunjing2:'镜界',
@@ -7932,7 +7894,6 @@ character.swd={
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
 		kunlunjing_info:'回合开始前或当你受到一次伤害后，你可以令场上所有牌还原到你上一回合结束后的位置；若在回合开始前发动，你流失一点体力',
-		swdshelie_info:'摸牌阶段，你可以放弃摸牌，改为从牌堆顶亮出五张牌，你获得不同花色的牌各一张，将其余的牌置入弃牌堆。',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌，每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',

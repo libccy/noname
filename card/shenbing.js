@@ -34,6 +34,9 @@ card.shenbing={
 			trigger:{player:'damageBegin'},
 			priority:10,
 			forced:true,
+			filter:function(event){
+				return event.num>0;
+			},
 			content:function(){
 				trigger.num--;
 				player.addSkill('huxinjing2');

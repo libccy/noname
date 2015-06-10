@@ -475,9 +475,11 @@ character.diy={
 							}
 							var be=target.num('e',{color:'black'});
 							if(target.num('h','shan')&&be){
+								if(!target.skills.contains('guidao')) return 0;
 								return [0,hastarget?target.num('he')/2:0];
 							}
 							if(target.num('h','shan')&&target.num('h')>2){
+								if(!target.skills.contains('guidao')) return 0;
 								return [0,hastarget?target.num('h')/4:0];
 							}
 							if(target.num('h')>3||(be&&target.num('h')>=2)){
@@ -489,6 +491,7 @@ character.diy={
 							if(target.num('h')==1&&!be){
 								return [1.2,0];
 							}
+							if(!target.skills.contains('guidao')) return [1,0.05];
 							return [1,Math.min(0.5,(target.num('h')+be)/4)];
 						}
 					}

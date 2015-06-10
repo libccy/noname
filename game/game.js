@@ -3693,8 +3693,11 @@ window.play={};
 						}
 						if(lib.skill[skill].mark){
 							if(lib.skill[skill].mark=='card'&&
-							get.itemtype(this.storage[skill])=='card'){
-								this.markSkill(skill,null,this.storage[skill]);
+								get.itemtype(this.storage[skill])=='card'){
+									this.markSkill(skill,null,this.storage[skill]);
+							}
+							else if(lib.skill[skill].mark=='image'){
+									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]));
 							}
 							else{
 								this.markSkill(skill);

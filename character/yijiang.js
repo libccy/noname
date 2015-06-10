@@ -2845,8 +2845,12 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				player.judge(function(card){
-					if(get.color(card)=='red') return 1;
-					if(player.skills.contains('shibei2')) return -1;
+					if(player.skills.contains('shibei2')){
+						if(get.color(card)=='black') return -1;
+					}
+					else{
+						if(get.color(card)=='red') return 1;
+					}
 					return 0;
 				})
 				"step 1"
@@ -3164,7 +3168,7 @@ character.yijiang={
 		zpaiyi:'排异',
 		zpaiyi_info:'回合结束阶段，将一张“权”移动到任何合理的区域，若不是你的区域，你可以摸一张牌',
 		shibei:'矢北',
-		shibei_info:'锁定技，每当你受到一次伤害，需进行一次判定，若结果为红色，你回复一点体力；若结果为黑色且你在本回合内受到过不止一次伤害，你失去一点体力',
+		shibei_info:'锁定技，每当你受到一次伤害，需进行一次判定，若结果为红色且是你回合内受到的第一次伤害，你回复一点体力；若结果为黑色且你在本回合内受到过不止一次伤害，你失去一点体力',
 		jianying:'渐营',
 		jianying_info:'每当你于出牌阶段内使用的牌与此阶段你使用的上一张牌点数或花色相同时，你可以摸一张牌',
 		xinenyuan:'恩怨',

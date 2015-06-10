@@ -833,7 +833,7 @@ character.xianjian={
 			},
 			content:function(){
 				if(target.num('he')){
-					player.discardPlayerCard(target,'he').ai=function(){
+					player.discardPlayerCard(target,'he',true).ai=function(){
 						if(ai.get.attitude(player,target)<0){
 							return ai.get.buttonValue.apply(this,arguments);
 						}

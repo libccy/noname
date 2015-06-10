@@ -1766,7 +1766,9 @@ character.sp={
 			enable:'chooseToUse',
 			direct:true,
 			filter:function(event,player){
-				return _status.currentPhase!==player&&event.parent.name!='_wuxie1'&&event.parent.name!='_wuxie2';
+				return _status.currentPhase!==player&&
+				event.parent.name!='_wuxie1'&&event.parent.name!='_wuxie2'&&
+				event.parent.name!='_chenhuodajie';
 			},
 			delay:0,
 			content:function(){

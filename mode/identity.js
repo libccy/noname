@@ -150,8 +150,7 @@ mode.identity={
 				return game.players.randomGet(game.me,game.zhu);
 			};
 			next.ai=function(player,list,list2){
-				switch(player.identity){
-					case 'zhu':
+				if(player.identity=='zhu'){
 					list2.randomSort();
 					var choice,choice2;
 					if(Math.random()-0.8<0&&list2.length){
@@ -176,9 +175,8 @@ mode.identity={
 						player.maxHp++;
 						player.update();
 					}
-					break;
-
-					case 'zhong':
+				}
+				else if(player.identity=='zhong'&&Math.random()<0.5){
 					var choice=0;
 					for(var i=0;i<list.length;i++){
 						if(lib.character[list[i]][1]==game.zhu.group){
@@ -191,9 +189,8 @@ mode.identity={
 					else{
 						player.init(list[choice]);
 					}
-					break;
-
-					default:
+				}
+				else{
 					if(get.config('double_character')){
 						player.init(list[0],list[1]);
 					}

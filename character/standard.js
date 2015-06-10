@@ -878,7 +878,7 @@ character.standard={
 		},
 		kurou:{
 			enable:'phaseUse',
-			prompt:'流失1点体力并摸两张牌',
+			prompt:'失去一点体力并摸两张牌',
 			content:function(){
 				"step 0"
 				player.loseHp(1);
@@ -1289,10 +1289,7 @@ character.standard={
 							return -3;
 						}
 						else{
-							var num=ui.selected.targets[0].num('h');
-							if(num==0) return 0;
-							if(num==1) return -0.1;
-							return -2;
+							return ai.get.effect(ui.selected.targets[0],{name:'juedou'},target,player);
 						}
 					}
 				},

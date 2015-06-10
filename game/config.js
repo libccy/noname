@@ -12,7 +12,9 @@ window.config={
 	layoutfixed:['chess','boss'],
 	all:{
 		mode:['identity','guozhan','versus','boss','chess','stone'],
-		characters:['standard','wind','fire','woods','mountain','extra','sp','yijiang','refresh','guozhan','jiange','zhuogui','diy','yxs','swd','xswd','gujian','xianjian'],
+		characters:['standard','wind','fire','woods','mountain',
+		'extra','sp','yijiang','refresh','guozhan',
+		'jiange','zhuogui','diy','hearth','yxs','swd','xswd','gujian','xianjian'],
 		cards:['standard','ex','extra','refresh','guozhan','zhenfa','qimou','yibao','shenbing','wanxiang','swd','shenqi','compensate'],
 		plays:['character','soldier','wuxing'],
 		layout:['default','newlayout'],
@@ -68,6 +70,7 @@ window.config={
 		extra_character_config:'神将',
 		swd_character_config:'轩辕剑',
 		xswd_character_config:'轩辕剑·二',
+		hearth_character_config:'炉石传说',
 		yxs_character_config:'英雄杀',
 		gujian_character_config:'古剑奇谭',
 		xianjian_character_config:'仙剑',

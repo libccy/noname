@@ -194,9 +194,6 @@ character.mountain={
 				return player.num('h')>0;
 			},
 			direct:true,
-			check:function(event,player){
-
-			},
 			content:function(){
 				"step 0"
 				var check,i,num=0,num2=0;

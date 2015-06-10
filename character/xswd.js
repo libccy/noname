@@ -7,7 +7,7 @@ character.xswd={
 		swd_kendi:['male','qun',3,['guanxing','jianyan']],
 		swd_lijing:['male','qun',4,['tianyi','zhuhai']],
 		swd_lilian:['female','qun',3,['swd_wuxie','qingcheng']],
-		swd_linming:['male','qun',3,['swdshelie','bifa']],
+		swd_linming:['male','qun',3,['shelie','bifa']],
 		swd_philis:['male','qun',4,['yicong','wangxi']],
 		swd_pepin:['male','qun',4,['rejianxiong','quhu']],
 		swd_kangnalishi:['male','qun',1,['busi','xuying','yinguo']],
