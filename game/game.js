@@ -11352,10 +11352,8 @@ window.play={};
 				window.lib=lib;
 				window._status=_status;
 			},
-			h:function(num){
-				for(var i=0;i<game.players[num].num('h');i++){
-					console.log(game.players[num].num('h')[i].name)
-				}
+			h:function(player){
+				console.log(get.translation(player.get('h')));
 			},
 			g:function(name,target){
 				target=target||game.me;

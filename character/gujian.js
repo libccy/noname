@@ -450,7 +450,9 @@ character.gujian={
 					filterTarget:function(card,player,target){
 						return player!=target;
 					},
-					filterCard:true,
+					filterCard:function(card){
+						return get.color(card)=='red';
+					},
 					ai1:function(card){
 						return 9-ai.get.value(card);
 					},
@@ -1009,7 +1011,7 @@ character.gujian={
 		yuehua:'月华',
 		yuehua_info:'每当你于回合外使用、打出或弃置红色牌，你可以摸一张牌',
 		xuelu:'血戮',
-		xuelu_info:'回合结束阶段，你可以弃置一张牌并对一名其他角色造成X点火焰伤害，X为你已损失体力值的一半，向上取整',
+		xuelu_info:'回合结束阶段，你可以弃置一张红色牌并对一名其他角色造成X点火焰伤害，X为你已损失体力值的一半，向上取整',
 		fanshi:'反噬',
 		fanshi_info:'锁定技，若你于回合内造成过伤害，你于弃牌阶段结束时流失一点体力并摸一张牌',
 		shahun:'煞魂',

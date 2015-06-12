@@ -214,15 +214,12 @@ character.swd={
 				cardSavable:function(card,player){
 					if(get.type(card,'trick')=='trick') return false;
 				},
-				cardUsable:function(card,player){
-					if(get.type(card,'trick')=='trick') return false;
-					if(card.name=='sha') return Infinity;
-				}
 			},
 			enable:['chooseToUse','chooseToRespond'],
 			filterCard:function(card){
 				return get.type(card,'trick')=='trick';
 			},
+			selectCard:2,
 			viewAs:{name:'sha'},
 			check:function(){return 1},
 			ai:{
@@ -336,19 +333,18 @@ character.swd={
 				var nh=player.num('h');
 				var pos=get.position(card);
 				if(nh<2) return 0;
-				if(nh>5) return 0;
-				if(nh==5&&pos=='e') return 0;
+				if(nh>4) return 0;
+				if(nh==4&&pos=='e') return 0;
 				if(player.num('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card)+(pos=='e'?0.4:0);
 				}
-				// if(nh==6||(nh==5&&pos=='e')) return 8-ai.get.value(card);
 				return 5.5-ai.get.value(card)+(pos=='e'?0.4:0);
 			},
 			content:function(){
 				"step 0"
 				player.draw(player.num('h'));
 				"step 1"
-				if(player.num('h')>=10){
+				if(player.num('h')>=8){
 					player.damage(3,'fire');
 					player.addTempSkill('heihuo2','phaseAfter');
 				}
@@ -836,7 +832,7 @@ character.swd={
 				event.cards=cards;
 				game.delay(0.5);
 				player.chooseTarget('是否发动【镇威】？',function(card,player,target){
-					return target!=trigger.player;
+					return target!=trigger.player&&get.distance(player,target,'attack')<=1;
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(att<=0) return 0;
@@ -1055,11 +1051,18 @@ character.swd={
 			forced:true,
 			content:function(){
 				trigger.num++;
-			},
-			ai:{
-				threaten:1.2
+                player.addSkill('guaili2');
 			}
 		},
+        guaili2:{
+            trigger:{source:'damageEnd'},
+            forced:true,
+            popup:false,
+            content:function(){
+                player.removeSkill('guaili2');
+                player.chooseToDiscard(true);
+            }
+        },
 		xingzhui:{
 			enable:'phaseUse',
 			usable:1,
@@ -1079,32 +1082,26 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				if(!target.num('he')){
-					event.finish();
-				}
-				else{
-					event.type=get.type(cards[0],'trick');
-					var dme=ai.get.damageEffect(target,player,target);
-					target.chooseToDiscard('he',true,'星坠：请弃置一张牌（若不是'+get.translation(event.type)+'牌则受到1点伤害）').ai=function(card){
-						var val=ai.get.value(card);
-						if(get.type(card,'trick')==event.type){
-							return -dme-ai.get.value(card);
-						}
-						return -ai.get.value(card);
+				event.type=get.type(cards[0],'trick');
+				var dme=ai.get.damageEffect(target,player,target);
+				target.chooseToDiscard('he',function(card){
+					return get.type(card,'trick')==event.type;
+				},'弃置一张牌'+get.translation(event.type)+'牌，或受到1点伤害').ai=function(card){
+					if(dme<0){
+						return 8-ai.get.value(card);
 					}
+					return 0;
 				}
 				"step 1"
-				if(result.bool){
-					if(get.type(result.cards[0],'trick')!=event.type){
-						target.damage();
-					}
+				if(!result.bool){
+					target.damage();
 				}
 			},
 			ai:{
 				order:9,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player)-0.1;
+						return ai.get.damageEffect(target,player);
 					}
 				},
 				threaten:2,
@@ -1651,7 +1648,7 @@ character.swd={
 			enable:'phaseUse',
 			group:'jilve6',
 			direct:true,
-			// usable:3,
+			usable:3,
 			delay:0,
 			content:function(){
 				"step 0"
@@ -4072,28 +4069,6 @@ character.swd={
 				trigger.directHit=true;
 			}
 		},
-		// poxing:{
-		// 	trigger:{player:'shaEnd'},
-		// 	frequent:true,
-		// 	filter:function(trigger,player){
-		// 		// if(trigger.targets&&trigger.target!=trigger.targets[trigger.targets.length-1])return false;
-		// 		if(trigger.card&&trigger.card.skill=='poxing') return false;
-		// 		if(trigger.targets.length>1) return false;
-		// 		if(player.hp>trigger.target.hp) return false;
-		// 		if(trigger.target.classList.contains('dead')) return false;
-		// 		return true;
-		// 		// return (get.itemtype(trigger.card)=='card'&&player.hp<=trigger.target.hp&&trigger.target.classList.contains('dead')==false);
-		// 	},
-		// 	content:function(){
-		// 		player.useCard({
-		// 			name:'sha',
-		// 			nature:trigger.card.nature,
-		// 			number:trigger.card.number,
-		// 			suit:trigger.card.suit,
-		// 			skill:'poxing'
-		// 		},trigger.targets);
-		// 	}
-		// },
 		poxing:{
 			trigger:{source:'damageBegin'},
 			filter:function(trigger,player){
@@ -4728,20 +4703,29 @@ character.swd={
 			content:function(){
 				"step 0"
 				game.delay(0.5);
-				player.chooseTarget('是否发动【挟雷】？',function(card,player,target){
-					if(player==target) return false;
-					if(trigger.name=='respond'){
-						return trigger.source!=target;
+				player.chooseCardTarget({
+					prompt:'是否发动【挟雷】？',
+					filterCard:true,
+					filterTarget:function(card,player,target){
+						if(player==target) return false;
+						if(trigger.name=='respond'){
+							return trigger.source!=target;
+						}
+						else{
+							return !trigger.targets.contains(target);
+						}
+					},
+					ai1:function(card){
+						return 8-ai.get.value(card);
+					},
+					ai2:function(target){
+						return ai.get.damageEffect(target,player,player,'thunder');
 					}
-					else{
-						return !trigger.targets.contains(target);
-					}
-				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder');
-				}
+				});
 				"step 1"
 				if(result.bool){
 					player.logSkill('xielei',result.targets,'thunder');
+					player.discard(result.cards);
 					result.targets[0].damage('thunder');
 				}
 			},
@@ -7585,7 +7569,7 @@ character.swd={
 		pingxu:'冯虚',
 		pingxu_info:'锁定技，当你没有武器牌时，与其他角色的距离-1；当你没有防具牌时，其他角色与你的距离+1',
 		yudun:'愚钝',
-		yudun_info:'锁定技，你的锦囊牌均视为杀，你于回合内使用的杀无数量限制',
+		yudun_info:'锁定技，你无法使用锦囊牌，你可以将两张锦囊牌当作杀使用',
 		bingfeng:'冰封',
 		bingfeng2:'冰封',
 		bingfeng2_info:'不能使用或打出手牌',
@@ -7593,7 +7577,7 @@ character.swd={
 		guozao:'聒噪',
 		guozao_info:'锁定技，每当距离你1以内的角色受到一次伤害，若伤害来源不你，你须观看牌堆顶的三张牌，然后指定一名有手牌的角色将手牌与这些牌交换',
 		heihuo:'黑火',
-		heihuo_info:'出牌阶段，你可以弃置一张装备牌，令你的手牌数加倍；若你的手牌因此达到10张或更多，你立即受到3点火焰伤害且本回合内不能再次发动黑火',
+		heihuo_info:'出牌阶段，你可以弃置一张装备牌，令你的手牌数加倍；若你的手牌因此达到8张或更多，你立即受到3点火焰伤害且本回合内不能再次发动黑火',
 		yaotong:'妖瞳',
 		yaotong1:'妖瞳',
 		yaotong2:'妖瞳',
@@ -7655,12 +7639,12 @@ character.swd={
 		fuyan2:'覆岩',
 		fuyan_info:'每当你受到一次伤害，可以摸一张牌，并将一张牌置于一名角色的武将牌上称为“岩”；当其受到伤害时，须将“岩”置于弃牌堆，然后令伤害-1',
 		guaili:'怪力',
-		guaili_info:'锁定技，你的杀造成的伤害+1',
+		guaili_info:'锁定技，你的杀造成的伤害+1，造成伤害后需弃置一张牌',
 		pingshen:'凭神',
 		pingshen2:'凭神',
 		pingshen_info:'锁定技，受到过你的伤害的角色可在回合内对你发动一次【离魂】（每局限发动一次）',
 		xingzhui:'星坠',
-		xingzhui_info:'出牌阶段限一次，你可以弃置一张牌，并选择一名角色令其弃置一张牌，若其弃置的牌类别与你不同，其受到一点伤害',
+		xingzhui_info:'出牌阶段限一次，你可以弃置一张牌，并令一名角色弃置一张类别相同的牌，若则受到一点伤害',
 		lingxian:'凌仙',
 		lingxian_info:'每当你于回合外使用或打出一张手牌，你可以选择攻击范围外的一名其他角色与你各摸一张牌',
 		shouyin:'守印',
@@ -7683,7 +7667,7 @@ character.swd={
 		xiaozhan:'消战',
 		xiaozhan_info:'其他角色使用杀时，若你不是杀的目标，可以弃置一张杀取消之',
 		xielei:'挟雷',
-		xielei_info:'每当你使用或打出一张杀，可立即对一名目标以外的角色造成一点雷电伤害',
+		xielei_info:'每当你使用或打出一张杀，弃置一张牌并对目标以外的一名角色造成一点雷电伤害',
 		dangping:'荡平',
 		dangping_info:'每当你造成一次伤害，可以弃置一张手牌对其距离1以内的另一名角色造成一点伤害',
 		guisi:'归思',
@@ -7793,7 +7777,7 @@ character.swd={
 		xuanyuan_info:'锁定技，你无视轩辕剑的装备条件；失去轩辕剑时不流失体力',
 		jilve:'极略',
 		jilve2:'极略',
-		jilve_info:'回合内，你可以观看牌堆顶的两张牌，然后使用其中的基本牌或锦囊牌',
+		jilve_info:'回合内，你可以观看牌堆顶的两张牌，然后使用其中的基本牌或锦囊牌。每回合最多发动三次',
 		gongshen:'工神',
 		gongshen_info:'任意一名其他角色使用一张基本牌或锦囊牌指定目标后，你可以弃置一张装备牌令其失效',
 

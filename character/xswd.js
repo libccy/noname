@@ -28,7 +28,7 @@ character.xswd={
 
 
 			swd_hanluo:['male','qun',5,['hzhenwei'],['fullskin']],
-			swd_fu:['male','qun',5,['yudun'],['fullskin']],
+			swd_fu:['male','qun',5,['yudun','paoxiao'],['fullskin']],
 			swd_linyue:['male','wei',3,['zhenjiu','mazui'],['fullskin']],
 			swd_zidashu:['male','wu',3,['shoulie','hudun'],['fullskin']],
 			swd_maixing:['male','wu',3,['toudan','shending'],['fullskin']],

@@ -243,26 +243,6 @@ character.zhuogui={
                 }
             }
         },
-        zuijiu:{
-			trigger:{source:'damageBegin'},
-			filter:function(event){
-				return event.card&&event.card.name=='sha'&&get.color(event.card)=='black';
-			},
-			forced:true,
-			content:function(){
-				trigger.num++;
-                player.addSkill('zuijiu2');
-			}
-		},
-        zuijiu2:{
-            trigger:{source:'damageEnd'},
-            forced:true,
-            popup:false,
-            content:function(){
-                player.removeSkill('zuijiu2');
-                player.chooseToDiscard(true);
-            }
-        },
         suoling:{
             trigger:{player:'phaseEnd'},
             forced:true,
