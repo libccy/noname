@@ -31,14 +31,14 @@ character.swd={
 			swd_xiarou:['female','shu',3,['xianghui','huiqi'],['fullskin']],
 			swd_moye:['female','wu',3,['rexue','liuli'],['fullskin']],
 
-			swd_zhaoyun:['male','shu',4,['ningjian','pozhen','tanlin'],['fullskin']],
+			swd_zhaoyun:['male','shu',4,['longdan','pozhen','tanlin'],['fullskin']],
 			swd_hengai:['female','shu',3,['funiao','ningxian','lingbo'],['fullskin']],
 			swd_duanmeng:['female','shu',4,['jizhan','lieren'],['fullskin']],
 			swd_jiangwu:['male','shu',4,['yijue','dangping'],['fullskin']],
 			swd_tuwei:['male','shu',3,['zhanlu','susheng'],['fullskin']],
 			swd_yeyaxi:['female','shu',3,['rexue','huopu'],['fullskin']],
 
-			swd_muyun:['male','wei',4,['ningjian','polang','jikong'],['fullskin']],
+			swd_muyun:['male','wei',4,['zhuhai','polang','jikong'],['fullskin']],
 			swd_lanyin:['female','wei',3,['xingdian','yulin','luomei'],['fullskin']],
 			swd_zhiyin:['female','wei',3,['xuehuang','ningshuang','zhuyu'],['fullskin']],
 			swd_qiner:['female','wei',3,['huanyin','tianhuo','xuanzhou'],['fullskin']],
@@ -656,10 +656,10 @@ character.swd={
 		},
 		lianda2:{},
 		huiqi:{
-			trigger:{player:'changeHp'},
+			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
-				return event.num<0&&player.hp<player.maxHp;
+				return player.hp<player.maxHp;
 			},
 			content:function(){
 				"step 0"
@@ -682,7 +682,7 @@ character.swd={
 				"step 1"
 				if(result.bool){
 					player.logSkill('huiqi',result.targets);
-					result.targets[0].draw(Math.min(3,player.maxHp-player.hp));
+					result.targets[0].draw(player.maxHp-player.hp);
 				}
 			},
 			ai:{
@@ -3715,43 +3715,70 @@ character.swd={
 			}
 		},
 		liaoyuan:{
-			trigger:{player:'shaAfter'},
+			trigger:{player:'shaBegin'},
 			direct:true,
 			filter:function(event,player){
 				if(get.itemtype(event.cards)!='cards') return false;
-				if(player.num('he',{suit:get.suit(event.cards)})>0){
-					for(var i=0;i<event.targets.length;i++){
-						if(event.targets[i].isAlive()) return true;
-					}
-				}
-				return false;
+				return player.num('he',{suit:get.suit(event.cards)})>0;
 			},
 			content:function(){
 				"step 0"
+				player.storage.liaoyuan=0;
+				event.num=0;
+				event.cards=[];
+				"step 1"
 				var suit=get.suit(trigger.cards);
-				player.chooseCard('he','是否将一张'+get.translation(suit)+'牌当杀对'+
-				get.translation(trigger.targets)+'使用？',{suit:suit}).ai=function(card){
-					var eff=0;
-					for(var i=0;i<trigger.targets.length;i++){
-						eff+=ai.get.effect(trigger.targets[i],{name:'sha'},player,player);
-					}
-					if(eff>0){
+				event.suit=suit;
+				player.chooseCard('he','是否发动【燎原】？',{suit:suit}).ai=function(card){
+					if(ai.get.attitude(player,trigger.target)>=0) return 0;
+					if(ai.get.effect(trigger.target,{name:'sha'},player,player)>0){
 						return 7-ai.get.value(card);
 					}
+					return 0;
 				}
-				"step 1"
+				"step 2"
 				if(result.bool){
-					player.logSkill('liaoyuan');
-					if(result.cards[0].name=='sha'){
-						player.useCard(result.cards,trigger.targets);
+					if(event.num==0){
+						player.logSkill('liaoyuan');
 					}
-					else{
-						player.useCard({name:'sha'},result.cards,trigger.targets);
+					player.discard(result.cards);
+					event.num++;
+					if(player.num('he',{suit:event.suit})>1){
+						event.goto(1);
 					}
 				}
+				"step 3"
+				if(event.num){
+					trigger.target.chooseToRespond({name:'shan'}).ai=ai.get.unuseful2;
+				}
+				else{
+					event.finish();
+				}
+				"step 4"
+				if(result.bool){
+					event.num--;
+					event.goto(3);
+				}
+				else{
+					trigger.untrigger();
+					trigger.directHit=true;
+					player.storage.liaoyuan=event.num;
+				}
+			},
+			group:'liaoyuan2'
+		},
+		liaoyuan2:{
+			trigger:{source:'damageBegin'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&player.storage.liaoyuan>0;
+			},
+			content:function(){
+				trigger.num+=player.storage.liaoyuan;
+				player.storage.liaoyuan>0;
 			}
 		},
-
 		dunxing:{
 			mod:{
 				targetEnabled:function(card,player,target){
@@ -4096,7 +4123,9 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('he','是否发动【唤魂】？').ai=function(card){
+				player.chooseToDiscard('he','是否发动【唤魂】？',function(card){
+					return get.color(card)=='red';
+				}).ai=function(card){
 					if(ai.get.attitude(player,trigger.player)>0){
 						return 8-ai.get.value(card);
 					}
@@ -7595,7 +7624,7 @@ character.swd={
 		xianghui:'祥晖',
 		xianghui_info:'出牌阶段限一次，你可以弃置一张红色手牌，然后令场上体力值最少的角色各回复一点体力',
 		huiqi:'回气',
-		huiqi_info:'每当你的体力值减少，可令一名角色摸X张牌，X为你已损失的体力值且最多为3',
+		huiqi_info:'每当你受到一次伤害，可令一名角色摸X张牌，X为你已损失的体力值',
 		toudan:'投弹',
 		toudan_info:'出牌阶段限一次，你可以弃置一张黑桃牌对一名其他角色造成一点火焰伤害，然后令距离该角色1以内的所有角色弃置一张牌',
 		shending:'神丁',
@@ -7922,10 +7951,10 @@ character.swd={
 		huanyin_info:'锁定技，每当你成为其他角色的卡牌的目标时，你进行一次判定，若为黑桃则取消之，若为红桃你摸一张牌',
 		luomu_info:'锁定技，每当你造成伤害时，受伤害角色随机弃置一张牌',
 		poxing_info:'锁定技，每当你即将造成伤害，若目标的体力值大于你，你令伤害+1',
-		liaoyuan_info:'每当你使用一张杀结算完毕后，可以将一张与此牌花色相同的牌当杀对目标使用',
+		liaoyuan_info:'每当你使用一张杀指定目标后，你可以弃置任意张与此杀花色相同的牌，若如此做，目标需额外打出等量的闪，否则此杀不可闪避且伤害+X，X为少打出的闪的个数',
 		yuhuo_info:'限定技，濒死阶段，你可以重置角色牌，减少一点体力上限，然后将体力回复至体力上限',
 		yishan_info:'每当你受到一次伤害，你可以重新获得最近失去的两张牌',
-		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张牌令其进行一次判定，若结果为红色，其回复一点体力',
+		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
 		daixing_info:'回合结束阶段，你可以弃置至多X张牌，并抵挡等量伤害，效果在下一个回合结束阶段失效，X为现存角色数-1',
 		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
 		qingcheng_info:'回合开始阶段，你可以进行判定，若为红色则可以继续判定，判定结束后将判定成功的牌收入手牌',

@@ -1,3 +1,4 @@
+'use strict';
 character.hearth={
 	character:{
 		// hs_jaina:['female','wei',3,[],['fullskin']],
@@ -38,9 +39,41 @@ character.hearth={
 			}
 		},
 		tzhenji:{
-			trigger:{player:'respond'},
-			filter:function(event,player){
-				return event.card.name=='shan';
+			trigger:{player:'discardAfter'},
+			direct:true,
+			filter:function(event){
+				if(event.cards){
+					for(var i=0;i<event.cards.length;i++){
+						if(get.color(event.cards[i])=='black') return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				"step 0";
+				player.chooseTarget('是否发动【震击】？').ai=function(target){
+					return ai.get.damageEffect(target,player,player,'thunder')-(target.num('he')?1:0);
+				};
+				"step 1"
+				if(result.bool){
+					game.delay(0.5);
+					var target=result.targets[0];
+					player.logSkill('tzhenji',target,'thunder');
+					target.damage('thunder',Math.floor(Math.random()*2));
+					var cs=target.get('he');
+					if(cs.length){
+						target.discard(cs.randomGet());
+					}
+				}
+			},
+			ai:{
+				threaten:0.7
+			}
+		},
+		tzhenji_old:{
+			trigger:{player:['useCard','respondEnd']},
+			filter:function(event){
+				return get.suit(event.card)=='spade';
 			},
 			direct:true,
 			content:function(){
@@ -52,26 +85,32 @@ character.hearth={
 				if(result.bool){
 					player.logSkill('tzhenji',result.targets,'thunder');
 					event.target=result.targets[0];
-					event.target.judge(function(card){
-						if(get.color(card)=='black') return -2;
-						return 0;
-					});
+					event.target.judge();
 				}
 				else{
 					event.finish();
 				}
 				"step 2"
-				if(result.bool==false){
+				if(result.color=='red'){
+					event.target.damage('fire');
+				}
+				else{
 					event.target.damage('thunder');
 					var cs=event.target.get('he');
 					if(cs.length){
 						event.target.discard(cs.randomGet());
 					}
+					cs=player.get('he');
+					if(cs.length){
+						player.discard(cs.randomGet());
+					}
 				}
 			},
 			ai:{
-				effect:{
-					target:function(card,player,target,current){
+				expose:0.2,
+				threaten:1.2,
+				effect_old:{
+					target:function(card,player,target){
 						if(get.tag(card,'respondShan')){
 							var hastarget=false;
 							for(var i=0;i<game.players.length;i++){
@@ -91,7 +130,7 @@ character.hearth={
 								return [0,0];
 							}
 							if(nh==0){
-								return [1.5,0];
+								return 1.5;
 							}
 							return [1,0.05];
 						}
@@ -135,7 +174,7 @@ character.hearth={
 			usable:1,
 			filterCard:true,
 			check:function(card){
-				return 8-ai.get.value(card);
+				return 6-ai.get.value(card);
 			},
 			filter:function(event,player){
 				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
@@ -213,6 +252,9 @@ character.hearth={
 			intro:{
 				content:'每当你造成一次伤害，你摸一张牌'
 			},
+			filter:function(event){
+				return event.num>0;
+			},
 			trigger:{source:'damageAfter'},
 			forced:true,
 			content:function(){
@@ -226,7 +268,7 @@ character.hearth={
 			},
 			trigger:{player:'damageBegin'},
 			forced:true,
-			filter:function(event,player){
+			filter:function(event){
 				return event.num>0;
 			},
 			content:function(){
@@ -240,7 +282,7 @@ character.hearth={
 			},
 			trigger:{source:'damageBegin'},
 			forced:true,
-			filter:function(event,player){
+			filter:function(event){
 				return event.card&&get.type(event.card)=='trick';
 			},
 			content:function(){
@@ -322,7 +364,7 @@ character.hearth={
 		tuteng3:'石爪图腾',
 		tuteng4:'空气之怒图腾',
 		tzhenji:'震击',
-		tzhenji_info:'每当你使用或打出一张闪，可以指定一名角色进行判定，若结果为黑色，其受到一点雷电伤害并随机弃置一张牌',
+		tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成0~1点雷电伤害，然后随机弃置其一张牌',
 		fenliu:'分流',
 		fenliu_info:'出牌阶段限一次，你可以失去一点体力并获得3张牌',
 		hongxi:'虹吸',

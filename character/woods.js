@@ -135,6 +135,9 @@ character.woods={
 					event.player.classList.contains('dead')==false&&
 					event.player.num('h')&&player.num('h'));
 			},
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)<=0;
+			},
 			priority:5,
 			content:function(){
 				"step 0"

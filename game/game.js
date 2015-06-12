@@ -1636,8 +1636,25 @@ window.play={};
 						}
 					}
 					player.changeHp(-num,false);
-					player.popup(-num,event.nature);
-					player.$damage(source);
+					if(player._damagetimeout!=source){
+						player.$damage(source);
+						player._damagetimeout=source;
+						setTimeout(function(){
+							delete player._damagetimeout;
+						},500);
+					}
+					if(player._damagepopup){
+						player._damagepopup-=num;
+						player._damagenature=event.nature;
+					}
+					else{
+						player._damagepopup=-num;
+						setTimeout(function(){
+							player.popup(player._damagepopup,player._damagenature);
+							delete player._damagepopup;
+							delete player._damagenature;
+						},300);
+					}
 					event.trigger('damage');
 					"step 1"
 					if(player.hp<=0&&player.isAlive()){
@@ -3517,6 +3534,7 @@ window.play={};
 						var that=this;
 						setTimeout(function(){that._popup();},1000);
 					}
+					return node;
 				},
 				_popup:function(){
 					if(this.popups.length){

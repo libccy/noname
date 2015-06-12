@@ -31,18 +31,18 @@ character.xianjian={
 	},
 	skill:{
 		xuanyan:{
-			trigger:{source:'damageBefore'},
-			forced:true,
-			priority:5,
-			check:function(event,player){
-				return player.hp>3;
-			},
-			filter:function(event){
-				return event.card&&get.color(event.card)=='red';
-			},
-			content:function(){
-				trigger.nature='fire';
-			},
+			// trigger:{source:'damageBefore'},
+			// forced:true,
+			// priority:5,
+			// check:function(event,player){
+			// 	return player.hp>3;
+			// },
+			// filter:function(event){
+			// 	return event.card&&get.color(event.card)=='red';
+			// },
+			// content:function(){
+			// 	trigger.nature='fire';
+			// },
 			group:['xuanyan2','xuanyan3']
 		},
 		xuanyan2:{
@@ -1327,7 +1327,7 @@ character.xianjian={
 
 		xuanyan:'玄炎',
 		xuanyan2:'玄炎',
-		xuanyan_info:'锁定技，你的红色牌造成的伤害均视为火属性；你的火属性伤害+1；你造成火属性后流失1点体力',
+		xuanyan_info:'锁定技，你的火属性伤害+1；你造成火属性伤害后流失1点体力',
 		ningbin:'凝冰',
 		ningbin_info:'锁定技，每当你造成或受到1次雷属性伤害，你回复1点体力',
 		fenxin:'焚心',

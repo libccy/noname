@@ -565,7 +565,7 @@ character.extra={
 					if(target.isMin()) return 0;
 					if(target.skills.contains('biantian2')) return 0;
 					var att=ai.get.attitude(player,target);
-					if(att>=5){
+					if(att>=4){
 						if(target.hp==1&&target.maxHp>2) return att;
 						if(target.hp==2&&target.maxHp>3&&target.num('he')==0) return att*0.7;
 						return 0;
