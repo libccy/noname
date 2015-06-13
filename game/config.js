@@ -12,11 +12,6 @@ window.config={
 	layoutfixed:['chess','boss'],
 	all:{
 		mode:['identity','guozhan','versus','boss','chess','stone'],
-		characters:['standard','wind','fire','woods','mountain',
-		'extra','sp','yijiang','refresh','guozhan',
-		'jiange','zhuogui','diy','hearth','yxs','swd','xswd','gujian','xianjian'],
-		cards:['standard','ex','extra','refresh','guozhan','zhenfa','qimou','yibao','shenbing','wanxiang','swd','shenqi','compensate'],
-		plays:['character','soldier','wuxing'],
 		layout:['default','newlayout'],
 		theme:['woodden','music'],
 		card_font:['xiaozhuan','huangcao','caoshu','xingshu'],
@@ -42,43 +37,12 @@ window.config={
 		infinity:'无限',
 		qunyingzhuan:'群英',
 		swd:'剧情',
-		standard_card_config:'标准',
-		ex_card_config:'ex',
-		extra_card_config:'军争',
-		guozhan_card_config:'国战',
-		zhenfa_card_config:'阵法',
-		qimou_card_config:'奇谋',
-		yibao_card_config:'异宝',
-		shenbing_card_config:'神兵',
-		wanxiang_card_config:'万象',
-		swd_card_config:'轩辕剑',
-		shenqi_card_config:'上古神器',
-		compensate_card_config:'补充卡牌',
-		refresh_card_config:'界限突破',
-		standard_character_config:'标准包',
-		wind_character_config:'风包',
-		fire_character_config:'火包',
-		woods_character_config:'林包',
-		mountain_character_config:'山包',
-		guozhan_character_config:'国战',
-		sp_character_config:'SP',
-		yijiang_character_config:'一将成名',
-		jiange_character_config:'守卫剑阁',
-		zhuogui_character_config:'捉鬼驱邪',
-		refresh_character_config:'界限突破',
-		diy_character_config:'DIY',
-		extra_character_config:'神将',
-		swd_character_config:'轩辕剑',
-		xswd_character_config:'轩辕剑·二',
-		hearth_character_config:'炉石传说',
-		yxs_character_config:'英雄杀',
-		gujian_character_config:'古剑奇谭',
-		xianjian_character_config:'仙剑',
-		others_character_config:'其他',
+
 		character_play_config:'角色卡牌',
 		soldier_play_config:'士兵模式',
 		strategy_play_config:'尔虞我诈',
 		wuxing_play_config:'五行生克',
+
 		sanguozhi:'三国志',
 		online:'OL',
 		background_music_config:'背景音乐',
@@ -236,6 +200,7 @@ window.config={
 	long_info:true,
 	background_music:'music_default',
 	background_audio:true,
+	background_speak:true,
 
 
 	theme:'woodden',
@@ -359,4 +324,8 @@ window.config={
 		['jiushi','jushou'],
 		['jiushi','kuiwei'],
 	]
-}
+};
+window.mode={};
+window.card={};
+window.character={};
+window.play={};

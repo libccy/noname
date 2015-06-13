@@ -9,9 +9,104 @@ character.hearth={
 		hs_guldan:['male','wei',3,['fenliu','hongxi'],['fullskin']],
 		// hs_anduin:['male','qun',4,[],['fullskin']],
 		hs_thrall:['male','qun',4,['tuteng','tzhenji'],['fullskin']],
-		// hs_waleera:['female','qun',4,[],['fullskin']],
+		hs_waleera:['female','qun',3,['jianren','mengun','wlianji'],['fullskin']],
 	},
 	skill:{
+		wlianji:{
+			trigger:{player:'phaseEnd'},
+			frequent:true,
+			filter:function(event,player){
+				return get.cardCount(true,player)>player.hp;
+			},
+			content:function(){
+				player.draw(2);
+			},
+			init:function(player){player.storage.jingce=true},
+			intro:{
+				content:function(storage,player){
+					if(_status.currentPhase==player) return '已使用'+get.cardCount(true,player)+'张牌';
+				}
+			}
+		},
+		mengun:{
+			trigger:{global:'useCardToBefore'},
+			priority:12,
+			filter:function(event,player){
+				if(event.player==player) return false;
+				if(_status.currentPhase!=event.player) return false;
+				if(event.player.skills.contains('mengun2')) return false;
+				if(get.itemtype(event.card)!='card') return false;
+				if(!player.num('h',{suit:get.suit(event.card)})) return false;
+				return get.type(event.card)=='basic';
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				var val=ai.get.value(trigger.card);
+				var suit=get.suit(trigger.card);
+				var eff=ai.get.effect(trigger.target,trigger.card,trigger.player,player);
+				player.chooseToDiscard('是否对'+get.translation(trigger.player)+'使用的'+get.translation(trigger.card)+'发动【闷棍】？',function(card){
+					return get.suit(card)==suit;
+				}).ai=function(card){
+					if(eff>=0) return 0;
+					return Math.min(8,1+val)-ai.get.value(card);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('mengun',trigger.player);
+					game.log(get.translation(trigger.player)+'收回了'+get.translation(trigger.cards));
+					trigger.untrigger();
+					trigger.finish();
+					game.delay();
+				}
+				"step 2"
+				trigger.player.$gain2(trigger.cards);
+				trigger.player.gain(trigger.cards);
+				trigger.player.storage.mengun2=trigger.cards[0];
+				trigger.player.addTempSkill('mengun2','phaseEnd');
+			}
+		},
+		mengun2:{
+			mark:'card',
+			mod:{
+				cardEnabled:function(card,player){
+					if(card==player.storage.mengun2) return false;
+				},
+			},
+			intro:{
+				content:'card',
+				onunmark:function(storage,player){
+					delete player.storage.mengun2;
+				}
+			},
+		},
+		jianren:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.get('e','1')?true:false;
+			},
+			filterCard:function(card,player){
+				return card==player.get('e','1');
+			},
+			position:'e',
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			selectCard:-1,
+			selectTarget:-1,
+			content:function(){
+				target.damage();
+			},
+			ai:{
+				order:9,
+				result:{
+					target:function(player,target){
+						return ai.get.damageEffect(target,player,target);
+					}
+				}
+			}
+		},
 		jihuo:{
 			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
@@ -371,5 +466,12 @@ character.hearth={
 		hongxi_info:'锁定技，每当有一名角色死亡，你将体力回复至体力上限',
 		jihuo:'激活',
 		jihuo_info:'回合结束阶段，你可以弃置一张手牌并进行一个额外的回合',
+		jianren:'剑刃',
+		jianren_info:'出牌阶段限一次，你可以弃置装备区内的武器牌，对所有其他角色造成一点伤害',
+		mengun:'闷棍',
+		mengun2:'闷棍',
+		mengun_info:'每当一名其他角色于回合内使用基本牌，你可以弃置一张与之花色相同的牌令其收回此牌，且在本回合内不能再次使用，每回合限一次',
+		wlianji:'连击',
+		wlianji_info:'回合结束阶段，若你本回合使用的卡牌数大于你当前的体力值，你可以摸两张牌',
 	},
 }

@@ -393,7 +393,6 @@ character.yxs={
 			}
 		},
 		xiangma:{
-//			group:['mashu','feiying']
 			inherit:'yicong'
 		},
 		weiyi:{

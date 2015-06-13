@@ -20,7 +20,7 @@ character.swd={
 			swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue'],['fullskin']],
 
 			swd_jiliang:['male','wu',3,['yunchou','gongxin','qimou'],['fullskin']],
-			swd_shuijing:['female','qun',4,['mojian','duoren','duanyue'],['fullskin']],
+			swd_shuijing:['female','qun',4,['mojian','duanyue'],['fullskin']],
 			swd_cheyun:['female','wu',3,['shengong','xianjiang3','qiaoxie'],['fullskin']],
 			swd_huanyuanzhi:['male','qun',3,['lanzhi','mufeng','tianshu'],['fullskin']],
 			swd_murongshi:['female','shu',4,['duanyi','guxing'],['fullskin']],
@@ -1898,7 +1898,7 @@ character.swd={
 					event.finish();
 				}
 				"step 2"
-				if(event.num>2){
+				if(event.num>=2){
 					player.loseHp();
 				}
 			},
@@ -7788,7 +7788,7 @@ character.swd={
 		mojian:'墨剑',
 		mojian_info:'每当你使用杀并指定目标后，你可以令其摸一张牌，然后你回复一点体力',
 		duanyue:'断月',
-		duanyue_info:'出牌阶段限一次，你可以弃置一张装备牌，对一名其他角色造成一点伤害，并弃其所有手牌。若弃置的手牌数不少于3，你流失一点体力',
+		duanyue_info:'出牌阶段限一次，你可以弃置一张装备牌，对一名其他角色造成一点伤害，并弃其所有手牌。若弃置的手牌数有两张或更多，你流失一点体力',
 		fengmo:'封魔',
 		fengmo_info:'出牌阶段限一次，你可以弃置场所有武器牌（至少两张），然后令一名未翻面的角色摸等量的牌并翻面',
 		pozhou:'破咒',

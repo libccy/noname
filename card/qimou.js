@@ -1,3 +1,4 @@
+'use strict';
 card.qimou={
 	card:{
 		chenhuodajie:{
@@ -28,6 +29,7 @@ card.qimou={
 			multitarget:true,
 			multiline:true,
 			filterTarget:function(card,player,target){
+				if(player==target) return true;
 				var num=target.num('h');
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('h')<num) return false;
@@ -175,7 +177,7 @@ card.qimou={
 			ai:{
 				order:4,
 				result:{
-					target:function(player,target){
+					target:function(player){
 						if(player.get('h').length<=1) return 0;
 						return -1;
 					},
@@ -310,7 +312,7 @@ card.qimou={
 		shuiyanqijun:'水淹七军',
 		shuiyanqijun_info:'令所有有装备的角色各弃置一张装备牌',
 		shushangkaihua:'树上开花',
-		shushangkaihua_info:'令手牌数最少的所有角色各摸一张牌',
+		shushangkaihua_info:'使用者与手牌数最少的所有角色各摸一张牌',
 		huoshaolianying:'火烧连营',
 		huoshaolianying_bg:'烧',
 		huoshaolianying_info:'对逆时针方向离你最近的一名横置角色使用（若无横置角色则对你的下家使用），对其造成一点火焰伤害',

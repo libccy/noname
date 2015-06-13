@@ -1,8 +1,4 @@
 "use strict";
-window.mode={};
-window.card={};
-window.character={};
-window.play={};
 (function(){
 	var _status={
 		paused:false,
@@ -158,7 +154,6 @@ window.play={};
 					lib.config.defaultcards=lib.config.cards.slice(0);
 				}
 				for(var i in config2){
-
 						if(i.indexOf('_mode_config')!=-1&&i.substr(i.indexOf('_mode_config')+13)==lib.config.mode){
 							lib.config.mode_config[lib.config.mode][i.substr(0,i.indexOf('_mode_config'))]=config2[i];
 						}
@@ -171,6 +166,26 @@ window.play={};
 				for(var i in lib.config.translate){
 					lib.translate[i]=lib.config.translate[i];
 				}
+				
+				lib.config.all.characters=[];
+				lib.config.all.cards=[];
+				lib.config.all.plays=[];
+				for(i in character.pack){
+					lib.config.all.characters.push(i);
+					lib.translate[i+'_character_config']=character.pack[i];
+				}
+				for(i in card.pack){
+					lib.config.all.cards.push(i);
+					lib.translate[i+'_card_config']=card.pack[i];
+				}
+				for(i in play.pack){
+					lib.config.all.plays.push(i);
+					lib.translate[i+'_play_config']=play.pack[i];
+				}
+				delete character.pack;
+				delete card.pack;
+				delete play.pack;
+
 				lib.init.js('mode',lib.config.mode);
 				lib.init.js('card',lib.config.all.cards);
 				lib.init.js('character',lib.config.all.characters);
@@ -11657,14 +11672,16 @@ window.play={};
 								}
 							}
 						}
-						if(lib[j][k]==undefined){
-							lib[j][k]=lib.init.eval(character[i][j][k]);
-							// if(j=='skill'||j=='character'){
-							// 	lib[j][k].packname=i;
-							// }
+						if(j=='translate'&&k==i){
+							lib[j][k+'_character_config']=character[i][j][k];
 						}
 						else{
-							alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+							if(lib[j][k]==undefined){
+								lib[j][k]=lib.init.eval(character[i][j][k]);
+							}
+							else{
+								alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+							}
 						}
 					}
 				}
@@ -11686,8 +11703,13 @@ window.play={};
 					}
 					else{
 						for(k in card[i][j]){
-							if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
-							else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k])
+							if(j=='translate'&&k==i){
+								lib[j][k+'_card_config']=card[i][j][k];
+							}
+							else{
+								if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
+								else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+							}
 						}
 					}
 				}
@@ -11730,10 +11752,15 @@ window.play={};
 				for(j in play[i]){
 					if(j=='mode'||j=='forbid'||j=='init'||j=='element'||j=='game'||j=='get'||j=='config'||j=='ui') continue;
 					for(k in play[i][j]){
-						if(lib[j][k]!=undefined){
-							console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
+						if(j=='translate'&&k==i){
+							lib[j][k+'_play_config']=play[i][j][k];
 						}
-						lib[j][k]=lib.init.eval(play[i][j][k]);
+						else{
+							if(lib[j][k]!=undefined){
+								console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
+							}
+							lib[j][k]=lib.init.eval(play[i][j][k]);
+						}
 					}
 				}
 				if(typeof play[i].init=='function') (lib.init.eval(play[i].init))();
