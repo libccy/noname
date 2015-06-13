@@ -1,3 +1,4 @@
+'use strict';
 character.refresh={
 	character:{
 		re_caocao:['male','wei',4,['hujia','rejianxiong'],['zhu','fullskin']],
@@ -37,6 +38,7 @@ character.refresh={
 			},
 		},
 		rejizhi:{
+			audio:2,
 			trigger:{player:'useCard'},
 			frequent:true,
 			filter:function(event){
@@ -59,6 +61,7 @@ character.refresh={
 			}
 		},
 		retuxi:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			direct:true,
 			content:function(){
@@ -84,6 +87,7 @@ character.refresh={
 			}
 		},
 		reguicai:{
+			audio:2,
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
@@ -127,6 +131,7 @@ character.refresh={
 			}
 		},
 		refankui:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -162,6 +167,7 @@ character.refresh={
 			}
 		},
 		reluoyi:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
 				if(player.num('h','sha')) return true;
@@ -202,6 +208,7 @@ character.refresh={
 			}
 		},
 		reganglie:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
 				return (event.source!=undefined);
@@ -291,6 +298,7 @@ character.refresh={
 			}
 		},
 		reyingzi:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
 			content:function(){
@@ -306,6 +314,7 @@ character.refresh={
 			}
 		},
 		refanjian:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -403,6 +412,7 @@ character.refresh={
 			}
 		},
 		relianying:{
+			audio:2,
 			trigger:{player:'loseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -544,6 +554,7 @@ character.refresh={
 			}
 		},
 		rejianxiong:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			content:function(){
@@ -579,6 +590,7 @@ character.refresh={
 			}
 		},
 		reyiji:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			frequent:true,
 			filter:function(event){
@@ -753,6 +765,7 @@ character.refresh={
 			}
 		},
 		retieji:{
+			audio:2,
 			trigger:{player:'shaBegin'},
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<0;
@@ -852,6 +865,7 @@ character.refresh={
 			}
 		},
 		rekurou:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterCard:true,
@@ -985,6 +999,7 @@ character.refresh={
 			}
 		},
 		reguose:{
+			audio:1,
 			enable:'phaseUse',
 			usable:1,
 			discard:false,

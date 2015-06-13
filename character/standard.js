@@ -1,3 +1,4 @@
+'use strict';
 character.standard={
 	character:{
 		caocao:['male','wei',4,['hujia','jianxiong'],['zhu','fullskin']],
@@ -41,6 +42,7 @@ character.standard={
 	},
 	skill:{
 		hujia:{
+			audio:2,
 			unique:true,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
@@ -87,6 +89,7 @@ character.standard={
 			},
 		},
 		jianxiong:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
 				return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0])=='d';
@@ -106,6 +109,7 @@ character.standard={
 			}
 		},
 		fankui:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -133,6 +137,7 @@ character.standard={
 			}
 		},
 		guicai:{
+			audio:2,
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
@@ -178,6 +183,7 @@ character.standard={
 			}
 		},
 		ganglie:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
 				return (event.source!=undefined);
@@ -213,6 +219,7 @@ character.standard={
 			}
 		},
 		tuxi:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			direct:true,
 			content:function(){
@@ -252,6 +259,7 @@ character.standard={
 			}
 		},
 		luoyi:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
 				var i,cancel=true;
@@ -282,6 +290,7 @@ character.standard={
 			}
 		},
 		tiandu:{
+			audio:4,
 			trigger:{player:'judgeEnd'},
 			frequent:true,
 			content:function(){
@@ -290,6 +299,7 @@ character.standard={
 			}
 		},
 		yiji:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			frequent:true,
 			filter:function(event){
@@ -343,6 +353,7 @@ character.standard={
 			}
 		},
 		luoshen:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
 			frequent:true,
 			content:function(){
@@ -381,6 +392,7 @@ character.standard={
 			}
 		},
 		qingguo:{
+			audio:2,
 			enable:['chooseToRespond'],
 			filterCard:function(card){
 				return get.color(card)=='black';
@@ -398,6 +410,7 @@ character.standard={
 			}
 		},
 		rende:{
+			audio:2,
 			group:['rende1'],
 			enable:'phaseUse',
 			filterCard:true,
@@ -478,6 +491,7 @@ character.standard={
 			group:['jijiang1','jijiang2'],
 		},
 		jijiang1:{
+			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(player.identity!='zhu') return false;
@@ -520,6 +534,7 @@ character.standard={
 			}
 		},
 		jijiang2:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(player!=game.zhu) return false;
@@ -585,6 +600,7 @@ character.standard={
 		},
 		jijiang3:{},
 		wusheng:{
+			audio:6,
 			enable:['chooseToRespond','chooseToUse'],
 			filterCard:function(card){
 				return get.color(card)=='red';
@@ -605,6 +621,7 @@ character.standard={
 			},
 		},
 		guanxing:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
 			frequent:true,
 			content:function(){
@@ -738,6 +755,7 @@ character.standard={
 			group:['longdan1','longdan2']
 		},
 		longdan1:{
+			audio:2,
 			enable:['chooseToUse','chooseToRespond'],
 			filterCard:{name:'shan'},
 			viewAs:{name:'sha'},
@@ -756,6 +774,7 @@ character.standard={
 			}
 		},
 		longdan2:{
+			audio:2,
 			enable:['chooseToRespond'],
 			filterCard:{name:'sha'},
 			viewAs:{name:'shan'},
@@ -788,6 +807,7 @@ character.standard={
 			}
 		},
 		tieji:{
+			audio:2,
 			trigger:{player:'shaBegin'},
 			content:function(){
 				"step 0"
@@ -802,6 +822,7 @@ character.standard={
 			}
 		},
 		jizhi:{
+			audio:2,
 			trigger:{player:'useCard'},
 			frequent:true,
 			filter:function(event){
@@ -823,6 +844,7 @@ character.standard={
 			},
 		},
 		zhiheng:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			position:'he',
@@ -842,6 +864,7 @@ character.standard={
 			},
 		},
 		jiuyuan:{
+			audio:2,
 			unique:true,
 			trigger:{target:'taoBegin'},
 			forced:true,
@@ -857,6 +880,7 @@ character.standard={
 			}
 		},
 		qixi:{
+			audio:4,
 			enable:'chooseToUse',
 			filterCard:function(card){
 				return get.color(card)=='black';
@@ -867,6 +891,7 @@ character.standard={
 			check:function(card){return 4-ai.get.value(card)}
 		},
 		keji:{
+			audio:4,
 			trigger:{player:'phaseDiscardBefore'},
 			filter:function(event,player){
 				return (get.cardCount({name:'sha'},player)==0);
@@ -877,6 +902,7 @@ character.standard={
 			}
 		},
 		kurou:{
+			audio:2,
 			enable:'phaseUse',
 			prompt:'失去一点体力并摸两张牌',
 			content:function(){
@@ -899,6 +925,7 @@ character.standard={
 			}
 		},
 		yingzi:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			frequent:true,
 			content:function(){
@@ -909,6 +936,7 @@ character.standard={
 			}
 		},
 		fanjian:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -971,6 +999,7 @@ character.standard={
 			}
 		},
 		guose:{
+			audio:1,
 			enable:'chooseToUse',
 			filterCard:function(card){
 				return get.suit(card)=='diamond';
@@ -984,6 +1013,7 @@ character.standard={
 			}
 		},
 		liuli:{
+			audio:2,
 			trigger:{target:'shaBefore'},
 			direct:true,
 			priority:5,
@@ -1075,6 +1105,7 @@ character.standard={
 			},
 		},
 		lianying:{
+			audio:2,
 			trigger:{player:'loseEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -1097,6 +1128,7 @@ character.standard={
 			}
 		},
 		xiaoji:{
+			audio:1,
 			trigger:{player:'loseEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -1121,6 +1153,7 @@ character.standard={
 			}
 		},
 		jieyin:{
+			audio:2,
 			enable:'phaseUse',
 			filterCard:true,
 			usable:1,
@@ -1158,6 +1191,7 @@ character.standard={
 			}
 		},
 		qingnang:{
+			audio:2,
 			enable:'phaseUse',
 			filterCard:true,
 			usable:1,
@@ -1184,6 +1218,7 @@ character.standard={
 			}
 		},
 		jijiu:{
+			audio:2,
 			enable:'chooseToUse',
 			filter:function(event,player){
 				return _status.currentPhase!=player;
@@ -1205,6 +1240,7 @@ character.standard={
 			group:['wushuang1','wushuang2']
 		},
 		wushuang1:{
+			audio:2,
 			trigger:{player:'shaBegin'},
 			forced:true,
 			content:function(){
@@ -1225,6 +1261,7 @@ character.standard={
 			}
 		},
 		wushuang2:{
+			audio:2,
 			trigger:{player:'juedou',target:'juedou'},
 			forced:true,
 			filter:function(event,player){
@@ -1254,6 +1291,7 @@ character.standard={
 			}
 		},
 		lijian:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -1298,21 +1336,13 @@ character.standard={
 			}
 		},
 		biyue:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			frequent:true,
 			content:function(){
 				player.draw();
 			},
 		},
-		invincible:{
-			trigger:{player:['damageBefore','loseHpBefore','loseMaxHpBefore']},
-			forced:true,
-			popup:false,
-			content:function(){
-				trigger.untrigger();
-				trigger.finish();
-			}
-		}
 	},
 	translate:{
 		caocao:'曹操',

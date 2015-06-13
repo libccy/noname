@@ -166,7 +166,7 @@
 				for(var i in lib.config.translate){
 					lib.translate[i]=lib.config.translate[i];
 				}
-				
+
 				lib.config.all.characters=[];
 				lib.config.all.cards=[];
 				lib.config.all.plays=[];
@@ -1143,11 +1143,15 @@
 				useCard:function(){
 					"step 0"
 					player.lose(cards);
+					var cardaudio=true;
 					if(event.skill){
+						if(lib.skill[event.skill].audio){
+							cardaudio=false;
+						}
 						player.logSkill(event.skill);
 						player.popup(event.card.name);
 					}
-					if(lib.config.background_audio){
+					if(cardaudio&&lib.config.background_audio){
 						var sex=player.sex=='female'?'female':'male';
 						if(lib.card[card.name].audio||lib.config.background_ogg){
 							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
@@ -1465,13 +1469,17 @@
 					if(event.delay!=false) game.delay();
 				},
 				respond:function(){
+					var cardaudio=true;
 					if(event.skill){
+						if(lib.skill[event.skill].audio){
+							cardaudio=false;
+						}
 						player.logSkill(event.skill);
 						if(player.checkShow){
 							player.checkShow(event.skill);
 						}
 					}
-					if(event.parent.parent.parent.name=='useCard'){
+					if(cardaudio&&event.parent.parent.parent.name=='useCard'){
 						if(lib.config.background_audio){
 							var sex=player.sex=='female'?'female':'male';
 							if(lib.card[card.name].audio||lib.config.background_ogg){
