@@ -10,7 +10,7 @@ character.swd={
 			swd_nicole:['female','wu',3,['minjing','lingwu','huanjian'],['fullskin']],
 		swd_wangsiyue:['female','wei',3,['duishi','guisi','biyue']],
 		swd_weida:['female','qun',3,['yueren','zhenlie']],
-			swd_xuanyuanjianxian:['male','qun',4,['fengmo','pozhou','huajian'],['fullskin']],
+			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian'],['fullskin']],
 
 			swd_chenjingchou:['male','wu',3,['youyin','yihua'],['fullskin']],
 			swd_duguningke:['female','qun',3,['lianji','touxi'],['fullskin']],

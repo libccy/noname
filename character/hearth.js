@@ -154,7 +154,7 @@ character.hearth={
 					game.delay(0.5);
 					var target=result.targets[0];
 					player.logSkill('tzhenji',target,'thunder');
-					target.damage('thunder',Math.floor(Math.random()*2));
+					target.damage('thunder',0);
 					var cs=target.get('he');
 					if(cs.length){
 						target.discard(cs.randomGet());
@@ -162,7 +162,15 @@ character.hearth={
 				}
 			},
 			ai:{
-				threaten:0.7
+				threaten:1.2,
+				expose:0.3,
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'loseCard')&&target.num('he')){
+							return 0.7;
+						}
+					}
+				},
 			}
 		},
 		tzhenji_old:{
@@ -373,12 +381,12 @@ character.hearth={
 		tuteng4:{
 			mark:'image',
 			intro:{
-				content:'你的锦囊牌造成的伤害+1'
+				content:'你的属性伤害+1'
 			},
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event){
-				return event.card&&get.type(event.card)=='trick';
+				return event.nature?true:false;
 			},
 			content:function(){
 				trigger.num++;
@@ -459,7 +467,7 @@ character.hearth={
 		tuteng3:'石爪图腾',
 		tuteng4:'空气之怒图腾',
 		tzhenji:'震击',
-		tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成0~1点雷电伤害，然后随机弃置其一张牌',
+		tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成0点雷电伤害，然后随机弃置其一张牌',
 		fenliu:'分流',
 		fenliu_info:'出牌阶段限一次，你可以失去一点体力并获得3张牌',
 		hongxi:'虹吸',

@@ -806,10 +806,7 @@ character.sp={
 				return event.player!=player&&_status.currentPhase==event.player;
 			},
 			content:function(){
-				"step 0"
-				trigger.player.draw();
-				"step 1"
-				player.draw();
+				game.asyncDraw([trigger.player,player]);
 			},
 			ai:{
 				expose:0.2

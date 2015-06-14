@@ -1672,6 +1672,7 @@
 					}
 					else{
 						player._damagepopup=-num;
+						player._damagenature=event.nature;
 						setTimeout(function(){
 							player.popup(player._damagepopup,player._damagenature);
 							delete player._damagepopup;
@@ -8506,6 +8507,7 @@
 							translate[1]+=e.y-ddialog._dragorigin.y;
 							ddialog.style.webkitTransform='translate('+translate[0]+'px,'+translate[1]+'px)'
 						}
+						_status.clicked=true;
 					}
 				}
 			},

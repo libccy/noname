@@ -194,6 +194,9 @@ mode.chess={
 				game.over(game.me.side==game.players[0].side);
 			},
 			$draw:function(num){
+				return this.$gainmod(num);
+			},
+			$drawx:function(num){
 				var cards,node;
 				if(get.itemtype(num)=='cards'){
 					cards=num;
@@ -663,6 +666,7 @@ mode.chess={
 					if(this._chessdrag){
 						this.parentNode.scrollLeft=this._chessdrag[1]-e.x+this._chessdrag[0].x;
 						this.parentNode.scrollTop=this._chessdrag[2]-e.y+this._chessdrag[0].y;
+						_status.clicked=true;
 					}
 					e.preventDefault();
 				});
@@ -820,7 +824,11 @@ mode.chess={
 		clickChessInfo:function(e){
 			if(this.link.isAlive()){
 				this.link.chessFocus();
-				ui.click.target.call(this.link,e);
+				if(this.link.classList.contains('selectable')||
+				this.link.classList.contains('selected')){
+					this.link.click();
+				}
+				// ui.click.target.call(this.link,e);
 				e.stopPropagation();
 			}
 		},
@@ -1051,6 +1059,7 @@ mode.chess={
 			game.me.node.avatar.classList.remove('glow2');
 			player.node.avatar.classList.add('glow2');
 			game.swapControl(player);
+			player.chessFocus();
 			ui.create.fakeme();
 		}
 	},
@@ -1305,7 +1314,7 @@ mode.chess={
 		zhiming:{
 			trigger:{source:'damageBegin'},
 			filter:function(event,player){
-				return get.distance(event.player,player,'attack')>1;
+				return get.distance(event.player,player,'attack')>1&&event.card&&event.card.name=='sha';
 			},
 			forced:true,
 			content:function(){

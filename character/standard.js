@@ -1327,7 +1327,7 @@ character.standard={
 							return -3;
 						}
 						else{
-							return ai.get.effect(ui.selected.targets[0],{name:'juedou'},target,player);
+							return ai.get.effect(ui.selected.targets[0],{name:'juedou'},target,target);
 						}
 					}
 				},

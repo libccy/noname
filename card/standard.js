@@ -198,15 +198,15 @@ card.standard={
 					target:function(player,target){
 						if(target.num('h')<=target.hp&&target.hp>2) return 0;
 						if(target.hp<0&&target!=player&&target.identity!='zhu') return 0;
-						if(ai.get.attitude(player,target)<3) return 0;
+						var att=ai.get.attitude(player,target);
+						if(att<3&&att>=0) return 0;
 						var tri=_status.event.parent._trigger;
 						if(lib.config.mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
-								var num=target.num('h','jiu')?1:0;
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].identity=='fan'){
 										num+=game.players[i].num('h','tao');
-										if(num>1) return 2;
+										if(num>2) return 2;
 									}
 								}
 								return 0;
