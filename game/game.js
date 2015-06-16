@@ -1305,7 +1305,8 @@
 					"step 0"
 					var info=get.info(event.skill);
 					event._skill=event.skill;
-					if(lib.config.background_speak&&!lib.skill.global.contains(event.skill)){
+					if(lib.config.background_speak&&
+						(!lib.skill.global.contains(event.skill)||lib.skill[event.skill].forceaudio)){
 						if(typeof info.audio=='number'){
 							game.playAudio('skill',event.skill+Math.ceil(info.audio*Math.random()));
 						}

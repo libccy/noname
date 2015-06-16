@@ -1,3 +1,4 @@
+'use strict';
 character.wind={
 	character:{
 		xiahouyuan:['male','wei',4,['shensu'],['fullskin']],
@@ -16,6 +17,7 @@ character.wind={
 			group:['shensu1','shensu2']
 		},
 		shensu1:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			content:function(){
@@ -40,6 +42,7 @@ character.wind={
 			}
 		},
 		shensu2:{
+			audio:2,
 			trigger:{player:'phaseUseBefore'},
 			direct:true,
 			filter:function(event,player){
@@ -87,6 +90,7 @@ character.wind={
 			},
 		},
 		jushou:{
+			audio:true,
 			trigger:{player:'phaseEnd'},
 			content:function(){
 				player.turnOver();
@@ -94,6 +98,7 @@ character.wind={
 			}
 		},
 		liegong:{
+			audio:2,
 			trigger:{player:'shaBegin'},
 			filter:function(event,player){
 				var length=event.target.num('h');
@@ -104,6 +109,7 @@ character.wind={
 			}
 		},
 		kuanggu:{
+			audio:2,
 			trigger:{source:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
@@ -114,6 +120,7 @@ character.wind={
 			}
 		},
 		tianxiang:{
+			audio:2,
 			trigger:{player:'damageBefore'},
 			direct:true,
 			filter:function(event,player){
@@ -205,6 +212,7 @@ character.wind={
 			}
 		},
 		buqu:{
+			audio:2,
 			trigger:{player:'dieBefore'},
 			forced:true,
 			filter:function(event,player){return player.maxHp>0},
@@ -249,6 +257,7 @@ character.wind={
 			}
 		},
 		fenji:{
+			audio:2,
 			trigger:{global:'discardAfter'},
 			filter:function(event){
 				if(_status.currentPhase!=event.player){
@@ -269,6 +278,7 @@ character.wind={
 			},
 		},
 		leiji:{
+			audio:2,
 			trigger:{player:'respond'},
 			filter:function(event,player){
 				return event.card.name=='shan';
@@ -320,6 +330,7 @@ character.wind={
 			}
 		},
 		guidao:{
+			audio:2,
 			trigger:{global:'judge'},
 			filter:function(event,player){
 				return player.num('he',{color:'black'})>0;
@@ -387,6 +398,7 @@ character.wind={
 			global:'huangtian2'
 		},
 		huangtian2:{
+			audio:2,
 			enable:'phaseUse',
 			discard:false,
 			line:true,
@@ -404,6 +416,7 @@ character.wind={
 				return target==game.zhu;
 			},
 			usable:1,
+			forceaudio:true,
 			content:function(){
 				target.gain(cards);
 			},

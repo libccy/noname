@@ -238,8 +238,8 @@ window.config={
 	right_click:'pause',
 	sort:'type_sort',
 
-	cards:['standard','ex','extra','refresh','guozhan'],
-	characters:['standard','wind','fire','woods','mountain','sp','yijiang','refresh','extra','guozhan'],
+	cards:['standard','ex','extra','refresh'],
+	characters:['standard','wind','fire','woods','mountain','refresh'],
 	plays:[],
 
 	mode:'identity',

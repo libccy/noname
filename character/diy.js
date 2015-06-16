@@ -432,6 +432,7 @@ character.diy={
 			},
 		},
 		diyleiji:{
+			audio:2,
 			trigger:{player:'respond'},
 			filter:function(event,player){
 				return event.card.name=='shan';
