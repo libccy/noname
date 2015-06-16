@@ -1766,7 +1766,7 @@ mode.chess={
 		chess_taishici:['male','wu',4,['guanchuan','pojun']],
 		//
 		// chess_lvbu:['male','qun',3,['']],
-		chess_sunshangxiang:['female','wu',3,['lingdong','lianshe']],
+		chess_sunshangxiang:['female','wu',3,['lingdong','lianshe','gongji']],
 		chess_diaochan:['female','qun',3,['xingzhui','pianyi']],
 		chess_huatuo:['male','qun',3,['zhenjiu','mazui']],
 		// chess_zhangjiao:['male','qun',3,['']],

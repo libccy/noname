@@ -392,7 +392,7 @@ character.extra={
 								}
 							}
 							if(!hasfriend) return;
-							if(player.hp>2&&ai.get.attitude(player,target<=0)) return [0,2];
+							if(player.hp>2&&ai.get.attitude(player,target)<=0) return [0,2];
 							return [1,0,0,-player.hp];
 						}
 					}
@@ -751,7 +751,7 @@ character.extra={
 							if(lib.config.mode=='identity'){
 								if(game.players[i].ai.shown<=0.2) return 0;
 							}
-							else if(lib.config.mode='guozhan'){
+							else if(lib.config.mode=='guozhan'){
 								if(game.players[i].identity=='unknown') return 0;
 							}
 						}

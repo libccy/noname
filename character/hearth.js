@@ -147,7 +147,11 @@ character.hearth={
 			content:function(){
 				"step 0";
 				player.chooseTarget('是否发动【震击】？').ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder')-(target.num('he')?1:0);
+					var eff=ai.get.damageEffect(target,player,player,'thunder');
+					if(eff>0){
+						return eff+(target.num('he')?1:0);
+					}
+					return 0;
 				};
 				"step 1"
 				if(result.bool){

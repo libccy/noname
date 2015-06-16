@@ -6109,7 +6109,10 @@ character.swd={
 		lanzhi:{
 			trigger:{source:'damageBefore'},
 			filter:function(event,player){
-				return player.skills.contains('lanzhi2')==false;
+				return player.skills.contains('lanzhi2')==false&&event.player!=player;
+			},
+			prompt:function(event){
+				return '是否对'+get.translation(event.player)+'发动【兰芷】？';
 			},
 			check:function(event,player){
 				if(event.source==player){
@@ -7667,7 +7670,7 @@ character.swd={
 		xiaozhan:'消战',
 		xiaozhan_info:'其他角色使用杀时，若你不是杀的目标，可以弃置一张杀取消之',
 		xielei:'挟雷',
-		xielei_info:'每当你使用或打出一张杀，弃置一张牌并对目标以外的一名角色造成一点雷电伤害',
+		xielei_info:'每当你使用或打出一张杀，可以弃置一张牌并对目标以外的一名角色造成一点雷电伤害',
 		dangping:'荡平',
 		dangping_info:'每当你造成一次伤害，可以弃置一张手牌对其距离1以内的另一名角色造成一点伤害',
 		guisi:'归思',

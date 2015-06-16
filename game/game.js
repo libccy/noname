@@ -25,7 +25,6 @@
 			frameId:0,
 		},
 		help:{
-			'关于':'无名杀 1.2.3<div class="dashedline"></div><ul><li>1L 先谢神上<li>图片等素材来自网(shén)络(shā)<li>bug反馈/建议欢迎来百度无名杀吧',
 			'选项帮助':'<ul><li>控制台命令：开启后可用浏览器控制台控制游戏<li>自动确认：开启后当候选目标仅有1个时点击目标无需再点击确定<li>悬停时间：弹出角色/卡牌介绍所需的等待时间<li>'+
 			'触屏模式：可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌：开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>隐藏非全身皮肤：在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法：为游戏增加不同玩法，开启后可在帮助中查看介绍'+
@@ -1142,6 +1141,11 @@
 				},
 				useCard:function(){
 					"step 0"
+					if(!card){
+						console.log('err: no card',get.translation(event.player));
+						event.finish();
+						return;
+					}
 					player.lose(cards);
 					var cardaudio=true;
 					if(event.skill){
@@ -6741,7 +6745,7 @@
 				if(thisiscard){
 					groupSort=function(name){
 						if(lib.card[name[2]].type=='basic') return 0;
-						if(lib.card[name[2]].type=='stone') return 0.5;
+						if(lib.card[name[2]].type=='stonecard') return 0.5;
 						if(lib.card[name[2]].type=='stonecharacter') return 1;
 						if(lib.card[name[2]].type=='chess') return 1.5;
 						if(lib.card[name[2]].type=='trick') return 2;
@@ -10401,7 +10405,7 @@
 			if(sort=='type_sort'){
 				func=function(card){
 					if(get.type(card)=='basic') return 2;
-					if(get.type(card)=='stone') return -0.5;
+					if(get.type(card)=='stonecard') return -0.5;
 					if(get.type(card)=='stonecharacter') return 1;
 					if(get.type(card)=='chess') return 1.5;
 					if(get.type(card)=='trick') return -1;
@@ -10603,7 +10607,8 @@
 						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+'已禁用'+'</div></div>');
 					}
 				}
-				if(!simple){
+				// if(!simple)
+				if(false){
 					var storage=node.storage;
 					for(i in storage){
 						if(get.info(i)&&get.info(i).intro){
@@ -10685,7 +10690,10 @@
 				else{
 					var stint=get.storageintro(info.content,player.storage[node.skill],player,uiintro);
 					if(stint){
-						if(stint.length<=10){
+						if(stint[0]=='$'){
+							uiintro.add('<div class="caption">'+stint.slice(1)+'</div>');
+						}
+						else if(stint.length<=10){
 							uiintro.add('<div class="text center">'+stint+'</div>');
 						}
 						else{

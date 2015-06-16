@@ -1214,7 +1214,7 @@ character.sp={
 				target.addSkill('yongjue');
 				target.marks.yongjue=target.markCharacter(player,{
 					name:'存嗣',
-					content:'已获得技能【勇决】'
+					content:'$<div><div class="skill">【勇决】</div><div>每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之（每回合最多能以此法获得一张杀）</div></div>'
 				})
 				"step 1"
 				player.turnOver();
@@ -2799,7 +2799,6 @@ character.sp={
 		shoucheng_info:'每当一名其他角色在其回合外失去最后的手牌时，你可令该角色摸一张牌。',
 		shengxi_info:'若你于出牌阶段未造成伤害，你可在弃牌阶段开始时摸两张牌。',
 		hengzheng_info:'摸牌阶段开始时，若你的体力值为1或你没有手牌，你可以放弃摸牌，获得每名其他角色区域里的一张牌。',
-		yongjue_info:'每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之（每回合最多能以此法获得一张杀）',
 		cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色，令该角色获得技能【勇决】，然后翻面',
 		guixiu_info:'每当你成为杀的目标，若你的手牌数小于体力值，可以摸一张牌',
 		fenming_info:'结束阶段开始时，若你处于连环状态，你可以弃置处于连环状态的每名角色的一张牌。',

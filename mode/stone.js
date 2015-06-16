@@ -513,7 +513,7 @@ mode.stone={
 			}
 		},
 		zhaohunfan:{
-			type:'stone',
+			type:'stonecard',
 			fullskin:true,
 			enable:true,
 			stoneact:2,
@@ -546,7 +546,7 @@ mode.stone={
 			}
 		},
 		jintiao:{
-			type:'stone',
+			type:'stonecard',
 			enable:true,
 			stoneact:2,
 			fullskin:true,
@@ -572,7 +572,7 @@ mode.stone={
 		},
 		liumangxingzhen:{
 			fullskin:true,
-			type:'stone',
+			type:'stonecard',
 			enable:true,
 			filterTarget:function(card,player,target){
 				return target.isMin();
@@ -597,7 +597,7 @@ mode.stone={
 		},
 		shengerpingdeng:{
 			fullskin:true,
-			type:'stone',
+			type:'stonecard',
 			enable:true,
 			stoneact:2,
 			filterTarget:function(card,player,target){
@@ -620,7 +620,7 @@ mode.stone={
 		},
 		emofengdi:{
 			fullskin:true,
-			type:'stone',
+			type:'stonecard',
 			enable:function(event,player){
 				if(player.isMin()) return false;
 				return player.canAddFellow();
@@ -644,7 +644,7 @@ mode.stone={
 			}
 		},
 		konghunshi:{
-			type:'stone',
+			type:'stonecard',
 			fullskin:true,
 			enable:function(event,player){
 				if(player.isMin()) return false;
@@ -671,7 +671,7 @@ mode.stone={
 		},
 		mindieyi:{
 			fullskin:true,
-			type:'stone',
+			type:'stonecard',
 			enable:true,
 			stoneact:3,
 			filterTarget:function(card,player,target){
@@ -692,7 +692,7 @@ mode.stone={
 			}
 		},
 		miefafu:{
-			type:'stone',
+			type:'stonecard',
 			enable:true,
 			stoneact:2,
 			fullskin:true,
@@ -714,9 +714,9 @@ mode.stone={
 		},
 		dianhaishenzhu:{
 			fullskin:true,
-			type:'stone',
+			type:'stonecard',
 			enable:true,
-			stoneact:3,
+			stoneact:1,
 			filterTarget:function(card,player,target){
 				return target.isMin()&&target.side==player.side&&!target.skills.contains('chaofeng');
 			},
@@ -738,7 +738,7 @@ mode.stone={
 		},
 		yesushengxue:{
 			fullskin:true,
-			type:'stone',
+			type:'stonecard',
 			enable:true,
 			stoneact:4,
 			filterTarget:function(card,player,target){
@@ -760,7 +760,7 @@ mode.stone={
 			}
 		},
 		sanghunzhao:{
-			type:'stone',
+			type:'stonecard',
 			fullskin:true,
 			enable:true,
 			stoneact:3,
@@ -785,7 +785,7 @@ mode.stone={
 			}
 		},
 		fengraozhijiao:{
-			type:'stone',
+			type:'stonecard',
 			fullskin:true,
 			enable:true,
 			stoneact:1,
@@ -1433,6 +1433,8 @@ mode.stone={
 		zhaohunfan_info:'令双方各一名随从立即死亡',
 		fengraozhijiao:'丰饶之角',
 		fengraozhijiao_info:'令一名随从回复一点体力',
+
+		stonecard:'法术'
 	},
 	ai:{
 		get:{
@@ -1455,7 +1457,7 @@ mode.stone={
 		'<li>牌堆中随机加入总量1/3的随从牌，使用之可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 		'随从与其他所有角色相互距离基数为1<li>'+
 		'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
-		'<li>牌堆中随机加入总量1/6的炉石牌，效果主要与随从有关，炉石牌根据强度不同可能会消耗额外的行动值'+
+		'<li>牌堆中随机加入总量1/6的法术牌，效果主要与随从有关，法术牌根据强度不同可能会消耗额外的行动值'+
 		'<li>主将可重铸装备牌和随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
 		'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
 		'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸2+X张牌，X为对方存活的随从数，无替补时游戏结束'

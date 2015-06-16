@@ -359,11 +359,14 @@ character.xianjian={
 					player.$throw(result.links);
 					ui.discardPile.appendChild(result.links[0]);
 					trigger.player.recover();
-					trigger.player.draw();
 					if(player!=trigger.player){
-						player.draw();
+						game.asyncDraw([trigger.player,player]);
 					}
 					player.logSkill('shuiyun5',trigger.player,'thunder');
+				}
+				"step 2"
+				if(trigger.player!=player){
+					game.delay();
 				}
 			},
 			ai:{
@@ -459,6 +462,10 @@ character.xianjian={
 					target.gain(cards);
 					target.addSkill('changnian2');
 					player.logSkill('changnian',target);
+					target.marks.changnian=target.markCharacter(player,{
+						name:'长念',
+						content:'$<div><div class="skill">【追思】</div><div>锁定技，回合结束阶段，你摸一张牌</div></div>'
+					});
 				}
 			},
 			ai:{
@@ -1344,12 +1351,12 @@ character.xianjian={
 		shuiyun2:'水蕴',
 		shuiyun5:'水蕴',
 		shuiyun3:'水蕴',
-		shuiyun_info:'回合结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力，然后与其各摸1张牌',
+		shuiyun_info:'回合结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力，若该角色不是你，你与其各摸1张牌',
 		wangyou:'忘忧',
 		wangyou_info:'其他角色的回合结束阶段，你可以弃置一张牌，令此回合内受过伤害的所有角色各摸一张牌',
 		changnian:'长念',
-		changnian2:'长念',
-		changnian_info:'你死亡时，可以将所有牌交给一名其他角色，令其于每个回合结束阶段摸一张牌；若你有至少1张“蕴”，该角色增加1点体力上限回复X点体力，X为“蕴”的个数',
+		changnian2:'追思',
+		changnian_info:'你死亡时，可以将所有牌交给一名其他角色，令其获得技能【追思】；若你有至少1张“蕴”，该角色增加1点体力上限回复X点体力，X为“蕴”的个数',
 		sajin:'洒金',
 		sajin_info:'出牌阶段，你可以弃置一张手牌并指定任意名角色进行判定，若判定花色与你弃置的牌相同，该角色回复一点体力',
 		jubao:'聚宝',

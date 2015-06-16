@@ -135,8 +135,27 @@ character.mountain={
 				"step 0"
 				player.chooseToDiscard(true);
 				"step 1"
-				player.storage.fangquan.phase();
+				var target=player.storage.fangquan;
+				target.marks.fangquan=target.markCharacter(player,{
+					name:'放权',
+					content:'进行一个额外的回合'
+				});
+				target.phase();
+				target.addSkill('fangquan3');
 				player.removeSkill('fangquan2');
+				delete player.storage.fangquan;
+			}
+		},
+		fangquan3:{
+			trigger:{player:'phaseAfter'},
+			forced:true,
+			popup:false,
+			content:function(){
+				if(player.marks.fangquan){
+					player.marks.fangquan.delete();
+					delete player.marks.fangquan;
+				}
+				player.removeSkill('fangquan3');
 			}
 		},
 		ruoyu:{

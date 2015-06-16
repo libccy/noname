@@ -519,7 +519,7 @@ character.gujian={
 				"step 2"
 				if(player.isTurnedOver()) player.turnOver();
 				"step 3"
-				player.draw(event.num);
+				player.draw(3);
 				"step 4"
 				player.recover(1-player.hp);
 				player.removeSkill('fanshi');
@@ -1016,7 +1016,7 @@ character.gujian={
 		fanshi_info:'锁定技，若你于回合内造成过伤害，你于弃牌阶段结束时流失一点体力并摸一张牌',
 		shahun:'煞魂',
 		shahun2:'煞魂',
-		shahun_info:'限定技，濒死阶段，你可以重置武将牌，弃置所有牌并摸等量的牌（至少三张），然后将体力回复至1；若如此做，你失去技能【反噬】，并获得技能【绝境】，然后于三回合后立即死亡',
+		shahun_info:'限定技，濒死阶段，你可以重置武将牌，弃置所有牌并摸三张牌，然后将体力回复至1；若如此做，你失去技能【反噬】，获得技能【绝境】，并于三回合后立即死亡',
 
 		xiuhua:'袖花',
 		xiuhua_info:'每当你使用杀击中目标，你可以将其拉至你的旁边',
