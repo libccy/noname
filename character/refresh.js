@@ -237,6 +237,7 @@ character.refresh={
 			}
 		},
 		qinxue:{
+			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -253,6 +254,7 @@ character.refresh={
 			}
 		},
 		qingjian:{
+			audio:2,
 			unique:true,
 			trigger:{player:'gainAfter'},
 			direct:true,
@@ -448,6 +450,7 @@ character.refresh={
 			}
 		},
 		retishen:{
+			audio:2,
 			unique:true,
 			mark:true,
 			trigger:{player:'phaseBegin'},
@@ -500,6 +503,7 @@ character.refresh={
 			}
 		},
 		reyajiao:{
+			audio:2,
 			trigger:{player:['respond','useCard']},
 			frequent:true,
 			filter:function(event,player){
@@ -675,6 +679,7 @@ character.refresh={
 			}
 		},
 		yijue:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -837,6 +842,7 @@ character.refresh={
 			}
 		},
 		qiaomeng:{
+			audio:2,
 			trigger:{source:'damageEnd'},
 			direct:true,
 			filter:function(event){
@@ -904,6 +910,9 @@ character.refresh={
 				if(_status.currentPhase==player){
 					player.addTempSkill('zhaxiang2',{player:'phaseAfter'});
 				}
+				else{
+					game.playAudio('skill','zhaxiang'+Math.ceil(Math.random()*2));
+				}
 			}
 		},
 		zhaxiang2:{
@@ -942,6 +951,7 @@ character.refresh={
 			}
 		},
 		qianxin:{
+			audio:2,
 			unique:true,
 			trigger:{source:'damageAfter'},
 			forced:true,
@@ -955,6 +965,7 @@ character.refresh={
 			}
 		},
 		jianyan:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			content:function(){
@@ -1006,7 +1017,7 @@ character.refresh={
 			filter:function(event,player){
 				return player.num('he',{suit:'diamond'})>0;
 			},
-			prepare:function(cards,player,targets){
+			prepare:function(cards,player){
 				player.$throw(cards);
 			},
 			position:'he',
@@ -1039,6 +1050,7 @@ character.refresh={
 			}
 		},
 		fenwei:{
+			audio:2,
 			unique:true,
 			mark:true,
 			trigger:{global:'useCard'},
@@ -1080,6 +1092,7 @@ character.refresh={
 			}
 		},
 		chulao:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -1116,6 +1129,7 @@ character.refresh={
 			}
 		},
 		xunxun:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			frequent:true,
 			content:function(){
@@ -1139,6 +1153,7 @@ character.refresh={
 			},
 		},
 		wangxi:{
+			audio:2,
 			trigger:{player:'damageEnd',source:'damageEnd'},
 			filter:function(event){
 				return event.num&&event.source&&event.player&&

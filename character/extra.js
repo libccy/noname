@@ -932,6 +932,7 @@ character.extra={
 			}
 		},
 		gongxin:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){

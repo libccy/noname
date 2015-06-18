@@ -1,3 +1,4 @@
+'use strict';
 character.fire={
 	character:{
 		zhugeliangwolong:['male','shu',3,['huoji','bazhen','kanpo'],['fullskin']],
@@ -15,6 +16,7 @@ character.fire={
 	},
 	skill:{
 		huoji:{
+			audio:2,
 			enable:'chooseToUse',
 			filterCard:function(card){
 				return get.color(card)=='red';
@@ -30,6 +32,7 @@ character.fire={
 			}
 		},
 		bazhen:{
+			audio:2,
 			inherit:'bagua_skill',
 			filter:function(event,player){
 				if(!event.filterCard({name:'shan'})) return false;
@@ -51,6 +54,7 @@ character.fire={
 			}
 		},
 		kanpo:{
+			audio:2,
 			enable:'chooseToUse',
 			filterCard:function(card){
 				return get.color(card)=='black';
@@ -67,6 +71,7 @@ character.fire={
 			group:['lianhuan1','lianhuan2']
 		},
 		lianhuan1:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.num('h',{suit:'club'})>0;
@@ -79,6 +84,7 @@ character.fire={
 			check:function(card){return 4-ai.get.value(card)}
 		},
 		lianhuan2:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.num('h',{suit:'club'})>0;
@@ -106,6 +112,7 @@ character.fire={
 			}
 		},
 		niepan:{
+			audio:2,
 			unique:true,
 			enable:'chooseToUse',
 			mark:true,
@@ -143,6 +150,7 @@ character.fire={
 			}
 		},
 		quhu:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -219,6 +227,7 @@ character.fire={
 			}
 		},
 		jieming:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -269,6 +278,7 @@ character.fire={
 			}
 		},
 		qiangxi:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterCard:function(card){
@@ -308,6 +318,7 @@ character.fire={
 			threaten:1.3
 		},
 		tianyi:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -378,6 +389,7 @@ character.fire={
 			}
 		},
 		shuangxiong:{
+			audio:true,
 			trigger:{player:'phaseDrawBefore'},
 			check:function(event,player){
 				if(player.num('h')>player.hp) return true;
@@ -396,6 +408,7 @@ character.fire={
 			}
 		},
 		shuangxiong2:{
+			audio:true,
 			enable:'phaseUse',
 			viewAs:{name:'juedou'},
 			filterCard:function(card,player){
@@ -411,6 +424,7 @@ character.fire={
 			}
 		},
 		luanji:{
+			audio:2,
 			enable:'phaseUse',
 			viewAs:{name:'wanjian'},
 			filterCard:function(card,player){
@@ -448,8 +462,8 @@ character.fire={
 			}
 		},
 		mengjin:{
+			audio:2,
 			trigger:{player:'shaMiss'},
-			popup:false,
 			priority:-1,
 			filter:function(event){
 				return event.target.num('he')>0;

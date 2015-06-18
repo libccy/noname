@@ -1,3 +1,4 @@
+'use strict';
 character.woods={
 	character:{
 		menghuo:['male','shu',4,['huoshou','zaiqi'],['fullskin']],
@@ -25,6 +26,7 @@ character.woods={
 			}
 		},
 		huoshou1:{
+			audio:2,
 			trigger:{target:'useCardToBefore'},
 			forced:true,
 			priority:15,
@@ -47,6 +49,7 @@ character.woods={
 			}
 		},
 		zaiqi:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			filter:function(event,player){
 				return player.hp<player.maxHp;
@@ -106,6 +109,7 @@ character.woods={
 			}
 		},
 		juxiang1:{
+			audio:2,
 			trigger:{target:'useCardToBefore'},
 			forced:true,
 			priority:15,
@@ -129,6 +133,7 @@ character.woods={
 			}
 		},
 		lieren:{
+			audio:2,
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
 				return (event.card&&event.card.name=='sha'&&
@@ -149,6 +154,7 @@ character.woods={
 			}
 		},
 		xingshang:{
+			audio:2,
 			unique:true,
 			gainable:true,
 			trigger:{global:'dieEnd'},
@@ -173,6 +179,7 @@ character.woods={
 			}
 		},
 		fangzhu:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			content:function(){
@@ -235,6 +242,8 @@ character.woods={
 			global:'songwei2',
 		},
 		songwei2:{
+			audio:2,
+			forceaudio:true,
 			trigger:{player:'judgeEnd'},
 			filter:function(event,player){
 				if(!game.zhu) return false;
@@ -254,6 +263,7 @@ character.woods={
 			}
 		},
 		duanliang1:{
+			audio:2,
 			enable:'chooseToUse',
 			filterCard:function(card){
 				if(get.type(card)=='trick') return false;
@@ -278,6 +288,7 @@ character.woods={
 			}
 		},
 		haoshi:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			threaten:1.4,
 			check:function(event,player){
@@ -340,6 +351,7 @@ character.woods={
 			}
 		},
 		dimeng:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			position:'he',
@@ -432,6 +444,7 @@ character.woods={
 			}
 		},
 		yinghun:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
 				return player.hp<player.maxHp;
@@ -494,6 +507,7 @@ character.woods={
 			}
 		},
 		jiuchi:{
+			audio:2,
 			enable:'chooseToUse',
 			filterCard:function(card){
 				return get.suit(card)=='spade';
@@ -506,6 +520,7 @@ character.woods={
 			}
 		},
 		roulin:{
+			audio:2,
 			trigger:{player:'shaBegin',target:'shaBegin'},
 			forced:true,
 			filter:function(event,player){
@@ -535,6 +550,7 @@ character.woods={
 			}
 		},
 		benghuai:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			check:function(){
@@ -569,6 +585,8 @@ character.woods={
 			global:'baonue2'
 		},
 		baonue2:{
+			audio:2,
+			forceaudio:true,
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
 				if(!game.zhu) return false;
@@ -590,6 +608,7 @@ character.woods={
 			}
 		},
 		luanwu:{
+			audio:2,
 			unique:true,
 			enable:'phaseUse',
 			filter:function(event,player){

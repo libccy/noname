@@ -1,3 +1,4 @@
+'use strict';
 character.mountain={
 	character:{
 		jiangwei:['male','shu',4,['tiaoxin','zhiji'],['fullskin']],
@@ -11,6 +12,7 @@ character.mountain={
 	},
 	skill:{
 		tiaoxin:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -44,6 +46,7 @@ character.mountain={
 			}
 		},
 		zhiji:{
+			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -73,6 +76,7 @@ character.mountain={
 			}
 		},
 		xiangle:{
+			audio:2,
 			trigger:{target:'useCardToBefore'},
 			forced:true,
 			filter:function(event,player){
@@ -103,6 +107,7 @@ character.mountain={
 			}
 		},
 		fangquan:{
+			audio:2,
 			trigger:{player:'phaseUseBefore'},
 			filter:function(event,player){
 				return player.num('h')>0;
@@ -159,6 +164,7 @@ character.mountain={
 			}
 		},
 		ruoyu:{
+			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -179,12 +185,14 @@ character.mountain={
 			}
 		},
 		qiaobian:{
+			audio:2,
 			group:['qiaobian1','qiaobian2','qiaobian3','qiaobian4'],
 			ai:{
 				threaten:3
 			}
 		},
 		qiaobian1:{
+			audio:2,
 			trigger:{player:'phaseJudgeBefore'},
 			filter:function(event,player){
 				return player.num('h')>0;
@@ -208,6 +216,7 @@ character.mountain={
 			}
 		},
 		qiaobian2:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			filter:function(event,player){
 				return player.num('h')>0;
@@ -270,6 +279,7 @@ character.mountain={
 			}
 		},
 		qiaobian3:{
+			audio:2,
 			trigger:{player:'phaseUseBefore'},
 			filter:function(event,player){
 				return player.num('h')>0;
@@ -395,6 +405,7 @@ character.mountain={
 			}
 		},
 		qiaobian4:{
+			audio:2,
 			trigger:{player:'phaseDiscardBefore'},
 			direct:true,
 			filter:function(event,player){
@@ -420,6 +431,7 @@ character.mountain={
 			}
 		},
 		tuntian:{
+			audio:2,
 			trigger:{player:'loseEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -480,6 +492,7 @@ character.mountain={
 			}
 		},
 		zaoxian:{
+			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -493,6 +506,7 @@ character.mountain={
 			}
 		},
 		jixi:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.storage.tuntian.length>0;
@@ -536,6 +550,7 @@ character.mountain={
 			}
 		},
 		jiang:{
+			audio:2,
 			trigger:{player:['shaBefore','juedouBefore'],target:['shaBefore','juedouBefore']},
 			filter:function(event,player){
 				if(event.card.name=='juedou') return true;
@@ -557,6 +572,7 @@ character.mountain={
 			}
 		},
 		hunzi:{
+			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
@@ -605,6 +621,8 @@ character.mountain={
 			global:'zhiba2',
 		},
 		zhiba2:{
+			audio:2,
+			forceaudio:true,
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(!game.zhu) return false;
@@ -647,6 +665,7 @@ character.mountain={
 			}
 		},
 		zhijian:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.num('h',{type:'equip'})>0;
@@ -684,6 +703,7 @@ character.mountain={
 			}
 		},
 		guzheng:{
+			audio:2,
 			unique:true,
 			gainable:true,
 			trigger:{global:'phaseDiscardEnd'},
@@ -745,6 +765,7 @@ character.mountain={
 			}
 		},
 		beige:{
+			audio:2,
 			trigger:{global:'damageEnd'},
 			filter:function(event,player){
 				return (event.card&&event.card.name=='sha'&&event.source&&
@@ -778,6 +799,7 @@ character.mountain={
 			}
 		},
 		duanchang:{
+			audio:2,
 			trigger:{player:'dieBegin'},
 			forced:true,
 			filter:function(event){
@@ -881,6 +903,7 @@ character.mountain={
 			}
 		},
 		huashen2:{
+			audio:2,
 			trigger:{player:['phaseBegin','phaseEnd'],global:'gameStart'},
 			filter:function(event,player,name){
 				if(name=='phaseBegin'&&game.phaseNumber==1) return false;
@@ -908,6 +931,8 @@ character.mountain={
 								player.storage.huashen.current=link;
 							}
 							player.addSkill(link);
+							player.logSkill('huashen2');
+							game.log(get.translation(player)+'获得技能'+get.translation(link));
 							player.popup(link);
 
 							for(var i=0;i<event.dialog.buttons.length;i++){
@@ -962,6 +987,7 @@ character.mountain={
 			}
 		},
 		xinsheng:{
+			audio:2,
 			unique:true,
 			forbid:['guozhan'],
 			trigger:{player:'damageEnd'},
