@@ -1218,6 +1218,7 @@ character.sp={
 				})
 				"step 1"
 				player.turnOver();
+				player.removeSkill('guixiu');
 			},
 			intro:{
 				content:'limited'
@@ -1742,7 +1743,7 @@ character.sp={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('aocai');
+					game.log(get.translation(player)+'傲才发动成功');
 					trigger.untrigger();
 					trigger.responded=true;
 					result.buttons[0].link.remove();
@@ -2799,7 +2800,7 @@ character.sp={
 		shoucheng_info:'每当一名其他角色在其回合外失去最后的手牌时，你可令该角色摸一张牌。',
 		shengxi_info:'若你于出牌阶段未造成伤害，你可在弃牌阶段开始时摸两张牌。',
 		hengzheng_info:'摸牌阶段开始时，若你的体力值为1或你没有手牌，你可以放弃摸牌，获得每名其他角色区域里的一张牌。',
-		cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色，令该角色获得技能【勇决】，然后翻面',
+		cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色，令该角色获得技能【勇决】，然后翻面并失去技能【闺秀】',
 		guixiu_info:'每当你成为杀的目标，若你的手牌数小于体力值，可以摸一张牌',
 		fenming_info:'结束阶段开始时，若你处于连环状态，你可以弃置处于连环状态的每名角色的一张牌。',
 		duanxie_info:'出牌阶段限一次，你可以令一名其他角色横置武将牌，若如此做，你横置武将牌。',

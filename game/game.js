@@ -860,7 +860,10 @@
 					"step 0"
 					if(event.isMine()){
 						ui.create.confirm('oc');
-						if(event.prompt){
+						if(event.dialog){
+							event.dialog.open();
+						}
+						else if(event.prompt){
 							event.dialog=ui.create.dialog(event.prompt);
 						}
 						_status.imchoosing=true;
@@ -2835,6 +2838,9 @@
 						}
 						else if(typeof arguments[i]=='string'){
 							next.prompt=arguments[i];
+						}
+						else if(get.itemtype(arguments[i])=='dialog'){
+							next.dialog=arguments[i];
 						}
 						if(next.choice==undefined) next.choice=true;
 					}

@@ -1,3 +1,4 @@
+'use strict';
 character.jiange={
     character:{
         jg_pangtong:['male','shu',3,['qiwu','tianyu'],['fullskin']],

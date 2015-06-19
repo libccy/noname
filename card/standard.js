@@ -203,6 +203,7 @@ card.standard={
 						var tri=_status.event.parent._trigger;
 						if(lib.config.mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
+								var num=0;
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].identity=='fan'){
 										num+=game.players[i].num('h','tao');

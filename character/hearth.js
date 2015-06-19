@@ -10,8 +10,133 @@ character.hearth={
 		// hs_anduin:['male','qun',4,[],['fullskin']],
 		hs_thrall:['male','qun',4,['tuteng','tzhenji'],['fullskin']],
 		hs_waleera:['female','qun',3,['jianren','mengun','wlianji'],['fullskin']],
+
+		hs_medivh:['male','wei',3,['jingxiang','moying','xianzhi'],['fullskin']],
+		// hs_alleria:['male','qun',3,[],['fullskin']],
+		// hs_magni:['male','qun',3,['jingxiang'],['fullskin']],
 	},
 	skill:{
+		moying:{
+			trigger:{player:'phaseEnd'},
+			filter:function(event,player){
+				return !player.getStat('damage');
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【魔影】？').ai=function(target){
+					if(player.skills.contains('xianzhi')){
+						return -ai.get.attitude(player,target);
+					}
+					return 0;
+				};
+				"step 1"
+				if(result.bool){
+					event.target=result.targets[0];
+					event.target.judge(function(card){
+						return get.color(card)=='red'?1:-1;
+					});
+					player.logSkill('moying',event.target);
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.bool){
+					event.target.draw();
+				}
+				else{
+					event.target.loseHp();
+				}
+			},
+			ai:{
+				expose:0.1,
+				threaten:1.3
+			}
+		},
+		xianzhi:{
+			trigger:{global:'judgeBegin'},
+			frequent:true,
+			filter:function(){
+				return ui.cardPile.childNodes.length>1;
+			},
+			content:function(){
+				'step 0'
+				var str='';
+				if(trigger.card) str=get.translation(trigger.card.viewAs||trigger.card.name);
+				else if(trigger.skill) str=get.translation(trigger.skill);
+				else str=get.translation(trigger.parent.name);
+
+				var cards=[ui.cardPile.childNodes[0],ui.cardPile.childNodes[1]];
+				var att=ai.get.attitude(player,trigger.player);
+				var delta=trigger.judge(ui.cardPile.childNodes[1])-trigger.judge(ui.cardPile.childNodes[0]);
+				player.chooseControl('调换顺序','cancel',
+				ui.create.dialog('先知：'+get.translation(trigger.player)+'的'+str+'判定',cards,'hidden')).ai=function(){
+					if(att*delta>0) return '调换顺序';
+					else return 'cancel';
+				};
+				'step 1'
+				if(result.control=='调换顺序'){
+					var card=ui.cardPile.firstChild;
+					ui.cardPile.removeChild(card);
+					ui.cardPile.insertBefore(card,ui.cardPile.firstChild.nextSibling);
+					game.log(get.translation(player)+'调换了牌堆顶两张牌的顺序');
+				}
+			},
+			ai:{
+				expose:0.1,
+				rejudge:0.5
+			}
+		},
+		jingxiang:{
+			trigger:{player:'chooseToRespondBegin'},
+			direct:true,
+			filter:function(event,player){
+				if(event.responded) return false;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].num('h')){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				"step 0"
+				var players=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].num('h')){
+						players.push(game.players[i]);
+					}
+				}
+				if(!players.length){
+					event.finish();
+					return;
+				}
+				var target=players.randomGet();
+				event.target=target;
+				var cards=target.get('h');
+				player.chooseCardButton('镜像：选择'+get.translation(target)+'的一张卡手牌打出',cards).filterButton=function(button){
+					return trigger.filterCard(button.link);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('jingxiang',event.target);
+					event.target.lose(result.links);
+					trigger.untrigger();
+					trigger.responded=true;
+					result.buttons[0].link.remove();
+					trigger.result={bool:true,card:result.buttons[0].link}
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,effect){
+						if(get.tag(card,'respondShan')) return 0.7;
+						if(get.tag(card,'respondSha')) return 0.7;
+					}
+				}
+			},
+		},
 		wlianji:{
 			trigger:{player:'phaseEnd'},
 			frequent:true,
@@ -454,6 +579,7 @@ character.hearth={
 		}
 	},
 	translate:{
+		hs_medivh:'麦迪文',
 		hs_jaina:'吉安娜',
 		hs_rexxar:'雷克萨',
 		hs_uther:'乌瑟尔',
@@ -464,6 +590,13 @@ character.hearth={
 		hs_thrall:'萨尔',
 		hs_waleera:'瓦莉拉',
 
+
+		xianzhi:'先知',
+		xianzhi_info:'任意一名角色进行判定前，你可以观看牌堆顶的两张牌，并可以将其调换顺序',
+		moying:'魔影',
+		moying_info:'回合结束阶段，若你本回合内没有造成伤害，可以指定一名角色进行判定，若为黑色，其流失一点体力，若为红色，其摸一张牌',
+		jingxiang:'镜像',
+		jingxiang_info:'每当你需要打出卡牌时，你可以观看一名随机角色的手牌并将其视为你的手牌打出',
 		tuteng:'图腾',
 		tuteng_info:'出牌阶段限一次，你可以弃置一张牌并随机获得一个图腾；每当你受到一次伤害，你随机失去一个图腾',
 		tuteng1:'治疗图腾',
