@@ -34,7 +34,7 @@ character.hearth={
 					if(!target.hujia) return 0.8;
 				},
 				effect:{
-					target:function(card,player,target){
+					target:function(card,player){
 						if(get.tag(card,'damage')){
 							if(player.skills.contains('jueqing')) return [1,-1];
 							return 0.8;
@@ -457,6 +457,7 @@ character.hearth={
 				return 3-ai.get.value(card)
 			},
 			ai:{
+				threaten:1.5,
 				expose:0.1,
 				order:1,
 				result:{
@@ -601,7 +602,7 @@ character.hearth={
 			},
 			ai:{
 				effect:{
-					target:function(card,player,target,effect){
+					target:function(card){
 						if(get.tag(card,'respondShan')) return 0.7;
 						if(get.tag(card,'respondSha')) return 0.7;
 					}
@@ -765,7 +766,7 @@ character.hearth={
 				threaten:1.2,
 				expose:0.3,
 				effect:{
-					target:function(card,player,target,current){
+					target:function(card,player,target){
 						if(get.tag(card,'loseCard')&&target.num('he')){
 							return 0.7;
 						}
@@ -1091,6 +1092,7 @@ character.hearth={
 		xianzhi:'先知',
 		xianzhi_info:'任意一名角色进行判定前，你可以观看牌堆顶的两张牌，并可以将其调换顺序',
 		mdzhoufu:'诅咒',
+		mdzhoufu2:'诅咒',
 		mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果；当受此技能影响的角色进行判定时，你摸一张牌',
 		moying:'魔影',
 		moying_info:'锁定技，回合开始阶段，若场上没有闪电，你将牌堆中的一张闪电置于你的判定区',
