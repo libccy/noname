@@ -119,6 +119,9 @@ character.sp={
 		chouhai:{
 			trigger:{player:'damageBegin'},
 			forced:true,
+			check:function(){
+				return false;
+			},
 			filter:function(event,player){
 				return player.num('h')==0;
 			},
@@ -565,8 +568,12 @@ character.sp={
 			usable:1,
 			filterCard:true,
 			filterTarget:function(card,player,target){
-				return player!=target;
+				return player!=target&&!target.skills.contains('zhoufu2');
 			},
+			prepare:function(cards,player){
+				player.$throw(cards);
+			},
+			discard:false,
 			content:function(){
 				target.$gain2(cards);
 				target.storage.zhoufu2=cards[0];
@@ -578,6 +585,7 @@ character.sp={
 				return 3-ai.get.value(card)
 			},
 			ai:{
+				expose:0.1,
 				order:1,
 				result:{
 					player:1
@@ -595,6 +603,9 @@ character.sp={
 				player.$throw(player.storage.zhoufu2);
 				if(player.storage.zhoufu3.isAlive()&&player.storage.zhoufu3.skills.contains('yingbin')){
 					player.storage.zhoufu3.draw(2);
+				}
+				else{
+					game.delay(1.5);
 				}
 				"step 1"
 				player.judging=player.storage.zhoufu2;

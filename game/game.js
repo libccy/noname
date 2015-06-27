@@ -291,6 +291,8 @@
 			diamond:"♦︎",
 			spade:"♠︎",
 			club:"♣︎",
+			ghujia:'护甲',
+			ghujia_bg:'甲',
 			heart2:"红桃",
 			diamond2:"方片",
 			spade2:"黑桃",
@@ -1108,7 +1110,10 @@
 						event.finish();
 						return;
 					}
-					event.dialog=ui.create.dialog(get.translation(player.name)+'展示的牌',cards);
+					if(!event.str){
+						event.str=get.translation(player.name)+'展示的牌';
+					}
+					event.dialog=ui.create.dialog(event.str,cards);
 					var str=get.translation(player)+'展示了'+get.translation(cards[0]);
 					for(var i=1;i<cards.length;i++){
 						str+='、'+get.translation(cards[i]);
@@ -1643,6 +1648,21 @@
 				},
 				damage:function(){
 					"step 0"
+					if(num>0&&player.hujia&&!player.hasSkillTag('nohujia')){
+						if(num>=player.hujia){
+							num-=player.hujia;
+							game.log(get.translation(player)+'的护甲抵挡了'+get.cnNumber(player.hujia)+'点伤害');
+							player.hujia=0;
+						}
+						else{
+							player.hujia-=num;
+							game.log(get.translation(player)+'的护甲抵挡了'+get.cnNumber(num)+'点伤害');
+							num=0;
+						}
+						event.hujia=true;
+						player.update();
+					}
+					event.num=num;
 					if(lib.config.background_audio){
 						game.playAudio('effect','damage'+(num>1?'2':''));
 					}
@@ -1667,25 +1687,30 @@
 						}
 					}
 					player.changeHp(-num,false);
-					if(player._damagetimeout!=source){
-						player.$damage(source);
-						player._damagetimeout=source;
-						setTimeout(function(){
-							delete player._damagetimeout;
-						},500);
-					}
-					if(player._damagepopup){
-						player._damagepopup-=num;
-						player._damagenature=event.nature;
+					if(source){
+						if(player._damagetimeout!=source){
+							player.$damage(source);
+							player._damagetimeout=source;
+							setTimeout(function(){
+								delete player._damagetimeout;
+							},500);
+						}
+						if(player._damagepopup){
+							player._damagepopup-=num;
+							player._damagenature=event.nature;
+						}
+						else{
+							player._damagepopup=-num;
+							player._damagenature=event.nature;
+							setTimeout(function(){
+								player.popup(player._damagepopup,player._damagenature);
+								delete player._damagepopup;
+								delete player._damagenature;
+							},300);
+						}
 					}
 					else{
-						player._damagepopup=-num;
-						player._damagenature=event.nature;
-						setTimeout(function(){
-							player.popup(player._damagepopup,player._damagenature);
-							delete player._damagepopup;
-							delete player._damagenature;
-						},300);
+						player.$damage();
 					}
 					event.trigger('damage');
 					"step 1"
@@ -2031,6 +2056,7 @@
 					this.group=info[1];
 					this.hp=info[2];
 					this.maxHp=info[2];
+					this.hujia=0;
 					this.node.intro.innerHTML=lib.config.intro;
 					if(lib.config.touchscreen){
 						lib.setLongPress(this,ui.click.intro);
@@ -2111,6 +2137,7 @@
 					delete this.group;
 					delete this.hp;
 					delete this.maxHp;
+					delete this.hujia;
 					this.skills.length=0;
 					this.node.identity.style.backgroundColor='';
 					this.node.intro.innerHTML='';
@@ -2146,6 +2173,12 @@
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
 					var hp=this.node.hp;
 					hp.style.transition='none';
+					if(this.hujia){
+						this.markSkill('ghujia');
+					}
+					else{
+						this.unmarkSkill('ghujia');
+					}
 					if(lib.config.layout=='default'&&this.maxHp>14){
 						hp.innerHTML=this.hp+'/'+this.maxHp;
 						hp.classList.add('text');
@@ -2458,6 +2491,19 @@
 						}
 						return cards;
 					}
+				},
+				changeHujia:function(num){
+					if(typeof num!='number'){
+						num=1;
+					}
+					this.hujia+=num;
+					if(num>0){
+						game.log(get.translation(this)+'获得了'+get.cnNumber(num)+'点护甲值');
+					}
+					if(this.hujia<0){
+						this.hujia=0;
+					}
+					this.update();
 				},
 				setIdentity:function(identity){
 					if(!identity) identity=this.identity;
@@ -2985,9 +3031,10 @@
 					next.player=this;
 					next.content=lib.element.playerproto.showHandcards;
 				},
-				showCards:function(cards){
+				showCards:function(cards,str){
 					var next=game.createEvent('showCards');
 					next.player=this;
+					next.str=str;
 					if(get.itemtype(cards)=='card') next.cards=[cards];
 					else if(get.itemtype(cards)=='cards') next.cards=cards;
 					else _status.event.next.remove(next);
@@ -4871,6 +4918,13 @@
 					name:'混乱'
 				}
 			},
+			ghujia:{
+				intro:{
+					content:function(content,player){
+						return '已有'+get.cnNumber(player.hujia)+'点护甲值';
+					}
+				}
+			},
 			_recoverCheck:{
 				trigger:{player:'recoverBefore'},
 				forced:true,
@@ -5823,6 +5877,7 @@
 					if(enable){
 						if(info.filter&&info.filter(event,player)==false) enable=false;
 						if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player)) enable=false;
+						if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
 						if(event.aiexclude.contains(skills2[i])) enable=false;
 						if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
 					}

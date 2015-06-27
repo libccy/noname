@@ -533,6 +533,10 @@ character.gujian={
 			},
 			ai:{
 				save:true,
+				skillTagFilter:function(player){
+					if(player.storage.shahun) return false;
+					if(player.hp>0) return false;
+				},
 				result:{
 					player:3
 				}

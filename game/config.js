@@ -13,7 +13,7 @@ window.config={
 	all:{
 		mode:['identity','guozhan','versus','boss','chess','stone'],
 		layout:['default','newlayout'],
-		theme:['woodden','music'],
+		theme:['woodden','music','simple'],
 		card_font:['xiaozhuan','huangcao','caoshu','xingshu'],
 		double_hp:['hejiansan','pingjun','zuidazhi','zuixiaozhi','zonghe'],
 
@@ -70,6 +70,7 @@ window.config={
 		white:'白色',
 		woodden:'木纹',
 		music:'音乐',
+		simple:'简约',
 		newlayout:'新版',
 		jeans:'牛仔',
 		metro:'极简',

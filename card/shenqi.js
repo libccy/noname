@@ -175,6 +175,7 @@ card.shenqi={
 		shouna:{
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
+				if(player.skills.contains('shouna2')) return false;
 				if(_status.currentPhase==event.player) return false;
 				if(event.player==player) return false;
 				for(var i=0;i<event.cards.length;i++){
@@ -208,6 +209,7 @@ card.shenqi={
 				"step 2"
 				if(result.bool){
 					player.logSkill('shouna');
+					player.addTempSkill('shouna2','phaseAfter');
 					player.$gain2(result.buttons[0].link);
 					event.hu.storage.shouna.push(result.buttons[0].link);
 					ui.special.appendChild(result.buttons[0].link);
@@ -216,6 +218,7 @@ card.shenqi={
 				}
 			},
 		},
+		shouna2:{},
 		donghuangzhong:{
 			mode:['identity','guozhan'],
 			enable:'phaseUse',
@@ -648,7 +651,7 @@ card.shenqi={
 		lianhua:'炼化',
 		lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		shouna:'收纳',
-		shouna_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你可以选择其中的一张放入炼妖壶',
+		shouna_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你可以选择其中的一张放入炼妖壶，每名角色的回合限一次',
 		// donghuangzhong_info:'出牌阶段，你可以将一名已死亡角色永久移出游戏，然后回复一点体力，或创建一名与你身份相同的新角色，然后流失X点体力，X为新角色的体力上限',
 		// xuanyuanjian_info:'锁定技，你使用的杀无视距离，可以额外指定一个目标，每当你造成一次伤害，有50％的机率使伤害加一并变为雷属性。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',

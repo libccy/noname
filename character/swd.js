@@ -897,43 +897,23 @@ character.swd={
 		},
 		fuyan:{
 			trigger:{player:'damageEnd'},
-			frequent:true,
+			direct:true,
 			filter:function(event){
 				return event.num>0;
 			},
 			content:function(){
 				"step 0"
-				player.draw();
+				player.chooseTarget('是否发动【覆岩】？',function(card,player,target){
+					return !target.hujia;
+				}).ai=function(target){
+					var eff=-ai.get.damageEffect(target,target,player);
+					return eff+(player==target?2:0);
+				};
 				"step 1"
-				if(player.num('he')){
-					player.chooseCardTarget({
-						position:'he',
-						prompt:'选择一张牌作为“岩”',
-						ai1:function(card){
-							return 8-ai.get.value(card);
-						},
-						ai2:function(target){
-							var eff=-ai.get.damageEffect(target,target,player);
-							return eff+(player==target?2:0);
-						},
-						filterCard:true,
-						filterTarget:function(card,player,target){
-							return !target.skills.contains('fuyan2');
-						}
-					});
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
 				if(result.bool){
-					player.line(result.targets);
-					player.lose(result.cards,ui.special);
+					player.logSkill('fuyan',result.targets);
 					var target=result.targets[0];
-					target.storage.fuyan2=result.cards[0];
-					target.addSkill('fuyan2');
-					player.$give(result.cards,target);
-					game.log(get.translation(player)+'将'+get.translation(result.cards)+'置于'+get.translation(target)+'的武将牌上');
+					target.changeHujia();
 				}
 			},
 			ai:{
@@ -3212,6 +3192,9 @@ character.swd={
 				return get.suit(card)=='heart';
 			},
 			viewAs:{name:'liuxinghuoyu'},
+			viewAsFilter:function(player){
+				if(!player.num('he',{suit:'heart'})) return false;
+			},
 			prompt:'将一张红桃手牌当作流星火羽使用',
 			check:function(card){return 6-ai.get.value(card)},
 			ai:{
@@ -3252,6 +3235,9 @@ character.swd={
 				return get.color(card)=='black';
 			},
 			viewAs:{name:'dujian'},
+			viewAsFilter:function(player){
+				if(!player.num('h',{color:'black'})) return false;
+			},
 			prompt:'将一张黑色手牌当作毒箭使用',
 			check:function(card){return 5-ai.get.value(card)},
 			ai:{
@@ -4236,13 +4222,9 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('daixing');
+					player.changeHujia(result.cards.length);
 					player.storage.daixing=result.cards.length;
-					player.markSkill('daixing');
-				}
-				else{
-					player.storage.daixing=0;
-					player.unmarkSkill('daixing');
+					player.logSkill('daixing');
 				}
 			},
 			ai:{
@@ -4262,24 +4244,14 @@ character.swd={
 			}
 		},
 		daixing2:{
-			trigger:{player:'damageBegin'},
-			filter:function(event,player){
-				return player.storage.daixing>0;
-			},
-			priority:-20,
-			popup:false,
+			trigger:{player:'phaseBegin'},
 			forced:true,
+			popup:false,
 			content:function(){
-				if(trigger.num>=player.storage.daixing){
-					trigger.num-=player.storage.daixing;
+				if(player.storage.daixing){
+					player.changeHujia(-player.storage.daixing);
 					player.storage.daixing=0;
-					player.unmarkSkill('daixing');
 				}
-				else{
-					player.storage.daixing-=trigger.num;
-					trigger.num=0;
-				}
-				player.popup('daixing');
 			}
 		},
 		swd_wuxie:{
@@ -7328,34 +7300,12 @@ character.swd={
 			trigger:{source:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return !player.storage.hudun;
+				return !player.hujia&&event.player!=player;
 			},
 			content:function(){
-				player.storage.hudun=true;
-				player.markSkill('hudun');
+				player.changeHujia();
+				player.update();
 			},
-			init:function(player){
-				player.storage.hudun=false;
-			},
-			intro:{
-				content:function(st){
-					if(st) return '已开启';
-					return '未开启';
-				}
-			},
-			group:'hudun2'
-		},
-		hudun2:{
-			trigger:{player:'damageBegin'},
-			forced:true,
-			filter:function(event,player){
-				return event.num>0&&player.storage.hudun;
-			},
-			content:function(){
-				trigger.num--;
-				player.storage.hudun=false;
-				player.unmarkSkill('hudun');
-			}
 		},
 		toudan:{
 			enable:'phaseUse',
@@ -7383,6 +7333,7 @@ character.swd={
 				}
 				lib.tempSortSeat=event.target;
 				event.targets.sort(lib.sort.seat);
+				event.targets.unshift(player);
 				delete lib.tempSortSeat;
 				"step 1"
 				if(event.targets.length){
@@ -7613,7 +7564,7 @@ character.swd={
 		huiqi:'回气',
 		huiqi_info:'每当你受到一次伤害，可令一名角色摸X张牌，X为你已损失的体力值',
 		toudan:'投弹',
-		toudan_info:'出牌阶段限一次，你可以弃置一张黑桃牌对一名其他角色造成一点火焰伤害，然后令距离该角色1以内的所有角色弃置一张牌',
+		toudan_info:'出牌阶段限一次，你可以弃置一张黑桃牌对一名其他角色造成一点火焰伤害，然后你与距离该角色1以内的所有角色各弃置一张牌',
 		shending:'神丁',
 		shending_info:'锁定技，若你没有宝物牌，视为装备了蓝格怪衣',
 		hzhenwei:'镇卫',
@@ -7623,7 +7574,7 @@ character.swd={
 		hudun:'护盾',
 		hudun_bg:'盾',
 		hudun2:'护盾',
-		hudun_info:'锁定技，当你造成一次伤害后，受到的下一次伤害-1',
+		hudun_info:'锁定技，当你对其他角色造成伤害后，若你没有护甲，你获得一点护甲值',
 		mazui:'麻醉',
 		mazui2:'麻醉',
 		mazui_info:'出牌阶段限一次，你可以将一张黑色手牌置于一名角色的武将牌上，该角色造成的下一次伤害-1，然后获得此牌',
@@ -7640,7 +7591,7 @@ character.swd={
 		zhenwei_info:'你可以将攻击范围内其他角色打出的卡牌交给除该角色外的任意一名角色',
 		fuyan:'覆岩',
 		fuyan2:'覆岩',
-		fuyan_info:'每当你受到一次伤害，可以摸一张牌，并将一张牌置于一名角色的武将牌上称为“岩”；当其受到伤害时，须将“岩”置于弃牌堆，然后令伤害-1',
+		fuyan_info:'每当你受到一次伤害，可以令一名没有护甲的角色获得一点护甲值',
 		guaili:'怪力',
 		guaili_info:'锁定技，你的杀造成的伤害+1，造成伤害后需弃置一张牌',
 		pingshen:'凭神',
@@ -7942,7 +7893,7 @@ character.swd={
 		yuhuo_info:'限定技，濒死阶段，你可以重置角色牌，减少一点体力上限，然后将体力回复至体力上限',
 		yishan_info:'每当你受到一次伤害，你可以重新获得最近失去的两张牌',
 		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
-		daixing_info:'回合结束阶段，你可以弃置至多X张牌，并抵挡等量伤害，效果在下一个回合结束阶段失效，X为现存角色数-1',
+		daixing_info:'回合结束阶段，你可以任意张牌并获得等量的护甲，这些护甲将在你的下个回合开始阶段消失',
 		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
 		qingcheng_info:'回合开始阶段，你可以进行判定，若为红色则可以继续判定，判定结束后将判定成功的牌收入手牌',
 		xianjiang_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',

@@ -136,6 +136,7 @@ character.fire={
 			ai:{
 				skillTagFilter:function(player){
 					if(player.storage.niepan) return false;
+					if(player.hp>0) return false;
 				},
 				save:true,
 				result:{

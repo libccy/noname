@@ -34,6 +34,10 @@ card.yibao={
 				}
 				else{
 					if(!card.expired){
+						var target=player.next;
+						if(target.num('j','huoshan')&&!target.next.num('j','huoshan')){
+							target=target.next;
+						}
 						if(card.name!='huoshan'){
 							player.next.addJudge('huoshan',card);
 						}
@@ -47,7 +51,21 @@ card.yibao={
 				}
 			},
 			cancel:function(){
-				player.next.addJudge(card);
+				if(!card.expired){
+					var target=player.next;
+					if(target.num('j','huoshan')&&!target.next.num('j','huoshan')){
+						target=target.next;
+					}
+					if(card.name!='huoshan'){
+						player.next.addJudge('huoshan',card);
+					}
+					else{
+						player.next.addJudge(card);
+					}
+				}
+				else{
+					card.expired=false;
+				}
 			},
 			ai:{
 				basic:{
@@ -131,11 +149,15 @@ card.yibao={
 				}
 				else{
 					if(!card.expired){
+						var target=player.next;
+						if(target.num('j','hongshui')&&!target.next.num('j','hongshui')){
+							target=target.next;
+						}
 						if(card.name!='hongshui'){
-							player.next.addJudge('hongshui',card);
+							target.addJudge('hongshui',card);
 						}
 						else{
-							player.next.addJudge(card);
+							target.addJudge(card);
 						}
 					}
 					else{
@@ -144,7 +166,21 @@ card.yibao={
 				}
 			},
 			cancel:function(){
-				player.next.addJudge(card);
+				if(!card.expired){
+					var target=player.next;
+					if(target.num('j','hongshui')&&!target.next.num('j','hongshui')){
+						target=target.next;
+					}
+					if(card.name!='hongshui'){
+						target.addJudge('hongshui',card);
+					}
+					else{
+						target.addJudge(card);
+					}
+				}
+				else{
+					card.expired=false;
+				}
 			},
 			ai:{
 				basic:{

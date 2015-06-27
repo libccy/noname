@@ -465,6 +465,7 @@ div:hover>.intro{opacity: 1;}
 }
 .dialog.scroll1>.bar.top{opacity:1}
 .dialog.scroll2>.bar.bottom{opacity:1}
+.dialog.slim{top:300px;bottom:auto;min-height: none}
 /*.dialog.scroll1{box-shadow:0 -10px 10px -9px rgba(0,0,0,0.1),0 -10px 0 -9px rgba(0,0,0,0.05);}
 .dialog.scroll2{box-shadow:0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05)}
 .dialog.scroll1.scroll2{box-shadow:0 -10px 10px -9px rgba(0,0,0,0.1),0 -10px 0 -9px rgba(0,0,0,0.05),

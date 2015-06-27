@@ -1341,7 +1341,7 @@ mode.chess={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToMove(1,'是否发动【翩仪】？');
+				player.chooseToMove(2,'是否发动【翩仪】？');
 				"step 1"
 				if(result.bool){
 					player.logSkill('pianyi');
@@ -1763,7 +1763,7 @@ mode.chess={
 		// chess_lusu:['male','wu',3,['']],
 		// chess_luxun:['male','wu',3,['']],
 		// chess_ganning:['male','wu',3,['']],
-		chess_taishici:['male','wu',4,['guanchuan','pojun']],
+		chess_taishici:['male','wu',4,['gongji','guanchuan','pojun']],
 		//
 		// chess_lvbu:['male','qun',3,['']],
 		chess_sunshangxiang:['female','wu',3,['lingdong','lianshe','gongji']],

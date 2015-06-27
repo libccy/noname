@@ -124,6 +124,17 @@ card.extra={
 					},
 					target:function(player,target){
 						if(target.skills.contains('huogong2')||target.num('h')==0) return 0;
+						if(target==player){
+							if(_status.event.filterCard({name:'huogong'})){
+								return -1.5;
+							}
+							if(_status.event.skill){
+								var viewAs=get.info(_status.event.skill).viewAs;
+								if(viewAs=='huogong') return -1.5;
+								if(viewAs&&viewAs.name=='huogong') return -1.5;
+							}
+							return 0;
+						}
 						return -1.5;
 					}
 				},

@@ -589,6 +589,10 @@ character.mountain={
 				player.removeSkill('hunzi');
 			},
 			ai:{
+				threaten:function(player,target){
+					if(target.hp==1) return 2;
+					return 0.5;
+				},
 				maixie:true,
 				effect:{
 					target:function(card,player,target){

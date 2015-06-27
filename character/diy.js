@@ -239,6 +239,7 @@ character.diy={
 			ai:{
 				skillTagFilter:function(player){
 					if(player.storage.guihan) return false;
+					if(player.hp>0) return false;
 				},
 				save:true,
 				result:{

@@ -607,6 +607,9 @@ character.standard={
 			},
 			position:'he',
 			viewAs:{name:'sha'},
+			viewAsFilter:function(player){
+				if(!player.num('h',{color:'red'})) return false;
+			},
 			prompt:'将一张红色牌当杀使用或打出',
 			check:function(card){return 4-ai.get.value(card)},
 			ai:{
@@ -759,6 +762,9 @@ character.standard={
 			enable:['chooseToUse','chooseToRespond'],
 			filterCard:{name:'shan'},
 			viewAs:{name:'sha'},
+			viewAsFilter:function(player){
+				if(!player.num('h','shan')) return false;
+			},
 			prompt:'将一张闪当杀使用或打出',
 			check:function(){return 1},
 			ai:{
@@ -768,6 +774,9 @@ character.standard={
 					}
 				},
 				respondSha:true,
+				skillTagFilter:function(player){
+					if(!player.num('h','shan')) return false;
+				},
 				order:4,
 				useful:-1,
 				value:-1
@@ -782,6 +791,9 @@ character.standard={
 			check:function(){return 1},
 			ai:{
 				respondShan:true,
+				skillTagFilter:function(player){
+					if(!player.num('h','sha')) return false;
+				},
 				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')&&current<0) return 0.6
@@ -887,6 +899,9 @@ character.standard={
 			},
 			position:'he',
 			viewAs:{name:'guohe'},
+			viewAsFilter:function(player){
+				if(!player.num('h',{color:'black'})) return false;
+			},
 			prompt:'将一张黑色牌当过河拆桥使用',
 			check:function(card){return 4-ai.get.value(card)}
 		},
@@ -1209,7 +1224,7 @@ character.standard={
 				order:9,
 				result:{
 					target:function(player,target){
-						if(target.hp==5) return 5;
+						if(target.hp==1) return 5;
 						if(player==target&&player.num('h')>player.hp) return 5;
 						return 2;
 					}

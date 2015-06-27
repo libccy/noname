@@ -196,7 +196,24 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
-						if(target.num('h')<=target.hp&&target.hp>2) return 0;
+						var nh=target.num('h');
+						var keep=false;
+						if(nh<=target.hp){
+							keep=true;
+						}
+						else if(nh==target.hp+1&&target.hp>=3){
+							keep=true;
+						}
+						if(target.hp>=2&&keep&&target.hasFriend()){
+							if(target.hp>2) return 0;
+							if(target.hp==2){
+								for(var i=0;i<game.players.length;i++){
+									if(target!=game.players[i]&&ai.get.attitude(target,game.players[i])>=3&&game.players[i].hp<=1){
+										return 0;
+									}
+								}
+							}
+						}
 						if(target.hp<0&&target!=player&&target.identity!='zhu') return 0;
 						var att=ai.get.attitude(player,target);
 						if(att<3&&att>=0) return 0;
@@ -908,11 +925,15 @@ card.standard={
 				}
 				else{
 					if(!card.expired){
+						var target=player.next;
+						if(target.num('j','shandian')&&!target.next.num('j','shandian')){
+							target=target.next;
+						}
 						if(card.name!='shandian'){
-							player.next.addJudge('shandian',card);
+							target.addJudge('shandian',card);
 						}
 						else{
-							player.next.addJudge(card);
+							target.addJudge(card);
 						}
 					}
 					else{
@@ -922,7 +943,16 @@ card.standard={
 			},
 			cancel:function(){
 				if(!card.expired){
-					player.next.addJudge(card);
+					var target=player.next;
+					if(target.num('j','shandian')&&!target.next.num('j','shandian')){
+						target=target.next;
+					}
+					if(card.name!='shandian'){
+						target.addJudge('shandian',card);
+					}
+					else{
+						target.addJudge(card);
+					}
 				}
 				else{
 					card.expired=false;
@@ -1486,7 +1516,7 @@ card.standard={
 		["spade",6,"qinggang"],
 		["spade",5,"qinglong"],
 		["spade",12,"zhangba"],
-		["spade",5,"guanshi"],
+		["diamond",5,"guanshi"],
 		["diamond",12,"fangtian"],
 		["heart",5,"qilin"],
 

@@ -526,8 +526,7 @@ character.xianjian={
 				}
 				return false;
 			},
-			frequent:true,
-			popup:false,
+			direct:true,
 			content:function(){
 				"step 0"
 				if(trigger.delay==false) game.delay();
@@ -539,9 +538,16 @@ character.xianjian={
 					}
 				}
 				if(cards.length){
+					player.chooseCardButton('聚宝：获得其中的一张非基本牌牌',cards);
+
+				}
+				"step 2"
+				if(result.bool){
+					var cards=result.links;
+					player.logSkill('jubao');
 					player.gain(cards);
 					player.$gain2(cards);
-					game.log(get.translation(player)+'发动聚宝，获得了'+get.translation(cards));
+					game.log(get.translation(player)+'获得了'+get.translation(cards));
 				}
 			},
 			ai:{
@@ -1169,6 +1175,9 @@ character.xianjian={
 			},
 			position:'he',
 			viewAs:{name:'shunshou'},
+			viewAsFilter:function(player){
+				if(!player.num('he',{suit:'club'})) return false;
+			},
 			prompt:'将一张装备牌当顺手牵羊使用',
 			check:function(card){
 				var player=_status.currentPhase;
@@ -1360,7 +1369,7 @@ character.xianjian={
 		sajin:'洒金',
 		sajin_info:'出牌阶段，你可以弃置一张手牌并指定任意名角色进行判定，若判定花色与你弃置的牌相同，该角色回复一点体力',
 		jubao:'聚宝',
-		jubao_info:'回合外，你可以将其他角色弃置的非基本牌收入手牌',
+		jubao_info:'当其他角色于你的回合外弃置非基本牌时，你可以获得其中的一张',
 		guiyuan:'归元',
 		guiyuan_info:'出牌阶段限一次，你可以弃置一张杀并回复一点体力',
 		shuangren:'双刃',
