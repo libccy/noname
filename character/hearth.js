@@ -7,7 +7,7 @@ character.hearth={
 		hs_garrosh:['male','qun',4,['zhanhou','qiangxi'],['fullskin']],
 		hs_malfurion:['male','wu',4,['jihuo'],['fullskin']],
 		hs_guldan:['male','qun',3,['fenliu','hongxi'],['fullskin']],
-		hs_anduin:['male','qun',3,['shengguang','shijie','anying'],['fullskin']],
+		hs_anduin:['male','wei',3,['shengguang','shijie','anying'],['fullskin']],
 		hs_thrall:['male','wu',4,['tuteng','tzhenji'],['fullskin']],
 		hs_waleera:['female','qun',3,['jianren','mengun','wlianji'],['fullskin']],
 
@@ -397,6 +397,7 @@ character.hearth={
 		moying:{
 			trigger:{player:'phaseBegin'},
 			filter:function(){
+				if(Math.random()<0.5) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('j','shandian')){
 						return false;
@@ -426,6 +427,9 @@ character.hearth={
 				if(card){
 					player.addJudge(card);
 				}
+				else{
+					event.finish();
+				}
 				'step 1'
 				game.delay();
 			},
@@ -454,14 +458,17 @@ character.hearth={
 				ui.special.appendChild(cards[0]);
 			},
 			check:function(card){
-				return 3-ai.get.value(card)
+				if(get.suit(card)=='spade'&&card.number>=2&&card.number<=9){
+					return 6-ai.get.value(card);
+				}
+				return -1;
 			},
 			ai:{
 				threaten:1.5,
 				expose:0.1,
-				order:1,
+				order:10,
 				result:{
-					player:1
+					target:-1
 				}
 			}
 		},
@@ -1095,7 +1102,7 @@ character.hearth={
 		mdzhoufu2:'诅咒',
 		mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果；当受此技能影响的角色进行判定时，你摸一张牌',
 		moying:'魔影',
-		moying_info:'锁定技，回合开始阶段，若场上没有闪电，你将牌堆中的一张闪电置于你的判定区',
+		moying_info:'锁定技，回合开始阶段，若场上没有闪电，你有50%的机率将牌堆中的一张闪电置于你的判定区',
 		moying_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
 		jingxiang:'镜像',
 		jingxiang_info:'每当你需要打出卡牌时，你可以观看一名随机角色的手牌并将其视为你的手牌打出',
