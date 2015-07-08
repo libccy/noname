@@ -1,3 +1,4 @@
+'use strict';
 card.refresh={
 	card:{
 		muniu:{
@@ -65,6 +66,7 @@ card.refresh={
 				respondSha:true,
 				respondShan:true,
 				order:1,
+				expose:0.1,
 				result:{
 					player:1
 				}

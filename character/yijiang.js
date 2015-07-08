@@ -1,3 +1,4 @@
+'use strict';
 character.yijiang={
 	character:{
 		yujin:['male','wei',4,['yizhong'],['fullskin']],
@@ -303,7 +304,7 @@ character.yijiang={
 						event.current.chooseToDiscard({subtype:'equip1'},'he','弃置一张武器牌或让'+
 						get.translation(target)+'摸一张牌').ai=function(card){
 							if(ai.get.attitude(event.current,target)<0) return 7-ai.get.value(card);
-							return -1.
+							return -1;
 						};
 					}
 				}
@@ -692,7 +693,7 @@ character.yijiang={
 				return player.num('h')>0;
 			},
 			filterTarget:function(card,player,target){
-				return target.hp<target.maxHp&&!target.tempSkills['dingpin2'];
+				return target.hp<target.maxHp&&!target.tempSkills.dingpin2;
 			},
 			filterCard:true,
 			check:function(card){
@@ -1009,7 +1010,7 @@ character.yijiang={
 			globalSilent:true,
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
-				return event.player!=player&&!event.player.tempSkills['qieting3'];
+				return event.player!=player&&!event.player.tempSkills.qieting3;
 			},
 			frequent:true,
 			content:function(){
@@ -1493,22 +1494,24 @@ character.yijiang={
 				event.num=player.maxHp-player.hp;
 				player.draw(event.num);
 				"step 1"
+				var check=player.num('h')-event.num;
 				player.chooseCardTarget({
 					selectCard:event.num,
 					filterTarget:function(card,player,target){
 						return player!=target;
 					},
 					ai1:function(card){
+						if(check<1) return 0;
+						if(player.hp>1&&check<2) return 0;
 						return ai.get.unuseful(card)+9;
 					},
 					ai2:function(target){
-						return ai.get.attitude(player,target);
+						return ai.get.attitude(player,target)-2;
 					},
 					prompt:'将'+event.num+'张手牌交给一名其他角色',
-					forced:true
 				});
 				"step 2"
-				if(result){
+				if(result.bool){
 					result.targets[0].gain(result.cards);
 					event.player.$give(result.cards.length,result.targets[0]);
 				}
@@ -1598,7 +1601,6 @@ character.yijiang={
 			}
 		},
 		xinwuyan:{
-			check:function(){return false},
 			trigger:{target:'useCardToBefore',player:'useCardToBefore'},
 			forced:true,
 			priority:15,
@@ -1771,6 +1773,7 @@ character.yijiang={
 			trigger:{source:'damageBefore'},
 			forced:true,
 			priority:10,
+			check:function(){return false;},
 			content:function(){
 				trigger.untrigger();
 				trigger.finish();
@@ -3300,7 +3303,7 @@ character.yijiang={
 		anxu_info:'出牌阶段，你可以选择两名手牌数不相等的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之',
 		zongxuan_info:'每当你的牌被弃置，你可以将其按任意顺序置于牌堆顶',
 		zhiyan_info:'回合结束阶段，你可以令一名角色摸一张并展示之，若是装备牌，其立即装备之并回复一点体力',
-		miji_info:'回合结束阶段，若你已受伤，可以摸X张牌，然后将等量的牌交给一名其他角色',
+		miji_info:'回合结束阶段，若你已受伤，可以摸X张牌，然后可以将等量的牌交给一名其他角色，X为你已损失的体力值',
 		zhenlie_info:'每当你成为其他角色的卡牌的目标时，你可以流失一点体力取消之，然后弃置对方一张牌',
 		chengxiang_info:'每当你受到一次伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和小于13的牌，将其余的牌置入弃牌堆。',
 		renxin_info:'每当体力值为1的一名其他角色受到伤害时，你可以将武将牌翻面并弃置一张装备牌，然后防止此伤害。',

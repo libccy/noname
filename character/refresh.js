@@ -95,7 +95,8 @@ character.refresh={
 			},
 			content:function(){
 				"step 0"
-				player.chooseCard('鬼才：请选择代替判定的牌','he').ai=function(card){
+				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+				get.translation(trigger.player.judging)+'，是否发动【鬼才】？','he').ai=function(card){
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
@@ -146,7 +147,7 @@ character.refresh={
 					return;
 				}
 				event.num--;
-				player.choosePlayerCard(trigger.source,ai.get.buttonValue,'he');
+				player.choosePlayerCard('是否对'+get.translation(trigger.source)+'发动【反馈】？',trigger.source,ai.get.buttonValue,'he');
 				"step 2"
 				if(result.bool){
 					player.logSkill('refankui',trigger.source);
@@ -653,9 +654,9 @@ character.refresh={
 					effect:function(card,player,target){
 						if(get.tag(card,'damage')){
 							if(player.skills.contains('jueqing')) return [1,-2];
-							if(player.hp>=4) return [1,get.tag(card,damage)*2];
-							if(target.hp==3) return [1,get.tag(card,damage)*1.5];
-							if(target.hp==2) return [1,get.tag(card,damage)*0.5];
+							if(player.hp>=4) return [1,get.tag(card,'damage')*2];
+							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
+							if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
 						}
 					}
 				},

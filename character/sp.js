@@ -1,3 +1,4 @@
+'use strict';
 character.sp={
 	character:{
 		yangxiu:['male','wei',3,['jilei','danlao'],['fullskin']],
@@ -1170,7 +1171,7 @@ character.sp={
 				if(event.card.name!='sha') return false;
 				if(event.player==player) return false;
 				if(event.targets.contains(player)) return false;
-				if(player.tempSkills['yongjue2']) return false;
+				if(player.tempSkills.yongjue2) return false;
 				if(event.cards){
 					for(var i=0;i<event.cards.length;i++){
 						if(get.position(event.cards[i])=='d') return true;
@@ -1566,7 +1567,7 @@ character.sp={
 								if(lib.config.mode=='identity'){
 									if(game.players[i].ai.shown<=0) return -10;
 								}
-								else if(lib.config.mode='guozhan'){
+								else if(lib.config.mode=='guozhan'){
 									if(game.players[i].identity=='unknown') return -10;
 								}
 							}
@@ -1818,7 +1819,7 @@ character.sp={
 				save:true,
 				result:{
 					player:function(player){
-						if(player.tempSkills['aocai4']) return 0;
+						if(player.tempSkills.aocai4) return 0;
 						if(_status.dying) return ai.get.attitude(player,_status.dying);
 						return 1;
 					}
@@ -1941,7 +1942,8 @@ character.sp={
 				if(player==_status.currentPhase) return false;
 				if(event.cards){
 					for(var i=0;i<event.cards.length;i++){
-						if(get.color(event.cards[i])=='red') return true;
+						if(get.color(event.cards[i])=='red'&&
+						event.cards[i].original!='j') return true;
 					}
 				}
 				return false;

@@ -1,3 +1,4 @@
+'use strict';
 character.xianjian={
 	character:{
 		pal_lixiaoyao:['male','qun',4,['xiaoyao','yujian'],['fullskin']],
@@ -526,7 +527,7 @@ character.xianjian={
 				}
 				return false;
 			},
-			direct:true,
+			frequent:true,
 			content:function(){
 				"step 0"
 				if(trigger.delay==false) game.delay();
@@ -538,16 +539,10 @@ character.xianjian={
 					}
 				}
 				if(cards.length){
-					player.chooseCardButton('聚宝：获得其中的一张非基本牌牌',cards);
-
-				}
-				"step 2"
-				if(result.bool){
-					var cards=result.links;
-					player.logSkill('jubao');
-					player.gain(cards);
-					player.$gain2(cards);
-					game.log(get.translation(player)+'获得了'+get.translation(cards));
+					var card=cards.randomGet();
+					player.gain(card);
+					player.$gain2(card);
+					game.log(get.translation(player)+'获得了'+get.translation(card));
 				}
 			},
 			ai:{
@@ -864,7 +859,8 @@ character.xianjian={
 					}
 				},
 				order:10,
-				threaten:1.2
+				threaten:1.2,
+				exoise:0.2
 			},
 			mod:{
 				targetInRange:function(card,player,target){
@@ -1142,6 +1138,7 @@ character.xianjian={
 			trigger:{player:['phaseBegin','dieBegin']},
 			forced:true,
 			popup:false,
+			silent:true,
 			content:function(){
 				"step 0"
 				event.players=game.players.slice(0);
@@ -1369,7 +1366,7 @@ character.xianjian={
 		sajin:'洒金',
 		sajin_info:'出牌阶段，你可以弃置一张手牌并指定任意名角色进行判定，若判定花色与你弃置的牌相同，该角色回复一点体力',
 		jubao:'聚宝',
-		jubao_info:'当其他角色于你的回合外弃置非基本牌时，你可以获得其中的一张',
+		jubao_info:'当其他角色于你的回合外弃置非基本牌时，你可以随机获得其中的一张',
 		guiyuan:'归元',
 		guiyuan_info:'出牌阶段限一次，你可以弃置一张杀并回复一点体力',
 		shuangren:'双刃',

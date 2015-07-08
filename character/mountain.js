@@ -747,7 +747,7 @@ character.mountain={
 					event.finish();
 					return;
 				}
-				player.chooseCardButton(event.cards,'选择令目标收回的牌');
+				player.chooseCardButton(event.cards,'固政：选择令'+get.translation(trigger.player)+'收回的牌');
 				"step 2"
 				if(result.bool){
 					player.logSkill('guzheng',trigger.player);

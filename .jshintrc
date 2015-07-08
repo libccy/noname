@@ -6,7 +6,7 @@
   "eqnull": true,
   "newcap": false,
   "browser": true,
-  "unused": true,
+  /*"unused": true,*/
   "loopfunc": true,
   "noyield": true,
   "devel": true,

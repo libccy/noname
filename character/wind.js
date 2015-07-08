@@ -338,7 +338,8 @@ character.wind={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseCard('请选择替换判定的牌','he',function(card){
+				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+				get.translation(trigger.player.judging)+'，是否发动【鬼道】？','he',function(card){
 					return get.color(card)=='black';
 				}).ai=function(card){
 					var trigger=_status.event.parent._trigger;

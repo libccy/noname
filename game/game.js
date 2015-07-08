@@ -1595,8 +1595,11 @@
 							else if(cards[i].parentNode.classList.contains('judges')){
 								cards[i].original='j';
 							}
-							else{
+							else if(cards[i].parentNode.id=='handcards1'||cards[i].parentNode.id=='handcards2'){
 								cards[i].original='h';
+							}
+							else{
+								cards[i].original=null;
 							}
 						}
 						if(event.position){
@@ -1888,8 +1891,9 @@
 							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
-					if(player==game.me&&ui.auto){
-						ui.auto.hide();
+					if(player==game.me){
+						if(ui.auto) ui.auto.hide();
+						if(ui.wuxie) ui.wuxie.hide();
 					}
 					player.$die(source);
 				},
@@ -3418,6 +3422,7 @@
 					game.dead.remove(this);
 					if(this==game.me){
 						if(ui.auto) ui.auto.show();
+						if(ui.wuxie) ui.wuxie.show();
 						if(ui.revive){
 							ui.revive.close();
 							delete ui.revive;
@@ -5578,6 +5583,7 @@
 			}
 
 			if(ui.auto) ui.auto.hide();
+			if(ui.wuxie) ui.wuxie.hide();
 			if(ui.revive){
 				ui.revive.close();
 				delete ui.revive;
@@ -6070,6 +6076,7 @@
 			}
 			if(game.me.isAlive()){
 				if(ui.auto) ui.auto.show();
+				if(ui.wuxie) ui.wuxie.show();
 				if(ui.revive){
 					ui.revive.close();
 					delete ui.revive;
@@ -6097,6 +6104,7 @@
 
 			if(game.me.isAlive()){
 				if(ui.auto) ui.auto.show();
+				if(ui.wuxie) ui.wuxie.show();
 				if(ui.revive){
 					ui.revive.close();
 					delete ui.revive;
@@ -6443,6 +6451,7 @@
 			if(player==game.me){
 				ui.me.hide();
 				ui.auto.hide();
+				ui.wuxie.hide();
 			}
 			setTimeout(function(){
 				player.removeAttribute('style');
@@ -9306,6 +9315,7 @@
 				if(this.classList.contains('dead')) return;
 				if(_status.over) return;
 				if(ui.auto) ui.auto.show();
+				if(ui.wuxie) ui.wuxie.show();
 				game.swapPlayer(this);
 			},
 			mousewheel:function(evt){
@@ -10774,7 +10784,19 @@
 				else{
 					uiintro.add(get.translation(node));
 				}
-				if(lib.translate[name+'_info']){
+				if(node.name=='muniu'&&get.position(node)=='e'){
+					var num=0;
+					if(node.cards){
+						num=node.cards.length;
+					}
+					if(get.owner(node)==game.me&&num){
+						uiintro.add(node.cards,true,num>4);
+					}
+					else{
+						uiintro.add('<div class="text center">'+'共有'+get.cnNumber(num)+'张牌'+'</div>');
+					}
+				}
+				else if(lib.translate[name+'_info']){
 					uiintro.add('<div class="text">'+lib.translate[name+'_info']+'</div>');
 				}
 				uiintro.add(ui.create.div('.placeholder.slim'));

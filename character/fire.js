@@ -22,6 +22,9 @@ character.fire={
 				return get.color(card)=='red';
 			},
 			viewAs:{name:'huogong',nature:'fire'},
+			viewAsFilter:function(player){
+				if(!player.num('h',{color:'red'})) return false;
+			},
 			prompt:'将一张红色牌当火攻使用',
 			check:function(card){
 				var player=_status.currentPhase;

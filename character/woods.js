@@ -513,10 +513,20 @@ character.woods={
 				return get.suit(card)=='spade';
 			},
 			viewAs:{name:'jiu'},
+			viewAsFilter:function(player){
+				if(!player.num('h',{suit:'spade'})) return false;
+			},
 			prompt:'将一张黑桃手牌当酒使用',
 			check:function(card){
 				if(_status.event.type=='dying') return 1;
 				return 4-ai.get.value(card);
+			},
+			ai:{
+				skillTagFilter:function(player){
+					return player.num('h',{suit:'spade'})>0;
+				},
+				threaten:1.5,
+				save:true,
 			}
 		},
 		roulin:{

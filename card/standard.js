@@ -1,3 +1,4 @@
+'use strict';
 card.standard={
 	card:{
 		damage:{
@@ -227,6 +228,11 @@ card.standard={
 										if(num>2) return 2;
 									}
 								}
+								return 0;
+							}
+						}
+						if(lib.config.mode=='identity'&&player.identity=='zhu'&&target.identity=='nei'){
+							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='zhong'){
 								return 0;
 							}
 						}

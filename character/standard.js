@@ -117,7 +117,7 @@ character.standard={
 			},
 			content:function(){
 				"step 0"
-				player.choosePlayerCard(trigger.source,ai.get.buttonValue,'he');
+				player.choosePlayerCard('是否对'+get.translation(trigger.source)+'发动【反馈】？',trigger.source,ai.get.buttonValue,'he');
 				"step 1"
 				if(result.bool){
 					player.logSkill('fankui',trigger.source);
@@ -145,7 +145,8 @@ character.standard={
 			},
 			content:function(){
 				"step 0"
-				player.chooseCard('鬼才：请选择代替判定的牌').ai=function(card){
+				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+				get.translation(trigger.player.judging)+'，是否发动【鬼才】？').ai=function(card){
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
@@ -717,7 +718,7 @@ character.standard={
 							else{
 								top.unshift(cards.shift());
 							}
-						};
+						}
 					}
 					var bottom;
 					if(!stopped){
@@ -1193,7 +1194,7 @@ character.standard={
 				target.recover();
 			},
 			ai:{
-				order:7.5,
+				order:5.5,
 				result:{
 					player:function(player){
 						if(player.hp<player.maxHp) return 4;
@@ -1246,6 +1247,9 @@ character.standard={
 			prompt:'将一张红色牌当桃使用',
 			check:function(card){return 15-ai.get.value(card)},
 			ai:{
+				skillTagFilter:function(player){
+					return player.num('he',{color:'red'})>0;
+				},
 				threaten:1.5,
 				save:true,
 			}

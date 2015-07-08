@@ -166,6 +166,7 @@ character.swd={
 										return -1;
 									}
 								}
+								break;
 							}
 							case 'guozhan':{
 								if(player.identity=='unknown') return 0;
@@ -1663,7 +1664,7 @@ character.swd={
 				order:12,
 				result:{
 					player:function(player){
-						if(player.tempSkills['jilve3']) return 0;
+						if(player.tempSkills.jilve3) return 0;
 						if(_status.dying) return ai.get.attitude(player,_status.dying);
 						return 1;
 					}
@@ -2917,7 +2918,8 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseCard('请选择替换判定的牌','he').ai=function(card){
+				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+				get.translation(trigger.player.judging)+'，是否发动【天道】？','he').ai=function(card){
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
@@ -3317,8 +3319,10 @@ character.swd={
 			group:['kunlunjing1','kunlunjing2'],
 			intro:{
 				content:function(storage,player){
-					return player.storage.kunlunjing3;
-
+					if(true){
+						return player.storage.kunlunjing3;
+					}
+					var table,str,st,tr,td;
 					for(var i=0;i<storage.length;i++){
 						if(game.players.contains(storage[i].player)){
 							st=storage[i];
@@ -3359,7 +3363,7 @@ character.swd={
 			}
 		},
 		kunlunjing1:{
-			trigger:{player:['damageAfter','phaseBefore']},
+			trigger:{player:['phaseBefore']},
 			filter:function(event,player){
 				if(player.storage.kunlunjing2) return false;
 				if(player.storage.kunlunjing) return true;
@@ -3369,7 +3373,7 @@ character.swd={
 				if(event.name=='phase'&&player.hp<3) return false;
 				var storage=event.player.storage.kunlunjing;
 				var num=0;
-				for(i=0;i<storage.length;i++){
+				for(var i=0;i<storage.length;i++){
 					if(game.players.contains(storage[i].player)){
 						var att=ai.get.attitude(player,storage[i].player);
 						var num2=storage[i].value-storage[i].player.num('he')+storage[i].player.num('j');
@@ -3386,12 +3390,14 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
+				game.delay(0.5);
+				"step 1"
 				event.player.storage.kunlunjing2=true;
 				ui.arena.classList.add('zoomout3');
 				ui.arena.delete();
 				ui.arena.hide();
 				game.delay(0,500);
-				"step 1"
+				"step 2"
 				var storage=event.player.storage.kunlunjing;
 				var player,frag;
 				var i,j;
@@ -3443,7 +3449,7 @@ character.swd={
 				ui.arena.classList.remove('zoomout3');
 				ui.arena.classList.add('zoomin3');
 				ui.window.appendChild(ui.arena);
-				"step 2"
+				"step 3"
 				ui.arena.show();
 				ui.arena.classList.remove('zoomin3');
 				event.player.storage.kunlunjing3='已发动';
@@ -3748,7 +3754,7 @@ character.swd={
 					player.storage.liaoyuan=event.num;
 				}
 			},
-			group:'liaoyuan2'
+			group:['liaoyuan2','liaoyuan3']
 		},
 		liaoyuan2:{
 			trigger:{source:'damageBegin'},
@@ -3759,7 +3765,16 @@ character.swd={
 			},
 			content:function(){
 				trigger.num+=player.storage.liaoyuan;
-				player.storage.liaoyuan>0;
+				player.storage.liaoyuan=0;
+			}
+		},
+		liaoyuan3:{
+			trigger:{player:'shaEnd'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.storage.liaoyuan=0;
 			}
 		},
 		dunxing:{
@@ -4339,7 +4354,7 @@ character.swd={
 			trigger:{player:'phaseAfter'},
 			frequent:true,
 			filter:function(event,player){
-				return get.cardCount(true,player)>=3;;
+				return get.cardCount(true,player)>=3;
 			},
 			content:function(){
 				player.phase();
@@ -5749,8 +5764,14 @@ character.swd={
 			trigger:{source:'damageEnd'},
 			priority:1,
 			forced:true,
+			filter:function(event,player){
+				return player.hp<player.maxHp;
+			},
 			content:function(){
 				"step 0"
+				player.recover();
+				event.finish();
+				"step 1"
 				if(player.hp<player.maxHp){
 					player.chooseControl('draw_card','recover_hp',function(event,target){
 						if(player.num('h')>=player.hp) return 'recover_hp';
@@ -5761,7 +5782,7 @@ character.swd={
 					player.draw();
 					event.finish();
 				}
-				"step 1"
+				"step 2"
 				if(result.control=='draw_card'){
 					player.draw();
 				}
@@ -5985,21 +6006,15 @@ character.swd={
 				for(var i=0;i<game.players.length;i++){
 					list=list.concat(game.players[i].get('j'));
 				}
-				var dialog=ui.create.dialog('天轮：替换'+get.translation(trigger.player.judging)+
-					'('+get.translation(get.suit(trigger.player.judging))+get.translation(get.number(trigger.player.judging))+')',list);
+				var dialog=ui.create.dialog(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+get.translation(trigger.player.judging)+
+					'，是否发动【天轮】？',list);
 				player.chooseButton(dialog,function(button){
 					var card=button.link;
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
 					var attitude=ai.get.attitude(player,trigger.player);
-					if(attitude==0||result==0) return 1;
-					if(attitude>0){
-						return result+1;
-					}
-					else{
-						return -result+1;
-					}
+					return result*attitude;
 				});
 				"step 1"
 				if(result.bool){
@@ -6009,10 +6024,8 @@ character.swd={
 				}
 				"step 2"
 				if(event.card){
-					player.logSkill('tianlun');
-					if(trigger.player.judging.clone) trigger.player.judging.clone.moveTo(player).delete();
-					else player.$draw();
-					player.gain(trigger.player.judging);
+					player.logSkill('tianlun',trigger.player);
+					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=event.card;
 					trigger.position.appendChild(event.card);
 					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(event.card));
@@ -7637,7 +7650,7 @@ character.swd={
 		daofa:'道法',
 		daofa_info:'每当有一名其他角色造成伤害，你可以令其弃置一张牌',
 		xiaomoyu:'魔愈',
-		xiaomoyu_info:'锁定技，每当你造成一次伤害，你摸一张牌或回复一点体力',
+		xiaomoyu_info:'锁定技，每当你造成一次伤害，你回复一点体力',
 		yihua:'移花',
 		yihua_info:'每当你成为其他角色的某张卡牌的惟一目标时，你可以弃置两张手牌，将使用者与目标对调',
 		youyin:'游吟',
@@ -7860,7 +7873,7 @@ character.swd={
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
-		kunlunjing_info:'回合开始前或当你受到一次伤害后，你可以令场上所有牌还原到你上一回合结束后的位置；若在回合开始前发动，你流失一点体力',
+		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，然后流失一点体力',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌，每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',
@@ -7882,7 +7895,7 @@ character.swd={
 		miles_xueyi_info:'锁定技，你防止即将受到的伤害，然后流失一点体力',
 		duanyi_info:'出牌阶段限一次，你可以弃置两张杀，对一名角色造成一点伤害，然后其翻面并摸X张牌，X为其已损失的体力值',
 		guxing_info:'出牌阶段，你可以将最后至多X张手牌当杀使用，此杀无视距离且可以指定至多3个目标，每造成一次伤害，你摸一张牌，Ｘ为你已损失的体力值且至少为１。',
-		tianlun_info:'任意一名角色的判定生效前，你可以弃置一张场上角色的判定牌替换之',
+		tianlun_info:'任意一名角色的判定生效前，你可以弃置一张场上角色的判定牌代替之',
 		longyin_info:'出牌阶段，你可以弃置任意张颜色相同且点数不同的牌，并获得逆时针座位距离与卡牌点数相同的角色区域内的一张牌。每阶段限一次',
 		lanzhi_info:'每当你即将造成伤害，可以防止此伤害，然后摸两张牌。每回合限发动一次。',
 		tianhuo_info:'出牌阶段，你可以令所有角色弃置其判定区域内的牌，并受到没有来源的等量火焰伤害，每阶段限一次',
