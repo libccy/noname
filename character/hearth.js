@@ -1080,7 +1080,7 @@ character.hearth={
 		dunji:'盾击',
 		dunji_info:'出牌阶段限，你可以失去你的所有护甲，并对等量的其他角色各造成一点伤害',
 		qiaodong:'巧动',
-		qiaodong_info:'你可以将一张装备牌当作当使用或打出',
+		qiaodong_info:'你可以将一张装备牌当作闪使用或打出',
 		fengxian:'奉献',
 		fengxian_info:'出牌阶段限一次，你可以令场上所有角色各弃置一张手牌',
 		zhanhou:'战吼',

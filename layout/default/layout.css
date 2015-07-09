@@ -19,6 +19,11 @@ table{table-layout: fixed;}
 	top:0;
 	z-index:20
 }
+#arena>canvas{
+	z-index: 10;
+	pointer-events: none;
+	position: absolute;
+}
 #me,#mebg{width: 100%;height: 140px;top:calc(100% - 140px);left:0;}
 #mebg{z-index:-1}
 #handcards1,#handcards2{width: calc(50% - 140px);height: 127px;padding: 10px;}

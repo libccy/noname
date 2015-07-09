@@ -89,8 +89,8 @@
 			var ctx=ui.ctx;
 			ctx.shadowBlur=5;
 			ctx.shadowColor='rgba(0,0,0,0.3)';
-			ctx.fillStyle='white';
 			ctx.strokeStyle='white';
+			ctx.lineCap='round';
 			ctx.lineWidth=3;
 			ctx.save();
 			for(var i=0;i<lib.canvasUpdates.length;i++){
@@ -5331,6 +5331,7 @@
 				}
 				ctx.beginPath();
 				if(dashed){
+					ctx.lineCap='butt';
 					ctx.setLineDash([8,2]);
 				}
 				ctx.moveTo(from[0],from[1]);
@@ -5994,11 +5995,13 @@
 					}
 				}
 			}
-			ui.arena.classList.remove('selecting');
-			_status.imchoosing=false;
-			_status.lastdragchange.length=0;
-			_status.mousedragging=null;
-			_status.mousedragorigin=null;
+			if(arguments[0]!='target'&&arguments[0]!='card'&&arguments[0]!='button'){
+				ui.arena.classList.remove('selecting');
+				_status.imchoosing=false;
+				_status.lastdragchange.length=0;
+				_status.mousedragging=null;
+				_status.mousedragorigin=null;
+			}
 			ui.canvas.width=ui.arena.offsetWidth;
 			ui.canvas.height=ui.arena.offsetHeight;
 			for(var i=0;i<game.players.length;i++){
@@ -8445,7 +8448,6 @@
 					dialogs[i].delete();
 				}
 				var node=_status.currentmouseenter;
-
 				if(_status.mousedragging){
 					e.preventDefault();
 					ui.canvas.width=ui.arena.offsetWidth;
@@ -8453,7 +8455,6 @@
 					var ctx=ui.ctx;
 					ctx.shadowBlur=5;
 					ctx.shadowColor='rgba(0,0,0,0.3)';
-					ctx.fillStyle='white';
 					ctx.strokeStyle='white';
 					ctx.lineWidth=3;
 					ctx.setLineDash([8,2]);
@@ -8508,7 +8509,13 @@
 							}
 							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
 								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
-								if(item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
+								var targetfixed=false;
+								if(itemtype=='player'){
+									if(get.select(_status.event.selectTarget)[1]==-1){
+										targetfixed=true;
+									}
+								}
+								if(!targetfixed&&item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
 									_status.mouseleft=true;
 									_status.dragstatuschanged=item;
 									_status.clicked=false;
@@ -10635,6 +10642,7 @@
 						}
 						return false;
 					}
+					break;
 				}
 				default:{
 					if(typeof type=='string'){
