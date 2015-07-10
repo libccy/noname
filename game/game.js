@@ -90,7 +90,7 @@
 			ctx.shadowBlur=5;
 			ctx.shadowColor='rgba(0,0,0,0.3)';
 			ctx.strokeStyle='white';
-			ctx.lineCap='round';
+			// ctx.lineCap='round';
 			ctx.lineWidth=3;
 			ctx.save();
 			for(var i=0;i<lib.canvasUpdates.length;i++){
@@ -4274,7 +4274,7 @@
 						clone.offsetTop+clone.offsetHeight/2,
 						player.offsetLeft+player.offsetWidth/2,
 						player.offsetTop+player.offsetHeight/2
-					],{opacity:0.5,dashed:true});
+					],{opacity:0.5,dashed:false});
 				}
 			},
 			card:{
@@ -5330,7 +5330,7 @@
 					return false;
 				}
 				ctx.beginPath();
-				if(dashed){
+				if(!dashed){
 					ctx.lineCap='butt';
 					ctx.setLineDash([8,2]);
 				}
