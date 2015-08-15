@@ -123,14 +123,6 @@ character.yxs={
 				}
 			}
 		},
-		kuixin:{
-			trigger:{player:'judgeEnd'},
-			forced:true,
-			content:function(){
-				player.gain(trigger.result.card);
-				player.$gain2(trigger.result.card);
-			}
-		},
 		seyou:{
 			unique:true,
 			mark:true,
@@ -303,12 +295,14 @@ character.yxs={
 				}
 				if(result.control!='cancel'){
 					player.addTempSkill('bolehuiyan4','phaseAfter');
+					player.logSkill(['bolehuiyan',result.control],trigger.target);
 					game.log(get.translation(player)+'预言'+result.control);
 					player.storage.bolehuiyan=result.control;
-					player.popup(result.control);
-					player.line(trigger.target,'green');
 					game.delay();
 				}
+			},
+			ai:{
+				threaten:1.3
 			}
 		},
 		bolehuiyan2:{
@@ -322,6 +316,10 @@ character.yxs={
 				if(player.storage.bolehuiyan=='不能命中'){
 					player.popup('预言成功');
 					player.draw();
+				}
+				else{
+					player.popup('预言失败');
+					player.chooseToDiscard('预言失败，请弃置一张牌','he',true);
 				}
 				delete player.storage.bolehuiyan;
 			}
@@ -337,6 +335,10 @@ character.yxs={
 				if(player.storage.bolehuiyan=='能命中'){
 					player.popup('预言成功');
 					player.draw();
+				}
+				else{
+					player.popup('预言失败');
+					player.chooseToDiscard('预言失败，请弃置一张牌','he',true);
 				}
 				delete player.storage.bolehuiyan;
 			}
@@ -915,9 +917,7 @@ character.yxs={
 		yxs_aijiyanhou:'埃及艳后',
 		yxs_diaochan:'貂蝉',
 		yxs_yangyuhuan:'杨玉环',
-
-		kuixin:'窥心',
-		kuixin_info:'锁定技，你立即获得你的判定牌',
+		
 		weiyi:'威仪',
 		weiyi_info:'每当你受到一次伤害，可以令伤害来源弃置两张牌',
 		xieling:'挟令',
@@ -937,7 +937,7 @@ character.yxs={
 		jianai:'兼爱',
 		jianai_info:'每当你回复一点体力，可以令所有其他角色回复一点体力',
 		bolehuiyan:'慧眼',
-		bolehuiyan_info:'当一名有手牌的其他角色成为来源不为你的杀的目标时，你可以预言此杀能否命中，若预言正确，你摸一张牌，每回合限发动一次',
+		bolehuiyan_info:'当一名有手牌的其他角色成为来源不为你的杀的目标时，你可以预言此杀能否命中，若预言正确，你摸一张牌，否则你须弃置一张牌。每回合限发动一次',
 		xiangma:'相马',
 		xiangma_info:'锁定技，只要你的体力值大于2点，你计算与其他角色的距离时，始终-1；只要你的体力值为2点或更低，其他角色计算与你的距离时，始终+1。',
 		seyou:'色诱',

@@ -184,7 +184,7 @@ card.standard={
 			savable:true,
 			selectTarget:-1,
 			filterTarget:function(card,player,target){
-				return target==player;
+				return target==player&&target.hp<target.maxHp;
 			},
 			content:function(){
 				target.recover();
@@ -700,12 +700,12 @@ card.standard={
 						if(ai.get.damageEffect(target,player,target)>0&&ai.get.attitude(player,target)>0&&ai.get.attitude(target,player)>0){
 							return 0;
 						}
-						var hs1=target.num('h','sha');
-						var hs2=player.num('h','sha');
+						var hs1=target.get('h','sha');
+						var hs2=player.get('h','sha');
 						if(hs1.length>hs2.length+1){
 							return -2;
 						}
-						if(hs1.length>hs2.length&&hs1[0].number>hs2[0].number){
+						if(hs1.length>hs2.length&&(!hs2.length||hs1[0].number>hs2[0].number)){
 							return -2;
 						}
 						return -0.5;

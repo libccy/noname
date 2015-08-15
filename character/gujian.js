@@ -357,7 +357,8 @@ character.gujian={
 				if(player==_status.currentPhase) return false;
 				if(event.cards){
 					for(var i=0;i<event.cards.length;i++){
-						if(get.color(event.cards[i])=='red') return true;
+						if(get.color(event.cards[i])=='red'&&
+						event.cards[i].original!='j') return true;
 					}
 				}
 				return false;
@@ -877,12 +878,18 @@ character.gujian={
 			selectTarget:-1,
 			content:function(){
 				if(!player.storage.jiehuo2){
-					player.storage.jiehuo2=player.hp;
+					player.storage.jiehuo2=player.maxHp;
+					player.addSkill('jiehuo2');
 				}
-				target.damage(Math.min(target.hp,player.storage.jiehuo2),'nosource','fire');
-				if(target==targets[targets.length-1]){
-					player.die();
-				}
+				target.damage(Math.min(target.hp,player.storage.jiehuo2),'fire');
+			}
+		},
+		jiehuo2:{
+			trigger:{player:'phaseUseEnd'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.die();
 			}
 		},
 		yuling:{
@@ -1053,7 +1060,7 @@ character.gujian={
 		yuling3:'御灵',
 		yuling4:'御灵',
 		zhaolu_info:'锁定技，每隔X回合，你流失一点体力上限，每当你受到一点伤害或有人死亡，视为减少两个回合，X为现存角色数且至多为5',
-		jiehuo_info:'限定技，出牌阶段，你可以令所有其他角色受到X点火焰伤害，然后你立即死亡，X为你的体力值且不超过该角色的当前体力值',
+		jiehuo_info:'限定技，出牌阶段，你可以令所有其他角色受到X点火焰伤害，并在此阶段结束后死亡，X为你的体力上限且不超过该角色的当前体力值',
 		yuling_info:'锁定技，你没有摸牌和弃牌阶段，你的手牌数始终为5，你在一个出牌阶段最多使用X+2张牌，X为你的体力上限',
 	},
 }

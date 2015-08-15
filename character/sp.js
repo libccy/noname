@@ -1633,6 +1633,9 @@ character.sp={
 				}
 				return true;
 			},
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
 			content:function(){
 				"step 0"
 				var cards=player.get('h');
@@ -2443,6 +2446,7 @@ character.sp={
 			discard:false,
 			prepare:function(cards,player,targets){
 				player.$give(cards.length,targets[0]);
+				player.line(targets[0]);
 			},
 			ai:{
 				order:1,
@@ -2450,6 +2454,14 @@ character.sp={
 					player:0,
 					target:function(player,target){
 						if(player.num('h')>1){
+							return 1;
+						}
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].num('h')&&game.players[i]!=target&&game.players[i]!=player&&ai.get.attitude(player,game.players[i])<0){
+								break;
+							}
+						}
+						if(i==game.players.length){
 							return 1;
 						}
 						return -2/(target.num('h')+1);
@@ -2460,7 +2472,7 @@ character.sp={
 				"step 0"
 				event.target1=targets[0];
 				targets[0].gain(cards);
-				game.delay(2);
+				game.delay();
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('h')&&game.players[i]!=event.target1&&game.players[i]!=player){
 						break;
@@ -2473,11 +2485,17 @@ character.sp={
 				player.chooseTarget(true,'选择拼点目标',function(card,player,target){
 					return target.num('h')&&target!=event.target1&&target!=player;
 				}).ai=function(target){
-					return ai.get.effect(target,{name:'sha'},event.target1,player)+1;
+					var eff=ai.get.effect(target,{name:'sha'},event.target1,player);
+					var att=ai.get.attitude(player,target);
+					if(att>0){
+						return eff-10;
+					}
+					return eff;
 				};
 				"step 2"
 				if(result.targets.length){
 					event.target2=result.targets[0];
+					event.target1.line(event.target2);
 					event.target1.chooseToCompare(event.target2);
 				}
 				else{

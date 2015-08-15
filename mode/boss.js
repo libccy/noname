@@ -481,7 +481,8 @@ mode.boss={
 			loopType:2,
 		},
 		boss_pangtong:{
-			loopType:2
+			loopType:2,
+			chongzheng:12
 		},
 		boss_zhenji:{
 			chongzheng:4,
@@ -495,8 +496,8 @@ mode.boss={
 		boss_diaochan:{
 			chongzheng:4,
 		},
-		boss_huatuo:{
-			chongzheng:4,
+		boss_huangyueying:{
+			chongzheng:12,
 		},
 		global:{
 			loopType:1,
@@ -514,7 +515,7 @@ mode.boss={
 		boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['fullskin','boss'],'wei'],
 		boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['fullskin','hiddenboss'],'qun'],
 		boss_caiwenji:['female','qun',4,['beige','boss_hujia','boss_guihan'],['fullskin','boss'],'wei'],
-		boss_zhangjiao:['male','qun',8,['diyleiji','guidao','tiangong','jidian'],['fullskin','boss'],'shu'],
+		boss_zhangjiao:['male','qun',8,['boss_leiji','tiandao','jidian'],['fullskin','boss'],'shu'],
 		boss_zuoci:['male','qun',0,['huanhua'],['fullskin','boss'],'shu'],
 		// boss_yuji:['male','qun',8,[],['fullskin','boss'],'nei'],
 		boss_diaochan:['female','qun',4,['fengwu','yunshen','lianji','boss_wange','yuehun'],['fullskin','boss'],'qun'],
@@ -523,13 +524,81 @@ mode.boss={
 		// boss_shuijing:['male','qun',8,[],['fullskin','boss'],'wei'],
 	},
 	skill:{
+		boss_leiji:{
+			audio:2,
+			trigger:{player:'respond'},
+			filter:function(event,player){
+				return event.card.name=='shan';
+			},
+			direct:true,
+			content:function(){
+				"step 0";
+				player.chooseTarget('是否发动雷击？').ai=function(target){
+					return ai.get.damageEffect(target,player,player,'thunder');
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('diyleiji',result.targets,'thunder');
+					event.target=result.targets[0];
+					event.target.judge(function(card){
+						// var suit=get.suit(card);
+						// if(suit=='spade') return -4;
+						// if(suit=='club') return -2;
+						if(get.color(card)=='black') return -2;
+						return 0;
+					});
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.bool==false){
+					event.target.damage('thunder');
+					player.draw();
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'respondShan')){
+							var hastarget=false;
+							for(var i=0;i<game.players.length;i++){
+								if(ai.get.attitude(target,game.players[i])<0){
+									hastarget=true;break;
+								}
+							}
+							var be=target.num('e',{color:'black'});
+							if(target.num('h','shan')&&be){
+								if(!target.skills.contains('guidao')) return 0;
+								return [0,hastarget?target.num('he')/2:0];
+							}
+							if(target.num('h','shan')&&target.num('h')>2){
+								if(!target.skills.contains('guidao')) return 0;
+								return [0,hastarget?target.num('h')/4:0];
+							}
+							if(target.num('h')>3||(be&&target.num('h')>=2)){
+								return [0,0];
+							}
+							if(target.num('h')==0){
+								return [1.5,0];
+							}
+							if(target.num('h')==1&&!be){
+								return [1.2,0];
+							}
+							if(!target.skills.contains('guidao')) return [1,0.05];
+							return [1,Math.min(0.5,(target.num('h')+be)/4)];
+						}
+					}
+				}
+			}
+		},
 		wuqin:{
-			trigger:{player:'phaseBegin'},
+			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
 				return player.num('h')==0;
 			},
 			content:function(){
-				player.draw(2)
+				player.draw(3)
 			}
 		},
 		boss_baolin:{
@@ -770,7 +839,7 @@ mode.boss={
 					event.finish();
 				}
 				"step 2"
-				if(result.color=='red'){
+				if(result.color=='black'){
 					event.target.damage('thunder');
 				}
 			}
@@ -799,8 +868,8 @@ mode.boss={
 						return ai.get.unuseful(card)+9;
 					},
 					ai2:function(target){
-						if(target.disabledSkills.boss_hujia) return 0.5;
-						return 1;
+						if(target.disabledSkills.boss_hujia) return Math.max(1,10-target.maxHp);
+						return 1/target.maxHp;
 					},
 					prompt:'是否发动【胡笳】？'
 				});
@@ -933,7 +1002,6 @@ mode.boss={
 			},
 			content:function(){
 				"step 0"
-				player.draw();
 				player.judge();
 				"step 1"
 				if(result.color=='black'){
@@ -941,6 +1009,7 @@ mode.boss={
 				}
 				else{
 					player.recover();
+					player.draw();
 				}
 			},
 			ai:{
@@ -992,6 +1061,7 @@ mode.boss={
 			forced:true,
 			unique:true,
 			content:function(){
+				player.addSkill('kanpo');
 				player.addSkill('shenwei');
 				player.addSkill('zhuyu');
 				game.bossinfo.loopType=1;
@@ -1028,6 +1098,13 @@ mode.boss={
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player){
 						game.players[i].forcemin=true;
+					}
+				}
+			},
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(get.type(card)=='delay'&&player!=target){
+						return false;
 					}
 				}
 			}
@@ -1236,11 +1313,11 @@ mode.boss={
 		boss_qiangzheng_info:'锁定技，回合结束阶段，你获得每个敌方角色的一张手牌',
 		boss_baolin:'暴凌',
 		guizhen:'归真',
-		guizhen_info:'每当你失去最后一张手牌，你可以所有敌人失去全部手牌（不触发技能）',
+		guizhen_info:'每当你失去最后一张手牌，你可以所有敌人失去全部手牌，没有手牌的角色失去一点体力（不触发技能）',
 		boss_shengshou:'圣手',
 		boss_shengshou_info:'每当你使用一张牌，你可以进行一次判定，若为红色，你回复一点体力',
 		wuqin:'五禽戏',
-		wuqin_info:'回合开始阶段，若你没有手牌，可以摸两张牌',
+		wuqin_info:'回合结束阶段，若你没有手牌，可以摸三张牌',
 
 		boss_konghun:'控心',
 		boss_konghun_info:'回合结束阶段，你可以指定一名敌人令其进入混乱状态（不受对方控制，并将队友视为敌人）直到下一回合开始',
@@ -1251,16 +1328,18 @@ mode.boss={
 		boss_wange:'笙歌',
 
 		huanhua:'幻化',
-		huanhua_info:'锁定技，游戏开始时，你获得其他角色的所有技能，体力上限变为其他角色之和；其他角色于摸牌摸牌时，你摸等量的牌；其他角色于弃牌阶段弃牌时，你弃置等量的手牌',
+		huanhua_info:'锁定技，游戏开始时，你获得其他角色的所有技能，体力上限变为其他角色之和；其他角色于摸牌阶段摸牌时，你摸等量的牌；其他角色于弃牌阶段弃牌时，你弃置等量的手牌',
 
+		boss_leiji:'雷击',
+		boss_leiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑色，其受到一点雷电伤害，然后你摸一张牌',
 		jidian:'亟电',
-		jidian_info:'每当你造成一次伤害，可以指定距离受伤害角色1以内的一名其他角色进行判定，若结果为红色，该角色受到一点雷电伤害',
+		jidian_info:'每当你造成一次伤害，可以指定距离受伤害角色1以内的一名其他角色进行判定，若结果为黑色，该角色受到一点雷电伤害',
 
 		tinqin:'听琴',
 		boss_guihan:'归汉',
 		boss_guihan_info:'限定技，濒死阶段，你可以将体力回复至体力上限，摸4张牌，令所有敌人的技能恢复，并获得技能【听琴】、【蕙质】',
 		boss_huixin:'蕙质',
-		boss_huixin_info:'每当你于回合外失去牌，可以摸一张牌并进行一次判定，若为黑色，当前回合角色失去一点体力，否则你回复一点体力',
+		boss_huixin_info:'每当你于回合外失去牌，可以进行一次判定，若为黑色，当前回合角色失去一点体力，否则你回复一点体力并摸一张牌',
 		boss_hujia:'胡笳',
 		boss_hujia_info:'回合结束阶段，若你已受伤，可以弃置一张牌令一名其他角色的所有技能失效，若其所有技能已失效，改为令其失去一点体力上限',
 		boss_honglian:'红莲',
@@ -1270,8 +1349,8 @@ mode.boss={
 		boss_xianyin:'仙音',
 		boss_xianyin_info:'每当你于回合外失去牌，你可以进行一次判定，若为红色，你令一名敌人失去一点体力',
 
-		boss_yuhuo:'浴火',
-		boss_yuhuo_info:'觉醒技，在你涅槃后，你获得技能【神威】、【朱羽】',
+		// boss_yuhuo:'浴火',
+		// boss_yuhuo_info:'觉醒技，在你涅槃后，你获得技能【神威】、【朱羽】',
 		boss_tianyu:'天狱',
 
 		boss_jizhi:'集智',
@@ -1279,7 +1358,7 @@ mode.boss={
 		boss_guiyin:'归隐',
 		boss_guiyin_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
 		boss_gongshen:'工神',
-		boss_gongshen_info:'锁定技，除你之外的角色没有装备区',
+		boss_gongshen_info:'锁定技，除你之外的角色没有装备区；你不能成为其他角色的的延时锦囊目标',
 
 		fanghua:'芳华',
 		fanghua_info:'回合结束阶段，你可以令所有已翻面角色流失一点体力',

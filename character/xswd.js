@@ -20,7 +20,7 @@ character.xswd={
 			swd_yuchiyanhong:['female','shu',3,['huanxing','meihuo'],['fullskin']],
 		swd_hanteng:['male','qun',4,['kuangfu']],
 		swd_heran:['male','qun',3,['yujian','guiyin','shejie']],
-		swd_xingtian:['male','qun',8,[]],
+		// swd_xingtian:['male','qun',8,[]],
 		swd_qinshubao:['male','qun',3,['huajing','pingxu']],
 		swd_tuobayueer:['female','shu',3,['shushen','biyue']],
 		swd_yangshuo:['male','qun',4,['longdan','luomu']],

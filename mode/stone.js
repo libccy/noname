@@ -3,7 +3,7 @@ mode.stone={
 	element:{
 		player:{
 			init:function(player){
-				if(!player.isMin()){
+				if(!player.isMin()||player.forcemin){
 					if(!player.node.actcount){
 						player.node.actcount=ui.create.div('.actcount.hp',player);
 					}
@@ -275,7 +275,8 @@ mode.stone={
 			}
 			for(i in lib.card){
 				if(lib.card[i].type=='equip'){
-					lib.card[i].chongzhu=true;
+					// lib.card[i].chongzhu=true;
+					lib.card[i].stoneact=0;
 				}
 				if(typeof lib.card[i].stoneact==='number'&&!lib.card[i].addinfo){
 					lib.card[i].addinfo='消耗 '+lib.card[i].stoneact;
@@ -516,7 +517,7 @@ mode.stone={
 			type:'stonecard',
 			fullskin:true,
 			enable:true,
-			stoneact:2,
+			stoneact:1,
 			filterTarget:function(card,player,target){
 				if(!target.isMin()) return false;
 				if(ui.selected.targets.length){
@@ -581,17 +582,24 @@ mode.stone={
 			multiline:true,
 			multitarget:true,
 			content:function(){
+				'step 0'
 				targets.sort(lib.sort.seat);
 				for(var i=0;i<targets.length;i++){
 					targets[i].die()._triggered=null;
 				}
 				ui.clear();
+				'step 1'
+				player.recover(2)
 			},
 			stoneact:6,
 			ai:{
 				order:9,
 				result:{
-					target:-1
+					target:-1,
+					player:function(player){
+						if(player.hp<player.maxHp) return 1;
+						return 0;
+					}
 				}
 			}
 		},
@@ -694,7 +702,7 @@ mode.stone={
 		miefafu:{
 			type:'stonecard',
 			enable:true,
-			stoneact:2,
+			stoneact:1,
 			fullskin:true,
 			filterTarget:function(card,player,target){
 				return target.isMin();
@@ -793,7 +801,7 @@ mode.stone={
 				return target.isMin()&&target.hp<target.maxHp;
 			},
 			content:function(){
-				target.recover();
+				target.recover(target.maxHp-target.hp);
 			},
 			ai:{
 				order:8,
@@ -1113,17 +1121,13 @@ mode.stone={
 				return player.getEnemy().num('e')>0;
 			},
 			content:function(){
-				"step 0"
-				event.chooser=player.getLeader();
-				event.enemy=player.getEnemy();
-				event.chooser.choosePlayerCard(event.enemy,'e','吴兵：令对方主将将装备区中的一张牌收入手牌');
-				player.line(event.chooser);
-				"step 1"
-				if(result.bool){
-					event.chooser.line(event.enemy);
+				var enemy=player.getEnemy();
+				var es=enemy.get('e');
+				if(es.length){
+					player.getLeader().line(enemy);
 					game.delay();
-					event.enemy.gain(result.links,'gain2');
-					game.log(get.translation(event.enemy)+'将'+get.translation(result.links)+'收入手牌')
+					enemy.gain(es,'gain2');
+					game.log(get.translation(event.enemy)+'将'+get.translation(es)+'收入手牌')
 				}
 			}
 		},
@@ -1364,7 +1368,7 @@ mode.stone={
 		stone_shujiang_info:'你出场时，已方主将可视为对一名敌方角色使用一张杀',
 
 		stone_wubing:'吴兵',
-		stone_wubing_info:'你出场时，已方主将可令敌方主将将装备区内的一张牌收入手牌',
+		stone_wubing_info:'你出场时，敌方主将将装备区内的所有牌收入手牌',
 		stone_wuguan:'吴官',
 		stone_wuguan_info:'你出场时，已方主将本回合手牌上限+1',
 		stone_wujiang:'吴将',
@@ -1418,7 +1422,7 @@ mode.stone={
 		miefafu:'灭法符',
 		miefafu_info:'将目标随从翻面',
 		liumangxingzhen:'六芒星阵',
-		liumangxingzhen_info:'令场上所有随从立即死亡（无法触发死亡技能）',
+		liumangxingzhen_info:'令场上所有随从立即死亡（无法触发死亡技能），回复两点体力',
 		dianhaishenzhu:'颠海神珠',
 		dianhaishenzhu_info:'令目标随从获得嘲讽',
 		chaofeng:'嘲讽',
@@ -1432,7 +1436,7 @@ mode.stone={
 		zhaohunfan:'招魂幡',
 		zhaohunfan_info:'令双方各一名随从立即死亡',
 		fengraozhijiao:'丰饶之角',
-		fengraozhijiao_info:'令一名随从回复一点体力',
+		fengraozhijiao_info:'令一名随从回复全部体力',
 
 		stonecard:'法术'
 	},
@@ -1453,12 +1457,12 @@ mode.stone={
 	config:['battle_number','double_character','double_hp','ban_weak','free_choose','change_choice'],
 	help:{
 		'炉石模式':'<ul><li>游戏流程类似1v1，场上有两名主将进行对抗'+
-		'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
+		'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
 		'<li>牌堆中随机加入总量1/3的随从牌，使用之可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 		'随从与其他所有角色相互距离基数为1<li>'+
 		'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
 		'<li>牌堆中随机加入总量1/6的法术牌，效果主要与随从有关，法术牌根据强度不同可能会消耗额外的行动值'+
-		'<li>主将可重铸装备牌和随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
+		'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
 		'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
 		'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸2+X张牌，X为对方存活的随从数，无替补时游戏结束'
 	}

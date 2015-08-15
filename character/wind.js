@@ -139,12 +139,12 @@ character.wind={
 						return 10-ai.get.value(card);
 					},
 					ai2:function(target){
+						var att=ai.get.attitude(player,target);
 						if(trigger.num>1){
-							if(target.maxHp>5&&target.hp>1) return 0;
+							if(target.maxHp>5&&target.hp>1) return -att/10;
 							return -att;
 						}
 						var eff=ai.get.damageEffect(target,trigger.source,target,trigger.nature);
-						var att=ai.get.attitude(player,target);
 						if(att==0) return 0.1;
 						if(eff>=0&&trigger.num==1){
 							return att;

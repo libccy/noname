@@ -306,13 +306,17 @@ character.yijiang={
 							if(ai.get.attitude(event.current,target)<0) return 7-ai.get.value(card);
 							return -1;
 						};
+						event.tempbool=false;
+					}
+					else{
+						event.tempbool=true;
 					}
 				}
 				else{
 					event.finish();
 				}
 				"step 2"
-				if(result.bool==false){
+				if(event.tempbool||result.bool==false){
 					target.draw();
 				}
 				event.goto(1);
@@ -681,6 +685,7 @@ character.yijiang={
 			trigger:{player:'phaseUseEnd'},
 			forced:true,
 			popup:false,
+			silent:true,
 			content:function(){
 				delete player.storage.qiangzhi;
 				player.unmarkSkill('qiangzhi');
@@ -997,6 +1002,13 @@ character.yijiang={
 				result:{
 					target:1,
 					player:function(player){
+						var bool=true;
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>2&&ai.get.attitude(game.players[i],player)>2 ){
+								bool=false;break;
+							}
+						}
+						if(bool) return -10;
 						if(player.hp==1) return 1;
 						if(game.phaseNumber<game.players.length) return -10;
 						if(player.num('e')+player.hp<=player.maxHp) return 1;
@@ -1306,7 +1318,14 @@ character.yijiang={
 			},
 			ai:{
 				result:{
-					player:1,
+					player:function(player){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>1&&ai.get.attitude(game.players[i],player)>1){
+								return 1;
+							}
+						}
+						return 0;
+					},
 					target:function(player,target){
 						if(ui.selected.targets.length){
 							return -0.1;
@@ -1508,7 +1527,7 @@ character.yijiang={
 					ai2:function(target){
 						return ai.get.attitude(player,target)-2;
 					},
-					prompt:'将'+event.num+'张手牌交给一名其他角色',
+					prompt:'将'+get.cnNumber(event.num)+'张手牌交给一名其他角色',
 				});
 				"step 2"
 				if(result.bool){

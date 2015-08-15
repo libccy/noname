@@ -112,9 +112,15 @@ card.swd={
 			},
 			content:function(){
 				"step 0"
-				target.chooseToDiscard({color:'black'},'弃置一张黑色手牌或受流失一点体力').ai=function(card){
-					return 8-ai.get.value(card);
-				};
+				if(!target.num('h',{color:'black'})){
+					target.loseHp();
+					event.finish();
+				}
+				else{
+					target.chooseToDiscard({color:'black'},'弃置一张黑色手牌或受流失一点体力').ai=function(card){
+						return 8-ai.get.value(card);
+					};
+				}
 				"step 1"
 				if(!result.bool){
 					target.loseHp();
@@ -255,7 +261,7 @@ card.swd={
 				else{
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
 					if(card.clone&&card.clone.parentNode==ui.arena){
-						card.clone.moveTo(player).delete();
+						card.clone.moveTo(target).delete();
 					}
 				}
 			},
@@ -363,7 +369,7 @@ card.swd={
 		zhufangshenshi:{
 			fullskin:true,
 			chongzhu:true,
-			type:'basic',
+			type:'trick',
 			enable:function(){
 				return game.players.length>2;
 			},

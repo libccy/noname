@@ -287,6 +287,7 @@
 		},
 		translate:{
 			'default':"默认",
+			zhenfa:'阵法',
 			heart:"♥︎",
 			diamond:"♦︎",
 			spade:"♠︎",
@@ -1690,31 +1691,33 @@
 						}
 					}
 					player.changeHp(-num,false);
-					if(source){
-						if(player._damagetimeout!=source){
-							player.$damage(source);
-							player._damagetimeout=source;
-							setTimeout(function(){
-								delete player._damagetimeout;
-							},500);
-						}
-						if(player._damagepopup){
-							player._damagepopup-=num;
-							player._damagenature=event.nature;
-						}
-						else{
-							player._damagepopup=-num;
-							player._damagenature=event.nature;
-							setTimeout(function(){
-								player.popup(player._damagepopup,player._damagenature);
-								delete player._damagepopup;
-								delete player._damagenature;
-							},300);
-						}
-					}
-					else{
-						player.$damage();
-					}
+					player.$damage(source);
+					player.popup(-num,event.nature);
+					// if(source){
+					// 	if(player._damagetimeout!=source){
+					// 		player.$damage(source);
+					// 		player._damagetimeout=source;
+					// 		setTimeout(function(){
+					// 			delete player._damagetimeout;
+					// 		},500);
+					// 	}
+					// 	if(player._damagepopup){
+					// 		player._damagepopup-=num;
+					// 		player._damagenature=event.nature;
+					// 	}
+					// 	else{
+					// 		player._damagepopup=-num;
+					// 		player._damagenature=event.nature;
+					// 		setTimeout(function(){
+					// 			player.popup(player._damagepopup,player._damagenature);
+					// 			delete player._damagepopup;
+					// 			delete player._damagenature;
+					// 		},300);
+					// 	}
+					// }
+					// else{
+					// 	player.$damage();
+					// }
 					event.trigger('damage');
 					"step 1"
 					if(player.hp<=0&&player.isAlive()){
@@ -3522,8 +3525,14 @@
 				},
 				logSkill:function(name,targets,nature){
 					if(get.itemtype(targets)=='player') targets=[targets];
+					var nopop=false;
+					if(Array.isArray(name)){
+						this.popup(name[1]);
+						name=name[0];
+						nopop=true;
+					}
 					if(lib.translate[name]){
-						this.popup(name);
+						if(!nopop) this.popup(name);
 						if(typeof targets=='object'&&targets.length){
 							var str=get.translation(this)+'对'+get.translation(targets[0]);
 							for(var i=1;i<targets.length;i++){
@@ -3600,6 +3609,10 @@
 				popup:function(name,className){
 					var name2=get.translation(name);
 					var node=ui.create.div('.popup',this.parentNode);
+					if(!name2){
+						node.remove();
+						return node;
+					}
 					node.dataset.position=this.dataset.position;
 					if(this.dataset.position==0||parseInt(this.dataset.position)==parseInt(ui.arena.dataset.number)/2||
 						typeof name2=='number'||this.classList.contains('minskin')){
@@ -4274,7 +4287,7 @@
 						clone.offsetTop+clone.offsetHeight/2,
 						player.offsetLeft+player.offsetWidth/2,
 						player.offsetTop+player.offsetHeight/2
-					],{opacity:0.5,dashed:false});
+					],{opacity:0.5,dashed:true});
 				}
 			},
 			card:{
@@ -5287,7 +5300,7 @@
 			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
 			var opacity=1;
 			var color=[255,255,255];
-			var dashed=false;
+			var dashed=lib.config.line_dash;
 			if(typeof arguments[1]=='object'){
 				for(var i in arguments[1]){
 					switch(i){
@@ -5330,9 +5343,12 @@
 					return false;
 				}
 				ctx.beginPath();
-				if(!dashed){
+				if(dashed){
 					ctx.lineCap='butt';
 					ctx.setLineDash([8,2]);
+				}
+				else{
+					ctx.lineCap='round';
 				}
 				ctx.moveTo(from[0],from[1]);
 				ctx.lineTo(current[0],current[1]);
@@ -5364,6 +5380,18 @@
 			}
 			_status.event.next.push(next);
 			return next;
+		},
+		createCard:function(name,suit,number){
+			if(typeof name!='string'){
+				name='sha';
+			}
+			if(typeof suit!='string'){
+				suit=['heart','diamond','club','spade'].randomGet();
+			}
+			if(typeof number!='number'){
+				number=Math.ceil(Math.random()*13);
+			}
+			return ui.create.card(ui.special).init([suit,number,name]);
 		},
 		over:function(result){
 			var i,j,k,num,table,tr,td,dialog;
@@ -7071,6 +7099,10 @@
 				ui.sidebar=ui.create.div('#sidebar');
 				ui.sidebar3=ui.create.div('#sidebar3');
 				ui.canvas=document.createElement('canvas');
+				if(lib.config.bottom_line){
+					ui.canvas.style.zIndex=0;
+				}
+
 				ui.arena.appendChild(ui.canvas);
 				ui.canvas.id='canvas';
 				ui.ctx=ui.canvas.getContext('2d');
@@ -7367,6 +7399,8 @@
 				appearence.push(ui.create.switcher('auto_popped',lib.config.auto_popped,ui.click.sidebar.global));
 				appearence.push(ui.create.switcher('only_fullskin',lib.config.only_fullskin,ui.click.sidebar.global2));
 				appearence.push(ui.create.switcher('hide_card_image',lib.config.hide_card_image,ui.click.sidebar.global2));
+				appearence.push(ui.create.switcher('bottom_line',lib.config.bottom_line,ui.click.sidebar.bottom_line));
+				appearence.push(ui.create.switcher('line_dash',lib.config.line_dash,ui.click.sidebar.global2));
 				appearence.push(ui.create.switcher('show_name',lib.config.show_name,ui.click.sidebar.show_name));
 				appearence.push(ui.create.switcher('show_replay',lib.config.show_replay,ui.click.sidebar.show_replay));
 				appearence.push(ui.create.switcher('show_playerids',lib.config.show_playerids,ui.click.sidebar.show_playerids));
@@ -9584,6 +9618,15 @@
 						ui.replay.style.display='none';
 					}
 				},
+				bottom_line:function(bool){
+					game.saveConfig('bottom_line',bool);
+					if(lib.config.bottom_line){
+						ui.canvas.style.zIndex=0;
+					}
+					else{
+						ui.canvas.style.zIndex='';
+					}
+				},
 				show_playerids:function(bool){
 					game.saveConfig('show_playerids',bool);
 					if(lib.config.show_playerids){
@@ -10517,16 +10560,34 @@
 			}
 		},
 		cardPile:function(name){
+			var card;
 			for(var i=0;i<ui.cardPile.childNodes.length;i++){
-				if(ui.cardPile.childNodes[i].name==name){
-					return ui.cardPile.childNodes[i];
+				card=ui.cardPile.childNodes[i];
+				if(typeof name=='string'){
+					if(card.name==name){
+						return card;
+					}
+				}
+				else if(typeof name=='function'){
+					if(name(card)){
+						return card;
+					}
 				}
 			}
 			for(var i=0;i<ui.discardPile.childNodes.length;i++){
-				if(ui.discardPile.childNodes[i].name==name){
-					return ui.discardPile.childNodes[i];
+				card=ui.discardPile.childNodes[i];
+				if(typeof name=='string'){
+					if(card.name==name){
+						return card;
+					}
+				}
+				else if(typeof name=='function'){
+					if(name(card)){
+						return card;
+					}
 				}
 			}
+			return null;
 		},
 		aiStrategy:function(){
 			switch(get.config('ai_strategy')){

@@ -18,7 +18,7 @@ card.extra={
 				else{
 					target.addTempSkill('jiu','phaseAfter');
 					if(card.clone&&card.clone.parentNode==ui.arena){
-						card.clone.moveTo(player).delete();
+						card.clone.moveTo(target).delete();
 					}
 				}
 			},

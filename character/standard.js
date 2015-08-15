@@ -536,8 +536,9 @@ character.standard={
 		},
 		jijiang2:{
 			audio:2,
-			enable:'phaseUse',
+			enable:'chooseToUse',
 			filter:function(event,player){
+				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
 				if(player!=game.zhu) return false;
 				if(player!=game.me&&player.skills.contains('jijiang3')) return false;
 				for(var i=0;i<game.players.length;i++){
@@ -560,9 +561,9 @@ character.standard={
 				else if(event.current.group=='shu'){
 					var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
 						function(card){return player.canUse(card,target)&&card.name=='sha';});
-					next.ai=function(){
+					next.ai=function(card){
 						var event=_status.event;
-						return (ai.get.attitude(event.player,event.target)<0);
+						return ai.get.effect(event.target,card,event.source,event.player);
 					};
 					next.autochoose=lib.filter.autoRespondSha;
 					next.source=player;
@@ -1077,15 +1078,18 @@ character.standard={
 				if(result.bool){
 					player.discard(result.cards);
 					player.logSkill('liuli',result.targets);
+					trigger.target=result.targets[0];
+					trigger.targets.remove(player);
+					trigger.targets.push(result.targets[0]);
+				}
+				else{
+					event.finish();
 				}
 				"step 2"
-				if(result.bool){
-					trigger.target=result.targets[0];
-					trigger.untrigger();
-					trigger.trigger('useCardToBefore');
-					trigger.trigger('shaBefore');
-					game.delay();
-				}
+				trigger.untrigger();
+				trigger.trigger('useCardToBefore');
+				trigger.trigger('shaBefore');
+				game.delay();
 			},
 			ai:{
 				effect:{

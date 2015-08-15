@@ -402,9 +402,10 @@ character.fire={
 			},
 			content:function(){
 				"step 0"
-				player.judge();
+				player.judge(ui.special);
 				"step 1"
 				player.gain(result.card);
+				player.$gain2(result.card);
 				player.addTempSkill('shuangxiong2','phaseAfter');
 				player.storage.shuangxiong=get.color(result.card);
 				trigger.untrigger();
@@ -519,7 +520,4 @@ character.fire={
 		xueyi_info:'场上每有一名其他群雄角色存活，你的手牌上限便+2。',
 		mengjin_info:'当你使用的【杀】被【闪】抵消时，你可以弃掉对方的一张牌。',
 	},
-	help:{
-
-	}
 }

@@ -80,7 +80,7 @@ character.xianjian={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'thunderDamage')){
-							if(target.hp<=1) return [0,0];
+							if(target.hp<=1||!target.skills.contains('fenxin')) return [0,0];
 							return [0,1.5];
 						}
 					}
@@ -300,6 +300,11 @@ character.xianjian={
 				};
 				"step 1"
 				if(result.bool){
+					player.$throw(result.cards);
+					var clone=result.cards[0].clone;
+					setTimeout(function(){
+						clone.moveTo(player,'flip').delete();
+					},500);
 					player.logSkill('shuiyun');
 					player.storage.shuiyun.push(result.cards[0]);
 					player.lose(result.cards,ui.special);
@@ -360,8 +365,8 @@ character.xianjian={
 					player.$throw(result.links);
 					ui.discardPile.appendChild(result.links[0]);
 					trigger.player.recover();
-					if(player!=trigger.player){
-						game.asyncDraw([trigger.player,player]);
+					if(trigger.player!=player){
+						trigger.player.draw();
 					}
 					player.logSkill('shuiyun5',trigger.player,'thunder');
 				}
@@ -839,17 +844,27 @@ character.xianjian={
 			check:function(card){
 				return 7-ai.get.value(card);
 			},
+			multitarget:true,
+			multiline:true,
 			content:function(){
-				if(target.num('he')){
-					player.discardPlayerCard(target,'he',true).ai=function(){
-						if(ai.get.attitude(player,target)<0){
-							return ai.get.buttonValue.apply(this,arguments);
-						}
-						return -1;
-					};
+				'step 0'
+				targets.sort(lib.sort.seat);
+				var target=targets[0];
+				var cs=target.get('he');
+				if(cs.length){
+					target.discard(cs.randomGet());
 				}
 				player.storage.zhuyue.add(target);
-
+				if(targets.length<2){
+					event.finish();
+				}
+				'step 1'
+				var target=targets[1];
+				var cs=target.get('he');
+				if(cs.length){
+					target.discard(cs.randomGet());
+				}
+				player.storage.zhuyue.add(target);
 			},
 			ai:{
 				result:{
@@ -940,7 +955,7 @@ character.xianjian={
 			unique:true,
 			enable:'phaseUse',
 			filter:function(event,player){
-				return !player.storage.guanri;
+				return !player.storage.guanri&&player.num('h',{color:'red'})>=2;
 			},
 			check:function(card){
 				return 8-ai.get.value(card);
@@ -1083,25 +1098,10 @@ character.xianjian={
 					var target=result.targets[0];
 					var card=get.cards()[0];
 					target.$draw(card);
-					if(get.type(card)=='equip'){
-						game.delay();
-						event.card=card;
-						event.target=target;
-					}
-					else{
-						target.storage.zhimeng2=card;
-						target.addSkill('zhimeng2');
-						event.finish();
-					}
+					target.storage.zhimeng2=card;
+					target.addSkill('zhimeng2');
+					event.finish();
 					player.logSkill('zhimeng',target);
-				}
-				"step 2"
-				if(event.target){
-					event.target.equip(event.card);
-				}
-				"step 3"
-				if(event.target){
-					event.target.draw();
 				}
 			},
 			ai:{
@@ -1164,21 +1164,21 @@ character.xianjian={
 		},
 		tannang:{
 			enable:'chooseToUse',
+			usable:1,
 			filterCard:function(card){
 				return get.suit(card)=='club';
 			},
 			filter:function(event,player){
-				return player.num('he',{suit:'club'});
+				return player.num('h',{suit:'club'});
 			},
-			position:'he',
 			viewAs:{name:'shunshou'},
 			viewAsFilter:function(player){
-				if(!player.num('he',{suit:'club'})) return false;
+				if(!player.num('h',{suit:'club'})) return false;
 			},
 			prompt:'将一张装备牌当顺手牵羊使用',
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.num('h',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				if(player.num('h')<player.hp){
@@ -1357,7 +1357,7 @@ character.xianjian={
 		shuiyun2:'水蕴',
 		shuiyun5:'水蕴',
 		shuiyun3:'水蕴',
-		shuiyun_info:'回合结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力，若该角色不是你，你与其各摸1张牌',
+		shuiyun_info:'回合结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力并摸一张牌',
 		wangyou:'忘忧',
 		wangyou_info:'其他角色的回合结束阶段，你可以弃置一张牌，令此回合内受过伤害的所有角色各摸一张牌',
 		changnian:'长念',
@@ -1385,7 +1385,7 @@ character.xianjian={
 		longxi2:'龙息',
 		longxi_info:'锁定技，在回合外每当你需要使用或打出一张卡牌时，若牌堆顶的前两张中有可使用或打出的牌，你立即获得之',
 		zhuyue:'逐月',
-		zhuyue_info:'出牌阶段限一次，你可以弃置一张非基本牌并指定至多两个目标各弃置其一张牌，若如此做，你本回使用的杀须指定选中角色为目标',
+		zhuyue_info:'出牌阶段限一次，你可以弃置一张非基本牌并指定至多两个目标各随机弃置一张牌，若如此做，你本回使用的杀须指定选中角色为目标',
 		guanri:'贯日',
 		guanri_info:'限制技，你可以弃置两张红色手牌并流失一点体力，然后对一名体力值不少于你的其他角色造成两点火焰伤害并弃置其所有装备牌',
 		tianxian:'天弦',
@@ -1393,11 +1393,11 @@ character.xianjian={
 		zhimeng:'织梦',
 		zhimeng2:'织梦',
 		zhimeng3:'织梦',
-		zhimeng_info:'回合结束阶段，选择一名角色并展示牌堆顶的一张牌，若其为装备牌，该角色立即装备之并摸一张牌，否则将其置于该角色的武将牌上，直到你的下个回合开始将其收入手牌。当一名角色武将牌上有牌时，每当其成为与此牌类型相同的卡牌的目标，可以摸一张牌',
+		zhimeng_info:'回合结束阶段，你可以选择一名角色将牌堆顶的一张牌置于该角色的武将牌上，直到你的下个回合开始将其收入手牌。当一名角色武将牌上有牌时，每当其成为与此牌类型相同的卡牌的目标，可以摸一张牌',
 		runxin:'润心',
 		runxin_info:'每当你使用或打出一张红桃牌，你可以令一名角色回复一点体力',
 		tannang:'探囊',
-		tannang_info:'你可以将一张梅花牌当顺手牵羊使用，你的顺手牵羊无距离限制',
+		tannang_info:'你可以将一张梅花手牌当顺手牵羊使用（每回合最多发动1次）；你的顺手牵羊无距离限制',
 		tuoqiao:'脱壳',
 		tuoqiao_info:'每当你成为身边角色的卡牌的目标，你可以将座位后移一位，然后取消之',
 		xiaoyao:'逍遥',

@@ -363,7 +363,10 @@ character.swd={
 			group:['yaotong1','yaotong2','yaotong3'],
 			ai:{
 				respondSha:true,
-				respondShan:true
+				respondShan:true,
+				skillTagFilter:function(player){
+					if(player.num('h')%2==0) return false;
+				},
 			},
 			threaten:1.3
 		},
@@ -1616,7 +1619,15 @@ character.swd={
 				effect:function(card,player,target){
 					if(get.tag(card,'damage')){
 						if(player.skills.contains('jueqing')) return [1,-0.5];
-						if(player.num('h')>2||player.num('e',{color:'black'})){
+						if(!target.hasFriend()){
+							if(lib.config.mode=='guozhan'){
+								if(!player.hasFriend()) return;
+							}
+							else{
+								return;
+							}
+						}
+						if(target.num('h')>2||target.num('e',{color:'black'})){
 							return [1,0,0,-1];
 						}
 						return [1,-0.5];
@@ -1912,7 +1923,7 @@ character.swd={
 			}
 		},
 		liuhong:{
-			trigger:{player:['useCard','respondAfter']},
+			trigger:{player:['useCard']},
 			frequent:true,
 			filter:function(event){
 				return event.card&&event.card.name=='sha';
@@ -2457,6 +2468,9 @@ character.swd={
 			selectTarget:2,
 			multitarget:true,
 			multiline:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
 			prepare:function(cards,player,targets){
 				player.$throw(cards);
 				player.line(targets);
@@ -4262,6 +4276,7 @@ character.swd={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			popup:false,
+			silent:true,
 			content:function(){
 				if(player.storage.daixing){
 					player.changeHujia(-player.storage.daixing);
@@ -4428,7 +4443,12 @@ character.swd={
 				return get.type(card,'trick')=='trick';
 			},
 			usable:1,
-			filter:function(event,player){return player.num('e')==0},
+			filter:function(event,player){
+				if(player.num('e')) return false;
+				if(player.num('h',{type:'trick'})) return true;
+				if(player.num('h',{type:'delay'})) return true;
+				return false;
+			},
 			selectCard:1,
 			check:function(card){
 				return 8-ai.get.value(card);
@@ -6830,7 +6850,7 @@ character.swd={
 				player.removeSkill('mailun8');
 				if(event.isMine()){
 					ui.auto.hide();
-					event.dialog=ui.create.dialog('选择一个效果');
+					event.dialog=ui.create.dialog('脉轮：选择一个效果');
 					var effects=lib.skill.mailun.effects;
 					var clickItem=function(){
 						event.choice=this.link;
@@ -6839,7 +6859,7 @@ character.swd={
 					for(var i=0;i<8;i++){
 						if(i==0&&player.maxHp==6) continue;
 						var item=event.dialog.add('<div class="popup" style="width:70%;display:inline-block"><div class="skill">【'+
-						get.cnNumber(i+1,true)+'轮'+'】</div><div>'+effects[i]+'</div></div>');
+						get.cnNumber(i+1,true)+'】</div><div>'+effects[i]+'</div></div>');
 						item.addEventListener('click',clickItem);
 						item.link=i+1;
 
@@ -7749,7 +7769,7 @@ character.swd={
 		gongshen_info:'任意一名其他角色使用一张基本牌或锦囊牌指定目标后，你可以弃置一张装备牌令其失效',
 
 		liuhong:'流虹',
-		liuhong_info:'每当你使用或打出一张杀，可以摸一张牌',
+		liuhong_info:'每当你使用一张杀，可以摸一张牌',
 		poyue:'破月',
 		poyue_info:'锁定技，你的黑杀无视距离，红色不计入回合内的出杀限制且不可闪避',
 		mojian:'墨剑',
