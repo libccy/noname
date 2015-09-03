@@ -972,7 +972,9 @@ mode.chess={
 					game.check();
 				};
 				ui.create.cheat=function(){
+					_status.createControl=ui.cheat2;
 					ui.cheat=ui.create.control('更换',event.changeDialog);
+					delete _status.createControl;
 				};
 				event.dialogxx=ui.create.characterDialog();
 				event.dialogxx.classList.add('fullwidth');
@@ -986,6 +988,9 @@ mode.chess={
 							delete this.backup;
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=1;
+							}
 							if(ui.cheat2x){
 								ui.cheat2x.close();
 								delete ui.cheat2x;
@@ -1000,6 +1005,9 @@ mode.chess={
 							this.dialog.open();
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=0.6;
+							}
 						}
 					});
 				}

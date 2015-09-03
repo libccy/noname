@@ -185,36 +185,26 @@ card.shenqi={
 				}
 				return false;
 			},
-			direct:true,
+			forced:true,
 			content:function(){
-				"step 0"
-				game.delay();
-				"step 1"
-				event.cards=trigger.cards.slice(0);
-				for(var i=0;i<event.cards.length;i++){
-					if(get.position(event.cards[i])!='d'){
-						event.cards.splice(i,1);i--;
+				var cards=trigger.cards.slice(0);
+				for(var i=0;i<cards.length;i++){
+					if(get.position(cards[i])!='d'){
+						cards.splice(i,1);i--;
 					}
 				}
 				var hu=player.get('e','5');
-				if(event.cards.length==0||!hu){
-					event.finish();
-					return;
-				}
-				event.hu=hu;
-				if(!hu.storage.shouna){
-					hu.storage.shouna=[];
-				}
-				player.chooseCardButton(event.cards,'选择一张牌收入炼妖壶').ai=function(){return 1};
-				"step 2"
-				if(result.bool){
-					player.logSkill('shouna');
+				if(cards.length&&hu){
+					if(!hu.storage.shouna){
+						hu.storage.shouna=[];
+					}
 					player.addTempSkill('shouna2','phaseAfter');
-					player.$gain2(result.buttons[0].link);
-					event.hu.storage.shouna.push(result.buttons[0].link);
-					ui.special.appendChild(result.buttons[0].link);
-					game.log(get.translation(player)+'将'+get.translation(result.buttons[0].link)+'收入炼妖壶');
-					game.delay();
+					player.$gain2(cards);
+					for(var i=0;i<cards.length;i++){
+						hu.storage.shouna.push(cards[i]);
+						ui.special.appendChild(cards[i]);
+					}
+					game.log(get.translation(player)+'将'+get.translation(cards)+'收入炼妖壶');
 				}
 			},
 		},
@@ -661,7 +651,7 @@ card.shenqi={
 		//kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束后的位置，然后流失一点体力',
 		nvwashi_info:'意一名角色濒死时，你可以令其进行一次判定，若结果为红桃，其回复一点体力',
 		kongxin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你可以指定另一名角色视为对方对该角色使用一张杀，否则对方可弃置你一张处于',
-		lianyaohu_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你可以选择其中的一张放入炼妖壶；出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
+		lianyaohu_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你将其放入炼妖壶（每回合只发动一次）；出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		fuxiqin_info:'出牌阶段，你可以选择一名角色并流失X点体力，然后获得其控制权直到其首次进入濒死状态，X为该角色当前的体力值',
 	},
 	list:[

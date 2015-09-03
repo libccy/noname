@@ -777,7 +777,9 @@ character.mountain={
 			},
 			direct:true,
 			check:function(event,player){
-				return (ai.get.attitude(player,event.player)-ai.get.attitude(player,event.source))>0;
+				var att1=ai.get.attitude(player,event.player);
+				var att2=ai.get.attitude(player,event.source);
+				return att1>att2&&att1>=0;
 			},
 			content:function(){
 				"step 0"

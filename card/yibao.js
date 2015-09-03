@@ -137,13 +137,18 @@ card.yibao={
 			effect:function(){
 				if(result.judge){
 					if(player.num('he')==0) player.loseHp();
-					else player.chooseToDiscard('he',true,3);
+					else{
+						player.discard(player.get('he').randomGets(3));
+					}
 					var players=get.players();
-					for(var i=0;i<game.players.length;i++){
-						var dist=get.distance(player,game.players[i]);
-						if(dist<=2&&player!=game.players[i]){
-							if(game.players[i].num('he')==0) game.players[i].loseHp();
-							else game.players[i].chooseToDiscard('he',true,3-Math.max(1,dist));
+					for(var i=0;i<players.length;i++){
+						var dist=get.distance(player,players[i]);
+						if(dist<=2&&player!=players[i]){
+							var cs=players[i].get('he');
+							if(cs.length==0) players[i].loseHp();
+							else{
+								players[i].discard(cs.randomGets(3-Math.max(1,dist)));
+							}
 						}
 					}
 				}
@@ -421,7 +426,7 @@ card.yibao={
 		huoshan:'火山',
 		huoshan_info:'出牌阶段，对自己使用。若判定结果为红桃2~9，则目标角色受到2点火焰伤害，距离目标1以内的其他角色受到1点火焰伤害。若判定不为红桃2~9，将之移动到下家的判定区里。',
 		hongshui:'洪水',
-		hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色须弃置3张牌，距离该角色为X的角色须弃置3-X张牌，若没有牌则失去一点体力，X至少为1',
+		hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力，X至少为1',
 		liuxinghuoyu:'流星火羽',
 		liuxinghuoyu_info:'出牌阶段，对一名有手牌或装备牌的角色使用，令其弃置0~2张牌，并受到2-X点火焰伤害，X为弃置的卡牌数',
 		dujian:'毒箭',

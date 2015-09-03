@@ -398,7 +398,9 @@ mode.stone={
 					game.check();
 				};
 				ui.create.cheat=function(){
+					_status.createControl=ui.cheat2;
 					ui.cheat=ui.create.control('更换',event.changeDialog);
+					delete _status.createControl;
 				};
 				event.dialogxx=ui.create.characterDialog();
 				ui.create.cheat2=function(){
@@ -410,6 +412,9 @@ mode.stone={
 							delete this.backup;
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=1;
+							}
 							if(ui.cheat2x){
 								ui.cheat2x.close();
 								delete ui.cheat2x;
@@ -424,6 +429,9 @@ mode.stone={
 							this.dialog.open();
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=0.6;
+							}
 						}
 					});
 				}
@@ -1142,7 +1150,7 @@ mode.stone={
 		stone_wuguan2:{
 			mod:{
 				maxHandcard:function(player,num){
-					return num+1;
+					return num+2;
 				}
 			},
 		},
@@ -1370,7 +1378,7 @@ mode.stone={
 		stone_wubing:'吴兵',
 		stone_wubing_info:'你出场时，敌方主将将装备区内的所有牌收入手牌',
 		stone_wuguan:'吴官',
-		stone_wuguan_info:'你出场时，已方主将本回合手牌上限+1',
+		stone_wuguan_info:'你出场时，已方主将本回合手牌上限+2',
 		stone_wujiang:'吴将',
 		stone_wujiang_info:'你出场时，已方主将摸两张牌',
 

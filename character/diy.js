@@ -3,7 +3,7 @@ character.diy={
 		// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
 		// diy_hanlong:['male','wei',4,['siji','ciqiu'],['fullskin']],
 		diy_feishi:['male','shu',3,['shuaiyan','moshou'],['fullskin']],
-		diy_liuyan:['male','shu',4,['juedao','geju'],['fullskin']],
+		diy_liuyan:['male','shu',3,['juedao','geju'],['fullskin']],
 		// diy_luxun:['male','wu',3,['shaoying','zonghuo'],['fullskin']],
 		// diy_yuji:['male','qun',3,['diyguhuo','diychanyuan'],['fullskin']],
 		// diy_zhouyu:['male','wu',3,['jieyan','honglian']],
@@ -417,7 +417,8 @@ character.diy={
 						if(card.name=='tiesuo') return 0;
 						if(get.tag(card,'thunderDamage')) return 0;
 					}
-				}
+				},
+				threaten:0.5
 			}
 		},
 		tiangong2:{

@@ -186,6 +186,9 @@ mode.guozhan={
 								delete this.backup;
 								game.uncheck();
 								game.check();
+								if(ui.cheat){
+									ui.cheat.style.opacity=1;
+								}
 								if(ui.cheat2x){
 									ui.cheat2x.close();
 									delete ui.cheat2x;
@@ -200,10 +203,14 @@ mode.guozhan={
 								this.dialog.open();
 								game.uncheck();
 								game.check();
+								if(ui.cheat){
+									ui.cheat.style.opacity=0.6;
+								}
 							}
 						});
 					}
 					ui.create.cheat=function(){
+						_status.createControl=ui.cheat2;
 						ui.cheat=ui.create.control('更换',function(){
 							if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
 								return;
@@ -219,6 +226,7 @@ mode.guozhan={
 							game.uncheck();
 							game.check();
 						});
+						delete _status.createControl;
 					}
 					if(!ui.cheat&&get.config('change_choice'))
 					ui.create.cheat();
@@ -441,10 +449,21 @@ mode.guozhan={
 				}
 			},
 			perfectPair:function(){
-				if(lib.perfectPair[this.name1]&&lib.perfectPair[this.name1].contains(this.name2)){
+				var name1=this.name1;
+				var name2=this.name2;
+				var list=['re','diy','sp','jsp','shen','jg','xin'];
+				for(var i=0;i<list.length;i++){
+					if(name1.indexOf(list[i]+'_')==0){
+						name1=name1.slice(list[i].length+1);
+					}
+					if(name2.indexOf(list[i]+'_')==0){
+						name2=name2.slice(list[i].length+1);
+					}
+				}
+				if(lib.perfectPair[name1]&&lib.perfectPair[name1].contains(name2)){
 					return true;
 				}
-				if(lib.perfectPair[this.name2]&&lib.perfectPair[this.name2].contains(this.name1)){
+				if(lib.perfectPair[name2]&&lib.perfectPair[name2].contains(name1)){
 					return true;
 				}
 				return false;

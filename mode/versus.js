@@ -141,6 +141,7 @@ mode.versus={
 				// }
 				event.check();
 				ui.create.cheat=function(){
+					_status.createControl=event.fill;
 					ui.cheat=ui.create.control('更换',function(){
 						if(lib.storage.choice=='∞'){
 							list.sort(sortByGroup);
@@ -155,6 +156,7 @@ mode.versus={
 						event.dialog=ui.create.dialog('选择角色',[list.slice(0,choice),'character']);
 						event.check();
 					});
+					delete _status.createControl;
 				}
 				if(!ui.cheat&&get.config('change_choice'))
 				ui.create.cheat();

@@ -668,6 +668,14 @@ card.swd={
 			enable:'phaseUse',
 			usable:1,
 			filterCard:true,
+			filter:function(event,player){
+				var nh=player.num('h');
+				if(nh==0) return false;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].num('h')>nh) return true;
+				}
+				return false;
+			},
 			check:function(card){
 				return 8-ai.get.value(card);
 			},

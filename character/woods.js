@@ -164,8 +164,8 @@ character.woods={
 			},
 			content:function(){
 				"step 0"
-				player.gain(trigger.cards);
-				player.$draw(trigger.cards);
+				player.gain(trigger.playerCards);
+				player.$draw(trigger.playerCards);
 				//trigger.player.$give(trigger.cards,player);
 				game.delay();
 				// var card=trigger.cards;
@@ -175,7 +175,10 @@ character.woods={
 				// }
 				// game.log(str);
 				"step 1"
-				trigger.cards.length=0;
+				for(var i=0;i<trigger.playerCards.length;i++){
+					trigger.cards.remove(trigger.playerCards[i]);
+				}
+				trigger.playerCards.length=0;
 			}
 		},
 		fangzhu:{
@@ -756,7 +759,7 @@ character.woods={
 		jiuchi_info:'你可将你的任意一张♠手牌当【酒】使用。',
 		roulin_info:'你对女性角色、女性角色对你使用【杀】时，都需连续使用两张【闪】才能抵消。',
 		benghuai_info:'回合结束阶段，若你的体力不是全场最少的(或之一)，你须减1点体力或体力上限。',
-		baonue:'其他群雄角色每造成一次伤害，可进行一次判定，若为♠，你回复1点体力。',
+		baonue_info:'其他群雄角色每造成一次伤害，可进行一次判定，若为♠，你回复1点体力。',
 		luanwu_info:'出牌阶段，可令除你外的所有角色依次对与其距离最近的另一名角色使用一张【杀】，无法如此做者失去1点体力。',
 		wansha_info:'在你的回合，除你以外，只有处于濒死状态的角色才能使用【桃】。',
 		weimu_info:'你不能成为♠或♣锦囊的目标。',

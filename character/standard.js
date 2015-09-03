@@ -1252,7 +1252,7 @@ character.standard={
 			check:function(card){return 15-ai.get.value(card)},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('he',{color:'red'})>0;
+					return player.num('he',{color:'red'})>0&&_status.currentPhase!=player;
 				},
 				threaten:1.5,
 				save:true,

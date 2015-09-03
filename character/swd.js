@@ -54,7 +54,7 @@ character.swd={
 
 			swd_sikongyu:['male','wu',4,['sliufeng','linyun','hutian'],['fullskin']],
 			swd_muyue:['female','wei',3,['xingzhui','lingxian','shouyin'],['fullskin']],
-			swd_ziqiao:['female','shu',3,['guaili','pingshen','fuyan'],['fullskin']],
+			swd_ziqiao:['female','shu',3,['guaili','fuyan'],['fullskin']],
 			swd_fengyu:['male','shu',4,['zhenwei','shangxi'],['fullskin']],
 	},
 	skill:{
@@ -815,7 +815,7 @@ character.swd={
 		zhenwei:{
 			trigger:{global:'respondEnd'},
 			filter:function(event,player){
-				if(get.distance(player,event.player,'attack')>1) return false;
+				if(_status.currentPhase!=player) return false;
 				if(event.player==player) return false;
 				if(event.cards){
 					for(var i=0;i<event.cards.length;i++){
@@ -836,7 +836,7 @@ character.swd={
 				event.cards=cards;
 				game.delay(0.5);
 				player.chooseTarget('是否发动【镇威】？',function(card,player,target){
-					return target!=trigger.player&&get.distance(player,target,'attack')<=1;
+					return target!=trigger.player;
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(att<=0) return 0;
@@ -910,8 +910,9 @@ character.swd={
 				player.chooseTarget('是否发动【覆岩】？',function(card,player,target){
 					return !target.hujia;
 				}).ai=function(target){
-					var eff=-ai.get.damageEffect(target,target,player);
-					return eff+(player==target?2:0);
+					if(ai.get.attitude(player,target)<=0) return 0;
+					var eff=-ai.get.damageEffect(target,target,player)+(player==target?2:0);
+					return Math.min(1,eff);
 				};
 				"step 1"
 				if(result.bool){
@@ -968,7 +969,7 @@ character.swd={
 				player.storage.pingshen2=false;
 			},
 			filter:function(event,player){
-				return !player.storage.pingshen2;
+				return !player.storage.pingshen2&&player.storage.pingshen.isAlive();
 			},
 			filterCard:true,
 			filterTarget:function(card,player,target){
@@ -1522,12 +1523,10 @@ character.swd={
 		},
 		guiying:{
 			enable:'chooseToUse',
-			filterCard:function(card){
-				return get.color(card)=='black';
-			},
+			filterCard:{color:'black'},
 			position:'he',
 			viewAs:{name:'toulianghuanzhu'},
-			prompt:'将一张黑色牌当偷梁换柱使用',
+			prompt:'将一张黑色牌当作偷梁换柱使用',
 			check:function(card){
 				if(_status.event.player.num('h')>_status.event.player.hp){
 					return 5-ai.get.value(card)
@@ -2351,11 +2350,6 @@ character.swd={
 		},
 		mufeng:{
 			priority:9,
-			// mod:{
-			// 	globalTo:function(from,to,distance){
-			// 		return distance+1;
-			// 	}
-			// },
 			filter:function(event,player){
 				return event.player!=player&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1;
 			},
@@ -2371,6 +2365,7 @@ character.swd={
 			ai:{
 				effect:{
 					target:function(card){
+						if(get.type(card)!='trick') return;
 						if(card.name=='tiesuo') return [0,0];
 						if(card.name=='yihuajiemu') return [0,1];
 						if(get.tag(card,'multineg')) return [0,2];
@@ -2423,7 +2418,7 @@ character.swd={
 				return ai.get.damageEffect(event.player,player,player,'thunder')>0;
 			},
 			filter:function(event,player){
-				return event.player!=player&&!player.skills.contains('touxi2');
+				return event.player!=player&&!player.skills.contains('touxi2')&&event.player.isAlive();
 			},
 			content:function(){
 				"step 0"
@@ -3180,6 +3175,9 @@ character.swd={
 			filterCard:function(card){var suit=get.suit(card); return suit=='spade';},
 			position:'he',
 			usable:1,
+			filter:function(event,player){
+				return player.num('he',{suit:'spade'})>0;
+			},
 			check:function(card){
 				return 10-ai.get.value(card)
 			},
@@ -3792,11 +3790,7 @@ character.swd={
 			}
 		},
 		dunxing:{
-			mod:{
-				targetEnabled:function(card,player,target){
-					if(_status.currentPhase==player&&target.hp<player.hp) return false;
-				}
-			}
+			inherit:'tuoqiao'
 		},
 		qiaoxie:{
 			group:['xiaoji2','xuanfeng2'],
@@ -5119,9 +5113,9 @@ character.swd={
 			unique:true,
 			enable:'phaseUse',
 			priority:-9,
-			filterCard:{type:['trick','delay']},
+			filterCard:true,
 			filter:function(event,player){
-				return player.num('h',{type:['trick','delay']})>0;
+				return player.num('h')>0;
 			},
 			filterTarget:function(card,player,target){
 				var names=[];
@@ -5238,6 +5232,7 @@ character.swd={
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
 			popup:false,
+			silent:true,
 			content:function(){
 				if(player.storage.tianshu){
 					player.unmark(player.storage.tianshu+'_charactermark');
@@ -6134,7 +6129,7 @@ character.swd={
 				trigger.untrigger();
 				trigger.finish();
 				trigger.source.draw(2);
-				player.addTempSkill('lanzhi2','phaseBegin');
+				player.addTempSkill('lanzhi2','phaseAfter');
 			},
 		},
 		lanzhi2:{},
@@ -7621,7 +7616,7 @@ character.swd={
 		shangxi:'伤袭',
 		shangxi_info:'回合开始阶段，你可以弃置一张牌，并对攻击范围内一名体力值不小于你的其他角色造成一点伤害',
 		zhenwei:'镇威',
-		zhenwei_info:'你可以将攻击范围内其他角色打出的卡牌交给除该角色外的任意一名角色',
+		zhenwei_info:'在你的回合内，你可以将其他角色打出的卡牌交给除该角色外的任意一名角色',
 		fuyan:'覆岩',
 		fuyan2:'覆岩',
 		fuyan_info:'每当你受到一次伤害，可以令一名没有护甲的角色获得一点护甲值',
@@ -7725,7 +7720,7 @@ character.swd={
 		yinmo_info:'锁定技，当你对场上所有角色发动「连计」后，你立即变身为魔化宁珂，然后对所有其他角色造成一点雷电伤害',
 		huanxing:'幻形',
 		huanxing2:'幻形',
-		huanxing_info:'回合开始阶段，你可以弃置一张处于并选择一名男性角色，获得其所有技能，直到你首次受到伤害',
+		huanxing_info:'回合开始阶段，你可以弃置一张牌并选择一名男性角色，获得其所有技能，直到你首次受到伤害',
 		meihuo:'魅惑',
 		meihuo_info:'每当你失去最后一张装备牌，你可以获得一名其他角色的一张牌，若此牌来自装备区，你立即装备之',
 
@@ -7799,7 +7794,7 @@ character.swd={
 		wanjun:'万钧',
 		wanjun_info:'你可以将一张装备牌当作南蛮入侵使用',
 		dunxing:'遁形',
-		dunxing_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
+		// dunxing_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
 		guiying:'鬼影',
 		guiying_info:'你可以将一张黑色牌当偷梁换柱使用',
 		shehun:'摄魂',
@@ -7810,7 +7805,6 @@ character.swd={
 		luomu:'落木',
 		jifeng:'魔影',
 		liaoyuan:'燎原',
-		chongsheng:'重生',
 		huanhun:'唤魂',
 		daixing:'代形',
 		yishan:'异闪',
@@ -7897,9 +7891,7 @@ character.swd={
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌，每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',
-		mailun_info:'回合开始阶段，你可以选择如下效果：一、减少一点体力并增加一点体力上限（不能超过6）；二、增加一点体力并减'+
-		'少一点体力上限；三、令你即将造成和即将受到的首次伤害-1；四、令你即将造成和即将受到的首次伤害+1；五、少摸一张牌并令手牌上限+1'+
-		'；六、多摸一张牌并令手牌上限-1；七、进攻距离+1，防御距离-1；八、进攻距离-1，防御距离+1',
+		mailun_info:'回合开始阶段，你可以选择一个脉轮效果直到下一回合开始',
 		yunshen_info:'每当你打出一张闪，你可以令其他角色与你的距离+1；回合开始阶段，你将累计的防御距离清零，然后摸等量的牌',
 		guiyan_info:'出牌阶段，你可以观看一名角色的手牌，并获得其中一张梅花牌，每阶段限一次。当你首次进入濒死状态时，你须回复一点体力并失去技能鬼眼',
 		busi_info:'锁定技，你死亡后每次轮过你时你自动复活',
@@ -7907,7 +7899,7 @@ character.swd={
 		yinguo_info:'除你之外的任意一名角色即将受到受到伤害时，若有伤害来源，你可以弃置一张牌将伤害来源和目标对调',
 		yueren_info:'每当你使用一张杀，可以进行一次判定，若结果为黑色，你弃置目标一张牌，若结果为红色，你将此杀收回，每回合限发动一次',
 		duijue_info:'限定技，出牌阶段，你可以指定一名角色与其单挑，直到一方死亡为止',
-		wuying_info:'锁定技，你的杀和单体锦囊目标锁定为范围内的所有角色',
+		wuying_info:'锁定技，你的杀和单体x锦囊目标锁定为范围内的所有角色',
 		xiehun_info:'锁定技，受到来自你伤害的角色进入混乱状态，行为不受控制，且会攻击队友，直到你的下一回合开始',
 		jumo_info:'锁定技，回合结束阶段，你摸X-1张牌，X为未进入混乱状态的角色数与进入混乱状态的角色数之差（若为双将则改为X）',
 		jifeng_info:'你的杀和单体锦囊可以额外指定任意个目标，若如此做，此卡牌有一定机率失效，指定的目标越多失效的概率越大',
@@ -7938,7 +7930,7 @@ character.swd={
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得双方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
-		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，并获得场上一名存活角色的一项技能直到你的下一回合开始（多次使用会替换前一次获得的技能）',
+		tianshu_info:'出牌阶段，你可以弃置一张手牌，并获得场上一名存活角色的一项技能直到你的下一出牌阶段开始',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',

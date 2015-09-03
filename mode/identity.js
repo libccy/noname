@@ -351,6 +351,7 @@ mode.identity={
 					return get.config('double_character')?2:1
 				};
 				ui.create.cheat=function(){
+					_status.createControl=ui.cheat2;
 					ui.cheat=ui.create.control('更换',function(){
 						if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
 							return;
@@ -372,6 +373,7 @@ mode.identity={
 						game.uncheck();
 						game.check();
 					});
+					delete _status.createControl;
 				};
 				event.dialogxx=ui.create.characterDialog();
 				ui.create.cheat2=function(){
@@ -383,6 +385,9 @@ mode.identity={
 							delete this.backup;
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=1;
+							}
 							if(ui.cheat2x){
 								ui.cheat2x.close();
 								delete ui.cheat2x;
@@ -397,6 +402,9 @@ mode.identity={
 							this.dialog.open();
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=0.6;
+							}
 						}
 					});
 				}

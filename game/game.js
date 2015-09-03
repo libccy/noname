@@ -631,6 +631,11 @@
 					target.chooseCard('请选择拼点牌',true).ai=event.ai;
 					"step 2"
 					event.card2=result.cards[0];
+					if(event.card2.number>=10||event.card2.number<=4){
+						if(target.num('h')>2){
+							event.addToAI=true;
+						}
+					}
 					player.lose(event.card1);
 					target.lose(event.card2);
 					"step 3"
@@ -680,7 +685,7 @@
 					"step 4"
 					game.delay(2);
 					"step 5"
-					if(typeof event.target.ai.shown=='number'&&event.target.ai.shown<=0.85){
+					if(typeof event.target.ai.shown=='number'&&event.target.ai.shown<=0.85&&event.addToAI){
 						event.target.ai.shown+=0.1;
 					}
 					if(event.clear!==false) ui.clear();
@@ -1837,6 +1842,7 @@
 						game.log(get.translation(player)+'遇难')
 					}
 					event.cards=player.get('hej');
+					event.playerCards=player.get('he');
 					if(event.cards.length){
 						for(var i=0;i<event.cards.length;i++){
 							event.cards[i].goto(ui.discardPile);
@@ -5043,7 +5049,7 @@
 					trigger.start=trigger.source||trigger.player;
 					var str=get.translation(trigger.player.name)+'濒死，是否帮助？';
 					_status.dying=event.dying;
-					if(player.hasSkillTag('save')||player.num('h','tao')||
+					if(player.hasSkillTag('save',true)||player.num('h','tao')||
 					(player==event.dying&&(player.num('h','jiu')||player.num('h','hufu')||player.num('h','tianxianjiu')))){
 						player.chooseToUse({
 							filterCard:function(card,player){
@@ -6997,7 +7003,7 @@
 				if(get.objtype(arguments[0])=='array') controls=arguments[0];
 				else controls=arguments;
 				var control=ui.create.div('.control');
-				ui.control.insertBefore(control,ui.confirm);
+				ui.control.insertBefore(control,_status.createControl||ui.confirm);
 				for(i in lib.element.control){
 					control[i]=lib.element.control[i];
 				}
@@ -8634,20 +8640,22 @@
 				for(var i=0;i<dialogs.length;i++){
 					dialogs[i].delete();
 				}
-
-				for(var i=0;i<e.path.length;i++){
-					var itemtype=get.itemtype(e.path[i]);
-					if(itemtype=='button') break;
-					if(itemtype=='dialog'&&!e.path[i].classList.contains('popped')){
-						var ddialog=e.path[i];
-						_status.draggingdialog=ddialog;
-						ddialog._dragorigin=e;
-						if(!ddialog._dragtransform){
-							ddialog._dragtransform=[0,0];
+				if(e.path){
+					for(var i=0;i<e.path.length;i++){
+						var itemtype=get.itemtype(e.path[i]);
+						if(itemtype=='button') break;
+						if(itemtype=='dialog'&&!e.path[i].classList.contains('popped')){
+							var ddialog=e.path[i];
+							_status.draggingdialog=ddialog;
+							ddialog._dragorigin=e;
+							if(!ddialog._dragtransform){
+								ddialog._dragtransform=[0,0];
+							}
+							return;
 						}
-						return;
 					}
 				}
+
 
 				var evt=_status.event;
 				if(!lib.config.enable_drag) return;
@@ -10865,6 +10873,18 @@
 						uiintro.add('<div class="text center">'+'共有'+get.cnNumber(num)+'张牌'+'</div>');
 					}
 				}
+				else if(node.name=='lianyaohu'&&get.position(node)=='e'){
+					var num=0;
+					if(node.storage.shouna){
+						num=node.storage.shouna.length;
+					}
+					if(num){
+						uiintro.add(node.storage.shouna,true,num>4);
+					}
+					else{
+						uiintro.add('<div class="text center">炼妖壶内没有牌</div>');
+					}
+				}
 				else if(lib.translate[name+'_info']){
 					uiintro.add('<div class="text">'+lib.translate[name+'_info']+'</div>');
 				}
@@ -11522,6 +11542,9 @@
 			return this;
 		};
 		Array.prototype.randomGets=function(num){
+			if(num>this.length){
+				num=this.length;
+			}
 			var arr=this.slice(0);
 			var list=[];
 			for(var i=0;i<num;i++){

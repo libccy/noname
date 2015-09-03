@@ -264,7 +264,29 @@ character.sp={
 			},
 		},
 		danlao:{
-			inherit:'mufeng'
+			priority:9,
+			filter:function(event,player){
+				return event.player!=player&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1;
+			},
+			check:function(event,player){
+				return get.tag(event.card,'multineg')||ai.get.effect(player,event.card,event.player,player)<=0;
+			},
+			trigger:{target:'useCardToBefore'},
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+				player.draw();
+			},
+			ai:{
+				effect:{
+					target:function(card){
+						if(get.type(card)!='trick') return;
+						if(card.name=='tiesuo') return [0,0];
+						if(card.name=='yihuajiemu') return [0,1];
+						if(get.tag(card,'multineg')) return [0,2];
+					}
+				}
+			}
 		},
 		taichen:{
 			enable:'phaseUse',
@@ -1345,7 +1367,11 @@ character.sp={
 				"step 1"
 				if(result.bool){
 					player.logSkill('xiaoguo',trigger.player);
+					var nono=(ai.get.damageEffect(trigger.player,player,trigger.player)>=0);
 					trigger.player.chooseToDiscard('he',{type:'equip'}).ai=function(card){
+						if(nono){
+							return 0;
+						}
 						if(trigger.player.hp==1) return 10-ai.get.value(card);
 						return 9-ai.get.value(card);
 					}

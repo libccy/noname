@@ -11,7 +11,7 @@ character.fire={
 		pangde:['male','qun',4,['mashu','mengjin'],['fullskin']],
 	},
 	perfectPair:{
-		zhugeliangwolong:['pangtong'],
+		zhugeliangwolong:['pangtong','huangyueying'],
 		yuanshao:['yanwen']
 	},
 	skill:{

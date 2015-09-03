@@ -446,6 +446,7 @@ card.extra={
 		_lianhuan2:'连环',
 		bingliang:'兵粮寸断',
 		hualiu:'骅骝',
+		hualiu_info:'其他角色与你的距离+1。',
 		zhuque:'朱雀羽扇',
 		bingliang_bg:'粮',
 		bingliang_info:'目标角色判定阶段进行判定：若判定结果不为梅花，则跳过该角色的摸牌阶段。',

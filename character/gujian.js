@@ -602,6 +602,10 @@ character.gujian={
 			ai:{
 				result:{
 					target:function(player,target){
+						if(player.num('h','sha')&&
+						lib.filter.targetInRange({name:'sha'},player,target)){
+							return 0;
+						}
 						return ai.get.effect(target,{name:'sha'},player,target);
 					},
 				},

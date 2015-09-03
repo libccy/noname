@@ -40,7 +40,7 @@ card.zhenfa={
 			},
 			mode:['guozhan'],
 			ai:{
-				order:7,
+				order:6.5,
 				result:{
 					target:1,
 				},
@@ -236,12 +236,17 @@ card.zhenfa={
 				player.choosePlayerCard(target,'he',true);
 				"step 1"
 				target.discard(result.buttons[0].link);
+				"step 2"
+				if(target==targets[targets.length-1]){
+					player.draw();
+				}
 			},
 			mode:['guozhan'],
 			ai:{
 				order:10,
 				result:{
 					target:-1,
+					player:1
 				},
 			}
 		},
@@ -353,7 +358,7 @@ card.zhenfa={
 		niaoxiangzhen:'鸟翔阵',
 		niaoxiangzhen_info:'令所有非你阵营的队列的角色今次打出一张闪，或者受到一点伤害',
 		huyizhen_info:'将一张非基本牌当作杀对你围攻的角色使用',
-		longfeizhen_info:'弃置围攻你的角色各一张牌',
+		longfeizhen_info:'弃置围攻你的角色各一张牌，然后摸一张牌',
 		qixingzhen_info:'令我方所有角色进入围攻状态',
 		shepanzhen_info:'令我方所有角色进入队列状态',
 		yunchuizhen_info:'令所有围攻角色获得技能【无双】，直到其首次造成伤害',
@@ -390,7 +395,7 @@ card.zhenfa={
 		// ["heart",5,'zhonghuangzhen'],
 
 		// ["diamond",6,'huyizhen'],
-		// ["club",6,'huyizhen'],
+		["club",6,'huyizhen'],
 		["spade",6,'huyizhen'],
 		// ["heart",6,'huyizhen'],
 
@@ -405,9 +410,9 @@ card.zhenfa={
 		["heart",8,'shepanzhen'],
 
 		// ["diamond",9,'longfeizhen'],
-		// ["club",9,'longfeizhen'],
+		["club",9,'longfeizhen'],
 		// ["spade",9,'longfeizhen'],
-		// ["heart",9,'longfeizhen'],
+		["heart",9,'longfeizhen'],
 
 		["diamond",11,'niaoxiangzhen'],
 		// ["club",11,'niaoxiangzhen'],

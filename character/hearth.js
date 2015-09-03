@@ -2,13 +2,13 @@
 character.hearth={
 	character:{
 		hs_jaina:['female','wei',3,['huopu','bianxing','bingjia'],['fullskin']],
-		hs_rexxar:['male','qun',4,['shoulie','gongji'],['fullskin']],
-		hs_uther:['male','qun',4,['fengxian','jieming'],['fullskin']],
-		hs_garrosh:['male','qun',4,['zhanhou','qiangxi'],['fullskin']],
+		hs_lrexxar:['male','qun',4,['shoulie','gongji'],['fullskin']],
+		hs_wuther:['male','qun',4,['fengxian','jieming'],['fullskin']],
+		hs_jgarrosh:['male','qun',4,['zhanhou','qiangxi'],['fullskin']],
 		hs_malfurion:['male','wu',4,['jihuo'],['fullskin']],
 		hs_guldan:['male','qun',3,['fenliu','hongxi'],['fullskin']],
 		hs_anduin:['male','qun',3,['shengguang','shijie','anying'],['fullskin']],
-		hs_thrall:['male','wu',4,['tuteng','tzhenji'],['fullskin']],
+		hs_sthrall:['male','qun',4,['tuteng','tzhenji'],['fullskin']],
 		hs_waleera:['female','qun',3,['jianren','mengun','wlianji'],['fullskin']],
 
 		hs_medivh:['male','wei',3,['jingxiang','moying','mdzhoufu'],['fullskin']],
@@ -16,15 +16,232 @@ character.hearth={
 		hs_magni:['male','qun',4,['zhongjia','dunji'],['fullskin']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu'],['fullskin']],
-		hs_velen:['male','qun',3,['shengyan','xianzhi'],['fullskin']],
+		hs_wvelen:['male','qun',3,['shengyan','xianzhi'],['fullskin']],
 		hs_antonidas:['male','wei',3,['yanshu','bingshuang'],['fullskin']],
+		hs_alakir:['male','wei',3,['fengnu','shengdun'],['fullskin']],
+		hs_zhouzhuo:['male','qun',3,['jubao','qingnang'],['fullskin']],
+		hs_yngvar:['male','wei',3,['huanwu'],['fullskin']],
+		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi'],['fullskin']],
+		hs_malorne:['male','wu',3,['shenen','chongsheng'],['fullskin']],
 
 		hs_ronghejuren:['male','shu',8,[],['fullskin']],
 		hs_wujiyuansu:['male','qun',3,['wujiwuji'],['fullskin']],
 		hs_mijiaojisi:['female','qun',3,['kuixin'],['fullskin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu'],['fullskin']],
+		hs_tgolem:['male','qun',4,['guozai'],['fullskin']],
+		hs_totemic:['male','qun',3,['s_tuteng'],['fullskin']],
 	},
 	skill:{
+		shenen:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return player.num('h')!=target.num('h');
+			},
+			content:function(){
+				var num=player.num('h')-target.num('h');
+				if(num>0){
+					target.draw(num);
+				}
+				else if(num<0){
+					target.chooseToDiscard(-num,true);
+				}
+			},
+			ai:{
+				threaten:1.8,
+				order:function(item,player){
+					console.log(item,player);
+					return 10;
+				},
+				result:{
+					target:function(player,target){
+						return player.num('h')-target.num('h');
+					}
+				},
+				expose:0.2
+			}
+		},
+		chongsheng:{
+			unique:true,
+			enable:'chooseToUse',
+			mark:true,
+			init:function(player){
+				player.storage.chongsheng=0;
+			},
+			filter:function(event,player){
+				if(event.type!='dying') return false;
+				if(player!=_status.dying) return false;
+				if(player.storage.chongsheng==3) return false;
+			},
+			content:function(){
+				player.hp=Math.min(3-player.storage.chongsheng,player.maxHp);
+				player.discard(player.get('hej'));
+				player.draw(3-player.storage.chongsheng);
+				player.storage.chongsheng++;
+				if(player.storage.chongsheng==3){
+					player.unmarkSkill('chongsheng');
+				}
+				if(player.classList.contains('linked')) player.link();
+				if(player.classList.contains('turnedover')) player.turnOver();
+			},
+			ai:{
+				skillTagFilter:function(player){
+					if(player.storage.chongsheng==3) return false;
+					if(player.hp>0) return false;
+				},
+				save:true,
+				result:{
+					player:10
+				},
+				threaten:function(player,target){
+					if(target.storage.chongsheng<3) return 0.6;
+				}
+			},
+			intro:{
+				content:function(storage){
+					return '剩余'+get.cnNumber(3-storage)+'次';
+				}
+			}
+		},
+		guozai:{
+			trigger:{player:'phaseDrawBegin'},
+			check:function(event,player){
+				return player.num('h')<player.hp;
+			},
+			filter:function(event,player){
+				return !player.skills.contains('guozai2');
+			},
+			content:function(){
+				trigger.num+=2;
+				player.addTempSkill('guozai2','phaseAfter');
+			}
+		},
+		guozai2:{
+			mark:true,
+			intro:{
+				content:'已发动过载'
+			},
+			mod:{
+				maxHandcard:function(player,num){
+					return num-1;
+				}
+			}
+		},
+		hanshuang:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			filter:function(event,player){
+				return event.card&&get.color(event.card)=='black'&&
+				!event.player.isTurnedOver()&&event.player.isAlive();
+			},
+			content:function(){
+				trigger.player.turnOver();
+				player.loseHp();
+			},
+			ai:{
+				threaten:1.5,
+				effect:{
+					player:function(card,player,target,current){
+						if(get.color(card)=='black'&&get.tag(card,'damage')){
+							console.log(1);
+							return [1,0,1,-2];
+						}
+					}
+				}
+			}
+		},
+		bingshi:{
+			trigger:{player:'dieBegin'},
+			forced:true,
+			content:function(){
+				'step 0'
+				event.targets=get.players(player);
+				event.targets.remove(player);
+				'step 1'
+				if(event.targets.length){
+					event.targets.shift().damage();
+					event.redo();
+				}
+			}
+		},
+		huanwu:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return !target.storage.huanwu;
+			},
+			content:function(){
+				target.gainMaxHp();
+				target.recover();
+				target.draw(2);
+				target.storage.huanwu=true;
+				target.mark('huanwu',{
+					name:'唤雾',
+					content:'已发动'
+				});
+			},
+			ai:{
+				threaten:1.2,
+				result:{
+					target:function(player,target){
+						return 1/target.hp;
+					}
+				},
+				order:10,
+				expose:0.3
+			}
+		},
+		fengnu:{
+			mod:{
+				cardUsable:function(){
+					return Infinity;
+				},
+				targetInRange:function(){
+					return true;
+				}
+			},
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				if(_status.currentPhase!=player) return false;
+				return get.cardCount(event.card,player)>1;
+			},
+			forced:true,
+			content:function(){
+				player.draw();
+			}
+		},
+		shengdun:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			silent:true,
+			popup:false,
+			priority:10,
+			init2:function(player){
+				player.markSkill('shengdun');
+			},
+			content:function(){
+				if(player.storage.shengdun){
+					player.markSkill('shengdun');
+				}
+				player.storage.shengdun=false;
+			},
+			intro:{
+				content:'未发动'
+			},
+			group:'shengdun2'
+		},
+		shengdun2:{
+			trigger:{player:'damageBegin'},
+			forced:true,
+			filter:function(event,player){
+				return event.num>0&&!player.storage.shengdun;
+			},
+			content:function(){
+				trigger.num--;
+				player.storage.shengdun=true;
+				player.unmarkSkill('shengdun');
+			}
+		},
 		jingmeng:{
 			trigger:{player:'useCard'},
 			frequent:true,
@@ -112,7 +329,8 @@ character.hearth={
 		bingshuang:{
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
-				return event.card&&get.type(event.card)=='trick'&&event.player.isAlive();
+				return event.card&&get.type(event.card)=='trick'&&
+				event.player.isAlive()&&!event.player.isTurnedOver();
 			},
 			prompt:function(event,player){
 				return '是否对'+get.translation(event.player)+'发动【冰霜】？';
@@ -126,21 +344,26 @@ character.hearth={
 			}
 		},
 		yanshu:{
-			trigger:{player:'phaseUseBegin'},
-			direct:true,
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.num('h',{type:'basic'})<player.num('h');
+			},
+			filterCard:function(card){
+				return get.type(card)!='basic';
+			},
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
 			content:function(){
-				'step 0'
-				player.chooseTarget('将一张流星火雨交给任意一名角色').ai=function(target){
-					return target==player?1:0;
-				};
-				'step 1'
-				if(result.bool){
-					player.logSkill('yanshu');
-					result.targets[0].gain(game.createCard('liuxinghuoyu'),'gain2');
-
-				}
+				var card=cards[0];
+				player.gain(game.createCard('liuxinghuoyu',get.suit(card),get.number(card)),'gain2');
 			},
 			ai:{
+				order:9,
+				result:{
+					player:1
+				},
 				threaten:2
 			}
 		},
@@ -592,8 +815,8 @@ character.hearth={
 		bianxing2:{},
 		moying:{
 			trigger:{player:'phaseBegin'},
-			filter:function(){
-				if(Math.random()<0.5) return false;
+			skillcheck:function(event,player){
+				if(!player.num('h',{suit:'spade'})) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('j','shandian')){
 						return false;
@@ -607,6 +830,11 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
+				if(!lib.skill.moying.skillcheck(trigger,player)){
+					player.draw();
+					event.finish();
+					return;
+				}
 				var card=null;
 				for(var i=0;i<ui.cardPile.childNodes.length;i++){
 					if(ui.cardPile.childNodes[i].name=='shandian'){
@@ -681,7 +909,8 @@ character.hearth={
 				ui.discardPile.appendChild(player.storage.mdzhoufu2);
 				player.$throw(player.storage.mdzhoufu2);
 				if(player.storage.mdzhoufu3.isAlive()){
-					player.storage.mdzhoufu3.draw();
+					// player.storage.mdzhoufu3.draw();
+					player.storage.mdzhoufu3.gain(player.judging,'gain2');
 				}
 				else{
 					game.delay(1.5);
@@ -1084,6 +1313,37 @@ character.hearth={
 			},
 			group:'tuteng_lose'
 		},
+		s_tuteng:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			content:function(){
+				var rand=['tuteng1','tuteng2','tuteng4',
+				'tuteng5','tuteng6','tuteng7'];
+				if(player.storage.s_tuteng){
+
+					var rand2=player.storage.s_tuteng;
+					for(var i=0;i<3;i++){
+						rand.remove(rand2[i]);
+					}
+					player.removeSkill(rand2.randomRemove());
+					var totem=rand.randomGet();
+					rand2.push(totem);
+					player.addSkill(totem);
+				}
+				else{
+					for(var i=0;i<3;i++){
+						rand.randomRemove();
+					}
+					for(var i=0;i<3;i++){
+						player.addSkill(rand[i]);
+					}
+					player.storage.s_tuteng=rand;
+				}
+			},
+			ai:{
+				threaten:2
+			}
+		},
 		tuteng:{
 			enable:'phaseUse',
 			usable:1,
@@ -1208,6 +1468,60 @@ character.hearth={
 				trigger.num++;
 			}
 		},
+		tuteng5:{
+			mark:'image',
+			intro:{
+				content:'回合结束阶段，你摸一张牌'
+			},
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				player.draw();
+			}
+		},
+		tuteng6:{
+			mark:'image',
+			intro:{
+				content:'你的杀造成的伤害+1'
+			},
+			trigger:{source:'damageBegin'},
+			forced:true,
+			filter:function(event){
+				return event.card&&event.card.name=='sha';
+			},
+			content:function(){
+				trigger.num++;
+			}
+		},
+		tuteng7:{
+			mark:'image',
+			intro:{
+				content:'回合结束阶段，你令一名其他角色回复一点体力'
+			},
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].hp<game.players[i].maxHp){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('活力图腾：令一名其他角色回复一点体力',function(card,player,target){
+					return target!=player&&target.hp<target.maxHp;
+				}).ai=function(target){
+					return ai.get.recoverEffect(target,player,player);
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('tuteng7',result.targets[0]);
+					result.targets[0].recover();
+				}
+			}
+		},
 		fenliu:{
 			enable:'phaseUse',
 			prompt:'流失1点体力并摸两张牌',
@@ -1263,31 +1577,68 @@ character.hearth={
 		},
 		tuteng4:{
 			image:'card/tuteng4',
-		}
+		},
+		tuteng5:{
+			image:'card/tuteng5',
+		},
+		tuteng6:{
+			image:'card/tuteng6',
+		},
+		tuteng7:{
+			image:'card/tuteng7',
+		},
 	},
 	translate:{
 		hs_alleria:'奥蕾莉亚',
 		hs_magni:'麦格尼',
 		hs_medivh:'麦迪文',
 		hs_jaina:'吉安娜',
-		hs_rexxar:'雷克萨',
-		hs_uther:'乌瑟尔',
-		hs_garrosh:'加尔鲁什',
+		hs_lrexxar:'雷克萨',
+		hs_wuther:'乌瑟尔',
+		hs_jgarrosh:'加尔鲁什',
 		hs_malfurion:'玛法里奥',
 		hs_guldan:'古尔丹',
 		hs_anduin:'安度因',
-		hs_thrall:'萨尔',
+		hs_sthrall:'萨尔',
 		hs_waleera:'瓦莉拉',
 
 		hs_neptulon:'耐普图隆',
-		hs_velen:'维纶',
+		hs_wvelen:'维纶',
 		hs_antonidas:'安东尼达斯',
+		hs_alakir:'奥拉基尔',
+		hs_zhouzhuo:'周卓',
+		hs_yngvar:'伊戈瓦尔',
+		hs_bchillmaw:'冰喉',
+		hs_malorne:'玛洛恩',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_wujiyuansu:'无羁元素',
 		hs_mijiaojisi:'秘教祭司',
 		hs_huzhixiannv:'湖之仙女',
+		hs_tgolem:'图腾魔像',
+		hs_totemic:'图腾师',
 
+		shenen:'神恩',
+		shenen_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等',
+		chongsheng:'重生',
+		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至3-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动3次',
+		s_tuteng:'滋养',
+		s_tuteng_info:'在你首个回合开始时，你获得三个随机图腾；在此后的每个回合开始阶段，你随机替换其中的一个图腾',
+		guozai:'过载',
+		guozai2:'过载',
+		guozai2_bg:'载',
+		guozai_info:'摸牌阶段，你可以额外摸两张牌，若如此做，你本回合的手牌上限-1',
+		hanshuang:'寒霜',
+		hanshuang_info:'锁定技，你使用黑色牌造成伤害后，受伤害角色须将武将牌翻至背面，然后你流失一点体力',
+		bingshi:'冰噬',
+		bingshi_info:'锁定技，你死亡时，对所有其他角色造成一点伤害',
+		huanwu:'唤雾',
+		huanwu_info:'出牌阶段限一次，你可以令一名角色增加一点体力上限，回复一点体力，并摸两张牌（每名角色限发动一次）',
+		fengnu:'风怒',
+		fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用卡牌时，你摸一张牌',
+		shengdun:'圣盾',
+		shengdun2:'圣盾',
+		shengdun_info:'锁定技，你受到的首次伤害-1，此技能于你回合开始阶段重置',
 		jingmeng:'镜梦',
 		jingmeng_info:'每当你于回合内使用第一张牌时，你可以从牌堆中随机获得一张与之类型相同的牌',
 		kuixin:'窥心',
@@ -1295,7 +1646,7 @@ character.hearth={
 		wujiwuji:'无羁',
 		wujiwuji_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
 		yanshu:'炎术',
-		yanshu_info:'出牌阶段开始时，你可以创造一张流星火雨并将其交给任意一名角色',
+		yanshu_info:'出牌阶段限一次，你可以弃置一张非基本牌，并获得一张流星火雨',
 		bingshuang:'冰霜',
 		bingshuang_info:'你使用锦囊牌造成伤害后，可令目标摸两张牌并翻面',
 		shengyan:'圣言',
@@ -1334,9 +1685,9 @@ character.hearth={
 		xianzhi_info:'任意一名角色进行判定前，你可以观看牌堆顶的两张牌，并可以将其调换顺序',
 		mdzhoufu:'诅咒',
 		mdzhoufu2:'诅咒',
-		mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果；当受此技能影响的角色进行判定时，你摸一张牌',
+		mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果，然后你获得亮出的判定牌',
 		moying:'魔影',
-		moying_info:'锁定技，回合开始阶段，若场上没有闪电，你有50%的机率将牌堆中的一张闪电置于你的判定区',
+		moying_info:'锁定技，回合开始阶段，若场上没有闪电且你手牌中有黑桃牌，你将牌堆中的一张闪电置于你的判定区，否则你摸一张牌',
 		moying_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
 		jingxiang:'镜像',
 		jingxiang_info:'每当你需要打出卡牌时，你可以观看一名随机角色的手牌并将其视为你的手牌打出',
@@ -1346,6 +1697,9 @@ character.hearth={
 		tuteng2:'灼热图腾',
 		tuteng3:'石爪图腾',
 		tuteng4:'空气之怒图腾',
+		tuteng5:'法力之潮图腾',
+		tuteng6:'火舌图腾',
+		tuteng7:'活力图腾',
 		tzhenji:'震击',
 		tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成1点雷电伤害，并随机弃置其一张牌，每回合限发动一次',
 		fenliu:'分流',

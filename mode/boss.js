@@ -392,11 +392,14 @@ mode.boss={
 					game.check();
 				};
 				ui.create.cheat=function(){
+					_status.createControl=ui.cheat2||event.asboss;
 					ui.cheat=ui.create.control('更换',event.changeDialog);
+					delete _status.createControl;
 				};
 				event.dialogxx=ui.create.characterDialog();
 				event.dialogxx.classList.add('bosscharacter');
 				ui.create.cheat2=function(){
+					_status.createControl=event.asboss;
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){
 							this.dialog.close();
@@ -405,6 +408,9 @@ mode.boss={
 							delete this.backup;
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=1;
+							}
 							if(ui.cheat2x){
 								ui.cheat2x.close();
 								delete ui.cheat2x;
@@ -419,8 +425,12 @@ mode.boss={
 							ui.window.appendChild(this.dialog);
 							game.uncheck();
 							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=0.6;
+							}
 						}
 					});
+					delete _status.createControl;
 				}
 				if(!ui.cheat&&get.config('change_choice'))
 				ui.create.cheat();
