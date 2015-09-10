@@ -342,7 +342,7 @@ character.refresh={
 				target.chooseControl('refanjian_card','refanjian_hp').ai=function(event,player){
 					var cards=target.get('he',{suit:get.suit(player.storage.refanjian)});
 					if(cards.length==1) return 0;
-					if(cards.length==2){
+					if(cards.length>=2){
 						for(var i=0;i<cards.length;i++){
 							if(get.tag(cards[i],'save')) return 1;
 						}

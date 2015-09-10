@@ -111,7 +111,8 @@ card.extra={
 					player:function(player){
 						var nh=player.num('h');
 						if(nh<=player.hp&&_status.event.name=='chooseToUse'){
-							if(_status.event.filterCard({name:'huogong'})){
+							if(_status.event.filterCard&&
+								_status.event.filterCard({name:'huogong'})){
 								return -10;
 							}
 							if(_status.event.skill){
@@ -125,7 +126,8 @@ card.extra={
 					target:function(player,target){
 						if(target.skills.contains('huogong2')||target.num('h')==0) return 0;
 						if(target==player){
-							if(_status.event.filterCard({name:'huogong'})){
+							if(_status.event.filterCard&&
+								_status.event.filterCard({name:'huogong'})){
 								return -1.5;
 							}
 							if(_status.event.skill){

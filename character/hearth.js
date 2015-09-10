@@ -8,7 +8,7 @@ character.hearth={
 		hs_malfurion:['male','wu',4,['jihuo'],['fullskin']],
 		hs_guldan:['male','qun',3,['fenliu','hongxi'],['fullskin']],
 		hs_anduin:['male','qun',3,['shengguang','shijie','anying'],['fullskin']],
-		hs_sthrall:['male','qun',4,['tuteng','tzhenji'],['fullskin']],
+		hs_sthrall:['male','wu',4,['tuteng','tzhenji'],['fullskin']],
 		hs_waleera:['female','qun',3,['jianren','mengun','wlianji'],['fullskin']],
 
 		hs_medivh:['male','wei',3,['jingxiang','moying','mdzhoufu'],['fullskin']],
@@ -19,7 +19,7 @@ character.hearth={
 		hs_wvelen:['male','qun',3,['shengyan','xianzhi'],['fullskin']],
 		hs_antonidas:['male','wei',3,['yanshu','bingshuang'],['fullskin']],
 		hs_alakir:['male','wei',3,['fengnu','shengdun'],['fullskin']],
-		hs_zhouzhuo:['male','qun',3,['jubao','qingnang'],['fullskin']],
+		hs_zhouzhuo:['male','qun',3,['jubao','qice'],['fullskin']],
 		hs_yngvar:['male','wei',3,['huanwu'],['fullskin']],
 		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi'],['fullskin']],
 		hs_malorne:['male','wu',3,['shenen','chongsheng'],['fullskin']],
@@ -29,7 +29,13 @@ character.hearth={
 		hs_mijiaojisi:['female','qun',3,['kuixin'],['fullskin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu'],['fullskin']],
 		hs_tgolem:['male','qun',4,['guozai'],['fullskin']],
-		hs_totemic:['male','qun',3,['s_tuteng'],['fullskin']],
+		hs_totemic:['male','wu',3,['s_tuteng'],['fullskin']],
+	},
+	perfectPair:{
+		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
+		hs_anduin:['hs_wvelen','hs_mijiaojisi'],
+		hs_jaina:['hs_antonidas'],
+		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
 		shenen:{
@@ -104,27 +110,42 @@ character.hearth={
 			}
 		},
 		guozai:{
-			trigger:{player:'phaseDrawBegin'},
-			check:function(event,player){
-				return player.num('h')<player.hp;
-			},
+			enable:'phaseUse',
+			usable:2,
 			filter:function(event,player){
-				return !player.skills.contains('guozai2');
+				return player.num('h')<4;
+			},
+			init:function(player){
+				player.storage.guozai2=0;
 			},
 			content:function(){
-				trigger.num+=2;
-				player.addTempSkill('guozai2','phaseAfter');
+				var num=4-player.num('h');
+				player.draw(num);
+				player.addSkill('guozai2');
+				player.storage.guozai2+=num;
+			},
+			ai:{
+				order:1,
+				result:{
+					player:function(player){
+						return (player.num('h')<=1)?1:0;
+					}
+				}
 			}
 		},
 		guozai2:{
 			mark:true,
 			intro:{
-				content:'已发动过载'
-			},
-			mod:{
-				maxHandcard:function(player,num){
-					return num-1;
+				content:function(storage){
+					return '需弃置'+get.cnNumber(storage)+'张牌';
 				}
+			},
+			trigger:{player:'phaseUseEnd'},
+			forced:true,
+			content:function(){
+				player.chooseToDiscard('he',true,player.storage.guozai2);
+				player.storage.guozai2=0;
+				player.removeSkill('guozai2');
 			}
 		},
 		hanshuang:{
@@ -1627,7 +1648,7 @@ character.hearth={
 		guozai:'过载',
 		guozai2:'过载',
 		guozai2_bg:'载',
-		guozai_info:'摸牌阶段，你可以额外摸两张牌，若如此做，你本回合的手牌上限-1',
+		guozai_info:'出牌阶段，你可将手牌补至四张，并于此阶段结束时弃置等量的牌，每阶段最多发动两次',
 		hanshuang:'寒霜',
 		hanshuang_info:'锁定技，你使用黑色牌造成伤害后，受伤害角色须将武将牌翻至背面，然后你流失一点体力',
 		bingshi:'冰噬',
@@ -1683,10 +1704,10 @@ character.hearth={
 		bianxing_info:'当一其他角色于回合内使用卡牌指定了惟一的其他目标后，你可以用一张合理的基本牌替代此牌，每名角色的回合限一次',
 		xianzhi:'先知',
 		xianzhi_info:'任意一名角色进行判定前，你可以观看牌堆顶的两张牌，并可以将其调换顺序',
-		mdzhoufu:'诅咒',
-		mdzhoufu2:'诅咒',
+		mdzhoufu:'缚魂',
+		mdzhoufu2:'缚魂',
 		mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果，然后你获得亮出的判定牌',
-		moying:'魔影',
+		moying:'诅咒',
 		moying_info:'锁定技，回合开始阶段，若场上没有闪电且你手牌中有黑桃牌，你将牌堆中的一张闪电置于你的判定区，否则你摸一张牌',
 		moying_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
 		jingxiang:'镜像',

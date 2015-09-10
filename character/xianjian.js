@@ -492,6 +492,7 @@ character.xianjian={
 			},
 			selectTarget:[1,Infinity],
 			filterCard:true,
+			usable:1,
 			check:function(card){
 				var player=_status.currentPhase;
 				if(player.num('h')>player.hp){
@@ -501,9 +502,9 @@ character.xianjian={
 			},
 			content:function(){
 				"step 0"
-				var suit=get.suit(cards[0]);
+				var color=get.color(cards[0]);
 				target.judge(function(card){
-					return get.suit(card)==suit?1:0;
+					return get.color(card)==color?1:0;
 				});
 				"step 1"
 				if(result.bool){
@@ -517,12 +518,13 @@ character.xianjian={
 						return ai.get.recoverEffect(target);
 					}
 				},
-				threaten:1.2
+				threaten:1.5
 			}
 		},
 		jubao:{
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
+				if(player.skills.contains('jubao2')) return false;
 				if(event.player==player) return false;
 				if(_status.currentPhase==player) return false;
 				for(var i=0;i<event.cards.length;i++){
@@ -548,12 +550,14 @@ character.xianjian={
 					player.gain(card);
 					player.$gain2(card);
 					game.log(get.translation(player)+'获得了'+get.translation(card));
+					player.addTempSkill('jubao2','phaseAfter');
 				}
 			},
 			ai:{
-				threaten:2
+				threaten:1.5
 			}
 		},
+		jubao2:{},
 		duci:{
 			trigger:{player:'loseEnd'},
 			direct:true,
@@ -1364,9 +1368,9 @@ character.xianjian={
 		changnian2:'追思',
 		changnian_info:'你死亡时，可以将所有牌交给一名其他角色，令其获得技能【追思】；若你有至少1张“蕴”，该角色增加1点体力上限回复X点体力，X为“蕴”的个数',
 		sajin:'洒金',
-		sajin_info:'出牌阶段，你可以弃置一张手牌并指定任意名角色进行判定，若判定花色与你弃置的牌相同，该角色回复一点体力',
+		sajin_info:'出牌阶段限一次，你可以弃置一张手牌并指定任意名角色进行判定，若判定颜色与你弃置的牌相同，该角色回复一点体力',
 		jubao:'聚宝',
-		jubao_info:'当其他角色于你的回合外弃置非基本牌时，你可以随机获得其中的一张',
+		jubao_info:'当其他角色于你的回合外首次弃置非基本牌时，你可以获得其中的随机一张',
 		guiyuan:'归元',
 		guiyuan_info:'出牌阶段限一次，你可以弃置一张杀并回复一点体力',
 		shuangren:'双刃',

@@ -1,7 +1,7 @@
 character.xswd={
 	character:{
 		swd_wushi:['male','wei',3,['zhoufu','yingbin','xuying']],
-			swd_lanmoshen:['female','wei',3,['bingjian','lieren'],['fullskin']],
+			// swd_lanmoshen:['female','wei',3,['bingjian','lieren'],['fullskin']],
 			swd_huanglei:['male','qun',3,['jilve','gongshen'],['fullskin']],
 		swd_libai:['female','qun',3,['miaobi','zhexian']],
 		swd_kendi:['male','qun',3,['guanxing','jianyan']],
