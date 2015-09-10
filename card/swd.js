@@ -889,7 +889,7 @@ card.swd={
 			trigger:{source:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha'
+				return event.card&&event.card.name=='sha'&&player.hp<player.maxHp;
 			},
 			content:function(){
 				player.recover(trigger.num);

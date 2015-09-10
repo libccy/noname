@@ -1065,7 +1065,7 @@ character.swd={
         guaili:{
 			trigger:{source:'damageBegin'},
 			filter:function(event){
-				return event.card&&event.card.name=='sha';
+				return event.card&&event.card.name=='sha'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
 			forced:true,
 			content:function(){
@@ -3807,7 +3807,7 @@ character.swd={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha'&&player.storage.liaoyuan>0;
+				return event.card&&event.card.name=='sha'&&player.storage.liaoyuan>0&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
 			content:function(){
 				trigger.num+=player.storage.liaoyuan;

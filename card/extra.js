@@ -35,6 +35,13 @@ card.extra={
 						if(target&&target==_status.dying) return 2;
 						var shas=target.get('h','sha');
 						var ok=false;
+						if(player.num('h','sha')>1){
+							if(player.num('e','zhuge')) return 0;
+							if(player.skills.contains('paoxiao')) return 0;
+							if(player.skills.contains('tanlnin3')) return 0;
+							if(player.skills.contains('zhaxiang2')) return 0;
+							if(player.skills.contains('fengnu')) return 0;
+						}
 						if(shas.length){
 							for(var i=0;i<shas.length;i++){
 								if(lib.filter.filterCard(shas[i],target)){

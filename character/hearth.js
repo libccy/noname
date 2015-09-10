@@ -20,7 +20,7 @@ character.hearth={
 		hs_antonidas:['male','wei',3,['yanshu','bingshuang'],['fullskin']],
 		hs_alakir:['male','wei',3,['fengnu','shengdun'],['fullskin']],
 		hs_zhouzhuo:['male','qun',3,['jubao','qice'],['fullskin']],
-		hs_yngvar:['male','wei',3,['huanwu'],['fullskin']],
+		hs_yngvar:['male','qun',3,['huanwu'],['fullskin']],
 		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi'],['fullskin']],
 		hs_malorne:['male','wu',3,['shenen','chongsheng'],['fullskin']],
 
@@ -55,8 +55,7 @@ character.hearth={
 			},
 			ai:{
 				threaten:1.8,
-				order:function(item,player){
-					console.log(item,player);
+				order:function(name,player){
 					return 10;
 				},
 				result:{
@@ -127,9 +126,7 @@ character.hearth={
 			ai:{
 				order:1,
 				result:{
-					player:function(player){
-						return (player.num('h')<=1)?1:0;
-					}
+					player:1
 				}
 			}
 		},
@@ -1483,7 +1480,7 @@ character.hearth={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event){
-				return event.card&&get.type(event.card)=='trick';
+				return event.card&&get.type(event.card)=='trick'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
 			content:function(){
 				trigger.num++;
@@ -1508,7 +1505,7 @@ character.hearth={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event){
-				return event.card&&event.card.name=='sha';
+				return event.card&&event.card.name=='sha'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
 			content:function(){
 				trigger.num++;

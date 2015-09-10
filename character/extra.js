@@ -371,11 +371,12 @@ character.extra={
 		wuhun:{
 			trigger:{player:'dieBegin'},
 			forced:true,
+			popup:false,
 			filter:function(event){
 				return event.source!=undefined;
 			},
 			content:function(){
-				trigger.source.loseHp(trigger.source.hp);
+				trigger.source.addSkill('wuhun2');
 			},
 			ai:{
 				threaten:function(player,target){
@@ -397,6 +398,14 @@ character.extra={
 						}
 					}
 				}
+			}
+		},
+		wuhun2:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			content:function(){
+				player.loseHp(player.hp);
+				player.removeSkill('wuhun2');
 			}
 		},
 		guixin:{
@@ -1038,6 +1047,7 @@ character.extra={
 		wushen:'武神',
 		wushen_info:'锁定技，你的红桃手牌视为杀；锁定技，你使用红桃杀时无距离限制。',
 		wuhun:'武魂',
+		wuhun2:'武魂',
 		wuhun_info:'锁定技，杀死你的角色立即进入濒死状态',
 		shelie:'涉猎',
 		gongxin:'攻心',

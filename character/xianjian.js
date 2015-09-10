@@ -1319,8 +1319,8 @@ character.xianjian={
 		},
 		tianshe2:{
 			trigger:{source:'damageAfter'},
-			filter:function(event){
-				if(event.nature) return true;
+			filter:function(event,player){
+				if(event.nature&&player.hp<player.maxHp) return true;
 			},
 			forced:true,
 			content:function(){

@@ -11643,13 +11643,22 @@
 				cheat.z('caopi');
 			},
 			cc:function(){
-				cheat.z('recaocao');
+				cheat.z('re_caocao');
 			},
 			ls:function(){
 				cheat.z('liushan');
 			},
 			zj:function(){
-				cheat.z('spzhangjiao');
+				cheat.z('diy_zhangjiao');
+			},
+			sc:function(){
+				cheat.z('sunce');
+			},
+			lc:function(){
+				cheat.z('liushan');
+			},
+			lb:function(){
+				cheat.z('liubei');
 			}
 		}
 		window.countGroups=function(){
