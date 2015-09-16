@@ -369,7 +369,7 @@ card.swd={
 		zhufangshenshi:{
 			fullskin:true,
 			chongzhu:true,
-			type:'trick',
+			type:'basic',
 			enable:function(){
 				return game.players.length>2;
 			},
@@ -1131,7 +1131,7 @@ card.swd={
 		xixueguizhihuan_info:'锁定技，每当你使用杀造成一点伤害，你回复一点体力',
 		xixue:'吸血',
 		xixue_info:'锁定技，每当你使用杀造成一点伤害，你回复一点体力',
-		zhufangshenshi:'土地神符',
+		zhufangshenshi:'祠符',
 		zhufangshenshi_info:'出牌阶段，对一名相邻角色使用，与其交换位置',
 		jingleishan:'惊雷闪',
 		jingleishan_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【杀】，否则受到1点雷电伤害。',
@@ -1158,7 +1158,7 @@ card.swd={
 		//['heart',3,'xiangyuye','poison'],
 
 		['club',4,'caoyao'],
-		//['heart',4,'zhufangshenshi'],
+		['spade',4,'zhufangshenshi'],
 		//['spade',4,'huanpodan'],
 //		['diamond',4,'xiangyuye','poison'],
 

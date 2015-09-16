@@ -11745,11 +11745,14 @@
 			console.log(str);
 			str='杀'+sha+'； '+'黑杀'+heisha+'； '+'红杀'+hongsha+'； '+'闪'+shan+'； '+'桃'+tao+'； '+'酒'+jiu+'； '+'无懈'+wuxie
 			console.log(str);
-			str='';
 			for(var i=1;i<=13;i++){
-				str+=num[i]+' ';
+				if(i<10){
+					console.log(i+' ',num[i]);
+				}
+				else{
+					console.log(i,num[i]);
+				}
 			}
-			console.log(str);
 			return aa+bb+cc+dd;
 		}
 		window.onkeydown=function(e){

@@ -248,6 +248,8 @@ card.yibao={
 					if(target.hasSkillTag('maixie')&&target.hp>1&&ui.selected.cards.length){
 						return 0;
 					}
+					if(card.name=='tao') return 0;
+					if(target.hp==1&&card.name=='jiu') return 0;
 					if(get.type(card)!='basic'){
 						return 10-ai.get.value(card);
 					}
@@ -268,6 +270,10 @@ card.yibao={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nofire')) return 0;
+						var nh=target.num('he');
+						if(target==player) nh--;
+						if(nh==2) return -2.5;
+						if(nh==1) return -3;
 						return -2;
 					}
 				},

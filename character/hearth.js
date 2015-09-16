@@ -22,7 +22,7 @@ character.hearth={
 		hs_zhouzhuo:['male','qun',3,['jubao','qice'],['fullskin']],
 		hs_yngvar:['male','qun',3,['huanwu'],['fullskin']],
 		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi'],['fullskin']],
-		hs_malorne:['male','wu',3,['shenen','chongsheng'],['fullskin']],
+		hs_malorne:['male','wu',3,['enze','chongsheng'],['fullskin']],
 
 		hs_ronghejuren:['male','shu',8,[],['fullskin']],
 		hs_wujiyuansu:['male','qun',3,['wujiwuji'],['fullskin']],
@@ -38,7 +38,7 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
-		shenen:{
+		enze:{
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -733,7 +733,7 @@ character.hearth={
 				player.chooseCard('是否发动【变形】？',function(card){
 					if(card.name!=trigger.card.name){
 						return card.name=='caoyao'||card.name=='dujian'||card.name=='sha'||card.name=='jiu'||
-						card.name=='tianxianjiu'||card.name=='tao'||card.name=='xiangyuye';
+						card.name=='tianxianjiu'||card.name=='tao'||card.name=='xiangyuye'||card.name=='zhufangshenshi';
 					}
 					return false;
 				}).ai=function(card){
@@ -1636,9 +1636,10 @@ character.hearth={
 		hs_tgolem:'图腾魔像',
 		hs_totemic:'图腾师',
 
-		shenen:'神恩',
-		shenen_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等',
+		enze:'恩泽',
+		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等',
 		chongsheng:'重生',
+		chongsheng_bg:'生',
 		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至3-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动3次',
 		s_tuteng:'滋养',
 		s_tuteng_info:'在你首个回合开始时，你获得三个随机图腾；在此后的每个回合开始阶段，你随机替换其中的一个图腾',

@@ -513,7 +513,7 @@ card.extra={
 		["club",1,"baiyin"],
 		["spade",2,"tengjia",'fire'],
 		["club",2,"tengjia",'fire'],
-		["spade",2,"guding"],
+		["spade",1,"guding"],
 		["diamond",2,"zhuque",'fire'],
 
 		["heart",2,"huogong","fire"],
