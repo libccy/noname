@@ -449,6 +449,7 @@ card.extra={
 		huogong:'火攻',
 		tiesuo:'铁锁连环',
 		huogong_bg:'攻',
+		huogong_info:'目标角色展示一张手牌，然后若你能弃掉一张与所展示牌相同花色的手牌，则火攻对该角色造成1点火焰伤害。',
 		tiesuo_bg:'锁',
 		_chongzhu:'重铸',
 		_lianhuan:'连环',
@@ -514,7 +515,7 @@ card.extra={
 		["spade",2,"tengjia",'fire'],
 		["club",2,"tengjia",'fire'],
 		["spade",1,"guding"],
-		["diamond",2,"zhuque",'fire'],
+		["diamond",1,"zhuque",'fire'],
 
 		["heart",2,"huogong","fire"],
 		["heart",3,"huogong","fire"],

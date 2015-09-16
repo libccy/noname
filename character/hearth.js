@@ -717,8 +717,7 @@ character.hearth={
 				for(var i=0;i<hs.length;i++){
 					if(hs[i].name!=event.card.name){
 						var card=hs[i];
-						if(card.name=='caoyao'||card.name=='dujian'||card.name=='sha'||card.name=='jiu'||
-						card.name=='tianxianjiu'||card.name=='tao'||card.name=='xiangyuye'){
+						if(get.type(card)=='basic'&&get.info(card.enable)){
 							return true;
 						}
 					}
@@ -732,8 +731,9 @@ character.hearth={
 				var att=ai.get.attitude(player,trigger.player);
 				player.chooseCard('是否发动【变形】？',function(card){
 					if(card.name!=trigger.card.name){
-						return card.name=='caoyao'||card.name=='dujian'||card.name=='sha'||card.name=='jiu'||
-						card.name=='tianxianjiu'||card.name=='tao'||card.name=='xiangyuye'||card.name=='zhufangshenshi';
+						if(get.type(card)=='basic'&&get.info(card).enable){
+							return true;
+						}
 					}
 					return false;
 				}).ai=function(card){

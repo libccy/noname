@@ -249,5 +249,8 @@ card.guozhan={
 		['diamond',6,'wuliu'],
 		['diamond',12,'sanjian'],
 		['heart',3,'jingfanma'],
+		["spade",4,'shunshou'],
+		["spade",12,'guohe'],
+		["spade",11,'wuxie'],
 	],
 }

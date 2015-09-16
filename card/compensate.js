@@ -4,25 +4,12 @@ card.compensate={
 		['club',8,'guohe'],
 		['spade',13,'guohe'],
 
-		["heart",4,"huogong","fire"],
-		["diamond",5,"huogong","fire"],
-		["diamond",10,"huogong","fire"],
-		["diamond",13,"huogong","fire"],
-
-		["heart",1,"juedou"],
-		["diamond",1,"juedou"],
-		["club",1,"juedou"],
-
-		["heart",12,"wuzhong"],
-		["diamond",3,"wuzhong"],
+		['diamond',8,'shunshou'],
+		['heart',5,'shunshou'],
 
 		["club",10,"wuxie"],
 		["spade",10,"wuxie"],
 		["spade",11,"wuxie"],
-
-		// ['heart',5,'jiu'],
-		// ['spade',9,'jiu'],
-		// ['spade',2,'jiu'],
 
 		['heart',8,'tao'],
 		['heart',10,'tao'],
