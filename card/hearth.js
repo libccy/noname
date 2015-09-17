@@ -2,6 +2,7 @@
 card.hearth={
 	card:{
 		jihuocard:{
+			fullskin:true,
 			type:'basic',
 			enable:true,
 			filterTarget:function(card,player,target){
@@ -22,6 +23,7 @@ card.hearth={
 			}
 		},
 		zhaomingdan:{
+			fullskin:true,
 			type:'trick',
 			chongzhu:true,
 			enable:function(card,player){
@@ -35,6 +37,7 @@ card.hearth={
 			},
 			content:function(){
 				target.discard(target.get('j'));
+				player.draw();
 			},
 			ai:{
 				order:9.5,
@@ -46,7 +49,7 @@ card.hearth={
 						for(var i=0;i<js.length;i++){
 							var jj=js[i].viewAs?{name:js[i].viewAs}:js[i];
 							if(jj.name=='zhaomingdan') num++;
-							else if(js.length==1&&ai.get.effect(target,jj,target,player)>=0){
+							else if(js.length==1&&ai.get.effect(target,jj,target,target)>=0){
 								num--;
 							}
 							else{
@@ -58,7 +61,8 @@ card.hearth={
 				}
 			}
 		},
-		yexinglanghun:{
+		shijieshu:{
+			fullskin:true,
 			enable:true,
 			type:'trick',
 			filterTarget:function(card,player,target){
@@ -121,6 +125,7 @@ card.hearth={
 			}
 		},
 		shandianjian:{
+			fullskin:true,
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
@@ -207,6 +212,7 @@ card.hearth={
 			}
 		},
 		shihuawuqi:{
+			fullskin:true,
 			type:'basic',
 			enable:true,
 			usable:1,
@@ -265,6 +271,7 @@ card.hearth={
 			}
 		},
 		dunpaigedang:{
+			fullskin:true,
 			enable:true,
 			type:'trick',
 			filterTarget:function(card,player,target){
@@ -285,6 +292,7 @@ card.hearth={
 			}
 		},
 		chuansongmen:{
+			fullskin:true,
 			type:'basic',
 			enable:true,
 			discard:false,
@@ -321,13 +329,14 @@ card.hearth={
 			ai:{
 				order:9.5,
 				value:7,
-				useful:2,
+				useful:3,
 				result:{
 					target:1
 				}
 			}
 		},
 		tanshezhiren:{
+			fullskin:true,
 			type:'trick',
 			enable:function(){
 				for(var i=0;i<game.players.length;i++){
@@ -373,6 +382,7 @@ card.hearth={
 			}
 		},
 		xingjiegoutong:{
+			fullskin:true,
 			type:'basic',
 			enable:true,
 			selectTarget:-1,
@@ -411,7 +421,7 @@ card.hearth={
 			content:function(){
 				var num=player.num('h')-target.num('h');
 				if(num<1) num=1;
-				if(num>5) num=5;
+				if(num>4) num=4;
 				target.draw(num);
 			},
 			ai:{
@@ -431,6 +441,7 @@ card.hearth={
 			}
         },
 		zhiliaobo:{
+			fullskin:true,
 			enable:true,
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -470,6 +481,7 @@ card.hearth={
 			}
 		},
 		yuansuhuimie:{
+			fullskin:true,
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
@@ -534,7 +546,7 @@ card.hearth={
 		shihuawuqi:{
 			mod:{
 				attackFrom:function(from,to,distance){
-					return distance-2;
+					return distance-1;
 				}
 			}
 		},
@@ -542,7 +554,7 @@ card.hearth={
 	},
 	translate:{
 		shenenshu:'神恩术',
-		shenenshu_info:'对一名其他角色使用，令其摸X张牌，直到手牌数与你相等（X不小于1且不大于5）',
+		shenenshu_info:'对一名其他角色使用，令其摸X张牌，直到手牌数与你相等（X不小于1且不大于4）',
 		zhiliaobo:'治疗波',
 		zhiliaobo_info:'对一名受伤角色使用，令其回复一点体力，若其仍处于受伤状态，则进行一次判定，若结果为红色则再回复一点体力',
 		yuansuhuimie:'元素毁灭',
@@ -556,15 +568,15 @@ card.hearth={
 		dunpaigedang:'盾牌格挡',
 		dunpaigedang_info:'获得一点护甲值，摸一张牌',
 		siwangchanrao:'死亡缠绕',
-		siwangchanrao_info:'弃置一名其他角色的一张手牌，若其此时没有手牌，则你摸一张牌',
+		siwangchanrao_infox:'弃置一名其他角色的一张手牌，若其此时没有手牌，则你摸一张牌',
 		shihuawuqi:'石化武器',
-		shihuawuqi_info:'本回合内攻击范围+2；若你手牌中没有杀，则从牌堆中获得一张杀',
+		shihuawuqi_infox:'本回合内攻击范围+1；若你手牌中没有杀，则从牌堆中获得一张杀',
 		shandianjian:'闪电箭',
 		shandianjian_info:'目标角色展示一张手牌，然后若你能弃掉一张与所展示牌相同花色的手牌，则对该角色造成1点雷电伤害。',
-		yexinglanghun:'野性狼魂',
-		yexinglanghun_info:'目标随机装备牌堆中的两张装备牌，使用者随机弃置一张手牌',
+		shijieshu:'视界术',
+		shijieshu_info:'目标随机装备牌堆中的两张装备牌，使用者随机弃置一张手牌',
 		zhaomingdan:'照明弹',
-		zhaomingdan_info:'弃置一名其他角色判定区内的所有牌',
+		zhaomingdan_info:'弃置一名其他角色判定区内的所有牌，然后摸一张牌',
 		jihuocard:'激活',
 		jihuocard_info:'跳过本回合的弃牌阶段，若你手牌数不大于当前体力值，则摸一张牌',
 	},
@@ -579,12 +591,9 @@ card.hearth={
 		['diamond',2,'chuansongmen'],
 		['heart',2,'chuansongmen'],
 		['club',3,'dunpaigedang'],
-		['club',1,'siwangchanrao'],
-		['club',3,'shihuawuqi'],
-		['spade',10,'shihuawuqi'],
-		['club',3,'shandianjian'],
-		['spade',1,'shandianjian'],
-		['spade',7,'yexinglanghun'],
+		['club',3,'shandianjian','thunder'],
+		['spade',1,'shandianjian','thunder'],
+		['spade',7,'shijieshu'],
 		['diamond',5,'zhaomingdan'],
 		['heart',10,'zhaomingdan'],
 		['diamond',2,'jihuocard'],

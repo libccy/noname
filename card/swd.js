@@ -369,7 +369,7 @@ card.swd={
 		zhufangshenshi:{
 			fullskin:true,
 			chongzhu:true,
-			type:'basic',
+			type:'trick',
 			enable:function(){
 				return game.players.length>2;
 			},
