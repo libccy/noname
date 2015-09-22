@@ -4320,6 +4320,9 @@
 						if(this.node.background.innerHTML.length>1) this.node.background.classList.add('tight');
 						else this.node.background.classList.remove('tight');
 					}
+					if(lib.card[card[2]].noname){
+						this.node.name.style.display='none';
+					}
 					if(lib.card[card[2]].color){
 						this.style.color=lib.card[card[2]].color;
 					}
@@ -10739,6 +10742,7 @@
 				var skills=node.skills;
 				var skills2=game.filterSkills(node.skills,node);
 				for(i=0;i<skills.length;i++){
+					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
 					if(lib.translate[skills[i]+'_info']){
 						translation=get.translation(skills[i]).slice(0,2);
 						if(!skills2.contains(skills[i])){
@@ -10828,7 +10832,7 @@
 				if(typeof info.mark=='function'){
 					var stint=info.mark(uiintro,player.storage[node.skill],player);
 					if(stint){
-						if(stint.length<=10){
+						if(stint.length<=100){
 							uiintro.add('<div class="text center">'+stint+'</div>');
 						}
 						else{
@@ -10842,7 +10846,7 @@
 						if(stint[0]=='$'){
 							uiintro.add('<div class="caption">'+stint.slice(1)+'</div>');
 						}
-						else if(stint.length<=10){
+						else if(stint.length<=100){
 							uiintro.add('<div class="text center">'+stint+'</div>');
 						}
 						else{
@@ -10886,7 +10890,12 @@
 					}
 				}
 				else if(lib.translate[name+'_info']){
-					uiintro.add('<div class="text">'+lib.translate[name+'_info']+'</div>');
+					if(lib.translate[name+'_info'].length<=100){
+						uiintro.add('<div class="text center">'+lib.translate[name+'_info']+'</div>');
+					}
+					else{
+						uiintro.add('<div class="text">'+lib.translate[name+'_info']+'</div>');
+					}
 				}
 				uiintro.add(ui.create.div('.placeholder.slim'));
 			}

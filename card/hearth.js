@@ -389,7 +389,7 @@ card.hearth={
 			filterTarget:function(card,player,target){return player==target},
 			content:function(){
 				target.gainMaxHp();
-				target.loseHp();
+				target.discard(target.get('h'));
 			},
 			ai:{
 				basic:{
@@ -399,12 +399,9 @@ card.hearth={
 				order:1,
 				result:{
 					target:function(player,target){
-						if(target.hp==target.maxHp){
-							if(target.num('h','tao')) return 1;
-							if(target.num('h','caoyao')) return 1;
-							if(target.num('h','zhiliaobo')) return 1;
-							if(target.num('h')<target.hp) return 1;
-						}
+						var nh=target.num('h');
+						if(nh<=1) return 1;
+						if(nh==2&&target.hp==target.maxHp) return 1;
 						return 0;
 					},
 				},
@@ -485,9 +482,7 @@ card.hearth={
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
-			filterTarget:function(card,player,target){
-				return target.num('he')>0;
-			},
+			filterTarget:true,
 			content:function(){
 				"step 0"
 				target.chooseToDiscard([1,2],'he').ai=function(card){
@@ -525,6 +520,7 @@ card.hearth={
 						if(target==player) nh--;
 						if(nh==2) return -2.5;
 						if(nh==1) return -3;
+						if(nh==0) return -4;
 						return -2;
 					},
 				},
@@ -558,9 +554,9 @@ card.hearth={
 		zhiliaobo:'治疗波',
 		zhiliaobo_info:'对一名受伤角色使用，令其回复一点体力，若其仍处于受伤状态，则进行一次判定，若结果为红色则再回复一点体力',
 		yuansuhuimie:'元素毁灭',
-		yuansuhuimie_info:'对所有有手牌的角色使用，令目标弃置1~2张牌，并受到2-X点雷电伤害，X为其弃置的手牌数',
+		yuansuhuimie_info:'对所有角色使用，令目标弃置1~2张牌，并受到2-X点雷电伤害，X为其弃置的手牌数',
 		xingjiegoutong:'星界沟通',
-		xingjiegoutong_info:'增加一点体力上限，然后流失一点体力',
+		xingjiegoutong_info:'增加一点体力上限，弃置你的所有手牌',
 		tanshezhiren:'弹射之刃',
 		tanshezhiren_info:'弃置一名随机角色的手牌，重复此过程直到有一名角色失去最后一张手牌',
 		chuansongmen:'传送门',

@@ -78,6 +78,7 @@ character.jiange={
                 "step 1"
                 if(event.targets.length){
                     event.targets.shift().damage('thunder');
+                    event.redo();
                 }
             }
         },

@@ -8,7 +8,7 @@ character.hearth={
 		hs_malfurion:['male','wu',4,['jihuo'],['fullskin']],
 		hs_guldan:['male','qun',3,['fenliu','hongxi'],['fullskin']],
 		hs_anduin:['male','qun',3,['shengguang','shijie','anying'],['fullskin']],
-		hs_sthrall:['male','wu',4,['tuteng','tzhenji'],['fullskin']],
+		hs_sthrall:['male','wu',4,['tuteng','guozai'],['fullskin']],
 		hs_waleera:['female','qun',3,['jianren','mengun','wlianji'],['fullskin']],
 
 		hs_medivh:['male','wei',3,['jingxiang','moying','mdzhoufu'],['fullskin']],
@@ -28,7 +28,7 @@ character.hearth={
 		hs_wujiyuansu:['male','qun',3,['wujiwuji'],['fullskin']],
 		hs_mijiaojisi:['female','qun',3,['kuixin'],['fullskin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu'],['fullskin']],
-		hs_tgolem:['male','qun',4,['guozai'],['fullskin']],
+		// hs_tgolem:['male','qun',4,['guozai'],['fullskin']],
 		hs_totemic:['male','wu',3,['s_tuteng'],['fullskin']],
 	},
 	perfectPair:{
@@ -1211,11 +1211,11 @@ character.hearth={
 					game.delay(0.5);
 					var target=result.targets[0];
 					player.logSkill('tzhenji',target,'thunder');
-					target.damage('thunder');
 					var cs=target.get('he');
 					if(cs.length){
 						target.discard(cs.randomGet());
 					}
+					target.damage('thunder');
 					player.addTempSkill('tzhenji2','phaseAfter');
 				}
 			},
@@ -1232,6 +1232,27 @@ character.hearth={
 			}
 		},
 		tzhenji2:{},
+		zuling:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				if(player.storage.zuling) return false;
+				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
+				var num=0;
+				for(var i=0;i<player.skills.length;i++){
+					if(rand.contains(player.skills[i])) num++;
+					if(num>=3) return true;
+				}
+				return false;
+			},
+			content:function(){
+				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
+				for(var i=0;i<rand.length;i++){
+					player.removeSkill(rand[i]);
+				}
+				player.storage.zuling=true;
+			}
+		},
 		tzhenji_old:{
 			trigger:{player:['useCard','respondEnd']},
 			filter:function(event){
@@ -1334,6 +1355,7 @@ character.hearth={
 		s_tuteng:{
 			trigger:{player:'phaseBegin'},
 			forced:true,
+			unique:true,
 			content:function(){
 				var rand=['tuteng1','tuteng2','tuteng4',
 				'tuteng5','tuteng6','tuteng7'];
@@ -1365,24 +1387,118 @@ character.hearth={
 		tuteng:{
 			enable:'phaseUse',
 			usable:1,
-			filter:function(event,player){
-				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
-				for(var i=0;i<player.skills.length;i++){
-					rand.remove(player.skills[i]);
-					if(rand.length==0) return false;
+			unique:true,
+			direct:true,
+			check:function(){
+				return 0;
+			},
+			delay:0,
+			init:function(){
+				for(var i=1;i<=8;i++){
+					lib.translate['tuteng'+i+'_info']=lib.skill['tuteng'+i].intro.content;
 				}
-				return true;
 			},
 			position:'he',
 			content:function(){
+				'step 0'
 				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
+				var rand2=[];
+				var randx=[];
+				var rand2x=[];
+				if(player.storage.tuteng_awake){
+					rand=rand.concat(['tuteng5','tuteng6','tuteng7','tuteng8']);
+				}
 				for(var i=0;i<player.skills.length;i++){
-					rand.remove(player.skills[i]);
+					if(rand.contains(player.skills[i])){
+						rand.remove(player.skills[i]);
+						rand2.push(player.skills[i]);
+					}
 				}
 				if(rand.length){
-					player.addSkill(rand.randomGet());
+					if(event.isMine()&&rand.length>1){
+						var dialog=ui.create.dialog();
+						for(var i=0;i<rand.length;i++){
+							randx[i]=['','',rand[i]];
+						}
+						for(var i=0;i<rand2.length;i++){
+							rand2x[i]=['','',rand2[i]];
+						}
+						dialog.add('选择一个图腾');
+						dialog.add([randx,'vcard']);
+						if(rand2.length>=3){
+							dialog.add('替换一个已有图腾');
+							dialog.add([rand2x,'vcard']);
+							player.chooseButton(dialog,2,true).filterButton=function(button){
+								if(ui.selected.buttons.length){
+									var current=ui.selected.buttons[0].name;
+									if(rand.contains(current)){
+										return rand2.contains(button.name);
+									}
+									else{
+										return rand.contains(button.name);
+									}
+								}
+								return true;
+							};
+						}
+						else{
+							player.chooseButton(dialog,true);
+						}
+						for(var i=0;i<dialog.buttons.length;i++){
+							var item=dialog.buttons[i]
+							if(i==4){
+								item.parentNode.insertBefore(document.createElement('br'),item);
+							}
+							item.style.zoom=0.7;
+						}
+					}
+					else{
+						if(player.hp<player.maxHp&&rand.contains('tuteng1')){
+							player.addSkill('tuteng1');
+						}
+						else{
+							player.addSkill(rand.randomGet());
+						}
+						if(rand2.length>=3){
+							player.removeSkill(rand2.randomGet());
+						}
+						game.delay();
+						event.finish();
+					}
 				}
-				player.addTempSkill('tuteng_h','phaseAfter');
+				else{
+					event.finish();
+				}
+				'step 1'
+				if(result.buttons.length==1){
+					player.addSkill(result.buttons[0].name);
+				}
+				else if(result.buttons.length==2){
+					var skill1=result.buttons[0].name;
+					var skill2=result.buttons[1].name;
+					if(player.skills.contains(skill1)){
+						player.removeSkill(skill1);
+						player.addSkill(skill2);
+					}
+					else{
+						player.removeSkill(skill2);
+						player.addSkill(skill1);
+					}
+				}
+				player.addSkill(event.choice);
+				if(!player.storage.tuteng_awake){
+					var rand=['tuteng1','tuteng2','tuteng3','tuteng4',
+					'tuteng5','tuteng6','tuteng7','tuteng8'];
+					var num=0;
+					for(var i=0;i<player.skills.length;i++){
+						if(rand.contains(player.skills[i])) num++;
+						if(num>=3){
+							player.storage.tuteng_awake=true;
+							player.popup('图腾已解锁');
+							break;
+						}
+					}
+				}
 			},
 			ai:{
 				order:11,
@@ -1391,7 +1507,7 @@ character.hearth={
 				},
 				effect:function(card,player){
 					if(get.tag(card,'damage')){
-						if(player.skills.contains('jueqing')) return [1,1];
+						if(player.skills.contains('jueqing')) return;
 						return 1.2;
 					}
 				},
@@ -1411,14 +1527,16 @@ character.hearth={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				var tuteng=['tuteng1','tuteng2','tuteng3','tuteng4'];
+				var tuteng=['tuteng1','tuteng2','tuteng3','tuteng4',
+				'tuteng5','tuteng6','tuteng7','tuteng8'];
 				for(var i=0;i<player.skills.length;i++){
 					if(tuteng.contains(player.skills[i])) return true;
 				}
 				return false;
 			},
 			content:function(){
-				var tuteng=['tuteng1','tuteng2','tuteng3','tuteng4'];
+				var tuteng=['tuteng1','tuteng2','tuteng3','tuteng4',
+				'tuteng5','tuteng6','tuteng7','tuteng8'];
 				var rand=[];
 				for(var i=0;i<player.skills.length;i++){
 					if(tuteng.contains(player.skills[i])){
@@ -1432,6 +1550,7 @@ character.hearth={
 		},
 		tuteng1:{
 			mark:'image',
+			nopop:true,
 			intro:{
 				content:'回合结束阶段，你回复一点体力'
 			},
@@ -1446,6 +1565,7 @@ character.hearth={
 		},
 		tuteng2:{
 			mark:'image',
+			nopop:true,
 			intro:{
 				content:'每当你造成一点伤害，你摸一张牌'
 			},
@@ -1460,6 +1580,7 @@ character.hearth={
 		},
 		tuteng3:{
 			mark:'image',
+			nopop:true,
 			intro:{
 				content:'你受到的伤害-1'
 			},
@@ -1474,6 +1595,7 @@ character.hearth={
 		},
 		tuteng4:{
 			mark:'image',
+			nopop:true,
 			intro:{
 				content:'你的锦囊牌造成的伤害+1'
 			},
@@ -1488,6 +1610,7 @@ character.hearth={
 		},
 		tuteng5:{
 			mark:'image',
+			nopop:true,
 			intro:{
 				content:'回合结束阶段，你摸一张牌'
 			},
@@ -1499,6 +1622,7 @@ character.hearth={
 		},
 		tuteng6:{
 			mark:'image',
+			nopop:true,
 			intro:{
 				content:'你的杀造成的伤害+1'
 			},
@@ -1513,6 +1637,7 @@ character.hearth={
 		},
 		tuteng7:{
 			mark:'image',
+			nopop:true,
 			intro:{
 				content:'回合结束阶段，你令一名其他角色回复一点体力'
 			},
@@ -1537,6 +1662,18 @@ character.hearth={
 				if(result.bool){
 					player.logSkill('tuteng7',result.targets[0]);
 					result.targets[0].recover();
+				}
+			}
+		},
+		tuteng8:{
+			mark:'image',
+			nopop:true,
+			intro:{
+				content:'当计算你与其它角色的距离时，始终-1'
+			},
+			mod:{
+				globalFrom:function(from,to,distance){
+					return distance-1;
 				}
 			}
 		},
@@ -1586,24 +1723,51 @@ character.hearth={
 	card:{
 		tuteng1:{
 			image:'card/tuteng1',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
 		},
 		tuteng2:{
 			image:'card/tuteng2',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
 		},
 		tuteng3:{
 			image:'card/tuteng3',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
 		},
 		tuteng4:{
 			image:'card/tuteng4',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
 		},
 		tuteng5:{
 			image:'card/tuteng5',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
 		},
 		tuteng6:{
 			image:'card/tuteng6',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
 		},
 		tuteng7:{
 			image:'card/tuteng7',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
+		},
+		tuteng8:{
+			image:'card/tuteng8',
+			color:'white',
+			noname:true,
+			textShadow:'black 0 0 2px',
 		},
 	},
 	translate:{
@@ -1711,7 +1875,9 @@ character.hearth={
 		jingxiang:'镜像',
 		jingxiang_info:'每当你需要打出卡牌时，你可以观看一名随机角色的手牌并将其视为你的手牌打出',
 		tuteng:'图腾',
-		tuteng_info:'出牌阶段限一次，你可以随机获得一个图腾，并令你本回合的手牌上限-1；每当你受到一次伤害，你随机失去一个图腾',
+		tuteng_info:'出牌阶段，你可以获得一个基础图腾，当你的图腾数量达到3时，你解锁全部图腾；每当你受到一次伤害，你随机失去一个图腾',
+		zuling:'祖灵',
+		zuling_info:'觉醒技，回合开始阶段，若你拥有至少3个图腾，你失去所有图腾，并解锁强化图腾',
 		tuteng1:'治疗图腾',
 		tuteng2:'灼热图腾',
 		tuteng3:'石爪图腾',
@@ -1719,6 +1885,7 @@ character.hearth={
 		tuteng5:'法力之潮图腾',
 		tuteng6:'火舌图腾',
 		tuteng7:'活力图腾',
+		tuteng8:'图腾魔像',
 		tzhenji:'震击',
 		tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成1点雷电伤害，并随机弃置其一张牌，每回合限发动一次',
 		fenliu:'分流',

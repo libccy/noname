@@ -205,7 +205,10 @@ card.qimou={
 			ai:{
 				order:9,
 				result:{
-					target:-1
+					target:function(player,target){
+						if(target.num('e')) return -1;
+						return 0;
+					}
 				},
 				tag:{
 					multitarget:1,

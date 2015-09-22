@@ -2028,6 +2028,7 @@ character.swd={
 				}
 				player.draw();
 				player.useCard({name:'sha'},cards,targets,'jianji',false).animate=false;
+				player.line(targets,'fire');
 				"step 1"
 				if(event.added){
 					player.skills.remove('unequip');

@@ -2051,7 +2051,7 @@ character.yijiang={
 				player.getStat('skill').qice--;
 				for(var i in lib.card){
 					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
-					if(lib.card[i].type=='trick') list.push(['','',i]);
+					if(lib.card[i].type=='trick') list.push(['锦囊','',i]);
 				}
 				var dialog=ui.create.dialog([list,'vcard']);
 				player.chooseButton(dialog,function(button){
