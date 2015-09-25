@@ -185,8 +185,9 @@ character.hearth={
 				if(event.targets.length){
 					var current=event.targets.shift();
 					trigger.player.line(current,'thunder');
-					current.damage('nosource').animate=false;
+					current.damage('nosource','thunder').animate=false;
 					current.$damage(trigger.player);
+					current.$thunder();
 					event.redo();
 				}
 			}

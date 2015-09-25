@@ -4254,7 +4254,7 @@
 				},
 				$thunder:function(){
 					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
-						this.offsetTop+this.offsetHeight-20,700,'thunder');
+						this.offsetTop+this.offsetHeight-30,700,'thunder');
 				},
 				$damage:function(source){
 					if(source&&source!=this){
@@ -5327,13 +5327,17 @@
 				var particles=[];
 				var particle_count=50;
 				if(type=='thunder'){
-					particle_count=10;
+					particle_count=30;
 				}
 				for(var i = 0; i < particle_count; i++) {
 			  		particles.push(new particle());
 			  	}
 				function particle() {
 					this.speed = {x: -1+Math.random()*2, y: -5+Math.random()*5};
+					if(type=='thunder'){
+						this.speed.y=-3+Math.random()*5;
+						this.speed.x=-2+Math.random()*4;
+					}
 					this.location = {x: x, y: y};
 
 					this.radius = .5+Math.random()*1;
@@ -5341,17 +5345,14 @@
 					this.life = 10+Math.random()*10;
 					this.death = this.life;
 
-					if(type=='thunder'){
-						this.radius*=3;
-						this.life*=1.2;
-						this.death*=1.2;
-					}
-
 					switch(type){
 						case 'thunder':{
 							this.b = 255;
 							this.r = Math.round(Math.random()*255);
 							this.g = Math.round(Math.random()*255);
+							this.x+=Math.random()*20-10;
+							this.y+=Math.random()*20-10;
+
 							break;
 						}
 						case 'fire':{
@@ -5377,14 +5378,16 @@
 			  			var p = particles[i];
 
 			  			surface.beginPath();
+						var middle=0.5;
+						var radius=p.radius;
 
 			  			p.opacity = Math.round(p.death/p.life*100)/100
 			  			var gradient = surface.createRadialGradient(p.location.x, p.location.y, 0, p.location.x, p.location.y, p.radius);
 			  			gradient.addColorStop(0, "rgba("+p.r+", "+p.g+", "+p.b+", "+p.opacity+")");
-			  			gradient.addColorStop(0.5, "rgba("+p.r+", "+p.g+", "+p.b+", "+p.opacity+")");
+			  			gradient.addColorStop(middle, "rgba("+p.r+", "+p.g+", "+p.b+", "+p.opacity+")");
 			  			gradient.addColorStop(1, "rgba("+p.r+", "+p.g+", "+p.b+", 0)");
 			  			surface.fillStyle = gradient;
-			  			surface.arc(p.location.x, p.location.y, p.radius, Math.PI*2, false);
+			  			surface.arc(p.location.x, p.location.y, radius, Math.PI*2, false);
 			  			surface.fill();
 			  			p.death--;
 			  			p.radius++;
@@ -11681,9 +11684,48 @@
 			h:function(player){
 				console.log(get.translation(player.get('h')));
 			},
-			g:function(name,target){
+			g:function(){
+				for(var i=0;i<arguments.length;i++){
+					if(i>0&&typeof arguments[i]=='number'){
+						for(var j=0;j<arguments[i]-1;j++){
+							cheat.gx(arguments[i-1]);
+						}
+					}
+					else{
+						cheat.gx(arguments[i]);
+					}
+				}
+			},
+			gx:function(name,target){
 				target=target||game.me;
+				var fire=false,thunder=false;
+				var suit=null;
+				var suits=['club','spade','diamond','heart'];
+				for(var i=0;i<suits.length;i++){
+					if(name.indexOf(suits[i])==0){
+						suit=suits[i];
+						name=name.slice(suits[i].length);
+						break;
+					}
+				}
+				if(name=='huosha'){
+					name='sha';
+					fire=true;
+				}
+				else if(name=='leisha'){
+					name='sha';
+					thunder=true;
+				}
 				for(var i=0;i<ui.cardPile.childNodes.length;i++){
+					if(fire&&ui.cardPile.childNodes[i].nature!='fire'){
+						continue;
+					}
+					if(thunder&&ui.cardPile.childNodes[i].nature!='thunder'){
+						continue;
+					}
+					if(suit&&ui.cardPile.childNodes[i].suit!=suit){
+						continue;
+					}
 					if(ui.cardPile.childNodes[i].name==name){
 						var card=ui.cardPile.childNodes[i];
 						target.node.handcards1.appendChild(card);
@@ -11693,6 +11735,15 @@
 					}
 				}
 				for(var i=0;i<ui.discardPile.childNodes.length;i++){
+					if(fire&&ui.cardPile.childNodes[i].nature!='fire'){
+						continue;
+					}
+					if(thunder&&ui.cardPile.childNodes[i].nature!='thunder'){
+						continue;
+					}
+					if(suit&&ui.cardPile.childNodes[i].suit!=suit){
+						continue;
+					}
 					if(ui.discardPile.childNodes[i].name==name){
 						var card=ui.discardPile.childNodes[i];
 						target.node.handcards1.appendChild(card);

@@ -468,8 +468,8 @@ div:hover>.intro{opacity: 1;}
 	position:absolute;
 	overflow:scroll;
 }
-.dialog.scroll1>.bar.top{opacity:1}
-.dialog.scroll2>.bar.bottom{opacity:1}
+/*.dialog.scroll1>.bar.top{opacity:1}
+.dialog.scroll2>.bar.bottom{opacity:1}*/
 .dialog.slim{top:300px;bottom:auto;min-height: none}
 /*.dialog.scroll1{box-shadow:0 -10px 10px -9px rgba(0,0,0,0.1),0 -10px 0 -9px rgba(0,0,0,0.05);}
 .dialog.scroll2{box-shadow:0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05)}
@@ -726,6 +726,14 @@ div[data-nature='soil']{
 .control.red,.control.blue{
 	color:white;
 	text-shadow:black 0 0 2px;
+}
+.dialog.scroll1,
+.dialog.scroll2,
+.dialog.withbg{
+	background: rgba(0,0,0,0.2);
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
+	border-radius:8px;
+	min-height:240px;
 }
 
 /*--------动画--------*/
