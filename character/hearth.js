@@ -161,7 +161,6 @@ character.hearth={
 				effect:{
 					player:function(card,player,target,current){
 						if(get.color(card)=='black'&&get.tag(card,'damage')){
-							console.log(1);
 							return [1,0,1,-2];
 						}
 					}
@@ -169,15 +168,25 @@ character.hearth={
 			}
 		},
 		bingshi:{
-			trigger:{player:'dieBegin'},
+			global:'bingshi2'
+		},
+		bingshi2:{
+			trigger:{global:'dieAfter'},
 			forced:true,
+			filter:function(event,player){
+				return !event.player.storage.bingshi;
+			},
 			content:function(){
 				'step 0'
-				event.targets=get.players(player);
-				event.targets.remove(player);
+				event.targets=get.players(trigger.player);
+				event.targets.remove(trigger.player);
+				trigger.player.storage.bingshi=true;
 				'step 1'
 				if(event.targets.length){
-					event.targets.shift().damage();
+					var current=event.targets.shift();
+					trigger.player.line(current,'thunder');
+					current.damage('nosource').animate=false;
+					current.$damage(trigger.player);
 					event.redo();
 				}
 			}

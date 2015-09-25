@@ -1696,7 +1696,17 @@
 						}
 					}
 					player.changeHp(-num,false);
-					player.$damage(source);
+					if(event.animate!==false){
+						player.$damage(source);
+						if(lib.config.animation){
+							if(event.nature=='fire'){
+								player.$fire();
+							}
+							else if(event.nature=='thunder'){
+								player.$thunder();
+							}
+						}
+					}
 					player.popup(-num,event.nature);
 					// if(source){
 					// 	if(player._damagetimeout!=source){
@@ -3319,6 +3329,7 @@
 					if(next.num==undefined) next.num=1;
 					if(next.nature=='poison') delete next._triggered;
 					next.content=lib.element.playerproto.damage;
+					return next;
 				},
 				recover:function(){
 					var next=game.createEvent('recover');
@@ -4236,6 +4247,14 @@
 						}
 					}
 					if(list.length) this.$draw(list);
+				},
+				$fire:function(){
+					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
+						this.offsetTop+this.offsetHeight-20,700,'fire');
+				},
+				$thunder:function(){
+					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
+						this.offsetTop+this.offsetHeight-20,700,'thunder');
 				},
 				$damage:function(source){
 					if(source&&source!=this){
@@ -5302,6 +5321,94 @@
 				lib.status.canvas=true;
 				game.update(lib.updateCanvas);
 			}
+		},
+		animate:{
+			flame:function(x,y,duration,type){
+				var particles=[];
+				var particle_count=50;
+				if(type=='thunder'){
+					particle_count=10;
+				}
+				for(var i = 0; i < particle_count; i++) {
+			  		particles.push(new particle());
+			  	}
+				function particle() {
+					this.speed = {x: -1+Math.random()*2, y: -5+Math.random()*5};
+					this.location = {x: x, y: y};
+
+					this.radius = .5+Math.random()*1;
+
+					this.life = 10+Math.random()*10;
+					this.death = this.life;
+
+					if(type=='thunder'){
+						this.radius*=3;
+						this.life*=1.2;
+						this.death*=1.2;
+					}
+
+					switch(type){
+						case 'thunder':{
+							this.b = 255;
+							this.r = Math.round(Math.random()*255);
+							this.g = Math.round(Math.random()*255);
+							break;
+						}
+						case 'fire':{
+							this.r = 255;
+							this.g = Math.round(Math.random()*155);
+							this.b = 0;
+							break;
+						}
+						default:{
+							this.r = 255;
+							this.g = Math.round(Math.random()*155);
+							this.b = 0;
+						}
+					}
+			  	}
+
+				game.draw(function(time,surface){
+			  		surface.globalCompositeOperation = "source-over";
+			  		surface.globalCompositeOperation = "lighter";
+
+			  		for(var i = 0; i < particles.length; i++)
+			  		{
+			  			var p = particles[i];
+
+			  			surface.beginPath();
+
+			  			p.opacity = Math.round(p.death/p.life*100)/100
+			  			var gradient = surface.createRadialGradient(p.location.x, p.location.y, 0, p.location.x, p.location.y, p.radius);
+			  			gradient.addColorStop(0, "rgba("+p.r+", "+p.g+", "+p.b+", "+p.opacity+")");
+			  			gradient.addColorStop(0.5, "rgba("+p.r+", "+p.g+", "+p.b+", "+p.opacity+")");
+			  			gradient.addColorStop(1, "rgba("+p.r+", "+p.g+", "+p.b+", 0)");
+			  			surface.fillStyle = gradient;
+			  			surface.arc(p.location.x, p.location.y, p.radius, Math.PI*2, false);
+			  			surface.fill();
+			  			p.death--;
+			  			p.radius++;
+			  			p.location.x += (p.speed.x);
+			  			p.location.y += (p.speed.y);
+
+			  			if(p.death < 0 || p.radius < 0){
+							if(typeof duration=='number'&&time+500>=duration){
+								particles.splice(i--,1);
+							}
+							else{
+								particles[i] = new particle();
+							}
+			  			}
+			  		}
+					if(particles.length==0){
+						return false;
+					}
+				});
+			}
+		},
+		animatex:function(){
+
+
 		},
 		linexy:function(path){
 			var from=[path[0],path[1]];
@@ -7425,6 +7532,7 @@
 				appearence.push(ui.create.switcher('threed_card',lib.config.threed_card,ui.click.sidebar.threed_card));
 				appearence.push(ui.create.switcher('blur_ui',lib.config.blur_ui,ui.click.sidebar.blur_ui));
 				appearence.push(ui.create.switcher('right_sidebar',lib.config.right_sidebar,ui.click.sidebar.right_sidebar));
+				appearence.push(ui.create.switcher('animation',lib.config.animation,ui.click.sidebar.global));
 
 				// appearence.push(ui.create.div('.placeholder'));
 				// appearence.push(ui.create.switcher('intro',['⦿','☯','●','❖','✻','i'],lib.config.intro,ui.click.sidebar.intro));

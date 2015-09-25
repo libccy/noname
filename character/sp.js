@@ -777,6 +777,7 @@ character.sp={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			popup:false,
+			silent:true,
 			content:function(){
 				player.unmarkSkill('wangzun');
 				player.storage.wangzun=null;

@@ -353,7 +353,7 @@ card.hearth={
 			content:function(){
 				'step 0'
 				for(var i=0;i<targets.length;i++){
-					if(!targets[i].num('h')) target.splice(i--,1);
+					if(!targets[i].num('h')) targets.splice(i--,1);
 				}
 				if(targets.contains(player)){
 					event.current=player;
@@ -389,6 +389,7 @@ card.hearth={
 			filterTarget:function(card,player,target){return player==target},
 			content:function(){
 				target.gainMaxHp();
+				target.recover();
 				target.discard(target.get('h'));
 			},
 			ai:{
@@ -400,8 +401,8 @@ card.hearth={
 				result:{
 					target:function(player,target){
 						var nh=target.num('h');
-						if(nh<=1) return 1;
-						if(nh==2&&target.hp==target.maxHp) return 1;
+						if(nh<=2) return 1;
+						if(target.hp==1&&target.maxHp>2) return 1;
 						return 0;
 					},
 				},
@@ -418,7 +419,7 @@ card.hearth={
 			content:function(){
 				var num=player.num('h')-target.num('h');
 				if(num<1) num=1;
-				if(num>4) num=4;
+				if(num>3) num=3;
 				target.draw(num);
 			},
 			ai:{
@@ -468,6 +469,8 @@ card.hearth={
 				useful:[6,3],
 				result:{
 					target:function(player,target){
+						var eff=ai.get.recoverEffect(target,player,target);
+						if(eff<=0) return 0;
 						var num=target.maxHp-target.hp;
 						if(num<1) return 0;
 						if(num==1) return 1;
@@ -550,13 +553,13 @@ card.hearth={
 	},
 	translate:{
 		shenenshu:'神恩术',
-		shenenshu_info:'对一名其他角色使用，令其摸X张牌，直到手牌数与你相等（X不小于1且不大于4）',
+		shenenshu_info:'对一名其他角色使用，令其摸X张牌，直到手牌数与你相等（X不小于1且不大于3）',
 		zhiliaobo:'治疗波',
 		zhiliaobo_info:'对一名受伤角色使用，令其回复一点体力，若其仍处于受伤状态，则进行一次判定，若结果为红色则再回复一点体力',
 		yuansuhuimie:'元素毁灭',
-		yuansuhuimie_info:'对所有角色使用，令目标弃置1~2张牌，并受到2-X点雷电伤害，X为其弃置的手牌数',
+		yuansuhuimie_info:'对所有角色使用，令目标弃置0~2张牌，并受到2-X点雷电伤害，X为其弃置的手牌数',
 		xingjiegoutong:'星界沟通',
-		xingjiegoutong_info:'增加一点体力上限，弃置你的所有手牌',
+		xingjiegoutong_info:'增加一点体力上限并回复一点体力，弃置你的所有手牌',
 		tanshezhiren:'弹射之刃',
 		tanshezhiren_info:'弃置一名随机角色的手牌，重复此过程直到有一名角色失去最后一张手牌',
 		chuansongmen:'传送门',
