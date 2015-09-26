@@ -166,7 +166,7 @@ window.config={
 		threed_card_config:'立体手牌',
 		blur_ui_config:'模糊效果',
 		vertical_scroll_config:'纵向滚动手牌',
-		animation_config:'动画效果',
+		animation_config:'动画特效',
 		right_sidebar_config:'侧栏靠右',
 		title_config:'标题栏显示信息',
 		intro_config:'信息符号',

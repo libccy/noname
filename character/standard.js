@@ -283,7 +283,8 @@ character.standard={
 		luoyi2:{
 			trigger:{source:'damageBegin'},
 			filter:function(event){
-				return (event.card&&(event.card.name=='sha'||event.card.name=='juedou'));
+				return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&
+				event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
 			forced:true,
 			content:function(){

@@ -1705,9 +1705,12 @@
 							else if(event.nature=='thunder'){
 								player.$thunder();
 							}
+							player.$damagepop(-num,event.nature);
+						}
+						else{
+							player.popup(-num,event.nature);
 						}
 					}
-					player.popup(-num,event.nature);
 					// if(source){
 					// 	if(player._damagetimeout!=source){
 					// 		player.$damage(source);
@@ -1746,7 +1749,14 @@
 					}
 					if(num>player.maxHp-player.hp) num=player.maxHp-player.hp;
 					if(num>0){
-						player.changeHp(num);
+						player.changeHp(num,false);
+						if(lib.config.animation){
+							player.$damagepop(num,'wood');
+							player.$recover();
+						}
+						else{
+							player.popup(num);
+						}
 						game.log(get.translation(player)+'回复了'+get.cnNumber(num)+'点体力')
 					}
 				},
@@ -4256,6 +4266,38 @@
 					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
 						this.offsetTop+this.offsetHeight-30,700,'thunder');
 				},
+				$recover:function(){
+					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
+						this.offsetTop+this.offsetHeight-30,700,'recover');
+				},
+				$damagepop:function(num,nature){
+					if(typeof num=='number'){
+						var node=ui.create.div('.damage');
+						if(num>0){
+							num='+'+num;
+						}
+						node.innerHTML=num;
+						this.damagepopups.push(node);
+						node.dataset.nature=nature||'soil';
+						if(this.damagepopups.length==1){
+							this.$damagepop();
+						}
+					}
+					else if(this.damagepopups.length){
+						var node=this.damagepopups[0];
+						this.appendChild(node);
+						ui.refresh(node);
+						node.classList.add('damageadded');
+						setTimeout(function(){
+							node.delete();
+						},500);
+						var that=this;
+						setTimeout(function(){
+							that.damagepopups.shift();
+							that.$damagepop();
+						},500);
+					}
+				},
 				$damage:function(source){
 					if(source&&source!=this){
 						var left,top;
@@ -5326,7 +5368,7 @@
 			flame:function(x,y,duration,type){
 				var particles=[];
 				var particle_count=50;
-				if(type=='thunder'){
+				if(type=='thunder'||type=='recover'){
 					particle_count=30;
 				}
 				for(var i = 0; i < particle_count; i++) {
@@ -5361,6 +5403,24 @@
 							this.b = 0;
 							break;
 						}
+						case 'recover':{
+							this.g = 255;
+							this.r = Math.round(Math.random()*200+55);
+							this.b = Math.round(Math.random()*155+55);
+							this.location.x+=Math.round(Math.random()*60)-30;
+							this.location.y+=Math.round(Math.random()*40)-20;
+							if(this.location.x<x){
+								this.speed.x=-Math.abs(this.speed.x);
+							}
+							else if(this.location.x>x){
+								this.speed.x=Math.abs(this.speed.x);
+							}
+							this.speed.x/=2;
+							this.speed.y/=2;
+							this.life*=2;
+							this.death*=2;
+							break;
+						}
 						default:{
 							this.r = 255;
 							this.g = Math.round(Math.random()*155);
@@ -5380,6 +5440,10 @@
 			  			surface.beginPath();
 						var middle=0.5;
 						var radius=p.radius;
+						if(type=='recover'){
+							middle=0.7;
+							radius/=3;
+						}
 
 			  			p.opacity = Math.round(p.death/p.life*100)/100
 			  			var gradient = surface.createRadialGradient(p.location.x, p.location.y, 0, p.location.x, p.location.y, p.radius);
@@ -5390,7 +5454,12 @@
 			  			surface.arc(p.location.x, p.location.y, radius, Math.PI*2, false);
 			  			surface.fill();
 			  			p.death--;
-			  			p.radius++;
+						if(type=='recover'){
+							p.radius+=0.5;
+						}
+						else {
+							p.radius++;
+						}
 			  			p.location.x += (p.speed.x);
 			  			p.location.y += (p.speed.y);
 
@@ -5408,10 +5477,6 @@
 					}
 				});
 			}
-		},
-		animatex:function(){
-
-
 		},
 		linexy:function(path){
 			var from=[path[0],path[1]];
@@ -8256,6 +8321,7 @@
 				node.forbiddenSkills=[];
 				node.modeSkills=[];
 				node.popups=[];
+				node.damagepopups=[];
 				node.stat=[{card:{},skill:{}}];
 				node.tempSkills={};
 				node.storage={};

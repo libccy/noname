@@ -452,7 +452,7 @@ card.hearth={
 				'step 1'
 				if(target.hp<target.maxHp){
 					target.judge(function(card){
-						return get.color(card)=='red'?1:-1;
+						return get.color(card)=='red'?1:0;
 					});
 				}
 				else{

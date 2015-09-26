@@ -211,6 +211,25 @@ margin-bottom: 5px;
 .player.dead,.player.likedead{z-index: 1;-webkit-filter:grayscale(1);}
 .player>.name{left: 18px;top:36px;}
 .player>.intro{top:87px;left: 18px;}
+.player>.damage{
+	font-family: 'huangcao';
+	font-size:72px;
+	width: 100%;
+	text-align: center;
+	top:calc(50% - 36px);
+	opacity: 0;
+	-webkit-transform:scale(0.7);
+}
+.player>.damage.damageadded{
+	opacity: 1;
+	-webkit-transform:scale(1);
+}
+.player.linked>.damage{
+	-webkit-transform:scale(0.7) rotate(90deg);
+}
+.player.linked>.damage.damageadded{
+	-webkit-transform:scale(1) rotate(90deg);
+}
 .avatar{width: 96px;height: 96px;left: 12px;top: 12px;overflow: hidden;}
 .avatar2{width: 42px;height: 42px;top: 70px;left: 70px;overflow: hidden;}
 .equips{width: 96px;height: 96px;right: 14px;top:12px;}
