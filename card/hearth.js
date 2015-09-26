@@ -1,6 +1,40 @@
 'use strict';
 card.hearth={
 	card:{
+		linghunzhihuo:{
+			fullskin:true,
+			type:'trick',
+			enable:true,
+			filterTarget:true,
+			content:function(){
+				target.damage('fire');
+				var hs=player.get('h');
+				if(hs.length){
+					player.discard(hs.randomGet());
+				}
+			},
+			ai:{
+				basic:{
+					order:5,
+					value:[5,1],
+					useful:2,
+				},
+				result:{
+					player:function(player,target){
+						if(player==target) return -1;
+						if(player.num('h')>=player.hp) return -0.1;
+						if(player.num('h')>1) return -0.5;
+						return 0;
+					},
+					target:-1
+				},
+				tag:{
+					damage:1,
+					fireDamage:1,
+					natureDamage:1,
+				}
+			}
+		},
 		jihuocard:{
 			fullskin:true,
 			type:'basic',
@@ -552,6 +586,8 @@ card.hearth={
 		shandianjian2:{},
 	},
 	translate:{
+		linghunzhihuo:'灵魂之火',
+		linghunzhihuo_info:'对一名角色造成一点火焰伤害，然后随机弃置一张手牌',
 		shenenshu:'神恩术',
 		shenenshu_info:'对一名其他角色使用，令其摸X张牌，直到手牌数与你相等（X不小于1且不大于3）',
 		zhiliaobo:'治疗波',
@@ -596,5 +632,6 @@ card.hearth={
 		['diamond',5,'zhaomingdan'],
 		['heart',10,'zhaomingdan'],
 		['diamond',2,'jihuocard'],
+		['diamond',1,'linghunzhihuo'],
 	],
 }
