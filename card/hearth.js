@@ -327,7 +327,7 @@ card.hearth={
 		},
 		chuansongmen:{
 			fullskin:true,
-			type:'basic',
+			type:'trick',
 			enable:true,
 			discard:false,
 			selectTarget:-1,
