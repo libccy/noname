@@ -4259,16 +4259,46 @@
 					if(list.length) this.$draw(list);
 				},
 				$fire:function(){
-					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
-						this.offsetTop+this.offsetHeight-20,700,'fire');
+					var left,top;
+					if(lib.config.mode=='chess'){
+						var rect=this.getBoundingClientRect();
+						left=rect.left;
+						top=rect.top;
+					}
+					else{
+						left=this.offsetLeft;
+						top=this.offsetTop;
+					}
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-20,700,'fire');
 				},
 				$thunder:function(){
-					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
-						this.offsetTop+this.offsetHeight-30,700,'thunder');
+					var left,top;
+					if(lib.config.mode=='chess'){
+						var rect=this.getBoundingClientRect();
+						left=rect.left;
+						top=rect.top;
+					}
+					else{
+						left=this.offsetLeft;
+						top=this.offsetTop;
+					}
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'thunder');
 				},
 				$recover:function(){
-					game.animate.flame(this.offsetLeft+this.offsetWidth/2,
-						this.offsetTop+this.offsetHeight-30,700,'recover');
+					var left,top;
+					if(lib.config.mode=='chess'){
+						var rect=this.getBoundingClientRect();
+						left=rect.left;
+						top=rect.top;
+					}
+					else{
+						left=this.offsetLeft;
+						top=this.offsetTop;
+					}
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'recover');
 				},
 				$damagepop:function(num,nature){
 					if(typeof num=='number'){

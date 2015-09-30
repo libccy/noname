@@ -624,6 +624,7 @@ mode.chess={
 				ui.chessContainer.style.WebkitOverflowScrolling='touch';
 				ui.chess=ui.create.div('#chess',ui.chessContainer);
 				ui.canvas2=document.createElement('canvas');
+				ui.canvas2.id='canvas2';
 				ui.chess.appendChild(ui.canvas2);
 				ui.ctx2=ui.canvas2.getContext('2d');
 				game.me=ui.create.player();

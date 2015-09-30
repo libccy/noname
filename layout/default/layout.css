@@ -217,6 +217,7 @@ margin-bottom: 5px;
 	width: 100%;
 	text-align: center;
 	top:calc(50% - 36px);
+	left:0;
 	opacity: 0;
 	-webkit-transform:scale(0.7);
 }

@@ -28,6 +28,11 @@
 #arena .card.thrown{
     z-index:4;
 }
+#canvas2{
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+}
 
 #handcards1{
     height:120px;
