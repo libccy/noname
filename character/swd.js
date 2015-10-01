@@ -2287,7 +2287,7 @@ character.swd={
 			content:function(){
 				"step 0"
 				var suit=get.suit(cards[0]);
-				target.chooseToDiscard({suit:suit},'弃置一张'+get.translation(suit)+
+				target.chooseToDiscard({suit:suit},'he','弃置一张'+get.translation(suit)+
 					'牌，或令'+get.translation(player)+'获得你的一张牌').ai=function(card){
 					if(ai.get.attitude(target,player)>0){
 						return -1;
@@ -3340,7 +3340,7 @@ character.swd={
 				return player.attitudeTo(event.player)>3;
 			},
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.num('h')>0&&!player.skills.contains('susheng2');
 			},
 			content:function(){
 				"step 0"
@@ -3354,6 +3354,7 @@ character.swd={
 					if(trigger.player.maxHp<1) trigger.player.maxHp=1;
 					trigger.player.update();
 					player.logSkill('susheng');
+					player.addTempSkill('susheng2','phaseAfter');
 				}
 
 			},
@@ -3361,6 +3362,7 @@ character.swd={
 				threaten:2
 			}
 		},
+		susheng2:{},
 		kunlunjing:{
 			unique:true,
 			group:['kunlunjing1','kunlunjing2'],
@@ -7690,7 +7692,7 @@ character.swd={
 		guisi:'归思',
 		guisi_info:'每当你成为杀的目标，你可以交给对方一张手牌并取消之',
 		duishi:'对诗',
-		duishi_info:'出牌阶段限一次，你可以弃置一张手牌，并指定一名角色弃置一张与之花色相同的手牌，否则你获得其一张牌',
+		duishi_info:'出牌阶段限一次，你可以弃置一张手牌，并指定一名角色弃置一张与之花色相同的牌，否则你获得其一张牌',
 		anlianying:'连营',
 		anlianying_info:'每当你失去最后一张手牌，可摸两张牌',
 		lianwu:'连舞',
@@ -7920,7 +7922,7 @@ character.swd={
 		yuhuo:'浴火',
 		huanjian_info:'你可以将一张黑色手牌当作毒箭使用',
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
-		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1',
+		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每合合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
 		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，然后流失一点体力',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
