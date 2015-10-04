@@ -26,6 +26,9 @@ card.refresh={
 			},
 			discard:false,
 			lose:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
 			prepare:function(cards,player){
 				player.$give(1,player,false);
 			},

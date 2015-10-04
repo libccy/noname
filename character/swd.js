@@ -1278,7 +1278,7 @@ character.swd={
 					return lib.card.sha.ai.order+0.1;
 				}
 			},
-			group:['linyun2','linyun3']
+			group:['linyun2']
 		},
 		linyun2:{
 			trigger:{player:'shaBegin'},
@@ -7675,7 +7675,7 @@ character.swd={
 		hutian3:'护天',
 		hutian_info:'回合结束阶段，你可以将X张牌置于一名角色的武将牌上，则该角色的体力值始终不能小于X；在你的下一个回合结束阶段，该角色获得武将牌上的牌（在此回合不能再次发动）',
 		linyun:'凌云',
-		linyun_info:'你可以将两张牌当作杀使用，此杀需要额外一张闪才能闪避；若此杀造成伤害，你摸一张牌',
+		linyun_info:'你可以将两张牌当作杀使用，此杀需要额外一张闪才能闪避',
 		sliufeng:'流风',
 		sliufeng_info:'锁定技，体力值不大于你的角色视为在你的攻击范围',
 		chengjian:'承剑',

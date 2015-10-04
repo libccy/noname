@@ -367,6 +367,11 @@ mode.chess={
 		playerproto:{
 			chooseToMove:function(){
 				"step 0"
+				if(!player.movable(0,1)&&!player.movable(0,-1)&&
+					!player.movable(1,0)&&!player.movable(-1,0)){
+					event.finish();
+					return;
+				}
 				event.switchToAuto=function(){
 					if(ui.movegrids){
 						while(ui.movegrids.length){

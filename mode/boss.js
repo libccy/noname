@@ -1098,7 +1098,11 @@ mode.boss={
 			}
 		},
 		boss_guiyin:{
-			inherit:'dunxing'
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(_status.currentPhase==player&&target.hp<player.hp) return false;
+				}
+			}
 		},
 		boss_gongshen:{
 			trigger:{global:'gameDrawAfter'},
