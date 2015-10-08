@@ -369,7 +369,6 @@ mode.chess={
 				"step 0"
 				if(!player.movable(0,1)&&!player.movable(0,-1)&&
 					!player.movable(1,0)&&!player.movable(-1,0)){
-					event.finish();
 					return;
 				}
 				event.switchToAuto=function(){
@@ -523,6 +522,117 @@ mode.chess={
 	game:{
 		minskin:true,
 		singleHandcard:true,
+		phaseLoopOrdered:function(player){
+			var next=game.createEvent('phaseLoop');
+			next.player=player;
+			next.content=function(){
+				"step 0"
+				var passed=false;
+				for(var i=0;i<game.players.length;i++){
+					if(!game.players[i].classList.contains('acted')){
+						if(game.players[i].side==player.side){
+							passed=true;break;
+						}
+					}
+				}
+				if(!passed){
+					var num1=0;
+					var next=null;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side==player.side){
+							game.players[i].classList.remove('acted');
+							num1++;
+						}
+						else if(!next){
+							next=game.players[i];
+						}
+					}
+					var num2=game.players.length-num1;
+					if(num2>num1){
+						if(next.side==game.me.side){
+							next=game.me;
+						}
+						var str;
+						if(num2-num1>1){
+							str='选择至多'+get.cnNumber(num2-num1)+'个已方角色各摸一张牌'
+						}
+						else{
+							str='选择一个已方角色摸一张牌'
+						}
+						var nevt=next.chooseTarget(str,function(card,player,target){
+							return target.side==next.side;
+						},[1,num2-num1]);
+						nevt.ai=function(target){
+							return Math.max(1,10-target.num('h'));
+						};
+						nevt.chessForceAll=true;
+					}
+					else{
+						event.goto(2);
+					}
+				}
+				else{
+					event.goto(2);
+				}
+				"step 1"
+				if(result.bool){
+					game.asyncDraw(result.targets);
+				}
+				"step 2"
+				var players=[];
+				var next=null;
+				if(player.side==game.me.side){
+					player=game.me;
+				}
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side==player.side){
+						if(!game.players[i].classList.contains('acted')){
+							players.push(game.players[i]);
+						}
+					}
+					else if(!next){
+						next=game.players[i];
+					}
+				}
+				if(players.length>1){
+					var nevt=player.chooseTarget('选择下一个行动的角色',function(card,player,target){
+						return target.side==player.side&&!target.classList.contains('acted');
+					},true);
+					nevt.chessForceAll=true;
+					nevt.ai=function(target){
+						var nj=target.num('j');
+						if(nj){
+							return -nj;
+						}
+						return Math.max(0,10-target.hp);
+					}
+				}
+				else{
+					event.decided=players[0];
+					event.player=next;
+				}
+				"step 3"
+				if(event.decided){
+					event.decided.phase();
+					event.justacted=event.decided;
+					delete event.decided;
+				}
+				else{
+					var current=result.targets[0];
+					current.phase();
+					event.justacted=current;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side!=player.side){
+							event.player=game.players[i];
+							break;
+						}
+					}
+				}
+				"step 4"
+				event.justacted.classList.add('acted');
+				event.goto(0);
+			}
+		},
 		isChessNeighbour:function(a,b){
 			if(a&&a.dataset){
 				a=a.dataset.position;
@@ -799,7 +909,12 @@ mode.chess={
 					}
 				}
 				game.gameDraw(p);
-				game.phaseLoop(p);
+				if(get.config('chess_ordered')){
+					game.phaseLoopOrdered(p);
+				}
+				else{
+					game.phaseLoop(p);
+				}
 				game.setChessInfo(p);
 			}
 		},
@@ -1414,6 +1529,10 @@ mode.chess={
 			delay:false,
 			preservecancel:true,
 			filter:function(event,player){
+				if(!player.movable(0,1)&&!player.movable(0,-1)&&
+					!player.movable(1,0)&&!player.movable(-1,0)){
+					return false;
+				}
 				var move=player.skills.contains('noactpunish')?2:1;
 				move=game.checkMod(player,move,'chessMove',player.get('s'));
 				return move>0;
@@ -1425,7 +1544,14 @@ mode.chess={
 				player.chooseToMove(move).phasing=true;
 				"step 1"
 				if(!result.bool){
-					player.getStat().skill._chessmove--;
+					var skill=player.getStat().skill;
+					skill._chessmove--;
+					if(typeof skill._chessmovetried=='number'){
+						skill._chessmovetried++;
+					}
+					else{
+						skill._chessmovetried=1;
+					}
 				}
 			},
 			ai:{
@@ -1464,6 +1590,9 @@ mode.chess={
 						return 1;
 					},
 					player:function(player){
+						if(player.getStat().skill._chessmovetried>=10){
+							return 0;
+						}
 						var x=lib.skill._chessmove.ai.result.playerx(player);
 						if(player.isMad()) return -x;
 						return x;
@@ -1629,6 +1758,7 @@ mode.chess={
 		chessscroll_speed_config:'边缘滚动速度',
 		chess_character_config:'战棋武将',
 		only_chess_character_config:'只用战棋武将',
+		chess_ordered_config:'指定行动顺序',
 
 		chess_caocao:'曹操',
 		chess_xunyu:'荀彧',
@@ -1797,9 +1927,18 @@ mode.chess={
 		'战棋模式':'<ul><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
 		'每人在出牌阶段有一次移动的机会，若一名角色在移动之前使用过指定其他角色为目标的牌，该回合可移动的最大距离为2，否则最大距离为1<li>'+
 		'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
-		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚'
+		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
+		'开启指定行动顺序后，双方将交替行动，在一方行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差'
 	},
 	config:['battle_number','ban_weak','free_choose','change_choice',
+	function(game,lib,get,ui){
+		var current=get.config('chess_ordered');
+		if(typeof current!=='boolean'){
+			game.saveConfig('chess_ordered',true,true);
+			current=true;
+		}
+		return ui.create.switcher('chess_ordered',current,ui.click.sidebar.local2);
+	},
 	function(game,lib,get,ui){
 		var current=get.config('chess_character');
 		if(typeof current!=='boolean'){

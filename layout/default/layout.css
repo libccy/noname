@@ -30,6 +30,8 @@ table{table-layout: fixed;}
 #handcards1,#handcards2{white-space:nowrap;overflow-x: scroll;overflow-y:hidden;display: block;text-align: center;}
 #handcards1{left: 0;top:calc(100% - 140px);}
 #handcards2{left: calc(50% + 120px);top:calc(100% - 140px);}
+#arena.single-handcard #handcards1{width: 100%;}
+#arena.single-handcard #handcards2{display: none;}
 #system{padding: 6px;width: calc(100% - 12px);white-space: nowrap;z-index: 3;}
 #system>div{height: 100%;position: relative;margin: 0;padding: 0;}
 #system>div:last-child{text-align: right;float:right}
@@ -203,6 +205,16 @@ margin-bottom: 5px;
 .control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;width: 0;opacity:0}
 .control>div{position: relative;padding: 3px;}
 /*--------角色--------*/
+.player>.avatar>.action{
+	margin: 5px;
+	font-family: 'huangcao';
+	font-size: 20px;
+	letter-spacing: -2px;
+	text-shadow: black 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px;
+}
+.player>.avatar:not(.glow2)>.action{opacity: 0}
+.player.fakeme{width:100px;height:120px;top:calc(100% - 140px)}
+.player.fakeme>.avatar{width: 100%;height: 100%;box-shadow: none;left: 0;top: 0}
 .player{z-index: 4;width: 240px;height: 120px;}
 .player.minskin{width:120px;}
 .player.replaceme{-webkit-animation:replaceme 0.5s}
@@ -734,6 +746,7 @@ div[data-nature='soil']{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
 }
 .glow2{
+	/*-webkit-animation:control_glow 4s infinite;*/
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
 }
 
@@ -757,6 +770,14 @@ div[data-nature='soil']{
 }
 
 /*--------动画--------*/
+@-webkit-keyframes control_glow{
+	0%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px}
+	30%{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px}
+	70%{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px}
+	100%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px}
+	/*from{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}
+	to{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important}*/
+}
 @-webkit-keyframes cardflip{
 	from {-webkit-transform:perspective(600px) rotateY(-90deg) translateX(52px)}
 	to{-webkit-transform:perspective(600px) rotateY(0deg) translateX(0)}

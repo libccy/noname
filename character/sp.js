@@ -1729,7 +1729,7 @@ character.sp={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(target.hp==target.maxHp) return [0,1];
+							if(target.hp==target.maxHp&&target.hasFriend()) return [0,1];
 						}
 						if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];
 					}

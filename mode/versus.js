@@ -324,13 +324,17 @@ mode.versus={
 				delete _status.list;
 				var num=lib.storage.number;
 				ui.create.players(num*2);
+				for(var i=0;i<game.players.length;i++){
+					ui.create.div('.action',game.players[i].node.avatar).innerHTML='行动';
+				}
 				if(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4){
 					ui.arena.dataset.number=parseInt(ui.arena.dataset.number)+1;
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].dataset.position=parseInt(game.players[i].dataset.position)+1;
 					}
-					ui.fakeme=ui.create.div('.player',ui.arena);
-					ui.fakeme.dataset.position=0;
+					game.singleHandcard=true;
+					ui.arena.classList.add('single-handcard');
+					ui.fakeme=ui.create.div('.player.fakeme');
 					ui.fakeme.line=lib.element.player.line;
 					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
 				}
@@ -820,7 +824,7 @@ mode.versus={
 				}
 				ui.versushighlight=game.me;
 				game.me.node.avatar.classList.add('glow2');
-				game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
+				// game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
 
 				var info=lib.character[name];
 				if(lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){

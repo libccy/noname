@@ -17,7 +17,8 @@ character.pack={
     swd:'轩辕剑',
     xswd:'轩辕剑·二',
     gujian:'古剑奇谭',
-    xianjian:'仙剑',
+    xianjian:'仙剑奇侠传',
+    xiake:'侠客风云传',
 };
 card.pack={
     standard:'标准',

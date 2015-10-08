@@ -175,7 +175,9 @@ mode.boss={
 				}
 				ui.create.me();
 				if(game.me!==boss){
-					ui.fakeme=ui.create.div('.player',ui.arena);
+					game.singleHandcard=true;
+					ui.arena.classList.add('single-handcard');
+					ui.fakeme=ui.create.div('.player');
 					ui.fakeme.dataset.position=0;
 					ui.fakeme.line=lib.element.player.line;
 					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
@@ -247,9 +249,15 @@ mode.boss={
 				event.bosslist.delete();
 
 				game.arrangePlayers();
+				for(var i=0;i<game.players.length;i++){
+					ui.create.div('.action',game.players[i].node.avatar).innerHTML='行动';
+				}
 				"step 3"
 				game.gameDraw(game.boss);
 				game.bossPhaseLoop();
+				setTimeout(function(){
+					ui.updateh(true);
+				},200);
 			}
 		},
 		bossPhaseLoop:function(){
@@ -323,11 +331,12 @@ mode.boss={
 				}
 				ui.versushighlight=game.me;
 				game.me.node.avatar.classList.add('glow2');
-				game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
+				// game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
 
 				ui.fakemebg.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
 				ui.fakemebg.style.backgroundSize='cover';
 			}
+			ui.updateh(true);
 		},
 		modeSwapPlayer:function(player){
 			game.swapControl(player);
@@ -485,7 +494,7 @@ mode.boss={
 	},
 	boss:{
 		boss_zhangjiao:{
-			loopType:2,
+			// loopType:2,
 		},
 		boss_caiwenji:{
 			loopType:2,

@@ -445,16 +445,23 @@ card.hearth={
 		shenenshu:{
 			fullskin:true,
 			enable:true,
-			usable:1,
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
 			type:'trick',
 			content:function(){
 				var num=player.num('h')-target.num('h');
-				if(num<1) num=1;
+				if(num<-3) num=-3;
 				if(num>3) num=3;
-				target.draw(num);
+				if(num>0){
+					target.draw(num);
+				}
+				else if(num<0){
+					player.draw(-num);
+				}
+				else{
+					game.asyncDraw([target,player]);
+				}
 			},
 			ai:{
 				order:10,
@@ -466,7 +473,18 @@ card.hearth={
 						if(!player.skills.contains('jizhi')){
 							nh--;
 						}
-						return Math.max(1,nh);
+						if(nh>0) return nh;
+						if(nh==0) return 1;
+						return 0;
+					},
+					player:function(player,target){
+						var nh=target.num('h')-player.num('h');
+						if(!player.skills.contains('jizhi')){
+							nh++;
+						}
+						if(nh>0) return nh;
+						if(nh==0) return 1;
+						return 0;
 					}
 				},
 				expose:0.2
@@ -589,7 +607,7 @@ card.hearth={
 		linghunzhihuo:'灵魂之火',
 		linghunzhihuo_info:'对一名角色造成一点火焰伤害，然后随机弃置一张手牌',
 		shenenshu:'神恩术',
-		shenenshu_info:'对一名其他角色使用，令其摸X张牌，直到手牌数与你相等（X不小于1且不大于3）',
+		shenenshu_info:'对一名其他角色使用，令你与目标中手牌数较少的摸若干张牌，直到手牌数相等（X不大于3），若手牌数已相等，改为你与目标各摸一张牌',
 		zhiliaobo:'治疗波',
 		zhiliaobo_info:'对一名受伤角色使用，令其回复一点体力，若其仍处于受伤状态，则进行一次判定，若结果为红色则再回复一点体力',
 		yuansuhuimie:'元素毁灭',

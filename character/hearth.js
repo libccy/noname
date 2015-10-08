@@ -174,7 +174,7 @@ character.hearth={
 			trigger:{global:'dieAfter'},
 			forced:true,
 			filter:function(event,player){
-				return !event.player.storage.bingshi;
+				return !event.player.storage.bingshi&&event.player.skills.contains('bingshi');
 			},
 			content:function(){
 				'step 0'
@@ -385,7 +385,11 @@ character.hearth={
 			},
 			content:function(){
 				var card=cards[0];
-				player.gain(game.createCard('liuxinghuoyu',get.suit(card),get.number(card)),'gain2');
+				var card2=get.cardPile('liuxinghuoyu');
+				if(!card2){
+					card2=game.createCard('liuxinghuoyu',get.suit(card),get.number(card));
+				}
+				player.gain(card2,'gain2');
 			},
 			ai:{
 				order:9,
@@ -1467,6 +1471,9 @@ character.hearth={
 							player.addSkill('tuteng1');
 						}
 						else{
+							if(rand.length>1){
+								rand.remove('tuteng1');
+							}
 							player.addSkill(rand.randomGet());
 						}
 						if(rand2.length>=3){

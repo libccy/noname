@@ -1105,6 +1105,9 @@ character.refresh={
 				}
 				return target.num('he')>0;
 			},
+			filter:function(event,player){
+				return player.num('he')>0;
+			},
 			filterCard:true,
 			position:'he',
 			selectTarget:[1,Infinity],

@@ -6056,7 +6056,7 @@
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<game.players.length;i++){
 						var nochess=true;
-						if(lib.config.mode=='chess'){
+						if(lib.config.mode=='chess'&&!event.chessForceAll){
 							if(player&&get.distance(player,game.players[i],'pure')>7){
 								nochess=false;
 							}

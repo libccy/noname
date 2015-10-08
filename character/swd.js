@@ -4370,7 +4370,7 @@ character.swd={
 			frequent:true,
 			content:function(){
 				"step 0"
-				event.cards=get.cards(Math.max(3,get.cardCount(true,player)+1));
+				event.cards=get.cards(3);
 				player.showCards(event.cards);
 				"step 1"
 				for(var i=0;i<cards.length;i++){
@@ -7719,7 +7719,7 @@ character.swd={
 		miejing:'灭境',
 		miejing_info:'限制技，你可以弃置所有黑色牌，然后令所有其他角色受到一点雷电伤害',
 		lingxin:'灵心',
-		lingxin_info:'回合结束阶段，你可以亮出牌堆顶的X+1张牌，然后获得其中的红桃牌，X为你回合内使用的牌数且至少为2',
+		lingxin_info:'回合结束阶段，你可以亮出牌堆顶的三张牌，然后获得其中的红桃牌',
 		fushen:'附身',
 		fushen_info:'回合开始前，你可以将自己移出游戏，并代替另一名角色进行一回合，然后流失一点体力',
 		fushen2:'附身',
