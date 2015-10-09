@@ -1,12 +1,35 @@
+'use strict';
 character.xiake={
     character:{
 		// xk_dongfangweiming:['male','shu',4,[],['fullskin']],
-		xk_guyuexuan:['male','qun',3,['rouquan','gzhenji'],['fullskin']],
-		// xk_jinji:['male','shu',4,[],['fullskin']],
-        // xk_shenxiangyun:['female','wei',3,[],['fullskin']],
+		xk_guyuexuan:['male','qun',4,['rouquan','gzhenji'],['fullskin']],
+		xk_jinji:['male','shu',4,['xueren','lianpo'],['fullskin']],
+        // xk_shenxiangyun:['female','wei',3,['zhenjiu'],['fullskin']],
 		xk_fujianhan:['male','qun',4,['zuijian','zitong'],['fullskin']],
     },
     skill:{
+        xueren:{
+            trigger:{source:'damageEnd'},
+            filter:function(event,player){
+                return event.parent.name!='xueren'&&event.player.isAlive();
+            },
+            prompt:function(event,player){
+                return '是否对'+get.translation(event.player)+'发动【血刃】？';
+            },
+            check:function(event,player){
+                if(ai.get.damageEffect(event.player,player,player)>0&&
+                    ai.get.attitude(player,event.player)<0){
+                    return player.hp>event.player.hp&&player.hp>=2;
+                }
+                return false;
+            },
+            content:function(){
+                game.delay();
+                player.line(trigger.player,'green');
+                player.loseHp();
+                trigger.player.damage();
+            }
+        },
         rouquan:{
             mod:{
 				selectTarget:function(card,player,range){
@@ -117,6 +140,8 @@ character.xiake={
 		xk_jinji:'荆棘',
         xk_shenxiangyun:'沈湘芸',
         xk_fujianhan:'傅剑寒',
+        xueren:'血刃',
+        xueren_info:'每当你造成一次伤害，你可流失一点体力并对目标再造成一点伤害',
         gzhenji:'震击',
         gzhenji_info:'你使用杀造成伤害后，可以摸一张牌，并且本回合内可以额外使用一张杀',
         rouquan:'柔拳',

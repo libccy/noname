@@ -493,7 +493,6 @@ card.hearth={
 		zhiliaobo:{
 			fullskin:true,
 			enable:true,
-			usable:1,
 			filterTarget:function(card,player,target){
 				return target.hp<target.maxHp;
 			},

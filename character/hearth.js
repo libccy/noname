@@ -76,14 +76,14 @@ character.hearth={
 			filter:function(event,player){
 				if(event.type!='dying') return false;
 				if(player!=_status.dying) return false;
-				if(player.storage.chongsheng==3) return false;
+				if(player.storage.chongsheng==2) return false;
 			},
 			content:function(){
-				player.hp=Math.min(3-player.storage.chongsheng,player.maxHp);
+				player.hp=Math.min(2-player.storage.chongsheng,player.maxHp);
 				player.discard(player.get('hej'));
-				player.draw(3-player.storage.chongsheng);
+				player.draw(2-player.storage.chongsheng);
 				player.storage.chongsheng++;
-				if(player.storage.chongsheng==3){
+				if(player.storage.chongsheng==2){
 					player.unmarkSkill('chongsheng');
 				}
 				if(player.classList.contains('linked')) player.link();
@@ -91,7 +91,7 @@ character.hearth={
 			},
 			ai:{
 				skillTagFilter:function(player){
-					if(player.storage.chongsheng==3) return false;
+					if(player.storage.chongsheng==2) return false;
 					if(player.hp>0) return false;
 				},
 				save:true,
@@ -99,7 +99,7 @@ character.hearth={
 					player:10
 				},
 				threaten:function(player,target){
-					if(target.storage.chongsheng<3) return 0.6;
+					if(target.storage.chongsheng<2) return 0.6;
 				}
 			},
 			intro:{
@@ -1821,7 +1821,7 @@ character.hearth={
 		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等',
 		chongsheng:'重生',
 		chongsheng_bg:'生',
-		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至3-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动3次',
+		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动2次',
 		s_tuteng:'滋养',
 		s_tuteng_info:'在你首个回合开始时，你获得三个随机图腾；在此后的每个回合开始阶段，你随机替换其中的一个图腾',
 		guozai:'过载',
