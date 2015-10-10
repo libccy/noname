@@ -2827,14 +2827,17 @@ character.swd={
 				player.draw(2);
 			},
 		},
-		swdqinyin:{
-			trigger:{player:'phaseEnd'},
+		qinyin:{
+			trigger:{player:'phaseDiscardEnd'},
 			direct:true,
 			filter:function(event,player){
-				return !player.getStat('damage');
+				return event.cards&&event.cards.length>1
 			},
 			content:function(){
 				"step 0"
+				if(typeof event.count!='number'){
+					event.count=trigger.cards.length-1;
+				}
 				var recover=0,lose=0;
 				for(var i=0;i<game.players.length;i++){
 					if(!game.players[i].isOut()){
@@ -2867,7 +2870,7 @@ character.swd={
 					}
 				}
 				player.chooseControl('失去体力','回复体力','cancel',
-				ui.create.dialog('是否发动【琴音】','hidden')).ai=function(){
+				ui.create.dialog('是否发动【琴音】（剩余'+get.cnNumber(event.count)+'次）','hidden')).ai=function(){
 					// console.log(lose,recover);
 					if(lose>recover&&lose>0) return 0;
 					if(lose<recover&&recover>0) return 1;
@@ -2894,6 +2897,11 @@ character.swd={
 					}
 					event.num++;
 					event.redo();
+				}
+				"step 3"
+				if(event.count>1){
+					event.count--;
+					event.goto(0);
 				}
 			},
 			ai:{
@@ -7922,7 +7930,7 @@ character.swd={
 		yuhuo:'浴火',
 		huanjian_info:'你可以将一张黑色手牌当作毒箭使用',
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
-		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每合合限发动一次',
+		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
 		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，然后流失一点体力',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',

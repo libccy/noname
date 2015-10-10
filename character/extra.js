@@ -769,14 +769,6 @@ character.extra={
 				}
 			}
 		},
-		qinyin:{
-			inherit:'swdqinyin',
-			trigger:{player:'phaseDiscardEnd'},
-			direct:true,
-			filter:function(event,player){
-				return event.cards&&event.cards.length>1
-			},
-		},
 		longhun:{
 			group:['longhun1','longhun2','longhun3','longhun4'],
 			ai:{

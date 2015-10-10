@@ -334,7 +334,7 @@ mode.versus={
 					}
 					game.singleHandcard=true;
 					ui.arena.classList.add('single-handcard');
-					ui.fakeme=ui.create.div('.player.fakeme');
+					ui.fakeme=ui.create.div('.player.controlfakeme');
 					ui.fakeme.line=lib.element.player.line;
 					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
 				}

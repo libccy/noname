@@ -8202,17 +8202,17 @@
 
 				var node2=ui.create.div('#paused2',node);
 				node2.innerHTML='已暂停';
-				node2.listen(function(){
-					_status.clicked=true;
-					if(ui.sidebar.classList.contains('hidden')){
-						ui.sidebar.show();
-						ui.sidebar3.show();
-					}
-					else{
-						ui.sidebar.hide();
-						ui.sidebar3.hide();
-					}
-				});
+				// node2.listen(function(){
+				// 	_status.clicked=true;
+				// 	if(ui.sidebar.classList.contains('hidden')){
+				// 		ui.sidebar.show();
+				// 		ui.sidebar3.show();
+				// 	}
+				// 	else{
+				// 		ui.sidebar.hide();
+				// 		ui.sidebar3.hide();
+				// 	}
+				// });
 				return node;
 			},
 			button:function(item,type,position,noclick){

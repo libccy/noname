@@ -177,7 +177,7 @@ mode.boss={
 				if(game.me!==boss){
 					game.singleHandcard=true;
 					ui.arena.classList.add('single-handcard');
-					ui.fakeme=ui.create.div('.player');
+					ui.fakeme=ui.create.div('.player.controlfakeme');
 					ui.fakeme.dataset.position=0;
 					ui.fakeme.line=lib.element.player.line;
 					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();

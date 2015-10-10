@@ -213,8 +213,8 @@ margin-bottom: 5px;
 	text-shadow: black 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px;
 }
 .player>.avatar:not(.glow2)>.action{opacity: 0}
-.player.fakeme{width:100px;height:120px;top:calc(100% - 140px)}
-.player.fakeme>.avatar{width: 100%;height: 100%;box-shadow: none;left: 0;top: 0}
+.player.controlfakeme{width:100px;height:120px;top:calc(100% - 140px)}
+.player.controlfakeme>.avatar{width: 100%;height: 100%;box-shadow: none;left: 0;top: 0}
 .player{z-index: 4;width: 240px;height: 120px;}
 .player.minskin{width:120px;}
 .player.replaceme{-webkit-animation:replaceme 0.5s}

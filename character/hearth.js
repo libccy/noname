@@ -174,22 +174,13 @@ character.hearth={
 			trigger:{global:'dieAfter'},
 			forced:true,
 			filter:function(event,player){
-				return !event.player.storage.bingshi&&event.player.skills.contains('bingshi');
+				return event.player.skills.contains('bingshi');
 			},
 			content:function(){
-				'step 0'
-				event.targets=get.players(trigger.player);
-				event.targets.remove(trigger.player);
-				trigger.player.storage.bingshi=true;
-				'step 1'
-				if(event.targets.length){
-					var current=event.targets.shift();
-					trigger.player.line(current,'thunder');
-					current.damage('nosource','thunder').animate=false;
-					current.$damage(trigger.player);
-					current.$thunder();
-					event.redo();
-				}
+				trigger.player.line(player,'thunder');
+				player.damage('nosource','thunder').animate=false;
+				player.$damage(trigger.player);
+				player.$thunder();
 			}
 		},
 		huanwu:{
