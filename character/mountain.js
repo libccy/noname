@@ -862,7 +862,7 @@ character.mountain={
 			},
 			group:['huashen1','huashen2'],
 			intro:{
-				content:function(storage){
+				content:function(storage,player){
 					var str='';
 					var slist=storage.owned;
 					var list=[];
@@ -875,7 +875,26 @@ character.mountain={
 							str+='、'+get.translation(list[i]);
 						}
 					}
+					var skill=player.additionalSkills.huashen;
+					if(skill){
+						str+='<p>当前技能：'+get.translation(skill);
+					}
 					return str;
+				},
+				mark:function(dialog,content,player){
+					var slist=content.owned;
+					var list=[];
+					for(var i in slist){
+						list.push(i);
+					}
+					if(list.length){
+						dialog.addSmall([list,'character']);
+					}
+					var skill=player.additionalSkills.huashen;
+					if(skill){
+						dialog.add('<div><div class="skill">【'+get.translation(skill)+
+						'】</div><div>'+lib.translate[skill+'_info']+'</div></div>');
+					}
 				}
 			},
 			mark:true
@@ -899,9 +918,9 @@ character.mountain={
 					}
 				}
 				for(var i=0;i<game.players.length;i++){
-					delete player.storage.huashen.list[game.players[i].name];
-					delete player.storage.huashen.list[game.players[i].name1];
-					delete player.storage.huashen.list[game.players[i].name2];
+					player.storage.huashen.list.remove([game.players[i].name]);
+					player.storage.huashen.list.remove([game.players[i].name1]);
+					player.storage.huashen.list.remove([game.players[i].name2]);
 				}
 				player.storage.huashen.unowned=player.storage.huashen.list.slice(0);
 				player.storage.huashen.unowned.sort(lib.sort.random);
@@ -926,17 +945,39 @@ character.mountain={
 				}
 				if(event.isMine()){
 					event.dialog=ui.create.dialog('选择获得一项技能',[list,'character']);
-					event.control=ui.create.control(['cancel']);
+					if(trigger.name=='game'){
+						event.control=ui.create.control();
+					}
+					else{
+						event.control=ui.create.control(['cancel']);
+					}
 					event.clickControl=function(link){
 						if(link!='cancel'){
-							if(player.storage.huashen.current){
-								player.removeSkill(player.storage.huashen.current);
-								delete player.storage.huashen.current;
+							var currentname=event.dialog.querySelector('.selected.button').link;
+							var mark=player.marks.huashen;
+							if(trigger.name=='game'){
+								mark.hide();
+								mark.style.webkitTransform='scale(0.8)';
+								mark.style.transition='all 0.3s';
+								setTimeout(function(){
+									mark.style.transition='all 0s';
+									ui.refresh(mark);
+									mark.setBackground(currentname,'character');
+									if(mark.firstChild){
+										mark.firstChild.remove();
+									}
+									setTimeout(function(){
+										mark.style.transition='';
+										mark.show();
+										mark.style.webkitTransform='';
+									},50);
+								},500);
 							}
-							if(!player.skills.contains(link)){
-								player.storage.huashen.current=link;
+							else{
+								mark.setBackground(currentname,'character');
 							}
-							player.addSkill(link);
+
+							player.additionalSkills.huashen=link;
 							player.logSkill('huashen2');
 							game.log(get.translation(player)+'获得技能'+get.translation(link));
 							player.popup(link);
@@ -965,7 +1006,12 @@ character.mountain={
 					event.custom.replace.button=function(button){
 						if(button.classList.contains('selected')){
 							button.classList.remove('selected');
-							event.control.replace(['cancel']);
+							if(trigger.name=='game'){
+								event.control.style.opacity=0;
+							}
+							else{
+								event.control.replace(['cancel']);
+							}
 						}
 						else{
 							for(var i=0;i<event.dialog.buttons.length;i++){
@@ -973,6 +1019,16 @@ character.mountain={
 							}
 							button.classList.add('selected');
 							event.control.replace(slist[button.link]);
+							if(trigger.name=='game'&&getComputedStyle(event.control).opacity==0){
+								event.control.style.transition='opacity 0.5s';
+								ui.refresh(event.control);
+								event.control.style.opacity=1;
+								event.control.style.transition='';
+								ui.refresh(event.control);
+							}
+							else{
+								event.control.style.opacity=1;
+							}
 						}
 						event.control.custom=event.clickControl;
 					}
@@ -980,7 +1036,12 @@ character.mountain={
 						for(var i=0;i<event.dialog.buttons.length;i++){
 							if(event.dialog.buttons[i].classList.contains('selected')){
 								event.dialog.buttons[i].classList.remove('selected');
-								event.control.replace(['cancel']);
+								if(trigger.name=='game'){
+									event.control.style.opacity=0;
+								}
+								else{
+									event.control.replace(['cancel']);
+								}
 								event.control.custom=event.clickControl;
 								return;
 							}

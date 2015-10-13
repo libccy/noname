@@ -67,7 +67,6 @@ mode.chess={
 				if(y>=ui.chessheight){
 					y=ui.chessheight-1;
 				}
-				// console.log(x,y);
 
 				var pos=y*ui.chesswidth+x;
 				if(!lib.posmap[pos]){
@@ -743,7 +742,19 @@ mode.chess={
 				ui.chess.appendChild(ui.canvas2);
 				ui.ctx2=ui.canvas2.getContext('2d');
 				game.me=ui.create.player();
-				game.chooseCharacter();
+				switch(get.config('chess_mode')){
+					case 'leader':{
+						game.leaderView();
+						break;
+					}
+					case 'combat':{
+						game.chooseCharacter();
+						break;
+					}
+					default:{
+						game.chooseCharacter();
+					}
+				}
 				"step 1"
 				ui.arena.classList.add('chess');
 				var num=Math.round((_status.mylist.length+_status.enemylist.length)/2);
@@ -942,6 +953,12 @@ mode.chess={
 				p=p.next;
 			}
 		},
+		initLeaderSave:function(save){
+			game.save(save,{
+				money:0,
+				character:[]
+			});
+		},
 		clickChessInfo:function(e){
 			if(this.link.isAlive()){
 				this.link.chessFocus();
@@ -951,6 +968,89 @@ mode.chess={
 				}
 				// ui.click.target.call(this.link,e);
 				e.stopPropagation();
+			}
+		},
+		leaderView:function(){
+			var next=game.createEvent('leaderView',false);
+			next.content=function(){
+				'step 0'
+				game.characterInfo={
+					free:[
+						'caocao',
+						'simayi',
+						'xiahoudun',
+						'zhangliao',
+						'xuzhu',
+						'guojia',
+						'zhenji',
+						'liubei',
+						'guanyu',
+						'zhangfei',
+						'zhugeliang',
+						'zhaoyun',
+						'machao',
+						'huangyueying',
+						'sunquan',
+						'ganning',
+						'lvmeng',
+						'huanggai',
+						'zhouyu',
+						'daqiao',
+						'luxun',
+						'sunshangxiang',
+						'huatuo',
+						'lvbu',
+						'diaochan'
+					],
+					rare:[
+						'diy_xuhuang',
+						'diy_zhenji',
+						're_huangyueying',
+						'diy_lukang',
+						'zhugeliangwolong',
+						'taishici',
+						'gjqt_xiayize',
+						'gjqt_fengqingxue',
+						'gjqt_fanglansheng',
+						'gjqt_yuewuyi',
+					],
+					epic:[
+						'diy_caiwenji',
+						'old_zhonghui',
+						'diy_zhouyu',
+						'xunyu',
+						'gjqt_bailitusu',
+						'gjqt_aruan',
+					],
+					legend:[
+						'shen_guanyu',
+						'shen_zhaoyun',
+						'shen_zhugeliang',
+						'shen_lvmeng',
+						'shen_zhouyu',
+						'shen_simayi',
+						'shen_caocao',
+						'shen_lvbu',
+					],
+					common:[],
+				};
+				for(var i in lib.character){
+					if(!game.characterInfo.free.contains('i')&&
+					!game.characterInfo.rare.contains('i')&&
+					!game.characterInfo.epic.contains('i')&&
+					!game.characterInfo.legend.contains('i')){
+						game.characterInfo.common.push(i);
+					}
+				}
+				var save=get.config('chess_leader_save');
+				if(!save){
+					save='save1';
+				}
+				if(!lib.storage[save]){
+					game.initLeaderSave(save);
+				}
+				game.pause();
+				'step 1'
 			}
 		},
 		chooseCharacter:function(){
@@ -1755,10 +1855,20 @@ mode.chess={
 		trueColor:"zhu",
 		falseColor:"wei",
 		_chessmove:'移动',
+		leader:'统率',
+		combat:'对阵',
 		chessscroll_speed_config:'边缘滚动速度',
 		chess_character_config:'战棋武将',
 		only_chess_character_config:'只用战棋武将',
 		chess_ordered_config:'指定行动顺序',
+		chess_mode_config:'游戏模式',
+		chess_leader_save_config:'选择历程',
+		chess_leader_clear_config:'清除进度',
+		save1:'一',
+		save2:'二',
+		save3:'三',
+		save4:'四',
+		save5:'五',
 
 		chess_caocao:'曹操',
 		chess_xunyu:'荀彧',
@@ -1814,7 +1924,7 @@ mode.chess={
 		guanchuan_info:'当你使用杀指定惟一的目标后，可将攻击射线内的其他角色也加入目标',
 
 		boss_qiangzheng:'强征',
-		boss_qiangzheng_info:'锁定技，回合结束阶段，你获得每个敌方角色的一张手牌',
+		boss_qiangzheng_info:'锁定技，回合结束阶段，你获得每个其他角色的一张手牌',
 		boss_baolin:'暴凌',
 		boss_moyan:'魔焰',
 		boss_moyan_info:'锁定技，回合结束阶段，你对场上所有角色造成一点火焰伤害',
@@ -1930,8 +2040,78 @@ mode.chess={
 		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
 		'开启指定行动顺序后，双方将交替行动，在一方行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差'
 	},
-	config:['battle_number','ban_weak','free_choose','change_choice',
+	config:[
 	function(game,lib,get,ui){
+		var current=get.config('chess_mode');
+		if(typeof current!=='string'){
+			game.saveConfig('chess_mode','combat',true);
+			current='combat';
+		}
+		return ui.create.switcher('chess_mode',['combat','leader'],current,function(){
+			ui.click.sidebar.local.apply(this,arguments);
+			window.location.reload();
+		});
+	},
+	function(game,lib,get,ui){
+		if(get.config('chess_mode')!='leader') return;
+		var current=get.config('chess_leader_save');
+		if(typeof current!=='string'){
+			current='save1';
+			game.saveConfig('chess_leader_save',current,true);
+		}
+		return ui.create.switcher('chess_leader_save',['save1','save2','save3','save4','save5'],current,function(){
+			ui.click.sidebar.local.apply(this,arguments);
+			window.location.reload();
+		});
+	},
+	function(game,lib,get,ui){
+		if(get.config('chess_mode')!='leader') return;
+		var switcher=ui.create.line('清除进度',function(){
+			var node=this;
+			if(node._clearing){
+				game.save(get.config('chess_leader_save'),null);
+				window.location.reload();
+				return;
+			}
+			node._clearing=true;
+			node.innerHTML='单击以确认 (3)';
+			setTimeout(function(){
+				node.innerHTML='单击以确认 (2)';
+				setTimeout(function(){
+					node.innerHTML='单击以确认 (1)';
+					setTimeout(function(){
+						node.innerHTML='清除进度';
+						delete node._clearing;
+					},1000);
+				},1000);
+			},1000);
+		});
+		return switcher;
+	},
+	function(){
+		if(get.config('chess_mode')!='leader'){
+			return 'battle_number';
+		}
+	},
+	function(){
+		if(get.config('chess_mode')!='leader'){
+			return 'ban_weak';
+		}
+	},
+	function(){
+		if(get.config('chess_mode')!='leader'){
+			return 'free_choose';
+		}
+	},
+	function(){
+		if(get.config('chess_mode')!='leader'){
+			return 'change_choice';
+		}
+	},
+	function(game,lib,get,ui){
+		if(get.config('chess_mode')=='leader'){
+			return;
+		}
 		var current=get.config('chess_ordered');
 		if(typeof current!=='boolean'){
 			game.saveConfig('chess_ordered',true,true);
@@ -1940,6 +2120,9 @@ mode.chess={
 		return ui.create.switcher('chess_ordered',current,ui.click.sidebar.local2);
 	},
 	function(game,lib,get,ui){
+		if(get.config('chess_mode')=='leader'){
+			return;
+		}
 		var current=get.config('chess_character');
 		if(typeof current!=='boolean'){
 			game.saveConfig('chess_character',true,true);

@@ -4865,7 +4865,13 @@
 					if(this.childNodes.length){
 						var width=0;
 						for(i=0;i<this.childNodes.length;i++) width+=this.childNodes[i].offsetWidth;
+						this.style.transition='width 0.2s';
+						ui.refresh(this);
 						this.style.width=width+'px';
+						var that=this;
+						setTimeout(function(){
+							that.style.transition='';
+						},200);
 					}
 					return this;
 				}
@@ -5284,7 +5290,7 @@
 		linked:['fire','thunder'],
 	};
 	var game={
-		version:0.912,
+		version:1.31,
 		playAudio:function(){
 			var str='';
 			for(var i=0;i<arguments.length;i++){
@@ -7449,6 +7455,18 @@
 					}
 				}));
 				for(i=0;i<lib.config.current_mode.length;i++){
+					if(typeof lib.config.current_mode[i]==='function'){
+						var result=lib.config.current_mode[i](game,lib,get,ui);
+						if(typeof result=='string'){
+							lib.config.current_mode[i]=result;
+						}
+						else{
+							if(get.objtype(result)=='div'){
+								modeconfig.push(result);
+							}
+							continue;
+						}
+					}
 					switch(lib.config.current_mode[i]){
 						case 'difficulty':
 							modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.local));break;
@@ -7502,9 +7520,6 @@
 							if(Array.isArray(lib.config.current_mode[i])){
 								modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
 							}
-							else if(typeof lib.config.current_mode[i]==='function'){
-								modeconfig.push(lib.config.current_mode[i](game,lib,get,ui));
-							}
 							else{
 								modeconfig.push(ui.create.div('.placeholder'));
 							}
@@ -7518,7 +7533,6 @@
 					else if(i=='initshow_draw'&&lib.config.current_mode[i]==true){
 
 					}
-
 				}
 				if(lib.config.modeconfig){
 					for(i=0;i<modeconfig.length;i++){
@@ -7553,7 +7567,7 @@
 				gameconfig.push(ui.hoverhandcardconfig);
 				if(!lib.config.hover_all) ui.hoverhandcardconfig.classList.add('disabled');
 				gameconfig.push(ui.create.switcher('touchscreen',lib.config.touchscreen,ui.click.sidebar.touchscreen));
-				gameconfig.push(ui.create.switcher('no_ios_zoom',lib.config.no_ios_zoom,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.switcher('no_ios_zoom',lib.config.no_ios_zoom,ui.click.sidebar.global));
 				ui.handcardmousewheel=ui.create.switcher('mousewheel',lib.config.mousewheel,ui.click.sidebar.mousewheel);
 				if(lib.config.touchscreen) ui.handcardmousewheel.classList.add('disabled');
 				gameconfig.push(ui.handcardmousewheel);
@@ -7578,7 +7592,7 @@
 					case '很大':ui.window.style.zoom=1.1;break;
 					default:ui.window.style.zoom=1;
 				}
-				if(lib.config.no_ios_zoom){
+				if(true||lib.config.no_ios_zoom){
 					var meta=document.createElement('meta');
 					meta.name='viewport';
 					meta.content="user-scalable=0";
@@ -11632,13 +11646,14 @@
 			this.classList.remove('removing');
 			return this;
 		};
-		HTMLDivElement.prototype.setBackground=function(name,type){
+		HTMLDivElement.prototype.setBackground=function(name,type,ext){
 			var src;
+			ext=ext||'.jpg';
 			if(type){
-				src='image/'+type+'/default/'+name+'.jpg';
+				src='image/'+type+'/default/'+name+ext;
 			}
 			else{
-				src='image/'+name+'.jpg';
+				src='image/'+name+ext;
 			}
 			this.style.backgroundImage="url('"+src+"')";
 			this.style.backgroundSize="cover";
@@ -12130,7 +12145,11 @@
 				if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
 				for(j in character[i]){
 					if(j=='mode'||j=='forbid') continue;
-					if(j=='character'&&!lib.config.characters.contains(i)) continue;
+					if(j=='character'&&!lib.config.characters.contains(i)){
+						if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
+							continue;
+						}
+					}
 					for(k in character[i][j]){
 						if(j=='character'){
 							if(!character[i][j][k][4]){

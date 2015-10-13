@@ -651,7 +651,7 @@ character.gujian={
 					player.logSkill('qianjun',targets);
 					for(var i=0;i<targets.length;i++){
 						trigger.targets.add(targets[i]);
-						targets[i].classList.add('selected');
+						// targets[i].classList.add('selected');
 					}
 				}
 			}

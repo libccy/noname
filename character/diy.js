@@ -5,7 +5,7 @@ character.diy={
 		diy_feishi:['male','shu',3,['shuaiyan','moshou'],['fullskin']],
 		diy_liuyan:['male','shu',3,['juedao','geju'],['fullskin']],
 		// diy_luxun:['male','wu',3,['shaoying','zonghuo'],['fullskin']],
-		// diy_yuji:['male','qun',3,['diyguhuo','diychanyuan'],['fullskin']],
+		diy_yuji:['male','qun',3,['diyguhuo','diychanyuan'],['fullskin']],
 		// diy_zhouyu:['male','wu',3,['jieyan','honglian']],
 		diy_zhouyu:['male','wu',3,['xiongzi','yaliang'],['fullskin']],
 		diy_caiwenji:['female','qun',3,['beige','guihan'],['fullskin']],
