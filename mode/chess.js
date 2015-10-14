@@ -974,74 +974,6 @@ mode.chess={
 			var next=game.createEvent('leaderView',false);
 			next.content=function(){
 				'step 0'
-				game.characterInfo={
-					free:[
-						'caocao',
-						'simayi',
-						'xiahoudun',
-						'zhangliao',
-						'xuzhu',
-						'guojia',
-						'zhenji',
-						'liubei',
-						'guanyu',
-						'zhangfei',
-						'zhugeliang',
-						'zhaoyun',
-						'machao',
-						'huangyueying',
-						'sunquan',
-						'ganning',
-						'lvmeng',
-						'huanggai',
-						'zhouyu',
-						'daqiao',
-						'luxun',
-						'sunshangxiang',
-						'huatuo',
-						'lvbu',
-						'diaochan'
-					],
-					rare:[
-						'diy_xuhuang',
-						'diy_zhenji',
-						're_huangyueying',
-						'diy_lukang',
-						'zhugeliangwolong',
-						'taishici',
-						'gjqt_xiayize',
-						'gjqt_fengqingxue',
-						'gjqt_fanglansheng',
-						'gjqt_yuewuyi',
-					],
-					epic:[
-						'diy_caiwenji',
-						'old_zhonghui',
-						'diy_zhouyu',
-						'xunyu',
-						'gjqt_bailitusu',
-						'gjqt_aruan',
-					],
-					legend:[
-						'shen_guanyu',
-						'shen_zhaoyun',
-						'shen_zhugeliang',
-						'shen_lvmeng',
-						'shen_zhouyu',
-						'shen_simayi',
-						'shen_caocao',
-						'shen_lvbu',
-					],
-					common:[],
-				};
-				for(var i in lib.character){
-					if(!game.characterInfo.free.contains('i')&&
-					!game.characterInfo.rare.contains('i')&&
-					!game.characterInfo.epic.contains('i')&&
-					!game.characterInfo.legend.contains('i')){
-						game.characterInfo.common.push(i);
-					}
-				}
 				var save=get.config('chess_leader_save');
 				if(!save){
 					save='save1';
@@ -1051,6 +983,7 @@ mode.chess={
 				}
 				game.pause();
 				'step 1'
+				console.log(1);
 			}
 		},
 		chooseCharacter:function(){

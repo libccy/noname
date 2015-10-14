@@ -5824,25 +5824,21 @@ character.swd={
 			trigger:{source:'damageEnd'},
 			priority:1,
 			forced:true,
-			filter:function(event,player){
-				return player.hp<player.maxHp;
-			},
 			content:function(){
 				"step 0"
-				player.recover();
-				event.finish();
-				"step 1"
 				if(player.hp<player.maxHp){
-					player.chooseControl('draw_card','recover_hp',function(event,target){
-						if(player.num('h')>=player.hp) return 'recover_hp';
-						return 'draw_card';
-					});
+					player.recover();
+					event.finish();
+					// player.chooseControl('draw_card','recover_hp',function(event,target){
+					// 	if(player.num('h')>=player.hp) return 'recover_hp';
+					// 	return 'draw_card';
+					// });
 				}
 				else{
 					player.draw();
 					event.finish();
 				}
-				"step 2"
+				"step 1"
 				if(result.control=='draw_card'){
 					player.draw();
 				}
@@ -7710,7 +7706,7 @@ character.swd={
 		daofa:'道法',
 		daofa_info:'每当有一名其他角色造成伤害，你可以令其弃置一张牌',
 		xiaomoyu:'魔愈',
-		xiaomoyu_info:'锁定技，每当你造成一次伤害，你回复一点体力',
+		xiaomoyu_info:'锁定技，每当你造成一次伤害，你回复一点体力，若你没有受伤，则改为摸一张牌',
 		yihua:'移花',
 		yihua_info:'每当你成为其他角色的某张卡牌的惟一目标时，你可以弃置两张手牌，将使用者与目标对调',
 		youyin:'游吟',

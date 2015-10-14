@@ -2989,16 +2989,17 @@ character.yijiang={
 			init:function(player){
 				player.storage.zbaijiang=false;
 			},
-			intro:{
-				content:'limited'
-			},
+			// intro:{
+			// 	content:'limited'
+			// },
 			filter:function(event,player){
-				return !player.storage.zbaijiang&&player.num('e')>=3;
+				return !player.storage.zbaijiang&&player.num('e')>=2;
 			},
 			content:function(){
 				player.storage.zbaijiang=true;
 				player.removeSkill('zzhenggong');
 				player.removeSkill('zquanji');
+				player.removeSkill('zbaijiang');
 				player.addSkill('zyexin');
 				player.addSkill('zzili');
 				player.gainMaxHp();
@@ -3069,10 +3070,11 @@ character.yijiang={
 				player.storage.zzili=true;
 				player.loseMaxHp();
 				player.addSkill('zpaiyi');
+				player.removeSkill('zzili');
 			},
-			intro:{
-				content:'limited'
-			}
+			// intro:{
+			// 	content:'limited'
+			// }
 		},
 		zpaiyi:{
 			trigger:{player:'phaseEnd'},
@@ -3181,7 +3183,7 @@ character.yijiang={
 		zquanji:'权计',
 		zquanji_info:'其他角色的回合即将开始时，你可以与该角色进行一次拼点。若你赢，该角色跳过回合开始阶段及判定阶段。',
 		zbaijiang:'拜将',
-		zbaijiang_info:'觉醒技，回合开始阶段若你的装备区的装备牌为三张或更多时，你必须增加1点体力上限，失去技能【权计】和【争功】并获得技能【野心】。',
+		zbaijiang_info:'觉醒技，回合开始阶段若你的装备区的装备牌为两张或更多时，你必须增加1点体力上限，失去技能【权计】和【争功】并获得技能【野心】和【自立】。',
 		zyexin:'野心',
 		zyexin2:'野心',
 		zyexin_info:'你每造成或受到一次伤害，可将牌堆顶的一张牌放置在武将牌上，称为“权”。出牌阶段，你可以用任意数量的手牌与等量的“权”交换，每阶段限一次。',
