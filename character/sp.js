@@ -759,6 +759,9 @@ character.sp={
 			filter:function(event,player){
 				return event.player!=player&&!player.storage.wangzun;
 			},
+			prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【妄尊】？';
+			},
 			content:function(){
 				player.draw();
 				player.markSkill('wangzun');
@@ -2176,7 +2179,7 @@ character.sp={
 				player.storage.songci=false;
 			},
 			filterTarget:function(card,player,target){
-				return (!target.storage.songci&&target.num('h')!=target.hp&&target.hp!=0);
+				return (!target.storage.songci&&target.num('h')!=target.hp);
 			},
 			content:function(){
 				if(target.num('h')>target.hp){

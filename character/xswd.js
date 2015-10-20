@@ -1,6 +1,6 @@
 character.xswd={
 	character:{
-		swd_wushi:['male','wei',3,['zhoufu','yingbin','xuying']],
+		// swd_wushi:['male','wei',3,['zhoufu','yingbin','xuying']],
 			// swd_lanmoshen:['female','wei',3,['bingjian','lieren'],['fullskin']],
 			swd_huanglei:['male','qun',3,['jilve','gongshen'],['fullskin']],
 		swd_libai:['female','qun',3,['miaobi','zhexian']],
@@ -10,7 +10,7 @@ character.xswd={
 		swd_linming:['male','qun',3,['shelie','bifa']],
 		swd_philis:['male','qun',4,['yicong','wangxi']],
 		swd_pepin:['male','qun',4,['rejianxiong','quhu']],
-		// swd_kangnalishi:['male','qun',1,['busi','xuying','yinguo']],
+			swd_kangnalishi:['male','qun',1,['busi','xuying','yinguo'],['fullskin']],
 			swd_xuanyuanjiantong:['male','qun',3,['chengjian','huanling'],['fullskin']],
 		// swd_huiyan:['male','qun',3,['wendao','xiaozhan','xunzhi']],
 

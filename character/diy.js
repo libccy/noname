@@ -163,7 +163,7 @@ character.diy={
 				var cards=player.get('he',{color:'black'});
 				for(var i=0;i<cards.length;i++){
 					var type=get.type(cards[i]);
-					if(type=='basic'||type=='equip') return true;
+					if(type=='basic') return true;
 				}
 				return false;
 			},
@@ -174,7 +174,7 @@ character.diy={
 			filterCard:function(card){
 				if(get.color(card)!='black') return false;
 				var type=get.type(card);
-				return type=='basic'||type=='equip';
+				return type=='basic';
 			},
 			filterTarget:function(card,player,target){
 				return lib.filter.filterTarget({name:'bingliang'},player,target);
@@ -780,7 +780,7 @@ character.diy={
 		jiaoxia_info:'每当你成为红色牌的目标，你可以摸一张牌',
 		diykuanggu_info:'锁定技，每当你造成一点伤害，你在其攻击范围内，你回复一点体力，否则你摸一张牌',
 		diyqiangxi_info:'出牌阶段，你可以自减一点体力或弃一张武器牌，然后你对你攻击范围内的一名角色造成一点伤害并弃置其一张牌，每回合限一次。',
-		diyduanliang_info:'出牌阶段限一次，你可以将一张黑色的基本牌或装备牌当兵粮寸断对一名角色使用，然后摸一张牌。你的兵粮寸断可以指定距离2以内的角色作为目标',
+		diyduanliang_info:'出牌阶段限一次，你可以将一张黑色的基本牌当兵粮寸断对一名角色使用，然后摸一张牌。你的兵粮寸断可以指定距离2以内的角色作为目标',
 		guihan_info:'限定技，当你进入濒死状态时，可以指定一名男性角色与其各回复一点体力并摸两张牌',
 		luweiyan_info:'你可以将一张装备牌当水淹七军使用',
 		xiongzi_info:'锁定技，你于摸牌阶段额外摸X+1张牌，X为你装备区牌数的一半，向下取整',

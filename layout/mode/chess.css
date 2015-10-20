@@ -134,3 +134,10 @@
 .button.forbidden{
     opacity:0.6
 }
+#arena.leaderhide>*:not(canvas){
+    opacity:0 !important;
+    transition: all 0.5s !important;
+}
+#arena.leadercontrol>#control{
+    transition: all 0.5s !important;
+}

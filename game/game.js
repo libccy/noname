@@ -224,6 +224,7 @@
 					var script=document.createElement('script');
 					script.src = path+'/'+file+".js";
 					document.head.appendChild(script);
+					return script;
 				}
 			},
 			parse:function(func){
@@ -1908,7 +1909,7 @@
 							game.playAudio('effect','die_'+(player.sex==='female'?'female':'male'));
 						}
 					}
-					if(player==game.me&&!_status.over){
+					if(player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
 						if(get.config('swap')&&lib.config.mode_choice.contains('swap')){
 							ui.swap=ui.create.control('换人',ui.click.dieswap);
@@ -1920,7 +1921,7 @@
 							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
-					if(player==game.me){
+					if(player==game.me&&!game.modeSwapPlayer){
 						if(ui.auto) ui.auto.hide();
 						if(ui.wuxie) ui.wuxie.hide();
 					}
@@ -4286,6 +4287,53 @@
 					game.animate.flame(left+this.offsetWidth/2,
 						top+this.offsetHeight-30,700,'thunder');
 				},
+				$rare:function(){
+					var left=this.offsetLeft-ui.arena.offsetLeft;
+					var top=this.offsetTop-ui.arena.offsetTop;
+					if(this.classList.contains('minskin')){
+						top+=15;
+					}
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'rare');
+				},
+				$epic:function(){
+					var left=this.offsetLeft-ui.arena.offsetLeft;
+					var top=this.offsetTop-ui.arena.offsetTop;
+					if(this.classList.contains('minskin')){
+						top+=15;
+					}
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'epic');
+				},
+				$legend:function(){
+					var left=this.offsetLeft-ui.arena.offsetLeft;
+					var top=this.offsetTop-ui.arena.offsetTop;
+					if(this.classList.contains('minskin')){
+						top+=15;
+					}
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'legend');
+				},
+				$coin:function(){
+					var left=this.offsetLeft-ui.arena.offsetLeft;
+					var top=this.offsetTop-ui.arena.offsetTop;
+					if(this.classList.contains('minskin')){
+						top+=15;
+					}
+					top-=25;
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'coin');
+				},
+				$dust:function(){
+					var left=this.offsetLeft-ui.arena.offsetLeft;
+					var top=this.offsetTop-ui.arena.offsetTop;
+					if(this.classList.contains('minskin')){
+						top+=15;
+					}
+					top-=25;
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'dust');
+				},
 				$recover:function(){
 					var left,top;
 					if(lib.config.mode=='chess'){
@@ -5407,14 +5455,30 @@
 				if(type=='thunder'||type=='recover'){
 					particle_count=30;
 				}
+				else if(type=='coin'||type=='dust'){
+					particle_count=50;
+				}
+				else if(type=='legend'){
+					particle_count=120;
+				}
+				else if(type=='epic'){
+					particle_count=80;
+				}
+				else if(type=='rare'){
+					particle_count=50;
+				}
 				for(var i = 0; i < particle_count; i++) {
 			  		particles.push(new particle());
 			  	}
 				function particle() {
 					this.speed = {x: -1+Math.random()*2, y: -5+Math.random()*5};
-					if(type=='thunder'){
+					if(type=='thunder'||type=='coin'||type=='dust'){
 						this.speed.y=-3+Math.random()*5;
 						this.speed.x=-2+Math.random()*4;
+					}
+					if(type=='legend'||type=='rare'||type=='epic'){
+						this.speed.x*=3;
+						this.speed.y*=1.5;
 					}
 					this.location = {x: x, y: y};
 
@@ -5437,6 +5501,92 @@
 							this.r = 255;
 							this.g = Math.round(Math.random()*155);
 							this.b = 0;
+							break;
+						}
+						case 'coin':{
+							this.r = 255;
+							this.g = Math.round(Math.random()*25+230);
+							this.b = Math.round(Math.random()*100+50);
+							this.location.x+=Math.round(Math.random()*60)-30;
+							this.location.y+=Math.round(Math.random()*40)-20;
+							if(this.location.x<x){
+								this.speed.x=-Math.abs(this.speed.x);
+							}
+							else if(this.location.x>x){
+								this.speed.x=Math.abs(this.speed.x);
+							}
+							this.life*=1.3;
+							this.death*=1.3;
+							break;
+						}
+						case 'dust':{
+							this.r = Math.round(Math.random()*55)+105;
+							this.g = Math.round(Math.random()*55)+150;
+							this.b = 255;
+							this.location.x+=Math.round(Math.random()*60)-30;
+							this.location.y+=Math.round(Math.random()*40)-20;
+							if(this.location.x<x){
+								this.speed.x=-Math.abs(this.speed.x);
+							}
+							else if(this.location.x>x){
+								this.speed.x=Math.abs(this.speed.x);
+							}
+							this.life*=1.3;
+							this.death*=1.3;
+							break;
+						}
+						case 'legend':{
+							this.r = 255;
+							this.g = Math.round(Math.random()*100+155);
+							this.b = Math.round(Math.random()*100+50);
+							this.location.x+=Math.round(Math.random()*60)-30;
+							this.location.y+=Math.round(Math.random()*40)-20;
+							if(this.location.x<x){
+								this.speed.x=-Math.abs(this.speed.x);
+							}
+							else if(this.location.x>x){
+								this.speed.x=Math.abs(this.speed.x);
+							}
+							this.speed.x/=2;
+							this.speed.y/=2;
+							this.life*=2;
+							this.death*=2;
+							break;
+						}
+						case 'epic':{
+							this.r = Math.round(Math.random()*55)+200;
+							this.g = Math.round(Math.random()*100)+55;
+							this.b = 255;
+							this.location.x+=Math.round(Math.random()*60)-30;
+							this.location.y+=Math.round(Math.random()*40)-20;
+							if(this.location.x<x){
+								this.speed.x=-Math.abs(this.speed.x);
+							}
+							else if(this.location.x>x){
+								this.speed.x=Math.abs(this.speed.x);
+							}
+							this.speed.x/=2;
+							this.speed.y/=2;
+							this.life*=2;
+							this.death*=2;
+							break;
+						}
+						case 'rare':{
+							this.r = Math.round(Math.random()*55)+105;
+							this.g = Math.round(Math.random()*55)+150;
+							this.b = 255;
+							this.location.x+=Math.round(Math.random()*60)-30;
+							this.location.y+=Math.round(Math.random()*40)-20;
+							if(this.location.x<x){
+								this.speed.x=-Math.abs(this.speed.x);
+							}
+							else if(this.location.x>x){
+								this.speed.x=Math.abs(this.speed.x);
+							}
+							this.speed.x/=2;
+							this.speed.y/=2;
+							this.life*=2;
+							this.death*=2;
 							break;
 						}
 						case 'recover':{
@@ -5476,7 +5626,8 @@
 			  			surface.beginPath();
 						var middle=0.5;
 						var radius=p.radius;
-						if(type=='recover'){
+						if(type=='recover'||type=='legend'||type=='rare'||
+							type=='epic'||type=='coin'||type=='dust'){
 							middle=0.7;
 							radius/=3;
 						}
@@ -5491,6 +5642,12 @@
 			  			surface.fill();
 			  			p.death--;
 						if(type=='recover'){
+							p.radius+=0.5;
+						}
+						else if(type=='coin'||type=='dust'){
+							p.radius+=0.7;
+						}
+						else if(type=='legend'||type=='rare'||type=='epic'){
 							p.radius+=0.5;
 						}
 						else {
@@ -5633,6 +5790,9 @@
 			if(result===false) result='战斗失败';
 			if(result==undefined) result='战斗结束';
 			dialog=ui.create.dialog(result);
+			if(game.addOverDialog){
+				game.addOverDialog(dialog,result);
+			}
 			if(true){
 				if(game.players.length){
 					table=document.createElement('table');
@@ -5824,6 +5984,12 @@
 			}
 			dialog.add(ui.create.div('.placeholder'));
 			dialog.add(ui.create.div('.placeholder'));
+			if(ui.auto) ui.auto.hide();
+			if(ui.wuxie) ui.wuxie.hide();
+
+			if(game.controlOver){
+				game.controlOver();return;
+			}
 			if(!ui.restart){
 				ui.restart=ui.create.control('restart',game.reload);
 			}
@@ -5831,8 +5997,6 @@
 				setTimeout(game.reload,500);
 			}
 
-			if(ui.auto) ui.auto.hide();
-			if(ui.wuxie) ui.wuxie.hide();
 			if(ui.revive){
 				ui.revive.close();
 				delete ui.revive;
@@ -7214,6 +7378,7 @@
 			},
 			control:function(){
 				var i,controls;
+				var nozoom=false;
 				if(get.objtype(arguments[0])=='array') controls=arguments[0];
 				else controls=arguments;
 				var control=ui.create.div('.control');
@@ -7225,17 +7390,28 @@
 					if(typeof controls[i]=='function'){
 						control.custom=controls[i];
 					}
+					else if(controls[i]=='nozoom'){
+						nozoom=true;
+					}
 					else{
 						control.add(controls[i]);
 					}
 				}
 				ui.controls.unshift(control);
+				if(nozoom){
+					control.classList.add('nozoom');
+				}
 				if(control.childNodes.length){
+					if(nozoom){
+						control.style.transition='opacity 0.5s';
+					}
 					var width=0;
 					for(i=0;i<control.childNodes.length;i++) width+=control.childNodes[i].offsetWidth;
 					ui.refresh(control);
 					control.style.width=width+'px';
 					control.style.opacity=1;
+					ui.refresh(control);
+					control.style.transition='';
 				}
 				return control;
 			},
@@ -8831,7 +9007,7 @@
 								_status.mousedragging||_status.mousedown||!node.offsetWidth||!node.offsetHeight){
 								return;
 							}
-							if(node._hoverfunc){
+							if(node._hoverfunc&&!node._nopup){
 								var dialog=node._hoverfunc.call(node,e);
 								dialog.classList.add('popped');
 								ui.window.appendChild(dialog);
@@ -8868,7 +9044,9 @@
 					for(var i=0;i<e.path.length;i++){
 						var itemtype=get.itemtype(e.path[i]);
 						if(itemtype=='button') break;
-						if(itemtype=='dialog'&&!e.path[i].classList.contains('popped')){
+						if(itemtype=='dialog'&&
+						!e.path[i].classList.contains('popped')&&
+						!e.path[i].classList.contains('fixed')){
 							var ddialog=e.path[i];
 							_status.draggingdialog=ddialog;
 							ddialog._dragorigin=e;
@@ -8900,6 +9078,7 @@
 								_status.mouseleft=false;
 								_status.selectionfull=false;
 								_status.multitarget=false;
+								// if(ui.confirm&&ui.confirm.str=='c') ui.confirm.close();
 							}
 						}
 						return;
@@ -9340,6 +9519,9 @@
 							str+='：'+info.prompt;
 						}
 						event.skillDialog=ui.create.dialog(str);
+					}
+					else if(info.promptfunc){
+						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%">'+info.promptfunc(event,event.player)+'</div></div>');
 					}
 					else if(lib.translate[skill+'_info']){
 						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%">'+lib.translate[skill+'_info']+'</div></div>');
@@ -10082,6 +10264,7 @@
 				}
 			},
 			rightplayer:function(e){
+				if(this._nopup) return false;
 				if(_status.clickedplayer){
 					return false;
 				}
@@ -11646,11 +11829,12 @@
 			this.classList.remove('removing');
 			return this;
 		};
-		HTMLDivElement.prototype.setBackground=function(name,type,ext){
+		HTMLDivElement.prototype.setBackground=function(name,type,ext,subfolder){
 			var src;
 			ext=ext||'.jpg';
+			subfolder=subfolder||'default'
 			if(type){
-				src='image/'+type+'/default/'+name+ext;
+				src='image/'+type+'/'+subfolder+'/'+name+ext;
 			}
 			else{
 				src='image/'+name+ext;

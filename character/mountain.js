@@ -1060,7 +1060,8 @@ character.mountain={
 			trigger:{player:'damageEnd'},
 			frequent:true,
 			filter:function(event,player){
-				return player.storage.huashen&&player.storage.huashen.unowned;
+				return player.storage.huashen&&player.storage.huashen.unowned&&
+					player.storage.huashen.unowned.length>0;
 			},
 			content:function(){
 				for(var i=0;i<trigger.num;i++){

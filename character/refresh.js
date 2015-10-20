@@ -939,7 +939,7 @@ character.refresh={
 			trigger:{global:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return event.player.getStat('damage')&&
+				return event.player.isAlive()&&event.player.getStat('damage')&&
 				lib.filter.targetEnabled({name:'sha'},player,event.player)&&
 				!lib.filter.autoRespondSha.call({player:player});
 			},

@@ -8,7 +8,7 @@ character.swd={
 			swd_kama:['female','qun',3,['yueren','shangshi'],['fullskin']],
 		swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
 			swd_nicole:['female','wu',3,['minjing','lingwu','huanjian'],['fullskin']],
-		swd_wangsiyue:['female','wei',3,['duishi','guisi','biyue']],
+			swd_wangsiyue:['female','wei',3,['duishi','biyue'],['fullskin']],
 		swd_weida:['female','qun',3,['yueren','zhenlie']],
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian'],['fullskin']],
 
@@ -92,6 +92,31 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		kongmo:{
+			trigger:{player:'useCardAfter'},
+			forced:true,
+			filter:function(event,player){
+				if(event.parent.name=='kongmo') return false;
+				if(!event.targets||!event.card) return false;
+				var type=get.type(event.card);
+				if(type!='basic'&&type!='trick') return false;
+				var card=game.createCard(event.card.name,event.card.suit,event.card.number);
+				for(var i=0;i<event.targets.length;i++){
+					if(!event.targets[i].isAlive()) return false;
+					if(!player.canUse({name:event.card.name},event.targets[i],false,false)){
+						return false;
+					}
+				}
+				return true;
+			},
+			content:function(){
+				var card=game.createCard(trigger.card.name,trigger.card.suit,trigger.card.number);
+				player.useCard(card,trigger.targets);
+			},
+			ai:{
+				threaten:2
+			}
+		},
 		miaobi:{
 			enable:'phaseUse',
 			viewAs:{name:'wugu'},
@@ -106,10 +131,12 @@ character.swd={
 		huajing:{
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
-				return event.card&&get.type(event.card,'trick')=='trick'&&player.hp<player.maxHp;
+				return event.card&&get.type(event.card,'trick')=='trick';
 			},
+			frequent:true,
 			content:function(){
 				player.recover();
+				player.draw();
 			}
 		},
 		pingxu:{
@@ -2275,19 +2302,19 @@ character.swd={
 		dangping2:{},
 		duishi:{
 			enable:'phaseUse',
-			usable:1,
+			usable:2,
 			filter:function(event,player){
-				return player.num('h')>0
+				return player.num('h')>0&&!player.skills.contains('duishi3');
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('he');
+				return player!=target&&target.num('h')&&!target.skills.contains('duishi2');
 			},
 			filterCard:true,
 			check:function(card){return 8-ai.get.value(card)},
 			content:function(){
 				"step 0"
 				var suit=get.suit(cards[0]);
-				target.chooseToDiscard({suit:suit},'he','弃置一张'+get.translation(suit)+
+				target.chooseToDiscard({suit:suit},'h','弃置一张'+get.translation(suit)+
 					'牌，或令'+get.translation(player)+'获得你的一张牌').ai=function(card){
 					if(ai.get.attitude(target,player)>0){
 						return -1;
@@ -2297,9 +2324,13 @@ character.swd={
 
 				"step 1"
 				if(!result.bool){
+					player.addTempSkill('duishi3','phaseAfter');
 					if(target.num('he')){
 						player.gainPlayerCard(target,'he',true,ai.get.buttonValue);
 					}
+				}
+				else{
+					target.addTempSkill('duishi2','phaseAfter');
 				}
 			},
 			ai:{
@@ -2312,6 +2343,8 @@ character.swd={
 				expose:0.2
 			}
 		},
+		duishi2:{},
+		duishi3:{},
 		guisi:{
 			trigger:{target:'shaBefore'},
 			popup:false,
@@ -6612,10 +6645,35 @@ character.swd={
 		},
 		yueren2:{},
 		busi:{
+			trigger:{player:'dying'},
+			priority:7,
+			unique:true,
+			forced:true,
+			filter:function(event,player){
+				return player.hp<=0;
+			},
+			content:function(){
+				'step 0'
+				player.judge(function(card){
+					return get.suit(card)=='spade'?-1:1;
+				});
+				'step 1'
+				if(result.bool){
+					player.recover(1-player.hp);
+					if(!player.isTurnedOver()){
+						player.turnOver();
+					}
+				}
+			},
+			ai:{
+				threaten:0.8
+			}
+		},
+		busi_old:{
 			unique:true,
 			global:'busi2',
 		},
-		busi2:{
+		busi_old2:{
 			trigger:{player:'phaseAfter'},
 			forced:true,
 			popup:false,
@@ -6665,7 +6723,10 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				var go=ai.get.attitude(player,trigger.player)>0&&ai.get.attitude(player,trigger.source)<0;
+				var go=ai.get.attitude(player,trigger.player)>0&&
+					ai.get.attitude(player,trigger.source)<0&&
+					ai.get.damageEffect(trigger.player,trigger.source,player)<
+					ai.get.damageEffect(trigger.source,trigger.player,player);
 				player.chooseToDiscard('是否将伤害来源（'+get.translation(trigger.source)+
 					'）和目标（'+get.translation(trigger.player)+'）对调？','he').ai=function(card){
 					if(go){
@@ -6704,7 +6765,7 @@ character.swd={
 							}
 						}
 						if(source&&source.num('he')){
-							if(ai.get.attitude(player,source)<0&&ai.get.attitude(player,target)<0){
+							if(ai.get.attitude(source,player)<0&&ai.get.attitude(source,target)>0){
 								return [0,0,0,-1];
 							}
 						}
@@ -7582,13 +7643,15 @@ character.swd={
 		swd_lanmoshen:'蓝魔神',
 		swd_wushi:'巫师',
 
+		kongmo:'恐魔',
+		kongmo_info:'锁定技，你使用基本牌或非延时锦囊牌后将额外结算一次卡牌效果',
 		miaobi:'妙笔',
 		miaobi_info:'出牌阶段限一次，你可以将一张红桃牌当作五谷丰登使用',
 		zhexian:'谪仙',
 		jufu:'巨斧',
 		jufu_info:'锁定技，当你有武器牌时，杀造成的伤害+1',
 		huajing:'化精',
-		huajing_info:'每当你使用锦囊牌造成伤害，可以回复一点体力',
+		huajing_info:'每当你使用锦囊牌造成伤害，可以回复一点体力并摸一张牌',
 		pingxu:'冯虚',
 		pingxu_info:'锁定技，当你没有武器牌时，与其他角色的距离-1；当你没有防具牌时，其他角色与你的距离+1',
 		yudun:'愚钝',
@@ -7696,7 +7759,7 @@ character.swd={
 		guisi:'归思',
 		guisi_info:'每当你成为杀的目标，你可以交给对方一张手牌并取消之',
 		duishi:'对诗',
-		duishi_info:'出牌阶段限一次，你可以弃置一张手牌，并指定一名角色弃置一张与之花色相同的牌，否则你获得其一张牌',
+		duishi_info:'出牌阶段，你可以弃置一张手牌，并指定一名有手牌的角色弃置一张与之花色相同的手牌，否则你获得其一张牌。若其弃置了手牌，你可对一名其他目标再发动一次',
 		anlianying:'连营',
 		anlianying_info:'每当你失去最后一张手牌，可摸两张牌',
 		lianwu:'连舞',
@@ -7935,7 +7998,7 @@ character.swd={
 		mailun_info:'回合开始阶段，你可以选择一个脉轮效果直到下一回合开始',
 		yunshen_info:'每当你打出一张闪，你可以令其他角色与你的距离+1；回合开始阶段，你将累计的防御距离清零，然后摸等量的牌',
 		guiyan_info:'出牌阶段，你可以观看一名角色的手牌，并获得其中一张梅花牌，每阶段限一次。当你首次进入濒死状态时，你须回复一点体力并失去技能鬼眼',
-		busi_info:'锁定技，你死亡后每次轮过你时你自动复活',
+		busi_info:'锁定技，当你进入濒死状态时，你进行一次判定，若结果不为黑桃，你将体力回复至1并将武将牌翻至背面',
 		xuying_info:'锁定技，每当你即将受到伤害，你防止此伤害，若你此时有手牌，你流失一点体力',
 		yinguo_info:'除你之外的任意一名角色即将受到受到伤害时，若有伤害来源，你可以弃置一张牌将伤害来源和目标对调',
 		yueren_info:'每当你使用一张杀，可以进行一次判定，若结果为黑色，你弃置目标一张牌，若结果为红色，你将此杀收回，每回合限发动一次',

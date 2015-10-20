@@ -397,8 +397,14 @@ card.hearth={
 				}
 				if(!targets.length) event.finish();
 				'step 1'
-				var current=targets.randomGet(event.current);
-				event.current.line(current);
+				var current;
+				if(targets.length>1){
+					current=targets.randomGet(event.current);
+					event.current.line(current);
+				}
+				else{
+					current=targets[0];
+				}
 				var hs=current.get('h');
 				if(hs.length){
 					current.discard(hs.randomGet());

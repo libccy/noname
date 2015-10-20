@@ -95,6 +95,9 @@ body>.background{z-index:-2}
 .card.cardflip{
 	-webkit-animation:cardflip 0.3s ease-out;
 }
+.player.playerflip{
+	-webkit-animation:playerflip 0.3s ease-out;
+}
 .button.card.button>.intro{top:69px;}
 .buttons.smallzoom{
 	zoom:0.65
@@ -124,6 +127,9 @@ body>.background{z-index:-2}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
 .dialog.fullheight{height:calc(100% - 80px) !important;top:40px !important}
 .dialog.fullwidth{left:calc(5% + 60px) !important;width:calc(90% - 120px) !important}
+.dialog.halfleft,.dialog.halfright{width:43% !important;opacity: 1 !important}
+.dialog.halfleft{left:5% !important}
+.dialog.halfright{left:52% !important}
 .dialog{top:calc(100% / 3 - 100px / 3);left: calc(5% + 210px);}
 
 #window>.dialog.popped{
@@ -202,7 +208,8 @@ margin-bottom: 5px;
 /*--------确认--------*/
 #control{text-align: center;z-index: 2;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);}
 .control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;margin-left: 4px;margin-right: 4px;}
-.control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;width: 0;opacity:0}
+.control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;opacity:0}
+.control:not(.nozoom){width:0}
 .control>div{position: relative;padding: 3px;}
 /*--------角色--------*/
 .player>.avatar>.action{
@@ -457,6 +464,7 @@ margin-bottom: 5px;
 #arena.selecting #me .card:not(.selectable)>.addinfo,
 #arena.selecting .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
 .dead,.likedead{opacity: 0.6;}
+.unselectable:not(.selected):not(.removing){opacity: 0.6 !important}
 .mark>.background{opacity: 1 !important;}
 #arena.selecting #me .card:not(.selectable){
 	opacity:0.8
@@ -471,7 +479,8 @@ margin-bottom: 5px;
 .purple{color: rgba(177, 62, 177,0.4);}
 .player,.button.character{color: white;text-shadow: black 0 0 2px;}
 .turnedover>div{opacity: 0.3;}
-.intro{opacity: 0;display:none !important}
+.intro:not(.showintro){opacity: 0;display:none !important}
+.intro.showintro{white-space: nowrap}
 div:hover>.intro{opacity: 1;}
 /*.hp>div{background: white;box-shadow:0px 1px 1px rgba(0,0,0,0.5);border:1px solid #fff;border-radius: 8px;}*/
 /*.hp>.lost{background: rgba(128,128,128,0.3);}*/
@@ -580,17 +589,29 @@ div[data-nature='fire']{
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px,
 		rgba(232, 53, 53,1) 0 0 10px,rgba(232, 53, 53,1) 0 0 20px,rgba(232, 53, 53,1) 0 0 20px
 }
+div[data-nature='firem']{
+	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 5px,
+		rgba(232, 53, 53,1) 0 0 5px,black 0 0 1px;
+}
 .player .identity[data-color="zhong"],
 .player .identity[data-color="qun"],
 div[data-nature='metal']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px,
 		rgba(255, 203, 0,1) 0 0 10px
 }
+div[data-nature='metalm']{
+	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 5px,
+		rgba(255, 203, 0,1) 0 0 5px,black 0 0 1px;
+}
 .player .identity[data-color="nei"],
 .player .identity[data-color="ye"],
 div[data-nature='thunder']{
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 10px,
 		rgba(100, 74, 139,1) 0 0 10px,rgba(100, 74, 139,1) 0 0 20px,rgba(100, 74, 139,1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='thunderm']{
+	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 5px,
+		rgba(100, 74, 139,1) 0 0 5px,black 0 0 1px;
 }
 .player .identity[data-color="fan"],
 .player .identity[data-color="wu"],
@@ -604,14 +625,26 @@ div[data-nature='water']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 10px,
 		rgba(78, 117, 140,1) 0 0 10px,rgba(78, 117, 140,1) 0 0 20px,rgba(78, 117, 140,1) 0 0 20px,black 0 0 1px;
 }
+div[data-nature='waterm']{
+	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 5px,
+		rgba(78, 117, 140,1) 0 0 5px,black 0 0 1px;
+}
 .player .identity[data-color="shu"],
 div[data-nature='soil']{
 	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,rgba(128, 59, 2,1) 0 0 10px,
 		rgba(128, 59, 2,1) 0 0 10px,rgba(128, 59, 2,1) 0 0 20px,rgba(128, 59, 2,1) 0 0 20px,black 0 0 1px;
 }
+div[data-nature='soilm']{
+	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,rgba(128, 59, 2,1) 0 0 5px,
+		rgba(128, 59, 2,1) 0 0 5px,black 0 0 1px;
+}
 .player .identity[data-color="unknownx"]{
 	text-shadow: rgba(0,0,0,0.5) 0 0 2px,rgba(0,0,0,0.5) 0 0 5px,rgba(0,0,0,0.5) 0 0 10px,
 		rgba(0,0,0,0.5) 0 0 10px,rgba(0,0,0,0.5) 0 0 20px,rgba(0,0,0,0.5) 0 0 20px,black 0 0 1px;
+}
+div[data-color="unknownm"]{
+	text-shadow: rgba(0,0,0,0.5) 0 0 2px,rgba(0,0,0,0.2) 0 0 5px,rgba(0,0,0,0.2) 0 0 5px,
+		rgba(0,0,0,0.2) 0 0 5px,black 0 0 1px;
 }
 
 .card.fullskin>.background{display:none !important}
@@ -781,6 +814,10 @@ div[data-nature='soil']{
 @-webkit-keyframes cardflip{
 	from {-webkit-transform:perspective(600px) rotateY(-90deg) translateX(52px)}
 	to{-webkit-transform:perspective(600px) rotateY(0deg) translateX(0)}
+}
+@-webkit-keyframes playerflip{
+	from {-webkit-transform:perspective(1200px) rotateY(-90deg) translateX(150px)}
+	to{-webkit-transform:perspective(1200px) rotateY(0deg) translateX(0)}
 }
 @-webkit-keyframes game_start{from {opacity: 0;}}
 @-webkit-keyframes equip_hover{0% {opacity: 0;}50% {opacity: 0;}}

@@ -1358,7 +1358,7 @@ character.yijiang={
 				if(result.bool){
 					trigger.untrigger();
 					trigger.finish();
-					player.logSkill('xuanhuo',result.targets);
+					player.logSkill('xinxuanhuo',result.targets);
 					event.target=result.targets[0];
 					event.target.draw(2);
 					player.chooseTarget('选择出杀的目标',true,function(card,player,target){
@@ -2265,7 +2265,7 @@ character.yijiang={
 			usable:1,
 			content:function(){
 				"step 0"
-				var cards=get.cards(3+player.maxHp-player.hp);
+				var cards=get.cards(3);
 				event.cards=cards;
 				player.chooseCardButton(cards,'选择获得的红桃牌',[1,Infinity]).filterButton=function(button){
 					return get.suit(button.link)=='heart';
@@ -3346,7 +3346,7 @@ character.yijiang={
 		shiyong_info:'锁定技，每当你受到一次红色【杀】或【酒】【杀】造成的伤害后，你减1点体力上限。',
 		danshou_info:'每当你造成一次伤害后，你可以摸一张牌。若如此做，终止一切结算，当前回合结束。',
 		yizhong_info:'锁定技，当你没有防具时，黑色的杀对你无效',
-		xinzhan_info:'出牌阶段限一次，你可以观看牌堆顶的3+X张牌，然后展示其中任意数量♥的牌并获得之，其余以任意顺序置于牌堆顶。X为你已损失的体力值',
+		xinzhan_info:'出牌阶段限一次，你可以观看牌堆顶的3张牌，然后展示其中任意数量♥的牌并获得之',
 		huilei_info:'锁定技，杀死你的角色立即弃置所有的牌。',
 		enyuan_info:'锁定技，其他角色每令你回复一点体力，该角色摸一张牌;其他角色每对你造成一次伤害，须给你一张♥手牌，否则该角色失去1点体力。',
 		xuanhuo_info:'你每次获得一名其他角色两张或更多的牌时，可以令其摸一张牌；每当你受到1点伤害后，你可以令伤害来源选择一项：交给你一张手牌，或失去1点体力。',

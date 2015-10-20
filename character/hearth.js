@@ -25,7 +25,7 @@ character.hearth={
 		hs_malorne:['male','wu',3,['enze','chongsheng'],['fullskin']],
 
 		hs_ronghejuren:['male','shu',8,[],['fullskin']],
-		hs_wujiyuansu:['male','qun',3,['wujiwuji'],['fullskin']],
+		hs_edwin:['male','qun',3,['lianzhan'],['fullskin']],
 		hs_mijiaojisi:['female','qun',3,['kuixin'],['fullskin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu'],['fullskin']],
 		// hs_tgolem:['male','qun',4,['guozai'],['fullskin']],
@@ -232,6 +232,17 @@ character.hearth={
 		shengdun:{
 			trigger:{player:'phaseBegin'},
 			forced:true,
+			filter:function(event,player){
+				return !player.hujia;
+			},
+			content:function(){
+				player.changeHujia();
+				player.update();
+			},
+		},
+		shengdun_old:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
 			silent:true,
 			popup:false,
 			priority:10,
@@ -249,7 +260,7 @@ character.hearth={
 			},
 			group:'shengdun2'
 		},
-		shengdun2:{
+		shengdun_old2:{
 			trigger:{player:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
@@ -332,7 +343,7 @@ character.hearth={
 				threaten:1.5
 			}
 		},
-		wujiwuji:{
+		lianzhan:{
 			trigger:{player:'phaseUseEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -1802,7 +1813,7 @@ character.hearth={
 		hs_malorne:'玛洛恩',
 
 		hs_ronghejuren:'熔核巨人',
-		hs_wujiyuansu:'无羁元素',
+		hs_edwin:'艾德温',
 		hs_mijiaojisi:'秘教祭司',
 		hs_huzhixiannv:'湖之仙女',
 		hs_tgolem:'图腾魔像',
@@ -1826,16 +1837,16 @@ character.hearth={
 		huanwu:'唤雾',
 		huanwu_info:'出牌阶段限一次，你可以令一名角色增加一点体力上限，回复一点体力，并摸两张牌（每名角色限发动一次）',
 		fengnu:'风怒',
-		fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用卡牌时，你摸一张牌',
+		fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用同名卡牌时，你摸一张牌',
 		shengdun:'圣盾',
 		shengdun2:'圣盾',
-		shengdun_info:'锁定技，你受到的首次伤害-1，此技能于你回合开始阶段重置',
+		shengdun_info:'锁定技，回合开始阶段，若你没有护甲，你获得一点护甲',
 		jingmeng:'镜梦',
 		jingmeng_info:'每当你于回合内使用第一张牌时，你可以从牌堆中随机获得一张与之类型相同的牌',
 		kuixin:'窥心',
 		kuixin_info:'回合结束阶段，你可以将你的手牌与一名其他角色交换（手牌数之差不能多于1）',
-		wujiwuji:'无羁',
-		wujiwuji_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
+		lianzhan:'连斩',
+		lianzhan_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
 		yanshu:'炎术',
 		yanshu_info:'出牌阶段限一次，你可以弃置一张非基本牌，并获得一张流星火雨',
 		bingshuang:'冰霜',
