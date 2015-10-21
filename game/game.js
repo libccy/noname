@@ -5251,7 +5251,7 @@
 			},
 			_chongzhu:{
 				enable:'phaseUse',
-				prompt:'弃置要重铸的牌并摸一张牌',
+				prompt:'将要重铸的牌置于弃牌堆并摸一张牌',
 				filter:function(event,player){
 					if(player.isMin()&&lib.config.mode=='stone') return false;
 					return (player.get('h',function(card){

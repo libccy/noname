@@ -39,10 +39,75 @@ character.yijiang={
 		caifuren:['female','qun',3,['qieting','xianzhou'],['fullskin']],
 		yj_jushou:['male','qun',3,['jianying','shibei'],['fullskin']],
 		zhangsong:['male','shu',3,['qiangzhi','xiantu'],['fullskin']],
-		zhuhuan:['male','wu',4,['youdi'],['fullskin'],['fullskin']],
+		zhuhuan:['male','wu',4,['youdi'],['fullskin']],
+		xiahoushi:['female','shu',3,['qiaoshi','yanyu'],['fullskin']],
 		// zhoucang:['male','shu',4,['zhongyong'],['fullskin']],
 	},
 	skill:{
+		qiaoshi:{
+			trigger:{global:'phaseEnd'},
+			filter:function(event,player){
+				return event.player!=player&&event.player.num('h')==player.num('h');
+			},
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)>=0;
+			},
+			content:function(){
+				game.asyncDraw([trigger.player,player]);
+			},
+			ai:{
+				expose:0.1
+			}
+		},
+		yanyu:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h','sha')>0;
+			},
+			filterCard:{name:'sha'},
+			prepare:function(cards,player){
+				player.$throw(cards,1000);
+			},
+			discard:false,
+			delay:0.5,
+			content:function(){
+				"step 0"
+				player.draw();
+				"step 1"
+				for(var i=0;i<cards.length;i++){
+					ui.discardPile.appendChild(cards[i]);
+				}
+			},
+			ai:{
+				basic:{
+					order:1
+				},
+				result:{
+					player:1,
+				},
+			},
+			group:'yanyu2'
+		},
+		yanyu2:{
+			trigger:{player:'phaseUseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.getStat().skill.yanyu>=2;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【燕语】？',function(card,player,target){
+					return target.sex=='male'&&target!=player;
+				}).ai=function(target){
+					return ai.get.attitude(player,target);
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('yanyu',result.targets);
+					result.targets[0].draw(2);
+				}
+			}
+		},
 		youdi:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -3177,6 +3242,13 @@ character.yijiang={
 		guanzhang:'关兴张苞',
 		yj_jushou:'沮授',
 		zhuhuan:'朱桓',
+		xiahoushi:'夏侯氏',
+
+		qiaoshi:'樵拾',
+		qiaoshi_info:'其他角色的结束阶段开始时，若你的手牌数与其相等，则你可以与其各摸一张牌。',
+		yanyu:'燕语',
+		yanyu2:'燕语',
+		yanyu_info:'出牌阶段，你可以重铸【杀】。出牌阶段结束时，若你于此阶段以此法重铸了至少两张【杀】，则你可以令一名男性角色摸两张牌。',
 
 		zzhenggong:'争功',
 		zzhenggong_info:'你每受到一次伤害，可以获得伤害来源装备区中的一张牌并立即放入你的装备区。',
