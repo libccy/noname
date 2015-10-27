@@ -1,6 +1,7 @@
 'use strict';
 mode.chess={
 	canvasUpdates2:[],
+	hiddenCharacters:[],
 	element:{
 		card:{
 			moveTo:function(player,method){
@@ -521,6 +522,39 @@ mode.chess={
 	game:{
 		minskin:true,
 		singleHandcard:true,
+		addChessPlayer:function(name,enemy,num){
+			if(typeof num!='number'){
+				num=4;
+			}
+			var grids=[];
+			var gridnum=ui.chessheight*ui.chesswidth;
+			for(var i=0;i<gridnum;i++){
+				grids.push(i);
+			}
+			for(var i=0;i<game.players.length;i++){
+				grids.remove(parseInt(game.players[i].dataset.position));
+			}
+			var player=ui.create.player().animate('start');
+			player.init(name);
+			if(enemy){
+				player.side=!game.me.side;
+				player.setIdentity('enemy');
+			}
+			else{
+				player.side=game.me.side;
+				player.setIdentity('friend');
+			}
+			player.node.identity.dataset.color=get.translation(player.side+'Color');
+			game.players.push(player);
+			ui.chess.appendChild(player);
+			player.dataset.position=grids.randomGet();
+			lib.posmap[player.dataset.position]=player;
+			if(num){
+				player.directgain(get.cards(num));
+			}
+			game.arrangePlayers();
+			return player;
+		},
 		addOverDialog:function(dialog,result){
 			dialog.classList.add('center');
 			if(result=='战斗胜利'){
@@ -547,13 +581,20 @@ mode.chess={
 		},
 		controlOver:function(){
 			if(_status.enterArena){
+				game.data.arena.acted.length=0;
 				if(_status.victory){
 					game.data.arena.win++;
 					for(var i=0;i<game.players.length;i++){
-						game.data.arena.dead.remove(game.players[i].name);
+						if(_status.arenaAdd&&_status.arenaAdd.contains(game.players[i].name)){
+							continue;
+						}
+						if(game.data.arena.dead.contains(game.players[i].name)){
+							game.data.arena.dead.remove(game.players[i].name);
+							game.data.arena.acted.push(game.players[i].name);
+						}
 					}
-					game.saveData();
 				}
+				game.saveData();
 			}
 			else{
 				if(_status.challenge&&(_status.zhaoxiang||_status.victory)){
@@ -600,7 +641,7 @@ mode.chess={
 						}
 					}
 					var num2=game.players.length-num1;
-					if(num2>num1&&get.config('chess_mode')!='leader'){
+					if(num2>num1){
 						if(next.side==game.me.side){
 							next=game.me;
 						}
@@ -912,6 +953,13 @@ mode.chess={
 					ui.chess.appendChild(friend);
 					friend.dataset.position=grids.randomRemove();
 					lib.posmap[friend.dataset.position]=friend;
+					if(_status.enterArena&&game.data.arena.acted.contains(friend.name)){
+						friend.hp--;
+						friend.update();
+					}
+					if(_status.enterArena){
+						friend.addSkill('arenaAdd');
+					}
 				}
 				while(_status.enemylist.length){
 					enemy=ui.create.player().animate('start');
@@ -1593,24 +1641,26 @@ mode.chess={
 						}
 						var rank=game.getRank(_status.challenge);
 						var total=Math.max(2,_status.mylist.length-1);
+						var list;
+						switch(rank){
+							case 's':list=game.rank.ap;break;
+							case 'ap':list=game.rank.s.concat(game.rank.a);break;
+							case 'a':list=game.rank.ap.concat(game.rank.am);break;
+							case 'am':list=game.rank.a.concat(game.rank.bp);break;
+							case 'bp':list=game.rank.am.concat(game.rank.b);break;
+							case 'b':list=game.rank.bp.concat(game.rank.bm);break;
+							case 'bm':list=game.rank.b.concat(game.rank.c);break;
+							case 'c':list=game.rank.bm.concat(game.rank.d);break;
+							case 'd':list=game.rank.c;break;
+						}
 						for(var i=0;i<total;i++){
 							if(Math.random()<0.7){
-								_status.enemylist.push(Array.prototype.randomGet.apply(game.rank[rank],_status.enemylist));
+								_status.enemylist.push(Array.prototype.randomGet.apply(
+									game.rank[rank],_status.enemylist.concat(_status.mylist)));
 							}
 							else{
-								var list;
-								switch(rank){
-									case 's':list=game.rank.ap;break;
-									case 'ap':list=game.rank.s.concat(game.rank.a);break;
-									case 'a':list=game.rank.ap.concat(game.rank.am);break;
-									case 'am':list=game.rank.a.concat(game.rank.bp);break;
-									case 'bp':list=game.rank.am.concat(game.rank.b);break;
-									case 'b':list=game.rank.bp.concat(game.rank.bm);break;
-									case 'bm':list=game.rank.b.concat(game.rank.c);break;
-									case 'c':list=game.rank.bm.concat(game.rank.d);break;
-									case 'd':list=game.rank.c;break;
-								}
-								_status.enemylist.push(Array.prototype.randomGet.apply(game.rank[rank],_status.enemylist));
+								_status.enemylist.push(Array.prototype.randomGet.apply(
+									list,_status.enemylist.concat(_status.mylist)));
 							}
 						}
 					}
@@ -1635,11 +1685,18 @@ mode.chess={
 							case 'leader_medium':list=game.rank.b.concat(game.rank.bp).concat(game.rank.am);break;
 							case 'leader_hard':list=game.rank.a.concat(game.rank.ap).concat(game.rank.s);break;
 						}
+						for(var i=0;i<lib.hiddenCharacters.length;i++){
+							if(list.length<=number){
+								break;
+							}
+							list.remove(lib.hiddenCharacters[i]);
+						}
 						for(var i=0;i<_status.mylist.length;i++){
 							list.remove(_status.mylist[i]);
 						}
 						_status.enemylist=list.randomGets(number);
 					}
+					var numdel=_status.enemylist.length-_status.mylist.length;
 					var reward=0;
 					for(var i=0;i<_status.enemylist.length;i++){
 						switch(game.getRank(_status.enemylist[i])){
@@ -1654,6 +1711,13 @@ mode.chess={
 							case 'd':reward+=5;break;
 						}
 					}
+					if(numdel>0){
+						switch(difficulty){
+							case 'leader_easy':reward+=10*numdel;break;
+							case 'leader_medium':reward+=20*numdel;break;
+							case 'leader_hard':reward+=40*numdel;break;
+						}
+					}
 					var punish=0;
 					for(var i=0;i<_status.mylist.length;i++){
 						switch(game.getRank(_status.mylist[i])){
@@ -1666,6 +1730,13 @@ mode.chess={
 							case 'bm':punish+=5;break;
 							case 'c':punish+=3;break;
 							case 'd':punish+=2;break;
+						}
+					}
+					if(numdel<0){
+						switch(difficulty){
+							case 'leader_easy':punish-=5*numdel;break;
+							case 'leader_medium':punish-=10*numdel;break;
+							case 'leader_hard':punish-=20*numdel;break;
 						}
 					}
 					game.reward=Math.max(3*_status.enemylist.length,reward-punish);
@@ -1942,6 +2013,7 @@ mode.chess={
 					game.data.arena={
 						win:0,
 						dead:[],
+						acted:[],
 						choice:choice,
 						arenachoice:event.arenachoice
 					}
@@ -1991,6 +2063,7 @@ mode.chess={
 				}
 				'step 6'
 				game.minskin=true;
+				ui.arena.classList.add('noleft');
 				var nodes=event.arenachoicenodes;
 				for(var i=0;i<nodes.length;i++){
 					nodes[i].style.webkitTransform='scale(0.8)';
@@ -2060,6 +2133,13 @@ mode.chess={
 						}
 						else{
 							nodes[i].style.opacity=1;
+							if(game.data.arena.acted.contains(nodes[i].name)){
+								var acted=ui.create.div('.action',nodes[i].node.avatar);
+								acted.style.opacity=1;
+								acted.innerHTML='疲劳';
+								acted.dataset.nature='soilm';
+								acted.classList.add('freecolor');
+							}
 						}
 					}
 				}
@@ -2666,6 +2746,45 @@ mode.chess={
 		}
 	},
 	skill:{
+		arenaAdd:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return _status.enterArena&&player.side==game.me.side&&game.data.arena.arenachoice.length>game.data.arena.dead.length;
+			},
+			direct:true,
+			delay:0,
+			preservecancel:true,
+			content:function(){
+				"step 0"
+				var list=game.data.arena.arenachoice.slice(0);
+				for(var i=0;i<game.data.arena.dead.length;i++){
+					list.remove(game.data.arena.dead[i]);
+				}
+				event.dialog=ui.create.dialog('选择一个出场武将',[list,'character']);
+				game.pause();
+				event.custom.replace.button=function(button){
+					event.choice=button.link;
+					game.resume();
+				}
+				event.custom.replace.confirm=game.resume;
+				"step 1"
+				event.dialog.close();
+				if(event.choice){
+					var name=event.choice;
+					game.addChessPlayer(name);
+					game.data.arena.dead.push(name);
+					game.saveData();
+					if(!_status.arenaAdd){
+						_status.arenaAdd=[];
+					}
+					_status.arenaAdd.push(name);
+				}
+				else{
+					player.getStat('skill').arenaAdd--;
+				}
+			},
+		},
 		leader_zhaoxiang:{
 			unique:true,
 			enable:'phaseUse',
@@ -3670,6 +3789,9 @@ mode.chess={
 		epic:'史诗',
 		legend:'传说',
 
+		arenaAdd:'援军',
+		arenaAdd_info:'出牌阶段限一次，你可以令一名未出场的已方角色加入战场。战斗结束后，该角色无论是否存活均不能再次出场',
+
 		pianyi:'翩仪',
 		pianyi_info:'回合结束阶段，若你没有于本回合内造成伤害，你获得一次移动机会',
 		lingdong:'移动射击',
@@ -3846,7 +3968,7 @@ mode.chess={
 		'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
 		'战斗中有君主出场时可招降敌将，成功率取决于敌将的稀有度、剩余体力值以及手牌数。成功后战斗立即结束且没有金钱奖励。每发动一次招降，无论成功还是失败，都会扣除10招募令<li>'+
 		'挑战武将会与该武将以及与其强度相近的武将进行战斗，敌方人数与我方出场人数相同，但不少于3。胜利后可通过招募令招募该武将<li>'+
-		'竞技场中，你随机选择9名武将，每次派出1〜3名武将参战。战斗中阵亡的武将不能再次上场。当取得12场胜利或所有武将全部阵亡后结束，并根据胜场数获得随机奖励'
+		'竞技场：<br>随机选择9名武将，每次派出1〜3名武将参战。战斗中阵亡的武将不能再次上场。<br><br>战斗后武将进入疲劳状态，若立即再次出场则初始体力值-1。<br><br>战斗中本方武将行动时可召唤后援，令一名未出场的已方武将加入战斗。后援武将在战斗结束后无论存活与否均不能再次出场<br><br>当取得12场胜利或所有武将全部阵亡后结束，并根据胜场数获得随机奖励'
 	},
 	config:[
 		function(game,lib,get,ui){

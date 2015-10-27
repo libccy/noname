@@ -1195,6 +1195,15 @@ card.standard={
 						return;
 					}
 				}
+				if(lib.config.wuxie_self&&event.state){
+					if((event.current==game.me||event.current.isUnderControl())&&
+						(trigger.player==game.me||trigger.player.isUnderControl())){
+						if(trigger.targets&&trigger.targets.length==1){
+							event._result={bool:false};
+							return;
+						}
+					}
+				}
 				if(event.current.num('h','wuxie')==0){
 					var noask=true;
 					var skills=event.current.get('s',true).concat(lib.skill.global);

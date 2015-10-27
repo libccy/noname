@@ -108,6 +108,7 @@ window.config={
 		revive_config:'开启复活',
 		auto_skill_config:'自动发动常用技能',
 		auto_confirm_config:'自动确认',
+		wuxie_self_config:'不无懈自己',
 		enable_drag_config:'启用拖拽',
 		hover_all_config:'悬停显示信息',
 		hover_handcard_config:'悬停手牌显示信息',

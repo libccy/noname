@@ -7733,6 +7733,7 @@
 				gameconfig.push(ui.create.switcher('cheat',lib.config.cheat,ui.click.sidebar.cheat));
 				gameconfig.push(ui.create.switcher('auto_confirm',lib.config.auto_confirm,ui.click.sidebar.global));
 				gameconfig.push(ui.create.switcher('enable_drag',lib.config.enable_drag,ui.click.sidebar.global));
+				gameconfig.push(ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.global));
 				gameconfig.push(ui.create.switcher('duration',[500,700,1000],lib.config.duration,ui.click.sidebar.global));
 				gameconfig.push(ui.create.switcher('hoveration',[700,1000,1500],lib.config.hoveration,ui.click.sidebar.global));
 				gameconfig.push(ui.create.div('.placeholder'));
@@ -12330,7 +12331,12 @@
 				for(j in character[i]){
 					if(j=='mode'||j=='forbid') continue;
 					if(j=='character'&&!lib.config.characters.contains(i)){
-						if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
+						if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
+							for(k in character[i][j]){
+								lib.hiddenCharacters.push(k);
+							}
+						}
+						else{
 							continue;
 						}
 					}

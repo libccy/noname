@@ -2118,6 +2118,10 @@ character.yijiang={
 					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
 					if(lib.card[i].type=='trick') list.push(['锦囊','',i]);
 				}
+				list=['taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+				for(var i=0;i<list.length;i++){
+					list[i]=['锦囊','',list[i]];
+				}
 				var dialog=ui.create.dialog([list,'vcard']);
 				player.chooseButton(dialog,function(button){
 					var recover=0,lose=1;

@@ -2914,7 +2914,7 @@ character.swd={
 					event.finish();
 				}
 				else{
-					player.logSkill(_status.event.name);
+					player.logSkill('qinyin');
 					event.bool=(result.control=='回复体力');
 					event.num=0;
 					event.players=game.players.slice(0);

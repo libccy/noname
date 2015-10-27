@@ -588,7 +588,7 @@ mode.identity={
 					case 'zhong':
 						switch(identity2){
 							case 'zhu': return 10;
-							case 'zhong': return get.population('fan')>0?4:0.1;
+							case 'zhong': return 4;
 							case 'nei':
 								if(get.population('fan')==0) return -2;
 								return Math.min(3,-situation);
