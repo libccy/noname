@@ -793,7 +793,7 @@ character.yxs={
 			trigger:{global:'useCardAfter'},
 			direct:true,
 			filter:function(event,player){
-				return _status.currentPhase!=player&&get.type(event.card)=='trick'&&
+				return _status.currentPhase!=player&&event.player!=player&&get.type(event.card)=='trick'&&
 					get.position(event.card)=='d'&&!player.skills.contains('zhulu2')&&
 					get.itemtype(event.card)=='card'&&player.num('he',{suit:get.suit(event.card)})>0;
 			},
@@ -917,7 +917,7 @@ character.yxs={
 		yxs_aijiyanhou:'埃及艳后',
 		yxs_diaochan:'貂蝉',
 		yxs_yangyuhuan:'杨玉环',
-		
+
 		weiyi:'威仪',
 		weiyi_info:'每当你受到一次伤害，可以令伤害来源弃置两张牌',
 		xieling:'挟令',

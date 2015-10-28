@@ -7733,7 +7733,8 @@
 				gameconfig.push(ui.create.switcher('cheat',lib.config.cheat,ui.click.sidebar.cheat));
 				gameconfig.push(ui.create.switcher('auto_confirm',lib.config.auto_confirm,ui.click.sidebar.global));
 				gameconfig.push(ui.create.switcher('enable_drag',lib.config.enable_drag,ui.click.sidebar.global));
-				gameconfig.push(ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.global));
+				ui.wuxie_self=ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.global);
+				gameconfig.push(ui.wuxie_self);
 				gameconfig.push(ui.create.switcher('duration',[500,700,1000],lib.config.duration,ui.click.sidebar.global));
 				gameconfig.push(ui.create.switcher('hoveration',[700,1000,1500],lib.config.hoveration,ui.click.sidebar.global));
 				gameconfig.push(ui.create.div('.placeholder'));
@@ -7813,6 +7814,7 @@
 				appearence.push(ui.create.switcher('show_auto',lib.config.show_auto,ui.click.sidebar.show_auto));
 				appearence.push(ui.create.switcher('show_volumn',lib.config.show_volumn,ui.click.sidebar.show_volumn));
 				appearence.push(ui.create.switcher('show_wuxie',lib.config.show_wuxie,ui.click.sidebar.show_wuxie));
+				appearence.push(ui.create.switcher('show_wuxie_self',lib.config.show_wuxie_self,ui.click.sidebar.global));
 				appearence.push(ui.create.switcher('show_discardpile',lib.config.show_discardpile,ui.click.sidebar.global));
 				appearence.push(ui.create.div('.placeholder'));
 				appearence.push(ui.create.switcher('title',lib.config.title,ui.click.sidebar.title));
@@ -8313,10 +8315,11 @@
 					ui.pause.style.display='none';
 				}
 				ui.config2=ui.create.system('选项',ui.click.config);
+				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
 				if(!lib.config.touchscreen){
 					lib.setPopped(ui.config2,ui.click.pauseconfig,170);
+					lib.setPopped(ui.wuxie,ui.click.wuxieconfig,170);
 				}
-				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
 				ui.auto=ui.create.system('托管',ui.click.auto);
 				ui.volumn=ui.create.system('♫');
 				lib.setPopped(ui.volumn,ui.click.volumn,200);
@@ -8393,6 +8396,7 @@
 
 				var node2=ui.create.div('#paused2',node);
 				node2.innerHTML='已暂停';
+
 				// node2.listen(function(){
 				// 	_status.clicked=true;
 				// 	if(ui.sidebar.classList.contains('hidden')){
@@ -8660,6 +8664,16 @@
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.style.maxHeight='400px';
 				uiintro.add(ui.sidebar);
+				return uiintro;
+			},
+			wuxieconfig:function(){
+				if(!lib.config.show_wuxie_self) return;
+				if(!lib.config.auto_popped) return;
+				if(!ui.config.childNodes.length) return;
+				var uiintro=ui.create.dialog('hidden');
+				var node=ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.wuxie_self);
+				uiintro.add(node);
+
 				return uiintro;
 			},
 			pauseconfig:function(){
@@ -9827,6 +9841,9 @@
 				local2:function(item){
 					game.saveConfig(this.name,item,true);
 					ui.sidebarrestart.classList.add('thundertext');
+				},
+				wuxie_self:function(item){
+					ui.wuxie_self.lastChild.click();
 				},
 				global:function(item){
 					game.saveConfig(this.name,item);
@@ -12220,6 +12237,17 @@
 			return aa+bb+cc+dd;
 		}
 		window.onkeydown=function(e){
+			if(ui.currentpopped){
+				if(ui.currentpopped._uiintro){
+					ui.currentpopped._uiintro.delete();
+					delete ui.currentpopped._uiintro;
+				}
+				delete ui.currentpopped;
+			}
+			var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
+			for(var i=0;i<dialogs.length;i++){
+				dialogs[i].delete();
+			}
 			if(e.keyCode==32){
 				var node=ui.window.querySelector('#paused');
 				if(node){
