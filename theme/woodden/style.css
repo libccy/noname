@@ -3,11 +3,14 @@ html{
 	text-shadow: black 0 0 2px;
 	background: url('grid.png'),linear-gradient(#6c7989, #434b55) fixed;
 }
-#system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar{
+#system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar,.menu{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
 	border-radius: 8px;
 }
-#window>.dialog.popped{
+.menu.main>.menu-tab>div:not(.active):not(*:hover){
+	color: rgba(77, 60, 51,0.5);
+}
+#window>.dialog.popped,.menu{
 	background:url('wood2.png');
 	color:rgba(77, 60, 51,0.8);
 	text-shadow:none;
@@ -40,8 +43,35 @@ html{
 .judges>div,.marks>div{
 	border-radius:4px;
 }
-#mebg{
+#mebg,.menubutton,.menubutton.highlight,.menubutton.active{
 	background: url('wood.png');
+}
+.menubutton.large{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+}
+.menubutton.large.active{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
+}
+.config.toggle>div>div{
+	background: url('wood.png');
+	box-shadow: rgba(151, 151, 151, 1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+}
+.config.toggle.on>div{
+	background-color: transparent;
+}
+.config.toggle.on>div::before{
+	content:'开';
+	position: absolute;
+	left: 13px;
+	opacity: 0.5;
+	font-size: 14px;
+	line-height: 26px;
+	font-family: 'xinwei'
+}
+.popup-container>.menu>div:hover{
+    color:white;
+	background-image: linear-gradient(rgb(0, 133, 255), rgb(5, 119, 220));
+	box-shadow: none;
 }
 .control,#system>div>div,.popup,.dialog>.bar{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 2px 10px;

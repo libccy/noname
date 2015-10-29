@@ -403,7 +403,7 @@ mode.guozhan={
 					this.classList.remove('unseen2');
 					break;
 				}
-				var initdraw=get.config('initshow_draw');
+				var initdraw=parseInt(get.config('initshow_draw'));
 				if(!_status.initshown&&initdraw&&this.isAlive()){
 					this.popup('首亮');
 					game.log(get.translation(this)+'首先明置武将，得到奖励');
@@ -449,6 +449,7 @@ mode.guozhan={
 				}
 			},
 			perfectPair:function(){
+				if(!get.config('zhulian')) return false;
 				var name1=this.name1;
 				var name2=this.name2;
 				var list=['re','diy','sp','jsp','shen','jg','xin'];

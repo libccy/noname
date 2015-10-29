@@ -903,7 +903,7 @@ mode.chess={
 				ui.chessscroll2=ui.create.div('.chessscroll.right',ui.chessContainer);
 				var chessscroll=function(){
 					var direction=this.direction;
-					var speed=get.config('chessscroll_speed');
+					var speed=parseInt(get.config('chessscroll_speed'));
 					if(!speed) return;
 					var interval=setInterval(function(){
 						ui.chessContainer.scrollLeft+=speed*direction;
@@ -1095,8 +1095,6 @@ mode.chess={
 			var next=game.createEvent('leaderView',false);
 			next.content=function(){
 				'step 0'
-				var script=lib.init.js('character','rank');
-				script.addEventListener('load',game.resume);
 				var save=get.config('chess_leader_save');
 				if(!save){
 					save='save1';
@@ -1120,9 +1118,7 @@ mode.chess={
 				ui.money.childNodes[2].style.color='#FFE600';
 				ui.money.childNodes[3].style.fontFamily='huangcao';
 				ui.money.style.letterSpacing='4px';
-				game.pause();
 				'step 1'
-				game.rank=window.characterRank;
 				game.rank.all=game.rank.s.
 					concat(game.rank.ap).
 					concat(game.rank.a).
@@ -1415,7 +1411,7 @@ mode.chess={
 					['','','leader_hard']
 				],'vcard']);
 				for(i=0;i<dialog2.buttons.length;i++){
-					dialog2.buttons[i].node.name.style.fontFamily='huangcao';
+					dialog2.buttons[i].node.name.style.fontFamily='xinwei';
 					dialog2.buttons[i].node.name.style.fontSize='30px';
 					dialog2.buttons[i].node.name.style.left='4px';
 					dialog2.buttons[i].node.name.dataset.color='unknownm';
@@ -1432,7 +1428,7 @@ mode.chess={
 				for(;i<dialog2.buttons.length;i++){
 					dialog2.buttons[i].style.background='rgba(0,0,0,0.2)';
 					dialog2.buttons[i].style.boxShadow='rgba(0, 0, 0, 0.3) 0 0 0 1px';
-					dialog2.buttons[i].node.background.style.fontFamily='huangcao';
+					dialog2.buttons[i].node.background.style.fontFamily='xinwei';
 					dialog2.buttons[i]._nopup=true;
 					dialog2.buttons[i].area='number';
 				}
@@ -2590,7 +2586,7 @@ mode.chess={
 				dialog.classList.add('fullwidth');
 				dialog.classList.add('fullheight');
 				dialog.add('0/'+get.config('battle_number'));
-				dialog.add([list.slice(0,get.config('battle_number')*4+5),'character']);
+				dialog.add([list.slice(0,parseInt(get.config('battle_number'))*4+5),'character']);
 				if(bossbuttons.length){
 					dialog.add('挑战魔王');
 					dialog.add(bosses);
@@ -2605,7 +2601,7 @@ mode.chess={
 					if(bossnum){
 						return 3*bossnum;
 					}
-					return get.config('battle_number');
+					return parseInt(get.config('battle_number'));
 				};
 				next.custom.add.button=addToButton;
 				next.custom.add.window=function(clicked){
@@ -2636,7 +2632,7 @@ mode.chess={
 					dialog.classList.add('fullwidth');
 					dialog.classList.add('fullheight');
 					dialog.add('0/'+_status.event.selectButton());
-					dialog.add([list.slice(0,get.config('battle_number')*4+5),'character']);
+					dialog.add([list.slice(0,parseInt(get.config('battle_number'))*4+5),'character']);
 					if(bossbuttons.length){
 						dialog.add('挑战魔王');
 						dialog.add(bosses);
@@ -3963,7 +3959,7 @@ mode.chess={
 		'每人在出牌阶段有一次移动的机会，若一名角色在移动之前使用过指定其他角色为目标的牌，该回合可移动的最大距离为2，否则最大距离为1<li>'+
 		'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
 		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
-		'开启指定行动顺序后，双方将交替行动，在一方行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差</ul>'+
+		'开启交替行动后，在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差</ul>'+
 		'统率：<ul><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
 		'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
 		'战斗中有君主出场时可招降敌将，成功率取决于敌将的稀有度、剩余体力值以及手牌数。成功后战斗立即结束且没有金钱奖励。每发动一次招降，无论成功还是失败，都会扣除10招募令<li>'+

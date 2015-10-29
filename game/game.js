@@ -17,6 +17,698 @@
 		configprefix:'noname_0.9_',
 		updates:[],
 		canvasUpdates:[],
+		configMenu:{
+			general:{
+				name:'通用',
+				config:{
+					cheat:{
+						name:'控制台命令',
+						init:false,
+						onclick:function(bool){
+							if(lib.config.cheat&&bool==false){
+								lib.cheat=window.cheat;
+								delete window.cheat;
+								delete window.game;
+								delete window.ui;
+								delete window.get;
+								delete window.ai;
+								delete window.lib;
+								delete window._status;
+							}
+							else if(!lib.config.cheat&&bool){
+								window.cheat=lib.cheat;
+								window.cheat.i();
+							}
+							game.saveConfig('cheat',bool);
+						},
+						unfrequent:true,
+					},
+					auto_confirm:{
+						name:'自动确认',
+						init:true,
+					},
+					enable_drag:{
+						name:'启用拖拽',
+						init:true,
+					},
+					wuxie_self:{
+						name:'不无懈自己',
+						init:true,
+					}
+					// *****
+				}
+			},
+			appearence:{
+				name:'外观',
+				config:{
+					theme:{
+						name:'主题',
+						init:'woodden',
+						item:{
+							woodden:'木纹',
+							music:'音乐',
+							simple:'简约',
+						},
+						onclick:function(theme){
+							game.saveConfig('theme',theme);
+							ui.arena.hide();
+							setTimeout(function(){
+								var theme=ui.css.theme;
+								ui.css.theme=lib.init.css('theme/'+lib.config.theme,'style');
+								theme.remove();
+								setTimeout(function(){ui.arena.show();},100);
+							},500);
+						}
+					}
+				}
+			}
+		},
+		mode:{
+			identity:{
+		        name:'身份',
+		        config:{
+		            player_number:{
+		                name:'游戏人数',
+		                init:'8',
+		                item:{
+		                    '2':'两人',
+		                    '3':'三人',
+		                    '4':'四人',
+		                    '5':'五人',
+		                    '6':'六人',
+		                    '7':'七人',
+		                    '8':'八人'
+		                },
+		                frequent:true
+		            },
+		            double_character:{
+		                name:'双将模式',
+		                init:false,
+		                frequent:true,
+		                restart:true,
+		            },
+		            double_hp:{
+		                name:'双将体力上限',
+		                init:'pingjun',
+		                item:{
+		                    hejiansan:'和减三',
+		                    pingjun:'平均值',
+		                    zuidazhi:'最大值',
+		                    zuixiaozhi:'最小值',
+		                    zonghe:'相加',
+		                },
+		                restart:true,
+		            },
+					auto_identity:{
+						name:'自动显示身份',
+						item:{
+							off:'关闭',
+							one:'一轮',
+							two:'两轮',
+							three:'三轮',
+							always:'始终'
+						},
+						init:'off',
+						onclick:function(bool){
+							game.saveConfig('auto_identity',bool,true);
+							var num;
+							switch(bool){
+								case '一轮':num=1;break;
+								case '两轮':num=2;break;
+								case '三轮':num=3;break;
+								default:num=0;break;
+							}
+							if(num&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
+								_status.identityShown=true;
+								game.showIdentity();
+							}
+						}
+					},
+		            ban_weak:{
+		                name:'屏蔽弱将',
+						init:false,
+						restart:true,
+		            },
+					enhance_zhu:{
+						name:'加强主公',
+						init:false,
+						restart:true,
+						frequent:true,
+					},
+					free_choose:{
+						name:'自由选将',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('free_choose',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+							else if(ui.cheat2&&!get.config('free_choose')){
+								ui.cheat2.close();
+								delete ui.cheat2;
+								if(ui.cheat2x){
+									ui.cheat2x.close();
+									delete ui.cheat2;
+								}
+							}
+						}
+					},
+					change_identity:{
+						name:'自由选择身份和座位',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('change_identity',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							var dialog;
+							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
+							else dialog=_status.event.dialog;
+							if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.parent.addSetting(dialog);
+							else _status.event.parent.removeSetting(dialog);
+							ui.update();
+						}
+					},
+					change_choice:{
+						name:'开启换将卡',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('change_choice',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
+							else if(ui.cheat&&!get.config('change_choice')){
+								ui.cheat.close();
+								delete ui.cheat;
+							}
+						}
+					},
+					change_card:{
+						name:'开启手气卡',
+						init:false,
+						frequent:true
+					},
+					dierestart:{
+						name:'死亡后显示重来',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('dierestart',bool,true);
+							if(get.config('dierestart')){
+								if(!ui.restart&&game.me.isDead()){
+									ui.restart=ui.create.control('restart',game.reload);
+								}
+							}
+							else if(ui.restart){
+								ui.restart.close();
+								delete ui.restart;
+							}
+						}
+					},
+					swap:{
+						name:'死亡后显示换人',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('swap',bool,true);
+							if(get.config('swap')){
+								if(!ui.swap&&game.me.isDead()){
+									ui.swap=ui.create.control('换人',ui.click.dieswap);
+								}
+							}
+							else if(ui.swap){
+								ui.swap.close();
+								delete ui.swap;
+							}
+						}
+					},
+					revive:{
+						name:'死亡后显示复活',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('revive',bool,true);
+							if(get.config('revive')){
+								if(!ui.revive&&game.me.isDead()){
+									ui.revive=ui.create.control('revive',ui.click.dierevive);
+								}
+							}
+							else if(ui.revive){
+								ui.revive.close();
+								delete ui.revive;
+							}
+						}
+					},
+					ai_strategy:{
+						name:'内奸策略',
+						init:'ai_strategy_1',
+						item:{
+							ai_strategy_1:'均衡',
+							ai_strategy_2:'偏反',
+							ai_strategy_3:'偏忠',
+							ai_strategy_4:'酱油',
+							ai_strategy_5:'天使',
+							ai_strategy_6:'仇主',
+						}
+					},
+					difficulty:{
+						name:'AI对人类态度',
+						init:'normal',
+						item:{
+							easy:'友好',
+							normal:'一般',
+							hard:'仇视',
+						}
+					},
+		        }
+		    },
+		    guozhan:{
+		        name:'国战',
+		        config:{
+		            player_number:{
+		                name:'游戏人数',
+		                init:'8',
+		                item:{
+		                    '3':'三人',
+		                    '4':'四人',
+		                    '5':'五人',
+		                    '6':'六人',
+		                    '7':'七人',
+		                    '8':'八人'
+		                },
+		                frequent:true
+		            },
+					initshow_draw:{
+						name:'首亮摸牌',
+						item:{
+							'0':'无',
+							'1':'一张',
+							'2':'两张',
+						},
+						init:'2',
+						frequent:true,
+					},
+					zhulian:{
+						name:'珠联璧合',
+						init:true,
+						frequent:true,
+					},
+		            double_hp:{
+		                name:'双将体力上限',
+		                init:'pingjun',
+		                item:{
+		                    hejiansan:'和减三',
+		                    pingjun:'平均值',
+		                    zuidazhi:'最大值',
+		                    zuixiaozhi:'最小值',
+		                    zonghe:'相加',
+		                },
+		                restart:true,
+		            },
+					free_choose:{
+						name:'自由选将',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('free_choose',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+							else if(ui.cheat2&&!get.config('free_choose')){
+								ui.cheat2.close();
+								delete ui.cheat2;
+								if(ui.cheat2x){
+									ui.cheat2x.close();
+									delete ui.cheat2;
+								}
+							}
+						}
+					},
+					change_identity:{
+						name:'自由选择座位',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('change_identity',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							var dialog;
+							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
+							else dialog=_status.event.dialog;
+							if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.parent.addSetting(dialog);
+							else _status.event.parent.removeSetting(dialog);
+							ui.update();
+						}
+					},
+					change_choice:{
+						name:'开启换将卡',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('change_choice',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
+							else if(ui.cheat&&!get.config('change_choice')){
+								ui.cheat.close();
+								delete ui.cheat;
+							}
+						}
+					},
+					change_card:{
+						name:'开启手气卡',
+						init:false,
+						frequent:true
+					},
+					dierestart:{
+						name:'死亡后显示重来',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('dierestart',bool,true);
+							if(get.config('dierestart')){
+								if(!ui.restart&&game.me.isDead()){
+									ui.restart=ui.create.control('restart',game.reload);
+								}
+							}
+							else if(ui.restart){
+								ui.restart.close();
+								delete ui.restart;
+							}
+						}
+					},
+					swap:{
+						name:'死亡后显示换人',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('swap',bool,true);
+							if(get.config('swap')){
+								if(!ui.swap&&game.me.isDead()){
+									ui.swap=ui.create.control('换人',ui.click.dieswap);
+								}
+							}
+							else if(ui.swap){
+								ui.swap.close();
+								delete ui.swap;
+							}
+						}
+					},
+					revive:{
+						name:'死亡后显示复活',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('revive',bool,true);
+							if(get.config('revive')){
+								if(!ui.revive&&game.me.isDead()){
+									ui.revive=ui.create.control('revive',ui.click.dierevive);
+								}
+							}
+							else if(ui.revive){
+								ui.revive.close();
+								delete ui.revive;
+							}
+						}
+					},
+					difficulty:{
+						name:'AI对人类态度',
+						init:'normal',
+						item:{
+							easy:'友好',
+							normal:'一般',
+							hard:'仇视',
+						}
+					},
+		        }
+		    },
+			versus:{
+				name:'对决',
+				config:{
+					change_choice:{
+						name:'开启换将卡',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('change_choice',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
+							else if(ui.cheat&&!get.config('change_choice')){
+								ui.cheat.close();
+								delete ui.cheat;
+							}
+						},
+						frequent:true,
+					},
+					ban_weak:{
+		                name:'屏蔽弱将',
+						init:false,
+						restart:true,
+						frequent:true,
+		            },
+				}
+			},
+			boss:{
+				name:'挑战',
+				config:{
+					free_choose:{
+						name:'自由选将',
+						init:true,
+						frequent:true,
+						onclick:function(bool){
+							game.saveConfig('free_choose',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+							else if(ui.cheat2&&!get.config('free_choose')){
+								ui.cheat2.close();
+								delete ui.cheat2;
+								if(ui.cheat2x){
+									ui.cheat2x.close();
+									delete ui.cheat2;
+								}
+							}
+						}
+					},
+					change_choice:{
+						name:'开启换将卡',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('change_choice',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
+							else if(ui.cheat&&!get.config('change_choice')){
+								ui.cheat.close();
+								delete ui.cheat;
+							}
+						},
+						frequent:true,
+					},
+					ban_weak:{
+						name:'屏蔽弱将',
+						init:false,
+						restart:true,
+						frequent:true,
+					},
+				}
+			},
+			chess:{
+				name:'战棋',
+				config:{
+					chess_mode:{
+						name:'游戏模式',
+						init:'combat',
+						item:{
+							combat:'对战',
+							leader:'统率'
+						},
+						restart:true,
+						frequent:true,
+					},
+					update:function(config,map){
+						if(config.chess_mode=='combat'){
+							map.chess_leader_save.hide();
+							map.chess_leader_clear.hide();
+
+							map.battle_number.show();
+							map.ban_weak.show();
+							map.free_choose.show();
+							map.change_choice.show();
+							map.chess_ordered.show();
+							map.chess_character.show();
+						}
+						else{
+							map.chess_leader_save.show();
+							map.chess_leader_clear.show();
+
+							map.battle_number.hide();
+							map.ban_weak.hide();
+							map.free_choose.hide();
+							map.change_choice.hide();
+							map.chess_ordered.hide();
+							map.chess_character.hide();
+						}
+					},
+					chess_leader_save:{
+						name:'选择历程',
+						init:'save1',
+						item:{
+							save1:'一',
+							save2:'二',
+							save3:'三',
+							save4:'四',
+							save5:'五',
+						},
+						restart:true,
+						frequent:true,
+					},
+					chess_leader_clear:{
+						name:'清除进度',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								game.save(get.config('chess_leader_save'),null);
+								window.location.reload();
+								return;
+							}
+							node._clearing=true;
+							node.innerHTML='单击以确认 (3)';
+							setTimeout(function(){
+								node.innerHTML='单击以确认 (2)';
+								setTimeout(function(){
+									node.innerHTML='单击以确认 (1)';
+									setTimeout(function(){
+										node.innerHTML='清除进度';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true,
+						frequent:true,
+					},
+					battle_number:{
+						name:'对战人数',
+						init:'3',
+						frequent:true,
+						item:{
+							'2':'2v2',
+							'3':'3v3',
+							'4':'4v4',
+							'6':'6v6',
+							'8':'8v8',
+						},
+						onclick:function(num){
+							game.saveConfig('battle_number',num,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(_status.event.parent.changeDialog){
+								_status.event.parent.changeDialog();
+							}
+						},
+					},
+					chess_ordered:{
+						name:'交替行动',
+						init:true,
+						frequent:true,
+					},
+					chess_character:{
+						name:'战棋武将',
+						init:true,
+						frequent:true,
+					},
+					chessscroll_speed:{
+						name:'边缘滚动速度',
+						init:'20',
+						item:{
+							'0':'不滚动',
+							'10':'10格/秒',
+							'20':'20格/秒',
+							'30':'30格/秒',
+						}
+					},
+					free_choose:{
+						name:'自由选将',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('free_choose',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+							else if(ui.cheat2&&!get.config('free_choose')){
+								ui.cheat2.close();
+								delete ui.cheat2;
+								if(ui.cheat2x){
+									ui.cheat2x.close();
+									delete ui.cheat2;
+								}
+							}
+						},
+					},
+					change_choice:{
+						name:'开启换将卡',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('change_choice',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
+							else if(ui.cheat&&!get.config('change_choice')){
+								ui.cheat.close();
+								delete ui.cheat;
+							}
+						},
+					},
+					ban_weak:{
+		                name:'屏蔽弱将',
+						init:false,
+						restart:true,
+		            },
+				}
+			},
+			stone:{
+				name:'炉石',
+				config:{
+					battle_number:{
+						name:'出场人数',
+						init:'3',
+						frequent:true,
+						item:{
+							'2':'两人',
+							'3':'三人',
+							'4':'四人',
+							'6':'六人',
+							'8':'八人',
+							'10':'十人',
+						},
+						onclick:function(num){
+							game.saveConfig('battle_number',num,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(_status.event.parent.changeDialog){
+								_status.event.parent.changeDialog();
+							}
+						},
+					},
+					free_choose:{
+						name:'自由选将',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('free_choose',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+							else if(ui.cheat2&&!get.config('free_choose')){
+								ui.cheat2.close();
+								delete ui.cheat2;
+								if(ui.cheat2x){
+									ui.cheat2x.close();
+									delete ui.cheat2;
+								}
+							}
+						},
+						frequent:true,
+					},
+					change_choice:{
+						name:'开启换将卡',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('change_choice',bool,true);
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
+							else if(ui.cheat&&!get.config('change_choice')){
+								ui.cheat.close();
+								delete ui.cheat;
+							}
+						},
+						frequent:true,
+					},
+					ban_weak:{
+		                name:'屏蔽弱将',
+						init:false,
+						restart:true,
+						frequent:true,
+		            },
+				}
+			}
+		},
 		status:{
 			running:false,
 			canvas:false,
@@ -153,8 +845,12 @@
 					lib.config.defaultcards=lib.config.cards.slice(0);
 				}
 				for(var i in config2){
-						if(i.indexOf('_mode_config')!=-1&&i.substr(i.indexOf('_mode_config')+13)==lib.config.mode){
-							lib.config.mode_config[lib.config.mode][i.substr(0,i.indexOf('_mode_config'))]=config2[i];
+						if(i.indexOf('_mode_config')!=-1){
+							var thismode=i.substr(i.indexOf('_mode_config')+13);
+							if(!lib.config.mode_config[thismode]){
+								lib.config.mode_config[thismode]={};
+							}
+							lib.config.mode_config[thismode][i.substr(0,i.indexOf('_mode_config'))]=config2[i];
 						}
 						else{
 							lib.config[i]=config2[i];
@@ -189,7 +885,9 @@
 				lib.init.js('card',lib.config.all.cards);
 				lib.init.js('character',lib.config.all.characters);
 				lib.init.js('play',lib.config.plays);
+				lib.init.js('character','rank');
 				ui.css={};
+				lib.init.css('layout/default','menu');
 				if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
 					lib.config.layout='newlayout';
 				}
@@ -5166,9 +5864,10 @@
 					game.phaseNumber++;
 					var num;
 					switch(get.config('auto_identity')){
-						case '一轮':num=1;break;
-						case '两轮':num=2;break;
-						case '三轮':num=3;break;
+						case 'one':num=1;break;
+						case 'two':num=2;break;
+						case 'three':num=3;break;
+						case 'always':num=-1;break;
 						default:num=0;break;
 					}
 					if(num&&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
@@ -6786,8 +7485,18 @@
 				config={};
 			}
 			if(local){
-				lib.config.mode_config[lib.config.mode][key]=value;
-				key+='_mode_config_'+lib.config.mode;
+				var localmode;
+				if(typeof local=='string'){
+					localmode=local;
+				}
+				else{
+					localmode=lib.config.mode;
+				}
+				if(!lib.config.mode_config[localmode]){
+					lib.config.mode_config[localmode]={};
+				}
+				lib.config.mode_config[localmode][key]=value;
+				key+='_mode_config_'+localmode;
 			}
 			else{
 				lib.config[key]=value;
@@ -6981,10 +7690,17 @@
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
 		create:{
-			div:function(str,position,position2){
-				var str,position,position2,style,divposition;
+			div:function(){
+				var str,innerHTML,position,position2,style,divposition,listen;
 				for(var i=0;i<arguments.length;i++){
-					if(typeof arguments[i]=='string') str=arguments[i];
+					if(typeof arguments[i]=='string'){
+						if(typeof str=='string'){
+							innerHTML=arguments[i];
+						}
+						else{
+							str=arguments[i];
+						}
+					}
 					else if(get.objtype(arguments[i])=='div'||
 						get.objtype(arguments[i])=='table'||
 						get.objtype(arguments[i])=='tr'||
@@ -6993,6 +7709,7 @@
 					else if(typeof arguments[i]=='number') position2=arguments[i];
 					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
 					else if(typeof arguments[i]=='object') style=arguments[i];
+					else if(typeof arguments[i]=='function') listen=arguments[i];
 				}
 				if(str==undefined) str='';
 				var node=document.createElement('div');
@@ -7023,6 +7740,8 @@
 	            }
 	            if(style) node.css(style);
 	            if(divposition) node.setPosition(divposition);
+				if(innerHTML) node.innerHTML=innerHTML;
+				if(listen) node.listen(listen);
 	            return node;
 			},
 			table:function(){
@@ -7532,622 +8251,623 @@
 				ui.config.ontouchmove = ui.click.touchScroll;
 				ui.sidebar.style.WebkitOverflowScrolling='touch';
 				ui.config.style.WebkitOverflowScrolling='touch';
-				if(lib.config.right_sidebar){
+				if(false&&lib.config.right_sidebar){
 					ui.sidebar.classList.add('right');
 					ui.sidebar3.classList.add('left');
 					ui.config.classList.add('right');
 				}
-				var folditems=[];
-				var foldsubitems=[];
-
-				var fold=function(list){
-					if(foldsubitems.contains(list)){
-						for(var i=0;i<list.length;i++){
-							if(!list[i].link.classList.contains('hidden')){
-								list[i].link.hide();
-								list[i].link.parentNode.style.height='20px';
-							}
-						}
-					}
-					for(i=0;i<list.length;i++){
-						if(list[i]) list[i].delete();
-					}
-				}
-				var unfold=function(node,list){
-					for(var i=0;i<folditems.length;i++){
-						if(folditems[i]!=list){
-							if(folditems[i]._configstr){
-								game.saveConfig(folditems[i]._configstr,false);
-							}
-							else{
-								folditems[i].fold=false;
-							}
-							fold(folditems[i]);
-						}
-					}
-					for(i=list.length-1;i>=0;i--){
-						if(list[i]){
-							list[i].animate('start');
-							node.parentNode.parentNode.insertBefore(list[i],node.parentNode.nextSibling);
-						}
-					}
-					node.clicked=true;
-					setTimeout(function(){
-						node.clicked=false;
-					},600);
-				}
-
-
-				var newgame=[];
-				newgame._configstr='newgame';
-				folditems.push(newgame);
-				ui.config.appendChild(ui.create.line2('新游戏',function(){
-					if(this.clicked) return;
-					if(lib.config.newgame){
-						game.saveConfig('newgame',false);
-						fold(newgame);
-					}
-					else{
-						game.saveConfig('newgame',true);
-						unfold(this,newgame);
-					}
-
-				}));
-				var span1='<div style="width:20px;text-align:center;padding-right:0">-</div>';
-				var span2='<div style="width:20px;text-align:center;padding-right:0">·</div>';
-				var clickmode=function(){
-					game.saveConfig('mode',this.parentNode.link);
-					game.reload();
-				};
-				for(var i=0;i<lib.config.all.mode.length;i++){
-					var thismode=lib.config.all.mode[i];
-					var line=ui.create.line((lib.config.mode==thismode?span1:span2)+lib.translate[thismode]+'模式',clickmode);
-					line.link=thismode;
-					newgame.push(line);
-				}
-
-				if(!lib.config.modeconfig&&!lib.config.gameconfig&&!lib.config.appearence){
-					for(i=0;i<newgame.length;i++){
-						ui.config.appendChild(newgame[i]);
-					}
-				}
-
-				ui.config.appendChild(ui.create.div('.placeholder'));
-
-
-
-				var modeconfig=[];
-				modeconfig._configstr='modeconfig';
-				folditems.push(modeconfig);
-				ui.config.appendChild(ui.create.line2(get.translation(lib.config.mode)+'选项',function(){
-					if(this.clicked) return;
-					if(lib.config.modeconfig){
-						game.saveConfig('modeconfig',false);
-						fold(modeconfig);
-					}
-					else{
-						game.saveConfig('modeconfig',true);
-						unfold(this,modeconfig);
-					}
-				}));
-				for(i=0;i<lib.config.current_mode.length;i++){
-					if(typeof lib.config.current_mode[i]==='function'){
-						var result=lib.config.current_mode[i](game,lib,get,ui);
-						if(typeof result=='string'){
-							lib.config.current_mode[i]=result;
-						}
-						else{
-							if(get.objtype(result)=='div'){
-								modeconfig.push(result);
-							}
-							continue;
-						}
-					}
-					switch(lib.config.current_mode[i]){
-						case 'difficulty':
-							modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.local));break;
-						case 'initshow_draw':
-							modeconfig.push(ui.create.switcher('initshow_draw',[0,1,2],get.config('initshow_draw'),ui.click.sidebar.local));break;
-						case 'ai_strategy':
-							modeconfig.push(ui.create.switcher('ai_strategy',
-								['ai_strategy_1','ai_strategy_2','ai_strategy_3','ai_strategy_4','ai_strategy_5','ai_strategy_6'],
-								get.config('ai_strategy'),ui.click.sidebar.local));break;
-						case 'ai_identity':
-							modeconfig.push(ui.create.switcher('ai_identity',get.config('ai_identity'),ui.click.sidebar.local));break;
-						case 'auto_identity':
-							modeconfig.push(ui.create.switcher('auto_identity',['一轮','两轮','三轮','关闭'],get.config('auto_identity'),ui.click.sidebar.auto_identity));break;
-						case 'player_number':
-							modeconfig.push(ui.create.switcher('player_number',[2,3,4,5,6,7,8],get.config('player_number'),ui.click.sidebar.player_number));break;
-						case 'battle_number':
-							var battle_number;
-							if(lib.config.mode=='chess'){
-								battle_number=[2,3,4,6,8];
-							}
-							else{
-								battle_number=[1,2,3,5,8,16];
-							}
-							modeconfig.push(ui.create.switcher('battle_number',battle_number,get.config('battle_number'),ui.click.sidebar.battle_number));break;
-						case 'double_character':
-							modeconfig.push(ui.create.switcher('double_character',get.config('double_character'),ui.click.sidebar.local));break;
-						case 'double_hp':
-							modeconfig.push(ui.create.switcher('double_hp',lib.config.all.double_hp,get.config('double_hp'),ui.click.sidebar.local2));break;
-						case 'free_choose':
-							modeconfig.push(ui.create.switcher('free_choose',get.config('free_choose'),ui.click.sidebar.free_choose));break;
-						case 'change_card':
-							modeconfig.push(ui.create.switcher('change_card',get.config('change_card'),ui.click.sidebar.local));break;
-						case 'change_choice':
-							modeconfig.push(ui.create.switcher('change_choice',get.config('change_choice'),ui.click.sidebar.change_choice));break;
-						case 'change_identity':
-							modeconfig.push(ui.create.switcher('change_identity',get.config('change_identity'),ui.click.sidebar.change_identity));break;
-						case 'swap':
-							modeconfig.push(ui.create.switcher('swap',get.config('swap'),ui.click.sidebar.swap));break;
-						case 'revive':
-							modeconfig.push(ui.create.switcher('revive',get.config('revive'),ui.click.sidebar.revive));break;
-						case 'dierestart':
-							modeconfig.push(ui.create.switcher('dierestart',get.config('dierestart'),ui.click.sidebar.local2));break;
-						case 'ban_weak':
-							modeconfig.push(ui.create.switcher('ban_weak',get.config('ban_weak'),ui.click.sidebar.local2));break;
-						case 'enhance_zhu':
-							modeconfig.push(ui.create.switcher('enhance_zhu',get.config('enhance_zhu'),ui.click.sidebar.local2));break;
-						case 'strict_sort':
-							modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
-							modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));break;
-						default:{
-							if(Array.isArray(lib.config.current_mode[i])){
-								modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
-							}
-							else{
-								modeconfig.push(ui.create.div('.placeholder'));
-							}
-						}
-					}
-				}
-				for(i in lib.config.current_mode){
-					if(i=='difficulty'&&lib.config.current_mode[i]==true){
-
-					}
-					else if(i=='initshow_draw'&&lib.config.current_mode[i]==true){
-
-					}
-				}
-				if(lib.config.modeconfig){
-					for(i=0;i<modeconfig.length;i++){
-						ui.config.appendChild(modeconfig[i]);
-					}
-				}
-				var gameconfig=[];
-				gameconfig._configstr='gameconfig';
-				folditems.push(gameconfig);
-				ui.config.appendChild(ui.create.line2('通用选项',function(){
-					if(this.clicked) return;
-					if(lib.config.gameconfig){
-						game.saveConfig('gameconfig',false);
-						fold(gameconfig);
-					}
-					else{
-						game.saveConfig('gameconfig',true);
-						unfold(this,gameconfig);
-					}
-				}));
-
-				gameconfig.push(ui.create.switcher('cheat',lib.config.cheat,ui.click.sidebar.cheat));
-				gameconfig.push(ui.create.switcher('auto_confirm',lib.config.auto_confirm,ui.click.sidebar.global));
-				gameconfig.push(ui.create.switcher('enable_drag',lib.config.enable_drag,ui.click.sidebar.global));
-				ui.wuxie_self=ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.global);
-				gameconfig.push(ui.wuxie_self);
-				gameconfig.push(ui.create.switcher('duration',[500,700,1000],lib.config.duration,ui.click.sidebar.global));
-				gameconfig.push(ui.create.switcher('hoveration',[700,1000,1500],lib.config.hoveration,ui.click.sidebar.global));
-				gameconfig.push(ui.create.div('.placeholder'));
-				gameconfig.push(ui.create.switcher('right_click',['pause','config','auto'],lib.config.right_click,ui.click.sidebar.global));
-				gameconfig.push(ui.create.switcher('right_info',lib.config.right_info,ui.click.sidebar.global2));
-				gameconfig.push(ui.create.switcher('hover_all',lib.config.hover_all,ui.click.sidebar.hover_all));
-				ui.hoverhandcardconfig=ui.create.switcher('hover_handcard',lib.config.hover_handcard,ui.click.sidebar.global);
-				gameconfig.push(ui.hoverhandcardconfig);
-				if(!lib.config.hover_all) ui.hoverhandcardconfig.classList.add('disabled');
-				gameconfig.push(ui.create.switcher('touchscreen',lib.config.touchscreen,ui.click.sidebar.touchscreen));
-				// gameconfig.push(ui.create.switcher('no_ios_zoom',lib.config.no_ios_zoom,ui.click.sidebar.global));
-				ui.handcardmousewheel=ui.create.switcher('mousewheel',lib.config.mousewheel,ui.click.sidebar.mousewheel);
-				if(lib.config.touchscreen) ui.handcardmousewheel.classList.add('disabled');
-				gameconfig.push(ui.handcardmousewheel);
-
-				gameconfig.push(ui.create.div('.placeholder'));
-				gameconfig.push(ui.create.switcher('background_music',lib.config.all.background_music,lib.config.background_music,ui.click.sidebar.background_music));
-				gameconfig.push(ui.create.switcher('background_audio',lib.config.background_audio,ui.click.sidebar.global));
-				gameconfig.push(ui.create.switcher('background_speak',lib.config.background_speak,ui.click.sidebar.global));
-				gameconfig.push(ui.create.switcher('background_ogg',lib.config.background_ogg,ui.click.sidebar.global));
-				gameconfig.push(ui.create.div('.placeholder'));
-
-				if(lib.config.gameconfig){
-					for(i=0;i<gameconfig.length;i++){
-						ui.config.appendChild(gameconfig[i]);
-					}
-				}
-				switch(lib.config.ui_zoom){
-					case '极小':ui.window.style.zoom=0.8;break;
-					case '很小':ui.window.style.zoom=0.9;break;
-					case '较小':ui.window.style.zoom=0.95;break;
-					case '较大':ui.window.style.zoom=1.05;break;
-					case '很大':ui.window.style.zoom=1.1;break;
-					default:ui.window.style.zoom=1;
-				}
-				if(true||lib.config.no_ios_zoom){
-					var meta=document.createElement('meta');
-					meta.name='viewport';
-					meta.content="user-scalable=0";
-					document.head.appendChild(meta);
-				}
-
-				var appearence=[];
-				appearence._configstr='appearence';
-				folditems.push(appearence);
-				ui.config.appendChild(ui.create.line2('外观选项',function(){
-					if(this.clicked) return;
-					if(lib.config.appearence){
-						game.saveConfig('appearence',false);
-						fold(appearence);
-					}
-					else{
-						game.saveConfig('appearence',true);
-						unfold(this,appearence);
-					}
-				}));
-				appearence.push(ui.create.switcher('theme',lib.config.all.theme,lib.config.theme,ui.click.sidebar.theme));
-				var layoutconfig=ui.create.switcher('layout',lib.config.all.layout,lib.config.layout,ui.click.sidebar.layout);
-				appearence.push(layoutconfig);
-				if(lib.config.layoutfixed.contains(lib.config.mode)){
-					layoutconfig.classList.add('disabled');
-				}
-				appearence.push(ui.create.switcher('image_background',lib.config.all.image_background,lib.config.image_background,ui.click.sidebar.image_background));
-				appearence.push(ui.create.switcher('image_background_filter',lib.config.all.image_background_filter,lib.config.image_background_filter,ui.click.sidebar.image_background_filter));
-				appearence.push(ui.create.switcher('ui_zoom',['极小','很小','较小','原始','较大','很大'],lib.config.ui_zoom,ui.click.sidebar.ui_zoom));
-
-				appearence.push(ui.create.div('.placeholder'));
-				appearence.push(ui.create.switcher('auto_popped',lib.config.auto_popped,ui.click.sidebar.global));
-				appearence.push(ui.create.switcher('only_fullskin',lib.config.only_fullskin,ui.click.sidebar.global2));
-				appearence.push(ui.create.switcher('hide_card_image',lib.config.hide_card_image,ui.click.sidebar.global2));
-				appearence.push(ui.create.switcher('bottom_line',lib.config.bottom_line,ui.click.sidebar.bottom_line));
-				appearence.push(ui.create.switcher('line_dash',lib.config.line_dash,ui.click.sidebar.global2));
-				appearence.push(ui.create.switcher('show_name',lib.config.show_name,ui.click.sidebar.show_name));
-				appearence.push(ui.create.switcher('show_replay',lib.config.show_replay,ui.click.sidebar.show_replay));
-				appearence.push(ui.create.switcher('show_playerids',lib.config.show_playerids,ui.click.sidebar.show_playerids));
-				appearence.push(ui.create.switcher('show_pause',lib.config.show_pause,ui.click.sidebar.show_pause));
-				appearence.push(ui.create.switcher('show_auto',lib.config.show_auto,ui.click.sidebar.show_auto));
-				appearence.push(ui.create.switcher('show_volumn',lib.config.show_volumn,ui.click.sidebar.show_volumn));
-				appearence.push(ui.create.switcher('show_wuxie',lib.config.show_wuxie,ui.click.sidebar.show_wuxie));
-				appearence.push(ui.create.switcher('show_wuxie_self',lib.config.show_wuxie_self,ui.click.sidebar.global));
-				appearence.push(ui.create.switcher('show_discardpile',lib.config.show_discardpile,ui.click.sidebar.global));
-				appearence.push(ui.create.div('.placeholder'));
-				appearence.push(ui.create.switcher('title',lib.config.title,ui.click.sidebar.title));
-
-				appearence.push(ui.create.switcher('fold_card',lib.config.fold_card,ui.click.sidebar.fold_card));
-				appearence.push(ui.create.switcher('threed_card',lib.config.threed_card,ui.click.sidebar.threed_card));
-				appearence.push(ui.create.switcher('blur_ui',lib.config.blur_ui,ui.click.sidebar.blur_ui));
-				appearence.push(ui.create.switcher('right_sidebar',lib.config.right_sidebar,ui.click.sidebar.right_sidebar));
-				appearence.push(ui.create.switcher('animation',lib.config.animation,ui.click.sidebar.global));
-
+				// var folditems=[];
+				// var foldsubitems=[];
+				//
+				// var fold=function(list){
+				// 	if(foldsubitems.contains(list)){
+				// 		for(var i=0;i<list.length;i++){
+				// 			if(!list[i].link.classList.contains('hidden')){
+				// 				list[i].link.hide();
+				// 				list[i].link.parentNode.style.height='20px';
+				// 			}
+				// 		}
+				// 	}
+				// 	for(i=0;i<list.length;i++){
+				// 		if(list[i]) list[i].delete();
+				// 	}
+				// }
+				// var unfold=function(node,list){
+				// 	for(var i=0;i<folditems.length;i++){
+				// 		if(folditems[i]!=list){
+				// 			if(folditems[i]._configstr){
+				// 				game.saveConfig(folditems[i]._configstr,false);
+				// 			}
+				// 			else{
+				// 				folditems[i].fold=false;
+				// 			}
+				// 			fold(folditems[i]);
+				// 		}
+				// 	}
+				// 	for(i=list.length-1;i>=0;i--){
+				// 		if(list[i]){
+				// 			list[i].animate('start');
+				// 			node.parentNode.parentNode.insertBefore(list[i],node.parentNode.nextSibling);
+				// 		}
+				// 	}
+				// 	node.clicked=true;
+				// 	setTimeout(function(){
+				// 		node.clicked=false;
+				// 	},600);
+				// }
+				//
+				//
+				// var newgame=[];
+				// newgame._configstr='newgame';
+				// folditems.push(newgame);
+				// ui.config.appendChild(ui.create.line2('新游戏',function(){
+				// 	if(this.clicked) return;
+				// 	if(lib.config.newgame){
+				// 		game.saveConfig('newgame',false);
+				// 		fold(newgame);
+				// 	}
+				// 	else{
+				// 		game.saveConfig('newgame',true);
+				// 		unfold(this,newgame);
+				// 	}
+				//
+				// }));
+				// var span1='<div style="width:20px;text-align:center;padding-right:0">-</div>';
+				// var span2='<div style="width:20px;text-align:center;padding-right:0">·</div>';
+				// var clickmode=function(){
+				// 	game.saveConfig('mode',this.parentNode.link);
+				// 	game.reload();
+				// };
+				// for(var i=0;i<lib.config.all.mode.length;i++){
+				// 	var thismode=lib.config.all.mode[i];
+				// 	var line=ui.create.line((lib.config.mode==thismode?span1:span2)+lib.translate[thismode]+'模式',clickmode);
+				// 	line.link=thismode;
+				// 	newgame.push(line);
+				// }
+				//
+				// if(!lib.config.modeconfig&&!lib.config.gameconfig&&!lib.config.appearence){
+				// 	for(i=0;i<newgame.length;i++){
+				// 		ui.config.appendChild(newgame[i]);
+				// 	}
+				// }
+				//
+				// ui.config.appendChild(ui.create.div('.placeholder'));
+				//
+				//
+				//
+				// var modeconfig=[];
+				// modeconfig._configstr='modeconfig';
+				// folditems.push(modeconfig);
+				// ui.config.appendChild(ui.create.line2(get.translation(lib.config.mode)+'选项',function(){
+				// 	if(this.clicked) return;
+				// 	if(lib.config.modeconfig){
+				// 		game.saveConfig('modeconfig',false);
+				// 		fold(modeconfig);
+				// 	}
+				// 	else{
+				// 		game.saveConfig('modeconfig',true);
+				// 		unfold(this,modeconfig);
+				// 	}
+				// }));
+				// for(i=0;i<lib.config.current_mode.length;i++){
+				// 	if(typeof lib.config.current_mode[i]==='function'){
+				// 		var result=lib.config.current_mode[i](game,lib,get,ui);
+				// 		if(typeof result=='string'){
+				// 			lib.config.current_mode[i]=result;
+				// 		}
+				// 		else{
+				// 			if(get.objtype(result)=='div'){
+				// 				modeconfig.push(result);
+				// 			}
+				// 			continue;
+				// 		}
+				// 	}
+				// 	switch(lib.config.current_mode[i]){
+				// 		case 'difficulty':
+				// 			modeconfig.push(ui.create.switcher('difficulty',['easy','normal','hard'],get.config('difficulty'),ui.click.sidebar.local));break;
+				// 		case 'initshow_draw':
+				// 			modeconfig.push(ui.create.switcher('initshow_draw',[0,1,2],get.config('initshow_draw'),ui.click.sidebar.local));break;
+				// 		case 'ai_strategy':
+				// 			modeconfig.push(ui.create.switcher('ai_strategy',
+				// 				['ai_strategy_1','ai_strategy_2','ai_strategy_3','ai_strategy_4','ai_strategy_5','ai_strategy_6'],
+				// 				get.config('ai_strategy'),ui.click.sidebar.local));break;
+				// 		case 'ai_identity':
+				// 			modeconfig.push(ui.create.switcher('ai_identity',get.config('ai_identity'),ui.click.sidebar.local));break;
+				// 		case 'auto_identity':
+				// 			modeconfig.push(ui.create.switcher('auto_identity',['一轮','两轮','三轮','关闭'],get.config('auto_identity'),ui.click.sidebar.auto_identity));break;
+				// 		case 'player_number':
+				// 			modeconfig.push(ui.create.switcher('player_number',[2,3,4,5,6,7,8],get.config('player_number'),ui.click.sidebar.player_number));break;
+				// 		case 'battle_number':
+				// 			var battle_number;
+				// 			if(lib.config.mode=='chess'){
+				// 				battle_number=[2,3,4,6,8];
+				// 			}
+				// 			else{
+				// 				battle_number=[1,2,3,5,8,16];
+				// 			}
+				// 			modeconfig.push(ui.create.switcher('battle_number',battle_number,get.config('battle_number'),ui.click.sidebar.battle_number));break;
+				// 		case 'double_character':
+				// 			modeconfig.push(ui.create.switcher('double_character',get.config('double_character'),ui.click.sidebar.local));break;
+				// 		case 'double_hp':
+				// 			modeconfig.push(ui.create.switcher('double_hp',lib.config.all.double_hp,get.config('double_hp'),ui.click.sidebar.local2));break;
+				// 		case 'free_choose':
+				// 			modeconfig.push(ui.create.switcher('free_choose',get.config('free_choose'),ui.click.sidebar.free_choose));break;
+				// 		case 'change_card':
+				// 			modeconfig.push(ui.create.switcher('change_card',get.config('change_card'),ui.click.sidebar.local));break;
+				// 		case 'change_choice':
+				// 			modeconfig.push(ui.create.switcher('change_choice',get.config('change_choice'),ui.click.sidebar.change_choice));break;
+				// 		case 'change_identity':
+				// 			modeconfig.push(ui.create.switcher('change_identity',get.config('change_identity'),ui.click.sidebar.change_identity));break;
+				// 		case 'swap':
+				// 			modeconfig.push(ui.create.switcher('swap',get.config('swap'),ui.click.sidebar.swap));break;
+				// 		case 'revive':
+				// 			modeconfig.push(ui.create.switcher('revive',get.config('revive'),ui.click.sidebar.revive));break;
+				// 		case 'dierestart':
+				// 			modeconfig.push(ui.create.switcher('dierestart',get.config('dierestart'),ui.click.sidebar.local2));break;
+				// 		case 'ban_weak':
+				// 			modeconfig.push(ui.create.switcher('ban_weak',get.config('ban_weak'),ui.click.sidebar.local2));break;
+				// 		case 'enhance_zhu':
+				// 			modeconfig.push(ui.create.switcher('enhance_zhu',get.config('enhance_zhu'),ui.click.sidebar.local2));break;
+				// 		case 'strict_sort':
+				// 			modeconfig.push(ui.create.switcher('strict_sort',get.config('strict_sort'),ui.click.sidebar.local));
+				// 			modeconfig.push(ui.create.switcher('reverse_sort',get.config('reverse_sort'),ui.click.sidebar.reverse_sort));break;
+				// 		default:{
+				// 			if(Array.isArray(lib.config.current_mode[i])){
+				// 				modeconfig.push(ui.create.switcher.apply(this,lib.config.current_mode[i]));
+				// 			}
+				// 			else{
+				// 				modeconfig.push(ui.create.div('.placeholder'));
+				// 			}
+				// 		}
+				// 	}
+				// }
+				// for(i in lib.config.current_mode){
+				// 	if(i=='difficulty'&&lib.config.current_mode[i]==true){
+				//
+				// 	}
+				// 	else if(i=='initshow_draw'&&lib.config.current_mode[i]==true){
+				//
+				// 	}
+				// }
+				// if(lib.config.modeconfig){
+				// 	for(i=0;i<modeconfig.length;i++){
+				// 		ui.config.appendChild(modeconfig[i]);
+				// 	}
+				// }
+				// var gameconfig=[];
+				// gameconfig._configstr='gameconfig';
+				// folditems.push(gameconfig);
+				// ui.config.appendChild(ui.create.line2('通用选项',function(){
+				// 	if(this.clicked) return;
+				// 	if(lib.config.gameconfig){
+				// 		game.saveConfig('gameconfig',false);
+				// 		fold(gameconfig);
+				// 	}
+				// 	else{
+				// 		game.saveConfig('gameconfig',true);
+				// 		unfold(this,gameconfig);
+				// 	}
+				// }));
+				//
+				// gameconfig.push(ui.create.switcher('cheat',lib.config.cheat,ui.click.sidebar.cheat));
+				// gameconfig.push(ui.create.switcher('auto_confirm',lib.config.auto_confirm,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.switcher('enable_drag',lib.config.enable_drag,ui.click.sidebar.global));
+				// ui.wuxie_self=ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.global);
+				// gameconfig.push(ui.wuxie_self);
+				// gameconfig.push(ui.create.switcher('duration',[500,700,1000],lib.config.duration,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.switcher('hoveration',[700,1000,1500],lib.config.hoveration,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.div('.placeholder'));
+				// gameconfig.push(ui.create.switcher('right_click',['pause','config','auto'],lib.config.right_click,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.switcher('right_info',lib.config.right_info,ui.click.sidebar.global2));
+				// gameconfig.push(ui.create.switcher('hover_all',lib.config.hover_all,ui.click.sidebar.hover_all));
+				// ui.hoverhandcardconfig=ui.create.switcher('hover_handcard',lib.config.hover_handcard,ui.click.sidebar.global);
+				// gameconfig.push(ui.hoverhandcardconfig);
+				// if(!lib.config.hover_all) ui.hoverhandcardconfig.classList.add('disabled');
+				// gameconfig.push(ui.create.switcher('touchscreen',lib.config.touchscreen,ui.click.sidebar.touchscreen));
+				// // gameconfig.push(ui.create.switcher('no_ios_zoom',lib.config.no_ios_zoom,ui.click.sidebar.global));
+				// ui.handcardmousewheel=ui.create.switcher('mousewheel',lib.config.mousewheel,ui.click.sidebar.mousewheel);
+				// if(lib.config.touchscreen) ui.handcardmousewheel.classList.add('disabled');
+				// gameconfig.push(ui.handcardmousewheel);
+				//
+				// gameconfig.push(ui.create.div('.placeholder'));
+				// gameconfig.push(ui.create.switcher('background_music',lib.config.all.background_music,lib.config.background_music,ui.click.sidebar.background_music));
+				// gameconfig.push(ui.create.switcher('background_audio',lib.config.background_audio,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.switcher('background_speak',lib.config.background_speak,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.switcher('background_ogg',lib.config.background_ogg,ui.click.sidebar.global));
+				// gameconfig.push(ui.create.div('.placeholder'));
+				//
+				// if(lib.config.gameconfig){
+				// 	for(i=0;i<gameconfig.length;i++){
+				// 		ui.config.appendChild(gameconfig[i]);
+				// 	}
+				// }
+				// switch(lib.config.ui_zoom){
+				// 	case '极小':ui.window.style.zoom=0.8;break;
+				// 	case '很小':ui.window.style.zoom=0.9;break;
+				// 	case '较小':ui.window.style.zoom=0.95;break;
+				// 	case '较大':ui.window.style.zoom=1.05;break;
+				// 	case '很大':ui.window.style.zoom=1.1;break;
+				// 	default:ui.window.style.zoom=1;
+				// }
+				// if(true||lib.config.no_ios_zoom){
+				// 	var meta=document.createElement('meta');
+				// 	meta.name='viewport';
+				// 	meta.content="user-scalable=0";
+				// 	document.head.appendChild(meta);
+				// }
+				//
+				// var appearence=[];
+				// appearence._configstr='appearence';
+				// folditems.push(appearence);
+				// ui.config.appendChild(ui.create.line2('外观选项',function(){
+				// 	if(this.clicked) return;
+				// 	if(lib.config.appearence){
+				// 		game.saveConfig('appearence',false);
+				// 		fold(appearence);
+				// 	}
+				// 	else{
+				// 		game.saveConfig('appearence',true);
+				// 		unfold(this,appearence);
+				// 	}
+				// }));
+				// appearence.push(ui.create.switcher('theme',lib.config.all.theme,lib.config.theme,ui.click.sidebar.theme));
+				// var layoutconfig=ui.create.switcher('layout',lib.config.all.layout,lib.config.layout,ui.click.sidebar.layout);
+				// appearence.push(layoutconfig);
+				// if(lib.config.layoutfixed.contains(lib.config.mode)){
+				// 	layoutconfig.classList.add('disabled');
+				// }
+				// appearence.push(ui.create.switcher('image_background',lib.config.all.image_background,lib.config.image_background,ui.click.sidebar.image_background));
+				// appearence.push(ui.create.switcher('image_background_filter',lib.config.all.image_background_filter,lib.config.image_background_filter,ui.click.sidebar.image_background_filter));
+				// appearence.push(ui.create.switcher('ui_zoom',['极小','很小','较小','原始','较大','很大'],lib.config.ui_zoom,ui.click.sidebar.ui_zoom));
+				//
 				// appearence.push(ui.create.div('.placeholder'));
-				// appearence.push(ui.create.switcher('intro',['⦿','☯','●','❖','✻','i'],lib.config.intro,ui.click.sidebar.intro));
-
-				// appearence.push(ui.create.switcher('sort',['type_sort','suit_sort','number_sort'],lib.config.sort,ui.click.sidebar.sort));
-
-				if(lib.config.appearence){
-					for(i=0;i<appearence.length;i++){
-						ui.config.appendChild(appearence[i]);
-					}
-				}
-				ui.config.appendChild(ui.create.div('.placeholder'));
-				var characterpack=[];
-				folditems.push(characterpack);
-				ui.config.appendChild(ui.create.line2('选择武将',function(){
-					if(this.clicked) return;
-					if(characterpack.fold){
-						characterpack.fold=false;
-						fold(characterpack);
-					}
-					else{
-						characterpack.fold=true;
-						unfold(this,characterpack);
-					}
-
-				}));
-				var characters=lib.config.all.characters;
-				for(i=0;i<characters.length;i++){
-					var node=ui.create.switcher(characters[i]+'_character',
-						lib.config.characters.contains(characters[i]),ui.click.sidebar.characters);
-					node.link=characters[i]+'_character';
-					characterpack[i]=node;
-				}
-				var reset_characterpack=ui.create.div('.config');
-				reset_characterpack.innerHTML='恢复默认';
-				reset_characterpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-					if(_status.dragged) return;
-					game.saveConfig('characters',lib.config.defaultcharacters);
-					for(var i=0;i<characterpack.length;i++){
-						if(characterpack[i].link){
-							var pnme=characterpack[i].link.slice(0,characterpack[i].link.indexOf('_character'));
-							if(lib.config.defaultcharacters.contains(pnme)){
-								if(!characterpack[i].lastChild.classList.contains('on')){
-									characterpack[i].querySelector('.toggle').link=true;
-									characterpack[i].lastChild.classList.add('on');
-								}
-							}
-							else{
-								if(characterpack[i].lastChild.classList.contains('on')){
-									characterpack[i].querySelector('.toggle').link=false;
-									characterpack[i].lastChild.classList.remove('on');
-								}
-							}
-						}
-					}
-					ui.sidebarrestart.classList.add('thundertext');
-				});
-				var all_characterpack=ui.create.div('.config');
-				all_characterpack.innerHTML='全部开启';
-				all_characterpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-					if(_status.dragged) return;
-					game.saveConfig('characters',lib.config.all.characters);
-					for(var i=0;i<characterpack.length;i++){
-						if(characterpack[i].link){
-							if(!characterpack[i].lastChild.classList.contains('on')){
-								characterpack[i].querySelector('.toggle').link=true;
-								characterpack[i].lastChild.classList.add('on');
-							}
-						}
-					}
-					ui.sidebarrestart.classList.add('thundertext');
-				});
-				characterpack.push(reset_characterpack);
-				characterpack.push(all_characterpack);
-
-				var cardpack=[];
-				folditems.push(cardpack);
-				ui.config.appendChild(ui.create.line2('选择卡牌',function(){
-					if(this.clicked) return;
-					if(cardpack.fold){
-						cardpack.fold=false;
-						fold(cardpack);
-					}
-					else{
-						cardpack.fold=true;
-						unfold(this,cardpack);
-					}
-
-				}));
-				var cards=lib.config.all.cards;
-				for(i=0;i<cards.length;i++){
-					var node=ui.create.switcher(cards[i]+'_card',
-						lib.config.cards.contains(cards[i]),ui.click.sidebar.cards);
-					node.link=cards[i]+'_card';
-					cardpack[i]=node;
-				}
-				var reset_cardpack=ui.create.div('.config');
-				reset_cardpack.innerHTML='恢复默认';
-				reset_cardpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-					if(_status.dragged) return;
-					game.saveConfig('cards',lib.config.defaultcards);
-					for(var i=0;i<cardpack.length;i++){
-						if(cardpack[i].link){
-							var pnme=cardpack[i].link.slice(0,cardpack[i].link.indexOf('_card'));
-							if(lib.config.defaultcards.contains(pnme)){
-								if(!cardpack[i].lastChild.classList.contains('on')){
-									cardpack[i].querySelector('.toggle').link=true;
-									cardpack[i].lastChild.classList.add('on');
-								}
-							}
-							else{
-								if(cardpack[i].lastChild.classList.contains('on')){
-									cardpack[i].querySelector('.toggle').link=false;
-									cardpack[i].lastChild.classList.remove('on');
-								}
-							}
-						}
-					}
-					ui.sidebarrestart.classList.add('thundertext');
-				});
-				var all_cardpack=ui.create.div('.config');
-				all_cardpack.innerHTML='全部开启';
-				all_cardpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-					if(_status.dragged) return;
-					game.saveConfig('cards',lib.config.all.cards);
-					for(var i=0;i<cardpack.length;i++){
-						if(cardpack[i].link){
-							if(!cardpack[i].lastChild.classList.contains('on')){
-								cardpack[i].querySelector('.toggle').link=true;
-								cardpack[i].lastChild.classList.add('on');
-							}
-						}
-					}
-					ui.sidebarrestart.classList.add('thundertext');
-				});
-				cardpack.push(reset_cardpack);
-				cardpack.push(all_cardpack);
-
-				var playpack=[];
-				folditems.push(playpack);
-				ui.config.appendChild(ui.create.line2('游戏玩法',function(){
-					if(this.clicked) return;
-					if(playpack.fold){
-						playpack.fold=false;
-						fold(playpack);
-					}
-					else{
-						playpack.fold=true;
-						unfold(this,playpack);
-					}
-
-				}));
-				var plays=lib.config.all.plays;
-				for(i=0;i<plays.length;i++){
-					var node=ui.create.switcher(plays[i]+'_play',
-						lib.config.plays.contains(plays[i]),ui.click.sidebar.plays);
-					node.link=plays[i]+'_play';
-					playpack[i]=node;
-				}
-				ui.config.appendChild(ui.create.div('.placeholder'));
-
-				var cardlist=[];
-				folditems.push(cardlist);
-				ui.config.appendChild(ui.create.line2('游戏资料',function(){
-					if(this.clicked) return;
-					if(cardlist.fold){
-						cardlist.fold=false;
-						fold(cardlist);
-					}
-					else{
-						cardlist.fold=true;
-						unfold(this,cardlist);
-					}
-
-				}));
-				ui.cardviewdialog=(function(){
-					var dialog=ui.create.cardDialog(true);
-					dialog.classList.add('fullheight');
-					var stopprop=function(e){e.stopPropagation();return false;};
-					var clickpop=function(){
-						this.delete();
-						if(dialog.popped==this) delete dialog.popped;
-					}
-					var clickbutt=function(e){
-						if(dialog.popped){
-							dialog.popped.delete();
-							if(dialog.popped.node==this&&dialog.popped.parentNode){
-								delete dialog.popped;
-								return;
-							}
-						}
-						var uiintro=get.nodeintro(this);
-						uiintro.classList.add('popped');
-						uiintro.classList.add('static');
-						uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',clickpop);
-						ui.window.appendChild(uiintro);
-						lib.placePoppedDialog(uiintro,e);
-
-						dialog.popped=uiintro;
-						dialog.popped.node=this;
-					};
-					for(var i=0;i<dialog.buttons.length;i++){
-						dialog.buttons[i].listen(clickbutt);
-					}
-					dialog.listen(stopprop);
-					dialog.oncontextmenu=stopprop;
-					dialog.origin='card';
-					dialog.style.zIndex=6;
-					dialog.classList.add('scroll1');
-					dialog.classList.add('scroll2');
-					return dialog;
-				}());
-				cardlist.push(ui.create.line('卡牌一览',function(){
-					if(ui.gameviewdialog){
-						if(ui.gameviewdialog.popped){
-							ui.gameviewdialog.popped.delete();
-							delete ui.gameviewdialog.popped;
-						}
-						ui.gameviewdialog.close();
-						ui.arena.classList.remove('paused2');
-						if(ui.gameviewdialog.origin=='card'){
-							this.classList.remove('thundertext');
-							delete ui.gameviewdialog;
-							return;
-						}
-					}
-					this.classList.add('thundertext');
-					ui.currentgameview=this;
-					this.parentNode.nextSibling.firstChild.classList.remove('thundertext');
-					ui.arena.classList.add('paused2');
-					ui.gameviewdialog=ui.cardviewdialog;
-					ui.configbg.appendChild(ui.cardviewdialog);
-				}));
-				ui.characterviewdialog=(function(){
-					var dialog=ui.create.characterDialog(true);
-					dialog.classList.add('fullheight');
-					var stopprop=function(e){e.stopPropagation();return false;};
-					var clickpop=function(){
-						this.delete();
-						if(dialog.popped==this) delete dialog.popped;
-					}
-					var clickbutt=function(e){
-						if(dialog.popped){
-							dialog.popped.delete();
-							if(dialog.popped.node==this&&dialog.popped.parentNode){
-								delete dialog.popped;
-								return;
-							}
-						}
-						var uiintro=get.nodeintro(this);
-						uiintro.classList.add('popped');
-						uiintro.classList.add('static');
-						uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',clickpop);
-						ui.window.appendChild(uiintro);
-						lib.placePoppedDialog(uiintro,e);
-
-						dialog.popped=uiintro;
-						dialog.popped.node=this;
-					};
-					for(var i=0;i<dialog.buttons.length;i++){
-						dialog.buttons[i].listen(clickbutt);
-					}
-					dialog.listen(stopprop);
-					dialog.oncontextmenu=stopprop;
-					dialog.origin='character';
-					dialog.style.zIndex=6;
-					dialog.classList.add('scroll1');
-					dialog.classList.add('scroll2');
-					return dialog;
-				}());
-				cardlist.push(ui.create.line('武将一览',function(){
-					if(ui.gameviewdialog){
-						if(ui.gameviewdialog.popped){
-							ui.gameviewdialog.popped.delete();
-							delete ui.gameviewdialog.popped;
-						}
-						ui.gameviewdialog.close();
-						ui.arena.classList.remove('paused2');
-						if(ui.gameviewdialog.origin=='character'){
-							this.classList.remove('thundertext');
-							delete ui.gameviewdialog;
-							return;
-						}
-					}
-					this.classList.add('thundertext');
-					ui.currentgameview=this;
-					this.parentNode.previousSibling.firstChild.classList.remove('thundertext');
-					ui.arena.classList.add('paused2');
-					ui.gameviewdialog=ui.characterviewdialog;
-					ui.configbg.appendChild(ui.characterviewdialog);
-				}));
-
+				// appearence.push(ui.create.switcher('auto_popped',lib.config.auto_popped,ui.click.sidebar.global));
+				// appearence.push(ui.create.switcher('only_fullskin',lib.config.only_fullskin,ui.click.sidebar.global2));
+				// appearence.push(ui.create.switcher('hide_card_image',lib.config.hide_card_image,ui.click.sidebar.global2));
+				// appearence.push(ui.create.switcher('bottom_line',lib.config.bottom_line,ui.click.sidebar.bottom_line));
+				// appearence.push(ui.create.switcher('line_dash',lib.config.line_dash,ui.click.sidebar.global2));
+				// appearence.push(ui.create.switcher('show_name',lib.config.show_name,ui.click.sidebar.show_name));
+				// appearence.push(ui.create.switcher('show_replay',lib.config.show_replay,ui.click.sidebar.show_replay));
+				// appearence.push(ui.create.switcher('show_playerids',lib.config.show_playerids,ui.click.sidebar.show_playerids));
+				// appearence.push(ui.create.switcher('show_pause',lib.config.show_pause,ui.click.sidebar.show_pause));
+				// appearence.push(ui.create.switcher('show_auto',lib.config.show_auto,ui.click.sidebar.show_auto));
+				// appearence.push(ui.create.switcher('show_volumn',lib.config.show_volumn,ui.click.sidebar.show_volumn));
+				// appearence.push(ui.create.switcher('show_wuxie',lib.config.show_wuxie,ui.click.sidebar.show_wuxie));
+				// appearence.push(ui.create.switcher('show_wuxie_self',lib.config.show_wuxie_self,ui.click.sidebar.global));
+				// appearence.push(ui.create.switcher('show_discardpile',lib.config.show_discardpile,ui.click.sidebar.global));
+				// appearence.push(ui.create.div('.placeholder'));
+				// appearence.push(ui.create.switcher('title',lib.config.title,ui.click.sidebar.title));
+				//
+				// appearence.push(ui.create.switcher('fold_card',lib.config.fold_card,ui.click.sidebar.fold_card));
+				// appearence.push(ui.create.switcher('threed_card',lib.config.threed_card,ui.click.sidebar.threed_card));
+				// appearence.push(ui.create.switcher('blur_ui',lib.config.blur_ui,ui.click.sidebar.blur_ui));
+				// appearence.push(ui.create.switcher('right_sidebar',lib.config.right_sidebar,ui.click.sidebar.right_sidebar));
+				// appearence.push(ui.create.switcher('animation',lib.config.animation,ui.click.sidebar.global));
+				// appearence.push(ui.create.switcher('config_menu',lib.config.config_menu,ui.click.sidebar.global));
+				//
+				// // appearence.push(ui.create.div('.placeholder'));
+				// // appearence.push(ui.create.switcher('intro',['⦿','☯','●','❖','✻','i'],lib.config.intro,ui.click.sidebar.intro));
+				//
+				// // appearence.push(ui.create.switcher('sort',['type_sort','suit_sort','number_sort'],lib.config.sort,ui.click.sidebar.sort));
+				//
+				// if(lib.config.appearence){
+				// 	for(i=0;i<appearence.length;i++){
+				// 		ui.config.appendChild(appearence[i]);
+				// 	}
+				// }
+				// ui.config.appendChild(ui.create.div('.placeholder'));
+				// var characterpack=[];
+				// folditems.push(characterpack);
+				// ui.config.appendChild(ui.create.line2('选择武将',function(){
+				// 	if(this.clicked) return;
+				// 	if(characterpack.fold){
+				// 		characterpack.fold=false;
+				// 		fold(characterpack);
+				// 	}
+				// 	else{
+				// 		characterpack.fold=true;
+				// 		unfold(this,characterpack);
+				// 	}
+				//
+				// }));
+				// var characters=lib.config.all.characters;
+				// for(i=0;i<characters.length;i++){
+				// 	var node=ui.create.switcher(characters[i]+'_character',
+				// 		lib.config.characters.contains(characters[i]),ui.click.sidebar.characters);
+				// 	node.link=characters[i]+'_character';
+				// 	characterpack[i]=node;
+				// }
+				// var reset_characterpack=ui.create.div('.config');
+				// reset_characterpack.innerHTML='恢复默认';
+				// reset_characterpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+				// 	if(_status.dragged) return;
+				// 	game.saveConfig('characters',lib.config.defaultcharacters);
+				// 	for(var i=0;i<characterpack.length;i++){
+				// 		if(characterpack[i].link){
+				// 			var pnme=characterpack[i].link.slice(0,characterpack[i].link.indexOf('_character'));
+				// 			if(lib.config.defaultcharacters.contains(pnme)){
+				// 				if(!characterpack[i].lastChild.classList.contains('on')){
+				// 					characterpack[i].querySelector('.toggle').link=true;
+				// 					characterpack[i].lastChild.classList.add('on');
+				// 				}
+				// 			}
+				// 			else{
+				// 				if(characterpack[i].lastChild.classList.contains('on')){
+				// 					characterpack[i].querySelector('.toggle').link=false;
+				// 					characterpack[i].lastChild.classList.remove('on');
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// 	ui.sidebarrestart.classList.add('thundertext');
+				// });
+				// var all_characterpack=ui.create.div('.config');
+				// all_characterpack.innerHTML='全部开启';
+				// all_characterpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+				// 	if(_status.dragged) return;
+				// 	game.saveConfig('characters',lib.config.all.characters);
+				// 	for(var i=0;i<characterpack.length;i++){
+				// 		if(characterpack[i].link){
+				// 			if(!characterpack[i].lastChild.classList.contains('on')){
+				// 				characterpack[i].querySelector('.toggle').link=true;
+				// 				characterpack[i].lastChild.classList.add('on');
+				// 			}
+				// 		}
+				// 	}
+				// 	ui.sidebarrestart.classList.add('thundertext');
+				// });
+				// characterpack.push(reset_characterpack);
+				// characterpack.push(all_characterpack);
+				//
+				// var cardpack=[];
+				// folditems.push(cardpack);
+				// ui.config.appendChild(ui.create.line2('选择卡牌',function(){
+				// 	if(this.clicked) return;
+				// 	if(cardpack.fold){
+				// 		cardpack.fold=false;
+				// 		fold(cardpack);
+				// 	}
+				// 	else{
+				// 		cardpack.fold=true;
+				// 		unfold(this,cardpack);
+				// 	}
+				//
+				// }));
+				// var cards=lib.config.all.cards;
+				// for(i=0;i<cards.length;i++){
+				// 	var node=ui.create.switcher(cards[i]+'_card',
+				// 		lib.config.cards.contains(cards[i]),ui.click.sidebar.cards);
+				// 	node.link=cards[i]+'_card';
+				// 	cardpack[i]=node;
+				// }
+				// var reset_cardpack=ui.create.div('.config');
+				// reset_cardpack.innerHTML='恢复默认';
+				// reset_cardpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+				// 	if(_status.dragged) return;
+				// 	game.saveConfig('cards',lib.config.defaultcards);
+				// 	for(var i=0;i<cardpack.length;i++){
+				// 		if(cardpack[i].link){
+				// 			var pnme=cardpack[i].link.slice(0,cardpack[i].link.indexOf('_card'));
+				// 			if(lib.config.defaultcards.contains(pnme)){
+				// 				if(!cardpack[i].lastChild.classList.contains('on')){
+				// 					cardpack[i].querySelector('.toggle').link=true;
+				// 					cardpack[i].lastChild.classList.add('on');
+				// 				}
+				// 			}
+				// 			else{
+				// 				if(cardpack[i].lastChild.classList.contains('on')){
+				// 					cardpack[i].querySelector('.toggle').link=false;
+				// 					cardpack[i].lastChild.classList.remove('on');
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// 	ui.sidebarrestart.classList.add('thundertext');
+				// });
+				// var all_cardpack=ui.create.div('.config');
+				// all_cardpack.innerHTML='全部开启';
+				// all_cardpack.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+				// 	if(_status.dragged) return;
+				// 	game.saveConfig('cards',lib.config.all.cards);
+				// 	for(var i=0;i<cardpack.length;i++){
+				// 		if(cardpack[i].link){
+				// 			if(!cardpack[i].lastChild.classList.contains('on')){
+				// 				cardpack[i].querySelector('.toggle').link=true;
+				// 				cardpack[i].lastChild.classList.add('on');
+				// 			}
+				// 		}
+				// 	}
+				// 	ui.sidebarrestart.classList.add('thundertext');
+				// });
+				// cardpack.push(reset_cardpack);
+				// cardpack.push(all_cardpack);
+				//
+				// var playpack=[];
+				// folditems.push(playpack);
+				// ui.config.appendChild(ui.create.line2('游戏玩法',function(){
+				// 	if(this.clicked) return;
+				// 	if(playpack.fold){
+				// 		playpack.fold=false;
+				// 		fold(playpack);
+				// 	}
+				// 	else{
+				// 		playpack.fold=true;
+				// 		unfold(this,playpack);
+				// 	}
+				//
+				// }));
+				// var plays=lib.config.all.plays;
+				// for(i=0;i<plays.length;i++){
+				// 	var node=ui.create.switcher(plays[i]+'_play',
+				// 		lib.config.plays.contains(plays[i]),ui.click.sidebar.plays);
+				// 	node.link=plays[i]+'_play';
+				// 	playpack[i]=node;
+				// }
+				// ui.config.appendChild(ui.create.div('.placeholder'));
+				//
+				// var cardlist=[];
+				// folditems.push(cardlist);
+				// ui.config.appendChild(ui.create.line2('游戏资料',function(){
+				// 	if(this.clicked) return;
+				// 	if(cardlist.fold){
+				// 		cardlist.fold=false;
+				// 		fold(cardlist);
+				// 	}
+				// 	else{
+				// 		cardlist.fold=true;
+				// 		unfold(this,cardlist);
+				// 	}
+				//
+				// }));
+				// ui.cardviewdialog=(function(){
+				// 	var dialog=ui.create.cardDialog(true);
+				// 	dialog.classList.add('fullheight');
+				// 	var stopprop=function(e){e.stopPropagation();return false;};
+				// 	var clickpop=function(){
+				// 		this.delete();
+				// 		if(dialog.popped==this) delete dialog.popped;
+				// 	}
+				// 	var clickbutt=function(e){
+				// 		if(dialog.popped){
+				// 			dialog.popped.delete();
+				// 			if(dialog.popped.node==this&&dialog.popped.parentNode){
+				// 				delete dialog.popped;
+				// 				return;
+				// 			}
+				// 		}
+				// 		var uiintro=get.nodeintro(this);
+				// 		uiintro.classList.add('popped');
+				// 		uiintro.classList.add('static');
+				// 		uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',clickpop);
+				// 		ui.window.appendChild(uiintro);
+				// 		lib.placePoppedDialog(uiintro,e);
+				//
+				// 		dialog.popped=uiintro;
+				// 		dialog.popped.node=this;
+				// 	};
+				// 	for(var i=0;i<dialog.buttons.length;i++){
+				// 		dialog.buttons[i].listen(clickbutt);
+				// 	}
+				// 	dialog.listen(stopprop);
+				// 	dialog.oncontextmenu=stopprop;
+				// 	dialog.origin='card';
+				// 	dialog.style.zIndex=6;
+				// 	dialog.classList.add('scroll1');
+				// 	dialog.classList.add('scroll2');
+				// 	return dialog;
+				// }());
+				// cardlist.push(ui.create.line('卡牌一览',function(){
+				// 	if(ui.gameviewdialog){
+				// 		if(ui.gameviewdialog.popped){
+				// 			ui.gameviewdialog.popped.delete();
+				// 			delete ui.gameviewdialog.popped;
+				// 		}
+				// 		ui.gameviewdialog.close();
+				// 		ui.arena.classList.remove('paused2');
+				// 		if(ui.gameviewdialog.origin=='card'){
+				// 			this.classList.remove('thundertext');
+				// 			delete ui.gameviewdialog;
+				// 			return;
+				// 		}
+				// 	}
+				// 	this.classList.add('thundertext');
+				// 	ui.currentgameview=this;
+				// 	this.parentNode.nextSibling.firstChild.classList.remove('thundertext');
+				// 	ui.arena.classList.add('paused2');
+				// 	ui.gameviewdialog=ui.cardviewdialog;
+				// 	ui.configbg.appendChild(ui.cardviewdialog);
+				// }));
+				// ui.characterviewdialog=(function(){
+				// 	var dialog=ui.create.characterDialog(true);
+				// 	dialog.classList.add('fullheight');
+				// 	var stopprop=function(e){e.stopPropagation();return false;};
+				// 	var clickpop=function(){
+				// 		this.delete();
+				// 		if(dialog.popped==this) delete dialog.popped;
+				// 	}
+				// 	var clickbutt=function(e){
+				// 		if(dialog.popped){
+				// 			dialog.popped.delete();
+				// 			if(dialog.popped.node==this&&dialog.popped.parentNode){
+				// 				delete dialog.popped;
+				// 				return;
+				// 			}
+				// 		}
+				// 		var uiintro=get.nodeintro(this);
+				// 		uiintro.classList.add('popped');
+				// 		uiintro.classList.add('static');
+				// 		uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',clickpop);
+				// 		ui.window.appendChild(uiintro);
+				// 		lib.placePoppedDialog(uiintro,e);
+				//
+				// 		dialog.popped=uiintro;
+				// 		dialog.popped.node=this;
+				// 	};
+				// 	for(var i=0;i<dialog.buttons.length;i++){
+				// 		dialog.buttons[i].listen(clickbutt);
+				// 	}
+				// 	dialog.listen(stopprop);
+				// 	dialog.oncontextmenu=stopprop;
+				// 	dialog.origin='character';
+				// 	dialog.style.zIndex=6;
+				// 	dialog.classList.add('scroll1');
+				// 	dialog.classList.add('scroll2');
+				// 	return dialog;
+				// }());
+				// cardlist.push(ui.create.line('武将一览',function(){
+				// 	if(ui.gameviewdialog){
+				// 		if(ui.gameviewdialog.popped){
+				// 			ui.gameviewdialog.popped.delete();
+				// 			delete ui.gameviewdialog.popped;
+				// 		}
+				// 		ui.gameviewdialog.close();
+				// 		ui.arena.classList.remove('paused2');
+				// 		if(ui.gameviewdialog.origin=='character'){
+				// 			this.classList.remove('thundertext');
+				// 			delete ui.gameviewdialog;
+				// 			return;
+				// 		}
+				// 	}
+				// 	this.classList.add('thundertext');
+				// 	ui.currentgameview=this;
+				// 	this.parentNode.previousSibling.firstChild.classList.remove('thundertext');
+				// 	ui.arena.classList.add('paused2');
+				// 	ui.gameviewdialog=ui.characterviewdialog;
+				// 	ui.configbg.appendChild(ui.characterviewdialog);
+				// }));
+				//
 				var autoskill=[];
-				folditems.push(autoskill);
+				// folditems.push(autoskill);
 				ui.autoskill=autoskill;
-				ui.config.appendChild(ui.create.line2('自动发动',function(){
-					if(this.clicked) return;
-					var sks=[];
-					if(game.players){
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]==game.me||game.players[i].isUnderControl()){
-								sks=sks.concat(game.expandSkills(game.players[i].get('s')));
-							}
-						}
-					}
-					for(var i=0;i<autoskill.length-1;i++){
-						if(!sks.contains(autoskill[i].link)){
-							autoskill[i].style.display='none';
-						}
-						else{
-							autoskill[i].style.display='';
-						}
-					}
-					autoskillempty.classList.remove('underlined');
-					if(autoskill.fold){
-						autoskill.fold=false;
-						fold(autoskill);
-					}
-					else{
-						autoskill.fold=true;
-						unfold(this,autoskill);
-					}
-
-				}));
+				// ui.config.appendChild(ui.create.line2('自动发动',function(){
+				// 	if(this.clicked) return;
+				// 	var sks=[];
+				// 	if(game.players){
+				// 		for(var i=0;i<game.players.length;i++){
+				// 			if(game.players[i]==game.me||game.players[i].isUnderControl()){
+				// 				sks=sks.concat(game.expandSkills(game.players[i].get('s')));
+				// 			}
+				// 		}
+				// 	}
+				// 	for(var i=0;i<autoskill.length-1;i++){
+				// 		if(!sks.contains(autoskill[i].link)){
+				// 			autoskill[i].style.display='none';
+				// 		}
+				// 		else{
+				// 			autoskill[i].style.display='';
+				// 		}
+				// 	}
+				// 	autoskillempty.classList.remove('underlined');
+				// 	if(autoskill.fold){
+				// 		autoskill.fold=false;
+				// 		fold(autoskill);
+				// 	}
+				// 	else{
+				// 		autoskill.fold=true;
+				// 		unfold(this,autoskill);
+				// 	}
+				//
+				// }));
 				if(!lib.config.autoskilllist){
 					lib.config.autoskilllist=[];
 				}
@@ -8161,144 +8881,144 @@
 						autoskill.push(nodex);
 					}
 				}
-
-				var autoskillempty=ui.create.div('.config');
-				autoskillempty.listen(function(){
-					var sks=[];
-					if(game.players){
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]==game.me||game.players[i].isUnderControl()){
-								sks=sks.concat(game.expandSkills(game.players[i].get('s')));
-							}
-						}
-					}
-					if(this.classList.contains('underlined')){
-						this.classList.remove('underlined');
-						for(var i=0;i<autoskill.length-1;i++){
-							if(!sks.contains(autoskill[i].link)){
-								autoskill[i].style.display='none';
-							}
-							else{
-								autoskill[i].style.display='';
-							}
-						}
-					}
-					else{
-						this.classList.add('underlined');
-						for(var i=0;i<autoskill.length-1;i++){
-							autoskill[i].style.display='';
-						}
-					}
-				});
-				autoskill.push(autoskillempty);
-				ui.create.div(autoskillempty).innerHTML='显示所有技能';
-
-				var forbidskill=[];
-				folditems.push(forbidskill);
-				ui.config.appendChild(ui.create.line2('技能禁配',function(){
-					if(this.clicked) return;
-					if(forbidskill.fold){
-						forbidskill.fold=false;
-						fold(forbidskill);
-					}
-					else{
-						forbidskill.fold=true;
-						unfold(this,forbidskill);
-					}
-
-				}));
-				var forbid=lib.config.forbid;
-				if(!lib.config.forbidlist){
-					var list=[];
-					for(i=0;i<forbid.length;i++){
-						list.push(true);
-					}
-					game.saveConfig('forbidlist',list);
-				}
-				var str,node,omit;
-				for(i=0;i<forbid.length;i++){
-					str='';
-					omit=false;
-					for(j=0;j<forbid[i].length;j++){
-						if(!lib.skill[forbid[i][j]]){
-							omit=true;break;
-						}
-						str+=get.translation(forbid[i][j])+'+';
-					}
-					if(omit) continue;
-					lib.translate['forbid'+i+'_forbid_config']=str.slice(0,str.length-1);
-					node=ui.create.switcher('forbid'+i+'_forbid',
-						lib.config.forbidlist[i],ui.click.sidebar.forbid);
-					node.link=i;
-					forbidskill[i]=node;
-				}
+				//
+				// var autoskillempty=ui.create.div('.config');
+				// autoskillempty.listen(function(){
+				// 	var sks=[];
+				// 	if(game.players){
+				// 		for(var i=0;i<game.players.length;i++){
+				// 			if(game.players[i]==game.me||game.players[i].isUnderControl()){
+				// 				sks=sks.concat(game.expandSkills(game.players[i].get('s')));
+				// 			}
+				// 		}
+				// 	}
+				// 	if(this.classList.contains('underlined')){
+				// 		this.classList.remove('underlined');
+				// 		for(var i=0;i<autoskill.length-1;i++){
+				// 			if(!sks.contains(autoskill[i].link)){
+				// 				autoskill[i].style.display='none';
+				// 			}
+				// 			else{
+				// 				autoskill[i].style.display='';
+				// 			}
+				// 		}
+				// 	}
+				// 	else{
+				// 		this.classList.add('underlined');
+				// 		for(var i=0;i<autoskill.length-1;i++){
+				// 			autoskill[i].style.display='';
+				// 		}
+				// 	}
+				// });
+				// autoskill.push(autoskillempty);
+				// ui.create.div(autoskillempty).innerHTML='显示所有技能';
+				//
+				// var forbidskill=[];
+				// folditems.push(forbidskill);
+				// ui.config.appendChild(ui.create.line2('技能禁配',function(){
+				// 	if(this.clicked) return;
+				// 	if(forbidskill.fold){
+				// 		forbidskill.fold=false;
+				// 		fold(forbidskill);
+				// 	}
+				// 	else{
+				// 		forbidskill.fold=true;
+				// 		unfold(this,forbidskill);
+				// 	}
+				//
+				// }));
+				// var forbid=lib.config.forbid;
+				// if(!lib.config.forbidlist){
+				// 	var list=[];
+				// 	for(i=0;i<forbid.length;i++){
+				// 		list.push(true);
+				// 	}
+				// 	game.saveConfig('forbidlist',list);
+				// }
+				// var str,node,omit;
+				// for(i=0;i<forbid.length;i++){
+				// 	str='';
+				// 	omit=false;
+				// 	for(j=0;j<forbid[i].length;j++){
+				// 		if(!lib.skill[forbid[i][j]]){
+				// 			omit=true;break;
+				// 		}
+				// 		str+=get.translation(forbid[i][j])+'+';
+				// 	}
+				// 	if(omit) continue;
+				// 	lib.translate['forbid'+i+'_forbid_config']=str.slice(0,str.length-1);
+				// 	node=ui.create.switcher('forbid'+i+'_forbid',
+				// 		lib.config.forbidlist[i],ui.click.sidebar.forbid);
+				// 	node.link=i;
+				// 	forbidskill[i]=node;
+				// }
+				// // ui.config.appendChild(ui.create.div('.placeholder'));
+				//
+				// var skilllist=[];
+				// folditems.push(skilllist);
+				// foldsubitems.push(skilllist);
+				// ui.config.appendChild(ui.create.line2('游戏帮助',function(){
+				// 	if(this.clicked) return;
+				// 	if(skilllist.fold){
+				// 		skilllist.fold=false;
+				// 		fold(skilllist);
+				// 	}
+				// 	else{
+				// 		skilllist.fold=true;
+				// 		unfold(this,skilllist);
+				// 	}
+				// }));
+				// var skillinfo,skillinfo2;
+				// var clickskillinfo=function(){
+				// 	var node=this.parentNode.link;
+				// 	if(node.classList.contains('hidden')){
+				// 		node.show();
+				// 		setTimeout(function(){
+				// 			node.parentNode.style.height=(30+node.parentNode.lastChild.offsetHeight)+'px';
+				// 		})
+				// 	}
+				// 	else{
+				// 		node.hide();
+				// 		node.parentNode.style.height='20px';
+				// 	}
+				// };
+				// for(i in lib.help){
+				// 		skillinfo=ui.create.line(i,clickskillinfo);
+				// 		skillinfo.style.height='20px';
+				// 		skillinfo2=ui.create.div('.configinfo');
+				// 		skillinfo2.innerHTML=lib.help[i];
+				// 		skillinfo2.hide();
+				// 		skillinfo.link=skillinfo2;
+				// 		skillinfo.appendChild(skillinfo2);
+				// 		skilllist.push(skillinfo);
+				// }
 				// ui.config.appendChild(ui.create.div('.placeholder'));
+				//
+				// var node=ui.create.div('.config.line2',ui.config);
+				// ui.create.div(node).innerHTML='重置游戏';
+				// node.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+				// 	if(_status.dragged) return;
+				// 	if(_status.reset){
+				// 		this.firstChild.innerHTML='重置游戏';
+				// 		_status.reset=false;
+				// 	}
+				// 	else{
+				// 		this.firstChild.innerHTML+=' ●';
+				// 		_status.reset=true;
+				// 	}
+				// });
+				//
+				// var node=ui.create.div('.config.line2',ui.config);
+				// ui.sidebarrestart=node;
+				// ui.create.div(node).innerHTML='重新开始';
+				// node.listen(function(){
+				// 	if(_status.reset) localStorage.clear();
+				// 	ui.arena.hide();
+				// 	ui.config.hide();
+				// 	setTimeout(game.reload,500);
+				// });
 
-				var skilllist=[];
-				folditems.push(skilllist);
-				foldsubitems.push(skilllist);
-				ui.config.appendChild(ui.create.line2('游戏帮助',function(){
-					if(this.clicked) return;
-					if(skilllist.fold){
-						skilllist.fold=false;
-						fold(skilllist);
-					}
-					else{
-						skilllist.fold=true;
-						unfold(this,skilllist);
-					}
-				}));
-				var skillinfo,skillinfo2;
-				var clickskillinfo=function(){
-					var node=this.parentNode.link;
-					if(node.classList.contains('hidden')){
-						node.show();
-						setTimeout(function(){
-							node.parentNode.style.height=(30+node.parentNode.lastChild.offsetHeight)+'px';
-						})
-					}
-					else{
-						node.hide();
-						node.parentNode.style.height='20px';
-					}
-				};
-				for(i in lib.help){
-						skillinfo=ui.create.line(i,clickskillinfo);
-						skillinfo.style.height='20px';
-						skillinfo2=ui.create.div('.configinfo');
-						skillinfo2.innerHTML=lib.help[i];
-						skillinfo2.hide();
-						skillinfo.link=skillinfo2;
-						skillinfo.appendChild(skillinfo2);
-						skilllist.push(skillinfo);
-				}
-				ui.config.appendChild(ui.create.div('.placeholder'));
-
-				var node=ui.create.div('.config.line2',ui.config);
-				ui.create.div(node).innerHTML='重置游戏';
-				node.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-					if(_status.dragged) return;
-					if(_status.reset){
-						this.firstChild.innerHTML='重置游戏';
-						_status.reset=false;
-					}
-					else{
-						this.firstChild.innerHTML+=' ●';
-						_status.reset=true;
-					}
-				});
-
-				var node=ui.create.div('.config.line2',ui.config);
-				ui.sidebarrestart=node;
-				ui.create.div(node).innerHTML='重新开始';
-				node.listen(function(){
-					if(_status.reset) localStorage.clear();
-					ui.arena.hide();
-					ui.config.hide();
-					setTimeout(game.reload,500);
-				});
-
-				if(lib.config.right_sidebar){
+				if(false&&lib.config.right_sidebar){
 					ui.system2=ui.create.div('#system2',ui.system);
 					ui.system1=ui.create.div('#system1',ui.system);
 				}
@@ -8307,6 +9027,7 @@
 					ui.system2=ui.create.div('#system2',ui.system);
 				}
 				ui.replay=ui.create.system('重来',game.reload,true);
+				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.pause=ui.create.system('历史',ui.click.pause);
 				if(!lib.config.touchscreen){
 					lib.setPopped(ui.pause,ui.click.pausehistory,220,400);
@@ -8314,11 +9035,10 @@
 				if(!lib.config.show_pause){
 					ui.pause.style.display='none';
 				}
-				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
 				if(!lib.config.touchscreen){
 					lib.setPopped(ui.config2,ui.click.pauseconfig,170);
-					lib.setPopped(ui.wuxie,ui.click.wuxieconfig,170);
+					// lib.setPopped(ui.wuxie,ui.click.wuxieconfig,170);
 				}
 				ui.auto=ui.create.system('托管',ui.click.auto);
 				ui.volumn=ui.create.system('♫');
@@ -8365,6 +9085,411 @@
 				ui.dialogs=[];
 				ui.controls=[];
 				ui.style={};
+
+				(function(){
+					var menu,menuContainer;
+					var startButton;
+					var popupContainer;
+		            var closeMenu=function(){
+		                popupContainer.classList.add('hidden');
+		                if(popupContainer.onclose){
+		                    popupContainer.onclose();
+		                }
+		            };
+		            popupContainer=ui.create.div('.popup-container.hidden',ui.window,closeMenu);
+
+		            var openMenu=function(node,e,onclose){
+		                popupContainer.innerHTML='';
+		                if(e){
+		                    node.style.left=e.x+'px';
+		                    node.style.top=e.y+'px';
+		                }
+		                popupContainer.appendChild(node);
+		                popupContainer.classList.remove('hidden');
+		                popupContainer.onclose=onclose;
+		            };
+		            var clickToggle=function(){
+		                this.classList.toggle('on');
+		                var config=this._link.config;
+		                if(config.onclick){
+		                    config.onclick.call(this,this.classList.contains('on'));
+		                }
+		                if(config.update){
+		                    config.update();
+		                }
+		            };
+		            var clickSwitcher=function(){
+		                var node=this;
+		                this.classList.add('on');
+		                if(this._link.menu){
+		                    var pos1=this.lastChild.getBoundingClientRect();
+		                    var pos2=ui.window.getBoundingClientRect();
+		                    openMenu(this._link.menu,{
+		                        x:pos1.left+pos1.width+5-pos2.left,
+		                        y:pos1.top-pos2.top
+		                    },function(){
+		                        node.classList.remove('on');
+		                    });
+		                }
+		            };
+					var clickContainer=function(){
+						if(this.animating){
+                            return;
+                        }
+                        this.animating=true;
+                        menu.classList.add('zoomout');
+                        menu.classList.remove('zoomin');
+                        setTimeout(function(){
+                            menuContainer.classList.add('hidden');
+                            menuContainer.animating=false;
+                        },300);
+
+						game.resume2();
+						if(game.onresume2){
+							game.onresume2();
+						}
+					};
+					var clickMenuItem=function(){
+		                var node=this.parentNode._link;
+		                var config=node._link.config;
+		                node._link.current=this.link;
+		                node.lastChild.innerHTML=config.item[this._link];
+		                if(config.onclick){
+		                    config.onclick.call(node,this._link);
+		                }
+		                if(config.update){
+		                    config.update();
+		                }
+		            };
+					var createMenu=function(tabs,config){
+						var createPage=function(position){
+			                var node=ui.create.div(position);
+			                ui.create.div('.left.pane',node);
+			                ui.create.div('.right.pane',node);
+			                return node;
+			            };
+						var menu=ui.create.div('.main.menu.dialog.popped.static',config.position,function(e){
+			                e.stopPropagation();
+			            });
+		                var menuTab=ui.create.div('.menu-tab',menu);
+		                var menuTabBar=ui.create.div('.menu-tab-bar',menu);
+						menuTabBar.style.left=(config.bar||0)+'px';
+		                var menuContent=ui.create.div('.menu-content',menu);
+		                var clickTab=function(){
+		                    var active=this.parentNode.querySelector('.active');
+		                    if(active){
+		                        active.classList.remove('active');
+		                        active._link.remove();
+		                    }
+		                    this.classList.add('active');
+		                    menuTabBar.style.left=this.offsetLeft+'px';
+		                    menuContent.appendChild(this._link);
+		                };
+		                var pages=[];
+		                for(var i=0;i<tabs.length;i++){
+		                    var active=(i===(config.init||0));
+		                    pages[i]=createPage(active?menuContent:null);
+		                    ui.create.div(active?'.active':'',tabs[i],menuTab,clickTab)._link=pages[i];
+		                }
+		                return {
+		                    menu:menu,
+		                    pages:pages
+		                };
+					};
+					var createConfig=function(config,position){
+		                var node=ui.create.div('.config',config.name);
+						node._link={config:config};
+		                if(config.item){
+		                    if(Array.isArray(config.init)){
+
+		                    }
+		                    else{
+		                        node.classList.add('switcher');
+		                        node.addEventListener('click',clickSwitcher);
+		                        ui.create.div('',config.item[config.init],node);
+		                        node._link.menu=ui.create.div('.menu');
+								node._link.menu._link=node;
+		                        node._link.current=config.init;
+		                        for(var i in config.item){
+		                            ui.create.div('',config.item[i],node._link.menu,clickMenuItem)._link=i;
+		                        }
+		                    }
+		                }
+		                else if(config.range){
+
+		                }
+						else if(config.clear){
+							node.listen(clickToggle);
+						}
+		                else{
+		                    node.classList.add('toggle');
+		                    node.listen(clickToggle);
+		                    ui.create.div(ui.create.div(node));
+		                    if(config.init==true){
+		                        node.classList.add('on');
+		                    }
+		                }
+		                if(position){
+		                    position.appendChild(node);
+		                }
+		                return node;
+		            };
+					menuContainer=ui.create.div('.menu-container.hidden',ui.window,clickContainer);
+					ui.click.configMenu=function(){
+                        if(menuContainer.classList.contains('hidden')){
+                            menu.classList.remove('zoomout');
+                            menu.classList.add('zoomin');
+                            menuContainer.classList.remove('hidden');
+                            menuContainer.animating=true;
+                            setTimeout(function(){
+                                menuContainer.animating=false;
+                            },300);
+                        }
+                        else{
+							clickContainer.call(menuContainer);
+                        }
+					}
+
+					var menux=createMenu(['开始','选项','武将','卡牌','技能','帮助'],{
+	                    position:menuContainer,bar:40
+	                });
+					menu=menux.menu;
+
+
+					var copyObj=function(obj){
+						var copy={};
+						for(var i in obj){
+							if(get.objtype(obj[i])=='object'){
+								copy[i]=util.copy(obj[i]);
+							}
+							else if(Array.isArray(obj[i])){
+								copy[i]=obj[i].slice(0);
+							}
+							else{
+								copy[i]=obj[i];
+							}
+						}
+						return copy;
+					};
+
+					(function(){
+						var start=menux.pages[0];
+						var rightPane=start.lastChild;
+
+						startButton=ui.create.div('.menubutton.round.highlight','启',start,function(){
+	                        if(this.animating||this.classList.contains('dim')){
+	                            return;
+	                        }
+	                        var active=this.parentNode.querySelector('.active');
+	                        if(active){
+								game.saveConfig('mode',active.mode);
+								game.reload();
+	                        }
+	                    });
+
+						var clickMode=function(){
+							var active=this.parentNode.querySelector('.active');
+							if(active===this){
+								return;
+							}
+							active.classList.remove('active');
+							active.link.remove();
+							active=this;
+							this.classList.add('active');
+							rightPane.appendChild(this.link);
+						};
+
+						var createModeConfig=function(mode,position){
+	                        var info=lib.mode[mode];
+	                        var page=ui.create.div('');
+	                        var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
+							node.link=page;
+							node.mode=mode;
+							if(mode==lib.config.mode){
+								node.classList.add('active');
+							}
+	                        var map={};
+	                        if(info.config){
+	                            var hiddenNodes=[];
+	                            for(var j in info.config){
+	                                if(j==='update'){
+	                                    continue;
+	                                }
+	                                var cfg=copyObj(info.config[j]);
+									cfg._name=j;
+									var config=lib.config.mode_config[mode]||{};
+	                                if(!config.hasOwnProperty(j)){
+										game.saveConfig(j,cfg.init,mode);
+	                                }
+	                                else{
+	                                    cfg.init=config[j];
+	                                }
+	                                if(!cfg.onclick){
+	                                    cfg.onclick=function(result){
+											var cfg=this._link.config;
+											game.saveConfig(cfg._name,result,mode);
+	                                        if(cfg.onsave){
+	                                            cfg.onsave.call(this,result);
+	                                        }
+											if(cfg.restart){
+												startButton.classList.add('glowing');
+											}
+	                                    };
+	                                }
+	                                if(info.config.update){
+	                                    cfg.update=function(){
+	                                        info.config.update(config,map);
+	                                    };
+	                                }
+	                                var cfgnode=createConfig(cfg);
+	                                map[j]=cfgnode;
+	                                if(cfg.frequent){
+	                                    page.appendChild(cfgnode);
+	                                }
+	                                else{
+	                                    cfgnode.classList.add('auto-hide');
+	                                    hiddenNodes.push(cfgnode);
+	                                }
+	                            }
+	                            var expanded=false;
+	                            if(hiddenNodes.length){
+	                                ui.create.div('.config.more','更多 <div>&gt;</div>',page,function(){
+	                                    if(expanded){
+	                                        this.classList.remove('on');
+	                                        this.parentNode.classList.remove('expanded');
+	                                    }
+	                                    else{
+	                                        this.classList.add('on');
+	                                        this.parentNode.classList.add('expanded');
+	                                    }
+	                                    expanded=!expanded;
+	                                });
+	                                for(var k=0;k<hiddenNodes.length;k++){
+	                                    page.appendChild(hiddenNodes[k]);
+	                                }
+	                            }
+	                            if(info.config.update){
+	                                info.config.update(config,map);
+	                            }
+	                        }
+	                        return node;
+	                    };
+
+						for(var i in lib.mode){
+	                        createModeConfig(i,start.firstChild);
+	                    }
+						var active=start.firstChild.querySelector('.active');
+	                    if(!active){
+	                        active=start.firstChild.firstChild;
+	                        active.classList.add('active');
+	                    }
+						rightPane.appendChild(active.link);
+
+					}());
+
+					(function(){
+						var start=menux.pages[1];
+						var rightPane=start.lastChild;
+
+						var clickMode=function(){
+							var active=this.parentNode.querySelector('.active');
+							if(active===this){
+								return;
+							}
+							active.classList.remove('active');
+							active.link.remove();
+							active=this;
+							this.classList.add('active');
+							rightPane.appendChild(this.link);
+						};
+
+						var createModeConfig=function(mode,position){
+	                        var info=lib.configMenu[mode];
+	                        var page=ui.create.div('');
+	                        var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
+							node.link=page;
+							node.mode=mode;
+							if(mode==lib.config.mode){
+								node.classList.add('active');
+							}
+	                        var map={};
+	                        if(info.config){
+	                            var hiddenNodes=[];
+	                            for(var j in info.config){
+	                                if(j==='update'){
+	                                    continue;
+	                                }
+	                                var cfg=copyObj(info.config[j]);
+									cfg._name=j;
+									var config=lib.config;
+	                                if(!config.hasOwnProperty(j)){
+										game.saveConfig(j,cfg.init);
+	                                }
+	                                else{
+	                                    cfg.init=config[j];
+	                                }
+	                                if(!cfg.onclick){
+	                                    cfg.onclick=function(result){
+											var cfg=this._link.config;
+											game.saveConfig(cfg._name,result);
+	                                        if(cfg.onsave){
+	                                            cfg.onsave.call(this,result);
+	                                        }
+											if(cfg.restart){
+												startButton.classList.add('glowing');
+											}
+	                                    };
+	                                }
+	                                if(info.config.update){
+	                                    cfg.update=function(){
+	                                        info.config.update(config,map);
+	                                    };
+	                                }
+	                                var cfgnode=createConfig(cfg);
+	                                map[j]=cfgnode;
+	                                if(!cfg.unfrequent){
+	                                    page.appendChild(cfgnode);
+	                                }
+	                                else{
+	                                    cfgnode.classList.add('auto-hide');
+	                                    hiddenNodes.push(cfgnode);
+	                                }
+	                            }
+	                            var expanded=false;
+	                            if(hiddenNodes.length){
+	                                ui.create.div('.config.more','更多 <div>&gt;</div>',page,function(){
+	                                    if(expanded){
+	                                        this.classList.remove('on');
+	                                        this.parentNode.classList.remove('expanded');
+	                                    }
+	                                    else{
+	                                        this.classList.add('on');
+	                                        this.parentNode.classList.add('expanded');
+	                                    }
+	                                    expanded=!expanded;
+	                                });
+	                                for(var k=0;k<hiddenNodes.length;k++){
+	                                    page.appendChild(hiddenNodes[k]);
+	                                }
+	                            }
+	                            if(info.config.update){
+	                                info.config.update(config,map);
+	                            }
+	                        }
+	                        return node;
+	                    };
+
+						for(var i in lib.configMenu){
+	                        createModeConfig(i,start.firstChild);
+	                    }
+						var active=start.firstChild.querySelector('.active');
+	                    if(!active){
+	                        active=start.firstChild.firstChild;
+	                        active.classList.add('active');
+	                    }
+						rightPane.appendChild(active.link);
+					}());
+				}());
 			},
 			system:function(str,func,right){
 				var node=ui.create.div(right?ui.system2:ui.system1);
@@ -8580,7 +9705,10 @@
 					return;
 				}
 				if(num==undefined) num=lib.config.mode_config[lib.config.mode].player_number;
-				if(num==undefined) num=5;
+				if(typeof num=='string'){
+					num=parseInt(num);
+				}
+				if(!num) num=5;
 				for(var i=0;i<num;i++){
 					var player=ui.create.player(ui.arena).animate('start');
 					game.players.push(player);
@@ -8667,20 +9795,20 @@
 				return uiintro;
 			},
 			wuxieconfig:function(){
-				if(!lib.config.show_wuxie_self) return;
 				if(!lib.config.auto_popped) return;
-				if(!ui.config.childNodes.length) return;
+				// if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
-				var node=ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.wuxie_self);
+				var node=ui.create.switcher('wuxie_self',lib.config.wuxie_self,ui.click.sidebar.global);
 				uiintro.add(node);
 
 				return uiintro;
 			},
 			pauseconfig:function(){
 				if(!lib.config.auto_popped) return;
-				if(!ui.config.childNodes.length) return;
+				// if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
 				var rows=Math.ceil(lib.config.all.mode.length/3);
+				uiintro.type='config';
 				for(var k=0;k<rows;k++){
 					var node=ui.create.div('.newgame');
 					for(var i=0;i<3&&i+k*3<lib.config.all.mode.length;i++){
@@ -8837,14 +9965,19 @@
 			leavehoverpopped:function(){
 				if(_status.dragged) return;
 				this.delete();
-				var button=this._poppedorigin
+				var button=this._poppedorigin;
+
+				var uiintro=this;
 				setTimeout(function(){
-					delete button._uiintro;
+					if(button._uiintro==uiintro){
+						delete button._uiintro;
+					}
 				},500);
+
 			},
 			dierevive:function(){
 				if(game.me.isDead()){
-					game.me.revive(1);
+					game.me.revive(Math.max(1,game.me.maxHp));
 					game.me.draw(2);
 				}
 				else{
@@ -8895,7 +10028,15 @@
 				if(_status.dragged) return;
 				game.swapPlayer(this.link);
 			},
+			windowmousewheel:function(e){
+				_status.tempunpopup=e;
+			},
 			windowmousemove:function(e){
+				if(_status.tempunpopup){
+					if(get.evtDistance(_status.tempunpopup,e)>5){
+						delete _status.tempunpopup;
+					}
+				}
 				if(e.button==2) return;
 				if(!Array.isArray(e.path)) return;
 				var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
@@ -9018,7 +10159,7 @@
 							}
 						}
 						_status._mouseentertimeout=setTimeout(function(){
-							if(_status.currentmouseenter!=node||node._mouseentercreated||
+							if(_status.currentmouseenter!=node||node._mouseentercreated||_status.tempunpopup||
 								_status.mousedragging||_status.mousedown||!node.offsetWidth||!node.offsetHeight){
 								return;
 							}
@@ -9741,16 +10882,22 @@
 
 				_status.clicked=true;
 				game.pause2();
-				ui.system.hide();
-				if(lib.config.right_sidebar) ui.arena.classList.add('left');
-				else ui.arena.classList.add('right');
-				ui.window.appendChild(ui.configbg);
-				setTimeout(function(){
-					ui.config.animate('start');
-					ui.window.appendChild(ui.config);
-				},100);
-				if(game.onpause2){
-					game.onpause2();
+
+				if(lib.config.config_menu){
+					ui.click.configMenu();
+				}
+				else{
+					ui.system.hide();
+					if(false&&lib.config.right_sidebar) ui.arena.classList.add('left');
+					else ui.arena.classList.add('right');
+					ui.window.appendChild(ui.configbg);
+					setTimeout(function(){
+						ui.config.animate('start');
+						ui.window.appendChild(ui.config);
+					},100);
+					if(game.onpause2){
+						game.onpause2();
+					}
 				}
 			},
 			config2:function(e){
@@ -9916,13 +11063,14 @@
 					game.saveConfig('player_number',num,true);
 					game.reload();
 				},
-				auto_identity:function(bool){
+				auto_identity:function(item){
 					game.saveConfig('auto_identity',bool,true);
 					var num;
-					switch(bool){
-						case '一轮':num=1;break;
-						case '两轮':num=2;break;
-						case '三轮':num=3;break;
+					switch(item){
+						case 'one':num=1;break;
+						case 'two':num=2;break;
+						case 'three':num=3;break;
+						case 'always':num=-1;break;
 						default:num=0;break;
 					}
 					if(num&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
@@ -10408,6 +11556,9 @@
 		config:function(item){
 			if(!lib.config.mode_config[lib.config.mode]) return;
 			return lib.config.mode_config[lib.config.mode][item];
+		},
+		evtDistance:function(e1,e2){
+			return Math.sqrt((e1.x-e2.x)*(e1.x-e2.x)+(e1.y-e2.y)*(e1.y-e2.y));
 		},
 		skillLocked:function(skill){
 			var info=lib.skill[skill];
@@ -12341,6 +13492,8 @@
 			}
 			lib.config.current_mode=mode[lib.config.mode].config||[];
 			lib.config.mode_choice=mode[lib.config.mode].config;
+			game.rank=window.characterRank;
+			delete window.characterRank;
 			for(i in mode[lib.config.mode]){
 				if(i=='element') continue;
 				if(i=='game') continue;
@@ -12504,6 +13657,7 @@
 			game.start();
 			game.loop();
 		};
+		document.onmousewheel=ui.click.windowmousewheel;
 		document.onmousemove=ui.click.windowmousemove;
 		document.onmousedown=ui.click.windowmousedown;
 		document.onmouseup=ui.click.windowmouseup;

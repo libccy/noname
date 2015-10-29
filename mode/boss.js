@@ -48,8 +48,8 @@ mode.boss={
 				}
 				var bosslistlinks={};
 				var toggleBoss=function(bool){
-					game.saveConfig(this.name,bool,true);
-					var node=bosslistlinks[this.name];
+					game.saveConfig(this._link.config._name,bool,true);
+					var node=bosslistlinks[this._link.config._name];
 					if(bool){
 						node.style.display='';
 					}
@@ -80,6 +80,11 @@ mode.boss={
 						}
 						lib.translate[cfg+'_config']=lib.translate[i];
 						lib.config.current_mode.push([cfg,get.config(cfg),toggleBoss]);
+						lib.mode.boss.config[cfg]={
+							name:get.translation(i),
+							onclick:toggleBoss,
+							init:true,
+						}
 						var player=ui.create.player(bosslist).init(i);
 						list.push(player);
 						player.node.hp.classList.add('text');

@@ -1,0 +1,327 @@
+.menu-container{
+	z-index:5;
+}
+.menu-container div{
+    position: relative;
+}
+.menu-container.hidden{
+    pointer-events: none;
+}
+#menu-button{
+	z-index:6;
+}
+.popup-container{
+	z-index:10;
+}
+
+.menu-container,.popup-container{
+	width:100%;
+	height:100%;
+	left:0;
+	top:0;
+	position: absolute;
+}
+
+.menu-container>.menu.main{
+	left: 15px;
+	top: 52px;
+}
+.menu-container>.menu.main.center{
+	left:calc(50% - 200px);
+	top:calc(50% - 150px);
+}
+.menu.main.slideup{
+	-webkit-animation:menuslideup 0.5s forwards;
+}
+.menu.main.slidedown{
+	-webkit-animation:menuslidedown 0.5s forwards;
+}
+.menu.main.zoomin{
+	-webkit-animation:menuzoomin 0.3s forwards;
+}
+.menu.main.zoomout{
+	-webkit-animation:menuzoomout 0.3s forwards;
+}
+.menu.main{
+	width: 400px;
+	height:300px;
+	position: absolute;
+	overflow:hidden;
+	padding:0;
+}
+.menu.main>.menu-tab{
+	height:37px;
+	text-align:center;
+	width:calc(100% - 30px);
+	padding-left:15px;
+	padding-right:15px;
+	position:relative;
+	text-align:center;
+
+	border-width: 0 0 1px;
+	border-style:solid;
+	border-image:linear-gradient(to right, transparent,rgba(0,0,0,0.2) 10%,rgba(0,0,0,0.2) 90%,transparent) 0 1 100%;
+}
+.menu.main>.menu-tab-bar{
+	width:45px;
+	height:2px;
+	top:35px;
+	position:absolute;
+	background-color:rgb(0, 133, 255);
+	transition:left 0.3s;
+}
+.menu.main>.menu-tab>div{
+	display:inline-block;
+	height:32px;
+	line-height:30px;
+	padding-top:5px;
+	width:45px;
+	margin-left:5px;
+	margin-right:5px;
+	transition:color 0.5s;
+}
+.menu.main>.menu-tab>div:not(.active):not(*:hover){
+	color:rgba(255,255,255,0.6);
+}
+.menu.main>.menu-content{
+	height:calc(100% - 38px);
+	position:relative;
+	width:100%;
+}
+.menu.main>.menu-content>div{
+	width:100%;
+	height:100%;
+}
+.menu.main>.menu-content>div>.pane{
+	position:absolute;
+	display:inline-block;
+	height:100%;
+}
+.menu.main>.menu-content>div>.left.pane{
+	width:34%;
+    left:0;
+    overflow: scroll;
+}
+.menu.main>.menu-content>div>.left.pane>div{
+	width:calc(100% - 30px);
+	margin-top:9px;
+	margin-left:10px;
+	transition:all 0.3s;
+    height: 23px;
+    font-size: 26px;
+    line-height: 26px;
+}
+.menu.main>.menu-content>div>.left.pane.dim>div:not(.active){
+	color:rgba(255,255,255,0.5);
+}
+.menu.main>.menu-content>div>.right.pane{
+	left:34%;
+	width:66%;
+	overflow:scroll;
+}
+.menu.main>.menu-content>div>.right.pane>div{
+	width:calc(100% - 5px);
+	position:absolute;
+	top:0;
+	left:0;
+	padding-left:5px;
+	padding-top:5px;
+}
+.menu.main>.menu-content>div>.right.pane>.expanded{
+	padding-bottom:80px;
+}
+.menu.main>.menu-content>div>.right.pane>div>.config{
+    left:2px;
+	margin-top:10px;
+	transition:all 0.3s;
+	width:calc(100% - 10px);
+    overflow: visible;
+}
+.menu.main>.menu-content>div>.right.pane>div>.config.toggle{
+    left:2px !important;
+    text-align: left !important;
+}
+.menu.main>.menu-content>div>.right.pane>div:not(.expanded)>.config.auto-hide,
+.menu.main>.menu-content>div>.right.pane>div>.config.hidden{
+	margin-top:-25px;
+	opacity:0;
+	z-index:-1;
+}
+.menu.main>.menu-content>div>.menubutton.round{
+	left:335px;
+	top:197px;
+	z-index:1;
+    transition-property: color, box-shadow;
+	transition-duration:0.3s;
+	position:absolute;
+}
+.menu.main>.menu-content>div>.menubutton.round.glowing{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
+}
+
+.popup-container.hidden{
+	display:none;
+}
+.popup-container>.menu{
+	position:absolute;
+	overflow:hidden;
+}
+.popup-container>.menu>div{
+	padding-top:5px;
+	padding-bottom:5px;
+	padding-left:10px;
+	padding-right:10px;
+    position: relative;
+    display: block;
+    transition: all 0s;
+}
+.popup-container>.menu>div:first-child{
+	margin-top:5px;
+}
+.popup-container>.menu>div:last-child{
+	margin-bottom:5px;
+}
+
+.config{
+	height:25px;
+	line-height:25px;
+	position:relative;
+}
+.config.switcher>div,
+.config.toggle>div{
+	position:absolute;
+	right:0;
+    left:auto;
+	display:inline-block;
+	transition:all 0.3s;
+	height:25px;
+}
+.config.switcher>div{
+	border-bottom-width:2px;
+	border-bottom-style:solid;
+	border-bottom-color:transparent;
+	margin-right: 4px;
+}
+.config.switcher.on>div{
+	border-bottom-color:rgb(0, 133, 255);
+}
+.config.toggle>div{
+	width:60px;
+}
+.config.toggle>div>div{
+	display:inline-block;
+	position:relative;
+	width:25px;
+	height:25px;
+	top:0;
+	left:0;
+	transition:all 0.3s;
+    padding: 0;
+}
+.config.toggle.on>div>div{
+	left:calc(100% - 25px);
+}
+.config.more{
+	z-index:1;
+}
+.config.more>div{
+	display:inline-block;
+	transition:transform 0.3s
+}
+.config.more>div{
+	transform:translateY(-2px);
+    font-family: 'huangcao';
+}
+.config.more.on>div{
+	transform:rotate(90deg) translateX(-2px);
+}
+
+.menubutton{
+	text-align:center;
+	display:inline-block;
+	padding:5px;
+}
+.menubutton.large{
+	font-size:30px;
+	line-height:30px;
+	font-family:'STXinwei','xinwei';
+}
+.menubutton.round{
+	width:40px;
+	height:40px;
+	border-radius:100%;
+	font-size:36px;
+	line-height:40px;
+	font-family:'xinwei'
+}
+.menubutton.left{
+	float:left;
+}
+.menubutton.right{
+	float:right;
+}
+.menubutton.search{
+	text-align:left;
+}
+.menubutton.search:not(.focus){
+	color:rgba(255,255,255,0.5);
+}
+.menubutton.dim{
+	color:rgba(255,255,255,0.5);
+}
+
+@-webkit-keyframes fadein{from{opacity:0}}
+@-webkit-keyframes menuslideup{from{top:100%}}
+@-webkit-keyframes menuslidedown{to{top:100%}}
+@-webkit-keyframes menuzoomin{from{transform:scale(0.5);opacity:0;transform-origin:2px -35px}to{transform-origin:2px -35px}}
+@-webkit-keyframes menuzoomout{from{transform-origin:2px -35px}to{transform:scale(0.5);opacity:0;transform-origin:2px -35px}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.menubutton{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+    border-radius:8px;
+    background-image: linear-gradient(rgba(75,75,75,1), rgba(70,70,70,1));
+}
+.menubutton{
+    border-radius:4px;
+}
+.menubutton.active{
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+}
+.menubutton.highlight{
+	background-image: linear-gradient(rgba(150, 47, 47, 1), rgba(132, 43, 43, 1));
+}
+.menubutton.large.active,
+.menubutton.large.lighlight{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px;
+}
+
+.config.toggle>div{
+	border-radius:25px;
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 0 10px inset;
+}
+.config.toggle.on>div{
+	background-color:rgba(47,101,150,1);
+}
+.config.toggle>div>div{
+	border-radius:25px;
+	background-image: linear-gradient(rgba(75,75,75,1), rgba(70,70,70,1));
+	box-shadow: rgba(51, 51, 51, 1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+}
+
+.popup-container>.menu>div:hover{
+    color:white;
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+	box-shadow: rgba(0,0,0,0.2) 0 0 0 1px;
+}

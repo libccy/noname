@@ -143,6 +143,7 @@ window.config={
 		image_background_config:'游戏背景',
 		image_background_filter_config:'背景效果',
 
+		config_menu_config:'选项菜单',
 		show_playerids_config:'显示身份按钮',
 		bottom_line_config:'指示线置底',
 		line_dash_config:'虚线指示线',
@@ -195,6 +196,7 @@ window.config={
 	volumn_background:8,
 	volumn_audio:8,
 
+	config_menu:true,
 	auto_popped:true,
 	auto_skill:true,
 	auto_confirm:true,
@@ -252,7 +254,7 @@ window.config={
 	mode_config:{
 		global:{
 			player_number:8,
-			auto_identity:'关闭',
+			auto_identity:'off',
 			double_character:false,
 			save_progress:true,
 			free_choose:true,

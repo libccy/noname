@@ -138,6 +138,8 @@ body>.background{z-index:-2}
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:6px;
+	transition: all 0.3s;
+	-webkit-animation:none;
 	-webkit-animation:dialog_start2 0.2s;
 	transition-property:opacity;
 }
@@ -846,6 +848,7 @@ div[data-color="unknownm"]{
 /*--------其它--------*/
 @font-face {font-family: 'xiaozhuan';src: url('../../font/xiaozhuan.ttf');}
 @font-face {font-family: 'huangcao';src: url('../../font/huangcao.ttf');}
+@font-face {font-family: 'xinwei';src: url('../../font/xinwei.ttf');}
 ::-webkit-scrollbar{display: none;}
 
 @media screen and (min-height: 800px) {
