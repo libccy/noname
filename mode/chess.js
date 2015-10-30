@@ -1119,21 +1119,21 @@ mode.chess={
 				ui.money.childNodes[3].style.fontFamily='huangcao';
 				ui.money.style.letterSpacing='4px';
 				'step 1'
-				game.rank.all=game.rank.s.
-					concat(game.rank.ap).
-					concat(game.rank.a).
-					concat(game.rank.am).
-					concat(game.rank.bp).
-					concat(game.rank.b).
-					concat(game.rank.bm).
-					concat(game.rank.c).
-					concat(game.rank.d);
-				game.rank.common=[];
-				for(var i=0;i<game.rank.all.length;i++){
-					if(!game.rank.legend.contains(game.rank.all[i])&&
-						!game.rank.epic.contains(game.rank.all[i])&&
-						!game.rank.rare.contains(game.rank.all[i])){
-						game.rank.common.push(game.rank.all[i]);
+				lib.rank.all=lib.rank.s.
+					concat(lib.rank.ap).
+					concat(lib.rank.a).
+					concat(lib.rank.am).
+					concat(lib.rank.bp).
+					concat(lib.rank.b).
+					concat(lib.rank.bm).
+					concat(lib.rank.c).
+					concat(lib.rank.d);
+				lib.rank.common=[];
+				for(var i=0;i<lib.rank.all.length;i++){
+					if(!lib.rank.legend.contains(lib.rank.all[i])&&
+						!lib.rank.epic.contains(lib.rank.all[i])&&
+						!lib.rank.rare.contains(lib.rank.all[i])){
+						lib.rank.common.push(lib.rank.all[i]);
 					}
 				}
 				delete window.characterRank;
@@ -1296,7 +1296,7 @@ mode.chess={
 					return aa>bb?1:-1;
 				});
 				if(game.data.character.length==0||!game.data.challenge){
-					game.data.character=game.rank.common.randomGets(3);
+					game.data.character=lib.rank.common.randomGets(3);
 					game.data.challenge=game.getLeaderList();
 					game.saveData();
 				}
@@ -1639,20 +1639,20 @@ mode.chess={
 						var total=Math.max(2,_status.mylist.length-1);
 						var list;
 						switch(rank){
-							case 's':list=game.rank.ap;break;
-							case 'ap':list=game.rank.s.concat(game.rank.a);break;
-							case 'a':list=game.rank.ap.concat(game.rank.am);break;
-							case 'am':list=game.rank.a.concat(game.rank.bp);break;
-							case 'bp':list=game.rank.am.concat(game.rank.b);break;
-							case 'b':list=game.rank.bp.concat(game.rank.bm);break;
-							case 'bm':list=game.rank.b.concat(game.rank.c);break;
-							case 'c':list=game.rank.bm.concat(game.rank.d);break;
-							case 'd':list=game.rank.c;break;
+							case 's':list=lib.rank.ap;break;
+							case 'ap':list=lib.rank.s.concat(lib.rank.a);break;
+							case 'a':list=lib.rank.ap.concat(lib.rank.am);break;
+							case 'am':list=lib.rank.a.concat(lib.rank.bp);break;
+							case 'bp':list=lib.rank.am.concat(lib.rank.b);break;
+							case 'b':list=lib.rank.bp.concat(lib.rank.bm);break;
+							case 'bm':list=lib.rank.b.concat(lib.rank.c);break;
+							case 'c':list=lib.rank.bm.concat(lib.rank.d);break;
+							case 'd':list=lib.rank.c;break;
 						}
 						for(var i=0;i<total;i++){
 							if(Math.random()<0.7){
 								_status.enemylist.push(Array.prototype.randomGet.apply(
-									game.rank[rank],_status.enemylist.concat(_status.mylist)));
+									lib.rank[rank],_status.enemylist.concat(_status.mylist)));
 							}
 							else{
 								_status.enemylist.push(Array.prototype.randomGet.apply(
@@ -1677,9 +1677,9 @@ mode.chess={
 							number=3;
 						}
 						switch(difficulty){
-							case 'leader_easy':list=game.rank.d.concat(game.rank.c).concat(game.rank.bm);break;
-							case 'leader_medium':list=game.rank.b.concat(game.rank.bp).concat(game.rank.am);break;
-							case 'leader_hard':list=game.rank.a.concat(game.rank.ap).concat(game.rank.s);break;
+							case 'leader_easy':list=lib.rank.d.concat(lib.rank.c).concat(lib.rank.bm);break;
+							case 'leader_medium':list=lib.rank.b.concat(lib.rank.bp).concat(lib.rank.am);break;
+							case 'leader_hard':list=lib.rank.a.concat(lib.rank.ap).concat(lib.rank.s);break;
 						}
 						for(var i=0;i<lib.hiddenCharacters.length;i++){
 							if(list.length<=number){
@@ -1996,15 +1996,15 @@ mode.chess={
 				}
 				else{
 					switch(event.arenachoice.length){
-						case 0:choice=game.rank.d.randomGets(3);break;
-						case 1:choice=game.rank.c.randomGets(3);break;
-						case 2:choice=game.rank.bm.randomGets(3);break;
-						case 3:choice=game.rank.b.randomGets(3);break;
-						case 4:choice=game.rank.bp.randomGets(3);break;
-						case 5:choice=game.rank.am.randomGets(3);break;
-						case 6:choice=game.rank.a.randomGets(3);break;
-						case 7:choice=game.rank.ap.randomGets(3);break;
-						case 8:choice=game.rank.s.randomGets(3);break;
+						case 0:choice=lib.rank.d.randomGets(3);break;
+						case 1:choice=lib.rank.c.randomGets(3);break;
+						case 2:choice=lib.rank.bm.randomGets(3);break;
+						case 3:choice=lib.rank.b.randomGets(3);break;
+						case 4:choice=lib.rank.bp.randomGets(3);break;
+						case 5:choice=lib.rank.am.randomGets(3);break;
+						case 6:choice=lib.rank.a.randomGets(3);break;
+						case 7:choice=lib.rank.ap.randomGets(3);break;
+						case 8:choice=lib.rank.s.randomGets(3);break;
 					}
 					game.data.arena={
 						win:0,
@@ -2356,14 +2356,14 @@ mode.chess={
 						}
 						game.saveData();
 						switch(game.data.arena.win){
-							case 0:list=game.rank.d.concat(game.rank.c);break;
-							case 1:list=game.rank.c.concat(game.rank.bm);break;
-							case 2:list=game.rank.bm.concat(game.rank.b);break;
-							case 3:list=game.rank.b.concat(game.rank.bp);break;
-							case 4:list=game.rank.bp.concat(game.rank.am);break;
-							case 5:list=game.rank.am.concat(game.rank.a);break;
-							case 6:list=game.rank.a.concat(game.rank.ap);break;
-							default:list=game.rank.ap.concat(game.rank.s);
+							case 0:list=lib.rank.d.concat(lib.rank.c);break;
+							case 1:list=lib.rank.c.concat(lib.rank.bm);break;
+							case 2:list=lib.rank.bm.concat(lib.rank.b);break;
+							case 3:list=lib.rank.b.concat(lib.rank.bp);break;
+							case 4:list=lib.rank.bp.concat(lib.rank.am);break;
+							case 5:list=lib.rank.am.concat(lib.rank.a);break;
+							case 6:list=lib.rank.a.concat(lib.rank.ap);break;
+							default:list=lib.rank.ap.concat(lib.rank.s);
 						}
 						for(var i=0;i<_status.mylist.length;i++){
 							list.remove(_status.mylist[i]);
@@ -2442,7 +2442,7 @@ mode.chess={
 		},
 		getRank:function(name){
 			if(name==_status.lord) return 'ap';
-			var rank=game.rank;
+			var rank=lib.rank;
 			if(rank.s.contains(name)) return 's';
 			if(rank.ap.contains(name)) return 'ap';
 			if(rank.a.contains(name)) return 'a';
@@ -2455,7 +2455,7 @@ mode.chess={
 			return 'x';
 		},
 		getLeaderList:function(){
-			var list=game.rank.all.slice(0);
+			var list=lib.rank.all.slice(0);
 			for(var i=0;i<game.data.character.length;i++){
 				list.remove(game.data.character[i]);
 			}
@@ -2475,13 +2475,13 @@ mode.chess={
 			if(Math.random()<pleg){
 				game.data.legend=0;
 				game.saveData();
-				return game.rank.legend.randomGet();
+				return lib.rank.legend.randomGet();
 			}
 			game.data.legend++;
 			game.saveData();
-			if(Math.random()<0.05) return game.rank.epic.randomGet();
-			if(Math.random()<0.3) return game.rank.rare.randomGet();
-			return game.rank.common.randomGet();
+			if(Math.random()<0.05) return lib.rank.epic.randomGet();
+			if(Math.random()<0.3) return lib.rank.rare.randomGet();
+			return lib.rank.common.randomGet();
 		},
 		changeMoney:function(num){
 			game.data.money+=num;
@@ -2494,7 +2494,7 @@ mode.chess={
 			ui.money.childNodes[1].innerHTML=game.data.dust;
 		},
 		getRarity:function(name){
-			var rank=game.rank;
+			var rank=lib.rank;
 			if(rank.legend.contains(name)) return 'legend';
 			if(rank.epic.contains(name)) return 'epic';
 			if(rank.rare.contains(name)) return 'rare';

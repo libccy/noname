@@ -216,7 +216,7 @@ margin-bottom: 5px;
 /*--------角色--------*/
 .player>.avatar>.action{
 	margin: 5px;
-	font-family: 'huangcao';
+	font-family: 'xinwei';
 	font-size: 20px;
 	letter-spacing: -2px;
 }
@@ -232,7 +232,7 @@ margin-bottom: 5px;
 .player.replaceenemy{-webkit-animation:replaceenemy 0.5s}
 .player>div{z-index: 2;}
 .player.dead,.player.likedead{z-index: 1;-webkit-filter:grayscale(1);}
-.player>.name{left: 18px;top:36px;}
+.player>.name{left: 18px;top:36px;font-family: 'huangcao';font-size:20px}
 .player>.intro{top:87px;left: 18px;}
 .player>.damage{
 	font-family: 'huangcao';

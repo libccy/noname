@@ -27,4 +27,10 @@
             default:bg.style.webkitFilter='';
         }
     }
+    window.resetGameTimeout=setTimeout(function(){
+        if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+            localStorage.clear();
+            window.location.reload();
+        }
+    },5000);
 }())

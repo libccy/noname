@@ -141,6 +141,11 @@
     left:2px !important;
     text-align: left !important;
 }
+.menu.main>.menu-content>div>.right.pane>div>.config.indent,
+.menu.main>.menu-content>div>.right.pane>div>.config.toggle.indent{
+    left:12px !important;
+	width: calc(100% - 20px) !important;
+}
 .menu.main>.menu-content>div>.right.pane>div:not(.expanded)>.config.auto-hide,
 .menu.main>.menu-content>div>.right.pane>div>.config.hidden{
 	margin-top:-25px;

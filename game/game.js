@@ -54,8 +54,95 @@
 					wuxie_self:{
 						name:'不无懈自己',
 						init:true,
+					},
+					game_speed:{
+						name:'游戏速度',
+						init:'mid',
+						item:{
+							vslow:'慢',
+							slow:'较慢',
+							mid:'中',
+							fast:'较快',
+							vfast:'快',
+						},
+					},
+					right_click:{
+						name:'右键功能',
+						init:'pause',
+						unfrequent:true,
+						item:{
+							pause:'暂停',
+							config:'选项',
+							auto:'托管',
+						}
+					},
+					right_info:{
+						name:'右键显示信息',
+						init:true,
+						unfrequent:true,
+						restart:true
+					},
+					hover_all:{
+						name:'悬停显示信息',
+						init:true,
+						unfrequent:true,
+						restart:true,
+					},
+					hover_handcard:{
+						name:'悬停手牌显示信息',
+						init:true,
+						unfrequent:true,
+					},
+					hoveration:{
+						name:'悬停菜单弹出时间',
+						unfrequent:true,
+						init:'1000',
+						item:{
+							'500':'0.5秒',
+							'700':'0.7秒',
+							'1000':'1秒',
+							'1500':'1.5秒',
+							'2500':'2.5秒',
+						}
+					},
+					touchscreen:{
+						name:'触屏模式',
+						init:false,
+						restart:true
+					},
+					mousewheel:{
+						name:'滚轮控制手牌',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('mousewheel',bool);
+							if(lib.config.touchscreen) return;
+							if(lib.config.mousewheel){
+								game.me.node.handcards1.onmousewheel=ui.click.mousewheel;
+								game.me.node.handcards2.onmousewheel=ui.click.mousewheel;
+							}
+							else{
+								game.me.node.handcards1.onmousewheel=null;
+								game.me.node.handcards2.onmousewheel=null;
+							}
+						}
+					},
+					update:function(config,map){
+						if(!config.hover_all){
+							map.hover_handcard.hide();
+							map.hoveration.hide();
+						}
+						else{
+							map.hover_handcard.show();
+							map.hoveration.show();
+						}
+						if(config.touchscreen){
+							map.mousewheel.hide();
+						}
+						else{
+							map.mousewheel.show();
+						}
 					}
-					// *****
 				}
 			},
 			appearence:{
@@ -79,6 +166,504 @@
 								setTimeout(function(){ui.arena.show();},100);
 							},500);
 						}
+					},
+					layout:{
+						name:'布局',
+						init:'newlayout',
+						item:{
+							default:'默认',
+							newlayout:'新版',
+						},
+						onclick:function(layout){
+							game.saveConfig('layout',layout);
+							if(lib.config.mode!='chess'){
+								ui.arena.hide();
+								setTimeout(function(){
+									var layout=ui.css.layout;
+									ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
+
+									setTimeout(function(){layout.remove();ui.arena.show();},100);
+								},500);
+							}
+						}
+					},
+					ui_zoom:{
+						name:'界面缩放',
+						unfrequent:true,
+						init:'normal',
+						item:{
+							esmall:'极小',
+							vsmall:'很小',
+							small:'较小',
+							normal:'原始',
+							big:'较大',
+							vbig:'很大',
+						},
+						onclick:function(zoom){
+							game.saveConfig('ui_zoom',zoom);
+							switch(zoom){
+								case 'esmall':ui.window.style.zoom=0.8;break;
+								case 'vsmall':ui.window.style.zoom=0.9;break;
+								case 'small':ui.window.style.zoom=0.95;break;
+								case 'big':ui.window.style.zoom=1.05;break;
+								case 'vbig':ui.window.style.zoom=1.1;break;
+								default:ui.window.style.zoom=1;
+							}
+						}
+					},
+					image_background:{
+						name:'游戏背景',
+						init:'default',
+						item:{
+							default:'默认',
+							huangyueying_bg:'逐墨',
+							zhulian_bg:'璧合',
+							september_bg:'九月',
+							xueji_bg:'雪霁',
+							yinxiang_bg:'印象',
+							chunhui_bg:'春晖',
+							grass_bg:'芳草',
+							huangtian_bg:'黄天',
+						},
+						onclick:function(background){
+							var animate=lib.config.image_background=='default';
+							game.saveConfig('image_background',background);
+							ui.background.delete();
+							ui.background=ui.create.div('.background');
+
+							switch (lib.config.image_background_filter){
+								case 'blur':ui.background.style.webkitFilter='blur(8px)';
+									ui.background.style.webkitTransform='scale(1.05)';break;
+								case 'gray':ui.background.style.webkitFilter='grayscale(1)';break;
+								case 'sepia':ui.background.style.webkitFilter='sepia(0.5)';break;
+								case 'invert':ui.background.style.webkitFilter='invert(1)';break;
+								case 'saturate':ui.background.style.webkitFilter='saturate(5)';break;
+								case 'contrast':ui.background.style.webkitFilter='contrast(1.4)';break;
+								case 'hue':ui.background.style.webkitFilter='hue-rotate(180deg)';break;
+								case 'brightness':ui.background.style.webkitFilter='brightness(5)';break;
+								default:ui.background.style.webkitFilter='';
+								ui.background.style.webkitTransform='';
+							}
+
+							document.body.insertBefore(ui.background,document.body.firstChild);
+							if(animate) ui.background.animate('start');
+							if(lib.config.image_background=='default'){
+								ui.background.style.backgroundImage="none";
+							}
+							else{
+								ui.background.style.backgroundImage="url('image/background/"+lib.config.image_background+".jpg')";
+							}
+							ui.background.style.backgroundSize='cover';
+						},
+					},
+					image_background_filter:{
+						name:'背景特效',
+						init:'default',
+						unfrequent:true,
+						item:{
+							default:'无',
+							blur:'模糊',
+							gray:'黑色',
+							sepia:'怀旧',
+							invert:'反色',
+							saturate:'饱和',
+							contrast:'对比',
+							hue:'偏色',
+							brightness:'高亮',
+						},
+						onclick:function(filter){
+							game.saveConfig('image_background_filter',filter);
+							ui.click.sidebar.image_background(lib.config.image_background);
+						},
+					},
+					auto_popped:{
+						name:'自动弹出菜单',
+						init:true,
+						unfrequent:true,
+					},
+					only_fullskin:{
+						name:'隐藏无全身皮肤武将',
+						init:true,
+						unfrequent:true,
+						restart:true,
+					},
+					hide_card_image:{
+						name:'隐藏卡牌背景',
+						init:false,
+						unfrequent:true,
+						restart:true,
+					},
+					bottom_line:{
+						name:'指示线置底',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('bottom_line',bool);
+							if(lib.config.bottom_line){
+								ui.canvas.style.zIndex=0;
+							}
+							else{
+								ui.canvas.style.zIndex='';
+							}
+						}
+					},
+					line_dash:{
+						name:'虚线指示线',
+						init:false,
+						unfrequent:true,
+					},
+					show_name:{
+						name:'显示武将名',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_name',bool);
+							if(lib.config.show_name){
+								for(var i=0;i<game.players.length;i++){
+									game.players[i].node.name.style.display='';
+								}
+							}
+							else{
+								for(var i=0;i<game.players.length;i++){
+									game.players[i].node.name.style.display='none';
+								}
+							}
+						}
+					},
+					show_replay:{
+						name:'显示重来按钮',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_replay',bool);
+							if(lib.config.show_replay){
+								ui.replay.style.display='';
+							}
+							else{
+								ui.replay.style.display='none';
+							}
+						}
+					},
+					show_playerids:{
+						name:'显示身份按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_playerids',bool);
+							if(lib.config.show_playerids){
+								ui.playerids.style.display='';
+							}
+							else{
+								ui.playerids.style.display='none';
+							}
+						}
+					},
+					show_pause:{
+						name:'显示历史按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_pause',bool);
+							if(lib.config.show_pause){
+								ui.pause.style.display='';
+							}
+							else{
+								ui.pause.style.display='none';
+							}
+						}
+					},
+					show_auto:{
+						name:'显示托管按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_auto',bool);
+							if(lib.config.show_auto){
+								ui.auto.style.display='';
+							}
+							else{
+								ui.auto.style.display='none';
+							}
+						}
+					},
+					show_volumn:{
+						name:'显示音量按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_volumn',bool);
+							if(lib.config.show_volumn){
+								ui.volumn.style.display='';
+							}
+							else{
+								ui.volumn.style.display='none';
+							}
+						}
+					},
+					show_wuxie:{
+						name:'显示不询问无懈',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_wuxie',bool);
+							if(lib.config.show_wuxie){
+								ui.wuxie.style.display='';
+							}
+							else{
+								ui.wuxie.style.display='none';
+							}
+						}
+					},
+					show_discardpile:{
+						name:'暂停时显示弃牌堆',
+						init:false,
+						unfrequent:true,
+					},
+					title:{
+						name:'标题栏显示信息',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('title',bool);
+							if(!lib.config.title) document.title='无名杀';
+						}
+					},
+					fold_card:{
+						name:'折叠手牌',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('fold_card',bool);
+							if(bool){
+								ui.css.fold=lib.init.css('layout/default','fold');
+							}
+							else if(ui.css.fold){
+								ui.css.fold.remove();
+							}
+						}
+					},
+					blur_ui:{
+						name:'模糊效果',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('blur_ui',bool);
+							if(bool){
+								ui.css.blur_ui=lib.init.css('layout/default','blur');
+							}
+							else if(ui.css.blur_ui){
+								ui.css.blur_ui.remove();
+							}
+						}
+					},
+					animation:{
+						name:'游戏特效',
+						init:true,
+					},
+					update:function(config,map){
+						if(lib.config.layoutfixed.contains(lib.config.mode)){
+							map.layout.hide();
+						}
+						if(lib.config.image_background=='default'){
+							map.image_background_filter.hide();
+						}
+						else{
+							map.image_background_filter.show();
+						}
+					},
+				}
+			},
+			audio:{
+				name:'音效',
+				config:{
+					background_music:{
+						name:'背景音乐',
+						init:true,
+						item:{
+							music_default:'默认',
+							music_diaochan:'貂蝉',
+							music_shezhan:'舌战',
+							music_danji:'单骑',
+							music_random:'随机',
+							music_off:'关闭',
+						},
+						onclick:function(item){
+							game.saveConfig('background_music',item);
+							game.playBackgroundMusic();
+						}
+					},
+					background_audio:{
+						name:'游戏音效',
+						init:true,
+					},
+					background_speak:{
+						name:'人物配音',
+						init:true,
+					},
+					background_ogg:{
+						name:'补全配音',
+						init:false
+					}
+				}
+			},
+			playpack:{
+				name:'玩法',
+				config:{
+					character:{
+						name:'角色卡牌',
+						init:false,
+						restart:true,
+						onclick:function(bool){
+							if(bool){
+								lib.config.plays.add('character');
+							}
+							else{
+								lib.config.plays.remove('character');
+							}
+							game.saveConfig('plays',lib.config.plays);
+						}
+					},
+					soldier:{
+						name:'士兵模式',
+						init:false,
+						restart:true,
+						onclick:function(bool){
+							if(bool){
+								lib.config.plays.add('soldier');
+							}
+							else{
+								lib.config.plays.remove('soldier');
+							}
+							game.saveConfig('plays',lib.config.plays);
+						}
+					},
+					wuxing:{
+						name:'五行生克',
+						init:false,
+						restart:true,
+						onclick:function(bool){
+							if(bool){
+								lib.config.plays.add('wuxing');
+							}
+							else{
+								lib.config.plays.remove('wuxing');
+							}
+							game.saveConfig('plays',lib.config.plays);
+						}
+					},
+					update:function(config,map){
+						for(var i in map){
+							if(lib.config.plays.contains(i)){
+								map[i].classList.add('on');
+							}
+							else{
+								map[i].classList.remove('on');
+							}
+						}
+					}
+				}
+			},
+			skill:{
+				name:'技能',
+				config:{
+					update:function(config,map){
+						for(var i in map){
+							if(map[i]._link.config.type=='autoskill'){
+								if(!lib.config.autoskilllist.contains(i)){
+									map[i].classList.add('on');
+									ui.autoskill[i].lastChild.classList.add('on');
+								}
+								else{
+									map[i].classList.remove('on');
+									ui.autoskill[i].lastChild.classList.remove('on');
+								}
+							}
+							else if(map[i]._link.config.type=='banskill'){
+								if(!lib.config.forbidlist.contains(i)){
+									map[i].classList.add('on');
+								}
+								else{
+									map[i].classList.remove('on');
+								}
+							}
+						}
+					}
+				}
+			},
+			others:{
+				name:'其它',
+				config:{
+					reset_game:{
+						name:'重置游戏',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								localStorage.clear();
+								window.location.reload();
+								return;
+							}
+							node._clearing=true;
+							node.innerHTML='单击以确认 (3)';
+							setTimeout(function(){
+								node.innerHTML='单击以确认 (2)';
+								setTimeout(function(){
+									node.innerHTML='单击以确认 (1)';
+									setTimeout(function(){
+										node.innerHTML='重置游戏';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true
+					},
+					import_data:{
+						name:'导入游戏数据',
+						onclick:function(){
+							ui.import_data_button.classList.toggle('hidden');
+						},
+						clear:true
+					},
+					import_data_button:{
+						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
+						'<input type="file" id="fileToLoad" style="width:calc(100% - 40px)">'+
+						'<button style="width:40px">确定</button></div>',
+						clear:true,
+					},
+					export_data:{
+						name:'导出游戏数据',
+						onclick:function(){
+							var data={};
+							for(var i in localStorage){
+								data[i]=localStorage[i];
+							}
+							var textToWrite = lib.init.encode(JSON.stringify(data));
+							var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+							var fileNameToSaveAs = 'noname-data';
+
+							var downloadLink = document.createElement("a");
+							downloadLink.download = fileNameToSaveAs;
+							downloadLink.innerHTML = "Download File";
+							if (window.webkitURL != null)
+							{
+								// Chrome allows the link to be clicked
+								// without actually adding it to the DOM.
+								downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+							}
+							else
+							{
+								// Firefox requires the link to be added to the DOM
+								// before it can be clicked.
+								downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+								downloadLink.onclick = function(){
+									downloadLink.remove();
+								};
+								downloadLink.style.display = "none";
+								document.body.appendChild(downloadLink);
+							}
+
+							downloadLink.click();
+						},
+						clear:true
 					}
 				}
 			}
@@ -899,6 +1484,8 @@
 				if(lib.config.threed_card) ui.css.threed=lib.init.css('layout/default','fold2');
 				if(lib.config.blur_ui) ui.css.blur_ui=lib.init.css('layout/default','blur');
 				ui.css.theme=lib.init.css('theme/'+lib.config.theme,'style');
+
+				lib.config.duration=500;
 			},
 			css:function(path,file,before){
 				var style = document.createElement("link");
@@ -1060,7 +1647,12 @@
 					player.phaseJudge();
 					"step 1"
 					player.phaseDraw();
-					game.delay();
+					if(player==game.me){
+						game.delay();
+					}
+					else{
+						game.delayx();
+					}
 					"step 2"
 					player.phaseUse();
 					"step 3"
@@ -1987,8 +2579,8 @@
 						}
 					}
 					if(event.animate!=false||num>0){
-						if(num==0)game.delay();
-						else game.delay(0.5);
+						if(num==0)game.delayx();
+						else game.delayx(0.5);
 					}
 					"step 3"
 					if(!get.info(event.card).multitarget&&num<targets.length-1){
@@ -2136,9 +2728,9 @@
 					}
 					if(num==0){
 						if(typeof info.delay=='number') game.delay(info.delay);
-						else if(info.delay!==false&&info.delay!==0) game.delay();
+						else if(info.delay!==false&&info.delay!==0) game.delayx();
 					}
-					else game.delay(0.5);
+					else game.delayx(0.5);
 					if(!info.multitarget&&num<targets.length-1){
 						event.num++;
 						event.redo();
@@ -2222,7 +2814,7 @@
 						if(event.card) name+=get.translation(event.card.name);
 					}
 					event.trigger('respond');
-					game.delay(0.5);
+					game.delayx(0.5);
 				},
 				gain:function(){
 					"step 0"
@@ -4596,8 +5188,15 @@
 					if(this.name&&this.name2){
 						this.forbiddenSkills.length=0;
 						var forbid=[];
+						var getName=function(arr){
+							var str='';
+							for(var i=0;i<arr.length;i++){
+								str+=arr[i]+'+';
+							}
+							return str.slice(0,str.length-1);
+						}
 						for(var i=0;i<lib.config.forbid.length;i++){
-							if(lib.config.forbidlist[i]){
+							if(!lib.config.forbidlist.contains(getName(lib.config.forbid[i]))){
 								for(var j=0;j<lib.config.forbid[i].length;j++){
 									if(this.skills.contains(lib.config.forbid[i][j])==false) break;
 								}
@@ -6820,6 +7419,16 @@
 			time=time*lib.config.duration+time2;
 			_status.timeout=setTimeout(game.resume,time);
 		},
+		delayx:function(time){
+			if(typeof time!='number') time=1;
+			switch(lib.config.game_speed){
+				case 'vslow':time*=2.5;break;
+				case 'slow':time*=1.5;break;
+				case 'fast':time*=0.7;break;
+				case 'vfast':time*=0.4;break;
+			}
+			return game.delay(time);
+		},
 		check:function(event){
 			var i,j,range;
 			if(event==undefined) event=_status.event;
@@ -8481,14 +9090,14 @@
 				// 		ui.config.appendChild(gameconfig[i]);
 				// 	}
 				// }
-				// switch(lib.config.ui_zoom){
-				// 	case '极小':ui.window.style.zoom=0.8;break;
-				// 	case '很小':ui.window.style.zoom=0.9;break;
-				// 	case '较小':ui.window.style.zoom=0.95;break;
-				// 	case '较大':ui.window.style.zoom=1.05;break;
-				// 	case '很大':ui.window.style.zoom=1.1;break;
-				// 	default:ui.window.style.zoom=1;
-				// }
+				switch(lib.config.ui_zoom){
+					case 'esmall':ui.window.style.zoom=0.8;break;
+					case 'vsmall':ui.window.style.zoom=0.9;break;
+					case 'small':ui.window.style.zoom=0.95;break;
+					case 'big':ui.window.style.zoom=1.05;break;
+					case 'vbig':ui.window.style.zoom=1.1;break;
+					default:ui.window.style.zoom=1;
+				}
 				// if(true||lib.config.no_ios_zoom){
 				// 	var meta=document.createElement('meta');
 				// 	meta.name='viewport';
@@ -8836,7 +9445,7 @@
 				// 	ui.configbg.appendChild(ui.characterviewdialog);
 				// }));
 				//
-				var autoskill=[];
+				var autoskill={};
 				// folditems.push(autoskill);
 				ui.autoskill=autoskill;
 				// ui.config.appendChild(ui.create.line2('自动发动',function(){
@@ -8878,7 +9487,7 @@
 						nodex=ui.create.switcher(i+'_forbid',
 							!lib.config.autoskilllist.contains(i),ui.click.sidebar.autoskill);
 						nodex.link=i;
-						autoskill.push(nodex);
+						autoskill[i]=nodex;
 					}
 				}
 				//
@@ -9250,7 +9859,7 @@
                         }
 					}
 
-					var menux=createMenu(['开始','选项','武将','卡牌','技能','帮助'],{
+					var menux=createMenu(['开始','选项','武将','卡牌','战局','帮助'],{
 	                    position:menuContainer,bar:40
 	                });
 					menu=menux.menu;
@@ -9403,6 +10012,62 @@
 							rightPane.appendChild(this.link);
 						};
 
+						var clickAutoSkill=function(bool){
+							var name=this._link.config._name;
+							var list=lib.config.autoskilllist;
+							if(bool){
+								list.remove(name);
+							}
+							else{
+								list.add(name);
+							}
+							game.saveConfig('autoskilllist',list);
+						};
+						for(var i in lib.skill){
+							if(lib.skill[i].frequent&&lib.translate[i]){
+								lib.configMenu.skill.config[i]={
+									name:lib.translate[i],
+									init:true,
+									type:'autoskill',
+									onclick:clickAutoSkill
+								}
+							}
+						}
+						var clickBanSkill=function(bool){
+							var name=this._link.config._name;
+							var list=lib.config.forbidlist;
+							if(bool){
+								list.remove(name);
+							}
+							else{
+								list.add(name);
+							}
+							game.saveConfig('forbidlist',list);
+						};
+						var forbid=lib.config.forbid;
+						lib.config.forbidmap={};
+						if(!lib.config.forbidlist){
+							game.saveConfig('forbidlist',[]);
+						}
+						for(var i=0;i<forbid.length;i++){
+							var str='';
+							var str2='';
+							for(var j=0;j<forbid[i].length;j++){
+								str+=get.translation(forbid[i][j])+'+';
+								str2+=forbid[i][j]+'+';
+							}
+							lib.config.forbidmap[str2]=forbid[i];
+							str=str.slice(0,str.length-1);
+							str2=str2.slice(0,str2.length-1);
+
+							lib.configMenu.skill.config[str2]={
+								name:str,
+								init:true,
+								type:'banskill',
+								onclick:clickBanSkill
+							}
+						}
+
 						var createModeConfig=function(mode,position){
 	                        var info=lib.configMenu[mode];
 	                        var page=ui.create.div('');
@@ -9415,6 +10080,43 @@
 	                        var map={};
 	                        if(info.config){
 	                            var hiddenNodes=[];
+								var autoskillNodes=[];
+								var banskillNodes=[];
+								var banskill;
+								if(mode=='skill'){
+									var autoskillexpanded=false;
+									var banskillexpanded=false;
+	                                ui.create.div('.config.more','自动发动 <div>&gt;</div>',page,function(){
+	                                    if(autoskillexpanded){
+	                                        this.classList.remove('on');
+	                                        for(var k=0;k<autoskillNodes.length;k++){
+			                                    autoskillNodes[k].hide();
+			                                }
+	                                    }
+	                                    else{
+	                                        this.classList.add('on');
+	                                        for(var k=0;k<autoskillNodes.length;k++){
+			                                    autoskillNodes[k].show();
+			                                }
+	                                    }
+	                                    autoskillexpanded=!autoskillexpanded;
+	                                });
+									banskill=ui.create.div('.config.more','双将禁配 <div>&gt;</div>',page,function(){
+	                                    if(banskillexpanded){
+	                                        this.classList.remove('on');
+	                                        for(var k=0;k<banskillNodes.length;k++){
+			                                    banskillNodes[k].hide();
+			                                }
+	                                    }
+	                                    else{
+	                                        this.classList.add('on');
+	                                        for(var k=0;k<banskillNodes.length;k++){
+			                                    banskillNodes[k].show();
+			                                }
+	                                    }
+	                                    banskillexpanded=!banskillexpanded;
+	                                });
+								}
 	                            for(var j in info.config){
 	                                if(j==='update'){
 	                                    continue;
@@ -9446,9 +10148,54 @@
 	                                    };
 	                                }
 	                                var cfgnode=createConfig(cfg);
+									if(cfg.type=='autoskill'){
+										autoskillNodes.push(cfgnode);
+										cfgnode.style.transition='all 0s';
+										cfgnode.classList.add('indent');
+										cfgnode.hide();
+									}
+									else if(cfg.type=='banskill'){
+										banskillNodes.push(cfgnode);
+										cfgnode.style.transition='all 0s';
+										cfgnode.classList.add('indent');
+										cfgnode.hide();
+									}
+									if(j=='import_data_button'){
+										ui.import_data_button=cfgnode;
+										cfgnode.hide();
+										cfgnode.querySelector('button').onclick=function(){
+											var fileToLoad = document.getElementById("fileToLoad").files[0];
+
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent)
+											{
+												var data = fileLoadedEvent.target.result;
+												if(!data) return;
+												try{
+													data=JSON.parse(lib.init.decode(data));
+													localStorage.clear();
+													for(var i in data){
+														localStorage.setItem(i,data[i]);
+													}
+												}
+												catch(e){
+													alert('导入失败');
+													return;
+												}
+												alert('导入成功');
+												game.reload();
+											};
+											fileReader.readAsText(fileToLoad, "UTF-8");
+										}
+									}
 	                                map[j]=cfgnode;
 	                                if(!cfg.unfrequent){
-	                                    page.appendChild(cfgnode);
+										if(cfg.type=='autoskill'){
+											page.insertBefore(cfgnode,banskill);
+										}
+										else{
+											page.appendChild(cfgnode);
+										}
 	                                }
 	                                else{
 	                                    cfgnode.classList.add('auto-hide');
@@ -9490,6 +10237,8 @@
 						rightPane.appendChild(active.link);
 					}());
 				}());
+				clearTimeout(window.resetGameTimeout);
+				delete window.resetGameTimeout;
 			},
 			system:function(str,func,right){
 				var node=ui.create.div(right?ui.system2:ui.system1);
@@ -9586,9 +10335,9 @@
 								ui.create.div('',node.node.hp);
 							}
 						}
-						if(!lib.config.show_name){
+						// if(!lib.config.show_name){
 							node.node.name.style.display='none';
-						}
+						// }
 						var name=get.translation(item);
 						node.node.name.innerHTML='';
 						for(var i=0;i<name.length;i++){
@@ -9835,8 +10584,8 @@
 						}
 					}
 				}
-				for(var i=0;i<autoskill.length-1;i++){
-					if(sks.contains(autoskill[i].link)){
+				for(var i=0;i<sks.length;i++){
+					if(autoskill[sks[i]]){
 						if(!auto){
 							ng=ui.create.div('.text');
 							ng.style.marginBottom=0;
@@ -9848,8 +10597,8 @@
 							auto.innerHTML='自动发动';
 							uiintro.add(auto);
 						}
-						autoskill[i].style.display='';
-						uiintro.add(autoskill[i]);
+						autoskill[sks[i]].style.display='';
+						uiintro.add(autoskill[sks[i]]);
 					}
 				}
 
@@ -10152,7 +10901,7 @@
 							hoveration=node._hoveration;
 						}
 						else{
-							hoveration=lib.config.hoveration;
+							hoveration=parseInt(lib.config.hoveration);
 							if(node.classList.contains('button')||
 								(node.parentNode&&node.parentNode.parentNode)==ui.me){
 								hoveration+=500;
@@ -13492,7 +14241,7 @@
 			}
 			lib.config.current_mode=mode[lib.config.mode].config||[];
 			lib.config.mode_choice=mode[lib.config.mode].config;
-			game.rank=window.characterRank;
+			lib.rank=window.characterRank;
 			delete window.characterRank;
 			for(i in mode[lib.config.mode]){
 				if(i=='element') continue;
@@ -13506,7 +14255,14 @@
 					lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
 				}
 			}
+			lib.characterPack={};
 			for(i in character){
+				lib.characterPack[i]=[];
+				if(character[i].character){
+					for(j in character[i].character){
+						lib.characterPack[i].push(character[i].character[j]);
+					}
+				}
 				if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
 				if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
 				for(j in character[i]){
