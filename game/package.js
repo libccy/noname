@@ -15,10 +15,10 @@ character.pack={
     yxs:'英雄杀',
     hearth:'炉石传说',
     swd:'轩辕剑',
-    xswd:'轩辕剑·二',
+    xswd:'轩辕剑2',
     gujian:'古剑奇谭',
-    xianjian:'仙剑奇侠传',
-    xiake:'侠客风云传',
+    xianjian:'仙剑',
+    xiake:'侠客',
 };
 card.pack={
     standard:'标准',

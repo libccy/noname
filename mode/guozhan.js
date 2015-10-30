@@ -447,6 +447,13 @@ mode.guozhan={
 						}
 					}
 				}
+				if(game.players[0].identity!='ye'){
+					for(var i=1;i<game.players.length;i++){
+						if(game.players[i].identity=='unknown') return;
+						if(game.players[i].identity!=game.players[0].identity) return;
+					}
+					game.checkResult();
+				}
 			},
 			perfectPair:function(){
 				if(!get.config('zhulian')) return false;

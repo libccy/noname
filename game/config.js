@@ -249,6 +249,8 @@ window.config={
 	cards:['standard','ex','extra','refresh'],
 	characters:['standard','wind','fire','woods','mountain','refresh'],
 	plays:[],
+	banned:[],
+	bannedcards:[],
 
 	mode:'identity',
 	mode_config:{

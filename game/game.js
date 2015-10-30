@@ -643,23 +643,16 @@
 							var downloadLink = document.createElement("a");
 							downloadLink.download = fileNameToSaveAs;
 							downloadLink.innerHTML = "Download File";
-							if (window.webkitURL != null)
-							{
-								// Chrome allows the link to be clicked
-								// without actually adding it to the DOM.
-								downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
-							}
-							else
-							{
-								// Firefox requires the link to be added to the DOM
-								// before it can be clicked.
-								downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-								downloadLink.onclick = function(){
-									downloadLink.remove();
-								};
-								downloadLink.style.display = "none";
-								document.body.appendChild(downloadLink);
-							}
+							downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+
+							// {
+							// 	downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+							// 	downloadLink.onclick = function(){
+							// 		downloadLink.remove();
+							// 	};
+							// 	downloadLink.style.display = "none";
+							// 	document.body.appendChild(downloadLink);
+							// }
 
 							downloadLink.click();
 						},
@@ -684,7 +677,8 @@
 		                    '7':'七人',
 		                    '8':'八人'
 		                },
-		                frequent:true
+		                frequent:true,
+						restart:true,
 		            },
 		            double_character:{
 		                name:'双将模式',
@@ -715,7 +709,7 @@
 						},
 						init:'off',
 						onclick:function(bool){
-							game.saveConfig('auto_identity',bool,true);
+							game.saveConfig('auto_identity',bool,this._link.config.mode);
 							var num;
 							switch(bool){
 								case '一轮':num=1;break;
@@ -744,7 +738,7 @@
 						name:'自由选将',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('free_choose',bool,true);
+							game.saveConfig('free_choose',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
@@ -761,7 +755,7 @@
 						name:'自由选择身份和座位',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('change_identity',bool,true);
+							game.saveConfig('change_identity',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							var dialog;
 							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
@@ -775,7 +769,7 @@
 						name:'开启换将卡',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('change_choice',bool,true);
+							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
@@ -793,7 +787,7 @@
 						name:'死亡后显示重来',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('dierestart',bool,true);
+							game.saveConfig('dierestart',bool,this._link.config.mode);
 							if(get.config('dierestart')){
 								if(!ui.restart&&game.me.isDead()){
 									ui.restart=ui.create.control('restart',game.reload);
@@ -809,7 +803,7 @@
 						name:'死亡后显示换人',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('swap',bool,true);
+							game.saveConfig('swap',bool,this._link.config.mode);
 							if(get.config('swap')){
 								if(!ui.swap&&game.me.isDead()){
 									ui.swap=ui.create.control('换人',ui.click.dieswap);
@@ -825,7 +819,7 @@
 						name:'死亡后显示复活',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('revive',bool,true);
+							game.saveConfig('revive',bool,this._link.config.mode);
 							if(get.config('revive')){
 								if(!ui.revive&&game.me.isDead()){
 									ui.revive=ui.create.control('revive',ui.click.dierevive);
@@ -874,7 +868,8 @@
 		                    '7':'七人',
 		                    '8':'八人'
 		                },
-		                frequent:true
+		                frequent:true,
+						restart:true,
 		            },
 					initshow_draw:{
 						name:'首亮摸牌',
@@ -907,7 +902,7 @@
 						name:'自由选将',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('free_choose',bool,true);
+							game.saveConfig('free_choose',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
@@ -924,7 +919,7 @@
 						name:'自由选择座位',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('change_identity',bool,true);
+							game.saveConfig('change_identity',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							var dialog;
 							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
@@ -938,7 +933,7 @@
 						name:'开启换将卡',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('change_choice',bool,true);
+							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
@@ -956,7 +951,7 @@
 						name:'死亡后显示重来',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('dierestart',bool,true);
+							game.saveConfig('dierestart',bool,this._link.config.mode);
 							if(get.config('dierestart')){
 								if(!ui.restart&&game.me.isDead()){
 									ui.restart=ui.create.control('restart',game.reload);
@@ -972,7 +967,7 @@
 						name:'死亡后显示换人',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('swap',bool,true);
+							game.saveConfig('swap',bool,this._link.config.mode);
 							if(get.config('swap')){
 								if(!ui.swap&&game.me.isDead()){
 									ui.swap=ui.create.control('换人',ui.click.dieswap);
@@ -988,7 +983,7 @@
 						name:'死亡后显示复活',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('revive',bool,true);
+							game.saveConfig('revive',bool,this._link.config.mode);
 							if(get.config('revive')){
 								if(!ui.revive&&game.me.isDead()){
 									ui.revive=ui.create.control('revive',ui.click.dierevive);
@@ -1018,7 +1013,7 @@
 						name:'开启换将卡',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('change_choice',bool,true);
+							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
@@ -1044,7 +1039,7 @@
 						init:true,
 						frequent:true,
 						onclick:function(bool){
-							game.saveConfig('free_choose',bool,true);
+							game.saveConfig('free_choose',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
@@ -1061,7 +1056,7 @@
 						name:'开启换将卡',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('change_choice',bool,true);
+							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
@@ -1166,7 +1161,7 @@
 							'8':'8v8',
 						},
 						onclick:function(num){
-							game.saveConfig('battle_number',num,true);
+							game.saveConfig('battle_number',num,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(_status.event.parent.changeDialog){
 								_status.event.parent.changeDialog();
@@ -1197,7 +1192,7 @@
 						name:'自由选将',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('free_choose',bool,true);
+							game.saveConfig('free_choose',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
@@ -1214,7 +1209,7 @@
 						name:'开启换将卡',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('change_choice',bool,true);
+							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
@@ -1246,7 +1241,7 @@
 							'10':'十人',
 						},
 						onclick:function(num){
-							game.saveConfig('battle_number',num,true);
+							game.saveConfig('battle_number',num,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(_status.event.parent.changeDialog){
 								_status.event.parent.changeDialog();
@@ -1257,7 +1252,7 @@
 						name:'自由选将',
 						init:true,
 						onclick:function(bool){
-							game.saveConfig('free_choose',bool,true);
+							game.saveConfig('free_choose',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
@@ -1275,7 +1270,7 @@
 						name:'开启换将卡',
 						init:false,
 						onclick:function(bool){
-							game.saveConfig('change_choice',bool,true);
+							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
@@ -1302,12 +1297,24 @@
 			frameId:0,
 		},
 		help:{
-			'选项帮助':'<ul><li>控制台命令：开启后可用浏览器控制台控制游戏<li>自动确认：开启后当候选目标仅有1个时点击目标无需再点击确定<li>悬停时间：弹出角色/卡牌介绍所需的等待时间<li>'+
-			'触屏模式：可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌：开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
-			'<li>隐藏非全身皮肤：在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法：为游戏增加不同玩法，开启后可在帮助中查看介绍'+
-			'<li>加强主公：反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）',
+			'游戏选项':'<ul><li>控制台命令<br>开启后可用浏览器控制台控制游戏<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
+			'触屏模式<br>可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
+			'<li>隐藏非全身皮肤<br>在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍'+
+			'<li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）',
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中双指点击切换暂停<li>键盘快捷键<br>'+
-			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>'
+			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
+			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
+			'<li>玩家<br>game.me<li>玩家的上/下家<br>game.me.previous/next'+
+			'<li>玩家的上/下家（含阵亡）<br>game.me.previousSeat/<br>nextSeat'+
+			'<li>牌堆<br>ui.cardPile<li>弃牌堆<br>ui.discardPile</ul>'+
+			'<div style="margin:10px">角色属性</div><ul style="margin-top:0"><li>体力值<br>player.hp'+
+			'<li>体力上限<br>player.maxHp<li>身份<br>player.identity<li>手牌<br>player.get("h")<li>装备牌<br>player.get("e")<li>判定牌<br>player.get("j")'+
+			'<li>是否存活/横置/翻面<br>player.isAlive()/isLinked()/<br>isTurnedOver()</ul>'+
+			'<div style="margin:10px">角色操作</div><ul style="margin-top:0"><li>受到伤害<br>player.damage(source,<br>num)'+
+			'<li>回复体力<br>player.recover(num)<li>摸牌<br>player.draw(num)<li>获得牌<br>player.gain(cards)<li>弃牌<br>player.discard(cards)'+
+			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
+			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在历史中记录<br>game.log(str)<li>游戏结束<br>game.over(bool)'+
+			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card'
 		},
 		setPopped:function(node,func,width,height){
 			node._poppedfunc=func;
@@ -9843,7 +9850,9 @@
 		                }
 		                return node;
 		            };
+					var menuUpdates=[];
 					menuContainer=ui.create.div('.menu-container.hidden',ui.window,clickContainer);
+					ui.menuContainer=menuContainer;
 					ui.click.configMenu=function(){
                         if(menuContainer.classList.contains('hidden')){
                             menu.classList.remove('zoomout');
@@ -9853,6 +9862,9 @@
                             setTimeout(function(){
                                 menuContainer.animating=false;
                             },300);
+							for(var i=0;i<menuUpdates.length;i++){
+								menuUpdates[i]();
+							}
                         }
                         else{
 							clickContainer.call(menuContainer);
@@ -9926,6 +9938,7 @@
 	                                }
 	                                var cfg=copyObj(info.config[j]);
 									cfg._name=j;
+									cfg.mode=mode;
 									var config=lib.config.mode_config[mode]||{};
 	                                if(!config.hasOwnProperty(j)){
 										game.saveConfig(j,cfg.init,mode);
@@ -10074,9 +10087,6 @@
 	                        var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
 							node.link=page;
 							node.mode=mode;
-							if(mode==lib.config.mode){
-								node.classList.add('active');
-							}
 	                        var map={};
 	                        if(info.config){
 	                            var hiddenNodes=[];
@@ -10137,9 +10147,6 @@
 	                                        if(cfg.onsave){
 	                                            cfg.onsave.call(this,result);
 	                                        }
-											if(cfg.restart){
-												startButton.classList.add('glowing');
-											}
 	                                    };
 	                                }
 	                                if(info.config.update){
@@ -10236,6 +10243,479 @@
 	                    }
 						rightPane.appendChild(active.link);
 					}());
+
+					(function(){
+						var start=menux.pages[2];
+						var rightPane=start.lastChild;
+
+						var clickMode=function(){
+							var active=this.parentNode.querySelector('.active');
+							if(active===this){
+								return;
+							}
+							active.classList.remove('active');
+							active.link.remove();
+							active=this;
+							this.classList.add('active');
+							rightPane.appendChild(this.link);
+						};
+						var updateNodes=function(){
+							for(var i=0;i<start.firstChild.childNodes.length;i++){
+								var node=start.firstChild.childNodes[i];
+								if(node.link){
+									if(lib.config.characters.contains(node.mode)){
+										node.classList.remove('off');
+										node.link.firstChild.classList.add('on');
+									}
+									else{
+										node.classList.add('off');
+										node.link.firstChild.classList.remove('on');
+									}
+								}
+							}
+						}
+						var togglePack=function(bool){
+							var name=this._link.config._name;
+							if(bool){
+								lib.config.characters.add(name);
+							}
+							else{
+								lib.config.characters.remove(name);
+							}
+							game.saveConfig('characters',lib.config.characters);
+							updateNodes();
+						};
+
+						var createModeConfig=function(mode,position){
+	                        var info=lib.characterPack[mode];
+	                        var page=ui.create.div('');
+	                        var node=ui.create.div('.menubutton.large',lib.translate[mode+'_character_config'],position,clickMode);
+							node.link=page;
+							node.mode=mode;
+							var list=[];
+							for(var i in info){
+								list.push(i);
+							}
+							var cfgnode=createConfig({
+								name:'开启',
+								_name:mode,
+								init:lib.config.characters.contains(mode),
+								onclick:togglePack
+							});
+							page.appendChild(cfgnode);
+							var banCharacter=function(){
+								this.classList.toggle('unselectable');
+								if(this.classList.contains('unselectable')){
+									lib.config.banned.add(this.link);
+								}
+								else{
+									lib.config.banned.remove(this.link);
+								}
+								game.saveConfig('banned',lib.config.banned);
+							};
+							var buttons=ui.create.buttons(list,'character',page);
+							for(var i=0;i<buttons.length;i++){
+								buttons[i].classList.add('noclick');
+								buttons[i].listen(banCharacter);
+								if(lib.config.banned.contains(buttons[i].link)){
+									buttons[i].classList.add('unselectable');
+								}
+							}
+							page.classList.add('menu-buttons');
+	                        return node;
+	                    };
+
+						for(var i=0;i<lib.config.all.characters.length;i++){
+	                        createModeConfig(lib.config.all.characters[i],start.firstChild);
+	                    }
+						var active=start.firstChild.querySelector('.active');
+	                    if(!active){
+	                        active=start.firstChild.firstChild;
+	                        active.classList.add('active');
+	                    }
+						rightPane.appendChild(active.link);
+
+						var node1=ui.create.div('.lefttext','全部开启',start.firstChild,function(){
+							game.saveConfig('characters',lib.config.all.characters);
+							updateNodes();
+						});
+						var node2=ui.create.div('.lefttext','恢复默认',start.firstChild,function(){
+							game.saveConfig('characters',lib.config.defaultcharacters);
+							updateNodes();
+						});
+						node1.style.marginTop='12px';
+						node2.style.marginTop='7px';
+
+						updateNodes();
+					}());
+
+					(function(){
+						var start=menux.pages[3];
+						var rightPane=start.lastChild;
+
+						var clickMode=function(){
+							var active=this.parentNode.querySelector('.active');
+							if(active===this){
+								return;
+							}
+							active.classList.remove('active');
+							active.link.remove();
+							active=this;
+							this.classList.add('active');
+							rightPane.appendChild(this.link);
+						};
+						var updateNodes=function(){
+							for(var i=0;i<start.firstChild.childNodes.length;i++){
+								var node=start.firstChild.childNodes[i];
+								if(node.link){
+									if(lib.config.cards.contains(node.mode)){
+										node.classList.remove('off');
+										node.link.firstChild.classList.add('on');
+									}
+									else{
+										node.classList.add('off');
+										node.link.firstChild.classList.remove('on');
+									}
+								}
+							}
+						}
+						var togglePack=function(bool){
+							var name=this._link.config._name;
+							if(bool){
+								lib.config.cards.add(name);
+							}
+							else{
+								lib.config.cards.remove(name);
+							}
+							game.saveConfig('cards',lib.config.cards);
+							updateNodes();
+						};
+
+						var createModeConfig=function(mode,position){
+	                        var info=lib.cardPack[mode];
+	                        var page=ui.create.div('');
+	                        var node=ui.create.div('.menubutton.large',lib.translate[mode+'_card_config'],position,clickMode);
+							node.link=page;
+							node.mode=mode;
+							var list=[];
+							for(var i=0;i<info.length;i++){
+								list.push(['',get.translation(get.type(info[i],'trick')),info[i]]);
+							}
+							var cfgnode=createConfig({
+								name:'开启',
+								_name:mode,
+								init:lib.config.cards.contains(mode),
+								onclick:togglePack
+							});
+							page.appendChild(cfgnode);
+							var banCard=function(){
+								this.classList.toggle('unselectable');
+								if(this.classList.contains('unselectable')){
+									lib.config.bannedcards.add(this.link[2]);
+								}
+								else{
+									lib.config.bannedcards.remove(this.link[2]);
+								}
+								game.saveConfig('bannedcards',lib.config.bannedcards);
+							};
+							var buttons=ui.create.buttons(list,'vcard',page);
+							for(var i=0;i<buttons.length;i++){
+								buttons[i].classList.add('noclick');
+								buttons[i].listen(banCard);
+								if(lib.config.bannedcards.contains(buttons[i].link[2])){
+									buttons[i].classList.add('unselectable');
+								}
+							}
+							page.classList.add('menu-buttons');
+	                        return node;
+	                    };
+
+						for(var i=0;i<lib.config.all.cards.length;i++){
+	                        createModeConfig(lib.config.all.cards[i],start.firstChild);
+	                    }
+						var active=start.firstChild.querySelector('.active');
+	                    if(!active){
+	                        active=start.firstChild.firstChild;
+	                        active.classList.add('active');
+	                    }
+						rightPane.appendChild(active.link);
+
+						var node1=ui.create.div('.lefttext','全部开启',start.firstChild,function(){
+							game.saveConfig('cards',lib.config.all.cards);
+							updateNodes();
+						});
+						var node2=ui.create.div('.lefttext','恢复默认',start.firstChild,function(){
+							game.saveConfig('cards',lib.config.defaultcards);
+							updateNodes();
+						});
+						node1.style.marginTop='12px';
+						node2.style.marginTop='7px';
+
+						updateNodes();
+					}());
+
+					(function(){
+						var start=menux.pages[4];
+						var rightPane=start.lastChild;
+						var cheatButton=ui.create.div('.menubutton.round.highlight','作',start);
+						var runButton=ui.create.div('.menubutton.round.highlight','执',start);
+
+						var clickMode=function(){
+							if(this.classList.contains('off')) return;
+							var active=this.parentNode.querySelector('.active');
+							if(active===this){
+								return;
+							}
+							active.classList.remove('active');
+							active.link.remove();
+							active=this;
+							this.classList.add('active');
+							rightPane.appendChild(this.link);
+							if(this.type=='cheat'){
+								cheatButton.style.display='';
+							}
+							else{
+								cheatButton.style.display='none';
+							}
+							if(this.type=='cmd'){
+								runButton.style.display='';
+							}
+							else{
+								runButton.style.display='none';
+							}
+						};
+						(function(){
+							var checkCheat=function(){
+								if(currentrow1&&currentrow2&&row3.querySelector('.glow')){
+									cheatButton.classList.add('glowing');
+									return true;
+								}
+								else{
+									cheatButton.classList.remove('glowing');
+									return false;
+								}
+							}
+							cheatButton.listen(function(){
+								if(checkCheat()){
+									var num;
+									switch(currentrow2.innerHTML){
+										case '一':num=1;break;
+										case '二':num=2;break;
+										case '三':num=3;break;
+										case '四':num=4;break;
+										case '五':num=5;break;
+									}
+									var targets=[];
+									var buttons=row3.querySelectorAll('.glow');
+									for(var i=0;i<buttons.length;i++){
+										targets.push(buttons[i].link);
+									}
+									while(targets.length){
+										var target=targets.shift();
+										switch(currentrow1.innerHTML){
+											case '伤害':target.damage(num,'nosource');break;
+											case '回复':target.recover(num,'nosource');break;
+											case '摸牌':target.draw(num);break;
+											case '弃牌':
+												var hs=target.get('he');
+												if(hs.length){
+													target.discard(hs.randomGets(num));
+												}
+												break;
+										}
+									}
+									clickContainer.call(menuContainer);
+								}
+							});
+
+							var page=ui.create.div('');
+							var node=ui.create.div('.menubutton.large','作弊',start.firstChild,clickMode);
+							node.link=page;
+							node.type='cheat';
+							page.classList.add('menu-sym');
+
+							var currentrow1=null;
+							var row1=ui.create.div('.menu-cheat',page);
+							var clickrow1=function(){
+								if(currentrow1==this){
+									this.classList.remove('selecting');
+									currentrow1=null;
+								}
+								else{
+									this.classList.add('selecting');
+									if(currentrow1){
+										currentrow1.classList.remove('selecting');
+									}
+									currentrow1=this;
+								}
+								checkCheat();
+							};
+							var nodedamage=ui.create.div('.menubutton','伤害',row1,clickrow1);
+							var noderecover=ui.create.div('.menubutton','回复',row1,clickrow1);
+							var nodedraw=ui.create.div('.menubutton','摸牌',row1,clickrow1);
+							var nodediscard=ui.create.div('.menubutton','弃牌',row1,clickrow1);
+
+							var currentrow2=null;
+							var row2=ui.create.div('.menu-cheat',page);
+							var clickrow2=function(){
+								if(currentrow2==this){
+									this.classList.remove('selecting');
+									currentrow2=null;
+								}
+								else{
+									this.classList.add('selecting');
+									if(currentrow2){
+										currentrow2.classList.remove('selecting');
+									}
+									currentrow2=this;
+								}
+								checkCheat();
+							};
+							var nodex1=ui.create.div('.menubutton','一',row2,clickrow2);
+							var nodex2=ui.create.div('.menubutton','二',row2,clickrow2);
+							var nodex3=ui.create.div('.menubutton','三',row2,clickrow2);
+							var nodex4=ui.create.div('.menubutton','四',row2,clickrow2);
+							var nodex5=ui.create.div('.menubutton','五',row2,clickrow2);
+
+							var row3=ui.create.div('.menu-buttons',page);
+							row3.style.marginTop='3px';
+							var clickrow3=function(){
+								this.classList.toggle('glow');
+								checkCheat();
+							};
+							menuUpdates.push(function(){
+								var list=[];
+								for(var i=0;i<game.players.length;i++){
+									if(lib.character[game.players[i].name]&&game.players[i].isAlive()){
+										list.push(game.players[i]);
+									}
+									else if(game.players[i]==game.me&&game.me.name1){
+										list.push(game.me);
+									}
+								}
+								if(list.length){
+									row1.show();
+									row2.show();
+									row3.innerHTML='';
+									var buttons=ui.create.buttons(list,'player',row3,true);
+									for(var i=0;i<buttons.length;i++){
+										buttons[i].listen(clickrow3);
+									}
+								}
+								else{
+									row1.hide();
+									row2.hide();
+								}
+								checkCheat();
+							});
+						}());
+						(function(){
+							if(lib.config.mode!='identity'&&lib.config.mode!='guozhan') return;
+							var page=ui.create.div('');
+							var node=ui.create.div('.menubutton.large','换人',start.firstChild,clickMode);
+							node.link=page;
+							page.classList.add('menu-sym');
+							var caption=ui.create.div('','选择一个换人目标',page);
+							caption.style.margin='5px';
+							caption.style.marginTop='6px';
+							var row3=ui.create.div('.menu-buttons',page);
+							row3.style.marginTop='3px';
+
+							var currentrow3=null;
+							var clickrow3=function(){
+								game.swapPlayer(this.link);
+							};
+							menuUpdates.push(function(){
+								var list=[];
+								for(var i=0;i<game.players.length;i++){
+									if(lib.character[game.players[i].name]&&
+										game.players[i].isAlive()&&game.players[i]!=game.me){
+										list.push(game.players[i]);
+									}
+								}
+								if(list.length&&game.phaseNumber&&!_status.event.isMine()){
+									node.classList.remove('off');
+									row3.innerHTML='';
+									var buttons=ui.create.buttons(list,'player',row3,true);
+									for(var i=0;i<buttons.length;i++){
+										buttons[i].listen(clickrow3);
+									}
+								}
+								else{
+									node.classList.add('off');
+									var active=start.firstChild.querySelector('.active');
+									if(active==node){
+										node.classList.remove('active');
+										node.link.remove();
+										active=start.firstChild.firstChild;
+										active.classList.add('active');
+										rightPane.appendChild(active.link);
+										cheatButton.style.display='';
+									}
+								}
+							});
+						}());
+						(function(){
+							var page=ui.create.div('');
+							var node=ui.create.div('.menubutton.large','命令',start.firstChild,clickMode);
+							node.type='cmd';
+							node.link=page;
+							page.classList.add('menu-sym');
+							var caption=ui.create.div('','输入要执行的命令',page);
+							caption.style.margin='6px';
+							var text=document.createElement('textarea');
+							text.style.width='200px';
+							text.style.height='80px';
+							text.style.resize='none';
+							page.appendChild(text);
+							runButton.listen(function(){
+								try{
+									eval(text.value);
+								}
+								catch(e){}
+								text.value='';
+								clickContainer.call(menuContainer);
+							});
+						}());
+
+						var active=start.firstChild.querySelector('.active');
+						if(!active){
+							active=start.firstChild.firstChild;
+							active.classList.add('active');
+						}
+						rightPane.appendChild(active.link);
+					}());
+
+					(function(){
+						var start=menux.pages[5];
+						var rightPane=start.lastChild;
+						var clickMode=function(){
+							if(this.classList.contains('off')) return;
+							var active=this.parentNode.querySelector('.active');
+							if(active===this){
+								return;
+							}
+							active.classList.remove('active');
+							active.link.remove();
+							active=this;
+							this.classList.add('active');
+							rightPane.appendChild(this.link);
+						};
+						for(var i in lib.help){
+							var page=ui.create.div('');
+							var node=ui.create.div('.menubutton.large',i,start.firstChild,clickMode);
+							node.link=page;
+							page.classList.add('menu-help');
+							page.innerHTML=lib.help[i];
+						}
+						var active=start.firstChild.querySelector('.active');
+						if(!active){
+							active=start.firstChild.firstChild;
+							active.classList.add('active');
+						}
+						rightPane.appendChild(active.link);
+					}());
+
 				}());
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;
@@ -10326,12 +10806,20 @@
 							intro:ui.create.div('.intro',node),
 							group:ui.create.div('.identity',node)
 						}
-						if(lib.character[item][2]>14){
-							node.node.hp.innerHTML=lib.character[item][2];
+						var infoitem=lib.character[item];
+						if(!infoitem){
+							for(var itemx in lib.characterPack){
+								if(lib.characterPack[itemx][item]){
+									infoitem=lib.characterPack[itemx][item];break;
+								}
+							}
+						}
+						if(infoitem[2]>14){
+							node.node.hp.innerHTML=infoitem[2];
 							node.node.hp.classList.add('text');
 						}
 						else{
-							for(var i =0;i<lib.character[item][2];i++){
+							for(var i =0;i<infoitem[2];i++){
 								ui.create.div('',node.node.hp);
 							}
 						}
@@ -10355,8 +10843,8 @@
 								lib.setHover(node,ui.click.hoverplayer);
 							}
 						}
-						node.node.group.innerHTML='<div>'+get.translation(lib.character[item][1])+'</div>';
-						node.node.group.style.backgroundColor=get.translation(lib.character[item][1]+'Color');
+						node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
+						node.node.group.style.backgroundColor=get.translation(infoitem[1]+'Color');
 					}
 					else{
 						if(item.name.indexOf('unknown')==0){
@@ -10529,6 +11017,7 @@
 				}
 				for(var i=0;i<lib.card.list.length;i++){
 					if(lib.card[lib.card.list[i][2]]){
+						if(lib.config.bannedcards.contains(lib.card.list[i][2])) continue;
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
 				}
@@ -12378,7 +12867,7 @@
 			if(Object.prototype.toString.call(obj) === '[object HTMLBodyElement]') return 'td';
 		},
 		type:function(obj,method){
-			if(typeof obj=='string') obj={name:'string'};
+			if(typeof obj=='string') obj={name:obj};
 			if(typeof obj!='object') return;
 			if(!lib.card[obj.name]) return;
 			if(method=='trick'&&lib.card[obj.name].type=='delay') return 'trick';
@@ -12935,7 +13424,15 @@
 		},
 		skillintro:function(name,learn,learn2){
 			var str='';
-			var skills=lib.character[name][3];
+			var infoitem=lib.character[item];
+			if(!infoitem){
+				for(var itemx in lib.characterPack){
+					if(lib.characterPack[itemx][item]){
+						infoitem=lib.characterPack[itemx][item];break;
+					}
+				}
+			}
+			var skills=infoitem[3];
 			var opacity;
 			for(var i=0;i<skills.length;i++){
 				if(lib.translate[skills[i]]&&lib.translate[skills[i]+'_info']&&lib.skill[skills[i]]){
@@ -13224,7 +13721,15 @@
 			else if(node.classList.contains('character')){
 				var character=node.link;
 				uiintro.add(get.translation(character));
-				var skills=lib.character[character][3];
+				var infoitem=lib.character[character];
+				if(!infoitem){
+					for(var itemx in lib.characterPack){
+						if(lib.characterPack[itemx][character]){
+							infoitem=lib.characterPack[itemx][character];break;
+						}
+					}
+				}
+				var skills=infoitem[3];
 				for(i=0;i<skills.length;i++){
 					if(lib.translate[skills[i]+'_info']){
 						translation=get.translation(skills[i])[0]+get.translation(skills[i])[1];
@@ -14137,6 +14642,7 @@
 			return aa+bb+cc+dd;
 		}
 		window.onkeydown=function(e){
+			if(!ui.menuContainer.classList.contains('hidden')) return;
 			if(ui.currentpopped){
 				if(ui.currentpopped._uiintro){
 					ui.currentpopped._uiintro.delete();
@@ -14257,11 +14763,8 @@
 			}
 			lib.characterPack={};
 			for(i in character){
-				lib.characterPack[i]=[];
 				if(character[i].character){
-					for(j in character[i].character){
-						lib.characterPack[i].push(character[i].character[j]);
-					}
+					lib.characterPack[i]=character[i].character
 				}
 				if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
 				if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
@@ -14287,6 +14790,14 @@
 									continue;
 								}
 							}
+							if(lib.config.banned.contains(k)){
+								if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
+									lib.hiddenCharacters.push(k);
+								}
+								else{
+									continue;
+								}
+							}
 						}
 						if(j=='translate'&&k==i){
 							lib[j][k+'_character_config']=character[i][j][k];
@@ -14302,7 +14813,16 @@
 					}
 				}
 			}
+			lib.cardPack={};
 			for(i in card){
+				lib.cardPack[i]=[];
+				if(card[i].card){
+					for(var j in card[i].card){
+						if(card[i].translate[j+'_info']){
+							lib.cardPack[i].push(j);
+						}
+					}
+				}
 				if(card[i].forbid&&card[i].forbid.contains(lib.config.mode)) continue;
 				if(card[i].mode&&card[i].mode.contains(lib.config.mode)==false) continue;
 				for(j in card[i]){
