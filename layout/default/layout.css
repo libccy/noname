@@ -75,6 +75,16 @@ body>.background{z-index:-2}
 .background2{width: 90%;height: 90%;left:5%;top: 5%;margin: 0;padding:0;display: inline-block !important;}
 .background,.button,.avatar,.avatar2{transition-property: top,box-shadow,opacity,-webkit-transform;transition-duration:0.5s;}
 .intro{width: 20px;height: 20px;}
+
+#systembutton{
+	left:calc(-150% / 47 + 15px);
+	bottom:calc(-100% / 18 + 135px);
+	top:auto;
+	margin:0;
+}
+#arena:not(.mobile)>#systembutton{
+	display: none !important;
+}
 /*--------卡牌--------*/
 .card{width: 104px;height: 104px;margin-top:8px;margin-left:4px;margin-right: 4px;position: relative;overflow: hidden;}
 .card>.info{right: 6px;top: 9px;white-space: nowrap;}

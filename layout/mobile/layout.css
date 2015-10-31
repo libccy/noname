@@ -1,0 +1,130 @@
+@import "../default/layout.css";
+@import "../newlayout/global.css";
+@import "equip.css";
+
+#arena{
+    width: 94%;
+    height: 95%;
+    left: 3%;
+}
+#control{
+    width: 100%;
+    bottom:130px;
+    height: 40px;
+    left:0;
+}
+/*#control>div{
+    height: 40px;
+    font-family: 'xinwei';
+    font-size: 30px;
+    line-height: 34px;
+}*/
+#arena:not(.chess)>#me,
+#arena:not(.chess)>#mebg{
+    bottom:10px;
+    width: calc(5000% / 47);
+    left:calc(-150% / 47);
+    top:auto;
+    border-radius:0;
+    height:120px;
+}
+#arena:not(.chess) #handcards1{
+    height:120px;
+    padding:0;
+    top:calc(100% - 120px);
+    width:calc(100% - 240px);
+    left:120px;
+}
+#handcards2{
+    display:none;
+}
+
+#arena:not(.chess) .player[data-position='0']>.equips>div{
+    width: 42px;
+    height: 42px;
+    margin: 0;
+    position: absolute;
+}
+#arena:not(.chess) .player[data-position='0']{
+    width: calc(5000% / 47);
+    left:calc(-150% / 47);
+    height: 120px;
+    top: calc(100% - 130px);
+    background: none !important;
+    pointer-events: none;
+}
+#arena:not(.chess) .player[data-position='0']:not(.selected):not(.selectable):not(.glow){
+    box-shadow: none !important;
+}
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.avatar,
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.equips{
+    width:120px;
+    height:120px;
+    border-radius:0px !important;
+    top:0;
+    left:0;
+    transition: transform 0.5s;
+    pointer-events: auto;
+}
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.equips{
+    left:calc(100% - 120px);
+}
+#arena:not(.chess) .player[data-position='0']>.equips>.equip1{top: 10px;left: 10px;}
+#arena:not(.chess) .player[data-position='0']>.equips>.equip2{top: 10px;right: 10px;}
+#arena:not(.chess) .player[data-position='0']>.equips>.equip3{bottom: 10px;left: 10px;}
+#arena:not(.chess) .player[data-position='0']>.equips>.equip4{bottom: 10px;right: 10px;}
+
+#arena:not(.chess) .player[data-position='0']>.name{
+    left:4px;
+}
+#arena:not(.chess) .player[data-position='0']>.identity{
+    left: 106px;
+    top: -8px;
+}
+#arena:not(.chess) .player[data-position='0']>.damage{
+    width: 120px;
+}
+#arena:not(.chess) .player[data-position='0'].target{
+    transform:none !important;
+}
+#arena:not(.chess) .player[data-position='0']>.hp:not(.actcount){
+    bottom: 5px;
+    left: 100px;
+}
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.count{
+    z-index: 2;
+    text-align: right;
+    left: -4px;
+    bottom:10px;
+}
+.popup[data-position='0']{top:calc(100% - 170px);left:0px}
+
+#arena:not(.chess) .player[data-position='0'].linked{
+    transform: none;
+}
+#arena:not(.chess) .player[data-position='0'].linked .avatar{
+    transform: rotate(-90deg);
+}
+
+.dialog{
+	height:calc(100% - 350px);
+    bottom:150px;
+}
+
+@media screen and (min-height: 800px) {
+    #arena{height: 760px;top: calc(50% - 350px);}
+    #arena:not(.chess)>#me,
+    #arena:not(.chess)>#mebg{
+        bottom:10px;
+    }
+	#arena:not(.chess) .player[data-position='0']{
+        top: calc(100% - 130px);
+    }
+}
+
+@media screen and (orientation:portrait) {
+
+}
+@media screen and (orientation:landscape) {
+
+}

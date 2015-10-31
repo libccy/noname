@@ -1,0 +1,133 @@
+.player:not([data-position='0']) .equips,
+#arena.chess .player .equips{
+	width:120px;
+	height:auto;
+	top:auto;
+	right:auto;
+	bottom:18px;
+	left:12px;
+	text-align:left;
+}
+.player:not([data-position='0']).minskin .equips,
+#arena.chess .player.minskin .equips{
+	-webkit-transform:scale(0.73);
+	-webkit-transform-origin:bottom left;
+}
+.player:not([data-position='0']) .equips>.card,
+#arena.chess .player .equips>.card{
+	position:relative;
+	width:100%;
+	height:22px;
+	line-height:22px;
+	margin-top:0;
+	margin-bottom:0;
+	background:linear-gradient(to right,rgba(0,0,0,0.3),transparent),
+			linear-gradient(135deg,rgba(0,0,0,0.5) ,transparent 80%,transparent);
+	box-shadow:none;
+	color:white;
+	text-shadow:black 0 0 2px;
+	-webkit-animation: card_start2x 0.5s;
+	display:block;
+	left:0;
+	top:0;
+	transition:all 0.5s;
+
+	border-radius:0;
+	border-width: 1px 0 0;
+	border-style:solid;
+	border-image:linear-gradient(to right, rgba(0, 0, 0,0.4) 70%,transparent) 100% 0 0;
+}
+.player:not([data-position='0']) .equips>.card>.image,
+#arena.chess .player .equips>.card>.image{
+	display:none;
+}
+
+
+.player:not([data-position='0']).unseen .equips>.card,
+#arena.chess .player.unseen .equips>.card{
+	background:none;
+	/*border-image:linear-gradient(to right, transparent,rgba(0,0,0,0.4) 10%,rgba(0, 0, 0,0.4) 70%,transparent) 100% 0 0;*/
+}
+.player:not([data-position='0']).unseen .equips>.card,
+#arena.chess .player.unseen .equips>.card{
+	border-image:linear-gradient(to right, transparent,rgba(0,0,0,0.4) 10%,rgba(0, 0, 0,0.4) 70%,transparent) 100% 0 0;
+}
+.player:not([data-position='0']).unseen .equips>.card:first-child,
+#arena.chess .player.unseen .equips>.card:first-child{
+	border-image:linear-gradient(transparent,transparent);
+}
+.player:not([data-position='0']) .equips>.card.selected,
+#arena.chess .player .equips>.card.selected{
+	background:linear-gradient(to right,rgba(0, 133, 255,0.3),transparent),
+			linear-gradient(135deg,rgba(0, 133, 255,0.5) ,transparent 80%,transparent);
+	box-shadow:none !important;
+	border-width: 1px 0 0;
+	border-style:solid;
+	border-image:linear-gradient(to right, rgba(0, 103, 205,0.4) 70%,transparent) 100% 0 0;
+}
+.player:not([data-position='0']) .equips>.card.fire,
+#arena.chess .player .equips>.card.fire{
+	color: rgb(255,119,63);
+}
+.player:not([data-position='0']) .equips>.card.thunder,
+#arena.chess .player .equips>.card.thunder{
+	color: rgb(117,186,255);
+}
+.player:not([data-position='0']) .equips>.card.poison,
+#arena.chess .player .equips>.card.poison{
+	color: rgb(104,221,127);
+}
+.player:not([data-position='0']) .equips>.card.brown,
+#arena.chess .player .equips>.card.brown{
+	color: rgb(195,161,223);
+}
+
+
+.player:not([data-position='0']) .equips>.card>.background,
+#arena.chess .player .equips>.card>.background{
+	display:none !important;
+}
+.player:not([data-position='0']) .equips>.card>.name2,
+#arena.chess .player .equips>.card>.name2{
+	display:block;
+	margin-left:5px;
+}
+.player:not([data-position='0']) .equips>.card>div,
+#arena.chess .player .equips>.card>div{
+	-webkit-animation:none !important;
+}
+.player:not([data-position='0']) .equips>.card>.name,
+.player:not([data-position='0']) .equips>.card>.info,
+#arena.chess .player .equips>.card>.name,
+#arena.chess .player .equips>.card>.info{
+	display:none !important;
+}
+
+
+.player:not([data-position='0']) .equips>.removing,
+#arena.chess .player .equips>.removing{
+	margin-top:-12px !important;
+	margin-bottom:-11px !important;
+	-webkit-transform:scale(1);
+}
+.player:not([data-position='0']) .equips>.removing+.removing,
+#arena.chess .player .equips>.removing+.removing{
+	margin-top:-23px !important;
+}
+
+
+.player:not([data-position='0']).linked .equips,
+#arena.chess .player.linked .equips{
+	-webkit-transform:rotate(90deg) translate(-150px,-6px);
+	-webkit-transform-origin:bottom left;
+}
+.player:not([data-position='0']).minskin.linked .equips,
+#arena.chess .player.minskin.linked .equips{
+	-webkit-transform:rotate(90deg) translate(-90px,-6px) scale(0.73);
+}
+.player:not([data-position='0']).linked div:not(.equips) .card,
+.player:not([data-position='0']).linked .identity,
+#arena.chess .player.linked div:not(.equips) .card,
+#arena.chess .player.linked .identity{
+	-webkit-transform:rotate(90deg);
+}

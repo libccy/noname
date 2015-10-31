@@ -3,7 +3,8 @@ html{
 	text-shadow: black 0 0 2px;
 	background: url('grid.png'),linear-gradient(#6c7989, #434b55) fixed;
 }
-#system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar,.menu{
+#system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar,.menu,
+#arena.mobile:not(.chess) .player[data-position='0'] .equips{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
 	border-radius: 8px;
 }
@@ -31,10 +32,11 @@ html{
 .control .thundertext{
 	color: rgba(29, 63, 137, 1);
 }
-.player,.card,.button,.dialog>.bar{
+.player,.card,.button,.dialog>.bar,
+#arena.mobile:not(.chess) .player[data-position='0'] .equips{
 	background: url('wood.jpg');
 }
-.control,#system>div>div{
+.control,#system>div>div,.menubutton{
 	background: url('wood2.jpg');
 	color:rgba(77, 60, 51,0.8);
 	text-shadow:none;
