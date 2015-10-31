@@ -97,7 +97,7 @@
     left: -4px;
     bottom:10px;
 }
-.popup[data-position='0']{top:calc(100% - 170px);left:0px}
+.popup[data-position='0']{top:calc(100% - 185px);left:0px}
 
 #arena:not(.chess) .player[data-position='0'].linked{
     transform: none;
