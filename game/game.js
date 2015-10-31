@@ -1313,7 +1313,7 @@
 			'<div style="margin:10px">角色操作</div><ul style="margin-top:0"><li>受到伤害<br>player.damage(source,<br>num)'+
 			'<li>回复体力<br>player.recover(num)<li>摸牌<br>player.draw(num)<li>获得牌<br>player.gain(cards)<li>弃牌<br>player.discard(cards)'+
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
-			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在历史中记录<br>game.log(str)<li>游戏结束<br>game.over(bool)'+
+			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令输入框中输出结果<br>game.print(str)<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card'
 		},
 		setPopped:function(node,func,width,height){
@@ -1354,6 +1354,12 @@
 			node.addEventListener('mouseleave',ui.click.mouseleave);
 			node.addEventListener('mousedown',ui.click.mousedown);
 			node.addEventListener('mousemove',ui.click.mousemove);
+			return node;
+		},
+		setScroll:function(node){
+			node.ontouchstart=ui.click.touchStart;
+			node.ontouchmove = ui.click.touchScroll;
+			node.style.WebkitOverflowScrolling='touch';
 			return node;
 		},
 		setLongPress:function(node,func){
@@ -9780,8 +9786,8 @@
 					var createMenu=function(tabs,config){
 						var createPage=function(position){
 			                var node=ui.create.div(position);
-			                ui.create.div('.left.pane',node);
-			                ui.create.div('.right.pane',node);
+			                lib.setScroll(ui.create.div('.left.pane',node));
+			                lib.setScroll(ui.create.div('.right.pane',node));
 			                return node;
 			            };
 						var menu=ui.create.div('.main.menu.dialog.popped.static',config.position,function(e){
@@ -10668,13 +10674,24 @@
 							text.style.height='80px';
 							text.style.resize='none';
 							page.appendChild(text);
+							var textstr='';
+							var perserveMenu=false;
+							game.print=function(str){
+								textstr+=str+'\n';
+								text.value=textstr;
+								perserveMenu=true;
+							}
 							runButton.listen(function(){
+								textstr='';
+								perserveMenu=false;
 								try{
 									eval(text.value);
 								}
 								catch(e){}
-								text.value='';
-								clickContainer.call(menuContainer);
+								if(!perserveMenu){
+									text.value='';
+									clickContainer.call(menuContainer);
+								}
 							});
 						}());
 
