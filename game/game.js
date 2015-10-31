@@ -9901,7 +9901,7 @@
 		                    }
 		                    else{
 		                        node.classList.add('switcher');
-		                        node.addEventListener('click',clickSwitcher);
+		                        node.listen(clickSwitcher);
 		                        ui.create.div('',config.item[config.init],node);
 		                        node._link.menu=ui.create.div('.menu');
 								node._link.menu._link=node;
