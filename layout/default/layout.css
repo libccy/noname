@@ -861,7 +861,7 @@ div[data-color="unknownm"]{
 @font-face {font-family: 'xinwei';src: url('../../font/xinwei.ttf');}
 ::-webkit-scrollbar{display: none;}
 
-@media screen and (min-height: 800px) {
+@media screen and (min-height: 800px) and (orientation:landscape)  {
 	#arena{height: 720px;top: calc(50% - 350px);}
 }
 @media screen and (min-width: 1280px) {

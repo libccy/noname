@@ -1139,7 +1139,15 @@ mode.chess={
 				delete window.characterRank;
 
 				ui.control.style.transition='all 0s';
-				ui.control.style.top='calc(100% - 30px)';
+				if(lib.config.layout=='mobile'){
+					ui.control.style.top='calc(100% - 70px)';
+				}
+				else if(lib.config.layout=='phone'){
+					ui.control.style.top='calc(100% - 80px)';
+				}
+				else{
+					ui.control.style.top='calc(100% - 30px)';
+				}
 				var cardNode=function(i,name,load){
 					var node=ui.create.player(ui.window);
 					node.style.transition='all 0.7s';
@@ -2592,7 +2600,15 @@ mode.chess={
 					dialog.add(bosses);
 				}
 				ui.control.style.transition='all 0s';
-				ui.control.style.top='calc(100% - 30px)';
+				if(lib.config.layout=='mobile'){
+					ui.control.style.top='calc(100% - 70px)';
+				}
+				else if(lib.config.layout=='phone'){
+					ui.control.style.top='calc(100% - 80px)';
+				}
+				else{
+					ui.control.style.top='calc(100% - 30px)';
+				}
 
 				var next=game.me.chooseButton(dialog,true);
 				next._triggered=null;

@@ -4,12 +4,12 @@
 
 #arena{
     width: 94%;
-    height: 95%;
+    height: calc(95% + 20px);
     left: 3%;
 }
 #control{
     width: 100%;
-    bottom:130px;
+    bottom:150px;
     height: 40px;
     left:0;
 }
@@ -21,7 +21,7 @@
 }*/
 #arena:not(.chess)>#me,
 #arena:not(.chess)>#mebg{
-    bottom:10px;
+    bottom:30px;
     width: calc(5000% / 47);
     left:calc(-150% / 47);
     top:auto;
@@ -49,7 +49,7 @@
     width: calc(5000% / 47);
     left:calc(-150% / 47);
     height: 120px;
-    top: calc(100% - 130px);
+    top: calc(100% - 150px);
     background: none !important;
     pointer-events: none;
 }
@@ -107,24 +107,21 @@
 }
 
 .dialog{
-	height:calc(100% - 350px);
-    bottom:150px;
+	height:calc(100% - 370px);
+    bottom:170px;
+}
+.dialog.fullheight {
+    height: calc(100% - 123px) !important;
+    top: 40px !important;
 }
 
-@media screen and (min-height: 800px) {
-    #arena{height: 760px;top: calc(50% - 350px);}
+@media screen and (min-height: 800px) and (orientation:landscape)  {
+    #arena{height: 780px;top: calc(50% - 350px);}
     #arena:not(.chess)>#me,
     #arena:not(.chess)>#mebg{
-        bottom:10px;
+        bottom:30px;
     }
 	#arena:not(.chess) .player[data-position='0']{
-        top: calc(100% - 130px);
+        top: calc(100% - 150px);
     }
-}
-
-@media screen and (orientation:portrait) {
-
-}
-@media screen and (orientation:landscape) {
-
 }

@@ -173,7 +173,8 @@
 						item:{
 							default:'旧版',
 							newlayout:'默认',
-							mobile:'紧凑'
+							mobile:'紧凑',
+							phone:'移动'
 						},
 						onclick:function(layout){
 							game.saveConfig('layout',layout);
@@ -183,7 +184,7 @@
 							setTimeout(function(){
 								var layout=ui.css.layout;
 								ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
-								if(lib.config.layout=='mobile'){
+								if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 									ui.arena.classList.add('mobile');
 									if(game.me&&game.me.node.handcards2.childNodes.length){
 										while(game.me.node.handcards2.childNodes.length){
@@ -1357,7 +1358,7 @@
 			dialog.style.top=idealtop+'px';
 		},
 		isMobileMe:function(player){
-			return lib.config.layout=='mobile'&&lib.config.mode!='chess'&&player.dataset.position==0;
+			return (lib.config.layout=='mobile'||lib.config.layout=='phone')&&lib.config.mode!='chess'&&player.dataset.position==0;
 		},
 		isNewLayout:function(){
 			if(lib.config.layout!='default') return true;
@@ -1365,7 +1366,7 @@
 			return false;
 		},
 		isSingleHandcard:function(){
-			if(game.singleHandcard||lib.config.layout=='mobile'){
+			if(game.singleHandcard||lib.config.layout=='mobile'||lib.config.layout=='phone'){
 				return true;
 			}
 			return false;
@@ -3565,7 +3566,7 @@
 					(
 						this.maxHp>9||
 						(this.maxHp>5&&this.classList.contains('minskin'))||
-						(lib.config.layout=='mobile'&&this.dataset.position==0&&this.maxHp>7)
+						((lib.config.layout=='mobile'||lib.config.layout=='phone')&&this.dataset.position==0&&this.maxHp>7)
 					)){
 						hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp;
 						hp.classList.add('text');
@@ -8890,11 +8891,8 @@
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena',ui.window);
-				if(lib.config.layout=='mobile'){
+				if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 					ui.arena.classList.add('mobile');
-				}
-				else{
-					ui.arena.classList.remove('mobile');
 				}
 				ui.backgroundMusic=document.createElement('audio');
 				ui.backgroundMusic.volume=lib.config.volumn_background/8;
@@ -9712,14 +9710,18 @@
 				// 	setTimeout(game.reload,500);
 				// });
 
-				if(false&&lib.config.right_sidebar){
-					ui.system2=ui.create.div('#system2',ui.system);
-					ui.system1=ui.create.div('#system1',ui.system);
+
+				ui.system1=ui.create.div('#system1',ui.system);
+				ui.system2=ui.create.div('#system2',ui.system);
+				if(lib.config.touchscreen){
+					ui.system1.addEventListener('touchstart',ui.click.system);
+					ui.system2.addEventListener('touchstart',ui.click.system);
 				}
 				else{
-					ui.system1=ui.create.div('#system1',ui.system);
-					ui.system2=ui.create.div('#system2',ui.system);
+					ui.system1.listen(ui.click.system);
+					ui.system2.listen(ui.click.system);
 				}
+
 				ui.replay=ui.create.system('重来',game.reload,true);
 				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.pause=ui.create.system('历史',ui.click.pause);
@@ -11118,6 +11120,15 @@
 			},
 		},
 		click:{
+			system:function(){
+				if(lib.config.layout!='phone') return;
+				_status.clicked=true;
+				this.classList.toggle('shown');
+				if(this.classList.contains('shown')){
+					if(this.nextSibling) this.nextSibling.classList.remove('shown');
+					if(this.previousSibling) this.previousSibling.classList.remove('shown');
+				}
+			},
 			pausehistory:function(){
 				if(!lib.config.auto_popped) return;
 				if(!ui.sidebar.childNodes.length) return;
@@ -11733,6 +11744,10 @@
 								game.check();
 							}
 						}
+					}
+					if(lib.config.layout=='phone'){
+						ui.system1.classList.remove('shown');
+						ui.system2.classList.remove('shown');
 					}
 				}
 				if(_status.tempunpop){

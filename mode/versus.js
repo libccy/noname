@@ -97,7 +97,15 @@ mode.versus={
 					game.resume();
 				};
 				ui.control.style.transition='all 0s';
-				ui.control.style.top='calc(100% - 30px)';
+				if(lib.config.layout=='mobile'){
+					ui.control.style.top='calc(100% - 70px)';
+				}
+				else if(lib.config.layout=='phone'){
+					ui.control.style.top='calc(100% - 80px)';
+				}
+				else{
+					ui.control.style.top='calc(100% - 30px)';
+				}
 				_status.friend=[];
 				_status.enemy=[];
 				game.additionaldead=[];
