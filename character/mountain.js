@@ -12,7 +12,7 @@ character.mountain={
 	},
 	skill:{
 		tiaoxin:{
-			audio:2,
+			audio:4,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -769,7 +769,7 @@ character.mountain={
 			}
 		},
 		beige:{
-			audio:2,
+			audio:6,
 			trigger:{global:'damageEnd'},
 			filter:function(event,player){
 				return (event.card&&event.card.name=='sha'&&event.source&&
@@ -805,7 +805,7 @@ character.mountain={
 			}
 		},
 		duanchang:{
-			audio:2,
+			audio:4,
 			trigger:{player:'dieBegin'},
 			forced:true,
 			filter:function(event){

@@ -109,6 +109,7 @@ character.yijiang={
 			}
 		},
 		youdi:{
+			audio:true,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -147,6 +148,7 @@ character.yijiang={
 			filterCard:true,
 			selectCard:2,
 			position:'h',
+			audio:2,
 			viewAs:{name:'sha'},
 			prompt:'将两张手牌当杀使用或打出',
 			check:function(card){
@@ -179,6 +181,7 @@ character.yijiang={
 			}
 		},
 		fencheng:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return !player.storage.fencheng;
@@ -245,6 +248,7 @@ character.yijiang={
 		mieji:{
 			trigger:{player:'useCardBegin'},
 			direct:true,
+			audio:2,
 			filter:function(event,player){
 				return event.targets.length==1&&get.type(event.card)=='trick'&&get.color(event.card)=='black';
 			},
@@ -265,6 +269,7 @@ character.yijiang={
 		},
 		junxing:{
 			enable:'phaseUse',
+			audio:2,
 			usable:1,
 			filterCard:true,
 			selectCard:[1,Infinity],
@@ -314,6 +319,7 @@ character.yijiang={
 			}
 		},
 		juece:{
+			audio:2,
 			trigger:{global:'loseEnd'},
 			check:function(event,player){
 				return ai.get.damageEffect(event.player,player,player)>0;
@@ -335,6 +341,7 @@ character.yijiang={
 			}
 		},
 		jiefan:{
+			audio:2,
 			unique:true,
 			mark:true,
 			init:function(player){
@@ -405,6 +412,7 @@ character.yijiang={
 			}
 		},
 		fuli:{
+			audio:2,
 			unique:true,
 			enable:'chooseToUse',
 			init:function(player){
@@ -438,8 +446,8 @@ character.yijiang={
 			}
 		},
 		qianxi:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
-			log:false,
 			content:function(){
 				"step 0"
 				player.judge(function(card){
@@ -456,7 +464,7 @@ character.yijiang={
 				if(result.bool&&result.targets.length){
 					result.targets[0].storage.qianxi2=event.color;
 					result.targets[0].addSkill('qianxi2');
-					player.logSkill('qianxi',result.targets);
+					player.line(result.targets,'green');
 				}
 			},
 		},
@@ -489,6 +497,7 @@ character.yijiang={
 			}
 		},
 		zhiman:{
+			audio:2,
 			trigger:{source:'damageBefore'},
 			check:function(event,player){
 				if(ai.get.damageEffect(event.player,player,player)<0) return true;
@@ -507,6 +516,7 @@ character.yijiang={
 			}
 		},
 		sanyao:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -537,6 +547,7 @@ character.yijiang={
 			}
 		},
 		qiaoshui:{
+			audio:2,
 			trigger:{player:'phaseUseBegin'},
 			direct:true,
 			filter:function(event,player){
@@ -579,6 +590,7 @@ character.yijiang={
 			}
 		},
 		jyzongshi:{
+			audio:2,
 			trigger:{target:'useCardToBegin'},
 			filter:function(event,player){
 				if(event.targets&&event.targets.length>1) return false;
@@ -595,6 +607,7 @@ character.yijiang={
 			}
 		},
 		shenxing:{
+			audio:2,
 			enable:'phaseUse',
 			position:'he',
 			filterCard:true,
@@ -612,6 +625,7 @@ character.yijiang={
 			},
 		},
 		bingyi:{
+			audio:2,
 			trigger:{player:'phaseDiscardEnd'},
 			filter:function(event,player){
 				var cards=player.get('h');
@@ -646,6 +660,7 @@ character.yijiang={
 		},
 		xiantu:{
 			unique:true,
+			audio:2,
 			gainnable:true,
 			forceunique:true,
 			trigger:{global:'phaseUseBegin'},
@@ -709,6 +724,7 @@ character.yijiang={
 			}
 		},
 		qiangzhi:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -759,6 +775,7 @@ character.yijiang={
 		dingpin:{
 			enable:'phaseUse',
 			usable:3,
+			audio:2,
 			filter:function(event,player){
 				return player.num('h')>0;
 			},
@@ -795,6 +812,7 @@ character.yijiang={
 			}
 		},
 		faen:{
+			audio:2,
 			trigger:{global:['turnOverAfter','linkAfter']},
 			filter:function(event,player){
 				if(event.name=='link') return event.player.isLinked();
@@ -811,6 +829,7 @@ character.yijiang={
 			}
 		},
 		jiaojin:{
+			audio:2,
 			trigger:{player:'damageBegin'},
 			filter:function(event,player){
 				return player.num('he',{type:'equip'})&&event.source&&event.source.sex=='male';
@@ -838,6 +857,7 @@ character.yijiang={
 			}
 		},
 		chanhui:{
+			audio:2,
 			trigger:{player:'useCard'},
 			filter:function(event,player){
 				if(_status.currentPhase!=player) return false;
@@ -897,6 +917,7 @@ character.yijiang={
 			}
 		},
 		quanji:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			frequent:true,
 			locked:false,
@@ -952,6 +973,7 @@ character.yijiang={
 			}
 		},
 		zili:{
+			audio:3,
 			unique:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -979,6 +1001,7 @@ character.yijiang={
 		paiyi:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			filterTarget:true,
 			filter:function(event,player){
 				return player.storage.quanji.length>0;
@@ -1012,6 +1035,7 @@ character.yijiang={
 			}
 		},
 		xianzhou:{
+			audio:2,
 			unique:true,
 			enable:'phaseUse',
 			filter:function(event,player){
@@ -1083,6 +1107,7 @@ character.yijiang={
 			}
 		},
 		qieting:{
+			audio:2,
 			global:'qieting2',
 			globalSilent:true,
 			trigger:{global:'phaseEnd'},
@@ -1122,6 +1147,7 @@ character.yijiang={
 		},
 		qieting3:{},
 		zhuikong:{
+			audio:2,
 			trigger:{global:'phaseBegin'},
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)<-2){
@@ -1152,6 +1178,7 @@ character.yijiang={
 			},
 		},
 		qiuyuan:{
+			audio:2,
 			trigger:{target:'shaBefore'},
 			direct:true,
 			priority:11,
@@ -1206,6 +1233,7 @@ character.yijiang={
 		gongji:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			position:'he',
 			filterCard:true,
 			check:function(card){
@@ -1254,6 +1282,7 @@ character.yijiang={
 			},
 		},
 		zhuiyi:{
+			audio:2,
 			trigger:{player:'dieBegin'},
 			direct:true,
 			content:function(){
@@ -1288,6 +1317,7 @@ character.yijiang={
 			enable:'phaseUse',
 			usable:1,
 			multitarget:true,
+			audio:2,
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				var num=target.num('h');
@@ -1313,6 +1343,7 @@ character.yijiang={
 				var card=giver.get('h').randomGet();
 				gainner.gain(card,'give');
 				giver.$give(card,gainner);
+				if(get.suit(card)!='spade') player.draw();
 			},
 			ai:{
 				order:10.5,
@@ -1341,6 +1372,7 @@ character.yijiang={
 		mingce:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			position:'he',
 			filterCard:function(card){
 				return card.name=='sha'||get.type(card)=='equip';
@@ -1403,6 +1435,7 @@ character.yijiang={
 			}
 		},
 		xinxuanhuo:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			direct:true,
 			content:function(){
@@ -1458,6 +1491,7 @@ character.yijiang={
 			}
 		},
 		zhichi:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
@@ -1488,6 +1522,7 @@ character.yijiang={
 			}
 		},
 		zongxuan:{
+			audio:2,
 			trigger:{player:'discardAfter'},
 			filter:function(event,player){
 				for(var i=0;i<event.cards.length;i++){
@@ -1519,6 +1554,7 @@ character.yijiang={
 			},
 		},
 		zhiyan:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			content:function(){
@@ -1561,6 +1597,7 @@ character.yijiang={
 			}
 		},
 		miji:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			check:function(event,player){
 				for(var i=0;i<game.players.length;i++){
@@ -1614,6 +1651,7 @@ character.yijiang={
 			}
 		},
 		zhenlie:{
+			audio:2,
 			filter:function(event,player){
 				return event.player!=player&&event.card&&(event.card.name=='sha'||get.type(event.card)=='trick');
 			},
@@ -1657,6 +1695,7 @@ character.yijiang={
 			}
 		},
 		wuyan:{
+			audio:2,
 			trigger:{target:'useCardToBefore',player:'useCardToBefore'},
 			forced:true,
 			priority:15,
@@ -1685,6 +1724,7 @@ character.yijiang={
 			}
 		},
 		xinwuyan:{
+			audio:2,
 			trigger:{target:'useCardToBefore',player:'useCardToBefore'},
 			forced:true,
 			priority:15,
@@ -1714,6 +1754,7 @@ character.yijiang={
 		xinjujian:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
+			audio:2,
 			filter:function(event,player){
 				return player.num('he')>player.num('he',{type:'basic'});
 			},
@@ -1802,6 +1843,7 @@ character.yijiang={
 		jujian:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			filterCard:true,
 			position:'he',
 			selectCard:[1,3],
@@ -1836,6 +1878,7 @@ character.yijiang={
 		yizhong:{
 			trigger:{target:'shaBefore'},
 			forced:true,
+			audio:2,
 			filter:function(event,player){
 				if(player.get('e','2')) return false;
 				return (event.card.name=='sha'&&get.color(event.card)=='black')
@@ -1856,6 +1899,7 @@ character.yijiang={
 		jueqing:{
 			trigger:{source:'damageBefore'},
 			forced:true,
+			audio:2,
 			priority:10,
 			check:function(){return false;},
 			content:function(){
@@ -1871,6 +1915,7 @@ character.yijiang={
 			}
 		},
 		shangshi:{
+			audio:2,
 			trigger:{player:['loseEnd','changeHp']},
 			forced:true,
 			filter:function(event,player){
@@ -1886,6 +1931,7 @@ character.yijiang={
 			group:['luoying1','luoying2'],
 		},
 		luoying1:{
+			audio:2,
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
 				if(event.player==player) return false;
@@ -1897,7 +1943,6 @@ character.yijiang={
 				return false;
 			},
 			frequent:true,
-			popup:false,
 			content:function(){
 				"step 0"
 				if(trigger.delay==false) game.delay();
@@ -1916,6 +1961,7 @@ character.yijiang={
 			},
 		},
 		luoying2:{
+			audio:2,
 			trigger:{global:'judgeAfter'},
 			frequent:true,
 			filter:function(event,player){
@@ -1932,6 +1978,7 @@ character.yijiang={
 			group:['jiushi1','jiushi2','jiushi3'],
 		},
 		jiushi1:{
+			audio:2,
 			enable:'chooseToUse',
 			filter:function(event,player){
 				if(player.classList.contains('turnedover')) return false;
@@ -1947,6 +1994,9 @@ character.yijiang={
 			},
 			ai:{
 				save:true,
+				skillTagFilter:function(player){
+					return player.hp<=0&&!player.isTurnedOver();
+				},
 				order:5,
 				result:{
 					player:function(player){
@@ -1973,6 +2023,7 @@ character.yijiang={
 			}
 		},
 		jiushi3:{
+			audio:2,
 			trigger:{player:'damageAfter'},
 			check:function(event,player){
 				return player.isTurnedOver();
@@ -2003,6 +2054,7 @@ character.yijiang={
 			}
 		},
 		zishou:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
 				return player.num('h')<=player.maxHp||player.skipList.contains('phaseUse');
@@ -2034,7 +2086,7 @@ character.yijiang={
 		yaowu:{
 			trigger:{player:'damageEnd'},
 			priority:1,
-			popup:false,
+			audio:2,
 			filter:function(event){
 				if(event.card&&(event.card.name=='sha')){
 					if(get.color(event.card)=='red') return true;
@@ -2104,6 +2156,7 @@ character.yijiang={
 		qice:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			group:['qice3'],
 			direct:true,
 			filter:function(event,player){
@@ -2214,6 +2267,7 @@ character.yijiang={
 		},
 		qice4:{},
 		zhiyu:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			content:function(){
 				"step 0"
@@ -2233,6 +2287,7 @@ character.yijiang={
 			}
 		},
 		xuanfeng:{
+			audio:2,
 			trigger:{player:['loseEnd','phaseDiscardEnd']},
 			direct:true,
 			filter:function(event,player){
@@ -2282,6 +2337,7 @@ character.yijiang={
 			}
 		},
 		jiangchi:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			direct:true,
 			content:function(){
@@ -2327,6 +2383,7 @@ character.yijiang={
 			}
 		},
 		xinzhan:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return true;//player.num('h')>player.maxHp;
@@ -2359,6 +2416,7 @@ character.yijiang={
 			}
 		},
 		huilei:{
+			audio:2,
 			trigger:{player:'dieBegin'},
 			forced:true,
 			filter:function(event){
@@ -2373,6 +2431,7 @@ character.yijiang={
 		},
 
 		xinenyuan:{
+			audio:true,
 			trigger:{player:'damageEnd'},
 			check:function(event,player){
 				var att=ai.get.attitude(player,event.source);
@@ -2444,6 +2503,7 @@ character.yijiang={
 		enyuan1:{
 			trigger:{player:'recoverEnd'},
 			forced:true,
+			audio:2,
 			filter:function(event,player){
 				return event.source&&event.source!=player;
 			},
@@ -2454,6 +2514,7 @@ character.yijiang={
 		enyuan2:{
 			trigger:{player:'damageEnd'},
 			forced:true,
+			audio:true,
 			filter:function(event,player){
 				return event.source&&event.source!=player;
 			},
@@ -2475,6 +2536,7 @@ character.yijiang={
 			}
 		},
 		xuanhuo:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			discard:false,
@@ -2529,6 +2591,7 @@ character.yijiang={
 		ganlu:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			selectTarget:2,
 			filterTarget:function(card,player,target){
 				if(target.isMin()) return false;
@@ -2598,6 +2661,7 @@ character.yijiang={
 		buyi:{
 			trigger:{global:'dying'},
 			priority:6,
+			audio:2,
 			filter:function(event,player){
 				return event.player.hp<=0&&event.player.num('h')>0;
 			},
@@ -2631,6 +2695,7 @@ character.yijiang={
 			}
 		},
 		pojun:{
+			audio:2,
 			trigger:{source:'damageEnd'},
 			check:function(event,player){
 				if(event.player.isTurnedOver()) return ai.get.attitude(player,event.player)>0;
@@ -2658,6 +2723,7 @@ character.yijiang={
 			content:function(){
 				player.draw(2);
 			},
+			audio:2,
 			init:function(player){player.storage.jingce=true},
 			intro:{
 				content:function(storage,player){
@@ -2668,6 +2734,7 @@ character.yijiang={
 		chengxiang:{
 			trigger:{player:'damageEnd'},
 			direct:true,
+			audio:2,
 			content:function(){
 				"step 0"
 				event.cards=get.cards(4);
@@ -2728,6 +2795,7 @@ character.yijiang={
 		},
 		renxin:{
 			trigger:{global:'damageBefore'},
+			audio:3,
 			priority:6,
 			filter:function(event,player){
 				return event.player!=player&&event.player.hp==1&&player.num('he',{type:'equip'})>0;
@@ -2758,6 +2826,7 @@ character.yijiang={
 			}
 		},
 		yuce:{
+			audio:2,
 			trigger:{player:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
@@ -2811,6 +2880,7 @@ character.yijiang={
 			}
 		},
 		xiansi:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			init:function(player){
@@ -2871,6 +2941,8 @@ character.yijiang={
 		},
 		xiansi2:{
 			enable:'phaseUse',
+			audio:2,
+			forceaudio:true,
 			filter:function(event,player){
 				var remove=true;
 				for(var i=0;i<game.players.length;i++){
@@ -2931,6 +3003,7 @@ character.yijiang={
 			}
 		},
 		shibei:{
+			audio:2,
 			trigger:{player:'damageAfter'},
 			forced:true,
 			content:function(){
@@ -2958,6 +3031,7 @@ character.yijiang={
 		},
 		shibei2:{},
 		jianying:{
+			audio:2,
 			trigger:{player:'useCard'},
 			frequent:true,
 			filter:function(event,player){
@@ -3397,7 +3471,7 @@ character.yijiang={
 		qiuyuan_info:'当你成为【杀】的目标时，你可以令另一名其他角色选择一项：①、交给你一张【闪】；②、成为此【杀】的额外目标。',
 		gongji_info:'出牌阶段，你可以弃置一张牌，令你的攻击范围无限，直到回合结束，然后若你以此法弃置的牌为装备牌，你可以弃置一名其他角色的一张牌。每回合限一次。',
 		zhuiyi_info:'你死亡时，可以令一名其他角色（杀死你的角色除外）摸三张牌，然后令其回复1点体力。',
-		anxu_info:'出牌阶段，你可以选择两名手牌数不相等的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之',
+		anxu_info:'出牌阶段，你可以选择两名手牌数不相等的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之，若不为黑桃，你摸一张牌',
 		zongxuan_info:'每当你的牌被弃置，你可以将其按任意顺序置于牌堆顶',
 		zhiyan_info:'回合结束阶段，你可以令一名角色摸一张并展示之，若是装备牌，其立即装备之并回复一点体力',
 		miji_info:'回合结束阶段，若你已受伤，可以摸X张牌，然后可以将等量的牌交给一名其他角色，X为你已损失的体力值',

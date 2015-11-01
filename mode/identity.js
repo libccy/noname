@@ -58,8 +58,9 @@ mode.identity={
 				game.phaseLoop(game.zhu);
 			}
 		},
-		showIdentity:function(){
+		showIdentity:function(me){
 			for(var i=0;i<game.players.length;i++){
+				// if(me===false&&game.players[i]==game.me) continue;
 				game.players[i].identityShown=true;
 				game.players[i].ai.shown=1;
 				game.players[i].setIdentity(game.players[i].identity);

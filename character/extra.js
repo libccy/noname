@@ -11,6 +11,7 @@ character.extra={
 	},
 	skill:{
 		lianpo:{
+			audio:true,
 			trigger:{source:'dieAfter'},
 			forced:true,
 			filter:function(event,player){
@@ -32,6 +33,7 @@ character.extra={
 			trigger:{source:'damageEnd',player:'damageEnd'},
 			forced:true,
 			mark:true,
+			audio:2,
 			filter:function(event){
 				return event.num>0;
 			},
@@ -46,6 +48,7 @@ character.extra={
 			}
 		},
 		shenfen:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return !player.storage.shenfen&&player.storage.baonu>=6;
@@ -98,6 +101,7 @@ character.extra={
 			}
 		},
 		wuqian:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.storage.baonu>=2&&!player.skills.contains('wushuang');
@@ -127,6 +131,7 @@ character.extra={
 			}
 		},
 		renjie:{
+			audio:true,
 			trigger:{player:'damageEnd'},
 			forced:true,
 			unique:true,
@@ -173,6 +178,7 @@ character.extra={
 			}
 		},
 		renjie2:{
+			audio:true,
 			trigger:{player:'phaseDiscardEnd'},
 			forced:true,
 			filter:function(event){
@@ -186,6 +192,7 @@ character.extra={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			unique:true,
+			audio:true,
 			filter:function(event,player){
 				return player.storage.renjie>=4;
 			},
@@ -200,6 +207,7 @@ character.extra={
 			group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi']
 		},
 		jilue_guicai:{
+			audio:true,
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
@@ -246,6 +254,7 @@ character.extra={
 			}
 		},
 		jilue_fangzhu:{
+			audio:true,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			priority:-1,
@@ -277,6 +286,7 @@ character.extra={
 			},
 		},
 		jilue_wansha:{
+			audio:true,
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -288,6 +298,7 @@ character.extra={
 			}
 		},
 		jilue_zhiheng:{
+			audio:true,
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -322,6 +333,7 @@ character.extra={
 			},
 		},
 		jilue_jizhi:{
+			audio:true,
 			trigger:{player:'useCard'},
 			filter:function(event,player){
 				return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card)&&player.storage.renjie>0;
@@ -352,6 +364,7 @@ character.extra={
 					if(get.suit(card)=='heart'||_status.event.skill=='wushen') return true;
 				}
 			},
+			audio:2,
 			enable:['chooseToUse','chooseToRespond'],
 			filterCard:{suit:'heart'},
 			viewAs:{name:'sha'},
@@ -401,6 +414,7 @@ character.extra={
 			}
 		},
 		wuhun2:{
+			audio:3,
 			trigger:{global:'dieAfter'},
 			forced:true,
 			content:function(){
@@ -409,6 +423,7 @@ character.extra={
 			}
 		},
 		guixin:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			check:function(event,player){
 				if(player.isTurnedOver()) return true;
@@ -475,6 +490,7 @@ character.extra={
 			}
 		},
 		qixing:{
+			audio:3,
 			unique:true,
 			trigger:{global:'gameDrawAfter',player:'phaseBegin'},
 			forced:true,
@@ -567,6 +583,7 @@ character.extra={
 			filter:function(event,player){
 				return player.storage.qixing&&player.storage.qixing.length;
 			},
+			audio:2,
 			content:function(){
 				"step 0"
 				player.chooseTarget('选择角色获得大雾标记',
@@ -651,6 +668,7 @@ character.extra={
 		},
 		kuangfeng:{
 			unique:true,
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -709,6 +727,7 @@ character.extra={
 		yeyan:{
 			unique:true,
 			enable:'phaseUse',
+			audio:3,
 			filter:function(event,player){
 				return !player.storage.yeyan;
 			},
@@ -812,6 +831,7 @@ character.extra={
 			}
 		},
 		longhun1:{
+			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
 			prompt:'将一张红桃牌当桃使用',
 			position:'he',
@@ -828,6 +848,7 @@ character.extra={
 			}
 		},
 		longhun2:{
+			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
 			prompt:'将一张方片牌当火杀使用或打出',
 			position:'he',
@@ -844,6 +865,7 @@ character.extra={
 			}
 		},
 		longhun3:{
+			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
 			prompt:'将一张黑桃牌当无懈可击使用',
 			position:'he',
@@ -863,6 +885,7 @@ character.extra={
 			}
 		},
 		longhun4:{
+			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
 			prompt:'将一张梅花牌当闪打出',
 			position:'he',
@@ -884,6 +907,7 @@ character.extra={
 					return 2+num;
 				}
 			},
+			audio:true,
 			trigger:{player:'phaseDrawBegin'},
 			priority:-5,
 			filter:function(event,player){
@@ -895,6 +919,7 @@ character.extra={
 			}
 		},
 		shelie:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			content:function(){
 				"step 0"

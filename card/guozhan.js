@@ -2,6 +2,7 @@
 card.guozhan={
 	card:{
 		yuanjiao:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -29,6 +30,7 @@ card.guozhan={
 			// mode:['guozhan'],
 		},
 		zhibi:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -92,6 +94,7 @@ card.guozhan={
 			}
 		},
 		yiyi:{
+			audio:true,
 			fullskin:true,
 			type:'trick',
 			enable:true,

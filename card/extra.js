@@ -404,6 +404,7 @@ card.extra={
 		baiyin_skill:{
 			trigger:{player:'damageBegin'},
 			forced:true,
+			audio:true,
 			filter:function(event,player){
 				if(event.num<=1) return false;
 				if(event.parent.player.num('s','unequip')) return false;

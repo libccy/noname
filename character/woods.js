@@ -563,7 +563,7 @@ character.woods={
 			}
 		},
 		benghuai:{
-			audio:2,
+			audio:4,
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			check:function(){
@@ -598,7 +598,7 @@ character.woods={
 			global:'baonue2'
 		},
 		baonue2:{
-			audio:2,
+			audio:4,
 			forceaudio:true,
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){

@@ -32,6 +32,8 @@
     height:120px;
     padding:0;
     top:calc(100% - 120px);
+}
+#arena:not(.chess):not(.single-handcard) #handcards1{
     width:calc(100% - 240px);
     left:120px;
 }
@@ -66,6 +68,10 @@
     transition: transform 0.5s;
     pointer-events: auto;
 }
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.judges,
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.marks{
+    pointer-events: auto;
+}
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.equips{
     left:calc(100% - 120px);
 }
@@ -97,7 +103,46 @@
     left: -4px;
     bottom:10px;
 }
-.popup[data-position='0']{top:calc(100% - 185px);left:0px}
+#arena:not(.chess) .player[data-position='0']>.hp.actcount{
+    top:10px;
+    left:2px;
+}
+
+#arena:not(.chess) .player.fullskin2[data-position='0']:not(.minskin)>.avatar,
+#arena:not(.chess) .player.fullskin2[data-position='0']:not(.minskin)>.avatar2{
+	width:60px;
+	background-position:50%;
+}
+#arena:not(.chess) .player.fullskin2[data-position='0']:not(.minskin)>.avatar2{
+	left:60px;
+    top:0;
+	z-index:1;
+}
+
+.popup[data-position='0']{
+    top:calc(100% - 187px);
+    left:calc(-150% / 47 + 15px);
+}
+
+#arena:not(.chess) .player[data-position='0']>.judges{
+    transform: rotate(-90deg);
+    left: -12px;
+    top: -5px;
+    transform-origin: top center;
+}
+#arena:not(.chess) .player[data-position='0']>.marks {
+    transform: rotate(90deg);
+    right: -12px;
+    left:auto;
+    top: -5px;
+    transform-origin: top center;
+}
+#arena:not(.chess) .player[data-position='0']>.judges>.card{
+    transform: rotate(90deg);
+}
+#arena:not(.chess) .player[data-position='0']>.marks>div{
+    transform: rotate(-90deg);
+}
 
 #arena:not(.chess) .player[data-position='0'].linked{
     transform: none;

@@ -2861,6 +2861,7 @@ character.swd={
 			},
 		},
 		qinyin:{
+			audio:2,
 			trigger:{player:'phaseDiscardEnd'},
 			direct:true,
 			filter:function(event,player){

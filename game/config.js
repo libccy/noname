@@ -189,7 +189,6 @@ window.config={
 		auto:'托管'
 	},
 
-	ui_zoom:'原始',
 	duration:500,
 	hoveration:1000,
 	cheat:false,
@@ -247,7 +246,7 @@ window.config={
 	sort:'type_sort',
 
 	cards:['standard','ex','extra','refresh'],
-	characters:['standard','wind','fire','woods','mountain','refresh'],
+	characters:['standard','wind','fire','woods','mountain','refresh','yijiang'],
 	plays:[],
 	banned:[],
 	bannedcards:[],

@@ -1085,9 +1085,10 @@ mode.chess={
 				this.link.chessFocus();
 				if(this.link.classList.contains('selectable')||
 				this.link.classList.contains('selected')){
-					this.link.click();
+					// this.link.click();
+					ui.click.target.call(this.link,e);
+					ui.click.window.call(ui.window,e);
 				}
-				// ui.click.target.call(this.link,e);
 				e.stopPropagation();
 			}
 		},
@@ -1493,13 +1494,15 @@ mode.chess={
 						node.classList.add('playerflip');
 						node.style.webkitTransform='none';
 						node.style.transition='';
-						setTimeout(function(){
-							switch(game.getRarity(node.name)){
-								case 'rare':node.$rare();break;
-								case 'epic':node.$epic();break;
-								case 'legend':node.$legend();break;
-							}
-						},150);
+						if(lib.config.animation){
+							setTimeout(function(){
+								switch(game.getRarity(node.name)){
+									case 'rare':node.$rare();break;
+									case 'epic':node.$epic();break;
+									case 'legend':node.$legend();break;
+								}
+							},150);
+						}
 					});
 				};
 				var zhaomu2=function(){
@@ -2212,13 +2215,15 @@ mode.chess={
 							node.classList.add('playerflip');
 							node.style.webkitTransform='none';
 							node.style.transition='';
-							setTimeout(function(){
-								switch(game.getRarity(node.name)){
-									case 'rare':node.$rare();break;
-									case 'epic':node.$epic();break;
-									case 'legend':node.$legend();break;
-								}
-							},150);
+							if(lib.config.animation){
+								setTimeout(function(){
+									switch(game.getRarity(node.name)){
+										case 'rare':node.$rare();break;
+										case 'epic':node.$epic();break;
+										case 'legend':node.$legend();break;
+									}
+								},150);
+							}
 						});
 					};
 					setTimeout(function(){

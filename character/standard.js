@@ -756,6 +756,20 @@ character.standard={
 					}
 				}
 			},
+			group:'kongcheng1'
+		},
+		kongcheng1:{
+			audio:2,
+			trigger:{player:'loseEnd'},
+			forced:true,
+			filter:function(event,player){
+				if(player.num('h')) return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].original=='h') return true;
+				}
+				return false;
+			},
+			content:function(){}
 		},
 		longdan:{
 			group:['longdan1','longdan2']
@@ -920,7 +934,7 @@ character.standard={
 			}
 		},
 		kurou:{
-			audio:2,
+			audio:4,
 			enable:'phaseUse',
 			prompt:'失去一点体力并摸两张牌',
 			content:function(){
@@ -1149,7 +1163,7 @@ character.standard={
 			}
 		},
 		xiaoji:{
-			audio:1,
+			audio:4,
 			trigger:{player:'loseEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -1415,6 +1429,7 @@ character.standard={
 		paoxiao:'咆哮',
 		guanxing:'观星',
 		kongcheng:'空城',
+		kongcheng1:'空城',
 		longdan:'龙胆',
 		longdan1:'龙胆',
 		longdan2:'龙胆',

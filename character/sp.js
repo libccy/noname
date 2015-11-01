@@ -69,6 +69,7 @@ character.sp={
 			}
 		},
 		canshi:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			check:function(event,player){
 				var num=0;
@@ -118,6 +119,7 @@ character.sp={
 			}
 		},
 		chouhai:{
+			audio:2,
 			trigger:{player:'damageBegin'},
 			forced:true,
 			check:function(){
@@ -138,6 +140,7 @@ character.sp={
 			}
 		},
 		kunfen:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			check:function(event,player){
@@ -175,6 +178,7 @@ character.sp={
 		},
 		fengliang:{
 			unique:true,
+			audio:2,
 			trigger:{player:'dying'},
 			priority:10,
 			forced:true,
@@ -227,6 +231,7 @@ character.sp={
 		jilei:{
 			trigger:{player:'damageEnd'},
 			priority:9,
+			audio:2,
 			check:function(event,player){
 				return ai.get.attitude(player,event.source)<0;
 			},
@@ -265,6 +270,7 @@ character.sp={
 		},
 		danlao:{
 			priority:9,
+			audio:2,
 			filter:function(event,player){
 				return event.player!=player&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1;
 			},
@@ -313,6 +319,7 @@ character.sp={
 			}
 		},
 		manjuan:{
+			audio:true,
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
 				if(event.player==player) return false;
@@ -372,6 +379,7 @@ character.sp={
 			}
 		},
 		zuixiang:{
+			audio:true,
 			unique:true,
 			mark:true,
 			trigger:{player:'phaseBegin'},
@@ -478,6 +486,7 @@ character.sp={
 			},
 		},
 		naman:{
+			audio:2,
 			trigger:{global:'respondEnd'},
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
@@ -502,6 +511,7 @@ character.sp={
 			},
 		},
 		xiemu:{
+			audio:2,
 			trigger:{target:'useCardToBegin'},
 			filter:function(event,player){
 				if(get.color(event.card)!='black') return false;
@@ -557,6 +567,7 @@ character.sp={
 			}
 		},
 		fenxun:{
+			audio:2,
 			trigger:{player:'shaBefore'},
 			direct:true,
 			filter:function(event,player){
@@ -587,6 +598,7 @@ character.sp={
 			}
 		},
 		zhoufu:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterCard:true,
@@ -625,6 +637,7 @@ character.sp={
 				ui.discardPile.appendChild(player.storage.zhoufu2);
 				player.$throw(player.storage.zhoufu2);
 				if(player.storage.zhoufu3.isAlive()&&player.storage.zhoufu3.skills.contains('yingbin')){
+					player.logSkill('yingbin');
 					player.storage.zhoufu3.draw(2);
 				}
 				else{
@@ -662,8 +675,11 @@ character.sp={
 				delete player.storage.zhoufu3;
 			},
 		},
-		yingbin:{},
+		yingbin:{
+			audio:2,
+		},
 		kuiwei:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			check:function(event,player){
 				if(player.isTurnedOver()) return true;
@@ -711,6 +727,7 @@ character.sp={
 		},
 		yanzheng:{
 			enable:'chooseToUse',
+			audio:2,
 			filter:function(event,player){
 				return player.hp<player.num('h')&&player.num('e')>0;
 			},
@@ -748,6 +765,7 @@ character.sp={
 			}
 		},
 		wangzun:{
+			audio:2,
 			trigger:{global:'phaseBegin'},
 			check:function(event,player){
 				var att=ai.get.attitude(player,event.player);
@@ -794,6 +812,7 @@ character.sp={
 			}
 		},
 		kaikang:{
+			audio:2,
 			trigger:{global:'shaBegin'},
 			filter:function(event,player){
 				return get.distance(player,event.target)<=1;
@@ -836,6 +855,7 @@ character.sp={
 			}
 		},
 		liangzhu:{
+			audio:2,
 			trigger:{global:'recoverAfter'},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>=0;
@@ -851,6 +871,7 @@ character.sp={
 			}
 		},
 		mingshi:{
+			audio:2,
 			trigger:{player:'damageBegin'},
 			direct:true,
 			filter:function(event,player){
@@ -872,6 +893,7 @@ character.sp={
 			}
 		},
 		lirang:{
+			audio:2,
 			trigger:{player:'discardAfter'},
 			filter:function(event,player){
 				for(var i=0;i<event.cards.length;i++){
@@ -922,6 +944,7 @@ character.sp={
 		moukui:{
 			trigger:{player:'shaBegin'},
 			direct:true,
+			audio:true,
 			content:function(){
 				"step 0"
 				var controls=['draw_card'];
@@ -954,6 +977,7 @@ character.sp={
 			}
 		},
 		moukui2:{
+			audio:true,
 			trigger:{player:'shaMiss'},
 			forced:true,
 			filter:function(event,player){
@@ -964,6 +988,7 @@ character.sp={
 			}
 		},
 		shenxian:{
+			audio:2,
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
 				if(event.player==player||_status.currentPhase==player) return false;
@@ -989,6 +1014,7 @@ character.sp={
 		},
 		shenxian2:{},
 		qiangwu:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			content:function(){
@@ -1022,6 +1048,7 @@ character.sp={
 			}
 		},
 		zhendu:{
+			audio:2,
 			trigger:{global:'phaseUseBegin'},
 			filter:function(event,player){
 				return event.player!=player&&player.num('h')>0;
@@ -1068,6 +1095,7 @@ character.sp={
 			group:['qiluan2','qiluan3']
 		},
 		qiluan2:{
+			audio:2,
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			filter:function(event,player){
@@ -1090,6 +1118,7 @@ character.sp={
 			},
 		},
 		shangyi:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -1123,10 +1152,12 @@ character.sp={
 			},
 			content:function(){
 				player.draw(2);
-			}
+			},
+			// audio:2,
 		},
 		shoucheng:{
 			trigger:{global:'loseEnd'},
+			audio:2,
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>0;
 			},
@@ -1147,6 +1178,7 @@ character.sp={
 			}
 		},
 		hengzheng:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
 			filter:function(event,player){
 				return player.hp==1||player.num('h')==0;
@@ -1192,6 +1224,7 @@ character.sp={
 			}
 		},
 		yongjue:{
+			audio:2,
 			trigger:{global:'useCardEnd'},
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
@@ -1219,6 +1252,7 @@ character.sp={
 		},
 		yongjue2:{},
 		guixiu:{
+			audio:2,
 			trigger:{target:'shaBegin'},
 			frequent:true,
 			filter:function(event,player){
@@ -1229,6 +1263,7 @@ character.sp={
 			}
 		},
 		cunsi:{
+			audio:2,
 			unique:true,
 			enable:'phaseUse',
 			mark:true,
@@ -1282,6 +1317,7 @@ character.sp={
 			}
 		},
 		fenming:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			check:function(event,player){
 				var num=0;
@@ -1322,6 +1358,7 @@ character.sp={
 		duanxie:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			filterTarget:function(card,player,target){
 				return player!=target&&!target.isLinked();
 			},
@@ -1350,6 +1387,7 @@ character.sp={
 			}
 		},
 		xiaoguo:{
+			audio:2,
 			trigger:{global:'phaseEnd'},
 			check:function(event,player){
 				return ai.get.damageEffect(event.player,player,player)>0;
@@ -1424,6 +1462,7 @@ character.sp={
 		sijian:{
 			trigger:{player:'loseEnd'},
 			direct:true,
+			audio:2,
 			filter:function(event,player){
 				if(player.num('h')) return false;
 				for(var i=0;i<event.cards.length;i++){
@@ -1554,6 +1593,7 @@ character.sp={
 		xiongyi:{
 			unique:true,
 			enable:'phaseUse',
+			audio:2,
 			mark:true,
 			filter:function(event,player){
 				return !player.storage.xiongyi;
@@ -1610,6 +1650,7 @@ character.sp={
 			}
 		},
 		shushen:{
+			audio:2,
 			trigger:{player:'recoverAfter'},
 			direct:true,
 			content:function(){
@@ -1652,6 +1693,7 @@ character.sp={
 			}
 		},
 		shenzhi:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
 			check:function(event,player){
 				if(player.hp>2) return false;
@@ -1678,6 +1720,7 @@ character.sp={
 			}
 		},
 		wuji:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
@@ -1692,6 +1735,7 @@ character.sp={
 			}
 		},
 		xueji:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -1740,6 +1784,7 @@ character.sp={
 			}
 		},
 		huxiao:{
+			audio:2,
 			trigger:{player:'shaMiss'},
 			forced:true,
 			content:function(){
@@ -1765,6 +1810,7 @@ character.sp={
 			},
 		},
 		aocai:{
+			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			frequent:true,
 			filter:function(event,player){
@@ -1903,6 +1949,7 @@ character.sp={
 			},
 		},
 		huanshi:{
+			audio:2,
 			trigger:{global:'judge'},
 			filter:function(event,player){
 				return player.num('he')>0;
@@ -1969,6 +2016,7 @@ character.sp={
 			}
 		},
 		mingzhe:{
+			audio:2,
 			trigger:{player:['useCardAfter','respondAfter','discardAfter']},
 			frequent:true,
 			filter:function(event,player){
@@ -1989,6 +2037,7 @@ character.sp={
 			}
 		},
 		duwu:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.skills.contains('duwu2')==false;
@@ -2056,6 +2105,7 @@ character.sp={
 			}
 		},
 		yongsi1:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
 			content:function(){
@@ -2070,6 +2120,7 @@ character.sp={
 			}
 		},
 		yongsi2:{
+			audio:2,
 			trigger:{player:'phaseDiscardBegin'},
 			forced:true,
 			content:function(){
@@ -2086,6 +2137,7 @@ character.sp={
 		bifa:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
+			audio:2,
 			filter:function(event,player){
 				return player.num('h')>0;
 			},
@@ -2168,6 +2220,7 @@ character.sp={
 			}
 		},
 		songci:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(){
 				for(var i=0;i<game.players.length;i++){
@@ -2279,6 +2332,7 @@ character.sp={
 			}
 		},
 		chongzhen1:{
+			audio:2,
 			trigger:{player:'shaBefore'},
 			filter:function(event,player){
 				if(event.skill!='longdan1') return false;
@@ -2291,6 +2345,7 @@ character.sp={
 			}
 		},
 		chongzhen2:{
+			audio:2,
 			trigger:{player:'respond'},
 			filter:function(event,player){
 				if(event.skill!='longdan2'&&event.skill!='longdan1') return false;
@@ -2303,6 +2358,7 @@ character.sp={
 			}
 		},
 		lihun:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -2357,6 +2413,7 @@ character.sp={
 			}
 		},
 		yuanhu:{
+			audio:3,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -2423,6 +2480,7 @@ character.sp={
 			}
 		},
 		tianming:{
+			audio:true,
 			trigger:{target:'shaBegin'},
 			check:function(event,player){
 				var cards=player.get('h');
@@ -2465,6 +2523,7 @@ character.sp={
 		mizhao:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			filter:function(event,player){
 				return player.num('h')>0;
 			},
@@ -2541,6 +2600,7 @@ character.sp={
 			}
 		},
 		gongao:{
+			audio:2,
 			trigger:{global:'dieAfter'},
 			forced:true,
 			unique:true,
@@ -2553,6 +2613,7 @@ character.sp={
 			}
 		},
 		juyi:{
+			audio:true,
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
 				return player.maxHp>game.players.length&&player.hp<player.maxHp&&!player.storage.juyi;
@@ -2570,6 +2631,7 @@ character.sp={
 			}
 		},
 		weizhong:{
+			audio:true,
 			trigger:{player:['gainMaxHpEnd','loseMaxHpEnd']},
 			forced:true,
 			content:function(){

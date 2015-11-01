@@ -366,3 +366,4 @@
 }
 @-webkit-keyframes card_start2x{from {opacity: 0;margin-top: -13px;margin-bottom:-11px}}
 @-webkit-keyframes card_start2xx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;-webkit-transform:scale(0)}}
+@-webkit-keyframes card_start2xxx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;-webkit-transform:scale(0) rotate(90deg)}}
