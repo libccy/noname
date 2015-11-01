@@ -41,26 +41,5 @@
 
 
 @media screen and (orientation:portrait) {
-    /*--------位置(8人)------*/
-    [data-number='8']>.player[data-position='1']{top: calc(100% - 350px)}
-    [data-number='8']>.player[data-position='2']{top:calc(50% - 175px)}
-    [data-number='8']>.player[data-position='3']{left:calc(100% - 150px);}
-    [data-number='8']>.player[data-position='4']{top:0;left:calc(50% - 75px);}
-    [data-number='8']>.player[data-position='5']{left:0;}
-    [data-number='8']>.player[data-position='6']{top:calc(50% - 175px)}
-    [data-number='8']>.player[data-position='7']{top:calc(100% - 350px)}
-    [data-number='8']>.card[data-position='1']{top:calc(200% / 3 - 122px);left:calc(100% - 127px);}
-    [data-number='8']>.card[data-position='2']{top:calc(100% / 3 - 132px);left:calc(100% - 127px);}
-    [data-number='8']>.card[data-position='3']{top:38px;left:calc(75% - 89.5px);}
-    [data-number='8']>.card[data-position='4']{top:38px;left:calc(50% - 52px);}
-    [data-number='8']>.card[data-position='5']{top:38px;left:calc(25% - 14.5px);}
-    [data-number='8']>.card[data-position='6']{top:calc(100% / 3 - 132px);left:23px;}
-    [data-number='8']>.card[data-position='7']{top:calc(200% / 3 - 122px);left:23px;}
-    [data-number='8']>.popup[data-position='1']{top:calc(200% / 3 - 150px);left:calc(100% - 186px);}
-    [data-number='8']>.popup[data-position='2']{top:calc(100% / 3 - 160px);left:calc(100% - 186px);}
-    [data-number='8']>.popup[data-position='3']{top:190px;left:calc(75% + 10.5px);}
-    [data-number='8']>.popup[data-position='4']{top:190px;left:calc(50% - 61px);}
-    [data-number='8']>.popup[data-position='5']{top:190px;left:calc(25% - 37.5px);}
-    [data-number='8']>.popup[data-position='6']{top:calc(100% / 3 - 160px);left:160px;}
-    [data-number='8']>.popup[data-position='7']{top:calc(200% / 3 - 150px);left:160px;}
+    
 }

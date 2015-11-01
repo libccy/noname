@@ -8909,6 +8909,7 @@
 				if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 					ui.arena.classList.add('mobile');
 				}
+				ui.updatePhone();
 				ui.backgroundMusic=document.createElement('audio');
 				ui.backgroundMusic.volume=lib.config.volumn_background/8;
 				game.playBackgroundMusic();
@@ -12912,24 +12913,23 @@
 						ui.dialog.classList.add('scroll2');
 					}
 				}
-
-				// if(lib.config.touchscreen||lib.config.layout=='newlayout'){
-				// 	ui.dialog.classList.add('scroll1');
-				// 	ui.dialog.classList.add('scroll2');
-				// }
-				// if(ui.dialog.contentContainer.scrollTop>0){
-				// 	ui.dialog.classList.add('scroll1');
-				// }
-				// else{
-				// 	ui.dialog.classList.remove('scroll1');
-				// }
-				// if(ui.dialog.contentContainer.scrollTop+ui.dialog.contentContainer.offsetHeight>=
-				// ui.dialog.contentContainer.scrollHeight-1){
-				// 	ui.dialog.classList.remove('scroll2');
-				// }
-				// else{
-				// 	ui.dialog.classList.add('scroll2');
-				// }
+			}
+			// ui.updatePhone();
+		},
+		updatePhone:function(){
+			if(lib.config.layout=='phone'&&lib.config.touchscreen){
+				if(document.body.offsetWidth<document.body.offsetHeight){
+					var windowWidth=document.body.offsetHeight;
+					var windowHeight=document.body.offsetWidth;
+					ui.window.style.height=windowHeight+'px';
+					ui.window.style.width=windowWidth+'px';
+					ui.window.style.transform='rotate(90deg)';
+					ui.window.style.transformOrigin='top left';
+					ui.window.style.left=windowHeight+'px';
+				}
+				else{
+					ui.window.removeAttribute('style');
+				}
 			}
 		},
 		recycle:function(node,key){
