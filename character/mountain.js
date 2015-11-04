@@ -145,6 +145,12 @@ character.mountain={
 					name:'放权',
 					content:'进行一个额外的回合'
 				});
+				game.addVideo('markCharacter',target,{
+					name:'放权',
+					content:'进行一个额外的回合',
+					id:'fangquan',
+					target:player.dataset.position
+				});
 				target.phase();
 				target.addSkill('fangquan3');
 				player.removeSkill('fangquan2');
@@ -159,6 +165,7 @@ character.mountain={
 				if(player.marks.fangquan){
 					player.marks.fangquan.delete();
 					delete player.marks.fangquan;
+					game.addVideo('unmark',player,'fangquan');
 				}
 				player.removeSkill('fangquan3');
 			}
@@ -452,7 +459,9 @@ character.mountain={
 					result.card.goto(ui.special);
 					player.storage.tuntian.push(result.card);
 					result.node.moveTo(player).delete();
+					game.addVideo('gain2',player,get.cardsInfo([result.node]));
 					player.markSkill('tuntian');
+					game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);
 				}
 			},
 			init:function(player){
@@ -519,6 +528,7 @@ character.mountain={
 					var card=result.buttons[0].link;
 					event.card=card;
 					player.storage.tuntian.remove(card);
+					game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);
 					if(!player.storage.tuntian.length){
 						player.unmarkSkill('tuntian');
 					}

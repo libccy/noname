@@ -240,6 +240,7 @@ window.config={
 	modeconfig:false,
 	gameconfig:false,
 	appearence:false,
+	video:'20',
 
 	intro:'i',
 	right_click:'pause',

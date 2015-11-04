@@ -527,6 +527,7 @@ character.gujian={
 				player.addSkill('juejing');
 				player.storage.shahun=3;
 				player.markSkill('shahun');
+				game.addVideo('storage',player,['shahun',player.storage.shahun]);
 			},
 			group:'shahun2',
 			intro:{
@@ -552,6 +553,7 @@ character.gujian={
 			content:function(){
 				if(player.storage.shahun>1){
 					player.storage.shahun--;
+					game.addVideo('storage',player,['shahun',player.storage.shahun]);
 				}
 				else{
 					player.die();
@@ -680,6 +682,7 @@ character.gujian={
 			content:function(){
 				player.storage.xuanning=3;
 				player.markSkill('xuanning');
+				game.addVideo('storage',player,['xuanning',player.storage.xuanning]);
 			},
 			ai:{
 				result:{
@@ -710,6 +713,7 @@ character.gujian={
 				if(!player.storage.xuanning){
 					player.unmarkSkill('xuanning');
 				}
+				game.addVideo('storage',player,['xuanning',player.storage.xuanning]);
 			}
 		},
 		liuguang:{
@@ -735,6 +739,7 @@ character.gujian={
 					event.targets=result.targets.slice(0);
 					event.targets.sort(lib.sort.seat);
 					player.logSkill('liuguang',result.targets);
+					game.addVideo('storage',player,['xuanning',player.storage.xuanning]);
 				}
 				else{
 					event.finish();
@@ -780,6 +785,7 @@ character.gujian={
 			content:function(){
 				player.storage.yangming2=2;
 				player.addSkill('yangming2');
+				game.addVideo('storage',player,['yangming2',player.storage.yangming2]);
 			},
 			check:function(card){
 				return 6-ai.get.value(card);
@@ -798,6 +804,7 @@ character.gujian={
 			content:function(){
 				"step 0"
 				player.storage.yangming2--;
+				game.addVideo('storage',player,['yangming2',player.storage.yangming2]);
 				if(player.storage.yangming2>0){
 					event.finish();
 				}
@@ -839,6 +846,7 @@ character.gujian={
 			forbid:['infinity'],
 			init:function(player){
 				player.storage.zhaolu=Math.min(5,game.players.length);
+				game.addVideo('storage',player,['zhaolu',player.storage.zhaolu]);
 			},
 			trigger:{player:['phaseEnd','damageEnd'],global:'dieAfter'},
 			forced:true,
@@ -852,6 +860,7 @@ character.gujian={
 					player.loseMaxHp(true);
 					player.storage.zhaolu=Math.min(5,game.players.length);
 				}
+				game.addVideo('storage',player,['zhaolu',player.storage.zhaolu]);
 			},
 			intro:{
 				content:'turn'
@@ -875,6 +884,7 @@ character.gujian={
 			intro:{
 				content:'limited'
 			},
+			// mark:true,
 			line:'fire',
 			filterTarget:function(card,player,target){
 				return player!=target;
@@ -885,6 +895,7 @@ character.gujian={
 					player.storage.jiehuo2=player.maxHp;
 					player.addSkill('jiehuo2');
 				}
+				player.storage.jiehuo=true;
 				target.damage(Math.min(target.hp,player.storage.jiehuo2),'fire');
 			}
 		},

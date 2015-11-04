@@ -465,22 +465,22 @@ margin-bottom: 5px;
 .flash{-webkit-animation:flash 1s;}
 .flip{-webkit-animation:flip 1s;}
 /*--------样式--------*/
-#arena.selecting .player[data-position='0'] .card:not(.selectable)>.background,
-#arena.selecting .player[data-position='0'] .card:not(.selectable)>.image,
-#arena.selecting .player[data-position='0'] .card:not(.selectable)>.name,
-#arena.selecting .player[data-position='0'] .card:not(.selectable)>.name2,
-#arena.selecting .player[data-position='0'] .card:not(.selectable)>.info,
-#arena.selecting #me .card:not(.selectable)>.background,
-#arena.selecting #me .card:not(.selectable)>.image,
-#arena.selecting #me .card:not(.selectable)>.name,
-#arena.selecting #me .card:not(.selectable)>.name2,
-#arena.selecting #me .card:not(.selectable)>.info,
-#arena.selecting #me .card:not(.selectable)>.addinfo,
-#arena.selecting .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
+#arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.background,
+#arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.image,
+#arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.name,
+#arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.name2,
+#arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.info,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.background,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.image,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.name,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.name2,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.info,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.addinfo,
+#arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
 .dead,.likedead{opacity: 0.6;}
 .unselectable:not(.selected):not(.removing){opacity: 0.6 !important}
 .mark>.background{opacity: 1 !important;}
-#arena.selecting #me .card:not(.selectable){
+#arena.selecting:not(.video) #me .card:not(.selectable){
 	opacity:0.8
 }
 
@@ -556,6 +556,9 @@ div:hover>.intro{opacity: 1;}
 	border-width: 0 0 2px;
 	border-style:solid;
 	border-color:transparent;
+}
+.underlinenode.slim{
+	padding-bottom: 0;
 }
 .on>.underline,.underlinenode.on{
 	border-color:rgb(0, 133, 255);

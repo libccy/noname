@@ -465,6 +465,7 @@ character.yijiang={
 					result.targets[0].storage.qianxi2=event.color;
 					result.targets[0].addSkill('qianxi2');
 					player.line(result.targets,'green');
+					game.addVideo('storage',result.targets[0],['qianxi2',event.color]);
 				}
 			},
 		},
@@ -734,6 +735,7 @@ character.yijiang={
 				var card=target.get('h').randomGet();
 				player.showCards(card);
 				player.storage.qiangzhi=get.type(card,'trick');
+				game.addVideo('storage',player,['qiangzhi',player.storage.qiangzhi]);
 				player.markSkill('qiangzhi');
 			},
 			intro:{
@@ -938,6 +940,7 @@ character.yijiang={
 				if(result.cards&&result.cards.length){
 					player.lose(result.cards,ui.special);
 					player.storage.quanji=player.storage.quanji.concat(result.cards);
+					game.addVideo('storage',player,['quanji',get.cardsInfo(player.storage.quanji),'cards']);
 					game.log(get.translation(player)+'将'+get.translation(result.cards)+'置于武将牌上作为“权”');
 					player.markSkill('quanji');
 				}
@@ -1016,6 +1019,7 @@ character.yijiang={
 				if(!player.storage.quanji.length){
 					player.unmarkSkill('quanji');
 				}
+				game.addVideo('storage',player,['quanji',get.cardsInfo(player.storage.quanji),'cards']);
 				"step 2"
 				target.draw(2);
 				"step 3"
@@ -2675,20 +2679,28 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				if(trigger.player!=player) event.card=trigger.player.get('h').randomGet();
-				else{
-					event.card=trigger.player.get('h',function(card){
-						return get.type(card)!='basic';
-					}).randomGet();
+				if(trigger.player!=player){
+					event.card=trigger.player.get('h').randomGet();
 				}
-				event.dialog=ui.create.dialog(get.translation(player)+'展示的手牌',[event.card]);
-				game.delay(2);
+				else{
+					player.chooseCard(true,'选择展示一张手牌').ai=function(card){
+						if(get.type(card)!='basic'){
+							return 10-ai.get.value(card);
+						}
+						return 0;
+					}
+					event.selfSelect=true;
+				}
 				"step 1"
+				if(event.selfSelect){
+					event.card=result.cards[0];
+				}
+				player.showCards([event.card],get.translation(player)+'展示的手牌');
+				"step 2"
 				if(get.type(event.card)!='basic'){
 					trigger.player.recover();
 					trigger.player.discard(event.card);
 				}
-				event.dialog.close();
 			},
 			ai:{
 				threaten:1.4
@@ -2742,6 +2754,8 @@ character.yijiang={
 					event.dialog=ui.create.dialog('称象',event.cards);
 					game.delay(2);
 				}
+				game.addVideo('showCards',player,['称象',get.cardsInfo(event.cards)]);
+				game.addVideo('delay',null,2);
 				"step 1"
 				if(event.dialog) event.dialog.close();
 				var dialog=ui.create.dialog('称象：选择任意张点数小于13的牌',event.cards);
@@ -2917,6 +2931,7 @@ character.yijiang={
 				if(result.bool){
 					player.markSkill('xiansi');
 					player.storage.xiansi=player.storage.xiansi.concat(result.links);
+					game.addVideo('storage',player,['xiansi',get.cardsInfo(player.storage.xiansi),'cards']);
 					event.current.lose(result.links,ui.special);
 					event.current.$give(result.links,player);
 					event.goto(2);
@@ -2977,6 +2992,7 @@ character.yijiang={
 					for(var i=0;i<result.links.length;i++){
 						event.target.storage.xiansi.remove(result.links[i]);
 					}
+					game.addVideo('storage',event.target,['xiansi',get.cardsInfo(event.target.storage.xiansi),'cards']);
 					if(!event.target.storage.xiansi.length){
 						event.target.unmarkSkill('xiansi');
 					}
@@ -3162,6 +3178,7 @@ character.yijiang={
 				player.storage.zyexin.push(card);
 				player.$draw(card);
 				player.markSkill('zyexin');
+				game.addVideo('storage',player,['zyexin',get.cardsInfo(player.storage.zyexin),'cards']);
 			},
 			group:'zyexin2'
 		},
@@ -3191,6 +3208,7 @@ character.yijiang={
 				for(var i=0;i<result.links.length;i++){
 					player.storage.zyexin.remove(result.links[i]);
 				}
+				game.addVideo('storage',player,['zyexin',get.cardsInfo(player.storage.zyexin),'cards']);
 			},
 			ai:{
 				order:5,
@@ -3262,6 +3280,7 @@ character.yijiang={
 				"step 2"
 				if(result.bool){
 					player.storage.zyexin.remove(event.card);
+					game.addVideo('storage',player,['zyexin',get.cardsInfo(player.storage.zyexin),'cards']);
 					game.delay();
 					if(get.type(event.card)=='equip'){
 						player.$give(event.card,result.targets[0]);

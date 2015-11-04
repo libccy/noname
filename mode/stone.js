@@ -17,7 +17,13 @@ mode.stone={
 					player.updateActCount();
 				}
 			},
-			updateActCount:function(used){
+			updateActCount:function(used,countx,current){
+				if(_status.video){
+					this.actcount=countx||2;
+				}
+				else{
+					game.addVideo('updateActCount',this,[used,this.actcount,this.getActCount()]);
+				}
 				for(var i=0;i<10;i++){
 					if(this.actcount>this.node.actcount.childElementCount){
 						ui.create.div(this.node.actcount);
@@ -30,7 +36,13 @@ mode.stone={
 					}
 				}
 				if(used!==false){
-					var count=this.actcount-this.getActCount();
+					var count;
+					if(_status.video){
+						count=this.actcount-(current||0);
+					}
+					else{
+						count=this.actcount-this.getActCount();
+					}
 					for(var i=0;i<this.actcount;i++){
 						if(i<count){
 							this.node.actcount.childNodes[i].classList.remove('lost');
@@ -82,6 +94,7 @@ mode.stone={
 					}
 				}
 				this.actcharacterlist[i]=fellow;
+				game.addVideo('stonePosition',null,[fellow.dataset.position,i+4+(this==game.me?0:4)]);
 				fellow.dataset.position=i+4+(this==game.me?0:4);
 				return this;
 			},
@@ -121,6 +134,14 @@ mode.stone={
 							}
 							game.players.push(player);
 							ui.arena.appendChild(player);
+
+							game.addVideo('stoneSwap',null,{
+								name:player.name,
+								name2:player.name2,
+								position:player.dataset.position,
+								actcount:player.actcount,
+								me:true
+							});
 							game.swapControl(player);
 							game.arrangePlayers();
 							player.draw(2+game.enemy.countFellow(),false);
@@ -156,6 +177,13 @@ mode.stone={
 							game.players.push(player);
 							game.enemy=player;
 							ui.arena.appendChild(player);
+
+							game.addVideo('stoneSwap',null,{
+								name:player.name,
+								name2:player.name2,
+								position:player.dataset.position,
+								actcount:player.actcount,
+							});
 							game.arrangePlayers();
 							player.draw(2+game.me.countFellow(),false);
 							game.resume();
@@ -181,6 +209,16 @@ mode.stone={
 	},
 	game:{
 		reserveDead:true,
+		getVideoName:function(){
+			var str=get.translation(game.me.name);
+			if(game.me.name2){
+				str+='/'+get.translation(game.me.name2);
+			}
+			var name=[
+				str,'炉石 - '+get.config('battle_number')+'人'
+			];
+			return name;
+		},
 		updateStatusCount:function(){
 			_status.friendCount.innerHTML='我方兵力：'+get.cnNumber(1+_status.mylist.length/(_status.double_character?2:1),true);
 			_status.enemyCount.innerHTML='敌方兵力：'+get.cnNumber(1+_status.enemylist.length/(_status.double_character?2:1),true);
@@ -293,9 +331,32 @@ mode.stone={
 				"step 0"
 				lib.init.css('layout/mode/','stone');
 				game.initStone();
-				game.prepareArena(2);
+
+				var playback=localStorage.getItem(lib.configprefix+'playback');
+				if(playback){
+					ui.create.arena();
+					ui.create.me();
+					ui.arena.style.display='none';
+					ui.system.style.display='none';
+					_status.playback=playback;
+					localStorage.removeItem(lib.configprefix+'playback');
+					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+					store.get(parseInt(playback)).onsuccess=function(e){
+						if(e.target.result){
+							game.playVideoContent(e.target.result.video);
+						}
+						else{
+							alert('播放失败：找不到录像');
+							game.reload();
+						}
+					}
+					event.finish();
+				}
+				else{
+					game.prepareArena(2);
+					game.delay();
+				}
 				ui.arena.classList.add('stone');
-				game.delay();
 				"step 1"
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].classList.add('noidentity');
@@ -335,6 +396,19 @@ mode.stone={
 
 				game.me.side=Math.random()<0.5;
 				game.enemy.side=!game.me.side;
+
+				var players=get.players(lib.sort.position);
+				var info=[];
+				for(var i=0;i<players.length;i++){
+					info.push({
+						name:players[i].name,
+						name2:players[i].name2,
+						count:players[i].actcount
+					});
+				}
+				_status.videoInited=true,
+				game.addVideo('init',null,info);
+
 				game.gameDraw(game.me,2);
 				if(game.me.side){
 					game.stoneLoop(game.me);

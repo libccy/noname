@@ -394,6 +394,7 @@ character.sp={
 			content:function(){
 				"step 0"
 				player.storage.zuixiang=get.cards(3);
+				game.addVideo('storage',player,['zuixiang',get.cardsInfo(player.storage.zuixiang),'cards']);
 				player.showCards(player.storage.zuixiang);
 				"step 1"
 				var cards=player.storage.zuixiang;
@@ -402,6 +403,7 @@ character.sp={
 					cards[2].number==cards[1].number){
 					player.gain(player.storage.zuixiang,'draw2');
 					player.storage.zuixiang=[];
+					player.unmarkSkill('zuixiang');
 					delete player.storage.zuixiang2;
 				}
 				else{
@@ -447,7 +449,7 @@ character.sp={
 		zuixiang2:{
 			unique:true,
 			trigger:{player:'phaseBegin'},
-			priority:10,
+			priority:9.5,
 			filter:function(event,player){
 				if(player.storage.zuixiang&&player.storage.zuixiang.length) return true;
 				return false;
@@ -465,6 +467,7 @@ character.sp={
 						ui.discardPile.appendChild(player.storage.zuixiang[i]);
 					}
 					player.storage.zuixiang=get.cards(3);
+					game.addVideo('storage',player,['zuixiang',get.cardsInfo(player.storage.zuixiang),'cards']);
 					player.showCards(player.storage.zuixiang);
 				}
 				"step 1"
@@ -615,6 +618,7 @@ character.sp={
 				target.addSkill('zhoufu2');
 				target.storage.zhoufu3=player;
 				ui.special.appendChild(cards[0]);
+				game.addVideo('storage',target,['zhoufu2',get.cardInfo(cards[0]),'card']);
 			},
 			check:function(card){
 				return 3-ai.get.value(card)
@@ -661,7 +665,7 @@ character.sp={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			content:function(){
-				player.unmark(player.storage.zhoufu2);
+				player.unmark(player.storage.zhoufu2.name);
 				if(player.storage.zhoufu3.isAlive()){
 					player.storage.zhoufu3.gain(player.storage.zhoufu2);
 					player.$give(player.storage.zhoufu2,player.storage.zhoufu3);
@@ -1289,6 +1293,12 @@ character.sp={
 					name:'存嗣',
 					content:'$<div><div class="skill">【勇决】</div><div>每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之（每回合最多能以此法获得一张杀）</div></div>'
 				})
+				game.addVideo('markCharacter',target,{
+					name:'存嗣',
+					content:'$<div><div class="skill">【勇决】</div><div>每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之（每回合最多能以此法获得一张杀）',
+					id:'yongjue',
+					target:player.dataset.position
+				});
 				"step 1"
 				player.turnOver();
 				player.removeSkill('guixiu');
@@ -2003,7 +2013,10 @@ character.sp={
 				}
 				"step 2"
 				if(result.bool){
-					if(trigger.player.judging.clone) trigger.player.judging.clone.delete();
+					if(trigger.player.judging.clone){
+						trigger.player.judging.clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging.clone]));
+					}
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=event.card;
 					game.delay(2);
@@ -2245,6 +2258,11 @@ character.sp={
 				target.mark('songci',{
 					name:'颂词',
 					content:'已发动'
+				});
+				game.addVideo('mark',target,{
+					name:'颂词',
+					content:'已发动',
+					id:'songci'
 				});
 			},
 			ai:{

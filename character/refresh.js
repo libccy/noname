@@ -119,7 +119,10 @@ character.refresh={
 				"step 2"
 				if(result.bool){
 					player.logSkill('reguicai');
-					if(trigger.player.judging.clone) trigger.player.judging.clone.delete();
+					if(trigger.player.judging.clone){
+						trigger.player.judging.clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging.clone]));
+					}
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					game.delay(2);
@@ -393,6 +396,7 @@ character.refresh={
 			},
 			content:function(){
 				player.storage.reqianxun2=player.storage.reqianxun2.concat(player.get('h'));
+				game.addVideo('storage',player,['reqianxun2',get.cardsInfo(player.storage.reqianxun2),'cards']);
 				player.lose(player.get('h'),ui.special);
 				player.addSkill('reqianxun2');
 			},
@@ -409,6 +413,7 @@ character.refresh={
 				player.gain(player.storage.reqianxun2);
 				player.removeSkill('reqianxun2');
 				player.storage.reqianxun2=[];
+				game.addVideo('storage',player,['reqianxun2',get.cardsInfo(player.storage.reqianxun2),'cards']);
 			},
 			mark:true,
 			intro:{
@@ -496,6 +501,7 @@ character.refresh={
 			silent:true,
 			content:function(){
 				player.storage.retishen2=player.hp;
+				game.addVideo('storage',player,['retishen2',player.storage.retishen2]);
 			},
 			intro:{
 				content:function(storage,player){
@@ -515,6 +521,7 @@ character.refresh={
 				"step 0"
 				event.card=get.cards()[0];
 				event.node=event.card.copy('thrown','center',ui.arena).animate('start');
+				game.addVideo('centernode',null,get.cardInfo(event.card));
 				if(get.type(event.card,'trick')==get.type(trigger.card,'trick')){
 					player.chooseTarget('选择获得此牌的角色').ai=function(target){
 						var att=ai.get.attitude(player,target);
@@ -539,15 +546,18 @@ character.refresh={
 						game.log(get.translation(player)+'展示并弃掉了'+get.translation(event.card));
 						ui.discardPile.appendChild(event.card);
 					}
+					game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 				}
 				else if(result.targets){
 					result.targets[0].gain(event.card);
 					event.node.moveTo(result.targets[0]);
 					game.log(get.translation(result.targets[0])+'获得了'+get.translation(event.card));
+					game.addVideo('gain2',result.targets[0],[get.cardInfo(event.node)]);
 				}
 				else{
 					game.log(get.translation(player)+'展示并弃掉了'+get.translation(event.card));
 					ui.discardPile.appendChild(event.card);
+					game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 				}
 				event.node.delete();
 			},
@@ -636,6 +646,7 @@ character.refresh={
 						result.targets[0].storage.reyiji2=result.cards;
 					}
 					player.$give(result.cards.length,result.targets[0]);
+					game.addVideo('storage',result.targets[0],['reyiji2',get.cardsInfo(result.targets[0].storage.reyiji2),'cards']);
 					if(num==1){
 						event.temp=result.targets[0];
 						event.num++;

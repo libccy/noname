@@ -1,12 +1,44 @@
 'use strict';
 mode.guozhan={
 	game:{
+		getVideoName:function(){
+			var str=get.translation(game.me.name1)+'/'+get.translation(game.me.name2);
+			var str2=get.cnNumber(parseInt(get.config('player_number')))+'人'+
+				get.translation(lib.config.mode);
+			if(game.me.identity=='ye'){
+				str2+=' - 野心家';
+			}
+			var name=[str,str2];
+			return name;
+		},
 		start:function(){
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
-				game.prepareArena();
-				game.delay();
+				var playback=localStorage.getItem(lib.configprefix+'playback');
+				if(playback){
+					ui.create.arena();
+					ui.create.me();
+					ui.arena.style.display='none';
+					ui.system.style.display='none';
+					_status.playback=playback;
+					localStorage.removeItem(lib.configprefix+'playback');
+					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+					store.get(parseInt(playback)).onsuccess=function(e){
+						if(e.target.result){
+							game.playVideoContent(e.target.result.video);
+						}
+						else{
+							alert('播放失败：找不到录像');
+							game.reload();
+						}
+					}
+					event.finish();
+				}
+				else{
+					game.prepareArena();
+					game.delay();
+				}
 				"step 1"
 				if(lib.storage.test){
 					_status.auto=true;
@@ -37,6 +69,7 @@ mode.guozhan={
 					player=game.players[Math.floor(Math.random()*game.players.length)];
 				}
 				event.trigger('gameStart');
+
 				game.gameDraw(player);
 				if(get.config('ai_identity')){
 					game.showIdentity(true);
@@ -53,6 +86,20 @@ mode.guozhan={
 					}
 				}
 				game.phaseLoop(player);
+
+
+				var players=get.players(lib.sort.position);
+				var info=[];
+				for(var i=0;i<players.length;i++){
+					info.push({
+						name:game.players[i].name,
+						translate:lib.translate[game.players[i].name],
+						name1:players[i].name1,
+						name2:players[i].name2,
+					});
+				}
+				_status.videoInited=true,
+				game.addVideo('init',null,info);
 			}
 		},
 		showIdentity:function(started){
@@ -369,6 +416,7 @@ mode.guozhan={
 				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
 					return;
 				}
+				game.addVideo('showCharacter',this,num);
 				if(this.identity=='unknown'){
 					this.group=lib.character[this.name1][1];
 					// this.node.identity.style.backgroundColor=get.translation(this.group+'Color');

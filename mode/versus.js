@@ -1,13 +1,45 @@
 'use strict';
 mode.versus={
 	game:{
+		getVideoName:function(){
+			var str=get.translation(game.me.name);
+			if(game.me.name2){
+				str+='/'+get.translation(game.me.name2);
+			}
+			var name=[
+				str,'对决 - '+lib.storage.number+'v'+lib.storage.number
+			];
+			return name;
+		},
 		start:function(){
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				var playback=localStorage.getItem(lib.configprefix+'playback');
+				if(playback){
+					ui.create.arena();
+					ui.create.me();
+					ui.arena.style.display='none';
+					ui.system.style.display='none';
+					_status.playback=playback;
+					localStorage.removeItem(lib.configprefix+'playback');
+					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+					store.get(parseInt(playback)).onsuccess=function(e){
+						if(e.target.result){
+							game.playVideoContent(e.target.result.video);
+						}
+						else{
+							alert('播放失败：找不到录像');
+							game.reload();
+						}
+					}
+					event.finish();
+					return;
+				}
 				if(lib.storage.choice==undefined) game.save('choice',20);
 				if(lib.storage.zhu==undefined) game.save('zhu',true);
 				if(lib.storage.noreplace_end==undefined) game.save('noreplace_end',true);
+				if(lib.storage.die_stop==undefined) game.save('die_stop',true);
 				if(lib.storage.autoreplaceinnerhtml==undefined) game.save('autoreplaceinnerhtml',true);
 				if(lib.storage.only_zhu==undefined) game.save('only_zhu',true);
 				if(lib.storage.single_control==undefined) game.save('single_control',true);
@@ -465,10 +497,24 @@ mode.versus={
 				}
 				_status.friend.splice(0,num);
 				_status.enemy.splice(0,num);
-				if(lib.storage.single_control&&lib.storage.control_all){
+				if(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4){
 					ui.fakemebg.show();
 					game.onSwapControl();
 				}
+
+				var players=get.players(lib.sort.position);
+				var info=[];
+				for(var i=0;i<players.length;i++){
+					info.push({
+						name:players[i].name,
+						name2:players[i].name2,
+						identity:players[i].node.identity.firstChild.innerHTML,
+						color:players[i].node.identity.dataset.color
+					});
+				}
+				_status.videoInited=true,
+				info.bool=(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4);
+				game.addVideo('init',null,info);
 			}
 		},
 		versusPhaseLoop:function(player){
@@ -575,6 +621,7 @@ mode.versus={
 					name:source.name,
 					stat:source.stat
 				});
+				game.addVideo('reinit',source,[event.character,get.translation(source.side+'Color')]);
 				source.uninit();
 				source.init(event.character);
 				source.node.identity.dataset.color=get.translation(source.side+'Color');
@@ -824,6 +871,7 @@ mode.versus={
 			game.save('autoreplaceinnerhtml',this.classList.contains('on'));
 		},
 		onSwapControl:function(){
+			game.addVideo('onSwapControl');
 			var name=game.me.name;
 			if(ui.fakeme&&ui.fakeme.current!=name){
 				ui.fakeme.current=name;

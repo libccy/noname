@@ -221,16 +221,15 @@ character.wind={
 				event.card=get.cards()[0];
 				if(player.storage.buqu==undefined) player.storage.buqu=[];
 				player.storage.buqu.push(event.card);
-				event.dialog=ui.create.dialog('不屈',player.storage.buqu);
+				game.addVideo('storage',player,['buqu',get.cardsInfo(player.storage.buqu),'cards']);
 				var str=get.translation(player)+'的不屈牌为'+player.storage.buqu[0].number;
 				for(var i=1;i<player.storage.buqu.length;i++){
 					str+='、'+player.storage.buqu[i].number;
 				}
+				player.showCards(player.storage.buqu,'不屈')
 				game.log(str);
-				game.delay(2);
 				player.markSkill('buqu');
 				"step 1"
-				event.dialog.close();
 				for(var i=0;i<player.storage.buqu.length-1;i++){
 					if(get.number(event.card)&&get.number(event.card)==get.number(player.storage.buqu[i])) return;
 				}

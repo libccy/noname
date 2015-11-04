@@ -215,6 +215,7 @@ character.xianjian={
 			content:function(){
 				target.storage.tianfu2=cards[0];
 				target.storage.tianfu3=player;
+				game.addVideo('storage',target,['tianfu2',get.cardInfo(cards[0]),'card']);
 				target.addSkill('tianfu2');
 			},
 			ai:{
@@ -304,11 +305,13 @@ character.xianjian={
 					var clone=result.cards[0].clone;
 					setTimeout(function(){
 						clone.moveTo(player,'flip').delete();
+						game.addVideo('gain2',player,get.cardsInfo([clone]));
 					},500);
 					player.logSkill('shuiyun');
 					player.storage.shuiyun.push(result.cards[0]);
 					player.lose(result.cards,ui.special);
 					player.markSkill('shuiyun');
+					game.addVideo('storage',player,['shuiyun',get.cardsInfo(player.storage.shuiyun),'cards']);
 				}
 			},
 			intro:{
@@ -369,6 +372,7 @@ character.xianjian={
 						trigger.player.draw();
 					}
 					player.logSkill('shuiyun5',trigger.player,'thunder');
+					game.addVideo('storage',player,['shuiyun',get.cardsInfo(player.storage.shuiyun),'cards']);
 				}
 				"step 2"
 				if(trigger.player!=player){
@@ -471,6 +475,12 @@ character.xianjian={
 					target.marks.changnian=target.markCharacter(player,{
 						name:'长念',
 						content:'$<div><div class="skill">【追思】</div><div>锁定技，回合结束阶段，你摸一张牌</div></div>'
+					});
+					game.addVideo('markCharacter',target,{
+						name:'长念',
+						content:'$<div><div class="skill">【追思】</div><div>锁定技，回合结束阶段，你摸一张牌</div></div>',
+						id:'changnian',
+						target:player.dataset.position
 					});
 				}
 			},
@@ -617,10 +627,13 @@ character.xianjian={
 					if(player.storage.shuangren){
 						player.unmark(player.storage.shuangren,'shuangren');
 						player.discard(player.storage.shuangren);
+						game.addVideo('unmarkId',player,[get.cardInfo(player.storage.shuangren),'shuangren']);
 					}
 					if(card.clone){
 						card.clone.moveTo(player,'flip').delete();
+						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
 						player.mark(card,'shuangren');
+						game.addVideo('markId',player,[get.cardInfo(card),'shuangren']);
 					}
 					ui.special.appendChild(card);
 					player.storage.shuangren=card;
@@ -1103,6 +1116,7 @@ character.xianjian={
 					var card=get.cards()[0];
 					target.$draw(card);
 					target.storage.zhimeng2=card;
+					game.addVideo('storage',target,['zhimeng2',get.cardInfo(card),'card']);
 					target.addSkill('zhimeng2');
 					event.finish();
 					player.logSkill('zhimeng',target);

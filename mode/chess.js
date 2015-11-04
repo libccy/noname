@@ -24,6 +24,10 @@ mode.chess={
 					this.style.transition='all 0.5s';
 					this.style.webkitTransform='rotate(180deg)';
 				}
+				else{
+					this.style.transition='all 0.5s';
+					this.style.webkitTransform='';
+				}
 				return this;
 			},
 		},
@@ -62,6 +66,7 @@ mode.chess={
 				return this.moveTo(x+xy[0],y+xy[1]);
 			},
 			moveTo:function(x,y){
+				game.addVideo('moveTo',this,[x,y]);
 				if(x>=ui.chesswidth){
 					x=ui.chesswidth-1;
 				}
@@ -79,6 +84,7 @@ mode.chess={
 				return this;
 			},
 			chessFocus:function(){
+				game.addVideo('chessFocus',this);
 				if(ui.chess._chessdrag) return;
 				if(_status.chessscrolling) return;
 				var player=this;
@@ -194,6 +200,20 @@ mode.chess={
 				game.over(game.me.side==game.players[0].side);
 			},
 			$draw:function(num){
+				var cards;
+				if(get.itemtype(num)=='cards'){
+					cards=num;
+				}
+				else if(get.itemtype(num)=='card'){
+					cards=[num];
+				}
+				if(cards){
+					game.addVideo('chessgainmod',this,get.cardsInfo(num));
+				}
+				else if(!num||typeof num=='number'){
+					game.addVideo('chessgainmod',this,num);
+				}
+
 				return this.$gainmod(num);
 			},
 			$drawx:function(num){
@@ -265,18 +285,29 @@ mode.chess={
 				var that=this;
 				if(num&&num>1){
 					if(cards){
-						that.$gain(cards)
+						that.$gain(cards,null,false)
 					}
 					else{
-						that.$gain(num-1)
+						that.$gain(num-1,null,false)
 					}
 				}
 			},
-			$throw:function(card,time){
+			$throw:function(card,time,init){
+				if(init!==false){
+					if(get.itemtype(card)!='cards'){
+						if(get.itemtype(card)=='card'){
+							card=[card];
+						}
+						else{
+							return;
+						}
+					}
+					game.addVideo('throw',this,[get.cardsInfo(card),time]);
+				}
 				this.chessFocus();
 				if(get.itemtype(card)=='cards'){
 					for(var i=0;i<card.length;i++){
-						this.$throw(card[i],time);
+						this.$throw(card[i],time,false);
 					}
 				}
 				else{
@@ -350,6 +381,7 @@ mode.chess={
 				return node;
 			},
 			$phaseJudge:function(card){
+				game.addVideo('phaseJudge',this,get.cardInfo(card));
 				var clone=card.copy('thrown',this.parentNode).animate('judgestart');
 				var player=this;
 				clone.style.opacity=0.6;
@@ -522,7 +554,14 @@ mode.chess={
 	game:{
 		minskin:true,
 		singleHandcard:true,
-		addChessPlayer:function(name,enemy,num){
+		getVideoName:function(){
+			var name=[
+				get.translation(game.me.name),
+				'战棋'+get.translation(get.config('chess_mode'))+' - '+_status.friendCount+'v'+_status.enemyCount
+			];
+			return name;
+		},
+		addChessPlayer:function(name,enemy,num,pos){
 			if(typeof num!='number'){
 				num=4;
 			}
@@ -539,24 +578,35 @@ mode.chess={
 			if(enemy){
 				player.side=!game.me.side;
 				player.setIdentity('enemy');
+				player.identity='enemy';
 			}
 			else{
 				player.side=game.me.side;
 				player.setIdentity('friend');
+				player.identity='friend';
 			}
 			player.node.identity.dataset.color=get.translation(player.side+'Color');
 			game.players.push(player);
 			ui.chess.appendChild(player);
-			player.dataset.position=grids.randomGet();
+			if(_status.video){
+				player.dataset.position=pos;
+			}
+			else{
+				player.dataset.position=grids.randomGet();
+			}
 			lib.posmap[player.dataset.position]=player;
+			game.addVideo('addChessPlayer',null,[name,enemy,num,player.dataset.position]);
 			if(num){
 				player.directgain(get.cards(num));
 			}
 			game.arrangePlayers();
+
+
 			return player;
 		},
 		addOverDialog:function(dialog,result){
 			dialog.classList.add('center');
+			if(get.config('chess_mode')!='leader') return;
 			if(result=='战斗胜利'){
 				_status.victory=true;
 				if(!_status.enterArena){
@@ -580,6 +630,8 @@ mode.chess={
 			}
 		},
 		controlOver:function(){
+			ui.create.control(get.config('chess_mode')=='leader'?'返回':'重新开始',game.reload);
+			if(get.config('chess_mode')!='leader') return;
 			if(_status.enterArena){
 				game.data.arena.acted.length=0;
 				if(_status.victory){
@@ -613,7 +665,6 @@ mode.chess={
 					}
 				}
 			}
-			ui.create.control('返回',game.reload);
 		},
 		phaseLoopOrdered:function(player){
 			var next=game.createEvent('phaseLoop');
@@ -675,6 +726,13 @@ mode.chess={
 				var players=[];
 				if(player.side==game.me.side){
 					player=game.me;
+				}
+				if(player.isDead()){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side==player.side){
+							player=game.players[i];
+						}
+					}
 				}
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].side==player.side){
@@ -815,6 +873,7 @@ mode.chess={
 				game.finishCards();
 				if(get.config('chess_character')){
 					for(var i in lib.chess_character){
+						if(i.indexOf('leader_')==0) continue;
 						lib.character[i]=lib.chess_character[i];
 						if(!lib.character[i][4]){
 							lib.character[i][4]=[];
@@ -830,22 +889,69 @@ mode.chess={
 				ui.chess.appendChild(ui.canvas2);
 				ui.ctx2=ui.canvas2.getContext('2d');
 				game.me=ui.create.player();
-				switch(get.config('chess_mode')){
-					case 'leader':{
-						game.leaderView();
-						break;
+				var playback=localStorage.getItem(lib.configprefix+'playback');
+				if(playback){
+					game.pause();
+					ui.system.style.display='none';
+					_status.playback=playback;
+					localStorage.removeItem(lib.configprefix+'playback');
+					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+					store.get(parseInt(playback)).onsuccess=function(e){
+						if(e.target.result){
+							event.video=e.target.result.video;
+							game.resume();
+						}
+						else{
+							alert('播放失败：找不到录像');
+							game.reload();
+						}
 					}
-					case 'combat':{
-						game.chooseCharacter();
-						break;
-					}
-					default:{
-						game.chooseCharacter();
+				}
+				else{
+					switch(get.config('chess_mode')){
+						case 'leader':{
+							game.leaderView();
+							break;
+						}
+						case 'combat':{
+							if(lib.storage.test){
+								_status.auto=true;
+								setTimeout(function(){
+									console.log(get.translation(game.players));
+									ui.updateh(true);
+								},500);
+								ui.auto.classList.add('glow');
+							}
+							game.chooseCharacter();
+							break;
+						}
+						default:{
+							game.chooseCharacter();
+						}
 					}
 				}
 				"step 1"
 				ui.arena.classList.add('chess');
-				var num=Math.round((_status.mylist.length+_status.enemylist.length)/2);
+				var mylistmap,enemylistmap;
+				if(event.video){
+					var videocontent=event.video[0].content;
+					_status.mylist=[];
+					_status.enemylist=[];
+					mylistmap=[];
+					enemylistmap=[];
+					for(var i=0;i<videocontent.length;i++){
+						if(videocontent[i].identity=='friend'){
+							_status.mylist.push(videocontent[i].name);
+							mylistmap.push(videocontent[i].position);
+						}
+						else{
+							_status.enemylist.push(videocontent[i].name);
+							enemylistmap.push(videocontent[i].position);
+						}
+					}
+					game.playerMap=lib.posmap;
+				}
+				var	num=Math.round((_status.mylist.length+_status.enemylist.length)/2);
 				var friend,enemy;
 				var side;
 				if(get.config('chess_mode')=='leader'){
@@ -948,28 +1054,40 @@ mode.chess={
 					friend.init(_status.mylist.shift());
 					friend.side=side;
 					friend.setIdentity('friend');
+					friend.identity='friend';
 					friend.node.identity.dataset.color=get.translation(side+'Color');
 					game.players.push(friend);
 					ui.chess.appendChild(friend);
-					friend.dataset.position=grids.randomRemove();
+					if(event.video){
+						friend.dataset.position=mylistmap.shift();
+					}
+					else{
+						friend.dataset.position=grids.randomRemove();
+						if(_status.enterArena&&game.data.arena.acted.contains(friend.name)){
+							friend.hp--;
+							friend.update();
+						}
+						if(_status.enterArena){
+							friend.addSkill('arenaAdd');
+						}
+					}
 					lib.posmap[friend.dataset.position]=friend;
-					if(_status.enterArena&&game.data.arena.acted.contains(friend.name)){
-						friend.hp--;
-						friend.update();
-					}
-					if(_status.enterArena){
-						friend.addSkill('arenaAdd');
-					}
 				}
 				while(_status.enemylist.length){
 					enemy=ui.create.player().animate('start');
 					enemy.init(_status.enemylist.shift());
 					enemy.side=!side;
 					enemy.setIdentity('enemy');
+					enemy.identity='enemy';
 					enemy.node.identity.dataset.color=get.translation(!side+'Color');
 					game.players.push(enemy);
 					ui.chess.appendChild(enemy);
-					enemy.dataset.position=grids.randomRemove();
+					if(event.video){
+						enemy.dataset.position=enemylistmap.shift();
+					}
+					else{
+						enemy.dataset.position=grids.randomRemove();
+					}
 					lib.posmap[enemy.dataset.position]=enemy;
 				}
 
@@ -1017,6 +1135,11 @@ mode.chess={
 				game.arrangePlayers();
 				"step 2"
 				ui.control.style.display='';
+				if(event.video){
+					game.playVideoContent(event.video);
+					game.setChessInfo(game.me);
+					return;
+				}
 				var p;
 				for(var i=0;i<game.players.length;i++){
 					if(_status.lord){
@@ -1034,6 +1157,19 @@ mode.chess={
 						}
 					}
 				}
+
+				var players=get.players(lib.sort.position);
+				var info=[];
+				for(var i=0;i<players.length;i++){
+					info.push({
+						name:players[i].name,
+						identity:players[i].identity,
+						position:players[i].dataset.position
+					});
+				}
+				_status.videoInited=true,
+				game.addVideo('init',null,info);
+
 				event.trigger('gameStart');
 				game.gameDraw(p);
 				if(get.config('chess_mode')=='leader'){
@@ -2755,8 +2891,10 @@ mode.chess={
 			}
 		},
 		modeSwapPlayer:function(player){
+			var content=[game.me.dataset.position,player.dataset.position];
 			game.me.node.avatar.classList.remove('glow2');
 			player.node.avatar.classList.add('glow2');
+			game.addVideo('chessSwap',null,content);
 			game.swapControl(player);
 			player.chessFocus();
 			ui.create.fakeme();
@@ -3861,6 +3999,7 @@ mode.chess={
 			playergrid:function(){
 				if(!_status.paused) return;
 				delete lib.posmap[this.link.dataset.position];
+				game.addVideo('moveTox',this.link,this.dataset.position);
 				this.link.dataset.position=this.dataset.position;
 				lib.posmap[this.link.dataset.position]=this.link;
 				if(ui.movegrids){

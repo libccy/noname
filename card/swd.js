@@ -262,6 +262,7 @@ card.swd={
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
 					if(card.clone&&card.clone.parentNode==ui.arena){
 						card.clone.moveTo(target).delete();
+						game.addVideo('gain2',target,get.cardsInfo([card]));
 					}
 				}
 			},

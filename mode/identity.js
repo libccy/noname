@@ -1,16 +1,49 @@
 'use strict';
 mode.identity={
 	game:{
+		getVideoName:function(){
+			var str=get.translation(game.me.name);
+			if(game.me.name2){
+				str+='/'+get.translation(game.me.name2);
+			}
+			var name=[
+				str,
+				get.cnNumber(parseInt(get.config('player_number')))+'人'+
+					get.translation(lib.config.mode)+' - '+lib.translate[game.me.identity+'2']
+			];
+			return name;
+		},
 		start:function(){
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
-				game.prepareArena();
-				game.delay();
+				var playback=localStorage.getItem(lib.configprefix+'playback');
+				if(playback){
+					ui.create.arena();
+					ui.create.me();
+					ui.arena.style.display='none';
+					ui.system.style.display='none';
+					_status.playback=playback;
+					localStorage.removeItem(lib.configprefix+'playback');
+					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+					store.get(parseInt(playback)).onsuccess=function(e){
+						if(e.target.result){
+							game.playVideoContent(e.target.result.video);
+						}
+						else{
+							alert('播放失败：找不到录像');
+							game.reload();
+						}
+					}
+					event.finish();
+				}
+				else{
+					game.prepareArena();
+					game.delay();
+				}
 				"step 1"
 				if(lib.storage.test){
 					_status.auto=true;
-					// ui.auto.innerHTML='手动';
 					ui.auto.classList.add('glow');
 				}
 				game.chooseCharacter();
@@ -54,6 +87,19 @@ mode.identity={
 				}
 				lib.config.ai_guess=true;
 				event.trigger('gameStart');
+				
+				var players=get.players(lib.sort.position);
+				var info=[];
+				for(var i=0;i<players.length;i++){
+					info.push({
+						name:players[i].name,
+						name2:players[i].name2,
+						identity:players[i].identity
+					});
+				}
+				_status.videoInited=true,
+				game.addVideo('init',null,info);
+
 				game.gameDraw(game.zhu);
 				game.phaseLoop(game.zhu);
 			}

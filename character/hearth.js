@@ -72,6 +72,7 @@ character.hearth={
 			mark:true,
 			init:function(player){
 				player.storage.chongsheng=0;
+				game.addVideo('storage',player,['chongsheng',player.storage.chongsheng]);
 			},
 			filter:function(event,player){
 				if(event.type!='dying') return false;
@@ -88,6 +89,7 @@ character.hearth={
 				}
 				if(player.classList.contains('linked')) player.link();
 				if(player.classList.contains('turnedover')) player.turnOver();
+				game.addVideo('storage',player,['chongsheng',player.storage.chongsheng]);
 			},
 			ai:{
 				skillTagFilter:function(player){
@@ -104,7 +106,7 @@ character.hearth={
 			},
 			intro:{
 				content:function(storage){
-					return '剩余'+get.cnNumber(3-storage)+'次';
+					return '剩余'+get.cnNumber(2-storage)+'次';
 				}
 			}
 		},
@@ -122,6 +124,7 @@ character.hearth={
 				player.draw(num);
 				player.addSkill('guozai2');
 				player.storage.guozai2+=num;
+				game.addVideo('storage',player,['guozai2',player.storage.guozai2]);
 			},
 			ai:{
 				order:1,
@@ -174,7 +177,7 @@ character.hearth={
 			trigger:{global:'dieAfter'},
 			forced:true,
 			filter:function(event,player){
-				return event.player.skills.contains('bingshi');
+				return event.player.skills.contains('bingshi')&&event.player.isDead();
 			},
 			content:function(){
 				trigger.player.line(player,'thunder');
@@ -197,6 +200,11 @@ character.hearth={
 				target.mark('huanwu',{
 					name:'唤雾',
 					content:'已发动'
+				});
+				game.addVideo('mark',target,{
+					name:'唤雾',
+					content:'已发动',
+					id:'huanwu'
 				});
 			},
 			ai:{
@@ -805,6 +813,7 @@ character.hearth={
 			content:function(){
 				player.storage.bingjia=cards[0];
 				player.addSkill('bingjia2');
+				game.addVideo('storage',player,['bingjia',get.cardInfo(cards[0]),'card']);
 			},
 			ai:{
 				order:1,
@@ -828,6 +837,7 @@ character.hearth={
 				delete player.storage.bingjia;
 				player.changeHujia();
 				player.removeSkill('bingjia2');
+				game.addVideo('storage',player,['bingjia',null]);
 			},
 			intro:{
 				mark:function(dialog,content,player){
@@ -913,6 +923,7 @@ character.hearth={
 				target.storage.mdzhoufu2=cards[0];
 				target.addSkill('mdzhoufu2');
 				target.storage.mdzhoufu3=player;
+				game.addVideo('storage',target,['mdzhoufu2',get.cardInfo(cards[0]),'card']);
 				ui.special.appendChild(cards[0]);
 			},
 			check:function(card){
@@ -1132,6 +1143,7 @@ character.hearth={
 				trigger.player.$gain2(trigger.cards);
 				trigger.player.gain(trigger.cards);
 				trigger.player.storage.mengun2=trigger.cards[0];
+				game.addVideo('storage',player,['mengun2',get.cardInfo(trigger.cards[0]),'card']);
 				trigger.player.addTempSkill('mengun2','phaseEnd');
 			}
 		},
@@ -1865,7 +1877,7 @@ character.hearth={
 		zhongjia:'重甲',
 		zhongjia_info:'锁定技，每当你受到一次伤害，你获得一点护甲值；当你的体力值大于1时，你的护甲不为你抵挡伤害',
 		dunji:'盾击',
-		dunji_info:'出牌阶段限，你可以失去你的所有护甲，并对等量的其他角色各造成一点伤害',
+		dunji_info:'出牌阶段，你可以失去你的所有护甲，并对等量的其他角色各造成一点伤害',
 		qiaodong:'巧动',
 		qiaodong_info:'你可以将一张装备牌当作闪使用或打出',
 		fengxian:'奉献',

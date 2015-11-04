@@ -168,10 +168,12 @@ card.qimou={
 					player.gain([result.player,result.target]);
 					result.player.clone.moveTo(player).delete();
 					result.target.clone.moveTo(player).delete();
+					game.addVideo('gain2',player,get.cardsInfo([result.player,result.target]));
 				}
 				else if(!result.cancelled){
 					result.player.clone.delete();
 					result.target.clone.delete();
+					game.addVideo('deletenode',player,get.cardsInfo([result.player,result.target]));
 				}
 			},
 			ai:{

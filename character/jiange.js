@@ -411,7 +411,7 @@ character.jiange={
                         event.cards2.push(event.cards[i]);
                     }
                 }
-                if(!event.isMine()){
+                if(!event.isMine()||event.cards2.length==0){
                     player.showCards(event.cards);
                 }
                 "step 1"

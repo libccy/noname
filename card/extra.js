@@ -19,6 +19,7 @@ card.extra={
 					target.addTempSkill('jiu','phaseAfter');
 					if(card.clone&&card.clone.parentNode==ui.arena){
 						card.clone.moveTo(target).delete();
+						game.addVideo('gain2',target,get.cardsInfo([card]));
 					}
 				}
 			},
@@ -88,6 +89,8 @@ card.extra={
 				};
 				"step 1"
 				event.dialog=ui.create.dialog(get.translation(target.name)+'展示的手牌',result.cards);
+				event.videoId=lib.status.videoId++;
+				game.addVideo('cardDialog',null,[get.translation(target.name)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
 				event.card2=result.cards[0];
 				game.log(get.translation(target.name)+'展示了'+get.translation(event.card2));
 				player.chooseToDiscard(function(card){
@@ -106,6 +109,7 @@ card.extra={
 				else{
 					target.addTempSkill('huogong2','phaseBegin');
 				}
+				game.addVideo('cardDialog',null,event.videoId);
 				event.dialog.close();
 			},
 			ai:{

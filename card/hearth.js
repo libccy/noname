@@ -180,6 +180,8 @@ card.hearth={
 				"step 1"
 				event.dialog=ui.create.dialog(get.translation(target.name)+'展示的手牌',result.cards);
 				event.card2=result.cards[0];
+				event.videoId=lib.status.videoId++;
+				game.addVideo('cardDialog',null,[get.translation(target.name)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
 				game.log(get.translation(target.name)+'展示了'+get.translation(event.card2));
 				player.chooseToDiscard(function(card){
 					return get.suit(card)==get.suit(_status.event.parent.card2);
@@ -197,6 +199,7 @@ card.hearth={
 				else{
 					target.addTempSkill('shandianjian2','phaseBegin');
 				}
+				game.addVideo('cardDialog',null,event.videoId);
 				event.dialog.close();
 			},
 			ai:{
@@ -396,6 +399,7 @@ card.hearth={
 					event.current=targets.randomGet();
 				}
 				if(!targets.length) event.finish();
+				event.num=0;
 				'step 1'
 				var current;
 				if(targets.length>1){
@@ -411,7 +415,10 @@ card.hearth={
 				}
 				if(hs.length>1){
 					event.current=current;
-					event.redo();
+					event.num++;
+					if(event.num<10){
+						event.redo();
+					}
 				}
 			},
 			ai:{
@@ -620,7 +627,7 @@ card.hearth={
 		xingjiegoutong:'星界沟通',
 		xingjiegoutong_info:'增加一点体力上限并回复一点体力，弃置你的所有手牌',
 		tanshezhiren:'弹射之刃',
-		tanshezhiren_info:'弃置一名随机角色的手牌，重复此过程直到有一名角色失去最后一张手牌',
+		tanshezhiren_info:'弃置一名随机角色的手牌，重复此过程直到有一名角色失去最后一张手牌（最多重复10次）',
 		chuansongmen:'传送门',
 		chuansongmen_info:'摸一张牌，若你能立即使用之，则将此牌回手（每回合最多使用3次）',
 		dunpaigedang:'盾牌格挡',

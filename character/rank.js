@@ -5,7 +5,6 @@ window.characterRank={
         'swd_septem',
         'hs_sthrall',
         'hs_malorne',
-        'swd_yuwentuo',
         'swd_duguningke',
         'swd_guyue',
         'swd_murongshi',
@@ -18,6 +17,7 @@ window.characterRank={
     ],
     ap:[
         'swd_xuanyuanjianxian',
+        'swd_yuwentuo',
         'pal_xuanxiao',
         'xk_fujianhan',
         'swd_cheyun',

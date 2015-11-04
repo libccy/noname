@@ -424,18 +424,36 @@ card.standard={
 				game.delay();
 				"step 1"
 				ui.clear();
-				ui.create.dialog('五谷丰登',get.cards(game.players.length),true).id='wugu';
+				var cards=get.cards(game.players.length);
+				var dialog=ui.create.dialog('五谷丰登',cards,true);
+				dialog.videoId=lib.status.videoId++;
+				game.addVideo('cardDialog',null,['五谷丰登',get.cardsInfo(cards),dialog.videoId]);
+				event.parent.preResult=dialog.videoId;
 			},
 			content:function(){
 				"step 0"
-				target.chooseButton(true,function(button){
-					return ai.get.value(button.link,_status.event.player);
-				});
+				for(var i=0;i<ui.dialogs.length;i++){
+					if(ui.dialogs[i].videoId==event.preResult){
+						event.dialog=ui.dialogs[i];
+					}
+				}
+				if(!event.dialog){
+					event.finish();
+					return;
+				}
+				if(event.dialog.buttons.length>1){
+					var next=target.chooseButton(event.dialog,true,function(button){
+						return ai.get.value(button.link,_status.event.player);
+					});
+					next.closeDialog=false;
+					next.dialog.style.display='';
+				}
+				else{
+					event.directButton=event.dialog.buttons[0];
+				}
 				"step 1"
-				var dialog;
-				if(ui.dialog.id=='wugu') dialog=ui.dialog;
-				else dialog=document.getElementById('wugu');
-				var button=result.buttons[0];
+				var dialog=event.dialog;
+				var button=event.directButton||result.buttons[0];
 				if(button.link){
 					target.gain(button.link);
 					target.$gain2(button.link);
@@ -444,12 +462,18 @@ card.standard={
 				button.getElementsByClassName('info')[0].innerHTML=get.translation(target.name);
 				dialog.content.firstChild.innerHTML=
 				get.translation(target)+'选择了'+get.translation(button.link);
+				game.addVideo('dialogCapt',null,[dialog.videoId,dialog.content.firstChild.innerHTML]);
 				game.log(get.translation(target)+'选择了'+get.translation(button.link));
 				game.delay();
 			},
 			contentAfter:function(){
-				if(ui.dialog.id=='wugu') ui.dialog.close();
-				else document.getElementById('wugu').close();
+				for(var i=0;i<ui.dialogs.length;i++){
+					if(ui.dialogs[i].videoId==event.preResult){
+						ui.dialogs[i].close();
+						break;
+					}
+				}
+				game.addVideo('cardDialog',null,event.preResult);
 			},
 			ai:{
 				wuxie:function(){

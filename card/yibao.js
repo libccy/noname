@@ -245,6 +245,7 @@ card.yibao={
 				"step 0"
 				target.chooseToDiscard('he',[1,2]).ai=function(card){
 					if(target.hasSkillTag('nofire')) return 0;
+					if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
 					if(target.hasSkillTag('maixie')&&target.hp>1&&ui.selected.cards.length){
 						return 0;
 					}
@@ -323,6 +324,7 @@ card.yibao={
 						clone.style.transition='all 0.5s';
 						clone.style.webkitTransform='scale(1.2)';
 						clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([clone]));
 					}
 					target.loseHp();
 				}

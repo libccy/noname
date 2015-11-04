@@ -39,9 +39,11 @@ character.extra={
 			},
 			init:function(player){
 				player.storage.baonu=2;
+				game.addVideo('storage',player,['baonu',player.storage.baonu]);
 			},
 			content:function(){
 				player.storage.baonu+=trigger.num;
+				game.addVideo('storage',player,['baonu',player.storage.baonu]);
 			},
 			intro:{
 				content:'mark'
@@ -142,9 +144,11 @@ character.extra={
 			},
 			init:function(player){
 				player.storage.renjie=0;
+				game.addVideo('storage',player,['renjie',player.storage.renjie]);
 			},
 			content:function(){
 				player.storage.renjie+=trigger.num;
+				game.addVideo('storage',player,['renjie',player.storage.renjie]);
 			},
 			intro:{
 				content:'mark'
@@ -186,6 +190,7 @@ character.extra={
 			},
 			content:function(){
 				player.storage.renjie+=trigger.cards.length;
+				game.addVideo('storage',player,['renjie',player.storage.renjie]);
 			}
 		},
 		sbaiyin:{
@@ -239,7 +244,10 @@ character.extra={
 				if(result.bool){
 					player.logSkill('jilue_guicai');
 					player.storage.renjie--;
-					if(trigger.player.judging.clone) trigger.player.judging.clone.delete();
+					if(trigger.player.judging.clone){
+						trigger.player.judging.clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging.clone]));
+					}
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
@@ -504,12 +512,16 @@ character.extra={
 				"step 0"
 				player.gain(get.cards(7))._triggered=null;
 				"step 1"
+				if(player==game.me){
+					game.addVideo('delay',null);
+				}
 				player.chooseCard('选择七张牌作为星',7,true).ai=function(card){
 					return ai.get.value(card);
 				};
 				"step 2"
 				player.lose(result.cards,ui.special)._triggered=null;
 				player.storage.qixing=result.cards;
+				game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
 			},
 			mark:true,
 			intro:{
@@ -550,6 +562,7 @@ character.extra={
 					player.logSkill('qixing');
 					player.lose(result.cards,ui.special)._triggered=null;
 					player.storage.qixing=player.storage.qixing.concat(result.cards);
+					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
 					event.num=result.cards.length;
 				}
 				else{
@@ -570,6 +583,7 @@ character.extra={
 				for(var i=0;i<result.links.length;i++){
 					player.storage.qixing.remove(result.links[i]);
 				}
+				game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
 				if(player==game.me&&_status.auto){
 					game.delay(0.5);
 				}
@@ -619,6 +633,7 @@ character.extra={
 				if(player.storage.qixing.length==0){
 					player.unmarkSkill('qixing');
 				}
+				game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
 				player.discard(result.links);
 			},
 			group:'dawu3'
@@ -699,6 +714,7 @@ character.extra={
 				if(player.storage.qixing.length==0){
 					player.unmarkSkill('qixing');
 				}
+				game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
 				player.discard(result.links);
 			},
 		},

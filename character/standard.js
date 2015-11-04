@@ -169,7 +169,10 @@ character.standard={
 				"step 2"
 				if(result.bool){
 					player.logSkill('guicai');
-					if(trigger.player.judging.clone) trigger.player.judging.clone.delete();
+					if(trigger.player.judging.clone){
+						trigger.player.judging.clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging.clone]));
+					}
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);

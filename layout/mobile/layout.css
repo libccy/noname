@@ -8,10 +8,10 @@
     left: 3%;
 }
 #control{
-    width: 100%;
+    width: calc(5000% / 47 - 240px);
+    left:calc(-150% / 47 + 120px);
     bottom:150px;
     height: 40px;
-    left:0;
 }
 /*#control>div{
     height: 40px;
@@ -42,10 +42,14 @@
 }
 
 #arena:not(.chess) .player[data-position='0']>.equips>div{
-    width: 42px;
-    height: 42px;
+    width: 45px;
+    height: 45px;
     margin: 0;
+    border-radius: 4px;
     position: absolute;
+}
+#arena:not(.chess) .player[data-position='0']>.equips>.equip5{
+    border-radius: 45px;
 }
 #arena:not(.chess) .player[data-position='0']{
     width: calc(5000% / 47);
@@ -59,6 +63,7 @@
     box-shadow: none !important;
 }
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.avatar,
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.avatar2,
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.equips{
     width:120px;
     height:120px;
@@ -147,8 +152,15 @@
 #arena:not(.chess) .player[data-position='0'].linked{
     transform: none;
 }
-#arena:not(.chess) .player[data-position='0'].linked .avatar{
+#arena:not(.chess) .player[data-position='0'].linked .avatar,
+#arena:not(.chess) .player[data-position='0'].linked .avatar2{
     transform: rotate(-90deg);
+}
+#arena:not(.chess) .player[data-position='0'].fullskin2 .avatar{
+    transform-origin: right center;
+}
+#arena:not(.chess) .player[data-position='0'].fullskin2 .avatar2{
+    transform-origin: left center;
 }
 
 .dialog{

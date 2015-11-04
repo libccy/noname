@@ -22,10 +22,43 @@ mode.boss={
 				game.over(!game.boss.isAlive());
 			}
 		},
+		getVideoName:function(){
+			var str=get.translation(game.me.name);
+			if(game.me.name2){
+				str+='/'+get.translation(game.me.name2);
+			}
+			var str2='挑战';
+			if(game.me!=game.boss){
+				str2+=' - '+get.translation(game.boss);
+			}
+			var name=[str,str2];
+			return name;
+		},
 		start:function(){
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				var playback=localStorage.getItem(lib.configprefix+'playback');
+				if(playback){
+					ui.create.arena();
+					ui.create.me();
+					ui.arena.style.display='none';
+					ui.system.style.display='none';
+					_status.playback=playback;
+					localStorage.removeItem(lib.configprefix+'playback');
+					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+					store.get(parseInt(playback)).onsuccess=function(e){
+						if(e.target.result){
+							game.playVideoContent(e.target.result.video);
+						}
+						else{
+							alert('播放失败：找不到录像');
+							game.reload();
+						}
+					}
+					event.finish();
+					return;
+				}
 				for(var i in lib.skill){
 					if(lib.skill[i].changeSeat){
 						lib.skill[i]={};
@@ -158,9 +191,11 @@ mode.boss={
 				boss.style.left=(rect.left-ui.arena.offsetLeft)+'px';
 				boss.style.top=(rect.top-ui.arena.offsetTop)+'px';
 				boss.setIdentity('zhu');
+				boss.identity='zhu';
 				for(var i=0;i<result.links.length;i++){
 					var player=ui.create.player(ui.arena).init(result.links[i]).animate('start');
 					player.setIdentity('cai');
+					player.identity='cai';
 					player.side=false;
 					game.players.push(player);
 					if(result.boss){
@@ -257,6 +292,20 @@ mode.boss={
 				for(var i=0;i<game.players.length;i++){
 					ui.create.div('.action',game.players[i].node.avatar).innerHTML='行动';
 				}
+
+				var players=get.players(lib.sort.position);
+				var info=[];
+				for(var i=0;i<players.length;i++){
+					info.push({
+						name:players[i].name,
+						identity:players[i].identity,
+						position:players[i].dataset.position
+					});
+				}
+				_status.videoInited=true,
+				info.boss=(game.me==game.boss);
+				game.addVideo('init',null,info);
+
 				"step 3"
 				game.gameDraw(game.boss);
 				game.bossPhaseLoop();
@@ -328,6 +377,7 @@ mode.boss={
 		},
 		onSwapControl:function(){
 			if(game.me==game.boss) return;
+			game.addVideo('onSwapControl');
 			var name=game.me.name;
 			if(ui.fakeme&&ui.fakeme.current!=name){
 				ui.fakeme.current=name;
@@ -1421,7 +1471,7 @@ mode.boss={
 		boss_zhangjiao:'天公将军',
 		boss_zuoci:'迷之仙人',
 		boss_yuji:'琅琊道士',
-		boss_liubei:'昭烈皇帝',
+		boss_liubei:'蜀汉烈帝',
 		boss_caiwenji:'异乡孤女',
 		boss_huatuo:'药坛圣手',
 		boss_luxun:'蹁跹君子',

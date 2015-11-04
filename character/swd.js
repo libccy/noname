@@ -1422,6 +1422,7 @@ character.swd={
 					player.addTempSkill('hutian4','phaseAfter');
 					target.addSkill('hutian2');
 					target.storage.hutian2=result.cards;
+					game.addVideo('storage',target,['hutian2',get.cardsInfo(result.cards),'cards']);
 				}
 				else{
 					event.finish();
@@ -1561,6 +1562,12 @@ character.swd={
 					}
 					player.additionalSkills.huanxing=list;
 					player.markCharacter(name,null,true,true);
+					game.addVideo('markCharacter',player,{
+						name:'幻形',
+						content:'',
+						id:'huanxing',
+						target:name
+					});
 					player.storage.huanxing=name;
 				}
 			},
@@ -1790,6 +1797,7 @@ character.swd={
 				if(player.storage.pozhou){
 					player.markSkill('pozhou');
 				}
+				game.addVideo('storage',player,['pozhou',player.storage.pozhou]);
 			},
 			intro:{
 				content:'mark'
@@ -3408,6 +3416,42 @@ character.swd={
 		kunlunjing:{
 			unique:true,
 			group:['kunlunjing1','kunlunjing2'],
+			video:function(player,data){
+				if(data){
+					for(var i in data){
+						var current=game.playerMap[i];
+						current.node.handcards1.innerHTML='';
+						current.node.handcards2.innerHTML='';
+						current.node.equips.innerHTML='';
+						current.node.judges.innerHTML='';
+						current.directgain(get.infoCards(data[i].h));
+						var es=get.infoCards(data[i].e);
+						for(var j=0;j<es.length;j++){
+							current.$equip(es[j]);
+						}
+						var js=get.infoCards(data[i].j);
+						for(var j=0;j<js.length;j++){
+							player.node.judges.appendChild(js[j]);
+						}
+					}
+					ui.window.classList.remove('zoomout3');
+					ui.window.classList.add('zoomin3');
+					document.body.appendChild(ui.window);
+					setTimeout(function(){
+						ui.window.show();
+						ui.window.classList.remove('zoomin3');
+						setTimeout(function(){
+							ui.window.style.transition='';
+						},500);
+					},100);
+				}
+				else{
+					ui.window.style.transition='all 0.5s';
+					ui.window.classList.add('zoomout3');
+					ui.window.delete();
+					ui.window.hide();
+				}
+			},
 			intro:{
 				content:function(storage,player){
 					if(true){
@@ -3461,7 +3505,7 @@ character.swd={
 				return false;
 			},
 			check:function(event,player){
-				if(event.name=='phase'&&player.hp<3) return false;
+				// if(event.name=='phase'&&player.hp<3) return false;
 				var storage=event.player.storage.kunlunjing;
 				var num=0;
 				for(var i=0;i<storage.length;i++){
@@ -3477,6 +3521,8 @@ character.swd={
 						}
 					}
 				}
+				// return num>2;
+				if(player.hp==2) return num>4;
 				return num>Math.min(3,game.players.length);
 			},
 			content:function(){
@@ -3484,10 +3530,12 @@ character.swd={
 				game.delay(0.5);
 				"step 1"
 				event.player.storage.kunlunjing2=true;
-				ui.arena.classList.add('zoomout3');
-				ui.arena.delete();
-				ui.arena.hide();
+				ui.window.style.transition='all 0.5s';
+				ui.window.classList.add('zoomout3');
+				ui.window.delete();
+				ui.window.hide();
 				game.delay(0,500);
+				game.addVideo('skill',event.player,'kunlunjing');
 				"step 2"
 				var storage=event.player.storage.kunlunjing;
 				var player,frag;
@@ -3537,15 +3585,35 @@ character.swd={
 					}
 				}
 				game.delay(0,100);
-				ui.arena.classList.remove('zoomout3');
-				ui.arena.classList.add('zoomin3');
-				ui.window.appendChild(ui.arena);
+				ui.window.classList.remove('zoomout3');
+				ui.window.classList.add('zoomin3');
+				document.body.appendChild(ui.window);
+				var data={};
+				for(var i=0;i<game.players.length;i++){
+					data[game.players[i].dataset.position]={
+						h:get.cardsInfo(game.players[i].get('h')),
+						e:get.cardsInfo(game.players[i].get('e')),
+						j:get.cardsInfo(game.players[i].get('j'))
+					}
+				}
+				game.addVideo('skill',event.player,['kunlunjing',data]);
 				"step 3"
-				ui.arena.show();
-				ui.arena.classList.remove('zoomin3');
+				ui.window.show();
+				ui.window.classList.remove('zoomin3');
+				setTimeout(function(){
+					ui.window.style.transition='';
+					game.resume();
+				},500);
 				event.player.storage.kunlunjing3='已发动';
+				game.pause();
+				'step 4'
 				if(trigger.name=='phase'){
-					event.player.loseHp();
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].hp<event.player.hp){
+							event.player.loseHp();
+							return;
+						}
+					}
 				}
 			}
 		},
@@ -4042,6 +4110,7 @@ character.swd={
 			},
 			init:function(player){
 				player.storage.yishan=[];
+				game.addVideo('storage',player,['yishan',get.cardsInfo(player.storage.yishan),'cards']);
 			},
 			mark:true,
 			content:function(){
@@ -4119,6 +4188,7 @@ character.swd={
 				for(var i=0;i<trigger.cards.length;i++){
 					player.storage.yishan.unshift(trigger.cards[i]);
 				}
+				game.addVideo('storage',player,['yishan',get.cardsInfo(player.storage.yishan),'cards']);
 			}
 		},
 		guanhu:{
@@ -4786,6 +4856,7 @@ character.swd={
 				player.chooseCardTarget({
 					prompt:'是否发动【挟雷】？',
 					filterCard:true,
+					position:'he',
 					filterTarget:function(card,player,target){
 						if(player==target) return false;
 						if(trigger.name=='respond'){
@@ -4812,6 +4883,53 @@ character.swd={
 			ai:{
 				expose:0.3,
 				threaten:1.6
+			}
+		},
+		jingjie:{
+			enable:'phaseUse',
+			init:function(player){
+				player.storage.jingjie=false;
+			},
+			mark:true,
+			intro:{
+				content:'limited',
+			},
+			filter:function(event,player){
+				return !player.storage.jingjie;
+			},
+			content:function(){
+				'step 0'
+				player.storage.jingjie=true;
+				player.unmarkSkill('jingjie');
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].discard(game.players[i].get('hej'))._triggered=null;
+				}
+				'step 1'
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].directgain(get.cards(2));
+					game.players[i].$draw(2);
+				}
+
+			},
+			ai:{
+				threaten:1.3,
+				order:1,
+				result:{
+					player:function(player){
+						var num=0;
+						for(var i=0;i<game.players.length;i++){
+							var att=ai.get.attitude(player,game.players[i]);
+							if(att>0){
+								num-=game.players[i].num('he')-2;
+							}
+							else if(att<0){
+								num+=game.players[i].num('he')-2;
+							}
+						}
+						if(player.hp==1) return num-1;
+						return num-game.players.length/2;
+					}
+				}
 			}
 		},
 		ningjian:{
@@ -5292,6 +5410,12 @@ character.swd={
 					name:get.translation(link),
 					content:lib.translate[link+'_info']
 				});
+				game.addVideo('markCharacter',player,{
+					name:'get.translation(link)',
+					content:lib.translate[link+'_info'],
+					id:'tianshu',
+					target:target.name
+				});
 				player.storage.tianshu=target.name;
 				player.checkMarks();
 				player.addTempSkill('tianshu_ai','phaseAfter');
@@ -5388,6 +5512,12 @@ character.swd={
 				player.markCharacter(target.name,{
 					name:get.translation(link),
 					content:lib.translate[link+'_info']
+				});
+				game.addVideo('markCharacter',player,{
+					name:'get.translation(link)',
+					content:lib.translate[link+'_info'],
+					id:'tianshu',
+					target:target.name
 				});
 				player.storage.tianshu=target.name;
 				player.checkMarks();
@@ -7003,6 +7133,7 @@ character.swd={
 				"step 1"
 				ui.auto.show();
 				player.storage.mailun=event.choice;
+				game.addVideo('storage',player,['mailun',player.storage.mailun]);
 				if(event.choice){
 					player.logSkill('mailun');
 					player.markSkill('mailun');
@@ -7314,12 +7445,14 @@ character.swd={
 			discard:false,
 			prepare:function(cards,player,targets){
 				player.$give(cards,targets[0]);
+				player.line(targets[0],'green');
 			},
 			content:function(){
 				"step 0"
 				game.delay();
 				"step 1"
 				target.storage.zhenjiu2=cards[0];
+				game.addVideo('storage',target,['zhenjiu2',get.cardInfo(target.storage.zhenjiu2),'card']);
 				target.addSkill('zhenjiu2');
 			},
 			ai:{
@@ -7364,6 +7497,7 @@ character.swd={
 			discard:false,
 			prepare:function(cards,player,targets){
 				player.$give(cards,targets[0]);
+				player.line(targets[0],'green');
 			},
 			content:function(){
 				"step 0"
@@ -7371,6 +7505,7 @@ character.swd={
 				"step 1"
 				target.storage.mazui2=cards[0];
 				target.addSkill('mazui2');
+				game.addVideo('storage',target,['mazui2',get.cardInfo(target.storage.mazui2),'card']);
 			},
 			ai:{
 				expose:0.2,
@@ -7644,6 +7779,9 @@ character.swd={
 		swd_lanmoshen:'蓝魔神',
 		swd_wushi:'巫师',
 
+		jingjie:'镜界',
+		jingjie_info:'回合开始阶段，你可以流失一点体力，并',
+		jingjie_old_info:'限定技，出牌阶段，你可以令所有角色弃置所有牌，然后摸两张牌（不触发任何技能）',
 		kongmo:'恐魔',
 		kongmo_info:'锁定技，你使用基本牌或非延时锦囊牌后将额外结算一次卡牌效果',
 		miaobi:'妙笔',
@@ -7992,7 +8130,7 @@ character.swd={
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
-		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，然后流失一点体力',
+		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，此时有其他角色的体力值比你少，你流失一点体力',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌，每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',
