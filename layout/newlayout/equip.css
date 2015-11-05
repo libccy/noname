@@ -8,8 +8,8 @@
 	text-align:left;
 }
 .player.minskin .equips{
-	-webkit-transform:scale(0.73);
-	-webkit-transform-origin:bottom left;
+	transform:scale(0.73);
+	transform-origin:bottom left;
 }
 .player .equips>.card{
 	position:relative;
@@ -23,6 +23,7 @@
 	box-shadow:none;
 	color:white;
 	text-shadow:black 0 0 2px;
+	animation: card_start2x 0.5s;
 	-webkit-animation: card_start2x 0.5s;
 	display:block;
 	left:0;
@@ -79,6 +80,7 @@
 	margin-left:5px;
 }
 .equips>.card>div{
+	animation:none !important;
 	-webkit-animation:none !important;
 }
 .equips>.card>.name,
@@ -90,7 +92,7 @@
 .equips>.removing{
 	margin-top:-12px !important;
 	margin-bottom:-11px !important;
-	-webkit-transform:scale(1);
+	transform:scale(1);
 }
 .equips>.removing+.removing{
 	margin-top:-23px !important;
@@ -98,13 +100,13 @@
 
 
 .player.linked .equips{
-	-webkit-transform:rotate(90deg) translate(-150px,-6px);
-	-webkit-transform-origin:bottom left;
+	transform:rotate(90deg) translate(-150px,-6px);
+	transform-origin:bottom left;
 }
 .player.minskin.linked .equips{
-	-webkit-transform:rotate(90deg) translate(-90px,-6px) scale(0.73);
+	transform:rotate(90deg) translate(-90px,-6px) scale(0.73);
 }
 .player.linked div:not(.equips) .card,
 .player.linked .identity{
-	-webkit-transform:rotate(90deg);
+	transform:rotate(90deg);
 }

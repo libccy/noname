@@ -1,5 +1,9 @@
 /*--------标签--------*/
-html{width: 100%;height: 100%;font-size: 16px;cursor: default;overflow: hidden;-webkit-user-select:none;-webkit-font-smoothing: subpixel-antialiased;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+html{width: 100%;height: 100%;font-size: 16px;cursor: default;overflow: hidden;
+	-ms-user-select:none;
+	-moz-user-select:none;
+	-webkit-user-select:none;
+	-webkit-font-smoothing: subpixel-antialiased;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 body{width: 100%;height: 100%;padding: 0; margin: 0;text-rendering:optimizeLegibility;font-family:'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif}
 div{display: inline-block;position: absolute;transition: all 0.5s;}
 table{table-layout: fixed;}
@@ -52,28 +56,43 @@ table{table-layout: fixed;}
 #scrollzone3{right: calc(50% - 140px);}
 #scrollzone4{right: 0;}
 .scrollzone{width: 20px;height: 140px;}
-body>.background.paused{-webkit-filter:blur(3px);}
+body>.background.paused{
+	filter:blur(3px);
+	-webkit-filter:blur(3px);
+}
 body>.background{z-index:-2}
 .popup{padding: 5px;}
 .removing,.hidden{opacity: 0 !important;}
 #system>div>div.hidden{opacity:0.5 !important;}
 .transparent{opacity:  0.3 !important;}
-.out{opacity: 0.3 !important;-webkit-filter:blur(3px)}
-.blur{-webkit-filter:blur(3px) !important;}
-.blur2{-webkit-filter:blur(6px) !important;}
-.zoomin{-webkit-transform: scale(1.05) !important;}
-.zoomout{-webkit-transform: scale(0.95) !important;}
-.zoomin2{-webkit-transform: scale(2) !important;}
-.zoomin3{-webkit-transform: scale(3) !important;}
-.zoomout2{-webkit-transform: scale(0.5) !important;}
-.zoomout3{-webkit-transform: scale(0.3) !important;}
-.rotateleft{-webkit-transform: rotate(-3deg) !important;}
-.rotateright{-webkit-transform: rotate(3deg) !important;}
+.out{opacity: 0.3 !important;
+	filter:blur(3px);
+	-webkit-filter:blur(3px)
+}
+.blur{
+	filter:blur(3px) !important;
+	-webkit-filter:blur(3px) !important;
+}
+.blur2{
+	filter:blur(6px) !important;
+	-webkit-filter:blur(6px) !important;
+}
+.zoomin{transform: scale(1.05) !important;}
+.zoomout{transform: scale(0.95) !important;}
+.zoomin2{transform: scale(2) !important;}
+.zoomin3{transform: scale(3) !important;}
+.zoomout2{transform: scale(0.5) !important;}
+.zoomout3{transform: scale(0.3) !important;}
+.rotateleft{transform: rotate(-3deg) !important;}
+.rotateright{transform: rotate(3deg) !important;}
 .exclude{opacity: 0.6 !important;}
-.button.buttonclick{-webkit-animation:buttonclick 0.8s}
+.button.buttonclick{
+	animation:buttonclick 0.8s;
+	-webkit-animation:buttonclick 0.8s
+}
 .background{width: 100%;height: 100%;left:0;top: 0;margin: 0;padding:0;display: inline-block !important;}
 .background2{width: 90%;height: 90%;left:5%;top: 5%;margin: 0;padding:0;display: inline-block !important;}
-.background,.button,.avatar,.avatar2{transition-property: top,box-shadow,opacity,-webkit-transform;transition-duration:0.5s;}
+.background,.button,.avatar,.avatar2{transition-property: top,box-shadow,opacity,transform;transition-duration:0.5s;}
 .intro{width: 20px;height: 20px;}
 
 #systembutton{
@@ -103,9 +122,11 @@ body>.background{z-index:-2}
 	display:none !important;
 }
 .card.cardflip{
+	animation:cardflip 0.3s ease-out;
 	-webkit-animation:cardflip 0.3s ease-out;
 }
 .player.playerflip{
+	animation:playerflip 0.3s ease-out;
 	-webkit-animation:playerflip 0.3s ease-out;
 }
 .button.card.button>.intro{top:69px;}
@@ -113,16 +134,16 @@ body>.background{z-index:-2}
 	zoom:0.65
 }
 .buttons .card.button>.name{
-	-webkit-transform:scale(0.8);
-	-webkit-transform-origin:top left;
+	transform:scale(0.8);
+	transform-origin:top left;
 }
 .buttons .card.button>.info{
-	-webkit-transform:scale(0.8);
-	-webkit-transform-origin:top right;
+	transform:scale(0.8);
+	transform-origin:top right;
 }
 .buttons .card.button>.addinfo{
-	-webkit-transform:scale(0.8);
-	-webkit-transform-origin:bottom left;
+	transform:scale(0.8);
+	transform-origin:bottom left;
 }
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
@@ -149,7 +170,7 @@ body>.background{z-index:-2}
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:6px;
 	transition: all 0.3s;
-	-webkit-animation:none;
+	animation:dialog_start2 0.2s;
 	-webkit-animation:dialog_start2 0.2s;
 	transition-property:opacity;
 }
@@ -238,10 +259,19 @@ margin-bottom: 5px;
 .player.controlfakeme>.avatar{width: 100%;height: 100%;box-shadow: none;left: 0;top: 0}
 .player{z-index: 4;width: 240px;height: 120px;}
 .player.minskin{width:120px;}
-.player.replaceme{-webkit-animation:replaceme 0.5s}
-.player.replaceenemy{-webkit-animation:replaceenemy 0.5s}
+.player.replaceme{
+	animation:replaceme 0.5s;
+	-webkit-animation:replaceme 0.5s
+}
+.player.replaceenemy{
+	animation:replaceenemy 0.5s;
+	-webkit-animation:replaceenemy 0.5s
+}
 .player>div{z-index: 2;}
-.player.dead,.player.likedead{z-index: 1;-webkit-filter:grayscale(1);}
+.player.dead,.player.likedead{z-index: 1;
+	filter:grayscale(1);
+	-webkit-filter:grayscale(1);
+}
 .player>.name{left: 18px;top:36px;font-family: 'huangcao';font-size:20px}
 .player>.intro{top:87px;left: 18px;}
 .player>.damage{
@@ -252,17 +282,17 @@ margin-bottom: 5px;
 	top:calc(50% - 36px);
 	left:0;
 	opacity: 0;
-	-webkit-transform:scale(0.7);
+	transform:scale(0.7);
 }
 .player>.damage.damageadded{
 	opacity: 1;
-	-webkit-transform:scale(1);
+	transform:scale(1);
 }
 .player.linked>.damage{
-	-webkit-transform:scale(0.7) rotate(90deg);
+	transform:scale(0.7) rotate(90deg);
 }
 .player.linked>.damage.damageadded{
-	-webkit-transform:scale(1) rotate(90deg);
+	transform:scale(1) rotate(90deg);
 }
 .avatar{width: 96px;height: 96px;left: 12px;top: 12px;overflow: hidden;}
 .avatar2{width: 42px;height: 42px;top: 70px;left: 70px;overflow: hidden;}
@@ -275,8 +305,16 @@ margin-bottom: 5px;
 .equips>.equip5{top: calc(50% - 21px);left:calc(50% - 21px);border-radius: 21px;z-index: 1}
 .equips>div>div:not(.image),.judges>div>div:not(.image),.marks>div>div:not(.image){display: none;}
 .equips>div>.image,.judges>div>.image,.marks>div>.image{width:120%;height:120%;left:-20%;top:-20%;}
-.equips>div:hover>.info{display: inline-block;-webkit-animation:equip_hover 1s;left: 0;right: auto;width: 42px;text-align: center;}
-.equips>div:hover>.background {-webkit-animation:equip_hover2 1s;-webkit-animation-fill-mode: forwards;}
+.equips>div:hover>.info{display: inline-block;
+	animation:equip_hover 1s;
+	-webkit-animation:equip_hover 1s;
+	left: 0;right: auto;width: 42px;text-align: center;}
+.equips>div:hover>.background {
+	animation:equip_hover2 1s;
+	animation-fill-mode: forwards;
+	-webkit-animation:equip_hover2 1s;
+	-webkit-animation-fill-mode: forwards;
+}
 .judges{height: 24px;left: 14px;top: -18px;}
 .marks{height: 24px;left: 14px;top: 112px;}
 .judges>div,.marks>div{width: 24px;height: 24px;margin-left: 0;margin-top: 0;margin-right: 4px;opacity: 1;}
@@ -288,6 +326,7 @@ margin-bottom: 5px;
 	border-radius: 100%;
 	box-shadow: rgba(0,0,0,0.2) 1px -1px 2px inset,rgba(255,255,255,0.15) -1px 1px 5px inset;
 	position: relative;
+	filter: brightness(1.5);
 	-webkit-filter: brightness(1.5);
 	transition: all 0.5s;
 }
@@ -317,11 +356,13 @@ margin-bottom: 5px;
 .hp.actcount>.lost{
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(31, 82, 131, 1);
+	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 }
 .hp>.lost{
 	background: rgba(57, 123, 4,1);
 	border: 1px solid rgba(39, 79, 7, 1);
+	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 }
 .hp.text[data-condition="low"]{
@@ -345,11 +386,11 @@ margin-bottom: 5px;
 .identity{text-align: center;width: 22px;height: 22px;}
 .identity>div{position: relative;top: 2px;}
 .unseen>.avatar,.unseen>.name,.unseen2>.avatar2{opacity: 0 !important;}
-.linked>.avatar,.linked>.avatar2{-webkit-transform:rotate(-90deg);}
+.linked>.avatar,.linked>.avatar2{transform:rotate(-90deg);}
 .linked>.avatar2{top: 5px;}
 .linked>.identity{top: 88px;}
 .linked>.count{right: 154px;}
-.acted>.identity{-webkit-transform:rotate(180deg);}
+.acted>.identity{transform:rotate(180deg);}
 
 /*--------位置(8人)------*/
 [data-number='8']>.player[data-position='1']{top:calc(200% / 3 - 90px);left:calc(100% - 240px);}
@@ -447,23 +488,62 @@ margin-bottom: 5px;
 .card[data-position='0']{top:calc(100% - 130px);left:calc(50% - 52px);}
 .popup[data-position='0']{top:calc(100% - 176px);left:calc(50% - 106px);}
 /*--------动画--------*/
-.start,.equips>.card,.judges>.card,.marks>.card,.popup{-webkit-animation: game_start 0.5s;}
-.dialog{-webkit-animation: dialog_start 0.5s;}
-.dialog.noslide{-webkit-animation: dialog_start2 0.5s;transition-property:opacity,background,box-shadow}
+.start,.equips>.card,.judges>.card,.marks>.card,.popup{
+	animation: game_start 0.5s;
+	-webkit-animation: game_start 0.5s;
+}
+.dialog{
+	animation: dialog_start 0.5s;
+	-webkit-animation: dialog_start 0.5s;
+}
+.dialog.noslide{
+	animation: dialog_start2 0.5s;
+	-webkit-animation: dialog_start2 0.5s;
+	transition-property:opacity,background,box-shadow
+}
 .dialog.removing{top: 100px}
-.card.drawing{-webkit-animation: drawing 1s; -webkit-animation-fill-mode: forwards;}
+.card.drawing{
+	animation: drawing 1s;
+	animation-fill-mode: forwards;
+	-webkit-animation: drawing 1s;
+	-webkit-animation-fill-mode: forwards;
+}
 .card.thrown{position: absolute;opacity: 1;margin:0}
-.card.start{-webkit-animation: card_start 0.5s;}
-.card.judgestart{-webkit-animation: card_judgestart 1s;}
-#me>div>.card.start{-webkit-animation: card_start2 0.5s;}
-.card.removing{-webkit-transform:scale(0);}
+.card.start{
+	animation: card_start 0.5s;
+	-webkit-animation: card_start 0.5s;
+}
+.card.judgestart{
+	animation: card_judgestart 1s;
+	-webkit-animation: card_judgestart 1s;
+}
+#me>div>.card.start{
+	animation: card_start2 0.5s;
+	-webkit-animation: card_start2 0.5s;
+}
+.card.removing{transform:scale(0);}
 #me>div>.card.removing{margin-left: -52px;margin-right: -52px;}
-.card.thrown.removing{width: 104px;height: 104px;-webkit-transform:none}
-#sidebar.sidebar{-webkit-animation:sidebar 0.5s}
-.button.zoom{-webkit-animation:zoom_button 0.5s}
-.content>.config.start{-webkit-animation:config 0.5s;}
-.flash{-webkit-animation:flash 1s;}
-.flip{-webkit-animation:flip 1s;}
+.card.thrown.removing{width: 104px;height: 104px;transform:none}
+#sidebar.sidebar{
+	animation:sidebar 0.5s;
+	-webkit-animation:sidebar 0.5s
+}
+.button.zoom{
+	animation:zoom_button 0.5s;
+	-webkit-animation:zoom_button 0.5s
+}
+.content>.config.start{
+	animation:config 0.5s;
+	-webkit-animation:config 0.5s;
+}
+.flash{
+	animation:flash 1s;
+	-webkit-animation:flash 1s;
+}
+.flip{
+	animation:flip 1s;
+	-webkit-animation:flip 1s;
+}
 /*--------样式--------*/
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.background,
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.image,
@@ -530,14 +610,14 @@ div:hover>.intro{opacity: 1;}
 .dialog.scroll2{box-shadow:0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05)}
 .dialog.scroll1.scroll2{box-shadow:0 -10px 10px -9px rgba(0,0,0,0.1),0 -10px 0 -9px rgba(0,0,0,0.05),
 	0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05);}*/
-.selected,.target{/*-webkit-transform: scale(1.05);*/}
-.target{-webkit-transform: rotate(-3deg);}
-.target2{-webkit-transform: rotate(3deg);}
+.selected,.target{/*transform: scale(1.05);*/}
+.target{transform: rotate(-3deg);}
+.target2{transform: rotate(3deg);}
 .content>.config.line2{
-	-webkit-transform:translateX(-5px);
+	transform:translateX(-5px);
 }
 #sidebar2>.config:not(.line2){
-	-webkit-transform:translateX(5px);
+	transform:translateX(5px);
 }
 .popup{
 	background: rgba(0,0,0,0.2);
@@ -599,6 +679,7 @@ div:hover>.intro{opacity: 1;}
 	top:0;
 }
 .player .identity.animate{
+	animation:identity 0.8s;
 	-webkit-animation:identity 0.8s;
 }
 .player .identity[data-color="zhu"],
@@ -763,6 +844,7 @@ div[data-color="unknownm"]{
 	height:12px;
 	margin-left:4px;
 	margin-bottom: 3px;
+	animation:game_start 0.5s;
 	-webkit-animation:game_start 0.5s;
 }
 .player .wunature{
@@ -820,6 +902,14 @@ div[data-color="unknownm"]{
 }
 
 /*--------动画--------*/
+@keyframes control_glow{
+	0%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px}
+	30%{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px}
+	70%{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px}
+	100%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px}
+	/*from{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}
+	to{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important}*/
+}
 @-webkit-keyframes control_glow{
 	0%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px}
 	30%{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px}
@@ -828,36 +918,70 @@ div[data-color="unknownm"]{
 	/*from{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}
 	to{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important}*/
 }
+@keyframes cardflip{
+	from {transform:perspective(600px) rotateY(-90deg) translateX(52px)}
+	to{transform:perspective(600px) rotateY(0deg) translateX(0)}
+}
 @-webkit-keyframes cardflip{
-	from {-webkit-transform:perspective(600px) rotateY(-90deg) translateX(52px)}
-	to{-webkit-transform:perspective(600px) rotateY(0deg) translateX(0)}
+	from {transform:perspective(600px) rotateY(-90deg) translateX(52px)}
+	to{transform:perspective(600px) rotateY(0deg) translateX(0)}
+}
+@keyframes playerflip{
+	from {transform:perspective(1200px) rotateY(-90deg) translateX(150px)}
+	to{transform:perspective(1200px) rotateY(0deg) translateX(0)}
+}
+@keyframes playerflip{
+	from {transform:perspective(1200px) rotateY(-90deg) translateX(150px)}
+	to{transform:perspective(1200px) rotateY(0deg) translateX(0)}
 }
 @-webkit-keyframes playerflip{
-	from {-webkit-transform:perspective(1200px) rotateY(-90deg) translateX(150px)}
-	to{-webkit-transform:perspective(1200px) rotateY(0deg) translateX(0)}
+	from {transform:perspective(1200px) rotateY(-90deg) translateX(150px)}
+	to{transform:perspective(1200px) rotateY(0deg) translateX(0)}
 }
+@keyframes game_start{from {opacity: 0;}}
 @-webkit-keyframes game_start{from {opacity: 0;}}
+@keyframes equip_hover{0% {opacity: 0;}50% {opacity: 0;}}
 @-webkit-keyframes equip_hover{0% {opacity: 0;}50% {opacity: 0;}}
-@-webkit-keyframes buttonclick{0% {-webkit-transform: scale(1);}50% {-webkit-transform: scale(0.9);}}
+@keyframes buttonclick{0% {transform: scale(1);}50% {transform: scale(0.9);}}
+@-webkit-keyframes buttonclick{0% {transform: scale(1);}50% {transform: scale(0.9);}}
+@keyframes equip_hover2{0% {}50% {opacity: 0.6}100%{opacity: 0.3}}
 @-webkit-keyframes equip_hover2{0% {}50% {opacity: 0.6}100%{opacity: 0.3}}
+@keyframes dialog_start{from {opacity: 0;top:100px;}}
 @-webkit-keyframes dialog_start{from {opacity: 0;top:100px;}}
-@-webkit-keyframes dialog_start2{from {opacity: 0;-webkit-transform:scale(0.8);}}
-@-webkit-keyframes replaceme{from {opacity: 0;-webkit-transform:translateY(120px)}}
-@-webkit-keyframes replaceenemy{from {opacity: 0;-webkit-transform:translateY(-120px)}}
+@keyframes dialog_start2{from {opacity: 0;transform:scale(0.8);}}
+@-webkit-keyframes dialog_start2{from {opacity: 0;transform:scale(0.8);}}
+@keyframes replaceme{from {opacity: 0;transform:translateY(120px)}}
+@-webkit-keyframes replaceme{from {opacity: 0;transform:translateY(120px)}}
+@keyframes replaceenemy{from {opacity: 0;transform:translateY(-120px)}}
+@-webkit-keyframes replaceenemy{from {opacity: 0;transform:translateY(-120px)}}
+@keyframes drawing{0% {opacity: 0;left:calc(50% - 52px);top:calc(50% - 52px);}50%{opacity: 1}100%{opacity: 0}}
 @-webkit-keyframes drawing{0% {opacity: 0;left:calc(50% - 52px);top:calc(50% - 52px);}50%{opacity: 1}100%{opacity: 0}}
+@keyframes drawing2{0% {opacity: 0}50%{opacity: 1}100%{opacity: 0}}
 @-webkit-keyframes drawing2{0% {opacity: 0}50%{opacity: 1}100%{opacity: 0}}
-@-webkit-keyframes card_start{from {opacity: 0;-webkit-transform:scale(0);}}
-@-webkit-keyframes card_start2{from {opacity: 0;-webkit-transform:scale(0);margin-left: -52px;margin-right: -52px;}}
-@-webkit-keyframes card_judgestart{from {opacity: 0;-webkit-transform:scale(0) rotateY(-180deg) perspective(600px);}}
+@keyframes card_start{from {opacity: 0;transform:scale(0);}}
+@-webkit-keyframes card_start{from {opacity: 0;transform:scale(0);}}
+@keyframes card_start2{from {opacity: 0;transform:scale(0);margin-left: -52px;margin-right: -52px;}}
+@-webkit-keyframes card_start2{from {opacity: 0;transform:scale(0);margin-left: -52px;margin-right: -52px;}}
+@keyframes card_judgestart{from {opacity: 0;transform:scale(0) rotateY(-180deg) perspective(600px);}}
+@-webkit-keyframes card_judgestart{from {opacity: 0;transform:scale(0) rotateY(-180deg) perspective(600px);}}
+@keyframes sidebar{from {left: -120px;opacity: 0}}
 @-webkit-keyframes sidebar{from {left: -120px;opacity: 0}}
-@-webkit-keyframes zoom_button{from {margin-top: -48px;margin-bottom: -48px;-webkit-transform:scale(0);opacity: 0}}
+@keyframes zoom_button{from {margin-top: -48px;margin-bottom: -48px;transform:scale(0);opacity: 0}}
+@-webkit-keyframes zoom_button{from {margin-top: -48px;margin-bottom: -48px;transform:scale(0);opacity: 0}}
+@keyframes config{from {margin-top:-28px;opacity: 0}}
 @-webkit-keyframes config{from {margin-top:-28px;opacity: 0}}
-@-webkit-keyframes zoomin{from {opacity: 0;-webkit-transform:scale(0.5);}}
-@-webkit-keyframes zoomout{from {opacity: 0;-webkit-transform:scale(2);}}
-@-webkit-keyframes zoomout3{from {opacity: 0;-webkit-transform:scale(3);}}
-@-webkit-keyframes zoomout4{from {opacity: 0;-webkit-transform:scale(4);}}
+@keyframes zoomin{from {opacity: 0;transform:scale(0.5);}}
+@-webkit-keyframes zoomin{from {opacity: 0;transform:scale(0.5);}}
+@keyframes zoomout{from {opacity: 0;transform:scale(2);}}
+@-webkit-keyframes zoomout{from {opacity: 0;transform:scale(2);}}
+@keyframes zoomout3{from {opacity: 0;transform:scale(3);}}
+@-webkit-keyframes zoomout3{from {opacity: 0;transform:scale(3);}}
+@keyframes zoomout4{from {opacity: 0;transform:scale(4);}}
+@-webkit-keyframes zoomout4{from {opacity: 0;transform:scale(4);}}
+@keyframes flash{0%{opacity: 1;}50%{opacity: 0;}100%{opacity: 1;}}
 @-webkit-keyframes flash{0%{opacity: 1;}50%{opacity: 0;}100%{opacity: 1;}}
-@-webkit-keyframes flip{from{-webkit-transform:perspective(1000px) rotateY(0);}to{-webkit-transform:perspective(1000px) rotateY(360deg);}}
+@keyframes flip{from{transform:perspective(1000px) rotateY(0);}to{transform:perspective(1000px) rotateY(360deg);}}
+@-webkit-keyframes flip{from{transform:perspective(1000px) rotateY(0);}to{transform:perspective(1000px) rotateY(360deg);}}
 /*--------其它--------*/
 @font-face {font-family: 'xiaozhuan';src: url('../../font/xiaozhuan.ttf');}
 @font-face {font-family: 'huangcao';src: url('../../font/huangcao.ttf');}

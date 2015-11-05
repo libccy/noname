@@ -792,7 +792,12 @@ character.gujian={
 			},
 			ai:{
 				result:{
-					player:1
+					player:function(player){
+						if(player.num('h')<=player.hp&&player.hp==player.maxHp){
+							return 0;
+						}
+						return 1;
+					}
 				},
 				order:6
 			}

@@ -3394,7 +3394,14 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否发动苏生？').ai=ai.get.unuseful2;
+				var att=ai.get.attitude(player,trigger.player);
+				var nh=player.num('h');
+				player.chooseToDiscard('是否发动苏生？').ai=function(card){
+					if(att>3||(att>1&&nh>2)){
+						return ai.get.unuseful2(card);
+					}
+					return 0;
+				};
 				"step 1"
 				if(result.bool){
 					// player.chooseToDiscard('h',true);

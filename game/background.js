@@ -16,15 +16,41 @@
         bg.style.backgroundSize="cover";
 
         switch (temp.image_background_filter){
-            case 'blur':bg.style.webkitFilter='blur(8px)';bg.style.webkitTransform='scale(1.05)';break;
-            case 'gray':bg.style.webkitFilter='grayscale(1)';break;
-            case 'sepia':bg.style.webkitFilter='sepia(0.5)';break;
-            case 'invert':bg.style.webkitFilter='invert(1)';break;
-            case 'saturate':bg.style.webkitFilter='saturate(5)';break;
-            case 'contrast':bg.style.webkitFilter='contrast(1.4)';break;
-            case 'hue':bg.style.webkitFilter='hue-rotate(180deg)';break;
-            case 'brightness':bg.style.webkitFilter='brightness(5)';break;
-            default:bg.style.webkitFilter='';
+            case 'blur':
+                bg.style.filter='blur(8px)';
+                bg.style.webkitFilter='blur(8px)';
+                bg.style.transform='scale(1.05)';
+                break;
+            case 'gray':
+                bg.style.filter='grayscale(1)';
+                bg.style.webkitFilter='grayscale(1)';
+                break;
+            case 'sepia':
+                bg.style.filter='sepia(0.5)';
+                bg.style.webkitFilter='sepia(0.5)';
+                break;
+            case 'invert':
+                bg.style.filter='invert(1)';
+                bg.style.webkitFilter='invert(1)';
+                break;
+            case 'saturate':
+                bg.style.filter='saturate(5)';
+                bg.style.webkitFilter='saturate(5)';
+                break;
+            case 'contrast':
+                bg.style.filter='contrast(1.4)';
+                bg.style.webkitFilter='contrast(1.4)';
+                break;
+            case 'hue':
+                bg.style.filter='hue-rotate(180deg)';
+                bg.style.webkitFilter='hue-rotate(180deg)';
+                break;
+            case 'brightness':
+                bg.style.filter='brightness(5)';
+                bg.style.webkitFilter='brightness(5)';
+                break;
+            default:
+                bg.style.webkitFilter='';
         }
     }
     window.resetGameTimeout=setTimeout(function(){

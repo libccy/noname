@@ -73,15 +73,19 @@
 	top:calc(50% - 150px);
 }
 .menu.main.slideup{
+	animation:menuslideup 0.5s forwards;
 	-webkit-animation:menuslideup 0.5s forwards;
 }
 .menu.main.slidedown{
+	animation:menuslidedown 0.5s forwards;
 	-webkit-animation:menuslidedown 0.5s forwards;
 }
 .menu.main.zoomin{
+	animation:menuzoomin 0.3s forwards;
 	-webkit-animation:menuzoomin 0.3s forwards;
 }
 .menu.main.zoomout{
+	animation:menuzoomout 0.3s forwards;
 	-webkit-animation:menuzoomout 0.3s forwards;
 }
 .menu.main{
@@ -122,7 +126,8 @@
 	margin-right:5px;
 	transition:color 0.5s;
 }
-.menu.main>.menu-tab>div:not(.active):not(*:hover){
+.menu.main>.menu-tab>div:not(.active):not(*:hover),
+.menu.main>.menu-tab>.disabled{
 	color:rgba(255,255,255,0.6);
 }
 .menu.main>.menu-content{
@@ -328,10 +333,15 @@
 	color:rgba(255,255,255,0.5);
 }
 
+@keyframes fadein{from{opacity:0}}
 @-webkit-keyframes fadein{from{opacity:0}}
+@keyframes menuslideup{from{top:100%}}
 @-webkit-keyframes menuslideup{from{top:100%}}
+@keyframes menuslidedown{to{top:100%}}
 @-webkit-keyframes menuslidedown{to{top:100%}}
+@keyframes menuzoomin{from{transform:scale(0.5);opacity:0;transform-origin:2px -35px}to{transform-origin:2px -35px}}
 @-webkit-keyframes menuzoomin{from{transform:scale(0.5);opacity:0;transform-origin:2px -35px}to{transform-origin:2px -35px}}
+@keyframes menuzoomout{from{transform-origin:2px -35px}to{transform:scale(0.5);opacity:0;transform-origin:2px -35px}}
 @-webkit-keyframes menuzoomout{from{transform-origin:2px -35px}to{transform:scale(0.5);opacity:0;transform-origin:2px -35px}}
 
 

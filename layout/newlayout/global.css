@@ -44,7 +44,7 @@
 	bottom: auto;
 	right: auto;
 	text-align: left;
-	-webkit-transform: none;
+	transform: none;
 }
 .player.fullskin2 .avatar,
 .player.fullskin2 .avatar2{
@@ -92,6 +92,7 @@
 	line-height:20px;
 	position:relative;
 	display:block;
+	animation:card_start2xx 0.5s;
 	-webkit-animation:card_start2xx 0.5s;
 }
 .player .marks>.removing,
@@ -120,12 +121,12 @@
 	top: auto;
 	left: 116px;
 	z-index:3;
-	-webkit-transform:rotate(180deg);
+	transform:rotate(180deg);
 }
 .player .hp.text{
 	font-family:'huangcao';
 	font-size:22px;
-	-webkit-transform:none;
+	transform:none;
 	transition:all 0s;
 	left:114px;
 }
@@ -168,6 +169,7 @@
 .player .count[data-condition="none"]{
 	background: rgba(57, 123, 4,1);
 	border: 1px solid rgba(39, 79, 7, 1);
+	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 }
 .player .count[data-condition="high"]{
@@ -195,12 +197,12 @@
 	left:102px;
 }
 .player.linked{
-	-webkit-transform:rotate(-90deg);
+	transform:rotate(-90deg);
 }
 .player.acted.linked .identity{
-	-webkit-transform:rotate(270deg);
+	transform:rotate(270deg);
 }
-.linked>.avatar,.linked>.avatar2{-webkit-transform:rotate(0deg);}
+.linked>.avatar,.linked>.avatar2{transform:rotate(0deg);}
 .linked>.avatar2{top:73px;}
 .linked>.identity{top: -5px;}
 .linked>.count{right: auto;}
@@ -312,6 +314,7 @@
 	height:calc(100% - 385px);
 	z-index:4;
 	transition-property:opacity,background,box-shadow;
+	animation: dialog_start2 0.5s;
 	-webkit-animation: dialog_start2 0.5s;
 }
 #arena.stone .dialog{
@@ -364,6 +367,11 @@
 		left: calc(5% + 220px);
 	}
 }
+
+@keyframes card_start2x{from {opacity: 0;margin-top: -13px;margin-bottom:-11px}}
+@keyframes card_start2xx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;transform:scale(0)}}
+@keyframes card_start2xxx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;transform:scale(0) rotate(90deg)}}
+
 @-webkit-keyframes card_start2x{from {opacity: 0;margin-top: -13px;margin-bottom:-11px}}
-@-webkit-keyframes card_start2xx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;-webkit-transform:scale(0)}}
-@-webkit-keyframes card_start2xxx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;-webkit-transform:scale(0) rotate(90deg)}}
+@-webkit-keyframes card_start2xx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;transform:scale(0)}}
+@-webkit-keyframes card_start2xxx{from {opacity: 0;margin-top: -12px;margin-bottom:-12px;transform:scale(0) rotate(90deg)}}

@@ -3,7 +3,7 @@ window.config={
 	forbidsingle:['menghuo','huanggai','caoren','machao','pangde','yanwen','xiahoudun','xuzhu','luxun',
 	'xuhuang','yujin','xiaoqiao','daqiao','zhangjiao','zhangbao'],
 	forbidall:['caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu',
-	'xiahouyuan','huangzhong','weiyan','dianwei','gongsunzan'],
+	'xiahouyuan','huangzhong','weiyan','dianwei','gongsunzan','zhangjiao'],
 	forbidversus:['swd_kangnalishi'],
 	forbidstone:['zhugedan','pal_xuanxiao'],
 	forbidchess:['hetaihou','swd_kangnalishi'],
@@ -157,7 +157,6 @@ window.config={
 		show_auto_config:'显示托管按钮',
 		show_volumn_config:'显示音量按钮',
 		show_name_config:'显示角色名称',
-		auto_popped_config:'自动弹出菜单',
 		ui_zoom_config:'界面缩放',
 		no_ios_zoom_config:'禁止触屏缩放',
 		show_stat_config:'显示战斗统计',
@@ -196,7 +195,8 @@ window.config={
 	volumn_audio:8,
 
 	config_menu:true,
-	auto_popped:true,
+	auto_popped_config:true,
+	auto_popped_history:false,
 	auto_skill:true,
 	auto_confirm:true,
 	enable_drag:true,
@@ -210,7 +210,7 @@ window.config={
 
 
 	theme:'woodden',
-	layout:'newlayout',
+	layout:'mobile',
 
 	image_character:'default',
 	image_background:'default',

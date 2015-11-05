@@ -105,10 +105,13 @@
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(255, 0, 0, 1) 0 0 5px, rgba(255, 0, 0, 1) 0 0 10px !important;
 }
 .fakeme.player>.dead{
+    filter:grayscale(1);
     -webkit-filter:grayscale(1);
     opacity:0.5;
 }
 .card.drawing{
+    animation: drawing2 1s;
+    animation-fill-mode: forwards;
     -webkit-animation: drawing2 1s;
     -webkit-animation-fill-mode: forwards;
 }

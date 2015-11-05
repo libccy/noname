@@ -322,7 +322,7 @@ card.yibao={
 					var clone=event.card1.clone;
 					if(clone){
 						clone.style.transition='all 0.5s';
-						clone.style.webkitTransform='scale(1.2)';
+						clone.style.transform='scale(1.2)';
 						clone.delete();
 						game.addVideo('deletenode',player,get.cardsInfo([clone]));
 					}

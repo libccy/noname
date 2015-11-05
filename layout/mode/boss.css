@@ -29,7 +29,7 @@
     transition:all 0.5s;
 }
 .player.bossplayer.highlight{
-    -webkit-transform:scale(1.1);
+    transform:scale(1.1);
     opacity:1;
 }
 #bosslist.removing>.player.bossplayer.highlight{
@@ -45,6 +45,7 @@
     height:216px;
     transition: all 0.3s;
     opacity:0.6;
+    animation:game_start 0.5s;
     -webkit-animation:game_start 0.5s;
 }
 .player.bossplayer>div:not(.hp):not(.identity):not(.avatar){

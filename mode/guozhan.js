@@ -41,6 +41,7 @@ mode.guozhan={
 				}
 				"step 1"
 				if(lib.storage.test){
+					lib.config.game_speed='vfast';
 					_status.auto=true;
 					ui.auto.classList.add('glow');
 				}

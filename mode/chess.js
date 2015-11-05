@@ -18,15 +18,15 @@ mode.chess={
 				}
 				if(method=='flip'){
 					this.style.transition='all 0.5s';
-					this.style.webkitTransform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
+					this.style.transform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
 				}
 				else if(method=='rotate'){
 					this.style.transition='all 0.5s';
-					this.style.webkitTransform='rotate(180deg)';
+					this.style.transform='rotate(180deg)';
 				}
 				else{
 					this.style.transition='all 0.5s';
-					this.style.webkitTransform='';
+					this.style.transform='';
 				}
 				return this;
 			},
@@ -238,7 +238,7 @@ mode.chess={
 				node.dataset.position=this.dataset.position;
 				this.parentNode.appendChild(node);
 				ui.refresh(node);
-				node.style.webkitTransform='';
+				node.style.transform='';
 				setTimeout(function(){
 					node.remove();
 				},1000);
@@ -271,15 +271,15 @@ mode.chess={
 				}
 				node.fixed=true;
 				game.$randomMove(this,node,100,30);
-				var ot=node.style.webkitTransform;
-				node.style.webkitTransform+='scale(0.6)';
+				var ot=node.style.transform;
+				node.style.transform+='scale(0.6)';
 				node.dataset.position=this.dataset.position;
 				this.parentNode.appendChild(node);
 				ui.refresh(node);
 				node.show();
-				node.style.webkitTransform=ot;
+				node.style.transform=ot;
 				setTimeout(function(){
-					node.style.webkitTransform='';
+					node.style.transform='';
 					node.delete();
 				},500);
 				var that=this;
@@ -371,7 +371,7 @@ mode.chess={
 				node.hide();
 				node.style.transitionProperty='left,top,opacity';
 				if(transform){
-					node.style.webkitTransform='rotate('+(Math.random()*16-8)+'deg)';
+					node.style.transform='rotate('+(Math.random()*16-8)+'deg)';
 				}
 				ui.arena.appendChild(node);
 				ui.refresh(node);
@@ -816,7 +816,7 @@ mode.chess={
 			else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
 				ty=-Math.abs(ty);
 			}
-			node.style.webkitTransform='translate('+tx+'px,'+ty+'px)';
+			node.style.transform='translate('+tx+'px,'+ty+'px)';
 		},
 		draw2:function(func){
 			lib.canvasUpdates2.push(func);
@@ -871,9 +871,10 @@ mode.chess={
 				ui.create.arena();
 				ui.create.cards();
 				game.finishCards();
-				if(get.config('chess_character')){
+				var playback=localStorage.getItem(lib.configprefix+'playback');
+				if(get.config('chess_character')||playback){
 					for(var i in lib.chess_character){
-						if(i.indexOf('leader_')==0) continue;
+						if(!playback&&i.indexOf('leader_')==0&&get.config('chess_mode')!='leader') continue;
 						lib.character[i]=lib.chess_character[i];
 						if(!lib.character[i][4]){
 							lib.character[i][4]=[];
@@ -889,8 +890,12 @@ mode.chess={
 				ui.chess.appendChild(ui.canvas2);
 				ui.ctx2=ui.canvas2.getContext('2d');
 				game.me=ui.create.player();
-				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
+					for(var i in lib.characterPack){
+						for(var j in lib.characterPack[i]){
+							lib.character[j]=lib.character[j]||lib.characterPack[i][j];
+						}
+					}
 					game.pause();
 					ui.system.style.display='none';
 					_status.playback=playback;
@@ -915,6 +920,7 @@ mode.chess={
 						}
 						case 'combat':{
 							if(lib.storage.test){
+								lib.config.game_speed='vfast';
 								_status.auto=true;
 								setTimeout(function(){
 									console.log(get.translation(game.players));
@@ -940,6 +946,9 @@ mode.chess={
 					mylistmap=[];
 					enemylistmap=[];
 					for(var i=0;i<videocontent.length;i++){
+						if(videocontent[i].lord){
+							_status.lord=videocontent[i].name;
+						}
 						if(videocontent[i].identity=='friend'){
 							_status.mylist.push(videocontent[i].name);
 							mylistmap.push(videocontent[i].position);
@@ -1135,11 +1144,6 @@ mode.chess={
 				game.arrangePlayers();
 				"step 2"
 				ui.control.style.display='';
-				if(event.video){
-					game.playVideoContent(event.video);
-					game.setChessInfo(game.me);
-					return;
-				}
 				var p;
 				for(var i=0;i<game.players.length;i++){
 					if(_status.lord){
@@ -1157,6 +1161,11 @@ mode.chess={
 						}
 					}
 				}
+				if(event.video){
+					game.playVideoContent(event.video);
+					game.setChessInfo(p);
+					return;
+				}
 
 				var players=get.players(lib.sort.position);
 				var info=[];
@@ -1164,7 +1173,8 @@ mode.chess={
 					info.push({
 						name:players[i].name,
 						identity:players[i].identity,
-						position:players[i].dataset.position
+						position:players[i].dataset.position,
+						lord:players[i].name==_status.lord
 					});
 				}
 				_status.videoInited=true,
@@ -1305,7 +1315,7 @@ mode.chess={
 						ui.refresh(node);
 					}
 					else if(!load){
-						node.style.webkitTransform='perspective(1200px) rotateY(180deg) translate(0,-200px)';
+						node.style.transform='perspective(1200px) rotateY(180deg) translate(0,-200px)';
 					}
 					node.name=name;
 					if(!load){
@@ -1379,7 +1389,7 @@ mode.chess={
 					}
 					if(kaibao){
 						node.node.avatar.style.display='none';
-						node.style.webkitTransform='perspective(1200px) rotateY(180deg) translateX(0)';
+						node.style.transform='perspective(1200px) rotateY(180deg) translateX(0)';
 						if(typeof i=='string'){
 							node.listen(event.turnCard2);
 						}
@@ -1409,7 +1419,7 @@ mode.chess={
 						}
 					}
 					else{
-						node.style.webkitTransform='';
+						node.style.transform='';
 					}
 					return node;
 				};
@@ -1617,8 +1627,8 @@ mode.chess={
 					this.turned=true;
 					var node=this;
 					node.style.transition='all ease-in 0.3s';
-					node.style.webkitTransform='perspective(1200px) rotateY(270deg) translateX(150px)';
-					node.addEventListener('webkitTransitionEnd',function(){
+					node.style.transform='perspective(1200px) rotateY(270deg) translateX(150px)';
+					var onEnd=function(){
 						game.minskin=false;
 						node.init(node.name);
 						game.minskin=true;
@@ -1628,7 +1638,7 @@ mode.chess={
 							node.node.intro.classList.add('showintro');
 						}
 						node.classList.add('playerflip');
-						node.style.webkitTransform='none';
+						node.style.transform='none';
 						node.style.transition='';
 						if(lib.config.animation){
 							setTimeout(function(){
@@ -1639,7 +1649,9 @@ mode.chess={
 								}
 							},150);
 						}
-					});
+					};
+					// node.addEventListener('transitionEnd',onEnd);
+					node.addEventListener('webkitTransitionEnd',onEnd);
 				};
 				var zhaomu2=function(){
 					if(_status.qianfan||_status.kaibao) return;
@@ -2092,7 +2104,7 @@ mode.chess={
 								var node=event.arenanodes.shift();
 								if(node==this){
 									node.node.hp.hide();
-									node.style.webkitTransform='scale(0.5)';
+									node.style.transform='scale(0.5)';
 									node.style.top='calc(50% + 50px)';
 									event.arenachoicenodes.push(node);
 									event.arrangeNodes();
@@ -2122,7 +2134,7 @@ mode.chess={
 						node.init(node.name);
 						node.isChosen=true;
 						node.listen(event.clickNode);
-						node.style.webkitTransform='scale(0.5)';
+						node.style.transform='scale(0.5)';
 						node.style.top='calc(50% + 50px)';
 						event.arenachoicenodes.push(node);
 					}
@@ -2209,7 +2221,7 @@ mode.chess={
 				ui.arena.classList.add('noleft');
 				var nodes=event.arenachoicenodes;
 				for(var i=0;i<nodes.length;i++){
-					nodes[i].style.webkitTransform='scale(0.8)';
+					nodes[i].style.transform='scale(0.8)';
 				}
 				if(_status.arenaLoaded){
 					setTimeout(function(){
@@ -2313,7 +2325,7 @@ mode.chess={
 						},1000);
 						if(node.name=='chess_coin'||node.name=='chess_dust'){
 							node.style.transition='all 0s';
-							node.style.webkitTransform='none';
+							node.style.transform='none';
 							node.style.overflow='visible';
 							node.style.background='none';
 							node.style.boxShadow='none';
@@ -2340,8 +2352,8 @@ mode.chess={
 							return;
 						}
 						node.style.transition='all ease-in 0.3s';
-						node.style.webkitTransform='perspective(1200px) rotateY(270deg) translateX(150px)';
-						node.addEventListener('webkitTransitionEnd',function(){
+						node.style.transform='perspective(1200px) rotateY(270deg) translateX(150px)';
+						var onEnd=function(){
 							node.init(node.name);
 							node.node.avatar.style.display='';
 							if(node.rarity){
@@ -2349,7 +2361,7 @@ mode.chess={
 								node.node.intro.classList.add('showintro');
 							}
 							node.classList.add('playerflip');
-							node.style.webkitTransform='none';
+							node.style.transform='none';
 							node.style.transition='';
 							if(lib.config.animation){
 								setTimeout(function(){
@@ -2360,7 +2372,9 @@ mode.chess={
 									}
 								},150);
 							}
-						});
+						};
+						// node.addEventListener('transitionEnd',onEnd);
+						node.addEventListener('webkitTransitionEnd',onEnd);
 					};
 					setTimeout(function(){
 						nodes[0].delete();
@@ -3076,6 +3090,7 @@ mode.chess={
 								}
 							}
 							player.storage.tongshuai.owned[name]=skills;
+							game.addVideo('chess_tongshuai',player,player.storage.tongshuai.owned);
 						}
 					}
 				}
@@ -3117,7 +3132,7 @@ mode.chess={
 					}
 				}
 			},
-			mark:true
+			// mark:true
 		},
 		tongshuai1:{
 			trigger:{global:'gameStart'},
@@ -3185,29 +3200,17 @@ mode.chess={
 						if(link!='cancel'){
 							var currentname=event.dialog.querySelector('.selected.button').link;
 							var mark=player.marks.tongshuai;
-							if(trigger.name=='game'){
-								mark.hide();
-								mark.style.webkitTransform='scale(0.8)';
-								mark.style.transition='all 0.3s';
-								setTimeout(function(){
-									mark.style.transition='all 0s';
-									ui.refresh(mark);
-									mark.setBackground(currentname,'character');
-									if(mark.firstChild){
-										mark.firstChild.remove();
-									}
-									setTimeout(function(){
-										mark.style.transition='';
-										mark.show();
-										mark.style.webkitTransform='';
-									},50);
-								},500);
+							if(!mark){
+								player.markSkill('tongshuai');
+								mark=player.marks.tongshuai;
+								if(mark.firstChild){
+									mark.firstChild.remove();
+								}
 							}
-							else{
-								mark.setBackground(currentname,'character');
-							}
+							mark.setBackground(currentname,'character');
 
 							player.additionalSkills.tongshuai=link;
+							game.addVideo('chess_tongshuai_skill',player,[currentname,link]);
 							player.logSkill('tongshuai2');
 							game.log(get.translation(player)+'获得技能'+get.translation(link));
 							player.popup(link);
@@ -3225,10 +3228,12 @@ mode.chess={
 						ui.auto.show();
 						event.dialog.close();
 						event.control.close();
+						_status.imchoosing=false;
 						game.resume();
 					};
 					event.control.custom=event.clickControl;
 					ui.auto.hide();
+					_status.imchoosing=true;
 					game.pause();
 					for(var i=0;i<event.dialog.buttons.length;i++){
 						event.dialog.buttons[i].classList.add('selectable');

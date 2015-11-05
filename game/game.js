@@ -66,6 +66,11 @@
 						name:'不无懈自己',
 						init:true,
 					},
+					touchscreen:{
+						name:'触屏模式',
+						init:false,
+						restart:true
+					},
 					game_speed:{
 						name:'游戏速度',
 						init:'mid',
@@ -115,11 +120,6 @@
 							'1500':'1.5秒',
 							'2500':'2.5秒',
 						}
-					},
-					touchscreen:{
-						name:'触屏模式',
-						init:false,
-						restart:true
 					},
 					mousewheel:{
 						name:'滚轮控制手牌',
@@ -193,11 +193,11 @@
 					},
 					layout:{
 						name:'布局',
-						init:'newlayout',
+						init:'mobile',
 						item:{
 							default:'旧版',
-							newlayout:'默认',
-							mobile:'紧凑',
+							newlayout:'对称',
+							mobile:'默认',
 							phone:'移动'
 						},
 						onclick:function(layout){
@@ -234,12 +234,13 @@
 						unfrequent:true,
 						init:'normal',
 						item:{
-							esmall:'极小',
-							vsmall:'很小',
-							small:'较小',
-							normal:'原始',
-							big:'较大',
-							vbig:'很大',
+							esmall:'80%',
+							vsmall:'90%',
+							small:'95%',
+							normal:'100%',
+							big:'105%',
+							vbig:'110%',
+							ebig:'120%',
 						},
 						onclick:function(zoom){
 							game.saveConfig('ui_zoom',zoom);
@@ -249,6 +250,7 @@
 								case 'small':ui.window.style.zoom=0.95;break;
 								case 'big':ui.window.style.zoom=1.05;break;
 								case 'vbig':ui.window.style.zoom=1.1;break;
+								case 'ebig':ui.window.style.zoom=1.2;break;
 								default:ui.window.style.zoom=1;
 							}
 						}
@@ -274,17 +276,43 @@
 							ui.background=ui.create.div('.background');
 
 							switch (lib.config.image_background_filter){
-								case 'blur':ui.background.style.webkitFilter='blur(8px)';
-									ui.background.style.webkitTransform='scale(1.05)';break;
-								case 'gray':ui.background.style.webkitFilter='grayscale(1)';break;
-								case 'sepia':ui.background.style.webkitFilter='sepia(0.5)';break;
-								case 'invert':ui.background.style.webkitFilter='invert(1)';break;
-								case 'saturate':ui.background.style.webkitFilter='saturate(5)';break;
-								case 'contrast':ui.background.style.webkitFilter='contrast(1.4)';break;
-								case 'hue':ui.background.style.webkitFilter='hue-rotate(180deg)';break;
-								case 'brightness':ui.background.style.webkitFilter='brightness(5)';break;
-								default:ui.background.style.webkitFilter='';
-								ui.background.style.webkitTransform='';
+								case 'blur':
+									ui.background.style.filter='blur(8px)';
+									ui.background.style.webkitFilter='blur(8px)';
+									ui.background.style.transform='scale(1.05)';
+									break;
+								case 'gray':
+									ui.background.style.filter='grayscale(1)';
+									ui.background.style.webkitFilter='grayscale(1)';
+									break;
+								case 'sepia':
+									ui.background.style.filter='sepia(0.5)';
+									ui.background.style.webkitFilter='sepia(0.5)';
+									break;
+								case 'invert':
+									ui.background.style.filter='invert(1)';
+									ui.background.style.webkitFilter='invert(1)';
+									break;
+								case 'saturate':
+									ui.background.style.filter='saturate(5)';
+									ui.background.style.webkitFilter='saturate(5)';
+									break;
+								case 'contrast':
+									ui.background.style.filter='contrast(1.4)';
+									ui.background.style.webkitFilter='contrast(1.4)';
+									break;
+								case 'hue':
+									ui.background.style.filter='hue-rotate(180deg)';
+									ui.background.style.webkitFilter='hue-rotate(180deg)';
+									break;
+								case 'brightness':
+									ui.background.style.filter='brightness(5)';
+									ui.background.style.webkitFilter='brightness(5)';
+									break;
+								default:
+									ui.background.style.filter='';
+									ui.background.style.webkitFilter='';
+									ui.background.style.transform='';
 							}
 
 							document.body.insertBefore(ui.background,document.body.firstChild);
@@ -318,9 +346,14 @@
 							ui.click.sidebar.image_background(lib.config.image_background);
 						},
 					},
-					auto_popped:{
-						name:'自动弹出菜单',
+					auto_popped_config:{
+						name:'自动弹出选项',
 						init:true,
+						unfrequent:true,
+					},
+					auto_popped_history:{
+						name:'自动弹出历史',
+						init:false,
 						unfrequent:true,
 					},
 					only_fullskin:{
@@ -675,7 +708,8 @@
 							for(var i in localStorage){
 								data[i]=localStorage[i];
 							}
-							game.export(lib.init.encode(JSON.stringify(data)),'noname-data');
+							game.export(lib.init.encode(JSON.stringify(data)),
+							'无名杀 - 数据 - '+(new Date()).toLocaleString());
 						},
 						clear:true
 					}
@@ -1731,7 +1765,7 @@
 					player.phaseUse();
 					"step 3"
 					player.phaseDiscard()
-					game.delay();
+					game.delayx();
 				},
 				phaseJudge:function(){
 					"step 0"
@@ -2458,7 +2492,7 @@
 						game.delay(2);
 					}
 					else{
-						game.delay();
+						game.delayx();
 					}
 					player.gain(event.cards);
 				},
@@ -2473,7 +2507,7 @@
 					event.dialog=ui.create.dialog(str,cards);
 					game.log(get.translation(player)+'展示了'+get.translation(cards));
 					game.addVideo('showCards',player,[str,get.cardsInfo(cards)]);
-					game.delay(2);
+					game.delayx(2);
 					"step 1"
 					event.dialog.close();
 				},
@@ -2492,7 +2526,7 @@
 						str+='、'+get.translation(cards[i]);
 					}
 					game.log(str);
-					game.delay(2);
+					game.delayx(2);
 					game.addVideo('showCards',player,[event.str,get.cardsInfo(cards)]);
 					"step 1"
 					event.dialog.close();
@@ -2511,7 +2545,7 @@
 							setTimeout(function(){
 								event.dialog.close();
 							},2*lib.config.duration);
-							game.delay(2);
+							game.delayx(2);
 						}
 					}
 					else{
@@ -2677,7 +2711,7 @@
 					}
 					"step 5"
 					if(document.getElementsByClassName('thrown').length){
-						game.delay();
+						game.delayx();
 					}
 					else{
 						event.finish();
@@ -2816,7 +2850,7 @@
 					}
 					"step 2"
 					if(document.getElementsByClassName('thrown').length){
-						if(event.skill&&get.info(event.skill).delay!==0) game.delay();
+						if(event.skill&&get.info(event.skill).delay!==0) game.delayx();
 					}
 					else{
 						event.finish();
@@ -2855,7 +2889,7 @@
 					if(event.animate!=false) player.$throw(cards,1000);
 					event.trigger('discard');
 					"step 1"
-					if(event.delay!=false) game.delay();
+					if(event.delay!=false) game.delayx();
 				},
 				respond:function(){
 					var cardaudio=true;
@@ -2907,7 +2941,7 @@
 						event.finish();
 					}
 					"step 1"
-					if(event.source) game.delay();
+					if(event.source) game.delayx();
 					"step 2"
 					if(player.getStat().gain==undefined){
 						player.getStat().gain=cards.length;
@@ -2941,7 +2975,7 @@
 					};
 					if(event.animate=='draw'){
 						player.$draw(cards.length);
-						game.delay(1,500);
+						game.delayx(1,500);
 						setTimeout(function(){
 							addv();
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
@@ -2951,7 +2985,7 @@
 					}
 					else if(event.animate=='gain'){
 						player.$gain(cards);
-						game.delay(1,700);
+						game.delayx(1,700);
 						setTimeout(function(){
 							addv();
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
@@ -2961,7 +2995,7 @@
 					}
 					else if(event.animate=='gain2'||event.animate=='draw2'){
 						player.$gain2(cards);
-						game.delay(1,500);
+						game.delayx(1,500);
 						setTimeout(function(){
 							addv();
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
@@ -3042,7 +3076,7 @@
 					next.content=info.onLose;
 					next.player=player;
 					next.card=cards[num];
-					game.delay();
+					game.delayx();
 					event.num++;
 					event.goto(1);
 				},
@@ -3130,7 +3164,7 @@
 					event.trigger('damage');
 					"step 1"
 					if(player.hp<=0&&player.isAlive()){
-						game.delay();
+						game.delayx();
 						player.dying(event);
 					}
 				},
@@ -3160,7 +3194,7 @@
 					player.changeHp(-num);
 					"step 1"
 					if(player.hp<=0){
-						game.delay();
+						game.delayx();
 						player.dying(event);
 					}
 				},
@@ -3281,12 +3315,14 @@
 					player.classList.add('dead');
 					player.classList.remove('turnedover');
 					player.classList.remove('out');
-					player.node.count.innerHTML='';
+					player.node.count.innerHTML='0';
+					player.node.hp.hide();
+					player.node.equips.hide();
+					player.node.count.hide();
 					player.previous.next=player.next;
 					player.next.previous=player.previous;
 					game.players.remove(player);
 					game.dead.push(player);
-					if(player.dieAfter) player.dieAfter(source);
 					if(lib.config.background_speak){
 						if(lib.character[player.name]&&
 						lib.character[player.name][4].contains('die_audio')){
@@ -3312,11 +3348,16 @@
 						}
 					}
 					if(player==game.me&&!game.modeSwapPlayer){
-						if(ui.auto) ui.auto.hide();
+						_status.auto=false;
+						if(ui.auto){
+							ui.auto.classList.remove('glow');
+							ui.auto.hide();
+						}
 						if(ui.wuxie) ui.wuxie.hide();
 					}
 					game.addVideo('diex',player);
 					player.$die(source);
+					if(player.dieAfter) player.dieAfter(source);
 				},
 				equip:function(){
 					"step 0"
@@ -3350,7 +3391,7 @@
 						next.content=info.onEquip;
 						next.player=player;
 						next.card=card;
-						game.delay();
+						game.delayx();
 					}
 					delete player.equiping;
 				},
@@ -3479,6 +3520,7 @@
 
 					this.node.avatar.show();
 					this.node.count.show();
+					this.node.equips.show();
 					this.name=character;
 					this.sex=info[0];
 					this.group=info[1];
@@ -3578,7 +3620,7 @@
 					this.node.intro.innerHTML='';
 					this.node.name.innerHTML='';
 					this.node.hp.innerHTML='';
-					this.node.count.innerHTML='';
+					this.node.count.innerHTML='0';
 					if(this.name2){
 						this.node.avatar2.hide();
 						delete this.name2;
@@ -4663,7 +4705,7 @@
 					}
 					next.content=lib.element.playerproto.respond;
 				},
-				directgain:function(cards){
+				directgain:function(cards,animate){
 					var hs=this.get('h');
 					for(var i=0;i<cards.length;i++){
 						if(hs.contains(cards[i])){
@@ -4672,11 +4714,14 @@
 					}
 					for(var i=0;i<cards.length;i++){
 						var sort=lib.config.sort_card(cards[i]);
+						if(animate!==false){
+							cards[i].animate('start');
+						}
 						if(lib.isSingleHandcard()||sort>0){
-							this.node.handcards1.appendChild(cards[i].animate('start'));
+							this.node.handcards1.appendChild(cards[i]);
 						}
 						else{
-							this.node.handcards2.appendChild(cards[i].animate('start'));
+							this.node.handcards2.appendChild(cards[i]);
 						}
 					}
 					if(!_status.video){
@@ -4868,6 +4913,11 @@
 					game.addVideo('revive',this);
 					this.classList.remove('dead');
 					this.removeAttribute('style');
+					this.node.avatar.style.transform='';
+					this.node.avatar2.style.transform='';
+					this.node.hp.show();
+					this.node.equips.show();
+					this.node.count.show();
 					this.update();
 					var player;
 					player=this.previousSeat;
@@ -5502,17 +5552,19 @@
 						'calc(50% - 114px)','calc(50% - 52px)'
 					);
 					node1.classList.add('infohidden');
-					node1.style.webkitTransform='perspective(600px) rotateY(180deg) translateX(0)';
+					node1.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
 					setTimeout(function(){
 						setTimeout(function(){
 							node1.style.transition='all ease-in 0.3s';
-							node1.style.webkitTransform='perspective(600px) rotateY(270deg) translateX(52px)';
-							node1.addEventListener('webkitTransitionEnd',function(){
+							node1.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+							var onEnd=function(){
 								node1.classList.remove('infohidden');
 								node1.classList.add('cardflip');
-								node1.style.webkitTransform='none';
+								node1.style.transform='none';
 								node1.style.transition='';
-							});
+							}
+							// node1.addEventListener('transitionEnd',onEnd);
+							node1.addEventListener('webkitTransitionEnd',onEnd);
 						},600);
 
 
@@ -5520,16 +5572,18 @@
 							'calc(50% + 10px)','calc(50% - 52px)'
 						);
 						node2.classList.add('infohidden');
-						node2.style.webkitTransform='perspective(600px) rotateY(180deg) translateX(0)';
+						node2.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
 						setTimeout(function(){
 							node2.style.transition='all ease-in 0.3s';
-							node2.style.webkitTransform='perspective(600px) rotateY(270deg) translateX(52px)';
-							node2.addEventListener('webkitTransitionEnd',function(){
+							node2.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+							var onEnd=function(){
 								node2.classList.remove('infohidden');
 								node2.classList.add('cardflip');
-								node2.style.webkitTransform='none';
+								node2.style.transform='none';
 								node2.style.transition='';
-							});
+							}
+							// node2.addEventListener('transitionEnd',onEnd);
+							node2.addEventListener('webkitTransitionEnd',onEnd);
 						},700);
 
 					},200);
@@ -5569,7 +5623,7 @@
 					node.hide();
 					node.style.transitionProperty='left,top,opacity';
 					if(transform){
-						node.style.webkitTransform='rotate('+(Math.random()*16-8)+'deg)';
+						node.style.transform='rotate('+(Math.random()*16-8)+'deg)';
 					}
 					ui.arena.appendChild(node);
 					ui.refresh(node);
@@ -5645,7 +5699,7 @@
 							node.hide();
 							node.style.transitionProperty='left,top,opacity';
 
-							node.style.webkitTransform='rotate('+(Math.random()*16-8)+'deg)';
+							node.style.transform='rotate('+(Math.random()*16-8)+'deg)';
 
 							ui.arena.appendChild(node);
 							ui.refresh(node);
@@ -5744,13 +5798,13 @@
 							node.fixed=true;
 							node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
 							node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
-							node.style.webkitTransform='scale(0)';
+							node.style.transform='scale(0)';
 							var player=this;
 							node.hide();
 							ui.arena.appendChild(node);
 							ui.refresh(node);
 							node.show();
-							node.style.webkitTransform='';
+							node.style.transform='';
 							setTimeout(function(){
 								node.moveTo(player).delete();
 							},700);
@@ -5763,7 +5817,7 @@
 					var list=[],list2=[];
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].clone&&cards[i].clone.parentNode==this.parentNode&&
-							getComputedStyle(cards[0].clone).opacity){
+							parseFloat(getComputedStyle(cards[0].clone).opacity)>0.3){
 							cards[i].clone.moveTo(this).delete();
 							list2.push(cards[i].clone);
 						}
@@ -5924,43 +5978,42 @@
 						if(source.offsetTop-this.offsetTop>0) top=-top;
 						if(lib.isMobileMe(this)){
 							if(this.isLinked()){
-								this.node.avatar.style.webkitTransform='translate('+left+'px,'+top+'px) rotate(-90deg)';
-								this.node.avatar2.style.webkitTransform='translate('+left+'px,'+top+'px) rotate(-90deg)';
+								this.node.avatar.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
+								this.node.avatar2.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
 							}
 							else{
-								this.node.avatar.style.webkitTransform='translate('+left+'px,'+top+'px)';
-								this.node.avatar2.style.webkitTransform='translate('+left+'px,'+top+'px)';
+								this.node.avatar.style.transform='translate('+left+'px,'+top+'px)';
+								this.node.avatar2.style.transform='translate('+left+'px,'+top+'px)';
 							}
 						}
 						else if(this.isLinked()&&lib.isNewLayout()){
-							this.style.webkitTransform='translate('+left+'px,'+top+'px) rotate(-90deg)';
+							this.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
 						}
 						else{
-							this.style.webkitTransform='translate('+left+'px,'+top+'px)';
+							this.style.transform='translate('+left+'px,'+top+'px)';
 						}
 					}
 					else{
 						if(lib.isMobileMe(this)){
 							if(this.isLinked()){
-								this.node.avatar.style.webkitTransform='scale(0.9) rotate(-90deg)';
-								this.node.avatar2.style.webkitTransform='scale(0.9) rotate(-90deg)';
+								this.node.avatar.style.transform='scale(0.9) rotate(-90deg)';
+								this.node.avatar2.style.transform='scale(0.9) rotate(-90deg)';
 							}
 							else{
-								this.node.avatar.style.webkitTransform='scale(0.9)';
-								this.node.avatar2.style.webkitTransform='scale(0.9)';
+								this.node.avatar.style.transform='scale(0.9)';
+								this.node.avatar2.style.transform='scale(0.9)';
 							}
 						}
 						else if(this.isLinked()&&lib.isNewLayout()){
-							this.style.webkitTransform='scale(0.95) rotate(-90deg)';
+							this.style.transform='scale(0.95) rotate(-90deg)';
 						}
 						else{
-							this.style.webkitTransform='scale(0.95)';
+							this.style.transform='scale(0.95)';
 						}
 					}
 					this.queue();
 				},
 				$die:function(){
-					if(lib.isMobileMe(this)) return;
 					game.addVideo('die',this);
 					var top0=ui.window.offsetHeight/2;
 					var left0=ui.window.offsetWidth/2;
@@ -5969,9 +6022,20 @@
 					var top=Math.abs(50/Math.sqrt(1+ratio*ratio));
 					if(left0-this.offsetLeft>0) left=-left;
 					if(top0-this.offsetTop>0) top=-top;
-					this.style.webkitTransform='translate('+left+'px,'+top+'px) '+
+					if(lib.isMobileMe(this)){
+						left=-Math.random()*5-10;
+						top=Math.random()*5+10;
+					}
+					var transform='translate('+left+'px,'+top+'px) '+
 					'rotate('+(Math.random()*20-10)+'deg) '+
 					((Math.random()-0.5<0)?'rotateX(180deg)':'rotateY(180deg)');
+					if(lib.isMobileMe(this)){
+						this.node.avatar.style.transform=transform;
+						this.node.avatar2.style.transform=transform;
+					}
+					else{
+						this.style.transform=transform;
+					}
 					this.queue(false);
 				},
 				$phaseJudge:function(card){
@@ -6089,11 +6153,11 @@
 					this.dataset.position=player.dataset.position;
 					if(method=='flip'){
 						this.style.transition='all 0.5s';
-						this.style.webkitTransform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
+						this.style.transform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
 					}
 					else if(method=='rotate'){
 						this.style.transition='all 0.5s';
-						this.style.webkitTransform='rotate(180deg)';
+						this.style.transform='rotate(180deg)';
 					}
 					return this;
 				},
@@ -6993,6 +7057,9 @@
 			downloadLink.click();
 		},
 		playVideo:function(time,mode){
+			if(!_status.replayvideo){
+				localStorage.setItem(lib.configprefix+'playbackmode',lib.config.mode);
+			}
 			game.saveConfig('mode',mode);
 			localStorage.setItem(lib.configprefix+'playback',time);
 			game.reload();
@@ -7041,9 +7108,20 @@
 				}
 				ui.system.firstChild.innerHTML='';
 				ui.system.lastChild.innerHTML='';
+				ui.system.firstChild.appendChild(ui.config2);
+				if(ui.updateVideoMenu){
+					ui.updateVideoMenu();
+				}
 				_status.videoDuration=1;
-				ui.create.system('返回',game.reload);
+				ui.create.system('返回',function(){
+					var mode=localStorage.getItem(lib.configprefix+'playbackmode');
+					if(mode){
+						game.saveConfig('mode',mode);
+					}
+					game.reload();
+				});
 				ui.create.system('重播',function(){
+					_status.replayvideo=true;
 					game.playVideo(_status.playback,lib.config.mode);
 				});
 				ui.create.system('暂停',ui.click.pause,true);
@@ -7229,19 +7307,39 @@
 				if(Array.isArray(num)){
 					num=get.infoCards(num);
 				}
-				player.$gainmod(num);
+				if(player&&player.$gainmod){
+					player.$gainmod(num);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			moveTo:function(player,pos){
-				player.moveTo(pos[0],pos[1]);
+				if(player&&player.moveTo&&pos){
+					player.moveTo(pos[0],pos[1]);
+				}
+				else{
+					console.log(player)
+				}
 			},
 			moveTox:function(player,pos){
-				delete lib.posmap[player.dataset.position];
-				player.dataset.position=pos;
-				lib.posmap[pos]=player;
-				game.delay();
+				if(player&&player.dataset){
+					delete lib.posmap[player.dataset.position];
+					player.dataset.position=pos;
+					lib.posmap[pos]=player;
+					game.delay();
+				}
+				else{
+					console.log(player);
+				}
 			},
 			chessFocus:function(player){
-				player.chessFocus();
+				if(player){
+					player.chessFocus();
+				}
+				else{
+					console.log('chessFocus');
+				}
 			},
 			stonePosition:function(content){
 				var player=game.playerMap[content[0]];
@@ -7249,6 +7347,9 @@
 					delete game.playerMap[content[0]];
 					player.dataset.position=content[1];
 					game.playerMap[content[1]]=player;
+				}
+				else{
+					console.log(content);
 				}
 			},
 			stoneSwap:function(info){
@@ -7264,10 +7365,35 @@
 				game.playerMap[player.dataset.position]=player;
 				game.arrangePlayers();
 			},
+			chess_tongshuai:function(player,content){
+				if(player&&player.storage){
+					player.storage.tongshuai.owned=content;
+				}
+				else{
+					console.log(player);
+				}
+			},
+			chess_tongshuai_skill:function(player,content){
+				if(player&&content){
+					if(player.marks.tongshuai.firstChild){
+						player.marks.tongshuai.firstChild.remove();
+					}
+					player.marks.tongshuai.setBackground(content[0],'character');
+					player.additionalSkills.tongshuai=content[1];
+				}
+				else{
+					console.log(player);
+				}
+			},
 			reinit:function(source,content){
-				source.uninit();
-				source.init(content[0]);
-				source.node.identity.dataset.color=content[1];
+				if(source&&content){
+					source.uninit();
+					source.init(content[0]);
+					source.node.identity.dataset.color=content[1];
+				}
+				else{
+					console.log(source);
+				}
 			},
 			skill:function(player,content){
 				if(typeof content=='string'){
@@ -7276,102 +7402,175 @@
 				else if(Array.isArray(content)){
 					lib.skill[content[0]].video(player,content[1]);
 				}
+				else{
+					console.log(player,content)
+				}
 			},
 			addFellow:function(content){
 				var player=game.addFellow(content[0],content[1]);
 				game.playerMap[player.dataset.position]=player;
 			},
 			updateActCount:function(player,content){
-				player.updateActCount(content[0],content[1],content[2]);
+				if(player&&content){
+					player.updateActCount(content[0],content[1],content[2]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			showCharacter:function(player,num){
-				switch(num){
-					case 0:
-					player.classList.remove('unseen');
-					break;
-					case 1:
-					player.classList.remove('unseen2');
-					break;
-					case 2:
-					player.classList.remove('unseen');
-					player.classList.remove('unseen2');
-					break;
+				if(player&&player.classList){
+					switch(num){
+						case 0:
+						player.classList.remove('unseen');
+						break;
+						case 1:
+						player.classList.remove('unseen2');
+						break;
+						case 2:
+						player.classList.remove('unseen');
+						player.classList.remove('unseen2');
+						break;
+					}
+				}
+				else{
+					console.log(num);
 				}
 			},
 			popup:function(player,info){
-				player.popup(info[0],info[1]);
+				if(player&&info){
+					player.popup(info[0],info[1]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			log:function(str){
 				game.log(str);
 			},
 			draw:function(player,info){
-				player.$draw(info);
+				if(player&&player.$draw){
+					player.$draw(info);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			drawCard:function(player,info){
-				player.$draw(get.infoCards(info));
+				if(player&&info){
+					player.$draw(get.infoCards(info));
+				}
+				else{
+					console.log(player);
+				}
 			},
 			throw:function(player,info){
-				player.$throw(get.infoCards(info[0]),info[1]);
+				if(player&&info){
+					player.$throw(get.infoCards(info[0]),info[1]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			compare:function(player,info){
-				player.$compare(get.infoCard(info[0]),game.playerMap[info[1]],get.infoCard(info[2]));
+				if(player&&info){
+					player.$compare(get.infoCard(info[0]),game.playerMap[info[1]],get.infoCard(info[2]));
+				}
+				else{
+					console.log(player);
+				}
 			},
 			give:function(player,info){
-				player.$give(info[0],game.playerMap[info[1]]);
+				if(player&&info){
+					player.$give(info[0],game.playerMap[info[1]]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			giveCard:function(player,info){
-				player.$give(get.infoCards(info[0]),game.playerMap[info[1]]);
+				if(player&&info){
+					player.$give(get.infoCards(info[0]),game.playerMap[info[1]]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			gain:function(player,info){
-				player.$gain(info);
+				if(player&&player.$gain){
+					player.$gain(info);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			gainCard:function(player,info){
-				player.$gain(get.infoCards(info));
+				if(player&&info){
+					player.$gain(get.infoCards(info));
+				}
+				else{
+					console.log(player);
+				}
 			},
 			gain2:function(player,cards){
-				var nodeList=document.querySelectorAll('#arena>.card,#chess>.card');
-				var nodes=[];
-				for(var i=0;i<nodeList.length;i++){
-					nodes.push(nodeList[i]);
-				}
-				for(var i=0;i<cards.length;i++){
-					for(var j=0;j<nodes.length;j++){
-						if(cards[i][2]==nodes[j].name&&cards[i][0]==nodes[j].suit&&cards[i][1]==nodes[j].number){
-							nodes[j].moveTo(player).delete();
-							cards.splice(i--,1);
-							nodes.splice(j--,1);
-							break;
+				if(player&&player.$draw){
+					var nodeList=document.querySelectorAll('#arena>.card,#chess>.card');
+					var nodes=[];
+					for(var i=0;i<nodeList.length;i++){
+						nodes.push(nodeList[i]);
+					}
+					for(var i=0;i<cards.length;i++){
+						for(var j=0;j<nodes.length;j++){
+							if(cards[i][2]==nodes[j].name&&cards[i][0]==nodes[j].suit&&cards[i][1]==nodes[j].number){
+								nodes[j].moveTo(player).delete();
+								cards.splice(i--,1);
+								nodes.splice(j--,1);
+								break;
+							}
 						}
 					}
+					if(cards.length){
+						player.$draw(get.infoCards(cards));
+					}
 				}
-				if(cards.length){
-					player.$draw(get.infoCards(cards));
+				else{
+					console.log(player);
 				}
 			},
 			deletenode:function(player,cards){
-				var nodeList=document.querySelectorAll('#arena>.card,#chess>.card');
-				var nodes=[];
-				for(var i=0;i<nodeList.length;i++){
-					nodes.push(nodeList[i]);
-				}
-				for(var i=0;i<cards.length;i++){
-					for(var j=0;j<nodes.length;j++){
-						if(cards[i][2]==nodes[j].name&&cards[i][0]==nodes[j].suit&&cards[i][1]==nodes[j].number){
-							nodes[j].delete();
-							cards.splice(i--,1);
-							nodes.splice(j--,1);
-							break;
+				if(cards){
+					var nodeList=document.querySelectorAll('#arena>.card,#chess>.card');
+					var nodes=[];
+					for(var i=0;i<nodeList.length;i++){
+						nodes.push(nodeList[i]);
+					}
+					for(var i=0;i<cards.length;i++){
+						for(var j=0;j<nodes.length;j++){
+							if(cards[i][2]==nodes[j].name&&cards[i][0]==nodes[j].suit&&cards[i][1]==nodes[j].number){
+								nodes[j].delete();
+								cards.splice(i--,1);
+								nodes.splice(j--,1);
+								break;
+							}
 						}
 					}
+				}
+				else{
+					console.log(player,cards);
 				}
 			},
 			uiClear:function(){
 				ui.clear();
 			},
 			judge1:function(player,content){
-				var judging=get.infoCard(content[0]);
-				judging.copy('thrown','center',ui.arena).animate('start');
-				ui.create.dialog(content[1]).videoId=content[2];
+				if(player&&content){
+					var judging=get.infoCard(content[0]);
+					judging.copy('thrown','center',ui.arena).animate('start');
+					ui.create.dialog(content[1]).videoId=content[2];
+				}
+				else{
+					console.log(player);
+				}
 			},
 			centernode:function(content){
 				get.infoCard(content).copy('thrown','center',ui.arena).animate('start');
@@ -7384,27 +7583,56 @@
 				}
 			},
 			unmarkname:function(player,name){
-				player.unmark(name);
+				if(player&&player.unmark){
+					player.unmark(name);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			unmark:function(player,name){
-				if(player.marks[name]){
+				if(player&&player.marks&&player.marks[name]){
 					player.marks[name].delete();
 					delete player.marks[name];
 				}
 			},
 			flame:function(player,type){
-				player['$'+type]();
+				if(player&&type){
+					player['$'+type]();
+				}
+				else{
+					console.log(player);
+				}
 			},
 			line:function(player,content){
-				player.line(game.playerMap[content[0]],content[1]);
+				if(player&&content){
+					player.line(game.playerMap[content[0]],content[1]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			damagepop:function(player,content){
-				player.$damagepop(content[0],content[1]);
+				if(player&&content){
+					player.$damagepop(content[0],content[1]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			damage:function(player,source){
-				player.$damage(game.playerMap[source]);
+				if(player&&player.$damage){
+					player.$damage(game.playerMap[source]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			diex:function(player){
+				if(!player){
+					console.log('diex');
+					return;
+				}
 				var cards=player.get('hej');
 				for(var i=0;i<cards.length;i++){
 					cards[i].goto(ui.discardPile);
@@ -7415,7 +7643,10 @@
 				player.classList.add('dead');
 				player.classList.remove('turnedover');
 				player.classList.remove('out');
-				player.node.count.innerHTML='';
+				player.node.count.innerHTML='0';
+				player.node.hp.hide();
+				player.node.equips.hide();
+				player.node.count.hide();
 				player.previous.next=player.next;
 				player.next.previous=player.previous;
 				game.players.remove(player);
@@ -7430,6 +7661,10 @@
 				game.addChessPlayer.apply(this,content);
 			},
 			die:function(player){
+				if(!player){
+					console.log('die');
+					return;
+				}
 				player.$die();
 				if(lib.config.mode=='chess'){
 					delete lib.posmap[player.dataset.position];
@@ -7446,55 +7681,100 @@
 				}
 			},
 			revive:function(player){
+				if(!player){
+					console.log('revive');
+					return;
+				}
 				player.classList.remove('dead');
+				player.node.hp.show();
+				player.node.equips.show();
+				player.node.count.show();
+				player.node.avatar.style.transform='';
+				player.node.avatar2.style.transform='';
 				player.removeAttribute('style');
 			},
 			update:function(player,info){
-				if(player.update){
+				if(player&&info){
 					player.hp=info[1];
 					player.maxHp=info[2];
 					player.hujia=info[3];
 					player.update(info[0]);
 				}
+				else{
+					console.log(player);
+				}
 			},
 			phaseJudge:function(player,card){
-				player.$phaseJudge(get.infoCard(card));
+				if(player&&card){
+					player.$phaseJudge(get.infoCard(card));
+				}
+				else{
+					console.log(player);
+				}
 			},
 			directgain:function(player,cards){
-				player.directgain(get.infoCards(cards));
+				if(player&&cards){
+					player.directgain(get.infoCards(cards));
+				}
+				else{
+					console.log(player);
+				}
 			},
 			gain12:function(player,cards12){
-				var cards1=get.infoCards(cards12[0]);
-				var cards2=get.infoCards(cards12[1]);
-				for(var i=0;i<cards1.length;i++){
-					cards1[i].animate('start');
-					player.node.handcards1.insertBefore(cards1[i],player.node.handcards1.firstChild);
+				if(player&&cards12){
+					var cards1=get.infoCards(cards12[0]);
+					var cards2=get.infoCards(cards12[1]);
+					for(var i=0;i<cards1.length;i++){
+						cards1[i].animate('start');
+						player.node.handcards1.insertBefore(cards1[i],player.node.handcards1.firstChild);
+					}
+					for(var i=0;i<cards2.length;i++){
+						cards2[i].animate('start');
+						player.node.handcards2.insertBefore(cards2[i],player.node.handcards2.firstChild);
+					}
 				}
-				for(var i=0;i<cards2.length;i++){
-					cards2[i].animate('start');
-					player.node.handcards2.insertBefore(cards2[i],player.node.handcards2.firstChild);
+				else{
+					console.log(player);
 				}
 			},
 			equip:function(player,card){
-				player.equip(get.infoCard(card));
+				if(player&&card){
+					player.equip(get.infoCard(card));
+				}
+				else{
+					console.log(player);
+				}
 			},
 			addJudge:function(player,content){
-				var card=get.infoCard(content[0]);
-				card.viewAs=content[1];
-				player.node.judges.insertBefore(card,player.node.judges.firstChild);
+				if(player&&content){
+					var card=get.infoCard(content[0]);
+					card.viewAs=content[1];
+					player.node.judges.insertBefore(card,player.node.judges.firstChild);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			markCharacter:function(player,content){
-				if(game.playerMap[content.target]){
-					content.target=game.playerMap[content.target];
+				if(player&&content){
+					if(game.playerMap[content.target]){
+						content.target=game.playerMap[content.target];
+					}
+					var mark=player.markCharacter(content.target,content);
+					if(content.id){
+						player.marks[content.id]=mark;
+					}
 				}
-				var mark=player.markCharacter(content.target,content);
-				if(content.id){
-					player.marks[content.id]=mark;
+				else{
+					console.log(player);
 				}
 			},
 			mark:function(player,content){
 				if(player&&content){
 					var mark=player.mark(content.id,content);
+				}
+				else{
+					console.log(player);
 				}
 			},
 			markSkill:function(player,content){
@@ -7506,10 +7786,16 @@
 						player.markSkill(content[0]);
 					}
 				}
+				else{
+					console.log(player);
+				}
 			},
 			unmarkSkill:function(player,name){
 				if(player&&name){
 					player.unmarkSkill(name);
+				}
+				else{
+					console.log(player);
 				}
 			},
 			storage:function(player,content){
@@ -7522,31 +7808,53 @@
 					}
 					player.storage[content[0]]=content[1];
 				}
+				else{
+					console.log(player);
+				}
 			},
 			markId:function(player,content){
-				player.mark(get.infoCard(content[0]),content[1]);
+				if(player&&content){
+					player.mark(get.infoCard(content[0]),content[1]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			unmarkId:function(player,content){
-				player.unmark(get.infoCard(content[0]),content[1]);
+				if(player&&content){
+					player.unmark(get.infoCard(content[0]),content[1]);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			lose:function(player,info){
-				var hs=info[0],es=info[1],js=info[2];
-				var phs=player.get('h'),pes=player.get('e'),pjs=player.get('j');
-				var checkMatch=function(l1,l2){
-					for(var i=0;i<l1.length;i++){
-						for(var j=0;j<l2.length;j++){
-							if(l2[j].suit==l1[i][0]&&l2[j].number==l1[i][1]&&l2[j].name==l1[i][2]){
-								l2[j].delete();
-								break;
+				if(player&&info){
+					var hs=info[0],es=info[1],js=info[2];
+					var phs=player.get('h'),pes=player.get('e'),pjs=player.get('j');
+					var checkMatch=function(l1,l2){
+						for(var i=0;i<l1.length;i++){
+							for(var j=0;j<l2.length;j++){
+								if(l2[j].suit==l1[i][0]&&l2[j].number==l1[i][1]&&l2[j].name==l1[i][2]){
+									l2[j].delete();
+									break;
+								}
 							}
 						}
 					}
+					checkMatch(hs,phs);
+					checkMatch(es,pes);
+					checkMatch(js,pjs);
 				}
-				checkMatch(hs,phs);
-				checkMatch(es,pes);
-				checkMatch(js,pjs);
+				else{
+					console.log(player);
+				}
 			},
 			loseAfter:function(player){
+				if(!player){
+					console.log('loseAfter');
+					return;
+				}
 				for(var i=player.node.handcards1.childNodes.length-1;i>0;i--){
 					if(player.node.handcards1.childNodes[i].classList.contains('removing')==false){
 						player.node.handcards1.childNodes[i].animate('last');
@@ -7561,26 +7869,41 @@
 				}
 			},
 			link:function(player,bool){
-				if(bool){
-					player.classList.add('linked');
+				if(player&&player.classList){
+					if(bool){
+						player.classList.add('linked');
+					}
+					else{
+						player.classList.remove('linked');
+					}
 				}
 				else{
-					player.classList.remove('linked');
+					console.log(player);
 				}
 			},
 			turnOver:function(player,bool){
-				if(bool){
-					player.classList.add('turnedover');
+				if(player&&player.classList){
+					if(bool){
+						player.classList.add('turnedover');
+					}
+					else{
+						player.classList.remove('turnedover');
+					}
 				}
 				else{
-					player.classList.remove('turnedover');
+					console.log(player);
 				}
 			},
 			showCards:function(player,info){
-				var dialog=ui.create.dialog(info[0],get.infoCards(info[1]));
-				setTimeout(function(){
-					dialog.close();
-				},1000);
+				if(info){
+					var dialog=ui.create.dialog(info[0],get.infoCards(info[1]));
+					setTimeout(function(){
+						dialog.close();
+					},1000);
+				}
+				else{
+					console.log(player);
+				}
 			},
 			cardDialog:function(content){
 				if(Array.isArray(content)){
@@ -7606,6 +7929,10 @@
 			swapSeat:function(content){
 				var player1=game.playerMap[content[0]];
 				var player2=game.playerMap[content[1]];
+				if(!player1||!player2){
+					console.log(content);
+					return;
+				}
 				var temp1,pos,i,num;
 				temp1=player1.dataset.position;
 				player1.dataset.position=player2.dataset.position;
@@ -7633,56 +7960,66 @@
 				}
 			},
 			swapControl:function(player,hs){
-				var cards=get.infoCards(hs);
-				player.node.handcards1.innerHTML='';
-				player.node.handcards2.innerHTML='';
-				player.directgain(cards);
+				if(player&&player.node){
+					var cards=get.infoCards(hs);
+					player.node.handcards1.innerHTML='';
+					player.node.handcards2.innerHTML='';
+					player.directgain(cards,false);
 
-				game.me.node.handcards1.delete();
-				game.me.node.handcards2.delete();
-				game.me=player;
-				ui.handcards1=player.node.handcards1.animate('start').fix();
-				ui.handcards2=player.node.handcards2.animate('start').fix();
-				ui.me.appendChild(ui.handcards1);
-				ui.me.appendChild(ui.handcards2);
+					game.me.node.handcards1.delete();
+					game.me.node.handcards2.delete();
+					game.me=player;
+					ui.handcards1=player.node.handcards1.animate('start').fix();
+					ui.handcards2=player.node.handcards2.animate('start').fix();
+					ui.me.appendChild(ui.handcards1);
+					ui.me.appendChild(ui.handcards2);
 
-				ui.updateh(true);
-				if(lib.config.mode=='chess'){
-					ui.create.fakeme();
+					ui.updateh(true);
+					if(lib.config.mode=='chess'){
+						ui.create.fakeme();
+					}
+				}
+				else{
+					console.log(player);
 				}
 			},
 			onSwapControl:function(){
 				game.onSwapControl();
 			},
 			swapPlayer:function(player,hs){
-				var cards=get.infoCards(hs);
-				player.node.handcards1.innerHTML='';
-				player.node.handcards2.innerHTML='';
-				player.directgain(cards);
+				if(player&&player.node){
+					var cards=get.infoCards(hs);
+					player.node.handcards1.innerHTML='';
+					player.node.handcards2.innerHTML='';
+					player.directgain(cards,false);
 
-				var pos=parseInt(player.dataset.position);
-				var num=game.players.length+game.dead.length;
-				var players=game.players.concat(game.dead);
-				var temp;
-				for(var i=0;i<players.length;i++){
-					temp=parseInt(players[i].dataset.position)-pos;
-					if(temp<0) temp+=num;
-					players[i].dataset.position=temp;
+					var pos=parseInt(player.dataset.position);
+					var num=game.players.length+game.dead.length;
+					var players=game.players.concat(game.dead);
+					var temp;
+					for(var i=0;i<players.length;i++){
+						temp=parseInt(players[i].dataset.position)-pos;
+						if(temp<0) temp+=num;
+						players[i].dataset.position=temp;
+					}
+					game.me.node.handcards1.delete();
+					game.me.node.handcards2.delete();
+					game.me=player;
+					ui.handcards1=player.node.handcards1.animate('start').fix();
+					ui.handcards2=player.node.handcards2.animate('start').fix();
+					ui.me.appendChild(ui.handcards1);
+					ui.me.appendChild(ui.handcards2);
+
+					ui.updateh(true);
+
+					game.playerMap={};
+					var players=game.players.concat(game.dead);
+					for(var i=0;i<players.length;i++){
+						game.playerMap[players[i].dataset.position]=players[i];
+					}
 				}
-				game.me.node.handcards1.delete();
-				game.me.node.handcards2.delete();
-				game.me=player;
-				ui.handcards1=player.node.handcards1.animate('start').fix();
-				ui.handcards2=player.node.handcards2.animate('start').fix();
-				ui.me.appendChild(ui.handcards1);
-				ui.me.appendChild(ui.handcards2);
-
-				ui.updateh(true);
-
-				game.playerMap={};
-				var players=game.players.concat(game.dead);
-				for(var i=0;i<players.length;i++){
-					game.playerMap[players[i].dataset.position]=players[i];
+				else{
+					console.log(player);
 				}
 			},
 			over:function(str){
@@ -7694,6 +8031,9 @@
 		reload:function(){
 			if(_status){
 				_status.reloading=true;
+			}
+			if(_status.video&&!_status.replayvideo){
+				localStorage.removeItem(lib.configprefix+'playbackmode');
 			}
 			window.location.reload();
 		},
@@ -8304,7 +8644,11 @@
 				lib.videos.unshift(newvid);
 				store.put(newvid);
 			}
-			if(ui.auto) ui.auto.hide();
+			_status.auto=false;
+			if(ui.auto){
+				ui.auto.classList.remove('glow');
+				ui.auto.hide();
+			}
 			if(ui.wuxie) ui.wuxie.hide();
 
 			if(lib.storage.test){
@@ -8447,7 +8791,7 @@
 			time=time*lib.config.duration+time2;
 			_status.timeout=setTimeout(game.resume,time);
 		},
-		delayx:function(time){
+		delayx:function(time,time2){
 			if(typeof time!='number') time=1;
 			switch(lib.config.game_speed){
 				case 'vslow':time*=2.5;break;
@@ -8455,7 +8799,7 @@
 				case 'fast':time*=0.7;break;
 				case 'vfast':time*=0.4;break;
 			}
-			return game.delay(time);
+			return game.delay(time,time2);
 		},
 		check:function(event){
 			var i,j,range;
@@ -10136,6 +10480,7 @@
 					case 'small':ui.window.style.zoom=0.95;break;
 					case 'big':ui.window.style.zoom=1.05;break;
 					case 'vbig':ui.window.style.zoom=1.1;break;
+					case 'ebig':ui.window.style.zoom=1.2;break;
 					default:ui.window.style.zoom=1;
 				}
 				// if(true||lib.config.no_ios_zoom){
@@ -10681,7 +11026,7 @@
 
 				ui.replay=ui.create.system('重来',game.reload,true);
 				ui.config2=ui.create.system('选项',ui.click.config);
-				ui.pause=ui.create.system('历史',ui.click.pause);
+				ui.pause=ui.create.system('暂停',ui.click.pause);
 				if(!lib.config.touchscreen){
 					lib.setPopped(ui.pause,ui.click.pausehistory,220,400);
 				}
@@ -10829,6 +11174,7 @@
 						menuTabBar.style.left=(config.bar||0)+'px';
 		                var menuContent=ui.create.div('.menu-content',menu);
 		                var clickTab=function(){
+							if(this.classList.contains('disabled')) return;
 		                    var active=this.parentNode.querySelector('.active');
 		                    if(active){
 		                        active.classList.remove('active');
@@ -11172,7 +11518,9 @@
 									cfg._name=j;
 									var config=lib.config;
 	                                if(!config.hasOwnProperty(j)){
-										game.saveConfig(j,cfg.init);
+										if(cfg.type!='autoskill'&&cfg.type!='banskill'){
+											game.saveConfig(j,cfg.init);
+										}
 	                                }
 	                                else{
 	                                    cfg.init=config[j];
@@ -11640,6 +11988,14 @@
 								checkCheat();
 							};
 							menuUpdates.push(function(){
+								if(_status.video){
+									node.classList.add('off');
+									node.classList.remove('active');
+									node.remove();
+									page.remove();
+									cheatButton.style.display='none';
+									return;
+								}
 								var list=[];
 								for(var i=0;i<game.players.length;i++){
 									if(lib.character[game.players[i].name]&&game.players[i].isAlive()){
@@ -11689,7 +12045,10 @@
 										list.push(game.players[i]);
 									}
 								}
-								if(list.length&&game.phaseNumber&&!_status.event.isMine()){
+								if(_status.video){
+									node.remove();
+								}
+								if(!_status.video&&list.length&&game.phaseNumber&&!_status.event.isMine()){
 									node.classList.remove('off');
 									row3.innerHTML='';
 									var buttons=ui.create.buttons(list,'player',row3,true);
@@ -11872,9 +12231,18 @@
 										saveButton.listen(function(){
 											var current=this.parentNode.querySelector('.videonode.active');
 											if(current){
-												game.export(lib.init.encode(JSON.stringify(current.link)),'noname-video');
+												game.export(lib.init.encode(JSON.stringify(current.link)),
+												'无名杀 - 录像 - '+current.link.name[0]+' - '+current.link.name[1]);
 											}
 										});
+
+										ui.updateVideoMenu=function(){
+											node.classList.add('active');
+											rightPane.appendChild(page);
+											playButton.style.display='';
+											deleteButton.style.display='';
+											saveButton.style.display='';
+										}
 									}
 						        };
 							});
@@ -12101,7 +12469,7 @@
 					hp:ui.create.div('.hp',node),
 					name:ui.create.div('.name',node),
 					count:ui.create.div('.count',node).hide(),
-					equips:ui.create.div('.equips',node),
+					equips:ui.create.div('.equips',node).hide(),
 					judges:ui.create.div('.judges',node),
 					marks:ui.create.div('.marks',node),
 					handcards1:ui.create.div('#handcards1'),
@@ -12244,7 +12612,7 @@
 				}
 			},
 			pausehistory:function(){
-				if(!lib.config.auto_popped) return;
+				if(!lib.config.auto_popped_history) return;
 				if(!ui.sidebar.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.style.maxHeight='400px';
@@ -12261,7 +12629,7 @@
 				return uiintro;
 			},
 			pauseconfig:function(){
-				if(!lib.config.auto_popped) return;
+				if(!lib.config.auto_popped_config) return;
 				// if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
 				var rows=Math.ceil(lib.config.all.mode.length/3);
@@ -12280,6 +12648,7 @@
 					}
 					uiintro.add(node);
 				}
+				if(_status.video) return uiintro;
 
 				var auto=null;
 				var ng=null;
@@ -12640,7 +13009,7 @@
 							var translate=ddialog._dragtransform.slice(0);
 							translate[0]+=e.x-ddialog._dragorigin.x;
 							translate[1]+=e.y-ddialog._dragorigin.y;
-							ddialog.style.webkitTransform='translate('+translate[0]+'px,'+translate[1]+'px)'
+							ddialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)'
 						}
 						_status.clicked=true;
 					}
@@ -12705,7 +13074,7 @@
 						var translate=ddialog._dragtransform;
 						translate[0]+=e.x-ddialog._dragorigin.x;
 						translate[1]+=e.y-ddialog._dragorigin.y;
-						ddialog.style.webkitTransform='translate('+translate[0]+'px,'+translate[1]+'px)';
+						ddialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 						delete ddialog._dragorigin;
 					}
 					delete _status.draggingdialog;
@@ -13598,17 +13967,42 @@
 					ui.background=ui.create.div('.background');
 
 					switch (lib.config.image_background_filter){
-						case 'blur':ui.background.style.webkitFilter='blur(8px)';
-							ui.background.style.webkitTransform='scale(1.05)';break;
-						case 'gray':ui.background.style.webkitFilter='grayscale(1)';break;
-						case 'sepia':ui.background.style.webkitFilter='sepia(0.5)';break;
-						case 'invert':ui.background.style.webkitFilter='invert(1)';break;
-						case 'saturate':ui.background.style.webkitFilter='saturate(5)';break;
-						case 'contrast':ui.background.style.webkitFilter='contrast(1.4)';break;
-						case 'hue':ui.background.style.webkitFilter='hue-rotate(180deg)';break;
-						case 'brightness':ui.background.style.webkitFilter='brightness(5)';break;
-						default:ui.background.style.webkitFilter='';
-						ui.background.style.webkitTransform='';
+						case 'blur':
+							ui.background.style.filter='blur(8px)';
+							ui.background.style.webkitFilter='blur(8px)';
+							ui.background.style.transform='scale(1.05)';break;
+						case 'gray':
+							ui.background.style.filter='grayscale(1)';
+							ui.background.style.webkitFilter='grayscale(1)';
+							break;
+						case 'sepia':
+							ui.background.style.filter='sepia(0.5)';
+							ui.background.style.webkitFilter='sepia(0.5)';
+							break;
+						case 'invert':
+							ui.background.style.filter='invert(1)';
+							ui.background.style.webkitFilter='invert(1)';
+							break;
+						case 'saturate':
+							ui.background.style.filter='saturate(5)';
+							ui.background.style.webkitFilter='saturate(5)';
+							break;
+						case 'contrast':
+							ui.background.style.filter='contrast(1.4)';
+							ui.background.style.webkitFilter='contrast(1.4)';
+							break;
+						case 'hue':
+							ui.background.style.filter='hue-rotate(180deg)';
+							ui.background.style.webkitFilter='hue-rotate(180deg)';
+							break;
+						case 'brightness':
+							ui.background.style.filter='brightness(5)';
+							ui.background.style.webkitFilter='brightness(5)';
+							break;
+						default:
+							ui.background.style.filter='';
+							ui.background.style.webkitFilter='';
+							ui.background.style.transform='';
 					}
 
 					document.body.insertBefore(ui.background,document.body.firstChild);
@@ -13909,6 +14303,13 @@
 				if(_status.clickedplayer){
 					_status.clickedplayer=false;
 					return;
+				}
+				if(ui.currentpopped){
+					if(ui.currentpopped._uiintro){
+						ui.currentpopped._uiintro.delete();
+						delete ui.currentpopped._uiintro;
+					}
+					delete ui.currentpopped;
 				}
 				switch(lib.config.right_click){
 					case 'pause':ui.click.pause();break;
@@ -15601,7 +16002,7 @@
 					str+='translate(0,'+parseInt(transform.top)+'px) ';
 				}
 			}
-			this.style.webkitTransform=str;
+			this.style.transform=str;
 			return this;
 		};
 		HTMLTableElement.prototype.get=function(row,col){

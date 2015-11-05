@@ -184,10 +184,8 @@ character.refresh={
 				trigger.finish();
 				"step 1"
 				event.cards=get.cards(3);
-				event.dialog=ui.create.dialog('裸衣',event.cards);
-				game.delay(2);
+				player.showCards(event.cards,'裸衣');
 				"step 2"
-				event.dialog.close();
 				for(var i=0;i<cards.length;i++){
 					if(get.type(cards[i],'trick')=='trick'&&cards[i].name!='juedou'){
 						ui.discardPile.appendChild(cards[i]);

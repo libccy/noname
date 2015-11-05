@@ -70,7 +70,8 @@
     border-radius:0px !important;
     top:0;
     left:0;
-    transition: transform 0.5s;
+    transition-property: opacity,transform;
+    transition-duration: 0.5s;
     pointer-events: auto;
 }
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.judges,

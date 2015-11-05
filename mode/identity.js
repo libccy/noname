@@ -43,6 +43,7 @@ mode.identity={
 				}
 				"step 1"
 				if(lib.storage.test){
+					lib.config.game_speed='vfast';
 					_status.auto=true;
 					ui.auto.classList.add('glow');
 				}
@@ -87,7 +88,7 @@ mode.identity={
 				}
 				lib.config.ai_guess=true;
 				event.trigger('gameStart');
-				
+
 				var players=get.players(lib.sort.position);
 				var info=[];
 				for(var i=0;i<players.length;i++){
