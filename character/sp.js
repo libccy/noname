@@ -2006,7 +2006,7 @@ character.sp={
 				"step 1"
 				if(result.bool){
 					event.card=result.buttons[0].link;
-					player.respond(event.card);
+					player.respond(event.card,'highlight');
 				}
 				else{
 					event.finish();

@@ -78,6 +78,12 @@ card.standard={
 				else{
 					var next=target.chooseToRespond({name:'shan'});
 					next.ai=function(){
+						var sks=target.get('s');
+						if(sks.contains('leiji')||
+							sks.contains('diyleiji')||
+							sks.contains('lingbo')){
+							return 1;
+						}
 						if(ai.get.damageEffect(target,player,target,card.nature)>=0) return -1;
 						return 1;
 					};
@@ -191,9 +197,12 @@ card.standard={
 			},
 			ai:{
 				basic:{
-					order:2,
-					useful:[8,5],
-					value:[8,5],
+					order:function(card,player){
+						if(player.hasSkillTag('pretao')) return 5;
+						return 2;
+					},
+					useful:[8,6],
+					value:[8,6],
 				},
 				result:{
 					target:function(player,target){
@@ -217,7 +226,7 @@ card.standard={
 						}
 						if(target.hp<0&&target!=player&&target.identity!='zhu') return 0;
 						var att=ai.get.attitude(player,target);
-						if(att<3&&att>=0) return 0;
+						if(att<3&&att>=0&&player!=target) return 0;
 						var tri=_status.event.parent._trigger;
 						if(lib.config.mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
@@ -542,6 +551,8 @@ card.standard={
 				var next=target.chooseToRespond({name:'sha'});
 				next.ai=function(card){
 					if(ai.get.damageEffect(target,player,target)>=0) return 0;
+					if(player.get('s').contains('xinwuyan')) return 0;
+					if(target.get('s').contains('xinwuyan')) return 0;
 					return 1;
 				};
 				next.autochoose=lib.filter.autoRespondSha;
@@ -593,6 +604,8 @@ card.standard={
 				var next=target.chooseToRespond({name:'shan'});
 				next.ai=function(card){
 					if(ai.get.damageEffect(target,player,target)>=0) return 0;
+					if(player.get('s').contains('xinwuyan')) return 0;
+					if(target.get('s').contains('xinwuyan')) return 0;
 					return 1;
 				};
 				next.autochoose=lib.filter.autoRespondShan;
@@ -676,6 +689,8 @@ card.standard={
 				else{
 					var next=event.turn.chooseToRespond({name:'sha'});
 					next.ai=function(card){
+						if(player.get('s').contains('xinwuyan')) return 0;
+						if(target.get('s').contains('xinwuyan')) return 0;
 						if(event.turn==target){
 							if(ai.get.attitude(target,player)<0){
 								return ai.get.unuseful2(card)
@@ -783,7 +798,24 @@ card.standard={
 						}
 						return -1.5;
 					},
-					player:1
+					player:function(player,target){
+						if(ai.get.attitude(player,target)<0&&!target.num('he')){
+							return 0;
+						}
+						if(ai.get.attitude(player,target)>1){
+							var js=target.get('j');
+							if(js.length){
+								var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
+								if(jj.name=='shunshou') return 1;
+								if(js.length==1&&ai.get.effect(target,jj,target,player)>=0){
+									return 0;
+								}
+								return 1;
+							}
+							return 0;
+						}
+						return 1;
+					}
 				},
 				tag:{
 					loseCard:1,
@@ -1119,7 +1151,7 @@ card.standard={
 						if(player.skills.contains('jiu')||
 						player.skills.contains('tianxianjiu')||
 						trigger.target.hp==1){
-							return 7-ai.get.value(card)
+							return 8-ai.get.value(card)
 						}
 						return 5-ai.get.value(card)
 					}
@@ -1157,7 +1189,14 @@ card.standard={
 			audio:true,
 			content:function(){
 				"step 0"
-				player.chooseButton(ui.create.dialog('选择要弃置的马',trigger.target.get('e',{subtype:['equip3','equip4']})));
+				var att=(ai.get.attitude(player,trigger.target)<=0);
+				player.chooseButton(ui.create.dialog('选择要弃置的马',
+				trigger.target.get('e',{subtype:['equip3','equip4']}))).ai=function(button){
+					if(att){
+						return ai.get.buttonValue(button);
+					}
+					return 0;
+				};
 				"step 1"
 				if(result.bool){
 					player.logSkill('qilin_skill');
@@ -1271,6 +1310,13 @@ card.standard={
 						if(info.ai&&info.ai.wuxie){
 							var aiii=info.ai.wuxie(trigger.target,trigger.card,trigger.player,_status.event.player,state);
 							if(typeof aiii=='number') return aiii;
+						}
+						if(info.multitarget){
+							var eff=0;
+							for(var i=0;i<trigger.targets.length;i++){
+								eff+=ai.get.effect(trigger.targets[i],trigger.card,trigger.player,_status.event.player)
+							}
+							return -eff*state;
 						}
 						if(Math.abs(ai.get.attitude(_status.event.player,trigger.target))<3) return 0;
 						return -ai.get.effect(trigger.target,trigger.card,trigger.player,_status.event.player)*state;

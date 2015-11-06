@@ -81,7 +81,7 @@ card.ex={
 						var equip1=player.get('e','1');
 						if(equip1&&equip1.name=='qinggang') return 1;
 						if(player.num('s','unequip')) return;
-						if(card.name=='sha'&&get.color(card)=='black') return 0;
+						if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
 					}
 				}
 			}

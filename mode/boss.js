@@ -290,7 +290,7 @@ mode.boss={
 
 				game.arrangePlayers();
 				for(var i=0;i<game.players.length;i++){
-					ui.create.div('.action',game.players[i].node.avatar).innerHTML='行动';
+					game.players[i].node.action.innerHTML='行动';
 				}
 
 				var players=get.players(lib.sort.position);

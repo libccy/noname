@@ -478,6 +478,7 @@ character.mountain={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
+						if(!target.hasFriend()) return;
 						if(get.tag(card,'loseCard')&&_status.currentPhase!=target&&target.num('he')){
 							return [0.5,Math.max(2,target.num('h'))];
 						}

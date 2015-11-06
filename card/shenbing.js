@@ -71,7 +71,7 @@ card.shenbing={
 				nothunder:true,
 				effect:{
 					target:function(card,player,target,current){
-						if(get.tag(card,'natureDamage')) return 0;
+						if(get.tag(card,'natureDamage')) return 'zerotarget';
 						if(card.name=='tiesuo'){
 							return [0,0];
 						}

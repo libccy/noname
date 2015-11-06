@@ -235,7 +235,7 @@ character.extra={
 				};
 				"step 1"
 				if(result.bool){
-					player.respond(result.cards);
+					player.respond(result.cards,'highlight');
 				}
 				else{
 					event.finish();

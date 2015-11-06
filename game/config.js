@@ -207,10 +207,12 @@ window.config={
 	background_music:'music_default',
 	background_audio:true,
 	background_speak:true,
+	glow_phase:true,
 
 
 	theme:'woodden',
 	layout:'mobile',
+	card_style:'default',
 
 	image_character:'default',
 	image_background:'default',

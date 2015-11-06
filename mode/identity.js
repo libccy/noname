@@ -254,6 +254,10 @@ mode.identity={
 				var list2=[];
 				var list3=[];
 				var identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+				if(get.config('player_number')=='8'&&get.config('double_nei')){
+					identityList.remove('fan');
+					identityList.push('nei');
+				}
 				var addSetting=function(dialog){
 					dialog.add('选择身份');
 					var table=document.createElement('table');
@@ -612,11 +616,19 @@ mode.identity={
 					return ai.get.realAttitude(from,to)+difficulty*1.5;
 				}
 				else{
+					if(from.identity=='zhong'&&to.ai.shown==0&&from.ai.tempIgnore&&
+						!from.ai.tempIgnore.contains(to)){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].ai.shown==0&&game.players[i].identity=='fan'){
+								return -0.1+difficulty*1.5;
+							}
+						}
+					}
 					return ai.get.realAttitude(from,to)*to.ai.shown+difficulty*1.5;
 				}
 			},
 			realAttitude:function(from,to){
-				if(_status.currentPhase==from&&from.ai.tempIgnore&&from.ai.tempIgnore.contains(to)) return 0;
+				// if(_status.currentPhase==from&&from.ai.tempIgnore&&from.ai.tempIgnore.contains(to)) return 0;
 				var situation=ai.get.situation();
 				var identity=from.spy||from.identity;
 				var identity2=to.identity;
@@ -628,6 +640,7 @@ mode.identity={
 							case 'zhong': return 6;
 							case 'nei':
 								if(game.players.length==2) return -10;
+								if(get.population('fan')==0) return -0.5;
 								if(situation>1) return 0;
 								return Math.min(3,get.population('fan'));
 							case 'fan': return -4;
@@ -667,7 +680,8 @@ mode.identity={
 								if(get.population('fan')==0) num=-5;
 								else if(situation<=0) num=0;
 								else if(game.zhu&&game.zhu.hp<2) num=0;
-								else if(game.zhu&&game.zhu.hp==2) num=-0.5
+								else if(game.zhu&&game.zhu.hp==2) num=-1;
+								else if(game.zhu&&game.zhu.hp<=2&&situation>1) num=-1;
 								else num=-2;
 								if(strategy==2) num--;
 								if(strategy==3) num++;
@@ -675,13 +689,14 @@ mode.identity={
 							case 'nei':
 								if(from==to) return 10;
 								if(from.ai.friend.contains(to)) return 5;
+								if(get.population('fan')+get.population('zhong')>0) return 0;
 								return -1;
 							case 'fan':
 								if(strategy==5) return Math.max(-1,situation);
 								if(strategy==6) return Math.min(0,situation);
-								if((game.zhu&&game.zhu.hp<=2&&situation<=0)||situation<-1) num=-3;
+								if((game.zhu&&game.zhu.hp<=2&&situation<0)||situation<-1) num=-3;
 								else if(situation<0||get.population('zhong')==0) num=-2;
-								else if((game.zhu&&game.zhu.hp>4&&situation>0)||situation>1) num=1;
+								else if((game.zhu&&game.zhu.hp>=4&&situation>0)||situation>1) num=1;
 								else num=0;
 								if(strategy==2) num++;
 								if(strategy==3) num--;
@@ -708,10 +723,11 @@ mode.identity={
 				var zhuzhong=0,total=0,zhu,fan=0;
 				for(i=0;i<game.players.length;i++){
 					player=game.players[i];
-					j=player.get('h').length+player.get('e').length*1.5+player.hp*2;
-					if(player.skills.contains('benghuai')){
-						j-=player.hp/1.5;
+					var php=player.hp;
+					if(player.skills.contains('benghuai')&&php>4){
+						php=4;
 					}
+					j=player.get('h').length+player.get('e').length*1.5+php*2;
 					if(player.identity=='zhu'){
 						zhuzhong+=j*1.2+5;
 						total+=j*1.2+5;

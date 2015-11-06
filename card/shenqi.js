@@ -521,6 +521,7 @@ card.shenqi={
 				order:7,
 				result:{
 					target:function(player,target){
+						if(player.num('h')<=1) return 0;
 						if(ai.get.attitude(player,target)>=0) return 0;
 						for(var i=0;i<game.players.length;i++){
 							if(player!=game.players[i]&&

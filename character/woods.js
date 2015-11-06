@@ -141,7 +141,7 @@ character.woods={
 					event.player.num('h')&&player.num('h'));
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.player)<=0;
+				return ai.get.attitude(player,event.player)<0&&player.num('h')>1;
 			},
 			priority:5,
 			content:function(){

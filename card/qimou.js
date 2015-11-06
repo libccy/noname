@@ -272,6 +272,9 @@ card.qimou={
 						return -0.5;
 					}
 				},
+				wuxie:function(){
+					return 0;
+				},
 				useful:3,
 				value:7
 			}

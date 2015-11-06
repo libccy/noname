@@ -706,6 +706,7 @@ character.swd={
 					if(ai.get.effect(trigger.target,{name:'sha'},player,player)>0){
 						return 7-ai.get.value(card);
 					}
+					return 0;
 				}
 				"step 1"
 				if(result.bool){
@@ -3028,7 +3029,7 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.respond(result.cards);
+					player.respond(result.cards,'highlight');
 				}
 				else{
 					event.finish();
@@ -6112,7 +6113,7 @@ character.swd={
 				order:1,
 				result:{
 					target:function(player,target){
-						var eff=ai.get.damageEffect(target,player);
+						var eff=ai.get.damageEffect(target,player,target,'fire');
 						if(eff>=0) return eff+1;
 						var judges=target.get('j');
 						if(!judges.length) return 0;
@@ -6248,6 +6249,10 @@ character.swd={
 					event.card=result.buttons[0].link;
 					if(get.owner(event.card)) get.owner(event.card).discard(event.card);
 					else trigger.player.$throw(event.card,1000);
+					if(event.card.clone){
+						event.card.clone.classList.add('thrownhighlight');
+						game.addVideo('highlightnode',player,get.cardInfo(event.card));
+					}
 				}
 				"step 2"
 				if(event.card){
@@ -6463,7 +6468,8 @@ character.swd={
 				},
 				threaten:function(player,target){
 					if(target.hp<target.maxHp-1) return 1.5;
-				}
+				},
+				pretao:true
 			}
 		},
 		guxing3:{

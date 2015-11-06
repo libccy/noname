@@ -953,6 +953,10 @@ character.hearth={
 				"step 0"
 				ui.discardPile.appendChild(player.storage.mdzhoufu2);
 				player.$throw(player.storage.mdzhoufu2);
+				if(player.storage.mdzhoufu2.clone){
+					player.storage.mdzhoufu2.clone.classList.add('thrownhighlight');
+					game.addVideo('highlightnode',player,get.cardInfo(player.storage.mdzhoufu2));
+				}
 				if(player.storage.mdzhoufu3.isAlive()){
 					// player.storage.mdzhoufu3.draw();
 					player.storage.mdzhoufu3.gain(player.judging,'gain2');

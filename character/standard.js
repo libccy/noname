@@ -161,7 +161,7 @@ character.standard={
 				};
 				"step 1"
 				if(result.bool){
-					player.respond(result.cards);
+					player.respond(result.cards,'highlight');
 				}
 				else{
 					event.finish();
@@ -349,6 +349,7 @@ character.standard={
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
 							if(player.skills.contains('jueqing')) return [1,-2];
+							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,get.tag(card,'damage')*2];
 							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
 							if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
@@ -434,6 +435,15 @@ character.standard={
 					if(ui.selected.cards.length){
 						return -1;
 					}
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].get('s').contains('haoshi')&&
+							!game.players[i].isTurnedOver()&&
+							!game.players[i].num('j','lebu')&&
+							ai.get.attitude(player,game.players[i])>=3&&
+							ai.get.attitude(game.players[i],player)>=3){
+							return 11-ai.get.value(card);
+						}
+					}
 					if(player.num('h')>player.hp) return 10-ai.get.value(card);
 					if(player.num('h')>2) return 6-ai.get.value(card);
 					return -1;
@@ -455,13 +465,19 @@ character.standard={
 				}
 			},
 			ai:{
-				order:10,
+				order:function(skill,player){
+					if(player.hp<player.maxHp&&player.storage.rende<2&&player.num('h')>1){
+						return 10;
+					}
+					return 1;
+				},
 				result:{
 					target:function(player,target){
+						if(target.num('j','lebu')) return 0;
 						var nh=target.num('h');
 						var np=player.num('h');
 						if(player.hp==player.maxHp||player.storage.rende<0||player.num('h')<=1){
-							if(nh>=np-1&&np<=player.hp) return 0;
+							if(nh>=np-1&&np<=player.hp&&!target.get('s').contains('haoshi')) return 0;
 						}
 						return Math.max(1,5-nh);
 					}
@@ -553,6 +569,11 @@ character.standard={
 				return false;
 			},
 			filterTarget:function(card,player,target){
+				if(_status.event._backup&&
+					typeof _status.event._backup.filterTarget=='function'&&
+					!_status.event._backup.filterTarget({name:'sha'},player,target)){
+					return false;
+				}
 				return player.canUse({name:'sha'},target);
 			},
 			content:function(){
@@ -560,6 +581,7 @@ character.standard={
 				if(event.current==undefined) event.current=player.next;
 				if(event.current==player){
 					player.addTempSkill('jijiang3','phaseAfter');
+					event.parent.parent.step=0;
 					event.finish();
 				}
 				else if(event.current.group=='shu'){

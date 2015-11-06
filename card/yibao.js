@@ -246,6 +246,8 @@ card.yibao={
 				target.chooseToDiscard('he',[1,2]).ai=function(card){
 					if(target.hasSkillTag('nofire')) return 0;
 					if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
+					if(player.get('s').contains('xinwuyan')) return 0;
+					if(target.get('s').contains('xinwuyan')) return 0;
 					if(target.hasSkillTag('maixie')&&target.hp>1&&ui.selected.cards.length){
 						return 0;
 					}
@@ -311,6 +313,8 @@ card.yibao={
 				};
 				"step 2"
 				event.card2=result.cards[0];
+				ui.arena.classList.add('thrownhighlight');
+				game.addVideo('thrownhighlight1');
 				player.$compare(event.card1,target,event.card2);
 				game.delay(4);
 				"step 3"
@@ -333,6 +337,8 @@ card.yibao={
 					target.$gain2(event.card2);
 					target.addTempSkill('dujian2','phaseBegin');
 				}
+				ui.arena.classList.remove('thrownhighlight');
+				game.addVideo('thrownhighlight2');
 			},
 			ai:{
 				basic:{

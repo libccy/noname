@@ -1208,8 +1208,8 @@ mode.stone={
 				if(es.length){
 					player.getLeader().line(enemy);
 					game.delay();
-					enemy.gain(es,'gain2');
-					game.log(get.translation(event.enemy)+'将'+get.translation(es)+'收入手牌')
+					enemy.discard(es.randomGet());
+					// game.log(get.translation(event.enemy)+'将'+get.translation(es)+'收入手牌')
 				}
 			}
 		},
@@ -1450,7 +1450,7 @@ mode.stone={
 		stone_shujiang_info:'你出场时，已方主将可视为对一名敌方角色使用一张杀',
 
 		stone_wubing:'吴兵',
-		stone_wubing_info:'你出场时，敌方主将将装备区内的所有牌收入手牌',
+		stone_wubing_info:'你出场时，敌方主将随机弃置一张装备牌',
 		stone_wuguan:'吴官',
 		stone_wuguan_info:'你出场时，已方主将本回合手牌上限+2',
 		stone_wujiang:'吴将',

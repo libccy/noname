@@ -1719,38 +1719,37 @@ character.yijiang={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-						if(get.type(card)=='trick'&&player!=target) return [0,0,0,0];
+						if(get.type(card)=='trick'&&player!=target) return 'zeroplayertarget';
 					},
 					player:function(card,player,target,current){
-						if(get.type(card)=='trick'&&player!=target) return [0,0,0,0];
+						if(get.type(card)=='trick'&&player!=target) return 'zeroplayertarget';
 					}
 				}
 			}
 		},
 		xinwuyan:{
 			audio:2,
-			trigger:{target:'useCardToBefore',player:'useCardToBefore'},
+			trigger:{source:'damageBefore',player:'damageBefore'},
 			forced:true,
 			priority:15,
 			filter:function(event,player){
-				if(event.player==player&&event.target==player) return false;
-				return (get.type(event.card,'trick')=='trick'&&get.tag(event.card,'damage'));
-			},
-			check:function(event,player){
-				return ai.get.effect(event.target,event.card,event.player,player)<0;
+				return get.type(event.card,'trick')=='trick';
 			},
 			content:function(){
-				game.log(get.translation(player)+'发动了无言，'+get.translation(trigger.card)+'对'+get.translation(trigger.target)+'失效')
 				trigger.untrigger();
 				trigger.finish();
 			},
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-						if(get.type(card)=='trick'&&player!=target&&get.tag(card,'damage')) return [0,0,0,0];
+						if(get.type(card)=='trick'&&get.tag(card,'damage')){
+							return 'zeroplayertarget';
+						}
 					},
 					player:function(card,player,target,current){
-						if(get.type(card)=='trick'&&player!=target&&get.tag(card,'damage')) return [0,0,0,0];
+						if(get.type(card)=='trick'&&get.tag(card,'damage')){
+							return 'zeroplayertarget';
+						}
 					}
 				}
 			}
@@ -1895,7 +1894,7 @@ character.yijiang={
 				effect:{
 					target:function(card,player,target){
 						if(target.get('e','2')) return;
-						if(card.name=='sha'&&get.color(card)=='black') return 0;
+						if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
 					}
 				}
 			}

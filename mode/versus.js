@@ -365,7 +365,7 @@ mode.versus={
 				var num=lib.storage.number;
 				ui.create.players(num*2);
 				for(var i=0;i<game.players.length;i++){
-					ui.create.div('.action',game.players[i].node.avatar).innerHTML='行动';
+					game.players[i].node.action.innerHTML='行动';
 				}
 				if(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4){
 					ui.arena.dataset.number=parseInt(ui.arena.dataset.number)+1;

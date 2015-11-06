@@ -2086,6 +2086,12 @@ mode.chess={
 								!this.classList.contains('selected')) return;
 							_status.chessclicked=true;
 							this.classList.toggle('selected');
+							if(this.classList.contains('selected')){
+								this.style.transform='scale(0.85)';
+							}
+							else{
+								this.style.transform='scale(0.8)';
+							}
 							if(document.querySelectorAll('.player.selected').length>=3){
 								for(var i=0;i<event.arenachoicenodes.length;i++){
 									if(!event.arenachoicenodes[i].classList.contains('dead')){
@@ -2289,7 +2295,7 @@ mode.chess={
 						else{
 							nodes[i].style.opacity=1;
 							if(game.data.arena.acted.contains(nodes[i].name)){
-								var acted=ui.create.div('.action',nodes[i].node.avatar);
+								var acted=nodes[i].node.action;
 								acted.style.opacity=1;
 								acted.innerHTML='疲劳';
 								acted.dataset.nature='soilm';
@@ -2585,6 +2591,7 @@ mode.chess={
 					event.arenaback.style.opacity=1;
 					event.arenagiveup.replace('放弃',giveup);
 					for(var i=0;i<nodes.length;i++){
+						nodes[i].style.transform='scale(0.8)';
 						nodes[i].classList.remove('selected');
 						nodes[i].classList.remove('unselectable');
 					}

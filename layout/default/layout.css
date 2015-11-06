@@ -284,6 +284,19 @@ margin-bottom: 5px;
 	opacity: 0;
 	transform:scale(0.7);
 }
+.player>.cardeffect{
+	font-family: 'huangcao';
+	font-size:108px;
+	width: 100%;
+	text-align: center;
+	top:calc(50% - 54px);
+	left:0;
+	animation:cardeffect 1s;
+	-webkit-animation:cardeffect 1s;
+
+	animation-fill-mode: forwards;
+	-webkit-animation-fill-mode: forwards;
+}
 .player>.damage.damageadded{
 	opacity: 1;
 	transform:scale(1);
@@ -294,7 +307,7 @@ margin-bottom: 5px;
 .player.linked>.damage.damageadded{
 	transform:scale(1) rotate(90deg);
 }
-.avatar{width: 96px;height: 96px;left: 12px;top: 12px;overflow: hidden;}
+.avatar{width: 100px;height: 100px;left: 10px;top: 10px;overflow: hidden;}
 .avatar2{width: 42px;height: 42px;top: 70px;left: 70px;overflow: hidden;}
 .equips{width: 96px;height: 96px;right: 14px;top:12px;}
 .equips>div{width: 42px;height: 42px;margin: 0;position: absolute;}
@@ -509,6 +522,10 @@ margin-bottom: 5px;
 	-webkit-animation-fill-mode: forwards;
 }
 .card.thrown{position: absolute;opacity: 1;margin:0}
+#arena.thrownhighlight>.card.thrown:not(.thrownhighlight){
+	opacity: 0.5;
+	transform:scale(0.95);
+}
 .card.start{
 	animation: card_start 0.5s;
 	-webkit-animation: card_start 0.5s;
@@ -736,7 +753,8 @@ div[data-nature='soilm']{
 	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,rgba(128, 59, 2,1) 0 0 5px,
 		rgba(128, 59, 2,1) 0 0 5px,black 0 0 1px;
 }
-.player .identity[data-color="unknownx"]{
+.player .identity[data-color="unknownx"],
+div[data-nature='black']{
 	text-shadow: rgba(0,0,0,0.5) 0 0 2px,rgba(0,0,0,0.5) 0 0 5px,rgba(0,0,0,0.5) 0 0 10px,
 		rgba(0,0,0,0.5) 0 0 10px,rgba(0,0,0,0.5) 0 0 20px,rgba(0,0,0,0.5) 0 0 20px,black 0 0 1px;
 }
@@ -877,9 +895,16 @@ div[data-color="unknownm"]{
 .glow{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
 }
-.glow2{
+.glow2:not(.player.glow_phase)>.avatar{
 	/*-webkit-animation:control_glow 4s infinite;*/
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
+}
+.player:not(.glow_phase)>.avatar.glow2{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px, rgba(10, 155, 67, 1) 0 0 10px !important
+}
+.player:not(.selectable):not(.selected).glow_phase{
+    box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(235, 239, 59) 0 0 15px, rgb(199, 64, 64) 0 0 15px !important;
+	/*box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;*/
 }
 
 .control.blue{
@@ -902,6 +927,14 @@ div[data-color="unknownm"]{
 }
 
 /*--------动画--------*/
+@keyframes cardeffect{
+	0%{opacity: 0;transform: scale(0.8)}
+	2%{opacity: 1;transform: scale(1)}
+	50%{opacity: 1;transform: scale(1)}
+	100%{opacity: 0;transform: scale(0.8)}
+	/*from{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}
+	to{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important}*/
+}
 @keyframes control_glow{
 	0%{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px}
 	30%{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px}

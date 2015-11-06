@@ -25,8 +25,22 @@ card.extra={
 			},
 			ai:{
 				basic:{
-					useful:[5,1],
-					value:[5,1],
+					useful:function(card,i){
+						if(_status.event.player.hp>1){
+							if(i==0) return 5;
+							return 1;
+						}
+						if(i==0) return 7.3;
+						return 3;
+					},
+					value:function(card,player){
+						if(player.hp>1){
+							if(i==0) return 5;
+							return 1;
+						}
+						if(i==0) return 7.3;
+						return 3;
+					},
 				},
 				order:function(){
 					return lib.card.sha.ai.order+0.2;
@@ -269,6 +283,8 @@ card.extra={
 			ai:{
 				basic:{
 					equipValue:function(card,player){
+						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
+						if(ai.get.damageEffect(player,player,player,'fire')>=0) return 10;
 						var num=3;
 						for(var i=0;i<game.players.length;i++){
 							if(ai.get.attitude(game.players[i],player)<0) num--;
@@ -323,7 +339,8 @@ card.extra={
 			group:'jiu2'
 		},
 		jiu2:{
-			trigger:{player:'useCardAfter'},
+			trigger:{player:['useCardAfter','shaMiss']},
+			priority:2,
 			filter:function(event){
 				return (event.card&&(event.card.name=='sha'));
 			},
@@ -373,12 +390,12 @@ card.extra={
 				effect:{
 					target:function(card,player,target,current){
 						if(player.num('s','unequip')) return;
-						if(card.name=='nanman'||card.name=='wanjian') return 0;
+						if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
 						if(card.name=='sha'){
     						var equip1=player.get('e','1');
     						if(equip1&&equip1.name=='zhuque') return 2;
     						if(equip1&&equip1.name=='qinggang') return 1;
-							if(!card.nature) return 0;
+							if(!card.nature) return 'zerotarget';
 						}
 					}
 				}

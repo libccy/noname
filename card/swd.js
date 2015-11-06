@@ -406,6 +406,8 @@ card.swd={
 				var next=target.chooseToRespond({name:'sha'});
 				next.ai=function(card){
 					if(ai.get.damageEffect(target,player,target,'thunder')>=0) return 0;
+					if(player.get('s').contains('xinwuyan')) return 0;
+					if(target.get('s').contains('xinwuyan')) return 0;
 					return 1;
 				};
 				next.autochoose=lib.filter.autoRespondSha;
@@ -459,6 +461,8 @@ card.swd={
 				var next=target.chooseToRespond({name:'shan'});
 				next.ai=function(card){
 					if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
+					if(player.get('s').contains('xinwuyan')) return 0;
+					if(target.get('s').contains('xinwuyan')) return 0;
 					return 1;
 				};
 				next.autochoose=lib.filter.autoRespondShan;

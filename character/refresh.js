@@ -111,7 +111,7 @@ character.refresh={
 				};
 				"step 1"
 				if(result.bool){
-					player.respond(result.cards);
+					player.respond(result.cards,'highlight');
 				}
 				else{
 					event.finish();
@@ -125,6 +125,8 @@ character.refresh={
 					}
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
+					trigger.position.appendChild(result.cards[0]);
+					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(result.cards[0]));
 					game.delay(2);
 				}
 			},
@@ -518,7 +520,9 @@ character.refresh={
 			content:function(){
 				"step 0"
 				event.card=get.cards()[0];
-				event.node=event.card.copy('thrown','center',ui.arena).animate('start');
+				event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).animate('start');
+				ui.arena.classList.add('thrownhighlight');
+				game.addVideo('thrownhighlight1');
 				game.addVideo('centernode',null,get.cardInfo(event.card));
 				if(get.type(event.card,'trick')==get.type(trigger.card,'trick')){
 					player.chooseTarget('选择获得此牌的角色').ai=function(target){
@@ -558,6 +562,8 @@ character.refresh={
 					game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 				}
 				event.node.delete();
+				game.addVideo('thrownhighlight2');
+				ui.arena.classList.remove('thrownhighlight');
 			},
 			ai:{
 				effect:{
