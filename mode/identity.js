@@ -706,8 +706,10 @@ mode.identity={
 					case 'fan':
 						switch(identity2){
 							case 'zhu':
-								if(situation==1) return -6;
-								if(situation>1) return -5;
+								if(get.population('nei')>0){
+									if(situation==1) return -6;
+									if(situation>1) return -5;
+								}
 								return -10;
 							case 'zhong': return -7;
 							case 'nei':

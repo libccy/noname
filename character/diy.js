@@ -549,6 +549,9 @@ character.diy={
 				else{
 					event.finish();
 				}
+			},
+			ai:{
+				threaten:1.2
 			}
 		},
 		moshou:{

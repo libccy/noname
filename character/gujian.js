@@ -948,7 +948,7 @@ character.gujian={
 			}
 		},
 		yuling2:{
-			trigger:{player:['loseEnd','drawEnd']},
+			trigger:{player:['loseEnd','drawEnd'],global:'gameDrawAfter'},
 			check:function(event,player){
 				return player.num('h')<2;
 			},

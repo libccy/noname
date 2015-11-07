@@ -255,6 +255,7 @@ window.characterRank={
     ],
     bm:[
         'guohuai',
+        'diy_feishi',
         'sunluban',
         'caozhang',
         'pal_lixiaoyao',
@@ -264,7 +265,6 @@ window.characterRank={
         'pangtong',
         'zhugeliangwolong',
         'shen_guanyu',
-        'diy_feishi',
         'jiangfei',
         're_caocao',
         're_lvbu',

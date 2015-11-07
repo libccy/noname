@@ -968,7 +968,7 @@ character.mountain={
 							var mark=player.marks.huashen;
 							if(trigger.name=='game'){
 								mark.hide();
-								mark.style.transform='scale(0.8)';
+								// mark.style.transform='scale(0.8)';
 								mark.style.transition='all 0.3s';
 								setTimeout(function(){
 									mark.style.transition='all 0s';
@@ -980,7 +980,7 @@ character.mountain={
 									setTimeout(function(){
 										mark.style.transition='';
 										mark.show();
-										mark.style.transform='';
+										// mark.style.transform='';
 									},50);
 								},500);
 							}
