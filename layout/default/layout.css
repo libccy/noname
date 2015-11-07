@@ -28,6 +28,9 @@ table{table-layout: fixed;}
 	pointer-events: none;
 	position: absolute;
 }
+#arena.playerfocus>div:not(.playerfocus){
+	opacity: 0.3 !important;
+}
 #me,#mebg{width: 100%;height: 140px;top:calc(100% - 140px);left:0;}
 #mebg{z-index:-1}
 #handcards1,#handcards2{width: calc(50% - 140px);height: 127px;padding: 10px;}
@@ -709,6 +712,7 @@ div[data-nature='firem']{
 		rgba(232, 53, 53,1) 0 0 5px,black 0 0 1px;
 }
 .player .identity[data-color="zhong"],
+.player .identity[data-color="mingzhong"],
 .player .identity[data-color="qun"],
 div[data-nature='metal']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px,

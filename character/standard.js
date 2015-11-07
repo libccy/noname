@@ -46,7 +46,7 @@ character.standard={
 			unique:true,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
-				if(player.identity!='zhu') return false;
+				if(!player.isZhu) return false;
 				if(event.filterCard({name:'shan'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='wei') return true;
@@ -515,7 +515,7 @@ character.standard={
 			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
-				if(player.identity!='zhu') return false;
+				if(!player.isZhu) return false;
 				if(event.filterCard({name:'sha'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='shu') return true;
@@ -559,7 +559,7 @@ character.standard={
 			enable:'chooseToUse',
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
-				if(player!=game.zhu) return false;
+				if(!player.isZhu) return false;
 				if(player!=game.me&&player.skills.contains('jijiang3')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].group=='shu'&&game.players[i]!=player){
@@ -924,7 +924,7 @@ character.standard={
 			forced:true,
 			filter:function(event,player){
 				if(event.player==player) return false;
-				if(player.identity!='zhu') return false;
+				if(!player.isZhu) return false;
 				if(player.hp>0) return false;
 				if(event.player.group!='wu') return false;
 				return true;

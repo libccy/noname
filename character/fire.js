@@ -457,7 +457,7 @@ character.fire={
 		xueyi:{
 			mod:{
 				maxHandcard:function(player,num){
-					if(player.identity=='zhu'){
+					if(player.isZhu){
 						for(var i=0;i<game.players.length;i++){
 							if(player!=game.players[i]&&game.players[i].group=='qun') num+=2;
 						}

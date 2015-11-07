@@ -38,7 +38,12 @@ mode.identity={
 					event.finish();
 				}
 				else{
-					game.prepareArena();
+					if(get.config('identity_mode')=='zhong'){
+						game.prepareArena(8);
+					}
+					else{
+						game.prepareArena();
+					}
 					game.delay();
 				}
 				"step 1"
@@ -49,7 +54,7 @@ mode.identity={
 				}
 				game.chooseCharacter();
 				"step 2"
-				if(get.config('ai_identity')||game.players.length==2){
+				if(game.players.length==2){
 					game.showIdentity(true);
 				}
 				else{
@@ -58,7 +63,12 @@ mode.identity={
 					}
 				}
 				game.zhu.ai.shown=1;
-				if(get.config('enhance_zhu')&&get.population('fan')>=3){
+				if(game.zhu2){
+					game.zhong=game.zhu;
+					game.zhu=game.zhu2;
+					delete game.zhu2;
+				}
+				if(get.config('identity_mode')!='zhong'&&get.config('enhance_zhu')&&get.population('fan')>=3){
 					var skill;
 					switch(game.zhu.name){
 						case 'liubei':skill='jizhen';break;
@@ -101,8 +111,8 @@ mode.identity={
 				_status.videoInited=true,
 				game.addVideo('init',null,info);
 
-				game.gameDraw(game.zhu);
-				game.phaseLoop(game.zhu);
+				game.gameDraw(game.zhong||game.zhu);
+				game.phaseLoop(game.zhong||game.zhu);
 			}
 		},
 		showIdentity:function(me){
@@ -111,40 +121,16 @@ mode.identity={
 				game.players[i].identityShown=true;
 				game.players[i].ai.shown=1;
 				game.players[i].setIdentity(game.players[i].identity);
+				if(game.players[i].identity=='zhu'){
+					game.players[i].isZhu=true;
+				}
 			}
 		},
 		checkResult:function(){
-			if(get.population('zhong')==0||(get.population('fan')+get.population('nei')==0)){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].spy=='zhong'){
-						game.players[i].identity='zhong';
-						game.players[i].setIdentity();
-						game.players[i].draw(2);
-						delete game.players[i].spy;
-					}
-				}
-			}
-			if(get.population('fan')==0||game.zhu.isDead()){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].spy=='fan'){
-						game.players[i].identity='fan';
-						game.players[i].setIdentity();
-						game.players[i].draw(2);
-						delete game.players[i].spy;
-					}
-				}
-			}
-			if(get.population('fan')+get.population('zhong')==0&&game.zhu.isAlive()){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].spy=='nei'){
-						game.players[i].identity='nei';
-						game.players[i].setIdentity();
-						game.players[i].draw(2);
-						delete game.players[i].spy;
-					}
-				}
-			}
 			if(game.zhu.isAlive()&&get.population('fan')+get.population('nei')>0) return;
+			if(game.zhong){
+				game.zhong.identity='zhong';
+			}
 			if(lib.storage.test){
 				if(game.zhu.isAlive()){
 					console.log('主忠胜利');
@@ -198,10 +184,23 @@ mode.identity={
 				return game.players.randomGet(game.me,game.zhu);
 			};
 			next.ai=function(player,list,list2){
-				if(player.identity=='zhu'){
+				if(_status.event.zhongmode){
+					if(get.config('double_character')){
+						player.init(list[0],list[1]);
+					}
+					else{
+						player.init(list[0]);
+					}
+					if(player.identity=='mingzhong'){
+						player.hp++;
+						player.maxHp++;
+						player.update();
+					}
+				}
+				else if(player.identity=='zhu'){
 					list2.randomSort();
 					var choice,choice2;
-					if(Math.random()-0.8<0&&list2.length){
+					if(!_status.event.zhongmode&&Math.random()-0.8<0&&list2.length){
 						choice=list2[0];
 						choice2=list[0];
 						if(choice2==choice){
@@ -253,11 +252,19 @@ mode.identity={
 				var list;
 				var list2=[];
 				var list3=[];
-				var identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
-				if(get.config('player_number')=='8'&&get.config('double_nei')){
-					identityList.remove('fan');
-					identityList.push('nei');
+				var identityList;
+				if(get.config('identity_mode')=='zhong'){
+					event.zhongmode=true;
+					identityList=['zhu','zhong','mingzhong','nei','fan','fan','fan','fan'];
 				}
+				else{
+					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+					if(get.config('player_number')=='8'&&get.config('double_nei')){
+						identityList.remove('fan');
+						identityList.push('nei');
+					}
+				}
+
 				var addSetting=function(dialog){
 					dialog.add('选择身份');
 					var table=document.createElement('table');
@@ -265,8 +272,15 @@ mode.identity={
 					table.style.maxWidth='500px';
 					var tr=document.createElement('tr');
 					table.appendChild(tr);
-					var list=['random','zhu','zhong','nei','fan'];
-					for(var i=0;i<5;i++){
+					var list;
+					if(event.zhongmode){
+						list=['random','zhu','mingzhong','zhong','nei','fan'];
+					}
+					else{
+						list=['random','zhu','zhong','nei','fan'];
+					}
+
+					for(var i=0;i<list.length;i++){
 						var td=document.createElement('td');
 						tr.appendChild(td);
 						td.style.width='40px';
@@ -280,6 +294,7 @@ mode.identity={
 							if(_status.dragged) return;
 							if(game.zhu.name){
 								game.zhu.uninit();
+								delete game.zhu.isZhu;
 								delete game.zhu.identityShown;
 							}
 							dialog.close();
@@ -362,13 +377,24 @@ mode.identity={
 				for(i=0;i<game.players.length;i++){
 					game.players[i].identity=identityList[i];
 					game.players[i].setIdentity('cai');
-					if(identityList[i]=='zhu'){
-						game.zhu=game.players[i];
+					if(event.zhongmode){
+						if(identityList[i]=='mingzhong'){
+							game.zhu=game.players[i];
+						}
+						else if(identityList[i]=='zhu'){
+							game.zhu2=game.players[i];
+						}
+					}
+					else{
+						if(identityList[i]=='zhu'){
+							game.zhu=game.players[i];
+						}
 					}
 					game.players[i].identityShown=false;
 				}
 				game.zhu.setIdentity();
 				game.zhu.identityShown=true;
+				game.zhu.isZhu=(game.zhu.identity=='zhu');
 				game.me.setIdentity();
 				for(i in lib.character){
 					if(lib.config.forbidai.contains(i)) continue;
@@ -386,6 +412,9 @@ mode.identity={
 				event.list.randomSort();
 				list3.randomSort();
 				var num=get.config('choice')[game.me.identity];
+				if(event.zhongmode){
+					num=3;
+				}
 				if(game.zhu!=game.me){
 					event.ai(game.zhu,event.list,list2)
 					event.list.remove(game.zhu.name);
@@ -393,7 +422,12 @@ mode.identity={
 					list=event.list.splice(0,num);
 				}
 				else{
-					list=list3.slice(0,num).concat(list2);
+					if(event.zhongmode){
+						list=list3.slice(0,6);
+					}
+					else{
+						list=list3.slice(0,num).concat(list2);
+					}
 				}
 				var dialog=ui.create.dialog('选择角色',[list,'character']);
 				if(get.config('change_identity')){
@@ -485,7 +519,7 @@ mode.identity={
 				}
 				event.list.remove(game.me.name);
 				event.list.remove(game.me.name2);
-				if(game.me.identity=='zhu'&&game.players.length>4){
+				if(game.me==game.zhu&&game.players.length>4){
 					game.me.hp++;
 					game.me.maxHp++;
 					game.me.update();
@@ -502,11 +536,13 @@ mode.identity={
 	translate:{
 		zhu:"主",
 		zhong:"忠",
+		mingzhong:"忠",
 		nei:"内",
 		fan:"反",
 		cai:"猜",
 		zhu2:"主公",
 		zhong2:"忠臣",
+		mingzhong2:"明忠",
 		nei2:"内奸",
 		fan2:"反贼",
 		random2:"随机",
@@ -540,12 +576,28 @@ mode.identity={
 				}
 				game.checkResult();
 				if(this.identity=='fan'&&source) source.draw(3);
-				else if(this.identity=='zhong'&&source&&source.identity=='zhu'){
+				else if(this.identity=='zhong'&&source&&source.identity=='zhu'&&source.isZhu){
 					source.discard(source.get('he'));
 				}
 				if(game.zhu.storage.enhance_zhu&&get.population('fan')<3){
 					game.zhu.removeSkill(game.zhu.storage.enhance_zhu);
 					delete game.zhu.storage.enhance_zhu;
+				}
+				if(this==game.zhong){
+					game.zhu.identityShown=true;
+					game.zhu.ai.shown=1;
+					game.zhu.setIdentity();
+					game.zhu.isZhu=true;
+					delete game.zhong;
+					game.zhu.$legend();
+					game.delay(2);
+					game.zhu.classList.add('playerfocus');
+					ui.arena.classList.add('playerfocus');
+					setTimeout(function(){
+						game.zhu.classList.remove('playerfocus');
+						ui.arena.classList.remove('playerfocus');
+					},1000);
+					game.addVideo('playerfocus',game.zhu);
 				}
 			},
 			logAi:function(targets,card){
@@ -630,14 +682,21 @@ mode.identity={
 			realAttitude:function(from,to){
 				// if(_status.currentPhase==from&&from.ai.tempIgnore&&from.ai.tempIgnore.contains(to)) return 0;
 				var situation=ai.get.situation();
-				var identity=from.spy||from.identity;
+				var identity=from.identity;
 				var identity2=to.identity;
-				if(from==to&&from.spy) identity2=from.spy;
+				if(identity2=='zhu'&&!to.isZhu){
+					identity2='zhong';
+					if(from==to) return 10;
+				}
+				var zhongmode=false;
+				if(!game.zhu.isZhu){
+					zhongmode=true;
+				}
 				switch(identity){
 					case 'zhu':
 						switch(identity2){
 							case 'zhu': return 10;
-							case 'zhong': return 6;
+							case 'zhong':case 'mingzhong': return 6;
 							case 'nei':
 								if(game.players.length==2) return -10;
 								if(get.population('fan')==0) return -0.5;
@@ -646,10 +705,10 @@ mode.identity={
 							case 'fan': return -4;
 						}
 						break;
-					case 'zhong':
+					case 'zhong':case 'mingzhong':
 						switch(identity2){
 							case 'zhu': return 10;
-							case 'zhong': return 4;
+							case 'zhong':case 'mingzhong': return 4;
 							case 'nei':
 								if(get.population('fan')==0) return -2;
 								return Math.min(3,-situation);
@@ -683,6 +742,18 @@ mode.identity={
 								else if(game.zhu&&game.zhu.hp==2) num=-1;
 								else if(game.zhu&&game.zhu.hp<=2&&situation>1) num=-1;
 								else num=-2;
+								if(zhongmode&&situation<2){
+									num=4;
+								}
+								if(strategy==2) num--;
+								if(strategy==3) num++;
+								return num;
+							case 'mingzhong':
+								if(strategy==5) return Math.min(0,-situation);
+								if(strategy==6) return Math.max(-1,-situation);
+								if(get.population('fan')==0) num=-5;
+								else if(situation<=0) num=0;
+								else num=-3;
 								if(strategy==2) num--;
 								if(strategy==3) num++;
 								return num;
@@ -695,7 +766,7 @@ mode.identity={
 								if(strategy==5) return Math.max(-1,situation);
 								if(strategy==6) return Math.min(0,situation);
 								if((game.zhu&&game.zhu.hp<=2&&situation<0)||situation<-1) num=-3;
-								else if(situation<0||get.population('zhong')==0) num=-2;
+								else if(situation<0||get.population('zhong')+get.population('mingzhong')==0) num=-2;
 								else if((game.zhu&&game.zhu.hp>=4&&situation>0)||situation>1) num=1;
 								else num=0;
 								if(strategy==2) num++;
@@ -712,8 +783,9 @@ mode.identity={
 								}
 								return -10;
 							case 'zhong': return -7;
+							case 'mingzhong':return -5;
 							case 'nei':
-								if(get.population('zhong')==0) return -7;
+								if(get.population('zhong')+get.population('mingzhong')==0) return -7;
 								if(game.zhu&&game.zhu.hp<=2) return -1;
 								return Math.min(3,situation);
 							case 'fan': return 5;
@@ -735,7 +807,7 @@ mode.identity={
 						total+=j*1.2+5;
 						zhu=j;
 					}
-					else if(player.identity=='zhong'){
+					else if(player.identity=='zhong'||player.identity=='mingzhong'){
 						zhuzhong+=j*0.8+3;
 						total+=j*0.8+3;
 					}
@@ -748,9 +820,11 @@ mode.identity={
 				if(absolute) return zhuzhong;
 				var result=parseInt(10*Math.abs(zhuzhong/total));
 				if(zhuzhong<0) result=-result;
-				if(zhu<12&&fan>30) result--;
-				if(zhu<6&&fan>15) result--;
-				if(zhu<4) result--;
+				if(!game.zhong){
+					if(zhu<12&&fan>30) result--;
+					if(zhu<6&&fan>15) result--;
+					if(zhu<4) result--;
+				}
 				return result;
 			},
 			population:function(identity){
@@ -765,11 +839,22 @@ mode.identity={
 				_status.clicked=true;
 				if(this.parentNode.identityShown) return;
 				if(this.parentNode==game.me) return;
-				switch(this.firstChild.innerHTML){
-					case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
-					case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
-					case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
-					case '内':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
+				if(get.config('identity_mode')=='zhong'){
+					switch(this.firstChild.innerHTML){
+						case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
+						case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
+						case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
+						case '内':this.firstChild.innerHTML='主';this.dataset.color='zhu';break;
+						case '主':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
+					}
+				}
+				else{
+					switch(this.firstChild.innerHTML){
+						case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
+						case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
+						case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
+						case '内':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
+					}
 				}
 			}
 		}

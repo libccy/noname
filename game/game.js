@@ -485,7 +485,7 @@
 						}
 					},
 					show_pause:{
-						name:'显示历史按钮',
+						name:'显示暂停按钮',
 						init:true,
 						unfrequent:true,
 						onclick:function(bool){
@@ -722,7 +722,8 @@
 							var node=this;
 							if(node._clearing){
 								localStorage.clear();
-								window.location.reload();
+								indexedDB.deleteDatabase(lib.configprefix+'data');
+								game.reload();
 								return;
 							}
 							node._clearing=true;
@@ -779,6 +780,28 @@
 						else{
 							map.double_nei.hide();
 						}
+						if(config.identity_mode=='zhong'){
+							map.player_number.hide();
+							map.enhance_zhu.hide();
+							map.double_nei.hide();
+							map.auto_identity.hide();
+						}
+						else{
+							map.player_number.show();
+							map.enhance_zhu.show();
+							map.double_nei.show();
+							map.auto_identity.show();
+						}
+					},
+					identity_mode:{
+						name:'游戏模式',
+						init:'normal',
+						item:{
+							normal:'普通',
+							zhong:'明忠'
+						},
+						restart:true,
+						frequent:true,
 					},
 		            player_number:{
 		                name:'游戏人数',
@@ -831,6 +854,7 @@
 						init:'off',
 						onclick:function(bool){
 							game.saveConfig('auto_identity',bool,this._link.config.mode);
+							if(get.config('identity_mode')=='zhong') return;
 							var num;
 							switch(bool){
 								case '一轮':num=1;break;
@@ -902,7 +926,6 @@
 					change_card:{
 						name:'开启手气卡',
 						init:false,
-						frequent:true
 					},
 					dierestart:{
 						name:'死亡后显示重来',
@@ -998,6 +1021,7 @@
 							'0':'无',
 							'1':'一张',
 							'2':'两张',
+							'3':'三张',
 						},
 						init:'2',
 						frequent:true,
@@ -1066,7 +1090,6 @@
 					change_card:{
 						name:'开启手气卡',
 						init:false,
-						frequent:true
 					},
 					dierestart:{
 						name:'死亡后显示重来',
@@ -1436,7 +1459,29 @@
 			'<li>回复体力<br>player.recover(num)<li>摸牌<br>player.draw(num)<li>获得牌<br>player.gain(cards)<li>弃牌<br>player.discard(cards)'+
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令输入框中输出结果<br>game.print(str)<li>游戏结束<br>game.over(bool)'+
-			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card'
+			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card',
+			'身份模式':'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
+			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
+			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
+			'战棋模式':'<div style="margin:10px">对阵</div><ul style="margin-top:0"><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
+			'每人在出牌阶段有一次移动的机会，若一名角色在移动之前使用过指定其他角色为目标的牌，该回合可移动的最大距离为2，否则最大距离为1<li>'+
+			'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
+			'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
+			'开启交替行动后，在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差</ul>'+
+			'<div style="margin:10px">统率</div><ul style="margin-top:0"><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
+			'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
+			'战斗中有君主出场时可招降敌将，成功率取决于敌将的稀有度、剩余体力值以及手牌数。成功后战斗立即结束且没有金钱奖励。每发动一次招降，无论成功还是失败，都会扣除10招募令<li>'+
+			'挑战武将会与该武将以及与其强度相近的武将进行战斗，敌方人数与我方出场人数相同，但不少于3。胜利后可通过招募令招募该武将<li>'+
+			'竞技场：<br>随机选择9名武将，每次派出1〜3名武将参战。战斗中阵亡的武将不能再次上场。<br><br>战斗后武将进入疲劳状态，若立即再次出场则初始体力值-1。<br><br>战斗中本方武将行动时可召唤后援，令一名未出场的已方武将加入战斗。后援武将在战斗结束后无论存活与否均不能再次出场<br><br>当取得12场胜利或所有武将全部阵亡后结束，并根据胜场数获得随机奖励',
+			'炉石模式':'<ul><li>游戏流程类似1v1，场上有两名主将进行对抗'+
+			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
+			'<li>牌堆中随机加入总量1/3的随从牌，使用之可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
+			'随从与其他所有角色相互距离基数为1<li>'+
+			'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
+			'<li>牌堆中随机加入总量1/6的法术牌，效果主要与随从有关，法术牌根据强度不同可能会消耗额外的行动值'+
+			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
+			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
+			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸2+X张牌，X为对方存活的随从数，无替补时游戏结束'
 		},
 		setPopped:function(node,func,width,height){
 			node._poppedfunc=func;
@@ -1670,10 +1715,6 @@
 							db.deleteObjectStore('video');
 						}
 						db.createObjectStore('video',{keyPath:'time'});
-						lib.db=db;
-						for(var i=0;i<lib._onDB.length;i++){
-							lib._onDB[i]();
-						}
 					};
 					request.onsuccess=function(e){
 						var db=e.target.result;
@@ -6054,8 +6095,15 @@
 				},
 				$rare:function(){
 					game.addVideo('flame',this,'rare');
-					var left=this.offsetLeft-ui.arena.offsetLeft;
-					var top=this.offsetTop-ui.arena.offsetTop;
+					var left,top;
+					if(lib.config.mode=='chess'){
+						left=this.offsetLeft-ui.arena.offsetLeft;
+						top=this.offsetTop-ui.arena.offsetTop;
+					}
+					else{
+						left=this.offsetLeft;
+						top=this.offsetTop;
+					}
 					if(this.classList.contains('minskin')){
 						top+=15;
 					}
@@ -6064,8 +6112,15 @@
 				},
 				$epic:function(){
 					game.addVideo('flame',this,'epic');
-					var left=this.offsetLeft-ui.arena.offsetLeft;
-					var top=this.offsetTop-ui.arena.offsetTop;
+					var left,top;
+					if(lib.config.mode=='chess'){
+						left=this.offsetLeft-ui.arena.offsetLeft;
+						top=this.offsetTop-ui.arena.offsetTop;
+					}
+					else{
+						left=this.offsetLeft;
+						top=this.offsetTop;
+					}
 					if(this.classList.contains('minskin')){
 						top+=15;
 					}
@@ -6074,8 +6129,15 @@
 				},
 				$legend:function(){
 					game.addVideo('flame',this,'legend');
-					var left=this.offsetLeft-ui.arena.offsetLeft;
-					var top=this.offsetTop-ui.arena.offsetTop;
+					var left,top;
+					if(lib.config.mode=='chess'){
+						left=this.offsetLeft-ui.arena.offsetLeft;
+						top=this.offsetTop-ui.arena.offsetTop;
+					}
+					else{
+						left=this.offsetLeft;
+						top=this.offsetTop;
+					}
 					if(this.classList.contains('minskin')){
 						top+=15;
 					}
@@ -7000,18 +7062,20 @@
 					game.log();
 					game.log(get.translation(player)+'的回合开始');
 					game.phaseNumber++;
-					var num;
-					switch(get.config('auto_identity')){
-						case 'one':num=1;break;
-						case 'two':num=2;break;
-						case 'three':num=3;break;
-						case 'always':num=-1;break;
-						default:num=0;break;
-					}
-					if(num&&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
-						if(!_status.video) player.popup('显示身份');
-						_status.identityShown=true;
-						game.showIdentity(false);
+					if(get.config('identity_mode')!='zhong'){
+						var num;
+						switch(get.config('auto_identity')){
+							case 'one':num=1;break;
+							case 'two':num=2;break;
+							case 'three':num=3;break;
+							case 'always':num=-1;break;
+							default:num=0;break;
+						}
+						if(num&&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
+							if(!_status.video) player.popup('显示身份');
+							_status.identityShown=true;
+							game.showIdentity(false);
+						}
 					}
 					player.ai.tempIgnore=[];
 					player.stat.push({card:{},skill:{}});
@@ -7515,6 +7579,19 @@
 					if(lib.config.glow_phase){
 						player.classList.add('glow_phase');
 					}
+				}
+				else{
+					console.log(player);
+				}
+			},
+			playerfocus:function(player){
+				if(player){
+					player.classList.add('playerfocus');
+					ui.arena.classList.add('playerfocus');
+					setTimeout(function(){
+						player.classList.remove('playerfocus');
+						ui.arena.classList.remove('playerfocus');
+					},1000);
 				}
 				else{
 					console.log(player);

@@ -407,6 +407,7 @@ character.wind={
 			},
 			filter:function(event,player){
 				if(!game.zhu) return false;
+				if(!game.zhu.isZhu) return false;
 				return (player!=game.zhu&&game.zhu.skills.contains('huangtian')&&player.group=='qun')
 			},
 			filterCard:function(card){

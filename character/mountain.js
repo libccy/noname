@@ -176,7 +176,7 @@ character.mountain={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				if(player!=game.zhu)return false;
+				if(!player.isZhu)return false;
 				if(player.storage.ruoyu) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].hp<player.hp) return false;
@@ -641,6 +641,7 @@ character.mountain={
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(!game.zhu) return false;
+				if(!game.zhu.isZhu) return false;
 				return (player!=game.zhu&&game.zhu.skills.contains('zhiba')&&
 					player.group=='wu'&&player.num('h')>0&&game.zhu.num('h')>0);
 			},

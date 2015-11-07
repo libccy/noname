@@ -250,6 +250,7 @@ character.woods={
 			trigger:{player:'judgeEnd'},
 			filter:function(event,player){
 				if(!game.zhu) return false;
+				if(!game.zhu.isZhu) return false;
 				return (player!=game.zhu&&game.zhu.skills.contains('songwei')&&player.group=='wei'&&get.color(event.result.card)=='black');
 			},
 			check:function(event,player){
@@ -603,6 +604,7 @@ character.woods={
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
 				if(!game.zhu) return false;
+				if(!game.zhu.isZhu) return false;
 				return (player!=game.zhu&&game.zhu.skills.contains('baonue')&&player.group=='qun')&&game.zhu.hp<game.zhu.maxHp;
 			},
 			check:function(event,player){
