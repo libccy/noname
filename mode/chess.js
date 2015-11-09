@@ -3377,6 +3377,7 @@ mode.chess={
 					game.resume();
 				}
 				event.custom.replace.confirm=game.resume;
+				event.switchToAuto=game.resume;
 				"step 1"
 				_status.imchoosing=false;
 				event.dialog.close();
@@ -4055,6 +4056,9 @@ mode.chess={
 		_chess_chuzhang:{
 			enable:'phaseUse',
 			usable:1,
+			direct:true,
+			delay:false,
+			preservecancel:true,
 			filter:function(event,player){
 				var num=0;
 				var xy=player.getXY();
@@ -4100,13 +4104,20 @@ mode.chess={
 					_status.imchoosing=true;
 					event.dialog=ui.create.dialog('选择一个与你相邻的障碍清除之');
 					event.dialog.add('<div class="text">'+lib.translate._chess_chuzhang_info+'</div>');
+					event.custom.replace.confirm=function(){
+						player.getStat().skill._chess_chuzhang--;
+						event.cancelled=true;
+						game.resume();
+					};
 				}
 				'step 1'
 				_status.imchoosing=false;
-				if(!event.obstacle){
-					event.obstacle=event.obstacles.randomGet();
+				if(!event.cancelled){
+					if(!event.obstacle){
+						event.obstacle=event.obstacles.randomGet();
+					}
+					game.removeObstacle(event.obstacle.dataset.position);
 				}
-				game.removeObstacle(event.obstacle.dataset.position);
 				for(var i=0;i<event.obstacles.length;i++){
 					event.obstacles[i].classList.remove('glow');
 				}
@@ -4835,10 +4846,10 @@ mode.chess={
 		['club',3,'chess_shezhang'],
 		['spade',5,'chess_shezhang'],
 		['spade',7,'chess_shezhang'],
-		['diamond',1,'chess_chuzhang'],
+		// ['diamond',1,'chess_chuzhang'],
 		['diamond',4,'chess_chuzhang'],
 		['heart',8,'chess_chuzhang'],
-		['diamond',9,'chess_chuzhang'],
+		// ['diamond',9,'chess_chuzhang'],
 	],
 	posmap:{},
 	help:{},

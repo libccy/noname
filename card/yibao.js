@@ -360,7 +360,11 @@ card.yibao={
 						}
 						return 0;
 					},
-					target:-1.5
+					target:function(player,target){
+						if(target.skills.contains('dujian2')||target.num('h')==0) return 0;
+						if(player.num('h')<=1) return 0;
+						return -1.5;
+					}
 				},
 				tag:{
 					loseHp:1

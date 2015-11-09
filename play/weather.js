@@ -1,0 +1,44 @@
+'use strict';
+play.weather={
+    arenaReady:function(){
+        if(_status.video) return;
+        _status.weather='qing';
+        _status.weatherlife=Math.ceil(Math.random()*3);
+        ui.weather=ui.create.system('晴',null,true);
+    },
+    skill:{
+        _weatherchange:{
+            trigger:{player:'phaseAfter'},
+            filter:function(){
+                return ui.weather?true:false;
+            },
+            content:function(){
+                if(_status.weather!='qing'&&Math.random()<0.5){
+                    _status.weather='qing';
+                }
+                else{
+                    _status.weather=['qing','yu','bao','wu','xue','feng','lei'].randomGet(_status.weather);
+                }
+                ui.weather.innerHTML=lib.translate['_weather_'+_status.weather];
+            }
+        }
+    },
+    translate:{
+        _weather_qing:'晴',
+        _weather_qing_info:'没有任何事情发生',
+        _weather_yu:'雨',
+        _weather_yu_info:'每当一名角色受到火焰伤害，有30%的机率令此伤害-1',
+        _weather_shuang:'霜',
+        _weather_shuang_info:'霜',
+        _weather_wu:'雾',
+        _weather_wu_info:'雾',
+        _weather_bao:'雹',
+        _weather_bao_info:'每名角色在回合结束阶段有20%的机率受到一点伤害',
+        _weather_xue:'雪',
+        _weather_xue_info:'雪',
+        _weather_feng:'风',
+        _weather_feng_info:'当一名角色受到火焰伤害时，有30%的机率令距离其1以内的一名其他角色受到一点火焰伤害',
+        _weather_lei:'雷',
+        _weather_lei_info:'在一名角色的回合结束阶段，有30%的机率将一张闪电置于其判定区',
+    }
+};

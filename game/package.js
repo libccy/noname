@@ -38,5 +38,6 @@ card.pack={
 play.pack={
     character:'武将卡牌',
     soldier:'士兵模式',
-    wuxing:'五行生克'
+    wuxing:'五行生克',
+    weather:'天气变化',
 };

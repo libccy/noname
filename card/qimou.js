@@ -65,15 +65,24 @@ card.qimou={
 					for(var i=0;i<game.players.length;i++){
 						if(target!=game.players[i]&&
 							game.players[i]!=player&&
-							game.players[i].isLinked()&&
-							get.distance(player,game.players[i],'absolute')<distance){
-							return false;
+							game.players[i].isLinked()){
+							if(get.distance(player,game.players[i],'absolute')<distance){
+								return false;
+							}
+							if(get.distance(player,game.players[i],'absolute')==distance&&
+								parseInt(game.players[i].dataset.position)<parseInt(target.dataset.position)){
+								return false;
+							}
 						}
 					}
 					return true;
 				}
 				else{
-					return target==player.next;
+					var dist=get.distance(player,target);
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]!=player&&get.distance(player,game.players[i])<dist) return false;
+					}
+					return true;
 				}
 			},
 			enable:true,
@@ -323,7 +332,7 @@ card.qimou={
 		shushangkaihua_info:'使用者与手牌数最少的所有角色各摸一张牌',
 		huoshaolianying:'火烧连营',
 		huoshaolianying_bg:'烧',
-		huoshaolianying_info:'对逆时针方向离你最近的一名横置角色使用（若无横置角色则对你的下家使用），对其造成一点火焰伤害',
+		huoshaolianying_info:'对离你最近的一名横置角色使用（若无横置角色则改为对距离你最近的所有角色使用），对目标造成一点火焰伤害',
 		chenhuodajie:'趁火打劫',
 		chenhuodajie_info:'任意一名其他角色受到伤害时对其使用，获得其一张牌',
 	},

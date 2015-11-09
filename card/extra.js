@@ -162,6 +162,7 @@ card.extra={
 							}
 							return 0;
 						}
+						if(player.num('h')<=1) return 0;
 						return -1.5;
 					}
 				},

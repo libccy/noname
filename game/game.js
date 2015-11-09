@@ -20,6 +20,7 @@
 		updates:[],
 		canvasUpdates:[],
 		video:[],
+		arenaReady:[],
 		_onDB:[],
 		onDB:function(func){
 			if(lib.db){
@@ -671,6 +672,20 @@
 							}
 							else{
 								lib.config.plays.remove('wuxing');
+							}
+							game.saveConfig('plays',lib.config.plays);
+						}
+					},
+					weather:{
+						name:'天气变化',
+						init:false,
+						restart:true,
+						onclick:function(bool){
+							if(bool){
+								lib.config.plays.add('weather');
+							}
+							else{
+								lib.config.plays.remove('weather');
 							}
 							game.saveConfig('plays',lib.config.plays);
 						}
@@ -12793,6 +12808,12 @@
 				// });
 				lib.status.date=new Date();
 				lib.status.dateDelayed=0;
+
+				while(lib.arenaReady.length){
+					(lib.arenaReady.shift())();
+				}
+				delete lib.arenaReady;
+
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;
 			},
@@ -17080,7 +17101,8 @@
 					lib.config.current_mode=lib.config.current_mode.concat(play[i].config);
 				}
 				for(j in play[i]){
-					if(j=='mode'||j=='forbid'||j=='init'||j=='element'||j=='game'||j=='get'||j=='config'||j=='ui') continue;
+					if(j=='mode'||j=='forbid'||j=='init'||j=='element'||
+					j=='game'||j=='get'||j=='config'||j=='ui'||j=='arenaReady') continue;
 					for(k in play[i][j]){
 						if(j=='translate'&&k==i){
 							lib[j][k+'_play_config']=play[i][j][k];
@@ -17094,6 +17116,7 @@
 					}
 				}
 				if(typeof play[i].init=='function') (lib.init.eval(play[i].init))();
+				if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
 			}
 			for(i=0;i<lib.card.list.length;i++){
 				if(!lib.card[lib.card.list[i][2]]){

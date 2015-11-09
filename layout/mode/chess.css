@@ -169,7 +169,7 @@
     left: 0;
     top: 0;
 }
-.player .action{
+.player.minskin .action{
     text-shadow: black 0 0 1px !important;
     font-size: 16px !important;
     left:0;
