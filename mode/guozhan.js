@@ -72,21 +72,12 @@ mode.guozhan={
 				event.trigger('gameStart');
 
 				game.gameDraw(player);
-				if(get.config('ai_identity')){
-					game.showIdentity(true);
-				}
-				else{
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].ai.shown=0;
-					}
-				}
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
 					if(game.players[i]==game.me){
 						lib.translate[game.players[i].name]+='（你）';
 					}
 				}
-				game.phaseLoop(player);
 
 
 				var players=get.players(lib.sort.position);
@@ -101,12 +92,21 @@ mode.guozhan={
 				}
 				_status.videoInited=true,
 				game.addVideo('init',null,info);
+				if(get.config('guozhan_mode')=='mingjiang'){
+					game.showIdentity(true);
+				}
+				else{
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].ai.shown=0;
+					}
+				}
+				game.phaseLoop(player);
 			}
 		},
 		showIdentity:function(started){
 			if(game.phaseNumber==0&&!started) return;
 			for(var i=0;i<game.players.length;i++){
-				game.players[i].showCharacter(2);
+				game.players[i].showCharacter(2,false);
 			}
 		},
 		checkResult:function(){
@@ -413,7 +413,7 @@ mode.guozhan={
 				}
 				return false;
 			},
-			showCharacter:function(num){
+			showCharacter:function(num,log){
 				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
 					return;
 				}
@@ -430,21 +430,21 @@ mode.guozhan={
 				var skills;
 				switch(num){
 					case 0:
-					game.log(get.translation(this)+'展示了主将'+get.translation(this.name1));
+					if(log!==false) game.log(get.translation(this)+'展示了主将'+get.translation(this.name1));
 					this.name=this.name1;
 					skills=lib.character[this.name][3];
 					this.sex=lib.character[this.name][0];
 					this.classList.remove('unseen');
 					break;
 					case 1:
-					game.log(get.translation(this)+'展示了副将'+get.translation(this.name2));
+					if(log!==false) game.log(get.translation(this)+'展示了副将'+get.translation(this.name2));
 					skills=lib.character[this.name2][3];
 					if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
 					if(this.name.indexOf('unknown')==0) this.name=this.name2;
 					this.classList.remove('unseen2');
 					break;
 					case 2:
-					game.log(get.translation(this)+'展示了主将'+get.translation(this.name1)+'、副将'+get.translation(this.name2));
+					if(log!==false) game.log(get.translation(this)+'展示了主将'+get.translation(this.name1)+'、副将'+get.translation(this.name2));
 					this.name=this.name1;
 					skills=lib.character[this.name][3].concat(lib.character[this.name2][3]);
 					this.sex=lib.character[this.name][0];
@@ -453,7 +453,7 @@ mode.guozhan={
 					break;
 				}
 				var initdraw=parseInt(get.config('initshow_draw'));
-				if(!_status.initshown&&initdraw&&this.isAlive()){
+				if(!_status.initshown&&initdraw&&this.isAlive()&&get.config('guozhan_mode')!='mingjiang'){
 					this.popup('首亮');
 					game.log(get.translation(this)+'首先明置武将，得到奖励');
 					game.log(get.translation(this)+'摸了'+get.cnNumber(initdraw)+'张牌');
@@ -777,5 +777,5 @@ mode.guozhan={
 	},
 	config:['player_number','initshow_draw',
 	'free_choose','change_identity','change_choice','change_card',
-	'swap','dierestart','ai_identity','revive','double_hp','difficulty']
+	'swap','dierestart','revive','double_hp','difficulty']
 }

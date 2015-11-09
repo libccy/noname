@@ -164,9 +164,15 @@
 						}
 						if(config.touchscreen){
 							map.mousewheel.hide();
+							map.hover_all.hide();
+							map.hover_handcard.hide();
+							map.hoveration.hide();
 						}
 						else{
 							map.mousewheel.show();
+							map.hover_all.show();
+							map.hover_handcard.show();
+							map.hoveration.show();
 						}
 					}
 				}
@@ -224,7 +230,7 @@
 								setTimeout(function(){
 									layout.remove();
 									ui.arena.show();
-									game.me.update();
+									if(game.me) game.me.update();
 									setTimeout(function(){
 										ui.updatex();
 									},500);
@@ -1017,6 +1023,16 @@
 		    guozhan:{
 		        name:'国战',
 		        config:{
+					guozhan_mode:{
+						name:'游戏模式',
+						init:'normal',
+						item:{
+							normal:'普通',
+							mingjiang:'明将'
+						},
+						restart:true,
+						frequent:true,
+					},
 		            player_number:{
 		                name:'游戏人数',
 		                init:'8',
@@ -1351,6 +1367,11 @@
 						},
 						frequent:true,
 					},
+					attack_move:{
+						name:'击退效果',
+						init:true,
+						// frequent:true,
+					},
 					show_distance:{
 						name:'显示距离',
 						init:true,
@@ -1495,7 +1516,7 @@
 			'触屏模式<br>可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>隐藏非全身皮肤<br>在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍'+
 			'<li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）',
-			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中双指点击切换暂停<li>键盘快捷键<br>'+
+			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中双指点击切换暂停<li>移动布局中，点击顶部的左半边或右半边可显示按钮，双击顶部可令界面下移（方便标身份）<li>键盘快捷键<br>'+
 			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
 			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
 			'<li>玩家<br>game.me<li>玩家的上/下家<br>game.me.previous/next'+
@@ -1514,12 +1535,13 @@
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
 			'战棋模式':
 			'<div style="margin:10px">对阵模式</div><ul style="margin-top:0"><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
-			'每人在出牌阶段有一次移动的机会，若一名角色在移动之前使用过指定其他角色为目标的牌，该回合可移动的最大距离为2，否则最大距离为1<li>'+
+			'每人在出牌阶段有一次移动的机会，可移动的最大距离为2<li>'+
 			'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
 			'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
 			'开启交替行动时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
 			'开启特殊战场角色后，每个回合结束时有一定机率出现一个特殊角色，该角色不参与战斗，并有一个影响周围或全体角色的效果。该角色在出现后的5〜10个回合内消失<li>'+
-			'战场上可设置出现随机路障，角色无法移动到路障处。当一名角色的周围四格有至少三格为路障或在战场外，其可以在回合内清除一个相邻路障</ul>'+
+			'开启击退效果后，当一名角色对相邻目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
+			'战场上可设置出现随机路障，角色无法移动到路障处。当一名角色的周围四格有至少三格为路障或在战场外时，其可以在回合内清除一个相邻路障</ul>'+
 			'<div style="margin:10px">统率模式</div><ul style="margin-top:0"><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
 			'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
 			'战斗中有君主出场时可招降敌将，成功率取决于敌将的稀有度、剩余体力值以及手牌数。成功后战斗立即结束且没有金钱奖励。每发动一次招降，无论成功还是失败，都会扣除10招募令<li>'+
@@ -3732,11 +3754,11 @@
 					if(lib.config.touchscreen){
 						lib.setLongPress(this,ui.click.intro);
 					}
+					else if(lib.config.hover_all){
+						lib.setHover(this,ui.click.hoverplayer);
+					}
 					if(lib.config.right_info){
 						this.oncontextmenu=ui.click.rightplayer;
-					}
-					if(lib.config.hover_all){
-						lib.setHover(this,ui.click.hoverplayer);
 					}
 					var name=get.translation(character);
 					this.node.name.innerHTML='';
@@ -5430,11 +5452,11 @@
 					if(lib.config.touchscreen){
 						lib.setLongPress(node,ui.click.intro);
 					}
+					else if(lib.config.hover_all){
+						lib.setHover(node,ui.click.hoverplayer);
+					}
 					if(lib.config.right_info){
 						node.oncontextmenu=ui.click.rightplayer;
-					}
-					if(lib.config.hover_all){
-						lib.setHover(node,ui.click.hoverplayer);
 					}
 					return node;
 				},
@@ -5475,11 +5497,11 @@
 						if(lib.config.touchscreen){
 							lib.setLongPress(node,ui.click.intro);
 						}
+						else if(lib.config.hover_all){
+							lib.setHover(node,ui.click.hoverplayer);
+						}
 						if(lib.config.right_info){
 							node.oncontextmenu=ui.click.rightplayer;
-						}
-						if(lib.config.hover_all){
-							lib.setHover(node,ui.click.hoverplayer);
 						}
 						return node;
 					}
@@ -9734,7 +9756,7 @@
 				var end=player;
 				do{
 					player.directgain(get.cards(4));
-					if(player.singleHp===true&&!player.classList.contains('unseen')&&!player.classList.contains('unseen2')){
+					if(player.singleHp===true&&lib.config.mode!='guozhan'){
 						player.doubleDraw();
 					}
 					player=player.next;
@@ -11498,7 +11520,11 @@
 				ui.system2=ui.create.div('#system2',ui.system);
 				if(lib.config.touchscreen){
 					ui.system1.addEventListener('touchstart',ui.click.system);
+					// ui.system1.addEventListener('touchend',ui.click.system);
+					// ui.system1.addEventListener('touchmove',ui.click.system);
 					ui.system2.addEventListener('touchstart',ui.click.system);
+					// ui.system2.addEventListener('touchend',ui.click.system);
+					// ui.system2.addEventListener('touchmove',ui.click.system);
 				}
 				else{
 					ui.system1.listen(ui.click.system);
@@ -12933,11 +12959,11 @@
 							if(lib.config.touchscreen){
 								lib.setLongPress(node,ui.click.intro);
 							}
+							else if(lib.config.hover_all){
+								lib.setHover(node,ui.click.hoverplayer);
+							}
 							if(lib.config.right_info){
 								node.oncontextmenu=ui.click.rightplayer;
-							}
-							if(lib.config.hover_all){
-								lib.setHover(node,ui.click.hoverplayer);
 							}
 						}
 						if(infoitem[1]){
@@ -13102,11 +13128,11 @@
 					if(lib.config.touchscreen){
 						lib.setLongPress(node,ui.click.intro);
 					}
+					else if(lib.config.hover_all){
+						lib.setHover(node,ui.click.hoverplayer);
+					}
 					if(lib.config.right_info){
 						node.oncontextmenu=ui.click.rightplayer;
-					}
-					if(lib.config.hover_all){
-						lib.setHover(node,ui.click.hoverplayer);
 					}
 				}
 				node.storage={};
@@ -13131,11 +13157,19 @@
 			system:function(){
 				if(lib.config.layout!='phone') return;
 				_status.clicked=true;
-				this.classList.toggle('shown');
-				if(this.classList.contains('shown')){
-					if(this.nextSibling) this.nextSibling.classList.remove('shown');
-					if(this.previousSibling) this.previousSibling.classList.remove('shown');
+				this.classList.add('shown');
+				if(this._tempclicking){
+					ui.arena.classList.add('phonetop');
 				}
+				else{
+					this._tempclicking=true;
+					var that=this;
+					setTimeout(function(){
+						that._tempclicking=false;
+					},300);
+				}
+				if(this.nextSibling) this.nextSibling.classList.remove('shown');
+				if(this.previousSibling) this.previousSibling.classList.remove('shown');
 			},
 			pausehistory:function(){
 				if(!lib.config.auto_popped_history) return;
@@ -13158,6 +13192,10 @@
 				if(!lib.config.auto_popped_config) return;
 				// if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
+				uiintro.listen(function(e){
+					e.stopPropagation();
+				});
+
 				var rows=Math.ceil(lib.config.all.mode.length/3);
 				uiintro.type='config';
 				for(var k=0;k<rows;k++){
@@ -13209,6 +13247,9 @@
 			},
 			volumn:function(){
 				var uiintro=ui.create.dialog('hidden');
+				uiintro.listen(function(e){
+					e.stopPropagation();
+				});
 				uiintro.add('背景音乐');
 				var vol1=ui.create.div('.volumn');
 				uiintro.add(vol1);
@@ -13284,6 +13325,12 @@
 				}
 				if(!this._poppedfunc){
 					return;
+				}
+				if(lib.config.touchscreen){
+					_status.touchpopping=true;
+					setTimeout(function(){
+						_status.touchpopping=false;
+					},500);
 				}
 				var uiintro=this._poppedfunc();
 				if(!uiintro) return;
@@ -13714,6 +13761,7 @@
 			window:function(){
 				var clicked=_status.clicked;
 				if(_status.dragged) return;
+				if(_status.touchpopping) return;
 				if(_status.reloading) return;
 				if(_status.clicked){
 					_status.clicked=false;
@@ -13755,8 +13803,12 @@
 						}
 					}
 					if(lib.config.layout=='phone'){
+						ui.arena.classList.remove('phonetop');
 						ui.system1.classList.remove('shown');
 						ui.system2.classList.remove('shown');
+						if(ui.chessinfo){
+							ui.chessinfo.classList.remove('zoomed');
+						}
 					}
 				}
 				if(_status.tempunpop){

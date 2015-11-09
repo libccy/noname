@@ -83,6 +83,23 @@
     left:calc(100% - 120px);
     overflow:scroll;
     text-align:center;
+    transition: all 0s;
+}
+.fakeme.player.zoomed{
+    width: 240px;
+    height: 240px;
+    left:calc(100% - 240px);
+    top:calc(100% - 240px);
+    background-size:200%;
+}
+.fakeme.player.zoomed>div{
+    width: 90px;
+    height: 90px;
+    left: 0;
+    top: 16px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 16px;
 }
 .fakeme.player>div{
     width:45px;

@@ -35,10 +35,22 @@
     opacity: 0;
     width: 50%;
 }
+#system>div.shown{
+    min-width: 50%;
+    width: auto;
+}
 #system>div:not(.shown)>div{
     pointer-events: none;
 }
 
+.menu-container>.menu.main {
+    top: 62px !important;
+    transform: scale(1.3) !important;
+}
+
+#arena.phonetop{
+    top:80px !important;
+}
 
 @media screen and (orientation:portrait) {
 

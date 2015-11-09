@@ -1118,9 +1118,18 @@ card.standard={
 			direct:true,
 			content:function(){
 				"step 0"
+				if(player.skills.contains('jiu')){
+					player.removeSkill('jiu');
+					event.jiu=true;
+				}
 				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1);
 				"step 1"
-				if(result.bool) player.logSkill('qinglong');
+				if(result.bool){
+					player.logSkill('qinglong');
+				}
+				else if(event.jiu){
+					player.addSkill('jiu');
+				}
 			}
 		},
 		zhangba_skill:{

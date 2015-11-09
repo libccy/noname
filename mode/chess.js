@@ -645,6 +645,11 @@ mode.chess={
 				}
 				player.node.identity.dataset.color=get.translation(player.side+'Color');
 				game.players.push(player);
+				if(lib.config.animation){
+					setTimeout(function(){
+						player.$rare2();
+					},300);
+				}
 			}
 			ui.chess.appendChild(player);
 			if(_status.video){
@@ -1285,9 +1290,10 @@ mode.chess={
 				ui.create.me();
 				ui.create.fakeme();
 
-				ui.chessinfo=ui.create.div('.fakeme.player',ui.me);
-				ui.chessinfo.ontouchmove = ui.click.touchScroll;
-				ui.chessinfo.style.WebkitOverflowScrolling='touch';
+				ui.chessinfo=ui.create.div('.fakeme.player',ui.me,function(e){
+					e.stopPropagation();
+				});
+				lib.setScroll(ui.chessinfo);
 
 				game.arrangePlayers();
 				"step 2"
@@ -1450,6 +1456,7 @@ mode.chess={
 					var node=ui.create.player(ui.window);
 					node.style.transition='all 0.7s';
 					node.style.opacity=0;
+					node.style.zIndex=4;
 
 					var kaibao=false;
 					if(!name||typeof i=='string'){
@@ -3074,6 +3081,44 @@ mode.chess={
 		}
 	},
 	skill:{
+		_attackmove:{
+			trigger:{player:'damageEnd'},
+			forced:true,
+			popup:false,
+			priority:50,
+			filter:function(event,player){
+				if(!get.config('attack_move')) return false;
+				if(!event.source) return false;
+				if(get.distance(event.source,player,'pure')>1) return false;
+				if(event.num<1) return false;
+				var xy1=event.source.getXY();
+				var xy2=player.getXY();
+				var dx=xy2[0]-xy1[0];
+				var dy=xy2[1]-xy1[1];
+				if(dx==0&&Math.abs(dy)==2){
+					dy/=2;
+				}
+				if(dy==0&&Math.abs(dx)==2){
+					dx/=2;
+				}
+				return player.movable(dx,dy);
+			},
+			content:function(){
+				var xy1=trigger.source.getXY();
+				var xy2=player.getXY();
+				var dx=xy2[0]-xy1[0];
+				var dy=xy2[1]-xy1[1];
+				if(dx==0&&Math.abs(dy)==2){
+					dy/=2;
+				}
+				if(dy==0&&Math.abs(dx)==2){
+					dx/=2;
+				}
+				if(player.movable(dx,dy)){
+					player.move(dx,dy);
+				}
+			}
+		},
 		dubiaoxianjing:{
 			global:'dubiaoxianjing2'
 		},
@@ -4161,13 +4206,15 @@ mode.chess={
 					!player.movable(1,0)&&!player.movable(-1,0)){
 					return false;
 				}
-				var move=player.skills.contains('noactpunish')?2:1;
+				// var move=player.skills.contains('noactpunish')?2:1;
+				var move=2;
 				move=game.checkMod(player,move,'chessMove',player.get('s'));
 				return move>0;
 			},
 			content:function(){
 				"step 0"
-				var move=player.skills.contains('noactpunish')?2:1;
+				// var move=player.skills.contains('noactpunish')?2:1;
+				var move=2;
 				move=game.checkMod(player,move,'chessMove',player.get('s'));
 				player.chooseToMove(move).phasing=true;
 				"step 1"
@@ -4846,7 +4893,7 @@ mode.chess={
 		['club',3,'chess_shezhang'],
 		['spade',5,'chess_shezhang'],
 		['spade',7,'chess_shezhang'],
-		// ['diamond',1,'chess_chuzhang'],
+		['diamond',1,'chess_chuzhang'],
 		['diamond',4,'chess_chuzhang'],
 		['heart',8,'chess_chuzhang'],
 		// ['diamond',9,'chess_chuzhang'],

@@ -340,7 +340,7 @@ card.extra={
 			group:'jiu2'
 		},
 		jiu2:{
-			trigger:{player:['useCardAfter','shaMiss']},
+			trigger:{player:['useCardAfter','phaseAfter']},
 			priority:2,
 			filter:function(event){
 				return (event.card&&(event.card.name=='sha'));
