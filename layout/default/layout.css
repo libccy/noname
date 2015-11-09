@@ -28,9 +28,13 @@ table{table-layout: fixed;}
 	pointer-events: none;
 	position: absolute;
 }
-#arena.playerfocus>div:not(.playerfocus){
+#arena.playerfocus>div:not(.playerfocus):not(#chess-container):not(.removing){
 	opacity: 0.3 !important;
 }
+#arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
+	opacity: 0.3 !important;
+}
+
 #me,#mebg{width: 100%;height: 140px;top:calc(100% - 140px);left:0;}
 #mebg{z-index:-1}
 #handcards1,#handcards2{width: calc(50% - 140px);height: 127px;padding: 10px;}
@@ -39,8 +43,8 @@ table{table-layout: fixed;}
 #handcards2{left: calc(50% + 120px);top:calc(100% - 140px);}
 #arena.single-handcard #handcards1{width: 100%;}
 #arena.single-handcard #handcards2{display: none;}
-#system{padding: 6px;width: calc(100% - 12px);white-space: nowrap;z-index: 3;}
-#system>div{height: 100%;position: relative;margin: 0;padding: 0;}
+#system{padding: 6px;width: calc(100% - 12px);white-space: nowrap;z-index: 3;pointer-events: none}
+#system>div{height: 100%;position: relative;margin: 0;padding: 0;pointer-events: auto}
 #system>div:last-child{text-align: right;float:right}
 #system>div>div{position: relative;padding-top: 6px;padding-bottom: 6px;padding-left: 8px;padding-right: 8px;text-align: center;margin:4px}
 #paused,#click{left: 0;top:0;width: 100%;height: 100%;z-index: 5;}
@@ -242,7 +246,8 @@ margin-bottom: 5px;
 .button.character>.intro{top:71px;left:0;}
 .button.character>.identity{top:-6px;left:72px;}
 /*--------确认--------*/
-#control{text-align: center;z-index: 2;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);}
+#control{text-align: center;z-index: 2;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);pointer-events: none}
+#control>*{pointer-events: auto}
 .control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;margin-left: 4px;margin-right: 4px;}
 .control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;opacity:0}
 .control:not(.nozoom){width:0}
@@ -260,7 +265,7 @@ margin-bottom: 5px;
 .player>.avatar:not(.glow2)>.action{opacity: 0}
 .player.controlfakeme{width:100px;height:120px;top:calc(100% - 140px)}
 .player.controlfakeme>.avatar{width: 100%;height: 100%;box-shadow: none;left: 0;top: 0}
-.player{z-index: 4;width: 240px;height: 120px;}
+.player{z-index: 2;width: 240px;height: 120px;}
 .player.minskin{width:120px;}
 .player.replaceme{
 	animation:replaceme 0.5s;
@@ -508,6 +513,10 @@ margin-bottom: 5px;
 	animation: game_start 0.5s;
 	-webkit-animation: game_start 0.5s;
 }
+.start2{
+	animation: card_start 0.5s;
+	-webkit-animation: card_start 0.5s;
+}
 .dialog{
 	animation: dialog_start 0.5s;
 	-webkit-animation: dialog_start 0.5s;
@@ -533,7 +542,7 @@ margin-bottom: 5px;
 	animation: card_start 0.5s;
 	-webkit-animation: card_start 0.5s;
 }
-.card.judgestart{
+.judgestart{
 	animation: card_judgestart 1s;
 	-webkit-animation: card_judgestart 1s;
 }

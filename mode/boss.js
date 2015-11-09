@@ -307,6 +307,7 @@ mode.boss={
 				game.addVideo('init',null,info);
 
 				"step 3"
+				event.trigger('gameStart');
 				game.gameDraw(game.boss);
 				game.bossPhaseLoop();
 				setTimeout(function(){

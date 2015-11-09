@@ -268,8 +268,22 @@ card.swd={
 			},
 			ai:{
 				basic:{
-					useful:[5,1],
-					value:[5,1],
+					useful:function(card,i){
+						if(_status.event.player.hp>1){
+							if(i==0) return 5;
+							return 1;
+						}
+						if(i==0) return 7.3;
+						return 3;
+					},
+					value:function(card,player){
+						if(player.hp>1){
+							if(i==0) return 5;
+							return 1;
+						}
+						if(i==0) return 7.3;
+						return 3;
+					},
 				},
 				order:function(){
 					return lib.card.sha.ai.order+0.2;

@@ -435,6 +435,7 @@ card.standard={
 				ui.clear();
 				var cards=get.cards(game.players.length);
 				var dialog=ui.create.dialog('五谷丰登',cards,true);
+				_status.dieClose.push(dialog);
 				dialog.videoId=lib.status.videoId++;
 				game.addVideo('cardDialog',null,['五谷丰登',get.cardsInfo(cards),dialog.videoId]);
 				event.parent.preResult=dialog.videoId;
@@ -479,6 +480,7 @@ card.standard={
 				for(var i=0;i<ui.dialogs.length;i++){
 					if(ui.dialogs[i].videoId==event.preResult){
 						ui.dialogs[i].close();
+						_status.dieClose.remove(ui.dialogs[i]);
 						break;
 					}
 				}

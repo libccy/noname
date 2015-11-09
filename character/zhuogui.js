@@ -1,7 +1,7 @@
 character.zhuogui={
     character:{
 		nianshou:['male','shu',4,['nianrui','qixiang']],
-		mamian:['male','qun',4,['lianyu','guiji']],
+		// mamian:['male','qun',4,['lianyu','guiji']],
 		niutou:['male','shu',4,['manjia','xiaoshou'],['fullskin']],
 		baiwuchang:['male','qun',3,['qiangzheng','moukui']],
 		heiwuchang:['male','qun',3,['suoling','xixing']],

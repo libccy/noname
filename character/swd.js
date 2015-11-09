@@ -6,7 +6,7 @@ character.swd={
 			swd_anka:['male','qun',3,['songci','anlianying'],['fullskin']],
 			swd_septem:['male','qun',4,['jiying','liaoyuan','yishan'],['fullskin']],
 			swd_kama:['female','qun',3,['yueren','shangshi'],['fullskin']],
-		swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
+		// swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
 			swd_nicole:['female','wu',3,['minjing','lingwu','huanjian'],['fullskin']],
 			swd_wangsiyue:['female','wei',3,['duishi','biyue'],['fullskin']],
 		swd_weida:['female','qun',3,['yueren','zhenlie']],
@@ -14,7 +14,7 @@ character.swd={
 
 			swd_chenjingchou:['male','wu',3,['youyin','yihua'],['fullskin']],
 			swd_duguningke:['female','qun',3,['lianji','touxi'],['fullskin']],
-			swd_guyue:['male','wei',3,['tiandao','swdqinyin','wangchen'],['fullskin']],
+			swd_guyue:['male','wei',3,['tiandao','qinyin','wangchen'],['fullskin']],
 			swd_tuobayuer:['female','shu',4,['liuhong','poyue','niepan'],['fullskin']],
 			swd_yuwentuo:['male','qun',4,['wushuang','xielei','kunlunjing'],['fullskin']],
 			swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue'],['fullskin']],
@@ -2879,7 +2879,8 @@ character.swd={
 			content:function(){
 				"step 0"
 				if(typeof event.count!='number'){
-					event.count=trigger.cards.length-1;
+					// event.count=trigger.cards.length-1;
+					event.count=1;
 				}
 				var recover=0,lose=0;
 				for(var i=0;i<game.players.length;i++){
@@ -2912,8 +2913,9 @@ character.swd={
 						}
 					}
 				}
+				var prompt='是否发动【琴音】（剩余'+get.cnNumber(event.count)+'次）';
 				player.chooseControl('失去体力','回复体力','cancel',
-				ui.create.dialog('是否发动【琴音】（剩余'+get.cnNumber(event.count)+'次）','hidden')).ai=function(){
+				ui.create.dialog('是否发动【琴音】？','hidden')).ai=function(){
 					// console.log(lose,recover);
 					if(lose>recover&&lose>0) return 0;
 					if(lose<recover&&recover>0) return 1;
@@ -7944,8 +7946,6 @@ character.swd={
 		fushen2:'附身',
 		tiandao:'天道',
 		tiandao_info:'任意一名角色的判定生效前，你可以打出一张牌替换之',
-		swdqinyin:'琴音',
-		swdqinyin_info:'回合结束阶段，若你于本回合内未造成过伤害，你可以令所有角色失去或回复一点体力',
 		wangchen:'忘尘',
 		wangchen_info:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
 		guiyin:'归隐',

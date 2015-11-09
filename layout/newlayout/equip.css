@@ -104,7 +104,7 @@
 	transform-origin:bottom left;
 }
 .player.minskin.linked .equips{
-	transform:rotate(90deg) translate(-90px,-6px) scale(0.73);
+	transform:rotate(90deg) translate(-92px,-6px) scale(0.73);
 }
 .player.linked div:not(.equips) .card,
 .player.linked .identity{

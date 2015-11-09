@@ -13,6 +13,7 @@
 		ai:{},
 		lastdragchange:[],
 		skillaudio:[],
+		dieClose:[]
 	};
 	var lib={
 		configprefix:'noname_0.9_',
@@ -1312,25 +1313,48 @@
 							}
 						},
 					},
+					chess_treasure:{
+						name:'特殊战场角色',
+						init:'0.2',
+						frequent:true,
+						item:{
+							'0':'关闭',
+							'0.1':'较少出现',
+							'0.2':'偶尔出现',
+							'0.333':'时常出现',
+							'0.5':'频繁出现',
+						}
+					},
+					chess_obstacle:{
+						name:'随机路障',
+						init:'0.333',
+						item:{
+							'0':'关闭',
+							'0.2':'少量',
+							'0.333':'中量',
+							'0.5':'大量',
+						},
+						frequent:true,
+					},
+					show_distance:{
+						name:'显示距离',
+						init:true,
+						// frequent:true,
+					},
 					chess_ordered:{
 						name:'交替行动',
 						init:true,
-						frequent:true,
+						// frequent:true,
 					},
 					chess_character:{
 						name:'战棋武将',
 						init:true,
-						frequent:true,
+						// frequent:true,
 					},
-					chessscroll_speed:{
-						name:'边缘滚动速度',
-						init:'20',
-						item:{
-							'0':'不滚动',
-							'10':'10格/秒',
-							'20':'20格/秒',
-							'30':'30格/秒',
-						}
+					chess_card:{
+						name:'战棋卡牌',
+						init:true,
+						// frequent:true,
 					},
 					free_choose:{
 						name:'自由选将',
@@ -1367,6 +1391,16 @@
 						init:false,
 						restart:true,
 		            },
+					chessscroll_speed:{
+						name:'边缘滚动速度',
+						init:'20',
+						item:{
+							'0':'不滚动',
+							'10':'10格/秒',
+							'20':'20格/秒',
+							'30':'30格/秒',
+						}
+					},
 				}
 			},
 			stone:{
@@ -1463,12 +1497,15 @@
 			'身份模式':'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
-			'战棋模式':'<div style="margin:10px">对阵</div><ul style="margin-top:0"><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
+			'战棋模式':
+			'<div style="margin:10px">对阵模式</div><ul style="margin-top:0"><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
 			'每人在出牌阶段有一次移动的机会，若一名角色在移动之前使用过指定其他角色为目标的牌，该回合可移动的最大距离为2，否则最大距离为1<li>'+
 			'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
 			'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
-			'开启交替行动后，在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差</ul>'+
-			'<div style="margin:10px">统率</div><ul style="margin-top:0"><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
+			'开启交替行动时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
+			'开启特殊战场角色后，每个回合结束时有一定机率出现一个特殊角色，该角色不参与战斗，并有一个影响周围或全体角色的效果。该角色在出现后的5〜10个回合内消失<li>'+
+			'战场上可设置出现随机路障，角色无法移动到路障处。当一名角色的周围四格有至少三格为路障或在战场外，其可以在回合内清除一个相邻路障</ul>'+
+			'<div style="margin:10px">统率模式</div><ul style="margin-top:0"><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
 			'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
 			'战斗中有君主出场时可招降敌将，成功率取决于敌将的稀有度、剩余体力值以及手牌数。成功后战斗立即结束且没有金钱奖励。每发动一次招降，无论成功还是失败，都会扣除10招募令<li>'+
 			'挑战武将会与该武将以及与其强度相近的武将进行战斗，敌方人数与我方出场人数相同，但不少于3。胜利后可通过招募令招募该武将<li>'+
@@ -2854,7 +2891,7 @@
 						event.finish();
 					}
 					"step 6"
-					ui.clear();
+					if(event.card.name!='wuxie') ui.clear();
 				},
 				useSkill:function(){
 					"step 0"
@@ -4131,6 +4168,18 @@
 						}
 						return cards;
 					}
+				},
+				playerfocus:function(time){
+					time=time||1000;
+					this.classList.add('playerfocus');
+					ui.arena.classList.add('playerfocus');
+					var that=this;
+					setTimeout(function(){
+						that.classList.remove('playerfocus');
+						ui.arena.classList.remove('playerfocus');
+					},1000);
+					game.addVideo('playerfocus',this,time);
+					return this;
 				},
 				changeHujia:function(num){
 					if(typeof num!='number'){
@@ -5777,6 +5826,7 @@
 				$throwordered:function(node,nosource){
 					if(nosource){
 						node.style.transform='scale(0)';
+						node.classList.add('center');
 					}
 					else{
 						node.dataset.position=this.dataset.position;
@@ -6092,6 +6142,30 @@
 					}
 					game.animate.flame(left+this.offsetWidth/2,
 						top+this.offsetHeight-30,700,'thunder');
+				},
+				$rare2:function(){
+					game.addVideo('flame',this,'rare2');
+					var rect=this.getBoundingClientRect();
+					var left=rect.left;
+					var top=rect.top+15;
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'rare');
+				},
+				$epic2:function(){
+					game.addVideo('flame',this,'epic2');
+					var rect=this.getBoundingClientRect();
+					var left=rect.left;
+					var top=rect.top+15;
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'epic');
+				},
+				$legend2:function(){
+					game.addVideo('flame',this,'legend2');
+					var rect=this.getBoundingClientRect();
+					var left=rect.left;
+					var top=rect.top+15;
+					game.animate.flame(left+this.offsetWidth/2,
+						top+this.offsetHeight-30,700,'legend');
 				},
 				$rare:function(){
 					game.addVideo('flame',this,'rare');
@@ -7442,7 +7516,9 @@
 					if(content.type=='delay'){
 						game.delay(content.content);
 					}
-					else if(typeof content.player=='string'&&game.playerMap[content.player]){
+					else if(typeof content.player=='string'&&game.playerMap[content.player]&&
+						game.playerMap[content.player].classList&&
+						!game.playerMap[content.player].classList.contains('obstacle')){
 						game.videoContent[content.type](game.playerMap[content.player],content.content);
 					}
 					else{
@@ -7584,14 +7660,9 @@
 					console.log(player);
 				}
 			},
-			playerfocus:function(player){
-				if(player){
-					player.classList.add('playerfocus');
-					ui.arena.classList.add('playerfocus');
-					setTimeout(function(){
-						player.classList.remove('playerfocus');
-						ui.arena.classList.remove('playerfocus');
-					},1000);
+			playerfocus:function(player,time){
+				if(player&&player.playerfocus){
+					player.playerfocus(time);
 				}
 				else{
 					console.log(player);
@@ -7626,6 +7697,17 @@
 					console.log(player)
 				}
 			},
+			addObstacle:function(pos){
+				if(pos){
+					game.addObstacle(pos[0],pos[1]);
+				}
+				else{
+					console.log(pos)
+				}
+			},
+			removeObstacle:function(pos){
+				game.removeObstacle(pos);
+			},
 			moveTox:function(player,pos){
 				if(player&&player.dataset){
 					delete lib.posmap[player.dataset.position];
@@ -7649,6 +7731,25 @@
 				}
 				else{
 					console.log('chessFocus');
+				}
+			},
+			removeTreasure:function(pos){
+				if(game.playerMap[pos]){
+					game.playerMap[pos].delete();
+					delete game.playerMap[pos];
+				}
+				else{
+					console.log(pos);
+				}
+			},
+			initobs:function(obs){
+				if(obs){
+					for(var i=0;i<obs.length;i++){
+						game.addObstacle(obs[i]);
+					}
+				}
+				else{
+					console.log(obs);
 				}
 			},
 			stonePosition:function(content){
@@ -8127,7 +8228,7 @@
 				}
 			},
 			unmarkSkill:function(player,name){
-				if(player&&name){
+				if(player&&player.unmarkSkill){
 					player.unmarkSkill(name);
 				}
 				else{
@@ -9088,6 +9189,9 @@
 				}
 				else{
 					if(player&&player.classList.contains('dead')&&event.name!='phaseLoop'){
+						while(_status.dieClose.length){
+							_status.dieClose.shift().close();
+						}
 						event.finish();
 					}
 					else if(player&&player.removed&&event.name!='phaseLoop'){
@@ -9251,7 +9355,7 @@
 								nochess=false;
 							}
 						}
-						if(event.filterTarget(card,player,game.players[i])&&
+						if(event.filterTarget(card,player,game.players[i])&&!game.players[i].forceout&&
 							(game.players[i].isOut()==false||event.includeOutTarget)&&nochess){
 							if(ui.selected.targets.length<range[1]){
 								game.players[i].classList.add('selectable');
@@ -9351,6 +9455,25 @@
 				_status.multitarget=true;
 			}
 			if(event.isMine()){
+				if(lib.config.mode=='chess'&&game.me&&get.config('show_distance')){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==game.me){
+							game.players[i].node.action.hide();
+						}
+						else{
+							game.players[i].node.action.show();
+							var dist=get.distance(game.me,game.players[i],'pure');
+							var dist2=get.distance(game.me,game.players[i]);
+							game.players[i].node.action.innerHTML='距离：'+dist2+'/'+dist;
+							if(dist>7){
+								game.players[i].node.action.classList.add('thunder');
+							}
+							else{
+								game.players[i].node.action.classList.remove('thunder');
+							}
+						}
+					}
+				}
 				if(ok&&auto&&lib.config.auto_confirm&&(!_status.mousedragging||!_status.mouseleft)&&!_status.mousedown){
 					if(ui.confirm){
 						if(!skillinfo||!skillinfo.preservecancel){
@@ -12001,6 +12124,7 @@
 							for(var i=0;i<start.firstChild.childNodes.length;i++){
 								var node=start.firstChild.childNodes[i];
 								if(node.link){
+									if(node.mode.indexOf('mode_')==0) continue;
 									if(lib.config.characters.contains(node.mode)){
 										node.classList.remove('off');
 										node.link.firstChild.classList.add('on');
@@ -12040,8 +12164,13 @@
 								init:lib.config.characters.contains(mode),
 								onclick:togglePack
 							});
-							page.appendChild(cfgnode);
+							if(mode.indexOf('mode_')!=0){
+								page.appendChild(cfgnode);
+							}
 							var banCharacter=function(){
+								if(mode.indexOf('mode_')==0){
+									return;
+								}
 								this.classList.toggle('unselectable');
 								if(this.classList.contains('unselectable')){
 									lib.config.banned.add(this.link);
@@ -12066,6 +12195,11 @@
 						for(var i=0;i<lib.config.all.characters.length;i++){
 	                        createModeConfig(lib.config.all.characters[i],start.firstChild);
 	                    }
+						for(var i in lib.characterPack){
+							if(i.indexOf('mode_')==0){
+								createModeConfig(i,start.firstChild);
+							}
+						}
 						var active=start.firstChild.querySelector('.active');
 	                    if(!active){
 	                        active=start.firstChild.firstChild;
@@ -12106,6 +12240,7 @@
 							for(var i=0;i<start.firstChild.childNodes.length;i++){
 								var node=start.firstChild.childNodes[i];
 								if(node.link){
+									if(node.mode.indexOf('mode_')==0) continue;
 									if(lib.config.cards.contains(node.mode)){
 										node.classList.remove('off');
 										node.link.firstChild.classList.add('on');
@@ -12145,8 +12280,13 @@
 								init:lib.config.cards.contains(mode),
 								onclick:togglePack
 							});
-							page.appendChild(cfgnode);
+							if(mode.indexOf('mode_')!=0){
+								page.appendChild(cfgnode);
+							}
 							var banCard=function(){
+								if(mode.indexOf('mode_')==0){
+									return;
+								}
 								this.classList.toggle('unselectable');
 								if(this.classList.contains('unselectable')){
 									lib.config.bannedcards.add(this.link[2]);
@@ -12171,6 +12311,11 @@
 						for(var i=0;i<lib.config.all.cards.length;i++){
 	                        createModeConfig(lib.config.all.cards[i],start.firstChild);
 	                    }
+						for(var i in lib.cardPack){
+							if(i.indexOf('mode_')==0){
+								createModeConfig(i,start.firstChild);
+							}
+						}
 						var active=start.firstChild.querySelector('.active');
 	                    if(!active){
 	                        active=start.firstChild.firstChild;
@@ -12774,8 +12919,13 @@
 								lib.setHover(node,ui.click.hoverplayer);
 							}
 						}
-						node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
-						node.node.group.style.backgroundColor=get.translation(infoitem[1]+'Color');
+						if(infoitem[1]){
+							node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
+							node.node.group.style.backgroundColor=get.translation(infoitem[1]+'Color');
+						}
+						else{
+							node.node.group.style.display='none';
+						}
 					}
 					else{
 						if(item.name.indexOf('unknown')==0){
@@ -15586,7 +15736,7 @@
 			var i,translation,intro,str;
 			if(node.classList.contains('player')){
 				var capt=get.translation(node.name);
-				if(lib.character[node.name]){
+				if(lib.character[node.name]&&lib.character[node.name][1]){
 					capt+='&nbsp;&nbsp;'+lib.translate[lib.character[node.name][1]];
 				}
 				uiintro.add(capt);
@@ -16802,7 +16952,7 @@
 				}
 			}
 			lib.skilllist=[];
-			lib.characterPack={};
+			if(!lib.characterPack) lib.characterPack={};
 			for(i in character){
 				if(character[i].character){
 					lib.characterPack[i]=character[i].character
@@ -16857,7 +17007,7 @@
 					}
 				}
 			}
-			lib.cardPack={};
+			if(!lib.cardPack) lib.cardPack={};
 			for(i in card){
 				lib.cardPack[i]=[];
 				if(card[i].card){

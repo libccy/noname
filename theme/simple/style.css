@@ -35,6 +35,10 @@ body{
 .player.unseen .equips:not(*:empty){
 	border-radius:4px;
 }
+#arena:not(.chess) .player[data-position='0']>.equips>.equip5 {
+    border-radius: 4px;
+}
+
 .card{
 	color:white;
 }
@@ -47,6 +51,15 @@ body{
 #me>div>.card,#arena>.card:not(*:empty){
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
+/*.player{
+	background:repeating-linear-gradient(
+      135deg,
+      rgba(0,0,0,0.4),
+      rgba(0,0,0,0.4) 2px,
+      rgba(0,0,0,0.2) 2px,
+      rgba(0,0,0,0.2) 4px
+    );
+}*/
 
 .menupaused{
 	opacity: 0.3;

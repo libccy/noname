@@ -589,15 +589,9 @@ mode.identity={
 					game.zhu.setIdentity();
 					game.zhu.isZhu=true;
 					delete game.zhong;
-					game.zhu.$legend();
+					if(lib.config.animation) game.zhu.$legend();
 					game.delay(2);
-					game.zhu.classList.add('playerfocus');
-					ui.arena.classList.add('playerfocus');
-					setTimeout(function(){
-						game.zhu.classList.remove('playerfocus');
-						ui.arena.classList.remove('playerfocus');
-					},1000);
-					game.addVideo('playerfocus',game.zhu);
+					game.zhu.playerfocus(1000);
 				}
 			},
 			logAi:function(targets,card){

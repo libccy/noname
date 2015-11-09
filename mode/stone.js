@@ -207,6 +207,45 @@ mode.stone={
 			}
 		}
 	},
+	cardPack:{
+		mode_stone:[
+			'zhaohunfan','jintiao','liumangxingzhen','shengerpingdeng','emofengdi','konghunshi',
+			'mindieyi','miefafu','dianhaishenzhu','yesushengxue','sanghunzhao','fengraozhijiao'
+		]
+	},
+	characterPack:{
+		mode_stone:{
+			stone_weibing:['male','wei',2,['stone_weibing'],['minskin','stone'],[1,0]],
+			stone_weiguan:['male','wei',1,['stone_weiguan'],['minskin','stone'],[1,2]],
+			stone_weijiang:['male','wei',3,['stone_weijiang'],['minskin','stone'],[3,0]],
+
+			stone_shubing:['male','shu',2,['stone_shubing'],['minskin','stone'],[1,0]],
+			stone_shuguan:['male','shu',1,['stone_shuguan'],['minskin','stone'],[1,2]],
+			stone_shujiang:['male','shu',3,['stone_shujiang'],['minskin','stone'],[3,0]],
+
+			stone_wubing:['male','wu',2,['stone_wubing'],['minskin','stone'],[1,0]],
+			stone_wuguan:['male','wu',1,['stone_wuguan'],['minskin','stone'],[1,2]],
+			stone_wujiang:['male','wu',3,['stone_wujiang'],['minskin','stone'],[3,0]],
+
+			stone_qunbing:['male','qun',2,['stone_qunbing'],['minskin','stone'],[1,0]],
+			stone_qunguan:['male','qun',1,['stone_qunguan'],['minskin','stone'],[1,2]],
+			stone_qunjiang:['male','qun',3,['stone_qunjiang'],['minskin','stone'],[3,0]],
+
+			stone_daoshi:['male','qun',1,['stone_daoshi'],['minskin','stone'],[1,2]],
+			stone_sanxian:['male','qun',2,['stone_sanxian'],['minskin','stone'],[2,0]],
+			stone_yisheng:['male','qun',1,['jijiu'],['minskin','stone'],[2,2]],
+			stone_yinshi:['male','qun',1,['stone_yinshi'],['minskin','stone'],[1,2]],
+			stone_banxian:['male','qun',3,['stone_banxian'],['minskin','stone'],[3,0]],
+
+			stone_daogu:['female','qun',1,['stone_daogu'],['minskin','stone'],[1,2]],
+			stone_gongzhu:['female','wu',1,['shushen'],['minskin','stone'],[2,2]],
+			stone_genv:['female','wei',1,['jieyin'],['minskin','stone'],[1,2]],
+			stone_wunv:['female','qun',1,['biyue'],['minskin','stone'],[3,2]],
+			stone_huanghou:['female','qun',2,['stone_huanghou'],['minskin','stone'],[3,1]],
+			stone_feipin:['female','qun',1,['guixiu'],['minskin','stone'],[1,2]],
+			stone_yiji:['female','qun',1,['stone_yiji'],['minskin','stone'],[2,2]],
+		}
+	},
 	game:{
 		reserveDead:true,
 		getVideoName:function(){
@@ -252,28 +291,27 @@ mode.stone={
 		initStone:function(){
 			var list=[],list2=[];
 			var i,j,name;
-			for(i in lib.character){
-				if(lib.character[i][4]&&lib.character[i][4].contains('minskin')&&lib.character[i][4].contains('stone')){
-					lib.character[i][3].add('stonesha');
-					lib.character[i][3].add('stoneshan');
-					lib.character[i][3].add('stonedraw');
-					name=i+'_stonecharacter';
-					if(lib.character[i][5][0]<3){
-						list.push(name);
-					}
-					else{
-						list2.push(name);
-					}
-					lib.card[name]={
-						image:'character/default/'+i,
-						stoneact:lib.character[i][5][0]
-					};
-					for(j in lib.card.stonecharacter){
-						lib.card[name][j]=lib.card.stonecharacter[j];
-					}
-					lib.translate[name]=get.translation(i);
-					lib.translate[name+'_info']=get.skillintro(i);
+			for(var i in lib.characterPack.mode_stone){
+				lib.character[i]=lib.characterPack.mode_stone[i];
+				lib.character[i][3].add('stonesha');
+				lib.character[i][3].add('stoneshan');
+				lib.character[i][3].add('stonedraw');
+				name=i+'_stonecharacter';
+				if(lib.character[i][5][0]<3){
+					list.push(name);
 				}
+				else{
+					list2.push(name);
+				}
+				lib.card[name]={
+					image:'character/default/'+i,
+					stoneact:lib.character[i][5][0]
+				};
+				for(j in lib.card.stonecharacter){
+					lib.card[name][j]=lib.card.stonecharacter[j];
+				}
+				lib.translate[name]=get.translation(i);
+				lib.translate[name+'_info']=get.skillintro(i);
 			}
 			var addedcardcount=Math.ceil(lib.card.list.length/80);
 			var addedcardcount2=Math.ceil(lib.card.list.length/160);
@@ -409,6 +447,7 @@ mode.stone={
 				_status.videoInited=true,
 				game.addVideo('init',null,info);
 
+				event.trigger('gameStart');
 				game.gameDraw(game.me,2);
 				if(game.me.side){
 					game.stoneLoop(game.me);
@@ -892,37 +931,6 @@ mode.stone={
 				}
 			}
 		},
-	},
-	character:{
-		stone_weibing:['male','wei',2,['stone_weibing'],['minskin','stone'],[1,0]],
-		stone_weiguan:['male','wei',1,['stone_weiguan'],['minskin','stone'],[1,2]],
-		stone_weijiang:['male','wei',3,['stone_weijiang'],['minskin','stone'],[3,0]],
-
-		stone_shubing:['male','shu',2,['stone_shubing'],['minskin','stone'],[1,0]],
-		stone_shuguan:['male','shu',1,['stone_shuguan'],['minskin','stone'],[1,2]],
-		stone_shujiang:['male','shu',3,['stone_shujiang'],['minskin','stone'],[3,0]],
-
-		stone_wubing:['male','wu',2,['stone_wubing'],['minskin','stone'],[1,0]],
-		stone_wuguan:['male','wu',1,['stone_wuguan'],['minskin','stone'],[1,2]],
-		stone_wujiang:['male','wu',3,['stone_wujiang'],['minskin','stone'],[3,0]],
-
-		stone_qunbing:['male','qun',2,['stone_qunbing'],['minskin','stone'],[1,0]],
-		stone_qunguan:['male','qun',1,['stone_qunguan'],['minskin','stone'],[1,2]],
-		stone_qunjiang:['male','qun',3,['stone_qunjiang'],['minskin','stone'],[3,0]],
-
-		stone_daoshi:['male','qun',1,['stone_daoshi'],['minskin','stone'],[1,2]],
-		stone_sanxian:['male','qun',2,['stone_sanxian'],['minskin','stone'],[2,0]],
-		stone_yisheng:['male','qun',1,['jijiu'],['minskin','stone'],[2,2]],
-		stone_yinshi:['male','qun',1,['stone_yinshi'],['minskin','stone'],[1,2]],
-		stone_banxian:['male','qun',3,['stone_banxian'],['minskin','stone'],[3,0]],
-
-		stone_daogu:['female','qun',1,['stone_daogu'],['minskin','stone'],[1,2]],
-		stone_gongzhu:['female','wu',1,['shushen'],['minskin','stone'],[2,2]],
-		stone_genv:['female','wei',1,['jieyin'],['minskin','stone'],[1,2]],
-		stone_wunv:['female','qun',1,['biyue'],['minskin','stone'],[3,2]],
-		stone_huanghou:['female','qun',2,['stone_huanghou'],['minskin','stone'],[3,1]],
-		stone_feipin:['female','qun',1,['guixiu'],['minskin','stone'],[1,2]],
-		stone_yiji:['female','qun',1,['stone_yiji'],['minskin','stone'],[2,2]],
 	},
 	skill:{
 		chaofeng:{
@@ -1520,7 +1528,9 @@ mode.stone={
 		fengraozhijiao:'丰饶之角',
 		fengraozhijiao_info:'令一名随从回复全部体力',
 
-		stonecard:'法术'
+		stonecard:'法术',
+		mode_stone_card_config:'炉石模式',
+		mode_stone_character_config:'炉石模式',
 	},
 	ai:{
 		get:{
@@ -1538,6 +1548,6 @@ mode.stone={
 	},
 	config:['battle_number','double_character','double_hp','ban_weak','free_choose','change_choice'],
 	help:{
-		
+
 	}
 }

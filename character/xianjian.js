@@ -68,7 +68,7 @@ character.xianjian={
 			}
 		},
 		ningbin:{
-			trigger:{player:'damageEnd',source:'damageEnd'},
+			trigger:{player:'damageEnd'},
 			forced:true,
 			filter:function(event){
 				return event.nature=='thunder';
@@ -1360,7 +1360,7 @@ character.xianjian={
 		xuanyan2:'玄炎',
 		xuanyan_info:'锁定技，你的火属性伤害+1；你造成火属性伤害后流失1点体力',
 		ningbin:'凝冰',
-		ningbin_info:'锁定技，每当你造成或受到1次雷属性伤害，你回复1点体力',
+		ningbin_info:'锁定技，每当你受到1次雷属性伤害，你回复1点体力',
 		fenxin:'焚心',
 		fenxin2:'焚心',
 		fenxin_info:'锁定技，每当你的体力值发生改变，你摸等量的牌；每当你杀死一名角色，你增加一点体力上限并回复一点体力',

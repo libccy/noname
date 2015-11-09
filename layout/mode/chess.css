@@ -116,10 +116,19 @@
     -webkit-animation-fill-mode: forwards;
 }
 
-.player.playergrid{
+.player.playergrid,.player.obstacle{
     background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
+}
+.player.obstacle{
+    background: repeating-linear-gradient(
+      135deg,
+      rgba(0,0,0,0.2),
+      rgba(0,0,0,0.2) 10px,
+      rgba(0,0,0,0.1) 10px,
+      rgba(0,0,0,0.1) 20px
+    );
 }
 .playergrid.temp{
     opacity:0.3;
@@ -146,4 +155,28 @@
 }
 #arena.leadercontrol>#control{
     transition: all 0.5s !important;
+}
+.player.treasure{
+    box-shadow: none;
+}
+.player.treasure .count,
+.player.treasure .identity{
+    display: none;
+}
+.player.treasure .avatar{
+    width: 120px;
+    height: 120px;
+    left: 0;
+    top: 0;
+}
+.player .action{
+    text-shadow: black 0 0 1px !important;
+    font-size: 16px !important;
+    left:0;
+}
+.player .action.thunder{
+    color: rgb(117,186,255);
+}
+#arena.selecting .player .action:not(.hidden){
+    opacity: 1 !important;
 }

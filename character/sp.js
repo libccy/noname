@@ -2268,6 +2268,7 @@ character.sp={
 			ai:{
 				order:7,
 				threaten:1.5,
+				expose:0.2,
 				result:{
 					target:function(player,target){
 						if(target.num('h')<target.hp){
