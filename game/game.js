@@ -641,7 +641,7 @@
 				name:'玩法',
 				config:{
 					character:{
-						name:'角色卡牌',
+						name:'技能卡牌',
 						init:false,
 						restart:true,
 						onclick:function(bool){
@@ -652,6 +652,16 @@
 								lib.config.plays.remove('character');
 							}
 							game.saveConfig('plays',lib.config.plays);
+						}
+					},
+					character_num_playpackconfig:{
+						name:'卡牌比例',
+						init:'0.05',
+						item:{
+							'0.02':'2%',
+							'0.05':'5%',
+							'0.1':'10%',
+							'0.2':'20%',
 						}
 					},
 					soldier:{
@@ -682,6 +692,16 @@
 							game.saveConfig('plays',lib.config.plays);
 						}
 					},
+					wuxing_num_playpackconfig:{
+						name:'带属性卡牌',
+						init:'0.3',
+						item:{
+							'0.1':'10%',
+							'0.2':'20%',
+							'0.3':'30%',
+							'0.5':'50%',
+						}
+					},
 					weather:{
 						name:'天气变化',
 						init:false,
@@ -696,13 +716,74 @@
 							game.saveConfig('plays',lib.config.plays);
 						}
 					},
+					// weather_noqing_playpackconfig:{
+					// 	name:'异常天气出现概率',
+					// 	init:'0.5',
+					// 	item:{
+					// 		'0.1':'10%',
+					// 		'0.3':'30%',
+					// 		'0.5':'50%',
+					// 		'0.7':'70%',
+					// 	}
+					// },
+					weather_chance_playpackconfig:{
+						name:'天气效果触发概率',
+						init:'0.2',
+						item:{
+							'0.1':'10%',
+							'0.2':'20%',
+							'0.3':'30%',
+							'0.5':'50%',
+						},
+						onclick:function(item){
+							game.saveConfig('weather_chance_playpackconfig',item);
+							_status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
+					        var chancestr=parseInt(_status.weatherchance*100)+'%';
+					        for(var i in lib.translate){
+					            if(i.indexOf('__weather_')==0){
+					                lib.translate[i.slice(1)]=lib.translate[i].replace(/&weather&/,chancestr);
+					            }
+					        }
+						}
+					},
+					weather_duration_playpackconfig:{
+						name:'异常天气持续时间',
+						init:'[3,6]',
+						item:{
+							'[3,3]':'3~6回合',
+							'[3,6]':'3~9回合',
+							'[6,3]':'6~9回合',
+							'[6,6]':'6~12回合',
+						}
+					},
+					weather_qingduration_playpackconfig:{
+						name:'晴朗天气持续时间',
+						init:'[3,6]',
+						item:{
+							'[3,3]':'3~6回合',
+							'[3,6]':'3~9回合',
+							'[6,3]':'6~9回合',
+							'[6,6]':'6~12回合',
+						}
+					},
 					update:function(config,map){
 						for(var i in map){
-							if(lib.config.plays.contains(i)){
-								map[i].classList.add('on');
+							if(i.indexOf('_playpackconfig')!=-1){
+								map[i].classList.add('indent');
+								if(lib.config.plays.contains(i.slice(0,i.indexOf('_')))){
+									map[i].show();
+								}
+								else{
+									map[i].hide();
+								}
 							}
 							else{
-								map[i].classList.remove('on');
+								if(lib.config.plays.contains(i)){
+									map[i].classList.add('on');
+								}
+								else{
+									map[i].classList.remove('on');
+								}
 							}
 						}
 					}
@@ -7553,6 +7634,26 @@
 					if(content.type=='delay'){
 						game.delay(content.content);
 					}
+					else if(content.type=='play'){
+						window.play={};
+						if(!event.playtoload){
+							event.playtoload=1;
+						}
+						else{
+							event.playtoload++;
+						}
+						var script=lib.init.js('play',content.name);
+						script.addEventListener('load',function(){
+							var play=window.play[content.name]
+							if(play&&play.video){
+								play.video(content.init);
+							}
+							event.playtoload--;
+							if(event.playtoload==0){
+								delete window.play;
+							}
+						});
+					}
 					else if(typeof content.player=='string'&&game.playerMap[content.player]&&
 						game.playerMap[content.player].classList&&
 						!game.playerMap[content.player].classList.contains('obstacle')){
@@ -11992,7 +12093,10 @@
 								var autoskillNodes=[];
 								var banskillNodes=[];
 								var banskill;
-								if(mode=='skill'){
+								if(mode=='playpack'){
+									page.style.paddingBottom='10px';
+								}
+								else if(mode=='skill'){
 									var autoskillexpanded=false;
 									var banskillexpanded=false;
 	                                ui.create.div('.config.more','自动发动 <div>&gt;</div>',page,function(){

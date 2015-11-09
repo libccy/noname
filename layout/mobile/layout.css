@@ -113,6 +113,9 @@
     top:10px;
     left:2px;
 }
+#arena:not(.chess) .player[data-position='0']:not(.minskin) .wunature{
+	top:84px;
+}
 
 #arena:not(.chess) .player.fullskin2[data-position='0']:not(.minskin)>.avatar,
 #arena:not(.chess) .player.fullskin2[data-position='0']:not(.minskin)>.avatar2{

@@ -2,6 +2,23 @@ play.wuxing={
 	init:function(){
 		// lib.nature.push('metal','wood','water','soil');
 		lib.card.list.splice(Math.floor(lib.card.list.length*Math.random()),0,['spade',5,'wuxingpan']);
+		if(!_status.video){
+			lib.video.push({
+				type:'play',
+				name:'wuxing'
+			});
+		}
+	},
+	video:function(){
+		for(var i in this.translate){
+			lib.translate[i]=this.translate[i];
+		}
+		for(var i in this.card){
+			lib.card[i]=this.card[i];
+		}
+		for(var i in this.skill){
+			lib.skill[i]=this.skill[i];
+		}
 	},
 	element:{
 		player:{
@@ -9,6 +26,7 @@ play.wuxing={
 				if(player.node.wuxing){
 					player.node.wuxing.remove();
 				}
+				if(_status.video) return;
 				var node=ui.create.div('.wunature',player);
 				var list=['metal','wood','water','fire','soil'];
 				var nature=list.randomGet();
@@ -20,9 +38,10 @@ play.wuxing={
 		},
 		card:{
 			init:function(card){
+				if(_status.video) return;
 				if(card.name=='wuxingpan') return;
 				if(card.wunature) return;
-				if(Math.random()>1/3) return;
+				if(Math.random()>(parseFloat(lib.config.wuxing_num_playpackconfig)||0)) return;
 				var node=ui.create.div('.wunature',card);
 				var list=['metal','wood','water','fire','soil'];
 				var nature=list.randomGet();
@@ -30,6 +49,9 @@ play.wuxing={
 				node.dataset.nature=nature;
 				node.innerHTML=get.translation(nature);
 				card.node.wuxing=node;
+				if(!card.suit||!card.number){
+					card.node.wuxing.style.display='none';
+				}
 			}
 		}
 	},
@@ -144,7 +166,7 @@ play.wuxing={
 				}
 			}
 		},
-		wuxing:{
+		wuxingpan_skill:{
 			enable:'phaseUse',
 			usable:1,
 			filterCard:true,
@@ -170,7 +192,7 @@ play.wuxing={
 		wuxingpan:{
 			type:'equip',
 			subtype:'equip5',
-			skills:['wuxing'],
+			skills:['wuxingpan_skill'],
 			fullskin:true
 		}
 	},
@@ -190,8 +212,9 @@ play.wuxing={
 		fireColor2:'rgba(255,51,0,0.3)',
 		soilColor2:'rgba(163,98,0,0.3)',
 		wuxingpan:'五行盘',
-		wuxing:'五行',
-		wuxing_info:'出牌阶段，你可以永久改变一张手牌的五行属性，每阶段限一次',
+		wuxingpan_skill:'五行',
+		wuxingpan_skill_info:'出牌阶段限一次，你可以永久改变一张手牌的五行属性',
+		wuxingpan_info:'出牌阶段限一次，你可以永久改变一张手牌的五行属性',
 	},
 	help:{
 		'五行生克':'<ul><li>每名角色在游戏开始时随机获得一个属性<li>牌堆中三分之一的牌会随机获得一个属性<li>当一名成为相克属性卡牌的目标时，'+

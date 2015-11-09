@@ -38,7 +38,7 @@ window.config={
 		qunyingzhuan:'群英',
 		swd:'剧情',
 
-		character_play_config:'角色卡牌',
+		character_play_config:'技能卡牌',
 		soldier_play_config:'士兵模式',
 		strategy_play_config:'尔虞我诈',
 		wuxing_play_config:'五行生克',

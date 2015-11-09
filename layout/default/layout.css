@@ -864,6 +864,14 @@ div[data-color="unknownm"]{
 	font-family:'huangcao';
 	font-size: 24px;
 	color:white !important;
+	pointer-events: none;
+}
+div:hover>.wunature{
+	/*opacity: 0.5;*/
+}
+.button.noclick .wunature,
+.player.treasure .wunature{
+	display: none;
 }
 .player .actcount.hp{
 	left: -24px;

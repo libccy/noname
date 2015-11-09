@@ -202,7 +202,7 @@
 .menu.main>.menu-content>div>.right.pane>div>.config.indent,
 .menu.main>.menu-content>div>.right.pane>div>.config.toggle.indent{
     left:12px !important;
-	width: calc(100% - 20px) !important;
+	width: calc(100% - 32px) !important;
 }
 .menu.main>.menu-content>div>.right.pane>div:not(.expanded)>.config.auto-hide,
 .menu.main>.menu-content>div>.right.pane>div>.config.hidden{

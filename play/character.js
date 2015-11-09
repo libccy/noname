@@ -1,6 +1,12 @@
 play.character={
-	mode:['identity','guozhan','versus'],
-	init:function(){
+	// mode:['identity','guozhan','versus'],
+	video:function(list){
+		this.init(list);
+		for(var i in this.skill){
+			lib.skill[i]=this.skill[i];
+		}
+	},
+	init:function(videolist){
 		var list=[],list2=[];
 		var i,j,name;
 		for(i in lib.character){
@@ -11,7 +17,19 @@ play.character={
 			list.push(i);
 		}
 		list.randomSort();
-		list=list.splice(0,Math.ceil(lib.card.list.length/20));
+		list=list.splice(0,Math.ceil(lib.card.list.length*(parseFloat(lib.config.character_num_playpackconfig)||0)));
+		if(_status.video){
+			if(videolist){
+				list=videolist;
+			}
+		}
+		else{
+			lib.video.push({
+				type:'play',
+				init:list,
+				name:'character'
+			});
+		}
 		var suit=['heart','diamond','club','spade'];
 		for(i=0;i<list.length;i++){
 			name=list[i]+'_charactercard';
@@ -74,9 +92,9 @@ play.character={
 		lib.card.list=lib.card.list.concat(list2);
 	},
 	help:{
-		'角色卡牌':'<ul><li>牌堆中随机加入5%的角色牌<li>出牌阶段对自己使用，'+
+		'技能卡牌':'<ul><li>牌堆中随机加入5%的技能牌<li>出牌阶段对自己使用，'+
 		'随机获得卡牌对应角色的一项技能直到使用者的下一个出牌阶段开始'+
-		'<li>一个角色最多只能通过角色卡牌获得一个技能，新获得技能后将失去之前以此法获得的技能'+
+		'<li>一个角色最多只能通过技能卡牌获得一个技能，新获得技能后将失去之前以此法获得的技能'+
 		'<li>不能获得主公技、限定技、觉醒技等特殊技能，以及场上只能唯一存在的技能'+
 		'<li>若卡牌对应角色没有可获得的技能，目标摸两张牌'
 	},
@@ -88,10 +106,34 @@ play.character={
 			mark:'card',
 			intro:{
 				name:function(storage,player){
-					return get.translation(player.additionalSkills.charactercard);
+					if(_status.video){
+						if(player.marks.charactercard&&player.marks.charactercard.name){
+							var name=player.marks.charactercard.name;
+							if(name){
+								name=name.slice(0,name.indexOf('_charactercard'));
+								return get.translation(name);
+							}
+						}
+						return '';
+					}
+					else{
+						return get.translation(player.additionalSkills.charactercard);
+					}
 				},
 				content:function(storage,player){
-					return lib.translate[player.additionalSkills.charactercard+'_info'];
+					if(_status.video){
+						if(player.marks.charactercard&&player.marks.charactercard.name){
+							var name=player.marks.charactercard.name;
+							if(name){
+								name=name.slice(0,name.indexOf('_charactercard'));
+								return get.skillintro(name,true,true);
+							}
+						}
+						return '';
+					}
+					else{
+						return lib.translate[player.additionalSkills.charactercard+'_info'];
+					}
 				},
 				onunmark:function(storage,player){
 					delete player.additionalSkills.charactercard;
