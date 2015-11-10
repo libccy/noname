@@ -350,8 +350,10 @@ character.woods={
 					}
 				});
 				"step 1"
-				result.targets[0].gain(result.cards);
-				player.$give(result.cards.length,result.targets[0]);
+				if(result.targets&&result.targets[0]){
+					result.targets[0].gain(result.cards);
+					player.$give(result.cards.length,result.targets[0]);
+				}
 			}
 		},
 		dimeng:{

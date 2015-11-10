@@ -2242,6 +2242,7 @@ character.yijiang={
 						if(player.skills.contains('qice5')) return 0;
 						var num=0;
 						var cards=player.get('h');
+						if(cards.length>=3&&player.hp>=3) return 0;
 						for(var i=0;i<cards.length;i++){
 							num+=Math.max(0,ai.get.value(cards[i],player,'raw'));
 						}
@@ -2489,7 +2490,6 @@ character.yijiang={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(get.tag(card,'recover')&&player!=target) return [1,0,0,0.1];
 						if(player.skills.contains('jueqing')) return [1,-2];
 						var hasfriend=false;
 						for(var i=0;i<game.players.length;i++){

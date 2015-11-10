@@ -716,54 +716,56 @@
 							game.saveConfig('plays',lib.config.plays);
 						}
 					},
-					// weather_noqing_playpackconfig:{
-					// 	name:'异常天气出现概率',
-					// 	init:'0.5',
-					// 	item:{
-					// 		'0.1':'10%',
-					// 		'0.3':'30%',
-					// 		'0.5':'50%',
-					// 		'0.7':'70%',
-					// 	}
+					// weather_animation_playpackconfig:{
+					// 	name:'天气动画',
+					// 	init:true
 					// },
+					weather_noqing_playpackconfig:{
+						name:'异常天气出现概率',
+						init:'0.5',
+						item:{
+							'0.1':'10%',
+							'0.3':'30%',
+							'0.5':'50%',
+							'0.7':'70%',
+							'0.9':'90%',
+						}
+					},
 					weather_chance_playpackconfig:{
 						name:'天气效果触发概率',
-						init:'0.2',
+						init:'0.5',
 						item:{
 							'0.1':'10%',
 							'0.2':'20%',
 							'0.3':'30%',
 							'0.5':'50%',
+							'0.8':'80%',
 						},
 						onclick:function(item){
 							game.saveConfig('weather_chance_playpackconfig',item);
 							_status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
-					        var chancestr=parseInt(_status.weatherchance*100)+'%';
-					        for(var i in lib.translate){
-					            if(i.indexOf('__weather_')==0){
-					                lib.translate[i.slice(1)]=lib.translate[i].replace(/&weather&/,chancestr);
-					            }
-					        }
 						}
 					},
 					weather_duration_playpackconfig:{
 						name:'异常天气持续时间',
-						init:'[3,6]',
+						init:'[4,4]',
 						item:{
-							'[3,3]':'3~6回合',
-							'[3,6]':'3~9回合',
-							'[6,3]':'6~9回合',
-							'[6,6]':'6~12回合',
+							'[2,4]':'1~3回合',
+							'[4,4]':'3~6回合',
+							'[4,7]':'3~9回合',
+							'[7,4]':'6~9回合',
+							'[7,7]':'6~12回合',
 						}
 					},
 					weather_qingduration_playpackconfig:{
 						name:'晴朗天气持续时间',
-						init:'[3,6]',
+						init:'[2,4]',
 						item:{
-							'[3,3]':'3~6回合',
-							'[3,6]':'3~9回合',
-							'[6,3]':'6~9回合',
-							'[6,6]':'6~12回合',
+							'[2,4]':'1~3回合',
+							'[4,4]':'3~6回合',
+							'[4,7]':'3~9回合',
+							'[7,4]':'6~9回合',
+							'[7,7]':'6~12回合',
 						}
 					},
 					update:function(config,map){
@@ -825,7 +827,7 @@
 							var node=this;
 							if(node._clearing){
 								localStorage.clear();
-								indexedDB.deleteDatabase(lib.configprefix+'data');
+								if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 								game.reload();
 								return;
 							}
@@ -3378,6 +3380,7 @@
 				},
 				damage:function(){
 					"step 0"
+					if(num<0) num=0;
 					if(num>0&&player.hujia&&!player.hasSkillTag('nohujia')){
 						if(num>=player.hujia){
 							num-=player.hujia;
@@ -8979,6 +8982,12 @@
 			}
 			if(typeof suit!='string'){
 				suit=['heart','diamond','club','spade'].randomGet();
+			}
+			else if(suit=='black'){
+				suit=Math.random()<0.5?'club':'spade';
+			}
+			else if(suit=='red'){
+				suit=Math.random()<0.5?'diamond':'heart';
 			}
 			if(typeof number!='number'){
 				number=Math.ceil(Math.random()*13);

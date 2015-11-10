@@ -426,7 +426,7 @@ mode.identity={
 						list=list3.slice(0,6);
 					}
 					else{
-						list=list3.slice(0,num).concat(list2);
+						list=list2.concat(list3.slice(0,num));
 					}
 				}
 				var dialog=ui.create.dialog('选择角色',[list,'character']);
