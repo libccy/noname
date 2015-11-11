@@ -12737,8 +12737,13 @@
 							page.appendChild(text);
 							var textstr='';
 							var perserveMenu=false;
-							game.print=function(str){
-								textstr+=str+'\n';
+							game.print=function(){
+								for(var i=0;i<arguments.length;i++){
+									if(arguments[i]){
+										textstr+=arguments[i]+' '
+									}
+								}
+								textstr+='\n';
 								text.value=textstr;
 								perserveMenu=true;
 							}
