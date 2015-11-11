@@ -112,7 +112,7 @@ character.hearth={
 		},
 		guozai:{
 			enable:'phaseUse',
-			usable:2,
+			usable:1,
 			filter:function(event,player){
 				return player.num('h')<4;
 			},
@@ -1845,7 +1845,7 @@ character.hearth={
 		guozai:'过载',
 		guozai2:'过载',
 		guozai2_bg:'载',
-		guozai_info:'出牌阶段，你可将手牌补至四张，并于此阶段结束时弃置等量的牌，每阶段最多发动两次',
+		guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
 		hanshuang:'寒霜',
 		hanshuang_info:'锁定技，你使用黑色牌造成伤害后，受伤害角色须将武将牌翻至背面，然后你流失一点体力',
 		bingshi:'冰噬',

@@ -211,7 +211,7 @@ card.standard={
 						if(nh<=target.hp){
 							keep=true;
 						}
-						else if(nh==target.hp+1&&target.hp>=3){
+						else if(nh==target.hp+1&&target.hp>=3&&target.num('h','tao')<=1){
 							keep=true;
 						}
 						if(target.hp>=2&&keep&&target.hasFriend()){

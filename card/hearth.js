@@ -447,6 +447,7 @@ card.hearth={
 				order:1,
 				result:{
 					target:function(player,target){
+						if(target.num('h','tao')) return 0;
 						var nh=target.num('h');
 						if(nh<=2) return 1;
 						if(target.hp==1&&target.maxHp>2) return 1;

@@ -3251,7 +3251,7 @@ mode.chess={
 				'step 1'
 				game.log('乌鸦神像发动');
 				player.recover('nosource');
-				player.draw();
+				// player.draw();
 				var card=get.cardPile(function(c){
 					return get.type(c)=='delay';
 				});
@@ -4517,7 +4517,7 @@ mode.chess={
 		shiyuansu:'护体',
 		shiyuansu_info:'任意一名角色一次性受到不少于两点伤害后，使其获得一点护甲',
 		wuyashenxiang:'厄音',
-		wuyashenxiang_info:'距离3格以内的角色在其回合结束后，若体力值不大于1，令其回复一点体力并摸一张牌，然后将牌堆中的一张延时锦囊牌置于其判定区',
+		wuyashenxiang_info:'距离3格以内的角色在其回合结束后，若体力值不大于1，令其回复一点体力，然后将牌堆中的一张延时锦囊牌置于其判定区',
 
 		leader_caocao:'曹操',
 		leader_liubei:'刘备',
