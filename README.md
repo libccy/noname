@@ -22,7 +22,7 @@ mac：覆盖contents/resources/app下的同名文件
 支持mp3或ogg格式
 #####技能
 路径：audio/skill<br>
-以制衡为例，若技能有一个配音，则命名为zhiheng.mp3，若有两个配音，则改为zhiheng1.mp3和zhiheng2.mp3<br>
+同一技能最多技能两个配音。以制衡为例，若技能有一个配音，则命名为zhiheng.mp3，若有两个配音，则改为zhiheng1.mp3和zhiheng2.mp3<br>
 查看自己技能名：在战局－命令中输入
 ````javascript
 game.print(game.me.skills);
@@ -52,10 +52,10 @@ var players=get.players(null,true);
 while(players.length){
     var player=players.shift();
     if(player.name1){
-        game.log(player.name1,player.name2);
+        game.print(player.name1,player.name2);
     }
     else{
-        game.log(player.name);
+        game.print(player.name);
     }
 }
 ````

@@ -67,7 +67,7 @@
 }
 
 #control.bosslist{
-    top:calc(100% - 50px);
+    top:calc(100% - 50px) !important;
     position:fixed;
 }
 
@@ -108,8 +108,7 @@
         bottom:calc(50% - 335px);
 	}
     #control.bosslist{
-        top:calc(50% + 350px);
-
+        top:calc(50% + 350px) !important;
     }
     #bosslist{
         top:calc(40% - 260px);

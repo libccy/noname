@@ -2167,7 +2167,7 @@ character.sp={
 						return player!=target&&!target.storage.bifa;
 					},
 					ai1:function(card){
-						return 8-ai.get.value(card);
+						return 7-ai.get.value(card);
 					},
 					ai2:function(target){
 						var num=target.hasSkillTag('maixie')?2:0;

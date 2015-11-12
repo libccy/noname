@@ -5,8 +5,11 @@
     left: 3%;
     top:3%
 }
-#control{
-    bottom:160px;
+#arena.mobile>#control{
+    top:calc(100% - 205px);
+}
+#arena.chess.mobile>#control{
+    top:calc(100% - 175px);
 }
 #control>div,#system>div>div{
     height: 40px;
@@ -34,6 +37,7 @@
 #system>div:not(.shown){
     opacity: 0;
     width: 50%;
+    min-width: 50%;
 }
 #system>div.shown{
     min-width: 50%;

@@ -912,10 +912,13 @@ character.mountain={
 			mark:true
 		},
 		huashen1:{
-			trigger:{global:'gameStart'},
+			trigger:{global:['gameStart','phaseBefore']},
 			forced:true,
 			popup:false,
 			priority:10,
+			filter:function(event,player){
+				return !player.storage.huasheninited;
+			},
 			content:function(){
 				for(var i in lib.character){
 					if(i.indexOf('stone_')==0) continue;
@@ -938,6 +941,7 @@ character.mountain={
 				player.storage.huashen.unowned=player.storage.huashen.list.slice(0);
 				player.storage.huashen.unowned.sort(lib.sort.random);
 				player.storage.huashen.get(2);
+				player.storage.huasheninited=true;
 			}
 		},
 		huashen2:{
@@ -987,6 +991,9 @@ character.mountain={
 								},500);
 							}
 							else{
+								if(mark.firstChild){
+									mark.firstChild.remove();
+								}
 								mark.setBackground(currentname,'character');
 							}
 

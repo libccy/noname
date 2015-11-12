@@ -211,7 +211,7 @@ card.hearth={
 				result:{
 					player:function(player){
 						var nh=player.num('h');
-						if(nh<=player.hp&&_status.event.name=='chooseToUse'){
+						if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
 							if(_status.event.filterCard&&
 								_status.event.filterCard({name:'shandianjian'})){
 								return -10;
@@ -226,6 +226,7 @@ card.hearth={
 					},
 					target:function(player,target){
 						if(target.skills.contains('shandianjian2')||target.num('h')==0) return 0;
+						if(player.num('h')<=1) return 0;
 						if(target==player){
 							if(_status.event.filterCard&&
 								_status.event.filterCard({name:'shandianjian'})){

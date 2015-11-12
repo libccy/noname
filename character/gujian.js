@@ -487,6 +487,7 @@ character.gujian={
 				},
 				effect:{
 					target:function(card,player,target){
+						if(!target.hasFriend()) return;
 						if(get.tag(card,'damage')){
 							if(target.hp==target.maxHp) return [0,1];
 						}

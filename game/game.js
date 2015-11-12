@@ -1341,33 +1341,60 @@
 						init:'combat',
 						item:{
 							combat:'对战',
-							leader:'统率'
+							leader:'统率',
+							tafang:'塔防'
 						},
 						restart:true,
 						frequent:true,
 					},
 					update:function(config,map){
-						if(config.chess_mode=='combat'){
-							map.chess_leader_save.hide();
-							map.chess_leader_clear.hide();
-
-							map.battle_number.show();
-							map.ban_weak.show();
-							map.free_choose.show();
-							map.change_choice.show();
-							map.chess_ordered.show();
-							map.chess_character.show();
-						}
-						else{
+						if(config.chess_mode=='leader'){
 							map.chess_leader_save.show();
 							map.chess_leader_clear.show();
-
-							map.battle_number.hide();
-							map.ban_weak.hide();
-							map.free_choose.hide();
-							map.change_choice.hide();
-							map.chess_ordered.hide();
 							map.chess_character.hide();
+						}
+						else{
+							map.chess_leader_save.hide();
+							map.chess_leader_clear.hide();
+							map.chess_character.show();
+						}
+						if(config.chess_mode=='combat'){
+							map.battle_number.show();
+							map.chess_ordered.show();
+								map.free_choose.show();
+								map.change_choice.show();
+						}
+						else{
+							map.battle_number.hide();
+							map.chess_ordered.hide();
+								map.free_choose.hide();
+								map.change_choice.hide();
+						}
+						if(config.chess_mode=='tafang'){
+							map.chess_treasure.hide();
+							map.chess_obstacle.hide();
+							map.tafang_size.show();
+						}
+						else{
+							map.chess_treasure.show();
+							map.chess_obstacle.show();
+							map.tafang_size.hide();
+						}
+						if(config.chess_mode=='combat'||config.chess_mode=='tafang'){
+							map.ban_weak.show();
+						}
+						else{
+							map.ban_weak.hide();
+						}
+					},
+					tafang_size:{
+						name:'战场大小',
+						init:'9',
+						frequent:true,
+						item:{
+							'6':'小',
+							'9':'中',
+							'12':'大',
 						}
 					},
 					chess_leader_save:{
@@ -1623,7 +1650,7 @@
 			'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
 			'开启交替行动时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
 			'开启战场机关后，每个回合结束时有一定机率出现一个机关，该机关不参与战斗，并有一个影响周围或全体角色的效果。机关在出现后的5〜10个回合内消失<li>'+
-			'开启击退效果后，当一名角色对相邻目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
+			'开启击退效果后，当一名角色对距离两格以内且在同一直线上的目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
 			'战场上可设置出现随机路障，角色无法移动到路障处。当一名角色的周围四格有至少三格为路障或在战场外时，其可以在回合内清除一个相邻路障</ul>'+
 			'<div style="margin:10px">统率模式</div><ul style="margin-top:0"><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
 			'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
@@ -12753,7 +12780,10 @@
 								try{
 									eval(text.value);
 								}
-								catch(e){}
+								catch(e){
+									text.value=e;
+									perserveMenu=true;
+								}
 								if(!perserveMenu){
 									text.value='';
 									clickContainer.call(menuContainer);
@@ -13093,6 +13123,10 @@
 						}
 					}
 					else{
+						node.node={
+							name:ui.create.div('.name',node),
+							intro:ui.create.div('.intro',node)
+						}
 						if(item.name.indexOf('unknown')==0){
 							node.setBackground(item.name1,'character');
 						}
@@ -13920,13 +13954,13 @@
 							}
 						}
 					}
-					if(lib.config.layout=='phone'){
+					if(lib.config.layout=='phone'&&ui.menuContainer.classList.contains('hidden')){
 						ui.arena.classList.remove('phonetop');
 						ui.system1.classList.remove('shown');
 						ui.system2.classList.remove('shown');
-						if(ui.chessinfo){
-							ui.chessinfo.classList.remove('zoomed');
-						}
+						// if(ui.chessinfo){
+						// 	ui.chessinfo.classList.remove('zoomed');
+						// }
 					}
 				}
 				if(_status.tempunpop){
@@ -15067,7 +15101,7 @@
 			for(var i=0;i<ui.updates.length;i++){
 				ui.updates[i]();
 			}
-			if(ui.dialog){
+			if(ui.dialog&&!ui.dialog.classList.contains('noupdate')){
 				if(lib.config.mode=='chess'){
 					if(ui.dialog.content.offsetHeight<240&&(!ui.dialog.buttons||!ui.dialog.buttons.length)){
 						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
