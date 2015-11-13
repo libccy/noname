@@ -1410,6 +1410,16 @@
 							'12':'大',
 						}
 					},
+					tafang_difficulty:{
+						name:'战斗难度',
+						init:'2',
+						frequent:true,
+						item:{
+							'1':'简单',
+							'2':'普通',
+							'3':'困难',
+						}
+					},
 					chess_leader_save:{
 						name:'选择历程',
 						init:'save1',
@@ -1669,11 +1679,12 @@
 			'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
 			'战斗中有君主出场时可招降敌将，成功率取决于敌将的稀有度、剩余体力值以及手牌数。成功后战斗立即结束且没有金钱奖励。每发动一次招降，无论成功还是失败，都会扣除10招募令<li>'+
 			'挑战武将会与该武将以及与其强度相近的武将进行战斗，敌方人数与我方出场人数相同，但不少于3。胜利后可通过招募令招募该武将<li>'+
-			'竞技场：<br>随机选择9名武将，每次派出1〜3名武将参战。战斗中阵亡的武将不能再次上场。<br><br>战斗后武将进入疲劳状态，若立即再次出场则初始体力值-1。<br><br>战斗中本方武将行动时可召唤后援，令一名未出场的已方武将加入战斗。后援武将在战斗结束后无论存活与否均不能再次出场<br><br>当取得12场胜利或所有武将全部阵亡后结束，并根据胜场数获得随机奖励'+
+			'竞技场：<br>随机选择9名武将，每次派出1〜3名武将参战。战斗中阵亡的武将不能再次上场。<br><br>战斗后武将进入疲劳状态，若立即再次出场则初始体力值-1。<br><br>战斗中本方武将行动时可召唤后援，令一名未出场的已方武将加入战斗。后援武将在战斗结束后无论存活与否均不能再次出场<br><br>当取得12场胜利或所有武将全部阵亡后结束，并根据胜场数获得随机奖励</ul>'+
 			'<div style="margin:10px">塔防模式</div><ul style="margin-top:0"><li>阻上敌人到达最下方的出口，坚持到给定的回合数即获得胜利<li>'+
-			'在1~10回合，每轮将新增1名敌人，11~20回合，每轮将新增2名敌人，20回合后每轮将增加3名敌人<li>'+
-			'每轮可分配10个行动点，用来布置机关、招募武将，或令武将行动。未用完的行动点将减半并累积到下一轮<li>'+
-			'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募10名友方角色。',
+			'每轮可获得10个行动点，用来布置机关、招募武将，或令武将行动。游戏难度将影响不同操作消耗的行动点数。未用完的行动点将减半并累积到下一轮<li>'+
+			'每一轮在最上方的一个随机位置增加一名敌人，若最上方已有角色，则将其下移一格<li>'+
+			'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募10名友方角色。<li>'+
+			'敌方角色到达底部出口时游戏失败，已方角色到达底部出口，将被移出游戏',
 			'炉石模式':'<ul><li>游戏流程类似1v1，场上有两名主将进行对抗'+
 			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
 			'<li>牌堆中随机加入总量1/3的随从牌，使用之可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
@@ -1688,7 +1699,12 @@
 			node._poppedfunc=func;
 			node._poppedwidth=width;
 			node._poppedheight=height;
-			node.addEventListener(lib.config.touchscreen?'touchstart':'mouseenter',ui.click.hoverpopped);
+			if(lib.config.touchscreen){
+				node.listen(ui.click.hoverpopped);
+			}
+			else{
+				node.addEventListener('mouseenter',ui.click.hoverpopped);
+			}
 		},
 		placePoppedDialog:function(dialog,e){
 			if(e.touches&&e.touches[0]){
@@ -3882,11 +3898,13 @@
 					if(lib.config.touchscreen){
 						lib.setLongPress(this,ui.click.intro);
 					}
-					else if(lib.config.hover_all){
-						lib.setHover(this,ui.click.hoverplayer);
-					}
-					if(lib.config.right_info){
-						this.oncontextmenu=ui.click.rightplayer;
+					else{
+						if(lib.config.hover_all){
+							lib.setHover(this,ui.click.hoverplayer);
+						}
+						if(lib.config.right_info){
+							this.oncontextmenu=ui.click.rightplayer;
+						}
 					}
 					var name=get.translation(character);
 					this.node.name.innerHTML='';
@@ -5580,11 +5598,13 @@
 					if(lib.config.touchscreen){
 						lib.setLongPress(node,ui.click.intro);
 					}
-					else if(lib.config.hover_all){
-						lib.setHover(node,ui.click.hoverplayer);
-					}
-					if(lib.config.right_info){
-						node.oncontextmenu=ui.click.rightplayer;
+					else{
+						if(lib.config.hover_all){
+							lib.setHover(node,ui.click.hoverplayer);
+						}
+						if(lib.config.right_info){
+							node.oncontextmenu=ui.click.rightplayer;
+						}
 					}
 					return node;
 				},
@@ -5625,11 +5645,13 @@
 						if(lib.config.touchscreen){
 							lib.setLongPress(node,ui.click.intro);
 						}
-						else if(lib.config.hover_all){
-							lib.setHover(node,ui.click.hoverplayer);
-						}
-						if(lib.config.right_info){
-							node.oncontextmenu=ui.click.rightplayer;
+						else{
+							if(lib.config.hover_all){
+								lib.setHover(node,ui.click.hoverplayer);
+							}
+							if(lib.config.right_info){
+								node.oncontextmenu=ui.click.rightplayer;
+							}
 						}
 						return node;
 					}
@@ -8296,6 +8318,14 @@
 				if(player){
 					player.delete();
 					delete game.playerMap[player.dataset.position];
+					game.players.remove(player);
+					for(var i=0;i<ui.phasequeue.length;i++){
+						if(ui.phasequeue[i].link==player){
+							ui.phasequeue[i].remove();
+							ui.phasequeue.splice(i,1);
+							break;
+						}
+					}
 				}
 			},
 			addChessPlayer:function(content){
@@ -13146,11 +13176,13 @@
 							if(lib.config.touchscreen){
 								lib.setLongPress(node,ui.click.intro);
 							}
-							else if(lib.config.hover_all){
-								lib.setHover(node,ui.click.hoverplayer);
-							}
-							if(lib.config.right_info){
-								node.oncontextmenu=ui.click.rightplayer;
+							else{
+								if(lib.config.hover_all){
+									lib.setHover(node,ui.click.hoverplayer);
+								}
+								if(lib.config.right_info){
+									node.oncontextmenu=ui.click.rightplayer;
+								}
 							}
 						}
 						if(infoitem[1]){
@@ -13319,11 +13351,13 @@
 					if(lib.config.touchscreen){
 						lib.setLongPress(node,ui.click.intro);
 					}
-					else if(lib.config.hover_all){
-						lib.setHover(node,ui.click.hoverplayer);
-					}
-					if(lib.config.right_info){
-						node.oncontextmenu=ui.click.rightplayer;
+					else{
+						if(lib.config.hover_all){
+							lib.setHover(node,ui.click.hoverplayer);
+						}
+						if(lib.config.right_info){
+							node.oncontextmenu=ui.click.rightplayer;
+						}
 					}
 				}
 				node.storage={};
@@ -13550,7 +13584,9 @@
 				}
 				uiintro.style.left=left+'px';
 				uiintro._poppedorigin=this;
-				uiintro.addEventListener(lib.config.touchscreen?'touchend':'mouseleave',ui.click.leavehoverpopped);
+				if(!lib.config.touchscreen){
+					uiintro.addEventListener('mouseleave',ui.click.leavehoverpopped);
+				}
 			},
 			leavehoverpopped:function(){
 				if(_status.dragged) return;
@@ -15065,6 +15101,7 @@
 				return false;
 			},
 			right:function(){
+				if(lib.config.touchscreen) return;
 				if(_status.noright){
 					_status.noright=false;
 					return false;

@@ -384,11 +384,14 @@ character.refresh={
 			init:function(player){
 				player.storage.reqianxun2=[];
 			},
-			trigger:{target:'useCardToBegin',player:'judgeAfter'},
+			trigger:{target:'useCardToBegin',player:'judgeBefore'},
 			filter:function(event,player){
 				if(player.num('h')==0) return false;
 				if(event.parent.name=='phaseJudge'){
-					return event.result.judge!=0;
+					if(lib.skill.reqianxun.trigger.player=='judgeBefore'){
+						return true;
+					}
+					return event.result&&event.result.judge!=0;
 				}
 				if(event.name=='judge') return false;
 				if(event.targets&&event.targets.length>1) return false;
