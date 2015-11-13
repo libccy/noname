@@ -41,11 +41,13 @@ mode.versus={
 				if(lib.storage.noreplace_end==undefined) game.save('noreplace_end',true);
 				if(lib.storage.die_stop==undefined) game.save('die_stop',true);
 				if(lib.storage.autoreplaceinnerhtml==undefined) game.save('autoreplaceinnerhtml',true);
-				if(lib.storage.only_zhu==undefined) game.save('only_zhu',true);
+				// if(lib.storage.only_zhu==undefined) game.save('only_zhu',true);
 				if(lib.storage.single_control==undefined) game.save('single_control',true);
-				if(lib.storage.control_all==undefined) game.save('control_all',true);
 				if(lib.storage.number==undefined) game.save('number',3);
 				if(lib.storage.replace_number==undefined) game.save('replace_number',3);
+				if(lib.storage.control_all==undefined) game.save('control_all',true);
+				game.save('only_zhu',true);
+
 				ui.create.arena();
 				ui.create.cards();
 				game.finishCards();
@@ -68,10 +70,12 @@ mode.versus={
 					}
 					ui.autoreplace.listen(game.switchAutoreplace);
 
-					ui.versusreplace=ui.create.system('换人',null,true);
-					ui.versushs=ui.create.system('手牌',null,true);
-					lib.setPopped(ui.versusreplace,game.versusHoverReplace);
-					lib.setPopped(ui.versushs,game.versusHoverHandcards);
+					// ui.versusreplace=ui.create.system('换人',null,true);
+					// lib.setPopped(ui.versusreplace,game.versusHoverReplace);
+					if(game.players.length>2){
+						ui.versushs=ui.create.system('手牌',null,true);
+						lib.setPopped(ui.versushs,game.versusHoverHandcards);
+					}
 				}
 				_status.friendCount=ui.create.system('我方阵亡：'+get.cnNumber(0),null,true);
 				_status.enemyCount=ui.create.system('敌方阵亡：'+get.cnNumber(0),null,true);
@@ -99,17 +103,18 @@ mode.versus={
 					for(var i=0;i<this.dialog.buttons.length;i++) this.dialog.buttons[i].style.opacity=1;
 					this.dialog.add('选项');
 					this.dialog.versus_zhu=this.dialog.add(ui.create.switcher('versus_zhu',lib.storage.zhu)).querySelector('.toggle');
-					this.dialog.versus_only_zhu=this.dialog.add(ui.create.switcher('versus_only_zhu',lib.storage.only_zhu)).querySelector('.toggle');
+					// this.dialog.versus_only_zhu=this.dialog.add(ui.create.switcher('versus_only_zhu',lib.storage.only_zhu)).querySelector('.toggle');
 					this.dialog.versus_main_zhu=this.dialog.add(ui.create.switcher('versus_main_zhu',lib.storage.main_zhu)).querySelector('.toggle');
 					if(lib.storage.zhu){
-						this.dialog.versus_only_zhu.parentNode.classList.remove('disabled');
+						// this.dialog.versus_only_zhu.parentNode.classList.remove('disabled');
 						this.dialog.versus_main_zhu.parentNode.classList.remove('disabled');
 					}
 					else{
-						this.dialog.versus_only_zhu.parentNode.classList.add('disabled');
+						// this.dialog.versus_only_zhu.parentNode.classList.add('disabled');
 						this.dialog.versus_main_zhu.parentNode.classList.add('disabled');
 					}
 					this.dialog.versus_assign_enemy=this.dialog.add(ui.create.switcher('versus_assign_enemy',lib.storage.assign_enemy)).querySelector('.toggle');
+					this.dialog.versus_cross_seat=this.dialog.add(ui.create.switcher('versus_cross_seat',lib.storage.cross_seat)).querySelector('.toggle');
 					this.dialog.versus_random_seat=this.dialog.add(ui.create.switcher('versus_random_seat',lib.storage.random_seat)).querySelector('.toggle');
 					this.dialog.versus_noreplace_end=this.dialog.add(ui.create.switcher('versus_noreplace_end',lib.storage.noreplace_end)).querySelector('.toggle');
 					this.dialog.versus_single_control=this.dialog.add(ui.create.switcher('versus_single_control',lib.storage.single_control)).querySelector('.toggle');
@@ -118,6 +123,25 @@ mode.versus={
 					this.dialog.versus_number=this.dialog.add(ui.create.switcher('versus_number',[1,2,3],lib.storage.number)).querySelector('.toggle');
 					this.dialog.replace_number=this.dialog.add(ui.create.switcher('replace_number',[0,1,2,3,5,7,9,17],lib.storage.replace_number)).querySelector('.toggle');
 					this.dialog.choice=this.dialog.add(ui.create.switcher('choice',[12,16,20,24,40,'∞'],lib.storage.choice)).querySelector('.toggle');
+
+					if(lib.storage.cross_seat){
+						this.dialog.versus_random_seat.parentNode.classList.add('disabled');
+					}
+					else{
+						this.dialog.versus_random_seat.parentNode.classList.remove('disabled');
+						if(lib.storage.random_seat){
+							this.dialog.versus_cross_seat.parentNode.classList.add('disabled');
+						}
+						else{
+							this.dialog.versus_cross_seat.parentNode.classList.remove('disabled');
+						}
+					}
+					if(lib.storage.single_control){
+						this.dialog.versus_control_all.parentNode.classList.remove('disabled');
+					}
+					else{
+						this.dialog.versus_control_all.parentNode.classList.add('disabled');
+					}
 				};
 				event.confirm=function(){
 					var dialog=event.dialog;
@@ -292,19 +316,32 @@ mode.versus={
 					}
 					game.save('zhu',dialog.versus_zhu.link);
 					if(lib.storage.zhu){
-						dialog.versus_only_zhu.parentNode.classList.remove('disabled');
+						// dialog.versus_only_zhu.parentNode.classList.remove('disabled');
 						dialog.versus_main_zhu.parentNode.classList.remove('disabled');
 					}
 					else{
-						dialog.versus_only_zhu.parentNode.classList.add('disabled');
+						// dialog.versus_only_zhu.parentNode.classList.add('disabled');
 						dialog.versus_main_zhu.parentNode.classList.add('disabled');
 					}
-					game.save('only_zhu',dialog.versus_only_zhu.link);
+					// game.save('only_zhu',dialog.versus_only_zhu.link);
 					game.save('main_zhu',dialog.versus_main_zhu.link);
 					game.save('assign_enemy',dialog.versus_assign_enemy.link);
 					game.save('random_seat',dialog.versus_random_seat.link);
+					game.save('cross_seat',dialog.versus_cross_seat.link);
 					game.save('noreplace_end',dialog.versus_noreplace_end.link);
 					game.save('single_control',dialog.versus_single_control.link);
+					if(lib.storage.cross_seat){
+						dialog.versus_random_seat.parentNode.classList.add('disabled');
+					}
+					else{
+						dialog.versus_random_seat.parentNode.classList.remove('disabled');
+						if(lib.storage.random_seat){
+							dialog.versus_cross_seat.parentNode.classList.add('disabled');
+						}
+						else{
+							dialog.versus_cross_seat.parentNode.classList.remove('disabled');
+						}
+					}
 					if(lib.storage.single_control){
 						dialog.versus_control_all.parentNode.classList.remove('disabled');
 					}
@@ -404,14 +441,26 @@ mode.versus={
 							}
 						}
 					}
-					for(i=0;i<position;i++){
-						game.friend.push(game.players[i-position+num*2]);
+					if(lib.storage.cross_seat){
+						for(i=0;i<game.players.length;i++){
+							if(i%2==0){
+								game.friend.push(game.players[i]);
+							}
+							else{
+								game.enemy.push(game.players[i]);
+							}
+						}
 					}
-					for(i=position;i<num;i++){
-						game.friend.push(game.players[i-position]);
-					}
-					for(i=0;i<num;i++){
-						game.enemy.push(game.players[num-position+i]);
+					else{
+						for(i=0;i<position;i++){
+							game.friend.push(game.players[i-position+num*2]);
+						}
+						for(i=position;i<num;i++){
+							game.friend.push(game.players[i-position]);
+						}
+						for(i=0;i<num;i++){
+							game.enemy.push(game.players[num-position+i]);
+						}
 					}
 				}
 				if(((position==Math.ceil(num/2)-1&&lib.storage.zhu)||(lib.storage.zhu&&lib.storage.single_control))){
@@ -449,19 +498,29 @@ mode.versus={
 						}
 					}
 					else{
-						if(i==Math.ceil(num/2)-1&&lib.storage.zhu){
+						if(game.me==game.friend[i]&&lib.storage.zhu){
 							game.friend[i].identity='zhu';
 							game.friend[i].setIdentity(_status.color+'Zhu');
 							game.friendZhu=game.friend[i];
+						}
+						else{
+							game.friend[i].identity='zhong';
+							game.friend[i].setIdentity(_status.color+'Zhong');
+
+						}
+						if(lib.storage.zhu&&get.distance(game.enemy[i],game.me,'pure')==num){
 							game.enemy[i].identity='zhu';
 							game.enemy[i].setIdentity(!_status.color+'Zhu');
 							game.enemyZhu=game.enemy[i];
 						}
 						else{
-							game.friend[i].identity='zhong';
-							game.friend[i].setIdentity(_status.color+'Zhong');
 							game.enemy[i].identity='zhong';
 							game.enemy[i].setIdentity(!_status.color+'Zhong');
+						}
+						if(lib.storage.zhu&&!game.enemyZhu){
+							game.enemy[0].identity='zhu';
+							game.enemy[0].setIdentity(!_status.color+'Zhu');
+							game.enemyZhu=game.enemy[0];
 						}
 					}
 					game.friend[i].node.identity.dataset.color=get.translation(_status.color+'Color');
@@ -955,6 +1014,7 @@ mode.versus={
 		versus_die_stop_config:'死亡后终止结算',
 		versus_main_zhu_config:'主将死亡后结束',
 		versus_assign_enemy_config:'指定对手',
+		versus_cross_seat_config:'交叉座位',
 		versus_random_seat_config:'随机座位',
 		versus_noreplace_end_config:'无替补时结束',
 		versus_single_control_config:'单人控制',
@@ -1025,7 +1085,7 @@ mode.versus={
 
 				var list=(this.side==game.me.side)?_status.friend:_status.enemy;
 				if((list.length==0&&lib.storage.noreplace_end)||
-				(lib.storage.zhu&&lib.storage.main_zhu&&this.identity=='zhu')){
+				(lib.storage.zhu&&lib.storage.main_zhu&&this.identity=='zhu'&&game.players.length>2)){
 					if(game.friend.contains(this)){
 						game.over(false);
 					}

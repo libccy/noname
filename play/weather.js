@@ -198,7 +198,7 @@ play.weather={
         }
     },
     weatherAnimation:{
-        
+
     },
     translate:{
         _weather_qing:'晴',

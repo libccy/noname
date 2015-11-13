@@ -396,6 +396,7 @@ character.woods={
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])<1) list.push(game.players[i]);
 				}
+				if(list.length==0) return -1;
 				list.sort(function(a,b){
 					return b.num('h')-a.num('h');
 				});
