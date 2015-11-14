@@ -10955,7 +10955,9 @@
 				ui.ctx=ui.canvas.getContext('2d');
 				ui.configbg=ui.create.div("#click");
 				ui.configbg.listen(ui.click.config2);
-				ui.configbg.oncontextmenu=ui.click.config2;
+				if(!lib.config.touchscreen){
+					ui.configbg.oncontextmenu=ui.click.config2;
+				}
 				ui.config=ui.create.div('#sidebar2.content');
 				ui.config.listen(function(){
 					if(_status.reloading) return;
@@ -10972,10 +10974,12 @@
 						game.check();
 					}
 				});
-				ui.config.oncontextmenu=function(e){
-					e.stopPropagation();
-					return false;
-				};
+				if(!lib.config.touchscreen){
+					ui.config.oncontextmenu=function(e){
+						e.stopPropagation();
+						return false;
+					};
+				}
 
 				ui.sidebar.ontouchstart=ui.click.touchStart;
 				ui.config.ontouchstart=ui.click.touchStart;
@@ -13116,7 +13120,9 @@
 				else{
 					node.addEventListener('click',ui.click.resume);
 				}
-				node.oncontextmenu=ui.click.resume;
+				if(!lib.config.touchscreen){
+					node.oncontextmenu=ui.click.resume;
+				}
 
 				var node2=ui.create.div('#paused2',node);
 				node2.innerHTML='已暂停';
@@ -14446,7 +14452,7 @@
 					return false;
 				}
 				layer.addEventListener(lib.config.touchscreen?'touchend':'click',clicklayer);
-				layer.oncontextmenu=clicklayer;
+				if(!lib.config.touchscreen) layer.oncontextmenu=clicklayer;
 				lib.placePoppedDialog(uiintro,e);
 				uiintro.style.zIndex=21;
 
@@ -17472,7 +17478,9 @@
 		document.onmousemove=ui.click.windowmousemove;
 		document.onmousedown=ui.click.windowmousedown;
 		document.onmouseup=ui.click.windowmouseup;
-		document.oncontextmenu=ui.click.right;
+		if(!lib.config.touchscreen){
+			document.oncontextmenu=ui.click.right;
+		}
 		document.ontouchend=function(e){
 			if(e.touches.length==1&&!_status.dragged){
 				ui.click.pause();
