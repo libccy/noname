@@ -238,6 +238,7 @@ window.config={
 	paused:false,
 	title:false,
 	right_sidebar:false,
+	button_press:true,
 
 	modeconfig:false,
 	gameconfig:false,

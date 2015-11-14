@@ -46,7 +46,7 @@ table{table-layout: fixed;}
 #system{padding: 6px;width: calc(100% - 12px);white-space: nowrap;z-index: 3;pointer-events: none}
 #system>div{height: 100%;position: relative;margin: 0;padding: 0;pointer-events: auto}
 #system>div:last-child{text-align: right;float:right}
-#system>div>div{position: relative;padding-top: 6px;padding-bottom: 6px;padding-left: 8px;padding-right: 8px;text-align: center;margin:4px}
+#system>div>div{position: relative;padding-top: 6px;padding-bottom: 6px;padding-left: 8px;padding-right: 8px;text-align: center;margin:4px;transition: all 0.1s}
 #paused,#click{left: 0;top:0;width: 100%;height: 100%;z-index: 5;}
 #paused2{font-size: 30px;top:calc(50% - 17px);left:calc(50% - 45px);}
 #sidebar,#sidebar2,#sidebar3{
@@ -247,7 +247,7 @@ margin-bottom: 5px;
 .button.character>.identity{top:-6px;left:72px;}
 /*--------确认--------*/
 #control{text-align: center;z-index: 2;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);pointer-events: none}
-#control>*{pointer-events: auto}
+#control>*{pointer-events: auto;}
 .control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;margin-left: 4px;margin-right: 4px;}
 .control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;opacity:0}
 .control:not(.nozoom){width:0}
@@ -281,7 +281,7 @@ margin-bottom: 5px;
 	filter:grayscale(1);
 	-webkit-filter:grayscale(1);
 }
-.player>.name{left: 18px;top:36px;font-family: 'huangcao';font-size:20px}
+.player>.name{left: 16px;top:36px;font-family: 'huangcao';font-size:20px}
 .player>.intro{top:87px;left: 18px;}
 .player>.damage{
 	font-family: 'huangcao';
@@ -852,8 +852,12 @@ div[data-color="unknownm"]{
 .firetext{
 	color: rgb(255,119,63);
 }
-.thundertext{
+.thundertext,
+.controlthundertext{
 	color: rgb(117,186,255);
+}
+.controlthundertext{
+	/*transform: scale(0.95);*/
 }
 .poisontext{
 	color: rgb(104,221,127);

@@ -30,18 +30,22 @@ html{
 .popup.thunder{
 	color: rgb(117,186,255);
 }
-.control .thundertext{
+.control .thundertext,
+.control .controlthundertext{
 	color: rgba(29, 63, 137, 1);
 }
 .player,.card,.button,.dialog>.bar,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips{
 	background: url('wood.jpg');
 }
-.control,#system>div>div,.menubutton{
+.control,#system>div>div,.menubutton,#system>div>.pressdown2{
 	background: url('wood2.jpg');
 	color:rgba(77, 60, 51,0.8);
 	text-shadow:none;
 	border-radius:4px;
+}
+#system>div>.pressdown2{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 .judges>div,.marks>div{
 	border-radius:4px;

@@ -201,8 +201,8 @@ card.standard={
 						if(player.hasSkillTag('pretao')) return 5;
 						return 2;
 					},
-					useful:[8,6],
-					value:[8,6],
+					useful:[8,6.5],
+					value:[8,6.5],
 				},
 				result:{
 					target:function(player,target){

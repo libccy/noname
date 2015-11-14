@@ -213,7 +213,7 @@
 .menu.main>.menu-content>div>.menubutton.round{
 	left:335px;
 	top:197px;
-	z-index:1;
+	z-index:3;
     transition-property: color, box-shadow;
 	transition-duration:0.3s;
 	position:absolute;
@@ -365,6 +365,12 @@
     border-radius:4px;
 }
 .menubutton.active{
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+}
+#system>div>.pressdown,.controlpressdown{
+	transform: scale(0.95);
+}
+#system>div>.pressdown2{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 }
 .menubutton.highlight{

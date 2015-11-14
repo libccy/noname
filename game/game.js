@@ -275,7 +275,7 @@
 							xueji_bg:'雪霁',
 							yinxiang_bg:'印象',
 							chunhui_bg:'春晖',
-							grass_bg:'芳草',
+							// grass_bg:'芳草',
 							huangtian_bg:'黄天',
 						},
 						onclick:function(background){
@@ -589,6 +589,11 @@
 								ui.css.blur_ui.remove();
 							}
 						}
+					},
+					button_press:{
+						name:'按钮效果',
+						init:true,
+						unfrequent:true,
 					},
 					animation:{
 						name:'游戏特效',
@@ -4109,7 +4114,7 @@
 						}
 						this.node.count.innerHTML=numh;
 					}
-					this.node.equips.dataset.number=this.num('e');
+					// this.node.equips.dataset.number=this.num('e');
 					if(this==game.me){
 						ui.updateh();
 					}
@@ -6224,7 +6229,7 @@
 					if(!equipped){
 						player.node.equips.appendChild(card);
 					}
-					player.node.equips.dataset.number=player.num('e');
+					// player.node.equips.dataset.number=player.num('e');
 					return player;
 				},
 				$gain:function(card,log,init){
@@ -7066,6 +7071,21 @@
 					node.link=item;
 					node.innerHTML=get.translation(item);
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control);
+
+					if(lib.config.button_press){
+						node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(e){
+							node.classList.add('controlthundertext');
+							node.parentNode.classList.add('controlpressdown');
+						});
+						node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(e){
+							node.classList.remove('controlthundertext');
+							node.parentNode.classList.remove('controlpressdown');
+						});
+						node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(e){
+							node.classList.remove('controlthundertext');
+							node.parentNode.classList.remove('controlpressdown');
+						});
+					}
 				},
 				close:function(){
 					ui.controls.remove(this);
@@ -11894,6 +11914,7 @@
 							game.onresume2();
 						}
 						ui.arena.classList.remove('menupaused');
+						ui.config2.classList.remove('pressdown2');
 					};
 					var clickMenuItem=function(){
 		                var node=this.parentNode._link;
@@ -11996,6 +12017,7 @@
 							for(var i=0;i<menuUpdates.length;i++){
 								menuUpdates[i]();
 							}
+							ui.config2.classList.add('pressdown2');
 							ui.arena.classList.add('menupaused');
                         }
                         else{
@@ -13103,6 +13125,17 @@
 						func.call(this,e);
 					});
 				}
+				if(lib.config.button_press){
+					node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(e){
+						node.classList.add('pressdown');
+					});
+					node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(e){
+						node.classList.remove('pressdown');
+					});
+					node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(e){
+						node.classList.remove('pressdown');
+					});
+				}
 				return node;
 			},
 			pause:function(){
@@ -14152,6 +14185,7 @@
 			button:function(){
 				if(_status.dragged) return;
 				if(_status.clicked) return;
+				if(_status.tempNoButton) return;
 				if(this.classList.contains('noclick')) return;
 				_status.clicked=true;
 				var custom=_status.event.custom;

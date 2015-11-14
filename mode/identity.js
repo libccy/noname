@@ -292,6 +292,10 @@ mode.identity={
 						td.innerHTML=get.translation(list[i]+'2');
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 							if(_status.dragged) return;
+							_status.tempNoButton=true;
+							setTimeout(function(){
+								_status.tempNoButton=false;
+							},500);
 							if(game.zhu.name){
 								game.zhu.uninit();
 								delete game.zhu.isZhu;
