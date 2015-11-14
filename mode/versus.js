@@ -517,16 +517,16 @@ mode.versus={
 							game.enemy[i].identity='zhong';
 							game.enemy[i].setIdentity(!_status.color+'Zhong');
 						}
-						if(lib.storage.zhu&&!game.enemyZhu){
-							game.enemy[0].identity='zhu';
-							game.enemy[0].setIdentity(!_status.color+'Zhu');
-							game.enemyZhu=game.enemy[0];
-						}
 					}
 					game.friend[i].node.identity.dataset.color=get.translation(_status.color+'Color');
 					game.enemy[i].node.identity.dataset.color=get.translation(!_status.color+'Color');
 					// game.friend[i].node.identity.style.backgroundColor=get.translation(_status.color+'Color');
 					// game.enemy[i].node.identity.style.backgroundColor=get.translation(!_status.color+'Color');
+				}
+				if(lib.storage.zhu&&!game.enemyZhu){
+					game.enemy[0].identity='zhu';
+					game.enemy[0].setIdentity(!_status.color+'Zhu');
+					game.enemyZhu=game.enemy[0];
 				}
 				"step 2"
 				var num=lib.storage.number;

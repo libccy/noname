@@ -1375,12 +1375,14 @@
 							map.chess_obstacle.hide();
 							map.tafang_size.show();
 							map.tafang_turn.show();
+							map.tafang_difficulty.show();
 						}
 						else{
 							map.chess_treasure.show();
 							map.chess_obstacle.show();
 							map.tafang_size.hide();
 							map.tafang_turn.hide();
+							map.tafang_difficulty.hide();
 						}
 						if(config.chess_mode=='combat'||config.chess_mode=='tafang'){
 							map.ban_weak.show();
@@ -1915,6 +1917,7 @@
 						game.saveConfig('totouched',true);
 						if(totouch){
 							game.saveConfig('touchscreen',true);
+							game.saveConfig('fold_card',false);
 							game.reload();
 						}
 					}
@@ -5908,17 +5911,29 @@
 					}
 					if(cards){
 						cards=cards.slice(0);
-						node=cards.shift().copy('drawing','thrown');
+						node=cards.shift().copy('thrown');
 					}
 					else{
-						node=ui.create.div('.card.drawing.thrown');
+						node=ui.create.div('.card.thrown');
 					}
 					node.fixed=true;
-					node.dataset.position=this.dataset.position;
+					node.hide();
+					// node.dataset.position=this.dataset.position;
+					node.style.left='calc(50% - 52px)';
+					node.style.top='calc(50% - 52px)';
 					this.parentNode.appendChild(node);
+					node.style.transitionDuration='1s';
+					ui.refresh(node);
+
+					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
+					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
+					node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					node.show();
+
 					setTimeout(function(){
-						node.remove();
-					},1000);
+						node.style.transitionDuration='0.5s';
+						node.delete();
+					},700);
 					var that=this;
 					if(num&&num>1){
 						setTimeout(function(){
@@ -5998,7 +6013,7 @@
 						if(false){
 							var node=this.$throwxy(card,
 								'calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)',
-								'calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)',true
+								'calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)'
 							);
 						}
 						else{
@@ -6011,22 +6026,9 @@
 					}
 				},
 				$throwordered:function(node,nosource){
-					if(nosource){
-						node.style.transform='scale(0)';
-						node.classList.add('center');
-					}
-					else{
-						node.dataset.position=this.dataset.position;
-					}
 					node.classList.add('thrown');
 					node.hide();
 					node.style.transitionProperty='left,top,opacity,transform';
-					ui.arena.appendChild(node);
-					ui.refresh(node);
-					if(nosource){
-						node.style.transform='';
-					}
-					node.show();
 					for(var i=0;i<ui.thrown.length;i++){
 						if(ui.thrown[i].parentNode!=ui.arena||
 							ui.thrown[i].classList.contains('removing')){
@@ -6084,16 +6086,35 @@
 							throwns[i].style.top=top;
 						}
 					}
+					if(nosource){
+						node.style.transform='scale(0)';
+						node.classList.add('center');
+					}
+					else{
+						var parseCalc=function(str){
+							var per=str.slice(str.indexOf('calc(')+5,str.indexOf('%'));
+							var add=str.slice(str.indexOf('%')+1,str.indexOf('px')).replace(/\s/g,'');
+							return [parseInt(per),parseInt(add)];
+						}
+						var nx=parseCalc(node.style.left);
+						var ny=parseCalc(node.style.top);
+						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
+						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
+						var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
+						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					}
+					ui.arena.appendChild(node);
+					ui.refresh(node);
+					node.style.transform='';
+					node.show();
 					return node;
 				},
-				$throwxy:function(card,left,top,transform){
+				$throwxy:function(card,left,top){
 					var node=card.copy('thrown');
 					node.dataset.position=this.dataset.position;
 					node.hide();
 					node.style.transitionProperty='left,top,opacity';
-					if(transform){
-						node.style.transform='rotate('+(Math.random()*16-8)+'deg)';
-					}
 					ui.arena.appendChild(node);
 					ui.refresh(node);
 					node.show();
@@ -6163,7 +6184,7 @@
 							else{
 								node=ui.create.div('.card.thrown');
 							}
-							node.dataset.position=this.dataset.position;
+							// node.dataset.position=this.dataset.position;
 							node.fixed=true;
 							this.$throwordered(node);
 							// node.hide();
@@ -6178,8 +6199,12 @@
 							// node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
 
 							setTimeout(function(){
-								node.removeAttribute('style');
-								node.dataset.position=player.dataset.position;
+								// node.removeAttribute('style');
+								// node.dataset.position=player.dataset.position;
+								var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
+								var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
+								node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+
 								node.delete();
 							},700);
 						}
@@ -6677,9 +6702,14 @@
 				},
 				moveTo:function(player,method){
 					this.fixed=true;
-					this.style.left='';
-					this.style.top='';
-					this.dataset.position=player.dataset.position;
+					this.style.left=this.offsetLeft+'px';
+					this.style.top=this.offsetTop+'px';
+
+					var dx=player.offsetLeft+player.offsetWidth/2-52-this.offsetLeft;
+					var dy=player.offsetTop+player.offsetHeight/2-52-this.offsetTop;
+					this.style.transform+=' translate('+dx+'px,'+dy+'px)';
+
+					// this.dataset.position=player.dataset.position;
 					if(method=='flip'){
 						this.style.transition='all 0.5s';
 						this.style.transform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
@@ -15160,17 +15190,25 @@
 		updatehx:function(node){
 			var num=node.childElementCount-node.getElementsByClassName('removing').length;
 			var width=node._handcardsWidth;
+			node.classList.remove('fold0');
+			node.classList.remove('fold1');
+			node.classList.remove('fold2');
+			node.classList.remove('fold3');
 			if(num*78+40>=width){
-				node.dataset.fold=3;
+				// node.dataset.fold=3;
+				node.classList.add('fold3');
 			}
 			else if(num*93+25>=width){
-				node.dataset.fold=2;
+				// node.dataset.fold=2;
+				node.classList.add('fold2');
 			}
 			else if(num*112+6>=width){
-				node.dataset.fold=1;
+				// node.dataset.fold=1;
+				node.classList.add('fold1');
 			}
 			else{
-				node.dataset.fold=0;
+				// node.dataset.fold=0;
+				node.classList.add('fold0');
 			}
 		},
 		update:function(){

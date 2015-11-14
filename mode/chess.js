@@ -674,10 +674,11 @@ mode.chess={
 		treasures:[],
 		obstacles:[],
 		getVideoName:function(){
-			var name=[
-				get.translation(game.me.name),
-				'战棋'+get.translation(get.config('chess_mode'))+' - '+_status.friendCount+'v'+_status.enemyCount
-			];
+			var str='战棋'+get.translation(get.config('chess_mode'))+' - '+_status.friendCount+'v'+_status.enemyCount;
+			if(get.config('chess_mode')=='tafang'){
+				str='战棋 - 塔防';
+			}
+			var name=[get.translation(game.me.name),str];
 			return name;
 		},
 		addChessPlayer:function(name,enemy,num,pos){

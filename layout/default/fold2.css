@@ -1,14 +1,14 @@
-#me>[data-fold='1']>.card:not(.selected){margin-right: -30px;transform:perspective(1000px) rotateY(30deg);}
-#me>[data-fold='2']>.card:not(.selected){margin-right: -38px;transform:perspective(1000px) rotateY(38deg);}
-#me>[data-fold='3']>.card:not(.selected){margin-right: -45px;transform:perspective(1000px) rotateY(45deg);}
+#me>.fold1>.card:not(.selected){margin-right: -30px;transform:perspective(1000px) rotateY(30deg);}
+#me>.fold2>.card:not(.selected){margin-right: -38px;transform:perspective(1000px) rotateY(38deg);}
+#me>.fold3>.card:not(.selected){margin-right: -45px;transform:perspective(1000px) rotateY(45deg);}
 
-#me>[data-fold='1']>.card:not(.selected):hover,
-#me>[data-fold='2']>.card:not(.selected):hover,
-#me>[data-fold='3']>.card:not(.selected):hover{margin-right: -8px;transform:perspective(1000px) rotateY(0);}
+#me>.fold1>.card:not(.selected):hover,
+#me>.fold2>.card:not(.selected):hover,
+#me>.fold3>.card:not(.selected):hover{margin-right: -8px;transform:perspective(1000px) rotateY(0);}
 
-#me>[data-fold='1']>.card.start,
-#me>[data-fold='2']>.card.start,
-#me>[data-fold='3']>.card.start{transform:none;}
+#me>.fold1>.card.start,
+#me>.fold2>.card.start,
+#me>.fold3>.card.start{transform:none;}
 
 #me>div>.card:last-child{margin-right: -8px;}
 #me>div>.card.last{margin-right: -8px;}
