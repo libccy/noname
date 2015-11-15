@@ -30,9 +30,11 @@ html{
 .popup.thunder{
 	color: rgb(117,186,255);
 }
-.control .thundertext,
-.control .controlthundertext{
+.control .thundertext{
 	color: rgba(29, 63, 137, 1);
+}
+.control .controlthundertext{
+	color: rgb(62, 41, 30);
 }
 .player,.card,.button,.dialog>.bar,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips{

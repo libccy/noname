@@ -407,7 +407,12 @@ mode.chess={
 				node.fixed=true;
 				game.$randomMove(this,node,100,30);
 				var ot=node.style.transform;
-				node.style.transform+='scale(0.6)';
+				if(node.style.transform&&node.style.transform!='none'){
+					node.style.transform+=' scale(0.6)';
+				}
+				else{
+					node.style.transform='scale(0.6)';
+				}
 				node.dataset.position=this.dataset.position;
 				this.parentNode.appendChild(node);
 				ui.refresh(node);

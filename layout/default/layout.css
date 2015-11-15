@@ -250,7 +250,8 @@ margin-bottom: 5px;
 #control>*{pointer-events: auto;}
 .control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;margin-left: 4px;margin-right: 4px;}
 .control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;opacity:0}
-.control:not(.nozoom){width:0}
+/*.control:not(.nozoom){width:0}*/
+.control.removing.removing2{transform: scale(0.8)}
 .control>div{position: relative;padding: 3px;}
 /*--------角色--------*/
 .player>.avatar>.action{
@@ -855,9 +856,6 @@ div[data-color="unknownm"]{
 .thundertext,
 .controlthundertext{
 	color: rgb(117,186,255);
-}
-.controlthundertext{
-	/*transform: scale(0.95);*/
 }
 .poisontext{
 	color: rgb(104,221,127);

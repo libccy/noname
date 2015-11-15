@@ -59,19 +59,29 @@
 					auto_confirm:{
 						name:'自动确认',
 						init:true,
+						unfrequent:true,
 					},
 					enable_drag:{
 						name:'启用拖拽',
 						init:true,
+						unfrequent:true,
 					},
 					wuxie_self:{
 						name:'不无懈自己',
 						init:true,
 					},
+					tao_enemy:{
+						name:'不对敌将使用桃',
+						init:false,
+					},
 					touchscreen:{
 						name:'触屏模式',
 						init:false,
 						restart:true
+					},
+					low_performance:{
+						name:'低性能模式',
+						init:false
 					},
 					game_speed:{
 						name:'游戏速度',
@@ -154,25 +164,27 @@
 						unfrequent:true,
 					},
 					update:function(config,map){
-						if(!config.hover_all){
-							map.hover_handcard.hide();
-							map.hoveration.hide();
-						}
-						else{
-							map.hover_handcard.show();
-							map.hoveration.show();
-						}
 						if(config.touchscreen){
 							map.mousewheel.hide();
 							map.hover_all.hide();
 							map.hover_handcard.hide();
 							map.hoveration.hide();
+							map.right_info.hide();
+							map.right_click.hide();
 						}
 						else{
 							map.mousewheel.show();
 							map.hover_all.show();
-							map.hover_handcard.show();
-							map.hoveration.show();
+							map.right_info.show();
+							map.right_click.show();
+							if(!config.hover_all){
+								map.hover_handcard.hide();
+								map.hoveration.hide();
+							}
+							else{
+								map.hover_handcard.show();
+								map.hoveration.show();
+							}
 						}
 					}
 				}
@@ -3329,7 +3341,9 @@
 						sort=lib.config.sort_card(cards[num]);
 						if(lib.config.reverse_sort) sort=-sort;
 						cards[num].fix();
-						cards[num].animate('start');
+						if(!lib.config.low_performance){
+							cards[num].animate('start');
+						}
 
 						if(lib.isSingleHandcard()||sort>0) frag1.appendChild(cards[num]);
 						else frag2.appendChild(cards[num]);
@@ -3401,7 +3415,12 @@
 							cards[i].goto(event.position);
 						}
 						else{
-							cards[i].delete();
+							if(lib.config.low_performance){
+								cards[i].remove();
+							}
+							else{
+								cards[i].delete();
+							}
 						}
 					}
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
@@ -5104,7 +5123,7 @@
 					}
 					for(var i=0;i<cards.length;i++){
 						var sort=lib.config.sort_card(cards[i]);
-						if(animate!==false){
+						if(animate!==false&&!lib.config.low_performance){
 							cards[i].animate('start');
 						}
 						if(lib.isSingleHandcard()||sort>0){
@@ -5932,7 +5951,12 @@
 
 					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
 					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
-					node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					if(node.style.transform&&node.style.transform!='none'){
+						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					}
+					else{
+						node.style.transform='translate('+dx+'px,'+dy+'px)';
+					}
 					node.show();
 
 					setTimeout(function(){
@@ -5969,6 +5993,7 @@
 								node1.classList.add('cardflip');
 								node1.style.transform='none';
 								node1.style.transition='';
+								node1.removeEventListener('webkitTransitionEnd',onEnd);
 							}
 							// node1.addEventListener('transitionEnd',onEnd);
 							node1.addEventListener('webkitTransitionEnd',onEnd);
@@ -5989,6 +6014,7 @@
 								node2.classList.add('cardflip');
 								node2.style.transform='none';
 								node2.style.transition='';
+								node2.removeEventListener('webkitTransitionEnd',onEnd);
 							}
 							// node2.addEventListener('transitionEnd',onEnd);
 							node2.addEventListener('webkitTransitionEnd',onEnd);
@@ -6015,10 +6041,13 @@
 					}
 					else{
 						if(card==undefined||card.length==0) return;
-						if(false){
-							var node=this.$throwxy(card,
-								'calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)',
-								'calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)'
+						if(lib.config.low_performance){
+							var left=-52+(Math.random()<0.5?1:-1)*Math.random()*100;
+							var top=-52+(Math.random()<0.5?1:-1)*Math.random()*80;
+
+							var node=this.$throwxy2(card,
+								'calc(50% '+(left>0?'+':'-')+' '+Math.abs(left)+'px)',
+								'calc(50% '+(top>0?'+':'-')+' '+Math.abs(top)+'px)'
 							);
 						}
 						else{
@@ -6107,7 +6136,12 @@
 						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
 						var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
 						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
-						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+						if(node.style.transform&&node.style.transform!='none'){
+							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+						}
+						else{
+							node.style.transform='translate('+dx+'px,'+dy+'px)';
+						}
 					}
 					ui.arena.appendChild(node);
 					ui.refresh(node);
@@ -6120,11 +6154,43 @@
 					node.dataset.position=this.dataset.position;
 					node.hide();
 					node.style.transitionProperty='left,top,opacity';
+
 					ui.arena.appendChild(node);
 					ui.refresh(node);
 					node.show();
 					node.style.left=left;
 					node.style.top=top;
+					return node;
+				},
+				$throwxy2:function(card,left,top){
+					var node=card.copy('thrown');
+					node.style.left=left;
+					node.style.top=top;
+					node.hide();
+					node.style.transitionProperty='left,top,opacity,transform';
+
+					var parseCalc=function(str){
+						var per=str.slice(str.indexOf('calc(')+5,str.indexOf('%'));
+						var add=str.slice(str.indexOf('%')+1,str.indexOf('px')).replace(/\s/g,'');
+						return [parseInt(per),parseInt(add)];
+					}
+					var nx=parseCalc(node.style.left);
+					var ny=parseCalc(node.style.top);
+					nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
+					ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
+					var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
+					var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+					if(node.style.transform&&node.style.transform!='none'){
+						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					}
+					else{
+						node.style.transform='translate('+dx+'px,'+dy+'px)';
+					}
+
+					ui.arena.appendChild(node);
+					ui.refresh(node);
+					node.show();
+					node.style.transform='';
 					return node;
 				},
 				$give:function(card,player,log,init){
@@ -6208,7 +6274,12 @@
 								// node.dataset.position=player.dataset.position;
 								var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
 								var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
-								node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+								if(node.style.transform&&node.style.transform!='none'){
+									node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+								}
+								else{
+									node.style.transform='translate('+dx+'px,'+dy+'px)';
+								}
 
 								node.delete();
 							},700);
@@ -6712,7 +6783,12 @@
 
 					var dx=player.offsetLeft+player.offsetWidth/2-52-this.offsetLeft;
 					var dy=player.offsetTop+player.offsetHeight/2-52-this.offsetTop;
-					this.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					if(this.style.transform&&this.style.transform!='none'){
+						this.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					}
+					else{
+						this.style.transform='translate('+dx+'px,'+dy+'px)';
+					}
 
 					// this.dataset.position=player.dataset.position;
 					if(method=='flip'){
@@ -7076,25 +7152,51 @@
 						node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(e){
 							node.classList.add('controlthundertext');
 							node.parentNode.classList.add('controlpressdown');
+							node.parentNode.classList.add('controlpressdownx');
 						});
 						node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(e){
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
+							setTimeout(function(){
+								node.parentNode.classList.remove('controlpressdownx');
+							},200);
 						});
 						node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(e){
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
+							setTimeout(function(){
+								node.parentNode.classList.remove('controlpressdownx');
+							},200);
 						});
 					}
 				},
 				close:function(){
 					ui.controls.remove(this);
-					this.style.width=0;
-					this.style.paddingLeft=0;
-					this.style.paddingRight=0;
-					this.style.marginLeft=0;
-					this.style.marginRight=0;
-					this.delete();
+
+					if(lib.config.low_performance){
+						this.remove();
+					}
+					else{
+						this.delete();
+					}
+
+					var that=this;
+					setTimeout(function(){
+						var nc=true;
+						for(var i=0;i<ui.control.childNodes.length;i++){
+							if(!ui.control.childNodes[i].classList.contains('removing')){
+								nc=false;break;
+							}
+						}
+						if(!nc){
+							var width=that.offsetWidth;
+							that.style.marginLeft=(-width/2)+'px';
+							that.style.marginRight=(-width/2)+'px';
+							that.animate('removing2');
+						}
+					},100);
+
+
 					if(ui.confirm==this) delete ui.confirm;
 					if(ui.skills==this) delete ui.skills;
 				},
@@ -7409,7 +7511,10 @@
 					trigger.start=trigger.source||trigger.player;
 					var str=get.translation(trigger.player.name)+'濒死，是否帮助？';
 					_status.dying=event.dying;
-					if(player.hasSkillTag('save',true)||player.num('h','tao')||
+					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
+						event._result={bool:false}
+					}
+					else if(player.hasSkillTag('save',true)||player.num('h','tao')||
 					(player==event.dying&&(player.num('h','jiu')||player.num('h','hufu')||player.num('h','tianxianjiu')))){
 						player.chooseToUse({
 							filterCard:function(card,player){
@@ -10844,6 +10949,12 @@
 				return caption;
 			},
 			control:function(){
+				var nc=true;
+				for(var i=0;i<ui.control.childNodes.length;i++){
+					if(!ui.control.childNodes[i].classList.contains('removing')){
+						nc=false;break;
+					}
+				}
 				var i,controls;
 				var nozoom=false;
 				if(get.objtype(arguments[0])=='array') controls=arguments[0];
@@ -10865,17 +10976,32 @@
 					}
 				}
 				ui.controls.unshift(control);
+				if(nc){
+					ui.control.animate('nozoom');
+				}
+				if(lib.config.low_performance||ui.control.classList.contains('nozoom')){
+					nozoom=true;
+				}
 				if(nozoom){
 					control.classList.add('nozoom');
 				}
 				if(control.childNodes.length){
+					control.style.transition='all 0s';
+					var width=control.offsetWidth;
+					control.style.marginLeft=(-width/2)+'px';
+					control.style.marginRight=(-width/2)+'px';
+					control.style.transform='scale(0.8)';
+					ui.refresh(control);
 					if(nozoom){
 						control.style.transition='opacity 0.5s';
 					}
-					var width=0;
-					for(i=0;i<control.childNodes.length;i++) width+=control.childNodes[i].offsetWidth;
+					else{
+						control.style.transition='';
+					}
 					ui.refresh(control);
-					control.style.width=width+'px';
+					control.style.marginLeft='';
+					control.style.marginRight='';
+					control.style.transform='';
 					control.style.opacity=1;
 					ui.refresh(control);
 					control.style.transition='';
@@ -11843,7 +11969,7 @@
 				if(!lib.config.show_replay){
 					ui.replay.style.display='none';
 				}
-				ui.control=ui.create.div('#control',ui.arena);
+				ui.control=ui.create.div('#control',ui.arena).animate('nozoom');
 				ui.cardPile=ui.create.div('#cardPile');
 				ui.discardPile=ui.create.div('#discardPile');
 				ui.special=ui.create.div('#special');
@@ -12007,6 +12133,8 @@
 					ui.menuContainer=menuContainer;
 					ui.click.configMenu=function(){
                         if(menuContainer.classList.contains('hidden')){
+							ui.config2.classList.add('pressdown2');
+							ui.arena.classList.add('menupaused');
                             menu.classList.remove('zoomout');
                             menu.classList.add('zoomin');
                             menuContainer.classList.remove('hidden');
@@ -12017,8 +12145,6 @@
 							for(var i=0;i<menuUpdates.length;i++){
 								menuUpdates[i]();
 							}
-							ui.config2.classList.add('pressdown2');
-							ui.arena.classList.add('menupaused');
                         }
                         else{
 							clickContainer.call(menuContainer);
@@ -16805,7 +16931,12 @@
 		};
 		HTMLDivElement.prototype.goto=function(position,time){
 			if(time==undefined) time=500;
-			this.classList.add('removing');
+			if(lib.config.low_performance){
+				this.remove();
+			}
+			else{
+				this.classList.add('removing');
+			}
 			var that=this;
 			this.timeout=setTimeout(function(){
 				position.appendChild(that);
