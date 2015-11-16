@@ -208,6 +208,9 @@ card.hearth={
 					value:[3,1],
 					useful:1,
 				},
+				wuxie:function(target,card,player,current,state){
+					if(ai.get.attitude(current,player)>=0&&state>0) return false;
+				},
 				result:{
 					player:function(player){
 						var nh=player.num('h');

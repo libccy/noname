@@ -315,6 +315,7 @@ character.fire={
 						return -2;
 					},
 					target:function(player,target){
+						if(player.hp<=2) return 0;
 						return ai.get.damageEffect(target,player);
 					}
 				}

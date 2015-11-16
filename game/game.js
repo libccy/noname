@@ -7157,16 +7157,15 @@
 						node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(e){
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
-							setTimeout(function(){
-								node.parentNode.classList.remove('controlpressdownx');
-							},200);
+							node.parentNode.classList.remove('controlpressdownx');
+							// setTimeout(function(){
+							// 	if(node.parentNode)
+							// },200);
 						});
 						node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(e){
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
-							setTimeout(function(){
-								node.parentNode.classList.remove('controlpressdownx');
-							},200);
+							node.parentNode.classList.remove('controlpressdownx');
 						});
 					}
 				},
@@ -10949,10 +10948,14 @@
 				return caption;
 			},
 			control:function(){
-				var nc=true;
+				var nc=(ui.control.childNodes.length==0);
 				for(var i=0;i<ui.control.childNodes.length;i++){
-					if(!ui.control.childNodes[i].classList.contains('removing')){
-						nc=false;break;
+					if(ui.control.childNodes[i].classList.contains('removing')){
+						var that=ui.control.childNodes[i];
+						var width=that.offsetWidth;
+						that.style.marginLeft=(-width/2)+'px';
+						that.style.marginRight=(-width/2)+'px';
+						that.style.transitionDuration=0.8*parseFloat(getComputedStyle(that).opacity)+'s';
 					}
 				}
 				var i,controls;

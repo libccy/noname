@@ -1052,6 +1052,9 @@ mode.chess={
 				}
 				if(_status.characterList.length<6){
 					game.over(true);
+					event.done.close();
+					event.control.close();
+					return;
 				}
 				setTimeout(function(){
 					dialog.open();
