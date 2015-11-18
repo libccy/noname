@@ -29,7 +29,8 @@ character.hearth={
 		// hs_trueheart:['male','wei',2,[],['fullskin']],
 		// hs_sainaliusi:['male','wei',2,[],['fullskin']],
 		// hs_lrhonin:['male','wei',2,[],['fullskin']],
-		hs_bolvar:['male','wei',2,[],['fullskin']],
+		// hs_bolvar:['male','wei',2,[],['fullskin']],
+		// hs_fuding:['male','wei',2,[],['fullskin']],
 
 		hs_ronghejuren:['male','shu',8,[],['fullskin']],
 		hs_edwin:['male','qun',3,['lianzhan'],['fullskin']],

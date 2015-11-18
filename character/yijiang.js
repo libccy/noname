@@ -1335,6 +1335,7 @@ character.yijiang={
 			},
 			selectTarget:2,
 			content:function(){
+				'step 0'
 				var gainner,giver;
 				if(targets[0].num('h')<targets[1].num('h')){
 					gainner=targets[0];
@@ -1344,10 +1345,36 @@ character.yijiang={
 					gainner=targets[1];
 					giver=targets[0];
 				}
-				var card=giver.get('h').randomGet();
-				gainner.gain(card,'give');
-				giver.$give(card,gainner);
-				if(get.suit(card)!='spade') player.draw();
+				giver.chooseCard('选择一张手牌交给'+get.translation(gainner),true);
+				event.gainner=gainner;
+				event.giver=giver;
+				'step 1'
+				var card=result.cards[0];
+				event.gainner.gain(card,'give');
+				event.giver.$give(1,event.gainner);
+				'step 2'
+				if(event.gainner.num('h')==event.giver.num('h')){
+					if(player.hp<player.maxHp){
+						player.chooseControl('draw_card','recover_hp',function(event,player){
+							if(player.hp>=3&&player.num('h')<player.hp) return 'draw_card';
+							return 'recover_hp';
+						});
+					}
+					else{
+						player.draw();
+						event.finish();
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 3'
+				if(result.control=='draw_card'){
+					player.draw();
+				}
+				else{
+					player.recover();
+				}
 			},
 			ai:{
 				order:10.5,
@@ -1369,7 +1396,7 @@ character.yijiang={
 							return 1;
 						}
 					},
-					player:0.01
+					player:0.1
 				}
 			}
 		},
@@ -3489,7 +3516,7 @@ character.yijiang={
 		qiuyuan_info:'当你成为【杀】的目标时，你可以令另一名其他角色选择一项：①、交给你一张【闪】；②、成为此【杀】的额外目标。',
 		gongji_info:'出牌阶段，你可以弃置一张牌，令你的攻击范围无限，直到回合结束，然后若你以此法弃置的牌为装备牌，你可以弃置一名其他角色的一张牌。每回合限一次。',
 		zhuiyi_info:'你死亡时，可以令一名其他角色（杀死你的角色除外）摸三张牌，然后令其回复1点体力。',
-		anxu_info:'出牌阶段，你可以选择两名手牌数不相等的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之，若不为黑桃，你摸一张牌',
+		anxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌多的角色将一张手牌交给手牌少的角色，然后若这两名角色手牌数相等，你摸一张牌或回复1点体力',
 		zongxuan_info:'每当你的牌被弃置，你可以将其按任意顺序置于牌堆顶',
 		zhiyan_info:'回合结束阶段，你可以令一名角色摸一张并展示之，若是装备牌，其立即装备之并回复一点体力',
 		miji_info:'回合结束阶段，若你已受伤，可以摸X张牌，然后可以将等量的牌交给一名其他角色，X为你已损失的体力值',

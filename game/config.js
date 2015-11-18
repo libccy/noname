@@ -8,7 +8,7 @@ window.config={
 	forbidstone:['zhugedan','pal_xuanxiao'],
 	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
-	forbiddouble:['zhugedan','swd_kangnalishi','swd_nicole','dongzhuo','jg_simayi'],
+	forbiddouble:['zhugedan','swd_kangnalishi','swd_nicole','dongzhuo','wutugu','jg_simayi'],
 	layoutfixed:['chess','boss'],
 	all:{
 		mode:['identity','guozhan','versus','boss','chess','stone'],

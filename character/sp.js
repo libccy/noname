@@ -29,8 +29,47 @@ character.sp={
 		sp_jiangwei:['male','shu',4,['kunfen','fengliang'],['fullskin']],
 		sp_machao:['male','qun',4,['zhuiji','cihuai'],['fullskin']],
 		sunhao:['male','wu',5,['canshi','chouhai'],['fullskin']],
+		shixie:['male','qun',3,['biluan','lixia'],['fullskin']],
+		mayunlu:['female','shu',3,['fengpo','mashu'],['fullskin']],
+		zhanglu:['male','qun',3,['yishe','bushi','midao'],['fullskin']],
+		wutugu:['male','qun',15,['ranshang','hanyong'],['fullskin']],
+		sp_caiwenji:['female','wei',3,['chenqing','mozhi'],['fullskin']],
 	},
 	skill:{
+		biluan:{
+			trigger:{player:'phaseDrawBefore'},
+			check:function(event,player){
+				var ng=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].group!='unknown'){
+						ng.add(game.players[i].group);
+					}
+				}
+				ng=ng.length;
+				if(ng<2) return false;
+				var nai=0;
+				for(var i=0;i<game.players.length;i++){
+					var dist=get.distance(game.players[i],player,'attack');
+					if(dist<=1&&dist+ng>1){
+						nai++;
+					}
+				}
+				console.log(nai);
+				return nai>=2;
+			},
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(get.distance(game.players[i],player)<=1){
+						return true;
+					}
+				}
+				return false;
+			},
+
+		},
+		biluan2:{
+			mark:true,
+		},
 		fuji:{
 			trigger:{global:'damageBegin'},
 			filter:function(event){
@@ -2806,8 +2845,34 @@ character.sp={
 		sp_jiangwei:'姜维',
 		zhangbao:'张宝',
 		yangxiou:'杨修',
-		yicong:'义从',
+		shixie:'士燮',
+		mayunlu:'马云騄',
+		zhanglu:'张鲁',
+		wutugu:'兀突骨',
 		mateng:'马腾',
+
+		biluan:'避乱',
+		biluan_info:'摸牌阶段开始时，若有其他角色与你距离不大于1，则你可以放弃摸牌。若如此做，其他角色与你距离+X（X为势力数）',
+		lixia:'礼下',
+		lixia_info:'锁定技，其他角色结束阶段开始时，若你不在其攻击范围内，你摸一张牌或令其摸一张牌。若如此做，其他角色与你的距离-1',
+		yishe:'义舍',
+		yishe_info:'结束阶段开始时，若你的武将牌上没有牌，你可以摸两张牌。若如此做，你将两张牌置于武将牌上，称为“米”；当“米”移至其他区域后，若你的武将牌上没有“米”，你回复1点体力',
+		bushi:'布施',
+		midao:'米道',
+		bushi_info:'当你受到1点伤害后，或其他角色受到你造成的1点伤害后，受到伤害的角色可以获得一张“米”',
+		midao_info:'当一张判定牌生效前，你可以打出一张“米”代替之',
+		fengpo:'凤魄',
+		fengpo_info:'当你于出牌阶段内使用第一张【杀】或【决斗】指定目标后，若目标角色数为1，你可以选择一项：1.摸X张牌；2.此牌造成的伤害+X（X为其手牌中方牌的数量）',
+		chenqing:'陈情',
+		chenqing_info:'每轮限一次，当一名角色处于濒死状态时，你可以令另一名其他角色摸四张牌，然后弃置四张牌。若其以此法弃置的四张牌花色各不相同，则视为该角色对濒死的角色使用一张【桃】',
+		mozhi:'默识',
+		mozhi_info:'结束阶段开始时，你可以将一张手牌当你本回合出牌阶段使用的第一张基本或非延时类锦囊牌使用。然后，你可以将一张手牌当你本回合出牌阶段使用的第二张基本或非延时类锦囊牌使用',
+		ranshang:'燃殇',
+		ranshang_info:'锁定技，当你受到1点火焰伤害后，你获得1枚“燃”标记；结束阶段开始时，你失去X点体力（X为“燃”标记的数量）',
+		hanyong:'悍勇',
+		hanyong_info:'当你使用【南蛮入侵】或【万箭齐发】时，若你的体力值小于游戏轮数，你可以令此牌造成的伤害+1',
+
+		yicong:'义从',
 		yongsi:'庸肆',
 		yongsi1:'庸肆',
 		yongsi2:'庸肆',
