@@ -90,6 +90,7 @@ character.gujian={
 			},
 			content:function(){
 				"step 0"
+				player.line(trigger.player,'green');
 				player.phase();
 				player.storage.meiying=trigger.player;
 				"step 1"

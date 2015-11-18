@@ -4,8 +4,9 @@
 #####运行
 使用chrome（推荐）或safari打开index.html<br>
 #####升级
-windows：覆盖resources/app文件夹下的同名文件<br>
-mac：覆盖contents/resources/app下的同名文件
+windows：覆盖resources/app文件夹内的同名文件<br>
+mac：右键显示包内容，覆盖contents/resources/app文件夹内的同名文件<br>
+android：用解压软件打开apk文件，覆盖assets/www文件夹内的同名文件
 
 ####选项设置
 #####通用

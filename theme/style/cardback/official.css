@@ -1,0 +1,4 @@
+.card:empty{
+    background: url('image/official.png');
+    background-size: cover;
+}

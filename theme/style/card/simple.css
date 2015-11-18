@@ -1,7 +1,7 @@
 .card:not(*:empty){
 	color:rgb(77, 60, 51);
 	text-shadow:none;
-	background: url('../simple/card.png');
+	background: url('../../simple/card.png');
 	background-size:cover;
 }
 #arena:not(.chess) .player[data-position='0']>.equips>.equip5 {

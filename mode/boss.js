@@ -423,6 +423,8 @@ mode.boss={
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbidboss.contains(i)) continue;
 					if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
+					if(get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
+					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
 					list.push(i);
 				}
 				list.randomSort();

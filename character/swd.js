@@ -1844,6 +1844,7 @@ character.swd={
 					}
 				}
 				target.addSkill('pozhou3');
+				player.line(target,'green');
 			}
 		},
 		pozhou3:{
@@ -3618,12 +3619,13 @@ character.swd={
 				game.pause();
 				'step 4'
 				if(trigger.name=='phase'){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].hp<event.player.hp){
-							event.player.loseHp();
-							return;
-						}
-					}
+					// for(var i=0;i<game.players.length;i++){
+					// 	if(game.players[i].hp<event.player.hp){
+					// 		event.player.loseHp();
+					// 		return;
+					// 	}
+					// }
+					if(player.hp>1) player.loseHp();
 				}
 			}
 		},
@@ -8143,7 +8145,7 @@ character.swd={
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
-		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，此时有其他角色的体力值比你少，你流失一点体力',
+		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，若你此时的体力值大于1，你流失一点体力',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌，每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',

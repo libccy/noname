@@ -161,7 +161,7 @@ body>.background{z-index:-2}
 .card>.background.tight{letter-spacing: -0.2em}
 .marks>.card>.background.skillmark{font-family:'huangcao';padding-top:4px;}
 /*--------窗口--------*/
-.dialog{text-align: center;}
+.dialog{text-align: center;z-index:4;}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
 .dialog.fullheight{height:calc(100% - 80px) !important;top:40px !important}
 .dialog.fullwidth{left:calc(5% + 60px) !important;width:calc(90% - 120px) !important}

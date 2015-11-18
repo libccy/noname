@@ -23,6 +23,13 @@ character.hearth={
 		hs_yngvar:['male','qun',3,['huanwu'],['fullskin']],
 		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi'],['fullskin']],
 		hs_malorne:['male','wu',3,['enze','chongsheng'],['fullskin']],
+		hs_malygos:['male','wei',4,['malymowang'],['fullskin']],
+		hs_xuefashi:['male','wei',2,['liehun','xjumo'],['fullskin']],
+		// hs_loatheb:['male','wei',2,[],['fullskin']],
+		// hs_trueheart:['male','wei',2,[],['fullskin']],
+		// hs_sainaliusi:['male','wei',2,[],['fullskin']],
+		// hs_lrhonin:['male','wei',2,[],['fullskin']],
+		hs_bolvar:['male','wei',2,[],['fullskin']],
 
 		hs_ronghejuren:['male','shu',8,[],['fullskin']],
 		hs_edwin:['male','qun',3,['lianzhan'],['fullskin']],
@@ -30,6 +37,9 @@ character.hearth={
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu'],['fullskin']],
 		// hs_tgolem:['male','qun',4,['guozai'],['fullskin']],
 		hs_totemic:['male','wu',3,['s_tuteng'],['fullskin']],
+		hs_xsylvanas:['female','qun',3,['busi','shixin','xmojian'],['fullskin']],
+		hs_siwangzhiyi:['male','qun',12,['mieshi'],['fullskin']],
+		hs_bilanyoulong:['male','wei',4,['lingzhou'],['fullskin']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -38,6 +48,180 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		liehun:{
+			trigger:{player:'phaseUseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('h',{type:'basic'})<player.num('h');
+			},
+			content:function(){
+				var hs=player.get('h');
+				for(var i=0;i<hs.length;i++){
+					if(get.type(hs[i])=='basic'){
+						hs.splice(i--,1);
+					}
+				}
+				if(hs.length){
+					var hs2=[];
+					for(var i=0;i<hs.length;i++){
+						hs2.push(game.createCard(hs[i].name,hs[i].suit,hs[i].number));
+					}
+					player.gain(hs2,'draw');
+				}
+			},
+			ai:{
+				threaten:1.5
+			}
+		},
+		xjumo:{
+			mod:{
+				maxHandcard:function(player,num){
+					return num+3;
+				}
+			},
+		},
+		malymowang:{
+			trigger:{source:'damageBegin'},
+			forced:true,
+			filter:function(event){
+				return event.card&&get.type(event.card)=='trick'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+			},
+			content:function(){
+				trigger.num++;
+			},
+			group:'malymowang2',
+			ai:{
+				threaten:1.8
+			}
+		},
+		malymowang2:{
+			trigger:{player:'phaseUseBegin'},
+			forced:true,
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i in lib.card){
+					if(!lib.translate[i+'_info']) continue;
+					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
+					if(lib.card[i].type=='trick') list.push(['锦囊','',i]);
+				}
+				list=list.randomGets(3);
+				var dialog=ui.create.dialog('选择一张锦囊牌加入你的手牌',[list,'vcard'],'hidden');
+				player.chooseButton(dialog,true);
+				'step 1'
+				if(result.buttons){
+					player.gain(game.createCard(result.buttons[0].link[2]),'gain2');
+				}
+			}
+		},
+		lingzhou:{
+			trigger:{player:'useCard'},
+			direct:true,
+			filter:function(event){
+				return get.type(event.card,'trick')=='trick';
+			},
+			content:function(){
+				"step 0"
+				var noneed=(trigger.card.name=='tao'&&trigger.targets[0]==player&&player.hp==player.maxHp-1);
+				player.chooseTarget('是否发动【灵咒】？').ai=function(target){
+					var num=ai.get.attitude(player,target);
+					if(num>0){
+						if(noneed&&player==target){
+							num=0.5;
+						}
+						else if(target.hp==1){
+							num+=3;
+						}
+						else if(target.hp==2){
+							num+=1;
+						}
+					}
+					return num;
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('lingzhou',result.targets);
+					var target=result.targets[0];
+					if(target.hp<target.maxHp){
+						target.chooseControl('draw_card','recover_hp',function(event,target){
+							if(target.hp>=3&&target.num('h')<target.hp) return 'draw_card';
+							return 'recover_hp';
+						});
+						event.target=target;
+					}
+					else{
+						target.draw();
+						event.finish();
+					}
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.control=='draw_card'){
+					event.target.draw();
+				}
+				else{
+					event.target.recover();
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.5
+			}
+		},
+		mieshi:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				'step 0'
+				player.loseHp();
+				'step 1'
+				event.target=game.players.randomGet(player);
+				player.line(event.target,'fire');
+				game.delayx();
+				'step 2'
+				event.target.damage('fire');
+			}
+		},
+		xmojian:{
+			trigger:{player:'turnOverAfter'},
+			direct:true,
+			filter:function(event,player){
+				return !player.skills.contains('xmojian2');
+			},
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【魔箭】？',function(card,player,target){
+					return lib.filter.targetEnabled({name:'sha'},player,target);
+				}).ai=function(target){
+					return ai.get.effect(target,{name:'sha'},player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('xmojian');
+					player.useCard({name:'sha'},result.targets,false);
+					player.addTempSkill('xmojian2','phaseAfter');
+				}
+			},
+			ai:{
+				expose:0.2,
+			}
+		},
+		xmojian2:{},
+		shixin:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			filter:function(event,player){
+				return event.player.isAlive()&&event.player!=player;
+			},
+			content:function(){
+				'step 0'
+				trigger.player.loseHp();
+				'step 1'
+				player.loseHp();
+			}
+		},
 		enze:{
 			enable:'phaseUse',
 			usable:1,
@@ -1827,6 +2011,10 @@ character.hearth={
 		hs_yngvar:'伊戈瓦尔',
 		hs_bchillmaw:'冰喉',
 		hs_malorne:'玛洛恩',
+		hs_xsylvanas:'希尔瓦娜斯',
+		hs_siwangzhiyi:'死亡之翼',
+		hs_malygos:'玛里苟斯',
+		hs_xuefashi:'血法师',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_edwin:'艾德温',
@@ -1834,7 +2022,22 @@ character.hearth={
 		hs_huzhixiannv:'湖之仙女',
 		hs_tgolem:'图腾魔像',
 		hs_totemic:'图腾师',
+		hs_bilanyoulong:'碧蓝幼龙',
 
+		xjumo:'聚魔',
+		xjumo_info:'锁定技，你的手牌上限+3',
+		liehun:'裂魂',
+		liehun_info:'锁定技，出牌阶段开始时，你获得手牌中所有非基本牌的复制',
+		malymowang:'魔网',
+		malymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你观看随机3张锦囊牌，并将其中一张加入你的手牌',
+		lingzhou:'灵咒',
+		lingzhou_info:'每当你使用一张锦囊牌，可令一名角色摸一张牌或回复一点体力',
+		mieshi:'灭世',
+		mieshi_info:'锁定技，回合结束阶段，你流失一点体力，并对一名随机的其他角色造成一点火焰伤害',
+		shixin:'蚀心',
+		shixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各流失一点体力',
+		xmojian:'魔箭',
+		xmojian_info:'每当你翻面时，你可以指定一名角色视为对其使用了一张杀，每回合最多发动一次',
 		enze:'恩泽',
 		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等',
 		chongsheng:'重生',

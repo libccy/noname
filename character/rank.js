@@ -48,6 +48,8 @@ window.characterRank={
         'liufeng',
         'swd_kangnalishi',
         'swd_xiarou',
+        'hs_xsylvanas',
+        'hs_malygos',
     ],
     a:[
         'yxs_diaochan',
@@ -85,6 +87,7 @@ window.characterRank={
         'zhoutai',
     ],
     am:[
+        'hs_xuefashi',
         'manchong',
         'swd_linyue',
         'swd_fuyan',
@@ -135,9 +138,13 @@ window.characterRank={
         'chengong',
         'caifuren',
         'yj_jushou',
+        'hs_siwangzhiyi',
+        'jg_huangyueying',
+        'hs_bilanyoulong',
     ],
     bp:[
         'yxs_mozi',
+        'xiahoushi',
         'zhangsong',
         'zhuhuan',
         'yxs_aijiyanhou',
@@ -197,8 +204,8 @@ window.characterRank={
         'wangyi',
         'chenqun',
         'guyong',
-        'jg_huangyueying',
         'diy_xuhuang',
+        'sunquan',
     ],
     b:[
         'pal_linyueru',
@@ -290,6 +297,7 @@ window.characterRank={
         'xusheng',
         'madai',
         'liru',
+        're_zhangfei',
     ],
     c:[
         'huaxiong',
@@ -300,7 +308,6 @@ window.characterRank={
         'machao',
         'zhangliang',
         're_lvmeng',
-        're_zhangfei',
         're_gongsunzan',
         're_xiahoudun',
         'caohong',
@@ -323,6 +330,7 @@ window.characterRank={
         'yangxiu',
         'pangde',
         'yujin',
+        'zhangfei',
     ],
     legend:[
         'swd_muyun',
@@ -361,6 +369,7 @@ window.characterRank={
         'shen_zhouyu',
         'shen_simayi',
         'shen_guanyu',
+        'hs_siwangzhiyi',
     ],
     epic:[
         'xk_fujianhan',
@@ -411,10 +420,11 @@ window.characterRank={
         'swd_wangsiyue',
         'gjqt_fanglansheng',
         'swd_qiner',
-        'hs_anduin',
+        'hs_xsylvanas',
     ],
     rare:[
         'yxs_diaochan',
+        'hs_anduin',
         'swd_hengai',
         'hs_wuther',
         'jg_pangtong',

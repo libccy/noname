@@ -1566,6 +1566,7 @@ mode.chess={
 				ui.chessContainer.ontouchmove = ui.click.touchScroll;
 				ui.chessContainer.style.WebkitOverflowScrolling='touch';
 				ui.chess=ui.create.div('#chess',ui.chessContainer);
+				lib.setScroll(ui.chess);
 				ui.canvas2=document.createElement('canvas');
 				ui.canvas2.id='canvas2';
 				ui.chess.appendChild(ui.canvas2);
@@ -1929,6 +1930,8 @@ mode.chess={
 						if(lib.config.forbidall.contains(i)) continue;
 						if(lib.config.forbidchess.contains(i)) continue;
 						if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
+						if(get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
+						if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
 						if(lib.character[i][4].contains('boss')) continue;
 						list.push(i);
 					}

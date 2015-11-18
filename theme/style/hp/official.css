@@ -1,0 +1,41 @@
+.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){
+    background: url('image/hp1.png');
+    box-shadow: none;
+    border: none;
+    background-size: cover;
+    transform: scale(1.4) rotate(180deg);
+}
+.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
+    background: url('image/hp2.png');
+    box-shadow: none;
+    border: none;
+    background-size: cover;
+    transform: scale(1.4) rotate(180deg);
+}
+.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
+    background: url('image/hp3.png');
+    box-shadow: none;
+    border: none;
+    background-size: cover;
+    transform: scale(1.4) rotate(180deg);
+}
+.hp:not(.text):not(.actcount)>.lost{
+    background: url('image/hp4.png');
+    box-shadow: none;
+    border: none;
+    background-size: cover;
+    transform: scale(1.4) rotate(180deg);
+}
+
+#arena.hpimage .player .hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){
+    transform: scale(1.6);
+}
+#arena.hpimage .player .hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
+    transform: scale(1.6);
+}
+#arena.hpimage .player .hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
+    transform: scale(1.6);
+}
+#arena.hpimage .player .hp:not(.text):not(.actcount)>.lost{
+    transform: scale(1.6);
+}

@@ -239,6 +239,12 @@
 								else{
 									ui.arena.classList.remove('mobile');
 								}
+								if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
+									ui.arena.classList.add('hpimage');
+								}
+								else{
+									ui.arena.classList.remove('hpimage');
+								}
 								setTimeout(function(){
 									layout.remove();
 									ui.arena.show();
@@ -368,7 +374,7 @@
 					},
 					card_style:{
 						name:'卡牌样式',
-						init:'mobile',
+						init:'default',
 						item:{
 							default:'默认',
 							wood:'木纹',
@@ -378,8 +384,46 @@
 						onclick:function(layout){
 							game.saveConfig('card_style',layout);
 							var style=ui.css.card_style;
-							ui.css.card_style=lib.init.css('theme/cardstyle',lib.config.card_style);
+							ui.css.card_style=lib.init.css('theme/style/card',lib.config.card_style);
 							style.remove();
+						},
+						unfrequent:true,
+					},
+					cardback_style:{
+						name:'卡背样式',
+						init:'default',
+						item:{
+							default:'默认',
+							wood:'木纹',
+							music:'音乐',
+							official:'原版'
+						},
+						onclick:function(layout){
+							game.saveConfig('cardback_style',layout);
+							var style=ui.css.cardback_style;
+							ui.css.cardback_style=lib.init.css('theme/style/cardback',lib.config.cardback_style);
+							style.remove();
+						},
+						unfrequent:true,
+					},
+					hp_style:{
+						name:'体力条样式',
+						init:'default',
+						item:{
+							default:'默认',
+							official:'原版'
+						},
+						onclick:function(layout){
+							game.saveConfig('hp_style',layout);
+							var style=ui.css.hp_style;
+							ui.css.hp_style=lib.init.css('theme/style/hp',lib.config.hp_style);
+							style.remove();
+							if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
+								ui.arena.classList.add('hpimage');
+							}
+							else{
+								ui.arena.classList.remove('hpimage');
+							}
 						},
 						unfrequent:true,
 					},
@@ -601,6 +645,11 @@
 								ui.css.blur_ui.remove();
 							}
 						}
+					},
+					damage_shake:{
+						name:'伤害抖动',
+						init:true,
+						unfrequent:true,
 					},
 					button_press:{
 						name:'按钮效果',
@@ -995,6 +1044,11 @@
 						init:false,
 						restart:true,
 		            },
+		            ban_strong:{
+		                name:'屏蔽强将',
+						init:false,
+						restart:true,
+		            },
 					enhance_zhu:{
 						name:'加强主公',
 						init:false,
@@ -1175,6 +1229,11 @@
 		                },
 		                restart:true,
 		            },
+		            ban_strong:{
+		                name:'屏蔽强将',
+						init:false,
+						restart:true,
+		            },
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -1305,6 +1364,12 @@
 						restart:true,
 						frequent:true,
 		            },
+		            ban_strong:{
+		                name:'屏蔽强将',
+						init:false,
+						restart:true,
+						frequent:true,
+		            },
 				}
 			},
 			boss:{
@@ -1348,6 +1413,12 @@
 						restart:true,
 						frequent:true,
 					},
+		            ban_strong:{
+		                name:'屏蔽强将',
+						init:false,
+						restart:true,
+						frequent:true,
+		            },
 				}
 			},
 			chess:{
@@ -1579,6 +1650,11 @@
 						init:false,
 						restart:true,
 		            },
+		            ban_strong:{
+		                name:'屏蔽强将',
+						init:false,
+						restart:true,
+		            },
 					chessscroll_speed:{
 						name:'边缘滚动速度',
 						init:'20',
@@ -1648,6 +1724,12 @@
 					},
 					ban_weak:{
 		                name:'屏蔽弱将',
+						init:false,
+						restart:true,
+						frequent:true,
+		            },
+		            ban_strong:{
+		                name:'屏蔽强将',
 						init:false,
 						restart:true,
 						frequent:true,
@@ -1923,7 +2005,9 @@
 				if(lib.config.threed_card) ui.css.threed=lib.init.css('layout/default','fold2');
 				if(lib.config.blur_ui) ui.css.blur_ui=lib.init.css('layout/default','blur');
 				ui.css.theme=lib.init.css('theme/'+lib.config.theme,'style');
-				ui.css.card_style=lib.init.css('theme/cardstyle',lib.config.card_style);
+				ui.css.card_style=lib.init.css('theme/style/card',lib.config.card_style);
+				ui.css.cardback_style=lib.init.css('theme/style/cardback',lib.config.cardback_style);
+				ui.css.hp_style=lib.init.css('theme/style/hp',lib.config.hp_style);
 
 				lib.config.duration=500;
 
@@ -3715,7 +3799,7 @@
 							game.playAudio('die',player.name);
 						}
 						else if(lib.config.background_ogg){
-							game.playAudio('die',player.name);
+							game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
 						}
 						// else if(lib.config.background_audio){
 						// 	game.playAudio('effect','die_'+(player.sex==='female'?'female':'male'));
@@ -6593,7 +6677,7 @@
 					else{
 						game.addVideo('damage',this);
 					}
-					if(source&&source!=this){
+					if(source&&source!=this&&lib.config.damage_shake){
 						var left,top;
 						if(source.offsetTop==this.offsetTop){
 							left=20;
@@ -6791,14 +6875,14 @@
 					}
 
 					// this.dataset.position=player.dataset.position;
-					if(method=='flip'){
-						this.style.transition='all 0.5s';
-						this.style.transform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
-					}
-					else if(method=='rotate'){
-						this.style.transition='all 0.5s';
-						this.style.transform='rotate(180deg)';
-					}
+					// if(method=='flip'){
+					// 	this.style.transition='all 0.5s';
+					// 	this.style.transform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
+					// }
+					// else if(method=='rotate'){
+					// 	this.style.transition='all 0.5s';
+					// 	this.style.transform='rotate(180deg)';
+					// }
 					return this;
 				},
 				copy:function(){
@@ -10980,7 +11064,7 @@
 				}
 				ui.controls.unshift(control);
 				if(nc){
-					ui.control.animate('nozoom');
+					ui.control.animate('nozoom',500);
 				}
 				if(lib.config.low_performance||ui.control.classList.contains('nozoom')){
 					nozoom=true;
@@ -11081,6 +11165,9 @@
 				ui.arena=ui.create.div('#arena',ui.window);
 				if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 					ui.arena.classList.add('mobile');
+				}
+				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
+					ui.arena.classList.add('hpimage');
 				}
 				ui.updatePhone();
 				ui.backgroundMusic=document.createElement('audio');
@@ -16898,12 +16985,12 @@
 		},
 	};
 	lib.init.init();
-		HTMLDivElement.prototype.animate=function(name){
+		HTMLDivElement.prototype.animate=function(name,time){
 			this.classList.add(name);
 			var that=this;
 			setTimeout(function(){
 				that.classList.remove(name);
-			},1000);
+			},time||1000);
 			return this;
 		};
 		HTMLDivElement.prototype.hide=function(){

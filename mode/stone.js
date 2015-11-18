@@ -479,6 +479,8 @@ mode.stone={
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbidstone.contains(i)) continue;
 					if(!get.config('double_character')&&get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
+					if(!get.config('double_character')&&get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
+					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
 					if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
 					list.push(i);
 				}

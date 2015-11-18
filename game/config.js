@@ -213,6 +213,8 @@ window.config={
 	theme:'woodden',
 	layout:'mobile',
 	card_style:'default',
+	cardback_style:'default',
+	hp_style:'default',
 
 	image_character:'default',
 	image_background:'default',
@@ -239,6 +241,7 @@ window.config={
 	title:false,
 	right_sidebar:false,
 	button_press:true,
+	damage_shake:true,
 
 	modeconfig:false,
 	gameconfig:false,

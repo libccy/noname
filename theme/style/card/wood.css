@@ -1,0 +1,6 @@
+.card:not(*:empty){
+	color:rgb(77, 60, 51);
+	text-shadow:none;
+	background: url('../../woodden/wood.jpg');
+    background-size:auto;
+}
