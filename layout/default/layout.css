@@ -132,6 +132,10 @@ body>.background{z-index:-2}
 	animation:cardflip 0.3s ease-out;
 	-webkit-animation:cardflip 0.3s ease-out;
 }
+.player.playerbright{
+	filter:brightness(1.2);
+	-webkit-filter:brightness(1.2);
+}
 .player.playerflip{
 	animation:playerflip 0.3s ease-out;
 	-webkit-animation:playerflip 0.3s ease-out;
@@ -246,7 +250,7 @@ margin-bottom: 5px;
 .button.character>.intro{top:71px;left:0;}
 .button.character>.identity{top:-6px;left:72px;}
 /*--------确认--------*/
-#control{text-align: center;z-index: 2;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);pointer-events: none}
+#control{text-align: center;z-index: 5;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);pointer-events: none}
 #control>*{pointer-events: auto;}
 .control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;margin-left: 4px;margin-right: 4px;}
 .control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;opacity:0}
@@ -642,6 +646,7 @@ div:hover>.intro{opacity: 1;}
 .dialog.scroll1.scroll2{box-shadow:0 -10px 10px -9px rgba(0,0,0,0.1),0 -10px 0 -9px rgba(0,0,0,0.05),
 	0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05);}*/
 .selected,.target{/*transform: scale(1.05);*/}
+/*.player.target{-webkit-filter:brightness(1.2)}*/
 .target{transform: rotate(-3deg);}
 .target2{transform: rotate(3deg);}
 .content>.config.line2{

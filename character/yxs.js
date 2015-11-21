@@ -658,12 +658,13 @@ character.yxs={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('he','是否弃置一张黑色牌并收回'+get.translation(trigger.card)+'？',{color:'black'}).ai=function(card){
+				var next=player.chooseToDiscard('he','是否弃置一张黑色牌并收回'+get.translation(trigger.card)+'？',{color:'black'});
+				next.ai=function(card){
 					return ai.get.value(trigger.card)-ai.get.value(card);
 				}
+				next.logSkill='jieyong';
 				"step 1"
 				if(result.bool){
-					player.logSkill('jieyong');
 					player.gain(trigger.card,'gain2');
 					player.addTempSkill('jieyong2',['phaseAfter','phaseBegin']);
 				}
@@ -801,15 +802,16 @@ character.yxs={
 				"step 0"
 				var val=ai.get.value(trigger.card);
 				var suit=get.suit(trigger.card);
-				player.chooseToDiscard('he','逐鹿：是否发动弃置一张'+get.translation(suit)+
-					'牌并获得'+get.translation(trigger.card)+'？',{suit:suit}).ai=function(card){
+				var next=player.chooseToDiscard('he','逐鹿：是否发动弃置一张'+get.translation(suit)+
+					'牌并获得'+get.translation(trigger.card)+'？',{suit:suit});
+				next.ai=function(card){
 					return val-ai.get.value(card);
 				};
+				next.logSkill='zhulu';
 				"step 1"
 				if(result.bool){
 					player.gain(trigger.card,'gain2');
 					player.addTempSkill('zhulu2','phaseAfter');
-					player.logSkill('zhulu');
 				}
 			},
 			ai:{

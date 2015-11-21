@@ -408,7 +408,9 @@ character.xianjian={
 						targets.push(game.players[i]);
 					}
 				}
-				player.chooseToDiscard('是否对'+get.translation(targets)+'发动【忘忧】？','he').ai=function(card){
+				var next=player.chooseToDiscard('是否对'+get.translation(targets)+'发动【忘忧】？','he');
+				next.logSkill=['wangyou',event.targets];
+				next.ai=function(card){
 					if(num<=0) return 0;
 					switch(num){
 						case 1:return 5-ai.get.value(card);
@@ -420,7 +422,6 @@ character.xianjian={
 				"step 1"
 				if(result.bool){
 					event.targets.sort(lib.sort.seat);
-					player.logSkill('wangyou',event.targets);
 					game.asyncDraw(event.targets);
 				}
 				else{
@@ -760,7 +761,8 @@ character.xianjian={
 					}
 				}
 				if(num){
-					player.chooseToDiscard(num,'是否发动【千方】？','he').ai=function(card){
+					var next=player.chooseToDiscard(num,'是否发动【千方】？','he');
+					next.ai=function(card){
 						if(ainum>=0){
 							switch(num){
 								case 1:return 8-ai.get.value(card);
@@ -770,6 +772,8 @@ character.xianjian={
 						}
 						return -1;
 					}
+					next.logSkill='qianfang';
+					event.logged=true;
 				}
 				else{
 					player.chooseBool('是否发动【千方】？').ai=function(){
@@ -781,7 +785,7 @@ character.xianjian={
 					player.storage.xuanning=0;
 					player.unmarkSkill('xuanning');
 					player.addTempSkill('qianfang2','phaseAfter');
-					player.logSkill('qianfang');
+					if(!event.logged) player.logSkill('qianfang');
 					player.useCard({name:'wanjian'},event.targets);
 				}
 				else{
@@ -1223,7 +1227,9 @@ character.xianjian={
 			trigger:{target:'useCardToBefore'},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否弃置两张牌使'+get.translation(trigger.card)+'失效？','he',2).ai=function(card){
+				var next=player.chooseToDiscard('是否弃置两张牌使'+get.translation(trigger.card)+'失效？','he',2);
+				next.logSkill='xiaoyao';
+				next.ai=function(card){
 					if(ai.get.effect(player,trigger.card,trigger.player,player)<0){
 						if(get.tag(trigger.card,'respondSha')&&player.num('h','sha')) return 0;
 						if(get.tag(trigger.card,'respondShan')&&player.num('h','shan')) return 0;
@@ -1235,7 +1241,6 @@ character.xianjian={
 				if(result.bool){
 					trigger.untrigger();
 					trigger.finish();
-					player.logSkill('xiaoyao');
 				}
 			}
 		},

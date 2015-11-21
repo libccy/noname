@@ -90,15 +90,16 @@ character.jiange={
             },
             content:function(){
                 "step 0"
-                player.chooseToDiscard('he','是否弃置一张牌令'+get.translation(trigger.player)+'的摸牌数-1？').ai=function(card){
+                var next=player.chooseToDiscard('he','是否弃置一张牌令'+get.translation(trigger.player)+'的摸牌数-1？');
+                next.ai=function(card){
                     if(ai.get.attitude(player,trigger.player)<0){
                         return 6-ai.get.value(card);
                     }
                     return 0;
                 }
+                next.logSkill=['jueji',trigger.player];
                 "step 1"
                 if(result.bool){
-                    player.logSkill('jueji',trigger.player);
                     trigger.num--;
                 }
             },

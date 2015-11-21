@@ -95,6 +95,7 @@ card.standard={
 				}
 				else{
 					event.trigger('shaMiss');
+					event.responded=result;
 				}
 				"step 2"
 				if(result.bool==false&&!event.unhurt){
@@ -1122,7 +1123,7 @@ card.standard={
 					player.removeSkill('jiu');
 					event.jiu=true;
 				}
-				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1);
+				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1).logSkill='qinglong';
 				"step 1"
 				if(result.bool){
 					player.logSkill('qinglong');
@@ -1154,9 +1155,11 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否发动贯石斧？',2,'he',function(card){
+				var next=player.chooseToDiscard('是否发动贯石斧？',2,'he',function(card){
 					return player.get('e',{subtype:'equip1'}).contains(card)==false;
-				}).ai=
+				});
+				next.logSkill='guanshi_skill';
+				next.ai=
 				function(card){
 					if(ai.get.attitude(player,trigger.target)<0){
 						if(player.skills.contains('jiu')||
@@ -1170,7 +1173,6 @@ card.standard={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('guanshi_skill');
 					trigger.untrigger();
 					trigger.trigger('shaHit');
 					trigger._result.bool=false;
@@ -1218,6 +1220,7 @@ card.standard={
 		bagua_skill:{
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
+				if(event.responded) return false;
 				if(!event.filterCard({name:'shan'})) return false;
 				if(event.parent.player.num('s','unequip')) return false;
 				return true;

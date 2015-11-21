@@ -534,7 +534,7 @@ card.hearth={
 			},
 			ai:{
 				order:4,
-				value:[6,3],
+				value:[8,3],
 				useful:[6,3],
 				result:{
 					target:function(player,target){
@@ -543,7 +543,7 @@ card.hearth={
 						var num=target.maxHp-target.hp;
 						if(num<1) return 0;
 						if(num==1) return 1;
-						if(target.hp==2) return 2.5;
+						if(target.hp==1) return 2.5;
 						return 2;
 					}
 				}

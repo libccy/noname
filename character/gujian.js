@@ -60,7 +60,9 @@ character.gujian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否弃置一张黑色牌使伤害+1？',{color:'black'}).ai=function(card){
+				var next=player.chooseToDiscard('是否弃置一张黑色牌使伤害+1？',{color:'black'});
+				next.logSkill='zhongji';
+				next.ai=function(card){
 					if(ai.get.attitude(player,trigger.player)<0){
 						return 7-ai.get.value(card);
 					}
@@ -68,7 +70,6 @@ character.gujian={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('zhongji');
 					trigger.num++;
 				}
 			},
@@ -120,12 +121,13 @@ character.gujian={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否发动【戏蝶】？',[1,Math.min(3,player.num('h')-player.hp)]).ai=function(card){
+				var next=player.chooseToDiscard('是否发动【戏蝶】？',[1,Math.min(3,player.num('h')-player.hp)]);
+				next.ai=function(card){
 					return 6-ai.get.value(card);
 				}
+				next.logSkill='xidie';
 				"step 1"
 				if(result.bool){
-					player.logSkill('xidie');
 					player.storage.xidie=result.cards.length;
 				}
 			},
@@ -380,7 +382,9 @@ character.gujian={
 			priority:-5,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【晴岚】？','he').ai=function(card){
+				var next=player.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【晴岚】？','he');
+				next.logSkill='qinglan';
+				next.ai=function(card){
 					if(trigger.num>1||!trigger.source){
 						if(ai.get.attitude(player,trigger.player)>0){
 							return 9-ai.get.value(card);
@@ -403,7 +407,6 @@ character.gujian={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('qinglan');
 					trigger.untrigger();
 					trigger.finish();
 					if(trigger.source){
@@ -644,15 +647,16 @@ character.gujian={
 				for(var i=0;i<event.targets.length;i++){
 					num+=ai.get.effect(event.targets[i],{name:'sha'},player,player);
 				}
-				player.chooseToDiscard(function(card){
+				var next=player.chooseToDiscard(function(card){
 					return get.type(card)!='basic';
-				},'是否发动千军？').ai=function(card){
+				},'是否发动千军？');
+				next.logSkill=['qianjun',event.targets];
+				next.ai=function(card){
 					if(num<=0) return -1;
 					return 7-ai.get.value(card);
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('qianjun',targets);
 					for(var i=0;i<targets.length;i++){
 						trigger.targets.add(targets[i]);
 						// targets[i].classList.add('selected');

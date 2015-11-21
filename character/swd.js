@@ -331,7 +331,7 @@ character.swd={
 				var dialog=ui.create.dialog('聒噪：选择一个目标将手牌替换',cards,'hidden');
 				dialog.classList.add('noselect');
 				var next=player.chooseTarget(true,dialog,function(card,player,target){
-					return target.num('h')>0;
+					return target.num('h')>0&&get.distance(player,target)<=2;
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					var hs=target.get('h');
@@ -665,9 +665,11 @@ character.swd={
 				"step 0"
 				var yep=ai.get.attitude(player,trigger.player)<0&&
 					trigger.player.num('h')>2;
-				player.chooseToDiscard(function(card){
+				var next=player.chooseToDiscard(function(card){
 					return get.type(card)!='basic';
-				},'是否对'+get.translation(trigger.player)+'发动【入梦】？','he').ai=function(card){
+				},'是否对'+get.translation(trigger.player)+'发动【入梦】？','he');
+				next.logSkill=['rumeng',trigger.player];
+				next.ai=function(card){
 					if(yep){
 						return 6-ai.get.value(card);
 					}
@@ -675,7 +677,6 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('rumeng',trigger.player);
 					trigger.player.chooseToDiscard({type:'basic'},'入梦：弃置一张基本牌或路过出牌及弃牌阶段').ai=function(card){
 						return 5-ai.get.value(card);
 					}
@@ -702,15 +703,16 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('he','是否发动【连打】？').ai=function(card){
+				var next=player.chooseToDiscard('he','是否发动【连打】？');
+				next.ai=function(card){
 					if(ai.get.effect(trigger.target,{name:'sha'},player,player)>0){
 						return 7-ai.get.value(card);
 					}
 					return 0;
 				}
+				next.logSkill='lianda';
 				"step 1"
 				if(result.bool){
-					player.logSkill('lianda');
 					player.addTempSkill('lianda2','phaseAfter');
 					player.useCard({name:'sha'},trigger.target);
 				}
@@ -840,7 +842,9 @@ character.swd={
 						}
 					}
 				}
-				player.chooseToDiscard('he','是否发动【镇卫】？').ai=function(card){
+				var next=player.chooseToDiscard('he','是否发动【镇卫】？');
+				next.logSkill='hzhenwei',trigger.target;
+				next.ai=function(card){
 					if(save){
 						return 7-ai.get.value(card);
 					}
@@ -848,7 +852,6 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('hzhenwei',trigger.target);
 					trigger.target=player;
 					trigger.untrigger();
 					trigger.trigger('useCardToBefore');
@@ -1616,13 +1619,14 @@ character.swd={
 			content:function(){
 				"step 0"
 				var att=ai.get.attitude(player,trigger.player);
-				player.chooseToDiscard('he','是否发动【碎岩】？').ai=function(card){
+				var next=player.chooseToDiscard('he','是否发动【碎岩】？');
+				next.ai=function(card){
 					if(att<0) return 7-ai.get.value(card);
 					return -1;
 				}
+				next.logSkill=['suiyan',trigger.player];
 				"step 1"
 				if(result.bool){
-					player.logSkill('suiyan',trigger.player);
 					trigger.player.discard(trigger.player.get('e'));
 				}
 			},
@@ -2146,7 +2150,9 @@ character.swd={
 					str+='对'+get.translation(trigger.targets);
 				}
 				str+='的'+get.translation(trigger.card)+'失效？'
-				player.chooseToDiscard('he',{type:'equip'},str).ai=function(card){
+				var next=player.chooseToDiscard('he',{type:'equip'},str);
+				next.logSkill='gongshen';
+				next.ai=function(card){
 					if(effect<0){
 						var val=9-ai.get.value(card);
 						var nme=trigger.card.name;
@@ -2173,7 +2179,6 @@ character.swd={
 					game.delay();
 					trigger.untrigger();
 					trigger.finish();
-					player.logSkill('gongshen');
 				}
 			},
 			ai:{
@@ -3066,14 +3071,15 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否弃置两张手牌将'+get.translation(trigger.card)+'反弹？',2).ai=function(card){
+				var next=player.chooseToDiscard('是否弃置两张手牌将'+get.translation(trigger.card)+'反弹？',2);
+				next.ai=function(card){
 					if(ai.get.effect(player,trigger.card)<0) return 4-ai.get.value(card);
 					return 0;
 				}
+				next.logSkill='yihua';
 				"step 1"
 				if(result.bool){
 					// player.discard(result.cards);
-					player.logSkill('yihua');
 					trigger.target=trigger.player;
 					trigger.player=player;
 					trigger.untrigger();
@@ -3312,10 +3318,9 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀',trigger.player);
+				player.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀',trigger.player).logSkill='rexue';
 				"step 1"
 				if(result.bool){
-					player.logSkill('rexue');
 					player.draw();
 				}
 			}
@@ -3400,7 +3405,9 @@ character.swd={
 				"step 0"
 				var att=ai.get.attitude(player,trigger.player);
 				var nh=player.num('h');
-				player.chooseToDiscard('是否发动苏生？').ai=function(card){
+				var next=player.chooseToDiscard('是否发动苏生？');
+				next.logSkill='susheng';
+				next.ai=function(card){
 					if(att>3||(att>1&&nh>2)){
 						return ai.get.unuseful2(card);
 					}
@@ -3414,7 +3421,6 @@ character.swd={
 					trigger.player.hp=1;
 					if(trigger.player.maxHp<1) trigger.player.maxHp=1;
 					trigger.player.update();
-					player.logSkill('susheng');
 					player.addTempSkill('susheng2','phaseAfter');
 				}
 
@@ -4268,9 +4274,11 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('he','是否发动【唤魂】？',function(card){
+				var next=player.chooseToDiscard('he','是否发动【唤魂】？',function(card){
 					return get.color(card)=='red';
-				}).ai=function(card){
+				});
+				next.logSkill=['huanhun',trigger.player];
+				next.ai=function(card){
 					if(ai.get.attitude(player,trigger.player)>0){
 						return 8-ai.get.value(card);
 					}
@@ -4278,7 +4286,6 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('huanhun',trigger.player);
 					trigger.player.judge(function(card){
 						return get.color(card)=='red'?1:-1;
 					});
@@ -4394,7 +4401,9 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('请选择发动代形的卡牌','he',[1,player.num('he')]).ai=function(card){
+				var next=player.chooseToDiscard('请选择发动代形的卡牌','he',[1,player.num('he')]);
+				next.logSkill='daixing';
+				next.ai=function(card){
 					if(ui.selected.cards.length>=2) return 0;
 					if(ui.selected.cards.length==1){
 						if(player.num('h')>player.hp){
@@ -4408,7 +4417,6 @@ character.swd={
 				if(result.bool){
 					player.changeHujia(result.cards.length);
 					player.storage.daixing=result.cards.length;
-					player.logSkill('daixing');
 				}
 			},
 			ai:{
@@ -5051,7 +5059,9 @@ character.swd={
 				var num=player.num('h')-trigger.source.num('h');
 				event.num=num;
 				if(num>0){
-					player.chooseToDiscard(num,'是否弃置'+num+'张手牌，并对'+get.translation(trigger.source)+'造成一点伤害？').ai=function(card){
+					var next=player.chooseToDiscard(num,'是否弃置'+num+'张手牌，并对'+get.translation(trigger.source)+'造成一点伤害？');
+					next.logSkill=['pozhen',trigger.source];
+					next.ai=function(card){
 						if(ai.get.damageEffect(trigger.source,player,player)>0&&num<=2){
 							return 6-ai.get.value(card);
 						}
@@ -5068,11 +5078,11 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('pozhen',trigger.source);
 					if(event.num>0){
 						trigger.source.damage();
 					}
 					else{
+						player.logSkill('pozhen',trigger.source);
 						var cards=trigger.source.get('h');
 						cards.sort(lib.sort.random);
 						trigger.source.discard(cards.slice(0,-event.num));
@@ -5605,9 +5615,11 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('he','是否弃置一张装备牌抵消伤害？',function(card,player){
+				var next=player.chooseToDiscard('he','是否弃置一张装备牌抵消伤害？',function(card,player){
 					return get.type(card)=='equip';
-				}).ai=function(card){
+				});
+				next.logSkill='yulin';
+				next.ai=function(card){
 					if(player.hp==1||trigger.num>1){
 						return 9-ai.get.value(card);
 					}
@@ -5618,7 +5630,6 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('yulin');
 					game.delay();
 					trigger.untrigger();
 					trigger.finish();
@@ -5792,9 +5803,11 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('朱羽：是否弃置一张红色手牌使其受到一点火焰伤害？',function(card){
+				var next=player.chooseToDiscard('朱羽：是否弃置一张红色手牌使其受到一点火焰伤害？',function(card){
 					return get.color(card)=='red';
-				}).ai=function(card){
+				});
+				next.logSkill=['zhuyu',trigger.player,'fire'];
+				next.ai=function(card){
 					if(trigger.player.hasSkillTag('nofire')) return 0;
 					if(ai.get.damageEffect(trigger.player,player,player,'fire')>0){
 						return 9-ai.get.value(card);
@@ -5803,7 +5816,6 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('zhuyu',trigger.player,'fire');
 					trigger.player.damage('fire');
 				}
 			}
@@ -5822,9 +5834,11 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否弃置一张黑色手牌使其横置或翻面？',function(card){
+				var next=player.chooseToDiscard('是否弃置一张黑色手牌使其横置或翻面？',function(card){
 					return get.color(card)=='black';
-				}).ai=function(card){
+				});
+				next.logSkill='ningshuang';
+				next.ai=function(card){
 					if(ai.get.attitude(player,trigger.player)<0){
 						return 9-ai.get.value(card);
 					}
@@ -5832,7 +5846,6 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('ningshuang');
 					if(trigger.player.classList.contains('turnedover')){
 						trigger.player.loseHp();
 					}
@@ -6239,7 +6252,7 @@ character.swd={
 					list=list.concat(game.players[i].get('j'));
 				}
 				var dialog=ui.create.dialog(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+get.translation(trigger.player.judging)+
-					'，是否发动【天轮】？',list);
+					'，是否发动【天轮】？',list,'hidden');
 				player.chooseButton(dialog,function(button){
 					var card=button.link;
 					var trigger=_status.event.parent._trigger;
@@ -6275,7 +6288,7 @@ character.swd={
 				}
 			}
 		},
-		longyin:{
+		hlongyin:{
 			enable:'phaseUse',
 			usable:1,
 			filterCard:function(card,player){
@@ -6875,16 +6888,17 @@ character.swd={
 					ai.get.attitude(player,trigger.source)<0&&
 					ai.get.damageEffect(trigger.player,trigger.source,player)<
 					ai.get.damageEffect(trigger.source,trigger.player,player);
-				player.chooseToDiscard('是否将伤害来源（'+get.translation(trigger.source)+
-					'）和目标（'+get.translation(trigger.player)+'）对调？','he').ai=function(card){
+				var next=player.chooseToDiscard('是否将伤害来源（'+get.translation(trigger.source)+
+					'）和目标（'+get.translation(trigger.player)+'）对调？','he');
+				next.ai=function(card){
 					if(go){
 						return 10-ai.get.value(card);
 					}
 					return 0;
 				};
+				next.logSkill='yinguo';
 				"step 1"
 				if(result.bool){
-					player.logSkill('yinguo');
 					var target=trigger.player;
 					trigger.player=trigger.source;
 					trigger.source=target;
@@ -7568,13 +7582,14 @@ character.swd={
 			content:function(){
 				"step 0"
 				var dis=trigger.target.num('h','shan')||trigger.target.num('e','bagua')||trigger.target.num('h')>2;
-				player.chooseToDiscard('是否发动【狩猎】？').ai=function(card){
+				var next=player.chooseToDiscard('是否发动【狩猎】？');
+				next.ai=function(card){
 					if(dis) return 7-ai.get.value(card);
 					return 0;
 				}
+				next.logSkill='shoulie';
 				"step 1"
 				if(result.bool){
-					player.logSkill('shoulie');
 					trigger.directHit=true;
 				}
 			}
@@ -7817,7 +7832,7 @@ character.swd={
 		bingfeng2_info:'不能使用或打出手牌',
 		bingfeng_info:'限定技，出牌阶段，你可以指定至多三个目标与其一同翻面，且处于翻面状态时不能使用或打出手牌；若如此做，你失去技能玄咒并减少一点体力上限',
 		guozao:'聒噪',
-		guozao_info:'锁定技，每当距离你1以内的角色受到一次伤害，若伤害来源不你，你须观看牌堆顶的三张牌，然后指定一名有手牌的角色将手牌与这些牌交换',
+		guozao_info:'锁定技，每当距离你1以内的角色受到一次伤害，若伤害来源不你，你须观看牌堆顶的三张牌，然后指定距离2以内的一名有手牌角色将手牌与这些牌交换',
 		heihuo:'黑火',
 		heihuo_info:'出牌阶段，你可以弃置一张装备牌，令你的手牌数加倍；若你的手牌因此达到8张或更多，你立即受到3点火焰伤害且本回合内不能再次发动黑火',
 		yaotong:'妖瞳',
@@ -8097,7 +8112,7 @@ character.swd={
 		tianhuo:'天火',
 		huanyin:'幻音',
 		tianlun:'天轮',
-		longyin:'龙吟',
+		hlongyin:'龙吟',
 		lanzhi:'兰芷',
 		duanyi:'断意',
 		miesheng:'灭生',
@@ -8166,7 +8181,7 @@ character.swd={
 		duanyi_info:'出牌阶段限一次，你可以弃置两张杀，对一名角色造成一点伤害，然后其翻面并摸X张牌，X为其已损失的体力值',
 		guxing_info:'出牌阶段，你可以将最后至多X张手牌当杀使用，此杀无视距离且可以指定至多3个目标，每造成一次伤害，你摸一张牌，Ｘ为你已损失的体力值且至少为１。',
 		tianlun_info:'任意一名角色的判定生效前，你可以弃置一张场上角色的判定牌代替之',
-		longyin_info:'出牌阶段，你可以弃置任意张颜色相同且点数不同的牌，并获得逆时针座位距离与卡牌点数相同的角色区域内的一张牌。每阶段限一次',
+		hlongyin_info:'出牌阶段，你可以弃置任意张颜色相同且点数不同的牌，并获得逆时针座位距离与卡牌点数相同的角色区域内的一张牌。每阶段限一次',
 		lanzhi_info:'每当你即将造成伤害，可以防止此伤害，然后摸两张牌。每回合限发动一次。',
 		tianhuo_info:'出牌阶段，你可以令所有角色弃置其判定区域内的牌，并受到没有来源的等量火焰伤害，每阶段限一次',
 		huanyin_info:'锁定技，每当你成为其他角色的卡牌的目标时，你进行一次判定，若为黑桃则取消之，若为红桃你摸一张牌',

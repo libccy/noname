@@ -202,6 +202,9 @@
 .player.linked{
 	transform:rotate(-90deg);
 }
+.player.linked.target{
+	transform:rotate(-93deg);
+}
 .player.acted.linked .identity{
 	transform:rotate(270deg);
 }

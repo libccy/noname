@@ -962,12 +962,8 @@ character.refresh={
 				!lib.filter.autoRespondSha.call({player:player});
 			},
 			content:function(){
-				"step 0"
-				player.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀',trigger.player);
-				"step 1"
-				if(result.bool){
-					player.logSkill('zhuhai');
-				}
+				player.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀',
+					trigger.player).logSkill='zhuhai';
 			}
 		},
 		qianxin:{

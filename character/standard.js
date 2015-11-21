@@ -46,6 +46,7 @@ character.standard={
 			unique:true,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
+				if(event.responded) return false;
 				if(!player.isZhu) return false;
 				if(event.filterCard({name:'shan'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
@@ -515,6 +516,7 @@ character.standard={
 			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
+				if(event.responded) return false;
 				if(!player.isZhu) return false;
 				if(event.filterCard({name:'sha'})==false) return false;
 				for(var i=0;i<game.players.length;i++){

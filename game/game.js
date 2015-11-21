@@ -239,6 +239,12 @@
 								else{
 									ui.arena.classList.remove('mobile');
 								}
+								if(lib.config.layout=='default'){
+									ui.arena.classList.add('oldlayout');
+								}
+								else{
+									ui.arena.classList.remove('oldlayout');
+								}
 								if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 									ui.arena.classList.add('hpimage');
 								}
@@ -359,7 +365,7 @@
 						item:{
 							default:'无',
 							blur:'模糊',
-							gray:'黑色',
+							gray:'黑白',
 							sepia:'怀旧',
 							invert:'反色',
 							saturate:'饱和',
@@ -1748,8 +1754,7 @@
 		help:{
 			'游戏选项':'<ul><li>控制台命令<br>开启后可用浏览器控制台控制游戏<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
 			'触屏模式<br>可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
-			'<li>隐藏非全身皮肤<br>在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍'+
-			'<li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）',
+			'<li>隐藏非全身皮肤<br>在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中双指点击切换暂停<li>移动布局中，点击顶部的左半边或右半边可显示按钮，双击顶部可令界面下移（方便标身份）<li>键盘快捷键<br>'+
 			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
 			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
@@ -1764,7 +1769,8 @@
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令输入框中输出结果<br>game.print(str)<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card',
-			'身份模式':'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
+			'身份模式':'<div style="margin:10px">选项</div><ul style="margin-top:0"><li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）</ul>'+
+			'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
 			'战棋模式':
@@ -1805,6 +1811,7 @@
 			}
 			else{
 				node.addEventListener('mouseenter',ui.click.hoverpopped);
+				// node.addEventListener('mouseleave',ui.click.hoverpopped_leave);
 			}
 		},
 		placePoppedDialog:function(dialog,e){
@@ -2203,6 +2210,9 @@
 			playerproto:{
 				phase:function(){
 					"step 0"
+					if(player.node.judges.childElementCount){
+						player.popup('判定阶段');
+					}
 					player.phaseJudge();
 					"step 1"
 					player.phaseDraw();
@@ -2213,6 +2223,7 @@
 						game.delayx();
 					}
 					"step 2"
+					if(!player.skipList.contains('phaseUse')) player.popup('出牌阶段');
 					player.phaseUse();
 					"step 3"
 					player.phaseDiscard()
@@ -2255,7 +2266,7 @@
 				},
 				phaseUse:function(){
 					"step 0";
-					player.chooseToUse();
+					player.chooseToUse().modCancel='结束';
 					"step 1"
 					if(result.bool){
 						event.goto(0);
@@ -2265,6 +2276,9 @@
 					"step 0"
 					event.num=player.num('h')-game.checkMod(player,player.hp,'maxHandcard',player.get('s'));
 					if(event.num<=0) event.finish();
+					else{
+						player.popup('弃牌阶段');
+					}
 					event.trigger('phaseDiscard');
 					"step 1"
 					player.chooseToDiscard(num,true);
@@ -2352,6 +2366,14 @@
 						event.skillDialog.close();
 					}
 					if(event.result.bool){
+						if(event.logSkill){
+							if(typeof event.logSkill=='string'){
+								player.logSkill(event.logSkill);
+							}
+							else if(Array.isArray(event.logSkill)){
+								player.logSkill.apply(player,event.logSkill);
+							}
+						}
 						if(event.result.card||!event.result.skill){
 							player.useCard(event.result.card,event.result.cards,event.result.targets,event.result.skill);
 						}
@@ -2463,6 +2485,14 @@
 					"step 1"
 					if(event.promptdiscard){
 						event.promptdiscard.close();
+					}
+					if(event.logSkill&&event.result.bool){
+						if(typeof event.logSkill=='string'){
+							player.logSkill(event.logSkill);
+						}
+						else if(Array.isArray(event.logSkill)){
+							player.logSkill.apply(player,event.logSkill);
+						}
 					}
 					player.discard(event.result.cards);
 					if(event.dialog) event.dialog.close();
@@ -3149,7 +3179,9 @@
 						}
 					}
 					if(event.animate!=false||num>0){
-						if(num==0)game.delayx();
+						if(num==0){
+							if(event.delayx!==false) game.delayx();
+						}
 						else game.delayx(0.5);
 					}
 					"step 3"
@@ -3169,7 +3201,7 @@
 					}
 					"step 5"
 					if(document.getElementsByClassName('thrown').length){
-						game.delayx();
+						if(event.delayx!==false) game.delayx();
 					}
 					else{
 						event.finish();
@@ -4461,6 +4493,13 @@
 							cards.splice(arg4);
 						}
 						return cards;
+					}
+				},
+				syncStorage:function(skill){
+					switch(get.itemtype(this.storage[skill])){
+						case 'cards':game.addVideo('storage',this,[skill,get.cardsInfo(this.storage[skill]),'cards']);break;
+						case 'card':game.addVideo('storage',this,[skill,get.cardInfo(this.storage[skill]),'cards']);break;
+						default:game.addVideo('storage',this,[skill,this.storage[skill]]);
 					}
 				},
 				playerfocus:function(time){
@@ -6035,7 +6074,7 @@
 
 					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
 					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
-					if(node.style.transform&&node.style.transform!='none'){
+					if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 					}
 					else{
@@ -6220,7 +6259,7 @@
 						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
 						var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
 						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
-						if(node.style.transform&&node.style.transform!='none'){
+						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 						}
 						else{
@@ -6264,7 +6303,7 @@
 					ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
 					var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
 					var dy=this.offsetTop+this.offsetHeight/2-52-ny;
-					if(node.style.transform&&node.style.transform!='none'){
+					if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 					}
 					else{
@@ -6358,7 +6397,7 @@
 								// node.dataset.position=player.dataset.position;
 								var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
 								var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
-								if(node.style.transform&&node.style.transform!='none'){
+								if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 									node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 								}
 								else{
@@ -6708,21 +6747,26 @@
 						}
 					}
 					else{
+						var zoom1=0.9,zoom2=0.95;
+						if(arguments[1]=='phase'){
+							zoom1=1.05;
+							zoom2=1.05;
+						}
 						if(lib.isMobileMe(this)){
 							if(this.isLinked()){
-								this.node.avatar.style.transform='scale(0.9) rotate(-90deg)';
-								this.node.avatar2.style.transform='scale(0.9) rotate(-90deg)';
+								this.node.avatar.style.transform='scale('+zoom1+') rotate(-90deg)';
+								this.node.avatar2.style.transform='scale('+zoom1+') rotate(-90deg)';
 							}
 							else{
-								this.node.avatar.style.transform='scale(0.9)';
-								this.node.avatar2.style.transform='scale(0.9)';
+								this.node.avatar.style.transform='scale('+zoom1+')';
+								this.node.avatar2.style.transform='scale('+zoom1+')';
 							}
 						}
 						else if(this.isLinked()&&lib.isNewLayout()){
-							this.style.transform='scale(0.95) rotate(-90deg)';
+							this.style.transform='scale('+zoom2+') rotate(-90deg)';
 						}
 						else{
-							this.style.transform='scale(0.95)';
+							this.style.transform='scale('+zoom2+')';
 						}
 					}
 					this.queue();
@@ -6867,7 +6911,7 @@
 
 					var dx=player.offsetLeft+player.offsetWidth/2-52-this.offsetLeft;
 					var dy=player.offsetTop+player.offsetHeight/2-52-this.offsetTop;
-					if(this.style.transform&&this.style.transform!='none'){
+					if(this.style.transform&&this.style.transform!='none'&&this.style.transform.indexOf('translate')==-1){
 						this.style.transform+=' translate('+dx+'px,'+dy+'px)';
 					}
 					else{
@@ -7552,7 +7596,9 @@
 							_status.currentPhase.classList.remove('glow_phase');
 						}
 						player.classList.add('glow_phase');
+						// player.animate('playerbright',500);
 					}
+					// player.$damage(null,'phase')
 					game.addVideo('phaseChange',player);
 					_status.currentPhase=player;
 					game.log();
@@ -8746,6 +8792,7 @@
 							for(var j=0;j<l2.length;j++){
 								if(l2[j].suit==l1[i][0]&&l2[j].number==l1[i][1]&&l2[j].name==l1[i][2]){
 									l2[j].delete();
+									l2.splice(j--,1);
 									break;
 								}
 							}
@@ -9968,12 +10015,20 @@
 				else{
 					ui.arena.classList.add('selecting');
 					_status.imchoosing=true;
-					if(!_status.noconfirm){
+					if(!_status.noconfirm&&!_status.event.noconfirm){
 						if(!_status.mousedown||_status.mouseleft){
 							var str='';
 							if(ok) str+='o';
 							if(!event.forced&&get.noSelected()) str+='c';
 							ui.create.confirm(str);
+						}
+						if(ui.confirm&&ui.confirm.lastChild.link=='cancel'){
+							if(_status.event.parent.name=='phaseUse'&&!_status.event.skill){
+								ui.confirm.lastChild.innerHTML='结束';
+							}
+							else{
+								ui.confirm.lastChild.innerHTML='取消';
+							}
 						}
 					}
 				}
@@ -10887,6 +10942,7 @@
 					groupSort=function(name){
 						if(lib.card[name[2]].type=='basic') return 0;
 						if(lib.card[name[2]].type=='stonecard') return 0.5;
+						if(lib.card[name[2]].type=='mengjing') return 0.3;
 						if(lib.card[name[2]].type=='stonecharacter') return 1;
 						if(lib.card[name[2]].type=='chess') return 1.5;
 						if(lib.card[name[2]].type=='trick') return 2;
@@ -11165,6 +11221,9 @@
 				ui.arena=ui.create.div('#arena',ui.window);
 				if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 					ui.arena.classList.add('mobile');
+				}
+				if(lib.config.layout=='default'){
+					ui.arena.classList.add('oldlayout');
 				}
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
@@ -12114,16 +12173,17 @@
 		                }
 		            };
 					var clickContainer=function(){
-						if(this.animating){
-                            return;
-                        }
-                        this.animating=true;
-                        menu.classList.add('zoomout');
-                        menu.classList.remove('zoomin');
-                        setTimeout(function(){
-                            menuContainer.classList.add('hidden');
-                            menuContainer.animating=false;
-                        },300);
+						// if(this.animating){
+                        //     return;
+                        // }
+                        // this.animating=true;
+                        // menu.classList.add('zoomout');
+                        // menu.classList.remove('zoomin');
+                        // setTimeout(function(){
+                        //     menuContainer.classList.add('hidden');
+                        //     menuContainer.animating=false;
+                        // },300);
+						menuContainer.classList.add('hidden');
 
 						game.resume2();
 						if(game.onresume2){
@@ -12225,13 +12285,13 @@
                         if(menuContainer.classList.contains('hidden')){
 							ui.config2.classList.add('pressdown2');
 							ui.arena.classList.add('menupaused');
-                            menu.classList.remove('zoomout');
-                            menu.classList.add('zoomin');
+                            // menu.classList.remove('zoomout');
+                            // menu.classList.add('zoomin');
                             menuContainer.classList.remove('hidden');
-                            menuContainer.animating=true;
-                            setTimeout(function(){
-                                menuContainer.animating=false;
-                            },300);
+                            // menuContainer.animating=true;
+                            // setTimeout(function(){
+                            //     menuContainer.animating=false;
+                            // },300);
 							for(var i=0;i<menuUpdates.length;i++){
 								menuUpdates[i]();
 							}
@@ -12696,9 +12756,14 @@
 								this.classList.toggle('unselectable');
 								if(this.classList.contains('unselectable')){
 									lib.config.banned.add(this.link);
+									this.node.hp._innerHTML=this.node.hp.innerHTML;
+									this.node.hp.innerHTML='已禁用';
+									this.node.hp.style.top='8px';
 								}
 								else{
 									lib.config.banned.remove(this.link);
+									this.node.hp.innerHTML=this.node.hp._innerHTML;
+									this.node.hp.style.top='';
 								}
 								game.saveConfig('banned',lib.config.banned);
 							};
@@ -12706,8 +12771,12 @@
 							for(var i=0;i<buttons.length;i++){
 								buttons[i].classList.add('noclick');
 								buttons[i].listen(banCharacter);
+								buttons[i].node.hp.style.transition='all 0s';
 								if(lib.config.banned.contains(buttons[i].link)){
 									buttons[i].classList.add('unselectable');
+									buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
+									buttons[i].node.hp.innerHTML='已禁用';
+									buttons[i].node.hp.style.top='8px';
 								}
 							}
 							page.classList.add('menu-buttons');
@@ -12812,9 +12881,13 @@
 								this.classList.toggle('unselectable');
 								if(this.classList.contains('unselectable')){
 									lib.config.bannedcards.add(this.link[2]);
+									this.node.info._innerHTML=this.node.info.innerHTML;
+									this.node.info.innerHTML='已禁用';
 								}
 								else{
 									lib.config.bannedcards.remove(this.link[2]);
+									this.node.info.innerHTML=this.node.info._innerHTML;
+									this.node.info.style.top='';
 								}
 								game.saveConfig('bannedcards',lib.config.bannedcards);
 							};
@@ -12824,6 +12897,8 @@
 								buttons[i].listen(banCard);
 								if(lib.config.bannedcards.contains(buttons[i].link[2])){
 									buttons[i].classList.add('unselectable');
+									buttons[i].node.info._innerHTML=buttons[i].node.info.innerHTML;
+									buttons[i].node.info.innerHTML='已禁用';
 								}
 							}
 							page.classList.add('menu-buttons');
@@ -13836,6 +13911,9 @@
 				if(!this._poppedfunc){
 					return;
 				}
+				// if(this._poppedalready){
+				// 	return;
+				// }
 				if(lib.config.touchscreen){
 					_status.touchpopping=true;
 					setTimeout(function(){
@@ -13848,6 +13926,7 @@
 					ui.currentpopped._uiintro.delete();
 					delete ui.currentpopped._uiintro;
 				}
+				// this._poppedalready=true;
 				ui.currentpopped=this;
 				uiintro.classList.add('popped');
 				uiintro.classList.add('static');
@@ -13872,6 +13951,9 @@
 				if(!lib.config.touchscreen){
 					uiintro.addEventListener('mouseleave',ui.click.leavehoverpopped);
 				}
+			},
+			hoverpopped_leave:function(){
+				this._poppedalready=false;
 			},
 			leavehoverpopped:function(){
 				if(_status.dragged) return;
@@ -16127,6 +16209,7 @@
 				func=function(card){
 					if(get.type(card)=='basic') return 2;
 					if(get.type(card)=='stonecard') return -0.5;
+					if(get.type(card)=='mengjing') return 0.5;
 					if(get.type(card)=='stonecharacter') return 1;
 					if(get.type(card)=='chess') return 1.5;
 					if(get.type(card)=='trick') return -1;
@@ -16357,7 +16440,7 @@
 					}
 				}
 				// if(!simple)
-				if(false){
+				if(lib.config.touchscreen){
 					var storage=node.storage;
 					for(i in storage){
 						if(get.info(i)&&get.info(i).intro){
@@ -16375,34 +16458,36 @@
 							}
 						}
 					}
-					uiintro.add(ui.create.div('.placeholder'));
-					var table,tr,td;
-					table=document.createElement('table');
-					tr=document.createElement('tr');
-					table.appendChild(tr);
-					td=document.createElement('td');
-					td.innerHTML='攻击范围';
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML='进攻距离';
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML='防御距离';
-					tr.appendChild(td);
+					if(false){
+						uiintro.add(ui.create.div('.placeholder'));
+						var table,tr,td;
+						table=document.createElement('table');
+						tr=document.createElement('tr');
+						table.appendChild(tr);
+						td=document.createElement('td');
+						td.innerHTML='攻击范围';
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML='进攻距离';
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML='防御距离';
+						tr.appendChild(td);
 
-					tr=document.createElement('tr');
-					table.appendChild(tr);
-					td=document.createElement('td');
-					td.innerHTML=get.attackRange(node);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=get.globalFrom(node);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=get.globalTo(node);
-					tr.appendChild(td);
+						tr=document.createElement('tr');
+						table.appendChild(tr);
+						td=document.createElement('td');
+						td.innerHTML=get.attackRange(node);
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML=get.globalFrom(node);
+						tr.appendChild(td);
+						td=document.createElement('td');
+						td.innerHTML=get.globalTo(node);
+						tr.appendChild(td);
 
-					uiintro.content.appendChild(table);
+						uiintro.content.appendChild(table);
+					}
 				}
 
 				uiintro.add(ui.create.div('.placeholder.slim'));
@@ -17189,6 +17274,13 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+			rank:function(){
+		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
+		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
+		        for(var i in lib.character){
+		            if(i!='zuoci'&&!list.contains(i)) console.log(i);
+		        }
+		    },
 			h:function(player){
 				console.log(get.translation(player.get('h')));
 			},

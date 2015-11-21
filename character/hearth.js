@@ -24,13 +24,14 @@ character.hearth={
 		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi'],['fullskin']],
 		hs_malorne:['male','wu',3,['enze','chongsheng'],['fullskin']],
 		hs_malygos:['male','wei',4,['malymowang'],['fullskin']],
-		hs_xuefashi:['male','wei',2,['liehun','xjumo'],['fullskin']],
+		hs_xuefashi:['male','wei',3,['liehun','xjumo'],['fullskin']],
 		// hs_loatheb:['male','wei',2,[],['fullskin']],
 		// hs_trueheart:['male','wei',2,[],['fullskin']],
 		// hs_sainaliusi:['male','wei',2,[],['fullskin']],
 		// hs_lrhonin:['male','wei',2,[],['fullskin']],
 		// hs_bolvar:['male','wei',2,[],['fullskin']],
 		// hs_fuding:['male','wei',2,[],['fullskin']],
+		hs_ysera:['female','wu',4,['chenshui'],['fullskin']],
 
 		hs_ronghejuren:['male','shu',8,[],['fullskin']],
 		hs_edwin:['male','qun',3,['lianzhan'],['fullskin']],
@@ -49,8 +50,21 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		chenshui:{
+			trigger:{player:'phaseEnd'},
+			frequent:true,
+			content:function(){
+				var list=['mengjing_feicuiyoulong','mengjing_huanxiaojiemei',
+					'mengjing_suxing','mengjing_mengye','mengjing_mengjing'];
+				player.gain(game.createCard(list.randomGet()));
+				player.$draw();
+			},
+			ai:{
+				threaten:2
+			}
+		},
 		liehun:{
-			trigger:{player:'phaseUseBegin'},
+			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
 				return player.num('h',{type:'basic'})<player.num('h');
@@ -78,7 +92,7 @@ character.hearth={
 			mod:{
 				maxHandcard:function(player,num){
 					return num+3;
-				}
+				},
 			},
 		},
 		malymowang:{
@@ -757,6 +771,22 @@ character.hearth={
 				}
 			}
 		},
+		mengjing_mengye:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			priority:-1,
+			filter:function(event,player){
+				return player.num('he')>0;
+			},
+			content:function(){
+				player.discard(player.get('he'));
+				player.removeSkill('mengjing_mengye');
+			},
+			mark:'image',
+			intro:{
+				content:'回合结束阶段，弃置所有牌'
+			}
+		},
 		zhanhou:{
 			init:function(player){
 				player.forcemin=true;
@@ -778,11 +808,11 @@ character.hearth={
 					player:1
 				}
 			},
-			mod:{
-				globalFrom:function(from,to,distance){
-					return distance-from.hujia;
-				}
-			},
+			// mod:{
+			// 	globalFrom:function(from,to,distance){
+			// 		return distance-from.hujia;
+			// 	}
+			// },
 		},
 		shijie:{
 			trigger:{player:'phaseEnd'},
@@ -1311,15 +1341,16 @@ character.hearth={
 				var val=ai.get.value(trigger.card);
 				var suit=get.suit(trigger.card);
 				var eff=ai.get.effect(trigger.target,trigger.card,trigger.player,player);
-				player.chooseToDiscard('是否对'+get.translation(trigger.player)+'使用的'+get.translation(trigger.card)+'发动【闷棍】？',function(card){
+				var next=player.chooseToDiscard('是否对'+get.translation(trigger.player)+'使用的'+get.translation(trigger.card)+'发动【闷棍】？',function(card){
 					return get.suit(card)==suit;
-				}).ai=function(card){
+				});
+				next.logSkill=['mengun',trigger.player];
+				next.ai=function(card){
 					if(eff>=0) return 0;
 					return Math.min(8,1+val)-ai.get.value(card);
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('mengun',trigger.player);
 					game.log(get.translation(trigger.player)+'收回了'+get.translation(trigger.cards));
 					trigger.untrigger();
 					trigger.finish();
@@ -1385,10 +1416,11 @@ character.hearth={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否发动【激活】？').ai=ai.get.unuseful2;
+				var next=player.chooseToDiscard('是否发动【激活】？');
+				next.ai=ai.get.unuseful2;
+				next.logSkill='jihuo';
 				"step 1"
 				if(result.bool){
-					player.logSkill('jihuo');
 					player.storage.jihuo=true;
 				}
 				else{
@@ -1941,6 +1973,146 @@ character.hearth={
 		},
 	},
 	card:{
+		mengjing_feicuiyoulong:{
+			type:'mengjing',
+			image:'card/mengjing_feicuiyoulong',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:true,
+			content:function(){
+				target.damage(2);
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-2
+				},
+				tag:{
+					damage:2
+				},
+				useful:5,
+				value:10,
+			}
+		},
+		mengjing_suxing:{
+			type:'mengjing',
+			image:'card/mengjing_suxing',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			selectTarget:-1,
+			content:function(){
+				target.loseHp();
+				var he=target.get('he');
+				if(he.length){
+					target.discard(he.randomGets(2));
+				}
+			},
+			ai:{
+				result:{
+					target:-1,
+				},
+				order:6,
+				useful:5,
+				value:10,
+			}
+		},
+		mengjing_mengye:{
+			type:'mengjing',
+			image:'card/mengjing_mengye',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:true,
+			content:function(){
+				target.draw();
+				target.addSkill('mengjing_mengye');
+			},
+			ai:{
+				order:1,
+				useful:5,
+				value:10,
+				result:{
+					target:function(player,target){
+						if(target.skills.contains('mengjing_mengye')) return 0.5;
+						return -target.num('he');
+					}
+				}
+			}
+		},
+		mengjing_mengjing:{
+			type:'mengjing',
+			image:'card/mengjing_mengjing',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:function(card,player,target){
+				return !target.num('j','lebu')||target.num('e')>0;
+			},
+			content:function(){
+				'step 0'
+				var es=target.get('e');
+				if(es.length){
+					target.gain(es,'gain2');
+				}
+				'step 1'
+				if(!target.num('j','lebu')){
+					target.addJudge(game.createCard('lebu'));
+				}
+			},
+			ai:{
+				order:2,
+				useful:5,
+				value:10,
+				result:{
+					target:function(player,target){
+						var num=target.hp-target.num('he')-2;
+						if(num>-1) return -1;
+						if(target.hp<3) num--;
+						if(target.hp<2) num--;
+						if(target.hp<1) num--;
+						return num;
+					}
+				}
+			}
+		},
+		mengjing_huanxiaojiemei:{
+			type:'mengjing',
+			image:'card/mengjing_huanxiaojiemei',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:function(card,player,target){
+				return target.hp<target.maxHp;
+			},
+			content:function(){
+				target.recover(target.maxHp-target.hp);
+			},
+			ai:{
+				order:6,
+				value:10,
+				useful:[7,4],
+				result:{
+					target:function(player,target){
+						var eff=ai.get.recoverEffect(target,player,target);
+						if(eff<=0) return 0;
+						var num=target.maxHp-target.hp;
+						if(num<1) return 0;
+						if(target.hp==1) return num+0.5;
+						return num;
+					}
+				}
+			}
+		},
 		tuteng1:{
 			image:'card/tuteng1',
 			color:'white',
@@ -2016,6 +2188,7 @@ character.hearth={
 		hs_siwangzhiyi:'死亡之翼',
 		hs_malygos:'玛里苟斯',
 		hs_xuefashi:'血法师',
+		hs_ysera:'伊瑟拉',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_edwin:'艾德温',
@@ -2025,10 +2198,24 @@ character.hearth={
 		hs_totemic:'图腾师',
 		hs_bilanyoulong:'碧蓝幼龙',
 
+		chenshui:'沉睡',
+		chenshui_info:'回合结束阶段，你可以将一张随机梦境牌加入你的手牌',
+		mengjing:'梦境',
+		mengjing_card_config:'梦境',
+		mengjing_feicuiyoulong:'翡翠幼龙',
+		mengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成2点伤害',
+		mengjing_huanxiaojiemei:'欢笑姐妹',
+		mengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复所有体力值',
+		mengjing_suxing:'苏醒',
+		mengjing_suxing_info:'令所有其他角色流失一点体力并随机弃置两张牌',
+		mengjing_mengye:'梦魇',
+		mengjing_mengye_info:'令一名角色摸1张牌，并在其下一个回合结束阶段弃置其所有牌',
+		mengjing_mengjing:'梦境',
+		mengjing_mengjing_info:'令一名角色将装备区内的所有牌收入手牌，并将一张乐不思蜀置于其判定区',
 		xjumo:'聚魔',
-		xjumo_info:'锁定技，你的手牌上限+3',
+		xjumo_info:'锁定技，你的手牌上限+2',
 		liehun:'裂魂',
-		liehun_info:'锁定技，出牌阶段开始时，你获得手牌中所有非基本牌的复制',
+		liehun_info:'锁定技，回合结束阶段，你获得手牌中所有非基本牌的复制',
 		malymowang:'魔网',
 		malymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你观看随机3张锦囊牌，并将其中一张加入你的手牌',
 		lingzhou:'灵咒',
@@ -2091,7 +2278,7 @@ character.hearth={
 		fengxian:'奉献',
 		fengxian_info:'出牌阶段限一次，你可以令场上所有角色各弃置一张手牌',
 		zhanhou:'战吼',
-		zhanhou_info:'锁定技，你没有装备区，你可以弃置一张装备牌并获得一点护甲值；每有一点护甲值，你与其他角色的距离-1',
+		zhanhou_info:'锁定技，你没有装备区，你可以弃置一张装备牌并获得一点护甲值',
 		anying:'暗影',
 		anying_info:'限定技，出牌阶段，你可以弃置两张黑色牌，失去技能圣光，并获得技能心刺',
 		shijie:'视界',

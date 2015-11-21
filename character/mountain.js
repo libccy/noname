@@ -212,11 +212,12 @@ character.mountain={
 					event.finish();
 				}
 				else{
-					player.chooseToDiscard('是否发动巧变路过判定阶段？').ai=ai.get.unuseful2;
+					var next=player.chooseToDiscard('是否发动巧变路过判定阶段？');
+					next.ai=ai.get.unuseful2;
+					next.logSkill='qiaobian';
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('qiaobian');
 					trigger.untrigger();
 					trigger.finish();
 				}
@@ -421,7 +422,9 @@ character.mountain={
 			content:function(){
 				"step 0"
 				var discard=player.num('h')>player.hp;
-				player.chooseToDiscard('是否发动巧变路过弃牌阶段？').ai=function(card){
+				var next=player.chooseToDiscard('是否发动巧变路过弃牌阶段？');
+				next.logSkill='qiaobian';
+				next.ai=function(card){
 					if(discard){
 						return 100-ai.get.useful(card);
 					}
@@ -431,7 +434,6 @@ character.mountain={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('qiaobian');
 					trigger.untrigger();
 					trigger.finish();
 				}
@@ -795,10 +797,11 @@ character.mountain={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('he','是否发动悲歌？').ai=ai.get.unuseful2;
+				var next=player.chooseToDiscard('he','是否发动悲歌？');
+				next.ai=ai.get.unuseful2;
+				next.logSkill='beige';
 				"step 1"
 				if(result.bool){
-					player.logSkill('beige');
 					trigger.player.judge();
 				}
 				else{
