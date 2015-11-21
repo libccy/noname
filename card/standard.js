@@ -1121,6 +1121,12 @@ card.standard={
 				"step 0"
 				if(player.skills.contains('jiu')){
 					player.removeSkill('jiu');
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
 					event.jiu=true;
 				}
 				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1).logSkill='qinglong';

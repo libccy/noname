@@ -581,6 +581,12 @@ character.yijiang={
 				"step 2"
 				if(player.skills.contains('jiu')){
 					player.removeSkill('jiu');
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
 					event.jiu=true;
 				}
 				player.chooseToUse('是否对'+get.translation(trigger.target)+'再使用一张杀？',
@@ -769,8 +775,11 @@ character.yijiang={
 					return '黑色';
 				}
 				'step 1'
+				event.control=result.control;
+				player.showHandcards();
+				'step 2'
 				var cards;
-				if(result.control=='red'){
+				if(event.control=='红色'){
 					cards=player.get('h',{color:'red'});
 				}
 				else{
@@ -778,13 +787,13 @@ character.yijiang={
 				}
 				player.discard(cards);
 				event.num=cards.length;
-				'step 2'
+				'step 3'
 				player.chooseTarget([1,event.num],function(card,player,target){
 					return target!=player&&target.num('he')>0;
 				}).ai=function(target){
 					return -ai.get.attitude(player,target)+0.5;
 				}
-				'step 3'
+				'step 4'
 				if(result.targets){
 					event.targets=result.targets;
 					event.gained=event.targets.length;
@@ -792,12 +801,12 @@ character.yijiang={
 				else{
 					event.finish();
 				}
-				'step 4'
+				'step 5'
 				if(event.targets.length){
 					player.gainPlayerCard(event.targets.shift(),'he',true);
 					event.redo();
 				}
-				'step 5'
+				'step 6'
 				if(event.gained>=2){
 					player.loseHp();
 				}

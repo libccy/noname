@@ -16,7 +16,11 @@ card.extra={
 			content:function(){
 				if(target==_status.dying) target.recover();
 				else{
-					target.addTempSkill('jiu','phaseAfter');
+					target.addSkill('jiu');
+					if(!player.node.jiu&&lib.config.jiu_effect){
+						player.node.jiu=ui.create.div('.playerjiu',player.node.avatar);
+						player.node.jiu2=ui.create.div('.playerjiu',player.node.avatar2);
+					}
 					if(card.clone&&card.clone.parentNode==ui.arena){
 						card.clone.moveTo(target).delete();
 						game.addVideo('gain2',target,get.cardsInfo([card]));
@@ -343,15 +347,22 @@ card.extra={
 			group:'jiu2'
 		},
 		jiu2:{
-			trigger:{player:['useCardAfter','phaseAfter']},
+			trigger:{player:'useCardAfter',global:'phaseAfter'},
 			priority:2,
 			filter:function(event){
-				return (event.card&&(event.card.name=='sha'));
+				if(event.name=='useCard') return (event.card&&(event.card.name=='sha'));
+				return true;
 			},
 			forced:true,
 			popup:false,
 			content:function(){
 				player.removeSkill('jiu');
+				if(player.node.jiu){
+					player.node.jiu.delete();
+					player.node.jiu2.delete();
+					delete player.node.jiu;
+					delete player.node.jiu2;
+				}
 			},
 		},
 		guding_skill:{

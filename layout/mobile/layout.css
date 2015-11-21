@@ -40,7 +40,10 @@
 #handcards2{
     display:none;
 }
-
+/*#arena:not(.chess) .player[data-position='0']>.playerjiu{
+    width: 120px;
+    border-radius: 0px;
+}*/
 #arena:not(.chess) .player[data-position='0']>.equips>div{
     width: 45px;
     height: 45px;

@@ -132,6 +132,18 @@ body>.background{z-index:-2}
 	animation:cardflip 0.3s ease-out;
 	-webkit-animation:cardflip 0.3s ease-out;
 }
+.player .playerjiu{
+	animation:game_start 0.5s;
+	-webkit-animation:game_start 0.5s;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left:0;
+	top:0;
+	z-index: 4;
+	pointer-events: none;
+	background: rgba(255, 0, 0, 0.3);
+}
 .player.playerbright{
 	filter:brightness(1.2);
 	-webkit-filter:brightness(1.2);

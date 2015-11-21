@@ -56,6 +56,11 @@
 						},
 						unfrequent:true,
 					},
+					confirm_exit:{
+						name:'确认退出',
+						init:false,
+						unfrequent:true
+					},
 					auto_confirm:{
 						name:'自动确认',
 						init:true,
@@ -92,6 +97,7 @@
 							mid:'中',
 							fast:'较快',
 							vfast:'快',
+							vvfast:'很快',
 						},
 					},
 					right_click:{
@@ -659,6 +665,11 @@
 					},
 					button_press:{
 						name:'按钮效果',
+						init:true,
+						unfrequent:true,
+					},
+					jiu_effect:{
+						name:'喝酒效果',
 						init:true,
 						unfrequent:true,
 					},
@@ -1978,7 +1989,10 @@
 				lib.config.all.characters=[];
 				lib.config.all.cards=[];
 				lib.config.all.plays=[];
+
+				var charlist=['standard','wind','fire','woods','mountain','guozhan','sp','yijiang','extra','refresh'];
 				for(i in character.pack){
+					if(window.minnoname&&charlist.indexOf(i)==-1) continue;
 					lib.config.all.characters.push(i);
 					lib.translate[i+'_character_config']=character.pack[i];
 				}
@@ -4261,6 +4275,12 @@
 					if(!_status.video){
 						game.addVideo('update',this,[this.num('h'),this.hp,this.maxHp,this.hujia]);
 					}
+					if(this.node.jiu&&!this.skills.contains('jiu')){
+						this.node.jiu.delete();
+						this.node.jiu2.delete();
+						delete this.node.jiu;
+						delete this.node.jiu2;
+					}
 					return this;
 				},
 				num:function(arg1,arg2,arg3){
@@ -4325,6 +4345,7 @@
 						if(arg2) skills=skills.concat(this.hiddenSkills);
 						if(arg3!==false){
 							for(i=0;i<this.node.equips.childNodes.length;i++){
+								if(this.node.equips.childNodes[i].classList.contains('removing')) continue;
 								if(get.info(this.node.equips.childNodes[i]).skills){
 									skills=skills.concat(get.info(this.node.equips.childNodes[i]).skills);
 								}
@@ -9761,6 +9782,7 @@
 			if(time==undefined) time=1;
 			if(time2==undefined) time2=0;
 			time=time*lib.config.duration+time2;
+			if(lib.config.speed=='vvfast') time/=3;
 			_status.timeout=setTimeout(game.resume,time);
 		},
 		delayx:function(time,time2){
@@ -9770,6 +9792,7 @@
 				case 'slow':time*=1.5;break;
 				case 'fast':time*=0.7;break;
 				case 'vfast':time*=0.4;break;
+				case 'vvfast':time*=0.2;break;
 			}
 			return game.delay(time,time2);
 		},
@@ -16458,6 +16481,13 @@
 							}
 						}
 					}
+					var js=node.get('j');
+					for(var i=0;i<js.length;i++){
+						var name=lib.translate[js[i].viewAs||js[i].name];
+						translation='<div><div class="skill">『'+name[0]+name[1]+'』</div><div>'+
+						lib.translate[(js[i].viewAs||js[i].name)+'_info']+'</div></div>';
+						uiintro.add(translation);
+					}
 					if(false){
 						uiintro.add(ui.create.div('.placeholder'));
 						var table,tr,td;
@@ -17821,11 +17851,11 @@
 			game.start();
 			game.loop();
 		};
-		document.onmousewheel=ui.click.windowmousewheel;
-		document.onmousemove=ui.click.windowmousemove;
-		document.onmousedown=ui.click.windowmousedown;
-		document.onmouseup=ui.click.windowmouseup;
 		if(!lib.config.touchscreen){
+			document.onmousewheel=ui.click.windowmousewheel;
+			document.onmousemove=ui.click.windowmousemove;
+			document.onmousedown=ui.click.windowmousedown;
+			document.onmouseup=ui.click.windowmouseup;
 			document.oncontextmenu=ui.click.right;
 		}
 		document.ontouchend=function(e){
@@ -17836,4 +17866,12 @@
 		document.ontouchmove = function(e) {
 			e.preventDefault();
 		};
+		window.onbeforeunload=function(){
+			if(lib.config.confirm_exit&&!_status.reloading){
+				return '是否离开游戏？'
+			}
+			else{
+				return null;
+			}
+		}
 }());
