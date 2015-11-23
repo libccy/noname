@@ -595,7 +595,7 @@ mode.identity={
 					game.zhu.setIdentity();
 					game.zhu.isZhu=true;
 					delete game.zhong;
-					if(lib.config.animation) game.zhu.$legend();
+					if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
 					game.delay(2);
 					game.zhu.playerfocus(1000);
 				}

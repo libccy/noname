@@ -61,7 +61,7 @@ character.yijiang={
 		zhuzhi:['male','wu',4,['anguo'],['fullskin']],
 		quancong:['male','wu',4,['yaoming'],['fullskin']],
 		gongsunyuan:['male','qun',4,['huaiyi'],['fullskin']],
-		guotufengji:['male','shu',3,['jigong','shifei'],['fullskin']],
+		guotufengji:['male','qun',3,['jigong','shifei'],['fullskin']],
 	},
 	skill:{
 		jinjiu:{
@@ -218,19 +218,15 @@ character.yijiang={
 			ai:{
 				effect:{
 					player:function(card,player){
-						console.log(1);
 						if(_status.currentPhase!=player) return;
 						if(card.name=='sha'&&player.num('h')<=player.hp&&!player.storage.chunlao.length){
-
 							return [0,0,0,0];
 						}
 					}
 				},
-			},
-			group:'chunlao2',
-			ai:{
 				threaten:1.4
-			}
+			},
+			group:'chunlao2'
 		},
 		chunlao2:{
 			trigger:{global:'dying'},
@@ -1175,7 +1171,12 @@ character.yijiang={
 			},
 			content:function(){
 				if(player==trigger.source){
-					game.asyncDraw([player,trigger.player]);
+					if(trigger.player.isAlive()){
+						game.asyncDraw([player,trigger.player]);
+					}
+					else{
+						player.draw();
+					}
 					player.storage.zhanjue++;
 				}
 				else{
@@ -1231,6 +1232,10 @@ character.yijiang={
 					};
 					next.autochoose=lib.filter.autoRespondSha;
 					next.source=player;
+				}
+				else{
+					event.current=event.current.next;
+					event.redo();
 				}
 				"step 3"
 				if(result.bool){
@@ -1300,6 +1305,10 @@ character.yijiang={
 					next.autochoose=lib.filter.autoRespondSha;
 					next.source=player;
 					next.target=target;
+				}
+				else{
+					event.current=event.current.next;
+					event.redo();
 				}
 				"step 1"
 				if(result.bool){

@@ -21,8 +21,8 @@ card.extra={
 						player.node.jiu=ui.create.div('.playerjiu',player.node.avatar);
 						player.node.jiu2=ui.create.div('.playerjiu',player.node.avatar2);
 					}
-					if(card.clone&&card.clone.parentNode==ui.arena){
-						card.clone.moveTo(target).delete();
+					if(card.clone&&card.clone.parentNode==player.parentNode){
+						card.clone.moveDelete(target);
 						game.addVideo('gain2',target,get.cardsInfo([card]));
 					}
 				}

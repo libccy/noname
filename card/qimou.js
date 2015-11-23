@@ -175,8 +175,8 @@ card.qimou={
 				"step 1"
 				if(result.bool){
 					player.gain([result.player,result.target]);
-					result.player.clone.moveTo(player).delete();
-					result.target.clone.moveTo(player).delete();
+					result.player.clone.moveDelete(player);
+					result.target.clone.moveDelete(player);
 					game.addVideo('gain2',player,get.cardsInfo([result.player,result.target]));
 				}
 				else if(!result.cancelled){

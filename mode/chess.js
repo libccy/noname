@@ -504,7 +504,7 @@ mode.chess={
 				}
 			},
 			$throwxy:function(card,left,top,transform){
-				var node=card.copy('thrown');
+				var node=card.copy('thrown','thrownhighlight');
 				var rect=this.getBoundingClientRect();
 				node.style.left=(rect.left+8)+'px';
 				node.style.top=(rect.top+8)+'px';
@@ -1280,7 +1280,7 @@ mode.chess={
 						next.player=mech;
 						next.content=info.content;
 						mech.chessFocus();
-						if(lib.config.animation){
+						if(lib.config.animation&&!lib.config.low_performance){
 							mech.$epic2();
 						}
 						game.delay();
@@ -1429,7 +1429,7 @@ mode.chess={
 						var name=Array.prototype.randomGet.apply(lib.treasurelist,list);
 						var treasure=game.addChessPlayer(name,'treasure',0);
 						treasure.playerfocus(1500);
-						if(lib.config.animation){
+						if(lib.config.animation&&!lib.config.low_performance){
 							setTimeout(function(){
 								treasure.$rare2();
 							},500);
@@ -2418,7 +2418,7 @@ mode.chess={
 						node.classList.add('playerflip');
 						node.style.transform='none';
 						node.style.transition='';
-						if(lib.config.animation){
+						if(lib.config.animation&&!lib.config.low_performance){
 							setTimeout(function(){
 								switch(game.getRarity(node.name)){
 									case 'rare':node.$rare();break;
@@ -3147,7 +3147,7 @@ mode.chess={
 							node.classList.add('playerflip');
 							node.style.transform='none';
 							node.style.transition='';
-							if(lib.config.animation){
+							if(lib.config.animation&&!lib.config.low_performance){
 								setTimeout(function(){
 									switch(game.getRarity(node.name)){
 										case 'rare':node.$rare();break;
@@ -3952,7 +3952,7 @@ mode.chess={
 					source.chessFocus();
 					source.playerfocus(1000);
 					source.line(player,'thunder');
-					if(lib.config.animation){
+					if(lib.config.animation&&!lib.config.low_performance){
 						setTimeout(function(){
 							source.$epic2();
 						},300);
@@ -3996,7 +3996,7 @@ mode.chess={
 					source.chessFocus();
 					source.playerfocus(1000);
 					source.line(player,'thunder');
-					if(lib.config.animation){
+					if(lib.config.animation&&!lib.config.low_performance){
 						setTimeout(function(){
 							source.$epic2();
 						},300);
@@ -4043,7 +4043,7 @@ mode.chess={
 					source.chessFocus();
 					source.playerfocus(1000);
 					source.line(player,'thunder');
-					if(lib.config.animation){
+					if(lib.config.animation&&!lib.config.low_performance){
 						setTimeout(function(){
 							source.$epic2();
 						},300);
@@ -4097,7 +4097,7 @@ mode.chess={
 					source.chessFocus();
 					source.playerfocus(1000);
 					source.line(player,'thunder');
-					if(lib.config.animation){
+					if(lib.config.animation&&!lib.config.low_performance){
 						setTimeout(function(){
 							source.$epic2();
 						},300);
@@ -4145,7 +4145,7 @@ mode.chess={
 					source.chessFocus();
 					source.playerfocus(1000);
 					source.line(player,'thunder');
-					if(lib.config.animation){
+					if(lib.config.animation&&!lib.config.low_performance){
 						setTimeout(function(){
 							source.$epic2();
 						},300);
@@ -4189,7 +4189,7 @@ mode.chess={
 					source.chessFocus();
 					source.playerfocus(1000);
 					source.line(player,'thunder');
-					if(lib.config.animation){
+					if(lib.config.animation&&!lib.config.low_performance){
 						setTimeout(function(){
 							source.$epic2();
 						},300);

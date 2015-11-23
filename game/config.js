@@ -209,7 +209,8 @@ window.config={
 	background_speak:true,
 	glow_phase:true,
 
-
+	skin:{},
+	
 	theme:'woodden',
 	layout:'mobile',
 	card_style:'default',

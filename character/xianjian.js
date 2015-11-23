@@ -304,7 +304,7 @@ character.xianjian={
 					player.$throw(result.cards);
 					var clone=result.cards[0].clone;
 					setTimeout(function(){
-						clone.moveTo(player,'flip').delete();
+						clone.moveDelete(player);
 						game.addVideo('gain2',player,get.cardsInfo([clone]));
 					},500);
 					player.logSkill('shuiyun');
@@ -631,7 +631,7 @@ character.xianjian={
 						game.addVideo('unmarkId',player,[get.cardInfo(player.storage.shuangren),'shuangren']);
 					}
 					if(card.clone){
-						card.clone.moveTo(player,'flip').delete();
+						card.clone.moveDelete(player);
 						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
 						player.mark(card,'shuangren');
 						game.addVideo('markId',player,[get.cardInfo(card),'shuangren']);

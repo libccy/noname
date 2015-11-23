@@ -45,8 +45,9 @@ mode.versus={
 				if(lib.storage.single_control==undefined) game.save('single_control',true);
 				if(lib.storage.number==undefined) game.save('number',3);
 				if(lib.storage.versus_reward==undefined) game.save('versus_reward',3);
+				if(lib.storage.versus_punish==undefined) game.save('versus_punish','弃牌');
 				if(lib.storage.replace_number==undefined) game.save('replace_number',3);
-				if(lib.storage.control_all==undefined) game.save('control_all',true);
+				// if(lib.storage.control_all==undefined) game.save('control_all',true);
 
 				switch(lib.storage.seat_order){
 					case '交叉':lib.storage.cross_seat=true;lib.storage.random_seat=false;break;
@@ -54,6 +55,7 @@ mode.versus={
 					default:lib.storage.cross_seat=false;lib.storage.random_seat=false;
 				}
 				game.save('only_zhu',true);
+				game.save('control_all',true);
 
 				ui.create.arena();
 				ui.create.cards();
@@ -125,9 +127,10 @@ mode.versus={
 					this.dialog.versus_noreplace_end=this.dialog.add(ui.create.switcher('versus_noreplace_end',lib.storage.noreplace_end)).querySelector('.toggle');
 					this.dialog.versus_assign_enemy=this.dialog.add(ui.create.switcher('versus_assign_enemy',lib.storage.assign_enemy)).querySelector('.toggle');
 					this.dialog.versus_single_control=this.dialog.add(ui.create.switcher('versus_single_control',lib.storage.single_control)).querySelector('.toggle');
-					this.dialog.versus_control_all=this.dialog.add(ui.create.switcher('versus_control_all',lib.storage.control_all)).querySelector('.toggle');
+					// this.dialog.versus_control_all=this.dialog.add(ui.create.switcher('versus_control_all',lib.storage.control_all)).querySelector('.toggle');
 					this.dialog.versus_die_stop=this.dialog.add(ui.create.switcher('versus_die_stop',lib.storage.die_stop)).querySelector('.toggle');
 					this.dialog.versus_reward=this.dialog.add(ui.create.switcher('versus_reward',[0,1,2,3,4],lib.storage.versus_reward)).querySelector('.toggle');
+					this.dialog.versus_punish=this.dialog.add(ui.create.switcher('versus_punish',['弃牌','无','摸牌'],lib.storage.versus_punish)).querySelector('.toggle');
 					this.dialog.versus_seat_order=this.dialog.add(ui.create.switcher('seat_order',['对阵','交叉','随机'],lib.storage.seat_order)).querySelector('.toggle');
 					this.dialog.versus_number=this.dialog.add(ui.create.switcher('versus_number',[1,2,3],lib.storage.number)).querySelector('.toggle');
 					this.dialog.replace_number=this.dialog.add(ui.create.switcher('replace_number',[0,1,2,3,5,7,9,17],lib.storage.replace_number)).querySelector('.toggle');
@@ -145,12 +148,12 @@ mode.versus={
 					// 		this.dialog.versus_cross_seat.parentNode.classList.remove('disabled');
 					// 	}
 					// }
-					if(lib.storage.single_control){
-						this.dialog.versus_control_all.parentNode.classList.remove('disabled');
-					}
-					else{
-						this.dialog.versus_control_all.parentNode.classList.add('disabled');
-					}
+					// if(lib.storage.single_control){
+					// 	this.dialog.versus_control_all.parentNode.classList.remove('disabled');
+					// }
+					// else{
+					// 	this.dialog.versus_control_all.parentNode.classList.add('disabled');
+					// }
 				};
 				event.confirm=function(){
 					var dialog=event.dialog;
@@ -358,16 +361,17 @@ mode.versus={
 						case '随机':lib.storage.cross_seat=false;lib.storage.random_seat=true;break;
 						default:lib.storage.cross_seat=false;lib.storage.random_seat=false;
 					}
-					if(lib.storage.single_control){
-						dialog.versus_control_all.parentNode.classList.remove('disabled');
-					}
-					else{
-						dialog.versus_control_all.parentNode.classList.add('disabled');
-					}
-					game.save('control_all',dialog.versus_control_all.link);
+					// if(lib.storage.single_control){
+					// 	dialog.versus_control_all.parentNode.classList.remove('disabled');
+					// }
+					// else{
+					// 	dialog.versus_control_all.parentNode.classList.add('disabled');
+					// }
+					// game.save('control_all',dialog.versus_control_all.link);
 					game.save('die_stop',dialog.versus_die_stop.link);
 					game.save('number',dialog.versus_number.link);
 					game.save('versus_reward',dialog.versus_reward.link);
+					game.save('versus_punish',dialog.versus_punish.link);
 					game.save('replace_number',dialog.replace_number.link);
 					game.save('choice',dialog.choice.link);
 					var count,i;
@@ -1038,6 +1042,7 @@ mode.versus={
 		seat_order_config:'座位排列',
 		versus_control_all_config:'固定控制位置',
 		versus_reward_config:'杀敌摸牌',
+		versus_punish_config:'杀死队友',
 		versus_number_config:'对阵人数',
 		replace_number_config:'替补人数',
 		choice_config:'候选人数'
@@ -1121,10 +1126,17 @@ mode.versus={
 				else{
 					if(source){
 						if(source.side!=this.side){
-							source.draw(lib.storage.versus_reward);
+							if(lib.storage.versus_reward){
+								source.draw(lib.storage.versus_reward);
+							}
 						}
 						else{
-							source.discard(source.get('he'));
+							if(lib.storage.versus_punish=='弃牌'){
+								source.discard(source.get('he'));
+							}
+							else if(lib.storage.versus_punish=='摸牌'&&lib.storage.versus_reward){
+								source.draw(lib.storage.versus_reward);
+							}
 						}
 					}
 					else{

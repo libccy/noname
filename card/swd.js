@@ -260,8 +260,8 @@ card.swd={
 				if(target==_status.dying) target.recover();
 				else{
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
-					if(card.clone&&card.clone.parentNode==ui.arena){
-						card.clone.moveTo(target).delete();
+					if(card.clone&&card.clone.parentNode==player.parentNode){
+						card.clone.moveDelete(target);
 						game.addVideo('gain2',target,get.cardsInfo([card]));
 					}
 				}

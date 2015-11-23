@@ -555,7 +555,7 @@ character.refresh={
 				}
 				else if(result.targets){
 					result.targets[0].gain(event.card);
-					event.node.moveTo(result.targets[0]);
+					event.node.moveDelete(result.targets[0]);
 					game.log(get.translation(result.targets[0])+'获得了'+get.translation(event.card));
 					game.addVideo('gain2',result.targets[0],[get.cardInfo(event.node)]);
 				}
@@ -563,8 +563,8 @@ character.refresh={
 					game.log(get.translation(player)+'展示并弃掉了'+get.translation(event.card));
 					ui.discardPile.appendChild(event.card);
 					game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
+					event.node.delete();
 				}
-				event.node.delete();
 				game.addVideo('thrownhighlight2');
 				ui.arena.classList.remove('thrownhighlight');
 			},
@@ -832,6 +832,7 @@ character.refresh={
 				delete player.disabledSkills.retieji;
 				player.removeSkill('retieji2');
 			},
+			audio:false,
 			mark:true,
 			intro:{
 				content:function(st,player){

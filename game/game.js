@@ -30,6 +30,17 @@
 				lib._onDB.push(func);
 			}
 		},
+		listenEnd:function(node){
+			if(!node._listeningEnd){
+				node._listeningEnd=true;
+				node.addEventListener('webkitTransitionEnd',function(){
+					if(node._onEndMoveDelete){
+						node.moveDelete(node._onEndMoveDelete);
+					}
+					node._transitionEnded=true;
+				});
+			}
+		},
 		configMenu:{
 			general:{
 				name:'通用',
@@ -54,6 +65,11 @@
 							}
 							game.saveConfig('cheat',bool);
 						},
+						unfrequent:true,
+					},
+					low_performance:{
+						name:'低性能模式',
+						init:false,
 						unfrequent:true,
 					},
 					confirm_exit:{
@@ -84,9 +100,9 @@
 						init:false,
 						restart:true
 					},
-					low_performance:{
-						name:'低性能模式',
-						init:false
+					change_skin:{
+						name:'双击换肤',
+						init:true
 					},
 					game_speed:{
 						name:'游戏速度',
@@ -2237,7 +2253,7 @@
 						game.delayx();
 					}
 					"step 2"
-					if(!player.skipList.contains('phaseUse')) player.popup('出牌阶段');
+					// if(!player.skipList.contains('phaseUse')) player.popup('出牌阶段');
 					player.phaseUse();
 					"step 3"
 					player.phaseDiscard()
@@ -3235,7 +3251,7 @@
 						else if(info.audio){
 							game.playAudio('skill',event.skill);
 						}
-						else if(lib.config.background_ogg){
+						else if(lib.config.background_ogg&&info.audio!==false){
 							game.playSkillAudio(event.skill);
 						}
 					}
@@ -3471,9 +3487,7 @@
 						sort=lib.config.sort_card(cards[num]);
 						if(lib.config.reverse_sort) sort=-sort;
 						cards[num].fix();
-						if(!lib.config.low_performance){
-							cards[num].animate('start');
-						}
+						cards[num].animate('start');
 
 						if(lib.isSingleHandcard()||sort>0) frag1.appendChild(cards[num]);
 						else frag2.appendChild(cards[num]);
@@ -3545,12 +3559,7 @@
 							cards[i].goto(event.position);
 						}
 						else{
-							if(lib.config.low_performance){
-								cards[i].remove();
-							}
-							else{
-								cards[i].delete();
-							}
+							cards[i].delete();
 						}
 					}
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
@@ -3639,7 +3648,7 @@
 					player.changeHp(-num,false);
 					if(event.animate!==false){
 						player.$damage(source);
-						if(lib.config.animation){
+						if(lib.config.animation&&!lib.config.low_performance){
 							if(event.nature=='fire'){
 								player.$fire();
 							}
@@ -3691,7 +3700,7 @@
 					if(num>player.maxHp-player.hp) num=player.maxHp-player.hp;
 					if(num>0){
 						player.changeHp(num,false);
-						if(lib.config.animation){
+						if(lib.config.animation&&!lib.config.low_performance){
 							player.$damagepop(num,'wood');
 							player.$recover();
 						}
@@ -3880,7 +3889,7 @@
 					if(get.owner(card)) get.owner(card).lose(card,ui.special);
 
 					if(card.clone){
-						card.clone.moveTo(player).delete();
+						card.clone.moveDelete(player);
 						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
 					}
 
@@ -3925,7 +3934,11 @@
 					}
 					else{
 						player.node.judges.insertBefore(cards[0],player.node.judges.firstChild);
-						player.$gain2(cards);
+						if(cards[0].clone&&cards[0].clone.parentNode==player.parentNode){
+							cards[0].clone.moveDelete(player);
+							game.addVideo('gain2',target,get.cardsInfo(cards));
+						}
+						// player.$gain2(cards);
 						if(get.itemtype(card)!='card'){
 							if(typeof card=='string') cards[0].viewAs=card;
 							else cards[0].viewAs=card.name;
@@ -4018,17 +4031,12 @@
 					if(!game.minskin&&lib.isNewLayout()&&info[4].contains('fullskin')){
 						this.classList.remove('minskin');
 						this.classList.add('fullskin');
-						if(lib.fakeavatar&&lib.fakeavatar[character]){
-							this.node.avatar.setBackground('character/fullskin/'+lib.fakeavatar[character]);
-						}
-						else{
-							this.node.avatar.setBackground('character/fullskin/'+character);
-						}
+						this.node.avatar.setBackground(character,'character',null,'fullskin');
 					}
 					else{
 						if(info[4].contains('fullskin')){
 							this.classList.add('fullskin');
-							this.node.avatar.setBackground('character/fullskin/'+character);
+							this.node.avatar.setBackground(character,'character',null,'fullskin');
 						}
 						else{
 							this.classList.remove('fullskin');
@@ -4076,17 +4084,12 @@
 
 						if(lib.isNewLayout()&&lib.config.only_fullskin){
 							this.classList.add('fullskin2');
-							if(lib.fakeavatar&&lib.fakeavatar[character2]){
-								this.node.avatar2.setBackground('character/fullskin/'+lib.fakeavatar[character2]);
-							}
-							else{
-								this.node.avatar2.setBackground('character/fullskin/'+character2);
-							}
+							this.node.avatar2.setBackground(character2,'character',null,'fullskin');
 						}
 						else{
 							if(info2[4].contains('fullskin')){
 								this.classList.add('fullskin2');
-								this.node.avatar2.setBackground('character/fullskin/'+character2);
+								this.node.avatar2.setBackground(character2,'character',null,'fullskin');
 							}
 							else{
 								this.classList.remove('fullskin2');
@@ -5267,7 +5270,7 @@
 					}
 					for(var i=0;i<cards.length;i++){
 						var sort=lib.config.sort_card(cards[i]);
-						if(animate!==false&&!lib.config.low_performance){
+						if(animate!==false){
 							cards[i].animate('start');
 						}
 						if(lib.isSingleHandcard()||sort>0){
@@ -5626,7 +5629,7 @@
 							game.playAudio('skill',name);
 						}
 						else{
-							if(lib.config.background_ogg){
+							if(lib.config.background_ogg&&info.audio!==false){
 								game.playSkillAudio(name);
 							}
 						}
@@ -6060,6 +6063,10 @@
 					return null;
 				},
 				$draw:function(num,init){
+					// if(lib.config.low_performance){
+					// 	this.$gain(num,false,init);
+					// 	return;
+					// }
 					var cards,node;
 					if(get.itemtype(num)=='cards'){
 						cards=num;
@@ -6122,11 +6129,10 @@
 				$compare:function(card1,target,card2){
 					game.addVideo('compare',this,[get.cardInfo(card1),target.dataset.position,get.cardInfo(card2)]);
 					var player=this;
-					var node1=player.$throwxy(card1,
-						'calc(50% - 114px)','calc(50% - 52px)'
+					var node1=player.$throwxy2(card1,
+						'calc(50% - 114px)','calc(50% - 52px)','perspective(600px) rotateY(180deg)',true
 					);
 					node1.classList.add('infohidden');
-					node1.classList.add('thrownhighlight');
 					node1.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
 					setTimeout(function(){
 						setTimeout(function(){
@@ -6134,36 +6140,41 @@
 							node1.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
 							var onEnd=function(){
 								node1.classList.remove('infohidden');
-								node1.classList.add('cardflip');
-								node1.style.transform='none';
+								node1.style.transition='all 0s';
+								ui.refresh(node1);
+								node1.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+								ui.refresh(node1);
 								node1.style.transition='';
+								ui.refresh(node1);
+								node1.style.transform='';
 								node1.removeEventListener('webkitTransitionEnd',onEnd);
 							}
 							// node1.addEventListener('transitionEnd',onEnd);
 							node1.addEventListener('webkitTransitionEnd',onEnd);
 						},600);
 
-
-						var node2=target.$throwxy(card2,
-							'calc(50% + 10px)','calc(50% - 52px)'
+						var node2=target.$throwxy2(card2,
+							'calc(50% + 10px)','calc(50% - 52px)','perspective(600px) rotateY(180deg)',true
 						);
 						node2.classList.add('infohidden');
-						node2.classList.add('thrownhighlight');
 						node2.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
 						setTimeout(function(){
 							node2.style.transition='all ease-in 0.3s';
 							node2.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
 							var onEnd=function(){
 								node2.classList.remove('infohidden');
-								node2.classList.add('cardflip');
-								node2.style.transform='none';
+								node2.style.transition='all 0s';
+								ui.refresh(node2);
+								node2.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+								ui.refresh(node2);
 								node2.style.transition='';
+								ui.refresh(node2);
+								node2.style.transform='';
 								node2.removeEventListener('webkitTransitionEnd',onEnd);
 							}
 							// node2.addEventListener('transitionEnd',onEnd);
 							node2.addEventListener('webkitTransitionEnd',onEnd);
 						},700);
-
 					},200);
 				},
 				$throw:function(card,time,init){
@@ -6179,13 +6190,15 @@
 						game.addVideo('throw',this,[get.cardsInfo(card),time]);
 					}
 					if(get.itemtype(card)=='cards'){
+						var node;
 						for(var i=0;i<card.length;i++){
-							this.$throw(card[i],time,false);
+							node=this.$throw(card[i],time,false);
 						}
+						return node;
 					}
 					else{
 						if(card==undefined||card.length==0) return;
-						if(lib.config.low_performance){
+						if(false){
 							var left=-52+(Math.random()<0.5?1:-1)*Math.random()*100;
 							var top=-52+(Math.random()<0.5?1:-1)*Math.random()*80;
 
@@ -6201,9 +6214,19 @@
 							node.fixed=true;
 							setTimeout(function(){node.delete()},time);
 						}
+						lib.listenEnd(node);
+						return node;
 					}
 				},
-				$throwordered:function(node,nosource){
+				$throwordered:function(){
+					if(lib.config.low_performance){
+						return this.$throwordered2.apply(this,arguments);
+					}
+					else{
+						return this.$throwordered1.apply(this,arguments);
+					}
+				},
+				$throwordered1:function(node,nosource){
 					node.classList.add('thrown');
 					node.hide();
 					node.style.transitionProperty='left,top,opacity,transform';
@@ -6291,10 +6314,99 @@
 					ui.refresh(node);
 					node.style.transform='';
 					node.show();
+					lib.listenEnd(node);
+					return node;
+				},
+				$throwordered2:function(node,nosource){
+					node.classList.add('thrown');
+					node.classList.add('center');
+					node.hide();
+					node.style.transitionProperty='left,top,opacity,transform';
+
+					if(nosource){
+						// node.style.transform='scale(0)';
+					}
+					else{
+						var nx=[50,-52];
+						var ny=[50,-52];
+						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
+						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
+						var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
+						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
+							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+						}
+						else{
+							node.style.transform='translate('+dx+'px,'+dy+'px)';
+						}
+					}
+					ui.arena.appendChild(node);
+					ui.refresh(node);
+
+					for(var i=0;i<ui.thrown.length;i++){
+						if(ui.thrown[i].parentNode!=ui.arena||
+							ui.thrown[i].classList.contains('removing')){
+							ui.thrown.splice(i--,1);
+						}
+					}
+					ui.thrown.push(node);
+					var uithrowns=ui.thrown.slice(0);
+					var row=0;
+					var tops;
+					switch(Math.floor((ui.thrown.length-1)/4)){
+						case 0:
+							tops=[0];
+							break;
+						case 1:
+							tops=[-57,57];
+							break;
+						case 2:
+							tops=[-114,0,114];
+							break;
+						default:
+							tops=[-171,-57,57,171];
+					}
+					while(uithrowns.length){
+						var throwns=uithrowns.splice(0,Math.min(uithrowns.length,4));
+						switch(throwns.length){
+							case 1:
+								throwns[0]._transthrown='translate(0px,';
+								break;
+							case 2:
+								throwns[0]._transthrown='translate(-57px,';
+								throwns[1]._transthrown='translate(57px,';
+								break;
+							case 3:
+								throwns[0]._transthrown='translate(-114px,';
+								throwns[1]._transthrown='translate(0,';
+								throwns[2]._transthrown='translate(114px,';
+								break;
+							case 4:
+								throwns[0]._transthrown='translate(-171px,';
+								throwns[1]._transthrown='translate(-57px,';
+								throwns[2]._transthrown='translate(57px,';
+								throwns[3]._transthrown='translate(171px,';
+								break;
+						}
+						var top;
+						if(tops.length){
+							top=tops.shift();
+						}
+						else{
+							top=0;
+						}
+						for(var i=0;i<throwns.length;i++){
+							throwns[i].style.transform=throwns[i]._transthrown+top+'px)';
+							delete throwns[i]._transthrown;
+						}
+					}
+
+					node.show();
+					lib.listenEnd(node);
 					return node;
 				},
 				$throwxy:function(card,left,top){
-					var node=card.copy('thrown');
+					var node=card.copy('thrown','thrownhighlight');
 					node.dataset.position=this.dataset.position;
 					node.hide();
 					node.style.transitionProperty='left,top,opacity';
@@ -6304,14 +6416,18 @@
 					node.show();
 					node.style.left=left;
 					node.style.top=top;
+					lib.listenEnd(node);
 					return node;
 				},
-				$throwxy2:function(card,left,top){
-					var node=card.copy('thrown');
+				$throwxy2:function(card,left,top,trans,flipx,flipy){
+					if(lib.config.mode=='chess'){
+						return this.$throwxy.apply(this,arguments);
+					}
+					var node=card.copy('thrown','thrownhighlight');
 					node.style.left=left;
 					node.style.top=top;
 					node.hide();
-					node.style.transitionProperty='left,top,opacity,transform';
+					// node.style.transitionProperty='left,top,opacity,transform';
 
 					var parseCalc=function(str){
 						var per=str.slice(str.indexOf('calc(')+5,str.indexOf('%'));
@@ -6324,8 +6440,10 @@
 					ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
 					var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
 					var dy=this.offsetTop+this.offsetHeight/2-52-ny;
-					if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
-						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+					if(flipx) dx=-dx;
+					if(flipy) dy=-dy;
+					if(trans){
+						node.style.transform=trans+' translate('+dx+'px,'+dy+'px)';
 					}
 					else{
 						node.style.transform='translate('+dx+'px,'+dy+'px)';
@@ -6334,7 +6452,8 @@
 					ui.arena.appendChild(node);
 					ui.refresh(node);
 					node.show();
-					node.style.transform='';
+					// node.style.transform=trans||'';
+					lib.listenEnd(node);
 					return node;
 				},
 				$give:function(card,player,log,init){
@@ -6402,6 +6521,7 @@
 							// node.dataset.position=this.dataset.position;
 							node.fixed=true;
 							this.$throwordered(node);
+							lib.listenEnd(node);
 							// node.hide();
 							// node.style.transitionProperty='left,top,opacity';
 							//
@@ -6504,24 +6624,29 @@
 						else{
 							var node;
 							if(get.itemtype(card)=='card'){
-								node=card.copy('thrown',false);
+								node=this.$throwordered(card,true);
+								// node=card.copy('thrown',false);
 							}
 							else{
-								node=ui.create.div('.card.thrown');
+								node=this.$throwordered(ui.create.div('.card.thrown'),true);
+								// node=ui.create.div('.card.thrown');
 								node.moveTo=lib.element.card.moveTo;
+								node.moveDelete=lib.element.card.moveDelete;
 							}
-							node.fixed=true;
-							node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
-							node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
-							node.style.transform='scale(0)';
+							// node.fixed=true;
+							// node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
+							// node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
+							// node.style.transform='scale(0)';
+							// node.hide();
+							// ui.arena.appendChild(node);
+							// ui.refresh(node);
+							// node.show();
+							// node.style.transform='';
+
+							lib.listenEnd(node);
 							var player=this;
-							node.hide();
-							ui.arena.appendChild(node);
-							ui.refresh(node);
-							node.show();
-							node.style.transform='';
 							setTimeout(function(){
-								node.moveTo(player).delete();
+								node.moveDelete(player);
 							},700);
 						}
 					}
@@ -6531,9 +6656,11 @@
 					else if(get.itemtype(cards)!='cards') return;
 					var list=[],list2=[];
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].clone&&cards[i].clone.parentNode==this.parentNode&&
+						if(cards[i].clone&&
+							(cards[i].clone.parentNode==this.parentNode||
+							cards[i].clone.parentNode==ui.arena)&&
 							parseFloat(getComputedStyle(cards[0].clone).opacity)>0.3){
-							cards[i].clone.moveTo(this).delete();
+							cards[i].clone.moveDelete(this);
 							list2.push(cards[i].clone);
 						}
 						else{
@@ -6820,17 +6947,25 @@
 				$phaseJudge:function(card){
 					game.addVideo('phaseJudge',this,get.cardInfo(card));
 					var player=this;
-					var clone=card.copy('thrown','thrownhighlight',ui.arena).animate('judgestart');
-					clone.style.opacity=0.6;
-					clone.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*50+'px)';
-					clone.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*40+'px)';
+					var clone;
+					// var clone=card.copy('thrown','thrownhighlight',ui.arena);
+					if(lib.config.low_performance){
+						clone=player.$throw(card);
+					}
+					else{
+						clone=card.copy('thrown','thrownhighlight',ui.arena).animate('judgestart');
+						clone.style.opacity=0.6;
+						clone.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*50+'px)';
+						clone.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*40+'px)';
+						game.linexy([
+							clone.offsetLeft+clone.offsetWidth/2,
+							clone.offsetTop+clone.offsetHeight/2,
+							player.offsetLeft+player.offsetWidth/2,
+							player.offsetTop+player.offsetHeight/2
+						],{opacity:0.5,dashed:true});
+					}
 					game.delay();
-					game.linexy([
-						clone.offsetLeft+clone.offsetWidth/2,
-						clone.offsetTop+clone.offsetHeight/2,
-						player.offsetLeft+player.offsetWidth/2,
-						player.offsetTop+player.offsetHeight/2
-					],{opacity:0.5,dashed:true});
+
 				}
 			},
 			card:{
@@ -6925,13 +7060,33 @@
 				aiexclude:function(){
 					_status.event.aiexclude.add(this);
 				},
+				moveDelete:function(player){
+					if(!this._listeningEnd||this._transitionEnded){
+						this.moveTo(player).delete();
+					}
+					else{
+						this._onEndMoveDelete=player;
+					}
+				},
 				moveTo:function(player,method){
 					this.fixed=true;
-					this.style.left=this.offsetLeft+'px';
-					this.style.top=this.offsetTop+'px';
+					var dx,dy;
+					if(this.classList.contains('center')){
+						var nx=[50,-52];
+						var ny=[50,-52];
+						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
+						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
+						dx=player.offsetLeft+player.offsetWidth/2-52-nx;
+						dy=player.offsetTop+player.offsetHeight/2-52-ny;
+					}
+					else{
+						this.style.left=this.offsetLeft+'px';
+						this.style.top=this.offsetTop+'px';
 
-					var dx=player.offsetLeft+player.offsetWidth/2-52-this.offsetLeft;
-					var dy=player.offsetTop+player.offsetHeight/2-52-this.offsetTop;
+						dx=player.offsetLeft+player.offsetWidth/2-52-this.offsetLeft;
+						dy=player.offsetTop+player.offsetHeight/2-52-this.offsetTop;
+					}
+
 					if(this.style.transform&&this.style.transform!='none'&&this.style.transform.indexOf('translate')==-1){
 						this.style.transform+=' translate('+dx+'px,'+dy+'px)';
 					}
@@ -6976,6 +7131,7 @@
 						else if(typeof arguments[i]=='boolean') clone=arguments[i];
 					}
 					node.moveTo=lib.element.card.moveTo;
+					node.moveDelete=lib.element.card.moveDelete;
 					if(clone) this.clone=node;
 					if(position) position.appendChild(node);
 					return node;
@@ -7320,13 +7476,7 @@
 				},
 				close:function(){
 					ui.controls.remove(this);
-
-					if(lib.config.low_performance){
-						this.remove();
-					}
-					else{
-						this.delete();
-					}
+					this.delete();
 
 					var that=this;
 					setTimeout(function(){
@@ -8445,7 +8595,7 @@
 					for(var i=0;i<cards.length;i++){
 						for(var j=0;j<nodes.length;j++){
 							if(cards[i][2]==nodes[j].name&&cards[i][0]==nodes[j].suit&&cards[i][1]==nodes[j].number){
-								nodes[j].moveTo(player).delete();
+								nodes[j].moveDelete(player);
 								cards.splice(i--,1);
 								nodes.splice(j--,1);
 								break;
@@ -9292,6 +9442,77 @@
 			}
 		},
 		linexy:function(path){
+			// if(lib.config.mode=='chess'){
+			// 	return game._linexy.apply(this,arguments);
+			// }
+			var from=[path[0],path[1]];
+			var to=[path[2],path[3]];
+			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
+			var opacity=1;
+			var color=[255,255,255];
+			var dashed=lib.config.line_dash;
+			if(typeof arguments[1]=='object'){
+				for(var i in arguments[1]){
+					switch(i){
+						case 'opacity':opacity=arguments[1][i];break;
+						case 'color':color=arguments[1][i];break;
+						case 'dashed':dashed=arguments[1][i];break;
+						case 'duration':total=arguments[1][i];break;
+					}
+				}
+			}
+			else if(arguments[1]=='fire'||arguments[1]=='thunder'||arguments[1]=='green'){
+				color=arguments[1];
+			}
+			if(color=='fire'){
+				color=[255, 146, 68];
+			}
+			else if(color=='thunder'){
+				color=[141, 216, 255];
+			}
+			else if(color=='green'){
+				color=[141, 255, 216];
+			}
+			var node=ui.create.div('.linexy.hidden');
+			node.style.transitionDuration=(total/3000)+'s';
+			node.style.left=from[0]+'px';
+			node.style.top=from[1]+'px';
+			node.style.backgroundColor='rgba('+color.toString()+','+opacity+')';
+			var dy=to[1]-from[1];
+			var dx=to[0]-from[0];
+			var deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
+			if(dx>=0){
+				if(dy<=0){
+					deg+=90;
+				}
+				else{
+					deg=90-deg;
+				}
+			}
+			else{
+				if(dy<=0){
+					deg=270-deg;
+				}
+				else{
+					deg+=270;
+				}
+			}
+			node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
+			node.style.height=get.xyDistance(from,to)+'px';
+			if(lib.config.mode=='chess'){
+				ui.chess.appendChild(node);
+			}
+			else{
+				ui.arena.appendChild(node);
+			}
+			ui.refresh(node);
+			node.show();
+			node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
+			setTimeout(function(){
+				node.delete();
+			},total/1.5);
+		},
+		_linexy:function(path){
 			var from=[path[0],path[1]];
 			var to=[path[2],path[3]];
 			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
@@ -10045,14 +10266,14 @@
 							if(!event.forced&&get.noSelected()) str+='c';
 							ui.create.confirm(str);
 						}
-						if(ui.confirm&&ui.confirm.lastChild.link=='cancel'){
-							if(_status.event.parent.name=='phaseUse'&&!_status.event.skill){
-								ui.confirm.lastChild.innerHTML='结束';
-							}
-							else{
-								ui.confirm.lastChild.innerHTML='取消';
-							}
-						}
+					}
+				}
+				if(ui.confirm&&ui.confirm.lastChild.link=='cancel'){
+					if(_status.event.parent.name=='phaseUse'&&!_status.event.skill){
+						ui.confirm.lastChild.innerHTML='结束';
+					}
+					else{
+						ui.confirm.lastChild.innerHTML='取消';
 					}
 				}
 			}
@@ -11145,7 +11366,7 @@
 				if(nc){
 					ui.control.animate('nozoom',500);
 				}
-				if(lib.config.low_performance||ui.control.classList.contains('nozoom')){
+				if(ui.control.classList.contains('nozoom')){
 					nozoom=true;
 				}
 				if(nozoom){
@@ -13619,8 +13840,8 @@
 			player:function(position){
 				var node=ui.create.div('.player',position);
 				node.node={
-					avatar:ui.create.div('.avatar',node).hide(),
-					avatar2:ui.create.div('.avatar2',node).hide(),
+					avatar:ui.create.div('.avatar',node,ui.click.avatar).hide(),
+					avatar2:ui.create.div('.avatar2',node,ui.click.avatar2).hide(),
 					intro:ui.create.div('.intro',node),
 					identity:ui.create.div('.identity',node),
 					hp:ui.create.div('.hp',node),
@@ -14572,6 +14793,84 @@
 					custom.add.card();
 				}
 				game.check();
+			},
+			avatar:function(){
+				if(!lib.config.change_skin) return;
+				if(this.parentNode.classList.contains('unseen')) return;
+				var avatar=this;
+				var player=this.parentNode;
+				if(!this._doubleClicking){
+					this._doubleClicking=true;
+					setTimeout(function(){
+						avatar._doubleClicking=false;
+					},500);
+					return;
+				}
+				var num=1;
+				if(lib.config.skin[player.name]){
+					num=lib.config.skin[player.name]+1;
+				}
+				var img=new Image();
+				img.onload=function(){
+					lib.config.skin[player.name]=num;
+					game.saveConfig('skin',lib.config.skin);
+					avatar.style.backgroundImage='url("'+img.src+'")';
+				}
+				img.onerror=function(){
+					delete lib.config.skin[player.name];
+					game.saveConfig('skin',lib.config.skin);
+					if(player.classList.contains('fullskin')){
+						avatar.setBackground(player.name,'character',null,'fullskin');
+					}
+					else{
+						avatar.setBackground(player.name,'character');
+					}
+				}
+				if(player.classList.contains('fullskin')){
+					img.src='image/character/skin/'+player.name+'/'+num+'f.jpg';
+				}
+				else{
+					img.src='image/character/skin/'+player.name+'/'+num+'f.jpg';
+				}
+			},
+			avatar2:function(){
+				if(!lib.config.change_skin) return;
+				if(this.parentNode.classList.contains('unseen2')) return;
+				var avatar=this;
+				var player=this.parentNode;
+				if(!this._doubleClicking){
+					this._doubleClicking=true;
+					setTimeout(function(){
+						avatar._doubleClicking=false;
+					},500);
+					return;
+				}
+				var num=1;
+				if(lib.config.skin[player.name2]){
+					num=lib.config.skin[player.name2]+1;
+				}
+				var img=new Image();
+				img.onload=function(){
+					lib.config.skin[player.name2]=num;
+					game.saveConfig('skin',lib.config.skin);
+					avatar.style.backgroundImage='url("'+img.src+'")';
+				}
+				img.onerror=function(){
+					delete lib.config.skin[player.name2];
+					game.saveConfig('skin',lib.config.skin);
+					if(player.classList.contains('fullskin2')){
+						avatar.setBackground(player.name2,'character',null,'fullskin');
+					}
+					else{
+						avatar.setBackground(player.name2,'character');
+					}
+				}
+				if(player.classList.contains('fullskin2')){
+					img.src='image/character/skin/'+player.name2+'/'+num+'f.jpg';
+				}
+				else{
+					img.src='image/character/skin/'+player.name2+'/'+num+'f.jpg';
+				}
 			},
 			player:function(){
 				return ui.click.target.apply(this,arguments);
@@ -15679,6 +15978,9 @@
 		},
 		evtDistance:function(e1,e2){
 			return Math.sqrt((e1.x-e2.x)*(e1.x-e2.x)+(e1.y-e2.y)*(e1.y-e2.y));
+		},
+		xyDistance:function(from,to){
+			return Math.sqrt((from[0]-to[0])*(from[0]-to[0])+(from[1]-to[1])*(from[1]-to[1]));
 		},
 		skillLocked:function(skill){
 			var info=lib.skill[skill];
@@ -17136,12 +17438,8 @@
 		};
 		HTMLDivElement.prototype.goto=function(position,time){
 			if(time==undefined) time=500;
-			if(lib.config.low_performance){
-				this.remove();
-			}
-			else{
-				this.classList.add('removing');
-			}
+			this.classList.add('removing');
+
 			var that=this;
 			this.timeout=setTimeout(function(){
 				position.appendChild(that);
@@ -17162,7 +17460,13 @@
 			ext=ext||'.jpg';
 			subfolder=subfolder||'default'
 			if(type){
-				src='image/'+type+'/'+subfolder+'/'+name+ext;
+				if(type=='character'&&lib.config.skin[name]){
+					src='image/character/skin/'+name+'/'+lib.config.skin[name]+
+						(subfolder=='fullskin'?'f':'')+ext;
+				}
+				else{
+					src='image/'+type+'/'+subfolder+'/'+name+ext;
+				}
 			}
 			else{
 				src='image/'+name+ext;

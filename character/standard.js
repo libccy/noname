@@ -539,6 +539,10 @@ character.standard={
 					next.autochoose=lib.filter.autoRespondSha;
 					next.source=player;
 				}
+				else{
+					event.current=event.current.next;
+					event.redo();
+				}
 				"step 1"
 				if(result.bool){
 					event.finish();
@@ -596,6 +600,10 @@ character.standard={
 					next.autochoose=lib.filter.autoRespondSha;
 					next.source=player;
 					next.target=target;
+				}
+				else{
+					event.current=event.current.next;
+					event.redo();
 				}
 				"step 1"
 				if(result.bool){

@@ -460,7 +460,7 @@ character.mountain={
 				if(result.bool){
 					result.card.goto(ui.special);
 					player.storage.tuntian.push(result.card);
-					result.node.moveTo(player).delete();
+					result.node.moveDelete(player);
 					game.addVideo('gain2',player,get.cardsInfo([result.node]));
 					player.markSkill('tuntian');
 					game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);

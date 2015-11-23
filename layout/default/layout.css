@@ -34,7 +34,14 @@ table{table-layout: fixed;}
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
 	opacity: 0.3 !important;
 }
-
+.linexy{
+	transition-property: transform,opacity;
+	width: 3px;
+	border-radius: 4px;
+	z-index: 4;
+	box-shadow: rgba(0,0,0,0.5) 0 0 2px;
+	transform-origin: top center;
+}
 #me,#mebg{width: 100%;height: 140px;top:calc(100% - 140px);left:0;}
 #mebg{z-index:-1}
 #handcards1,#handcards2{width: calc(50% - 140px);height: 127px;padding: 10px;}
@@ -130,7 +137,9 @@ body>.background{z-index:-2}
 }
 .card.cardflip{
 	animation:cardflip 0.3s ease-out;
+	animation-fill-mode: none;
 	-webkit-animation:cardflip 0.3s ease-out;
+	-webkit-animation-fill-mode:none;
 }
 .player .playerjiu{
 	animation:game_start 0.5s;
@@ -275,6 +284,10 @@ margin-bottom: 5px;
 	font-family: 'xinwei';
 	font-size: 20px;
 	letter-spacing: -2px;
+}
+.player>.avatar.hidden,
+.player>.avatar2.hidden{
+	pointer-events: none !important;
 }
 .player>.avatar>.action:not(.freecolor){
 	text-shadow: black 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px;
@@ -555,6 +568,7 @@ margin-bottom: 5px;
 #arena.thrownhighlight>.card.thrown:not(.thrownhighlight){
 	opacity: 0.5;
 	transform:scale(0.95);
+	/*-webkit-filter:blur(3px);*/
 }
 .card.start{
 	animation: card_start 0.5s;
