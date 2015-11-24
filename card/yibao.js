@@ -245,7 +245,8 @@ card.yibao={
 				"step 0"
 				target.chooseToDiscard('he',[1,2]).ai=function(card){
 					if(target.hasSkillTag('nofire')) return 0;
-					if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
+					if(ai.get.damageEffect(target,player,target,'fire')>=0&&
+						!target.hasSkillTag('maixie')) return 0;
 					if(player.get('s').contains('xinwuyan')) return 0;
 					if(target.get('s').contains('xinwuyan')) return 0;
 					if(target.hasSkillTag('maixie')&&target.hp>1&&ui.selected.cards.length){

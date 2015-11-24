@@ -34,6 +34,10 @@ table{table-layout: fixed;}
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
 	opacity: 0.3 !important;
 }
+#arena.low_performance #me>div>.card{
+	position: absolute;
+	left:8px;
+}
 .linexy{
 	transition-property: transform,opacity;
 	width: 3px;
@@ -581,6 +585,10 @@ margin-bottom: 5px;
 #me>div>.card.start{
 	animation: card_start2 0.5s;
 	-webkit-animation: card_start2 0.5s;
+}
+.card.drawinghidden{
+	opacity: 0;
+	transform: scale(0.8);
 }
 .card.removing{transform:scale(0);}
 #me>div>.card.removing{margin-left: -52px;margin-right: -52px;}

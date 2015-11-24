@@ -1,11 +1,11 @@
-#me>.fold1>.card:not(.selected){margin-right: -15px;}
-#me>.fold2>.card:not(.selected){margin-right: -30px;}
-#me>.fold3>.card:not(.selected){margin-right: -45px;}
+#arena:not(.low_performance) #me>.fold1>.card:not(.selected){margin-right: -15px;}
+#arena:not(.low_performance) #me>.fold2>.card:not(.selected){margin-right: -30px;}
+#arena:not(.low_performance) #me>.fold3>.card:not(.selected){margin-right: -45px;}
 
-#me>.fold1>.card:not(.selected):hover,
-#me>.fold2>.card:not(.selected):hover,
-#me>.fold3>.card:not(.selected):hover{margin-right: 0;}
+#arena:not(.low_performance) #me>.fold1>.card:not(.selected):hover,
+#arena:not(.low_performance) #me>.fold2>.card:not(.selected):hover,
+#arena:not(.low_performance) #me>.fold3>.card:not(.selected):hover{margin-right: 0;}
 
-#me>div>.card:last-child{margin-right: 0 !important;}
-#me>div>.card.last{margin-right: 0 !important;}
-#me>div>.card.removing{margin-right: -52px !important;}
+#arena:not(.low_performance) #me>div>.card:last-child{margin-right: 0 !important;}
+#arena:not(.low_performance) #me>div>.card.last{margin-right: 0 !important;}
+#arena:not(.low_performance) #me>div>.card.removing{margin-right: -52px !important;}
