@@ -756,6 +756,7 @@ character.refresh={
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			mark:true,
+			audio:false,
 			content:function(){
 				delete player.disabledSkills.yijue;
 				player.removeSkill('yijue2');

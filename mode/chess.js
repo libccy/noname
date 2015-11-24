@@ -1137,8 +1137,8 @@ mode.chess={
 							ui.create.fakeme();
 							ui.handcards1=player.node.handcards1.animate('start').fix();
 							ui.handcards2=player.node.handcards2.animate('start').fix();
-							ui.me.appendChild(ui.handcards1);
-							ui.me.appendChild(ui.handcards2);
+							ui.handcards1Container.appendChild(ui.handcards1);
+							ui.handcards2Container.appendChild(ui.handcards2);
 							ui.updateh(true);
 							game.setChessInfo();
 							game.addVideo('tafangMe',player);

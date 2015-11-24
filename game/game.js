@@ -37,6 +37,9 @@
 					if(node._onEndMoveDelete){
 						node.moveDelete(node._onEndMoveDelete);
 					}
+					else if(node._onEndDelete){
+						node.delete();
+					}
 					node._transitionEnded=true;
 				});
 			}
@@ -75,9 +78,18 @@
 							game.saveConfig('low_performance',bool);
 							if(bool){
 								ui.arena.classList.add('low_performance');
+								ui.updatehl();
 							}
 							else{
 								ui.arena.classList.remove('low_performance');
+								var hs=ui.me.querySelectorAll('.handcards>.card');
+								for(var i=0;i<hs.length;i++){
+									hs[i].style.transform='';
+									hs[i].classList.remove('drawinghidden');
+								}
+								ui.handcards1.style.width='';
+								ui.handcards2.style.width='';
+								ui.updateh(true);
 							}
 						}
 					},
@@ -2064,6 +2076,7 @@
 						game.saveConfig('totouched',true);
 						if(totouch){
 							game.saveConfig('touchscreen',true);
+							game.saveConfig('low_performance',true);
 							game.saveConfig('fold_card',false);
 							game.reload();
 						}
@@ -3500,7 +3513,7 @@
 						if(!lib.config.low_performance){
 							cards[num].animate('start');
 						}
-						else{
+						else if(player==game.me){
 							cards[num].classList.add('drawinghidden');
 						}
 
@@ -3520,7 +3533,7 @@
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
 							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
 							player.update();
-							ui.updatehl(player);
+							if(player==game.me) ui.updatehl();
 						},500);
 					}
 					else if(event.animate=='gain'){
@@ -3531,7 +3544,7 @@
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
 							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
 							player.update();
-							ui.updatehl(player);
+							if(player==game.me) ui.updatehl();
 						},700);
 					}
 					else if(event.animate=='gain2'||event.animate=='draw2'){
@@ -3542,7 +3555,7 @@
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
 							player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
 							player.update();
-							ui.updatehl(player);
+							if(player==game.me) ui.updatehl();
 						},500);
 					}
 					else{
@@ -3550,7 +3563,7 @@
 						player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
 						player.node.handcards2.insertBefore(frag2,player.node.handcards2.firstChild);
 						player.update();
-						ui.updatehl(player);
+						if(player==game.me) ui.updatehl();
 					}
 				},
 				lose:function(){
@@ -3566,7 +3579,7 @@
 								cards[i].original='j';
 								js.push(cards[i]);
 							}
-							else if(cards[i].parentNode.id=='handcards1'||cards[i].parentNode.id=='handcards2'){
+							else if(cards[i].parentNode.classList.contains('handcards')){
 								cards[i].original='h';
 								hs.push(cards[i]);
 							}
@@ -3575,7 +3588,7 @@
 							}
 						}
 						if(lib.config.low_performance){
-							cards[i].style.transform+=' scale(0.8)';
+							cards[i].style.transform+=' scale(0.2)';
 						}
 						if(event.position){
 							cards[i].goto(event.position);
@@ -3584,7 +3597,7 @@
 							cards[i].delete();
 						}
 					}
-					ui.updatehl(player);
+					if(player==game.me) ui.updatehl();
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
 					player.update();
 					game.addVideo('loseAfter',player);
@@ -3921,6 +3934,7 @@
 					"step 1"
 					card.fix();
 					card.style.transform='';
+					card.classList.remove('drawinghidden');
 					if(player.isMin()){
 						event.finish();
 						ui.discardPile.appendChild(card);
@@ -3953,6 +3967,7 @@
 					}
 					cards[0].fix();
 					cards[0].style.transform='';
+					cards[0].classList.remove('drawinghidden');
 					var viewAs=typeof card=='string'?card:card.name;
 					if(!lib.card[viewAs]||!lib.card[viewAs].effect){
 						ui.discardPile.appendChild(cards[0]);
@@ -5299,7 +5314,7 @@
 						if(animate!==false&&!lib.config.low_performance){
 							cards[i].animate('start');
 						}
-						else{
+						else if(this==game.me){
 							cards[i].classList.add('drawinghidden');
 						}
 						if(lib.isSingleHandcard()||sort>0){
@@ -5309,7 +5324,7 @@
 							this.node.handcards2.appendChild(cards[i]);
 						}
 					}
-					ui.updatehl(this);
+					if(this==game.me) ui.updatehl();
 					if(!_status.video){
 						game.addVideo('directgain',this,get.cardsInfo(cards));
 						this.update();
@@ -6092,8 +6107,8 @@
 					}
 					return null;
 				},
-				$draw:function(num,init){
-					// if(lib.config.low_performance){
+				$draw:function(num,init,config){
+					// if(lib.config.low_performance&&lib.config.mode!='chess'){
 					// 	this.$gain(num,false,init);
 					// 	return;
 					// }
@@ -6123,15 +6138,51 @@
 					}
 					node.fixed=true;
 					node.hide();
-					// node.dataset.position=this.dataset.position;
+
 					node.style.left='calc(50% - 52px)';
 					node.style.top='calc(50% - 52px)';
+
 					this.parentNode.appendChild(node);
-					node.style.transitionDuration='1s';
+					if(!lib.config.low_performance){
+						node.style.transitionDuration='1s';
+					}
+					else{
+						node.style.transitionDuration='0.8s';
+					}
 					ui.refresh(node);
 
 					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
 					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
+					var num3;
+					if(lib.config.low_performance&&typeof num=='number'&&init!==false){
+						config={
+							total:num,
+							current:1
+						}
+					}
+					if(config&&config.total>1){
+						var total=config.total,current=config.current;
+						var dxtotal;
+						if(total<=5){
+							dxtotal=Math.min(80,(total-1)*20);
+							dx+=-dxtotal+2*dxtotal*(current-1)/(total-1)
+						}
+						else{
+							var total2=Math.floor(total/2);
+							if(current<=total2){
+								total=total2;
+								dy-=20;
+							}
+							else{
+								current-=total2;
+								total-=total2;
+								dy+=20;
+							}
+							dxtotal=Math.min(80,(total-1)*20);
+							dx+=-dxtotal+2*dxtotal*(current-1)/(total-1)
+						}
+						config.current++;
+					}
 					if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 						node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 					}
@@ -6140,20 +6191,37 @@
 					}
 					node.show();
 
-					setTimeout(function(){
-						node.style.transitionDuration='0.5s';
+					node.addEventListener('webkitTransitionEnd',function(){
 						node.delete();
-					},700);
+					});
+					if(!lib.config.low_performance){
+						setTimeout(function(){
+							node.style.transitionDuration='0.5s';
+							node.hide();
+						},700);
+					}
 					var that=this;
 					if(num&&num>1){
-						setTimeout(function(){
-							if(cards){
-								that.$draw(cards,false)
-							}
-							else{
-								that.$draw(num-1,false)
-							}
-						},200);
+						if(config&&config.total>1){
+							setTimeout(function(){
+								if(cards){
+									that.$draw(cards,false,config)
+								}
+								else{
+									that.$draw(num-1,false,config)
+								}
+							},50)
+						}
+						else{
+							setTimeout(function(){
+								if(cards){
+									that.$draw(cards,false,config)
+								}
+								else{
+									that.$draw(num-1,false,config)
+								}
+							},200);
+						}
 					}
 				},
 				$compare:function(card1,target,card2){
@@ -6563,9 +6631,7 @@
 							// node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
 							// node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
 
-							setTimeout(function(){
-								// node.removeAttribute('style');
-								// node.dataset.position=player.dataset.position;
+							node.addEventListener('webkitTransitionEnd',function(){
 								var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
 								var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
 								if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
@@ -6576,7 +6642,21 @@
 								}
 
 								node.delete();
-							},700);
+							});
+							// setTimeout(function(){
+							// 	// node.removeAttribute('style');
+							// 	// node.dataset.position=player.dataset.position;
+							// 	var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
+							// 	var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
+							// 	if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
+							// 		node.style.transform+=' translate('+dx+'px,'+dy+'px)';
+							// 	}
+							// 	else{
+							// 		node.style.transform='translate('+dx+'px,'+dy+'px)';
+							// 	}
+							//
+							// 	node.delete();
+							// },700);
 						}
 					}
 				},
@@ -6592,7 +6672,7 @@
 							break;
 						}
 					}
-					game.print(card.name)
+					// game.print(card.name,card.timeout,card.className)
 					if(!equipped){
 						player.node.equips.appendChild(card);
 					}
@@ -7149,6 +7229,7 @@
 					node.classList.remove('selectable');
 					node.classList.remove('selected');
 					node.classList.remove('removing');
+					node.classList.remove('drawinghidden');
 					node.node={
 						name:node.querySelector('.name'),
 						info:node.querySelector('.info'),
@@ -7520,11 +7601,9 @@
 							}
 						}
 						if(!nc){
-							var width=that.offsetWidth;
-							that.style.marginLeft=(-width/2)+'px';
-							that.style.marginRight=(-width/2)+'px';
-							that.animate('removing2');
+							that.style.transform='scale(0.8)';
 						}
+						ui.updatec();
 					},100);
 
 
@@ -7548,14 +7627,11 @@
 					if(this.childNodes.length){
 						var width=0;
 						for(i=0;i<this.childNodes.length;i++) width+=this.childNodes[i].offsetWidth;
-						this.style.transition='width 0.2s';
 						ui.refresh(this);
 						this.style.width=width+'px';
 						var that=this;
-						setTimeout(function(){
-							that.style.transition='';
-						},200);
 					}
+					ui.updatec();
 					return this;
 				}
 			},
@@ -8126,7 +8202,7 @@
 						if(nodes[i]==ui.me) continue;
 						nodes[i].remove();
 					}
-					ui.me.innerHTML='';
+					// ui.me.f.innerHTML='';
 					ui.sidebar.innerHTML='';
 					ui.cardPile.innerHTML='';
 					ui.discardPile.innerHTML='';
@@ -8245,8 +8321,8 @@
 				game.me=game.players[0];
 				ui.handcards1=game.me.node.handcards1;
 				ui.handcards2=game.me.node.handcards2;
-				ui.me.appendChild(ui.handcards1);
-				ui.me.appendChild(ui.handcards2);
+				ui.handcards1Container.appendChild(ui.handcards1);
+				ui.handcards2Container.appendChild(ui.handcards2);
 				if(lib.config.mode=='versus'){
 					if(players.bool){
 						ui.arena.dataset.number=parseInt(ui.arena.dataset.number)+1;
@@ -8796,8 +8872,8 @@
 					ui.create.fakeme();
 					ui.handcards1=player.node.handcards1.animate('start').fix();
 					ui.handcards2=player.node.handcards2.animate('start').fix();
-					ui.me.appendChild(ui.handcards1);
-					ui.me.appendChild(ui.handcards2);
+					ui.handcards1Container.appendChild(ui.handcards1);
+					ui.handcards2Container.appendChild(ui.handcards2);
 					ui.updateh(true);
 					game.setChessInfo();
 				}
@@ -8884,13 +8960,24 @@
 					var cards1=get.infoCards(cards12[0]);
 					var cards2=get.infoCards(cards12[1]);
 					for(var i=0;i<cards1.length;i++){
-						cards1[i].animate('start');
+						if(lib.config.low_performance){
+							cards1[i].classList.add('drawinghidden');
+						}
+						else{
+							cards1[i].animate('start');
+						}
 						player.node.handcards1.insertBefore(cards1[i],player.node.handcards1.firstChild);
 					}
 					for(var i=0;i<cards2.length;i++){
-						cards2[i].animate('start');
+						if(lib.config.low_performance){
+							cards2[i].classList.add('drawinghidden');
+						}
+						else{
+							cards2[i].animate('start');
+						}
 						player.node.handcards2.insertBefore(cards2[i],player.node.handcards2.firstChild);
 					}
+					ui.updatehl();
 				}
 				else{
 					console.log(player);
@@ -9131,8 +9218,8 @@
 					game.me=player;
 					ui.handcards1=player.node.handcards1.animate('start').fix();
 					ui.handcards2=player.node.handcards2.animate('start').fix();
-					ui.me.appendChild(ui.handcards1);
-					ui.me.appendChild(ui.handcards2);
+					ui.handcards1Container.appendChild(ui.handcards1);
+					ui.handcards2Container.appendChild(ui.handcards2);
 
 					ui.updateh(true);
 					if(lib.config.mode=='chess'){
@@ -9167,8 +9254,8 @@
 					game.me=player;
 					ui.handcards1=player.node.handcards1.animate('start').fix();
 					ui.handcards2=player.node.handcards2.animate('start').fix();
-					ui.me.appendChild(ui.handcards1);
-					ui.me.appendChild(ui.handcards2);
+					ui.handcards1Container.appendChild(ui.handcards1);
+					ui.handcards2Container.appendChild(ui.handcards2);
 
 					ui.updateh(true);
 
@@ -10442,8 +10529,8 @@
 				game.me=player;
 				ui.handcards1=player.node.handcards1.animate('start').fix();
 				ui.handcards2=player.node.handcards2.animate('start').fix();
-				ui.me.appendChild(ui.handcards1);
-				ui.me.appendChild(ui.handcards2);
+				ui.handcards1Container.appendChild(ui.handcards1);
+				ui.handcards2Container.appendChild(ui.handcards2);
 
 				ui.updateh(true);
 			}
@@ -10474,8 +10561,8 @@
 			game.me=player;
 			ui.handcards1=player.node.handcards1.animate('start').fix();
 			ui.handcards2=player.node.handcards2.animate('start').fix();
-			ui.me.appendChild(ui.handcards1);
-			ui.me.appendChild(ui.handcards2);
+			ui.handcards1Container.appendChild(ui.handcards1);
+			ui.handcards2Container.appendChild(ui.handcards2);
 			ui.updateh(true);
 			game.addVideo('swapControl',player,get.cardsInfo(player.get('h')));
 
@@ -11406,26 +11493,20 @@
 					control.classList.add('nozoom');
 				}
 				if(control.childNodes.length){
-					control.style.transition='all 0s';
-					var width=control.offsetWidth;
-					control.style.marginLeft=(-width/2)+'px';
-					control.style.marginRight=(-width/2)+'px';
-					control.style.transform='scale(0.8)';
-					ui.refresh(control);
 					if(nozoom){
 						control.style.transition='opacity 0.5s';
 					}
 					else{
 						control.style.transition='';
+						control.style.transform='scale(0.8)';
 					}
 					ui.refresh(control);
-					control.style.marginLeft='';
-					control.style.marginRight='';
-					control.style.transform='';
 					control.style.opacity=1;
 					ui.refresh(control);
+					control.style.transform='';
 					control.style.transition='';
 				}
+				ui.updatec();
 				return control;
 			},
 			confirm:function(str,func){
@@ -13753,7 +13834,12 @@
 					break;
 
 					case 'card':
-					node=item.cloneNode(true);
+					if(typeof item.copy=='function'){
+						node=item.copy();
+					}
+					else{
+						node=item.cloneNode(true);
+					}
 					node.classList.add('button');
 					position.appendChild(node);
 					node.link=item;
@@ -13886,8 +13972,8 @@
 					equips:ui.create.div('.equips',node).hide(),
 					judges:ui.create.div('.judges',node),
 					marks:ui.create.div('.marks',node),
-					handcards1:ui.create.div('#handcards1'),
-					handcards2:ui.create.div('#handcards2'),
+					handcards1:ui.create.div('.handcards'),
+					handcards2:ui.create.div('.handcards'),
 				};
 				node.node.action=ui.create.div('.action',node.node.avatar);
 
@@ -13964,12 +14050,14 @@
 			me:function(){
 				ui.mebg=ui.create.div('#mebg',ui.arena);
 				ui.me=ui.create.div('#me',ui.arena).animate('start');
+				ui.handcards1Container=ui.create.div('#handcards1',ui.me);
+				ui.handcards2Container=ui.create.div('#handcards2',ui.me);
 				if(game.players.length){
 					game.me=game.players[0];
 					ui.handcards1=game.me.node.handcards1;
 					ui.handcards2=game.me.node.handcards2;
-					ui.me.appendChild(ui.handcards1);
-					ui.me.appendChild(ui.handcards2);
+					ui.handcards1Container.appendChild(ui.handcards1);
+					ui.handcards2Container.appendChild(ui.handcards2);
 					ui.updateh(true);
 				}
 			},
@@ -15866,22 +15954,54 @@
 				if(!nodes[i].fixed) nodes[i].delete();
 			}
 		},
+		updatec:function(){
+			var length=0;
+			var controls=[];
+			var widths=[];
+			for(var i=0;i<ui.control.childNodes.length;i++){
+				if(ui.control.childNodes[i].classList.contains('removing')) continue;
+				var thiswidth=parseInt(ui.control.childNodes[i].style.width);
+				if(thiswidth){
+					thiswidth+=8;
+					length+=thiswidth;
+					widths.push(thiswidth);
+				}
+				else{
+					length+=ui.control.childNodes[i].offsetWidth;
+					widths.push(ui.control.childNodes[i].offsetWidth);
+				}
+				controls.push(ui.control.childNodes[i]);
+				if(i>0){
+					width+=6;
+				}
+			}
+			if(!controls.length) return;
+			var offset=-length/2;
+			var control=controls.shift();
+			control.style.transform='translateX('+offset+'px)';
+			while(controls.length){
+				var control=controls.shift();
+				var width=widths.shift();
+				offset+=width+6;
+				control.style.transform='translateX('+offset+'px)';
+			}
+		},
 		updatex:function(){
 			ui.update.apply(this,arguments);
 			ui.updateh(true);
 		},
-		updatehl:function(player){
+		updatehl:function(){
+			if(!game.me) return;
 			if(!lib.config.low_performance) return;
-			if(player!=game.me) return;
 			var hs1=[],hs2=[];
-			for(var i=0;i<player.node.handcards1.childElementCount;i++){
-				if(!player.node.handcards1.childNodes[i].classList.contains('removing')){
-					hs1.push(player.node.handcards1.childNodes[i]);
+			for(var i=0;i<ui.handcards1Container.firstChild.childElementCount;i++){
+				if(!ui.handcards1Container.firstChild.childNodes[i].classList.contains('removing')){
+					hs1.push(ui.handcards1Container.firstChild.childNodes[i]);
 				}
 			}
-			for(var i=0;i<player.node.handcards2.childElementCount;i++){
-				if(!player.node.handcards2.childNodes[i].classList.contains('removing')){
-					hs2.push(player.node.handcards2.childNodes[i]);
+			for(var i=0;i<ui.handcards2Container.firstChild.childElementCount;i++){
+				if(!ui.handcards2Container.firstChild.childNodes[i].classList.contains('removing')){
+					hs2.push(ui.handcards2Container.firstChild.childNodes[i]);
 				}
 			}
 			for(var i=0;i<hs1.length;i++){
@@ -15889,28 +16009,30 @@
 				ui.refresh(hs1[i]);
 				hs1[i].classList.remove('drawinghidden');
 			}
+			ui.handcards1Container.firstChild.style.width=(112*hs1.length+8)+'px';
 			for(var i=0;i<hs2.length;i++){
 				hs2[i].style.transform='translateX('+(i*112)+'px)';
 				ui.refresh(hs2[i]);
 				hs2[i].classList.remove('drawinghidden');
 			}
+			ui.handcards2Container.firstChild.style.width=(112*hs2.length+8)+'px';
 		},
 		updateh:function(compute){
 			if(!game.me) return;
+			if(lib.config.low_performance){
+				if(compute) ui.updatehl();
+				return;
+			}
 			if(compute){
-				game.me.node.handcards1._handcardsWidth=game.me.node.handcards1.offsetWidth;
-				game.me.node.handcards2._handcardsWidth=game.me.node.handcards2.offsetWidth;
+				ui.handcards1Container._handcardsWidth=ui.handcards1Container.offsetWidth;
+				ui.handcards2Container._handcardsWidth=ui.handcards2Container.offsetWidth;
 			}
 			ui.updatehx(game.me.node.handcards1);
 			ui.updatehx(game.me.node.handcards2);
 		},
-		updatehxx:function(node){
-			node.dataset.fold=Math.min(6,node.childElementCount-
-				node.getElementsByClassName('removing').length)-3;
-		},
 		updatehx:function(node){
+			var width=node.parentNode._handcardsWidth;
 			var num=node.childElementCount-node.getElementsByClassName('removing').length;
-			var width=node._handcardsWidth;
 			node.classList.remove('fold0');
 			node.classList.remove('fold1');
 			node.classList.remove('fold2');
@@ -16350,8 +16472,7 @@
 			if(card.timeout&&card.destiny){
 				if(card.destiny.classList.contains('equips')) return 'e';
 				if(card.destiny.classList.contains('judges')) return 'j';
-				if(card.destiny.id=='handcards1'||
-					card.destiny.id=='handcards2') return 'h';
+				if(card.destiny.classList.contains('handcards')) return 'h';
 				if(card.destiny.id=='discardPile') return 'd';
 				if(card.destiny.id=='special') return 's';
 				return;
@@ -16359,8 +16480,7 @@
 			if(!card.parentNode) return;
 			if(card.parentNode.classList.contains('equips')) return 'e';
 			if(card.parentNode.classList.contains('judges')) return 'j';
-			if(card.parentNode.id=='handcards1'||
-				card.parentNode.id=='handcards2') return 'h';
+			if(card.parentNode.classList.contains('handcards')) return 'h';
 			if(card.parentNode.id=='discardPile') return 'd';
 			if(card.parentNode.id=='special') return 's';
 		},
@@ -17512,6 +17632,7 @@
 		};
 		HTMLDivElement.prototype.fix=function(){
 			clearTimeout(this.timeout);
+			delete this.timeout;
 			delete this.destiny;
 			this.classList.remove('removing');
 			return this;
@@ -17726,6 +17847,7 @@
 						target.node.handcards1.appendChild(card);
 						game.check();
 						target.update();
+						ui.updatehl();
 						return;
 					}
 				}
@@ -17744,6 +17866,7 @@
 						target.node.handcards1.appendChild(card);
 						game.check();
 						target.update();
+						ui.updatehl();
 						return;
 					}
 				}

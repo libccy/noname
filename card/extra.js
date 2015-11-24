@@ -14,7 +14,12 @@ card.extra={
 				return target==player;
 			},
 			content:function(){
-				if(target==_status.dying) target.recover();
+				if(target==_status.dying){
+					target.recover();
+					if(_status.currentPhase==target){
+						target.getStat().card.jiu--;
+					}
+				}
 				else{
 					target.addSkill('jiu');
 					if(!player.node.jiu&&lib.config.jiu_effect){

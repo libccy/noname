@@ -34,7 +34,7 @@ table{table-layout: fixed;}
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
 	opacity: 0.3 !important;
 }
-#arena.low_performance #me>div>.card{
+#arena.low_performance #me>div>div>.card{
 	position: absolute;
 	left:8px;
 }
@@ -52,6 +52,22 @@ table{table-layout: fixed;}
 #handcards1,#handcards2{white-space:nowrap;overflow-x: scroll;overflow-y:hidden;display: block;text-align: center;}
 #handcards1{left: 0;top:calc(100% - 140px);}
 #handcards2{left: calc(50% + 120px);top:calc(100% - 140px);}
+#arena #handcards1>div,
+#arena #handcards2>div{
+	height: 100%;
+	position: relative;
+	margin-right: 15px;
+	margin-left: -7px;
+}
+#arena.low_performance #handcards1,
+#arena.low_performance #handcards2{
+	text-align: left;
+}
+#arena.low_performance #handcards1>div,
+#arena.low_performance #handcards2>div{
+	margin-left: 2px;
+	margin-right: 10px;
+}
 #arena.single-handcard #handcards1{width: 100%;}
 #arena.single-handcard #handcards2{display: none;}
 #system{padding: 6px;width: calc(100% - 12px);white-space: nowrap;z-index: 3;pointer-events: none}
@@ -184,6 +200,7 @@ body>.background{z-index:-2}
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
 .equips>.card>.background{font-size: 36px;height: 36px;padding-top: 3px;}
+#arena.low_performance .player .equips{transition: all 0s}
 .judges>.card>.background,.marks>.card>.background{font-size: 20px;height: 20px;padding-top: 3px;}
 .button.card>.background{font-size: 68px;height: 68px;padding-top: 12px;}
 .card>.background{font-family:'xiaozhuan'}
@@ -277,11 +294,16 @@ margin-bottom: 5px;
 /*--------确认--------*/
 #control{text-align: center;z-index: 5;top: calc(200% / 3);left: calc(5% + 240px);width: calc(90% - 480px);pointer-events: none}
 #control>*{pointer-events: auto;}
-.control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;margin-left: 4px;margin-right: 4px;}
-.control{font-size: 18px;white-space: nowrap;position: relative;overflow: hidden;opacity:0}
+#control.nozoom>div{transition-property: opacity}
+.control{padding-top: 2px;padding-bottom: 2px;padding-left: 4px;padding-right: 4px;}
+.control{font-size: 18px;white-space: nowrap;overflow: hidden;opacity:0}
 /*.control:not(.nozoom){width:0}*/
-.control.removing.removing2{transform: scale(0.8)}
-.control>div{position: relative;padding: 3px;}
+.control.removing.removing2{transform: scale(0.2)}
+.control>div{position: relative;padding: 3px;margin: 0}
+#control>div{
+	position: absolute;
+	left: 50%;
+}
 /*--------角色--------*/
 .player>.avatar>.action{
 	margin: 5px;
@@ -582,16 +604,16 @@ margin-bottom: 5px;
 	animation: card_judgestart 1s;
 	-webkit-animation: card_judgestart 1s;
 }
-#me>div>.card.start{
+#me>div>div>.card.start{
 	animation: card_start2 0.5s;
 	-webkit-animation: card_start2 0.5s;
 }
-.card.drawinghidden{
+#me>div>div>.card.drawinghidden{
 	opacity: 0;
-	transform: scale(0.8);
+	transform: scale(0.2) !important;
 }
 .card.removing{transform:scale(0);}
-#me>div>.card.removing{margin-left: -52px;margin-right: -52px;}
+#me>div>div>.card.removing{margin-left: -52px;margin-right: -52px;}
 .card.thrown.removing{width: 104px;height: 104px;transform:none}
 #sidebar.sidebar{
 	animation:sidebar 0.5s;

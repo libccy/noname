@@ -33,7 +33,7 @@ html{
 	text-shadow: black 0 0 2px;
 	background: linear-gradient(#4b4b4b, #464646);
 }
-#me>div>.card,#arena>.card:not(*:empty){
+#me>div>div>.card,#arena>.card:not(*:empty){
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
 .fire{
