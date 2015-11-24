@@ -210,7 +210,7 @@ window.config={
 	glow_phase:true,
 
 	skin:{},
-	
+
 	theme:'woodden',
 	layout:'mobile',
 	card_style:'default',
@@ -350,3 +350,4 @@ window.mode={};
 window.card={};
 window.character={};
 window.play={};
+window.background={};

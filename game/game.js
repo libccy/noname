@@ -336,14 +336,6 @@
 						init:'default',
 						item:{
 							default:'默认',
-							huangyueying_bg:'逐墨',
-							zhulian_bg:'璧合',
-							september_bg:'九月',
-							xueji_bg:'雪霁',
-							yinxiang_bg:'印象',
-							chunhui_bg:'春晖',
-							// grass_bg:'芳草',
-							huangtian_bg:'黄天',
 						},
 						onclick:function(background){
 							var animate=lib.config.image_background=='default';
@@ -2040,6 +2032,12 @@
 				for(i in play.pack){
 					lib.config.all.plays.push(i);
 					lib.translate[i+'_play_config']=play.pack[i];
+				}
+				if(background&&background.pack){
+					for(i in background.pack){
+						lib.configMenu.appearence.config.image_background.item[i]=background.pack[i];
+					}
+					delete window.background;
 				}
 				delete character.pack;
 				delete card.pack;

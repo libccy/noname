@@ -41,3 +41,12 @@ play.pack={
     wuxing:'五行生克',
     weather:'天气变化',
 };
+background.pack={
+    huangyueying_bg:'逐墨',
+    zhulian_bg:'璧合',
+    september_bg:'九月',
+    xueji_bg:'雪霁',
+    yinxiang_bg:'印象',
+    chunhui_bg:'春晖',
+    huangtian_bg:'黄天',
+};
