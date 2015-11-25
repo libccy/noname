@@ -304,7 +304,7 @@ mode.stone={
 					list2.push(name);
 				}
 				lib.card[name]={
-					image:'character/default/'+i,
+					image:'character/'+i,
 					stoneact:lib.character[i][5][0]
 				};
 				for(j in lib.card.stonecharacter){

@@ -23,3 +23,9 @@
 #arena.stone>.player.minskin[data-position='8']{top:30px;left:0;}
 #arena.stone>.card[data-position='8']{top:38px;left:8px;}
 #arena.stone>.popup[data-position='8']{top:160px;left:8px;}
+#arena:not(.chess).mobile>.player[data-position='0']>.name{
+    top:30px;
+}
+#arena .player>.name{
+    top:36px;
+}

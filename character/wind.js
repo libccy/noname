@@ -198,6 +198,7 @@ character.wind={
 			trigger:{player:['damageAfter','damageCancelled']},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				if(player.hp<player.maxHp) player.draw(player.maxHp-player.hp);
 				player.removeSkill('tianxiang2');

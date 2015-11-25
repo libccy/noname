@@ -433,7 +433,7 @@ mode.identity={
 					dialog.add('选择身份');
 					var table=document.createElement('table');
 					table.style.margin='0 auto';
-					table.style.maxWidth='500px';
+					table.style.maxWidth='400px';
 					var tr=document.createElement('tr');
 					table.appendChild(tr);
 					var list;
@@ -447,9 +447,9 @@ mode.identity={
 					for(var i=0;i<list.length;i++){
 						var td=document.createElement('td');
 						tr.appendChild(td);
-						td.style.width='40px';
-						td.style.fontSize='18px';
 						td.link=list[i];
+						td.style.fontSize='25px';
+						td.style.fontFamily='xinwei';
 						if(td.link===game.me.identity){
 							td.classList.add('thundertext');
 						}
@@ -483,14 +483,15 @@ mode.identity={
 					dialog.add('选择座位');
 					var seats=document.createElement('table');
 					seats.style.margin='0 auto';
-					seats.style.maxWidth='490px';
+					seats.style.maxWidth=(60*(parseInt(get.config('player_number'))-1))+'px';
 					var tr=document.createElement('tr');
 					seats.appendChild(tr);
 					for(var i=2;i<=game.players.length;i++){
 						var td=document.createElement('td');
 						tr.appendChild(td);
 						td.style.width='40px';
-						td.style.fontSize='18px';
+						td.style.fontSize='25px';
+						td.style.fontFamily='xinwei';
 						td.innerHTML=get.cnNumber(i,true);
 						td.link=i-1;
 						if(get.distance(game.zhu,game.me,'absolute')===i-1){

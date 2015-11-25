@@ -3307,7 +3307,8 @@ character.swd={
 			prompt:'将一张红桃手牌当作流星火羽使用',
 			check:function(card){return 6-ai.get.value(card)},
 			ai:{
-				threaten:1.4
+				threaten:1.4,
+				order:9,
 			}
 		},
 		rexue:{

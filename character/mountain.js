@@ -136,6 +136,7 @@ character.mountain={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				"step 0"
 				player.chooseToDiscard(true);
@@ -161,6 +162,7 @@ character.mountain={
 			trigger:{player:'phaseAfter'},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				if(player.marks.fangquan){
 					player.marks.fangquan.delete();

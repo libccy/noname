@@ -1742,6 +1742,7 @@ character.yijiang={
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				if(lib.config.glow_phase){
 					if(_status.currentPhase){
@@ -1871,6 +1872,7 @@ character.yijiang={
 		xinpojun2:{
 			trigger:{global:'phaseEnd'},
 			forced:true,
+			audio:false,
 			mark:true,
 			intro:{
 				content:'cardCount'
@@ -2313,6 +2315,7 @@ character.yijiang={
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			mark:true,
+			audio:false,
 			content:function(){
 				player.removeSkill('qianxi2');
 				delete player.storage.qianxi2;
@@ -2547,6 +2550,7 @@ character.yijiang={
 		xiantu2:{
 			trigger:{player:'phaseUseEnd'},
 			forced:true,
+			audio:false,
 			content:function(){
 				if(player.storage.xiantu){
 					player.storage.xiantu.loseHp();
@@ -2559,6 +2563,7 @@ character.yijiang={
 		xiantu3:{
 			trigger:{source:'dieAfter'},
 			forced:true,
+			audio:false,
 			content:function(){
 				delete player.storage.xiantu;
 				player.removeSkill('xiantu2');
@@ -2755,6 +2760,7 @@ character.yijiang={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				player.removeSkill('chanhui2');
 			}
@@ -4002,6 +4008,7 @@ character.yijiang={
 		shiyong2:{
 			trigger:{player:'damageEnd'},
 			forced:true,
+			audio:false,
 			check:function(){
 				return false;
 			},

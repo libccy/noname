@@ -153,14 +153,15 @@ mode.guozhan={
 					dialog.add('选择座位');
 					var seats=document.createElement('table');
 					seats.style.margin='0 auto';
-					seats.style.maxWidth='490px';
+					seats.style.maxWidth=(60*parseInt(get.config('player_number')))+'px';
 					var tr=document.createElement('tr');
 					seats.appendChild(tr);
 					for(var i=1;i<=game.players.length;i++){
 						var td=document.createElement('td');
 						tr.appendChild(td);
 						td.style.width='40px';
-						td.style.fontSize='18px';
+						td.style.fontSize='25px';
+						td.style.fontFamily='xinwei';
 						td.innerHTML=get.cnNumber(i,true);
 						td.link=i-1;
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){

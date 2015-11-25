@@ -36,7 +36,7 @@ play.character={
 			lib.card[name]={
 				enable:true,
 				type:'character',
-				image:'character/default/'+list[i],
+				image:'character/'+list[i],
 				color:'white',
 				opacity:1,
 				textShadow:'black 0 0 2px',

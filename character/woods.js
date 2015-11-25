@@ -326,6 +326,7 @@ character.woods={
 			trigger:{player:'phaseDrawEnd'},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				"step 0"
 				player.removeSkill('haoshi2');

@@ -330,6 +330,8 @@ margin-bottom: 5px;
 	font-family: 'xinwei';
 	font-size: 20px;
 	letter-spacing: -2px;
+	right:5px;
+	text-align: right;
 }
 .player>.avatar.hidden,
 .player>.avatar2.hidden{
@@ -357,7 +359,10 @@ margin-bottom: 5px;
 	filter:grayscale(1);
 	-webkit-filter:grayscale(1);
 }
-.player>.name{left: 16px;top:36px;font-family: 'huangcao';font-size:20px}
+.player>.name{left: 16px;top:24px;font-family: 'xinwei';font-size:20px}
+.button.character>.name{
+	font-family: 'xinwei'
+}
 .player>.intro{top:87px;left: 18px;}
 .player>.damage{
 	font-family: 'huangcao';
@@ -814,6 +819,10 @@ div[data-nature='metalm']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 5px,
 		rgba(255, 203, 0,1) 0 0 5px,black 0 0 1px;
 }
+div[data-nature='metalmm']{
+	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,
+		rgba(255, 203, 0,1) 0 0 2px,black 0 0 1px;
+}
 .player .identity[data-color="nei"],
 .player .identity[data-color="ye"],
 div[data-nature='thunder']{
@@ -830,6 +839,14 @@ div[data-nature='wood']{
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 10px,
 		rgba(57, 123, 4,1) 0 0 10px,rgba(57, 123, 4,1) 0 0 20px,rgba(57, 123, 4,1) 0 0 20px,black 0 0 1px;
 }
+div[data-nature='woodm']{
+	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 5px,
+		rgba(57, 123, 4,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='woodmm']{
+	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,
+		rgba(57, 123, 4,1) 0 0 2px,black 0 0 1px;
+}
 .player .identity[data-color="cai"],
 .player .identity[data-color="wei"],
 div[data-nature='water']{
@@ -839,6 +856,9 @@ div[data-nature='water']{
 div[data-nature='waterm']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 5px,
 		rgba(78, 117, 140,1) 0 0 5px,black 0 0 1px;
+}div[data-nature='watermm']{
+	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,
+		rgba(78, 117, 140,1) 0 0 2px,black 0 0 1px;
 }
 .player .identity[data-color="shu"],
 div[data-nature='soil']{
@@ -848,6 +868,10 @@ div[data-nature='soil']{
 div[data-nature='soilm']{
 	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,rgba(128, 59, 2,1) 0 0 5px,
 		rgba(128, 59, 2,1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='soilmm']{
+	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,
+		rgba(128, 59, 2,1) 0 0 2px,black 0 0 1px;
 }
 .player .identity[data-color="unknownx"],
 div[data-nature='black']{

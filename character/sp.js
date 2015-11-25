@@ -758,6 +758,7 @@ character.sp={
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			priority:10,
+			audio:2,
 			mod:{
 				cardEnabled:function(){
 					return false;
@@ -1224,6 +1225,7 @@ character.sp={
 		kuiwei2:{
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
+			audio:false,
 			content:function(){
 				var num=0;
 				for(var i=0;i<game.players.length;i++){
@@ -2607,6 +2609,7 @@ character.sp={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				player.removeSkill('duwu2');
 			}
@@ -2706,6 +2709,7 @@ character.sp={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			mark:true,
+			audio:false,
 			content:function(){
 				"step 0"
 				if(player.storage.bifa[1].isAlive()){
@@ -2930,6 +2934,7 @@ character.sp={
 			trigger:{player:'phaseUseEnd'},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				"step 0"
 				player.removeSkill('lihun2');

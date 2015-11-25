@@ -360,6 +360,7 @@ card.extra={
 			},
 			forced:true,
 			popup:false,
+			audio:false,
 			content:function(){
 				player.removeSkill('jiu');
 				if(player.node.jiu){

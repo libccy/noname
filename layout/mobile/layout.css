@@ -91,6 +91,7 @@
 
 #arena:not(.chess) .player[data-position='0']>.name{
     left:4px;
+    top:10px;
 }
 #arena:not(.chess) .player[data-position='0']>.identity{
     left: 106px;

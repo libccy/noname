@@ -221,7 +221,7 @@ window.config={
 	image_background:'default',
 
 	card_font:'xiaozhuan',
-	show_name:false,
+	show_name:true,
 	show_replay:false,
 	show_pause:true,
 	show_auto:true,

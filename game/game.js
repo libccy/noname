@@ -4083,7 +4083,7 @@
 					var skills=info[3];
 					this.skills.length=0;
 					this.classList.add('fullskin');
-					if(!game.minskin&&lib.isNewLayout()){
+					if(!game.minskin&&lib.isNewLayout()&&!info[4].contains('minskin')){
 						this.classList.remove('minskin');
 						this.node.avatar.setBackground(character,'character');
 					}
@@ -4111,6 +4111,12 @@
 					this.maxHp=info[2];
 					this.hujia=0;
 					this.node.intro.innerHTML=lib.config.intro;
+					switch(this.group){
+						case 'wei':this.node.name.dataset.nature='watermm';break;
+						case 'shu':this.node.name.dataset.nature='soilmm';break;
+						case 'wu':this.node.name.dataset.nature='woodmm';break;
+						case 'qun':this.node.name.dataset.nature='metalmm';break;
+					}
 					if(lib.config.touchscreen){
 						lib.setLongPress(this,ui.click.intro);
 					}
@@ -5320,7 +5326,7 @@
 							this.node.handcards2.appendChild(cards[i]);
 						}
 					}
-					if(this==game.me) ui.updatehl();
+					if(this==game.me||_status.video) ui.updatehl();
 					if(!_status.video){
 						game.addVideo('directgain',this,get.cardsInfo(cards));
 						this.update();
@@ -8073,6 +8079,7 @@
 			}
 			if(_status.skillaudio.contains(str)) return;
 			_status.skillaudio.add(str);
+			game.addVideo('playAudio',null,str);
 			setTimeout(function(){
 				_status.skillaudio.remove(str);
 			},1000);
@@ -8096,6 +8103,7 @@
 		},
 		playSkillAudio:function(name){
 			if(_status.skillaudio.contains(name)) return;
+			game.addVideo('playSkillAudio',null,name);
 			_status.skillaudio.add(name);
 			setTimeout(function(){
 				_status.skillaudio.remove(name);
@@ -8415,6 +8423,12 @@
 					ui.arena.show();
 					ui.updateh(true);
 				}
+			},
+			playAudio:function(str){
+				game.playAudio(str);
+			},
+			playSkillAudio:function(name){
+				game.playSkillAudio(name);
 			},
 			phaseChange:function(player){
 				if(player){
@@ -9091,6 +9105,7 @@
 					checkMatch(hs,phs);
 					checkMatch(es,pes);
 					checkMatch(js,pjs);
+					ui.updatehl();
 				}
 				else{
 					console.log(player);
@@ -9211,15 +9226,21 @@
 					player.node.handcards1.innerHTML='';
 					player.node.handcards2.innerHTML='';
 					player.directgain(cards,false);
+					if(lib.config.low_performance){
+						game.me.node.handcards1.remove();
+						game.me.node.handcards2.remove();
+					}
+					else{
+						game.me.node.handcards1.delete();
+						game.me.node.handcards2.delete();
+					}
 
-					game.me.node.handcards1.delete();
-					game.me.node.handcards2.delete();
-					game.me=player;
 					ui.handcards1=player.node.handcards1.animate('start').fix();
 					ui.handcards2=player.node.handcards2.animate('start').fix();
-					ui.handcards1Container.appendChild(ui.handcards1);
-					ui.handcards2Container.appendChild(ui.handcards2);
+					ui.handcards1Container.insertBefore(ui.handcards1,ui.handcards1Container.firstChild);
+					ui.handcards2Container.insertBefore(ui.handcards2,ui.handcards2Container.firstChild);
 
+					game.me=player;
 					ui.updateh(true);
 					if(lib.config.mode=='chess'){
 						ui.create.fakeme();
@@ -10557,13 +10578,19 @@
 		},
 		swapControl:function(player){
 			if(player==game.me) return;
-			game.me.node.handcards1.delete();
-			game.me.node.handcards2.delete();
+			if(lib.config.low_performance){
+				game.me.node.handcards1.remove();
+				game.me.node.handcards2.remove();
+			}
+			else{
+				game.me.node.handcards1.delete();
+				game.me.node.handcards2.delete();
+			}
 			game.me=player;
 			ui.handcards1=player.node.handcards1.animate('start').fix();
 			ui.handcards2=player.node.handcards2.animate('start').fix();
-			ui.handcards1Container.appendChild(ui.handcards1);
-			ui.handcards2Container.appendChild(ui.handcards2);
+			ui.handcards1Container.insertBefore(ui.handcards1,ui.handcards1Container.firstChild);
+			ui.handcards2Container.insertBefore(ui.handcards2,ui.handcards2Container.firstChild);
 			ui.updateh(true);
 			game.addVideo('swapControl',player,get.cardsInfo(player.get('h')));
 
@@ -13901,9 +13928,9 @@
 								ui.create.div('',node.node.hp);
 							}
 						}
-						// if(!lib.config.show_name){
+						if(!lib.config.show_name){
 							node.node.name.style.display='none';
-						// }
+						}
 						var name=get.translation(item);
 						node.node.name.innerHTML='';
 						for(var i=0;i<name.length;i++){
@@ -16012,7 +16039,10 @@
 		updateh:function(compute){
 			if(!game.me) return;
 			if(lib.config.low_performance){
-				if(compute) ui.updatehl();
+				if(compute){
+					ui.updatehl();
+					setTimeout(ui.updatehl,1000);
+				}
 				return;
 			}
 			if(compute){

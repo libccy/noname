@@ -344,6 +344,7 @@ character.gujian={
 			trigger:{source:'damageEnd'},
 			forced:true,
 			popup:false,
+			audio:false,
 			filter:function(event,player){
 				return player.storage.mingkong?true:false;
 			},

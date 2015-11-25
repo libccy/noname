@@ -384,6 +384,7 @@ character.refresh={
 			init:function(player){
 				player.storage.reqianxun2=[];
 			},
+			audio:2,
 			trigger:{target:'useCardToBegin',player:'judgeBefore'},
 			filter:function(event,player){
 				if(player.num('h')==0) return false;
@@ -412,6 +413,7 @@ character.refresh={
 		reqianxun2:{
 			trigger:{global:'phaseAfter'},
 			forced:true,
+			audio:false,
 			content:function(){
 				player.gain(player.storage.reqianxun2);
 				player.removeSkill('reqianxun2');
@@ -687,6 +689,7 @@ character.refresh={
 			forced:true,
 			mark:true,
 			popup:'遗计拿牌',
+			audio:false,
 			content:function(){
 				player.$draw(player.storage.reyiji2.length);
 				player.gain(player.storage.reyiji2);
