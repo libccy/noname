@@ -168,7 +168,7 @@ character.sp={
 				player.storage.mozhi=[];
 			},
 			trigger:{player:'phaseEnd'},
-			frequent:true,
+			direct:true,
 			filter:function(event,player){
 				return player.storage.mozhi.length>0&&player.num('h')>0;
 			},
@@ -185,6 +185,7 @@ character.sp={
 						if(i<game.players.length){
 							lib.skill.mozhix.viewAs=card;
 							var next=player.chooseToUse();
+							next.logSkill='mozhi';
 							if(event.isMine()){
 								next.openskilldialog='将一张手牌当'+get.translation(card)+'使用';
 							}

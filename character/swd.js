@@ -3632,6 +3632,7 @@ character.swd={
 					// 		return;
 					// 	}
 					// }
+					var player=event.player;
 					if(player.hp>1) player.loseHp();
 				}
 			}
