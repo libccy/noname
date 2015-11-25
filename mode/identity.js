@@ -44,16 +44,180 @@ mode.identity={
 					else{
 						game.prepareArena();
 					}
-					game.delay();
+					if(!lib.config.new_tutorial){
+						game.delay();
+					}
 				}
 				"step 1"
+				if(!lib.config.new_tutorial){
+					var clear=function(){
+						ui.dialog.close();
+						while(ui.controls.length) ui.controls[0].close();
+					};
+					var clear2=function(){
+						ui.auto.show();
+						ui.arena.classList.remove('only_dialog');
+					};
+					var step1=function(){
+						ui.create.dialog('欢迎来到无名杀，是否进入新手向导？');
+						game.saveConfig('new_tutorial',true);
+						ui.dialog.add('<div class="text center">跳过后，你可以在选项-其它中重置新手向导');
+						ui.auto.hide();
+						ui.create.control('跳过向导',function(){
+							clear();
+							clear2();
+							game.resume();
+						});
+						ui.create.control('继续',step2);
+					}
+					var step2=function(){
+						if(lib.config.layout!='phone'){
+							clear();
+							ui.create.dialog('如果你在使用手机，可能会觉得按钮有点小'+
+							'，将布局改成移动可以使按钮变大');
+							ui.dialog.add('<div class="text center">你可以在选项-外观-布局中更改此设置');
+							var lcontrol=ui.create.control('使用移动布局',function(){
+								if(lib.config.layout=='phone'){
+									ui.control.firstChild.firstChild.innerHTML='使用移动布局';
+									lib.init.layout('mobile');
+								}
+								else{
+									ui.control.firstChild.firstChild.innerHTML='使用默认布局';
+									lib.init.layout('phone');
+								}
+							});
+							ui.create.control('继续',step3);
+						}
+						else{
+							step3();
+						}
+					};
+					var step3=function(){
+						if(lib.config.layout=='phone'){
+							clear();
+							ui.create.dialog('在移动布局后，点击顶部的左半边或右半边可以显示按钮');
+							var node=ui.create.div('.tutorial_tap',ui.window);
+							var nodefunc=function(){
+								setTimeout(function(){
+									node.style.top='20px';
+									node.style.left='10%';
+									setTimeout(function(){
+										node.style.transition='all 0.2s';
+										node.style.opacity=0;
+										setTimeout(function(){
+											node.style.opacity='';
+											setTimeout(function(){
+												node.style.transition='';
+											},300);
+										},300);
+									},1200);
+									setTimeout(function(){
+										node.style.left='calc(90% - 30px)';
+										setTimeout(function(){
+											node.style.transition='all 0.2s';
+											node.style.opacity=0;
+											setTimeout(function(){
+												node.style.opacity='';
+												setTimeout(function(){
+													node.style.transition='';
+												},300);
+											},300);
+										},1200);
+										setTimeout(function(){
+											node.style.top='';
+											node.style.left='';
+										},2000);
+									},2000);
+								},1000);
+							};
+							nodefunc();
+							var interval=setInterval(nodefunc,7000);
+							var interval2,node2;
+							var double=true;
+							ui.create.control('继续',function(){
+								if(double){
+									node2=ui.create.div('.tutorial_tap',ui.window);
+									ui.refresh(node2);
+									node2.style.top='20px';
+									node2.style.left='calc(50% - 15px)';
+									interval2=setInterval(function(){
+										node2.style.transition='all 0.2s';
+										node2.style.opacity=0;
+										setTimeout(function(){
+											node2.style.opacity='';
+											setTimeout(function(){
+												node2.style.opacity=0;
+												setTimeout(function(){
+													node2.style.opacity='';
+													setTimeout(function(){
+														node2.style.transition='';
+													},300);
+												},300);
+											},300);
+										},300);
+									},3000);
+									clearInterval(interval);
+									node.delete();
+									double=false;
+									ui.dialog.close();
+									ui.create.dialog('双击顶部可令界面下移，方便进行标身份等操作');
+								}
+								else{
+									clearInterval(interval2);
+									node2.delete();
+									step4();
+								}
+							});
+						}
+						else{
+							step4();
+						}
+					};
+					var step4=function(){
+						clear();
+						ui.window.classList.add('noclick_important');
+						ui.click.configMenu();
+						ui.control.classList.add('noclick_click_important');
+						ui.control.style.top='calc(100% - 105px)';
+						ui.create.control('在菜单中，可以进行各项设置',function(){
+							ui.click.menuTab('选项');
+							ui.controls[0].replace('如果你感到游戏较卡，可以开启低性能模式',function(){
+								ui.controls[0].replace('在技能一栏中，可以设置自动发动或双将禁配的技能',function(){
+									ui.click.menuTab('武将');
+									ui.controls[0].replace('在武将或卡牌一栏中，单击武将/卡牌可以将其禁用',function(){
+										ui.click.menuTab('战局');
+										ui.controls[0].replace('在战局中可以输入游戏命令，或者管理录像',function(){
+											ui.click.configMenu();
+											ui.window.classList.remove('noclick_important');
+											ui.control.classList.remove('noclick_click_important');
+											ui.control.style.top='';
+											step5();
+										});
+									});
+								});
+							});
+						})
+					};
+					var step5=function(){
+						clear();
+						ui.create.dialog('如果还有其它问题，欢迎来到百度无名杀吧进行交流');
+						ui.create.control('完成',function(){
+							clear();
+							clear2();
+							game.resume();
+						})
+					};
+					game.pause();
+					step1();
+				}
+				"step 2"
 				if(lib.storage.test){
 					lib.config.game_speed='vfast';
 					_status.auto=true;
 					ui.auto.classList.add('glow');
 				}
 				game.chooseCharacter();
-				"step 2"
+				"step 3"
 				if(game.players.length==2){
 					game.showIdentity(true);
 				}

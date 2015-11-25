@@ -90,6 +90,7 @@ window.characterRank={
         'liuchen',
     ],
     am:[
+        'zhugeguo',
         'sp_caiwenji',
         'caorui',
         'manchong',

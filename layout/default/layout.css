@@ -9,6 +9,19 @@ div{display: inline-block;position: absolute;transition: all 0.5s;}
 table{table-layout: fixed;}
 /*--------场景--------*/
 #window{width: 100%;height: 100%;top: 0;left: 0;transition-property:opacity;overflow:hidden}
+#window>.tutorial_tap{
+	width:30px;
+	height:30px;
+	border-radius: 100%;
+	background: rgba(255,255,255,0.5);
+	box-shadow: rgba(255,255,255,0.5) 0 0 5px;
+	left:calc(50% - 15px);
+	top:calc(50% - 15px);
+	position: absolute;
+	transition: all 1s;
+}
+#window.noclick_important *{pointer-events: none !important;}
+#window.noclick_important .noclick_click_important div{pointer-events: auto !important}
 #arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;}
 #arena.right:not(.noleft){left:240px;opacity: 0.6;}
 #arena.left:not(.noleft){left:calc(10% - 240px);opacity: 0.6;}
@@ -22,6 +35,10 @@ table{table-layout: fixed;}
 	left:0;
 	top:0;
 	z-index:20
+}
+#arena.only_dialog>div:not(.dialog):not(#control){
+	opacity: 0 !important;
+	pointer-events: none !important;
 }
 #arena>canvas{
 	z-index: 10;
@@ -196,6 +213,9 @@ body>.background{z-index:-2}
 .buttons .card.button>.addinfo{
 	transform:scale(0.8);
 	transform-origin:bottom left;
+}
+.dialog .buttons>.button.character{
+	height:108px;
 }
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}

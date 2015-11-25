@@ -909,7 +909,8 @@ character.refresh={
 				result:{
 					player:function(player){
 						if(player.hp<=2) return player.num('h')==0?1:0;
-						return player.num('h')<player.hp?1:0;
+						if(player.num('h',{name:'sha',color:'red'})) return 1;
+						return player.num('h')<=player.hp?1:0;
 					}
 				},
 				effect:function(card,player){

@@ -73,7 +73,6 @@
 					low_performance:{
 						name:'低性能模式',
 						init:false,
-						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('low_performance',bool);
 							if(bool){
@@ -264,45 +263,12 @@
 							phone:'移动'
 						},
 						onclick:function(layout){
-							game.saveConfig('layout',layout);
 							if(lib.config.layoutfixed.contains(lib.config.mode)&&layout=='default'){
-								return;
+								game.saveConfig('layout',layout);
 							}
-							setTimeout(function(){
-								var layout=ui.css.layout;
-								ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
-								if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
-									ui.arena.classList.add('mobile');
-									if(game.me&&game.me.node.handcards2.childNodes.length){
-										while(game.me.node.handcards2.childNodes.length){
-											game.me.node.handcards1.appendChild(game.me.node.handcards2.firstChild);
-										}
-									}
-								}
-								else{
-									ui.arena.classList.remove('mobile');
-								}
-								if(lib.config.layout=='default'){
-									ui.arena.classList.add('oldlayout');
-								}
-								else{
-									ui.arena.classList.remove('oldlayout');
-								}
-								if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
-									ui.arena.classList.add('hpimage');
-								}
-								else{
-									ui.arena.classList.remove('hpimage');
-								}
-								setTimeout(function(){
-									layout.remove();
-									ui.arena.show();
-									if(game.me) game.me.update();
-									setTimeout(function(){
-										ui.updatex();
-									},500);
-								},100);
-							},500);
+							else{
+								lib.init.layout(layout);
+							}
 						}
 					},
 					ui_zoom:{
@@ -478,37 +444,37 @@
 						init:false,
 						unfrequent:true,
 					},
-					only_fullskin:{
-						name:'隐藏无全身皮肤武将',
-						init:true,
-						unfrequent:true,
-						restart:true,
-					},
+					// only_fullskin:{
+					// 	name:'隐藏无全身皮肤武将',
+					// 	init:true,
+					// 	unfrequent:true,
+					// 	restart:true,
+					// },
 					hide_card_image:{
 						name:'隐藏卡牌背景',
 						init:false,
 						unfrequent:true,
 						restart:true,
 					},
-					bottom_line:{
-						name:'指示线置底',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('bottom_line',bool);
-							if(lib.config.bottom_line){
-								ui.canvas.style.zIndex=0;
-							}
-							else{
-								ui.canvas.style.zIndex='';
-							}
-						}
-					},
-					line_dash:{
-						name:'虚线指示线',
-						init:false,
-						unfrequent:true,
-					},
+					// bottom_line:{
+					// 	name:'指示线置底',
+					// 	init:false,
+					// 	unfrequent:true,
+					// 	onclick:function(bool){
+					// 		game.saveConfig('bottom_line',bool);
+					// 		if(lib.config.bottom_line){
+					// 			ui.canvas.style.zIndex=0;
+					// 		}
+					// 		else{
+					// 			ui.canvas.style.zIndex='';
+					// 		}
+					// 	}
+					// },
+					// line_dash:{
+					// 	name:'虚线指示线',
+					// 	init:false,
+					// 	unfrequent:true,
+					// },
 					glow_phase:{
 						name:'当前回合角色高亮',
 						init:false,
@@ -955,6 +921,13 @@
 									},1000);
 								},1000);
 							},1000);
+						},
+						clear:true
+					},
+					reset_tutorial:{
+						name:'重置新手向导',
+						onclick:function(){
+							game.saveConfig('new_tutorial',false);
 						},
 						clear:true
 					},
@@ -2127,6 +2100,48 @@
 					document.head.appendChild(script);
 					return script;
 				}
+			},
+			layout:function(layout){
+				game.saveConfig('layout',layout);
+				ui.arena.hide();
+				setTimeout(function(){
+					var layout=ui.css.layout;
+					ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
+					if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
+						ui.arena.classList.add('mobile');
+						if(game.me&&game.me.node.handcards2.childNodes.length){
+							while(game.me.node.handcards2.childNodes.length){
+								game.me.node.handcards1.appendChild(game.me.node.handcards2.firstChild);
+							}
+						}
+					}
+					else{
+						ui.arena.classList.remove('mobile');
+					}
+					if(lib.config.layout=='default'){
+						ui.arena.classList.add('oldlayout');
+					}
+					else{
+						ui.arena.classList.remove('oldlayout');
+					}
+					if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
+						ui.arena.classList.add('hpimage');
+					}
+					else{
+						ui.arena.classList.remove('hpimage');
+					}
+					setTimeout(function(){
+						layout.remove();
+						ui.arena.show();
+						if(game.me) game.me.update();
+						setTimeout(function(){
+							ui.updatex();
+						},500);
+						setTimeout(function(){
+							ui.updatec();
+						},1000);
+					},100);
+				},500);
 			},
 			parse:function(func){
 				var k,func2;
@@ -4067,25 +4082,22 @@
 					var info=lib.character[character];
 					var skills=info[3];
 					this.skills.length=0;
-					if(!game.minskin&&lib.isNewLayout()&&info[4].contains('fullskin')){
+					this.classList.add('fullskin');
+					if(!game.minskin&&lib.isNewLayout()){
 						this.classList.remove('minskin');
-						this.classList.add('fullskin');
-						this.node.avatar.setBackground(character,'character',null,'fullskin');
+						this.node.avatar.setBackground(character,'character');
 					}
 					else{
-						if(info[4].contains('fullskin')){
-							this.classList.add('fullskin');
-							this.node.avatar.setBackground(character,'character',null,'fullskin');
-						}
-						else{
-							this.classList.remove('fullskin');
-							this.node.avatar.setBackground(character,'character');
-						}
+						this.node.avatar.setBackground(character,'character');
+
 						if(info[4].contains('minskin')){
 							this.classList.add('minskin');
 						}
 						else if(game.minskin){
 							this.classList.add('minskin');
+						}
+						else{
+							this.classList.remove('minskin');
 						}
 					}
 
@@ -4120,23 +4132,8 @@
 					}
 					if(character2){
 						var info2=lib.character[character2];
-
-						if(lib.isNewLayout()&&lib.config.only_fullskin){
-							this.classList.add('fullskin2');
-							this.node.avatar2.setBackground(character2,'character',null,'fullskin');
-						}
-						else{
-							if(info2[4].contains('fullskin')){
-								this.classList.add('fullskin2');
-								this.node.avatar2.setBackground(character2,'character',null,'fullskin');
-							}
-							else{
-								this.classList.remove('fullskin2');
-								this.node.avatar2.setBackground(character2,'character');
-							}
-						}
-
-
+						this.classList.add('fullskin2');
+						this.node.avatar2.setBackground(character2,'character');
 
 						this.node.avatar2.show();
 						this.name2=character2;
@@ -5308,6 +5305,7 @@
 						}
 					}
 					for(var i=0;i<cards.length;i++){
+						cards[i].fix();
 						var sort=lib.config.sort_card(cards[i]);
 						if(animate!==false&&!lib.config.low_performance){
 							cards[i].animate('start');
@@ -6190,11 +6188,14 @@
 					node.show();
 
 					node.addEventListener('webkitTransitionEnd',function(){
+						node.style.transitionDuration='0.5s';
+						ui.refresh(node);
 						node.delete();
 					});
 					if(!lib.config.low_performance){
 						setTimeout(function(){
 							node.style.transitionDuration='0.5s';
+							ui.refresh(node);
 							node.hide();
 						},700);
 					}
@@ -9568,7 +9569,8 @@
 			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
 			var opacity=1;
 			var color=[255,255,255];
-			var dashed=lib.config.line_dash;
+			// var dashed=lib.config.line_dash;
+			var dashed=false;
 			if(typeof arguments[1]=='object'){
 				for(var i in arguments[1]){
 					switch(i){
@@ -9636,7 +9638,8 @@
 			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
 			var opacity=1;
 			var color=[255,255,255];
-			var dashed=lib.config.line_dash;
+			// var dashed=lib.config.line_dash;
+			var dashed=false;
 			if(typeof arguments[1]=='object'){
 				for(var i in arguments[1]){
 					switch(i){
@@ -11575,6 +11578,9 @@
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena',ui.window);
+				if(!lib.config.new_tutorial&&lib.config.mode=='identity'){
+					ui.arena.classList.add('only_dialog');
+				}
 				if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 					ui.arena.classList.add('mobile');
 				}
@@ -11600,9 +11606,9 @@
 				ui.sidebar=ui.create.div('#sidebar');
 				ui.sidebar3=ui.create.div('#sidebar3');
 				ui.canvas=document.createElement('canvas');
-				if(lib.config.bottom_line){
-					ui.canvas.style.zIndex=0;
-				}
+				// if(lib.config.bottom_line){
+				// 	ui.canvas.style.zIndex=0;
+				// }
 
 				ui.arena.appendChild(ui.canvas);
 				ui.canvas.id='canvas';
@@ -12588,6 +12594,14 @@
 		                    menuTabBar.style.left=this.offsetLeft+'px';
 		                    menuContent.appendChild(this._link);
 		                };
+						ui.click.menuTab=function(tab){
+							for(var i=0;i<menuTab.childNodes.length;i++){
+								if(menuTab.childNodes[i].innerHTML==tab){
+									clickTab.call(menuTab.childNodes[i]);
+									return;
+								}
+							}
+						};
 		                var pages=[];
 		                for(var i=0;i<tabs.length;i++){
 		                    var active=(i===(config.init||0));
@@ -13777,7 +13791,7 @@
 				}
 				if(lib.config.button_press){
 					node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(e){
-						node.classList.add('pressdown');
+						if(!node.classList.contains('hidden')) node.classList.add('pressdown');
 					});
 					node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(e){
 						node.classList.remove('pressdown');
@@ -14941,19 +14955,9 @@
 				img.onerror=function(){
 					delete lib.config.skin[player.name];
 					game.saveConfig('skin',lib.config.skin);
-					if(player.classList.contains('fullskin')){
-						avatar.setBackground(player.name,'character',null,'fullskin');
-					}
-					else{
-						avatar.setBackground(player.name,'character');
-					}
+					avatar.setBackground(player.name,'character');
 				}
-				if(player.classList.contains('fullskin')){
-					img.src='image/character/skin/'+player.name+'/'+num+'f.jpg';
-				}
-				else{
-					img.src='image/character/skin/'+player.name+'/'+num+'f.jpg';
-				}
+				img.src='image/skin/'+player.name+'/'+num+'.jpg';
 			},
 			avatar2:function(){
 				if(!lib.config.change_skin) return;
@@ -14980,19 +14984,9 @@
 				img.onerror=function(){
 					delete lib.config.skin[player.name2];
 					game.saveConfig('skin',lib.config.skin);
-					if(player.classList.contains('fullskin2')){
-						avatar.setBackground(player.name2,'character',null,'fullskin');
-					}
-					else{
-						avatar.setBackground(player.name2,'character');
-					}
+					avatar.setBackground(player.name2,'character');
 				}
-				if(player.classList.contains('fullskin2')){
-					img.src='image/character/skin/'+player.name2+'/'+num+'f.jpg';
-				}
-				else{
-					img.src='image/character/skin/'+player.name2+'/'+num+'f.jpg';
-				}
+				img.src='image/skin/'+player.name2+'/'+num+'.jpg';
 			},
 			player:function(){
 				return ui.click.target.apply(this,arguments);
@@ -17641,11 +17635,15 @@
 			subfolder=subfolder||'default'
 			if(type){
 				if(type=='character'&&lib.config.skin[name]){
-					src='image/character/skin/'+name+'/'+lib.config.skin[name]+
-						(subfolder=='fullskin'?'f':'')+ext;
+					src='image/skin/'+name+'/'+lib.config.skin[name]+ext;
 				}
 				else{
-					src='image/'+type+'/'+subfolder+'/'+name+ext;
+					if(type=='character'){
+						src='image/character/'+name+ext;
+					}
+					else{
+						src='image/'+type+'/'+subfolder+'/'+name+ext;
+					}
 				}
 			}
 			else{
@@ -18184,11 +18182,11 @@
 							if(!character[i][j][k][4]){
 								character[i][j][k][4]=[];
 							}
-							if(lib.config.only_fullskin&&lib.isNewLayout()&&lib.config.mode!='chess'){
-								if(!character[i][j][k][4].contains('fullskin')&&!character[i][j][k][4].contains('minskin')){
-									continue;
-								}
-							}
+							// if(lib.config.only_fullskin&&lib.isNewLayout()&&lib.config.mode!='chess'){
+							// 	if(!character[i][j][k][4].contains('fullskin')&&!character[i][j][k][4].contains('minskin')){
+							// 		continue;
+							// 	}
+							// }
 							if(lib.config.banned.contains(k)){
 								if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
 									lib.hiddenCharacters.push(k);

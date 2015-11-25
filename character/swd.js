@@ -9,7 +9,7 @@ character.swd={
 		// swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
 			swd_nicole:['female','wu',3,['minjing','lingwu','huanjian'],['fullskin']],
 			swd_wangsiyue:['female','wei',3,['duishi','biyue'],['fullskin']],
-		swd_weida:['female','qun',3,['yueren','zhenlie']],
+		// swd_weida:['female','qun',3,['yueren','zhenlie']],
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian'],['fullskin']],
 
 			swd_chenjingchou:['male','wu',3,['youyin','yihua'],['fullskin']],

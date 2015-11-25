@@ -965,7 +965,7 @@ mode.versus={
 				var info=lib.character[name];
 				if(lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){
 					ui.fakeme.classList.add('fullskin');
-					ui.fakemebg.style.backgroundImage='url("image/character/fullskin/'+name+'.jpg")';
+					ui.fakemebg.style.backgroundImage='url("image/character/'+name+'.jpg")';
 					ui.fakemebg.style.backgroundSize='cover';
 				}
 				else{

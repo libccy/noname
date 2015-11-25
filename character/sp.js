@@ -34,8 +34,63 @@ character.sp={
 		zhanglu:['male','qun',3,['yishe','bushi','midao'],['fullskin']],
 		wutugu:['male','qun',15,['ranshang','hanyong'],['fullskin']],
 		sp_caiwenji:['female','wei',3,['chenqing','mozhi'],['fullskin']],
+		zhugeguo:['female','shu',3,['yuhua','qirang'],['fullskin']],
 	},
 	skill:{
+		qirang:{
+			trigger:{player:'equipEnd'},
+			frequent:true,
+			content:function(){
+				player.gain(get.cardPile(function(card){
+					return get.type(card,'trick')=='trick';
+				}),'gain2');
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(get.type(card)=='equip') return [1,3];
+					}
+				},
+				threaten:1.3
+			}
+		},
+		yuhua:{
+			trigger:{player:'phaseDiscardBegin'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('h',{type:'basic'})<player.num('h');
+			},
+			content:function(){
+				'step 0'
+				var hs=player.get('h');
+				for(var i=0;i<hs.length;i++){
+					if(get.type(hs[i])=='basic'){
+						hs.splice(i--,1);
+					}
+				}
+				if(hs.length){
+					player.lose(hs,ui.special)._triggered=null;
+					player.storage.yuhua=hs;
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				game.delay();
+			},
+			group:'yuhua2'
+		},
+		yuhua2:{
+			trigger:{player:'phaseDiscardEnd'},
+			forced:true,
+			filter:function(event,player){
+				return player.storage.yuhua?true:false;
+			},
+			content:function(){
+				player.directgain(player.storage.yuhua);
+				delete player.storage.yuhua;
+			}
+		},
 		chenqing:{
 			trigger:{global:'dying'},
 			priority:6,
@@ -3270,7 +3325,12 @@ character.sp={
 		wutugu:'兀突骨',
 		mateng:'马腾',
 		sp_caiwenji:'蔡文姬',
+		zhugeguo:'诸葛果',
 
+		yuhua:'羽化',
+		yuhua_info:'锁定技，弃牌阶段内，你的非基本牌不计入手牌数，且你不能弃置你的非基本牌',
+		qirang:'祈禳',
+		qirang_info:'当有装备牌进入你的装备区时，你可以获得牌堆中的一张锦囊牌',
 		biluan:'避乱',
 		biluan_info:'摸牌阶段开始时，若有其他角色与你距离不大于1，则你可以放弃摸牌。若如此做，其他角色与你距离+X（X为势力数）',
 		lixia:'礼下',

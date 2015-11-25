@@ -2240,8 +2240,8 @@ mode.chess={
 						intro.classList.add('showintro');
 						intro.style.fontFamily='huangcao';
 						intro.style.fontSize='20px';
-						intro.style.top='67px';
-						intro.style.left='1px';
+						intro.style.top='82px';
+						intro.style.left='2px';
 						switch(rarity){
 							case 'rare':intro.dataset.nature='waterm';break;
 							case 'epic':intro.dataset.nature='thunderm';break;
