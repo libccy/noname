@@ -6156,7 +6156,7 @@
 					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
 					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
 					var num3;
-					if(lib.config.low_performance&&typeof num=='number'&&init!==false){
+					if(typeof num=='number'&&init!==false){
 						config={
 							total:num,
 							current:1
@@ -18066,7 +18066,7 @@
 			return aa+bb+cc+dd;
 		}
 		window.onkeydown=function(e){
-			if(!ui.menuContainer.classList.contains('hidden')) return;
+			if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')) return;
 			if(ui.currentpopped){
 				if(ui.currentpopped._uiintro){
 					ui.currentpopped._uiintro.delete();
