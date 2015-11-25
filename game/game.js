@@ -183,12 +183,12 @@
 							game.saveConfig('mousewheel',bool);
 							if(lib.config.touchscreen) return;
 							if(lib.config.mousewheel){
-								game.me.node.handcards1.onmousewheel=ui.click.mousewheel;
-								game.me.node.handcards2.onmousewheel=ui.click.mousewheel;
+								ui.handcards1Container.onmousewheel=ui.click.mousewheel;
+								ui.handcards2Container.onmousewheel=ui.click.mousewheel;
 							}
 							else{
-								game.me.node.handcards1.onmousewheel=null;
-								game.me.node.handcards2.onmousewheel=null;
+								ui.handcards1Container.onmousewheel=null;
+								ui.handcards2Container.onmousewheel=null;
 							}
 						}
 					},
@@ -14033,19 +14033,6 @@
 				node.ai={friend:[],enemy:[],neutral:[]};
 				node.queueCount=0;
 
-				if(lib.config.mousewheel&&!lib.config.touchscreen){
-					node.node.handcards1.onmousewheel=ui.click.mousewheel;
-					node.node.handcards2.onmousewheel=ui.click.mousewheel;
-					// node.node.equips.onmousewheel=ui.click.mousewheel;
-				}
-
-				node.node.handcards1.ontouchstart = ui.click.touchStart;
-				node.node.handcards2.ontouchstart = ui.click.touchStart;
-				node.node.handcards1.ontouchmove = ui.click.touchScroll;
-				node.node.handcards2.ontouchmove = ui.click.touchScroll;
-				node.node.handcards1.style.WebkitOverflowScrolling='touch';
-				node.node.handcards2.style.WebkitOverflowScrolling='touch';
-
 				for(var i in lib.element.player){
 					node[i]=lib.element.player[i];
 				}
@@ -14091,6 +14078,17 @@
 				ui.me=ui.create.div('#me',ui.arena).animate('start');
 				ui.handcards1Container=ui.create.div('#handcards1',ui.me);
 				ui.handcards2Container=ui.create.div('#handcards2',ui.me);
+				if(lib.config.mousewheel&&!lib.config.touchscreen){
+					ui.handcards1Container.onmousewheel=ui.click.mousewheel;
+					ui.handcards2Container.onmousewheel=ui.click.mousewheel;
+				}
+				ui.handcards1Container.ontouchstart = ui.click.touchStart;
+				ui.handcards2Container.ontouchstart = ui.click.touchStart;
+				ui.handcards1Container.ontouchmove = ui.click.touchScroll;
+				ui.handcards2Container.ontouchmove = ui.click.touchScroll;
+				ui.handcards1Container.style.WebkitOverflowScrolling='touch';
+				ui.handcards2Container.style.WebkitOverflowScrolling='touch';
+
 				if(game.players.length){
 					game.me=game.players[0];
 					ui.handcards1=game.me.node.handcards1;
