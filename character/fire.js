@@ -1,14 +1,14 @@
 'use strict';
 character.fire={
 	character:{
-		zhugeliangwolong:['male','shu',3,['huoji','bazhen','kanpo'],['fullskin']],
-		pangtong:['male','shu',3,['lianhuan','niepan'],['fullskin']],
-		xunyu:['male','wei',3,['quhu','jieming'],['fullskin']],
-		dianwei:['male','wei',4,['qiangxi'],['fullskin']],
-		taishici:['male','wu',4,['tianyi'],['fullskin']],
-		yanwen:['male','qun',4,['shuangxiong'],['fullskin']],
-		yuanshao:['male','qun',4,['luanji','xueyi'],['zhu','fullskin']],
-		pangde:['male','qun',4,['mashu','mengjin'],['fullskin']],
+		zhugeliangwolong:['male','shu',3,['huoji','bazhen','kanpo']],
+		pangtong:['male','shu',3,['lianhuan','niepan']],
+		xunyu:['male','wei',3,['quhu','jieming']],
+		dianwei:['male','wei',4,['qiangxi']],
+		taishici:['male','wu',4,['tianyi']],
+		yanwen:['male','qun',4,['shuangxiong']],
+		yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
+		pangde:['male','qun',4,['mashu','mengjin']],
 	},
 	perfectPair:{
 		zhugeliangwolong:['pangtong','huangyueying'],

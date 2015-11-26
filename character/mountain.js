@@ -1,14 +1,14 @@
 'use strict';
 character.mountain={
 	character:{
-		jiangwei:['male','shu',4,['tiaoxin','zhiji'],['fullskin']],
-		liushan:['male','shu',3,['xiangle','fangquan','ruoyu'],['zhu','fullskin']],
-		zhanghe:['male','wei',4,['qiaobian'],['fullskin']],
-		dengai:['male','wei',4,['tuntian','zaoxian'],['fullskin']],
+		jiangwei:['male','shu',4,['tiaoxin','zhiji']],
+		liushan:['male','shu',3,['xiangle','fangquan','ruoyu'],['zhu']],
+		zhanghe:['male','wei',4,['qiaobian']],
+		dengai:['male','wei',4,['tuntian','zaoxian']],
 		sunce:['male','wu',4,['jiang','hunzi','zhiba'],['zhu','fullskin']],
-		zhangzhang:['male','wu',3,['zhijian','guzheng'],['fullskin']],
-		caiwenji:['female','qun',3,['beige','duanchang'],['fullskin']],
-		zuoci:['male','qun',3,['huashen','xinsheng'],['fullskin']],
+		zhangzhang:['male','wu',3,['zhijian','guzheng']],
+		caiwenji:['female','qun',3,['beige','duanchang']],
+		zuoci:['male','qun',3,['huashen','xinsheng']],
 	},
 	skill:{
 		tiaoxin:{

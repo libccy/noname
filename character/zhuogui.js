@@ -1,10 +1,10 @@
 character.zhuogui={
     character:{
-		nianshou:['male','shu',4,['nianrui','qixiang'],['fullskin']],
-		mamian:['male','qun',4,['lianyu','guiji'],['fullskin']],
-		niutou:['male','shu',4,['manjia','xiaoshou'],['fullskin']],
-		baiwuchang:['male','qun',3,['qiangzheng','moukui'],['fullskin']],
-		heiwuchang:['male','qun',3,['suoling','xixing'],['fullskin']],
+		nianshou:['male','shu',4,['nianrui','qixiang']],
+		mamian:['male','qun',4,['lianyu','guiji']],
+		niutou:['male','shu',4,['manjia','xiaoshou']],
+		baiwuchang:['male','qun',3,['qiangzheng','moukui']],
+		heiwuchang:['male','qun',3,['suoling','xixing']],
     },
     skill:{
         qixiang:{

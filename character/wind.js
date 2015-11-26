@@ -1,14 +1,14 @@
 'use strict';
 character.wind={
 	character:{
-		xiahouyuan:['male','wei',4,['shensu'],['fullskin']],
-		caoren:['male','wei',4,['jushou'],['fullskin']],
-		huangzhong:['male','shu',4,['liegong'],['fullskin']],
-		weiyan:['male','shu',4,['kuanggu'],['fullskin']],
-		xiaoqiao:['female','wu',3,['tianxiang','hongyan'],['fullskin']],
-		zhoutai:['male','wu',4,['buqu','fenji'],['fullskin']],
-		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu','fullskin']],
-		diy_zhangjiao:['male','qun',3,['diyleiji','guidao','huangtian'],['zhu','fullskin']],
+		xiahouyuan:['male','wei',4,['shensu']],
+		caoren:['male','wei',4,['jushou']],
+		huangzhong:['male','shu',4,['liegong']],
+		weiyan:['male','shu',4,['kuanggu']],
+		xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
+		zhoutai:['male','wu',4,['buqu','fenji']],
+		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
+		diy_zhangjiao:['male','qun',3,['diyleiji','guidao','huangtian'],['zhu']],
 		// spzhangjiao:['male','qun',3,['spleiji','guidao','huangtian'],['zhu']],
 		// yuji:['male','qun',3,['guhuo']],
 	},

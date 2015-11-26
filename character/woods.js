@@ -1,14 +1,14 @@
 'use strict';
 character.woods={
 	character:{
-		menghuo:['male','shu',4,['huoshou','zaiqi'],['fullskin']],
-		zhurong:['female','shu',4,['juxiang','lieren'],['fullskin']],
-		caopi:['male','wei',3,['xingshang','fangzhu','songwei'],['zhu','fullskin']],
-		xuhuang:['male','wei',4,['duanliang'],['fullskin']],
-		lusu:['male','wu',3,['haoshi','dimeng'],['fullskin']],
-		sunjian:['male','wu',4,['yinghun'],['fullskin']],
-		dongzhuo:['male','qun',8,['jiuchi','roulin','benghuai','baonue'],['zhu','fullskin']],
-		jiaxu:['male','qun',3,['luanwu','wansha','weimu'],['fullskin']],
+		menghuo:['male','shu',4,['huoshou','zaiqi']],
+		zhurong:['female','shu',4,['juxiang','lieren']],
+		caopi:['male','wei',3,['xingshang','fangzhu','songwei'],['zhu']],
+		xuhuang:['male','wei',4,['duanliang']],
+		lusu:['male','wu',3,['haoshi','dimeng']],
+		sunjian:['male','wu',4,['yinghun']],
+		dongzhuo:['male','qun',8,['jiuchi','roulin','benghuai','baonue'],['zhu']],
+		jiaxu:['male','qun',3,['luanwu','wansha','weimu']],
 	},
 	perfectPair:{
 		menghuo:['zhurong']

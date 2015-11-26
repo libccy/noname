@@ -1,11 +1,11 @@
 'use strict';
 character.xiake={
     character:{
-		// xk_dongfangweiming:['male','shu',4,[],['fullskin']],
-		xk_guyuexuan:['male','qun',4,['rouquan','gzhenji'],['fullskin']],
-		xk_jinji:['male','shu',4,['xueren','lianpo'],['fullskin']],
-        // xk_shenxiangyun:['female','wei',3,['zhenjiu'],['fullskin']],
-		xk_fujianhan:['male','qun',4,['zuijian','zitong'],['fullskin']],
+		// xk_dongfangweiming:['male','shu',4,[]],
+		xk_guyuexuan:['male','qun',4,['rouquan','gzhenji']],
+		xk_jinji:['male','shu',4,['xueren','lianpo']],
+        // xk_shenxiangyun:['female','wei',3,['zhenjiu']],
+		xk_fujianhan:['male','qun',4,['zuijian','zitong']],
     },
     skill:{
         xueren:{

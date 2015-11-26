@@ -6237,7 +6237,8 @@
 					);
 					node1.classList.add('infohidden');
 					node1.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
-					setTimeout(function(){
+					var onEnd01=function(){
+						node1.removeEventListener('webkitTransitionEnd',onEnd01);
 						setTimeout(function(){
 							node1.style.transition='all ease-in 0.3s';
 							node1.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
@@ -6252,32 +6253,36 @@
 								node1.style.transform='';
 								node1.removeEventListener('webkitTransitionEnd',onEnd);
 							}
-							// node1.addEventListener('transitionEnd',onEnd);
 							node1.addEventListener('webkitTransitionEnd',onEnd);
-						},600);
-
+						},300);
+					};
+					node1.addEventListener('webkitTransitionEnd',onEnd01);
+					setTimeout(function(){
 						var node2=target.$throwxy2(card2,
 							'calc(50% + 10px)','calc(50% - 52px)','perspective(600px) rotateY(180deg)',true
 						);
 						node2.classList.add('infohidden');
 						node2.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
-						setTimeout(function(){
-							node2.style.transition='all ease-in 0.3s';
-							node2.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
-							var onEnd=function(){
-								node2.classList.remove('infohidden');
-								node2.style.transition='all 0s';
-								ui.refresh(node2);
-								node2.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
-								ui.refresh(node2);
-								node2.style.transition='';
-								ui.refresh(node2);
-								node2.style.transform='';
-								node2.removeEventListener('webkitTransitionEnd',onEnd);
-							}
-							// node2.addEventListener('transitionEnd',onEnd);
-							node2.addEventListener('webkitTransitionEnd',onEnd);
-						},700);
+						var onEnd02=function(){
+							node2.removeEventListener('webkitTransitionEnd',onEnd02);
+							setTimeout(function(){
+								node2.style.transition='all ease-in 0.3s';
+								node2.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+								var onEnd=function(){
+									node2.classList.remove('infohidden');
+									node2.style.transition='all 0s';
+									ui.refresh(node2);
+									node2.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+									ui.refresh(node2);
+									node2.style.transition='';
+									ui.refresh(node2);
+									node2.style.transform='';
+									node2.removeEventListener('webkitTransitionEnd',onEnd);
+								}
+								node2.addEventListener('webkitTransitionEnd',onEnd);
+							},200);
+						};
+						node2.addEventListener('webkitTransitionEnd',onEnd02);
 					},200);
 				},
 				$throw:function(card,time,init){
@@ -18370,14 +18375,19 @@
 			document.onmouseup=ui.click.windowmouseup;
 			document.oncontextmenu=ui.click.right;
 		}
-		document.ontouchend=function(e){
-			if(e.touches.length==1&&!_status.dragged){
-				ui.click.pause();
-			}
+		else{
+			document.ontouchstart=ui.click.windowmousedown;
+			document.ontouchend=ui.click.windowmousemove;
+			document.ontouchmove=ui.click.windowmousemove;
 		}
-		document.ontouchmove = function(e) {
-			e.preventDefault();
-		};
+		// document.ontouchend=function(e){
+		// 	if(e.touches.length==1&&!_status.dragged){
+		// 		ui.click.pause();
+		// 	}
+		// }
+		// document.ontouchmove = function(e) {
+		// 	e.preventDefault();
+		// };
 		window.onbeforeunload=function(){
 			if(lib.config.confirm_exit&&!_status.reloading){
 				return '是否离开游戏？'

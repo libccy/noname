@@ -1,21 +1,21 @@
 'use strict';
 character.xianjian={
 	character:{
-		pal_lixiaoyao:['male','qun',4,['xiaoyao','yujian'],['fullskin']],
-		pal_zhaoliner:['female','wei',3,['huimeng','tianshe'],['fullskin']],
-		pal_linyueru:['female','wei',3,['guiyuan','qijian'],['fullskin']],
+		pal_lixiaoyao:['male','qun',4,['xiaoyao','yujian']],
+		pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
+		pal_linyueru:['female','wei',3,['guiyuan','qijian']],
 
 		// pal_wangxiaohu:['male','qun',4,['guiyuan','qijian']],
 		// pal_sumei:['female','shu',3,['guiyuan','qijian']],
 		// pal_shenqishuang:['female','wei',3,['guiyuan','qijian']],
 
 
-		pal_jingtian:['male','wu',3,['sajin','jubao'],['fullskin']],
-		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci'],['fullskin']],
+		pal_jingtian:['male','wu',3,['sajin','jubao']],
+		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci']],
 		// pal_longkui:['female','shu',3,['shuangren','shenmu','duci']],
 		// pal_longkuigui:['female','shu',3,['shuangren','shenmu','duci']],
-		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian'],['fullskin']],
-		pal_changqing:['male','wei',4,['luanjian','tianfu'],['fullskin']],
+		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
+		pal_changqing:['male','wei',4,['luanjian','tianfu']],
 
 		// pal_nangonghuang:['male','wei',3,[]],
 		// pal_wenhui:['female','shu',4,[]],
@@ -23,11 +23,11 @@ character.xianjian={
 		// pal_xingxuan:['male','wei',3,[]],
 		// pal_xingxuan:['male','wei',3,[]],
 
-		pal_yuntianhe:['male','wu',4,['longxi','zhuyue','guanri'],['fullskin']],
-		pal_hanlingsha:['female','shu',3,['tannang','tuoqiao'],['fullskin']],
-		pal_liumengli:['female','wei',3,['tianxian','runxin','zhimeng'],['fullskin']],
-		pal_murongziying:['male','wei',4,['xuanning','poyun','qianfang'],['fullskin']],
-		pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','fenxin'],['fullskin']],
+		pal_yuntianhe:['male','wu',4,['longxi','zhuyue','guanri']],
+		pal_hanlingsha:['female','shu',3,['tannang','tuoqiao']],
+		pal_liumengli:['female','wei',3,['tianxian','runxin','zhimeng']],
+		pal_murongziying:['male','wei',4,['xuanning','poyun','qianfang']],
+		pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','fenxin']],
 
 	},
 	skill:{

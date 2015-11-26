@@ -1,14 +1,14 @@
 'use strict';
 character.jiange={
     character:{
-        jg_pangtong:['male','shu',3,['qiwu','tianyu'],['fullskin']],
-        jg_huangyueying:['female','shu',3,['zhinang','jingmiao'],['fullskin']],
-        jg_zhugeliang:['male','shu',3,['biantian','bazhen'],['fullskin']],
-        jg_liubei:['male','shu',4,['jizhen','lingfeng'],['fullskin']],
-        jg_xiahouyuan:['male','wei',4,['shensu','juechen'],['fullskin']],
-        jg_caozhen:['male','wei',4,['chiying','jingfan'],['fullskin']],
-        jg_zhanghe:['male','wei',4,['huodi','jueji'],['fullskin']],
-        jg_simayi:['male','wei',5,['xuanlei','sfanshi','konghun'],['fullskin']],
+        jg_pangtong:['male','shu',3,['qiwu','tianyu']],
+        jg_huangyueying:['female','shu',3,['zhinang','jingmiao']],
+        jg_zhugeliang:['male','shu',3,['biantian','bazhen']],
+        jg_liubei:['male','shu',4,['jizhen','lingfeng']],
+        jg_xiahouyuan:['male','wei',4,['shensu','juechen']],
+        jg_caozhen:['male','wei',4,['chiying','jingfan']],
+        jg_zhanghe:['male','wei',4,['huodi','jueji']],
+        jg_simayi:['male','wei',5,['xuanlei','sfanshi','konghun']],
     },
     skill:{
         sfanshi:{

@@ -88,6 +88,7 @@ window.characterRank={
         'zhoutai',
         'zhongyao',
         'liuchen',
+        'baiwuchang',
     ],
     am:[
         'zhugeguo',
@@ -102,6 +103,7 @@ window.characterRank={
         'xunyou',
         're_daqiao',
         'swd_fengyu',
+        'nianshou',
         'swd_xuanyuanjiantong',
         'diy_caiwenji',
         'zhugeke',
@@ -151,10 +153,12 @@ window.characterRank={
     bp:[
         'gongsunyuan',
         'guotufengji',
+        'mamian',
         'shixie',
         'yxs_mozi',
         'hs_xuefashi',
         'xiahoushi',
+        'heiwuchang',
         'zhangsong',
         'zhuhuan',
         'yxs_aijiyanhou',

@@ -1,13 +1,13 @@
 'use strict';
 character.yxs={
 	character:{
-		yxs_wuzetian:['female','wu',4,['nvquan','qiandu','weiyi'],['fullskin']],
-		yxs_caocao:['male','wei',4,['zhulu','xieling'],['fullskin']],
-		yxs_mozi:['male','qun',3,['jieyong','feigong','jianai'],['fullskin']],
-		yxs_bole:['male','wu',3,['bolehuiyan','xiangma'],['fullskin']],
-		yxs_aijiyanhou:['female','qun',3,['seyou','sheshi'],['fullskin']],
-		yxs_diaochan:['female','qun',3,['fengyi','wange'],['fullskin']],
-		yxs_yangyuhuan:['female','wu',3,['fengyan','nichang'],['fullskin']],
+		yxs_wuzetian:['female','wu',4,['nvquan','qiandu','weiyi']],
+		yxs_caocao:['male','wei',4,['zhulu','xieling']],
+		yxs_mozi:['male','qun',3,['jieyong','feigong','jianai']],
+		yxs_bole:['male','wu',3,['bolehuiyan','xiangma']],
+		yxs_aijiyanhou:['female','qun',3,['seyou','sheshi']],
+		yxs_diaochan:['female','qun',3,['fengyi','wange']],
+		yxs_yangyuhuan:['female','wu',3,['fengyan','nichang']],
 	},
 	skill:{
 		nichang:{

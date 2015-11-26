@@ -1,13 +1,13 @@
 character.extra={
 	character:{
-		shen_guanyu:['male','shu',6,['wuhun','wushen'],['fullskin']],
-		shen_zhaoyun:['male','shu',2,['juejing','longhun'],['fullskin'],['fullskin']],
-		shen_zhugeliang:['male','shu',3,['qixing','kuangfeng','dawu'],['fullskin']],
-		shen_lvmeng:['male','wu',3,['shelie','gongxin'],['fullskin']],
-		shen_zhouyu:['male','wu',4,['yeyan','qinyin'],['fullskin']],
-		shen_simayi:['male','wei',4,['renjie','sbaiyin','lianpo'],['fullskin']],
-		shen_caocao:['male','wei',3,['guixin','feiying'],['fullskin']],
-		shen_lvbu:['male','qun',5,['baonu','wuqian','shenfen'],['fullskin']],
+		shen_guanyu:['male','shu',6,['wuhun','wushen']],
+		shen_zhaoyun:['male','shu',2,['juejing','longhun']],
+		shen_zhugeliang:['male','shu',3,['qixing','kuangfeng','dawu']],
+		shen_lvmeng:['male','wu',3,['shelie','gongxin']],
+		shen_zhouyu:['male','wu',4,['yeyan','qinyin']],
+		shen_simayi:['male','wei',4,['renjie','sbaiyin','lianpo']],
+		shen_caocao:['male','wei',3,['guixin','feiying']],
+		shen_lvbu:['male','qun',5,['baonu','wuqian','shenfen']],
 	},
 	skill:{
 		lianpo:{

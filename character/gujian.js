@@ -1,16 +1,16 @@
 character.gujian={
 	character:{
-		gjqt_bailitusu:['male','shu',4,['xuelu','fanshi','shahun'],['fullskin']],
-		gjqt_fengqingxue:['female','wu',3,['qinglan','yuehua','swd_wuxie'],['fullskin']],
-		gjqt_xiangling:['female','wu',3,['qianhuan','meihu','xidie'],['fullskin']],
-		gjqt_fanglansheng:['male','wu',3,['fanyin','mingkong','fumo'],['fullskin']],
-		gjqt_yinqianshang:['male','qun',4,['zhongji','zuizhan'],['fullskin']],
-		gjqt_hongyu:['female','shu',4,['jianwu','meiying'],['fullskin']],
+		gjqt_bailitusu:['male','shu',4,['xuelu','fanshi','shahun']],
+		gjqt_fengqingxue:['female','wu',3,['qinglan','yuehua','swd_wuxie']],
+		gjqt_xiangling:['female','wu',3,['qianhuan','meihu','xidie']],
+		gjqt_fanglansheng:['male','wu',3,['fanyin','mingkong','fumo']],
+		gjqt_yinqianshang:['male','qun',4,['zhongji','zuizhan']],
+		gjqt_hongyu:['female','shu',4,['jianwu','meiying']],
 
-		gjqt_yuewuyi:['male','wei',4,['yanjia','xiuhua'],['fullskin']],
-		gjqt_wenrenyu:['female','shu',4,['jizhan','qianjun'],['fullskin']],
-		gjqt_xiayize:['male','qun',3,['xuanning','liuguang','yangming'],['fullskin']],
-		gjqt_aruan:['female','wu',3,['zhaolu','jiehuo','yuling'],['fullskin']],
+		gjqt_yuewuyi:['male','wei',4,['yanjia','xiuhua']],
+		gjqt_wenrenyu:['female','shu',4,['jizhan','qianjun']],
+		gjqt_xiayize:['male','qun',3,['xuanning','liuguang','yangming']],
+		gjqt_aruan:['female','wu',3,['zhaolu','jiehuo','yuling']],
 	},
 	skill:{
 		jianwu:{
