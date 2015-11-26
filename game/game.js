@@ -16230,6 +16230,7 @@
 		updatehl:function(){
 			if(!game.me) return;
 			if(!lib.config.low_performance) return;
+			if(!ui.handcards1Container||!ui.handcards2Container) return;
 			var hs1=[],hs2=[];
 			for(var i=0;i<ui.handcards1Container.firstChild.childElementCount;i++){
 				if(!ui.handcards1Container.firstChild.childNodes[i].classList.contains('removing')){

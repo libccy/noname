@@ -3541,6 +3541,9 @@ mode.chess={
 					dialog.add('挑战魔王');
 					dialog.add(bosses);
 				}
+				for(var i=0;i<bosses.childNodes.length;i++){
+					bosses.childNodes[i].classList.add('squarebutton');
+				}
 				ui.control.style.transition='all 0s';
 				if(lib.config.layout=='mobile'){
 					ui.control.style.top='calc(100% - 70px)';

@@ -206,3 +206,17 @@
     top: 66px;
     left: 5px;
 }
+.dialog .buttons>.button.character.squarebutton{
+    height:90px;
+}
+.dialog .buttons>.button.character.squarebutton>.hp.text{
+    /*left:22px;*/
+    right: 4px;
+    text-align: right;
+    bottom: 4px;
+    top: auto;
+    left: auto;
+}
+.dialog .buttons>.button.character.squarebutton>.name{
+    top:8px;
+}

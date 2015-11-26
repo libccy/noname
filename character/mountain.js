@@ -525,6 +525,8 @@ character.mountain={
 			filter:function(event,player){
 				return player.storage.tuntian.length>0;
 			},
+			delay:false,
+			direct:true,
 			content:function(){
 				"step 0"
 				player.chooseCardButton('急袭',player.storage.tuntian);
@@ -532,18 +534,13 @@ character.mountain={
 				if(result.bool){
 					var card=result.buttons[0].link;
 					event.card=card;
-					player.storage.tuntian.remove(card);
-					game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);
-					if(!player.storage.tuntian.length){
-						player.unmarkSkill('tuntian');
-					}
 					player.chooseTarget(function(noname,player,target){
 						var temp=card.name;
 						card.name='shunshou';
 						var result=player.canUse(card,target);
 						card.name=temp;
 						return result;
-					},true).ai=function(target){
+					}).ai=function(target){
 						return -ai.get.attitude(player,target);
 					};
 				}
@@ -551,8 +548,15 @@ character.mountain={
 					event.finish();
 				}
 				"step 2"
-				if(result.bool){
-					player.useCard({name:'shunshou'},[event.card],result.targets[0])
+				if(result.bool&&result.targets&&result.targets.length){
+					var card=event.card;
+					player.storage.tuntian.remove(card);
+					game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);
+					if(!player.storage.tuntian.length){
+						player.unmarkSkill('tuntian');
+					}
+					player.logSkill('jixi',result.targets);
+					player.useCard({name:'shunshou'},[event.card],result.targets[0]);
 				}
 			},
 			ai:{
