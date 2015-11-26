@@ -16,7 +16,7 @@ card.hearth={
 			ai:{
 				basic:{
 					order:5,
-					value:[5,1],
+					value:[6,1],
 					useful:2,
 				},
 				result:{

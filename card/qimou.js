@@ -285,7 +285,7 @@ card.qimou={
 					return 0;
 				},
 				useful:3,
-				value:7
+				value:4
 			}
 		},
 	},

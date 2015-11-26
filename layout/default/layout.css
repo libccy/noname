@@ -489,6 +489,9 @@ margin-bottom: 5px;
 .identity{text-align: center;width: 22px;height: 22px;}
 .identity>div{position: relative;top: 2px;}
 .unseen>.avatar,.unseen>.name,.unseen2>.avatar2{opacity: 0 !important;}
+.player[data-position='0'].unseen>.avatar,
+.player[data-position='0'].unseen2>.avatar2,
+.player[data-position='0']>.name{opacity: 0.2 !important}
 .linked>.avatar,.linked>.avatar2{transform:rotate(-90deg);}
 .linked>.avatar2{top: 5px;}
 .linked>.identity{top: 88px;}
@@ -728,7 +731,7 @@ div:hover>.intro{opacity: 1;}
 	0 10px 10px -9px rgba(0,0,0,0.1),0 10px 0 -9px rgba(0,0,0,0.05);}*/
 .selected,.target{/*transform: scale(1.05);*/}
 /*.player.target{-webkit-filter:brightness(1.2)}*/
-.target{transform: rotate(-3deg);}
+.target{transform: rotate(-3deg);box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.8) 0 0 15px !important;}
 .target2{transform: rotate(3deg);}
 .content>.config.line2{
 	transform:translateX(-5px);

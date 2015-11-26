@@ -1176,14 +1176,16 @@ character.sp={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			content:function(){
-				player.unmark(player.storage.zhoufu2.name);
-				if(player.storage.zhoufu3.isAlive()){
-					player.storage.zhoufu3.gain(player.storage.zhoufu2);
-					player.$give(player.storage.zhoufu2,player.storage.zhoufu3);
-					game.delay();
-				}
-				else{
-					ui.discardPile.appendChild(player.storage.zhoufu2);
+				if(player.storage.zhoufu2){
+					player.unmark(player.storage.zhoufu2.name);
+					if(player.storage.zhoufu3.isAlive()){
+						player.storage.zhoufu3.gain(player.storage.zhoufu2);
+						player.$give(player.storage.zhoufu2,player.storage.zhoufu3);
+						game.delay();
+					}
+					else{
+						ui.discardPile.appendChild(player.storage.zhoufu2);
+					}
 				}
 				player.removeSkill('zhoufu2');
 				delete player.storage.zhoufu2;

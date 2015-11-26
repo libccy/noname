@@ -1103,7 +1103,7 @@ character.yijiang={
 						clone.delete();
 						game.addVideo('deletenode',player,get.cardsInfo([clone]));
 					}
-					player.gainPlayerCard(target,true);
+					player.gainPlayerCard(target,true,'he');
 				}
 				else{
 					player.$gain2(event.card1);

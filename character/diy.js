@@ -218,7 +218,7 @@ character.diy={
 				return true;
 			},
 			filterTarget:function(card,player,target){
-				return target.sex=='male';
+				return target.sex=='male'&&player!=target;
 			},
 			content:function(){
 				"step 0"

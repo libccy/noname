@@ -118,7 +118,8 @@
 					touchscreen:{
 						name:'触屏模式',
 						init:false,
-						restart:true
+						restart:true,
+						unfrequent:true,
 					},
 					change_skin:{
 						name:'双击换肤',
@@ -665,6 +666,11 @@
 					},
 					jiu_effect:{
 						name:'喝酒效果',
+						init:true,
+						unfrequent:true,
+					},
+					die_flip:{
+						name:'阵亡效果',
 						init:true,
 						unfrequent:true,
 					},
@@ -3273,6 +3279,10 @@
 					}
 					"step 6"
 					if(event.card.name!='wuxie') ui.clear();
+					if(ui.tempnowuxie&&ui.tempnowuxie._origin==event){
+						ui.tempnowuxie.close();
+						delete ui.tempnowuxie;
+					}
 				},
 				useSkill:function(){
 					"step 0"
@@ -3932,6 +3942,10 @@
 					game.addVideo('diex',player);
 					player.$die(source);
 					if(player.dieAfter) player.dieAfter(source);
+					if(ui.tempnowuxie&&ui.tempnowuxie._origin&&ui.tempnowuxie._origin.player==player){
+						ui.tempnowuxie.close();
+						delete ui.tempnowuxie;
+					}
 				},
 				equip:function(){
 					"step 0"
@@ -7043,28 +7057,30 @@
 				},
 				$die:function(){
 					game.addVideo('die',this);
-					var top0=ui.window.offsetHeight/2;
-					var left0=ui.window.offsetWidth/2;
-					var ratio=(left0-this.offsetLeft)/(top0-this.offsetTop);
-					var left=Math.abs(50*ratio/Math.sqrt(1+ratio*ratio));
-					var top=Math.abs(50/Math.sqrt(1+ratio*ratio));
-					if(left0-this.offsetLeft>0) left=-left;
-					if(top0-this.offsetTop>0) top=-top;
-					if(lib.isMobileMe(this)){
-						left=-Math.random()*5-10;
-						top=Math.random()*5+10;
+					if(lib.config.die_flip){
+						var top0=ui.window.offsetHeight/2;
+						var left0=ui.window.offsetWidth/2;
+						var ratio=(left0-this.offsetLeft)/(top0-this.offsetTop);
+						var left=Math.abs(50*ratio/Math.sqrt(1+ratio*ratio));
+						var top=Math.abs(50/Math.sqrt(1+ratio*ratio));
+						if(left0-this.offsetLeft>0) left=-left;
+						if(top0-this.offsetTop>0) top=-top;
+						if(lib.isMobileMe(this)){
+							left=-Math.random()*5-10;
+							top=Math.random()*5+10;
+						}
+						var transform='translate('+left+'px,'+top+'px) '+
+						'rotate('+(Math.random()*20-10)+'deg) '+
+						((Math.random()-0.5<0)?'rotateX(180deg)':'rotateY(180deg)');
+						if(lib.isMobileMe(this)){
+							this.node.avatar.style.transform=transform;
+							this.node.avatar2.style.transform=transform;
+						}
+						else{
+							this.style.transform=transform;
+						}
+						this.queue(false);
 					}
-					var transform='translate('+left+'px,'+top+'px) '+
-					'rotate('+(Math.random()*20-10)+'deg) '+
-					((Math.random()-0.5<0)?'rotateX(180deg)':'rotateY(180deg)');
-					if(lib.isMobileMe(this)){
-						this.node.avatar.style.transform=transform;
-						this.node.avatar2.style.transform=transform;
-					}
-					else{
-						this.style.transform=transform;
-					}
-					this.queue(false);
 				},
 				$phaseJudge:function(card){
 					game.addVideo('phaseJudge',this,get.cardInfo(card));
@@ -13587,7 +13603,7 @@
 							var perserveMenu=false;
 							game.print=function(){
 								for(var i=0;i<arguments.length;i++){
-									if(arguments[i]){
+									if(arguments[i]!==undefined){
 										textstr+=arguments[i]+' '
 									}
 								}
@@ -14430,6 +14446,195 @@
 			dieswap2:function(){
 				if(_status.dragged) return;
 				game.swapPlayer(this.link);
+			},
+			windowtouchstart:function(e){
+				_status.mousedown=true;
+				if(e.path){
+					for(var i=0;i<e.path.length;i++){
+						var itemtype=get.itemtype(e.path[i]);
+						if(itemtype=='button') break;
+						if(itemtype=='dialog'&&
+						!e.path[i].classList.contains('popped')&&
+						!e.path[i].classList.contains('fixed')){
+							var ddialog=e.path[i];
+							_status.draggingdialog=ddialog;
+							ddialog._dragorigin=e;
+							if(!ddialog._dragtransform){
+								ddialog._dragtransform=[0,0];
+							}
+							return;
+						}
+					}
+				}
+				var evt=_status.event;
+				if(!lib.config.enable_drag) return;
+				if(!ui.arena.classList.contains('selecting')) return;
+				if(!evt.isMine()) return;
+				if(!Array.isArray(e.path)) return;
+				for(var i=0;i<e.path.length;i++){
+					var itemtype=get.itemtype(e.path[i]);
+					if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
+						if(e.path[i].classList.contains('selectable')&&
+							!e.path[i].classList.contains('selected')&&
+							!e.path[i].classList.contains('noclick')){
+							_status.clicked=false;
+							ui.click[itemtype].call(e.path[i]);
+							if(e.path[i].classList.contains('selected')){
+								_status.mousedragging=e.touches[0];
+								_status.mousedragorigin=e.path[i];
+								_status.mouseleft=false;
+								_status.selectionfull=false;
+								_status.multitarget=false;
+								// if(ui.confirm&&ui.confirm.str=='c') ui.confirm.close();
+							}
+						}
+						return;
+					}
+				}
+			},
+			windowtouchmove:function(e){
+				if(!Array.isArray(e.path)) return;
+				var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
+				for(var i=0;i<dialogs.length;i++){
+					dialogs[i].delete();
+				}
+				var node=_status.currentmouseenter;
+				if(_status.mousedragging){
+					e.preventDefault();
+					ui.canvas.width=ui.arena.offsetWidth;
+					ui.canvas.height=ui.arena.offsetHeight;
+					var ctx=ui.ctx;
+					ctx.shadowBlur=5;
+					ctx.shadowColor='rgba(0,0,0,0.3)';
+					ctx.strokeStyle='white';
+					ctx.lineWidth=3;
+					ctx.setLineDash([8,2]);
+
+					ctx.beginPath();
+					ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
+					if(_status.multitarget){
+						for(var i=0;i<_status.lastdragchange.length;i++){
+							var exy=_status.lastdragchange[i]._lastdragchange;
+							ctx.lineTo(exy[0],exy[1]);
+						}
+					}
+					if(!_status.selectionfull){
+						ctx.lineTo(e.touches[0].clientX-ui.arena.offsetLeft,e.touches[0].clientY-ui.arena.offsetTop);
+					}
+					ctx.stroke();
+					if(!_status.multitarget){
+						for(var i=0;i<_status.lastdragchange.length;i++){
+							ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
+							var exy=_status.lastdragchange[i]._lastdragchange;
+							ctx.lineTo(exy[0],exy[1]);
+							ctx.stroke();
+						}
+					}
+
+					for(var i=0;i<e.path.length;i++){
+						// e.path.contains(_status.mousedragorigin)===true
+						if(e.path[i]==_status.mousedragorigin){
+							if(_status.mouseleft){
+								_status.mousedragging=null;
+								_status.mousedragorigin=null;
+								_status.clicked=false;
+								game.uncheck();
+								game.check();
+								ui.canvas.width=ui.arena.offsetWidth;
+								ui.canvas.height=ui.arena.offsetHeight;
+								_status.clicked=true;
+							}
+							return;
+						}
+						game.print(2);
+						var itemtype=get.itemtype(e.path[i]);
+						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
+							_status.mouseleft=true;
+							var item=e.path[i];
+							var ex=e.touches[0].clientX-ui.arena.offsetLeft;
+							var ey=e.touches[0].clientY-ui.arena.offsetTop;
+							var exx=ex,eyy=ey;
+							if(lib.config.mode=='chess'){
+								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
+								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
+							}
+							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
+								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
+								var targetfixed=false;
+								if(itemtype=='player'){
+									if(get.select(_status.event.selectTarget)[1]==-1){
+										targetfixed=true;
+									}
+								}
+								if(!targetfixed&&item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
+									_status.mouseleft=true;
+									_status.dragstatuschanged=item;
+									_status.clicked=false;
+									var notbefore=itemtype=='player'&&!item.classList.contains('selected');
+									ui.click[itemtype].call(item);
+									if(item.classList.contains('selected')){
+										if(notbefore){
+											_status.lastdragchange.push(item);
+											e.path[i]._lastdragchange=[exx,eyy];
+										}
+									}
+									else{
+										_status.lastdragchange.remove(item);
+									}
+									_status.selectionfull=true;
+									if(_status.event.filterButton&&ui.selected.buttons.length<get.select(_status.event.selectButton)[1]){
+										_status.selectionfull=false;
+									}
+									else if(_status.event.filterCard&&ui.selected.cards.length<get.select(_status.event.selectCard)[1]){
+										_status.selectionfull=false;
+									}
+									else if(_status.event.filterTarget&&ui.selected.targets.length<get.select(_status.event.selectTarget)[1]){
+										_status.selectionfull=false;
+									}
+								}
+							}
+							return;
+						}
+					}
+					_status.mouseleft=true;
+					_status.dragstatuschanged=null;
+				}
+				e.preventDefault();
+			},
+			windowtouchend:function(e){
+				if(e.touches.length==1&&!_status.dragged){
+					ui.click.pause();
+				}
+				else{
+					var tmpflag=false;
+					_status.mousedown=false;
+					if(_status.mousedragging&&_status.mouseleft){
+						if(game.check()){
+							if(ui.confirm){
+								ui.confirm.close();
+							}
+							ui.click.ok();
+						}
+						else{
+							game.uncheck();
+							game.check();
+						}
+					}
+					else if(_status.mousedragging&&_status.mousedragorigin){
+						tmpflag=_status.mousedragorigin;
+					}
+					_status.lastdragchange.length=0;
+					_status.mousedragging=null;
+					_status.mouseleft=false;
+					_status.mousedragorigin=null;
+					_status.dragstatuschanged=false;
+					ui.canvas.width=ui.arena.offsetWidth;
+					ui.canvas.height=ui.arena.offsetHeight;
+					if(tmpflag){
+						ui.click[get.itemtype(tmpflag)].call(tmpflag);
+						game.check();
+					}
+				}
 			},
 			windowmousewheel:function(e){
 				_status.tempunpopup=e;
@@ -15313,6 +15518,15 @@
 					ui.click.cancel(ui.confirm.lastChild);
 				}
 			},
+			tempnowuxie:function(){
+				if(this.classList.contains('hidden')) return;
+				this.classList.toggle('glow');
+				if(this.classList.contains('glow')&&
+				(_status.event.parent.name=='_wuxie1'||_status.event.parent.name=='_wuxie2')&&
+				_status.event.isMine()&&ui.confirm){
+					ui.click.cancel(ui.confirm.lastChild);
+				}
+			},
 			pause:function(){
 				if(_status.paused2) return;
 				ui.system.hide();
@@ -15438,6 +15652,7 @@
 				_status.dragged=false;
 			},
 			touchScroll:function(e) {
+				if(_status.mousedragging) return;
 				if(!_status.dragged){
 					if (Math.abs(e.touches[0].clientX - this.startX) > 10 ||
 						Math.abs(e.touches[0].clientY - this.startY) > 10) {
@@ -18376,18 +18591,18 @@
 			document.oncontextmenu=ui.click.right;
 		}
 		else{
-			document.ontouchstart=ui.click.windowmousedown;
-			document.ontouchend=ui.click.windowmousemove;
-			document.ontouchmove=ui.click.windowmousemove;
+			// document.ontouchstart=ui.click.windowtouchstart;
+			// document.ontouchend=ui.click.windowtouchend;
+			// document.ontouchmove=ui.click.windowtouchmove;
+			document.ontouchend=function(e){
+				if(e.touches.length==1&&!_status.dragged){
+					ui.click.pause();
+				}
+			}
+			document.ontouchmove = function(e) {
+				e.preventDefault();
+			};
 		}
-		// document.ontouchend=function(e){
-		// 	if(e.touches.length==1&&!_status.dragged){
-		// 		ui.click.pause();
-		// 	}
-		// }
-		// document.ontouchmove = function(e) {
-		// 	e.preventDefault();
-		// };
 		window.onbeforeunload=function(){
 			if(lib.config.confirm_exit&&!_status.reloading){
 				return '是否离开游戏？'

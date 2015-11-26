@@ -1272,7 +1272,8 @@ card.standard={
 				event.state=true;
 				event.card=trigger.card;
 				"step 1"
-				if(ui.wuxie.classList.contains('glow')&&!_status.auto){
+				if((ui.wuxie.classList.contains('glow')||(ui.tempnowuxie&&
+					ui.tempnowuxie.classList.contains('glow')))&&!_status.auto){
 					if(event.current==game.me||event.current.isUnderControl()){
 						event._result={bool:false};
 						return;
@@ -1316,7 +1317,7 @@ card.standard={
 					str+='失效';
 				}
 				str+='，是否无懈？';
-				event.current.chooseToUse({
+				var nevt=event.current.chooseToUse({
 					filterCard:function(card,player){
 						if(card.name!='wuxie') return false;
 						var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
@@ -1344,6 +1345,12 @@ card.standard={
 					source:event.source,
 					source2:event.source2
 				});
+				if(nevt.isMine()&&!trigger.multitarget){
+					if(trigger.targets.length>1&&!ui.tempnowuxie){
+						ui.tempnowuxie=ui.create.control('本轮不无懈',ui.click.tempnowuxie);
+						ui.tempnowuxie._origin=trigger.parent;
+					}
+				}
 				"step 2"
 				if(result.bool){
 					event.end=event.current;
