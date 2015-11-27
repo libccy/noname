@@ -6204,12 +6204,7 @@
 					node.style.top='calc(50% - 52px)';
 
 					this.parentNode.appendChild(node);
-					if(!lib.config.low_performance){
-						node.style.transitionDuration='1s';
-					}
-					else{
-						node.style.transitionDuration='0.8s';
-					}
+					node.style.transitionDuration='0.8s';
 					ui.refresh(node);
 
 					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
@@ -6257,13 +6252,6 @@
 						ui.refresh(node);
 						node.delete();
 					});
-					if(!lib.config.low_performance){
-						setTimeout(function(){
-							node.style.transitionDuration='0.5s';
-							ui.refresh(node);
-							node.hide();
-						},700);
-					}
 					var that=this;
 					if(num&&num>1){
 						if(config&&config.total>1){
