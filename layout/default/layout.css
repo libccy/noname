@@ -101,6 +101,14 @@ table{table-layout: fixed;}
 #sidebar3.left{left:0;text-align:left;}
 .dialog.popped #sidebar,
 .dialog.popped #sidebar2{padding:0;}
+.dialog .poppedpile{
+	width: 100%;
+	padding-bottom: 10px;
+}
+.dialog .poppedpile>div{
+	display: block;
+	position: relative;
+}
 #sidebar>div,#sidebar3>div{margin: 10px;position: relative;display: block;min-height: 5px;}
 #scrollzone1{left: 0;}
 #scrollzone2{left: calc(50% - 140px);}
@@ -226,6 +234,23 @@ body>.background{z-index:-2}
 .card>.background{font-family:'xiaozhuan'}
 .card>.background.tight{letter-spacing: -0.2em}
 .marks>.card>.background.skillmark{font-family:'huangcao';padding-top:4px;}
+.marks>.card.overflowmark{
+	overflow: visible;
+}
+.marks>div>.markcount.menubutton{
+	font-family: 'xinwei';
+	font-size: 9px;
+	width: 12px;
+	height: 12px;
+	padding: 0;
+	line-height: 14px;
+	position: absolute;
+	left: 16px;
+	top: 14px;
+	border-radius: 100%;
+	z-index: 1;
+	display: block !important;
+}
 /*--------窗口--------*/
 .dialog{text-align: center;z-index:4;}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
@@ -491,7 +516,8 @@ margin-bottom: 5px;
 .unseen>.avatar,.unseen>.name,.unseen2>.avatar2{opacity: 0 !important;}
 .player[data-position='0'].unseen>.avatar,
 .player[data-position='0'].unseen2>.avatar2,
-.player[data-position='0']>.name{opacity: 0.2 !important}
+.player[data-position='0'].unseen>.name,
+.player[data-position='0'].unseen2>.name{opacity: 0.2 !important}
 .linked>.avatar,.linked>.avatar2{transform:rotate(-90deg);}
 .linked>.avatar2{top: 5px;}
 .linked>.identity{top: 88px;}

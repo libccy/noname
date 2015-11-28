@@ -2600,7 +2600,8 @@ character.yijiang={
 			trigger:{player:'useCard'},
 			frequent:true,
 			filter:function(event,player){
-				return (get.type(event.card,'trick')==player.storage.qiangzhi&&event.cards[0]&&event.cards[0]==event.card);
+				// return (get.type(event.card,'trick')==player.storage.qiangzhi&&event.cards[0]&&event.cards[0]==event.card);
+				return get.type(event.card,'trick')==player.storage.qiangzhi;
 			},
 			content:function(){
 				player.draw();
@@ -3607,6 +3608,9 @@ character.yijiang={
 			trigger:{source:'damageBefore',player:'damageBefore'},
 			forced:true,
 			priority:15,
+			check:function(event,player){
+				return ai.get.effect(event.target,event.card,event.player,player)<0;
+			},
 			filter:function(event,player){
 				return get.type(event.card,'trick')=='trick';
 			},

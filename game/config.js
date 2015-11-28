@@ -226,8 +226,9 @@ window.config={
 	show_pause:true,
 	show_auto:true,
 	show_volumn:true,
+	show_cardpile:true,
 	only_fullskin:true,
-	show_wuxie:true,
+	show_wuxie:false,
 	show_wuxie_self:true,
 	show_stat:true,
 	show_playerids:true,
@@ -258,6 +259,8 @@ window.config={
 	plays:[],
 	banned:[],
 	bannedcards:[],
+	bannedpile:{},
+	addedpile:{},
 
 	mode:'identity',
 	mode_config:{

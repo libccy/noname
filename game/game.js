@@ -598,9 +598,23 @@
 							}
 						}
 					},
+					show_cardpile:{
+						name:'显示牌堆按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_cardpile',bool);
+							if(lib.config.show_cardpile){
+								ui.cardPileButton.style.display='';
+							}
+							else{
+								ui.cardPileButton.style.display='none';
+							}
+						}
+					},
 					show_wuxie:{
 						name:'显示不询问无懈',
-						init:true,
+						init:false,
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_wuxie',bool);
@@ -4340,7 +4354,36 @@
 						delete this.node.jiu;
 						delete this.node.jiu2;
 					}
+					this.updateMarks();
 					return this;
+				},
+				updateMarks:function(){
+					for(var i in this.marks){
+						if(i=='ghujia'||(!this.marks[i].querySelector('.image')&&lib.skill[i]&&
+							lib.skill[i].intro&&this.storage[i])){
+							this.marks[i].classList.add('overflowmark')
+							var num;
+							if(i=='ghujia'){
+								num=this.hujia;
+							}
+							else if(typeof this.storage[i]=='number'){
+								num=this.storage[i];
+							}
+							else if(Array.isArray(this.storage[i])){
+								num=this.storage[i].length;
+							}
+							if(num){
+								if(!this.marks[i].markcount){
+									this.marks[i].markcount=ui.create.div('.markcount.menubutton',this.marks[i]);
+								}
+								this.marks[i].markcount.innerHTML=num;
+							}
+							else if(this.marks[i].markcount){
+								this.marks[i].markcount.delete();
+								delete this.marks[i].markcount;
+							}
+						}
+					}
 				},
 				num:function(arg1,arg2,arg3){
 					var i,j,k;
@@ -5791,6 +5834,7 @@
 					}
 					if(this.marks[name]){
 						this.marks[name].info=info;
+						this.updateMarks();
 					}
 					else{
 						if(card){
@@ -5888,6 +5932,7 @@
 								node.oncontextmenu=ui.click.rightplayer;
 							}
 						}
+						this.updateMarks();
 						return node;
 					}
 				},
@@ -8085,6 +8130,7 @@
 		},
 		character:{},
 		perfectPair:{},
+		cardPile:{},
 		group:['wei','shu','wu','qun'],
 		nature:['fire','thunder','poison'],
 		linked:['fire','thunder'],
@@ -9355,6 +9401,9 @@
 		addVideo:function(type,player,content){
 			if(_status.video) return;
 			if(!_status.videoInited) return;
+			if(type=='storage'&&player&&player.update){
+				player.updateMarks();
+			}
 			if(game.getVideoName){
 				var time=get.time();
 				if(!_status.lastVideoLog){
@@ -9998,9 +10047,21 @@
 			var vinum=parseInt(lib.config.video);
 			if(!_status.video&&vinum&&game.getVideoName&&window.indexedDB){
 				var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-				if(lib.videos.length>=vinum){
-					var toremove=lib.videos.pop();
-					store.delete(toremove.time);
+				var videos=lib.videos.slice(0);
+				for(var i=0;i<videos.length;i++){
+					if(videos[i].starred){
+						videos.splice(i--,1);
+					}
+				}
+				for(var deletei=0;deletei<5;deletei++){
+					if(videos.length>=vinum){
+						var toremove=videos.pop();
+						lib.videos.remove(toremove);
+						store.delete(toremove.time);
+					}
+					else{
+						break;
+					}
 				}
 				var newvid={
 					name:game.getVideoName(),
@@ -11148,6 +11209,28 @@
 				if(listen) node.listen(listen);
 	            return node;
 			},
+			selectlist:function(list,init,position){
+				var select=document.createElement('select');
+				for(var i=0;i<list.length;i++){
+					var option=document.createElement('option');
+					if(Array.isArray(list[i])){
+						option.value=list[i][0];
+						option.innerHTML=list[i][1];
+					}
+					else{
+						option.value=list[i];
+						option.innerHTML=list[i];
+					}
+					if(init==list[i]){
+						option.selected='selected';
+					}
+					select.appendChild(option);
+				}
+				if(position){
+					position.appendChild(select);
+				}
+				return select;
+			},
 			table:function(){
 				var str,row,col,position,position2,fixed,style,divposition;
 				for(var i=0;i<arguments.length;i++){
@@ -11296,7 +11379,8 @@
 				else{
 					for(var i in lib.character){
 						if(lib.character[i][4].contains('minskin')) continue;
-						if(lib.character[i][4].contains('boss')) continue;
+						if(lib.character[i][4].contains('boss')&&!
+						lib.character[i][4].contains('bossallowed')) continue;
 						if(lib.character[i][4].contains('hiddenboss')) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
@@ -12488,6 +12572,8 @@
 				if(!lib.config.show_pause){
 					ui.pause.style.display='none';
 				}
+				ui.cardPileButton=ui.create.system('牌堆',null,true);
+				lib.setPopped(ui.cardPileButton,ui.click.cardPileButton,220);
 				ui.wuxie=ui.create.system('不询问无懈',ui.click.wuxie,true);
 				if(!lib.config.touchscreen){
 					lib.setPopped(ui.config2,ui.click.pauseconfig,170);
@@ -12505,6 +12591,9 @@
 				}
 				if(!lib.config.show_wuxie){
 					ui.wuxie.style.display='none';
+				}
+				if(!lib.config.show_cardpile){
+					ui.cardPileButton.style.display='none';
 				}
 				if(lib.config.touchscreen&&!lib.config.confirmtouch){
 					var backtomouse=ui.create.system('返回鼠标模式');
@@ -12961,13 +13050,13 @@
 	                                    if(autoskillexpanded){
 	                                        this.classList.remove('on');
 	                                        for(var k=0;k<autoskillNodes.length;k++){
-			                                    autoskillNodes[k].hide();
+			                                    autoskillNodes[k].style.display='none';
 			                                }
 	                                    }
 	                                    else{
 	                                        this.classList.add('on');
 	                                        for(var k=0;k<autoskillNodes.length;k++){
-			                                    autoskillNodes[k].show();
+			                                    autoskillNodes[k].style.display='';
 			                                }
 	                                    }
 	                                    autoskillexpanded=!autoskillexpanded;
@@ -12976,13 +13065,13 @@
 	                                    if(banskillexpanded){
 	                                        this.classList.remove('on');
 	                                        for(var k=0;k<banskillNodes.length;k++){
-			                                    banskillNodes[k].hide();
+			                                    banskillNodes[k].style.display='none';
 			                                }
 	                                    }
 	                                    else{
 	                                        this.classList.add('on');
 	                                        for(var k=0;k<banskillNodes.length;k++){
-			                                    banskillNodes[k].show();
+			                                    banskillNodes[k].style.display='';
 			                                }
 	                                    }
 	                                    banskillexpanded=!banskillexpanded;
@@ -13021,15 +13110,17 @@
 	                                var cfgnode=createConfig(cfg);
 									if(cfg.type=='autoskill'){
 										autoskillNodes.push(cfgnode);
-										cfgnode.style.transition='all 0s';
+										// cfgnode.style.transition='all 0s';
 										cfgnode.classList.add('indent');
-										cfgnode.hide();
+										// cfgnode.hide();
+										cfgnode.style.display='none';
 									}
 									else if(cfg.type=='banskill'){
 										banskillNodes.push(cfgnode);
-										cfgnode.style.transition='all 0s';
+										// cfgnode.style.transition='all 0s';
 										cfgnode.classList.add('indent');
-										cfgnode.hide();
+										// cfgnode.hide();
+										cfgnode.style.display='none';
 									}
 									if(j=='import_data_button'){
 										ui.import_data_button=cfgnode;
@@ -13275,6 +13366,17 @@
 							game.saveConfig('cards',lib.config.cards);
 							updateNodes();
 						};
+						var toggleCardPile=function(bool){
+							var name=this._link.config._name;
+							var number=this._link.config._number;
+							if(bool){
+								lib.config.bannedpile[name].remove(number);
+							}
+							else{
+								lib.config.bannedpile[name].add(number);
+							}
+							game.saveConfig('bannedpile',lib.config.bannedpile);
+						}
 
 						var createModeConfig=function(mode,position){
 	                        var info=lib.cardPack[mode];
@@ -13323,6 +13425,136 @@
 								}
 							}
 							page.classList.add('menu-buttons');
+							if(mode.indexOf('mode_')!=0&&lib.cardPile[mode]){
+								var cardpileNodes=[];
+								var cardpileexpanded=false;
+								if(!lib.config.bannedpile[mode]){
+									lib.config.bannedpile[mode]=[];
+								}
+								if(!lib.config.addedpile[mode]){
+									lib.config.addedpile[mode]=[];
+								}
+								ui.create.div('.config.more','编辑牌堆 <div>&gt;</div>',page,function(){
+									if(cardpileexpanded){
+										this.classList.remove('on');
+										for(var k=0;k<cardpileNodes.length;k++){
+											cardpileNodes[k].style.display='none';
+										}
+									}
+									else{
+										this.classList.add('on');
+										for(var k=0;k<cardpileNodes.length;k++){
+											cardpileNodes[k].style.display='';
+										}
+									}
+									cardpileexpanded=!cardpileexpanded;
+								});
+								var cfgnode=createConfig({
+									name:'添加...',
+									clear:true,
+									onclick:function(){
+										this.nextSibling.classList.toggle('hidden');
+									}
+								});
+								cardpileNodes.push(cfgnode);
+								cfgnode.style.display='none';
+								cfgnode.classList.add('cardpilecfg');
+								cfgnode.classList.add('toggle');
+								cfgnode.style.marginTop='5px';
+								page.appendChild(cfgnode);
+
+								var cardpileadd=ui.create.div('.config.toggle.hidden.cardpilecfg.cardpilecfgadd',page);
+								var pileaddlist=[];
+								for(var i=0;i<lib.config.cards.length;i++){
+									if(!lib.cardPack[lib.config.cards[i]]) continue;
+									for(var j=0;j<lib.cardPack[lib.config.cards[i]].length;j++){
+										var cname=lib.cardPack[lib.config.cards[i]][j];
+										pileaddlist.push([cname,get.translation(cname)]);
+									}
+								}
+								var cardpileaddname=ui.create.selectlist(pileaddlist,null,cardpileadd);
+								cardpileaddname.style.width='75px';
+								cardpileaddname.style.marginRight='2px';
+								cardpileaddname.style.marginLeft='-1px';
+								var cardpileaddsuit=ui.create.selectlist([
+									['heart','红桃'],
+									['diamond','方片'],
+									['club','梅花'],
+									['spade','黑桃'],
+								],null,cardpileadd);
+								cardpileaddsuit.style.width='53px';
+								cardpileaddsuit.style.marginRight='2px';
+								var cardpileaddnumber=ui.create.selectlist([
+									1,2,3,4,5,6,7,8,9,10,11,12,13
+								],null,cardpileadd);
+								cardpileaddnumber.style.width='43px';
+								cardpileaddnumber.style.marginRight='2px';
+								var button=document.createElement('button');
+								button.innerHTML='确定';
+								button.style.width='40px';
+								var deletecard=function(){
+									this.parentNode.remove();
+									var info=this.parentNode._info;
+									var list=lib.config.addedpile[mode];
+									for(var i=0;i<list.length;i++){
+										if(list[i][0]==info[0]&&list[i][1]==info[1]&&list[i][2]==info[2]){
+											list.splice(i,1);break;
+										}
+									}
+									game.saveConfig('addedpile',lib.config.addedpile);
+								};
+								button.onclick=function(){
+									var card=[
+										cardpileaddsuit.value,
+										cardpileaddnumber.value,
+										cardpileaddname.value,
+									];
+									lib.config.addedpile[mode].push(card);
+									game.saveConfig('addedpile',lib.config.addedpile);
+									var cfgnode=ui.create.div('.config.toggle.cardpilecfg');
+									cfgnode._info=card;
+									cfgnode.innerHTML=get.translation(card[2])+' '+get.translation(card[0])+card[1];
+									var cfgnodedelete=document.createElement('span');
+									cfgnodedelete.classList.add('cardpiledelete');
+									cfgnodedelete.innerHTML='删除';
+									cfgnodedelete.onclick=deletecard;
+									cfgnode.appendChild(cfgnodedelete);
+									page.insertBefore(cfgnode,cardpileadd.nextSibling);
+								};
+								cardpileadd.appendChild(button);
+								cardpileadd.style.whiteSpace='nowrap';
+								cardpileNodes.push(cardpileadd);
+
+								for(var i=0;i<lib.config.addedpile[mode].length;i++){
+									var card=lib.config.addedpile[mode][i];
+									var cfgnode=ui.create.div('.config.toggle.cardpilecfg');
+									cfgnode._info=card;
+									cfgnode.innerHTML=get.translation(card[2])+' '+get.translation(card[0])+card[1];
+									var cfgnodedelete=document.createElement('span');
+									cfgnodedelete.classList.add('cardpiledelete');
+									cfgnodedelete.innerHTML='删除';
+									cfgnodedelete.onclick=deletecard;
+									cfgnode.appendChild(cfgnodedelete);
+									cfgnode.style.display='none';
+									cardpileNodes.push(cfgnode);
+									page.appendChild(cfgnode);
+								}
+
+								for(var i=0;i<lib.cardPile[mode].length;i++){
+									var card=lib.cardPile[mode][i];
+									var cfgnode=createConfig({
+										name:get.translation(card[2])+' '+get.translation(card[0])+card[1],
+										_number:i,
+										_name:mode,
+										init:!lib.config.bannedpile[mode].contains(i),
+										onclick:toggleCardPile
+									});
+									cardpileNodes.push(cfgnode);
+									cfgnode.style.display='none';
+									cfgnode.classList.add('cardpilecfg');
+									page.appendChild(cfgnode);
+								}
+							}
 	                        return node;
 	                    };
 
@@ -13654,6 +13886,17 @@
 											}
 											this.classList.toggle('active');
 										};
+										var staritem=function(){
+											this.parentNode.classList.toggle('starred');
+											var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+											if(this.parentNode.classList.contains('starred')){
+												this.parentNode.link.starred=true;
+											}
+											else{
+												this.parentNode.link.starred=false;
+											}
+											store.put(this.parentNode.link);
+										}
 										var createNode=function(video,before){
 											var node=ui.create.div('.videonode.menubutton.large',clickcapt);
 											node.link=video;
@@ -13680,6 +13923,10 @@
 											}
 											else{
 												page.appendChild(node);
+											}
+											ui.create.div('.video_star','★',node,staritem);
+											if(video.starred){
+												node.classList.add('starred');
 											}
 										}
 										for(var i=0;i<lib.videos.length;i++){
@@ -13715,14 +13962,26 @@
 													return;
 												}
 												var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-												if(lib.videos.length>=parseInt(lib.config.video)&&lib.videos.length){
-													var toremove=lib.videos.pop();
-													store.delete(toremove.time);
-													for(var i=0;i<page.childNodes.length;i++){
-														if(page.childNodes[i].link==toremove){
-															page.childNodes[i].remove();
-															break;
+												var videos=lib.videos.slice(0);
+												for(var i=0;i<videos.length;i++){
+													if(videos[i].starred){
+														videos.splice(i--,1);
+													}
+												}
+												for(var deletei=0;deletei<5;deletei++){
+													if(videos.length>=parseInt(lib.config.video)&&videos.length){
+														var toremove=videos.pop();
+														lib.videos.remove(toremove);
+														store.delete(toremove.time);
+														for(var i=0;i<page.childNodes.length;i++){
+															if(page.childNodes[i].link==toremove){
+																page.childNodes[i].remove();
+																break;
+															}
 														}
+													}
+													else{
+														break;
 													}
 												}
 												for(var i=0;i<lib.videos.length;i++){
@@ -14254,6 +14513,25 @@
 					}
 				}
 
+				return uiintro;
+			},
+			cardPileButton:function(){
+				var uiintro=ui.create.dialog('hidden');
+				uiintro.listen(function(e){
+					e.stopPropagation();
+				});
+				uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+ui.cardPile.childNodes.length);
+				uiintro.add('<div class="text center">弃牌堆</div>');
+				if(ui.discardPile.childNodes.length){
+					var list=[];
+					for(var i=0;i<ui.discardPile.childNodes.length;i++){
+						list.push(ui.discardPile.childNodes[i]);
+					}
+					uiintro.addSmall([list,'card']);
+				}
+				else{
+					uiintro.add('<div class="text center" style="padding-bottom:3px">无</div>');
+				}
 				return uiintro;
 			},
 			volumn:function(){
@@ -18422,7 +18700,7 @@
 								lib.hiddenCharacters.push(k);
 							}
 						}
-						else{
+						else if(lib.config.mode!='boss'||i!='boss'){
 							continue;
 						}
 					}
@@ -18430,6 +18708,9 @@
 						if(j=='character'){
 							if(!character[i][j][k][4]){
 								character[i][j][k][4]=[];
+							}
+							if(character[i][j][k][4].contains('boss')){
+								lib.config.forbidai.add(k);
 							}
 							// if(lib.config.only_fullskin&&lib.isNewLayout()&&lib.config.mode!='chess'){
 							// 	if(!character[i][j][k][4].contains('fullskin')&&!character[i][j][k][4].contains('minskin')){
@@ -18478,12 +18759,30 @@
 					if(j=='mode'||j=='forbid') continue;
 					if(j=='list'){
 						if(lib.config.cards.contains(i)){
+							var pile;
 							if(typeof card[i][j]=='function'){
-								lib.card.list=lib.card.list.concat(lib.init.eval(card[i][j])());
+								pile=lib.init.eval(card[i][j])();
 							}
 							else{
-								lib.card.list=lib.card.list.concat(card[i][j]);
+								pile=card[i][j];
 							}
+							lib.cardPile[i]=pile.slice(0);
+							if(lib.config.bannedpile[i]){
+								for(var k=0;k<lib.config.bannedpile[i].length;k++){
+									pile[lib.config.bannedpile[i][k]]=null;
+								}
+							}
+							for(var k=0;k<pile.length;k++){
+								if(!pile[k]){
+									pile.splice(k--,1);
+								}
+							}
+							if(lib.config.addedpile[i]){
+								for(var k=0;k<lib.config.addedpile[i].length;k++){
+									pile.push(lib.config.addedpile[i][k]);
+								}
+							}
+							lib.card.list=lib.card.list.concat(pile);
 						}
 					}
 					else{
