@@ -13001,7 +13001,9 @@
 	                    };
 
 						for(var i in lib.mode){
-	                        createModeConfig(i,start.firstChild);
+							if(lib.config.all.mode.contains(i)){
+								createModeConfig(i,start.firstChild);
+							}
 	                    }
 						var active=start.firstChild.querySelector('.active');
 	                    if(!active){
@@ -18593,7 +18595,7 @@
 				cheat.z('liushan');
 			},
 			zj:function(){
-				cheat.z('diy_zhangjiao');
+				cheat.z('sp_zhangjiao');
 			},
 			sc:function(){
 				cheat.z('sunce');

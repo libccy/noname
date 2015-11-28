@@ -271,7 +271,7 @@ window.characterRank={
         'huatuo',
         'swd_luchengxuan',
         'swd_moye',
-        'diy_zhangjiao',
+        'sp_zhangjiao',
         'dongzhuo',
         'niutou',
         'fazheng',

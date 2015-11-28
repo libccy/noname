@@ -2452,6 +2452,7 @@ character.sp={
 		hongyuan:{
 			trigger:{player:'phaseDrawBegin'},
 			direct:true,
+			audio:2,
 			content:function(){
 				"step 0"
 				var check;

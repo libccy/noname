@@ -8,11 +8,82 @@ character.wind={
 		xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 		zhoutai:['male','wu',4,['buqu','fenji']],
 		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
-		diy_zhangjiao:['male','qun',3,['diyleiji','guidao','huangtian'],['zhu']],
+		sp_zhangjiao:['male','qun',3,['diyleiji','guidao','huangtian'],['zhu']],
 		// spzhangjiao:['male','qun',3,['spleiji','guidao','huangtian'],['zhu']],
 		// yuji:['male','qun',3,['guhuo']],
 	},
 	skill:{
+
+		diyleiji:{
+			audio:2,
+			trigger:{player:'respond'},
+			filter:function(event,player){
+				return event.card.name=='shan';
+			},
+			direct:true,
+			content:function(){
+				"step 0";
+				player.chooseTarget('是否发动新雷击？').ai=function(target){
+					return ai.get.damageEffect(target,player,player,'thunder');
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('diyleiji',result.targets,'thunder');
+					event.target=result.targets[0];
+					event.target.judge(function(card){
+						var suit=get.suit(card);
+						if(suit=='spade') return -4;
+						if(suit=='club') return -2;
+						return 0;
+					});
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.suit=='club'){
+					event.target.damage('thunder');
+					player.recover();
+				}
+				else if(result.suit=='spade'){
+					event.target.damage(2,'thunder');
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'respondShan')){
+							var hastarget=false;
+							for(var i=0;i<game.players.length;i++){
+								if(ai.get.attitude(target,game.players[i])<0){
+									hastarget=true;break;
+								}
+							}
+							var be=target.num('e',{color:'black'});
+							if(target.num('h','shan')&&be){
+								if(!target.skills.contains('guidao')) return 0;
+								return [0,hastarget?target.num('he')/2:0];
+							}
+							if(target.num('h','shan')&&target.num('h')>2){
+								if(!target.skills.contains('guidao')) return 0;
+								return [0,hastarget?target.num('h')/4:0];
+							}
+							if(target.num('h')>3||(be&&target.num('h')>=2)){
+								return [0,0];
+							}
+							if(target.num('h')==0){
+								return [1.5,0];
+							}
+							if(target.num('h')==1&&!be){
+								return [1.2,0];
+							}
+							if(!target.skills.contains('guidao')) return [1,0.05];
+							return [1,Math.min(0.5,(target.num('h')+be)/4)];
+						}
+					}
+				}
+			}
+		},
 		shensu:{
 			group:['shensu1','shensu2']
 		},
@@ -435,6 +506,7 @@ character.wind={
 		xiahouyuan:'夏侯渊',
 		caoren:'曹仁',
 		huangzhong:'黄忠',
+		sp_zhangjiao:'张角',
 		weiyan:'魏延',
 		xiaoqiao:'小乔',
 		zhoutai:'周泰',
@@ -457,6 +529,11 @@ character.wind={
 		huangtian2:'黄天',
 		guhuo:'蛊惑',
 		fenji:'奋激',
+		diyleiji:'雷击',
+		diyleiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害',
+		tiangong:'天公',
+		tiangong2:'天公',
+		tiangong_info:'锁定技，你防止即将受到的雷电伤害，每当你造成一次雷电伤害，你摸一张牌',
 		shensu_info:
 		'你可以跳过摸牌阶段，或跳过出牌阶段并弃置一张装备牌，'+
 		'若如此则视为对任意一名使用一张【杀】',

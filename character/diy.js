@@ -433,76 +433,6 @@ character.diy={
 				player.draw();
 			},
 		},
-		diyleiji:{
-			audio:2,
-			trigger:{player:'respond'},
-			filter:function(event,player){
-				return event.card.name=='shan';
-			},
-			direct:true,
-			content:function(){
-				"step 0";
-				player.chooseTarget('是否发动新雷击？').ai=function(target){
-					return ai.get.damageEffect(target,player,player,'thunder');
-				};
-				"step 1"
-				if(result.bool){
-					player.logSkill('diyleiji',result.targets,'thunder');
-					event.target=result.targets[0];
-					event.target.judge(function(card){
-						var suit=get.suit(card);
-						if(suit=='spade') return -4;
-						if(suit=='club') return -2;
-						return 0;
-					});
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				if(result.suit=='club'){
-					event.target.damage('thunder');
-					player.recover();
-				}
-				else if(result.suit=='spade'){
-					event.target.damage(2,'thunder');
-				}
-			},
-			ai:{
-				effect:{
-					target:function(card,player,target,current){
-						if(get.tag(card,'respondShan')){
-							var hastarget=false;
-							for(var i=0;i<game.players.length;i++){
-								if(ai.get.attitude(target,game.players[i])<0){
-									hastarget=true;break;
-								}
-							}
-							var be=target.num('e',{color:'black'});
-							if(target.num('h','shan')&&be){
-								if(!target.skills.contains('guidao')) return 0;
-								return [0,hastarget?target.num('he')/2:0];
-							}
-							if(target.num('h','shan')&&target.num('h')>2){
-								if(!target.skills.contains('guidao')) return 0;
-								return [0,hastarget?target.num('h')/4:0];
-							}
-							if(target.num('h')>3||(be&&target.num('h')>=2)){
-								return [0,0];
-							}
-							if(target.num('h')==0){
-								return [1.5,0];
-							}
-							if(target.num('h')==1&&!be){
-								return [1.2,0];
-							}
-							if(!target.skills.contains('guidao')) return [1,0.05];
-							return [1,Math.min(0.5,(target.num('h')+be)/4)];
-						}
-					}
-				}
-			}
-		},
 		xicai:{
 			inherit:'jianxiong'
 		},
@@ -731,7 +661,6 @@ character.diy={
 		diy_menghuo:'孟获',
 		diy_huangzhong:'黄忠',
 		diy_xuhuang:'徐晃',
-		diy_zhangjiao:'张角',
 		diy_dianwei:'典韦',
 		diy_weiyan:'魏延',
 		xicai:'惜才',
@@ -754,9 +683,6 @@ character.diy={
 		diy_liuyan:'刘焉',
 		juedao:'绝道',
 		geju:'割据',
-		diyleiji:'雷击',
-		tiangong:'天公',
-		tiangong2:'天公',
 		shaoying:'烧营',
 		zonghuo:'纵火',
 		diychanyuan:'缠怨',
@@ -793,8 +719,6 @@ character.diy={
 		diychanyuan_info:'锁定技，杀死你的角色失去一点体力上限',
 		zonghuo_info:'你可弃置一张牌将你即将造成的伤害变为火焰伤害',
 		shaoying_info:'每当你造成一次火焰伤害，可指定距离受伤害角色1以内的另一名角色，并展示牌堆顶的一张牌，若此牌为红色，该角色受到一点火焰伤害',
-		tiangong_info:'锁定技，你防止即将受到的雷电伤害，每当你造成一次雷电伤害，你摸一张牌',
-		diyleiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害',
 		juedao_info:'出牌阶段，你可以弃置一张手牌，横置你的武将牌；锁定技，若你处于连环状态，你与其他角色的距离、其他角色与你的距离各+1。',
 		geju_info:'准备阶段开始时，你可以摸X张牌（X为攻击范围内不含有你的势力数）。',
 		siji_info:'弃牌阶段结束后，你可以摸2X张牌（X为你于此阶段内弃置的【杀】的数量）。',
