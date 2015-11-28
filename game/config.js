@@ -207,7 +207,7 @@ window.config={
 	background_music:'music_default',
 	background_audio:true,
 	background_speak:true,
-	glow_phase:true,
+	glow_phase:'yellow',
 
 	skin:{},
 

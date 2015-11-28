@@ -224,6 +224,7 @@ body>.background{z-index:-2}
 }
 .dialog .buttons>.button.character{
 	height:108px;
+	background-size: cover;
 }
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
@@ -233,7 +234,7 @@ body>.background{z-index:-2}
 .button.card>.background{font-size: 68px;height: 68px;padding-top: 12px;}
 .card>.background{font-family:'xiaozhuan'}
 .card>.background.tight{letter-spacing: -0.2em}
-.marks>.card>.background.skillmark{font-family:'huangcao';padding-top:4px;}
+.marks>.card>.background.skillmark{font-family:'huangcao','xinwei';padding-top:4px;}
 .marks>.card.overflowmark{
 	overflow: visible;
 }
@@ -330,7 +331,7 @@ margin-bottom: 5px;
 .button.character>.hp.text{
 	top:8px;
 	left:6px;
-	font-family:'huangcao';
+	font-family:'huangcao','xinwei';
 	font-size:20px;
 	letter-spacing:3px;
 }
@@ -390,7 +391,7 @@ margin-bottom: 5px;
 }
 .player>.intro{top:87px;left: 18px;}
 .player>.damage{
-	font-family: 'huangcao';
+	font-family: 'huangcao','xinwei';
 	font-size:72px;
 	width: 100%;
 	text-align: center;
@@ -400,7 +401,7 @@ margin-bottom: 5px;
 	transform:scale(0.7);
 }
 .player>.cardeffect{
-	font-family: 'huangcao';
+	font-family: 'huangcao','xinwei';
 	font-size:108px;
 	width: 100%;
 	text-align: center;
@@ -820,7 +821,7 @@ div:hover>.intro{opacity: 1;}
 .player .identity>div{
 	margin: auto;
 	position: relative;
-	font-family: 'huangcao';
+	font-family: 'huangcao','xinwei';
 	font-size: 24px;
 	top:0;
 }
@@ -998,7 +999,7 @@ div[data-color="unknownm"]{
 	color: rgb(195,161,223);
 }
 .wunature{
-	font-family:'huangcao';
+	font-family:'huangcao','xinwei';
 	font-size: 24px;
 	color:white !important;
 	pointer-events: none;
@@ -1067,12 +1068,18 @@ div:hover>.wunature{
 	/*-webkit-animation:control_glow 4s infinite;*/
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
 }
-.player:not(.glow_phase)>.avatar.glow2{
+.player:not(.glow_phase)>.avatar.glow2,
+.button.glow2:not(.selected){
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px, rgba(10, 155, 67, 1) 0 0 10px !important
 }
-.player:not(.selectable):not(.selected).glow_phase{
+#arena[data-glow_phase="yellow"] .player:not(.selectable):not(.selected).glow_phase{
     box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(235, 239, 59) 0 0 15px, rgb(199, 64, 64) 0 0 15px !important;
-	/*box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;*/
+}
+#arena[data-glow_phase="green"] .player:not(.selectable):not(.selected).glow_phase{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
+}
+#arena[data-glow_phase="purple"] .player:not(.selectable):not(.selected).glow_phase{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(178, 59, 239) 0 0 15px, rgb(199, 64, 101) 0 0 15px !important;
 }
 
 .control.blue{

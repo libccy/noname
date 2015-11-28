@@ -36,6 +36,17 @@ character.sp={
 		sp_caiwenji:['female','wei',3,['chenqing','mozhi']],
 		zhugeguo:['female','shu',3,['yuhua','qirang']],
 	},
+	perfectPair:{
+		zhugejin:['zhugeke'],
+		guanyinping:['guanyu'],
+		zhangxingcai:['liushan'],
+		fuwan:['fuhuanghou'],
+		sunshangxiang:['liubei'],
+		caoang:['caocao'],
+		zhangbao:['zhangliang','zhangjiao'],
+		zhangliang:['zhangjiao'],
+		maliang:['masu'],
+	},
 	skill:{
 		qirang:{
 			trigger:{player:'equipEnd'},

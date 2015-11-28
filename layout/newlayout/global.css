@@ -127,7 +127,7 @@
 	transform:rotate(180deg);
 }
 .player .hp.text{
-	font-family:'huangcao';
+	font-family:'huangcao','xinwei';
 	font-size:22px;
 	transform:none;
 	transition:all 0s;

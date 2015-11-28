@@ -8,6 +8,7 @@ character.boss={
 		// boss_zhugeliang:['male','shu',4,[],['boss','bossallowed'],'qun'],
 		boss_huangyueying:['female','shu',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['boss','bossallowed'],'wei'],
 		boss_pangtong:['male','shu',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['boss','bossallowed'],'zhu'],
+		boss_zhaoyun:['male','shu',1,['boss_juejing','longhun'],['boss','bossallowed'],'qun'],
 		boss_zhouyu:['male','wu',6,['huoshen','boss_honglian','boss_xianyin'],['boss','bossallowed'],'zhu'],
 		boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['boss','bossallowed'],'wei'],
 		boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['hiddenboss'],'qun'],
@@ -21,6 +22,25 @@ character.boss={
 		// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
 	},
 	skill:{
+		boss_juejing:{
+			trigger:{player:'phaseDrawBefore'},
+			forced:true,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			group:'boss_juejing2'
+		},
+		boss_juejing2:{
+			trigger:{player:'loseEnd'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('h')<4;
+			},
+			content:function(){
+				player.draw(4-player.num('h'));
+			}
+		},
 		boss_leiji:{
 			audio:2,
 			trigger:{player:'respond'},
@@ -845,6 +865,10 @@ character.boss={
 		// boss_yuhuo_info:'觉醒技，在你涅槃后，你获得技能【神威】、【朱羽】',
 		boss_tianyu:'天狱',
 
+		boss_juejing:'绝境',
+		boss_juejing2:'绝境',
+		boss_juejing_info:'锁定技，摸牌阶段开始时，你不摸牌；锁定技，若你的手牌数小于4，你将手牌补至四张',
+
 		boss_jizhi:'集智',
 		boss_jizhi_info:'每当你使用一张锦囊牌或装备牌，你可以摸一张牌并展示之',
 		boss_guiyin:'归隐',
@@ -889,5 +913,6 @@ character.boss={
 		boss_luxun:'蹁跹君子',
 		boss_zhenji:'洛水仙子',
 		boss_diaochan:'绝代妖姬',
+		boss_zhaoyun:'高达一号',
 	}
 };

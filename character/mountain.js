@@ -84,10 +84,14 @@ character.mountain={
 			},
 			content:function(){
 				"step 0"
+				var eff=ai.get.effect(player,trigger.card,trigger.player,trigger.player);
 				trigger.player.chooseToDiscard(function(card){
 					return get.type(card)=='basic';
 				}).ai=function(card){
-					return 10-ai.get.value(card);
+					if(eff>0){
+						return 10-ai.get.value(card);
+					}
+					return 0;
 				};
 				"step 1"
 				if(result.bool==false){

@@ -330,7 +330,7 @@
 }
 .config.more>div{
 	transform:translateY(-2px);
-    font-family: 'huangcao';
+    font-family: 'huangcao','xinwei';
 }
 .config.more.on>div{
 	transform:rotate(90deg) translateX(-2px);
@@ -481,7 +481,7 @@
 	font-family:'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
 }
 .videonode.menubutton>.victory{
-	font-family: 'huangcao';
+	font-family: 'huangcao','xinwei';
 	font-size: 25px;
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 5px,
 		rgba(255, 203, 0,1) 0 0 5px,black 0 0 1px;

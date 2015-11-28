@@ -582,7 +582,7 @@ mode.identity={
 				}
 				event.list.randomSort();
 				list3.randomSort();
-				var num=get.config('choice')[game.me.identity];
+				var num=get.config('choice_'+game.me.identity);
 				if(event.zhongmode){
 					num=3;
 				}
@@ -698,7 +698,7 @@ mode.identity={
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.zhu&&game.players[i]!=game.me){
 						event.ai(game.players[i],
-							event.list.splice(0,get.config('choice')[game.players[i].identity]))
+							event.list.splice(0,get.config('choice_'+game.players[i].identity)))
 					}
 				}
 			}

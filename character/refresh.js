@@ -19,11 +19,40 @@ character.refresh={
 		re_luxun:['male','wu',3,['reqianxun','relianying']],
 		re_daqiao:['female','wu',3,['reguose','liuli']],
 		re_huanggai:['male','wu',4,['rekurou','zhaxiang']],
-		re_lvbu:['male','qun',5,['wushuang']],
+		re_lvbu:['male','qun',5,['wushuang','linu']],
 		re_gongsunzan:['male','qun',4,['qiaomeng','reyicong']],
 		re_huatuo:['male','qun',3,['chulao','jijiu']],
 	},
 	skill:{
+		linu:{
+			trigger:{source:'damageEnd'},
+			direct:true,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&event.player.isAlive()&&event.player.num('he')>0;
+			},
+			content:function(){
+				'step 0'
+				trigger.player.chooseTarget(function(card,player,target){
+					return player.canUse({name:'juedou'},target);
+				},'是否发动【利奴】？').ai=function(target){
+					return ai.get.effect(target,{name:'juedou'},player,trigger.player)-2;
+				};
+				'step 1'
+				if(result.bool){
+					player.gainPlayerCard(trigger.player,'he',true);
+					player.logSkill('linu');
+					event.target=result.targets[0];
+					trigger.player.line(player,'green');
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(event.target){
+					player.useCard({name:'juedou'},event.target);
+				}
+			}
+		},
 		reqicai:{
 			trigger:{player:'equipEnd'},
 			frequent:true,
@@ -1260,7 +1289,8 @@ character.refresh={
 		fenwei:'奋威',
 		chulao:'除痨',
 		rejizhi:'集智',
-//		rejizhi_info:'当你使用一张装备牌或锦囊牌时，你可以展示牌堆顶牌，若该牌为基本牌，将之置入弃牌堆或用一张手牌与之交换；若不为基本牌，则将之收入手牌。',
+		linu:'利驭',
+		linu_info:'当你使用【杀】对一名其他角色造成伤害后，该角色可令你获得其一张牌，若如此做，则视为你对其选择的另一名角色使用一张【决斗】',
 		rejizhi_info:'当你使用一张装备牌或锦囊牌时，你可以摸一张牌并展示之，若此牌是基本牌，你须弃置一张手牌',
 		xunxun_info:'摸牌阶段，你可以放弃摸牌，改为观看牌堆顶的四张牌，然后获得其中的两张牌，将其余的牌以任意顺序置于牌堆底。',
 		wangxi_info:'每当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可与该角色各摸一张牌。',

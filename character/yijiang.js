@@ -63,6 +63,22 @@ character.yijiang={
 		gongsunyuan:['male','qun',4,['huaiyi']],
 		guotufengji:['male','qun',3,['jigong','shifei']],
 	},
+	perfectPair:{
+		wuguotai:['sunjian','sunshangxiang'],
+		zhangchunhua:['simayi'],
+		caozhi:['zhenji'],
+		xunyou:['xunyu'],
+		xushu:['liubei'],
+		lingtong:['ganning'],
+		chengong:['lvbu'],
+		bulianshi:['sunquan'],
+		fuhuanghou:['liuxie'],
+		sunluban:['quancong'],
+		caifuren:['liubiao'],
+		xiahoushi:['zhangfei'],
+		zhoucang:['guanyu'],
+		guanping:['guanyu'],
+	},
 	skill:{
 		jinjiu:{
 			mod:{

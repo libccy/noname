@@ -561,6 +561,9 @@ mode.boss={
 			loopType:2,
 			chongzheng:12
 		},
+		boss_zhaoyun:{
+			chongzheng:12
+		},
 		boss_zhenji:{
 			chongzheng:4,
 		},

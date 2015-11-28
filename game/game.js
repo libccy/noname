@@ -435,6 +435,29 @@
 						},
 						unfrequent:true,
 					},
+					glow_phase:{
+						name:'当前回合角色高亮',
+						unfrequent:true,
+						init:'yellow',
+						item:{
+							none:'无',
+							yellow:'黄色',
+							green:'绿色',
+							purple:'紫色',
+						},
+						onclick:function(bool){
+							game.saveConfig('glow_phase',bool);
+							if(_status.currentPhase){
+								if(lib.config.glow_phase){
+									_status.currentPhase.classList.add('glow_phase');
+									ui.arena.dataset.glow_phase=lib.config.glow_phase;
+								}
+								else{
+									_status.currentPhase.classList.remove('glow_phase');
+								}
+							}
+						}
+					},
 					auto_popped_config:{
 						name:'自动弹出选项',
 						init:true,
@@ -476,22 +499,6 @@
 					// 	init:false,
 					// 	unfrequent:true,
 					// },
-					glow_phase:{
-						name:'当前回合角色高亮',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('glow_phase',bool);
-							if(_status.currentPhase){
-								if(lib.config.glow_phase){
-									_status.currentPhase.classList.add('glow_phase');
-								}
-								else{
-									_status.currentPhase.classList.remove('glow_phase');
-								}
-							}
-						}
-					},
 					show_name:{
 						name:'显示武将名',
 						init:false,
@@ -685,7 +692,7 @@
 					},
 					die_flip:{
 						name:'阵亡效果',
-						init:true,
+						init:false,
 						unfrequent:true,
 					},
 					animation:{
@@ -1211,6 +1218,58 @@
 							hard:'仇视',
 						}
 					},
+					choice_zhu:{
+						name:'主公候选武将数',
+						init:'3',
+						restart:true,
+						item:{
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'8':'八',
+							'10':'十',
+						}
+					},
+					choice_zhong:{
+						name:'忠臣候选武将数',
+						init:'4',
+						restart:true,
+						item:{
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'8':'八',
+							'10':'十',
+						}
+					},
+					choice_nei:{
+						name:'内奸候选武将数',
+						init:'5',
+						restart:true,
+						item:{
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'8':'八',
+							'10':'十',
+						}
+					},
+					choice_fan:{
+						name:'反贼候选武将数',
+						init:'3',
+						restart:true,
+						item:{
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'8':'八',
+							'10':'十',
+						}
+					},
 		        }
 		    },
 		    guozhan:{
@@ -1377,7 +1436,20 @@
 							normal:'一般',
 							hard:'仇视',
 						}
-					}
+					},
+					choice_num:{
+						name:'候选武将数',
+						init:'7',
+						restart:true,
+						item:{
+							'5':'五',
+							'6':'六',
+							'7':'七',
+							'8':'八',
+							'9':'九',
+							'10':'十',
+						}
+					},
 		        }
 		    },
 			versus:{
@@ -7935,6 +8007,7 @@
 							_status.currentPhase.classList.remove('glow_phase');
 						}
 						player.classList.add('glow_phase');
+						// player.dataset.glow_phase=lib.config.glow_phase;
 						// player.animate('playerbright',500);
 					}
 					// player.$damage(null,'phase')
@@ -8493,6 +8566,7 @@
 					}
 					if(lib.config.glow_phase){
 						player.classList.add('glow_phase');
+						// player.dataset.glow_phase=lib.config.glow_phase;
 					}
 				}
 				else{
@@ -11713,6 +11787,7 @@
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
+				ui.arena.dataset.glow_phase=lib.config.glow_phase;
 				ui.updatePhone();
 				ui.backgroundMusic=document.createElement('audio');
 				ui.backgroundMusic.volume=lib.config.volumn_background/8;
@@ -14630,7 +14705,12 @@
 
 				var height=this._poppedheight||uiintro.content.scrollHeight;
 				uiintro.style.height=Math.min(ui.window.offsetHeight-260,height)+'px';
-				uiintro.style.top='50px';
+				if(lib.config.layout=='phone'){
+					uiintro.style.top='70px';
+				}
+				else{
+					uiintro.style.top='50px';
+				}
 				var left=this.parentNode.offsetLeft+this.offsetLeft+this.offsetWidth/2-width/2;
 				if(left<10){
 					left=10;
@@ -16523,6 +16603,7 @@
 		},
 		updateh:function(compute){
 			if(!game.me) return;
+			if(!ui.handcards1Container) return;
 			if(lib.config.low_performance){
 				if(compute){
 					ui.updatehl();
@@ -17452,8 +17533,7 @@
 						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+'已禁用'+'</div></div>');
 					}
 				}
-				// if(!simple)
-				if(lib.config.touchscreen){
+				if(!simple||lib.config.touchscreen){
 					var storage=node.storage;
 					for(i in storage){
 						if(get.info(i)&&get.info(i).intro){
@@ -17507,6 +17587,73 @@
 						tr.appendChild(td);
 
 						uiintro.content.appendChild(table);
+					}
+					if(lib.config.change_skin&&(
+						!node.classList.contains('unseen')||!node.classList.contains('unseen2')
+					)){
+						var num=1;
+						var introadded=false;
+						var loadImage=function(avatar2){
+							var img=new Image();
+							img.onload=function(){
+								num++;
+								loadImage(avatar2);
+							}
+							img.onerror=function(){
+								num--;
+								if(num){
+									if(!introadded){
+										introadded=true;
+										uiintro.add('更改皮肤');
+									}
+									var buttons=ui.create.div('.buttons.smallzoom');
+									for(var i=0;i<=num;i++){
+										var button=ui.create.div('.button.character',buttons,function(){
+											if(this._link){
+												if(avatar2){
+													lib.config.skin[node.name2]=this._link;
+													node.node.avatar2.style.backgroundImage=this.style.backgroundImage;
+												}
+												else{
+													lib.config.skin[node.name]=this._link;
+													node.node.avatar.style.backgroundImage=this.style.backgroundImage;
+												}
+													game.saveConfig('skin',lib.config.skin);
+											}
+											else{
+												if(avatar2){
+													delete lib.config.skin[node.name2];
+													node.node.avatar2.setBackground(node.name2,'character');
+												}
+												else{
+													delete lib.config.skin[node.name];
+													node.node.avatar.setBackground(node.name,'character');
+												}
+												game.saveConfig('skin',lib.config.skin);
+											}
+										});
+										button._link=i;
+										if(i){
+											button.style.backgroundImage='url("image/skin/'+(avatar2?node.name2:node.name)+'/'+i+'.jpg")';
+										}
+										else{
+											button.style.backgroundImage='url("image/character/'+(avatar2?node.name2:node.name)+'.jpg")';
+										}
+									}
+									uiintro.add(buttons);
+								}
+								if(!avatar2){
+									if(!node.classList.contains('unseen2')&&node.name2){
+										num=1;
+										loadImage(true);
+									}
+								}
+							}
+							img.src='image/skin/'+(avatar2?node.name2:node.name)+'/'+num+'.jpg';
+						}
+						if(!node.classList.contains('unseen')){
+							loadImage();
+						}
 					}
 				}
 

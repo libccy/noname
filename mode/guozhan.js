@@ -207,7 +207,7 @@ mode.guozhan={
 					event.list.push(i);
 				}
 				event.list.randomSort();
-				var list=event.list.splice(0,7);
+				var list=event.list.splice(0,parseInt(get.config('choice_num')));
 				if(_status.auto){
 					event.ai(game.me,list);
 				}
@@ -218,6 +218,17 @@ mode.guozhan={
 					}
 					var next=game.me.chooseButton(dialog,true,2);
 					next.filterButton=function(button){
+						if(ui.dialog.buttons.length<=10){
+							for(var i=0;i<ui.dialog.buttons.length;i++){
+								if(ui.dialog.buttons[i]!=button){
+									if(lib.element.player.perfectPair.call({
+										name1:button.link,name2:ui.dialog.buttons[i].link
+									})){
+										button.classList.add('glow2');
+									}
+								}
+							}
+						}
 						if(ui.selected.buttons.length==0) return true;
 						return (lib.character[button.link][1]==lib.character[ui.selected.buttons[0].link][1]);
 					};
@@ -267,7 +278,7 @@ mode.guozhan={
 							}
 							event.list=event.list.concat(list);
 							event.list.randomSort();
-							list=event.list.splice(0,7);
+							list=event.list.splice(0,parseInt(get.config('choice_num')));
 							_status.event.dialog.close();
 							_status.event.dialog=ui.create.dialog('选择角色',[list,'character']);
 							if(get.config('change_identity')){
@@ -304,7 +315,7 @@ mode.guozhan={
 				event.list.remove(game.me.name2);
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.me){
-						event.ai(game.players[i],event.list.splice(0,7))
+						event.ai(game.players[i],event.list.splice(0,parseInt(get.config('choice_num'))))
 					}
 				}
 				for(var i=0;i<game.players.length;i++){
