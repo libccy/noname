@@ -93,81 +93,83 @@ mode.identity={
 						}
 					};
 					var step3=function(){
-						if(lib.config.layout=='phone'){
+						if(lib.config.touchscreen){
 							clear();
-							ui.create.dialog('在移动布局后，点击顶部的左半边或右半边可以显示按钮');
-							var node=ui.create.div('.tutorial_tap',ui.window);
-							var nodefunc=function(){
-								setTimeout(function(){
-									node.style.top='20px';
-									node.style.left='10%';
-									setTimeout(function(){
-										node.style.transition='all 0.2s';
-										node.style.opacity=0;
-										setTimeout(function(){
-											node.style.opacity='';
-											setTimeout(function(){
-												node.style.transition='';
-											},300);
-										},300);
-									},1200);
-									setTimeout(function(){
-										node.style.left='calc(90% - 30px)';
-										setTimeout(function(){
-											node.style.transition='all 0.2s';
-											node.style.opacity=0;
-											setTimeout(function(){
-												node.style.opacity='';
-												setTimeout(function(){
-													node.style.transition='';
-												},300);
-											},300);
-										},1200);
-										setTimeout(function(){
-											node.style.top='';
-											node.style.left='';
-										},2000);
-									},2000);
-								},1000);
-							};
-							nodefunc();
-							var interval=setInterval(nodefunc,7000);
-							var interval2,node2;
-							var double=true;
-							ui.create.control('继续',function(){
-								if(double){
-									node2=ui.create.div('.tutorial_tap',ui.window);
-									ui.refresh(node2);
-									node2.style.top='20px';
-									node2.style.left='calc(50% - 15px)';
-									interval2=setInterval(function(){
-										node2.style.transition='all 0.2s';
-										node2.style.opacity=0;
-										setTimeout(function(){
-											node2.style.opacity='';
-											setTimeout(function(){
-												node2.style.opacity=0;
-												setTimeout(function(){
-													node2.style.opacity='';
-													setTimeout(function(){
-														node2.style.transition='';
-													},300);
-												},300);
-											},300);
-										},300);
-									},3000);
-									clearInterval(interval);
-									node.delete();
-									double=false;
-									ui.dialog.close();
-									ui.create.dialog('双击顶部可令界面下移，方便进行标身份等操作');
-								}
-								else{
-									clearInterval(interval2);
-									node2.delete();
-									step4();
-								}
-							});
+							ui.create.dialog('触屏模式中，下划可以显示菜单，上划可以切换托管，双指单击可以暂停');
+							ui.dialog.add('<div class="text center">你可以在选项-通用-中更改手势设置');
+							ui.create.control('继续',step4);
+							// var node=ui.create.div('.tutorial_tap',ui.window);
+							// var nodefunc=function(){
+							// 	setTimeout(function(){
+							// 		node.style.top='20px';
+							// 		node.style.left='10%';
+							// 		setTimeout(function(){
+							// 			node.style.transition='all 0.2s';
+							// 			node.style.opacity=0;
+							// 			setTimeout(function(){
+							// 				node.style.opacity='';
+							// 				setTimeout(function(){
+							// 					node.style.transition='';
+							// 				},300);
+							// 			},300);
+							// 		},1200);
+							// 		setTimeout(function(){
+							// 			node.style.left='calc(90% - 30px)';
+							// 			setTimeout(function(){
+							// 				node.style.transition='all 0.2s';
+							// 				node.style.opacity=0;
+							// 				setTimeout(function(){
+							// 					node.style.opacity='';
+							// 					setTimeout(function(){
+							// 						node.style.transition='';
+							// 					},300);
+							// 				},300);
+							// 			},1200);
+							// 			setTimeout(function(){
+							// 				node.style.top='';
+							// 				node.style.left='';
+							// 			},2000);
+							// 		},2000);
+							// 	},1000);
+							// };
+							// nodefunc();
+							// var interval=setInterval(nodefunc,7000);
+							// var interval2,node2;
+							// var double=true;
+							// ui.create.control('继续',function(){
+							// 	if(double){
+							// 		node2=ui.create.div('.tutorial_tap',ui.window);
+							// 		ui.refresh(node2);
+							// 		node2.style.top='20px';
+							// 		node2.style.left='calc(50% - 15px)';
+							// 		interval2=setInterval(function(){
+							// 			node2.style.transition='all 0.2s';
+							// 			node2.style.opacity=0;
+							// 			setTimeout(function(){
+							// 				node2.style.opacity='';
+							// 				setTimeout(function(){
+							// 					node2.style.opacity=0;
+							// 					setTimeout(function(){
+							// 						node2.style.opacity='';
+							// 						setTimeout(function(){
+							// 							node2.style.transition='';
+							// 						},300);
+							// 					},300);
+							// 				},300);
+							// 			},300);
+							// 		},3000);
+							// 		clearInterval(interval);
+							// 		node.delete();
+							// 		double=false;
+							// 		ui.dialog.close();
+							// 		ui.create.dialog('双击顶部可令界面下移，方便进行标身份等操作');
+							// 	}
+							// 	else{
+							// 		clearInterval(interval2);
+							// 		node2.delete();
+							// 		step4();
+							// 	}
+							// });
 						}
 						else{
 							step4();

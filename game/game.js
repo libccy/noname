@@ -125,6 +125,31 @@
 						name:'双击换肤',
 						init:true
 					},
+					swipe:{
+						name:'滑动手势',
+						init:true,
+						unfrequent:true,
+					},
+					swipe_down:{
+						name:'下划操作',
+						init:'system',
+						unfrequent:true,
+						item:{
+							system:'显示按钮',
+							menu:'打开菜单',
+						}
+					},
+					swipe_up:{
+						name:'上划操作',
+						init:'auto',
+						unfrequent:true,
+						item:{
+							system:'显示按钮',
+							menu:'打开菜单',
+							pause:'切换暂停',
+							auto:'切换托管'
+						}
+					},
 					game_speed:{
 						name:'游戏速度',
 						init:'mid',
@@ -214,6 +239,7 @@
 							map.hoveration.hide();
 							map.right_info.hide();
 							map.right_click.hide();
+							map.swipe.show();
 						}
 						else{
 							map.mousewheel.show();
@@ -228,6 +254,7 @@
 								map.hover_handcard.show();
 								map.hoveration.show();
 							}
+							map.swipe.hide();
 						}
 					}
 				}
@@ -535,6 +562,31 @@
 					// 	},
 					// 	unfrequent:true,
 					// },
+					show_roundmenu:{
+						name:'显示触屏按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_roundmenu',bool);
+							if(bool&&lib.config.touchscreen){
+								ui.roundmenu.style.display='';
+							}
+							else{
+								ui.roundmenu.style.display='none';
+							}
+						}
+					},
+					round_menu_func:{
+						name:'触屏按钮功能',
+						init:'system',
+						unfrequent:true,
+						item:{
+							system:'显示按钮',
+							menu:'打开菜单',
+							pause:'切换暂停',
+							auto:'切换托管'
+						}
+					},
 					show_replay:{
 						name:'显示重来按钮',
 						init:false,
@@ -705,6 +757,14 @@
 						}
 						else{
 							map.image_background_filter.show();
+						}
+						if(lib.config.layout!='phone'){
+							map.round_menu_func.hide();
+							map.show_roundmenu.hide();
+						}
+						else{
+							map.round_menu_func.show();
+							map.show_roundmenu.show();
 						}
 					},
 				}
@@ -1860,7 +1920,7 @@
 			'游戏选项':'<ul><li>控制台命令<br>开启后可用浏览器控制台控制游戏<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
 			'触屏模式<br>可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>隐藏非全身皮肤<br>在新版布局中，若角色没有全身皮肤将被隐藏<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
-			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中双指点击切换暂停<li>移动布局中，点击顶部的左半边或右半边可显示按钮，双击顶部可令界面下移（方便标身份）<li>键盘快捷键<br>'+
+			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>移动布局中，点击顶部的左半边或右半边可显示按钮，双击顶部可令界面下移（方便标身份）<li>键盘快捷键<br>'+
 			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
 			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
 			'<li>玩家<br>game.me<li>玩家的上/下家<br>game.me.previous/next'+
@@ -2221,6 +2281,12 @@
 					}
 					else{
 						ui.arena.classList.remove('hpimage');
+					}
+					if(lib.config.layout=='phone'){
+						ui.roundmenu.style.display='';
+					}
+					else{
+						ui.roundmenu.style.display='none';
 					}
 					setTimeout(function(){
 						layout.remove();
@@ -3800,11 +3866,11 @@
 							else if(event.nature=='thunder'){
 								player.$thunder();
 							}
-							player.$damagepop(-num,event.nature);
 						}
-						else{
-							player.popup(-num,event.nature);
-						}
+						player.$damagepop(-num,event.nature);
+						// else{
+						// 	player.popup(-num,event.nature);
+						// }
 					}
 					// if(source){
 					// 	if(player._damagetimeout!=source){
@@ -3846,12 +3912,9 @@
 					if(num>0){
 						player.changeHp(num,false);
 						if(lib.config.animation&&!lib.config.low_performance){
-							player.$damagepop(num,'wood');
 							player.$recover();
 						}
-						else{
-							player.popup(num);
-						}
+						player.$damagepop(num,'wood');
 						game.log(get.translation(player)+'回复了'+get.cnNumber(num)+'点体力')
 					}
 				},
@@ -7088,9 +7151,14 @@
 						this.appendChild(node);
 						ui.refresh(node);
 						node.classList.add('damageadded');
-						setTimeout(function(){
-							node.delete();
-						},500);
+						node.addEventListener('webkitTransitionEnd',function(){
+							setTimeout(function(){
+								node.delete();
+							},200);
+						});
+						// setTimeout(function(){
+						// 	node.delete();
+						// },500);
 						var that=this;
 						setTimeout(function(){
 							that.damagepopups.shift();
@@ -8335,6 +8403,7 @@
 						if(nodes[i]==ui.control) continue;
 						if(nodes[i]==ui.mebg) continue;
 						if(nodes[i]==ui.me) continue;
+						if(nodes[i]==ui.roundmenu) continue;
 						nodes[i].remove();
 					}
 					// ui.me.f.innerHTML='';
@@ -10309,8 +10378,10 @@
 			var custom=event.custom||{};
 			var ok=true,auto=true;
 			var player=event.player;
+			// ui.roundmenu.show();
 			if(!event.filterButton&&!event.filterCard&&!event.filterTarget&&!event.skill) return;
 			if(event.filterButton){
+				// ui.roundmenu.hide();
 				var dialog=event.dialog;
 				range=get.select(event.selectButton);
 				if(range[0]!=range[1]||range[0]>1) auto=false;
@@ -10566,6 +10637,7 @@
 			return ok;
 		},
 		uncheck:function(){
+			// ui.roundmenu.show();
 			var i,j;
 			if(false){
 				if(lib.config.mode=='chess'){
@@ -11796,7 +11868,59 @@
 				ui.backgroundMusic.addEventListener('ended',game.playBackgroundMusic);
 				ui.window.appendChild(ui.backgroundMusic);
 
-
+				ui.roundmenu=ui.create.div('#roundmenu.roundarenabutton.menubutton.round',ui.arena);
+				ui.roundmenu._position=[180,210];
+				ui.create.div(ui.roundmenu);
+				ui.create.div(ui.roundmenu);
+				ui.create.div(ui.roundmenu);
+				ui.create.div(ui.roundmenu);
+				ui.create.div(ui.roundmenu);
+				ui.create.div(ui.roundmenu);
+				var resetround=function(e){
+					_status.draggingroundmenu=false;
+					ui.roundmenu.style.transform='';
+					ui.roundmenu._dragtransform=[0,0];
+					ui.roundmenu.style.transition='all 0.3s';
+					delete ui.roundmenu._dragtouches;
+					delete ui.roundmenu._dragorigin;
+					delete ui.roundmenu._dragorigintransform;
+					setTimeout(function(){
+						ui.roundmenu.style.transition='';
+					},500);
+					game.saveConfig('roundmenu_transform',[0,0]);
+					e.stopPropagation();
+					return false;
+				};
+				if(lib.config.touchscreen){
+					ui.roundmenu.addEventListener('touchstart',function(e){
+						_status.draggingroundmenu=true;
+						ui.roundmenu._dragorigin={
+							clientX:e.touches[0].clientX,
+							clientY:e.touches[0].clientY,
+						};
+						if(!ui.roundmenu._dragtransform){
+							ui.roundmenu._dragtransform=[0,0];
+						}
+						ui.roundmenu._dragorigintransform=ui.roundmenu._dragtransform.slice(0);
+						ui.roundmenu._resetTimeout=setTimeout(function(){
+							resetround();
+							delete ui.roundmenu._resetTimeout;
+						},1000);
+					});
+					// lib.setLongPress(ui.roundmenu,resetround);
+				}
+				else{
+					ui.roundmenu.oncontextmenu=resetround;
+				}
+				if(lib.config.roundmenu_transform){
+					var translate=lib.config.roundmenu_transform;
+					ui.roundmenu._dragtransform=translate;
+					ui.roundmenu.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
+					ui.click.checkroundtranslate();
+				}
+				if(lib.config.layout!='phone'){
+					ui.roundmenu.style.display='none';
+				}
 
 				ui.sidebar=ui.create.div('#sidebar');
 				ui.sidebar3=ui.create.div('#sidebar3');
@@ -12613,18 +12737,18 @@
 
 				ui.system1=ui.create.div('#system1',ui.system);
 				ui.system2=ui.create.div('#system2',ui.system);
-				if(lib.config.touchscreen){
-					ui.system1.addEventListener('touchstart',ui.click.system);
+				// if(lib.config.touchscreen){
+				// 	ui.system1.addEventListener('touchstart',ui.click.system);
 					// ui.system1.addEventListener('touchend',ui.click.system);
 					// ui.system1.addEventListener('touchmove',ui.click.system);
-					ui.system2.addEventListener('touchstart',ui.click.system);
+					// ui.system2.addEventListener('touchstart',ui.click.system);
 					// ui.system2.addEventListener('touchend',ui.click.system);
 					// ui.system2.addEventListener('touchmove',ui.click.system);
-				}
-				else{
-					ui.system1.listen(ui.click.system);
-					ui.system2.listen(ui.click.system);
-				}
+				// }
+				// else{
+				// 	ui.system1.listen(ui.click.system);
+				// 	ui.system2.listen(ui.click.system);
+				// }
 
 				ui.replay=ui.create.system('重来',game.reload,true);
 				ui.config2=ui.create.system('选项',ui.click.config);
@@ -14506,6 +14630,40 @@
 				if(this.nextSibling) this.nextSibling.classList.remove('shown');
 				if(this.previousSibling) this.previousSibling.classList.remove('shown');
 			},
+			roundmenu:function(){
+				switch(lib.config.round_menu_func){
+					case 'system':
+						if((_status.removinground&&lib.config.touchscreen)||
+							ui.system2.classList.contains('shown')){
+							// _status.removinground=false;
+							// game.pause2();
+							// ui.click.configMenu();
+							ui.system1.classList.remove('shown');
+							ui.system2.classList.remove('shown');
+						}
+						else{
+							ui.system1.classList.add('shown');
+							ui.system2.classList.add('shown');
+						}
+						break;
+					case 'menu':
+						game.pause2();
+						ui.click.configMenu();
+						ui.system1.classList.remove('shown');
+						ui.system2.classList.remove('shown');
+						break;
+					case 'pause':
+						ui.click.pause();
+						break;
+					case 'auto':
+						ui.click.auto();
+						if(!ui.system1.classList.contains('shown')){
+							 ui.system1.classList.add('shown');
+						 }
+						break;
+				}
+				_status.clicked=true;
+			},
 			pausehistory:function(){
 				if(!lib.config.auto_popped_history) return;
 				if(!ui.sidebar.childNodes.length) return;
@@ -14796,193 +14954,141 @@
 				game.swapPlayer(this.link);
 			},
 			windowtouchstart:function(e){
-				_status.mousedown=true;
-				if(e.path){
-					for(var i=0;i<e.path.length;i++){
-						var itemtype=get.itemtype(e.path[i]);
-						if(itemtype=='button') break;
-						if(itemtype=='dialog'&&
-						!e.path[i].classList.contains('popped')&&
-						!e.path[i].classList.contains('fixed')){
-							var ddialog=e.path[i];
-							_status.draggingdialog=ddialog;
-							ddialog._dragorigin=e;
-							if(!ddialog._dragtransform){
-								ddialog._dragtransform=[0,0];
-							}
-							return;
-						}
-					}
-				}
-				var evt=_status.event;
-				if(!lib.config.enable_drag) return;
-				if(!ui.arena.classList.contains('selecting')) return;
-				if(!evt.isMine()) return;
-				if(!Array.isArray(e.path)) return;
-				for(var i=0;i<e.path.length;i++){
-					var itemtype=get.itemtype(e.path[i]);
-					if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
-						if(e.path[i].classList.contains('selectable')&&
-							!e.path[i].classList.contains('selected')&&
-							!e.path[i].classList.contains('noclick')){
-							_status.clicked=false;
-							ui.click[itemtype].call(e.path[i]);
-							if(e.path[i].classList.contains('selected')){
-								_status.mousedragging=e.touches[0];
-								_status.mousedragorigin=e.path[i];
-								_status.mouseleft=false;
-								_status.selectionfull=false;
-								_status.multitarget=false;
-								// if(ui.confirm&&ui.confirm.str=='c') ui.confirm.close();
-							}
-						}
-						return;
+				if(e.touches[0]&&lib.config.swipe){
+					_status._swipeorigin={
+						clientX:e.touches[0].clientX,
+						clientY:e.touches[0].clientY,
+						time:get.currentTime()
 					}
 				}
 			},
 			windowtouchmove:function(e){
-				if(!Array.isArray(e.path)) return;
-				var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
-				for(var i=0;i<dialogs.length;i++){
-					dialogs[i].delete();
-				}
-				var node=_status.currentmouseenter;
-				if(_status.mousedragging){
-					e.preventDefault();
-					ui.canvas.width=ui.arena.offsetWidth;
-					ui.canvas.height=ui.arena.offsetHeight;
-					var ctx=ui.ctx;
-					ctx.shadowBlur=5;
-					ctx.shadowColor='rgba(0,0,0,0.3)';
-					ctx.strokeStyle='white';
-					ctx.lineWidth=3;
-					ctx.setLineDash([8,2]);
-
-					ctx.beginPath();
-					ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
-					if(_status.multitarget){
-						for(var i=0;i<_status.lastdragchange.length;i++){
-							var exy=_status.lastdragchange[i]._lastdragchange;
-							ctx.lineTo(exy[0],exy[1]);
-						}
-					}
-					if(!_status.selectionfull){
-						ctx.lineTo(e.touches[0].clientX-ui.arena.offsetLeft,e.touches[0].clientY-ui.arena.offsetTop);
-					}
-					ctx.stroke();
-					if(!_status.multitarget){
-						for(var i=0;i<_status.lastdragchange.length;i++){
-							ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
-							var exy=_status.lastdragchange[i]._lastdragchange;
-							ctx.lineTo(exy[0],exy[1]);
-							ctx.stroke();
-						}
-					}
-
-					for(var i=0;i<e.path.length;i++){
-						// e.path.contains(_status.mousedragorigin)===true
-						if(e.path[i]==_status.mousedragorigin){
-							if(_status.mouseleft){
-								_status.mousedragging=null;
-								_status.mousedragorigin=null;
-								_status.clicked=false;
-								game.uncheck();
-								game.check();
-								ui.canvas.width=ui.arena.offsetWidth;
-								ui.canvas.height=ui.arena.offsetHeight;
-								_status.clicked=true;
-							}
-							return;
-						}
-						game.print(2);
-						var itemtype=get.itemtype(e.path[i]);
-						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
-							_status.mouseleft=true;
-							var item=e.path[i];
-							var ex=e.touches[0].clientX-ui.arena.offsetLeft;
-							var ey=e.touches[0].clientY-ui.arena.offsetTop;
-							var exx=ex,eyy=ey;
-							if(lib.config.mode=='chess'){
-								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
-								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
-							}
-							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
-								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
-								var targetfixed=false;
-								if(itemtype=='player'){
-									if(get.select(_status.event.selectTarget)[1]==-1){
-										targetfixed=true;
-									}
-								}
-								if(!targetfixed&&item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
-									_status.mouseleft=true;
-									_status.dragstatuschanged=item;
-									_status.clicked=false;
-									var notbefore=itemtype=='player'&&!item.classList.contains('selected');
-									ui.click[itemtype].call(item);
-									if(item.classList.contains('selected')){
-										if(notbefore){
-											_status.lastdragchange.push(item);
-											e.path[i]._lastdragchange=[exx,eyy];
-										}
-									}
-									else{
-										_status.lastdragchange.remove(item);
-									}
-									_status.selectionfull=true;
-									if(_status.event.filterButton&&ui.selected.buttons.length<get.select(_status.event.selectButton)[1]){
-										_status.selectionfull=false;
-									}
-									else if(_status.event.filterCard&&ui.selected.cards.length<get.select(_status.event.selectCard)[1]){
-										_status.selectionfull=false;
-									}
-									else if(_status.event.filterTarget&&ui.selected.targets.length<get.select(_status.event.selectTarget)[1]){
-										_status.selectionfull=false;
-									}
-								}
-							}
-							return;
-						}
-					}
-					_status.mouseleft=true;
-					_status.dragstatuschanged=null;
-				}
 				e.preventDefault();
+				if(_status.draggingroundmenu){
+					delete _status._swipeorigin;
+					if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform&&e.touches.length){
+						var translate=ui.roundmenu._dragtransform.slice(0);
+						var dx=e.touches[0].clientX-ui.roundmenu._dragorigin.clientX;
+						var dy=e.touches[0].clientY-ui.roundmenu._dragorigin.clientY;
+						translate[0]+=dx;
+						translate[1]+=dy;
+						if(dx*dx+dy*dy>100){
+							if(ui.roundmenu._resetTimeout){
+								clearTimeout(ui.roundmenu._resetTimeout);
+								delete ui.roundmenu._resetTimeout;
+							}
+						}
+						ui.roundmenu._dragtouches=e.touches[0];
+						ui.click.checkroundtranslate(translate);
+					}
+					_status.clicked=true;
+				}
+				else if(_status._swipeorigin&&e.touches[0]){
+					_status._swipeorigin.touches=e.touches[0];
+				}
 			},
 			windowtouchend:function(e){
 				if(e.touches.length==1&&!_status.dragged){
 					ui.click.pause();
 				}
-				else{
-					var tmpflag=false;
-					_status.mousedown=false;
-					if(_status.mousedragging&&_status.mouseleft){
-						if(game.check()){
-							if(ui.confirm){
-								ui.confirm.close();
-							}
-							ui.click.ok();
+				if(_status.draggingroundmenu){
+					delete _status._swipeorigin;
+					if(ui.roundmenu._resetTimeout){
+						clearTimeout(ui.roundmenu._resetTimeout);
+						delete ui.roundmenu._resetTimeout;
+					}
+					if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform&&ui.roundmenu._dragtouches){
+						var dx=ui.roundmenu._dragtouches.clientX-ui.roundmenu._dragorigin.clientX;
+						var dy=ui.roundmenu._dragtouches.clientY-ui.roundmenu._dragorigin.clientY;
+						if(dx*dx+dy*dy<1000){
+							ui.click.roundmenu();
+							ui.roundmenu._dragtransform=ui.roundmenu._dragorigintransform;
+							var translate=ui.roundmenu._dragtransform;
+							ui.roundmenu.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 						}
 						else{
-							game.uncheck();
-							game.check();
+							var translate=ui.roundmenu._dragtransform;
+							translate[0]+=dx;
+							translate[1]+=dy;
+							ui.click.checkroundtranslate();
 						}
+						delete ui.roundmenu._dragorigin;
 					}
-					else if(_status.mousedragging&&_status.mousedragorigin){
-						tmpflag=_status.mousedragorigin;
+					else{
+						ui.click.roundmenu();
 					}
-					_status.lastdragchange.length=0;
-					_status.mousedragging=null;
-					_status.mouseleft=false;
-					_status.mousedragorigin=null;
-					_status.dragstatuschanged=false;
-					ui.canvas.width=ui.arena.offsetWidth;
-					ui.canvas.height=ui.arena.offsetHeight;
-					if(tmpflag){
-						ui.click[get.itemtype(tmpflag)].call(tmpflag);
-						game.check();
-					}
+					_status.clicked=false;
+					game.saveConfig('roundmenu_transform',translate);
+					delete _status.draggingroundmenu;
 				}
+				else if(_status._swipeorigin&&!_status.paused2){
+					 if(get.currentTime()-_status._swipeorigin.time<500){
+						 var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
+						 var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
+						 if(Math.abs(dx)<100){
+							 if(dy<-200){
+								 switch(lib.config.swipe_up){
+ 				 					case 'system':
+ 				 						if(ui.system2.classList.contains('shown')){
+ 				 							ui.system1.classList.remove('shown');
+ 				 							ui.system2.classList.remove('shown');
+ 				 						}
+ 				 						else{
+ 				 							ui.system1.classList.add('shown');
+ 				 							ui.system2.classList.add('shown');
+ 				 						}
+ 				 						break;
+ 				 					case 'menu':
+ 				 						game.pause2();
+ 				 						ui.click.configMenu();
+ 				 						ui.system1.classList.remove('shown');
+ 				 						ui.system2.classList.remove('shown');
+ 				 						break;
+ 				 					case 'pause':
+ 				 						ui.click.pause();
+ 				 						break;
+ 				 					case 'auto':
+ 				 						ui.click.auto();
+ 										if(!ui.system1.classList.contains('shown')){
+ 		   									 ui.system1.classList.add('shown');
+ 		   								 }
+ 				 						break;
+ 				 				}
+							}
+							else if(dy>200){
+								if(lib.config.swipe_down=='menu'||
+									ui.system2.classList.contains('shown')||
+									lib.config.layout!='phone'){
+									game.pause2();
+									ui.click.configMenu();
+									ui.system1.classList.remove('shown');
+									ui.system2.classList.remove('shown');
+								}
+								else{
+									ui.system1.classList.add('shown');
+									ui.system2.classList.add('shown');
+								}
+							 }
+						 }
+
+					 }
+				}
+			},
+			checkroundtranslate:function(translate){
+				var translate=translate||ui.roundmenu._dragtransform;
+				if(translate[1]+ui.roundmenu._position[1]+50+ui.arena.offsetTop>ui.window.offsetHeight){
+					translate[1]=ui.window.offsetHeight-(ui.roundmenu._position[1]+50)-ui.arena.offsetTop;
+				}
+				else if(translate[1]+ui.roundmenu._position[1]+ui.arena.offsetTop<0){
+					translate[1]=-ui.roundmenu._position[1]-ui.arena.offsetTop;
+				}
+				if(translate[0]+ui.roundmenu._position[0]+50+ui.arena.offsetLeft>ui.window.offsetWidth){
+					translate[0]=ui.window.offsetWidth-(ui.roundmenu._position[0]+50)-ui.arena.offsetLeft;
+				}
+				else if(translate[0]+ui.roundmenu._position[0]+ui.arena.offsetLeft<0){
+					translate[0]=-ui.roundmenu._position[0]-ui.arena.offsetLeft;
+				}
+				ui.roundmenu.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 			},
 			windowmousewheel:function(e){
 				_status.tempunpopup=e;
@@ -15143,6 +15249,15 @@
 						}
 						_status.clicked=true;
 					}
+					if(_status.draggingroundmenu){
+						if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform){
+							var translate=ui.roundmenu._dragtransform.slice(0);
+							translate[0]+=e.x-ui.roundmenu._dragorigin.x;
+							translate[1]+=e.y-ui.roundmenu._dragorigin.y;
+							ui.click.checkroundtranslate(translate);
+						}
+						_status.clicked=true;
+					}
 				}
 			},
 			windowmousedown:function(e){
@@ -15166,6 +15281,13 @@
 								ddialog._dragtransform=[0,0];
 							}
 							return;
+						}
+						if(e.path[i]==ui.roundmenu){
+							_status.draggingroundmenu=true;
+							ui.roundmenu._dragorigin=e;
+							if(!ui.roundmenu._dragtransform){
+								ui.roundmenu._dragtransform=[0,0];
+							}
 						}
 					}
 				}
@@ -15208,6 +15330,23 @@
 						delete ddialog._dragorigin;
 					}
 					delete _status.draggingdialog;
+				}
+				if(_status.draggingroundmenu){
+					if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform){
+						var dx=e.x-ui.roundmenu._dragorigin.x;
+						var dy=e.y-ui.roundmenu._dragorigin.y;
+						if(dx*dx+dy*dy<25){
+							ui.click.roundmenu();
+						}
+						var translate=ui.roundmenu._dragtransform;
+						translate[0]+=dx;
+						translate[1]+=dy;
+						ui.click.checkroundtranslate();
+						delete ui.roundmenu._dragorigin;
+					}
+
+					game.saveConfig('roundmenu_transform',translate);
+					delete _status.draggingroundmenu;
 				}
 				if(e.button==2){
 					if(_status.mousedragging){
@@ -15360,6 +15499,12 @@
 						}
 					}
 					if(lib.config.layout=='phone'&&ui.menuContainer.classList.contains('hidden')){
+						if(ui.system2.classList.contains('shown')){
+							_status.removinground=true;
+							setTimeout(function(){
+								_status.removinground=false;
+							},200);
+						}
 						ui.arena.classList.remove('phonetop');
 						ui.system1.classList.remove('shown');
 						ui.system2.classList.remove('shown');
@@ -15918,6 +16063,8 @@
 
 				if(lib.config.config_menu){
 					ui.click.configMenu();
+					ui.system1.classList.remove('shown');
+					ui.system2.classList.remove('shown');
 				}
 				else{
 					ui.system.hide();
@@ -16007,11 +16154,12 @@
 						_status.dragged=true;
 					}
 				}
-				if(this.scrollWidth<=this.offsetWidth&&
-					this.scrollHeight<=this.offsetHeight){
+				if(this.scrollWidth<=this.offsetWidth+5&&
+					this.scrollHeight<=this.offsetHeight+5){
 					e.preventDefault();
 				}
 				else{
+					delete _status._swipeorigin;
 					e.stopPropagation();
 				}
 			},
@@ -16493,7 +16641,20 @@
 				if(_status.clickedplayer){
 					return false;
 				}
-				ui.click.intro.call(this,e);
+				// if(this._mouseentercreated){
+				// 	this._mouseentercreated=false;
+				// 	ui.click.window();
+				// }
+				// else{
+				// 	ui.click.intro.call(this,e);
+				// }
+
+				if(this._mouseenterdialog&&this._mouseenterdialog.parentNode){
+					this._mouseenterdialog.delete();
+				}
+				else{
+					ui.click.intro.call(this,e);
+				}
 				_status.clickedplayer=true;
 				_status.clicked=false;
 				ui.click.longpresscancel.call(this);
@@ -16748,6 +16909,9 @@
 			else{
 				return lib.getUTC(new Date())-lib.getUTC(lib.status.date)-lib.status.dateDelayed;
 			}
+		},
+		currentTime:function(){
+			return lib.getUTC(new Date());
 		},
 		evtDistance:function(e1,e2){
 			return Math.sqrt((e1.x-e2.x)*(e1.x-e2.x)+(e1.y-e2.y)*(e1.y-e2.y));
@@ -17606,7 +17770,7 @@
 								if(num){
 									if(!introadded){
 										introadded=true;
-										uiintro.add('更改皮肤');
+										uiintro.add('<div class="text center">更改皮肤</div>');
 									}
 									var buttons=ui.create.div('.buttons.smallzoom');
 									for(var i=0;i<=num;i++){
@@ -19028,17 +19192,9 @@
 			document.oncontextmenu=ui.click.right;
 		}
 		else{
-			// document.ontouchstart=ui.click.windowtouchstart;
-			// document.ontouchend=ui.click.windowtouchend;
-			// document.ontouchmove=ui.click.windowtouchmove;
-			document.ontouchend=function(e){
-				if(e.touches.length==1&&!_status.dragged){
-					ui.click.pause();
-				}
-			}
-			document.ontouchmove = function(e) {
-				e.preventDefault();
-			};
+			document.ontouchstart=ui.click.windowtouchstart;
+			document.ontouchend=ui.click.windowtouchend;
+			document.ontouchmove=ui.click.windowtouchmove;
 		}
 		window.onbeforeunload=function(){
 			if(lib.config.confirm_exit&&!_status.reloading){

@@ -55,6 +55,49 @@ table{table-layout: fixed;}
 	position: absolute;
 	left:8px;
 }
+
+.roundarenabutton{
+	/*width: 50px;
+	height: 50px;*/
+	left:180px;
+	top:210px;
+	position: absolute;
+	/*background: rgba(0,0,0,0.2);
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
+	border-radius:100%;*/
+	z-index: 7;
+	transition-property: opacity;
+}
+#roundmenu>div{
+	width: 26px;
+	height: 4px;
+	background: white;
+	position: absolute;
+	left: 12px;
+	border-radius: 2px;
+	box-shadow: black 0 0 2px;
+}
+#roundmenu>div:nth-of-type(even){
+	width: 20px;
+	left:18px;
+}
+#roundmenu>div:nth-of-type(odd){
+	width: 4px;
+}
+
+#roundmenu>div:nth-of-type(1),
+#roundmenu>div:nth-of-type(2){
+	top:14px;
+}
+#roundmenu>div:nth-of-type(3),
+#roundmenu>div:nth-of-type(4){
+	top:23px;
+}
+#roundmenu>div:nth-of-type(5),
+#roundmenu>div:nth-of-type(6){
+	top:32px;
+}
+
 .linexy{
 	transition-property: transform,opacity;
 	width: 3px;
@@ -88,7 +131,8 @@ table{table-layout: fixed;}
 #arena.single-handcard #handcards1{width: 100%;}
 #arena.single-handcard #handcards2{display: none;}
 #system{padding: 6px;width: calc(100% - 12px);white-space: nowrap;z-index: 3;pointer-events: none}
-#system>div{height: 100%;position: relative;margin: 0;padding: 0;pointer-events: auto}
+#system>div{height: 100%;position: relative;margin: 0;padding: 0;}
+#system>div>div{pointer-events: auto}
 #system>div:last-child{text-align: right;float:right}
 #system>div>div{position: relative;padding-top: 6px;padding-bottom: 6px;padding-left: 8px;padding-right: 8px;text-align: center;margin:4px;transition: all 0.1s}
 #paused,#click{left: 0;top:0;width: 100%;height: 100%;z-index: 5;}

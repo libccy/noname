@@ -1563,6 +1563,7 @@ mode.chess={
 				ui.create.cards();
 				game.finishCards();
 				ui.chessContainer=ui.create.div('#chess-container',ui.arena);
+				ui.chessContainer.ontouchstart = ui.click.touchStart;
 				ui.chessContainer.ontouchmove = ui.click.touchScroll;
 				ui.chessContainer.style.WebkitOverflowScrolling='touch';
 				ui.chess=ui.create.div('#chess',ui.chessContainer);

@@ -646,7 +646,7 @@ character.standard={
 			position:'he',
 			viewAs:{name:'sha'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{color:'red'})) return false;
+				if(!player.num('he',{color:'red'})) return false;
 			},
 			prompt:'将一张红色牌当杀使用或打出',
 			check:function(card){return 4-ai.get.value(card)},
@@ -1520,7 +1520,7 @@ character.standard={
 		qicai_info:'锁定技，你使用的锦囊牌无距离限制',
 		zhiheng_info:'出牌阶段，你可以弃置任意张牌并摸等量的牌，每阶段限1次',
 		jiuyuan_info:'锁定技，濒死阶段，吴势力角色对你使用的[桃]额外回复一点体力',
-		qixi_info:'你可以将一张黑色手牌当[过河拆桥]使用',
+		qixi_info:'你可以将一张黑色牌当[过河拆桥]使用',
 		keji_info:'若你在出牌阶段没有使用[杀]，则可跳过弃牌阶段',
 		kurou_info:'出牌阶段，你可以流失一点体力并摸两张牌',
 		yingzi_info:'摸牌阶段，你可以额外摸一张牌',

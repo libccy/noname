@@ -219,8 +219,9 @@ card.standard={
 							if(target.hp>2) return 0;
 							if(target.hp==2){
 								for(var i=0;i<game.players.length;i++){
-									if(target!=game.players[i]&&ai.get.attitude(target,game.players[i])>=3&&game.players[i].hp<=1){
-										return 0;
+									if(target!=game.players[i]&&ai.get.attitude(target,game.players[i])>=3){
+										if(game.players[i].hp<=1) return 0;
+										if(lib.config.mode=='identity'&&game.players[i].isZhu&&game.players[i].hp<=2) return 0;
 									}
 								}
 							}

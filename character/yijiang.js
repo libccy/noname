@@ -613,7 +613,10 @@ character.yijiang={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			content:function(){
+				'step 0'
 				player.phaseUse();
+				'step 1'
+				player.getStat().card={};
 			}
 		},
 		longyin:{
@@ -681,9 +684,11 @@ character.yijiang={
 		jigong:{
 			trigger:{player:'phaseUseBegin'},
 			check:function(event,player){
-				var nh=player.num('h');
-				if(nh<=2) return true;
-				if(nh==3&&!player.num('h','tao')) return Math.random()<0.5;
+				var nh=player.num('h')-player.num('h',{type:'equip'});
+				if(nh<=1) return true;
+				if(player.num('h','tao')) return false;
+				if(nh<=2) return Math.random()<0.7;
+				if(nh<=3) return Math.random()<0.4;
 				return false;
 			},
 			content:function(){
@@ -1671,8 +1676,10 @@ character.yijiang={
 				return false;
 			},
 			init:function(player){
-				if(player.isZhu) player.markSkill('xingshuai');
-				player.storage.xingshuai=false;
+				if(player.isZhu){
+					player.markSkill('xingshuai');
+					player.storage.xingshuai=false;
+				}
 			},
 			intro:{
 				content:'limited'
@@ -2542,7 +2549,7 @@ character.yijiang={
 				"step 0"
 				player.draw(2);
 				"step 1"
-				player.chooseCard(2,true,'交给'+get.translation(trigger.player)+'两张牌').ai=function(card){
+				player.chooseCard(2,'he',true,'交给'+get.translation(trigger.player)+'两张牌').ai=function(card){
 					if(ui.selected.cards.length&&card.name==ui.selected.cards[0].name) return -1;
 					if(get.tag(card,'damage')) return 1;
 					if(get.type(card)=='equip') return 1;
@@ -4076,6 +4083,7 @@ character.yijiang={
 				return 1;
 			},
 			filterTarget:function(card,player,target){
+				if(player==target) return false;
 				var num=player.getStat().skill.danshou;
 				if(num){
 					num++;
@@ -5579,7 +5587,7 @@ character.yijiang={
 		xinzhan_info:'出牌阶段限一次，你可以观看牌堆顶的3张牌，然后展示其中任意数量♥的牌并获得之',
 		huilei_info:'锁定技，杀死你的角色立即弃置所有的牌。',
 		enyuan_info:'锁定技，其他角色每令你回复一点体力，该角色摸一张牌;其他角色每对你造成一次伤害，须给你一张♥手牌，否则该角色失去1点体力。',
-		xuanhuo_info:'你每次获得一名其他角色两张或更多的牌时，可以令其摸一张牌；每当你受到1点伤害后，你可以令伤害来源选择一项：交给你一张手牌，或失去1点体力。',
+		xuanhuo_info:'出牌阶段限一次，你可以将一张红桃手牌交给一名其他角色，获得该角色的一张牌，然后交给除该角色外的一名其他角色',
 		ganlu_info:'出牌阶段，你可以选择两名角色，交换他们装备区里的所有牌。以此法交换的装备数差不能超过X(X为你已损失体力值)。每回合限一次。',
 		buyi_info:'当有角色进入濒死状态时，你可以展示该角色的一张手牌：若此牌不为基本牌，则该角色弃掉这张牌并回复1点体力。',
 		mingce_info:'出牌阶段，你可以交给任一其他角色一张装备牌或【杀】，该角色进行二选一：1. 视为对其攻击范围内的另一名由你指定的角色使用一张【杀】。2. 摸一张牌。每回合限一次。',

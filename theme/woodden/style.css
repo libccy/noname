@@ -46,6 +46,10 @@ html{
 	text-shadow:none;
 	border-radius:4px;
 }
+#roundmenu>div{
+	background:rgba(77, 60, 51,0.8);
+	box-shadow:none;
+}
 #system>div>.pressdown2{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
 }

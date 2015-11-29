@@ -46,9 +46,15 @@
 #system>div:not(.shown)>div{
     pointer-events: none;
 }
+/*#system1>div:first-child{
+    display: none !important;
+}
+#system1>div:last-child{
+    display: none !important;
+}*/
 
 .menu-container>.menu.main {
-    top: 55px !important;
+    top: 12px !important;
     left: 10px !important;
     zoom:1.3;
 }

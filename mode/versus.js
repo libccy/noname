@@ -86,8 +86,11 @@ mode.versus={
 						lib.setPopped(ui.versushs,game.versusHoverHandcards);
 					}
 				}
-				_status.friendCount=ui.create.system('我方阵亡：'+get.cnNumber(0),null,true);
-				_status.enemyCount=ui.create.system('敌方阵亡：'+get.cnNumber(0),null,true);
+				_status.friendCount=ui.create.system('友军: '+get.cnNumber(_status.friend.length,true),null,true);
+				_status.enemyCount=ui.create.system('敌军: '+get.cnNumber(_status.friend.length,true),null,true);
+				// _status.friendCount=ui.create.system('友方',null,true);
+				// _status.enemyCount=ui.create.system('敌方',null,true);
+
 				lib.setPopped(_status.friendCount,game.versusHoverFriend);
 				lib.setPopped(_status.enemyCount,game.versusHoverEnemy);
 
@@ -1100,12 +1103,12 @@ mode.versus={
 				this.dieSpeak();
 				if(this.side==game.me.side){
 					_status.friendDied.push(this.name);
+					_status.friendCount.innerHTML='友军: '+get.cnNumber(Math.max(0,_status.friend.length-1),true);
 				}
 				else{
 					_status.enemyDied.push(this.name);
+					_status.enemyCount.innerHTML='敌军: '+get.cnNumber(Math.max(0,_status.enemy.length-1),true);
 				}
-				_status.friendCount.innerHTML='我方阵亡：'+get.cnNumber(_status.friendDied.length,true);
-				_status.enemyCount.innerHTML='敌方阵亡：'+get.cnNumber(_status.enemyDied.length,true);
 
 				var list=(this.side==game.me.side)?_status.friend:_status.enemy;
 				if((list.length==0&&lib.storage.noreplace_end)||

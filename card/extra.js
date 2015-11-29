@@ -375,6 +375,7 @@ card.extra={
 			audio:true,
 			trigger:{source:'damageBegin'},
 			filter:function(event){
+				if(event.parent.name=='_lianhuan'||event.parent.name=='_lianhuan2') return false;
 				if(event.card&&event.card.name=='sha'){
 					if(event.player.get('h').length==0) return true;
 				}
