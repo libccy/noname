@@ -419,7 +419,6 @@ margin-bottom: 5px;
 #control>div{
 	position: absolute;
 	left: 50%;
-	height: 24px;
 }
 /*--------角色--------*/
 .player>.avatar>.action{
