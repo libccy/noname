@@ -5,3 +5,7 @@
 #arena.menupaused{
     opacity: 0.6;
 }
+#arena.thrownhighlight>.card.thrown:not(.thrownhighlight){
+    filter:blur(2px);
+    -webkit-filter:blur(2px);
+}

@@ -4661,6 +4661,10 @@
 								delete this.marks[i].markcount;
 							}
 						}
+						else if(this.marks[i].markcount){
+							this.marks[i].markcount.delete();
+							delete this.marks[i].markcount;
+						}
 					}
 				},
 				num:function(arg1,arg2,arg3){
@@ -9703,7 +9707,7 @@
 		addVideo:function(type,player,content){
 			if(_status.video) return;
 			if(!_status.videoInited) return;
-			if(type=='storage'&&player&&player.update){
+			if(type=='storage'&&player&&player.updateMarks){
 				player.updateMarks();
 			}
 			if(game.getVideoName){
@@ -10731,13 +10735,16 @@
 
 
 				var globalskills=[];
+				var globallist=lib.skill.global.slice(0);
+				game.expandSkills(globallist);
 				for(var i=0;i<skills.length;i++){
-					if(lib.skill.global.contains(skills[i])){
+					if(globallist.contains(skills[i])){
 						globalskills.push(skills.splice(i--,1)[0]);
 					}
 				}
 				var equipskills=[];
 				var ownedskills=player.get('s',true,false);
+				game.expandSkills(ownedskills);
 				for(var i=0;i<skills.length;i++){
 					if(!ownedskills.contains(skills[i])){
 						equipskills.push(skills.splice(i--,1)[0]);
@@ -11963,6 +11970,7 @@
 				// }
 				var i,controls;
 				var nozoom=false;
+				var noupdate=false;
 				if(get.objtype(arguments[0])=='array') controls=arguments[0];
 				else controls=arguments;
 				var control=ui.create.div('.control');
@@ -11976,6 +11984,9 @@
 					}
 					else if(controls[i]=='nozoom'){
 						nozoom=true;
+					}
+					else if(controls[i]=='noupdate'){
+						noupdate=true;
 					}
 					else{
 						control.add(controls[i]);
@@ -12005,7 +12016,7 @@
 					ui.refresh(control);
 					control.style.transition='';
 				}
-				ui.updatec();
+				if(!noupdate) ui.updatec();
 				return control;
 			},
 			confirm:function(str,func){
@@ -12063,9 +12074,12 @@
 					delete ui.skills;
 				}
 				if(skills==undefined||skills.length==0) return;
-				ui.skills=ui.create.control(skills.concat([ui.click.skill]));
+				ui.skills=ui.create.control(skills.concat([ui.click.skill]),'noupdate');
 				if(!_status.event.isMine()){
 					ui.skills.style.display='none';
+				}
+				else{
+					ui.updatec();
 				}
 				ui.skills.skills=skills;
 				ui.skills._nomove=true;
@@ -12088,9 +12102,12 @@
 					delete ui.skills2;
 				}
 				if(skills==undefined||skills.length==0) return;
-				ui.skills2=ui.create.control(skills.concat([ui.click.skill]));
+				ui.skills2=ui.create.control(skills.concat([ui.click.skill]),'noupdate');
 				if(!_status.event.isMine()){
 					ui.skills2.style.display='none';
+				}
+				else{
+					ui.updatec();
 				}
 				ui.skills2.skills=skills;
 				return ui.skills2;
@@ -12112,9 +12129,12 @@
 					delete ui.skills3;
 				}
 				if(skills==undefined||skills.length==0) return;
-				ui.skills3=ui.create.control(skills.concat([ui.click.skill]));
+				ui.skills3=ui.create.control(skills.concat([ui.click.skill]),'noupdate');
 				if(!_status.event.isMine()){
 					ui.skills3.style.display='none';
+				}
+				else{
+					ui.updatec();
 				}
 				ui.skills3.skills=skills;
 				return ui.skills3;
@@ -14937,7 +14957,12 @@
 						node.dataset.color=i;
 						ui.refresh(node);
 						node.show();
-						node.style.transform='translateY('+((num++)*30)+'px)';
+						if(lib.config.layout=='phone'){
+							node.style.transform='scale(1.3) translateY('+((num++)*30)+'px)';
+						}
+						else{
+							node.style.transform='translateY('+((num++)*30)+'px)';
+						}
 						nodes.push(node);
 					}
 				}
@@ -16046,8 +16071,16 @@
 					lib.config.skin[player.name]=num;
 					game.saveConfig('skin',lib.config.skin);
 					avatar.style.backgroundImage='url("'+img.src+'")';
+					if(lib.config.animation&&!lib.config.low_performance){
+						player.$rare();
+					}
 				}
 				img.onerror=function(){
+					if(lib.config.skin[player.name]){
+						if(lib.config.animation&&!lib.config.low_performance){
+							player.$rare();
+						}
+					}
 					delete lib.config.skin[player.name];
 					game.saveConfig('skin',lib.config.skin);
 					avatar.setBackground(player.name,'character');
@@ -16075,8 +16108,16 @@
 					lib.config.skin[player.name2]=num;
 					game.saveConfig('skin',lib.config.skin);
 					avatar.style.backgroundImage='url("'+img.src+'")';
+					if(lib.config.animation&&!lib.config.low_performance){
+						player.$rare();
+					}
 				}
 				img.onerror=function(){
+					if(lib.config.skin[player.name2]){
+						if(lib.config.animation&&!lib.config.low_performance){
+							player.$rare();
+						}
+					}
 					delete lib.config.skin[player.name2];
 					game.saveConfig('skin',lib.config.skin);
 					avatar.setBackground(player.name2,'character');

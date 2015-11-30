@@ -244,6 +244,7 @@ character.extra={
 				if(result.bool){
 					player.logSkill('jilue_guicai');
 					player.storage.renjie--;
+					player.updateMarks();
 					if(trigger.player.judging.clone){
 						trigger.player.judging.clone.delete();
 						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging.clone]));
@@ -287,6 +288,7 @@ character.extra={
 				"step 1"
 				if(result.bool){
 					player.storage.renjie--;
+					player.updateMarks();
 					player.logSkill('jilue_fangzhu',result.targets);
 					result.targets[0].draw(player.maxHp-player.hp);
 					result.targets[0].turnOver();
@@ -302,6 +304,7 @@ character.extra={
 			},
 			content:function(){
 				player.storage.renjie--;
+				player.updateMarks();
 				player.addTempSkill('wansha','phaseAfter');
 			}
 		},
@@ -319,6 +322,7 @@ character.extra={
 			check:function(card){return 6-ai.get.value(card)},
 			content:function(){
 				player.storage.renjie--;
+				player.updateMarks();
 				player.draw(cards.length);
 			},
 			ai:{
@@ -348,6 +352,7 @@ character.extra={
 			},
 			content:function(){
 				player.storage.renjie--;
+				player.updateMarks();
 				player.draw();
 			},
 			ai:{

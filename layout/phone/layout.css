@@ -66,6 +66,9 @@
 #arena.phonetop{
     top:80px !important;
 }
+.player>.identity{
+    transform: scale(1.3);
+}
 
 @media screen and (orientation:portrait) {
 

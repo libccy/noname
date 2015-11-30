@@ -113,6 +113,12 @@
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.count{
     bottom:10px;
 }
+#arena:not(.chess).slim_player .player[data-position='0']:not(.minskin)>.count{
+    border-radius: 0 2px 2px 0;
+    left:-4px;
+    z-index: 3;
+    text-align: right;
+}
 #arena:not(.chess) .player[data-position='0']>.hp.actcount{
     top:10px;
     left:2px;

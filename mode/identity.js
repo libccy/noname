@@ -799,7 +799,7 @@ mode.identity={
 					game.delay(2);
 					game.zhu.playerfocus(1000);
 				}
-				var node=ui.create.div('.damage',get.translation(this.identity+'2'),this);
+				var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
 				ui.refresh(node);
 				node.style.opacity=1;
 			},
