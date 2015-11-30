@@ -2368,6 +2368,7 @@ character.yijiang={
 			trigger:{source:'damageBefore'},
 			check:function(event,player){
 				if(ai.get.damageEffect(event.player,player,player)<0) return true;
+				if(ai.get.attitude(player,event.player)>0&&event.player.num('j')) return true;
 				var cards=event.player.get('e');
 				for(var i=0;i<cards.length;i++){
 					if(ai.get.equipValue(cards[i])>=6) return true;
@@ -3502,14 +3503,6 @@ character.yijiang={
 		miji:{
 			audio:2,
 			trigger:{player:'phaseEnd'},
-			check:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>0){
-						return true;
-					}
-				}
-				return false;
-			},
 			filter:function(event,player){
 				return player.hp<player.maxHp;
 			},

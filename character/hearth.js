@@ -24,7 +24,7 @@ character.hearth={
 		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi']],
 		hs_malorne:['male','wu',3,['enze','chongsheng']],
 		hs_malygos:['male','wei',4,['malymowang']],
-		hs_xuefashi:['male','wei',3,['liehun','xjumo']],
+		hs_xuefashi:['male','wei',2,['liehun','xjumo']],
 		// hs_loatheb:['male','wei',2,[]],
 		// hs_trueheart:['male','wei',2,[]],
 		// hs_sainaliusi:['male','wei',2,[]],
@@ -91,6 +91,7 @@ character.hearth={
 		xjumo:{
 			mod:{
 				maxHandcard:function(player,num){
+					if(player.hp<player.maxHp) return num+5;
 					return num+3;
 				},
 			},
@@ -2213,10 +2214,11 @@ character.hearth={
 		mengjing_mengjing:'梦境',
 		mengjing_mengjing_info:'令一名角色将装备区内的所有牌收入手牌，并将一张乐不思蜀置于其判定区',
 		xjumo:'聚魔',
-		xjumo_info:'锁定技，你的手牌上限+2',
+		xjumo_info:'锁定技，你的手牌上限+3；若你已受伤，改为+5',
 		liehun:'裂魂',
 		liehun_info:'锁定技，回合结束阶段，你获得手牌中所有非基本牌的复制',
 		malymowang:'魔网',
+		malymowang2:'魔网',
 		malymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你观看随机3张锦囊牌，并将其中一张加入你的手牌',
 		lingzhou:'灵咒',
 		lingzhou_info:'每当你使用一张锦囊牌，可令一名角色摸一张牌或回复一点体力',

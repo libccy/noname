@@ -149,6 +149,15 @@ character.sp={
 							}
 						}
 					}
+					if(att<0&&ui.selected.cards.length==3){
+						var suit=get.suit(card);
+						for(var i=0;i<ui.selected.cards.length;i++){
+							if(get.suit(ui.selected.cards[i])==suit){
+								return -ai.get.value(card);
+							}
+						}
+						return -10-ai.get.value(card);
+					}
 					return -ai.get.value(card);
 				}
 				'step 3'

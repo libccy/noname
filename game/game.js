@@ -16,6 +16,16 @@
 		dieClose:[]
 	};
 	var lib={
+		version:1.62,
+		changeLog:[
+			'改进触屏操作，增加上划/下划手势（可在选项－通用中设置）',
+			'音效菜单中增加音量选项',
+			'字体选项',
+			'修改标身份操作',
+			'装备距离提示',
+			'加入部分美化版素材(by @tanyuanjkl)',
+			'界面、bug修复'
+		],
 		configprefix:'noname_0.9_',
 		updates:[],
 		canvasUpdates:[],
@@ -71,7 +81,7 @@
 						unfrequent:true,
 					},
 					low_performance:{
-						name:'低性能模式',
+						name:'流畅模式',
 						init:false,
 						onclick:function(bool){
 							game.saveConfig('low_performance',bool);
@@ -137,6 +147,8 @@
 						item:{
 							system:'显示按钮',
 							menu:'打开菜单',
+							pause:'切换暂停',
+							auto:'切换托管'
 						}
 					},
 					swipe_up:{
@@ -240,6 +252,14 @@
 							map.right_info.hide();
 							map.right_click.hide();
 							map.swipe.show();
+							if(config.swipe){
+								map.swipe_up.show();
+								map.swipe_down.show();
+							}
+							else{
+								map.swipe_up.hide();
+								map.swipe_down.hide();
+							}
 						}
 						else{
 							map.mousewheel.show();
@@ -255,6 +275,8 @@
 								map.hoveration.show();
 							}
 							map.swipe.hide();
+							map.swipe_up.hide();
+							map.swipe_down.hide();
 						}
 					}
 				}
@@ -446,7 +468,7 @@
 						init:'default',
 						item:{
 							default:'默认',
-							official:'原版'
+							official:'勾玉',
 						},
 						onclick:function(layout){
 							game.saveConfig('hp_style',layout);
@@ -482,6 +504,20 @@
 								else{
 									_status.currentPhase.classList.remove('glow_phase');
 								}
+							}
+						}
+					},
+					slim_player:{
+						name:'窄边框',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('slim_player',bool);
+							if(bool){
+								ui.arena.classList.add('slim_player');
+							}
+							else{
+								ui.arena.classList.remove('slim_player');
 							}
 						}
 					},
@@ -583,8 +619,8 @@
 						item:{
 							system:'显示按钮',
 							menu:'打开菜单',
-							pause:'切换暂停',
-							auto:'切换托管'
+							// pause:'切换暂停',
+							// auto:'切换托管'
 						}
 					},
 					show_replay:{
@@ -751,6 +787,66 @@
 						name:'游戏特效',
 						init:true,
 					},
+					name_font:{
+						name:'人名字体',
+						init:'xinwei',
+						unfrequent:true,
+						item:{
+							xinwei:'新魏',
+							huangcao:'黄草',
+							xiaozhuan:'小篆',
+							// default:'默认',
+						},
+						onclick:function(font){
+							game.saveConfig('name_font',font);
+							ui.arena.dataset.name_font=font;
+						}
+					},
+					identity_font:{
+						name:'身份字体',
+						init:'huangcao',
+						unfrequent:true,
+						item:{
+							xinwei:'新魏',
+							huangcao:'黄草',
+							xiaozhuan:'小篆',
+							// default:'默认',
+						},
+						onclick:function(font){
+							game.saveConfig('identity_font',font);
+							ui.arena.dataset.identity_font=font;
+						}
+					},
+					global_font:{
+						name:'界面字体',
+						init:'default',
+						unfrequent:true,
+						item:{
+							xinwei:'新魏',
+							huangcao:'黄草',
+							xiaozhuan:'小篆',
+							default:'默认',
+						},
+						onclick:function(font){
+							game.saveConfig('global_font',font);
+							ui.arena.dataset.global_font=font;
+						}
+					},
+					// font_size:{
+					// 	name:'字体大小',
+					// 	init:'16',
+					// 	unfrequent:true,
+					// 	item:{
+					// 		'14':'14px',
+					// 		'16':'16px',
+					// 		'18':'18px',
+					// 		'20':'20px',
+					// 	},
+					// 	onclick:function(font){
+					// 		game.saveConfig('font_size',font);
+					// 		ui.arena.dataset.font_size=font;
+					// 	}
+					// },
 					update:function(config,map){
 						if(lib.config.image_background=='default'){
 							map.image_background_filter.hide();
@@ -799,6 +895,40 @@
 					background_ogg:{
 						name:'补全配音',
 						init:true
+					},
+					volumn_audio:{
+						name:'音效音量',
+						init:8,
+						item:{
+							'1':'一',
+							'2':'二',
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'7':'七',
+							'8':'八',
+						},
+						onclick:function(volume){
+							game.saveConfig('volumn_audio',parseInt(volume));
+						}
+					},
+					volumn_background:{
+						name:'音乐音量',
+						init:8,
+						item:{
+							'1':'一',
+							'2':'二',
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'7':'七',
+							'8':'八',
+						},
+						onclick:function(volume){
+							game.saveConfig('volumn_background',parseInt(volume));
+						}
 					}
 				}
 			},
@@ -2146,7 +2276,6 @@
 
 				var charlist=['standard','wind','fire','woods','mountain','guozhan','sp','yijiang','extra','refresh'];
 				for(i in character.pack){
-					if(window.minnoname&&charlist.indexOf(i)==-1) continue;
 					lib.config.all.characters.push(i);
 					lib.translate[i+'_character_config']=character.pack[i];
 				}
@@ -2449,6 +2578,10 @@
 					// if(!player.skipList.contains('phaseUse')) player.popup('出牌阶段');
 					player.phaseUse();
 					"step 3"
+					if(ui.tempnowuxie){
+						ui.tempnowuxie.close();
+						delete ui.tempnowuxie;
+					}
 					player.phaseDiscard()
 					game.delayx();
 				},
@@ -2489,7 +2622,7 @@
 				},
 				phaseUse:function(){
 					"step 0";
-					player.chooseToUse().modCancel='结束';
+					player.chooseToUse();
 					"step 1"
 					if(result.bool){
 						event.goto(0);
@@ -4046,6 +4179,7 @@
 						delete player.tempSkills[i];
 					}
 					player.classList.add('dead');
+					player.classList.remove('linked');
 					player.classList.remove('turnedover');
 					player.classList.remove('out');
 					player.node.count.innerHTML='0';
@@ -4321,6 +4455,15 @@
 						this.hp=this.maxHp;
 						this.node.count.classList.add('p2');
 						skills=skills.concat(info2[3]);
+
+						var name=get.translation(character2);
+						this.node.name2.innerHTML='';
+						if(!lib.config.show_name){
+							this.node.name2.style.display='none';
+						}
+						for(var i=0;i<name.length;i++){
+							this.node.name2.innerHTML+=name[i]+'<br/>';
+						}
 					}
 					if(skill!=false){
 						for(var i=0;i<skills.length;i++){
@@ -7260,7 +7403,7 @@
 					var player=this;
 					var clone;
 					// var clone=card.copy('thrown','thrownhighlight',ui.arena);
-					if(lib.config.low_performance){
+					if(true){
 						clone=player.$throw(card);
 					}
 					else{
@@ -7344,12 +7487,12 @@
 					for(var i=0;i<name.length;i++){
 						this.node.name.innerHTML+=name[i]+'<br/>';
 					}
-					if(lib.card[card[2]].subtype=='equip3'){
-						this.node.name.innerHTML+='+';
-					}
-					else if(lib.card[card[2]].subtype=='equip4'){
-						this.node.name.innerHTML+='-';
-					}
+					// if(lib.card[card[2]].subtype=='equip3'){
+					// 	this.node.name.innerHTML+='+';
+					// }
+					// else if(lib.card[card[2]].subtype=='equip4'){
+					// 	this.node.name.innerHTML+='-';
+					// }
 					this.node.name2.innerHTML=get.translation(card[0])+card[1]+' '+name;
 					this.suit=card[0];
 					this.number=card[1];
@@ -7366,6 +7509,25 @@
 						}
 					}
 					if(typeof lib.card[card[2]].init=='function') lib.card[card[2]].init();
+
+					switch(get.subtype(this)){
+						case 'equip1':
+							var added=false;
+							if(lib.card[this.name]&&lib.card[this.name].distance){
+								var dist=lib.card[this.name].distance;
+								if(dist.attackFrom){
+									added=true;
+									this.node.range.innerHTML='范围: '+(-dist.attackFrom+1);
+								}
+							}
+							if(!added){
+								this.node.range.innerHTML='范围: 1';
+							}
+							break;
+						case 'equip3':this.node.range.innerHTML='防御: 1';break;
+						case 'equip4':this.node.range.innerHTML='进攻: 1';break;
+					}
+
 					return this;
 				},
 				aiexclude:function(){
@@ -7791,23 +7953,31 @@
 					ui.controls.remove(this);
 					this.delete();
 
-					var that=this;
-					setTimeout(function(){
-						var nc=true;
-						for(var i=0;i<ui.control.childNodes.length;i++){
-							if(!ui.control.childNodes[i].classList.contains('removing')){
-								nc=false;break;
-							}
-						}
-						if(!nc){
-							that.style.transform='scale(0.8)';
-						}
-						ui.updatec();
-					},100);
+					// if(!this._nomove){
+					// 	var that=this;
+					// 	setTimeout(function(){
+					// 		var nc=true;
+					// 		for(var i=0;i<ui.control.childNodes.length;i++){
+					// 			if(!ui.control.childNodes[i].classList.contains('removing')){
+					// 				nc=false;break;
+					// 			}
+					// 		}
+					// 		if(!nc){
+					// 			that.style.transform='scale(0.8)';
+					// 		}
+					// 		ui.updatec();
+					// 	},100);
+					// }
+					// else{
+					// 	ui.updatec();
+					// }
+					setTimeout(ui.updatec,100);
 
 
 					if(ui.confirm==this) delete ui.confirm;
 					if(ui.skills==this) delete ui.skills;
+					if(ui.skills2==this) delete ui.skills2;
+					if(ui.skills3==this) delete ui.skills3;
 				},
 				replace:function(){
 					while(this.childNodes.length) this.firstChild.remove();
@@ -8265,8 +8435,8 @@
 		linked:['fire','thunder'],
 	};
 	var game={
-		version:1.31,
 		playAudio:function(){
+			if(_status.video&&arguments[1]!='video') return;
 			var str='';
 			for(var i=0;i<arguments.length;i++){
 				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
@@ -8298,6 +8468,7 @@
 			ui.window.appendChild(audio);
 		},
 		playSkillAudio:function(name){
+			if(_status.video&&arguments[1]!='video') return;
 			if(_status.skillaudio.contains(name)) return;
 			game.addVideo('playSkillAudio',null,name);
 			_status.skillaudio.add(name);
@@ -8622,10 +8793,10 @@
 				}
 			},
 			playAudio:function(str){
-				game.playAudio(str);
+				game.playAudio(str,'video');
 			},
 			playSkillAudio:function(name){
-				game.playSkillAudio(name);
+				game.playSkillAudio(name,'video');
 			},
 			phaseChange:function(player){
 				if(player){
@@ -10557,15 +10728,50 @@
 						skills.add(skills2[i]);
 					}
 				}
+
+
+				var globalskills=[];
+				for(var i=0;i<skills.length;i++){
+					if(lib.skill.global.contains(skills[i])){
+						globalskills.push(skills.splice(i--,1)[0]);
+					}
+				}
+				var equipskills=[];
+				var ownedskills=player.get('s',true,false);
+				for(var i=0;i<skills.length;i++){
+					if(!ownedskills.contains(skills[i])){
+						equipskills.push(skills.splice(i--,1)[0]);
+					}
+				}
+				if(equipskills.length){
+					ui.create.skills3(equipskills);
+				}
+				else if(ui.skills3){
+					ui.skills3.close();
+				}
 				if(skills.length){
 					ui.create.skills(skills);
 				}
 				else if(ui.skills){
 					ui.skills.close();
 				}
+				if(globalskills.length){
+					ui.create.skills2(globalskills);
+				}
+				else if(ui.skills2){
+					ui.skills2.close();
+				}
 			}
-			else if(ui.skills){
-				ui.skills.close()
+			else{
+				if(ui.skills){
+					ui.skills.close()
+				}
+				if(ui.skills2){
+					ui.skills2.close()
+				}
+				if(ui.skills3){
+					ui.skills3.close()
+				}
 			}
 			_status.multitarget=false;
 			var skillinfo=get.info(_status.event.skill);
@@ -11064,8 +11270,34 @@
 					lib.storage[key]=value;
 				}
 			}
-			config.version=game.version;
+			config.version=lib.version;
 			localStorage.setItem(lib.configprefix+lib.config.mode,JSON.stringify(config));
+		},
+		showChangeLog:function(){
+			if(lib.version!=lib.config.version){
+				game.saveConfig('version',lib.version);
+				var ul=document.createElement('ul');
+				ul.style.textAlign='left';
+				for(var i=0;i<lib.changeLog.length;i++){
+					var li=document.createElement('li');
+					li.innerHTML=lib.changeLog[i];
+					ul.appendChild(li);
+				}
+				var dialog=ui.create.dialog(lib.version+'更新内容');
+				dialog.content.appendChild(ul);
+				var hidden=false;
+				if(!ui.auto.classList.contains('hidden')){
+					ui.auto.hide();
+					hidden=true;
+				}
+				game.pause();
+				var control=ui.create.control('确定',function(){
+					dialog.close();
+					control.close();
+					if(hidden) ui.auto.show();
+					game.resume();
+				});
+			}
 		},
 		updateSave:function(){
 			if(_status.reloading) return;
@@ -11720,15 +11952,15 @@
 			},
 			control:function(){
 				var nc=(ui.control.childNodes.length==0);
-				for(var i=0;i<ui.control.childNodes.length;i++){
-					if(ui.control.childNodes[i].classList.contains('removing')){
-						var that=ui.control.childNodes[i];
-						var width=that.offsetWidth;
-						that.style.marginLeft=(-width/2)+'px';
-						that.style.marginRight=(-width/2)+'px';
-						that.style.transitionDuration=0.8*parseFloat(getComputedStyle(that).opacity)+'s';
-					}
-				}
+				// for(var i=0;i<ui.control.childNodes.length;i++){
+				// 	if(ui.control.childNodes[i].classList.contains('removing')){
+				// 		var that=ui.control.childNodes[i];
+				// 		var width=that.offsetWidth;
+				// 		that.style.marginLeft=(-width/2)+'px';
+				// 		that.style.marginRight=(-width/2)+'px';
+				// 		that.style.transitionDuration=0.8*parseFloat(getComputedStyle(that).opacity)+'s';
+				// 	}
+				// }
 				var i,controls;
 				var nozoom=false;
 				if(get.objtype(arguments[0])=='array') controls=arguments[0];
@@ -11751,26 +11983,26 @@
 				}
 				ui.controls.unshift(control);
 				if(nc){
-					ui.control.animate('nozoom',500);
+					ui.control.animate('nozoom',100);
 				}
-				if(ui.control.classList.contains('nozoom')){
-					nozoom=true;
-				}
-				if(nozoom){
-					control.classList.add('nozoom');
-				}
+				// if(ui.control.classList.contains('nozoom')){
+				// 	nozoom=true;
+				// }
+				// if(nozoom){
+				// 	control.classList.add('nozoom');
+				// }
 				if(control.childNodes.length){
-					if(nozoom){
-						control.style.transition='opacity 0.5s';
-					}
-					else{
-						control.style.transition='';
-						control.style.transform='scale(0.8)';
-					}
+					// if(nozoom||true){
+					control.style.transition='opacity 0.5s';
+					// }
+					// else{
+					// 	control.style.transition='';
+					// 	control.style.transform='scale(0.8)';
+					// }
 					ui.refresh(control);
+					control.style.transform='translateX(-'+(control.offsetWidth/2)+'px)';
 					control.style.opacity=1;
 					ui.refresh(control);
-					control.style.transform='';
 					control.style.transition='';
 				}
 				ui.updatec();
@@ -11836,7 +12068,56 @@
 					ui.skills.style.display='none';
 				}
 				ui.skills.skills=skills;
+				ui.skills._nomove=true;
 				return ui.skills;
+			},
+			skills2:function(skills){
+				var i,same;
+				if(ui.skills2){
+					if(ui.skills2.skills.length==skills.length&&ui.skills2.style.display!='none'){
+						same=true;
+						for(i=0;i<skills.length;i++){
+							if(ui.skills2.skills.contains(skills[i])==false){
+								same=false;
+								break;
+							}
+						}
+					}
+					if(same) return;
+					ui.skills2.close();
+					delete ui.skills2;
+				}
+				if(skills==undefined||skills.length==0) return;
+				ui.skills2=ui.create.control(skills.concat([ui.click.skill]));
+				if(!_status.event.isMine()){
+					ui.skills2.style.display='none';
+				}
+				ui.skills2.skills=skills;
+				return ui.skills2;
+			},
+			skills3:function(skills){
+				var i,same;
+				if(ui.skills3){
+					if(ui.skills3.skills.length==skills.length&&ui.skills3.style.display!='none'){
+						same=true;
+						for(i=0;i<skills.length;i++){
+							if(ui.skills3.skills.contains(skills[i])==false){
+								same=false;
+								break;
+							}
+						}
+					}
+					if(same) return;
+					ui.skills3.close();
+					delete ui.skills3;
+				}
+				if(skills==undefined||skills.length==0) return;
+				ui.skills3=ui.create.control(skills.concat([ui.click.skill]));
+				if(!_status.event.isMine()){
+					ui.skills3.style.display='none';
+				}
+				ui.skills3.skills=skills;
+				return ui.skills3;
 			},
 			arena:function(){
 				var i,j;
@@ -11856,9 +12137,16 @@
 				if(lib.config.low_performance){
 					ui.arena.classList.add('low_performance');
 				}
+				if(lib.config.slim_player){
+					ui.arena.classList.add('slim_player');
+				}
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
+				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
+				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
+				ui.arena.dataset.global_font=lib.config.global_font||'default';
+				// ui.arena.dataset.font_size=lib.config.font_size||'16';
 				ui.arena.dataset.glow_phase=lib.config.glow_phase;
 				ui.updatePhone();
 				ui.backgroundMusic=document.createElement('audio');
@@ -13451,6 +13739,10 @@
 								page.appendChild(cfgnode);
 							}
 							var banCharacter=function(){
+								if(_status.clicked){
+									_status.clicked=false;
+									return;
+								}
 								if(mode.indexOf('mode_')==0){
 									return;
 								}
@@ -13587,6 +13879,10 @@
 								page.appendChild(cfgnode);
 							}
 							var banCard=function(){
+								if(_status.clicked){
+									_status.clicked=false;
+									return;
+								}
 								if(mode.indexOf('mode_')==0){
 									return;
 								}
@@ -14476,6 +14772,7 @@
 					identity:ui.create.div('.identity',node),
 					hp:ui.create.div('.hp',node),
 					name:ui.create.div('.name',node),
+					name2:ui.create.div('.name.name2',node),
 					count:ui.create.div('.count',node).hide(),
 					equips:ui.create.div('.equips',node).hide(),
 					judges:ui.create.div('.judges',node),
@@ -14576,6 +14873,7 @@
 					name2:ui.create.div('.name2',node),
 					background:ui.create.div('.background',node),
 					intro:ui.create.div('.intro',node),
+					range:ui.create.div('.range',node),
 				}
 				for(var i in lib.element.card){
 					node[i]=lib.element.card[i];
@@ -14613,6 +14911,51 @@
 			},
 		},
 		click:{
+			identity:function(){
+				if(_status.dragged) return;
+				_status.clicked=true;
+				if(!game.getIdentityList) return;
+				if(_status.clickingidentity){
+					for(var i=0;i<_status.clickingidentity[1].length;i++){
+						_status.clickingidentity[1][i].delete();
+						_status.clickingidentity[1][i].style.transform='';
+					}
+					if(_status.clickingidentity[0]==this.parentNode){
+						delete _status.clickingidentity;
+						return;
+					}
+				}
+				var list=game.getIdentityList(this.parentNode);
+				if(!list) return;
+				var nodes=[];
+				_status.clickingidentity=[this.parentNode,nodes];
+				var num=1;
+				for(var i in list){
+					if(this.firstChild.innerHTML!=list[i]){
+						var node=ui.create.div('.identity.hidden',this.parentNode,ui.click.identity2);
+						ui.create.div(node).innerHTML=list[i];
+						node.dataset.color=i;
+						ui.refresh(node);
+						node.show();
+						node.style.transform='translateY('+((num++)*30)+'px)';
+						nodes.push(node);
+					}
+				}
+			},
+			identity2:function(){
+				if(_status.clickingidentity){
+					_status.clicked=true;
+					var player=_status.clickingidentity[0];
+					var nodes=_status.clickingidentity[1];
+					player.node.identity.dataset.color=this.dataset.color;
+					player.node.identity.firstChild.innerHTML=this.firstChild.innerHTML;
+					for(var i=0;i<nodes.length;i++){
+						nodes[i].delete();
+						nodes[i].style.transform='';
+					}
+					delete _status.clickingidentity;
+				}
+			},
 			system:function(){
 				if(lib.config.layout!='phone') return;
 				_status.clicked=true;
@@ -15023,15 +15366,18 @@
 				}
 				else if(_status._swipeorigin&&!_status.paused2){
 					 if(get.currentTime()-_status._swipeorigin.time<500){
-						 var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
-						 var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
-						 if(Math.abs(dx)<100){
-							 if(dy<-200){
-								 switch(lib.config.swipe_up){
+						var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
+						var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
+						if(Math.abs(dx)<100){
+							if(dy<-200){
+								switch(lib.config.swipe_up){
  				 					case 'system':
- 				 						if(ui.system2.classList.contains('shown')){
- 				 							ui.system1.classList.remove('shown');
- 				 							ui.system2.classList.remove('shown');
+ 				 						if(ui.system2.classList.contains('shown')||
+											lib.config.layout!='phone'){
+											game.pause2();
+											ui.click.configMenu();
+											ui.system1.classList.remove('shown');
+											ui.system2.classList.remove('shown');
  				 						}
  				 						else{
  				 							ui.system1.classList.add('shown');
@@ -15056,18 +15402,36 @@
  				 				}
 							}
 							else if(dy>200){
-								if(lib.config.swipe_down=='menu'||
-									ui.system2.classList.contains('shown')||
-									lib.config.layout!='phone'){
-									game.pause2();
-									ui.click.configMenu();
-									ui.system1.classList.remove('shown');
-									ui.system2.classList.remove('shown');
-								}
-								else{
-									ui.system1.classList.add('shown');
-									ui.system2.classList.add('shown');
-								}
+								switch(lib.config.swipe_down){
+ 				 					case 'system':
+ 				 						if(ui.system2.classList.contains('shown')||
+											lib.config.layout!='phone'){
+											game.pause2();
+											ui.click.configMenu();
+											ui.system1.classList.remove('shown');
+											ui.system2.classList.remove('shown');
+ 				 						}
+ 				 						else{
+ 				 							ui.system1.classList.add('shown');
+ 				 							ui.system2.classList.add('shown');
+ 				 						}
+ 				 						break;
+ 				 					case 'menu':
+ 				 						game.pause2();
+ 				 						ui.click.configMenu();
+ 				 						ui.system1.classList.remove('shown');
+ 				 						ui.system2.classList.remove('shown');
+ 				 						break;
+ 				 					case 'pause':
+ 				 						ui.click.pause();
+ 				 						break;
+ 				 					case 'auto':
+ 				 						ui.click.auto();
+ 										if(!ui.system1.classList.contains('shown')){
+ 		   									 ui.system1.classList.add('shown');
+ 		   								 }
+ 				 						break;
+ 				 				}
 							 }
 						 }
 
@@ -15463,6 +15827,9 @@
 					_status.clicked=false;
 				}
 				else{
+					if(ui.controls.length){
+						ui.updatec();
+					}
 					if(_status.editing){
 						if(_status.editing.innerHTML.length){
 							_status.editing.link=_status.editing.innerHTML;
@@ -15881,6 +16248,8 @@
 					event.restore();
 				}
 				if(ui.skills) ui.skills.close();
+				if(ui.skills2) ui.skills2.close();
+				if(ui.skills3) ui.skills3.close();
 				game.uncheck();
 				if(event.custom.add.confirm){
 					event.custom.add.confirm(true);
@@ -15912,6 +16281,8 @@
 					node.parentNode.close();
 				}
 				if(ui.skills) ui.skills.close();
+				if(ui.skills2) ui.skills2.close();
+				if(ui.skills3) ui.skills3.close();
 				game.uncheck();
 				if(event.custom.add.confirm){
 					event.custom.add.confirm(true);
@@ -16718,7 +17089,12 @@
 				}
 				controls.push(ui.control.childNodes[i]);
 				if(i>0){
-					width+=6;
+					if(lib.config.layout=='phone'){
+						width+=12;
+					}
+					else{
+						width+=6;
+					}
 				}
 			}
 			if(!controls.length) return;
@@ -16729,6 +17105,9 @@
 				var control=controls.shift();
 				var width=widths.shift();
 				offset+=width+6;
+				if(lib.config.layout=='phone'){
+					offset+=6;
+				}
 				control.style.transform='translateX('+offset+'px)';
 			}
 		},
@@ -17325,8 +17704,17 @@
 			return selectable;
 		},
 		skills:function(){
-			if(!ui.skills) return [];
-			return ui.skills.skills.slice(0);
+			var skills=[];
+			if(ui.skills){
+				skills=skills.concat(ui.skills.skills);
+			}
+			if(ui.skills2){
+				skills=skills.concat(ui.skills2.skills);
+			}
+			if(ui.skills3){
+				skills=skills.concat(ui.skills3.skills);
+			}
+			return skills;
 		},
 		selectableTargets:function(sort){
 			var selectable=[];
@@ -17904,6 +18292,19 @@
 					}
 				}
 				else if(lib.translate[name+'_info']){
+					if(get.subtype(node)=='equip1'){
+						var added=false;
+						if(lib.card[node.name]&&lib.card[node.name].distance){
+							var dist=lib.card[node.name].distance;
+							if(dist.attackFrom){
+								added=true;
+								uiintro.add('<div class="text center">攻击范围：'+(-dist.attackFrom+1)+'</div>');
+							}
+						}
+						if(!added){
+							uiintro.add('<div class="text center">攻击范围：1</div>');
+						}
+					}
 					if(lib.translate[name+'_info'].length<=100){
 						uiintro.add('<div class="text center">'+lib.translate[name+'_info']+'</div>');
 					}
@@ -19010,7 +19411,8 @@
 							if(!character[i][j][k][4]){
 								character[i][j][k][4]=[];
 							}
-							if(character[i][j][k][4].contains('boss')){
+							if(character[i][j][k][4].contains('boss')||
+								character[i][j][k][4].contains('hiddenboss')){
 								lib.config.forbidai.add(k);
 							}
 							// if(lib.config.only_fullskin&&lib.isNewLayout()&&lib.config.mode!='chess'){

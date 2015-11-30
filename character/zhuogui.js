@@ -95,7 +95,7 @@ character.zhuogui={
 						var eff=0;
 						for(var i=0;i<game.players.length;i++){
 							if(!game.players[i].isOut()){
-								num+=ai.get.damageEffect(game.players[i],player,player,'fire');
+								eff+=ai.get.damageEffect(game.players[i],player,player,'fire');
 							}
 						}
 						return eff;

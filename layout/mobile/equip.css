@@ -8,6 +8,10 @@
 	left:10px;
 	text-align:left;
 }
+#arena.slim_player .player:not([data-position='0']) .equips,
+#arena.chess.slim_player .player .equips{
+	left:7px;
+}
 .player:not([data-position='0']).minskin .equips,
 #arena.chess .player.minskin .equips{
 	transform:scale(0.73);
@@ -123,9 +127,17 @@
 	transform:rotate(90deg) translate(-152px,-6px);
 	transform-origin:bottom left;
 }
+#arena.slim_player .player:not([data-position='0']).linked .equips,
+#arena.chess.slim_player .player.linked .equips{
+	transform:rotate(90deg) translate(-155px,-6px);
+}
 .player:not([data-position='0']).minskin.linked .equips,
 #arena.chess .player.minskin.linked .equips{
 	transform:rotate(90deg) translate(-92px,-6px) scale(0.73);
+}
+#arena.slim_player .player:not([data-position='0']).minskin.linked .equips,
+#arena.chess.slim_player .player.minskin.linked .equips{
+	transform:rotate(90deg) translate(-95px,-6px) scale(0.73);
 }
 .player:not([data-position='0']).linked div:not(.equips) .card,
 .player:not([data-position='0']).linked .identity,

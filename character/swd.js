@@ -4330,6 +4330,7 @@ character.swd={
 				});
 				next.logSkill=['huanhun',trigger.player];
 				next.ai=function(card){
+					if(card.name=='tao') return 0;
 					if(ai.get.attitude(player,trigger.player)>0){
 						return 8-ai.get.value(card);
 					}

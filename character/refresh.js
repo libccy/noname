@@ -1107,6 +1107,7 @@ character.refresh={
 			trigger:{global:'useCard'},
 			priority:5,
 			filter:function(event,player){
+				if(get.type(event.card)!='trick') return false;
 				if(get.info(event.card).multitarget) return false;
 				if(event.targets.length<2) return false;
 				if(player.storage.fenwei) return false;

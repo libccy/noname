@@ -29,3 +29,6 @@
 #arena .player>.name{
     top:36px;
 }
+#arena.slim_player .player>.name{
+    top:33px;
+}

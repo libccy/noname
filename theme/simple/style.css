@@ -67,6 +67,12 @@ body{
     );
 }*/
 
+.card:empty{
+    background: url('../style/cardback/image/official.png');
+    background-size: cover;
+}
+
+
 .menupaused{
 	opacity: 0.3;
 }

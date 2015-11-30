@@ -22,6 +22,24 @@ table{table-layout: fixed;}
 }
 #window.noclick_important *{pointer-events: none !important;}
 #window.noclick_important .noclick_click_important div{pointer-events: auto !important}
+#arena[data-global_font='xiaozhuan']{
+	font-family: 'xiaozhuan';
+}
+#arena[data-global_font='xinwei']{
+	font-family: 'xinwei';
+}
+/*#arena[data-font_size='14']{
+	font-size:14px;
+}
+#arena[data-font_size='16']{
+	font-size:16px;
+}
+#arena[data-font_size='18']{
+	font-size:18px;
+}
+#arena[data-font_size='20']{
+	font-size:20px;
+}*/
 #arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;}
 #arena.right:not(.noleft){left:240px;opacity: 0.6;}
 #arena.left:not(.noleft){left:calc(10% - 240px);opacity: 0.6;}
@@ -210,6 +228,7 @@ body>.background{z-index:-2}
 /*--------卡牌--------*/
 .card{width: 104px;height: 104px;margin-top:8px;margin-left:4px;margin-right: 4px;position: relative;overflow: hidden;}
 .card>.info{right: 6px;top: 9px;white-space: nowrap;}
+.card>.range{bottom: 5px;right: 5px;text-align: right;}
 .card>.name{top:9px;left: 6px;text-align: center;}
 .card>.name2{display:none;}
 .card>.intro{top:85px;right: 0;}
@@ -341,14 +360,21 @@ margin-bottom: 5px;
 .content>.placeholder.slim{margin:1px;}
 .content>.placeholder.removing{margin-top: -13px;}
 .content{display: block;width: 100%;}
+.dialog:not(.popped) .content{
+	vertical-align: top;
+}
 .dialog:not(.popped) .content>.config{
 	width:200px;
 	left:0;
 	margin-left: 20px;
 	display:inline-block;
 }
+.dialog:not(.popped) .content>.config>.switcher{
+	position: absolute;
+}
 .dialog .content>.volumn{
 	margin:0;
+	font-family: 'xinwei';
 }
 .dialog .content>.volumn>span{
 	margin-left:2px;
@@ -393,6 +419,7 @@ margin-bottom: 5px;
 #control>div{
 	position: absolute;
 	left: 50%;
+	height: 24px;
 }
 /*--------角色--------*/
 .player>.avatar>.action{
@@ -429,7 +456,29 @@ margin-bottom: 5px;
 	filter:grayscale(1);
 	-webkit-filter:grayscale(1);
 }
-.player>.name{left: 16px;top:24px;font-family: 'xinwei';font-size:20px}
+
+#arena[data-name_font='xiaozhuan'] .player>.name,
+#arena[data-name_font='xiaozhuan'] .button.character>.name{
+	font-family: 'xiaozhuan';
+}
+#arena[data-name_font='xinwei'] .player>.name,
+#arena[data-name_font='xinwei'] .button.character>.name{
+	font-family: 'xinwei';
+}
+#arena[data-name_font='huangcao'] .player>.name,
+#arena[data-name_font='huangcao'] .button.character>.name{
+	font-family: 'huangcao','xinwei';
+}
+
+.player>.name{left: 16px;top:24px;font-size:20px;font-family: 'xinwei';}
+.player>.name.name2{left:81px}
+#arena.slim_player .player>.name{
+	left:13px;
+	top:21px;
+}
+#arena.slim_player .player>.name.name2{
+	left:78px
+}
 .button.character>.name{
 	font-family: 'xinwei'
 }
@@ -558,7 +607,8 @@ margin-bottom: 5px;
 .identity{left: 90px;top:5px;}
 .identity{text-align: center;width: 22px;height: 22px;}
 .identity>div{position: relative;top: 2px;}
-.unseen>.avatar,.unseen>.name,.unseen2>.avatar2{opacity: 0 !important;}
+.unseen>.avatar,.unseen>.name:not(.name2),
+.unseen2>.avatar2,.unseen2>.name2{opacity: 0 !important;}
 .player[data-position='0'].unseen>.avatar,
 .player[data-position='0'].unseen2>.avatar2,
 .player[data-position='0'].unseen>.name,
@@ -740,11 +790,13 @@ margin-bottom: 5px;
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.name,
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.name2,
 #arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.info,
+#arena.selecting:not(.video) .player[data-position='0'] .card:not(.selectable)>.range,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.background,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.image,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.name,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.name2,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.info,
+#arena.selecting:not(.video) #me .card:not(.selectable)>.range,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.addinfo,
 #arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
 .dead,.likedead{opacity: 0.6;}
@@ -754,7 +806,12 @@ margin-bottom: 5px;
 	opacity:0.8
 }
 
-.card.selectable>.background,.card.selectable>.name,.card.selectable>.name2,.card.selectable>.info,.button.selectable{opacity: 1;}
+.card.selectable>.background,
+.card.selectable>.name,
+.card.selectable>.name2,
+.card.selectable>.info,
+.card.selectable>.range,
+.button.selectable{opacity: 1;}
 .card{color: rgba(0,0,0,0.3);text-shadow:none;}
 .fire{color: rgba(255,0,0,0.3);}
 .thunder{color: rgba(0,80,255,0.3);}
@@ -861,6 +918,15 @@ div:hover>.intro{opacity: 1;}
 	border-radius: 100%;
 	display:inline-flex;
 	transition: all 0.2s;
+}
+#arena[data-identity_font='xiaozhuan'] .player .identity>div{
+	font-family: 'xiaozhuan';
+}
+#arena[data-identity_font='xinwei'] .player .identity>div{
+	font-family: 'xinwei';
+}
+#arena[data-identity_font='huangcao'] .player .identity>div{
+	font-family: 'huangcao','xinwei';
 }
 .player .identity>div{
 	margin: auto;
@@ -975,6 +1041,7 @@ div[data-color="unknownm"]{
 	color:rgb(74, 29, 1);
 	text-shadow: none;
     text-align:center;
+	line-height: 18px;
 }
 .card.fullskin.thunder>.name{
 	color:#152E63;

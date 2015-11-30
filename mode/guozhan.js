@@ -1,6 +1,40 @@
 'use strict';
 mode.guozhan={
 	game:{
+		getIdentityList:function(player){
+			if(!player.isUnseen()) return;
+			if(player==game.me) return;
+			var list={
+				wei:'魏',
+				shu:'蜀',
+				wu:'吴',
+				qun:'群',
+				ye:'野',
+				unknown:'猜'
+			}
+			var num=Math.floor((game.players.length+game.dead.length)/2);
+			var noye=true;
+			if(get.population('wei')>=num){
+				delete list.wei;
+				noye=false;
+			}
+			if(get.population('shu')>=num){
+				delete list.shu;
+				noye=false;
+			}
+			if(get.population('wu')>=num){
+				delete list.wu;
+				noye=false;
+			}
+			if(get.population('qun')>=num){
+				delete list.qun;
+				noye=false;
+			}
+			if(noye){
+				delete list.ye;
+			}
+			return list;
+		},
 		getVideoName:function(){
 			var str=get.translation(game.me.name1)+'/'+get.translation(game.me.name2);
 			var str2=get.cnNumber(parseInt(get.config('player_number')))+'人'+
@@ -38,6 +72,7 @@ mode.guozhan={
 				else{
 					game.prepareArena();
 					game.delay();
+					game.showChangeLog();
 				}
 				"step 1"
 				if(lib.storage.test){
@@ -354,20 +389,20 @@ mode.guozhan={
 	},
 	ui:{
 		click:{
-			identity:function(){
-				if(this.touched) {this.touched=false;return;}
-				_status.clicked=true;
-				if(this.parentNode.isUnseen()&&this.parentNode!=game.me){
-					switch(this.firstChild.innerHTML){
-						case '魏':this.firstChild.innerHTML='蜀';this.dataset.color='shu';break;
-						case '蜀':this.firstChild.innerHTML='吴';this.dataset.color='wu';break;
-						case '吴':this.firstChild.innerHTML='群';this.dataset.color='qun';break;
-						case '群':this.firstChild.innerHTML='野';this.dataset.color='ye';break;
-						case '野':this.firstChild.innerHTML='猜';this.dataset.color='unknown';break;
-						default:this.firstChild.innerHTML='魏';this.dataset.color='wei';break;
-					}
-				}
-			}
+			// identity:function(){
+			// 	if(this.touched) {this.touched=false;return;}
+			// 	_status.clicked=true;
+			// 	if(this.parentNode.isUnseen()&&this.parentNode!=game.me){
+			// 		switch(this.firstChild.innerHTML){
+			// 			case '魏':this.firstChild.innerHTML='蜀';this.dataset.color='shu';break;
+			// 			case '蜀':this.firstChild.innerHTML='吴';this.dataset.color='wu';break;
+			// 			case '吴':this.firstChild.innerHTML='群';this.dataset.color='qun';break;
+			// 			case '群':this.firstChild.innerHTML='野';this.dataset.color='ye';break;
+			// 			case '野':this.firstChild.innerHTML='猜';this.dataset.color='unknown';break;
+			// 			default:this.firstChild.innerHTML='魏';this.dataset.color='wei';break;
+			// 		}
+			// 	}
+			// }
 		}
 	},
 	translate:{

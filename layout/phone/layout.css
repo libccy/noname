@@ -34,10 +34,14 @@
 #system{
     z-index: 5;
 }
+#system>div{
+    transition-duration: 0.3s;
+}
 #system>div:not(.shown){
-    opacity: 0;
-    width: 50%;
-    min-width: 50%;
+    /*opacity: 0;*/
+    /*width: 50%;
+    min-width: 50%;*/
+    transform: translateY(-80px); */
 }
 #system>div.shown{
     min-width: 50%;

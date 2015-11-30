@@ -92,6 +92,10 @@ html{
 .card{
 	text-shadow:rgba(0,0,0,0.1) 0 0 1px;
 }
+.card.equip3>.range,
+.card.equip4>.range{
+	text-shadow: white 0 0 2px;
+}
 .card{
 	color:rgb(77, 60, 51);
 	text-shadow:none;

@@ -1,6 +1,37 @@
 'use strict';
 mode.identity={
 	game:{
+		getIdentityList:function(player){
+			if(player.identityShown) return;
+			if(player==game.me) return;
+			if(get.config('identity_mode')=='zhong'){
+				if(game.zhu&&game.zhu.isZhu){
+					return {
+						fan:'反',
+						zhong:'忠',
+						nei:'内',
+						cai:'猜',
+					}
+				}
+				else{
+					return {
+						fan:'反',
+						zhong:'忠',
+						nei:'内',
+						zhu:'主',
+						cai:'猜',
+					}
+				}
+			}
+			else{
+				return {
+					fan:'反',
+					zhong:'忠',
+					nei:'内',
+					cai:'猜',
+				}
+			}
+		},
 		getVideoName:function(){
 			var str=get.translation(game.me.name);
 			if(game.me.name2){
@@ -50,6 +81,7 @@ mode.identity={
 				}
 				"step 1"
 				if(!lib.config.new_tutorial){
+					game.saveConfig('version',lib.version);
 					var clear=function(){
 						ui.dialog.close();
 						while(ui.controls.length) ui.controls[0].close();
@@ -183,7 +215,7 @@ mode.identity={
 						ui.control.style.top='calc(100% - 105px)';
 						ui.create.control('在菜单中，可以进行各项设置',function(){
 							ui.click.menuTab('选项');
-							ui.controls[0].replace('如果你感到游戏较卡，可以开启低性能模式',function(){
+							ui.controls[0].replace('如果你感到游戏较卡，可以开启流畅模式',function(){
 								ui.controls[0].replace('在技能一栏中，可以设置自动发动或双将禁配的技能',function(){
 									ui.click.menuTab('武将');
 									ui.controls[0].replace('在武将或卡牌一栏中，单击武将/卡牌可以将其禁用',function(){
@@ -211,6 +243,9 @@ mode.identity={
 					};
 					game.pause();
 					step1();
+				}
+				else{
+					game.showChangeLog();
 				}
 				"step 2"
 				if(lib.storage.test){
@@ -308,9 +343,7 @@ mode.identity={
 					console.log('反贼胜利');
 				}
 			}
-			for(var i=0;i<game.players.length;i++){
-				game.players[i].setIdentity(game.players[i].identity);
-			}
+			game.showIdentity();
 			if(game.me.identity=='zhu'||game.me.identity=='zhong'){
 				if(game.zhu.classList.contains('dead')){
 					game.over(false);
@@ -766,6 +799,9 @@ mode.identity={
 					game.delay(2);
 					game.zhu.playerfocus(1000);
 				}
+				var node=ui.create.div('.damage',get.translation(this.identity+'2'),this);
+				ui.refresh(node);
+				node.style.opacity=1;
 			},
 			logAi:function(targets,card){
 				if(this.ai.shown==1) return;
@@ -1001,29 +1037,29 @@ mode.identity={
 	},
 	ui:{
 		click:{
-			identity:function(){
-				if(_status.dragged) return;
-				_status.clicked=true;
-				if(this.parentNode.identityShown) return;
-				if(this.parentNode==game.me) return;
-				if(get.config('identity_mode')=='zhong'){
-					switch(this.firstChild.innerHTML){
-						case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
-						case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
-						case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
-						case '内':this.firstChild.innerHTML='主';this.dataset.color='zhu';break;
-						case '主':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
-					}
-				}
-				else{
-					switch(this.firstChild.innerHTML){
-						case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
-						case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
-						case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
-						case '内':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
-					}
-				}
-			}
+			// identity:function(){
+			// 	if(_status.dragged) return;
+			// 	_status.clicked=true;
+			// 	if(this.parentNode.identityShown) return;
+			// 	if(this.parentNode==game.me) return;
+			// 	if(get.config('identity_mode')=='zhong'){
+			// 		switch(this.firstChild.innerHTML){
+			// 			case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
+			// 			case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
+			// 			case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
+			// 			case '内':this.firstChild.innerHTML='主';this.dataset.color='zhu';break;
+			// 			case '主':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
+			// 		}
+			// 	}
+			// 	else{
+			// 		switch(this.firstChild.innerHTML){
+			// 			case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
+			// 			case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
+			// 			case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
+			// 			case '内':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
+			// 		}
+			// 	}
+			// }
 		}
 	},
 	config:['player_number','double_character','double_hp',

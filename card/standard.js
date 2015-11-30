@@ -527,7 +527,7 @@ card.standard={
 			ai:{
 				basic:{
 					order:9,
-					useful:[5,1],
+					useful:[3,1],
 					value:0
 				},
 				result:{
@@ -962,6 +962,7 @@ card.standard={
 						if(target.hp<3) num--;
 						if(target.hp<2) num--;
 						if(target.hp<1) num--;
+						if(target.isTurnedOver()) num/=2;
 						return num;
 					}
 				},
@@ -1524,13 +1525,14 @@ card.standard={
 		tao_info:'出牌阶段，对自己使用，回复一点体力。',
 		bagua_info:'每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
 		bagua_skill_info:'每当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
-		jueying_info:'其他角色与你的距离+1。',
-		dilu_info:'其他角色与你的距离+1。',
-		zhuahuang_info:'其他角色与你的距离+1。',
-		chitu_info:'你与其他角色的距离-1。',
-		dawan_info:'你与其他角色的距离-1。',
-		zixin_info:'你与其他角色的距离-1。',
-		jingfanma_info:'你与其他角色的距离-1。',
+		jueying_info:'其他角色与你的距离+1',
+		dilu_info:'其他角色与你的距离+1',
+		zhuahuang_info:'其他角色与你的距离+1',
+		hualiu_info:'其他角色与你的距离+1',
+		chitu_info:'你与其他角色的距离-1',
+		dawan_info:'你与其他角色的距离-1',
+		zixin_info:'你与其他角色的距离-1',
+		jingfanma_info:'你与其他角色的距离-1',
 		zhuge_skill_info:'你于出牌阶段内使用【杀】无次数限制。',
 		zhuge_info:'你于出牌阶段内使用【杀】无次数限制。',
 		cixiong_skill_info:'每当你使用【杀】指定一名异性的目标角色后，你可以令其选择一项：1.弃置一张手牌；2.令你摸一张牌。',

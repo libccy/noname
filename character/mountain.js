@@ -104,6 +104,16 @@ character.mountain={
 					target:function(card,player,target,current){
 						if(card.name=='sha'){
 							if(player.num('h',{type:'basic'})<2) return 0;
+							var bs=player.num('h',{type:'basic'});
+							if(bs.length<2) return 0;
+							if(bs.length<=3&&player.num('h','sha')<=1){
+								for(var i=0;i<bs.length;i++){
+									if(bs[i].name!='sha'&&ai.get.value(bs[i])<7){
+										return [1,0,1,-0.5];
+									}
+								}
+								return 0;
+							}
 							return [1,0,1,-0.5];
 						}
 					}
