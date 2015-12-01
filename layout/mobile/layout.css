@@ -112,10 +112,14 @@
 }
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.count{
     bottom:10px;
+    border-radius: 0 2px 2px 0;
+    left:-1px;
+    z-index: 3;
+    text-align: right;
 }
 #arena:not(.chess).slim_player .player[data-position='0']:not(.minskin)>.count{
     border-radius: 0 2px 2px 0;
-    left:-4px;
+    left:-1px;
     z-index: 3;
     text-align: right;
 }
@@ -184,6 +188,15 @@
 .dialog.fullheight {
     height: calc(100% - 123px) !important;
     top: 40px !important;
+}
+
+#me>.fakeme.avatar{
+    width:120px;
+    height:120px;
+    border-radius:0px;
+    top:0;
+    left:0;
+    background-size:cover;
 }
 
 @media screen and (min-height: 800px) and (orientation:landscape)  {

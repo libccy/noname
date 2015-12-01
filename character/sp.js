@@ -2813,7 +2813,7 @@ character.sp={
 				result:{
 					target:function(player,target){
 						if(target.num('h')<target.hp){
-							if(target.num('h')<=1) return 1;
+							if(target.num('h')<=2) return 1;
 						}
 						else if(target.num('h')>target.hp){
 							if(target.num('h')<=3) return -1;

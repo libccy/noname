@@ -217,13 +217,13 @@ mode.boss={
 				if(game.me!==boss){
 					game.singleHandcard=true;
 					ui.arena.classList.add('single-handcard');
-					ui.fakeme=ui.create.div('.player.controlfakeme');
-					ui.fakeme.dataset.position=0;
-					ui.fakeme.line=lib.element.player.line;
-					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
-					ui.refresh(ui.fakemebg);
+					ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
+					// ui.fakeme.dataset.position=0;
+					// ui.fakeme.line=lib.element.player.line;
+					// ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
+					// ui.refresh(ui.fakemebg);
 					game.onSwapControl();
-					ui.fakemebg.show();
+					// ui.fakemebg.show();
 
 					lib.setPopped(ui.create.system('查看手牌',null,true),function(){
 						var uiintro=ui.create.dialog('hidden');
@@ -383,14 +383,14 @@ mode.boss={
 			if(ui.fakeme&&ui.fakeme.current!=name){
 				ui.fakeme.current=name;
 				if(ui.versushighlight&&ui.versushighlight!=game.me){
-					ui.versushighlight.node.avatar.classList.remove('glow2');
+					ui.versushighlight.classList.remove('current_action');
 				}
 				ui.versushighlight=game.me;
-				game.me.node.avatar.classList.add('glow2');
+				game.me.classList.add('current_action');
 				// game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
 
-				ui.fakemebg.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
-				ui.fakemebg.style.backgroundSize='cover';
+				ui.fakeme.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
+				// ui.fakeme.style.backgroundSize='cover';
 			}
 			ui.updateh(true);
 		},

@@ -80,6 +80,10 @@ mode.guozhan={
 					_status.auto=true;
 					ui.auto.classList.add('glow');
 				}
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].node.name.hide();
+					game.players[i].node.name2.hide();
+				}
 				game.chooseCharacter();
 				"step 2"
 				if(lib.storage.test){
@@ -109,6 +113,7 @@ mode.guozhan={
 				game.gameDraw(player);
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
+					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
 					if(game.players[i]==game.me){
 						lib.translate[game.players[i].name]+='（你）';
 					}
@@ -203,6 +208,10 @@ mode.guozhan={
 							if(_status.dragged) return;
 							if(_status.cheat_seat){
 								_status.cheat_seat.classList.remove('thundertext');
+								if(_status.cheat_seat==this){
+									delete _status.cheat_seat;
+									return;
+								}
 							}
 							this.classList.add('thundertext');
 							_status.cheat_seat=this;
@@ -366,6 +375,8 @@ mode.guozhan={
 					game.players[i].name1=game.players[i].name;
 					game.players[i].name='unknown';
 					game.players[i].identity='unknown';
+					game.players[i].node.name.show();
+					game.players[i].node.name2.show();
 					for(var j=0;j<game.players[i].hiddenSkills.length;j++){
 						var ifo=get.info(game.players[i].hiddenSkills[j]);
 						if(ifo.init){

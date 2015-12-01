@@ -40,7 +40,7 @@
     position:relative;
     margin:10px;
     left:0;
-    top:0;
+    top:4px;
     width:180px;
     height:216px;
     transition: all 0.3s;

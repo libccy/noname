@@ -8,10 +8,10 @@ character.boss={
 		// boss_zhugeliang:['male','shu',4,[],['boss','bossallowed'],'qun'],
 		boss_huangyueying:['female','shu',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['boss','bossallowed'],'wei'],
 		boss_pangtong:['male','shu',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['boss','bossallowed'],'zhu'],
-		boss_zhaoyun:['male','shu',1,['boss_juejing','longhun'],['boss','bossallowed'],'qun'],
+		boss_zhaoyun:['male','shu',1,['boss_juejing','longhun','zhanjiang'],['boss','bossallowed'],'qun'],
 		boss_zhouyu:['male','wu',6,['huoshen','boss_honglian','boss_xianyin'],['boss','bossallowed'],'zhu'],
 		boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['boss','bossallowed'],'wei'],
-		boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['hiddenboss'],'qun'],
+		boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['hiddenboss','bossallowed'],'qun'],
 		boss_caiwenji:['female','qun',4,['beige','boss_hujia','boss_guihan'],['boss','bossallowed'],'wei'],
 		boss_zhangjiao:['male','qun',8,['boss_leiji','tiandao','jidian'],['boss','bossallowed'],'shu'],
 		boss_zuoci:['male','qun',0,['huanhua'],['boss','bossallowed'],'shu'],
@@ -22,6 +22,28 @@ character.boss={
 		// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
 	},
 	skill:{
+		zhanjiang:{
+			trigger:{player:'phaseBegin'},
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].num('e','qinggang')){
+						return true;
+					}
+				}
+			},
+			content:function(){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player){
+						var e=game.players[i].get('e','qinggang');
+						if(e.length){
+							player.gain(e);
+							game.players[i].$give(e,player);
+							break;
+						}
+					}
+				}
+			}
+		},
 		boss_juejing:{
 			trigger:{player:'phaseDrawBefore'},
 			forced:true,
@@ -277,6 +299,7 @@ character.boss={
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]==player) continue;
 					player.maxHp+=game.players[i].maxHp;
+					if(!game.players[i].name||!lib.character[game.players[i].name]) continue;
 					var skills=lib.character[game.players[i].name][3];
 					for(var j=0;j<skills.length;j++){
 						if(!lib.skill[skills[j]].forceunique){
@@ -821,6 +844,9 @@ character.boss={
 		},
 	},
 	translate:{
+		zhanjiang:'斩将',
+		zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
+
 		boss_qiangzheng:'强征',
 		boss_qiangzheng_info:'锁定技，回合结束阶段，你获得每个敌方角色的一张手牌',
 		boss_baolin:'暴凌',

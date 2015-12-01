@@ -26,17 +26,17 @@ window.config={
 			'music_danji','music_random','music_off']
 	},
 	translate:{
-		identity:'身份',
-		guozhan:'国战',
-		versus:'对决',
-		stone:'炉石',
-		changjing:'场景',
-		mowang:'魔王',
-		boss:'挑战',
-		chess:'战棋',
-		infinity:'无限',
-		qunyingzhuan:'群英',
-		swd:'剧情',
+		// identity:'身份',
+		// guozhan:'国战',
+		// versus:'对决',
+		// stone:'炉石',
+		// changjing:'场景',
+		// mowang:'魔王',
+		// boss:'挑战',
+		// chess:'战棋',
+		// infinity:'无限',
+		// qunyingzhuan:'群英',
+		// swd:'剧情',
 
 		character_play_config:'技能卡牌',
 		soldier_play_config:'士兵模式',
@@ -323,14 +323,15 @@ window.config={
 		// ['relianying','zhiheng'],
 		['lianying','rende'],
 		['lianying','yinguo'],
-		// ['lianying','sajin'],
 		['lianying','qingjian'],
+		['boss_juejing','rende'],
+		['boss_juejing','yinguo'],
+		['boss_juejing','qingjian'],
 		['shangshi','rende'],
 		['shangshi','yinguo'],
 		['shangshi','qingjian'],
 		['rende','relianying'],
 		['yinguo','relianying'],
-		// ['sajin','relianying'],
 		['shenxing','relianying'],
 		['qingjian','relianying'],
 		['rende','yuling'],
@@ -355,3 +356,4 @@ window.card={};
 window.character={};
 window.play={};
 window.background={};
+window.music={};

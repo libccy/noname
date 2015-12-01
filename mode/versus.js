@@ -435,11 +435,14 @@ mode.versus={
 					}
 					game.singleHandcard=true;
 					ui.arena.classList.add('single-handcard');
-					ui.fakeme=ui.create.div('.player.controlfakeme');
-					ui.fakeme.line=lib.element.player.line;
-					ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
+					ui.fakeme=ui.create.div('.fakeme.avatar');
+					// ui.fakeme.line=lib.element.player.line;
+					// ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
 				}
 				ui.create.me();
+				if(ui.fakeme){
+					ui.me.appendChild(ui.fakeme);
+				}
 				var position,i;
 				if(lib.storage.zhu&&lib.storage.only_zhu) position=Math.ceil(num/2)-1;
 				else position=Math.floor(Math.random()*num)
@@ -581,7 +584,7 @@ mode.versus={
 				_status.friend.splice(0,num);
 				_status.enemy.splice(0,num);
 				if(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4){
-					ui.fakemebg.show();
+					// ui.fakemebg.show();
 					game.onSwapControl();
 				}
 
@@ -959,22 +962,23 @@ mode.versus={
 			if(ui.fakeme&&ui.fakeme.current!=name){
 				ui.fakeme.current=name;
 				if(ui.versushighlight&&ui.versushighlight!=game.me){
-					ui.versushighlight.node.avatar.classList.remove('glow2');
+					ui.versushighlight.classList.remove('current_action');
 				}
 				ui.versushighlight=game.me;
-				game.me.node.avatar.classList.add('glow2');
+				game.me.classList.add('current_action');
 				// game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
 
-				var info=lib.character[name];
-				if(lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){
-					ui.fakeme.classList.add('fullskin');
-					ui.fakemebg.style.backgroundImage='url("image/character/'+name+'.jpg")';
-					ui.fakemebg.style.backgroundSize='cover';
-				}
-				else{
-					ui.fakeme.classList.remove('fullskin');
-					ui.fakemebg.setBackground(name,'character');
-				}
+				ui.fakeme.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
+				// var info=lib.character[name];
+				// if(lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){
+				// 	// ui.fakeme.classList.add('fullskin');
+				// 	ui.fakeme.style.backgroundImage='url("image/character/'+name+'.jpg")';
+				// 	ui.fakeme.style.backgroundSize='cover';
+				// }
+				// else{
+				// 	ui.fakeme.classList.remove('fullskin');
+				// 	ui.fakemebg.setBackground(name,'character');
+				// }
 			}
 		},
 		modeSwapPlayer:function(player){

@@ -41,6 +41,14 @@ play.pack={
     wuxing:'五行生克',
     weather:'天气变化',
 };
+mode.pack={
+    identity:'身份',
+    guozhan:'国战',
+    versus:'对决',
+    boss:'挑战',
+    chess:'战棋',
+    stone:'炉石',
+};
 background.pack={
     huangyueying_bg:'逐墨',
     zhulian_bg:'璧合',
@@ -52,3 +60,11 @@ background.pack={
     yinxiang_bg:'印象',
     huangtian_bg:'黄天',
 };
+music.pack={
+    music_default:'默认',
+    music_diaochan:'貂蝉',
+    music_shezhan:'舌战',
+    music_danji:'单骑',
+    music_random:'随机',
+    music_off:'关闭',
+}

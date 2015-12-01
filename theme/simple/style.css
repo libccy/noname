@@ -21,6 +21,9 @@ body{
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
 	border-radius: 8px;
 }
+/*.player.current_action{
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+}*/
 .menubutton{
 	border-radius: 4px;
 }
@@ -72,6 +75,10 @@ body{
     background-size: cover;
 }
 
+#system>div>.glow{
+    background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+}
 
 .menupaused{
 	opacity: 0.3;

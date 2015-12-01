@@ -91,14 +91,16 @@
 							}
 							else{
 								ui.arena.classList.remove('low_performance');
-								var hs=ui.me.querySelectorAll('.handcards>.card');
-								for(var i=0;i<hs.length;i++){
-									hs[i].style.transform='';
-									hs[i].classList.remove('drawinghidden');
+								if(ui.me){
+									var hs=ui.me.querySelectorAll('.handcards>.card');
+									for(var i=0;i<hs.length;i++){
+										hs[i].style.transform='';
+										hs[i].classList.remove('drawinghidden');
+									}
+									ui.handcards1.style.width='';
+									ui.handcards2.style.width='';
+									ui.updateh(true);
 								}
-								ui.handcards1.style.width='';
-								ui.handcards2.style.width='';
-								ui.updateh(true);
 							}
 						}
 					},
@@ -871,14 +873,7 @@
 					background_music:{
 						name:'背景音乐',
 						init:true,
-						item:{
-							music_default:'默认',
-							music_diaochan:'貂蝉',
-							music_shezhan:'舌战',
-							music_danji:'单骑',
-							music_random:'随机',
-							music_off:'关闭',
-						},
+						item:{},
 						onclick:function(item){
 							game.saveConfig('background_music',item);
 							game.playBackgroundMusic();
@@ -2068,6 +2063,8 @@
 			'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
+		},
+		help2:{
 			'战棋模式':
 			'<div style="margin:10px">对阵模式</div><ul style="margin-top:0"><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
 			'每人在出牌阶段有一次移动的机会，可移动的最大距离为2<li>'+
@@ -2273,6 +2270,7 @@
 				lib.config.all.characters=[];
 				lib.config.all.cards=[];
 				lib.config.all.plays=[];
+				lib.config.all.mode=[];
 
 				var charlist=['standard','wind','fire','woods','mountain','guozhan','sp','yijiang','extra','refresh'];
 				for(i in character.pack){
@@ -2287,15 +2285,33 @@
 					lib.config.all.plays.push(i);
 					lib.translate[i+'_play_config']=play.pack[i];
 				}
+				for(i in mode.pack){
+					lib.config.all.mode.push(i);
+					lib.translate[i]=mode.pack[i];
+				}
 				if(background&&background.pack){
 					for(i in background.pack){
 						lib.configMenu.appearence.config.image_background.item[i]=background.pack[i];
 					}
-					delete window.background;
+				}
+				if(music&&music.pack){
+					for(i in music.pack){
+						lib.configMenu.audio.config.background_music.item[i]=music.pack[i];
+					}
 				}
 				delete character.pack;
 				delete card.pack;
 				delete play.pack;
+				delete mode.pack;
+				delete window.background;
+				delete window.music;
+
+				if(lib.config.all.mode.indexOf('chess')!=-1){
+					for(var i in lib.help2){
+						lib.help[i]=lib.help2[i];
+					}
+				}
+				delete lib.help2;
 
 				lib.init.js('mode',lib.config.mode);
 				lib.init.js('card',lib.config.all.cards);
@@ -7957,24 +7973,6 @@
 					ui.controls.remove(this);
 					this.delete();
 
-					// if(!this._nomove){
-					// 	var that=this;
-					// 	setTimeout(function(){
-					// 		var nc=true;
-					// 		for(var i=0;i<ui.control.childNodes.length;i++){
-					// 			if(!ui.control.childNodes[i].classList.contains('removing')){
-					// 				nc=false;break;
-					// 			}
-					// 		}
-					// 		if(!nc){
-					// 			that.style.transform='scale(0.8)';
-					// 		}
-					// 		ui.updatec();
-					// 	},100);
-					// }
-					// else{
-					// 	ui.updatec();
-					// }
 					setTimeout(ui.updatec,100);
 
 
@@ -8829,10 +8827,10 @@
 				var me=game.playerMap[content[0]];
 				var player=game.playerMap[content[1]];
 				if(me){
-					me.node.avatar.classList.remove('glow2');
+					me.classList.remove('current_action');
 				}
 				if(player){
-					player.node.avatar.classList.add('glow2');
+					player.classList.add('current_action');
 				}
 			},
 			chessgainmod:function(player,num){
@@ -9599,14 +9597,9 @@
 					player.node.handcards1.innerHTML='';
 					player.node.handcards2.innerHTML='';
 					player.directgain(cards,false);
-					if(lib.config.low_performance){
-						game.me.node.handcards1.remove();
-						game.me.node.handcards2.remove();
-					}
-					else{
-						game.me.node.handcards1.delete();
-						game.me.node.handcards2.delete();
-					}
+
+					game.me.node.handcards1.remove();
+					game.me.node.handcards2.remove();
 
 					ui.handcards1=player.node.handcards1.animate('start').fix();
 					ui.handcards2=player.node.handcards2.animate('start').fix();
@@ -11007,14 +11000,10 @@
 		},
 		swapControl:function(player){
 			if(player==game.me) return;
-			if(lib.config.low_performance){
-				game.me.node.handcards1.remove();
-				game.me.node.handcards2.remove();
-			}
-			else{
-				game.me.node.handcards1.delete();
-				game.me.node.handcards2.delete();
-			}
+
+			game.me.node.handcards1.remove();
+			game.me.node.handcards2.remove();
+
 			game.me=player;
 			ui.handcards1=player.node.handcards1.animate('start').fix();
 			ui.handcards2=player.node.handcards2.animate('start').fix();
@@ -11754,7 +11743,8 @@
 						if(lib.character[i][4].contains('minskin')) continue;
 						if(lib.character[i][4].contains('boss')&&!
 						lib.character[i][4].contains('bossallowed')) continue;
-						if(lib.character[i][4].contains('hiddenboss')) continue;
+						if(lib.character[i][4].contains('hiddenboss')&&!
+						lib.character[i][4].contains('bossallowed')) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
 						if(namecapt.indexOf(getCapt(i))==-1){
@@ -11970,7 +11960,6 @@
 				// }
 				var i,controls;
 				var nozoom=false;
-				var noupdate=false;
 				if(get.objtype(arguments[0])=='array') controls=arguments[0];
 				else controls=arguments;
 				var control=ui.create.div('.control');
@@ -11984,9 +11973,6 @@
 					}
 					else if(controls[i]=='nozoom'){
 						nozoom=true;
-					}
-					else if(controls[i]=='noupdate'){
-						noupdate=true;
 					}
 					else{
 						control.add(controls[i]);
@@ -12016,7 +12002,7 @@
 					ui.refresh(control);
 					control.style.transition='';
 				}
-				if(!noupdate) ui.updatec();
+				ui.updatec();
 				return control;
 			},
 			confirm:function(str,func){
@@ -12074,15 +12060,18 @@
 					delete ui.skills;
 				}
 				if(skills==undefined||skills.length==0) return;
-				ui.skills=ui.create.control(skills.concat([ui.click.skill]),'noupdate');
+				if(!_status.event.isMine()){
+					_status.noupdatec=true;
+				}
+				ui.skills=ui.create.control(skills.concat([ui.click.skill]));
 				if(!_status.event.isMine()){
 					ui.skills.style.display='none';
 				}
 				else{
 					ui.updatec();
 				}
+				_status.noupdatec=false;
 				ui.skills.skills=skills;
-				ui.skills._nomove=true;
 				return ui.skills;
 			},
 			skills2:function(skills){
@@ -12102,13 +12091,17 @@
 					delete ui.skills2;
 				}
 				if(skills==undefined||skills.length==0) return;
-				ui.skills2=ui.create.control(skills.concat([ui.click.skill]),'noupdate');
+				if(!_status.event.isMine()){
+					_status.noupdatec=true;
+				}
+				ui.skills2=ui.create.control(skills.concat([ui.click.skill]));
 				if(!_status.event.isMine()){
 					ui.skills2.style.display='none';
 				}
 				else{
 					ui.updatec();
 				}
+				_status.noupdatec=false;
 				ui.skills2.skills=skills;
 				return ui.skills2;
 			},
@@ -12129,13 +12122,17 @@
 					delete ui.skills3;
 				}
 				if(skills==undefined||skills.length==0) return;
-				ui.skills3=ui.create.control(skills.concat([ui.click.skill]),'noupdate');
+				if(!_status.event.isMine()){
+					_status.noupdatec=true;
+				}
+				ui.skills3=ui.create.control(skills.concat([ui.click.skill]));
 				if(!_status.event.isMine()){
 					ui.skills3.style.display='none';
 				}
 				else{
 					ui.updatec();
 				}
+				_status.noupdatec=false;
 				ui.skills3.skills=skills;
 				return ui.skills3;
 			},
@@ -17113,6 +17110,7 @@
 			}
 		},
 		updatec:function(){
+			if(_status.noupdatec) return;
 			var length=0;
 			var controls=[];
 			var widths=[];
@@ -17321,6 +17319,17 @@
 				cards.push(get.infoCard(info[i]));
 			}
 			return cards;
+		},
+		verticalStr:function(str){
+			if(typeof str!='string') return '';
+			var str2='';
+			for(var i=0;i<str.length;i++){
+				str2+=str[i];
+				if(i<str.length-1){
+					str2+='<br>';
+				}
+			}
+			return str2;
 		},
 		time:function(){
 			if(lib.status.dateDelaying){

@@ -33,7 +33,7 @@ character.refresh={
 			content:function(){
 				'step 0'
 				trigger.player.chooseTarget(function(card,player,target){
-					return player.canUse({name:'juedou'},target);
+					return player.canUse({name:'juedou'},target)&&target!=trigger.player;
 				},'是否发动【利奴】？').ai=function(target){
 					return ai.get.effect(target,{name:'juedou'},player,trigger.player)-2;
 				};

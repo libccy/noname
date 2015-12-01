@@ -1133,6 +1133,7 @@ mode.chess={
 						_status.friends.push(player);
 						if(!game.me.name){
 							game.me=player;
+							game.me.classList.add('current_action');
 							ui.me.lastChild.show();
 							ui.create.fakeme();
 							ui.handcards1=player.node.handcards1.animate('start').fix();
@@ -1959,6 +1960,7 @@ mode.chess={
 				else{
 					event.trigger('gameStart');
 					game.gameDraw(p);
+					game.me.classList.add('current_action');
 					if(get.config('chess_mode')=='leader'){
 						game.phaseLoopOrdered(p);
 					}
@@ -3697,8 +3699,8 @@ mode.chess={
 		},
 		modeSwapPlayer:function(player){
 			var content=[game.me.dataset.position,player.dataset.position];
-			game.me.node.avatar.classList.remove('glow2');
-			player.node.avatar.classList.add('glow2');
+			game.me.classList.remove('current_action');
+			player.classList.add('current_action');
 			game.addVideo('chessSwap',null,content);
 			game.swapControl(player);
 			player.chessFocus();

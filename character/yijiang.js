@@ -201,6 +201,32 @@ character.yijiang={
 						range[1]++;
 					}
 				},
+			},
+			group:'lihuo2'
+		},
+		lihuo2:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.parent.skill=='lihuo';
+			},
+			content:function(){
+				player.addTempSkill('lihuo3','phaseAfter');
+			}
+		},
+		lihuo3:{
+			trigger:{player:'useCardAfter'},
+			filter:function(event,player){
+				return event.card.name=='sha';
+			},
+			forced:true,
+			silent:true,
+			audio:false,
+			content:function(){
+				player.loseHp();
+				player.removeSkill('lihuo3');
+				delete player.tempSkills.lihuo3;
 			}
 		},
 		chunlao:{
