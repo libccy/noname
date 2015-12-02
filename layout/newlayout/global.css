@@ -362,7 +362,7 @@
 #control{
 	z-index:5;
 	top:auto;
-	bottom:190px;
+	bottom:210px;
 	width: calc(100% - 300px);
 	left:150px;
 }

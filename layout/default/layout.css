@@ -81,7 +81,7 @@ table{table-layout: fixed;}
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
 	opacity: 0.3 !important;
 }
-#arena.low_performance #me>div>div>.card{
+#arena #me>div>div>.card{
 	position: absolute;
 	left:8px;
 }
@@ -138,27 +138,27 @@ table{table-layout: fixed;}
 }
 #me,#mebg{width: 100%;height: 140px;top:calc(100% - 140px);left:0;}
 #mebg{z-index:-1}
-#handcards1,#handcards2{width: calc(50% - 140px);height: 127px;padding: 10px;}
-#handcards1,#handcards2{white-space:nowrap;overflow-x: scroll;overflow-y:hidden;display: block;text-align: center;}
+#handcards1,#handcards2{
+	width: calc(50% - 140px);height: 127px;padding: 10px;
+	text-align: left;
+}
+#handcards1,#handcards2{white-space:nowrap;overflow-x: hidden;overflow-y:hidden;display: block;}
+#handcards1.scrollh,#handcards2.scrollh{overflow-x: scroll;}
 #handcards1{left: 0;top:calc(100% - 140px);}
 #handcards2{left: calc(50% + 120px);top:calc(100% - 140px);}
 #arena #handcards1>div,
 #arena #handcards2>div{
 	height: 100%;
 	position: relative;
-	margin-right: 15px;
-	margin-left: -7px;
-}
-#arena.low_performance #handcards1,
-#arena.low_performance #handcards2{
-	text-align: left;
-}
-#arena.low_performance #handcards1>div,
-#arena.low_performance #handcards2>div{
 	margin-left: 2px;
 	margin-right: 10px;
 }
+#arena:not(.mobile):not(.single-handcard) #handcards1>div,
+#arena:not(.mobile):not(.single-handcard) #handcards2>div{
+	left:-10px;
+}
 #arena.single-handcard #handcards1{width: calc(100% - 120px);left:120px;}
+#arena:not(.mobile).single-handcard #handcards1{width: calc(100% - 140px);}
 #arena.single-handcard #handcards2{display: none;}
 #system{padding: 6px;width: calc(100% - 12px);white-space: nowrap;z-index: 3;pointer-events: none}
 #system>div{height: 100%;position: relative;margin: 0;padding: 0;}
