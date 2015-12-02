@@ -16,15 +16,11 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.62,
+		version:1.63,
 		changeLog:[
-			'改进触屏操作，增加上划/下划手势（可在选项－通用中设置）',
-			'音效菜单中增加音量选项',
-			'字体选项',
-			'修改标身份操作',
-			'装备距离提示',
-			'加入部分美化版素材(by @tanyuanjkl)',
-			'界面、bug修复'
+			'流畅模式折叠手牌',
+			'自定义背景',
+			'bug修复'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -354,6 +350,7 @@
 						init:'default',
 						item:{
 							default:'默认',
+							custom:'自定',
 						},
 						onclick:function(background){
 							var animate=lib.config.image_background=='default';
@@ -406,11 +403,30 @@
 							if(lib.config.image_background=='default'){
 								ui.background.style.backgroundImage="none";
 							}
+							else if(lib.config.image_background=='custom'){
+								ui.background.style.backgroundImage="none";
+								game.getDB('image','background',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent)
+									{
+										var data = fileLoadedEvent.target.result;
+										ui.background.style.backgroundImage='url('+data+')';
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
 							else{
 								ui.background.style.backgroundImage="url('image/background/"+lib.config.image_background+".jpg')";
 							}
 							ui.background.style.backgroundSize='cover';
 						},
+					},
+					import_background:{
+						name:'<div style="white-space:nowrap;width:calc(100% - 5px)">'+
+						'<input type="file" style="width:calc(100% - 40px)" accept="image/jpeg">'+
+						'<button style="width:40px">确定</button></div>',
+						clear:true,
 					},
 					image_background_filter:{
 						name:'背景特效',
@@ -856,6 +872,12 @@
 						else{
 							map.image_background_filter.show();
 						}
+						if(lib.config.image_background=='custom'&&lib.db){
+							map.import_background.show();
+						}
+						else{
+							map.import_background.hide();
+						}
 						if(lib.config.layout!='phone'){
 							map.round_menu_func.hide();
 							map.show_roundmenu.hide();
@@ -923,6 +945,7 @@
 						},
 						onclick:function(volume){
 							game.saveConfig('volumn_background',parseInt(volume));
+							ui.backgroundMusic.volume=volume/8;
 						}
 					}
 				}
@@ -1152,7 +1175,7 @@
 					},
 					import_data_button:{
 						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
-						'<input type="file" id="fileToLoad" style="width:calc(100% - 40px)">'+
+						'<input type="file" style="width:calc(100% - 40px)">'+
 						'<button style="width:40px">确定</button></div>',
 						clear:true,
 					},
@@ -2356,13 +2379,27 @@
 				}
 
 				if(window.indexedDB){
-					var request = window.indexedDB.open(lib.configprefix+'data', 1);
+					var request = window.indexedDB.open(lib.configprefix+'data', 2);
 					request.onupgradeneeded=function(e){
 						var db=e.target.result;
-						if(db.objectStoreNames.contains('video')){
-							db.deleteObjectStore('video');
+						if(!db.objectStoreNames.contains('video')){
+							db.createObjectStore('video',{keyPath:'time'});
 						}
-						db.createObjectStore('video',{keyPath:'time'});
+						if(!db.objectStoreNames.contains('image')){
+							db.createObjectStore('image');
+						}
+						if(!db.objectStoreNames.contains('character')){
+							db.createObjectStore('character');
+						}
+						if(!db.objectStoreNames.contains('card')){
+							db.createObjectStore('card');
+						}
+						if(!db.objectStoreNames.contains('skill')){
+							db.createObjectStore('skill');
+						}
+						if(!db.objectStoreNames.contains('translate')){
+							db.createObjectStore('translate');
+						}
 					};
 					request.onsuccess=function(e){
 						var db=e.target.result;
@@ -3552,7 +3589,9 @@
 					}
 					if(event.animate!=false||num>0){
 						if(num==0){
-							if(event.delayx!==false) game.delayx();
+							if(event.delayx!==false){
+								game.delayx();
+							}
 						}
 						else game.delayx(0.5);
 					}
@@ -4015,11 +4054,11 @@
 							else if(event.nature=='thunder'){
 								player.$thunder();
 							}
+							player.$damagepop(-num,event.nature);
 						}
-						player.$damagepop(-num,event.nature);
-						// else{
-						// 	player.popup(-num,event.nature);
-						// }
+						else{
+							player.popup(-num,event.nature);
+						}
 					}
 					// if(source){
 					// 	if(player._damagetimeout!=source){
@@ -4062,8 +4101,11 @@
 						player.changeHp(num,false);
 						if(lib.config.animation&&!lib.config.low_performance){
 							player.$recover();
+							player.$damagepop(num,'wood');
 						}
-						player.$damagepop(num,'wood');
+						else{
+							player.popup('+'+num);
+						}
 						game.log(get.translation(player)+'回复了'+get.cnNumber(num)+'点体力')
 					}
 				},
@@ -4195,7 +4237,7 @@
 						delete player.tempSkills[i];
 					}
 					player.classList.add('dead');
-					player.classList.remove('linked');
+					// player.classList.remove('linked');
 					player.classList.remove('turnedover');
 					player.classList.remove('out');
 					player.node.count.innerHTML='0';
@@ -8428,6 +8470,18 @@
 					}
 				}
 			},
+			_lianhuan3:{
+				trigger:{global:'damageAfter'},
+				priority:-10,
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.player.classList.contains('dead');
+				},
+				content:function(){
+					trigger.player.classList.remove('linked');
+				}
+			}
 		},
 		character:{},
 		perfectPair:{},
@@ -8444,6 +8498,7 @@
 				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
 					str+='/'+arguments[i];
 				}
+				if(_status.video) break;
 			}
 			if(_status.skillaudio.contains(str)) return;
 			_status.skillaudio.add(str);
@@ -11246,6 +11301,47 @@
 			game.addVideo('log',null,str);
 			if(lib.config.title) document.title=str;
 		},
+		putDB:function(type,id,item,callback){
+			if(!lib.db) return item;
+			var put=lib.db.transaction([type],'readwrite').objectStore(type).put(item,id);
+			if(callback){
+				put.onsuccess=callback;
+			}
+		},
+		getDB:function(type,id,callback){
+			if(!lib.db){
+				callback(null);
+				return;
+			}
+			if(!callback) return;
+			var store=lib.db.transaction([type],'readwrite').objectStore(type);
+			if(id){
+				store.get(id).onsuccess=function(e){
+					callback(e.target.result);
+				};
+			}
+			else{
+				var obj={};
+				store.openCursor().onsuccess=function(e){
+					var cursor=e.target.result;
+					if(cursor){
+						obj[cursor.key]=cursor.value;
+						cursor.continue();
+					}
+					else{
+						callback(obj);
+					}
+				}
+			}
+		},
+		deleteDB:function(type,id,callback){
+			if(!lib.db){
+				callback(false);
+				return;
+			}
+			var store=lib.db.transaction([type],'readwrite').objectStore(type);
+			store.delete(id).onsuccess=callback;
+		},
 		save:function(key,value){
 			if(_status.reloading) return;
 			var config={};
@@ -13620,28 +13716,48 @@
 										ui.import_data_button=cfgnode;
 										cfgnode.hide();
 										cfgnode.querySelector('button').onclick=function(){
-											var fileToLoad = document.getElementById("fileToLoad").files[0];
-
-											var fileReader = new FileReader();
-											fileReader.onload = function(fileLoadedEvent)
-											{
-												var data = fileLoadedEvent.target.result;
-												if(!data) return;
-												try{
-													data=JSON.parse(lib.init.decode(data));
-													localStorage.clear();
-													for(var i in data){
-														localStorage.setItem(i,data[i]);
+											var fileToLoad=this.previousSibling.files[0];
+											if(fileToLoad){
+												var fileReader = new FileReader();
+												fileReader.onload = function(fileLoadedEvent)
+												{
+													var data = fileLoadedEvent.target.result;
+													if(!data) return;
+													try{
+														data=JSON.parse(lib.init.decode(data));
+														localStorage.clear();
+														for(var i in data){
+															localStorage.setItem(i,data[i]);
+														}
 													}
-												}
-												catch(e){
-													alert('导入失败');
-													return;
-												}
-												alert('导入成功');
-												game.reload();
-											};
-											fileReader.readAsText(fileToLoad, "UTF-8");
+													catch(e){
+														alert('导入失败');
+														return;
+													}
+													alert('导入成功');
+													game.reload();
+												};
+												fileReader.readAsText(fileToLoad, "UTF-8");
+											}
+										}
+									}
+									else if(j=='import_background'){
+										cfgnode.querySelector('button').onclick=function(){
+											var fileToLoad=this.previousSibling.files[0];
+											if(fileToLoad){
+												game.putDB('image','background',fileToLoad);
+												var fileReader = new FileReader();
+												fileReader.onload = function(fileLoadedEvent)
+												{
+													var data = fileLoadedEvent.target.result;
+													ui.background.style.backgroundImage='url('+data+')';
+												};
+												fileReader.readAsDataURL(fileToLoad, "UTF-8");
+											}
+											else{
+												game.deleteDB('image','background');
+												ui.background.style.backgroundImage='none';
+											}
 										}
 									}
 	                                map[j]=cfgnode;
@@ -13713,6 +13829,7 @@
 								var node=start.firstChild.childNodes[i];
 								if(node.link){
 									if(node.mode.indexOf('mode_')==0) continue;
+									if(node.mode=='custom') continue;
 									if(lib.config.characters.contains(node.mode)){
 										node.classList.remove('off');
 										node.link.firstChild.classList.add('on');
@@ -13807,6 +13924,18 @@
 	                        active.classList.add('active');
 	                    }
 						rightPane.appendChild(active.link);
+
+						lib.onDB(function(){
+							return;
+							var page=ui.create.div('.menu-buttons');
+	                        var node=ui.create.div('.menubutton.large','自定义',start.firstChild,clickMode);
+							node.link=page;
+							node.mode='custom';
+
+							ui.create.div('.config.more','创建武将 <div>&gt;</div>',page,function(){
+								this.classList.toggle('on');
+							});
+						});
 
 						var node1=ui.create.div('.lefttext','全部开启',start.firstChild,function(){
 							game.saveConfig('characters',lib.config.all.characters);
@@ -16771,6 +16900,19 @@
 					if(lib.config.image_background=='default'){
 						ui.background.style.backgroundImage="none";
 					}
+					else if(lib.config.image_background=='custom'){
+						ui.background.style.backgroundImage="none";
+						game.getDB('image','background',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent)
+							{
+								var data = fileLoadedEvent.target.result;
+								ui.background.style.backgroundImage='url('+data+')';
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
 					else{
 						ui.background.style.backgroundImage="url('image/background/"+lib.config.image_background+".jpg')";
 					}
@@ -17169,6 +17311,7 @@
 					hs2.push(ui.handcards2Container.firstChild.childNodes[i]);
 				}
 			}
+			// var offset1=112;
 			for(var i=0;i<hs1.length;i++){
 				hs1[i].style.transform='translateX('+(i*112)+'px)';
 				ui.refresh(hs1[i]);
@@ -19379,6 +19522,22 @@
 			ui.background=document.querySelector('.background.static');
 			ui.background.classList.remove('static');
 			ui.dynamicBackground=document.querySelector('.background.dynamic');
+
+			lib.onDB(function(){
+				if(lib.config.image_background=='custom'){
+					ui.background.style.backgroundImage="none";
+					game.getDB('image','background',function(fileToLoad){
+						if(!fileToLoad) return;
+						var fileReader = new FileReader();
+						fileReader.onload = function(fileLoadedEvent)
+						{
+							var data = fileLoadedEvent.target.result;
+							ui.background.style.backgroundImage='url('+data+')';
+						};
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+				}
+			});
 			var i,j,k;
 			for(i in mode[lib.config.mode].element){
 				if(!lib.element[i]) lib.element[i]=[];

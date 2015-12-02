@@ -11,9 +11,11 @@
         return;
     }
     var bg=document.querySelector('.background');
-    if(temp.image_background&&temp.image_background!='default'){
-        bg.style.backgroundImage="url('image/background/"+temp.image_background+".jpg')";
+    if(bg){
         bg.style.backgroundSize="cover";
+    }
+    if(temp.image_background&&temp.image_background!='default'&&temp.image_background!='custom'){
+        bg.style.backgroundImage="url('image/background/"+temp.image_background+".jpg')";
 
         switch (temp.image_background_filter){
             case 'blur':

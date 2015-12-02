@@ -567,6 +567,7 @@ mode.guozhan={
 				if(!get.config('zhulian')) return false;
 				var name1=this.name1;
 				var name2=this.name2;
+				if(lib.character[name1][1]!=lib.character[name2][1]) return false;
 				var list=['re','diy','sp','jsp','shen','jg','xin'];
 				for(var i=0;i<list.length;i++){
 					if(name1.indexOf(list[i]+'_')==0){
