@@ -1066,7 +1066,7 @@ character.gujian={
 		jizhan:'疾战',
 		jizhan_info:'出牌阶段限一次，你可以将移动到任意一名角色的前一位，视为对其使用了一张杀',
 		qianjun:'千军',
-		qianjun_info:'每当你使用一张杀，你可以弃置一张非基本牌，令距离目标1以内的所有角色成为额外目标',
+		qianjun_info:'每当你使用一张杀，你可以弃置一张牌，令距离目标1以内的所有角色成为额外目标',
 		xuanning:'玄凝',
 		xuanning1:'玄凝',
 		xuanning2:'玄凝',
