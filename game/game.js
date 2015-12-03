@@ -18,7 +18,8 @@
 	var lib={
 		version:1.63,
 		changeLog:[
-			'流畅模式折叠手牌',
+			'折叠手牌',
+			'触屏拖拽',
 			'自定义背景',
 			'bug修复'
 		],
@@ -102,6 +103,16 @@
 					enable_drag:{
 						name:'启用拖拽',
 						init:true,
+						unfrequent:true,
+					},
+					enable_dragline:{
+						name:'拖拽指示线',
+						init:true,
+						unfrequent:true,
+					},
+					enable_touchdragline:{
+						name:'拖拽指示线',
+						init:false,
 						unfrequent:true,
 					},
 					wuxie_self:{
@@ -264,6 +275,20 @@
 							map.swipe.hide();
 							map.swipe_up.hide();
 							map.swipe_down.hide();
+						}
+						if(lib.config.enable_drag){
+							if(lib.config.touchscreen){
+								map.enable_dragline.hide();
+								map.enable_touchdragline.show();
+							}
+							else{
+								map.enable_dragline.show();
+								map.enable_touchdragline.hide();
+							}
+						}
+						else{
+							map.enable_dragline.hide();
+							map.enable_touchdragline.hide();
 						}
 					}
 				}
@@ -773,7 +798,7 @@
 					},
 					die_flip:{
 						name:'阵亡效果',
-						init:false,
+						init:true,
 						unfrequent:true,
 					},
 					animation:{
@@ -2362,6 +2387,9 @@
 						if(!db.objectStoreNames.contains('image')){
 							db.createObjectStore('image');
 						}
+						if(!db.objectStoreNames.contains('audio')){
+							db.createObjectStore('audio');
+						}
 						if(!db.objectStoreNames.contains('character')){
 							db.createObjectStore('character');
 						}
@@ -2383,6 +2411,36 @@
 						}
 					}
 				}
+
+				lib.cardSelectObserver=new MutationObserver(function(mutations){
+					for(var i=0;i<mutations.length;i++){
+						if(mutations[i].attributeName=='class'){
+							var node=mutations[i].target;
+							if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
+								node.parentNode.parentNode.parentNode==ui.me){
+								if(node.classList.contains('selected')){
+									setTimeout((function(node){
+										return function(){
+											if(node._transform&&node.parentNode&&node.parentNode.parentNode&&
+												node.parentNode.parentNode.parentNode==ui.me){
+												if(node.classList.contains('selected')&&
+												!node.parentNode.parentNode.classList.contains('scrollh')){
+													node.style.transform=node._transform+' translateY(-20px)';
+												}
+												else{
+													node.style.transform=node._transform;
+												}
+											}
+										}
+									}(node)),200);
+								}
+								else{
+									node.style.transform=node._transform;
+								}
+							}
+						}
+					}
+				});
 			},
 			css:function(path,file,before){
 				var style = document.createElement("link");
@@ -7035,11 +7093,9 @@
 							break;
 						}
 					}
-					// game.print(card.name,card.timeout,card.className)
 					if(!equipped){
 						player.node.equips.appendChild(card);
 					}
-					// player.node.equips.dataset.number=player.num('e');
 					return player;
 				},
 				$gain:function(card,log,init){
@@ -10820,7 +10876,8 @@
 						}
 					}
 				}
-				if(ok&&auto&&lib.config.auto_confirm&&(!_status.mousedragging||!_status.mouseleft)&&!_status.mousedown){
+				if(ok&&auto&&lib.config.auto_confirm&&(!_status.mousedragging||!_status.mouseleft)&&
+				!_status.mousedown&&!_status.touchnocheck){
 					if(ui.confirm){
 						if(!skillinfo||!skillinfo.preservecancel){
 							ui.confirm.close();
@@ -10911,6 +10968,10 @@
 				_status.lastdragchange.length=0;
 				_status.mousedragging=null;
 				_status.mousedragorigin=null;
+
+				while(ui.touchlines.length){
+					ui.touchlines.shift().delete();
+				}
 			}
 			ui.canvas.width=ui.arena.offsetWidth;
 			ui.canvas.height=ui.arena.offsetHeight;
@@ -11565,6 +11626,7 @@
 	var ui={
 		updates:[],
 		thrown:[],
+		touchlines:[],
 		refresh:function(node){
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
@@ -12264,7 +12326,6 @@
 							delete ui.roundmenu._resetTimeout;
 						},1000);
 					});
-					// lib.setLongPress(ui.roundmenu,resetround);
 				}
 				else{
 					ui.roundmenu.oncontextmenu=resetround;
@@ -14907,6 +14968,11 @@
 				ui.create.div(node.node.identity);
 				node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.target);
 				node.node.identity.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.identity);
+
+				if(lib.config.touchscreen){
+					node.addEventListener('touchstart',ui.click.playertouchstart);
+				}
+
 				return node;
 			},
 			players:function(num){
@@ -14997,6 +15063,13 @@
 				node.storage={};
 				if(info!='noclick'){
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
+					if(lib.config.touchscreen){
+						node.addEventListener('touchstart',ui.click.cardtouchstart);
+						node.addEventListener('touchmove',ui.click.cardtouchmove);
+					}
+					if(lib.cardSelectObserver){
+						lib.cardSelectObserver.observe(node,{attributes:true});
+					}
 				}
 				return node;
 			},
@@ -15436,6 +15509,158 @@
 				else if(_status._swipeorigin&&e.touches[0]){
 					_status._swipeorigin.touches=e.touches[0];
 				}
+
+				if(_status.mousedragging&&e.touches.length){
+					e.preventDefault();
+					var item=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
+					while(item){
+						if(lib.config.enable_touchdragline&&_status.mouseleft&&lib.config.mode!='chess'){
+							ui.canvas.width=ui.arena.offsetWidth;
+							ui.canvas.height=ui.arena.offsetHeight;
+							var ctx=ui.ctx;
+							ctx.shadowBlur=5;
+							ctx.shadowColor='rgba(0,0,0,0.3)';
+							ctx.strokeStyle='white';
+							ctx.lineWidth=3;
+							ctx.setLineDash([8,2]);
+
+							ctx.beginPath();
+
+							ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
+
+							if(_status.multitarget){
+								for(var i=0;i<_status.lastdragchange.length;i++){
+									var exy=_status.lastdragchange[i]._lastdragchange;
+									ctx.lineTo(exy[0],exy[1]);
+								}
+							}
+							if(!_status.selectionfull){
+								ctx.lineTo(e.touches[0].clientX-ui.arena.offsetLeft,e.touches[0].clientY-ui.arena.offsetTop);
+							}
+							ctx.stroke();
+							if(!_status.multitarget){
+								for(var i=0;i<_status.lastdragchange.length;i++){
+									ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
+									var exy=_status.lastdragchange[i]._lastdragchange;
+									ctx.lineTo(exy[0],exy[1]);
+									ctx.stroke();
+								}
+							}
+						}
+
+						if(item==_status.mousedragorigin){
+							if(_status.mouseleft){
+								_status.mousedragging=null;
+								_status.mousedragorigin=null;
+								_status.clicked=false;
+								game.uncheck();
+								game.check();
+								ui.canvas.width=ui.arena.offsetWidth;
+								ui.canvas.height=ui.arena.offsetHeight;
+								_status.clicked=true;
+							}
+							return;
+						}
+						var itemtype=get.itemtype(item);
+						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
+							_status.mouseleft=true;
+							var ex=e.touches[0].clientX-ui.arena.offsetLeft;
+							var ey=e.touches[0].clientY-ui.arena.offsetTop;
+							var exx=ex,eyy=ey;
+							if(lib.config.mode=='chess'){
+								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
+								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
+							}
+							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
+								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
+								var targetfixed=false;
+								if(itemtype=='player'){
+									if(get.select(_status.event.selectTarget)[1]==-1){
+										targetfixed=true;
+									}
+								}
+								if(!targetfixed&&item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
+									_status.mouseleft=true;
+									_status.dragstatuschanged=item;
+									_status.clicked=false;
+									_status.dragged=false;
+									var notbefore=itemtype=='player'&&!item.classList.contains('selected');
+									ui.click[itemtype].call(item);
+									if(item.classList.contains('selected')){
+										if(notbefore){
+											_status.lastdragchange.push(item);
+											item._lastdragchange=[exx,eyy];
+											if(false){
+												var from=[_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop];
+												var to=[exx,eyy];
+												var node=ui.create.div('.linexy.hidden');
+												node.style.left=from[0]+'px';
+												node.style.top=from[1]+'px';
+												node.style.transitionDuration='0.3s';
+												node.style.backgroundColor='white';
+												var dy=to[1]-from[1];
+												var dx=to[0]-from[0];
+												var deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
+												if(dx>=0){
+													if(dy<=0){
+														deg+=90;
+													}
+													else{
+														deg=90-deg;
+													}
+												}
+												else{
+													if(dy<=0){
+														deg=270-deg;
+													}
+													else{
+														deg+=270;
+													}
+												}
+												node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
+												node.style.height=get.xyDistance(from,to)+'px';
+												if(lib.config.mode=='chess'){
+													ui.chess.appendChild(node);
+												}
+												else{
+													ui.arena.appendChild(node);
+												}
+												ui.refresh(node);
+												node.show();
+												node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
+												ui.touchlines.push(node);
+												node._origin=item;
+											}
+										}
+									}
+									else{
+										_status.lastdragchange.remove(item);
+										for(var i=0;i<ui.touchlines.length;i++){
+											if(ui.touchlines[i]._origin==item){
+												ui.touchlines[i].delete();
+												ui.touchlines.splice(i--,1);
+											}
+										}
+									}
+									_status.selectionfull=true;
+									if(_status.event.filterButton&&ui.selected.buttons.length<get.select(_status.event.selectButton)[1]){
+										_status.selectionfull=false;
+									}
+									else if(_status.event.filterCard&&ui.selected.cards.length<get.select(_status.event.selectCard)[1]){
+										_status.selectionfull=false;
+									}
+									else if(_status.event.filterTarget&&ui.selected.targets.length<get.select(_status.event.selectTarget)[1]){
+										_status.selectionfull=false;
+									}
+								}
+							}
+							return;
+						}
+						item=item.parentNode;
+					}
+					_status.mouseleft=true;
+					_status.dragstatuschanged=null;
+				}
 			},
 			windowtouchend:function(e){
 				if(e.touches.length==1&&!_status.dragged){
@@ -15471,7 +15696,7 @@
 					game.saveConfig('roundmenu_transform',translate);
 					delete _status.draggingroundmenu;
 				}
-				else if(_status._swipeorigin&&!_status.paused2){
+				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging){
 					 if(get.currentTime()-_status._swipeorigin.time<500){
 						var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
 						var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
@@ -15544,6 +15769,39 @@
 
 					 }
 				}
+				var tmpflag=false;
+				_status.mousedown=false;
+				_status.clicked=false;
+				if(_status.mousedragging&&_status.mouseleft){
+					if(game.check()){
+						if(ui.confirm){
+							ui.confirm.close();
+						}
+						ui.click.ok();
+					}
+					else{
+						game.uncheck();
+						game.check();
+					}
+				}
+				else if(_status.mousedragging&&_status.mousedragorigin){
+					tmpflag=_status.mousedragorigin;
+				}
+				_status.lastdragchange.length=0;
+				_status.mousedragging=null;
+				_status.mouseleft=false;
+				_status.mousedragorigin=null;
+				_status.dragstatuschanged=false;
+				while(ui.touchlines.length){
+					ui.touchlines.shift().delete();
+				}
+				ui.canvas.width=ui.arena.offsetWidth;
+				ui.canvas.height=ui.arena.offsetHeight;
+				if(tmpflag){
+					game.check();
+				}
+				_status.dragged=false;
+				_status.clicked=false;
 			},
 			checkroundtranslate:function(translate){
 				var translate=translate||ui.roundmenu._dragtransform;
@@ -15579,37 +15837,38 @@
 				var node=_status.currentmouseenter;
 				if(_status.mousedragging){
 					e.preventDefault();
-					ui.canvas.width=ui.arena.offsetWidth;
-					ui.canvas.height=ui.arena.offsetHeight;
-					var ctx=ui.ctx;
-					ctx.shadowBlur=5;
-					ctx.shadowColor='rgba(0,0,0,0.3)';
-					ctx.strokeStyle='white';
-					ctx.lineWidth=3;
-					ctx.setLineDash([8,2]);
+					if(lib.config.enable_dragline){
+						ui.canvas.width=ui.arena.offsetWidth;
+						ui.canvas.height=ui.arena.offsetHeight;
+						var ctx=ui.ctx;
+						ctx.shadowBlur=5;
+						ctx.shadowColor='rgba(0,0,0,0.3)';
+						ctx.strokeStyle='white';
+						ctx.lineWidth=3;
+						ctx.setLineDash([8,2]);
 
-					ctx.beginPath();
+						ctx.beginPath();
 
-					ctx.moveTo(_status.mousedragging.x-ui.arena.offsetLeft,_status.mousedragging.y-ui.arena.offsetTop);
-					if(_status.multitarget){
-						for(var i=0;i<_status.lastdragchange.length;i++){
-							var exy=_status.lastdragchange[i]._lastdragchange;
-							ctx.lineTo(exy[0],exy[1]);
+						ctx.moveTo(_status.mousedragging.x-ui.arena.offsetLeft,_status.mousedragging.y-ui.arena.offsetTop);
+						if(_status.multitarget){
+							for(var i=0;i<_status.lastdragchange.length;i++){
+								var exy=_status.lastdragchange[i]._lastdragchange;
+								ctx.lineTo(exy[0],exy[1]);
+							}
+						}
+						if(!_status.selectionfull){
+							ctx.lineTo(e.x-ui.arena.offsetLeft,e.y-ui.arena.offsetTop);
+						}
+						ctx.stroke();
+						if(!_status.multitarget){
+							for(var i=0;i<_status.lastdragchange.length;i++){
+								ctx.moveTo(_status.mousedragging.x-ui.arena.offsetLeft,_status.mousedragging.y-ui.arena.offsetTop);
+								var exy=_status.lastdragchange[i]._lastdragchange;
+								ctx.lineTo(exy[0],exy[1]);
+								ctx.stroke();
+							}
 						}
 					}
-					if(!_status.selectionfull){
-						ctx.lineTo(e.x-ui.arena.offsetLeft,e.y-ui.arena.offsetTop);
-					}
-					ctx.stroke();
-					if(!_status.multitarget){
-						for(var i=0;i<_status.lastdragchange.length;i++){
-							ctx.moveTo(_status.mousedragging.x-ui.arena.offsetLeft,_status.mousedragging.y-ui.arena.offsetTop);
-							var exy=_status.lastdragchange[i]._lastdragchange;
-							ctx.lineTo(exy[0],exy[1]);
-							ctx.stroke();
-						}
-					}
-
 
 					for(var i=0;i<e.path.length;i++){
 						if(e.path[i]==_status.mousedragorigin){
@@ -15763,7 +16022,6 @@
 					}
 				}
 
-
 				var evt=_status.event;
 				if(!lib.config.enable_drag) return;
 				if(!ui.arena.classList.contains('selecting')) return;
@@ -15788,6 +16046,40 @@
 						}
 						return;
 					}
+				}
+			},
+			cardtouchstart:function(e){
+				if(e.touches.length!=1) return;
+				if(!lib.config.enable_drag) return;
+				if(!this.parentNode) return;
+				if(!this.parentNode.parentNode) return;
+				if(this.parentNode.parentNode.parentNode!=ui.me) return;
+				if(this.parentNode.parentNode.classList.contains('scrollh')) return;
+				if(this.classList.contains('selectable')&&
+					!this.classList.contains('selected')&&
+					!this.classList.contains('noclick')){
+					this._waitingfordrag={clientX:e.touches[0].clientX,clientY:e.touches[0].clientY};
+				}
+			},
+			cardtouchmove:function(e){
+				if(this._longpresstimeout){
+					clearTimeout(this._longpresstimeout);
+					delete this._longpresstimeout;
+				}
+				if(this._waitingfordrag){
+					var drag=this._waitingfordrag;
+					_status.clicked=false;
+					_status.touchnocheck=true;
+					ui.click.card.call(this);
+					_status.touchnocheck=false;
+					if(this.classList.contains('selected')){
+						_status.mousedragging=drag;
+						_status.mousedragorigin=this;
+						_status.mouseleft=false;
+						_status.selectionfull=false;
+						_status.multitarget=false;
+					}
+					delete this._waitingfordrag;
 				}
 			},
 			windowmouseup:function(e){
@@ -15861,6 +16153,7 @@
 						ui.click[get.itemtype(tmpflag)].call(tmpflag);
 						game.check();
 					}
+					// ui.updatehl();
 				}
 			},
 			mousemove:function(){
@@ -15916,6 +16209,16 @@
 							_status.longpressed=false;
 						},500);
 						func.call(node,e);
+						if(lib.config.touchscreen&&lib.config.enable_drag&&!node._waitingfordrag){
+							_status.mousedragging=null;
+							_status.mousedragorigin=null;
+							_status.clicked=false;
+							game.uncheck();
+							game.check();
+							ui.canvas.width=ui.arena.offsetWidth;
+							ui.canvas.height=ui.arena.offsetHeight;
+							_status.clicked=true;
+						}
 					}
 				},500);
 			},
@@ -16091,6 +16394,7 @@
 				game.check();
 			},
 			card:function(){
+				delete this._waitingfordrag;
 				if(_status.dragged) return;
 				if(_status.clicked) return;
 				if(ui.intro) return;
@@ -16101,17 +16405,21 @@
 					return;
 				}
 				if(this.classList.contains('selectable')==false) return;
+				var notoggle=false;
 				if(this.classList.contains('selected')){
 					ui.selected.cards.remove(this);
 					if(_status.multitarget){
 						game.uncheck();
 						game.check();
+						notoggle=true;
 					}
 				}
 				else{
 					ui.selected.cards.add(this);
 				}
-				this.classList.toggle('selected');
+				if(!notoggle){
+					this.classList.toggle('selected');
+				}
 				if(false){
 					if(lib.config.mode=='chess'&&!_status.event.skill&&this.classList.contains('selected')&&
 					_status.event.isMine()&&_status.event.name=='chooseToUse'){
@@ -17248,6 +17556,7 @@
 			}
 			for(var i=0;i<hs1.length;i++){
 				hs1[i].style.transform='translateX('+(i*offset1)+'px)';
+				hs1[i]._transform='translateX('+(i*offset1)+'px)';
 				ui.refresh(hs1[i]);
 				hs1[i].classList.remove('drawinghidden');
 			}
@@ -17262,6 +17571,7 @@
 			}
 			for(var i=0;i<hs2.length;i++){
 				hs2[i].style.transform='translateX('+(i*offset2)+'px)';
+				hs2[i]._transform='translateX('+(i*offset2)+'px)';
 				ui.refresh(hs2[i]);
 				hs2[i].classList.remove('drawinghidden');
 			}
@@ -19255,6 +19565,7 @@
 					game.me.node.handcards1.appendChild(card);
 					game.check();
 					game.me.update();
+					ui.updatehl();
 				}
 			},
 			s:function(skill){

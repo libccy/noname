@@ -29,5 +29,6 @@
     }
   ],
   "display": "fullscreen",
-  "orientation": "landscape"
+  "orientation": "landscape",
+  "xwalk_android_keep_screen_on":true
 }

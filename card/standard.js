@@ -717,17 +717,22 @@ card.standard={
 					}
 				}
 				"step 3"
-				if(result.bool){
-					if(event.turn==target) event.turn=player;
-					else event.turn=target;
-					event.goto(1);
+				if(event.target.isDead()||event.player.isDead()){
+					event.finish();
 				}
 				else{
-					if(event.turn==target){
-						target.damage();
+					if(result.bool){
+						if(event.turn==target) event.turn=player;
+						else event.turn=target;
+						event.goto(1);
 					}
 					else{
-						player.damage(target);
+						if(event.turn==target){
+							target.damage();
+						}
+						else{
+							player.damage(target);
+						}
 					}
 				}
 			},

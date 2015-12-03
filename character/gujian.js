@@ -626,7 +626,7 @@ character.gujian={
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
 				if(event.targets.length!=1) return false;
-				if(player.num('h',{type:'basic'})==player.num('h')) return false;
+				if(!player.num('he')) return false;
 				var target=event.targets[0];
 				for(var i=0;i<game.players.length;i++){
 					if(player!=game.players[i]&&target!=game.players[i]&&get.distance(target,game.players[i])<=1){
@@ -641,16 +641,13 @@ character.gujian={
 				for(var i=0;i<game.players.length;i++){
 					if(player!=game.players[i]&&trigger.targets[0]!=game.players[i]&&get.distance(trigger.targets[0],game.players[i])<=1){
 						event.targets.push(game.players[i]);
-						game.players[i].classList.add('selected');
 					}
 				}
 				var num=0;
 				for(var i=0;i<event.targets.length;i++){
 					num+=ai.get.effect(event.targets[i],{name:'sha'},player,player);
 				}
-				var next=player.chooseToDiscard(function(card){
-					return get.type(card)!='basic';
-				},'是否发动千军？');
+				var next=player.chooseToDiscard('是否对'+get.translation(event.targets)+'发动千军？','he');
 				next.logSkill=['qianjun',event.targets];
 				next.ai=function(card){
 					if(num<=0) return -1;
