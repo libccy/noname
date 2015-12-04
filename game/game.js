@@ -2368,6 +2368,7 @@
 						if(totouch){
 							game.saveConfig('touchscreen',true);
 							game.saveConfig('low_performance',true);
+							game.saveConfig('layout','phone');
 							game.reload();
 						}
 					}

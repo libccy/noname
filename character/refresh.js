@@ -210,7 +210,7 @@ character.refresh={
 			},
 			content:function(){
 				"step 0"
-				player.addTempSkill('luoyi2',{player:'phaseBefore'});
+				player.addTempSkill('reluoyi2',{player:'phaseBefore'});
 				trigger.untrigger();
 				trigger.finish();
 				"step 1"
