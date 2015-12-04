@@ -559,6 +559,7 @@ character.mountain={
 					};
 				}
 				else{
+					player.addTempSkill('jixi_nouse','phaseAfter');
 					event.finish();
 				}
 				"step 2"
@@ -577,11 +578,13 @@ character.mountain={
 				order:10,
 				result:{
 					player:function(player){
+						if(player.skills.contains('jixi_nouse')) return 0;
 						return player.storage.tuntian.length-1;
 					}
 				}
 			}
 		},
+		jixi_nouse:{},
 		jiang:{
 			audio:2,
 			trigger:{player:['shaBefore','juedouBefore'],target:['shaBefore','juedouBefore']},

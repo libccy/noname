@@ -2677,6 +2677,7 @@
 					}
 					player.phaseDiscard()
 					game.delayx();
+					delete player._noSkill;
 				},
 				phaseJudge:function(){
 					"step 0"
@@ -3735,6 +3736,12 @@
 							player.stat[player.stat.length-1].skill[skill]++;
 						}
 					}
+					if(player.stat[player.stat.length-1].allSkills==undefined){
+						player.stat[player.stat.length-1].allSkills=1;
+					}
+					else{
+						player.stat[player.stat.length-1].allSkills++;
+					}
 					"step 1"
 					if(!event.skill){
 						console.log('error: no skill',get.translation(event.player),event.player.get('s'));
@@ -3794,6 +3801,10 @@
 						event.redo();
 					}
 					"step 2"
+					if(player.getStat().allSkills>200){
+						player._noSkill=true;
+						console.log(player.name,event.skill);
+					}
 					if(document.getElementsByClassName('thrown').length){
 						if(event.skill&&get.info(event.skill).delay!==0) game.delayx();
 					}
@@ -18890,7 +18901,10 @@
 						return (j>0);
 					}
 					lib.temp={};
-					cards=get.selectableCards().concat(get.skills());
+					cards=get.selectableCards();
+					if(!_status.event.player._noSkill){
+						cards=cards.concat(get.skills());
+					}
 					cards2=cards.slice(0);
 					cards.sort(function(a,b){
 						return (check(b,cards2)-check(a,cards2));
