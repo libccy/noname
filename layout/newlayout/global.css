@@ -241,6 +241,14 @@
 .linked>.avatar2{top:73px;}
 .linked>.identity{top: -5px;}
 .linked>.count{right: auto;}
+
+.player.linked>.name{
+	transform-origin: top center;
+	transform: rotate(90deg) translate(132px,-96px);
+}
+.player.linked>.name.name2{
+	transform: rotate(90deg) translate(110px,-31px);
+}
 /*--------位置(n人)------*/
 
 /*--------位置(8人)------*/

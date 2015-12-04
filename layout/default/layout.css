@@ -304,7 +304,8 @@ body>.background{z-index:-2}
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
 .equips>.card>.background{font-size: 36px;height: 36px;padding-top: 3px;}
-#arena.low_performance .player .equips{transition: all 0s}
+#arena.low_performance .player .equips,
+#arena.low_performance .player .name{transition: all 0s}
 .judges>.card>.background,.marks>.card>.background{font-size: 20px;height: 20px;padding-top: 3px;}
 .button.card>.background{font-size: 68px;height: 68px;padding-top: 12px;}
 .card>.background{font-family:'xiaozhuan'}

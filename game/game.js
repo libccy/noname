@@ -553,6 +553,11 @@
 							}
 						}
 					},
+					fold_card:{
+						name:'折叠手牌',
+						init:true,
+						unfrequent:true,
+					},
 					auto_popped_config:{
 						name:'自动弹出选项',
 						init:true,
@@ -17547,13 +17552,20 @@
 					hs2.push(ui.handcards2Container.firstChild.childNodes[i]);
 				}
 			}
-			var offset1=Math.min(112,(ui.handcards1Container.offsetWidth-128)/(hs1.length-1));
-			if(offset1<32){
-				offset1=32;
+			var offset1;
+			if(!lib.config.fold_card){
+				offset1=112;
 				ui.handcards1Container.classList.add('scrollh');
 			}
 			else{
-				ui.handcards1Container.classList.remove('scrollh');
+				offset1=Math.min(112,(ui.handcards1Container.offsetWidth-128)/(hs1.length-1));
+				if(offset1<32){
+					offset1=32;
+					ui.handcards1Container.classList.add('scrollh');
+				}
+				else{
+					ui.handcards1Container.classList.remove('scrollh');
+				}
 			}
 			for(var i=0;i<hs1.length;i++){
 				hs1[i].style.transform='translateX('+(i*offset1)+'px)';
@@ -17562,13 +17574,21 @@
 				hs1[i].classList.remove('drawinghidden');
 			}
 			ui.handcards1Container.firstChild.style.width=(offset1*(hs1.length-1)+118)+'px';
-			var offset2=Math.min(112,(ui.handcards2Container.offsetWidth-128)/(hs2.length-1));
-			if(offset2<32){
-				offset2=32;
+
+			var offset2;
+			if(!lib.config.fold_card){
+				offset2=112;
 				ui.handcards2Container.classList.add('scrollh');
 			}
 			else{
-				ui.handcards2Container.classList.remove('scrollh');
+				offset2=Math.min(112,(ui.handcards2Container.offsetWidth-128)/(hs2.length-1));
+				if(offset2<32){
+					offset2=32;
+					ui.handcards2Container.classList.add('scrollh');
+				}
+				else{
+					ui.handcards2Container.classList.remove('scrollh');
+				}
 			}
 			for(var i=0;i<hs2.length;i++){
 				hs2[i].style.transform='translateX('+(i*offset2)+'px)';

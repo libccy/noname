@@ -89,11 +89,14 @@
 #arena:not(.chess) .player[data-position='0']>.equips>.equip3{bottom: 10px;left: 10px;}
 #arena:not(.chess) .player[data-position='0']>.equips>.equip4{bottom: 10px;right: 10px;}
 
-#arena:not(.chess) .player[data-position='0']>.name{
+#arena:not(.chess) .player[data-position='0']>.name,
+#arena:not(.chess) .player[data-position='0'].linked>.name{
     left:4px;
     top:10px;
+    transform: none;
 }
-#arena:not(.chess) .player[data-position='0']>.name.name2{
+#arena:not(.chess) .player[data-position='0']>.name.name2,
+#arena:not(.chess) .player[data-position='0'].linked>.name.name2{
     left:69px;
 }
 #arena:not(.chess) .player[data-position='0']>.identity{
