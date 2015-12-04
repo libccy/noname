@@ -61,6 +61,4 @@ music.pack={
     music_diaochan:'貂蝉',
     music_shezhan:'舌战',
     music_danji:'单骑',
-    music_random:'随机',
-    music_off:'关闭',
 }

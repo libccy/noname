@@ -2326,6 +2326,8 @@
 					for(i in music.pack){
 						lib.configMenu.audio.config.background_music.item[i]=music.pack[i];
 					}
+				    lib.configMenu.audio.config.background_music.item.music_random='随机';
+				    lib.configMenu.audio.config.background_music.item.music_off='关闭';
 				}
 				delete character.pack;
 				delete card.pack;

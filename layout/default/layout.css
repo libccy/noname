@@ -143,7 +143,7 @@ table{table-layout: fixed;}
 	text-align: left;
 }
 #handcards1,#handcards2{white-space:nowrap;overflow-x: visible;overflow-y:visible;display: block;}
-#handcards1.scrollh,#handcards2.scrollh{overflow-x: scroll;}
+#handcards1.scrollh,#handcards2.scrollh{overflow-x: scroll;overflow-y:hidden}
 #handcards1{left: 0;top:calc(100% - 140px);}
 #handcards2{left: calc(50% + 120px);top:calc(100% - 140px);}
 #arena #handcards1>div,
