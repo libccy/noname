@@ -62,9 +62,11 @@ card.extra={
 						if(player.num('h','sha')>1){
 							if(player.num('e','zhuge')) return 0;
 							if(player.skills.contains('paoxiao')) return 0;
-							if(player.skills.contains('tanlnin3')) return 0;
-							if(player.skills.contains('zhaxiang2')) return 0;
 							if(player.skills.contains('fengnu')) return 0;
+							if(!player.getStat().card.sha){
+								if(player.skills.contains('tanlnin3')) return 0;
+								if(player.skills.contains('zhaxiang2')) return 0;
+							}
 						}
 						if(shas.length){
 							for(var i=0;i<shas.length;i++){
@@ -77,7 +79,8 @@ card.extra={
 							var card=target.get('h','sha',0);
 							for(var i=0;i<game.players.length;i++){
 								if(ai.get.attitude(target,game.players[i])<0&&
-									target.canUse(card,game.players[i],true,true)){
+									target.canUse(card,game.players[i],true,true)&&
+									!game.players[i].num('e','baiyin')){
 									if(ai.get.effect(game.players[i],card,target)>0) return 1;
 								}
 							}

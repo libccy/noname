@@ -49,9 +49,13 @@ mode.guozhan={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				if(lib.db&&!_status.characterLoaded){
+					_status.waitingForCharacters=true;
+					game.pause();
+				}
+				"step 1"
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
-					ui.create.arena();
 					ui.create.me();
 					ui.arena.style.display='none';
 					ui.system.style.display='none';
@@ -74,7 +78,7 @@ mode.guozhan={
 					game.delay();
 					game.showChangeLog();
 				}
-				"step 1"
+				"step 2"
 				if(lib.storage.test){
 					lib.config.game_speed='vfast';
 					_status.auto=true;
@@ -85,7 +89,7 @@ mode.guozhan={
 					game.players[i].node.name2.hide();
 				}
 				game.chooseCharacter();
-				"step 2"
+				"step 3"
 				if(lib.storage.test){
 					var str='';
 					for(var i=0;i<game.players.length;i++){
@@ -246,6 +250,7 @@ mode.guozhan={
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbiddouble.contains(i)) continue;
+					if(lib.config.banned.contains(i)) continue;
 					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);

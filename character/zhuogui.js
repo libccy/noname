@@ -218,6 +218,7 @@ character.zhuogui={
             }
         },
         qiangzheng:{
+            audio:2,
             trigger:{player:'phaseEnd'},
             direct:true,
             forced:true,

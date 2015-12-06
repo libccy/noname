@@ -806,6 +806,12 @@ character.standard={
 			},
 			content:function(){}
 		},
+		test:{
+			subSkills:{
+				t1:{},
+				t2:{}
+			}
+		},
 		longdan:{
 			group:['longdan1','longdan2']
 		},
@@ -1193,6 +1199,12 @@ character.standard={
 				effect:{
 					target:function(card){
 						if(card.name=='guohe'||card.name=='liuxinghuoyu') return 0.5;
+					}
+				},
+				noh:true,
+				skillTagFilter:function(player,tag){
+					if(tag=='noh'){
+						if(player.num('h')!=1) return false;
 					}
 				}
 			}

@@ -12,6 +12,7 @@ play.character={
 		for(i in lib.character){
 			if(lib.config.forbidai.contains(i)) continue;
 			if(lib.config.forbidall.contains(i)) continue;
+			if(lib.config.banned.contains(i)) continue;
 			if(!get.config('double_character')&&get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 			if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
 			list.push(i);

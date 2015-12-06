@@ -15,7 +15,7 @@ body{
 	display: block;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
-.player.unseen .equips:not(*:empty),.menu,.menubutton,
+.player.unseen .equips:not(*:empty),.menu,.menubutton,#splash>div,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips{
 	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));

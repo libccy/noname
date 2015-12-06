@@ -170,13 +170,11 @@ character.extra={
 					},
 					player:function(card,player){
 						if(_status.currentPhase!=player) return;
-						if(card.name=='wuzhong'||card.name=='yiyi'||
-							card.name=='yuanjiao'||card.name=='shunshou') return;
+						if(get.type(card)=='basic'||get.type(card,'trick')=='trick') return;
 						if(player.hp<=2) return;
 						if(!player.skills.contains('jilue')||player.storage.renjie==0){
 							return [0,0,0,0];
 						}
-
 					}
 				}
 			}

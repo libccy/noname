@@ -448,6 +448,12 @@ card.swd={
 							if(game.players[i].ai.shown==0) num++;
 						}
 						if(num>1) return 0;
+						var nh=target.num('h');
+						if(lib.config.mode=='identity'){
+							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
+						}
+						if(nh==0) return -2;
+						if(nh==1) return -1.7
 						return -1.5;
 					},
 				},
@@ -503,6 +509,12 @@ card.swd={
 							if(game.players[i].ai.shown==0) num++;
 						}
 						if(num>1) return 0;
+						var nh=target.num('h');
+						if(lib.config.mode=='identity'){
+							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
+						}
+						if(nh==0) return -2;
+						if(nh==1) return -1.7
 						return -1.5;
 					},
 				},

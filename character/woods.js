@@ -216,6 +216,7 @@ character.woods={
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
 							if(player.skills.contains('jueqing')) return [1,-2];
+							if(target.hp<=1) return;
 							var hastarget=false;
 							var hasfriend=false;
 							var turnfriend=false;
@@ -607,7 +608,7 @@ character.woods={
 			global:'baonue2'
 		},
 		baonue2:{
-			audio:4,
+			audio:2,
 			forceaudio:true,
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
@@ -671,6 +672,9 @@ character.woods={
 				order:1,
 				result:{
 					player:function(player){
+						if(lib.config.mode=='identity'&&game.zhu.isZhu&&player.identity=='fan'){
+							if(game.zhu.hp==1&&game.zhu.num('h')<=2) return 1;
+						}
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
 							var att=ai.get.attitude(player,game.players[i]);

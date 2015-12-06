@@ -210,6 +210,9 @@ window.config={
 	glow_phase:'yellow',
 
 	skin:{},
+	hiddenModePack:[],
+	hiddenCharacterPack:[],
+	hiddenCardPack:[],
 
 	theme:'woodden',
 	layout:'mobile',
@@ -262,6 +265,8 @@ window.config={
 	bannedcards:[],
 	bannedpile:{},
 	addedpile:{},
+	customCharacterPack:{},
+	customCardPack:{},
 
 	mode:'identity',
 	mode_config:{

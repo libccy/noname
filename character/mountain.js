@@ -806,7 +806,7 @@ character.mountain={
 			}
 		},
 		beige:{
-			audio:6,
+			audio:4,
 			trigger:{global:'damageEnd'},
 			filter:function(event,player){
 				return (event.card&&event.card.name=='sha'&&event.source&&

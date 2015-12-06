@@ -895,7 +895,7 @@ character.sp={
 					next.ai=function(card){
 						return maxval-ai.get.value(card);
 					};
-					next.logSkill='manjuan';
+					next.logSkill=event.name;
 					event.cards=cards;
 				}
 				"step 2"
@@ -3308,12 +3308,12 @@ character.sp={
 	translate:{
 		chenlin:'陈琳',
 		yuanshu:'袁术',
-		re_yuanshu:'袁术',
+		re_yuanshu:'新袁术',
 		gongsunzan:'公孙瓒',
-		sp_diaochan:'貂蝉',
+		sp_diaochan:'sp貂蝉',
 		yangxiu:'杨修',
-		sp_zhaoyun:'赵云',
-		jsp_zhaoyun:'赵云',
+		sp_zhaoyun:'sp赵云',
+		jsp_zhaoyun:'界sp赵云',
 		caohong:'曹洪',
 		liuxie:'刘协',
 		xiahouba:'夏侯霸',
@@ -3328,10 +3328,10 @@ character.sp={
 		tianfeng:'田丰',
 		sp_pangtong:'庞统',
 		maliang:'马良',
-		sp_caoren:'曹仁',
+		sp_caoren:'sp曹仁',
 		yuejin:'乐进',
 		mifuren:'糜夫人',
-		sp_dongzhuo:'董卓',
+		sp_dongzhuo:'sp董卓',
 		chendong:'陈武董袭',
 		jiangfei:'蒋琬费祎',
 		jiangqing:'蒋钦',
@@ -3344,7 +3344,7 @@ character.sp={
 		sp_pangde:'庞德',
 		sp_sunshangxiang:'孙尚香',
 		zhugedan:'诸葛诞',
-		sp_machao:'马超',
+		sp_machao:'sp马超',
 		sp_jiangwei:'姜维',
 		zhangbao:'张宝',
 		yangxiou:'杨修',
@@ -3353,7 +3353,7 @@ character.sp={
 		zhanglu:'张鲁',
 		wutugu:'兀突骨',
 		mateng:'马腾',
-		sp_caiwenji:'蔡文姬',
+		sp_caiwenji:'sp蔡文姬',
 		zhugeguo:'诸葛果',
 
 		yuhua:'羽化',

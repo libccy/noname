@@ -4,7 +4,7 @@ html{
 	background: url('grid.png'),linear-gradient(#333333, #222222) fixed;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
-.player.unseen .equips:not(*:empty),.menu,
+.player.unseen .equips:not(*:empty),.menu,#splash>div,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(#4b4b4b, #464646);

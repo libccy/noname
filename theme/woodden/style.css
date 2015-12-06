@@ -3,7 +3,7 @@ html{
 	text-shadow: black 0 0 2px;
 	background: url('grid.png'),linear-gradient(#6c7989, #434b55) fixed;
 }
-#system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar,.menu,
+#system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar,.menu,#splash>div,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
 	border-radius: 8px;
@@ -16,6 +16,9 @@ html{
 	background:url('wood2.png');
 	color:rgba(77, 60, 51,0.8);
 	text-shadow:none;
+}
+#splash>div{
+	background:url('wood2.png');
 }
 
 .player.unseen .equips:not(*:empty){

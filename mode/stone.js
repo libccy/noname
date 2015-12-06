@@ -367,12 +367,16 @@ mode.stone={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				if(lib.db&&!_status.characterLoaded){
+					_status.waitingForCharacters=true;
+					game.pause();
+				}
+				"step 1"
 				lib.init.css('layout/mode/','stone');
 				game.initStone();
 
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
-					ui.create.arena();
 					ui.create.me();
 					ui.arena.style.display='none';
 					ui.system.style.display='none';
@@ -395,13 +399,13 @@ mode.stone={
 					game.delay();
 				}
 				ui.arena.classList.add('stone');
-				"step 1"
+				"step 2"
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].classList.add('noidentity');
 				}
 				game.enemy=game.me.next;
 				game.chooseCharacter();
-				"step 2"
+				"step 3"
 				_status.friendCount=ui.create.system('',null,true);
 				_status.enemyCount=ui.create.system('',null,true);
 				game.updateStatusCount();
@@ -478,6 +482,7 @@ mode.stone={
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbidstone.contains(i)) continue;
+					if(lib.config.banned.contains(i)) continue;
 					if(!get.config('double_character')&&get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 					if(!get.config('double_character')&&get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
 					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;

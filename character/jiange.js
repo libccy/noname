@@ -456,6 +456,7 @@ character.jiange={
             }
         },
         qiwu:{
+            audio:true,
             trigger:{player:'useCard'},
             forced:true,
             filter:function(event,player){

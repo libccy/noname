@@ -1010,13 +1010,19 @@ character.yijiang={
 				}
 				'step 4'
 				if(result&&result.cards){
+					event.card=result.cards[0];
 					event.current.lose(result.cards,ui.special);
+					event.current.$throw(ui.create.card(),1000);
+				}
+				else{
+					event.card=null;
 				}
 				'step 5'
 				if(event.current==game.me) game.delay(0.5);
 				'step 6'
-				if(result&&result.cards){
-					ui.cardPile.insertBefore(result.cards[0],ui.cardPile.firstChild);
+				if(event.card){
+					event.card.fix();
+					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
 				}
 				event.goto(2);
 			}
@@ -3824,7 +3830,7 @@ character.yijiang={
 			trigger:{source:'damageBefore'},
 			forced:true,
 			audio:2,
-			priority:10,
+			priority:16,
 			check:function(){return false;},
 			content:function(){
 				trigger.untrigger();
@@ -3848,6 +3854,14 @@ character.yijiang={
 			content:function(){
 				player.draw(Math.min(3,player.maxHp-player.hp)-player.num('h'));
 			},
+			ai:{
+				noh:true,
+				skillTagFilter:function(player,tag){
+					if(tag=='noh'&&player.maxHp-player.hp<player.num('h')){
+						return false;
+					}
+				}
+			}
 		},
 		luoying:{
 			unique:true,
@@ -3906,7 +3920,9 @@ character.yijiang={
 			enable:'chooseToUse',
 			filter:function(event,player){
 				if(player.classList.contains('turnedover')) return false;
-				if(event.parent.name=='phaseUse') return true;
+				if(event.parent.name=='phaseUse'){
+					return lib.filter.filterCard({name:'jiu'},player,event);
+				}
 				if(event.type!='dying') return false;
 				if(player!=_status.dying) return false;
 				if(player.storage.niepan) return false;
@@ -4897,7 +4913,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				player.chooseTarget('是否发动陷嗣？',[1,2],function(card,player,target){
-					return target.num('he')>0&&player!=target;
+					return target.num('he')>0;
 				},
 					function(target){
 					return -ai.get.attitude(_status.event.player,target);

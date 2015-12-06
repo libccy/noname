@@ -32,7 +32,7 @@ character.refresh={
 			},
 			content:function(){
 				'step 0'
-				trigger.player.chooseTarget(function(card,player,target){
+				trigger.player.chooseTarget(function(card,playerx,target){
 					return player.canUse({name:'juedou'},target)&&target!=trigger.player;
 				},'是否发动【利奴】？').ai=function(target){
 					return ai.get.effect(target,{name:'juedou'},player,trigger.player)-2;
@@ -487,7 +487,8 @@ character.refresh={
 					target:function(card){
 						if(card.name=='guohe'||card.name=='liuxinghuoyu') return 0.5;
 					}
-				}
+				},
+				noh:true,
 			}
 		},
 		retishen:{
@@ -1227,28 +1228,28 @@ character.refresh={
 		}
 	},
 	translate:{
-		re_zhangliao:'张辽',
-		re_huangyueying:'黄月英',
-		re_simayi:'司马懿',
-		re_xuzhu:'许褚',
-		re_xiahoudun:'夏侯惇',
-		re_lvmeng:'吕蒙',
-		re_zhouyu:'周瑜',
-		re_luxun:'陆逊',
-		re_zhaoyun:'赵云',
-		re_guanyu:'关羽',
-		re_zhangfei:'张飞',
-		re_machao:'马超',
-		re_caocao:'曹操',
-		re_guojia:'郭嘉',
-		re_lvbu:'吕布',
-		re_xushu:'徐庶',
-		re_huanggai:'黄盖',
-		re_gongsunzan:'公孙瓒',
-		re_daqiao:'大乔',
-		re_ganning:'甘宁',
-		re_huatuo:'华佗',
-		re_lidian:'李典',
+		re_zhangliao:'界张辽',
+		re_huangyueying:'新黄月英',
+		re_simayi:'界司马懿',
+		re_xuzhu:'界许褚',
+		re_xiahoudun:'界夏侯惇',
+		re_lvmeng:'界吕蒙',
+		re_zhouyu:'界周瑜',
+		re_luxun:'界陆逊',
+		re_zhaoyun:'界赵云',
+		re_guanyu:'界关羽',
+		re_zhangfei:'界张飞',
+		re_machao:'界马超',
+		re_caocao:'界曹操',
+		re_guojia:'界郭嘉',
+		re_lvbu:'界吕布',
+		re_xushu:'界徐庶',
+		re_huanggai:'界黄盖',
+		re_gongsunzan:'界公孙瓒',
+		re_daqiao:'界大乔',
+		re_ganning:'界甘宁',
+		re_huatuo:'界华佗',
+		re_lidian:'界李典',
 		qinxue:'勤学',
 		retuxi:'突袭·新',
 		reluoyi:'裸衣·新',

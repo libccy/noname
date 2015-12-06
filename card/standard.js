@@ -115,7 +115,12 @@ card.standard={
 				},
 				order:3,
 				result:{
-					target:-1.5,
+					target:function(player,target){
+						if(player.skills.contains('jiu')&&!target.num('e','baiyin')){
+							return -3;
+						}
+						return -1.5;
+					},
 				},
 				tag:{
 					respond:1,
@@ -212,7 +217,7 @@ card.standard={
 						if(nh<=target.hp){
 							keep=true;
 						}
-						else if(nh==target.hp+1&&target.hp>=3&&target.num('h','tao')<=1){
+						else if(nh==target.hp+1&&target.hp>=2&&target.num('h','tao')<=1){
 							keep=true;
 						}
 						if(target.hp>=2&&keep&&target.hasFriend()){
@@ -582,6 +587,12 @@ card.standard={
 							if(game.players[i].ai.shown==0) num++;
 						}
 						if(num>1) return 0;
+						var nh=target.num('h');
+						if(lib.config.mode=='identity'){
+							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
+						}
+						if(nh==0) return -2;
+						if(nh==1) return -1.7
 						return -1.5;
 					},
 				},
@@ -635,6 +646,12 @@ card.standard={
 							if(game.players[i].ai.shown==0) num++;
 						}
 						if(num>1) return 0;
+						var nh=target.num('h');
+						if(lib.config.mode=='identity'){
+							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
+						}
+						if(nh==0) return -2;
+						if(nh==1) return -1.7
 						return -1.5;
 					},
 				},
@@ -855,6 +872,13 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
+						var es=target.get('e');
+						var nh=target.num('h');
+						var noe=(es.length==0);
+						var noe2=(es.length==1&&es[0].name=='baiyin'&&target.hp<target.maxHp);
+						var noh=(nh==0||target.hasSkillTag('noh'));
+						if(noh&&noe) return 0;
+						if(noh&&noe2) return 0.01;
 						if(ai.get.attitude(player,target)<=0) return (target.num('he'))?-1.5:1.5;
 						var js=target.get('j');
 						if(js.length){
@@ -963,12 +987,12 @@ card.standard={
 				result:{
 					target:function(player,target){
 						var num=target.hp-target.num('h')-2;
-						if(num>-1) return -1;
+						if(num>-1) return -0.01;
 						if(target.hp<3) num--;
-						if(target.hp<2) num--;
-						if(target.hp<1) num--;
 						if(target.isTurnedOver()) num/=2;
-						return num;
+						var dist=get.distance(player,target,'absolute');
+						if(dist<1) dist=1;
+						return num/Math.sqrt(dist);
 					}
 				},
 				tag:{
@@ -1440,6 +1464,14 @@ card.standard={
 							if(typeof aiii=='number') return aiii;
 						}
 						if(Math.abs(ai.get.attitude(_status.event.player,trigger.player))<3) return 0;
+						if(trigger.player.skills.contains('guanxing')) return 0;
+						if(trigger.card.name!='lebu'&&trigger.card.name!='bingliang'){
+							if(trigger.player!=_status.event.player){
+								return 0;
+							}
+						}
+						var eff=ai.get.effect(trigger.player,trigger.card,trigger.player,player);
+						if(eff>=0) return 0;
 						return state*ai.get.attitude(_status.event.player,trigger.player);
 					},
 					source:trigger.player

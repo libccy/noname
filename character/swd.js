@@ -726,7 +726,7 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					trigger.player.chooseToDiscard({type:'basic'},'入梦：弃置一张基本牌或路过出牌及弃牌阶段').ai=function(card){
+					trigger.player.chooseToDiscard({type:'basic'},'入梦：弃置一张基本牌或跳过出牌及弃牌阶段').ai=function(card){
 						return 5-ai.get.value(card);
 					}
 				}
@@ -2586,6 +2586,7 @@ character.swd={
 			}
 		},
 		lianji:{
+			audio:true,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -3063,6 +3064,7 @@ character.swd={
 			}
 		},
 		tiandao:{
+			audio:true,
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
@@ -6459,6 +6461,7 @@ character.swd={
 			}
 		},
 		swd_xiuluo:{
+			audio:2,
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			filter:function(event,player){
@@ -7568,6 +7571,7 @@ character.swd={
 			}
 		},
 		mazui:{
+			audio:true,
 			enable:'phaseUse',
 			usable:1,
 			filterCard:{color:'black'},

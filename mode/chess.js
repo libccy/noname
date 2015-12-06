@@ -1524,6 +1524,11 @@ mode.chess={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				if(lib.db&&!_status.characterLoaded){
+					_status.waitingForCharacters=true;
+					game.pause();
+				}
+				"step 1"
 				for(var i in lib.skill){
 					if(lib.skill[i].changeSeat){
 						lib.skill[i]={};
@@ -1560,7 +1565,6 @@ mode.chess={
 					lib.card.list=lib.card.list.concat(lib.chess_obstaclelist);
 					delete lib.chess_obstaclelist
 				}
-				ui.create.arena();
 				ui.create.cards();
 				game.finishCards();
 				ui.chessContainer=ui.create.div('#chess-container',ui.arena);
@@ -1625,7 +1629,7 @@ mode.chess={
 						}
 					}
 				}
-				"step 1"
+				"step 2"
 				ui.arena.classList.add('chess');
 				var mylistmap,enemylistmap;
 				if(event.video){
@@ -1878,7 +1882,7 @@ mode.chess={
 				lib.setScroll(ui.chessinfo);
 
 				game.arrangePlayers();
-				"step 2"
+				"step 3"
 				ui.control.style.display='';
 				var p;
 				for(var i=0;i<game.players.length;i++){
@@ -1931,6 +1935,7 @@ mode.chess={
 						if(lib.config.forbidai.contains(i)) continue;
 						if(lib.config.forbidall.contains(i)) continue;
 						if(lib.config.forbidchess.contains(i)) continue;
+						if(lib.config.banned.contains(i)) continue;
 						if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 						if(get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
 						if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
@@ -3475,6 +3480,7 @@ mode.chess={
 					if(lib.character[i][4].contains('minskin')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
+					if(lib.config.banned.contains(i)) continue;
 					if(lib.config.forbidchess.contains(i)) continue;
 					if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 					if(lib.character[i][4].contains('boss')){

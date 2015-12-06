@@ -15,9 +15,13 @@ mode.versus={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				if(lib.db&&!_status.characterLoaded){
+					_status.waitingForCharacters=true;
+					game.pause();
+				}
+				"step 1"
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
-					ui.create.arena();
 					ui.create.me();
 					ui.arena.style.display='none';
 					ui.system.style.display='none';
@@ -57,15 +61,14 @@ mode.versus={
 				game.save('only_zhu',true);
 				game.save('control_all',true);
 
-				ui.create.arena();
 				ui.create.cards();
 				game.finishCards();
 				ui.auto.hide();
 				ui.wuxie.hide();
 				game.delay();
-				"step 1"
-				game.chooseCharacter();
 				"step 2"
+				game.chooseCharacter();
+				"step 3"
 				event.trigger('gameStart');
 				game.gameDraw(game.players[0]);
 				_status.round=0;
@@ -185,6 +188,7 @@ mode.versus={
 				for(i in lib.character){
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidversus.contains(i)) continue;
+					if(lib.config.banned.contains(i)) continue;
 					if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 					if(get.config('ban_weak')&&lib.config.forbidall.contains(i)) continue;
 					if(get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;

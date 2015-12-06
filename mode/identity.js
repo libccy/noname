@@ -48,9 +48,16 @@ mode.identity={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				if(lib.db&&!_status.characterLoaded){
+					_status.waitingForCharacters=true;
+					game.pause();
+				}
+				if(!lib.config.new_tutorial){
+					ui.arena.classList.add('only_dialog');
+				}
+				"step 1"
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
-					ui.create.arena();
 					ui.create.me();
 					ui.arena.style.display='none';
 					ui.system.style.display='none';
@@ -79,7 +86,7 @@ mode.identity={
 						game.delay();
 					}
 				}
-				"step 1"
+				"step 2"
 				if(!lib.config.new_tutorial){
 					game.saveConfig('version',lib.version);
 					var clear=function(){
@@ -247,14 +254,14 @@ mode.identity={
 				else{
 					game.showChangeLog();
 				}
-				"step 2"
+				"step 3"
 				if(lib.storage.test){
 					lib.config.game_speed='vfast';
 					_status.auto=true;
 					ui.auto.classList.add('glow');
 				}
 				game.chooseCharacter();
-				"step 3"
+				"step 4"
 				if(game.players.length==2){
 					game.showIdentity(true);
 				}
@@ -603,6 +610,7 @@ mode.identity={
 				for(i in lib.character){
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
+					if(lib.config.banned.contains(i)) continue;
 					if(!get.config('double_character')&&get.config('ban_weak')&&
 					(lib.config.forbidsingle.contains(i)||lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
 					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
@@ -770,11 +778,6 @@ mode.identity={
 				}
 			},
 			dieAfter:function(source){
-				if(this.spy){
-					this.identity=this.spy;
-					this.setIdentity();
-					delete this.spy;
-				}
 				this.dieSpeak();
 				if(get.config('show_identity')&&!this.identityShown){
 					this.setIdentity(this.identity);
@@ -812,8 +815,7 @@ mode.identity={
 					var effect=0,c,shown;
 					var info=get.info(card);
 					if(info.ai&&info.ai.expose){
-						if(this.spy) this.ai.shown-=info.ai.expose;
-						else this.ai.shown+=info.ai.expose;
+						this.ai.shown+=info.ai.expose;
 					}
 					if(targets.length>0){
 						for(var i=0;i<targets.length;i++){
@@ -825,7 +827,7 @@ mode.identity={
 							effect+=ai.get.effect(targets[i],card,this)*c;
 						}
 					}
-					if(effect>0&&!this.spy){
+					if(effect>0){
 						if(effect<1) c=0.5;
 						else c=1;
 						if(targets.length==1&&targets[0]==this);
@@ -835,11 +837,6 @@ mode.identity={
 					else if(effect<0&&this==game.me&&game.me.identity!='nei'){
 						if(targets.length==1&&targets[0]==this);
 						else if(targets.length==1) this.ai.shown-=0.2;
-						else this.ai.shown-=0.1;
-					}
-					else if(this.spy){
-						if(this.ai.shown>0.5) this.ai.shown=0.5;
-						if(targets.length==1&&targets[0]!=this) this.ai.shown-=0.2;
 						else this.ai.shown-=0.1;
 					}
 				}
@@ -867,7 +864,7 @@ mode.identity={
 				}
 				var difficulty=0;
 				if(to==game.me) difficulty=2-get.difficulty();
-				if(get.config('ai_identity')||from==to||!lib.config.ai_guess||(to.identityShown&&!to.spy)){
+				if(get.config('ai_identity')||from==to||!lib.config.ai_guess||(to.identityShown)){
 					return ai.get.realAttitude(from,to)+difficulty*1.5;
 				}
 				else{
@@ -931,8 +928,24 @@ mode.identity={
 								if(strategy==6) return -1;
 								if(strategy==5) return 10;
 								if(to.hp<=0) return 10;
-								if(situation>1) num=0;
-								else num=get.population('fan')+Math.max(0,3-game.zhu.hp);
+								if(get.population('fan')==1){
+									var fan;
+									for(var i=0;i<game.players.length;i++){
+										if(game.players[i].identity=='fan'){
+											fan=game.players[i];break;
+										}
+									}
+									if(fan){
+										if(to.hp>1&&to.hp>fan.hp&&to.num('he')>fan.num('he')){
+											return -3;
+										}
+									}
+									return 0;
+								}
+								else{
+									if(situation>1||get.population('fan')==0) num=0;
+									else num=get.population('fan')+Math.max(0,3-game.zhu.hp);
+								}
 								if(strategy==2) num--;
 								if(strategy==3) num++;
 								return num;
@@ -988,6 +1001,7 @@ mode.identity={
 							case 'zhong': return -7;
 							case 'mingzhong':return -5;
 							case 'nei':
+								if(get.population('fan')==1) return 0;
 								if(get.population('zhong')+get.population('mingzhong')==0) return -7;
 								if(game.zhu&&game.zhu.hp<=2) return -1;
 								return Math.min(3,situation);

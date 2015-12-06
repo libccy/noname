@@ -387,11 +387,136 @@
 
 
 
+.menu-buttons>.new_character{
+	display: block;
+	position: relative;
+	width: 100%;
+}
+.menu-buttons>.new_character>.avatar{
+	top:8px;
+	left:12px;
+	position: absolute;
+	width: 100px;
+	height: 120px;
+	background-size: cover;
+}
+.menu-buttons>.new_character>.avatar>input{
+	z-index: 3;
+	border-radius: 8px;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	left:0;
+	top:0;
+	position: absolute;
+}
+.menu-buttons>.new_character>.avatar>.select_avatar{
+	font-family: 'xinwei';
+	font-size: 20px;
+	width: 100%;
+	height: 20px;
+	line-height: 20px;
+	top:50px;
+	left:0;
+	text-align: center;
+}
+.menu-buttons>.new_character>.avatar.inited>.select_avatar{
+	display: none;
+}
+.menu-buttons>.new_character>.indent{
+	display: block;
+	margin-left: 123px;
+	width: calc(100% - 135px);
+	position: relative;
+	padding-top: 7px;
+	text-align: left;
+	white-space: nowrap;
+}
+.menu-buttons>.new_character>.indent>input{
+	width: 60px;
+}
+.menu-buttons>.new_character>div>select{
+	margin-right: 3px;
+}
+.menu-buttons>.new_character>.add_skill{
+	position: absolute;
+	left: 12px;
+	top:145px;
+	text-align: left;
+	line-height: 20px;
+}
+.menu-buttons>.new_character>.add_skill.create{
+	top: 195px;
+}
+.menu-buttons>.new_character>.add_skill.create>div{
+	position: relative;
+}
+.menu-buttons>.new_character>.add_skill.create>div.hidden{
+	display: none;
+}
+.menu-buttons>.new_character>.add_skill.create>div>textarea{
+	resize: none;
+    width: 200px;
+    height: 100px;
+    margin-top: 5px;
+}
+.menu-buttons>.new_character>.add_skill.create>div>div{
+	position: relative;
+	margin-top: 5px;
+}
+.menu-buttons>.new_character>.add_skill.create>div>div>input{
+	width: 120px;
+}
+.menu-buttons>.new_character>.skill_list{
+	position: absolute;
+	left: 12px;
+	top: 215px;
+	text-align: left;
+	height: auto;
+	width: calc(100% - 20px);
+	padding-bottom: 30px;
+	transition: all 0s;
+}
+.menu-buttons>.new_character>.skill_list>div{
+	position: relative;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	height: auto;
+}
+.menu-buttons>.new_character>.skill_list>div>div{
+	position: relative;
+}
+.menu-buttons>.new_character>.skill_list>div:first-child{
+	margin-bottom: 10px;
+}
+.menu-buttons>.new_character>.skill_list>div:first-child>div{
+	width: calc(50% - 10px);
+	margin-right: 10px;
+	margin-top: 6px;
+}
+.menu-buttons>.new_character>.skill_list>div:first-child>div>div{
+	position: relative;
+}
+.menu-buttons>.new_character>.skill_list>div:first-child>div>div:last-child{
+	float: right;
+}
 
-
-
-
-
+.menu-buttons>.new_character.export{
+	text-align: left;
+}
+.menu-buttons>.new_character.export>div{
+	position: relative;
+	margin-left: 12px;
+	margin-top: 5px;
+}
+.menu-buttons>.new_character.export>div>input{
+	width: 100px;
+	margin-right: 5px;
+}
+.menu-buttons>.new_character.export.import>div>input{
+	width: 153px;
+}
 
 .menubutton{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;

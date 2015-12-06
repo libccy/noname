@@ -38,9 +38,13 @@ mode.boss={
 			var next=game.createEvent('game',false);
 			next.content=function(){
 				"step 0"
+				if(lib.db&&!_status.characterLoaded){
+					_status.waitingForCharacters=true;
+					game.pause();
+				}
+				"step 1"
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
-					ui.create.arena();
 					ui.create.me();
 					ui.arena.style.display='none';
 					ui.system.style.display='none';
@@ -69,7 +73,7 @@ mode.boss={
 				}
 				lib.init.css('layout/mode','boss');
 				game.delay(0.1);
-				"step 1"
+				"step 2"
 				var bosslist=ui.create.div('#bosslist.hidden');
 				event.bosslist=bosslist;
 				bosslist.ontouchmove = ui.click.touchScroll;
@@ -144,7 +148,6 @@ mode.boss={
 				}
 				ui.create.div(bosslist);
 				lib.translate.boss_pangtong='涅槃凤雏';
-				ui.create.arena();
 				ui.create.cards();
 				game.finishCards();
 				ui.arena.dataset.number=8;
@@ -170,7 +173,7 @@ mode.boss={
 					game.save('current',target.name);
 					target.classList.add('highlight');
 				});
-				"step 2"
+				"step 3"
 				game.bossinfo=lib.boss.global;
 				for(var i in lib.boss[event.current.name]){
 					game.bossinfo[i]=lib.boss[event.current.name][i];
@@ -306,7 +309,7 @@ mode.boss={
 				info.boss=(game.me==game.boss);
 				game.addVideo('init',null,info);
 
-				"step 3"
+				"step 4"
 				event.trigger('gameStart');
 				game.gameDraw(game.boss);
 				game.bossPhaseLoop();
@@ -422,6 +425,7 @@ mode.boss={
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbidboss.contains(i)) continue;
+					if(lib.config.banned.contains(i)) continue;
 					if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 					if(get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
 					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;

@@ -924,6 +924,7 @@ character.gujian={
 				content:'time'
 			},
 			ai:{
+				noh:true,
 				threaten:0.8,
 				effect:{
 					target:function(card,player,target){

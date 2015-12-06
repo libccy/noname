@@ -51,6 +51,9 @@ character.boss={
 				trigger.untrigger();
 				trigger.finish();
 			},
+			ai:{
+				noh:true,
+			},
 			group:'boss_juejing2'
 		},
 		boss_juejing2:{
@@ -77,7 +80,7 @@ character.boss={
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('diyleiji',result.targets,'thunder');
+					player.logSkill('boss_leiji',result.targets,'thunder');
 					event.target=result.targets[0];
 					event.target.judge(function(card){
 						// var suit=get.suit(card);
@@ -132,6 +135,7 @@ character.boss={
 			}
 		},
 		wuqin:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
 				return player.num('h')==0;
@@ -141,9 +145,11 @@ character.boss={
 			}
 		},
 		boss_baolin:{
+			audio:true,
 			inherit:'juece',
 		},
 		boss_qiangzheng:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
             forced:true,
 			unique:true,
@@ -171,6 +177,7 @@ character.boss={
             }
 		},
 		guizhen:{
+			audio:2,
 			trigger:{player:'loseEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -248,6 +255,7 @@ character.boss={
 			inherit:'guiji'
 		},
 		fengwu:{
+			audio:2,
 			unique:true,
 			enable:'phaseUse',
 			usable:1,
@@ -292,6 +300,7 @@ character.boss={
 			}
 		},
 		huanhua:{
+			audio:2,
 			trigger:{global:'gameDrawAfter'},
 			forced:true,
 			unique:true,
@@ -356,6 +365,7 @@ character.boss={
 			}
 		},
 		jidian:{
+			audio:2,
 			trigger:{source:'damageAfter'},
 			direct:true,
 			unique:true,
@@ -385,9 +395,11 @@ character.boss={
 			}
 		},
 		tinqin:{
+			audio:false,
 			inherit:'manjuan'
 		},
 		boss_hujia:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			unique:true,
@@ -431,6 +443,7 @@ character.boss={
 			}
 		},
 		boss_guihan:{
+			audio:2,
 			unique:true,
 			enable:'chooseToUse',
 			mark:true,
@@ -565,6 +578,7 @@ character.boss={
 			}
 		},
 		boss_shengshou:{
+			audio:true,
 			trigger:{player:'useCard'},
 			frequent:true,
 			unique:true,
@@ -583,6 +597,7 @@ character.boss={
 			},
 		},
 		boss_honglian:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			unique:true,
@@ -612,9 +627,11 @@ character.boss={
 			}
 		},
 		boss_tianyu:{
+			audio:true,
 			inherit:'suoling'
 		},
 		boss_jizhi:{
+			audio:2,
 			trigger:{player:'useCard'},
 			frequent:true,
 			unique:true,
@@ -686,6 +703,7 @@ character.boss={
 			}
 		},
 		tashui:{
+			audio:2,
 			trigger:{player:['useCard','respondAfter']},
 			direct:true,
 			unique:true,
@@ -721,6 +739,7 @@ character.boss={
 			trigger:{player:['loseEnd','changeHp']},
 			forced:true,
 			unique:true,
+			audio:2,
 			filter:function(event,player){
 				return player.num('h')<4;
 			},
@@ -739,7 +758,8 @@ character.boss={
 							return [0,1];
 						}
 					}
-				}
+				},
+				noh:true,
 			}
 		},
 		shangshix2:{
@@ -762,9 +782,11 @@ character.boss={
 		},
 		wuxin:{
 			inherit:'miles_xueyi',
-			group:'swd_wuxie'
+			group:'swd_wuxie',
+			audio:2,
 		},
 		shenwei:{
+			audio:2,
 			unique:true,
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
@@ -791,6 +813,7 @@ character.boss={
 			trigger:{player:'changeHp'},
 			forced:true,
 			priority:100,
+			audio:2,
 			filter:function(event,player){
 				return player.hp<=4
 			},
