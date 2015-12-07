@@ -228,7 +228,7 @@ character.mountain={
 					event.finish();
 				}
 				else{
-					var next=player.chooseToDiscard('是否发动巧变路过判定阶段？');
+					var next=player.chooseToDiscard('是否发动巧变跳过判定阶段？');
 					next.ai=ai.get.unuseful2;
 					next.logSkill='qiaobian';
 				}
@@ -276,7 +276,7 @@ character.mountain={
 					},
 					selectTarget:[0,2],
 					filterCard:true,
-					prompt:'是否发动巧变路过摸牌阶段？'
+					prompt:'是否发动巧变跳过摸牌阶段？'
 				});
 				"step 1"
 				if(result.bool){
@@ -378,7 +378,7 @@ character.mountain={
 					},
 					selectTarget:2,
 					filterCard:true,
-					prompt:'是否发动巧变路过出牌阶段？',
+					prompt:'是否发动巧变跳过出牌阶段？',
 					targetprompt:['被移走','移动目标']
 				});
 				"step 1"
@@ -438,7 +438,7 @@ character.mountain={
 			content:function(){
 				"step 0"
 				var discard=player.num('h')>player.hp;
-				var next=player.chooseToDiscard('是否发动巧变路过弃牌阶段？');
+				var next=player.chooseToDiscard('是否发动巧变跳过弃牌阶段？');
 				next.logSkill='qiaobian';
 				next.ai=function(card){
 					if(discard){

@@ -22,6 +22,13 @@ card.refresh={
 			usable:1,
 			filterCard:true,
 			check:function(card){
+				var player=_status.event.player;
+				var nh=player.num('h');
+				if(nh<=player.hp){
+					if(nh<3) return 0;
+					if(nh==3) return 5-ai.get.value(card);
+					return 7-ai.get.value(card);
+				}
 				return 10-ai.get.useful(card);
 			},
 			discard:false,

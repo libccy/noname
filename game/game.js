@@ -24,7 +24,9 @@
 			'boss配音',
 			'隐藏模式、武将、卡牌包',
 			'开始界面',
-			'自定义武将'
+			'中间显示历史记录',
+			'左滑/右滑手势',
+			'自定义武将',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -180,7 +182,8 @@
 							system:'显示按钮',
 							menu:'打开菜单',
 							pause:'切换暂停',
-							auto:'切换托管'
+							auto:'切换托管',
+							off:'关闭',
 						}
 					},
 					swipe_up:{
@@ -191,7 +194,32 @@
 							system:'显示按钮',
 							menu:'打开菜单',
 							pause:'切换暂停',
-							auto:'切换托管'
+							auto:'切换托管',
+							off:'关闭',
+						}
+					},
+					swipe_left:{
+						name:'左划操作',
+						init:'off',
+						unfrequent:true,
+						item:{
+							system:'显示按钮',
+							menu:'打开菜单',
+							pause:'切换暂停',
+							auto:'切换托管',
+							off:'关闭',
+						}
+					},
+					swipe_right:{
+						name:'右划操作',
+						init:'off',
+						unfrequent:true,
+						item:{
+							system:'显示按钮',
+							menu:'打开菜单',
+							pause:'切换暂停',
+							auto:'切换托管',
+							off:'关闭',
 						}
 					},
 					show_splash:{
@@ -291,10 +319,14 @@
 							if(config.swipe){
 								map.swipe_up.show();
 								map.swipe_down.show();
+								map.swipe_left.show();
+								map.swipe_right.show();
 							}
 							else{
 								map.swipe_up.hide();
 								map.swipe_down.hide();
+								map.swipe_left.hide();
+								map.swipe_right.hide();
 							}
 						}
 						else{
@@ -313,6 +345,8 @@
 							map.swipe.hide();
 							map.swipe_up.hide();
 							map.swipe_down.hide();
+							map.swipe_left.hide();
+							map.swipe_right.hide();
 						}
 						if(lib.config.enable_drag){
 							if(lib.config.touchscreen){
@@ -554,6 +588,28 @@
 						},
 						unfrequent:true,
 					},
+					show_log:{
+						name:'显示历史记录',
+						init:'off',
+						unfrequent:true,
+						item:{
+							off:'关闭',
+							left:'靠左',
+							center:'居中',
+							right:'靠右',
+						},
+						onclick:function(bool){
+							game.saveConfig('show_log',bool);
+							if(lib.config.show_log!='off'){
+								ui.arenalog.style.display='';
+								ui.arenalog.dataset.position=bool;
+							}
+							else{
+								ui.arenalog.style.display='none';
+								ui.arenalog.innerHTML='';
+							}
+						}
+					},
 					glow_phase:{
 						name:'当前回合角色高亮',
 						unfrequent:true,
@@ -606,12 +662,6 @@
 						init:false,
 						unfrequent:true,
 					},
-					// only_fullskin:{
-					// 	name:'隐藏无全身皮肤武将',
-					// 	init:true,
-					// 	unfrequent:true,
-					// 	restart:true,
-					// },
 					hide_card_image:{
 						name:'隐藏卡牌背景',
 						init:false,
@@ -2506,11 +2556,12 @@
 							game.getDB('character',null,function(list){
 								for(var i in list){
 									if(!list[i][4]) list[i][4]=[];
-									for(var j=0;j<list[i][3].length;j++){
-										if(!lib.skill[list[i][3][j]]){
-											list[i][3].splice(j--,1);
-										}
-									}
+									// for(var j=0;j<list[i][3].length;j++){
+									// 	if(!lib.skill[list[i][3][j]]){
+									// 		alert(list[i][3][j]);
+									// 		list[i][3].splice(j--,1);
+									// 	}
+									// }
 									lib.character[i]=list[i];
 									lib.customCharacters.push(i);
 									lib.setTranslate(i);
@@ -2557,6 +2608,23 @@
 						}
 					}
 				});
+
+				var scripts=document.head.querySelectorAll('script');
+				for(var i=0;i<scripts.length;i++){
+					if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
+						if(scripts[i].src.indexOf('ipad')!=-1){
+							window.isIpad=true;
+						}
+						else if(scripts[i].src.indexOf('iphone')!=-1){
+							var metas=document.head.querySelectorAll('meta');
+							for(var i=0;i<metas.length;i++){
+								if(metas[i].name=='viewport'){
+									metas[i].content="user-scalable=no, initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, width=device-width, height=device-height";
+								}
+							}
+						}
+					}
+				}
 			},
 			css:function(path,file,before){
 				var style = document.createElement("link");
@@ -2849,6 +2917,10 @@
 					"step 1"
 					if(result.bool){
 						event.goto(0);
+					}
+					if(ui.tempnowuxie){
+						ui.tempnowuxie.close();
+						delete ui.tempnowuxie;
 					}
 				},
 				phaseDiscard:function(){
@@ -6801,7 +6873,17 @@
 					var node1=player.$throwxy2(card1,
 						'calc(50% - 114px)','calc(50% - 52px)','perspective(600px) rotateY(180deg)',true
 					);
-					node1.classList.add('infohidden');
+					if(lib.config.cardback_style!='default'){
+						node1.style.transitionProperty='none';
+						ui.refresh(node1);
+						node1.classList.add('infohidden');
+						ui.refresh(node1);
+						node1.style.transitionProperty='';
+					}
+					else{
+						node1.classList.add('infohidden');
+					}
+
 					node1.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
 					var onEnd01=function(){
 						node1.removeEventListener('webkitTransitionEnd',onEnd01);
@@ -6827,7 +6909,16 @@
 						var node2=target.$throwxy2(card2,
 							'calc(50% + 10px)','calc(50% - 52px)','perspective(600px) rotateY(180deg)',true
 						);
-						node2.classList.add('infohidden');
+						if(lib.config.cardback_style!='default'){
+							node2.style.transitionProperty='none';
+							ui.refresh(node2);
+							node2.classList.add('infohidden');
+							ui.refresh(node2);
+							node2.style.transitionProperty='';
+						}
+						else{
+							node2.classList.add('infohidden');
+						}
 						node2.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
 						var onEnd02=function(){
 							node2.removeEventListener('webkitTransitionEnd',onEnd02);
@@ -8658,6 +8749,19 @@
 				content:function(){
 					trigger.player.classList.remove('linked');
 				}
+			},
+			_lianhuan4:{
+				trigger:{global:'dieAfter'},
+				priority:-10,
+				forced:true,
+				popup:false,
+				filter:function(event,player){
+					return event.player.classList.contains('dead')&&event.parent.parent.name!='damage';
+				},
+				content:function(){
+					window.x=event;
+					trigger.player.classList.remove('linked');
+				}
 			}
 		},
 		character:{},
@@ -8812,7 +8916,7 @@
 
 			downloadLink.click();
 		},
-		exportCharacters:function(packname,list){
+		exportCharacters:function(packname,list,callback){
 			var zipReady=function(){
 				var zip=new JSZip();
 				var imageLoaded=0;
@@ -8831,6 +8935,10 @@
 					downloadLink.href = window.URL.createObjectURL(blob);
 
 					downloadLink.click();
+
+					if(typeof callback=='function'){
+						callback(character);
+					}
 				};
 				for(var i=0;i<lib.customCharacters.length;i++){
 					var name=lib.customCharacters[i];
@@ -11576,6 +11684,12 @@
 			ui.sidebar.insertBefore(node,ui.sidebar.firstChild);
 			game.addVideo('log',null,str);
 			if(lib.config.title) document.title=str;
+			if(lib.config.show_log!='off'&&lib.config.mode!='chess'){
+				ui.arenalog.insertBefore(node.cloneNode(true),ui.arenalog.firstChild);
+				while(ui.arenalog.childNodes.length&&ui.arenalog.scrollHeight>ui.arenalog.offsetHeight){
+					ui.arenalog.lastChild.remove();
+				}
+			}
 		},
 		putDB:function(type,id,item,callback){
 			if(!lib.db) return item;
@@ -12524,6 +12638,10 @@
 			arena:function(){
 				var i,j;
 				ui.window=ui.create.div('#window.hidden',document.body);
+				if(window.isIpad){
+					ui.window.classList.add('ipad');
+					delete window.isIpad;
+				}
 				ui.refresh(ui.window);
 				setTimeout(function(){
 					ui.window.show();
@@ -12559,6 +12677,11 @@
 				ui.backgroundMusic.autoplay=true;
 				ui.backgroundMusic.addEventListener('ended',game.playBackgroundMusic);
 				ui.window.appendChild(ui.backgroundMusic);
+
+				ui.arenalog=ui.create.div('#arenalog',ui.arena);
+				if(lib.config.show_log=='off'){
+					ui.arenalog.style.display='none';
+				}
 
 				ui.roundmenu=ui.create.div('#roundmenu.roundarenabutton.menubutton.round',ui.arena);
 				ui.roundmenu._position=[180,210];
@@ -13332,23 +13455,24 @@
 										}
 	                                }
 	                                else{
-	                                    cfgnode.classList.add('auto-hide');
+	                                    // cfgnode.classList.add('auto-hide');
 	                                    hiddenNodes.push(cfgnode);
 	                                }
 	                            }
 	                            var expanded=false;
 	                            if(hiddenNodes.length){
-	                                ui.create.div('.config.more','更多 <div>&gt;</div>',page,function(){
-	                                    if(expanded){
-	                                        this.classList.remove('on');
-	                                        this.parentNode.classList.remove('expanded');
-	                                    }
-	                                    else{
-	                                        this.classList.add('on');
-	                                        this.parentNode.classList.add('expanded');
-	                                    }
-	                                    expanded=!expanded;
-	                                });
+	                                // ui.create.div('.config.more','更多 <div>&gt;</div>',page,function(){
+	                                //     if(expanded){
+	                                //         this.classList.remove('on');
+	                                //         this.parentNode.classList.remove('expanded');
+	                                //     }
+	                                //     else{
+	                                //         this.classList.add('on');
+	                                //         this.parentNode.classList.add('expanded');
+	                                //     }
+	                                //     expanded=!expanded;
+	                                // });
+									page.classList.add('morenodes');
 	                                for(var k=0;k<hiddenNodes.length;k++){
 	                                    page.appendChild(hiddenNodes[k]);
 	                                }
@@ -13475,6 +13599,27 @@
 							}
 							page.classList.add('menu-buttons');
 							if(lib.config.customCharacterPack[mode]){
+								ui.create.div('.config.more','编辑武将包',page,function(){
+									if(this.innerHTML=='编辑武将包'){
+										this.innerHTML='确认编辑';
+										var that=this;
+										setTimeout(function(){
+											that.innerHTML='编辑武将包';
+										},1000);
+									}
+									else{
+										var pack=lib.config.customCharacterPack[mode];
+										delete lib.config.customCharacterPack[mode];
+										game.saveConfig('customCharacterPack',lib.config.customCharacterPack);
+										page.remove();
+										node.remove();
+										lib.recreateCustomCharacters();
+
+										var active=ui.customCharacter;
+										active.classList.add('active');
+										rightPane.appendChild(active.link);
+									}
+								});
 								ui.create.div('.config.more','删除武将包',page,function(){
 									if(this.innerHTML=='删除武将包'){
 										this.innerHTML='确认删除';
@@ -13490,15 +13635,18 @@
 										page.remove();
 										node.remove();
 										for(var i=0;i<pack.character.length;i++){
+											lib.customCharacters.remove(pack.character[i]);
+											delete lib.character[pack.character[i]];
 											game.deleteDB('character',pack.character[i]);
 											game.deleteDB('image','character:'+pack.character[i]);
+											lib.config.banned.remove(pack.character[i])
 										}
+										game.saveConfig('banned',lib.config.banned);
 										for(var i=0;i<pack.skill.length;i++){
 											game.deleteDB('skill',pack.skill[i]);
 										}
 									}
-									game.saveConfig('hiddenCharacterPack',lib.config.hiddenCharacterPack);
-								});
+								}).style.marginTop='5px';
 							}
 							else if(mode.indexOf('mode_')!=0){
 								ui.create.div('.config.more','隐藏武将包',page,function(){
@@ -13534,6 +13682,7 @@
 						lib.onDB(function(){
 							var page=ui.create.div('.menu-buttons');
 	                        var node=ui.create.div('.menubutton.large','自定义',clickMode);
+							ui.customCharacter=node;
 							start.firstChild.insertBefore(node,start.firstChild.querySelector('.lefttext'));
 							node.link=page;
 							node.mode='custom';
@@ -13565,13 +13714,20 @@
 								newCharacter.querySelector('.new_hp').value=info[2];
 								sexes.value=info[0];
 								groups.value=info[1];
+								if(info[4]){
+									for(var i=0;i<options.childNodes.length-1;i++){
+										if(info[4].contains(options.childNodes[i].lastChild.name)){
+											options.childNodes[i].lastChild.checked=true;
+										}
+									}
+								}
 
 								var skills=info[3];
 								for(var i=0;i<skills.length;i++){
 									var node=ui.create.div(skillList.firstChild);
 									node.skill=skills[i];
 									ui.create.div('',lib.translate[skills[i]],node,editnode);
-									ui.create.div('','×',node,delnode);
+									ui.create.div('','×',node,deletenode);
 									if(lib.skill[skills[i]].createInfo){
 										node.createInfo=lib.skill[skills[i]].createInfo;
 									}
@@ -13608,7 +13764,7 @@
 							var createButton=function(name){
 								var button=ui.create.button(name,'character');
 								button.listen(clickButton);
-								page.classList.add('noclick');
+								button.classList.add('noclick');
 								page.insertBefore(button,page.firstChild);
 							}
 
@@ -13623,8 +13779,14 @@
 									createModeConfig(i,start.firstChild,node);
 								}
 								for(var i=0;i<lib.customCharacters.length;i++){
-									if(!lib.checkCharacterName(lib.customCharacters[i]))
-									createButton(lib.customCharacters[i]);
+									var clname=lib.customCharacters[i];
+									for(var j=0;j<lib.character[clname][3].length;j++){
+										if(!lib.skill[lib.character[clname][3][j]]){
+											lib.character[clname][3].splice(j--,1);
+										}
+									}
+									if(!lib.checkCharacterName(clname))
+									createButton(clname);
 								}
 							}
 							if(_status.characterLoaded){
@@ -13632,6 +13794,23 @@
 							}
 							else{
 								lib.onCharacterLoad=cl;
+							}
+							lib.recreateCustomCharacters=function(){
+								var buttons=page.querySelectorAll('.button.character');
+								var list=[];
+								for(var i=0;i<buttons.length;i++){
+									list.push(buttons[i]);
+								}
+								for(var i=0;i<list.length;i++){
+									list[i].remove();
+								}
+								for(var i=0;i<lib.customCharacters.length;i++){
+									if(!lib.checkCharacterName(lib.customCharacters[i]))
+									createButton(lib.customCharacters[i]);
+								}
+								resetEditor();
+								resetImport();
+								resetExport();
 							}
 
 							var importCharacter;
@@ -13700,7 +13879,7 @@
 														var namej=lib.config.customCharacterPack[name].character[j];
 														lib.characterPack[name][namej]=lib.character[namej];
 													}
-													createModeConfig(name,start.firstChild,node);
+													clickMode.call(createModeConfig(name,start.firstChild,node));
 												},500);
 
 												delete game.importedPack;
@@ -13765,7 +13944,29 @@
 								for(var i=0;i<list2.length;i++){
 									list2[i].classList.remove('selected');
 								}
-								if(name) game.exportCharacters(name,list.length?list:null);
+								if(name) game.exportCharacters(name,list.length?list:null,function(result){
+									game.import('character',result);
+									for(var i in result.character){
+										var buttons=page.querySelectorAll('.button.character');
+										for(var j=0;j<buttons.length;j++){
+											if(buttons[j].link==i){
+												buttons[j].remove();
+												break;
+											}
+										}
+									}
+
+									lib.characterPack[name]={};
+									lib.translate[name+'_character_config']=name;
+									for(var j=0;j<lib.config.customCharacterPack[name].character.length;j++){
+										var namej=lib.config.customCharacterPack[name].character[j];
+										lib.characterPack[name][namej]=lib.character[namej];
+									}
+									clickMode.call(createModeConfig(name,start.firstChild,node));
+									resetExport();
+
+									delete game.importedPack;
+								});
 							}
 
 							var newCharacter;
@@ -13842,10 +14043,11 @@
 								['wu','吴'],
 								['qun','群'],
 							],null,ui.create.div('.indent','势力：',newCharacter));
+							var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
 							var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
 							var list=[];
 							for(var i in lib.character){
-								if(lib.character[i][3].length);
+								if(!lib.customCharacters.contains(i)&&lib.character[i][3].length);
 								list.push([i,lib.translate[i]]);
 							}
 							list.sort(function(a,b){
@@ -13881,7 +14083,7 @@
 							var addSkillButton=document.createElement('button');
 							addSkillButton.innerHTML='添加';
 							addSkill.appendChild(addSkillButton);
-							var delnode=function(){
+							var deletenode=function(){
 								this.parentNode.remove();
 							}
 							var editnode=function(){
@@ -13889,7 +14091,7 @@
 								if(info){
 									createSkill.lastChild.classList.remove('hidden');
 									createSkill.firstChild.innerHTML='创建技能';
-									skillList.style.top='410px';
+									skillList.style.top='435px';
 
 									createSkill.lastChild.querySelector('.skillname').value=info.name;
 									createSkill.lastChild.querySelector('.skilldescription').value=info.description;
@@ -13903,7 +14105,7 @@
 								var node=ui.create.div(skillList.firstChild);
 								node.skill=skillopt.value;
 								ui.create.div('',lib.translate[skillopt.value],node,editnode);
-								ui.create.div('','×',node,delnode);
+								ui.create.div('','×',node,deletenode);
 								if(lib.skill[skillopt.value].createInfo){
 									node.createInfo=lib.skill[skillopt.value].createInfo;
 								}
@@ -13918,7 +14120,7 @@
 								}
 								else{
 									this.innerHTML='创建技能';
-									skillList.style.top='410px';
+									skillList.style.top='435px';
 								}
 							});
 							var newSkill=document.createElement('textarea');
@@ -13926,9 +14128,10 @@
 							createSkill.lastChild.innerHTML+='<br>';
 							ui.create.div('','技能名称：<input class="skillname" type="text">',createSkill.lastChild);
 							createSkill.lastChild.innerHTML+='<br>';
-							ui.create.div('','技能描述：<input class="skilldescription" type="text"><br><button>确定</button>',createSkill.lastChild);
-							createSkill.lastChild.lastChild.lastChild.style.marginTop='5px';
-							createSkill.lastChild.lastChild.lastChild.onclick=function(){
+							ui.create.div('','技能描述：<input class="skilldescription" type="text"><br><button>确定</button><button>取消</button>',createSkill.lastChild);
+							createSkill.lastChild.lastChild.lastChild.previousSibling.style.marginTop='5px';
+							createSkill.lastChild.lastChild.lastChild.previousSibling.style.marginRight='3px';
+							createSkill.lastChild.lastChild.lastChild.previousSibling.onclick=function(){
 								var node;
 								var name=createSkill.lastChild.querySelector('.skillname').value;
 								var description=createSkill.lastChild.querySelector('.skilldescription').value;
@@ -13951,14 +14154,30 @@
 										name2=name2.slice(name2.indexOf(':')+1);
 									}
 									ui.create.div('',name2,node,editnode);
-									ui.create.div('','×',node,delnode);
+									ui.create.div('','×',node,deletenode);
 								}
 								node.createInfo={
 									name:name,
 									description:description,
 									content:content
 								}
+								createSkill.lastChild.querySelector('.skillname').value='';
+								createSkill.lastChild.querySelector('.skilldescription').value='';
+								createSkill.lastChild.querySelector('textarea').value='';
+
+								createSkill.lastChild.classList.add('hidden');
+								createSkill.firstChild.innerHTML='创建技能...';
+								skillList.style.top='';
 							}
+							createSkill.lastChild.lastChild.lastChild.onclick=function(){
+								createSkill.lastChild.querySelector('.skillname').value='';
+								createSkill.lastChild.querySelector('.skilldescription').value='';
+								createSkill.lastChild.querySelector('textarea').value='';
+
+								createSkill.lastChild.classList.add('hidden');
+								createSkill.firstChild.innerHTML='创建技能...';
+								skillList.style.top='';
+							};
 							var skillList=ui.create.div('.skill_list',newCharacter);
 							ui.create.div(skillList);
 							ui.create.div('.menubutton.large','创建武将',ui.create.div(skillList),function(){
@@ -13975,7 +14194,8 @@
 									game.putDB('image','character:'+name,image);
 								}
 								for(var i=0;i<skillList.firstChild.childNodes.length;i++){
-									if(lib.checkSkillName(skillList.firstChild.childNodes[i].skill)) continue;
+									if(skillList.firstChild.childNodes[i].createInfo&&
+										lib.checkSkillName(skillList.firstChild.childNodes[i].skill)) continue;
 									skills.add(skillList.firstChild.childNodes[i].skill);
 									var info=skillList.firstChild.childNodes[i].createInfo;
 									if(info){
@@ -13992,7 +14212,16 @@
 										game.putDB('skill',info.name,info);
 									}
 								}
-								var charinfo=[sexes.value,groups.value,hp,skills,[]];
+								var tags=[];
+								for(var i=0;i<options.childNodes.length-1;i++){
+									if(options.childNodes[i].lastChild.checked){
+										tags.push(options.childNodes[i].lastChild.name);
+									}
+								}
+								if(tags.contains('boss')){
+									tags.add('bossallowed');
+								}
+								var charinfo=[sexes.value,groups.value,hp,skills,tags];
 								game.putDB('character',name,charinfo);
 								lib.character[name]=charinfo;
 								lib.customCharacters.add(name);
@@ -15241,9 +15470,9 @@
 					case 'system':
 						if((_status.removinground&&lib.config.touchscreen)||
 							ui.system2.classList.contains('shown')){
-							// _status.removinground=false;
-							// game.pause2();
-							// ui.click.configMenu();
+							_status.removinground=false;
+							game.pause2();
+							ui.click.configMenu();
 							ui.system1.classList.remove('shown');
 							ui.system2.classList.remove('shown');
 						}
@@ -15787,73 +16016,54 @@
 					 if(get.currentTime()-_status._swipeorigin.time<500){
 						var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
 						var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
+						var goswipe=function(action){
+							switch(action){
+								case 'system':
+									if(ui.system2.classList.contains('shown')||
+										lib.config.layout!='phone'){
+										game.pause2();
+										ui.click.configMenu();
+										ui.system1.classList.remove('shown');
+										ui.system2.classList.remove('shown');
+									}
+									else{
+										ui.system1.classList.add('shown');
+										ui.system2.classList.add('shown');
+									}
+									break;
+								case 'menu':
+									game.pause2();
+									ui.click.configMenu();
+									ui.system1.classList.remove('shown');
+									ui.system2.classList.remove('shown');
+									break;
+								case 'pause':
+									ui.click.pause();
+									break;
+								case 'auto':
+									ui.click.auto();
+									if(!ui.system1.classList.contains('shown')){
+										 ui.system1.classList.add('shown');
+									 }
+									break;
+							}
+						}
 						if(Math.abs(dx)<100){
 							if(dy<-200){
-								switch(lib.config.swipe_up){
- 				 					case 'system':
- 				 						if(ui.system2.classList.contains('shown')||
-											lib.config.layout!='phone'){
-											game.pause2();
-											ui.click.configMenu();
-											ui.system1.classList.remove('shown');
-											ui.system2.classList.remove('shown');
- 				 						}
- 				 						else{
- 				 							ui.system1.classList.add('shown');
- 				 							ui.system2.classList.add('shown');
- 				 						}
- 				 						break;
- 				 					case 'menu':
- 				 						game.pause2();
- 				 						ui.click.configMenu();
- 				 						ui.system1.classList.remove('shown');
- 				 						ui.system2.classList.remove('shown');
- 				 						break;
- 				 					case 'pause':
- 				 						ui.click.pause();
- 				 						break;
- 				 					case 'auto':
- 				 						ui.click.auto();
- 										if(!ui.system1.classList.contains('shown')){
- 		   									 ui.system1.classList.add('shown');
- 		   								 }
- 				 						break;
- 				 				}
+								goswipe(lib.config.swipe_up);
 							}
 							else if(dy>200){
-								switch(lib.config.swipe_down){
- 				 					case 'system':
- 				 						if(ui.system2.classList.contains('shown')||
-											lib.config.layout!='phone'){
-											game.pause2();
-											ui.click.configMenu();
-											ui.system1.classList.remove('shown');
-											ui.system2.classList.remove('shown');
- 				 						}
- 				 						else{
- 				 							ui.system1.classList.add('shown');
- 				 							ui.system2.classList.add('shown');
- 				 						}
- 				 						break;
- 				 					case 'menu':
- 				 						game.pause2();
- 				 						ui.click.configMenu();
- 				 						ui.system1.classList.remove('shown');
- 				 						ui.system2.classList.remove('shown');
- 				 						break;
- 				 					case 'pause':
- 				 						ui.click.pause();
- 				 						break;
- 				 					case 'auto':
- 				 						ui.click.auto();
- 										if(!ui.system1.classList.contains('shown')){
- 		   									 ui.system1.classList.add('shown');
- 		   								 }
- 				 						break;
- 				 				}
+								goswipe(lib.config.swipe_down);
 							 }
 						 }
-
+						 else if(Math.abs(dy)<100){
+							 if(dx<-200){
+ 								goswipe(lib.config.swipe_left);
+ 							}
+ 							else if(dx>200){
+ 								goswipe(lib.config.swipe_right);
+ 							 }
+						 }
 					 }
 				}
 				var tmpflag=false;

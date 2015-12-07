@@ -189,6 +189,7 @@ mode.versus={
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidversus.contains(i)) continue;
 					if(lib.config.banned.contains(i)) continue;
+					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 					if(get.config('ban_weak')&&lib.config.forbidall.contains(i)) continue;
 					if(get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;

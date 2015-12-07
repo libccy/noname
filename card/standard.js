@@ -757,7 +757,7 @@ card.standard={
 				basic:{
 					order:5,
 					useful:1,
-					value:4
+					value:4.5
 				},
 				result:{
 					target:-1.5,
@@ -1303,8 +1303,9 @@ card.standard={
 				event.state=true;
 				event.card=trigger.card;
 				"step 1"
-				if((ui.wuxie.classList.contains('glow')||(ui.tempnowuxie&&
-					ui.tempnowuxie.classList.contains('glow')))&&!_status.auto){
+				if((ui.wuxie.classList.contains('glow')||
+					(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&
+					event.state))&&!_status.auto){
 					if(event.current==game.me||event.current.isUnderControl()){
 						event._result={bool:false};
 						return;
@@ -1378,7 +1379,7 @@ card.standard={
 				});
 				if(nevt.isMine()&&!trigger.multitarget){
 					if(trigger.targets.length>1&&!ui.tempnowuxie){
-						ui.tempnowuxie=ui.create.control('本轮不无懈',ui.click.tempnowuxie);
+						ui.tempnowuxie=ui.create.control('不无懈'+get.translation(trigger.card.name),ui.click.tempnowuxie);
 						ui.tempnowuxie._origin=trigger.parent;
 					}
 				}

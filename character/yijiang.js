@@ -5333,7 +5333,7 @@ character.yijiang={
 		fuhuanghou:'伏皇后',
 		caifuren:'蔡夫人',
 		zhonghui:'钟会',
-		old_zhonghui:'钟会',
+		old_zhonghui:'钟士季',
 		sunluban:'孙鲁班',
 		chenqun:'陈群',
 		zhangsong:'张松',

@@ -1931,6 +1931,7 @@ mode.chess={
 					for(i in lib.character){
 						if(i.indexOf('treasure_')==0) continue;
 						if(i.indexOf('chess_mech_')==0) continue;
+						if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 						if(lib.character[i][4].contains('minskin')) continue;
 						if(lib.config.forbidai.contains(i)) continue;
 						if(lib.config.forbidall.contains(i)) continue;
@@ -3477,6 +3478,7 @@ mode.chess={
 				for(i in lib.character){
 					if(i.indexOf('treasure_')==0) continue;
 					if(i.indexOf('chess_mech_')==0) continue;
+					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(lib.character[i][4].contains('minskin')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;

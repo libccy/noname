@@ -110,7 +110,7 @@ mode.boss={
 				var list=[];
 				for(var i in lib.character){
 					var info=lib.character[i];
-					if(info[4].contains('boss')){
+					if(info[4].contains('boss')&&!lib.config.banned.contains(i)){
 						var cfg=i+'_bossconfig';
 						if(get.config(cfg)==undefined){
 							game.saveConfig(cfg,true,true);
@@ -347,7 +347,7 @@ mode.boss={
 						}
 						player.update();
 						if(player.storage.boss_chongzheng>=game.bossinfo.chongzheng){
-							player.revive();
+							player.revive(player.hp);
 						}
 					}
 
@@ -422,6 +422,7 @@ mode.boss={
 					if(lib.character[i][4].contains('minskin')) continue;
 					if(lib.character[i][4].contains('boss')) continue;
 					if(lib.character[i][4].contains('hiddenboss')) continue;
+					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbidboss.contains(i)) continue;

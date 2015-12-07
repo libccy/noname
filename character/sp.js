@@ -3326,7 +3326,7 @@ character.sp={
 		simalang:'司马朗',
 		zhangliang:'张梁',
 		tianfeng:'田丰',
-		sp_pangtong:'庞统',
+		sp_pangtong:'sp庞统',
 		maliang:'马良',
 		sp_caoren:'sp曹仁',
 		yuejin:'乐进',

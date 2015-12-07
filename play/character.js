@@ -13,6 +13,8 @@ play.character={
 			if(lib.config.forbidai.contains(i)) continue;
 			if(lib.config.forbidall.contains(i)) continue;
 			if(lib.config.banned.contains(i)) continue;
+			if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
+			if(lib.character[i][4]&&lib.character[i][4].contains('boss')) continue;
 			if(!get.config('double_character')&&get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
 			if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
 			list.push(i);

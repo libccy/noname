@@ -608,6 +608,7 @@ mode.identity={
 				game.zhu.isZhu=(game.zhu.identity=='zhu');
 				game.me.setIdentity();
 				for(i in lib.character){
+					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.banned.contains(i)) continue;
@@ -802,9 +803,21 @@ mode.identity={
 					game.delay(2);
 					game.zhu.playerfocus(1000);
 				}
-				var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
-				ui.refresh(node);
-				node.style.opacity=1;
+				if(!this.node.dieidentity){
+					var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
+					ui.refresh(node);
+					node.style.opacity=1;
+					this.node.dieidentity=node;
+				}
+				var trans=this.style.transform;
+				if(trans){
+					if(trans.indexOf('rotateY')!=-1){
+						this.node.dieidentity.style.transform='rotateY(180deg)';
+					}
+					if(trans.indexOf('rotateX')!=-1){
+						this.node.dieidentity.style.transform='rotateX(180deg)';
+					}
+				}
 			},
 			logAi:function(targets,card){
 				if(this.ai.shown==1) return;
@@ -1017,6 +1030,9 @@ mode.identity={
 					var php=player.hp;
 					if(player.skills.contains('benghuai')&&php>4){
 						php=4;
+					}
+					else if(php>6){
+						php=6;
 					}
 					j=player.get('h').length+player.get('e').length*1.5+php*2;
 					if(player.identity=='zhu'){

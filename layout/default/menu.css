@@ -224,6 +224,9 @@
 .menu.main>.menu-content>div>.right.pane>.expanded{
 	padding-bottom:80px;
 }
+.menu.main>.menu-content>div>.right.pane>.morenodes{
+	padding-bottom:10px;
+}
 .menu.main>.menu-content>div>.right.pane>div>.config{
     left:2px;
 	margin-top:10px;
@@ -441,12 +444,18 @@
 .menu-buttons>.new_character>.add_skill{
 	position: absolute;
 	left: 12px;
-	top:145px;
+	top:170px;
 	text-align: left;
 	line-height: 20px;
 }
+.menu-buttons>.new_character>.add_skill.options{
+	top:145px;
+}
+.menu-buttons>.new_character>.add_skill.options>span{
+	margin-right: 10px;
+}
 .menu-buttons>.new_character>.add_skill.create{
-	top: 195px;
+	top: 220px;
 }
 .menu-buttons>.new_character>.add_skill.create>div{
 	position: relative;
@@ -470,7 +479,7 @@
 .menu-buttons>.new_character>.skill_list{
 	position: absolute;
 	left: 12px;
-	top: 215px;
+	top: 240px;
 	text-align: left;
 	height: auto;
 	width: calc(100% - 20px);

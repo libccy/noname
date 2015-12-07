@@ -70,7 +70,7 @@ body{
     );
 }*/
 
-.card:empty{
+.card:empty,.card.infohidden{
     background: url('../style/cardback/image/official.png');
     background-size: cover;
 }

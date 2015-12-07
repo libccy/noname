@@ -247,6 +247,7 @@ mode.guozhan={
 				var i;
 				event.list=[];
 				for(i in lib.character){
+					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbiddouble.contains(i)) continue;
