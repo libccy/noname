@@ -493,7 +493,7 @@ character.hearth={
 				});
 				if(card){
 					player.gain(card,'gain2');
-					game.log(get.translation(player)+'获得了'+get.translation(card));
+					game.log(player,'获得了',card);
 				}
 			},
 			ai:{
@@ -990,7 +990,7 @@ character.hearth={
 					player.lose(result.cards);
 					event.cards=result.cards;
 					player.logSkill('bianxing',trigger.player);
-					game.log(get.translation(player)+'将'+get.translation(trigger.card.name)+'变为'+get.translation(result.cards));
+					game.log(player,'将',trigger.card,'变为',result.cards);
 					game.delay(0.5);
 					trigger.untrigger();
 					trigger.card=card;
@@ -1184,7 +1184,7 @@ character.hearth={
 				player.judging=player.storage.mdzhoufu2;
 				trigger.position.appendChild(player.storage.mdzhoufu2);
 				// trigger.untrigger();
-				game.log(get.translation(player)+'的判定牌改为'+get.translation(player.storage.mdzhoufu2));
+				game.log(player,'的判定牌改为',player.storage.mdzhoufu2);
 				player.removeSkill('mdzhoufu2');
 				delete player.storage.mdzhoufu2;
 				delete player.storage.mdzhoufu3;
@@ -1250,7 +1250,7 @@ character.hearth={
 					var card=ui.cardPile.firstChild;
 					ui.cardPile.removeChild(card);
 					ui.cardPile.insertBefore(card,ui.cardPile.firstChild.nextSibling);
-					game.log(get.translation(player)+'调换了牌堆顶两张牌的顺序');
+					game.log(player,'调换了牌堆顶两张牌的顺序');
 				}
 			},
 			ai:{
@@ -1352,7 +1352,7 @@ character.hearth={
 				}
 				"step 1"
 				if(result.bool){
-					game.log(get.translation(trigger.player)+'收回了'+get.translation(trigger.cards));
+					game.log(trigger.player,'收回了',trigger.cards);
 					trigger.untrigger();
 					trigger.finish();
 					game.delay();

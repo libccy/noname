@@ -49,7 +49,7 @@ character.gujian={
 				if(list.length){
 					event.target=list.randomGet();
 					event.target.popup('zuizhan');
-					game.log(get.translation(event.target)+'被追加为额外目标');
+					game.log(event.target,'被追加为额外目标');
 					trigger.targets.push(event.target);
 					player.draw();
 				}

@@ -58,7 +58,6 @@ card.extra={
 					target:function(player,target){
 						if(target&&target==_status.dying) return 2;
 						var shas=target.get('h','sha');
-						var ok=false;
 						if(player.num('h','sha')>1){
 							if(player.num('e','zhuge')) return 0;
 							if(player.skills.contains('paoxiao')) return 0;
@@ -68,15 +67,15 @@ card.extra={
 								if(player.skills.contains('zhaxiang2')) return 0;
 							}
 						}
+						var card;
 						if(shas.length){
 							for(var i=0;i<shas.length;i++){
 								if(lib.filter.filterCard(shas[i],target)){
-									ok=true;break;
+									card=shas[i];break;
 								}
 							}
 						}
-						if(ok){
-							var card=target.get('h','sha',0);
+						if(card){
 							for(var i=0;i<game.players.length;i++){
 								if(ai.get.attitude(target,game.players[i])<0&&
 									target.canUse(card,game.players[i],true,true)&&
@@ -118,7 +117,7 @@ card.extra={
 				event.videoId=lib.status.videoId++;
 				game.addVideo('cardDialog',null,[get.translation(target.name)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
 				event.card2=result.cards[0];
-				game.log(get.translation(target.name)+'展示了'+get.translation(event.card2));
+				game.log(target,'展示了',event.card2);
 				player.chooseToDiscard(function(card){
 					return get.suit(card)==get.suit(_status.event.parent.card2);
 				},function(card){
@@ -151,7 +150,7 @@ card.extra={
 					player:function(player){
 						var nh=player.num('h');
 						if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
-							if(_status.event.filterCard&&
+							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'huogong'})){
 								return -10;
 							}
@@ -167,7 +166,7 @@ card.extra={
 						if(target.skills.contains('huogong2')||target.num('h')==0) return 0;
 						if(player.num('h')<=1) return 0;
 						if(target==player){
-							if(_status.event.filterCard&&
+							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'huogong'})){
 								return -1.5;
 							}

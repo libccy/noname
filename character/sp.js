@@ -413,7 +413,7 @@ character.sp={
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=event.card;
 					trigger.position.appendChild(event.card);
-					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(event.card));
+					game.log(trigger.player,'的判定牌改为',event.card);
 					event.card.expired=true;
 					game.delay(2);
 				}
@@ -900,7 +900,7 @@ character.sp={
 				}
 				"step 2"
 				if(result.bool){
-					game.log(get.translation(player)+'获得了'+get.translation(event.cards));
+					game.log(player,'获得了',event.cards);
 					player.gain(event.cards,'gain2');
 				}
 			},
@@ -1182,7 +1182,7 @@ character.sp={
 				player.judging=player.storage.zhoufu2;
 				trigger.position.appendChild(player.storage.zhoufu2);
 				// trigger.untrigger();
-				game.log(get.translation(player)+'的判定牌改为'+get.translation(player.storage.zhoufu2));
+				game.log(player,'的判定牌改为',player.storage.zhoufu2);
 				player.removeSkill('zhoufu2');
 				delete player.storage.zhoufu2;
 				delete player.storage.zhoufu3;
@@ -2382,7 +2382,7 @@ character.sp={
 				}
 				"step 1"
 				if(result.bool){
-					game.log(get.translation(player)+'傲才发动成功');
+					game.log(player,'傲才发动成功');
 					trigger.untrigger();
 					trigger.responded=true;
 					result.buttons[0].link.remove();
@@ -2429,7 +2429,7 @@ character.sp={
 				player.popup('aocai');
 				"step 1"
 				if(result.bool){
-					game.log(get.translation(player)+'发动了傲才')
+					game.log(player,'发动了傲才')
 					lib.skill.aocai3.viewAs=result.buttons[0].link;
 					event.parent.parent.backup('aocai3');
 					event.parent.parent.step=0;
@@ -2761,7 +2761,7 @@ character.sp={
 				}
 				else{
 					ui.discardPile.appendChild(player.storage.bifa[0]);
-					game.log(get.translation(player.storage.bifa[0])+'进入弃牌堆');
+					game.log(player.storage.bifa[0],'进入弃牌堆');
 					player.$throw(player.storage.bifa[0]);
 					player.loseHp();
 				}

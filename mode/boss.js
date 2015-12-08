@@ -333,7 +333,7 @@ mode.boss={
 					if(player.maxHp>0){
 						if(player.hp<player.maxHp){
 							player.hp++;
-							game.log(get.translation(player)+'回复了一点体力');
+							game.log(player,'回复了一点体力');
 						}
 						else{
 							var card=get.cards()[0];
@@ -343,7 +343,7 @@ mode.boss={
 							card.animate('start');
 							position.insertBefore(card,position.firstChild);
 							player.$draw();
-							game.log(get.translation(player)+'摸了一张牌');
+							game.log(player,'摸了一张牌');
 						}
 						player.update();
 						if(player.storage.boss_chongzheng>=game.bossinfo.chongzheng){

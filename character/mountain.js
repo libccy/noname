@@ -790,12 +790,12 @@ character.mountain={
 					player.logSkill('guzheng',trigger.player);
 					trigger.player.gain(result.buttons[0].link);
 					trigger.player.$gain2(result.buttons[0].link);
-					game.log(get.translation(trigger.player)+'收回了'+get.translation(result.buttons[0].link));
+					game.log(trigger.player,'收回了',result.buttons[0].link);
 					event.cards.remove(result.buttons[0].link);
 					if(event.cards.length){
 						player.gain(event.cards);
 						player.$gain2(event.cards);
-						game.log(get.translation(player)+'收回了'+get.translation(event.cards));
+						game.log(player,'收回了',event.cards);
 					}
 					game.delay();
 				}
@@ -893,7 +893,7 @@ character.mountain={
 							}
 							player.storage.huashen.owned[name]=skills;
 							player.popup(name);
-							game.log(get.translation(player)+'获得了一个化身');
+							game.log(player,'获得了一个化身');
 						}
 					}
 				}
@@ -1025,7 +1025,7 @@ character.mountain={
 
 							player.additionalSkills.huashen=link;
 							player.logSkill('huashen2');
-							game.log(get.translation(player)+'获得技能'+get.translation(link));
+							game.log(player,'获得技能','【'+get.translation(link)+'】');
 							player.popup(link);
 
 							for(var i=0;i<event.dialog.buttons.length;i++){

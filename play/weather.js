@@ -100,7 +100,7 @@ play.weather={
                 trigger.untrigger();
                 trigger.finish();
                 player.popup('雾');
-                game.log('大雾使'+get.translation(player)+'躲避了杀');
+                game.log('大雾使',player,'躲避了杀');
             }
         },
         _weather_bao:{
@@ -115,7 +115,7 @@ play.weather={
             content:function(){
                 player.damage('nosource');
                 player.popup('雹');
-                game.log(get.translation(player)+'被冰雹砸中');
+                game.log(player,'被冰雹砸中');
             }
         },
         _weather_feng:{
@@ -150,7 +150,7 @@ play.weather={
                     game.delay();
                     target.damage('fire',trigger.source||'nosource');
                     target.popup('风');
-                    game.log('大风使'+get.translation(target)+'受到波及');
+                    game.log('大风使',target,'受到波及');
                 }
             }
         },
@@ -172,7 +172,7 @@ play.weather={
                 if(player.movable(0,1)) list.push('moveDown');
                 if(list.length){
                     player.popup('雪');
-                    game.log('由于地滑，'+get.translation(player)+'发生移动');
+                    game.log('由于地滑，',player,'发生移动');
                     player[list.randomGet()]();
                 }
             }

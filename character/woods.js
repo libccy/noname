@@ -166,14 +166,7 @@ character.woods={
 				"step 0"
 				player.gain(trigger.playerCards);
 				player.$draw(trigger.playerCards);
-				//trigger.player.$give(trigger.cards,player);
 				game.delay();
-				// var card=trigger.cards;
-				// var str=get.translation(player)+'获得了'+get.translation(card[0]);
-				// for(var i=1;i<card.length;i++){
-				// 	str+='、'+get.translation(card[i]);
-				// }
-				// game.log(str);
 				"step 1"
 				for(var i=0;i<trigger.playerCards.length;i++){
 					trigger.cards.remove(trigger.playerCards[i]);

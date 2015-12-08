@@ -182,7 +182,7 @@ card.hearth={
 				event.card2=result.cards[0];
 				event.videoId=lib.status.videoId++;
 				game.addVideo('cardDialog',null,[get.translation(target.name)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
-				game.log(get.translation(target.name)+'展示了'+get.translation(event.card2));
+				game.log(target,'展示了',event.card2);
 				player.chooseToDiscard(function(card){
 					return get.suit(card)==get.suit(_status.event.parent.card2);
 				},function(card){
@@ -215,7 +215,7 @@ card.hearth={
 					player:function(player){
 						var nh=player.num('h');
 						if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
-							if(_status.event.filterCard&&
+							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'shandianjian'})){
 								return -10;
 							}
@@ -231,7 +231,7 @@ card.hearth={
 						if(target.skills.contains('shandianjian2')||target.num('h')==0) return 0;
 						if(player.num('h')<=1) return 0;
 						if(target==player){
-							if(_status.event.filterCard&&
+							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'shandianjian'})){
 								return -1.5;
 							}

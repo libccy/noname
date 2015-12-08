@@ -117,7 +117,12 @@ card.standard={
 				result:{
 					target:function(player,target){
 						if(player.skills.contains('jiu')&&!target.num('e','baiyin')){
-							return -3;
+							if(ai.get.attitude(player,target)>0){
+								return -6;
+							}
+							else{
+								return -3;
+							}
 						}
 						return -1.5;
 					},
@@ -480,7 +485,7 @@ card.standard={
 				dialog.content.firstChild.innerHTML=
 				get.translation(target)+'选择了'+get.translation(button.link);
 				game.addVideo('dialogCapt',null,[dialog.videoId,dialog.content.firstChild.innerHTML]);
-				game.log(get.translation(target)+'选择了'+get.translation(button.link));
+				game.log(target,'选择了',button.link);
 				game.delay();
 			},
 			contentAfter:function(){

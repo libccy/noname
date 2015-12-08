@@ -177,7 +177,7 @@ character.standard={
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
-					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(result.cards[0]));
+					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 					game.delay(2);
 				}
 			},
@@ -693,7 +693,7 @@ character.standard={
 							}
 							event.dialog.close();
 							event.control.close();
-							game.log(get.translation(player)+'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
+							game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
 							ui.auto.show();
 							game.resume();
 						}
@@ -775,7 +775,7 @@ character.standard={
 						ui.cardPile.appendChild(bottom[i]);
 					}
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
-					game.log(get.translation(player)+'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
 					game.delay(2);
 				}
 			},

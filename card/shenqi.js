@@ -148,7 +148,7 @@ card.shenqi={
 				if(result.bool){
 					var type=[];
 					player.$throw(result.links);
-					game.log(get.translation(player)+'弃置了'+get.translation(result.links));
+					game.log(player,'弃置了',result.links);
 					for(var i=0;i<result.links.length;i++){
 						event.hu.storage.shouna.remove(result.links[i]);
 						ui.discardPile.appendChild(result.links[i]);
@@ -204,7 +204,7 @@ card.shenqi={
 						hu.storage.shouna.push(cards[i]);
 						ui.special.appendChild(cards[i]);
 					}
-					game.log(get.translation(player)+'将'+get.translation(cards)+'收入炼妖壶');
+					game.log(player,'将',cards,'收入炼妖壶');
 				}
 			},
 		},
@@ -340,7 +340,7 @@ card.shenqi={
 				"step 2"
 				if(event.success){
 					player.popup('收化成功');
-					game.log(get.translation(player)+'将'+get.translation(target)+'收化');
+					game.log(player,'将',target,'收化');
 					target.dataset.position=event.position;
 					var card=player.get('e','5');
 					if(!card.storage.shouhua) card.storage.shouhua=[];
@@ -397,8 +397,7 @@ card.shenqi={
 						trigger.result.bool=false;
 						trigger.player.popup('杯具');
 					}
-					game.log(get.translation(trigger.player)+'的判定结果为'+get.translation(card)+
-						'('+get.translation(get.suit(card))+get.number(card)+')');
+					game.log(trigger.player,'的判定结果为',card);
 					trigger.direct=true;
 					trigger.position.appendChild(card);
 					game.delay(2);

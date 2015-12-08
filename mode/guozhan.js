@@ -81,6 +81,7 @@ mode.guozhan={
 				"step 2"
 				if(lib.storage.test){
 					lib.config.game_speed='vfast';
+					lib.config.low_performance=true;
 					_status.auto=true;
 					ui.auto.classList.add('glow');
 				}
@@ -495,21 +496,21 @@ mode.guozhan={
 				var skills;
 				switch(num){
 					case 0:
-					if(log!==false) game.log(get.translation(this)+'展示了主将'+get.translation(this.name1));
+					if(log!==false) game.log(this,'展示了主将'+get.translation(this.name1));
 					this.name=this.name1;
 					skills=lib.character[this.name][3];
 					this.sex=lib.character[this.name][0];
 					this.classList.remove('unseen');
 					break;
 					case 1:
-					if(log!==false) game.log(get.translation(this)+'展示了副将'+get.translation(this.name2));
+					if(log!==false) game.log(this,'展示了副将'+get.translation(this.name2));
 					skills=lib.character[this.name2][3];
 					if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
 					if(this.name.indexOf('unknown')==0) this.name=this.name2;
 					this.classList.remove('unseen2');
 					break;
 					case 2:
-					if(log!==false) game.log(get.translation(this)+'展示了主将'+get.translation(this.name1)+'、副将'+get.translation(this.name2));
+					if(log!==false) game.log(this,'展示了主将'+get.translation(this.name1)+'、副将'+get.translation(this.name2));
 					this.name=this.name1;
 					skills=lib.character[this.name][3].concat(lib.character[this.name2][3]);
 					this.sex=lib.character[this.name][0];
@@ -520,8 +521,8 @@ mode.guozhan={
 				var initdraw=parseInt(get.config('initshow_draw'));
 				if(!_status.initshown&&initdraw&&this.isAlive()&&get.config('guozhan_mode')!='mingjiang'){
 					this.popup('首亮');
-					game.log(get.translation(this)+'首先明置武将，得到奖励');
-					game.log(get.translation(this)+'摸了'+get.cnNumber(initdraw)+'张牌');
+					game.log(this,'首先明置武将，得到奖励');
+					game.log(this,'摸了'+get.cnNumber(initdraw)+'张牌');
 					this.draw(initdraw).log=false;
 					_status.initshown=true;
 				}
@@ -539,7 +540,7 @@ mode.guozhan={
 						next.content=function(){
 							"step 0"
 							player.popup('珠联璧合');
-							game.log(get.translation(player)+'发动了【珠联璧合】');
+							game.log(player,'发动了【珠联璧合】');
 							if(player.hp==player.maxHp){
 								player.draw(2);
 								event.finish();

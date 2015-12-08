@@ -860,7 +860,7 @@ mode.stone={
 			content:function(){
 				target.addSkill('chaofeng');
 				target.markSkill('chaofeng');
-				game.log(get.translation(target)+'获得了嘲讽');
+				game.log(target,'获得了嘲讽');
 				target.popup('嘲讽');
 			},
 			ai:{

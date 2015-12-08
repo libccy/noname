@@ -72,7 +72,7 @@ play.soldier={
 				"step 1"
 				if(event.dialog) event.dialog.close();
 				if(result.control!='cancel'&&result.control){
-					game.log(get.translation(player)+'牺牲了'+get.translation(result.control));
+					game.log(player,'牺牲了'+get.translation(result.control));
 					player.storage.soldier.remove(result.control);
 					player.removeSkill(result.control);
 					player.popup(result.control);

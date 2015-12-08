@@ -814,9 +814,15 @@ mode.identity={
 					if(trans.indexOf('rotateY')!=-1){
 						this.node.dieidentity.style.transform='rotateY(180deg)';
 					}
-					if(trans.indexOf('rotateX')!=-1){
+					else if(trans.indexOf('rotateX')!=-1){
 						this.node.dieidentity.style.transform='rotateX(180deg)';
 					}
+					else{
+						this.node.dieidentity.style.transform='';
+					}
+				}
+				else{
+					this.node.dieidentity.style.transform='';
 				}
 			},
 			logAi:function(targets,card){

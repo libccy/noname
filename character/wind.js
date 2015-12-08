@@ -294,12 +294,8 @@ character.wind={
 				if(player.storage.buqu==undefined) player.storage.buqu=[];
 				player.storage.buqu.push(event.card);
 				game.addVideo('storage',player,['buqu',get.cardsInfo(player.storage.buqu),'cards']);
-				var str=get.translation(player)+'的不屈牌为'+player.storage.buqu[0].number;
-				for(var i=1;i<player.storage.buqu.length;i++){
-					str+='、'+player.storage.buqu[i].number;
-				}
 				player.showCards(player.storage.buqu,'不屈')
-				game.log(str);
+				game.log(player,'的不屈牌为',player.storage.buqu);
 				player.markSkill('buqu');
 				"step 1"
 				for(var i=0;i<player.storage.buqu.length-1;i++){
@@ -439,7 +435,7 @@ character.wind={
 					player.gain(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
-					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(result.cards[0]));
+					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 				}
 				"step 3"
 				game.delay(2);

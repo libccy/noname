@@ -560,7 +560,7 @@ character.xianjian={
 					var card=cards.randomGet();
 					player.gain(card);
 					player.$gain2(card);
-					game.log(get.translation(player)+'获得了'+get.translation(card));
+					game.log(player,'获得了',card);
 					player.addTempSkill('jubao2','phaseAfter');
 				}
 			},
@@ -951,7 +951,7 @@ character.xianjian={
 				if(cards.length){
 					player.gain(cards,'draw');
 					player.logSkill('longxi');
-					game.log(get.translation(player)+'获得了'+get.cnNumber(cards.length)+'张牌');
+					game.log(player,'获得了'+get.cnNumber(cards.length)+'张牌');
 				}
 			},
 			ai:{
@@ -1173,7 +1173,7 @@ character.xianjian={
 							ui.discardPile.appendChild(player.storage.zhimeng2);
 						}
 						else{
-							game.log(get.translation(player)+'发动织梦，获得了'+get.translation(player.storage.zhimeng2));
+							game.log(player,'发动织梦，获得了',player.storage.zhimeng2);
 							player.gain(player.storage.zhimeng2,'gain2');
 							player.popup('zhimeng');
 						}

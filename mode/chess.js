@@ -4340,7 +4340,7 @@ mode.chess={
 					game.over();
 				}
 				else{
-					game.log('招降'+get.translation(target)+'失败')
+					game.log('招降',target,'失败')
 					player.popup('招降失败');
 					player.damage(target);
 				}
@@ -4519,7 +4519,7 @@ mode.chess={
 							player.additionalSkills.tongshuai=link;
 							game.addVideo('chess_tongshuai_skill',player,[currentname,link]);
 							player.logSkill('tongshuai2');
-							game.log(get.translation(player)+'获得技能'+get.translation(link));
+							game.log(player,'获得技能','【'+get.translation(link)+'】');
 							player.popup(link);
 
 							for(var i=0;i<event.dialog.buttons.length;i++){

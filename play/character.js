@@ -64,7 +64,7 @@ play.character={
 					if(list.length){
 						var skill=list.randomGet();
 						target.popup(skill);
-						game.log(get.translation(target)+'获得技能'+get.translation(skill));
+						game.log(target,'获得技能','【'+get.translation(skill)+'】');
 						target.addSkill(skill);
 						target.skills.remove(skill);
 						target.additionalSkills.charactercard=skill;

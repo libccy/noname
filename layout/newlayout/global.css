@@ -360,6 +360,10 @@
 	animation: dialog_start2 0.5s;
 	-webkit-animation: dialog_start2 0.5s;
 }
+.dialog.nobutton{
+	bottom:auto !important;
+	top:200px !important;
+}
 #arena.stone .dialog{
 	width: calc(90% - 440px);
 	left: calc(5% + 220px);

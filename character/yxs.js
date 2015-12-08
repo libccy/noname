@@ -212,7 +212,7 @@ character.yxs={
 				}
 				if(result.control!='cancel'){
 					player.logSkill('sheshi');
-					game.log(get.translation(player)+'指定的花色为'+get.translation(result.control));
+					game.log(player,'指定的花色为',result.control);
 					var suit=result.control.slice(0,result.control.length-1);
 					var cards=[];
 					for(var i=0;i<ui.cardPile.childNodes.length;i++){
@@ -296,7 +296,7 @@ character.yxs={
 				if(result.control!='cancel'){
 					player.addTempSkill('bolehuiyan4','phaseAfter');
 					player.logSkill(['bolehuiyan',result.control],trigger.target);
-					game.log(get.translation(player)+'预言'+result.control);
+					game.log(player,'预言'+result.control);
 					player.storage.bolehuiyan=result.control;
 					game.delay();
 				}
@@ -369,7 +369,7 @@ character.yxs={
 					event.dialog.close();
 				}
 				if(result.control!='cancel'){
-					game.log(get.translation(player)+'预言判定结果为'+get.translation(result.control));
+					game.log(player,'预言判定结果为'+get.translation(result.control));
 					player.storage.bolehuiyan=result.control.slice(0,result.control.length-1);
 					player.popup(result.control);
 					game.delay();
@@ -383,7 +383,7 @@ character.yxs={
 			popup:false,
 			content:function(){
 				if(player.storage.bolehuiyan==trigger.result.suit){
-					game.log(get.translation(player)+'预言成功');
+					game.log(player,'预言成功');
 					player.popup('洗具');
 					player.draw(2);
 				}

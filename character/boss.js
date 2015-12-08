@@ -642,7 +642,7 @@ character.boss={
 			content:function(){
 				var cards=get.cards();
 				player.gain(cards,'gain2');
-				game.log(get.translation(player)+'获得了'+get.translation(cards));
+				game.log(player,'获得了',cards);
 			},
 			ai:{
 				threaten:1.4

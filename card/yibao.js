@@ -319,8 +319,8 @@ card.yibao={
 				player.$compare(event.card1,target,event.card2);
 				game.delay(4);
 				"step 3"
-				game.log(get.translation(player)+'展示了'+get.translation(event.card1));
-				game.log(get.translation(target)+'展示了'+get.translation(event.card2));
+				game.log(player,'展示了',event.card1);
+				game.log(target,'展示了',event.card2);
 				if(get.color(event.card2)==get.color(event.card1)){
 					player.discard(event.card1).animate=false;
 					target.$gain2(event.card2);
@@ -350,7 +350,8 @@ card.yibao={
 				result:{
 					player:function(player,target){
 						if(player.num('h')<=Math.max(2,player.hp)&&_status.event.name=='chooseToUse'){
-							if(_status.event.filterCard({name:'dujian'})){
+							if(typeof _status.event.filterCard=='function'&&
+								_status.event.filterCard({name:'dujian'})){
 								return -10;
 							}
 							if(_status.event.skill){

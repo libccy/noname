@@ -417,7 +417,7 @@ character.swd={
 					player.logSkill('guozao',target);
 					var cards=target.get('h');
 					target.lose(cards)._triggered=null;
-					game.log(get.translation(target)+'弃置了'+get.translation(cards)+'，并获得三张牌');
+					game.log(target,'弃置了',cards,'，并获得三张牌');
 					// target.$draw(3);
 					target.$throw(cards);
 					target.gain(event.cards,'draw')._triggered=null;
@@ -962,7 +962,7 @@ character.swd={
 				"step 1"
 				if(result.bool){
 					player.logSkill('zhenwei');
-					game.log(get.translation(result.targets[0])+'获得了'+get.translation(event.cards));
+					game.log(result.targets[0],'获得了',event.cards);
 					result.targets[0].gain(event.cards,'gain2');
 				}
 			},
@@ -3100,7 +3100,7 @@ character.swd={
 					player.gain(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
-					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(result.cards[0]));
+					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 				}
 				"step 3"
 				game.delay(2);
@@ -4194,7 +4194,7 @@ character.swd={
 				var cards=player.storage.yishan.splice(0,2);
 				player.gain(cards);
 				player.$gain2(cards);
-				game.log(get.translation(player)+'获得了'+get.translation(cards));
+				game.log(player,'获得了',cards);
 			},
 			ai:{
 				maixie:true,
@@ -5326,7 +5326,7 @@ character.swd={
 				var cards=get.cards(1);
 				event.card=cards[0];
 				player.gain(cards,'gain2');
-				game.log(get.translation(player)+'获得了'+get.translation(event.card));
+				game.log(player,'获得了',event.card);
 				"step 1"
 				var gained=event.card;
 				if(lib.filter.filterCard(gained)){
@@ -5841,7 +5841,11 @@ character.swd={
 				order:1,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target,'fire');
+						var eff=ai.get.damageEffect(target,player,target,'fire');
+						if(player==target&&player.hp<=1&&eff<0){
+							eff*10;
+						}
+						return eff;
 					}
 				}
 			}
@@ -6331,7 +6335,7 @@ character.swd={
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=event.card;
 					trigger.position.appendChild(event.card);
-					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(event.card));
+					game.log(trigger.player,'的判定牌改为',event.card);
 					event.card.expired=true;
 					game.delay(2);
 				}
@@ -6855,7 +6859,7 @@ character.swd={
 				else if(trigger.cards&&trigger.cards.length){
 					player.gain(trigger.cards);
 					player.$gain2(trigger.cards);
-					game.log(get.translation(player)+'收回了'+get.translation(trigger.cards));
+					game.log(player,'收回了',trigger.cards);
 				}
 			}
 		},
@@ -7562,7 +7566,7 @@ character.swd={
 			content:function(){
 				player.recover();
 				player.gain(player.storage.zhenjiu2,'gain2');
-				game.log(get.translation(player)+'获得了'+get.translation(player.storage.zhenjiu2));
+				game.log(player,'获得了',player.storage.zhenjiu2);
 				player.removeSkill('zhenjiu2');
 				delete player.storage.zhenjiu2;
 			},
@@ -7627,7 +7631,7 @@ character.swd={
 			popup:false,
 			content:function(){
 				player.gain(player.storage.mazui2,'gain2');
-				game.log(get.translation(player)+'获得了'+get.translation(player.storage.mazui2));
+				game.log(player,'获得了',player.storage.mazui2);
 				player.removeSkill('mazui3');
 				delete player.storage.mazui2;
 			}

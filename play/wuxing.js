@@ -69,10 +69,10 @@ play.wuxing={
 					switch(player.wunature){
 						case 'wood':
 							if(player.num('he')){
-							game.log(get.translation(player)+'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
+							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被金属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('金克木')};return;
 						case 'water':
-							game.log(get.translation(player)+'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
+							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('金生水');
 							return;
 						default:return;
@@ -81,10 +81,10 @@ play.wuxing={
 					switch(player.wunature){
 						case 'soil':
 							if(player.num('he')){
-							game.log(get.translation(player)+'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
+							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被木属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('木克土')};return;
 						case 'fire':
-							game.log(get.translation(player)+'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
+							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('木生火');
 							return;
 						default:return;
@@ -93,10 +93,10 @@ play.wuxing={
 					switch(player.wunature){
 						case 'fire':
 							if(player.num('he')){
-							game.log(get.translation(player)+'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
+							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被水属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('水克火')};return;
 						case 'wood':
-							game.log(get.translation(player)+'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
+							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('水生木');
 							return;
 						default:return;
@@ -105,10 +105,10 @@ play.wuxing={
 					switch(player.wunature){
 						case 'metal':
 							if(player.num('he')){
-							game.log(get.translation(player)+'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
+							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被火属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('火克金')};return;
 						case 'soil':
-							game.log(get.translation(player)+'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
+							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('火生土');
 							return;
 						default:return;
@@ -117,10 +117,10 @@ play.wuxing={
 					switch(player.wunature){
 						case 'water':
 							if(player.num('he')){
-							game.log(get.translation(player)+'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
+							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被土属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('土克水')};return;
 						case 'metal':
-							game.log(get.translation(player)+'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
+							game.log(player,'得到'+get.translation(trigger.card.wunature)+'属性卡牌的加成');
 							player.draw();player.popup('土生金');
 							return;
 						default:return;

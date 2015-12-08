@@ -78,7 +78,7 @@ character.refresh={
 				"step 0"
 				var cards=get.cards();
 				player.gain(cards,'gain2');
-				game.log(get.translation(player)+'获得了'+get.translation(cards));
+				game.log(player,'获得了',cards);
 				if(get.type(cards[0])!='basic'){
 					event.finish();
 				}
@@ -155,7 +155,7 @@ character.refresh={
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
-					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(result.cards[0]));
+					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 					game.delay(2);
 				}
 			},
@@ -576,11 +576,11 @@ character.refresh={
 				"step 1"
 				if(event.disbool){
 					if(!result.bool){
-						game.log(get.translation(player)+'展示了'+get.translation(event.card));
+						game.log(player,'展示了',event.card);
 						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
 					}
 					else{
-						game.log(get.translation(player)+'展示并弃掉了'+get.translation(event.card));
+						game.log(player,'展示并弃掉了',event.card);
 						ui.discardPile.appendChild(event.card);
 					}
 					game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
@@ -588,11 +588,11 @@ character.refresh={
 				else if(result.targets){
 					result.targets[0].gain(event.card);
 					event.node.moveDelete(result.targets[0]);
-					game.log(get.translation(result.targets[0])+'获得了'+get.translation(event.card));
+					game.log(result.targets[0],'获得了',event.card);
 					game.addVideo('gain2',result.targets[0],[get.cardInfo(event.node)]);
 				}
 				else{
-					game.log(get.translation(player)+'展示并弃掉了'+get.translation(event.card));
+					game.log(player,'展示并弃掉了',event.card);
 					ui.discardPile.appendChild(event.card);
 					game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
 					event.node.delete();
@@ -1249,7 +1249,7 @@ character.refresh={
 		re_daqiao:'界大乔',
 		re_ganning:'界甘宁',
 		re_huatuo:'界华佗',
-		re_lidian:'界李典',
+		re_lidian:'李典',
 		qinxue:'勤学',
 		retuxi:'突袭·新',
 		reluoyi:'裸衣·新',

@@ -250,7 +250,7 @@ character.extra={
 					ui.discardPile.appendChild(trigger.player.judging);
 					trigger.player.judging=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
-					game.log(get.translation(trigger.player)+'的判定牌改为'+get.translation(result.cards[0]));
+					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 					game.delay(2);
 				}
 			},
@@ -623,7 +623,7 @@ character.extra={
 						result.targets[i].popup('dawu');
 					}
 					player.logSkill('dawu',result.targets,'thunder');
-					game.log(get.translation(player)+'对'+get.translation(result.targets)+'发动了大雾')
+					game.log(player,'对',result.targets,'发动了大雾')
 					player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.storage.qixing,true);
 				}
 				else{
@@ -1044,7 +1044,7 @@ character.extra={
 				if(event.insert){
 					event.card.fix();
 					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
-					game.log(get.translation(player)+'将'+get.translation(event.card)+'置于牌堆顶');
+					game.log(player,'将',event.card,'置于牌堆顶');
 					game.delay(2);
 				}
 				"step 3"

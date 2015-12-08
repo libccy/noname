@@ -98,6 +98,9 @@ table{table-layout: fixed;}
 	top:200px;
 	overflow: hidden;
 }
+#arenalog.withdialog{
+	opacity: 0.5;
+}
 #arena:not(.oldlayout)>#arenalog[data-position="center"]{
 	left: calc(25% + 105px);
 }
@@ -414,7 +417,7 @@ div:not(.handcards)>.card>.name,
 	display: block !important;
 }
 /*--------窗口--------*/
-.dialog{text-align: center;z-index:4;}
+.dialog{text-align: center;z-index:4;transition-property:opacity,background,box-shadow,top}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
 .dialog.fullheight{height:calc(100% - 80px) !important;top:40px !important}
 .dialog.fullwidth{left:calc(5% + 60px) !important;width:calc(90% - 120px) !important}
@@ -422,7 +425,8 @@ div:not(.handcards)>.card>.name,
 .dialog.halfleft{left:5% !important}
 .dialog.halfright{left:52% !important}
 .dialog{top:calc(100% / 3 - 100px / 3);left: calc(5% + 210px);}
-
+.dialog.nobutton{width: 400px;left:calc(50% - 200px);bottom:auto !important;min-height: 0px !important;}
+.dialog.nobutton .content>div:last-child{padding-bottom: 8px;}
 #window>.dialog.popped{
 	z-index:5;
 	width:220px;
@@ -964,9 +968,11 @@ div:hover>.intro{opacity: 1;}
 }
 .dialog>.content-container{
 	width:100%;
-	height:calc(100% - 5px);
+	height:calc(100% - 0px);
+	/*height:calc(100% - 5px);*/
 	left:0;
-	top:5px;
+	top:0px;
+	/*top:5px;*/
 	position:absolute;
 	overflow:scroll;
 }
@@ -1220,6 +1226,15 @@ div[data-color="unknownm"]{
 .firetext{
 	color: rgb(255,119,63);
 }
+.yellowtext{
+	color: #FFFF7A;
+}
+.bluetext{
+	color: rgb(150, 202, 255);
+}
+.greentext{
+	color: rgb(104,221,127);
+}
 .thundertext,
 .controlthundertext{
 	color: rgb(117,186,255);
@@ -1251,7 +1266,7 @@ div:hover>.wunature{
 	display: none !important;
 }
 .player .actcount.hp{
-	left: -24px;
+	left: 216px;
 	top: 9px;
 	width: 20px;
 }

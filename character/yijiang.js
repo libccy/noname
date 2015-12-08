@@ -507,7 +507,7 @@ character.yijiang={
 			},
 			content:function(){
 				var card=get.cards()[0];
-				game.log(get.translation(player)+'将'+get.translation(card)+'置于武将牌上');
+				game.log(player,'将',card,'置于武将牌上');
 				player.$gain2(card);
 				player.storage.sidi.add(card);
 				player.markSkill('sidi');
@@ -567,7 +567,7 @@ character.yijiang={
 				if(button){
 					player.$throw([button]);
 					player.line(trigger.player,'green');
-					game.log(get.translation(player)+'将'+get.translation(button)+'置于弃牌堆');
+					game.log(player,'将',button,'置于弃牌堆');
 					ui.discardPile.appendChild(button);
 					trigger.player.addTempSkill('sidi3','phaseAfter');
 					player.storage.sidi.remove(button);
@@ -1128,8 +1128,8 @@ character.yijiang={
 				player.$compare(event.card1,target,event.card2);
 				game.delay(4);
 				"step 3"
-				game.log(get.translation(player)+'展示了'+get.translation(event.card1));
-				game.log(get.translation(target)+'展示了'+get.translation(event.card2));
+				game.log(player,'展示了',event.card1);
+				game.log(target,'展示了',event.card2);
 				var name1=event.card1.name;
 				if(player.hp==1&&name1=='shan'){
 					name1='sha';
@@ -1517,7 +1517,7 @@ character.yijiang={
 				return 6-ai.get.value(card);
 			},
 			content:function(){
-				game.log(get.translation(player)+'将'+get.translation(cards)+'置于牌堆顶');
+				game.log(player,'将',cards,'置于牌堆顶');
 				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 				player.useCard({name:'sha'},targets);
 			},
@@ -1561,7 +1561,7 @@ character.yijiang={
 				return 8-ai.get.value(card);
 			},
 			content:function(){
-				game.log(get.translation(player)+'将'+get.translation(cards)+'置于牌堆顶');
+				game.log(player,'将',cards,'置于牌堆顶');
 				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 				player.useCard({name:'tao'},targets).delayx=false;
 			},
@@ -1605,7 +1605,7 @@ character.yijiang={
 				return 6-ai.get.value(card);
 			},
 			content:function(){
-				game.log(get.translation(player)+'将'+get.translation(cards)+'置于牌堆顶');
+				game.log(player,'将',cards,'置于牌堆顶');
 				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 				player.useCard({name:'jiu'},targets).delayx=false;
 			},
@@ -1662,8 +1662,22 @@ character.yijiang={
 			selectTarget:function(){
 				return get.select(get.info(_status.event.player.storage.taoxi).selectTarget);
 			},
+			multitarget:true,
+			multiline:true,
 			content:function(){
-				player.useCard(player.storage.taoxi,targets);
+				'step 0'
+				var card=player.storage.taoxi;
+				if(!card){
+					event.finish();
+					return;
+				}
+				var owner=get.owner(card);
+				if(owner){
+					owner.lose(card,ui.special);
+				}
+				event.card=card;
+				'step 1'
+				player.useCard(event.card,targets).animate=false;
 				delete player.storage.taoxi;
 				delete player.storage.taoxi2;
 				player.unmarkSkill('taoxi');
@@ -1745,7 +1759,7 @@ character.yijiang={
 				if(result.bool){
 					event.damages.push(event.current);
 					event.current.line(player,'green');
-					game.log(get.translation(event.current)+'令'+get.translation(player)+'回复一点体力');
+					game.log(event.current,'令',player,'回复一点体力');
 				}
 				if(event.targets.length){
 					event.goto(1);
@@ -2805,10 +2819,10 @@ character.yijiang={
 					trigger.untrigger();
 					trigger.player=event.target;
 					trigger.trigger('useCard');
-					game.log(get.translation(event.target)+'成为了'+get.translation(trigger.card)+'的使用者');
+					game.log(event.target,'成为了',trigger.card,'的使用者');
 				}
 				else{
-					game.log(get.translation(event.target)+'成为了'+get.translation(trigger.card)+'的额外目标');
+					game.log(event.target,'成为了',trigger.card,'的额外目标');
 					trigger.targets.push(event.target);
 				}
 			}
@@ -2845,7 +2859,7 @@ character.yijiang={
 					player.lose(result.cards,ui.special);
 					player.storage.quanji=player.storage.quanji.concat(result.cards);
 					game.addVideo('storage',player,['quanji',get.cardsInfo(player.storage.quanji),'cards']);
-					game.log(get.translation(player)+'将'+get.translation(result.cards)+'置于武将牌上作为“权”');
+					game.log(player,'将',result.cards,'置于武将牌上作为“权”');
 					player.markSkill('quanji');
 				}
 			},
@@ -3120,7 +3134,7 @@ character.yijiang={
 				}
 				else{
 					trigger.targets.push(event.target);
-					game.log(get.translation(event.target)+'成为了额外目标');
+					game.log(event.target,'成为了额外目标');
 				}
 			},
 			ai:{
@@ -3406,7 +3420,7 @@ character.yijiang={
 				}
 				"step 2"
 				if(result.bool&&result.targets.length){
-					game.log(get.translation(player)+'指定的出杀目标为'+get.translation(result.targets));
+					game.log(player,'指定的出杀目标为',result.targets);
 					event.target.line(result.targets);
 					event.target.chooseToUse('对'+get.translation(result.targets)+'使用一张杀，或令'+get.translation(player)+'获得你的两张牌',{name:'sha'},result.targets[0],-1);
 				}
@@ -3445,7 +3459,7 @@ character.yijiang={
 				return get.type(event.card)=='trick'||event.card.name=='sha';
 			},
 			content:function(){
-				game.log(get.translation(player)+'发动了智迟，'+get.translation(trigger.card)+'对'+get.translation(trigger.target)+'失效')
+				game.log(player,'发动了智迟，',trigger.card,'对',trigger.target,'失效')
 				trigger.untrigger();
 				trigger.finish();
 			},
@@ -3520,7 +3534,7 @@ character.yijiang={
 				}
 				else{
 					event.target.gain(cards,'gain2');
-					game.log(get.translation(event.target)+'获得了'+get.translation(card));
+					game.log(event.target,'获得了',card);
 				}
 				"step 3"
 				switch(event.effect){
@@ -3636,7 +3650,7 @@ character.yijiang={
 				return (get.type(event.card)=='trick');
 			},
 			content:function(){
-				game.log(get.translation(player)+'发动了无言，'+get.translation(trigger.card)+'对'+get.translation(trigger.target)+'失效')
+				game.log(player,'发动了无言，',trigger.card,'对',trigger.target,'失效');
 				trigger.untrigger();
 				trigger.finish();
 			},
@@ -3894,7 +3908,7 @@ character.yijiang={
 				if(cards.length){
 					player.gain(cards);
 					player.$gain2(cards);
-					game.log(get.translation(player)+'发动落英，获得了'+get.translation(cards));
+					game.log(player,'发动落英，获得了',cards);
 				}
 			},
 		},

@@ -116,7 +116,7 @@ card.zhenfa={
 			content:function(){
 				target.addTempSkill('feiying',{player:'damageAfter'});
 				target.popup('feiying');
-				game.log(get.translation(target)+'获得了技能飞影');
+				game.log(target,'获得了技能','【飞影】');
 			},
 			mode:['guozhan'],
 			ai:{
@@ -137,7 +137,7 @@ card.zhenfa={
 			content:function(){
 				target.addTempSkill('wushuang',{source:'damageAfter'});
 				target.popup('wushuang');
-				game.log(get.translation(target)+'获得了技能无双');
+				game.log(target,'获得了技能','【无双】');
 			},
 			mode:['guozhan'],
 			ai:{
