@@ -21,7 +21,7 @@ table{table-layout: fixed;}
 	overflow:hidden
 }
 #window.ipad{
-	width: calc(100% - 15px);
+	height: calc(100% - 15px);
 	top: 15px;
 }
 #window>.tutorial_tap{

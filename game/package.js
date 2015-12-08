@@ -57,7 +57,6 @@ background.pack={
     huangtian_bg:'黄天',
 };
 music.pack={
-    music_default:'默认',
     music_diaochan:'貂蝉',
     music_shezhan:'舌战',
     music_danji:'单骑',
