@@ -49,6 +49,7 @@ character.sp={
 	},
 	skill:{
 		qirang:{
+			audio:2,
 			trigger:{player:'equipEnd'},
 			frequent:true,
 			content:function(){
@@ -68,6 +69,7 @@ character.sp={
 		yuhua:{
 			trigger:{player:'phaseDiscardBegin'},
 			forced:true,
+			audio:2,
 			filter:function(event,player){
 				return player.num('h',{type:'basic'})<player.num('h');
 			},
@@ -92,6 +94,7 @@ character.sp={
 			group:'yuhua2'
 		},
 		yuhua2:{
+			audio:false,
 			trigger:{player:'phaseDiscardEnd'},
 			forced:true,
 			filter:function(event,player){

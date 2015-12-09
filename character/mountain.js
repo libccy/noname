@@ -103,9 +103,10 @@ character.mountain={
 				effect:{
 					target:function(card,player,target,current){
 						if(card.name=='sha'){
-							if(player.num('h',{type:'basic'})<2) return 0;
-							var bs=player.num('h',{type:'basic'});
+							if(_status.event.name=='xiangle') return;
+							var bs=player.get('h',{type:'basic'});
 							if(bs.length<2) return 0;
+							if(player.skills.contains('jiu')||player.skills.contains('tianxianjiu')) return;
 							if(bs.length<=3&&player.num('h','sha')<=1){
 								for(var i=0;i<bs.length;i++){
 									if(bs[i].name!='sha'&&ai.get.value(bs[i])<7){

@@ -217,6 +217,7 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
+						// if(player==target&&player.hp<=0) return 2;
 						var nh=target.num('h');
 						var keep=false;
 						if(nh<=target.hp){
@@ -249,6 +250,7 @@ card.standard={
 										if(num>2) return 2;
 									}
 								}
+								if(num>1&&player==target) return 2;
 								return 0;
 							}
 						}
