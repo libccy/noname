@@ -1022,7 +1022,7 @@ character.refresh={
 			usable:1,
 			content:function(){
 				"step 0"
-				player.chooseControl(['red','black'].concat(get.types())).ai=function(){
+				player.chooseControl(['red','black','basic','trick','equip']).ai=function(){
 					if(player.num('shan')==0) return 'basic';
 					if(player.num('e')<=1) return 'equip';
 					if(player.num('h')>2) return 'trick';

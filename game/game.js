@@ -226,7 +226,7 @@
 					},
 					show_splash:{
 						name:'显示开始界面',
-						init:false,
+						init:true,
 					},
 					game_speed:{
 						name:'游戏速度',
@@ -1339,12 +1339,6 @@
 		        name:'身份',
 		        config:{
 					update:function(config,map){
-						if(config.player_number=='8'){
-							map.double_nei.show();
-						}
-						else{
-							map.double_nei.hide();
-						}
 						if(config.identity_mode=='zhong'){
 							map.player_number.hide();
 							map.enhance_zhu.hide();
@@ -1354,8 +1348,13 @@
 						else{
 							map.player_number.show();
 							map.enhance_zhu.show();
-							map.double_nei.show();
 							map.auto_identity.show();
+							if(config.player_number=='8'){
+								map.double_nei.show();
+							}
+							else{
+								map.double_nei.hide();
+							}
 						}
 					},
 					identity_mode:{
@@ -3014,20 +3013,25 @@
 								_status.event.aiexclude.length=0;
 							}
 							else{
-								if(event.skill){
-									var skill=event.skill;
-									ui.click.cancel();
-									event.aiexclude.add(skill);
+								if(!event.norestore){
+									if(event.skill){
+										var skill=event.skill;
+										ui.click.cancel();
+										event.aiexclude.add(skill);
+									}
+									else{
+										get.card().aiexclude();
+										game.uncheck();
+									}
+									event.redo();
+									game.resume();
 								}
 								else{
-									get.card().aiexclude();
-									game.uncheck();
+									ui.click.cancel();
 								}
-								event.redo();
-								game.resume();
 							}
 						}
-						else if(event.skill){
+						else if(event.skill&&!event.norestore){
 							var skill=event.skill;
 							ui.click.cancel();
 							event.aiexclude.add(skill);
@@ -12708,9 +12712,10 @@
 					delete window.isIpad;
 				}
 				ui.refresh(ui.window);
-				setTimeout(function(){
-					ui.window.show();
-				},500);
+				// setTimeout(function(){
+				// 	ui.window.show();
+				// },500);
+				ui.window.show();
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena',ui.window);
@@ -13825,6 +13830,7 @@
 								var button=this;
 								var delnode=ui.create.div('.menubutton.large','删除',confirm.parentNode,function(){
 									button.remove();
+									lib.customCharacters.remove(button.link);
 									game.deleteDB('character',button.link);
 									game.deleteDB('image','character:'+button.link);
 									var skills=lib.character[button.link][3];
@@ -13998,8 +14004,7 @@
 									packExporting=true;
 								}
 								else{
-									exportCharacter.style.display='none';
-									packExporting=false;
+									resetExport();
 								}
 							});
 							var resetExport=function(){
@@ -17080,7 +17085,7 @@
 				if(event.custom.replace.confirm){
 					event.custom.replace.confirm(false);return;
 				}
-				if(event.skill){
+				if(event.skill&&!event.norestore){
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
 					}
@@ -17924,6 +17929,7 @@
 		updatehl:function(){
 			if(!game.me) return;
 			if(!ui.handcards1Container||!ui.handcards2Container) return;
+			if(!ui.handcards1Container.childNodes.length) return;
 			var hs1=[],hs2=[];
 			for(var i=0;i<ui.handcards1Container.firstChild.childElementCount;i++){
 				if(!ui.handcards1Container.firstChild.childNodes[i].classList.contains('removing')){
@@ -18063,6 +18069,9 @@
 					if(!ui.dialog.buttons||!ui.dialog.buttons.length){
 						ui.dialog.classList.add('nobutton');
 						if(ui.dialog.content.offsetHeight<240){
+							if(!ui.dialog._heightset){
+								ui.dialog._heightset=ui.dialog.style.height||true;
+							}
 							ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
 							if(lib.config.show_log!='off'){
 								ui.dialog.classList.add('scroll1');
@@ -18071,10 +18080,23 @@
 							}
 						}
 						else{
-							ui.dialog.style.height='';
+							if(typeof ui.dialog._heightset=='string'){
+								ui.dialog.style.height=ui.dialog._heightset;
+							}
+							else if(ui.dialog._heightset){
+								ui.dialog.style.height='';
+							}
+							delete ui.dialog._heightset;
 						}
 					}
 					else{
+						if(typeof ui.dialog._heightset=='string'){
+							ui.dialog.style.height=ui.dialog._heightset;
+						}
+						else if(ui.dialog._heightset){
+							ui.dialog.style.height='';
+						}
+						delete ui.dialog._heightset;
 						ui.dialog.classList.remove('nobutton');
 					}
 				}
@@ -20529,37 +20551,93 @@
 				game.start();
 				game.loop();
 			}
-			// if(lib.config.version==1.70&&!lib.config.birthdayshown){
-			// 	window.inSplash=true;
-			// 	var splash=ui.create.div('#splash',document.body);
-			// }
-			// else
-			if(!mode[lib.config.mode]){
+
+			var goon=function(){
+				if(!mode[lib.config.mode]){
+					window.inSplash=true;
+					var clickNode=function(){
+						lib.config.mode=this.link;
+						splash.delete();
+						delete window.inSplash;
+						lib.init.js('mode',lib.config.mode).onload=proceed;
+					}
+					var splash=ui.create.div('#splash',document.body);
+					for(var i=0;i<lib.config.all.mode.length;i++){
+						var node=ui.create.div(splash,'.hidden',clickNode);
+						node.link=lib.config.all.mode[i];
+						ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
+						ui.create.div(node,'.avatar').style.backgroundImage='url("image/splash/'+lib.config.all.mode[i]+'.jpg")';
+						ui.refresh(node);
+						setTimeout((function(node){
+							return function(){
+								node.show();
+							}
+						}(node)),i*100);
+					}
+				}
+				else{
+					proceed();
+				}
+				localStorage.removeItem(lib.configprefix+'directstart');
+			};
+			if(lib.version==1.7&&!lib.config.birthdayshown){
+				game.saveConfig('birthdayshown',true);
 				window.inSplash=true;
-				var clickNode=function(){
-					lib.config.mode=this.link;
-					splash.delete();
-					delete window.inSplash;
-					lib.init.js('mode',lib.config.mode).onload=proceed;
-				}
-				var splash=ui.create.div('#splash',document.body);
-				for(var i=0;i<lib.config.all.mode.length;i++){
-					var node=ui.create.div(splash,'.hidden',clickNode);
-					node.link=lib.config.all.mode[i];
-					ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
-					ui.create.div(node,'.avatar').style.backgroundImage='url("image/splash/'+lib.config.all.mode[i]+'.jpg")';
+				var container=ui.create.div(document.body);
+				container.style.width='100%';
+				container.style.height='100%';
+				container.style.left=0;
+				container.style.top=0;
+				var createName=function(str){
+					var node=ui.create.div('',str);
+					node.style.fontSize='200px';
+					node.style.color='white';
+					node.style.fontFamily='huangcao,xinwei';
+					node.style.opacity=0;
+					node.style.transform='scale(3)';
+					node.style.top='calc(50% - 100px)';
+					node.style.textShadow='black 0 0 2px';
+					container.appendChild(node);
 					ui.refresh(node);
-					setTimeout((function(node){
-						return function(){
-							node.show();
-						}
-					}(node)),i*100);
+					node.style.opacity=1;
+					node.style.transform='scale(1)';
+					return node;
 				}
+				createName('无').style.left='calc(50% - 300px)';
+				setTimeout(function(){
+					createName('名').style.left='calc(50% - 100px)';
+				},500);
+				setTimeout(function(){
+					createName('杀').style.left='calc(50% + 100px)';
+				},1000);
+
+				setTimeout(function(){
+					var node4=ui.create.div('','两周年');
+					node4.style.color='white';
+					node4.style.textShadow='black 0 0 2px';
+					node4.style.fontFamily='huangcao,xinwei';
+					node4.style.fontSize='60px';
+					node4.style.webkitAnimation='flip3t 1s';
+					node4.style.letterSpacing='-10px';
+					node4.style.top='calc(50% + 100px)';
+					node4.style.left='calc(50% + 180px)';
+					node4.style.border='2px solid white';
+					node4.style.borderRadius='8px';
+					node4.style.boxShadow='black 0 0 2px';
+					node4.style.transform='rotate(-10deg)';
+					node4.style.animationTimingFunction="linear"
+					container.appendChild(node4);
+					setTimeout(function(){
+						container.style.transform='scale(0.5)';
+						container.delete();
+						window.inSplash=false;
+					},2500);
+				},1500);
+				setTimeout(goon,4500);
 			}
 			else{
-				proceed();
+				goon();
 			}
-			localStorage.removeItem(lib.configprefix+'directstart');
 		};
 		if(!lib.config.touchscreen){
 			document.onmousewheel=ui.click.windowmousewheel;

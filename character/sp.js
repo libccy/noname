@@ -209,6 +209,7 @@ character.sp={
 							if(event.isMine()){
 								next.openskilldialog='将一张手牌当'+get.translation(card)+'使用';
 							}
+							next.norestore=true;
 							next.backup('mozhix');
 						}
 					}

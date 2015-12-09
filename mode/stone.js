@@ -491,9 +491,10 @@ mode.stone={
 					list.push(i);
 				}
 				list.randomSort();
-				var dialog=ui.create.dialog('按顺序选择出场角色'+(get.config('double_character')?'（双将）':''));
+				var dialog=ui.create.dialog('按顺序选择出场角色'+(get.config('double_character')?'（双将）':''),'hidden');
 				dialog.add('0/'+(get.config('double_character')?2:1)*get.config('battle_number'));
 				dialog.add([list.slice(0,get.config('battle_number')*2+5),'character']);
+				dialog.open();
 
 				var next=game.me.chooseButton(dialog,true);
 				next.selectButton=function(){
