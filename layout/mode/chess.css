@@ -204,7 +204,8 @@
     font-family: 'xinwei';
     font-size: 20px;
     top: 66px;
-    left: 5px;
+    right: 5px;
+    left:auto;
 }
 .dialog .buttons>.button.character.squarebutton{
     height:90px;

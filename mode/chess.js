@@ -331,7 +331,16 @@ mode.chess={
 						return;
 					}
 				}
-				if(get.config('chess_mode')=='tafang') return;
+				if(get.config('chess_mode')=='tafang'){
+					if(_status.friends.length==0&&ui.fakeme){
+						ui.fakeme.hide();
+						this.node.handcards1.delete();
+						this.node.handcards2.delete();
+						game.me=ui.create.player();
+						game.me.side=true;
+					}
+					return;
+				}
 				game.over(game.me.side==game.players[0].side);
 			},
 			$draw:function(num){
@@ -880,6 +889,7 @@ mode.chess={
 				var difficulty=parseInt(get.config('tafang_difficulty'));
 				for(var i=0;i<map.bufang.length;i++){
 					var button=map.bufang[i];
+					button.node.name.style.top='8px';
 					button.node.intro.classList.add('showintro');
 					button.node.intro.classList.add('tafang');
 					if(button.link=='chess_mech_nengliangqiu'||
@@ -1134,13 +1144,14 @@ mode.chess={
 						if(!game.me.name){
 							game.me=player;
 							game.me.classList.add('current_action');
-							ui.me.lastChild.show();
+							ui.me.querySelector('.fakeme.avatar').show();
+							ui.me.querySelector('.fakeme.player').show();
 							ui.create.fakeme();
 							ui.handcards1=player.node.handcards1.animate('start').fix();
 							ui.handcards2=player.node.handcards2.animate('start').fix();
 							ui.handcards1Container.appendChild(ui.handcards1);
 							ui.handcards2Container.appendChild(ui.handcards2);
-							ui.updateh(true);
+							ui.updatehl();
 							game.setChessInfo();
 							game.addVideo('tafangMe',player);
 						}
@@ -1224,7 +1235,7 @@ mode.chess={
 							_status.enemies.push(enemy);
 							event.justadded.push(enemy.name);
 							if(game.players.length==1){
-								ui.me.lastChild.show();
+								ui.me.querySelector('.fakeme.player').show();
 								game.setChessInfo(game.players[0]);
 							}
 							game.delay();
@@ -1612,7 +1623,7 @@ mode.chess={
 								_status.auto=true;
 								setTimeout(function(){
 									console.log(get.translation(game.players));
-									ui.updateh(true);
+									ui.updatehl();
 								},500);
 								ui.auto.classList.add('glow');
 							}
@@ -1924,8 +1935,8 @@ mode.chess={
 				}
 
 				if(get.config('chess_mode')=='tafang'){
-					ui.me.firstChild.hide();
-					ui.me.lastChild.hide();
+					ui.me.querySelector('.fakeme.player').hide();
+					ui.me.querySelector('.fakeme.avatar').hide();
 
 					var list=[];
 					for(i in lib.character){

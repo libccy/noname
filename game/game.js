@@ -11834,8 +11834,9 @@
 					li.innerHTML=lib.changeLog[i];
 					ul.appendChild(li);
 				}
-				var dialog=ui.create.dialog(lib.version+'更新内容');
+				var dialog=ui.create.dialog(lib.version+'更新内容','hidden');
 				dialog.content.appendChild(ul);
+				dialog.open();
 				var hidden=false;
 				if(!ui.auto.classList.contains('hidden')){
 					ui.auto.hide();
@@ -18056,7 +18057,7 @@
 			}
 			if(ui.dialog&&!ui.dialog.classList.contains('noupdate')){
 				if(lib.config.mode=='chess'){
-					if(ui.dialog.content.offsetHeight<240&&(!ui.dialog.buttons||!ui.dialog.buttons.length)){
+					if(ui.dialog.content.scrollHeight<240&&(!ui.dialog.buttons||!ui.dialog.buttons.length)){
 						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
 						ui.dialog.classList.add('slim');
 					}

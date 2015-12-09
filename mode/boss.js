@@ -314,7 +314,7 @@ mode.boss={
 				game.gameDraw(game.boss);
 				game.bossPhaseLoop();
 				setTimeout(function(){
-					ui.updateh(true);
+					ui.updatehl();
 				},200);
 			}
 		},
@@ -395,7 +395,7 @@ mode.boss={
 				ui.fakeme.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
 				// ui.fakeme.style.backgroundSize='cover';
 			}
-			ui.updateh(true);
+			ui.updatehl();
 		},
 		modeSwapPlayer:function(player){
 			game.swapControl(player);
