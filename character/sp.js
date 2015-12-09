@@ -3352,7 +3352,7 @@ character.sp={
 		sp_sunshangxiang:'孙尚香',
 		zhugedan:'诸葛诞',
 		sp_machao:'sp马超',
-		sp_jiangwei:'姜维',
+		sp_jiangwei:'sp姜维',
 		zhangbao:'张宝',
 		yangxiou:'杨修',
 		shixie:'士燮',

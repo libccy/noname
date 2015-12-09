@@ -47,7 +47,7 @@ mode.pack={
     versus:'对决',
     boss:'挑战',
     chess:'战棋',
-    stone:'炉石',
+    stone:'统率',
 };
 background.pack={
     zhulian_bg:'璧合',

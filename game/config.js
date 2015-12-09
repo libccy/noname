@@ -29,7 +29,7 @@ window.config={
 		// identity:'身份',
 		// guozhan:'国战',
 		// versus:'对决',
-		// stone:'炉石',
+		// stone:'统率',
 		// changjing:'场景',
 		// mowang:'魔王',
 		// boss:'挑战',

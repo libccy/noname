@@ -5254,7 +5254,7 @@ mode.chess={
 		trueColor:"zhu",
 		falseColor:"wei",
 		_chessmove:'移动',
-		leader:'统率',
+		leader:'君主',
 		combat:'对阵',
 		chessscroll_speed_config:'边缘滚动速度',
 		chess_character_config:'战棋武将',

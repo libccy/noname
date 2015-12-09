@@ -254,7 +254,7 @@ mode.stone={
 				str+='/'+get.translation(game.me.name2);
 			}
 			var name=[
-				str,'炉石 - '+get.config('battle_number')+'人'
+				str,'统率 - '+get.config('battle_number')+'人'
 			];
 			return name;
 		},
@@ -354,8 +354,10 @@ mode.stone={
 					// lib.card[i].chongzhu=true;
 					lib.card[i].stoneact=0;
 				}
-				if(typeof lib.card[i].stoneact==='number'&&!lib.card[i].addinfo){
-					lib.card[i].addinfo='消耗 '+lib.card[i].stoneact;
+				else{
+					if(typeof lib.card[i].stoneact==='number'&&!lib.card[i].addinfo){
+						lib.card[i].addinfo='消耗 '+lib.card[i].stoneact;
+					}
 				}
 			}
 
@@ -1538,8 +1540,8 @@ mode.stone={
 		fengraozhijiao_info:'令一名随从回复全部体力',
 
 		stonecard:'法术',
-		mode_stone_card_config:'炉石模式',
-		mode_stone_character_config:'炉石模式',
+		mode_stone_card_config:'统率模式',
+		mode_stone_character_config:'统率模式',
 	},
 	ai:{
 		get:{
