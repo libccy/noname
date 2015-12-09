@@ -18165,11 +18165,13 @@
 			}
 			return cards;
 		},
-		verticalStr:function(str){
+		verticalStr:function(str,sp){
 			if(typeof str!='string') return '';
+			str=str.toUpperCase();
 			var str2='';
 			for(var i=0;i<str.length;i++){
 				str2+=str[i];
+				if(sp&&str[i]=='S'&&str[i+1]=='P') continue;
 				if(i<str.length-1){
 					str2+='<br>';
 				}
@@ -18185,7 +18187,7 @@
 			else if(str2.indexOf('界sp')==0){
 				str2=str2.slice(3);
 			}
-			return get.verticalStr(str2);
+			return get.verticalStr(str2,true);
 		},
 		time:function(){
 			if(lib.status.dateDelaying){
