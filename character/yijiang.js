@@ -3692,7 +3692,8 @@ character.yijiang={
 			forced:true,
 			priority:15,
 			check:function(event,player){
-				return ai.get.effect(event.target,event.card,event.player,player)<0;
+				if(player==event.player) return true;
+				return false;
 			},
 			filter:function(event,player){
 				return get.type(event.card,'trick')=='trick';
