@@ -30,7 +30,7 @@ character.sp={
 		sp_machao:['male','qun',4,['zhuiji','cihuai']],
 		sunhao:['male','wu',5,['canshi','chouhai']],
 		shixie:['male','qun',3,['biluan','lixia']],
-		mayunlu:['female','shu',3,['fengpo','mashu']],
+		mayunlu:['female','shu',4,['fengpo','mashu']],
 		zhanglu:['male','qun',3,['yishe','bushi','midao']],
 		wutugu:['male','qun',15,['ranshang','hanyong']],
 		sp_caiwenji:['female','wei',3,['chenqing','mozhi']],

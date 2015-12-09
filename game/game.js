@@ -12752,6 +12752,9 @@
 				if(lib.config.show_log=='off'){
 					ui.arenalog.style.display='none';
 				}
+				else{
+					ui.arenalog.dataset.position=lib.config.show_log;
+				}
 
 				ui.roundmenu=ui.create.div('#roundmenu.roundarenabutton.menubutton.round',ui.arena);
 				ui.roundmenu._position=[180,210];
