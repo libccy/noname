@@ -250,6 +250,7 @@ character.sp={
 		},
 		chenqing2:{},
 		ranshang:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
 				return event.nature=='fire';
@@ -287,6 +288,7 @@ character.sp={
 			group:'ranshang2'
 		},
 		ranshang2:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
@@ -311,6 +313,7 @@ character.sp={
 			group:'hanyong2'
 		},
 		hanyong2:{
+			audio:false,
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			popup:false,
@@ -320,6 +323,7 @@ character.sp={
 			}
 		},
 		hanyong3:{
+			audio:false,
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
@@ -426,6 +430,7 @@ character.sp={
 			}
 		},
 		fengpo:{
+			audio:2,
 			trigger:{player:['shaBegin','juedouBegin']},
 			filter:function(event,player){
 				if(player.skills.contains('fengpo3')) return false;
@@ -458,6 +463,7 @@ character.sp={
 				event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
 			forced:true,
+			audio:false,
 			content:function(){
 				if(typeof player.storage.fengpo=='number'){
 					trigger.num+=player.storage.fengpo;

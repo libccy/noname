@@ -708,6 +708,7 @@ character.yijiang={
 			}
 		},
 		jigong:{
+			audio:2,
 			trigger:{player:'phaseUseBegin'},
 			check:function(event,player){
 				var nh=player.num('h')-player.num('h',{type:'equip'});
@@ -732,6 +733,7 @@ character.yijiang={
 			}
 		},
 		shifei:{
+			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
@@ -804,6 +806,7 @@ character.yijiang={
 			}
 		},
 		huaiyi:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			delay:0,
@@ -866,6 +869,7 @@ character.yijiang={
 			}
 		},
 		yaoming:{
+			audio:2,
 			trigger:{player:'damageEnd',source:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -905,6 +909,7 @@ character.yijiang={
 		},
 		yaoming2:{},
 		anguo:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -970,6 +975,7 @@ character.yijiang={
 			}
 		},
 		xingxue:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			content:function(){
@@ -1028,6 +1034,7 @@ character.yijiang={
 			}
 		},
 		yanzhu:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -1173,6 +1180,7 @@ character.yijiang={
 			}
 		},
 		zhanjue:{
+			audio:2,
 			enable:'phaseUse',
 			filterCard:true,
 			selectCard:-1,
@@ -1207,6 +1215,7 @@ character.yijiang={
 			}
 		},
 		zhanjue2:{
+			audio:false,
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			popup:false,
@@ -1216,6 +1225,7 @@ character.yijiang={
 			}
 		},
 		zhanjue3:{
+			audio:false,
 			trigger:{player:'damageAfter',source:'damageAfter'},
 			forced:true,
 			popup:false,
@@ -1243,6 +1253,7 @@ character.yijiang={
 			group:['qinwang1','qinwang2'],
 		},
 		qinwang1:{
+			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
@@ -1309,6 +1320,7 @@ character.yijiang={
 			}
 		},
 		qinwang2:{
+			audio:2,
 			enable:'chooseToUse',
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
@@ -1432,6 +1444,7 @@ character.yijiang={
 			}
 		},
 		huomo:{
+			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
@@ -1621,6 +1634,7 @@ character.yijiang={
 			}
 		},
 		taoxi:{
+			audio:2,
 			trigger:{player:'useCardToBegin'},
 			filter:function(event,player){
 				return _status.currentPhase==player&&event.targets.length==1&&
@@ -1647,6 +1661,7 @@ character.yijiang={
 			group:['taoxi2','taoxi3']
 		},
 		taoxi2:{
+			audio:false,
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(player.storage.taoxi&&player.storage.taoxi2&&
@@ -1710,6 +1725,7 @@ character.yijiang={
 		},
 		taoxi4:{},
 		xingshuai:{
+			audio:2,
 			trigger:{player:'dying'},
 			priority:6,
 			filter:function(event,player){
@@ -1776,6 +1792,7 @@ character.yijiang={
 			}
 		},
 		mingjian:{
+			audio:2,
 			trigger:{player:'phaseUseBefore'},
 			direct:true,
 			filter:function(event,player){
@@ -1796,7 +1813,7 @@ character.yijiang={
 				}
 				'step 1'
 				if(result.bool){
-					player.logSkill('huituo',result.targets);
+					player.logSkill('mingjian',result.targets);
 					trigger.untrigger();
 					trigger.finish();
 					var target=result.targets[0];
@@ -1808,6 +1825,7 @@ character.yijiang={
 			}
 		},
 		mingjian2:{
+			audio:false,
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			popup:false,
@@ -1828,6 +1846,7 @@ character.yijiang={
 			}
 		},
 		huituo:{
+			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
 			content:function(){
@@ -1955,6 +1974,7 @@ character.yijiang={
 			}
 		},
 		qiaoshi:{
+			audio:2,
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
 				return event.player!=player&&event.player.num('h')==player.num('h');
@@ -1971,6 +1991,7 @@ character.yijiang={
 			}
 		},
 		yanyu:{
+			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.num('h','sha')>0;
