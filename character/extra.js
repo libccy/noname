@@ -501,7 +501,7 @@ character.extra={
 			}
 		},
 		qixing:{
-			audio:3,
+			audio:2,
 			unique:true,
 			trigger:{global:'gameDrawAfter',player:'phaseBegin'},
 			forced:true,

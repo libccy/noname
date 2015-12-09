@@ -8168,7 +8168,7 @@
 								if(info.popup!=false&&!info.direct){
 									if(info.popup){
 										player.popup(info.popup);
-										game.log(player,'发动了','【'+event.skill+'】');
+										game.log(player,'发动了','【'+get.translation(event.skill)+'】');
 									}
 									else{
 										player.logSkill(event.skill);
@@ -19769,8 +19769,12 @@
 			return this;
 		};
 		HTMLDivElement.prototype.delete=function(time){
+			if(this.timeout){
+				clearTimeout(this.timeout);
+				delete this.timeout;
+			}
 			if(!this._listeningEnd||this._transitionEnded){
-				if(time==undefined) time=500;
+				if(typeof time!='number') time=500;
 				this.classList.add('removing');
 				var that=this;
 				this.timeout=setTimeout(function(){
@@ -19784,7 +19788,12 @@
 			return this;
 		};
 		HTMLDivElement.prototype.goto=function(position,time){
-			if(time==undefined) time=500;
+			if(this.timeout){
+				clearTimeout(this.timeout);
+				delete this.timeout;
+			}
+
+			if(typeof time!='number') time=500;
 			this.classList.add('removing');
 
 			var that=this;
