@@ -697,9 +697,19 @@ character.mountain={
 				expose:0.2,
 				result:{
 					target:function(player){
+						if(player.num('h')<=player.hp) return false;
+						var maxnum=0;
+						var cards2=game.zhu.get('h');
+						for(var i=0;i<cards2.length;i++){
+							if(cards2[i].number>maxnum){
+								maxnum=cards2[i].number;
+							}
+						}
+						if(maxnum>10) maxnum=10;
+						if(maxnum<5&&cards2.length>1) maxnum=5;
 						var cards=player.get('h');
 						for(var i=0;i<cards.length;i++){
-							if(cards[i].number<=9) return 1;
+							if(cards[i].number<maxnum) return 1;
 						}
 						return 0;
 					}
