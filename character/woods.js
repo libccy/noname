@@ -749,7 +749,7 @@ character.woods={
 		baonue2:'暴虐',
 		baonue_hp:'体力',
 		baonue_maxHp:'体力上限',
-		luanwu:'乱舞',
+		luanwu:'乱武',
 		wansha:'完杀',
 		weimu:'帷幕',
 		huoshou_info:'【南蛮入侵】对你无效；你是任何【南蛮入侵】造成伤害的来源。',
