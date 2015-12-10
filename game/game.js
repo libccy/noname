@@ -2300,6 +2300,9 @@
 			if(game.singleHandcard||lib.config.layout=='mobile'||lib.config.layout=='phone'){
 				return true;
 			}
+			if(lib.config.layout=='default'&&lib.config.layoutfixed.contains(lib.config.mode)){
+				return true;
+			}
 			return false;
 		},
 		setHover:function(node,func,hoveration,width){
@@ -2499,7 +2502,7 @@
 				var layout=lib.config.layout;
 				if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
 					if(layout=='default'){
-						layout='newlayout';
+						layout='mobile';
 					}
 				}
 				ui.css.layout=lib.init.css('layout/'+layout,'layout');
@@ -2635,14 +2638,17 @@
 				var scripts=document.head.querySelectorAll('script');
 				for(var i=0;i<scripts.length;i++){
 					if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
-						if(scripts[i].src.indexOf('ipad')!=-1){
-							window.isIpad=true;
-						}
-						else if(scripts[i].src.indexOf('iphone')!=-1){
-							var metas=document.head.querySelectorAll('meta');
-							for(var i=0;i<metas.length;i++){
-								if(metas[i].name=='viewport'){
-									metas[i].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
+						if(scripts[i].src.indexOf('ios')!=-1){
+							var ua=navigator.userAgent.toLowerCase();
+							if(ua.indexOf('ipad')!=-1){
+								window.isIpad=true;
+							}
+							else{
+								var metas=document.head.querySelectorAll('meta');
+								for(var i=0;i<metas.length;i++){
+									if(metas[i].name=='viewport'){
+										metas[i].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
+									}
 								}
 							}
 						}
@@ -13831,13 +13837,15 @@
 								toggle.innerHTML='编辑武将 <div>&gt;</div>';
 								var confirm=newCharacter.querySelector('.menubutton.large');
 								confirm.innerHTML='编辑武将';
+								confirm._origin=this;
 								var button=this;
-								var delnode=ui.create.div('.menubutton.large','删除',confirm.parentNode,function(){
+								var delnodefunc=function(){
 									button.remove();
 									lib.customCharacters.remove(button.link);
 									game.deleteDB('character',button.link);
 									game.deleteDB('image','character:'+button.link);
 									var skills=lib.character[button.link][3];
+									delete lib.character[button.link];
 									for(var i=0;i<skills.length;i++){
 										if(!lib.checkSkillName(skills[i])){
 											var keep=false;
@@ -13853,7 +13861,8 @@
 										}
 									}
 									resetEditor();
-								});
+								};
+								var delnode=ui.create.div('.menubutton.large','删除',confirm.parentNode,delnodefunc);
 								delnode.style.marginLeft='25px';
 							}
 
@@ -14094,6 +14103,7 @@
 								toggle.innerHTML='创建武将 <div>&gt;</div>';
 								var node=newCharacter.querySelector('.menubutton.large');
 								node.innerHTML='创建武将';
+								delete node._origin;
 								if(node.nextSibling){
 									node.nextSibling.remove();
 								}
@@ -14285,9 +14295,45 @@
 								hp=parseInt(hp);
 								if(!hp) hp=1;
 								var skills=[];
-								if(image){
-									game.putDB('image','character:'+name,image);
+								var dontcreate=false;
+								if(this.innerHTML=='编辑武将'&&this._origin&&this._origin.link!=name){
+									dontcreate=true;
+									var origin=this._origin;
+									game.getDB('image','character:'+this._origin.link,function(data){
+										if(data){
+											game.putDB('image','character:'+name,data);
+											origin.remove();
+											lib.customCharacters.remove(origin.link);
+											game.deleteDB('character',origin.link);
+											game.deleteDB('image','character:'+origin.link);
+											if(lib.character[origin.link]){
+												var skills=lib.character[origin.link][3];
+												delete lib.character[origin.link];
+												for(var i=0;i<skills.length;i++){
+													if(!lib.checkSkillName(skills[i])){
+														var keep=false;
+														for(var j=0;j<lib.customCharacters.length;j++){
+															if(lib.customCharacters[j]==origin.link) continue;
+															if(lib.character[lib.customCharacters[j]][3].contains(skills[i])){
+																keep=true;break;
+															}
+														}
+														if(!keep){
+															game.deleteDB('skill',skills[i]);
+														}
+													}
+												}
+											}
+										}
+										createButton(name);
+									});
 								}
+								else{
+									if(image){
+										game.putDB('image','character:'+name,image);
+									}
+								}
+
 								for(var i=0;i<skillList.firstChild.childNodes.length;i++){
 									if(skillList.firstChild.childNodes[i].createInfo&&
 										lib.checkSkillName(skillList.firstChild.childNodes[i].skill)) continue;
@@ -14330,9 +14376,10 @@
 										}
 									}
 								}
-								createButton(name);
+								if(!dontcreate) createButton(name);
 								resetEditor();
 								currentEditing=null;
+								delete this._origin;
 							});
 						});
 

@@ -847,8 +847,8 @@ margin-bottom: 5px;
 	-webkit-animation: card_start 0.5s;
 }
 .dialog{
-	animation: dialog_start 0.5s;
-	-webkit-animation: dialog_start 0.5s;
+	animation: dialog_start2 0.5s;
+	-webkit-animation: dialog_start2 0.5s;
 }
 .dialog.noslide{
 	animation: dialog_start2 0.5s;

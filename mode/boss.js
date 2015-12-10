@@ -151,7 +151,11 @@ mode.boss={
 				ui.create.cards();
 				game.finishCards();
 				ui.arena.dataset.number=8;
+				ui.control.style.transitionProperty='opacity';
 				ui.control.classList.add('bosslist');
+				setTimeout(function(){
+					ui.control.style.transitionProperty='';
+				},1000);
 
 				ui.window.appendChild(bosslist);
 

@@ -2083,7 +2083,7 @@ mode.chess={
 				delete window.characterRank;
 
 				ui.control.style.transition='all 0s';
-				if(lib.config.layout=='mobile'){
+				if(lib.config.layout=='mobile'||lib.config.layout=='default'){
 					ui.control.style.top='calc(100% - 70px)';
 				}
 				else if(lib.config.layout=='phone'){
@@ -3567,7 +3567,7 @@ mode.chess={
 					bosses.childNodes[i].classList.add('squarebutton');
 				}
 				ui.control.style.transition='all 0s';
-				if(lib.config.layout=='mobile'){
+				if(lib.config.layout=='mobile'||lib.config.layout=='default'){
 					ui.control.style.top='calc(100% - 70px)';
 				}
 				else if(lib.config.layout=='phone'){

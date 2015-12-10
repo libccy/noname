@@ -1029,14 +1029,24 @@ card.standard={
 				else{
 					if(!card.expired){
 						var target=player.next;
-						if(target.num('j','shandian')&&!target.next.num('j','shandian')){
-							target=target.next;
+						for(var iwhile=0;iwhile<10;iwhile++){
+							if(target.num('j','shandian')){
+								target=target.next;
+							}
+							else{
+								break;
+							}
 						}
-						if(card.name!='shandian'){
-							target.addJudge('shandian',card);
+						if(target.num('j','shandian')||target==player){
+							ui.discardPile.appendChild(card);
 						}
 						else{
-							target.addJudge(card);
+							if(card.name!='shandian'){
+								target.addJudge('shandian',card);
+							}
+							else{
+								target.addJudge(card);
+							}
 						}
 					}
 					else{
@@ -1047,14 +1057,24 @@ card.standard={
 			cancel:function(){
 				if(!card.expired){
 					var target=player.next;
-					if(target.num('j','shandian')&&!target.next.num('j','shandian')){
-						target=target.next;
+					for(var iwhile=0;iwhile<10;iwhile++){
+						if(target.num('j','shandian')){
+							target=target.next;
+						}
+						else{
+							break;
+						}
 					}
-					if(card.name!='shandian'){
-						target.addJudge('shandian',card);
+					if(target.num('j','shandian')||target==player){
+						ui.discardPile.appendChild(card);
 					}
 					else{
-						target.addJudge(card);
+						if(card.name!='shandian'){
+							target.addJudge('shandian',card);
+						}
+						else{
+							target.addJudge(card);
+						}
 					}
 				}
 				else{
