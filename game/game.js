@@ -11684,9 +11684,9 @@
 						lib.translate[i+'_info']=lib.translate[lib.skill[i].inherit+'_info'];
 					}
 				}
-				if(lib.skill[i].subSkills){
-					for(var j in lib.skill[i].subSkills){
-						lib.skill[i+'_'+j]=lib.skill[i].subSkills[j];
+				if(lib.skill[i].subSkill){
+					for(var j in lib.skill[i].subSkill){
+						lib.skill[i+'_'+j]=lib.skill[i].subSkill[j];
 						lib.translate[i+'_'+j]=lib.translate[i];
 					}
 				}
@@ -20028,6 +20028,21 @@
 				window.ai=ai;
 				window.lib=lib;
 				window._status=_status;
+			},
+			u:function(){
+				var card={name:'sha'},source=game.me.next;
+				for(var i=0;i<arguments.length;i++){
+					if(get.itemtype(arguments[i])=='player'){
+						source=arguments[i];
+					}
+					else if(typeof arguments[i]=='object'){
+						card=arguments[i];
+					}
+					else if(typeof arguments[i]=='string'){
+						card={name:arguments[i]}
+					}
+				}
+				source.useCard(card,game.me);
 			},
 			rank:function(){
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).

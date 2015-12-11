@@ -13,7 +13,6 @@ character.wind={
 		// yuji:['male','qun',3,['guhuo']],
 	},
 	skill:{
-
 		diyleiji:{
 			audio:2,
 			trigger:{player:'respond'},

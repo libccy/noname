@@ -1290,21 +1290,23 @@ character.sp={
 			threaten:1.2
 		},
 		tongji:{
-			global:'tongji2',
+			global:'tongji_disable',
 			unique:true,
 			gainnable:true,
-		},
-		tongji2:{
-			mod:{
-				targetEnabled:function(card,player,target){
-					if(player.skills.contains('tongji')) return;
-					if(card.name=='sha'){
-						if(target.skills.contains('tongji')) return;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].skills.contains('tongji')){
-								if(game.players[i].hp<game.players[i].num('h')&&
-									get.distance(player,game.players[i],'attack')<=1){
-									return false;
+			subSkill:{
+				disable:{
+					mod:{
+						targetEnabled:function(card,player,target){
+							if(player.skills.contains('tongji')) return;
+							if(card.name=='sha'){
+								if(target.skills.contains('tongji')) return;
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].skills.contains('tongji')){
+										if(game.players[i].hp<game.players[i].num('h')&&
+											get.distance(player,game.players[i],'attack')<=1){
+											return false;
+										}
+									}
 								}
 							}
 						}
@@ -2905,7 +2907,7 @@ character.sp={
 			audio:2,
 			trigger:{player:'shaBefore'},
 			filter:function(event,player){
-				if(event.skill!='longdan1') return false;
+				if(event.skill!='longdan_sha') return false;
 				return event.target.num('h')>0;
 			},
 			content:function(){
@@ -2918,7 +2920,7 @@ character.sp={
 			audio:2,
 			trigger:{player:'respond'},
 			filter:function(event,player){
-				if(event.skill!='longdan2'&&event.skill!='longdan1') return false;
+				if(event.skill!='longdan_shan'&&event.skill!='longdan_sha') return false;
 				return event.source&&event.source.num('h')>0;
 			},
 			content:function(){

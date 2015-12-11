@@ -405,10 +405,16 @@ character.standard={
 				return get.color(card)=='black';
 			},
 			viewAs:{name:'shan'},
+			viewAsFilter:function(player){
+				if(!player.num('h',{color:'black'})) return false;
+			},
 			prompt:'将一张黑色牌当闪打出',
 			check:function(){return 1},
 			ai:{
 				respondShan:true,
+				skillTagFilter:function(player){
+					if(!player.num('h',{color:'black'})) return false;
+				},
 				result:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')&&current<0) return 0.6
@@ -651,6 +657,9 @@ character.standard={
 			prompt:'将一张红色牌当杀使用或打出',
 			check:function(card){return 4-ai.get.value(card)},
 			ai:{
+				skillTagFilter:function(player){
+					if(!player.num('he',{color:'red'})) return false;
+				},
 				respondSha:true,
 			}
 		},
@@ -806,60 +815,56 @@ character.standard={
 			},
 			content:function(){}
 		},
-		test:{
-			subSkills:{
-				t1:{},
-				t2:{}
-			}
-		},
 		longdan:{
-			group:['longdan1','longdan2']
-		},
-		longdan1:{
-			audio:2,
-			enable:['chooseToUse','chooseToRespond'],
-			filterCard:{name:'shan'},
-			viewAs:{name:'sha'},
-			viewAsFilter:function(player){
-				if(!player.num('h','shan')) return false;
-			},
-			prompt:'将一张闪当杀使用或打出',
-			check:function(){return 1},
-			ai:{
-				effect:{
-					target:function(card,player,target,current){
-						if(get.tag(card,'respondSha')&&current<0) return 0.6
+			group:['longdan_sha','longdan_shan'],
+			subSkill:{
+				sha:{
+					audio:2,
+					enable:['chooseToUse','chooseToRespond'],
+					filterCard:{name:'shan'},
+					viewAs:{name:'sha'},
+					viewAsFilter:function(player){
+						if(!player.num('h','shan')) return false;
+					},
+					prompt:'将一张闪当杀使用或打出',
+					check:function(){return 1},
+					ai:{
+						effect:{
+							target:function(card,player,target,current){
+								if(get.tag(card,'respondSha')&&current<0) return 0.6
+							}
+						},
+						respondSha:true,
+						skillTagFilter:function(player){
+							if(!player.num('h','shan')) return false;
+						},
+						order:4,
+						useful:-1,
+						value:-1
 					}
 				},
-				respondSha:true,
-				skillTagFilter:function(player){
-					if(!player.num('h','shan')) return false;
-				},
-				order:4,
-				useful:-1,
-				value:-1
-			}
-		},
-		longdan2:{
-			audio:2,
-			enable:['chooseToRespond'],
-			filterCard:{name:'sha'},
-			viewAs:{name:'shan'},
-			prompt:'将一张杀当闪打出',
-			check:function(){return 1},
-			ai:{
-				respondShan:true,
-				skillTagFilter:function(player){
-					if(!player.num('h','sha')) return false;
-				},
-				effect:{
-					target:function(card,player,target,current){
-						if(get.tag(card,'respondShan')&&current<0) return 0.6
+				shan:{
+					audio:2,
+					enable:['chooseToRespond'],
+					filterCard:{name:'sha'},
+					viewAs:{name:'shan'},
+					prompt:'将一张杀当闪打出',
+					check:function(){return 1},
+					ai:{
+						respondShan:true,
+						skillTagFilter:function(player){
+							if(!player.num('h','sha')) return false;
+						},
+						effect:{
+							target:function(card,player,target,current){
+								if(get.tag(card,'respondShan')&&current<0) return 0.6
+							}
+						},
+						order:4,
+						useful:-1,
+						value:-1
 					}
-				},
-				order:4,
-				useful:-1,
-				value:-1
+				}
 			}
 		},
 		mashu:{
