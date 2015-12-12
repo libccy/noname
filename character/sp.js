@@ -1496,7 +1496,7 @@ character.sp={
 		moukui:{
 			trigger:{player:'shaBegin'},
 			direct:true,
-			audio:true,
+			audio:2,
 			content:function(){
 				"step 0"
 				var controls=['draw_card'];
@@ -1529,7 +1529,7 @@ character.sp={
 			}
 		},
 		moukui2:{
-			audio:true,
+			audio:false,
 			trigger:{player:'shaMiss'},
 			forced:true,
 			filter:function(event,player){
