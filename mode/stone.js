@@ -454,7 +454,7 @@ mode.stone={
 				game.addVideo('init',null,info);
 
 				event.trigger('gameStart');
-				game.gameDraw(game.me,2);
+				game.gameDraw(game.me);
 				if(game.me.side){
 					game.stoneLoop(game.me);
 				}

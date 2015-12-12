@@ -12,14 +12,6 @@ body{
 div{display: inline-block;position: absolute;transition: all 0.5s;}
 table{table-layout: fixed;}
 
-@keyframes flip3t{
-	0%{opacity: 0;transform: scale(2) rotate(530deg)}
-	25%{opacity: 0.25;transform: scale(1.75) rotate(350deg)}
-	50%{opacity: 0.5;transform: scale(1.5) rotate(170deg)}
-	100%{opacity: 1;transform: scale(1) rotate(-10deg)}
-	/*from{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}
-	to{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important}*/
-}
 /*--------场景--------*/
 #window{
 	width: 100%;

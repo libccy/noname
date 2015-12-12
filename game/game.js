@@ -20698,92 +20698,32 @@
 				game.loop();
 			}
 
-			var goon=function(){
-				if(!mode[lib.config.mode]){
-					window.inSplash=true;
-					var clickNode=function(){
-						lib.config.mode=this.link;
-						splash.delete();
-						delete window.inSplash;
-						lib.init.js('mode',lib.config.mode).onload=proceed;
-					}
-					var splash=ui.create.div('#splash',document.body);
-					for(var i=0;i<lib.config.all.mode.length;i++){
-						var node=ui.create.div(splash,'.hidden',clickNode);
-						node.link=lib.config.all.mode[i];
-						ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
-						ui.create.div(node,'.avatar').style.backgroundImage='url("image/splash/'+lib.config.all.mode[i]+'.jpg")';
-						ui.refresh(node);
-						setTimeout((function(node){
-							return function(){
-								node.show();
-							}
-						}(node)),i*100);
-					}
-				}
-				else{
-					proceed();
-				}
-				localStorage.removeItem(lib.configprefix+'directstart');
-			};
-			if(lib.version==1.7&&!lib.config.birthdayshown){
-				game.saveConfig('birthdayshown',true);
+			if(!mode[lib.config.mode]){
 				window.inSplash=true;
-				var container=ui.create.div(document.body);
-				container.style.width='100%';
-				container.style.height='100%';
-				container.style.left=0;
-				container.style.top=0;
-				var createName=function(str){
-					var node=ui.create.div('',str);
-					node.style.fontSize='200px';
-					node.style.color='white';
-					node.style.fontFamily='huangcao,xinwei';
-					node.style.opacity=0;
-					node.style.transform='scale(3)';
-					node.style.top='calc(50% - 100px)';
-					node.style.textShadow='black 0 0 2px';
-					container.appendChild(node);
-					ui.refresh(node);
-					node.style.opacity=1;
-					node.style.transform='scale(1)';
-					return node;
+				var clickNode=function(){
+					lib.config.mode=this.link;
+					splash.delete();
+					delete window.inSplash;
+					lib.init.js('mode',lib.config.mode).onload=proceed;
 				}
-				createName('无').style.left='calc(50% - 300px)';
-				setTimeout(function(){
-					createName('名').style.left='calc(50% - 100px)';
-				},500);
-				setTimeout(function(){
-					createName('杀').style.left='calc(50% + 100px)';
-				},1000);
-
-				setTimeout(function(){
-					var node4=ui.create.div('','两周年');
-					node4.style.color='white';
-					node4.style.textShadow='black 0 0 2px';
-					node4.style.fontFamily='huangcao,xinwei';
-					node4.style.fontSize='60px';
-					node4.style.webkitAnimation='flip3t 1s';
-					node4.style.letterSpacing='-10px';
-					node4.style.top='calc(50% + 100px)';
-					node4.style.left='calc(50% + 180px)';
-					node4.style.border='2px solid white';
-					node4.style.borderRadius='8px';
-					node4.style.boxShadow='black 0 0 2px';
-					node4.style.transform='rotate(-10deg)';
-					node4.style.animationTimingFunction="linear"
-					container.appendChild(node4);
-					setTimeout(function(){
-						container.style.transform='scale(0.5)';
-						container.delete();
-						window.inSplash=false;
-					},2500);
-				},1500);
-				setTimeout(goon,4500);
+				var splash=ui.create.div('#splash',document.body);
+				for(var i=0;i<lib.config.all.mode.length;i++){
+					var node=ui.create.div(splash,'.hidden',clickNode);
+					node.link=lib.config.all.mode[i];
+					ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
+					ui.create.div(node,'.avatar').style.backgroundImage='url("image/splash/'+lib.config.all.mode[i]+'.jpg")';
+					ui.refresh(node);
+					setTimeout((function(node){
+						return function(){
+							node.show();
+						}
+					}(node)),i*100);
+				}
 			}
 			else{
-				goon();
+				proceed();
 			}
+			localStorage.removeItem(lib.configprefix+'directstart');
 		};
 		if(!lib.config.touchscreen){
 			document.onmousewheel=ui.click.windowmousewheel;
