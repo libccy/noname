@@ -43,7 +43,7 @@ mode.versus={
 				if(lib.storage.choice==undefined) game.save('choice',20);
 				if(lib.storage.zhu==undefined) game.save('zhu',true);
 				if(lib.storage.noreplace_end==undefined) game.save('noreplace_end',true);
-				if(lib.storage.die_stop==undefined) game.save('die_stop',true);
+				if(lib.storage.first_less==undefined) game.save('first_less',true);
 				if(lib.storage.autoreplaceinnerhtml==undefined) game.save('autoreplaceinnerhtml',true);
 				// if(lib.storage.only_zhu==undefined) game.save('only_zhu',true);
 				if(lib.storage.single_control==undefined) game.save('single_control',true);
@@ -70,7 +70,45 @@ mode.versus={
 				game.chooseCharacter();
 				"step 3"
 				event.trigger('gameStart');
-				game.gameDraw(game.players[0]);
+				var firstAct;
+				if(lib.storage.zhu){
+					firstAct=(_status.currentSide==game.me.side)?game.friendZhu:game.enemyZhu;
+				}
+				else{
+					if(!lib.storage.cross_seat&&!lib.storage.random_seat&&lib.storage.number>1){
+						for(var i=0;i<game.players.length-1;i++){
+							if(game.players[i].side!=game.players[i+1].side){
+								var actcount;
+								if(Math.random()<0.5){
+									actcount=i;
+								}
+								else{
+									if(i>=lib.storage.number){
+										actcount=i-lib.storage.number;
+									}
+									else{
+										actcount=i+lib.storage.number;
+									}
+								}
+								if(actcount>0){
+									actcount--;
+								}
+								else{
+									actcount=game.players.length-1;
+								}
+								firstAct=game.players[actcount];
+								break;
+							}
+						}
+					}
+					else{
+						firstAct=game.players[Math.floor(Math.random()*game.players.length)];
+					}
+				}
+				game.gameDraw(firstAct,function(player){
+					if(player==firstAct) return 3;
+					return 4;
+				});
 				_status.round=0;
 				if(lib.storage.single_control){
 					lib.skill.global.push('versus_swap');
@@ -99,10 +137,10 @@ mode.versus={
 
 				if(lib.storage.zhu){
 					_status.currentSide=true;
-					game.versusPhaseLoop((_status.currentSide==game.me.side)?game.friendZhu:game.enemyZhu);
+					game.versusPhaseLoop(firstAct);
 				}
 				else{
-					game.versusPhaseLoop(game.players[Math.floor(Math.random()*game.players.length)]);
+					game.versusPhaseLoop(firstAct);
 				}
 			}
 		},
@@ -134,7 +172,7 @@ mode.versus={
 					this.dialog.versus_assign_enemy=this.dialog.add(ui.create.switcher('versus_assign_enemy',lib.storage.assign_enemy)).querySelector('.toggle');
 					this.dialog.versus_single_control=this.dialog.add(ui.create.switcher('versus_single_control',lib.storage.single_control)).querySelector('.toggle');
 					// this.dialog.versus_control_all=this.dialog.add(ui.create.switcher('versus_control_all',lib.storage.control_all)).querySelector('.toggle');
-					this.dialog.versus_die_stop=this.dialog.add(ui.create.switcher('versus_die_stop',lib.storage.die_stop)).querySelector('.toggle');
+					this.dialog.versus_first_less=this.dialog.add(ui.create.switcher('versus_first_less',lib.storage.first_less)).querySelector('.toggle');
 					this.dialog.versus_reward=this.dialog.add(ui.create.switcher('versus_reward',[0,1,2,3,4],lib.storage.versus_reward)).querySelector('.toggle');
 					this.dialog.versus_punish=this.dialog.add(ui.create.switcher('versus_punish',['弃牌','无','摸牌'],lib.storage.versus_punish)).querySelector('.toggle');
 					this.dialog.versus_seat_order=this.dialog.add(ui.create.switcher('seat_order',['对阵','交叉','随机'],lib.storage.seat_order)).querySelector('.toggle');
@@ -252,7 +290,7 @@ mode.versus={
 					var buttons=_status.event.dialog.buttons.slice(0);
 					buttons.randomSort();
 					for(var i=0;i<buttons.length;i++){
-						if(buttons[i].classList.contains('glow')||buttons[i].classList.contains('selected')){
+						if(buttons[i].classList.contains('glow')||buttons[i].classList.contains('selectedx')){
 							buttons.splice(i,1);i--;
 						}
 					}
@@ -277,10 +315,10 @@ mode.versus={
 				});
 				event.custom.replace.button=function(button){
 					if(_status.choose_enemy){
-						if(button.classList.contains('glow')||button.classList.contains('selected')||_status.choosefinished) return;
+						if(button.classList.contains('glow')||button.classList.contains('selectedx')||_status.choosefinished) return;
 						_status.choose_enemy=false;
 						if(!_status.color){
-							button.classList.add('selected');
+							button.classList.add('selectedx');
 							// button.style.transform='rotate(-3deg)';
 						}
 						else{
@@ -290,15 +328,15 @@ mode.versus={
 						_status.enemy.push(button.link);
 						var buttons=_status.event.dialog.buttons.slice(0);
 						for(var i=0;i<buttons.length;i++){
-							if(buttons[i].classList.contains('glow')||buttons[i].classList.contains('selected')){
+							if(buttons[i].classList.contains('glow')||buttons[i].classList.contains('selectedx')){
 								buttons.splice(i,1);i--;
 							}
 						}
 					}
 					else{
-						if(button.classList.contains('glow')||button.classList.contains('selected')||_status.choosefinished) return;
+						if(button.classList.contains('glow')||button.classList.contains('selectedx')||_status.choosefinished) return;
 						if(_status.color){
-							button.classList.add('selected');
+							button.classList.add('selectedx');
 							// button.style.transform='rotate(-3deg)';
 						}
 						else{
@@ -308,7 +346,7 @@ mode.versus={
 						_status.friend.push(button.link);
 						var buttons=_status.event.dialog.buttons.slice(0);
 						for(var i=0;i<buttons.length;i++){
-							if(buttons[i].classList.contains('glow')||buttons[i].classList.contains('selected')){
+							if(buttons[i].classList.contains('glow')||buttons[i].classList.contains('selectedx')){
 								buttons.splice(i,1);i--;
 							}
 						}
@@ -322,7 +360,7 @@ mode.versus={
 								// button2.style.transform='rotate(-3deg)';
 							}
 							else{
-								button2.classList.add('selected');
+								button2.classList.add('selectedx');
 								// button2.style.transform='rotate(-3deg)';
 							}
 							_status.enemy.push(button2.link);
@@ -376,7 +414,7 @@ mode.versus={
 					// 	dialog.versus_control_all.parentNode.classList.add('disabled');
 					// }
 					// game.save('control_all',dialog.versus_control_all.link);
-					game.save('die_stop',dialog.versus_die_stop.link);
+					game.save('first_less',dialog.versus_first_less.link);
 					game.save('number',dialog.versus_number.link);
 					game.save('versus_reward',dialog.versus_reward.link);
 					game.save('versus_punish',dialog.versus_punish.link);
@@ -717,9 +755,7 @@ mode.versus={
 				source.init(event.character);
 				source.node.identity.dataset.color=get.translation(source.side+'Color');
 				source.draw(4);
-				if(lib.storage.die_stop){
-					_status.event.parent.parent.parent.untrigger(true);
-				}
+				_status.event.parent.parent.parent.untrigger(false,source);
 				if(lib.storage.single_control&&lib.storage.control_all){
 					game.onSwapControl();
 				}
@@ -1044,7 +1080,6 @@ mode.versus={
 		falseColor:"wei",
 		versus_zhu_config:'启用主将',
 		versus_only_zhu_config:'只当主将',
-		versus_die_stop_config:'死亡后终止结算',
 		versus_main_zhu_config:'主将死亡后结束',
 		versus_assign_enemy_config:'指定对手',
 		versus_cross_seat_config:'交叉座位',
@@ -1053,6 +1088,7 @@ mode.versus={
 		versus_single_control_config:'单人控制',
 		seat_order_config:'座位排列',
 		versus_control_all_config:'固定控制位置',
+		versus_first_less_config:'先手少摸牌',
 		versus_reward_config:'杀敌摸牌',
 		versus_punish_config:'杀死队友',
 		versus_number_config:'对阵人数',

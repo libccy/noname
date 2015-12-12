@@ -498,6 +498,7 @@ mode.identity={
 						td.innerHTML=get.translation(list[i]+'2');
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 							if(_status.dragged) return;
+							if(_status.justdragged) return;
 							_status.tempNoButton=true;
 							setTimeout(function(){
 								_status.tempNoButton=false;
@@ -541,6 +542,7 @@ mode.identity={
 						}
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 							if(_status.dragged) return;
+							if(_status.justdragged) return;
 							if(get.distance(game.zhu,game.me,'absolute')==this.link) return;
 							var current=this.parentNode.querySelector('.thundertext');
 							if(current){

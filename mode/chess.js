@@ -1579,11 +1579,9 @@ mode.chess={
 				ui.create.cards();
 				game.finishCards();
 				ui.chessContainer=ui.create.div('#chess-container',ui.arena);
-				ui.chessContainer.ontouchstart = ui.click.touchStart;
-				ui.chessContainer.ontouchmove = ui.click.touchScroll;
+				lib.setScroll(ui.chessContainer);
 				ui.chessContainer.style.WebkitOverflowScrolling='touch';
 				ui.chess=ui.create.div('#chess',ui.chessContainer);
-				lib.setScroll(ui.chess);
 				ui.canvas2=document.createElement('canvas');
 				ui.canvas2.id='canvas2';
 				ui.chess.appendChild(ui.canvas2);
@@ -1692,42 +1690,46 @@ mode.chess={
 				}
 				ui.chess.style.height=148*ui.chessheight+'px';
 				ui.chess.style.width=148*ui.chesswidth+'px';
-				ui.chess.addEventListener('mousedown',function(e){
-					if(Array.isArray(e.path)){
-						for(var i=0;i<e.path.length;i++){
-							var itemtype=get.itemtype(e.path[i]);
-							if(itemtype=='button'||itemtype=='card'||itemtype=='player'){
-								return;
+				if(!lib.config.touchscreen){
+					ui.chess.addEventListener('mousedown',function(e){
+						if(Array.isArray(e.path)){
+							for(var i=0;i<e.path.length;i++){
+								var itemtype=get.itemtype(e.path[i]);
+								if(itemtype=='button'||itemtype=='card'||itemtype=='player'){
+									return;
+								}
 							}
 						}
-					}
-					this._chessdrag=[e,this.parentNode.scrollLeft,this.parentNode.scrollTop];
-				});
-				ui.chess.addEventListener('mouseleave',function(){
-					this._chessdrag=null;
-				});
-				ui.chess.addEventListener('mouseup',function(){
-					if(this._chessdrag){
+						this._chessdrag=[e,this.parentNode.scrollLeft,this.parentNode.scrollTop];
+					});
+					ui.chess.addEventListener('mouseleave',function(){
 						this._chessdrag=null;
-					}
-				});
-				ui.chess.addEventListener('mousemove',function(e){
-					if(this._chessdrag){
-						this.parentNode.scrollLeft=this._chessdrag[1]-e.x+this._chessdrag[0].x;
-						this.parentNode.scrollTop=this._chessdrag[2]-e.y+this._chessdrag[0].y;
-						_status.clicked=true;
-					}
-					e.preventDefault();
-				});
-				ui.chessContainer.addEventListener('mousewheel',function(){
-					if(_status.currentChessFocus){
-						clearInterval(_status.currentChessFocus);
-						delete _status.currentChessFocus;
-					}
-				});
+					});
+					ui.chess.addEventListener('mouseup',function(){
+						if(this._chessdrag){
+							this._chessdrag=null;
+						}
+					});
+					ui.chess.addEventListener('mousemove',function(e){
+						if(this._chessdrag){
+							this.parentNode.scrollLeft=this._chessdrag[1]-e.x+this._chessdrag[0].x;
+							this.parentNode.scrollTop=this._chessdrag[2]-e.y+this._chessdrag[0].y;
+							_status.clicked=true;
+						}
+						e.preventDefault();
+					});
+					ui.chessContainer.addEventListener('mousewheel',function(){
+						if(_status.currentChessFocus){
+							clearInterval(_status.currentChessFocus);
+							delete _status.currentChessFocus;
+						}
+					});
+				}
+
 				ui.chessscroll1=ui.create.div('.chessscroll.left',ui.chessContainer);
 				ui.chessscroll2=ui.create.div('.chessscroll.right',ui.chessContainer);
 				var chessscroll=function(){
+					if(lib.config.touchscreen) return;
 					var direction=this.direction;
 					var speed=parseInt(get.config('chessscroll_speed'));
 					if(!speed) return;

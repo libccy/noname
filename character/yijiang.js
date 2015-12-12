@@ -5592,7 +5592,7 @@ character.yijiang={
 		anxu:'安恤',
 		zhuiyi:'追忆',
 		gongji:'弓骑',
-		qiuyuan:'救援',
+		qiuyuan:'求援',
 		zhuikong:'惴恐',
 		qieting:'窃听',
 		xianzhou:'献州',

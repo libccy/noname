@@ -405,12 +405,12 @@ character.wind={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging)+'，是否发动【鬼道】？','he',function(card){
+				get.translation(trigger.player.judging[0])+'，是否发动【鬼道】？','he',function(card){
 					return get.color(card)=='black';
 				}).ai=function(card){
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
-					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
+					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
 					var attitude=ai.get.attitude(player,trigger.player);
 					if(attitude==0||result==0) return 0;
 					if(attitude>0){
@@ -430,9 +430,9 @@ character.wind={
 				"step 2"
 				if(result.bool){
 					player.logSkill('guidao');
-					player.$gain2(trigger.player.judging);
-					player.gain(trigger.player.judging);
-					trigger.player.judging=result.cards[0];
+					player.$gain2(trigger.player.judging[0]);
+					player.gain(trigger.player.judging[0]);
+					trigger.player.judging[0]=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
 					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 				}

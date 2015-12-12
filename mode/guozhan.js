@@ -211,6 +211,7 @@ mode.guozhan={
 						td.link=i-1;
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 							if(_status.dragged) return;
+							if(_status.justdragged) return;
 							if(_status.cheat_seat){
 								_status.cheat_seat.classList.remove('thundertext');
 								if(_status.cheat_seat==this){

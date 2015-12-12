@@ -16,18 +16,11 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.70,
+		version:1.71,
 		changeLog:[
-			'界面显示改进',
-			'AI改进',
-			'武将图修改',
-			'boss、将5配音(@tanyuanjkl提取)',
-			'可隐藏模式、武将、卡牌包',
-			'开始界面',
-			'显示历史记录选项',
-			'左滑/右滑手势',
-			'自定义背景音乐',
-			'自定义武将',
+			'bug修复',
+			'双指拖动对话框',
+			'对决模式调整',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -2471,6 +2464,9 @@
 					}
 				    lib.configMenu.audio.config.background_music.item.music_random='随机';
 				    lib.configMenu.audio.config.background_music.item.music_off='关闭';
+					if(lib.config.touchscreen){
+						delete lib.configMenu.audio.config.background_music.item.music_custom;
+					}
 				}
 				delete character.pack;
 				delete card.pack;
@@ -4649,33 +4645,33 @@
 					"step 0"
 					var judgestr=get.translation(player)+'的'+event.judgestr+'判定';
 					event.videoId=lib.status.videoId++;
-					player.judging=get.cards()[0];
-					game.addVideo('judge1',player,[get.cardInfo(player.judging),judgestr,event.videoId]);
+					player.judging.unshift(get.cards()[0]);
+					game.addVideo('judge1',player,[get.cardInfo(player.judging[0]),judgestr,event.videoId]);
 					if(lib.config.mode=='chess'){
-						event.node=player.judging.copy('thrown','center',ui.arena).animate('start');
+						event.node=player.judging[0].copy('thrown','center',ui.arena).animate('start');
 					}
 					else{
-						event.node=player.$throwordered(player.judging.copy(),true);
+						event.node=player.$throwordered(player.judging[0].copy(),true);
 					}
 					event.node.classList.add('thrownhighlight');
 					ui.arena.classList.add('thrownhighlight');
 					event.dialog=ui.create.dialog(judgestr);
 					event.dialog.classList.add('center');
-					game.log(player,'进行'+event.judgestr+'判定，亮出的判定牌为',player.judging);
+					game.log(player,'进行'+event.judgestr+'判定，亮出的判定牌为',player.judging[0]);
 					game.delay(2);
 					event.trigger('judge');
 					"step 1"
 					event.result={
-						card:player.judging,
-						number:get.number(player.judging),
-						suit:get.suit(player.judging),
-						color:get.color(player.judging),
-						judge:event.judge(player.judging),
+						card:player.judging[0],
+						number:get.number(player.judging[0]),
+						suit:get.suit(player.judging[0]),
+						color:get.color(player.judging[0]),
+						judge:event.judge(player.judging[0]),
 						node:event.node,
 					};
 					if(event.result.judge>0) event.result.bool=true;
 					if(event.result.judge<0) event.result.bool=false;
-					delete player.judging;
+					player.judging.shift();
 					if(event.result.judge>0){
 						player.popup('洗具');
 					}
@@ -8123,6 +8119,9 @@
 								if(info.filter&&!info.filter(trigger,player,event.triggername)){
 									event.finish();
 								}
+								else if(event._trigger.notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
+									event.finish();
+								}
 								else{
 									var hidden=player.hiddenSkills.slice(0);
 									game.expandSkills(hidden);
@@ -8184,14 +8183,20 @@
 						}
 					}
 				},
-				untrigger:function(all){
+				untrigger:function(all,player){
 					if(all){
 						this.next.length=0;
 						this._triggered=5;
 					}
+					else if(player){
+						this.notrigger.add(player);
+						for(var i=0;i<this.next.length;i++){
+							if(this.next[i].player==player) this.next.splice(i--,1);
+						}
+					}
 					else{
 						for(var i=0;i<this.next.length;i++){
-							if(this.next[i]._trigger==this) this.next.remove(this.next[i]);
+							if(this.next[i]._trigger==this) this.next.splice(i--,1);
 						}
 					}
 				}
@@ -9111,6 +9116,7 @@
 				ui.system.style.display='';
 				ui.refresh(ui.system);
 				ui.system.show();
+				ui.window.show();
 				if(lib.config.mode!='versus'&&lib.config.mode!='boss'){
 					ui.arena.style.display='';
 					ui.refresh(ui.arena);
@@ -10569,6 +10575,7 @@
 				finished:false,
 				next:[],
 				aiexclude:[],
+				notrigger:[],
 				custom:{
 					add:{},
 					replace:{}
@@ -11538,8 +11545,12 @@
 			next.content=function(){
 				"step 0"
 				var end=player;
+				var numx=num;
 				do{
-					player.directgain(get.cards(4));
+					if(typeof num=='function'){
+						numx=num(player);
+					}
+					player.directgain(get.cards(numx));
 					if(player.singleHp===true&&lib.config.mode!='guozhan'){
 						player.doubleDraw();
 					}
@@ -12457,6 +12468,7 @@
 				dialog.contentContainer.ontouchstart=ui.click.touchStart;
 				dialog.contentContainer.ontouchmove = ui.click.touchScroll;
 				dialog.contentContainer.style.WebkitOverflowScrolling='touch';
+				dialog.ontouchstart=ui.click.dragtouchdialog;
 				return dialog;
 			},
 			line2:function(){
@@ -12719,10 +12731,15 @@
 					delete window.isIpad;
 				}
 				ui.refresh(ui.window);
-				// setTimeout(function(){
-				// 	ui.window.show();
-				// },500);
-				ui.window.show();
+				if(!localStorage.getItem(lib.configprefix+'playback')){
+					ui.window.show();
+				}
+				else{
+					setTimeout(function(){
+						ui.window.show();
+					},1000);
+				}
+
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena',ui.window);
@@ -14942,22 +14959,22 @@
 								}
 								textstr+='\n';
 								text.value=textstr;
-								perserveMenu=true;
+								// perserveMenu=true;
 							}
 							runButton.listen(function(){
 								textstr='';
-								perserveMenu=false;
+								// perserveMenu=false;
 								try{
-									eval(text.value);
+									eval('text.value='+text.value);
 								}
 								catch(e){
 									text.value=e;
-									perserveMenu=true;
+									// perserveMenu=true;
 								}
-								if(!perserveMenu){
-									text.value='';
-									clickContainer.call(menuContainer);
-								}
+								// if(!perserveMenu){
+								// 	text.value='';
+								// 	clickContainer.call(menuContainer);
+								// }
 							});
 						}());
 						(function(){
@@ -15409,6 +15426,7 @@
 				node.modeSkills=[];
 				node.popups=[];
 				node.damagepopups=[];
+				node.judging=[];
 				node.stat=[{card:{},skill:{}}];
 				node.tempSkills={};
 				node.storage={};
@@ -15540,6 +15558,23 @@
 			},
 		},
 		click:{
+			dragtouchdialog:function(e){
+				if(e.touches.length>1&&
+					!this.classList.contains('popped')&&
+					!this.classList.contains('fixed')){
+					_status.draggingtouchdialog=this;
+					this._dragorigin={
+						clientX:e.touches[0].clientX,
+						clientY:e.touches[0].clientY,
+					};
+					if(!this._dragtransform){
+						this._dragtransform=[0,0];
+					}
+					this._dragorigintransform=this._dragtransform.slice(0);
+					e.preventDefault();
+					e.stopPropagation();
+				}
+			},
 			identity:function(){
 				if(_status.dragged) return;
 				_status.clicked=true;
@@ -15933,7 +15968,7 @@
 			},
 			windowtouchstart:function(e){
 				if(window.inSplash) return;
-				if(e.touches[0]&&lib.config.swipe){
+				if(e.touches[0]&&lib.config.swipe&&e.touches.length<2){
 					_status._swipeorigin={
 						clientX:e.touches[0].clientX,
 						clientY:e.touches[0].clientY,
@@ -15960,6 +15995,19 @@
 						}
 						ui.roundmenu._dragtouches=e.touches[0];
 						ui.click.checkroundtranslate(translate);
+					}
+					_status.clicked=true;
+				}
+				else if(_status.draggingtouchdialog){
+					delete _status._swipeorigin;
+					if(_status.draggingtouchdialog._dragorigin&&_status.draggingtouchdialog._dragtransform&&e.touches.length){
+						var translate=_status.draggingtouchdialog._dragtransform.slice(0);
+						var dx=e.touches[0].clientX-_status.draggingtouchdialog._dragorigin.clientX;
+						var dy=e.touches[0].clientY-_status.draggingtouchdialog._dragorigin.clientY;
+						translate[0]+=dx;
+						translate[1]+=dy;
+						_status.draggingtouchdialog._dragtouches=e.touches[0];
+						_status.draggingtouchdialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 					}
 					_status.clicked=true;
 				}
@@ -16121,7 +16169,7 @@
 			},
 			windowtouchend:function(e){
 				if(window.inSplash) return;
-				if(e.touches.length==1&&!_status.dragged){
+				if(e.touches.length==1&&!_status.dragged&&!_status.draggingtouchdialog){
 					ui.click.pause();
 				}
 				if(_status.draggingroundmenu){
@@ -16153,6 +16201,25 @@
 					_status.clicked=false;
 					game.saveConfig('roundmenu_transform',translate);
 					delete _status.draggingroundmenu;
+				}
+				else if(_status.draggingtouchdialog){
+					delete _status._swipeorigin;
+					if(_status.draggingtouchdialog._dragorigin&&_status.draggingtouchdialog._dragtransform&&_status.draggingtouchdialog._dragtouches){
+						var dx=_status.draggingtouchdialog._dragtouches.clientX-_status.draggingtouchdialog._dragorigin.clientX;
+						var dy=_status.draggingtouchdialog._dragtouches.clientY-_status.draggingtouchdialog._dragorigin.clientY;
+						var translate=_status.draggingtouchdialog._dragtransform;
+						translate[0]+=dx;
+						translate[1]+=dy;
+						_status.draggingtouchdialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
+
+						delete _status.draggingtouchdialog._dragorigin;
+					}
+					_status.clicked=false;
+					delete _status.draggingtouchdialog;
+					_status.justdragged=true;
+					setTimeout(function(){
+						_status.justdragged=false;
+					},500);
 				}
 				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging){
 					 if(get.currentTime()-_status._swipeorigin.time<500){
@@ -16813,7 +16880,9 @@
 				if(_status.dragged) return;
 				if(_status.clicked) return;
 				if(_status.tempNoButton) return;
+				if(_status.draggingtouchdialog) return;
 				if(this.classList.contains('noclick')) return;
+				if(_status.justdragged) return;
 				_status.clicked=true;
 				var custom=_status.event.custom;
 				if(custom.replace.button){
@@ -17396,6 +17465,7 @@
 			},
 			touchScroll:function(e) {
 				if(_status.mousedragging) return;
+				if(_status.draggingtouchdialog) return;
 				if(!_status.dragged){
 					if (Math.abs(e.touches[0].clientX - this.startX) > 10 ||
 						Math.abs(e.touches[0].clientY - this.startY) > 10) {
@@ -18778,7 +18848,7 @@
 		},
 		owner:function(card){
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].get('hej').contains(card)||game.players[i].judging==card)
+				if(game.players[i].get('hej').contains(card)||game.players[i].judging[0]==card)
 					return game.players[i];
 			}
 			for(var i=0;i<game.players.length;i++){

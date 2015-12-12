@@ -1175,13 +1175,14 @@ character.hearth={
 				}
 				if(player.storage.mdzhoufu3.isAlive()){
 					// player.storage.mdzhoufu3.draw();
-					player.storage.mdzhoufu3.gain(player.judging,'gain2');
+					player.storage.mdzhoufu3.gain(player.judging[0],'gain2');
 				}
 				else{
+					ui.discardPile.appendChild(player.judging[0]);
 					game.delay(1.5);
 				}
 				"step 1"
-				player.judging=player.storage.mdzhoufu2;
+				player.judging[0]=player.storage.mdzhoufu2;
 				trigger.position.appendChild(player.storage.mdzhoufu2);
 				// trigger.untrigger();
 				game.log(player,'的判定牌改为',player.storage.mdzhoufu2);

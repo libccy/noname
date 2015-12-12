@@ -221,7 +221,7 @@ character.extra={
 				player.chooseCard('是否弃置一枚“忍”，并发动【鬼才】？').ai=function(card){
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
-					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
+					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
 					var attitude=ai.get.attitude(player,trigger.player);
 					if(attitude==0||result==0) return 0;
 					if(attitude>0){
@@ -243,12 +243,12 @@ character.extra={
 					player.logSkill('jilue_guicai');
 					player.storage.renjie--;
 					player.updateMarks();
-					if(trigger.player.judging.clone){
-						trigger.player.judging.clone.delete();
-						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging.clone]));
+					if(trigger.player.judging[0].clone){
+						trigger.player.judging[0].clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 					}
-					ui.discardPile.appendChild(trigger.player.judging);
-					trigger.player.judging=result.cards[0];
+					ui.discardPile.appendChild(trigger.player.judging[0]);
+					trigger.player.judging[0]=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
 					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 					game.delay(2);

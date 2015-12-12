@@ -390,13 +390,13 @@ character.sp={
 			content:function(){
 				"step 0"
 				var list=player.storage.yishe;
-				var dialog=ui.create.dialog(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+get.translation(trigger.player.judging)+
+				var dialog=ui.create.dialog(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+get.translation(trigger.player.judging[0])+
 					'，是否发动【米道】？',list,'hidden');
 				player.chooseButton(dialog,function(button){
 					var card=button.link;
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
-					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
+					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
 					var attitude=ai.get.attitude(player,trigger.player);
 					return result*attitude;
 				});
@@ -418,8 +418,8 @@ character.sp={
 				"step 2"
 				if(event.card){
 					player.logSkill('midao',trigger.player);
-					ui.discardPile.appendChild(trigger.player.judging);
-					trigger.player.judging=event.card;
+					ui.discardPile.appendChild(trigger.player.judging[0]);
+					trigger.player.judging[0]=event.card;
 					trigger.position.appendChild(event.card);
 					game.log(trigger.player,'的判定牌改为',event.card);
 					event.card.expired=true;
@@ -1189,7 +1189,7 @@ character.sp={
 					game.delay(1.5);
 				}
 				"step 1"
-				player.judging=player.storage.zhoufu2;
+				player.judging[0]=player.storage.zhoufu2;
 				trigger.position.appendChild(player.storage.zhoufu2);
 				// trigger.untrigger();
 				game.log(player,'的判定牌改为',player.storage.zhoufu2);
@@ -2518,7 +2518,7 @@ character.sp={
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)<=0) return false;
 				var cards=player.get('he');
-				var judge=event.judge(event.player.judging);
+				var judge=event.judge(event.player.judging[0]);
 				for(var i=0;i<cards.length;i++){
 					// console.log(event.judge(cards[i]),judge,ai.get.useful(cards[i]));
 					var judge2=event.judge(cards[i]);
@@ -2530,7 +2530,7 @@ character.sp={
 			content:function(){
 				"step 0"
 				var target=trigger.player;
-				var judge=trigger.judge(target.judging);
+				var judge=trigger.judge(target.judging[0]);
 				var attitude=ai.get.attitude(target,player);
 				target.choosePlayerCard('请选择代替判定的牌','he','visible',true,player).ai=function(button){
 					var card=button.link;
@@ -2564,12 +2564,12 @@ character.sp={
 				}
 				"step 2"
 				if(result.bool){
-					if(trigger.player.judging.clone){
-						trigger.player.judging.clone.delete();
-						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging.clone]));
+					if(trigger.player.judging[0].clone){
+						trigger.player.judging[0].clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[[0]].clone]));
 					}
-					ui.discardPile.appendChild(trigger.player.judging);
-					trigger.player.judging=event.card;
+					ui.discardPile.appendChild(trigger.player.judging[0]);
+					trigger.player.judging[0]=event.card;
 					game.delay(2);
 				}
 			},
@@ -3536,7 +3536,7 @@ character.sp={
 		duanxie_info:'出牌阶段限一次，你可以令一名其他角色横置武将牌，若如此做，你横置武将牌。',
 		xiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌并令你摸一张牌；2.受到你对其造成的1点伤害。',
 		sijian_info:'当你失去最后的手牌时，你可以弃置一名其他角色的一张牌。',
-		suishi_info:'锁定技。当一名其他角色进入濒死状态时，你摸一张牌；其他与你势力相同的角色死亡时，你失去1点体力。',
+		suishi_info:'锁定技。当一名其他角色进入濒死状态时，你摸一张牌；当一名其他角色死亡时，你失去1点体力。',
 		quji_info:'出牌阶段限一次，你可以弃置X张牌（X为你已损失的体力值），然后令至多X名已受伤的角色各回复1点体力。若你以此法弃置的牌中有黑色牌，你失去一点体力。',
 		junbing_info:'一名角色的结束阶段开始时，若其手牌数少于或者等于1，该角色可以摸一张牌。若如此做，该角色须将所有手牌交给你，然后你交给其等量的牌。',
 		shefu_info:'结束阶段开始时，你可以将一张手牌移出游戏，称为“伏兵”。然后为“伏兵”记录一个基本牌或锦囊牌名称(须与其他“伏兵”记录的名称均不同)。你的回合外，当有其他角色使用与你记录的“伏兵”牌名相同的牌时，你可以令此牌无效，然后将该“伏兵”置入弃牌堆。',

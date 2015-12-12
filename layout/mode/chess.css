@@ -19,6 +19,7 @@
     top:0;
     overflow:scroll;
     text-align:center;
+    position: absolute;
 }
 #chess{
     margin-top:36px;

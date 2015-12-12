@@ -3073,10 +3073,10 @@ character.swd={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging)+'，是否发动【天道】？','he').ai=function(card){
+				get.translation(trigger.player.judging[0])+'，是否发动【天道】？','he').ai=function(card){
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
-					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
+					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
 					var attitude=ai.get.attitude(player,trigger.player);
 					if(attitude==0||result==0) return 0;
 					if(attitude>0){
@@ -3096,9 +3096,9 @@ character.swd={
 				"step 2"
 				if(result.bool){
 					player.logSkill('tiandao');
-					player.$gain2(trigger.player.judging);
-					player.gain(trigger.player.judging);
-					trigger.player.judging=result.cards[0];
+					player.$gain2(trigger.player.judging[0]);
+					player.gain(trigger.player.judging[0]);
+					trigger.player.judging[0]=result.cards[0];
 					trigger.position.appendChild(result.cards[0]);
 					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 				}
@@ -6309,13 +6309,13 @@ character.swd={
 				for(var i=0;i<game.players.length;i++){
 					list=list.concat(game.players[i].get('j'));
 				}
-				var dialog=ui.create.dialog(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+get.translation(trigger.player.judging)+
+				var dialog=ui.create.dialog(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+get.translation(trigger.player.judging[0])+
 					'，是否发动【天轮】？',list,'hidden');
 				player.chooseButton(dialog,function(button){
 					var card=button.link;
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
-					var result=trigger.judge(card)-trigger.judge(trigger.player.judging);
+					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
 					var attitude=ai.get.attitude(player,trigger.player);
 					return result*attitude;
 				});
@@ -6332,8 +6332,8 @@ character.swd={
 				"step 2"
 				if(event.card){
 					player.logSkill('tianlun',trigger.player);
-					ui.discardPile.appendChild(trigger.player.judging);
-					trigger.player.judging=event.card;
+					ui.discardPile.appendChild(trigger.player.judging[0]);
+					trigger.player.judging[0]=event.card;
 					trigger.position.appendChild(event.card);
 					game.log(trigger.player,'的判定牌改为',event.card);
 					event.card.expired=true;
