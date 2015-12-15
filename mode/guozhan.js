@@ -1,6 +1,30 @@
 'use strict';
 mode.guozhan={
 	game:{
+		addRecord:function(bool){
+			if(typeof bool=='boolean'){
+				var data=lib.config.gameRecord.guozhan.data;
+				var identity=game.me.identity;
+				if(!data[identity]){
+					data[identity]=[0,0];
+				}
+				if(bool){
+					data[identity][0]++;
+				}
+				else{
+					data[identity][1]++;
+				}
+				var list=['wei','shu','wu','qun','ye'];
+				var str='';
+				for(var i=0;i<list.length;i++){
+					if(data[list[i]]){
+						str+=lib.translate[list[i]+'2']+'：'+data[list[i]][0]+'胜'+' '+data[list[i]][1]+'负<br>';
+					}
+				}
+				lib.config.gameRecord.guozhan.str=str;
+				game.saveConfig('gameRecord',lib.config.gameRecord);
+			}
+		},
 		getIdentityList:function(player){
 			if(!player.isUnseen()) return;
 			if(player==game.me) return;
@@ -431,6 +455,11 @@ mode.guozhan={
 	translate:{
 		change_identity_config:'自由选择座位',
 		ye:'野',
+		ye2:'野心家',
+		wei2:'魏国',
+		shu2:'蜀国',
+		wu2:'吴国',
+		qun2:'群雄',
 		unknown:'无名氏',
 		unknown0:'一号位',
 		unknown1:'二号位',

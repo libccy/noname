@@ -198,6 +198,7 @@ window.config={
 	glow_phase:'yellow',
 
 	skin:{},
+	gameRecord:{},
 	hiddenModePack:[],
 	hiddenCharacterPack:[],
 	hiddenCardPack:[],

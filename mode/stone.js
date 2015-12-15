@@ -1335,7 +1335,7 @@ mode.stone={
 			fullskin:true,
 			type:'stonecard',
 			enable:true,
-			stoneact:3,
+			stoneact:2,
 			filterTarget:function(card,player,target){
 				return target.isMin();
 			},

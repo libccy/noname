@@ -11,6 +11,30 @@ mode.versus={
 			];
 			return name;
 		},
+		addRecord:function(bool){
+			if(typeof bool=='boolean'){
+				var data=lib.config.gameRecord.versus.data;
+				var identity=get.cnNumber(lib.storage.number)+'人';
+				if(!data[identity]){
+					data[identity]=[0,0];
+				}
+				if(bool){
+					data[identity][0]++;
+				}
+				else{
+					data[identity][1]++;
+				}
+				var list=['一人','两人','三人'];
+				var str='';
+				for(var i=0;i<list.length;i++){
+					if(data[list[i]]){
+						str+=list[i]+'：'+data[list[i]][0]+'胜'+' '+data[list[i]][1]+'负<br>';
+					}
+				}
+				lib.config.gameRecord.versus.str=str;
+				game.saveConfig('gameRecord',lib.config.gameRecord);
+			}
+		},
 		start:function(){
 			var next=game.createEvent('game',false);
 			next.content=function(){

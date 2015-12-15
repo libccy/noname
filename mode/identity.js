@@ -44,6 +44,33 @@ mode.identity={
 			];
 			return name;
 		},
+		addRecord:function(bool){
+			if(typeof bool=='boolean'){
+				var data=lib.config.gameRecord.identity.data;
+				var identity=game.me.identity;
+				if(identity=='mingzhong'){
+					identity='zhong';
+				}
+				if(!data[identity]){
+					data[identity]=[0,0];
+				}
+				if(bool){
+					data[identity][0]++;
+				}
+				else{
+					data[identity][1]++;
+				}
+				var list=['zhu','zhong','nei','fan'];
+				var str='';
+				for(var i=0;i<list.length;i++){
+					if(data[list[i]]){
+						str+=lib.translate[list[i]+'2']+'：'+data[list[i]][0]+'胜'+' '+data[list[i]][1]+'负<br>';
+					}
+				}
+				lib.config.gameRecord.identity.str=str;
+				game.saveConfig('gameRecord',lib.config.gameRecord);
+			}
+		},
 		start:function(){
 			var next=game.createEvent('game',false);
 			next.content=function(){

@@ -22,6 +22,7 @@
 			'双指拖动对话框',
 			'对决模式调整',
 			'炉石构筑模式',
+			'战绩',
 			'金币系统（在选项－玩法中开启，暂无实际用途）',
 		],
 		configprefix:'noname_0.9_',
@@ -1221,6 +1222,18 @@
 							game.saveConfig('plays',lib.config.plays);
 						}
 					},
+					coin_display_playpackconfig:{
+						name:'金币显示',
+						init:'text',
+						item:{
+							symbol:'符号',
+							text:'文字'
+						},
+						onclick:function(item){
+							game.saveConfig('coin_display_playpackconfig',item);
+							if(game.changeCoin) game.changeCoin(0);
+						}
+					},
 					update:function(config,map){
 						for(var i in map){
 							if(i.indexOf('_playpackconfig')!=-1){
@@ -2335,11 +2348,11 @@
 			'<li>法师：对一名随从造成一点火焰伤害'+
 			'<li>医生：回复一点体力'+
 			'<li>战士：获得一点护甲，摸一张牌'+
-			'<li>术士：弃置一张牌并从牌库中摸两张牌'+
-			'<li>游侠：装备一把武器和一匹-1马'+
+			'<li>术士：牌库中摸两张牌'+
+			'<li>装备一把武器和一个随机非武器装备'+
 			'<li>谋士：召唤一名士兵'+
-			'<li>猎人：弃置一张牌并对敌方主将造成一点伤害'+
-			'<li>蛮人：视为使用一张杀，此杀无视距离和防具且不计入出杀限制</ul>'+
+			'<li>猎人：对敌方主将造成一点伤害'+
+			'<li>蛮人：视为使用一张不计入出杀次数的杀</ul>'+
 			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗'+
 			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
 			'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
@@ -2547,10 +2560,17 @@
 					lib.config.all.plays.push(i);
 					lib.translate[i+'_play_config']=play.pack[i];
 				}
+
+				if(!lib.config.gameRecord){
+					lib.config.gameRecord={};
+				}
 				for(i in mode.pack){
 					if(lib.config.hiddenModePack.indexOf(i)==-1){
 						lib.config.all.mode.push(i);
 						lib.translate[i]=mode.pack[i];
+						if(!lib.config.gameRecord[i]){
+							lib.config.gameRecord[i]={data:{}};
+						}
 					}
 				}
 				if(background&&background.pack){
@@ -11055,6 +11075,17 @@
 				delete ui.swap;
 			}
 			if(game.onOver) game.onOver(result);
+			if(game.addRecord){
+				if(result=='战斗胜利'){
+					game.addRecord(true);
+				}
+				else if(result=='战斗失败'){
+					game.addRecord(false);
+				}
+				else{
+					game.addRecord();
+				}
+			}
 		},
 		loop:function(){
 			var event=_status.event;
@@ -15193,6 +15224,37 @@
 								// 	clickContainer.call(menuContainer);
 								// }
 							});
+						}());
+						(function(){
+							var page=ui.create.div('');
+							var node=ui.create.div('.menubutton.large','战绩',start.firstChild,clickMode);
+							node.type='rec';
+							node.link=page;
+							page.style.paddingBottom='10px';
+							var reset=function(){
+								if(this.innerHTML=='重置'){
+									this.innerHTML='确定';
+									var that=this;
+									setTimeout(function(){
+										that.innerHTML='重置';
+									},1000);
+								}
+								else{
+									this.parentNode.previousSibling.remove();
+									this.parentNode.remove();
+									delete lib.config.gameRecord[this.parentNode.link];
+									game.saveConfig('gameRecord',lib.config.gameRecord);
+								}
+							}
+							for(var i=0;i<lib.config.all.mode.length;i++){
+								if(lib.config.gameRecord[lib.config.all.mode[i]].str){
+									ui.create.div('.config.indent',lib.translate[lib.config.all.mode[i]],page).style.marginBottom='-5px';
+									var item=ui.create.div('.config.indent',lib.config.gameRecord[lib.config.all.mode[i]].str+'<span>重置</span>',page);
+									item.style.height='auto';
+									item.lastChild.addEventListener('click',reset);
+									item.link=lib.config.all.mode[i];
+								}
+							}
 						}());
 						(function(){
 							if(!window.indexedDB) return;

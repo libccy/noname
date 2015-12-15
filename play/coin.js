@@ -1,3 +1,4 @@
+'use strict';
 play.coin={
 	init:function(){
 		if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
@@ -7,14 +8,28 @@ play.coin={
 	arenaReady:function(){
         if(_status.video) return;
 		if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
-			ui.coin=ui.create.system('<span style="position:absolute">㉤</span><span style="margin-left:18px;font-family:xinwei;line-height:10px">'+lib.config.coin+'</span>',null,true);
+			var str;
+			if(lib.config.coin_display_playpackconfig=='text'){
+				str='<span>'+lib.config.coin+'</span><span>金</span>'
+			}
+			else{
+				str='<span style="position:absolute">㉤</span><span style="margin-left:18px;font-family:xinwei;line-height:10px">'+lib.config.coin+'</span>';
+			}
+			ui.coin=ui.create.system(str,null,true);
 		}
     },
 	game:{
 		changeCoin:function(num){
 			if(typeof num=='number'&&ui.coin){
 				game.saveConfig('coin',lib.config.coin+num);
-				ui.coin.lastChild.innerHTML=lib.config.coin;
+				var str;
+				if(lib.config.coin_display_playpackconfig=='text'){
+					str='<span>'+lib.config.coin+'</span><span>金</span>'
+				}
+				else{
+					str='<span style="position:absolute">㉤</span><span style="margin-left:18px;font-family:xinwei;line-height:10px">'+lib.config.coin+'</span>';
+				}
+				ui.coin.innerHTML=str;
 			}
 		},
 	},
