@@ -241,6 +241,7 @@ window.config={
 	modeconfig:false,
 	gameconfig:false,
 	appearence:false,
+	target_shake:true,
 	video:'20',
 	coin:0,
 

@@ -881,6 +881,20 @@
 						init:true,
 						unfrequent:true,
 					},
+					target_shake:{
+						name:'出牌抖动',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('target_shake',bool);
+							if(bool){
+								ui.arena.classList.remove('no_target_shake');
+							}
+							else{
+								ui.arena.classList.add('no_target_shake');
+							}
+						}
+					},
 					button_press:{
 						name:'按钮效果',
 						init:true,
@@ -12951,6 +12965,9 @@
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
+				if(!lib.config.target_shake){
+					ui.arena.classList.add('no_target_shake');
+				}
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
 				ui.arena.dataset.global_font=lib.config.global_font||'default';
@@ -17493,6 +17510,7 @@
 			},
 			auto:function(){
 				if(ui.auto.classList.contains('hidden')) return;
+				if(_status.paused2) return;
 				if(!_status.auto){
 					_status.auto=true;
 					// ui.auto.innerHTML='手动';
