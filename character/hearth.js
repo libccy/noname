@@ -789,22 +789,20 @@ character.hearth={
 			}
 		},
 		zhanhou:{
-			init:function(player){
-				player.forcemin=true;
-			},
 			enable:'phaseUse',
-			filterCard:{type:'equip'},
+			filterCard:{subtype:'equip2'},
+			position:'he',
 			filter:function(event,player){
-				return player.num('h',{type:'equip'})>0;
+				return player.num('he',{subtype:'equip2'})>0;
 			},
-			check:function(){
-				return 1;
+			check:function(card){
+				return 7-ai.get.value(card);
 			},
 			content:function(){
 				player.changeHujia();
 			},
 			ai:{
-				order:2,
+				order:9.5,
 				result:{
 					player:1
 				}
@@ -2281,7 +2279,7 @@ character.hearth={
 		fengxian:'奉献',
 		fengxian_info:'出牌阶段限一次，你可以令场上所有角色各弃置一张手牌',
 		zhanhou:'战吼',
-		zhanhou_info:'锁定技，你没有装备区，你可以弃置一张装备牌并获得一点护甲值',
+		zhanhou_info:'出牌阶段限一次，你可以弃置一张防具牌并获得一点护甲值',
 		anying:'暗影',
 		anying_info:'限定技，出牌阶段，你可以弃置两张黑色牌，失去技能圣光，并获得技能心刺',
 		shijie:'视界',

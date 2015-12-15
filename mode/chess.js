@@ -90,7 +90,7 @@ mode.chess={
 					this.chessFocus();
 				}
 
-				if(get.config('chess_mode')=='tafang'&&!_status.video){
+				if(_status.mode=='tafang'&&!_status.video){
 					if(_status.tafangend.contains(this.dataset.position)){
 						if(_status.enemies.contains(this)){
 							game.over(false);
@@ -331,7 +331,7 @@ mode.chess={
 						return;
 					}
 				}
-				if(get.config('chess_mode')=='tafang'){
+				if(_status.mode=='tafang'){
 					if(_status.friends.length==0&&ui.fakeme){
 						ui.fakeme.hide();
 						this.node.handcards1.delete();
@@ -562,7 +562,7 @@ mode.chess={
 					var randomMove=['moveUp','moveDown','moveLeft','moveRight'];
 					for(var iwhile=0;iwhile<num;iwhile++){
 						var targets=[];
-						if(get.config('chess_mode')=='tafang'&&_status.enemies.contains(player)){
+						if(_status.mode=='tafang'&&_status.enemies.contains(player)){
 							var targets2=[];
 							for(var i=0;i<ui.chesswidth;i++){
 								var tafangdes=ui.chesswidth*(ui.chessheight-1)+i;
@@ -688,8 +688,8 @@ mode.chess={
 		treasures:[],
 		obstacles:[],
 		getVideoName:function(){
-			var str='战棋'+get.translation(get.config('chess_mode'))+' - '+_status.friendCount+'v'+_status.enemyCount;
-			if(get.config('chess_mode')=='tafang'){
+			var str='战棋'+get.translation(_status.mode)+' - '+_status.friendCount+'v'+_status.enemyCount;
+			if(_status.mode=='tafang'){
 				str='战棋 - 塔防';
 			}
 			var name=[get.translation(game.me.name),str];
@@ -811,7 +811,7 @@ mode.chess={
 		},
 		addOverDialog:function(dialog,result){
 			dialog.classList.add('center');
-			if(get.config('chess_mode')!='leader') return;
+			if(_status.mode!='leader') return;
 			if(result=='战斗胜利'){
 				_status.victory=true;
 				if(!_status.enterArena){
@@ -836,7 +836,7 @@ mode.chess={
 		},
 		controlOver:function(){
 			ui.create.control('返回',game.reload);
-			if(get.config('chess_mode')!='leader') return;
+			if(_status.mode!='leader') return;
 			if(_status.enterArena){
 				game.data.arena.acted.length=0;
 				if(_status.victory){
@@ -1539,6 +1539,7 @@ mode.chess={
 					_status.waitingForCharacters=true;
 					game.pause();
 				}
+				_status.mode=get.config('chess_mode');
 				"step 1"
 				for(var i in lib.skill){
 					if(lib.skill[i].changeSeat){
@@ -1554,7 +1555,7 @@ mode.chess={
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				lib.treasurelist=[];
 				lib.mechlist=[];
-				if(get.config('chess_character')||playback||get.config('chess_mode')=='leader'){
+				if(get.config('chess_character')||playback||_status.mode=='leader'){
 					for(var i in lib.characterPack.mode_chess){
 						if(i.indexOf('treasure_')==0){
 							lib.treasurelist.push(i);
@@ -1562,7 +1563,7 @@ mode.chess={
 						else if(i.indexOf('chess_mech_')==0){
 							lib.mechlist.push(i);
 						}
-						if(!playback&&i.indexOf('leader_')==0&&get.config('chess_mode')!='leader') continue;
+						if(!playback&&i.indexOf('leader_')==0&&_status.mode!='leader') continue;
 						lib.character[i]=lib.characterPack.mode_chess[i];
 						if(!lib.character[i][4]){
 							lib.character[i][4]=[];
@@ -1572,7 +1573,7 @@ mode.chess={
 				if(get.config('chess_card')){
 					lib.card.list=lib.card.list.concat(lib.chess_cardlist);
 				}
-				if(parseFloat(get.config('chess_obstacle'))>0&&get.config('chess_mode')!='tafang'){
+				if(parseFloat(get.config('chess_obstacle'))>0&&_status.mode!='tafang'){
 					lib.card.list=lib.card.list.concat(lib.chess_obstaclelist);
 					delete lib.chess_obstaclelist
 				}
@@ -1610,7 +1611,7 @@ mode.chess={
 					}
 				}
 				else{
-					switch(get.config('chess_mode')){
+					switch(_status.mode){
 						case 'leader':{
 							game.leaderView();
 							break;
@@ -1665,14 +1666,14 @@ mode.chess={
 				var	num=Math.round((_status.mylist.length+_status.enemylist.length)/2);
 				var friend,enemy;
 				var side;
-				if(get.config('chess_mode')=='leader'){
+				if(_status.mode=='leader'){
 					side=true;
 				}
 				else{
 					side=Math.random()<0.5;
 				}
 
-				if(get.config('chess_mode')=='tafang'){
+				if(_status.mode=='tafang'){
 					ui.chesswidth=parseInt(get.config('tafang_size'));
 					ui.chessheight=11;
 				}
@@ -1772,7 +1773,7 @@ mode.chess={
 				event.obs=[];
 				if(!event.video){
 					var tafanglist=[0,2,3,5,6,8,9,11,12];
-					if(get.config('chess_mode')=='tafang'){
+					if(_status.mode=='tafang'){
 						for(var i=0;i<ui.chessheight-1;i++){
 							for(var j=0;j<ui.chesswidth;j++){
 								if(i>=8&&j!=0&&j!=ui.chesswidth-1) continue;
@@ -1936,7 +1937,7 @@ mode.chess={
 					game.addVideo('initobs',null,event.obs);
 				}
 
-				if(get.config('chess_mode')=='tafang'){
+				if(_status.mode=='tafang'){
 					ui.me.querySelector('.fakeme.player').hide();
 					ui.me.querySelector('.fakeme.avatar').hide();
 
@@ -1980,7 +1981,7 @@ mode.chess={
 					event.trigger('gameStart');
 					game.gameDraw(p);
 					game.me.classList.add('current_action');
-					if(get.config('chess_mode')=='leader'){
+					if(_status.mode=='leader'){
 						game.phaseLoopOrdered(p);
 					}
 					else if(get.config('chess_ordered')){
@@ -2074,12 +2075,12 @@ mode.chess={
 					concat(lib.rank.bm).
 					concat(lib.rank.c).
 					concat(lib.rank.d);
-				lib.rank.common=[];
+				lib.rank.rarity.common=[];
 				for(var i=0;i<lib.rank.all.length;i++){
-					if(!lib.rank.legend.contains(lib.rank.all[i])&&
-						!lib.rank.epic.contains(lib.rank.all[i])&&
-						!lib.rank.rare.contains(lib.rank.all[i])){
-						lib.rank.common.push(lib.rank.all[i]);
+					if(!lib.rank.rarity.legend.contains(lib.rank.all[i])&&
+						!lib.rank.rarity.epic.contains(lib.rank.all[i])&&
+						!lib.rank.rarity.rare.contains(lib.rank.all[i])){
+						lib.rank.rarity.common.push(lib.rank.all[i]);
 					}
 				}
 				delete window.characterRank;
@@ -2251,7 +2252,7 @@ mode.chess={
 					return aa>bb?1:-1;
 				});
 				if(game.data.character.length==0||!game.data.challenge){
-					game.data.character=lib.rank.common.randomGets(3);
+					game.data.character=lib.rank.rarity.common.randomGets(3);
 					game.data.challenge=game.getLeaderList();
 					game.saveData();
 				}
@@ -2594,7 +2595,7 @@ mode.chess={
 							case 'epic':_status.challengeMoney=400;break;
 							case 'legend':_status.challengeMoney=1600;break;
 						}
-						var rank=game.getRank(_status.challenge);
+						var rank=get.rank(_status.challenge);
 						var total=Math.max(2,_status.mylist.length-1);
 						var list;
 						switch(rank){
@@ -2654,7 +2655,7 @@ mode.chess={
 					var numdel=_status.enemylist.length-_status.mylist.length;
 					var reward=0;
 					for(var i=0;i<_status.enemylist.length;i++){
-						switch(game.getRank(_status.enemylist[i])){
+						switch(get.rank(_status.enemylist[i])){
 							case 's':reward+=50;break;
 							case 'ap':reward+=40;break;
 							case 'a':reward+=32;break;
@@ -2675,7 +2676,7 @@ mode.chess={
 					}
 					var punish=0;
 					for(var i=0;i<_status.mylist.length;i++){
-						switch(game.getRank(_status.mylist[i])){
+						switch(get.rank(_status.mylist[i])){
 							case 's':punish+=25;break;
 							case 'ap':punish+=20;break;
 							case 'a':punish+=16;break;
@@ -3410,20 +3411,6 @@ mode.chess={
 		saveData:function(){
 			game.save(get.config('chess_leader_save'),game.data);
 		},
-		getRank:function(name){
-			if(name==_status.lord) return 'ap';
-			var rank=lib.rank;
-			if(rank.s.contains(name)) return 's';
-			if(rank.ap.contains(name)) return 'ap';
-			if(rank.a.contains(name)) return 'a';
-			if(rank.am.contains(name)) return 'am';
-			if(rank.bp.contains(name)) return 'bp';
-			if(rank.b.contains(name)) return 'b';
-			if(rank.bm.contains(name)) return 'bm';
-			if(rank.c.contains(name)) return 'c';
-			if(rank.d.contains(name)) return 'd';
-			return 'x';
-		},
 		getLeaderList:function(){
 			var list=lib.rank.all.slice(0);
 			for(var i=0;i<game.data.character.length;i++){
@@ -3445,13 +3432,13 @@ mode.chess={
 			if(Math.random()<pleg){
 				game.data.legend=0;
 				game.saveData();
-				return lib.rank.legend.randomGet();
+				return lib.rank.rarity.legend.randomGet();
 			}
 			game.data.legend++;
 			game.saveData();
-			if(Math.random()<0.05) return lib.rank.epic.randomGet();
-			if(Math.random()<0.3) return lib.rank.rare.randomGet();
-			return lib.rank.common.randomGet();
+			if(Math.random()<0.05) return lib.rank.rarity.epic.randomGet();
+			if(Math.random()<0.3) return lib.rank.rarity.rare.randomGet();
+			return lib.rank.rarity.common.randomGet();
 		},
 		changeMoney:function(num){
 			game.data.money+=num;
@@ -3464,7 +3451,7 @@ mode.chess={
 			ui.money.childNodes[1].innerHTML=game.data.dust;
 		},
 		getRarity:function(name){
-			var rank=lib.rank;
+			var rank=lib.rank.rarity;
 			if(rank.legend.contains(name)) return 'legend';
 			if(rank.epic.contains(name)) return 'epic';
 			if(rank.rare.contains(name)) return 'rare';
@@ -3694,6 +3681,9 @@ mode.chess={
 
 
 				_status.mylist=result.links.slice(0);
+				if(ui.coin){
+					_status.coinCoeff=get.coinCoeff(_status.mylist);
+				}
 				for(var i=0;i<result.links.length;i++){
 					event.list.remove(result.links[i]);
 				}
@@ -4937,7 +4927,7 @@ mode.chess={
 			delay:false,
 			preservecancel:true,
 			filter:function(event,player){
-				if(get.config('chess_mode')=='tafang') return false;
+				if(_status.mode=='tafang') return false;
 				var num=0;
 				var xy=player.getXY();
 				if(game.obstacles.contains(player.getNeighbour(-1,0))||xy[0]==0) num++;
@@ -5066,7 +5056,7 @@ mode.chess={
 				order:5,
 				result:{
 					playerx:function(player){
-						if(get.config('chess_mode')=='tafang'&&_status.enemies.contains(player)){
+						if(_status.mode=='tafang'&&_status.enemies.contains(player)){
 							return 1;
 						}
 						var nh=player.num('h');
@@ -5444,7 +5434,7 @@ mode.chess={
 		create:{
 			playergrid:function(player,x,y){
 				var pos=player.getDataPos(x,y);
-				if(get.config('chess_mode')=='tafang'){
+				if(_status.mode=='tafang'){
 					if(pos<ui.chesswidth) return false;
 					if(pos/ui.chesswidth>=ui.chessheight-1) return false;
 				}
@@ -5763,6 +5753,188 @@ mode.chess={
 		['heart',8,'chess_chuzhang'],
 		// ['diamond',9,'chess_chuzhang'],
 	],
+	rank:{
+		rarity:{
+	        legend:[
+	            'swd_muyun',
+	            'shen_caocao',
+	            'swd_zhaoyun',
+	            'swd_septem',
+	            'hs_sthrall',
+	            'hs_malorne',
+	            'swd_yuwentuo',
+	            'swd_duguningke',
+	            'swd_guyue',
+	            'swd_yuxiaoxue',
+	            'swd_huanglei',
+	            'pal_liumengli',
+	            'pal_yuntianhe',
+	            'swd_xuanyuanjianxian',
+	            'diaochan',
+	            'gjqt_aruan',
+	            'hs_neptulon',
+	            'shen_lvbu',
+	            'swd_qi',
+	            'swd_huzhongxian',
+	            'jg_liubei',
+	            'hs_medivh',
+	            'shen_zhugeliang',
+	            'yxs_wuzetian',
+	            'sp_pangtong',
+	            'swd_murongshi',
+	            'shen_lvmeng',
+	            'chenlin',
+	            'hs_zhouzhuo',
+	            'diy_caiwenji',
+	            're_luxun',
+	            'shen_zhaoyun',
+	            'zhangchunhua',
+	            'shen_zhouyu',
+	            'shen_simayi',
+	            'shen_guanyu',
+	            'hs_siwangzhiyi',
+	        ],
+	        epic:[
+	            'xk_fujianhan',
+	            'diy_zhenji',
+	            'swd_jipeng',
+	            'swd_cheyun',
+	            'pal_xuanxiao',
+	            'old_zhonghui',
+	            'swd_tuobayuer',
+	            'gjqt_bailitusu',
+	            'xunyu',
+	            'swd_jiliang',
+	            'liuxie',
+	            'hs_totemic',
+	            'zhangxingcai',
+	            'swd_muyue',
+	            'pal_zixuan',
+	            'hs_bchillmaw',
+	            'swd_lanyin',
+	            'gjqt_xiayize',
+	            'hs_edwin',
+	            'hs_antonidas',
+	            'swd_chenjingchou',
+	            'yxs_yangyuhuan',
+	            'gjqt_fengqingxue',
+	            'pal_xuejian',
+	            'xunyou',
+	            're_daqiao',
+	            're_zhouyu',
+	            'hs_wvelen',
+	            'zhugeke',
+	            'jg_xiahouyuan',
+	            'swd_kama',
+	            'swd_anka',
+	            'xk_guyuexuan',
+	            'caozhi',
+	            'wuguotai',
+	            'yxs_aijiyanhou',
+	            'swd_zhiyin',
+	            're_guanyu',
+	            'sp_diaochan',
+	            'swd_huanyuanzhi',
+	            'swd_kangnalishi',
+	            're_huanggai',
+	            'hs_alakir',
+	            'swd_xiarou',
+	            'pal_murongziying',
+	            'swd_wangsiyue',
+	            'gjqt_fanglansheng',
+	            'swd_qiner',
+	            'hs_xsylvanas',
+	        ],
+	        rare:[
+	            'yxs_diaochan',
+	            'hs_anduin',
+	            'swd_hengai',
+	            'hs_wuther',
+	            'jg_pangtong',
+	            'lusu',
+	            'bulianshi',
+	            'swd_shuijing',
+	            'swd_sikongyu',
+	            'zhangliao',
+	            'liufeng',
+	            'diy_yuji',
+	            're_zhangliao',
+	            'caoang',
+	            'pal_jingtian',
+	            'swd_shanxiaoxiao',
+	            'yxs_caocao',
+	            'jianyong',
+	            'manchong',
+	            'swd_linyue',
+	            'swd_xuanyuanjiantong',
+	            'swd_maixing',
+	            'diy_xuhuang',
+	            'dengai',
+	            'hs_jaina',
+	            'zhonghui',
+	            'gjqt_xiangling',
+	            'zhugejin',
+	            'swd_jiuyou',
+	            'diy_zhouyu',
+	            'pal_changqing',
+	            'swd_yuchiyanhong',
+	            'swd_duopeng',
+	            'swd_yuli',
+	            'swd_rongshuang',
+	            'taishici',
+	            'pal_zhaoliner',
+	            're_machao',
+	            'zhanghe',
+	            'zhangzhang',
+	            'xin_fazheng',
+	            'caochong',
+	            'caifuren',
+	            'jg_caozhen',
+	            'jg_zhanghe',
+	            'xin_masu',
+	            'swd_situqiang',
+	            'hs_malfurion',
+	            'yxs_bole',
+	            'yj_jushou',
+	            'gjqt_yuewuyi',
+	            'hs_mijiaojisi',
+	            'yxs_mozi',
+	            'gjqt_hongyu',
+	            'hs_waleera',
+	            'zhangsong',
+	            'sp_dongzhuo',
+	            'jiangwei',
+	            'swd_chunyuheng',
+	            'hetaihou',
+	            'swd_jiangziya',
+	            'liushan',
+	            'zhugedan',
+	            'sp_zhaoyun',
+	            're_huatuo',
+	            'swd_nicole',
+	            'sp_jiangwei',
+	            'swd_zhuoshanzhu',
+	            'swd_shaowei',
+	            'caopi',
+	            'jiaxu',
+	            'maliang',
+	            'lingtong',
+	            'wangyi',
+	            'chenqun',
+	            'mifuren',
+	            'pal_linyueru',
+	            'jg_simayi',
+	            'jg_huangyueying',
+	            'jg_zhugeliang',
+	            'swd_jialanduo',
+	            'sp_machao',
+	            'caiwenji',
+	            'hs_yngvar',
+	            're_xushu',
+	            're_huangyueying',
+	        ],
+	    }
+	},
 	posmap:{},
 	help:{},
 }

@@ -40,6 +40,7 @@ play.pack={
     soldier:'士兵模式',
     wuxing:'五行生克',
     weather:'天气变化',
+    coin:'富甲天下',
 };
 mode.pack={
     identity:'身份',
@@ -47,7 +48,7 @@ mode.pack={
     versus:'对决',
     boss:'挑战',
     chess:'战棋',
-    stone:'统率',
+    stone:'炉石',
 };
 background.pack={
     zhulian_bg:'璧合',

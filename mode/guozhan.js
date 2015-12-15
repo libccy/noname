@@ -91,6 +91,9 @@ mode.guozhan={
 				}
 				game.chooseCharacter();
 				"step 3"
+				if(ui.coin){
+					_status.coinCoeff=get.coinCoeff([game.me.name1,game.me.name2]);
+				}
 				if(lib.storage.test){
 					var str='';
 					for(var i=0;i<game.players.length;i++){
@@ -177,6 +180,7 @@ mode.guozhan={
 					game.over('战斗胜利');
 				}
 			}
+			game.showIdentity();
 		},
 		chooseCharacter:function(){
 			var next=game.createEvent('chooseCharacter',false);

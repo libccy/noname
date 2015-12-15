@@ -554,6 +554,7 @@ mode.boss={
 						boss:false,
 						links:result.links
 					};
+					_status.coinCoeff=get.coinCoeff(result.links);
 				}
 			}
 			return next;

@@ -77,6 +77,9 @@
     transition-duration: 0.5s;
     pointer-events: auto;
 }
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.identity{
+    pointer-events: auto;
+}
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.judges,
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.marks{
     pointer-events: auto;

@@ -452,6 +452,8 @@ mode.versus={
 				"step 1"
 				_status.friendDied=[];
 				_status.enemyDied=[];
+				_status.totalCount=_status.friend.length;
+				_status.coinCoeff=get.coinCoeff(_status.friend);
 
 				ui.auto.show();
 				ui.wuxie.show();

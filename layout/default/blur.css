@@ -1,4 +1,4 @@
-#arena.paused,#arena.right,#arena.menupaused{
+#arena.paused,#arena.unfocus,#arena.right,#arena.menupaused{
     filter:blur(3px);
     -webkit-filter:blur(3px);
 }

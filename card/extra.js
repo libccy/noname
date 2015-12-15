@@ -57,6 +57,9 @@ card.extra={
 				result:{
 					target:function(player,target){
 						if(target&&target==_status.dying) return 2;
+						if(lib.config.mode=='stone'&&!player.isMin()){
+							if(player.getActCount()+1>=player.actcount) return false;
+						}
 						var shas=target.get('h','sha');
 						if(player.num('h','sha')>1){
 							if(player.num('e','zhuge')) return 0;

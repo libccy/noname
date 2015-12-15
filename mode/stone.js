@@ -61,6 +61,25 @@ mode.stone={
 				}
 				return false;
 			},
+			getDeckCards:function(num){
+				var player=this;
+				if(typeof num!='number'){
+					num=1;
+				}
+				for(var i=0;i<5;i++){
+					if(player.deckCards.length<num){
+						get.deck(player,player.deck);
+					}
+					else{
+						break;
+					}
+				}
+				var list=[];
+				for(var i=0;i<num;i++){
+					list.push(player.deckCards.randomRemove());
+				}
+				return list;
+			},
 			getActCount:function(){
 				return get.cardCount(true,this)+(this.actused||0)
 			},
@@ -110,7 +129,7 @@ mode.stone={
 				var dead=this;
 				if(game.me.isDead()){
 					if(!_status.mylist.length){
-						_status.friendCount.innerHTML='我方兵力：'+get.cnNumber(0);
+						_status.friendCount.innerHTML='友军: '+get.cnNumber(0);
 						game.over(false);
 					}
 					else{
@@ -132,6 +151,9 @@ mode.stone={
 							else{
 								player.init(_status.mylist.shift());
 							}
+							if(_status.mode=='deck'){
+								get.deck(player,_status.deck.shift());
+							}
 							game.players.push(player);
 							ui.arena.appendChild(player);
 
@@ -144,7 +166,17 @@ mode.stone={
 							});
 							game.swapControl(player);
 							game.arrangePlayers();
-							player.draw(2+game.enemy.countFellow(),false);
+							if(_status.mode=='deck'){
+								player.draw(2,false);
+								var nd=game.enemy.countFellow();
+								if(nd){
+									console.log(nd);
+									player.directgain(player.getDeckCards(nd));
+								}
+							}
+							else{
+								player.draw(2+game.enemy.countFellow(),false);
+							}
 							game.resume();
 							game.updateStatusCount();
 						},lib.config.duration);
@@ -153,7 +185,7 @@ mode.stone={
 				}
 				else if(game.enemy.isDead()){
 					if(!_status.enemylist.length){
-						_status.enemyCount.innerHTML='敌方兵力：'+get.cnNumber(0);
+						_status.enemyCount.innerHTML='敌军: '+get.cnNumber(0);
 						game.over(true);
 					}
 					else{
@@ -173,6 +205,9 @@ mode.stone={
 							}
 							else{
 								player.init(_status.enemylist.shift());
+							}
+							if(_status.mode=='deck'){
+								get.deck(player,'random');
 							}
 							game.players.push(player);
 							game.enemy=player;
@@ -244,23 +279,46 @@ mode.stone={
 			stone_huanghou:['female','qun',2,['stone_huanghou'],['minskin','stone'],[3,1]],
 			stone_feipin:['female','qun',1,['guixiu'],['minskin','stone'],[1,2]],
 			stone_yiji:['female','qun',1,['stone_yiji'],['minskin','stone'],[2,2]],
+
+			stone_tuteng1:['none','qun',2,['shaman_tuteng','chaofeng'],['minskin','stone','stonehidden'],[2,0]],
+			stone_tuteng2:['none','qun',2,['shaman_tuteng','shaman_zhuore'],['minskin','stone','stonehidden'],[2,0]],
+			stone_tuteng3:['none','qun',2,['shaman_tuteng','shaman_fali'],['minskin','stone','stonehidden'],[2,0]],
+			stone_tuteng4:['none','qun',2,['shaman_tuteng','shaman_zhiliao'],['minskin','stone','stonehidden'],[2,0]],
+
+			stone_xinbing:['none','qun',2,[],['minskin','stone','stonehidden'],[2,1]],
 		}
 	},
+	careerList:['mage','shaman','druid','paladin','rogue','priest','hunter','warrior','warlock'],
 	game:{
 		reserveDead:true,
+		modPhaseDraw:function(player,num){
+			if(_status.mode=='deck'&&!player.isMin()){
+				if(num>1){
+					player.draw(num-1,false);
+				}
+				if(num>0){
+					player.directgain(player.getDeckCards(),'draw');
+				}
+				player.$draw(num);
+				game.delay();
+			}
+			else{
+				player.draw(num);
+			}
+		},
 		getVideoName:function(){
 			var str=get.translation(game.me.name);
 			if(game.me.name2){
 				str+='/'+get.translation(game.me.name2);
 			}
 			var name=[
-				str,'统率 - '+get.config('battle_number')+'人'
+				str,'炉石 - '+get.config('battle_number')+'人'
 			];
 			return name;
 		},
 		updateStatusCount:function(){
-			_status.friendCount.innerHTML='我方兵力：'+get.cnNumber(1+_status.mylist.length/(_status.double_character?2:1),true);
-			_status.enemyCount.innerHTML='敌方兵力：'+get.cnNumber(1+_status.enemylist.length/(_status.double_character?2:1),true);
+			_status.friendCount.innerHTML='友军: '+get.cnNumber(1+_status.mylist.length/(_status.double_character?2:1),true);
+			_status.enemyCount.innerHTML='敌军: '+get.cnNumber(1+_status.enemylist.length/(_status.double_character?2:1),true);
 		},
 		stoneLoop:function(player){
 			var next=game.createEvent('phaseLoop');
@@ -296,6 +354,7 @@ mode.stone={
 				lib.character[i][3].add('stonesha');
 				lib.character[i][3].add('stoneshan');
 				lib.character[i][3].add('stonedraw');
+				if(lib.character[i][4].contains('stonehidden')) continue;
 				name=i+'_stonecharacter';
 				if(lib.character[i][5][0]<3){
 					list.push(name);
@@ -313,33 +372,48 @@ mode.stone={
 				lib.translate[name]=get.translation(i);
 				lib.translate[name+'_info']=get.skillintro(i);
 			}
-			var addedcardcount=Math.ceil(lib.card.list.length/80);
-			var addedcardcount2=Math.ceil(lib.card.list.length/160);
-			var suit=['heart','diamond','club','spade'];
-			while(addedcardcount--){
-				for(i=0;i<list.length;i++){
-					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),list[i]]);
+			if(_status.mode=='deck'){
+				lib.spells=lib.cardPack.mode_stone.slice(0);
+				lib.minions=list.concat(list2);
+				if(!lib.storage.deckList){
+					lib.storage.deckList={};
 				}
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'shengerpingdeng']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'konghunshi']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'emofengdi']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'mindieyi']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'miefafu']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'sanghunzhao']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'sanghunzhao']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'jintiao']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'zhaohunfan']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'fengraozhijiao']);
 			}
-			while(addedcardcount2--){
-				for(i=0;i<list2.length;i++){
-					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),list2[i]]);
+			else{
+				delete game.modPhaseDraw;
+				var random_length=parseInt(get.config('random_length').slice(2));
+				if(!random_length){
+					random_length=80;
 				}
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'liumangxingzhen']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'dianhaishenzhu']);
-				lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'yesushengxue']);
+				var addedcardcount=Math.ceil(lib.card.list.length/random_length);
+				var addedcardcount2=Math.ceil(lib.card.list.length/random_length/2);
+				var suit=['heart','diamond','club','spade'];
+				while(addedcardcount--){
+					for(i=0;i<list.length;i++){
+						lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),list[i]]);
+					}
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'shengerpingdeng']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'konghunshi']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'emofengdi']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'mindieyi']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'miefafu']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'sanghunzhao']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'sanghunzhao']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'jintiao']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'zhaohunfan']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'fengraozhijiao']);
+				}
+				while(addedcardcount2--){
+					for(i=0;i<list2.length;i++){
+						lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),list2[i]]);
+					}
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'liumangxingzhen']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'dianhaishenzhu']);
+					lib.card.list.push([suit.randomGet(),Math.ceil(Math.random()*13),'yesushengxue']);
+				}
+				lib.card.list.randomSort();
 			}
-			lib.card.list.randomSort();
+
 			lib.skill._chongzhu.usable=3;
 			for(i in lib.skill){
 				if(lib.skill[i].changeSeat){
@@ -351,7 +425,6 @@ mode.stone={
 			}
 			for(i in lib.card){
 				if(lib.card[i].type=='equip'){
-					// lib.card[i].chongzhu=true;
 					lib.card[i].stoneact=0;
 				}
 				else{
@@ -375,9 +448,313 @@ mode.stone={
 				}
 				"step 1"
 				lib.init.css('layout/mode/','stone');
+				_status.mode=get.config('stone_mode');
 				game.initStone();
-
 				var playback=localStorage.getItem(lib.configprefix+'playback');
+
+				if(!playback&&_status.mode=='deck'){
+					(function(){
+						ui.deckBuilder=ui.create.div('.popup-container#deck-builder',function(){
+							if(careerList.classList.contains('shown')){
+								careerList.classList.remove('shown');
+								newDeck.classList.remove('active');
+							}
+							else if(!cardDialog.classList.contains('shown')){
+								this.classList.remove('shown');
+								this.timeout=setTimeout(function(){
+									ui.deckBuilder.remove();
+								},500);
+								ui.arena.style.top='';
+								ui.arena.style.transform='';
+								ui.system.style.opacity='';
+								ui.auto.show();
+								ui.pause.show();
+							}
+						});
+						var clickNode=function(){
+							cardDialog.classList.add('shown');
+							controls.classList.add('shown');
+							var name='未命名';
+							for(var i=1;;i++){
+								if(!lib.storage.deckList[name+i]){
+									break;
+								}
+							}
+							cardDialog.editing={
+								name:name+i,
+								content:{
+									career:this.firstChild.dataset.career,
+									deck:[]
+								},
+							}
+							rename.innerHTML=name+i;
+							newDeck.innerHTML='确认编辑';
+							newDeck.classList.add('active');
+							careerList.classList.remove('shown');
+							listContainer.style.transform='translateX(200px)';
+							deckContainer.innerHTML='';
+							deckContainer.classList.add('shown');
+							updateCardDialog();
+						}
+						var careerList=ui.create.div('.shadowed.career',ui.deckBuilder);
+						for(var i=0;i<lib.careerList.length;i++){
+							var node=ui.create.div(careerList,clickNode);
+							ui.create.div('.menubutton.round',node).dataset.career=lib.careerList[i];
+							ui.create.div('.text',lib.translate[lib.careerList[i]],node);
+						}
+						var controls=ui.create.div('.controls',ui.deckBuilder);
+						var cardCount=ui.create.div('.card-count',controls);
+						ui.create.div('.menubutton.large','删除',controls,function(e){
+							if(this.innerHTML=='删除'){
+								this.innerHTML='确定';
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='删除';
+								},1000);
+							}
+							else{
+								cardDialog.classList.remove('shown');
+								controls.classList.remove('shown');
+								newDeck.innerHTML='新建卡组';
+								newDeck.classList.remove('active');
+								var editing=cardDialog.editing;
+								if(editing){
+									if(editing.origin){
+										delete lib.storage.deckList[editing.origin];
+										for(var i=0;i<listContainer.childElementCount;i++){
+											if(listContainer.childNodes[i].name==editing.origin){
+												listContainer.childNodes[i].remove();break;
+											}
+										}
+									}
+								}
+								game.save('deckList',lib.storage.deckList);
+								listContainer.style.transform='';
+								deckContainer.classList.remove('shown');
+							}
+							e.stopPropagation();
+						});
+						var rename=ui.create.div('.menubutton.large','重命名',controls);
+						rename.contentEditable=true;
+						rename.onfocus=function(){
+							var range = document.createRange();
+						    range.selectNodeContents(this);
+						    var sel = window.getSelection();
+						    sel.removeAllRanges();
+						    sel.addRange(range);
+						};
+						rename.onblur=function(){
+							if(cardDialog.editing){
+								if(!lib.storage.deckList[this.innerHTML]){
+									cardDialog.editing.name=this.innerHTML;
+								}
+								else{
+									this.innerHTML=cardDialog.editing.name;
+								}
+							}
+							var sel = window.getSelection();
+						    sel.removeAllRanges();
+						};
+						var removeLine=function() {
+							rename.innerHTML=rename.innerHTML.replace(/\n|<br>/g,'');
+						};
+						var observer = new MutationObserver(removeLine);
+						observer.observe(rename,{characterData:true,subtree:true});
+						rename.addEventListener('keyup',removeLine);
+
+						var cardDialog=ui.create.cardDialog(true,function(name){
+							var type=lib.card[name].type;
+							return type!='stonecard'&&type!='stonecharacter';
+						},{seperate:function(list){
+							var nl=[],ns=[];
+							var result={
+								'中立法术':ns,
+								'中立随从':nl,
+							}
+							for(var i=0;i<list.length;i++){
+								if(lib.card[list[i][2]].type=='stonecard'){
+									ns.push(list[i]);
+								}
+								else{
+									nl.push(list[i]);
+								}
+							}
+							return result;
+						}});
+						for(var i=0;i<cardDialog.buttons.length;i++){
+							if(cardDialog.buttons[i].node.info.innerHTML.indexOf('随从')!=-1){
+								var buttonName=cardDialog.buttons[i].link[2];
+								buttonName=buttonName.slice(0,buttonName.indexOf('_stonecharacter'));
+								buttonName=lib.character[buttonName];
+								cardDialog.buttons[i].node.info.innerHTML=buttonName[5][1]+'/'+buttonName[2];
+							}
+						}
+						var updateCardDialog=function(button){
+							if(deckContainer.childElementCount>=30){
+								for(var i=0;i<cardDialog.buttons.length;i++){
+									cardDialog.buttons[i].classList.add('unselectable');
+								}
+							}
+							else{
+								var nummap={};
+								for(var i=0;i<deckContainer.childElementCount;i++){
+									var name=deckContainer.childNodes[i].name;
+									if(!nummap[name]){
+										nummap[name]=1;
+									}
+									else{
+										nummap[name]++;
+									}
+								}
+								var list=[];
+								for(var i in nummap){
+									if(nummap[i]>=2){
+										list.push(i);
+									}
+								}
+								for(var i=0;i<cardDialog.buttons.length;i++){
+									if(list.contains(cardDialog.buttons[i].link[2])){
+										cardDialog.buttons[i].classList.add('unselectable');
+									}
+									else{
+										cardDialog.buttons[i].classList.remove('unselectable');
+									}
+								}
+							}
+							cardCount.innerHTML=deckContainer.childElementCount+'/30';
+						};
+						var clickCard=function(){
+							this.remove();
+							updateCardDialog();
+						};
+						var clickButton=function(){
+							if(!this.classList.contains('unselectable')){
+								var card=ui.create.card(null,'noclick').init(this.link).listen(clickCard);
+								deckContainer.insertBefore(card,deckContainer.firstChild);
+								updateCardDialog();
+							}
+						}
+						for(var i=0;i<cardDialog.buttons.length;i++){
+							cardDialog.buttons[i].listen(clickButton);
+						}
+						cardDialog.classList.add('fullheight');
+						cardDialog.classList.add('scroll1');
+						cardDialog.classList.add('scroll2');
+						cardDialog.classList.add('fixed');
+						cardDialog.listen(function(e){
+							e.stopPropagation();
+						});
+
+						ui.deckBuilder.appendChild(cardDialog);
+						var deckList=ui.create.div('.shadowed.list',ui.deckBuilder,function(e){
+							e.stopPropagation();
+							if(careerList.classList.contains('shown')){
+								careerList.classList.remove('shown');
+								newDeck.classList.remove('active');
+							}
+						});
+						var editDeck=function(){
+							if(!cardDialog.classList.contains('shown')){
+								cardDialog.classList.add('shown');
+								controls.classList.add('shown');
+								var info=lib.storage.deckList[this.name];
+								cardDialog.editing={
+									origin:this.name,
+									name:this.name,
+									content:{
+										career:info.career,
+										deck:info.deck
+									},
+								}
+								rename.innerHTML=this.name;
+								newDeck.innerHTML='确认编辑';
+								newDeck.classList.add('active');
+								careerList.classList.remove('shown');
+								listContainer.style.transform='translateX(200px)';
+								deckContainer.innerHTML='';
+								for(var i=0;i<info.deck.length;i++){
+									ui.create.card(deckContainer,'noclick').init(['',get.translation(lib.card[info.deck[i]].type),info.deck[i]]).listen(clickCard);
+								}
+								deckContainer.classList.add('shown');
+								updateCardDialog();
+							}
+						};
+						var newDeck=ui.create.div('.menubutton.large.create','新建卡组',deckList,function(e){
+							if(this.innerHTML=='新建卡组'){
+								this.classList.toggle('active');
+								if(this.classList.contains('active')){
+									careerList.classList.add('shown');
+								}
+								else{
+									careerList.classList.remove('shown');
+								}
+							}
+							else{
+								cardDialog.classList.remove('shown');
+								controls.classList.remove('shown');
+								this.innerHTML='新建卡组';
+								this.classList.remove('active');
+								var editing=cardDialog.editing;
+								if(editing){
+									editing.content.deck.length=0;
+									for(var i=0;i<deckContainer.childElementCount;i++){
+										editing.content.deck.push(deckContainer.childNodes[i].name);
+									}
+									if(editing.origin){
+										for(var i=0;i<listContainer.childElementCount;i++){
+											if(listContainer.childNodes[i].name==editing.origin){
+												listContainer.childNodes[i].name=editing.name;
+												listContainer.childNodes[i].firstChild.innerHTML=editing.name;
+												break;
+											}
+										}
+										delete lib.storage.deckList[editing.origin];
+									}
+									else if(!lib.storage.deckList[editing.name]){
+										var deckitem=ui.create.div('.deckitem.shadowed','<span>'+editing.name+'</span>',
+											listContainer,editDeck);
+										ui.create.div('.menubutton.round',deckitem).dataset.career=editing.content.career;
+										deckitem.name=editing.name;
+									}
+									lib.storage.deckList[editing.name]=editing.content;
+								}
+								game.save('deckList',lib.storage.deckList);
+								listContainer.style.transform='';
+								deckContainer.classList.remove('shown');
+							}
+							e.stopPropagation();
+						});
+						var listContainer=ui.create.div('.list-container',deckList);
+						for(var i in lib.storage.deckList){
+							var deckitem=ui.create.div('.deckitem.shadowed','<span>'+i+'</span>',
+								listContainer,editDeck);
+							ui.create.div('.menubutton.round',deckitem).dataset.career=lib.storage.deckList[i].career;
+							deckitem.name=i;
+						}
+						var deckContainer=ui.create.div('.list-container.deck',deckList);
+					}());
+
+					ui.deckcontrol=ui.create.system('卡组管理',function(){
+						if(lib.config.low_performance){
+							ui.arena.style.transform='translateY('+ui.window.offsetHeight+'px)';
+						}
+						else{
+							ui.arena.style.top='100%';
+						}
+						ui.system.style.opacity=0;
+						ui.window.appendChild(ui.deckBuilder);
+						if(ui.deckBuilder.timeout){
+							clearTimeout(ui.deckBuilder.timeout);
+							delete ui.deckBuilder.timeout;
+						}
+						ui.refresh(ui.deckBuilder);
+						ui.deckBuilder.classList.add('shown');
+						ui.auto.hide();
+						ui.pause.hide();
+					},true);
+
+				}
+
 				if(playback){
 					ui.create.me();
 					ui.arena.style.display='none';
@@ -408,6 +785,18 @@ mode.stone={
 				game.enemy=game.me.next;
 				game.chooseCharacter();
 				"step 3"
+				if(_status.mode=='deck'){
+					_status.deckButton=ui.create.system('卡组',null,true);
+					lib.setPopped(_status.deckButton,function(){
+						var uiintro=ui.create.dialog('hidden');
+						uiintro.listen(function(e){
+							e.stopPropagation();
+						});
+						uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+game.me.deckCards.length);
+						uiintro.addSmall([game.me.deckCards,'card']);
+						return uiintro;
+					},220);
+				}
 				_status.friendCount=ui.create.system('',null,true);
 				_status.enemyCount=ui.create.system('',null,true);
 				game.updateStatusCount();
@@ -454,7 +843,14 @@ mode.stone={
 				game.addVideo('init',null,info);
 
 				event.trigger('gameStart');
-				game.gameDraw(game.me);
+				if(_status.mode=='deck'){
+					game.gameDraw(game.me,2);
+					game.me.directgain(game.me.getDeckCards(2));
+					game.me.next.directgain(game.me.next.getDeckCards(2));
+				}
+				else{
+					game.gameDraw(game.me);
+				}
 				if(game.me.side){
 					game.stoneLoop(game.me);
 				}
@@ -466,14 +862,6 @@ mode.stone={
 		chooseCharacter:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.showConfig=true;
-			next.ai=function(player,list){
-				if(get.config('double_character')){
-					player.init(list[0],list[1]);
-				}
-				else{
-					player.init(list[0]);
-				}
-			}
 			next.content=function(){
 				"step 0"
 				var i;
@@ -482,6 +870,7 @@ mode.stone={
 				for(i in lib.character){
 					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(lib.character[i][4]&&lib.character[i][4].contains('minskin')) continue;
+					if(lib.character[i][4]&&lib.character[i][4].contains('stonehidden')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.forbidstone.contains(i)) continue;
@@ -576,6 +965,10 @@ mode.stone={
 					ui.cheat2x.close();
 					delete ui.cheat2x;
 				}
+				if(ui.deckcontrol){
+					ui.deckcontrol.remove();
+					delete ui.deckcontrol;
+				}
 				_status.mylist=result.links.slice(0);
 				for(var i=0;i<result.links.length;i++){
 					event.list.remove(result.links[i]);
@@ -583,6 +976,79 @@ mode.stone={
 				event.list.randomSort();
 				_status.enemylist=event.list.slice(0,result.links.length);
 				_status.double_character=get.config('double_character');
+				"step 2"
+				if(_status.mode=='deck'){
+					_status.deck=[];
+					if(!_status.auto){
+						ui.auto.hide();
+						game.pause();
+						var list=_status.mylist.slice(0);
+						if(_status.double_character){
+							event.dialog=ui.create.dialog('','hidden');
+						}
+						else{
+							event.dialog=ui.create.dialog('','hidden');
+						}
+
+						var buttons=ui.create.div('.buttons',event.dialog.content);
+						var currentNode=null;
+						var clickButton=function(click){
+							if(click!==false){
+								_status.deck.push(this.name);
+							}
+							if(currentNode){
+								currentNode.delete();
+							}
+							if(list.length){
+								var names=[];
+								if(_status.double_character){
+									names.push(list.shift());
+									names.push(list.shift());
+									event.dialog.content.firstChild.innerHTML='为'+get.translation(names[0])+'/'+get.translation(names[1])+'选择一个卡组';
+									currentNode=ui.create.player().init(names[0],names[1]);
+								}
+								else{
+									names.push(list.shift());
+									event.dialog.content.firstChild.innerHTML='为'+get.translation(names[0])+'选择一个卡组';
+									currentNode=ui.create.player().init(names[0]);
+								}
+								currentNode.classList.add('stone_deck');
+								ui.arena.appendChild(currentNode);
+								ui.refresh(currentNode);
+								currentNode.classList.add('shown');
+							}
+							else{
+								event.dialog.close();
+								ui.auto.show();
+								game.resume();
+							}
+						}
+						clickButton(false);
+						for(var i in lib.storage.deckList){
+							if(lib.storage.deckList[i].deck.length==30){
+								var deckitem=ui.create.div('.deckitem.shadowed','<span>'+i+'</span>',buttons,clickButton);
+								ui.create.div('.menubutton.round',deckitem).dataset.career=lib.storage.deckList[i].career;
+								deckitem.name=i;
+							}
+						}
+						for(var i=0;i<lib.careerList.length;i++){
+							var deckitem=ui.create.div('.deckitem.shadowed','<span>随机</span>',buttons,clickButton);
+							ui.create.div('.menubutton.round',deckitem).dataset.career=lib.careerList[i];
+							deckitem.name='random:'+lib.careerList[i];
+						}
+						event.dialog.open();
+					}
+					else{
+						var bn=parseInt(get.config('battle_number'));
+						for(var i=0;i<bn;i++){
+							_status.deck.push('random');
+						}
+					}
+				}
+				"step 3"
+				if(ui.coin){
+					_status.coinCoeff=get.coinCoeff(_status.mylist);
+				}
 				if(_status.double_character){
 					game.me.init(_status.mylist.shift(),_status.mylist.shift());
 					game.enemy.init(_status.enemylist.shift(),_status.enemylist.shift());
@@ -591,8 +1057,64 @@ mode.stone={
 					game.me.init(_status.mylist.shift());
 					game.enemy.init(_status.enemylist.shift());
 				}
+				if(_status.mode=='deck'){
+					get.deck(game.me,_status.deck.shift());
+					get.deck(game.enemy,'random');
+				}
 			}
 		},
+	},
+	onWash:function(){
+		if(_status.mode!='deck') return;
+		var list=[];
+		for(var i=0;i<ui.discardPile.childElementCount;i++){
+			var type=get.type(ui.discardPile.childNodes[i]);
+			if(type=='stonecard'||type=='stonecharacter'){
+				list.push(ui.discardPile.childNodes[i]);
+			}
+		}
+		while(list.length){
+			list.shift().remove();
+		}
+	},
+	get:{
+		deck:function(player,name){
+			var career,deck;
+			if(name=='random'){
+				career=lib.careerList.randomGet();
+				deck=lib.minions.randomGets(20).concat(lib.spells.randomGets(10));
+			}
+			else if(name.indexOf('random:')==0){
+				career=name.slice(7);
+				deck=lib.minions.randomGets(20).concat(lib.spells.randomGets(10));
+			}
+			else{
+				career=lib.storage.deckList[name].career;
+				deck=lib.storage.deckList[name].deck.slice(0);
+			}
+			player.deck=name;
+			player.career=career;
+			if(!player.node.career){
+				player.node.career=ui.create.div('.menubutton.round.identity',player);
+				player.node.career.dataset.career=career;
+				if(lib.config.touchscreen){
+					lib.setLongPress(player.node.career,ui.click.intro);
+				}
+				else{
+					if(lib.config.hover_all){
+						lib.setHover(player.node.career,ui.click.hoverplayer);
+					}
+					if(lib.config.right_info){
+						player.node.career.oncontextmenu=ui.click.rightplayer;
+					}
+				}
+			}
+			deck.randomSort();
+			if(!player.deckCards) player.deckCards=[];
+			for(var i=0;i<deck.length;i++){
+				player.deckCards.push(game.createCard(deck[i]));
+			}
+		}
 	},
 	card:{
 		stonecharacter:{
@@ -944,6 +1466,383 @@ mode.stone={
 		},
 	},
 	skill:{
+		_priest_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='priest') return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return true;
+			},
+			usable:1,
+			filterTarget:true,
+			content:function(){
+				player.actused+=2;
+				player.updateActCount();
+				target.recover();
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						return ai.get.recoverEffect(target,player,target);
+					}
+				}
+			}
+		},
+		_mage_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='mage') return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return true;
+			},
+			usable:1,
+			line:'fire',
+			filterTarget:function(card,player,target){
+				return !target.career;
+			},
+			content:function(){
+				player.actused+=2;
+				player.updateActCount();
+				target.damage('fire');
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						return ai.get.damageEffect(target,player,target,'fire');
+					}
+				}
+			}
+		},
+		_warlock_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='warlock') return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return player.num('he')>0;
+			},
+			usable:1,
+			content:function(){
+				player.actused+=2;
+				player.updateActCount();
+				player.gain(player.getDeckCards(2),'draw');
+			},
+			ai:{
+				order:2,
+				result:{
+					player:1
+				}
+			}
+		},
+		_hunter_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='hunter') return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return player.num('he')>0;
+			},
+			usable:1,
+			selectTarget:-1,
+			filterTarget:function(card,player,target){
+				return target.career&&target.side!=player.side;
+			},
+			content:function(){
+				player.actused+=2;
+				player.updateActCount();
+				target.damage();
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						return ai.get.damageEffect(target,player,target);
+					}
+				}
+			}
+		},
+		_warrior_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='warrior') return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return true;
+			},
+			usable:1,
+			content:function(){
+				player.actused+=2;
+				player.updateActCount();
+				player.changeHujia(1);
+				player.draw();
+			},
+			ai:{
+				order:2,
+				result:{
+					player:1
+				}
+			}
+		},
+		_rogue_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='rogue') return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return true;
+			},
+			usable:1,
+			content:function(){
+				'step 0'
+				player.actused+=2;
+				player.updateActCount();
+				var equip1=get.cardPile(function(card){
+					return get.subtype(card)=='equip1';
+				});
+				if(!equip1){
+					equip1=game.createCard('qingnang');
+				}
+				var equip4=get.cardPile(function(card){
+					return get.type(card)=='equip'&&get.subtype(card)!='equip1';
+				});
+				if(!equip4){
+					equip4=game.createCard('chitu');
+				}
+				player.$gain(equip1);
+				setTimeout(function(){
+					player.$gain(equip4);
+				},250);
+				game.delay();
+				event.equip1=equip1;
+				event.equip4=equip4;
+				'step 1'
+				player.equip(event.equip1);
+				game.delay(0.5);
+				'step 2'
+				player.equip(event.equip4);
+			},
+			ai:{
+				order:function(skill,player){
+					if(!player.get('e','1')&&player.num('e')<2){
+						if(player.num('h','sha')&&player.getActCount()+3<=player.actcount){
+							return 4;
+						}
+						return 0.1;
+					}
+					return 0;
+				},
+				result:{
+					player:function(player){
+						if(player.num('e')<=2) return 1;
+						return 0;
+					}
+				}
+			}
+		},
+		_druid_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='druid') return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return player.num('he')>0&&lib.filter.cardEnabled({name:'sha'},player);
+			},
+			usable:1,
+			filterTarget:function(card,player,target){
+				return player.canUse('sha',target,false);
+			},
+			direct:true,
+			content:function(){
+				player.actused+=2;
+				player.updateActCount();
+				player.useCard({name:'sha'},targets,'_druid_skill',false).animate=false;
+			},
+			ai:{
+				order:function(){
+					return lib.card.sha.ai.order-0.1;
+				},
+				result:{
+					target:function(player,target){
+						return ai.get.effect(target,{name:'sha'},player,target);
+					}
+				}
+			}
+		},
+		shaman_tuteng:{
+			trigger:{player:'phaseDrawBefore'},
+			forced:true,
+			popup:false,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			}
+		},
+		shaman_zhiliao:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			direct:true,
+			content:function(){
+				'step 0'
+				var players=get.players();
+				var targets=[];
+				for(var i=0;i<players.length;i++){
+					if(players[i].side==player.side&&!players[i].career&&players[i].hp<players[i].maxHp){
+						targets.push(players[i]);
+						players[i].recover();
+					}
+				}
+				if(targets.length){
+					player.logSkill('shaman_zhiliao',targets);
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				game.delay();
+			}
+		},
+		shaman_fali:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			direct:true,
+			content:function(){
+				'step 0'
+				var players=get.players();
+				var targets=[];
+				for(var i=0;i<players.length;i++){
+					if(players[i].side==player.side&&!players[i].career&&players[i].num('h')==0){
+						targets.push(players[i]);
+					}
+				}
+				if(targets.length){
+					game.asyncDraw(targets);
+					player.logSkill('shaman_fali',targets);
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				game.delay();
+			}
+		},
+		shaman_zhuore:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			direct:true,
+			content:function(){
+				'step 0'
+				var players=get.players();
+				var targets=[];
+				for(var i=0;i<players.length;i++){
+					if(players[i].side!=player.side&&!players[i].career){
+						targets.push(players[i]);
+					}
+				}
+				if(targets.length){
+					var target=targets.randomGet();
+					player.logSkill('shaman_zhuore',target);
+					target.damage();
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				game.delay();
+			}
+		},
+		_shaman_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='shaman') return false;
+				if(!player.canAddFellow()) return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return true;
+			},
+			usable:1,
+			content:function(){
+				"step 0"
+				player.actused+=2;
+				player.updateActCount();
+				var name='stone_tuteng'+Math.ceil(Math.random()*4);
+				var added=false;
+				var i;
+				for(i=0;i<player.actcharacterlist.length;i++){
+					if(player.actcharacterlist[i]===null){
+						added=true;
+						break;
+					}
+				}
+				var pos=i+4;
+				if(player!=game.me){
+					pos+=4;
+				}
+				var fellow=game.addFellow(pos,name);
+				fellow.side=player.side;
+				fellow.classList.add('turnedover');
+				player.actcharacterlist[i]=fellow;
+				event.source=fellow;
+				var num=lib.character[name][5][1];
+				if(num){
+					fellow.draw(num,false);
+				}
+				player.updateActCount();
+				fellow.noPhaseDelay=true;
+				player.line(fellow,'green');
+				"step 1"
+				event.trigger('fellow');
+			},
+			ai:{
+				order:2,
+				result:{
+					player:1
+				}
+			}
+		},
+		_paladin_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.career!='paladin') return false;
+				if(!player.canAddFellow()) return false;
+				if(player.getActCount()+2>player.actcount) return false;
+				return true;
+			},
+			usable:1,
+			content:function(){
+				"step 0"
+				player.actused+=2;
+				player.updateActCount();
+				var name='stone_xinbing';
+				var added=false;
+				var i;
+				for(i=0;i<player.actcharacterlist.length;i++){
+					if(player.actcharacterlist[i]===null){
+						added=true;
+						break;
+					}
+				}
+				var pos=i+4;
+				if(player!=game.me){
+					pos+=4;
+				}
+				var fellow=game.addFellow(pos,name);
+				fellow.side=player.side;
+				fellow.classList.add('turnedover');
+				player.actcharacterlist[i]=fellow;
+				event.source=fellow;
+				var num=lib.character[name][5][1];
+				if(num){
+					fellow.draw(num,false);
+				}
+				player.updateActCount();
+				fellow.noPhaseDelay=true;
+				player.line(fellow,'green');
+				"step 1"
+				event.trigger('fellow');
+			},
+			ai:{
+				order:2,
+				result:{
+					player:1
+				}
+			}
+		},
 		chaofeng:{
 			mark:true,
 			intro:{
@@ -1379,7 +2278,7 @@ mode.stone={
 					player.actcount=player.getEnemy().actcount+1;
 				}
 				if(player.actcount>6){
-					player.actcount-=5;
+					player.actcount-=4;
 				}
 				player.updateActCount();
 			}
@@ -1453,6 +2352,52 @@ mode.stone={
 		}
 	},
 	translate:{
+		shaman:'祭司',
+		mage:'法师',
+		priest:'医生',
+		warrior:'战士',
+		warlock:'术士',
+		knight:'死亡骑士',
+		rogue:'游侠',
+		paladin:'谋士',
+		hunter:'猎人',
+		druid:'蛮人',
+
+		shaman_tuteng:'图腾',
+		shaman_tuteng_info:'锁定技，你跳过摸牌阶段',
+		shaman_fali:'法潮',
+		shaman_fali_info:'回合结束阶段，令所有无手牌的友方随从摸一张牌',
+		shaman_zhiliao:'治疗',
+		shaman_zhiliao_info:'回合结束阶段，令所有友方随从回复一点体力',
+		shaman_zhuore:'灼热',
+		shaman_zhuore_info:'回合结束阶段，对一名随机敌方随从造成一点伤害',
+
+		_shaman_skill:'祭天',
+		_shaman_skill_info:'召唤一个随机图腾',
+		_mage_skill:'火冲',
+		_mage_skill_info:'对一名随从造成一点火焰伤害',
+		_priest_skill:'治疗',
+		_priest_skill_info:'回复一点体力',
+		_warrior_skill:'战甲',
+		_warrior_skill_info:'获得一点护甲，摸一张牌',
+		_warlock_skill:'作法',
+		_warlock_skill_info:'从牌库中获得两张牌',
+		_rogue_skill:'出鞘',
+		_rogue_skill_info:'装备一把武器和一个随机非武器装备',
+		_paladin_skill:'动员',
+		_paladin_skill_info:'召唤一名士兵',
+		_hunter_skill:'射击',
+		_hunter_skill_info:'对敌方主将造成一点伤害',
+		_druid_skill:'猛击',
+		_druid_skill_info:'视为使用一张不计入出杀次数的杀',
+
+		stone_tuteng1:'石爪图腾',
+		stone_tuteng2:'灼热图腾',
+		stone_tuteng3:'法潮图腾',
+		stone_tuteng4:'治疗图腾',
+
+		stone_xinbing:'新兵',
+
 		stone_weibing:'魏兵',
 		stone_weibing_info:'你出场时，已方主将可以弃置对方一名随从的所有牌',
 		stone_weiguan:'魏官',
@@ -1540,8 +2485,8 @@ mode.stone={
 		fengraozhijiao_info:'令一名随从回复全部体力',
 
 		stonecard:'法术',
-		mode_stone_card_config:'统率模式',
-		mode_stone_character_config:'统率模式',
+		mode_stone_card_config:'炉石模式',
+		mode_stone_character_config:'炉石模式',
 	},
 	ai:{
 		get:{
@@ -1558,7 +2503,4 @@ mode.stone={
 		}
 	},
 	config:['battle_number','double_character','double_hp','ban_weak','free_choose','change_choice'],
-	help:{
-
-	}
 }

@@ -4,7 +4,7 @@ mode.identity={
 		getIdentityList:function(player){
 			if(player.identityShown) return;
 			if(player==game.me) return;
-			if(get.config('identity_mode')=='zhong'){
+			if(_status.mode=='zhong'){
 				if(game.zhu&&game.zhu.isZhu){
 					return {
 						fan:'反',
@@ -55,6 +55,7 @@ mode.identity={
 				if(!lib.config.new_tutorial){
 					ui.arena.classList.add('only_dialog');
 				}
+				_status.mode=get.config('identity_mode');
 				"step 1"
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
@@ -76,7 +77,7 @@ mode.identity={
 					event.finish();
 				}
 				else{
-					if(get.config('identity_mode')=='zhong'){
+					if(_status.mode=='zhong'){
 						game.prepareArena(8);
 					}
 					else{
@@ -137,78 +138,6 @@ mode.identity={
 							ui.create.dialog('触屏模式中，下划可以显示菜单，上划可以切换托管，双指单击可以暂停');
 							ui.dialog.add('<div class="text center">你可以在选项-通用-中更改手势设置');
 							ui.create.control('继续',step4);
-							// var node=ui.create.div('.tutorial_tap',ui.window);
-							// var nodefunc=function(){
-							// 	setTimeout(function(){
-							// 		node.style.top='20px';
-							// 		node.style.left='10%';
-							// 		setTimeout(function(){
-							// 			node.style.transition='all 0.2s';
-							// 			node.style.opacity=0;
-							// 			setTimeout(function(){
-							// 				node.style.opacity='';
-							// 				setTimeout(function(){
-							// 					node.style.transition='';
-							// 				},300);
-							// 			},300);
-							// 		},1200);
-							// 		setTimeout(function(){
-							// 			node.style.left='calc(90% - 30px)';
-							// 			setTimeout(function(){
-							// 				node.style.transition='all 0.2s';
-							// 				node.style.opacity=0;
-							// 				setTimeout(function(){
-							// 					node.style.opacity='';
-							// 					setTimeout(function(){
-							// 						node.style.transition='';
-							// 					},300);
-							// 				},300);
-							// 			},1200);
-							// 			setTimeout(function(){
-							// 				node.style.top='';
-							// 				node.style.left='';
-							// 			},2000);
-							// 		},2000);
-							// 	},1000);
-							// };
-							// nodefunc();
-							// var interval=setInterval(nodefunc,7000);
-							// var interval2,node2;
-							// var double=true;
-							// ui.create.control('继续',function(){
-							// 	if(double){
-							// 		node2=ui.create.div('.tutorial_tap',ui.window);
-							// 		ui.refresh(node2);
-							// 		node2.style.top='20px';
-							// 		node2.style.left='calc(50% - 15px)';
-							// 		interval2=setInterval(function(){
-							// 			node2.style.transition='all 0.2s';
-							// 			node2.style.opacity=0;
-							// 			setTimeout(function(){
-							// 				node2.style.opacity='';
-							// 				setTimeout(function(){
-							// 					node2.style.opacity=0;
-							// 					setTimeout(function(){
-							// 						node2.style.opacity='';
-							// 						setTimeout(function(){
-							// 							node2.style.transition='';
-							// 						},300);
-							// 					},300);
-							// 				},300);
-							// 			},300);
-							// 		},3000);
-							// 		clearInterval(interval);
-							// 		node.delete();
-							// 		double=false;
-							// 		ui.dialog.close();
-							// 		ui.create.dialog('双击顶部可令界面下移，方便进行标身份等操作');
-							// 	}
-							// 	else{
-							// 		clearInterval(interval2);
-							// 		node2.delete();
-							// 		step4();
-							// 	}
-							// });
 						}
 						else{
 							step4();
@@ -262,6 +191,9 @@ mode.identity={
 				}
 				game.chooseCharacter();
 				"step 4"
+				if(ui.coin){
+					_status.coinCoeff=get.coinCoeff([game.me.name]);
+				}
 				if(game.players.length==2){
 					game.showIdentity(true);
 				}
@@ -276,7 +208,7 @@ mode.identity={
 					game.zhu=game.zhu2;
 					delete game.zhu2;
 				}
-				if(get.config('identity_mode')!='zhong'&&get.config('enhance_zhu')&&get.population('fan')>=3){
+				if(_status.mode!='zhong'&&get.config('enhance_zhu')&&get.population('fan')>=3){
 					var skill;
 					switch(game.zhu.name){
 						case 'liubei':skill='jizhen';break;
@@ -459,7 +391,7 @@ mode.identity={
 				var list2=[];
 				var list3=[];
 				var identityList;
-				if(get.config('identity_mode')=='zhong'){
+				if(_status.mode=='zhong'){
 					event.zhongmode=true;
 					identityList=['zhu','zhong','mingzhong','nei','fan','fan','fan','fan'];
 				}
@@ -1071,33 +1003,6 @@ mode.identity={
 			population:function(identity){
 				return get.population(identity);
 			}
-		}
-	},
-	ui:{
-		click:{
-			// identity:function(){
-			// 	if(_status.dragged) return;
-			// 	_status.clicked=true;
-			// 	if(this.parentNode.identityShown) return;
-			// 	if(this.parentNode==game.me) return;
-			// 	if(get.config('identity_mode')=='zhong'){
-			// 		switch(this.firstChild.innerHTML){
-			// 			case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
-			// 			case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
-			// 			case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
-			// 			case '内':this.firstChild.innerHTML='主';this.dataset.color='zhu';break;
-			// 			case '主':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
-			// 		}
-			// 	}
-			// 	else{
-			// 		switch(this.firstChild.innerHTML){
-			// 			case '猜':this.firstChild.innerHTML='反';this.dataset.color='fan';break;
-			// 			case '反':this.firstChild.innerHTML='忠';this.dataset.color='zhong';break;
-			// 			case '忠':this.firstChild.innerHTML='内';this.dataset.color='nei';break;
-			// 			case '内':this.firstChild.innerHTML='猜';this.dataset.color='cai';break;
-			// 		}
-			// 	}
-			// }
 		}
 	},
 	config:['player_number','double_character','double_hp',

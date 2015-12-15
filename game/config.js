@@ -26,18 +26,6 @@ window.config={
 			'music_danji','music_random','music_off']
 	},
 	translate:{
-		// identity:'身份',
-		// guozhan:'国战',
-		// versus:'对决',
-		// stone:'统率',
-		// changjing:'场景',
-		// mowang:'魔王',
-		// boss:'挑战',
-		// chess:'战棋',
-		// infinity:'无限',
-		// qunyingzhuan:'群英',
-		// swd:'剧情',
-
 		character_play_config:'技能卡牌',
 		soldier_play_config:'士兵模式',
 		strategy_play_config:'尔虞我诈',
@@ -254,6 +242,7 @@ window.config={
 	gameconfig:false,
 	appearence:false,
 	video:'20',
+	coin:0,
 
 	intro:'i',
 	right_click:'pause',

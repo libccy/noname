@@ -141,9 +141,10 @@ table{table-layout: fixed;}
 #arena.right:not(.noleft){left:240px;opacity: 0.6;}
 #arena.left:not(.noleft){left:calc(10% - 240px);opacity: 0.6;}
 #arena.top{top:-100%;}
-#arena.paused{/*-webkit-filter:blur(3px);*/opacity:  0.3 !important;}
+#arena.paused,#arena.unfocus{opacity:  0.3 !important;}
 #arena.paused2{opacity:  0.1 !important;}
-#arena>.poplayer{
+#arena>.poplayer,
+#window>.poplayer{
 	width:100%;
 	height:100%;
 	position:absolute;
@@ -499,6 +500,7 @@ margin-bottom: 5px;
 .skill{left: 0 !important;width: 70px !important;}
 .caption>.ctext{text-align:center;font-size:16px;}
 .button.character,.button.card{width: 90px;height: 90px;position: relative;margin: 6px;}
+.button.card{font-size: 14px;}
 .button.character>.name{left:5px;top:22px;}
 .button.character>.hp{left:5px;top:3px;}
 .button.character>.hp.text{
@@ -508,6 +510,7 @@ margin-bottom: 5px;
 	font-size:20px;
 	letter-spacing:3px;
 }
+.button.nodisplay{display: none;}
 .button.character>.intro{top:71px;left:0;}
 .button.character>.identity{top:-6px;left:72px;}
 /*--------确认--------*/
@@ -1291,6 +1294,12 @@ div:hover>.wunature{
 	top:74px;
 	right:6px;
 }
+/*.card.equip1 .wunature,
+.card.equip3 .wunature,
+.card.equip4 .wunature{
+	top:56px;
+	right:4px;
+}*/
 .card .addinfo{
 	bottom:6px;
 	left:6px;

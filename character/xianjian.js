@@ -368,9 +368,9 @@ character.xianjian={
 					player.$throw(result.links);
 					ui.discardPile.appendChild(result.links[0]);
 					trigger.player.recover();
-					if(trigger.player!=player){
-						trigger.player.draw();
-					}
+					// if(trigger.player!=player){
+					// 	trigger.player.draw();
+					// }
 					player.logSkill('shuiyun5',trigger.player,'thunder');
 					game.addVideo('storage',player,['shuiyun',get.cardsInfo(player.storage.shuiyun),'cards']);
 				}
@@ -1380,7 +1380,7 @@ character.xianjian={
 		shuiyun2:'水蕴',
 		shuiyun5:'水蕴',
 		shuiyun3:'水蕴',
-		shuiyun_info:'回合结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力并摸一张牌',
+		shuiyun_info:'回合结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力',
 		wangyou:'忘忧',
 		wangyou_info:'其他角色的回合结束阶段，你可以弃置一张牌，令此回合内受过伤害的所有角色各摸一张牌',
 		changnian:'长念',

@@ -21,6 +21,8 @@
 			'bug修复',
 			'双指拖动对话框',
 			'对决模式调整',
+			'炉石构筑模式',
+			'金币系统（在选项－玩法中开启，暂无实际用途）',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -1191,6 +1193,20 @@
 							'[7,7]':'6~12回合',
 						}
 					},
+					coin:{
+						name:'富甲天下',
+						init:false,
+						restart:true,
+						onclick:function(bool){
+							if(bool){
+								lib.config.plays.add('coin');
+							}
+							else{
+								lib.config.plays.remove('coin');
+							}
+							game.saveConfig('plays',lib.config.plays);
+						}
+					},
 					update:function(config,map){
 						for(var i in map){
 							if(i.indexOf('_playpackconfig')!=-1){
@@ -1622,7 +1638,6 @@
 							normal:'普通',
 							mingjiang:'明将'
 						},
-						restart:true,
 						frequent:true,
 					},
 		            player_number:{
@@ -2119,8 +2134,61 @@
 				}
 			},
 			stone:{
-				name:'统率',
+				name:'炉石',
 				config:{
+					update:function(config,map){
+						if(config.stone_mode=='deck'){
+							// map.deck_length.show();
+							// map.deck_repeat.show();
+							map.random_length.hide();
+						}
+						else{
+							// map.deck_length.hide();
+							// map.deck_repeat.hide();
+							map.random_length.show();
+						}
+					},
+					stone_mode:{
+						name:'游戏模式',
+						init:'deck',
+						item:{
+							deck:'构筑',
+							random:'随机'
+						},
+						restart:true,
+						frequent:true,
+					},
+					// deck_length:{
+					// 	name:'卡组长度',
+					// 	init:'30',
+					// 	item:{
+					// 		'30':'30张',
+					// 		'50':'50张',
+					// 		'80':'80张',
+					// 	},
+					// 	frequent:true,
+					// },
+					// deck_repeat:{
+					// 	name:'重复卡牌',
+					// 	init:'2',
+					// 	item:{
+					// 		'2':'2张',
+					// 		'3':'3张',
+					// 		'5':'5张',
+					// 		'80':'无限',
+					// 	},
+					// 	frequent:true,
+					// },
+					random_length:{
+						name:'随从牌数量',
+						init:'1/80',
+						item:{
+							'1/120':'少',
+							'1/80':'中',
+							'1/50':'多',
+						},
+						frequent:true,
+					},
 					battle_number:{
 						name:'出场人数',
 						init:'3',
@@ -2141,6 +2209,14 @@
 							}
 						},
 					},
+		            double_character:{
+		                name:'双将模式',
+		                init:false,
+		                frequent:true,
+						restart:function(){
+							return _status.event.parent.name!='chooseCharacter'||_status.event.name!='chooseButton';
+						}
+		            },
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -2157,7 +2233,6 @@
 								}
 							}
 						},
-						frequent:true,
 					},
 					change_choice:{
 						name:'开启换将卡',
@@ -2171,19 +2246,16 @@
 								delete ui.cheat;
 							}
 						},
-						frequent:true,
 					},
 					ban_weak:{
 		                name:'屏蔽弱将',
 						init:false,
 						restart:true,
-						frequent:true,
 		            },
 		            ban_strong:{
 		                name:'屏蔽强将',
 						init:false,
 						restart:true,
-						frequent:true,
 		            },
 				}
 			}
@@ -2239,12 +2311,26 @@
 			'每一轮在最上方的一个随机位置增加一名敌人，若最上方已有角色，则将其下移一格<li>'+
 			'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募10名友方角色。<li>'+
 			'敌方角色到达底部出口时游戏失败，已方角色到达底部出口，将被移出游戏',
-			'统率模式':'<ul><li>游戏流程类似1v1，场上有两名主将进行对抗'+
+			'炉石模式':
+			'<div style="margin:10px">构筑</div><ul style="margin-top:0"><li>点击右上角的卡组管理构建卡组<li>一套卡组共30张牌，由法术和随从牌构成，每个同名卡牌最多带两张'+
+			'<li>卡组管理器中，随从右上角的x/y表示登场状态为x牌y血'+
+			'<li>摸牌阶段，主将少摸一张牌，并从卡组中获得一张牌'+
+			'<li>每名角色使用一套卡组，卡组用完后会重新补满'+
+			'<li>卡组与职业绑定，每个职业有一个专属技能，每回合限用一次，消耗两点行动值</ul>'+
+			'<div style="margin:10px">职业技能</div><ul style="margin-top:0"><li>祭司：召唤一个随机图腾'+
+			'<li>法师：对一名随从造成一点火焰伤害'+
+			'<li>医生：回复一点体力'+
+			'<li>战士：获得一点护甲，摸一张牌'+
+			'<li>术士：弃置一张牌并从牌库中摸两张牌'+
+			'<li>游侠：装备一把武器和一匹-1马'+
+			'<li>谋士：召唤一名士兵'+
+			'<li>猎人：弃置一张牌并对敌方主将造成一点伤害'+
+			'<li>蛮人：视为使用一张杀，此杀无视距离和防具且不计入出杀限制</ul>'+
+			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗'+
 			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
-			'<li>牌堆中随机加入总量1/3的随从牌，使用之可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
+			'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 			'随从与其他所有角色相互距离基数为1<li>'+
 			'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
-			'<li>牌堆中随机加入总量1/6的法术牌，效果主要与随从有关，法术牌根据强度不同可能会消耗额外的行动值'+
 			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
 			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
 			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸2+X张牌，X为对方存活的随从数，无替补时游戏结束'
@@ -2883,11 +2969,13 @@
 					player.phaseJudge();
 					"step 1"
 					player.phaseDraw();
-					if(player==game.me){
-						game.delay();
-					}
-					else{
-						game.delayx();
+					if(!player.noPhaseDelay){
+						if(player==game.me){
+							game.delay();
+						}
+						else{
+							game.delayx();
+						}
 					}
 					"step 2"
 					// if(!player.skipList.contains('phaseUse')) player.popup('出牌阶段');
@@ -2898,7 +2986,7 @@
 						delete ui.tempnowuxie;
 					}
 					player.phaseDiscard()
-					game.delayx();
+					if(!player.noPhaseDelay) game.delayx();
 					delete player.using;
 					delete player._noSkill;
 				},
@@ -2935,7 +3023,12 @@
 					event.goto(0);
 				},
 				phaseDraw:function(){
-					player.draw(event.num);
+					if(game.modPhaseDraw){
+						game.modPhaseDraw(player,event.num);
+					}
+					else{
+						player.draw(event.num);
+					}
 				},
 				phaseUse:function(){
 					"step 0";
@@ -4560,6 +4653,11 @@
 					game.addVideo('diex',player);
 					player.$die(source);
 					if(player.dieAfter) player.dieAfter(source);
+					if(typeof _status.coin=='number'&&source&&!_status.auto){
+						if(source==game.me||source.isUnderControl()){
+							_status.coin+=10;
+						}
+					}
 					if(ui.tempnowuxie&&ui.tempnowuxie._origin&&ui.tempnowuxie._origin.player==player){
 						ui.tempnowuxie.close();
 						delete ui.tempnowuxie;
@@ -5994,10 +6092,10 @@
 							cards[i].classList.add('drawinghidden');
 						}
 						if(lib.isSingleHandcard()||sort>0){
-							this.node.handcards1.appendChild(cards[i]);
+							this.node.handcards1.insertBefore(cards[i],this.node.handcards1.firstChild);
 						}
 						else{
-							this.node.handcards2.appendChild(cards[i]);
+							this.node.handcards2.insertBefore(cards[i],this.node.handcards2.firstChild);
 						}
 					}
 					if(this==game.me||_status.video) ui.updatehl();
@@ -7809,7 +7907,7 @@
 						this.node.info.innerHTML=get.translation(card[0])+'<span> </span>'+card[1];
 					}
 					if(lib.card[card[2]].addinfo){
-						this.node.addinfo=ui.create.div('.addinfo',this);
+						this.node.addinfo=ui.create.div('.range',this);
 						this.node.addinfo.innerHTML=lib.card[card[2]].addinfo;
 					}
 					if(card[0]=='heart'||card[0]=='diamond'){
@@ -8577,7 +8675,9 @@
 				priority:20,
 				popup:false,
 				content:function(){
-					player.popup('_phasebegin');
+					if(!player.noPhaseDelay){
+						player.popup('_phasebegin');
+					}
 					if(lib.config.glow_phase){
 						if(_status.currentPhase){
 							_status.currentPhase.classList.remove('glow_phase');
@@ -10630,6 +10730,64 @@
 			if(game.addOverDialog){
 				game.addOverDialog(dialog,result);
 			}
+			if(typeof _status.coin=='number'){
+				var coeff=Math.random()*0.4+0.8;
+				var added=0;
+				if(result=='战斗胜利'){
+					_status.coin+=20;
+					switch(lib.config.mode){
+						case 'identity':{
+							switch(game.me.identity){
+								case 'zhu':case 'zhong':case 'mingzhong':
+									if(get.config('enhance_zhu')){
+										added=10;
+									}
+									else{
+										added=20;
+									}
+									break;
+								case 'fan':
+									if(get.config('enhance_zhu')){
+										added=16;
+									}
+									else{
+										added=8;
+									}
+									break;
+								case 'nei':
+									added=40;
+									break;
+							}
+							added=added*(game.players.length+game.dead.length)/8;
+							break;
+						}
+						case 'guozhan':
+							if(game.me.identity=='ye'){
+								added=8;
+							}
+							else{
+								added=5/get.totalPopulation(game.me.identity);
+							}
+							added=added*(game.players.length+game.dead.length);
+							break;
+						case 'versus':
+							added=5*(game.players.length+_status.friend.length);
+							break;
+						default:
+							added=10;
+					}
+				}
+				else{
+					added=10;
+				}
+				_status.coin+=added*coeff;
+				if(_status.coinCoeff){
+					_status.coin*=_status.coinCoeff;
+				}
+				_status.coin=Math.ceil(_status.coin);
+				dialog.add(ui.create.div('','获得'+_status.coin+'金'));
+				game.changeCoin(_status.coin);
+			}
 			if(true){
 				if(game.players.length){
 					table=document.createElement('table');
@@ -11676,6 +11834,11 @@
 				if(lib.skill[i].viewAs){
 					if(lib.skill[i].ai==undefined) lib.skill[i].ai={};
 					var skill=lib.skill[i].ai;
+					if(!lib.card[lib.skill[i].viewAs.name]){
+						lib.skill[i]={};
+						lib.translate[i+'_info']='技能不可用';
+						continue;
+					}
 					var card=lib.card[lib.skill[i].viewAs.name].ai;
 					for(j in card){
 						if(skill[j]==undefined) skill[j]=card[j];
@@ -12277,10 +12440,13 @@
 				return ui.create.characterDialog.apply(this,args);
 			},
 			characterDialog:function(){
-				var filter,str,noclick,thisiscard;
+				var filter,str,noclick,thisiscard,seperate;
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
 						thisiscard=true;
+					}
+					else if(typeof arguments[i]=='object'&&typeof arguments[i].seperate=='function'){
+						seperate=arguments[i].seperate;
 					}
 					else if(typeof arguments[i]==='string'){
 						str=arguments[i];
@@ -12295,6 +12461,9 @@
 				var list=[];
 				var dialog;
 				var node=ui.create.div('.caption');
+				if(lib.config.layout=='phone'){
+					node.style.fontSize='30px';
+				}
 				var namecapt=[];
 				var getCapt=function(str){
 					if(lib.customCharacters.contains(str)){
@@ -12330,6 +12499,7 @@
 						lib.character[i][4].contains('bossallowed')) continue;
 						if(lib.character[i][4].contains('hiddenboss')&&!
 						lib.character[i][4].contains('bossallowed')) continue;
+						if(lib.character[i][4].contains('stonehidden')) continue;
 						if(lib.config.banned.contains(i)) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
@@ -12349,10 +12519,10 @@
 						this.classList.remove('thundertext');
 						for(var i=0;i<dialog.buttons.length;i++){
 							if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
-								dialog.buttons[i].style.display='none';
+								dialog.buttons[i].classList.add('nodisplay');
 							}
 							else{
-								dialog.buttons[i].style.display='';
+								dialog.buttons[i].classList.remove('nodisplay');
 							}
 						}
 					}
@@ -12366,10 +12536,22 @@
 						for(var i=0;i<dialog.buttons.length;i++){
 							if(dialog.buttons[i].capt!=dialog.currentcapt||
 							(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup)){
-								dialog.buttons[i].style.display='none';
+								dialog.buttons[i].classList.add('nodisplay');
 							}
 							else{
-								dialog.buttons[i].style.display='';
+								dialog.buttons[i].classList.remove('nodisplay');
+							}
+						}
+					}
+					if(dialog.seperate){
+						for(var i=0;i<dialog.seperate.length;i++){
+							if(!dialog.seperate[i].nextSibling.querySelector('.button:not(.nodisplay)')){
+								dialog.seperate[i].style.display='none';
+								dialog.seperate[i].nextSibling.style.display='none';
+							}
+							else{
+								dialog.seperate[i].style.display='';
+								dialog.seperate[i].nextSibling.style.display='';
 							}
 						}
 					}
@@ -12387,9 +12569,9 @@
 				if(thisiscard){
 					groupSort=function(name){
 						if(lib.card[name[2]].type=='basic') return 0;
-						if(lib.card[name[2]].type=='stonecard') return 0.5;
+						if(lib.card[name[2]].type=='stonecard') return -0.5;
 						if(lib.card[name[2]].type=='mengjing') return 0.3;
-						if(lib.card[name[2]].type=='stonecharacter') return 1;
+						if(lib.card[name[2]].type=='stonecharacter') return -1;
 						if(lib.card[name[2]].type=='chess') return 1.5;
 						if(lib.card[name[2]].type=='trick') return 2;
 						if(lib.card[name[2]].type=='delay') return 3;
@@ -12427,7 +12609,17 @@
 				}
 				dialog.add(node);
 				if(thisiscard){
-					dialog.add([list,'vcard'],noclick);
+					if(seperate){
+						seperate=seperate(list);
+						dialog.seperate=[];
+						for(var i in seperate){
+							dialog.seperate.push(dialog.add(i));
+							dialog.add([seperate[i],'vcard'],noclick);
+						}
+					}
+					else{
+						dialog.add([list,'vcard'],noclick);
+					}
 				}
 				else{
 					dialog.add([list,'character'],noclick);
@@ -13243,7 +13435,12 @@
 	                                        if(cfg.onsave){
 	                                            cfg.onsave.call(this,result);
 	                                        }
-											if(cfg.restart){
+											if(typeof cfg.restart=='function'){
+												if(cfg.restart()){
+													startButton.classList.add('glowing');
+												}
+											}
+											else if(cfg.restart){
 												startButton.classList.add('glowing');
 											}
 	                                    };
@@ -14782,6 +14979,9 @@
 												}
 												break;
 										}
+									}
+									if(ui.coin){
+										game.changeCoin(-20);
 									}
 									clickContainer.call(menuContainer);
 								}
@@ -17256,7 +17456,7 @@
 				uiintro.classList.add('popped');
 				uiintro.classList.add('static');
 				ui.window.appendChild(uiintro);
-				var layer=ui.create.div('.poplayer',ui.arena);
+				var layer=ui.create.div('.poplayer',ui.window);
 				var clicklayer=function(e){
 					uiintro.delete();
 					this.remove();
@@ -17337,6 +17537,8 @@
 			},
 			pause:function(){
 				if(_status.paused2) return;
+				if(_status.nopause) return;
+				if(ui.pause.classList.contains('hidden')) return;
 				ui.system.hide();
 				game.pause2();
 				var node=ui.create.pause().animate('start');
@@ -18266,6 +18468,41 @@
 			if(!lib.config.mode_config[lib.config.mode]) return;
 			return lib.config.mode_config[lib.config.mode][item];
 		},
+		coinCoeff:function(list){
+			var num=0;
+			for(var i=0;i<list.length;i++){
+				var rank=get.rank(list[i]);
+				switch(rank){
+					case 'sp':return 0.1;break;
+					case 's':num+=0.4;break;
+					case 'ap':num+=0.6;break;
+					case 'a':num+=0.8;break;
+					case 'am':num+=0.95;break;
+					case 'bp':num+=1.05;break;
+					case 'b':num+=1.2;break;
+					case 'bm':num+=1.4;break;
+					case 'c':num+=1.6;break;
+					case 'd':num+=1.8;break;
+				}
+			}
+			return num/list.length;
+		},
+		rank:function(name){
+			if(name==_status.lord) return 'ap';
+			var rank=lib.rank;
+			if(rank.s.contains(name)) return 's';
+			if(rank.ap.contains(name)) return 'ap';
+			if(rank.a.contains(name)) return 'a';
+			if(rank.am.contains(name)) return 'am';
+			if(rank.bp.contains(name)) return 'bp';
+			if(rank.b.contains(name)) return 'b';
+			if(rank.bm.contains(name)) return 'bm';
+			if(rank.c.contains(name)) return 'c';
+			if(rank.d.contains(name)) return 'd';
+			if(lib.customCharacters.contains(name)) return 's';
+			if(lib.characterPack.boss&&lib.characterPack.boss[name]) return 'sp';
+			return 'x';
+		},
 		cardInfo:function(card){
 			return [card.suit,card.number,card.name,card.nature];
 		},
@@ -18456,6 +18693,7 @@
 						_status.maxShuffle--;
 					}
 					var cards=[],i;
+					if(game.onWash) game.onWash();
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
 						cards.push(ui.discardPile.childNodes[i]);
 					}
@@ -19366,6 +19604,11 @@
 					}
 				}
 				uiintro.add(ui.create.div('.placeholder.slim'));
+			}
+			else if(node.classList.contains('identity')&&node.dataset.career){
+				var career=node.dataset.career;
+				uiintro.add(get.translation(career));
+				uiintro.add('<div class="text center" style="padding-bottom:5px">'+lib.translate['_'+career+'_skill_info']+'</div>');
 			}
 			return uiintro;
 		},
@@ -20566,11 +20809,11 @@
 							}
 						}
 					}
-					if(card[i].forbid&&card[i].forbid.contains(lib.config.mode)) continue;
-					if(card[i].mode&&card[i].mode.contains(lib.config.mode)==false) continue;
 					for(j in card[i]){
 						if(j=='mode'||j=='forbid') continue;
 						if(j=='list'){
+							if(card[i].forbid&&card[i].forbid.contains(lib.config.mode)) continue;
+							if(card[i].mode&&card[i].mode.contains(lib.config.mode)==false) continue;
 							if(lib.config.cards.contains(i)){
 								var pile;
 								if(typeof card[i][j]=='function'){
