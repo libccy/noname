@@ -438,6 +438,7 @@ mode.boss={
 				}
 				list.randomSort();
 				var dialog=ui.create.dialog('选择参战角色','hidden');
+				dialog.classList.add('fixed');
 				ui.window.appendChild(dialog);
 				dialog.classList.add('bosscharacter');
 				dialog.add('0/3');
@@ -462,6 +463,7 @@ mode.boss={
 					_status.event.dialog=ui.create.dialog('选择参战角色','hidden');
 					ui.window.appendChild(_status.event.dialog);
 					_status.event.dialog.classList.add('bosscharacter');
+					_status.event.dialog.classList.add('fixed');
 					_status.event.dialog.add('0/3');
 					_status.event.dialog.add([list.slice(0,20),'character']);
 					game.uncheck();
@@ -474,6 +476,7 @@ mode.boss={
 				};
 				event.dialogxx=ui.create.characterDialog();
 				event.dialogxx.classList.add('bosscharacter');
+				event.dialogxx.classList.add('fixed');
 				ui.create.cheat2=function(){
 					_status.createControl=event.asboss;
 					ui.cheat2=ui.create.control('自由选将',function(){

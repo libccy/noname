@@ -2274,11 +2274,11 @@ mode.chess={
 					}
 				}
 				game.leaderLord=['leader_caocao','leader_liubei','leader_sunquan'];
-				var dialog1=ui.create.dialog('选择君主');
+				var dialog1=ui.create.dialog('选择君主','hidden');
 				event.dialog1=dialog1;
-				dialog1.classList.add('fixed');
 				dialog1.classList.add('fullheight');
 				dialog1.classList.add('halfleft');
+				dialog1.classList.add('fixed');
 				dialog1.add([game.leaderLord,'character']);
 				var i;
 				for(i=0;i<dialog1.buttons.length;i++){
@@ -2356,11 +2356,13 @@ mode.chess={
 					dialog1.buttons[i].area='character';
 					fixButton(dialog1.buttons[i]);
 				}
-				var dialog2=ui.create.dialog('战斗难度');
+				dialog1.open();
+
+				var dialog2=ui.create.dialog('战斗难度','hidden');
 				event.dialog2=dialog2;
-				dialog2.classList.add('fixed');
 				dialog2.classList.add('fullheight');
 				dialog2.classList.add('halfright');
+				dialog2.classList.add('fixed');
 				dialog2.add([[
 					['','','leader_easy'],
 					['','','leader_medium'],
@@ -2394,6 +2396,7 @@ mode.chess={
 					dialog2.buttons[i].area='challenge';
 					fixButton(dialog2.buttons[i])
 				}
+				dialog2.open();
 
 				var selected={
 					lord:[],
@@ -3543,9 +3546,10 @@ mode.chess={
 					bossbuttons[i].classList.add('noclick');
 					bossbuttons[i].listen(clickBoss);
 				}
-				var dialog=ui.create.dialog('选择出场角色');
+				var dialog=ui.create.dialog('选择出场角色','hidden');
 				dialog.classList.add('fullwidth');
 				dialog.classList.add('fullheight');
+				dialog.classList.add('fixed');
 				dialog.add('0/'+get.config('battle_number'));
 				dialog.add([list.slice(0,parseInt(get.config('battle_number'))*4+5),'character']);
 				if(bossbuttons.length){
@@ -3599,16 +3603,18 @@ mode.chess={
 					}
 					list.randomSort();
 					_status.event.dialog.close();
-					var dialog=ui.create.dialog('选择出场角色');
+					var dialog=ui.create.dialog('选择出场角色','hidden');
 					_status.event.dialog=dialog;
 					dialog.classList.add('fullwidth');
 					dialog.classList.add('fullheight');
+					dialog.classList.add('fixed');
 					dialog.add('0/'+_status.event.selectButton());
 					dialog.add([list.slice(0,parseInt(get.config('battle_number'))*4+5),'character']);
 					if(bossbuttons.length){
 						dialog.add('挑战魔王');
 						dialog.add(bosses);
 					}
+					dialog.open();
 					game.uncheck();
 					game.check();
 				};
@@ -3620,6 +3626,7 @@ mode.chess={
 				event.dialogxx=ui.create.characterDialog();
 				event.dialogxx.classList.add('fullwidth');
 				event.dialogxx.classList.add('fullheight');
+				event.dialogxx.classList.add('fixed');
 				ui.create.cheat2=function(){
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){

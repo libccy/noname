@@ -50,6 +50,9 @@
 	left:6px;
     right: auto;
 }
+.player .equips{
+    z-index: 4;
+}
 
 #arena:not(.chess).mobile .player[data-position='0']:not(.minskin)>.identity{
     left: 102px;

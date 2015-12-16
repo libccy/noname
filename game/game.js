@@ -17,16 +17,12 @@
 	};
 	var lib={
 		version:1.71,
-		changeLog:[
-			'bug修复',
-			'双指拖动对话框',
-			'对决模式调整',
-			'炉石构筑模式',
-			'战绩',
-			'金币系统（在选项－玩法中开启，暂无实际用途）',
-		],
+		changeLog:[],
 		configprefix:'noname_0.9_',
-		updates:[],
+		updates:[
+			'DIY命名规则修改：冒号改为竖线|',
+			'记住对话框位置'
+		],
 		canvasUpdates:[],
 		video:[],
 		arenaReady:[],
@@ -45,11 +41,11 @@
 			}
 		},
 		setTranslate:function(name){
-			if(name.indexOf(':')==-1){
+			if(name.indexOf('|')==-1){
 				lib.translate[name]=name;
 			}
 			else{
-				lib.translate[name]=name.slice(name.indexOf(':')+1);
+				lib.translate[name]=name.slice(name.indexOf('|')+1);
 			}
 		},
 		checkCharacterName:function(name){
@@ -664,6 +660,31 @@
 						name:'自动弹出历史',
 						init:false,
 						unfrequent:true,
+					},
+					remember_dialog:{
+						name:'记住对话框位置',
+						init:true,
+						unfrequent:true,
+					},
+					reset_dialog:{
+						name:'重置对话框位置',
+						clear:true,
+						unfrequent:true,
+						onclick:function(){
+							if(ui.dialog){
+								var dialog=ui.dialog;
+								dialog.style.transform='';
+								dialog._dragtransform=[0,0];
+								dialog.style.transition='all 0.3s';
+								dialog._dragtouches;
+								dialog._dragorigin;
+								dialog._dragorigintransform;
+								setTimeout(function(){
+									dialog.style.transition='';
+								},500);
+							}
+							game.saveConfig('dialog_transform',[0,0]);
+						}
 					},
 					hide_card_image:{
 						name:'隐藏卡牌背景',
@@ -2693,7 +2714,9 @@
 									lib.setTranslate(i);
 									lib.translate[i+'_info']=skills[i].description;
 								}
-								game.finishCards();
+								if(_status.cardsFinished){
+									game.finishCards();
+								}
 							}
 							game.getDB('character',null,function(list){
 								for(var i in list){
@@ -8384,9 +8407,31 @@
 						else ui.dialogs[i].hide();
 					}
 					ui.dialog=this;
+					if(lib.config.remember_dialog&&lib.config.dialog_transform&&!this.classList.contains('fixed')){
+						var translate=lib.config.dialog_transform;
+						this._dragtransform=translate;
+						this.style.transform='translate('+translate[0]+'px,'+translate[1]+'px) scale(0.8)';
+					}
+					else{
+						this.style.transform='scale(0.8)';
+					}
+					this.style.transitionProperty='opacity,transform';
+					this.style.opacity=0;
 					ui.arena.appendChild(this);
 					ui.dialogs.unshift(this);
 					ui.update();
+					ui.refresh(this);
+					if(lib.config.remember_dialog&&lib.config.dialog_transform&&!this.classList.contains('fixed')){
+						this.style.transform='translate('+translate[0]+'px,'+translate[1]+'px) scale(1)';
+					}
+					else{
+						this.style.transform='scale(1)';
+					}
+					this.style.opacity=1;
+					var that=this;
+					setTimeout(function(){
+						that.style.transitionProperty='';
+					},500);
 					return this;
 				},
 				close:function(){
@@ -11804,6 +11849,7 @@
 			}
 		},
 		finishCards:function(){
+			_status.cardsFinished=true;
 			var i,j,k;
 			for(i in lib.card){
 				var card=lib.card[i];
@@ -11877,6 +11923,9 @@
 					continue;
 				}
 				if(lib.skill[i].viewAs){
+					if(typeof lib.skill[i].viewAs=='string'){
+						lib.skill[i].viewAs={name:lib.skill[i].viewAs};
+					}
 					if(lib.skill[i].ai==undefined) lib.skill[i].ai={};
 					var skill=lib.skill[i].ai;
 					if(!lib.card[lib.skill[i].viewAs.name]){
@@ -14517,8 +14566,8 @@
 									node=ui.create.div(skillList.firstChild);
 									node.skill=name;
 									var name2=name;
-									if(name.indexOf(':')!=-1){
-										name2=name2.slice(name2.indexOf(':')+1);
+									if(name.indexOf('|')!=-1){
+										name2=name2.slice(name2.indexOf('|')+1);
 									}
 									ui.create.div('',name2,node,editnode);
 									ui.create.div('','×',node,deletenode);
@@ -15213,7 +15262,7 @@
 								textstr='';
 								// perserveMenu=false;
 								try{
-									eval('text.value='+text.value);
+									eval(text.value);
 								}
 								catch(e){
 									text.value=e;
@@ -16286,7 +16335,7 @@
 						translate[0]+=dx;
 						translate[1]+=dy;
 						_status.draggingtouchdialog._dragtouches=e.touches[0];
-						_status.draggingtouchdialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
+						ui.click.checkdialogtranslate(translate,_status.draggingtouchdialog);
 					}
 					_status.clicked=true;
 				}
@@ -16489,11 +16538,12 @@
 						var translate=_status.draggingtouchdialog._dragtransform;
 						translate[0]+=dx;
 						translate[1]+=dy;
-						_status.draggingtouchdialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
+						ui.click.checkdialogtranslate(null,_status.draggingtouchdialog);
 
 						delete _status.draggingtouchdialog._dragorigin;
 					}
 					_status.clicked=false;
+					game.saveConfig('dialog_transform',translate);
 					delete _status.draggingtouchdialog;
 					_status.justdragged=true;
 					setTimeout(function(){
@@ -16603,6 +16653,10 @@
 					translate[0]=-ui.roundmenu._position[0]-ui.arena.offsetLeft;
 				}
 				ui.roundmenu.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
+			},
+			checkdialogtranslate:function(translate,dialog){
+				var translate=translate||dialog._dragtransform;
+				dialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 			},
 			windowmousewheel:function(e){
 				_status.tempunpopup=e;
@@ -16761,7 +16815,7 @@
 							var translate=ddialog._dragtransform.slice(0);
 							translate[0]+=e.x-ddialog._dragorigin.x;
 							translate[1]+=e.y-ddialog._dragorigin.y;
-							ddialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)'
+							ui.click.checkdialogtranslate(translate,ddialog);
 						}
 						_status.clicked=true;
 					}
@@ -16877,9 +16931,10 @@
 						var translate=ddialog._dragtransform;
 						translate[0]+=e.x-ddialog._dragorigin.x;
 						translate[1]+=e.y-ddialog._dragorigin.y;
-						ddialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
+						ui.click.checkdialogtranslate(null,ddialog);
 						delete ddialog._dragorigin;
 					}
+					game.saveConfig('dialog_transform',translate);
 					delete _status.draggingdialog;
 				}
 				if(_status.draggingroundmenu){
@@ -16895,7 +16950,6 @@
 						ui.click.checkroundtranslate();
 						delete ui.roundmenu._dragorigin;
 					}
-
 					game.saveConfig('roundmenu_transform',translate);
 					delete _status.draggingroundmenu;
 				}

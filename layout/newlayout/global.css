@@ -356,9 +356,6 @@
 	bottom:185px;
 	height:calc(100% - 385px);
 	z-index:4;
-	transition-property:opacity,background,box-shadow;
-	animation: dialog_start2 0.5s;
-	-webkit-animation: dialog_start2 0.5s;
 }
 .dialog.nobutton{
 	bottom:auto !important;

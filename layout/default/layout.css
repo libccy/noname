@@ -419,7 +419,7 @@ div:not(.handcards)>.card>.name,
 	display: block !important;
 }
 /*--------窗口--------*/
-.dialog{text-align: center;z-index:4;transition-property:opacity,background,box-shadow,top}
+.dialog{text-align: center;z-index:4;transition-property:opacity,background,box-shadow}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
 .dialog.fullheight{height:calc(100% - 80px) !important;top:40px !important}
 .dialog.fullwidth{left:calc(5% + 60px) !important;width:calc(90% - 120px) !important}
@@ -435,10 +435,7 @@ div:not(.handcards)>.card>.name,
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:6px;
-	transition: all 0.3s;
-	animation:dialog_start2 0.2s;
-	-webkit-animation:dialog_start2 0.2s;
-	transition-property:opacity;
+	transition: opacity 0.3s;
 }
 #window>.dialog.popped>.bar{
 	display:none !important;
@@ -841,14 +838,9 @@ margin-bottom: 5px;
 	animation: card_start 0.5s;
 	-webkit-animation: card_start 0.5s;
 }
-.dialog{
-	animation: dialog_start2 0.5s;
-	-webkit-animation: dialog_start2 0.5s;
-}
-.dialog.noslide{
-	animation: dialog_start2 0.5s;
-	-webkit-animation: dialog_start2 0.5s;
-	transition-property:opacity,background,box-shadow
+.dialog.popped{
+	animation: dialog_start2 0.3s;
+	-webkit-animation: dialog_start2 0.3s;
 }
 .dialog.removing{top: 100px}
 .card.drawing{
