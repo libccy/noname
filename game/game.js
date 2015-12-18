@@ -21,7 +21,9 @@
 		configprefix:'noname_0.9_',
 		updates:[
 			'DIY命名规则修改：冒号改为竖线|',
-			'记住对话框位置'
+			'DIY技能引用现有配音',
+			'从现有技能创建新技能',
+			'记住对话框位置',
 		],
 		canvasUpdates:[],
 		video:[],
@@ -45,7 +47,12 @@
 				lib.translate[name]=name;
 			}
 			else{
-				lib.translate[name]=name.slice(name.indexOf('|')+1);
+				if(name.lastIndexOf('|')>name.indexOf('|')){
+					lib.translate[name]=name.slice(name.indexOf('|')+1,name.lastIndexOf('|'));
+				}
+				else{
+					lib.translate[name]=name.slice(name.indexOf('|')+1);
+				}
 			}
 		},
 		checkCharacterName:function(name){
@@ -2946,6 +2953,23 @@
 				str+='}';
 				return str;
 			},
+			stringifySkill:function(obj){
+				var str='';
+				for(var i in obj){
+					str+=i+':'
+					if(Object.prototype.toString.call(obj[i])=='[object Object]'){
+						str+='{\n'+lib.init.stringifySkill(obj[i])+'}';
+					}
+					else if(typeof obj[i]=='function'){
+						str+=obj[i].toString().replace(/\t/g,'');
+					}
+					else{
+						str+=JSON.stringify(obj[i]);
+					}
+					str+=',\n'
+				}
+				return str;
+			}
 		},
 		translate:{
 			'default':"默认",
@@ -4061,11 +4085,19 @@
 					event._skill=event.skill;
 					if(lib.config.background_speak&&
 						(!lib.skill.global.contains(event.skill)||lib.skill[event.skill].forceaudio)){
-						if(typeof info.audio=='number'){
-							game.playAudio('skill',event.skill+Math.ceil(info.audio*Math.random()));
+						var audioname=event.skill;
+						var audioinfo=info.audio;
+						if(audioname.indexOf('|')<audioname.lastIndexOf('|')){
+							audioname=audioname.slice(audioname.lastIndexOf('|')+1);
+							if(lib.skill[audioname]){
+								audioinfo=lib.skill[audioname].audio;
+							}
 						}
-						else if(info.audio){
-							game.playAudio('skill',event.skill);
+						if(typeof audioinfo=='number'){
+							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
+						}
+						else if(audioinfo){
+							game.playAudio('skill',audioname);
 						}
 						else if(lib.config.background_ogg&&info.audio!==false){
 							game.playSkillAudio(event.skill);
@@ -6493,11 +6525,19 @@
 					}
 					var info=lib.skill[name];
 					if(info&&lib.config.background_speak){
-						if(typeof info.audio==='number'){
-							game.playAudio('skill',name+Math.ceil(info.audio*Math.random()));
+						var audioname=name;
+						var audioinfo=info.audio;
+						if(audioname.indexOf('|')<audioname.lastIndexOf('|')){
+							audioname=audioname.slice(audioname.lastIndexOf('|')+1);
+							if(lib.skill[audioname]){
+								audioinfo=lib.skill[audioname].audio;
+							}
 						}
-						else if(info.audio){
-							game.playAudio('skill',name);
+						if(typeof audioinfo==='number'){
+							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
+						}
+						else if(audioinfo){
+							game.playAudio('skill',audioname);
 						}
 						else{
 							if(lib.config.background_ogg&&info.audio!==false){
@@ -9014,6 +9054,9 @@
 			if(_status.video&&arguments[1]!='video') return;
 			if(_status.skillaudio.contains(name)) return;
 			game.addVideo('playSkillAudio',null,name);
+			if(name.indexOf('|')<name.lastIndexOf('|')){
+				name=name.slice(name.lastIndexOf('|')+1);
+			}
 			_status.skillaudio.add(name);
 			setTimeout(function(){
 				_status.skillaudio.remove(name);
@@ -12750,7 +12793,7 @@
 				if(!hidden){
 					dialog.open();
 				}
-				// if(!lib.config.touchscreen) dialog.contentContainer.onscroll=ui.update;
+				if(!lib.config.touchscreen) dialog.contentContainer.onscroll=ui.update;
 				dialog.contentContainer.ontouchstart=ui.click.touchStart;
 				dialog.contentContainer.ontouchmove = ui.click.touchScroll;
 				dialog.contentContainer.style.WebkitOverflowScrolling='touch';
@@ -14463,7 +14506,7 @@
 							var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
 							var list=[];
 							for(var i in lib.character){
-								if(!lib.customCharacters.contains(i)&&lib.character[i][3].length);
+								if(!lib.customCharacters.contains(i)&&lib.character[i][3].length)
 								list.push([i,lib.translate[i]]);
 							}
 							list.sort(function(a,b){
@@ -14496,6 +14539,9 @@
 								}
 							};
 							var skillopt=ui.create.selectlist(list2,list2[0],addSkill);
+							var editSkillButton=document.createElement('button');
+							editSkillButton.innerHTML='编辑';
+							addSkill.appendChild(editSkillButton);
 							var addSkillButton=document.createElement('button');
 							addSkillButton.innerHTML='添加';
 							addSkill.appendChild(addSkillButton);
@@ -14513,7 +14559,20 @@
 									createSkill.lastChild.querySelector('.skilldescription').value=info.description;
 									createSkill.lastChild.querySelector('textarea').value=info.content;
 								}
-							}
+							};
+							editSkillButton.onclick=function(){
+								var name=skillopt.value;
+								var info=lib.skill[name];
+								if(info){
+									createSkill.lastChild.classList.remove('hidden');
+									createSkill.firstChild.innerHTML='创建技能';
+									skillList.style.top='435px';
+
+									createSkill.lastChild.querySelector('.skillname').value='skill|'+lib.translate[name]+'|'+name;
+									createSkill.lastChild.querySelector('.skilldescription').value=lib.translate[name+'_info'];
+									createSkill.lastChild.querySelector('textarea').value=lib.init.stringifySkill(info);
+								}
+							};
 							addSkillButton.onclick=function(){
 								for(var i=0;i<skillList.firstChild.childNodes.length;i++){
 									if(skillList.firstChild.childNodes[i].skill==skillopt.value) return;
@@ -14525,7 +14584,7 @@
 								if(lib.skill[skillopt.value].createInfo){
 									node.createInfo=lib.skill[skillopt.value].createInfo;
 								}
-							}
+							};
 
 							var createSkill=ui.create.div('.add_skill.create','<div>创建技能...</div><br><div class="hidden"></div>',newCharacter);
 							createSkill.firstChild.listen(function(){
@@ -14567,7 +14626,12 @@
 									node.skill=name;
 									var name2=name;
 									if(name.indexOf('|')!=-1){
-										name2=name2.slice(name2.indexOf('|')+1);
+										if(name2.lastIndexOf('|')>name2.indexOf('|')){
+											name2=name2.slice(name2.indexOf('|')+1,name2.lastIndexOf('|'));
+										}
+										else{
+											name2=name2.slice(name2.indexOf('|')+1);
+										}
 									}
 									ui.create.div('',name2,node,editnode);
 									ui.create.div('','×',node,deletenode);
@@ -16230,6 +16294,7 @@
 			},
 			leavehoverpopped:function(){
 				if(_status.dragged) return;
+				if(this.classList.contains('noleave')) return;
 				this.delete();
 				var button=this._poppedorigin;
 

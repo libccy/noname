@@ -3526,43 +3526,6 @@ character.swd={
 					if(true){
 						return player.storage.kunlunjing3;
 					}
-					var table,str,st,tr,td;
-					for(var i=0;i<storage.length;i++){
-						if(game.players.contains(storage[i].player)){
-							st=storage[i];
-
-							tr=document.createElement('tr');
-							table.appendChild(tr);
-							td=document.createElement('td');
-							td.innerHTML=get.translation(st.player);
-							tr.appendChild(td);
-							td=document.createElement('td');
-							td.innerHTML=(st.handcards1.length+st.handcards2.length);
-							td.style.textAlign='center';
-							tr.appendChild(td);
-
-							td=document.createElement('td');
-							td.style.width='30px';
-							tr.appendChild(td);
-
-							str='';
-							if(st.equips.length+st.judges.length){
-								if(st.equips.length){
-									str+=get.translation(st.equips)
-								}
-								str=get.translation(st.equips.concat(st.judges));
-							}
-							else{
-								str='无';
-							}
-							td=document.createElement('td');
-							td.innerHTML=str;
-							tr.appendChild(td);
-						}
-					}
-
-					player.storage.kunlunjing3=table.outerHTML;
-					return table.outerHTML;
 				}
 			}
 		},
@@ -3763,7 +3726,7 @@ character.swd={
 				}
 				table.firstChild.firstChild.style.width='85px';
 				table.firstChild.childNodes[1].style.width='48px';
-				player.storage.kunlunjing3=table.outerHTML;
+				player.storage.kunlunjing3='未发动';
 			}
 		},
 		oldliaoyuan:{
