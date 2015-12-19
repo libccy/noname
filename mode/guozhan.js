@@ -405,7 +405,11 @@ mode.guozhan={
 						game.players[i].node.identity.firstChild.innerHTML='猜';
 						game.players[i].node.identity.dataset.color='unknown';
 					}
-					game.players[i].hiddenSkills=lib.character[game.players[i].name][3].concat(lib.character[game.players[i].name2][3]);
+					game.players[i].hiddenSkills=lib.character[game.players[i].name][3].slice(0);
+					var hiddenSkills2=lib.character[game.players[i].name2][3];
+					for(var j=0;j<hiddenSkills2.length;j++){
+						game.players[i].hiddenSkills.add(hiddenSkills2[j]);
+					}
 					game.players[i].group='unknown';
 					game.players[i].sex='unknown';
 					game.players[i].name1=game.players[i].name;
@@ -768,23 +772,55 @@ mode.guozhan={
 					event.finish();
 				}
 				else{
-					event.name=(game.expandSkills(lib.character[player.name1][3]).contains(trigger.skill))?
-					player.name1:player.name2;
-					var info=get.info(trigger.skill);
-					var yes=!info.check||info.check(trigger._trigger,player);
-					player.chooseBool('是否明置'+get.translation(event.name)+'以发动'+get.translation(trigger.skill)+'？').ai=function(){
-						return yes;
-					};
+					var bool1=(game.expandSkills(lib.character[player.name1][3]).contains(trigger.skill));
+					var bool2=(game.expandSkills(lib.character[player.name2][3]).contains(trigger.skill));
+					if(bool1&&bool2){
+						event.name=player.name1;
+						event.name2=player.name2;
+						var info=get.info(trigger.skill);
+						var yes=!info.check||info.check(trigger._trigger,player);
+						player.chooseBool('是否明置'+get.translation(event.name)+'以发动【'+get.translation(trigger.skill)+'】？').ai=function(){
+							return yes;
+						};
+					}
+					else{
+						event.name=bool1?player.name1:player.name2;
+						var info=get.info(trigger.skill);
+						var yes=!info.check||info.check(trigger._trigger,player);
+						player.chooseBool('是否明置'+get.translation(event.name)+'以发动【'+get.translation(trigger.skill)+'】？').ai=function(){
+							return yes;
+						};
+					}
 				}
 				"step 1"
 				if(result.bool){
 					if(event.name==player.name1) player.showCharacter(0);
 					else player.showCharacter(1);
 					trigger.revealed=true;
+					event.finish();
+				}
+				else if(event.name2){
+					var info=get.info(trigger.skill);
+					var yes=!info.check||info.check(trigger._trigger,player);
+					player.chooseBool('是否明置'+get.translation(event.name2)+'以发动【'+get.translation(trigger.skill)+'】？').ai=function(){
+						return yes;
+					};
 				}
 				else{
+					event.finish();
 					trigger.untrigger();
 					trigger.cancelled=true;
+				}
+				"step 2"
+				if(event.name2){
+					if(result.bool){
+						player.showCharacter(1);
+						trigger.revealed=true;
+					}
+					else{
+						trigger.untrigger();
+						trigger.cancelled=true;
+					}
 				}
 			}
 		},

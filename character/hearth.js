@@ -39,7 +39,7 @@ character.hearth={
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
 		// hs_tgolem:['male','qun',4,['guozai']],
 		hs_totemic:['male','wu',3,['s_tuteng']],
-		hs_xsylvanas:['female','qun',3,['busi','shixin','xmojian']],
+		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
 	},
@@ -225,7 +225,7 @@ character.hearth={
 			}
 		},
 		xmojian2:{},
-		shixin:{
+		xshixin:{
 			trigger:{source:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
@@ -2223,8 +2223,8 @@ character.hearth={
 		lingzhou_info:'每当你使用一张锦囊牌，可令一名角色摸一张牌或回复一点体力',
 		mieshi:'灭世',
 		mieshi_info:'锁定技，回合结束阶段，你流失一点体力，并对一名随机的其他角色造成一点火焰伤害',
-		shixin:'蚀心',
-		shixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各流失一点体力',
+		xshixin:'蚀心',
+		xshixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各流失一点体力',
 		xmojian:'魔箭',
 		xmojian_info:'每当你翻面时，你可以指定一名角色视为对其使用了一张杀，每回合最多发动一次',
 		enze:'恩泽',

@@ -1018,6 +1018,8 @@ character.yijiang={
 				if(result&&result.cards){
 					event.card=result.cards[0];
 					event.current.lose(result.cards,ui.special);
+					var cardx=ui.create.card();
+					cardx.classList.add('infohidden')
 					event.current.$throw(ui.create.card(),1000);
 				}
 				else{
@@ -2776,7 +2778,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('he','是否弃置一张装备牌令伤害-1？',function(card,player){
+				var next=player.chooseToDiscard('he','骄矜：是否弃置一张装备牌令伤害-1？',function(card,player){
 					return get.type(card)=='equip';
 				});
 				next.ai=function(card){

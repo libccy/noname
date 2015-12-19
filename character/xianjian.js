@@ -27,7 +27,7 @@ character.xianjian={
 		pal_hanlingsha:['female','shu',3,['tannang','tuoqiao']],
 		pal_liumengli:['female','wei',3,['tianxian','runxin','zhimeng']],
 		pal_murongziying:['male','wei',4,['xuanning','poyun','qianfang']],
-		pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','fenxin']],
+		pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','xfenxin']],
 
 	},
 	skill:{
@@ -80,14 +80,14 @@ character.xianjian={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'thunderDamage')){
-							if(target.hp<=1||!target.skills.contains('fenxin')) return [0,0];
+							if(target.hp<=1||!target.skills.contains('xfenxin')) return [0,0];
 							return [0,1.5];
 						}
 					}
 				}
 			},
 		},
-		fenxin:{
+		xfenxin:{
 			trigger:{player:'changeHp'},
 			forced:true,
 			filter:function(event){
@@ -106,9 +106,9 @@ character.xianjian={
 					}
 				}
 			},
-			group:'fenxin2'
+			group:'xfenxin2'
 		},
-		fenxin2:{
+		xfenxin2:{
 			trigger:{source:'dieAfter'},
 			forced:true,
 			content:function(){
@@ -1366,9 +1366,9 @@ character.xianjian={
 		xuanyan_info:'锁定技，你的火属性伤害+1；你造成火属性伤害后流失1点体力',
 		ningbin:'凝冰',
 		ningbin_info:'锁定技，每当你受到1次雷属性伤害，你回复1点体力',
-		fenxin:'焚心',
-		fenxin2:'焚心',
-		fenxin_info:'锁定技，每当你的体力值发生改变，你摸等量的牌；每当你杀死一名角色，你增加一点体力上限并回复一点体力',
+		xfenxin:'焚心',
+		xfenxin2:'焚心',
+		xfenxin_info:'锁定技，每当你的体力值发生改变，你摸等量的牌；每当你杀死一名角色，你增加一点体力上限并回复一点体力',
 		luanjian:'乱剑',
 		luanjian_info:'你可以将两张杀当杀使用，此杀无视距离和防具，且可以指定任意名目标',
 		tianfu:'天符',

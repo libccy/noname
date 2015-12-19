@@ -447,6 +447,7 @@
 	top:170px;
 	text-align: left;
 	line-height: 20px;
+	white-space: nowrap;
 }
 .menu-buttons>.new_character>.add_skill.options{
 	top:145px;

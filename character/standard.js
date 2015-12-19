@@ -884,6 +884,9 @@ character.standard={
 		tieji:{
 			audio:2,
 			trigger:{player:'shaBegin'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.target)<=0;
+			},
 			content:function(){
 				"step 0"
 				player.judge(function(card){

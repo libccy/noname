@@ -366,7 +366,7 @@ character.refresh={
 			},
 			discard:false,
 			prepare:function(cards,player,targets){
-				player.$give(1,targets[0]);
+				player.$give(cards,targets[0]);
 			},
 			content:function(){
 				"step 0"

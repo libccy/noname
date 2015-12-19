@@ -16,15 +16,16 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.71,
-		changeLog:[],
-		configprefix:'noname_0.9_',
-		updates:[
+		version:1.72,
+		changeLog:[
 			'DIY命名规则修改：冒号改为竖线|',
 			'DIY技能引用现有配音',
 			'从现有技能创建新技能',
 			'记住对话框位置',
+			'新武将（SP&英雄杀）'
 		],
+		configprefix:'noname_0.9_',
+		updates:[],
 		canvasUpdates:[],
 		video:[],
 		arenaReady:[],
@@ -6641,7 +6642,6 @@
 					}
 					if(this.marks[name]){
 						this.marks[name].info=info;
-						this.updateMarks();
 					}
 					else{
 						if(card){
@@ -6651,6 +6651,7 @@
 							this.marks[name]=this.mark(name,info);
 						}
 					}
+					this.updateMarks();
 					return this;
 				},
 				unmarkSkill:function(name){
@@ -8011,6 +8012,7 @@
 						this.node.info.classList.add('red');
 					}
 					this.node.name.innerHTML='';
+					this.node.image.className='image';
 					var name=get.translation(card[2]);
 					if(card[2]=='sha'){
 						if(card[3]=='fire'){
@@ -8039,6 +8041,10 @@
 					if(card[3]){
 						if(lib.nature.contains(card[3])) this.nature=card[3];
 						this.classList.add(card[3]);
+					}
+					else if(this.nature){
+						this.classList.remove(this.nature);
+						delete this.nature;
 					}
 					if(lib.card[card[2]].subtype) this.classList.add(lib.card[card[2]].subtype);
 					if(this.inits){
@@ -9347,6 +9353,7 @@
 				if(lib.config.mode!='chess'){
 					game.playerMap={};
 				}
+				game.finishCards();
 				'step 2'
 				if(event.video.length){
 					var content=event.video.shift();
@@ -14528,7 +14535,8 @@
 							for(var i=0;i<skills.length;i++){
 								list2.push([skills[i],lib.translate[skills[i]]]);
 							}
-							ui.create.selectlist(list,list[0],addSkill).onchange=function(){
+							var selectname=ui.create.selectlist(list,list[0],addSkill);
+							selectname.onchange=function(){
 								var skills=lib.character[this.value][3];
 								skillopt.innerHTML='';
 								for(var i=0;i<skills.length;i++){
@@ -14538,9 +14546,11 @@
 									skillopt.appendChild(option);
 								}
 							};
+							selectname.style.maxWidth='85px';
 							var skillopt=ui.create.selectlist(list2,list2[0],addSkill);
 							var editSkillButton=document.createElement('button');
 							editSkillButton.innerHTML='编辑';
+							editSkillButton.style.marginRight='3px';
 							addSkill.appendChild(editSkillButton);
 							var addSkillButton=document.createElement('button');
 							addSkillButton.innerHTML='添加';
@@ -20560,7 +20570,7 @@
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
-		            if(i!='zuoci'&&!list.contains(i)) console.log(i);
+		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&!list.contains(i)) console.log(i);
 		        }
 		    },
 			h:function(player){

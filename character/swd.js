@@ -166,17 +166,6 @@ character.swd={
 				threaten:2
 			}
 		},
-		miaobi:{
-			enable:'phaseUse',
-			viewAs:{name:'wugu'},
-			filterCard:{suit:'heart'},
-			filter:function(event,player){
-				return !player.getStat('skill').miaobi&&player.num('h',{suit:'heart'})>0;
-			},
-			check:function(card){
-				return 5-ai.get.value(card);
-			}
-		},
 		huajing:{
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
@@ -7736,9 +7725,6 @@ character.swd={
 				}
 			}
 		},
-		zhexian:{
-			inherit:'lingbo'
-		}
 	},
 	translate:{
 		swd_yangshuo:'杨硕',
@@ -7839,9 +7825,6 @@ character.swd={
 		jingjie_old_info:'限定技，出牌阶段，你可以令所有角色弃置所有牌，然后摸两张牌（不触发任何技能）',
 		kongmo:'恐魔',
 		kongmo_info:'锁定技，你使用基本牌或非延时锦囊牌后将额外结算一次卡牌效果',
-		miaobi:'妙笔',
-		miaobi_info:'出牌阶段限一次，你可以将一张红桃牌当作五谷丰登使用',
-		zhexian:'谪仙',
 		jufu:'巨斧',
 		jufu_info:'锁定技，当你有武器牌时，杀造成的伤害+1',
 		huajing:'化精',
@@ -8231,7 +8214,6 @@ character.swd={
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
 		funiao_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
-		zhexian_info:'每当你使用或打出一张闪，你可以摸两张牌',
 		lingbo_info:'每当你使用或打出一张闪，你可以摸两张牌',
 		xuehuang_info:'出牌阶段限一次，你可以弃置一张红色手牌令距离你一以内的所有角色受到一点火焰伤害',
 		zhuyu_info:'每当有横置的角色即将受到非火焰伤害，你可以弃置一张红色牌使其额外受到一点火焰伤害',

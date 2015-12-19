@@ -94,7 +94,7 @@ character.wind={
 				"step 0"
 				player.addSkill('shensu3');
 				var check= player.num('h')>2;
-				player.chooseTarget('是否发动神速？',function(card,player,target){
+				player.chooseTarget('是否发动【神速】？',function(card,player,target){
 					if(player==target) return false;
 					return player.canUse({name:'sha'},target);
 				}).ai=function(target){

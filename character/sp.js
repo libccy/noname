@@ -35,6 +35,11 @@ character.sp={
 		wutugu:['male','qun',15,['ranshang','hanyong']],
 		sp_caiwenji:['female','wei',3,['chenqing','mozhi']],
 		zhugeguo:['female','shu',3,['yuhua','qirang']],
+		liuzan:['male','wu',4,['fenyin']],
+		lingcao:['male','wu',4,['dujin']],
+		sunru:['female','wu',3,['shixin','qingyi']],
+		lingju:['female','qun',3,['jieyuan','fenxin']],
+		lifeng:['male','shu',3,['tunchu','shuliang']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -46,8 +51,337 @@ character.sp={
 		zhangbao:['zhangliang','zhangjiao'],
 		zhangliang:['zhangjiao'],
 		maliang:['masu'],
+		lingcao:['lingtong'],
+		lingju:['diaochan','lvbu'],
 	},
 	skill:{
+		tunchu:{
+			trigger:{player:'phaseDrawBegin'},
+			check:function(event,player){
+				return player.num('h')-player.num('h',{type:'equip'})+2<=player.hp;
+			},
+			content:function(){
+				trigger.num+=2;
+				player.addTempSkill('tunchu_choose','phaseDrawAfter');
+			},
+			init:function(player){
+				player.storage.tunchu=[];
+			},
+			intro:{
+				content:'cards'
+			},
+			group:'tunchu_disable',
+			subSkill:{
+				choose:{
+					trigger:{player:'phaseDrawEnd'},
+					forced:true,
+					popup:false,
+					content:function(){
+						'step 0'
+						player.removeSkill('tunchu_choose');
+						if(player.num('h')){
+							player.chooseCard('h',true);
+						}
+						else{
+							event.finish();
+						}
+						'step 1'
+						player.lose(result.cards,ui.special);
+						player.storage.tunchu=player.storage.tunchu.concat(result.cards);
+						player.markSkill('tunchu');
+						player.syncStorage('tunchu');
+					}
+				},
+				disable:{
+					mod:{
+						cardEnabled:function(card,player){
+							if(player.storage.tunchu&&player.storage.tunchu.length&&
+								(card.name=='sha'||card.name=='juedou')){
+								return false;
+							}
+						},
+						cardUsable:function(card,player){
+							if(player.storage.tunchu&&player.storage.tunchu.length&&
+								(card.name=='sha'||card.name=='juedou')){
+								return false;
+							}
+						},
+					}
+				}
+			}
+		},
+		shuliang:{
+			trigger:{global:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.storage.tunchu&&player.storage.tunchu.length>0&&event.player.num('h')==0;
+			},
+			content:function(){
+				'step 0'
+				var goon=(ai.get.attitude(player,trigger.player)>0);
+				player.chooseCardButton('是否对'+get.translation(trigger.player)+'发动【输粮】？',player.storage.tunchu).ai=function(){
+					if(goon) return 1;
+					return 0;
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('shuliang',trigger.player);
+					player.storage.tunchu.remove(result.links[0]);
+					player.$throw(result.links);
+					ui.discardPile.appendChild(result.links[0]);
+					player.syncStorage('tunchu');
+					if(player.storage.tunchu.length==0){
+						player.unmarkSkill('tunchu');
+					}
+					trigger.player.draw(2);
+				}
+			}
+		},
+		jieyuan:{
+			group:['jieyuan_more','jieyuan_less'],
+			subSkill:{
+				more:{
+					trigger:{source:'damageBegin'},
+					direct:true,
+					filter:function(event,player){
+						if(!player.num('h',{color:'black'})) return false;
+						return event.player.hp>=player.hp&&player!=event.player;
+					},
+					content:function(){
+						'step 0'
+						var goon=(ai.get.attitude(player,trigger.player)<0);
+						var next=player.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【竭缘】？',{color:'black'});
+						next.ai=function(){
+							if(goon){
+								return 8-ai.get.value(card);
+							}
+							return 0;
+						}
+						next.logSkill=['jieyuan',trigger.player];
+						'step 1'
+						if(result.bool){
+							player.logSkill('jieyuan',trigger.player);
+							trigger.num++;
+						}
+					}
+				},
+				less:{
+					trigger:{player:'damageBegin'},
+					filter:function(event,player){
+						if(!player.num('h',{color:'red'})) return false;
+						return event.source&&event.source.hp>=player.hp&&player!=event.source;
+					},
+					direct:true,
+					content:function(){
+						"step 0"
+						var next=player.chooseToDiscard('竭缘：是否弃置一张红色手牌令伤害-1？',{color:'red'});
+						next.ai=function(card){
+							if(player.hp==1||trigger.num>1){
+								return 9-ai.get.value(card);
+							}
+							if(player.hp==2){
+								return 8-ai.get.value(card);
+							}
+							return 7-ai.get.value(card);
+						};
+						next.logSkill='jieyuan';
+						"step 1"
+						if(result.bool){
+							game.delay();
+							trigger.num--;
+						}
+					}
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.5
+			}
+		},
+		fenxin:{
+			mode:['identity'],
+			trigger:{source:'dieBegin'},
+			filter:function(event,player){
+				return event.player.identity!='zhu'&&player.identity!='zhu'&&
+					player.identity!='mingzhong'&&event.player.identity!='mingzhong';
+			},
+			check:function(event,player){
+				if(player.identity==event.player.identity) return Math.random()<0.5;
+				var stat=ai.get.situation();
+				switch(player.identity){
+					case 'fan':
+						if(stat<0) return false;
+						if(stat==0) return Math.random()<0.6;
+						return true;
+					case 'zhong':
+						if(stat>0) return false;
+						if(stat==0) return Math.random()<0.6;
+						return true;
+					case 'nei':
+						if(event.player.identity=='fan'&&stat<0) return true;
+						if(event.player.identity=='zhong'&&stat>0) return true;
+						if(stat==0) return Math.random()<0.7;
+						return false;
+				}
+			},
+			prompt:function(event,player){
+				return '焚心：是否与'+get.translation(event.player)+'交换身份？';
+			},
+			content:function(){
+				var identity=player.identity;
+				player.identity=trigger.player.identity;
+				if(player.identityShown||player==game.me){
+					player.setIdentity();
+				}
+				trigger.player.identity=identity;
+				player.line(trigger.player,'green');
+			}
+		},
+		qingyi:{
+			group:['qingyi1','qingyi2']
+		},
+		qingyi1:{
+			audio:2,
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.addSkill('qingyi3');
+				var check= player.num('h')>2;
+				player.chooseTarget('是否发动【轻逸】？',function(card,player,target){
+					if(player==target) return false;
+					return player.canUse({name:'sha'},target);
+				}).ai=function(target){
+					if(!check) return 0;
+					return ai.get.effect(target,{name:'sha'},_status.event.player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('qingyi1',result.targets);
+					player.useCard({name:'sha'},result.targets[0],false);
+					player.skip('phaseJudge');
+					player.skip('phaseDraw');
+				}
+				player.removeSkill('qingyi3');
+			}
+		},
+		qingyi2:{
+			audio:2,
+			trigger:{player:'phaseUseBefore'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he',{type:'equip'})>0;
+			},
+			content:function(){
+				"step 0"
+				player.addSkill('qingyi3');
+				var check=player.num('h')<=player.hp;
+				player.chooseCardTarget({
+					prompt:'是否发动【轻逸】？',
+					filterCard:function(card){
+						return get.type(card)=='equip'
+					},
+					position:'he',
+					filterTarget:function(card,player,target){
+						if(player==target) return false;
+						return player.canUse({name:'sha'},target);
+					},
+					ai1:function(card){
+						if(!check) return 0;
+						return 6-ai.get.value(card);
+					},
+					ai2:function(target){
+						if(!check) return 0;
+						return ai.get.effect(target,{name:'sha'},_status.event.player);
+					}
+				});
+				"step 1"
+				if(result.bool){
+					player.logSkill('qingyi2',result.targets);
+					player.discard(result.cards[0]);
+					player.useCard({name:'sha'},result.targets[0]);
+					trigger.untrigger();
+					trigger.finish();
+				}
+				player.removeSkill('qingyi3');
+			}
+		},
+		qingyi3:{
+			mod:{
+				targetInRange:function(card,player,target,now){
+					return true;
+				}
+			},
+		},
+		shixin:{
+			trigger:{player:'damageBefore'},
+			filter:function(event){
+				return event.nature=='fire';
+			},
+			forced:true,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				nofire:true,
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'fireDamage')) return 0;
+					}
+				}
+			}
+		},
+		fenyin:{
+			audio:2,
+			trigger:{player:'useCard'},
+			frequent:true,
+			filter:function(event,player){
+				if(!event.cards||event.cards.length!=1) return false;
+				if(_status.currentPhase!=player) return false;
+				if(!player.storage.fenyin) return false;
+				return get.color(player.storage.fenyin)!=get.color(event.cards[0]);
+			},
+			content:function(){
+				player.draw();
+			},
+			intro:{
+				content:'card'
+			},
+			group:['fenyin2','fenyin3']
+		},
+		fenyin3:{
+			trigger:{player:'useCard'},
+			priority:-1,
+			forced:true,
+			popup:false,
+			silent:true,
+			filter:function(event,player){
+				if(!event.cards||event.cards.length!=1) return false;
+				if(_status.currentPhase!=player) return false;
+				return true;
+			},
+			content:function(){
+				player.storage.fenyin=trigger.cards[0];
+			}
+		},
+		fenyin2:{
+			trigger:{player:'phaseAfter'},
+			forced:true,
+			silent:true,
+			popup:false,
+			content:function(){
+				player.storage.fenyin=null;
+			}
+		},
+		dujin:{
+			audio:2,
+			trigger:{player:'phaseDrawBegin'},
+			frequent:true,
+			content:function(){
+				trigger.num+=1+Math.floor(player.num('e')/2);
+			}
+		},
 		qirang:{
 			audio:2,
 			trigger:{player:'equipEnd'},
@@ -3367,7 +3701,26 @@ character.sp={
 		mateng:'马腾',
 		sp_caiwenji:'sp蔡文姬',
 		zhugeguo:'诸葛果',
+		liuzan:'留赞',
+		lingcao:'凌操',
+		sunru:'孙茹',
+		lingju:'灵雎',
+		lifeng:'李丰',
 
+		tunchu:'屯储',
+		tunchu_info:'摸牌阶段摸牌时，你可以额外摸两张牌，若如此做，将一张手牌置于你的武将上，称为“粮”，只要你的武将牌上有“粮”，你便不能使用【杀】和【决斗】',
+		shuliang:'输粮',
+		shuliang_info:'每当一名角色的结束阶段开始时，若其没有手牌，你可以将一张“粮”置入弃牌堆，然后该角色摸两张牌',
+		jieyuan:'竭缘',
+		jieyuan_info:'当你对一名其他角色造成伤害时，若其体力值大于或等于你的体力值，你可弃置一张黑色手牌令此伤害+1；当你受到一名其他角色造成的伤害时，若其体力值大于或等于你的体力值，你可弃置一张红色手牌令此伤害-1。',
+		fenxin:'焚心',
+		fenxin_info:'定技，当你杀死一名非主公角色时，在其翻开身份牌之前，你可以与该角色交换身份牌。（你的身份为主公时不能发动此技能）',
+		shixin:'释衅',
+		shixin_info:'锁定技，当你受到火属性伤害时，你防止此伤害',
+		qingyi:'轻逸',
+		qingyi_info:'你可以跳过摸牌阶段，或跳过出牌阶段并弃置一张装备牌，若如此则视为对任意一名使用一张【杀】',
+		dujin:'独进',
+		dujin_info:'摸牌阶段，你可以额外摸X+1张牌（X为你装备区里牌数的一半且向下取整）',
 		yuhua:'羽化',
 		yuhua_info:'锁定技，弃牌阶段内，你的非基本牌不计入手牌数，且你不能弃置你的非基本牌',
 		qirang:'祈禳',
@@ -3472,6 +3825,8 @@ character.sp={
 		jilei2:'鸡肋',
 		fulu:'符箓',
 		fuji:'助祭',
+		fenyin:'奋音',
+		fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌',
 		fuji_info:'当一名角色造成雷电伤害时，你可以令其进行一次判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得此牌。',
 		fulu_info:'你可以将【杀】当雷【杀】使用。',
 		jilei_info:'每当你受到一次伤害，可以令伤害来源不能使用或打出其手牌直到回合结束',
