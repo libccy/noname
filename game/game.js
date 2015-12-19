@@ -7644,7 +7644,7 @@
 						if(cards[i].clone&&
 							(cards[i].clone.parentNode==this.parentNode||
 							cards[i].clone.parentNode==ui.arena)&&
-							parseFloat(getComputedStyle(cards[0].clone).opacity)>0.3){
+							parseFloat(getComputedStyle(cards[i].clone).opacity)>0.3){
 							cards[i].clone.moveDelete(this);
 							list2.push(cards[i].clone);
 						}
