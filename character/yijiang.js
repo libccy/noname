@@ -1019,8 +1019,9 @@ character.yijiang={
 					event.card=result.cards[0];
 					event.current.lose(result.cards,ui.special);
 					var cardx=ui.create.card();
-					cardx.classList.add('infohidden')
-					event.current.$throw(ui.create.card(),1000);
+					cardx.classList.add('infohidden');
+					cardx.classList.add('infoflip');
+					event.current.$throw(cardx,1000);
 				}
 				else{
 					event.card=null;

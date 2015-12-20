@@ -430,6 +430,10 @@ card.hearth={
 				order:8,
 				result:{
 					target:-1
+				},
+				tag:{
+					multineg:1,
+					multitarget:1
 				}
 			}
 		},

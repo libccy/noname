@@ -8,18 +8,18 @@ character.yxs={
 		yxs_aijiyanhou:['female','qun',3,['seyou','sheshi']],
 		yxs_diaochan:['female','qun',3,['fengyi','wange']],
 		yxs_yangyuhuan:['female','wu',3,['fengyan','nichang']],
-		yxs_baosi:['female','qun',3,['jieyin','fenghuo']],
-		yxs_napolun:['male','qun',4,['tongling','fanpu']],
-		yxs_kaisa:['male','qun',4,['ducai']],
-		yxs_zhuyuanzhang:['male','qun',4,['qiangyun']],
+		yxs_baosi:['female','wu',3,['jieyin','fenghuo']],
+		yxs_napolun:['male','wei',4,['tongling','fanpu']],
+		yxs_kaisa:['male','shu',4,['ducai']],
+		yxs_zhuyuanzhang:['male','wu',4,['qiangyun']],
 		yxs_jinke:['male','qun',3,['cike','qiangxi']],
 		yxs_libai:['male','qun',3,['miaobi','zhexian']],
-		yxs_luban:['male','qun',3,['guifu','lshengong']],
-		yxs_lvzhi:['female','qun',4,['zhensha','xumou']],
-		yxs_goujian:['male','qun',3,['keji','tuqiang']],
+		yxs_luban:['male','wu',3,['guifu','lshengong']],
+		yxs_lvzhi:['female','shu',4,['zhensha','xumou']],
+		yxs_goujian:['male','wu',3,['keji','tuqiang']],
 		yxs_lishimin:['male','qun',4,['kongju']],
-		yxs_huamulan:['female','qun',3,['xiaoji','yizhuang']],
-		yxs_luobinhan:['male','qun',4,['xiadao','lzhangyi']],
+		yxs_huamulan:['female','shu',3,['xiaoji','yizhuang']],
+		yxs_luobinhan:['male','wu',4,['xiadao','lzhangyi']],
 	},
 	skill:{
 		xiadao:{
@@ -953,7 +953,7 @@ character.yxs={
 				for(var i=0;i<trigger.targets.length;i++){
 					effect+=ai.get.effect(trigger.targets[i],trigger.card,trigger.player,player);
 				}
-				var str='是否弃置一张杀令'+get.translation(trigger.player);
+				var str='非攻：是否弃置一张杀令'+get.translation(trigger.player);
 				if(trigger.targets&&trigger.targets.length){
 					str+='对'+get.translation(trigger.targets);
 				}
@@ -976,7 +976,7 @@ character.yxs={
 			},
 			ai:{
 				threaten:1.2,
-				expose:0.1
+				expose:0.2
 			}
 		},
 		feiming:{

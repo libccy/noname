@@ -334,6 +334,7 @@ div:not(.handcards)>.card>.info,
 .handcards>.card:last-child>.info,
 div:not(.handcards)>.card>.name,
 .handcards>.card:last-child>.name{transform: none !important}
+div:not(.handcards)>.card>.info>span{display: inline !important}
 .card>.image{
 	width: 100%;
 	height: 100%;
@@ -387,7 +388,8 @@ div:not(.handcards)>.card>.name,
 	transform:scale(0.8);
 	transform-origin:bottom left;
 }
-.dialog .buttons>.button.character{
+.dialog .buttons>.button.character,
+.button.character.longcharacter{
 	height:108px;
 	background-size: cover;
 }

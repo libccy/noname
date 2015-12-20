@@ -4625,7 +4625,7 @@
 				gainMaxHp:function(){
 					"step 0"
 					game.log(player,'获得了'+get.cnNumber(num)+'点体力上限');
-					if(typeof player.singleHp==='boolean'){
+					if(!event.forced&&typeof player.singleHp==='boolean'){
 						if(player.singleHp){
 							player.singleHp=false;
 							player.maxHp+=num;
@@ -6339,11 +6339,18 @@
 					}
 					next.content=lib.element.playerproto.loseMaxHp;
 				},
-				gainMaxHp:function(num){
+				gainMaxHp:function(){
 					var next=game.createEvent('gainMaxHp');
-					next.num=num;
 					next.player=this;
-					if(next.num==undefined) next.num=1;
+					next.num=1;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]==='number'){
+							next.num=arguments[i];
+						}
+						else if(typeof arguments[i]==='boolean'){
+							next.forced=arguments[i];
+						}
+					}
 					next.content=lib.element.playerproto.gainMaxHp;
 				},
 				changeHp:function(num,popup){
@@ -12801,7 +12808,7 @@
 					dialog.open();
 				}
 				if(!lib.config.touchscreen) dialog.contentContainer.onscroll=ui.update;
-				dialog.contentContainer.ontouchstart=ui.click.touchStart;
+				dialog.contentContainer.ontouchstart=ui.click.dialogtouchStart;
 				dialog.contentContainer.ontouchmove = ui.click.touchScroll;
 				dialog.contentContainer.style.WebkitOverflowScrolling='touch';
 				dialog.ontouchstart=ui.click.dragtouchdialog;
@@ -15732,6 +15739,9 @@
 						if(!lib.config.show_name){
 							node.node.name.style.display='none';
 						}
+						if(node.node.hp.childNodes.length==0){
+							node.node.name.style.top='8px';
+						}
 						// var name=get.translation(item);
 						node.node.name.innerHTML=get.slimName(item);
 						// for(var i=0;i<name.length;i++){
@@ -17149,6 +17159,11 @@
 			},
 			window:function(){
 				var clicked=_status.clicked;
+				var dialogtouched=false;
+				if(_status.dialogtouched){
+					_status.dialogtouched=false;
+					dialogtouched=true;
+				}
 				if(_status.dragged) return;
 				if(_status.touchpopping) return;
 				if(_status.reloading) return;
@@ -17180,7 +17195,7 @@
 						ui.control.show();
 						game.resume2();
 					}
-					else if(_status.event.isMine()){
+					else if(_status.event.isMine()&&!dialogtouched){
 						if(_status.event.custom.replace.window){
 							_status.event.custom.replace.window();
 						}
@@ -17874,6 +17889,12 @@
 				this.startY=e.touches[0].clientY;
 				_status.dragged=false;
 			},
+			dialogtouchStart:function(e){
+				this.startX=e.touches[0].clientX;
+				this.startY=e.touches[0].clientY;
+				_status.dragged=false;
+				_status.dialogtouched=true;
+			},
 			touchScroll:function(e) {
 				if(_status.mousedragging) return;
 				if(_status.draggingtouchdialog) return;
@@ -18498,9 +18519,11 @@
 				hs1[i].classList.remove('drawinghidden');
 				if(offset12>40){
 					offset12=90-hs1[i].node.info.offsetWidth;
+					hs1[i].node.info.querySelector('span').style.display='none';
 					hs1[i].node.name.style.transform='translateY(17px)';
 				}
 				else{
+					hs1[i].node.info.querySelector('span').style.display='';
 					hs1[i].node.name.style.transform='';
 				}
 				hs1[i].node.info.style.transform='translateX(-'+offset12+'px)';
@@ -18532,9 +18555,11 @@
 				hs2[i].classList.remove('drawinghidden');
 				if(offset22>40){
 					offset22=90-hs2[i].node.info.offsetWidth;
+					hs2[i].node.info.querySelector('span').style.display='none';
 					hs2[i].node.name.style.transform='translateY(17px)';
 				}
 				else{
+					hs2[i].node.info.querySelector('span').style.display='';
 					hs2[i].node.name.style.transform='';
 				}
 				hs2[i].node.info.style.transform='translateX(-'+offset22+'px)';

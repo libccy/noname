@@ -1,5 +1,0 @@
-character.xswd={
-	character:{
-		
-	},
-}

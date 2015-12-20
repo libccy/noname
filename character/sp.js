@@ -56,6 +56,7 @@ character.sp={
 	},
 	skill:{
 		tunchu:{
+			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
 				return player.num('h')-player.num('h',{type:'equip'})+2<=player.hp;
@@ -111,6 +112,7 @@ character.sp={
 			}
 		},
 		shuliang:{
+			audio:2,
 			trigger:{global:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -141,6 +143,7 @@ character.sp={
 			group:['jieyuan_more','jieyuan_less'],
 			subSkill:{
 				more:{
+					audio:true,
 					trigger:{source:'damageBegin'},
 					direct:true,
 					filter:function(event,player){
@@ -157,15 +160,15 @@ character.sp={
 							}
 							return 0;
 						}
-						next.logSkill=['jieyuan',trigger.player];
+						next.logSkill=['jieyuan_more',trigger.player];
 						'step 1'
 						if(result.bool){
-							player.logSkill('jieyuan',trigger.player);
 							trigger.num++;
 						}
 					}
 				},
 				less:{
+					audio:true,
 					trigger:{player:'damageBegin'},
 					filter:function(event,player){
 						if(!player.num('h',{color:'red'})) return false;
@@ -184,7 +187,7 @@ character.sp={
 							}
 							return 7-ai.get.value(card);
 						};
-						next.logSkill='jieyuan';
+						next.logSkill='jieyuan_less';
 						"step 1"
 						if(result.bool){
 							game.delay();
@@ -201,7 +204,16 @@ character.sp={
 		fenxin:{
 			mode:['identity'],
 			trigger:{source:'dieBegin'},
+			init:function(player){
+				player.storage.fenxin=false;
+			},
+			intro:{
+				content:'limited'
+			},
+			audio:2,
+			mark:true,
 			filter:function(event,player){
+				if(player.storage.fenxin) return false;
 				return event.player.identity!='zhu'&&player.identity!='zhu'&&
 					player.identity!='mingzhong'&&event.player.identity!='mingzhong';
 			},
@@ -235,13 +247,15 @@ character.sp={
 				}
 				trigger.player.identity=identity;
 				player.line(trigger.player,'green');
+				player.storage.fenxin=true;
+				player.unmarkSkill('fenxin');
 			}
 		},
 		qingyi:{
 			group:['qingyi1','qingyi2']
 		},
 		qingyi1:{
-			audio:2,
+			audio:true,
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			content:function(){
@@ -266,7 +280,7 @@ character.sp={
 			}
 		},
 		qingyi2:{
-			audio:2,
+			audio:true,
 			trigger:{player:'phaseUseBefore'},
 			direct:true,
 			filter:function(event,player){
@@ -314,6 +328,7 @@ character.sp={
 			},
 		},
 		shixin:{
+			audio:2,
 			trigger:{player:'damageBefore'},
 			filter:function(event){
 				return event.nature=='fire';
@@ -3712,9 +3727,11 @@ character.sp={
 		shuliang:'输粮',
 		shuliang_info:'每当一名角色的结束阶段开始时，若其没有手牌，你可以将一张“粮”置入弃牌堆，然后该角色摸两张牌',
 		jieyuan:'竭缘',
+		jieyuan_more:'竭缘',
+		jieyuan_less:'竭缘',
 		jieyuan_info:'当你对一名其他角色造成伤害时，若其体力值大于或等于你的体力值，你可弃置一张黑色手牌令此伤害+1；当你受到一名其他角色造成的伤害时，若其体力值大于或等于你的体力值，你可弃置一张红色手牌令此伤害-1。',
 		fenxin:'焚心',
-		fenxin_info:'定技，当你杀死一名非主公角色时，在其翻开身份牌之前，你可以与该角色交换身份牌。（你的身份为主公时不能发动此技能）',
+		fenxin_info:'限定技，当你杀死一名非主公角色时，在其翻开身份牌之前，你可以与该角色交换身份牌。（你的身份为主公时不能发动此技能）',
 		shixin:'释衅',
 		shixin_info:'锁定技，当你受到火属性伤害时，你防止此伤害',
 		qingyi:'轻逸',

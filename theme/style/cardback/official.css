@@ -2,3 +2,7 @@
     background: url('image/official.png');
     background-size: cover;
 }
+.card.infohidden:not(.infoflip){
+	background: url('image/official2.png');
+    background-size: cover;
+}

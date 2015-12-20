@@ -32,16 +32,22 @@ character.hearth={
 		// hs_bolvar:['male','wei',2,[]],
 		// hs_fuding:['male','wei',2,[]],
 		hs_ysera:['female','wu',4,['chenshui']],
+		hs_alextrasza:['female','shu',5,['fushi']],
+		hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
 
-		hs_ronghejuren:['male','shu',8,[]],
+		hs_zhishigushu:['male','shu',4,['jiaohui']],
+		hs_zhanzhenggushu:['male','wei',6,['biri']],
+		hs_ronghejuren:['male','shu',8,['ronghuo']],
+		hs_shanlingjuren:['male','qun',8,['luoshi']],
 		hs_edwin:['male','qun',3,['lianzhan']],
 		hs_mijiaojisi:['female','qun',3,['kuixin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
-		// hs_tgolem:['male','qun',4,['guozai']],
+		hs_tgolem:['male','qun',4,['guozaix']],
 		hs_totemic:['male','wu',3,['s_tuteng']],
 		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
+		hs_jinglinglong:['male','wu',3,['mianyi']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -50,6 +56,222 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		biri:{
+			trigger:{global:'useCard'},
+			priority:15,
+			filter:function(event,player){
+				return event.card.name=='sha'&&event.player!=player&&
+					get.distance(player,event.targets[0])<=1&&
+					player.num('h',{type:'basic'})>0&&
+					event.targets.contains(player)==false&&event.targets.length==1;
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				var effect=0;
+				for(var i=0;i<trigger.targets.length;i++){
+					effect+=ai.get.effect(trigger.targets[i],trigger.card,trigger.player,player);
+				}
+				var str='蔽日：是否弃置一张基本牌令'+get.translation(trigger.player);
+				if(trigger.targets&&trigger.targets.length){
+					str+='对'+get.translation(trigger.targets);
+				}
+				str+='的'+get.translation(trigger.card)+'失效？';
+				if(event.isMine()||effect<0){
+					game.delay(0.5);
+				}
+				player.chooseToDiscard('h',{type:'basic'},str).ai=function(card){
+					if(effect<0){
+						return 9-ai.get.value(card);
+					}
+					return -1;
+				}
+				"step 1"
+				if(result.bool){
+					trigger.untrigger();
+					trigger.finish();
+					player.logSkill('biri',trigger.targets);
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		stuxi:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				'step 0'
+				event.targets=get.players();
+				'step 1'
+				if(event.targets.length){
+					var target=event.targets.shift();
+					if(!target.isTurnedOver()&&target.num('he')){
+						target.chooseToDiscard(true);
+					}
+					event.redo();
+				}
+			}
+		},
+		bingdong:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return !player.isTurnedOver();
+			},
+			filterTarget:function(card,player,target){
+				return !target.isTurnedOver()&&player!=target;
+			},
+			content:function(){
+				'step 0'
+				if(!player.isTurnedOver()){
+					player.turnOver();
+				}
+				'step 1'
+				if(!target.isTurnedOver()){
+					target.turnOver();
+				}
+			},
+			ai:{
+				order:1,
+				expose:0.2,
+				result:{
+					target:function(player,target){
+						if(ai.get.attitude(player,target)<-3&&player.identity!='zhu'){
+							return -1;
+						}
+						return 0;
+					}
+				}
+			}
+		},
+		luoshi:{
+			trigger:{player:'damageEnd'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('he')>0||(event.source&&event.source.num('he')>0);
+			},
+			content:function(){
+				'step 0'
+				var hs=player.get('he');
+				if(hs.length){
+					player.discard(hs.randomGet())
+				}
+				'step 1'
+				if(trigger.source){
+					var hs=trigger.source.get('he');
+					if(hs.length){
+						trigger.source.discard(hs.randomGet())
+					}
+				}
+			}
+		},
+		ronghuo:{
+			trigger:{player:'useCardToBefore'},
+			priority:7,
+			filter:function(event,player){
+				if(event.card.name=='sha'&&!event.card.nature) return true;
+			},
+			check:function(event,player){
+				var att=ai.get.attitude(player,event.target);
+				if(event.target.hasSkillTag('nofire')){
+					return att>0;
+				}
+				return att<=0;
+			},
+			forced:true,
+			content:function(){
+				trigger.card.nature='fire';
+				player.addSkill('ronghuo2');
+				player.storage.ronghuo=trigger.card;
+			}
+		},
+		ronghuo2:{
+			trigger:{player:'useCardAfter'},
+			forced:true,
+			popup:false,
+			content:function(){
+				delete player.storage.ronghuo.nature;
+			}
+		},
+		fushi:{
+			enable:'phaseUse',
+			filterTarget:true,
+			content:function(){
+				'step 0'
+				target.loseMaxHp(true);
+				'step 1'
+				if(target.hp<target.maxHp){
+					target.recover();
+				}
+			},
+			ai:{
+				threaten:1.4,
+				expose:0.2,
+				order:9,
+				result:{
+					target:function(player,target){
+						if(target.hp==target.maxHp) return 0;
+						if(target.hp==target.maxHp-1) return -1;
+						if(target.hp==1) return 1;
+						if(target.hp<target.maxHp-2) return 0.5;
+						return 0;
+					}
+				}
+			}
+		},
+		mianyi:{
+			mod:{
+				targetEnabled:function(card,player,target,now){
+					if(player!=target){
+						if(get.type(card)=='trick'&&!get.tag(card,'multitarget')) return false;
+					}
+				}
+			}
+		},
+		jiaohui:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return !player.getStat('damage');
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【教诲】？').ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(att>1&&target.hp<=1){
+						att+=2;
+					}
+					return att;
+				};
+				'step 1'
+				if(result.bool){
+					event.target=result.targets[0];
+					player.logSkill('jiaohui',event.target);
+					if(event.target.hp<event.target.maxHp){
+						event.target.chooseControl('draw_card','recover_hp',function(event,target){
+							if(target.hp>=2||target.hp>=target.maxHp-1) return 'draw_card';
+							if(target.hp==2&&target.num('h')==0) return 'draw_card';
+							return 'recover_hp';
+						});
+					}
+					else{
+						event.target.draw(2);
+						event.finish();
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.control=='draw_card'){
+					event.target.draw(2);
+				}
+				else{
+					event.target.recover();
+				}
+			},
+		},
 		chenshui:{
 			trigger:{player:'phaseEnd'},
 			frequent:true,
@@ -346,6 +568,44 @@ character.hearth={
 				player.chooseToDiscard('he',true,player.storage.guozai2);
 				player.storage.guozai2=0;
 				player.removeSkill('guozai2');
+			}
+		},
+		guozaix:{
+			enable:'phaseUse',
+			usable:2,
+			filter:function(event,player){
+				return player.num('h')<4;
+			},
+			init:function(player){
+				player.storage.guozaix2=0;
+			},
+			content:function(){
+				var num=4-player.num('h');
+				player.draw(num);
+				player.addSkill('guozaix2');
+				player.storage.guozaix2+=num;
+				game.addVideo('storage',player,['guozaix2',player.storage.guozaix2]);
+			},
+			ai:{
+				order:1,
+				result:{
+					player:1
+				}
+			}
+		},
+		guozaix2:{
+			mark:true,
+			intro:{
+				content:function(storage){
+					return '需弃置'+get.cnNumber(storage)+'张牌';
+				}
+			},
+			trigger:{player:'phaseUseEnd'},
+			forced:true,
+			content:function(){
+				player.chooseToDiscard('he',true,player.storage.guozaix2);
+				player.storage.guozaix2=0;
+				player.removeSkill('guozaix2');
 			}
 		},
 		hanshuang:{
@@ -2189,15 +2449,37 @@ character.hearth={
 		hs_malygos:'玛里苟斯',
 		hs_xuefashi:'血法师',
 		hs_ysera:'伊瑟拉',
+		hs_alextrasza:'阿莱克斯塔',
 
+		fushi:'缚誓',
+		fushi_info:'出牌阶段，你可以令一名已受伤角色失去一点体力上限并回复一点体力',
 		hs_ronghejuren:'熔核巨人',
+		hs_shanlingjuren:'山岭巨人',
 		hs_edwin:'艾德温',
 		hs_mijiaojisi:'秘教祭司',
 		hs_huzhixiannv:'湖之仙女',
 		hs_tgolem:'图腾魔像',
 		hs_totemic:'图腾师',
 		hs_bilanyoulong:'碧蓝幼龙',
+		hs_zhishigushu:'知识古树',
+		hs_zhanzhenggushu:'战争古树',
+		hs_jinglinglong:'精灵龙',
+		hs_sapphiron:'萨菲隆',
 
+		biri:'蔽日',
+		biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张基本牌取消之',
+		stuxi:'吐息',
+		stuxi_info:'锁定技，回合结束阶段，你令所有未翻面角色各弃置一张牌',
+		bingdong:'冰冻',
+		bingdong_info:'出牌阶段限一次，若你的武将牌正面朝上，你可以选择一名未翻面的角色与其同时将武将牌翻至背面',
+		ronghuo:'熔火',
+		ronghuo_info:'锁定技，你的普通杀均视为火杀',
+		luoshi:'落石',
+		luoshi_info:'锁定技，每当你受到一次伤害，你与伤害来源各随机弃置一张牌',
+		mianyi:'免疫',
+		mianyi_info:'锁定技，你不能成为其他角色的单体非延时锦囊的目标',
+		jiaohui:'教诲',
+		jiaohui_info:'回合结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸两张牌或回复一点体力',
 		chenshui:'沉睡',
 		chenshui_info:'回合结束阶段，你可以将一张随机梦境牌加入你的手牌',
 		mengjing:'梦境',
@@ -2238,6 +2520,10 @@ character.hearth={
 		guozai2:'过载',
 		guozai2_bg:'载',
 		guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
+		guozaix:'重载',
+		guozaix2:'重载',
+		guozaix2_bg:'载',
+		guozaix_info:'出牌阶段限两次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
 		hanshuang:'寒霜',
 		hanshuang_info:'锁定技，你使用黑色牌造成伤害后，受伤害角色须将武将牌翻至背面，然后你流失一点体力',
 		bingshi:'冰噬',
