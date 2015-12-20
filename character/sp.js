@@ -2449,7 +2449,7 @@ character.sp={
 			}
 		},
 		junbing2:{
-			trigger:{player:'phaseBegin'},
+			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
 				if(player.skills.contains('junbing')||player.num('h')>1) return false;
 				for(var i=0;i<game.players.length;i++){
