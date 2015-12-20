@@ -18520,13 +18520,14 @@
 				if(offset12>40){
 					offset12=90-hs1[i].node.info.offsetWidth;
 					hs1[i].node.info.querySelector('span').style.display='none';
-					hs1[i].node.name.style.transform='translateY(17px)';
+					hs1[i].node.name.style.transform='translateY(16px)';
+					hs1[i].node.info.style.transform='translateX(-'+offset12+'px) translateY(-3px)';
 				}
 				else{
 					hs1[i].node.info.querySelector('span').style.display='';
 					hs1[i].node.name.style.transform='';
+					hs1[i].node.info.style.transform='translateX(-'+offset12+'px)';
 				}
-				hs1[i].node.info.style.transform='translateX(-'+offset12+'px)';
 			}
 			ui.handcards1Container.firstChild.style.width=(offset1*(hs1.length-1)+118)+'px';
 
@@ -18556,13 +18557,14 @@
 				if(offset22>40){
 					offset22=90-hs2[i].node.info.offsetWidth;
 					hs2[i].node.info.querySelector('span').style.display='none';
-					hs2[i].node.name.style.transform='translateY(17px)';
+					hs2[i].node.name.style.transform='translateY(16px)';
+					hs2[i].node.info.style.transform='translateX(-'+offset22+'px) translateY(-3px)';
 				}
 				else{
 					hs2[i].node.info.querySelector('span').style.display='';
 					hs2[i].node.name.style.transform='';
+					hs2[i].node.info.style.transform='translateX(-'+offset22+'px)';
 				}
-				hs2[i].node.info.style.transform='translateX(-'+offset22+'px)';
 			}
 			ui.handcards2Container.firstChild.style.width=(offset2*(hs2.length-1)+118)+'px';
 		},
