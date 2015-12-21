@@ -17,13 +17,7 @@
 	};
 	var lib={
 		version:1.72,
-		changeLog:[
-			'DIY命名规则修改：冒号改为竖线|',
-			'DIY技能引用现有配音',
-			'从现有技能创建新技能',
-			'记住对话框位置',
-			'新武将（SP&英雄杀）'
-		],
+		changeLog:[],
 		configprefix:'noname_0.9_',
 		updates:[],
 		canvasUpdates:[],

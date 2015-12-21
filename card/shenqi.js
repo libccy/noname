@@ -444,7 +444,7 @@ card.shenqi={
 						return ai.get.recoverEffect(player);
 					}
 				},
-				order:4
+				order:2.5
 			}
 		},
 		kongdongyin:{
