@@ -80,7 +80,7 @@ character.gujian={
 		meiying:{
 			trigger:{global:'phaseBefore'},
 			filter:function(event,player){
-				return event.player!=player&&!player.isTurnedOver();
+				return event.player!=player&&!player.isTurnedOver()&&!player.storage.meiying;
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0&&
