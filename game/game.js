@@ -2569,7 +2569,6 @@
 				lib.config.all.plays=[];
 				lib.config.all.mode=[];
 
-				var charlist=['standard','wind','fire','woods','mountain','guozhan','sp','yijiang','extra','refresh'];
 				for(i in character.pack){
 					if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
 						lib.config.all.characters.push(i);
@@ -2631,8 +2630,8 @@
 				if(localStorage.getItem(lib.configprefix+'playback')){
 					lib.init.js('mode',lib.config.mode);
 				}
-				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)
-					&&lib.config.all.mode.indexOf(lib.config.mode)!=-1){
+				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)&&
+					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
 					lib.init.js('mode',lib.config.mode);
 				}
 				lib.init.js('card',lib.config.all.cards);
@@ -2876,7 +2875,7 @@
 				},500);
 			},
 			parse:function(func){
-				var k,func2;
+				var k;
 				var str='(';
 				str+=func.toString();
 				if(str.indexOf('step 0')==-1){
@@ -3151,6 +3150,7 @@
 						else if(event.prompt==undefined){
 							var str;
 							if(typeof event.filterCard=='object'){
+								var filter=event.filterCard;
 								str='请使用'+get.cnNumber(event.selectCard[0])+'张'
 								if(filter.name){
 									str+=get.translation(filter.name);
@@ -4332,7 +4332,7 @@
 						player.getStat().gain+=cards.length;
 					}
 					"step 3"
-					var j,sort,position;
+					var sort;
 					var frag1=document.createDocumentFragment();
 					var frag2=document.createDocumentFragment();
 					var hs=player.get('h');
@@ -4986,7 +4986,7 @@
 						skills=skills.concat(info2[3]);
 
 						// var name=get.translation(character2);
-						this.node.name2.innerHTML=get.slimName(character2);;
+						this.node.name2.innerHTML=get.slimName(character2);
 						if(!lib.config.show_name){
 							this.node.name2.style.display='none';
 						}
@@ -5009,7 +5009,6 @@
 					return this;
 				},
 				uninit:function(){
-					var that=this;
 					this.node.avatar.hide();
 					this.node.count.hide();
 					if(this.node.wuxing){
@@ -5197,7 +5196,6 @@
 					}
 				},
 				num:function(arg1,arg2,arg3){
-					var i,j,k;
 					if(get.itemtype(arg1)=='position'){
 						return this.get(arg1,arg2,arg3).length;
 					}
@@ -5227,7 +5225,7 @@
 						],config,true);
 					}
 				},
-				line2:function(targets,config,init){
+				line2:function(targets,config){
 					this.line(targets[0],config);
 					targets=targets.slice(0);
 					for(var i=1;i<targets.length;i++){
@@ -6171,7 +6169,7 @@
 					}
 					next.content=lib.element.playerproto.respond;
 				},
-				directgain:function(cards,animate){
+				directgain:function(cards){
 					var hs=this.get('h');
 					for(var i=0;i<cards.length;i++){
 						if(hs.contains(cards[i])){
@@ -7027,7 +7025,6 @@
 
 					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
 					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
-					var num3;
 					if(typeof num=='number'&&init!==false){
 						config={
 							total:num,
@@ -7230,7 +7227,6 @@
 					}
 					ui.thrown.push(node);
 					var uithrowns=ui.thrown.slice(0);
-					var row=0;
 					var tops;
 					switch(Math.floor((ui.thrown.length-1)/4)){
 						case 0:
@@ -7343,7 +7339,6 @@
 					}
 					ui.thrown.push(node);
 					var uithrowns=ui.thrown.slice(0);
-					var row=0;
 					var tops;
 					switch(Math.floor((ui.thrown.length-1)/4)){
 						case 0:
@@ -7647,7 +7642,7 @@
 						}
 					}
 				},
-				$gain2:function(cards,log){
+				$gain2:function(cards){
 					if(get.itemtype(cards)=='card') cards=[cards];
 					else if(get.itemtype(cards)!='cards') return;
 					var list=[],list2=[];
@@ -8096,7 +8091,7 @@
 						this._onEndMoveDelete=player;
 					}
 				},
-				moveTo:function(player,method){
+				moveTo:function(player){
 					this.fixed=true;
 					var dx,dy;
 					if(this.classList.contains('center')){
@@ -8121,16 +8116,6 @@
 					else{
 						this.style.transform='translate('+dx+'px,'+dy+'px)';
 					}
-
-					// this.dataset.position=player.dataset.position;
-					// if(method=='flip'){
-					// 	this.style.transition='all 0.5s';
-					// 	this.style.transform='rotate'+(Math.random()<0.5?'X':'Y')+'(180deg) perspective(1000px)';
-					// }
-					// else if(method=='rotate'){
-					// 	this.style.transition='all 0.5s';
-					// 	this.style.transform='rotate(180deg)';
-					// }
 					return this;
 				},
 				copy:function(){
@@ -8254,7 +8239,7 @@
 					}
 
 					var player=event._endTrigger;
-					var list=[],others=[];
+					var list=[];
 					for(i=0;i<game.players.length;i++){
 						for(j in game.players[i].tempSkills){
 							var expire=game.players[i].tempSkills[j];
@@ -8518,12 +8503,12 @@
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control);
 
 					if(lib.config.button_press){
-						node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(e){
+						node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
 							node.classList.add('controlthundertext');
 							node.parentNode.classList.add('controlpressdown');
 							node.parentNode.classList.add('controlpressdownx');
 						});
-						node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(e){
+						node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
 							node.parentNode.classList.remove('controlpressdownx');
@@ -8531,7 +8516,7 @@
 							// 	if(node.parentNode)
 							// },200);
 						});
-						node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(e){
+						node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(){
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
 							node.parentNode.classList.remove('controlpressdownx');
@@ -8569,7 +8554,6 @@
 						for(i=0;i<this.childNodes.length;i++) width+=this.childNodes[i].offsetWidth;
 						ui.refresh(this);
 						this.style.width=width+'px';
-						var that=this;
 					}
 					ui.updatec();
 					return this;
@@ -10483,7 +10467,7 @@
 					}
 					this.location = {x: x, y: y};
 
-					this.radius = .5+Math.random()*1;
+					this.radius = 0.5+Math.random()*1;
 
 					this.life = 10+Math.random()*10;
 					this.death = this.life;
@@ -13527,7 +13511,7 @@
 						var copy={};
 						for(var i in obj){
 							if(get.objtype(obj[i])=='object'){
-								copy[i]=util.copy(obj[i]);
+								copy[i]=copyObj(obj[i]);
 							}
 							else if(Array.isArray(obj[i])){
 								copy[i]=obj[i].slice(0);
@@ -18011,7 +17995,7 @@
 					game.reload();
 				},
 				auto_identity:function(item){
-					game.saveConfig('auto_identity',bool,true);
+					game.saveConfig('auto_identity',item,true);
 					var num;
 					switch(item){
 						case 'one':num=1;break;
@@ -18724,7 +18708,7 @@
 			for(var i=0;i<list.length;i++){
 				var rank=get.rank(list[i]);
 				switch(rank){
-					case 'sp':return 0.1;break;
+					case 'sp':return 0.1;
 					case 's':num+=0.4;break;
 					case 'ap':num+=0.6;break;
 					case 'a':num+=0.8;break;
