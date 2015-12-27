@@ -3601,6 +3601,9 @@ mode.chess={
 					if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
 						return;
 					}
+					if(game.changeCoin){
+						game.changeCoin(-10);
+					}
 					list.randomSort();
 					_status.event.dialog.close();
 					var dialog=ui.create.dialog('选择出场角色','hidden');
@@ -3630,6 +3633,9 @@ mode.chess={
 				ui.create.cheat2=function(){
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){
+							if(game.changeCoin){
+								game.changeCoin(50);
+							}
 							this.dialog.close();
 							_status.event.dialog=this.backup;
 							this.backup.open();
@@ -3645,6 +3651,9 @@ mode.chess={
 							}
 						}
 						else{
+							if(game.changeCoin){
+								game.changeCoin(-50);
+							}
 							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
 							this.backup=_status.event.dialog;
 							_status.event.dialog.close();

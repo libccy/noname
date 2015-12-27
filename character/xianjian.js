@@ -463,12 +463,12 @@ character.xianjian={
 				if(result.bool){
 					var cards=player.get('hej');
 					var target=result.targets[0];
-					if(player.storage.shuiyun&&player.storage.shuiyun.length){
-						target.gainMaxHp();
-						target.recover(player.storage.shuiyun.length);
-						cards=cards.concat(player.storage.shuiyun);
-						player.storage.shuiyun.length=0;
-					}
+					// if(player.storage.shuiyun&&player.storage.shuiyun.length){
+					// 	target.gainMaxHp();
+					// 	target.recover(player.storage.shuiyun.length);
+					// 	cards=cards.concat(player.storage.shuiyun);
+					// 	player.storage.shuiyun.length=0;
+					// }
 					player.$give(cards,target);
 					target.gain(cards);
 					target.addSkill('changnian2');
@@ -1385,7 +1385,7 @@ character.xianjian={
 		wangyou_info:'其他角色的回合结束阶段，你可以弃置一张牌，令此回合内受过伤害的所有角色各摸一张牌',
 		changnian:'长念',
 		changnian2:'追思',
-		changnian_info:'你死亡时，可以将所有牌交给一名其他角色，令其获得技能【追思】；若你有至少1张“蕴”，该角色增加1点体力上限回复X点体力，X为“蕴”的个数',
+		changnian_info:'你死亡时，可以将所有牌交给一名其他角色，令其获得技能【追思】',
 		sajin:'洒金',
 		sajin_info:'出牌阶段限一次，你可以弃置一张手牌并指定任意名角色进行判定，若判定颜色与你弃置的牌相同，该角色回复一点体力',
 		jubao:'聚宝',

@@ -183,7 +183,7 @@ character.diy={
 				return 7-ai.get.value(card);
 			},
 			content:function(){
-				target.addJudge('bingliang',cards);
+				player.useCard({name:'bingliang'},target,cards).animate=false;
 				player.draw();
 			},
 			ai:{

@@ -1795,6 +1795,47 @@ character.yijiang={
 			}
 		},
 		mingjian:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			filterCard:true,
+			selectCard:-1,
+			discard:false,
+			lose:true,
+			content:function(){
+				player.$give(cards.length,target);
+				target.gain(cards);
+				target.addTempSkill('mingjian2',{player:'phaseAfter'});
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+						if(player.hp<=2&&player.num('h','shan')) return 0;
+						if(target.num('h')+player.num('h')>target.hp+2) return 0;
+						if(ai.get.attitude(player,target)>3) return 1;
+						return 0;
+					}
+				}
+			}
+		},
+		mingjian2:{
+			mark:true,
+			intro:{
+				content:'手牌上限+1，出杀次数+1'
+			},
+			mod:{
+				maxHandcard:function(player,num){
+					return num+1;
+				},
+				cardUsable:function(card,player,num){
+					if(card.name=='sha') return num+1;
+				}
+			},
+		},
+		mingjian_old:{
 			audio:2,
 			trigger:{player:'phaseUseBefore'},
 			direct:true,
@@ -1827,7 +1868,7 @@ character.yijiang={
 				}
 			}
 		},
-		mingjian2:{
+		mingjian2_old:{
 			audio:false,
 			trigger:{global:'phaseAfter'},
 			forced:true,
@@ -4303,6 +4344,7 @@ character.yijiang={
 		qice2:{
 			filterCard:true,
 			selectCard:-1,
+			audio:2
 		},
 		qice3:{
 			trigger:{player:'useCardBefore'},
@@ -4616,7 +4658,7 @@ character.yijiang={
 				"step 2"
 				var source=target;
 				event.card=result.buttons[0].link;
-				player.chooseTarget(function(card,player,target){
+				player.chooseTarget('选择一个目标送出'+get.translation(event.card),function(card,player,target){
 					return target!=source&&target!=player;
 				}).ai=function(target){
 					return ai.get.attitude(player,target);
@@ -5472,7 +5514,8 @@ character.yijiang={
 		huituo:'恢拓',
 		huituo_info:'每当你受到伤害后，你可以令一名角色进行一次判定，若结果为红色，该角色回复1点体力；若结果为黑色，该角色摸X张牌（X为此次伤害的伤害数）',
 		mingjian:'明鉴',
-		mingjian_info:'你可以跳过出牌阶段并将所有手牌交给一名其他角色。若如此做，你结束此回合，然后该角色进行一个额外的出牌阶段',
+		mingjian2:'明鉴',
+		mingjian_info:'出牌阶段限一次，你可以将所有手牌交给一名其他角色，若如此做，该角色于其下个回合的手牌上限+1，且出杀的次数上限+1',
 		xingshuai:'兴衰',
 		xingshuai_info:'主公技，限定技，当你进入濒死状态时，其他魏势力角色可依次令你回复1点体力，然后这些角色依次受到1点伤害',
 		duodao:'夺刀',

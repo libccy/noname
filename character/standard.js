@@ -313,10 +313,10 @@ character.standard={
 			},
 			content:function(){
 				"step 0"
-				event.cards=get.cards(2*trigger.num);
-				player.gain(event.cards);
-				player.$draw(event.cards.length);
+				player.draw(2*trigger.num);
 				"step 1"
+				event.cards=result;
+				"step 2"
 				player.chooseCardTarget({
 					filterCard:function(card){
 						return _status.event.parent.cards.contains(card);
@@ -334,14 +334,14 @@ character.standard={
 					},
 					prompt:'请选择要送人的卡牌'
 				});
-				"step 2"
+				"step 3"
 				if(result.bool){
 					result.targets[0].gain(result.cards);
 					player.$give(result.cards.length,result.targets[0]);
 					for(var i=0;i<result.cards.length;i++){
 						event.cards.remove(result.cards[i]);
 					}
-					if(event.cards.length) event.goto(1);
+					if(event.cards.length) event.goto(2);
 				}
 			},
 			ai:{
@@ -644,7 +644,7 @@ character.standard={
 		},
 		jijiang3:{},
 		wusheng:{
-			audio:6,
+			audio:3,
 			enable:['chooseToRespond','chooseToUse'],
 			filterCard:function(card){
 				return get.color(card)=='red';
@@ -1029,21 +1029,6 @@ character.standard={
 			content:function(){
 				"step 0"
 				target.chooseControl('heart2','diamond2','club2','spade2').ai=function(event){
-					//var player=event.parent.player;
-					//var list=[player.get('h',{suit:'heart'}),
-					//player.get('h',{suit:'diamond'}),
-					//player.get('h',{suit:'club'}),
-					//player.get('h',{suit:'spade'})];
-					//for(var i=0;i<list.length;i++){
-					//	list[i]+=Math.random()*player.num('h')*2;
-					//}
-					//var max=list[0],result=0;
-					//for(var i=1;i<4;i++){
-					//	if(list[i]>max){
-					//		result=i;
-					//		max=list[i];
-					//	}
-					//}
 					switch(Math.floor(Math.random()*6)){
 						case 0:return 'heart2';
 						case 1:case 4:case 5:return 'diamond2';
@@ -1052,6 +1037,7 @@ character.standard={
 					}
 				};
 				"step 1"
+				game.log(target,'选择了'+get.translation(result.control));
 				event.choice=result.control;
 				target.popup(event.choice);
 				event.card=player.get('h').randomGet();
@@ -1336,6 +1322,9 @@ character.standard={
 			audio:2,
 			trigger:{player:'shaBegin'},
 			forced:true,
+			filter:function(event,player){
+				return !event.directHit;
+			},
 			content:function(){
 				"step 0"
 				var next=trigger.target.chooseToRespond({name:'shan'});

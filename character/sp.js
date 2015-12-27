@@ -3402,7 +3402,7 @@ character.sp={
 			}
 		},
 		tianming:{
-			audio:true,
+			audio:2,
 			trigger:{target:'shaBegin'},
 			check:function(event,player){
 				var cards=player.get('h');

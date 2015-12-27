@@ -540,6 +540,7 @@ character.woods={
 			trigger:{player:'shaBegin',target:'shaBegin'},
 			forced:true,
 			filter:function(event,player){
+				if(event.directHit) return false;
 				if(player==event.player){
 					return event.target.sex=='female';
 				}
@@ -638,12 +639,21 @@ character.woods={
 			intro:{
 				content:'limited'
 			},
+			prepare:function(cards,player){
+				player.line(game.players);
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player){
+						game.players[i].animate('target');
+					}
+				}
+			},
 			content:function(){
 				"step 0"
 				player.unmarkSkill('luanwu')
 				player.storage.luanwu=true;
 				event.current=player.next;
 				"step 1"
+				event.current.animate('target');
 				event.current.chooseToUse({name:'sha'},function(card,player,target){
 					if(player==target) return false;
 					if(get.distance(player,target)<=1) return true;

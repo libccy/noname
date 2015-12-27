@@ -16,8 +16,11 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.72,
-		changeLog:[],
+		version:1.73,
+		changeLog:[
+			'bug修复',
+			'新武将'
+		],
 		configprefix:'noname_0.9_',
 		updates:[],
 		canvasUpdates:[],
@@ -3905,6 +3908,9 @@
 						player.logSkill(event.skill);
 						player.popup(event.card.name);
 					}
+					if(event.audio===false){
+						cardaudio=false;
+					}
 					if(cardaudio&&lib.config.background_audio){
 						var sex=player.sex=='female'?'female':'male';
 						if(lib.card[card.name].audio||lib.config.background_ogg){
@@ -4078,7 +4084,7 @@
 					"step 0"
 					var info=get.info(event.skill);
 					event._skill=event.skill;
-					if(lib.config.background_speak&&
+					if(!info.direct&&lib.config.background_speak&&
 						(!lib.skill.global.contains(event.skill)||lib.skill[event.skill].forceaudio)){
 						var audioname=event.skill;
 						var audioinfo=info.audio;
@@ -4103,6 +4109,9 @@
 					}
 					if(info.discard!=false&&info.lose!=false&&!info.viewAs){
 						player.discard(cards).delay=false;
+						if(info.prepare){
+							info.prepare(cards,player,targets);
+						}
 					}
 					else{
 						if(info.lose!=false){
@@ -10343,8 +10352,8 @@
 						if(temp<0) temp+=num;
 						players[i].dataset.position=temp;
 					}
-					game.me.node.handcards1.delete();
-					game.me.node.handcards2.delete();
+					game.me.node.handcards1.remove();
+					game.me.node.handcards2.remove();
 					game.me=player;
 					ui.handcards1=player.node.handcards1.animate('start').fix();
 					ui.handcards2=player.node.handcards2.animate('start').fix();
@@ -11749,8 +11758,8 @@
 					if(temp<0) temp+=num;
 					players[i].dataset.position=temp;
 				}
-				game.me.node.handcards1.delete();
-				game.me.node.handcards2.delete();
+				game.me.node.handcards1.remove();
+				game.me.node.handcards2.remove();
 				game.me=player;
 				ui.handcards1=player.node.handcards1.animate('start').fix();
 				ui.handcards2=player.node.handcards2.animate('start').fix();
@@ -11872,6 +11881,9 @@
 				game.pause();
 				"step 3"
 				if(event.bool){
+					if(game.changeCoin){
+						game.changeCoin(-10);
+					}
 					game.me.lose(game.me.get('h'))._triggered=null;
 				}
 				else{
@@ -15261,6 +15273,9 @@
 
 							var currentrow3=null;
 							var clickrow3=function(){
+								if(game.changeCoin){
+									game.changeCoin(-20);
+								}
 								game.swapPlayer(this.link);
 							};
 							menuUpdates.push(function(){
@@ -17520,6 +17535,7 @@
 					}
 				}
 				if(this.parentNode.classList.contains('hidden')) return;
+				if(this.parentNode.classList.contains('removing')) return;
 				if(ui.intro){
 					ui.intro.close();
 					delete ui.intro;

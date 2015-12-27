@@ -572,7 +572,11 @@ character.mountain={
 						player.unmarkSkill('tuntian');
 					}
 					player.logSkill('jixi',result.targets);
-					player.useCard({name:'shunshou'},[event.card],result.targets[0]);
+					player.useCard({name:'shunshou'},[event.card],result.targets[0]).audio=false;
+				}
+				else{
+					player.addTempSkill('jixi2','phaseAfter');
+					event.finish();
 				}
 			},
 			ai:{

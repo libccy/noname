@@ -774,6 +774,16 @@ character.refresh={
 			ai:{
 				result:{
 					target:function(player,target){
+						var hs=player.get('h');
+						if(hs.length<3) return 0;
+						var bool=false;
+						for(var i=0;i<hs.length;i++){
+							if(hs[i].number>=9&&ai.get.value(hs[i])<7){
+								bool=true;
+								break;
+							}
+						}
+						if(!bool) return 0;
 						if(target.num('h')>target.hp+1&&ai.get.recoverEffect(target)>0){
 							return 1;
 						}
@@ -1088,7 +1098,7 @@ character.refresh={
 					target.discard(target.getJudge('lebu'));
 				}
 				else{
-					target.addJudge('lebu',cards);
+					player.useCard({name:'lebu'},target,cards).animate=false;
 				}
 				player.draw();
 			},
