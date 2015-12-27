@@ -12,15 +12,15 @@
 		},
 		ai:{},
 		lastdragchange:[],
-		skillaudio:[],
+		skillaudio:[
+			'界面问题修正',
+			'引用配音方法调整'
+		],
 		dieClose:[]
 	};
 	var lib={
-		version:1.73,
-		changeLog:[
-			'bug修复',
-			'新武将'
-		],
+		version:1.74,
+		changeLog:[],
 		configprefix:'noname_0.9_',
 		updates:[],
 		canvasUpdates:[],
@@ -4088,10 +4088,10 @@
 						(!lib.skill.global.contains(event.skill)||lib.skill[event.skill].forceaudio)){
 						var audioname=event.skill;
 						var audioinfo=info.audio;
-						if(audioname.indexOf('|')<audioname.lastIndexOf('|')){
-							audioname=audioname.slice(audioname.lastIndexOf('|')+1);
-							if(lib.skill[audioname]){
-								audioinfo=lib.skill[audioname].audio;
+						if(typeof audioinfo=='string'){
+							audioname=audioinfo;
+							if(lib.skill[audioinfo]){
+								audioinfo=lib.skill[audioinfo].audio;
 							}
 						}
 						if(typeof audioinfo=='number'){
@@ -4101,7 +4101,7 @@
 							game.playAudio('skill',audioname);
 						}
 						else if(lib.config.background_ogg&&info.audio!==false){
-							game.playSkillAudio(event.skill);
+							game.playSkillAudio(audioname);
 						}
 					}
 					if(player.checkShow){
@@ -6538,10 +6538,10 @@
 					if(info&&lib.config.background_speak){
 						var audioname=name;
 						var audioinfo=info.audio;
-						if(audioname.indexOf('|')<audioname.lastIndexOf('|')){
-							audioname=audioname.slice(audioname.lastIndexOf('|')+1);
-							if(lib.skill[audioname]){
-								audioinfo=lib.skill[audioname].audio;
+						if(typeof audioinfo=='string'){
+							audioname=audioinfo;
+							if(lib.skill[audioinfo]){
+								audioinfo=lib.skill[audioinfo].audio;
 							}
 						}
 						if(typeof audioinfo==='number'){
@@ -6552,7 +6552,7 @@
 						}
 						else{
 							if(lib.config.background_ogg&&info.audio!==false){
-								game.playSkillAudio(name);
+								game.playSkillAudio(audioname);
 							}
 						}
 					}

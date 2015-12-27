@@ -35,12 +35,7 @@
 #arena .player.linked>.name{
     transform: rotate(90deg) translate(120px,-96px);
 }
-#arena .player.minskin>.name{
-    top:16px;
-}
-#arena .player.linked.minskin>.name{
-    transform: rotate(90deg) translate(83px,-71px);
-}
+
 .player>.identity.menubutton.round{
     padding: 0;
     transform: scale(1.2) translate(-2px,2px);

@@ -1454,7 +1454,7 @@ character.yijiang={
 				if(!event.filterCard({name:'shan'})) return false;
 				if(player.skills.contains('huomo2')) return false;
 				if(event.parent.name!='sha') return false;
-				var hs=player.get('h',{color:'black'});
+				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])!='basic'){
 						break;
@@ -1466,7 +1466,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseCard('是否发动【活墨】？',function(card){
+				player.chooseCard('是否发动【活墨】？','he',function(card){
 					return get.type(card)!='basic'&&get.color(card)=='black';
 				}).ai=function(card){
 					if(!player.num('h','shan')){
@@ -1511,7 +1511,7 @@ character.yijiang={
 					return false;
 				}
 				if(player.getStat().card.sha) return false;
-				var hs=player.get('h',{color:'black'});
+				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])!='basic'){
 						break;
@@ -1523,6 +1523,7 @@ character.yijiang={
 				}
 				return false;
 			},
+			position:'he',
 			filterCard:function(card){
 				return get.type(card)!='basic'&&get.color(card)=='black';
 			},
@@ -1557,7 +1558,7 @@ character.yijiang={
 					return false;
 				}
 				if(player.getStat().card.tao) return false;
-				var hs=player.get('h',{color:'black'});
+				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])!='basic'){
 						break;
@@ -1566,6 +1567,7 @@ character.yijiang={
 				if(i==hs.length) return false;
 				return player.hp<player.maxHp;
 			},
+			position:'he',
 			filterCard:function(card){
 				return get.type(card)!='basic'&&get.color(card)=='black';
 			},
@@ -1601,7 +1603,7 @@ character.yijiang={
 					return false;
 				}
 				if(player.getStat().card.jiu) return false;
-				var hs=player.get('h',{color:'black'});
+				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])!='basic'){
 						break;
@@ -1610,6 +1612,7 @@ character.yijiang={
 				if(i==hs.length) return false;
 				return true;
 			},
+			position:'he',
 			filterCard:function(card){
 				return get.type(card)!='basic'&&get.color(card)=='black';
 			},

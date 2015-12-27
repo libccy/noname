@@ -39,7 +39,6 @@ character.sp={
 		lingcao:['male','wu',4,['dujin']],
 		sunru:['female','wu',3,['shixin','qingyi']],
 		lingju:['female','qun',3,['jieyuan','fenxin']],
-		lifeng:['male','shu',3,['tunchu','shuliang']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -55,6 +54,48 @@ character.sp={
 		lingju:['diaochan','lvbu'],
 	},
 	skill:{
+		danji:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return !player.storage.danji&&player.num('h')>player.hp;
+			},
+			content:function(){
+				player.storage.danji=true;
+				player.loseMaxHp();
+				player.addSkill('mashu');
+				player.addSkill('nuzhan');
+			}
+		},
+		nuzhan:{
+			mod:{
+				cardUsable:function(card){
+					if(card.name=='sha'&&get.color(card)=='red') return Infinity;
+				}
+			},
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				return event.card.name=='sha'&&get.color(event.card)=='red';
+			},
+			forced:true,
+			content:function(){
+				if(player.stat[player.stat.length-1].card.sha>0){
+					player.stat[player.stat.length-1].card.sha--;
+				}
+			},
+			group:'nuzhan2'
+		},
+		nuzhan2:{
+			trigger:{player:'shaBegin'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.card&&get.color(event.card)=='red';
+			},
+			content:function(){
+				trigger.directHit=true;
+			}
+		},
 		tunchu:{
 			audio:2,
 			trigger:{player:'phaseDrawBegin'},
@@ -3721,7 +3762,12 @@ character.sp={
 		sunru:'孙茹',
 		lingju:'灵雎',
 		lifeng:'李丰',
+		jsp_guanyu:'sp关羽',
 
+		nuzhan:'怒斩',
+		nuzhan_info:'锁定技，你使用的由一张锦囊牌转化而来的【杀】不计入限制的使用次数；锁定技，你使用的由一张装备牌转化而来的【杀】的伤害值基数+1',
+		danji:'单骑',
+		danji_info:'觉醒技，准备阶段开始时，若你的手牌数大于你的体力值，你减1点体力上限，然后获得“马术”和“怒斩”',
 		tunchu:'屯储',
 		tunchu_info:'摸牌阶段摸牌时，你可以额外摸两张牌，若如此做，将一张手牌置于你的武将上，称为“粮”，只要你的武将牌上有“粮”，你便不能使用【杀】和【决斗】',
 		shuliang:'输粮',

@@ -584,6 +584,16 @@ margin-bottom: 5px;
 #arena.slim_player .player>.name.name2{
 	left:78px
 }
+
+#arena .player.minskin>.name,
+#arena.slim_player .player.minskin>.name{
+    top:16px;
+}
+#arena .player.linked.minskin>.name,
+#arena.slim_player .player.linked.minskin>.name{
+    transform: rotate(90deg) translate(83px,-65px);
+}
+
 .button.character>.name{
 	font-family: 'xinwei'
 }
@@ -651,6 +661,7 @@ margin-bottom: 5px;
 }
 .judges{height: 24px;left: 14px;top: -18px;}
 .marks{height: 24px;left: 14px;top: 112px;}
+.player>.marks{z-index: 4}
 .judges>div,.marks>div{width: 24px;height: 24px;margin-left: 0;margin-top: 0;margin-right: 4px;opacity: 1;}
 .hp{left: 18px;top:14px;width: 72px;line-height: 14px;text-align: left;}
 .hp.text{top:18px;}
