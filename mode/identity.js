@@ -418,6 +418,9 @@ mode.identity={
 				var list2=[];
 				var list3=[];
 				var identityList;
+				var chosen=lib.config.continue_name||[];
+				game.saveConfig('continue_name');
+				event.chosen=chosen;
 				if(_status.mode=='zhong'){
 					event.zhongmode=true;
 					identityList=['zhu','zhong','mingzhong','nei','fan','fan','fan','fan'];
@@ -569,6 +572,7 @@ mode.identity={
 				game.zhu.isZhu=(game.zhu.identity=='zhu');
 				game.me.setIdentity();
 				for(i in lib.character){
+					if(chosen.contains(i)) continue;
 					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
@@ -605,13 +609,15 @@ mode.identity={
 						list=list2.concat(list3.slice(0,num));
 					}
 				}
-				var dialog=ui.create.dialog('选择角色',[list,'character']);
+				var dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
 				if(get.config('change_identity')){
 					addSetting(dialog);
 				}
-				game.me.chooseButton(dialog,true).selectButton=function(){
-					return get.config('double_character')?2:1
-				};
+				if(!event.chosen.length){
+					game.me.chooseButton(dialog,true).selectButton=function(){
+						return get.config('double_character')?2:1
+					};
+				}
 				ui.create.cheat=function(){
 					_status.createControl=ui.cheat2;
 					ui.cheat=ui.create.control('更换',function(){
@@ -696,7 +702,10 @@ mode.identity={
 					ui.cheat2x.close();
 					delete ui.cheat2x;
 				}
-				if(result.buttons.length==2){
+				if(event.chosen.length){
+					game.me.init(event.chosen[0],event.chosen[1]);
+				}
+				else if(result.buttons.length==2){
 					game.me.init(result.buttons[0].link,result.buttons[1].link)
 				}
 				else{

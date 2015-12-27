@@ -1031,6 +1031,12 @@ character.refresh={
 			audio:2,
 			enable:'phaseUse',
 			usable:1,
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].sex=='male') return true;
+				}
+				return false;
+			},
 			content:function(){
 				"step 0"
 				player.chooseControl(['red','black','basic','trick','equip']).ai=function(){

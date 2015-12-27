@@ -1574,22 +1574,22 @@
 							}
 						}
 					},
-					// swap:{
-					// 	name:'死亡后显示换人',
-					// 	init:true,
-					// 	onclick:function(bool){
-					// 		game.saveConfig('swap',bool,this._link.config.mode);
-					// 		if(get.config('swap')){
-					// 			if(!ui.swap&&game.me.isDead()){
-					// 				ui.swap=ui.create.control('换人',ui.click.dieswap);
-					// 			}
-					// 		}
-					// 		else if(ui.swap){
-					// 			ui.swap.close();
-					// 			delete ui.swap;
-					// 		}
-					// 	}
-					// },
+					continue_game:{
+						name:'显示继续游戏',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('continue_game',bool,this._link.config.mode);
+							if(get.config('continue_game')){
+								if(!ui.continue_game&&_status.over){
+									ui.continue_game=ui.create.control('继续',game.reloadCurrent);
+								}
+							}
+							else if(ui.continue_game){
+								ui.continue_game.close();
+								delete ui.continue_game;
+							}
+						}
+					},
 					revive:{
 						name:'死亡后显示复活',
 						init:false,
@@ -1804,22 +1804,22 @@
 							}
 						}
 					},
-					// swap:{
-					// 	name:'死亡后显示换人',
-					// 	init:true,
-					// 	onclick:function(bool){
-					// 		game.saveConfig('swap',bool,this._link.config.mode);
-					// 		if(get.config('swap')){
-					// 			if(!ui.swap&&game.me.isDead()){
-					// 				ui.swap=ui.create.control('换人',ui.click.dieswap);
-					// 			}
-					// 		}
-					// 		else if(ui.swap){
-					// 			ui.swap.close();
-					// 			delete ui.swap;
-					// 		}
-					// 	}
-					// },
+					continue_game:{
+						name:'显示继续游戏',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('continue_game',bool,this._link.config.mode);
+							if(get.config('continue_game')){
+								if(!ui.continue_game&&_status.over){
+									ui.continue_game=ui.create.control('继续',game.reloadCurrent);
+								}
+							}
+							else if(ui.continue_game){
+								ui.continue_game.close();
+								delete ui.continue_game;
+							}
+						}
+					},
 					revive:{
 						name:'死亡后显示复活',
 						init:false,
@@ -2628,7 +2628,7 @@
 				}
 				delete lib.help2;
 
-				if(localStorage.getItem(lib.configprefix+'playbackmode')){
+				if(localStorage.getItem(lib.configprefix+'playback')){
 					lib.init.js('mode',lib.config.mode);
 				}
 				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)
@@ -10390,6 +10390,11 @@
 			}
 			window.location.reload();
 		},
+		reloadCurrent:function(){
+			game.saveConfig('continue_name',[game.me.name1||game.me.name,game.me.name2]);
+			localStorage.setItem(lib.configprefix+'directstart',true);
+			game.reload();
+		},
 		update:function(func){
 			lib.updates.push(func);
 			if(lib.updates.length===1){
@@ -11164,9 +11169,9 @@
 			if(game.controlOver){
 				game.controlOver();return;
 			}
-			// if(!ui.savevideo&&lib.db&&lib.config.savevideo){
-			// 	ui.savevideo=ui.create.control('保存录像',game.saveVideo);
-			// }
+			if(get.config('continue_game')){
+				ui.continue_game=ui.create.control('继续',game.reloadCurrent);
+			}
 			if(!ui.restart){
 				ui.restart=ui.create.control('restart',game.reload);
 			}

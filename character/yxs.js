@@ -37,6 +37,18 @@ character.yxs={
 		yxs_luzhishen:['male','qun',4,['dili','kuangchan']],
 	},
 	skill:{
+		zhijie:{
+			enable:'phaseUse',
+			usable:1,
+			viewAsFilter:function(player){
+				return player.num('h',{suit:'heart'})>0;
+			},
+			viewAs:{name:'wuzhong'},
+			filterCard:{suit:'heart'},
+			check:function(card){
+				return 8-ai.get.value(card);
+			}
+		},
 		dili:{
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,

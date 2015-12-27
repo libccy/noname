@@ -274,9 +274,14 @@ mode.guozhan={
 				event.addSetting=addSetting;
 				event.removeSetting=removeSetting;
 
+				var chosen=lib.config.continue_name||[];
+				game.saveConfig('continue_name');
+				event.chosen=chosen;
+
 				var i;
 				event.list=[];
 				for(i in lib.character){
+					if(chosen.contains(i)) continue;
 					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidall.contains(i)) continue;
@@ -291,8 +296,11 @@ mode.guozhan={
 				if(_status.auto){
 					event.ai(game.me,list);
 				}
+				else if(chosen.length){
+					game.me.init(chosen[0],chosen[1],false);
+				}
 				else{
-					var dialog=ui.create.dialog('选择角色',[list,'character']);
+					var dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
 					if(get.config('change_identity')){
 						addSetting(dialog);
 					}
@@ -418,6 +426,11 @@ mode.guozhan={
 					var hiddenSkills2=lib.character[game.players[i].name2][3];
 					for(var j=0;j<hiddenSkills2.length;j++){
 						game.players[i].hiddenSkills.add(hiddenSkills2[j]);
+					}
+					for(var j=0;j<game.players[i].hiddenSkills.length;j++){
+						if(!lib.skill[game.players[i].hiddenSkills[j]]){
+							game.players[i].hiddenSkills.splice(j--,1);
+						}
 					}
 					game.players[i].group='unknown';
 					game.players[i].sex='unknown';
