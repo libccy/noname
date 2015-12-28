@@ -785,6 +785,10 @@ mode.versus={
 				if(lib.storage.single_control&&lib.storage.control_all){
 					game.onSwapControl();
 				}
+				"step 2"
+				// if(_status.currentPhase==source){
+				// 	source.skip('phase');
+				// }
 			}
 		},
 		versusClickToSwap:function(e){
@@ -1218,7 +1222,6 @@ mode.versus={
 					}
 					game.replacePlayer(this);
 				}
-
 			}
 		}
 	},

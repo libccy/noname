@@ -12,15 +12,16 @@
 		},
 		ai:{},
 		lastdragchange:[],
-		skillaudio:[
-			'界面问题修正',
-			'引用配音方法调整'
-		],
+		skillaudio:[],
 		dieClose:[]
 	};
 	var lib={
 		version:1.74,
-		changeLog:[],
+		changeLog:[
+			'界面问题修正',
+			'限制结算速度选项（较卡时建议开启）',
+			'引用配音方法调整'
+		],
 		configprefix:'noname_0.9_',
 		updates:[],
 		canvasUpdates:[],
@@ -32,6 +33,7 @@
 		skilllist:[],
 		characterPack:{},
 		cardPack:{},
+		onresize:[],
 		onDB:function(func){
 			if(lib.db){
 				func();
@@ -236,6 +238,10 @@
 							vfast:'快',
 							vvfast:'很快',
 						},
+					},
+					sync_speed:{
+						name:'限制结算速度',
+						init:true
 					},
 					right_click:{
 						name:'右键功能',
@@ -1258,6 +1264,19 @@
 						onclick:function(item){
 							game.saveConfig('coin_display_playpackconfig',item);
 							if(game.changeCoin) game.changeCoin(0);
+						}
+					},
+					coin_canvas_playpackconfig:{
+						name:'特效置顶',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('coin_canvas_playpackconfig',bool);
+							if(bool){
+								ui.window.classList.add('canvas_top');
+							}
+							else{
+								ui.window.classList.remove('canvas_top');
+							}
 						}
 					},
 					update:function(config,map){
@@ -3377,8 +3396,6 @@
 					ui.arena.classList.add('thrownhighlight');
 					game.addVideo('thrownhighlight1');
 					player.$compare(event.card1,target,event.card2);
-					// player.$throw(event.card1);
-					// target.$throw(event.card2);
 					game.log(player,'的拼点牌为',event.card1);
 					game.log(target,'的拼点牌为',event.card2);
 					event.result={
@@ -3953,11 +3970,18 @@
 							}
 						}
 						player.$throw(cards);
+						if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
+							var waitingForTransition=get.time();
+							event.waitingForTransition=waitingForTransition;
+							cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+								if(_status.waitingForTransition==waitingForTransition&&_status.paused){
+									game.resume();
+								}
+								delete event.waitingForTransition;
+							});
+						}
 					}
 					event.trigger('useCard');
-					// if(event.card.name=='sha'&&lib.config.animation){
-					// 	player.$sha(event.card.nature);
-					// }
 					if(get.type(card)!='equip'){
 						var str='';
 						if(targets.length){
@@ -4045,7 +4069,13 @@
 					if(event.animate!=false||num>0){
 						if(num==0){
 							if(event.delayx!==false){
-								game.delayx();
+								if(event.waitingForTransition){
+									_status.waitingForTransition=event.waitingForTransition;
+									game.pause();
+								}
+								else{
+									game.delayx();
+								}
 							}
 						}
 						else game.delayx(0.5);
@@ -4112,6 +4142,9 @@
 						if(info.prepare){
 							info.prepare(cards,player,targets);
 						}
+						if(lib.config.low_performance){
+							event.discardTransition=true;
+						}
 					}
 					else{
 						if(info.lose!=false){
@@ -4122,6 +4155,16 @@
 						}
 						else if(info.viewAs){
 							player.$throw(cards);
+							if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
+							    var waitingForTransition=get.time();
+							    event.waitingForTransition=waitingForTransition;
+							    cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+							        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
+							            game.resume();
+							        }
+							        delete event.waitingForTransition;
+							    });
+							}
 						}
 					}
 					if((info.line||info.discard!=false)&&targets.length){
@@ -4220,7 +4263,15 @@
 					}
 					if(num==0){
 						if(typeof info.delay=='number') game.delay(info.delay);
-						else if(info.delay!==false&&info.delay!==0) game.delayx();
+						else if(info.delay!==false&&info.delay!==0){
+							if(event.waitingForTransition){
+							    _status.waitingForTransition=event.waitingForTransition;
+							    game.pause();
+							}
+							else{
+								game.delayx()
+							}
+						}
 					}
 					else game.delayx(0.5);
 					if(!info.multitarget&&num<targets.length-1){
@@ -4264,10 +4315,43 @@
 					}
 					game.log(player,'弃置了',cards);
 					player.lose(cards);
-					if(event.animate!=false) player.$throw(cards,1000);
+					if(event.animate!=false){
+						player.$throw(cards,1000);
+						if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
+							if(event.delay!=false){
+								var waitingForTransition=get.time();
+							    event.waitingForTransition=waitingForTransition;
+							    cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+							        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
+							            game.resume();
+							        }
+							        delete event.waitingForTransition;
+							    });
+							}
+							else if(event.parent.discardTransition){
+								delete event.parent.discardTransition;
+								var waitingForTransition=get.time();
+							    event.parent.waitingForTransition=waitingForTransition;
+							    cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+							        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
+							            game.resume();
+							        }
+							        delete event.parent.waitingForTransition;
+							    });
+							}
+						}
+					}
 					event.trigger('discard');
 					"step 1"
-					if(event.delay!=false) game.delayx();
+					if(event.delay!=false){
+						if(event.waitingForTransition){
+						    _status.waitingForTransition=event.waitingForTransition;
+						    game.pause();
+						}
+						else{
+							game.delayx();
+						}
+					}
 				},
 				respond:function(){
 					var cardaudio=true;
@@ -7962,8 +8046,19 @@
 							player.offsetTop+player.offsetHeight/2
 						],{opacity:0.5,dashed:true});
 					}
-					game.delay();
-
+					if(lib.config.low_performance&&card&&card.clone){
+					    var waitingForTransition=get.time();
+					    _status.waitingForTransition=waitingForTransition;
+					    card.clone.addEventListener('webkitTransitionEnd',function(){
+					        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
+					            game.resume();
+					        }
+					    });
+						game.pause();
+					}
+					else{
+						game.delay();
+					}
 				}
 			},
 			card:{
@@ -11287,6 +11382,7 @@
 		resume:function(){
 			if(_status.paused){
 				_status.paused=false;
+				delete _status.waitingForTransition;
 				game.loop();
 			}
 		},
@@ -18477,6 +18573,9 @@
 		updatex:function(){
 			ui.update.apply(this,arguments);
 			ui.updatehl();
+			for(var i=0;i<lib.onresize.length;i++){
+				lib.onresize[i]();
+			}
 		},
 		updatehl:function(){
 			if(!game.me) return;

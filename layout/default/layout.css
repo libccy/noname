@@ -279,7 +279,7 @@ body>.background.paused{
 	filter:blur(3px);
 	-webkit-filter:blur(3px);
 }
-body>.background{z-index:-2}
+body>.background{z-index:-5}
 .popup{padding: 5px;}
 .removing,.hidden{opacity: 0 !important;}
 #system>div>div.hidden{opacity:0.5 !important;}
@@ -1256,6 +1256,34 @@ div[data-color="unknownm"]{
 }
 .browntext{
 	color: rgb(195,161,223);
+}
+#window>canvas.fun{
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: -2;
+	pointer-events: none;
+}
+#window.canvas_top>canvas.fun{
+	z-index: 20;
+}
+.coin_menu .content>.caption>.coin_buy{
+	line-height: 36px;
+    font-family: 'xinwei';
+    font-size: 24px;
+}
+.coin_menu .content>.caption>.coin_buy>.menubutton{
+	width: auto;
+    display: inline-block;
+    position: relative;
+    float: right;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: auto;
+    font-size: 24px;
+}
+.coin_menu .content>.caption>.coin_buy>.menubutton.disabled{
+	opacity: 0.5;
 }
 .wunature{
 	font-family:'huangcao','xinwei';

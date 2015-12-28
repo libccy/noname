@@ -1803,6 +1803,9 @@ character.yijiang={
 			filterTarget:function(card,player,target){
 				return player!=target;
 			},
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
 			filterCard:true,
 			selectCard:-1,
 			discard:false,
