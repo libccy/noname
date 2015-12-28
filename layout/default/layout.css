@@ -1281,6 +1281,7 @@ div[data-color="unknownm"]{
     padding-right: 5px;
     height: auto;
     font-size: 24px;
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important
 }
 .coin_menu .content>.caption>.coin_buy>.menubutton.disabled{
 	opacity: 0.5;

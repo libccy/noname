@@ -16,7 +16,7 @@ card.hearth={
 			},
 			ai:{
 				basic:{
-					order:2,
+					order:1.8,
 					value:[6,1],
 					useful:2,
 				},

@@ -1279,6 +1279,10 @@
 							}
 						}
 					},
+					coin_free_playpackconfig:{
+						name:'仅在空闲时显示特效',
+						init:false,
+					},
 					update:function(config,map){
 						for(var i in map){
 							if(i.indexOf('_playpackconfig')!=-1){
