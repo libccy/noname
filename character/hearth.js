@@ -8,7 +8,7 @@ character.hearth={
 		hs_malfurion:['male','wu',4,['jihuo']],
 		hs_guldan:['male','qun',3,['fenliu','hongxi']],
 		hs_anduin:['male','qun',3,['shengguang','shijie','anying']],
-		hs_sthrall:['male','wu',4,['tuteng','guozai']],
+		hs_sthrall:['male','wu',4,['tuteng','guozai','zuling']],
 		hs_waleera:['female','qun',3,['jianren','mengun','wlianji']],
 
 		hs_medivh:['male','wei',3,['jingxiang','moying','mdzhoufu']],
@@ -26,7 +26,7 @@ character.hearth={
 		hs_malygos:['male','wei',4,['malymowang']],
 		hs_xuefashi:['male','wei',2,['liehun','xjumo']],
 		// hs_loatheb:['male','wei',2,[]],
-		// hs_trueheart:['male','wei',2,[]],
+		hs_trueheart:['female','qun',3,['qianghua']],
 		// hs_sainaliusi:['male','wei',2,[]],
 		// hs_lrhonin:['male','wei',2,[]],
 		// hs_bolvar:['male','wei',2,[]],
@@ -42,7 +42,7 @@ character.hearth={
 		hs_edwin:['male','qun',3,['lianzhan']],
 		hs_mijiaojisi:['female','qun',3,['kuixin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
-		hs_tgolem:['male','qun',4,['guozaix']],
+		hs_tgolem:['male','qun',4,['xinwuyan','guozai']],
 		hs_totemic:['male','wu',3,['s_tuteng']],
 		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
@@ -56,13 +56,59 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		qianghua:{
+			trigger:{player:'useCardAfter'},
+			filter:function(event,player){
+				if(event.parent.name=='qianghua') return false;
+				if(player.storage.qianghua>=2) return false;
+				if(_status.currentPhase!=player) return false;
+				if(event.parent.parent.name!='phaseUse') return false;
+				if(!event.targets||!event.card) return false;
+				var type=get.type(event.card);
+				if(type!='basic'&&type!='trick') return false;
+				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
+				for(var i=0;i<event.targets.length;i++){
+					if(!event.targets[i].isAlive()) return false;
+					if(!player.canUse({name:event.card.name},event.targets[i],false,false)){
+						return false;
+					}
+				}
+				return true;
+			},
+			check:function(event,player){
+				if(event.card.name=='tiesuo') return false;
+				if(event.card.name=='toulianghuanzhu') return false;
+				return true;
+			},
+			content:function(){
+				player.storage.qianghua++;
+				var card=game.createCard(trigger.card.name,trigger.card.suit,trigger.card.number,trigger.card.nature);
+				player.useCard(card,trigger.targets);
+			},
+			ai:{
+				threaten:1.3
+			},
+			group:'qianghua_clear',
+			subSkill:{
+				clear:{
+					trigger:{player:'phaseBegin'},
+					forced:true,
+					silent:true,
+					popup:false,
+					content:function(){
+						player.storage.qianghua=0;
+					}
+				}
+			}
+		},
+		qianghua2:{},
 		biri:{
 			trigger:{global:'useCard'},
 			priority:15,
 			filter:function(event,player){
 				return event.card.name=='sha'&&event.player!=player&&
 					get.distance(player,event.targets[0])<=1&&
-					player.num('h',{type:'basic'})>0&&
+					player.num('h','shan')>0&&
 					event.targets.contains(player)==false&&event.targets.length==1;
 			},
 			direct:true,
@@ -72,7 +118,7 @@ character.hearth={
 				for(var i=0;i<trigger.targets.length;i++){
 					effect+=ai.get.effect(trigger.targets[i],trigger.card,trigger.player,player);
 				}
-				var str='蔽日：是否弃置一张基本牌令'+get.translation(trigger.player);
+				var str='蔽日：是否弃置一张闪令'+get.translation(trigger.player);
 				if(trigger.targets&&trigger.targets.length){
 					str+='对'+get.translation(trigger.targets);
 				}
@@ -80,17 +126,20 @@ character.hearth={
 				if(event.isMine()||effect<0){
 					game.delay(0.5);
 				}
-				player.chooseToDiscard('h',{type:'basic'},str).ai=function(card){
+				var next=player.chooseToDiscard('h',function(card){
+					return card.name=='shan';
+				},str);
+				next.ai=function(card){
 					if(effect<0){
 						return 9-ai.get.value(card);
 					}
 					return -1;
 				}
+				next.logSkill=['biri',trigger.targets];
 				"step 1"
 				if(result.bool){
 					trigger.untrigger();
 					trigger.finish();
-					player.logSkill('biri',trigger.targets);
 				}
 			},
 			ai:{
@@ -224,7 +273,7 @@ character.hearth={
 			mod:{
 				targetEnabled:function(card,player,target,now){
 					if(player!=target){
-						if(get.type(card)=='trick'&&!get.tag(card,'multitarget')) return false;
+						if(get.type(card)=='trick') return false;
 					}
 				}
 			}
@@ -534,7 +583,7 @@ character.hearth={
 		},
 		guozai:{
 			enable:'phaseUse',
-			usable:1,
+			usable:2,
 			filter:function(event,player){
 				return player.num('h')<4;
 			},
@@ -1181,6 +1230,8 @@ character.hearth={
 		anying:{
 			unique:true,
 			enable:'phaseUse',
+			skillAnimation:'epic',
+			animationColor:'thunder',
 			filter:function(event,player){
 				return !player.storage.anying&&player.num('he',{color:'black'})>1;
 			},
@@ -1741,27 +1792,6 @@ character.hearth={
 			}
 		},
 		tzhenji2:{},
-		zuling:{
-			trigger:{player:'phaseBegin'},
-			forced:true,
-			filter:function(event,player){
-				if(player.storage.zuling) return false;
-				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
-				var num=0;
-				for(var i=0;i<player.skills.length;i++){
-					if(rand.contains(player.skills[i])) num++;
-					if(num>=3) return true;
-				}
-				return false;
-			},
-			content:function(){
-				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
-				for(var i=0;i<rand.length;i++){
-					player.removeSkill(rand[i]);
-				}
-				player.storage.zuling=true;
-			}
-		},
 		tzhenji_old:{
 			trigger:{player:['useCard','respondEnd']},
 			filter:function(event){
@@ -1924,7 +1954,7 @@ character.hearth={
 					}
 				}
 				if(rand.length){
-					if(event.isMine()&&rand.length>1){
+					if(event.isMine()&&(rand.length>1||rand2.length>=3)){
 						var dialog=ui.create.dialog();
 						for(var i=0;i<rand.length;i++){
 							randx[i]=['','',rand[i]];
@@ -1998,19 +2028,6 @@ character.hearth={
 					}
 				}
 				player.addSkill(event.choice);
-				if(!player.storage.tuteng_awake){
-					var rand=['tuteng1','tuteng2','tuteng3','tuteng4',
-					'tuteng5','tuteng6','tuteng7','tuteng8'];
-					var num=0;
-					for(var i=0;i<player.skills.length;i++){
-						if(rand.contains(player.skills[i])) num++;
-						if(num>=3){
-							player.storage.tuteng_awake=true;
-							player.popup('图腾已解锁');
-							break;
-						}
-					}
-				}
 			},
 			ai:{
 				order:11,
@@ -2026,6 +2043,31 @@ character.hearth={
 				threaten:1.3
 			},
 			group:'tuteng_lose'
+		},
+		zuling:{
+			skillAnimation:'epic',
+			animationColor:'thunder',
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				if(!player.storage.tuteng_awake){
+					var rand=['tuteng1','tuteng2','tuteng3','tuteng4',
+					'tuteng5','tuteng6','tuteng7','tuteng8'];
+					var num=0;
+					for(var i=0;i<player.skills.length;i++){
+						if(rand.contains(player.skills[i])) num++;
+						if(num>=3){
+							return true;
+						}
+					}
+				}
+				return false;
+			},
+			content:function(){
+				player.storage.tuteng_awake=true;
+				player.popup('图腾已解锁');
+				player.loseMaxHp();
+			}
 		},
 		tuteng_h:{
 			mod:{
@@ -2450,7 +2492,10 @@ character.hearth={
 		hs_xuefashi:'血法师',
 		hs_ysera:'伊瑟拉',
 		hs_alextrasza:'阿莱克斯塔',
+		hs_trueheart:'图哈特',
 
+		qianghua:'强化',
+		qianghua_info:'出牌阶段限两次，你可以令一张你使用的基本牌或非延时锦囊牌额外结算一次',
 		fushi:'缚誓',
 		fushi_info:'出牌阶段，你可以令一名已受伤角色失去一点体力上限并回复一点体力',
 		hs_ronghejuren:'熔核巨人',
@@ -2467,7 +2512,7 @@ character.hearth={
 		hs_sapphiron:'萨菲隆',
 
 		biri:'蔽日',
-		biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张基本牌取消之',
+		biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张闪取消之',
 		stuxi:'吐息',
 		stuxi_info:'锁定技，回合结束阶段，你令所有未翻面角色各弃置一张牌',
 		bingdong:'冰冻',
@@ -2477,7 +2522,7 @@ character.hearth={
 		luoshi:'落石',
 		luoshi_info:'锁定技，每当你受到一次伤害，你与伤害来源各随机弃置一张牌',
 		mianyi:'免疫',
-		mianyi_info:'锁定技，你不能成为其他角色的单体非延时锦囊的目标',
+		mianyi_info:'锁定技，你不能成为其他角色的非延时锦囊的目标',
 		jiaohui:'教诲',
 		jiaohui_info:'回合结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸两张牌或回复一点体力',
 		chenshui:'沉睡',
@@ -2519,7 +2564,7 @@ character.hearth={
 		guozai:'过载',
 		guozai2:'过载',
 		guozai2_bg:'载',
-		guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
+		guozai_info:'出牌阶段限两次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
 		guozaix:'重载',
 		guozaix2:'重载',
 		guozaix2_bg:'载',
@@ -2588,9 +2633,9 @@ character.hearth={
 		jingxiang:'镜像',
 		jingxiang_info:'每当你需要打出卡牌时，你可以观看一名随机角色的手牌并将其视为你的手牌打出',
 		tuteng:'图腾',
-		tuteng_info:'出牌阶段，你可以获得一个基础图腾，当你的图腾数量达到3时，你解锁全部图腾；每当你受到一次伤害，你随机失去一个图腾',
+		tuteng_info:'出牌阶段，你可以获得一个基础图腾，你最多可以同时拥有3个图腾；每当你受到一次伤害，你随机失去一个图腾',
 		zuling:'祖灵',
-		zuling_info:'觉醒技，回合开始阶段，若你拥有至少3个图腾，你失去所有图腾，并解锁强化图腾',
+		zuling_info:'觉醒技，回合开始阶段，若你拥有至少3个图腾，你失去一点体力上限，并解锁强化图腾',
 		tuteng1:'治疗图腾',
 		tuteng2:'灼热图腾',
 		tuteng3:'石爪图腾',

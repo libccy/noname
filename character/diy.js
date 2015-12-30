@@ -208,6 +208,7 @@ character.diy={
 			unique:true,
 			enable:'chooseToUse',
 			mark:true,
+			skillAnimation:'epic',
 			init:function(player){
 				player.storage.guihan=false;
 			},

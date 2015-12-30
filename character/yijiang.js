@@ -1047,7 +1047,7 @@ character.yijiang={
 				'step 0'
 				if(target.num('e')){
 					target.chooseBool('是否将装备区内的所有牌交给'+get.translation(player)+'？').ai=function(){
-						if(player.num('e')>=2) return false;
+						if(target.num('e')>=3) return false;
 						return true;
 					}
 				}
@@ -1650,7 +1650,7 @@ character.yijiang={
 				return ai.get.attitude(player,event.target)<0;
 			},
 			intro:{
-				content:'cards'
+				content:'card'
 			},
 			content:function(){
 				var card=trigger.target.get('h').randomGet();
@@ -1660,9 +1660,6 @@ character.yijiang={
 				player.syncStorage('taoxi');
 				player.markSkill('taoxi');
 				player.addTempSkill('taoxi4','phaseAfter');
-			},
-			intro:{
-				content:'card'
 			},
 			group:['taoxi2','taoxi3']
 		},
@@ -1731,6 +1728,7 @@ character.yijiang={
 		},
 		taoxi4:{},
 		xingshuai:{
+			skillAnimation:true,
 			audio:2,
 			trigger:{player:'dying'},
 			priority:6,
@@ -1879,7 +1877,6 @@ character.yijiang={
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			popup:false,
-			audio:false,
 			content:function(){
 				if(lib.config.glow_phase){
 					if(_status.currentPhase){
@@ -2163,6 +2160,8 @@ character.yijiang={
 			}
 		},
 		fencheng:{
+			skillAnimation:'epic',
+			animationColor:'fire',
 			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
@@ -2323,6 +2322,7 @@ character.yijiang={
 			}
 		},
 		jiefan:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			mark:true,
@@ -2394,6 +2394,7 @@ character.yijiang={
 			}
 		},
 		fuli:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			enable:'chooseToUse',
@@ -2966,6 +2967,7 @@ character.yijiang={
 			}
 		},
 		zili:{
+			skillAnimation:true,
 			audio:3,
 			unique:true,
 			trigger:{player:'phaseBegin'},
@@ -3029,6 +3031,7 @@ character.yijiang={
 			}
 		},
 		xianzhou:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			enable:'phaseUse',
@@ -5237,6 +5240,7 @@ character.yijiang={
 			}
 		},
 		zbaijiang:{
+			skillAnimation:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			unique:true,
@@ -5313,6 +5317,7 @@ character.yijiang={
 			}
 		},
 		zzili:{
+			skillAnimation:true,
 			unique:true,
 			init:function(player){
 				player.storage.zzili=false;

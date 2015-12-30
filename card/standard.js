@@ -1366,7 +1366,14 @@ card.standard={
 							}
 						}
 					}
-					if(noask) {event._result={bool:false};return;}
+					if(noask){
+						if(event.current==game.me&&ui.tempnowuxie){
+							ui.tempnowuxie.close();
+							delete ui.tempnowuxie;
+						}
+						event._result={bool:false};
+						return;
+					}
 				}
 				var str=get.translation(event.card.name)+'对'+get.translation(event.source2||event.source)+'将';
 				if(event.state){

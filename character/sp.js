@@ -55,6 +55,7 @@ character.sp={
 	},
 	skill:{
 		danji:{
+			skillAnimation:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
@@ -195,7 +196,7 @@ character.sp={
 						'step 0'
 						var goon=(ai.get.attitude(player,trigger.player)<0);
 						var next=player.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【竭缘】？',{color:'black'});
-						next.ai=function(){
+						next.ai=function(card){
 							if(goon){
 								return 8-ai.get.value(card);
 							}
@@ -251,6 +252,7 @@ character.sp={
 			intro:{
 				content:'limited'
 			},
+			skillAnimation:'epic',
 			audio:2,
 			mark:true,
 			filter:function(event,player){
@@ -396,10 +398,12 @@ character.sp={
 				if(!event.cards||event.cards.length!=1) return false;
 				if(_status.currentPhase!=player) return false;
 				if(!player.storage.fenyin) return false;
+				if(player.storage.fenyin2>=3) return false;
 				return get.color(player.storage.fenyin)!=get.color(event.cards[0]);
 			},
 			content:function(){
 				player.draw();
+				player.storage.fenyin2++;
 			},
 			intro:{
 				content:'card'
@@ -422,12 +426,13 @@ character.sp={
 			}
 		},
 		fenyin2:{
-			trigger:{player:'phaseAfter'},
+			trigger:{player:'phaseBegin'},
 			forced:true,
 			silent:true,
 			popup:false,
 			content:function(){
 				player.storage.fenyin=null;
+				player.storage.fenyin2=0;
 			}
 		},
 		dujin:{
@@ -1106,6 +1111,7 @@ character.sp={
 			}
 		},
 		fengliang:{
+			skillAnimation:true,
 			unique:true,
 			audio:2,
 			trigger:{player:'dying'},
@@ -1309,6 +1315,7 @@ character.sp={
 			}
 		},
 		zuixiang:{
+			skillAnimation:true,
 			audio:true,
 			unique:true,
 			mark:true,
@@ -2206,6 +2213,7 @@ character.sp={
 			}
 		},
 		cunsi:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			enable:'phaseUse',
@@ -2541,6 +2549,7 @@ character.sp={
 			unique:true
 		},
 		xiongyi:{
+			skillAnimation:true,
 			unique:true,
 			enable:'phaseUse',
 			audio:2,
@@ -2670,6 +2679,7 @@ character.sp={
 			}
 		},
 		wuji:{
+			skillAnimation:true,
 			audio:2,
 			trigger:{player:'phaseEnd'},
 			forced:true,
@@ -3576,6 +3586,7 @@ character.sp={
 			}
 		},
 		juyi:{
+			skillAnimation:true,
 			audio:true,
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
@@ -3675,6 +3686,7 @@ character.sp={
 		},
 		suiren:{
 			trigger:{player:'phaseBegin'},
+			skillAnimation:true,
 			check:function(event,player){
 				return player.hp==1||(player.hp==2&&player.num('h')<=1);
 			},
@@ -3889,7 +3901,7 @@ character.sp={
 		fulu:'符箓',
 		fuji:'助祭',
 		fenyin:'奋音',
-		fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌',
+		fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌，每回合最多发动3次',
 		fuji_info:'当一名角色造成雷电伤害时，你可以令其进行一次判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得此牌。',
 		fulu_info:'你可以将【杀】当雷【杀】使用。',
 		jilei_info:'每当你受到一次伤害，可以令伤害来源不能使用或打出其手牌直到回合结束',

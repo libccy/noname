@@ -46,6 +46,7 @@ character.mountain={
 			}
 		},
 		zhiji:{
+			skillAnimation:'true',
 			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
@@ -188,6 +189,7 @@ character.mountain={
 			}
 		},
 		ruoyu:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
@@ -521,6 +523,7 @@ character.mountain={
 			}
 		},
 		zaoxian:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
@@ -613,6 +616,7 @@ character.mountain={
 			}
 		},
 		hunzi:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},

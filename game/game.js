@@ -20,7 +20,9 @@
 		changeLog:[
 			'界面问题修正',
 			'限制结算速度选项（较卡时建议开启）',
-			'引用配音方法调整'
+			'引用配音方法调整',
+			'觉醒技、限定技特效',
+			'烟花、下雪等特效（需在选项－玩法中开启富甲天下）'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -947,6 +949,10 @@
 						name:'游戏特效',
 						init:true,
 					},
+					skill_animation:{
+						name:'技能特效',
+						init:true,
+					},
 					name_font:{
 						name:'人名字体',
 						init:'xinwei',
@@ -1279,10 +1285,10 @@
 							}
 						}
 					},
-					coin_free_playpackconfig:{
-						name:'仅在空闲时显示特效',
-						init:false,
-					},
+					// coin_free_playpackconfig:{
+					// 	name:'仅在空闲时显示特效',
+					// 	init:false,
+					// },
 					update:function(config,map){
 						for(var i in map){
 							if(i.indexOf('_playpackconfig')!=-1){
@@ -4200,7 +4206,12 @@
 					str+='发动了';
 					if(!info.direct){
 						game.log(player,str,'【'+get.translation(skill)+'】');
-						player.popup(skill);
+						if(lib.config.skill_animation&&lib.skill[skill]&&lib.skill[skill].skillAnimation){
+							player.$skill(lib.skill[skill].animationStr||lib.translate[skill],lib.skill[skill].skillAnimation,lib.skill[skill].animationColor);
+						}
+						else{
+							player.popup(skill);
+						}
 					}
 					if(event.addCount!=false){
 						if(player.stat[player.stat.length-1].skill[skill]==undefined){
@@ -5530,7 +5541,7 @@
 					setTimeout(function(){
 						that.classList.remove('playerfocus');
 						ui.arena.classList.remove('playerfocus');
-					},1000);
+					},time);
 					game.addVideo('playerfocus',this,time);
 					return this;
 				},
@@ -6600,7 +6611,10 @@
 						nopop=true;
 					}
 					if(lib.translate[name]){
-						if(!nopop) this.popup(name);
+						if(lib.config.skill_animation&&lib.skill[name]&&lib.skill[name].skillAnimation){
+							this.$skill(lib.skill[name].animationStr||lib.translate[name],lib.skill[name].skillAnimation,lib.skill[name].animationColor);
+						}
+						else if(!nopop) this.popup(name);
 						if(typeof targets=='object'&&targets.length){
 							game.log(this,'对',targets,'发动了','【'+get.translation(name)+'】');
 						}
@@ -6992,7 +7006,7 @@
 					this.queueTimeout=setTimeout(function(){
 						player.queueCount--;
 						if(player.queueCount==0){
-							player.removeAttribute('style');
+							player.style.transform='';
 							player.node.avatar.style.transform='';
 							player.node.avatar2.style.transform='';
 							if(player==game.me) ui.me.removeAttribute('style');
@@ -7751,6 +7765,23 @@
 					}
 					if(list.length) this.$draw(list);
 				},
+				$skill:function(name,type,color){
+					if(typeof type!='string') type='legend';
+					game.delay(2);
+					this.playerfocus(1500);
+					var that=this;
+					setTimeout(function(){
+						if(lib.config.animation&&!lib.config.low_performance){
+							if(lib.config.mode=='chess'){
+								that['$'+type+'2'](1200);
+							}
+							else{
+								that['$'+type](1200);
+							}
+						}
+						that.$fullscreenpop(name,color);
+					},300);
+				},
 				$fire:function(){
 					game.addVideo('flame',this,'fire');
 					var left,top;
@@ -7805,7 +7836,8 @@
 					game.animate.flame(left+this.offsetWidth/2,
 						top+this.offsetHeight-30,700,'legend');
 				},
-				$rare:function(){
+				$rare:function(time){
+					time=time||700;
 					game.addVideo('flame',this,'rare');
 					var left,top;
 					if(lib.config.mode=='chess'){
@@ -7820,9 +7852,10 @@
 						top+=15;
 					}
 					game.animate.flame(left+this.offsetWidth/2,
-						top+this.offsetHeight-30,700,'rare');
+						top+this.offsetHeight-30,time,'rare');
 				},
-				$epic:function(){
+				$epic:function(time){
+					time=time||700;
 					game.addVideo('flame',this,'epic');
 					var left,top;
 					if(lib.config.mode=='chess'){
@@ -7837,9 +7870,10 @@
 						top+=15;
 					}
 					game.animate.flame(left+this.offsetWidth/2,
-						top+this.offsetHeight-30,700,'epic');
+						top+this.offsetHeight-30,time,'epic');
 				},
-				$legend:function(){
+				$legend:function(time){
+					time=time||700;
 					game.addVideo('flame',this,'legend');
 					var left,top;
 					if(lib.config.mode=='chess'){
@@ -7854,7 +7888,7 @@
 						top+=15;
 					}
 					game.animate.flame(left+this.offsetWidth/2,
-						top+this.offsetHeight-30,700,'legend');
+						top+this.offsetHeight-30,time,'legend');
 				},
 				$coin:function(){
 					game.addVideo('flame',this,'coin');
@@ -7907,8 +7941,19 @@
 					node.dataset.nature=nature||'black';
 					return node;
 				},
+				$fullscreenpop:function(str,nature){
+					game.addVideo('fullscreenpop',this,[str,nature]);
+					var node=ui.create.div('.damage',ui.window);
+					node.innerHTML=str;
+					node.dataset.nature=nature||'soil';
+					ui.refresh(node);
+					node.classList.add('damageadded');
+					setTimeout(function(){
+						node.delete();
+					},1000);
+				},
 				$damagepop:function(num,nature){
-					if(typeof num=='number'){
+					if(typeof num=='number'||typeof num=='string'){
 						game.addVideo('damagepop',this,[num,nature]);
 						var node=ui.create.div('.damage');
 						if(num>0){
@@ -10014,6 +10059,14 @@
 					console.log(player);
 				}
 			},
+			fullscreenpop:function(player,content){
+				if(player&&content){
+					player.$fullscreenpop(content[0],content[1]);
+				}
+				else{
+					console.log(player);
+				}
+			},
 			damagepop:function(player,content){
 				if(player&&content){
 					player.$damagepop(content[0],content[1]);
@@ -10823,9 +10876,11 @@
 			ui.refresh(node);
 			node.show();
 			node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
-			setTimeout(function(){
-				node.delete();
-			},total/1.5);
+			node.addEventListener('webkitTransitionEnd',function(){
+				setTimeout(function(){
+					node.delete();
+				},total/3);
+			});
 		},
 		_linexy:function(path){
 			var from=[path[0],path[1]];
@@ -10916,7 +10971,7 @@
 			_status.event.next.push(next);
 			return next;
 		},
-		createCard:function(name,suit,number){
+		createCard:function(name,suit,number,nature){
 			if(typeof name!='string'){
 				name='sha';
 			}
@@ -10932,7 +10987,7 @@
 			if(typeof number!='number'){
 				number=Math.ceil(Math.random()*13);
 			}
-			return ui.create.card(ui.special).init([suit,number,name]);
+			return ui.create.card(ui.special).init([suit,number,name,nature]);
 		},
 		over:function(result){
 			var i,j,k,num,table,tr,td,dialog;
@@ -10960,7 +11015,12 @@
 			if(typeof _status.coin=='number'){
 				var coeff=Math.random()*0.4+0.8;
 				var added=0;
+				var betWin=false;
 				if(result=='战斗胜利'){
+					if(_status.betWin){
+						betWin=true;
+						_status.coin+=10;
+					}
 					_status.coin+=20;
 					switch(lib.config.mode){
 						case 'identity':{
@@ -11013,6 +11073,11 @@
 				}
 				_status.coin=Math.ceil(_status.coin);
 				dialog.add(ui.create.div('','获得'+_status.coin+'金'));
+				if(betWin){
+					game.changeCoin(20);
+					dialog.content.appendChild(document.createElement('br'));
+					dialog.add(ui.create.div('','（下注赢得10金）'));
+				}
 				game.changeCoin(_status.coin);
 			}
 			if(true){
@@ -17082,6 +17147,7 @@
 				if(this.classList.contains('selectable')&&
 					!this.classList.contains('selected')&&
 					!this.classList.contains('noclick')){
+						game.print(1)
 					this._waitingfordrag={clientX:e.touches[0].clientX,clientY:e.touches[0].clientY};
 				}
 			},
@@ -20699,7 +20765,7 @@
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
-		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&!list.contains(i)) console.log(i);
+		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&!list.contains(i)&&!lib.customCharacters.contains(i)) console.log(i);
 		        }
 		    },
 			h:function(player){

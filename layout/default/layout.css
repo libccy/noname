@@ -137,7 +137,7 @@ table{table-layout: fixed;}
 #arena[data-font_size='20']{
 	font-size:20px;
 }*/
-#arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;}
+#arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;z-index: 0}
 #arena.right:not(.noleft){left:240px;opacity: 0.6;}
 #arena.left:not(.noleft){left:calc(10% - 240px);opacity: 0.6;}
 #arena.top{top:-100%;}
@@ -166,6 +166,9 @@ table{table-layout: fixed;}
 }
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
 	opacity: 0.3 !important;
+}
+.player.playerfocus{
+	transform: scale(1.1);
 }
 #arena #me>div>div>.card{
 	position: absolute;
@@ -587,18 +590,19 @@ margin-bottom: 5px;
 
 #arena .player.minskin>.name,
 #arena.slim_player .player.minskin>.name{
-    top:16px;
+    top:17px;
 }
 #arena .player.linked.minskin>.name,
 #arena.slim_player .player.linked.minskin>.name{
-    transform: rotate(90deg) translate(83px,-65px);
+    transform: rotate(90deg) translate(81px,-66px);
 }
 
 .button.character>.name{
 	font-family: 'xinwei'
 }
 .player>.intro{top:87px;left: 18px;}
-.player>.damage{
+.player>.damage,
+#window>.damage{
 	font-family: 'huangcao','xinwei';
 	font-size:72px;
 	width: 100%;
@@ -607,6 +611,12 @@ margin-bottom: 5px;
 	left:0;
 	opacity: 0;
 	transform:scale(0.7);
+	white-space: nowrap;
+	z-index: 5;
+}
+#window>.damage{
+	transform:scale(2);
+	font-size: 120px;
 }
 .player[data-position='0']>.damage.dieidentity,
 .player:not(.dead)>.damage.dieidentity{
@@ -628,7 +638,8 @@ margin-bottom: 5px;
 	animation-fill-mode: forwards;
 	-webkit-animation-fill-mode: forwards;
 }
-.player>.damage.damageadded{
+.player>.damage.damageadded,
+#window>.damage.damageadded{
 	opacity: 1;
 	transform:scale(1);
 }
@@ -863,7 +874,8 @@ margin-bottom: 5px;
 	-webkit-animation: drawing 1s;
 	-webkit-animation-fill-mode: forwards;
 }
-.card.thrown{position: absolute;opacity: 1;margin:0;z-index: 3}
+.card.thrown{position: absolute;opacity: 1;margin:0;z-index: 3;}
+#arena>.card.thrown{pointer-events: none}
 #arena.thrownhighlight>.card.thrown:not(.thrownhighlight){
 	opacity: 0.5;
 	transform:scale(0.95);
@@ -1281,7 +1293,7 @@ div[data-color="unknownm"]{
     padding-right: 5px;
     height: auto;
     font-size: 24px;
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important
+	margin-left: 10px;
 }
 .coin_menu .content>.caption>.coin_buy>.menubutton.disabled{
 	opacity: 0.5;

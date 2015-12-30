@@ -498,6 +498,7 @@ character.yxs={
 			}
 		},
 		heqin:{
+			skillAnimation:true,
 			enable:'phaseUse',
 			filter:function(event,player){
 				return !player.storage.heqin;
@@ -563,7 +564,34 @@ character.yxs={
 			}
 		},
 		chajue:{
-			inherit:'zhichi'
+			trigger:{player:'damageEnd'},
+			forced:true,
+			filter:function(event,player){
+				return _status.currentPhase!=player;
+			},
+			content:function(){
+				player.addTempSkill('chajue2',['phaseAfter','phaseBefore']);
+			}
+		},
+		chajue2:{
+			trigger:{target:'useCardToBefore'},
+			forced:true,
+			priority:15,
+			filter:function(event,player){
+				return get.type(event.card)=='trick'||event.card.name=='sha';
+			},
+			content:function(){
+				game.log(player,'发动了察觉，',trigger.card,'对',trigger.target,'失效')
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(get.type(card)=='trick'||card.name=='sha') return [0,0,0,0];
+					}
+				}
+			}
 		},
 		tiewan:{
 			trigger:{global:'useCardAfter'},
@@ -899,6 +927,16 @@ character.yxs={
 					}
 					if(suit&&get.suit(card)==suit) return false;
 				},
+				cardRespondable:function(card,player){
+					if(player.skills.contains('ducai2')) return;
+					var suit;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].skills.contains('ducai2')){
+							suit=get.suit(game.players[i].storage.ducai2);
+						}
+					}
+					if(suit&&get.suit(card)==suit) return false;
+				},
 				cardSavable:function(card,player){
 					if(player.skills.contains('ducai2')) return;
 					var suit;
@@ -1120,6 +1158,7 @@ character.yxs={
 			}
 		},
 		seyou:{
+			skillAnimation:true,
 			unique:true,
 			mark:true,
 			init:function(player){
@@ -2119,6 +2158,7 @@ character.yxs={
 		heqin3:'和亲',
 		heqin_info:'限定技，你可以与场上一名男性角色形成【和亲】状态，你与该男性角色于摸牌阶段摸牌数+1。你或者男性角色阵亡，【和亲】状态消失',
 		chajue:'察觉',
+		chajue2:'察觉',
 		chajue_info:'锁定技，你的回合外，你每受到一次伤害，任何【杀】或非延时类锦囊均对你无效，直到该回合结束。',
 		tiewan:'铁腕',
 		tiewan_info:'每当其他角色使用乐不思蜀时，你可以立即将一张红色牌当作乐不思蜀使用',
@@ -2154,7 +2194,7 @@ character.yxs={
 		ducai:'独裁',
 		ducai2:'独裁',
 		ducai3:'独裁',
-		ducai_info:'出牌阶段限一次，你可以弃置一张牌，则本轮内除你外的角色不能使用与该手牌花色相同的手牌',
+		ducai_info:'出牌阶段限一次，你可以弃置一张牌，则本轮内除你外的角色不能使用或打出与该手牌花色相同的手牌',
 		tongling:'统领',
 		tongling_info:'每当其他角色受到一次伤害时，你获得1个统领标记（标记上限为3）',
 		fanpu:'反扑',

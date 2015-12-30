@@ -196,6 +196,7 @@ window.config={
 	background_audio:true,
 	background_speak:true,
 	glow_phase:'yellow',
+	die_flip:true,
 
 	skin:{},
 	gameRecord:{},
@@ -231,6 +232,7 @@ window.config={
 	vertical_scroll:false,
 	handcard_scroll:0,
 	animation:true,
+	skill_animation:true,
 	paused:false,
 	title:false,
 	right_sidebar:false,

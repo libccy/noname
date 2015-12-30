@@ -58,6 +58,8 @@ character.extra={
 			init:function(player){
 				player.storage.shenfen=false;
 			},
+			skillAnimation:true,
+			animationColor:'metal',
 			mark:true,
 			content:function(){
 				"step 0"
@@ -192,6 +194,7 @@ character.extra={
 			}
 		},
 		sbaiyin:{
+			skillAnimation:'epic',
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			unique:true,
@@ -747,6 +750,8 @@ character.extra={
 			unique:true,
 			enable:'phaseUse',
 			audio:3,
+			animationColor:'fire',
+			skillAnimation:'legend',
 			filter:function(event,player){
 				return !player.storage.yeyan;
 			},

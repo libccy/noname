@@ -119,6 +119,9 @@ character.fire={
 			unique:true,
 			enable:'chooseToUse',
 			mark:true,
+			skillAnimation:true,
+			animationStr:'涅盘',
+			animationColor:'fire',
 			init:function(player){
 				player.storage.niepan=false;
 			},

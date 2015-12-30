@@ -272,6 +272,7 @@ character.refresh={
 			}
 		},
 		qinxue:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},
@@ -496,6 +497,7 @@ character.refresh={
 			audio:2,
 			unique:true,
 			mark:true,
+			skillAnimation:true,
 			trigger:{player:'phaseBegin'},
 			init:function(player){
 				player.storage.retishen=false;
@@ -1028,6 +1030,7 @@ character.refresh={
 			}
 		},
 		jianyan:{
+			skillAnimation:true,
 			audio:2,
 			enable:'phaseUse',
 			usable:1,
@@ -1119,6 +1122,7 @@ character.refresh={
 			}
 		},
 		fenwei:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			mark:true,
@@ -1314,7 +1318,7 @@ character.refresh={
 		xunxun_info:'摸牌阶段，你可以放弃摸牌，改为观看牌堆顶的四张牌，然后获得其中的两张牌，将其余的牌以任意顺序置于牌堆底。',
 		wangxi_info:'每当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可与该角色各摸一张牌。',
 		reguose_info:'出牌阶段限一次，你可以选择一项：将一张方片花色牌当做【乐不思蜀】使用；或弃置一张方片花色牌并弃置场上的一张【乐不思蜀】。选择完成后，你摸一张牌。',
-		fenwei_info:'当一名角色使用的锦囊牌指定了至少两名角色为目标时，你可以令此牌对其中任意名角色无效。',
+		fenwei_info:'限定技，当一名角色使用的锦囊牌指定了至少两名角色为目标时，你可以令此牌对其中任意名角色无效。',
 		chulao_info:'出牌阶段限一次，若你有牌，你可以选择任意名势力各不相同的其他角色，你弃置你和这些角色的各一张牌。然后以此法弃置黑桃牌的角色各摸一张牌。',
 		reguicai_info:'在任意角色的判定牌生效前，你可以打出一张牌代替之',
 		zhuhai_info:'一名其他角色的结束阶段开始时，若该角色本回合造成过伤害，你可以对其使用一张【杀】。',

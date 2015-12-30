@@ -513,6 +513,8 @@ character.gujian={
 		},
 		shahun:{
 			enable:'chooseToUse',
+			skillAnimation:true,
+			animationColor:'fire',
 			filter:function(event,player){
 				return !player.storage.shahun&&player.hp<=0;
 			},
@@ -882,6 +884,8 @@ character.gujian={
 		jiehuo:{
 			unique:true,
 			forbid:['infinity'],
+			skillAnimation:true,
+			animationColor:'fire',
 			init:function(player){
 				player.storage.jiehuo=false;
 			},

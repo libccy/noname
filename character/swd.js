@@ -199,6 +199,8 @@ character.swd={
 			}
 		},
 		bingfeng:{
+			skillAnimation:'epic',
+			animationColor:'water',
 			unique:true,
 			enable:'phaseUse',
 			filter:function(event,player){
@@ -1263,6 +1265,8 @@ character.swd={
 			}
 		},
 		shouyin:{
+			skillAnimation:'epic',
+			animationColor:'water',
 			unique:true,
 			enable:'chooseToUse',
 			init:function(player){

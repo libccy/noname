@@ -2065,6 +2065,24 @@ mode.chess={
 				ui.money.childNodes[2].style.color='#FFE600';
 				ui.money.childNodes[3].style.fontFamily='huangcao';
 				ui.money.style.letterSpacing='4px';
+				for(var i in lib.rank){
+					if(Array.isArray(lib.rank[i])){
+						for(var j=0;j<lib.rank[i].length;j++){
+							if(!lib.character[lib.rank[i][j]]){
+								lib.rank[i].splice(j--,1);
+							}
+						}
+					}
+				}
+				for(var i in lib.rank.rarity){
+					if(Array.isArray(lib.rank.rarity[i])){
+						for(var j=0;j<lib.rank.rarity[i].length;j++){
+							if(!lib.character[lib.rank.rarity[i][j]]){
+								lib.rank.rarity[i].splice(j--,1);
+							}
+						}
+					}
+				}
 				'step 1'
 				lib.rank.all=lib.rank.s.
 					concat(lib.rank.ap).
