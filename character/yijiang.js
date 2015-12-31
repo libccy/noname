@@ -899,7 +899,7 @@ character.yijiang={
 						target.draw();
 					}
 					else{
-						player.discardPlayerCard(target,'he',true);
+						target.discard(target.get('h').randomGet());
 					}
 				}
 			},
@@ -5491,7 +5491,7 @@ character.yijiang={
 		huaiyi:'怀异',
 		huaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若其中包含不止一种颜色，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法获得的牌不少于两张，则你失去1点体力',
 		yaoming:'邀名',
-		yaoming_info:'每回合限一次，当你造成或受到伤害后，你可以选择一项：1. 弃置手牌数大于你的一名角色的一张牌；2. 令手牌数小于你的一名角色摸一张牌',
+		yaoming_info:'每回合限一次，当你造成或受到伤害后，你可以选择一项：1. 弃置手牌数大于你的一名角色的一张手牌；2. 令手牌数小于你的一名角色摸一张牌',
 		anguo:'安国',
 		anguo_info:'出牌阶段限一次，你可以选择一名其他角色装备区里的一张牌，令其将此牌收回手牌。然后若该角色攻击范围内的角色数因此减少，则你摸一张牌',
 		yanzhu:'宴诛',

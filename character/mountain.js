@@ -970,6 +970,9 @@ character.mountain={
 					var add=false;
 					for(var j=0;j<lib.character[i][3].length;j++){
 						var info=lib.skill[lib.character[i][3][j]];
+						if(!info){
+							continue;
+						}
 						if(info.gainable||!info.unique){
 							add=true;break;
 						}

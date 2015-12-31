@@ -10,6 +10,91 @@ character.extra={
 		shen_lvbu:['male','qun',5,['baonu','wuqian','shenfen']],
 	},
 	skill:{
+		qinyin:{
+			audio:2,
+			trigger:{player:'phaseDiscardEnd'},
+			direct:true,
+			filter:function(event,player){
+				return event.cards&&event.cards.length>1
+			},
+			content:function(){
+				"step 0"
+				if(typeof event.count!='number'){
+					// event.count=trigger.cards.length-1;
+					event.count=1;
+				}
+				var recover=0,lose=0;
+				for(var i=0;i<game.players.length;i++){
+					if(!game.players[i].isOut()){
+						if(game.players[i].hp<game.players[i].maxHp){
+							if(ai.get.attitude(player,game.players[i])>0){
+								if(game.players[i].hp<2){
+									lose--;
+									recover+=0.5;
+								}
+								lose--;
+								recover++;
+							}
+							else if(ai.get.attitude(player,game.players[i])<0){
+								if(game.players[i].hp<2){
+									lose++;
+									recover-=0.5;
+								}
+								lose++;
+								recover--;
+							}
+						}
+						else{
+							if(ai.get.attitude(player,game.players[i])>0){
+								lose--;
+							}
+							else if(ai.get.attitude(player,game.players[i])<0){
+								lose++;
+							}
+						}
+					}
+				}
+				var prompt='是否发动【琴音】（剩余'+get.cnNumber(event.count)+'次）';
+				player.chooseControl('失去体力','回复体力','cancel',
+				ui.create.dialog('是否发动【琴音】？','hidden')).ai=function(){
+					// console.log(lose,recover);
+					if(lose>recover&&lose>0) return 0;
+					if(lose<recover&&recover>0) return 1;
+					return 2;
+				}
+				"step 1"
+				if(result.bool==false||result.control=='cancel'){
+					event.finish();
+				}
+				else{
+					player.logSkill('qinyin');
+					event.bool=(result.control=='回复体力');
+					event.num=0;
+					event.players=game.players.slice(0);
+				}
+				"step 2"
+				if(event.num<event.players.length){
+					var target=event.players[event.num];
+					if(event.bool){
+						target.recover();
+					}
+					else{
+						target.loseHp();
+					}
+					event.num++;
+					event.redo();
+				}
+				"step 3"
+				if(event.count>1){
+					event.count--;
+					event.goto(0);
+				}
+			},
+			ai:{
+				expose:0.1,
+				threaten:2
+			}
+		},
 		lianpo:{
 			audio:true,
 			trigger:{source:'dieAfter'},

@@ -60,8 +60,8 @@ card.extra={
 						if(lib.config.mode=='stone'&&!player.isMin()){
 							if(player.getActCount()+1>=player.actcount) return false;
 						}
-						var shas=target.get('h','sha');
-						if(player.num('h','sha')>1){
+						var shas=player.get('h','sha');
+						if(shas.length>1){
 							if(player.num('e','zhuge')) return 0;
 							if(player.skills.contains('paoxiao')) return 0;
 							if(player.skills.contains('fengnu')) return 0;

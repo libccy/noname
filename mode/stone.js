@@ -364,7 +364,8 @@ mode.stone={
 				}
 				lib.card[name]={
 					image:'character/'+i,
-					stoneact:lib.character[i][5][0]
+					stoneact:lib.character[i][5][0],
+					career:lib.character[i][5][2]||null
 				};
 				for(j in lib.card.stonecharacter){
 					lib.card[name][j]=lib.card.stonecharacter[j];
