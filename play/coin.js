@@ -58,15 +58,15 @@ play.coin={
 					if(item.bought){
 						if(item.running){
 							buy.innerHTML='停止';
+							if(item.control){
+								var node=item.control();
+								if(node){
+									buy.parentNode.appendChild(node,buy);
+								}
+							}
 						}
 						else{
 							buy.innerHTML='开始';
-						}
-						if(item.control){
-							var node=item.control();
-							if(node){
-								buy.parentNode.appendChild(node,buy);
-							}
 						}
 					}
 					buy.name=i;

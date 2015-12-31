@@ -218,7 +218,7 @@ card.guozhan={
 				});
 				"step 1"
 				if(result.bool){
-					player.logSkill('sanjian_skill');
+					player.logSkill('sanjian_skill',result.targets);
 					player.discard(result.cards);
 					result.targets[0].damage();
 				}

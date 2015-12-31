@@ -639,6 +639,8 @@ character.woods={
 			intro:{
 				content:'limited'
 			},
+			skillAnimation:'epic',
+			animationColor:'thunder',
 			prepare:function(cards,player){
 				player.line(game.players);
 				for(var i=0;i<game.players.length;i++){

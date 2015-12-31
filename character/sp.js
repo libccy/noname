@@ -39,6 +39,7 @@ character.sp={
 		lingcao:['male','wu',4,['dujin']],
 		sunru:['female','wu',3,['shixin','qingyi']],
 		lingju:['female','qun',3,['jieyuan','fenxin']],
+		lifeng:['male','shu',3,['tunchu','shuliang']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
