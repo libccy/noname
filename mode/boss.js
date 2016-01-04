@@ -6,6 +6,9 @@ mode.boss={
 				if(this!=game.boss){
 					this.storage.boss_chongzheng=0;
 				}
+				if(game.bossinfo.checkResult&&game.bossinfo.checkResult()===false){
+					return;
+				}
 				if(this==game.boss||game.players.length==1){
 					game.checkResult();
 				}
@@ -14,6 +17,32 @@ mode.boss={
 	},
 	game:{
 		reserveDead:true,
+		changeBoss:function(name){
+			if(game.additionaldead){
+				game.additionaldead.push(game.boss);
+			}
+			else{
+				game.additionaldead=[game.boss];
+			}
+			game.boss.delete();
+			game.dead.remove(game.boss);
+			var boss=ui.create.player().init(name);
+			game.addVideo('bossSwap',game.boss,boss.name);
+			if(game.me==game.boss){
+				boss.dataset.position=0;
+				game.swapControl(boss);
+			}
+			else{
+				boss.dataset.position=7;
+			}
+			game.players.push(boss.animate('zoominanim'));
+			game.arrangePlayers();
+			game.boss=boss;
+			ui.arena.appendChild(boss);
+			boss.directgain(get.cards(4));
+			boss.setIdentity('zhu');
+			boss.identity='zhu';
+		},
 		checkResult:function(){
 			if(game.boss==game.me){
 				game.over(game.boss.isAlive());
@@ -360,6 +389,9 @@ mode.boss={
 					}
 				}
 				else{
+					if(player.identity=='zhu'&&game.boss!=player){
+						player=game.boss;
+					}
 					player.phase();
 				}
 				"step 1"
@@ -441,7 +473,7 @@ mode.boss={
 				dialog.classList.add('fixed');
 				ui.window.appendChild(dialog);
 				dialog.classList.add('bosscharacter');
-				dialog.add('0/3');
+				// dialog.add('0/3');
 				dialog.add([list.slice(0,20),'character']);
 				dialog.noopen=true;
 
@@ -449,11 +481,11 @@ mode.boss={
 				next._triggered=null;
 				next.custom.replace.target=event.customreplacetarget;
 				next.selectButton=[3,3];
-				next.custom.add.button=function(){
-					if(ui.cheat2&&ui.cheat2.backup) return;
-					_status.event.dialog.content.childNodes[1].innerHTML=
-					ui.selected.buttons.length+'/3';
-				};
+				// next.custom.add.button=function(){
+				// 	if(ui.cheat2&&ui.cheat2.backup) return;
+				// 	_status.event.dialog.content.childNodes[1].innerHTML=
+				// 	ui.selected.buttons.length+'/3';
+				// };
 				event.changeDialog=function(){
 					if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
 						return;
@@ -467,7 +499,7 @@ mode.boss={
 					ui.window.appendChild(_status.event.dialog);
 					_status.event.dialog.classList.add('bosscharacter');
 					_status.event.dialog.classList.add('fixed');
-					_status.event.dialog.add('0/3');
+					// _status.event.dialog.add('0/3');
 					_status.event.dialog.add([list.slice(0,20),'character']);
 					game.uncheck();
 					game.check();
@@ -573,6 +605,14 @@ mode.boss={
 		},
 	},
 	boss:{
+		boss_zhuoguiquxie:{
+			chongzheng:99,
+			checkResult:function(){
+				if(game.boss.name!='boss_yecha'&&game.boss.name!='boss_luocha'){
+					return false;
+				}
+			}
+		},
 		boss_zhangjiao:{
 			// loopType:2,
 		},
@@ -607,7 +647,6 @@ mode.boss={
 		},
 	},
 	skill:{
-
 		_bossswap:{
 			trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 			'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',

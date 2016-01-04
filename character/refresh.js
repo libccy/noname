@@ -1016,6 +1016,7 @@ character.refresh={
 			}
 		},
 		qianxin:{
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			trigger:{source:'damageAfter'},
@@ -1030,7 +1031,6 @@ character.refresh={
 			}
 		},
 		jianyan:{
-			skillAnimation:true,
 			audio:2,
 			enable:'phaseUse',
 			usable:1,

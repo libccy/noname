@@ -99,6 +99,7 @@ window.characterRank={
         'hs_tgolem',
     ],
     am:[
+        'lifeng',
         'zhugeguo',
         'sp_caiwenji',
         'yxs_yingzheng',

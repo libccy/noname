@@ -2315,6 +2315,7 @@ character.yijiang={
 				return false;
 			},
 			content:function(){
+				player.line(trigger.damage,'green');
 				trigger.player.damage();
 			},
 			ai:{

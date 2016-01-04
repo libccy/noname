@@ -1424,7 +1424,7 @@ card.standard={
 					else event.state=true;
 					event.goto(1);
 				}
-				else if(event.current.next==event.end){
+				else if(event.current.next==event.end||event.end.isDead()){
 					if(event.state==false){
 						trigger.untrigger();
 						trigger.finish();
@@ -1518,7 +1518,7 @@ card.standard={
 					else event.state=true;
 					event.goto(1);
 				}
-				else if(event.current.next==event.end){
+				else if(event.current.next==event.end||event.end.isDead()){
 					if(event.state==false){
 						trigger.untrigger();
 						trigger.cancelled=true;

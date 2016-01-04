@@ -4083,6 +4083,7 @@ character.swd={
 				}
 			},
 			intro:{
+				nocount:true,
 				onunmark:function(content,player){
 					player.storage.yishan.length=0;
 				},
@@ -7302,7 +7303,6 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.discard(result.cards);
 					player.logSkill('huanling',result.targets);
 					player.turnOver();
 					result.targets[0].turnOver();

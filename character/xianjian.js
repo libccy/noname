@@ -816,14 +816,14 @@ character.xianjian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.discardPlayerCard(trigger.player,'he','是否发动【破云】',[1,2]);
+				player.discardPlayerCard(trigger.player,'he','是否发动【破云】',[1,2]).logSkill=['poyun',trigger.player];
 				"step 1"
 				if(result.bool){
 					player.storage.xuanning--;
 					if(!player.storage.xuanning){
 						player.unmarkSkill('xuanning');
 					}
-					player.logSkill('poyun',trigger.player);
+					player.syncStorage('xuanning');
 				}
 			},
 			ai:{

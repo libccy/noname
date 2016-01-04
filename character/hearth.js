@@ -245,7 +245,9 @@ character.hearth={
 		},
 		fushi:{
 			enable:'phaseUse',
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return target.hp<target.maxHp;
+			},
 			content:function(){
 				'step 0'
 				target.loseMaxHp(true);
@@ -692,7 +694,9 @@ character.hearth={
 				trigger.player.line(player,'thunder');
 				player.damage('nosource','thunder').animate=false;
 				player.$damage(trigger.player);
-				player.$thunder();
+				if(lib.config.animation&&!lib.config.low_performance){
+					player.$thunder();
+				}
 			}
 		},
 		huanwu:{

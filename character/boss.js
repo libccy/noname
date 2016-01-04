@@ -10,6 +10,19 @@ character.boss={
 		boss_pangtong:['male','shu',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['boss','bossallowed'],'zhu'],
 		boss_zhaoyun:['male','shu',1,['boss_juejing','longhun','zhanjiang'],['boss','bossallowed'],'qun'],
 		boss_zhouyu:['male','wu',6,['huoshen','boss_honglian','boss_xianyin'],['boss','bossallowed'],'zhu'],
+
+		boss_zhuoguiquxie:['male','qun',0,['boss_bianshen'],['boss','bossallowed']],
+		boss_baiwuchang:['male','qun',9,['boss_baolian','boss_qiangzheng','boss_zuijiu','juece','boss_bianshen4'],['hiddenboss','bossallowed']],
+		boss_heiwuchang:['male','qun',9,['boss_guiji','boss_taiping','boss_suoming','boss_xixing','boss_bianshen4'],['hiddenboss','bossallowed']],
+		boss_luocha:['male','qun',12,['boss_modao','boss_yushou','yizhong','boss_moyany'],['hiddenboss','bossallowed']],
+		boss_yecha:['male','qun',11,['boss_modao','boss_mojian','bazhen','boss_danshu'],['hiddenboss','bossallowed']],
+		boss_niutou:['male','qun',7,['boss_baolian','niepan','boss_manjia','boss_xiaoshou','boss_bianshen3'],['hiddenboss','bossallowed']],
+		boss_mamian:['male','qun',6,['boss_guiji','fankui','boss_lianyu','juece','boss_bianshen3'],['hiddenboss','bossallowed']],
+		boss_chi:['male','qun',5,['boss_guimei','boss_didong','boss_shanbeng','boss_bianshen2'],['hiddenboss','bossallowed']],
+		boss_mo:['female','qun',5,['boss_guimei','enyuan','boss_beiming','boss_bianshen2'],['hiddenboss','bossallowed']],
+		boss_wang:['male','qun',5,['boss_guimei','boss_luolei','huilei','boss_bianshen2'],['hiddenboss','bossallowed']],
+		boss_liang:['female','qun',5,['boss_guimei','boss_guihuo','boss_minbao','boss_bianshen2'],['hiddenboss','bossallowed']],
+
 		boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['boss','bossallowed'],'wei'],
 		boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['hiddenboss','bossallowed'],'qun'],
 		boss_caiwenji:['female','qun',4,['beige','boss_hujia','boss_guihan'],['boss','bossallowed'],'wei'],
@@ -20,8 +33,490 @@ character.boss={
 		boss_huatuo:['male','qun',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['boss','bossallowed'],'wu'],
 		boss_dongzhuo:['male','qun',20,['jiuchi','boss_qiangzheng','boss_baolin'],['boss','bossallowed'],'shu'],
 		// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
+
 	},
 	skill:{
+		boss_bianshen2:{
+			mode:['boss'],
+			global:'boss_bianshen2x'
+		},
+		boss_bianshen2x:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			priority:-10,
+			filter:function(event){
+				if(lib.config.mode!='boss') return false;
+				return event.player==game.boss&&event.player.skills.contains('boss_bianshen2');
+			},
+			content:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				game.changeBoss(['boss_niutou','boss_mamian'].randomGet());
+			}
+		},
+		boss_bianshen3:{
+			mode:['boss'],
+			global:'boss_bianshen3x'
+		},
+		boss_bianshen3x:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			priority:-10,
+			filter:function(event){
+				if(lib.config.mode!='boss') return false;
+				return event.player==game.boss&&event.player.skills.contains('boss_bianshen3');
+			},
+			content:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				game.changeBoss(['boss_baiwuchang','boss_heiwuchang'].randomGet());
+			}
+		},
+		boss_bianshen4:{
+			mode:['boss'],
+			global:'boss_bianshen4x'
+		},
+		boss_bianshen4x:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			priority:-10,
+			filter:function(event){
+				if(lib.config.mode!='boss') return false;
+				return event.player==game.boss&&event.player.skills.contains('boss_bianshen4');
+			},
+			content:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				game.changeBoss(['boss_yecha','boss_luocha'].randomGet());
+			}
+		},
+		boss_moyany:{
+			trigger:{player:'loseEnd'},
+			frequent:true,
+			unique:true,
+			filter:function(event,player){
+				return _status.currentPhase!=player;
+			},
+			content:function(){
+				"step 0"
+				player.judge(function(card){
+					return get.color(card)=='red'?1:0;
+				});
+				"step 1"
+				if(result.bool){
+					player.chooseTarget(true,'选择一个目标对其造成两点火焰伤害',function(card,player,target){
+						return player!=target;
+					}).ai=function(target){
+						return ai.get.damageEffect(target,player,player,'fire');
+					}
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.targets.length){
+					player.line(result.targets,'fire');
+					result.targets[0].damage(2,'fire');
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card){
+						if(get.tag(card,'loseCard')){
+							return [0.5,1];
+						}
+					}
+				}
+			}
+		},
+		boss_danshu:{
+			trigger:{player:'loseEnd'},
+			frequent:true,
+			unique:true,
+			filter:function(event,player){
+				return _status.currentPhase!=player&&player.hp<player.maxHp;
+			},
+			content:function(){
+				"step 0"
+				player.judge(function(card){
+					return get.color(card)=='red'?1:0;
+				});
+				"step 1"
+				if(result.color=='red'){
+					player.recover();
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card){
+						if(get.tag(card,'loseCard')){
+							return [0.5,1];
+						}
+					}
+				}
+			}
+		},
+		boss_modao:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			content:function(){
+				player.draw(2);
+			}
+		},
+		boss_mojian:{
+			trigger:{player:'phaseUseBegin'},
+			content:function(){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(player.canUse('wanjian',game.players[i])){
+						list.push(game.players[i]);
+					}
+				}
+				list.sort(lib.sort.seat);
+				player.useCard({name:'wanjian'},list);
+			}
+		},
+		boss_yushou:{
+			trigger:{player:'phaseUseBegin'},
+			content:function(){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(player.canUse('nanman',game.players[i])){
+						list.push(game.players[i]);
+					}
+				}
+				list.sort(lib.sort.seat);
+				player.useCard({name:'nanman'},list);
+			}
+		},
+		boss_zuijiu:{
+			trigger:{source:'damageBegin'},
+			filter:function(event){
+				return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&
+				event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+			},
+			forced:true,
+			content:function(){
+				trigger.num++;
+			}
+		},
+		boss_xixing:{
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【吸星】？',function(card,player,target){
+					return player!=target&&target.isLinked();
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player,'thunder');
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_xixing',result.targets);
+					result.targets[0].damage('thunder');
+					player.recover();
+				}
+			},
+		},
+		boss_suoming:{
+			trigger:{player:'phaseEnd'},
+            direct:true,
+            filter:function(event,player){
+                for(var i=0;i<game.players.length;i++){
+                    if(!game.players[i].isLinked()&&player!=game.players[i]){
+                        return true;
+                    }
+                }
+            },
+            content:function(){
+                "step 0"
+                var num=0;
+                for(var i=0;i<game.players.length;i++){
+                    if(!game.players[i].isLinked()&&player!=game.players[i]){
+                        num++;
+                    }
+                }
+                player.chooseTarget('是否发动【索命】？',[1,num],function(card,player,target){
+                    return !target.isLinked()&&player!=target;
+                }).ai=function(target){
+                    return -ai.get.attitude(player,target);
+                }
+                "step 1"
+                if(result.bool){
+                    player.logSkill('boss_suoming',result.targets);
+                    event.targets=result.targets;
+                    event.num=0;
+                }
+                else{
+                    event.finish();
+                }
+                "step 2"
+                if(event.num<event.targets.length){
+                    event.targets[event.num].link();
+                    event.num++;
+                    event.redo();
+                }
+            },
+		},
+		boss_taiping:{
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			content:function(){
+				trigger.num+=2;
+			}
+		},
+		boss_baolian:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				player.draw(2);
+			}
+		},
+		boss_xiaoshou:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【枭首】？',function(card,player,target){
+					return player!=target&&target.hp>=player.hp;
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player,'fire');
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_xiaoshou',result.targets);
+					result.targets[0].damage('fire',3);
+				}
+			},
+		},
+		boss_manjia:{
+			group:['boss_manjia1','boss_manjia2']
+		},
+        boss_manjia1:{
+			trigger:{target:'useCardToBefore'},
+			forced:true,
+			priority:6,
+			filter:function(event,player){
+                if(player.get('e','2')) return false;
+				if(event.player.num('s','unequip')) return false;
+				if(event.card.name=='nanman') return true;
+				if(event.card.name=='wanjian') return true;
+				if(event.card.name=='sha'&&!event.card.nature) return true;
+			},
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+                        if(target.get('e','2')) return;
+						if(player.num('s','unequip')) return;
+						if(card.name=='nanman'||card.name=='wanjian') return 0;
+						if(card.name=='sha'){
+    						var equip1=player.get('e','1');
+    						if(equip1&&equip1.name=='zhuque') return 2;
+    						if(equip1&&equip1.name=='qinggang') return 1;
+							if(!card.nature) return 0;
+						}
+					}
+				}
+			}
+		},
+		boss_manjia2:{
+			trigger:{player:'damageBegin'},
+			filter:function(event,player){
+                if(player.get('e','2')) return false;
+				if(event.nature=='fire') return true;
+			},
+			forced:true,
+            check:function(){
+                return false;
+            },
+			content:function(){
+				trigger.num++;
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+                        if(target.get('e','2')) return;
+						if(card.name=='sha'){
+							if(card.nature=='fire'||player.skills.contains('zhuque_skill')) return 2;
+						}
+						if(get.tag(card,'fireDamage')&&current<0) return 2;
+					}
+				}
+			}
+		},
+		boss_lianyu:{
+			trigger:{player:'phaseEnd'},
+			unique:true,
+			content:function(){
+				"step 0"
+				event.players=get.players(player);
+				event.players.remove(player);
+				"step 1"
+				if(event.players.length){
+					var current=event.players.shift();
+					player.line(current,'fire');
+					current.damage('fire');
+					event.redo();
+				}
+			},
+		},
+		boss_guiji:{
+			trigger:{player:'phaseJudgeBegin'},
+            forced:true,
+            content:function(){
+                player.discard(player.get('j').randomGet());
+            },
+            filter:function(event ,player){
+                return player.num('j')>0;
+            },
+            ai:{
+                effect:{
+                    target:function(card,player,target,current){
+                        if(get.type(card)=='delay'&&target.num('j')==0) return 0.1;
+                    }
+                }
+            }
+		},
+		boss_minbao:{
+			global:'boss_minbao2'
+		},
+		boss_minbao2:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			filter:function(event,player){
+				return event.player.skills.contains('boss_minbao')&&event.player.isDead();
+			},
+			content:function(){
+				trigger.player.line(player,'fire');
+				player.damage('nosource','fire').animate=false;
+				player.$damage(trigger.player);
+				if(lib.config.animation&&!lib.config.low_performance){
+					player.$fire();
+				}
+			}
+		},
+		boss_guihuo:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【鬼火】？',function(card,player,target){
+					return player!=target;
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player,'fire');
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_guihuo',result.targets);
+					result.targets[0].damage('fire');
+				}
+			},
+		},
+		boss_luolei:{
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【落雷】？',function(card,player,target){
+					return player!=target;
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player,'thunder');
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_luolei',result.targets);
+					result.targets[0].damage('thunder');
+				}
+			},
+		},
+		boss_beiming:{
+			trigger:{player:'dieBegin'},
+			forced:true,
+			filter:function(event){
+				return event.source!=undefined;
+			},
+			content:function(){
+				trigger.source.discard(trigger.source.get('h'));
+			},
+			ai:{
+				threaten:0.7
+			}
+		},
+		boss_shanbeng:{
+			global:'boss_shanbeng2',
+			trigger:{player:'dieBegin'},
+			forced:true,
+			content:function(){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].num('e')){
+						player.line(game.players[i],'green');
+					}
+				}
+				game.delay();
+			}
+		},
+		boss_shanbeng2:{
+			trigger:{global:'dieAfter'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('e')>0&&event.player.skills.contains('boss_shanbeng')&&event.player.isDead();
+			},
+			content:function(){
+				player.discard(player.get('e'));
+			}
+		},
+		boss_didong:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【地动】？',function(card,player,target){
+					return player!=target;
+				}).ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(target.isTurnedOver()){
+						if(att>0){
+							return att+5;
+						}
+						return -1;
+					}
+					if(player.isTurnedOver()){
+						return 5-att;
+					}
+					return -att;
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_didong',result.targets);
+					result.targets[0].turnOver();
+				}
+			},
+		},
+		boss_guimei:{
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(get.type(card)=='delay'){
+						return false;
+					}
+				}
+			}
+		},
+		boss_bianshen:{
+			trigger:{global:'gameStart'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.init(['boss_chi','boss_mo','boss_wang','boss_liang'].randomGet());
+				game.addVideo('reinit2',player,player.name);
+			}
+		},
 		zhanjiang:{
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
@@ -413,6 +908,7 @@ character.boss={
 				player.chooseCardTarget({
 					position:'he',
 					filterTarget:function(card,player,target){
+						if(!lib.character[target.name]) return false;
 						return player!=target&&!target.storage.boss_hujia;
 					},
 					filterCard:true,
@@ -535,6 +1031,7 @@ character.boss={
 				}
 				"step 2"
 				if(result.targets.length){
+					player.line(result.targets);
 					result.targets[0].loseHp();
 				}
 			},
@@ -867,6 +1364,73 @@ character.boss={
 		},
 	},
 	translate:{
+		boss_chi:'魑',
+		boss_mo:'魅',
+		boss_wang:'魍',
+		boss_liang:'魉',
+		boss_niutou:'牛头',
+		boss_mamian:'马面',
+		boss_baiwuchang:'白无常',
+		boss_heiwuchang:'黑无常',
+		boss_luocha:'罗刹',
+		boss_yecha:'夜叉',
+
+		boss_yushou:'驭兽',
+		boss_yushou_info:'出牌阶段开始时，视为你使用了一张[南蛮入侵]',
+		boss_moyany:'魔炎',
+		boss_moyany_info:'每当你于回合外失去牌时，你可以进行一次判定，若结果为红色，你对一名其他角色造成2点火焰伤害',
+		boss_modao:'魔道',
+		boss_modao_info:'锁定技，准备阶段，你摸两张牌',
+		boss_mojian:'魔箭',
+		boss_mojian_info:'出牌阶段开始时，视为你使用了一张[万箭齐发]',
+		boss_danshu:'丹术',
+		boss_danshu_info:'每当你于回合外失去牌时，你可以进行一次判定，若结果为红色，你回复1点体力',
+
+		boss_zuijiu:'醉酒',
+		boss_zuijiu_info:'锁定技，你的【杀】额外造成1点伤害',
+		boss_taiping:'太平',
+		boss_taiping_info:'锁定技，摸牌阶段摸牌时，你的摸牌数量+2',
+		boss_suoming:'索命',
+		boss_suoming_info:'结束阶段，将任意名未被横置的其他角色的武将牌横置',
+		boss_xixing:'吸星',
+		boss_xixing_info:'准备阶段，对任意一名横置的其他角色造成1点雷电伤害，然后回复1点体力',
+
+		boss_baolian:'暴敛',
+		boss_baolian_info:'锁定技，结束阶段，你摸两张牌',
+		boss_manjia:'蛮甲',
+		boss_manjia_info:'锁定技，若你的装备区内没有防具牌，则你视为装备了[藤甲]',
+		boss_xiaoshou:'枭首',
+		boss_xiaoshou_info:'结束阶段，对体力不小于你的一名其他角色造成3点伤害',
+		boss_guiji:'诡计',
+		boss_guiji_info:'锁定技，准备阶段结束时，若你的判定区内有牌，你随机弃置其中一张牌',
+		boss_lianyu:'炼狱',
+		boss_lianyu_info:'结束阶段，对所有其他角色造成1点火焰伤害',
+
+		boss_guihuo:'鬼火',
+		boss_guihuo_info:'结束阶段，对一名其他角色造成1点火焰伤害',
+		boss_minbao:'冥爆',
+		boss_minbao_info:'锁定技，当你死亡时，对场上所有其他角色造成1点火焰伤害',
+		boss_luolei:'落雷',
+		boss_luolei_info:'准备阶段，对一名其他角色造成1点雷电伤害',
+		boss_beiming:'悲鸣',
+		boss_beiming_info:'锁定技，当你死亡时，你令杀死你的角色弃置所有手牌',
+		boss_guimei:'鬼魅',
+		boss_guimei_info:'锁定技，你不能成为延时类锦囊的目标',
+		boss_didong:'地动',
+		boss_didong_info:'结束阶段，令一名其他角色将其武将牌翻面',
+		boss_shanbeng:'山崩',
+		boss_shanbeng_info:'锁定技，当你死亡时，你令所有其他角色弃置其装备区内的所有牌',
+
+		boss_zhuoguiquxie:'捉鬼驱邪',
+		boss_bianshen:'变身',
+		boss_bianshen_info:'游戏开始时，你随机变身为魑、魅、魍、魉中的一个',
+		boss_bianshen2:'变身',
+		boss_bianshen2_info:'你死亡后随机变身为牛头、马面中的一个',
+		boss_bianshen3:'变身',
+		boss_bianshen3_info:'你死亡后随机变身为白无常、黑无常中的一个',
+		boss_bianshen4:'变身',
+		boss_bianshen4_info:'你死亡后随机变身为罗刹、夜叉中的一个',
+
 		zhanjiang:'斩将',
 		zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
 

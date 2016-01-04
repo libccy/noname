@@ -2029,7 +2029,9 @@ character.yxs={
 			check:function(card){
 				return 6-ai.get.value(card);
 			},
-			filterCard:true,
+			filterCard:function(card){
+				return !lib.card[card.name].image;
+			},
 			discard:false,
 			lose:false,
 			prepare:function(cards,player,targets){

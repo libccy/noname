@@ -137,7 +137,7 @@ table{table-layout: fixed;}
 #arena[data-font_size='20']{
 	font-size:20px;
 }*/
-#arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;z-index: 0}
+#arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;}
 #arena.right:not(.noleft){left:240px;opacity: 0.6;}
 #arena.left:not(.noleft){left:calc(10% - 240px);opacity: 0.6;}
 #arena.top{top:-100%;}
@@ -299,6 +299,7 @@ body>.background{z-index:-5}
 	filter:blur(6px) !important;
 	-webkit-filter:blur(6px) !important;
 }
+.zoominanim{-webkit-animation:zoomin 0.5s;}
 .zoomin{transform: scale(1.05) !important;}
 .zoomout{transform: scale(0.95) !important;}
 .zoomin2{transform: scale(2) !important;}
@@ -514,6 +515,7 @@ margin-bottom: 5px;
 	letter-spacing:3px;
 }
 .button.nodisplay{display: none;}
+.dialog .content>.nodisplay{display: none;}
 .button.character>.intro{top:71px;left:0;}
 .button.character>.identity{top:-6px;left:72px;}
 /*--------确认--------*/
