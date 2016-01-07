@@ -53,6 +53,9 @@ character.sp={
 		maliang:['masu'],
 		lingcao:['lingtong'],
 		lingju:['diaochan','lvbu'],
+		jiangqing:['zhoutai'],
+		dingfeng:['xusheng'],
+		caohong:['caoren'],
 	},
 	skill:{
 		danji:{
@@ -521,7 +524,8 @@ character.sp={
 						return att1/2+att2+att3;
 					}
 					else{
-						return ai.get.attitude(player,target);
+						return 0;
+						// return ai.get.attitude(player,target);
 					}
 				}
 				'step 1'
@@ -1786,13 +1790,18 @@ character.sp={
 				event.card=result.cards[0];
 				if(get.type(event.card)!='equip') event.finish();
 				"step 2"
-				trigger.target.chooseBool('是否装备'+get.translation(event.card)+'？').ai=function(){
-					var current=trigger.target.get('e',{subtype:get.subtype(event.card)});
-					if(current&&current.length){
-						return ai.get.equipValue(event.card)>ai.get.equipValue(current[0]);
-					}
-					return true;
-				};
+				if(!trigger.target.isMin()){
+					trigger.target.chooseBool('是否装备'+get.translation(event.card)+'？').ai=function(){
+						var current=trigger.target.get('e',{subtype:get.subtype(event.card)});
+						if(current&&current.length){
+							return ai.get.equipValue(event.card)>ai.get.equipValue(current[0]);
+						}
+						return true;
+					};
+				}
+				else{
+					event.finish();
+				}
 				"step 3"
 				if(result.bool){
 					trigger.target.equip(event.card);

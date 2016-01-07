@@ -6,7 +6,7 @@ mode.boss={
 				if(this!=game.boss){
 					this.storage.boss_chongzheng=0;
 				}
-				if(game.bossinfo.checkResult&&game.bossinfo.checkResult()===false){
+				if(game.bossinfo.checkResult&&game.bossinfo.checkResult(this)===false){
 					return;
 				}
 				if(this==game.boss||game.players.length==1){
@@ -206,6 +206,19 @@ mode.boss={
 					game.save('current',target.name);
 					target.classList.add('highlight');
 				});
+				if(lib.storage.test){
+					event.current.classList.remove('highlight');
+					if(event.current.nextSibling&&event.current.nextSibling.classList.contains('player')){
+						event.current=event.current.nextSibling;
+					}
+					else{
+						event.current=event.current.parentNode.childNodes[1];
+					}
+					lib.config.game_speed='vfast';
+					_status.auto=true;
+					ui.auto.classList.add('glow');
+					game.save('current',event.current.name);
+				}
 				"step 3"
 				game.bossinfo=lib.boss.global;
 				for(var i in lib.boss[event.current.name]){
@@ -313,6 +326,26 @@ mode.boss={
 
 					return uiintro;
 				},180);
+				ui.single_swap=ui.create.system('换人',function(){
+					var players=get.players(game.me);
+					players.remove(game.boss);
+					if(players.length>1){
+						if(ui.auto.classList.contains('hidden')){
+							game.me.popup('请稍后换人');
+							return;
+						}
+						if(_status.event.isMine()){
+							ui.click.auto();
+							setTimeout(function(){
+								ui.click.auto();
+							},500);
+						}
+						game.modeSwapPlayer(players[1]);
+					}
+				},true);
+				if(get.config('single_control')||game.me==game.boss){
+					ui.single_swap.style.display='none';
+				}
 
 				ui.arena.appendChild(boss);
 				ui.refresh(boss);
@@ -607,8 +640,8 @@ mode.boss={
 	boss:{
 		boss_zhuoguiquxie:{
 			chongzheng:99,
-			checkResult:function(){
-				if(game.boss.name!='boss_yecha'&&game.boss.name!='boss_luocha'){
+			checkResult:function(player){
+				if(player==game.boss&&game.boss.name!='boss_yecha'&&game.boss.name!='boss_luocha'){
 					return false;
 				}
 			}
@@ -655,6 +688,7 @@ mode.boss={
 			priority:100,
 			popup:false,
 			filter:function(event,player){
+				if(!get.config('single_control')) return false;
 				if(event.autochoose&&event.autochoose()) return false;
 				return player.isUnderControl();
 			},

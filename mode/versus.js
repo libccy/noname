@@ -87,7 +87,7 @@ mode.versus={
 
 				ui.create.cards();
 				game.finishCards();
-				ui.auto.hide();
+				// ui.auto.hide();
 				ui.wuxie.hide();
 				game.delay();
 				"step 2"
@@ -284,6 +284,7 @@ mode.versus={
 				_status.list=list;
 				var choice=(lib.storage.choice=='∞')?list.length:lib.storage.choice;
 				event.dialog=ui.create.dialog('选择角色',[list.slice(0,choice),'character']);
+				event.dialog.classList.add('fixed');
 				// for(var i=0;i<event.dialog.buttons.length;i++){
 				// 	event.dialog.buttons[i].style.transform='scale(0.95)';
 				// }
@@ -308,9 +309,17 @@ mode.versus={
 				}
 				if(!ui.cheat&&get.config('change_choice'))
 				ui.create.cheat();
-				event.fill=ui.create.control('补全',function(){
+				if(lib.storage.test){
+					lib.config.game_speed='vfast';
+					_status.auto=true;
+					ui.auto.classList.add('glow');
+					setTimeout(function(){
+						event.switchToAuto();
+					},500);
+				}
+				event.switchToAuto=function(){
 					delete _status.choosefinished;
-					arguments[1].parentNode.close();
+					event.fill.close();
 					var buttons=_status.event.dialog.buttons.slice(0);
 					buttons.randomSort();
 					for(var i=0;i<buttons.length;i++){
@@ -336,7 +345,8 @@ mode.versus={
 					dialog.close();
 					if(ui.confirm) ui.confirm.close();
 					game.resume();
-				});
+				};
+				event.fill=ui.create.control('补全',event.switchToAuto);
 				event.custom.replace.button=function(button){
 					if(_status.choose_enemy){
 						if(button.classList.contains('glow')||button.classList.contains('selectedx')||_status.choosefinished) return;
@@ -479,7 +489,7 @@ mode.versus={
 				_status.totalCount=_status.friend.length;
 				_status.coinCoeff=get.coinCoeff(_status.friend);
 
-				ui.auto.show();
+				// ui.auto.show();
 				ui.wuxie.show();
 				ui.control.style.display='none';
 				setTimeout(function(){

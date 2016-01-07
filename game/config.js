@@ -314,13 +314,6 @@ window.config={
 	current_mode:{},
 	forbid:[
 		['huashen'],
-		['lingwu'],
-		// ['lingwu','jilve'],
-		// ['lingwu','yongsi'],
-		// ['lingwu','shangshi'],
-		// ['jizhi','zhiheng'],
-		// ['xiaoji','zhiheng'],
-		// ['relianying','zhiheng'],
 		['lianying','rende'],
 		['lianying','yinguo'],
 		['lianying','qingjian'],

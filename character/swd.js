@@ -7,7 +7,7 @@ character.swd={
 			swd_septem:['male','qun',4,['jiying','liaoyuan','yishan']],
 			swd_kama:['female','qun',3,['yueren','shangshi']],
 		// swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
-			swd_nicole:['female','wu',3,['minjing','lingwu','huanjian']],
+			swd_nicole:['female','wu',3,['huanjian','lingwu','minjing']],
 			swd_wangsiyue:['female','wei',3,['duishi','biyue']],
 		// swd_weida:['female','qun',3,['yueren','zhenlie']],
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian']],
@@ -3173,7 +3173,6 @@ character.swd={
 			}
 		},
 		miejing:{
-			forbid:['infinity'],
 			init:function(player){
 				player.storage.miejing=false;
 			},
@@ -3185,30 +3184,28 @@ character.swd={
 			intro:{
 				content:'limited'
 			},
+			mark:true,
+			line:'thunder',
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			selectTarget:-1,
 			content:function(){
 				"step 0"
-				var cards=player.get('hej');
-				for(var i=0;i<cards.length;i++){
-					if(get.color(cards[i])!='black'){
-						cards.splice(i,1);i--;
+				if(target==targets[0]){
+					var cards=player.get('hej');
+					for(var i=0;i<cards.length;i++){
+						if(get.color(cards[i])!='black'){
+							cards.splice(i,1);i--;
+						}
 					}
+					cards.sort(lib.sort.random);
+					player.discard(cards);
+					player.storage.miejing=true;
+					player.unmarkSkill('miejing');
 				}
-				cards.sort(lib.sort.random);
-				player.discard(cards);
-				event.num=0;
-				event.players=game.players.slice(0);
-				player.storage.miejing=true;
 				"step 1"
-				var i=event.num;
-				if(event.num<event.players.length){
-					if(event.players[event.num]!=player){
-						event.players[i].damage('thunder','nosource');
-					}
-					event.num++;
-					event.redo();
-				}
-				//player.maxHp=1;
-				//player.update();
+				target.damage('thunder');
 			}
 		},
 		// zhanlu:{
@@ -3303,13 +3300,14 @@ character.swd={
 				return get.color(card)=='black';
 			},
 			viewAs:{name:'dujian'},
+			position:'he',
 			viewAsFilter:function(player){
-				if(!player.num('h',{color:'black'})) return false;
+				if(!player.num('he',{color:'black'})) return false;
 			},
-			prompt:'将一张黑色手牌当作毒箭使用',
+			prompt:'将一张黑色牌当作毒箭使用',
 			check:function(card){return 5-ai.get.value(card)},
 			ai:{
-				threaten:1.6
+				threaten:1.1
 			}
 		},
 		benlei:{
@@ -4458,7 +4456,7 @@ character.swd={
 			trigger:{player:'phaseAfter'},
 			frequent:true,
 			filter:function(event,player){
-				return get.cardCount(true,player)>=3;
+				return get.cardCount(true,player)>=3&&event.parent.name!='lingwu';
 			},
 			content:function(){
 				player.phase();
@@ -4467,7 +4465,8 @@ character.swd={
 				order:-10,
 				result:{
 					target:2
-				}
+				},
+				threaten:1.5
 			}
 		},
 		xianjiang:{
@@ -7879,7 +7878,7 @@ character.swd={
 		benlei2:'奔雷',
 		benlei_info:'你可以将三张牌当惊雷闪使用；每当你造成一次雷属性伤害，你回复一点体力',
 		lingwu:'灵舞',
-		lingwu_info:'回合结束后，若你在本回合内使用了至少3张牌，你可以进行一个额外的回合',
+		lingwu_info:'回合结束后，若你在本回合内使用了至少3张牌，你可以进行一个额外的回合（不可重复发动）',
 		miejing:'灭境',
 		miejing_info:'限制技，你可以弃置所有黑色牌，然后令所有其他角色受到一点雷电伤害',
 		lingxin:'灵心',
@@ -8082,7 +8081,7 @@ character.swd={
 		shengshou:'圣手',
 		huanjian:'幻箭',
 		yuhuo:'浴火',
-		huanjian_info:'你可以将一张黑色手牌当作毒箭使用',
+		huanjian_info:'你可以将一张黑色牌当作毒箭使用',
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',

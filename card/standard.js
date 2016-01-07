@@ -1411,7 +1411,7 @@ card.standard={
 					source:event.source,
 					source2:event.source2
 				});
-				if(nevt.isMine()&&!trigger.multitarget){
+				if(event.current.isUnderControl(true)&&!_status.auto&&!trigger.multitarget){
 					if(trigger.targets.length>1&&!ui.tempnowuxie){
 						ui.tempnowuxie=ui.create.control('不无懈'+get.translation(trigger.card.name),ui.click.tempnowuxie);
 						ui.tempnowuxie._origin=trigger.parent;

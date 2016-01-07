@@ -16,10 +16,13 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.75,
+		version:1.76,
 		changeLog:[
-			'挑战模式修复，增加捉鬼驱邪',
-			'完善炉石模式'
+			'捉鬼bug修复',
+			'配音支持引用文件名',
+			'挑战模式可关闭单人控制',
+			'不同模式可单独设置禁将、禁卡',
+			'炉石模式平衡调整'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -1432,6 +1435,10 @@
 							map.enhance_zhu.hide();
 							map.double_nei.hide();
 							map.auto_identity.hide();
+							map.choice_zhu.hide();
+							map.choice_zhong.hide();
+							map.choice_nei.hide();
+							map.choice_fan.hide();
 						}
 						else{
 							map.player_number.show();
@@ -1443,6 +1450,10 @@
 							else{
 								map.double_nei.hide();
 							}
+							map.choice_zhu.show();
+							map.choice_zhong.show();
+							map.choice_nei.show();
+							map.choice_fan.show();
 						}
 					},
 					identity_mode:{
@@ -1952,6 +1963,22 @@
 						},
 						frequent:true,
 					},
+					single_control:{
+						name:'单人控制',
+						init:true,
+						frequent:true,
+						onclick:function(bool){
+							game.saveConfig('single_control',bool,this._link.config.mode);
+							if(ui.single_swap&&game.me!=game.boss){
+								if(bool){
+									ui.single_swap.style.display='none';
+								}
+								else{
+									ui.single_swap.style.display='';
+								}
+							}
+						},
+					},
 					ban_weak:{
 						name:'屏蔽弱将',
 						init:false,
@@ -2399,20 +2426,20 @@
 			'<div style="margin:10px">职业技能</div><ul style="margin-top:0"><li>祭司：召唤一个随机图腾'+
 			'<li>法师：对一名随从造成一点火焰伤害'+
 			'<li>牧师：回复一点体力'+
-			'<li>战士：获得一点护甲'+
+			'<li>战士：获得一点护甲（不能超过5点）'+
 			'<li>术士：牌库中摸两张牌'+
 			'<li>潜行者：装备一把武器和一个随机非武器装备'+
 			'<li>圣骑士：召唤一名士兵'+
 			'<li>猎人：对敌方主将造成一点伤害'+
 			'<li>德鲁伊：视为使用一张不计入出杀次数的杀</ul>'+
-			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗'+
+			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+2'+
 			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
 			'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 			'随从与其他所有角色相互距离基数为1<li>'+
 			'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
 			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
 			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
-			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸2+X张牌，X为对方存活的随从数，无替补时游戏结束'
+			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
 		},
 		setPopped:function(node,func,width,height){
 			node._poppedfunc=func;
@@ -4139,6 +4166,10 @@
 								audioinfo=lib.skill[audioinfo].audio;
 							}
 						}
+						else if(Array.isArray(audioinfo)){
+							audioname=audioinfo[0];
+							audioinfo=audioinfo[1];
+						}
 						if(typeof audioinfo=='number'){
 							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
 						}
@@ -4316,10 +4347,27 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','draw');
 					}
-					if(event.log!=false){
-						game.log(player,'摸了'+get.cnNumber(num)+'张牌');
+					if(event.drawDeck){
+						num-=event.drawDeck;
 					}
-					var cards=get.cards(num);
+					if(event.log!=false){
+						if(num>0){
+							game.log(player,'摸了'+get.cnNumber(num)+'张牌');
+						}
+						if(event.drawDeck){
+							game.log(player,'从牌库中获得了'+get.cnNumber(event.drawDeck)+'张牌');
+						}
+					}
+					var cards;
+					if(num>0){
+						cards=get.cards(num);
+					}
+					else{
+						cards=[];
+					}
+					if(event.drawDeck){
+						cards=cards.concat(player.getDeckCards(event.drawDeck));
+					}
 					if(event.animate!=false){
 						player.gain(cards,'draw');
 					}
@@ -6210,6 +6258,9 @@
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
+						else if(typeof arguments[i]=='object'&&arguments[i].drawDeck){
+							next.drawDeck=arguments[i].drawDeck;
+						}
 					}
 					if(next.num==undefined) next.num=1;
 					if(next.num<=0) _status.event.next.remove(next);
@@ -6649,6 +6700,10 @@
 								audioinfo=lib.skill[audioinfo].audio;
 							}
 						}
+						else if(Array.isArray(audioinfo)){
+							audioname=audioinfo[0];
+							audioinfo=audioinfo[1];
+						}
 						if(typeof audioinfo==='number'){
 							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
 						}
@@ -7041,14 +7096,17 @@
 				isIn:function(){
 					return this.classList.contains('dead')==false&&this.classList.contains('out')==false&&!this.removed;
 				},
-				isUnderControl:function(){
-					if(this===game.me) return false;
+				isUnderControl:function(self){
+					if(!self&&this===game.me) return false;
 					if(this.isMad()) return false;
 					if(lib.config.mode=='versus'){
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==game.me.side;
 					}
-					else if(lib.config.mode=='chess'||lib.config.mode=='boss'){
+					else if(lib.config.mode=='boss'){
+						return this.side==game.me.side&&get.config('single_control');
+					}
+					else if(lib.config.mode=='chess'){
 						return this.side==game.me.side;
 					}
 					return false;
@@ -8387,6 +8445,9 @@
 				},
 				isMine:function(){
 					return (this.player&&this.player==game.me&&!_status.auto&&!this.player.isMad());
+				},
+				notLink:function(){
+					return this.parent.name!='_lianhuan'&&this.parent.name!='_lianhuan2';
 				},
 				trigger:function(name){
 					if(_status.video) return;
@@ -11347,6 +11408,16 @@
 			if(ui.wuxie) ui.wuxie.hide();
 
 			if(lib.storage.test){
+				if(lib.config.test_game){
+					switch(lib.config.mode){
+						case 'identity':game.saveConfig('mode','guozhan');break;
+						case 'guozhan':game.saveConfig('mode','versus');break;
+						case 'versus':game.saveConfig('mode','boss');break;
+						case 'boss':game.saveConfig('mode','chess');break;
+						case 'chess':game.saveConfig('mode','stone');break;
+						case 'stone':game.saveConfig('mode','identity');break;
+					}
+				}
 				setTimeout(game.reload,500);
 			}
 			if(game.controlOver){
@@ -12755,10 +12826,10 @@
 							node.classList.remove('thundertext');
 							for(var i=0;i<dialog.buttons.length;i++){
 								if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.currentcapt){
-									dialog.buttons[i].style.display='none';
+									dialog.buttons[i].classList.add('nodisplay');
 								}
 								else{
-									dialog.buttons[i].style.display='';
+									dialog.buttons[i].classList.remove('nodisplay');
 								}
 							}
 						}
@@ -12772,10 +12843,10 @@
 							for(var i=0;i<dialog.buttons.length;i++){
 								if(dialog.buttons[i].group!=link||
 								(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.currentcapt)){
-									dialog.buttons[i].style.display='none';
+									dialog.buttons[i].classList.add('nodisplay');
 								}
 								else{
-									dialog.buttons[i].style.display='';
+									dialog.buttons[i].classList.remove('nodisplay');
 								}
 							}
 						}
@@ -13289,6 +13360,10 @@
 					setTimeout(function(){
 						ui.window.show();
 					},1000);
+				}
+
+				if(lib.config.test_game){
+					lib.storage.test=true;
 				}
 
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
@@ -14260,7 +14335,7 @@
 									this.node.hp.innerHTML=this.node.hp._innerHTML;
 									this.node.hp.style.top='';
 								}
-								game.saveConfig('banned',lib.config.banned);
+								game.saveConfig('banned',lib.config.banned,true);
 							};
 							var buttons=ui.create.buttons(list,'character',page);
 							for(var i=0;i<buttons.length;i++){
@@ -14318,7 +14393,7 @@
 											game.deleteDB('image','character:'+pack.character[i]);
 											lib.config.banned.remove(pack.character[i])
 										}
-										game.saveConfig('banned',lib.config.banned);
+										game.saveConfig('banned',lib.config.banned,true);
 										for(var i=0;i<pack.skill.length;i++){
 											game.deleteDB('skill',pack.skill[i]);
 										}
@@ -15089,7 +15164,7 @@
 									this.node.info.innerHTML=this.node.info._innerHTML;
 									this.node.info.style.top='';
 								}
-								game.saveConfig('bannedcards',lib.config.bannedcards);
+								game.saveConfig('bannedcards',lib.config.bannedcards,true);
 							};
 							var buttons=ui.create.buttons(list,'vcard',page);
 							for(var i=0;i<buttons.length;i++){
@@ -20803,6 +20878,14 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+			aa:function(){
+				game.saveConfig('test_game',!lib.config.test_game);
+				game.reload();
+			},
+			a:function(){
+				game.save('test',!lib.storage.test);
+				game.reload();
+			},
 			u:function(){
 				var card={name:'sha'},source=game.me.next;
 				for(var i=0;i<arguments.length;i++){
@@ -21193,6 +21276,8 @@
 				}
 				lib.config.current_mode=mode[lib.config.mode].config||[];
 				lib.config.mode_choice=mode[lib.config.mode].config;
+				lib.config.banned=get.config('banned')||[];
+				lib.config.bannedcards=get.config('bannedcards')||[];
 
 				lib.rank=window.characterRank;
 				delete window.characterRank;

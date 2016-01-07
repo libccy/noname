@@ -516,7 +516,7 @@ character.diy={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha'&&event.player.hp==event.player.maxHp;
+				return event.card&&event.card.name=='sha'&&event.player.hp==event.player.maxHp&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;
@@ -672,7 +672,6 @@ character.diy={
 		diy_hanlong:'韩龙',
 		diy_luxun:'陆伯言',
 		diy_yuji:'于吉',
-		diy_zhouyu:'神周瑜',
 		diy_zhouyu:'周公瑾',
 		diy_lukang:'陆抗',
 		diy_caiwenji:'蔡昭姬',

@@ -70,6 +70,22 @@ mode.stone={
 					player.updateActCount();
 				}
 			},
+			drawDeck:function(num,log){
+				if(!num){
+					num=1;
+				}
+				if(log==false){
+					this.directgain(this.getDeckCards(num));
+				}
+				else if(log==true){
+					this.directgain(this.getDeckCards(num));
+					game.log(this,'从牌库中获得了'+get.cnNumber(num)+'张牌');
+				}
+				else{
+					this.gain(this.getDeckCards(num),'draw');
+					game.log(this,'从牌库中获得了'+get.cnNumber(num)+'张牌');
+				}
+			},
 			updateActCount:function(used,countx,current){
 				if(_status.video){
 					this.actcount=countx||2;
@@ -255,6 +271,8 @@ mode.stone={
 							else{
 								player.init(_status.mylist.shift());
 							}
+							player.maxHp++;
+							player.hp++;
 							if(_status.mode=='deck'){
 								get.deck(player,_status.deck.shift());
 							}
@@ -271,14 +289,16 @@ mode.stone={
 							game.swapControl(player);
 							game.arrangePlayers();
 							if(_status.mode=='deck'){
-								player.draw(2,false);
 								var nd=game.enemy.countFellow();
 								if(nd){
-									player.directgain(player.getDeckCards(nd));
+									player.draw(3+nd,{drawDeck:nd},false);
+								}
+								else{
+									player.draw(3,false);
 								}
 							}
 							else{
-								player.draw(2+game.enemy.countFellow(),false);
+								player.draw(3+game.enemy.countFellow(),false);
 							}
 							game.resume();
 							game.updateStatusCount();
@@ -309,6 +329,8 @@ mode.stone={
 							else{
 								player.init(_status.enemylist.shift());
 							}
+							player.maxHp++;
+							player.hp++;
 							if(_status.mode=='deck'){
 								get.deck(player,'random');
 							}
@@ -323,14 +345,25 @@ mode.stone={
 								actcount:player.actcount,
 							});
 							game.arrangePlayers();
-							player.draw(2+game.me.countFellow(),false);
+							if(_status.mode=='deck'){
+								var nd=game.me.countFellow();
+								if(nd){
+									player.draw(3+nd,{drawDeck:nd},false);
+								}
+								else{
+									player.draw(3,false);
+								}
+							}
+							else{
+								player.draw(3+game.me.countFellow(),false);
+							}
 							game.resume();
 							game.updateStatusCount();
 						},lib.config.duration);
 					}
 				}
 				if(source&&source.side!=this.side&&!source.isMin()){
-					source.draw(2);
+					source.draw(2,{drawDeck:1});
 					if(source.getActCount()>0){
 						source.actused--;
 					}
@@ -372,13 +405,13 @@ mode.stone={
 			stone_kuangyedoushi:['male','wu',3,['druid_nuhuo'],['minskin','stone'],[4,2,'druid']],
 			stone_conglinshouwei:['male','wu',3,['druid_huwei'],['minskin','stone'],[4,2,'druid']],
 			stone_baohuzhishu:['male','qun',6,['chaofeng'],['minskin','stone'],[6,4,'druid']],
-			stone_liebao:['male','wei',3,['stone_jixing'],['minskin','stone'],[3,3,'druid']],
+			stone_liebao:['male','wei',3,['stone_chongfeng'],['minskin','stone'],[3,3,'druid']],
 			stone_zongxiong:['male','shu',4,['chaofeng'],['minskin','stone'],[4,2,'druid']],
 			stone_baoqishi:['female','wei',2,['druid_chengzhang'],['minskin','stone'],[2,2,'druid']],
 
 			stone_caoyuanshi:['male','qun',5,['hunter_nuhou'],['minskin','stone'],[5,2,'hunter']],
 			stone_leiouke:['male','shu',3,['hunter_zhanhuo'],['minskin','stone'],[3,1,'hunter']],
-			stone_huofu:['male','qun',2,['stone_jixing'],['minskin','stone'],[3,4,'hunter']],
+			stone_huofu:['male','qun',2,['stone_chongfeng'],['minskin','stone'],[3,4,'hunter']],
 			stone_misha:['male','shu',3,['chaofeng'],['minskin','stone'],[3,3,'hunter']],
 			stone_jiewangzhu:['male','wu',1,['hunter_jiewang'],['minskin','stone'],[1,2,'hunter']],
 			stone_xunshoushi:['male','qun',2,['hunter_xunshou'],['minskin','stone'],[4,3,'hunter']],
@@ -401,16 +434,16 @@ mode.stone={
 			stone_xiaoguishouling:['male','qun',3,['warlock_zhaogui'],['minskin','stone'],[3,1,'warlock']],
 			stone_xiaogui:['male','qun',1,[],['minskin','stone','stonehidden'],[1,1]],
 			stone_kongjuzhanma:['male','qun',1,['warlock_yongsheng'],['minskin','stone'],[3,1,'warlock']],
-			stone_morishouwei:['male','qun',4,['warlock_zaihuo'],['minskin','stone'],[4,4,'warlock']],
+			stone_morishouwei:['male','qun',5,['warlock_zaihuo'],['minskin','stone'],[4,4,'warlock']],
 			stone_xukongxingzhe:['male','qun',2,['chaofeng'],['minskin','stone'],[1,1,'warlock']],
 			stone_diyuhuo:['male','qun',4,['warlock_yuhuo'],['minskin','stone'],[5,4,'warlock']],
 
-			stone_zhihuiguan:['female','qun',2,['warrior_tongling'],['minskin','stone'],[2,1,'warrior']],
-			stone_kuangzhanshi:['male','qun',3,['warrior_baoluan'],['minskin','stone'],[3,0,'warrior']],
+			stone_zhihuiguan:['female','qun',2,['warrior_tongling'],['minskin','stone'],[2,2,'warrior']],
+			stone_kuangzhanshi:['male','qun',2,['warrior_baoluan'],['minskin','stone'],[3,1,'warrior']],
 			stone_zhujiashi:['male','qun',2,['warrior_zhujia'],['minskin','stone'],[2,1,'warrior']],
-			stone_jiangong:['male','qun',2,['warrior_jiangong'],['minskin','stone'],[2,1,'warrior']],
+			stone_jiangong:['male','qun',2,['warrior_jiangong'],['minskin','stone'],[2,2,'warrior']],
 			stone_chidunshinv:['female','qun',4,['warrior_tidun'],['minskin','stone'],[5,4,'warrior']],
-			stone_yuanhou:['male','qun',4,['chaofeng'],['minskin','stone'],[4,2,'warrior']],
+			stone_yuanhou:['male','qun',2,['chaofeng'],['minskin','stone'],[2,3,'warrior']],
 
 			stone_daomufeizei:['male','qun',3,['rogue_xunbao'],['minskin','stone'],[4,3,'rogue']],
 			stone_qiezei:['male','qun',2,['rogue_touqie'],['minskin','stone'],[2,2,'rogue']],
@@ -431,7 +464,7 @@ mode.stone={
 			stone_zhucangzhe:['male','wei',1,['stone_zhucangzhe1'],['minskin','stone'],[1,2]],
 			stone_huoqiangshou:['male','wei',3,['stone_huoqiangshou1'],['minskin','stone'],[3,1]],
 
-			stone_lansaizhanshi:['male','shu',1,['stone_jixing'],['minskin','stone'],[1,2]],
+			stone_lansaizhanshi:['male','shu',1,['stone_chongfeng'],['minskin','stone'],[1,2]],
 			stone_kutongsiseng:['male','shu',1,['stone_kutongsiseng1'],['minskin','stone'],[1,2]],
 			stone_yuanguanying:['male','shu',3,['stone_yuanguanying1'],['minskin','stone'],[3,1]],
 
@@ -443,13 +476,13 @@ mode.stone={
 			stone_hanguangzhizhe:['male','qun',2,['stone_hanguangzhizhe1'],['minskin','stone'],[2,2]],
 			stone_aihaozhihun:['male','qun',3,['stone_aihaozhihun1'],['minskin','stone'],[3,1]],
 
-			stone_fennuxiaoji:['male','qun',1,['stone_fennuxiaoji1'],['minskin','stone'],[1,1]],
+			stone_fennuxiaoji:['male','qun',1,['stone_fennuxiaoji1'],['minskin','stone'],[1,2]],
 			stone_juxingchanchu:['male','qun',2,['stone_juxingchanchu1'],['minskin','stone'],[2,1]],
 			stone_wuyi:['male','qun',1,['jijiu'],['minskin','stone'],[2,2]],
 			stone_langren:['male','qun',1,['stone_qianxing'],['minskin','stone'],[1,2]],
 			stone_shishigui:['male','qun',2,['stone_shishigui1'],['minskin','stone'],[2,1]],
 
-			stone_fatiaozhuru:['female','qun',1,['stone_fatiaozhuru1'],['minskin','stone'],[1,1]],
+			stone_fatiaozhuru:['female','qun',1,['stone_fatiaozhuru1'],['minskin','stone'],[1,2]],
 			stone_mingguangjisi:['female','wu',2,['shushen'],['minskin','stone'],[2,1]],
 			stone_nianqingjisi:['female','wei',2,['stone_zhufu'],['minskin','stone'],[2,1]],
 			stone_aomishouwei:['female','qun',1,['biyue'],['minskin','stone'],[2,2]],
@@ -457,11 +490,11 @@ mode.stone={
 			stone_zhiyuzhe:['female','qun',3,['stone_zhiyu'],['minskin','stone'],[3,1]],
 			stone_mafengzhuru:['female','qun',1,['stone_mafengzhuru1'],['minskin','stone'],[1,2]],
 
-			stone_shumiao:['none','wu',1,[],['minskin','stone','stonehidden'],[1,2]],
-			stone_shuren:['none','wu',2,['stone_jixing','stone_zibao'],['minskin','stone','stonehidden'],[2,2]],
+			stone_shumiao:['none','wu',1,[],['minskin','stone','stonehidden'],[1,1]],
+			stone_shuren:['none','wu',2,['stone_chongfeng','stone_zibao'],['minskin','stone','stonehidden'],[2,2]],
 			stone_youlinglang:['none','qun',2,['chaofeng'],['minskin','stone','stonehidden'],[2,2]],
 			stone_shengguanghuwei:['female','qun',2,['priest_shengguang'],['minskin','stone','stonehidden'],[1,1]],
-			stone_liegou:['none','qun',1,['stone_jixing'],['minskin','stone','stonehidden'],[1,2]],
+			stone_liegou:['none','qun',1,['stone_chongfeng'],['minskin','stone','stonehidden'],[1,2]],
 			stone_mianyang:['none','qun',1,['mage_mianyang'],['minskin','stone','stonehidden'],[1,0]],
 			stone_qingwa:['none','wu',1,['shaman_qingwa'],['minskin','stone','stonehidden'],[1,0]],
 
@@ -491,14 +524,7 @@ mode.stone={
 		},
 		modPhaseDraw:function(player,num){
 			if(_status.mode=='deck'&&!player.isMin()){
-				if(num>1){
-					player.draw(num-1,false);
-				}
-				if(num>0){
-					player.directgain(player.getDeckCards(),'draw');
-				}
-				player.$draw(num);
-				game.delay();
+				player.draw(num,{drawDeck:1});
 			}
 			else{
 				player.draw(num);
@@ -689,6 +715,7 @@ mode.stone={
 								},500);
 								ui.arena.style.top='';
 								ui.arena.style.transform='';
+								ui.arena.style.opacity='';
 								ui.system.style.opacity='';
 								ui.auto.show();
 								ui.pause.show();
@@ -778,6 +805,13 @@ mode.stone={
 							var sel = window.getSelection();
 						    sel.removeAllRanges();
 						};
+						rename.onkeydown=function(e){
+							if(e.keyCode==13){
+								e.preventDefault();
+								e.stopPropagation();
+								rename.blur();
+							}
+						};
 						var removeLine=function() {
 							rename.innerHTML=rename.innerHTML.replace(/\n|<br>/g,'');
 						};
@@ -817,11 +851,11 @@ mode.stone={
 								}
 							}
 							for(var i=0;i<lib.careerList.length;i++){
-								result['职业法术_link:'+lib.careerList[i]]=careerspell[lib.careerList[i]];
-								result['职业随从_link:'+lib.careerList[i]]=career[lib.careerList[i]];
+								result['法术·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=careerspell[lib.careerList[i]];
+								result['随从·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=career[lib.careerList[i]];
 							}
-							result['中立法术']=ns;
-							result['中立随从']=nl;
+							result['法术·中立']=ns;
+							result['随从·中立']=nl;
 							return result;
 						}});
 						for(var i=0;i<cardDialog.buttons.length;i++){
@@ -844,6 +878,15 @@ mode.stone={
 							}
 						}
 						var updateCardDialog=function(button){
+							if(!deckContainer.classList.contains('shown')){
+								for(var i=0;i<cardDialog.buttons.length;i++){
+									cardDialog.buttons[i].classList.remove('unselectable');
+								}
+								for(var i=0;i<cardDialog.content.childElementCount;i++){
+									cardDialog.content.childNodes[i].classList.remove('nodisplay');
+								}
+								return;
+							}
 							if(deckContainer.childElementCount>=30){
 								for(var i=0;i<cardDialog.buttons.length;i++){
 									cardDialog.buttons[i].classList.add('unselectable');
@@ -896,6 +939,7 @@ mode.stone={
 							updateCardDialog();
 						};
 						var clickButton=function(){
+							if(!deckContainer.classList.contains('shown')) return;
 							if(!this.classList.contains('unselectable')){
 								var card=ui.create.card(null,'noclick').init(this.link).listen(clickCard);
 								deckContainer.insertBefore(card,deckContainer.firstChild);
@@ -968,6 +1012,11 @@ mode.stone={
 									for(var i=0;i<deckContainer.childElementCount;i++){
 										editing.content.deck.push(deckContainer.childNodes[i].name);
 									}
+									editing.content.deck.sort(function(a,b){
+										if(a>b) return 1;
+										if(a<b) return -1;
+										return 0;
+									});
 									if(editing.origin){
 										for(var i=0;i<listContainer.childElementCount;i++){
 											if(listContainer.childNodes[i].name==editing.origin){
@@ -989,6 +1038,7 @@ mode.stone={
 								game.save('deckList',lib.storage.deckList);
 								listContainer.style.transform='';
 								deckContainer.classList.remove('shown');
+								updateCardDialog();
 							}
 							e.stopPropagation();
 						});
@@ -1003,12 +1053,14 @@ mode.stone={
 					}());
 
 					ui.deckcontrol=ui.create.system('卡组管理',function(){
-						if(lib.config.low_performance){
-							ui.arena.style.transform='translateY('+ui.window.offsetHeight+'px)';
-						}
-						else{
-							ui.arena.style.top='100%';
-						}
+						// if(lib.config.low_performance){
+						// 	ui.arena.style.transform='translateY('+ui.window.offsetHeight+'px)';
+						// }
+						// else{
+						// 	ui.arena.style.top='100%';
+						// }
+						// ui.arena.style.transform='scale(0.6)';
+						ui.arena.style.opacity=0;
 						ui.system.style.opacity=0;
 						ui.window.appendChild(ui.deckBuilder);
 						if(ui.deckBuilder.timeout){
@@ -1051,6 +1103,11 @@ mode.stone={
 					game.players[i].classList.add('noidentity');
 				}
 				game.enemy=game.me.next;
+				if(lib.storage.test){
+					lib.config.game_speed='vfast';
+					_status.auto=true;
+					ui.auto.classList.add('glow');
+				}
 				game.chooseCharacter();
 				"step 3"
 				if(_status.mode=='deck'){
@@ -1112,9 +1169,9 @@ mode.stone={
 
 				event.trigger('gameStart');
 				if(_status.mode=='deck'){
-					game.gameDraw(game.me,2);
-					game.me.directgain(game.me.getDeckCards(2));
-					game.me.next.directgain(game.me.next.getDeckCards(2));
+					game.gameDraw(game.me,3);
+					game.me.drawDeck(1,false);
+					game.me.next.drawDeck(1,false);
 				}
 				else{
 					game.gameDraw(game.me);
@@ -1334,6 +1391,12 @@ mode.stone={
 					game.me.init(_status.mylist.shift());
 					game.enemy.init(_status.enemylist.shift());
 				}
+				game.me.maxHp++;
+				game.me.hp++;
+				game.me.update();
+				game.enemy.maxHp++;
+				game.enemy.hp++;
+				game.enemy.update();
 				if(_status.mode=='deck'){
 					get.deck(game.me,_status.deck.shift());
 					get.deck(game.enemy,'random');
@@ -1347,6 +1410,7 @@ mode.stone={
 			if(name=='random'||name.indexOf('random:')==0){
 				if(name=='random'){
 					career=lib.careerList.randomGet();
+					name=name+':'+career;
 				}
 				else{
 					career=name.slice(7);
@@ -1508,7 +1572,7 @@ mode.stone={
 		},
 		spell_naluzhiguang:{
 			type:'stonecard',
-			stoneact:2,
+			stoneact:1,
 			career:'priest',
 			enable:true,
 			fullimage:true,
@@ -1587,14 +1651,14 @@ mode.stone={
 
 		spell_nuxi:{
 			type:'stonecard',
-			stoneact:2,
+			stoneact:3,
 			career:'warrior',
 			enable:true,
 			fullimage:true,
 			filterTarget:true,
 			content:function(){
 				target.damage();
-				player.changeHujia();
+				player.changeHujia(2);
 			},
 			ai:{
 				order:7,
@@ -1610,7 +1674,7 @@ mode.stone={
 		},
 		spell_dunpaimengji:{
 			type:'stonecard',
-			stoneact:1,
+			stoneact:2,
 			career:'warrior',
 			enable:function(event,player){
 				return player.hujia>0;
@@ -1798,7 +1862,7 @@ mode.stone={
 		},
 		spell_guanmenfanggou:{
 			type:'stonecard',
-			stoneact:2,
+			stoneact:3,
 			career:'hunter',
 			enable:function(event,player){
 				return player.getEnemy().countFellow()>0;
@@ -1840,7 +1904,8 @@ mode.stone={
 			selectTarget:-1,
 			content:function(){
 				var list=['stone_misha','stone_leiouke','stone_huofu',
-				'stone_caoyuanshi','stone_qingwa','stone_mianyang','stone_jiewangzhu'];
+				'stone_caoyuanshi','stone_qingwa','stone_mianyang','stone_jiewangzhu',
+				'stone_fennuxiaoji','stone_juxingchanchu','stone_yanjingshe'];
 				player.addFellowAuto(list.randomGet());
 			},
 			ai:{
@@ -2042,6 +2107,7 @@ mode.stone={
 				useful:5,
 				result:{
 					player:function(player,target){
+						if(player==target) return -10;
 						var list=[];
 						var maxHp=0;
 						for(var i=0;i<game.players.length;i++){
@@ -2121,20 +2187,21 @@ mode.stone={
 		spell_yexingchengzhang:{
 			type:'stonecard',
 			fullimage:true,
-			enable:true,
-			stoneact:0,
+			chongzhu:true,
+			enable:function(event,player){
+				return !player.skills.contains('druid_yexingchengzhang');
+			},
+			stoneact:2,
 			career:'druid',
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
 			selectTarget:-1,
 			content:function(){
-				player.actused--;
-				player.updateActCount();
-				player.draw();
+				player.addSkill('druid_yexingchengzhang');
 			},
 			ai:{
-				order:9,
+				order:2,
 				value:5,
 				useful:5,
 				result:{
@@ -2404,7 +2471,7 @@ mode.stone={
 				target.damage();
 			},
 			contentAfter:function(){
-				player.gain(player.getDeckCards(),'draw');
+				player.drawDeck();
 			},
 			ai:{
 				order:8,
@@ -2548,11 +2615,13 @@ mode.stone={
 		spell_fuchouzhinu:{
 			type:'stonecard',
 			fullimage:true,
-			enable:true,
-			stoneact:5,
+			enable:function(event,player){
+				return player.getEnemy().countFellow()>0;
+			},
+			stoneact:4,
 			career:'paladin',
 			filterTarget:function(card,player,target){
-				return target.side!=player.side;
+				return target.side!=player.side&&target.isMin();
 			},
 			selectTarget:-1,
 			multitarget:true,
@@ -2622,7 +2691,7 @@ mode.stone={
 				target.draw(2);
 			},
 			ai:{
-				order:5,
+				order:4,
 				value:5,
 				useful:5,
 				result:{
@@ -2672,7 +2741,7 @@ mode.stone={
 			filterTarget:true,
 			content:function(){
 				target.damage();
-				player.gain(player.getDeckCards(),'draw');
+				player.drawDeck();
 			},
 			ai:{
 				order:8,
@@ -2744,7 +2813,7 @@ mode.stone={
 			type:'stonecard',
 			fullimage:true,
 			enable:true,
-			stoneact:2,
+			stoneact:1,
 			career:'shaman',
 			filterTarget:function(card,player,target){
 				return target.isMin();
@@ -2755,7 +2824,7 @@ mode.stone={
 				target.noPhaseDelay=true;
 			},
 			ai:{
-				order:5,
+				order:7,
 				value:5,
 				useful:5,
 				result:{
@@ -2953,7 +3022,7 @@ mode.stone={
 			type:'stonecard',
 			fullimage:true,
 			enable:true,
-			stoneact:2,
+			stoneact:1,
 			career:'mage',
 			filterTarget:function(card,player,target){
 				return target.isMin();
@@ -2963,7 +3032,7 @@ mode.stone={
 				target.init('stone_mianyang');
 			},
 			ai:{
-				order:5,
+				order:7,
 				value:5,
 				useful:5,
 				result:{
@@ -2984,7 +3053,7 @@ mode.stone={
 			},
 			selectTarget:-1,
 			content:function(){
-				player.gain(player.getDeckCards(2),'draw');
+				player.drawDeck(2);
 			},
 			ai:{
 				order:0.5,
@@ -3048,7 +3117,7 @@ mode.stone={
 						return 1-target.hp-target.num('h')/2;
 					}
 				},
-				order:5
+				order:7
 			}
 		},
 		spell_morizaihuo:{
@@ -3096,7 +3165,7 @@ mode.stone={
 				target.loseMaxHp(target.maxHp-1);
 			},
 			ai:{
-				order:9,
+				order:9.1,
 				result:{
 					target:function(player,target){
 						if(target.hp>1) return -1;
@@ -3123,7 +3192,7 @@ mode.stone={
 				player.addFellow(target);
 			},
 			ai:{
-				order:9,
+				order:9.5,
 				result:{
 					target:function(player,target){
 						return -target.hp;
@@ -3149,7 +3218,7 @@ mode.stone={
 				target.addSkill('spell_anyingkuangluan_die');
 			},
 			ai:{
-				order:9,
+				order:9.5,
 				result:{
 					target:function(player,target){
 						return -target.hp;
@@ -3235,9 +3304,7 @@ mode.stone={
 			fullimage:true,
 			enable:true,
 			stoneact:2,
-			filterTarget:function(card,player,target){
-				return target.isMin();
-			},
+			filterTarget:true,
 			selectTarget:-1,
 			multitarget:true,
 			multiline:true,
@@ -3287,26 +3354,32 @@ mode.stone={
 		spell_yanmie:{
 			type:'stonecard',
 			fullimage:true,
-			enable:function(event,player){
-				return player.getEnemy().num('he')>0;
-			},
-			stoneact:5,
+			enable:true,
+			stoneact:3,
 			selectTarget:-1,
 			filterTarget:function(card,player,target){
 				return target==player.getEnemy();
 			},
 			content:function(){
-				'step 0'
-				target.chooseControl('discard_card','失去体力').ai=function(){
-					if(target.hp>=2&&(target.num('h','tao')||target.hp>=5)&&target.num('h')>2) return '失去体力';
-					return 'discard_card';
+				"step 0"
+				var targets=[player,target];
+				event.cards=[targets[0].get('e'),targets[1].get('e')];
+				targets[0].lose(event.cards[0],ui.special);
+				targets[1].lose(event.cards[1],ui.special);
+				if(event.cards[0].length) targets[0].$give(event.cards[0],targets[1]);
+				if(event.cards[1].length) targets[1].$give(event.cards[1],targets[0]);
+				"step 1"
+				var targets=[player,target];
+				for(var i=0;i<event.cards[1].length;i++){
+					targets[0].equip(event.cards[1][i]);
 				}
-				'step 1'
-				if(result.control=='discard_card'){
-					target.discard(target.get('he'));
+				for(var i=0;i<event.cards[0].length;i++){
+					targets[1].equip(event.cards[0][i]);
 				}
-				else{
-					target.loseHp(2);
+				"step 2"
+				var dh=target.num('h')-player.num('h');
+				if(dh>0){
+					player.draw(dh);
 				}
 			},
 			ai:{
@@ -3314,7 +3387,13 @@ mode.stone={
 				value:5,
 				useful:5,
 				result:{
-					target:-2
+					target:function(player,target){
+						var ne1=target.num('e'),ne2=player.num('e');
+						var nh1=target.num('h'),nh2=player.num('h');
+						if(nh1<nh2) nh1=nh2;
+						if(ne2-ne1<nh1-nh2+ne1-ne2) return -1;
+						return 0;
+					}
 				}
 			}
 		},
@@ -3395,7 +3474,7 @@ mode.stone={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				return player.getLeader().skills.contains('spell_yemanpaoxiao');
+				return player.getLeader().skills.contains('spell_yemanpaoxiao')&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;
@@ -3525,8 +3604,7 @@ mode.stone={
 				return event.player.isMin();
 			},
 			content:function(){
-				var target=player.getLeader();
-				target.gain(target.getDeckCards(),'draw');
+				player.getLeader().drawDeck();
 			}
 		},
 		priest_shengguang:{
@@ -3634,8 +3712,7 @@ mode.stone={
 			forced:true,
 			unique:true,
 			content:function(){
-				var target=player.getLeader();
-				target.gain(target.getDeckCards(),'draw');
+				player.getLeader().drawDeck();
 			}
 		},
 		rogue_zhaomu:{
@@ -4117,7 +4194,7 @@ mode.stone={
 				player.removeSkill('hunter_nuhou2');
 			}
 		},
-		stone_jixing:{
+		stone_chongfeng:{
 			trigger:{source:'fellow'},
 			forced:true,
 			unique:true,
@@ -4189,6 +4266,19 @@ mode.stone={
 						event.target.loseMaxHp(event.target.maxHp-1);
 					}
 				}
+			}
+		},
+		druid_yexingchengzhang:{
+			trigger:{player:'phaseUseBegin'},
+			forced:true,
+			mark:true,
+			intro:{
+				content:'下个出牌阶段开始时获得三点额外行动值',
+			},
+			content:function(){
+				player.actused-=3;
+				player.updateActCount();
+				player.removeSkill('druid_yexingchengzhang');
 			}
 		},
 		druid_chengzhang:{
@@ -4272,7 +4362,7 @@ mode.stone={
 				return event.player.career&&player.side==event.player.side;
 			},
 			content:function(){
-				trigger.player.gain(trigger.player.getDeckCards(),'draw');
+				trigger.player.drawDeck();
 				trigger.player.recover();
 			}
 		},
@@ -4307,7 +4397,7 @@ mode.stone={
 			trigger:{global:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				return event.source&&event.source!=player&&player.side==event.source.side;
+				return event.source&&event.source!=player&&player.side==event.source.side&&event.notLink();
 			},
 			content:function(){
 				trigger.num++
@@ -4386,14 +4476,14 @@ mode.stone={
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(player.career!='warlock') return false;
-				if(player.getActCount()+2>=player.actcount) return false;
+				if(player.getActCount()+2>player.actcount) return false;
 				return true;
 			},
 			usable:1,
 			content:function(){
 				player.actused+=2;
 				player.updateActCount();
-				player.gain(player.getDeckCards(2),'draw');
+				player.drawDeck(2);
 				event.parent.career='warlock';
 			},
 			ai:{
@@ -4433,6 +4523,7 @@ mode.stone={
 		_warrior_skill:{
 			enable:'phaseUse',
 			filter:function(event,player){
+				if(player.hujia>=5) return false;
 				if(player.career!='warrior') return false;
 				if(player.getActCount()+2>player.actcount) return false;
 				return true;
@@ -4570,6 +4661,9 @@ mode.stone={
 				}
 				'step 1'
 				game.delay();
+			},
+			ai:{
+				threaten:2
 			}
 		},
 		shaman_fali:{
@@ -5254,7 +5348,7 @@ mode.stone={
 		priest_shengguang_info:'每当一名随从获得治疗，摸一张牌',
 
 		spell_nuxi:'怒袭',
-		spell_nuxi_info:'造成一点伤害，获得一点护甲',
+		spell_nuxi_info:'造成一点伤害，获得两点护甲',
 		spell_dunpaimengji:'盾牌猛击',
 		spell_dunpaimengji_info:'对一名随从造成等同于你护甲值的伤害',
 		spell_zhansha:'斩杀',
@@ -5272,7 +5366,7 @@ mode.stone={
 		spell_kuaisusheji_info:'造成一点伤害，摸一张牌',
 		spell_guanmenfanggou:'关门放狗',
 		spell_guanmenfanggou_info:'每有一名敌方随从，便召唤一只猎狗',
-		spell_zhaohuanchongwu:'召唤宠物',
+		spell_zhaohuanchongwu:'动物伙伴',
 		spell_zhaohuanchongwu_info:'随机召唤一只野兽',
 		spell_zidanshangtang:'子弹上膛',
 		spell_zidanshangtang_info:'随机获得一张猎人职业法术牌，并获得技能【上膛】直到回合结束',
@@ -5304,12 +5398,17 @@ mode.stone={
 		spell_hengsao:'横扫',
 		spell_hengsao_info:'对一名敌方角色造成两点伤害，然后对其他敌方角色造成一点伤害',
 		spell_yexingchengzhang:'野性成长',
-		spell_yexingchengzhang_info:'获得一点行动值，摸一张牌',
+		spell_yexingchengzhang_info:'下个出牌阶段开始时获得三点额外行动值',
 		spell_ziranzhili:'自然之力',
 		spell_ziranzhili_info:'召唤三个树人，树人在其回合结束后死亡',
 		spell_yemanpaoxiao:'野蛮咆哮',
+		spell_yemanpaoxiao_bg:'咆',
 		spell_yemanpaoxiao2:'咆哮',
 		spell_yemanpaoxiao_info:'所有友方角色造成的伤害+1，直到你的下个回合开始',
+
+		druid_yexingchengzhang:'成长',
+		druid_yexingchengzhang_bg:'长',
+		druid_yexingchengzhang_info:'下个出牌阶段开始时获得三点额外行动值',
 
 		stone_shumiao:'树苗',
 		stone_shuren:'树人',
@@ -5327,12 +5426,12 @@ mode.stone={
 		spell_cisha:'刺杀',
 		spell_cisha_info:'杀死一名随从',
 		spell_modaoyou:'磨刀油',
-		spell_modaoyou_info:'令你下一次剑刃乱舞造成的伤害+1，令一名随机友方角色摸两张牌',
+		spell_modaoyou_info:'令你下一次剑刃乱舞造成的伤害+1，令一名随机友方随从摸两张牌',
 
 		spell_fengxian:'奉献',
 		spell_fengxian_info:'对所有敌方角色造成一点伤害',
 		spell_fuchouzhinu:'复仇之怒',
-		spell_fuchouzhinu_info:'造成5点伤害，随机分配到所有敌人上',
+		spell_fuchouzhinu_info:'造成5点伤害，随机分配到所有敌方随从上',
 		spell_shengliaoshu:'圣疗术',
 		spell_shengliaoshu_info:'恢复两点体力，摸两张牌',
 		spell_fennuzhichui:'愤怒之锤',
@@ -5520,8 +5619,8 @@ mode.stone={
 		stone_liebao:'猎豹',
 		stone_zongxiong:'棕熊',
 
-		stone_jixing:'疾行',
-		stone_jixing_info:'你出场时，立即将武将牌翻至正面',
+		stone_chongfeng:'冲锋',
+		stone_chongfeng_info:'你出场时，立即将武将牌翻至正面',
 		druid_nuhuo:'怒火',
 		druid_nuhuo_info:'每当己方主将使用一次职业技能，便对一名随机敌人造成一点伤害',
 		druid_chengzhang:'成长',
@@ -5566,7 +5665,7 @@ mode.stone={
 		_priest_skill:'治疗',
 		_priest_skill_info:'回复一点体力',
 		_warrior_skill:'战甲',
-		_warrior_skill_info:'获得一点护甲',
+		_warrior_skill_info:'获得一点护甲（不能超过5点）',
 		_warlock_skill:'作法',
 		_warlock_skill_info:'从牌库中获得两张牌',
 		_rogue_skill:'出鞘',
@@ -5657,7 +5756,7 @@ mode.stone={
 		stone_fatiaozhuru1:'发条',
 		stone_fatiaozhuru1_info:'回合结束阶段，若你没有手牌，你摸两张牌',
 
-		stonesha:'冲锋',
+		stonesha:'进攻',
 		stonesha_info:'锁定技，你的装备牌均视为杀',
 		stoneshan:'格挡',
 		stoneshan_info:'锁定技，你的随从牌均视为闪',
@@ -5682,13 +5781,13 @@ mode.stone={
 		spell_wangzhezhufu:'王者祝福',
 		spell_wangzhezhufu_info:'令一名随从增加两点体力上限（不能超过5），回复两点体力并摸两张牌',
 		spell_diyulieyan:'地狱烈焰',
-		spell_diyulieyan_info:'令场上所有随从失去一点体力',
+		spell_diyulieyan_info:'所有角色失去一点体力',
 		spell_chenmo:'沉默',
 		spell_chenmo_info:'弃置一名随从的所有牌，并令其体力上限减至1',
 		spell_zhiliaoshui:'治疗水',
 		spell_zhiliaoshui_info:'出牌阶段对自己使用，恢复两点体力值；或于濒死阶段对一名角色使用，令目标恢复一点体力',
-		spell_yanmie:'湮灭',
-		spell_yanmie_info:'令敌方主将选择一项：弃置所有牌或失去两点体力',
+		spell_yanmie:'黑暗契约',
+		spell_yanmie_info:'交换你与敌方主将的装备区，并摸若干张牌直到你的手牌数与敌方主将相等',
 		spell_xiaoshi:'消失',
 		spell_xiaoshi_info:'令敌方主将将所有装备区内的牌收入手牌，并弃置其若干张手牌，直到其手牌数与你相等',
 

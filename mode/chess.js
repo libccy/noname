@@ -5362,7 +5362,7 @@ mode.chess={
 		treasure_dubiaoxianjing:'毒镖陷阱',
 		treasure_jiqishi:'集气石',
 		treasure_shenmidiaoxiang:'神秘雕像',
-		treasure_shenpanxianjing:'审判之镰',
+		treasure_shenpanxianjing:'审判之刃',
 		treasure_shiyuansu:'石元素',
 		treasure_wuyashenxiang:'乌鸦神像',
 

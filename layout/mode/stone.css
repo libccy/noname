@@ -35,6 +35,9 @@
 #arena .player.linked>.name{
     transform: rotate(90deg) translate(120px,-96px);
 }
+#arena .player.linked>.name.name2{
+    transform: rotate(90deg) translate(98px,-31px);
+}
 
 .player>.identity.menubutton.round{
     padding: 0;
@@ -195,12 +198,18 @@
     left: auto;
     right: 240px;
     width: calc(100% - 280px);
-    opacity: 0;
+    /*opacity: 0;*/
     animation: none;
     -webkit-animation:none;
+    /*transform: scale(0.8);*/
+    /*pointer-events: none;*/
+    /*-webkit-animation:dialog_start2 0.5s;*/
+    transition: all 0.5s;
+}
+#deck-builder:not(.shown)>.dialog.fixed{
+    opacity: 0;
     transform: scale(0.8);
     pointer-events: none;
-    transition: all 0.5s;
 }
 #deck-builder>.dialog.fixed.shown{
     opacity: 1;

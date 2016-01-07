@@ -120,7 +120,7 @@ character.xiake={
             trigger:{player:'useCard'},
             frequent:true,
             filter:function(event,player){
-                return _status.currentPhase==player&&get.cardCount(true,player)==2;
+                return _status.currentPhase==player&&get.cardCount(true,player)==3;
             },
             content:function(){
                 var card=get.cardPile('chuansongmen');
@@ -148,7 +148,7 @@ character.xiake={
         rouquan_info:'你可以重铸装备区内的牌；当你没有武器牌时，你的杀可以指定任意个目标',
         zuijian:'醉剑',
         zuijian_info:'出牌阶段，你可以将一张手牌或装备牌当酒使用；当你使用酒后，你的攻击范围+1',
-        zitong:'自通',
-        zitong_info:'当你于自己的回合内使用第二张牌时，你可以将一张传送门置于你的手牌',
+        zitong:'通悟',
+        zitong_info:'当你于自己的回合内使用第三张牌时，你可以将一张传送门置于你的手牌',
     },
 }

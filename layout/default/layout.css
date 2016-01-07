@@ -167,8 +167,11 @@ table{table-layout: fixed;}
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
 	opacity: 0.3 !important;
 }
-.player.playerfocus{
+.player:not(.treasure).playerfocus{
 	transform: scale(1.1);
+}
+.player.linked:not(.treasure).playerfocus{
+	transform: scale(1.1) rotate(-90deg);
 }
 #arena #me>div>div>.card{
 	position: absolute;
