@@ -67,7 +67,7 @@ mode.versus={
 				if(lib.storage.choice==undefined) game.save('choice',20);
 				if(lib.storage.zhu==undefined) game.save('zhu',true);
 				if(lib.storage.noreplace_end==undefined) game.save('noreplace_end',true);
-				if(lib.storage.first_less==undefined) game.save('first_less',true);
+				if(get.config('first_less')==undefined) game.saveConfig('first_less',true,true);
 				if(lib.storage.autoreplaceinnerhtml==undefined) game.save('autoreplaceinnerhtml',true);
 				// if(lib.storage.only_zhu==undefined) game.save('only_zhu',true);
 				if(lib.storage.single_control==undefined) game.save('single_control',true);
@@ -129,10 +129,8 @@ mode.versus={
 						firstAct=game.players[Math.floor(Math.random()*game.players.length)];
 					}
 				}
-				game.gameDraw(firstAct,function(player){
-					if(player==firstAct) return 3;
-					return 4;
-				});
+				game.gameDraw(firstAct,4);
+				_status.first_less=true;
 				_status.round=0;
 				if(lib.storage.single_control){
 					lib.skill.global.push('versus_swap');
@@ -148,11 +146,11 @@ mode.versus={
 					// lib.setPopped(ui.versusreplace,game.versusHoverReplace);
 					if(game.players.length>2){
 						ui.versushs=ui.create.system('手牌',null,true);
-						lib.setPopped(ui.versushs,game.versusHoverHandcards);
+						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
 					}
 				}
-				_status.friendCount=ui.create.system('友军: '+get.cnNumber(_status.friend.length,true),null,true);
-				_status.enemyCount=ui.create.system('敌军: '+get.cnNumber(_status.friend.length,true),null,true);
+				_status.enemyCount=ui.create.system('杀敌: '+get.cnNumber(0,true),null,true);
+				_status.friendCount=ui.create.system('阵亡: '+get.cnNumber(0,true),null,true);
 				// _status.friendCount=ui.create.system('友方',null,true);
 				// _status.enemyCount=ui.create.system('敌方',null,true);
 
@@ -196,7 +194,7 @@ mode.versus={
 					this.dialog.versus_assign_enemy=this.dialog.add(ui.create.switcher('versus_assign_enemy',lib.storage.assign_enemy)).querySelector('.toggle');
 					this.dialog.versus_single_control=this.dialog.add(ui.create.switcher('versus_single_control',lib.storage.single_control)).querySelector('.toggle');
 					// this.dialog.versus_control_all=this.dialog.add(ui.create.switcher('versus_control_all',lib.storage.control_all)).querySelector('.toggle');
-					this.dialog.versus_first_less=this.dialog.add(ui.create.switcher('versus_first_less',lib.storage.first_less)).querySelector('.toggle');
+					this.dialog.versus_first_less=this.dialog.add(ui.create.switcher('versus_first_less',get.config('first_less'))).querySelector('.toggle');
 					this.dialog.versus_reward=this.dialog.add(ui.create.switcher('versus_reward',[0,1,2,3,4],lib.storage.versus_reward)).querySelector('.toggle');
 					this.dialog.versus_punish=this.dialog.add(ui.create.switcher('versus_punish',['弃牌','无','摸牌'],lib.storage.versus_punish)).querySelector('.toggle');
 					this.dialog.versus_seat_order=this.dialog.add(ui.create.switcher('seat_order',['对阵','交叉','随机'],lib.storage.seat_order)).querySelector('.toggle');
@@ -448,7 +446,7 @@ mode.versus={
 					// 	dialog.versus_control_all.parentNode.classList.add('disabled');
 					// }
 					// game.save('control_all',dialog.versus_control_all.link);
-					game.save('first_less',dialog.versus_first_less.link);
+					game.saveConfig('first_less',dialog.versus_first_less.link,true);
 					game.save('number',dialog.versus_number.link);
 					game.save('versus_reward',dialog.versus_reward.link);
 					game.save('versus_punish',dialog.versus_punish.link);
@@ -920,7 +918,7 @@ mode.versus={
 					uiintro.add(get.translation(game.players[i]));
 					var cards=game.players[i].get('h');
 					if(cards.length){
-						uiintro.add(cards,true);
+						uiintro.addSmall(cards,true);
 					}
 					else{
 						uiintro.add('（无）');
@@ -1188,11 +1186,11 @@ mode.versus={
 				this.dieSpeak();
 				if(this.side==game.me.side){
 					_status.friendDied.push(this.name);
-					_status.friendCount.innerHTML='友军: '+get.cnNumber(Math.max(0,_status.friend.length-1),true);
+					_status.friendCount.innerHTML='阵亡: '+get.cnNumber(_status.friendDied.length,true);
 				}
 				else{
 					_status.enemyDied.push(this.name);
-					_status.enemyCount.innerHTML='敌军: '+get.cnNumber(Math.max(0,_status.enemy.length-1),true);
+					_status.enemyCount.innerHTML='杀敌: '+get.cnNumber(_status.enemyDied.length,true);
 				}
 
 				var list=(this.side==game.me.side)?_status.friend:_status.enemy;

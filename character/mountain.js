@@ -46,7 +46,7 @@ character.mountain={
 			}
 		},
 		zhiji:{
-			skillAnimation:'true',
+			skillAnimation:true,
 			audio:2,
 			unique:true,
 			trigger:{player:'phaseBegin'},

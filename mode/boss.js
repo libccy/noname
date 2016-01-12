@@ -171,6 +171,12 @@ mode.boss={
 						}
 					}
 				}
+				if(!list.length){
+					alert('挑战模式不可隐藏boss武将包，请在选项－其它中选择“重置隐藏扩展包”');
+					event.finish();
+					_status.over=true;
+					return;
+				}
 				if(!event.current){
 					event.current=bosslist.childNodes[1];
 					event.current.classList.add('highlight');
@@ -274,7 +280,7 @@ mode.boss={
 					game.onSwapControl();
 					// ui.fakemebg.show();
 
-					lib.setPopped(ui.create.system('查看手牌',null,true),function(){
+					lib.setPopped(ui.create.system('手牌',null,true),function(){
 						var uiintro=ui.create.dialog('hidden');
 
 						var players=game.players.concat(game.dead);
@@ -283,7 +289,7 @@ mode.boss={
 								uiintro.add(get.translation(players[i]));
 								var cards=players[i].get('h');
 								if(cards.length){
-									uiintro.add(cards,true);
+									uiintro.addSmall(cards,true);
 								}
 								else{
 									uiintro.add('（无）');
@@ -292,7 +298,7 @@ mode.boss={
 						}
 
 						return uiintro;
-					});
+					},220);
 				}
 				lib.setPopped(ui.create.system('重整',null,true),function(){
 					var uiintro=ui.create.dialog('hidden');
@@ -524,7 +530,7 @@ mode.boss={
 						return;
 					}
 					if(game.changeCoin){
-						game.changeCoin(-10);
+						game.changeCoin(-3);
 					}
 					list.randomSort();
 					_status.event.dialog.close();
@@ -568,7 +574,7 @@ mode.boss={
 						}
 						else{
 							if(game.changeCoin){
-								game.changeCoin(-50);
+								game.changeCoin(-10);
 							}
 							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
 							this.backup=_status.event.dialog;

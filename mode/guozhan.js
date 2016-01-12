@@ -348,7 +348,7 @@ mode.guozhan={
 							}
 							else{
 								if(game.changeCoin){
-									game.changeCoin(-50);
+									game.changeCoin(-10);
 								}
 								ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
 								this.backup=_status.event.dialog;
@@ -371,7 +371,7 @@ mode.guozhan={
 								return;
 							}
 							if(game.changeCoin){
-								game.changeCoin(-10);
+								game.changeCoin(-3);
 							}
 							event.list=event.list.concat(list);
 							event.list.randomSort();

@@ -625,7 +625,7 @@ mode.identity={
 							return;
 						}
 						if(game.changeCoin){
-							game.changeCoin(-10);
+							game.changeCoin(-3);
 						}
 						if(game.zhu!=game.me){
 							event.list=event.list.concat(list);
@@ -669,7 +669,7 @@ mode.identity={
 						}
 						else{
 							if(game.changeCoin){
-								game.changeCoin(-50);
+								game.changeCoin(-10);
 							}
 							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
 							this.backup=_status.event.dialog;

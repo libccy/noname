@@ -18,10 +18,12 @@
 	var lib={
 		version:1.76,
 		changeLog:[
-			'捉鬼bug修复',
+			'bug修复（捉鬼、导出武将）',
 			'配音支持引用文件名',
 			'挑战模式可关闭单人控制',
 			'不同模式可单独设置禁将、禁卡',
+			'自定义技能禁配',
+			'战棋对战选项',
 			'炉石模式平衡调整'
 		],
 		configprefix:'noname_0.9_',
@@ -2019,16 +2021,16 @@
 							map.chess_character.show();
 						}
 						if(config.chess_mode=='combat'){
-							map.battle_number.show();
-							map.chess_ordered.show();
-								map.free_choose.show();
-								map.change_choice.show();
+							// map.battle_number.show();
+							// map.chess_ordered.show();
+							map.free_choose.show();
+							map.change_choice.show();
 						}
 						else{
-							map.battle_number.hide();
-							map.chess_ordered.hide();
-								map.free_choose.hide();
-								map.change_choice.hide();
+							// map.battle_number.hide();
+							// map.chess_ordered.hide();
+							map.free_choose.hide();
+							map.change_choice.hide();
 						}
 						if(config.chess_mode=='tafang'){
 							map.chess_treasure.hide();
@@ -2120,25 +2122,25 @@
 						clear:true,
 						frequent:true,
 					},
-					battle_number:{
-						name:'对战人数',
-						init:'3',
-						frequent:true,
-						item:{
-							'2':'2v2',
-							'3':'3v3',
-							'4':'4v4',
-							'6':'6v6',
-							'8':'8v8',
-						},
-						onclick:function(num){
-							game.saveConfig('battle_number',num,this._link.config.mode);
-							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
-							if(_status.event.parent.changeDialog){
-								_status.event.parent.changeDialog();
-							}
-						},
-					},
+					// battle_number:{
+					// 	name:'对战人数',
+					// 	init:'3',
+					// 	frequent:true,
+					// 	item:{
+					// 		'2':'2v2',
+					// 		'3':'3v3',
+					// 		'4':'4v4',
+					// 		'6':'6v6',
+					// 		'8':'8v8',
+					// 	},
+					// 	onclick:function(num){
+					// 		game.saveConfig('battle_number',num,this._link.config.mode);
+					// 		if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+					// 		if(_status.event.parent.changeDialog){
+					// 			_status.event.parent.changeDialog();
+					// 		}
+					// 	},
+					// },
 					chess_treasure:{
 						name:'战场机关',
 						init:'0.2',
@@ -2172,11 +2174,11 @@
 						init:true,
 						// frequent:true,
 					},
-					chess_ordered:{
-						name:'交替行动',
-						init:true,
-						// frequent:true,
-					},
+					// chess_ordered:{
+					// 	name:'交替行动',
+					// 	init:true,
+					// 	// frequent:true,
+					// },
 					chess_character:{
 						name:'战棋武将',
 						init:true,
@@ -2403,6 +2405,8 @@
 			'每人在出牌阶段有一次移动的机会，可移动的最大距离为2<li>'+
 			'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
 			'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
+			'若开启主将，双方各选择一名角色成为主将。主将体力上限加一，主将死亡后，若有副将，副将代替之成为主将，否则游戏结束<li>'+
+			'开启无尽模式后，任何一方有角色死亡都将选择一名新角色重新加入战场，直到点击左上角的结束游戏按钮手动结束游戏。结束游戏时，杀敌更多的一方获胜<li>'+
 			'开启交替行动时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
 			'开启战场机关后，每个回合结束时有一定机率出现一个机关，该机关不参与战斗，并有一个影响周围或全体角色的效果。机关在出现后的5〜10个回合内消失<li>'+
 			'开启击退效果后，当一名角色对距离两格以内且在同一直线上的目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
@@ -3158,7 +3162,12 @@
 						game.modPhaseDraw(player,event.num);
 					}
 					else{
-						player.draw(event.num);
+						if(get.config('first_less')&&game.phaseNumber==1&&_status.first_less){
+							event.num--;
+						}
+						if(event.num>0){
+							player.draw(event.num);
+						}
 					}
 				},
 				phaseUse:function(){
@@ -7107,6 +7116,7 @@
 						return this.side==game.me.side&&get.config('single_control');
 					}
 					else if(lib.config.mode=='chess'){
+						if(_status.mode=='combat'&&!get.config('single_control')) return false;
 						return this.side==game.me.side;
 					}
 					return false;
@@ -7843,7 +7853,9 @@
 								that['$'+type](1200);
 							}
 						}
-						that.$fullscreenpop(name,color);
+						if(name){
+							that.$fullscreenpop(name,color);
+						}
 					},300);
 				},
 				$fire:function(){
@@ -9437,7 +9449,10 @@
 				};
 				for(var i=0;i<lib.customCharacters.length;i++){
 					var name=lib.customCharacters[i];
-					if(lib.checkCharacterName(name)) continue;
+					if(lib.checkCharacterName(name)){
+						imageLoaded++;
+						continue;
+					}
 					if(list&&!list.contains(name)){
 						imageLoaded++;
 						continue;
@@ -9746,6 +9761,14 @@
 			playerfocus:function(player,time){
 				if(player&&player.playerfocus){
 					player.playerfocus(time);
+				}
+				else{
+					console.log(player);
+				}
+			},
+			identityText:function(player,str){
+				if(player&&str){
+					player.node.identity.firstChild.innerHTML=str;
 				}
 				else{
 					console.log(player);
@@ -11163,6 +11186,9 @@
 				else{
 					added=10;
 				}
+				if(lib.config.mode=='chess'&&_status.mode=='combat'&&get.config('additional_player')){
+					added=2;
+				}
 				_status.coin+=added*coeff;
 				if(_status.coinCoeff){
 					_status.coin*=_status.coinCoeff;
@@ -12146,7 +12172,7 @@
 				"step 3"
 				if(event.bool){
 					if(game.changeCoin){
-						game.changeCoin(-10);
+						game.changeCoin(-3);
 					}
 					game.me.lose(game.me.get('h'))._triggered=null;
 				}
@@ -12590,7 +12616,60 @@
 			return player2;
 		},
 		arrangePlayers:function(){
-			game.players.sort(lib.sort.position);
+			if(lib.config.mode=='chess'&&game.me){
+				var friendCount=0;
+				var enemyCount=0;
+				var rand=Math.random()<0.5;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side==game.me.side){
+						if(rand){
+							if(game.players[i]==game.friendZhu){
+								game.players[i]._sortCount=-2;
+							}
+							else{
+								game.players[i]._sortCount=2*friendCount;
+							}
+						}
+						else{
+							if(game.players[i]==game.friendZhu){
+								game.players[i]._sortCount=-1;
+							}
+							else{
+								game.players[i]._sortCount=2*friendCount+1;
+							}
+						}
+						friendCount++;
+					}
+					else{
+						if(rand){
+							if(game.players[i]==game.enemyZhu){
+								game.players[i]._sortCount=-1;
+							}
+							else{
+								game.players[i]._sortCount=2*enemyCount+1;
+							}
+						}
+						else{
+							if(game.players[i]==game.enemyZhu){
+								game.players[i]._sortCount=-2;
+							}
+							else{
+								game.players[i]._sortCount=2*enemyCount;
+							}
+						}
+						enemyCount++;
+					}
+				}
+				game.players.sort(function(a,b){
+					return a._sortCount-b._sortCount;
+				});
+				for(var i=0;i<game.players.length;i++){
+					delete game.players[i]._sortCount;
+				}
+			}
+			else{
+				game.players.sort(lib.sort.position);
+			}
 			var players=game.players.concat(game.dead);
 			players.sort(lib.sort.position);
 			for(var i=0;i<players.length;i++){
@@ -15551,7 +15630,7 @@
 							var currentrow3=null;
 							var clickrow3=function(){
 								if(game.changeCoin){
-									game.changeCoin(-20);
+									game.changeCoin(-10);
 								}
 								game.swapPlayer(this.link);
 							};

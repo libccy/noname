@@ -53,10 +53,11 @@ play.character={
 					target.$gain2(card);
 					var skills=lib.character[name][3];
 					var list=[];
+					var targetskills=target.get('s');
 					for(var j=0;j<skills.length;j++){
 						if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
 							!lib.skill[skills[j]].unique&&
-							!target.skills.contains(skills[j])){
+							!targetskills.contains(skills[j])){
 							list.push(skills[j]);
 						}
 					}
