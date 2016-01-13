@@ -24,7 +24,8 @@
 			'不同模式可单独设置禁将、禁卡',
 			'自定义技能禁配',
 			'战棋对战选项',
-			'炉石模式平衡调整'
+			'炉石模式平衡调整',
+			'ctrl+shift+R重置游戏'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -21090,6 +21091,33 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+			uy:function(me){
+				if(me){
+					game.me.useCard({name:'spell_yexinglanghun'},game.me);
+				}
+				else{
+					var enemy=game.me.getEnemy();
+					enemy.useCard({name:'spell_yexinglanghun'},enemy);
+				}
+			},
+			gs:function(name,act){
+				var card=game.createCard('spell_'+name);
+				game.me.node.handcards1.appendChild(card);
+				if(!act){
+					game.me.actused=-99;
+				}
+				ui.updatehl();
+				setTimeout(game.check,300);
+			},
+			gc:function(name,act){
+				var card=game.createCard('stone_'+name+'_stonecharacter');
+				game.me.node.handcards1.appendChild(card);
+				if(!act){
+					game.me.actused=-99;
+				}
+				ui.updatehl();
+				setTimeout(game.check,300);
+			},
 			aa:function(){
 				game.saveConfig('test_game',!lib.config.test_game);
 				game.reload();
@@ -21405,8 +21433,17 @@
 				}
 			}
 			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
-				_status.reloading=true;
-				game.reload();
+				if(e.shiftKey){
+					if(confirm('是否重置游戏？')){
+						localStorage.clear();
+						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+						game.reload();
+						return;
+					}
+				}
+				else{
+					game.reload();
+				}
 			}
 		};
 		window.onload=function(){

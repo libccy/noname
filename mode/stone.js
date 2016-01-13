@@ -2396,24 +2396,22 @@ mode.stone={
 			stoneact:2,
 			career:'rogue',
 			filterTarget:true,
-			contentBefore:function(){
+			content:function(){
 				'step 0'
-				player.storage.spell_cigu=false;
-				if(player.num('he',{type:'equip'})){
-					player.chooseToDiscard('he','是否弃置一张装备牌令伤害+1？',{type:'equip'}).ai=function(card){
+				if(player.num('e')){
+					player.chooseToDiscard('e','是否弃置一张装备区内的牌令伤害+1？').ai=function(card){
 						return 7-ai.get.value(card);
 					}
 				}
 				else{
-					event.finish();
+					event.goto(2);
 				}
 				'step 1'
 				if(result.bool){
-					player.storage.spell_cigu=true;
+					event.add=true;
 				}
-			},
-			content:function(){
-				if(player.storage.spell_cigu){
+				'step 2'
+				if(event.add){
 					target.damage(2);
 				}
 				else{
@@ -2509,6 +2507,7 @@ mode.stone={
 				else{
 					target.damage();
 				}
+				player.unmarkSkill('spell_modaoyou');
 			},
 			contentAfter:function(){
 				player.storage.spell_modaoyou=0;
@@ -2559,6 +2558,7 @@ mode.stone={
 			},
 			selectTarget:-1,
 			content:function(){
+				player.markSkill('spell_modaoyou');
 				if(typeof player.storage.spell_modaoyou!='number'){
 					player.storage.spell_modaoyou=1;
 				}
@@ -2572,7 +2572,10 @@ mode.stone={
 					}
 				}
 				if(list.length){
-					list.randomGet().draw(2);
+					game.asyncDraw([player,list.randomGet()],2);
+				}
+				else{
+					player.draw(2);
 				}
 			},
 			ai:{
@@ -3429,6 +3432,13 @@ mode.stone={
 		},
 	},
 	skill:{
+		spell_modaoyou:{
+			intro:{
+				content:function(storage){
+					return '下次剑刃乱舞的伤害+'+storage;
+				}
+			}
+		},
 		hunter_jiewang2:{
 			trigger:{global:'dieAfter'},
 			forced:true,
@@ -3635,21 +3645,30 @@ mode.stone={
 			unique:true,
 			filter:function(event,player){
 				var target=player.getLeader();
-				return target.actcount-target.getActCount()>=2;
+				return target.num('e')>0;
 			},
 			content:function(){
 				"step 0"
 				event.chooser=player.getLeader();
-				event.chooser.chooseTarget('偷袭：对一名对方随从角色一点伤害',function(card,playerx,target){
-					return player.side!=target.side;
-				}).ai=function(target){
-					return ai.get.damageEffect(target,player,player);
-				};
+				event.chooser.chooseCardTarget({
+					position:'e',
+					filterTarget:function(card,player,target){
+						return player.side!=target.side;
+					},
+					filterCard:true,
+					ai1:function(card){
+						return 9-ai.get.value(card);
+					},
+					ai2:function(target){
+						return ai.get.damageEffect(target,player,player);
+					},
+					prompt:'偷袭：弃置一张装备区内的牌并对一名敌方角色一点伤害'
+				});
 				player.line(event.chooser);
 				"step 1"
 				if(result.bool){
+					event.chooser.discard(result.cards);
 					event.chooser.line(result.targets[0]);
-					game.delay();
 					result.targets[0].damage(event.chooser);
 				}
 			}
@@ -5416,7 +5435,7 @@ mode.stone={
 		stone_zibao_info:'结合结束后立即死亡',
 
 		spell_cigu:'刺骨',
-		spell_cigu_info:'造成一点伤害，你可以弃置一张装备牌令伤害+1',
+		spell_cigu_info:'造成一点伤害，你可以弃置一张装备区内的牌令伤害+1',
 		spell_jianrenluanwu:'剑刃乱舞',
 		spell_jianrenluanwu_info:'弃置你的武器牌，并对所有敌方角色造成一点伤害',
 		spell_daoshan:'刀扇',
@@ -5426,7 +5445,7 @@ mode.stone={
 		spell_cisha:'刺杀',
 		spell_cisha_info:'杀死一名随从',
 		spell_modaoyou:'磨刀油',
-		spell_modaoyou_info:'令你下一次剑刃乱舞造成的伤害+1，令一名随机友方随从摸两张牌',
+		spell_modaoyou_info:'令你下一次剑刃乱舞造成的伤害+1，并与一名随机友方随从各摸两张牌',
 
 		spell_fengxian:'奉献',
 		spell_fengxian_info:'对所有敌方角色造成一点伤害',
@@ -5512,7 +5531,7 @@ mode.stone={
 		rogue_cisha:'刺杀',
 		rogue_cisha_info:'每当你对一名随从造成伤害，受伤害随从立即死亡',
 		rogue_touxi:'偷袭',
-		rogue_touxi_info:'你出场时，若己方主将拥有至少两点剩余行动值，则可对一名角色造成一点伤害',
+		rogue_touxi_info:'你出场时，己方主将可弃置一张装备区内的牌并对一名敌方角色造成一点伤害',
 		rogue_qiancang:'潜藏',
 		rogue_qiancang_info:'你出场时，对所有未受伤害的敌方随从造成一点伤害',
 		rogue_zhaomu:'结伙',

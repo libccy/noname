@@ -63,6 +63,7 @@
     height: 120px;
     top: calc(100% - 150px);
     background: none !important;
+    border:none !important;
     pointer-events: none;
 }
 #arena:not(.chess) .player[data-position='0']:not(.selected):not(.selectable):not(.glow){
