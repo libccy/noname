@@ -312,6 +312,7 @@ window.config={
 		character_card_config:'',
 	},
 	current_mode:{},
+	customforbid:[],
 	forbid:[
 		['huashen'],
 		['lianying','rende'],

@@ -73,7 +73,8 @@
 .menu-buttons>.button{
 	zoom:0.75;
 }
-.menu-buttons .cardpiledelete{
+.menu-buttons .cardpiledelete,
+.toggle>.cardpiledelete{
 	display: inline-block;
 	position: relative;
 	float: right;
@@ -234,6 +235,19 @@
 	transition:all 0.3s;
 	width:calc(100% - 20px);
     overflow: visible;
+}
+.menu.main>.menu-content>div>.right.pane>div>.config.banskilladd{
+	height: 50px;
+	transition: all 0s;
+}
+.menu.main>.menu-content>div>.right.pane>div>.config.banskilladd.hidden{
+	margin-top: -50px;
+}
+.menu.main>.menu-content>div>.right.pane>div>.config.banskilladd:not(.hidden){
+	margin-top:0;
+}
+.menu.main>.menu-content>div>.right.pane>div>.config.banskilladd>select{
+	margin-right: 3px;
 }
 .menu.main>.menu-content>div>.right.pane>div>.config.toggle{
     left:2px !important;

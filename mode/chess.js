@@ -658,7 +658,7 @@ mode.chess={
 				if(_status.friendDied<_status.enemyDied){
 					game.over(true);
 				}
-				else if(_status.friendDied<_status.enemyDied){
+				else if(_status.friendDied>_status.enemyDied){
 					game.over(false);
 				}
 				else{

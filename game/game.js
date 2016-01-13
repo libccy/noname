@@ -2393,7 +2393,8 @@
 			'<li>回复体力<br>player.recover(num)<li>摸牌<br>player.draw(num)<li>获得牌<br>player.gain(cards)<li>弃牌<br>player.discard(cards)'+
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令输入框中输出结果<br>game.print(str)<li>游戏结束<br>game.over(bool)'+
-			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card',
+			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>'+
+			'<div style="margin:10px">富甲天下</div><ul style="margin-top:0"><li>改变金币数<br>game.changeCoin(num)<li>自动下雪<br>game.saveConfig(<br><span style="width:10px;display:inline-block"></span>"snowFall",true)',
 			'身份模式':'<div style="margin:10px">选项</div><ul style="margin-top:0"><li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）</ul>'+
 			'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
@@ -7046,12 +7047,16 @@
 							}
 							return str.slice(0,str.length-1);
 						}
-						for(var i=0;i<lib.config.forbid.length;i++){
-							if(!lib.config.forbidlist.contains(getName(lib.config.forbid[i]))){
-								for(var j=0;j<lib.config.forbid[i].length;j++){
-									if(this.skills.contains(lib.config.forbid[i][j])==false) break;
+						var forbidlist=lib.config.forbid.concat(lib.config.customforbid);
+						for(var i=0;i<forbidlist.length;i++){
+							if(lib.config.customforbid.contains(forbidlist[i])||
+								!lib.config.forbidlist.contains(getName(forbidlist[i]))){
+								for(var j=0;j<forbidlist[i].length;j++){
+									if(this.skills.contains(forbidlist[i][j])==false) break;
 								}
-								if(j==lib.config.forbid[i].length) forbid.push(lib.config.forbid[i]);
+								if(j==forbidlist[i].length){
+									forbid.push(forbidlist[i]);
+								}
 							}
 						}
 						for(var i=0;i<forbid.length;i++){
@@ -14122,6 +14127,7 @@
 	                            var hiddenNodes=[];
 								var autoskillNodes=[];
 								var banskillNodes=[];
+								var custombanskillNodes=[];
 								var banskill;
 								if(mode=='playpack'){
 									page.style.paddingBottom='10px';
@@ -14159,6 +14165,133 @@
 	                                    }
 	                                    banskillexpanded=!banskillexpanded;
 	                                });
+
+									var banskilladd=ui.create.div('.config.indent','添加...',page,function(){
+										this.nextSibling.classList.toggle('hidden');
+									});
+									banskilladd.style.display='none';
+									banskillNodes.push(banskilladd);
+
+									var banskilladdNode=ui.create.div('.config.indent.hidden.banskilladd',page);
+									banskilladdNode.style.display='none';
+									banskillNodes.push(banskilladdNode);
+
+									var matchBanSkill=function(skills1,skills2){
+										if(skills1.length!=skills2.length) return false;
+										for(var i=0;i<skills1.length;i++){
+											if(!skills2.contains(skills1[i])) return false;
+										}
+										return true;
+									}
+									var deleteCustomBanSkill=function(){
+										for(var i=0;i<lib.config.customforbid.length;i++){
+											if(matchBanSkill(lib.config.customforbid[i],this.parentNode.link)){
+												lib.config.customforbid.splice(i--,1);
+												break;
+											}
+										}
+										game.saveConfig('customforbid',lib.config.customforbid);
+										this.parentNode.remove();
+									}
+									var createCustomBanSkill=function(skills){
+										var node=ui.create.div('.config.indent.toggle');
+										node.style.display='none';
+										node.link=skills;
+										banskillNodes.push(node);
+										custombanskillNodes.push(node);
+										var str=get.translation(skills[0]);
+										for(var i=1;i<skills.length;i++){
+											str+='+'+get.translation(skills[i]);
+										}
+										node.innerHTML=str;
+										var span=document.createElement('span');
+										span.classList.add('cardpiledelete');
+										span.innerHTML='删除';
+										span.onclick=deleteCustomBanSkill;
+										node.appendChild(span);
+										page.insertBefore(node,banskilladdNode.nextSibling);
+										return node;
+									};
+									for(var i=0;i<lib.config.customforbid.length;i++){
+										createCustomBanSkill(lib.config.customforbid[i]);
+									}
+
+									(function(){
+										var list=[];
+										for(var i in lib.character){
+											if(lib.character[i][3].length)
+											list.push([i,lib.translate[i]]);
+										}
+										list.sort(function(a,b){
+											a=a[0];b=b[0];
+											var aa=a,bb=b;
+											if(aa.indexOf('_')!=-1){
+												aa=aa.slice(aa.indexOf('_')+1);
+											}
+											if(bb.indexOf('_')!=-1){
+												bb=bb.slice(bb.indexOf('_')+1);
+											}
+											if(aa!=bb){
+												return aa>bb?1:-1;
+											}
+											return a>b?1:-1;
+										});
+										var list2=[];
+										var skills=lib.character[list[0][0]][3];
+										for(var i=0;i<skills.length;i++){
+											list2.push([skills[i],lib.translate[skills[i]]]);
+										}
+										var selectname=ui.create.selectlist(list,list[0],banskilladdNode);
+										selectname.onchange=function(){
+											var skills=lib.character[this.value][3];
+											skillopt.innerHTML='';
+											for(var i=0;i<skills.length;i++){
+												var option=document.createElement('option');
+												option.value=skills[i];
+												option.innerHTML=lib.translate[skills[i]];
+												skillopt.appendChild(option);
+											}
+										};
+										selectname.style.maxWidth='85px';
+										var skillopt=ui.create.selectlist(list2,list2[0],banskilladdNode);
+
+										var span=document.createElement('span');
+										span.innerHTML='＋';
+										banskilladdNode.appendChild(span);
+										var br=document.createElement('br');
+										banskilladdNode.appendChild(br);
+
+										var selectname2=ui.create.selectlist(list,list[0],banskilladdNode);
+										selectname2.onchange=function(){
+											var skills=lib.character[this.value][3];
+											skillopt2.innerHTML='';
+											for(var i=0;i<skills.length;i++){
+												var option=document.createElement('option');
+												option.value=skills[i];
+												option.innerHTML=lib.translate[skills[i]];
+												skillopt2.appendChild(option);
+											}
+										};
+										selectname2.style.maxWidth='85px';
+										var skillopt2=ui.create.selectlist(list2,list2[0],banskilladdNode);
+
+										var confirmbutton=document.createElement('button');
+										confirmbutton.innerHTML='确定';
+										banskilladdNode.appendChild(confirmbutton);
+										confirmbutton.onclick=function(){
+											var skills=[skillopt.value,skillopt2.value];
+											if(skills[0]==skills[1]){
+												skills.shift();
+											}
+											for(var i=0;i<lib.config.customforbid.length;i++){
+												if(matchBanSkill(lib.config.customforbid[i],skills)) return;
+											}
+											lib.config.customforbid.push(skills);
+											game.saveConfig('customforbid',lib.config.customforbid);
+											createCustomBanSkill(skills).style.display='';
+										}
+									}());
+
 									page.style.paddingBottom='10px';
 								}
 								var config=lib.config;
@@ -19967,7 +20100,7 @@
 				for(i=0;i<forbidden.length;i++){
 					if(lib.translate[forbidden[i]+'_info']){
 						translation=get.translation(forbidden[i]).slice(0,2);
-						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+'已禁用'+'</div></div>');
+						uiintro.add('<div><div class="skill">『'+translation+'』</div><div>'+'已禁用'+'</div></div>');
 					}
 				}
 				if(!simple||lib.config.touchscreen){

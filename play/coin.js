@@ -19,6 +19,12 @@ play.coin={
 				ui.window.classList.add('canvas_top');
 			}
 			ui.coin=ui.create.system(str,null,true);
+			if(lib.config.snowFall){
+				game.haveFun.list.snow.bought=true;
+				setTimeout(function(){
+					game.haveFun.snow();
+				},500);
+			}
 			lib.setPopped(ui.coin,function(){
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.classList.add('coin_menu')
@@ -143,6 +149,10 @@ play.coin={
 					name:'闪烁',
 					cost:10
 				}
+			},
+			alwaysSnow:function(){
+				game.saveConfig('snowFall',!lib.config.snowFall);
+				game.reload();
 			},
 			blink:function(){
 				if(game.haveFun.list.blink.running) return;
@@ -1007,6 +1017,7 @@ play.coin={
 							if(this&&this.innerHTML){
 								this.innerHTML='大雪';
 							}
+							game.saveConfig('coinSnowSize',true);
 						}
 						else{
 							game.haveFun.list.snow.size='large';
@@ -1016,7 +1027,11 @@ play.coin={
 							if(this&&this.innerHTML){
 								this.innerHTML='小雪';
 							}
+							game.saveConfig('coinSnowSize',false);
 						}
+					}
+					if(lib.config.coinSnowSize){
+						game.haveFun.snowSize();
 					}
 					snow.start();
 				}
