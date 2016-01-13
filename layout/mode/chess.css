@@ -222,3 +222,6 @@
 .dialog .buttons>.button.character.squarebutton>.name{
     top:8px;
 }
+br.finish_game{
+    display: none;
+}

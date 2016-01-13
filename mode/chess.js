@@ -2116,6 +2116,8 @@ mode.chess={
 					},true);
 				}
 				if(!event.video&&_status.mode=='combat'&&!_status.vsboss&&get.config('additional_player')){
+					var finishGameBr=document.createElement('br');
+					finishGameBr.classList.add('finish_game');
 					ui.finishGame=ui.create.system('结束游戏',function(){
 						ui.finishGame.remove();
 						var next=game.createEvent('finish_game');
@@ -2129,6 +2131,8 @@ mode.chess={
 							game.resume();
 						}
 					});
+					ui.finishGame.classList.add('finish_game');
+					ui.finishGame.parentNode.insertBefore(finishGameBr,ui.finishGame);
 				}
 
 				ui.create.me();
@@ -3891,10 +3895,12 @@ mode.chess={
 					dialog.choice.replace_number=dialog.add(ui.create.switcher('replace_number',[0,1,2,3,5,7,9,17],get.config('replace_number'))).querySelector('.toggle');
 					dialog.choice.choice_number=dialog.add(ui.create.switcher('choice_number',[3,6,9],get.config('choice_number'))).querySelector('.toggle');
 					if(get.config('additional_player')){
+						dialog.choice.noreplace_end.parentNode.classList.add('disabled');
 						dialog.choice.replace_number.parentNode.classList.add('disabled');
 						dialog.choice.choice_number.parentNode.classList.remove('disabled');
 					}
 					else{
+						dialog.choice.noreplace_end.parentNode.classList.remove('disabled');
 						dialog.choice.replace_number.parentNode.classList.remove('disabled');
 						dialog.choice.choice_number.parentNode.classList.add('disabled');
 					}
@@ -3954,10 +3960,12 @@ mode.chess={
 							dialog.choice.main_zhu.parentNode.classList.add('disabled');
 						}
 						if(get.config('additional_player')){
+							dialog.choice.noreplace_end.parentNode.classList.add('disabled');
 							dialog.choice.replace_number.parentNode.classList.add('disabled');
 							dialog.choice.choice_number.parentNode.classList.remove('disabled');
 						}
 						else{
+							dialog.choice.noreplace_end.parentNode.classList.remove('disabled');
 							dialog.choice.replace_number.parentNode.classList.remove('disabled');
 							dialog.choice.choice_number.parentNode.classList.add('disabled');
 						}
