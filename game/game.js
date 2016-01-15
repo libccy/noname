@@ -7112,8 +7112,11 @@
 					return this.classList.contains('dead')==false&&this.classList.contains('out')==false&&!this.removed;
 				},
 				isUnderControl:function(self){
-					if(!self&&this===game.me) return false;
 					if(this.isMad()) return false;
+					if(this===game.me){
+						if(self) return true;
+						return false;
+					}
 					if(lib.config.mode=='versus'){
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==game.me.side;

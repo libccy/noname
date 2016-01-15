@@ -455,7 +455,7 @@ mode.stone={
 
 			stone_beijunmushi:['male','qun',2,['priest_shengliao'],['minskin','stone'],[1,1,'priest']],
 			stone_guanliyuan:['male','qun',2,['priest_faxian'],['minskin','stone'],[2,1,'priest']],
-			stone_linghunjisi:['male','qun',4,['priest_hunwu'],['minskin','stone'],[4,2,'priest']],
+			stone_linghunjisi:['female','qun',4,['priest_hunwu'],['minskin','stone'],[4,2,'priest']],
 			stone_heianjiaotu:['male','qun',3,['priest_zhufu'],['minskin','stone'],[3,2,'priest']],
 			stone_guangyaozhizi:['male','qun',3,['priest_guangyao'],['minskin','stone'],[5,3,'priest']],
 			stone_longmianjiaoguan:['male','qun',2,['priest_xundao'],['minskin','stone'],[2,2,'priest']],
@@ -1460,11 +1460,13 @@ mode.stone={
 			filterTarget:true,
 			selectTarget:-1,
 			content:function(){
-				if(player.hasFellowSkill('priest_hunwu')){
-					target.loseHp();
-				}
-				else if(player.side==target.side){
-					target.recover();
+				if(player.side==target.side){
+					if(player.hasFellowSkill('priest_hunwu')){
+						target.loseHp();
+					}
+					else{
+						target.recover();
+					}
 				}
 				else{
 					target.damage();
@@ -3284,12 +3286,10 @@ mode.stone={
 			enable:true,
 			stoneact:4,
 			filterTarget:function(card,player,target){
-				return target.isMin()&&target.hp<5;
+				return target.isMin();
 			},
 			content:function(){
-				if(target.maxHp<5){
-					target.gainMaxHp(Math.min(2,5-target.maxHp));
-				}
+				target.gainMaxHp(2);
 				target.recover(2);
 				target.draw(2);
 			},
@@ -3297,7 +3297,7 @@ mode.stone={
 				order:7,
 				result:{
 					target:function(player,target){
-						return 5-target.hp;
+						return Math.max(1,10-target.hp);
 					}
 				}
 			}
@@ -4097,9 +4097,12 @@ mode.stone={
 					}
 				}
 				var target=list.randomGet();
-				player.line(target,'green');
+				player.line(target,'fire');
 				target.damage('fire');
 				game.delay();
+			},
+			ai:{
+				threaten:1.3
 			}
 		},
 		mage_zhufa:{
@@ -4238,6 +4241,9 @@ mode.stone={
 				player.line(target,'green');
 				target.damage();
 				game.delay();
+			},
+			ai:{
+				threaten:1.5
 			}
 		},
 		druid_huwei:{
@@ -4277,7 +4283,7 @@ mode.stone={
 				}
 				"step 2"
 				if(result.control=='造成伤害'){
-					event.target.damage();
+					event.target.damage(event.chooser);
 				}
 				else{
 					event.target.discard(event.target.get('h'));
@@ -4697,7 +4703,7 @@ mode.stone={
 				var players=get.players();
 				var targets=[];
 				for(var i=0;i<players.length;i++){
-					if(players[i].side==player.side&&!players[i].career&&players[i].num('h')==0){
+					if(players[i].side==player.side&&!players[i].career&&players[i].num('h')<=1){
 						targets.push(players[i]);
 					}
 				}
@@ -5671,7 +5677,7 @@ mode.stone={
 		shaman_tuteng:'图腾',
 		shaman_tuteng_info:'你跳过摸牌阶段',
 		shaman_fali:'空气',
-		shaman_fali_info:'已方主将的回合结束阶段，令所有无手牌的友方随从摸一张牌',
+		shaman_fali_info:'已方主将的回合结束阶段，令所有手牌数不大于1的友方随从摸一张牌',
 		shaman_zhiliao:'治疗',
 		shaman_zhiliao_info:'已方主将的回合结束阶段，令所有友方随从回复一点体力',
 		shaman_zhuore:'灼热',
@@ -5798,7 +5804,7 @@ mode.stone={
 		chaofeng:'嘲讽',
 		chaofeng_info:'同阵营的无嘲讽角色不以能成为杀或决斗的目标',
 		spell_wangzhezhufu:'王者祝福',
-		spell_wangzhezhufu_info:'令一名随从增加两点体力上限（不能超过5），回复两点体力并摸两张牌',
+		spell_wangzhezhufu_info:'令一名随从增加两点体力上限，回复两点体力并摸两张牌',
 		spell_diyulieyan:'地狱烈焰',
 		spell_diyulieyan_info:'所有角色失去一点体力',
 		spell_chenmo:'沉默',

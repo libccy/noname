@@ -184,10 +184,8 @@ character.gujian={
 			},
 			content:function(){
 				"step 0"
-				player.draw();
-				"step 1"
 				player.recover();
-				"step 2"
+				"step 1"
 				player.turnOver();
 			},
 			mod:{
@@ -1040,7 +1038,7 @@ character.gujian={
 		zuizhan:'醉斩',
 		zuizhan_info:'每当你使用一张杀，可以摸一张牌，然后此杀随机增加一个额外目标',
 		qianhuan:'千幻',
-		qianhuan_info:'回合结束后，若你已受伤，你可以回复一点体力并摸一张牌，然后将武将牌翻面。若你的武将牌背面朝上，你不能使用卡牌，也不能成为卡牌的目标',
+		qianhuan_info:'回合结束后，若你已受伤，你可以回复一点体力并将武将牌翻面。若你的武将牌背面朝上，你不能使用卡牌，也不能成为卡牌的目标',
 		fumo:'伏魔',
 		fumo_info:'每当你受到一次伤害，可以弃置两张颜色相同的手牌并对伤害来源造成一点雷电伤害',
 		fanyin:'梵音',
