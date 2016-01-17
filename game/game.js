@@ -12317,7 +12317,15 @@
 				if(lib.skill[i].subSkill){
 					for(var j in lib.skill[i].subSkill){
 						lib.skill[i+'_'+j]=lib.skill[i].subSkill[j];
-						lib.translate[i+'_'+j]=lib.translate[i];
+						if(lib.skill[i].subSkill[j].name){
+							lib.translate[i+'_'+j]=lib.skill[i].subSkill[j].name;
+						}
+						else{
+							lib.translate[i+'_'+j]=lib.translate[i];
+						}
+						if(lib.skill[i].subSkill[j].description){
+							lib.translate[i+'_'+j+'_info']=lib.skill[i].subSkill[j].description;
+						}
 					}
 				}
 				if(i[0]=='_'){
