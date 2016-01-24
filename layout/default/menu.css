@@ -63,7 +63,7 @@
 .menu-buttons>.toggle.cardpilecfgadd:not(.hidden){
 	margin-top: 0 !important;
 }
-.menu-buttons>.toggle.cardpilecfg{
+.menu-buttons>.toggle.cardpilecfg:not(.nomarginleft){
 	margin-left: 20px !important;
 	width: calc(100% - 35px) !important;
 }
@@ -243,7 +243,8 @@
 .menu.main>.menu-content>div>.right.pane>div>.config.banskilladd.hidden{
 	margin-top: -50px;
 }
-.menu.main>.menu-content>div>.right.pane>div>.config.banskilladd:not(.hidden){
+.menu.main>.menu-content>div>.right.pane>div>.config.banskilladd:not(.hidden),
+.menu.main>.menu-content>div>.right.pane>div>.config.cardpileadd:not(.hidden){
 	margin-top:0;
 }
 .menu.main>.menu-content>div>.right.pane>div>.config.banskilladd>select{

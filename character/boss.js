@@ -33,11 +33,11 @@ character.boss={
 		boss_dongzhuo:['male','qun',20,['jiuchi','boss_qiangzheng','boss_baolin'],['boss','bossallowed'],'shu'],
 		// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
 
-		boss_liedixuande:['male','shu',5,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+		boss_liedixuande:['male','shu',5,['boss_lingfeng','boss_jizhen'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
 		boss_gongshenyueying:['male','shu',4,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
 		boss_tianhoukongming:['male','shu',4,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
 		boss_yuhuoshiyuan:['male','shu',4,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
-		boss_qiaokuijunyi:['male','wei',4,[],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+		boss_qiaokuijunyi:['male','wei',4,['boss_huodi','boss_jueji'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
 		boss_jiarenzidan:['male','wei',5,['boss_chiying','boss_jingfan'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
 		boss_duanyuzhongda:['male','wei',5,['boss_fanshi','boss_xuanlei','boss_skonghun'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
 		boss_juechenmiaocai:['male','wei',4,['boss_chuanyun','boss_leili','boss_fengxing'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
@@ -53,6 +53,194 @@ character.boss={
 
 	},
 	skill:{
+		boss_jizhen:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			filter:function(event,player){
+				if(player.hp<player.maxHp) return true;
+				if(typeof player.side=='boolean'){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side==player.side&&game.players[i].hp<game.players[i].maxHp){
+							return true;
+						}
+					}
+				}
+				return false;
+			},
+			content:function(){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hp<game.players[i].maxHp){
+						if(game.players[i]==player){
+							list.push(game.players[i]);
+						}
+						else if(typeof player.side=='boolean'&&game.players[i].side==player.side){
+							list.push(game.players[i]);
+						}
+					}
+				}
+				if(list.length){
+					player.line(list,'green');
+					game.asyncDraw(list);
+				}
+			},
+			ai:{
+				threaten:1.4
+			}
+		},
+		boss_lingfeng:{
+			trigger:{player:'phaseDrawBefore'},
+            content:function(){
+                "step 0"
+                trigger.untrigger();
+                trigger.finish();
+                event.cards=get.cards(2);
+                player.showCards(event.cards);
+                "step 1"
+                if(get.color(event.cards[0])!=get.color(event.cards[1])){
+                    player.chooseTarget('是否令一名敌方角色失去1点体力？',function(card,player,target){
+						if(typeof player.side=='boolean'){
+							return player.side!=target.side;
+						}
+                        return player!=target;
+                    }).ai=function(target){
+                        return -ai.get.attitude(player,target);
+                    }
+                }
+                "step 2"
+                if(result.bool&&result.targets&&result.targets.length){
+					player.line(result.targets,'green');
+                    result.targets[0].loseHp();
+                }
+                "step 3"
+                player.gain(event.cards);
+                player.$draw(event.cards);
+                game.delay();
+            },
+            ai:{
+                threaten:1.4
+            }
+		},
+		boss_jueji:{
+            trigger:{global:'phaseDrawBegin'},
+            filter:function(event,player){
+				if(typeof player.side=='boolean'&&player.side==event.player.side){
+					return false;
+				}
+                return event.num>0&&event.player!=player&&event.player.hp<event.player.maxHp;
+            },
+			prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【惑敌】？'
+			},
+            content:function(){
+				player.line(trigger.player,'green');
+                trigger.num--;
+            },
+            ai:{
+                expose:0.2,
+                threaten:1.4
+            }
+        },
+		boss_huodi:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				if(typeof player.side=='boolean'){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side==player.side&&game.players[i].isTurnedOver()){
+							return true;
+						}
+					}
+					return false;
+				}
+				return player.isTurnedOver();
+			},
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【惑敌】？',function(card,player,target){
+					if(typeof player.side=='boolean'){
+						return player.side!=target.side;
+					}
+					return player!=target;
+				}).ai=function(target){
+					return -ai.get.attitude(player,target);
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_huodi',result.targets);
+					result.targets[0].turnOver();
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		boss_chuanyun:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【穿云】？',function(card,player,target){
+					return player.hp<target.hp;
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_chuanyun',result.targets);
+					result.targets[0].damage();
+				}
+			},
+		},
+		boss_leili:{
+			trigger:{source:'damageEnd'},
+			direct:true,
+			filter:function(event){
+				return event.card&&event.card.name=='sha';
+			},
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【雷厉】？',function(card,player,target){
+					if(player==target) return false;
+					if(target==trigger.player) return false;
+					if(typeof player.side=='boolean') return player.side!=target.side;
+					return true;
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player,'thunder');
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_leili',result.targets);
+					result.targets[0].damage('thunder');
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.3
+			}
+		},
+		boss_fengxing:{
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【风行】？',function(card,player,target){
+					if(typeof player.side=='boolean'&&player.side==target.side) return false;
+					return lib.filter.targetEnabled({name:'sha'},player,target);
+				}).ai=function(target){
+					return ai.get.effect(target,{name:'sha'},player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_fengxing');
+					player.useCard({name:'sha'},result.targets,false);
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.3
+			}
+		},
 		boss_xuanlei:{
             trigger:{player:'phaseBegin'},
             forced:true,
@@ -79,14 +267,7 @@ character.boss={
                     event.targets.shift().damage('thunder');
                     event.redo();
                 }
-            },
-			ai:{
-				threaten:function(player,target){
-					if(target.hp==1) return 2;
-					if(target.hp==2&&game.players.length<8) return 1.5;
-					return 0.5;
-				},
-			}
+            }
         },
 		boss_fanshi:{
             trigger:{player:'phaseEnd'},
@@ -129,6 +310,13 @@ character.boss={
 				}
 				'step 2'
 				player.recover(event.num);
+			},
+			ai:{
+				threaten:function(player,target){
+					if(target.hp==1) return 2;
+					if(target.hp==2&&game.players.length<8) return 1.5;
+					return 0.5;
+				},
 			}
 		},
 		boss_chiying:{
@@ -1591,6 +1779,20 @@ character.boss={
 		boss_suannimech:'食火狻猊',
 		boss_yazimech:'裂石睚眦',
 
+		boss_lingfeng:'灵锋',
+		boss_lingfeng_info:'摸牌阶段，你可以放弃摸牌，亮出牌堆顶的两张牌，然后获得之，若这些牌的颜色不同，你令一名敌方角色失去1点体力',
+		boss_jizhen:'激阵',
+		boss_jizhen_info:'锁定技，结束阶段，你令所有已受伤的己方角色摸一张牌',
+		boss_huodi:'惑敌',
+		boss_huodi_info:'结束阶段，若有武将牌背面朝上的己方角色，你可以令一名敌方角色将其身份牌翻面',
+		boss_jueji:'绝汲',
+		boss_jueji_info:'敌方角色摸牌阶段，若其已受伤，你可以令其少摸一张牌',
+		boss_chuanyun:'穿云',
+		boss_chuanyun_info:'结束阶段，你可以对体力比你多的一名其他角色造成1点伤害',
+		boss_leili:'雷厉',
+		boss_leili_info:'每当你的[杀]造成伤害后，你可以对另一名敌方角色造成1点雷电伤害',
+		boss_fengxing:'风行',
+		boss_fengxing_info:'准备阶段，你可以选择一名敌方角色，若如此做，视为对其使用了一张[杀]',
 		boss_skonghun:'控魂',
 		boss_skonghun_info:'出牌阶段开始时，若你已损失体力值不小于敌方角色数，你可以对所有敌方角色各造成1点雷电伤害，然后你恢复X点体力（X为受到伤害的角色数）',
 		boss_fanshi:'反噬',
@@ -1639,17 +1841,17 @@ character.boss={
 		boss_lianyu_info:'结束阶段，对所有其他角色造成1点火焰伤害',
 
 		boss_guihuo:'鬼火',
-		boss_guihuo_info:'结束阶段，对一名其他角色造成1点火焰伤害',
+		boss_guihuo_info:'结束阶段，你可以对一名其他角色造成1点火焰伤害',
 		boss_minbao:'冥爆',
 		boss_minbao_info:'锁定技，当你死亡时，对场上所有其他角色造成1点火焰伤害',
 		boss_luolei:'落雷',
-		boss_luolei_info:'准备阶段，对一名其他角色造成1点雷电伤害',
+		boss_luolei_info:'准备阶段，你可以对一名其他角色造成1点雷电伤害',
 		boss_beiming:'悲鸣',
 		boss_beiming_info:'锁定技，当你死亡时，你令杀死你的角色弃置所有手牌',
 		boss_guimei:'鬼魅',
 		boss_guimei_info:'锁定技，你不能成为延时类锦囊的目标',
 		boss_didong:'地动',
-		boss_didong_info:'结束阶段，令一名其他角色将其武将牌翻面',
+		boss_didong_info:'结束阶段，你可以令一名其他角色将其武将牌翻面',
 		boss_shanbeng:'山崩',
 		boss_shanbeng_info:'锁定技，当你死亡时，你令所有其他角色弃置其装备区内的所有牌',
 

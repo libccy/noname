@@ -2257,7 +2257,7 @@ character.sp={
 					if(_status.currentPhase==player&&card.name=='sha'&&card.number>player.storage.qiangwu) return Infinity;
 				}
 			},
-			group:'qiangwu2'
+			group:['qiangwu2','qiangwu3']
 		},
 		qiangwu2:{
 			trigger:{player:'phaseUseBegin'},
@@ -2266,6 +2266,21 @@ character.sp={
 			content:function(){
 				delete player.storage.qiangwu;
 			}
+		},
+		qiangwu3:{
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				if(_status.currentPhase==player&&event.card.name=='sha'&&
+				event.card.number>player.storage.qiangwu) return true;
+				return false;
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				if(player.stat[player.stat.length-1].card.sha>0){
+					player.stat[player.stat.length-1].card.sha--;
+				}
+			},
 		},
 		zhendu:{
 			audio:2,

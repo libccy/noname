@@ -2986,7 +2986,7 @@ character.shenhua={
 		xinsheng_info:'你每受到1点伤害，可获得一张新化身牌。',
 		jiangwei:'姜维',
 		liushan:'刘禅',
-		zhanghe:'张颌',
+		zhanghe:'张郃',
 		dengai:'邓艾',
 		sunce:'孙策',
 		zhangzhang:'张昭张紘',

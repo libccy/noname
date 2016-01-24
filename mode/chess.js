@@ -5620,7 +5620,7 @@ mode.chess={
 				player.chessFocus();
 			},
 		},
-		boss_fengxing:{
+		boss_bfengxing:{
 			mod:{
 				chessMove:function(player,current){
 					return current+2;
@@ -5904,8 +5904,8 @@ mode.chess={
 
 		cangming:'颠动沧溟',
 		cangming_info:'出牌阶段限一次，你可弃置四张花色不同的手牌并将武将牌翻至背面，然后令所有其他角色进入混乱状态直到你的下一回合开始',
-		boss_fengxing:'风行',
-		boss_fengxing_info:'锁定技，你摸牌阶段摸牌数+2；你的攻击范围+2；你回合内的移动距离+2',
+		boss_bfengxing:'风行',
+		boss_bfengxing_info:'锁定技，你摸牌阶段摸牌数+2；你的攻击范围+2；你回合内的移动距离+2',
 		boss_chiyu:'炽羽',
 		boss_chiyu_info:'出牌阶段限一次，你可以弃置一张红色牌对距离5以内的所有其他角色造成一点火焰伤害',
 		boss_tenglong:'腾龙八齐',
@@ -6240,7 +6240,7 @@ mode.chess={
 			// chess_zhangjiao:['male','qun',3,['']],
 			// chess_menghuo:['male','qun',3,['']],
 			//
-			chess_jinchidiao:['male','qun',15,['boss_fengxing','boss_chiyu'],['boss','chessboss']],
+			chess_jinchidiao:['male','qun',15,['boss_bfengxing','boss_chiyu'],['boss','chessboss']],
 			chess_beimingjukun:['male','qun',25,['boss_wuying','cangming'],['boss','chessboss']],
 			chess_wuzhaojinlong:['male','qun',30,['boss_tenglong','boss_wushang'],['boss','chessboss']],
 			chess_dongzhuo:['male','qun',20,['jiuchi','boss_stoneqiangzheng','boss_stonebaolin'],['boss','chessboss']],

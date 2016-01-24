@@ -258,6 +258,7 @@ window.config={
 	banned:[],
 	bannedcards:[],
 	bannedpile:{},
+	customcardpile:{},
 	addedpile:{},
 	customCharacterPack:{},
 	customCardPack:{},

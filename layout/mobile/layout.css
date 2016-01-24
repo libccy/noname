@@ -67,6 +67,13 @@
     border-radius: 0 !important;
     pointer-events: none;
 }
+
+#arena:not(.chess) .player[data-position='0'].linked>.damage{
+	transform:scale(0.7) rotate(0);
+}
+#arena:not(.chess) .player[data-position='0'].linked>.damage.damageadded{
+	transform:scale(1) rotate(0);
+}
 #arena:not(.chess) .player[data-position='0']:not(.selected):not(.selectedx):not(.selectable):not(.glow){
     box-shadow: none !important;
 }

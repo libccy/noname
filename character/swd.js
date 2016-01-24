@@ -4745,9 +4745,6 @@ character.swd={
 		jikong2:{
 			trigger:{player:'phaseBegin'},
 			direct:true,
-			// filter:function(event,player){
-			// 	return player.num('he')>0;
-			// },
 			content:function(){
 				"step 0"
 				player.chooseTarget('是否发动【亟空】？',function(card,player,target){

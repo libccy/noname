@@ -294,8 +294,9 @@ character.refresh={
 			unique:true,
 			trigger:{player:'gainAfter'},
 			direct:true,
-			filter:function(event){
+			filter:function(event,player){
 				if(event.parent.parent.name=='phaseDraw') return false;
+				if(player.storage.qingjian>=4) return false;
 				return event.cards&&event.cards.length>0
 			},
 			content:function(){
@@ -322,6 +323,7 @@ character.refresh={
 				});
 				"step 2"
 				if(result.bool){
+					player.storage.qingjian++;
 					player.logSkill('qingjian',result.targets);
 					result.targets[0].gain(result.cards);
 					player.$give(result.cards.length,result.targets[0]);
@@ -333,6 +335,16 @@ character.refresh={
 			},
 			ai:{
 				expose:0.3
+			},
+			group:'qingjian2'
+		},
+		qingjian2:{
+			trigger:{global:'phaseBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.storage.qingjian=0;
 			}
 		},
 		reyingzi:{
@@ -1339,7 +1351,7 @@ character.refresh={
 		relianying_info:'当你失去最后的手牌时，你可以令至多X名角色各摸一张牌（X为你此次失去的手牌数）。',
 		reyingzi_info:'锁定技，摸牌阶段摸牌时，你额外摸一张牌；你的手牌上限不会因体力值的减少而减少。',
 		refanjian_info:'出牌阶段限一次，你可以展示一张手牌并将此牌交给一名其他角色。然后该角色选择一项：展示其手牌并弃置所有与此牌花色相同的牌，或是去一点体力。',
-		qingjian_info:'每当你于摸牌阶段外获得牌时，你可以将其中任意牌以任意顺序交给其他角色',
+		qingjian_info:'每当你于摸牌阶段外获得牌时，你可以将其中任意牌以任意顺序交给其他角色，每回合最多发动四次',
 		qinxue_info:'觉醒技，准备阶段开始时，若你的手牌数比体力值多3（人数不少于7时改为2）或更多，你须减一点体力上限并获得技能【攻心】',
 		retuxi_info:'摸牌阶段摸牌时，你可以少摸任意张牌，然后选择等量的手牌数大于或等于你的其他角色，获得这些角色的各一张手牌。',
 		reluoyi_info:'你可以跳过摸牌阶段，然后展示牌堆顶的三张牌，获得其中的基本牌、武器牌和【决斗】，若如此做，直到你的下回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。',

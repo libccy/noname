@@ -2461,7 +2461,7 @@
 			videoId:0,
 		},
 		help:{
-			'游戏选项':'<ul><li>控制台命令<br>开启后可用浏览器控制台控制游戏<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
+			'游戏选项':'<ul><li>控制台命令<br>开启后可用浏览器控制台控制游戏<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
 			'触屏模式<br>可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
@@ -4069,7 +4069,8 @@
 						player.logSkill(event.skill);
 						player.popup(event.card.name);
 					}
-					else if(lib.config.show_card_prompt&&get.type(event.card)!='equip'){
+					else if(lib.config.show_card_prompt){
+						//&&get.type(event.card)!='equip'
 						player.popup(event.card.name,'metal');
 					}
 					if(event.audio===false){
@@ -4906,7 +4907,7 @@
 					if(player.hp>player.maxHp) player.hp=player.maxHp;
 					player.update();
 					if(event.popup!==false){
-						player.popup(num);
+						player.$damagepop(num,'water');
 					}
 					event.trigger('changeHp');
 				},
@@ -15445,6 +15446,8 @@
 								var node=start.firstChild.childNodes[i];
 								if(node.link){
 									if(node.mode.indexOf('mode_')==0) continue;
+									if(node.mode=='custom') continue;
+									if(node.mode=='cardpile') continue;
 									if(lib.config.cards.contains(node.mode)){
 										node.classList.remove('off');
 										node.link.firstChild.classList.add('on');
@@ -15690,6 +15693,114 @@
 	                        active.classList.add('active');
 	                    }
 						rightPane.appendChild(active.link);
+
+						(function(){
+							var page=ui.create.div('.menu-buttons');
+	                        var node=ui.create.div('.menubutton.large','牌堆',clickMode);
+							ui.customCharacter=node;
+							start.firstChild.insertBefore(node,start.firstChild.querySelector('.lefttext'));
+							node.link=page;
+							node.mode='cardpile';
+
+							var updatePileConfig=function(){
+								var current=get.config('cardpilename');
+								for(var i=0;i<page.childNodes.length;i++){
+									if(page.childNodes[i].use){
+										if(page.childNodes[i].link==current){
+											page.childNodes[i].use.style.display='none';
+										}
+										else{
+											page.childNodes[i].use.style.display='';
+										}
+									}
+								}
+							};
+
+							var pileUse=function(){
+								game.saveConfig('cardpilename',this.parentNode.link,true);
+								restart.style.display='';
+								updatePileConfig();
+							};
+							var pileDel=function(){
+								delete lib.config.customcardpile[this.parentNode.link];
+								this.parentNode.remove();
+								game.saveConfig('customcardpile',lib.config.customcardpile);
+								for(var i in lib.config.mode_config){
+									if(i=='global') continue;
+									if(lib.config.mode_config[i].cardpilename==this.parentNode.link){
+										game.saveConfig('cardpilename',null,i);
+									}
+								}
+							};
+							var createPileNode=function(name){
+								var node=ui.create.div('.config.toggle.cardpilecfg.nomarginleft',name);
+								node.link=name;
+								var edit=document.createElement('span');
+								edit.innerHTML='使用';
+								edit.classList.add('cardpiledelete');
+								edit.onclick=pileUse;
+								var del=document.createElement('span');
+								del.innerHTML='删除';
+								del.classList.add('cardpiledelete');
+								del.onclick=pileDel;
+								node.appendChild(del);
+								node.appendChild(edit);
+								node.use=edit;
+								page.insertBefore(node,page.firstChild);
+							};
+							for(var i in lib.config.customcardpile){
+								createPileNode(i);
+							}
+							updatePileConfig();
+							var restart=ui.create.div('.config.more','重新启动',game.reload,page);
+							restart.style.display='none';
+							ui.create.div('.config.more','使用默认牌堆',function(){
+								this.innerHTML='已使用';
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='使用默认牌堆';
+								},1000);
+								game.saveConfig('cardpilename',null,true);
+								game.saveConfig('bannedpile');
+								game.saveConfig('addedpile');
+								updatePileConfig();
+							},page);
+							var exportCardPile;
+							ui.create.div('.config.more','保存当前牌堆 <div>&gt;</div>',page,function(){
+								this.classList.toggle('on');
+								if(this.classList.contains('on')){
+									exportCardPile.classList.remove('hidden');
+								}
+								else{
+									exportCardPile.classList.add('hidden');
+								}
+							});
+							exportCardPile=ui.create.div('.config.cardpileadd.indent',page);
+							exportCardPile.classList.add('hidden');
+							ui.create.div('','名称：<input type="text"><button>确定</button>',exportCardPile);
+							var input=exportCardPile.firstChild.lastChild.previousSibling;
+							input.value='自定义牌堆';
+							input.style.marginRight='3px';
+							exportCardPile.firstChild.lastChild.onclick=function(){
+								var name=input.value;
+								var ok=true;
+								if(lib.config.customcardpile[name]){
+									for(var i=1;i<=1000;i++){
+										if(!lib.config.customcardpile[name+'('+i+')']){
+											name=name+'('+i+')';
+											break;
+										}
+									}
+								}
+								lib.config.customcardpile[name]=[lib.config.bannedpile,lib.config.addedpile];
+								game.saveConfig('cardpilename',name,true);
+								game.saveConfig('customcardpile',lib.config.customcardpile);
+								game.saveConfig('bannedpile');
+								game.saveConfig('addedpile');
+								createPileNode(name);
+								updatePileConfig();
+							};
+						}());
 
 						var node1=ui.create.div('.lefttext','全部开启',start.firstChild,function(){
 							game.saveConfig('cards',lib.config.all.cards);
@@ -21737,6 +21848,12 @@
 							}
 						}
 					}
+				}
+
+				var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
+				if(pilecfg){
+					lib.config.bannedpile=pilecfg[0];
+					lib.config.addedpile=pilecfg[1];
 				}
 				for(i in card){
 					lib.cardPack[i]=[];
