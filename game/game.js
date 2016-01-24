@@ -16,16 +16,18 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.76,
+		version:1.77,
 		changeLog:[
-			'bug修复（捉鬼、导出武将）',
-			'配音支持引用文件名',
-			'挑战模式可关闭单人控制',
-			'不同模式可单独设置禁将、禁卡',
-			'自定义技能禁配',
-			'战棋对战选项',
-			'炉石模式平衡调整',
-			'ctrl+shift+R重置游戏'
+			'新武将(SP)',
+			'志继、化身结算',
+			'提示样式修改',
+			'牌堆管理',
+			'战棋1v1、对决4v4',
+			'年兽、守卫剑阁',
+			'注1：年兽在挑战模式，守卫剑阁在对决模式菜单中的游戏模式里选',
+			'注2：此版本去掉了diy捉鬼和剑阁武将包，未来将进入diy武将包',
+			'注3：此版本更改了手气卡代码，若要关闭需重新设置',
+			'注4：安卓版预计一周内更新'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -661,6 +663,20 @@
 								ui.arena.classList.remove('slim_player');
 							}
 						}
+					},
+					// popup_style:{
+					// 	name:'提示样式',
+					// 	init:'newstyle',
+					// 	item:{
+					// 		newstyle:'默认',
+					// 		old:'旧版'
+					// 	},
+					// 	unfrequent:true,
+					// },
+					show_card_prompt:{
+						name:'出牌显示卡牌名',
+						init:true,
+						unfrequent:true,
 					},
 					fold_card:{
 						name:'折叠手牌',
@@ -1346,12 +1362,11 @@
 				name:'其它',
 				config:{
 					reset_game:{
-						name:'重置游戏',
+						name:'重置游戏设置',
 						onclick:function(){
 							var node=this;
 							if(node._clearing){
 								localStorage.clear();
-								if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 								game.reload();
 								return;
 							}
@@ -1363,6 +1378,30 @@
 									node.innerHTML='单击以确认 (1)';
 									setTimeout(function(){
 										node.innerHTML='重置游戏';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true
+					},
+					reset_database:{
+						name:'重置自定义武将及录像',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+								game.reload();
+								return;
+							}
+							node._clearing=true;
+							node.innerHTML='单击以确认 (3)';
+							setTimeout(function(){
+								node.innerHTML='单击以确认 (2)';
+								setTimeout(function(){
+									node.innerHTML='单击以确认 (1)';
+									setTimeout(function(){
+										node.innerHTML='重置自定义武将及录像';
 										delete node._clearing;
 									},1000);
 								},1000);
@@ -1596,7 +1635,13 @@
 					},
 					change_card:{
 						name:'开启手气卡',
-						init:false,
+						init:'disabled',
+						item:{
+							disabled:'禁用',
+							once:'一次',
+							twice:'两次',
+							unlimited:'无限',
+						}
 					},
 					dierestart:{
 						name:'死亡后显示重来',
@@ -1826,7 +1871,13 @@
 					},
 					change_card:{
 						name:'开启手气卡',
-						init:false,
+						init:'disabled',
+						item:{
+							disabled:'禁用',
+							once:'一次',
+							twice:'两次',
+							unlimited:'无限',
+						}
 					},
 					dierestart:{
 						name:'死亡后显示重来',
@@ -1903,6 +1954,62 @@
 			versus:{
 				name:'对决',
 				config:{
+					update:function(config,map){
+						if(config.versus_mode=='four'){
+							map.change_choice.hide();
+							map.enable_all.show();
+							map.four_assign.show();
+						}
+						else{
+							map.change_choice.show();
+							map.enable_all.hide();
+							map.four_assign.hide();
+						}
+						if(config.versus_mode=='jiange'){
+							map.free_choose.show();
+						}
+						else{
+							map.free_choose.hide();
+						}
+					},
+					versus_mode:{
+						name:'游戏模式',
+						init:'standard',
+						item:{
+							standard:'标准',
+							jiange:'剑阁',
+							four:'<span style="display:inline-block;width:100%;text-align:center">4v4</span>'
+						},
+						restart:true,
+						frequent:true,
+					},
+					enable_all:{
+						name:'启用全部武将',
+						init:false,
+						frequent:true,
+						restart:true,
+					},
+					four_assign:{
+						name:'代替队友选将',
+						init:true,
+						frequent:true,
+						restart:true,
+					},
+					free_choose:{
+						name:'自由选将',
+						init:true,
+						frequent:true,
+						onclick:function(bool){
+							game.saveConfig('free_choose',bool,this._link.config.mode);
+							if(!ui.create.cheat2) return;
+							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
+							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+							else if(ui.cheat2&&!get.config('free_choose')){
+								ui.cheat2.close();
+								delete ui.cheat2;
+							}
+						}
+					},
 					change_choice:{
 						name:'开启换将卡',
 						init:false,
@@ -2123,25 +2230,6 @@
 						clear:true,
 						frequent:true,
 					},
-					// battle_number:{
-					// 	name:'对战人数',
-					// 	init:'3',
-					// 	frequent:true,
-					// 	item:{
-					// 		'2':'2v2',
-					// 		'3':'3v3',
-					// 		'4':'4v4',
-					// 		'6':'6v6',
-					// 		'8':'8v8',
-					// 	},
-					// 	onclick:function(num){
-					// 		game.saveConfig('battle_number',num,this._link.config.mode);
-					// 		if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
-					// 		if(_status.event.parent.changeDialog){
-					// 			_status.event.parent.changeDialog();
-					// 		}
-					// 	},
-					// },
 					chess_treasure:{
 						name:'战场机关',
 						init:'0.2',
@@ -2168,27 +2256,22 @@
 					attack_move:{
 						name:'击退效果',
 						init:true,
-						// frequent:true,
 					},
 					show_distance:{
 						name:'显示距离',
 						init:true,
-						// frequent:true,
 					},
-					// chess_ordered:{
-					// 	name:'交替行动',
-					// 	init:true,
-					// 	// frequent:true,
-					// },
 					chess_character:{
 						name:'战棋武将',
 						init:true,
-						// frequent:true,
 					},
+					// chess_jiange:{
+					// 	name:'守卫剑阁',
+					// 	init:true,
+					// },
 					chess_card:{
 						name:'战棋卡牌',
 						init:true,
-						// frequent:true,
 					},
 					free_choose:{
 						name:'自由选将',
@@ -2400,6 +2483,9 @@
 			'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
+			'对决模式':'<div style="margin:10px">4v4</div><ul style="margin-top:0"><li>双方各有一名主公和三名忠臣，杀死对方主公获胜<li>'+
+			'8号位游戏开始时额外摸一张牌，7、8号位可在游戏开始时置换一次手牌<li>'+
+			'杀死对方忠臣摸2+x张牌，x为对方（含刚被杀的忠臣）与己方的存活人数之差；主公杀死己方忠臣须弃置所有牌',
 		},
 		help2:{
 			'战棋模式':
@@ -2411,7 +2497,7 @@
 			'开启无尽模式后，任何一方有角色死亡都将选择一名新角色重新加入战场，直到点击左上角的结束游戏按钮手动结束游戏。结束游戏时，杀敌更多的一方获胜<li>'+
 			'开启交替行动时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
 			'开启战场机关后，每个回合结束时有一定机率出现一个机关，该机关不参与战斗，并有一个影响周围或全体角色的效果。机关在出现后的5〜10个回合内消失<li>'+
-			'开启击退效果后，当一名角色对距离两格以内且在同一直线上的目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
+			'开启击退效果后，当一名角色对距离两格以内的目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
 			'战场上可设置出现随机路障，角色无法移动到路障处。当一名角色的周围四格有至少三格为路障或在战场外时，其可以在回合内清除一个相邻路障</ul>'+
 			'<div style="margin:10px">君主模式</div><ul style="margin-top:0"><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
 			'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
@@ -2426,6 +2512,7 @@
 			'炉石模式':
 			'<div style="margin:10px">构筑</div><ul style="margin-top:0"><li>点击右上角的卡组管理构建卡组<li>一套卡组共30张牌，由法术和随从牌构成，每个同名卡牌最多带两张'+
 			'<li>卡组管理器中，随从右上角的x/y表示登场状态为x牌y血'+
+			'<li>游戏开始时，双方摸三张牌并从牌库中获得一张牌，并可选择将手牌置换一次'+
 			'<li>摸牌阶段，主将少摸一张牌，并从卡组中获得一张牌'+
 			'<li>每名角色使用一套卡组，卡组用完后会重新补满'+
 			'<li>卡组与职业绑定，每个职业有一个专属技能，每回合限用一次，消耗两点行动值</ul>'+
@@ -2776,6 +2863,9 @@
 									lib.skill[i].createInfo=skills[i];
 									lib.setTranslate(i);
 									lib.translate[i+'_info']=skills[i].description;
+									if(lib.skill[i].marktext){
+										lib.translate[i+'_bg']=lib.skill[i].marktext;
+									}
 								}
 								if(_status.cardsFinished){
 									game.finishCards();
@@ -3100,9 +3190,9 @@
 			playerproto:{
 				phase:function(){
 					"step 0"
-					if(player.node.judges.childElementCount){
-						player.popup('判定阶段');
-					}
+					// if(player.node.judges.childElementCount){
+					// 	player.popup('判定阶段');
+					// }
 					player.phaseJudge();
 					"step 1"
 					player.phaseDraw();
@@ -3135,6 +3225,7 @@
 						player.$phaseJudge(event.card);
 						event.cancelled=false;
 						event.trigger('phaseJudge');
+						player.popup(event.card.viewAs||event.card.name,'thunder');
 					}
 					else event.finish();
 					"step 1"
@@ -3978,6 +4069,9 @@
 						player.logSkill(event.skill);
 						player.popup(event.card.name);
 					}
+					else if(lib.config.show_card_prompt&&get.type(event.card)!='equip'){
+						player.popup(event.card.name,'metal');
+					}
 					if(event.audio===false){
 						cardaudio=false;
 					}
@@ -4443,6 +4537,9 @@
 							player.checkShow(event.skill);
 						}
 					}
+					else if(lib.config.show_card_prompt){
+						player.popup(card.name,'wood');
+					}
 					if(cardaudio&&event.parent.parent.parent.name=='useCard'){
 						if(lib.config.background_audio){
 							var sex=player.sex=='female'?'female':'male';
@@ -4685,11 +4782,8 @@
 							else if(event.nature=='thunder'){
 								player.$thunder();
 							}
-							player.$damagepop(-num,event.nature);
 						}
-						else{
-							player.popup(-num,event.nature);
-						}
+						player.$damagepop(-num,event.nature);
 					}
 					// if(source){
 					// 	if(player._damagetimeout!=source){
@@ -4732,11 +4826,8 @@
 						player.changeHp(num,false);
 						if(lib.config.animation&&!lib.config.low_performance){
 							player.$recover();
-							player.$damagepop(num,'wood');
 						}
-						else{
-							player.popup('+'+num);
-						}
+						player.$damagepop(num,'wood');
 						game.log(player,'回复了'+get.cnNumber(num)+'点体力')
 					}
 				},
@@ -5593,7 +5684,7 @@
 				syncStorage:function(skill){
 					switch(get.itemtype(this.storage[skill])){
 						case 'cards':game.addVideo('storage',this,[skill,get.cardsInfo(this.storage[skill]),'cards']);break;
-						case 'card':game.addVideo('storage',this,[skill,get.cardInfo(this.storage[skill]),'cards']);break;
+						case 'card':game.addVideo('storage',this,[skill,get.cardInfo(this.storage[skill]),'card']);break;
 						default:game.addVideo('storage',this,[skill,this.storage[skill]]);
 					}
 				},
@@ -6764,6 +6855,11 @@
 				},
 				popup:function(name,className){
 					var name2=get.translation(name);
+					if(true){
+						if(!name2) return;
+						this.$damagepop(name2,className||'water',true);
+						return;
+					}
 					var node=ui.create.div('.popup',this.parentNode);
 					if(!name2){
 						node.remove();
@@ -7009,6 +7105,9 @@
 					this.unmarkSkill(skill);
 					this.skills.remove(skill);
 					this.checkConflict();
+					if(lib.skill[skill]&&lib.skill[skill].onremove){
+						lib.skill[skill].onremove(this);
+					}
 					return skill;
 				},
 				addTempSkill:function(skill,expire){
@@ -7118,6 +7217,7 @@
 						return false;
 					}
 					if(lib.config.mode=='versus'){
+						if(_status.mode=='four'||_status.mode=='jiange') return false;
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==game.me.side;
 					}
@@ -8037,10 +8137,13 @@
 						node.delete();
 					},1000);
 				},
-				$damagepop:function(num,nature){
+				$damagepop:function(num,nature,font){
 					if(typeof num=='number'||typeof num=='string'){
-						game.addVideo('damagepop',this,[num,nature]);
+						game.addVideo('damagepop',this,[num,nature,font]);
 						var node=ui.create.div('.damage');
+						if(font){
+							node.classList.add('normal-font');
+						}
 						if(num>0){
 							num='+'+num;
 						}
@@ -8548,79 +8651,7 @@
 					if(list.length){
 						list.sort(lib.sort.priority);
 						for(i=0;i<list.length;i++){
-							if(list[i][1].isOut()||list[i][1].isDead()||list[i][1].removed) continue;
-							var next=game.createEvent('trigger',false);
-							next.skill=list[i][0];
-							next.player=list[i][1];
-							next.triggername=name;
-							next._trigger=event;
-							next.content=function(){
-								"step 0"
-								var info=get.info(event.skill);
-								if(info.filter&&!info.filter(trigger,player,event.triggername)){
-									event.finish();
-								}
-								else if(event._trigger.notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
-									event.finish();
-								}
-								else{
-									var hidden=player.hiddenSkills.slice(0);
-									game.expandSkills(hidden);
-									if(hidden.contains(event.skill)&&!get.info(event.skill).direct){
-										event.trigger('triggerHidden');
-									}
-								}
-								"step 1"
-								if(event.cancelled){
-									event.finish();
-								}
-								else{
-									event.trigger('triggerBefore');
-								}
-								"step 2"
-								if(event.cancelled){
-									event.finish();
-									return;
-								}
-								if(!event.revealed&&!get.info(event.skill).forced){
-									if(get.info(event.skill).direct&&player.isUnderControl()){
-										game.modeSwapPlayer(player);
-										event._result={bool:true};
-									}
-									else if(get.info(event.skill).frequent&&!lib.config.autoskilllist.contains(event.skill)){
-										event._result={bool:true};
-									}
-									else if(get.info(event.skill).direct&&player==game.me&&!_status.auto){
-										event._result={bool:true};
-									}
-									else{
-										var str;
-										var check=get.info(event.skill).check;
-										if(get.info(event.skill).prompt) str=get.info(event.skill).prompt;
-										else str='是否发动【'+get.translation(event.skill)+'】？';
-										if(typeof str=='function'){str=str(trigger,player)}
-										player.chooseBool(str).ai=function(){
-											return !check||check(trigger,player);
-										};
-									}
-								}
-								"step 3"
-								if(result&&result.bool==false) return;
-								var info=get.info(event.skill);
-								var next=game.createEvent(event.skill);
-								next.player=player;
-								next._trigger=trigger;
-								next.content=info.content;
-								if(info.popup!=false&&!info.direct){
-									if(info.popup){
-										player.popup(info.popup);
-										game.log(player,'发动了','【'+get.translation(event.skill)+'】');
-									}
-									else{
-										player.logSkill(event.skill);
-									}
-								}
-							}
+							game.createTrigger(name,list[i][0],list[i][1],event);
 						}
 					}
 				},
@@ -9041,7 +9072,7 @@
 				popup:false,
 				content:function(){
 					if(!player.noPhaseDelay){
-						player.popup('_phasebegin');
+						player.popup('回合开始');
 					}
 					if(lib.config.glow_phase){
 						if(_status.currentPhase){
@@ -9650,6 +9681,9 @@
 		videoContent:{
 			init:function(players){
 				if(lib.config.mode=='chess') return;
+				if(lib.config.mode=='versus'){
+					players.bool=players.pop();
+				}
 				ui.arena.dataset.number=players.length;
 				ui.arena.classList.add('video');
 				game.players.length=0;
@@ -10197,7 +10231,7 @@
 			},
 			damagepop:function(player,content){
 				if(player&&content){
-					player.$damagepop(content[0],content[1]);
+					player.$damagepop(content[0],content[1],content[2]);
 				}
 				else{
 					console.log(player);
@@ -11078,7 +11112,83 @@
 				game.draw(drawfunc);
 			}
 		},
-		createEvent:function(name,trigger){
+		createTrigger:function(name,skill,player,event){
+			if(player.isOut()||player.isDead()||player.removed) return;
+			var next=game.createEvent('trigger',false,event);
+			next.skill=skill;
+			next.player=player;
+			next.triggername=name;
+			next._trigger=event;
+			next.content=function(){
+				"step 0"
+				var info=get.info(event.skill);
+				if(info.filter&&!info.filter(trigger,player,event.triggername)){
+					event.finish();
+				}
+				else if(event._trigger.notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
+					event.finish();
+				}
+				else{
+					var hidden=player.hiddenSkills.slice(0);
+					game.expandSkills(hidden);
+					if(hidden.contains(event.skill)&&!get.info(event.skill).direct){
+						event.trigger('triggerHidden');
+					}
+				}
+				"step 1"
+				if(event.cancelled){
+					event.finish();
+				}
+				else{
+					event.trigger('triggerBefore');
+				}
+				"step 2"
+				if(event.cancelled){
+					event.finish();
+					return;
+				}
+				if(!event.revealed&&!get.info(event.skill).forced){
+					if(get.info(event.skill).direct&&player.isUnderControl()){
+						game.modeSwapPlayer(player);
+						event._result={bool:true};
+					}
+					else if(get.info(event.skill).frequent&&!lib.config.autoskilllist.contains(event.skill)){
+						event._result={bool:true};
+					}
+					else if(get.info(event.skill).direct&&player==game.me&&!_status.auto){
+						event._result={bool:true};
+					}
+					else{
+						var str;
+						var check=get.info(event.skill).check;
+						if(get.info(event.skill).prompt) str=get.info(event.skill).prompt;
+						else str='是否发动【'+get.translation(event.skill)+'】？';
+						if(typeof str=='function'){str=str(trigger,player)}
+						player.chooseBool(str).ai=function(){
+							return !check||check(trigger,player);
+						};
+					}
+				}
+				"step 3"
+				if(result&&result.bool==false) return;
+				var info=get.info(event.skill);
+				var next=game.createEvent(event.skill);
+				next.player=player;
+				next._trigger=trigger;
+				next.triggername=event.triggername;
+				next.content=info.content;
+				if(info.popup!=false&&!info.direct){
+					if(info.popup){
+						player.popup(info.popup);
+						game.log(player,'发动了','【'+get.translation(event.skill)+'】');
+					}
+					else{
+						player.logSkill(event.skill);
+					}
+				}
+			}
+		},
+		createEvent:function(name,trigger,triggerevent){
 			var next={
 				name:name,
 				step:0,
@@ -11096,7 +11206,7 @@
 			for(var i in lib.element.event){
 				next[i]=lib.element.event[i];
 			}
-			_status.event.next.push(next);
+			(triggerevent||_status.event).next.push(next);
 			return next;
 		},
 		createCard:function(name,suit,number,nature){
@@ -11186,7 +11296,9 @@
 							added=added*(game.players.length+game.dead.length);
 							break;
 						case 'versus':
-							added=5*(game.players.length+_status.friend.length);
+							if(_status.friend){
+								added=5*(game.players.length+_status.friend.length);
+							}
 							break;
 						default:
 							added=10;
@@ -11566,7 +11678,7 @@
 					event._triggered++;
 				}
 				else{
-					if(player&&player.classList.contains('dead')&&event.name!='phaseLoop'){
+					if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
 						while(_status.dieClose.length){
 							_status.dieClose.shift().close();
 						}
@@ -12164,8 +12276,12 @@
 					player=player.next;
 				}
 				while(player!=end);
+				event.changeCard=get.config('change_card');
+				if(lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
+					event.changeCard='disabled';
+				}
 				"step 1"
-				if(get.config('change_card')){
+				if(event.changeCard!='disabled'){
 					event.dialog=ui.create.dialog('是否使用手气卡？');
 					ui.create.confirm('oc');
 					event.custom.replace.confirm=function(bool){
@@ -12177,24 +12293,34 @@
 					event.finish();
 				}
 				"step 2"
+				if(event.changeCard=='once'){
+					event.changeCard='disabled';
+				}
+				else if(event.changeCard=='twice'){
+					event.changeCard='once';
+				}
+				else if(event.changeCard=='disabled'){
+					event.bool=false;
+					return;
+				}
 				game.pause();
 				"step 3"
 				if(event.bool){
 					if(game.changeCoin){
 						game.changeCoin(-3);
 					}
-					game.me.lose(game.me.get('h'))._triggered=null;
+					var hs=game.me.get('h');
+					for(var i=0;i<hs.length;i++){
+						ui.discardPile.appendChild(hs[i]);
+					}
+					game.me.directgain(get.cards(hs.length));
+					event.goto(2);
 				}
 				else{
 					event.dialog.close();
 					ui.confirm.close();
 					event.finish();
 				}
-				"step 4"
-				game.delay();
-				game.me.gain(get.cards(4))._triggered=null;
-				"step 5"
-				event.goto(2);
 			}
 		},
 		asyncDraw:function(players,num){
@@ -12325,6 +12451,9 @@
 						}
 						if(lib.skill[i].subSkill[j].description){
 							lib.translate[i+'_'+j+'_info']=lib.skill[i].subSkill[j].description;
+						}
+						if(lib.skill[i].subSkill[j].marktext){
+							lib.translate[i+'_'+j+'_bg']=lib.skill[i].subSkill[j].marktext;
 						}
 					}
 				}
@@ -17496,7 +17625,6 @@
 				if(this.classList.contains('selectable')&&
 					!this.classList.contains('selected')&&
 					!this.classList.contains('noclick')){
-						game.print(1)
 					this._waitingfordrag={clientX:e.touches[0].clientX,clientY:e.touches[0].clientY};
 				}
 			},
@@ -19269,7 +19397,11 @@
 			return info;
 		},
 		infoCard:function(info){
-			return ui.create.card().init(info);
+			var card=ui.create.card();
+			if(info[0]){
+				card.init(info);
+			}
+			return card;
 		},
 		infoCards:function(info){
 			var cards=[];

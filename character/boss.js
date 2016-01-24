@@ -1,6 +1,5 @@
 'usr strict';
 character.boss={
-	mode:['identity','guozhan','stone','boss'],
 	character:{
 		boss_zhangchunhua:['female','wei',4,['jueqing','wuxin','shangshix'],['boss','bossallowed'],'wei'],
 		boss_zhenji:['female','wei',4,['tashui','lingbo','jiaoxia','fanghua'],['boss','bossallowed'],'wei'],
@@ -34,8 +33,136 @@ character.boss={
 		boss_dongzhuo:['male','qun',20,['jiuchi','boss_qiangzheng','boss_baolin'],['boss','bossallowed'],'shu'],
 		// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
 
+		boss_liedixuande:['male','shu',5,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+		boss_gongshenyueying:['male','shu',4,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+		boss_tianhoukongming:['male','shu',4,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+		boss_yuhuoshiyuan:['male','shu',4,[],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+		boss_qiaokuijunyi:['male','wei',4,[],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+		boss_jiarenzidan:['male','wei',5,['boss_chiying','boss_jingfan'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+		boss_duanyuzhongda:['male','wei',5,['boss_fanshi','boss_xuanlei','boss_skonghun'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+		boss_juechenmiaocai:['male','wei',4,['boss_chuanyun','boss_leili','boss_fengxing'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+
+		boss_baihumech:['male','shu',4,[],['jiangemech','hiddenboss','bossallowed'],'shu'],
+		boss_qinglongmech:['male','shu',4,[],['jiangemech','hiddenboss','bossallowed'],'shu'],
+		boss_xuanwumech:['male','shu',4,[],['jiangemech','hiddenboss','bossallowed'],'shu'],
+		boss_zhuquemech:['male','shu',4,[],['jiangemech','hiddenboss','bossallowed'],'shu'],
+		boss_bianmech:['male','wei',4,[],['jiangemech','hiddenboss','bossallowed'],'wei'],
+		boss_chiwenmech:['male','wei',4,[],['jiangemech','hiddenboss','bossallowed'],'wei'],
+		boss_suannimech:['male','wei',4,[],['jiangemech','hiddenboss','bossallowed'],'wei'],
+		boss_yazimech:['male','wei',4,[],['jiangemech','hiddenboss','bossallowed'],'wei'],
+
 	},
 	skill:{
+		boss_xuanlei:{
+            trigger:{player:'phaseBegin'},
+            forced:true,
+            filter:function(event,player){
+                for(var i=0;i<game.players.length;i++){
+					if(typeof player.side=='boolean'&&player.side==game.players[i].side) continue;
+                    if(game.players[i]!=player&&game.players[i].num('j')) return true;
+                }
+                return false;
+            },
+            content:function(){
+                "step 0"
+                event.targets=[];
+                for(var i=0;i<game.players.length;i++){
+					if(typeof player.side=='boolean'&&player.side==game.players[i].side) continue;
+                    if(game.players[i]!=player&&game.players[i].num('j')){
+                        event.targets.push(game.players[i]);
+                    }
+                }
+                event.targets.sort(lib.sort.seat);
+				player.line(event.targets,'thunder');
+                "step 1"
+                if(event.targets.length){
+                    event.targets.shift().damage('thunder');
+                    event.redo();
+                }
+            },
+			ai:{
+				threaten:function(player,target){
+					if(target.hp==1) return 2;
+					if(target.hp==2&&game.players.length<8) return 1.5;
+					return 0.5;
+				},
+			}
+        },
+		boss_fanshi:{
+            trigger:{player:'phaseEnd'},
+            forced:true,
+            check:function(){
+                return false;
+            },
+            content:function(){
+                player.loseHp();
+            }
+        },
+		boss_skonghun:{
+			trigger:{player:'phaseUseBegin'},
+			filter:function(event,player){
+				var num=player.maxHp-player.hp;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side!=player.side){
+						num--;
+					}
+				}
+				return num>=0;
+			},
+			forced:true,
+			content:function(){
+				'step 0'
+				var targets=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side!=player.side){
+						targets.push(game.players[i]);
+					}
+				}
+				targets.sort(lib.sort.seat);
+				event.targets=targets;
+				player.line(targets,'thunder');
+				event.num=targets.length;
+				'step 1'
+				if(event.targets.length){
+					event.targets.shift().damage('thunder');
+					event.redo();
+				}
+				'step 2'
+				player.recover(event.num);
+			}
+		},
+		boss_chiying:{
+            trigger:{global:'damageBegin'},
+            forced:true,
+            filter:function(event,player){
+                if(event.num<=1) return false;
+				if(typeof player.side=='boolean'){
+					return player.side==event.player.side;
+				}
+                return player==event.player;
+            },
+            priority:-11,
+            content:function(){
+                trigger.num=1;
+            }
+        },
+		boss_jingfan:{
+			global:'boss_jingfan2',
+		},
+		boss_jingfan2:{
+			mod:{
+				globalFrom:function(from,to,distance){
+					if(typeof from.side=='boolean'){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].skills.contains('boss_jingfan')&&
+								game.players[i].side==from.side&&game.players[i]!=from){
+								return distance-1;
+							}
+						}
+					}
+				}
+			}
+		},
 		boss_bianshen2:{
 			mode:['boss'],
 			global:'boss_bianshen2x'
@@ -747,7 +874,7 @@ character.boss={
 			}
 		},
 		boss_wange:{
-			inherit:'guiji'
+			inherit:'boss_guiji'
 		},
 		fengwu:{
 			audio:2,
@@ -1125,7 +1252,32 @@ character.boss={
 		},
 		boss_tianyu:{
 			audio:true,
-			inherit:'suoling'
+			trigger:{player:'phaseEnd'},
+            forced:true,
+            filter:function(event,player){
+                if(player.isLinked()) return true;
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i]!=player&&!game.players[i].isLinked()){
+                        return true;
+                    }
+                }
+                return false;
+            },
+            content:function(){
+                "step 0"
+                event.targets=game.players.slice(0);
+                event.targets.remove(player);
+                event.targets.sort(lib.sort.seat);
+                if(player.isLinked()) player.link();
+                "step 1"
+                if(event.targets.length){
+                    var target=event.targets.shift();
+                    if(!target.isLinked()){
+                        target.link();
+                    }
+                    event.redo();
+                }
+            }
 		},
 		boss_jizhi:{
 			audio:2,
@@ -1311,6 +1463,7 @@ character.boss={
 			forced:true,
 			priority:100,
 			audio:2,
+			mode:['identity','guozhan','boss','stone'],
 			filter:function(event,player){
 				return player.hp<=4
 			},
@@ -1362,6 +1515,51 @@ character.boss={
 				player.draw(4,false);
 			}
 		},
+		qiwu:{
+            audio:true,
+            trigger:{player:'useCard'},
+            forced:true,
+            filter:function(event,player){
+                return get.suit(event.card)=='club'&&player.hp<player.maxHp;
+            },
+            content:function(){
+                player.recover();
+            }
+        },
+		jizhen:{
+            trigger:{player:'phaseEnd'},
+            direct:true,
+            filter:function(event,player){
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i].hp<game.players[i].maxHp&&player!=game.players[i]){
+                        return true;
+                    }
+                }
+            },
+            content:function(){
+                "step 0"
+                var num=0;
+                for(var i=0;i<game.players.length;i++){
+                    if(!game.players[i].isLinked()&&player!=game.players[i]){
+                        num++;
+                    }
+                }
+                player.chooseTarget('是否发动【激阵】？',[1,2],function(card,player,target){
+                    return target.hp<target.maxHp&&player!=target;
+                }).ai=function(target){
+                    return ai.get.attitude(player,target);
+                }
+                "step 1"
+                if(result.bool){
+                    player.logSkill('jizhen',result.targets);
+                    game.asyncDraw(result.targets);
+                }
+            },
+            ai:{
+                expose:0.3,
+                threaten:1.3
+            }
+        },
 	},
 	translate:{
 		boss_chi:'魑',
@@ -1374,6 +1572,40 @@ character.boss={
 		boss_heiwuchang:'黑无常',
 		boss_luocha:'罗刹',
 		boss_yecha:'夜叉',
+
+		boss_liedixuande:'烈帝玄德',
+		boss_gongshenyueying:'工神月英',
+		boss_tianhoukongming:'天侯孔明',
+		boss_yuhuoshiyuan:'浴火士元',
+		boss_qiaokuijunyi:'巧魁儁乂',
+		boss_jiarenzidan:'佳人子丹',
+		boss_duanyuzhongda:'断狱仲达',
+		boss_juechenmiaocai:'绝尘妙才',
+
+		boss_baihumech:'机雷白虎',
+		boss_qinglongmech:'云屏青龙',
+		boss_xuanwumech:'灵甲玄武',
+		boss_zhuquemech:'炽羽朱雀',
+		boss_bianmech:'缚地狴犴',
+		boss_chiwenmech:'吞天螭吻',
+		boss_suannimech:'食火狻猊',
+		boss_yazimech:'裂石睚眦',
+
+		boss_skonghun:'控魂',
+		boss_skonghun_info:'出牌阶段开始时，若你已损失体力值不小于敌方角色数，你可以对所有敌方角色各造成1点雷电伤害，然后你恢复X点体力（X为受到伤害的角色数）',
+		boss_fanshi:'反噬',
+		boss_fanshi_info:'锁定技，结束阶段，你失去1点体力',
+		boss_xuanlei:'玄雷',
+		boss_xuanlei_info:'锁定技，准备阶段，令所有判定区内有牌的敌方角色受到1点雷电伤害',
+		boss_chiying:'持盈',
+		boss_chiying_info:'锁定技，每当己方角色受到多于1伤害时，你防止其余伤害',
+		boss_jingfan:'惊帆',
+		boss_jingfan_info:'锁定技，己方其他角色计算与敌方角色距离时，始终-1',
+
+        qiwu:'栖梧',
+        qiwu_info:'锁定技。每当你使用一张梅花牌，你回复一点体力',
+        jizhen:'激阵',
+        jizhen_info:'结束阶段，你可以令所至多两名已受伤角色摸一张牌',
 
 		boss_yushou:'驭兽',
 		boss_yushou_info:'出牌阶段开始时，视为你使用了一张[南蛮入侵]',
@@ -1447,7 +1679,7 @@ character.boss={
 		boss_konghun:'控心',
 		boss_konghun_info:'回合结束阶段，你可以指定一名敌人令其进入混乱状态（不受对方控制，并将队友视为敌人）直到下一回合开始',
 		yuehun:'月魂',
-		yuehun_info:'回合开始阶段，你可以回复一点体力并摸两张牌',
+		yuehun_info:'回合结束阶段，你可以回复一点体力并摸两张牌',
 		fengwu:'风舞',
 		fengwu_info:'出牌阶段限一次，可令除你外的所有角色依次对与其距离最近的另一名角色使用一张【杀】，无法如此做者失去1点体力。',
 		boss_wange:'笙歌',
@@ -1477,6 +1709,7 @@ character.boss={
 		// boss_yuhuo:'浴火',
 		// boss_yuhuo_info:'觉醒技，在你涅槃后，你获得技能【神威】、【朱羽】',
 		boss_tianyu:'天狱',
+		boss_tianyu_info:'锁定技，回合结束阶段，你解除横置状态，除你之外的所有角色进入横置状态',
 
 		boss_juejing:'绝境',
 		boss_juejing2:'绝境',

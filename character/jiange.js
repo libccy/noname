@@ -249,7 +249,7 @@ character.jiange={
         lingfeng:{
             trigger:{player:'phaseDrawBefore'},
             check:function(event,player){
-                for(i=0;i<game.players.length;i++){
+                for(var i=0;i<game.players.length;i++){
                     if(player!=game.players[i]){
                         if(ai.get.attitude(player,game.players[i])<0) return true;
                     }
@@ -455,17 +455,6 @@ character.jiange={
                 threaten:1.3
             }
         },
-        qiwu:{
-            audio:true,
-            trigger:{player:'useCard'},
-            forced:true,
-            filter:function(event,player){
-                return get.suit(event.card)=='club'&&player.hp<player.maxHp;
-            },
-            content:function(){
-                player.recover();
-            }
-        },
         tianyu:{
             trigger:{player:'phaseEnd'},
             direct:true,
@@ -553,7 +542,6 @@ character.jiange={
         jg_caozhen:'佳人子丹',
         jg_zhanghe:'巧魁儁乂',
         jg_simayi:'断狱仲达',
-        qiwu:'栖梧',
         tianyu:'天狱',
         zhinang:'智囊',
         jingmiao:'精妙',
@@ -579,7 +567,6 @@ character.jiange={
         biantian_info:'锁定技，准备阶段，你进行一次判定，若为红色，你可以选择至多三名角色进入“狂风”状态直到你的下一回合开始，若为黑桃，直到下个回合开始前，你处于“大雾”状态',
         jingmiao_info:'每当有一名其他角色使用无懈可击，你可以弃置其一张牌',
         zhinang_info:'准备阶段，你可以亮出牌堆顶的三张牌，你可以将其中锦囊或装备牌交给一名角色，然后将其余牌置入弃牌堆',
-        qiwu_info:'锁定技。每当你使用一张梅花牌，你回复一点体力',
         tianyu_info:'回合结束阶段，你可以将任意名未横置的其他角色横置',
         juechen:'绝尘',
         juechen_info:'每当你使用一张杀，可以弃置一名其他角色的一张牌（不能是杀的目标）',

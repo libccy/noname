@@ -1011,7 +1011,7 @@ character.refresh={
 				!lib.filter.autoRespondSha.call({player:player});
 			},
 			content:function(){
-				player.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀',
+				player.chooseToUse({name:'sha'},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀',
 					trigger.player).logSkill='zhuhai';
 			}
 		},

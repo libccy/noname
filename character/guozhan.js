@@ -12,5 +12,6 @@ character.guozhan={
 		hetaihou:['female','qun',3,['zhendu','qiluan']],
 		kongrong:['male','qun',3,['lirang','mingshi']],
 		dingfeng:['male','wu',4,['fenxun']],
+		panfeng:['male','qun',4,['kuangfu']],
 	},
 };

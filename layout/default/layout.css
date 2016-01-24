@@ -623,6 +623,15 @@ margin-bottom: 5px;
 	transform:scale(2);
 	font-size: 120px;
 }
+.damage.normal-font{
+	font-family: xinwei;
+    font-size: 30px;
+    top: calc(50% - 15px);
+}
+.player.minskin>.damage.normal-font{
+	font-size: 26px;
+    top: calc(50% - 13px);
+}
 .player[data-position='0']>.damage.dieidentity,
 .player:not(.dead)>.damage.dieidentity{
 	opacity: 0 !important

@@ -363,7 +363,12 @@ mode.stone={
 					}
 				}
 				if(source&&source.side!=this.side&&!source.isMin()){
-					source.draw(2,{drawDeck:1});
+					if(_status.mode=='deck'){
+						source.draw(2,{drawDeck:1});
+					}
+					else{
+						source.draw(2);
+					}
 					if(source.getActCount()>0){
 						source.actused--;
 					}
@@ -1176,6 +1181,23 @@ mode.stone={
 				else{
 					game.gameDraw(game.me);
 				}
+				"step 4"
+				game.me.chooseBool('是否置换手牌？');
+				"step 5"
+				if(result.bool){
+					var hs=game.me.get('h');
+					for(var i=0;i<hs.length;i++){
+						ui.discardPile.appendChild(hs[i]);
+					}
+					if(_status.mode=='deck'){
+						game.me.drawDeck(1,false);
+						game.me.directgain(get.cards(3));
+					}
+					else{
+						game.me.directgain(get.cards(4));
+					}
+				}
+				"step 6"
 				if(game.me.side){
 					game.stoneLoop(game.me);
 				}

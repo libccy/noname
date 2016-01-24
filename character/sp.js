@@ -40,6 +40,10 @@ character.sp={
 		sunru:['female','wu',3,['shixin','qingyi']],
 		lingju:['female','qun',3,['jieyuan','fenxin']],
 		lifeng:['male','shu',3,['tunchu','shuliang']],
+
+		// zhuling:['male','wei',4,['zhanyi']],
+		sunluyu:['female','wu',3,['meibu','mumu']],
+		hanba:['female','qun',4,['fentian','zhiri']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -58,6 +62,262 @@ character.sp={
 		caohong:['caoren'],
 	},
 	skill:{
+		meibu:{
+			trigger:{global:'phaseUseBegin'},
+			filter:function(event,player){
+				return event.player!=player&&get.distance(event.player,player,'attack')>1;
+			},
+			prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【魅步】？'
+			},
+			check:function(event,player){
+				if(ai.get.attitude(player,event.player)>=0) return false;
+				var e2=player.get('e','2');
+				if(e2){
+					if(e2.name=='tengjia') return true;
+					if(e2.name=='bagua') return	true;
+				}
+				return player.num('h','shan')>0;
+			},
+			content:function(){
+				var target=trigger.player;
+				player.line(target,'green');
+				target.addTempSkill('meibu_viewas','phaseAfter');
+				target.addTempSkill('meibu_range','phaseAfter');
+				target.storage.meibu=player;
+				target.marks.meibu=target.markCharacter(player,{
+					name:'魅步',
+					content:'锦囊牌均视为杀且'+get.translation(player)+'视为在攻击范围内'
+				});
+				game.addVideo('markCharacter',target,{
+					name:'魅步',
+					content:'锦囊牌均视为杀且'+get.translation(player)+'视为在攻击范围内',
+					id:'meibu',
+					target:player.dataset.position
+				});
+			},
+			ai:{
+				expose:0.2
+			},
+			subSkill:{
+				range:{
+					mod:{
+						targetInRange:function(card,player,target){
+							if(card.name=='sha'&&target==player.storage.meibu){
+								return true;
+							}
+						}
+					},
+					onremove:function(player){
+						if(player.marks.meibu){
+							player.marks.meibu.delete();
+							delete player.marks.meibu;
+							game.addVideo('unmark',player,'meibu');
+						}
+					},
+					trigger:{player:'useCard'},
+					forced:true,
+					popup:false,
+					filter:function(event,player){
+						return event.skill=='meibu_viewas'
+					},
+					content:function(){
+						player.removeSkill('meibu_viewas');
+						if(player.marks.meibu&&player.marks.meibu.info){
+							player.marks.meibu.info.content=player.marks.meibu.info.content.slice(8);
+						}
+					}
+				},
+				viewas:{
+					mod:{
+						cardEnabled:function(card,player){
+							if(card.name!='sha'&&get.type(card,'trick')=='trick') return false;
+						},
+						cardUsable:function(card,player){
+							if(card.name!='sha'&&get.type(card,'trick')=='trick') return false;
+						},
+						cardRespondable:function(card,player){
+							if(card.name!='sha'&&get.type(card,'trick')=='trick') return false;
+						},
+						cardSavable:function(card,player){
+							if(card.name!='sha'&&get.type(card,'trick')=='trick') return false;
+						},
+					},
+					enable:['chooseToUse','chooseToRespond'],
+					filterCard:function(card){
+						return get.type(card,'trick')=='trick';
+					},
+					viewAs:{name:'sha'},
+					check:function(){return 1},
+					ai:{
+						effect:{
+							target:function(card,player,target,current){
+								if(get.tag(card,'respondSha')&&current<0) return 0.8
+							}
+						},
+						respondSha:true,
+						order:4,
+						useful:-1,
+						value:-1
+					}
+				}
+			}
+		},
+		mumu:{
+			enable:'phaseUse',
+			// usable:1,
+			filterCard:function(card,player,target){
+				return card.name=='sha'||(get.type(card,'trick')=='trick'&&get.color(card)=='black');
+			},
+			check:function(card){
+				return 7-ai.get.value(card);
+			},
+			filterTarget:function(card,player,target){
+				if(target==player) return false;
+				return target.get('e','1')||target.get('e','2');
+			},
+			content:function(){
+				'step 0'
+				var e1=target.get('e','1');
+				var e2=target.get('e','2');
+				event.e1=e1;
+				event.e2=e2;
+				if(e1&&e2){
+					player.chooseControl('武器牌','防具牌').ai=function(){
+						if(player.get('e','2')){
+							return '武器牌';
+						}
+						return '防具牌';
+					}
+				}
+				else if(e1){
+					event.choice='武器牌';
+				}
+				else{
+					event.choice='防具牌';
+				}
+				'step 1'
+				var choice=event.choice||result.control;
+				if(choice=='武器牌'){
+					target.discard(event.e1);
+					player.draw();
+				}
+				else{
+					player.equip(event.e2);
+					target.$give(event.e2,player);
+				}
+			},
+			ai:{
+				order:8,
+				result:{
+					target:function(player,target){
+						if(target.get('e','2')&&!player.get('e','2')){
+							return -2;
+						}
+						return -1;
+					}
+				}
+			}
+		},
+		fentian:{
+			audio:2,
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				if(player.num('h')>=player.hp) return false;
+				for(var i=0;i<game.players.length;i++){
+					if(player!=game.players[i]&&get.distance(player,game.players[i],'attack')<=1){
+						return true;
+					}
+				}
+				return false;
+			},
+			intro:{
+				content:'cards',
+			},
+			init:function(player){
+				player.storage.fentian=[];
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('焚天：选择一名攻击范围内的角色，将其一张牌置于你的武将牌上',true,function(card,player,target){
+					return player!=target&&get.distance(player,target,'attack')<=1;
+				}).ai=function(target){
+					return -ai.get.attitude(player,target)
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('fentian',result.targets);
+					event.target=result.targets[0];
+					player.choosePlayerCard(result.targets[0],'he',true);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					event.target.$give(result.links,player);
+					event.target.lose(result.links,ui.special);
+					player.storage.fentian=player.storage.fentian.concat(result.links);
+					player.syncStorage('fentian');
+					setTimeout(function(){
+						player.markSkill('fentian');
+					},700);
+				}
+			},
+			mod:{
+				attackFrom:function(from,to,distance){
+					return distance-from.storage.fentian.length;
+				}
+			}
+		},
+		zhiri:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			unique:true,
+			audio:2,
+			skillAnimation:true,
+			animationColor:'fire',
+			filter:function(event,player){
+				return player.storage.fentian&&player.storage.fentian.length>=3&&!player.storage.zhiri;
+			},
+			content:function(){
+				player.loseMaxHp();
+				player.addSkill('xintan');
+				player.storage.zhiri=true;
+			}
+		},
+		xintan:{
+			enable:'phaseUse',
+			usable:1,
+			audio:2,
+			unique:true,
+			filter:function(event,player){
+				return player.storage.fentian&&player.storage.fentian.length>=2;
+			},
+			filterTarget:true,
+			prompt:'两张“焚”置入弃牌堆并令一名角色失去一点体力',
+			content:function(){
+				'step 0'
+				player.chooseCardButton(2,'两张“焚”置入弃牌堆并令'+get.translation(target)+'失去一点体力',player.storage.fentian,true);
+				'step 1'
+				if(result.bool){
+					player.$throw(result.links);
+					for(var i=0;i<result.links.length;i++){
+						player.storage.fentian.remove(result.links[i]);
+						ui.discardPile.appendChild(result.links[i]);
+					}
+					player.syncStorage('fentian');
+					target.loseHp();
+				}
+			},
+			ai:{
+				order:8,
+				result:{
+					target:-1
+				}
+			}
+		},
 		danji:{
 			skillAnimation:true,
 			trigger:{player:'phaseBegin'},
@@ -1089,7 +1349,8 @@ character.sp={
 			},
 			content:function(){
 				"step 0"
-				if(player.storage.kunfen){
+				if(player.storage.kunfen||
+				(lib.config.mode=='guozhan'&&player.hiddenSkills.contains('kunfen'))){
 					player.chooseBool('是否发动【困奋】？').ai=function(){
 						if(player.hp>3) return true;
 						if(player.hp==3&&player.num('h')<3) return true;
@@ -2405,26 +2666,60 @@ character.sp={
 		suishi:{
 			trigger:{global:'dying'},
 			forced:true,
+			popup:false,
 			priority:6,
 			filter:function(event,player){
-				return event.player!=player;
+				return event.player!=player&&event.parent.name=='damage'&&event.parent.source&&event.parent.source!=event.player;
 			},
 			content:function(){
-				player.draw();
+				'step 0'
+				var str;
+				if(trigger.parent.source==player){
+					str='随势：是否摸一张牌？';
+				}
+				else{
+					str='随势：是否令'+get.translation(player)+'摸一张牌？'
+				}
+				trigger.parent.source.chooseBool(str).ai=function(){
+					return ai.get.attitude(trigger.parent.source,player)>0;
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('suishi');
+					trigger.parent.source.line(player,'green');
+					player.draw();
+				}
 			},
 			group:'suishi2'
 		},
 		suishi2:{
 			trigger:{global:'dieAfter'},
 			forced:true,
+			popup:false,
 			check:function(){
 				return false;
 			},
 			filter:function(event,player){
-				return event.player!=player;
+				return event.player!=player&&event.source&&event.source!=player&&event.source!=event.player;
 			},
 			content:function(){
-				player.loseHp();
+				'step 0'
+				var str;
+				if(trigger.source==player){
+					str='随势：是否流失一点体力？';
+				}
+				else{
+					str='随势：是否令'+get.translation(player)+'流失一点体力？'
+				}
+				trigger.source.chooseBool(str).ai=function(){
+					return ai.get.attitude(trigger.source,player)<0;
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('suishi');
+					trigger.source.line(player,'green');
+					player.loseHp();
+				}
 			},
 		},
 		sijian:{
@@ -3727,7 +4022,32 @@ character.sp={
 					result.targets[0].draw(3);
 				}
 			}
-		}
+		},
+		kuangfu:{
+			trigger:{source:'damageEnd'},
+			direct:true,
+			audio:2,
+			filter:function(event){
+				return event.card&&event.card.name=='sha'&&event.player.num('e');
+			},
+			content:function(){
+				"step 0"
+				var neg=ai.get.attitude(player,trigger.player)<=0;
+				player.choosePlayerCard('e',trigger.player).ai=function(button){
+					if(neg){
+						return ai.get.buttonValue(button);
+					}
+					return 0;
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('kuangfu');
+					trigger.player.$give(result.links,player);
+					game.delay(2);
+					player.equip(result.links[0]);
+				}
+			}
+		},
 	},
 	translate:{
 		chenlin:'陈琳',
@@ -3785,7 +4105,25 @@ character.sp={
 		lingju:'灵雎',
 		lifeng:'李丰',
 		jsp_guanyu:'sp关羽',
+		zhuling:'朱灵',
+		sunluyu:'孙鲁育',
+		hanba:'旱魃',
+		panfeng:'潘凤',
 
+		kuangfu:'狂斧',
+		kuangfu_info:'每当你使用杀造成伤害，可以将对方的一张装备牌移到你的装备区',
+		xintan:'心惔',
+		xintan_info:'出牌阶段限一次，你可以将两张“焚”置入弃牌堆并选择一名角色，该角色失去一点体',
+		fentian:'焚天',
+		fentian_info:'锁定技，结束阶段开始时，若你的手牌数少于体力值，你须选择一名攻击范围内的角色，将其一张牌置于你的武将牌上，称为“焚”。锁定技，你的攻击范围+X（X为“焚”的数量）',
+		zhiri:'炙日',
+		zhiri_info:'觉醒技，准备阶段开始时，若“焚”数不小于3，你减1点体力上限，然后获得技能“心惔”（出牌阶段限一次，你可以将两张“焚”置入弃牌堆并选择一名角色，该角色失去一点体力）',
+		meibu:'魅步',
+		meibu_info:'一名其他角色的出牌阶段开始时，若你不在其攻击范围内，你可以令该角色的锦囊牌均视为【杀】，直到该角色以此法使用了一张【杀】或回合结束。若如此做，则直到回合结束，视为你在其攻击范围内。',
+		mumu:'穆穆',
+		mumu_info:'出牌阶段限一次，你可以弃置一张【杀】或黑色锦囊牌，然后选择一项：弃置场上一张武器牌，然后摸一张牌；或将场上的一张防具牌移动到你的装备区里（可替换原防具）',
+		zhanyi:'战意',
+		zhanyi_info:'出牌阶段限一次，你可以弃置一张牌并失去1点体力，然后根据你弃置的牌获得以下效果直到回合结束：基本牌，你可以将一张基本牌当任意一张基本牌使用或打出；锦囊牌，摸两张牌且你使用的牌无距离限制；装备牌，你使用【杀】指定目标角色后，其弃置两张牌。',
 		nuzhan:'怒斩',
 		nuzhan_info:'锁定技，你使用的由一张锦囊牌转化而来的【杀】不计入限制的使用次数；锁定技，你使用的由一张装备牌转化而来的【杀】的伤害值基数+1',
 		danji:'单骑',
@@ -3976,7 +4314,7 @@ character.sp={
 		duanxie_info:'出牌阶段限一次，你可以令一名其他角色横置武将牌，若如此做，你横置武将牌。',
 		xiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌并令你摸一张牌；2.受到你对其造成的1点伤害。',
 		sijian_info:'当你失去最后的手牌时，你可以弃置一名其他角色的一张牌。',
-		suishi_info:'锁定技。当一名其他角色进入濒死状态时，你摸一张牌；当一名其他角色死亡时，你失去1点体力。',
+		suishi_info:'每当其他角色进入濒死状态时，伤害来源可以令你摸一张牌；每当其他角色死亡时，伤害来源可以令你失去1点体力',
 		quji_info:'出牌阶段限一次，你可以弃置X张牌（X为你已损失的体力值），然后令至多X名已受伤的角色各回复1点体力。若你以此法弃置的牌中有黑色牌，你失去一点体力。',
 		junbing_info:'一名角色的结束阶段开始时，若其手牌数少于或者等于1，该角色可以摸一张牌。若如此做，该角色须将所有手牌交给你，然后你交给其等量的牌。',
 		shefu_info:'结束阶段开始时，你可以将一张手牌移出游戏，称为“伏兵”。然后为“伏兵”记录一个基本牌或锦囊牌名称(须与其他“伏兵”记录的名称均不同)。你的回合外，当有其他角色使用与你记录的“伏兵”牌名相同的牌时，你可以令此牌无效，然后将该“伏兵”置入弃牌堆。',

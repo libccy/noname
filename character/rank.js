@@ -254,6 +254,7 @@ window.characterRank={
         'quancong',
         'yxs_luocheng',
         'yxs_napolun',
+        'caoren',
     ],
     b:[
         'yxs_lishimin',
@@ -336,7 +337,7 @@ window.characterRank={
         'yxs_mingchenghuanghou',
         'pangtong',
         'yxs_libai',
-        'zhugeliangwolong',
+        'sp_zhugeliang',
         'shen_guanyu',
         'jiangfei',
         're_caocao',
@@ -371,7 +372,6 @@ window.characterRank={
         'huaxiong',
         'xiahouyuan',
         'liaohua',
-        'caoren',
         'huangzhong',
         'zhaoyun',
         'machao',
@@ -388,6 +388,7 @@ window.characterRank={
     ],
     d:[
         'menghuo',
+        'panfeng',
         'sunru',
         'zhoucang',
         'weiyan',

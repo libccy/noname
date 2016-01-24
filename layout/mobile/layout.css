@@ -64,9 +64,10 @@
     top: calc(100% - 150px);
     background: none !important;
     border:none !important;
+    border-radius: 0 !important;
     pointer-events: none;
 }
-#arena:not(.chess) .player[data-position='0']:not(.selected):not(.selectable):not(.glow){
+#arena:not(.chess) .player[data-position='0']:not(.selected):not(.selectedx):not(.selectable):not(.glow){
     box-shadow: none !important;
 }
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.avatar,

@@ -242,6 +242,9 @@ character.zhuogui={
                     result.targets[0].$give(1,player);
                     game.delay();
                 }
+            },
+            ai:{
+                threaten:1.7
             }
         },
         suoling:{

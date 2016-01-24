@@ -62,6 +62,8 @@ character.yijiang={
 		quancong:['male','wu',4,['yaoming']],
 		gongsunyuan:['male','qun',4,['huaiyi']],
 		guotufengji:['male','qun',3,['jigong','shifei']],
+
+		xin_yujin:['male','wei',4,['jieyue']],
 	},
 	perfectPair:{
 		wuguotai:['sunjian','sunshangxiang'],
@@ -80,6 +82,119 @@ character.yijiang={
 		guanping:['guanyu'],
 	},
 	skill:{
+		jieyue:{
+			group:'jieyue1'
+		},
+		jieyue1:{
+			audio:2,
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseCardTarget({
+					filterTarget:function(card,player,target){
+						return target!=player&&target.num('he')>0;
+					},
+					filterCard:true,
+					ai1:function(card){
+						return 7-ai.get.useful(card);
+					},
+					ai2:function(target){
+						return 1-ai.get.attitude(player,target);
+					},
+					prompt:'是否发动【节钺】？'
+				});
+				'step 1'
+				if(result.bool){
+					player.logSkill('jieyue1',result.targets);
+					player.discard(result.cards);
+					var target=result.targets[0];
+					event.target=target;
+					target.chooseCard('将一张牌置于'+get.translation(player)+'的武将牌上，或令其弃置你的一张牌','he').ai=function(card){
+						if(ai.get.attitude(player,target)>0){
+							return 8-ai.get.value(card);
+						}
+						var nh=player.num('h');
+						if(nh<=2){
+							return 6-ai.get.value(card);
+						}
+						if(nh<=3){
+							return 2-ai.get.value(card);
+						}
+						return 0;
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool&&result.cards&&result.cards.length){
+					event.target.$give(result.cards,player);
+					player.storage.jieyue2=result.cards[0];
+					event.target.lose(result.cards[0],ui.special);
+					player.syncStorage('jieyue2');
+					player.addSkill('jieyue2');
+				}
+				else if(event.target.num('he')){
+					player.discardPlayerCard(event.target,true);
+				}
+			},
+			ai:{
+				expose:0.1
+			}
+		},
+		jieyue2:{
+			mark:'card',
+			intro:{
+				content:'card'
+			},
+			audio:true,
+			enable:'chooseToUse',
+			filterCard:function(card){
+				return get.color(card)=='black';
+			},
+			viewAsFilter:function(player){
+				return player.num('h',{color:'black'})>0;
+			},
+			viewAs:{name:'wuxie'},
+			prompt:'将一张黑色手牌当无懈可击使用',
+			check:function(card){return 8-ai.get.value(card)},
+			threaten:1.2,
+			group:['jieyue3','jieyue4']
+		},
+		jieyue3:{
+			enable:['chooseToRespond'],
+			filterCard:function(card){
+				return get.color(card)=='red';
+			},
+			viewAs:{name:'shan'},
+			viewAsFilter:function(player){
+				if(!player.num('h',{color:'red'})) return false;
+			},
+			audio:true,
+			prompt:'将一张红色手牌当闪打出',
+			check:function(){return 1},
+			ai:{
+				respondShan:true,
+				skillTagFilter:function(player){
+					if(!player.num('h',{color:'red'})) return false;
+				},
+				result:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'respondShan')&&current<0) return 0.8
+					}
+				}
+			}
+		},
+		jieyue4:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			content:function(){
+				player.gain(player.storage.jieyue2,'gain2');
+				player.storage.jieyue2=null;
+				player.removeSkill('jieyue2');
+			}
+		},
 		jinjiu:{
 			mod:{
 				cardEnabled:function(card,player){
@@ -665,7 +780,10 @@ character.yijiang={
 						!trigger.player.skills.contains('fengnu')&&
 						!trigger.player.num('e','zhuge')){
 						var nh=trigger.player.num('h');
-						if(nh>=4){
+						if(player==trigger.player){
+							go=(player.num('h','sha')>0);
+						}
+						else if(nh>=4){
 							go=true;
 						}
 						else if(player.num('h','sha')){
@@ -5460,7 +5578,14 @@ character.yijiang={
 		hanhaoshihuan:'韩浩史涣',
 		chengpu:'程普',
 		gaoshun:'高顺',
+		xin_yujin:'新于禁',
 
+		jieyue:'节钺',
+		jieyue1:'节钺',
+		jieyue2:'节钺',
+		jieyue3:'节钺',
+		jieyue4:'节钺',
+		jieyue_info:'结束阶段开始时，你可以弃置一张手牌，然后令一名其他角色选择一项：将一张牌置于你的武将牌上；或令你弃置其一张牌。你武将牌上有牌时，你可以将红色手牌当【闪】、黑色的手牌当【无懈可击】使用或打出。准备阶段开始时，你获得你武将牌上的牌。',
 		xianzhen:'陷阵',
 		xianzhen_info:'出牌阶段，你可以与一名角色拼点。若你赢，你获得以下技能直到回合结束：无视与该角色的距离；无视防具且可使用任意数量的【杀】。若你没赢，你不能使用【杀】直到回合结束。每回合限一次',
 		jinjiu:'禁酒',

@@ -1205,7 +1205,10 @@ card.standard={
 			viewAs:{name:'sha'},
 			audio:true,
 			prompt:'将两张手牌当杀使用或打出',
-			check:function(card){return 6-ai.get.useful(card)},
+			check:function(card){
+				if(card.name=='sha') return 0;
+				return 6-ai.get.useful(card)
+			},
 			ai:{
 				respondSha:true,
 			}

@@ -113,7 +113,7 @@ character.swd={
 		swd_sikongyu:['swd_muyue'],
 		swd_fengyu:['swd_ziqiao'],
 		swd_zhaoyun:['swd_hengai','swd_yeyaxi','zhaoyun'],
-		swd_hengai:['zhugeliang','zhugeliangwolong'],
+		swd_hengai:['zhugeliang','sp_zhugeliang'],
 		swd_duanmeng:['swd_shangzhang'],
 		swd_shangzhang:['swd_situqiang'],
 		swd_tuwei:['swd_hengai'],
@@ -558,30 +558,6 @@ character.swd={
 					}
 				}
 			},
-		},
-		kuangfu:{
-			trigger:{source:'damageEnd'},
-			direct:true,
-			filter:function(event){
-				return event.card&&event.card.name=='sha'&&event.player.num('e');
-			},
-			content:function(){
-				"step 0"
-				var neg=ai.get.attitude(player,trigger.player)<=0;
-				player.choosePlayerCard('e',trigger.player).ai=function(button){
-					if(neg){
-						return ai.get.buttonValue(button);
-					}
-					return 0;
-				};
-				"step 1"
-				if(result.bool){
-					player.logSkill('kuangfu');
-					trigger.player.$give(result.links,player);
-					game.delay(2);
-					player.equip(result.links[0]);
-				}
-			}
 		},
 		huajin:{
 			enable:'phaseUse',
@@ -4456,7 +4432,7 @@ character.swd={
 			trigger:{player:'phaseAfter'},
 			frequent:true,
 			filter:function(event,player){
-				return get.cardCount(true,player)>=3&&event.parent.name!='lingwu';
+				return get.cardCount(true,player)>=player.hp&&event.parent.name!='lingwu';
 			},
 			content:function(){
 				player.phase();
@@ -7768,8 +7744,6 @@ character.swd={
 		yaotong_info:'当你的手牌数为奇数时，你可以将一张手牌当作杀或闪使用或打出，当你的手牌数为偶数时，你可以将一张手牌当作无懈可击使用',
 		pojian:'破茧',
 		pojian_info:'每当你失去最后一张手牌，可以从牌堆中获得一张装备牌并装备之',
-		kuangfu:'狂斧',
-		kuangfu_info:'每当你使用杀造成伤害，可以将对方的一张装备牌移到你的装备区',
 		huajin:'化金',
 		huajin2:'化金',
 		huajin_info:'出牌阶段限一次，你可以弃置一张牌令你造成的伤害+1，直到你的下一回合开始',
@@ -7878,7 +7852,7 @@ character.swd={
 		benlei2:'奔雷',
 		benlei_info:'你可以将三张牌当惊雷闪使用；每当你造成一次雷属性伤害，你回复一点体力',
 		lingwu:'灵舞',
-		lingwu_info:'回合结束后，若你在本回合内使用了至少3张牌，你可以进行一个额外的回合（不可重复发动）',
+		lingwu_info:'回合结束后，若你在本回合内使用的牌数不少于当前体力值，你可以进行一个额外的回合（不可重复发动）',
 		miejing:'灭境',
 		miejing_info:'限制技，你可以弃置所有黑色牌，然后令所有其他角色受到一点雷电伤害',
 		lingxin:'灵心',

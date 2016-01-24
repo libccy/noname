@@ -408,7 +408,7 @@ character.standard={
 			viewAsFilter:function(player){
 				if(!player.num('h',{color:'black'})) return false;
 			},
-			prompt:'将一张黑色牌当闪打出',
+			prompt:'将一张黑色手牌当闪打出',
 			check:function(){return 1},
 			ai:{
 				respondShan:true,

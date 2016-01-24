@@ -1,6 +1,6 @@
 window.config={
 	forbidai:['zuoci','caiwenji'],
-	forbidsingle:['menghuo','huanggai','caoren','machao','pangde','yanwen','xiahoudun','xuzhu','luxun',
+	forbidsingle:['menghuo','huanggai','machao','pangde','yanwen','xiahoudun','xuzhu','luxun',
 	'xuhuang','yujin','xiaoqiao','daqiao','zhangjiao','zhangbao'],
 	forbidall:['caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu',
 	'xiahouyuan','huangzhong','weiyan','dianwei','gongsunzan','zhangjiao'],
@@ -8,7 +8,7 @@ window.config={
 	forbidstone:['zhugedan','pal_xuanxiao'],
 	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
-	forbiddouble:['zhugedan','swd_kangnalishi','swd_nicole','dongzhuo','wutugu','jg_simayi','hs_siwangzhiyi','hs_ronghejuren'],
+	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','jg_simayi','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	layoutfixed:['chess'],
 	all:{
 		mode:['identity','guozhan','versus','boss','chess','stone'],
@@ -253,7 +253,7 @@ window.config={
 	sort:'type_sort',
 
 	cards:['standard','ex','extra','refresh'],
-	characters:['standard','wind','fire','woods','mountain','refresh','yijiang'],
+	characters:['standard','shenhua','refresh','yijiang'],
 	plays:[],
 	banned:[],
 	bannedcards:[],

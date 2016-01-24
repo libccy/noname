@@ -1646,7 +1646,7 @@ character.yxs={
 			trigger:{player:'recoverEnd'},
 			check:function(event,player){
 				if(event.parent.name=='taoyuan'&&event.parent.player==player){
-					console.log(1);return false;
+					return false;
 				}
 				var num=0;
 				var ef;

@@ -775,7 +775,8 @@ character.gujian={
 				}
 			},
 			ai:{
-				expose:0.2
+				expose:0.2,
+				threaten:1.3
 			}
 		},
 		yangming:{
@@ -804,7 +805,8 @@ character.gujian={
 						return 1;
 					}
 				},
-				order:6
+				order:6,
+				threaten:1.3
 			}
 		},
 		yangming2:{
