@@ -559,6 +559,15 @@ mode.guozhan={
 					// this.node.identity.dataset.color=this.identity;
 					this.setIdentity(this.identity);
 					this.ai.shown=1;
+
+					if(_status.clickingidentity&&_status.clickingidentity[0]==this){
+						for(var i=0;i<_status.clickingidentity[1].length;i++){
+							_status.clickingidentity[1][i].delete();
+							_status.clickingidentity[1][i].style.transform='';
+						}
+						delete _status.clickingidentity;
+					}
+					game.addVideo('setIdentity',this,this.identity);
 				}
 				var skills;
 				switch(num){

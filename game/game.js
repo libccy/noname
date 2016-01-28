@@ -10078,6 +10078,14 @@
 					console.log(player);
 				}
 			},
+			setIdentity:function(player,identity){
+				if(player&&identity){
+					player.setIdentity(identity);
+				}
+				else{
+					console.log(num);
+				}
+			},
 			showCharacter:function(player,num){
 				if(player&&player.classList){
 					switch(num){
@@ -16876,6 +16884,7 @@
 				if(_status.dragged) return;
 				_status.clicked=true;
 				if(!game.getIdentityList) return;
+				if(_status.video) return;
 				if(_status.clickingidentity){
 					for(var i=0;i<_status.clickingidentity[1].length;i++){
 						_status.clickingidentity[1][i].delete();

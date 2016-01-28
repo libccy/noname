@@ -292,6 +292,13 @@ mode.identity={
 					game.players[i].isZhu=true;
 				}
 			}
+			if(_status.clickingidentity){
+				for(var i=0;i<_status.clickingidentity[1].length;i++){
+					_status.clickingidentity[1][i].delete();
+					_status.clickingidentity[1][i].style.transform='';
+				}
+				delete _status.clickingidentity;
+			}
 		},
 		checkResult:function(){
 			if(game.zhu.isAlive()&&get.population('fan')+get.population('nei')>0) return;
@@ -787,6 +794,13 @@ mode.identity={
 					if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
 					game.delay(2);
 					game.zhu.playerfocus(1000);
+					if(_status.clickingidentity&&_status.clickingidentity[0]==game.zhu){
+						for(var i=0;i<_status.clickingidentity[1].length;i++){
+							_status.clickingidentity[1][i].delete();
+							_status.clickingidentity[1][i].style.transform='';
+						}
+						delete _status.clickingidentity;
+					}
 				}
 				if(!this.node.dieidentity){
 					var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
