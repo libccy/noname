@@ -676,7 +676,22 @@
 					// 	unfrequent:true,
 					// },
 					show_card_prompt:{
-						name:'出牌显示卡牌名',
+						name:'显示出牌提示',
+						init:true,
+						unfrequent:true,
+					},
+					hide_card_prompt_basic:{
+						name:'隐藏基本牌提示',
+						init:false,
+						unfrequent:true,
+					},
+					hide_card_prompt_equip:{
+						name:'隐藏装备牌提示',
+						init:false,
+						unfrequent:true,
+					},
+					show_phase_prompt:{
+						name:'显示阶段提示',
 						init:true,
 						unfrequent:true,
 					},
@@ -1054,6 +1069,14 @@
 						else{
 							map.round_menu_func.show();
 							map.show_roundmenu.show();
+						}
+						if(config.show_card_prompt){
+							map.hide_card_prompt_basic.show();
+							map.hide_card_prompt_equip.show();
+						}
+						else{
+							map.hide_card_prompt_basic.hide();
+							map.hide_card_prompt_equip.hide();
 						}
 					},
 				}
@@ -3283,7 +3306,9 @@
 					event.num=player.num('h')-game.checkMod(player,player.hp,'maxHandcard',player.get('s'));
 					if(event.num<=0) event.finish();
 					else{
-						player.popup('弃牌阶段');
+						if(lib.config.show_phase_prompt){
+							player.popup('弃牌阶段');
+						}
 					}
 					event.trigger('phaseDiscard');
 					"step 1"
@@ -4072,8 +4097,11 @@
 						player.popup(event.card.name);
 					}
 					else if(lib.config.show_card_prompt){
-						//&&get.type(event.card)!='equip'
-						player.popup(event.card.name,'metal');
+						if(get.type(event.card)=='equip'&&lib.config.hide_card_prompt_equip);
+						else if(get.type(event.card)=='basic'&&lib.config.hide_card_prompt_basic);
+						else{
+							player.popup(event.card.name,'metal');
+						}
 					}
 					if(event.audio===false){
 						cardaudio=false;
@@ -4543,7 +4571,7 @@
 							player.checkShow(event.skill);
 						}
 					}
-					else if(lib.config.show_card_prompt){
+					else if(lib.config.show_card_prompt&&!lib.config.hide_card_prompt_basic){
 						player.popup(card.name,'wood');
 					}
 					if(cardaudio&&event.parent.parent.parent.name=='useCard'){
@@ -9101,7 +9129,7 @@
 				priority:20,
 				popup:false,
 				content:function(){
-					if(!player.noPhaseDelay){
+					if(!player.noPhaseDelay&&lib.config.show_phase_prompt){
 						player.popup('回合开始');
 					}
 					if(lib.config.glow_phase){
