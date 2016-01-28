@@ -374,6 +374,7 @@ character.yxs={
 				return 8-ai.get.value(card);
 			},
 			filterTarget:function(card,player,target){
+				if(target.hp==Infinity) return false;
 				if(target.hp>player.hp) return true;
 				if(target.hp<player.hp&&target.hp<target.maxHp) return true;
 				return false;
@@ -1245,7 +1246,7 @@ character.yxs={
 				if(event.dialog){
 					event.dialog.close();
 				}
-				if(result.control!='cancel'){
+				if(result.control&&result.control.indexOf('2')!=-1){
 					player.logSkill('sheshi');
 					game.log(player,'指定的花色为',result.control);
 					var suit=result.control.slice(0,result.control.length-1);

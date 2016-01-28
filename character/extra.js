@@ -1216,6 +1216,7 @@ character.extra={
 		dawu_info:'回合结束阶段，你可以弃掉X枚“星”指定X名角色：直到你的下回合开始，防止他们受到的除雷电伤害外的一切伤害。',
 		kuangfeng:'狂风',
 		kuangfeng2:'狂风',
+		kuangfeng2_bg:'风',
 		// kuangfeng2_info:'已获得狂风标记',
 		kuangfeng3:'狂风',
 		kuangfeng_info:'回合结束阶段，你可以弃掉1枚“星”指定一名角色：直到你的下回合开始，该角色每次受到的火焰伤害+1。',

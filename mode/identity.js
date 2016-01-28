@@ -348,7 +348,7 @@ mode.identity={
 			next.removePlayer=function(){
 				return game.players.randomGet(game.me,game.zhu);
 			};
-			next.ai=function(player,list,list2){
+			next.ai=function(player,list,list2,back){
 				if(_status.event.zhongmode){
 					if(get.config('double_character')){
 						player.init(list[0],list[1]);
@@ -408,6 +408,13 @@ mode.identity={
 					}
 					else{
 						player.init(list[0]);
+					}
+				}
+				if(back){
+					list.remove(player.name);
+					list.remove(player.name2);
+					for(var i=0;i<list.length;i++){
+						back.push(list[i]);
 					}
 				}
 			}
@@ -720,8 +727,7 @@ mode.identity={
 				}
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.zhu&&game.players[i]!=game.me){
-						event.ai(game.players[i],
-							event.list.splice(0,get.config('choice_'+game.players[i].identity)))
+						event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
 					}
 				}
 			}

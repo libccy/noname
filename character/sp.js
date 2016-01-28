@@ -44,6 +44,7 @@ character.sp={
 		// zhuling:['male','wei',4,['zhanyi']],
 		sunluyu:['female','wu',3,['meibu','mumu']],
 		hanba:['female','qun',4,['fentian','zhiri']],
+		zumao:['male','wu',4,['yinbing','juedi']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -62,6 +63,133 @@ character.sp={
 		caohong:['caoren'],
 	},
 	skill:{
+		yinbing:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			init:function(player){
+				player.storage.yinbing=[];
+			},
+			filter:function(event,player){
+				return player.num('he',{type:'basic'})<player.num('he');
+			},
+			marktext:'兵',
+			content:function(){
+				"step 0"
+				player.chooseCard([1,player.num('he')-player.num('he',{type:'basic'})],'he','是否发动【引兵】？',function(card){
+					return get.type(card)!='basic';
+				}).ai=function(card){
+					return 6-ai.get.value(card);
+				};
+				"step 1"
+				if(result.bool){
+					player.$give(result.cards,player,false);
+					player.logSkill('yinbing');
+					game.log(player,'将',result.cards,'置于武将牌上');
+					player.storage.yinbing=player.storage.yinbing.concat(result.cards);
+					player.lose(result.cards,ui.special);
+					player.markSkill('yinbing');
+					player.syncStorage('yinbing');
+				}
+			},
+			intro:{
+				content:'cards',
+				onunmark:function(storage,player){
+					if(storage&&storage.length){
+						for(var i=0;i<storage.length;i++){
+							ui.discardPile.appendChild(storage[i]);
+						}
+						player.$throw(storage);
+						delete player.storage.yinbing;
+					}
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(card.name=='sha'||card.name=='juedou'){
+							if(current<0) return 1.2;
+						}
+					}
+				},
+				threaten:1.2
+			},
+			subSkill:{
+				discard:{
+					trigger:{player:'damageEnd'},
+					forced:true,
+					filter:function(event,player){
+						return event.card&&player.storage.yinbing.length>0&&
+						(event.card.name=='sha'||event.card.name=='juedou');
+					},
+					content:function(){
+						'step 0'
+						player.chooseCardButton('将一张引兵牌置入弃牌堆',true,player.storage.yinbing);
+						'step 1'
+						var card=result.links[0];
+						player.storage.yinbing.remove(card);
+						ui.discardPile.appendChild(card);
+						player.$throw(card);
+						game.log(player,'将',card,'置入弃牌堆');
+						player.syncStorage('yinbing');
+						if(player.storage.yinbing.length==0){
+							player.unmarkSkill('yinbing');
+						}
+					}
+				}
+			},
+			group:'yinbing_discard'
+		},
+		juedi:{
+			trigger:{player:'phaseBegin'},
+			filter:function(event,player){
+				return player.storage.yinbing&&player.storage.yinbing.length>0;
+			},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【绝地】？',function(card,player,target){
+					return player.hp>=target.hp;
+				}).ai=function(target){
+					if(target==player) return 0.5;
+					var att=ai.get.attitude(player,target);
+					if(att<2) return 0;
+					if(target.hp==1&&att>2){
+						att+=2;
+					}
+					if(player.num('j','lebu')){
+						if(target.hp==target.maxHp) return att-2;
+						return att-1;
+					}
+					if(target.hp==target.maxHp) return 0;
+					if(player.num('h')<player.hp-1){
+						return att-3;
+					}
+					return att-2;
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('juedi',result.targets);
+					if(result.targets[0]==player){
+						player.$throw(player.storage.yinbing,1000);
+						player.draw(player.storage.yinbing.length);
+						while(player.storage.yinbing.length){
+							ui.discardPile.appendChild(player.storage.yinbing.shift());
+						}
+						player.syncStorage('yinbing');
+						player.unmarkSkill('yinbing');
+					}
+					else{
+						var target=result.targets[0];
+						game.log(target,'获得了',player.storage.yinbing);
+						target.recover();
+						target.gain(player.storage.yinbing.slice(0),'gain2');
+						player.storage.yinbing.length=0;
+					}
+					player.syncStorage('yinbing');
+					player.unmarkSkill('yinbing');
+				}
+			}
+		},
 		meibu:{
 			trigger:{global:'phaseUseBegin'},
 			filter:function(event,player){
@@ -4124,7 +4252,12 @@ character.sp={
 		sunluyu:'孙鲁育',
 		hanba:'旱魃',
 		panfeng:'潘凤',
+		zumao:'祖茂',
 
+		yinbing:'引兵',
+		yinbing_info:'结束阶段开始时，你可以将至少一张非基本牌置于武将牌上。每当你受到【杀】或【决斗】的伤害后，你将一张“引兵牌”置入弃牌堆。',
+		juedi:'绝地',
+		juedi_info:'准备阶段开始时，若你有“引兵牌”，你可以选择一项：1.将这些牌置入弃牌堆并摸等量的牌；2.令一名体力值不大于你的其他角色回复1点体力并获得这些牌。 ',
 		kuangfu:'狂斧',
 		kuangfu_info:'每当你使用杀造成伤害，可以将对方的一张装备牌移到你的装备区',
 		xintan:'心惔',

@@ -656,25 +656,6 @@ mode.chess={
 			}
 		},
 		playerproto:{
-			finishGame:function(){
-				'step 0'
-				while(ui.controls.length){
-					ui.controls[0].close();
-				}
-				while(ui.dialogs.length){
-					ui.dialogs[0].close();
-				}
-				'step 1'
-				if(_status.friendDied<_status.enemyDied){
-					game.over(true);
-				}
-				else if(_status.friendDied>_status.enemyDied){
-					game.over(false);
-				}
-				else{
-					game.over();
-				}
-			},
 			replaceChessPlayer:function(){
 				'step 0'
 				if(get.config('additional_player')){
@@ -2141,15 +2122,14 @@ mode.chess={
 					finishGameBr.classList.add('finish_game');
 					ui.finishGame=ui.create.system('结束游戏',function(){
 						ui.finishGame.remove();
-						var next=game.createEvent('finish_game');
-						next.content=lib.element.playerproto.finishGame;
-						if(_status.paused){
-							if(_status.event.next.length>1){
-								_status.event.next.length=0;
-								_status.event.next.push(next);
-							}
-							game.uncheck();
-							game.resume();
+						if(_status.friendDied<_status.enemyDied){
+							game.forceOver(true);
+						}
+						else if(_status.friendDied>_status.enemyDied){
+							game.forceOver(false);
+						}
+						else{
+							game.forceOver();
 						}
 					});
 					ui.finishGame.classList.add('finish_game');

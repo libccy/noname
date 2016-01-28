@@ -24,10 +24,12 @@
 			'牌堆管理',
 			'战棋1v1、对决4v4',
 			'年兽、守卫剑阁',
-			'注1：年兽在挑战模式，守卫剑阁在对决模式菜单中的游戏模式里选',
+			'炉石模式新卡',
+			'修复身份、国战开将过少导致不能游戏的bug',
+			'注1：年兽在挑战模式，守卫剑阁、4v4在对决模式菜单中的游戏模式里选',
 			'注2：此版本去掉了diy捉鬼和剑阁武将包，未来将进入diy武将包',
 			'注3：此版本更改了手气卡代码，若要关闭需重新设置',
-			'注4：安卓版预计一周内更新'
+			'注4：安卓版大约两周后更新'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -695,7 +697,7 @@
 					},
 					remember_dialog:{
 						name:'记住对话框位置',
-						init:true,
+						init:false,
 						unfrequent:true,
 					},
 					reset_dialog:{
@@ -1643,6 +1645,22 @@
 							unlimited:'无限',
 						}
 					},
+					continue_game:{
+						name:'显示再战',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('continue_game',bool,this._link.config.mode);
+							if(get.config('continue_game')){
+								if(!ui.continue_game&&_status.over){
+									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
+								}
+							}
+							else if(ui.continue_game){
+								ui.continue_game.close();
+								delete ui.continue_game;
+							}
+						}
+					},
 					dierestart:{
 						name:'死亡后显示重来',
 						init:true,
@@ -1656,22 +1674,6 @@
 							else if(ui.restart){
 								ui.restart.close();
 								delete ui.restart;
-							}
-						}
-					},
-					continue_game:{
-						name:'显示继续游戏',
-						init:false,
-						onclick:function(bool){
-							game.saveConfig('continue_game',bool,this._link.config.mode);
-							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over){
-									ui.continue_game=ui.create.control('继续',game.reloadCurrent);
-								}
-							}
-							else if(ui.continue_game){
-								ui.continue_game.close();
-								delete ui.continue_game;
 							}
 						}
 					},
@@ -1879,6 +1881,22 @@
 							unlimited:'无限',
 						}
 					},
+					continue_game:{
+						name:'显示再战',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('continue_game',bool,this._link.config.mode);
+							if(get.config('continue_game')){
+								if(!ui.continue_game&&_status.over){
+									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
+								}
+							}
+							else if(ui.continue_game){
+								ui.continue_game.close();
+								delete ui.continue_game;
+							}
+						}
+					},
 					dierestart:{
 						name:'死亡后显示重来',
 						init:true,
@@ -1892,22 +1910,6 @@
 							else if(ui.restart){
 								ui.restart.close();
 								delete ui.restart;
-							}
-						}
-					},
-					continue_game:{
-						name:'显示继续游戏',
-						init:false,
-						onclick:function(bool){
-							game.saveConfig('continue_game',bool,this._link.config.mode);
-							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over){
-									ui.continue_game=ui.create.control('继续',game.reloadCurrent);
-								}
-							}
-							else if(ui.continue_game){
-								ui.continue_game.close();
-								delete ui.continue_game;
 							}
 						}
 					},
@@ -2513,7 +2515,7 @@
 			'<div style="margin:10px">构筑</div><ul style="margin-top:0"><li>点击右上角的卡组管理构建卡组<li>一套卡组共30张牌，由法术和随从牌构成，每个同名卡牌最多带两张'+
 			'<li>卡组管理器中，随从右上角的x/y表示登场状态为x牌y血'+
 			'<li>游戏开始时，双方摸三张牌并从牌库中获得一张牌，并可选择将手牌置换一次'+
-			'<li>摸牌阶段，主将少摸一张牌，并从卡组中获得一张牌'+
+			'<li>每当主将摸X张牌时，若X至少为2，则其中的X-1张牌从牌堆中获得，1张牌从牌库中获得'+
 			'<li>每名角色使用一套卡组，卡组用完后会重新补满'+
 			'<li>卡组与职业绑定，每个职业有一个专属技能，每回合限用一次，消耗两点行动值</ul>'+
 			'<div style="margin:10px">职业技能</div><ul style="margin-top:0"><li>祭司：召唤一个随机图腾'+
@@ -2525,12 +2527,12 @@
 			'<li>圣骑士：召唤一名士兵'+
 			'<li>猎人：对敌方主将造成一点伤害'+
 			'<li>德鲁伊：视为使用一张不计入出杀次数的杀</ul>'+
-			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+2'+
-			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至2并重新累加'+
+			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+1'+
+			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
 			'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 			'随从与其他所有角色相互距离基数为1<li>'+
 			'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
-			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）'+
+			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为从牌库中获得一张法术牌'+
 			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
 			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
 		},
@@ -4454,6 +4456,9 @@
 						game.playAudio('effect','draw');
 					}
 					if(event.drawDeck){
+						if(event.drawDeck>num){
+							event.drawDeck=num;
+						}
 						num-=event.drawDeck;
 					}
 					if(event.log!=false){
@@ -5319,7 +5324,10 @@
 							this.unmarkSkill('ghujia');
 						}
 					}
-					if(lib.config.layout=='default'&&this.maxHp>14){
+					if(this.maxHp==Infinity){
+						hp.innerHTML='∞';
+					}
+					else if(lib.config.layout=='default'&&this.maxHp>14){
 						hp.innerHTML=this.hp+'/'+this.maxHp;
 						hp.classList.add('text');
 					}
@@ -6361,13 +6369,17 @@
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i].drawDeck){
+						else if(typeof arguments[i]=='object'&&arguments[i].drawDeck!=undefined){
 							next.drawDeck=arguments[i].drawDeck;
 						}
 					}
 					if(next.num==undefined) next.num=1;
 					if(next.num<=0) _status.event.next.remove(next);
 					next.content=lib.element.playerproto.draw;
+					if(lib.config.mode=='stone'&&_status.mode=='deck'&&
+					next.drawDeck==undefined&&!next.player.isMin()&&next.num>1){
+						next.drawDeck=1;
+					}
 					return next;
 				},
 				discard:function(){
@@ -7188,11 +7200,28 @@
 						}
 					},time)
 				},
+				isEnemyOf:function(){
+					return !this.isFriendOf.apply(this,arguments);
+				},
+				isFriendOf:function(player){
+					if(typeof this.side=='boolean'&&typeof player.side=='boolean'){
+						return this.side==player.side;
+					}
+					if(lib.config.mode=='guozhan'){
+						if(this.identity=='unknown'||this.identity=='ye') return false;
+						if(player.identity=='unknown'||player.identity=='ye') return false;
+						return this.identity==player.identity;
+					}
+					return this==player;
+				},
 				isAlive:function(){
 					return this.classList.contains('dead')==false;
 				},
 				isDead:function(){
 					return this.classList.contains('dead');
+				},
+				isDamaged:function(){
+					return this.hp<this.maxHp;
 				},
 				isLinked:function(){
 					return this.classList.contains('linked');
@@ -9199,7 +9228,26 @@
 				delay:0.5,
 				content:function(){
 					"step 0"
-					player.draw();
+					if(lib.config.mode=='stone'&&_status.mode=='deck'&&
+					!player.isMin()&&get.type(cards[0]).indexOf('stone')==0){
+						var list=[];
+						for(var i=0;i<player.deckCards.length;i++){
+							if(get.type(player.deckCards[i])=='stonecard'){
+								list.push(player.deckCards[i]);
+							}
+						}
+						if(list.length){
+							var choice=list.randomGet();
+							player.deckCards.remove(choice);
+							player.gain(choice,'draw');
+						}
+						else{
+							player.draw({drawDeck:1})
+						}
+					}
+					else{
+						player.draw();
+					}
 					"step 1"
 					for(var i=0;i<cards.length;i++){
 						ui.discardPile.appendChild(cards[i]);
@@ -11228,6 +11276,26 @@
 			}
 			return ui.create.card(ui.special).init([suit,number,name,nature]);
 		},
+		forceOver:function(bool){
+			_status.event.next.length=0;
+			var next=game.createEvent('finish_game');
+			next.bool=bool;
+			next.content=function(){
+				'step 0'
+				while(ui.controls.length){
+					ui.controls[0].close();
+				}
+				while(ui.dialogs.length){
+					ui.dialogs[0].close();
+				}
+				'step 1'
+				game.over(event.bool);
+			};
+			if(_status.paused){
+				game.uncheck();
+				game.resume();
+			}
+		},
 		over:function(result){
 			var i,j,k,num,table,tr,td,dialog;
 			_status.over=true;
@@ -11261,6 +11329,9 @@
 						_status.coin+=10;
 					}
 					_status.coin+=20;
+					if(_status.additionalReward){
+						_status.coin+=_status.additionalReward();
+					}
 					switch(lib.config.mode){
 						case 'identity':{
 							switch(game.me.identity){
@@ -11571,8 +11642,37 @@
 			if(game.controlOver){
 				game.controlOver();return;
 			}
-			if(get.config('continue_game')){
-				ui.continue_game=ui.create.control('继续',game.reloadCurrent);
+			if(lib.config.mode=='boss'){
+				ui.create.control('再战',function(){
+					var pointer=game.boss;
+					var map={boss:game.me==game.boss,links:[]};
+					for(var iwhile=0;iwhile<10;iwhile++){
+						pointer=pointer.nextSeat;
+						if(pointer==game.boss){
+							break;
+						}
+						map.links.push(pointer.name);
+					}
+					game.saveConfig('continue_name_boss',map);
+					localStorage.setItem(lib.configprefix+'directstart',true);
+					game.reload();
+				});
+			}
+			else if(lib.config.mode=='versus'){
+				if(_status.mode=='standard'){
+					ui.create.control('再战',function(){
+						game.saveConfig('continue_name_versus',{
+							friend:_status.friendBackup,
+							enemy:_status.enemyBackup,
+							color:_status.color
+						});
+						localStorage.setItem(lib.configprefix+'directstart',true);
+						game.reload();
+					});
+				}
+			}
+			else if(get.config('continue_game')){
+				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 			}
 			if(!ui.restart){
 				ui.restart=ui.create.control('restart',game.reload);
@@ -11751,6 +11851,7 @@
 				range=get.select(event.selectButton);
 				if(range[0]!=range[1]||range[0]>1) auto=false;
 				for(i=0;i<dialog.buttons.length;i++){
+					if(dialog.buttons[i].classList.contains('unselectable')) continue;
 					if(event.filterButton(dialog.buttons[i],player)&&lib.filter.buttonIncluded(dialog.buttons[i])){
 						if(ui.selected.buttons.length<range[1]){
 							dialog.buttons[i].classList.add('selectable');
@@ -12457,6 +12558,9 @@
 							lib.translate[i+'_'+j+'_bg']=lib.skill[i].subSkill[j].marktext;
 						}
 					}
+				}
+				if(lib.skill[i].marktext){
+					lib.translate[i+'_bg']=lib.skill[i].marktext;
 				}
 				if(i[0]=='_'){
 					lib.skill.global.add(i);
@@ -16479,6 +16583,9 @@
 						}
 						if(infoitem[2]>14){
 							node.node.hp.innerHTML=infoitem[2];
+							if(infoitem[2]==Infinity){
+								node.node.hp.innerHTML='∞';
+							}
 							node.node.hp.classList.add('text');
 						}
 						else{
@@ -19458,6 +19565,27 @@
 		},
 	};
 	var get={
+		zhu:function(player,skill){
+			if(typeof player=='string'){
+				skill=player;
+				player=null;
+			}
+			if(lib.config.mode=='identity'){
+				if(skill&&!game.zhu.get('s').contains(skill)) return null;
+				if(game.zhu.isZhu) return game.zhu;
+			}
+			else if(lib.config.mode=='versus'&&_status.mode=='four'){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isZhu){
+						if(skill&&!(game.players[i].get('s').contains(skill))) continue;
+						if(!player||player.side==game.players[i].side){
+							return game.players[i];
+						}
+					}
+				}
+			}
+			return null;
+		},
 		config:function(item){
 			if(!lib.config.mode_config[lib.config.mode]) return;
 			return lib.config.mode_config[lib.config.mode][item];
@@ -21393,7 +21521,7 @@
 						card={name:arguments[i]}
 					}
 				}
-				source.useCard(card,game.me);
+				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),game.me);
 			},
 			rank:function(){
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
@@ -21419,7 +21547,7 @@
 			},
 			gx:function(name,target){
 				target=target||game.me;
-				var fire=false,thunder=false;
+				var nature=null;
 				var suit=null;
 				var suits=['club','spade','diamond','heart'];
 				for(var i=0;i<suits.length;i++){
@@ -21429,52 +21557,28 @@
 						break;
 					}
 				}
+				if(name.indexOf('red')==0){
+					name=name.slice(3);
+					suit=['diamond','heart'].randomGet();
+				}
+				if(name.indexOf('black')==0){
+					name=name.slice(5);
+					suit=['spade','club'].randomGet();
+				}
+
 				if(name=='huosha'){
 					name='sha';
-					fire=true;
+					nature='fire';
 				}
 				else if(name=='leisha'){
 					name='sha';
-					thunder=true;
+					nature='thunder';
 				}
-				for(var i=0;i<ui.cardPile.childNodes.length;i++){
-					if(fire&&ui.cardPile.childNodes[i].nature!='fire'){
-						continue;
-					}
-					if(thunder&&ui.cardPile.childNodes[i].nature!='thunder'){
-						continue;
-					}
-					if(suit&&ui.cardPile.childNodes[i].suit!=suit){
-						continue;
-					}
-					if(ui.cardPile.childNodes[i].name==name){
-						var card=ui.cardPile.childNodes[i];
-						target.node.handcards1.appendChild(card);
-						game.check();
-						target.update();
-						ui.updatehl();
-						return;
-					}
-				}
-				for(var i=0;i<ui.discardPile.childNodes.length;i++){
-					if(fire&&ui.cardPile.childNodes[i].nature!='fire'){
-						continue;
-					}
-					if(thunder&&ui.cardPile.childNodes[i].nature!='thunder'){
-						continue;
-					}
-					if(suit&&ui.cardPile.childNodes[i].suit!=suit){
-						continue;
-					}
-					if(ui.discardPile.childNodes[i].name==name){
-						var card=ui.discardPile.childNodes[i];
-						target.node.handcards1.appendChild(card);
-						game.check();
-						target.update();
-						ui.updatehl();
-						return;
-					}
-				}
+				var card=game.createCard(name,suit,null,nature);
+				target.node.handcards1.appendChild(card);
+				game.check();
+				target.update();
+				ui.updatehl();
 			},
 			ge:function(){
 				cheat.g('zhuge');

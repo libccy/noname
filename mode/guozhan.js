@@ -210,11 +210,18 @@ mode.guozhan={
 			var next=game.createEvent('chooseCharacter',false);
 			next.showConfig=true;
 			next.addPlayer=true;
-			next.ai=function(player,list){
+			next.ai=function(player,list,back){
 				for(var i=0;i<list.length-1;i++){
 					for(var j=i+1;j<list.length;j++){
 						if(lib.character[list[i]][1]==lib.character[list[j]][1]){
 							player.init(list[i],list[j],false);
+							if(back){
+								list.remove(player.name1);
+								list.remove(player.name2);
+								for(var i=0;i<list.length;i++){
+									back.push(list[i]);
+								}
+							}
 							return;
 						}
 					}
@@ -412,7 +419,7 @@ mode.guozhan={
 				event.list.remove(game.me.name2);
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.me){
-						event.ai(game.players[i],event.list.splice(0,parseInt(get.config('choice_num'))))
+						event.ai(game.players[i],event.list.splice(0,parseInt(get.config('choice_num'))),event.list);
 					}
 				}
 				for(var i=0;i<game.players.length;i++){

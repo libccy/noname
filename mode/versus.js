@@ -298,6 +298,16 @@ mode.versus={
 					weiboss:[],shuboss:[],
 				}
 				event.list=list;
+				if(lib.characterPack.boss){
+					for(var i in lib.characterPack.boss){
+						if(!lib.character[i]&&lib.characterPack.boss[i][4]){
+							if(lib.characterPack.boss[i][4].contains('jiangeboss')||
+							lib.characterPack.boss[i][4].contains('jiangemech')){
+								lib.character[i]=lib.characterPack.boss[i];
+							}
+						}
+					}
+				}
 				for(var i in lib.character){
 					if(lib.character[i][4]){
 						if(lib.character[i][4].contains('jiangeboss')){
@@ -596,6 +606,15 @@ mode.versus={
 			next.showConfig=true;
 			next.content=function(){
 				"step 0"
+				if(lib.config.continue_name_versus){
+					_status.friend=lib.config.continue_name_versus.friend;
+					_status.enemy=lib.config.continue_name_versus.enemy;
+					_status.color=lib.config.continue_name_versus.color;
+					game.additionaldead=[];
+					event.goto(1);
+					game.saveConfig('continue_name_versus');
+					return;
+				}
 				event.check=function(){
 					this.dialog.classList.add('fullwidth');
 					this.dialog.classList.add('fullheight');
@@ -907,6 +926,9 @@ mode.versus={
 				};
 				game.pause();
 				"step 1"
+				_status.friendBackup=_status.friend.slice(0);
+				_status.enemyBackup=_status.enemy.slice(0);
+
 				_status.friendDied=[];
 				_status.enemyDied=[];
 				_status.totalCount=_status.friend.length;

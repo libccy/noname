@@ -1081,7 +1081,7 @@ character.xianjian={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('runxin');
+					player.logSkill('runxin',result.targets);
 					result.targets[0].recover();
 				}
 			},

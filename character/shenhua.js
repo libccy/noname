@@ -525,9 +525,14 @@ character.shenhua={
 			intro:{
 				content:'cards'
 			},
-			mod:{
-				globalFrom:function(from,to,distance){
-					if(from.storage.tuntian) return distance-from.storage.tuntian.length;
+			group:'tuntian_dist',
+			subSkill:{
+				dist:{
+					mod:{
+						globalFrom:function(from,to,distance){
+							if(from.storage.tuntian) return distance-from.storage.tuntian.length;
+						}
+					}
 				}
 			},
 			ai:{
@@ -708,20 +713,19 @@ character.shenhua={
 			forceaudio:true,
 			enable:'phaseUse',
 			filter:function(event,player){
-				if(!game.zhu) return false;
-				if(!game.zhu.isZhu) return false;
-				return (player!=game.zhu&&game.zhu.skills.contains('zhiba')&&
-					player.group=='wu'&&player.num('h')>0&&game.zhu.num('h')>0);
+				var zhu=get.zhu('zhiba');
+				if(!zhu) return false;
+				return (player!=zhu&&player.group=='wu'&&player.num('h')>0&&zhu.num('h')>0);
 			},
 			filterTarget:function(card,player,target){
-				return target==game.zhu;
+				return target.isZhu&&target.get('s').contains('zhiba');
 			},
 			usable:1,
 			content:function(){
 				"step 0"
 				player.chooseToCompare(target,function(card){
 					var player=get.owner(card);
-					if(player!=game.zhu&&ai.get.attitude(player,game.zhu)>0){
+					if(player!=target&&ai.get.attitude(player,target)>0){
 						return -get.number(card);
 					}
 					return get.number(card);
@@ -738,10 +742,10 @@ character.shenhua={
 				},
 				expose:0.2,
 				result:{
-					target:function(player){
+					target:function(player,target){
 						if(player.num('h')<=player.hp) return false;
 						var maxnum=0;
-						var cards2=game.zhu.get('h');
+						var cards2=target.get('h');
 						for(var i=0;i<cards2.length;i++){
 							if(cards2[i].number>maxnum){
 								maxnum=cards2[i].number;
@@ -1432,15 +1436,15 @@ character.shenhua={
 			forceaudio:true,
 			trigger:{player:'judgeEnd'},
 			filter:function(event,player){
-				if(!game.zhu) return false;
-				if(!game.zhu.isZhu) return false;
-				return (player!=game.zhu&&game.zhu.skills.contains('songwei')&&player.group=='wei'&&get.color(event.result.card)=='black');
+				var zhu=get.zhu('songwei');
+				if(!zhu) return false;
+				return (player!=zhu&&player.group=='wei'&&get.color(event.result.card)=='black');
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,game.zhu)>0;
+				return ai.get.attitude(player,get.zhu('songwei'))>0;
 			},
 			content:function(){
-				game.zhu.draw();
+				get.zhu('songwei').draw();
 			}
 		},
 		duanliang:{
@@ -1795,12 +1799,14 @@ character.shenhua={
 			forceaudio:true,
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
-				if(!game.zhu) return false;
-				if(!game.zhu.isZhu) return false;
-				return (player!=game.zhu&&game.zhu.skills.contains('baonue')&&player.group=='qun')&&game.zhu.hp<game.zhu.maxHp;
+				var zhu=get.zhu('baonue');
+				if(!zhu) return false;
+				return (player!=zhu&&player.group=='qun'&&zhu.hp<zhu.maxHp);
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,game.zhu)>0;
+				var zhu=get.zhu('baonue');
+				if(!zhu) return false;
+				return ai.get.attitude(player,zhu)>0;
 			},
 			content:function(){
 				"step 0"
@@ -1810,7 +1816,10 @@ character.shenhua={
 				})
 				"step 1"
 				if(result.bool){
-					game.zhu.recover();
+					var zhu=get.zhu('baonue');
+					if(zhu){
+						zhu.recover();
+					}
 				}
 			}
 		},
@@ -2912,15 +2921,16 @@ character.shenhua={
 				player.$give(cards,targets[0]);
 			},
 			filter:function(event,player){
-				if(!game.zhu) return false;
-				if(!game.zhu.isZhu) return false;
-				return (player!=game.zhu&&game.zhu.skills.contains('huangtian')&&player.group=='qun')
+				var zhu=get.zhu('huangtian');
+				if(!zhu) return false;
+				return (player!=zhu&&player.group=='qun'&&
+				(player.num('h','shan')+player.num('h','shandian')>0))
 			},
 			filterCard:function(card){
 				return (card.name=='shan'||card.name=='shandian')
 			},
 			filterTarget:function(card,player,target){
-				return target==game.zhu;
+				return target.isZhu&&target.get('s').contains('huangtian');
 			},
 			usable:1,
 			forceaudio:true,

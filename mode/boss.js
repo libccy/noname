@@ -156,6 +156,9 @@ mode.boss={
 						player.node.hp.classList.add('text');
 						player.node.hp.dataset.condition='';
 						player.node.hp.innerHTML=info[2];
+						if(info[2]==Infinity){
+							player.node.hp.innerHTML='∞';
+						}
 						player.setIdentity(player.name);
 						player.node.identity.dataset.color=info[5];
 						bosslistlinks[cfg]=player;
@@ -204,14 +207,19 @@ mode.boss={
 					bosslist.show();
 				},200);
 				game.me=ui.create.player();
-				game.chooseCharacter(function(target){
-					if(event.current){
-						event.current.classList.remove('highlight');
-					}
-					event.current=target;
-					game.save('current',target.name);
-					target.classList.add('highlight');
-				});
+				if(lib.config.continue_name_boss){
+					event.noslide=true;
+				}
+				else{
+					game.chooseCharacter(function(target){
+						if(event.current){
+							event.current.classList.remove('highlight');
+						}
+						event.current=target;
+						game.save('current',target.name);
+						target.classList.add('highlight');
+					});
+				}
 				if(lib.storage.test){
 					event.current.classList.remove('highlight');
 					if(event.current.nextSibling&&event.current.nextSibling.classList.contains('player')){
@@ -239,14 +247,20 @@ mode.boss={
 				var boss=ui.create.player().init(event.current.name);
 				game.boss=boss;
 				boss.side=true;
-				boss.classList.add('bossplayer');
-				boss.classList.add('highlight');
-				boss.animate('bossing');
-				boss.node.hp.animate('start');
-				boss.style.left=(rect.left-ui.arena.offsetLeft)+'px';
-				boss.style.top=(rect.top-ui.arena.offsetTop)+'px';
+				if(!event.noslide){
+					// boss.classList.add('bossplayer');
+					// boss.classList.add('highlight');
+					boss.animate('bossing');
+					boss.node.hp.animate('start');
+					boss.style.left=(rect.left-ui.arena.offsetLeft)+'px';
+					boss.style.top=(rect.top-ui.arena.offsetTop)+'px';
+				}
 				boss.setIdentity('zhu');
 				boss.identity='zhu';
+				if(lib.config.continue_name_boss){
+					result=lib.config.continue_name_boss;
+					game.saveConfig('continue_name_boss');
+				}
 				for(var i=0;i<result.links.length;i++){
 					var player=ui.create.player(ui.arena).init(result.links[i]).animate('start');
 					player.setIdentity('cai');
@@ -380,7 +394,9 @@ mode.boss={
 				_status.videoInited=true,
 				info.boss=(game.me==game.boss);
 				game.addVideo('init',null,info);
-
+				if(game.bossinfo.init){
+					game.bossinfo.init();
+				}
 				"step 4"
 				event.trigger('gameStart');
 				game.gameDraw(game.boss);
@@ -650,6 +666,53 @@ mode.boss={
 				if(player==game.boss&&game.boss.name!='boss_yecha'&&game.boss.name!='boss_luocha'){
 					return false;
 				}
+			},
+			init:function(){
+				_status.additionalReward=function(){
+					return 500;
+				}
+			}
+		},
+		boss_nianshou:{
+			chongzheng:99,
+			init:function(){
+				game.boss.node.action.classList.add('freecolor');
+				game.boss.node.action.style.opacity=1;
+				game.boss.node.action.style.letterSpacing='4px';
+				game.boss.node.action.style.marginRight=0;
+				game.boss.node.action.style.fontFamily='huangcao';
+				game.boss.node.action.innerHTML='';
+				_status.additionalReward=function(){
+					return Math.round(Math.pow(_status.damageCount,2.4))*2;
+				}
+				var time=360;
+				var interval=setInterval(function(){
+					if(_status.over){
+						clearInterval(interval);
+						return;
+					}
+					var sec=time%60;
+					if(sec<10){
+						sec='0'+sec;
+					}
+					game.boss.node.action.innerHTML=Math.floor(time/60)+':'+sec;
+					if(time<=0){
+						delete _status.additionalReward;
+						if(typeof _status.coin=='number'){
+							if(game.me==game.boss){
+								_status.coin+=Math.round(Math.pow(_status.damageCount,2.4));
+							}
+							else{
+								_status.coin+=Math.round(Math.pow(_status.damageCount,1.8));
+							}
+						}
+						game.forceOver(true);
+						clearInterval(interval);
+					}
+					time--;
+				},1000);
+				_status.damageCount=0;
+				ui.damageCount=ui.create.system('伤害: 0',null,true);
 			}
 		},
 		boss_zhangjiao:{
