@@ -75,10 +75,6 @@
     top:auto;
     bottom:65px;
     height:calc(100% - 383px);
-    /*min-height: 207px;*/
-    background: rgba(0,0,0,0.2);
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
-	border-radius:8px;
     animation: dialog_start2 0.5s;
 	-webkit-animation: dialog_start2 0.5s;
 }

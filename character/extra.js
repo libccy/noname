@@ -517,7 +517,9 @@ character.extra={
 			trigger:{global:'dieAfter'},
 			forced:true,
 			content:function(){
-				player.loseHp(player.hp);
+				if(player.hp<Infinity){
+					player.loseHp(player.hp);
+				}
 				player.removeSkill('wuhun2');
 			}
 		},

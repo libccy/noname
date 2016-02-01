@@ -66,6 +66,7 @@ character.sp={
 		yinbing:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
+			audio:2,
 			init:function(player){
 				player.storage.yinbing=[];
 			},
@@ -145,6 +146,7 @@ character.sp={
 				return player.storage.yinbing&&player.storage.yinbing.length>0;
 			},
 			direct:true,
+			audio:2,
 			content:function(){
 				'step 0'
 				player.chooseTarget('是否发动【绝地】？',function(card,player,target){
@@ -293,7 +295,7 @@ character.sp={
 		},
 		mumu:{
 			enable:'phaseUse',
-			// usable:1,
+			usable:1,
 			filterCard:function(card,player,target){
 				return card.name=='sha'||(get.type(card,'trick')=='trick'&&get.color(card)=='black');
 			},

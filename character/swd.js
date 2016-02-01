@@ -851,7 +851,7 @@ character.swd={
 				"step 0"
 				var save=false;
 				if(ai.get.attitude(player,trigger.target)>2){
-					if(player.num('h','shan')||player.num('e','2')||
+					if(player.num('h','shan')||player.get('e','2')||
 					trigger.target.hp==1||player.hp>trigger.target.hp+1){
 						if(!trigger.target.num('h','shan')||trigger.target.num('h')<player.num('h')){
 							save=true;

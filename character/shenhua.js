@@ -166,7 +166,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				var fang=player.hp>=2&&player.num('h')<=player.hp+1;
-				player.chooseTarget('是否发动放权？',function(card,player,target){
+				player.chooseTarget('是否发动【放权】？',function(card,player,target){
 					return target!=player;
 				}).ai=function(target){
 					if(!fang) return -1;
@@ -877,7 +877,7 @@ character.shenhua={
 			},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('he','是否发动悲歌？');
+				var next=player.chooseToDiscard('he','是否发动【悲歌】？');
 				next.ai=ai.get.unuseful2;
 				next.logSkill='beige';
 				"step 1"
@@ -1957,7 +1957,7 @@ character.shenhua={
 						if(player==target&&get.subtype(card)=='equip2'){
 							if(ai.get.equipValue(card)<=8) return 0;
 						}
-						if(target.num('e','2')) return;
+						if(target.get('e','2')) return;
 						if(player.skills.contains('unequip')) return;
 						if(get.tag(card,'respondShan')) return [0.5,0];
 					}
@@ -2039,13 +2039,16 @@ character.shenhua={
 				if(player.storage.niepan) return false;
 			},
 			content:function(){
+				'step 0'
 				player.hp=Math.min(3,player.maxHp);
 				player.discard(player.get('hej'));
 				player.draw(3);
 				player.unmarkSkill('niepan');
-				if(player.classList.contains('linked')) player.link();
-				if(player.classList.contains('turnedover')) player.turnOver();
 				player.storage.niepan=true;
+				'step 1'
+				if(player.classList.contains('linked')) player.link();
+				'step 2'
+				if(player.classList.contains('turnedover')) player.turnOver();
 			},
 			ai:{
 				skillTagFilter:function(player){
@@ -2150,7 +2153,7 @@ character.shenhua={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget([1,trigger.num],function(card,player,target){
+				player.chooseTarget('是否发动【节命】？',[1,trigger.num],function(card,player,target){
 					return target.num('h')<Math.min(target.maxHp,5);
 				}).ai=function(target){
 					var att=ai.get.attitude(_status.event.player,target);
@@ -2470,7 +2473,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动新雷击？').ai=function(target){
+				player.chooseTarget('是否发动【雷击·新】？').ai=function(target){
 					return ai.get.damageEffect(target,player,player,'thunder');
 				};
 				"step 1"
@@ -2800,7 +2803,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动雷击？').ai=function(target){
+				player.chooseTarget('是否发动【雷击】？').ai=function(target){
 					return ai.get.damageEffect(target,player,player);
 				};
 				"step 1"
@@ -3116,7 +3119,7 @@ character.shenhua={
 		hongyan:'红颜',
 		buqu:'不屈',
 		leiji:'雷击',
-		spleiji:'新雷击',
+		spleiji:'雷击·新',
 		guidao:'鬼道',
 		huangtian:'黄天',
 		huangtian2:'黄天',

@@ -481,8 +481,13 @@ mode.versus={
 				event.list=[];
 				event.filterChoice=function(name){
 					if(get.config('enable_all')) return false;
-					if(['yuanshu','re_yuanshu','zhangxingcai','hetaiyou','wenpin','yuji','sunluyu',
-					'sp_zhaoyun','sp_diaochan','sp_pangtong','sp_caoren'].contains(name)){
+					if(['yuanshu','re_yuanshu','zhangxingcai','hetaiyou','wenpin','yuji',
+					'xunyu','lusu','guanping','zhangzong','zhoutai','sp_zhangjiao','zhangjiao',
+					'shixie','zhanglu','chenlin','mayunlu','yangxiu','zhugeke','chengyu',
+					'zhangbao','zhangliang','sunhao','wutugu','zhugeguo','liuzan','lingcao',
+					'sunru','lingju','lifeng','hanba','sunluyu','zhuling',
+					'sp_zhaoyun','sp_diaochan','sp_pangtong','sp_caoren','sp_daqiao',
+					'sp_ganning','sp_zhangfei','sp_xiahoudun'].contains(name)){
 						return true;
 					}
 					if(lib.characterPack.refresh[name]) return false;

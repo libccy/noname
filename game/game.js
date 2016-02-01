@@ -419,6 +419,42 @@
 							}
 						}
 					},
+					// background_color_music:{
+					// 	name:'背景色',
+					// 	init:'black',
+					// 	item:{
+					// 		blue:'蓝色',
+					// 		black:'黑色',
+					// 	},
+					// 	onclick:function(color){
+					// 		game.saveConfig('background_color_music',color);
+					// 		document.body.dataset.background_color_music=color;
+					// 	}
+					// },
+					// background_color_wood:{
+					// 	name:'背景色',
+					// 	init:'blue',
+					// 	item:{
+					// 		blue:'蓝色',
+					// 		black:'黑色',
+					// 	},
+					// 	onclick:function(color){
+					// 		game.saveConfig('background_color_wood',color);
+					// 		document.body.dataset.background_color_wood=color;
+					// 	}
+					// },
+					// theme_color_music:{
+					// 	name:'主题色',
+					// 	init:'black',
+					// 	item:{
+					// 		blue:'蓝色',
+					// 		black:'黑色',
+					// 	},
+					// 	onclick:function(color){
+					// 		game.saveConfig('theme_color_music',color);
+					// 		document.body.dataset.theme_color_music=color;
+					// 	}
+					// },
 					ui_zoom:{
 						name:'界面缩放',
 						unfrequent:true,
@@ -663,6 +699,20 @@
 							}
 							else{
 								ui.arena.classList.remove('slim_player');
+							}
+						}
+					},
+					reduce_radius:{
+						name:'减小圆角',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('reduce_radius',bool);
+							if(bool){
+								ui.window.classList.add('reduce_radius');
+							}
+							else{
+								ui.window.classList.remove('reduce_radius');
 							}
 						}
 					},
@@ -1019,6 +1069,21 @@
 							ui.arena.dataset.identity_font=font;
 						}
 					},
+					cardtext_font:{
+						name:'卡牌字体',
+						init:'default',
+						unfrequent:true,
+						item:{
+							xinwei:'新魏',
+							huangcao:'黄草',
+							xiaozhuan:'小篆',
+							default:'默认',
+						},
+						onclick:function(font){
+							game.saveConfig('cardtext_font',font);
+							ui.arena.dataset.cardtext_font=font;
+						}
+					},
 					global_font:{
 						name:'界面字体',
 						init:'default',
@@ -1078,6 +1143,24 @@
 							map.hide_card_prompt_basic.hide();
 							map.hide_card_prompt_equip.hide();
 						}
+						// if(config.theme=='woodden'&&config.image_background=='default'){
+						// 	map.background_color_wood.show();
+						// }
+						// else{
+						// 	map.background_color_wood.hide();
+						// }
+						// if(config.theme=='music'&&config.image_background=='default'){
+						// 	map.background_color_music.show();
+						// }
+						// else{
+						// 	map.background_color_music.hide();
+						// }
+						// if(config.theme=='music'){
+						// 	map.theme_color_music.show();
+						// }
+						// else{
+						// 	map.theme_color_music.hide();
+						// }
 					},
 				}
 			},
@@ -1511,7 +1594,7 @@
 							map.player_number.show();
 							map.enhance_zhu.show();
 							map.auto_identity.show();
-							if(config.player_number=='8'){
+							if(config.player_number!='2'){
 								map.double_nei.show();
 							}
 							else{
@@ -2556,7 +2639,7 @@
 			'随从与其他所有角色相互距离基数为1<li>'+
 			'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
 			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为从牌库中获得一张法术牌'+
-			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀或决斗的目标'+
+			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀目标'+
 			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
 		},
 		setPopped:function(node,func,width,height){
@@ -12461,7 +12544,7 @@
 				}
 			}
 		},
-		asyncDraw:function(players,num){
+		asyncDraw:function(players,num,drawDeck){
 			for(var i=0;i<players.length;i++){
 				var num2=1;
 				if(typeof num=='number'){
@@ -12470,7 +12553,12 @@
 				else if(Array.isArray(num)){
 					num2=num[i];
 				}
-				players[i].draw(num2,false);
+				if(drawDeck&&drawDeck.drawDeck){
+					players[i].draw(num2,false,drawDeck);
+				}
+				else{
+					players[i].draw(num2,false);
+				}
 				players[i].$draw(num2);
 			}
 		},
@@ -13748,14 +13836,27 @@
 				if(lib.config.slim_player){
 					ui.arena.classList.add('slim_player');
 				}
+				if(lib.config.reduce_radius){
+					ui.window.classList.add('reduce_radius');
+				}
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
 				if(!lib.config.target_shake){
 					ui.arena.classList.add('no_target_shake');
 				}
+				// var themeentry='background_color_'+lib.config.theme;
+				// if(lib.config[themeentry]){
+				// 	document.body.dataset[themeentry]=lib.config[themeentry];
+				// }
+				// themeentry='theme_color_'+lib.config.theme;
+				// if(lib.config[themeentry]){
+				// 	document.body.dataset[themeentry]=lib.config[themeentry];
+				// }
+
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
+				ui.arena.dataset.cardtext_font=lib.config.cardtext_font||'default';
 				ui.arena.dataset.global_font=lib.config.global_font||'default';
 				// ui.arena.dataset.font_size=lib.config.font_size||'16';
 				ui.arena.dataset.glow_phase=lib.config.glow_phase;
@@ -16857,6 +16958,7 @@
 				for(var i=0;i<lib.card.list.length;i++){
 					if(lib.card[lib.card.list[i][2]]){
 						if(lib.config.bannedcards.contains(lib.card.list[i][2])) continue;
+						if(game.bannedcards&&game.bannedcards.contains(lib.card.list[i][2])) continue;
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
 					}
 				}

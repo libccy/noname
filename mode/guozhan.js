@@ -869,7 +869,7 @@ mode.guozhan={
 				if(from.identity==toidentity&&toidentity!='ye'){
 					return 4+difficulty;
 				}
-				if(lib.character[from.name1][1]==toidentity){
+				if(from.identity=='unknown'&&lib.character[from.name1][1]==toidentity){
 					if(get.totalPopulation(toidentity)+1<=get.population()/2) return 4+difficulty;
 				}
 				var groups=[];
@@ -902,7 +902,7 @@ mode.guozhan={
 				if(to==game.me) difficulty=(2-get.difficulty())*1.5;
 				if(from==to) return 5+difficulty;
 				if(from.identity==to.identity&&from.identity!='unknown'&&from.identity!='ye') return 5+difficulty;
-				if(lib.character[from.name1][1]==to.identity){
+				if(from.identity=='unknown'&&lib.character[from.name1][1]==to.identity){
 					if(get.totalPopulation(to.identity)+1<=get.population()/2) return 4+difficulty;
 				}
 				var toidentity=to.identity;

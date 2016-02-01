@@ -54,7 +54,7 @@
 .player .actcount.hp{
 	top: 18px;
 	left: 15px;
-	width: 130px;
+	width: 120px;
 	bottom: auto;
 	right: auto;
 	text-align: left;
@@ -75,6 +75,9 @@
 }
 .player.fullskin2 .avatar{
 	border-radius:8px 0 0 8px;
+}
+#window.reduce_radius .player.fullskin2 .avatar{
+	border-radius:4px 0 0 4px;
 }
 .player.fullskin2 .avatar2{
 	top:10px;
@@ -381,7 +384,6 @@
 .dialog.withbg{
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
-	border-radius:8px;
 	min-height:240px;
 }
 .dialog>.bar{

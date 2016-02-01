@@ -61,6 +61,9 @@
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 }
+#window.reduce_radius>.dialog{
+    border-radius:4px;
+}
 #arena>.dialog.slim:not(.center){
     top:40px;
 }
@@ -138,6 +141,10 @@
     background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
+}
+#window.reduce_radius .player.playergrid,
+#window.reduce_radius .player.obstacle{
+    border-radius:4px;
 }
 .player.playerblank{
     background: none;

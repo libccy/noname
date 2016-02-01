@@ -1,7 +1,12 @@
 html{
 	color: white;
 	text-shadow: black 0 0 2px;
+}
+body{
 	background: url('grid.png'),linear-gradient(#333333, #222222) fixed;
+}
+body[data-background_color_music='blue']{
+	background: url('grid.png'),linear-gradient(#6c7989, #434b55) fixed;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
 .player.unseen .equips:not(*:empty),.menu,#splash>div,
@@ -10,6 +15,40 @@ html{
 	background-image: linear-gradient(#4b4b4b, #464646);
 	border-radius: 8px;
 }
+
+#window.reduce_radius #system>div>div,
+#window.reduce_radius #mebg,
+#window.reduce_radius .control,
+#window.reduce_radius .player,
+#window.reduce_radius .card,
+#window.reduce_radius .avatar,
+#window.reduce_radius .avatar2,
+#window.reduce_radius .button,
+#window.reduce_radius #window>.dialog.popped,
+#window.reduce_radius .player.unseen .equips:not(*:empty),
+#window.reduce_radius .menu,#splash>div,
+#window.reduce_radius.mobile:not(.chess) .player[data-position='0'] .equips{
+	border-radius: 4px;
+}
+
+body[data-background_color_music='blue'] #system>div>div,
+body[data-background_color_music='blue'] #mebg,
+body[data-background_color_music='blue'] .control,
+body[data-background_color_music='blue'] .player,
+body[data-background_color_music='blue'] .card,
+body[data-background_color_music='blue'] .avatar,
+body[data-background_color_music='blue'] .avatar2,
+body[data-background_color_music='blue'] .button,
+body[data-background_color_music='blue'] #window>.dialog.popped,
+body[data-background_color_music='blue'] .player.unseen .equips:not(*:empty),
+body[data-background_color_music='blue'] .menu,#splash>div,
+body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-position='0'] .equips{
+	background-image: linear-gradient(#6c7989, #434b55);
+}
+
+
+
+
 /*.player.current_action{
 	background-image: linear-gradient(rgba(57, 123, 4,1), rgb(48, 103, 3));
 }*/

@@ -447,6 +447,9 @@ div:not(.handcards)>.card>.info>span,
 	border-radius:6px;
 	transition: opacity 0.3s;
 }
+#window.reduce_radius>.dialog.popped{
+	border-radius:4px;
+}
 #window>.dialog.popped>.bar{
 	display:none !important;
 }
@@ -723,6 +726,10 @@ margin-bottom: 5px;
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(31, 82, 131, 1);
 }
+.hp.actcount>div.overflow:not(.lost){
+	background: rgb(162, 162, 162);
+	border: 1px solid rgb(117, 117, 117);
+}
 .hp.actcount>.lost{
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(31, 82, 131, 1);
@@ -881,7 +888,7 @@ margin-bottom: 5px;
 	animation: dialog_start2 0.3s;
 	-webkit-animation: dialog_start2 0.3s;
 }
-.dialog.removing{top: 100px}
+/*.dialog.removing{top: 100px}*/
 .card.drawing{
 	animation: drawing 1s;
 	animation-fill-mode: forwards;
@@ -919,6 +926,9 @@ margin-bottom: 5px;
     top:10px;
     left:10px;
     background-size:cover;
+}
+#window.reduce_radius #me>.fakeme.avatar{
+	border-radius:4px;
 }
 
 .card.removing{transform:scale(0);}
@@ -1042,6 +1052,9 @@ div:hover>.intro{opacity: 1;}
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 }
+#window.reduce_radius .shadowed{
+	border-radius: 4px;
+}
 .underline,.underlinenode{
 	padding:3px;
 	width:auto;
@@ -1093,6 +1106,18 @@ div:hover>.intro{opacity: 1;}
 #arena[data-identity_font='huangcao'] .player .identity>div{
 	font-family: 'huangcao','xinwei';
 }
+
+
+#arena[data-cardtext_font='xiaozhuan'] .card div:not(.info):not(.background){
+	font-family: 'xiaozhuan';
+}
+#arena[data-cardtext_font='xinwei'] .card div:not(.info):not(.background){
+	font-family: 'xinwei';
+}
+#arena[data-cardtext_font='huangcao'] .card div:not(.info):not(.background){
+	font-family: 'huangcao','xinwei';
+}
+
 .player .identity>div{
 	margin: auto;
 	position: relative;
@@ -1429,6 +1454,11 @@ div:hover>.wunature{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 	min-height:240px;
+}
+#window.reduce_radius .dialog.scroll1,
+#window.reduce_radius .dialog.scroll2,
+#window.reduce_radius .dialog.withbg{
+	border-radius:4px;
 }
 
 /*--------动画--------*/

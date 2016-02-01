@@ -326,7 +326,7 @@ mode.identity={
 				}
 			}
 			else if(game.me.identity=='nei'){
-				if(get.population('fan')+get.population('zhu')+get.population('zhong')==0){
+				if(game.players.length==1){
 					game.over(true);
 				}
 				else{
@@ -334,7 +334,8 @@ mode.identity={
 				}
 			}
 			else{
-				if(get.population('fan')+get.population('zhong')>0&&game.zhu.classList.contains('dead')){
+				if((get.population('fan')+get.population('zhong')>0||get.population('nei')>1)&&
+					game.zhu.classList.contains('dead')){
 					game.over(true);
 				}
 				else{
@@ -441,9 +442,33 @@ mode.identity={
 				}
 				else{
 					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
-					if(get.config('player_number')=='8'&&get.config('double_nei')){
-						identityList.remove('fan');
-						identityList.push('nei');
+					if(get.config('double_nei')){
+						switch(get.config('player_number')){
+							case '8':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case '7':
+							identityList.remove('zhong');
+							identityList.push('nei');
+							break;
+							case '6':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case '5':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case '4':
+							identityList.remove('zhong');
+							identityList.push('nei');
+							break;
+							case '3':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+						}
 					}
 				}
 
@@ -995,7 +1020,7 @@ mode.identity={
 								if(from==to) return 10;
 								if(from.ai.friend.contains(to)) return 5;
 								if(get.population('fan')+get.population('zhong')>0) return 0;
-								return -1;
+								return -5;
 							case 'fan':
 								if(strategy==5) return Math.max(-1,situation);
 								if(strategy==6) return Math.min(0,situation);

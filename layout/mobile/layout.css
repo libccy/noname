@@ -25,7 +25,7 @@
     width: calc(5000% / 47);
     left:calc(-150% / 47);
     top:auto;
-    border-radius:0;
+    border-radius:0 !important;
     height:120px;
 }
 #arena:not(.chess) #handcards1{
