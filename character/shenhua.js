@@ -1775,6 +1775,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				player.chooseControl('baonue_hp','baonue_maxHp',function(event,player){
+					if(player.hp==player.maxHp) return 'baonue_hp';
 					if(player.hp<player.maxHp-1||player.hp<=2) return 'baonue_maxHp';
 					return 'baonue_hp';
 				});

@@ -921,6 +921,18 @@ character.yijiang={
 					trigger.responded=true;
 					trigger.result={bool:true,card:{name:'shan'}}
 				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'respondShan')&&current<0){
+							var nh=player.num('h');
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].num('h')>nh) return 0.4;
+							}
+						}
+					}
+				}
 			}
 		},
 		huaiyi:{

@@ -356,7 +356,9 @@ character.sp={
 			filter:function(event,player){
 				if(player.num('h')>=player.hp) return false;
 				for(var i=0;i<game.players.length;i++){
-					if(player!=game.players[i]&&get.distance(player,game.players[i],'attack')<=1){
+					if(player!=game.players[i]&&
+						get.distance(player,game.players[i],'attack')<=1&&
+						game.players[i].num('he')){
 						return true;
 					}
 				}
@@ -371,7 +373,7 @@ character.sp={
 			content:function(){
 				'step 0'
 				player.chooseTarget('焚天：选择一名攻击范围内的角色，将其一张牌置于你的武将牌上',true,function(card,player,target){
-					return player!=target&&get.distance(player,target,'attack')<=1;
+					return player!=target&&get.distance(player,target,'attack')<=1&&target.num('he')>0;
 				}).ai=function(target){
 					return -ai.get.attitude(player,target)
 				}

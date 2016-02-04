@@ -2441,11 +2441,13 @@
 							// map.deck_length.show();
 							// map.deck_repeat.show();
 							map.random_length.hide();
+							map.skill_bar.show();
 						}
 						else{
 							// map.deck_length.hide();
 							// map.deck_repeat.hide();
 							map.random_length.show();
+							map.skill_bar.hide();
 						}
 					},
 					stone_mode:{
@@ -2508,6 +2510,12 @@
 								_status.event.parent.changeDialog();
 							}
 						},
+					},
+					skill_bar:{
+						name:'怒气值',
+						init:true,
+						frequent:true,
+						restart:true,
 					},
 		            double_character:{
 		                name:'双将模式',
@@ -2627,13 +2635,18 @@
 			'<div style="margin:10px">职业技能</div><ul style="margin-top:0"><li>祭司：召唤一个随机图腾'+
 			'<li>法师：对一名随从造成一点火焰伤害'+
 			'<li>牧师：回复一点体力'+
-			'<li>战士：获得一点护甲（不能超过5点）'+
+			'<li>战士：获得一点护甲（不能超过3点）'+
 			'<li>术士：牌库中摸两张牌'+
 			'<li>潜行者：装备一把武器和一个随机非武器装备'+
 			'<li>圣骑士：召唤一名士兵'+
 			'<li>猎人：对敌方主将造成一点伤害'+
 			'<li>德鲁伊：视为使用一张不计入出杀次数的杀</ul>'+
+			'<div style="margin:10px">怒气值</div><ul style="margin-top:0"><li>每当友方随从受到伤害获得3点怒气值，主将受到伤害获得6点怒气值'+
+			'<li>每有一个友方随从死亡，获得10点怒气值，主将死亡获得20点怒气值'+
+			'<li>回合结束阶段，若己方随从数少于对方会获得10X点怒气值，X为随从数之差'+
+			'<li>怒气值达到100时不再增加。回合开始阶段，若怒气值己满，可消耗全部怒气值并召唤一名传说随从</ul>'+
 			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+1'+
+			'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段的卡牌'+
 			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
 			'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 			'随从与其他所有角色相互距离基数为1<li>'+
@@ -2641,6 +2654,20 @@
 			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为从牌库中获得一张法术牌'+
 			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀目标'+
 			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
+		},
+		setIntro:function(node,func){
+			if(lib.config.touchscreen){
+				lib.setLongPress(node,ui.click.intro);
+			}
+			else{
+				if(lib.config.hover_all){
+					lib.setHover(node,ui.click.hoverplayer);
+				}
+				if(lib.config.right_info){
+					node.oncontextmenu=ui.click.rightplayer;
+				}
+			}
+			node._customintro=func;
 		},
 		setPopped:function(node,func,width,height){
 			node._poppedfunc=func;
@@ -3966,7 +3993,7 @@
 							event.dialog.add('手牌');
 							var hs=target.get('h');
 							hs.randomSort();
-							if(event.visible){
+							if(event.visible||target==player){
 								event.dialog.add(hs);
 							}
 							else{
@@ -4042,7 +4069,7 @@
 							event.dialog.add('手牌');
 							var hs=target.get('h');
 							hs.randomSort();
-							if(event.visible){
+							if(event.visible||target==player){
 								event.dialog.add(hs);
 							}
 							else{
@@ -5115,7 +5142,9 @@
 						if(ui.wuxie) ui.wuxie.hide();
 					}
 					game.addVideo('diex',player);
-					player.$die(source);
+					if(event.animate!==false){
+						player.$die(source);
+					}
 					if(player.dieAfter) player.dieAfter(source);
 					if(typeof _status.coin=='number'&&source&&!_status.auto){
 						if(source==game.me||source.isUnderControl()){
@@ -9334,6 +9363,12 @@
 				},
 				prepare:function(cards,player){
 					player.$throw(cards,1000);
+				},
+				check:function(card){
+					if(get.type(card)=='stonecharacter'&&_status.event.player.num('h',{type:'stonecharacter'})<=1){
+						return 0;
+					}
+					return 1;
 				},
 				discard:false,
 				delay:0.5,
@@ -20598,7 +20633,22 @@
 				return uiintro;
 			}
 			var i,translation,intro,str;
-			if(node.classList.contains('player')){
+			if(typeof node._customintro=='function'){
+				node._customintro(uiintro);
+			}
+			else if(Array.isArray(node._customintro)){
+				var caption=node._customintro[0];
+				var content=node._customintro[1];
+				if(typeof caption=='function'){
+					caption=caption(node);
+				}
+				if(typeof content=='function'){
+					content=content(node);
+				}
+				uiintro.add(caption);
+				uiintro.add('<div class="text center" style="padding-bottom:5px">'+content+'</div>');
+			}
+			else if(node.classList.contains('player')){
 				var capt=get.translation(node.name);
 				if(lib.character[node.name]&&lib.character[node.name][1]){
 					capt+='&nbsp;&nbsp;'+lib.translate[lib.character[node.name][1]];
@@ -20879,6 +20929,16 @@
 				var career=node.dataset.career;
 				uiintro.add(get.translation(career));
 				uiintro.add('<div class="text center" style="padding-bottom:5px">'+lib.translate['_'+career+'_skill_info']+'</div>');
+			}
+			else if(node.classList.contains('skillbar')){
+				if(node==ui.friendBar){
+					uiintro.add('友方怒气值');
+					uiintro.add('<div class="text center" style="padding-bottom:5px">'+_status.friendRage+'/100</div>');
+				}
+				else if(node==ui.enemyBar){
+					uiintro.add('敌方怒气值');
+					uiintro.add('<div class="text center" style="padding-bottom:5px">'+_status.enemyRage+'/100</div>');
+				}
 			}
 			return uiintro;
 		},

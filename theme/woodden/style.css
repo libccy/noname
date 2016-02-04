@@ -9,7 +9,7 @@ body[data-background_color_wood='black']{
 	background: url('grid.png'),linear-gradient(#333333, #222222) fixed;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,.dialog>.bar,.menu,#splash>div,
-#arena.mobile:not(.chess) .player[data-position='0'] .equips{
+#arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
 	border-radius: 8px;
 }
@@ -66,7 +66,7 @@ body[data-background_color_wood='black']{
 	color: rgb(62, 41, 30);
 }
 .player,.card,.button,.dialog>.bar,
-#arena.mobile:not(.chess) .player[data-position='0'] .equips{
+#arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg{
 	background: url('wood.jpg');
 }
 .control,#system>div>div,.menubutton,#system>div>.pressdown2{

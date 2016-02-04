@@ -727,8 +727,12 @@ margin-bottom: 5px;
 	border: 1px solid rgba(31, 82, 131, 1);
 }
 .hp.actcount>div.overflow:not(.lost){
-	background: rgb(162, 162, 162);
-	border: 1px solid rgb(117, 117, 117);
+	background: rgb(154, 154, 154);
+	border: 1px solid rgb(109, 109, 109);
+}
+.hp.actcount.overflow2>div.overflow:not(.lost){
+	background: rgb(173, 129, 63);
+    border: 1px solid rgb(131, 109, 31);
 }
 .hp.actcount>.lost{
 	background: rgba(63, 119, 173,1);

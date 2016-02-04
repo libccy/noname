@@ -291,6 +291,9 @@ card.swd={
 				result:{
 					target:function(player,target){
 						if(target&&target==_status.dying) return 2;
+						if(lib.config.mode=='stone'&&!player.isMin()){
+							if(player.getActCount()+1>=player.actcount) return false;
+						}
 						var shas=target.get('h','sha');
 						var ok=false;
 						if(shas.length){
@@ -847,10 +850,10 @@ card.swd={
 				"step 0"
 				player.judge(function(card){
 					switch(get.suit(card)){
-						case 'heart':return player.maxHp>player.hp?2:0;break;
-						case 'diamond':return 1;break;
-						case 'club':return 1;break;
-						case 'spade':return 0;break;
+						case 'heart':return player.maxHp>player.hp?2:0;
+						case 'diamond':return 1;
+						case 'club':return 1;
+						case 'spade':return 0;
 					}
 				});
 				"step 1"
