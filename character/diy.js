@@ -122,21 +122,6 @@ character.diy={
 				}
 			}
 		},
-		jiaoxia:{
-			trigger:{target:'useCardToBegin'},
-			filter:function(event,player){
-				return event.card&&get.color(event.card)=='red';
-			},
-			frequent:true,
-			content:function(){
-				player.draw();
-			},
-			ai:{
-				effect:function(card,player,target){
-					if(get.color(card)=='red') return [1,1];
-				},
-			}
-		},
 		diykuanggu:{
 			trigger:{source:'damageEnd'},
 			forced:true,
@@ -699,14 +684,12 @@ character.diy={
 		diyduanliang2:'断粮',
 		diyqiangxi:'强袭',
 		diykuanggu:'狂骨',
-		jiaoxia:'皎霞',
 		diyzaiqi:'再起',
 		batu:'霸图',
 		zaiqix:'再起',
 		zaiqix_info:'摸牌阶段，若你已受伤，你可以放弃摸牌并展示牌堆顶的X+1张牌，X为你已损失的体力值，其中每有一张♥牌，你回复1点体力，然后弃掉这些♥牌，将其余的牌收入手牌。',
 		batu_info:'回合结束阶段，你可以将手牌数补至X，X为现存的势力数',
 		diyzaiqi_info:'锁定技，你摸牌阶段额外摸X张牌，X为你已损失的体力值',
-		jiaoxia_info:'每当你成为红色牌的目标，你可以摸一张牌',
 		diykuanggu_info:'锁定技，每当你造成一点伤害，你在其攻击范围内，你回复一点体力，否则你摸一张牌',
 		diyqiangxi_info:'出牌阶段，你可以自减一点体力或弃一张武器牌，然后你对你攻击范围内的一名角色造成一点伤害并弃置其一张牌，每回合限一次。',
 		diyduanliang_info:'出牌阶段限一次，你可以将一张黑色的基本牌当兵粮寸断对一名角色使用，然后摸一张牌。你的兵粮寸断可以指定距离2以内的角色作为目标',

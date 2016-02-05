@@ -39,6 +39,13 @@
     transform: rotate(90deg) translate(98px,-31px);
 }
 
+#arena.oldlayout .player.linked>.name{
+    transform: none !important;
+}
+#arena.oldlayout .player.linked>.name.name2{
+    transform: none !important;
+}
+
 .player>.identity.menubutton.round{
     padding: 0;
     transform: scale(1.2) translate(-2px,2px);

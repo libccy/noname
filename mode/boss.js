@@ -72,6 +72,10 @@ mode.boss={
 					game.pause();
 				}
 				"step 1"
+				if(lib.config.hiddenCharacterPack.contains('boss')){
+					game.loadPackage('character/boss');
+				}
+				"step 2"
 				var playback=localStorage.getItem(lib.configprefix+'playback');
 				if(playback){
 					ui.create.me();
@@ -102,7 +106,7 @@ mode.boss={
 				}
 				lib.init.css('layout/mode','boss');
 				game.delay(0.1);
-				"step 2"
+				"step 3"
 				var bosslist=ui.create.div('#bosslist.hidden');
 				event.bosslist=bosslist;
 				bosslist.ontouchmove = ui.click.touchScroll;
@@ -233,7 +237,7 @@ mode.boss={
 					ui.auto.classList.add('glow');
 					game.save('current',event.current.name);
 				}
-				"step 3"
+				"step 4"
 				game.bossinfo=lib.boss.global;
 				for(var i in lib.boss[event.current.name]){
 					game.bossinfo[i]=lib.boss[event.current.name][i];
@@ -397,7 +401,7 @@ mode.boss={
 				if(game.bossinfo.init){
 					game.bossinfo.init();
 				}
-				"step 4"
+				"step 5"
 				event.trigger('gameStart');
 				game.gameDraw(game.boss);
 				game.bossPhaseLoop();
@@ -423,7 +427,7 @@ mode.boss={
 							player.hp++;
 							game.log(player,'回复了一点体力');
 						}
-						else{
+						else if(player.num('h')<4){
 							var card=get.cards()[0];
 							var sort=lib.config.sort_card(card);
 							var position=sort>0?player.node.handcards1:player.node.handcards2;
@@ -717,6 +721,9 @@ mode.boss={
 				_status.damageCount=0;
 				ui.damageCount=ui.create.system('伤害: 0',null,true);
 			}
+		},
+		boss_nianshou_heti:{
+			chongzheng:99,
 		},
 		boss_zhangjiao:{
 			// loopType:2,

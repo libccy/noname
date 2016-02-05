@@ -292,6 +292,10 @@ mode.versus={
 			next.showConfig=true;
 			next.content=function(){
 				'step 0'
+				if(lib.config.hiddenCharacterPack.contains('boss')){
+					game.loadPackage('character/boss');
+				}
+				'step 1'
 				var list={
 					weilist:[],shulist:[],
 					weimech:[],shumech:[],
@@ -418,8 +422,11 @@ mode.versus={
 						dialog=ui.create.dialog('选择角色',[list[game.me.identity+'boss'],'character']);
 						break;
 				}
-				game.me.chooseButton(dialog,true);
-				'step 1'
+				game.me.chooseButton(dialog,true).selectButton=function(){
+					if(get.config('double_character_jiange')) return [2,2];
+					return [1,1];
+				};
+				'step 2'
 				if(ui.cheat){
 					ui.cheat.close();
 					delete ui.cheat;
@@ -428,14 +435,20 @@ mode.versus={
 					ui.cheat2.close();
 					delete ui.cheat2;
 				}
-				game.me.init(result.links[0]);
+				var double=(result.links.length==2);
+				game.me.init(result.links[0],result.links[1]);
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].name) continue;
 					if(game.players[i].type!='human'){
 						game.players[i].init(event.list[game.players[i].identity+game.players[i].type].randomRemove());
 					}
 					else{
-						game.players[i].init(event.list[game.players[i].identity+'list'].randomRemove());
+						if(double){
+							game.players[i].init(event.list[game.players[i].identity+'list'].randomRemove(),event.list[game.players[i].identity+'list'].randomRemove());
+						}
+						else{
+							game.players[i].init(event.list[game.players[i].identity+'list'].randomRemove());
+						}
 					}
 				}
 			};

@@ -16,20 +16,11 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.77,
+		version:1.78,
 		changeLog:[
-			'新武将(SP)',
-			'志继、化身结算',
-			'提示样式修改',
-			'牌堆管理',
-			'战棋1v1、对决4v4',
-			'年兽、守卫剑阁',
-			'炉石模式新卡',
-			'修复身份、国战开将过少导致不能游戏的bug',
-			'注1：年兽在挑战模式，守卫剑阁、4v4在对决模式菜单中的游戏模式里选',
-			'注2：此版本去掉了diy捉鬼和剑阁武将包，未来将进入diy武将包',
-			'注3：此版本更改了手气卡代码，若要关闭需重新设置',
-			'注4：安卓版大约两周后更新'
+			'修bug',
+			'新年兽',
+			'剑阁双将',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -1571,6 +1562,22 @@
 							'无名杀 - 数据 - '+(new Date()).toLocaleString());
 						},
 						clear:true
+					},
+					trim_game:{
+						name:'隐藏非官方扩展包',
+						onclick:function(){
+							if(this.innerHTML!='已隐藏'){
+								this.innerHTML='已隐藏';
+								game.saveConfig('hiddenModePack',['stone','chess','boss']);
+								game.saveConfig('hiddenCardPack',['zhenfa','qimou','yibao','shenbing','swd','shenqi','hearth','compensate']);
+								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','xiake','boss']);
+								var that=this;
+								setTimeout(function(){
+									that.innerHTML='隐藏非官方扩展包';
+								},500);
+							}
+						},
+						clear:true
 					}
 				}
 			}
@@ -2075,9 +2082,11 @@
 						}
 						if(config.versus_mode=='jiange'){
 							map.free_choose.show();
+							map.double_character_jiange.show();
 						}
 						else{
 							map.free_choose.hide();
+							map.double_character_jiange.hide();
 						}
 					},
 					versus_mode:{
@@ -2132,17 +2141,22 @@
 						},
 						frequent:true,
 					},
+					double_character_jiange:{
+						name:'双将模式',
+						init:false,
+						frequent:true,
+					},
 					ban_weak:{
 		                name:'屏蔽弱将',
 						init:false,
 						restart:true,
-						frequent:true,
+						// frequent:true,
 		            },
 		            ban_strong:{
 		                name:'屏蔽强将',
 						init:false,
 						restart:true,
-						frequent:true,
+						// frequent:true,
 		            },
 				}
 			},
@@ -12495,6 +12509,99 @@
 				}
 			}
 			return players[0];
+		},
+		loadPackage:function(){
+			var next=game.createEvent('loadPackage');
+			next.packages=[];
+			for(var i=0;i<arguments.length;i++){
+				if(typeof arguments[i]=='string'){
+					next.packages.push(arguments[i]);
+				}
+			}
+			next.content=function(){
+				'step 0'
+				if(event.packages.length){
+					window.character={};
+					window.card={};
+					var pack=event.packages.shift().split('/');
+					lib.init.js(pack[0],pack[1],game.resume);
+					game.pause();
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				var character=window.character;
+				var card=window.card;
+				var i,j,k;
+				for(i in character){
+					if(character[i].character){
+						lib.characterPack[i]=character[i].character
+					}
+					if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
+					if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
+					for(j in character[i]){
+						if(j=='mode'||j=='forbid') continue;
+						for(k in character[i][j]){
+							if(j=='character'){
+								if(!character[i][j][k][4]){
+									character[i][j][k][4]=[];
+								}
+								if(character[i][j][k][4].contains('boss')||
+									character[i][j][k][4].contains('hiddenboss')){
+									lib.config.forbidai.add(k);
+								}
+								if(lib.config.banned.contains(k)){
+									if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
+										lib.hiddenCharacters.push(k);
+									}
+									else{
+										continue;
+									}
+								}
+								for(var l=0;l<character[i][j][k][3].length;l++){
+									lib.skilllist.add(character[i][j][k][3][l]);
+								}
+							}
+							if(j=='translate'&&k==i){
+								lib[j][k+'_character_config']=character[i][j][k];
+							}
+							else{
+								if(lib[j][k]==undefined){
+									lib[j][k]=lib.init.eval(character[i][j][k]);
+								}
+								else{
+									alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+								}
+							}
+						}
+					}
+				}
+				for(i in card){
+					lib.cardPack[i]=[];
+					if(card[i].card){
+						for(var j in card[i].card){
+							if(card[i].translate[j+'_info']){
+								lib.cardPack[i].push(j);
+							}
+						}
+					}
+					for(j in card[i]){
+						if(j=='mode'||j=='forbid') continue;
+						if(j=='list') continue;
+						for(k in card[i][j]){
+							if(j=='translate'&&k==i){
+								lib[j][k+'_card_config']=card[i][j][k];
+							}
+							else{
+								if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
+								else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+							}
+						}
+					}
+				}
+				event.goto(0);
+			}
 		},
 		phaseLoop:function(player){
 			var next=game.createEvent('phaseLoop');

@@ -389,7 +389,7 @@ card.yibao={
 				},
 				result:{
 					player:function(player,target){
-						if(player.num('h')<=Math.max(2,player.hp)&&_status.event.name=='chooseToUse'){
+						if(player.num('h')<=Math.min(5,Math.max(2,player.hp))&&_status.event.name=='chooseToUse'){
 							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'dujian'})){
 								return -10;

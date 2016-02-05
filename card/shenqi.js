@@ -97,7 +97,7 @@ card.shenqi={
 				basic:{
 					equipValue:function(card,player){
 						if(player.hp==2) return 7;
-						if(player.hp==1) return 9;
+						if(player.hp==1) return 10;
 						return 5;
 					}
 				}

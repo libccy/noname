@@ -552,7 +552,7 @@ mode.stone={
 			stone_misha:['male','shu',3,['chaofeng'],['minskin','stone'],[3,3,'hunter']],
 			stone_jiewangzhu:['male','wu',1,['hunter_jiewang'],['minskin','stone'],[1,2,'hunter']],
 			stone_xunshoushi:['male','qun',2,['hunter_xunshou'],['minskin','stone'],[4,3,'hunter']],
-			stone_senlinlang:['male','qun',1,['hunter_qunxi'],['minskin','stone'],[1,1,'hunter']],
+			stone_senlinlang:['male','qun',1,['hunter_qunxi'],['minskin','stone'],[1,2,'hunter']],
 			stone_tujiu:['male','qun',3,['hunter_mishi'],['minskin','stone'],[3,2,'hunter']],
 			stone_muyangren:['male','qun',3,['hunter_muyang'],['minskin','stone'],[4,3,'hunter']],
 			stone_jujishou:['male','qun',2,['hunter_juji'],['minskin','stone'],[2,2,'hunter']],
@@ -2579,7 +2579,7 @@ mode.stone={
 				if(target.isAlive()){
 					var hs=target.get('h');
 					if(hs.length){
-						target.discard(hs.randomGet());
+						target.discard(hs.randomGets(2));
 					}
 				}
 			},
@@ -2877,7 +2877,7 @@ mode.stone={
 			},
 			content:function(){
 				'step 0'
-				target.die();
+				target.die()._triggered=null;
 				event.name=target.name;
 				'step 1'
 				player.getEnemy().gain(game.createCard(event.name+'_stonecharacter'),'gain2');
@@ -3521,7 +3521,7 @@ mode.stone={
 			},
 			content:function(){
 				'step 0'
-				target.die();
+				target.die()._triggered=null;
 				'step 1'
 				if(player.deckCards){
 					player.deckCards.push(game.createCard(target.name+'_stonecharacter'));
@@ -4421,8 +4421,8 @@ mode.stone={
 			},
 			ai:{
 				order:8,
-				value:5,
-				useful:5,
+				value:6,
+				useful:6,
 				result:{
 					target:-1.5
 				},
@@ -4514,8 +4514,8 @@ mode.stone={
 			},
 			ai:{
 				order:8,
-				value:5,
-				useful:5,
+				value:6,
+				useful:6,
 				result:{
 					target:-1.5
 				},
@@ -5597,7 +5597,10 @@ mode.stone={
 				trigger.num+=2;
 			},
 			ai:{
-				threaten:1.5
+				threaten:function(player,target){
+					if(target.hp==target.maxHp) return 0.5;
+					return 1.8;
+				},
 			}
 		},
 		stone_lianyu:{
@@ -7410,6 +7413,9 @@ mode.stone={
 			},
 			content:function(){
 				player.draw();
+			},
+			ai:{
+				threaten:1.6
 			}
 		},
 		warrior_jiangong:{
@@ -7770,6 +7776,7 @@ mode.stone={
 					result.targets[0].hp++;
 					result.targets[0].update();
 					result.targets[0].draw(2);
+					result.targets[0].addSkill('chaofeng');
 				}
 			}
 		},
@@ -9286,7 +9293,7 @@ mode.stone={
 		spell_shengguangzhadan:'圣光炸弹',
 		spell_shengguangzhadan_info:'对所有随从造成等同于其手牌数的伤害',
 		spell_maizang:'埋葬',
-		spell_maizang_info:'令一名敌方随从死亡，并将一张与该随从同名的随从洗入你的牌库',
+		spell_maizang_info:'令一名敌方随从死亡（不触发死亡技能），并将一张与该随从同名的随从洗入你的牌库',
 		spell_xinlingshijie:'心灵视界',
 		spell_xinlingshijie_info:'将一张敌方主将手牌的复制置于你的手牌',
 		spell_naluzhiguang:'纳鲁之光',
@@ -9341,7 +9348,7 @@ mode.stone={
 		spell_dubiao:'毒镖',
 		spell_dubiao_info:'对一名随机敌方角色造成一点伤害',
 		spell_qiangfengsheji:'强风射击',
-		spell_qiangfengsheji_info:'对两名敌方随从各造成一点伤害，并弃置其一张手牌',
+		spell_qiangfengsheji_info:'对两名敌方随从各造成一点伤害，并弃置其两张手牌',
 		spell_tanxianmao:'探险冒',
 		hunter_tanxianmao:'探险冒',
 		hunter_tanxianmao_info:'你死亡时，将一张探险冒置入主将的手牌',
@@ -9457,7 +9464,7 @@ mode.stone={
 		spell_modaoyou_info:'令你下一次剑刃乱舞造成的伤害+1，并与一名随机友方随从各摸两张牌',
 
 		spell_mengun:'闷棍',
-		spell_mengun_info:'令一名敌方随从死亡，将一张该随从的复制置入对手的手牌',
+		spell_mengun_info:'令一名敌方随从死亡（不触发死亡技能），将一张该随从的复制置入对手的手牌',
 		spell_anzhongpohuai:'暗中破坏',
 		spell_anzhongpohuai_info:'随机杀死一名敌方随从，随机弃置敌方的一张装备牌',
 		spell_beici:'背刺',
@@ -9832,7 +9839,7 @@ mode.stone={
 		hunter_jiewang:'结网',
 		hunter_jiewang_info:'你死亡时，己方主将获得一张随机野兽牌',
 		hunter_xunshou:'驯兽',
-		hunter_xunshou_info:'你出场时，己方主将可选择一名其他友方随从令其增加一点体力和体力上限并摸两张牌',
+		hunter_xunshou_info:'你出场时，己方主将可选择一名其他友方随从令其增加一点体力和体力上限，摸两张牌并获得嘲讽',
 		hunter_nuhou:'怒吼',
 		hunter_nuhou_info:'当你死亡时，对所有敌方角色造成一点伤害',
 		hunter_zhanhuo:'战火',

@@ -1844,6 +1844,7 @@ character.swd={
 			trigger:{global:'phaseBegin'},
 			priority:-5,
 			check:function(event,player){
+				if(event.player.isMin()) return false;
 				return ai.get.attitude(player,event.player)<-3;
 			},
 			filter:function(event,player){
@@ -2554,100 +2555,6 @@ character.swd={
 				player.removeSkill('touxi2');
 			}
 		},
-		lianji:{
-			audio:true,
-			enable:'phaseUse',
-			usable:1,
-			filterTarget:function(card,player,target){
-				if(player==target) return false;
-				return target.num('h')>0;
-			},
-			selectTarget:2,
-			multitarget:true,
-			multiline:true,
-			filter:function(event,player){
-				return player.num('h')>0;
-			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-				player.line(targets);
-			},
-			discard:false,
-			filterCard:true,
-			check:function(card){
-				return 6-ai.get.value(card);
-			},
-			content:function(){
-				"step 0"
-				if(!player.storage.lianji){
-					player.storage.lianji=[];
-				}
-				if(targets[0].num('h')&&targets[1].num('h')){
-					targets[0].chooseToCompare(targets[1]);
-					player.storage.lianji.add(targets[0]);
-					player.storage.lianji.add(targets[1]);
-				}
-				else{
-					event.finish();
-				}
-				"step 1"
-				if(result.bool){
-					targets[0].gain(cards);
-					targets[0].$gain2(cards);
-					targets[1].damage(targets[0]);
-				}
-				else{
-					targets[1].gain(cards);
-					targets[1].$gain2(cards);
-					targets[0].damage(targets[1]);
-				}
-				if(!player.skills.contains('yinmo')){
-					event.finish();
-				}
-				"step 2"
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&!player.storage.lianji.contains(game.players[i])){
-						event.finish();
-						return;
-					}
-				}
-				"step 3"
-				player.logSkill('yinmo');
-				player.gainMaxHp();
-				"step 4"
-				lib.character.swd_duguningke2=['','qun',4,['benlei','juece'],['temp']];
-				if(player.name=='swd_duguningke') player.name='swd_duguningke2';
-				if(player.name1=='swd_duguningke') player.name1='swd_duguningke2';
-				if(player.name2=='swd_duguningke'){
-					player.name2='swd_duguningke2';
-					player.node.avatar2.setBackground('swd_duguningke2','character');
-				}
-				else{
-					player.node.avatar.setBackground('swd_duguningke2','character');
-				}
-				player.removeSkill('yinmo');
-				player.removeSkill('lianji');
-				player.removeSkill('touxi');
-				player.addSkill('benlei');
-				player.addSkill('juece');
-				event.players=game.players.slice(0);
-				event.players.remove(player);
-				event.players.sort(lib.sort.seat);
-				"step 5"
-				if(event.players.length){
-					event.players.shift().damage('thunder');
-					event.redo();
-				}
-			},
-			ai:{
-				expose:0.3,
-				threaten:2,
-				order:9,
-				result:{
-					target:-1
-				}
-			},
-		},
 		lianji2:{
 			group:['lianji3','lianji4']
 		},
@@ -2945,55 +2852,6 @@ character.swd={
 			},
 			content:function(){
 				player.storage.wangchen.out();
-			}
-		},
-		tiandao:{
-			audio:true,
-			trigger:{global:'judge'},
-			direct:true,
-			filter:function(event,player){
-				return player.num('he')>0;
-			},
-			content:function(){
-				"step 0"
-				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging[0])+'，是否发动【天道】？','he').ai=function(card){
-					var trigger=_status.event.parent._trigger;
-					var player=_status.event.player;
-					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
-					var attitude=ai.get.attitude(player,trigger.player);
-					if(attitude==0||result==0) return 0;
-					if(attitude>0){
-						return result;
-					}
-					else{
-						return -result;
-					}
-				};
-				"step 1"
-				if(result.bool){
-					player.respond(result.cards,'highlight');
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				if(result.bool){
-					player.logSkill('tiandao');
-					player.$gain2(trigger.player.judging[0]);
-					player.gain(trigger.player.judging[0]);
-					trigger.player.judging[0]=result.cards[0];
-					trigger.position.appendChild(result.cards[0]);
-					game.log(trigger.player,'的判定牌改为',result.cards[0]);
-				}
-				"step 3"
-				game.delay(2);
-			},
-			ai:{
-				tag:{
-					rejudge:1
-				},
-				threaten:1.5
 			}
 		},
 		yihua:{
@@ -5584,86 +5442,6 @@ character.swd={
 				player.storage.funiao=false;
 			}
 		},
-		lingbo:{
-			trigger:{player:'respond'},
-			filter:function(event,player){
-				return event.card.name=='shan';
-			},
-			frequent:true,
-			content:function(){
-				player.draw(2);
-			},
-			ai:{
-				mingzhi:false,
-				effect:{
-					target:function(card,player,target){
-						if(get.tag(card,'respondShan')){
-							var shans=target.num('h','shan');
-							var hs=target.num('h');
-							if(shans>1) return [0,1];
-							if(shans&&hs>2) return [0,1];
-							if(shans) return [0,0];
-							if(hs>2) return [0,0];
-							if(hs>1) return [1,0.5];
-							return [1.5,0];
-						}
-					}
-				},
-				threaten:0.8
-			}
-		},
-		yunshen:{
-			trigger:{player:'respond'},
-			filter:function(event,player){
-				return event.card.name=='shan';
-			},
-			frequent:true,
-			init:function(player){
-				player.storage.yunshen=0;
-			},
-			content:function(){
-				player.storage.yunshen++;
-				player.markSkill('yunshen');
-			},
-			ai:{
-				effect:{
-					target:function(card,player,target){
-						if(get.tag(card,'respondShan')){
-							var shans=target.num('h','shan');
-							var hs=target.num('h');
-							if(shans>1) return [1,1];
-							if(shans&&hs>2) return [1,1];
-							if(shans) return [1,0.5];
-							if(hs>2) return [1,0.3];
-							if(hs>1) return [1,0.2];
-							return [1.2,0];
-						}
-					}
-				},
-				threaten:0.8
-			},
-			intro:{
-				content:'mark'
-			},
-			group:'yunshen2'
-		},
-		yunshen2:{
-			trigger:{player:'phaseBegin'},
-			forced:true,
-			filter:function(event,player){
-				return player.storage.yunshen>0;
-			},
-			content:function(){
-				player.draw(player.storage.yunshen);
-				player.storage.yunshen=0;
-				player.unmarkSkill('yunshen');
-			},
-			mod:{
-				globalTo:function(from,to,distance){
-					if(typeof to.storage.yunshen=='number') return distance+to.storage.yunshen;
-				}
-			}
-		},
 		xuehuang:{
 			enable:'phaseUse',
 			usable:1,
@@ -7418,68 +7196,6 @@ character.swd={
 				content:'card'
 			}
 		},
-		mazui:{
-			audio:true,
-			enable:'phaseUse',
-			usable:1,
-			filterCard:{color:'black'},
-			filterTarget:function(card,player,target){
-				return !target.skills.contains('mazui2');
-			},
-			check:function(card){
-				return 6-ai.get.value(card);
-			},
-			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-				player.line(targets[0],'green');
-			},
-			content:function(){
-				"step 0"
-				game.delay();
-				"step 1"
-				target.storage.mazui2=cards[0];
-				target.addSkill('mazui2');
-				game.addVideo('storage',target,['mazui2',get.cardInfo(target.storage.mazui2),'card']);
-			},
-			ai:{
-				expose:0.2,
-				result:{
-					target:function(player,target){
-						return -target.hp;
-					}
-				},
-				order:4,
-				threaten:1.2
-			}
-		},
-		mazui2:{
-			trigger:{source:'damageBegin'},
-			forced:true,
-			mark:'card',
-			filter:function(event){
-				return event.num>0;
-			},
-			content:function(){
-				trigger.num--;
-				player.addSkill('mazui3');
-				player.removeSkill('mazui2');
-			},
-			intro:{
-				content:'card'
-			}
-		},
-		mazui3:{
-			trigger:{source:'damageEnd'},
-			forced:true,
-			popup:false,
-			content:function(){
-				player.gain(player.storage.mazui2,'gain2');
-				game.log(player,'获得了',player.storage.mazui2);
-				player.removeSkill('mazui3');
-				delete player.storage.mazui2;
-			}
-		},
 		shoulie:{
 			trigger:{player:'shaBegin'},
 			direct:true,
@@ -7774,9 +7490,6 @@ character.swd={
 		hudun_bg:'盾',
 		hudun2:'护盾',
 		hudun_info:'锁定技，当你对其他角色造成伤害后，若你没有护甲，你获得一点护甲值',
-		mazui:'麻醉',
-		mazui2:'麻醉',
-		mazui_info:'出牌阶段限一次，你可以将一张黑色手牌置于一名角色的武将牌上，该角色造成的下一次伤害-1，然后获得此牌',
 		zhenjiu:'针灸',
 		zhenjiu2:'针灸',
 		zhenjiu_info:'出牌阶段限一次，你可以将一张红色手牌置于一名角色的武将牌上，该角色于下一个回合开始阶段回复一点体力，然后获得此牌',
@@ -7857,8 +7570,6 @@ character.swd={
 		fushen:'附身',
 		fushen_info:'回合开始前，你可以将自己移出游戏，并代替另一名角色进行一回合，然后流失一点体力',
 		fushen2:'附身',
-		tiandao:'天道',
-		tiandao_info:'任意一名角色的判定生效前，你可以打出一张牌替换之',
 		wangchen:'忘尘',
 		wangchen_info:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
 		guiyin:'归隐',
@@ -7883,8 +7594,6 @@ character.swd={
 		milesxiehun_info:'锁定技，出牌阶段结束后，你令随机Ｘ名角色各弃置一张牌，Ｘ为你已损失的体力值且至少为1 ',
 		liaochen:'撩尘',
 		liaochen_info:'锁定技，出牌阶段结束后，所有角色需弃置一张牌',
-		lianji:'连计',
-		lianji_info:'出牌阶段限一次，你可以选择一张手牌并指定两名角色进行拼点，拼点赢的角色获得此牌，并对没赢的角色造成一点伤害',
 		yinmo:'引魔',
 		yinmo_info:'锁定技，当你对场上所有角色发动「连计」后，你立即变身为魔化宁珂，然后对所有其他角色造成一点雷电伤害',
 		huanxing:'幻形',
@@ -7998,7 +7707,6 @@ character.swd={
 		luomei:'落梅',
 		yulin:'玉鳞',
 		funiao:'符鸟',
-		lingbo:'凌波',
 		xuehuang:'血凰',
 		zhuyu:'朱羽',
 		ningshuang:'凝霜',
@@ -8032,8 +7740,6 @@ character.swd={
 		guiyan:'鬼眼',
 		guiyan2:'鬼眼',
 		swd_xiuluo:'修罗',
-		yunshen:'云身',
-		yunshen2:'云身',
 		suiyan:'碎岩',
 		suiyan_info:'每当你造成一次伤害，可以弃置一张牌并弃置对方的全部装备牌',
 		xianyin:'散结',
@@ -8061,7 +7767,6 @@ character.swd={
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌，每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',
 		mailun_info:'回合开始阶段，你可以选择一个脉轮效果直到下一回合开始',
-		yunshen_info:'每当你打出一张闪，你可以令其他角色与你的距离+1；回合开始阶段，你将累计的防御距离清零，然后摸等量的牌',
 		guiyan_info:'出牌阶段，你可以观看一名角色的手牌，并获得其中一张梅花牌，每阶段限一次。当你首次进入濒死状态时，你须回复一点体力并失去技能鬼眼',
 		busi_info:'锁定技，当你进入濒死状态时，你进行一次判定，若结果不为黑桃，你将体力回复至1并将武将牌翻至背面',
 		xuying_info:'锁定技，每当你即将受到伤害，你防止此伤害，若你此时有手牌，你流失一点体力',
@@ -8104,7 +7809,6 @@ character.swd={
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
 		funiao_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
-		lingbo_info:'每当你使用或打出一张闪，你可以摸两张牌',
 		xuehuang_info:'出牌阶段限一次，你可以弃置一张红色手牌令距离你一以内的所有角色受到一点火焰伤害',
 		zhuyu_info:'每当有横置的角色即将受到非火焰伤害，你可以弃置一张红色牌使其额外受到一点火焰伤害',
 		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则将其翻面',
