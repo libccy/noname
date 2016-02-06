@@ -8484,6 +8484,16 @@
 			},
 			card:{
 				init:function(card){
+					if(Array.isArray(card)){
+						if(card[2]=='huosha'){
+							card[2]='sha';
+							card[3]='fire';
+						}
+						if(card[2]=='leisha'){
+							card[2]='sha';
+							card[3]='thunder';
+						}
+					}
 					var bg=card[2];
 					if(!lib.config.hide_card_image&&lib.card[card[2]].fullskin){
 						this.classList.add('fullskin');
@@ -12644,7 +12654,7 @@
 					event.changeCard='disabled';
 				}
 				"step 1"
-				if(event.changeCard!='disabled'){
+				if(event.changeCard!='disabled'&&!_status.auto){
 					event.dialog=ui.create.dialog('是否使用手气卡？');
 					ui.create.confirm('oc');
 					event.custom.replace.confirm=function(bool){
@@ -15974,6 +15984,10 @@
 									for(var j=0;j<lib.cardPack[lib.config.cards[i]].length;j++){
 										var cname=lib.cardPack[lib.config.cards[i]][j];
 										pileaddlist.push([cname,get.translation(cname)]);
+										if(cname=='sha'){
+											pileaddlist.push(['huosha','火杀']);
+											pileaddlist.push(['leisha','雷杀']);
+										}
 									}
 								}
 								var cardpileaddname=ui.create.selectlist(pileaddlist,null,cardpileadd);
@@ -22373,6 +22387,16 @@
 					if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
 				}
 				for(i=0;i<lib.card.list.length;i++){
+					if(lib.card.list[i][2]=='huosha'){
+						lib.card.list[i]=lib.card.list[i].slice(0);
+						lib.card.list[i][2]='sha';
+						lib.card.list[i][3]='fire';
+					}
+					else if(lib.card.list[i][2]=='leisha'){
+						lib.card.list[i]=lib.card.list[i].slice(0);
+						lib.card.list[i][2]='sha';
+						lib.card.list[i][3]='thunder';
+					}
 					if(!lib.card[lib.card.list[i][2]]){
 						lib.card.list.splice(i,1);i--;
 					}

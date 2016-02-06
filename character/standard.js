@@ -777,7 +777,7 @@ character.standard={
 						}
 					}
 					bottom=cards;
-					for(i=0;i<top.length;i++){
+					for(var i=0;i<top.length;i++){
 						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
 					}
 					for(i=0;i<bottom.length;i++){
@@ -966,7 +966,7 @@ character.standard={
 			position:'he',
 			viewAs:{name:'guohe'},
 			viewAsFilter:function(player){
-				if(!player.num('h',{color:'black'})) return false;
+				if(!player.num('he',{color:'black'})) return false;
 			},
 			prompt:'将一张黑色牌当过河拆桥使用',
 			check:function(card){return 4-ai.get.value(card)}

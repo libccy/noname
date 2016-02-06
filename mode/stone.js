@@ -525,7 +525,7 @@ mode.stone={
 			stone_tuyuansu:['male','qun',5,['chaofeng'],['minskin','stone'],[5,4,'shaman']],
 			stone_huoyuansu:['male','shu',3,['shaman_huoxi'],['minskin','stone'],[4,3,'shaman']],
 			stone_fachao:['male','wei',3,['shaman_tuteng','shaman_fachao'],['minskin','stone'],[3,0,'shaman']],
-			stone_huoshe:['male','shu',3,['shaman_tuteng','shaman_huoshe'],['minskin','stone'],[4,0,'shaman']],
+			stone_huoshe:['male','shu',3,['shaman_tuteng','shaman_huoshe'],['minskin','stone'],[3,0,'shaman']],
 			stone_huoli:['male','wei',3,['shaman_tuteng','shaman_huoli'],['minskin','stone'],[2,0,'shaman']],
 			stone_huoyanweishi:['male','shu',4,['shaman_zhuhuo'],['minskin','stone'],[4,1,'shaman']],
 			stone_tutengshi:['female','wei',2,['shaman_peiyu'],['minskin','stone'],[3,3,'shaman']],
@@ -649,7 +649,7 @@ mode.stone={
 			stone_yuanguanying:['male','shu',3,['stone_yuanguanying1'],['minskin','stone'],[3,1]],
 
 			stone_dijieshicong:['male','wu',2,['stone_dijieshicong1'],['minskin','stone'],[1,1]],
-			stone_yaosaishouwei:['male','wu',1,['stone_yaosaishouwei1'],['minskin','stone'],[1,2]],
+			stone_yaosaishouwei:['male','wu',2,['stone_yaosaishouwei1'],['minskin','stone'],[1,1]],
 			stone_famingjia:['male','wu',3,['stone_famingjia1'],['minskin','stone'],[3,1]],
 
 			stone_chilundashi:['male','qun',2,['stone_chilundashi1'],['minskin','stone'],[1,1]],
@@ -5445,14 +5445,17 @@ mode.stone={
 			content:function(){
 				'step 0'
 				var list=[];
+				event.num=0;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isMin()&&game.players[i]!=player){
 						list.push(game.players[i]);
+						if(game.players[i].side!=player.side){
+							event.num+=2;
+						}
 					}
 				}
 				list.sort(lib.sort.seat);
 				event.list=list;
-				event.num=list.length;
 				'step 1'
 				if(event.list.length){
 					var target=event.list.shift();
@@ -5464,12 +5467,11 @@ mode.stone={
 				}
 				'step 2'
 				var target=player.getLeader();
-				// var hs=target.get('h');
-				// if(hs.length){
-				// 	target.discard(hs);
-				// }
-				target.skip('phaseJudge');
-				target.skip('phaseUse');
+				var hs=target.get('h');
+				if(hs.length){
+					target.discard(hs);
+				}
+				game.delay();
 				'step 3'
 				if(event.num){
 					player.damage(event.num,'nosource');
@@ -5537,7 +5539,7 @@ mode.stone={
 				event.card&&get.type(event.card)=='stonecard';
 			},
 			content:function(){
-				trigger.num++
+				trigger.num+=2;
 			},
 			ai:{
 				threaten:1.6
@@ -7553,13 +7555,13 @@ mode.stone={
 			forced:true,
 			mark:true,
 			intro:{
-				content:'使用下一张随从牌时，获得一点行动值'
+				content:'使用下一张随从牌时，获得两点行动值'
 			},
 			filter:function(event,player){
 				return get.type(event.card)=='stonecharacter';
 			},
 			content:function(){
-				player.actused--;
+				player.actused-=2;
 				player.updateActCount();
 				player.removeSkill('paladin_zhaohuan2');
 			}
@@ -8061,7 +8063,8 @@ mode.stone={
 			trigger:{global:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				return event.source&&event.source!=player&&player.side==event.source.side&&event.notLink();
+				return event.source&&event.source!=player&&event.source.isMin()&&
+				player.side==event.source.side&&event.notLink();
 			},
 			content:function(){
 				trigger.num++
@@ -8344,7 +8347,7 @@ mode.stone={
 			filter:function(event,player){
 				if(player.career!='druid') return false;
 				if(player.getActCount()+2>player.actcount) return false;
-				return player.num('he')>0&&lib.filter.cardEnabled({name:'sha'},player);
+				return lib.filter.cardEnabled({name:'sha'},player);
 			},
 			usable:1,
 			filterTarget:function(card,player,target){
@@ -9147,7 +9150,10 @@ mode.stone={
 					heilong=true;
 				}
 				else if(dc==2){
-					if(player.actcount-player.getActCount()<=0){
+					if(player.getEnemy().countFellow()>=3){
+						heilong=Math.random()<0.5;
+					}
+					else if(player.actcount-player.getActCount()<=0){
 						heilong=true;
 					}
 					else{
@@ -9263,13 +9269,13 @@ mode.stone={
 		stone_fushi:'缚誓',
 		stone_fushi_info:'你出场时，为所有友方角色回复所有体力值',
 		stone_mieshi:'灭世',
-		stone_mieshi_info:'你出场时，消灭所有其他随从，跳过己方主将的下个判定和出牌阶段，并受到等同于死亡随从数的伤害',
+		stone_mieshi_info:'你出场时，消灭所有其他随从，弃置己方主将的所有手牌，每有一名敌方随从死亡，便受到两点伤害',
 		stone_shixu:'时序',
 		stone_shixu_info:'你出场的回合内，己方主将获得3点行动值',
 		stone_chenshui:'沉睡',
 		stone_chenshui_info:'己方主将的回合结束阶段，令其获得一张梦境牌',
 		stone_mowang:'魔网',
-		stone_mowang_info:'己方法术伤害+1',
+		stone_mowang_info:'己方法术伤害+2',
 
 		stone_zhiyin:'指引',
 		stone_zhiyin_info:'每当己方主将使用一张法术牌，将一张火球术置于其手牌',
@@ -9770,7 +9776,7 @@ mode.stone={
 
 		paladin_zhaohuan:'召唤',
 		paladin_zhaohuan2:'召唤',
-		paladin_zhaohuan_info:'你出场后，你的主将在使用下一张随从牌时获得一点行动值',
+		paladin_zhaohuan_info:'你出场后，你的主将在使用下一张随从牌时获得两点行动值',
 		paladin_shouwei:'守卫',
 		paladin_shouwei_info:'你出场时，你的主将回复两点体力值',
 		paladin_chidun:'持盾',
@@ -9928,7 +9934,7 @@ mode.stone={
 		shaman_fachao:'法潮',
 		shaman_fachao_info:'己方主将在其每个回合结束阶从牌库中获得一张牌并回复一点体力',
 		shaman_huoshe:'火舌',
-		shaman_huoshe_info:'其他己方角色造成的伤害始终+1',
+		shaman_huoshe_info:'其他友方随从造成的伤害始终+1',
 
 		shaman_jili:'激励',
 		shaman_jili_info:'己方主将回合结束时，所有友方图腾摸一张牌',

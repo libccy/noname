@@ -1536,6 +1536,8 @@ card.standard={
 	},
 	translate:{
 		sha:'杀',
+		huosha:'火杀',
+		leisha:'雷杀',
 		shan:'闪',
 		tao:'桃',
 		bagua:'八卦阵',

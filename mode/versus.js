@@ -296,6 +296,14 @@ mode.versus={
 					game.loadPackage('character/boss');
 				}
 				'step 1'
+				for(var i in lib.skill){
+					if(lib.skill[i].changeSeat){
+						lib.skill[i]={};
+						if(lib.translate[i+'_info']){
+							lib.translate[i+'_info']='此模式下不可用';
+						}
+					}
+				}
 				var list={
 					weilist:[],shulist:[],
 					weimech:[],shumech:[],
