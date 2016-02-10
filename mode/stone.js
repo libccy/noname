@@ -2088,6 +2088,7 @@ mode.stone={
 			multitarget:true,
 			multiline:true,
 			content:function(){
+				'step 0'
 				var maxf=[],maxe=[];
 				for(var i=0;i<targets.length;i++){
 					if(targets[i].side==player.side){
@@ -2116,10 +2117,11 @@ mode.stone={
 					targets.remove(maxe.randomGet());
 				}
 				targets.sort(lib.sort.seat);
-				for(var i=0;i<targets.length;i++){
-					targets[i].die()._triggered=null;
+				event.targets=targets;
+				'step 1'
+				if(event.targets.length){
+					event.targets.shift().die();
 				}
-				ui.clear();
 			},
 			ai:{
 				order:9,
@@ -3802,12 +3804,14 @@ mode.stone={
 			},
 			selectTarget:-1,
 			content:function(){
+				'step 0'
 				targets.randomRemove();
 				targets.sort(lib.sort.seat);
-				for(var i=0;i<targets.length;i++){
-					targets[i].die()._triggered=null;
+				event.list=targets;
+				'step 1'
+				if(event.list.length){
+					event.list.shift().die();
 				}
-				ui.clear();
 			},
 			ai:{
 				order:9,
@@ -5137,11 +5141,12 @@ mode.stone={
 			content:function(){
 				'step 0'
 				targets.sort(lib.sort.seat);
-				for(var i=0;i<targets.length;i++){
-					targets[i].die()._triggered=null;
-				}
-				ui.clear();
+				event.list=targets;
 				'step 1'
+				if(event.list.length){
+					event.list.shift().die();
+				}
+				'step 2'
 				player.recover(2)
 			},
 			stoneact:5,
@@ -5525,7 +5530,7 @@ mode.stone={
 			},
 			content:function(){
 				var target=player.getLeader();
-				target.actused-=3;
+				target.actused-=4;
 				target.updateActCount();
 				player.line(target,'green');
 			}
@@ -7119,7 +7124,7 @@ mode.stone={
 				trigger.finish();
 			},
 			ai:{
-				threaten:0.5
+				threaten:0
 			}
 		},
 		stone_jingxiang:{
@@ -7145,6 +7150,9 @@ mode.stone={
 				cardEnabled:function(card){
 					if(card.name=='sha') return false;
 				}
+			},
+			ai:{
+				threaten:0
 			}
 		},
 		priest_xundao:{
@@ -9271,7 +9279,7 @@ mode.stone={
 		stone_mieshi:'灭世',
 		stone_mieshi_info:'你出场时，消灭所有其他随从，弃置己方主将的所有手牌，每有一名敌方随从死亡，便受到两点伤害',
 		stone_shixu:'时序',
-		stone_shixu_info:'你出场的回合内，己方主将获得3点行动值',
+		stone_shixu_info:'你出场的回合内，己方主将获得4点行动值',
 		stone_chenshui:'沉睡',
 		stone_chenshui_info:'己方主将的回合结束阶段，令其获得一张梦境牌',
 		stone_mowang:'魔网',
@@ -9335,8 +9343,8 @@ mode.stone={
 		spell_nuhuozhongshao_info:'对一名随从造成一点伤害，然后令其摸两张牌',
 		spell_xuanfengzhan:'旋风斩',
 		spell_xuanfengzhan_info:'对所有随从造成一点伤害',
-		spell_juemingluandou:'绝命乱半',
-		spell_juemingluandou_info:'随机保留一名随从，然后令所有其他随从死亡（无法触发死亡技能）',
+		spell_juemingluandou:'绝命乱斗',
+		spell_juemingluandou_info:'随机保留一名随从，然后令所有其他随从死亡',
 
 		spell_zhongnian:'重碾',
 		spell_zhongnian_info:'造成X点伤害，X为已受伤的友方角色数且不超过3',
@@ -9499,7 +9507,7 @@ mode.stone={
 		spell_liliangzhufu_info:'令一名随从摸两张牌',
 
 		spell_jinyingduijue:'精英对决',
-		spell_jinyingduijue_info:'双方各保留体力值最高的一名随从，然后令其他随从死亡（无法触发死亡技能）',
+		spell_jinyingduijue_info:'双方各保留体力值最高的一名随从，然后令其他随从死亡',
 		spell_shenpan:'审判',
 		spell_shenpan_info:'若你的对手随从数多于你，则随机令一名敌方随从死亡',
 		spell_shenshengfennu:'神圣愤怒',
@@ -10066,7 +10074,7 @@ mode.stone={
 		spell_binghuan:'冰环',
 		spell_binghuan_info:'将场上所有随从翻面',
 		spell_morizaihuo:'末日灾祸',
-		spell_morizaihuo_info:'令场上所有随从立即死亡（无法触发死亡技能），回复两点体力',
+		spell_morizaihuo_info:'令场上所有随从立即死亡，回复两点体力',
 		spell_zhiliaozhichu:'治疗之触',
 		spell_zhiliaozhichu_info:'令目标随从恢复所有体力值并获得嘲讽',
 		chaofeng:'嘲讽',

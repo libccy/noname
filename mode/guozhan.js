@@ -216,7 +216,7 @@ mode.guozhan={
 						if(lib.character[list[i]][1]==lib.character[list[j]][1]){
 							player.init(list[i],list[j],false);
 							if(back){
-								list.remove(player.name1);
+								list.remove(player.name);
 								list.remove(player.name2);
 								for(var i=0;i<list.length;i++){
 									back.push(list[i]);

@@ -2474,7 +2474,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动【雷击·新】？').ai=function(target){
+				player.chooseTarget('是否发动【新雷击】？').ai=function(target){
 					return ai.get.damageEffect(target,player,player,'thunder');
 				};
 				"step 1"
@@ -3120,7 +3120,7 @@ character.shenhua={
 		hongyan:'红颜',
 		buqu:'不屈',
 		leiji:'雷击',
-		spleiji:'雷击·新',
+		spleiji:'新雷击',
 		guidao:'鬼道',
 		huangtian:'黄天',
 		huangtian2:'黄天',

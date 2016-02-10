@@ -2,8 +2,10 @@ window.config={
 	forbidai:['zuoci','caiwenji'],
 	forbidsingle:['menghuo','huanggai','machao','pangde','yanwen','xiahoudun','xuzhu','luxun',
 	'xuhuang','yujin','xiaoqiao','daqiao','zhangjiao','zhangbao'],
-	forbidall:['caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu',
-	'xiahouyuan','huangzhong','weiyan','dianwei','gongsunzan','zhangjiao'],
+	forbidall:['xiahouyuan','huangzhong','weiyan','dianwei','zhangjiao'],
+	forbidpack:{
+		refresh:['caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu','gongsunzan']
+	},
 	forbidversus:['swd_kangnalishi'],
 	forbidstone:['zhugedan','pal_xuanxiao','hs_malfurion','lusu','chenlin',
 	'gjqt_bailitusu','yuanshao','swd_anka','swd_nicole','daqiao','re_daqiao',

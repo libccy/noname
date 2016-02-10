@@ -20644,8 +20644,15 @@
 					else{
 						opacity='';
 					}
+					var skilltrans=get.translation(skills[i]);
+					if(skilltrans&&skilltrans.length==3&&skilltrans[0]=='新'){
+						skilltrans=skilltrans.slice(1);
+					}
+					else{
+						skilltrans=skilltrans.slice(0,2);
+					}
 					str+='<div class="skill" style="'+opacity+
-					'">【'+get.translation(skills[i]).slice(0,2)+'】</div><div style="'+opacity+'">'+
+					'">【'+skilltrans+'】</div><div style="'+opacity+'">'+
 					lib.translate[skills[i]+'_info']+'</div><div style="display:block;height:10px"></div>';
 				}
 			}
@@ -20780,7 +20787,13 @@
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
 					if(lib.translate[skills[i]+'_info']){
-						translation=get.translation(skills[i]).slice(0,2);
+						translation=get.translation(skills[i]);
+						if(translation.length==3&&translation[0]=='新'){
+							translation=translation.slice(1);
+						}
+						else{
+							translation=translation.slice(0,2);
+						}
 						if(!skills2.contains(skills[i])){
 							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
@@ -21040,7 +21053,13 @@
 				var skills=infoitem[3];
 				for(i=0;i<skills.length;i++){
 					if(lib.translate[skills[i]+'_info']){
-						translation=get.translation(skills[i])[0]+get.translation(skills[i])[1];
+						translation=get.translation(skills[i]);
+						if(translation.length==3&&translation[0]=='新'){
+							translation=translation.slice(1);
+						}
+						else{
+							translation=translation.slice(0,2);
+						}
 						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 					}
 				}
@@ -22271,6 +22290,11 @@
 								}
 							}
 						}
+					}
+				}
+				for(i in lib.config.forbidpack){
+					if(lib.config.characters.contains(i)){
+						lib.config.forbidall=lib.config.forbidall.concat(lib.config.forbidpack[i]);
 					}
 				}
 
