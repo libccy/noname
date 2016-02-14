@@ -489,7 +489,7 @@ character.yijiang={
 			trigger:{global:'phaseJudgeBegin'},
 			direct:true,
 			filter:function(event,player){
-				return event.player!=player&&event.player.num('j')>0;
+				return event.player!=player&&event.player.num('j')>0&&get.distance(player,event.player,'attack')<=1;
 			},
 			content:function(){
 				'step 0'

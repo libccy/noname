@@ -76,7 +76,7 @@ card.shenqi={
 			subtype:'equip5',
 			skills:['kongxin'],
 			ai:{
-				equipValue:8
+				equipValue:6
 			}
 		},
 		shennongding:{

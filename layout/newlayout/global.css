@@ -234,8 +234,12 @@
 .player.linked{
 	transform:rotate(-90deg);
 }
-#arena:not(.no_target_shake) .linked.target{transform: rotate(-93deg);}
-#arena:not(.no_target_shake) .linked.target2{transform: rotate(-87deg);}
+#arena[data-target_shake='shake'] .linked.target{transform: rotate(-93deg);}
+#arena[data-target_shake='shake'] .linked.target2{transform: rotate(-87deg);}
+
+#arena[data-target_shake='zoom'] .linked.target,
+#arena[data-target_shake='zoom'] .linked.target2{transform: scale(1.03) rotate(-90deg);}
+
 
 .player.acted.linked .identity{
 	transform:rotate(270deg);

@@ -506,7 +506,7 @@ mode.versus={
 					'xunyu','lusu','guanping','zhangzong','zhoutai','sp_zhangjiao','zhangjiao',
 					'shixie','zhanglu','chenlin','mayunlu','yangxiu','zhugeke','chengyu',
 					'zhangbao','zhangliang','sunhao','wutugu','zhugeguo','liuzan','lingcao',
-					'sunru','lingju','lifeng','hanba','sunluyu','zhuling',
+					'sunru','lingju','lifeng','hanba','sunluyu','zhuling','daxiaoqiao',
 					'sp_zhaoyun','sp_diaochan','sp_pangtong','sp_caoren','sp_daqiao',
 					'sp_ganning','sp_zhangfei','sp_xiahoudun'].contains(name)){
 						return true;
@@ -1653,10 +1653,10 @@ mode.versus={
 	element:{
 		player:{
 			dieSpeak:function(){
-				switch(this.identity){
-					case 'zhu': this.popup('吾降矣',2000);break;
-					case 'zhong': this.popup('呃啊',2000);break;
-				}
+				// switch(this.identity){
+				// 	case 'zhu': this.popup('吾降矣',2000);break;
+				// 	case 'zhong': this.popup('呃啊',2000);break;
+				// }
 			},
 			dieAfter:function(source){
 				if(_status.mode=='four'){

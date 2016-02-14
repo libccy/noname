@@ -11,7 +11,7 @@ window.config={
 	'gjqt_bailitusu','yuanshao','swd_anka','swd_nicole','daqiao','re_daqiao',
 	'zhuran','huatuo','swd_tuwei','hs_guldan','wangyi','caoang','swd_guyue',
 	'swd_jiangziya','guojia','re_guojia','shen_caocao','swd_qiner','caopi','hs_yngvar',
-	'gjqt_aruan','swd_hanluo','hs_anduin','swd_huanglei','yxs_luzhishen'],
+	'gjqt_aruan','swd_hanluo','hs_anduin','swd_huanglei','yxs_luzhishen','swd_muyun'],
 	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
 	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','jg_simayi','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],

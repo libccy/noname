@@ -788,12 +788,12 @@ mode.identity={
 	element:{
 		player:{
 			dieSpeak:function(){
-				switch(this.identity){
-					case 'zhu': this.popup('吾降矣',2000);break;
-					case 'zhong': this.popup('呃啊',2000);break;
-					case 'nei': this.popup('啊，被看穿了',2000);break;
-					case 'fan': this.popup('饶命啊',2000);break;
-				}
+				// switch(this.identity){
+				// 	case 'zhu': this.popup('吾降矣',2000);break;
+				// 	case 'zhong': this.popup('呃啊',2000);break;
+				// 	case 'nei': this.popup('啊，被看穿了',2000);break;
+				// 	case 'fan': this.popup('饶命啊',2000);break;
+				// }
 			},
 			dieAfter:function(source){
 				this.dieSpeak();

@@ -299,7 +299,7 @@ character.diy={
 			ai:{
 				effect:{
 					target:function(card){
-						if(get.type(card)=='delay') return [0,1];
+						if(get.type(card)=='delay') return [0,0.5];
 					}
 				}
 			}

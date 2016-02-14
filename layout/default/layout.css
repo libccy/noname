@@ -1037,8 +1037,11 @@ div:hover>.intro{opacity: 1;}
 /*.player.target{-webkit-filter:brightness(1.2)}*/
 
 .target{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.5) 0 0 12px, rgba(255, 0, 0, 0.8) 0 0 15px !important}
-#arena:not(.no_target_shake) .target{transform: rotate(-3deg);}
-#arena:not(.no_target_shake) .target2{transform: rotate(3deg);}
+#arena[data-target_shake='shake'] .target{transform: rotate(-3deg);}
+#arena[data-target_shake='shake'] .target2{transform: rotate(3deg);}
+
+#arena[data-target_shake='zoom'] .target,
+#arena[data-target_shake='zoom'] .target2{transform: scale(1.03);}
 
 .content>.config.line2{
 	transform:translateX(-5px);

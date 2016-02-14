@@ -19,8 +19,7 @@
 		version:1.78,
 		changeLog:[
 			'修bug',
-			'新年兽',
-			'剑阁双将',
+			'新武将（SP）',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -993,20 +992,6 @@
 						init:true,
 						unfrequent:true,
 					},
-					target_shake:{
-						name:'出牌抖动',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('target_shake',bool);
-							if(bool){
-								ui.arena.classList.remove('no_target_shake');
-							}
-							else{
-								ui.arena.classList.add('no_target_shake');
-							}
-						}
-					},
 					button_press:{
 						name:'按钮效果',
 						init:true,
@@ -1029,6 +1014,26 @@
 					skill_animation:{
 						name:'技能特效',
 						init:true,
+					},
+					target_shake:{
+						name:'目标效果',
+						init:'zoom',
+						item:{
+							off:'关闭',
+							zoom:'缩放',
+							shake:'抖动',
+						},
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('target_shake',bool);
+							ui.arena.dataset.target_shake=bool;
+							// if(bool){
+							// 	ui.arena.classList.remove('no_target_shake');
+							// }
+							// else{
+							// 	ui.arena.classList.add('no_target_shake');
+							// }
+						}
 					},
 					name_font:{
 						name:'人名字体',
@@ -4481,7 +4486,7 @@
 						else if(info.line=='thunder'){
 							config.color='thunder';
 						}
-						else if(info.line===undefined){
+						else if(info.line===undefined||info.line=='green'){
 							config.color='green';
 						}
 						if(info.multitarget&&!info.multiline&&targets.length>1){
@@ -13994,9 +13999,9 @@
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
-				if(!lib.config.target_shake){
-					ui.arena.classList.add('no_target_shake');
-				}
+				// if(!lib.config.target_shake){
+				// 	ui.arena.classList.add('no_target_shake');
+				// }
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
@@ -14005,6 +14010,8 @@
 				// if(lib.config[themeentry]){
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
 				// }
+
+				ui.arena.dataset.target_shake=lib.config.target_shake||'zoom';
 
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';

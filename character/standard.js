@@ -238,7 +238,7 @@ character.standard={
 					}
 				}
 				check=(num>=2);
-				player.chooseTarget('是否发动突袭？',[1,2],function(card,player,target){
+				player.chooseTarget('是否发动【突袭】？',[1,2],function(card,player,target){
 					return target.num('h')>0&&player!=target;
 				},
 					function(target){
@@ -1085,6 +1085,7 @@ character.standard={
 			direct:true,
 			priority:5,
 			filter:function(event,player){
+				if(player.num('he')==0) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(get.distance(player,game.players[i],'attack')<=1&&
 						game.players[i]!=event.player&&game.players[i]!=player){
@@ -1122,7 +1123,7 @@ character.standard={
 						}
 						return -1;
 					},
-					prompt:'是否发动[流离]？'
+					prompt:'是否发动【流离】？'
 				});
 				"step 1"
 				if(result.bool){

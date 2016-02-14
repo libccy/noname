@@ -692,12 +692,12 @@ mode.stone={
 
 			stone_siwangzhiyi:['male','qun',6,['stone_mieshi'],['minskin','stone','stonehidden','stonelegend'],[6,6]],
 			stone_alaikesita:['male','qun',5,['stone_fushi'],['minskin','stone','stonehidden','stonelegend'],[6,5]],
-			stone_yisela:['male','qun',6,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,3]],
+			stone_yisela:['male','qun',6,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 			stone_nuoziduomu:['male','qun',5,['stone_shixu'],['minskin','stone','stonehidden','stonelegend'],[6,5]],
-			stone_maligousi:['male','qun',6,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,3]],
+			stone_maligousi:['male','qun',6,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 
 			stone_aolajier:['male','qun',6,['stone_chongfeng','shaman_fengnu','paladin_hudun','chaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
-			stone_andongni:['male','qun',6,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,6]],
+			stone_andongni:['male','qun',6,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
 			stone_jialakesi:['male','qun',6,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
 			stone_jialakesix:['male','qun',6,['stone_lianyu'],['stonehidden','stonespecial']],
 			stone_kelushi:['male','qun',8,['stone_chongfeng'],['minskin','stone','stonehidden','stonelegend_hunter'],[6,8]],
@@ -1777,8 +1777,8 @@ mode.stone={
 			},
 			ai:{
 				order:4,
-				value:5,
-				useful:5,
+				value:3,
+				useful:3,
 				result:{
 					target:function(player,target){
 						if(target.side!=player.side){
@@ -1817,8 +1817,8 @@ mode.stone={
 			},
 			ai:{
 				order:7,
-				value:3,
-				useful:3,
+				value:5,
+				useful:5,
 				result:{
 					player:function(player){
 						if(player.getEnemy().countFellow()>=2) return 1;
@@ -2121,6 +2121,7 @@ mode.stone={
 				'step 1'
 				if(event.targets.length){
 					event.targets.shift().die();
+					event.redo();
 				}
 			},
 			ai:{
@@ -2220,7 +2221,8 @@ mode.stone={
 			stoneact:2,
 			career:'paladin',
 			enable:function(card,player){
-				return player.getEnemy().countFellow()>player.countFellow();
+				var num=player.getEnemy().countFellow();
+				return num>0&&num>=player.countFellow();
 			},
 			fullimage:true,
 			notarget:true,
@@ -3302,7 +3304,11 @@ mode.stone={
 				result:{
 					target:function(player,target){
 						if(target.isTurnedOver()) return 0;
-						if(target.isMin()) return target.hp;
+						var num=0;
+						if(target.skills.contains('shaman_fengnu')){
+							num=3;
+						}
+						if(target.isMin()) return target.hp+num;
 						return 1.1;
 					}
 				}
@@ -3811,6 +3817,7 @@ mode.stone={
 				'step 1'
 				if(event.list.length){
 					event.list.shift().die();
+					event.redo();
 				}
 			},
 			ai:{
@@ -5145,6 +5152,7 @@ mode.stone={
 				'step 1'
 				if(event.list.length){
 					event.list.shift().die();
+					event.redo();
 				}
 				'step 2'
 				player.recover(2)
@@ -5455,7 +5463,10 @@ mode.stone={
 					if(game.players[i].isMin()&&game.players[i]!=player){
 						list.push(game.players[i]);
 						if(game.players[i].side!=player.side){
-							event.num+=2;
+							event.num+=game.players[i].hp;
+						}
+						else{
+							event.num-=game.players[i].hp;
 						}
 					}
 				}
@@ -5505,11 +5516,8 @@ mode.stone={
 			}
 		},
 		stone_chenshui:{
-			trigger:{global:'phaseEnd'},
+			trigger:{player:'phaseEnd'},
 			forced:true,
-			filter:function(event,player){
-				return event.player==player.getLeader();
-			},
 			content:function(){
 				var list=['mengjing_feicuiyoulong','mengjing_huanxiaojiemei',
 					'mengjing_suxing','mengjing_mengye','mengjing_mengjing'];
@@ -6454,6 +6462,15 @@ mode.stone={
 						var name=ui.cardPile.childNodes[i].name;
 						if(!added.contains(name)&&!target.hasJudge(name)){
 							target.addJudge(ui.cardPile.childNodes[i]);
+							added.add(name);
+						}
+					}
+				}
+				for(var i=0;i<ui.discardPile.childNodes.length;i++){
+					if(get.type(ui.discardPile.childNodes[i])=='delay'){
+						var name=ui.discardPile.childNodes[i].name;
+						if(!added.contains(name)&&!target.hasJudge(name)){
+							target.addJudge(ui.discardPile.childNodes[i]);
 							added.add(name);
 						}
 					}
@@ -9193,6 +9210,9 @@ mode.stone={
 					if(num>6){
 						honglong=true;
 					}
+					else if(player.maxHp-player.hp>=3&&player.hp<=2){
+						honglong=true;
+					}
 				}
 				player.chooseButton(dialog).ai=function(button){
 					if(button.link=='stone_siwangzhiyi'){
@@ -9277,11 +9297,11 @@ mode.stone={
 		stone_fushi:'缚誓',
 		stone_fushi_info:'你出场时，为所有友方角色回复所有体力值',
 		stone_mieshi:'灭世',
-		stone_mieshi_info:'你出场时，消灭所有其他随从，弃置己方主将的所有手牌，每有一名敌方随从死亡，便受到两点伤害',
+		stone_mieshi_info:'你出场时，消灭所有其他随从，弃置己方主将的所有手牌，并受到X点伤害，X为敌方与己方的随从数体力值之差',
 		stone_shixu:'时序',
 		stone_shixu_info:'你出场的回合内，己方主将获得4点行动值',
 		stone_chenshui:'沉睡',
-		stone_chenshui_info:'己方主将的回合结束阶段，令其获得一张梦境牌',
+		stone_chenshui_info:'在你的回合结束阶段，令己方主将获得一张梦境牌',
 		stone_mowang:'魔网',
 		stone_mowang_info:'己方法术伤害+2',
 
@@ -9509,7 +9529,7 @@ mode.stone={
 		spell_jinyingduijue:'精英对决',
 		spell_jinyingduijue_info:'双方各保留体力值最高的一名随从，然后令其他随从死亡',
 		spell_shenpan:'审判',
-		spell_shenpan_info:'若你的对手随从数多于你，则随机令一名敌方随从死亡',
+		spell_shenpan_info:'若你的对手随从数不少于你，则随机令一名敌方随从死亡',
 		spell_shenshengfennu:'神圣愤怒',
 		spell_shenshengfennu_info:'从牌库中获得一张牌，并造成等同于其行动值消耗的伤害',
 		spell_yongshizhufu:'勇士祝福',

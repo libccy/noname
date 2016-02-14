@@ -22,7 +22,7 @@ character.yxs={
 		yxs_luobinhan:['male','wu',4,['xiadao','lzhangyi']],
 		yxs_chengjisihan:['male','qun',4,['mashu','qianglue']],
 		yxs_mingchenghuanghou:['female','shu',3,['tiewan','chajue']],
-		yxs_wangzhaojun:['female','wei',3,['heqin','luoyan']],
+		yxs_wangzhaojun:['female','wei',3,['heqin','wluoyan']],
 		yxs_luocheng:['male','wu',4,['hanqiang','biaoqi']],
 		yxs_direnjie:['male','wei',3,['shentan','kanpo']],
 		yxs_sunwu:['male','wu',3,['bingsheng','taolue']],
@@ -424,6 +424,7 @@ character.yxs={
 			check:function(card){
 				return 7-ai.get.value(card);
 			},
+			position:'he',
 			content:function(){
 				"step 0"
 				var hs=target.get('h');
@@ -487,16 +488,14 @@ character.yxs={
 				}
 			}
 		},
-		luoyan:{
-			trigger:{player:'damageBegin'},
+		wluoyan:{
+			trigger:{player:'damageBefore'},
 			forced:true,
-			priority:-5,
-			filter:function(event){
-				return event.nature?true:false;
-			},
 			content:function(){
-				delete trigger.nature;
-			}
+				trigger.untrigger();
+				trigger.finish();
+				player.loseHp();
+			},
 		},
 		heqin:{
 			skillAnimation:true,
@@ -2154,8 +2153,8 @@ character.yxs={
 		hanqiang_info:'锁定技，当你没装备武器时，攻击范围+1',
 		biaoqi:'骠骑',
 		biaoqi_info:'锁定技，当你出杀指定目标后，若你的攻击范围大于目标体力值，则此杀不可闪避；若你的攻击范围小于目标体力值，你摸一张牌',
-		luoyan:'落雁',
-		luoyan_info:'锁定技，你即将受到的属性伤害均改为无属性',
+		wluoyan:'落雁',
+		wluoyan_info:'锁定技，你防止即将受到的伤害，改为流失一点体力',
 		heqin:'和亲',
 		heqin2:'和亲',
 		heqin3:'和亲',
