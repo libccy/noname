@@ -123,7 +123,7 @@ card.shenqi={
 			subtype:'equip5',
 			skills:['nvwashi'],
 			ai:{
-				equipValue:7
+				equipValue:5
 			}
 		}
 	},

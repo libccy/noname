@@ -1017,7 +1017,7 @@
 					},
 					target_shake:{
 						name:'目标效果',
-						init:'zoom',
+						init:'shake',
 						item:{
 							off:'关闭',
 							zoom:'缩放',
@@ -1027,12 +1027,6 @@
 						onclick:function(bool){
 							game.saveConfig('target_shake',bool);
 							ui.arena.dataset.target_shake=bool;
-							// if(bool){
-							// 	ui.arena.classList.remove('no_target_shake');
-							// }
-							// else{
-							// 	ui.arena.classList.add('no_target_shake');
-							// }
 						}
 					},
 					name_font:{
@@ -5853,7 +5847,7 @@
 					switch(get.itemtype(this.storage[skill])){
 						case 'cards':game.addVideo('storage',this,[skill,get.cardsInfo(this.storage[skill]),'cards']);break;
 						case 'card':game.addVideo('storage',this,[skill,get.cardInfo(this.storage[skill]),'card']);break;
-						default:game.addVideo('storage',this,[skill,this.storage[skill]]);
+						default:game.addVideo('storage',this,[skill,JSON.parse(JSON.stringify(this.storage[skill]))]);
 					}
 				},
 				playerfocus:function(time){
@@ -7110,7 +7104,17 @@
 						delete this.marks[name];
 						var info=lib.skill[name];
 						if(info&&info.intro&&info.intro.onunmark){
-							info.intro.onunmark(this.storage[name],this);
+							if(info.intro.onunmark=='throw'){
+								if(get.itemtype(this.storage[name])=='cards'){
+									this.$throw(this.storage[name]);
+									while(this.storage[name].length){
+										ui.discardPile.appendChild(this.storage[name].shift());
+									}
+								}
+							}
+							else if(typeof info.intro.onunmark=='function'){
+								info.intro.onunmark(this.storage[name],this);
+							}
 						}
 					}
 				},
@@ -13999,9 +14003,6 @@
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
-				// if(!lib.config.target_shake){
-				// 	ui.arena.classList.add('no_target_shake');
-				// }
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
@@ -14011,7 +14012,7 @@
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
 				// }
 
-				ui.arena.dataset.target_shake=lib.config.target_shake||'zoom';
+				ui.arena.dataset.target_shake=lib.config.target_shake||'shake';
 
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';

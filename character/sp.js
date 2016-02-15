@@ -47,7 +47,7 @@ character.sp={
 		zumao:['male','wu',4,['yinbing','juedi']],
 		daxiaoqiao:['female','wu',3,['xingwu','luoyan']],
 		sp_daqiao:['female','wu',3,['yanxiao','anxian']],
-		// sp_ganning:['male','wu',4,['yinling','junwei']],
+		sp_ganning:['male','wu',4,['yinling','junwei']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -67,6 +67,195 @@ character.sp={
 		daxiaoqiao:['zhouyu','sunce'],
 	},
 	skill:{
+		junwei:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.storage.yinling&&player.storage.yinling.length>=3;
+			},
+			content:function(){
+				'step 0'
+				var dialog=ui.create.dialog('是否发动【军威】？','hidden',player.storage.yinling);
+				if(player.storage.yinling.length>3){
+					player.chooseButton(dialog,3).ai=function(button){
+						return 1;
+					};
+				}
+				else{
+					for(var i=0;i<dialog.buttons.length;i++){
+						dialog.buttons[i].classList.add('selectedx');
+					}
+					player.chooseBool(dialog);
+					event.cards=player.storage.yinling.slice(0);
+				}
+				'step 1'
+				if(result.bool){
+					var cards=event.cards||result.links;
+					for(var i=0;i<cards.length;i++){
+						player.storage.yinling.remove(cards[i]);
+						ui.discardPile.appendChild(cards[i]);
+					}
+					player.$throw(cards);
+					player.syncStorage('yinling');
+					if(player.storage.yinling.length==0){
+						player.unmarkSkill('yinling');
+					}
+					game.delay();
+					player.chooseTarget(true,function(card,player,target){
+						return player!=target;
+					}).ai=function(target){
+						return -ai.get.attitude(player,target);
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool&&result.targets&&result.targets.length){
+					var target=result.targets[0];
+					player.logSkill('junwei',result.targets);
+					event.target=target;
+					var nshan=target.num('h','shan');
+					if(nshan==0){
+						event.directfalse=true;
+					}
+					else{
+						target.chooseCard('交给'+get.translation(player)+'一张闪，或流失一点体力',function(card){
+							return card.name=='shan';
+						}).ai=function(card){
+							if(nshan>1) return 1;
+							if(target.hp>3) return 0;
+							return 1;
+						};
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 3'
+				if(!event.directfalse&&result.bool) game.delay();
+				ui.clear();
+				'step 4'
+				if(!event.directfalse&&result.bool){
+					event.cards=result.cards;
+					event.target.$throw(result.cards);
+					player.chooseTarget('将闪交给一名角色',true,function(card,player,target){
+						return target!=event.target;
+					}).ai=function(target){
+						return ai.get.attitude(player,target)/(target.num('h','shan')+1);
+					}
+				}
+				else{
+					event.target.loseHp();
+					delete event.cards;
+				}
+				'step 5'
+				if(event.cards){
+					player.line(result.targets,'green');
+					result.targets[0].gain(event.cards,'gain2');
+					game.log(player,'将',event.cards,'交给',result.targets[0]);
+					event.finish();
+				}
+				else{
+					if(event.target.num('e')){
+						player.choosePlayerCard('e','将'+get.translation(event.target)+'的一张装备牌移出游戏',true,event.target);
+					}
+					else{
+						event.finish();
+					}
+				}
+				'step 6'
+				if(result.bool){
+					var card=result.links[0];
+					if(event.target.storage.junwei2){
+						event.target.storage.junwei2.push(card);
+					}
+					else{
+						event.target.storage.junwei2=[card];
+					}
+					event.target.lose(card,ui.special);
+					event.target.addSkill('junwei2');
+					event.target.syncStorage('junwei2');
+				}
+			}
+		},
+		junwei2:{
+			mark:true,
+			intro:{
+				content:'cards'
+			},
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				'step 0'
+				if(player.storage.junwei2.length){
+					var card=player.storage.junwei2.shift();
+					player.equip(card);
+					event.redo();
+				}
+				'step 1'
+				player.removeSkill('junwei2');
+				delete player.storage.junwei2;
+			}
+		},
+		yinling:{
+			enable:'phaseUse',
+			filterCard:{color:'black'},
+			position:'he',
+			intro:{
+				content:'cards',
+				onunmark:'throw'
+			},
+			filter:function(event,player){
+				return player.num('he',{color:'black'})>0&&player.storage.yinling.length<4;
+			},
+			filterTarget:function(card,player,target){
+				return target.num('he')>0&&target!=player;
+			},
+			init:function(player){
+				player.storage.yinling=[];
+			},
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				player.choosePlayerCard('hej',target,true);
+				'step 1'
+				target.$give(result.links,player);
+				target.lose(result.links,ui.special);
+				player.storage.yinling.push(result.links[0]);
+				player.markSkill('yinling');
+				player.syncStorage('yinling');
+			},
+			ai:{
+				order:10.1,
+				expose:0.1,
+				result:{
+					target:function(player,target){
+						if(target.skills.contains('tuntian')) return 0;
+						var es=target.get('e');
+						var nh=target.num('h');
+						var noe=(es.length==0);
+						var noe2=(es.length==1&&es[0].name=='baiyin'&&target.hp<target.maxHp);
+						var noh=(nh==0||target.hasSkillTag('noh'));
+						if(noh&&noe) return 0;
+						if(noh&&noe2) return 0.01;
+						if(ai.get.attitude(player,target)<=0) return (target.num('he'))?-1.5:1.5;
+						var js=target.get('j');
+						if(js.length){
+							var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
+							if(jj.name=='guohe') return 3;
+							if(js.length==1&&ai.get.effect(target,jj,target,player)>=0){
+								return -1.5;
+							}
+							return 2;
+						}
+						return -1.5;
+					},
+				},
+			}
+		},
 		yanxiao:{
 			enable:'phaseUse',
 			filterCard:{suit:'diamond'},
@@ -4665,6 +4854,7 @@ character.sp={
 		yinling_bg:'锦',
 		yinling_info:'出牌阶段，你可以弃置一张黑色牌并指定一名其他角色。若如此做，你获得其一张牌并置于你的武将牌上，称为“锦”（数量最多为四）',
 		junwei:'军威',
+		junwei2:'军威',
 		junwei_info:'回合结束阶段开始时，你可以将三张“锦”置入弃牌堆。若如此做，你须指定一名角色并令其选择一项：1.亮出一张【闪】，然后由你交给任意一名角色。2.该角色失去1点体力，然后由你选择将其装备区的一张牌移出游戏。在该角色的回合结束后，将以此法移出游戏的装备牌移回原处',
 		yanxiao:'言笑',
 		yanxiao2:'言笑',
