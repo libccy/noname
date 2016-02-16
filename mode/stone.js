@@ -691,8 +691,8 @@ mode.stone={
 			stone_xinbing:['none','qun',2,[],['minskin','stone','stonehidden'],[2,1]],
 
 			stone_siwangzhiyi:['male','qun',6,['stone_mieshi'],['minskin','stone','stonehidden','stonelegend'],[6,6]],
-			stone_alaikesita:['male','qun',5,['stone_fushi'],['minskin','stone','stonehidden','stonelegend'],[6,5]],
-			stone_yisela:['male','qun',6,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
+			stone_alaikesita:['female','qun',5,['stone_fushi'],['minskin','stone','stonehidden','stonelegend'],[6,5]],
+			stone_yisela:['female','qun',6,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 			stone_nuoziduomu:['male','qun',5,['stone_shixu'],['minskin','stone','stonehidden','stonelegend'],[6,5]],
 			stone_maligousi:['male','qun',6,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 
@@ -5521,9 +5521,10 @@ mode.stone={
 			content:function(){
 				var list=['mengjing_feicuiyoulong','mengjing_huanxiaojiemei',
 					'mengjing_suxing','mengjing_mengye','mengjing_mengjing'];
-				trigger.player.gain(game.createCard(list.randomGet()));
-				trigger.player.$draw();
-				player.line(trigger.player,'green');
+				var target=player.getLeader();
+				target.gain(game.createCard(list.randomGet()));
+				target.$draw();
+				player.line(target,'green');
 			},
 			ai:{
 				threaten:2

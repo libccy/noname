@@ -19,7 +19,6 @@
 		version:1.78,
 		changeLog:[
 			'修bug',
-			'新武将（SP）',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
