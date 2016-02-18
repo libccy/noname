@@ -267,7 +267,6 @@ character.sp={
 			prepare:function(cards,player,targets){
 				player.$give(cards,targets[0]);
 			},
-			line:'green',
 			content:function(){
 				if(target.skills.contains('yanxiao2')&&target.storage.yanxiao2){
 					target.storage.yanxiao2.push(cards[0]);
@@ -1524,7 +1523,7 @@ character.sp={
 				var tosave=trigger.player;
 				var att=ai.get.attitude(target,tosave);
 				var hastao=target.num('h','tao');
-				target.chooseToDiscard(4,true).ai=function(card){
+				target.chooseToDiscard(4,true,'he').ai=function(card){
 					if(!hastao&&att>0){
 						var suit=get.suit(card);
 						for(var i=0;i<ui.selected.cards.length;i++){
@@ -1604,7 +1603,8 @@ character.sp={
 		},
 		mozhix:{
 			filterCard:true,
-			selectCard:1
+			selectCard:1,
+			popname:true,
 		},
 		mozhi2:{
 			trigger:{player:'phaseAfter'},

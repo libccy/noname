@@ -886,6 +886,79 @@ mode.identity={
 				if(this!=game.me) this.ai.shown*=2;
 				if(this.ai.shown>0.95) this.ai.shown=0.95;
 				if(this.ai.shown<-0.5) this.ai.shown=-0.5;
+
+				if(this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished'){
+					if(_status.clickingidentity&&_status.clickingidentity[0]==this){
+						for(var i=0;i<_status.clickingidentity[1].length;i++){
+							_status.clickingidentity[1][i].delete();
+							_status.clickingidentity[1][i].style.transform='';
+						}
+						delete _status.clickingidentity;
+					}
+					if(!Array.isArray(targets)){
+						targets=[];
+					}
+					var effect=0,c,shown;
+					var zhu=game.zhu;
+					if(_status.mode=='zhong'&&!game.zhu.isZhu){
+						zhu=game.zhong;
+					}
+					if(targets.length==1&&targets[0]==this){
+						effect=0;
+					}
+					else if(this.identity!='nei'){
+						if(this.ai.shown>0){
+							if(this.identity=='fan'){
+								effect=-1;
+							}
+							else{
+								effect=1;
+							}
+						}
+					}
+					else if(targets.length>0){
+						for(var i=0;i<targets.length;i++){
+							shown=Math.abs(targets[i].ai.shown);
+							if(shown<0.2||targets[i].identity=='nei') c=0;
+							else if(shown<0.4) c=0.5;
+							else if(shown<0.6) c=0.8;
+							else c=1;
+							effect+=ai.get.effect(targets[i],card,this,zhu)*c;
+						}
+					}
+					if(this.identity=='nei'){
+						if(effect>=0){
+							if(this.ai.identity_mark=='fan'){
+								this.setIdentity();
+								this.ai.identity_mark='finished';
+							}
+							else{
+								this.setIdentity('zhong');
+								this.ai.identity_mark='zhong';
+							}
+						}
+						else{
+							if(this.ai.identity_mark=='zhong'){
+								this.setIdentity();
+								this.ai.identity_mark='finished';
+							}
+							else{
+								this.setIdentity('fan');
+								this.ai.identity_mark='fan';
+							}
+						}
+					}
+					else{
+						if(effect>0&&this.identity!='fan'){
+							this.setIdentity('zhong');
+							this.ai.identity_mark='finished';
+						}
+						else if(effect<0&&this.identity=='fan'){
+							this.setIdentity('fan');
+							this.ai.identity_mark='finished';
+						}
+					}
+				}
 			},
 		}
 	},
@@ -942,6 +1015,7 @@ mode.identity={
 							case 'zhong':case 'mingzhong': return 6;
 							case 'nei':
 								if(game.players.length==2) return -10;
+								if(zhongmode&&to.ai.sizhong) return 6;
 								if(get.population('fan')==0) return -0.5;
 								if(situation>1) return 0;
 								return Math.min(3,get.population('fan'));
@@ -953,6 +1027,7 @@ mode.identity={
 							case 'zhu': return 10;
 							case 'zhong':case 'mingzhong': return 4;
 							case 'nei':
+								if(zhongmode&&to.ai.sizhong) return 6;
 								if(get.population('fan')==0) return -2;
 								return Math.min(3,-situation);
 							case 'fan': return -8;
@@ -1008,6 +1083,12 @@ mode.identity={
 								if(strategy==3) num++;
 								return num;
 							case 'mingzhong':
+								if(zhongmode){
+									if(from.ai.sizhong==undefined){
+										from.ai.sizhong=(Math.random()<0.5);
+									}
+									if(from.ai.sizhong) return 6;
+								}
 								if(strategy==5) return Math.min(0,-situation);
 								if(strategy==6) return Math.max(-1,-situation);
 								if(get.population('fan')==0) num=-5;
@@ -1044,6 +1125,7 @@ mode.identity={
 							case 'zhong': return -7;
 							case 'mingzhong':return -5;
 							case 'nei':
+								if(zhongmode&&to.ai.sizhong) return -7;
 								if(get.population('fan')==1) return 0;
 								if(get.population('zhong')+get.population('mingzhong')==0) return -7;
 								if(game.zhu&&game.zhu.hp<=2) return -1;

@@ -1627,9 +1627,33 @@ character.yijiang={
 					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
 				}
 			},
-			group:['huomo_sha','huomo_jiu','huomo_tao']
+			group:['huomo_count','huomo_count2','huomo_sha','huomo_jiu','huomo_tao']
 		},
 		huomo2:{},
+		huomo_count:{
+			init:function(player){
+				player.storage.huomo={};
+			},
+			trigger:{global:'phaseBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.storage.huomo={};
+			}
+		},
+		huomo_count2:{
+			trigger:{player:'useCard'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				switch(trigger.card.name){
+					case 'sha':player.storage.huomo.sha=true;break;
+					case 'tao':player.storage.huomo.tao=true;break;
+				}
+			}
+		},
 		huomo_sha:{
 			enable:'phaseUse',
 			discard:false,
@@ -1637,10 +1661,10 @@ character.yijiang={
 				player.$throw(cards);
 			},
 			filter:function(event,player){
+				if(player.storage.huomo.sha) return false;
 				if(!lib.filter.filterCard({name:'sha'},player,event)){
 					return false;
 				}
-				if(player.getStat().card.sha) return false;
 				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])!='basic'){
@@ -1678,16 +1702,13 @@ character.yijiang={
 			}
 		},
 		huomo_tao:{
-			enable:'phaseUse',
+			enable:'chooseToUse',
 			discard:false,
 			prepare:function(cards,player){
 				player.$throw(cards);
 			},
 			filter:function(event,player){
-				if(!lib.filter.filterCard({name:'tao'},player,event)){
-					return false;
-				}
-				if(player.getStat().card.tao) return false;
+				if(player.storage.huomo.tao) return false;
 				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])!='basic'){
@@ -1695,6 +1716,13 @@ character.yijiang={
 					}
 				}
 				if(i==hs.length) return false;
+				if(event.type=='dying'){
+					return event.filterCard({name:'tao'},player);
+				}
+				if(event.parent.name!='phaseUse') return false;
+				if(!lib.filter.filterCard({name:'tao'},player,event)){
+					return false;
+				}
 				return player.hp<player.maxHp;
 			},
 			position:'he',
@@ -1702,6 +1730,9 @@ character.yijiang={
 				return get.type(card)!='basic'&&get.color(card)=='black';
 			},
 			filterTarget:function(card,player,target){
+				if(_status.event.type=='dying'){
+					return target==_status.event.dying;
+				}
 				return player==target;
 			},
 			selectTarget:-1,
@@ -1714,6 +1745,18 @@ character.yijiang={
 				player.useCard({name:'tao'},targets).delayx=false;
 			},
 			ai:{
+				skillTagFilter:function(player){
+					if(player.storage.huomo.tao) return false;
+					var hs=player.get('he',{color:'black'});
+					for(var i=0;i<hs.length;i++){
+						if(get.type(hs[i])!='basic'){
+							return true;
+						}
+					}
+					return false;
+				},
+				threaten:1.5,
+				save:true,
 				order:9,
 				result:{
 					target:function(player,target){
@@ -1824,6 +1867,7 @@ character.yijiang={
 					owner.lose(card,ui.special);
 				}
 				event.card=card;
+				player.$throw(card);
 				'step 1'
 				player.useCard(event.card,targets).animate=false;
 				delete player.storage.taoxi;
@@ -4486,7 +4530,8 @@ character.yijiang={
 		qice2:{
 			filterCard:true,
 			selectCard:-1,
-			audio:2
+			audio:2,
+			popname:true
 		},
 		qice3:{
 			trigger:{player:'useCardBefore'},

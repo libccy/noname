@@ -16,9 +16,9 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.78,
+		version:1.79,
 		changeLog:[
-			'修bug',
+			'自动标身份',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -1685,6 +1685,10 @@
 								game.showIdentity(false);
 							}
 						}
+					},
+					auto_mark_identity:{
+						name:'自动标记身份',
+						init:false
 					},
 		            ban_weak:{
 		                name:'屏蔽弱将',
@@ -4216,7 +4220,9 @@
 							cardaudio=false;
 						}
 						player.logSkill(event.skill);
-						player.popup(event.card.name);
+						if(get.info(event.skill).popname){
+							player.popup(event.card.name);
+						}
 					}
 					else if(lib.config.show_card_prompt){
 						if(get.type(event.card)=='equip'&&lib.config.hide_card_prompt_equip);
@@ -4471,7 +4477,7 @@
 							}
 						}
 					}
-					if((info.line||info.discard!=false)&&targets.length){
+					if(info.line!=false&&targets.length){
 						var config={};
 						if(info.line=='fire'){
 							config.color='fire';

@@ -170,19 +170,16 @@ card.guozhan={
 		},
 	},
 	skill:{
-		wuliu_skill:{
-			global:'wuliu_skill2'
-		},
-		wuliu_skill2:{
+		wuliu_skill:{},
+		_wuliu_skill2:{
 			mod:{
 				attackFrom:function(from,to,distance){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==from) continue;
 						if(game.players[i].identity=='unknown'||game.players[i].identity=='ye') continue;
 						if(game.players[i].identity!=from.identity) continue;
-						if(game.players[i].skills.contains('wuliu')) distance--;
+						if(game.players[i].get('s').contains('wuliu_skill')) distance--;
 					}
-					if(from.skills.contains('wuliu')) distance--;
 					return distance;
 				}
 			}
@@ -235,7 +232,7 @@ card.guozhan={
 		yiyi_info:'对与自己势力相同的所有角色使用，摸两张牌然后弃置两张牌（非国战模式改为对自己使用，摸3张弃两张）',
 		yiyi_bg:'逸',
 		wuliu:'吴六剑',
-		wuliu_info:'与装备者势力相同的角色攻击范围+1',
+		wuliu_info:'其他与装备者势力相同的角色攻击范围+1',
 		sanjian:'三尖两刃刀',
 		sanjian_info:'当你使用杀造成伤害后，可以弃置1张手牌对一名距离受伤害角色1以内的其他角色造成1点伤害',
 		wuliu_skill:'吴六剑',

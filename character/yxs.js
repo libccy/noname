@@ -1809,6 +1809,7 @@ character.yxs={
 		},
 		jieyong2:{
 			filterCard:{suit:'heart'},
+			popname:true,
 		},
 		jieyong3:{
 			trigger:{player:'useCardBefore'},

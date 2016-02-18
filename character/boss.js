@@ -2482,7 +2482,7 @@ character.boss={
 				if(event.target){
 					var es=event.target.get('e');
 					if(es.length){
-						event.discard(es);
+						event.target.discard(es);
 					}
 				}
 			},
