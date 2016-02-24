@@ -520,6 +520,7 @@ character.standard={
 		},
 		jijiang1:{
 			audio:2,
+			audioname:['liushan'],
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
@@ -568,6 +569,7 @@ character.standard={
 		},
 		jijiang2:{
 			audio:2,
+			audioname:['liushan'],
 			enable:'chooseToUse',
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
@@ -672,6 +674,7 @@ character.standard={
 		},
 		guanxing:{
 			audio:2,
+			audioname:['jiangwei'],
 			trigger:{player:'phaseBegin'},
 			frequent:true,
 			content:function(){
@@ -901,6 +904,7 @@ character.standard={
 		},
 		jizhi:{
 			audio:2,
+			audioname:['jianyong'],
 			trigger:{player:'useCard'},
 			frequent:true,
 			filter:function(event){

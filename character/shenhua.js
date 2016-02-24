@@ -1644,6 +1644,7 @@ character.shenhua={
 		},
 		yinghun:{
 			audio:2,
+			audioname:['sunce'],
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
 				return player.hp<player.maxHp;
@@ -1651,7 +1652,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget(function(card,player,target){
+				player.chooseTarget('是否发动【英魂】？',function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
 					if(player.maxHp-player.hp==1&&target.num('he')==0){

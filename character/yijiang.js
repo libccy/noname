@@ -4206,12 +4206,43 @@ character.yijiang={
 				order:5,
 				result:{
 					player:function(player){
+						if(_status.event.parent.name=='phaseUse'){
+							if(player.num('h','jiu')>0) return 0;
+							if(player.num('e','zhuge')&&player.num('h','sha')>1) return 0;
+							if(!player.num('h','sha')) return 0;
+							for(var i=0;i<game.players.length;i++){
+								if(ai.get.attitude(player,game.players[i])<0){
+									var target=game.players[i];
+									if(player.canUse('sha',target)&&ai.get.effect(target,{name:'sha'},player,player)>0){
+										var e2=target.get('e','2');
+										if(e2){
+											if(e2.name=='tengjia'){
+												if(!player.num('h',{name:'sha',nature:'fire'})&&!player.num('e','zhuque')) return 0;
+											}
+											if(e2.name=='renwang'){
+												if(!player.num('h',{name:'sha',color:'red'})) return 0;
+											}
+											if(e2.name=='baiyin') return 0;
+										}
+										if(player.num('e','guanshi')&&player.num('he')>2) return 1;
+										return target.num('h')>3?0:1;
+									}
+								}
+							}
+						}
 						if(player==_status.event.dying||player.isTurnedOver()) return 3;
 					}
 				},
 				effect:{
-					target:function(card){
+					target:function(card,player,target){
 						if(card.name=='guiyoujie') return [0,0.5];
+						if(target.isTurnedOver()){
+							if(get.tag(card,'damage')){
+								if(player.skills.contains('jueqing')) return [1,-2];
+								if(target.hp==1) return;
+								return [1,target.num('h')/2];
+							}
+						}
 					}
 				}
 			},

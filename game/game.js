@@ -18,7 +18,9 @@
 	var lib={
 		version:1.79,
 		changeLog:[
+			'修bug',
 			'自动标身份',
+			'配音支持与人名关联',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -32,6 +34,7 @@
 		characterPack:{},
 		cardPack:{},
 		onresize:[],
+		onwash:[],
 		onDB:function(func){
 			if(lib.db){
 				func();
@@ -4434,6 +4437,17 @@
 							audioname=audioinfo[0];
 							audioinfo=audioinfo[1];
 						}
+						if(Array.isArray(info.audioname)){
+							if(info.audioname.contains(player.name)){
+								audioname+='_'+player.name;
+							}
+							else if(info.audioname.contains(player.name1)){
+								audioname+='_'+player.name1;
+							}
+							else if(info.audioname.contains(player.name2)){
+								audioname+='_'+player.name2;
+							}
+						}
 						if(typeof audioinfo=='number'){
 							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
 						}
@@ -6976,6 +6990,17 @@
 						else if(Array.isArray(audioinfo)){
 							audioname=audioinfo[0];
 							audioinfo=audioinfo[1];
+						}
+						if(Array.isArray(info.audioname)){
+							if(info.audioname.contains(this.name)){
+								audioname+='_'+this.name;
+							}
+							else if(info.audioname.contains(this.name1)){
+								audioname+='_'+this.name1;
+							}
+							else if(info.audioname.contains(this.name2)){
+								audioname+='_'+this.name2;
+							}
 						}
 						if(typeof audioinfo==='number'){
 							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
@@ -10931,6 +10956,7 @@
 		},
 		reloadCurrent:function(){
 			game.saveConfig('continue_name',[game.me.name1||game.me.name,game.me.name2]);
+			game.saveConfig('mode',lib.config.mode);
 			localStorage.setItem(lib.configprefix+'directstart',true);
 			game.reload();
 		},
@@ -11846,6 +11872,7 @@
 						map.links.push(pointer.name);
 					}
 					game.saveConfig('continue_name_boss',map);
+					game.saveConfig('mode',lib.config.mode);
 					localStorage.setItem(lib.configprefix+'directstart',true);
 					game.reload();
 				});
@@ -11858,6 +11885,7 @@
 							enemy:_status.enemyBackup,
 							color:_status.color
 						});
+						game.saveConfig('mode',lib.config.mode);
 						localStorage.setItem(lib.configprefix+'directstart',true);
 						game.reload();
 					});
@@ -20128,7 +20156,9 @@
 						_status.maxShuffle--;
 					}
 					var cards=[],i;
-					if(game.onWash) game.onWash();
+					for(var i=0;i<lib.onwash.length;i++){
+						lib.onwash[i]();
+					}
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
 						cards.push(ui.discardPile.childNodes[i]);
 					}
@@ -22232,6 +22262,10 @@
 				}
 				for(i in mode[lib.config.mode].get){
 					get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
+				}
+				if(game.onwash){
+					lib.onwash.push(game.onwash);
+					delete game.onwash;
 				}
 				lib.config.current_mode=mode[lib.config.mode].config||[];
 				lib.config.mode_choice=mode[lib.config.mode].config;

@@ -831,6 +831,7 @@ character.boss={
 			}
 		},
 		boss_gongshenjg:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			mode:['versus'],
 			filter:function(event,player){
@@ -966,6 +967,7 @@ character.boss={
             trigger:{player:'phaseBegin'},
             forced:true,
             unique:true,
+			audio:false,
             group:'boss_biantian4',
             content:function(){
                 "step 0"
@@ -987,6 +989,7 @@ character.boss={
                 "step 1"
 				var targets=[];
                 if(result.color=='red'){
+					game.playAudio('boss_biantianx2');
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].isFriendOf(player)){
 							game.players[i].addSkill('boss_biantian3');
@@ -997,6 +1000,7 @@ character.boss={
 					player.logSkill('kuangfeng',targets,'fire');
                 }
                 else if(result.suit=='spade'){
+					game.playAudio('boss_biantianx1');
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isFriendOf(player)){
 							game.players[i].addSkill('boss_biantian2');
@@ -1012,6 +1016,7 @@ character.boss={
 			}
         },
         boss_biantian2:{
+			audio:false,
             trigger:{player:'damageBefore'},
             filter:function(event){
                 if(event.nature!='thunder') return true;
@@ -1061,6 +1066,7 @@ character.boss={
             }
         },
 		boss_jizhen:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
@@ -1088,6 +1094,7 @@ character.boss={
 			}
 		},
 		boss_lingfeng:{
+			audio:2,
 			trigger:{player:'phaseDrawBefore'},
             content:function(){
                 "step 0"
@@ -1118,6 +1125,7 @@ character.boss={
             }
 		},
 		boss_jueji:{
+			audio:2,
             trigger:{global:'phaseDrawBegin'},
             filter:function(event,player){
 				if(event.player.isFriendOf(player)){
@@ -1138,6 +1146,7 @@ character.boss={
             }
         },
 		boss_huodi:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -1166,6 +1175,7 @@ character.boss={
 			}
 		},
 		boss_chuanyun:{
+			audio:true,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			content:function(){
@@ -1183,6 +1193,7 @@ character.boss={
 			},
 		},
 		boss_leili:{
+			audio:2,
 			trigger:{source:'damageEnd'},
 			direct:true,
 			filter:function(event){
@@ -1208,6 +1219,7 @@ character.boss={
 			}
 		},
 		boss_fengxing:{
+			audio:true,
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			content:function(){
@@ -1230,6 +1242,7 @@ character.boss={
 			}
 		},
 		boss_xuanlei:{
+			audio:true,
             trigger:{player:'phaseBegin'},
             forced:true,
             filter:function(event,player){
@@ -1256,6 +1269,7 @@ character.boss={
             }
         },
 		boss_fanshi:{
+			audio:true,
             trigger:{player:'phaseEnd'},
             forced:true,
             check:function(){
@@ -1266,9 +1280,11 @@ character.boss={
             }
         },
 		boss_skonghun:{
+			audio:true,
 			trigger:{player:'phaseUseBegin'},
 			filter:function(event,player){
 				var num=player.maxHp-player.hp;
+				if(num==0) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].side!=player.side){
 						num--;
@@ -1306,6 +1322,7 @@ character.boss={
 			}
 		},
 		boss_chiying:{
+			audio:2,
             trigger:{global:'damageBegin'},
             forced:true,
             filter:function(event,player){
@@ -2431,6 +2448,7 @@ character.boss={
 			}
 		},
 		boss_yuhuojg:{
+			audio:true,
 			trigger:{player:'damageBefore'},
 			filter:function(event){
 				return event.nature=='fire';
@@ -2547,6 +2565,7 @@ character.boss={
             }
 		},
 		boss_qiwu:{
+			audio:true,
 			trigger:{player:'useCard'},
 			direct:true,
 			filter:function(event,player){

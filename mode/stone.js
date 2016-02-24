@@ -712,7 +712,7 @@ mode.stone={
 	game:{
 		reserveDead:true,
 		bannedcards:['lebu','guiyoujie'],
-		onWash:function(){
+		onwash:function(){
 			if(_status.mode!='deck') return;
 			var list=[];
 			for(var i=0;i<ui.discardPile.childElementCount;i++){
