@@ -69,6 +69,7 @@ mode.stone={
 			},
 			changeRage:function(num){
 				if(_status.mode!='deck') return;
+				if(!_status.rageEnabled) return;
 				var popup=null;
 				if(this.side==game.me.side){
 					if(_status.friendRage<100){
@@ -1320,6 +1321,8 @@ mode.stone={
 						return uiintro;
 					},220);
 					if(get.config('skill_bar')){
+						_status.rageEnabled=true;
+
 						ui.friendBar=ui.create.div('.skillbar.right.shadowed.playerbg',ui.arena);
 						ui.enemyBar=ui.create.div('.skillbar.left.shadowed.playerbg',ui.arena);
 						// ui.friendBar.dataset.nature='metal';

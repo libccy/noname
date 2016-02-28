@@ -226,7 +226,7 @@
 					},
 					show_splash:{
 						name:'显示开始界面',
-						init:true,
+						init:false,
 					},
 					game_speed:{
 						name:'游戏速度',
@@ -1742,7 +1742,7 @@
 					},
 					change_choice:{
 						name:'开启换将卡',
-						init:false,
+						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -1978,7 +1978,7 @@
 					},
 					change_choice:{
 						name:'开启换将卡',
-						init:false,
+						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -2134,7 +2134,7 @@
 					},
 					change_choice:{
 						name:'开启换将卡',
-						init:false,
+						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -2188,7 +2188,7 @@
 					},
 					change_choice:{
 						name:'开启换将卡',
-						init:false,
+						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -2419,7 +2419,7 @@
 					},
 					change_choice:{
 						name:'开启换将卡',
-						init:false,
+						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
@@ -2563,7 +2563,7 @@
 					},
 					change_choice:{
 						name:'开启换将卡',
-						init:false,
+						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
 							if(!_status.event.parent.showConfig&&!_status.event.showConfig) return;
