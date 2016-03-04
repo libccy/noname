@@ -1661,6 +1661,7 @@ character.yijiang={
 				player.$throw(cards);
 			},
 			filter:function(event,player){
+				if(!player.storage.huomo) player.storage.huomo={};
 				if(player.storage.huomo.sha) return false;
 				if(!lib.filter.filterCard({name:'sha'},player,event)){
 					return false;
@@ -1708,6 +1709,7 @@ character.yijiang={
 				player.$throw(cards);
 			},
 			filter:function(event,player){
+				if(!player.storage.huomo) player.storage.huomo={};
 				if(player.storage.huomo.tao) return false;
 				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
@@ -1746,6 +1748,7 @@ character.yijiang={
 			},
 			ai:{
 				skillTagFilter:function(player){
+					if(!player.storage.huomo) player.storage.huomo={};
 					if(player.storage.huomo.tao) return false;
 					var hs=player.get('he',{color:'black'});
 					for(var i=0;i<hs.length;i++){

@@ -5197,7 +5197,13 @@ character.swd={
 				};
 				for(i=0;i<list.length;i++){
 					if(lib.translate[list[i]+'_info']){
-						var translation=get.translation(list[i])[0]+get.translation(list[i])[1];
+						var translation=get.translation(list[i]);
+						if(translation[0]=='新'&&translation.length==3){
+							translation=translation.slice(1,3);
+						}
+						else{
+							translation=translation.slice(0,2);
+						}
 						var item=dialog.add('<div class="popup" style="width:50%;display:inline-block"><div class="skill">【'+
 						translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
 						item.firstChild.addEventListener('click',clickItem);

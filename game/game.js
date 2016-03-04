@@ -16,11 +16,10 @@
 		dieClose:[]
 	};
 	var lib={
-		version:1.79,
+		version:'1.7.10',
 		changeLog:[
-			'修bug',
-			'自动标身份',
-			'配音支持与人名关联',
+			'新武将',
+			'明忠锦囊',
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
