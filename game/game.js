@@ -35,6 +35,7 @@
 		cardPack:{},
 		onresize:[],
 		onwash:[],
+		onover:[],
 		onDB:function(func){
 			if(lib.db){
 				func();
@@ -11530,6 +11531,10 @@
 					game.playAudio('effect','tie');
 				}
 			}
+			var resultbool=result;
+			if(typeof resultbool!=='boolean'){
+				resultbool=null;
+			}
 			if(result===true) result='战斗胜利';
 			if(result===false) result='战斗失败';
 			if(result==undefined) result='战斗结束';
@@ -11910,17 +11915,11 @@
 				ui.swap.close();
 				delete ui.swap;
 			}
-			if(game.onOver) game.onOver(result);
+			for(var i=0;i<lib.onover.length;i++){
+				lib.onover[i](resultbool);
+			}
 			if(game.addRecord){
-				if(result=='战斗胜利'){
-					game.addRecord(true);
-				}
-				else if(result=='战斗失败'){
-					game.addRecord(false);
-				}
-				else{
-					game.addRecord();
-				}
+				game.addRecord(resultbool);
 			}
 		},
 		loop:function(){
@@ -22266,6 +22265,10 @@
 				if(game.onwash){
 					lib.onwash.push(game.onwash);
 					delete game.onwash;
+				}
+				if(game.onover){
+					lib.onover.push(game.onover);
+					delete game.onover;
 				}
 				lib.config.current_mode=mode[lib.config.mode].config||[];
 				lib.config.mode_choice=mode[lib.config.mode].config;
