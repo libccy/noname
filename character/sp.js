@@ -263,6 +263,10 @@ character.sp={
 			check:function(card){
 				return 7-ai.get.value(card);
 			},
+			position:'he',
+			filter:function(event,player){
+				return player.num('he',{suit:'diamond'})>0;
+			},
 			discard:false,
 			prepare:function(cards,player,targets){
 				player.$give(cards,targets[0]);

@@ -9,7 +9,7 @@ character.swd={
 		// swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
 			swd_nicole:['female','wu',3,['huanjian','lingwu','minjing']],
 			swd_wangsiyue:['female','wei',3,['duishi','biyue']],
-		// swd_weida:['female','qun',3,['yueren','zhenlie']],
+			swd_weida:['female','qun',3,['yueren','zhenlie']],
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian']],
 
 			swd_chenjingchou:['male','wu',3,['youyin','yihua']],
@@ -21,6 +21,8 @@ character.swd={
 
 			swd_jiliang:['male','wu',3,['yunchou','gongxin','qimou']],
 			swd_shuijing:['female','qun',4,['mojian','duanyue']],
+			swd_quxian:['female','qun',3,['mojian','huanxia']],
+			swd_xiyan:['male','qun',3,['tianshu','daofa']],
 			swd_cheyun:['female','wu',3,['shengong','xianjiang3','qiaoxie']],
 			swd_huanyuanzhi:['male','qun',3,['lanzhi','mufeng','tianshu']],
 			swd_murongshi:['female','shu',4,['duanyi','guxing']],
@@ -63,7 +65,7 @@ character.swd={
 		// swd_libai:['female','qun',3,['miaobi','zhexian']],
 		// swd_kendi:['male','qun',3,['guanxing','jianyan']],
 		// swd_lijing:['male','qun',4,['tianyi','zhuhai']],
-		// swd_lilian:['female','qun',3,['swd_wuxie','qingcheng']],
+		swd_lilian:['female','qun',3,['swd_wuxie','qingcheng']],
 		// swd_linming:['male','qun',3,['shelie','bifa']],
 		// swd_philis:['male','qun',4,['yicong','wangxi']],
 		// swd_pepin:['male','qun',4,['rejianxiong','quhu']],
@@ -141,6 +143,51 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		huanxia:{
+			enable:'chooseToUse',
+			filterCard:function(card){
+				return get.color(card)=='red';
+			},
+			position:'he',
+			viewAs:{name:'sha'},
+			viewAsFilter:function(player){
+				if(!player.num('he',{color:'red'})) return false;
+			},
+			prompt:'将一张红色牌当杀使用',
+			check:function(card){return 5-ai.get.value(card)},
+			ai:{
+				skillTagFilter:function(player){
+					if(!player.num('he',{color:'red'})) return false;
+				},
+			},
+			group:['huanxia_expire','huanxia_draw'],
+			subSkill:{
+				expire:{
+					trigger:{source:'damageAfter'},
+					forced:true,
+					popup:false,
+					filter:function(event){
+						return event.parent.skill=='huanxia';
+					},
+					content:function(){
+						player.storage.huanxia=true;
+					}
+				},
+				draw:{
+					trigger:{player:'shaAfter'},
+					direct:true,
+					content:function(){
+						if(trigger.parent.skill=='huanxia'){
+							var card=trigger.cards[0];
+							if(get.itemtype(card)=='card'&&get.position(card)=='d'&&!player.storage.huanxia){
+								player.gain(card,'gain2');
+							}
+						}
+						delete player.storage.huanxia;
+					}
+				}
+			}
+		},
 		kongmo:{
 			trigger:{player:'useCardAfter'},
 			forced:true,
@@ -4215,7 +4262,7 @@ character.swd={
 			}
 		},
 		qingcheng:{
-			trigger:{player:'phaseBegin'},
+			trigger:{player:'phaseEnd'},
 			frequent:true,
 			content:function(){
 				"step 0"
@@ -4227,12 +4274,14 @@ character.swd={
 				"step 1"
 				if(result.judge>0){
 					event.cards.push(result.card);
-					// if(event.cards.length==2){
-					// 	player.gain(event.cards);
-					// 	event.finish();
-					// }
-					// else
-					if(lib.config.auto_skill==false){
+					if(event.cards.length==3){
+						player.gain(event.cards,'draw2');
+						if(event.cards.length){
+							player.$draw(event.cards);
+						}
+						event.finish();
+					}
+					else if(lib.config.autoskilllist.contains('qingcheng')){
 						player.chooseBool('是否再次发动？');
 					}
 					else{
@@ -4241,6 +4290,9 @@ character.swd={
 				}
 				else{
 					player.gain(event.cards);
+					if(event.cards.length){
+						player.$draw(event.cards);
+					}
 					event.finish();
 				}
 				"step 2"
@@ -4249,6 +4301,9 @@ character.swd={
 				}
 				else{
 					player.gain(event.cards);
+					if(event.cards.length){
+						player.$draw(event.cards);
+					}
 				}
 			},
 			ai:{
@@ -4286,7 +4341,6 @@ character.swd={
 			}
 		},
 		lingwu:{
-			unique:true,
 			trigger:{player:'phaseAfter'},
 			frequent:true,
 			filter:function(event,player){
@@ -7427,7 +7481,11 @@ character.swd={
 		swd_xingtian:'刑天',
 		swd_lanmoshen:'蓝魔神',
 		swd_wushi:'巫师',
+		swd_quxian:'屈娴',
+		swd_xiyan:'犀衍',
 
+		huanxia:'幻霞',
+		huanxia_info:'你可以将一张红色牌当作杀使用，若此杀未造成伤害，你可以在其进入弃牌堆后收回此牌',
 		jingjie:'镜界',
 		jingjie_info:'回合开始阶段，你可以流失一点体力，并',
 		jingjie_old_info:'限定技，出牌阶段，你可以令所有角色弃置所有牌，然后摸两张牌（不触发任何技能）',
@@ -7794,7 +7852,7 @@ character.swd={
 		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
 		daixing_info:'回合结束阶段，你可以任意张牌并获得等量的护甲，这些护甲将在你的下个回合开始阶段消失',
 		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
-		qingcheng_info:'回合开始阶段，你可以进行判定，若为红色则可以继续判定，判定结束后将判定成功的牌收入手牌',
+		qingcheng_info:'回合结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
 		xianjiang_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
 		xianjiang3_info:'出牌阶段，若你装备区内没有牌，你可以弃置一张锦囊牌，并从牌堆中随机获得一张装备牌，若牌堆中没有装备牌，你摸一张牌，每阶段限一次',
 		shengong_info:'每当你需要打出一张杀或闪时，你可以弃置一名角色装备区内的一张武器牌或防具牌，视为打出一张杀或闪，然后该角色摸一张牌，你弃一张牌',

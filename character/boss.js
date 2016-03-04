@@ -382,13 +382,53 @@ character.boss={
 			content:function(){
 				'step 0'
 				player.line(trigger.player,'green');
-				trigger.player.chooseCard(true,'选择保留一张牌，然后弃置其它牌','he').ai=function(card){
+				var next=trigger.player.chooseCard(true,'选择保留一张手牌和一张装备区内的牌，然后弃置其它牌','he',function(card){
+					switch(get.position(card)){
+						case 'h':{
+							if(ui.selected.cards.length){
+								return get.position(ui.selected.cards[0])=='e';
+							}
+							else{
+								return trigger.player.num('h')>1;
+							}
+							break;
+						}
+						case 'e':{
+							if(ui.selected.cards.length){
+								return get.position(ui.selected.cards[0])=='h';
+							}
+							else{
+								return trigger.player.num('e')>1;
+							}
+							break;
+						}
+					}
+				});
+				var num=0;
+				if(trigger.player.num('h')>1){
+					num++;
+				}
+				if(trigger.player.num('e')>1){
+					num++;
+				}
+				next.selectCard=[num,num];
+				next.ai=function(card){
 					return ai.get.value(card);
 				};
 				'step 1'
 				if(result.bool){
-					var he=trigger.player.get('he');
-					he.remove(result.cards[0]);
+					var he=[];
+					var hs=trigger.player.get('h');
+					var es=trigger.player.get('e');
+					if(hs.length>1){
+						he=he.concat(hs);
+					}
+					if(es.length>1){
+						he=he.concat(es);
+					}
+					for(var i=0;i<result.cards.length;i++){
+						he.remove(result.cards[i]);
+					}
 					trigger.player.discard(he);
 				}
 			}

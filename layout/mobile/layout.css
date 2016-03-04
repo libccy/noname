@@ -218,12 +218,14 @@
 }
 
 @media screen and (min-height: 800px) and (orientation:landscape)  {
-    #arena{height: 780px;top: calc(50% - 350px);}
+    /*#arena{height: 780px;top: calc(50% - 350px);}
     #arena:not(.chess)>#me,
     #arena:not(.chess)>#mebg{
         bottom:30px;
     }
 	#arena:not(.chess) .player[data-position='0']{
         top: calc(100% - 150px);
-    }
+    }*/
+
+    #arena{height: calc(95% + 20px);top: calc(5% + 10px);}
 }

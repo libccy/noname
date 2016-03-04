@@ -31,9 +31,12 @@ character.hearth={
 		// hs_lrhonin:['male','wei',2,[]],
 		// hs_bolvar:['male','wei',2,[]],
 		// hs_fuding:['male','wei',2,[]],
+		hs_xuanzhuanjijia:['male','shu',2,['jixuan']],
 		hs_ysera:['female','wu',4,['chenshui']],
 		hs_alextrasza:['female','shu',5,['fushi']],
+		hs_nozdormu:['male','qun',5,['shixu']],
 		hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
+		hs_kchromaggus:['male','wei',4,['fenlie']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
 		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -48,6 +51,7 @@ character.hearth={
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
 		hs_jinglinglong:['male','wu',3,['mianyi']],
+		hs_ruanniguai:['male','wu',3,['nianfu']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -56,6 +60,118 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		fenlie:{
+			audio:2,
+			forced:true,
+			trigger:{player:'gainAfter'},
+			filter:function(event,player){
+				if(event.parent.parent.name=='phaseDraw') return false;
+				if(event.parent.name=='fenlie') return false;
+				if(player.storage.fenlie>=3) return false;
+				return true;
+			},
+			content:function(){
+				var cards=[];
+				for(var i=0;i<trigger.cards.length;i++){
+					cards.push(game.createCard(trigger.cards[i]));
+				}
+				player.storage.fenlie++;
+				player.gain(cards,'draw');
+			},
+			group:'fenlie2'
+		},
+		fenlie2:{
+			trigger:{global:'phaseBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.storage.fenlie=0;
+			}
+		},
+		nianfu:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return player!=target&&target.num('e')>0;
+			},
+			filter:function(event,player){
+				return game.hasPlayer(function(target){
+					return target!=player&&target.num('e');
+				});
+			},
+			content:function(){
+				var es=target.get('e');
+				if(es.length>1){
+					es=es.randomGets(Math.ceil(Math.random()*2));
+				}
+				target.discard(es);
+			},
+			ai:{
+				order:9.5,
+				result:{
+					target:function(player,target){
+						var ne=target.num('e');
+						if(ne>1) return -1.5;
+						return -1;
+					}
+				}
+			}
+		},
+		shixu:{
+			group:['shixu_begin','shixu_end','shixu_discard'],
+			subSkill:{
+				begin:{
+					trigger:{global:'phaseUseBegin'},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:function(){
+						trigger.player.storage.shixu_begin=get.time();
+					}
+				},
+				end:{
+					trigger:{global:'phaseUseEnd'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event,player){
+						return typeof event.player.storage.shixu_begin=='number';
+					},
+					content:function(){
+						trigger.player.storage.shixu=get.time()-trigger.player.storage.shixu_begin;
+						delete trigger.player.storage.shixu_begin;
+					}
+				},
+				discard:{
+					trigger:{global:'phaseEnd'},
+					forced:true,
+					filter:function(event,player){
+						return typeof event.player.storage.shixu=='number'&&
+							event.player.storage.shixu>3000&&event.player.num('he')>0;
+					},
+					content:function(){
+						player.line(trigger.player,'green');
+						trigger.player.chooseToDiscard('he',true,Math.floor(trigger.player.storage.shixu/3000));
+						delete trigger.player.storage.shixu;
+					}
+				}
+			}
+		},
+		jixuan:{
+			trigger:{player:'phaseAfter'},
+			forced:true,
+			filter:function(event,player){
+				return event.parent.name!='jixuan';
+			},
+			content:function(){
+				player.draw();
+				player.phase();
+			},
+			ai:{
+				threaten:1.8
+			},
+		},
 		qianghua:{
 			trigger:{player:'useCardAfter'},
 			filter:function(event,player){
@@ -2497,9 +2613,8 @@ character.hearth={
 		hs_ysera:'伊瑟拉',
 		hs_alextrasza:'阿莱克斯塔',
 		hs_trueheart:'图哈特',
+		hs_nozdormu:'诺兹多姆',
 
-		qianghua:'强化',
-		qianghua_info:'出牌阶段限两次，你可以令一张你使用的基本牌或非延时锦囊牌额外结算一次',
 		fushi:'缚誓',
 		fushi_info:'出牌阶段，你可以令一名已受伤角色失去一点体力上限并回复一点体力',
 		hs_ronghejuren:'熔核巨人',
@@ -2514,7 +2629,20 @@ character.hearth={
 		hs_zhanzhenggushu:'战争古树',
 		hs_jinglinglong:'精灵龙',
 		hs_sapphiron:'萨菲隆',
+		hs_xuanzhuanjijia:'旋转机甲',
+		hs_ruanniguai:'软泥怪',
+		hs_kchromaggus:'克洛玛古斯',
 
+		fenlie:'分裂',
+		fenlie_info:'锁定技，每当你于摸牌阶段外获得卡牌，你获得一张此牌的复制，每回合最多发动三次',
+		nianfu:'粘附',
+		nianfu_info:'出牌阶段限一次，你可以指定一名其他角色，随机弃置其1~2张装备牌',
+		shixu:'时序',
+		shixu_info:'锁定技，所有角色于出牌阶段每消耗3秒，便须于回合结束阶段弃置一张牌',
+		qianghua:'强化',
+		qianghua_info:'出牌阶段限两次，你可以令一张你使用的基本牌或非延时锦囊牌额外结算一次',
+		jixuan:'疾旋',
+		jixuan_info:'锁定技，回合结束后，你摸一张牌并进行一个额外的回合',
 		biri:'蔽日',
 		biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张闪取消之',
 		stuxi:'吐息',

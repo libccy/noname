@@ -373,7 +373,7 @@ character.standard={
 				"step 1"
 				if(result.judge>0){
 					event.cards.push(result.card);
-					if(lib.config.auto_skill==false){
+					if(lib.config.autoskilllist.contains('luoshen')){
 						player.chooseBool('是否再次发动？');
 					}
 					else{
@@ -387,6 +387,9 @@ character.standard={
 						}
 					}
 					player.gain(event.cards);
+					if(event.cards.length){
+						player.$draw(event.cards);
+					}
 					event.finish();
 				}
 				"step 2"
@@ -395,6 +398,9 @@ character.standard={
 				}
 				else{
 					player.gain(event.cards);
+					if(event.cards.length){
+						player.$draw(event.cards);
+					}
 				}
 			}
 		},
@@ -531,6 +537,10 @@ character.standard={
 				}
 				return false;
 			},
+			check:function(event,player){
+				if(player.storage.jijianging) return false;
+				return true;
+			},
 			content:function(){
 				"step 0"
 				if(event.current==undefined) event.current=player.next;
@@ -538,6 +548,7 @@ character.standard={
 					event.finish();
 				}
 				else if(event.current.group=='shu'){
+					player.storage.jijianging=true;
 					var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
 					next.ai=function(){
 						var event=_status.event;
@@ -551,6 +562,7 @@ character.standard={
 					event.redo();
 				}
 				"step 1"
+				player.storage.jijianging=false;
 				if(result.bool){
 					event.finish();
 					trigger.result=result;
@@ -1071,6 +1083,9 @@ character.standard={
 		},
 		guose:{
 			audio:1,
+			filter:function(event,player){
+				return player.num('he',{suit:'diamond'})>0;
+			},
 			enable:'chooseToUse',
 			filterCard:function(card){
 				return get.suit(card)=='diamond';
