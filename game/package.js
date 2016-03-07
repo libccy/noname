@@ -23,6 +23,7 @@ card.pack={
     extra:'军争',
     refresh:'界限突破',
     guozhan:'国战',
+    mingzhong:'忠胆英杰',
     zhenfa:'阵法',
     qimou:'奇谋',
     yibao:'异宝',
