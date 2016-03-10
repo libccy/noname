@@ -2281,11 +2281,13 @@
 							map.tafang_turn.hide();
 							map.tafang_difficulty.hide();
 						}
-						if(config.chess_mode=='combat'||config.chess_mode=='tafang'){
+						if(config.chess_mode!='leader'){
 							map.ban_weak.show();
+							map.ban_strong.show();
 						}
 						else{
 							map.ban_weak.hide();
+							map.ban_strong.hide();
 						}
 					},
 					tafang_turn:{
