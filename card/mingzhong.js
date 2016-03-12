@@ -75,9 +75,8 @@ card.mingzhong={
             fullskin:true,
             enable:true,
             type:'trick',
-			filterTarget:function(card,player,target){
-				return get.distance(player,target)<=1;
-			},
+			range:{global:1},
+            filterTarget:true,
 			content:function(){
 				'step 0'
 				target.draw(3);
@@ -111,7 +110,77 @@ card.mingzhong={
             fullskin:true,
             enable:true,
             type:'delay',
+			filterTarget:function(card,player,target){
+				return (lib.filter.judge(card,player,target)&&player!=target);
+			},
+			judge:function(card){
+				if(get.suit(card)=='club') return 0;
+				return -3;
+			},
+			effect:function(){
+				if(result.bool==false){
+					player.addTempSkill('caomu_skill','phaseAfter');
+				}
+			},
+			ai:{
+				basic:{
+					order:1,
+					useful:1,
+					value:4.5,
+				},
+				result:{
+					player:function(player,target){
+						var num=0;
+						for(var i=0;i<game.players.length;i++){
+							if(get.distance(target,game.players[i])<=1&&game.players[i]!=target){
+								var att=ai.get.attitude(player,game.players[i]);
+								if(att>3){
+									num+=1.1;
+								}
+								else if(att>0){
+									num++;
+								}
+								else if(att<-3){
+									num-=1.1;
+								}
+								else if(att<0){
+									num--;
+								}
+							}
+						}
+						return num;
+					},
+					target:-1
+				},
+			}
         }
+	},
+	skill:{
+		caomu_skill:{
+			unique:true,
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				trigger.num--;
+			},
+			group:'caomu_skill2'
+		},
+		caomu_skill2:{
+			trigger:{player:'phaseDrawAfter'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				var targets=game.filterPlayer(function(current){
+					return get.distance(player,current)<=1&&player!=current;
+				});
+				if(targets.length){
+					game.asyncDraw(targets);
+				}
+			}
+		}
 	},
 	translate:{
         shengdong:'声东击西',

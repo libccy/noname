@@ -37,6 +37,7 @@ character.hearth={
 		hs_nozdormu:['male','qun',5,['shixu']],
 		hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
 		hs_kchromaggus:['male','wei',4,['fenlie']],
+		hs_kesuen:['male','wei',3,['fenlie']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
 		hs_zhanzhenggushu:['male','wei',6,['biri']],

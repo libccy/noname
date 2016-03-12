@@ -2373,7 +2373,7 @@
 					},
 					chess_obstacle:{
 						name:'随机路障',
-						init:'0.333',
+						init:'0',
 						item:{
 							'0':'关闭',
 							'0.2':'少量',
@@ -2384,6 +2384,10 @@
 					},
 					attack_move:{
 						name:'击退效果',
+						init:true,
+					},
+					show_range:{
+						name:'显示卡牌范围',
 						init:true,
 					},
 					show_distance:{
@@ -7053,11 +7057,11 @@
 				},
 				popup:function(name,className){
 					var name2=get.translation(name);
-					if(true){
-						if(!name2) return;
-						this.$damagepop(name2,className||'water',true);
-						return;
-					}
+                    if(!name2) return;
+                    this.$damagepop(name2,className||'water',true);
+				},
+                popup_old:function(name,className){
+                    var name2=get.translation(name);
 					var node=ui.create.div('.popup',this.parentNode);
 					if(!name2){
 						node.remove();
@@ -7086,7 +7090,7 @@
 						setTimeout(function(){that._popup();},1000);
 					}
 					return node;
-				},
+                },
 				_popup:function(){
 					if(this.popups.length){
 						this.popups.shift().delete();
@@ -7697,18 +7701,7 @@
 					else{
 						var node;
 						if(card==undefined||card.length==0) return;
-						if(false){
-							var left=-52+(Math.random()<0.5?1:-1)*Math.random()*100;
-							var top=-52+(Math.random()<0.5?1:-1)*Math.random()*80;
-
-							node=this.$throwxy2(card,
-								'calc(50% '+(left>0?'+':'-')+' '+Math.abs(left)+'px)',
-								'calc(50% '+(top>0?'+':'-')+' '+Math.abs(top)+'px)'
-							);
-						}
-						else{
-							node=this.$throwordered(card.copy('thrown'));
-						}
+						node=this.$throwordered(card.copy('thrown'));
 						if(time!=undefined){
 							node.fixed=true;
 							setTimeout(function(){node.delete()},time);
@@ -8491,23 +8484,7 @@
 				$phaseJudge:function(card){
 					game.addVideo('phaseJudge',this,get.cardInfo(card));
 					var player=this;
-					var clone;
-					// var clone=card.copy('thrown','thrownhighlight',ui.arena);
-					if(true){
-						clone=player.$throw(card);
-					}
-					else{
-						clone=card.copy('thrown','thrownhighlight',ui.arena).animate('judgestart');
-						clone.style.opacity=0.6;
-						clone.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*50+'px)';
-						clone.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*40+'px)';
-						game.linexy([
-							clone.offsetLeft+clone.offsetWidth/2,
-							clone.offsetTop+clone.offsetHeight/2,
-							player.offsetLeft+player.offsetWidth/2,
-							player.offsetTop+player.offsetHeight/2
-						],{opacity:0.5,dashed:true});
-					}
+					var clone=player.$throw(card);
 					if(lib.config.low_performance&&card&&card.clone){
 					    var waitingForTransition=get.time();
 					    _status.waitingForTransition=waitingForTransition;
@@ -12368,9 +12345,8 @@
 			return ok;
 		},
 		uncheck:function(){
-			// ui.roundmenu.show();
 			var i,j;
-			if(false){
+			if(true){
 				if(lib.config.mode=='chess'){
 					var shadows=ui.chessContainer.getElementsByClassName('playergrid temp');
 					while(shadows.length){
@@ -13321,6 +13297,15 @@
 				if(func(game.players[i])) return true;
 			}
 			return false;
+		},
+		filterPlayer:function(func){
+			var list=[];
+			for(var i=0;i<game.players.length;i++){
+				if(func(game.players[i])){
+					list.push(game.players[i]);
+				}
+			}
+			return list;
 		},
 		players:[],
 		dead:[],
@@ -17713,7 +17698,7 @@
 										if(notbefore){
 											_status.lastdragchange.push(item);
 											item._lastdragchange=[exx,eyy];
-											if(false){
+											if(lib.falseitem){
 												var from=[_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop];
 												var to=[exx,eyy];
 												var node=ui.create.div('.linexy.hidden');
@@ -18565,21 +18550,19 @@
 				if(!notoggle){
 					this.classList.toggle('selected');
 				}
-				if(false){
-					if(lib.config.mode=='chess'&&!_status.event.skill&&this.classList.contains('selected')&&
-					_status.event.isMine()&&_status.event.name=='chooseToUse'){
-						var player=_status.event.player;
-						var range=get.info(this).range;
-						if(range){
-							if(typeof range.attack==='number'){
-								player.createRangeShadow(get.attackRange(player)+range.attack-1);
-							}
-							else if(typeof range.global==='number'){
-								player.createRangeShadow(get.globalFrom(player)+range.global);
-							}
-						}
-					}
-				}
+                if(lib.config.mode=='chess'&&get.config('show_range')&&!_status.event.skill&&this.classList.contains('selected')&&
+                _status.event.isMine()&&_status.event.name=='chooseToUse'){
+                    var player=_status.event.player;
+                    var range=get.info(this).range;
+                    if(range){
+                        if(typeof range.attack==='number'){
+                            player.createRangeShadow(Math.min(8,get.attackRange(player)+range.attack-1));
+                        }
+                        else if(typeof range.global==='number'){
+                            player.createRangeShadow(Math.min(8,get.globalFrom(player)+range.global));
+                        }
+                    }
+                }
 				if(custom.add.card){
 					custom.add.card();
 				}
@@ -20797,7 +20780,6 @@
 						}
 						return false;
 					}
-					break;
 				}
 				default:{
 					if(typeof type=='string'){
@@ -20889,7 +20871,7 @@
 						lib.translate[(js[i].viewAs||js[i].name)+'_info']+'</div></div>';
 						uiintro.add(translation);
 					}
-					if(false){
+					if(lib.falseitem){
 						uiintro.add(ui.create.div('.placeholder'));
 						var table,tr,td;
 						table=document.createElement('table');
