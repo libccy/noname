@@ -7459,6 +7459,9 @@
 					}
 					return false;
 				},
+				hasSkill:function(skill){
+					return this.get('s').contains(skill);
+				},
 				hasSkillTag:function(tag,hidden){
 					var skills=game.expandSkills(this.get('s',hidden));
 					for(var i=0;i<skills.length;i++){
@@ -20780,6 +20783,7 @@
 						}
 						return false;
 					}
+					break;
 				}
 				default:{
 					if(typeof type=='string'){
