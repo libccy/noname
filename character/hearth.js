@@ -31,7 +31,7 @@ character.hearth={
 		// hs_lrhonin:['male','wei',2,[]],
 		// hs_bolvar:['male','wei',2,[]],
 		// hs_fuding:['male','wei',2,[]],
-		hs_xuanzhuanjijia:['male','shu',2,['jixuan']],
+		hs_xuanzhuanjijia:['male','shu',3,['jixuan']],
 		hs_ysera:['female','wu',4,['chenshui']],
 		hs_alextrasza:['female','shu',5,['fushi']],
 		hs_nozdormu:['male','qun',5,['shixu']],
@@ -52,6 +52,9 @@ character.hearth={
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
 		hs_jinglinglong:['male','wu',3,['mianyi']],
 		hs_ruanniguai:['male','wu',3,['nianfu']],
+		hs_hudunren:['male','shu',3,['hhudun']],
+		hs_nate:['male','wu',4,['chuidiao']],
+		hs_jiaziruila:['male','wu',4,['hannu']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -60,6 +63,44 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		hannu:{
+			trigger:{player:'damageEnd'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			content:function(){
+				'step 0'
+				var nh=player.num('h');
+				if(nh){
+					player.draw(nh);
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				var hs=player.get('h');
+				if(hs.length>10&&hs.length>player.hp){
+					player.discard(hs.randomGets(hs.length-player.hp));
+				}
+			}
+		},
+		chuidiao:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				var num=Math.floor(Math.random()*3);
+				if(num) player.draw(num);
+			},
+		},
+		hhudun:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			content:function(){
+				player.changeHujia();
+				player.update();
+			},
+		},
 		fenlie:{
 			audio:2,
 			forced:true,
@@ -165,7 +206,6 @@ character.hearth={
 				return event.parent.name!='jixuan';
 			},
 			content:function(){
-				player.draw();
 				player.phase();
 			},
 			ai:{
@@ -2615,8 +2655,6 @@ character.hearth={
 		hs_trueheart:'图哈特',
 		hs_nozdormu:'诺兹多姆',
 
-		fushi:'缚誓',
-		fushi_info:'出牌阶段，你可以令一名已受伤角色失去一点体力上限并回复一点体力',
 		hs_ronghejuren:'熔核巨人',
 		hs_shanlingjuren:'山岭巨人',
 		hs_edwin:'艾德温',
@@ -2632,7 +2670,18 @@ character.hearth={
 		hs_xuanzhuanjijia:'旋转机甲',
 		hs_ruanniguai:'软泥怪',
 		hs_kchromaggus:'克洛玛古斯',
+		hs_hudunren:'护盾人',
+		hs_nate:'纳特',
+		hs_jiaziruila:'加兹瑞拉',
 
+		hannu:'寒怒',
+		hannu_info:'锁定技，每当你受到一次伤害，你将手牌数翻倍；若你的手牌数因此超过10张，你随机弃置若干张手牌直到手牌数等于你当前的体力值',
+		chuidiao:'垂钓',
+		chuidiao_info:'锁定技，回合结束阶段，你随机摸0~2张牌',
+		fushi:'缚誓',
+		fushi_info:'出牌阶段，你可以令一名已受伤角色失去一点体力上限并回复一点体力',
+		hhudun:'护盾',
+		hhudun_info:'锁定技，回合开始阶段，你获得一点护甲',
 		fenlie:'分裂',
 		fenlie_info:'锁定技，每当你于摸牌阶段外获得卡牌，你获得一张此牌的复制，每回合最多发动三次',
 		nianfu:'粘附',
@@ -2642,7 +2691,7 @@ character.hearth={
 		qianghua:'强化',
 		qianghua_info:'出牌阶段限两次，你可以令一张你使用的基本牌或非延时锦囊牌额外结算一次',
 		jixuan:'疾旋',
-		jixuan_info:'锁定技，回合结束后，你摸一张牌并进行一个额外的回合',
+		jixuan_info:'锁定技，回合结束后，你进行一个额外的回合',
 		biri:'蔽日',
 		biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张闪取消之',
 		stuxi:'吐息',
