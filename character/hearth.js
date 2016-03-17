@@ -25,11 +25,11 @@ character.hearth={
 		hs_malorne:['male','wu',3,['enze','chongsheng']],
 		hs_malygos:['male','wei',4,['malymowang']],
 		hs_xuefashi:['male','wei',2,['liehun','xjumo']],
-		// hs_loatheb:['male','wei',2,[]],
+		hs_loatheb:['male','wu',5,['fengyin']],
 		hs_trueheart:['female','qun',3,['qianghua']],
-		// hs_sainaliusi:['male','wei',2,[]],
+		hs_sainaliusi:['male','wu',4,['chongsheng','yulu']],
 		// hs_lrhonin:['male','wei',2,[]],
-		// hs_bolvar:['male','wei',2,[]],
+		hs_bolvar:['male','wei',4,['yuanzheng','byuhuo']],
 		// hs_fuding:['male','wei',2,[]],
 		hs_xuanzhuanjijia:['male','shu',3,['jixuan']],
 		hs_ysera:['female','wu',4,['chenshui']],
@@ -63,6 +63,162 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		yuanzheng:{
+			trigger:{player:'useCardToBegin'},
+			direct:true,
+			filter:function(event,player){
+				return event.target&&event.target!=player&&get.distance(player,event.target,'attack')>1;
+			},
+			content:function(){
+				'step 0'
+				if(trigger.target.num('he')){
+					player.chooseControl('draw_card','discard_card','cancel').prompt='是否发动【远征】？';
+				}
+				else{
+					player.chooseControl('draw_card','cancel').prompt='是否发动【远征】？';
+				}
+				'step 1'
+				if(result.control!='cancel'){
+					player.logSkill('yuanzheng');
+					if(result.control=='draw_card'){
+						player.draw();
+					}
+					else{
+						player.discardPlayerCard(trigger.target,'he',true);
+					}
+				}
+			}
+		},
+		byuhuo:{
+			unique:true,
+			enable:'chooseToUse',
+			mark:true,
+			skillAnimation:true,
+			animationColor:'fire',
+			init:function(player){
+				player.storage.byuhuo=false;
+			},
+			filter:function(event,player){
+				if(event.type!='dying') return false;
+				if(player!=_status.dying) return false;
+				if(player.storage.byuhuo) return false;
+			},
+			content:function(){
+				'step 0'
+				player.hp=Math.min(3,player.maxHp);
+				player.discard(player.get('hej'));
+				player.unmarkSkill('yuhuo');
+				player.storage.byuhuo=true;
+				player.removeSkill('yuanzheng');
+				player.addSkill('busi');
+				'step 1'
+				if(player.classList.contains('linked')) player.link();
+				'step 2'
+				if(player.classList.contains('turnedover')) player.turnOver();
+				'step 3'
+				player.loseMaxHp();
+				'step 4'
+				var targets=game.players.slice(0);
+				targets.remove(player);
+				targets.sort(lib.sort.seat);
+				event.targets=targets;
+				event.num=0;
+				'step 5'
+				if(num<event.targets.length){
+					if(event.targets[num].num('hej')){
+						player.gainPlayerCard(event.targets[num],'hej',true);
+					}
+					event.num++;
+					event.redo();
+				}
+			},
+			ai:{
+				skillTagFilter:function(player){
+					if(player.storage.byuhuo) return false;
+					if(player.hp>0) return false;
+				},
+				save:true,
+				result:{
+					player:10
+				},
+				threaten:function(player,target){
+					if(!target.storage.byuhuo) return 0.6;
+				}
+			},
+			intro:{
+				content:'limited'
+			}
+		},
+		yulu:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:true,
+			selectTarget:[1,3],
+			content:function(){
+				'step 0'
+				if(target==targets[0]){
+					game.asyncDraw(targets,2);
+				}
+				'step 1'
+				if(target==targets[0]){
+					game.delay();
+				}
+				'step 2'
+				target.chooseToDiscard(2,true);
+			},
+			ai:{
+				order:10,
+				result:{
+					target:function(player,target){
+						switch(target.num('he')==0){
+							case 0:return 0;
+							case 1:return 0.5;
+							case 2:return 0.8;
+							default:return 1;
+						}
+					}
+				},
+				threaten:1.2
+			}
+		},
+		fengyin:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				var stat=player.getStat('card');
+				for(var i in stat){
+					if(typeof stat[i]=='number'&&get.type(i,'trick')=='trick'){
+						return false;
+					}
+				}
+				return true;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【封印】？',function(card,player,target){
+					return target!=player;
+				}).ai=function(target){
+					return -ai.get.attitude(player,target)*Math.sqrt(target.num('h'));
+				}
+				'step 1'
+				if(result.bool){
+					player.line(result.targets[0],'green');
+					result.targets[0].addTempSkill('fengyin2',{player:'phaseAfter'});
+				}
+			}
+		},
+		fengyin2:{
+			mod:{
+				cardEnabled:function(card){
+					if(get.type(card,'trick')=='trick') return false;
+				}
+			},
+			mark:true,
+			marktext:'封',
+			intro:{
+				content:'下个回合无法使用锦囊牌'
+			}
+		},
 		hannu:{
 			trigger:{player:'damageEnd'},
 			forced:true,
@@ -2654,10 +2810,16 @@ character.hearth={
 		hs_alextrasza:'阿莱克斯塔',
 		hs_trueheart:'图哈特',
 		hs_nozdormu:'诺兹多姆',
+		hs_loatheb:'洛欧塞布',
+		hs_jiaziruila:'加兹瑞拉',
+		hs_sainaliusi:'塞纳留斯',
+		hs_bolvar:'伯瓦尔',
+		hs_lrhonin:'罗宁',
+		hs_fuding:'弗西',
+		hs_edwin:'艾德温',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_shanlingjuren:'山岭巨人',
-		hs_edwin:'艾德温',
 		hs_mijiaojisi:'秘教祭司',
 		hs_huzhixiannv:'湖之仙女',
 		hs_tgolem:'图腾魔像',
@@ -2672,8 +2834,16 @@ character.hearth={
 		hs_kchromaggus:'克洛玛古斯',
 		hs_hudunren:'护盾人',
 		hs_nate:'纳特',
-		hs_jiaziruila:'加兹瑞拉',
 
+		yuanzheng:'远征',
+		yuanzheng_info:'每当你对攻击范围外的一名角色使用一张牌，你可以选择一项：摸一张牌，或弃置目标一张牌',
+		byuhuo:'浴火',
+		byuhuo_info:'限定技，当你处于濒死状态时，你可以丢弃你所有的牌和你判定区里的牌，并重置你的武将牌，失去技能远征并获得技能不死，然后失去一点体力上限并回复所有体力，然后从所有其他角色的区域内各获得一张牌。',
+		yulu:'雨露',
+		yulu_info:'出牌阶段限一次，你可以指定至多3名角色各摸两张牌，然后各弃置两张牌',
+		fengyin:'封印',
+		fengyin2:'封印',
+		fengyin_info:'回合结束阶段，若你于本回合内未使用过锦囊牌，你可以指定一名其他角色令其下个回合无法使用锦囊牌',
 		hannu:'寒怒',
 		hannu_info:'锁定技，每当你受到一次伤害，你将手牌数翻倍；若你的手牌数因此超过10张，你随机弃置若干张手牌直到手牌数等于你当前的体力值',
 		chuidiao:'垂钓',
