@@ -80,6 +80,8 @@ character.sp={
 			filter:function(event,player){
 				if(!event.targets) return false;
 				if(_status.currentPhase!=player) return false;
+				var type=get.type(event.card,'trick');
+				if(type!='basic'&&type!='trick') return false;
 				return game.hasPlayer(function(target){
 					return !event.targets.contains(target)&&target.num('he')>0;
 				});
