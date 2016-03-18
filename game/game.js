@@ -3978,16 +3978,26 @@
 						event.finish();
 						return;
 					}
-					if(event.isMine()){
-						event.dialog.open();
-					}
-					game.check();
-					if(event.isMine()){
-						game.pause();
+					var cs=target.get(event.position||'h');
+					if(event.forced&&get.select(event.selectButton)[0]>=cs.length){
+						event.result={
+							bool:true,
+							buttons:event.dialog.buttons,
+							links:cs
+						}
 					}
 					else{
-						if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
-						else ui.click.cancel();
+						if(event.isMine()){
+							event.dialog.open();
+						}
+						game.check();
+						if(event.isMine()){
+							game.pause();
+						}
+						else{
+							if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
+							else ui.click.cancel();
+						}
 					}
 					"step 1"
 					event.dialog.close();
@@ -4038,16 +4048,26 @@
 						event.finish();
 						return;
 					}
-					if(event.isMine()){
-						event.dialog.open();
-					}
-					game.check();
-					if(event.isMine()){
-						game.pause();
+					var cs=target.get(event.position||'h');
+					if(event.forced&&get.select(event.selectButton)[0]>=cs.length){
+						event.result={
+							bool:true,
+							buttons:event.dialog.buttons,
+							links:cs
+						}
 					}
 					else{
-						if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
-						else ui.click.cancel();
+						if(event.isMine()){
+							event.dialog.open();
+						}
+						game.check();
+						if(event.isMine()){
+							game.pause();
+						}
+						else{
+							if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
+							else ui.click.cancel();
+						}
 					}
 					"step 1"
 					event.dialog.close();
@@ -4115,16 +4135,26 @@
 						event.finish();
 						return;
 					}
-					if(event.isMine()){
-						event.dialog.open();
-					}
-					game.check();
-					if(event.isMine()){
-						game.pause();
+					var cs=target.get(event.position||'h');
+					if(event.forced&&get.select(event.selectButton)[0]>=cs.length){
+						event.result={
+							bool:true,
+							buttons:event.dialog.buttons,
+							links:cs
+						}
 					}
 					else{
-						if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
-						else ui.click.cancel();
+						if(event.isMine()){
+							event.dialog.open();
+						}
+						game.check();
+						if(event.isMine()){
+							game.pause();
+						}
+						else{
+							if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
+							else ui.click.cancel();
+						}
 					}
 					"step 1"
 					event.dialog.close();
@@ -7341,6 +7371,9 @@
 						if(this.modeSkills.contains(this.skills[i])==false&&
 							exclude.contains(this.skills[i])==false){
 							list.push(this.skills[i]);
+							if(lib.skill[this.skills[i]]&&lib.skill[this.skills[i]].onremove){
+								lib.skill[this.skills[i]].onremove(this);
+							}
 						}
 					}
 					this.skills.remove(list);
@@ -13300,6 +13333,13 @@
 				if(func(game.players[i])) return true;
 			}
 			return false;
+		},
+		countPlayer:function(func){
+			var num=0;
+			for(var i=0;i<game.players.length;i++){
+				if(func(game.players[i])) num++;
+			}
+			return num;
 		},
 		filterPlayer:function(func){
 			var list=[];

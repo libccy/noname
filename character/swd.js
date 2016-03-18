@@ -57,7 +57,7 @@ character.swd={
 			swd_sikongyu:['male','wu',4,['sliufeng','linyun','hutian']],
 			swd_muyue:['female','wei',3,['xingzhui','lingxian','shouyin']],
 			swd_ziqiao:['female','shu',3,['guaili','fuyan']],
-			swd_fengyu:['male','shu',4,['zhenwei','shangxi']],
+			swd_fengyu:['male','shu',4,['fzhenwei','shangxi']],
 
 		// swd_wushi:['male','wei',3,['zhoufu','yingbin','xuying']],
 			// swd_lanmoshen:['female','wei',3,['bingjian','lieren']],
@@ -906,7 +906,7 @@ character.swd={
 					}
 				}
 				var next=player.chooseToDiscard('he','是否发动【镇卫】？');
-				next.logSkill='hzhenwei',trigger.target;
+				next.logSkill=['hzhenwei',trigger.target];
 				next.ai=function(card){
 					if(save){
 						return 7-ai.get.value(card);
@@ -940,7 +940,7 @@ character.swd={
 				player.removeSkill('hzhenwei2');
 			}
 		},
-		zhenwei:{
+		fzhenwei:{
 			trigger:{global:'respondEnd'},
 			filter:function(event,player){
 				if(_status.currentPhase!=player) return false;
@@ -975,7 +975,7 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('zhenwei');
+					player.logSkill('fzhenwei');
 					game.log(result.targets[0],'获得了',event.cards);
 					result.targets[0].gain(event.cards,'gain2');
 				}
@@ -4630,30 +4630,6 @@ character.swd={
 				}
 			}
 		},
-		// jikong2:{
-		// 	trigger:{player:'damageEnd'},
-		// 	frequent:true,
-		// 	filter:function(event,player){
-		// 		return event.source&&event.source.num('h')>player.num('h');
-		// 	},
-		// 	content:function(){
-		// 		player.draw(trigger.source.num('h')-player.num('h'));
-		// 	},
-		// 	ai:{
-		// 		effect:{
-		// 			target:function(card,player,target){
-		// 				if(get.tag(card,'damage')){
-		// 					var num=player.num('h')-target.num('h');
-		// 					if(num>0){
-		// 						if(player.hp>=4) return [1,num];
-		// 						if(target.hp==3) return [1,num*0.5];
-		// 						if(target.hp==2) return [1,num*0.2];
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// },
 		jikong2:{
 			trigger:{player:'phaseBegin'},
 			direct:true,
@@ -7563,8 +7539,8 @@ character.swd={
 		lxianglong:'翔龙',
 		shangxi:'伤袭',
 		shangxi_info:'回合开始阶段，你可以弃置一张牌，并对攻击范围内一名体力值不小于你的其他角色造成一点伤害',
-		zhenwei:'镇威',
-		zhenwei_info:'在你的回合内，你可以将其他角色打出的卡牌交给除该角色外的任意一名角色',
+		fzhenwei:'镇威',
+		fzhenwei_info:'在你的回合内，你可以将其他角色打出的卡牌交给除该角色外的任意一名角色',
 		fuyan:'覆岩',
 		fuyan2:'覆岩',
 		fuyan_info:'每当你受到一次伤害，可以令一名没有护甲的角色获得一点护甲值',

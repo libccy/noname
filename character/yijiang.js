@@ -2992,6 +2992,7 @@ character.yijiang={
 				return ai.get.attitude(player,event.player)>0;
 			},
 			content:function(){
+				player.line(trigger.player,'green');
 				trigger.player.draw();
 			},
 			ai:{
