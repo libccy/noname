@@ -39,7 +39,7 @@ card.mingzhong={
 						event.directresult=he;
 					}
 					else{
-						event.target1.chooseCard('he','将两张牌交给'+get.translation(event.target2),true);
+						event.target1.chooseCard('he','将两张牌交给'+get.translation(event.target2),2,true);
 					}
 				}
 				'step 3'
@@ -47,7 +47,7 @@ card.mingzhong={
 					event.directresult=result.cards;
 				}
 				event.target1.$give(2,event.target2);
-				event.target2.gain(result.cards);
+				event.target2.gain(event.directresult);
 			},
 			ai:{
 				order:2.5,

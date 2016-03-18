@@ -574,6 +574,9 @@ character.sp={
 		},
 		xunzhi:{
 			trigger:{player:'phaseBegin'},
+			init:function(player){
+				player.storage.xunzhi=0;
+			},
 			filter:function(event,player){
 				return player.hp!=player.previousSeat.hp&&player.hp!=player.nextSeat.hp;
 			},
@@ -582,18 +585,25 @@ character.sp={
 			},
 			content:function(){
 				player.loseHp();
-				player.addTempSkill('xunzhi2','phaseAfter');
-			}
-		},
-		xunzhi2:{
+				player.storage.xunzhi+=2;
+			},
+			mark:true,
+			intro:{
+				content:function(storage,player){
+					return '手牌上限+'+player.storage.xunzhi;
+				}
+			},
 			mod:{
 				maxHandcard:function(player,num){
-					return num+2;
-				},
-			},
+					if(typeof player.storage.xunzhi=='number'){
+						return num+player.storage.xunzhi;
+					}
+				}
+			}
 		},
 		yawang:{
 			trigger:{player:'phaseDrawBefore'},
+			forced:true,
 			check:function(event,player){
 				var num=game.countPlayer(function(target){
 					return target!=player&&target.hp==player.hp;
@@ -1129,7 +1139,7 @@ character.sp={
 					}
 				}
 			},
-			trigger:{player:'phaseEnd'},
+			trigger:{player:'phaseDiscardBegin'},
 			direct:true,
 			filter:function(event,player){
 				var length=player.storage.xingwu_color.length;

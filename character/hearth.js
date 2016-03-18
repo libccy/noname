@@ -28,9 +28,9 @@ character.hearth={
 		hs_loatheb:['male','wu',5,['fengyin']],
 		hs_trueheart:['female','qun',3,['qianghua']],
 		hs_sainaliusi:['male','wu',4,['chongsheng','yulu']],
-		// hs_lrhonin:['male','wei',2,[]],
+		hs_lrhonin:['male','wei',4,['bingyan','yufa']],
 		hs_bolvar:['male','wei',4,['yuanzheng','byuhuo']],
-		// hs_fuding:['male','wei',2,[]],
+		hs_fuding:['male','wei',4,['shengdun','fbeifa']],
 		hs_xuanzhuanjijia:['male','shu',3,['jixuan']],
 		hs_ysera:['female','wu',4,['chenshui']],
 		hs_alextrasza:['female','shu',5,['fushi']],
@@ -64,6 +64,147 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		fbeifa:{
+			trigger:{player:'loseEnd'},
+			filter:function(event,player){
+				if(player.num('h')) return false;
+				if(player.storage.fbeifa>=3) return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].original=='h') return true;
+				}
+				return false;
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget('是否发动【北伐】？',function(card,player,target){
+					return lib.filter.targetEnabled({name:'sha'},player,target);
+				}).ai=function(target){
+					return ai.get.effect(target,{name:'sha'},player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('fbeifa');
+					player.useCard({name:'sha'},result.targets,false);
+					player.storage.fbeifa++;
+				}
+			},
+			ai:{
+				expose:0.2,
+			},
+			group:['fbeifa2','fbeifa3'],
+		},
+		fbeifa2:{
+			trigger:{source:'damageAfter'},
+			forced:true,
+			popup:false,
+			filter:function(event){
+				return event.parent.parent.parent.name=='fbeifa';
+			},
+			content:function(){
+				player.draw();
+			}
+		},
+		fbeifa3:{
+			trigger:{global:'phaseBegin'},
+			forced:true,
+			silent:true,
+			popup:false,
+			content:function(){
+				player.storage.fbeifa=0;
+			}
+		},
+		yufa:{
+			trigger:{global:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.storage.yufa==event.player;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【驭法】？',function(card,player,target){
+					return target!=trigger.player;
+				}).ai=function(target){
+					return ai.get.attitude(player,target);
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('yufa',result.targets);
+					result.targets[0].gain(game.createCard('chuansongmen'),'gain2');
+				}
+			},
+			group:['yufa2','yufa3'],
+			ai:{
+				expose:0.1
+			}
+		},
+		yufa2:{
+			trigger:{player:'damageEnd'},
+			filter:function(event,player){
+				return event.source==_status.currentPhase&&event.source!=player;
+			},
+			popup:false,
+			forced:true,
+			silent:true,
+			content:function(){
+				player.storage.yufa=trigger.source;
+			}
+		},
+		yufa3:{
+			trigger:{global:'phaseBegin'},
+			popup:false,
+			forced:true,
+			silent:true,
+			content:function(){
+				player.storage.yufa=null;
+			}
+		},
+		bingyan:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.num('he')>0;
+			},
+			filterTarget:function(card,player,target){
+				if(get.color(card)=='red'){
+					return player.canUse('chiyuxi',target);
+				}
+				else{
+					return player.canUse('jingleishan',target);
+				}
+			},
+			selectTarget:-1,
+			discard:false,
+			delay:false,
+			line:false,
+			filterCard:true,
+			position:'he',
+			log:'notarget',
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			multitarget:true,
+			content:function(){
+				if(get.color(cards[0])=='black'){
+					player.useCard({name:'jingleishan'},cards,targets);
+				}
+				else{
+					player.useCard({name:'chiyuxi'},cards,targets);
+				}
+			},
+			ai:{
+				order:9.1,
+				result:{
+					target:function(player,target){
+						var card=ui.selected.cards[0];
+						if(card&&get.color(card)=='black'){
+							return ai.get.effect(target,{name:'jingleishan'},player,target);
+						}
+						return ai.get.effect(target,{name:'chiyuxi'},player,target);
+					}
+				}
+			}
+		},
 		shifa:{
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
@@ -110,7 +251,9 @@ character.hearth={
 		},
 		byuhuo:{
 			unique:true,
-			enable:'chooseToUse',
+			trigger:{player:'dying'},
+			priority:6,
+			forced:true,
 			mark:true,
 			skillAnimation:true,
 			animationColor:'fire',
@@ -118,31 +261,25 @@ character.hearth={
 				player.storage.byuhuo=false;
 			},
 			filter:function(event,player){
-				if(event.type!='dying') return false;
-				if(player!=_status.dying) return false;
+				if(player.hp>0) return false;
 				if(player.storage.byuhuo) return false;
+				return true;
 			},
 			content:function(){
 				'step 0'
-				player.hp=Math.min(3,player.maxHp);
-				player.discard(player.get('hej'));
 				player.unmarkSkill('yuhuo');
 				player.storage.byuhuo=true;
-				player.removeSkill('yuanzheng');
 				player.addSkill('busi');
-				'step 1'
-				if(player.classList.contains('linked')) player.link();
-				'step 2'
-				if(player.classList.contains('turnedover')) player.turnOver();
-				'step 3'
 				player.loseMaxHp();
-				'step 4'
+				'step 1'
+				player.recover(player.maxHp);
+				'step 2'
 				var targets=game.players.slice(0);
 				targets.remove(player);
 				targets.sort(lib.sort.seat);
 				event.targets=targets;
 				event.num=0;
-				'step 5'
+				'step 3'
 				if(num<event.targets.length){
 					if(event.targets[num].num('hej')){
 						player.gainPlayerCard(event.targets[num],'hej',true);
@@ -152,14 +289,6 @@ character.hearth={
 				}
 			},
 			ai:{
-				skillTagFilter:function(player){
-					if(player.storage.byuhuo) return false;
-					if(player.hp>0) return false;
-				},
-				save:true,
-				result:{
-					player:10
-				},
 				threaten:function(player,target){
 					if(!target.storage.byuhuo) return 0.6;
 				}
@@ -2903,7 +3032,7 @@ character.hearth={
 		hs_sainaliusi:'塞纳留斯',
 		hs_bolvar:'伯瓦尔',
 		hs_lrhonin:'罗宁',
-		hs_fuding:'弗西',
+		hs_fuding:'弗丁',
 		hs_edwin:'艾德温',
 
 		hs_ronghejuren:'熔核巨人',
@@ -2924,6 +3053,12 @@ character.hearth={
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
 
+		fbeifa:'北伐',
+		fbeifa_info:'每当你失去最后一张手牌，你可以视为使用一张无视距离的杀，若此杀造成伤害，你摸一张牌，每回合最多发动3次',
+		yufa:'驭法',
+		yufa_info:'在任意一名其他角色的回合结束阶段，若你于此回合内受过其伤害，你可以将一张传送门交给除此角色外的任意一名角色',
+		bingyan:'冰焰',
+		bingyan_info:'出牌阶段限一次，你可以将一张红色牌当作炽羽袭，或将一张黑色牌当作惊雷闪使用',
 		hsshenqi:'神器',
 		hsshenqi_morijingxiang:'末日镜像',
 		hsshenqi_morijingxiang_info:'从所有其他角色的区域内各获得1张牌',
@@ -2936,7 +3071,7 @@ character.hearth={
 		yuanzheng:'远征',
 		yuanzheng_info:'每当你对攻击范围外的一名角色使用一张牌，你可以选择一项：摸一张牌，或弃置目标一张牌',
 		byuhuo:'浴火',
-		byuhuo_info:'限定技，当你处于濒死状态时，你可以丢弃你所有的牌和你判定区里的牌，并重置你的武将牌，失去技能远征并获得技能不死，然后失去一点体力上限并回复所有体力，然后从所有其他角色的区域内各获得一张牌。',
+		byuhuo_info:'觉醒技，当你进入濒死状态时，你须失去一点体力上限，回复所有体力，获得技能不死，然后从所有其他角色的区域内各获得一张牌',
 		yulu:'雨露',
 		yulu_info:'出牌阶段限一次，你可以指定至多3名角色各摸两张牌，然后各弃置两张牌',
 		fengyin:'封印',

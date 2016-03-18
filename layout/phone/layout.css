@@ -69,6 +69,10 @@
 .player>.identity{
     transform: scale(1.3);
 }
+.player:not([data-position='0']).linked .identity,
+#arena.chess .player.linked .identity{
+	transform:scale(1.3) rotate(90deg);
+}
 
 br.finish_game{
     display: inline !important;

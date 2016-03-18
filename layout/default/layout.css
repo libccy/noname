@@ -621,6 +621,7 @@ margin-bottom: 5px;
 	transform:scale(0.7);
 	white-space: nowrap;
 	z-index: 5;
+	pointer-events: none;
 }
 #window>.damage{
 	transform:scale(2);

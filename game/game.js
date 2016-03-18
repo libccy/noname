@@ -4546,7 +4546,7 @@
 						}
 					}
 					var str='';
-					if(targets&&targets.length){
+					if(targets&&targets.length&&info.log!='notarget'){
 						str+='对<span class="bluetext">'+(targets[0]==player?'自己':get.translation(targets[0]));
 						for(var i=1;i<targets.length;i++){
 							str+='、'+(targets[i]==player?'自己':get.translation(targets[i]));
@@ -17248,12 +17248,14 @@
 						node.dataset.color=i;
 						ui.refresh(node);
 						node.show();
+						var transstr='translateY('+((num++)*30)+'px)';
 						if(lib.config.layout=='phone'){
-							node.style.transform='scale(1.3) translateY('+((num++)*30)+'px)';
+							transstr+=' scale(1.3)';
 						}
-						else{
-							node.style.transform='translateY('+((num++)*30)+'px)';
+						if(lib.isNewLayout()&&this.parentNode.isLinked()){
+							transstr+=' rotate(90deg)';
 						}
+						node.style.transform=transstr;
 						nodes.push(node);
 					}
 				}

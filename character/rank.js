@@ -50,8 +50,11 @@ window.characterRank={
         'swd_xiarou',
         'hs_xsylvanas',
         'hs_malygos',
+        'hs_alakir',
     ],
     a:[
+        'hs_sainaliusi',
+        'hs_lrhonin',
         'hs_ysera',
         'yxs_diaochan',
         'liuzan',
@@ -76,7 +79,6 @@ window.characterRank={
         'hs_antonidas',
         'chenlin',
         'swd_chenjingchou',
-        'hs_alakir',
         'hs_anduin',
         'yxs_yangyuhuan',
         'caoang',
@@ -100,6 +102,7 @@ window.characterRank={
     ],
     am:[
         'lifeng',
+        'hs_fuding',
         'zhugeguo',
         'sp_caiwenji',
         'yxs_yingzheng',
@@ -170,6 +173,7 @@ window.characterRank={
         'swd_xiyan',
     ],
     bp:[
+        'hs_loatheb',
         'hs_alextrasza',
         'hs_xuanzhuanjijia',
         'hs_nuoziduomu',
