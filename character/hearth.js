@@ -55,6 +55,7 @@ character.hearth={
 		hs_hudunren:['male','shu',3,['hhudun']],
 		hs_nate:['male','wu',4,['chuidiao']],
 		hs_jiaziruila:['male','wu',4,['hannu']],
+		hs_shifazhe:['male','wei',3,['jizhi','shifa']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -63,6 +64,24 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		shifa:{
+			trigger:{player:'phaseUseBegin'},
+			forced:true,
+			content:function(){
+				'step 0'
+				var players=get.players();
+				var list=[];
+				for(var i in lib.card){
+					if(!lib.translate[i+'_info']) continue;
+					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
+					if(lib.card[i].type=='trick') list.push(i);
+				}
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].gain(game.createCard(list.randomGet()));
+					game.players[i].$draw();
+				}
+			}
+		},
 		yuanzheng:{
 			trigger:{player:'useCardToBegin'},
 			direct:true,
@@ -639,8 +658,8 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			frequent:true,
 			content:function(){
-				var list=['mengjing_feicuiyoulong','mengjing_huanxiaojiemei',
-					'mengjing_suxing','mengjing_mengye','mengjing_mengjing'];
+				var list=['hsmengjing_feicuiyoulong','hsmengjing_huanxiaojiemei',
+					'hsmengjing_suxing','hsmengjing_mengye','hsmengjing_mengjing'];
 				player.gain(game.createCard(list.randomGet()));
 				player.$draw();
 			},
@@ -1397,7 +1416,7 @@ character.hearth={
 				}
 			}
 		},
-		mengjing_mengye:{
+		hsmengjing_mengye:{
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			priority:-1,
@@ -1406,7 +1425,7 @@ character.hearth={
 			},
 			content:function(){
 				player.discard(player.get('he'));
-				player.removeSkill('mengjing_mengye');
+				player.removeSkill('hsmengjing_mengye');
 			},
 			mark:'image',
 			intro:{
@@ -2591,9 +2610,9 @@ character.hearth={
 		},
 	},
 	card:{
-		mengjing_feicuiyoulong:{
-			type:'mengjing',
-			image:'card/mengjing_feicuiyoulong',
+		hsshenqi_nengliangzhiguang:{
+			type:'hsshenqi',
+			image:'card/hsshenqi_nengliangzhiguang',
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
@@ -2614,9 +2633,78 @@ character.hearth={
 				value:10,
 			}
 		},
-		mengjing_suxing:{
-			type:'mengjing',
-			image:'card/mengjing_suxing',
+		hsshenqi_kongbusangzhong:{
+			type:'hsshenqi',
+			image:'card/hsshenqi_kongbusangzhong',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:true,
+			content:function(){
+				target.damage(2);
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-2
+				},
+				tag:{
+					damage:2
+				},
+				useful:5,
+				value:10,
+			}
+		},
+		hsshenqi_morijingxiang:{
+			type:'hsshenqi',
+			image:'card/hsshenqi_morijingxiang',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:true,
+			content:function(){
+				target.damage(2);
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-2
+				},
+				tag:{
+					damage:2
+				},
+				useful:5,
+				value:10,
+			}
+		},
+		hsmengjing_feicuiyoulong:{
+			type:'hsmengjing',
+			image:'card/hsmengjing_feicuiyoulong',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			enable:true,
+			filterTarget:true,
+			content:function(){
+				target.damage(2);
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-2
+				},
+				tag:{
+					damage:2
+				},
+				useful:5,
+				value:10,
+			}
+		},
+		hsmengjing_suxing:{
+			type:'hsmengjing',
+			image:'card/hsmengjing_suxing',
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
@@ -2641,9 +2729,9 @@ character.hearth={
 				value:10,
 			}
 		},
-		mengjing_mengye:{
-			type:'mengjing',
-			image:'card/mengjing_mengye',
+		hsmengjing_mengye:{
+			type:'hsmengjing',
+			image:'card/hsmengjing_mengye',
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
@@ -2651,7 +2739,7 @@ character.hearth={
 			filterTarget:true,
 			content:function(){
 				target.draw();
-				target.addSkill('mengjing_mengye');
+				target.addSkill('hsmengjing_mengye');
 			},
 			ai:{
 				order:1,
@@ -2659,15 +2747,15 @@ character.hearth={
 				value:10,
 				result:{
 					target:function(player,target){
-						if(target.skills.contains('mengjing_mengye')) return 0.5;
+						if(target.skills.contains('hsmengjing_mengye')) return 0.5;
 						return -target.num('he');
 					}
 				}
 			}
 		},
-		mengjing_mengjing:{
-			type:'mengjing',
-			image:'card/mengjing_mengjing',
+		hsmengjing_mengjing:{
+			type:'hsmengjing',
+			image:'card/hsmengjing_mengjing',
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
@@ -2702,9 +2790,9 @@ character.hearth={
 				}
 			}
 		},
-		mengjing_huanxiaojiemei:{
-			type:'mengjing',
-			image:'card/mengjing_huanxiaojiemei',
+		hsmengjing_huanxiaojiemei:{
+			type:'hsmengjing',
+			image:'card/hsmengjing_huanxiaojiemei',
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
@@ -2834,7 +2922,17 @@ character.hearth={
 		hs_kchromaggus:'克洛玛古斯',
 		hs_hudunren:'护盾人',
 		hs_nate:'纳特',
+		hs_shifazhe:'嗜法者',
 
+		hsshenqi:'神器',
+		hsshenqi_morijingxiang:'末日镜像',
+		hsshenqi_morijingxiang_info:'从所有其他角色的区域内各获得1张牌',
+		hsshenqi_kongbusangzhong:'恐怖丧钟',
+		hsshenqi_kongbusangzhong_info:'对所有其他角色各造成1~2点伤害',
+		hsshenqi_nengliangzhiguang:'能量之光',
+		hsshenqi_nengliangzhiguang_info:'令一名角色增加一点体力上限，回复一点体力，并摸四张牌',
+		shifa:'嗜法',
+		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
 		yuanzheng:'远征',
 		yuanzheng_info:'每当你对攻击范围外的一名角色使用一张牌，你可以选择一项：摸一张牌，或弃置目标一张牌',
 		byuhuo:'浴火',
@@ -2878,18 +2976,18 @@ character.hearth={
 		jiaohui_info:'回合结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸两张牌或回复一点体力',
 		chenshui:'沉睡',
 		chenshui_info:'回合结束阶段，你可以将一张随机梦境牌加入你的手牌',
-		mengjing:'梦境',
-		mengjing_card_config:'梦境',
-		mengjing_feicuiyoulong:'翡翠幼龙',
-		mengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成2点伤害',
-		mengjing_huanxiaojiemei:'欢笑姐妹',
-		mengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复所有体力值',
-		mengjing_suxing:'苏醒',
-		mengjing_suxing_info:'令所有其他角色流失一点体力并随机弃置两张牌',
-		mengjing_mengye:'梦魇',
-		mengjing_mengye_info:'令一名角色摸1张牌，并在其下一个回合结束阶段弃置其所有牌',
-		mengjing_mengjing:'梦境',
-		mengjing_mengjing_info:'令一名角色将装备区内的所有牌收入手牌，并将一张乐不思蜀置于其判定区',
+		hsmengjing:'梦境',
+		hsmengjing_card_config:'梦境',
+		hsmengjing_feicuiyoulong:'翡翠幼龙',
+		hsmengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成2点伤害',
+		hsmengjing_huanxiaojiemei:'欢笑姐妹',
+		hsmengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复所有体力值',
+		hsmengjing_suxing:'苏醒',
+		hsmengjing_suxing_info:'令所有其他角色流失一点体力并随机弃置两张牌',
+		hsmengjing_mengye:'梦魇',
+		hsmengjing_mengye_info:'令一名角色摸1张牌，并在其下一个回合结束阶段弃置其所有牌',
+		hsmengjing_mengjing:'梦境',
+		hsmengjing_mengjing_info:'令一名角色将装备区内的所有牌收入手牌，并将一张乐不思蜀置于其判定区',
 		xjumo:'聚魔',
 		xjumo_info:'锁定技，你的手牌上限+3；若你已受伤，改为+5',
 		liehun:'裂魂',

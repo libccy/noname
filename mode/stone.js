@@ -5522,8 +5522,8 @@ mode.stone={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			content:function(){
-				var list=['mengjing_feicuiyoulong','mengjing_huanxiaojiemei',
-					'mengjing_suxing','mengjing_mengye','mengjing_mengjing'];
+				var list=['hsmengjing_feicuiyoulong','hsmengjing_huanxiaojiemei',
+					'hsmengjing_suxing','hsmengjing_mengye','hsmengjing_mengjing'];
 				var target=player.getLeader();
 				target.gain(game.createCard(list.randomGet()));
 				target.$draw();

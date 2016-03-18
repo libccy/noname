@@ -13680,7 +13680,9 @@
 					groupSort=function(name){
 						if(lib.card[name[2]].type=='basic') return 0;
 						if(lib.card[name[2]].type=='stonecard') return -0.5;
-						if(lib.card[name[2]].type=='mengjing') return 0.3;
+						if(lib.card[name[2]].type=='hsmengjing') return 0.3;
+						if(lib.card[name[2]].type=='hsbaowu') return 0.3;
+						if(lib.card[name[2]].type=='hsshenqi') return 0.3;
 						if(lib.card[name[2]].type=='stonecharacter') return -1;
 						if(lib.card[name[2]].type=='chess') return 1.5;
 						if(lib.card[name[2]].type=='trick') return 2;
@@ -20632,7 +20634,9 @@
 				func=function(card){
 					if(get.type(card)=='basic') return 2;
 					if(get.type(card)=='stonecard') return -0.5;
-					if(get.type(card)=='mengjing') return 0.5;
+					if(get.type(card)=='hsmengjing') return 0.5;
+					if(get.type(card)=='hsbaowu') return 0.5;
+					if(get.type(card)=='hsshenqi') return 0.5;
 					if(get.type(card)=='stonecharacter') return 1;
 					if(get.type(card)=='chess') return 1.5;
 					if(get.type(card)=='trick') return -1;
