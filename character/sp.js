@@ -1987,10 +1987,11 @@ character.sp={
 			}
 		},
 		fenyin2:{
-			trigger:{player:'phaseBegin'},
+			trigger:{player:'phaseBefore'},
 			forced:true,
 			silent:true,
 			popup:false,
+			priority:10,
 			content:function(){
 				player.storage.fenyin=null;
 				player.storage.fenyin2=0;

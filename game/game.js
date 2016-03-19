@@ -3280,6 +3280,7 @@
 		translate:{
 			'default':"默认",
 			zhenfa:'阵法',
+			mode_derivation_card_config:'衍生',
 			heart:"♥︎",
 			diamond:"♦︎",
 			spade:"♠︎",
@@ -8398,7 +8399,7 @@
 						if(font){
 							node.classList.add('normal-font');
 						}
-						if(num>0){
+						if(typeof num=='number'&&num>0){
 							num='+'+num;
 						}
 						node.innerHTML=num;
@@ -20202,6 +20203,7 @@
 						lib.onwash[i]();
 					}
 					for(i=0;i<ui.discardPile.childNodes.length;i++){
+						if(get.info(ui.discardPile.childNodes[i]).vanish) continue;
 						cards.push(ui.discardPile.childNodes[i]);
 					}
 					cards.randomSort();
@@ -22387,12 +22389,30 @@
 							else{
 								if(lib[j][k]==undefined){
 									lib[j][k]=lib.init.eval(character[i][j][k]);
+									if(j=='card'&&lib[j][k].derivation){
+										if(!lib.cardPack.mode_derivation){
+											lib.cardPack.mode_derivation=[k];
+										}
+										else{
+											lib.cardPack.mode_derivation.push(k);
+										}
+									}
 								}
 								else{
 									alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
 								}
 							}
 						}
+					}
+				}
+				if(lib.cardPack.mode_derivation){
+					for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
+						if(!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]){
+							lib.cardPack.mode_derivation.splice(i--,1);
+						}
+					}
+					if(lib.cardPack.mode_derivation.length==0){
+						delete lib.cardPack.mode_derivation;
 					}
 				}
 				for(i in lib.config.forbidpack){

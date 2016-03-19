@@ -46,7 +46,7 @@ card.mingzhong={
 				if(!event.directresult){
 					event.directresult=result.cards;
 				}
-				event.target1.$give(2,event.target2);
+				event.target1.$give(event.directresult.length,event.target2);
 				event.target2.gain(event.directresult);
 			},
 			ai:{

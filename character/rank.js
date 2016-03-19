@@ -101,6 +101,7 @@ window.characterRank={
         'hs_tgolem',
     ],
     am:[
+        'hs_lafamu',
         'lifeng',
         'hs_fuding',
         'zhugeguo',

@@ -56,6 +56,8 @@ character.hearth={
 		hs_nate:['male','wu',4,['chuidiao']],
 		hs_jiaziruila:['male','wu',4,['hannu']],
 		hs_shifazhe:['male','wei',3,['jizhi','shifa']],
+		hs_lafamu:['male','shu',4,['xieneng']],
+		hs_yelise:['female','wei',3,['xunbao','zhuizong']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -64,6 +66,154 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		zhuizong:{
+			enable:'phaseUse',
+			usable:1,
+			filterCard:true,
+			position:'he',
+			selectCard:[1,Infinity],
+			check:function(card){
+				if(ui.selected.cards.length) return 0;
+				return 6-ai.get.value(card)
+			},
+			content:function(){
+				'step 0'
+				event.cards=get.cards(4*cards.length);
+				player.chooseCardButton('获得其中的一张牌',true,event.cards,true);
+				'step 1'
+				player.gain(result.links,'draw');
+				event.cards.remove(result.links[0]);
+				for(var i=0;i<event.cards.length;i++){
+					ui.discardPile.appendChild(event.cards[i]);
+				}
+			},
+			ai:{
+				order:8,
+				result:{
+					player:1
+				},
+			}
+		},
+		xunbao:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return !player.skills.contains('xunbao2');
+			},
+			filterCard:true,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			position:'he',
+			content:function(){
+				player.storage.xunbao2=game.createCard('hsbaowu_cangbaotu');
+				player.addSkill('xunbao2');
+				player.popup(player.storage.xunbao2.number.toString());
+			},
+			ai:{
+				order:3,
+				result:{
+					player:1
+				}
+			}
+		},
+		xunbao2:{
+			mark:'card',
+			intro:{
+				content:'card',
+			},
+			direct:true,
+			trigger:{player:'phaseBegin'},
+			filter:function(event,player){
+				var hs=player.get('he');
+				for(var i=0;i<hs.length;i++){
+					if(hs[i].number==player.storage.xunbao2.number) return true;
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.chooseToDiscard('是否弃置一张点数为'+player.storage.xunbao2.number+'的牌获得藏宝图？','he',function(card){
+					return card.number==player.storage.xunbao2.number;
+				}).ai=function(card){
+					return 7-ai.get.value(card);
+				};
+				'step 1'
+				if(result.bool){
+					player.gain(player.storage.xunbao2,'gain2');
+					game.log(player,'获得了',player.storage.xunbao2);
+					delete player.storage.xunbao2;
+					player.removeSkill('xunbao2');
+				}
+			}
+		},
+		hsbaowu_cangbaotu:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.gain(game.createCard('hsbaowu_huangjinyuanhou'),'gain2');
+				player.removeSkill('hsbaowu_cangbaotu');
+			}
+		},
+		hsbaowu_huangjinyuanhou:{
+			mark:'card',
+			intro:{
+				content:'防止你受到的所有伤害'
+			},
+			trigger:{player:'damageBefore'},
+			forced:true,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				nofire:true,
+				nothunder:true,
+				nodamage:true,
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'damage')) return [0,0];
+					}
+				},
+			},
+			group:'hsbaowu_huangjinyuanhou2'
+		},
+		hsbaowu_huangjinyuanhou2:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.removeSkill('hsbaowu_huangjinyuanhou');
+				delete player.storage.hsbaowu_huangjinyuanhou;
+			}
+		},
+		xieneng:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				'step 0'
+				var list=[['','','hsshenqi_morijingxiang'],
+					['','','hsshenqi_kongbusangzhong'],
+					['','','hsshenqi_nengliangzhiguang']];
+				var dialog=ui.create.dialog('将武将牌翻面并获得一张神器牌',[list,'vcard'],'hidden');
+				player.chooseButton(dialog).ai=function(){return Math.random();};
+				'step 1'
+				if(result.buttons){
+					player.logSkill('xieneng');
+					player.turnOver();
+					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
+				}
+			},
+			ai:{
+				threaten:1.3,
+				effect:{
+					target:function(card,player,target){
+						if(card.name=='guiyoujie') return [0,1];
+					}
+				}
+			}
+		},
 		fbeifa:{
 			trigger:{player:'loseEnd'},
 			filter:function(event,player){
@@ -2739,24 +2889,92 @@ character.hearth={
 		},
 	},
 	card:{
+		hsbaowu_cangbaotu:{
+			type:'hsbaowu',
+			image:'card/hsbaowu_cangbaotu',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			vanish:true,
+			enable:true,
+			derivation:'hs_yelise',
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			content:function(){
+				target.addSkill('hsbaowu_cangbaotu');
+				target.draw();
+			},
+			ai:{
+				order:10,
+				result:{
+					player:10
+				},
+				useful:10,
+				value:10,
+			}
+		},
+		hsbaowu_huangjinyuanhou:{
+			type:'hsbaowu',
+			image:'card/hsbaowu_huangjinyuanhou',
+			color:'white',
+			opacity:1,
+			textShadow:'black 0 0 2px',
+			vanish:true,
+			enable:true,
+			derivation:'hs_yelise',
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			content:function(){
+				var hs=target.get('h');
+				target.discard(hs);
+				var cs=[];
+				for(var i=0;i<hs.length;i++){
+					cs.push(game.createCard('wuzhong'));
+				}
+				target.gain(cs,'gain2');
+				target.storage.hsbaowu_huangjinyuanhou=cards[0];
+				target.addSkill('hsbaowu_huangjinyuanhou');
+			},
+			ai:{
+				order:10,
+				result:{
+					player:function(player){
+						if(player.num('h')>1) return 1;
+						if(player.hp==1) return 1;
+						return 0;
+					}
+				},
+				useful:10,
+				value:10,
+			}
+		},
 		hsshenqi_nengliangzhiguang:{
 			type:'hsshenqi',
 			image:'card/hsshenqi_nengliangzhiguang',
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
+			derivation:'hs_lafamu',
 			filterTarget:true,
 			content:function(){
-				target.damage(2);
+				target.gainMaxHp();
+				target.recover();
+				target.draw(4);
 			},
 			ai:{
 				order:5,
 				result:{
-					target:-2
-				},
-				tag:{
-					damage:2
+					target:function(player,target){
+						if(target.hp<=1) return 2;
+						if(target.num('h')<target.hp||target.hp==2) return 1.5;
+						return 1;
+					}
 				},
 				useful:5,
 				value:10,
@@ -2768,18 +2986,25 @@ character.hearth={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
-			filterTarget:true,
+			derivation:'hs_lafamu',
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			selectTarget:-1,
 			content:function(){
-				target.damage(2);
+				target.damage(Math.ceil(Math.random()*2));
 			},
 			ai:{
-				order:5,
+				order:9,
 				result:{
 					target:-2
 				},
 				tag:{
-					damage:2
+					damage:2,
+					multitarget:1,
+					multineg:1,
 				},
 				useful:5,
 				value:10,
@@ -2791,18 +3016,24 @@ character.hearth={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
-			filterTarget:true,
+			derivation:'hs_lafamu',
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('hej')>0;
+			},
+			selectTarget:-1,
 			content:function(){
-				target.damage(2);
+				if(target.num('hej')) player.gainPlayerCard(target,'hej',true,Math.ceil(Math.random()*2));
 			},
 			ai:{
-				order:5,
+				order:9.5,
 				result:{
-					target:-2
+					player:1
 				},
 				tag:{
-					damage:2
+					multitarget:1,
+					multineg:1,
 				},
 				useful:5,
 				value:10,
@@ -2814,7 +3045,9 @@ character.hearth={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
+			derivation:'hs_ysera',
 			filterTarget:true,
 			content:function(){
 				target.damage(2);
@@ -2837,7 +3070,9 @@ character.hearth={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
+			derivation:'hs_ysera',
 			filterTarget:function(card,player,target){
 				return player!=target;
 			},
@@ -2864,7 +3099,9 @@ character.hearth={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
+			derivation:'hs_ysera',
 			filterTarget:true,
 			content:function(){
 				target.draw();
@@ -2888,7 +3125,9 @@ character.hearth={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
+			derivation:'hs_ysera',
 			filterTarget:function(card,player,target){
 				return !target.num('j','lebu')||target.num('e')>0;
 			},
@@ -2925,7 +3164,9 @@ character.hearth={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
+			vanish:true,
 			enable:true,
+			derivation:'hs_ysera',
 			filterTarget:function(card,player,target){
 				return target.hp<target.maxHp;
 			},
@@ -3034,6 +3275,8 @@ character.hearth={
 		hs_lrhonin:'罗宁',
 		hs_fuding:'弗丁',
 		hs_edwin:'艾德温',
+		hs_lafamu:'拉法姆',
+		hs_yelise:'伊莉斯',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_shanlingjuren:'山岭巨人',
@@ -3053,6 +3296,13 @@ character.hearth={
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
 
+		zhuizong:'追踪',
+		zhuizong_info:'出牌阶段限一次，你可以弃置任意张牌，观看牌堆顶的等同于弃牌数四倍的牌，然后获得其中的一张牌',
+		xunbao:'寻宝',
+		xunbao2:'寻宝',
+		xunbao_info:'出牌阶段，若你的武将牌上没有藏宝图，你可以弃置一手牌，并将一张藏宝图置于你的武将牌上；回合开始阶段，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图',
+		xieneng:'邪能',
+		xieneng_info:'回合结束阶段，你可以将武将牌翻面，并获得一张神器牌',
 		fbeifa:'北伐',
 		fbeifa_info:'每当你失去最后一张手牌，你可以视为使用一张无视距离的杀，若此杀造成伤害，你摸一张牌，每回合最多发动3次',
 		yufa:'驭法',
@@ -3061,11 +3311,16 @@ character.hearth={
 		bingyan_info:'出牌阶段限一次，你可以将一张红色牌当作炽羽袭，或将一张黑色牌当作惊雷闪使用',
 		hsshenqi:'神器',
 		hsshenqi_morijingxiang:'末日镜像',
-		hsshenqi_morijingxiang_info:'从所有其他角色的区域内各获得1张牌',
+		hsshenqi_morijingxiang_info:'从所有其他角色的区域内各获得1~2张牌',
 		hsshenqi_kongbusangzhong:'恐怖丧钟',
 		hsshenqi_kongbusangzhong_info:'对所有其他角色各造成1~2点伤害',
 		hsshenqi_nengliangzhiguang:'能量之光',
 		hsshenqi_nengliangzhiguang_info:'令一名角色增加一点体力上限，回复一点体力，并摸四张牌',
+		hsbaowu:'宝物',
+		hsbaowu_huangjinyuanhou:'黄金猿猴',
+		hsbaowu_huangjinyuanhou_info:'弃置所有手牌，并获得等量的无中生有；直到下个回合开始，防上即将受到的一切伤害',
+		hsbaowu_cangbaotu:'藏宝图',
+		hsbaowu_cangbaotu_info:'回合结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
 		shifa:'嗜法',
 		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
 		yuanzheng:'远征',
