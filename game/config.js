@@ -17,7 +17,7 @@ window.config={
 	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','jg_simayi','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	layoutfixed:['chess'],
 	all:{
-		mode:['identity','guozhan','versus','boss','chess','stone'],
+		stockmode:['identity','guozhan','versus','boss','chess','stone'],
 		layout:['default','newlayout'],
 		theme:['woodden','music','simple'],
 		card_font:['xiaozhuan','huangcao','caoshu','xingshu'],
@@ -209,6 +209,7 @@ window.config={
 	hiddenModePack:[],
 	hiddenCharacterPack:[],
 	hiddenCardPack:[],
+	hiddenPlayPack:[],
 
 	theme:'woodden',
 	layout:'mobile',
@@ -261,6 +262,7 @@ window.config={
 	cards:['standard','ex','extra','refresh'],
 	characters:['standard','shenhua','refresh','yijiang'],
 	plays:[],
+	extensions:[],
 	banned:[],
 	bannedcards:[],
 	bannedpile:{},

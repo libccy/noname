@@ -6,8 +6,6 @@ character.pack={
     sp:'SP',
     guozhan:'国战',
     yijiang:'一将成名',
-    // jiange:'守卫剑阁',
-    // zhuogui:'捉鬼驱邪',
     diy:'DIY',
     yxs:'英雄杀',
     hearth:'炉石传说',

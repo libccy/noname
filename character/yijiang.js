@@ -1349,7 +1349,7 @@ character.yijiang={
 		},
 		zhanjue2:{
 			audio:false,
-			trigger:{player:'phaseBegin'},
+			trigger:{player:'phaseBefore'},
 			forced:true,
 			popup:false,
 			silent:true,

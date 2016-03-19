@@ -25,7 +25,6 @@
 		updates:[],
 		canvasUpdates:[],
 		video:[],
-		arenaReady:[],
 		_onDB:[],
 		customCharacters:[],
 		customCards:[],
@@ -35,6 +34,7 @@
 		onresize:[],
 		onwash:[],
 		onover:[],
+		arenaReady:[],
 		onDB:function(func){
 			if(lib.db){
 				func();
@@ -1234,197 +1234,255 @@
 					}
 				}
 			},
-			playpack:{
-				name:'玩法',
+			extension:{
+				name:'扩展',
 				config:{
 					character:{
-						name:'技能卡牌',
-						init:false,
-						restart:true,
-						onclick:function(bool){
-							if(bool){
-								lib.config.plays.add('character');
-							}
-							else{
-								lib.config.plays.remove('character');
-							}
-							game.saveConfig('plays',lib.config.plays);
-						}
+					    name:'技能卡牌',
+					    init:false,
+					    restart:true,
+					    onclick:function(bool){
+					        if(bool){
+					            lib.config.plays.add('character');
+					        }
+					        else{
+					            lib.config.plays.remove('character');
+					        }
+					        game.saveConfig('plays',lib.config.plays);
+					    }
 					},
 					character_num_playpackconfig:{
-						name:'卡牌比例',
-						init:'0.05',
-						item:{
-							'0.02':'2%',
-							'0.05':'5%',
-							'0.1':'10%',
-							'0.2':'20%',
+					    name:'卡牌比例',
+					    init:'0.05',
+					    item:{
+					        '0.02':'2%',
+					        '0.05':'5%',
+					        '0.1':'10%',
+					        '0.2':'20%',
+					    }
+					},
+					character_hide_playpackconfig:{
+					    name:'隐藏此扩展',
+					    clear:true,
+					    onclick:function(){
+							lib.config.hiddenPlayPack.add('character');
+							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
 						}
 					},
 					soldier:{
-						name:'士兵模式',
-						init:false,
-						restart:true,
-						onclick:function(bool){
-							if(bool){
-								lib.config.plays.add('soldier');
-							}
-							else{
-								lib.config.plays.remove('soldier');
-							}
-							game.saveConfig('plays',lib.config.plays);
+					    name:'士兵模式',
+					    init:false,
+					    restart:true,
+					    onclick:function(bool){
+					        if(bool){
+					            lib.config.plays.add('soldier');
+					        }
+					        else{
+					            lib.config.plays.remove('soldier');
+					        }
+					        game.saveConfig('plays',lib.config.plays);
+					    }
+					},
+					soldier_hide_playpackconfig:{
+					    name:'隐藏此扩展',
+					    clear:true,
+					    onclick:function(){
+							lib.config.hiddenPlayPack.add('soldier');
+							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
 						}
 					},
 					wuxing:{
-						name:'五行生克',
-						init:false,
-						restart:true,
-						onclick:function(bool){
-							if(bool){
-								lib.config.plays.add('wuxing');
-							}
-							else{
-								lib.config.plays.remove('wuxing');
-							}
-							game.saveConfig('plays',lib.config.plays);
-						}
+					    name:'五行生克',
+					    init:false,
+					    restart:true,
+					    onclick:function(bool){
+					        if(bool){
+					            lib.config.plays.add('wuxing');
+					        }
+					        else{
+					            lib.config.plays.remove('wuxing');
+					        }
+					        game.saveConfig('plays',lib.config.plays);
+					    }
 					},
 					wuxing_num_playpackconfig:{
-						name:'带属性卡牌',
-						init:'0.3',
-						item:{
-							'0.1':'10%',
-							'0.2':'20%',
-							'0.3':'30%',
-							'0.5':'50%',
+					    name:'带属性卡牌',
+					    init:'0.3',
+					    item:{
+					        '0.1':'10%',
+					        '0.2':'20%',
+					        '0.3':'30%',
+					        '0.5':'50%',
+					    }
+					},
+					wuxing_hide_playpackconfig:{
+					    name:'隐藏此扩展',
+					    clear:true,
+					    onclick:function(){
+							lib.config.hiddenPlayPack.add('wuxing');
+							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
 						}
 					},
 					weather:{
-						name:'天气变化',
-						init:false,
-						restart:true,
-						onclick:function(bool){
-							if(bool){
-								lib.config.plays.add('weather');
-							}
-							else{
-								lib.config.plays.remove('weather');
-							}
-							game.saveConfig('plays',lib.config.plays);
-						}
+					    name:'天气变化',
+					    init:false,
+					    restart:true,
+					    onclick:function(bool){
+					        if(bool){
+					            lib.config.plays.add('weather');
+					        }
+					        else{
+					            lib.config.plays.remove('weather');
+					        }
+					        game.saveConfig('plays',lib.config.plays);
+					    }
 					},
 					// weather_animation_playpackconfig:{
 					// 	name:'天气动画',
 					// 	init:true
 					// },
 					weather_noqing_playpackconfig:{
-						name:'异常天气出现概率',
-						init:'0.5',
-						item:{
-							'0.1':'10%',
-							'0.3':'30%',
-							'0.5':'50%',
-							'0.7':'70%',
-							'0.9':'90%',
-						}
+					    name:'异常天气出现概率',
+					    init:'0.5',
+					    item:{
+					        '0.1':'10%',
+					        '0.3':'30%',
+					        '0.5':'50%',
+					        '0.7':'70%',
+					        '0.9':'90%',
+					    }
 					},
 					weather_chance_playpackconfig:{
-						name:'天气效果触发概率',
-						init:'0.5',
-						item:{
-							'0.1':'10%',
-							'0.2':'20%',
-							'0.3':'30%',
-							'0.5':'50%',
-							'0.8':'80%',
-						},
-						onclick:function(item){
-							game.saveConfig('weather_chance_playpackconfig',item);
-							_status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
-						}
+					    name:'天气效果触发概率',
+					    init:'0.5',
+					    item:{
+					        '0.1':'10%',
+					        '0.2':'20%',
+					        '0.3':'30%',
+					        '0.5':'50%',
+					        '0.8':'80%',
+					    },
+					    onclick:function(item){
+					        game.saveConfig('weather_chance_playpackconfig',item);
+					        _status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
+					    }
 					},
 					weather_duration_playpackconfig:{
-						name:'异常天气持续时间',
-						init:'[4,4]',
-						item:{
-							'[2,4]':'1~3回合',
-							'[4,4]':'3~6回合',
-							'[4,7]':'3~9回合',
-							'[7,4]':'6~9回合',
-							'[7,7]':'6~12回合',
-						}
+					    name:'异常天气持续时间',
+					    init:'[4,4]',
+					    item:{
+					        '[2,4]':'1~3回合',
+					        '[4,4]':'3~6回合',
+					        '[4,7]':'3~9回合',
+					        '[7,4]':'6~9回合',
+					        '[7,7]':'6~12回合',
+					    }
 					},
 					weather_qingduration_playpackconfig:{
-						name:'晴朗天气持续时间',
-						init:'[2,4]',
-						item:{
-							'[2,4]':'1~3回合',
-							'[4,4]':'3~6回合',
-							'[4,7]':'3~9回合',
-							'[7,4]':'6~9回合',
-							'[7,7]':'6~12回合',
+					    name:'晴朗天气持续时间',
+					    init:'[2,4]',
+					    item:{
+					        '[2,4]':'1~3回合',
+					        '[4,4]':'3~6回合',
+					        '[4,7]':'3~9回合',
+					        '[7,4]':'6~9回合',
+					        '[7,7]':'6~12回合',
+					    }
+					},
+					weather_hide_playpackconfig:{
+					    name:'隐藏此扩展',
+					    clear:true,
+					    onclick:function(){
+							lib.config.hiddenPlayPack.add('weather');
+							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
 						}
 					},
 					coin:{
-						name:'富甲天下',
-						init:false,
-						restart:true,
-						onclick:function(bool){
-							if(bool){
-								lib.config.plays.add('coin');
-							}
-							else{
-								lib.config.plays.remove('coin');
-							}
-							game.saveConfig('plays',lib.config.plays);
-						}
+					    name:'富甲天下',
+					    init:false,
+					    restart:true,
+					    onclick:function(bool){
+					        if(bool){
+					            lib.config.plays.add('coin');
+					        }
+					        else{
+					            lib.config.plays.remove('coin');
+					        }
+					        game.saveConfig('plays',lib.config.plays);
+					    }
 					},
 					coin_display_playpackconfig:{
-						name:'金币显示',
-						init:'text',
-						item:{
-							symbol:'符号',
-							text:'文字'
-						},
-						onclick:function(item){
-							game.saveConfig('coin_display_playpackconfig',item);
-							if(game.changeCoin) game.changeCoin(0);
-						}
+					    name:'金币显示',
+					    init:'text',
+					    item:{
+					        symbol:'符号',
+					        text:'文字'
+					    },
+					    onclick:function(item){
+					        game.saveConfig('coin_display_playpackconfig',item);
+					        if(game.changeCoin) game.changeCoin(0);
+					    }
 					},
 					coin_canvas_playpackconfig:{
-						name:'特效置顶',
-						init:false,
-						onclick:function(bool){
-							game.saveConfig('coin_canvas_playpackconfig',bool);
-							if(bool){
-								ui.window.classList.add('canvas_top');
-							}
-							else{
-								ui.window.classList.remove('canvas_top');
-							}
+					    name:'特效置顶',
+					    init:false,
+					    onclick:function(bool){
+					        game.saveConfig('coin_canvas_playpackconfig',bool);
+					        if(bool){
+					            ui.window.classList.add('canvas_top');
+					        }
+					        else{
+					            ui.window.classList.remove('canvas_top');
+					        }
+					    }
+					},
+					coin_hide_playpackconfig:{
+					    name:'隐藏此扩展',
+					    clear:true,
+					    onclick:function(){
+							lib.config.hiddenPlayPack.add('coin');
+							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
 						}
 					},
-					// coin_free_playpackconfig:{
-					// 	name:'仅在空闲时显示特效',
-					// 	init:false,
-					// },
 					update:function(config,map){
 						for(var i in map){
-							if(i.indexOf('_playpackconfig')!=-1){
-								map[i].classList.add('indent');
-								if(lib.config.plays.contains(i.slice(0,i.indexOf('_')))){
-									map[i].show();
-								}
-								else{
+							if(i.indexOf('extension_')==0) continue;
+					        if(i.indexOf('_playpackconfig')!=-1){
+								var packname=i.slice(0,i.indexOf('_'));
+					            map[i].classList.add('indent');
+					            if(!lib.config.hiddenPlayPack.contains(packname)&&
+									lib.config.plays.contains(packname)){
+					                map[i].show();
+					            }
+					            else{
+					                map[i].hide();
+					            }
+					        }
+					        else{
+								if(lib.config.hiddenPlayPack.contains(i)){
 									map[i].hide();
 								}
-							}
-							else{
-								if(lib.config.plays.contains(i)){
-									map[i].classList.add('on');
-								}
 								else{
-									map[i].classList.remove('on');
+									if(lib.config.plays.contains(i)){
+						                map[i].classList.add('on');
+						            }
+						            else{
+						                map[i].classList.remove('on');
+						            }
+								}
+					        }
+					    }
+						for(var i=0;i<lib.config.extensions.length;i++){
+							var name='extension_'+lib.config.extensions[i];
+							for(var j in map){
+								if(j!=name&&j.indexOf(name)==0){
+									map[j].classList.add('indent');
+									if(config[name]){
+										map[j].show();
+									}
+									else{
+										map[j].hide();
+									}
 								}
 							}
 						}
@@ -1517,6 +1575,7 @@
 								game.saveConfig('hiddenModePack',[]);
 								game.saveConfig('hiddenCharacterPack',[]);
 								game.saveConfig('hiddenCardPack',[]);
+								game.saveConfig('hiddenPlayPack',[]);
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='重置隐藏扩展包';
@@ -2618,8 +2677,7 @@
 			'<li>回复体力<br>player.recover(num)<li>摸牌<br>player.draw(num)<li>获得牌<br>player.gain(cards)<li>弃牌<br>player.discard(cards)'+
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令输入框中输出结果<br>game.print(str)<li>游戏结束<br>game.over(bool)'+
-			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>'+
-			'<div style="margin:10px">富甲天下</div><ul style="margin-top:0"><li>改变金币数<br>game.changeCoin(num)<li>自动下雪<br>game.haveFun.alwaysSnow()',
+			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 			'身份模式':'<div style="margin:10px">选项</div><ul style="margin-top:0"><li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）</ul>'+
 			'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
@@ -2863,8 +2921,6 @@
 						else{
 							lib.config[i]=config2[i];
 						}
-
-
 				}
 				for(var i in lib.config.translate){
 					lib.translate[i]=lib.config.translate[i];
@@ -2932,6 +2988,24 @@
 					}
 				}
 				delete lib.help2;
+
+				for(var i=0;i<lib.config.extensions.length;i++){
+					try{
+						eval(localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]));
+					}
+					catch(e){}
+					if(game.importedPack&&lib.config['extension_'+game.importedPack.name]){
+						var cfg={};
+						for(var i in lib.config){
+							if(i.indexOf('extension_'+game.importedPack.name)==0&&
+								i!='extension_'+game.importedPack.name){
+								cfg[i.slice(11+game.importedPack.name.length)]=lib.config[i];
+							}
+						}
+						game.importedPack.content(cfg);
+						delete game.importedPack;
+					}
+				}
 
 				if(localStorage.getItem(lib.configprefix+'playback')){
 					lib.init.js('mode',lib.config.mode);
@@ -3120,6 +3194,10 @@
 			    return style;
 			},
 			js:function(path,file,onload){
+				if(path=='mode'&&lib.config.all.stockmode.indexOf(file)==-1){
+					lib.init['setMode_'+file]();
+					return;
+				}
 				if(typeof file=='object'){
 					for(var i=0;i<file.length;i++){
 						lib.init.js(path,file[i]);
@@ -8550,23 +8628,45 @@
 						}
 					}
 					var bg=card[2];
+					var img=lib.card[card[2]].image;
+					if(img&&img.indexOf('db:')==0){
+						img=img.slice(3);
+					}
+					else{
+						img=null;
+					}
 					if(!lib.config.hide_card_image&&lib.card[card[2]].fullskin){
 						this.classList.add('fullskin');
-						this.node.image.style.backgroundImage='url("image/card/'+card[2]+'.png")'
+						if(img){
+							this.node.image.setBackgroundDB(img);
+						}
+						else{
+							this.node.image.style.backgroundImage='url("image/card/'+card[2]+'.png")'
+						}
 					}
 					else if(lib.card[card[2]].image=='background'){
 						if(card[3]) this.node.background.setBackground(bg+'_'+card[3],'card');
 						else this.node.background.setBackground(bg,'card');
 					}
 					else if(lib.card[card[2]].fullimage){
-						this.setBackground('card/'+bg);
+						if(img){
+							this.setBackgroundDB(img);
+						}
+						else{
+							this.setBackground('card/'+bg);
+						}
 					}
 					else if(lib.card[card[2]].image=='card'){
 						if(card[3]) this.setBackground(bg+'_'+card[3],'card');
 						else this.setBackground(bg,'card');
 					}
-					else if(typeof lib.card[card[2]].image=='string'){
-						this.setBackground(lib.card[card[2]].image);
+					else if(typeof lib.card[card[2]].image=='string'&&!lib.card[card[2]].fullskin){
+						if(img){
+							this.setBackgroundDB(img);
+						}
+						else{
+							this.setBackground(lib.card[card[2]].image);
+						}
 					}
 					else{
 						this.node.background.innerHTML=lib.translate[bg+'_bg']||get.translation(bg)[0];
@@ -9723,6 +9823,57 @@
 				}
 				lib.config.customCharacterPack[obj.name]=pack;
 				game.saveConfig('customCharacterPack',lib.config.customCharacterPack);
+			}
+			else if(type=='extension'){
+				lib.configMenu.extension.config['extension_'+obj.name]={
+					name:obj.name,
+					init:true
+				}
+				for(var i in obj.config){
+					lib.configMenu.extension.config['extension_'+obj.name+'_'+i]=obj.config[i];
+				}
+				for(var i in obj.help){
+					lib.help[i]=obj.help[i];
+				}
+				lib.configMenu.extension.config['extension_'+obj.name+'_delete']={
+					name:'删除此扩展',
+					clear:true,
+					onclick:function(){
+						if(this.innerHTML=='确认删除'){
+							var prefix='extension_'+obj.name;
+							var page=this.parentNode;
+							for(var i=0;i<page.childElementCount;i++){
+								if(page.childNodes[i]._link&&page.childNodes[i]._link.config._name.indexOf(prefix)==0){
+									page.childNodes[i].remove();
+									i--;
+								}
+							}
+							for(var i in lib.config){
+								if(i.indexOf(prefix)==0){
+									game.saveConfig(i);
+								}
+							}
+							localStorage.removeItem(lib.configprefix+prefix);
+							lib.config.extensions.remove(obj.name);
+							game.saveConfig('extensions',lib.config.extensions);
+							if(obj.image){
+								for(var i=0;i<obj.image.length;i++){
+									game.deleteDB('image','extension-'+obj.name+':'+obj.image[i]);
+								}
+							}
+							if(obj.onremove){
+								obj.onremove();
+							}
+						}
+						else{
+							this.innerHTML='确认删除';
+							var that=this;
+							setTimeout(function(){
+								that.innerHTML='删除'+obj.name;
+							},1000);
+						}
+					}
+				}
 			}
 			game.importedPack=obj;
 		},
@@ -13097,8 +13248,19 @@
 			else{
 				lib.config[key]=value;
 			}
-			config[key]=value;
+			if(value===undefined){
+				delete config[key];
+			}
+			else{
+				config[key]=value;
+			}
 			localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
+		},
+		saveExtensionConfig:function(extension,key,value){
+			return game.saveConfig('extension_'+extension+'_'+key,value);
+		},
+		getExtensionConfig:function(extension,key){
+			return lib.config['extension_'+extension+'_'+key];
 		},
 		addPlayer:function(position,character,character2){
 			if(position<0||position>game.players.length+game.dead.length||position==undefined){
@@ -14748,8 +14910,110 @@
 								var banskillNodes=[];
 								var custombanskillNodes=[];
 								var banskill;
-								if(mode=='playpack'){
+								if(mode=='extension'){
+									var importextensionexpanded=false;
+									page.style.textAlign='left';
 									page.style.paddingBottom='10px';
+									var importExtension;
+	                                var extensionnode=ui.create.div('.config.more','导入扩展 <div>&gt;</div>',page,function(){
+	                                    if(importextensionexpanded){
+	                                        this.classList.remove('on');
+	                                        importExtension.style.display='none';
+	                                    }
+	                                    else{
+	                                        this.classList.add('on');
+											importExtension.style.display='';
+	                                    }
+	                                    importextensionexpanded=!importextensionexpanded;
+	                                });
+									importExtension=ui.create.div('.new_character.export.import',page);
+									importExtension.style.marginLeft='5px';
+									importExtension.style.marginTop='5px';
+									importExtension.style.display='none';
+									ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
+
+									importExtension.firstChild.lastChild.onclick=function(){
+										var fileToLoad=this.previousSibling.files[0];
+										if(fileToLoad){
+											var zipReady=function(){
+												var fileReader = new FileReader();
+												fileReader.onload = function(fileLoadedEvent)
+												{
+													var data = fileLoadedEvent.target.result;
+													var zip=new JSZip();
+													zip.load(data);
+													var str=zip.file('extension.js').asText();
+													try{
+														eval(str);
+														if(!game.importedPack) throw('err');
+														var extname=game.importedPack.name;
+														localStorage.setItem(lib.configprefix+'extension_'+extname,str);
+														lib.config.extensions.add(extname);
+														game.saveConfig('extensions',lib.config.extensions);
+														game.saveConfig('extension_'+extname,true);
+														for(var i in game.importedPack.config){
+															if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
+																game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
+															}
+														}
+														if(game.importedPack.image){
+															for(var i=0;i<game.importedPack.image.length;i++){
+																var buttons=page.querySelectorAll('.button.character');
+																for(var j=0;j<buttons.length;j++){
+																	if(buttons[j].link==i){
+																		buttons[j].remove();
+																		break;
+																	}
+																}
+																var imgname=game.importedPack.image[i];
+																var str=zip.file(imgname).asArrayBuffer();
+																if(str){
+																	var blob=new Blob([str]);
+																	var fileReader=new FileReader();
+																	fileReader.onload = (function(imgname){
+																		return function(fileLoadedEvent)
+																		{
+																			var data = fileLoadedEvent.target.result;
+																			game.putDB('image','extension-'+extname+':'+imgname,data);
+																		};
+																	}(imgname))
+																	fileReader.readAsDataURL(blob, "UTF-8");
+																}
+															}
+														}
+														delete game.importedPack;
+													}
+													catch(e){
+														console.log(e);
+														alert('导入失败');
+														return;
+													}
+			                                        extensionnode.innerHTML='导入成功，5秒后将重启';
+													setTimeout(function(){
+														extensionnode.innerHTML='导入成功，4秒后将重启';
+														setTimeout(function(){
+															extensionnode.innerHTML='导入成功，3秒后将重启';
+															setTimeout(function(){
+																extensionnode.innerHTML='导入成功，2秒后将重启';
+																setTimeout(function(){
+																	extensionnode.innerHTML='导入成功，1秒后将重启';
+																	setTimeout(game.reload,1000);
+																},1000);
+															},1000);
+														},1000);
+													},1000);
+			                                        importExtension.style.display='none';
+												};
+												fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+											}
+											if(!window.JSZip){
+												lib.init.js('game','jszip',zipReady);
+											}
+											else{
+												zipReady();
+											}
+										}
+									}
 								}
 								else if(mode=='skill'){
 									var autoskillexpanded=false;
@@ -16608,6 +16872,7 @@
 								}
 							}
 							for(var i=0;i<lib.config.all.mode.length;i++){
+								if(!lib.config.gameRecord[lib.config.all.mode[i]]) continue;
 								if(lib.config.gameRecord[lib.config.all.mode[i]].str){
 									ui.create.div('.config.indent',lib.translate[lib.config.all.mode[i]],page).style.marginBottom='-5px';
 									var item=ui.create.div('.config.indent',lib.config.gameRecord[lib.config.all.mode[i]].str+'<span>重置</span>',page);
@@ -21742,7 +22007,16 @@
 			ext=ext||'.jpg';
 			subfolder=subfolder||'default'
 			if(type){
-				if(type=='character'&&lib.customCharacters.contains(name)){
+				if(type=='character'&&lib.character[name]&&lib.character[name][4]&&
+				lib.character[name][4].contains('dbimage')){
+					for(var i=0;i<lib.character[name][4].length;i++){
+						if(lib.character[name][4][i].indexOf('db:')==0){
+							this.setBackgroundDB(lib.character[name][4][i].slice(3));
+							return this;
+						}
+					}
+				}
+				else if(type=='character'&&lib.customCharacters.contains(name)){
 					src="";
 					var node=this;
 					game.getDB('image','character:'+name,function(src){
@@ -21767,6 +22041,13 @@
 			this.style.backgroundImage="url('"+src+"')";
 			this.style.backgroundSize="cover";
 			return this;
+		};
+		HTMLDivElement.prototype.setBackgroundDB=function(img){
+			var node=this;
+			game.getDB('image',img,function(src){
+				node.style.backgroundImage="url('"+src+"')";
+				node.style.backgroundSize="cover";
+			});
 		};
 		HTMLDivElement.prototype.listen=function(func){
 			this.addEventListener(lib.config.touchscreen?'touchend':'click',function(e){
@@ -22481,6 +22762,7 @@
 					}
 				}
 				for(i in play){
+					if(lib.config.hiddenPlayPack.contains(i)) continue;
 					if(play[i].forbid&&play[i].forbid.contains(lib.config.mode)) continue;
 					if(play[i].mode&&play[i].mode.contains(lib.config.mode)==false) continue;
 					for(j in play[i].element){
@@ -22512,12 +22794,9 @@
 					for(j in play[i].get){
 						get[j]=lib.init.eval(play[i].get[j]);
 					}
-					if(play[i].config){
-						lib.config.current_mode=lib.config.current_mode.concat(play[i].config);
-					}
 					for(j in play[i]){
 						if(j=='mode'||j=='forbid'||j=='init'||j=='element'||
-						j=='game'||j=='get'||j=='config'||j=='ui'||j=='arenaReady') continue;
+						j=='game'||j=='get'||j=='ui'||j=='arenaReady') continue;
 						for(k in play[i][j]){
 							if(j=='translate'&&k==i){
 								lib[j][k+'_play_config']=play[i][j][k];
@@ -22583,14 +22862,25 @@
 					lib.config.mode=this.link;
 					splash.delete();
 					delete window.inSplash;
-					lib.init.js('mode',lib.config.mode).onload=proceed;
+					var scriptnode=lib.init.js('mode',lib.config.mode);
+					if(scriptnode){
+						scriptnode.onload=proceed;
+					}
+					else{
+						proceed();
+					}
 				}
 				var splash=ui.create.div('#splash',document.body);
 				for(var i=0;i<lib.config.all.mode.length;i++){
 					var node=ui.create.div(splash,'.hidden',clickNode);
 					node.link=lib.config.all.mode[i];
 					ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
-					ui.create.div(node,'.avatar').style.backgroundImage='url("image/splash/'+lib.config.all.mode[i]+'.jpg")';
+					if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
+						ui.create.div(node,'.avatar').style.backgroundImage='url("image/splash/'+lib.config.all.mode[i]+'.jpg")';
+					}
+					else{
+						ui.create.div(node,'.avatar').setBackgroundDB(lib.mode[lib.config.all.mode[i]].splash);
+					}
 					ui.refresh(node);
 					setTimeout((function(node){
 						return function(){
