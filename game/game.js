@@ -16,10 +16,9 @@
 		dieClose:[]
 	};
 	var lib={
-		version:'1.7.10',
+		version:'1.7.11',
 		changeLog:[
-			'新武将',
-			'明忠锦囊',
+			'扩展'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -2988,21 +2987,34 @@
 					}
 				}
 				delete lib.help2;
-
+				if(lib.config.extensions.length){
+					window.resetExtension=function(){
+						for(var i=0;i<lib.config.extensions.length;i++){
+							game.saveConfig('extension_'+lib.config.extensions[i],false);
+						}
+					}
+				}
 				for(var i=0;i<lib.config.extensions.length;i++){
 					try{
 						eval(localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]));
 					}
-					catch(e){}
+					catch(e){
+						console.log(e);
+					}
 					if(game.importedPack&&lib.config['extension_'+game.importedPack.name]){
 						var cfg={};
-						for(var i in lib.config){
-							if(i.indexOf('extension_'+game.importedPack.name)==0&&
-								i!='extension_'+game.importedPack.name){
-								cfg[i.slice(11+game.importedPack.name.length)]=lib.config[i];
+						for(var j in lib.config){
+							if(j.indexOf('extension_'+game.importedPack.name)==0&&
+								j!='extension_'+game.importedPack.name){
+								cfg[j.slice(11+game.importedPack.name.length)]=lib.config[j];
 							}
 						}
-						game.importedPack.content(cfg);
+						try{
+							game.importedPack.content(cfg);
+						}
+						catch(e){
+							console.log(e);
+						}
 						delete game.importedPack;
 					}
 				}
@@ -17110,6 +17122,7 @@
 
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;
+				delete window.resetExtension;
 			},
 			system:function(str,func,right){
 				var node=ui.create.div(right?ui.system2:ui.system1);

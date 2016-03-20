@@ -2139,7 +2139,7 @@ mode.chess={
 				ui.create.me();
 				ui.create.fakeme();
 
-				if(!event.video&&_status.mode=='combat'&&get.config('zhu')){
+				if(!event.video&&_status.mode=='combat'&&get.config('zhu')&&!_status.vsboss&&game.players.length>2){
 					game.friendZhu=event.friendZhu;
 					game.friendZhu.hp++;
 					game.friendZhu.maxHp++;
@@ -2157,7 +2157,7 @@ mode.chess={
 						}
 					}
 
-					if(get.config('main_zhu')){
+					if(get.config('main_zhu')&&event.friendViceZhu){
 						game.friendViceZhu=event.friendViceZhu;
 						game.friendViceZhu.node.identity.firstChild.innerHTML='仕';
 						for(var i=0;i<game.players.length;i++){
