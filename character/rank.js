@@ -174,6 +174,7 @@ window.characterRank={
         'swd_xiyan',
     ],
     bp:[
+        'hs_yelise',
         'hs_loatheb',
         'hs_alextrasza',
         'hs_xuanzhuanjijia',

@@ -2959,6 +2959,13 @@
 						}
 					}
 				}
+				if(lib.config.all.mode.length==0){
+					lib.config.all.mode.push('identity');
+					lib.translate.identity='身份';
+					if(!lib.config.gameRecord.identity){
+						lib.config.gameRecord.identity={data:{}};
+					}
+				}
 				if(background&&background.pack){
 					for(i in background.pack){
 						lib.configMenu.appearence.config.image_background.item[i]=background.pack[i];
@@ -16454,7 +16461,6 @@
 						(function(){
 							var page=ui.create.div('.menu-buttons');
 	                        var node=ui.create.div('.menubutton.large','牌堆',clickMode);
-							ui.customCharacter=node;
 							start.firstChild.insertBefore(node,start.firstChild.querySelector('.lefttext'));
 							node.link=page;
 							node.mode='cardpile';
@@ -16538,6 +16544,7 @@
 							var input=exportCardPile.firstChild.lastChild.previousSibling;
 							input.value='自定义牌堆';
 							input.style.marginRight='3px';
+							input.style.width='120px';
 							exportCardPile.firstChild.lastChild.onclick=function(){
 								var name=input.value;
 								var ok=true;
@@ -22717,8 +22724,8 @@
 
 				var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
 				if(pilecfg){
-					lib.config.bannedpile=pilecfg[0];
-					lib.config.addedpile=pilecfg[1];
+					lib.config.bannedpile=pilecfg[0]||{};
+					lib.config.addedpile=pilecfg[1]||{};
 				}
 				for(i in card){
 					lib.cardPack[i]=[];
