@@ -1017,9 +1017,38 @@ mode.identity={
 								if(game.players.length==2) return -10;
 								if(zhongmode&&to.ai.sizhong) return 6;
 								if(get.population('fan')==0) return -0.5;
+								if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
+									var fan;
+									for(var i=0;i<game.players.length;i++){
+										if(game.players[i].identity=='fan'){
+											fan=game.players[i];break;
+										}
+									}
+									if(fan){
+										if(to.hp>1&&to.hp>fan.hp&&to.num('he')>fan.num('he')){
+											return -3;
+										}
+									}
+									return 0;
+								}
 								if(situation>1) return 0;
 								return Math.min(3,get.population('fan'));
-							case 'fan': return -4;
+							case 'fan':
+								if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
+									var nei;
+									for(var i=0;i<game.players.length;i++){
+										if(game.players[i].identity=='nei'){
+											nei=game.players[i];break;
+										}
+									}
+									if(nei){
+										if(nei.hp>1&&nei.hp>to.hp&&nei.num('he')>to.num('he')){
+											return 0;
+										}
+									}
+									return -3;
+								}
+								return -4;
 						}
 						break;
 					case 'zhong':case 'mingzhong':

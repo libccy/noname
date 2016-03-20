@@ -101,6 +101,7 @@ window.characterRank={
         'hs_tgolem',
     ],
     am:[
+        'hs_bolvar',
         'hs_lafamu',
         'lifeng',
         'hs_fuding',
@@ -271,6 +272,7 @@ window.characterRank={
         'sp_ganning',
     ],
     b:[
+        'hs_nozdormu',
         'yxs_lishimin',
         'hs_ruanniguai',
         'hanba',
