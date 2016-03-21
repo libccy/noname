@@ -263,7 +263,6 @@ mode.identity={
 					console.log(str);
 					game.showIdentity();
 				}
-				lib.config.ai_guess=true;
 				event.trigger('gameStart');
 
 				var players=get.players(lib.sort.position);
@@ -802,6 +801,12 @@ mode.identity={
 					this.identityShown=true;
 				}
 				game.checkResult();
+				if(game.zhu.isZhu){
+					if(get.population('zhong')+get.population('nei')==0||
+					get.population('zhong')+get.population('fan')==0){
+						game.showIdentity();
+					}
+				}
 				if(this.identity=='fan'&&source) source.draw(3);
 				else if(this.identity=='zhong'&&source&&source.identity=='zhu'&&source.isZhu){
 					source.discard(source.get('he'));
@@ -867,7 +872,11 @@ mode.identity={
 							else if(shown<0.4) c=0.5;
 							else if(shown<0.6) c=0.8;
 							else c=1;
-							effect+=ai.get.effect(targets[i],card,this)*c;
+							var eff=ai.get.effect(targets[i],card,this);
+							effect+=eff*c;
+							if(eff==0&&shown==0&&this.identity=='zhong'&&targets[i]!=this){
+								effect+=0.1;
+							}
 						}
 					}
 					if(effect>0){
@@ -887,8 +896,9 @@ mode.identity={
 				if(this.ai.shown>0.95) this.ai.shown=0.95;
 				if(this.ai.shown<-0.5) this.ai.shown=-0.5;
 
-				if(this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished'){
-					if(_status.clickingidentity&&_status.clickingidentity[0]==this){
+				var marknow=(this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished');
+				if(true){
+					if(marknow&&_status.clickingidentity&&_status.clickingidentity[0]==this){
 						for(var i=0;i<_status.clickingidentity[1].length;i++){
 							_status.clickingidentity[1][i].delete();
 							_status.clickingidentity[1][i].style.transform='';
@@ -927,28 +937,28 @@ mode.identity={
 						}
 					}
 					if(this.identity=='nei'){
-						if(effect>=0){
+						if(effect>0){
 							if(this.ai.identity_mark=='fan'){
-								this.setIdentity();
+								if(marknow) this.setIdentity();
 								this.ai.identity_mark='finished';
 							}
 							else{
-								this.setIdentity('zhong');
+								if(marknow) this.setIdentity('zhong');
 								this.ai.identity_mark='zhong';
 							}
 						}
-						else{
+						else if(effect<0&&get.population('fan')>0){
 							if(this.ai.identity_mark=='zhong'){
-								this.setIdentity();
+								if(marknow) this.setIdentity();
 								this.ai.identity_mark='finished';
 							}
 							else{
-								this.setIdentity('fan');
+								if(marknow) this.setIdentity('fan');
 								this.ai.identity_mark='fan';
 							}
 						}
 					}
-					else{
+					else if(marknow){
 						if(effect>0&&this.identity!='fan'){
 							this.setIdentity('zhong');
 							this.ai.identity_mark='finished';
@@ -959,6 +969,7 @@ mode.identity={
 						}
 					}
 				}
+
 			},
 		}
 	},
@@ -980,7 +991,7 @@ mode.identity={
 				}
 				var difficulty=0;
 				if(to==game.me) difficulty=2-get.difficulty();
-				if(get.config('ai_identity')||from==to||!lib.config.ai_guess||(to.identityShown)){
+				if(from==to||to.identityShown){
 					return ai.get.realAttitude(from,to)+difficulty*1.5;
 				}
 				else{
@@ -992,17 +1003,32 @@ mode.identity={
 							}
 						}
 					}
-					return ai.get.realAttitude(from,to)*to.ai.shown+difficulty*1.5;
+					var aishown=to.ai.shown;
+					if(to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
+						aishown=0.5;
+					}
+					else if(aishown==0&&to.identity!='fan'&&to.identity!='zhu'){
+						var fanshown=true;
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].identity=='fan'&&game.players[i].ai.shown==0&&game.players[i]!=from){
+								fanshown=false;break;
+							}
+						}
+						if(fanshown) aishown=0.3;
+					}
+					return ai.get.realAttitude(from,to)*aishown+difficulty*1.5;
 				}
 			},
 			realAttitude:function(from,to){
-				// if(_status.currentPhase==from&&from.ai.tempIgnore&&from.ai.tempIgnore.contains(to)) return 0;
 				var situation=ai.get.situation();
 				var identity=from.identity;
 				var identity2=to.identity;
 				if(identity2=='zhu'&&!to.isZhu){
 					identity2='zhong';
 					if(from==to) return 10;
+				}
+				if(to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
+					identity2=to.ai.identity_mark;
 				}
 				var zhongmode=false;
 				if(!game.zhu.isZhu){
@@ -1150,8 +1176,12 @@ mode.identity={
 									if(situation==1) return -6;
 									if(situation>1) return -5;
 								}
-								return -10;
-							case 'zhong': return -7;
+								return -8;
+							case 'zhong':
+								if(!zhongmode&&game.zhu.hp>=3&&to.hp==1){
+									return -10;
+								}
+								return -7;
 							case 'mingzhong':return -5;
 							case 'nei':
 								if(zhongmode&&to.ai.sizhong) return -7;

@@ -1138,85 +1138,104 @@ div:hover>.intro{opacity: 1;}
 	-webkit-animation:identity 0.8s;
 }
 .player .identity[data-color="zhu"],
-div[data-nature='fire']{
+div[data-nature='fire'],
+span[data-nature='fire']{
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px,
 		rgba(232, 53, 53,1) 0 0 10px,rgba(232, 53, 53,1) 0 0 20px,rgba(232, 53, 53,1) 0 0 20px
 }
-div[data-nature='firem']{
+div[data-nature='firem'],
+span[data-nature='firem']{
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 5px,
 		rgba(232, 53, 53,1) 0 0 5px,black 0 0 1px;
 }
 .player .identity[data-color="zhong"],
 .player .identity[data-color="mingzhong"],
 .player .identity[data-color="qun"],
-div[data-nature='metal']{
+div[data-nature='metal'],
+span[data-nature='metal']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px,
 		rgba(255, 203, 0,1) 0 0 10px
 }
-div[data-nature='metalm']{
+div[data-nature='metalm'],
+span[data-nature='metalm']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 5px,
 		rgba(255, 203, 0,1) 0 0 5px,black 0 0 1px;
 }
-div[data-nature='metalmm']{
+div[data-nature='metalmm'],
+span[data-nature='metalmm']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,
 		rgba(255, 203, 0,1) 0 0 2px,black 0 0 1px;
 }
 .player .identity[data-color="nei"],
 .player .identity[data-color="ye"],
-div[data-nature='thunder']{
+div[data-nature='thunder'],
+span[data-nature='thunder']{
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 10px,
 		rgba(100, 74, 139,1) 0 0 10px,rgba(100, 74, 139,1) 0 0 20px,rgba(100, 74, 139,1) 0 0 20px,black 0 0 1px;
 }
-div[data-nature='thunderm']{
+div[data-nature='thunderm'],
+span[data-nature='thunderm']{
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 5px,
 		rgba(100, 74, 139,1) 0 0 5px,black 0 0 1px;
 }
 .player .identity[data-color="fan"],
 .player .identity[data-color="wu"],
-div[data-nature='wood']{
+div[data-nature='wood'],
+span[data-nature='wood']{
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 10px,
 		rgba(57, 123, 4,1) 0 0 10px,rgba(57, 123, 4,1) 0 0 20px,rgba(57, 123, 4,1) 0 0 20px,black 0 0 1px;
 }
-div[data-nature='woodm']{
+div[data-nature='woodm'],
+span[data-nature='woodm']{
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 5px,
 		rgba(57, 123, 4,1) 0 0 5px,black 0 0 1px;
 }
-div[data-nature='woodmm']{
+div[data-nature='woodmm'],
+span[data-nature='woodmm']{
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,
 		rgba(57, 123, 4,1) 0 0 2px,black 0 0 1px;
 }
 .player .identity[data-color="cai"],
 .player .identity[data-color="wei"],
-div[data-nature='water']{
+div[data-nature='water'],
+span[data-nature='water']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 10px,
 		rgba(78, 117, 140,1) 0 0 10px,rgba(78, 117, 140,1) 0 0 20px,rgba(78, 117, 140,1) 0 0 20px,black 0 0 1px;
 }
-div[data-nature='waterm']{
+div[data-nature='waterm'],
+span[data-nature='waterm']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 5px,
 		rgba(78, 117, 140,1) 0 0 5px,black 0 0 1px;
-}div[data-nature='watermm']{
+}
+div[data-nature='watermm'],
+span[data-nature='watermm']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,
 		rgba(78, 117, 140,1) 0 0 2px,black 0 0 1px;
 }
 .player .identity[data-color="shu"],
-div[data-nature='soil']{
+div[data-nature='soil'],
+span[data-nature='soil']{
 	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,rgba(128, 59, 2,1) 0 0 10px,
 		rgba(128, 59, 2,1) 0 0 10px,rgba(128, 59, 2,1) 0 0 20px,rgba(128, 59, 2,1) 0 0 20px,black 0 0 1px;
 }
-div[data-nature='soilm']{
+div[data-nature='soilm'],
+span[data-nature='soilm']{
 	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 5px,rgba(128, 59, 2,1) 0 0 5px,
 		rgba(128, 59, 2,1) 0 0 5px,black 0 0 1px;
 }
-div[data-nature='soilmm']{
+div[data-nature='soilmm'],
+span[data-nature='soilmm']{
 	text-shadow: rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,rgba(128, 59, 2,1) 0 0 2px,
 		rgba(128, 59, 2,1) 0 0 2px,black 0 0 1px;
 }
 .player .identity[data-color="unknownx"],
-div[data-nature='black']{
+div[data-nature='black'],
+span[data-nature='black']{
 	text-shadow: rgba(0,0,0,0.5) 0 0 2px,rgba(0,0,0,0.5) 0 0 5px,rgba(0,0,0,0.5) 0 0 10px,
 		rgba(0,0,0,0.5) 0 0 10px,rgba(0,0,0,0.5) 0 0 20px,rgba(0,0,0,0.5) 0 0 20px,black 0 0 1px;
 }
-div[data-color="unknownm"]{
+div[data-color="unknownm"],
+span[data-color="unknownm"]{
 	text-shadow: rgba(0,0,0,0.5) 0 0 2px,rgba(0,0,0,0.2) 0 0 5px,rgba(0,0,0,0.2) 0 0 5px,
 		rgba(0,0,0,0.2) 0 0 5px,black 0 0 1px;
 }

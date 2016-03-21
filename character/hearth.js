@@ -537,6 +537,27 @@ character.hearth={
 				if(hs.length>10&&hs.length>player.hp){
 					player.discard(hs.randomGets(hs.length-player.hp));
 				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'damage')){
+							if(player.skills.contains('jueqing')) return [1,-2];
+							if(!target.hasFriend()) return;
+							var nh=target.num('h');
+							if(nh>5) return [1,-1];
+							if(nh<=1) return [1,-0.1];
+							if(nh==2){
+								if(target.hp>=2) return [1,0.1];
+							}
+							else{
+								if(target.hp>=4) return [1,2];
+								if(target.hp==3) return [1,1.5];
+								if(target.hp==2) return [1,0.5];
+							}
+						}
+					}
+				}
 			}
 		},
 		chuidiao:{

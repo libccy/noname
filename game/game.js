@@ -18,7 +18,8 @@
 	var lib={
 		version:'1.7.11',
 		changeLog:[
-			'扩展'
+			'扩展',
+			'AI改进'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
@@ -22514,9 +22515,9 @@
 				}
 			}
 			else if(e.keyCode==73){
-				if(game.showIdentity){
-					game.showIdentity();
-				}
+				// if(game.showIdentity){
+				// 	game.showIdentity();
+				// }
 			}
 			else if(e.keyCode==67){
 				var node=ui.window.querySelector('#click');

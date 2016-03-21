@@ -99,12 +99,20 @@ card.guozhan={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				if(player.identity=='unknown'||player.identity=='ye'||lib.config.mode!='guozhan') return player==target;
-				return player.identity==target.identity;
+				if(lib.config.mode=='guozhan'){
+					if(player.identity=='unknown'||player.identity=='ye') return player==target;
+					return player.identity==target.identity;
+				}
+				else{
+					return true;
+				}
 			},
-			selectTarget:-1,
+			selectTarget:function(){
+				if(lib.config.mode=='guozhan') return -1;
+				return [1,3];
+			},
 			content:function(){
-				target.draw(lib.config.mode=='guozhan'?2:3);
+				target.draw(2);
 				target.chooseToDiscard(2,'he',true).ai=ai.get.disvalue;
 			},
 			ai:{
@@ -114,15 +122,17 @@ card.guozhan={
 					}
 				},
 				basic:{
-					useful:4,
-					value:4,
-					order:7
+					useful:3,
+					value:3,
+					order:5
 				},
 				result:{
 					target:function(player,target){
-						if(lib.config.mode!='guozhan') return 1;
 						if(target.num('h')<=1){
-							return 0;
+							if(target==player){
+								return 0;
+							}
+							return 0.3;
 						}
 						return 1;
 					},
@@ -229,7 +239,7 @@ card.guozhan={
 		zhibi:'知己知彼',
 		zhibi_info:'出牌阶段对一名其他角色使用，观看其手牌或装备牌',
 		yiyi:'以逸待劳',
-		yiyi_info:'对与自己势力相同的所有角色使用，摸两张牌然后弃置两张牌（非国战模式改为对自己使用，摸3张弃两张）',
+		yiyi_info:'对与自己势力相同的所有角色使用，摸两张牌然后弃置两张牌（非国战模式改为任意指定三名角色）',
 		yiyi_bg:'逸',
 		wuliu:'吴六剑',
 		wuliu_info:'其他与装备者势力相同的角色攻击范围+1',
