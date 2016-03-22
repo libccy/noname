@@ -117,9 +117,7 @@ card.guozhan={
 			},
 			ai:{
 				wuxie:function(){
-					if(lib.config.mode=='guozhan'){
-						return 0;
-					}
+					return 0;
 				},
 				basic:{
 					useful:3,

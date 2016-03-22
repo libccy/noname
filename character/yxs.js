@@ -168,7 +168,7 @@ character.yxs={
 				return 6-ai.get.value(card);
 			},
 			ai:{
-				order:7.5,
+				order:2,
 				result:{
 					target:function(player,target){
 						if(target.isLinked()) return 1;

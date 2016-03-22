@@ -5225,7 +5225,7 @@ character.swd={
 					content:lib.translate[link+'_info']
 				});
 				game.addVideo('markCharacter',player,{
-					name:'get.translation(link)',
+					name:get.translation(link),
 					content:lib.translate[link+'_info'],
 					id:'tianshu',
 					target:target.name

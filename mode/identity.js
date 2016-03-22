@@ -1041,8 +1041,8 @@ mode.identity={
 							case 'zhong':case 'mingzhong': return 6;
 							case 'nei':
 								if(game.players.length==2) return -10;
-								if(zhongmode&&to.ai.sizhong) return 6;
 								if(get.population('fan')==0) return -0.5;
+								if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
 								if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
 									var fan;
 									for(var i=0;i<game.players.length;i++){
@@ -1082,8 +1082,8 @@ mode.identity={
 							case 'zhu': return 10;
 							case 'zhong':case 'mingzhong': return 4;
 							case 'nei':
-								if(zhongmode&&to.ai.sizhong) return 6;
 								if(get.population('fan')==0) return -2;
+								if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
 								return Math.min(3,-situation);
 							case 'fan': return -8;
 						}

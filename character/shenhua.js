@@ -901,6 +901,7 @@ character.shenhua={
 		},
 		duanchang:{
 			audio:4,
+			forbid:['boss'],
 			trigger:{player:'dieBegin'},
 			forced:true,
 			filter:function(event){
@@ -1353,7 +1354,7 @@ character.shenhua={
 			trigger:{global:'dieEnd'},
 			priority:5,
 			filter:function(event){
-				return event.cards.length>0
+				return event.playerCards&&event.playerCards.length>0
 			},
 			content:function(){
 				"step 0"
@@ -2993,7 +2994,7 @@ character.shenhua={
 		hunzi_info:'觉醒技，回合开始阶段，若你的体力为1，你须减1点体力上限，并永久获得技能“英姿”和“英魂”。',
 		zhiba_info:'主公技，其他吴势力角色的出牌阶段，可与你进行一次拼点，若该角色没赢，你可以获得双方拼点的牌；你的觉醒技发动后，你可以拒绝此拼点。每回合限一次。',
 		zhijian_info:'出牌阶段，你可以将你手牌中的一张装备牌置于一名其他角色装备区里（不得替换原装备），然后摸一张牌。',
-		guzheng_info:'其他角色的弃牌阶段结束时，你可将此阶段中弃掉的一张牌从弃牌堆返回该角色手牌；若如此做，你可以获得弃牌堆里其余于此阶段中弃掉的牌。',
+		guzheng_info:'其他角色的弃牌阶段结束时，你可将其弃置的一张牌返回其手牌，然后获得其弃置的其它牌',
 		beige_info:'一名角色每受到【杀】造成的一次伤害，你可以弃一张牌，并令其进行一次判定，判定结果为：♥该角色回复1点体力；♦︎该角色摸两张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 		duanchang_info:'锁定技，杀死你的角色失去当前的所有技能直到游戏结束。',
 		// fushen_info:'回合开始前，你可以选择与任意一名角色交换控制权，该角色可选择在下一个回合开始前与你换回',

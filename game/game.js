@@ -1629,7 +1629,7 @@
 							if(this.innerHTML!='已隐藏'){
 								this.innerHTML='已隐藏';
 								game.saveConfig('hiddenModePack',['stone','chess','boss']);
-								game.saveConfig('hiddenCardPack',['zhenfa','qimou','yibao','shenbing','swd','shenqi','hearth','compensate']);
+								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth','compensate']);
 								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','xiake','boss']);
 								var that=this;
 								setTimeout(function(){
@@ -7283,6 +7283,43 @@
 						}
 					}
 				},
+				markSkillCharacter:function(target,name,content,id){
+					if(typeof target=='object'){
+						target=target.name;
+					}
+					if(this.marks[id]){
+						if(this.marks[id]._name==target){
+							return this;
+						}
+						this.marks[id].name=name+'_charactermark';
+						this.marks[id]._name=target;
+						this.marks[id].info={
+							name:name,
+							content:content
+						};
+						this.marks[id].setBackground(target,'character');
+						game.addVideo('changeMarkCharacter',this,{
+							id:id,
+							name:name,
+							content:content,
+							target:target
+						});
+					}
+					else{
+						this.marks[id]=this.markCharacter(target,{
+							name:name,
+							content:content
+						});
+						this.marks[id]._name=target;
+						game.addVideo('markCharacter',this,{
+							name:name,
+							content:content,
+							id:id,
+							target:target
+						});
+					}
+					return this;
+				},
 				markCharacter:function(name,info,learn,learn2){
 					if(typeof name=='object'){
 						name=name.name;
@@ -10867,6 +10904,15 @@
 					console.log(player);
 				}
 			},
+			changeMarkCharacter:function(player,content){
+				if(player&&content&&player.marks[content.id]){
+					player.marks[content.id].info={
+						name:content.name,
+						content:content.content
+					};
+					player.marks[content.id].setBackground(content.target,'character');
+				}
+			},
 			mark:function(player,content){
 				if(player&&content){
 					var mark=player.mark(content.id,content);
@@ -13532,6 +13578,17 @@
 				}
 			}
 			return list;
+		},
+		findCards:function(func){
+			var cards=[];
+			for(var i in lib.card){
+				if(!lib.translate[i+'_info']) continue;
+				if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
+				if(func(i,lib.card[i])){
+					cards.push(i);
+				}
+			}
+			return cards;
 		},
 		players:[],
 		dead:[],
@@ -19210,7 +19267,7 @@
 				var clicklayer=function(e){
 					uiintro.delete();
 					this.remove();
-					game.resume2();
+					if(!ui.arena.classList.contains('menupaused')) game.resume2();
 					e.stopPropagation();
 					return false;
 				}
@@ -19222,7 +19279,7 @@
 				var clickintro=function(){
 					layer.remove();
 					this.delete();
-					game.resume2();
+					if(!ui.arena.classList.contains('menupaused')) game.resume2();
 				};
 				uiintro.addEventListener('mouseleave',clickintro);
 				uiintro.addEventListener('click',clickintro);
