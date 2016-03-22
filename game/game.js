@@ -36,6 +36,7 @@
 		onwash:[],
 		onover:[],
 		arenaReady:[],
+		packageReady:[],
 		onDB:function(func){
 			if(lib.db){
 				func();
@@ -3019,7 +3020,9 @@
 							}
 						}
 						try{
+							_status.extension=game.importedPack.name;
 							game.importedPack.content(cfg);
+							delete _status.extension;
 						}
 						catch(e){
 							console.log(e);
@@ -11709,6 +11712,61 @@
 			}
 			(triggerevent||_status.event).next.push(next);
 			return next;
+		},
+		addCharacter:function(name,info){
+			var character=[info.sex,info.group,info.hp,info.skills||[],['db:extension-'+_status.extension+':'+name+'.jpg']];
+			if(info.tags){
+				character[4]=character[4].concat(info.tags);
+			}
+			lib.character[name]=character;
+			var packname='mode_extension_'+_status.extension;
+			if(!lib.characterPack[packname]){
+				lib.characterPack[packname]={};
+				lib.translate[name]=info.translate;
+			}
+			lib.characterPack[packname][name]=character;
+			lib.translate[packname+'_character_config']=_status.extension;
+		},
+		addCard:function(name,info,info2){
+			if(info.fullskin){
+				info.image='db:extension-'+_status.extension+':'+name+'.png';
+			}
+			else if(info.fullimage){
+				info.image='db:extension-'+_status.extension+':'+name+'.jpg';
+			}
+			lib.card[name]=info;
+			lib.translate[name]=info2.translate;
+			lib.translate[name+'_info']=info2.description;
+			if(typeof info2.number=='number'){
+				var suits=['heart','spade','diamond','club'];
+				if(info2.color=='red'){
+					suits=['heart','diamond'];
+				}
+				else if(info2.color=='black'){
+					suits=['club','spade'];
+				}
+				for(var i=0;i<info2.number;i++){
+					lib.card.list.push([suits[Math.floor(Math.random()*suits.length)],Math.ceil(Math.random()*13),name]);
+				}
+			}
+			var packname='mode_extension_'+_status.extension;
+			if(!lib.cardPack[packname]){
+				lib.cardPack[packname]=[];
+				lib.translate[packname+'_card_config']=_status.extension;
+			}
+			lib.cardPack[packname].push(name);
+		},
+		addMode:function(name,info,info2){
+			lib.config.all.mode.push(name);
+			lib.translate[name]=info2.translate;
+			lib.mode[name]={
+				name:info2.translate,
+				config:info2.config,
+				splash:'extension-'+_status.extension+':'+'sunquanmode.jpg'
+			}
+			lib.init['setMode_'+name]=function(){
+				mode[name]=info;
+			}
 		},
 		createCard:function(name,suit,number,nature){
 			if(typeof name=='object'){
@@ -22933,6 +22991,15 @@
 				delete window.card;
 				delete window.character;
 				delete window.play;
+				for(var i in lib.init){
+					if(i.indexOf('setMode_')==0){
+						delete lib.init[i];
+					}
+				}
+				while(lib.packageReady.length){
+					(lib.init.eval(lib.packageReady.shift()))();
+				}
+				delete lib.packageReady;
 				ui.create.arena();
 				game.start();
 				game.loop();

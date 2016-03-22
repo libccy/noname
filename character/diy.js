@@ -643,7 +643,7 @@ character.diy={
 		},
 	},
 	translate:{
-		diy_caocao:'曹操',
+		// diy_caocao:'曹操',
 		diy_menghuo:'孟获',
 		diy_huangzhong:'黄汉升',
 		diy_xuhuang:'徐公明',
