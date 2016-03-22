@@ -6853,9 +6853,9 @@ mode.stone={
 			forced:true,
 			unique:true,
 			mark:true,
-			marktext:'冒',
+			marktext:'帽',
 			intro:{
-				content:'你死亡时，将一张探险冒置入主将的手牌'
+				content:'你死亡时，将一张探险帽置入主将的手牌'
 			},
 			content:function(){
 				player.getLeader().addSkill('hunter_tanxianmao2');
@@ -9387,10 +9387,10 @@ mode.stone={
 		spell_dubiao_info:'对一名随机敌方角色造成一点伤害',
 		spell_qiangfengsheji:'强风射击',
 		spell_qiangfengsheji_info:'对两名敌方随从各造成一点伤害，并弃置其两张手牌',
-		spell_tanxianmao:'探险冒',
-		hunter_tanxianmao:'探险冒',
-		hunter_tanxianmao_info:'你死亡时，将一张探险冒置入主将的手牌',
-		spell_tanxianmao_info:'令一名友方随从增加一点体力和体力上限并摸一张牌，当该随从死亡时，将一张探险冒置入你的手牌',
+		spell_tanxianmao:'探险帽',
+		hunter_tanxianmao:'探险帽',
+		hunter_tanxianmao_info:'你死亡时，将一张探险帽置入主将的手牌',
+		spell_tanxianmao_info:'令一名友方随从增加一点体力和体力上限并摸一张牌，当该随从死亡时，将一张探险帽置入你的手牌',
 		spell_shalumingling:'杀戮命令',
 		spell_shalumingling_info:'造成两点伤害，所有友方随从摸一张牌',
 		spell_zhuizongshu:'追踪术',
