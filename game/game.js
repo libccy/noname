@@ -22085,14 +22085,17 @@
 			ext=ext||'.jpg';
 			subfolder=subfolder||'default'
 			if(type){
-				if(type=='character'&&lib.character[name]&&lib.character[name][4]&&
-				lib.character[name][4].contains('dbimage')){
+				var dbimage=null;
+				if(type=='character'&&lib.character[name]&&lib.character[name][4]){
 					for(var i=0;i<lib.character[name][4].length;i++){
 						if(lib.character[name][4][i].indexOf('db:')==0){
-							this.setBackgroundDB(lib.character[name][4][i].slice(3));
-							return this;
+							dbimage=lib.character[name][4][i];break;
 						}
 					}
+				}
+				if(dbimage){
+					this.setBackgroundDB(dbimage.slice(3));
+					return this;
 				}
 				else if(type=='character'&&lib.customCharacters.contains(name)){
 					src="";
