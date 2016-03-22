@@ -1,6 +1,8 @@
 {
   "name": "noname",
-  "xwalk_version": "1.7.11",
+  "xwalk_app_version": "1.7.11",
+  "xwalk_package_id": "com.widget.noname",
+  "xwalk_android_keep_screen_on":true,
   "start_url": "index.html",
   "icons": [
     {
@@ -29,6 +31,5 @@
     }
   ],
   "display": "fullscreen",
-  "orientation": "landscape",
-  "xwalk_android_keep_screen_on":true
+  "orientation": "landscape"
 }

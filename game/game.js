@@ -19,7 +19,8 @@
 		version:'1.7.11',
 		changeLog:[
 			'扩展',
-			'AI改进'
+			'AI改进',
+			'安卓屏幕常亮'
 		],
 		configprefix:'noname_0.9_',
 		updates:[],
