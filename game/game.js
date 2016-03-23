@@ -3144,7 +3144,10 @@
 								}
 								_status.characterLoaded=true;
 								if(_status.waitingForCharacters){
-									game.resume();
+									game.createEvent('game',false).content=lib.init.start;
+									delete lib.init.start;
+									game.loop();
+									delete _status.waitingForCharacters;
 								}
 								if(lib.onCharacterLoad){
 									lib.onCharacterLoad();
@@ -12968,7 +12971,7 @@
 		},
 		gameDraw:function(player,num){
 			var next=game.createEvent('gameDraw');
-			next.player=player;
+			next.player=player||game.me;
 			if(num==undefined) next.num=4;
 			else next.num=num;
 			next.content=function(){
@@ -13386,6 +13389,24 @@
 		},
 		getExtensionConfig:function(extension,key){
 			return lib.config['extension_'+extension+'_'+key];
+		},
+		clearModeConfig:function(mode){
+			if(_status.reloading) return;
+			var config;
+			try{
+				config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
+				if(!config||typeof config!='object') throw 'err'
+			}
+			catch(err){
+				config={};
+			}
+			for(var i in config){
+				if(i.substr(i.indexOf('_mode_config')+13)==mode){
+					delete config[i];
+				}
+			}
+			localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
+			localStorage.removeItem(lib.configprefix+mode);
 		},
 		addPlayer:function(position,character,character2){
 			if(position<0||position>game.players.length+game.dead.length||position==undefined){
@@ -22738,6 +22759,7 @@
 				for(i in mode[lib.config.mode].get){
 					get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
 				}
+				lib.init.start=mode[lib.config.mode].start;
 				if(game.onwash){
 					lib.onwash.push(game.onwash);
 					delete game.onwash;
@@ -22760,6 +22782,7 @@
 					if(i=='ui') continue;
 					if(i=='get') continue;
 					if(i=='config') continue;
+					if(i=='start') continue;
 					if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
 					for(j in mode[lib.config.mode][i]){
 						lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
@@ -23001,8 +23024,14 @@
 				}
 				delete lib.packageReady;
 				ui.create.arena();
-				game.start();
-				game.loop();
+				if(lib.db&&!_status.characterLoaded){
+					_status.waitingForCharacters=true;
+				}
+				else{
+					game.createEvent('game',false).content=lib.init.start;
+					delete lib.init.start;
+					game.loop();
+				}
 			}
 
 			if(!mode[lib.config.mode]){

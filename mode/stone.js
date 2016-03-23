@@ -1,5 +1,545 @@
 'use strict';
 mode.stone={
+	start:function(){
+		"step 0"
+		lib.init.css('layout/mode/','stone');
+		_status.mode=get.config('stone_mode');
+		game.initStone();
+		var playback=localStorage.getItem(lib.configprefix+'playback');
+
+		if(!playback&&_status.mode=='deck'){
+			(function(){
+				ui.deckBuilder=ui.create.div('.popup-container#deck-builder',function(){
+					if(careerList.classList.contains('shown')){
+						careerList.classList.remove('shown');
+						newDeck.classList.remove('active');
+					}
+					else if(!cardDialog.classList.contains('shown')){
+						this.classList.remove('shown');
+						this.timeout=setTimeout(function(){
+							ui.deckBuilder.remove();
+						},500);
+						ui.arena.style.top='';
+						ui.arena.style.transform='';
+						ui.arena.style.opacity='';
+						ui.system.style.opacity='';
+						ui.auto.show();
+						ui.pause.show();
+					}
+				});
+				var clickNode=function(){
+					cardDialog.classList.add('shown');
+					controls.classList.add('shown');
+					var name='未命名';
+					for(var i=1;;i++){
+						if(!lib.storage.deckList[name+i]){
+							break;
+						}
+					}
+					cardDialog.editing={
+						name:name+i,
+						content:{
+							career:this.firstChild.dataset.career,
+							deck:[]
+						},
+					}
+					rename.innerHTML=name+i;
+					newDeck.innerHTML='确认编辑';
+					newDeck.classList.add('active');
+					careerList.classList.remove('shown');
+					listContainer.style.transform='translateX(200px)';
+					deckContainer.innerHTML='';
+					deckContainer.classList.add('shown');
+					updateCardDialog();
+				}
+				var careerList=ui.create.div('.shadowed.career',ui.deckBuilder);
+				for(var i=0;i<lib.careerList.length;i++){
+					var node=ui.create.div(careerList,clickNode);
+					ui.create.div('.menubutton.round',node).dataset.career=lib.careerList[i];
+					ui.create.div('.text',lib.translate[lib.careerList[i]],node);
+				}
+				var controls=ui.create.div('.controls',ui.deckBuilder);
+				var cardCount=ui.create.div('.card-count',controls);
+				ui.create.div('.menubutton.large','删除',controls,function(e){
+					if(this.innerHTML=='删除'){
+						this.innerHTML='确定';
+						var that=this;
+						setTimeout(function(){
+							that.innerHTML='删除';
+						},1000);
+					}
+					else{
+						cardDialog.classList.remove('shown');
+						controls.classList.remove('shown');
+						newDeck.innerHTML='新建卡组';
+						newDeck.classList.remove('active');
+						var editing=cardDialog.editing;
+						if(editing){
+							if(editing.origin){
+								delete lib.storage.deckList[editing.origin];
+								for(var i=0;i<listContainer.childElementCount;i++){
+									if(listContainer.childNodes[i].name==editing.origin){
+										listContainer.childNodes[i].remove();break;
+									}
+								}
+							}
+						}
+						game.save('deckList',lib.storage.deckList);
+						listContainer.style.transform='';
+						deckContainer.classList.remove('shown');
+						updateCardDialog();
+					}
+					e.stopPropagation();
+				});
+				var rename=ui.create.div('.menubutton.large','重命名',controls);
+				rename.contentEditable=true;
+				rename.onfocus=function(){
+					var range = document.createRange();
+					range.selectNodeContents(this);
+					var sel = window.getSelection();
+					sel.removeAllRanges();
+					sel.addRange(range);
+				};
+				rename.onblur=function(){
+					if(cardDialog.editing){
+						if(!lib.storage.deckList[this.innerHTML]){
+							cardDialog.editing.name=this.innerHTML;
+						}
+						else{
+							this.innerHTML=cardDialog.editing.name;
+						}
+					}
+					var sel = window.getSelection();
+					sel.removeAllRanges();
+				};
+				rename.onkeydown=function(e){
+					if(e.keyCode==13){
+						e.preventDefault();
+						e.stopPropagation();
+						rename.blur();
+					}
+				};
+				var removeLine=function() {
+					rename.innerHTML=rename.innerHTML.replace(/\n|<br>/g,'');
+				};
+				var observer = new MutationObserver(removeLine);
+				observer.observe(rename,{characterData:true,subtree:true});
+				rename.addEventListener('keyup',removeLine);
+
+				var cardDialog=ui.create.cardDialog(true,function(name){
+					if(lib.card[name].stonehidden) return true;
+					var type=lib.card[name].type;
+					return type!='stonecard'&&type!='stonecharacter';
+				},{seperate:function(list){
+					var nl=[],ns=[];
+					var career={};
+					var careerspell={};
+					for(var i=0;i<lib.careerList.length;i++){
+						career[lib.careerList[i]]=[];
+						careerspell[lib.careerList[i]]=[];
+					}
+					var result={}
+					for(var i=0;i<list.length;i++){
+						if(lib.card[list[i][2]].type=='stonecard'){
+							if(lib.card[list[i][2]].career&&lib.careerList.contains(lib.card[list[i][2]].career)){
+								careerspell[lib.card[list[i][2]].career].push(list[i]);
+							}
+							else{
+								ns.push(list[i]);
+							}
+						}
+						else{
+							if(lib.card[list[i][2]].career&&lib.careerList.contains(lib.card[list[i][2]].career)){
+								career[lib.card[list[i][2]].career].push(list[i]);
+							}
+							else{
+								nl.push(list[i]);
+							}
+						}
+					}
+					for(var i=0;i<lib.careerList.length;i++){
+						result['法术·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=careerspell[lib.careerList[i]];
+						result['随从·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=career[lib.careerList[i]];
+					}
+					result['法术·中立']=ns;
+					result['随从·中立']=nl;
+					return result;
+				}});
+				for(var i=0;i<cardDialog.buttons.length;i++){
+					if(cardDialog.buttons[i].node.info.innerHTML.indexOf('随从')!=-1){
+						var buttonName=cardDialog.buttons[i].link[2];
+						buttonName=buttonName.slice(0,buttonName.indexOf('_stonecharacter'));
+						buttonName=lib.character[buttonName];
+						cardDialog.buttons[i].node.info.innerHTML=buttonName[5][1]+'/'+buttonName[2];
+					}
+					if(lib.config.touchscreen){
+						lib.setLongPress(cardDialog.buttons[i],ui.click.intro);
+					}
+					else{
+						if(lib.config.hover_all){
+							lib.setHover(cardDialog.buttons[i],ui.click.hoverplayer);
+						}
+						if(lib.config.right_info){
+							cardDialog.buttons[i].oncontextmenu=ui.click.rightplayer;
+						}
+					}
+				}
+				var updateCardDialog=function(button){
+					if(!deckContainer.classList.contains('shown')){
+						for(var i=0;i<cardDialog.buttons.length;i++){
+							cardDialog.buttons[i].classList.remove('unselectable');
+						}
+						for(var i=0;i<cardDialog.content.childElementCount;i++){
+							cardDialog.content.childNodes[i].classList.remove('nodisplay');
+						}
+						return;
+					}
+					if(deckContainer.childElementCount>=30){
+						for(var i=0;i<cardDialog.buttons.length;i++){
+							cardDialog.buttons[i].classList.add('unselectable');
+						}
+					}
+					else{
+						var nummap={};
+						for(var i=0;i<deckContainer.childElementCount;i++){
+							var name=deckContainer.childNodes[i].name;
+							if(!nummap[name]){
+								nummap[name]=1;
+							}
+							else{
+								nummap[name]++;
+							}
+						}
+						var list=[];
+						for(var i in nummap){
+							if(nummap[i]>=2){
+								list.push(i);
+							}
+						}
+						for(var i=0;i<cardDialog.buttons.length;i++){
+							if(list.contains(cardDialog.buttons[i].link[2])){
+								cardDialog.buttons[i].classList.add('unselectable');
+							}
+							else{
+								cardDialog.buttons[i].classList.remove('unselectable');
+							}
+						}
+					}
+					var career=cardDialog.editing.content.career;
+					for(var i=0;i<cardDialog.content.childElementCount;i++){
+						var currentNode=cardDialog.content.childNodes[i];
+						if(currentNode.link){
+							if(currentNode.link==career){
+								currentNode.classList.remove('nodisplay');
+								currentNode.nextSibling.classList.remove('nodisplay');
+							}
+							else{
+								currentNode.classList.add('nodisplay');
+								currentNode.nextSibling.classList.add('nodisplay');
+							}
+						}
+					}
+					cardCount.innerHTML=deckContainer.childElementCount+'/30';
+				};
+				var clickCard=function(){
+					this.remove();
+					updateCardDialog();
+				};
+				var clickButton=function(){
+					if(!deckContainer.classList.contains('shown')) return;
+					if(!this.classList.contains('unselectable')){
+						var card=ui.create.card(null,'noclick').init(this.link).listen(clickCard);
+						deckContainer.insertBefore(card,deckContainer.firstChild);
+						updateCardDialog();
+					}
+				}
+				for(var i=0;i<cardDialog.buttons.length;i++){
+					cardDialog.buttons[i].listen(clickButton);
+				}
+				cardDialog.classList.add('fullheight');
+				cardDialog.classList.add('scroll1');
+				cardDialog.classList.add('scroll2');
+				cardDialog.classList.add('fixed');
+				cardDialog.listen(function(e){
+					e.stopPropagation();
+				});
+
+				ui.deckBuilder.appendChild(cardDialog);
+				var deckList=ui.create.div('.shadowed.list',ui.deckBuilder,function(e){
+					e.stopPropagation();
+					if(careerList.classList.contains('shown')){
+						careerList.classList.remove('shown');
+						newDeck.classList.remove('active');
+					}
+				});
+				var editDeck=function(){
+					if(!cardDialog.classList.contains('shown')){
+						cardDialog.classList.add('shown');
+						controls.classList.add('shown');
+						var info=lib.storage.deckList[this.name];
+						cardDialog.editing={
+							origin:this.name,
+							name:this.name,
+							content:{
+								career:info.career,
+								deck:info.deck
+							},
+						}
+						rename.innerHTML=this.name;
+						newDeck.innerHTML='确认编辑';
+						newDeck.classList.add('active');
+						careerList.classList.remove('shown');
+						listContainer.style.transform='translateX(200px)';
+						deckContainer.innerHTML='';
+						for(var i=0;i<info.deck.length;i++){
+							ui.create.card(deckContainer,'noclick').init(['',get.translation(lib.card[info.deck[i]].type),info.deck[i]]).listen(clickCard);
+						}
+						deckContainer.classList.add('shown');
+						updateCardDialog();
+					}
+				};
+				var newDeck=ui.create.div('.menubutton.large.create','新建卡组',deckList,function(e){
+					if(this.innerHTML=='新建卡组'){
+						this.classList.toggle('active');
+						if(this.classList.contains('active')){
+							careerList.classList.add('shown');
+						}
+						else{
+							careerList.classList.remove('shown');
+						}
+					}
+					else{
+						cardDialog.classList.remove('shown');
+						controls.classList.remove('shown');
+						this.innerHTML='新建卡组';
+						this.classList.remove('active');
+						var editing=cardDialog.editing;
+						if(editing){
+							editing.content.deck.length=0;
+							for(var i=0;i<deckContainer.childElementCount;i++){
+								editing.content.deck.push(deckContainer.childNodes[i].name);
+							}
+							editing.content.deck.sort(function(a,b){
+								if(a>b) return 1;
+								if(a<b) return -1;
+								return 0;
+							});
+							if(editing.origin){
+								for(var i=0;i<listContainer.childElementCount;i++){
+									if(listContainer.childNodes[i].name==editing.origin){
+										listContainer.childNodes[i].name=editing.name;
+										listContainer.childNodes[i].firstChild.innerHTML=editing.name;
+										break;
+									}
+								}
+								delete lib.storage.deckList[editing.origin];
+							}
+							else if(!lib.storage.deckList[editing.name]){
+								var deckitem=ui.create.div('.deckitem.shadowed','<span>'+editing.name+'</span>',
+									listContainer,editDeck);
+								ui.create.div('.menubutton.round',deckitem).dataset.career=editing.content.career;
+								deckitem.name=editing.name;
+							}
+							lib.storage.deckList[editing.name]=editing.content;
+						}
+						game.save('deckList',lib.storage.deckList);
+						listContainer.style.transform='';
+						deckContainer.classList.remove('shown');
+						updateCardDialog();
+					}
+					e.stopPropagation();
+				});
+				var listContainer=ui.create.div('.list-container',deckList);
+				for(var i in lib.storage.deckList){
+					var deckitem=ui.create.div('.deckitem.shadowed','<span>'+i+'</span>',
+						listContainer,editDeck);
+					ui.create.div('.menubutton.round',deckitem).dataset.career=lib.storage.deckList[i].career;
+					deckitem.name=i;
+				}
+				var deckContainer=ui.create.div('.list-container.deck',deckList);
+			}());
+
+			ui.deckcontrol=ui.create.system('卡组管理',function(){
+				// if(lib.config.low_performance){
+				// 	ui.arena.style.transform='translateY('+ui.window.offsetHeight+'px)';
+				// }
+				// else{
+				// 	ui.arena.style.top='100%';
+				// }
+				// ui.arena.style.transform='scale(0.6)';
+				ui.arena.style.opacity=0;
+				ui.system.style.opacity=0;
+				ui.window.appendChild(ui.deckBuilder);
+				if(ui.deckBuilder.timeout){
+					clearTimeout(ui.deckBuilder.timeout);
+					delete ui.deckBuilder.timeout;
+				}
+				ui.refresh(ui.deckBuilder);
+				ui.deckBuilder.classList.add('shown');
+				ui.auto.hide();
+				ui.pause.hide();
+			},true);
+
+		}
+
+		if(playback){
+			ui.create.me();
+			ui.arena.style.display='none';
+			ui.system.style.display='none';
+			_status.playback=playback;
+			localStorage.removeItem(lib.configprefix+'playback');
+			var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+			store.get(parseInt(playback)).onsuccess=function(e){
+				if(e.target.result){
+					game.playVideoContent(e.target.result.video);
+				}
+				else{
+					alert('播放失败：找不到录像');
+					game.reload();
+				}
+			}
+			event.finish();
+		}
+		else{
+			game.prepareArena(2);
+			game.delay();
+		}
+		ui.arena.classList.add('stone');
+		"step 1"
+		for(var i=0;i<game.players.length;i++){
+			game.players[i].classList.add('noidentity');
+		}
+		game.enemy=game.me.next;
+		if(lib.storage.test){
+			lib.config.game_speed='vfast';
+			_status.auto=true;
+			ui.auto.classList.add('glow');
+		}
+		game.chooseCharacter();
+		"step 2"
+		if(_status.mode=='deck'){
+			_status.deckButton=ui.create.system('卡组',null,true);
+			lib.setPopped(_status.deckButton,function(){
+				var uiintro=ui.create.dialog('hidden');
+				uiintro.listen(function(e){
+					e.stopPropagation();
+				});
+				uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+game.me.deckCards.length);
+				uiintro.addSmall([game.me.deckCards,'card']);
+				return uiintro;
+			},220);
+			if(get.config('skill_bar')){
+				_status.rageEnabled=true;
+
+				ui.friendBar=ui.create.div('.skillbar.right.shadowed.playerbg',ui.arena);
+				ui.enemyBar=ui.create.div('.skillbar.left.shadowed.playerbg',ui.arena);
+				// ui.friendBar.dataset.nature='metal';
+				// ui.enemyBar.dataset.nature='fire';
+				ui.create.div('.skillbarshadow',ui.friendBar);
+				ui.create.div('.skillbarshadow',ui.enemyBar);
+				ui.create.div('.skillbarfill',ui.friendBar);
+				ui.create.div('.skillbarfill',ui.enemyBar);
+				ui.friendBar.fillnode=ui.create.div(ui.friendBar.lastChild);
+				ui.enemyBar.fillnode=ui.create.div(ui.enemyBar.lastChild);
+				// ui.friendBar.popnode=ui.create.div('.skillbartext',ui.friendBar);
+				// ui.enemyBar.popnode=ui.create.div('.skillbartext',ui.enemyBar);
+				_status.friendRage=0;
+				_status.enemyRage=0;
+
+				if(lib.config.touchscreen){
+					lib.setLongPress(ui.friendBar,ui.click.intro);
+					lib.setLongPress(ui.enemyBar,ui.click.intro);
+				}
+				else{
+					if(lib.config.hover_all){
+						lib.setHover(ui.friendBar,ui.click.hoverplayer);
+						lib.setHover(ui.enemyBar,ui.click.hoverplayer);
+					}
+					if(lib.config.right_info){
+						ui.friendBar.oncontextmenu=ui.click.rightplayer;
+						ui.enemyBar.oncontextmenu=ui.click.rightplayer;
+					}
+				}
+			}
+		}
+		_status.friendCount=ui.create.system('',null,true);
+		_status.enemyCount=ui.create.system('',null,true);
+		game.updateStatusCount();
+		lib.setPopped(_status.friendCount,function(){
+			var uiintro=ui.create.dialog('hidden');
+
+			if(_status.deadfriend.length){
+				uiintro.add('已阵亡');
+				uiintro.add([_status.deadfriend,'player']);
+			}
+
+			uiintro.add('未上场');
+			if(_status.mylist.length){
+				uiintro.add([_status.mylist,'character']);
+			}
+			else{
+				uiintro.add('（无）')
+			}
+
+			return uiintro;
+		});
+		lib.setPopped(_status.enemyCount,function(){
+			if(_status.deadenemy.length){
+				var uiintro=ui.create.dialog('hidden');
+				uiintro.add('已阵亡');
+				uiintro.add([_status.deadenemy,'player']);
+				return uiintro;
+			}
+		});
+
+		game.me.side=Math.random()<0.5;
+		game.enemy.side=!game.me.side;
+
+		var players=get.players(lib.sort.position);
+		var info=[];
+		for(var i=0;i<players.length;i++){
+			info.push({
+				name:players[i].name,
+				name2:players[i].name2,
+				count:players[i].actcount
+			});
+		}
+		_status.videoInited=true,
+		game.addVideo('init',null,info);
+
+		event.trigger('gameStart');
+		if(_status.mode=='deck'){
+			game.gameDraw(game.me,3);
+			game.me.drawDeck(1,false);
+			game.me.next.drawDeck(1,false);
+		}
+		else{
+			game.gameDraw(game.me);
+		}
+		"step 3"
+		game.me.chooseBool('是否置换手牌？');
+		"step 4"
+		if(result.bool){
+			var hs=game.me.get('h');
+			for(var i=0;i<hs.length;i++){
+				ui.discardPile.appendChild(hs[i]);
+			}
+			if(_status.mode=='deck'){
+				game.me.drawDeck(1,false);
+				game.me.directgain(get.cards(3));
+			}
+			else{
+				game.me.directgain(get.cards(4));
+			}
+		}
+		"step 5"
+		if(game.me.side){
+			game.stoneLoop(game.me);
+		}
+		else{
+			game.stoneLoop(game.enemy);
+		}
+	},
 	element:{
 		stonecharacter:{
 			type:'stonecharacter',
@@ -884,554 +1424,6 @@ mode.stone={
 			_status.deadfriend=[];
 			_status.deadenemy=[];
 			game.additionaldead=[];
-		},
-		start:function(){
-			var next=game.createEvent('game',false);
-			next.content=function(){
-				"step 0"
-				if(lib.db&&!_status.characterLoaded){
-					_status.waitingForCharacters=true;
-					game.pause();
-				}
-				"step 1"
-				lib.init.css('layout/mode/','stone');
-				_status.mode=get.config('stone_mode');
-				game.initStone();
-				var playback=localStorage.getItem(lib.configprefix+'playback');
-
-				if(!playback&&_status.mode=='deck'){
-					(function(){
-						ui.deckBuilder=ui.create.div('.popup-container#deck-builder',function(){
-							if(careerList.classList.contains('shown')){
-								careerList.classList.remove('shown');
-								newDeck.classList.remove('active');
-							}
-							else if(!cardDialog.classList.contains('shown')){
-								this.classList.remove('shown');
-								this.timeout=setTimeout(function(){
-									ui.deckBuilder.remove();
-								},500);
-								ui.arena.style.top='';
-								ui.arena.style.transform='';
-								ui.arena.style.opacity='';
-								ui.system.style.opacity='';
-								ui.auto.show();
-								ui.pause.show();
-							}
-						});
-						var clickNode=function(){
-							cardDialog.classList.add('shown');
-							controls.classList.add('shown');
-							var name='未命名';
-							for(var i=1;;i++){
-								if(!lib.storage.deckList[name+i]){
-									break;
-								}
-							}
-							cardDialog.editing={
-								name:name+i,
-								content:{
-									career:this.firstChild.dataset.career,
-									deck:[]
-								},
-							}
-							rename.innerHTML=name+i;
-							newDeck.innerHTML='确认编辑';
-							newDeck.classList.add('active');
-							careerList.classList.remove('shown');
-							listContainer.style.transform='translateX(200px)';
-							deckContainer.innerHTML='';
-							deckContainer.classList.add('shown');
-							updateCardDialog();
-						}
-						var careerList=ui.create.div('.shadowed.career',ui.deckBuilder);
-						for(var i=0;i<lib.careerList.length;i++){
-							var node=ui.create.div(careerList,clickNode);
-							ui.create.div('.menubutton.round',node).dataset.career=lib.careerList[i];
-							ui.create.div('.text',lib.translate[lib.careerList[i]],node);
-						}
-						var controls=ui.create.div('.controls',ui.deckBuilder);
-						var cardCount=ui.create.div('.card-count',controls);
-						ui.create.div('.menubutton.large','删除',controls,function(e){
-							if(this.innerHTML=='删除'){
-								this.innerHTML='确定';
-								var that=this;
-								setTimeout(function(){
-									that.innerHTML='删除';
-								},1000);
-							}
-							else{
-								cardDialog.classList.remove('shown');
-								controls.classList.remove('shown');
-								newDeck.innerHTML='新建卡组';
-								newDeck.classList.remove('active');
-								var editing=cardDialog.editing;
-								if(editing){
-									if(editing.origin){
-										delete lib.storage.deckList[editing.origin];
-										for(var i=0;i<listContainer.childElementCount;i++){
-											if(listContainer.childNodes[i].name==editing.origin){
-												listContainer.childNodes[i].remove();break;
-											}
-										}
-									}
-								}
-								game.save('deckList',lib.storage.deckList);
-								listContainer.style.transform='';
-								deckContainer.classList.remove('shown');
-								updateCardDialog();
-							}
-							e.stopPropagation();
-						});
-						var rename=ui.create.div('.menubutton.large','重命名',controls);
-						rename.contentEditable=true;
-						rename.onfocus=function(){
-							var range = document.createRange();
-						    range.selectNodeContents(this);
-						    var sel = window.getSelection();
-						    sel.removeAllRanges();
-						    sel.addRange(range);
-						};
-						rename.onblur=function(){
-							if(cardDialog.editing){
-								if(!lib.storage.deckList[this.innerHTML]){
-									cardDialog.editing.name=this.innerHTML;
-								}
-								else{
-									this.innerHTML=cardDialog.editing.name;
-								}
-							}
-							var sel = window.getSelection();
-						    sel.removeAllRanges();
-						};
-						rename.onkeydown=function(e){
-							if(e.keyCode==13){
-								e.preventDefault();
-								e.stopPropagation();
-								rename.blur();
-							}
-						};
-						var removeLine=function() {
-							rename.innerHTML=rename.innerHTML.replace(/\n|<br>/g,'');
-						};
-						var observer = new MutationObserver(removeLine);
-						observer.observe(rename,{characterData:true,subtree:true});
-						rename.addEventListener('keyup',removeLine);
-
-						var cardDialog=ui.create.cardDialog(true,function(name){
-							if(lib.card[name].stonehidden) return true;
-							var type=lib.card[name].type;
-							return type!='stonecard'&&type!='stonecharacter';
-						},{seperate:function(list){
-							var nl=[],ns=[];
-							var career={};
-							var careerspell={};
-							for(var i=0;i<lib.careerList.length;i++){
-								career[lib.careerList[i]]=[];
-								careerspell[lib.careerList[i]]=[];
-							}
-							var result={}
-							for(var i=0;i<list.length;i++){
-								if(lib.card[list[i][2]].type=='stonecard'){
-									if(lib.card[list[i][2]].career&&lib.careerList.contains(lib.card[list[i][2]].career)){
-										careerspell[lib.card[list[i][2]].career].push(list[i]);
-									}
-									else{
-										ns.push(list[i]);
-									}
-								}
-								else{
-									if(lib.card[list[i][2]].career&&lib.careerList.contains(lib.card[list[i][2]].career)){
-										career[lib.card[list[i][2]].career].push(list[i]);
-									}
-									else{
-										nl.push(list[i]);
-									}
-								}
-							}
-							for(var i=0;i<lib.careerList.length;i++){
-								result['法术·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=careerspell[lib.careerList[i]];
-								result['随从·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=career[lib.careerList[i]];
-							}
-							result['法术·中立']=ns;
-							result['随从·中立']=nl;
-							return result;
-						}});
-						for(var i=0;i<cardDialog.buttons.length;i++){
-							if(cardDialog.buttons[i].node.info.innerHTML.indexOf('随从')!=-1){
-								var buttonName=cardDialog.buttons[i].link[2];
-								buttonName=buttonName.slice(0,buttonName.indexOf('_stonecharacter'));
-								buttonName=lib.character[buttonName];
-								cardDialog.buttons[i].node.info.innerHTML=buttonName[5][1]+'/'+buttonName[2];
-							}
-							if(lib.config.touchscreen){
-								lib.setLongPress(cardDialog.buttons[i],ui.click.intro);
-							}
-							else{
-								if(lib.config.hover_all){
-									lib.setHover(cardDialog.buttons[i],ui.click.hoverplayer);
-								}
-								if(lib.config.right_info){
-									cardDialog.buttons[i].oncontextmenu=ui.click.rightplayer;
-								}
-							}
-						}
-						var updateCardDialog=function(button){
-							if(!deckContainer.classList.contains('shown')){
-								for(var i=0;i<cardDialog.buttons.length;i++){
-									cardDialog.buttons[i].classList.remove('unselectable');
-								}
-								for(var i=0;i<cardDialog.content.childElementCount;i++){
-									cardDialog.content.childNodes[i].classList.remove('nodisplay');
-								}
-								return;
-							}
-							if(deckContainer.childElementCount>=30){
-								for(var i=0;i<cardDialog.buttons.length;i++){
-									cardDialog.buttons[i].classList.add('unselectable');
-								}
-							}
-							else{
-								var nummap={};
-								for(var i=0;i<deckContainer.childElementCount;i++){
-									var name=deckContainer.childNodes[i].name;
-									if(!nummap[name]){
-										nummap[name]=1;
-									}
-									else{
-										nummap[name]++;
-									}
-								}
-								var list=[];
-								for(var i in nummap){
-									if(nummap[i]>=2){
-										list.push(i);
-									}
-								}
-								for(var i=0;i<cardDialog.buttons.length;i++){
-									if(list.contains(cardDialog.buttons[i].link[2])){
-										cardDialog.buttons[i].classList.add('unselectable');
-									}
-									else{
-										cardDialog.buttons[i].classList.remove('unselectable');
-									}
-								}
-							}
-							var career=cardDialog.editing.content.career;
-							for(var i=0;i<cardDialog.content.childElementCount;i++){
-								var currentNode=cardDialog.content.childNodes[i];
-								if(currentNode.link){
-									if(currentNode.link==career){
-										currentNode.classList.remove('nodisplay');
-										currentNode.nextSibling.classList.remove('nodisplay');
-									}
-									else{
-										currentNode.classList.add('nodisplay');
-										currentNode.nextSibling.classList.add('nodisplay');
-									}
-								}
-							}
-							cardCount.innerHTML=deckContainer.childElementCount+'/30';
-						};
-						var clickCard=function(){
-							this.remove();
-							updateCardDialog();
-						};
-						var clickButton=function(){
-							if(!deckContainer.classList.contains('shown')) return;
-							if(!this.classList.contains('unselectable')){
-								var card=ui.create.card(null,'noclick').init(this.link).listen(clickCard);
-								deckContainer.insertBefore(card,deckContainer.firstChild);
-								updateCardDialog();
-							}
-						}
-						for(var i=0;i<cardDialog.buttons.length;i++){
-							cardDialog.buttons[i].listen(clickButton);
-						}
-						cardDialog.classList.add('fullheight');
-						cardDialog.classList.add('scroll1');
-						cardDialog.classList.add('scroll2');
-						cardDialog.classList.add('fixed');
-						cardDialog.listen(function(e){
-							e.stopPropagation();
-						});
-
-						ui.deckBuilder.appendChild(cardDialog);
-						var deckList=ui.create.div('.shadowed.list',ui.deckBuilder,function(e){
-							e.stopPropagation();
-							if(careerList.classList.contains('shown')){
-								careerList.classList.remove('shown');
-								newDeck.classList.remove('active');
-							}
-						});
-						var editDeck=function(){
-							if(!cardDialog.classList.contains('shown')){
-								cardDialog.classList.add('shown');
-								controls.classList.add('shown');
-								var info=lib.storage.deckList[this.name];
-								cardDialog.editing={
-									origin:this.name,
-									name:this.name,
-									content:{
-										career:info.career,
-										deck:info.deck
-									},
-								}
-								rename.innerHTML=this.name;
-								newDeck.innerHTML='确认编辑';
-								newDeck.classList.add('active');
-								careerList.classList.remove('shown');
-								listContainer.style.transform='translateX(200px)';
-								deckContainer.innerHTML='';
-								for(var i=0;i<info.deck.length;i++){
-									ui.create.card(deckContainer,'noclick').init(['',get.translation(lib.card[info.deck[i]].type),info.deck[i]]).listen(clickCard);
-								}
-								deckContainer.classList.add('shown');
-								updateCardDialog();
-							}
-						};
-						var newDeck=ui.create.div('.menubutton.large.create','新建卡组',deckList,function(e){
-							if(this.innerHTML=='新建卡组'){
-								this.classList.toggle('active');
-								if(this.classList.contains('active')){
-									careerList.classList.add('shown');
-								}
-								else{
-									careerList.classList.remove('shown');
-								}
-							}
-							else{
-								cardDialog.classList.remove('shown');
-								controls.classList.remove('shown');
-								this.innerHTML='新建卡组';
-								this.classList.remove('active');
-								var editing=cardDialog.editing;
-								if(editing){
-									editing.content.deck.length=0;
-									for(var i=0;i<deckContainer.childElementCount;i++){
-										editing.content.deck.push(deckContainer.childNodes[i].name);
-									}
-									editing.content.deck.sort(function(a,b){
-										if(a>b) return 1;
-										if(a<b) return -1;
-										return 0;
-									});
-									if(editing.origin){
-										for(var i=0;i<listContainer.childElementCount;i++){
-											if(listContainer.childNodes[i].name==editing.origin){
-												listContainer.childNodes[i].name=editing.name;
-												listContainer.childNodes[i].firstChild.innerHTML=editing.name;
-												break;
-											}
-										}
-										delete lib.storage.deckList[editing.origin];
-									}
-									else if(!lib.storage.deckList[editing.name]){
-										var deckitem=ui.create.div('.deckitem.shadowed','<span>'+editing.name+'</span>',
-											listContainer,editDeck);
-										ui.create.div('.menubutton.round',deckitem).dataset.career=editing.content.career;
-										deckitem.name=editing.name;
-									}
-									lib.storage.deckList[editing.name]=editing.content;
-								}
-								game.save('deckList',lib.storage.deckList);
-								listContainer.style.transform='';
-								deckContainer.classList.remove('shown');
-								updateCardDialog();
-							}
-							e.stopPropagation();
-						});
-						var listContainer=ui.create.div('.list-container',deckList);
-						for(var i in lib.storage.deckList){
-							var deckitem=ui.create.div('.deckitem.shadowed','<span>'+i+'</span>',
-								listContainer,editDeck);
-							ui.create.div('.menubutton.round',deckitem).dataset.career=lib.storage.deckList[i].career;
-							deckitem.name=i;
-						}
-						var deckContainer=ui.create.div('.list-container.deck',deckList);
-					}());
-
-					ui.deckcontrol=ui.create.system('卡组管理',function(){
-						// if(lib.config.low_performance){
-						// 	ui.arena.style.transform='translateY('+ui.window.offsetHeight+'px)';
-						// }
-						// else{
-						// 	ui.arena.style.top='100%';
-						// }
-						// ui.arena.style.transform='scale(0.6)';
-						ui.arena.style.opacity=0;
-						ui.system.style.opacity=0;
-						ui.window.appendChild(ui.deckBuilder);
-						if(ui.deckBuilder.timeout){
-							clearTimeout(ui.deckBuilder.timeout);
-							delete ui.deckBuilder.timeout;
-						}
-						ui.refresh(ui.deckBuilder);
-						ui.deckBuilder.classList.add('shown');
-						ui.auto.hide();
-						ui.pause.hide();
-					},true);
-
-				}
-
-				if(playback){
-					ui.create.me();
-					ui.arena.style.display='none';
-					ui.system.style.display='none';
-					_status.playback=playback;
-					localStorage.removeItem(lib.configprefix+'playback');
-					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-					store.get(parseInt(playback)).onsuccess=function(e){
-						if(e.target.result){
-							game.playVideoContent(e.target.result.video);
-						}
-						else{
-							alert('播放失败：找不到录像');
-							game.reload();
-						}
-					}
-					event.finish();
-				}
-				else{
-					game.prepareArena(2);
-					game.delay();
-				}
-				ui.arena.classList.add('stone');
-				"step 2"
-				for(var i=0;i<game.players.length;i++){
-					game.players[i].classList.add('noidentity');
-				}
-				game.enemy=game.me.next;
-				if(lib.storage.test){
-					lib.config.game_speed='vfast';
-					_status.auto=true;
-					ui.auto.classList.add('glow');
-				}
-				game.chooseCharacter();
-				"step 3"
-				if(_status.mode=='deck'){
-					_status.deckButton=ui.create.system('卡组',null,true);
-					lib.setPopped(_status.deckButton,function(){
-						var uiintro=ui.create.dialog('hidden');
-						uiintro.listen(function(e){
-							e.stopPropagation();
-						});
-						uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+game.me.deckCards.length);
-						uiintro.addSmall([game.me.deckCards,'card']);
-						return uiintro;
-					},220);
-					if(get.config('skill_bar')){
-						_status.rageEnabled=true;
-
-						ui.friendBar=ui.create.div('.skillbar.right.shadowed.playerbg',ui.arena);
-						ui.enemyBar=ui.create.div('.skillbar.left.shadowed.playerbg',ui.arena);
-						// ui.friendBar.dataset.nature='metal';
-						// ui.enemyBar.dataset.nature='fire';
-						ui.create.div('.skillbarshadow',ui.friendBar);
-						ui.create.div('.skillbarshadow',ui.enemyBar);
-						ui.create.div('.skillbarfill',ui.friendBar);
-						ui.create.div('.skillbarfill',ui.enemyBar);
-						ui.friendBar.fillnode=ui.create.div(ui.friendBar.lastChild);
-						ui.enemyBar.fillnode=ui.create.div(ui.enemyBar.lastChild);
-						// ui.friendBar.popnode=ui.create.div('.skillbartext',ui.friendBar);
-						// ui.enemyBar.popnode=ui.create.div('.skillbartext',ui.enemyBar);
-						_status.friendRage=0;
-						_status.enemyRage=0;
-
-						if(lib.config.touchscreen){
-							lib.setLongPress(ui.friendBar,ui.click.intro);
-							lib.setLongPress(ui.enemyBar,ui.click.intro);
-						}
-						else{
-							if(lib.config.hover_all){
-								lib.setHover(ui.friendBar,ui.click.hoverplayer);
-								lib.setHover(ui.enemyBar,ui.click.hoverplayer);
-							}
-							if(lib.config.right_info){
-								ui.friendBar.oncontextmenu=ui.click.rightplayer;
-								ui.enemyBar.oncontextmenu=ui.click.rightplayer;
-							}
-						}
-					}
-				}
-				_status.friendCount=ui.create.system('',null,true);
-				_status.enemyCount=ui.create.system('',null,true);
-				game.updateStatusCount();
-				lib.setPopped(_status.friendCount,function(){
-					var uiintro=ui.create.dialog('hidden');
-
-					if(_status.deadfriend.length){
-						uiintro.add('已阵亡');
-						uiintro.add([_status.deadfriend,'player']);
-					}
-
-					uiintro.add('未上场');
-					if(_status.mylist.length){
-						uiintro.add([_status.mylist,'character']);
-					}
-					else{
-						uiintro.add('（无）')
-					}
-
-					return uiintro;
-				});
-				lib.setPopped(_status.enemyCount,function(){
-					if(_status.deadenemy.length){
-						var uiintro=ui.create.dialog('hidden');
-						uiintro.add('已阵亡');
-						uiintro.add([_status.deadenemy,'player']);
-						return uiintro;
-					}
-				});
-
-				game.me.side=Math.random()<0.5;
-				game.enemy.side=!game.me.side;
-
-				var players=get.players(lib.sort.position);
-				var info=[];
-				for(var i=0;i<players.length;i++){
-					info.push({
-						name:players[i].name,
-						name2:players[i].name2,
-						count:players[i].actcount
-					});
-				}
-				_status.videoInited=true,
-				game.addVideo('init',null,info);
-
-				event.trigger('gameStart');
-				if(_status.mode=='deck'){
-					game.gameDraw(game.me,3);
-					game.me.drawDeck(1,false);
-					game.me.next.drawDeck(1,false);
-				}
-				else{
-					game.gameDraw(game.me);
-				}
-				"step 4"
-				game.me.chooseBool('是否置换手牌？');
-				"step 5"
-				if(result.bool){
-					var hs=game.me.get('h');
-					for(var i=0;i<hs.length;i++){
-						ui.discardPile.appendChild(hs[i]);
-					}
-					if(_status.mode=='deck'){
-						game.me.drawDeck(1,false);
-						game.me.directgain(get.cards(3));
-					}
-					else{
-						game.me.directgain(get.cards(4));
-					}
-				}
-				"step 6"
-				if(game.me.side){
-					game.stoneLoop(game.me);
-				}
-				else{
-					game.stoneLoop(game.enemy);
-				}
-			}
 		},
 		chooseCharacter:function(){
 			var next=game.createEvent('chooseCharacter',false);
@@ -10134,5 +10126,4 @@ mode.stone={
 			}
 		}
 	},
-	config:['battle_number','double_character','double_hp','ban_weak','free_choose','change_choice'],
 }

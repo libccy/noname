@@ -1,5 +1,103 @@
 'use strict';
 mode.guozhan={
+	start:function(){
+		"step 0"
+		var playback=localStorage.getItem(lib.configprefix+'playback');
+		if(playback){
+			ui.create.me();
+			ui.arena.style.display='none';
+			ui.system.style.display='none';
+			_status.playback=playback;
+			localStorage.removeItem(lib.configprefix+'playback');
+			var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+			store.get(parseInt(playback)).onsuccess=function(e){
+				if(e.target.result){
+					game.playVideoContent(e.target.result.video);
+				}
+				else{
+					alert('播放失败：找不到录像');
+					game.reload();
+				}
+			}
+			event.finish();
+		}
+		else{
+			game.prepareArena();
+			game.delay();
+			game.showChangeLog();
+		}
+		"step 1"
+		if(lib.storage.test){
+			lib.config.game_speed='vfast';
+			lib.config.low_performance=true;
+			_status.auto=true;
+			ui.auto.classList.add('glow');
+		}
+		for(var i=0;i<game.players.length;i++){
+			game.players[i].node.name.hide();
+			game.players[i].node.name2.hide();
+		}
+		game.chooseCharacter();
+		"step 2"
+		if(ui.coin){
+			_status.coinCoeff=get.coinCoeff([game.me.name1,game.me.name2]);
+		}
+		if(lib.storage.test){
+			var str='';
+			for(var i=0;i<game.players.length;i++){
+				str+=get.translation(game.players[i].name1)+' '+get.translation(game.players[i].name2)+'; ';
+			}
+			console.log(str);
+		}
+		var player;
+		if(_status.cheat_seat){
+			var seat=_status.cheat_seat.link;
+			if(seat==0){
+				player=game.me;
+			}
+			else{
+				player=game.players[game.players.length-seat];
+			}
+			if(!player) player=game.me;
+			delete _status.cheat_seat;
+		}
+		else{
+			player=game.players[Math.floor(Math.random()*game.players.length)];
+		}
+		event.trigger('gameStart');
+
+		game.gameDraw(player);
+		for(var i=0;i<game.players.length;i++){
+			game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
+			game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
+			if(game.players[i]==game.me){
+				lib.translate[game.players[i].name]+='（你）';
+			}
+		}
+
+
+		var players=get.players(lib.sort.position);
+		var info=[];
+		for(var i=0;i<players.length;i++){
+			info.push({
+				name:game.players[i].name,
+				translate:lib.translate[game.players[i].name],
+				name1:players[i].name1,
+				name2:players[i].name2,
+			});
+		}
+		_status.videoInited=true,
+		game.addVideo('init',null,info);
+		if(get.config('guozhan_mode')=='mingjiang'){
+			game.showIdentity(true);
+		}
+		else{
+			for(var i=0;i<game.players.length;i++){
+				game.players[i].ai.shown=0;
+			}
+		}
+		game.phaseLoop(player);
+	},
 	game:{
 		addRecord:function(bool){
 			if(typeof bool=='boolean'){
@@ -68,112 +166,6 @@ mode.guozhan={
 			}
 			var name=[str,str2];
 			return name;
-		},
-		start:function(){
-			var next=game.createEvent('game',false);
-			next.content=function(){
-				"step 0"
-				if(lib.db&&!_status.characterLoaded){
-					_status.waitingForCharacters=true;
-					game.pause();
-				}
-				"step 1"
-				var playback=localStorage.getItem(lib.configprefix+'playback');
-				if(playback){
-					ui.create.me();
-					ui.arena.style.display='none';
-					ui.system.style.display='none';
-					_status.playback=playback;
-					localStorage.removeItem(lib.configprefix+'playback');
-					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-					store.get(parseInt(playback)).onsuccess=function(e){
-						if(e.target.result){
-							game.playVideoContent(e.target.result.video);
-						}
-						else{
-							alert('播放失败：找不到录像');
-							game.reload();
-						}
-					}
-					event.finish();
-				}
-				else{
-					game.prepareArena();
-					game.delay();
-					game.showChangeLog();
-				}
-				"step 2"
-				if(lib.storage.test){
-					lib.config.game_speed='vfast';
-					lib.config.low_performance=true;
-					_status.auto=true;
-					ui.auto.classList.add('glow');
-				}
-				for(var i=0;i<game.players.length;i++){
-					game.players[i].node.name.hide();
-					game.players[i].node.name2.hide();
-				}
-				game.chooseCharacter();
-				"step 3"
-				if(ui.coin){
-					_status.coinCoeff=get.coinCoeff([game.me.name1,game.me.name2]);
-				}
-				if(lib.storage.test){
-					var str='';
-					for(var i=0;i<game.players.length;i++){
-						str+=get.translation(game.players[i].name1)+' '+get.translation(game.players[i].name2)+'; ';
-					}
-					console.log(str);
-				}
-				var player;
-				if(_status.cheat_seat){
-					var seat=_status.cheat_seat.link;
-					if(seat==0){
-						player=game.me;
-					}
-					else{
-						player=game.players[game.players.length-seat];
-					}
-					if(!player) player=game.me;
-					delete _status.cheat_seat;
-				}
-				else{
-					player=game.players[Math.floor(Math.random()*game.players.length)];
-				}
-				event.trigger('gameStart');
-
-				game.gameDraw(player);
-				for(var i=0;i<game.players.length;i++){
-					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
-					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
-					if(game.players[i]==game.me){
-						lib.translate[game.players[i].name]+='（你）';
-					}
-				}
-
-
-				var players=get.players(lib.sort.position);
-				var info=[];
-				for(var i=0;i<players.length;i++){
-					info.push({
-						name:game.players[i].name,
-						translate:lib.translate[game.players[i].name],
-						name1:players[i].name1,
-						name2:players[i].name2,
-					});
-				}
-				_status.videoInited=true,
-				game.addVideo('init',null,info);
-				if(get.config('guozhan_mode')=='mingjiang'){
-					game.showIdentity(true);
-				}
-				else{
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].ai.shown=0;
-					}
-				}
-				game.phaseLoop(player);
-			}
 		},
 		showIdentity:function(started){
 			if(game.phaseNumber==0&&!started) return;
@@ -950,7 +942,4 @@ mode.guozhan={
 			},
 		}
 	},
-	config:['player_number','initshow_draw',
-	'free_choose','change_identity','change_choice','change_card',
-	'swap','dierestart','revive','double_hp','difficulty']
 }

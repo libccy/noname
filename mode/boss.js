@@ -1,5 +1,344 @@
 'use strict';
 mode.boss={
+	start:function(){
+		"step 0"
+		if(lib.config.hiddenCharacterPack.contains('boss')){
+			game.loadPackage('character/boss');
+		}
+		"step 1"
+		var playback=localStorage.getItem(lib.configprefix+'playback');
+		if(playback){
+			ui.create.me();
+			ui.arena.style.display='none';
+			ui.system.style.display='none';
+			_status.playback=playback;
+			localStorage.removeItem(lib.configprefix+'playback');
+			var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
+			store.get(parseInt(playback)).onsuccess=function(e){
+				if(e.target.result){
+					game.playVideoContent(e.target.result.video);
+				}
+				else{
+					alert('播放失败：找不到录像');
+					game.reload();
+				}
+			}
+			event.finish();
+			return;
+		}
+		for(var i in lib.skill){
+			if(lib.skill[i].changeSeat){
+				lib.skill[i]={};
+				if(lib.translate[i+'_info']){
+					lib.translate[i+'_info']='此模式下不可用';
+				}
+			}
+		}
+		lib.init.css('layout/mode','boss');
+		game.delay(0.1);
+		"step 2"
+		var bosslist=ui.create.div('#bosslist.hidden');
+		event.bosslist=bosslist;
+		bosslist.ontouchmove = ui.click.touchScroll;
+		bosslist.style.WebkitOverflowScrolling='touch';
+		if(!lib.config.touchscreen&&lib.config.mousewheel){
+			bosslist._scrollspeed=30;
+			bosslist._scrollnum=10;
+			bosslist.onmousewheel=ui.click.mousewheel;
+		}
+		var bosslistlinks={};
+		var toggleBoss=function(bool){
+			game.saveConfig(this._link.config._name,bool,true);
+			var node=bosslistlinks[this._link.config._name];
+			if(bool){
+				node.style.display='';
+			}
+			else{
+				node.style.display='none';
+			}
+		};
+		var onpause=function(){
+			ui.window.classList.add('bosspaused');
+		}
+		var onresume=function(){
+			ui.window.classList.remove('bosspaused');
+		}
+		game.onpause=onpause;
+		game.onpause2=onpause;
+		game.onresume=onresume;
+		game.onresume2=onresume;
+		ui.create.div(bosslist);
+
+		event.current=null;
+		var list=[];
+		for(var i in lib.character){
+			var info=lib.character[i];
+			if(info[4].contains('boss')&&!lib.config.banned.contains(i)){
+				var cfg=i+'_bossconfig';
+				if(get.config(cfg)==undefined){
+					game.saveConfig(cfg,true,true);
+				}
+				lib.translate[cfg+'_config']=lib.translate[i];
+				lib.config.current_mode.push([cfg,get.config(cfg),toggleBoss]);
+				lib.mode.boss.config[cfg]={
+					name:get.translation(i),
+					onclick:toggleBoss,
+					init:true,
+				}
+				var player=ui.create.player(bosslist).init(i);
+				list.push(player);
+				player.node.hp.classList.add('text');
+				player.node.hp.dataset.condition='';
+				player.node.hp.innerHTML=info[2];
+				if(info[2]==Infinity){
+					player.node.hp.innerHTML='∞';
+				}
+				player.setIdentity(player.name);
+				player.node.identity.dataset.color=info[5];
+				bosslistlinks[cfg]=player;
+				player.classList.add('bossplayer');
+
+				if(lib.storage.current==i){
+					event.current=player;
+					player.classList.add('highlight');
+				}
+
+				if(!get.config(cfg)){
+					player.style.display='none';
+				}
+			}
+		}
+		if(!list.length){
+			alert('挑战模式不可隐藏boss武将包，请在选项－其它中选择“重置隐藏扩展包”');
+			event.finish();
+			_status.over=true;
+			return;
+		}
+		if(!event.current){
+			event.current=bosslist.childNodes[1];
+			event.current.classList.add('highlight');
+		}
+		ui.create.div(bosslist);
+		lib.translate.boss_pangtong='涅槃凤雏';
+		ui.create.cards();
+		game.finishCards();
+		ui.arena.dataset.number=8;
+		ui.control.style.transitionProperty='opacity';
+		ui.control.classList.add('bosslist');
+		setTimeout(function(){
+			ui.control.style.transitionProperty='';
+		},1000);
+
+		ui.window.appendChild(bosslist);
+
+		setTimeout(function(){
+			if(event.current){
+				var left=event.current.offsetLeft-(ui.window.offsetWidth-180)/2;
+				if(bosslist.scrollLeft<left){
+					bosslist.scrollLeft=left;
+				}
+			}
+			bosslist.show();
+		},200);
+		game.me=ui.create.player();
+		if(lib.config.continue_name_boss){
+			event.noslide=true;
+		}
+		else{
+			game.chooseCharacter(function(target){
+				if(event.current){
+					event.current.classList.remove('highlight');
+				}
+				event.current=target;
+				game.save('current',target.name);
+				target.classList.add('highlight');
+			});
+		}
+		if(lib.storage.test){
+			event.current.classList.remove('highlight');
+			if(event.current.nextSibling&&event.current.nextSibling.classList.contains('player')){
+				event.current=event.current.nextSibling;
+			}
+			else{
+				event.current=event.current.parentNode.childNodes[1];
+			}
+			lib.config.game_speed='vfast';
+			_status.auto=true;
+			ui.auto.classList.add('glow');
+			game.save('current',event.current.name);
+		}
+		"step 3"
+		game.bossinfo=lib.boss.global;
+		for(var i in lib.boss[event.current.name]){
+			game.bossinfo[i]=lib.boss[event.current.name][i];
+		}
+		delete lib.boss;
+
+		setTimeout(function(){
+			ui.control.classList.remove('bosslist');
+		},500);
+		var rect=event.current.getBoundingClientRect();
+		var boss=ui.create.player().init(event.current.name);
+		game.boss=boss;
+		boss.side=true;
+		if(!event.noslide){
+			// boss.classList.add('bossplayer');
+			// boss.classList.add('highlight');
+			boss.animate('bossing');
+			boss.node.hp.animate('start');
+			boss.style.left=(rect.left-ui.arena.offsetLeft)+'px';
+			boss.style.top=(rect.top-ui.arena.offsetTop)+'px';
+		}
+		boss.setIdentity('zhu');
+		boss.identity='zhu';
+		if(lib.config.continue_name_boss){
+			result=lib.config.continue_name_boss;
+			game.saveConfig('continue_name_boss');
+		}
+		for(var i=0;i<result.links.length;i++){
+			var player=ui.create.player(ui.arena).init(result.links[i]).animate('start');
+			player.setIdentity('cai');
+			player.identity='cai';
+			player.side=false;
+			game.players.push(player);
+			if(result.boss){
+				player.dataset.position=(i+1)*2;
+			}
+			else{
+				player.dataset.position=i+1;
+			}
+		}
+		if(result.boss){
+			game.players.unshift(boss);
+			boss.dataset.position=0;
+		}
+		else{
+			game.players.push(boss);
+			boss.dataset.position=7;
+		}
+		ui.create.me();
+		if(game.me!==boss){
+			game.singleHandcard=true;
+			ui.arena.classList.add('single-handcard');
+			ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
+			// ui.fakeme.dataset.position=0;
+			// ui.fakeme.line=lib.element.player.line;
+			// ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
+			// ui.refresh(ui.fakemebg);
+			game.onSwapControl();
+			// ui.fakemebg.show();
+
+			lib.setPopped(ui.create.system('手牌',null,true),function(){
+				var uiintro=ui.create.dialog('hidden');
+
+				var players=game.players.concat(game.dead);
+				for(var i=0;i<players.length;i++){
+					if(players[i].side==game.me.side&&players[i]!=game.me){
+						uiintro.add(get.translation(players[i]));
+						var cards=players[i].get('h');
+						if(cards.length){
+							uiintro.addSmall(cards,true);
+						}
+						else{
+							uiintro.add('（无）');
+						}
+					}
+				}
+
+				return uiintro;
+			},220);
+		}
+		lib.setPopped(ui.create.system('重整',null,true),function(){
+			var uiintro=ui.create.dialog('hidden');
+
+			uiintro.add('重整');
+			var table=ui.create.div('.bosschongzheng');
+
+			var tr,td,added=false;
+			for(var i=0;i<game.dead.length;i++){
+				if(typeof game.dead[i].storage.boss_chongzheng!=='number') continue;
+				added=true;
+				tr=ui.create.div(table);
+				td=ui.create.div(tr);
+				td.innerHTML=get.translation(game.dead[i]);
+				td=ui.create.div(tr);
+				if(game.dead[i].maxHp>0){
+					td.innerHTML='剩余'+get.cnNumber(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
+				}
+				else{
+					td.innerHTML='无法重整'
+				}
+			}
+
+			if(!added){
+				uiintro.add('<div class="text center">（无重整角色）</div>');
+				uiintro.add(ui.create.div('.placeholder.slim'))
+			}
+			else{
+				uiintro.add(table);
+			}
+
+			return uiintro;
+		},180);
+		ui.single_swap=ui.create.system('换人',function(){
+			var players=get.players(game.me);
+			players.remove(game.boss);
+			if(players.length>1){
+				if(ui.auto.classList.contains('hidden')){
+					game.me.popup('请稍后换人');
+					return;
+				}
+				if(_status.event.isMine()){
+					ui.click.auto();
+					setTimeout(function(){
+						ui.click.auto();
+					},500);
+				}
+				game.modeSwapPlayer(players[1]);
+			}
+		},true);
+		if(get.config('single_control')||game.me==game.boss){
+			ui.single_swap.style.display='none';
+		}
+
+		ui.arena.appendChild(boss);
+		ui.refresh(boss);
+		boss.classList.remove('highlight');
+		boss.classList.remove('bossplayer');
+		boss.style.left='';
+		boss.style.top='';
+		boss.style.position='';
+
+		event.bosslist.delete();
+
+		game.arrangePlayers();
+		for(var i=0;i<game.players.length;i++){
+			game.players[i].node.action.innerHTML='行动';
+		}
+
+		var players=get.players(lib.sort.position);
+		var info=[];
+		for(var i=0;i<players.length;i++){
+			info.push({
+				name:players[i].name,
+				identity:players[i].identity,
+				position:players[i].dataset.position
+			});
+		}
+		_status.videoInited=true,
+		info.boss=(game.me==game.boss);
+		game.addVideo('init',null,info);
+		if(game.bossinfo.init){
+			game.bossinfo.init();
+		}
+		"step 5"
+		event.trigger('gameStart');
+		game.gameDraw(game.boss);
+		game.bossPhaseLoop();
+		setTimeout(function(){
+			ui.updatehl();
+		},200);
+	},
 	element:{
 		player:{
 			dieAfter:function(){
@@ -62,353 +401,6 @@ mode.boss={
 			}
 			var name=[str,str2];
 			return name;
-		},
-		start:function(){
-			var next=game.createEvent('game',false);
-			next.content=function(){
-				"step 0"
-				if(lib.db&&!_status.characterLoaded){
-					_status.waitingForCharacters=true;
-					game.pause();
-				}
-				"step 1"
-				if(lib.config.hiddenCharacterPack.contains('boss')){
-					game.loadPackage('character/boss');
-				}
-				"step 2"
-				var playback=localStorage.getItem(lib.configprefix+'playback');
-				if(playback){
-					ui.create.me();
-					ui.arena.style.display='none';
-					ui.system.style.display='none';
-					_status.playback=playback;
-					localStorage.removeItem(lib.configprefix+'playback');
-					var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
-					store.get(parseInt(playback)).onsuccess=function(e){
-						if(e.target.result){
-							game.playVideoContent(e.target.result.video);
-						}
-						else{
-							alert('播放失败：找不到录像');
-							game.reload();
-						}
-					}
-					event.finish();
-					return;
-				}
-				for(var i in lib.skill){
-					if(lib.skill[i].changeSeat){
-						lib.skill[i]={};
-						if(lib.translate[i+'_info']){
-							lib.translate[i+'_info']='此模式下不可用';
-						}
-					}
-				}
-				lib.init.css('layout/mode','boss');
-				game.delay(0.1);
-				"step 3"
-				var bosslist=ui.create.div('#bosslist.hidden');
-				event.bosslist=bosslist;
-				bosslist.ontouchmove = ui.click.touchScroll;
-				bosslist.style.WebkitOverflowScrolling='touch';
-				if(!lib.config.touchscreen&&lib.config.mousewheel){
-					bosslist._scrollspeed=30;
-					bosslist._scrollnum=10;
-					bosslist.onmousewheel=ui.click.mousewheel;
-				}
-				var bosslistlinks={};
-				var toggleBoss=function(bool){
-					game.saveConfig(this._link.config._name,bool,true);
-					var node=bosslistlinks[this._link.config._name];
-					if(bool){
-						node.style.display='';
-					}
-					else{
-						node.style.display='none';
-					}
-				};
-				var onpause=function(){
-					ui.window.classList.add('bosspaused');
-				}
-				var onresume=function(){
-					ui.window.classList.remove('bosspaused');
-				}
-				game.onpause=onpause;
-				game.onpause2=onpause;
-				game.onresume=onresume;
-				game.onresume2=onresume;
-				ui.create.div(bosslist);
-
-				event.current=null;
-				var list=[];
-				for(var i in lib.character){
-					var info=lib.character[i];
-					if(info[4].contains('boss')&&!lib.config.banned.contains(i)){
-						var cfg=i+'_bossconfig';
-						if(get.config(cfg)==undefined){
-							game.saveConfig(cfg,true,true);
-						}
-						lib.translate[cfg+'_config']=lib.translate[i];
-						lib.config.current_mode.push([cfg,get.config(cfg),toggleBoss]);
-						lib.mode.boss.config[cfg]={
-							name:get.translation(i),
-							onclick:toggleBoss,
-							init:true,
-						}
-						var player=ui.create.player(bosslist).init(i);
-						list.push(player);
-						player.node.hp.classList.add('text');
-						player.node.hp.dataset.condition='';
-						player.node.hp.innerHTML=info[2];
-						if(info[2]==Infinity){
-							player.node.hp.innerHTML='∞';
-						}
-						player.setIdentity(player.name);
-						player.node.identity.dataset.color=info[5];
-						bosslistlinks[cfg]=player;
-						player.classList.add('bossplayer');
-
-						if(lib.storage.current==i){
-							event.current=player;
-							player.classList.add('highlight');
-						}
-
-						if(!get.config(cfg)){
-							player.style.display='none';
-						}
-					}
-				}
-				if(!list.length){
-					alert('挑战模式不可隐藏boss武将包，请在选项－其它中选择“重置隐藏扩展包”');
-					event.finish();
-					_status.over=true;
-					return;
-				}
-				if(!event.current){
-					event.current=bosslist.childNodes[1];
-					event.current.classList.add('highlight');
-				}
-				ui.create.div(bosslist);
-				lib.translate.boss_pangtong='涅槃凤雏';
-				ui.create.cards();
-				game.finishCards();
-				ui.arena.dataset.number=8;
-				ui.control.style.transitionProperty='opacity';
-				ui.control.classList.add('bosslist');
-				setTimeout(function(){
-					ui.control.style.transitionProperty='';
-				},1000);
-
-				ui.window.appendChild(bosslist);
-
-				setTimeout(function(){
-					if(event.current){
-						var left=event.current.offsetLeft-(ui.window.offsetWidth-180)/2;
-						if(bosslist.scrollLeft<left){
-							bosslist.scrollLeft=left;
-						}
-					}
-					bosslist.show();
-				},200);
-				game.me=ui.create.player();
-				if(lib.config.continue_name_boss){
-					event.noslide=true;
-				}
-				else{
-					game.chooseCharacter(function(target){
-						if(event.current){
-							event.current.classList.remove('highlight');
-						}
-						event.current=target;
-						game.save('current',target.name);
-						target.classList.add('highlight');
-					});
-				}
-				if(lib.storage.test){
-					event.current.classList.remove('highlight');
-					if(event.current.nextSibling&&event.current.nextSibling.classList.contains('player')){
-						event.current=event.current.nextSibling;
-					}
-					else{
-						event.current=event.current.parentNode.childNodes[1];
-					}
-					lib.config.game_speed='vfast';
-					_status.auto=true;
-					ui.auto.classList.add('glow');
-					game.save('current',event.current.name);
-				}
-				"step 4"
-				game.bossinfo=lib.boss.global;
-				for(var i in lib.boss[event.current.name]){
-					game.bossinfo[i]=lib.boss[event.current.name][i];
-				}
-				delete lib.boss;
-
-				setTimeout(function(){
-					ui.control.classList.remove('bosslist');
-				},500);
-				var rect=event.current.getBoundingClientRect();
-				var boss=ui.create.player().init(event.current.name);
-				game.boss=boss;
-				boss.side=true;
-				if(!event.noslide){
-					// boss.classList.add('bossplayer');
-					// boss.classList.add('highlight');
-					boss.animate('bossing');
-					boss.node.hp.animate('start');
-					boss.style.left=(rect.left-ui.arena.offsetLeft)+'px';
-					boss.style.top=(rect.top-ui.arena.offsetTop)+'px';
-				}
-				boss.setIdentity('zhu');
-				boss.identity='zhu';
-				if(lib.config.continue_name_boss){
-					result=lib.config.continue_name_boss;
-					game.saveConfig('continue_name_boss');
-				}
-				for(var i=0;i<result.links.length;i++){
-					var player=ui.create.player(ui.arena).init(result.links[i]).animate('start');
-					player.setIdentity('cai');
-					player.identity='cai';
-					player.side=false;
-					game.players.push(player);
-					if(result.boss){
-						player.dataset.position=(i+1)*2;
-					}
-					else{
-						player.dataset.position=i+1;
-					}
-				}
-				if(result.boss){
-					game.players.unshift(boss);
-					boss.dataset.position=0;
-				}
-				else{
-					game.players.push(boss);
-					boss.dataset.position=7;
-				}
-				ui.create.me();
-				if(game.me!==boss){
-					game.singleHandcard=true;
-					ui.arena.classList.add('single-handcard');
-					ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
-					// ui.fakeme.dataset.position=0;
-					// ui.fakeme.line=lib.element.player.line;
-					// ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
-					// ui.refresh(ui.fakemebg);
-					game.onSwapControl();
-					// ui.fakemebg.show();
-
-					lib.setPopped(ui.create.system('手牌',null,true),function(){
-						var uiintro=ui.create.dialog('hidden');
-
-						var players=game.players.concat(game.dead);
-						for(var i=0;i<players.length;i++){
-							if(players[i].side==game.me.side&&players[i]!=game.me){
-								uiintro.add(get.translation(players[i]));
-								var cards=players[i].get('h');
-								if(cards.length){
-									uiintro.addSmall(cards,true);
-								}
-								else{
-									uiintro.add('（无）');
-								}
-							}
-						}
-
-						return uiintro;
-					},220);
-				}
-				lib.setPopped(ui.create.system('重整',null,true),function(){
-					var uiintro=ui.create.dialog('hidden');
-
-					uiintro.add('重整');
-					var table=ui.create.div('.bosschongzheng');
-
-					var tr,td,added=false;
-					for(var i=0;i<game.dead.length;i++){
-						if(typeof game.dead[i].storage.boss_chongzheng!=='number') continue;
-						added=true;
-						tr=ui.create.div(table);
-						td=ui.create.div(tr);
-						td.innerHTML=get.translation(game.dead[i]);
-						td=ui.create.div(tr);
-						if(game.dead[i].maxHp>0){
-							td.innerHTML='剩余'+get.cnNumber(game.bossinfo.chongzheng-game.dead[i].storage.boss_chongzheng)+'回合';
-						}
-						else{
-							td.innerHTML='无法重整'
-						}
-					}
-
-					if(!added){
-						uiintro.add('<div class="text center">（无重整角色）</div>');
-						uiintro.add(ui.create.div('.placeholder.slim'))
-					}
-					else{
-						uiintro.add(table);
-					}
-
-					return uiintro;
-				},180);
-				ui.single_swap=ui.create.system('换人',function(){
-					var players=get.players(game.me);
-					players.remove(game.boss);
-					if(players.length>1){
-						if(ui.auto.classList.contains('hidden')){
-							game.me.popup('请稍后换人');
-							return;
-						}
-						if(_status.event.isMine()){
-							ui.click.auto();
-							setTimeout(function(){
-								ui.click.auto();
-							},500);
-						}
-						game.modeSwapPlayer(players[1]);
-					}
-				},true);
-				if(get.config('single_control')||game.me==game.boss){
-					ui.single_swap.style.display='none';
-				}
-
-				ui.arena.appendChild(boss);
-				ui.refresh(boss);
-				boss.classList.remove('highlight');
-				boss.classList.remove('bossplayer');
-				boss.style.left='';
-				boss.style.top='';
-				boss.style.position='';
-
-				event.bosslist.delete();
-
-				game.arrangePlayers();
-				for(var i=0;i<game.players.length;i++){
-					game.players[i].node.action.innerHTML='行动';
-				}
-
-				var players=get.players(lib.sort.position);
-				var info=[];
-				for(var i=0;i<players.length;i++){
-					info.push({
-						name:players[i].name,
-						identity:players[i].identity,
-						position:players[i].dataset.position
-					});
-				}
-				_status.videoInited=true,
-				info.boss=(game.me==game.boss);
-				game.addVideo('init',null,info);
-				if(game.bossinfo.init){
-					game.bossinfo.init();
-				}
-				"step 5"
-				event.trigger('gameStart');
-				game.gameDraw(game.boss);
-				game.bossPhaseLoop();
-				setTimeout(function(){
-					ui.updatehl();
-				},200);
-			}
 		},
 		bossPhaseLoop:function(){
 			var next=game.createEvent('phaseLoop');
@@ -794,5 +786,4 @@ mode.boss={
 			}
 		}
 	},
-	config:['ban_weak','change_choice','free_choose','']
 }
