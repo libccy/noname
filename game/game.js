@@ -5244,13 +5244,10 @@
 					}
 					if(player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
-						// if(get.config('swap')&&lib.config.mode_choice.contains('swap')){
-						// 	ui.swap=ui.create.control('换人',ui.click.dieswap);
-						// }
-						if(get.config('revive')&&lib.config.mode_choice.contains('revive')){
+						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive){
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
 						}
-						if(get.config('dierestart')&&lib.config.mode_choice.contains('dierestart')){
+						if(get.config('dierestart')&&lib.mode[lib.config.mode].config.dierestart){
 							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
@@ -22715,7 +22712,6 @@
 					delete game.onover;
 				}
 				lib.config.current_mode=mode[lib.config.mode].config||[];
-				lib.config.mode_choice=mode[lib.config.mode].config;
 				lib.config.banned=get.config('banned')||[];
 				lib.config.bannedcards=get.config('bannedcards')||[];
 
