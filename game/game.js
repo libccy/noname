@@ -180,7 +180,7 @@
 					},
 					swipe_down:{
 						name:'下划操作',
-						init:'system',
+						init:'menu',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
@@ -224,6 +224,17 @@
 							pause:'切换暂停',
 							auto:'切换托管',
 							off:'关闭',
+						}
+					},
+					round_menu_func:{
+						name:'触屏按钮操作',
+						init:'system',
+						unfrequent:true,
+						item:{
+							system:'显示按钮',
+							menu:'打开菜单',
+							// pause:'切换暂停',
+							// auto:'切换托管'
 						}
 					},
 					show_splash:{
@@ -369,6 +380,12 @@
 						else{
 							map.enable_dragline.hide();
 							map.enable_touchdragline.hide();
+						}
+						if(lib.config.layout!='phone'){
+							map.round_menu_func.hide();
+						}
+						else{
+							map.round_menu_func.show();
 						}
 					}
 				}
@@ -785,25 +802,6 @@
 						unfrequent:true,
 						restart:true,
 					},
-					// bottom_line:{
-					// 	name:'指示线置底',
-					// 	init:false,
-					// 	unfrequent:true,
-					// 	onclick:function(bool){
-					// 		game.saveConfig('bottom_line',bool);
-					// 		if(lib.config.bottom_line){
-					// 			ui.canvas.style.zIndex=0;
-					// 		}
-					// 		else{
-					// 			ui.canvas.style.zIndex='';
-					// 		}
-					// 	}
-					// },
-					// line_dash:{
-					// 	name:'虚线指示线',
-					// 	init:false,
-					// 	unfrequent:true,
-					// },
 					show_name:{
 						name:'显示武将名',
 						init:false,
@@ -820,49 +818,6 @@
 									game.players[i].node.name.style.display='none';
 								}
 							}
-						}
-					},
-					// savevideo:{
-					// 	name:'显示保存录像',
-					// 	init:true,
-					// 	onclick:function(bool){
-					// 		game.saveConfig('savevideo',bool);
-					// 		if(!lib.db) return;
-					// 		if(lib.config.savevideo){
-					// 			if(!ui.savevideo&&_status.over){
-					// 				ui.savevideo=ui.create.control('保存录像',game.saveVideo);
-					// 			}
-					// 		}
-					// 		else if(ui.savevideo){
-					// 			ui.savevideo.close();
-					// 			delete ui.savevideo;
-					// 		}
-					// 	},
-					// 	unfrequent:true,
-					// },
-					show_roundmenu:{
-						name:'显示触屏按钮',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_roundmenu',bool);
-							if(bool&&lib.config.touchscreen){
-								ui.roundmenu.style.display='';
-							}
-							else{
-								ui.roundmenu.style.display='none';
-							}
-						}
-					},
-					round_menu_func:{
-						name:'触屏按钮功能',
-						init:'system',
-						unfrequent:true,
-						item:{
-							system:'显示按钮',
-							menu:'打开菜单',
-							// pause:'切换暂停',
-							// auto:'切换托管'
 						}
 					},
 					show_replay:{
@@ -1120,14 +1075,6 @@
 						}
 						else{
 							map.import_background.hide();
-						}
-						if(lib.config.layout!='phone'){
-							map.round_menu_func.hide();
-							map.show_roundmenu.hide();
-						}
-						else{
-							map.round_menu_func.show();
-							map.show_roundmenu.show();
 						}
 						if(config.show_card_prompt){
 							map.hide_card_prompt_basic.show();
@@ -11486,7 +11433,6 @@
 			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
 			var opacity=1;
 			var color=[255,255,255];
-			// var dashed=lib.config.line_dash;
 			var dashed=false;
 			if(typeof arguments[1]=='object'){
 				for(var i in arguments[1]){
@@ -11557,7 +11503,6 @@
 			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
 			var opacity=1;
 			var color=[255,255,255];
-			// var dashed=lib.config.line_dash;
 			var dashed=false;
 			if(typeof arguments[1]=='object'){
 				for(var i in arguments[1]){
@@ -12859,6 +12804,19 @@
 				}
 			}
 			return players[0];
+		},
+		loadMode:function(mode){
+			var next=game.createEvent('loadMode');
+			next.mode=mode;
+			next.content=function(){
+				'step 0'
+				window.mode={};
+				lib.init.js('mode',event.mode,game.resume);
+				game.pause();
+				'step 1'
+				event.result=window.mode[event.mode];
+				delete window.mode;
+			}
 		},
 		loadPackage:function(){
 			var next=game.createEvent('loadPackage');
@@ -14486,9 +14444,6 @@
 				ui.sidebar=ui.create.div('#sidebar');
 				ui.sidebar3=ui.create.div('#sidebar3');
 				ui.canvas=document.createElement('canvas');
-				// if(lib.config.bottom_line){
-				// 	ui.canvas.style.zIndex=0;
-				// }
 
 				ui.arena.appendChild(ui.canvas);
 				ui.canvas.id='canvas';
@@ -19830,15 +19785,6 @@
 					}
 					else{
 						ui.replay.style.display='none';
-					}
-				},
-				bottom_line:function(bool){
-					game.saveConfig('bottom_line',bool);
-					if(lib.config.bottom_line){
-						ui.canvas.style.zIndex=0;
-					}
-					else{
-						ui.canvas.style.zIndex='';
 					}
 				},
 				show_playerids:function(bool){

@@ -139,8 +139,6 @@ window.config={
 
 		config_menu_config:'选项菜单',
 		show_playerids_config:'显示身份按钮',
-		bottom_line_config:'指示线置底',
-		line_dash_config:'虚线指示线',
 		show_replay_config:'显示重来按钮',
 		show_pause_config:'显示暂停按钮',
 		show_wuxie_config:'显示不询问无懈',
