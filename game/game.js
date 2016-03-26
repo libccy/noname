@@ -9972,6 +9972,7 @@
 					var blob = zip.generate({type:"blob"});
 					var fileNameToSaveAs = packname||'noname';
 					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
+					fileNameToSaveAs+='.zip';
 
 					if(window.resolveLocalFileSystemURL){
 						window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,function(entry){
@@ -9980,7 +9981,7 @@
 									fileWriter.onwriteend=function(){
 										alert('文件已导出至'+cordova.file.externalDataDirectory+fileNameToSaveAs);
 									}
-									fileWriter.write(textFileAsBlob)
+									fileWriter.write(blob)
 								});
 							});
 						});
