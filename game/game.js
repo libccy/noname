@@ -2821,20 +2821,25 @@
 				for(var i=0;i<scripts.length;i++){
 					if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
 						if(scripts[i].src.indexOf('ios')!=-1){
+							lib.device='ios';
 							var ua=navigator.userAgent.toLowerCase();
 							if(ua.indexOf('ipad')!=-1){
 								window.isIpad=true;
 							}
 							else{
 								var metas=document.head.querySelectorAll('meta');
-								for(var i=0;i<metas.length;i++){
-									if(metas[i].name=='viewport'){
-										metas[i].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
+								for(var j=0;j<metas.length;j++){
+									if(metas[j].name=='viewport'){
+										metas[j].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
+										break;
 									}
 								}
 							}
 						}
-						if(scripts[i].src.indexOf('cordova')!=-1){
+						else if(scripts[i].src.indexOf('android')!=-1){
+							lib.device='android';
+						}
+						if(scripts[i].src.indexOf('cdvfile')!=-1){
 							lib.assetLoading=[];
 						}
 						break;
@@ -3164,7 +3169,7 @@
 					}
 				});
 
-				if(navigator.userAgent.toLowerCase().indexOf('android')!=-1){
+				if(lib.device=='android'){
 					window._onDeviceReady=function(){
 						document.addEventListener("pause", function(){
 							if(!_status.paused2&&!_status.event.isMine()){
@@ -3200,29 +3205,30 @@
 								navigator.app.exitApp();
 							}
 						});
-						if(window.resolveLocalFileSystemURL){
-							window.resolveLocalFileSystemURL(cordova.file.externalApplicationStorageDirectory,function(entry){
-								var url=entry.toURL();
-								if(Array.isArray(lib.assetLoading)){
-									for(var i=0;i<lib.assetLoading.length;i++){
-										var item=lib.assetLoading[i];
-										if(typeof item=='string'){
-											ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+item+"';src: url('"+url+"font/"+item+".ttf');}",0);
-										}
-										else if(item._cordovaimg){
-											item.style.backgroundImage='url("'+url+item._cordovaimg+'")';
-											delete item._cordovaimg;
-										}
-										else if(item._cordovasrc){
-											item.src=url+item._cordovasrc;
-											delete item._cordovasrc;
-										}
-									}
+						if(Array.isArray(lib.assetLoading)){
+							var url=cordova.file.externalApplicationStorageDirectory;
+							for(var i=0;i<lib.assetLoading.length;i++){
+								var item=lib.assetLoading[i];
+								if(typeof item=='string'){
+									ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+item+"';src: url('"+url+"font/"+item+".ttf');}",0);
 								}
-								delete lib.assetLoading;
-								lib.assetURL=url;
-							});
+								else if(item._cordovaimg){
+									item.style.backgroundImage='url("'+url+item._cordovaimg+'")';
+									delete item._cordovaimg;
+								}
+								else if(item._cordovasrc){
+									item.src=url+item._cordovasrc;
+									delete item._cordovasrc;
+								}
+							}
+							delete lib.assetLoading;
+							lib.assetURL=url;
 						}
+					}
+				}
+				else if(lib.device=='ios'){
+					window._onDeviceReady=function(){
+						game.export('123');
 					}
 				}
 			},
@@ -9941,12 +9947,19 @@
 			var fileNameToSaveAs = name||'noname';
 			fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
 
-			if(window.resolveLocalFileSystemURL){
-				window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,function(entry){
+			if(lib.device=='android'||lib.device=='ios'){
+				var directory;
+				if(lib.device=='android'){
+					directory=cordova.file.externalDataDirectory;
+				}
+				else{
+					directory=cordova.file.documentsDirectory;
+				}
+				window.resolveLocalFileSystemURL(directory,function(entry){
 					entry.getFile(fileNameToSaveAs,{create:true},function(fileEntry){
 						fileEntry.createWriter(function(fileWriter){
 							fileWriter.onwriteend=function(){
-								alert('文件已导出至'+cordova.file.externalDataDirectory+fileNameToSaveAs);
+								alert('文件已导出至'+directory+fileNameToSaveAs);
 							}
 							fileWriter.write(textFileAsBlob)
 						});
@@ -9977,11 +9990,18 @@
 					fileNameToSaveAs+='.zip';
 
 					if(window.resolveLocalFileSystemURL){
-						window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,function(entry){
+						var directory;
+						if(lib.device=='android'){
+							directory=cordova.file.externalDataDirectory;
+						}
+						else{
+							directory=cordova.file.documentsDirectory;
+						}
+						window.resolveLocalFileSystemURL(directory,function(entry){
 							entry.getFile(fileNameToSaveAs,{create:true},function(fileEntry){
 								fileEntry.createWriter(function(fileWriter){
 									fileWriter.onwriteend=function(){
-										alert('文件已导出至'+cordova.file.externalDataDirectory+fileNameToSaveAs);
+										alert('文件已导出至'+directory+fileNameToSaveAs);
 									}
 									fileWriter.write(blob)
 								});
@@ -15152,7 +15172,7 @@
 																game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
 															}
 														}
-														if(game.importedPack.image){
+														if(game.importedPack.image&&lib.db){
 															for(var i=0;i<game.importedPack.image.length;i++){
 																var buttons=page.querySelectorAll('.button.character');
 																for(var j=0;j<buttons.length;j++){

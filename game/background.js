@@ -71,15 +71,21 @@
             }
         }
     },5000);
-    if(navigator.userAgent.toLowerCase().indexOf('android')!=-1){
-        var script=document.createElement('script');
-        script.src='cordova.js';
-        document.body.appendChild(script);
-        document.addEventListener('deviceready',function(){
-            if(window._onDeviceReady){
-                window._onDeviceReady();
-                delete window._onDeviceReady;
+    var scripts=document.head.querySelectorAll('script');
+    for(var i=0;i<scripts.length;i++){
+        if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
+            if(scripts[i].src.indexOf('ios')!=-1||scripts[i].src.indexOf('android')!=-1){
+                var script=document.createElement('script');
+                script.src='cordova.js';
+                document.body.appendChild(script);
+                document.addEventListener('deviceready',function(){
+                    if(window._onDeviceReady){
+                        window._onDeviceReady();
+                        delete window._onDeviceReady;
+                    }
+                });
             }
-        });
+            break;
+        }
     }
 }())
