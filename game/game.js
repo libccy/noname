@@ -16,7 +16,7 @@
 		dieClose:[]
 	};
 	var lib={
-		version:'1.7.12',
+		version:'1.8.0',
 		changeLog:[
 			'安卓版改进：',
 			'·程序与素材分离',
