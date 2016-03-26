@@ -16,13 +16,15 @@
 		dieClose:[]
 	};
 	var lib={
-		version:'1.7.11',
+		version:'1.7.12',
 		changeLog:[
-			'扩展',
-			'AI改进',
-			'安卓屏幕常亮'
+			'安卓版改进：',
+			'·程序与素材分离',
+			'·可导出数据',
+			'·自动暂停、确认退出等'
 		],
 		configprefix:'noname_0.9_',
+		assetURL:'',
 		updates:[],
 		canvasUpdates:[],
 		video:[],
@@ -255,6 +257,10 @@
 					},
 					sync_speed:{
 						name:'限制结算速度',
+						init:true
+					},
+					enable_vibrate:{
+						name:'开启震动',
 						init:true
 					},
 					right_click:{
@@ -564,7 +570,7 @@
 								});
 							}
 							else{
-								ui.background.style.backgroundImage="url('image/background/"+lib.config.image_background+".jpg')";
+								ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
 							}
 							ui.background.style.backgroundSize='cover';
 						},
@@ -992,12 +998,7 @@
 						name:'人名字体',
 						init:'xinwei',
 						unfrequent:true,
-						item:{
-							xinwei:'新魏',
-							huangcao:'黄草',
-							xiaozhuan:'小篆',
-							// default:'默认',
-						},
+						item:{},
 						onclick:function(font){
 							game.saveConfig('name_font',font);
 							ui.arena.dataset.name_font=font;
@@ -1007,12 +1008,7 @@
 						name:'身份字体',
 						init:'huangcao',
 						unfrequent:true,
-						item:{
-							xinwei:'新魏',
-							huangcao:'黄草',
-							xiaozhuan:'小篆',
-							// default:'默认',
-						},
+						item:{},
 						onclick:function(font){
 							game.saveConfig('identity_font',font);
 							ui.arena.dataset.identity_font=font;
@@ -1022,12 +1018,7 @@
 						name:'卡牌字体',
 						init:'default',
 						unfrequent:true,
-						item:{
-							xinwei:'新魏',
-							huangcao:'黄草',
-							xiaozhuan:'小篆',
-							default:'默认',
-						},
+						item:{},
 						onclick:function(font){
 							game.saveConfig('cardtext_font',font);
 							ui.arena.dataset.cardtext_font=font;
@@ -1037,12 +1028,7 @@
 						name:'界面字体',
 						init:'default',
 						unfrequent:true,
-						item:{
-							xinwei:'新魏',
-							huangcao:'黄草',
-							xiaozhuan:'小篆',
-							default:'默认',
-						},
+						item:{},
 						onclick:function(font){
 							game.saveConfig('global_font',font);
 							ui.arena.dataset.global_font=font;
@@ -1567,8 +1553,7 @@
 							for(var i in localStorage){
 								data[i]=localStorage[i];
 							}
-							game.export(lib.init.encode(JSON.stringify(data)),
-							'无名杀 - 数据 - '+(new Date()).toLocaleString());
+							game.export(lib.init.encode(JSON.stringify(data)),'无名杀 - 数据 - '+(new Date()).toLocaleString());
 						},
 						clear:true
 					},
@@ -2832,6 +2817,30 @@
 		},
 		init:{
 			init:function(){
+				var scripts=document.head.querySelectorAll('script');
+				for(var i=0;i<scripts.length;i++){
+					if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
+						if(scripts[i].src.indexOf('ios')!=-1){
+							var ua=navigator.userAgent.toLowerCase();
+							if(ua.indexOf('ipad')!=-1){
+								window.isIpad=true;
+							}
+							else{
+								var metas=document.head.querySelectorAll('meta');
+								for(var i=0;i<metas.length;i++){
+									if(metas[i].name=='viewport'){
+										metas[i].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
+									}
+								}
+							}
+						}
+						if(scripts[i].src.indexOf('asset')!=-1){
+							lib.assetLoading=[];
+						}
+						break;
+					}
+				}
+
 				lib.config={};
 				var config2;
 				var config=window.config;
@@ -2931,12 +2940,31 @@
 						delete lib.configMenu.audio.config.background_music.item.music_custom;
 					}
 				}
+				ui.fontsheet=document.createElement('style');
+				document.head.appendChild(ui.fontsheet);
+				if(font&&font.pack){
+					for(i in font.pack){
+						lib.configMenu.appearence.config.name_font.item[i]=font.pack[i];
+						lib.configMenu.appearence.config.identity_font.item[i]=font.pack[i];
+						lib.configMenu.appearence.config.cardtext_font.item[i]=font.pack[i];
+						lib.configMenu.appearence.config.global_font.item[i]=font.pack[i];
+						if(Array.isArray(lib.assetLoading)){
+							lib.assetLoading.push(i);
+						}
+						else{
+							ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"';src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
+						}
+					}
+					lib.configMenu.appearence.config.cardtext_font.item.default='默认';
+					lib.configMenu.appearence.config.global_font.item.default='默认';
+				}
 				delete character.pack;
 				delete card.pack;
 				delete play.pack;
 				delete mode.pack;
 				delete window.background;
 				delete window.music;
+				delete window.font;
 
 				if(lib.config.all.mode.indexOf('chess')!=-1){
 					for(var i in lib.help2){
@@ -3017,6 +3045,7 @@
 							game.saveConfig('touchscreen',true);
 							game.saveConfig('low_performance',true);
 							game.saveConfig('layout','phone');
+							game.saveConfig('confirm_exit',true);
 							game.reload();
 						}
 					}
@@ -3135,23 +3164,63 @@
 					}
 				});
 
-				var scripts=document.head.querySelectorAll('script');
-				for(var i=0;i<scripts.length;i++){
-					if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
-						if(scripts[i].src.indexOf('ios')!=-1){
-							var ua=navigator.userAgent.toLowerCase();
-							if(ua.indexOf('ipad')!=-1){
-								window.isIpad=true;
+				if(navigator.userAgent.toLowerCase().indexOf('android')!=-1){
+					window._onDeviceReady=function(){
+						document.addEventListener("pause", function(){
+							if(!_status.paused2&&!_status.event.isMine()){
+								ui.click.pause();
+							}
+							if(ui.backgroundMusic){
+								ui.backgroundMusic.pause();
+							}
+						});
+						document.addEventListener("resume", function(){
+							if(ui.backgroundMusic){
+								ui.backgroundMusic.play();
+							}
+						});
+						document.addEventListener("backbutton", function(){
+							if(ui.arena.classList.contains('menupaused')){
+								ui.click.configMenu();
+							}
+							else if(lib.config.confirm_exit){
+								navigator.notification.confirm(
+									'是否退出游戏？',
+									 function(index){
+										 switch(index){
+											 case 2:game.saveConfig('null');game.reload();break;
+											 case 3:navigator.app.exitApp();break;
+										 }
+									 },
+									'确认退出',
+									['取消','重新开始','退出']
+								);
 							}
 							else{
-								var metas=document.head.querySelectorAll('meta');
-								for(var i=0;i<metas.length;i++){
-									if(metas[i].name=='viewport'){
-										metas[i].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
+								navigator.app.exitApp();
+							}
+						});
+						window.resolveLocalFileSystemURL(cordova.file.externalApplicationStorageDirectory,function(entry){
+							var url=entry.toURL();
+							if(Array.isArray(lib.assetLoading)){
+								for(var i=0;i<lib.assetLoading.length;i++){
+									var item=lib.assetLoading[i];
+									if(typeof item=='string'){
+										ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+item+"';src: url('"+url+"font/"+item+".ttf');}",0);
+									}
+									else if(item._cordovaimg){
+										item.style.backgroundImage='url("'+url+item._cordovaimg+'")';
+										delete item._cordovaimg;
+									}
+									else if(item._cordovasrc){
+										item.src=url+item._cordovasrc;
+										delete item._cordovasrc;
 									}
 								}
 							}
-						}
+							delete lib.assetLoading;
+							lib.assetURL=url;
+						});
 					}
 				}
 			},
@@ -3510,6 +3579,10 @@
 					if(event.isMine()){
 						if(!ok||!lib.config.auto_confirm){
 							game.pause();
+							if(lib.config.enable_vibrate&&player._noVibrate){
+								delete player._noVibrate;
+								game.vibrate();
+							}
 						}
 						if(typeof event.prompt=='string'){
 							if(!ok) event.dialog=ui.create.dialog(event.prompt);
@@ -4512,41 +4585,7 @@
 					"step 0"
 					var info=get.info(event.skill);
 					event._skill=event.skill;
-					if(!info.direct&&lib.config.background_speak&&
-						(!lib.skill.global.contains(event.skill)||lib.skill[event.skill].forceaudio)){
-						var audioname=event.skill;
-						var audioinfo=info.audio;
-						if(typeof audioinfo=='string'){
-							audioname=audioinfo;
-							if(lib.skill[audioinfo]){
-								audioinfo=lib.skill[audioinfo].audio;
-							}
-						}
-						else if(Array.isArray(audioinfo)){
-							audioname=audioinfo[0];
-							audioinfo=audioinfo[1];
-						}
-						if(Array.isArray(info.audioname)){
-							if(info.audioname.contains(player.name)){
-								audioname+='_'+player.name;
-							}
-							else if(info.audioname.contains(player.name1)){
-								audioname+='_'+player.name1;
-							}
-							else if(info.audioname.contains(player.name2)){
-								audioname+='_'+player.name2;
-							}
-						}
-						if(typeof audioinfo=='number'){
-							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
-						}
-						else if(audioinfo){
-							game.playAudio('skill',audioname);
-						}
-						else if(lib.config.background_ogg&&info.audio!==false){
-							game.playSkillAudio(audioname);
-						}
-					}
+					game.trySkillAudio(event.skill,player);
 					if(player.checkShow){
 						player.checkShow(event.skill);
 					}
@@ -7063,43 +7102,7 @@
 					if(this.checkShow){
 						this.checkShow(name);
 					}
-					var info=lib.skill[name];
-					if(info&&lib.config.background_speak){
-						var audioname=name;
-						var audioinfo=info.audio;
-						if(typeof audioinfo=='string'){
-							audioname=audioinfo;
-							if(lib.skill[audioinfo]){
-								audioinfo=lib.skill[audioinfo].audio;
-							}
-						}
-						else if(Array.isArray(audioinfo)){
-							audioname=audioinfo[0];
-							audioinfo=audioinfo[1];
-						}
-						if(Array.isArray(info.audioname)){
-							if(info.audioname.contains(this.name)){
-								audioname+='_'+this.name;
-							}
-							else if(info.audioname.contains(this.name1)){
-								audioname+='_'+this.name1;
-							}
-							else if(info.audioname.contains(this.name2)){
-								audioname+='_'+this.name2;
-							}
-						}
-						if(typeof audioinfo==='number'){
-							game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
-						}
-						else if(audioinfo){
-							game.playAudio('skill',audioname);
-						}
-						else{
-							if(lib.config.background_ogg&&info.audio!==false){
-								game.playSkillAudio(audioname);
-							}
-						}
-					}
+					game.trySkillAudio(name,this,true);
 					if(lib.config.mode=='chess'){
 						this.chessFocus();
 					}
@@ -8649,7 +8652,7 @@
 							this.node.image.setBackgroundDB(img);
 						}
 						else{
-							this.node.image.style.backgroundImage='url("image/card/'+card[2]+'.png")'
+							this.node.image.setBackgroundImage('image/card/'+card[2]+'.png');
 						}
 					}
 					else if(lib.card[card[2]].image=='background'){
@@ -9445,6 +9448,7 @@
 					game.log();
 					game.log(player,'的回合开始');
 					game.phaseNumber++;
+					player._noVibrate=true;
 					if(get.config('identity_mode')!='zhong'){
 						var num;
 						switch(get.config('auto_identity')){
@@ -9694,7 +9698,7 @@
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			audio.src='audio'+str+'.mp3';
+			audio.src=lib.assetURL+'audio'+str+'.mp3';
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
@@ -9703,11 +9707,50 @@
 					this.remove();
 				}
 				else{
-					this.src='audio'+str+'.ogg';
+					this.src=lib.assetURL+'audio'+str+'.ogg';
 					this._changed=true;
 				}
 			};
 			ui.window.appendChild(audio);
+		},
+		trySkillAudio:function(skill,player,directaudio){
+			var info=get.info(skill);
+			if(!info) return;
+			if((!info.direct||directaudio)&&lib.config.background_speak&&
+				(!lib.skill.global.contains(skill)||lib.skill[skill].forceaudio)){
+				var audioname=skill;
+				var audioinfo=info.audio;
+				if(typeof audioinfo=='string'){
+					audioname=audioinfo;
+					if(lib.skill[audioinfo]){
+						audioinfo=lib.skill[audioinfo].audio;
+					}
+				}
+				else if(Array.isArray(audioinfo)){
+					audioname=audioinfo[0];
+					audioinfo=audioinfo[1];
+				}
+				if(Array.isArray(info.audioname)&&player){
+					if(info.audioname.contains(player.name)){
+						audioname+='_'+player.name;
+					}
+					else if(info.audioname.contains(player.name1)){
+						audioname+='_'+player.name1;
+					}
+					else if(info.audioname.contains(player.name2)){
+						audioname+='_'+player.name2;
+					}
+				}
+				if(typeof audioinfo=='number'){
+					game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
+				}
+				else if(audioinfo){
+					game.playAudio('skill',audioname);
+				}
+				else if(lib.config.background_ogg&&info.audio!==false){
+					game.playSkillAudio(audioname);
+				}
+			}
 		},
 		playSkillAudio:function(name){
 			if(_status.video&&arguments[1]!='video') return;
@@ -9724,7 +9767,7 @@
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			audio.src=str+name+'.mp3';
+			audio.src=lib.assetURL+str+name+'.mp3';
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
@@ -9732,17 +9775,17 @@
 			audio.onerror=function(){
 				switch(this._changed){
 					case 1:{
-						audio.src=str+name+'.ogg';
+						audio.src=lib.assetURL+str+name+'.ogg';
 						this._changed=2;
 						break;
 					}
 					case 2:{
-						audio.src=str+name+Math.ceil(Math.random()*2)+'.mp3';
+						audio.src=lib.assetURL+str+name+Math.ceil(Math.random()*2)+'.mp3';
 						this._changed=3;
 						break;
 					}
 					case 3:{
-						audio.src=str+name+Math.ceil(Math.random()*2)+'.ogg';
+						audio.src=lib.assetURL+str+name+Math.ceil(Math.random()*2)+'.ogg';
 						this._changed=4;
 						break;
 					}
@@ -9784,7 +9827,13 @@
 					}
 				}
 				else{
-					ui.backgroundMusic.src='audio/background/'+music+'.mp3';
+					if(lib.assetLoading){
+						ui.backgroundMusic._cordovasrc='audio/background/'+music+'.mp3';
+						lib.assetLoading.push(ui.backgroundMusic);
+					}
+					else{
+						ui.backgroundMusic.src=lib.assetURL+'audio/background/'+music+'.mp3';
+					}
 				}
 			}
 		},
@@ -9888,13 +9937,27 @@
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 			var fileNameToSaveAs = name||'noname';
+			fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
 
-			var downloadLink = document.createElement("a");
-			downloadLink.download = fileNameToSaveAs;
-			downloadLink.innerHTML = "Download File";
-			downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-
-			downloadLink.click();
+			if(window.resolveLocalFileSystemURL){
+				window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,function(entry){
+					entry.getFile(fileNameToSaveAs,{create:true},function(fileEntry){
+						fileEntry.createWriter(function(fileWriter){
+							fileWriter.onwriteend=function(){
+								alert('文件已导出至'+cordova.file.externalDataDirectory+fileNameToSaveAs);
+							}
+							fileWriter.write(textFileAsBlob)
+						});
+					});
+				});
+			}
+			else{
+				var downloadLink = document.createElement("a");
+				downloadLink.download = fileNameToSaveAs;
+				downloadLink.innerHTML = "Download File";
+				downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+				downloadLink.click();
+			}
 		},
 		exportCharacters:function(packname,list,callback){
 			var zipReady=function(){
@@ -9908,13 +9971,27 @@
 				var load=function(img){
 					var blob = zip.generate({type:"blob"});
 					var fileNameToSaveAs = packname||'noname';
+					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
 
-					var downloadLink = document.createElement("a");
-					downloadLink.download = fileNameToSaveAs;
-					downloadLink.innerHTML = "Download File";
-					downloadLink.href = window.URL.createObjectURL(blob);
-
-					downloadLink.click();
+					if(window.resolveLocalFileSystemURL){
+						window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,function(entry){
+							entry.getFile(fileNameToSaveAs,{create:true},function(fileEntry){
+								fileEntry.createWriter(function(fileWriter){
+									fileWriter.onwriteend=function(){
+										alert('文件已导出至'+cordova.file.externalDataDirectory+fileNameToSaveAs);
+									}
+									fileWriter.write(textFileAsBlob)
+								});
+							});
+						});
+					}
+					else{
+						var downloadLink = document.createElement("a");
+						downloadLink.download = fileNameToSaveAs;
+						downloadLink.innerHTML = "Download File";
+						downloadLink.href = window.URL.createObjectURL(blob);
+						downloadLink.click();
+					}
 
 					if(typeof callback=='function'){
 						callback(character);
@@ -11198,6 +11275,11 @@
 				game.update(lib.updateCanvas);
 			}
 		},
+		vibrate:function(time){
+			if(typeof navigator.vibrate=='function'){
+				navigator.vibrate(time||500);
+			}
+		},
 		animate:{
 			flame:function(x,y,duration,type){
 				var particles=[];
@@ -11659,25 +11741,27 @@
 			return next;
 		},
 		addCharacter:function(name,info){
-			var character=[info.sex,info.group,info.hp,info.skills||[],['db:extension-'+_status.extension+':'+name+'.jpg']];
+			var extname=(_status.extension||info.extension);
+			var character=[info.sex,info.group,info.hp,info.skills||[],['db:extension-'+extname+':'+name+'.jpg']];
 			if(info.tags){
 				character[4]=character[4].concat(info.tags);
 			}
 			lib.character[name]=character;
-			var packname='mode_extension_'+_status.extension;
+			var packname='mode_extension_'+extname;
 			if(!lib.characterPack[packname]){
 				lib.characterPack[packname]={};
-				lib.translate[name]=info.translate;
 			}
+			lib.translate[name]=info.translate;
 			lib.characterPack[packname][name]=character;
-			lib.translate[packname+'_character_config']=_status.extension;
+			lib.translate[packname+'_character_config']=extname;
 		},
 		addCard:function(name,info,info2){
+			var extname=(_status.extension||info2.extension);
 			if(info.fullskin){
-				info.image='db:extension-'+_status.extension+':'+name+'.png';
+				info.image='db:extension-'+extname+':'+name+'.png';
 			}
 			else if(info.fullimage){
-				info.image='db:extension-'+_status.extension+':'+name+'.jpg';
+				info.image='db:extension-'+extname+':'+name+'.jpg';
 			}
 			lib.card[name]=info;
 			lib.translate[name]=info2.translate;
@@ -11694,10 +11778,10 @@
 					lib.card.list.push([suits[Math.floor(Math.random()*suits.length)],Math.ceil(Math.random()*13),name]);
 				}
 			}
-			var packname='mode_extension_'+_status.extension;
+			var packname='mode_extension_'+extname;
 			if(!lib.cardPack[packname]){
 				lib.cardPack[packname]=[];
-				lib.translate[packname+'_card_config']=_status.extension;
+				lib.translate[packname+'_card_config']=extname;
 			}
 			lib.cardPack[packname].push(name);
 		},
@@ -11707,7 +11791,7 @@
 			lib.mode[name]={
 				name:info2.translate,
 				config:info2.config,
-				splash:'extension-'+_status.extension+':'+'sunquanmode.jpg'
+				splash:'extension-'+(_status.extension||info2.extension)+':'+name+'.jpg'
 			}
 			lib.init['setMode_'+name]=function(){
 				mode[name]=info;
@@ -19026,7 +19110,7 @@
 					game.saveConfig('skin',lib.config.skin);
 					avatar.setBackground(player.name,'character');
 				}
-				img.src='image/skin/'+player.name+'/'+num+'.jpg';
+				img.src=lib.assetURL+'image/skin/'+player.name+'/'+num+'.jpg';
 			},
 			avatar2:function(){
 				if(!lib.config.change_skin) return;
@@ -19063,7 +19147,7 @@
 					game.saveConfig('skin',lib.config.skin);
 					avatar.setBackground(player.name2,'character');
 				}
-				img.src='image/skin/'+player.name2+'/'+num+'.jpg';
+				img.src=lib.assetURL+'image/skin/'+player.name2+'/'+num+'.jpg';
 			},
 			player:function(){
 				return ui.click.target.apply(this,arguments);
@@ -19742,7 +19826,7 @@
 						});
 					}
 					else{
-						ui.background.style.backgroundImage="url('image/background/"+lib.config.image_background+".jpg')";
+						ui.background.setBackgroundImage("image/background/"+lib.config.image_background+".jpg");
 					}
 					ui.background.style.backgroundSize='cover';
 				},
@@ -21349,7 +21433,7 @@
 													lib.config.skin[node.name]=this._link;
 													node.node.avatar.style.backgroundImage=this.style.backgroundImage;
 												}
-													game.saveConfig('skin',lib.config.skin);
+												game.saveConfig('skin',lib.config.skin);
 											}
 											else{
 												if(avatar2){
@@ -21365,10 +21449,10 @@
 										});
 										button._link=i;
 										if(i){
-											button.style.backgroundImage='url("image/skin/'+(avatar2?node.name2:node.name)+'/'+i+'.jpg")';
+											button.setBackgroundImage('image/skin/'+(avatar2?node.name2:node.name)+'/'+i+'.jpg');
 										}
 										else{
-											button.style.backgroundImage='url("image/character/'+(avatar2?node.name2:node.name)+'.jpg")';
+											button.setBackgroundImage('image/character/'+(avatar2?node.name2:node.name)+'.jpg');
 										}
 									}
 									uiintro.add(buttons);
@@ -21380,7 +21464,7 @@
 									}
 								}
 							}
-							img.src='image/skin/'+(avatar2?node.name2:node.name)+'/'+num+'.jpg';
+							img.src=lib.assetURL+'image/skin/'+(avatar2?node.name2:node.name)+'/'+num+'.jpg';
 						}
 						if(!node.classList.contains('unseen')){
 							loadImage();
@@ -22142,7 +22226,7 @@
 			else{
 				src='image/'+name+ext;
 			}
-			this.style.backgroundImage="url('"+src+"')";
+			this.setBackgroundImage(src);
 			this.style.backgroundSize="cover";
 			return this;
 		};
@@ -22153,6 +22237,15 @@
 				node.style.backgroundSize="cover";
 			});
 		};
+		HTMLDivElement.prototype.setBackgroundImage=function(img){
+			if(lib.assetLoading){
+				this._cordovaimg=img;
+				lib.assetLoading.push(this);
+			}
+			else{
+				this.style.backgroundImage='url("'+lib.assetURL+img+'")';
+			}
+		},
 		HTMLDivElement.prototype.listen=function(func){
 			this.addEventListener(lib.config.touchscreen?'touchend':'click',function(e){
 				if(_status.dragged) return;
@@ -22317,8 +22410,13 @@
 				game.saveConfig('test_game',!lib.config.test_game);
 				game.reload();
 			},
-			a:function(){
-				game.save('test',!lib.storage.test);
+			a:function(name){
+				if(lib.storage.test&&!name){
+					game.save('test',false);
+				}
+				else{
+					game.save('test',name||true);
+				}
 				game.reload();
 			},
 			u:function(){
@@ -22975,11 +23073,11 @@
 					game.loop();
 				}
 			}
-
 			if(!mode[lib.config.mode]){
 				window.inSplash=true;
 				var clickNode=function(){
 					lib.config.mode=this.link;
+					game.saveConfig('mode',this.link);
 					splash.delete();
 					delete window.inSplash;
 					var scriptnode=lib.init.js('mode',lib.config.mode);
@@ -22996,7 +23094,7 @@
 					node.link=lib.config.all.mode[i];
 					ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
 					if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
-						ui.create.div(node,'.avatar').style.backgroundImage='url("image/splash/'+lib.config.all.mode[i]+'.jpg")';
+						ui.create.div(node,'.avatar').setBackgroundImage('image/splash/'+lib.config.all.mode[i]+'.jpg');
 					}
 					else{
 						ui.create.div(node,'.avatar').setBackgroundDB(lib.mode[lib.config.all.mode[i]].splash);

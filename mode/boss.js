@@ -528,7 +528,6 @@ mode.boss={
 				// dialog.add('0/3');
 				dialog.add([list.slice(0,20),'character']);
 				dialog.noopen=true;
-
 				var next=game.me.chooseButton(dialog,true);
 				next._triggered=null;
 				next.custom.replace.target=event.customreplacetarget;

@@ -4214,25 +4214,42 @@ character.yijiang={
 							if(player.num('h','jiu')>0) return 0;
 							if(player.num('e','zhuge')&&player.num('h','sha')>1) return 0;
 							if(!player.num('h','sha')) return 0;
+							var targets=[];
+							var target;
 							for(var i=0;i<game.players.length;i++){
 								if(ai.get.attitude(player,game.players[i])<0){
-									var target=game.players[i];
-									if(player.canUse('sha',target)&&ai.get.effect(target,{name:'sha'},player,player)>0){
-										var e2=target.get('e','2');
-										if(e2){
-											if(e2.name=='tengjia'){
-												if(!player.num('h',{name:'sha',nature:'fire'})&&!player.num('e','zhuque')) return 0;
-											}
-											if(e2.name=='renwang'){
-												if(!player.num('h',{name:'sha',color:'red'})) return 0;
-											}
-											if(e2.name=='baiyin') return 0;
-										}
-										if(player.num('e','guanshi')&&player.num('he')>2) return 1;
-										return target.num('h')>3?0:1;
+									if(player.canUse('sha',game.players[i],true,true)){
+										targets.push(game.players[i]);
 									}
 								}
 							}
+							if(targets.length){
+								target=targets[0];
+							}
+							else{
+								return 0;
+							}
+							var num=ai.get.effect(target,{name:'sha'},player,player);
+							for(var i=1;i<targets.length;i++){
+								var num2=ai.get.effect(targets[i],{name:'sha'},player,player);
+								if(num2>num){
+									target=targets[i];
+									num=num2;
+								}
+							}
+							if(num<=0) return 0;
+							var e2=target.get('e','2');
+							if(e2){
+								if(e2.name=='tengjia'){
+									if(!player.num('h',{name:'sha',nature:'fire'})&&!player.num('e','zhuque')) return 0;
+								}
+								if(e2.name=='renwang'){
+									if(!player.num('h',{name:'sha',color:'red'})) return 0;
+								}
+								if(e2.name=='baiyin') return 0;
+							}
+							if(player.num('e','guanshi')&&player.num('he')>2) return 1;
+							return target.num('h')>3?0:1;
 						}
 						if(player==_status.event.dying||player.isTurnedOver()) return 3;
 					}

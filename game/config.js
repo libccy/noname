@@ -364,3 +364,4 @@ window.character={};
 window.play={};
 window.background={};
 window.music={};
+window.font={};

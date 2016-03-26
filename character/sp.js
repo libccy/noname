@@ -461,14 +461,16 @@ character.sp={
 					trigger.player.line(player);
 				}
 				else{
-					trigger.player.$gain2(trigger.card);
-					if(!trigger.player.storage.zhenwei2){
-						trigger.player.storage.zhenwei2=[trigger.card];
+					if(get.itemtype(trigger.card)=='card'){
+						trigger.player.$gain2(trigger.card);
+						if(!trigger.player.storage.zhenwei2){
+							trigger.player.storage.zhenwei2=[trigger.card];
+						}
+						else{
+							trigger.player.storage.zhenwei2.push(trigger.card);
+						}
+						ui.special.appendChild(trigger.card);
 					}
-					else{
-						trigger.player.storage.zhenwei2.push(trigger.card);
-					}
-					ui.special.appendChild(trigger.card);
 					trigger.untrigger();
 					trigger.finish();
 					trigger.player.addSkill('zhenwei2');

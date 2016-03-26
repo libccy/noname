@@ -65,7 +65,7 @@ body[data-background_color_wood='black']{
 .control .controlthundertext{
 	color: rgb(62, 41, 30);
 }
-.player,.card,.button,.dialog>.bar,
+.player,.card,.dialog>.bar,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg{
 	background: url('wood.jpg');
 }

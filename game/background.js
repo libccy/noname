@@ -15,7 +15,7 @@
         bg.style.backgroundSize="cover";
     }
     if(temp.image_background&&temp.image_background!='default'&&temp.image_background!='custom'){
-        bg.style.backgroundImage="url('image/background/"+temp.image_background+".jpg')";
+        bg.setBackgroundImage('image/background/'+temp.image_background+'.jpg');
 
         switch (temp.image_background_filter){
             case 'blur':
@@ -71,4 +71,15 @@
             }
         }
     },5000);
+    if(navigator.userAgent.toLowerCase().indexOf('android')!=-1){
+        var script=document.createElement('script');
+        script.src='cordova.js';
+        document.body.appendChild(script);
+        document.addEventListener('deviceready',function(){
+            if(window._onDeviceReady){
+                window._onDeviceReady();
+                delete window._onDeviceReady;
+            }
+        });
+    }
 }())

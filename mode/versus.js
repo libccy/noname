@@ -1512,19 +1512,8 @@ mode.versus={
 				}
 				ui.versushighlight=game.me;
 				game.me.classList.add('current_action');
-				// game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
 
 				ui.fakeme.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
-				// var info=lib.character[name];
-				// if(lib.config.layout=='newlayout'&&info[4]&&info[4].contains('fullskin')){
-				// 	// ui.fakeme.classList.add('fullskin');
-				// 	ui.fakeme.style.backgroundImage='url("image/character/'+name+'.jpg")';
-				// 	ui.fakeme.style.backgroundSize='cover';
-				// }
-				// else{
-				// 	ui.fakeme.classList.remove('fullskin');
-				// 	ui.fakemebg.setBackground(name,'character');
-				// }
 			}
 		},
 		modeSwapPlayer:function(player){

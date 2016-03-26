@@ -55,4 +55,9 @@ music.pack={
     music_diaochan:'貂蝉',
     music_shezhan:'舌战',
     music_danji:'单骑',
+};
+font.pack={
+    xiaozhuan:'小篆',
+    xinwei:'新魏',
+    huangcao:'黄草',
 }

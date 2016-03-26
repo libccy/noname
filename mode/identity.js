@@ -177,6 +177,10 @@ mode.identity={
 			game.zhu.storage.enhance_zhu=skill;
 		}
 		if(lib.storage.test){
+			if(typeof lib.storage.test=='string'){
+				if(Math.random()<0.5) game.me.next.init(lib.storage.test);
+				else game.me.init(lib.storage.test);
+			}
 			var str='';
 			for(var i=0;i<game.players.length;i++){
 				str+=get.translation(game.players[i]);

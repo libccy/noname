@@ -1578,11 +1578,7 @@ div:hover>.wunature{
 @keyframes flip{from{transform:perspective(1000px) rotateY(0);}to{transform:perspective(1000px) rotateY(360deg);}}
 @-webkit-keyframes flip{from{transform:perspective(1000px) rotateY(0);}to{transform:perspective(1000px) rotateY(360deg);}}
 /*--------其它--------*/
-@font-face {font-family: 'xiaozhuan';src: url('../../font/xiaozhuan.ttf');}
-@font-face {font-family: 'huangcao';src: url('../../font/huangcao.ttf');}
-@font-face {font-family: 'xinwei';src: url('../../font/xinwei.ttf');}
 ::-webkit-scrollbar{display: none;}
-
 @media screen and (min-height: 800px) and (orientation:landscape)  {
 	#arena{height: 720px;top: calc(50% - 350px);}
 }
