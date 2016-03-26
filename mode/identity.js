@@ -1027,6 +1027,15 @@ mode.identity={
 				if(to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
 					identity2=to.ai.identity_mark;
 				}
+				if(get.population('fan')==0&&identity2=='zhong'){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].identity=='nei'&&
+						game.players[i].ai.identity_mark=='zhong'&&
+						game.players[i].ai.shown<1){
+							identity2='nei';break;
+						}
+					}
+				}
 				var zhongmode=false;
 				if(!game.zhu.isZhu){
 					zhongmode=true;
@@ -1038,7 +1047,11 @@ mode.identity={
 							case 'zhong':case 'mingzhong': return 6;
 							case 'nei':
 								if(game.players.length==2) return -10;
-								if(get.population('fan')==0) return -0.5;
+								if(to.identity=='zhong') return 0;
+								if(get.population('fan')==0){
+									if(to.ai.identity_mark=='zhong'&&to.ai.shown<1) return 0;
+									return -0.5;
+								}
 								if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
 								if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
 									var fan;
