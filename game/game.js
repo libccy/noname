@@ -2834,7 +2834,7 @@
 								}
 							}
 						}
-						if(scripts[i].src.indexOf('asset')!=-1){
+						if(scripts[i].src.indexOf('cordova')!=-1){
 							lib.assetLoading=[];
 						}
 						break;
@@ -3200,27 +3200,29 @@
 								navigator.app.exitApp();
 							}
 						});
-						window.resolveLocalFileSystemURL(cordova.file.externalApplicationStorageDirectory,function(entry){
-							var url=entry.toURL();
-							if(Array.isArray(lib.assetLoading)){
-								for(var i=0;i<lib.assetLoading.length;i++){
-									var item=lib.assetLoading[i];
-									if(typeof item=='string'){
-										ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+item+"';src: url('"+url+"font/"+item+".ttf');}",0);
-									}
-									else if(item._cordovaimg){
-										item.style.backgroundImage='url("'+url+item._cordovaimg+'")';
-										delete item._cordovaimg;
-									}
-									else if(item._cordovasrc){
-										item.src=url+item._cordovasrc;
-										delete item._cordovasrc;
+						if(window.resolveLocalFileSystemURL){
+							window.resolveLocalFileSystemURL(cordova.file.externalApplicationStorageDirectory,function(entry){
+								var url=entry.toURL();
+								if(Array.isArray(lib.assetLoading)){
+									for(var i=0;i<lib.assetLoading.length;i++){
+										var item=lib.assetLoading[i];
+										if(typeof item=='string'){
+											ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+item+"';src: url('"+url+"font/"+item+".ttf');}",0);
+										}
+										else if(item._cordovaimg){
+											item.style.backgroundImage='url("'+url+item._cordovaimg+'")';
+											delete item._cordovaimg;
+										}
+										else if(item._cordovasrc){
+											item.src=url+item._cordovasrc;
+											delete item._cordovasrc;
+										}
 									}
 								}
-							}
-							delete lib.assetLoading;
-							lib.assetURL=url;
-						});
+								delete lib.assetLoading;
+								lib.assetURL=url;
+							});
+						}
 					}
 				}
 			},
