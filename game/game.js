@@ -9,6 +9,7 @@
             }
         }
         else{
+			alert(document.head.outerHTML)
             if(confirm('游戏似乎未正常载入，是否重置游戏？')){
                 localStorage.clear();
                 if(indexedDB) indexedDB.deleteDatabase('noname_0.9_data');
@@ -2989,7 +2990,15 @@
 				lib.init.js(lib.assetURL+'card',lib.config.all.cards);
 				lib.init.js(lib.assetURL+'character',lib.config.all.characters);
 				lib.init.js(lib.assetURL+'play',lib.config.plays);
-				lib.init.js(lib.assetURL+'character','rank');
+				lib.init.js(lib.assetURL+'character','rank',function(){
+					if(_status.windowLoaded){
+						delete _status.windowLoaded;
+						lib.init.onload();
+					}
+					else{
+						_status.packLoaded=true;
+					}
+				});
 				ui.css={};
 				lib.init.css(lib.assetURL+'layout/default','menu');
 				var layout=lib.config.layout;
@@ -3206,6 +3215,448 @@
 						};
 					}
 				}
+			},
+			onload:function(){
+				if(lib.device){
+					var script=document.createElement('script');
+					script.src='cordova.js';
+					document.body.appendChild(script);
+					document.addEventListener('deviceready',function(){
+						if(lib.init.cordovaReady){
+							lib.init.cordovaReady();
+							delete lib.init.cordovaReady;
+						}
+					});
+				}
+				ui.background=ui.create.div('.background');
+				ui.background.style.backgroundSize="cover";
+				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background!='custom'){
+			        ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
+			        switch (lib.config.image_background_filter){
+			            case 'blur':
+			                ui.background.style.filter='blur(8px)';
+			                ui.background.style.webkitFilter='blur(8px)';
+			                ui.background.style.transform='scale(1.05)';
+			                break;
+			            case 'gray':
+			                ui.background.style.filter='grayscale(1)';
+			                ui.background.style.webkitFilter='grayscale(1)';
+			                break;
+			            case 'sepia':
+			                ui.background.style.filter='sepia(0.5)';
+			                ui.background.style.webkitFilter='sepia(0.5)';
+			                break;
+			            case 'invert':
+			                ui.background.style.filter='invert(1)';
+			                ui.background.style.webkitFilter='invert(1)';
+			                break;
+			            case 'saturate':
+			                ui.background.style.filter='saturate(5)';
+			                ui.background.style.webkitFilter='saturate(5)';
+			                break;
+			            case 'contrast':
+			                ui.background.style.filter='contrast(1.4)';
+			                ui.background.style.webkitFilter='contrast(1.4)';
+			                break;
+			            case 'hue':
+			                ui.background.style.filter='hue-rotate(180deg)';
+			                ui.background.style.webkitFilter='hue-rotate(180deg)';
+			                break;
+			            case 'brightness':
+			                ui.background.style.filter='brightness(5)';
+			                ui.background.style.webkitFilter='brightness(5)';
+			                break;
+			            default:
+			                ui.background.style.webkitFilter='';
+			        }
+			    }
+				document.body.insertBefore(ui.background,document.body.firstChild);
+
+				document.body.onresize=ui.updatex;
+				if(lib.config.touchscreen){
+					document.body.addEventListener('touchstart',function(e){
+						this.startX=e.touches[0].clientX;
+						this.startY=e.touches[0].clientY;
+						_status.dragged=false;
+					});
+					document.body.addEventListener('touchmove',function(e){
+						if(_status.dragged) return;
+						if (Math.abs(e.touches[0].clientX - this.startX) > 10 ||
+							Math.abs(e.touches[0].clientY - this.startY) > 10) {
+							_status.dragged=true;
+						}
+					});
+				}
+
+				lib.onDB(function(){
+					if(lib.config.image_background=='custom'){
+						ui.background.style.backgroundImage="none";
+						game.getDB('image','background',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent)
+							{
+								var data = fileLoadedEvent.target.result;
+								ui.background.style.backgroundImage='url('+data+')';
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
+				});
+
+				var proceed=function(){
+					var i,j,k;
+					for(i in mode[lib.config.mode].element){
+						if(!lib.element[i]) lib.element[i]=[];
+						for(j in mode[lib.config.mode].element[i]){
+							if(j=='init'){
+								if(!lib.element[i].inits) lib.element[i].inits=[];
+								lib.element[i].inits.push(lib.init.eval(mode[lib.config.mode].element[i][j]));
+							}
+							else{
+								lib.element[i][j]=lib.init.eval(mode[lib.config.mode].element[i][j]);
+							}
+						}
+					}
+					for(i in mode[lib.config.mode].ai){
+						if(typeof mode[lib.config.mode].ai[i]=='object'){
+							if(ai[i]==undefined) ai[i]={};
+							for(j in mode[lib.config.mode].ai[i]){
+								ai[i][j]=lib.init.eval(mode[lib.config.mode].ai[i][j]);
+							}
+						}
+						else{
+							ai[i]=lib.init.eval(mode[lib.config.mode].ai[i]);
+						}
+					}
+					for(i in mode[lib.config.mode].ui){
+						if(typeof mode[lib.config.mode].ui[i]=='object'){
+							if(ui[i]==undefined) ui[i]={};
+							for(j in mode[lib.config.mode].ui[i]){
+								ui[i][j]=lib.init.eval(mode[lib.config.mode].ui[i][j]);
+							}
+						}
+						else{
+							ui[i]=lib.init.eval(mode[lib.config.mode].ui[i]);
+						}
+					}
+					for(i in mode[lib.config.mode].game){
+						game[i]=lib.init.eval(mode[lib.config.mode].game[i]);
+					}
+					for(i in mode[lib.config.mode].get){
+						get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
+					}
+					lib.init.start=mode[lib.config.mode].start;
+					if(game.onwash){
+						lib.onwash.push(game.onwash);
+						delete game.onwash;
+					}
+					if(game.onover){
+						lib.onover.push(game.onover);
+						delete game.onover;
+					}
+					lib.config.current_mode=mode[lib.config.mode].config||[];
+					lib.config.banned=get.config('banned')||[];
+					lib.config.bannedcards=get.config('bannedcards')||[];
+
+					lib.rank=window.characterRank;
+					delete window.characterRank;
+					for(i in mode[lib.config.mode]){
+						if(i=='element') continue;
+						if(i=='game') continue;
+						if(i=='ai') continue;
+						if(i=='ui') continue;
+						if(i=='get') continue;
+						if(i=='config') continue;
+						if(i=='start') continue;
+						if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
+						for(j in mode[lib.config.mode][i]){
+							lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
+						}
+					}
+					for(i in character){
+						if(character[i].character){
+							lib.characterPack[i]=character[i].character
+						}
+						if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
+						if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
+						for(j in character[i]){
+							if(j=='mode'||j=='forbid') continue;
+							if(j=='character'&&!lib.config.characters.contains(i)){
+								if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
+									for(k in character[i][j]){
+										lib.hiddenCharacters.push(k);
+									}
+								}
+								else if(lib.config.mode!='boss'||i!='boss'){
+									continue;
+								}
+							}
+							for(k in character[i][j]){
+								if(j=='character'){
+									if(!character[i][j][k][4]){
+										character[i][j][k][4]=[];
+									}
+									if(character[i][j][k][4].contains('boss')||
+										character[i][j][k][4].contains('hiddenboss')){
+										lib.config.forbidai.add(k);
+									}
+									if(lib.config.banned.contains(k)){
+										if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
+											lib.hiddenCharacters.push(k);
+										}
+										else{
+											continue;
+										}
+									}
+									for(var l=0;l<character[i][j][k][3].length;l++){
+										lib.skilllist.add(character[i][j][k][3][l]);
+									}
+								}
+								if(j=='translate'&&k==i){
+									lib[j][k+'_character_config']=character[i][j][k];
+								}
+								else{
+									if(lib[j][k]==undefined){
+										lib[j][k]=lib.init.eval(character[i][j][k]);
+										if(j=='card'&&lib[j][k].derivation){
+											if(!lib.cardPack.mode_derivation){
+												lib.cardPack.mode_derivation=[k];
+											}
+											else{
+												lib.cardPack.mode_derivation.push(k);
+											}
+										}
+									}
+									else{
+										alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+									}
+								}
+							}
+						}
+					}
+					if(lib.cardPack.mode_derivation){
+						for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
+							if(!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]){
+								lib.cardPack.mode_derivation.splice(i--,1);
+							}
+						}
+						if(lib.cardPack.mode_derivation.length==0){
+							delete lib.cardPack.mode_derivation;
+						}
+					}
+					for(i in lib.config.forbidpack){
+						if(lib.config.characters.contains(i)){
+							lib.config.forbidall=lib.config.forbidall.concat(lib.config.forbidpack[i]);
+						}
+					}
+
+					var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
+					if(pilecfg){
+						lib.config.bannedpile=pilecfg[0]||{};
+						lib.config.addedpile=pilecfg[1]||{};
+					}
+					for(i in card){
+						lib.cardPack[i]=[];
+						if(card[i].card){
+							for(var j in card[i].card){
+								if(card[i].translate[j+'_info']){
+									lib.cardPack[i].push(j);
+								}
+							}
+						}
+						for(j in card[i]){
+							if(j=='mode'||j=='forbid') continue;
+							if(j=='list'){
+								if(card[i].forbid&&card[i].forbid.contains(lib.config.mode)) continue;
+								if(card[i].mode&&card[i].mode.contains(lib.config.mode)==false) continue;
+								if(lib.config.cards.contains(i)){
+									var pile;
+									if(typeof card[i][j]=='function'){
+										pile=lib.init.eval(card[i][j])();
+									}
+									else{
+										pile=card[i][j];
+									}
+									lib.cardPile[i]=pile.slice(0);
+									if(lib.config.bannedpile[i]){
+										for(var k=0;k<lib.config.bannedpile[i].length;k++){
+											pile[lib.config.bannedpile[i][k]]=null;
+										}
+									}
+									for(var k=0;k<pile.length;k++){
+										if(!pile[k]){
+											pile.splice(k--,1);
+										}
+									}
+									if(lib.config.addedpile[i]){
+										for(var k=0;k<lib.config.addedpile[i].length;k++){
+											pile.push(lib.config.addedpile[i][k]);
+										}
+									}
+									lib.card.list=lib.card.list.concat(pile);
+								}
+							}
+							else{
+								for(k in card[i][j]){
+									if(j=='translate'&&k==i){
+										lib[j][k+'_card_config']=card[i][j][k];
+									}
+									else{
+										if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
+										else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+									}
+								}
+							}
+						}
+					}
+					for(i in play){
+						if(lib.config.hiddenPlayPack.contains(i)) continue;
+						if(play[i].forbid&&play[i].forbid.contains(lib.config.mode)) continue;
+						if(play[i].mode&&play[i].mode.contains(lib.config.mode)==false) continue;
+						for(j in play[i].element){
+							if(!lib.element[j]) lib.element[j]=[];
+							for(k in play[i].element[j]){
+								if(k=='init'){
+									if(!lib.element[j].inits) lib.element[j].inits=[];
+									lib.element[j].inits.push(lib.init.eval(play[i].element[j][k]));
+								}
+								else{
+									lib.element[j][k]=lib.init.eval(play[i].element[j][k]);
+								}
+							}
+						}
+						for(j in play[i].ui){
+							if(typeof play[i].ui[j]=='object'){
+								if(ui[j]==undefined) ui[j]={};
+								for(k in play[i].ui[j]){
+									ui[j][k]=lib.init.eval(play[i].ui[j][k]);
+								}
+							}
+							else{
+								ui[j]=lib.init.eval(play[i].ui[j]);
+							}
+						}
+						for(j in play[i].game){
+							game[j]=lib.init.eval(play[i].game[j]);
+						}
+						for(j in play[i].get){
+							get[j]=lib.init.eval(play[i].get[j]);
+						}
+						for(j in play[i]){
+							if(j=='mode'||j=='forbid'||j=='init'||j=='element'||
+							j=='game'||j=='get'||j=='ui'||j=='arenaReady') continue;
+							for(k in play[i][j]){
+								if(j=='translate'&&k==i){
+									lib[j][k+'_play_config']=play[i][j][k];
+								}
+								else{
+									if(lib[j][k]!=undefined){
+										console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
+									}
+									lib[j][k]=lib.init.eval(play[i][j][k]);
+								}
+							}
+						}
+						if(typeof play[i].init=='function') (lib.init.eval(play[i].init))();
+						if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
+					}
+					for(i=0;i<lib.card.list.length;i++){
+						if(lib.card.list[i][2]=='huosha'){
+							lib.card.list[i]=lib.card.list[i].slice(0);
+							lib.card.list[i][2]='sha';
+							lib.card.list[i][3]='fire';
+						}
+						else if(lib.card.list[i][2]=='leisha'){
+							lib.card.list[i]=lib.card.list[i].slice(0);
+							lib.card.list[i][2]='sha';
+							lib.card.list[i][3]='thunder';
+						}
+						if(!lib.card[lib.card.list[i][2]]){
+							lib.card.list.splice(i,1);i--;
+						}
+						else if(lib.card[lib.card.list[i][2]].mode&&
+							lib.card[lib.card.list[i][2]].mode.contains(lib.config.mode)==false){
+							lib.card.list.splice(i,1);i--;
+						}
+					}
+					try{
+						lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
+						if(typeof lib.storage!='object') throw('err');
+						if(lib.storage==null) throw('err');
+					}
+					catch(err){
+						lib.storage={};
+						localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
+					}
+					if(lib.config.cheat) cheat.i();
+					else{
+						lib.cheat=window.cheat;
+						delete window.cheat;
+					}
+					lib.config.sort_card=get.sortCard(lib.config.sort);
+					delete window.config;
+					delete window.mode;
+					delete window.card;
+					delete window.character;
+					delete window.play;
+					for(var i in lib.init){
+						if(i.indexOf('setMode_')==0){
+							delete lib.init[i];
+						}
+					}
+					while(lib.packageReady.length){
+						(lib.init.eval(lib.packageReady.shift()))();
+					}
+					delete lib.packageReady;
+					ui.create.arena();
+					if(lib.db&&!_status.characterLoaded){
+						_status.waitingForCharacters=true;
+					}
+					else{
+						game.createEvent('game',false).content=lib.init.start;
+						delete lib.init.start;
+						game.loop();
+					}
+				}
+				if(!mode[lib.config.mode]){
+					window.inSplash=true;
+					var clickNode=function(){
+						lib.config.mode=this.link;
+						game.saveConfig('mode',this.link);
+						splash.delete();
+						delete window.inSplash;
+						var scriptnode=lib.init.js(lib.assetURL+'mode',lib.config.mode);
+						if(scriptnode){
+							scriptnode.onload=proceed;
+						}
+						else{
+							proceed();
+						}
+					}
+					var splash=ui.create.div('#splash',document.body);
+					for(var i=0;i<lib.config.all.mode.length;i++){
+						var node=ui.create.div(splash,'.hidden',clickNode);
+						node.link=lib.config.all.mode[i];
+						ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
+						if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
+							ui.create.div(node,'.avatar').setBackgroundImage('image/splash/'+lib.config.all.mode[i]+'.jpg');
+						}
+						else{
+							ui.create.div(node,'.avatar').setBackgroundDB(lib.mode[lib.config.all.mode[i]].splash);
+						}
+						ui.refresh(node);
+						setTimeout((function(node){
+							return function(){
+								node.show();
+							}
+						}(node)),i*100);
+					}
+				}
+				else{
+					proceed();
+				}
+				localStorage.removeItem(lib.configprefix+'directstart');
 			},
 			css:function(path,file,before){
 				var style = document.createElement("link");
@@ -14849,7 +15300,6 @@
 	                });
 					menu=menux.menu;
 
-
 					var copyObj=function(obj){
 						var copy={};
 						for(var i in obj){
@@ -15005,7 +15455,6 @@
 	                        active.classList.add('active');
 	                    }
 						rightPane.appendChild(active.link);
-
 					}());
 
 					(function(){
@@ -15288,13 +15737,13 @@
 									for(var i=0;i<lib.config.customforbid.length;i++){
 										createCustomBanSkill(lib.config.customforbid[i]);
 									}
-
 									(function(){
 										var list=[];
 										for(var i in lib.character){
 											if(lib.character[i][3].length)
 											list.push([i,lib.translate[i]]);
 										}
+
 										list.sort(function(a,b){
 											a=a[0];b=b[0];
 											var aa=a,bb=b;
@@ -15309,11 +15758,13 @@
 											}
 											return a>b?1:-1;
 										});
+
 										var list2=[];
 										var skills=lib.character[list[0][0]][3];
 										for(var i=0;i<skills.length;i++){
 											list2.push([skills[i],lib.translate[skills[i]]]);
 										}
+
 										var selectname=ui.create.selectlist(list,list[0],banskilladdNode);
 										selectname.onchange=function(){
 											var skills=lib.character[this.value][3];
@@ -15347,15 +15798,16 @@
 										};
 										selectname2.style.maxWidth='85px';
 										var skillopt2=ui.create.selectlist(list2,list2[0],banskilladdNode);
-
 										var confirmbutton=document.createElement('button');
 										confirmbutton.innerHTML='确定';
 										banskilladdNode.appendChild(confirmbutton);
+
 										confirmbutton.onclick=function(){
 											var skills=[skillopt.value,skillopt2.value];
 											if(skills[0]==skills[1]){
 												skills.shift();
 											}
+											if(!lib.config.customforbid) return;
 											for(var i=0;i<lib.config.customforbid.length;i++){
 												if(matchBanSkill(lib.config.customforbid[i],skills)) return;
 											}
@@ -15364,7 +15816,6 @@
 											createCustomBanSkill(skills).style.display='';
 										}
 									}());
-
 									page.style.paddingBottom='10px';
 								}
 								var config=lib.config;
@@ -17254,7 +17705,6 @@
 						rightPane.appendChild(active.link);
 					}());
 
-
 					(function(){
 						var start=menux.pages[5];
 						var rightPane=start.lastChild;
@@ -17514,7 +17964,6 @@
 					}());
 
 				}());
-
 				lib.status.date=new Date();
 				lib.status.dateDelayed=0;
 
@@ -22950,446 +23399,13 @@
 			}
 		};
 		window.onload=function(){
-			if(lib.device){
-				var script=document.createElement('script');
-				script.src='cordova.js';
-				document.body.appendChild(script);
-				document.addEventListener('deviceready',function(){
-					if(lib.init.cordovaReady){
-						lib.init.cordovaReady();
-						delete lib.init.cordovaReady;
-					}
-				});
-			}
-			ui.background=ui.create.div('.background');
-			ui.background.style.backgroundSize="cover";
-			if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background!='custom'){
-		        ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
-		        switch (lib.config.image_background_filter){
-		            case 'blur':
-		                ui.background.style.filter='blur(8px)';
-		                ui.background.style.webkitFilter='blur(8px)';
-		                ui.background.style.transform='scale(1.05)';
-		                break;
-		            case 'gray':
-		                ui.background.style.filter='grayscale(1)';
-		                ui.background.style.webkitFilter='grayscale(1)';
-		                break;
-		            case 'sepia':
-		                ui.background.style.filter='sepia(0.5)';
-		                ui.background.style.webkitFilter='sepia(0.5)';
-		                break;
-		            case 'invert':
-		                ui.background.style.filter='invert(1)';
-		                ui.background.style.webkitFilter='invert(1)';
-		                break;
-		            case 'saturate':
-		                ui.background.style.filter='saturate(5)';
-		                ui.background.style.webkitFilter='saturate(5)';
-		                break;
-		            case 'contrast':
-		                ui.background.style.filter='contrast(1.4)';
-		                ui.background.style.webkitFilter='contrast(1.4)';
-		                break;
-		            case 'hue':
-		                ui.background.style.filter='hue-rotate(180deg)';
-		                ui.background.style.webkitFilter='hue-rotate(180deg)';
-		                break;
-		            case 'brightness':
-		                ui.background.style.filter='brightness(5)';
-		                ui.background.style.webkitFilter='brightness(5)';
-		                break;
-		            default:
-		                ui.background.style.webkitFilter='';
-		        }
-		    }
-			document.body.insertBefore(ui.background,document.body.firstChild);
-
-			document.body.onresize=ui.updatex;
-			if(lib.config.touchscreen){
-				document.body.addEventListener('touchstart',function(e){
-					this.startX=e.touches[0].clientX;
-					this.startY=e.touches[0].clientY;
-					_status.dragged=false;
-				});
-				document.body.addEventListener('touchmove',function(e){
-					if(_status.dragged) return;
-					if (Math.abs(e.touches[0].clientX - this.startX) > 10 ||
-						Math.abs(e.touches[0].clientY - this.startY) > 10) {
-						_status.dragged=true;
-					}
-				});
-			}
-
-			lib.onDB(function(){
-				if(lib.config.image_background=='custom'){
-					ui.background.style.backgroundImage="none";
-					game.getDB('image','background',function(fileToLoad){
-						if(!fileToLoad) return;
-						var fileReader = new FileReader();
-						fileReader.onload = function(fileLoadedEvent)
-						{
-							var data = fileLoadedEvent.target.result;
-							ui.background.style.backgroundImage='url('+data+')';
-						};
-						fileReader.readAsDataURL(fileToLoad, "UTF-8");
-					});
-				}
-			});
-
-			var proceed=function(){
-				var i,j,k;
-				for(i in mode[lib.config.mode].element){
-					if(!lib.element[i]) lib.element[i]=[];
-					for(j in mode[lib.config.mode].element[i]){
-						if(j=='init'){
-							if(!lib.element[i].inits) lib.element[i].inits=[];
-							lib.element[i].inits.push(lib.init.eval(mode[lib.config.mode].element[i][j]));
-						}
-						else{
-							lib.element[i][j]=lib.init.eval(mode[lib.config.mode].element[i][j]);
-						}
-					}
-				}
-				for(i in mode[lib.config.mode].ai){
-					if(typeof mode[lib.config.mode].ai[i]=='object'){
-						if(ai[i]==undefined) ai[i]={};
-						for(j in mode[lib.config.mode].ai[i]){
-							ai[i][j]=lib.init.eval(mode[lib.config.mode].ai[i][j]);
-						}
-					}
-					else{
-						ai[i]=lib.init.eval(mode[lib.config.mode].ai[i]);
-					}
-				}
-				for(i in mode[lib.config.mode].ui){
-					if(typeof mode[lib.config.mode].ui[i]=='object'){
-						if(ui[i]==undefined) ui[i]={};
-						for(j in mode[lib.config.mode].ui[i]){
-							ui[i][j]=lib.init.eval(mode[lib.config.mode].ui[i][j]);
-						}
-					}
-					else{
-						ui[i]=lib.init.eval(mode[lib.config.mode].ui[i]);
-					}
-				}
-				for(i in mode[lib.config.mode].game){
-					game[i]=lib.init.eval(mode[lib.config.mode].game[i]);
-				}
-				for(i in mode[lib.config.mode].get){
-					get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
-				}
-				lib.init.start=mode[lib.config.mode].start;
-				if(game.onwash){
-					lib.onwash.push(game.onwash);
-					delete game.onwash;
-				}
-				if(game.onover){
-					lib.onover.push(game.onover);
-					delete game.onover;
-				}
-				lib.config.current_mode=mode[lib.config.mode].config||[];
-				lib.config.banned=get.config('banned')||[];
-				lib.config.bannedcards=get.config('bannedcards')||[];
-
-				lib.rank=window.characterRank;
-				delete window.characterRank;
-				for(i in mode[lib.config.mode]){
-					if(i=='element') continue;
-					if(i=='game') continue;
-					if(i=='ai') continue;
-					if(i=='ui') continue;
-					if(i=='get') continue;
-					if(i=='config') continue;
-					if(i=='start') continue;
-					if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
-					for(j in mode[lib.config.mode][i]){
-						lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
-					}
-				}
-				for(i in character){
-					if(character[i].character){
-						lib.characterPack[i]=character[i].character
-					}
-					if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
-					if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
-					for(j in character[i]){
-						if(j=='mode'||j=='forbid') continue;
-						if(j=='character'&&!lib.config.characters.contains(i)){
-							if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
-								for(k in character[i][j]){
-									lib.hiddenCharacters.push(k);
-								}
-							}
-							else if(lib.config.mode!='boss'||i!='boss'){
-								continue;
-							}
-						}
-						for(k in character[i][j]){
-							if(j=='character'){
-								if(!character[i][j][k][4]){
-									character[i][j][k][4]=[];
-								}
-								if(character[i][j][k][4].contains('boss')||
-									character[i][j][k][4].contains('hiddenboss')){
-									lib.config.forbidai.add(k);
-								}
-								if(lib.config.banned.contains(k)){
-									if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
-										lib.hiddenCharacters.push(k);
-									}
-									else{
-										continue;
-									}
-								}
-								for(var l=0;l<character[i][j][k][3].length;l++){
-									lib.skilllist.add(character[i][j][k][3][l]);
-								}
-							}
-							if(j=='translate'&&k==i){
-								lib[j][k+'_character_config']=character[i][j][k];
-							}
-							else{
-								if(lib[j][k]==undefined){
-									lib[j][k]=lib.init.eval(character[i][j][k]);
-									if(j=='card'&&lib[j][k].derivation){
-										if(!lib.cardPack.mode_derivation){
-											lib.cardPack.mode_derivation=[k];
-										}
-										else{
-											lib.cardPack.mode_derivation.push(k);
-										}
-									}
-								}
-								else{
-									alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
-								}
-							}
-						}
-					}
-				}
-				if(lib.cardPack.mode_derivation){
-					for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
-						if(!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]){
-							lib.cardPack.mode_derivation.splice(i--,1);
-						}
-					}
-					if(lib.cardPack.mode_derivation.length==0){
-						delete lib.cardPack.mode_derivation;
-					}
-				}
-				for(i in lib.config.forbidpack){
-					if(lib.config.characters.contains(i)){
-						lib.config.forbidall=lib.config.forbidall.concat(lib.config.forbidpack[i]);
-					}
-				}
-
-				var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
-				if(pilecfg){
-					lib.config.bannedpile=pilecfg[0]||{};
-					lib.config.addedpile=pilecfg[1]||{};
-				}
-				for(i in card){
-					lib.cardPack[i]=[];
-					if(card[i].card){
-						for(var j in card[i].card){
-							if(card[i].translate[j+'_info']){
-								lib.cardPack[i].push(j);
-							}
-						}
-					}
-					for(j in card[i]){
-						if(j=='mode'||j=='forbid') continue;
-						if(j=='list'){
-							if(card[i].forbid&&card[i].forbid.contains(lib.config.mode)) continue;
-							if(card[i].mode&&card[i].mode.contains(lib.config.mode)==false) continue;
-							if(lib.config.cards.contains(i)){
-								var pile;
-								if(typeof card[i][j]=='function'){
-									pile=lib.init.eval(card[i][j])();
-								}
-								else{
-									pile=card[i][j];
-								}
-								lib.cardPile[i]=pile.slice(0);
-								if(lib.config.bannedpile[i]){
-									for(var k=0;k<lib.config.bannedpile[i].length;k++){
-										pile[lib.config.bannedpile[i][k]]=null;
-									}
-								}
-								for(var k=0;k<pile.length;k++){
-									if(!pile[k]){
-										pile.splice(k--,1);
-									}
-								}
-								if(lib.config.addedpile[i]){
-									for(var k=0;k<lib.config.addedpile[i].length;k++){
-										pile.push(lib.config.addedpile[i][k]);
-									}
-								}
-								lib.card.list=lib.card.list.concat(pile);
-							}
-						}
-						else{
-							for(k in card[i][j]){
-								if(j=='translate'&&k==i){
-									lib[j][k+'_card_config']=card[i][j][k];
-								}
-								else{
-									if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
-									else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
-								}
-							}
-						}
-					}
-				}
-				for(i in play){
-					if(lib.config.hiddenPlayPack.contains(i)) continue;
-					if(play[i].forbid&&play[i].forbid.contains(lib.config.mode)) continue;
-					if(play[i].mode&&play[i].mode.contains(lib.config.mode)==false) continue;
-					for(j in play[i].element){
-						if(!lib.element[j]) lib.element[j]=[];
-						for(k in play[i].element[j]){
-							if(k=='init'){
-								if(!lib.element[j].inits) lib.element[j].inits=[];
-								lib.element[j].inits.push(lib.init.eval(play[i].element[j][k]));
-							}
-							else{
-								lib.element[j][k]=lib.init.eval(play[i].element[j][k]);
-							}
-						}
-					}
-					for(j in play[i].ui){
-						if(typeof play[i].ui[j]=='object'){
-							if(ui[j]==undefined) ui[j]={};
-							for(k in play[i].ui[j]){
-								ui[j][k]=lib.init.eval(play[i].ui[j][k]);
-							}
-						}
-						else{
-							ui[j]=lib.init.eval(play[i].ui[j]);
-						}
-					}
-					for(j in play[i].game){
-						game[j]=lib.init.eval(play[i].game[j]);
-					}
-					for(j in play[i].get){
-						get[j]=lib.init.eval(play[i].get[j]);
-					}
-					for(j in play[i]){
-						if(j=='mode'||j=='forbid'||j=='init'||j=='element'||
-						j=='game'||j=='get'||j=='ui'||j=='arenaReady') continue;
-						for(k in play[i][j]){
-							if(j=='translate'&&k==i){
-								lib[j][k+'_play_config']=play[i][j][k];
-							}
-							else{
-								if(lib[j][k]!=undefined){
-									console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
-								}
-								lib[j][k]=lib.init.eval(play[i][j][k]);
-							}
-						}
-					}
-					if(typeof play[i].init=='function') (lib.init.eval(play[i].init))();
-					if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
-				}
-				for(i=0;i<lib.card.list.length;i++){
-					if(lib.card.list[i][2]=='huosha'){
-						lib.card.list[i]=lib.card.list[i].slice(0);
-						lib.card.list[i][2]='sha';
-						lib.card.list[i][3]='fire';
-					}
-					else if(lib.card.list[i][2]=='leisha'){
-						lib.card.list[i]=lib.card.list[i].slice(0);
-						lib.card.list[i][2]='sha';
-						lib.card.list[i][3]='thunder';
-					}
-					if(!lib.card[lib.card.list[i][2]]){
-						lib.card.list.splice(i,1);i--;
-					}
-					else if(lib.card[lib.card.list[i][2]].mode&&
-						lib.card[lib.card.list[i][2]].mode.contains(lib.config.mode)==false){
-						lib.card.list.splice(i,1);i--;
-					}
-				}
-				try{
-					lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
-					if(typeof lib.storage!='object') throw('err');
-					if(lib.storage==null) throw('err');
-				}
-				catch(err){
-					lib.storage={};
-					localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
-				}
-				if(lib.config.cheat) cheat.i();
-				else{
-					lib.cheat=window.cheat;
-					delete window.cheat;
-				}
-				lib.config.sort_card=get.sortCard(lib.config.sort);
-				delete window.config;
-				delete window.mode;
-				delete window.card;
-				delete window.character;
-				delete window.play;
-				for(var i in lib.init){
-					if(i.indexOf('setMode_')==0){
-						delete lib.init[i];
-					}
-				}
-				while(lib.packageReady.length){
-					(lib.init.eval(lib.packageReady.shift()))();
-				}
-				delete lib.packageReady;
-				ui.create.arena();
-				if(lib.db&&!_status.characterLoaded){
-					_status.waitingForCharacters=true;
-				}
-				else{
-					game.createEvent('game',false).content=lib.init.start;
-					delete lib.init.start;
-					game.loop();
-				}
-			}
-			if(!mode[lib.config.mode]){
-				window.inSplash=true;
-				var clickNode=function(){
-					lib.config.mode=this.link;
-					game.saveConfig('mode',this.link);
-					splash.delete();
-					delete window.inSplash;
-					var scriptnode=lib.init.js(lib.assetURL+'mode',lib.config.mode);
-					if(scriptnode){
-						scriptnode.onload=proceed;
-					}
-					else{
-						proceed();
-					}
-				}
-				var splash=ui.create.div('#splash',document.body);
-				for(var i=0;i<lib.config.all.mode.length;i++){
-					var node=ui.create.div(splash,'.hidden',clickNode);
-					node.link=lib.config.all.mode[i];
-					ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
-					if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
-						ui.create.div(node,'.avatar').setBackgroundImage('image/splash/'+lib.config.all.mode[i]+'.jpg');
-					}
-					else{
-						ui.create.div(node,'.avatar').setBackgroundDB(lib.mode[lib.config.all.mode[i]].splash);
-					}
-					ui.refresh(node);
-					setTimeout((function(node){
-						return function(){
-							node.show();
-						}
-					}(node)),i*100);
-				}
+			if(_status.packLoaded){
+				delete _status.packLoaded;
+				lib.init.onload();
 			}
 			else{
-				proceed();
+				_status.windowLoaded=true;
 			}
-			localStorage.removeItem(lib.configprefix+'directstart');
 		};
 		if(!lib.config.touchscreen){
 			document.onmousewheel=ui.click.windowmousewheel;
