@@ -18,7 +18,11 @@
 	var lib={
 		version:'1.8.1',
 		changeLog:[
-			'',
+			'AI问题修复',
+			'检查更新功能',
+			'游戏内下载/更新素材',
+			'iOS/Mac/Windows版优化',
+			'iOS版支持录像、扩展等'
 		],
 		configprefix:'noname_0.9_',
 		assetURL:'',
@@ -299,6 +303,19 @@
 							'2500':'2.5秒',
 						}
 					},
+					video:{
+						name:'保存录像',
+						init:'20',
+						item:{
+							'0':'关闭',
+							'5':'五局',
+							'10':'十局',
+							'20':'二十局',
+							'50':'五十局',
+							'10000':'无限',
+						},
+						unfrequent:true,
+					},
 					mousewheel:{
 						name:'滚轮控制手牌',
 						init:true,
@@ -316,18 +333,10 @@
 							}
 						}
 					},
-					video:{
-						name:'保存录像',
-						init:'20',
-						item:{
-							'0':'关闭',
-							'5':'五局',
-							'10':'十局',
-							'20':'二十局',
-							'50':'五十局',
-							'10000':'无限',
-						},
-						unfrequent:true,
+					auto_check_update:{
+						name:'自动检查更新',
+						init:false,
+						unfrequent:true
 					},
 					update:function(config,map){
 						if(config.touchscreen){
@@ -2609,65 +2618,6 @@
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
 			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令输入框中输出结果<br>game.print(str)<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
-			'身份模式':'<div style="margin:10px">选项</div><ul style="margin-top:0"><li>加强主公<br>反贼人数多于2时主公会额外增加一个技能（每个主公的额外技能固定，非常备主公增加天命）</ul>'+
-			'<div style="margin:10px">明忠</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
-			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
-			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
-			'对决模式':'<div style="margin:10px">4v4</div><ul style="margin-top:0"><li>双方各有一名主公和三名忠臣，杀死对方主公获胜<li>'+
-			'8号位游戏开始时额外摸一张牌，7、8号位可在游戏开始时置换一次手牌<li>'+
-			'杀死对方忠臣摸2+x张牌，x为对方（含刚被杀的忠臣）与己方的存活人数之差；主公杀死己方忠臣须弃置所有牌',
-		},
-		help2:{
-			'战棋模式':
-			'<div style="margin:10px">对阵模式</div><ul style="margin-top:0"><li>n人对战n人的模式，由单人控制，开始游戏后随机分配位置与出牌顺序<li>'+
-			'每人在出牌阶段有一次移动的机会，可移动的最大距离为2<li>'+
-			'任何卡牌或技能无法指定位置相隔8个格以上的角色为目标<li>'+
-			'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
-			'若开启主将，双方各选择一名角色成为主将。主将体力上限加一，主将死亡后，若有副将，副将代替之成为主将，否则游戏结束<li>'+
-			'开启无尽模式后，任何一方有角色死亡都将选择一名新角色重新加入战场，直到点击左上角的结束游戏按钮手动结束游戏。结束游戏时，杀敌更多的一方获胜<li>'+
-			'开启交替行动时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
-			'开启战场机关后，每个回合结束时有一定机率出现一个机关，该机关不参与战斗，并有一个影响周围或全体角色的效果。机关在出现后的5〜10个回合内消失<li>'+
-			'开启击退效果后，当一名角色对距离两格以内的目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
-			'战场上可设置出现随机路障，角色无法移动到路障处。当一名角色的周围四格有至少三格为路障或在战场外时，其可以在回合内清除一个相邻路障</ul>'+
-			'<div style="margin:10px">君主模式</div><ul style="margin-top:0"><li>收集武将进行战斗，根据战斗难度及我方出场武将的强度，战斗胜利后将获得数量不等的金钱。没有君主出场时，获得的金钱较多<li>'+
-			'金钱可以用来招募随机武将，招到已有武将，或遣返不需要的武将时可得到招募令<li>'+
-			'战斗中有君主出场时可招降敌将，成功率取决于敌将的稀有度、剩余体力值以及手牌数。成功后战斗立即结束且没有金钱奖励。每发动一次招降，无论成功还是失败，都会扣除10招募令<li>'+
-			'挑战武将会与该武将以及与其强度相近的武将进行战斗，敌方人数与我方出场人数相同，但不少于3。胜利后可通过招募令招募该武将<li>'+
-			'竞技场：<br>随机选择9名武将，每次派出1〜3名武将参战。战斗中阵亡的武将不能再次上场。<br><br>战斗后武将进入疲劳状态，若立即再次出场则初始体力值-1。<br><br>战斗中本方武将行动时可召唤后援，令一名未出场的已方武将加入战斗。后援武将在战斗结束后无论存活与否均不能再次出场<br><br>当取得12场胜利或所有武将全部阵亡后结束，并根据胜场数获得随机奖励</ul>'+
-			'<div style="margin:10px">塔防模式</div><ul style="margin-top:0"><li>阻上敌人到达最下方的出口，坚持到给定的回合数即获得胜利<li>'+
-			'每轮可获得10个行动点，用来布置机关、招募武将，或令武将行动。游戏难度将影响不同操作消耗的行动点数。未用完的行动点将减半并累积到下一轮<li>'+
-			'每一轮在最上方的一个随机位置增加一名敌人，若最上方已有角色，则将其下移一格<li>'+
-			'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募10名友方角色。<li>'+
-			'敌方角色到达底部出口时游戏失败，已方角色到达底部出口，将被移出游戏',
-			'炉石模式':
-			'<div style="margin:10px">构筑</div><ul style="margin-top:0"><li>点击右上角的卡组管理构建卡组<li>一套卡组共30张牌，由法术和随从牌构成，每个同名卡牌最多带两张'+
-			'<li>卡组管理器中，随从右上角的x/y表示登场状态为x牌y血'+
-			'<li>游戏开始时，双方摸三张牌并从牌库中获得一张牌，并可选择将手牌置换一次'+
-			'<li>每当主将摸X张牌时，若X至少为2，则其中的X-1张牌从牌堆中获得，1张牌从牌库中获得'+
-			'<li>每名角色使用一套卡组，卡组用完后会重新补满'+
-			'<li>卡组与职业绑定，每个职业有一个专属技能，每回合限用一次，消耗两点行动值</ul>'+
-			'<div style="margin:10px">职业技能</div><ul style="margin-top:0"><li>祭司：召唤一个随机图腾'+
-			'<li>法师：对一名随从造成一点火焰伤害'+
-			'<li>牧师：回复一点体力'+
-			'<li>战士：获得一点护甲（不能超过3点）'+
-			'<li>术士：牌库中摸两张牌'+
-			'<li>潜行者：装备一把武器和一个随机非武器装备'+
-			'<li>圣骑士：召唤一名士兵'+
-			'<li>猎人：对敌方主将造成一点伤害'+
-			'<li>德鲁伊：视为使用一张不计入出杀次数的杀</ul>'+
-			'<div style="margin:10px">怒气值</div><ul style="margin-top:0"><li>每当友方随从受到伤害获得3点怒气值，主将受到伤害获得6点怒气值'+
-			'<li>每有一个友方随从死亡，获得10点怒气值，主将死亡获得20点怒气值'+
-			'<li>回合结束阶段，若己方随从数少于对方会获得10X点怒气值，X为随从数之差'+
-			'<li>怒气值达到100时不再增加。回合开始阶段，若怒气值己满，可消耗全部怒气值并召唤一名传说随从</ul>'+
-			'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+1'+
-			'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段的卡牌'+
-			'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
-			'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
-			'随从与其他所有角色相互距离基数为1<li>'+
-			'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
-			'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为从牌库中获得一张法术牌'+
-			'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀目标'+
-			'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
 		},
 		setIntro:function(node,func){
 			if(lib.config.touchscreen){
@@ -2968,12 +2918,6 @@
 				delete window.music;
 				delete window.font;
 
-				if(lib.config.all.mode.indexOf('chess')!=-1){
-					for(var i in lib.help2){
-						lib.help[i]=lib.help2[i];
-					}
-				}
-				delete lib.help2;
 				if(lib.config.extensions.length){
 					window.resetExtension=function(){
 						for(var i=0;i<lib.config.extensions.length;i++){
@@ -3166,44 +3110,52 @@
 					}
 				});
 
-				if(lib.device=='android'){
+				if(lib.device){
 					window._onDeviceReady=function(){
-						document.addEventListener("pause", function(){
-							if(!_status.paused2&&!_status.event.isMine()){
-								ui.click.pause();
-							}
-							if(ui.backgroundMusic){
-								ui.backgroundMusic.pause();
-							}
-						});
-						document.addEventListener("resume", function(){
-							if(ui.backgroundMusic){
-								ui.backgroundMusic.play();
-							}
-						});
-						document.addEventListener("backbutton", function(){
-							if(ui.arena.classList.contains('menupaused')){
-								ui.click.configMenu();
-							}
-							else if(lib.config.confirm_exit){
-								navigator.notification.confirm(
-									'是否退出游戏？',
-									 function(index){
-										 switch(index){
-											 case 2:game.saveConfig('null');game.reload();break;
-											 case 3:navigator.app.exitApp();break;
-										 }
-									 },
-									'确认退出',
-									['取消','重新开始','退出']
-								);
+						if(lib.device=='android'){
+							document.addEventListener("pause", function(){
+								if(!_status.paused2&&!_status.event.isMine()){
+									ui.click.pause();
+								}
+								if(ui.backgroundMusic){
+									ui.backgroundMusic.pause();
+								}
+							});
+							document.addEventListener("resume", function(){
+								if(ui.backgroundMusic){
+									ui.backgroundMusic.play();
+								}
+							});
+							document.addEventListener("backbutton", function(){
+								if(ui.arena.classList.contains('menupaused')){
+									ui.click.configMenu();
+								}
+								else if(lib.config.confirm_exit){
+									navigator.notification.confirm(
+										'是否退出游戏？',
+										 function(index){
+											 switch(index){
+												 case 2:game.saveConfig('null');game.reload();break;
+												 case 3:navigator.app.exitApp();break;
+											 }
+										 },
+										'确认退出',
+										['取消','重新开始','退出']
+									);
+								}
+								else{
+									navigator.app.exitApp();
+								}
+							});
+						}
+						if(Array.isArray(lib.assetLoading)){
+							var url;
+							if(lib.device=='android'){
+								url=cordova.file.externalApplicationStorageDirectory;
 							}
 							else{
-								navigator.app.exitApp();
+								url=cordova.file.documentsDirectory;
 							}
-						});
-						if(Array.isArray(lib.assetLoading)){
-							var url=cordova.file.externalApplicationStorageDirectory;
 							for(var i=0;i<lib.assetLoading.length;i++){
 								var item=lib.assetLoading[i];
 								if(typeof item=='string'){
@@ -3221,11 +3173,6 @@
 							delete lib.assetLoading;
 							lib.assetURL=url;
 						}
-					}
-				}
-				else if(lib.device=='ios'){
-					window._onDeviceReady=function(){
-
 					}
 				}
 			},
@@ -10047,6 +9994,67 @@
 			}
 			else{
 				zipReady();
+			}
+		},
+		checkForUpdate:function(forcecheck){
+			if(_status.checkingForUpdate){
+				alert('正在检查...');
+			}
+			else{
+				_status.checkingForUpdate=true;
+				var createLayer=function(){
+					var layer=document.createElement('div');
+					layer.classList.add('poplayer');
+					layer.style.zIndex='100';
+					layer.listen(function(){
+						this.remove();
+					});
+					layer.style.background='rgba(0,0,0,0.5)';
+
+					var iframe=document.createElement('iframe');
+					iframe.src='http://pan.baidu.com/s/1jG5oK8e';
+					iframe.width=Math.round(ui.window.offsetWidth*0.8)+'px';
+					iframe.height=Math.round(ui.window.offsetHeight*0.9)+'px';
+					iframe.style.left=Math.round(ui.window.offsetWidth*0.1)+'px';
+					iframe.style.top=Math.round(ui.window.offsetHeight*0.05)+'px';
+					iframe.style.position='absolute';
+					layer.appendChild(iframe);
+
+					ui.window.appendChild(layer);
+				};
+				var script=lib.init.js('http://iserve.applinzi.com','update',function(){
+					_status.checkingForUpdate=false;
+					script.remove();
+					var update=window.noname_update;
+					delete window.noname_update;
+					if(forcecheck===false&&update.version==lib.config.check_version){
+						return;
+					}
+					game.saveConfig('check_version',update.version);
+					if(update.version!=lib.version){
+						var str='有新版本'+update.version+'可用，是否下载？';
+						if(navigator.notification&&navigator.notification.confirm){
+							navigator.notification.confirm(
+								update.content,
+								function(index){
+									if(index==1){
+										createLayer();
+									}
+								},
+								str,
+								['确定','取消']
+							);
+						}
+						else{
+							if(confirm(str)){
+								createLayer();
+							}
+						}
+					}
+					else{
+						alert('当前版本已是最新');
+					}
+				});
 			}
 		},
 		playVideo:function(time,mode){
@@ -17302,13 +17310,12 @@
 							active.classList.add('active');
 						}
 						rightPane.appendChild(active.link);
+
+						var update=ui.create.div('.lefttext','检查更新',start.firstChild,game.checkForUpdate);
 					}());
 
 				}());
 
-				// ui.systemButton=ui.create.div('.menubutton.round.highlight#systembutton','设',ui.arena,function(){
-				//
-				// });
 				lib.status.date=new Date();
 				lib.status.dateDelayed=0;
 
@@ -17316,6 +17323,11 @@
 					(lib.init.eval(lib.arenaReady.shift()))();
 				}
 				delete lib.arenaReady;
+				if(lib.config.auto_check_update){
+					setTimeout(function(){
+						game.checkForUpdate(false);
+					},3000);
+				}
 
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;

@@ -839,6 +839,7 @@ character.hearth={
 				if(event.parent.parent.name=='phaseDraw') return false;
 				if(event.parent.name=='fenlie') return false;
 				if(player.storage.fenlie>=3) return false;
+				if(!event.cards) return false;
 				return true;
 			},
 			content:function(){
