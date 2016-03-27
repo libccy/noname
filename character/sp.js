@@ -147,7 +147,7 @@ character.sp={
 			}
 		},
 		mouduan:{
-			init:function(player){
+			init2:function(player){
 				player.storage.mouduan_mark=player.mark('武',{
 					content:'拥有技能【激昂】、【谦逊】'
 				});
@@ -159,7 +159,7 @@ character.sp={
 			trigger:{player:'loseEnd'},
 			forced:true,
 			filter:function(event,player){
-				return player.storage.mouduan_mark.name=='武'&&player.num('h')<=2;
+				return player.storage.mouduan_mark&&player.storage.mouduan_mark.name=='武'&&player.num('h')<=2;
 			},
 			content:function(){
 				player.storage.mouduan_mark.name='文';
@@ -174,7 +174,7 @@ character.sp={
 			trigger:{global:'phaseBegin'},
 			priority:5,
 			filter:function(event,player){
-				return player.storage.mouduan_mark.name=='文'&&player.num('h')>2;
+				return player.storage.mouduan_mark&&player.storage.mouduan_mark.name=='文'&&player.num('h')>2;
 			},
 			direct:true,
 			content:function(){

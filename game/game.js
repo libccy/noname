@@ -25,7 +25,7 @@
 			'iOS版支持录像、扩展等'
 		],
 		configprefix:'noname_0.9_',
-		updateURL:'http://iserve.applinzi.com/',
+		updateURL:'http://isha.applinzi.com/',
 		onlineURL:'http',
 		assetURL:'',
 		updates:[],
@@ -338,11 +338,6 @@
 					auto_check_update:{
 						name:'自动检查游戏更新',
 						init:false,
-						unfrequent:true
-					},
-					auto_check_asset_update:{
-						name:'自动检查素材更新',
-						init:true,
 						unfrequent:true
 					},
 					update:function(config,map){
@@ -3154,17 +3149,6 @@
 									navigator.app.exitApp();
 								}
 							});
-
-							game.download=function(url,folder,onsuccess,onerror){
-								var fileTransfer = new FileTransfer();
-								url=lib.updateURL+url;
-								var uri = encodeURI(url);
-								fileTransfer.download(
-								    uri,
-								    cordova.file.externalApplicationStorageDirectory+folder+'/'+url.slice(url.lastIndexOf('/')+1),
-								    onsuccess,onerror
-								);
-							};
 						}
 						if(Array.isArray(lib.assetLoading)){
 							var url;
@@ -3191,6 +3175,12 @@
 							delete lib.assetLoading;
 							lib.assetURL=url;
 						}
+						game.download=function(url,folder,onsuccess,onerror){
+							var fileTransfer = new FileTransfer();
+							url=lib.updateURL+url;
+							folder=lib.assetURL+folder;
+							fileTransfer.download(encodeURI(url),folder,onsuccess,onerror);
+						};
 					}
 				}
 			},
@@ -10043,7 +10033,7 @@
 
 					ui.window.appendChild(layer);
 				};
-				var script=lib.init.js(lib.updateURL,'update',function(){
+				var script=lib.init.js(lib.updateURL,'game/update',function(){
 					_status.checkingForUpdate=false;
 					script.remove();
 					var update=window.noname_update;
@@ -17329,26 +17319,90 @@
 						li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px"></p>';
 						li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
 
+						var button1,button2;
+
 						game.checkForAssetUpdate=function(forcecheck){
 							if(_status.checkingForAssetUpdate){
-								if(forcecheck!==false){
-									alert('正在检查...');
-								}
+								return;
 							}
 							else if(game.download){
+								button2.innerHTML='正在检查更新';
+								button2.disabled=true;
 								_status.checkingForAssetUpdate=true;
-								var script=lib.init.js(lib.updateURL,'asset',function(){
-									_status.checkingForAssetUpdate=false;
+								var script=lib.init.js(lib.updateURL,'game/asset',function(){
 									script.remove();
-									var update=window.noname_asset_list;
+									var updates=window.noname_asset_list;
 									delete window.noname_asset_list;
 									game.saveConfig('asset_version',lib.version);
-									var n=update.length;
-									for(var i=0;i<update.length;i++){
-										resolveLocalFileSystemURL(lib.assetURL+update[i],function(entry){
-											game.print(entry.toURL());
+									var n=updates.length;
+
+									var proceed=function(){
+										if(updates.length==0){
+											if(forcecheck!==false) alert('素材已是最新');
+											_status.checkingForAssetUpdate=false;
+											button2.disabled=false;
+											button2.innerHTML='检查素材更新';
+											return;
+										}
+										if(forcecheck===false){
+											if(!confirm('有新的素材可用，是否下载？')){
+												_status.checkingForAssetUpdate=false;
+												button2.disabled=false;
+												button2.innerHTML='检查素材更新';
+												return;
+											}
+										}
+										if(!ui.arena.classList.contains('menupaused')){
+											ui.click.configMenu();
+											ui.click.menuTab('帮助');
+										}
+										var p=button2.parentNode;
+										button2.remove();
+										var span=document.createElement('span');
+										var n1=0;
+										var n2=updates.length;
+										var n=n2;
+										span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
+										p.appendChild(span);
+										var finish=function(){
+											_status.checkingForAssetUpdate=false;
+											span.innerHTML='素材更新完毕（'+n1+'/'+n2+'）';
+											p.appendChild(document.createElement('br'));
+											var button=document.createElement('button');
+											button.innerHTML='重新启动';
+											button.onclick=game.reload;
+											p.appendChild(button);
+										}
+										for(var i=0;i<updates.length;i++){
+											game.download(updates[i],updates[i],function(){
+												n--;
+												n1++;
+												span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
+												if(n==0){
+													setTimeout(finish,500);
+												}
+											},function(e){
+												n--;
+												game.print('下载失败：'+e.source);
+												span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
+												if(n==0){
+													setTimeout(finish,500);
+												}
+											});
+										}
+									};
+									for(var i=0;i<updates.length;i++){
+										resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
+											n--;
+											updates.remove(entry.toURL().slice(lib.assetURL.length));
+											if(n==0){
+												proceed();
+											}
 										},function(){
-											game.print(123);
+											n--;
+											if(n==0){
+												proceed();
+											}
 										});
 									}
 								});
@@ -17360,11 +17414,11 @@
 							}
 						};
 
-						var button1=document.createElement('button');
+						button1=document.createElement('button');
 						button1.innerHTML='检查游戏更新';
 						button1.onclick=game.checkForUpdate;
 						li1.lastChild.appendChild(button1);
-						var button2=document.createElement('button');
+						button2=document.createElement('button');
 						button2.innerHTML='检查素材更新';
 						button2.onclick=game.checkForAssetUpdate;
 						li2.lastChild.appendChild(button2);
@@ -17372,7 +17426,6 @@
 						ul.appendChild(li1);
 						ul.appendChild(li2);
 						page.appendChild(ul);
-
 
 						for(var i in lib.help){
 							var page=ui.create.div('');
@@ -17401,11 +17454,6 @@
 				if(lib.config.auto_check_update){
 					setTimeout(function(){
 						game.checkForUpdate(false);
-					},3000);
-				}
-				if(lib.config.auto_check_asset_update&&lib.config.asset_version!=lib.version){
-					setTimeout(function(){
-						game.checkForAssetUpdate(false);
 					},3000);
 				}
 
