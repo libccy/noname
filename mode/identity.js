@@ -1024,10 +1024,10 @@ mode.identity={
 					identity2='zhong';
 					if(from==to) return 10;
 				}
-				if(to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
+				if(from!=to&&to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
 					identity2=to.ai.identity_mark;
 				}
-				if(get.population('fan')==0&&identity2=='zhong'){
+				if(from.identity!='nei'&&from!=to&&get.population('fan')==0&&identity2=='zhong'){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].identity=='nei'&&
 						game.players[i].ai.identity_mark=='zhong'&&

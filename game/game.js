@@ -16,12 +16,9 @@
 		dieClose:[]
 	};
 	var lib={
-		version:'1.8.0',
+		version:'1.8.1',
 		changeLog:[
-			'安卓版改进：',
-			'·程序与素材分离',
-			'·可导出数据',
-			'·自动暂停、确认退出等'
+			'',
 		],
 		configprefix:'noname_0.9_',
 		assetURL:'',
@@ -3228,7 +3225,7 @@
 				}
 				else if(lib.device=='ios'){
 					window._onDeviceReady=function(){
-						game.export('123');
+
 					}
 				}
 			},
@@ -5710,10 +5707,6 @@
 						}
 						this.node.count.innerHTML=numh;
 					}
-					// this.node.equips.dataset.number=this.num('e');
-					// if(this==game.me){
-					// 	ui.updateh();
-					// }
 					if(this.updates){
 						for(var i=0;i<lib.element.player.updates.length;i++){
 							lib.element.player.updates[i](this);
