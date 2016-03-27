@@ -25,6 +25,8 @@
 			'iOS版支持录像、扩展等'
 		],
 		configprefix:'noname_0.9_',
+		updateURL:'http://iserve.applinzi.com/',
+		onlineURL:'http',
 		assetURL:'',
 		updates:[],
 		canvasUpdates:[],
@@ -334,8 +336,13 @@
 						}
 					},
 					auto_check_update:{
-						name:'自动检查更新',
+						name:'自动检查游戏更新',
 						init:false,
+						unfrequent:true
+					},
+					auto_check_asset_update:{
+						name:'自动检查素材更新',
+						init:true,
 						unfrequent:true
 					},
 					update:function(config,map){
@@ -3147,6 +3154,17 @@
 									navigator.app.exitApp();
 								}
 							});
+
+							game.download=function(url,folder,onsuccess,onerror){
+								var fileTransfer = new FileTransfer();
+								url=lib.updateURL+url;
+								var uri = encodeURI(url);
+								fileTransfer.download(
+								    uri,
+								    cordova.file.externalApplicationStorageDirectory+folder+'/'+url.slice(url.lastIndexOf('/')+1),
+								    onsuccess,onerror
+								);
+							};
 						}
 						if(Array.isArray(lib.assetLoading)){
 							var url;
@@ -3189,6 +3207,9 @@
 			    return style;
 			},
 			js:function(path,file,onload){
+				if(path[path.length-1]=='/'){
+					path=path.slice(0,path.length-1);
+				}
 				if(path=='mode'&&lib.config.all.stockmode.indexOf(file)==-1){
 					lib.init['setMode_'+file]();
 					return;
@@ -9887,7 +9908,7 @@
 			var fileNameToSaveAs = name||'noname';
 			fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
 
-			if(lib.device=='android'||lib.device=='ios'){
+			if(lib.device){
 				var directory;
 				if(lib.device=='android'){
 					directory=cordova.file.externalDataDirectory;
@@ -9929,7 +9950,7 @@
 					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
 					fileNameToSaveAs+='.zip';
 
-					if(window.resolveLocalFileSystemURL){
+					if(lib.device){
 						var directory;
 						if(lib.device=='android'){
 							directory=cordova.file.externalDataDirectory;
@@ -10022,7 +10043,7 @@
 
 					ui.window.appendChild(layer);
 				};
-				var script=lib.init.js('http://iserve.applinzi.com','update',function(){
+				var script=lib.init.js(lib.updateURL,'update',function(){
 					_status.checkingForUpdate=false;
 					script.remove();
 					var update=window.noname_update;
@@ -17297,6 +17318,62 @@
 							this.classList.add('active');
 							rightPane.appendChild(this.link);
 						};
+
+						var page=ui.create.div();
+						var node=ui.create.div('.menubutton.large','检查更新',start.firstChild,clickMode);
+						node.link=page;
+						page.classList.add('menu-help');
+						var ul=document.createElement('ul');
+						var li1=document.createElement('li');
+						var li2=document.createElement('li');
+						li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px"></p>';
+						li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
+
+						game.checkForAssetUpdate=function(forcecheck){
+							if(_status.checkingForAssetUpdate){
+								if(forcecheck!==false){
+									alert('正在检查...');
+								}
+							}
+							else if(game.download){
+								_status.checkingForAssetUpdate=true;
+								var script=lib.init.js(lib.updateURL,'asset',function(){
+									_status.checkingForAssetUpdate=false;
+									script.remove();
+									var update=window.noname_asset_list;
+									delete window.noname_asset_list;
+									game.saveConfig('asset_version',lib.version);
+									var n=update.length;
+									for(var i=0;i<update.length;i++){
+										resolveLocalFileSystemURL(lib.assetURL+update[i],function(entry){
+											game.print(entry.toURL());
+										},function(){
+											game.print(123);
+										});
+									}
+								});
+							}
+							else{
+								if(forcecheck!==false){
+									alert('此版本不支持游戏内更新素材，请手动更新');
+								}
+							}
+						};
+
+						var button1=document.createElement('button');
+						button1.innerHTML='检查游戏更新';
+						button1.onclick=game.checkForUpdate;
+						li1.lastChild.appendChild(button1);
+						var button2=document.createElement('button');
+						button2.innerHTML='检查素材更新';
+						button2.onclick=game.checkForAssetUpdate;
+						li2.lastChild.appendChild(button2);
+
+						ul.appendChild(li1);
+						ul.appendChild(li2);
+						page.appendChild(ul);
+
+
 						for(var i in lib.help){
 							var page=ui.create.div('');
 							var node=ui.create.div('.menubutton.large',i,start.firstChild,clickMode);
@@ -17310,8 +17387,6 @@
 							active.classList.add('active');
 						}
 						rightPane.appendChild(active.link);
-
-						var update=ui.create.div('.lefttext','检查更新',start.firstChild,game.checkForUpdate);
 					}());
 
 				}());
@@ -17326,6 +17401,11 @@
 				if(lib.config.auto_check_update){
 					setTimeout(function(){
 						game.checkForUpdate(false);
+					},3000);
+				}
+				if(lib.config.auto_check_asset_update&&lib.config.asset_version!=lib.version){
+					setTimeout(function(){
+						game.checkForAssetUpdate(false);
 					},3000);
 				}
 
