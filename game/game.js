@@ -1,5 +1,24 @@
 "use strict";
 (function(){
+    window.resetGameTimeout=setTimeout(function(){
+        if(window.inSplash) return;
+        if(window.resetExtension){
+            if(confirm('游戏似乎未正常载入，是否禁用扩展并重新打开？')){
+                window.resetExtension();
+                window.location.reload();
+            }
+        }
+        else{
+            if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+                localStorage.clear();
+                if(indexedDB) indexedDB.deleteDatabase('noname_0.9_data');
+                window.location.reload();
+            }
+        }
+    },5000);
+}());
+
+(function(){
 	var _status={
 		paused:false,
 		paused2:false,
@@ -420,7 +439,7 @@
 							ui.arena.hide();
 							setTimeout(function(){
 								var theme=ui.css.theme;
-								ui.css.theme=lib.init.css('theme/'+lib.config.theme,'style');
+								ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
 								theme.remove();
 								setTimeout(function(){ui.arena.show();},100);
 							},500);
@@ -620,7 +639,7 @@
 						onclick:function(layout){
 							game.saveConfig('card_style',layout);
 							var style=ui.css.card_style;
-							ui.css.card_style=lib.init.css('theme/style/card',lib.config.card_style);
+							ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
 							style.remove();
 						},
 						unfrequent:true,
@@ -637,7 +656,7 @@
 						onclick:function(layout){
 							game.saveConfig('cardback_style',layout);
 							var style=ui.css.cardback_style;
-							ui.css.cardback_style=lib.init.css('theme/style/cardback',lib.config.cardback_style);
+							ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
 							style.remove();
 						},
 						unfrequent:true,
@@ -652,7 +671,7 @@
 						onclick:function(layout){
 							game.saveConfig('hp_style',layout);
 							var style=ui.css.hp_style;
-							ui.css.hp_style=lib.init.css('theme/style/hp',lib.config.hp_style);
+							ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
 							style.remove();
 							if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 								ui.arena.classList.add('hpimage');
@@ -953,7 +972,7 @@
 						onclick:function(bool){
 							game.saveConfig('blur_ui',bool);
 							if(bool){
-								ui.css.blur_ui=lib.init.css('layout/default','blur');
+								ui.css.blur_ui=lib.init.css(lib.assetURL+'layout/default','blur');
 							}
 							else if(ui.css.blur_ui){
 								ui.css.blur_ui.remove();
@@ -2794,6 +2813,12 @@
 						break;
 					}
 				}
+				var noname_inited=localStorage.getItem('noname_inited');
+				if(noname_inited){
+					lib.device='android';
+					lib.assetURL=noname_inited;
+					delete lib.assetLoading;
+				}
 
 				lib.config={};
 				var config2;
@@ -2955,30 +2980,30 @@
 				}
 
 				if(localStorage.getItem(lib.configprefix+'playback')){
-					lib.init.js('mode',lib.config.mode);
+					lib.init.js(lib.assetURL+'mode',lib.config.mode);
 				}
 				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)&&
 					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
-					lib.init.js('mode',lib.config.mode);
+					lib.init.js(lib.assetURL+'mode',lib.config.mode);
 				}
-				lib.init.js('card',lib.config.all.cards);
-				lib.init.js('character',lib.config.all.characters);
-				lib.init.js('play',lib.config.plays);
-				lib.init.js('character','rank');
+				lib.init.js(lib.assetURL+'card',lib.config.all.cards);
+				lib.init.js(lib.assetURL+'character',lib.config.all.characters);
+				lib.init.js(lib.assetURL+'play',lib.config.plays);
+				lib.init.js(lib.assetURL+'character','rank');
 				ui.css={};
-				lib.init.css('layout/default','menu');
+				lib.init.css(lib.assetURL+'layout/default','menu');
 				var layout=lib.config.layout;
 				if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
 					if(layout=='default'){
 						layout='mobile';
 					}
 				}
-				ui.css.layout=lib.init.css('layout/'+layout,'layout');
-				if(lib.config.blur_ui) ui.css.blur_ui=lib.init.css('layout/default','blur');
-				ui.css.theme=lib.init.css('theme/'+lib.config.theme,'style');
-				ui.css.card_style=lib.init.css('theme/style/card',lib.config.card_style);
-				ui.css.cardback_style=lib.init.css('theme/style/cardback',lib.config.cardback_style);
-				ui.css.hp_style=lib.init.css('theme/style/hp',lib.config.hp_style);
+				ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout');
+				if(lib.config.blur_ui) ui.css.blur_ui=lib.init.css(lib.assetURL+'layout/default','blur');
+				ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
+				ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
+				ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
+				ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
 
 				lib.config.duration=500;
 
@@ -3111,7 +3136,7 @@
 				});
 
 				if(lib.device){
-					window._onDeviceReady=function(){
+					lib.init.cordovaReady=function(){
 						if(lib.device=='android'){
 							document.addEventListener("pause", function(){
 								if(!_status.paused2&&!_status.event.isMine()){
@@ -3222,7 +3247,7 @@
 				ui.arena.hide();
 				setTimeout(function(){
 					var layout=ui.css.layout;
-					ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
+					ui.css.layout=lib.init.css(lib.assetURL+'layout/'+lib.config.layout,'layout',layout);
 					if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 						ui.arena.classList.add('mobile');
 						if(game.me&&game.me.node.handcards2.childNodes.length){
@@ -9999,7 +10024,7 @@
 				zip.file('pack.js','game.import("character",'+lib.init.stringify(character)+')');
 			}
 			if(!window.JSZip){
-				lib.init.js('game','jszip',zipReady);
+				lib.init.js(lib.assetURL+'game','jszip',zipReady);
 			}
 			else{
 				zipReady();
@@ -10125,7 +10150,7 @@
 						else{
 							event.playtoload++;
 						}
-						var script=lib.init.js('play',content.name);
+						var script=lib.init.js(lib.assetURL+'play',content.name);
 						script.addEventListener('load',function(){
 							var play=window.play[content.name]
 							if(play&&play.video){
@@ -12864,7 +12889,7 @@
 			next.content=function(){
 				'step 0'
 				window.mode={};
-				lib.init.js('mode',event.mode,game.resume);
+				lib.init.js(lib.assetURL+'mode',event.mode,game.resume);
 				game.pause();
 				'step 1'
 				event.result=window.mode[event.mode];
@@ -12885,7 +12910,7 @@
 					window.character={};
 					window.card={};
 					var pack=event.packages.shift().split('/');
-					lib.init.js(pack[0],pack[1],game.resume);
+					lib.init.js(lib.assetURL+pack[0],pack[1],game.resume);
 					game.pause();
 				}
 				else{
@@ -15172,7 +15197,7 @@
 												fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
 											}
 											if(!window.JSZip){
-												lib.init.js('game','jszip',zipReady);
+												lib.init.js(lib.assetURL+'game','jszip',zipReady);
 											}
 											else{
 												zipReady();
@@ -15909,7 +15934,7 @@
 										fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
 									}
 									if(!window.JSZip){
-										lib.init.js('game','jszip',zipReady);
+										lib.init.js(lib.assetURL+'game','jszip',zipReady);
 									}
 									else{
 										zipReady();
@@ -17502,7 +17527,6 @@
 						game.checkForUpdate(false);
 					},3000);
 				}
-
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;
 				delete window.resetExtension;
@@ -19947,7 +19971,7 @@
 					ui.arena.hide();
 					setTimeout(function(){
 						var theme=ui.css.theme;
-						ui.css.theme=lib.init.css('theme/'+lib.config.theme,'style');
+						ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
 						theme.remove();
 						setTimeout(function(){ui.arena.show();},100);
 					},500);
@@ -19958,7 +19982,7 @@
 						ui.arena.hide();
 						setTimeout(function(){
 							var layout=ui.css.layout;
-							ui.css.layout=lib.init.css('layout/'+lib.config.layout,'layout',layout);
+							ui.css.layout=lib.init.css(lib.assetURL+'layout/'+lib.config.layout,'layout',layout);
 
 							setTimeout(function(){layout.remove();ui.arena.show();},100);
 						},500);
@@ -20121,7 +20145,7 @@
 					game.saveConfig('show_scrollbar',bool);
 					if(lib.config.touchscreen) return;
 					if(bool){
-						ui.css.scrollbar=lib.init.css('layout/default','scrollbar');
+						ui.css.scrollbar=lib.init.css(lib.assetURL+'layout/default','scrollbar');
 					}
 					else{
 						ui.css.scrollbar.remove();
@@ -20141,7 +20165,7 @@
 				blur_ui:function(bool){
 					game.saveConfig('blur_ui',bool);
 					if(bool){
-						ui.css.blur_ui=lib.init.css('layout/default','blur');
+						ui.css.blur_ui=lib.init.css(lib.assetURL+'layout/default','blur');
 					}
 					else if(ui.css.blur_ui){
 						ui.css.blur_ui.remove();
@@ -22926,6 +22950,61 @@
 			}
 		};
 		window.onload=function(){
+			if(lib.device){
+				var script=document.createElement('script');
+				script.src='cordova.js';
+				document.body.appendChild(script);
+				document.addEventListener('deviceready',function(){
+					if(lib.init.cordovaReady){
+						lib.init.cordovaReady();
+						delete lib.init.cordovaReady;
+					}
+				});
+			}
+			ui.background=ui.create.div('.background');
+			ui.background.style.backgroundSize="cover";
+			if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background!='custom'){
+		        ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
+		        switch (lib.config.image_background_filter){
+		            case 'blur':
+		                ui.background.style.filter='blur(8px)';
+		                ui.background.style.webkitFilter='blur(8px)';
+		                ui.background.style.transform='scale(1.05)';
+		                break;
+		            case 'gray':
+		                ui.background.style.filter='grayscale(1)';
+		                ui.background.style.webkitFilter='grayscale(1)';
+		                break;
+		            case 'sepia':
+		                ui.background.style.filter='sepia(0.5)';
+		                ui.background.style.webkitFilter='sepia(0.5)';
+		                break;
+		            case 'invert':
+		                ui.background.style.filter='invert(1)';
+		                ui.background.style.webkitFilter='invert(1)';
+		                break;
+		            case 'saturate':
+		                ui.background.style.filter='saturate(5)';
+		                ui.background.style.webkitFilter='saturate(5)';
+		                break;
+		            case 'contrast':
+		                ui.background.style.filter='contrast(1.4)';
+		                ui.background.style.webkitFilter='contrast(1.4)';
+		                break;
+		            case 'hue':
+		                ui.background.style.filter='hue-rotate(180deg)';
+		                ui.background.style.webkitFilter='hue-rotate(180deg)';
+		                break;
+		            case 'brightness':
+		                ui.background.style.filter='brightness(5)';
+		                ui.background.style.webkitFilter='brightness(5)';
+		                break;
+		            default:
+		                ui.background.style.webkitFilter='';
+		        }
+		    }
+			document.body.insertBefore(ui.background,document.body.firstChild);
+
 			document.body.onresize=ui.updatex;
 			if(lib.config.touchscreen){
 				document.body.addEventListener('touchstart',function(e){
@@ -22941,8 +23020,6 @@
 					}
 				});
 			}
-			ui.background=document.querySelector('.background.static');
-			ui.background.classList.remove('static');
 
 			lib.onDB(function(){
 				if(lib.config.image_background=='custom'){
@@ -23282,7 +23359,7 @@
 					game.saveConfig('mode',this.link);
 					splash.delete();
 					delete window.inSplash;
-					var scriptnode=lib.init.js('mode',lib.config.mode);
+					var scriptnode=lib.init.js(lib.assetURL+'mode',lib.config.mode);
 					if(scriptnode){
 						scriptnode.onload=proceed;
 					}

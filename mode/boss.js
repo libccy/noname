@@ -34,7 +34,7 @@ mode.boss={
 				}
 			}
 		}
-		lib.init.css('layout/mode','boss');
+		lib.init.css(lib.assetURL+'layout/mode','boss');
 		game.delay(0.1);
 		"step 2"
 		var bosslist=ui.create.div('#bosslist.hidden');

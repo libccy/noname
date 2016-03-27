@@ -2,7 +2,7 @@
 mode.stone={
 	start:function(){
 		"step 0"
-		lib.init.css('layout/mode/','stone');
+		lib.init.css(lib.assetURL+'layout/mode/','stone');
 		_status.mode=get.config('stone_mode');
 		game.initStone();
 		var playback=localStorage.getItem(lib.configprefix+'playback');

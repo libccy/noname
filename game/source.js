@@ -30,7 +30,6 @@ window.noname_source_list=[
     'character/yxs.js',
     'character/zhuogui.js',
     'game/asset.js',
-    'game/background.js',
     'game/config.js',
     'game/game.js',
     'game/jszip.js',
@@ -93,5 +92,4 @@ window.noname_source_list=[
     'theme/style/hp/image/hp2.png',
     'theme/style/hp/image/hp3.png',
     'theme/style/hp/image/hp4.png',
-    'index.html'
 ];

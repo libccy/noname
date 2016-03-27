@@ -17,7 +17,7 @@ mode.chess={
 				}
 			}
 		}
-		lib.init.css('layout/mode','chess');
+		lib.init.css(lib.assetURL+'layout/mode','chess');
 		ui.chesssheet=document.createElement('style');
 		document.head.appendChild(ui.chesssheet);
 		var playback=localStorage.getItem(lib.configprefix+'playback');
