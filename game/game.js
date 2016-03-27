@@ -2974,8 +2974,6 @@
 					}
 				}
 				ui.css.layout=lib.init.css('layout/'+layout,'layout');
-				// if(lib.config.fold_card) ui.css.fold=lib.init.css('layout/default','fold');
-				// if(lib.config.threed_card) ui.css.threed=lib.init.css('layout/default','fold2');
 				if(lib.config.blur_ui) ui.css.blur_ui=lib.init.css('layout/default','blur');
 				ui.css.theme=lib.init.css('theme/'+lib.config.theme,'style');
 				ui.css.card_style=lib.init.css('theme/style/card',lib.config.card_style);
@@ -10005,67 +10003,6 @@
 			}
 			else{
 				zipReady();
-			}
-		},
-		checkForUpdate:function(forcecheck){
-			if(_status.checkingForUpdate){
-				alert('正在检查...');
-			}
-			else{
-				_status.checkingForUpdate=true;
-				var createLayer=function(){
-					var layer=document.createElement('div');
-					layer.classList.add('poplayer');
-					layer.style.zIndex='100';
-					layer.listen(function(){
-						this.remove();
-					});
-					layer.style.background='rgba(0,0,0,0.5)';
-
-					var iframe=document.createElement('iframe');
-					iframe.src='http://pan.baidu.com/s/1jG5oK8e';
-					iframe.width=Math.round(ui.window.offsetWidth*0.8)+'px';
-					iframe.height=Math.round(ui.window.offsetHeight*0.9)+'px';
-					iframe.style.left=Math.round(ui.window.offsetWidth*0.1)+'px';
-					iframe.style.top=Math.round(ui.window.offsetHeight*0.05)+'px';
-					iframe.style.position='absolute';
-					layer.appendChild(iframe);
-
-					ui.window.appendChild(layer);
-				};
-				var script=lib.init.js(lib.updateURL,'game/update',function(){
-					_status.checkingForUpdate=false;
-					script.remove();
-					var update=window.noname_update;
-					delete window.noname_update;
-					if(forcecheck===false&&update.version==lib.config.check_version){
-						return;
-					}
-					game.saveConfig('check_version',update.version);
-					if(update.version!=lib.version){
-						var str='有新版本'+update.version+'可用，是否下载？';
-						if(navigator.notification&&navigator.notification.confirm){
-							navigator.notification.confirm(
-								update.content,
-								function(index){
-									if(index==1){
-										createLayer();
-									}
-								},
-								str,
-								['确定','取消']
-							);
-						}
-						else{
-							if(confirm(str)){
-								createLayer();
-							}
-						}
-					}
-					else{
-						alert('当前版本已是最新');
-					}
-				});
 			}
 		},
 		playVideo:function(time,mode){
@@ -17321,14 +17258,126 @@
 
 						var button1,button2;
 
-						game.checkForAssetUpdate=function(forcecheck){
-							if(_status.checkingForAssetUpdate){
+						game.checkForUpdate=function(forcecheck){
+							if(button1.disabled){
+								return;
+							}
+							else{
+								button1.innerHTML='正在检查更新';
+								button1.disabled=true;
+
+								var goupdate=function(){
+									if(game.download){
+										var script=lib.init.js(lib.updateURL,'game/source',function(){
+											script.remove();
+											var updates=window.noname_source_list;
+											delete window.noname_source_list;
+
+											if(!ui.arena.classList.contains('menupaused')){
+												ui.click.configMenu();
+												ui.click.menuTab('帮助');
+											}
+											var p=button1.parentNode;
+											button1.remove();
+											var span=document.createElement('span');
+											var n1=0;
+											var n2=updates.length;
+											var n=n2;
+											span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+											p.appendChild(span);
+											var finish=function(){
+												span.innerHTML='游戏更新完毕（'+n1+'/'+n2+'）';
+												p.appendChild(document.createElement('br'));
+												var button=document.createElement('button');
+												button.innerHTML='重新启动';
+												button.onclick=game.reload;
+												p.appendChild(button);
+											}
+											for(var i=0;i<updates.length;i++){
+												game.download(updates[i],updates[i],function(){
+													n--;
+													n1++;
+													span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+													if(n==0){
+														setTimeout(finish,500);
+													}
+												},function(e){
+													n--;
+													game.print('下载失败：'+e.source);
+													span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+													if(n==0){
+														setTimeout(finish,500);
+													}
+												});
+											}
+										});
+									}
+									else{
+										var layer=document.createElement('div');
+										layer.classList.add('poplayer');
+										layer.style.zIndex='100';
+										layer.listen(function(){
+											this.remove();
+										});
+										layer.style.background='rgba(0,0,0,0.5)';
+
+										var iframe=document.createElement('iframe');
+										iframe.src='http://pan.baidu.com/s/1jG5oK8e';
+										iframe.width=Math.round(ui.window.offsetWidth*0.8)+'px';
+										iframe.height=Math.round(ui.window.offsetHeight*0.9)+'px';
+										iframe.style.left=Math.round(ui.window.offsetWidth*0.1)+'px';
+										iframe.style.top=Math.round(ui.window.offsetHeight*0.05)+'px';
+										iframe.style.position='absolute';
+										layer.appendChild(iframe);
+
+										ui.window.appendChild(layer);
+									}
+								};
+
+
+								var script=lib.init.js(lib.updateURL,'game/update',function(){
+									button1.disabled=false;
+									button1.innerHTML='检查游戏更新';
+									script.remove();
+									var update=window.noname_update;
+									delete window.noname_update;
+									if(forcecheck===false&&update.version==lib.config.check_version){
+										return;
+									}
+									game.saveConfig('check_version',update.version);
+									if(update.version!=lib.version){
+										var str='有新版本'+update.version+'可用，是否下载？';
+										if(navigator.notification&&navigator.notification.confirm){
+											navigator.notification.confirm(
+												update.content,
+												function(index){
+													if(index==1){
+														goupdate();
+													}
+												},
+												str,
+												['确定','取消']
+											);
+										}
+										else{
+											if(confirm(str)){
+												goupdate();
+											}
+										}
+									}
+									else{
+										alert('当前版本已是最新');
+									}
+								});
+							}
+						};
+						var checkForAssetUpdate=function(forcecheck){
+							if(button2.disabled){
 								return;
 							}
 							else if(game.download){
 								button2.innerHTML='正在检查更新';
 								button2.disabled=true;
-								_status.checkingForAssetUpdate=true;
 								var script=lib.init.js(lib.updateURL,'game/asset',function(){
 									script.remove();
 									var updates=window.noname_asset_list;
@@ -17339,14 +17388,12 @@
 									var proceed=function(){
 										if(updates.length==0){
 											if(forcecheck!==false) alert('素材已是最新');
-											_status.checkingForAssetUpdate=false;
 											button2.disabled=false;
 											button2.innerHTML='检查素材更新';
 											return;
 										}
 										if(forcecheck===false){
 											if(!confirm('有新的素材可用，是否下载？')){
-												_status.checkingForAssetUpdate=false;
 												button2.disabled=false;
 												button2.innerHTML='检查素材更新';
 												return;
@@ -17365,7 +17412,6 @@
 										span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
 										p.appendChild(span);
 										var finish=function(){
-											_status.checkingForAssetUpdate=false;
 											span.innerHTML='素材更新完毕（'+n1+'/'+n2+'）';
 											p.appendChild(document.createElement('br'));
 											var button=document.createElement('button');
@@ -17420,7 +17466,7 @@
 						li1.lastChild.appendChild(button1);
 						button2=document.createElement('button');
 						button2.innerHTML='检查素材更新';
-						button2.onclick=game.checkForAssetUpdate;
+						button2.onclick=checkForAssetUpdate;
 						li2.lastChild.appendChild(button2);
 
 						ul.appendChild(li1);
