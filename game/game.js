@@ -2802,7 +2802,7 @@
 				}
 
 				var noname_inited=localStorage.getItem('noname_inited');
-				if(noname_inited){
+				if(noname_inited&&noname_inited!=='nodejs'){
                     var ua=navigator.userAgent.toLowerCase();
                     if(ua.indexOf('android')!=-1){
                         lib.device='android';
@@ -3128,7 +3128,7 @@
 						});
 					}
 				}
-                if(window.require){
+                if(typeof window.require=='function'&&!lib.device){
                     lib.node={
                         fs:require('fs'),
                         http:require('http'),
@@ -3137,7 +3137,44 @@
                         }
                     }
                     game.download=function(url,folder,onsuccess,onerror){
-                        
+                        url=lib.updateURL+url;
+                        var dir=folder.split('/');
+                        var str='';
+                        var download=function(){
+                            try{
+                                var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
+                            }
+                            catch(e){
+                                onerror();
+                            }
+                            var request = lib.node.http.get(url, function(response) {
+                                var stream=response.pipe(file);
+                                stream.on('finish',onsuccess);
+                                stream.on('error',onerror);
+                            });
+                        }
+                        var access=function(){
+                            if(dir.length<=1){
+                                download();
+                            }
+                            else{
+                                str+='/'+dir.shift();
+                                lib.node.fs.access(__dirname+str,function(e){
+                                    if(e){
+                                        try{
+                                            lib.node.fs.mkdir(__dirname+str,access);
+                                        }
+                                        catch(e){
+                                            onerror();
+                                        }
+                                    }
+                                    else{
+                                        access();
+                                    }
+                                });
+                            }
+                        }
+                        access();
                     }
                 }
 				lib.cardSelectObserver=new MutationObserver(function(mutations){
@@ -10477,6 +10514,25 @@
 				zipReady();
 			}
 		},
+        multiDownload:function(list,onsuccess,onerror,onfinish){
+            list=list.slice(0);
+            var download=function(){
+                if(list.length){
+                    var current=list.shift();
+                    game.download(current,current,function(){
+                        if(onsuccess) onsuccess();
+                        download();
+                    },function(){
+                        if(onerror) onerror();
+                        download();
+                    });
+                }
+                else{
+                    if(onfinish) onfinish();
+                }
+            }
+            download();
+        },
 		playVideo:function(time,mode){
 			if(!_status.replayvideo){
 				localStorage.setItem(lib.configprefix+'playbackmode',lib.config.mode);
@@ -17763,7 +17819,6 @@
 											var span=document.createElement('span');
 											var n1=0;
 											var n2=updates.length;
-											var n=n2;
 											span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
 											p.appendChild(span);
 											var finish=function(){
@@ -17774,23 +17829,14 @@
 												button.onclick=game.reload;
 												p.appendChild(button);
 											}
-											for(var i=0;i<updates.length;i++){
-												game.download(updates[i],updates[i],function(){
-													n--;
-													n1++;
-													span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
-													if(n==0){
-														setTimeout(finish,500);
-													}
-												},function(e){
-													n--;
-													game.print('下载失败：'+e.source);
-													span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
-													if(n==0){
-														setTimeout(finish,500);
-													}
-												});
-											}
+                                            game.multiDownload(updates,function(){
+                                                n1++;
+                                                span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+                                            },function(){
+                                                game.print('下载失败：'+e.source);
+                                            },function(){
+                                                setTimeout(finish,500);
+                                            });
 										});
 									}
 									else{
@@ -17898,7 +17944,6 @@
 										var span=document.createElement('span');
 										var n1=0;
 										var n2=updates.length;
-										var n=n2;
 										span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
 										p.appendChild(span);
 										var finish=function(){
@@ -17912,37 +17957,49 @@
 											button.onclick=game.reload;
 											p.appendChild(button);
 										}
-										for(var i=0;i<updates.length;i++){
-											game.download(updates[i],updates[i],function(){
-												n--;
-												n1++;
-												span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
-												if(n==0){
-													setTimeout(finish,500);
-												}
-											},function(e){
-												n--;
-												game.print('下载失败：'+e.source);
-												span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
-												if(n==0){
-													setTimeout(finish,500);
-												}
-											});
-										}
+                                        game.multiDownload(updates,function(){
+                                            n1++;
+                                            span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
+                                        },function(){
+                                            game.print('下载失败：'+e.source);
+                                        },function(){
+                                            setTimeout(finish,500);
+                                        });
 									};
 									for(var i=0;i<updates.length;i++){
-										resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
-											n--;
-											updates.remove(entry.toURL().slice(lib.assetURL.length));
-											if(n==0){
-												proceed();
-											}
-										},function(){
-											n--;
-											if(n==0){
-												proceed();
-											}
-										});
+                                        if(lib.node){
+                                            lib.node.fs.access(__dirname+'/'+updates[i],(function(entry){
+                                                return function(err){
+                                                    if(err){
+                                                        n--;
+            											if(n==0){
+            												proceed();
+            											}
+                                                    }
+                                                    else{
+                                                        n--;
+            											updates.remove(entry);
+            											if(n==0){
+            												proceed();
+            											}
+                                                    }
+        										}
+                                            }(updates[i])));
+                                        }
+                                        else{
+                                            resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
+    											n--;
+    											updates.remove(entry.toURL().slice(lib.assetURL.length));
+    											if(n==0){
+    												proceed();
+    											}
+    										},function(){
+    											n--;
+    											if(n==0){
+    												proceed();
+    											}
+    										});
+                                        }
 									}
 								},function(){
                                     alert('连接失败');
