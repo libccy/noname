@@ -40,7 +40,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-		updateURL:'http://isha.applinzi.com/',
+		updateURL:localStorage.getItem('noname_download_source')||'http://isha.applinzi.com/',
 		assetURL:'',
 		changeLog:[],
 		updates:[],
@@ -17707,9 +17707,15 @@
 						page.classList.add('menu-help');
 						var ul=document.createElement('ul');
 						var li1=document.createElement('li');
-						var li2=document.createElement('li');
+                        var li2=document.createElement('li');
+						var li3=document.createElement('li');
 						li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px"></p>';
 						li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
+                        li3.innerHTML='更新源<br><p style="margin-top:8px"><input type="text" style="width:120px" value="'+lib.updateURL+'"><button style="margin-left:5px">确定</button></p>';
+                        li3.querySelector('button').onclick=function(){
+                            lib.updateURL=this.previousSibling.value;
+                            localStorage.setItem('noname_download_source',lib.updateURL);
+                        }
 
 						var button1,button2;
 
@@ -17827,7 +17833,12 @@
 									else{
 										alert('当前版本已是最新');
 									}
-								});
+								},function(){
+                                    alert('连接失败');
+                                    button1.disabled=false;
+									button1.innerHTML='检查游戏更新';
+									script.remove();
+                                });
 							}
 						};
 						var checkForAssetUpdate=function(){
@@ -17913,7 +17924,12 @@
 											}
 										});
 									}
-								});
+								},function(){
+                                    alert('连接失败');
+                                    button2.disabled=false;
+									button2.innerHTML='检查游戏更新';
+									script.remove();
+                                });
 							}
 							else{
 								alert('此版本不支持游戏内更新素材，请手动更新');
@@ -17930,7 +17946,8 @@
 						li2.lastChild.appendChild(button2);
 
 						ul.appendChild(li1);
-						ul.appendChild(li2);
+                        ul.appendChild(li2);
+						ul.appendChild(li3);
 						page.appendChild(ul);
 
 						for(var i in lib.help){
