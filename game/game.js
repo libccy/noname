@@ -17876,7 +17876,7 @@
 								});
 							}
 						};
-						var checkForAssetUpdate=function(forcecheck){
+						var checkForAssetUpdate=function(){
 							if(button2.disabled){
 								return;
 							}
@@ -17887,22 +17887,22 @@
 									script.remove();
 									var updates=window.noname_asset_list;
 									delete window.noname_asset_list;
-									game.saveConfig('asset_version',lib.version);
+									var asset_version=updates.shift();
+									if(asset_version==lib.config.asset_version){
+										alert('素材已是最新');
+										button2.disabled=false;
+										button2.innerHTML='检查素材更新';
+										return;
+									}
 									var n=updates.length;
 
 									var proceed=function(){
 										if(updates.length==0){
-											if(forcecheck!==false) alert('素材已是最新');
+											game.saveConfig('asset_version',asset_version);
+											alert('素材已是最新');
 											button2.disabled=false;
 											button2.innerHTML='检查素材更新';
 											return;
-										}
-										if(forcecheck===false){
-											if(!confirm('有新的素材可用，是否下载？')){
-												button2.disabled=false;
-												button2.innerHTML='检查素材更新';
-												return;
-											}
 										}
 										if(!ui.arena.classList.contains('menupaused')){
 											ui.click.configMenu();
@@ -17917,6 +17917,9 @@
 										span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
 										p.appendChild(span);
 										var finish=function(){
+											if(n1==n2){
+												game.saveConfig('asset_version',asset_version);
+											}
 											span.innerHTML='素材更新完毕（'+n1+'/'+n2+'）';
 											p.appendChild(document.createElement('br'));
 											var button=document.createElement('button');
@@ -17959,9 +17962,7 @@
 								});
 							}
 							else{
-								if(forcecheck!==false){
-									alert('此版本不支持游戏内更新素材，请手动更新');
-								}
+								alert('此版本不支持游戏内更新素材，请手动更新');
 							}
 						};
 
