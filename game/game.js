@@ -2801,39 +2801,29 @@
 					delete window.noname_update;
 				}
 
-				var scripts=document.head.querySelectorAll('script');
-				for(var i=0;i<scripts.length;i++){
-					if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
-						if(scripts[i].src.indexOf('ios')!=-1){
-							lib.device='ios';
-							var ua=navigator.userAgent.toLowerCase();
-							if(ua.indexOf('ipad')!=-1){
-								window.isIpad=true;
-							}
-							else{
-								var metas=document.head.querySelectorAll('meta');
-								for(var j=0;j<metas.length;j++){
-									if(metas[j].name=='viewport'){
-										metas[j].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
-										break;
-									}
-								}
-							}
-						}
-						else if(scripts[i].src.indexOf('android')!=-1){
-							lib.device='android';
-						}
-						if(scripts[i].src.indexOf('cdvfile')!=-1){
-							lib.assetLoading=[];
-						}
-						break;
-					}
-				}
 				var noname_inited=localStorage.getItem('noname_inited');
 				if(noname_inited){
-					lib.device='android';
+                    var ua=navigator.userAgent.toLowerCase();
+                    if(ua.indexOf('android')!=-1){
+                        lib.device='android';
+                    }
+                    else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1){
+                        lib.device='ios';
+                        var ua=navigator.userAgent.toLowerCase();
+                        if(ua.indexOf('ipad')!=-1){
+                            window.isIpad=true;
+                        }
+                        else{
+                            var metas=document.head.querySelectorAll('meta');
+                            for(var j=0;j<metas.length;j++){
+                                if(metas[j].name=='viewport'){
+                                    metas[j].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
+                                    break;
+                                }
+                            }
+                        }
+                    }
 					lib.assetURL=noname_inited;
-					delete lib.assetLoading;
 				}
 
 				lib.config={};
@@ -2943,12 +2933,7 @@
 						lib.configMenu.appearence.config.identity_font.item[i]=font.pack[i];
 						lib.configMenu.appearence.config.cardtext_font.item[i]=font.pack[i];
 						lib.configMenu.appearence.config.global_font.item[i]=font.pack[i];
-						if(Array.isArray(lib.assetLoading)){
-							lib.assetLoading.push(i);
-						}
-						else{
-							ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"';src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
-						}
+						ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"';src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
 					}
 					lib.configMenu.appearence.config.cardtext_font.item.default='默认';
 					lib.configMenu.appearence.config.global_font.item.default='默认';
@@ -3202,31 +3187,6 @@
 									navigator.app.exitApp();
 								}
 							});
-						}
-						if(Array.isArray(lib.assetLoading)){
-							var url;
-							if(lib.device=='android'){
-								url=cordova.file.externalApplicationStorageDirectory;
-							}
-							else{
-								url=cordova.file.documentsDirectory;
-							}
-							for(var i=0;i<lib.assetLoading.length;i++){
-								var item=lib.assetLoading[i];
-								if(typeof item=='string'){
-									ui.fontsheet.sheet.insertRule("@font-face {font-family: '"+item+"';src: url('"+url+"font/"+item+".ttf');}",0);
-								}
-								else if(item._cordovaimg){
-									item.style.backgroundImage='url("'+url+item._cordovaimg+'")';
-									delete item._cordovaimg;
-								}
-								else if(item._cordovasrc){
-									item.src=url+item._cordovasrc;
-									delete item._cordovasrc;
-								}
-							}
-							delete lib.assetLoading;
-							lib.assetURL=url;
 						}
 						game.download=function(url,folder,onsuccess,onerror){
 							var fileTransfer = new FileTransfer();
@@ -10282,13 +10242,7 @@
 					}
 				}
 				else{
-					if(lib.assetLoading){
-						ui.backgroundMusic._cordovasrc='audio/background/'+music+'.mp3';
-						lib.assetLoading.push(ui.backgroundMusic);
-					}
-					else{
-						ui.backgroundMusic.src=lib.assetURL+'audio/background/'+music+'.mp3';
-					}
+					ui.backgroundMusic.src=lib.assetURL+'audio/background/'+music+'.mp3';
 				}
 			}
 		},
@@ -22944,13 +22898,7 @@
 			});
 		};
 		HTMLDivElement.prototype.setBackgroundImage=function(img){
-			if(lib.assetLoading){
-				this._cordovaimg=img;
-				lib.assetLoading.push(this);
-			}
-			else{
-				this.style.backgroundImage='url("'+lib.assetURL+img+'")';
-			}
+			this.style.backgroundImage='url("'+lib.assetURL+img+'")';
 		},
 		HTMLDivElement.prototype.listen=function(func){
 			this.addEventListener(lib.config.touchscreen?'touchend':'click',function(e){
