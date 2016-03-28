@@ -2949,6 +2949,7 @@
                 if(!lib.config.totouched&&(lib.device=='ios'||lib.device=='android')){
                     game.saveConfig('totouched',true);
                     game.saveConfig('touchscreen',true);
+                    game.saveConfig('confirmtouch',true);
                     game.saveConfig('low_performance',true);
                     game.saveConfig('layout','phone');
                     game.saveConfig('confirm_exit',true);
