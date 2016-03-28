@@ -13,7 +13,7 @@
 				var noname_inited=localStorage.getItem('noname_inited');
                 localStorage.clear();
 				if(noname_inited){
-					localStorage.setItem(noname_inited);
+					localStorage.setItem('noname_inited',noname_inited);
 				}
                 if(indexedDB) indexedDB.deleteDatabase('noname_0.9_data');
                 window.location.reload();
@@ -1485,7 +1485,7 @@
 								var noname_inited=localStorage.getItem('noname_inited');
 				                localStorage.clear();
 								if(noname_inited){
-									localStorage.setItem(noname_inited);
+									localStorage.setItem('noname_inited',noname_inited);
 								}
 								game.reload();
 								return;
@@ -15900,7 +15900,7 @@
 														var noname_inited=localStorage.getItem('noname_inited');
 										                localStorage.clear();
 														if(noname_inited){
-															localStorage.setItem(noname_inited);
+															localStorage.setItem('noname_inited',noname_inited);
 														}
 														for(var i in data){
 															localStorage.setItem(i,data[i]);
@@ -23421,7 +23421,7 @@
 						var noname_inited=localStorage.getItem('noname_inited');
 		                localStorage.clear();
 						if(noname_inited){
-							localStorage.setItem(noname_inited);
+							localStorage.setItem('noname_inited',noname_inited);
 						}
 						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 						game.reload();
