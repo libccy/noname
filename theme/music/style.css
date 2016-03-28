@@ -1,12 +1,7 @@
 html{
 	color: white;
 	text-shadow: black 0 0 2px;
-}
-body{
 	background: url('grid.png'),linear-gradient(#333333, #222222) fixed;
-}
-body[data-background_color_music='blue']{
-	background: url('grid.png'),linear-gradient(#6c7989, #434b55) fixed;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
 .player.unseen .equips:not(*:empty),.menu,#splash>div,

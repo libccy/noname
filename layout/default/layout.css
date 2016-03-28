@@ -232,7 +232,7 @@ table{table-layout: fixed;}
 	transform-origin: top center;
 }
 #me,#mebg{width: 100%;height: 140px;top:calc(100% - 140px);left:0;}
-#mebg{z-index:0}
+#mebg{z-index:-1}
 #handcards1,#handcards2{
 	width: calc(50% - 140px);height: 127px;padding: 10px;
 	text-align: left;
@@ -1342,7 +1342,7 @@ span[data-color="unknownm"]{
 	position: absolute;
 	left: 0;
 	top: 0;
-	z-index: 1;
+	z-index: -2;
 	pointer-events: none;
 }
 #window.canvas_top>canvas.fun{

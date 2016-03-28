@@ -2,6 +2,8 @@ html{
 	color: white;
 	text-shadow: black 0 0 2px;
 	min-height: 100%;
+	background-image: url('../../image/background/shengshi_bg.jpg');
+	background-size: cover;
 }
 body{
 	width: 100%;
@@ -9,8 +11,6 @@ body{
 	min-height: 100%;
 	left: 0;
 	top: 0;
-	background-image: url('../../image/background/shengshi_bg.jpg');
-	background-size: cover;
 	position: absolute;
 	display: block;
 }

@@ -3128,7 +3128,18 @@
 						});
 					}
 				}
-
+                if(window.require){
+                    lib.node={
+                        fs:require('fs'),
+                        http:require('http'),
+                        debug:function(){
+                            require('remote').getCurrentWindow().toggleDevTools();
+                        }
+                    }
+                    game.download=function(url,folder,onsuccess,onerror){
+                        
+                    }
+                }
 				lib.cardSelectObserver=new MutationObserver(function(mutations){
 					for(var i=0;i<mutations.length;i++){
 						if(mutations[i].attributeName=='class'){
