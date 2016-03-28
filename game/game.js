@@ -2946,6 +2946,14 @@
 				delete window.music;
 				delete window.font;
 
+                if(!lib.config.totouched&&(lib.device=='ios'||lib.device=='android')){
+                    game.saveConfig('totouched',true);
+                    game.saveConfig('touchscreen',true);
+                    game.saveConfig('low_performance',true);
+                    game.saveConfig('layout','phone');
+                    game.saveConfig('confirm_exit',true);
+                }
+
 				if(lib.config.extensions.length){
 					window.resetExtension=function(){
 						for(var i=0;i<lib.config.extensions.length;i++){
@@ -3023,7 +3031,7 @@
 				lib.config.duration=500;
 
 				var ua=navigator.userAgent.toLowerCase();
-				if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('android')!=-1){
+                if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('android')!=-1){
 					if(!lib.config.totouched&&!lib.config.touchscreen){
 						var totouch=window.confirm('您似乎在使用触屏设备，是否切换到触屏模式？');
 						game.saveConfig('totouched',true);
