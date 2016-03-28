@@ -598,7 +598,7 @@ mode.stone={
 						player.node.actcount=ui.create.div('.actcount.hp',player);
 					}
 					if(typeof player.actcount!=='number'){
-						player.actcount=2;
+						player.actcount=0;
 					}
 					player.actused=0;
 					if(!player.actcharacterlist){
@@ -9011,13 +9011,22 @@ mode.stone={
 			content:function(){
 				player.actused=0;
 				if(player.side){
-					player.actcount=player.getEnemy().actcount;
-				}
-				else{
 					player.actcount=player.getEnemy().actcount+1;
 				}
+				else{
+					player.actcount=player.getEnemy().actcount;
+					if(!_status.actcoin){
+						_status.actcoin=true;
+						player.actused--;
+					}
+				}
 				if(player.actcount>6){
-					player.actcount-=4;
+					if(get.config('mana_mode')=='inc'){
+						player.actcount=6;
+					}
+					else{
+						player.actcount-=4;
+					}
 				}
 				player.updateActCount();
 				player.getEnemy().updateActCount('outphase');
@@ -10149,7 +10158,7 @@ mode.stone={
 		'<li>怒气值达到100时不再增加。回合开始阶段，若怒气值己满，可消耗全部怒气值并召唤一名传说随从</ul>'+
 		'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+1'+
 		'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段的卡牌'+
-		'<li>主将出牌阶段的出牌数量（行动值）有上限，先手为2，后手为3，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
+		'<li>主将出牌阶段的出牌数量（行动值）有上限，从1开始递增，后手的首个回合有一点额外行动值，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
 		'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 		'随从与其他所有角色相互距离基数为1<li>'+
 		'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+

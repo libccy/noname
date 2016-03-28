@@ -9,9 +9,12 @@
             }
         }
         else{
-			alert(document.head.outerHTML)
             if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+				var noname_inited=localStorage.getItem('noname_inited');
                 localStorage.clear();
+				if(noname_inited){
+					localStorage.setItem(noname_inited);
+				}
                 if(indexedDB) indexedDB.deleteDatabase('noname_0.9_data');
                 window.location.reload();
             }
@@ -36,18 +39,10 @@
 		dieClose:[]
 	};
 	var lib={
-		version:'1.8.1',
-		changeLog:[
-			'AI问题修复',
-			'检查更新功能',
-			'游戏内下载/更新素材',
-			'iOS/Mac/Windows版优化',
-			'iOS版支持录像、扩展等'
-		],
 		configprefix:'noname_0.9_',
 		updateURL:'http://isha.applinzi.com/',
-		onlineURL:'http',
 		assetURL:'',
+		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
 		video:[],
@@ -1487,7 +1482,11 @@
 						onclick:function(){
 							var node=this;
 							if(node._clearing){
-								localStorage.clear();
+								var noname_inited=localStorage.getItem('noname_inited');
+				                localStorage.clear();
+								if(noname_inited){
+									localStorage.setItem(noname_inited);
+								}
 								game.reload();
 								return;
 							}
@@ -2542,6 +2541,7 @@
 						init:'3',
 						frequent:true,
 						item:{
+							'1':'一人',
 							'2':'两人',
 							'3':'三人',
 							'4':'四人',
@@ -2556,6 +2556,15 @@
 								_status.event.parent.changeDialog();
 							}
 						},
+					},
+					mana_mode:{
+						name:'行动值变化',
+						init:'inc',
+						item:{
+							inf:'涨落',
+							inc:'递增'
+						},
+						frequent:true
 					},
 					skill_bar:{
 						name:'怒气值',
@@ -2786,6 +2795,12 @@
 		},
 		init:{
 			init:function(){
+				if(window.noname_update){
+					lib.version=window.noname_update.version;
+					lib.changeLog=window.noname_update.changeLog;
+					delete window.noname_update;
+				}
+
 				var scripts=document.head.querySelectorAll('script');
 				for(var i=0;i<scripts.length;i++){
 					if(scripts[i].src&&scripts[i].src.indexOf('game/game.js')!=-1){
@@ -2979,26 +2994,32 @@
 						delete game.importedPack;
 					}
 				}
-
+				var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+lib.config.plays.length+1;
+				var packLoaded=function(){
+					toLoad--;
+					if(toLoad==0){
+						if(_status.windowLoaded){
+							delete _status.windowLoaded;
+							lib.init.onload();
+						}
+						else{
+							_status.packLoaded=true;
+						}
+					}
+				};
 				if(localStorage.getItem(lib.configprefix+'playback')){
-					lib.init.js(lib.assetURL+'mode',lib.config.mode);
+					toLoad++;
+					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
 				}
 				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)&&
 					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
-					lib.init.js(lib.assetURL+'mode',lib.config.mode);
+					toLoad++;
+					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
 				}
-				lib.init.js(lib.assetURL+'card',lib.config.all.cards);
-				lib.init.js(lib.assetURL+'character',lib.config.all.characters);
-				lib.init.js(lib.assetURL+'play',lib.config.plays);
-				lib.init.js(lib.assetURL+'character','rank',function(){
-					if(_status.windowLoaded){
-						delete _status.windowLoaded;
-						lib.init.onload();
-					}
-					else{
-						_status.packLoaded=true;
-					}
-				});
+				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
+				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
+				lib.init.js(lib.assetURL+'play',lib.config.plays,packLoaded,packLoaded);
+				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
 				ui.css={};
 				lib.init.css(lib.assetURL+'layout/default','menu');
 				var layout=lib.config.layout;
@@ -3670,7 +3691,7 @@
 				}
 			    return style;
 			},
-			js:function(path,file,onload){
+			js:function(path,file,onload,onerror){
 				if(path[path.length-1]=='/'){
 					path=path.slice(0,path.length-1);
 				}
@@ -3678,9 +3699,9 @@
 					lib.init['setMode_'+file]();
 					return;
 				}
-				if(typeof file=='object'){
+				if(Array.isArray(file)){
 					for(var i=0;i<file.length;i++){
-						lib.init.js(path,file[i]);
+						lib.init.js(path,file[i],onload,onerror);
 					}
 				}
 				else{
@@ -3689,6 +3710,7 @@
 					document.head.appendChild(script);
 					if(typeof onload=='function'){
 						script.addEventListener('load',onload);
+						script.addEventListener('error',onerror);
 					}
 					return script;
 				}
@@ -15875,7 +15897,11 @@
 													if(!data) return;
 													try{
 														data=JSON.parse(lib.init.decode(data));
-														localStorage.clear();
+														var noname_inited=localStorage.getItem('noname_inited');
+										                localStorage.clear();
+														if(noname_inited){
+															localStorage.setItem(noname_inited);
+														}
 														for(var i in data){
 															localStorage.setItem(i,data[i]);
 														}
@@ -17823,8 +17849,12 @@
 									if(update.version!=lib.version){
 										var str='有新版本'+update.version+'可用，是否下载？';
 										if(navigator.notification&&navigator.notification.confirm){
+											var str2=update.changeLog[0];
+											for(var i=1;i<update.changeLog.length;i++){
+												str2+='；'+update.changeLog[i];
+											}
 											navigator.notification.confirm(
-												update.content,
+												str2,
 												function(index){
 													if(index==1){
 														goupdate();
@@ -23387,7 +23417,11 @@
 			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
 				if(e.shiftKey){
 					if(confirm('是否重置游戏？')){
-						localStorage.clear();
+						var noname_inited=localStorage.getItem('noname_inited');
+		                localStorage.clear();
+						if(noname_inited){
+							localStorage.setItem(noname_inited);
+						}
 						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
 						game.reload();
 						return;

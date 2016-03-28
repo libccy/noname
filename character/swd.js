@@ -2175,6 +2175,7 @@ character.swd={
 		huangyu:{
 			enable:'phaseUse',
 			filter:function(event,player){
+				if(!lib.card.chiyuxi) return false;
 				return !player.getStat('skill').huangyu&&player.num('he',{color:'red'})>1;
 			},
 			filterCard:{color:'red'},

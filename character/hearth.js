@@ -568,6 +568,7 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
+				if(!lib.card.chiyuxi||!lib.card.jingleishan) return false;
 				return player.num('he')>0;
 			},
 			filterTarget:function(card,player,target){
