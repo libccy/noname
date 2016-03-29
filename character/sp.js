@@ -610,7 +610,7 @@ character.sp={
 			forced:true,
 			check:function(event,player){
 				var num=game.countPlayer(function(target){
-					return target!=player&&target.hp==player.hp;
+					return target.hp==player.hp;
 				});
 				if(!player.skills.contains('xunzhi2')){
 					var nh=player.num('h');
@@ -621,7 +621,7 @@ character.sp={
 			},
 			prompt:function(event,player){
 				var num=game.countPlayer(function(target){
-					return target!=player&&target.hp==player.hp;
+					return target.hp==player.hp;
 				});
 				return '雅望：是否放弃摸牌，改为摸'+get.cnNumber(num)+'张牌？';
 			},
@@ -629,7 +629,7 @@ character.sp={
 				trigger.untrigger();
 				trigger.finish();
 				var num=game.countPlayer(function(target){
-					return target!=player&&target.hp==player.hp;
+					return target.hp==player.hp;
 				});
 				if(num){
 					player.draw(num);

@@ -20,6 +20,13 @@
             }
         }
     },5000);
+    var links=document.head.querySelectorAll('link');
+    for(var i=0;i<links.length;i++){
+        if(links[i].href='app/color.css'){
+            links[i].remove();
+            break;
+        }
+    }
 }());
 
 (function(){
@@ -2671,7 +2678,7 @@
 			'<div style="margin:10px">角色操作</div><ul style="margin-top:0"><li>受到伤害<br>player.damage(source,<br>num)'+
 			'<li>回复体力<br>player.recover(num)<li>摸牌<br>player.draw(num)<li>获得牌<br>player.gain(cards)<li>弃牌<br>player.discard(cards)'+
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
-			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令输入框中输出结果<br>game.print(str)<li>游戏结束<br>game.over(bool)'+
+			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 		},
 		setIntro:function(node,func){
@@ -3666,7 +3673,7 @@
 					}
 					delete lib.packageReady;
 					ui.create.arena();
-					if(indexedDB&&!_status.characterLoaded){
+					if(window.indexedDB&&!_status.characterLoaded){
 						_status.waitingForCharacters=true;
 					}
 					else{
@@ -17581,40 +17588,88 @@
 							node.type='cmd';
 							node.link=page;
 							page.classList.add('menu-sym');
-							var caption=ui.create.div('','输入要执行的命令',page);
-							caption.style.margin='6px';
-							var text=document.createElement('textarea');
-							text.style.width='200px';
-							text.style.height='80px';
-							text.style.resize='none';
+							var text=document.createElement('div');
+							text.style.width='194px';
+                            text.style.height='104px';
+                            text.style.marginTop='12px';
+							text.style.padding='3px';
+                            text.style.boxShadow='rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 0';
+                            text.style.textAlign='left';
+                            text.style.webkitUserSelect='initial';
+                            text.style.overflow='scroll';
 							page.appendChild(text);
-							var textstr='';
-							var perserveMenu=false;
+
+							var caption=ui.create.div('','输入命令',page);
+							caption.style.margin='6px';
+                            caption.style.position='absolute';
+                            caption.style.width='120px';
+                            caption.style.top='129px';
+                            caption.style.left='calc(50% - 68px)';
+							var text2=document.createElement('input');
+							text2.style.width='200px';
+                            text2.style.position='absolute';
+                            text2.style.top='159px';
+                            text2.style.left='calc(50% - 102px)';
+							text2.style.resize='none';
+                            var g={};
+                            var logs=[];
+                            var logindex=-1;
+                            var runCommand=function(e){
+                                if(text2.value){
+                                    logindex=-1;
+                                    logs.unshift(text2.value);
+                                }
+                                if(text2.value=='cls'){
+                                    text.innerHTML='';
+                                }
+                                else{
+                                    try{
+                                        var result=eval(text2.value);
+                                        if(result){
+                                            game.print(result);
+                                        }
+                                    }
+                                    catch(e){
+                                        game.print(e);
+                                    }
+                                }
+                                text2.value='';
+                            }
+                            text2.addEventListener('keydown',function(e){
+                                if(e.keyCode==13){
+                                    runCommand();
+                                }
+                                else if(e.keyCode==38){
+                                    if(logindex+1<logs.length){
+                                        text2.value=logs[++logindex];
+                                    }
+                                }
+                                else if(e.keyCode==40){
+                                    if(logindex>=0){
+                                        logindex--;
+                                        if(logindex<0){
+                                            text2.value='';
+                                        }
+                                        else{
+                                            text2.value=logs[logindex];
+                                        }
+                                    }
+                                }
+                            });
+							page.appendChild(text2);
 							game.print=function(){
+							    var textstr='';
 								for(var i=0;i<arguments.length;i++){
-									if(arguments[i]!==undefined){
-										textstr+=arguments[i]+' '
-									}
+									textstr+=arguments[i];
+                                    if(i<arguments.length-1){
+                                        textstr+=' ';
+                                    }
 								}
-								textstr+='\n';
-								text.value=textstr;
-								// perserveMenu=true;
+								textstr+='<br>';
+								text.innerHTML+=textstr;
+                                text.scrollTop=text.scrollHeight;
 							}
-							runButton.listen(function(){
-								textstr='';
-								// perserveMenu=false;
-								try{
-									eval(text.value);
-								}
-								catch(e){
-									text.value=e;
-									// perserveMenu=true;
-								}
-								// if(!perserveMenu){
-								// 	text.value='';
-								// 	clickContainer.call(menuContainer);
-								// }
-							});
+							runButton.listen(runCommand);
 						}());
 						(function(){
 							var page=ui.create.div('');

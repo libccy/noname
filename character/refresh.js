@@ -713,6 +713,12 @@ character.refresh={
 						event.goto(1);
 					}
 				}
+				else if(event.count<trigger.num){
+					delete event.temp;
+					event.num=1;
+					event.count++;
+					event.goto(1);
+				}
 			},
 			ai:{
 				maixie:true,
