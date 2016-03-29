@@ -332,6 +332,16 @@ mode.boss={
 			game.bossinfo.init();
 		}
 		"step 5"
+		if(get.config('single_control')){
+			for(var i=0;i<game.players.length;i++){
+				if(game.players[i].side==game.me.side){
+					game.addRecentCharacter(game.players[i].name);
+				}
+			}
+		}
+		else{
+			game.addRecentCharacter(game.me.name);
+		}
 		event.trigger('gameStart');
 		game.gameDraw(game.boss);
 		game.bossPhaseLoop();

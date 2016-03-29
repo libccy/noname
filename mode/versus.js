@@ -452,6 +452,7 @@ mode.versus={
 						}
 					}
 				}
+				game.addRecentCharacter(game.me.name,game.me.name2);
 			};
 		},
 		chooseCharacterFour:function(){
@@ -618,6 +619,7 @@ mode.versus={
 				if(event.xdialog){
 					event.xdialog.close();
 				}
+				game.addRecentCharacter(game.me.name,game.me.name2);
 			}
 		},
 		chooseCharacter:function(){

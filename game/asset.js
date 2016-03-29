@@ -1,11 +1,12 @@
 window.noname_asset_list=[
-    '1.8.0',
+    '1.8.1',
     'image/background/huangtian_bg.jpg',
     'image/background/shengshi_bg.jpg',
     'image/background/xueji_bg.jpg',
     'image/background/yinxiang_bg.jpg',
     'image/background/zhulian_bg.jpg',
     'image/background/zhulin_bg.jpg',
+    'image/skin/caocao/1.jpg',
     'image/card/spell_jingshenkongzhi.jpg',
     'image/card/bagua.png',
     'image/card/baiyin.png',

@@ -57,6 +57,14 @@
 		onover:[],
 		arenaReady:[],
 		packageReady:[],
+        characterDialogGroup:{
+            '收藏':function(name,capt){
+                return lib.config.favouriteCharacter.contains(name)?capt:null;
+            },
+            '最近':function(name,capt){
+                return lib.config.recentCharacter.contains(name)?capt:null;
+            }
+        },
 		onDB:function(func){
 			if(lib.db){
 				func();
@@ -827,14 +835,19 @@
 					},
                     character_dialog_tool:{
                         name:'自由选将显示',
-                        init:'recent',
+                        init:'最近',
                         item:{
-                            favourite:'收藏',
-                            recent:'最近',
-                            diy:'自创',
+                            '收藏':'收藏',
+                            '最近':'最近',
+                            '自创':'自创',
                             all:'全部'
                         },
                         unfrequent:true,
+                    },
+                    show_favourite:{
+                        name:'显示添加收藏',
+                        init:true,
+                        unfrequent:true
                     },
 					hide_card_image:{
 						name:'隐藏卡牌背景',
@@ -3114,12 +3127,6 @@
 							game.getDB('character',null,function(list){
 								for(var i in list){
 									if(!list[i][4]) list[i][4]=[];
-									// for(var j=0;j<list[i][3].length;j++){
-									// 	if(!lib.skill[list[i][3][j]]){
-									// 		alert(list[i][3][j]);
-									// 		list[i][3].splice(j--,1);
-									// 	}
-									// }
 									lib.character[i]=list[i];
 									lib.customCharacters.push(i);
 									lib.setTranslate(i);
@@ -3659,7 +3666,7 @@
 					}
 					delete lib.packageReady;
 					ui.create.arena();
-					if(lib.db&&!_status.characterLoaded){
+					if(indexedDB&&!_status.characterLoaded){
 						_status.waitingForCharacters=true;
 					}
 					else{
@@ -12308,6 +12315,17 @@
 				mode[name]=info;
 			}
 		},
+        addRecentCharacter:function(){
+            for(var i=0;i<arguments.length;i++){
+                if(lib.character[arguments[i]]){
+                    lib.config.recentCharacter.unshift(arguments[i]);
+                }
+            }
+            if(lib.config.recentCharacter.length>20){
+                lib.config.recentCharacter.splice(0,20);
+            }
+            game.saveConfig('recentCharacter',lib.config.recentCharacter);
+        },
 		createCard:function(name,suit,number,nature){
 			if(typeof name=='object'){
 				nature=name.nature;
@@ -14494,8 +14512,9 @@
                 if(!thisiscard){
                     namecapt.remove('自创');
                     namecapt.push('newline');
-                    namecapt.push('收藏');
-                    namecapt.push('最近');
+                    for(var i in lib.characterDialogGroup){
+                        namecapt.push(i);
+                    }
                     namecapt.push('自创');
                 }
                 var newlined=false;
@@ -14563,11 +14582,7 @@
     					span.link=namecapt[i];
     					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
     					newlined.appendChild(span);
-                        switch(namecapt[i]){
-                            case '收藏':node.favourite=span;break;
-                            case '最近':node.recent=span;break;
-                            case '自创':node.diy=span;break;
-                        }
+                        node[namecapt[i]]=span;
                     }
                     else{
                         var span=document.createElement('span');
@@ -14619,7 +14634,9 @@
 				});
 				dialog=ui.create.dialog('hidden');
                 dialog.getCurrentCapt=function(link,capt){
-                    if(this.currentcapt=='收藏'&&(capt=='j'||capt=='t')) return capt;
+                    if(lib.characterDialogGroup[this.currentcapt]){
+                        return lib.characterDialogGroup[this.currentcapt](link,capt);
+                    }
                     return this.currentcapt;
                 }
 				if(str){
@@ -14661,7 +14678,8 @@
 					}
 				}
 
-                if(!thisiscard&&['favourite','recent','diy'].contains(lib.config.character_dialog_tool)){
+                if(!thisiscard&&(lib.characterDialogGroup[lib.config.character_dialog_tool]||
+                    lib.config.character_dialog_tool=='自创')){
                     clickCapt.call(node[lib.config.character_dialog_tool]);
                 }
 				return dialog;
@@ -18469,6 +18487,18 @@
 			},
 		},
 		click:{
+            favouriteCharacter:function(e){
+                if(this.innerHTML=='添加收藏'){
+                    this.innerHTML='移除收藏';
+                    lib.config.favouriteCharacter.add(this.link);
+                }
+                else{
+                    this.innerHTML='添加收藏';
+                    lib.config.favouriteCharacter.remove(this.link);
+                }
+                game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
+                e.stopPropagation();
+            },
 			dragtouchdialog:function(e){
 				if(e.touches.length>1&&
 					!this.classList.contains('popped')&&
@@ -22153,6 +22183,20 @@
 						uiintro.add('<div><div class="skill">『'+translation+'』</div><div>'+'已禁用'+'</div></div>');
 					}
 				}
+
+                if(lib.config.show_favourite&&lib.character[node.name]){
+                    var addFavourite=ui.create.div('.text.center');
+                    addFavourite.link=node.link;
+                    if(lib.config.favouriteCharacter.contains(node.name)){
+                        addFavourite.innerHTML='移除收藏';
+                    }
+                    else{
+                        addFavourite.innerHTML='添加收藏';
+                    }
+                    addFavourite.listen(ui.click.favouriteCharacter)
+                    uiintro.add(addFavourite);
+                }
+
 				if(!simple||lib.config.touchscreen){
 					var storage=node.storage;
 					for(i in storage){
@@ -22208,6 +22252,7 @@
 
 						uiintro.content.appendChild(table);
 					}
+
 					if(lib.config.change_skin&&(
 						!node.classList.contains('unseen')||!node.classList.contains('unseen2')
 					)){
@@ -22407,7 +22452,22 @@
 						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 					}
 				}
-				uiintro.add(ui.create.div('.placeholder.slim'));
+                if((node.parentNode.classList.contains('menu-buttons')||lib.config.show_favourite)&&lib.character[node.link]){
+                    var addFavourite=ui.create.div('.text.center');
+                    addFavourite.link=node.link;
+                    addFavourite.style.marginBottom='15px';
+                    if(lib.config.favouriteCharacter.contains(node.link)){
+                        addFavourite.innerHTML='移除收藏';
+                    }
+                    else{
+                        addFavourite.innerHTML='添加收藏';
+                    }
+                    addFavourite.listen(ui.click.favouriteCharacter)
+                    uiintro.add(addFavourite);
+                }
+                else{
+                    uiintro.add(ui.create.div('.placeholder.slim'));
+                }
 			}
 			else if(node.classList.contains('identity')&&node.dataset.career){
 				var career=node.dataset.career;

@@ -406,6 +406,7 @@ mode.guozhan={
 				if(result.buttons){
 					game.me.init(result.buttons[0].link,result.buttons[1].link,false);
 				}
+				game.addRecentCharacter(game.me.name,game.me.name2);
 				game.me.setIdentity(game.me.group);
 				event.list.remove(game.me.name);
 				event.list.remove(game.me.name2);

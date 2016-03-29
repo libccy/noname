@@ -746,6 +746,7 @@ mode.identity={
 				else{
 					game.me.init(result.buttons[0].link)
 				}
+				game.addRecentCharacter(game.me.name,game.me.name2);
 				event.list.remove(game.me.name);
 				event.list.remove(game.me.name2);
 				if(game.me==game.zhu&&game.players.length>4){

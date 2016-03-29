@@ -208,6 +208,8 @@ window.config={
 	hiddenCharacterPack:[],
 	hiddenCardPack:[],
 	hiddenPlayPack:[],
+	favouriteCharacter:[],
+	recentCharacter:[],
 
 	theme:'woodden',
 	layout:'mobile',
