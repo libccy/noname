@@ -48,6 +48,7 @@ background.pack={
     zhulian_bg:'璧合',
     zhulin_bg:'竹林',
     shengshi_bg:'盛世',
+    xueji_bg:'雪霁',
     yinxiang_bg:'印象',
     huangtian_bg:'黄天',
 };
