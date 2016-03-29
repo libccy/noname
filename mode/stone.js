@@ -1624,6 +1624,7 @@ mode.stone={
 					}
 				}
 				"step 3"
+				game.addRecentCharacter.apply(this,_status.mylist);
 				if(ui.coin){
 					_status.coinCoeff=get.coinCoeff(_status.mylist);
 				}
