@@ -825,6 +825,17 @@
 							game.saveConfig('dialog_transform',[0,0]);
 						}
 					},
+                    character_dialog_tool:{
+                        name:'自由选将显示',
+                        init:'recent',
+                        item:{
+                            favourite:'收藏',
+                            recent:'最近',
+                            diy:'自创',
+                            all:'全部'
+                        },
+                        unfrequent:true,
+                    },
 					hide_card_image:{
 						name:'隐藏卡牌背景',
 						init:false,
@@ -14372,7 +14383,7 @@
 							dialog.currentgroupnode=null;
 							node.classList.remove('thundertext');
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.currentcapt){
+								if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
 									dialog.buttons[i].classList.add('nodisplay');
 								}
 								else{
@@ -14389,7 +14400,7 @@
 							node.classList.add('thundertext');
 							for(var i=0;i<dialog.buttons.length;i++){
 								if(dialog.buttons[i].group!=link||
-								(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.currentcapt)){
+								(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt))){
 									dialog.buttons[i].classList.add('nodisplay');
 								}
 								else{
@@ -14435,7 +14446,7 @@
 				var namecapt=[];
 				var getCapt=function(str){
 					if(lib.customCharacters.contains(str)){
-						return '★';
+						return '自创';
 					}
 					var capt;
 					if(str.indexOf('_')==-1){
@@ -14446,7 +14457,7 @@
 					}
 					capt=capt.toLowerCase();
 					if(!/[a-z]/i.test(capt)){
-						capt='★';
+                        capt='自创';
 					}
 					return capt;
 				}
@@ -14480,6 +14491,14 @@
 				namecapt.sort(function(a,b){
 					return a>b?1:-1;
 				});
+                if(!thisiscard){
+                    namecapt.remove('自创');
+                    namecapt.push('newline');
+                    namecapt.push('收藏');
+                    namecapt.push('最近');
+                    namecapt.push('自创');
+                }
+                var newlined=false;
 				var clickCapt=function(e){
 					if(_status.dragged) return;
 					if(this.classList.contains('thundertext')){
@@ -14503,7 +14522,7 @@
 						dialog.currentcaptnode=this;
 						this.classList.add('thundertext');
 						for(var i=0;i<dialog.buttons.length;i++){
-							if(dialog.buttons[i].capt!=dialog.currentcapt||
+							if(dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)||
 							(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup)){
 								dialog.buttons[i].classList.add('nodisplay');
 							}
@@ -14525,14 +14544,38 @@
 						}
 					}
 
-					e.stopPropagation();
+					if(e) e.stopPropagation();
 				};
 				for(i=0;i<namecapt.length;i++){
-					var span=document.createElement('span');
-					span.innerHTML=' '+namecapt[i].toUpperCase()+' ';
-					span.link=namecapt[i];
-					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
-					node.appendChild(span);
+                    if(namecapt[i]=='newline'){
+                        newlined=document.createElement('div');
+                        newlined.style.marginTop='5px';
+                        newlined.style.display='block';
+                        newlined.style.fontFamily='xinwei';
+                        newlined.style.fontSize='22px';
+                        newlined.style.textAlign='center';
+                        node.appendChild(newlined);
+                    }
+                    else if(newlined){
+                        var span=document.createElement('span');
+                        span.style.margin='3px';
+    					span.innerHTML=' '+namecapt[i].toUpperCase()+' ';
+    					span.link=namecapt[i];
+    					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+    					newlined.appendChild(span);
+                        switch(namecapt[i]){
+                            case '收藏':node.favourite=span;break;
+                            case '最近':node.recent=span;break;
+                            case '自创':node.diy=span;break;
+                        }
+                    }
+                    else{
+                        var span=document.createElement('span');
+    					span.innerHTML=' '+namecapt[i].toUpperCase()+' ';
+    					span.link=namecapt[i];
+    					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+    					node.appendChild(span);
+                    }
 				}
 				var groupSort;
 				if(thisiscard){
@@ -14575,6 +14618,10 @@
 					return aa>bb?1:-1;
 				});
 				dialog=ui.create.dialog('hidden');
+                dialog.getCurrentCapt=function(link,capt){
+                    if(this.currentcapt=='收藏'&&(capt=='j'||capt=='t')) return capt;
+                    return this.currentcapt;
+                }
 				if(str){
 					dialog.add(str);
 				}
@@ -14613,6 +14660,10 @@
 						dialog.buttons[i].capt=getCapt(dialog.buttons[i].link);
 					}
 				}
+
+                if(!thisiscard&&['favourite','recent','diy'].contains(lib.config.character_dialog_tool)){
+                    clickCapt.call(node[lib.config.character_dialog_tool]);
+                }
 				return dialog;
 			},
 			dialog:function(){

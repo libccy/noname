@@ -257,7 +257,7 @@ window.config={
 	sort:'type_sort',
 
 	cards:['standard','ex','extra','refresh'],
-	characters:['standard','shenhua','refresh','yijiang'],
+	characters:['standard','shenhua','refresh','sp','yijiang'],
 	plays:[],
 	extensions:[],
 	banned:[],
