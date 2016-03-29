@@ -3291,6 +3291,9 @@
 						}
 					});
 				}
+                if(lib.config.debug){
+                    require('remote').getCurrentWindow().openDevTools();
+                }
 				ui.background=ui.create.div('.background');
 				ui.background.style.backgroundSize="cover";
 				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background!='custom'){
@@ -3737,8 +3740,9 @@
 				if(path[path.length-1]=='/'){
 					path=path.slice(0,path.length-1);
 				}
-				if(path=='mode'&&lib.config.all.stockmode.indexOf(file)==-1){
+				if(path==lib.assetURL+'mode'&&lib.config.all.stockmode.indexOf(file)==-1){
 					lib.init['setMode_'+file]();
+                    onload();
 					return;
 				}
 				if(Array.isArray(file)){
@@ -17600,6 +17604,7 @@
                             text.style.position='absolute';
                             text.style.left='30px';
                             text.style.top='12px';
+                            text.style.wordBreak='break-all';
 							page.appendChild(text);
 
 							var caption=ui.create.div('','输入命令',page);
@@ -17633,7 +17638,7 @@
                                 else{
                                     try{
                                         var result=eval(text2.value);
-                                        if(result){
+                                        if(result!==undefined){
                                             game.print(result);
                                         }
                                     }
@@ -17941,6 +17946,11 @@
 											script.remove();
 											var updates=window.noname_source_list;
 											delete window.noname_source_list;
+                                            for(var i=0;i<updates.length;i++){
+                                                if(updates[i].indexOf('theme/')==0){
+                                                    updates.splice(i--,1);
+                                                }
+                                            }
 
 											if(!ui.arena.classList.contains('menupaused')){
 												ui.click.configMenu();

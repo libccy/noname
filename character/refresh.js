@@ -349,6 +349,7 @@ character.refresh={
 		},
 		reyingzi:{
 			audio:2,
+			audioname:['sunce'],
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
 			content:function(){

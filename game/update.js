@@ -1,7 +1,9 @@
 window.noname_update={
-    version:'1.8.1.2',
+    version:'1.8.1.4',
     changeLog:[
         '自由选将改进',
-        '命令输入改进'
+        '命令输入改进',
+        '修复不能导入模式的bug',
+        '主题并入素材'
     ]
 }
