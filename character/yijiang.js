@@ -2831,7 +2831,7 @@ character.yijiang={
 			forceunique:true,
 			trigger:{global:'phaseUseBegin'},
 			filter:function(event,player){
-				return event.player!=player&&player.num('h')>0;
+				return event.player!=player;
 			},
 			prompt:function(event,player){
 				return '是否对'+get.translation(event.player)+'发动【献图】？'
@@ -2893,17 +2893,28 @@ character.yijiang={
 		},
 		qiangzhi:{
 			audio:2,
-			enable:'phaseUse',
-			usable:1,
+			trigger:{player:'phaseUseBegin'},
+			direct:true,
 			filterTarget:function(card,player,target){
 				return target!=player&&target.num('h')>0;
 			},
 			content:function(){
-				var card=target.get('h').randomGet();
-				player.showCards(card);
-				player.storage.qiangzhi=get.type(card,'trick');
-				game.addVideo('storage',player,['qiangzhi',player.storage.qiangzhi]);
-				player.markSkill('qiangzhi');
+				'step 0'
+				player.chooseTarget('是否发动【强识】？',function(card,player,target){
+					return target!=player&&target.num('h')>0;
+				}).ai=function(){
+					return Math.random();
+				}
+				'step 1'
+				if(result.bool){
+					var target=result.targets[0];
+					player.logSkill('qiangzhi',target);
+					var card=target.get('h').randomGet();
+					player.showCards(card);
+					player.storage.qiangzhi=get.type(card,'trick');
+					game.addVideo('storage',player,['qiangzhi',player.storage.qiangzhi]);
+					player.markSkill('qiangzhi');
+				}
 			},
 			intro:{
 				content:function(type){

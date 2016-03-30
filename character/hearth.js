@@ -144,6 +144,7 @@ character.hearth={
 				}
 				'step 1'
 				if(result.control){
+					game.stopCountChoose();
 					var link=result.control;
 					player.addSkill(link);
 					player.skills.remove(link);
@@ -2904,6 +2905,7 @@ character.hearth={
 					event.finish();
 				}
 				'step 1'
+				game.stopCountChoose();
 				if(result.buttons.length==1){
 					player.addSkill(result.buttons[0].name);
 				}

@@ -607,6 +607,7 @@ character.shenhua={
 				}
 				"step 2"
 				if(result.bool&&result.targets&&result.targets.length){
+					game.stopCountChoose();
 					var card=event.card;
 					player.storage.tuntian.remove(card);
 					game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);

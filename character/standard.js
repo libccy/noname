@@ -694,12 +694,54 @@ character.standard={
 				if(player.isUnderControl()){
 					game.modeSwapPlayer(player);
 				}
+				var cards=get.cards(Math.min(5,game.players.length));
+				event.switchToAuto=function(){
+					_status.imchoosing=false;
+					if(event.dialog) event.dialog.close();
+					if(event.control) event.control.close();
+					var top=[];
+					var judges=player.node.judges.childNodes;
+					var stopped=false;
+					if(!player.num('h','wuxie')){
+						for(var i=0;i<judges.length;i++){
+							var judge=get.judge(judges[i]);
+							cards.sort(function(a,b){
+								return judge(b)-judge(a);
+							});
+							if(judge(cards[0])<0){
+								stopped=true;break;
+							}
+							else{
+								top.unshift(cards.shift());
+							}
+						}
+					}
+					var bottom;
+					if(!stopped){
+						cards.sort(function(a,b){
+							return ai.get.value(b,player)-ai.get.value(a,player);
+						});
+						while(cards.length){
+							if(ai.get.value(cards[0],player)<=5) break;
+							top.unshift(cards.shift());
+						}
+					}
+					bottom=cards;
+					for(var i=0;i<top.length;i++){
+						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+					}
+					for(i=0;i<bottom.length;i++){
+						ui.cardPile.appendChild(bottom[i]);
+					}
+					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
+					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+					game.delay(2);
+				};
 				if(event.isMine()){
-					ui.auto.hide();
 					event.top=[];
 					event.bottom=[];
 					event.status=true;
-					event.dialog=ui.create.dialog('按顺序选择置于牌堆顶的牌（先选择的在上）',get.cards(Math.min(5,game.players.length)));
+					event.dialog=ui.create.dialog('按顺序选择置于牌堆顶的牌（先选择的在上）',cards);
 					event.control=ui.create.control('ok','pileTop','pileBottom',function(link){
 						var event=_status.event;
 						if(link=='ok'){
@@ -718,8 +760,8 @@ character.standard={
 							event.dialog.close();
 							event.control.close();
 							game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
-							ui.auto.show();
 							game.resume();
+							_status.imchoosing=false;
 						}
 						else if(link=='pileTop'){
 							event.status=true;
@@ -761,46 +803,10 @@ character.standard={
 						}
 					}
 					game.pause();
+					game.countChoose();
 				}
 				else{
-					var cards=get.cards(Math.min(5,game.players.length));
-					var top=[];
-					var judges=player.node.judges.childNodes;
-					var stopped=false;
-					if(!player.num('h','wuxie')){
-						for(var i=0;i<judges.length;i++){
-							var judge=get.judge(judges[i]);
-							cards.sort(function(a,b){
-								return judge(b)-judge(a);
-							});
-							if(judge(cards[0])<0){
-								stopped=true;break;
-							}
-							else{
-								top.unshift(cards.shift());
-							}
-						}
-					}
-					var bottom;
-					if(!stopped){
-						cards.sort(function(a,b){
-							return ai.get.value(b,player)-ai.get.value(a,player);
-						});
-						while(cards.length){
-							if(ai.get.value(cards[0],player)<=5) break;
-							top.unshift(cards.shift());
-						}
-					}
-					bottom=cards;
-					for(var i=0;i<top.length;i++){
-						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-					}
-					for(i=0;i<bottom.length;i++){
-						ui.cardPile.appendChild(bottom[i]);
-					}
-					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
-					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-					game.delay(2);
+					event.switchToAuto();
 				}
 			},
 			ai:{

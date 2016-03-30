@@ -6,6 +6,17 @@ mode.identity={
 			ui.arena.classList.add('only_dialog');
 		}
 		_status.mode=get.config('identity_mode');
+		if(lib.config.connectMode){
+			game.createServer();
+			for(var i in lib.mode.identity.config){
+				if(lib.mode.identity.config[i].connect){
+					lib.configOL[i]=get.config(i);
+				}
+			}
+			lib.configOL.number=lib.configOL.player_number;
+			lib.configOL.characterPack='standard';
+			lib.configOL.cardPack='standard';
+		}
 		"step 1"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 		if(playback){
@@ -139,7 +150,12 @@ mode.identity={
 			_status.auto=true;
 			ui.auto.classList.add('glow');
 		}
-		game.chooseCharacter();
+		if(_status.connectMode){
+			game.waitForStart();
+		}
+		else{
+			game.chooseCharacter();
+		}
 		"step 4"
 		if(ui.coin){
 			_status.coinCoeff=get.coinCoeff([game.me.name]);

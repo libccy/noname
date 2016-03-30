@@ -228,6 +228,7 @@ window.config={
 	show_volumn:true,
 	show_cardpile:true,
 	only_fullskin:true,
+	show_connect:true,
 	show_wuxie:false,
 	show_wuxie_self:true,
 	show_stat:true,

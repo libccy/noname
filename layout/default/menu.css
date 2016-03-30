@@ -282,7 +282,8 @@
 }
 .popup-container>.menu{
 	position:absolute;
-	overflow:hidden;
+	overflow:scroll;
+	max-height: 400px;
 }
 .popup-container>.menu>div{
 	padding-top:5px;
