@@ -110,6 +110,9 @@
     top:10px;
     transform: none;
 }
+#arena:not(.chess) .player[data-position='0']>.nameol{
+    display: none;
+}
 #arena:not(.chess) .player[data-position='0']>.name.name2,
 #arena:not(.chess) .player[data-position='0'].linked>.name.name2{
     left:69px;

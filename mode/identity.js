@@ -13,9 +13,15 @@ mode.identity={
 					lib.configOL[i]=get.config(i);
 				}
 			}
-			lib.configOL.number=lib.configOL.player_number;
+			if(_status.mode=='zhong'){
+				lib.configOL.number=8;
+			}
+			else{
+				lib.configOL.number=lib.configOL.player_number;
+			}
 			lib.configOL.characterPack='standard';
 			lib.configOL.cardPack='standard';
+			lib.configOL.mode='identity';
 		}
 		"step 1"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
@@ -37,7 +43,7 @@ mode.identity={
 			}
 			event.finish();
 		}
-		else{
+		else if(!_status.connectMode){
 			if(_status.mode=='zhong'){
 				game.prepareArena(8);
 			}
@@ -47,6 +53,9 @@ mode.identity={
 			if(!lib.config.new_tutorial){
 				game.delay();
 			}
+		}
+		if(!lib.node){
+			game.connect('localhost');
 		}
 		"step 2"
 		if(!lib.config.new_tutorial){
@@ -151,12 +160,57 @@ mode.identity={
 			ui.auto.classList.add('glow');
 		}
 		if(_status.connectMode){
-			game.waitForStart();
+			game.waitForPlayer();
+		}
+		"step 4"
+		if(_status.connectMode){
+			game.prepareArena();
+			var list=[];
+			for(var i=0;i<game.players.length;i++){
+				if(game.players[i]!=game.me){
+					list.push(game.players[i]);
+				}
+			}
+			var map=[];
+			for(var i=0;i<lib.node.clients.length;i++){
+				var current=list.randomRemove();
+				current.ws=lib.node.clients[i];
+				current.setNameOL(current.ws.nickname);
+				current.playerid=current.ws.id;
+				current.nickname=current.ws.nickname;
+			}
+			game.me.playerid=get.id();
+			game.me.nickname=lib.config.connect_nickname;
+			game.me.setNameOL(game.me.nickname);
+			for(var i=0;i<game.players.length;i++){
+				if(!game.players[i].playerid){
+					game.players[i].playerid=get.id();
+				}
+				map.push([game.players[i].playerid,game.players[i].nickname]);
+				lib.playerOL[game.players[i].playerid]=game.players[i];
+			}
+			game.broadcast(function(map){
+				ui.create.players();
+				ui.create.me();
+				game.me.playerid=game.onlineID;
+				game.me.nickname=lib.config.connect_nickname;
+				for(var i=0;i<map.length;i++){
+					if(map[i][0]==game.me.playerid){
+						map=map.concat(map.splice(0,i));
+						break;
+					}
+				}
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].playerid=map[i][0];
+					game.players[i].setNameOL(map[i][1]);
+				}
+			},map);
+			game.chooseCharacterOL();
 		}
 		else{
 			game.chooseCharacter();
 		}
-		"step 4"
+		"step 5"
 		if(ui.coin){
 			_status.coinCoeff=get.coinCoeff([game.me.name]);
 		}
@@ -775,6 +829,132 @@ mode.identity={
 						event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
 					}
 				}
+			}
+		},
+		chooseCharacterOL:function(){
+			var next=game.createEvent('chooseCharacter',false);
+			next.content=function(){
+				"step 0"
+				var i;
+				var identityList;
+				if(_status.mode=='zhong'){
+					event.zhongmode=true;
+					identityList=['zhu','zhong','mingzhong','nei','fan','fan','fan','fan'];
+				}
+				else{
+					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+					if(get.config('double_nei')){
+						switch(get.config('player_number')){
+							case '8':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case '7':
+							identityList.remove('zhong');
+							identityList.push('nei');
+							break;
+							case '6':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case '5':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case '4':
+							identityList.remove('zhong');
+							identityList.push('nei');
+							break;
+							case '3':
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+						}
+					}
+				}
+				identityList.randomSort();
+				for(i=0;i<game.players.length;i++){
+					game.players[i].identity=identityList[i];
+					game.players[i].setIdentity('cai');
+					if(event.zhongmode){
+						if(identityList[i]=='mingzhong'){
+							game.zhu=game.players[i];
+						}
+						else if(identityList[i]=='zhu'){
+							game.zhu2=game.players[i];
+						}
+					}
+					else{
+						if(identityList[i]=='zhu'){
+							game.zhu=game.players[i];
+						}
+					}
+					game.players[i].identityShown=false;
+				}
+				game.zhu.setIdentity();
+				game.zhu.identityShown=true;
+				game.zhu.isZhu=(game.zhu.identity=='zhu');
+				game.me.setIdentity();
+
+				var list;
+				var list2=[];
+				var list3=[];
+				event.list=[];
+				for(i in lib.character){
+					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
+					if(lib.config.forbidai.contains(i)) continue;
+					if(lib.config.forbidall.contains(i)) continue;
+					if(lib.config.banned.contains(i)) continue;
+					if(!get.config('double_character')&&get.config('ban_weak')&&
+					(lib.config.forbidsingle.contains(i)||lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
+					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
+					if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
+					event.list.push(i);
+					if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
+						list2.push(i);
+					}
+					else{
+						list3.push(i);
+					}
+				}
+				var num=get.config('choice_'+game.zhu.identity);
+				if(event.zhongmode){
+					num=3;
+				}
+				if(event.zhongmode){
+					list=event.list.randomGets(6);
+				}
+				else{
+					list=list2.concat(list3.randomGets(num));
+				}
+				var next=game.zhu.chooseButton(true);
+				next.selectButton=(lib.configOL.double_character?2:1);
+				next.createDialog=['选择角色','hidden',[list,'character']];
+				next.ai=function(button){
+					return Math.random();
+				}
+				"step 1"
+				if(result.buttons.length==2){
+					game.zhu.init(result.links[0],result.links[1])
+				}
+				else{
+					game.zhu.init(result.links[0])
+				}
+				event.list.remove(game.zhu.name);
+				event.list.remove(game.zhu.name2);
+				// game.addRecentCharacter(game.me.name,game.me.name2);
+				// event.list.remove(game.me.name);
+				// event.list.remove(game.me.name2);
+				// if(game.me==game.zhu&&game.players.length>4){
+				// 	game.me.hp++;
+				// 	game.me.maxHp++;
+				// 	game.me.update();
+				// }
+				// for(var i=0;i<game.players.length;i++){
+				// 	if(game.players[i]!=game.zhu&&game.players[i]!=game.me){
+				// 		event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
+				// 	}
+				// }
 			}
 		},
 	},

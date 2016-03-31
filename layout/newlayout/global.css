@@ -6,7 +6,7 @@
 	width:130px;
 	height:160px;
 }
-#arena.slim_player .player:not(.minskin):not(.fakeme) .avatar{
+#window>.player>.avatar,#arena.slim_player .player:not(.minskin):not(.fakeme) .avatar{
 	width: 136px;
 	height: 166px;
 	left:7px;
@@ -351,6 +351,18 @@
 [data-number='2']>.popup[data-position='1']{top:190px;left:calc(50% - 61px);}
 /*--------位置(1人)------*/
 .player[data-position='0']{top:calc(100% - 170px);left:calc(50% - 75px);}
+/*--------位置(联机)------*/
+#window>.player.connect[data-position='0']{left:calc(200% / 7 - 1200px / 7);top:calc(100% / 3 - 400px / 3 + 12px);}
+#window>.player.connect[data-position='1']{left:calc(300% / 7 - 750px / 7);top:calc(100% / 3 - 400px / 3 + 12px);}
+#window>.player.connect[data-position='2']{left:calc(400% / 7 - 300px / 7);top:calc(100% / 3 - 400px / 3 + 12px);}
+#window>.player.connect[data-position='3']{left:calc(500% / 7 + 150px / 7);top:calc(100% / 3 - 400px / 3 + 12px);}
+#window>.player.connect[data-position='4']{left:calc(200% / 7 - 1200px / 7);top:calc(150% / 3 - 20px + 9px);}
+#window>.player.connect[data-position='5']{left:calc(300% / 7 - 750px / 7);top:calc(150% / 3 - 20px + 9px);}
+#window>.player.connect[data-position='6']{left:calc(400% / 7 - 300px / 7);top:calc(150% / 3 - 20px + 9px);}
+#window>.player.connect[data-position='7']{left:calc(500% / 7 + 150px / 7);top:calc(150% / 3 - 20px + 9px);}
+
+
+
 .card[data-position='0']{top:calc(100% - 130px);left:calc(50% - 52px);}
 .popup[data-position='0']{top:calc(100% - 206px);left:calc(50% - 61px);}
 #me,#mebg{top:calc(100% - 150px);}

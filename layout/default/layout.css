@@ -589,6 +589,17 @@ margin-bottom: 5px;
 	font-family: 'huangcao','xinwei';
 }
 
+.player>.nameol{
+	left:0;
+	top:15px;
+	width: 100%;
+	font-size: 12px;
+	text-align: center;
+	/*opacity: 0;*/
+}
+.player:hover>.nameol{
+	opacity: 1;
+}
 .player>.name{left: 16px;top:24px;font-size:20px;font-family: 'xinwei';}
 .player>.name.name2{left:81px}
 #arena.slim_player .player>.name{
@@ -979,6 +990,7 @@ margin-bottom: 5px;
 #arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
 .dead,.likedead{opacity: 0.6;}
 .unselectable:not(.selected):not(.removing){opacity: 0.6 !important}
+.unselectable2{opacity: 0.4 !important}
 .mark>.background{opacity: 1 !important;}
 #arena.selecting:not(.video) #me .card:not(.selectable){
 	opacity:0.8
