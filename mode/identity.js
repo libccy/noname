@@ -19,8 +19,8 @@ mode.identity={
 			else{
 				lib.configOL.number=lib.configOL.player_number;
 			}
-			lib.configOL.characterPack='standard';
-			lib.configOL.cardPack='standard';
+			lib.configOL.characterPack=['standard','wind'];
+			lib.configOL.cardPack=['standard'];
 			lib.configOL.mode='identity';
 		}
 		"step 1"
@@ -175,13 +175,13 @@ mode.identity={
 			for(var i=0;i<lib.node.clients.length;i++){
 				var current=list.randomRemove();
 				current.ws=lib.node.clients[i];
-				current.setNameOL(current.ws.nickname);
 				current.playerid=current.ws.id;
 				current.nickname=current.ws.nickname;
+				current.setNickname();
 			}
 			game.me.playerid=get.id();
 			game.me.nickname=lib.config.connect_nickname;
-			game.me.setNameOL(game.me.nickname);
+			game.me.setNickname();
 			for(var i=0;i<game.players.length;i++){
 				if(!game.players[i].playerid){
 					game.players[i].playerid=get.id();
@@ -202,8 +202,11 @@ mode.identity={
 				}
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].playerid=map[i][0];
-					game.players[i].setNameOL(map[i][1]);
+					game.players[i].nickname=map[i][1];
+					game.players[i].setNickname();
+					lib.playerOL[game.players[i].playerid]=game.players[i];
 				}
+				_status.mode=lib.configOL.identity_mode;
 			},map);
 			game.chooseCharacterOL();
 		}
@@ -216,6 +219,11 @@ mode.identity={
 		}
 		if(game.players.length==2){
 			game.showIdentity(true);
+			if(game.me.next.isOnline){
+				game.me.next.send(function(identity){
+					game.me.next.setIdentity(identity);
+				},game.me.identity);
+			}
 		}
 		else{
 			for(var i=0;i<game.players.length;i++){
@@ -896,65 +904,109 @@ mode.identity={
 				game.zhu.isZhu=(game.zhu.identity=='zhu');
 				game.me.setIdentity();
 
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].send(function(zhu,me,identity){
+						for(var i in lib.playerOL){
+							lib.playerOL[i].setIdentity('cai');
+						}
+						zhu.identityShown=true;
+						zhu.setIdentity('zhu');
+						me.setIdentity(identity);
+					},game.zhu,game.players[i],game.players[i].identity);
+				}
+
 				var list;
 				var list2=[];
 				var list3=[];
 				event.list=[];
-				for(i in lib.character){
-					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
+
+				var libCharacter={};
+				for(var i=0;i<lib.configOL.characterPack.length;i++){
+					var pack=lib.characterPack[lib.configOL.characterPack[i]];
+					for(var j in pack){
+						libCharacter[j]=pack[j];
+					}
+				}
+				for(i in libCharacter){
+					if(libCharacter[i][4]&&libCharacter[i][4].contains('forbidai')) continue;
 					if(lib.config.forbidai.contains(i)) continue;
-					if(lib.config.forbidall.contains(i)) continue;
+					// if(lib.config.forbidall.contains(i)) continue;
 					if(lib.config.banned.contains(i)) continue;
 					if(!get.config('double_character')&&get.config('ban_weak')&&
 					(lib.config.forbidsingle.contains(i)||lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
 					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
 					if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
 					event.list.push(i);
-					if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
+					if(libCharacter[i][4]&&libCharacter[i][4].contains('zhu')){
 						list2.push(i);
 					}
 					else{
 						list3.push(i);
 					}
 				}
-				var num=get.config('choice_'+game.zhu.identity);
-				if(event.zhongmode){
-					num=3;
-				}
 				if(event.zhongmode){
 					list=event.list.randomGets(6);
 				}
 				else{
-					list=list2.concat(list3.randomGets(num));
+					list=list2.concat(list3.randomGets(3));
 				}
 				var next=game.zhu.chooseButton(true);
-				next.selectButton=(lib.configOL.double_character?2:1);
-				next.createDialog=['选择角色','hidden',[list,'character']];
-				next.ai=function(button){
+				next.set('selectButton',(lib.configOL.double_character?2:1));
+				next.set('createDialog',['选择角色',[list,'character']]);
+				next.set('callback',function(player,result){
+					player.init(result.links[0],result.links[1]);
+				});
+				next.set('ai',function(button){
 					return Math.random();
-				}
+				});
 				"step 1"
-				if(result.buttons.length==2){
+				if(game.me!=game.zhu){
 					game.zhu.init(result.links[0],result.links[1])
-				}
-				else{
-					game.zhu.init(result.links[0])
 				}
 				event.list.remove(game.zhu.name);
 				event.list.remove(game.zhu.name2);
-				// game.addRecentCharacter(game.me.name,game.me.name2);
-				// event.list.remove(game.me.name);
-				// event.list.remove(game.me.name2);
-				// if(game.me==game.zhu&&game.players.length>4){
-				// 	game.me.hp++;
-				// 	game.me.maxHp++;
-				// 	game.me.update();
-				// }
-				// for(var i=0;i<game.players.length;i++){
-				// 	if(game.players[i]!=game.zhu&&game.players[i]!=game.me){
-				// 		event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
-				// 	}
-				// }
+
+				game.broadcast(function(zhu,name,name2){
+					if(game.zhu!=game.me){
+						zhu.init(name,name2);
+					}
+				},game.zhu,game.zhu.name,game.zhu.name2);
+
+				var list=[];
+				var selectButton=(lib.configOL.double_character?2:1);
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=game.zhu){
+						var num;
+						switch(game.players[i].identity){
+							case 'zhong':num=4;break;
+							case 'nei':num=5;break;
+							default:num=3;break;
+						}
+						list.push([game.players[i],['选择角色',[event.list.randomRemove(num),'character']],selectButton,true]);
+					}
+				}
+				game.me.chooseButtonOL(list,function(player,result){
+					if(game.online||player==game.me) player.init(result.links[0],null,result.links[1]);
+				});
+				"step 2"
+				for(var i in result){
+					if(result[i]=='ai'){
+						result[i]=event.list.randomRemove(lib.configOL.double_character?2:1);
+					}
+					else{
+						result[i]=result[i].links
+					}
+					if(!lib.playerOL[i].name){
+						lib.playerOL[i].init(result[i][0],result[i][1]);
+					}
+				}
+				game.broadcast(function(result){
+					for(var i in result){
+						if(!lib.playerOL[i].name){
+							lib.playerOL[i].init(result[i][0],result[i][1]);
+						}
+					}
+				},result);
 			}
 		},
 	},

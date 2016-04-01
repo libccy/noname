@@ -3579,7 +3579,7 @@ character.hearth={
 		hs_hudunren:'护盾人',
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
-
+		
 		xueren:'血刃',
 		xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各流失一点体力，然后你摸两张牌',
 		maoxian:'冒险',
