@@ -16889,7 +16889,7 @@
 							active=this;
 							this.classList.add('active');
 							rightPane.appendChild(this.link);
-                            if(lib.mode[this.mode].connect){
+                            if(lib.mode[this.mode].connect&&lib.node){
                                 connectButton.style.display='';
                             }
                             else{
