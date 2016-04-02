@@ -53,6 +53,9 @@ card.mingzhong={
 				order:2.5,
 				value:[4,1],
 				useful:1,
+				wuxie:function(){
+					return 0;
+				},
 				result:{
 					target:function(player,target){
 						var ok=false;

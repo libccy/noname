@@ -122,7 +122,7 @@ character.standard={
 				"step 1"
 				if(result.bool){
 					player.logSkill('fankui',trigger.source);
-					player.gain(result.buttons[0].link);
+					player.gain(result.links[0]);
 					trigger.source.$give(1,player);
 				}
 			},
@@ -1009,12 +1009,15 @@ character.standard={
 			filterCard:true,
 			selectCard:[1,Infinity],
 			prompt:'弃置任意张牌并摸等量的牌',
-			check:function(card){return 6-ai.get.value(card)},
+			check:function(card){
+				return -1;
+				return 6-ai.get.value(card)
+			},
 			content:function(){
 				player.draw(cards.length);
 			},
 			ai:{
-				order:1,
+				order:11,
 				result:{
 					player:1
 				},

@@ -228,7 +228,7 @@ character.refresh={
 						cards.splice(i,1);i--;
 					}
 				}
-				player.gain(cards);
+				player.gain(cards,'gain2');
 			}
 		},
 		reluoyi2:{

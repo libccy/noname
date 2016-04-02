@@ -1879,7 +1879,7 @@
 						onclick:function(bool){
 							game.saveConfig('dierestart',bool,this._link.config.mode);
 							if(get.config('dierestart')){
-								if(!ui.restart&&game.me.isDead()){
+								if(!ui.restart&&game.me.isDead()&&!_status.connectMode){
 									ui.restart=ui.create.control('restart',game.reload);
 								}
 							}
@@ -2115,7 +2115,7 @@
 						onclick:function(bool){
 							game.saveConfig('dierestart',bool,this._link.config.mode);
 							if(get.config('dierestart')){
-								if(!ui.restart&&game.me.isDead()){
+								if(!ui.restart&&game.me.isDead()&&!_status.connectMode){
 									ui.restart=ui.create.control('restart',game.reload);
 								}
 							}
@@ -3359,8 +3359,8 @@
 						}
 					});
 				}
-                if(lib.config.debug){
-                    require('remote').getCurrentWindow().openDevTools();
+                if(lib.config.debug&&window.require){
+                    window.require('remote').getCurrentWindow().openDevTools();
                 }
 				ui.background=ui.create.div('.background');
 				ui.background.style.backgroundSize="cover";
@@ -3696,6 +3696,9 @@
 					}
 
                     if(lib.config.connectMode&&lib.mode[lib.config.mode].connect){
+                        _status.connectMode=true;
+                    }
+                    else if(lib.config.mode=='connect'){
                         _status.connectMode=true;
                     }
 					if(lib.config.cheat&&!_status.connectMode){
@@ -4240,6 +4243,7 @@
 							ui.click.cancel();
 						}
                     }
+                    "step 2"
                     delete _status.noclearcountdown;
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
@@ -4254,7 +4258,7 @@
                     if(!_status.noclearcountdown){
                         game.stopCountChoose();
                     }
-                    "step 2"
+                    "step 3"
                     if(event._result&&event.result){
                         event.result.result=event._result;
                     }
@@ -4265,7 +4269,7 @@
 						delete event.dialog;
 						return;
 					}
-					if(event.autochoose&&event.autochoose()){
+					if(!_status.connectMode&&event.autochoose&&event.autochoose()){
 						event.result={bool:false};
 					}
 					else{
@@ -4274,24 +4278,32 @@
 							game.pause();
 							if(event.dialog) event.dialog=ui.create.dialog(event.dialog);
 						}
+                        else if(event.isOnline()){
+                            event.send();
+                        }
 						else{
-							if(ai.basic.chooseCard(event.ai)||forced){
-								ui.click.ok();
-							}
-							else if(event.skill){
-								var skill=event.skill;
-								ui.click.cancel();
-								event.aiexclude.add(skill);
-								event.redo();
-								game.resume();
-							}
-							else{
-								ui.click.cancel();
-							}
+							event.result='ai';
 						}
 					}
 					"step 1"
-					if(event.result.bool){
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseCard(event.ai)||forced){
+                            ui.click.ok();
+                        }
+                        else if(event.skill){
+                            var skill=event.skill;
+                            ui.click.cancel();
+                            event.aiexclude.add(skill);
+                            event.redo();
+                            game.resume();
+                        }
+                        else{
+                            ui.click.cancel();
+                        }
+                    }
+                    "step 2"
+					if(event.result.bool&&!game.online){
 						player.respond(event.result.cards,event.result.card,event.animate,event.result.skill,event.source);
 					}
 					if(event.dialog&&event.dialog.close) event.dialog.close();
@@ -4342,23 +4354,31 @@
 								event.dialog.open();
 							}
 						}
+                        else if(event.isOnline()){
+                            event.send();
+                        }
 						else{
-							if(ai.basic.chooseCard(event.ai)||forced){
-								ui.click.ok();
-							}
-							else if(event.skill){
-								var skill=event.skill;
-								ui.click.cancel();
-								event.aiexclude.add(skill);
-								event.redo();
-								game.resume();
-							}
-							else{
-								ui.click.cancel();
-							}
+							event.result='ai';
 						}
 					}
 					"step 1"
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseCard(event.ai)||forced){
+                            ui.click.ok();
+                        }
+                        else if(event.skill){
+                            var skill=event.skill;
+                            ui.click.cancel();
+                            event.aiexclude.add(skill);
+                            event.redo();
+                            game.resume();
+                        }
+                        else{
+                            ui.click.cancel();
+                        }
+                    }
+                    "step 2"
 					if(event.promptdiscard){
 						event.promptdiscard.close();
 					}
@@ -4370,7 +4390,7 @@
 							player.logSkill.apply(player,event.logSkill);
 						}
 					}
-					player.discard(event.result.cards);
+					if(!game.online) player.discard(event.result.cards);
 					if(event.dialog) event.dialog.close();
 				},
 				chooseToCompare:function(){
@@ -4395,7 +4415,10 @@
 					player.lose(event.card1);
 					target.lose(event.card2);
 					"step 3"
-					ui.arena.classList.add('thrownhighlight');
+                    game.broadcast(function(){
+                        ui.arena.classList.add('thrownhighlight');
+                    });
+                    ui.arena.classList.add('thrownhighlight');
 					game.addVideo('thrownhighlight1');
 					player.$compare(event.card1,target,event.card2);
 					game.log(player,'的拼点牌为',event.card1);
@@ -4404,11 +4427,17 @@
 						player:event.card1,
 						target:event.card2,
 					}
+                    event.dialogid=lib.status.videoId++;
 					if(get.number(event.card1)>get.number(event.card2)){
 						event.result.bool=true;
-
 						setTimeout(function(){
-							event.dialog=ui.create.dialog(get.translation(player.name)+'拼点成功');
+                            var str=get.translation(player.name)+'拼点成功';
+                            game.broadcast(function(str,id){
+                                var dialog=ui.create.dialog(str);
+                                dialog.videoId=id;
+                                dialog.classList.add('center');
+                            },str,event.dialogid);
+							event.dialog=ui.create.dialog(str);
 							event.dialog.classList.add('center');
 							player.popup('胜');
 							target.popup('负');
@@ -4420,7 +4449,13 @@
 						if(get.number(event.card1)>get.number(event.card2)){
 							event.result.tie=true;
 							setTimeout(function(){
-								event.dialog=ui.create.dialog(get.translation(player.name)+'拼点失败');
+                                var str=get.translation(player.name)+'拼点失败';
+                                game.broadcast(function(str,id){
+                                    var dialog=ui.create.dialog(str);
+                                    dialog.videoId=id;
+                                    dialog.classList.add('center');
+                                },str,event.dialogid);
+								event.dialog=ui.create.dialog(str);
 								event.dialog.classList.add('center');
 								player.popup('平');
 								target.popup('平');
@@ -4445,8 +4480,18 @@
 						event.target.ai.shown+=0.1;
 					}
 					ui.arena.classList.remove('thrownhighlight');
+                    game.broadcast(function(id){
+                        var dialog=get.idDialog(id);
+                        if(dialog){
+                            dialog.close();
+                        }
+                        ui.arena.classList.remove('thrownhighlight');
+                    },event.dialogid);
 					game.addVideo('thrownhighlight2');
-					if(event.clear!==false) ui.clear();
+					if(event.clear!==false){
+                        ui.clear();
+                        game.broadcast(ui.clear);
+                    }
 					event.dialog.close();
 				},
 				chooseButton:function(){
@@ -4565,8 +4610,16 @@
 							}
 						}
 					}
+                    else if(event.isOnline()){
+                        event.send();
+                    }
 					else{
-						if(ai.basic.chooseCard(event.ai)||forced){
+						event.result='ai';
+					}
+					"step 1"
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseCard(event.ai)||forced){
 							ui.click.ok();
 						}
 						else if(event.skill){
@@ -4579,14 +4632,14 @@
 						else{
 							ui.click.cancel();
 						}
-					}
-					"step 1"
+                    }
+                    "step 2"
 					if(event.dialog) event.dialog.close();
 				},
 				chooseTarget:function(){
 					"step 0"
-					game.check();
 					if(event.isMine()){
+                        game.check();
 						game.pause();
 						if(event.prompt!=false){
 							var str;
@@ -4610,15 +4663,22 @@
 							event.dialog.open();
 						}
 					}
+                    else if(event.isOnline()){
+                        event.send();
+                    }
 					else{
-						if(ai.basic.chooseTarget(event.ai)||forced){
+                        event.result='ai';
+					}
+					"step 1"
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseTarget(event.ai)||forced){
 							ui.click.ok();
 						}
 						else{
 							ui.click.cancel();
 						}
-					}
-					"step 1"
+                    }
 					if(event.result.bool){
 						for(var i=0;i<event.result.targets.length;i++){
 							event.result.targets[i].animate('target');
@@ -4628,15 +4688,23 @@
 				},
 				chooseCardTarget:function(){
 					"step 0"
-					game.check();
 					if(event.isMine()){
+                        game.check();
 						game.pause();
 						if(event.prompt!=false){
 							event.dialog=ui.create.dialog(event.prompt||'请选择卡牌和目标');
 						}
 					}
+                    else if(event.isOnline()){
+                        event.send();
+                    }
 					else{
-						if(ai.basic.chooseCard(event.ai1)){
+						event.result='ai';
+					}
+					"step 1"
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseCard(event.ai1)){
 							if(ai.basic.chooseTarget(event.ai2)){
 								ui.click.ok();
 								_status.event.aiexclude.length=0;
@@ -4651,8 +4719,8 @@
 						else{
 							ui.click.cancel();
 						}
-					}
-					"step 1"
+                    }
+                    "step 2"
 					if(event.result.bool){
 						for(var i=0;i<event.result.targets.length;i++){
 							event.result.targets[i].animate('target');
@@ -4677,16 +4745,22 @@
 						game.pause();
                         game.countChoose();
 					}
+                    else if(event.isOnline()){
+                        event.send();
+                    }
 					else{
-						event.result={};
+						event.result='ai';
+					}
+					"step 1"
+                    if(event.result=='ai'){
+                        event.result={};
 						if(event.ai){
 							var result=event.ai(event.getParent(),player);
 							if(typeof result=='number') event.result.control=event.controls[result];
 							else event.result.control=result;
 						}
 						else event.result.control=event.controls[event.choice];
-					}
-					"step 1"
+                    }
 					_status.imchoosing=false;
 					if(event.dialog) event.dialog.close();
 					if(event.controlbar) event.controlbar.close();
@@ -4704,13 +4778,19 @@
 						game.pause();
                         game.countChoose();
 					}
+                    else if(event.isOnline()){
+                        event.send();
+                    }
 					else{
-						if(event.ai){
+                        event.result='ai';
+					}
+					"step 1"
+                    if(event.result=='ai'){
+                        if(event.ai){
 							event.choice=event.ai(event.getParent(),player);
 						}
 						event.result={bool:event.choice};
-					}
-					"step 1"
+                    }
 					_status.imchoosing=false;
 					if(event.dialog) event.dialog.close();
 				},
@@ -4762,17 +4842,22 @@
 					else{
 						if(event.isMine()){
 							event.dialog.open();
-						}
-						game.check();
-						if(event.isMine()){
+    						game.check();
 							game.pause();
 						}
+                        else if(event.isOnline()){
+                            event.send();
+                        }
 						else{
-							if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
-							else ui.click.cancel();
+							event.result='ai';
 						}
 					}
 					"step 1"
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
+                        else ui.click.cancel();
+                    }
 					event.dialog.close();
 				},
 				discardPlayerCard:function(){
@@ -4832,20 +4917,25 @@
 					else{
 						if(event.isMine()){
 							event.dialog.open();
-						}
-						game.check();
-						if(event.isMine()){
+    						game.check();
 							game.pause();
 						}
+                        else if(event.isOnline()){
+                            event.send();
+                        }
 						else{
-							if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
-							else ui.click.cancel();
+							event.result='ai';
 						}
 					}
 					"step 1"
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
+                        else ui.click.cancel();
+                    }
 					event.dialog.close();
 					"step 2"
-					if(event.result.bool&&event.result.buttons){
+					if(event.result.bool&&event.result.buttons&&!game.online){
 						if(event.logSkill){
 							if(typeof event.logSkill=='string'){
 								player.logSkill(event.logSkill);
@@ -4855,8 +4945,8 @@
 							}
 						}
 						var cards=[];
-						for(var i=0;i<event.result.buttons.length;i++){
-							cards.push(event.result.buttons[i].link);
+						for(var i=0;i<event.result.links.length;i++){
+							cards.push(event.result.links[i]);
 						}
 						target.discard(cards);
 					}
@@ -4919,22 +5009,31 @@
 					else{
 						if(event.isMine()){
 							event.dialog.open();
-						}
-						game.check();
-						if(event.isMine()){
+                            game.check();
 							game.pause();
 						}
+                        else if(event.isOnline()){
+                            event.send();
+                        }
 						else{
-							if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
-							else ui.click.cancel();
+							event.result='ai';
 						}
 					}
 					"step 1"
+                    if(event.result=='ai'){
+                        game.check();
+                        if(ai.basic.chooseButton(event.ai)||forced) ui.click.ok();
+                        else ui.click.cancel();
+                    }
 					event.dialog.close();
-					"step 2"
+                    "step 2"
+                    if(game.online){
+                        event.finish();
+                    }
+					"step 3"
 					var cards=[];
-					for(var i=0;i<event.result.buttons.length;i++){
-						cards.push(event.result.buttons[i].link);
+					for(var i=0;i<event.result.links.length;i++){
+						cards.push(event.result.links[i]);
 					}
 					target.lose(cards);
 					event.cards=cards;
@@ -4953,7 +5052,7 @@
 					if(oths.length){
 						target.$give(oths,player);
 					}
-					"step 3"
+					"step 4"
 					if(player==game.me){
 						game.delay(2);
 					}
@@ -4971,10 +5070,21 @@
 					var cards=player.get('h');
 					var str=get.translation(player.name)+'的手牌';
 					event.dialog=ui.create.dialog(str,cards);
+                    event.dialogid=lib.status.videoId++;
+                    event.dialog.videoId=event.dialogid;
+                    game.broadcast(function(str,cards,id){
+                        ui.create.dialog(str,cards).videoId=id;
+                    },str,cards,event.dialogid);
 					game.log(player,'展示了',cards);
 					game.addVideo('showCards',player,[str,get.cardsInfo(cards)]);
 					game.delayx(2);
 					"step 1"
+                    game.broadcast(function(id){
+                        var dialog=get.idDialog(id);
+                        if(dialog){
+                            dialog.close();
+                        }
+                    },event.dialogid);
 					event.dialog.close();
 				},
 				showCards:function(){
@@ -4987,10 +5097,21 @@
 						event.str=get.translation(player.name)+'展示的牌';
 					}
 					event.dialog=ui.create.dialog(event.str,cards);
+                    event.dialogid=lib.status.videoId++;
+                    event.dialog.videoId=event.dialogid;
+                    game.broadcast(function(str,cards,id){
+                        ui.create.dialog(str,cards).videoId=id;
+                    },event.str,cards,event.dialogid);
 					game.log(player,'展示了',cards);
 					game.delayx(2);
 					game.addVideo('showCards',player,[event.str,get.cardsInfo(cards)]);
 					"step 1"
+                    game.broadcast(function(id){
+                        var dialog=get.idDialog(id);
+                        if(dialog){
+                            dialog.close();
+                        }
+                    },event.dialogid);
 					event.dialog.close();
 				},
 				viewHandcards:function(){
@@ -5004,18 +5125,23 @@
 						}
 						else{
 							event.finish();
+                            event.result='viewed';
 							setTimeout(function(){
 								event.dialog.close();
 							},2*lib.config.duration);
 							game.delayx(2);
 						}
 					}
+                    else if(event.isOnline()){
+                        event.send();
+                    }
 					else{
 						event.finish();
 					}
 					"step 1"
+                    event.result='viewed';
 					_status.imchoosing=false;
-					event.dialog.close();
+					if(event.dialog) event.dialog.close();
 				},
 				useCard:function(){
 					"step 0"
@@ -5939,18 +6065,24 @@
 						player.skills.remove(i);
 						delete player.tempSkills[i];
 					}
-					player.classList.add('dead');
-					// player.classList.remove('linked');
-					player.classList.remove('turnedover');
-					player.classList.remove('out');
-					player.node.count.innerHTML='0';
-					player.node.hp.hide();
-					player.node.equips.hide();
-					player.node.count.hide();
-					player.previous.next=player.next;
-					player.next.previous=player.previous;
-					game.players.remove(player);
-					game.dead.push(player);
+
+                    var proc=function(player){
+                        player.classList.add('dead');
+    					// player.classList.remove('linked');
+    					player.classList.remove('turnedover');
+    					player.classList.remove('out');
+    					player.node.count.innerHTML='0';
+    					player.node.hp.hide();
+    					player.node.equips.hide();
+    					player.node.count.hide();
+    					player.previous.next=player.next;
+    					player.next.previous=player.previous;
+    					game.players.remove(player);
+    					game.dead.push(player);
+                    }
+                    proc(player);
+                    game.broadcast(proc,player);
+
 					if(lib.config.background_speak){
 						if(lib.character[player.name]&&
 						lib.character[player.name][4].contains('die_audio')){
@@ -5963,7 +6095,7 @@
 						// 	game.playAudio('effect','die_'+(player.sex==='female'?'female':'male'));
 						// }
 					}
-					if(player==game.me&&!_status.over&&!game.controlOver){
+					if(!_status.connectMode&&player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
 						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive){
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
@@ -5972,7 +6104,7 @@
 							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
-					if(player==game.me&&!game.modeSwapPlayer){
+					if(!_status.connectMode&&player==game.me&&!game.modeSwapPlayer){
 						// _status.auto=false;
 						if(ui.auto){
 							// ui.auto.classList.remove('glow');
@@ -6127,6 +6259,9 @@
 				turnOver:function(){
 					game.log(player,'翻面');
 					player.classList.toggle('turnedover');
+                    game.broadcast(function(player){
+                        player.classList.toggle('turnedover');
+                    },player);
 					game.addVideo('turnOver',player,player.classList.contains('turnedover'));
 				},
 				link:function(){
@@ -6139,8 +6274,12 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','link');
 					}
-					player.classList.remove('target');
+                    player.classList.remove('target');
 					player.classList.toggle('linked');
+                    game.broadcast(function(player){
+                        player.classList.remove('target');
+    					player.classList.toggle('linked');
+                    },player);
 					game.addVideo('link',player,player.classList.contains('linked'));
 				},
 			},
@@ -6356,12 +6495,12 @@
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
 					var hp=this.node.hp;
 					hp.style.transition='none';
-                    game.broadcast(function(player,hp,maxHp,nh,hujia){
+                    game.broadcast(function(player,hp,maxHp,hujia){
                         player.hp=hp;
                         player.maxHp=maxHp;
                         player.hujia=hujia;
                         player.update();
-                    },this,this.hp,this.maxHp,this.num('h'),this.hujia);
+                    },this,this.hp,this.maxHp,this.hujia);
 					if(!_status.video){
 						if(this.hujia){
 							this.markSkill('ghujia');
@@ -6909,6 +7048,7 @@
 						}
 					}
 					next.content=lib.element.playerproto.chooseToRespond;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				chooseToDiscard:function(){
@@ -6951,6 +7091,7 @@
 						return get.select(this.selectCard)[0]>=this.player.num(this.position||'h');
 					}
 					next.content=lib.element.playerproto.chooseToDiscard;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				chooseToCompare:function(target,check){
@@ -6977,6 +7118,7 @@
 						}
 					}
 					next.content=lib.element.playerproto.chooseToCompare;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				chooseCardButton:function(){
@@ -7021,6 +7163,7 @@
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(){return 1};
 					next.content=lib.element.playerproto.chooseButton;
+                    next._args=Array.from(arguments);
 					return next;
 				},
                 chooseButtonOL:function(list,callback,ai){
@@ -7029,6 +7172,7 @@
                     next.content=lib.element.playerproto.chooseButtonOL;
                     next.ai=ai;
                     next.callback=callback;
+                    next._args=Array.from(arguments);
                     return next;
                 },
 				chooseCard:function(){
@@ -7062,6 +7206,7 @@
 					if(next.selectCard==undefined) next.selectCard=[1,1];
 					if(next.ai==undefined) next.ai=ai.get.unuseful2;
 					next.content=lib.element.playerproto.chooseCard;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				chooseTarget:function(){
@@ -7093,6 +7238,7 @@
 					if(next.selectTarget==undefined) next.selectTarget=[1,1];
 					if(next.ai==undefined) next.ai=ai.get.attitude2;
 					next.content=lib.element.playerproto.chooseTarget;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				chooseCardTarget:function(choose){
@@ -7124,6 +7270,7 @@
 					if(next.ai1==undefined) next.ai1=ai.get.unuseful2;
 					if(next.ai2==undefined) next.ai2=ai.get.attitude2;
 					next.content=lib.element.playerproto.chooseCardTarget;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				chooseControl:function(){
@@ -7149,6 +7296,7 @@
 					next.player=this;
 					if(next.choice==undefined) next.choice=0;
 					next.content=lib.element.playerproto.chooseControl;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				chooseBool:function(){
@@ -7170,6 +7318,7 @@
 					}
 					next.player=this;
 					next.content=lib.element.playerproto.chooseBool;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				choosePlayerCard:function(){
@@ -7214,6 +7363,7 @@
 						return val;
 					};
 					next.content=lib.element.playerproto.choosePlayerCard;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				discardPlayerCard:function(){
@@ -7258,6 +7408,7 @@
 						return val;
 					};
 					next.content=lib.element.playerproto.discardPlayerCard;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				gainPlayerCard:function(){
@@ -7302,12 +7453,15 @@
 						return val;
 					};
 					next.content=lib.element.playerproto.gainPlayerCard;
+                    next._args=Array.from(arguments);
 					return next;
 				},
 				showHandcards:function(){
 					var next=game.createEvent('showHandcards');
 					next.player=this;
 					next.content=lib.element.playerproto.showHandcards;
+                    next._args=Array.from(arguments);
+                    return next;
 				},
 				showCards:function(cards,str){
 					var next=game.createEvent('showCards');
@@ -7317,12 +7471,15 @@
 					else if(get.itemtype(cards)=='cards') next.cards=cards;
 					else _status.event.next.remove(next);
 					next.content=lib.element.playerproto.showCards;
+                    next._args=Array.from(arguments);
 				},
 				viewHandcards:function(target){
 					var next=game.createEvent('viewHandcards');
 					next.player=this;
 					next.target=target;
 					next.content=lib.element.playerproto.viewHandcards;
+                    next._args=Array.from(arguments);
+                    return next;
 				},
                 useResult:function(result,event){
                     event=event||_status.event;
@@ -9833,10 +9990,11 @@
                             skills:lib.playerOL[i].skills,
                             hiddenSkills:lib.playerOL[i].hiddenSkills,
                             additionalSkills:lib.playerOL[i].additionalSkills,
+                            tempSkills:lib.playerOL[i].tempSkills,
                             storage:lib.playerOL[i].storage,
                         }
                     }
-                    this.player.send(function(name,args,set,event,trigger,stat,skills){
+                    this.player.send(function(name,args,set,event,stat,skills){
                         for(var i in skills){
                             if(i=='global'){
                                 lib.skill.global=skills[i];
@@ -9853,11 +10011,9 @@
                             next.set(set[i][0],set[i][1]);
                         }
                         next._modparent=event;
-                        next._trigger=trigger;
                         game.resume();
                     },this.name,this._args||[],this._set,
                     get.stringifiedResult(this.parent,3),
-                    get.stringifiedResult(this._trigger,2),
                     this.player.getStat(),skills);
                     this.player.wait();
                     game.pause();
@@ -10239,6 +10395,10 @@
             },
             ws:{
                 onopen:function(){
+                    if(_status.connectCallback){
+                        _status.connectCallback(true);
+                        delete _status.connectCallback;
+                    }
                     game.send('init',lib.versionOL,{
                         avatar:lib.config.connect_avatar,
                         nickname:lib.config.connect_nickname
@@ -10267,12 +10427,22 @@
                     lib.message.client[message.shift()].apply(null,message);
                 },
                 onerror:function(e){
-                    alert('连接失败');
+                    if(_status.connectCallback){
+                        _status.connectCallback(false);
+                        delete _status.connectCallback;
+                    }
+                    else{
+                        alert('连接失败');
+                    }
                 },
                 onclose:function(){
+                    if(_status.connectCallback){
+                        _status.connectCallback(false);
+                        delete _status.connectCallback;
+                    }
                     game.saveConfig('reconnect_info');
                     if(game.online){
-                        alert('连接已断开');
+                        game.saveConfig('reconnect_more',game.ip);
                         game.reload();
                     }
                     game.online=false;
@@ -10831,6 +11001,7 @@
                 init:function(id,config,ip){
                     game.online=true;
                     game.onlineID=id;
+                    game.ip=ip;
                     game.saveConfig('reconnect_info',[_status.ip,id]);
                     _status.connectMode=true;
                     lib.configOL=config;
@@ -10839,7 +11010,17 @@
                     game.clearArena();
                     game.finishCards();
                     ui.create.connectPlayers(ip);
+                    ui.pause.hide();
                     ui.auto.hide();
+                    ui.cardPileButton.style.display='none';
+                    if(ui.ipnode){
+                        ui.ipnode.delete();
+                        delete ui.ipnode;
+                    }
+                    if(ui.iptext){
+                        ui.iptext.delete();
+                        delete ui.iptext;
+                    }
                     var proceed=function(){
                         game.loadModeAsync(config.mode,function(mode){
                             for(var i in mode.ai){
@@ -10857,8 +11038,8 @@
                                 lib.translate[i]=mode.translate[i];
                             }
                             if(mode.game){
-                                game.getIdentityList=mode.game.getIdentityList;
-                                game.updateState=mode.game.updateState;
+                                game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
+                                game.updateState=lib.init.eval(mode.game.updateState);
                             }
                             _status.event={
                                 finished:true,
@@ -10906,8 +11087,8 @@
                             lib.translate[i]=mode.translate[i];
                         }
                         if(mode.game){
-                            game.getIdentityList=mode.game.getIdentityList;
-                            game.updateState=mode.game.updateState;
+                            game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
+                            game.updateState=lib.init.eval(mode.game.updateState);
                         }
                         state=get.parsedResult(state);
                         game.players=[];
@@ -10984,7 +11165,11 @@
                         case 'version':alert('加入失败：版本不匹配');break;
                         case 'gaming':alert('加入失败：游戏已开始');break;
                         case 'number':alert('加入失败：房间已满');break;
-                        case 'offline':if(_status.paused) game.resume();break;
+                        case 'offline':
+                        if(_status.paused&&_status.event.name=='game'){
+                            setTimeout(game.resume,500);
+                        }
+                        break;
                     }
                     game.ws.close();
                 },
@@ -11008,7 +11193,15 @@
                         ui.connectStartButton.delete();
                         delete ui.connectStartButton;
                     }
+                    if(ui.connectStartBar){
+                        ui.connectStartBar.delete();
+                        delete ui.connectStartBar;
+                    }
                     ui.auto.show();
+                    ui.pause.show();
+                    if(lib.config.show_cardpile){
+                        ui.cardPileButton.style.display='';
+                    }
                 },
                 updateWaiting:function(map){
                     for(var i=0;i<map.length;i++){
@@ -11064,10 +11257,9 @@
             var next=game.createEvent('waitForPlayer',false);
             next.content=function(){
                 'step 0'
-                if(!ui.auto.classList.contains('hidden')){
-                    ui.auto.hide();
-                    event.hideauto=true;
-                }
+                ui.auto.hide();
+                ui.pause.hide();
+                ui.cardPileButton.style.display='none';
                 ui.create.connectPlayers(game.ip);
                 var me=game.connectPlayers[0];
                 me.initOL(lib.config.connect_nickname,lib.config.connect_avatar);
@@ -11083,8 +11275,10 @@
                 delete game.connectPlayers;
                 game.broadcast('gameStart');
                 game.delay(2);
-                if(event.hideauto){
-                    ui.auto.show();
+                ui.auto.show();
+                ui.pause.show();
+                if(lib.config.show_cardpile){
+                    ui.cardPileButton.style.display='';
                 }
             }
         },
@@ -11132,7 +11326,8 @@
                 ui.timer.hide();
             }
         },
-        connect:function(ip){
+        connect:function(ip,callback){
+            if(game.online) return;
             var withport=false;
             var index=ip.lastIndexOf(':');
             if(index!=-1){
@@ -11144,7 +11339,7 @@
             if(!withport){
                 ip=ip+':8080';
             }
-            if(game.online) return;
+            _status.connectCallback=callback;
             try{
                 game.ws=new WebSocket('ws://'+ip+'');
             }
@@ -13257,6 +13452,9 @@
 					else if(get.info(event.skill).direct&&player==game.me&&!_status.auto){
 						event._result={bool:true};
 					}
+                    else if(get.info(event.skill).direct&&player.isOnline()){
+                        event._result={bool:true};
+                    }
 					else{
 						var str;
 						var check=get.info(event.skill).check;
@@ -13432,6 +13630,16 @@
 			_status.over=true;
 			ui.control.show();
 			ui.clear();
+            game.stopCountChoose();
+            if(game.online){
+                game.saveConfig('reconnect_info');
+                ui.create.dialog().content.innerHTML=result;
+                ui.update();
+                if(!ui.restart){
+    				ui.restart=ui.create.control('restart',game.reload);
+    			}
+                return;
+            }
 			if(lib.config.background_audio){
 				if(result===true){
 					game.playAudio('effect','win');
@@ -13721,6 +13929,7 @@
 			}
 			dialog.add(ui.create.div('.placeholder'));
 			dialog.add(ui.create.div('.placeholder'));
+            game.broadcast(game.over,dialog.content.innerHTML);
 			game.addVideo('over',null,dialog.content.innerHTML);
 			var vinum=parseInt(lib.config.video);
 			if(!_status.video&&vinum&&game.getVideoName&&window.indexedDB&&!game.online){
@@ -13808,7 +14017,7 @@
 					});
 				}
 			}
-			else if(get.config('continue_game')){
+			else if(!_status.connectMode&&get.config('continue_game')){
 				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 			}
 			if(!ui.restart){
@@ -19699,7 +19908,7 @@
 
 				return node;
 			},
-            connectPlayers:function(){
+            connectPlayers:function(ip){
                 game.connectPlayers=[];
                 for(var i=0;i<8;i++){
                     var player=ui.create.player(ui.window);
@@ -19710,6 +19919,18 @@
                         player.classList.add('unselectable2');
                     }
                 }
+
+                var bar=ui.create.div(ui.window);
+                bar.style.height='20px';
+                bar.style.width='80%';
+                bar.style.left='10%';
+                bar.style.top='calc(200% / 7 - 120px + 5px)';
+                bar.style.textAlign='center';
+                var ipbar=ui.create.div('.shadowed',ip,bar);
+                ipbar.style.padding='4px';
+                ipbar.style.borderRadius='2px';
+                ipbar.style.position='relative';
+
                 var button=ui.create.div('.menubutton.large.highlight',game.online?'退出联机':'开始游戏',ui.window,function(){
                     if(button.clicked) return;
                     if(game.online){
@@ -19719,20 +19940,17 @@
                         game.resume();
                     }
                     button.delete();
+                    bar.delete();
                     delete ui.connectStartButton;
+                    delete ui.connectStartBar;
                     button.clicked=true;
                 });
-
-                var bar=ui.create.div('.shadowed',ui.window);
-                bar.style.height='20px';
-                bar.style.width='80%';
-                bar.style.left='10%';
-                bar.style.top='calc(200% / 7 - 120px + 5px)';
 
                 button.style.top='calc(500% / 7 + 80px + 5px)';
                 button.style.width='130px';
                 button.style.left='calc(50% - 65px)';
                 ui.connectStartButton=button;
+                ui.connectStartBar=bar;
             },
 			players:function(num){
 				if(num===0){
@@ -21639,26 +21857,27 @@
 				if(_status.paused2) return;
 				if(!_status.auto){
 					_status.auto=true;
-					// ui.auto.innerHTML='手动';
 					ui.auto.classList.add('glow');
-					if(ui.confirm) ui.confirm.close();
-					ui.control.hide();
-					if(_status.event.switchToAuto){
-						_status.event.switchToAuto();
-					}
-					else{
-						if(_status.paused&&_status.imchoosing){
-							game.uncheck();
-							_status.event.redo();
-						}
-					}
-					game.resume();
+
+                    if(_status.imchoosing&&_status.paused){
+                        if(ui.confirm) ui.confirm.close();
+    					ui.control.hide();
+    					if(_status.event.switchToAuto){
+    						_status.event.switchToAuto();
+    					}
+    					else{
+    						if(_status.paused&&_status.imchoosing){
+    							game.uncheck();
+    							_status.event.redo();
+    						}
+    					}
+    					game.resume();
+                    }
 				}
 				else{
 					ui.control.show();
 					_status.auto=false;
 					ui.auto.classList.remove('glow');
-					// ui.auto.innerHTML='托管';
 				}
 			},
 			wuxie:function(){
@@ -22374,18 +22593,21 @@
                     case 'player': return get.playerInfoOL(item);
                     case 'players': return get.playersInfoOL(item);
                     default:
+                    if(typeof level!='number'){
+                        level=5;
+                    }
                     if(Array.isArray(item)){
+                        if(level==0){
+                            return [];
+                        }
                         var item2=[];
                         for(var i=0;i<item.length;i++){
-                            item2.push(get.stringifiedResult(item[i]));
+                            item2.push(get.stringifiedResult(item[i],level-1));
                         }
                         return item2;
                     }
                     else if(Object.prototype.toString.call(item)=='[object Object]'){
-                        if(typeof level!='number'){
-                            level=-1;
-                        }
-                        else if(level==0){
+                        if(level==0){
                             return {};
                         }
                         var item2={};

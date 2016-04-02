@@ -77,16 +77,18 @@ card.standard={
 				}
 				else{
 					var next=target.chooseToRespond({name:'shan'});
-					next.ai=function(){
+					next.set('ai',function(){
+						var target=_status.event.player;
+						var evt=_status.event.getParent();
 						var sks=target.get('s');
 						if(sks.contains('leiji')||
 							sks.contains('diyleiji')||
 							sks.contains('lingbo')){
 							return 1;
 						}
-						if(ai.get.damageEffect(target,player,target,card.nature)>=0) return -1;
+						if(ai.get.damageEffect(target,evt.player,target,evt.card.nature)>=0) return -1;
 						return 1;
-					};
+					});
 					next.autochoose=lib.filter.autoRespondShan;
 				}
 				"step 1"
@@ -605,12 +607,13 @@ card.standard={
 			content:function(){
 				"step 0"
 				var next=target.chooseToRespond({name:'sha'});
-				next.ai=function(card){
-					if(ai.get.damageEffect(target,player,target)>=0) return 0;
-					if(player.get('s').contains('xinwuyan')) return 0;
-					if(target.get('s').contains('xinwuyan')) return 0;
+				next.set('ai',function(card){
+					var evt=_status.event.getParent();
+					if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
+					if(evt.player.get('s').contains('xinwuyan')) return 0;
+					if(evt.target.get('s').contains('xinwuyan')) return 0;
 					return 1;
-				};
+				});
 				next.autochoose=lib.filter.autoRespondSha;
 				"step 1"
 				if(result.bool==false){
@@ -664,12 +667,13 @@ card.standard={
 			content:function(){
 				"step 0"
 				var next=target.chooseToRespond({name:'shan'});
-				next.ai=function(card){
-					if(ai.get.damageEffect(target,player,target)>=0) return 0;
-					if(player.get('s').contains('xinwuyan')) return 0;
-					if(target.get('s').contains('xinwuyan')) return 0;
+				next.set('ai',function(card){
+					var evt=_status.event.getParent();
+					if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
+					if(evt.player.get('s').contains('xinwuyan')) return 0;
+					if(evt.target.get('s').contains('xinwuyan')) return 0;
 					return 1;
-				};
+				});
 				next.autochoose=lib.filter.autoRespondShan;
 				"step 1"
 				if(result.bool==false){
@@ -1196,9 +1200,10 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				trigger.target.chooseToDiscard().ai=function(card){
-					return -ai.get.attitude(trigger.target,player)-ai.get.value(card);
-				};
+				trigger.target.chooseToDiscard().set('ai',function(card){
+					var trigger=_status.event.getParent()._trigger;
+					return -ai.get.attitude(trigger.target,trigger.player)-ai.get.value(card);
+				});
 				"step 1"
 				if(result.bool==false) player.draw();
 			}
@@ -1265,21 +1270,21 @@ card.standard={
 			content:function(){
 				"step 0"
 				var next=player.chooseToDiscard('是否发动贯石斧？',2,'he',function(card){
-					return player.get('e',{subtype:'equip1'}).contains(card)==false;
+					return _status.event.player.get('e',{subtype:'equip1'}).contains(card)==false;
 				});
 				next.logSkill='guanshi_skill';
-				next.ai=
-				function(card){
-					if(ai.get.attitude(player,trigger.target)<0){
-						if(player.skills.contains('jiu')||
-						player.skills.contains('tianxianjiu')||
-						trigger.target.hp==1){
+				next.set('ai',function(card){
+					var evt=_status.event.getParent();
+					if(ai.get.attitude(evt.player,evt._trigger.target)<0){
+						if(evt.player.skills.contains('jiu')||
+						evt.player.skills.contains('tianxianjiu')||
+						evt._trigger.target.hp==1){
 							return 8-ai.get.value(card)
 						}
 						return 5-ai.get.value(card)
 					}
 					return -1;
-				};
+				});
 				"step 1"
 				if(result.bool){
 					trigger.untrigger();
@@ -1312,17 +1317,17 @@ card.standard={
 			content:function(){
 				"step 0"
 				var att=(ai.get.attitude(player,trigger.target)<=0);
-				player.chooseButton(ui.create.dialog('选择要弃置的马',
-				trigger.target.get('e',{subtype:['equip3','equip4']}))).ai=function(button){
-					if(att){
-						return ai.get.buttonValue(button);
-					}
+				var next=player.chooseButton();
+				next.set('att',att);
+				next.set('createDialog',['选择要弃置的马',trigger.target.get('e',{subtype:['equip3','equip4']})]);
+				next.set('ai',function(button){
+					if(_status.event.att) return ai.get.buttonValue(button);
 					return 0;
-				};
+				});
 				"step 1"
 				if(result.bool){
 					player.logSkill('qilin_skill');
-					trigger.target.discard(result.buttons[0].link);
+					trigger.target.discard(result.links[0]);
 				}
 			}
 		},
@@ -1399,6 +1404,7 @@ card.standard={
 				var id=get.id();
 				event.id=id;
 				var send=function(state,isJudge,card,source,target,targets,id){
+					state=state?1:-1;
 					var str='';
 					if(isJudge){
 						str+=get.translation(source)+'的';
@@ -1432,7 +1438,7 @@ card.standard={
 										return 0;
 									}
 								}
-								var eff=ai.get.effect(source,card,source,_status.event.player);
+								var eff=ai.get.effect(source,card,source,source);
 								if(eff>=0) return 0;
 								return state*ai.get.attitude(_status.event.player,source);
 							}
@@ -1466,20 +1472,44 @@ card.standard={
 					}
 				};
 				var aix=function(player){
-					var info=get.info(event.card);
-					if(info.ai&&info.ai.wuxie){
-						var aiii=info.ai.wuxie(event.target,event.card,event.source,player,event.state);
-						if(typeof aiii=='number') return aiii;
-					}
-					if(info.multitarget&&targets){
-						var eff=0;
-						for(var i=0;i<event.targets.length;i++){
-							eff+=ai.get.effect(event.targets[i],event.card,event.source,player)
+					var source=event.source;
+					var card=event.card;
+					var state=event.state?1:-1;
+					var target=event.target;
+					var targets=event.targets;
+					if(event.triggername=='phaseJudge'){
+						var info=lib.card[card.viewAs||card.name];
+						if(info&&info.ai&&info.ai.wuxie){
+							var aiii=info.ai.wuxie(source,card,source,player,state);
+							if(typeof aiii=='number') return aiii;
 						}
-						return -eff*state;
+						if(Math.abs(ai.get.attitude(player,source))<3) return 0;
+						if(source.skills.contains('guanxing')) return 0;
+						if(card.name!='lebu'&&card.name!='bingliang'){
+							if(source!=player){
+								return 0;
+							}
+						}
+						var eff=ai.get.effect(source,card,source,source);
+						if(eff>=0) return 0;
+						return state*ai.get.attitude(player,source);
 					}
-					if(Math.abs(ai.get.attitude(player,event.target))<3) return 0;
-					return -ai.get.effect(event.target,event.card,event.source,player)*event.state;
+					else{
+						var info=get.info(card);
+						if(info.ai&&info.ai.wuxie){
+							var aiii=info.ai.wuxie(target,card,source,player,state);
+							if(typeof aiii=='number') return aiii;
+						}
+						if(info.multitarget&&targets){
+							var eff=0;
+							for(var i=0;i<targets.length;i++){
+								eff+=ai.get.effect(targets[i],card,source,player)
+							}
+							return -eff*state;
+						}
+						if(Math.abs(ai.get.attitude(player,target))<3) return 0;
+						return -ai.get.effect(target,card,source,player)*state;
+					}
 				};
 				var sendback=function(result,player){
 					if(result&&result.id==id&&!event.wuxieresult&&result.bool){
@@ -1542,7 +1572,7 @@ card.standard={
 								game.resume();
 							}
 						}
-					},event.aionly?200:(Math.random()*90000+3000));
+					},event.aionly?200:(Math.random()*5000+3000));
 				}
 				else{
 					event.aionly=false;
