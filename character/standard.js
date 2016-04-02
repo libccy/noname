@@ -63,13 +63,13 @@ character.standard={
 				else if(event.current.group=='wei'){
 					if((event.current==game.me&&!_status.auto)||(
 						ai.get.attitude(event.current,player)>2)){
-					var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
-					next.ai=function(){
-						var event=_status.event;
-						return (ai.get.attitude(event.player,event.source)-2);
-					};
-					next.autochoose=lib.filter.autoRespondShan;
-					next.source=player;
+						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
+						next.set('ai',function(){
+							var event=_status.event;
+							return (ai.get.attitude(event.player,event.source)-2);
+						});
+						next.autochoose=lib.filter.autoRespondShan;
+						next.set('source',player);
 					}
 				}
 				"step 1"
@@ -147,7 +147,7 @@ character.standard={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？').ai=function(card){
+				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？').set('ai',function(card){
 					var trigger=_status.event.getParent()._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
@@ -159,7 +159,7 @@ character.standard={
 					else{
 						return -result-ai.get.value(card)/2;
 					}
-				};
+				});
 				"step 1"
 				if(result.bool){
 					player.respond(result.cards,'highlight');
@@ -206,9 +206,9 @@ character.standard={
 				if(result.judge<2){
 					event.finish();return;
 				}
-				trigger.source.chooseToDiscard(2).ai=function(card){
+				trigger.source.chooseToDiscard(2).set('ai',function(card){
 					return ai.get.unuseful(card)+2.5*(5-get.owner(card).hp);
-				};
+				});
 				"step 2"
 				if(result.bool==false){
 					trigger.source.damage();
@@ -240,11 +240,10 @@ character.standard={
 				check=(num>=2);
 				player.chooseTarget('是否发动【突袭】？',[1,2],function(card,player,target){
 					return target.num('h')>0&&player!=target;
-				},
-					function(target){
-					if(!check) return 0;
+				},function(target){
+					if(!_status.event.aicheck) return 0;
 					return (1-ai.get.attitude(_status.event.player,target));
-				});
+				}).set('aicheck',check);
 				"step 1"
 				if(result.bool){
 					player.logSkill('tuxi',result.targets);
@@ -549,12 +548,12 @@ character.standard={
 				else if(event.current.group=='shu'){
 					player.storage.jijianging=true;
 					var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
-					next.ai=function(){
+					next.set('ai',function(){
 						var event=_status.event;
 						return (ai.get.attitude(event.player,event.source)-2);
-					};
+					});
+					next.set('source',player);
 					next.autochoose=lib.filter.autoRespondSha;
-					next.source=player;
 				}
 				else{
 					event.current=event.current.next;
@@ -611,14 +610,17 @@ character.standard={
 				}
 				else if(event.current.group=='shu'){
 					var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
-						function(card){return player.canUse(card,target)&&card.name=='sha';});
-					next.ai=function(card){
+					function(card){
+						var evt=_status.event.getParent();
+						return evt.player.canUse(card,evt.target)&&card.name=='sha';
+					});
+					next.set('ai',function(card){
 						var event=_status.event;
 						return ai.get.effect(event.target,card,event.source,event.player);
-					};
+					});
+					next.set('source',player);
+					next.set('target',target);
 					next.autochoose=lib.filter.autoRespondSha;
-					next.source=player;
-					next.target=target;
 				}
 				else{
 					event.current=event.current.next;
@@ -1010,14 +1012,13 @@ character.standard={
 			selectCard:[1,Infinity],
 			prompt:'弃置任意张牌并摸等量的牌',
 			check:function(card){
-				return -1;
 				return 6-ai.get.value(card)
 			},
 			content:function(){
 				player.draw(cards.length);
 			},
 			ai:{
-				order:11,
+				order:1,
 				result:{
 					player:1
 				},
@@ -1111,14 +1112,14 @@ character.standard={
 			},
 			content:function(){
 				"step 0"
-				target.chooseControl('heart2','diamond2','club2','spade2').ai=function(event){
+				target.chooseControl('heart2','diamond2','club2','spade2').set('ai',function(event){
 					switch(Math.floor(Math.random()*6)){
 						case 0:return 'heart2';
 						case 1:case 4:case 5:return 'diamond2';
 						case 2:return 'club2';
 						case 3:return 'spade2';
 					}
-				};
+				});
 				"step 1"
 				game.log(target,'选择了'+get.translation(result.control));
 				event.choice=result.control;
@@ -1185,6 +1186,7 @@ character.standard={
 				var next=player.chooseCardTarget({
 					position:'he',
 					filterTarget:function(card,player,target){
+						var trigger=_status.event.getParent()._trigger;
 						if(get.distance(player,target,'attack')<=1&&
 							target!=trigger.player&&target!=player){
 							if(player.canUse(trigger.card,target)) return true;
@@ -1416,12 +1418,12 @@ character.standard={
 				"step 0"
 				var next=trigger.target.chooseToRespond({name:'shan'});
 				next.autochoose=lib.filter.autoRespondShan;
-				next.ai=function(card){
-					if(trigger.target.num('h','shan')>1){
+				next.set('ai',function(card){
+					if(_status.event.player.num('h','shan')>1){
 						return ai.get.unuseful2(card);
 					}
 					return -1;
-				};
+				});
 				"step 1"
 				if(result.bool==false){
 					trigger.untrigger();

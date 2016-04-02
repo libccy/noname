@@ -10968,7 +10968,7 @@
                         game.broadcast(function(player){
                             player.setNickname();
                         },player);
-                        this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{});
+                        this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip);
                     }
                     else{
                         this.send('denied','offline');
@@ -11063,8 +11063,9 @@
         				}
         			}
                 },
-                reinit:function(config,state,state2){
+                reinit:function(config,state,state2,ip){
                     game.online=true;
+                    game.ip=ip;
                     game.saveConfig('reconnect_info',[_status.ip,game.onlineID]);
                     _status.connectMode=true;
                     lib.configOL=config;
@@ -11431,6 +11432,9 @@
 			if(_status.skillaudio.contains(str)) return;
 			_status.skillaudio.add(str);
 			game.addVideo('playAudio',null,str);
+            game.broadcast(function(str){
+                game.playAudio(str);
+            },str);
 			setTimeout(function(){
 				_status.skillaudio.remove(str);
 			},1000);
@@ -11495,6 +11499,9 @@
 			if(_status.video&&arguments[1]!='video') return;
 			if(_status.skillaudio.contains(name)) return;
 			game.addVideo('playSkillAudio',null,name);
+            game.broadcast(function(name){
+                game.playSkillAudio(name);
+            },name);
 			if(name.indexOf('|')<name.lastIndexOf('|')){
 				name=name.slice(name.lastIndexOf('|')+1);
 			}

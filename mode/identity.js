@@ -1112,27 +1112,31 @@ mode.identity={
 						delete _status.clickingidentity;
 					}
 				}
-				if(!this.node.dieidentity){
-					var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
-					ui.refresh(node);
-					node.style.opacity=1;
-					this.node.dieidentity=node;
-				}
-				var trans=this.style.transform;
-				if(trans){
-					if(trans.indexOf('rotateY')!=-1){
-						this.node.dieidentity.style.transform='rotateY(180deg)';
+				var setIdentity=function(player){
+					if(!player.node.dieidentity){
+						var node=ui.create.div('.damage.dieidentity',get.translation(player.identity+'2'),player);
+						ui.refresh(node);
+						node.style.opacity=1;
+						player.node.dieidentity=node;
 					}
-					else if(trans.indexOf('rotateX')!=-1){
-						this.node.dieidentity.style.transform='rotateX(180deg)';
+					var trans=player.style.transform;
+					if(trans){
+						if(trans.indexOf('rotateY')!=-1){
+							player.node.dieidentity.style.transform='rotateY(180deg)';
+						}
+						else if(trans.indexOf('rotateX')!=-1){
+							player.node.dieidentity.style.transform='rotateX(180deg)';
+						}
+						else{
+							player.node.dieidentity.style.transform='';
+						}
 					}
 					else{
-						this.node.dieidentity.style.transform='';
+						player.node.dieidentity.style.transform='';
 					}
 				}
-				else{
-					this.node.dieidentity.style.transform='';
-				}
+				setIdentity(this);
+				game.broadcast(setIdentity,this);
 			},
 			logAi:function(targets,card){
 				if(this.ai.shown==1) return;
@@ -1256,6 +1260,7 @@ mode.identity={
 	ai:{
 		get:{
 			attitude:function(from,to){
+				if(!from||!to) return 0;
 				var x=0,num=0,temp,i;
 				if(_status.ai.customAttitude){
 					for(i=0;i<_status.ai.customAttitude.length;i++){
