@@ -148,7 +148,7 @@ character.standard={
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？').ai=function(card){
-					var trigger=_status.event.parent._trigger;
+					var trigger=_status.event.getParent()._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
 					var attitude=ai.get.attitude(player,trigger.player);
@@ -287,8 +287,7 @@ character.standard={
 		luoyi2:{
 			trigger:{source:'damageBegin'},
 			filter:function(event){
-				return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&
-				event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+				return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.notLink();
 			},
 			forced:true,
 			content:function(){
@@ -319,7 +318,7 @@ character.standard={
 				"step 2"
 				player.chooseCardTarget({
 					filterCard:function(card){
-						return _status.event.parent.cards.contains(card);
+						return _status.event.getParent().cards.contains(card);
 					},
 					selectCard:[1,event.cards.length],
 					filterTarget:function(card,player,target){
@@ -607,7 +606,7 @@ character.standard={
 				if(event.current==undefined) event.current=player.next;
 				if(event.current==player){
 					player.addTempSkill('jijiang3','phaseAfter');
-					event.parent.parent.step=0;
+					event.getParent(2).step=0;
 					event.finish();
 				}
 				else if(event.current.group=='shu'){
@@ -695,7 +694,8 @@ character.standard={
 					game.modeSwapPlayer(player);
 				}
 				var cards=get.cards(Math.min(5,game.players.length));
-				event.switchToAuto=function(){
+				event.cards=cards;
+				var switchToAuto=function(){
 					_status.imchoosing=false;
 					if(event.dialog) event.dialog.close();
 					if(event.control) event.control.close();
@@ -737,29 +737,53 @@ character.standard={
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
 					game.delay(2);
 				};
-				if(event.isMine()){
+				var chooseButton=function(online,player,cards){
+					var event=_status.event;
+					player=player||event.player;
+					cards=cards||event.cards;
 					event.top=[];
 					event.bottom=[];
 					event.status=true;
 					event.dialog=ui.create.dialog('按顺序选择置于牌堆顶的牌（先选择的在上）',cards);
+					event.switchToAuto=function(){
+						event._result='ai';
+						event.dialog.close();
+						event.control.close();
+						_status.imchoosing=false;
+					},
 					event.control=ui.create.control('ok','pileTop','pileBottom',function(link){
 						var event=_status.event;
 						if(link=='ok'){
-							var i;
-							for(i=0;i<event.top.length;i++){
-								ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
+							if(online){
+								event._result={
+									top:[],
+									bottom:[]
+								}
+								for(var i=0;i<event.top.length;i++){
+									event._result.top.push(event.top[i].link);
+								}
+								for(var i=0;i<event.bottom.length;i++){
+									event._result.bottom.push(event.bottom[i].link);
+								}
 							}
-							for(i=0;i<event.bottom.length;i++){
-								ui.cardPile.appendChild(event.bottom[i].link);
-							}
-							for(i=0;i<event.dialog.buttons.length;i++){
-								if(event.dialog.buttons[i].classList.contains('glow')==false&&
-									event.dialog.buttons[i].classList.contains('target')==false)
-								ui.cardPile.appendChild(event.dialog.buttons[i].link);
+							else{
+								var i;
+								for(i=0;i<event.top.length;i++){
+									ui.cardPile.insertBefore(event.top[i].link,ui.cardPile.firstChild);
+								}
+								for(i=0;i<event.bottom.length;i++){
+									ui.cardPile.appendChild(event.bottom[i].link);
+								}
+								for(i=0;i<event.dialog.buttons.length;i++){
+									if(event.dialog.buttons[i].classList.contains('glow')==false&&
+										event.dialog.buttons[i].classList.contains('target')==false)
+									ui.cardPile.appendChild(event.dialog.buttons[i].link);
+								}
+								player.popup(get.cnNumber(event.top.length)+'上'+get.cnNumber(event.cards.length-event.top.length)+'下');
+								game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
 							}
 							event.dialog.close();
 							event.control.close();
-							game.log(player,'将'+get.cnNumber(event.top.length)+'张牌置于牌堆顶');
 							game.resume();
 							_status.imchoosing=false;
 						}
@@ -804,9 +828,43 @@ character.standard={
 					}
 					game.pause();
 					game.countChoose();
+				};
+				event.switchToAuto=switchToAuto;
+
+				if(event.isMine()){
+					chooseButton();
+					event.finish();
+				}
+				else if(event.isOnline()){
+					event.player.send(chooseButton,true,event.player,event.cards);
+					event.player.wait();
+					game.pause();
 				}
 				else{
 					event.switchToAuto();
+					event.finish();
+				}
+				"step 1"
+				if(event.result=='ai'||!event.result){
+					event.switchToAuto();
+				}
+				else{
+					var top=event.result.top||[];
+					var bottom=event.result.bottom||[];
+					for(var i=0;i<top.length;i++){
+						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
+					}
+					for(i=0;i<bottom.length;i++){
+						ui.cardPile.appendChild(bottom[i]);
+					}
+					for(i=0;i<event.cards.length;i++){
+						if(!top.contains(event.cards[i])&&!bottom.contains(event.cards[i])){
+							ui.cardPile.appendChild(event.cards[i]);
+						}
+					}
+					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(event.cards.length-top.length)+'下');
+					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
+					game.delay(2);
 				}
 			},
 			ai:{

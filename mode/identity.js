@@ -19,9 +19,14 @@ mode.identity={
 			else{
 				lib.configOL.number=lib.configOL.player_number;
 			}
-			lib.configOL.characterPack=['standard','wind'];
+			lib.configOL.characterPack=['standard'];
 			lib.configOL.cardPack=['standard'];
 			lib.configOL.mode='identity';
+			for(var i=0;i<lib.card.list.length;i++){
+				if(!lib.cardPack.standard.contains(lib.card.list[i][2])){
+					lib.card.list.splice(i--,1);
+				}
+			}
 		}
 		"step 1"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
@@ -53,9 +58,6 @@ mode.identity={
 			if(!lib.config.new_tutorial){
 				game.delay();
 			}
-		}
-		if(!lib.node){
-			game.connect('localhost');
 		}
 		"step 2"
 		if(!lib.config.new_tutorial){
@@ -268,6 +270,7 @@ mode.identity={
 			console.log(str);
 			game.showIdentity();
 		}
+		game.syncState();
 		event.trigger('gameStart');
 
 		var players=get.players(lib.sort.position);
@@ -286,6 +289,37 @@ mode.identity={
 		game.phaseLoop(game.zhong||game.zhu);
 	},
 	game:{
+		getState:function(){
+			var state={};
+			for(var i in lib.playerOL){
+				var player=lib.playerOL[i];
+				state[i]={identity:player.identity};
+				if(player==game.zhu){
+					state[i].zhu=player.isZhu?true:false;
+				}
+				if(player==game.zhong){
+					state[i].zhong=true;
+				}
+				state[i].shown=player.ai.shown;
+			}
+			return state;
+		},
+		updateState:function(state){
+			for(var i in state){
+				var player=lib.playerOL[i];
+				if(player){
+					player.identity=state[i].identity;
+					if(typeof state[i].zhu=='boolean'){
+						game.zhu=player;
+						player.isZhu=state[i].zhu;
+					}
+					if(state[i].zhong){
+						game.zhong=player;
+					}
+					player.ai.shown=state[i].shown;
+				}
+			}
+		},
 		getIdentityList:function(player){
 			if(player.identityShown) return;
 			if(player==game.me) return;

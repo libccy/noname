@@ -17,7 +17,7 @@ window.config={
 	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','jg_simayi','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	layoutfixed:['chess'],
 	all:{
-		stockmode:['identity','guozhan','versus','boss','chess','stone'],
+		stockmode:['identity','guozhan','versus','boss','chess','stone','connect'],
 		layout:['default','newlayout'],
 		theme:['woodden','music','simple'],
 		card_font:['xiaozhuan','huangcao','caoshu','xingshu'],

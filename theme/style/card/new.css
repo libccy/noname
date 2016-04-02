@@ -1,0 +1,9 @@
+.card:not(*:empty){
+	color:rgb(77, 60, 51);
+	text-shadow:none;
+	background: url('image/new.png');
+	background-size:cover;
+}
+#arena:not(.chess) .player[data-position='0']>.equips>.equip5 {
+    border-radius: 4px;
+}

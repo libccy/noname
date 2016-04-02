@@ -372,18 +372,6 @@
 						init:false,
 						unfrequent:true
 					},
-                    connect_nickname:{
-                        name:'联机昵称',
-                        input:true,
-                        unfrequent:true,
-                        init:'无名玩家'
-                    },
-                    connect_avatar:{
-                        name:'联机头像',
-                        init:'caocao',
-                        item:{},
-                        unfrequent:true
-                    },
 					update:function(config,map){
 						if(config.touchscreen){
 							map.mousewheel.hide();
@@ -628,7 +616,8 @@
 							default:'默认',
 							wood:'木纹',
 							music:'音乐',
-							simple:'原版'
+                            simple:'原版',
+							new:'新版'
 						},
 						onclick:function(layout){
 							game.saveConfig('card_style',layout);
@@ -645,7 +634,8 @@
 							default:'默认',
 							wood:'木纹',
 							music:'音乐',
-							official:'原版'
+                            official:'原版',
+							new:'新版',
 						},
 						onclick:function(layout){
 							game.saveConfig('cardback_style',layout);
@@ -957,20 +947,6 @@
 							}
 						}
 					},
-                    show_connect:{
-                        name:'显示联机按钮',
-						init:true,
-						unfrequent:true,
-                        onclick:function(bool){
-        					game.saveConfig('show_connect',bool);
-        					if(lib.config.show_connect){
-        						ui.connectconfig.style.display='';
-        					}
-        					else{
-        						ui.connectconfig.style.display='none';
-        					}
-        				}
-                    },
 					show_cardpile:{
 						name:'显示牌堆按钮',
 						init:true,
@@ -2719,7 +2695,28 @@
 						restart:true,
 		            },
 				}
-			}
+			},
+            connect:{
+                name:'联机',
+                config:{
+                    connect_nickname:{
+                        name:'联机昵称',
+                        input:true,
+                        frequent:true,
+                        init:'无名玩家'
+                    },
+                    connect_avatar:{
+                        name:'联机头像',
+                        init:'caocao',
+                        item:{},
+                        frequent:true,
+                        onclick:function(item){
+                            game.saveConfig('connect_avatar',item);
+                            game.saveConfig('connect_avatar',item,true);
+                        }
+                    },
+                }
+            }
 		},
 		status:{
 			running:false,
@@ -3541,7 +3538,7 @@
 						}
 					}
                     for(var i in lib.character){
-                        lib.configMenu.general.config.connect_avatar.item[i]=lib.translate[i];
+                        lib.mode.connect.config.connect_avatar.item[i]=lib.translate[i];
                     }
 					if(lib.cardPack.mode_derivation){
 						for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
@@ -3728,13 +3725,7 @@
 					delete lib.packageReady;
 					ui.create.arena();
 
-                    if(lib.config.reconnect_info){
-                        var info=lib.config.reconnect_info;
-                        game.onlineID=info[1];
-                        game.connect(info[0]);
-                        game.saveConfig('reconnect_info');
-                    }
-					else if(window.indexedDB&&!_status.characterLoaded){
+                    if(window.indexedDB&&!_status.characterLoaded){
 						_status.waitingForCharacters=true;
 					}
 					else{
@@ -3782,6 +3773,20 @@
 				}
 				localStorage.removeItem(lib.configprefix+'directstart');
 			},
+            startOnline:function(){
+                'step 0'
+                event._resultid=null;
+                event._result=null;
+                game.pause();
+                'step 1'
+                if(result){
+                    if(event._resultid){
+                        result.id=event._resultid;
+                    }
+                    game.send('result',result);
+                }
+                event.goto(0);
+            },
 			css:function(path,file,before){
 				var style = document.createElement("link");
 			    style.rel = "stylesheet";
@@ -4136,6 +4141,14 @@
 					"step 0"
                     _status.noclearcountdown=true;
 					if(event.isMine()){
+                        if(event.type=='wuxie'){
+                            if(ui.wuxie&&ui.wuxie.classList.contains('glow')){
+                                event.result={
+                                    bool:false
+                                }
+                                return;
+                            }
+                        }
                         var ok=game.check();
 						if(!ok||!lib.config.auto_confirm){
 							game.pause();
@@ -4231,28 +4244,19 @@
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
 					}
-					if(event.result.bool&&!game.online){
-                        if(event.result.skill&&get.info(event.result.skill).direct){
-                            _status.noclearcountdown=true;
-                        }
-						if(event.logSkill){
-							if(typeof event.logSkill=='string'){
-								player.logSkill(event.logSkill);
-							}
-							else if(Array.isArray(event.logSkill)){
-								player.logSkill.apply(player,event.logSkill);
-							}
-						}
-						if(event.result.card||!event.result.skill){
-							player.useCard(event.result.card,event.result.cards,event.result.targets,event.result.skill);
-						}
-						else if(event.result.skill){
-							player.useSkill(event.result.skill,event.result.cards,event.result.targets);
-						}
+                    if(event.onresult){
+                        event.onresult(event.result);
+                    }
+					if(event.result.bool&&!game.online&&!event.nouse){
+                        player.useResult(event.result,event);
 					}
 					if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
                     if(!_status.noclearcountdown){
                         game.stopCountChoose();
+                    }
+                    "step 2"
+                    if(event._result&&event.result){
+                        event.result.result=event._result;
                     }
 				},
 				chooseToRespond:function(){
@@ -4447,6 +4451,9 @@
 				},
 				chooseButton:function(){
 					"step 0"
+                    if(typeof event.dialog=='number'){
+                        event.dialog=get.idDialog(event.dialog);
+                    }
                     if(event.createDialog&&!event.dialog){
                         if(Array.isArray(event.createDialog)){
                             event.createDialog.add('hidden');
@@ -4455,7 +4462,7 @@
                         event.closeDialog=true;
                     }
 					if(event.dialog==undefined) event.dialog=ui.dialog;
-					if(event.isMine()){
+					if(event.isMine()||event.dialogdisplay){
 						event.dialog.style.display='';
 						event.dialog.open();
 					}
@@ -5054,9 +5061,9 @@
 						}
 					}
 					if(event.animate!=false){
-						if(card.name=='wuxie'&&event.getParent().source){
-							var lining=event.getParent().source2||event.getParent().source;
-							if(Array.isArray(lining)&&event.getParent(2)._trigger.name=='jiedao'){
+						if(card.name=='wuxie'&&event.getParent().target){
+							var lining=event.getParent().target2||event.getParent().target;
+							if(Array.isArray(lining)&&event.getParent()._trigger.name=='jiedao'){
 								player.line(lining[0],'green');
 							}
 							else{
@@ -5223,6 +5230,9 @@
 						ui.tempnowuxie.close();
 						delete ui.tempnowuxie;
 					}
+                    if(event._result){
+                        event.result=event._result;
+                    }
 				},
 				useSkill:function(){
 					"step 0"
@@ -5566,9 +5576,9 @@
 						}
 					};
                     var broadcast=function(){
-                        player.send(function(cards){
-                            game.me.directgain(cards);
-                        },cards);
+                        game.broadcast(function(player,cards){
+                            player.directgain(cards);
+                        },player,cards);
                     };
 					if(event.animate=='draw'){
 						player.$draw(cards.length);
@@ -5645,25 +5655,26 @@
 						}
 					}
 					if(player==game.me) ui.updatehl();
-                    player.send(function(cards){
+                    game.broadcast(function(player,cards){
                         for(var i=0;i<cards.length;i++){
                             cards[i].delete();
                         }
-                        var player=game.me;
-                        for(var i=player.node.handcards1.childNodes.length-1;i>0;i--){
-    						if(player.node.handcards1.childNodes[i].classList.contains('removing')==false){
-    							player.node.handcards1.childNodes[i].animate('last');
-    							break;
-    						}
-    					}
-    					for(var i=player.node.handcards2.childNodes.length-1;i>0;i--){
-    						if(player.node.handcards2.childNodes[i].classList.contains('removing')==false){
-    							player.node.handcards2.childNodes[i].animate('last');
-    							break;
-    						}
-    					}
-                        ui.updatehl();
-                    },cards);
+                        if(player==game.me){
+                            for(var i=player.node.handcards1.childNodes.length-1;i>0;i--){
+        						if(player.node.handcards1.childNodes[i].classList.contains('removing')==false){
+        							player.node.handcards1.childNodes[i].animate('last');
+        							break;
+        						}
+        					}
+        					for(var i=player.node.handcards2.childNodes.length-1;i>0;i--){
+        						if(player.node.handcards2.childNodes[i].classList.contains('removing')==false){
+        							player.node.handcards2.childNodes[i].animate('last');
+        							break;
+        						}
+        					}
+                            ui.updatehl();
+                        }
+                    },player,cards);
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
 					player.update();
 					game.addVideo('loseAfter',player);
@@ -6330,7 +6341,9 @@
                         position:parseInt(this.dataset.position),
                         hujia:this.hujia,
                         className:this.className,
-                        identity:[this.node.identity.innerHTML,this.node.identity.dataset.color],
+                        identityShown:this.identityShown,
+                        identityNode:[this.node.identity.innerHTML,this.node.identity.dataset.color],
+                        identity:this.identity,
                         transform:this.queueCount?'':this.style.transform
                     }
                 },
@@ -6346,7 +6359,6 @@
                     game.broadcast(function(player,hp,maxHp,nh,hujia){
                         player.hp=hp;
                         player.maxHp=maxHp;
-                        player._onlineh=nh;
                         player.hujia=hujia;
                         player.update();
                     },this,this.hp,this.maxHp,this.num('h'),this.hujia);
@@ -6416,9 +6428,6 @@
 						hp.style.transition='';
 					});
 					var numh=this.num('h');
-                    if(this._onlineh){
-                        numh=this._onlineh;
-                    }
 					if(_status.video){
 						numh=arguments[0];
 					}
@@ -7315,6 +7324,26 @@
 					next.target=target;
 					next.content=lib.element.playerproto.viewHandcards;
 				},
+                useResult:function(result,event){
+                    event=event||_status.event;
+                    if(result.skill&&get.info(result.skill).direct){
+                        _status.noclearcountdown=true;
+                    }
+                    if(event.logSkill){
+                        if(typeof event.logSkill=='string'){
+                            this.logSkill(event.logSkill);
+                        }
+                        else if(Array.isArray(event.logSkill)){
+                            this.logSkill.apply(this,event.logSkill);
+                        }
+                    }
+                    if(result.card||!result.skill){
+                        this.useCard(result.card,result.cards,result.targets,result.skill);
+                    }
+                    else if(result.skill){
+                        this.useSkill(result.skill,result.cards,result.targets);
+                    }
+                },
 				useCard:function(){
 					var next=game.createEvent('useCard');
 					next.player=this;
@@ -7516,9 +7545,9 @@
 						game.addVideo('directgain',this,get.cardsInfo(cards));
 						this.update();
 					}
-                    this.send(function(cards){
-                        game.me.directgain(cards);
-                    },cards);
+                    game.broadcast(function(player,cards){
+                        player.directgain(cards);
+                    },this,cards);
 					return this;
 				},
 				gain:function(){
@@ -7828,25 +7857,43 @@
 				skip:function(name){
 					this.skipList.add(name);
 				},
-                wait:function(){
+                wait:function(callback){
                     if(lib.node){
-                        lib.node.torespond[this.playerid]='_noname_waiting';
+                        if(typeof callback=='function'){
+                            callback._noname_waiting=true;
+                            lib.node.torespond[this.playerid]=callback;
+                        }
+                        else{
+                            lib.node.torespond[this.playerid]='_noname_waiting';
+                        }
                     }
                 },
                 unwait:function(result){
                     if(!lib.node.torespond.hasOwnProperty(this.playerid)){
                         return;
                     }
+                    var noresume=false;
+                    var proceed=null;
+                    if(typeof lib.node.torespond[this.playerid]=='function'&&lib.node.torespond[this.playerid]._noname_waiting){
+                        proceed=lib.node.torespond[this.playerid](result,this);
+                        if(proceed===false){
+                            noresume=true;
+                        }
+                    }
                     lib.node.torespond[this.playerid]=result;
                     for(var i in lib.node.torespond){
                         if(lib.node.torespond[i]=='_noname_waiting'){
+                            return;
+                        }
+                        else if(lib.node.torespond[i]&&lib.node.torespond[i]._noname_waiting){
                             return;
                         }
                     }
                     _status.event.result=result;
                     _status.event.resultOL=lib.node.torespond;
                     lib.node.torespond={};
-                    if(_status.paused) game.resume();
+                    if(typeof proceed=='function') proceed();
+                    else if(_status.paused&&!noresume) game.resume();
                 },
 				logSkill:function(name,targets,nature){
 					if(get.itemtype(targets)=='player') targets=[targets];
@@ -8404,6 +8451,26 @@
 					}
 					return false;
 				},
+                hasWuxie:function(){
+                    if(this.num('h','wuxie')) return true;
+					var skills=this.get('s',true).concat(lib.skill.global);
+					game.expandSkills(skills);
+					for(var i=0;i<skills.length;i++){
+						var ifo=get.info(skills[i]);
+						if(ifo.viewAs&&ifo.viewAs.name=='wuxie'){
+							if(!ifo.viewAsFilter||ifo.viewAsFilter(this)){
+								return true;
+							}
+						}
+						else{
+							var hiddenCard=get.info(skills[i]).hiddenCard;
+							if(typeof hiddenCard=='function'&&hiddenCard(player,'wuxie')){
+								return true;
+							}
+						}
+					}
+                    return false;
+                },
 				getJudge:function(name){
 					var judges=this.node.judges.childNodes;
 					for(var i=0;i<judges.length;i++){
@@ -9769,7 +9836,7 @@
                             storage:lib.playerOL[i].storage,
                         }
                     }
-                    this.player.send(function(name,args,set,event,stat,skills){
+                    this.player.send(function(name,args,set,event,trigger,stat,skills){
                         for(var i in skills){
                             if(i=='global'){
                                 lib.skill.global=skills[i];
@@ -9786,9 +9853,12 @@
                             next.set(set[i][0],set[i][1]);
                         }
                         next._modparent=event;
+                        next._trigger=trigger;
                         game.resume();
                     },this.name,this._args||[],this._set,
-                    get.stringifiedResult(this.parent,3),this.player.getStat(),skills);
+                    get.stringifiedResult(this.parent,3),
+                    get.stringifiedResult(this._trigger,2),
+                    this.player.getStat(),skills);
                     this.player.wait();
                     game.pause();
                 },
@@ -9866,7 +9936,7 @@
                     return (this.player&&this.player.isOnline());
                 },
 				notLink:function(){
-					return this.parent.name!='_lianhuan'&&this.parent.name!='_lianhuan2';
+					return this.getParent().name!='_lianhuan'&&this.getParent().name!='_lianhuan2';
 				},
 				trigger:function(name){
 					if(_status.video) return;
@@ -10459,6 +10529,7 @@
                             player.classList.add('glow_phase');
                         },player);
 					}
+                    game.syncState();
 					game.addVideo('phaseChange',player);
 					_status.currentPhase=player;
 					game.log();
@@ -10715,7 +10786,7 @@
                                 break;
                             }
                         }
-                        this.send('init',this.id,lib.configOL);
+                        this.send('init',this.id,lib.configOL,game.ip);
                     }
                 },
                 reinit:function(id){
@@ -10727,7 +10798,7 @@
                         game.broadcast(function(player){
                             player.setNickname();
                         },player);
-                        this.send('reinit',lib.configOL,get.arenaState());
+                        this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{});
                     }
                     else{
                         this.send('denied','offline');
@@ -10747,10 +10818,17 @@
                     if(player){
                         player.unwait(result);
                     }
-                }
+                },
+                exec:function(func){
+                    if(typeof func=='function'){
+                        var args=Array.from(arguments);
+                        args.shift();
+                        func.apply(this,args);
+                    }
+                },
             },
             client:{
-                init:function(id,config){
+                init:function(id,config,ip){
                     game.online=true;
                     game.onlineID=id;
                     game.saveConfig('reconnect_info',[_status.ip,id]);
@@ -10759,23 +10837,38 @@
         			lib.playerOL={};
         			lib.cardOL={};
                     game.clearArena();
-                    ui.create.connectPlayers();
+                    game.finishCards();
+                    ui.create.connectPlayers(ip);
+                    ui.auto.hide();
                     var proceed=function(){
-                        _status.event={
-                            finished:true,
-                            next:[],
-                        };
-                        game.createEvent('game',false).content=function(){
-                            'step 0'
-                            event._result=null;
-                            game.pause();
-                            'step 1'
-                            if(result){
-                                game.send('result',get.stringifiedResult(result));
+                        game.loadModeAsync(config.mode,function(mode){
+                            for(var i in mode.ai){
+        						if(typeof mode.ai[i]=='object'){
+        							if(ai[i]==undefined) ai[i]={};
+        							for(j in mode.ai[i]){
+        								ai[i][j]=lib.init.eval(mode.ai[i][j]);
+        							}
+        						}
+        						else{
+        							ai[i]=lib.init.eval(mode.ai[i]);
+        						}
+        					}
+                            for(var i in mode.translate){
+                                lib.translate[i]=mode.translate[i];
                             }
-                            event.goto(0);
-                        };
-                        game.loop();
+                            if(mode.game){
+                                game.getIdentityList=mode.game.getIdentityList;
+                                game.updateState=mode.game.updateState;
+                            }
+                            _status.event={
+                                finished:true,
+                                next:[],
+                            };
+                            _status.paused=false;
+                            game.createEvent('game',false).content=lib.init.startOnline;
+                            game.loop();
+                            game.send('inited');
+                        });
                     }
                     if(_status.event.getParent()){
                         game.forceOver('noover',proceed);
@@ -10788,63 +10881,102 @@
         					lib.character[j]=lib.character[j]||lib.characterPack[i][j];
         				}
         			}
-                    game.send('inited');
                 },
-                reinit:function(config,state){
+                reinit:function(config,state,state2){
                     game.online=true;
                     game.saveConfig('reconnect_info',[_status.ip,game.onlineID]);
                     _status.connectMode=true;
                     lib.configOL=config;
         			lib.playerOL={};
         			lib.cardOL={};
-                    game.players=[];
-                    for(var i in lib.characterPack){
-        				for(var j in lib.characterPack[i]){
-        					lib.character[j]=lib.character[j]||lib.characterPack[i][j];
-        				}
-        			}
 
-                    game.clearArena();
-                    ui.arena.dataset.number=state.number;
+                    game.loadModeAsync(config.mode,function(mode){
+                        for(var i in mode.ai){
+                            if(typeof mode.ai[i]=='object'){
+                                if(ai[i]==undefined) ai[i]={};
+                                for(j in mode.ai[i]){
+                                    ai[i][j]=lib.init.eval(mode.ai[i][j]);
+                                }
+                            }
+                            else{
+                                ai[i]=lib.init.eval(mode.ai[i]);
+                            }
+                        }
+                        for(var i in mode.translate){
+                            lib.translate[i]=mode.translate[i];
+                        }
+                        if(mode.game){
+                            game.getIdentityList=mode.game.getIdentityList;
+                            game.updateState=mode.game.updateState;
+                        }
+                        state=get.parsedResult(state);
+                        game.players=[];
+                        for(var i in lib.characterPack){
+            				for(var j in lib.characterPack[i]){
+            					lib.character[j]=lib.character[j]||lib.characterPack[i][j];
+            				}
+            			}
+                        game.clearArena();
+                        game.finishCards();
+                        ui.arena.dataset.number=state.number;
+                        var pos=state.players[game.onlineID].position;
+                        for(var i in state.players){
+                            var info=state.players[i];
+                            var player=ui.create.player(ui.arena).animate('start');
+        					player.dataset.position=info.position<pos?info.position-pos+parseInt(state.number):info.position-pos;
+                            player.init(info.name,info.name2);
+                            player.playerid=i;
+                            player.nickname=info.nickname;
+                            player.identity=info.identity;
+                            player.identityShown=info.identityShown;
+                            player.setNickname();
+                            if(i==game.onlineID){
+                                game.me=player;
 
-                    var pos=state.players[game.onlineID].position;
-                    for(var i in state.players){
-                        var info=state.players[i];
-                        var player=ui.create.player(ui.arena).animate('start');
-    					player.dataset.position=info.position<pos?info.position-pos+parseInt(state.number):info.position-pos;
-                        player.init(info.name,info.name2);
-                        player.playerid=i;
-                        player.nickname=info.nickname;
-                        player.setNickname();
-                        if(i==game.onlineID){
-                            game.me=player;
+                            }
+                            player.directgain(info.handcards);
+                            lib.playerOL[i]=player;
+                            for(var i=0;i<info.equips.length;i++){
+                                player.$equip(info.equips[i]);
+                            }
+                            for(var i=0;i<info.judges.length;i++){
+                                player.node.judges.appendChild(info.equips[i]);
+                            }
+                            if(player==game.me||player.identityShown){
+                                player.setIdentity();
+                            }
+                            else if(!game.getIdentityList&&info.identityNode){
+                                player.node.identity.innerHTML=info.identityNode[0];
+                                player.node.identity.dataset.color=info.identityNode[1];
+                            }
+                            else{
+                                player.setIdentity('cai');
+                            }
+                            player.update();
+                            game.players.push(player);
                         }
-                        lib.playerOL[i]=player;
-                        game.players.push(player);
-                    }
-                    game.arrangePlayers();
-                    ui.create.me(true);
-                    game.createEvent('game',false).content=function(){
-                        'step 0'
-                        event._result=null;
-                        game.pause();
-                        'step 1'
-                        if(result){
-                            game.send('result',get.stringifiedResult(result));
+                        game.arrangePlayers();
+                        ui.create.me(true);
+
+                        _status.event={
+                            finished:true,
+                            next:[],
+                        };
+                        _status.paused=false;
+
+                        if(game.updateState){
+                            game.updateState(state2);
                         }
-                        event.goto(0);
-                    };
-                    game.loop();
-                    game.send('inited');
+                        game.createEvent('game',false).content=lib.init.startOnline;
+                        game.loop();
+                        game.send('reinited');
+                    });
                 },
-                exec:function(funcstr){
-                    try{
+                exec:function(func){
+                    if(typeof func=='function'){
                         var args=Array.from(arguments);
                         args.shift();
-                        eval('('+funcstr+').apply(this,args);');
-                    }
-                    catch(e){
-                        console.log(e);
+                        func.apply(this,args);
                     }
                 },
                 denied:function(reason){
@@ -10852,9 +10984,20 @@
                         case 'version':alert('加入失败：版本不匹配');break;
                         case 'gaming':alert('加入失败：游戏已开始');break;
                         case 'number':alert('加入失败：房间已满');break;
-                        case 'offline':alert('无法重新连接');game.reload();break;
+                        case 'offline':if(_status.paused) game.resume();break;
                     }
                     game.ws.close();
+                },
+                cancel:function(id){
+                    if(_status.event.id==id&&_status.event.isMine()&&_status.paused&&_status.imchoosing){
+                        ui.click.cancel();
+                        if(ui.confirm){
+                            ui.confirm.close();
+                        }
+                        if(_status.event.result){
+                            _status.event.result.id=id;
+                        }
+                    }
                 },
                 gameStart:function(){
                     for(var i=0;i<game.connectPlayers.length;i++){
@@ -10865,6 +11008,7 @@
                         ui.connectStartButton.delete();
                         delete ui.connectStartButton;
                     }
+                    ui.auto.show();
                 },
                 updateWaiting:function(map){
                     for(var i=0;i<map.length;i++){
@@ -10896,6 +11040,13 @@
                 }
             }
         },
+        syncState:function(){
+            if(game.getState&&game.updateState){
+                game.broadcast(function(state){
+    				game.updateState(state);
+    			},game.getState());
+            }
+		},
         updateWaiting:function(){
             var map=[];
             for(var i=0;i<game.connectPlayers.length;i++){
@@ -10917,7 +11068,7 @@
                     ui.auto.hide();
                     event.hideauto=true;
                 }
-                ui.create.connectPlayers();
+                ui.create.connectPlayers(game.ip);
                 var me=game.connectPlayers[0];
                 me.initOL(lib.config.connect_nickname,lib.config.connect_avatar);
                 me.playerid=1;
@@ -10961,7 +11112,14 @@
             _status.imchoosing=true;
             if(_status.connectMode&&!_status.countDown){
                 ui.timer.show();
-                game.countDown(parseInt(get.config('choose_timeout')),function(){
+                var num;
+                if(_status.connectMode){
+                    num=lib.configOL.choose_timeout;
+                }
+                else{
+                    num=get.config('choose_timeout');
+                }
+                game.countDown(parseInt(num),function(){
                     ui.click.auto();
                     ui.timer.hide();
                 });
@@ -11010,7 +11168,11 @@
         },
         send:function(){
             if(game.ws){
-                game.ws.send(JSON.stringify(Array.from(arguments)));
+                var args=Array.from(arguments);
+                if(typeof args[0]=='function'){
+                    args.unshift('exec');
+                }
+                game.ws.send(JSON.stringify(get.stringifiedResult(args)));
             }
         },
         createServer:function(){
@@ -11021,6 +11183,13 @@
 			lib.cardOL={};
             var WebSocketServer=require('ws').Server;
             var wss=new WebSocketServer({port:8080});
+            var os=require('os');
+            var en0 = os.networkInterfaces().en0;
+            for(var i=0;i<en0.length;i++){
+                if(en0[i].family=='IPv4'){
+                    game.ip=en0[i].address;break;
+                }
+            }
             wss.on('connection',function(ws){
                 var client={
                     ws:ws,
@@ -13745,6 +13914,11 @@
 						while(_status.dieClose.length){
 							_status.dieClose.shift().close();
 						}
+                        game.broadcast(function(){
+                            while(_status.dieClose.length){
+    							_status.dieClose.shift().close();
+    						}
+                        });
 						event.finish();
 					}
 					else if(player&&player.removed&&event.name!='phaseLoop'){
@@ -14308,6 +14482,15 @@
 			}
 			return players[0];
 		},
+        loadModeAsync:function(name,callback){
+            window.mode={};
+            var script=lib.init.js(lib.assetURL+'mode',name,function(){
+                script.remove();
+                var mode=window.mode;
+                delete window.mode;
+                callback(mode[name]);
+            });
+        },
 		loadMode:function(mode){
 			var next=game.createEvent('loadMode');
 			next.mode=mode;
@@ -14687,7 +14870,6 @@
             ui.discardPile.innerHTML='';
             ui.special.innerHTML='';
             ui.playerids.remove();
-            ui.connectconfig.remove();
             game.players.length=0;
             game.dead.length=0;
             game.me=null;
@@ -16094,8 +16276,6 @@
 				ui.system1=ui.create.div('#system1',ui.system);
 				ui.system2=ui.create.div('#system2',ui.system);
 
-                ui.connectconfig=ui.create.system('联机',null,true);
-                lib.setPopped(ui.connectconfig,ui.click.connectconfig,220,null,true);
 				ui.replay=ui.create.system('重来',game.reload,true);
 				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.pause=ui.create.system('暂停',ui.click.pause);
@@ -16104,9 +16284,6 @@
 				}
 				if(!lib.config.show_pause){
 					ui.pause.style.display='none';
-				}
-				if(!lib.config.show_connect){
-					ui.connectconfig.style.display='none';
 				}
 				ui.cardPileButton=ui.create.system('牌堆',null,true);
 				lib.setPopped(ui.cardPileButton,ui.click.cardPileButton,220);
@@ -16211,7 +16388,6 @@
 
                 if(_status.connectMode){
                     ui.playerids.remove();
-                    ui.connectconfig.remove();
                     ui.pause.innerHTML='历史';
                 }
                 setTimerPosition.call(ui.timer);
@@ -16457,6 +16633,9 @@
                                 active.update();
 	                        }
 	                    });
+                        if(!lib.node){
+                            connectButton.style.display='none';
+                        }
                         connectButton.style.left='275px';
                         ui.connectButton=connectButton;
                         if(lib.config.connectMode){
@@ -19532,6 +19711,7 @@
                     }
                 }
                 var button=ui.create.div('.menubutton.large.highlight',game.online?'退出联机':'开始游戏',ui.window,function(){
+                    if(button.clicked) return;
                     if(game.online){
                         game.reload();
                     }
@@ -19540,8 +19720,16 @@
                     }
                     button.delete();
                     delete ui.connectStartButton;
+                    button.clicked=true;
                 });
-                button.style.top='calc(200% / 3 + 280px / 3 + 6px)';
+
+                var bar=ui.create.div('.shadowed',ui.window);
+                bar.style.height='20px';
+                bar.style.width='80%';
+                bar.style.left='10%';
+                bar.style.top='calc(200% / 7 - 120px + 5px)';
+
+                button.style.top='calc(500% / 7 + 80px + 5px)';
                 button.style.width='130px';
                 button.style.left='calc(50% - 65px)';
                 ui.connectStartButton=button;
@@ -19821,6 +20009,7 @@
 					var node=ui.create.div('.newgame');
 					for(var i=0;i<3&&i+k*3<lib.config.all.mode.length;i++){
 						var thismode=lib.config.all.mode[i+k*3];
+                        if(thismode=='connect') continue;
 						var div=ui.create.div(thismode==lib.config.mode?'.underlinenode.on':'.underlinenode',node);
 						div.innerHTML=lib.translate[thismode];
 						div.link=thismode;
@@ -21988,6 +22177,14 @@
 		},
 	};
 	var get={
+        idDialog:function(id){
+            for(var i=0;i<ui.dialogs.length;i++){
+                if(ui.dialogs[i].videoId==id){
+                    return ui.dialogs[i];
+                }
+            }
+            return null;
+        },
         arenaState:function(){
             var state={
                 number:ui.arena.dataset.number,
@@ -21999,7 +22196,7 @@
             return state;
         },
         id:function(){
-            return (Math.floor((new Date()).getTime()*Math.random())).toString();
+            return (Math.floor(1000000000+9000000000*Math.random())).toString();
         },
 		zhu:function(player,skill){
 			if(typeof player=='string'){

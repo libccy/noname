@@ -43,6 +43,7 @@ mode.pack={
     boss:'挑战',
     chess:'战棋',
     stone:'炉石',
+    connect:'联机',
 };
 background.pack={
     zhulian_bg:'璧合',
