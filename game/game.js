@@ -3770,6 +3770,9 @@
 							}
 						}(node)),i*100);
 					}
+                    if(lib.config.mousewheel){
+                        splash.onmousewheel=ui.click.mousewheel;
+                    }
 				}
 				else{
 					proceed();
