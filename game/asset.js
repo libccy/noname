@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.8.2',
+    '1.8.2.1',
     'image/background/huangtian_bg.jpg',
     'image/background/shengshi_bg.jpg',
     'image/background/xueji_bg.jpg',
@@ -974,6 +974,7 @@ window.noname_asset_list=[
     'image/splash/identity.jpg',
     'image/splash/stone.jpg',
     'image/splash/versus.jpg',
+    'image/splash/connect.jpg',
     'audio/background/music_danji.mp3',
     'audio/background/music_default.mp3',
     'audio/background/music_diaochan.mp3',
