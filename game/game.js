@@ -6221,16 +6221,30 @@
 					event.videoId=lib.status.videoId++;
 					player.judging.unshift(get.cards()[0]);
 					game.addVideo('judge1',player,[get.cardInfo(player.judging[0]),judgestr,event.videoId]);
-					if(lib.config.mode=='chess'){
-						event.node=player.judging[0].copy('thrown','center',ui.arena).animate('start');
-					}
-					else{
-						event.node=player.$throwordered(player.judging[0].copy(),true);
-					}
-					event.node.classList.add('thrownhighlight');
-					ui.arena.classList.add('thrownhighlight');
-					event.dialog=ui.create.dialog(judgestr);
-					event.dialog.classList.add('center');
+
+                    var create=function(player,card,str,id){
+                        var event;
+                        if(game.online){
+                            event={};
+                        }
+                        else{
+                            event=_status.event;
+                        }
+                        if(lib.config.mode=='chess'){
+    						event.node=card.copy('thrown','center',ui.arena).animate('start');
+    					}
+    					else{
+    						event.node=player.$throwordered(card.copy(),true);
+    					}
+    					event.node.classList.add('thrownhighlight');
+    					ui.arena.classList.add('thrownhighlight');
+    					event.dialog=ui.create.dialog(str);
+    					event.dialog.classList.add('center');
+                        event.dialog.videoId=id;
+                    }
+                    create(player,player.judging[0],judgestr,event.videoId);
+                    game.broadcast(create,player,player.judging[0],judgestr,event.videoId);
+
 					game.log(player,'进行'+event.judgestr+'判定，亮出的判定牌为',player.judging[0]);
 					game.delay(2);
 					event.trigger('judge');
@@ -6252,7 +6266,17 @@
 					else if(event.result.judge<0){
 						player.popup('杯具');
 					}
-					if(event.clearArena!=false) ui.clear();
+					if(event.clearArena!=false){
+                        ui.clear();
+                        game.broadcast(ui.clear);
+                    }
+                    game.broadcast(function(id){
+                        var dialog=get.idDialog(id);
+                        if(dialog){
+                            dialog.close();
+                        }
+                        ui.arena.classList.remove('thrownhighlight');
+                    },event.videoId);
 					event.dialog.close();
 					game.addVideo('judge2',null,event.videoId);
 					ui.arena.classList.remove('thrownhighlight');
@@ -11435,9 +11459,6 @@
 			if(_status.skillaudio.contains(str)) return;
 			_status.skillaudio.add(str);
 			game.addVideo('playAudio',null,str);
-            game.broadcast(function(str){
-                game.playAudio(str);
-            },str);
 			setTimeout(function(){
 				_status.skillaudio.remove(str);
 			},1000);
@@ -11502,9 +11523,6 @@
 			if(_status.video&&arguments[1]!='video') return;
 			if(_status.skillaudio.contains(name)) return;
 			game.addVideo('playSkillAudio',null,name);
-            game.broadcast(function(name){
-                game.playSkillAudio(name);
-            },name);
 			if(name.indexOf('|')<name.lastIndexOf('|')){
 				name=name.slice(name.lastIndexOf('|')+1);
 			}
@@ -16781,6 +16799,7 @@
                                     input.innerHTML='无名玩家';
                                 }
                                 game.saveConfig('connect_nickname',input.innerHTML);
+                                game.saveConfig('connect_nickname',input.innerHTML,true);
                             }
                         }
 		                else{
