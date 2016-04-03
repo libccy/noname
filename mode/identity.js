@@ -939,14 +939,15 @@ mode.identity={
 				game.me.setIdentity();
 
 				for(var i=0;i<game.players.length;i++){
-					game.players[i].send(function(zhu,me,identity){
+					game.players[i].send(function(zhu,zhuid,me,identity){
 						for(var i in lib.playerOL){
 							lib.playerOL[i].setIdentity('cai');
 						}
 						zhu.identityShown=true;
-						zhu.setIdentity('zhu');
+						zhu.identity=zhuid;
+						zhu.setIdentity();
 						me.setIdentity(identity);
-					},game.zhu,game.players[i],game.players[i].identity);
+					},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
 				}
 
 				var list;
@@ -1000,10 +1001,16 @@ mode.identity={
 				event.list.remove(game.zhu.name);
 				event.list.remove(game.zhu.name2);
 
+				game.zhu.maxHp++;
+				game.zhu.hp++;
+				game.zhu.update();
 				game.broadcast(function(zhu,name,name2){
 					if(game.zhu!=game.me){
 						zhu.init(name,name2);
 					}
+					zhu.maxHp++;
+					zhu.hp++;
+					zhu.update();
 				},game.zhu,game.zhu.name,game.zhu.name2);
 
 				var list=[];
@@ -1011,10 +1018,15 @@ mode.identity={
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.zhu){
 						var num;
-						switch(game.players[i].identity){
-							case 'zhong':num=4;break;
-							case 'nei':num=5;break;
-							default:num=3;break;
+						if(event.zhongmode){
+							num=3;
+						}
+						else{
+							switch(game.players[i].identity){
+								case 'zhong':num=4;break;
+								case 'nei':num=5;break;
+								default:num=3;break;
+							}
 						}
 						list.push([game.players[i],['选择角色',[event.list.randomRemove(num),'character']],selectButton,true]);
 					}
@@ -1180,7 +1192,7 @@ mode.identity={
 				if(this.ai.shown>0.95) this.ai.shown=0.95;
 				if(this.ai.shown<-0.5) this.ai.shown=-0.5;
 
-				var marknow=(this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished');
+				var marknow=(!_status.connectMode&&this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished');
 				if(true){
 					if(marknow&&_status.clickingidentity&&_status.clickingidentity[0]==this){
 						for(var i=0;i<_status.clickingidentity[1].length;i++){

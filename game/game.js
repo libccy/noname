@@ -8624,7 +8624,7 @@
 						}
 						else{
 							var hiddenCard=get.info(skills[i]).hiddenCard;
-							if(typeof hiddenCard=='function'&&hiddenCard(player,'wuxie')){
+							if(typeof hiddenCard=='function'&&hiddenCard(this,'wuxie')){
 								return true;
 							}
 						}
