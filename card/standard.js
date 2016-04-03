@@ -1414,7 +1414,7 @@ card.standard={
 					if(targets||target){
 						str+='对'+get.translation(targets||target);
 					}
-					str+='将'+(state?'生效':'失效')+'，是否无懈？';
+					str+='将'+(state>0?'生效':'失效')+'，是否无懈？';
 					var next=game.me.chooseToUse({
 						filterCard:function(card,player){
 							if(card.name!='wuxie') return false;

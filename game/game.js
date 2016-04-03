@@ -20156,6 +20156,7 @@
                 var button=ui.create.div('.menubutton.large.highlight',game.online?'退出联机':'开始游戏',ui.window,function(){
                     if(button.clicked) return;
                     if(game.online){
+                        game.saveConfig('reconnect_info');
                         game.reload();
                     }
                     else{
