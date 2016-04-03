@@ -594,7 +594,7 @@ margin-bottom: 5px;
 
 .player>.nameol{
 	left:0;
-	top:15px;
+	top:13px;
 	width: 100%;
 	font-size: 12px;
 	text-align: center;
@@ -1510,9 +1510,9 @@ div:hover>.wunature{
 	top:59px;
 }
 
-.timerbar>div{left: 25px;box-shadow:0px 1px 3px rgba(0,0,0,0.3);border-radius: 8px;height: 4px;width: 100px;}
+.timerbar>div{left: 25px;box-shadow:0px 1px 3px rgba(0,0,0,0.3);border-radius: 8px;height: 5px;width: 100px;}
 .timerbar>div:first-child{background: rgba(255,255,255,0.6);}
-.timerbar>div{top:9px;}
+.timerbar>div{top:165px;}
 .timerbar>div:last-child{background: linear-gradient(#FFDA47, #CE0404);transition-timing-function: linear;}
 /*.timerbar>div:last-child{background: linear-gradient(#FFFFFF,#F0F0F0);}
 .timerbar[data-color="red"]>div:last-child{background: linear-gradient(#FF0000, #CE0404)}
