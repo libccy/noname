@@ -451,6 +451,17 @@ mode.identity={
 				}
 			}
 		},
+		checkOnlineResult:function(player){
+			if(game.zhu.isAlive()){
+				return (player.identity=='zhu'||player.identity=='zhong');
+			}
+			else if(game.players.length==1&&game.players[0].identity=='nei'){
+				return player.isAlive();
+			}
+			else{
+				return player.identity=='fan';
+			}
+		},
 		chooseCharacter:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.showConfig=true;
@@ -1001,17 +1012,21 @@ mode.identity={
 				event.list.remove(game.zhu.name);
 				event.list.remove(game.zhu.name2);
 
-				game.zhu.maxHp++;
-				game.zhu.hp++;
-				game.zhu.update();
-				game.broadcast(function(zhu,name,name2){
+				if(game.players.length>4){
+					game.zhu.maxHp++;
+					game.zhu.hp++;
+					game.zhu.update();
+				}
+				game.broadcast(function(zhu,name,name2,addMaxHp){
 					if(game.zhu!=game.me){
 						zhu.init(name,name2);
 					}
-					zhu.maxHp++;
-					zhu.hp++;
-					zhu.update();
-				},game.zhu,game.zhu.name,game.zhu.name2);
+					if(addMaxHp){
+						zhu.maxHp++;
+						zhu.hp++;
+						zhu.update();
+					}
+				},game.zhu,game.zhu.name,game.zhu.name2,game.players.length>4);
 
 				var list=[];
 				var selectButton=(lib.configOL.double_character?2:1);
@@ -1149,6 +1164,29 @@ mode.identity={
 				}
 				setIdentity(this);
 				game.broadcast(setIdentity,this);
+
+				if(!_status.over){
+					var giveup;
+					if(get.population('fan')+get.population('nei')==1){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].identity=='fan'||game.players[i].identity=='nei'){
+								giveup=game.players[i];break;
+							}
+						}
+					}
+					else if(get.population('zhong')+get.population('mingzhong')+get.population('nei')==0){
+						giveup=game.zhu;
+					}
+					if(giveup){
+						if(giveup==game.me){
+							ui.create.giveup();
+						}
+						else if(giveup.isOnline2()){
+							giveup.send(ui.create.giveup);
+						}
+					}
+				}
+
 			},
 			logAi:function(targets,card){
 				if(this.ai.shown==1) return;

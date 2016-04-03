@@ -1381,6 +1381,7 @@ card.standard={
 				event.state=true;
 				event.card=trigger.card;
 				event.blacklist=[];
+				event._global_waiting=true;
 				'step 1'
 				var list=[],list2=[];
 				for(var i=0;i<game.players.length;i++){

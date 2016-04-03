@@ -37,7 +37,6 @@ window.noname_source_list=[
     'game/source.js',
     'game/update.js',
     'layout/default/blur.css',
-    'layout/default/filter.css',
     'layout/default/layout.css',
     'layout/default/menu.css',
     'layout/mobile/equip.css',

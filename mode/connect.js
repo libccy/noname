@@ -4,25 +4,13 @@ mode.connect={
         'step 0'
         if(lib.config.reconnect_info){
             var info=lib.config.reconnect_info;
-            game.onlineID=info[1];
-            game.connect(info[0],game.resume);
             game.saveConfig('reconnect_info');
-            game.pause();
-        }
-        'step 1'
-        delete game.onlineID;
-        if(lib.config.reconnect_more){
+            game.onlineID=info[1];
             var n=5;
             var connect=function(){
-                game.connect(lib.config.reconnect_more,function(success){
-                    if(success){
-                        game.saveConfig('reconnect_more');
-                    }
-                    else if(n--){
+                game.connect(info[0],function(success){
+                    if(!success&&n--){
                         event.timeout=setTimeout(connect,1000);
-                    }
-                    else{
-                        game.saveConfig('reconnect_more');
                     }
                 });
             };
