@@ -1557,6 +1557,11 @@ card.standard={
 					}
 					event.goto(3);
 				}
+				if(withme||withol){
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].showTimer();
+					}
+				}
 				event.withol=withol;
 				if(list2.length){
 					event.aichoice=list2.randomGet();
@@ -1594,6 +1599,9 @@ card.standard={
 				}
 				'step 4'
 				clearTimeout(event.wuxietimeout);
+				for(var i=0;i<game.players.length;i++){
+					game.players[i].hideTimer();
+				}
 				if(event.wuxieresult2=='ai'){
 					event.wuxieresult.chooseToUse({
 						filterCard:function(card,player){

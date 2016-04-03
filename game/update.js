@@ -1,6 +1,7 @@
 window.noname_update={
-    version:'1.8.2.4',
+    version:'1.8.2.5',
     changeLog:[
+        '联机音效',
         '投降按钮',
         '出牌进度条',
         '修复若干卡死问题',

@@ -5175,19 +5175,25 @@
 					if(event.audio===false){
 						cardaudio=false;
 					}
-					if(cardaudio&&lib.config.background_audio){
-						var sex=player.sex=='female'?'female':'male';
-						if(lib.card[card.name].audio||lib.config.background_ogg){
-							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
-								game.playAudio('card',sex,card.name+'_'+card.nature);
-							}
-							else{
-								game.playAudio('card',sex,card.name);
-							}
-						}
-						else if(get.type(card)!='equip'){
-							game.playAudio('card/default');
-						}
+					if(cardaudio){
+                        var audiofunc=function(player,card){
+                            if(lib.config.background_audio){
+                                var sex=player.sex=='female'?'female':'male';
+        						if(lib.card[card.name].audio||lib.config.background_ogg){
+        							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
+        								game.playAudio('card',sex,card.name+'_'+card.nature);
+        							}
+        							else{
+        								game.playAudio('card',sex,card.name);
+        							}
+        						}
+        						else if(get.type(card)!='equip'){
+        							game.playAudio('card/default');
+        						}
+                            }
+                        };
+						audiofunc(player,card);
+                        game.broadcast(audiofunc,player,card);
 					}
 					if(event.animate!=false){
 						if(card.name=='wuxie'&&event.getParent().target){
@@ -5535,6 +5541,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','draw');
 					}
+                    game.broadcast(function(){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect','draw');
+    					}
+                    });
 					if(event.drawDeck){
 						if(event.drawDeck>num){
 							event.drawDeck=num;
@@ -5572,6 +5583,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','discard');
 					}
+                    game.broadcast(function(){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect','discard');
+    					}
+                    });
 					game.log(player,'弃置了',cards);
 					player.lose(cards);
 					if(event.animate!=false){
@@ -5627,15 +5643,19 @@
 						player.popup(card.name,'wood');
 					}
 					if(cardaudio&&event.getParent(3).name=='useCard'){
-						if(lib.config.background_audio){
-							var sex=player.sex=='female'?'female':'male';
-							if(lib.card[card.name].audio||lib.config.background_ogg){
-								game.playAudio('card',sex,card.name);
-							}
-							else{
-								game.playAudio('card/default');
-							}
-						}
+                        var audiofunc=function(player,card){
+                            if(lib.config.background_audio){
+    							var sex=player.sex=='female'?'female':'male';
+    							if(lib.card[card.name].audio||lib.config.background_ogg){
+    								game.playAudio('card',sex,card.name);
+    							}
+    							else{
+    								game.playAudio('card/default');
+    							}
+    						}
+                        }
+						audiofunc(player,card);
+                        game.broadcast(audiofunc,player,card);
 					}
 					if(cards.length&&(cards.length>1||cards[0].name!=card.name)){
 						game.log(player,'打出了',card,'（',cards,'）');
@@ -5867,6 +5887,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','damage'+(num>1?'2':''));
 					}
+                    game.broadcast(function(num){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect','damage'+(num>1?'2':''));
+    					}
+                    },num);
 					var str='受到了';
 					if(source) str+='来自<span class="bluetext">'+(source==player?'自己':get.translation(source))+'</span>的';
 					str+=get.cnNumber(num)+'点';
@@ -5936,6 +5961,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','recover');
 					}
+                    game.broadcast(function(){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect','recover');
+    					}
+                    });
 					if(num>player.maxHp-player.hp) num=player.maxHp-player.hp;
 					if(num>0){
 						player.changeHp(num,false);
@@ -5951,6 +5981,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','loseHp');
 					}
+                    game.broadcast(function(){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect','loseHp');
+    					}
+                    });
 					game.log(player,'失去了'+get.cnNumber(num)+'点体力')
 					player.changeHp(-num);
 					"step 1"
@@ -6086,18 +6121,19 @@
                     proc(player);
                     game.broadcast(proc,player);
 
-					if(lib.config.background_speak){
-						if(lib.character[player.name]&&
-						lib.character[player.name][4].contains('die_audio')){
-							game.playAudio('die',player.name);
-						}
-						else if(lib.config.background_ogg){
-							game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
-						}
-						// else if(lib.config.background_audio){
-						// 	game.playAudio('effect','die_'+(player.sex==='female'?'female':'male'));
-						// }
-					}
+                    var audiofunc=function(player){
+                        if(lib.config.background_speak){
+    						if(lib.character[player.name]&&
+    						lib.character[player.name][4].contains('die_audio')){
+    							game.playAudio('die',player.name);
+    						}
+    						else if(lib.config.background_ogg){
+    							game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
+    						}
+    					}
+                    }
+					audiofunc(player);
+                    game.broadcast(audiofunc,player);
 					if(!_status.connectMode&&player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
 						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive){
@@ -6155,6 +6191,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect',get.subtype(card));
 					}
+                    game.broadcast(function(type){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect',type);
+    					}
+                    },get.subtype(card));
 					player.$equip(card);
 					game.addVideo('equip',player,get.cardInfo(card));
 					game.log(player,'装备了',card);
@@ -6176,6 +6217,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','judge');
 					}
+                    game.broadcast(function(){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect','judge');
+    					}
+                    });
 					cards[0].fix();
 					cards[0].style.transform='';
 					cards[0].classList.remove('drawinghidden');
@@ -6303,6 +6349,11 @@
 					if(lib.config.background_audio){
 						game.playAudio('effect','link');
 					}
+                    game.broadcast(function(){
+                        if(lib.config.background_audio){
+    						game.playAudio('effect','link');
+    					}
+                    });
                     player.classList.remove('target');
 					player.classList.toggle('linked');
                     game.broadcast(function(player){
@@ -8213,6 +8264,9 @@
 					}
 				},
                 showTimer:function(time){
+                    if(!time&&lib.configOL){
+                        time=parseInt(lib.configOL.choose_timeout)*1000;
+                    }
                     if(_status.connectMode&&!game.online){
                         game.broadcast(function(player,time){
                             player.showTimer(time);
@@ -11428,6 +11482,9 @@
                     ui.click.auto();
                     ui.timer.hide();
                 });
+                if(!game.online&&game.me){
+                    game.me.showTimer();
+                }
             }
         },
         stopCountChoose:function(){
@@ -11435,6 +11492,9 @@
                 clearInterval(_status.countDown);
                 delete _status.countDown;
                 ui.timer.hide();
+            }
+            if(_status.connectMode&&!game.online&&game.me){
+                game.me.hideTimer();
             }
         },
         connect:function(ip,callback){
@@ -11566,6 +11626,7 @@
 			ui.window.appendChild(audio);
 		},
 		trySkillAudio:function(skill,player,directaudio){
+            game.broadcast(game.trySkillAudio,skill,player,directaudio);
 			var info=get.info(skill);
 			if(!info) return;
 			if((!info.direct||directaudio)&&lib.config.background_speak&&
@@ -13747,15 +13808,27 @@
             if(game.online){
                 var dialog=ui.create.dialog();
                 dialog.content.innerHTML=result;
-                if(arguments[1]==true){
+                var result2=arguments[1];
+                if(result2==true){
                     dialog.content.firstChild.innerHTML='战斗胜利';
                 }
-                else if(arguments[1]==false){
+                else if(result2==false){
                     dialog.content.firstChild.innerHTML='战斗失败';
                 }
                 ui.update();
                 if(!ui.restart){
     				ui.restart=ui.create.control('restart',game.reload);
+    			}
+                if(lib.config.background_audio){
+    				if(result2===true){
+    					game.playAudio('effect','win');
+    				}
+    				else if(result2===false){
+    					game.playAudio('effect','lose');
+    				}
+    				else{
+    					game.playAudio('effect','tie');
+    				}
     			}
                 return;
             }
@@ -14048,10 +14121,10 @@
 			}
 			dialog.add(ui.create.div('.placeholder'));
 			dialog.add(ui.create.div('.placeholder'));
-            for(var i=0;i<game.players.length;i++){
-                if(game.players[i].isOnline2()){
-                    console.log(game.players[i]);
-                    game.players[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(game.players[i]));
+            var clients=game.players.concat(game.dead);
+            for(var i=0;i<clients.length;i++){
+                if(clients[i].isOnline2()){
+                    clients[i].send(game.over,dialog.content.innerHTML,game.checkOnlineResult(clients[i]));
                 }
             }
 			game.addVideo('over',null,dialog.content.innerHTML);
