@@ -175,6 +175,7 @@ mode.identity={
 			}
 			var map=[];
 			for(var i=0;i<lib.node.clients.length;i++){
+				if(!list.length) break;
 				var current=list.randomRemove();
 				current.ws=lib.node.clients[i];
 				current.playerid=current.ws.id;
@@ -1093,6 +1094,29 @@ mode.identity={
 	},
 	element:{
 		player:{
+			$dieAfter:function(){
+				if(!this.node.dieidentity){
+					var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
+					ui.refresh(node);
+					node.style.opacity=1;
+					this.node.dieidentity=node;
+				}
+				var trans=this.style.transform;
+				if(trans){
+					if(trans.indexOf('rotateY')!=-1){
+						this.node.dieidentity.style.transform='rotateY(180deg)';
+					}
+					else if(trans.indexOf('rotateX')!=-1){
+						this.node.dieidentity.style.transform='rotateX(180deg)';
+					}
+					else{
+						this.node.dieidentity.style.transform='';
+					}
+				}
+				else{
+					this.node.dieidentity.style.transform='';
+				}
+			},
 			dieSpeak:function(){
 				// switch(this.identity){
 				// 	case 'zhu': this.popup('吾降矣',2000);break;
@@ -1139,31 +1163,6 @@ mode.identity={
 						delete _status.clickingidentity;
 					}
 				}
-				var setIdentity=function(player){
-					if(!player.node.dieidentity){
-						var node=ui.create.div('.damage.dieidentity',get.translation(player.identity+'2'),player);
-						ui.refresh(node);
-						node.style.opacity=1;
-						player.node.dieidentity=node;
-					}
-					var trans=player.style.transform;
-					if(trans){
-						if(trans.indexOf('rotateY')!=-1){
-							player.node.dieidentity.style.transform='rotateY(180deg)';
-						}
-						else if(trans.indexOf('rotateX')!=-1){
-							player.node.dieidentity.style.transform='rotateX(180deg)';
-						}
-						else{
-							player.node.dieidentity.style.transform='';
-						}
-					}
-					else{
-						player.node.dieidentity.style.transform='';
-					}
-				}
-				setIdentity(this);
-				game.broadcast(setIdentity,this);
 
 				if(!_status.over){
 					var giveup;

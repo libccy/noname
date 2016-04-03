@@ -102,7 +102,7 @@ character.sp={
 					player.storage.qizhi++;
 					if(!event.isMine()) game.delay();
 					player.logSkill('qizh',result.targets);
-					player.discardPlayerCard(result.targets[0],true);
+					player.discardPlayerCard(result.targets[0],true,'he');
 					event.target=result.targets[0];
 				}
 				else{
@@ -313,6 +313,11 @@ character.sp={
 				maxHandcard:function(player,num){
 					if(player.get('e','3')||player.get('e','4')) return;
 					return num+1;
+				},
+				targetInRange:function(card,player,target,now){
+					if(player.get('e','5')) return;
+					var type=get.type(card);
+					if(type=='trick'||type=='delay') return true;
 				}
 			}
 		},
