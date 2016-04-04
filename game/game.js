@@ -11095,20 +11095,21 @@
 					"step 0"
 					if(lib.config.mode=='stone'&&_status.mode=='deck'&&
 					!player.isMin()&&get.type(cards[0]).indexOf('stone')==0){
-						var list=[];
-						for(var i=0;i<player.deckCards.length;i++){
-							if(get.type(player.deckCards[i])=='stonecard'){
-								list.push(player.deckCards[i]);
-							}
-						}
-						if(list.length){
-							var choice=list.randomGet();
-							player.deckCards.remove(choice);
-							player.gain(choice,'draw');
-						}
-						else{
-							player.draw({drawDeck:1})
-						}
+						// var list=[];
+						// for(var i=0;i<player.deckCards.length;i++){
+						// 	if(get.type(player.deckCards[i])=='stonecard'){
+						// 		list.push(player.deckCards[i]);
+						// 	}
+						// }
+						// if(list.length){
+						// 	var choice=list.randomGet();
+						// 	player.deckCards.remove(choice);
+						// 	player.gain(choice,'draw');
+						// }
+						// else{
+						// 	player.draw({drawDeck:1})
+						// }
+                        player.draw({drawDeck:1})
 					}
 					else{
 						player.draw();

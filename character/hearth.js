@@ -38,7 +38,7 @@ character.hearth={
 		hs_nozdormu:['male','qun',5,['shixu']],
 		hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
 		hs_kchromaggus:['male','wei',4,['fenlie']],
-		hs_lreno:['male','shu',4,['tanbao']],
+		hs_lreno:['male','shu',4,['tanmi']],
 		hs_brann:['male','shu',4,['qianghua']],
 		hs_finley:['male','wu',3,['maoxian']],
 
@@ -70,6 +70,19 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		tanmi:{
+			trigger:{global:'phaseEnd'},
+			filter:function(event,player){
+				return player.num('h')==0;
+			},
+			content:function(){
+				'step 0'
+				player.draw(2);
+				player.recover();
+				'step 1'
+				player.chooseToUse();
+			}
+		},
 		xueren:{
 			trigger:{source:'damageEnd'},
 			filter:function(event){
@@ -3579,14 +3592,14 @@ character.hearth={
 		hs_hudunren:'护盾人',
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
-		
+
 		xueren:'血刃',
 		xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各流失一点体力，然后你摸两张牌',
 		maoxian:'冒险',
 		maoxian2:'冒险',
 		maoxian_info:'出牌阶段限两次，你可以从三个来自其他存活角色的技能中选择一个作为你的技能',
-		tanbao:'探秘',
-		tanbao_info:'出牌阶段限一次，若你的手牌类别均不相同，你可以展示手牌，然后回复等同于手牌数的体力',
+		tanmi:'探秘',
+		tanmi_info:'在任意一名角色的回合结束阶段，若你没有手牌，你可以摸两张牌并回复一点体力，然后你可以立即使用一张牌',
 		yiwen:'轶闻',
 		yiwen_info:'锁定技，每当其他角色于回合内首次使用卡牌指定你为惟一目标，你获得一张此牌的复制',
 		tanbao_old:'探宝',
