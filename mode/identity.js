@@ -1131,15 +1131,17 @@ mode.identity={
 			},
 			dieAfter:function(source){
 				this.dieSpeak();
-				if(get.config('show_identity')&&!this.identityShown){
-					this.setIdentity(this.identity);
-					this.identityShown=true;
+				if(!this.identityShown){
+					game.broadcastAll(function(player){
+						player.setIdentity(player.identity);
+						player.identityShown=true;
+					},this);
 				}
 				game.checkResult();
 				if(game.zhu.isZhu){
 					if(get.population('zhong')+get.population('nei')==0||
 					get.population('zhong')+get.population('fan')==0){
-						game.showIdentity();
+						game.broadcastAll(game.showIdentity);
 					}
 				}
 				if(this.identity=='fan'&&source) source.draw(3);
@@ -1151,21 +1153,24 @@ mode.identity={
 					delete game.zhu.storage.enhance_zhu;
 				}
 				if(this==game.zhong){
-					game.zhu.identityShown=true;
-					game.zhu.ai.shown=1;
-					game.zhu.setIdentity();
-					game.zhu.isZhu=true;
-					delete game.zhong;
-					if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
+					game.broadcastAll(function(player){
+						game.zhu=player;
+						game.zhu.identityShown=true;
+						game.zhu.ai.shown=1;
+						game.zhu.setIdentity();
+						game.zhu.isZhu=true;
+						if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
+						delete game.zhong;
+						if(_status.clickingidentity&&_status.clickingidentity[0]==game.zhu){
+							for(var i=0;i<_status.clickingidentity[1].length;i++){
+								_status.clickingidentity[1][i].delete();
+								_status.clickingidentity[1][i].style.transform='';
+							}
+							delete _status.clickingidentity;
+						}
+					},game.zhu);
 					game.delay(2);
 					game.zhu.playerfocus(1000);
-					if(_status.clickingidentity&&_status.clickingidentity[0]==game.zhu){
-						for(var i=0;i<_status.clickingidentity[1].length;i++){
-							_status.clickingidentity[1][i].delete();
-							_status.clickingidentity[1][i].style.transform='';
-						}
-						delete _status.clickingidentity;
-					}
 				}
 
 				if(!_status.over){

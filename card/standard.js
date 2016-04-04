@@ -1221,6 +1221,9 @@ card.standard={
 		qinglong_skill:{
 			trigger:{player:'shaMiss'},
 			direct:true,
+			filter:function(event,player){
+				return player.canUse('sha',event.target);
+			},
 			content:function(){
 				"step 0"
 				if(player.skills.contains('jiu')){

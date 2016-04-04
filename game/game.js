@@ -6188,6 +6188,12 @@
                         for(var i=0;i<cards.length;i++){
 							cards[i].goto(ui.discardPile);
 						}
+                        if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
+                            ui.exit=ui.create.control('退出联机',function(){
+                                game.saveConfig('reconnect_info');
+                                game.reload();
+                            });
+                        }
 
                         if(lib.config.background_speak){
     						if(lib.character[player.name]&&
@@ -6209,6 +6215,7 @@
 							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
+
 					if(!_status.connectMode&&player==game.me&&!game.modeSwapPlayer){
 						// _status.auto=false;
 						if(ui.auto){
@@ -9652,11 +9659,6 @@
 						top+this.offsetHeight-30,700,'thunder');
 				},
 				$rare2:function(){
-                    game.broadcast(function(player){
-                        if(!lib.config.low_performance){
-                            player.$rare2();
-                        }
-                    },this);
 					game.addVideo('flame',this,'rare2');
 					var rect=this.getBoundingClientRect();
 					var left=rect.left;
@@ -9665,11 +9667,6 @@
 						top+this.offsetHeight-30,700,'rare');
 				},
 				$epic2:function(){
-                    game.broadcast(function(player){
-                        if(!lib.config.low_performance){
-                            player.$epic2();
-                        }
-                    },this);
 					game.addVideo('flame',this,'epic2');
 					var rect=this.getBoundingClientRect();
 					var left=rect.left;
@@ -9678,11 +9675,6 @@
 						top+this.offsetHeight-30,700,'epic');
 				},
 				$legend2:function(){
-                    game.broadcast(function(player){
-                        if(!lib.config.low_performance){
-                            player.$legend2();
-                        }
-                    },this);
 					game.addVideo('flame',this,'legend2');
 					var rect=this.getBoundingClientRect();
 					var left=rect.left;
@@ -9691,11 +9683,6 @@
 						top+this.offsetHeight-30,700,'legend');
 				},
 				$rare:function(time){
-                    game.broadcast(function(player,time){
-                        if(!lib.config.low_performance){
-                            player.$rare(time);
-                        }
-                    },this,time);
 					time=time||700;
 					game.addVideo('flame',this,'rare');
 					var left,top;
@@ -9714,11 +9701,6 @@
 						top+this.offsetHeight-30,time,'rare');
 				},
 				$epic:function(time){
-                    game.broadcast(function(player,time){
-                        if(!lib.config.low_performance){
-                            player.$epic(time);
-                        }
-                    },this,time);
 					time=time||700;
 					game.addVideo('flame',this,'epic');
 					var left,top;
@@ -9737,11 +9719,6 @@
 						top+this.offsetHeight-30,time,'epic');
 				},
 				$legend:function(time){
-                    game.broadcast(function(player,time){
-                        if(!lib.config.low_performance){
-                            player.$legend(time);
-                        }
-                    },this,time);
 					time=time||700;
 					game.addVideo('flame',this,'legend');
 					var left,top;
@@ -11046,7 +11023,7 @@
 								var mod=game.checkMod(card,player,'unchanged','cardSavable',player.get('s'));
 								if(mod!='unchanged') return mod;
 								var savable=get.info(card).savable;
-								if(typeof savable=='function') savable=savable(card,player,event.dying);
+								if(typeof savable=='function') savable=savable(card,player,_status.event.dying);
 								return savable;
 							},
 							filterTarget:trigger.player,
@@ -11553,6 +11530,12 @@
                         game.createEvent('game',false).content=lib.init.startOnline;
                         game.loop();
                         game.send('reinited');
+                        if(!observe&&game.me&&game.me.isDead){
+                            ui.exit=ui.create.control('退出联机',function(){
+                                game.saveConfig('reconnect_info');
+                                game.reload();
+                            });
+                        }
                     });
                 },
                 exec:function(func){
@@ -14089,6 +14072,12 @@
     					game.playAudio('effect','tie');
     				}
     			}
+                if(!ui.exit){
+                    ui.exit=ui.create.control('退出联机',function(){
+                        game.saveConfig('reconnect_info');
+                        game.reload();
+                    });
+                }
                 return;
             }
 			if(lib.config.background_audio){
@@ -22059,7 +22048,7 @@
 			avatar:function(){
 				if(!lib.config.change_skin) return;
 				if(this.parentNode.classList.contains('unseen')) return;
-                if(!this.name) return;
+                if(!this.parentNode.name) return;
 				var avatar=this;
 				var player=this.parentNode;
 				if(!this._doubleClicking){
@@ -22097,7 +22086,7 @@
 			avatar2:function(){
 				if(!lib.config.change_skin) return;
 				if(this.parentNode.classList.contains('unseen2')) return;
-                if(!this.name2) return;
+                if(!this.parentNode.name2) return;
 				var avatar=this;
 				var player=this.parentNode;
 				if(!this._doubleClicking){
