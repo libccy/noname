@@ -966,8 +966,7 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				targets[0].chooseToUse(
-					'对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
+				targets[0].chooseToUse('对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
 					{name:'sha'},targets[1],-1).targetRequired=true;
 				"step 1"
 				if(result.bool==false){
@@ -1236,9 +1235,7 @@ card.standard={
 				}
 				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1).logSkill='qinglong';
 				"step 1"
-				if(result.bool){
-					player.logSkill('qinglong');
-				}
+				if(result.bool);
 				else if(event.jiu){
 					player.addSkill('jiu');
 				}

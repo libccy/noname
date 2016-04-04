@@ -47,7 +47,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:1,
+        versionOL:2,
 		updateURL:localStorage.getItem('noname_download_source')||'http://isha.applinzi.com/',
 		assetURL:'',
 		changeLog:[],
@@ -6298,16 +6298,17 @@
 					else{
 						cards[0].style.transform='';
 						player.node.judges.insertBefore(cards[0],player.node.judges.firstChild);
-                        game.broadcast(function(player,card){
+                        game.broadcast(function(player,card,viewAs){
                             card.fix();
         					card.style.transform='';
         					card.classList.remove('drawinghidden');
+                            card.viewAs=viewAs;
                             player.node.judges.insertBefore(card,player.node.judges.firstChild);
                             if(card.clone&&card.clone.parentNode==player.parentNode){
     							card.clone.moveDelete(player);
     							game.addVideo('gain2',player,get.cardsInfo([card]));
     						}
-                        },player,cards[0]);
+                        },player,cards[0],viewAs);
 						if(cards[0].clone&&cards[0].clone.parentNode==player.parentNode){
 							cards[0].clone.moveDelete(player);
 							game.addVideo('gain2',player,get.cardsInfo(cards));
@@ -20710,18 +20711,26 @@
 
                 var input;
                 var addEntry=function(info){
+                    if(list._chatempty){
+                        list.innerHTML='';
+                        delete list._chatempty;
+                    }
                     var name=get.translation(info[0].name)||info[0].nickname;
-                    var node=ui.create.div('.text');
+                    var node=ui.create.div('.text.chat');
                     node.innerHTML=name+': '+info[1];
-                    node.style.wordBreak='break-all';
-                    node.style.marginBottom='3px';
                     list.appendChild(node);
                     list.scrollTop=list.scrollHeight;
     				uiintro.style.height=uiintro.content.scrollHeight+'px';
                     if(input) input.value='';
                 }
-                for(var i=0;i<lib.chatHistory.length;i++){
-                    addEntry(lib.chatHistory[i]);
+                if(lib.chatHistory.length){
+                    for(var i=0;i<lib.chatHistory.length;i++){
+                        addEntry(lib.chatHistory[i]);
+                    }
+                }
+                else{
+                    list._chatempty=true;
+                    list.appendChild(ui.create.div('.text.center','无聊天记录'))
                 }
                 uiintro.add(list);
                 uiintro.style.height=uiintro.content.offsetHeight+'px';
@@ -20731,7 +20740,7 @@
                 node.style.paddingTop=0;
                 node.style.marginBottom='16px';
                 input=node.firstChild;
-                input.style.width='80%';
+                input.style.width='calc(100% - 20px)';
                 input.onkeydown=function(e){
                     if(e.keyCode==13&&input.value){
                         var player=game.me;

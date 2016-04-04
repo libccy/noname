@@ -151,6 +151,7 @@ card.refresh={
 				var dialog=ui.create.dialog('木牛流马',player.get('e','5').cards);
 				var trigger=event.parent.parent;
 				player.chooseButton(dialog,function(button){
+					var player=_status.event.player;
 					if(get.select(get.info(button.link).selectTarget)[1]==-1){
 						if(get.type(button.link)=='delay') return -1;
 						if(get.type(button.link)=='equip'){
@@ -160,6 +161,12 @@ card.refresh={
 						}
 						if(get.tag(button.link,'multitarget')) return -1;
 						if(button.link.name=='huoshaolianying') return -1;
+					}
+					if(button.link.name=='jiu'){
+						if(ai.get.effect(player,{name:'jiu'},player)>0){
+							return 1;
+						}
+						return -1;
 					}
 					return 1;
 				}).filterButton=function(button){
