@@ -87,7 +87,6 @@ card.refresh={
 					return !target.isMin()&&player!=target&&!target.get('e','5');
 				});
 				next.set('ai',function(target){
-					console.log(_status.event.choice);
 					return target==_status.event.choice?1:-1;
 				});
 				next.set('choice',choice);
