@@ -361,6 +361,9 @@
 #window>.player.connect[data-position='6']{left:calc(400% / 7 - 300px / 7);top:calc(400% / 7 - 40px + 5px);}
 #window>.player.connect[data-position='7']{left:calc(500% / 7 + 150px / 7);top:calc(400% / 7 - 40px + 5px);}
 
+.connectbutton{
+	top:calc(500% / 7 + 80px + 5px);
+}
 
 
 .card[data-position='0']{top:calc(100% - 130px);left:calc(50% - 52px);}

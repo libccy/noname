@@ -63,6 +63,7 @@
 		onresize:[],
 		onwash:[],
 		onover:[],
+        chatHistory:[],
 		arenaReady:[],
 		packageReady:[],
         characterDialogGroup:{
@@ -2775,10 +2776,21 @@
 			}
 		},
 		placePoppedDialog:function(dialog,e){
+            if(dialog._place_text){
+                if(dialog._place_text.firstChild.offsetWidth>=190){
+                    dialog._place_text.style.textAlign='left';
+                    dialog._place_text.style.marginLeft='14px';
+                }
+            }
+
 			if(e.touches&&e.touches[0]){
 				e=e.touches[0];
 			}
-			dialog.style.height=Math.min(ui.window.offsetHeight-20,dialog.content.scrollHeight)+'px';
+            var height=Math.min(ui.window.offsetHeight-20,dialog.content.scrollHeight);
+            if(dialog._mod_height){
+                height+=dialog._mod_height;
+            }
+			dialog.style.height=height+'px';
 			if(e.clientX<ui.window.offsetWidth/2){
 				dialog.style.left=(e.clientX+10)+'px';
 			}
@@ -4410,12 +4422,55 @@
 						return;
 					}
 					game.log(player,'对',target,'发起拼点');
-					player.chooseCard('请选择拼点牌',true).ai=event.ai;
-					"step 1"
-					event.card1=result.cards[0];
-					target.chooseCard('请选择拼点牌',true).ai=event.ai;
-					"step 2"
-					event.card2=result.cards[0];
+                    "step 1"
+                    player.wait();
+                    target.wait();
+                    if(player.isOnline()){
+                        player.send(function(){
+                            game.me.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=ai;
+                            game.resume();
+                        },ai);
+                    }
+                    else{
+                        event.localPlayer=true;
+                        player.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=event.ai;
+                    }
+                    if(target.isOnline()){
+                        target.send(function(){
+                            game.me.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=ai;
+                            game.resume();
+                        },ai);
+                    }
+                    else{
+                        event.localTarget=true;
+                    }
+                    "step 2"
+                    if(event.localPlayer){
+                        player.unwait(result);
+                    }
+                    if(event.localTarget){
+                        target.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=event.ai;
+                    }
+                    "step 3"
+                    if(event.localTarget){
+                        target.unwait(result);
+                    }
+                    if(!event.resultOL){
+                        game.pause();
+                    }
+					"step 4"
+                    try{
+                        event.card1=event.resultOL[player.playerid].cards[0];
+                        event.card2=event.resultOL[target.playerid].cards[0];
+                        if(!event.card1||!event.card2){
+                            throw('err');
+                        }
+                    }
+                    catch(e){
+                        console.log(e);
+                        event.finish();
+                        return;
+                    }
 					if(event.card2.number>=10||event.card2.number<=4){
 						if(target.num('h')>2){
 							event.addToAI=true;
@@ -4423,7 +4478,7 @@
 					}
 					player.lose(event.card1);
 					target.lose(event.card2);
-					"step 3"
+					"step 5"
                     game.broadcast(function(){
                         ui.arena.classList.add('thrownhighlight');
                     });
@@ -4482,9 +4537,9 @@
 						}
 					}
 					game.pause();
-					"step 4"
+					"step 6"
 					game.delay(2);
-					"step 5"
+					"step 7"
 					if(typeof event.target.ai.shown=='number'&&event.target.ai.shown<=0.85&&event.addToAI){
 						event.target.ai.shown+=0.1;
 					}
@@ -4643,6 +4698,11 @@
 						}
                     }
                     "step 2"
+                    if(event.glow_result){
+                        for(var i=0;i<event.result.cards.length;i++){
+                            event.result.cards[i].classList.add('glow');
+                        }
+                    }
 					if(event.dialog) event.dialog.close();
 				},
 				chooseTarget:function(){
@@ -5802,6 +5862,7 @@
 							}
 						}
 						cards[i].style.transform+=' scale(0.2)';
+                        cards[i].classList.remove('glow');
 						if(event.position){
 							cards[i].goto(event.position);
 						}
@@ -5812,6 +5873,7 @@
 					if(player==game.me) ui.updatehl();
                     game.broadcast(function(player,cards){
                         for(var i=0;i<cards.length;i++){
+                            cards[i].classList.remove('glow');
                             cards[i].delete();
                         }
                         if(player==game.me){
@@ -6550,6 +6612,60 @@
                     if(!this.ws||this.ws.closed) return this;
                     this.ws.send.apply(this.ws,arguments);
                     return this;
+                },
+                chat:function(str){
+                    lib.element.player.say.call(this,str);
+                    game.broadcast(function(id,str){
+                        if(lib.playerOL[id]){
+                            lib.playerOL[id].say(str);
+                        }
+                        else if(game.connectPlayers){
+                            for(var i=0;i<game.connectPlayers.length;i++){
+                                if(game.connectPlayers[i].playerid==id){
+                                    lib.element.player.say.call(game.connectPlayers[i],str);
+                                    return;
+                                }
+                            }
+                        }
+                    },this.playerid,str);
+                },
+                say:function(str){
+                    var dialog=ui.create.dialog('hidden');
+                    dialog.classList.add('static');
+                    dialog.add('<div class="text" style="word-break:break-all;display:inline">'+str+'</div>');
+                    dialog.classList.add('popped');
+                    ui.window.appendChild(dialog);
+                    var width=dialog.content.firstChild.firstChild.offsetWidth;
+                    if(width<190){
+                        dialog._mod_height=-16;
+                    }
+                    else{
+                        dialog.content.firstChild.style.textAlign='left';
+                    }
+                    dialog.style.width=(width+16)+'px';
+                    var refnode;
+                    if(this.node&&this.node.avatar&&this.parentNode==ui.arena){
+                        refnode=this.node.avatar;
+                    }
+                    if(refnode){
+                        lib.placePoppedDialog(dialog,{
+                            clientX:ui.arena.offsetLeft+this.offsetLeft+refnode.offsetLeft+refnode.offsetWidth/2,
+                            clientY:ui.arena.offsetTop+this.offsetTop+refnode.offsetTop+refnode.offsetHeight*3/4
+                        });
+                    }
+                    else{
+                        lib.placePoppedDialog(dialog,{
+                            clientX:this.offsetLeft+this.offsetWidth/2,
+                            clientY:this.offsetTop+this.offsetHeight*3/4
+                        });
+                    }
+                    if(dialog._mod_height){
+                        dialog.content.firstChild.style.padding=0;
+                    }
+                    setTimeout(function(){
+                        dialog.delete();
+                    },2000);
+                    lib.chatHistory.push([this,str]);
                 },
                 getState:function(){
                     return {
@@ -10128,6 +10244,7 @@
                 set:function(key,value){
                     this[key]=value;
                     this._set.push([key,value]);
+                    return this;
                 },
                 send:function(){
                     var skills={
@@ -11187,8 +11304,10 @@
                     lib.configOL=config;
         			lib.playerOL={};
         			lib.cardOL={};
+
                     game.clearArena();
                     game.finishCards();
+                    ui.create.chat();
                     ui.create.connectPlayers(ip);
                     ui.pause.hide();
                     ui.auto.hide();
@@ -11302,6 +11421,7 @@
             			}
                         game.clearArena();
                         game.finishCards();
+                        ui.create.chat();
                         ui.arena.dataset.number=state.number;
                         var pos=state.players[game.onlineID].position;
                         for(var i in state.players){
@@ -11431,9 +11551,11 @@
                                 game.connectPlayers[i].setIdentity('zhu');
                             }
                             game.connectPlayers[i].initOL(map[i][0],map[i][1]);
+                            game.connectPlayers[i].playerid=map[i][2];
                         }
                         else{
                             game.connectPlayers[i].uninitOL();
+                            delete game.connectPlayers[i].playerid;
                         }
                     }
                 }
@@ -11466,7 +11588,7 @@
             for(var i=0;i<game.connectPlayers.length;i++){
                 var player=game.connectPlayers[i];
                 if(player.playerid){
-                    map[i]=[player.nickname,player.avatar];
+                    map[i]=[player.nickname,player.avatar,player.playerid];
                 }
                 else{
                     map[i]=null;
@@ -11601,6 +11723,7 @@
 			lib.cardOL={};
             var WebSocketServer=require('ws').Server;
             var wss=new WebSocketServer({port:8080});
+            ui.create.chat();
 
             var interfaces = require('os').networkInterfaces();
             for(var devName in interfaces){
@@ -15870,6 +15993,10 @@
 				if(listen) node.listen(listen);
 	            return node;
 			},
+            chat:function(){
+                var chat=ui.create.system('聊天',null,true);
+                lib.setPopped(chat,ui.click.chat,220);
+            },
 			selectlist:function(list,init,position){
 				var select=document.createElement('select');
 				for(var i=0;i<list.length;i++){
@@ -20209,7 +20336,7 @@
                 ipbar.style.borderRadius='2px';
                 ipbar.style.position='relative';
 
-                var button=ui.create.div('.menubutton.large.highlight',game.online?'退出联机':'开始游戏',ui.window,function(){
+                var button=ui.create.div('.menubutton.large.highlight.connectbutton',game.online?'退出联机':'开始游戏',ui.window,function(){
                     if(button.clicked) return;
                     if(game.online){
                         game.saveConfig('reconnect_info');
@@ -20225,9 +20352,6 @@
                     button.clicked=true;
                 });
 
-                button.style.top='calc(500% / 7 + 80px + 5px)';
-                button.style.width='130px';
-                button.style.left='calc(50% - 65px)';
                 ui.connectStartButton=button;
                 ui.connectStartBar=bar;
             },
@@ -20570,30 +20694,91 @@
 				}
 				return uiintro;
 			},
-            connectconfig:function(){
-                if(game.online) return;
+            chat:function(){
                 var uiintro=ui.create.dialog('hidden');
 				uiintro.listen(function(e){
 					e.stopPropagation();
 				});
-                uiintro.add('<div class="text center">输入地址</div>');
-                uiintro.classList.add('noleave');
+                // uiintro.add('<div class="text center">对话记录</div>');
+                // uiintro.add(ui.create.div('.placeholder.slim'));
+                // uiintro.classList.add('noleave');
+
+                var list=ui.create.div('.caption');
+                list.style.maxHeight='350px';
+                list.style.overflow='scroll';
+                uiintro.contentContainer.style.overflow='hidden';
+
+                var input;
+                var addEntry=function(info){
+                    var name=get.translation(info[0].name)||info[0].nickname;
+                    var node=ui.create.div('.text');
+                    node.innerHTML=name+': '+info[1];
+                    node.style.wordBreak='break-all';
+                    node.style.marginBottom='3px';
+                    list.appendChild(node);
+                    list.scrollTop=list.scrollHeight;
+    				uiintro.style.height=uiintro.content.scrollHeight+'px';
+                    if(input) input.value='';
+                }
+                for(var i=0;i<lib.chatHistory.length;i++){
+                    addEntry(lib.chatHistory[i]);
+                }
+                uiintro.add(list);
+                uiintro.style.height=uiintro.content.offsetHeight+'px';
+                list.scrollTop=list.scrollHeight;
+
                 var node=uiintro.add('<input type="text" value="">');
                 node.style.paddingTop=0;
                 node.style.marginBottom='16px';
-                var input=node.firstChild;
+                input=node.firstChild;
                 input.style.width='80%';
                 input.onkeydown=function(e){
                     if(e.keyCode==13&&input.value){
-                        game.connect(input.value);
+                        var player=game.me;
+                        var str=input.value;
+                        if(!player){
+                            if(game.connectPlayers){
+                                if(game.online){
+                                    for(var i=0;i<game.connectPlayers.length;i++){
+                                        if(game.connectPlayers[i].playerid==game.onlineID){
+                                            player=game.connectPlayers[i];break;
+                                        }
+                                    }
+                                }
+                                else{
+                                    player=game.connectPlayers[0];
+                                }
+                            }
+                        }
+                        if(!player) return;
+                        if(game.online){
+                            game.send(function(id,str){
+                                var player;
+                                if(lib.playerOL[id]){
+                                    player=lib.playerOL[id];
+                                }
+                                else if(game.connectPlayers){
+                                    for(var i=0;i<game.connectPlayers.length;i++){
+                                        if(game.connectPlayers[i].playerid==id){
+                                            player=game.connectPlayers[i];break;
+                                        }
+                                    }
+                                }
+                                if(player) lib.element.player.chat.call(player,str);
+                            },game.onlineID,str);
+                        }
+                        else{
+                            lib.element.player.chat.call(player,str);
+                        }
+                        addEntry([player,str]);
                     }
-                    else{
-                        e.stopPropagation();
-                    }
+                    e.stopPropagation();
                 }
-                setTimeout(function(){
+                uiintro._onopen=function(){
                     input.focus();
-                },200);
+                    list.scrollTop=list.scrollHeight;
+                };
+                uiintro._heightfixed=true;
                 return uiintro;
             },
 			volumn:function(){
@@ -20702,8 +20887,13 @@
 				var width=this._poppedwidth||330;
 				uiintro.style.width=width+'px';
 
-				var height=this._poppedheight||uiintro.content.scrollHeight;
-				uiintro.style.height=Math.min(ui.window.offsetHeight-260,height)+'px';
+                if(uiintro._heightfixed){
+                    uiintro.style.height=uiintro.content.scrollHeight+'px';
+                }
+                else{
+                    var height=this._poppedheight||uiintro.content.scrollHeight;
+    				uiintro.style.height=Math.min(ui.window.offsetHeight-260,height)+'px';
+                }
 				if(lib.config.layout=='phone'){
 					uiintro.style.top='70px';
 				}
@@ -20722,6 +20912,10 @@
 				if(!lib.config.touchscreen){
 					uiintro.addEventListener('mouseleave',ui.click.leavehoverpopped);
 				}
+
+                if(uiintro._onopen){
+                    uiintro._onopen();
+                }
 			},
 			hoverpopped_leave:function(){
 				this._poppedalready=false;
@@ -24054,12 +24248,7 @@
 					else if(lib.card[name]&&lib.card[name].addinfomenu){
 						uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
 					}
-					if(lib.translate[name+'_info'].length<=100){
-						uiintro.add('<div class="text center">'+lib.translate[name+'_info']+'</div>');
-					}
-					else{
-						uiintro.add('<div class="text">'+lib.translate[name+'_info']+'</div>');
-					}
+                    uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
 				}
 				uiintro.add(ui.create.div('.placeholder.slim'));
 			}
