@@ -33,6 +33,22 @@ card.refresh={
 			},
 			discard:false,
 			lose:true,
+			sync:function(muniu){
+				if(game.online){
+					return;
+				}
+				if(!muniu.cards){
+					muniu.cards=[];
+				}
+				for(var i=0;i<muniu.cards.length;i++){
+					if(!muniu.cards[i].parentNode||muniu.cards[i].parentNode.id!='special'){
+						muniu.cards.splice(i--,1);
+					}
+				}
+				game.broadcast(function(muniu,cards){
+					muniu.cards=cards;
+				},muniu,muniu.cards);
+			},
 			filter:function(event,player){
 				return player.num('h')>0;
 			},
@@ -54,6 +70,9 @@ card.refresh={
 				}
 				if(muniu.cards==undefined) muniu.cards=[];
 				muniu.cards.push(cards[0]);
+				game.broadcast(function(muniu,cards){
+					muniu.cards=cards;
+				},muniu,muniu.cards);
 				var players=[];
 				for(var i=0;i<game.players.length;i++){
 					if(!game.players[i].get('e','5')&&game.players[i]!=player&&
@@ -64,11 +83,14 @@ card.refresh={
 				}
 				players.sort(lib.sort.seat);
 				var choice=players[0];
-				player.chooseTarget('是否移动木牛流马？',function(card,player,target){
+				var next=player.chooseTarget('是否移动木牛流马？',function(card,player,target){
 					return !target.isMin()&&player!=target&&!target.get('e','5');
-				}).ai=function(target){
-					return target==choice?1:-1;
-				};
+				});
+				next.set('ai',function(target){
+					console.log(_status.event.choice);
+					return target==_status.event.choice?1:-1;
+				});
+				next.set('choice',choice);
 				"step 1"
 				if(result.bool){
 					var card=player.get('e','5');
@@ -98,11 +120,7 @@ card.refresh={
 				if(event.responded) return false;
 				var muniu=player.get('e','5');
 				if(!muniu.cards) return false;
-				for(var i=0;i<muniu.cards.length;i++){
-					if(muniu.cards[i].parentNode.id!='special'){
-						muniu.cards.splice(i,1);i--;
-					}
-				}
+				lib.skill.muniu_skill.sync(muniu);
 				for(var i=0;i<muniu.cards.length;i++){
 					if(event.filterCard(muniu.cards[i])) return true;
 				}
@@ -135,11 +153,7 @@ card.refresh={
 			filter:function(event,player){
 				var muniu=player.get('e','5');
 				if(!muniu.cards) return false;
-				for(var i=0;i<muniu.cards.length;i++){
-					if(muniu.cards[i].parentNode.id!='special'){
-						muniu.cards.splice(i,1);i--;
-					}
-				}
+				lib.skill.muniu_skill.sync(muniu);
 				for(var i=0;i<muniu.cards.length;i++){
 					if(event.filterCard(muniu.cards[i],player)) return true;
 				}
@@ -210,11 +224,7 @@ card.refresh={
 			hiddenCard:function(player,name){
 				var muniu=player.get('e','5');
 				if(!muniu.cards) return false;
-				for(var i=0;i<muniu.cards.length;i++){
-					if(muniu.cards[i].parentNode.id!='special'){
-						muniu.cards.splice(i,1);i--;
-					}
-				}
+				lib.skill.muniu_skill.sync(muniu);
 				for(var i=0;i<muniu.cards.length;i++){
 					if(muniu.cards[i].name==name) return true;
 				}

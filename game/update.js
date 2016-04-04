@@ -1,7 +1,6 @@
 window.noname_update={
-    version:'1.8.2.6',
+    version:'1.8.2.8',
     changeLog:[
-        '聊天功能',
-        '修复界面问题',
+        '旁观',
     ]
 }

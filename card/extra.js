@@ -21,13 +21,17 @@ card.extra={
 					}
 				}
 				else{
-					target.addSkill('jiu');
-					if(!player.node.jiu&&lib.config.jiu_effect){
-						player.node.jiu=ui.create.div('.playerjiu',player.node.avatar);
-						player.node.jiu2=ui.create.div('.playerjiu',player.node.avatar2);
-					}
-					if(card.clone&&card.clone.parentNode==player.parentNode){
-						card.clone.moveDelete(target);
+					game.broadcastAll(function(target,card){
+						target.addSkill('jiu');
+						if(!target.node.jiu&&lib.config.jiu_effect){
+							target.node.jiu=ui.create.div('.playerjiu',target.node.avatar);
+							target.node.jiu2=ui.create.div('.playerjiu',target.node.avatar2);
+						}
+						if(card.clone&&card.clone.parentNode==target.parentNode){
+							card.clone.moveDelete(target);
+						}
+					},target,card);
+					if(card.clone&&card.clone.parentNode==target.parentNode){
 						game.addVideo('gain2',target,get.cardsInfo([card]));
 					}
 				}
@@ -56,7 +60,7 @@ card.extra={
 				},
 				result:{
 					target:function(player,target){
-						if(target&&target==_status.dying) return 2;
+						if(target&&target.hp<=0) return 2;
 						if(lib.config.mode=='stone'&&!player.isMin()){
 							if(player.getActCount()+1>=player.actcount) return false;
 						}
@@ -116,16 +120,17 @@ card.extra={
 					return ai.get.value(card);
 				};
 				"step 1"
-				event.dialog=ui.create.dialog(get.translation(target.name)+'展示的手牌',result.cards);
+				event.dialog=ui.create.dialog(get.translation(target)+'展示的手牌',result.cards);
 				event.videoId=lib.status.videoId++;
-				game.addVideo('cardDialog',null,[get.translation(target.name)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
+
+				game.broadcast('createDialog',event.videoId,get.translation(target)+'展示的手牌',result.cards);
+				game.addVideo('cardDialog',null,[get.translation(target)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
 				event.card2=result.cards[0];
 				game.log(target,'展示了',event.card2);
-				player.chooseToDiscard(function(card){
-					return get.suit(card)==get.suit(_status.event.parent.card2);
-				},function(card){
-					if(ai.get.damageEffect(target,player,player,'fire')>0){
-						return 7-ai.get.value(card,_status.event.player);
+				player.chooseToDiscard({suit:get.suit(event.card2)},function(card){
+					var evt=_status.event.getParent();
+					if(ai.get.damageEffect(evt.target,evt.player,evt.player,'fire')>0){
+						return 7-ai.get.value(card,evt.player);
 					}
 					return -1;
 				}).prompt=false;
@@ -137,8 +142,9 @@ card.extra={
 				else{
 					target.addTempSkill('huogong2','phaseBegin');
 				}
-				game.addVideo('cardDialog',null,event.videoId);
 				event.dialog.close();
+				game.addVideo('cardDialog',null,event.videoId);
+				game.broadcast('closeDialog',event.videoId);
 			},
 			ai:{
 				basic:{
@@ -367,13 +373,15 @@ card.extra={
 			popup:false,
 			audio:false,
 			content:function(){
-				player.removeSkill('jiu');
-				if(player.node.jiu){
-					player.node.jiu.delete();
-					player.node.jiu2.delete();
-					delete player.node.jiu;
-					delete player.node.jiu2;
-				}
+				game.broadcastAll(function(player){
+					player.removeSkill('jiu');
+					if(player.node.jiu){
+						player.node.jiu.delete();
+						player.node.jiu2.delete();
+						delete player.node.jiu;
+						delete player.node.jiu2;
+					}
+				},player);
 			},
 		},
 		guding_skill:{

@@ -1224,13 +1224,15 @@ card.standard={
 			content:function(){
 				"step 0"
 				if(player.skills.contains('jiu')){
-					player.removeSkill('jiu');
-					if(player.node.jiu){
-						player.node.jiu.delete();
-						player.node.jiu2.delete();
-						delete player.node.jiu;
-						delete player.node.jiu2;
-					}
+					game.broadcastAll(function(player){
+						player.removeSkill('jiu');
+						if(player.node.jiu){
+							player.node.jiu.delete();
+							player.node.jiu2.delete();
+							delete player.node.jiu;
+							delete player.node.jiu2;
+						}
+					},player);
 					event.jiu=true;
 				}
 				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1).logSkill='qinglong';
@@ -1554,9 +1556,11 @@ card.standard={
 					}
 					event.goto(3);
 				}
-				if(withme||withol){
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].showTimer();
+				if(_status.connectMode){
+					if(withme||withol){
+						for(var i=0;i<game.players.length;i++){
+							game.players[i].showTimer();
+						}
 					}
 				}
 				event.withol=withol;

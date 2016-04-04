@@ -36,6 +36,8 @@ card.ex={
 			content:function(){
 				"step 0"
 				player.choosePlayerCard('是否发动【寒冰剑】？','he',trigger.target,Math.min(2,trigger.target.num('he')),function(button){
+					var trigger=_status.event.getParent()._trigger;
+					var player=_status.event.player;
 					var eff=ai.get.damageEffect(trigger.target,player,player);
 					if(ai.get.attitude(player,trigger.target)>0){
 						if(eff>=0) return false;
@@ -43,7 +45,8 @@ card.ex={
 					}
 					if(eff<=0) return ai.get.buttonValue(button);
 					if(trigger.target.hp==1) return false;
-					if(player.skills.contains('jiu')||player.skills.contains('tianxianjiu')) return false;
+					if(player.skills.contains('jiu')||player.skills.contains('tianxianjiu')||
+					player.skills.contains('luoyi2')||player.skills.contains('reluoyi2')) return false;
 					if(_status.event.dialog.buttons.length<2) return -1;
 					var num=0;
 					for(var i=0;i<_status.event.dialog.buttons.length;i++){
@@ -55,7 +58,7 @@ card.ex={
 				if(result.bool){
 					trigger.untrigger();
 					var cards=[];
-					for(var i=0;i<result.buttons.length;i++) cards.push(result.buttons[i].link);
+					for(var i=0;i<result.links.length;i++) cards.push(result.links[i]);
 					player.logSkill('hanbing_skill');
 					trigger.unhurt=true;
 					trigger.target.discard(cards);

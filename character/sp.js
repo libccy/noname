@@ -101,7 +101,7 @@ character.sp={
 				if(result.bool){
 					player.storage.qizhi++;
 					if(!event.isMine()) game.delay();
-					player.logSkill('qizh',result.targets);
+					player.logSkill('qizhi',result.targets);
 					player.discardPlayerCard(result.targets[0],true,'he');
 					event.target=result.targets[0];
 				}

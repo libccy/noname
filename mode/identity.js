@@ -20,10 +20,14 @@ mode.identity={
 				lib.configOL.number=lib.configOL.player_number;
 			}
 			lib.configOL.characterPack=['standard'];
-			lib.configOL.cardPack=['standard'];
+			lib.configOL.cardPack=['standard','ex','extra'];
 			lib.configOL.mode='identity';
+			var cardPackList=[];
+			for(var i=0;i<lib.configOL.cardPack.length;i++){
+				cardPackList=cardPackList.concat(lib.cardPack[lib.configOL.cardPack[i]]);
+			}
 			for(var i=0;i<lib.card.list.length;i++){
-				if(!lib.cardPack.standard.contains(lib.card.list[i][2])){
+				if(!cardPackList.contains(lib.card.list[i][2])){
 					lib.card.list.splice(i--,1);
 				}
 			}

@@ -581,6 +581,7 @@ character.standard={
 			audio:2,
 			audioname:['liushan'],
 			enable:'chooseToUse',
+			usable:20,
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
 				if(!player.isZhu) return false;
