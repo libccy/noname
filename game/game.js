@@ -6060,14 +6060,16 @@
 					player.changeHp(-num,false);
 					if(event.animate!==false){
 						player.$damage(source);
-						if(lib.config.animation&&!lib.config.low_performance){
-							if(event.nature=='fire'){
-								player.$fire();
-							}
-							else if(event.nature=='thunder'){
-								player.$thunder();
-							}
-						}
+                        game.broadcastAll(function(nature,player){
+                            if(lib.config.animation&&!lib.config.low_performance){
+    							if(nature=='fire'){
+    								player.$fire();
+    							}
+    							else if(nature=='thunder'){
+    								player.$thunder();
+    							}
+    						}
+                        },event.nature,player);
 						player.$damagepop(-num,event.nature);
 					}
 					// if(source){
@@ -6754,7 +6756,7 @@
                     lib.chatHistory.push(info);
                     if(_status.addChatEntry){
                         if(_status.addChatEntry._origin.parentNode){
-                            _status.addChatEntry(info);
+                            _status.addChatEntry(info,false);
                         }
                         else{
                             delete _status.addChatEntry;
@@ -9715,25 +9717,22 @@
 					this.playerfocus(1500);
 					var that=this;
 					setTimeout(function(){
-						if(lib.config.animation&&!lib.config.low_performance){
-							if(lib.config.mode=='chess'){
-								that['$'+type+'2'](1200);
-							}
-							else{
-								that['$'+type](1200);
-							}
-						}
-						if(name){
-							that.$fullscreenpop(name,color);
-						}
+                        game.broadcastAll(function(that,type,name){
+                            if(lib.config.animation&&!lib.config.low_performance){
+    							if(lib.config.mode=='chess'){
+    								that['$'+type+'2'](1200);
+    							}
+    							else{
+    								that['$'+type](1200);
+    							}
+    						}
+    						if(name){
+    							that.$fullscreenpop(name,color);
+    						}
+                        },that,type,name);
 					},300);
 				},
 				$fire:function(){
-                    game.broadcast(function(player){
-                        if(!lib.config.low_performance){
-                            player.$fire();
-                        }
-                    },this);
 					game.addVideo('flame',this,'fire');
 					var left,top;
 					if(lib.config.mode=='chess'){
@@ -9749,11 +9748,6 @@
 						top+this.offsetHeight-20,700,'fire');
 				},
 				$thunder:function(){
-                    game.broadcast(function(player){
-                        if(!lib.config.low_performance){
-                            player.$thunder();
-                        }
-                    },this);
 					game.addVideo('flame',this,'thunder');
 					var left,top;
 					if(lib.config.mode=='chess'){
@@ -11591,7 +11585,7 @@
                         for(var i in state.players){
                             var info=state.players[i];
                             var player=ui.create.player(ui.arena).animate('start');
-        					player.dataset.position=info.position<pos?info.position-pos+parseInt(state.number):info.position-pos;
+        					player.dataset.position=(info.position<pos)?info.position-pos+parseInt(state.number):info.position-pos;
                             player.init(info.name,info.name2);
                             player.playerid=i;
                             player.nickname=info.nickname;
@@ -16068,6 +16062,9 @@
 		expandSkills:function(skills){
 			var skills2=[];
 			for(var i=0;i<skills.length;i++){
+                if(!get.info(skills[i])){
+                    console.log(skills[i]);
+                }
 				if(get.info(skills[i]).group) skills2=skills2.concat(get.info(skills[i]).group);
 			}
 			for(var i=0;i<skills2.length;i++){
@@ -20896,7 +20893,7 @@
                 uiintro.contentContainer.style.overflow='hidden';
 
                 var input;
-                var addEntry=function(info){
+                var addEntry=function(info,clear){
                     if(list._chatempty){
                         list.innerHTML='';
                         delete list._chatempty;
@@ -20906,7 +20903,6 @@
                     list.appendChild(node);
                     list.scrollTop=list.scrollHeight;
     				uiintro.style.height=uiintro.content.scrollHeight+'px';
-                    if(input) input.value='';
                 }
                 _status.addChatEntry=addEntry;
                 _status.addChatEntry._origin=uiintro;
@@ -20953,6 +20949,7 @@
                         else{
                             lib.element.player.chat.call(player,str);
                         }
+                        input.value='';
                     }
                     e.stopPropagation();
                 }
