@@ -20,7 +20,7 @@ mode.identity={
 				lib.configOL.number=lib.configOL.player_number;
 			}
 			lib.configOL.characterPack=['standard'];
-			lib.configOL.cardPack=['standard','ex','extra'];
+			lib.configOL.cardPack=['standard','ex','extra','refresh','mingzhong'];
 			lib.configOL.mode='identity';
 			var cardPackList=[];
 			for(var i=0;i<lib.configOL.cardPack.length;i++){
@@ -1099,6 +1099,7 @@ mode.identity={
 	element:{
 		player:{
 			$dieAfter:function(){
+				if(_status.video) return;
 				if(!this.node.dieidentity){
 					var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
 					ui.refresh(node);

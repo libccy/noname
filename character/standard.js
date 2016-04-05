@@ -150,7 +150,8 @@ character.standard={
 				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？').set('ai',function(card){
 					var trigger=_status.event.getParent()._trigger;
 					var player=_status.event.player;
-					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
+					var judging=_status.event.judging;
+					var result=trigger.judge(card)-trigger.judge(judging);
 					var attitude=ai.get.attitude(player,trigger.player);
 					if(attitude==0||result==0) return 0;
 					if(attitude>0){
@@ -159,7 +160,7 @@ character.standard={
 					else{
 						return -result-ai.get.value(card)/2;
 					}
-				});
+				}).set('judging',trigger.player.judging[0]);
 				"step 1"
 				if(result.bool){
 					player.respond(result.cards,'highlight');
@@ -171,7 +172,12 @@ character.standard={
 				if(result.bool){
 					player.logSkill('guicai');
 					if(trigger.player.judging[0].clone){
-						trigger.player.judging[0].clone.delete();
+						trigger.player.judging[0].clone.classList.remove('thrownhighlight');
+						game.broadcast(function(card){
+							if(card.clone){
+								card.clone.classList.remove('thrownhighlight');
+							}
+						},trigger.player.judging[0]);
 						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 					}
 					ui.discardPile.appendChild(trigger.player.judging[0]);

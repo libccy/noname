@@ -175,7 +175,7 @@ character.hearth={
 					}
 					if(target){
 						player.line(target,'green');
-						player.markSkillCharacter(target,get.translation(link),lib.translate[link+'_info'],'maoxian');
+						player.markSkillCharacter('maoxian',target,get.translation(link),lib.translate[link+'_info']);
 					}
 					player.checkMarks();
 					game.delay();

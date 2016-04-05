@@ -4257,8 +4257,8 @@
 										ui.click.cancel();
 										event.aiexclude.add(skill);
                                         var info=get.info(skill);
-                                        if(info.aiexclude){
-                                            event.aiexclude.add(info.aiexclude);
+                                        if(info.sourceSkill){
+                                            event.sourceSkill.add(info.aiexclude);
                                         }
 									}
 									else{
@@ -4292,7 +4292,7 @@
                                 if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
                                 var dialog=info.chooseButton.dialog(event,player);
                                 var next=player.chooseButton(dialog);
-                                next.set('ai',info.chooseButton.check||function(){return 0;});
+                                next.set('ai',info.chooseButton.check||function(){return 1;});
                                 next.set('filterButton',info.chooseButton.filter||function(){return true;});
                                 event.buttoned=event.result.skill;
                             }
@@ -4303,7 +4303,7 @@
                         if(result.bool){
                             var info=get.info(event.buttoned).chooseButton;
                             lib.skill[event.buttoned+'_backup']=info.backup(result.links,player);
-                            lib.skill[event.buttoned+'_backup'].aiexclude=event.buttoned;
+                            lib.skill[event.buttoned+'_backup'].sourceSkill=event.buttoned;
                             if(game.online){
                                 event._sendskill=[event.buttoned+'_backup',lib.skill[event.buttoned+'_backup']];
                             }
@@ -5385,6 +5385,15 @@
 							else{
 								player.stat[player.stat.length-1].skill[event.skill]++;
 							}
+                            var sourceSkill=get.info(event.skill).sourceSkill;
+                            if(sourceSkill){
+                                if(player.stat[player.stat.length-1].skill[sourceSkill]==undefined){
+        							player.stat[player.stat.length-1].skill[sourceSkill]=1;
+        						}
+        						else{
+        							player.stat[player.stat.length-1].skill[sourceSkill]++;
+        						}
+                            }
 						}
 					}
 					"step 1"
@@ -5568,6 +5577,15 @@
 						else{
 							player.stat[player.stat.length-1].skill[skill]++;
 						}
+                        var sourceSkill=get.info(skill).sourceSkill;
+                        if(sourceSkill){
+                            if(player.stat[player.stat.length-1].skill[sourceSkill]==undefined){
+    							player.stat[player.stat.length-1].skill[sourceSkill]=1;
+    						}
+    						else{
+    							player.stat[player.stat.length-1].skill[sourceSkill]++;
+    						}
+                        }
 					}
 					if(player.stat[player.stat.length-1].allSkills==undefined){
 						player.stat[player.stat.length-1].allSkills=1;
@@ -5790,6 +5808,15 @@
 						if(event.skill) name=get.translation(event.skill)+'：';
 						if(event.card) name+=get.translation(event.card.name);
 					}
+                    if(event.highlight){
+                        game.broadcast(function(cards){
+                            for(var i=0;i<cards.length;i++){
+                                if(cards[i].clone){
+                                    cards[i].clone.classList.add('thrownhighlight');
+                                }
+                            }
+                        },cards);
+                    }
 					event.trigger('respond');
 					game.delayx(0.5);
 				},
@@ -6213,6 +6240,11 @@
 						while(player.node.marks.childNodes.length){
 							player.node.marks.firstChild.remove();
 						}
+                        game.broadcast(function(player){
+                            while(player.node.marks.childNodes.length){
+    							player.node.marks.firstChild.remove();
+    						}
+                        },player);
 					}
 					for(var i in player.tempSkills){
 						player.skills.remove(i);
@@ -7141,7 +7173,13 @@
 					switch(get.itemtype(this.storage[skill])){
 						case 'cards':game.addVideo('storage',this,[skill,get.cardsInfo(this.storage[skill]),'cards']);break;
 						case 'card':game.addVideo('storage',this,[skill,get.cardInfo(this.storage[skill]),'card']);break;
-						default:game.addVideo('storage',this,[skill,JSON.parse(JSON.stringify(this.storage[skill]))]);
+						default:
+                        try{
+                            game.addVideo('storage',this,[skill,JSON.parse(JSON.stringify(this.storage[skill]))]);
+                        }
+                        catch(e){
+                            console.log(this.storage[skill]);
+                        }
 					}
 				},
 				playerfocus:function(time){
@@ -7206,7 +7244,7 @@
 				chooseToUse:function(use){
 					var next=game.createEvent('chooseToUse');
 					next.player=this;
-					if(arguments.length==1){
+					if(arguments.length==1&&get.objtype(arguments[0])=='object'){
 						for(var i in use){
 							next[i]=use[i];
 						}
@@ -8499,33 +8537,43 @@
 					else{
 						game.addVideo('markSkill',this,[name]);
 					}
-					if(!info){
-						if(this.marks[name]){
-							return this;
-						}
-						if(lib.skill[name]){
-							info=lib.skill[name].intro;
-						}
-						if(!info){
-							return this;
-						}
-					}
-					if(this.marks[name]){
-						this.marks[name].info=info;
-					}
-					else{
-						if(card){
-							this.marks[name]=this.mark(card,info,name);
-						}
-						else{
-							this.marks[name]=this.mark(name,info);
-						}
-					}
-					this.updateMarks();
+                    game.broadcastAll(function(storage,player,name,info,card){
+                        player.storage[name]=storage;
+                        if(!info){
+    						if(player.marks[name]){
+    							player.updateMarks();
+                                return;
+    						}
+    						if(lib.skill[name]){
+    							info=lib.skill[name].intro;
+    						}
+    						if(!info){
+    							return;
+    						}
+    					}
+    					if(player.marks[name]){
+    						player.marks[name].info=info;
+    					}
+    					else{
+    						if(card){
+    							player.marks[name]=player.mark(card,info,name);
+    						}
+    						else{
+    							player.marks[name]=player.mark(name,info);
+    						}
+    					}
+                        player.updateMarks();
+                    },this.storage[name],this,name,info,card);
 					return this;
 				},
 				unmarkSkill:function(name){
 					game.addVideo('unmarkSkill',this,name);
+                    game.broadcast(function(player,name){
+                        if(player.marks[name]){
+                            player.marks[name].delete();
+                            delete player.marks[name];
+                        }
+                    },this,name);
 					if(this.marks[name]){
 						this.marks[name].delete();
 						delete this.marks[name];
@@ -8545,41 +8593,43 @@
 						}
 					}
 				},
-				markSkillCharacter:function(target,name,content,id){
+				markSkillCharacter:function(id,target,name,content){
 					if(typeof target=='object'){
 						target=target.name;
 					}
-					if(this.marks[id]){
-						if(this.marks[id]._name==target){
-							return this;
-						}
-						this.marks[id].name=name+'_charactermark';
-						this.marks[id]._name=target;
-						this.marks[id].info={
-							name:name,
-							content:content
-						};
-						this.marks[id].setBackground(target,'character');
-						game.addVideo('changeMarkCharacter',this,{
-							id:id,
-							name:name,
-							content:content,
-							target:target
-						});
-					}
-					else{
-						this.marks[id]=this.markCharacter(target,{
-							name:name,
-							content:content
-						});
-						this.marks[id]._name=target;
-						game.addVideo('markCharacter',this,{
-							name:name,
-							content:content,
-							id:id,
-							target:target
-						});
-					}
+                    game.broadcastAll(function(player,target,name,content,id){
+                        if(player.marks[id]){
+    						if(player.marks[id]._name==target){
+    							return player;
+    						}
+    						player.marks[id].name=name+'_charactermark';
+    						player.marks[id]._name=target;
+    						player.marks[id].info={
+    							name:name,
+    							content:content
+    						};
+    						player.marks[id].setBackground(target,'character');
+    						game.addVideo('changeMarkCharacter',player,{
+    							id:id,
+    							name:name,
+    							content:content,
+    							target:target
+    						});
+    					}
+    					else{
+    						player.marks[id]=player.markCharacter(target,{
+    							name:name,
+    							content:content
+    						});
+    						player.marks[id]._name=target;
+    						game.addVideo('markCharacter',player,{
+    							name:name,
+    							content:content,
+    							id:id,
+    							target:target
+    						});
+    					}
+                    },this,target,name,content,id);
 					return this;
 				},
 				markCharacter:function(name,info,learn,learn2){
@@ -13504,7 +13554,7 @@
 			}
 		},
 		addVideo:function(type,player,content){
-			if(_status.video) return;
+			if(_status.video||game.online) return;
 			if(!_status.videoInited) return;
 			if(type=='storage'&&player&&player.updateMarks){
 				player.updateMarks();
@@ -23011,6 +23061,14 @@
 		},
 	};
 	var get={
+        mode:function(){
+            if(_status.connectMode){
+                return lib.configOL.mode;
+            }
+            else{
+                return lib.config.mode;
+            }
+        },
         idDialog:function(id){
             for(var i=0;i<ui.dialogs.length;i++){
                 if(ui.dialogs[i].videoId==id){
@@ -23037,11 +23095,12 @@
 				skill=player;
 				player=null;
 			}
-			if(lib.config.mode=='identity'){
+            var mode=get.mode();
+			if(mode=='identity'){
 				if(skill&&!game.zhu.get('s').contains(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}
-			else if(lib.config.mode=='versus'&&_status.mode=='four'){
+			else if(mode=='versus'&&_status.mode=='four'){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isZhu){
 						if(skill&&!(game.players[i].get('s').contains(skill))) continue;
@@ -23382,7 +23441,8 @@
 			return 0;
 		},
 		objtype:function(obj){
-			if(Object.prototype.toString.call(obj) === '[object Array]') return 'array';
+            if(Object.prototype.toString.call(obj) === '[object Array]') return 'array';
+			if(Object.prototype.toString.call(obj) === '[object Object]') return 'object';
 			if(Object.prototype.toString.call(obj) === '[object HTMLDivElement]') return 'div';
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableElement]') return 'table';
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableRowElement]') return 'tr';
@@ -23663,7 +23723,7 @@
 					}
 				}
 				if(get.itemtype(str)=='card'&&str.suit&&str.number){
-					str2+='【'+get.translation(get.suit(str))+get.number(str)+'】'
+					str2+='【'+get.translation(str.suit)+str.number+'】'
 				}
 				return str2;
 			}

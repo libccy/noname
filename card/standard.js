@@ -228,13 +228,14 @@ card.standard={
 						else if(nh==target.hp+1&&target.hp>=2&&target.num('h','tao')<=1){
 							keep=true;
 						}
+						var mode=get.mode();
 						if(target.hp>=2&&keep&&target.hasFriend()){
 							if(target.hp>2) return 0;
 							if(target.hp==2){
 								for(var i=0;i<game.players.length;i++){
 									if(target!=game.players[i]&&ai.get.attitude(target,game.players[i])>=3){
 										if(game.players[i].hp<=1) return 0;
-										if(lib.config.mode=='identity'&&game.players[i].isZhu&&game.players[i].hp<=2) return 0;
+										if(mode=='identity'&&game.players[i].isZhu&&game.players[i].hp<=2) return 0;
 									}
 								}
 							}
@@ -243,7 +244,7 @@ card.standard={
 						var att=ai.get.attitude(player,target);
 						if(att<3&&att>=0&&player!=target) return 0;
 						var tri=_status.event.getParent()._trigger;
-						if(lib.config.mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
+						if(mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
 								var num=0;
 								for(var i=0;i<game.players.length;i++){
@@ -256,12 +257,12 @@ card.standard={
 								return 0;
 							}
 						}
-						if(lib.config.mode=='identity'&&player.identity=='zhu'&&target.identity=='nei'){
+						if(mode=='identity'&&player.identity=='zhu'&&target.identity=='nei'){
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='zhong'){
 								return 0;
 							}
 						}
-						if(lib.config.mode=='stone'&&target.isMin()&&
+						if(mode=='stone'&&target.isMin()&&
 						player!=target&&tri&&tri.name=='dying'&&player.side==target.side&&
 						tri.source!=target.getEnemy()){
 							return 0;
@@ -638,7 +639,7 @@ card.standard={
 						}
 						if(num>1) return 0;
 						var nh=target.num('h');
-						if(lib.config.mode=='identity'){
+						if(get.mode()=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
 						}
 						if(nh==0) return -2;
@@ -698,7 +699,7 @@ card.standard={
 						}
 						if(num>1) return 0;
 						var nh=target.num('h');
-						if(lib.config.mode=='identity'){
+						if(get.mode()=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
 						}
 						if(nh==0) return -2;
@@ -1147,7 +1148,8 @@ card.standard={
 						}
 						if(num>0) return num;
 						if(num==0){
-							if(lib.config.mode=='identity'){
+							var mode=get.mode();
+							if(mode=='identity'){
 								if(target.identity=='nei') return 1;
 								var situ=ai.get.situation();
 								if(target.identity=='fan'){
@@ -1157,7 +1159,7 @@ card.standard={
 									if(situ<-1) return 1;
 								}
 							}
-							else if(lib.config.mode=='guozhan'){
+							else if(mode=='guozhan'){
 								if(target.identity=='ye') return 1;
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].identity=='unknown') return -1;
