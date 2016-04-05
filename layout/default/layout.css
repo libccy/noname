@@ -62,6 +62,9 @@ table{table-layout: fixed;}
 	position: relative;
 	transition: all 0.5s;
 }
+#splash>div:hover{
+	transform: scale(1.02);
+}
 #splash>div.hidden{
 	transform: translateY(-200px);
 }

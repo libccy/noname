@@ -3768,14 +3768,14 @@
 						game.saveConfig('mode',this.link);
 						splash.delete();
 						delete window.inSplash;
-						var scriptnode=lib.init.js(lib.assetURL+'mode',lib.config.mode);
-						if(scriptnode){
-							scriptnode.onload=proceed;
-						}
-						else{
-							proceed();
-						}
+						lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
 					}
+                    var downNode=function(){
+                        this.classList.add('glow');
+                    }
+                    var upNode=function(){
+                        this.classList.remove('glow');
+                    }
 					var splash=ui.create.div('#splash',document.body);
 					for(var i=0;i<lib.config.all.mode.length;i++){
 						var node=ui.create.div(splash,'.hidden',clickNode);
@@ -3787,6 +3787,16 @@
 						else{
 							ui.create.div(node,'.avatar').setBackgroundDB(lib.mode[lib.config.all.mode[i]].splash);
 						}
+                        if(lib.config.touchscreen){
+                            node.addEventListener('touchstart',downNode);
+                            node.addEventListener('touchend',upNode);
+                            node.addEventListener('mouseleave',upNode);
+                        }
+                        else{
+                            node.addEventListener('mousedown',downNode);
+                            node.addEventListener('mouseup',upNode);
+                            node.addEventListener('mouseleave',upNode);
+                        }
 						ui.refresh(node);
 						setTimeout((function(node){
 							return function(){
@@ -4246,6 +4256,10 @@
 										var skill=event.skill;
 										ui.click.cancel();
 										event.aiexclude.add(skill);
+                                        var info=get.info(skill);
+                                        if(info.aiexclude){
+                                            event.aiexclude.add(info.aiexclude);
+                                        }
 									}
 									else{
 										get.card().aiexclude();
@@ -4271,21 +4285,55 @@
 						}
                     }
                     "step 2"
+                    if(event.result){
+                        if(event.result.skill){
+                            var info=get.info(event.result.skill);
+                            if(info&&info.chooseButton){
+                                if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
+                                var dialog=info.chooseButton.dialog(event,player);
+                                var next=player.chooseButton(dialog);
+                                next.set('ai',info.chooseButton.check||function(){return 0;});
+                                next.set('filterButton',info.chooseButton.filter||function(){return true;});
+                                event.buttoned=event.result.skill;
+                            }
+                        }
+                    }
+                    "step 3"
+                    if(event.buttoned){
+                        if(result.bool){
+                            var info=get.info(event.buttoned).chooseButton;
+                            lib.skill[event.buttoned+'_backup']=info.backup(result.links,player);
+                            lib.skill[event.buttoned+'_backup'].aiexclude=event.buttoned;
+                            if(game.online){
+                                event._sendskill=[event.buttoned+'_backup',lib.skill[event.buttoned+'_backup']];
+                            }
+                            event.backup(event.buttoned+'_backup');
+                            if(info.prompt){
+                                event.openskilldialog=info.prompt(result.links,player);
+                            }
+                        }
+                        else{
+                            event.aiexclude.add(event.buttoned);
+                        }
+                        event.goto(0);
+                        delete event.buttoned;
+                    }
+                    "step 4"
                     delete _status.noclearcountdown;
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
 					}
-                    if(event.onresult){
-                        event.onresult(event.result);
-                    }
 					if(event.result.bool&&!game.online&&!event.nouse){
                         player.useResult(event.result,event);
 					}
+                    else if(event._sendskill){
+                        event.result._sendskill=event._sendskill;
+                    }
 					if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
                     if(!_status.noclearcountdown){
                         game.stopCountChoose();
                     }
-                    "step 3"
+                    "step 5"
                     if(event._result&&event.result){
                         event.result.result=event._result;
                     }
@@ -5420,6 +5468,9 @@
 						next.preResult=event.preResult;
 					}
 					"step 5"
+                    if(event._result){
+                        event.result=event._result;
+                    }
 					delete player.using;
 					if(document.getElementsByClassName('thrown').length){
 						if(event.delayx!==false) game.delayx();
@@ -5435,9 +5486,6 @@
 						ui.tempnowuxie.close();
 						delete ui.tempnowuxie;
 					}
-                    if(event._result){
-                        event.result=event._result;
-                    }
 				},
 				useSkill:function(){
 					"step 0"
@@ -7698,8 +7746,20 @@
 				},
                 useResult:function(result,event){
                     event=event||_status.event;
-                    if(result.skill&&get.info(result.skill).direct){
-                        _status.noclearcountdown=true;
+                    if(result._sendskill){
+                        lib.skill[result._sendskill[0]]=result._sendskill[1];
+                    }
+                    if(event.onresult){
+                        event.onresult(result);
+                    }
+                    if(result.skill){
+                        var info=get.info(result.skill);
+                        if(info.onuse){
+                            info.onuse(result,this);
+                        }
+                        if(info.direct){
+                            _status.noclearcountdown=true;
+                        }
                     }
                     if(event.logSkill){
                         if(typeof event.logSkill=='string'){
@@ -10234,6 +10294,7 @@
                     var skills={
                         global:lib.skill.global
                     };
+                    var skillinfo={};
                     for(var i in lib.playerOL){
                         skills[i]={
                             skills:lib.playerOL[i].skills,
@@ -10243,7 +10304,12 @@
                             storage:lib.playerOL[i].storage,
                         }
                     }
-                    this.player.send(function(name,args,set,event,stat,skills){
+                    for(var i in lib.skill){
+                        if(lib.skill[i].chooseButton&&lib.skill[i].enable){
+                            skillinfo[i]=lib.skill[i].chooseButton;
+                        }
+                    }
+                    this.player.send(function(name,args,set,event,stat,skills,skillinfo){
                         for(var i in skills){
                             if(i=='global'){
                                 lib.skill.global=skills[i];
@@ -10254,6 +10320,12 @@
                                 }
                             }
                         }
+                        for(var i in skillinfo){
+                            if(!lib.skill[i]){
+                                lib.skill[i]={};
+                            }
+                            lib.skill[i].chooseButton=skillinfo[i];
+                        }
                         game.me.stat=[stat];
                         var next=game.me[name].apply(game.me,args);
                         for(var i=0;i<set.length;i++){
@@ -10263,7 +10335,7 @@
                         game.resume();
                     },this.name,this._args||[],this._set,
                     get.stringifiedResult(this.parent,3),
-                    this.player.getStat(),skills);
+                    this.player.getStat(),skills,skillinfo);
                     this.player.wait();
                     game.pause();
                 },
@@ -11531,7 +11603,7 @@
                         game.createEvent('game',false).content=lib.init.startOnline;
                         game.loop();
                         game.send('reinited');
-                        if(!observe&&game.me&&game.me.isDead){
+                        if(!observe&&game.me&&game.me.isDead()){
                             ui.exit=ui.create.control('退出联机',function(){
                                 game.saveConfig('reconnect_info');
                                 game.reload();
@@ -14812,7 +14884,7 @@
 						if(info.filter&&info.filter(event,player)==false) enable=false;
 						if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player)) enable=false;
 						if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
-						if(event.aiexclude.contains(skills2[i])) enable=false;
+						if(!event.isMine()&&event.aiexclude.contains(skills2[i])) enable=false;
 						if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
 					}
 					if(enable){
@@ -23110,6 +23182,9 @@
         },
         funcInfoOL:function(func){
             if(typeof func=='function'){
+                if(func._filter_args){
+                    return '_noname_func:'+JSON.stringify(get.stringifiedResult(func._filter_args,3));
+                }
                 return '_noname_func:'+func.toString();
             }
             return '';
@@ -23121,6 +23196,9 @@
             }
             catch(e){
                 return function(){};
+            }
+            if(Array.isArray(func)){
+                func=get.filter.apply(this,get.parsedResult(func));
             }
             return func;
         },
@@ -23683,7 +23761,7 @@
 		filter:function(filter,i){
 			if(typeof filter=='function') return filter;
 			if(i==undefined) i=0;
-			return function(){
+			var result=function(){
 				if(filter==arguments[i]) return true;
 				for(var j in filter){
 					if(filter.hasOwnProperty(j)){
@@ -23742,6 +23820,8 @@
 				}
 				return true;
 			}
+            result._filter_args=[filter,i];
+            return result;
 		},
 		cardCount:function(card,player){
 			var num;

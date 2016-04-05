@@ -2214,7 +2214,7 @@ character.sp={
 			},
 			content:function(){
 				player.storage.mozhi.add(trigger.card);
-				player.markSkill('mozhi');
+				if(player.get('s').contains('mozhi')) player.markSkill('mozhi');
 			}
 		},
 		chenqing2:{},

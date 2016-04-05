@@ -2749,7 +2749,6 @@ character.shenhua={
 				player.storage.buqu.push(event.card);
 				game.addVideo('storage',player,['buqu',get.cardsInfo(player.storage.buqu),'cards']);
 				player.showCards(player.storage.buqu,'不屈')
-				game.log(player,'的不屈牌为',player.storage.buqu);
 				player.markSkill('buqu');
 				"step 1"
 				for(var i=0;i<player.storage.buqu.length-1;i++){

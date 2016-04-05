@@ -1383,6 +1383,12 @@ card.standard={
 				event.state=true;
 				event.card=trigger.card;
 				event._global_waiting=true;
+				event.filterCard=function(card,player){
+					if(card.name!='wuxie') return false;
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					if(mod!='unchanged') return mod;
+					return true;
+				};
 				event.send=function(player,state,isJudge,card,source,target,targets,id){
 					state=state?1:-1;
 					var str='';
