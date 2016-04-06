@@ -3748,7 +3748,7 @@
 					if(lib.config.cheat&&!_status.connectMode){
                         cheat.i();
                     }
-                    else if(!lib.config.debug){
+                    else{
 						lib.cheat=window.cheat;
 						delete window.cheat;
 					}
@@ -11533,6 +11533,8 @@
                         ui.ipbutton.delete();
                         delete ui.ipbutton;
                     }
+                    clearTimeout(_status.event.createNodeTimeout);
+                    
                     var proceed=function(){
                         game.loadModeAsync(config.mode,function(mode){
                             for(var i in mode.ai){
@@ -11591,6 +11593,7 @@
                         ui.ipbutton.delete();
                         delete ui.ipbutton;
                     }
+                    clearTimeout(_status.event.createNodeTimeout);
                     game.online=true;
                     game.ip=ip;
                     if(observe){
@@ -20045,10 +20048,6 @@
 						var button1,button2;
 
 						game.checkForUpdate=function(forcecheck){
-                            if(lib.config.debug){
-                                alert('不能在开发模式下更新');
-                                return;
-                            }
 							if(button1.disabled){
 								return;
 							}
@@ -20166,10 +20165,6 @@
 							}
 						};
 						var checkForAssetUpdate=function(){
-                            if(lib.config.debug){
-                                alert('不能在开发模式下更新');
-                                return;
-                            }
 							if(button2.disabled){
 								return;
 							}
