@@ -1102,7 +1102,6 @@ mode.identity={
 		player:{
 			$dieAfter:function(){
 				if(_status.video) return;
-				alert(1)
 				if(!this.node.dieidentity){
 					var node=ui.create.div('.damage.dieidentity',get.translation(this.identity+'2'),this);
 					ui.refresh(node);

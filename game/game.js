@@ -11664,6 +11664,10 @@
                                 if(lib.element.player.$dieAfter){
                                     lib.element.player.$dieAfter.call(player);
                                 }
+                                game.dead.push(player);
+                            }
+                            else{
+                                game.players.push(player);
                             }
                             if(info.linked){
                                 player.classList.add('linked');
@@ -11694,7 +11698,6 @@
                                 player.setIdentity('cai');
                             }
                             player.update();
-                            game.players.push(player);
                         }
                         game.arrangePlayers();
                         ui.create.me(true);
