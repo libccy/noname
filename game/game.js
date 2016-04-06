@@ -11547,7 +11547,7 @@
                                 game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
                                 game.updateState=lib.init.eval(mode.game.updateState);
                                 if(mode.element&&mode.element.player&&mode.element.player.$dieAfter){
-                                    lib.element.player.$dieAfter=mode.element.player.$dieAfter;
+                                    lib.element.player.$dieAfter=lib.init.eval(mode.element.player.$dieAfter);
                                 }
                             }
                             _status.event={
@@ -11615,11 +11615,12 @@
                             game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
                             game.updateState=lib.init.eval(mode.game.updateState);
                             if(mode.element&&mode.element.player&&mode.element.player.$dieAfter){
-                                lib.element.player.$dieAfter=mode.element.player.$dieAfter;
+                                lib.element.player.$dieAfter=lib.init.eval(mode.element.player.$dieAfter);
                             }
                         }
                         state=get.parsedResult(state);
                         game.players=[];
+                        game.dead=[];
                         for(var i in lib.characterPack){
             				for(var j in lib.characterPack[i]){
             					lib.character[j]=lib.character[j]||lib.characterPack[i][j];
@@ -11645,6 +11646,9 @@
                             player.nickname=info.nickname;
                             player.identity=info.identity;
                             player.identityShown=info.identityShown;
+                            player.hp=info.hp;
+                            player.maxHp=info.maxHp;
+                            player.hujia=info.hujia;
                             player.setNickname();
                             if(info.dead){
                                 player.classList.add('dead');
@@ -19676,7 +19680,7 @@
 							node.link=page;
 							page.classList.add('menu-sym');
                             menuUpdates.push(function(){
-								if(_status.connectMode){
+								if(_status.connectMode&&!lib.config.debug){
 									node.classList.add('off');
                                     if(node.classList.contains('active')){
                                         node.classList.remove('active');

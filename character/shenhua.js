@@ -2027,6 +2027,7 @@ character.shenhua={
 			},
 			filter:function(event,player){
 				if(event.type!='dying') return false;
+				if(player!=event.dying) return false;
 				if(player.storage.niepan) return false;
 			},
 			content:function(){
