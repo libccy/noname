@@ -3745,7 +3745,7 @@
                     else if(lib.config.mode=='connect'){
                         _status.connectMode=true;
                     }
-					if(lib.config.cheat&&!_status.connectMode){
+					if(lib.config.cheat&&(!_status.connectMode||lib.config.debug)){
                         cheat.i();
                     }
                     else{
@@ -4232,8 +4232,8 @@
                                 }
                                 return;
                             }
-                            if(!_status.connectMode&&lib.config.wuxie_self){
-                                var tw=event.parent._trigger.parent;
+                            if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
+                                var tw=event.getParent()._trigger.parent;
                                 if(tw.player==player&&tw.targets&&tw.targets.length==1){
                                     event.result={
                                         bool:false

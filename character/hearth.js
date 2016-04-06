@@ -73,14 +73,18 @@ character.hearth={
 		tanmi:{
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
-				return player.num('h')==0;
+				return player.num('h')==0&&event.player!=player;
 			},
+			frequent:true,
 			content:function(){
 				'step 0'
 				player.draw(2);
-				player.recover();
 				'step 1'
 				player.chooseToUse();
+				'step 2'
+				if(result.bool){
+					event.goto(1);
+				}
 			}
 		},
 		xueren:{
@@ -3600,7 +3604,7 @@ character.hearth={
 		maoxian2:'冒险',
 		maoxian_info:'出牌阶段限两次，你可以从三个来自其他存活角色的技能中选择一个作为你的技能',
 		tanmi:'探秘',
-		tanmi_info:'在任意一名角色的回合结束阶段，若你没有手牌，你可以摸两张牌并回复一点体力，然后你可以立即使用一张牌',
+		tanmi_info:'在一名其他角色的回合结束阶段，若你没有手牌，你可以摸两张牌并进行一个出牌阶段',
 		yiwen:'轶闻',
 		yiwen_info:'锁定技，每当其他角色于回合内首次使用卡牌指定你为惟一目标，你获得一张此牌的复制',
 		tanbao_old:'探宝',
