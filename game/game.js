@@ -3785,16 +3785,19 @@
 					var clickNode=function(){
                         if(clickedNode) return;
                         clickedNode=true;
-                        this.classList.add('clicked');
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
 						splash.delete();
 						delete window.inSplash;
-                        this.addEventListener('webkitTransitionEnd',function(){
+
+                        var proceed2=function(){
                             if(proceeded) return;
                             proceeded=true;
                             lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
-                        });
+                        };
+                        this.classList.add('clicked');
+                        this.addEventListener('webkitTransitionEnd',proceed2);
+                        setTimeout(proceed2,500);
 					}
                     var downNode=function(){
                         this.classList.add('glow');

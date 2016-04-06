@@ -68,6 +68,7 @@ card.mingzhong={
 						}
 						if(!ok) return 0;
 						if(ui.selected.targets.length==1) return 2;
+						if(target.num('he')==0) return 0;
 						if(player.hasFriend()) return -1;
 						return 0;
 					}
