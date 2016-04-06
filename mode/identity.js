@@ -19,7 +19,7 @@ mode.identity={
 			else{
 				lib.configOL.number=lib.configOL.player_number;
 			}
-			lib.configOL.characterPack=['standard'];
+			lib.configOL.characterPack=['standard','shenhua'];
 			lib.configOL.cardPack=['standard','ex','extra','refresh','mingzhong'];
 			lib.configOL.mode='identity';
 			var cardPackList=[];

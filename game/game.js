@@ -4094,10 +4094,12 @@
 					"step 2"
 					player.phaseUse();
 					"step 3"
-					if(ui.tempnowuxie){
-						ui.tempnowuxie.close();
-						delete ui.tempnowuxie;
-					}
+                    game.broadcastAll(function(){
+                        if(ui.tempnowuxie){
+    						ui.tempnowuxie.close();
+    						delete ui.tempnowuxie;
+    					}
+                    });
 					player.phaseDiscard()
 					if(!player.noPhaseDelay) game.delayx();
 					delete player.using;
@@ -4156,10 +4158,12 @@
 					if(result.bool){
 						event.goto(0);
 					}
-					if(ui.tempnowuxie){
-						ui.tempnowuxie.close();
-						delete ui.tempnowuxie;
-					}
+                    game.broadcastAll(function(){
+                        if(ui.tempnowuxie){
+    						ui.tempnowuxie.close();
+    						delete ui.tempnowuxie;
+    					}
+                    });
 					delete player.using;
 				},
 				phaseDiscard:function(){
@@ -4187,6 +4191,21 @@
                                     bool:false
                                 }
                                 return;
+                            }
+                            if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')){
+                                event.result={
+                                    bool:false
+                                }
+                                return;
+                            }
+                            if(!_status.connectMode&&lib.config.wuxie_self){
+                                var tw=event.parent._trigger.parent;
+                                if(tw.player==player&&tw.targets&&tw.targets.length==1){
+                                    event.result={
+                                        bool:false
+                                    }
+                                    return;
+                                }
                             }
                         }
                         var ok=game.check();
@@ -4258,7 +4277,7 @@
 										event.aiexclude.add(skill);
                                         var info=get.info(skill);
                                         if(info.sourceSkill){
-                                            event.sourceSkill.add(info.aiexclude);
+                                            event.aiexclude.add(info.sourceSkill);
                                         }
 									}
 									else{
@@ -4477,25 +4496,32 @@
 					}
 					game.log(player,'对',target,'发起拼点');
                     "step 1"
+                    var sendback=function(){
+                        if(_status.event!=event){
+                            return function(){
+                                event.resultOL=_status.event.resultOL;
+                            };
+                        }
+                    };
                     if(player.isOnline()){
-                        player.wait();
+                        player.wait(sendback);
                         event.ol=true;
-                        player.send(function(){
+                        player.send(function(ai){
                             game.me.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=ai;
                             game.resume();
-                        },ai);
+                        },event.ai);
                     }
                     else{
                         event.localPlayer=true;
                         player.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=event.ai;
                     }
                     if(target.isOnline()){
-                        target.wait();
+                        target.wait(sendback);
                         event.ol=true;
-                        target.send(function(){
+                        target.send(function(ai){
                             game.me.chooseCard('请选择拼点牌',true).set('glow_result',true).ai=ai;
                             game.resume();
-                        },ai);
+                        },event.ai);
                     }
                     else{
                         event.localTarget=true;
@@ -5353,7 +5379,16 @@
 							});
 						}
 					}
+                    event.id=get.id();
 					event.trigger('useCard');
+                    event._oncancel=function(){
+                        game.broadcastAll(function(id){
+                            if(ui.tempnowuxie&&ui.tempnowuxie._origin==id){
+        						ui.tempnowuxie.close();
+        						delete ui.tempnowuxie;
+        					}
+                        },event.id);
+                    };
 					if(get.type(card)!='equip'){
 						var str='';
 						if(targets.length){
@@ -5491,10 +5526,7 @@
 					if(event.card.name!='wuxie'){
                         game.broadcastAll(ui.clear);
                     }
-					if(ui.tempnowuxie&&ui.tempnowuxie._origin==event){
-						ui.tempnowuxie.close();
-						delete ui.tempnowuxie;
-					}
+                    event._oncancel();
 				},
 				useSkill:function(){
 					"step 0"
@@ -6315,10 +6347,6 @@
 						if(source==game.me||source.isUnderControl()){
 							_status.coin+=10;
 						}
-					}
-					if(ui.tempnowuxie&&ui.tempnowuxie._origin&&ui.tempnowuxie._origin.player==player){
-						ui.tempnowuxie.close();
-						delete ui.tempnowuxie;
 					}
 				},
 				equip:function(){
@@ -9717,7 +9745,7 @@
 					this.playerfocus(1500);
 					var that=this;
 					setTimeout(function(){
-                        game.broadcastAll(function(that,type,name){
+                        game.broadcastAll(function(that,type,name,color){
                             if(lib.config.animation&&!lib.config.low_performance){
     							if(lib.config.mode=='chess'){
     								that['$'+type+'2'](1200);
@@ -9729,7 +9757,7 @@
     						if(name){
     							that.$fullscreenpop(name,color);
     						}
-                        },that,type,name);
+                        },that,type,name,color);
 					},300);
 				},
 				$fire:function(){
@@ -14195,6 +14223,10 @@
                         game.reload();
                     });
                 }
+                if(ui.tempnowuxie){
+    				ui.tempnowuxie.close();
+    				delete ui.tempnowuxie;
+    			}
                 return;
             }
 			if(lib.config.background_audio){
@@ -14690,6 +14722,9 @@
     							_status.dieClose.shift().close();
     						}
                         });
+                        if(event._oncancel){
+                            event._oncancel();
+                        }
 						event.finish();
 					}
 					else if(player&&player.removed&&event.name!='phaseLoop'){
@@ -22103,6 +22138,7 @@
 					custom.replace.button(this);
 					return;
 				}
+                if(!_status.event.isMine()) return;
 				if(this.classList.contains('selectable')==false) return;
 				if(this.classList.contains('selected')){
 					ui.selected.buttons.remove(this);
@@ -22545,18 +22581,16 @@
 			wuxie:function(){
 				if(this.classList.contains('hidden')) return;
 				this.classList.toggle('glow');
-				if(this.classList.contains('glow')&&
-				(_status.event.getParent().name=='_wuxie1'||_status.event.getParent().name=='_wuxie2')&&
-				_status.event.isMine()&&ui.confirm){
+				if(this.classList.contains('glow')&&_status.event.type=='wuxie'&&
+                _status.event.isMine()&&ui.confirm&&_status.imchoosing){
 					ui.click.cancel(ui.confirm.lastChild);
 				}
 			},
 			tempnowuxie:function(){
 				if(this.classList.contains('hidden')) return;
 				this.classList.toggle('glow');
-				if(this.classList.contains('glow')&&
-				(_status.event.getParent().name=='_wuxie1'||_status.event.getParent().name=='_wuxie2')&&
-				_status.event.isMine()&&ui.confirm){
+				if(this.classList.contains('glow')&&_status.event.type=='wuxie'&&
+				_status.event.isMine()&&ui.confirm&&_status.imchoosing){
 					ui.click.cancel(ui.confirm.lastChild);
 				}
 			},

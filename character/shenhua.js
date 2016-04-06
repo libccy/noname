@@ -1519,13 +1519,13 @@ character.shenhua={
 				player.chooseCardTarget({
 					selectCard:Math.floor(player.num('h')/2),
 					filterTarget:function(card,player,target){
-						return target.num('h')==temp;
+						return target.num('h')==_status.event.temp;
 					},
 					forced:true,
 					ai2:function(target){
-						return ai.get.attitude(player,target);
+						return ai.get.attitude(_status.event.player,target);
 					}
-				});
+				}).set('temp',temp);
 				"step 1"
 				if(result.targets&&result.targets[0]){
 					result.targets[0].gain(result.cards);
@@ -1643,7 +1643,8 @@ character.shenhua={
 				"step 0"
 				player.chooseTarget('是否发动【英魂】？',function(card,player,target){
 					return player!=target;
-				}).ai=function(target){
+				}).set('ai',function(target){
+					var player=_status.event.player;
 					if(player.maxHp-player.hp==1&&target.num('he')==0){
 						return 0;
 					}
@@ -1654,7 +1655,7 @@ character.shenhua={
 						return -1;
 					}
 					return 1;
-				}
+				});
 				"step 1"
 				if(result.bool){
 					player.logSkill('yinghun',result.targets);
@@ -1845,7 +1846,7 @@ character.shenhua={
 				event.current=player.next;
 				"step 1"
 				event.current.animate('target');
-				event.current.chooseToUse({name:'sha'},function(card,player,target){
+				event.current.chooseToUse('乱舞：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
 					if(player==target) return false;
 					if(get.distance(player,target)<=1) return true;
 					for(var i=0;i<game.players.length;i++){
@@ -1853,7 +1854,7 @@ character.shenhua={
 						if(get.distance(player,game.players[i])<get.distance(player,target)) return false;
 					}
 					return true;
-				})
+				});
 				"step 2"
 				if(result.bool==false) event.current.loseHp();
 				if(event.current.next!=player){
@@ -2026,7 +2027,6 @@ character.shenhua={
 			},
 			filter:function(event,player){
 				if(event.type!='dying') return false;
-				if(player!=_status.dying) return false;
 				if(player.storage.niepan) return false;
 			},
 			content:function(){
@@ -2077,10 +2077,18 @@ character.shenhua={
 				player.chooseToCompare(target);
 				"step 1"
 				if(result.bool){
-					player.chooseTarget(function(card,player,target1){
-						return target1!=target&&get.distance(target,target1,'attack')<=1;
-					},true).ai=function(target1){
-						return ai.get.damageEffect(target1,target,player);
+					if(game.hasPlayer(function(player){
+						return player!=target&&get.distance(target,player,'attack')<=1;
+					})){
+						player.chooseTarget(function(card,player,target){
+							var source=_status.event.source;
+							return target!=source&&get.distance(source,target,'attack')<=1;
+						},true).set('ai',function(target){
+							return ai.get.damageEffect(target,_status.event.source,player);
+						}).set('source',target);
+					}
+					else{
+						event.finish();
 					}
 				}
 				else{
@@ -2089,6 +2097,7 @@ character.shenhua={
 				}
 				"step 2"
 				if(result.bool&&result.targets&&result.targets.length){
+					target.line(result.targets[0],'green');
 					result.targets[0].damage(target);
 				}
 			},
@@ -2146,13 +2155,13 @@ character.shenhua={
 				"step 0"
 				player.chooseTarget('是否发动【节命】？',[1,trigger.num],function(card,player,target){
 					return target.num('h')<Math.min(target.maxHp,5);
-				}).ai=function(target){
+				}).set('ai',function(target){
 					var att=ai.get.attitude(_status.event.player,target);
 					if(att>2){
 						return Math.min(5,target.maxHp)-target.num('h');
 					}
 					return att/3;
-				}
+				});
 				"step 1"
 				if(result.bool){
 					player.logSkill('jieming',result.targets);
