@@ -11533,8 +11533,8 @@
                         ui.ipbutton.delete();
                         delete ui.ipbutton;
                     }
-                    clearTimeout(_status.event.createNodeTimeout);
-                    
+                    clearTimeout(_status.createNodeTimeout);
+
                     var proceed=function(){
                         game.loadModeAsync(config.mode,function(mode){
                             for(var i in mode.ai){
@@ -11593,7 +11593,7 @@
                         ui.ipbutton.delete();
                         delete ui.ipbutton;
                     }
-                    clearTimeout(_status.event.createNodeTimeout);
+                    clearTimeout(_status.createNodeTimeout);
                     game.online=true;
                     game.ip=ip;
                     if(observe){

@@ -67,7 +67,7 @@ mode.connect={
                 });
             };
             event.timeout=setTimeout(connect,500);
-            event.createNodeTimeout=setTimeout(createNode,2000);
+            _status.createNodeTimeout=setTimeout(createNode,2000);
         }
         else{
             createNode();
