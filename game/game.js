@@ -14176,8 +14176,9 @@
                     lib.config.recentCharacter.unshift(arguments[i]);
                 }
             }
-            if(lib.config.recentCharacter.length>parseInt(lib.config.recent_character_number)){
-                lib.config.recentCharacter.splice(0,12);
+            var num=parseInt(lib.config.recent_character_number);
+            if(lib.config.recentCharacter.length>num){
+                lib.config.recentCharacter.splice(num);
             }
             game.saveConfig('recentCharacter',lib.config.recentCharacter);
         },
@@ -25377,9 +25378,15 @@
 			a:function(name){
 				if(lib.storage.test&&!name){
 					game.save('test',false);
+                    if(lib.config.mode=='identity'){
+                        game.saveConfig('double_character',false,true);
+                    }
 				}
 				else{
 					game.save('test',name||true);
+                    if(lib.config.mode=='identity'){
+                        game.saveConfig('double_character',true,true);
+                    }
 				}
 				game.reload();
 			},

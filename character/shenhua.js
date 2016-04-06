@@ -2622,6 +2622,9 @@ character.shenhua={
 		liegong:{
 			audio:2,
 			trigger:{player:'shaBegin'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.target)<=0;
+			},
 			filter:function(event,player){
 				var length=event.target.num('h');
 				return (length>=player.hp||length<=get.attackRange(player));

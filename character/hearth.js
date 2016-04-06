@@ -163,6 +163,7 @@ character.hearth={
 					player.skills.remove(link);
 					player.additionalSkills.maoxian=link;
 					player.popup(link);
+					game.log(player,'获得了技能','【'+get.translation(link)+'】')
 					var name=event.map[link];
 					var target;
 					for(var i=0;i<game.players.length;i++){
@@ -173,7 +174,7 @@ character.hearth={
 							target=game.players[i];break;
 						}
 					}
-					if(target){
+					if(target&&(target.name==name||(target.name2==name&&!target.classList.contains('unseen2')))){
 						player.line(target,'green');
 						player.markSkillCharacter('maoxian',target,get.translation(link),lib.translate[link+'_info']);
 					}
