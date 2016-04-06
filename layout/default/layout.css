@@ -60,7 +60,10 @@ table{table-layout: fixed;}
 	margin-left:10px;
 	margin-right:10px;
 	position: relative;
-	transition: all 0.5s;
+}
+#splash>div:not(.hidden){
+	animation: splash 0.5s;
+	-webkit-animation: splash 0.5s;
 }
 #splash>div:hover{
 	transform: scale(1.02);
@@ -1661,6 +1664,8 @@ div:hover>.wunature{
 	from {transform:perspective(1200px) rotateY(-90deg) translateX(150px)}
 	to{transform:perspective(1200px) rotateY(0deg) translateX(0)}
 }
+@keyframes splash{from {opacity: 0;transform: translateY(-200px)}}
+@-webkit-keyframes splash{from {opacity: 0;transform: translateY(-200px)}}
 @keyframes game_start{from {opacity: 0;}}
 @-webkit-keyframes game_start{from {opacity: 0;}}
 @keyframes equip_hover{0% {opacity: 0;}50% {opacity: 0;}}

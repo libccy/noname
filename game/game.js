@@ -3798,14 +3798,20 @@
                     }
 					var splash=ui.create.div('#splash',document.body);
 					for(var i=0;i<lib.config.all.mode.length;i++){
-						var node=ui.create.div(splash,'.hidden',clickNode);
+						var node=ui.create.div('.hidden',splash,clickNode);
 						node.link=lib.config.all.mode[i];
 						ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
 						if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
 							ui.create.div(node,'.avatar').setBackgroundImage('image/splash/'+lib.config.all.mode[i]+'.jpg');
 						}
 						else{
-							ui.create.div(node,'.avatar').setBackgroundDB(lib.mode[lib.config.all.mode[i]].splash);
+							var avatarnode=ui.create.div(node,'.avatar');
+                            var avatarbg=lib.mode[lib.config.all.mode[i]].splash;
+                            lib.onDB((function(avatarnode,avatarbg){
+                                return (function(){
+                                    avatarnode.setBackgroundDB(avatarbg);
+                                });
+                            }(avatarnode,avatarbg)));
 						}
                         if(lib.config.touchscreen){
                             node.addEventListener('touchstart',downNode);
@@ -3817,7 +3823,6 @@
                             node.addEventListener('mouseup',upNode);
                             node.addEventListener('mouseleave',upNode);
                         }
-						ui.refresh(node);
 						setTimeout((function(node){
 							return function(){
 								node.show();
@@ -6487,7 +6492,7 @@
     					else{
     						event.node=player.$throwordered(card.copy(),true);
     					}
-                        lib.cardOL[cardid]=event.node;
+                        if(lib.cardOL) lib.cardOL[cardid]=event.node;
                         event.node.cardid=cardid;
     					event.node.classList.add('thrownhighlight');
     					ui.arena.classList.add('thrownhighlight');
