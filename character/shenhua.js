@@ -1070,7 +1070,8 @@ character.shenhua={
 								}
 								mark.setBackground(currentname,'character');
 							}
-
+							player.addSkill(link);
+							player.skills.remove(link);
 							player.additionalSkills.huashen=link;
 							player.logSkill('huashen2');
 							game.log(player,'获得技能','【'+get.translation(link)+'】');

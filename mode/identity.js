@@ -1043,10 +1043,11 @@ mode.identity={
 							num=3;
 						}
 						else{
-							switch(game.players[i].identity){
-								case 'zhong':num=4;break;
-								case 'nei':num=5;break;
-								default:num=3;break;
+							if(game.players[i].identity=='nei'){
+								num=7;
+							}
+							else{
+								num=5;
 							}
 						}
 						list.push([game.players[i],['选择角色',[event.list.randomRemove(num),'character']],selectButton,true]);

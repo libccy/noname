@@ -2723,6 +2723,25 @@
                             game.saveConfig('connect_avatar',item,'connect');
                         }
                     },
+                    connect_start:{
+                        name:'启动服务器',
+                        clear:true,
+                        frequent:true,
+                        onclick:function(){
+                            game.saveConfig('connectMode',true);
+                            game.saveConfig('mode','identity');
+                            localStorage.setItem(lib.configprefix+'directstart',true);
+                            game.reload();
+                        }
+                    },
+                    update:function(config,map){
+                        if(lib.node){
+                            map.connect_start.show();
+                        }
+                        else{
+                            map.connect_start.hide();
+                        }
+                    }
                 }
             }
 		},
@@ -14229,6 +14248,9 @@
     				ui.tempnowuxie.close();
     				delete ui.tempnowuxie;
     			}
+                for(var i=0;i<game.players.length;i++){
+                    game.players[i].setIdentity();
+                }
                 return;
             }
 			if(lib.config.background_audio){
