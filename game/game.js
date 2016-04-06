@@ -1598,7 +1598,7 @@
 						clear:true
 					},
 					import_data:{
-						name:'导入游戏数据',
+						name:'导入游戏设置',
 						onclick:function(){
 							ui.import_data_button.classList.toggle('hidden');
 						},
@@ -1611,7 +1611,7 @@
 						clear:true,
 					},
 					export_data:{
-						name:'导出游戏数据',
+						name:'导出游戏设置',
 						onclick:function(){
 							var data={};
 							for(var i in localStorage){
@@ -1655,12 +1655,14 @@
                                     map[i].style.display='none';
                                 }
                             }
+                            map.observe.show();
                             map.choose_timeout.show();
                         }
                         else{
                             for(var i in map){
                                 map[i].style.display='';
                             }
+                            map.observe.hide();
                             map.choose_timeout.hide();
                         }
 						if(config.identity_mode=='zhong'){
@@ -1731,15 +1733,14 @@
 		            },
                     observe:{
                         name:'允许旁观',
-                        init:true,
-                        frequent:true,
+                        init:false,
                         connect:true
                     },
 					double_nei:{
 						name:'双内奸',
 						init:false,
-						frequent:true,
 						restart:true,
+                        frequent:true,
                         connect:true
 					},
 		            double_character:{
@@ -6453,8 +6454,7 @@
 					event.videoId=lib.status.videoId++;
 					player.judging.unshift(get.cards()[0]);
 					game.addVideo('judge1',player,[get.cardInfo(player.judging[0]),judgestr,event.videoId]);
-
-                    game.broadcastAll(function(player,card,str,id){
+                    game.broadcastAll(function(player,card,str,id,cardid){
                         var event;
                         if(game.online){
                             event={};
@@ -6468,12 +6468,14 @@
     					else{
     						event.node=player.$throwordered(card.copy(),true);
     					}
+                        lib.cardOL[cardid]=event.node;
+                        event.node.cardid=cardid;
     					event.node.classList.add('thrownhighlight');
     					ui.arena.classList.add('thrownhighlight');
     					event.dialog=ui.create.dialog(str);
     					event.dialog.classList.add('center');
                         event.dialog.videoId=id;
-                    },player,player.judging[0],judgestr,event.videoId);
+                    },player,player.judging[0],judgestr,event.videoId,get.id());
 
 					game.log(player,'进行'+event.judgestr+'判定，亮出的判定牌为',player.judging[0]);
 					game.delay(2);
@@ -7461,7 +7463,7 @@
 						else if(get.itemtype(arguments[i])=='select'||typeof arguments[i]=='number') select=arguments[i];
 					}
 					if(prompt==undefined) prompt='请选择卡牌';
-					return this.chooseButton(ui.create.dialog(prompt,cards),forced,select,'hidden');
+					return this.chooseButton([prompt,cards,'hidden'],forced,select,'hidden');
 				},
 				chooseButton:function(){
 					var next=game.createEvent('chooseButton');

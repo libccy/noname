@@ -62,7 +62,8 @@ character.standard={
 				}
 				else if(event.current.group=='wei'){
 					if((event.current==game.me&&!_status.auto)||(
-						ai.get.attitude(event.current,player)>2)){
+						ai.get.attitude(event.current,player)>2)||
+						event.current.isOnline()){
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
 						next.set('ai',function(){
 							var event=_status.event;

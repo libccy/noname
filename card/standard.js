@@ -968,7 +968,7 @@ card.standard={
 			content:function(){
 				"step 0"
 				targets[0].chooseToUse('对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
-					{name:'sha'},targets[1],-1).targetRequired=true;
+					{name:'sha'},targets[1],-1).set('targetRequired',true);
 				"step 1"
 				if(result.bool==false){
 					player.gain(targets[0].get('e',{subtype:'equip1'}));

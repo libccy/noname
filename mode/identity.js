@@ -975,7 +975,8 @@ mode.identity={
 				for(var i=0;i<lib.configOL.characterPack.length;i++){
 					var pack=lib.characterPack[lib.configOL.characterPack[i]];
 					for(var j in pack){
-						libCharacter[j]=pack[j];
+						if(j=='zuoci') continue;
+						if(lib.character[j]) libCharacter[j]=pack[j];
 					}
 				}
 				for(i in libCharacter){
