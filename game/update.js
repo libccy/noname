@@ -1,7 +1,6 @@
 window.noname_update={
-    version:'1.8.3.0',
+    version:'1.8.3.1',
     changeLog:[
-        '风火林山联机',
-        'bug修复'
+        '修复重连问题'
     ]
 }

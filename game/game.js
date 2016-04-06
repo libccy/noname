@@ -3748,10 +3748,7 @@
 					if(lib.config.cheat&&!_status.connectMode){
                         cheat.i();
                     }
-                    else if(lib.config.debug){
-                        cheat.i();
-                    }
-					else{
+                    else if(!lib.config.debug){
 						lib.cheat=window.cheat;
 						delete window.cheat;
 					}
@@ -3783,12 +3780,21 @@
 				}
 				if(!mode[lib.config.mode]){
 					window.inSplash=true;
+                    var clickedNode=false;
+                    var proceeded=false;
 					var clickNode=function(){
+                        if(clickedNode) return;
+                        clickedNode=true;
+                        this.classList.add('clicked');
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
 						splash.delete();
 						delete window.inSplash;
-						lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
+                        this.addEventListener('webkitTransitionEnd',function(){
+                            if(proceeded) return;
+                            proceeded=true;
+                            lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
+                        });
 					}
                     var downNode=function(){
                         this.classList.add('glow');
