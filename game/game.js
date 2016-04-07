@@ -2042,6 +2042,11 @@
 		                },
 		                restart:true,
 		            },
+		            ban_weak:{
+		                name:'屏蔽强将',
+						init:false,
+						restart:true,
+		            },
 		            ban_strong:{
 		                name:'屏蔽强将',
 						init:false,
@@ -3594,11 +3599,6 @@
 							delete lib.cardPack.mode_derivation;
 						}
 					}
-					for(i in lib.config.forbidpack){
-						if(lib.config.characters.contains(i)){
-							lib.config.forbidall=lib.config.forbidall.concat(lib.config.forbidpack[i]);
-						}
-					}
 
 					var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
 					if(pilecfg){
@@ -3745,7 +3745,7 @@
                     else if(lib.config.mode=='connect'){
                         _status.connectMode=true;
                     }
-					if(lib.config.cheat&&(!_status.connectMode||lib.config.debug)){
+					if(lib.config.cheat&&!lib.storage.test&&(!_status.connectMode||lib.config.debug)){
                         cheat.i();
                     }
                     else{
@@ -10900,6 +10900,33 @@
 			filterButton:function(button){
 				return true;
 			},
+            characterDisabled:function(i){
+                if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
+                if(lib.config.forbidai.contains(i)) return true;
+                if(lib.config.banned.contains(i)) return true;
+                var double_character=false;
+                if(lib.config.mode=='guozhan'){
+                    double_character=true;
+                }
+                else if(get.config('double_character')&&(lib.config.mode=='identity'||lib.config.mode=='stone')){
+                    double_character=true;
+                }
+                else if(get.config('double_character_jiange')&&(lib.config.mode=='versus'&&_status.mode=='jiange')){
+                    double_character=true;
+                }
+                if(double_character&&lib.config.forbiddouble.contains(i)){
+                    return true;
+                }
+                if(get.config('ban_weak')){
+                    if(lib.config.forbidall.contains(i)) return true;
+                    if(!double_character&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))){
+                        return true;
+                    }
+                }
+                if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))){
+                    return true;
+                }
+            },
 			cardEnabled:function(card,player,event){
 				if(player==undefined) player=_status.event.player;
 				var filter=get.info(card).enable;
@@ -19742,6 +19769,7 @@
                             var g={};
                             var logs=[];
                             var logindex=-1;
+                            var cheat=lib.cheat;
                             var runCommand=function(e){
                                 if(text2.value){
                                     logindex=-1;
@@ -19753,9 +19781,7 @@
                                 else{
                                     try{
                                         var result=eval(text2.value);
-                                        if(result!==undefined){
-                                            game.print(result);
-                                        }
+                                        game.print(result);
                                     }
                                     catch(e){
                                         game.print(e);
@@ -20161,6 +20187,9 @@
 										alert('当前版本已是最新');
 									}
 								},function(){
+                                    if(forcecheck===false){
+                                        return;
+                                    }
                                     alert('连接失败');
                                     button1.disabled=false;
 									button1.innerHTML='检查游戏更新';

@@ -322,14 +322,7 @@ mode.versus={
 							list[lib.character[i][1]+'mech'].push(i);continue;
 						}
 					}
-					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
-					if(lib.config.forbidai.contains(i)) continue;
-					if(lib.config.forbidall.contains(i)) continue;
-					if(lib.config.banned.contains(i)) continue;
-					if(!get.config('double_character')&&get.config('ban_weak')&&
-					(lib.config.forbidsingle.contains(i)||lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
-					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
-					if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
+					if(lib.filter.characterDisabled(i)) continue;
 					if(lib.character[i][1]=='wei'){
 						list.weilist.push(i);
 					}
@@ -517,14 +510,7 @@ mode.versus={
 				}
 				for(i in lib.character){
 					if(event.filterChoice(i)) continue;
-					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
-					if(lib.config.forbidai.contains(i)) continue;
-					if(lib.config.forbidall.contains(i)) continue;
-					if(lib.config.banned.contains(i)) continue;
-					if(!get.config('double_character')&&get.config('ban_weak')&&
-					(lib.config.forbidsingle.contains(i)||lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
-					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
-					if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
+					if(lib.filter.characterDisabled(i)) continue;
 					event.list.push(i);
 					if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 						list2.push(i);
@@ -711,14 +697,8 @@ mode.versus={
 				_status.color=Math.random()<0.5;
 				var i,list=[];
 				for(i in lib.character){
-					if(lib.config.forbidai.contains(i)) continue;
 					if(lib.config.forbidversus.contains(i)) continue;
-					if(lib.config.banned.contains(i)) continue;
-					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
-					if(get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
-					if(get.config('ban_weak')&&lib.config.forbidall.contains(i)) continue;
-					if(get.config('ban_weak')&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))) continue;
-					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
+					if(lib.filter.characterDisabled(i)) continue;
 					list.push(i);
 				}
 				var groupSort=function(name){

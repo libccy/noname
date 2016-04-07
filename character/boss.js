@@ -1029,7 +1029,7 @@ character.boss={
                 "step 1"
 				var targets=[];
                 if(result.color=='red'){
-					game.playAudio('boss_biantianx2');
+					game.trySkillAudio('boss_biantianx2');
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].isFriendOf(player)){
 							game.players[i].addSkill('boss_biantian3');
@@ -1040,7 +1040,7 @@ character.boss={
 					player.logSkill('kuangfeng',targets,'fire');
                 }
                 else if(result.suit=='spade'){
-					game.playAudio('boss_biantianx1');
+					game.trySkillAudio('boss_biantianx1');
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isFriendOf(player)){
 							game.players[i].addSkill('boss_biantian2');

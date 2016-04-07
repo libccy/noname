@@ -404,6 +404,7 @@ character.sp={
 				if(!player.num('he')) return false;
 				if(event.targets.length>1) return false;
 				if(!event.target) return false;
+				if(event.target.hp>=player.hp) return false;
 
 				var card=event.card;
 				if(card.name=='sha') return true;

@@ -1,13 +1,9 @@
 window.config={
 	forbidai:['zuoci','caiwenji'],
-	forbidsingle:['menghuo','huanggai','machao','pangde','yanwen','xiahoudun','xuzhu','luxun',
-	'xuhuang','yujin','xiaoqiao','daqiao','zhangjiao','zhangbao'],
-	forbidall:['xiahouyuan','huangzhong','weiyan','dianwei','zhangjiao'],
-	forbidpack:{
-		refresh:['caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu','gongsunzan']
-	},
+	forbidall:['xiahouyuan','huangzhong','weiyan','dianwei','zhangjiao',
+	'caocao','simayi','guanyu','zhangfei','zhaoyun','ganning','lvmeng','lvbu','gongsunzan'],
 	forbidversus:['swd_kangnalishi'],
-	forbidstone:['zhugedan','pal_xuanxiao','hs_malfurion','lusu','chenlin',
+	forbidstone:['zhugedan','pal_xuanxiao','hs_malfurion','lusu','chenlin','hs_siwangzhiyi',
 	'gjqt_bailitusu','yuanshao','swd_anka','swd_nicole','daqiao','re_daqiao',
 	'zhuran','huatuo','swd_tuwei','hs_guldan','wangyi','caoang','swd_guyue',
 	'swd_jiangziya','guojia','re_guojia','shen_caocao','swd_qiner','caopi','hs_yngvar',

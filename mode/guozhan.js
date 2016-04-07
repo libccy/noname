@@ -281,12 +281,7 @@ mode.guozhan={
 				event.list=[];
 				for(i in lib.character){
 					if(chosen.contains(i)) continue;
-					if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
-					if(lib.config.forbidai.contains(i)) continue;
-					if(lib.config.forbidall.contains(i)) continue;
-					if(lib.config.forbiddouble.contains(i)) continue;
-					if(lib.config.banned.contains(i)) continue;
-					if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))) continue;
+					if(lib.filter.characterDisabled(i)) continue;
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);
 				}

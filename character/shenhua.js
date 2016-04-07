@@ -295,7 +295,7 @@ character.shenhua={
 					ai2:function(target){
 						var evt=_status.event;
 						if(!evt.check) return 0;
-						return 1-ai.get.attitude(evt.player,evt.target);
+						return 1-ai.get.attitude(evt.player,target);
 					},
 					filterTarget:function(card,player,target){
 						return target.num('h')>0;
