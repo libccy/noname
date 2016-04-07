@@ -535,6 +535,8 @@ margin-bottom: 5px;
 .caption>.text{font-size:16px;text-align:left}
 .caption>.text.center{text-align:center}
 .caption>.text.chat{word-break: break-all;margin-bottom: 3px;margin-left: 10px;width: calc(100% - 20px)}
+.caption>.text.textlink{margin-left: 10px}
+.caption>.text.textlink:hover{text-decoration: underline;}
 .caption>div>div{font-size: 16px;position: relative;width: calc(100% - 70px);vertical-align: top;margin: 0;padding: 0;}
 .skill{left: 0 !important;width: 70px !important;}
 .caption>.ctext{text-align:center;font-size:16px;}

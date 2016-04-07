@@ -1358,7 +1358,7 @@ character.xianjian={
 		pal_hanlingsha:'韩菱纱',
 		pal_liumengli:'柳梦璃',
 		pal_murongziying:'慕容紫英',
-		pal_changqing:'长聊',
+		pal_changqing:'长卿',
 		pal_xuanxiao:'玄霄',
 
 		xuanyan:'玄炎',

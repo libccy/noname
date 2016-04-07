@@ -21,7 +21,7 @@ mode.connect={
 
             var connect=function(e){
                 clearTimeout(event.timeout);
-                e.preventDefault();
+                if(e) e.preventDefault();
                 game.saveConfig('last_ip',node.innerHTML);
                 game.connect(node.innerHTML);
             };
@@ -53,6 +53,31 @@ mode.connect={
             button.style.top='calc(50% + 60px)';
             ui.window.appendChild(button);
             ui.ipbutton=button;
+
+            ui.recentIP=ui.create.system('最近连接',null,true);
+            var clickLink=function(){
+                node.innerHTML=this.innerHTML;
+                connect();
+            };
+            var trimIP=function(str){
+                var len=str.length-5;
+                if(str.lastIndexOf(':8080')==len){
+                    str=str.slice(0,len);
+                }
+                return str;
+            };
+            lib.setPopped(ui.recentIP,function(){
+                var uiintro=ui.create.dialog('hidden');
+				uiintro.listen(function(e){
+					e.stopPropagation();
+				});
+                var list=ui.create.div('.caption');
+                for(var i=0;i<lib.config.recentIP.length;i++){
+                    ui.create.div('.text.textlink',list,clickLink).innerHTML=trimIP(lib.config.recentIP[i]);
+                }
+                uiintro.add(list);
+                return uiintro;
+            },220);
         }
         if(lib.config.reconnect_info){
             var info=lib.config.reconnect_info;

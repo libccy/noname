@@ -65,7 +65,7 @@
 		onover:[],
         chatHistory:[],
 		arenaReady:[],
-		packageReady:[],
+        extensions:[],
         characterDialogGroup:{
             '收藏':function(name,capt){
                 return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -138,19 +138,17 @@
 						onclick:function(bool){
                             game.saveConfig('cheat',bool);
                             if(_status.connectMode) return;
-							if(lib.config.cheat&&bool==false){
-								lib.cheat=window.cheat;
-								delete window.cheat;
+							if(bool){
+                                lib.cheat.i();
+							}
+							else{
+                                delete window.cheat;
 								delete window.game;
 								delete window.ui;
 								delete window.get;
 								delete window.ai;
 								delete window.lib;
 								delete window._status;
-							}
-							else if(!lib.config.cheat&&bool){
-								window.cheat=lib.cheat;
-								window.cheat.i();
 							}
 						},
 						unfrequent:true,
@@ -3068,7 +3066,7 @@
 						lib.configMenu.appearence.config.theme.item[i]=theme.pack[i];
 					}
                 }
-                
+
 				ui.fontsheet=document.createElement('style');
 				document.head.appendChild(ui.fontsheet);
 				if(font&&font.pack){
@@ -3122,9 +3120,14 @@
 							}
 						}
 						try{
-							_status.extension=game.importedPack.name;
-							game.importedPack.content(cfg);
-							delete _status.extension;
+                            if(game.importedPack.precontent){
+                                _status.extension=game.importedPack.name;
+    							game.importedPack.precontent(cfg);
+    							delete _status.extension;
+                            }
+                            if(game.importedPack.content){
+                                lib.extensions.push([game.importedPack.name,game.importedPack.content,cfg]);
+                            }
 						}
 						catch(e){
 							console.log(e);
@@ -3748,12 +3751,8 @@
                         _status.connectMode=true;
                     }
 					if(lib.config.cheat&&!lib.storage.test&&(!_status.connectMode||lib.config.debug)){
-                        cheat.i();
+                        lib.cheat.i();
                     }
-                    else{
-						lib.cheat=window.cheat;
-						delete window.cheat;
-					}
 					lib.config.sort_card=get.sortCard(lib.config.sort);
 					delete window.config;
 					delete window.mode;
@@ -3765,10 +3764,19 @@
 							delete lib.init[i];
 						}
 					}
-					while(lib.packageReady.length){
-						(lib.init.eval(lib.packageReady.shift()))();
-					}
-					delete lib.packageReady;
+                    if(!_status.connectMode){
+                        for(var i=0;i<lib.extensions.length;i++){
+                            try{
+                                _status.extension=lib.extensions[i][0];
+                                lib.extensions[i][1](lib.extensions[i][2]);
+                                delete _status.extension;
+                            }
+                            catch(e){
+                                console.log(e);
+                            }
+                        }
+                    }
+                    delete lib.extensions;
 					ui.create.arena();
 
                     if(window.indexedDB&&!_status.characterLoaded){
@@ -4040,6 +4048,211 @@
 					str+=',\n'
 				}
 				return str;
+			}
+		},
+        cheat:{
+			i:function(){
+                window.cheat=lib.cheat;
+				window.game=game;
+				window.ui=ui;
+				window.get=get;
+				window.ai=ai;
+				window.lib=lib;
+				window._status=_status;
+			},
+			uy:function(me){
+				if(me){
+					game.me.useCard({name:'spell_yexinglanghun'},game.me);
+				}
+				else{
+					var enemy=game.me.getEnemy();
+					enemy.useCard({name:'spell_yexinglanghun'},enemy);
+				}
+			},
+			gs:function(name,act){
+				var card=game.createCard('spell_'+name);
+				game.me.node.handcards1.appendChild(card);
+				if(!act){
+					game.me.actused=-99;
+				}
+				ui.updatehl();
+				setTimeout(game.check,300);
+			},
+			gc:function(name,act){
+				var card=game.createCard('stone_'+name+'_stonecharacter');
+				game.me.node.handcards1.appendChild(card);
+				if(!act){
+					game.me.actused=-99;
+				}
+				ui.updatehl();
+				setTimeout(game.check,300);
+			},
+			aa:function(){
+				game.saveConfig('test_game',!lib.config.test_game);
+				game.reload();
+			},
+			a:function(name){
+				if(lib.storage.test&&!name){
+					game.save('test',false);
+                    if(lib.config.mode=='identity'){
+                        game.saveConfig('double_character',false,true);
+                    }
+				}
+				else{
+					game.save('test',name||true);
+                    if(lib.config.mode=='identity'){
+                        game.saveConfig('double_character',true,true);
+                    }
+				}
+				game.reload();
+			},
+			u:function(){
+				var card={name:'sha'},source=game.me.next;
+				for(var i=0;i<arguments.length;i++){
+					if(get.itemtype(arguments[i])=='player'){
+						source=arguments[i];
+					}
+					else if(typeof arguments[i]=='object'){
+						card=arguments[i];
+					}
+					else if(typeof arguments[i]=='string'){
+						card={name:arguments[i]}
+					}
+				}
+				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),game.me);
+			},
+			rank:function(){
+		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
+		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
+		        for(var i in lib.character){
+		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&!list.contains(i)&&!lib.customCharacters.contains(i)) console.log(i);
+		        }
+		    },
+			h:function(player){
+				console.log(get.translation(player.get('h')));
+			},
+			g:function(){
+				for(var i=0;i<arguments.length;i++){
+					if(i>0&&typeof arguments[i]=='number'){
+						for(var j=0;j<arguments[i]-1;j++){
+							cheat.gx(arguments[i-1]);
+						}
+					}
+					else{
+						cheat.gx(arguments[i]);
+					}
+				}
+			},
+			gx:function(name,target){
+				target=target||game.me;
+				var nature=null;
+				var suit=null;
+				var suits=['club','spade','diamond','heart'];
+				for(var i=0;i<suits.length;i++){
+					if(name.indexOf(suits[i])==0){
+						suit=suits[i];
+						name=name.slice(suits[i].length);
+						break;
+					}
+				}
+				if(name.indexOf('red')==0){
+					name=name.slice(3);
+					suit=['diamond','heart'].randomGet();
+				}
+				if(name.indexOf('black')==0){
+					name=name.slice(5);
+					suit=['spade','club'].randomGet();
+				}
+
+				if(name=='huosha'){
+					name='sha';
+					nature='fire';
+				}
+				else if(name=='leisha'){
+					name='sha';
+					nature='thunder';
+				}
+				var card=game.createCard(name,suit,null,nature);
+				target.node.handcards1.appendChild(card);
+				game.check();
+				target.update();
+				ui.updatehl();
+			},
+			ge:function(){
+				cheat.g('zhuge');
+				cheat.g('qilin');
+				cheat.g('bagua');
+				cheat.g('dilu');
+				cheat.g('chitu');
+				cheat.g('muniu');
+			},
+			gj:function(){
+				cheat.g('shandian');
+				cheat.g('huoshan');
+				cheat.g('hongshui');
+				cheat.g('lebu');
+				cheat.g('bingliang');
+				cheat.g('guiyoujie');
+			},
+			d:function(num,target){
+				if(num==undefined) num=1;
+				var cards=get.cards(num);
+				for(var i=0;i<num;i++){
+					var card=cards[i];
+					game.me.node.handcards1.appendChild(card);
+					game.check();
+					game.me.update();
+					ui.updatehl();
+				}
+			},
+			s:function(skill){
+				game.me.addSkill(skill);
+				game.check();
+			},
+			t:function(num){
+				if(num==undefined){
+					for(var i=0;i<game.players.length;i++) cheat.t(i);
+					return;
+				}
+				var player=game.players[num];
+				var cards=player.get('hej');
+				for(var i=0;i<cards.length;i++){
+					ui.discardPile.appendChild(cards[i]);
+				}
+				player.update();
+			},
+			k:function(i){
+				if(i==undefined) i=1;
+				game.players[i].hp=1;
+				cheat.t(i);
+				cheat.g('juedou');
+			},
+			z:function(name){
+				game.zhu.init(name);
+				game.zhu.maxHp++;
+				game.zhu.hp++;
+				game.zhu.update();
+			},
+			cp:function(){
+				cheat.z('caopi');
+			},
+			cc:function(){
+				cheat.z('re_caocao');
+			},
+			ls:function(){
+				cheat.z('liushan');
+			},
+			zj:function(){
+				cheat.z('sp_zhangjiao');
+			},
+			sc:function(){
+				cheat.z('sunce');
+			},
+			lc:function(){
+				cheat.z('liushan');
+			},
+			lb:function(){
+				cheat.z('liubei');
 			}
 		},
 		translate:{
@@ -5936,9 +6149,10 @@
 						}
 					};
                     var broadcast=function(){
-                        game.broadcast(function(player,cards){
+                        game.broadcast(function(player,cards,num){
                             player.directgain(cards);
-                        },player,cards);
+                            _status.cardPileNum=num;
+                        },player,cards,ui.cardPile.childNodes.length);
                     };
 					if(event.animate=='draw'){
 						player.$draw(cards.length);
@@ -6016,7 +6230,7 @@
 						}
 					}
 					if(player==game.me) ui.updatehl();
-                    game.broadcast(function(player,cards){
+                    game.broadcast(function(player,cards,num){
                         for(var i=0;i<cards.length;i++){
                             cards[i].classList.remove('glow');
                             cards[i].delete();
@@ -6036,7 +6250,8 @@
         					}
                             ui.updatehl();
                         }
-                    },player,cards);
+                        _status.cardPileNum=num;
+                    },player,cards,ui.cardPile.childNodes.length);
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
 					player.update();
 					game.addVideo('loseAfter',player);
@@ -10874,11 +11089,13 @@
                     }
                 },
                 onclose:function(){
+                    if(this._nocallback) return;
                     if(_status.connectCallback){
                         _status.connectCallback(false);
                         delete _status.connectCallback;
                     }
                     if(game.online){
+                        localStorage.setItem(lib.configprefix+'directstart',true);
                         game.reload();
                     }
                     else{
@@ -11541,6 +11758,10 @@
                     game.onlineID=id;
                     game.ip=ip;
                     game.saveConfig('reconnect_info',[_status.ip,id]);
+                    lib.config.recentIP.remove(_status.ip);
+                    lib.config.recentIP.unshift(_status.ip);
+                    lib.config.recentIP.splice(5);
+                    game.saveConfig('recentIP',lib.config.recentIP);
                     _status.connectMode=true;
                     lib.configOL=config;
         			lib.playerOL={};
@@ -11552,18 +11773,21 @@
                     ui.create.connectPlayers(ip);
                     ui.pause.hide();
                     ui.auto.hide();
-                    ui.cardPileButton.style.display='none';
                     if(ui.ipnode){
-                        ui.ipnode.delete();
+                        ui.ipnode.remove();
                         delete ui.ipnode;
                     }
                     if(ui.iptext){
-                        ui.iptext.delete();
+                        ui.iptext.remove();
                         delete ui.iptext;
                     }
                     if(ui.ipbutton){
-                        ui.ipbutton.delete();
+                        ui.ipbutton.remove();
                         delete ui.ipbutton;
+                    }
+                    if(ui.recentIP){
+                        ui.recentIP.remove();
+                        delete ui.recentIP;
                     }
                     clearTimeout(_status.createNodeTimeout);
 
@@ -11614,16 +11838,20 @@
                 },
                 reinit:function(config,state,state2,ip,observe){
                     if(ui.ipnode){
-                        ui.ipnode.delete();
+                        ui.ipnode.remove();
                         delete ui.ipnode;
                     }
                     if(ui.iptext){
-                        ui.iptext.delete();
+                        ui.iptext.remove();
                         delete ui.iptext;
                     }
                     if(ui.ipbutton){
-                        ui.ipbutton.delete();
+                        ui.ipbutton.remove();
                         delete ui.ipbutton;
+                    }
+                    if(ui.recentIP){
+                        ui.recentIP.remove();
+                        delete ui.recentIP;
                     }
                     clearTimeout(_status.createNodeTimeout);
                     game.online=true;
@@ -11880,19 +12108,26 @@
             }
             game.broadcast('updateWaiting',map);
         },
-        waitForPlayer:function(){
+        waitForPlayer:function(func){
             var next=game.createEvent('waitForPlayer',false);
+            next.func=func;
             next.content=function(){
                 'step 0'
                 ui.auto.hide();
                 ui.pause.hide();
-                ui.cardPileButton.style.display='none';
+
+                game.createServer();
+                if(event.func){
+                    event.func();
+                }
+
                 ui.create.connectPlayers(game.ip);
                 var me=game.connectPlayers[0];
                 me.initOL(lib.config.connect_nickname,lib.config.connect_avatar);
                 me.playerid=1;
                 me.setIdentity('zhu');
                 _status.waitingForPlayer=true;
+
                 game.pause();
                 'step 1'
                 _status.waitingForPlayer=false;
@@ -11974,6 +12209,11 @@
             }
             _status.connectCallback=callback;
             try{
+                if(game.ws){
+                    game.ws._nocallback=true;
+                    game.ws.close();
+                    delete game.ws;
+                }
                 game.ws=new WebSocket('ws://'+ip+'');
             }
             catch(e){
@@ -17214,7 +17454,7 @@
 				if(!lib.config.show_wuxie){
 					ui.wuxie.style.display='none';
 				}
-				if(!lib.config.show_cardpile){
+				if(!lib.config.show_cardpile||_status.connectMode){
 					ui.cardPileButton.style.display='none';
 				}
 				if(lib.config.touchscreen&&!lib.config.confirmtouch){
@@ -20971,7 +21211,16 @@
 				uiintro.listen(function(e){
 					e.stopPropagation();
 				});
-				uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+ui.cardPile.childNodes.length);
+                var num;
+                if(game.online){
+                    num=_status.cardPileNum||0;
+                }
+                else{
+                    num=ui.cardPile.childNodes.length;
+                }
+				uiintro.add('剩余 <span style="font-family:'+'xinwei'+'">'+num);
+
+                if(_status.connectMode) return uiintro;
 				uiintro.add('<div class="text center">弃牌堆</div>');
 				if(ui.discardPile.childNodes.length){
 					var list=[];
@@ -25369,210 +25618,6 @@
 			}
 			return list;
 		};
-		window.cheat={
-			i:function(){
-				window.game=game;
-				window.ui=ui;
-				window.get=get;
-				window.ai=ai;
-				window.lib=lib;
-				window._status=_status;
-			},
-			uy:function(me){
-				if(me){
-					game.me.useCard({name:'spell_yexinglanghun'},game.me);
-				}
-				else{
-					var enemy=game.me.getEnemy();
-					enemy.useCard({name:'spell_yexinglanghun'},enemy);
-				}
-			},
-			gs:function(name,act){
-				var card=game.createCard('spell_'+name);
-				game.me.node.handcards1.appendChild(card);
-				if(!act){
-					game.me.actused=-99;
-				}
-				ui.updatehl();
-				setTimeout(game.check,300);
-			},
-			gc:function(name,act){
-				var card=game.createCard('stone_'+name+'_stonecharacter');
-				game.me.node.handcards1.appendChild(card);
-				if(!act){
-					game.me.actused=-99;
-				}
-				ui.updatehl();
-				setTimeout(game.check,300);
-			},
-			aa:function(){
-				game.saveConfig('test_game',!lib.config.test_game);
-				game.reload();
-			},
-			a:function(name){
-				if(lib.storage.test&&!name){
-					game.save('test',false);
-                    if(lib.config.mode=='identity'){
-                        game.saveConfig('double_character',false,true);
-                    }
-				}
-				else{
-					game.save('test',name||true);
-                    if(lib.config.mode=='identity'){
-                        game.saveConfig('double_character',true,true);
-                    }
-				}
-				game.reload();
-			},
-			u:function(){
-				var card={name:'sha'},source=game.me.next;
-				for(var i=0;i<arguments.length;i++){
-					if(get.itemtype(arguments[i])=='player'){
-						source=arguments[i];
-					}
-					else if(typeof arguments[i]=='object'){
-						card=arguments[i];
-					}
-					else if(typeof arguments[i]=='string'){
-						card={name:arguments[i]}
-					}
-				}
-				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),game.me);
-			},
-			rank:function(){
-		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
-		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
-		        for(var i in lib.character){
-		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&!list.contains(i)&&!lib.customCharacters.contains(i)) console.log(i);
-		        }
-		    },
-			h:function(player){
-				console.log(get.translation(player.get('h')));
-			},
-			g:function(){
-				for(var i=0;i<arguments.length;i++){
-					if(i>0&&typeof arguments[i]=='number'){
-						for(var j=0;j<arguments[i]-1;j++){
-							cheat.gx(arguments[i-1]);
-						}
-					}
-					else{
-						cheat.gx(arguments[i]);
-					}
-				}
-			},
-			gx:function(name,target){
-				target=target||game.me;
-				var nature=null;
-				var suit=null;
-				var suits=['club','spade','diamond','heart'];
-				for(var i=0;i<suits.length;i++){
-					if(name.indexOf(suits[i])==0){
-						suit=suits[i];
-						name=name.slice(suits[i].length);
-						break;
-					}
-				}
-				if(name.indexOf('red')==0){
-					name=name.slice(3);
-					suit=['diamond','heart'].randomGet();
-				}
-				if(name.indexOf('black')==0){
-					name=name.slice(5);
-					suit=['spade','club'].randomGet();
-				}
-
-				if(name=='huosha'){
-					name='sha';
-					nature='fire';
-				}
-				else if(name=='leisha'){
-					name='sha';
-					nature='thunder';
-				}
-				var card=game.createCard(name,suit,null,nature);
-				target.node.handcards1.appendChild(card);
-				game.check();
-				target.update();
-				ui.updatehl();
-			},
-			ge:function(){
-				cheat.g('zhuge');
-				cheat.g('qilin');
-				cheat.g('bagua');
-				cheat.g('dilu');
-				cheat.g('chitu');
-				cheat.g('muniu');
-			},
-			gj:function(){
-				cheat.g('shandian');
-				cheat.g('huoshan');
-				cheat.g('hongshui');
-				cheat.g('lebu');
-				cheat.g('bingliang');
-				cheat.g('guiyoujie');
-			},
-			d:function(num,target){
-				if(num==undefined) num=1;
-				var cards=get.cards(num);
-				for(var i=0;i<num;i++){
-					var card=cards[i];
-					game.me.node.handcards1.appendChild(card);
-					game.check();
-					game.me.update();
-					ui.updatehl();
-				}
-			},
-			s:function(skill){
-				game.me.addSkill(skill);
-				game.check();
-			},
-			t:function(num){
-				if(num==undefined){
-					for(var i=0;i<game.players.length;i++) cheat.t(i);
-					return;
-				}
-				var player=game.players[num];
-				var cards=player.get('hej');
-				for(var i=0;i<cards.length;i++){
-					ui.discardPile.appendChild(cards[i]);
-				}
-				player.update();
-			},
-			k:function(i){
-				if(i==undefined) i=1;
-				game.players[i].hp=1;
-				cheat.t(i);
-				cheat.g('juedou');
-			},
-			z:function(name){
-				game.zhu.init(name);
-				game.zhu.maxHp++;
-				game.zhu.hp++;
-				game.zhu.update();
-			},
-			cp:function(){
-				cheat.z('caopi');
-			},
-			cc:function(){
-				cheat.z('re_caocao');
-			},
-			ls:function(){
-				cheat.z('liushan');
-			},
-			zj:function(){
-				cheat.z('sp_zhangjiao');
-			},
-			sc:function(){
-				cheat.z('sunce');
-			},
-			lc:function(){
-				cheat.z('liushan');
-			},
-			lb:function(){
-				cheat.z('liubei');
-			}
-		}
 		window.countGroups=function(){
 			var a=0,b=0,c=0,d=0;
 			var sa=0,sb=0,sc=0,sd=0;

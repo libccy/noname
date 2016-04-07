@@ -2108,7 +2108,7 @@ character.yxs={
 		yxs_mingchenghuanghou:'明成皇后',
 		yxs_wangzhaojun:'王昭君',
 		yxs_luocheng:'罗成',
-		yxs_direnjie:'狄人杰',
+		yxs_direnjie:'狄仁杰',
 		yxs_sunwu:'孙武',
 		yxs_chengyaojin:'程咬金',
 		yxs_yujix:'虞姬',

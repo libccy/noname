@@ -207,6 +207,7 @@ window.config={
 	hiddenPlayPack:[],
 	favouriteCharacter:[],
 	recentCharacter:[],
+	recentIP:[],
 
 	theme:'woodden',
 	layout:'mobile',
