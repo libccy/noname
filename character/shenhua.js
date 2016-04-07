@@ -1901,8 +1901,9 @@ character.shenhua={
 		wansha2:{
 			mod:{
 				cardSavable:function(card,player){
-					if(_status.currentPhase.skills.contains('wansha')&&_status.currentPhase!=player){
-						if(card.name=='tao'&&_status.dying!=player) return false;
+					if(!_status.currentPhase) return;
+					if(_status.currentPhase.get('s').contains('wansha')&&_status.currentPhase!=player){
+						if(card.name=='tao'&&_status.event.dying!=player) return false;
 					}
 				}
 			}

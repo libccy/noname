@@ -11395,9 +11395,9 @@
                             player.classList.add('glow_phase');
                         },player);
 					}
+					_status.currentPhase=player;
                     game.syncState();
 					game.addVideo('phaseChange',player);
-					_status.currentPhase=player;
 					game.log();
 					game.log(player,'的回合开始');
 					game.phaseNumber++;
@@ -11974,7 +11974,13 @@
                         if(game.updateState){
                             game.updateState(state2);
                         }
-                        game.createEvent('game',false).content=lib.init.startOnline;
+                        var next=game.createEvent('game',false);
+                        next.content=lib.init.startOnline;
+                        if(observe){
+                            next.custom.replace.target=function(player){
+                                if(player.isAlive()) game.swapPlayer(player);
+                            }
+                        }
                         game.loop();
                         game.send('reinited');
                         if(!observe&&game.me&&game.me.isDead()){
@@ -12090,9 +12096,10 @@
         },
         syncState:function(){
             if(game.getState&&game.updateState){
-                game.broadcast(function(state){
+                game.broadcast(function(state,current){
     				game.updateState(state);
-    			},game.getState());
+                    _status.currentPhase=current;
+    			},game.getState(),_status.currentPhase);
             }
 		},
         updateWaiting:function(){

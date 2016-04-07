@@ -67,6 +67,7 @@ mode.connect={
                 return str;
             };
             lib.setPopped(ui.recentIP,function(){
+                if(!lib.config.recentIP.length) return;
                 var uiintro=ui.create.dialog('hidden');
 				uiintro.listen(function(e){
 					e.stopPropagation();
@@ -76,6 +77,14 @@ mode.connect={
                     ui.create.div('.text.textlink',list,clickLink).innerHTML=trimIP(lib.config.recentIP[i]);
                 }
                 uiintro.add(list);
+                var clear=uiintro.add('<div class="text center">清除</div>');
+                clear.style.paddingTop=0;
+                clear.style.paddingBottom='3px';
+                clear.listen(function(){
+                    lib.config.recentIP.length=0;
+                    game.saveConfig('recentIP',[]);
+                    uiintro.delete();
+                });
                 return uiintro;
             },220);
         }

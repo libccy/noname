@@ -1045,7 +1045,7 @@ mode.identity={
 					}
 				}
 				game.me.chooseButtonOL(list,function(player,result){
-					if(game.online||player==game.me) player.init(result.links[0],null,result.links[1]);
+					if(game.online||player==game.me) player.init(result.links[0],result.links[1]);
 				});
 				"step 2"
 				for(var i in result){
