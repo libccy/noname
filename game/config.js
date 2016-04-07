@@ -24,8 +24,7 @@ window.config={
 		'september_bg','xueji_bg','yinxiang_bg','chunhui_bg',
 		'grass_bg','huangtian_bg'],
 		image_background_filter:['default','blur','gray','sepia','invert','saturate','contrast','hue','brightness'],
-		background_music:['music_default','music_diaochan','music_shezhan',
-			'music_danji','music_random','music_off']
+		background_music:['music_default','music_diaochan','music_shezhan','music_danji','music_random','music_off']
 	},
 	translate:{
 		character_play_config:'技能卡牌',
@@ -366,3 +365,4 @@ window.play={};
 window.background={};
 window.music={};
 window.font={};
+window.theme={};

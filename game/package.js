@@ -62,4 +62,9 @@ font.pack={
     xiaozhuan:'小篆',
     xinwei:'新魏',
     huangcao:'黄草',
+};
+theme.pack={
+    woodden:'木纹',
+    music:'音乐',
+    simple:'简约',
 }

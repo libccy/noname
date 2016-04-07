@@ -53,6 +53,9 @@ table{table-layout: fixed;}
 	overflow-x: scroll;
 	white-space: nowrap;
 }
+#splash.removing{
+	pointer-events: none;
+}
 #splash>div{
 	width:100px;
 	height:300px;
@@ -62,10 +65,6 @@ table{table-layout: fixed;}
 	position: relative;
 	transition: all 0.8s;
 }
-/*#splash>div:not(.hidden){
-	animation: splash 0.7s;
-	-webkit-animation: splash 0.7s;
-}*/
 #splash>div:hover{
 	transform: translateY(-20px);
 }
@@ -75,7 +74,13 @@ table{table-layout: fixed;}
 	opacity: 0;
 }
 #splash>div.hidden{
-	transform: translateY(-300px);
+	transform: translateY(-300px) scale(0.5);
+}
+#splash.low_performance>div.hidden{
+	transform: scale(0.8);
+}
+#splash.low_performance>div{
+	transition: all 0.5s;
 }
 #splash>div>.splashtext{
 	font-family: 'huangcao','xinwei';

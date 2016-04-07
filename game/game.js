@@ -443,11 +443,7 @@
 					theme:{
 						name:'主题',
 						init:'woodden',
-						item:{
-							woodden:'木纹',
-							music:'音乐',
-							simple:'简约',
-						},
+						item:{},
 						onclick:function(theme){
 							game.saveConfig('theme',theme);
 							ui.arena.hide();
@@ -3067,6 +3063,12 @@
 						delete lib.configMenu.audio.config.background_music.item.music_custom;
 					}
 				}
+                if(theme&&theme.pack){
+                    for(i in theme.pack){
+						lib.configMenu.appearence.config.theme.item[i]=theme.pack[i];
+					}
+                }
+                
 				ui.fontsheet=document.createElement('style');
 				document.head.appendChild(ui.fontsheet);
 				if(font&&font.pack){
@@ -3787,7 +3789,7 @@
                         clickedNode=true;
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
-						splash.delete();
+						splash.delete(1000);
 						delete window.inSplash;
 
                         var proceed2=function(){
