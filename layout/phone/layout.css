@@ -20,6 +20,9 @@
 #system{
     z-index: 31 !important;
 }
+#window>.dialog.popped{
+    z-index: 11 !important;
+}
 #system>div{
     position: absolute;
     width: 100%;
@@ -51,9 +54,6 @@
 }
 #system>div:not(.shown)>div{
     pointer-events: none;
-}
-#shortcut>div{
-    transform: scale(1.3);
 }
 #pausebutton,#autobutton{
     display: none !important;

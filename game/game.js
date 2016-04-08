@@ -21889,9 +21889,9 @@
 									break;
 								case 'auto':
 									ui.click.auto();
-									if(!ui.system1.classList.contains('shown')){
-										 ui.system1.classList.add('shown');
-									 }
+									// if(!ui.system1.classList.contains('shown')){
+									// 	 ui.system1.classList.add('shown');
+									//  }
 									break;
                                 case 'chat':
                                     if(ui.chatButton){
