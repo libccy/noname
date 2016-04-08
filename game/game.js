@@ -2811,7 +2811,6 @@
                     dialog._place_text.style.marginLeft='14px';
                 }
             }
-
 			if(e.touches&&e.touches[0]){
 				e=e.touches[0];
 			}
@@ -21477,9 +21476,6 @@
 				if(!this._poppedfunc){
 					return;
 				}
-				// if(this._poppedalready){
-				// 	return;
-				// }
 				if(lib.config.touchscreen||this.forceclick){
 					_status.touchpopping=true;
 					setTimeout(function(){
@@ -21492,22 +21488,29 @@
 					ui.currentpopped._uiintro.delete();
 					delete ui.currentpopped._uiintro;
 				}
-				// this._poppedalready=true;
 				ui.currentpopped=this;
-				uiintro.classList.add('popped');
+                uiintro.classList.add('popped');
+				uiintro.classList.add('hoverdialog');
 				uiintro.classList.add('static');
 				this._uiintro=uiintro;
 
 				ui.window.appendChild(uiintro);
 				var width=this._poppedwidth||330;
 				uiintro.style.width=width+'px';
+                if(lib.config.layout=='phone'){
+                    width*=1.3;
+                }
 
                 if(uiintro._heightfixed){
                     uiintro.style.height=uiintro.content.scrollHeight+'px';
                 }
                 else{
                     var height=this._poppedheight||uiintro.content.scrollHeight;
-    				uiintro.style.height=Math.min(ui.window.offsetHeight-260,height)+'px';
+                    var height2=ui.window.offsetHeight-260;
+                    if(lib.config.layout=='phone'){
+                        height2=(ui.window.offsetHeight-80)/1.3;
+                    }
+    				uiintro.style.height=Math.min(height2,height)+'px';
                 }
 				if(lib.config.layout=='phone'){
 					uiintro.style.top='70px';

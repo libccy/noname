@@ -47,7 +47,7 @@
     /*opacity: 0;*/
     /*width: 50%;
     min-width: 50%;*/
-    transform: translateY(-80px); */
+    transform: translateY(-80px);
 }
 #system>div.shown{
     width: auto;
@@ -76,6 +76,10 @@
 }
 .player>.identity{
     transform: scale(1.3);
+}
+#window>.dialog.popped.hoverdialog{
+    transform: scale(1.3);
+    transform-origin: left top;
 }
 .player:not([data-position='0']).linked .identity,
 #arena.chess .player.linked .identity{
