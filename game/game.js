@@ -16581,9 +16581,7 @@
                 lib.setPopped(chat,function(){
                     if(game.getRoomInfo){
                         var uiintro=ui.create.dialog('hidden');
-                        // uiintro.style.textAlign='left';
                         game.getRoomInfo(uiintro);
-                        console.log(uiintro);
                         return uiintro;
                     }
                 },180);
@@ -16989,6 +16987,7 @@
 			dialog:function(){
 				var i;
 				var hidden=false;
+                var noscroll=false;
 				var dialog=ui.create.div('.dialog');
 				dialog.contentContainer=ui.create.div('.content-container',dialog);
 				dialog.content=ui.create.div('.content',dialog.contentContainer);
@@ -17000,17 +16999,20 @@
 				}
 				for(i=0;i<arguments.length;i++){
 					if(typeof arguments[i]=='boolean') dialog.static=arguments[i];
-					else if(arguments[i]=='hidden') hidden=true;
+                    else if(arguments[i]=='hidden') hidden=true;
+					else if(arguments[i]=='noscroll') noscroll=true;
 					else dialog.add(arguments[i]);
 				}
 				if(!hidden){
 					dialog.open();
 				}
 				if(!lib.config.touchscreen) dialog.contentContainer.onscroll=ui.update;
-				dialog.contentContainer.ontouchstart=ui.click.dialogtouchStart;
-				dialog.contentContainer.ontouchmove = ui.click.touchScroll;
-				dialog.contentContainer.style.WebkitOverflowScrolling='touch';
-				dialog.ontouchstart=ui.click.dragtouchdialog;
+                if(!noscroll){
+                    dialog.contentContainer.ontouchstart=ui.click.dialogtouchStart;
+    				dialog.contentContainer.ontouchmove = ui.click.touchScroll;
+    				dialog.contentContainer.style.WebkitOverflowScrolling='touch';
+    				dialog.ontouchstart=ui.click.dragtouchdialog;
+                }
 				return dialog;
 			},
 			line2:function(){
@@ -21187,21 +21189,16 @@
 			roundmenu:function(){
 				switch(lib.config.round_menu_func){
 					case 'system':
-						if((_status.removinground&&lib.config.touchscreen)||
-							ui.system2.classList.contains('shown')){
-							_status.removinground=false;
-							game.pause2();
+                        ui.click.window();
+						ui.system1.classList.add('shown');
+						ui.system2.classList.add('shown');
+                        if(!ui.menuContainer.classList.contains('hidden')){
 							ui.click.configMenu();
-							ui.system1.classList.remove('shown');
-							ui.system2.classList.remove('shown');
-						}
-						else{
-							ui.system1.classList.add('shown');
-							ui.system2.classList.add('shown');
-                            ui.click.shortcut();
-						}
+                        }
+                        ui.click.shortcut();
 						break;
 					case 'menu':
+                        ui.click.window();
 						game.pause2();
 						ui.click.configMenu();
 						ui.system1.classList.remove('shown');
@@ -21870,20 +21867,16 @@
 						var goswipe=function(action){
 							switch(action){
 								case 'system':
-									// if(ui.system2.classList.contains('shown')||
-									// 	lib.config.layout!='phone'){
-									// 	game.pause2();
-									// 	ui.click.configMenu();
-									// 	ui.system1.classList.remove('shown');
-									// 	ui.system2.classList.remove('shown');
-									// }
-									// else{
-									// }
+                                    ui.click.window();
 									ui.system1.classList.add('shown');
 									ui.system2.classList.add('shown');
+                                    if(!ui.menuContainer.classList.contains('hidden')){
+            							ui.click.configMenu();
+                                    }
                                     ui.click.shortcut();
 									break;
 								case 'menu':
+                                    ui.click.window();
 									game.pause2();
 									ui.click.configMenu();
 									ui.system1.classList.remove('shown');
@@ -21894,9 +21887,6 @@
 									break;
 								case 'auto':
 									ui.click.auto();
-									// if(!ui.system1.classList.contains('shown')){
-									// 	 ui.system1.classList.add('shown');
-									//  }
 									break;
                                 case 'chat':
                                     if(ui.chatButton){
@@ -22696,6 +22686,7 @@
 				if(_status.clicked) return;
 				if(ui.intro) return;
                 if(this.classList.contains('connect')){
+                    if(game.online) return;
                     if(this.playerid){
                         if(this.ws){
                             if(confirm('是否踢出'+this.nickname+'？')){
@@ -24614,7 +24605,7 @@
 			}
 		},
 		nodeintro:function(node,simple){
-			var uiintro=ui.create.dialog('hidden');
+			var uiintro=ui.create.dialog('hidden','noscroll');
 			if(node.classList.contains('player')&&!node.name){
 				return uiintro;
 			}
@@ -24963,7 +24954,10 @@
 					uiintro.add('<div class="text center" style="padding-bottom:5px">'+_status.enemyRage+'/100</div>');
 				}
 			}
-			return uiintro;
+            if(lib.config.touchscreen){
+                lib.setScroll(uiintro.contentContainer);
+            }
+            return uiintro;
 		},
 		groups:function(){
 			return ['wei','shu','wu','qun'];
