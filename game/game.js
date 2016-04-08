@@ -21212,9 +21212,6 @@
 						break;
 					case 'auto':
 						ui.click.auto();
-						if(!ui.system1.classList.contains('shown')){
-							 ui.system1.classList.add('shown');
-						 }
 						break;
 				}
 				_status.clicked=true;
@@ -21316,6 +21313,9 @@
 				return uiintro;
 			},
             chat:function(){
+                ui.system1.classList.add('shown');
+                ui.system2.classList.add('shown');
+
                 var uiintro=ui.create.dialog('hidden');
 				uiintro.listen(function(e){
 					e.stopPropagation();
