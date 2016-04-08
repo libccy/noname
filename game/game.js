@@ -13891,8 +13891,8 @@
 			window.location.reload();
 		},
         exit:function(){
-            if(navigator.app&&navigator.app.exit){
-                navigator.app.exit();
+            if(navigator.app&&navigator.app.exitApp){
+                navigator.app.exitApp();
             }
         },
 		reloadCurrent:function(){
@@ -17794,6 +17794,7 @@
 					menuContainer=ui.create.div('.menu-container.hidden',ui.window,clickContainer);
 					ui.menuContainer=menuContainer;
 					ui.click.configMenu=function(){
+                        ui.click.shortcut(false)
                         if(menuContainer.classList.contains('hidden')){
 							ui.config2.classList.add('pressdown2');
 							ui.arena.classList.add('menupaused');
@@ -20673,6 +20674,7 @@
 			},
 			pause:function(){
 				if(_status.pausing) return;
+                ui.click.shortcut(false);
 				var node=ui.create.div("#paused",ui.window);
 				_status.pausing=true;
 				setTimeout(function(){
@@ -21525,7 +21527,7 @@
 				if(!lib.config.touchscreen){
 					uiintro.addEventListener('mouseleave',ui.click.leavehoverpopped);
 				}
-
+                ui.click.shortcut(false);
                 if(uiintro._onopen){
                     uiintro._onopen();
                 }
@@ -21865,18 +21867,18 @@
 						var goswipe=function(action){
 							switch(action){
 								case 'system':
-									if(ui.system2.classList.contains('shown')||
-										lib.config.layout!='phone'){
-										game.pause2();
-										ui.click.configMenu();
-										ui.system1.classList.remove('shown');
-										ui.system2.classList.remove('shown');
-									}
-									else{
-										ui.system1.classList.add('shown');
-										ui.system2.classList.add('shown');
-                                        ui.click.shortcut();
-									}
+									// if(ui.system2.classList.contains('shown')||
+									// 	lib.config.layout!='phone'){
+									// 	game.pause2();
+									// 	ui.click.configMenu();
+									// 	ui.system1.classList.remove('shown');
+									// 	ui.system2.classList.remove('shown');
+									// }
+									// else{
+									// }
+									ui.system1.classList.add('shown');
+									ui.system2.classList.add('shown');
+                                    ui.click.shortcut();
 									break;
 								case 'menu':
 									game.pause2();
@@ -22440,6 +22442,7 @@
 							}
 						}
 					}
+                    ui.click.shortcut(false);
 					if(lib.config.layout=='phone'&&ui.menuContainer.classList.contains('hidden')){
 						if(ui.system2.classList.contains('shown')){
 							_status.removinground=true;
@@ -22978,6 +22981,7 @@
 			auto:function(){
 				if(ui.auto.classList.contains('hidden')) return;
 				if(_status.paused2) return;
+                ui.click.shortcut(false);
 				if(!_status.auto){
 					_status.auto=true;
 					ui.auto.classList.add('glow');
@@ -23069,8 +23073,6 @@
 
 				_status.clicked=true;
 				game.pause2();
-
-                ui.click.shortcut(false);
 				ui.click.configMenu();
 				ui.system1.classList.remove('shown');
 				ui.system2.classList.remove('shown');
