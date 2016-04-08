@@ -237,13 +237,12 @@
 							pause:'切换暂停',
 							auto:'切换托管',
                             chat:'显示聊天',
-                            shortcut:'快捷操作',
 							off:'关闭',
 						}
 					},
 					swipe_left:{
 						name:'左划操作',
-						init:'shortcut',
+						init:'chat',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
@@ -251,7 +250,6 @@
 							pause:'切换暂停',
 							auto:'切换托管',
                             chat:'显示聊天',
-                            shortcut:'快捷操作',
 							off:'关闭',
 						}
 					},
@@ -265,7 +263,6 @@
 							pause:'切换暂停',
 							auto:'切换托管',
                             chat:'显示聊天',
-                            shortcut:'快捷操作',
 							off:'关闭',
 						}
 					},
@@ -11063,7 +11060,7 @@
                         id:game.onlineID,
                         avatar:lib.config.connect_avatar,
                         nickname:lib.config.connect_nickname
-                    });
+                    },lib.config.banned_info);
                 },
                 onmessage:function(messageevent){
                     var message;
@@ -11636,8 +11633,11 @@
 		cardPile:{},
         message:{
             server:{
-                init:function(version,config){
-                    if(config.id&&lib.playerOL&&lib.playerOL[config.id]&&lib.playerOL[config.id].isOffline()){
+                init:function(version,config,banned_info){
+                    if(lib.node.banned.contains(banned_info)){
+                        this.send('denied','banned');
+                    }
+                    else if(config.id&&lib.playerOL&&lib.playerOL[config.id]&&lib.playerOL[config.id].isOffline()){
                         var player=lib.playerOL[config.id];
                         player.setNickname();
                         player.ws=this;
@@ -11684,9 +11684,11 @@
                             this.nickname=config.nickname;
                         }
                         for(var i=0;i<game.connectPlayers.length;i++){
+                            if(game.connectPlayers[i].classList.contains('unselectable2')) continue;
                             if(game.connectPlayers[i]!=game.me&&!game.connectPlayers[i].playerid){
                                 game.connectPlayers[i].playerid=this.id;
                                 game.connectPlayers[i].initOL(this.nickname,this.avatar);
+                                game.connectPlayers[i].ws=this;
                                 break;
                             }
                         }
@@ -11774,6 +11776,7 @@
 
                     game.clearArena();
                     game.finishCards();
+                    ui.create.roomInfo();
                     ui.create.chat();
                     ui.create.connectPlayers(ip);
                     ui.pause.hide();
@@ -11815,6 +11818,7 @@
                             if(mode.game){
                                 game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
                                 game.updateState=lib.init.eval(mode.game.updateState);
+                                game.getRoomInfo=lib.init.eval(mode.game.getRoomInfo);
                                 if(mode.element&&mode.element.player&&mode.element.player.$dieAfter){
                                     lib.element.player.$dieAfter=lib.init.eval(mode.element.player.$dieAfter);
                                 }
@@ -12008,6 +12012,7 @@
                         case 'version':alert('加入失败：版本不匹配');break;
                         case 'gaming':alert('加入失败：游戏已开始');break;
                         case 'number':alert('加入失败：房间已满');break;
+                        case 'banned':alert('加入失败：房间拒绝你加入');break;
                         case 'offline':
                         if(_status.paused&&_status.event.name=='game'){
                             setTimeout(game.resume,500);
@@ -12054,6 +12059,10 @@
                         ui.connectStartBar.delete();
                         delete ui.connectStartBar;
                     }
+                    if(ui.roomInfo){
+                        ui.roomInfo.remove();
+                        delete ui.roomInfo;
+                    }
                     ui.auto.show();
                     ui.pause.show();
                     if(lib.config.show_cardpile){
@@ -12062,16 +12071,22 @@
                 },
                 updateWaiting:function(map){
                     for(var i=0;i<map.length;i++){
-                        if(map[i]){
-                            if(i==0){
-                                game.connectPlayers[i].setIdentity('zhu');
-                            }
-                            game.connectPlayers[i].initOL(map[i][0],map[i][1]);
-                            game.connectPlayers[i].playerid=map[i][2];
+                        if(map[i]=='disabled'){
+                            game.connectPlayers[i].classList.add('unselectable2');
                         }
                         else{
-                            game.connectPlayers[i].uninitOL();
-                            delete game.connectPlayers[i].playerid;
+                            game.connectPlayers[i].classList.remove('unselectable2');
+                            if(map[i]){
+                                if(i==0){
+                                    game.connectPlayers[i].setIdentity('zhu');
+                                }
+                                game.connectPlayers[i].initOL(map[i][0],map[i][1]);
+                                game.connectPlayers[i].playerid=map[i][2];
+                            }
+                            else{
+                                game.connectPlayers[i].uninitOL();
+                                delete game.connectPlayers[i].playerid;
+                            }
                         }
                     }
                 }
@@ -12113,6 +12128,9 @@
                 var player=game.connectPlayers[i];
                 if(player.playerid){
                     map[i]=[player.nickname,player.avatar,player.playerid];
+                }
+                else if(player.classList.contains('unselectable2')){
+                    map[i]='disabled';
                 }
                 else{
                     map[i]=null;
@@ -12252,6 +12270,7 @@
         },
         createServer:function(){
             lib.node.clients=[];
+            lib.node.banned=[];
             lib.node.observing=[];
             lib.node.torespond={};
             lib.node.torespondtimeout={};
@@ -12758,7 +12777,7 @@
 					_status.replayvideo=true;
 					game.playVideo(_status.playback,lib.config.mode);
 				});
-				ui.create.system('暂停',ui.click.pause,true);
+				ui.create.system('暂停',ui.click.pause,true).id='pausebutton';
 				var slow=ui.create.system('减速',function(){
 					_status.videoDuration*=1.5;
 					updateDuration();
@@ -16557,6 +16576,19 @@
                 ui.chatButton=chat;
                 lib.setPopped(chat,ui.click.chat,220);
             },
+            roomInfo:function(){
+                var chat=ui.create.system('房间信息',null,true);
+                ui.roomInfo=chat;
+                lib.setPopped(chat,function(){
+                    if(game.getRoomInfo){
+                        var uiintro=ui.create.dialog('hidden');
+                        // uiintro.style.textAlign='left';
+                        game.getRoomInfo(uiintro);
+                        console.log(uiintro);
+                        return uiintro;
+                    }
+                },180);
+            },
 			selectlist:function(list,init,position){
 				var select=document.createElement('select');
 				for(var i=0;i<list.length;i++){
@@ -17447,6 +17479,7 @@
 				ui.replay=ui.create.system('重来',game.reload,true);
 				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.pause=ui.create.system('暂停',ui.click.pause);
+                ui.pause.id='pausebutton';
 				if(!lib.config.touchscreen){
 					lib.setPopped(ui.pause,ui.click.pausehistory,220,400);
 				}
@@ -17460,6 +17493,7 @@
 					lib.setPopped(ui.config2,ui.click.pauseconfig,170);
 				}
 				ui.auto=ui.create.system('托管',ui.click.auto);
+                ui.auto.id='autobutton';
 				ui.volumn=ui.create.system('♫');
 				lib.setPopped(ui.volumn,ui.click.volumn,200);
 				// if(lib.config.show_pause) ui.auto.style.marginLeft='10px';
@@ -17556,18 +17590,17 @@
 
                 ui.shortcut=ui.create.div('#shortcut.hidden',ui.window);
                 ui.shortcut.listen(ui.click.shortcut);
-                ui.create.div('.menubutton.blue.large','重新开始',ui.shortcut,game.reload).dataset.position=1;
-                ui.create.div('.menubutton.red.large','退出游戏',ui.shortcut,game.exit).dataset.position=3;
-                ui.create.div('.menubutton.blue.large','模式选择',ui.shortcut,function(){
-                    game.saveConfig('mode','restart');
-                    game.reload();
-                }).dataset.position=4;
-                ui.create.div('.menubutton.blue.large','打开菜单',ui.shortcut,ui.click.configMenu).dataset.position=2;
+                ui.create.div('.menubutton.round','<span>重来</span>',ui.shortcut,game.reload).dataset.position=1;
+                ui.create.div('.menubutton.round','<span>退出</span>',ui.shortcut,game.exit).dataset.position=3;
+                ui.create.div('.menubutton.round','<span>记录</span>',ui.shortcut,ui.click.pause).dataset.position=4;
+                ui.shortcut.autobutton=ui.create.div('.menubutton.round','<span>托管</span>',ui.shortcut,ui.click.auto);
+                ui.shortcut.autobutton.dataset.position=2;
+                // ui.create.div('.menubutton.round','<span>菜单</span>',ui.shortcut,ui.click.config).dataset.position=5;
 
 
                 if(_status.connectMode){
                     ui.playerids.remove();
-                    ui.pause.innerHTML='历史';
+                    ui.pause.innerHTML='记录';
                 }
                 setTimerPosition.call(ui.timer);
                 ui.arena.appendChild(ui.timer);
@@ -17764,13 +17797,7 @@
                         if(menuContainer.classList.contains('hidden')){
 							ui.config2.classList.add('pressdown2');
 							ui.arena.classList.add('menupaused');
-                            // menu.classList.remove('zoomout');
-                            // menu.classList.add('zoomin');
                             menuContainer.classList.remove('hidden');
-                            // menuContainer.animating=true;
-                            // setTimeout(function(){
-                            //     menuContainer.animating=false;
-                            // },300);
 							for(var i=0;i<menuUpdates.length;i++){
 								menuUpdates[i]();
 							}
@@ -20365,7 +20392,7 @@
 											var updates=window.noname_source_list;
 											delete window.noname_source_list;
                                             for(var i=0;i<updates.length;i++){
-                                                if(updates[i].indexOf('theme/')==0){
+                                                if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('style.css')==-1){
                                                     updates.splice(i--,1);
                                                 }
                                             }
@@ -21037,12 +21064,23 @@
 			},
 		},
 		click:{
-            shortcut:function(){
-                ui.shortcut.classList.toggle('hidden');
+            shortcut:function(show){
+                if(show===false){
+                    ui.shortcut.classList.add('hidden');
+                }
+                else{
+                    ui.shortcut.classList.toggle('hidden');
+                }
                 if(ui.shortcut.classList.contains('hidden')){
                     ui.window.classList.remove('shortcutpaused');
                 }
                 else{
+                    if(_status.auto){
+                        ui.shortcut.autobutton.classList.add('active');
+                    }
+                    else{
+                        ui.shortcut.autobutton.classList.remove('active');
+                    }
                     ui.window.classList.add('shortcutpaused');
                 }
             },
@@ -21159,6 +21197,7 @@
 						else{
 							ui.system1.classList.add('shown');
 							ui.system2.classList.add('shown');
+                            ui.click.shortcut();
 						}
 						break;
 					case 'menu':
@@ -21189,6 +21228,7 @@
 			},
 			pauseconfig:function(){
 				if(!lib.config.auto_popped_config) return;
+                if(lib.config.layout=='phone') return;
 				// if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.listen(function(e){
@@ -21835,6 +21875,7 @@
 									else{
 										ui.system1.classList.add('shown');
 										ui.system2.classList.add('shown');
+                                        ui.click.shortcut();
 									}
 									break;
 								case 'menu':
@@ -21856,9 +21897,6 @@
                                     if(ui.chatButton){
                                         ui.click.hoverpopped.call(ui.chatButton);
                                     }
-                                    break;
-                                case 'shortcut':
-                                    ui.click.shortcut();
                                     break;
 							}
 						}
@@ -22651,6 +22689,34 @@
 				if(_status.dragged) return;
 				if(_status.clicked) return;
 				if(ui.intro) return;
+                if(this.classList.contains('connect')){
+                    if(this.playerid){
+                        if(this.ws){
+                            if(confirm('是否踢出'+this.nickname+'？')){
+                                var id=get.id();
+                                this.ws.send(function(id){
+                                    if(game.ws){
+                                        game.ws.close();
+                                        game.saveConfig('reconnect_info');
+                                        game.saveConfig('banned_info',id);
+                                    }
+                                },id);
+                                lib.node.banned.push(id);
+                            }
+                        }
+                    }
+                    else{
+                        this.classList.toggle('unselectable2')
+                        if(this.classList.contains('unselectable2')){
+                            lib.configOL.number--;
+                        }
+                        else{
+                            lib.configOL.number++;
+                        }
+                        game.updateWaiting();
+                    }
+                    return;
+                }
 				_status.clicked=true;
 				var custom=_status.event.custom;
 				if(custom.replace.target){
@@ -23004,24 +23070,10 @@
 				_status.clicked=true;
 				game.pause2();
 
-				if(lib.config.config_menu){
-					ui.click.configMenu();
-					ui.system1.classList.remove('shown');
-					ui.system2.classList.remove('shown');
-				}
-				else{
-					ui.system.hide();
-					if(false&&lib.config.right_sidebar) ui.arena.classList.add('left');
-					else ui.arena.classList.add('right');
-					ui.window.appendChild(ui.configbg);
-					setTimeout(function(){
-						ui.config.animate('start');
-						ui.window.appendChild(ui.config);
-					},100);
-					if(game.onpause2){
-						game.onpause2();
-					}
-				}
+                ui.click.shortcut(false);
+				ui.click.configMenu();
+				ui.system1.classList.remove('shown');
+				ui.system2.classList.remove('shown');
 			},
 			config2:function(e){
 				_status.clicked=true;

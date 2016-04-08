@@ -39,7 +39,8 @@ table{table-layout: fixed;}
 	position: absolute;
 	transition: all 1s;
 }
-#window.shortcutpaused>div:not(.background):not(#shortcut){opacity: 0.3 !important}
+#window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing){opacity: 0.3 !important}
+#window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden){opacity: 0.3 !important}
 #window.noclick_important *{pointer-events: none !important;}
 #window.noclick_important .noclick_click_important div{pointer-events: auto !important}
 #shortcut{
@@ -49,30 +50,46 @@ table{table-layout: fixed;}
 	left:0;
 	top:0;
 	z-index: 30;
-	background-color: rgba(0, 0, 0, 0.6);
+	/*background-color: rgba(0, 0, 0, 0.6);*/
 }
 #shortcut>div{
-	width: 130px;
-	height: 30px;
+	width: 80px;
+	height: 80px;
 	padding: 10px;
-	font-size: 32px;
 	margin: 0;
+
+	overflow: hidden;
+	line-height: 80px;
+	font-size: 50px;
+	white-space: nowrap;
+	text-align: center;
+	letter-spacing: -6px;
+}
+#shortcut>div>span{
+	width: 200px;
+	left: -63px;
+	position: relative;
+	display: inline-block;
 }
 #shortcut>div[data-position="1"]{
-	left:calc(50% - 75px);
-	top: calc(50% - 200px);
+	left:calc(50% - 50px);
+	top: calc(50% - 250px);
 }
 #shortcut>div[data-position="2"]{
 	left:calc(50% + 150px);
-	top: calc(50% - 25px);
+	top: calc(50% - 50px);
 }
 #shortcut>div[data-position="3"]{
-	left:calc(50% - 75px);
+	left:calc(50% - 50px);
 	top: calc(50% + 150px);
 }
 #shortcut>div[data-position="4"]{
-	left:calc(50% - 300px);
-	top: calc(50% - 25px);
+	left:calc(50% - 250px);
+	top: calc(50% - 50px);
+}
+#shortcut>div[data-position="5"]{
+	left:calc(50% - 50px);
+	top: calc(50% - 50px);
 }
 #shortcut.hidden{
 	pointer-events: none;
@@ -1152,10 +1169,12 @@ div:hover>.intro{opacity: 1;}
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:4px;
 }
-.shadowed{
+.shadowed,
+.menubutton.large.shadowed{
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
+	color: white !important;
 }
 #window.reduce_radius .shadowed{
 	border-radius: 4px;

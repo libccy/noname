@@ -552,9 +552,10 @@
     border-radius:4px;
     background-image: linear-gradient(rgba(75,75,75,1), rgba(70,70,70,1));
 }
-.menubutton.blue,
-.menubutton.red{
+.menubutton.large.blue,
+.menubutton.large.red{
 	color:white !important;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px !important;
 }
 .menubutton.active,
 .menubutton.blue{

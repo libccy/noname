@@ -168,6 +168,7 @@ mode.identity={
 		}
 		"step 4"
 		if(_status.connectMode){
+			_status.mode=lib.configOL.identity_mode;
 			game.prepareArena();
 			var list=[];
 			for(var i=0;i<game.players.length;i++){
@@ -194,7 +195,8 @@ mode.identity={
 				map.push([game.players[i].playerid,game.players[i].nickname]);
 				lib.playerOL[game.players[i].playerid]=game.players[i];
 			}
-			game.broadcast(function(map){
+			game.broadcast(function(map,config){
+				lib.configOL=config;
 				ui.create.players();
 				ui.create.me();
 				game.me.playerid=game.onlineID;
@@ -212,7 +214,7 @@ mode.identity={
 					lib.playerOL[game.players[i].playerid]=game.players[i];
 				}
 				_status.mode=lib.configOL.identity_mode;
-			},map);
+			},map,lib.configOL);
 			game.chooseCharacterOL();
 		}
 		else{
@@ -322,6 +324,12 @@ mode.identity={
 					player.ai.shown=state[i].shown;
 				}
 			}
+		},
+		getRoomInfo:function(uiintro){
+			uiintro.add('<div class="text chat">游戏模式：'+(lib.configOL.identity_mode=='zhong'?'明忠':'普通'));
+			uiintro.add('<div class="text chat">双将模式：'+(lib.configOL.double_character?'开启':'关闭'));
+			uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
+			uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒').style.paddingBottom='8px';
 		},
 		getIdentityList:function(player){
 			if(player.identityShown) return;
