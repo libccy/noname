@@ -1,4 +1,5 @@
-#arena.paused,#arena.unfocus,#arena.right,#arena.menupaused{
+#arena.paused,#arena.unfocus,#arena.right,
+#arena.menupaused,#window.shortcutpaused>div:not(#shortcut){
     filter:blur(3px);
     -webkit-filter:blur(3px);
 }

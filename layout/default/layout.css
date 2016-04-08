@@ -39,8 +39,44 @@ table{table-layout: fixed;}
 	position: absolute;
 	transition: all 1s;
 }
+#window.shortcutpaused>div:not(.background):not(#shortcut){opacity: 0.3 !important}
 #window.noclick_important *{pointer-events: none !important;}
 #window.noclick_important .noclick_click_important div{pointer-events: auto !important}
+#shortcut{
+	width:100%;
+	height:100%;
+	position:absolute;
+	left:0;
+	top:0;
+	z-index: 30;
+	background-color: rgba(0, 0, 0, 0.6);
+}
+#shortcut>div{
+	width: 130px;
+	height: 30px;
+	padding: 10px;
+	font-size: 32px;
+	margin: 0;
+}
+#shortcut>div[data-position="1"]{
+	left:calc(50% - 75px);
+	top: calc(50% - 200px);
+}
+#shortcut>div[data-position="2"]{
+	left:calc(50% + 150px);
+	top: calc(50% - 25px);
+}
+#shortcut>div[data-position="3"]{
+	left:calc(50% - 75px);
+	top: calc(50% + 150px);
+}
+#shortcut>div[data-position="4"]{
+	left:calc(50% - 300px);
+	top: calc(50% - 25px);
+}
+#shortcut.hidden{
+	pointer-events: none;
+}
 #splash{
 	width:100%;
 	height: 100%;
@@ -65,7 +101,7 @@ table{table-layout: fixed;}
 	position: relative;
 	transition: all 0.8s;
 }
-#splash>div:hover{
+#splash:not(.touch)>div:hover{
 	transform: translateY(-20px);
 }
 #splash>div.clicked{

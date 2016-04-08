@@ -223,6 +223,7 @@
 							menu:'打开菜单',
 							pause:'切换暂停',
 							auto:'切换托管',
+                            chat:'显示聊天',
 							off:'关闭',
 						}
 					},
@@ -235,30 +236,36 @@
 							menu:'打开菜单',
 							pause:'切换暂停',
 							auto:'切换托管',
+                            chat:'显示聊天',
+                            shortcut:'快捷操作',
 							off:'关闭',
 						}
 					},
 					swipe_left:{
 						name:'左划操作',
-						init:'off',
+						init:'shortcut',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
 							menu:'打开菜单',
 							pause:'切换暂停',
 							auto:'切换托管',
+                            chat:'显示聊天',
+                            shortcut:'快捷操作',
 							off:'关闭',
 						}
 					},
 					swipe_right:{
 						name:'右划操作',
-						init:'off',
+						init:'chat',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
 							menu:'打开菜单',
 							pause:'切换暂停',
 							auto:'切换托管',
+                            chat:'显示聊天',
+                            shortcut:'快捷操作',
 							off:'关闭',
 						}
 					},
@@ -3365,7 +3372,7 @@
 								}
 							});
 							document.addEventListener("backbutton", function(){
-								if(ui.arena.classList.contains('menupaused')){
+								if(ui.arena&&ui.arena.classList.contains('menupaused')){
 									ui.click.configMenu();
 								}
 								else if(lib.config.confirm_exit){
@@ -3794,6 +3801,7 @@
                     var proceeded=false;
 					var clickNode=function(){
                         if(clickedNode) return;
+                        this.classList.add('clicked');
                         clickedNode=true;
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
@@ -3805,7 +3813,6 @@
                             proceeded=true;
                             lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
                         };
-                        this.classList.add('clicked');
                         this.addEventListener('webkitTransitionEnd',proceed2);
                         setTimeout(proceed2,500);
 					}
@@ -3816,6 +3823,9 @@
                         this.classList.remove('glow');
                     }
 					var splash=ui.create.div('#splash',document.body);
+                    if(lib.config.touchscreen){
+                        splash.classList.add('touch');
+                    }
 					for(var i=0;i<lib.config.all.mode.length;i++){
 						var node=ui.create.div('.hidden',splash,clickNode);
 						node.link=lib.config.all.mode[i];
@@ -3832,12 +3842,7 @@
                                 });
                             }(avatarnode,avatarbg)));
 						}
-                        if(lib.config.touchscreen){
-                            node.addEventListener('touchstart',downNode);
-                            node.addEventListener('touchend',upNode);
-                            node.addEventListener('mouseleave',upNode);
-                        }
-                        else{
+                        if(!lib.config.touchscreen){
                             node.addEventListener('mousedown',downNode);
                             node.addEventListener('mouseup',upNode);
                             node.addEventListener('mouseleave',upNode);
@@ -13866,6 +13871,11 @@
 			}
 			window.location.reload();
 		},
+        exit:function(){
+            if(navigator.app&&navigator.app.exit){
+                navigator.app.exit();
+            }
+        },
 		reloadCurrent:function(){
 			game.saveConfig('continue_name',[game.me.name1||game.me.name,game.me.name2]);
 			game.saveConfig('mode',lib.config.mode);
@@ -16544,6 +16554,7 @@
 			},
             chat:function(){
                 var chat=ui.create.system('聊天',null,true);
+                ui.chatButton=chat;
                 lib.setPopped(chat,ui.click.chat,220);
             },
 			selectlist:function(list,init,position){
@@ -17543,6 +17554,17 @@
                 }
                 ui.timer.listen(setTimerPosition);
 
+                ui.shortcut=ui.create.div('#shortcut.hidden',ui.window);
+                ui.shortcut.listen(ui.click.shortcut);
+                ui.create.div('.menubutton.blue.large','重新开始',ui.shortcut,game.reload).dataset.position=1;
+                ui.create.div('.menubutton.red.large','退出游戏',ui.shortcut,game.exit).dataset.position=3;
+                ui.create.div('.menubutton.blue.large','模式选择',ui.shortcut,function(){
+                    game.saveConfig('mode','restart');
+                    game.reload();
+                }).dataset.position=4;
+                ui.create.div('.menubutton.blue.large','打开菜单',ui.shortcut,ui.click.configMenu).dataset.position=2;
+
+
                 if(_status.connectMode){
                     ui.playerids.remove();
                     ui.pause.innerHTML='历史';
@@ -17869,14 +17891,16 @@
 	                                        if(cfg.onsave){
 	                                            cfg.onsave.call(this,result);
 	                                        }
-											if(typeof cfg.restart=='function'){
-												if(cfg.restart()){
-													startButton.classList.add('glowing');
-												}
-											}
-											else if(cfg.restart){
-												startButton.classList.add('glowing');
-											}
+                                            if(!_status.connectMode||game.online){
+                                                if(typeof cfg.restart=='function'){
+    												if(cfg.restart()){
+    													startButton.classList.add('glowing');
+    												}
+    											}
+    											else if(cfg.restart){
+    												startButton.classList.add('glowing');
+    											}
+                                            }
 	                                    };
 	                                }
 	                                if(info.config.update){
@@ -20378,7 +20402,7 @@
 									else{
 										var layer=document.createElement('div');
 										layer.classList.add('poplayer');
-										layer.style.zIndex='100';
+										layer.style.zIndex='25';
 										layer.listen(function(){
 											this.remove();
 										});
@@ -21013,6 +21037,15 @@
 			},
 		},
 		click:{
+            shortcut:function(){
+                ui.shortcut.classList.toggle('hidden');
+                if(ui.shortcut.classList.contains('hidden')){
+                    ui.window.classList.remove('shortcutpaused');
+                }
+                else{
+                    ui.window.classList.add('shortcutpaused');
+                }
+            },
             favouriteCharacter:function(e){
                 if(this.innerHTML=='添加收藏'){
                     this.innerHTML='移除收藏';
@@ -21246,13 +21279,11 @@
 				uiintro.listen(function(e){
 					e.stopPropagation();
 				});
-                // uiintro.add('<div class="text center">对话记录</div>');
-                // uiintro.add(ui.create.div('.placeholder.slim'));
-                // uiintro.classList.add('noleave');
 
                 var list=ui.create.div('.caption');
                 list.style.maxHeight='350px';
                 list.style.overflow='scroll';
+                lib.setScroll(list);
                 uiintro.contentContainer.style.overflow='hidden';
 
                 var input;
@@ -21821,6 +21852,14 @@
 										 ui.system1.classList.add('shown');
 									 }
 									break;
+                                case 'chat':
+                                    if(ui.chatButton){
+                                        ui.click.hoverpopped.call(ui.chatButton);
+                                    }
+                                    break;
+                                case 'shortcut':
+                                    ui.click.shortcut();
+                                    break;
 							}
 						}
 						if(Math.abs(dx)<100){

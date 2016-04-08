@@ -552,7 +552,12 @@
     border-radius:4px;
     background-image: linear-gradient(rgba(75,75,75,1), rgba(70,70,70,1));
 }
-.menubutton.active{
+.menubutton.blue,
+.menubutton.red{
+	color:white !important;
+}
+.menubutton.active,
+.menubutton.blue{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 }
 #system>div>.pressdown{
@@ -564,7 +569,8 @@
 #system>div>.pressdown2{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 }
-.menubutton.highlight{
+.menubutton.highlight,
+.menubutton.red{
 	background-image: linear-gradient(rgba(150, 47, 47, 1), rgba(132, 43, 43, 1));
 }
 .menubutton.large.active,
