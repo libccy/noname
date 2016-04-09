@@ -21,7 +21,7 @@
     z-index: 31 !important;
 }
 #window>.dialog.popped{
-    z-index: 11 !important;
+    z-index: 21 !important;
 }
 #system>div{
     position: absolute;

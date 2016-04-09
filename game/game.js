@@ -12098,6 +12098,15 @@
 	var game={
         online:false,
         onlineID:null,
+        closePopped:function(){
+            if(ui.currentpopped){
+                if(ui.currentpopped._uiintro){
+                    ui.currentpopped._uiintro.delete();
+                    delete ui.currentpopped._uiintro;
+                }
+                delete ui.currentpopped;
+            }
+        },
         broadcast:function(){
             if(!lib.node||!lib.node.clients||game.online) return;
             for(var i=0;i<lib.node.clients.length;i++){
@@ -16987,7 +16996,7 @@
 			dialog:function(){
 				var i;
 				var hidden=false;
-                var noscroll=false;
+                var notouchscroll=false;
 				var dialog=ui.create.div('.dialog');
 				dialog.contentContainer=ui.create.div('.content-container',dialog);
 				dialog.content=ui.create.div('.content',dialog.contentContainer);
@@ -17000,14 +17009,14 @@
 				for(i=0;i<arguments.length;i++){
 					if(typeof arguments[i]=='boolean') dialog.static=arguments[i];
                     else if(arguments[i]=='hidden') hidden=true;
-					else if(arguments[i]=='noscroll') noscroll=true;
+					else if(arguments[i]=='notouchscroll') notouchscroll=true;
 					else dialog.add(arguments[i]);
 				}
 				if(!hidden){
 					dialog.open();
 				}
 				if(!lib.config.touchscreen) dialog.contentContainer.onscroll=ui.update;
-                if(!noscroll){
+                if(!notouchscroll){
                     dialog.contentContainer.ontouchstart=ui.click.dialogtouchStart;
     				dialog.contentContainer.ontouchmove = ui.click.touchScroll;
     				dialog.contentContainer.style.WebkitOverflowScrolling='touch';
@@ -21189,7 +21198,7 @@
 			roundmenu:function(){
 				switch(lib.config.round_menu_func){
 					case 'system':
-                        ui.click.window();
+                        game.closePopped();
 						ui.system1.classList.add('shown');
 						ui.system2.classList.add('shown');
                         if(!ui.menuContainer.classList.contains('hidden')){
@@ -21198,7 +21207,7 @@
                         ui.click.shortcut();
 						break;
 					case 'menu':
-                        ui.click.window();
+                        game.closePopped();
 						game.pause2();
 						ui.click.configMenu();
 						ui.system1.classList.remove('shown');
@@ -21867,7 +21876,7 @@
 						var goswipe=function(action){
 							switch(action){
 								case 'system':
-                                    ui.click.window();
+                                    game.closePopped();
 									ui.system1.classList.add('shown');
 									ui.system2.classList.add('shown');
                                     if(!ui.menuContainer.classList.contains('hidden')){
@@ -21876,7 +21885,7 @@
                                     ui.click.shortcut();
 									break;
 								case 'menu':
-                                    ui.click.window();
+                                    game.closePopped();
 									game.pause2();
 									ui.click.configMenu();
 									ui.system1.classList.remove('shown');
@@ -22455,13 +22464,7 @@
 					_status.tempunpop=false;
 				}
 				else{
-					if(ui.currentpopped){
-						if(ui.currentpopped._uiintro){
-							ui.currentpopped._uiintro.delete();
-							delete ui.currentpopped._uiintro;
-						}
-						delete ui.currentpopped;
-					}
+					game.closePopped();
 				}
 				if(_status.event.custom.add.window){
 					_status.event.custom.add.window(clicked);
@@ -23208,13 +23211,7 @@
 					_status.clickedplayer=false;
 					return;
 				}
-				if(ui.currentpopped){
-					if(ui.currentpopped._uiintro){
-						ui.currentpopped._uiintro.delete();
-						delete ui.currentpopped._uiintro;
-					}
-					delete ui.currentpopped;
-				}
+				game.closePopped();
 				switch(lib.config.right_click){
 					case 'pause':ui.click.pause();break;
 					case 'auto':ui.click.auto();break;
@@ -24605,7 +24602,7 @@
 			}
 		},
 		nodeintro:function(node,simple){
-			var uiintro=ui.create.dialog('hidden','noscroll');
+			var uiintro=ui.create.dialog('hidden','notouchscroll');
 			if(node.classList.contains('player')&&!node.name){
 				return uiintro;
 			}
@@ -25811,13 +25808,7 @@
 		}
 		window.onkeydown=function(e){
 			if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')) return;
-			if(ui.currentpopped){
-				if(ui.currentpopped._uiintro){
-					ui.currentpopped._uiintro.delete();
-					delete ui.currentpopped._uiintro;
-				}
-				delete ui.currentpopped;
-			}
+			game.closePopped();
 			var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
 			for(var i=0;i<dialogs.length;i++){
 				dialogs[i].delete();
