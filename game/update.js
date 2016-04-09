@@ -1,6 +1,7 @@
 window.noname_update={
     version:'1.8.4.1',
     changeLog:[
+        '修复几处界面问题',
         '修复完杀和双将bug',
         '旁观可切换视角',
         '聊天手势',

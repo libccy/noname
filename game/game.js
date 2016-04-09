@@ -12098,6 +12098,11 @@
 	var game={
         online:false,
         onlineID:null,
+        closeMenu:function(){
+            if(!ui.menuContainer.classList.contains('hidden')){
+                ui.click.configMenu();
+            }
+        },
         closePopped:function(){
             if(ui.currentpopped){
                 if(ui.currentpopped._uiintro){
@@ -17600,6 +17605,7 @@
 
                 ui.shortcut=ui.create.div('#shortcut.hidden',ui.window);
                 ui.shortcut.listen(ui.click.shortcut);
+                ui.create.div(ui.shortcut,function(e){e.stopPropagation()});
                 ui.create.div('.menubutton.round','<span>重来</span>',ui.shortcut,game.reload).dataset.position=1;
                 ui.create.div('.menubutton.round','<span>退出</span>',ui.shortcut,game.exit).dataset.position=3;
                 ui.create.div('.menubutton.round','<span>记录</span>',ui.shortcut,ui.click.pause).dataset.position=4;
@@ -21201,9 +21207,7 @@
                         game.closePopped();
 						ui.system1.classList.add('shown');
 						ui.system2.classList.add('shown');
-                        if(!ui.menuContainer.classList.contains('hidden')){
-							ui.click.configMenu();
-                        }
+                        game.closeMenu();
                         ui.click.shortcut();
 						break;
 					case 'menu':
@@ -21879,9 +21883,7 @@
                                     game.closePopped();
 									ui.system1.classList.add('shown');
 									ui.system2.classList.add('shown');
-                                    if(!ui.menuContainer.classList.contains('hidden')){
-            							ui.click.configMenu();
-                                    }
+                                    game.closeMenu();
                                     ui.click.shortcut();
 									break;
 								case 'menu':
@@ -21898,6 +21900,7 @@
 									ui.click.auto();
 									break;
                                 case 'chat':
+                                    game.closeMenu();
                                     if(ui.chatButton){
                                         ui.click.hoverpopped.call(ui.chatButton);
                                     }
