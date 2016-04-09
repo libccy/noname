@@ -21184,23 +21184,6 @@
 					delete _status.clickingidentity;
 				}
 			},
-			system:function(){
-				if(lib.config.layout!='phone') return;
-				_status.clicked=true;
-				this.classList.add('shown');
-				if(this._tempclicking){
-					ui.arena.classList.add('phonetop');
-				}
-				else{
-					this._tempclicking=true;
-					var that=this;
-					setTimeout(function(){
-						that._tempclicking=false;
-					},300);
-				}
-				if(this.nextSibling) this.nextSibling.classList.remove('shown');
-				if(this.previousSibling) this.previousSibling.classList.remove('shown');
-			},
 			roundmenu:function(){
 				switch(lib.config.round_menu_func){
 					case 'system':
