@@ -20570,7 +20570,7 @@
                                         });
 									};
 									for(var i=0;i<updates.length;i++){
-                                        if(lib.node){
+                                        if(lib.node&&lib.node.fs){
                                             lib.node.fs.access(__dirname+'/'+updates[i],(function(entry){
                                                 return function(err){
                                                     if(err){

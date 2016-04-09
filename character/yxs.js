@@ -2031,7 +2031,8 @@ character.yxs={
 				return 6-ai.get.value(card);
 			},
 			filterCard:function(card){
-				return !lib.card[card.name].image;
+				var info=lib.card[card.name].image;
+				return !info.image&&!info.fullimage;
 			},
 			discard:false,
 			lose:false,
