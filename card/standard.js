@@ -1385,6 +1385,7 @@ card.standard={
 				event.state=true;
 				event.card=trigger.card;
 				event._global_waiting=true;
+				event.tempnowuxie=(trigger.targets&&trigger.targets.length>1&&!trigger.multitarget);
 				event.filterCard=function(card,player){
 					if(card.name!='wuxie') return false;
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
@@ -1494,7 +1495,8 @@ card.standard={
 				}
 				else{
 					event.current=event.list.shift();
-					event.send(event.current,event.state,event.triggername=='phaseJudge',event.card,event.source,event.target,event.targets,event.id);
+					event.send(event.current,event.state,event.triggername=='phaseJudge',
+					event.card,event.source,event.target,event.targets,event.id,trigger.parent.id,event.tempnowuxie);
 				}
 				'step 3'
 				if(result.bool){
@@ -1528,7 +1530,6 @@ card.standard={
 						}
 					}
 				};
-				var tempnowuxie=(trigger.targets&&trigger.targets.length>1&&!trigger.multitarget);
 
 				var withme=false;
 				var withol=false;
@@ -1538,13 +1539,13 @@ card.standard={
 						withol=true;
 						list[i].wait(sendback);
 						list[i].send(event.send,list[i],event.state,event.triggername=='phaseJudge',
-						event.card,event.source,event.target,event.targets,event.id,trigger.parent.id,tempnowuxie);
+						event.card,event.source,event.target,event.targets,event.id,trigger.parent.id,event.tempnowuxie);
 						list.splice(i--,1);
 					}
 					else if(list[i]==game.me){
 						withme=true;
 						event.send(list[i],event.state,event.triggername=='phaseJudge',
-						event.card,event.source,event.target,event.targets,event.id,trigger.parent.id,tempnowuxie);
+						event.card,event.source,event.target,event.targets,event.id,trigger.parent.id,event.tempnowuxie);
 						list.splice(i--,1);
 					}
 				}

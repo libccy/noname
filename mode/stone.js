@@ -1158,7 +1158,7 @@ mode.stone={
 			stone_qiezei:['male','qun',2,['rogue_touqie'],['minskin','stone'],[2,2,'rogue']],
 			stone_heitieairen:['male','qun',2,['rogue_qiancang'],['minskin','stone'],[4,3,'rogue']],
 			stone_tegong:['male','qun',2,['rogue_touxi'],['minskin','stone'],[3,3,'rogue']],
-			stone_haidaotoumu:['male','qun',2,['rogue_zhaomu'],['minskin','stone'],[3,2,'rogue']],
+			stone_haidaotoumu:['male','qun',2,['rogue_zhaomu'],['minskin','stone'],[2,2,'rogue']],
 			stone_haidao:['male','qun',1,[],['minskin','stone','stonehidden'],[1,2,'rogue']],
 			stone_cike:['male','qun',1,['rogue_cisha','stone_qianxing'],['minskin','stone'],[1,1,'rogue']],
 			stone_duyanhaidao:['male','qun',2,['rogue_duxing'],['minskin','stone'],[3,4,'rogue']],
@@ -1643,6 +1643,18 @@ mode.stone={
 		},
 	},
 	get:{
+		stonecard:function(type,career){
+			var list=[];
+			for(var i in lib.card){
+				if(lib.card[i].stonehidden) continue;
+				if(lib.card[i].type!='stonecard'&&lib.card[i].type!='stonecharacter') continue;
+				if(type==1&&lib.card[i].type!='stonecard') continue;
+				if(type==2&&lib.card[i].type!='stonecharacter') continue;
+				if(career&&lib.card[i].career!=career) continue;
+				list.push(i);
+			}
+			return list;
+		},
 		deck:function(player,name){
 			var career,deck;
 			if(name=='random'||name.indexOf('random:')==0){
@@ -1723,7 +1735,7 @@ mode.stone={
 			type:'stonecard',
 			fullimage:true,
 			enable:true,
-			stoneact:2,
+			stoneact:3,
 			career:'warlock',
 			filterTarget:true,
 			content:function(){
@@ -2448,19 +2460,20 @@ mode.stone={
 
 		spell_shalumingling:{
 			type:'stonecard',
-			stoneact:3,
+			stoneact:2,
 			career:'hunter',
 			enable:true,
 			fullimage:true,
 			filterTarget:true,
 			content:function(){
-				'step 0'
-				target.damage(2);
-				'step 1'
+				var num=1;
 				var friends=player.getFellow();
-				if(friends.length){
-					game.asyncDraw(friends);
+				for(var i=0;i<friends.length;i++){
+					if(lib.beastList.contains(friends[i].name)){
+						num=2;break;
+					}
 				}
+				target.damage(num);
 			},
 			ai:{
 				order:7,
@@ -3120,7 +3133,7 @@ mode.stone={
 		},
 		spell_hanbingpingzhang:{
 			type:'stonecard',
-			stoneact:2,
+			stoneact:1,
 			career:'mage',
 			enable:true,
 			fullimage:true,
@@ -3232,7 +3245,11 @@ mode.stone={
 			career:'mage',
 			filterTarget:true,
 			content:function(){
-				target.damage(4,'fire');
+				var num=4;
+				if(!target.isMin()){
+					num=Math.min(4,target.hp);
+				}
+				target.damage(num,'fire');
 			},
 			ai:{
 				order:8,
@@ -4979,7 +4996,11 @@ mode.stone={
 			career:'mage',
 			filterTarget:true,
 			content:function(){
-				target.damage(3,'fire');
+				var num=3;
+				if(!target.isMin()){
+					num=Math.min(3,target.hp);
+				}
+				target.damage(num,'fire');
 			},
 			ai:{
 				order:8,
@@ -5188,7 +5209,7 @@ mode.stone={
 				if(player.isMin()) return false;
 				return player.canAddFellow();
 			},
-			stoneact:5,
+			stoneact:6,
 			filterTarget:function(card,player,target){
 				return target.isMin()&&target.side!=player.side;
 			},
@@ -5196,6 +5217,9 @@ mode.stone={
 				target.getLeader().removeFellow(target);
 				target.side=player.side;
 				player.addFellow(target);
+				if(!target.isTurnedOver()){
+					target.turnOver();
+				}
 			},
 			ai:{
 				order:9.5,
@@ -9387,7 +9411,7 @@ mode.stone={
 		hunter_tanxianmao_info:'你死亡时，将一张探险帽置入主将的手牌',
 		spell_tanxianmao_info:'令一名友方随从增加一点体力和体力上限并摸一张牌，当该随从死亡时，将一张探险帽置入你的手牌',
 		spell_shalumingling:'杀戮命令',
-		spell_shalumingling_info:'造成两点伤害，所有友方随从摸一张牌',
+		spell_shalumingling_info:'造成一点伤害，如果你控制任何野兽，则改为造成两点伤害',
 		spell_zhuizongshu:'追踪术',
 		spell_zhuizongshu_info:'从牌库中随机选择三张牌，获得其中的一张',
 		spell_tianjiangzhuqun:'天降蛛群',
@@ -9427,7 +9451,7 @@ mode.stone={
 		spell_emozhixin:'恶魔之心',
 		spell_emozhixin_info:'对一名敌方随从造成四点伤害，或令一名友方随从摸四张牌',
 		spell_ansezhadan:'暗色炸弹',
-		spell_ansezhadan_info:'造成两点伤害，随机弃置一张手牌',
+		spell_ansezhadan_info:'造成两点伤害',
 		spell_fushishu:'腐蚀术',
 		warlock_fushishu:'腐蚀',
 		warlock_fushishu_info:'下个回合结束后死亡',
@@ -9590,7 +9614,7 @@ mode.stone={
 		spell_canying:'残影',
 		spell_canying_info:'复制你的所有随从，并将其置入你的手牌',
 		spell_yanbaoshu:'炎爆术',
-		spell_yanbaoshu_info:'造成四点火焰伤害',
+		spell_yanbaoshu_info:'造成四点火焰伤害（若目标为主将，伤害不能超过目标的当前体力值）',
 		spell_jingxiang:'镜像',
 		spell_jingxiang_info:'召唤两个具有嘲讽且摸牌阶段不摸牌的随从',
 		spell_aoshufeidan:'奥术飞弹',
@@ -9611,7 +9635,7 @@ mode.stone={
 		spell_bianxingshu:'变形术',
 		spell_bianxingshu_info:'将一个随从变成一只绵羊',
 		spell_huoqiushu:'火球术',
-		spell_huoqiushu_info:'造成三点火焰伤害',
+		spell_huoqiushu_info:'造成三点火焰伤害（若目标为主将，伤害不能超过目标的当前体力值）',
 
 		stone_mianyang:'绵羊',
 		mage_mianyang:'绵羊',
@@ -9974,7 +9998,7 @@ mode.stone={
 		shaman_zhuore:'灼热',
 		shaman_zhuore_info:'已方主将的回合结束阶段，对一名随机敌方随从造成一点伤害',
 
-		_shaman_skill:'祭天',
+		_shaman_skill:'图腾',
 		_shaman_skill_info:'召唤一个随机图腾',
 		_mage_skill:'火冲',
 		_mage_skill_info:'对一名随从造成一点火焰伤害',
@@ -10156,7 +10180,7 @@ mode.stone={
 		'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 		'随从与其他所有角色相互距离基数为1<li>'+
 		'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
-		'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为从牌库中获得一张法术牌'+
+		'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为获得一张随机法术牌'+
 		'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀目标'+
 		'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
 	}

@@ -80,7 +80,7 @@ play.coin={
 					buy.listen(clickBuy);
 				}
 
-				if(!game.phaseNumber){
+				if(!game.phaseNumber&&!game.online){
 					uiintro.add('下注');
 					uiintro.add('<div class="coin_buy">本局获胜<div class="menubutton">20金</span></div></div>');
 					var bet=uiintro.content.lastChild.lastChild.lastChild;

@@ -168,10 +168,11 @@ character.shenhua={
 				var fang=player.hp>=2&&player.num('h')<=player.hp+1;
 				player.chooseTarget('是否发动【放权】？',function(card,player,target){
 					return target!=player;
-				}).ai=function(target){
-					if(!fang) return -1;
+				}).set('ai',function(target){
+					if(!_status.event.fang) return -1;
+					if(target.num('j','lebu')) return -1;
 					return ai.get.attitude(player,target)-4;
-				};
+				}).set('fang',fang);
 				"step 1"
 				if(result.bool){
 					player.logSkill('fangquan',result.targets);

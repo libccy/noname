@@ -4442,7 +4442,7 @@
                                 }
                                 return;
                             }
-                            if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')){
+                            if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&event.getParent().state){
                                 event.result={
                                     bool:false
                                 }
@@ -10742,6 +10742,9 @@
 				},
 				trigger:function(name){
 					if(_status.video) return;
+                    if(name=='gameStart'){
+                        _status.gameStarted=true;
+                    }
 					var event=this;
 					var i,j,iwhile,next,add;
 					var totalPopulation=game.players.length+game.dead.length+1;
@@ -11521,21 +11524,13 @@
 					"step 0"
 					if(lib.config.mode=='stone'&&_status.mode=='deck'&&
 					!player.isMin()&&get.type(cards[0]).indexOf('stone')==0){
-						// var list=[];
-						// for(var i=0;i<player.deckCards.length;i++){
-						// 	if(get.type(player.deckCards[i])=='stonecard'){
-						// 		list.push(player.deckCards[i]);
-						// 	}
-						// }
-						// if(list.length){
-						// 	var choice=list.randomGet();
-						// 	player.deckCards.remove(choice);
-						// 	player.gain(choice,'draw');
-						// }
-						// else{
-						// 	player.draw({drawDeck:1})
-						// }
-                        player.draw({drawDeck:1})
+						var list=get.stonecard(1,player.career);
+						if(list.length){
+							player.gain(game.createCard(list.randomGet()),'draw');
+						}
+						else{
+							player.draw({drawDeck:1})
+						}
 					}
 					else{
 						player.draw();
@@ -23019,6 +23014,7 @@
 				if(_status.paused2) return;
 				if(_status.nopause) return;
 				if(ui.pause.classList.contains('hidden')) return;
+                if(!_status.gameStarted) return;
 				ui.system.hide();
 				game.pause2();
 				var node=ui.create.pause().animate('start');
