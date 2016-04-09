@@ -82,28 +82,28 @@ table{table-layout: fixed;}
 }
 #shortcut>div[data-position="1"]{
 	left:calc(50% - 50px);
-	top: calc(50% - 200px);
+	top: calc(50% - 190px);
 }
 #shortcut.hidden>div[data-position="1"]{
 	transform: scale(1) translateY(150px);
 }
 #shortcut>div[data-position="2"]{
 	left:calc(50% + 100px);
-	top: calc(50% - 50px);
+	top: calc(50% - 40px);
 }
 #shortcut.hidden>div[data-position="2"]{
 	transform: scale(1) translateX(-150px);
 }
 #shortcut>div[data-position="3"]{
 	left:calc(50% - 50px);
-	top: calc(50% + 100px);
+	top: calc(50% + 110px);
 }
 #shortcut.hidden>div[data-position="3"]{
 	transform: scale(1) translateY(-150px);
 }
 #shortcut>div[data-position="4"]{
 	left:calc(50% - 200px);
-	top: calc(50% - 50px);
+	top: calc(50% - 40px);
 }
 #shortcut.hidden>div[data-position="4"]{
 	transform: scale(1) translateX(150px);

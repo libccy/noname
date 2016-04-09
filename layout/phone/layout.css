@@ -54,7 +54,7 @@
 #system>div:not(.shown)>div{
     pointer-events: none;
 }
-#pausebutton,#autobutton{
+#pausebutton,#autobutton,#restartbutton{
     display: none !important;
 }
 /*#system1>div:first-child{
@@ -85,9 +85,9 @@
 	transform:scale(1.3) rotate(90deg);
 }
 
-br.finish_game{
+/*br.finish_game{
     display: inline !important;
-}
+}*/
 div:not(.shown)>div.finish_game{
     opacity: 0 !important;
 }

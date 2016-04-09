@@ -17492,6 +17492,7 @@
 				ui.system2=ui.create.div('#system2',ui.system);
 
 				ui.replay=ui.create.system('重来',game.reload,true);
+                ui.replay.id='restartbutton';
 				ui.config2=ui.create.system('选项',ui.click.config);
 				ui.pause=ui.create.system('暂停',ui.click.pause);
                 ui.pause.id='pausebutton';
