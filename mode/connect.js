@@ -59,13 +59,6 @@ mode.connect={
                 node.innerHTML=this.innerHTML;
                 connect();
             };
-            var trimIP=function(str){
-                var len=str.length-5;
-                if(str.lastIndexOf(':8080')==len){
-                    str=str.slice(0,len);
-                }
-                return str;
-            };
             lib.setPopped(ui.recentIP,function(){
                 if(!lib.config.recentIP.length) return;
                 var uiintro=ui.create.dialog('hidden');
@@ -74,7 +67,7 @@ mode.connect={
 				});
                 var list=ui.create.div('.caption');
                 for(var i=0;i<lib.config.recentIP.length;i++){
-                    ui.create.div('.text.textlink',list,clickLink).innerHTML=trimIP(lib.config.recentIP[i]);
+                    ui.create.div('.text.textlink',list,clickLink).innerHTML=get.trimip(lib.config.recentIP[i]);
                 }
                 uiintro.add(list);
                 var clear=uiintro.add('<div class="text center">清除</div>');

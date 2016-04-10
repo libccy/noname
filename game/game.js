@@ -47,7 +47,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:2,
+        versionOL:3,
 		updateURL:localStorage.getItem('noname_download_source')||'http://isha.applinzi.com/',
 		assetURL:'',
 		changeLog:[],
@@ -3871,6 +3871,40 @@
                     game.send('result',result);
                 }
                 event.goto(0);
+            },
+            connection:function(ws){
+                var client={
+                    ws:ws,
+                    id:get.id(),
+                    closed:false
+                };
+                lib.node.clients.push(client);
+                for(var i in lib.element.client){
+                    client[i]=lib.element.client[i];
+                }
+                ws.on('message',function(messagestr){
+                    var message;
+                    try{
+                        message=JSON.parse(messagestr);
+                        if(!Array.isArray(message)||
+                            typeof lib.message.server[message[0]]!=='function'){
+                            throw('err');
+                        }
+                        for(var i=1;i<message.length;i++){
+                            message[i]=get.parsedResult(message[i]);
+                        }
+                    }
+                    catch(e){
+                        console.log(e);
+                        console.log('invalid message: '+messagestr);
+                        return;
+                    }
+                    lib.message.server[message.shift()].apply(client,message);
+                });
+                ws.on('close',function(){
+                    client.close();
+                });
+                client.send('opened');
             },
 			css:function(path,file,before){
 				var style = document.createElement("link");
@@ -11058,11 +11092,6 @@
                         _status.connectCallback(true);
                         delete _status.connectCallback;
                     }
-                    game.send('init',lib.versionOL,{
-                        id:game.onlineID,
-                        avatar:lib.config.connect_avatar,
-                        nickname:lib.config.connect_nickname
-                    },lib.config.banned_info);
                 },
                 onmessage:function(messageevent){
                     var message;
@@ -11755,6 +11784,79 @@
                 },
             },
             client:{
+                opened:function(){
+                    game.send('init',lib.versionOL,{
+                        id:game.onlineID,
+                        avatar:lib.config.connect_avatar,
+                        nickname:lib.config.connect_nickname
+                    },lib.config.banned_info);
+                },
+                createroom:function(){
+                    game.online=false;
+                    lib.node={};
+                    for(var i=0;i<ui.rooms.length;i++){
+                        ui.rooms[i].delete();
+                    }
+                    delete ui.rooms;
+                    game.switchMode('identity');
+                },
+                roomlist:function(list){
+                    game.online=true;
+                    lib.config.recentIP.remove(_status.ip);
+                    lib.config.recentIP.unshift(_status.ip);
+                    lib.config.recentIP.splice(5);
+                    game.saveConfig('recentIP',lib.config.recentIP);
+                    _status.connectMode=true;
+
+                    game.clearArena();
+                    ui.pause.hide();
+                    ui.auto.hide();
+
+                    if(ui.ipnode){
+                        ui.ipnode.remove();
+                        delete ui.ipnode;
+                    }
+                    if(ui.iptext){
+                        ui.iptext.remove();
+                        delete ui.iptext;
+                    }
+                    if(ui.ipbutton){
+                        ui.ipbutton.remove();
+                        delete ui.ipbutton;
+                    }
+                    if(ui.recentIP){
+                        ui.recentIP.remove();
+                        delete ui.recentIP;
+                    }
+                    clearTimeout(_status.createNodeTimeout);
+
+                    var proceed=function(){
+                        var list2=['re_caocao','liubei','sunquan'];
+                        ui.rooms=[];
+                        game.ip=get.trimip(_status.ip);
+                        for(var i=0;i<3;i++){
+                            var player=ui.create.player(ui.window);
+                            player.dataset.position='c'+i;
+                            player.classList.add('connect');
+                            player.roomindex=i;
+                            if(!list[i]||!list[i].config){
+                                player.initOL('空房间',list2[i])
+                            }
+                            else{
+                                var config=list[i].config;
+                                player.initOL(get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode),list[i].owner[1]);
+                                player.setNickname(list[i].owner[0]);
+                            }
+                            ui.rooms.push(player);
+                        }
+                    }
+                    if(_status.event.getParent()){
+                        game.forceOver('noover',proceed);
+                    }
+                    else{
+                        proceed();
+                    }
+                },
                 init:function(id,config,ip){
                     game.online=true;
                     game.onlineID=id;
@@ -12159,6 +12261,9 @@
                 if(event.func){
                     event.func();
                 }
+                if(game.ws){
+                    game.send('server','config',lib.configOL);
+                }
 
                 ui.create.connectPlayers(game.ip);
                 var me=game.connectPlayers[0];
@@ -12286,55 +12391,29 @@
             lib.configOL={};
 			lib.playerOL={};
 			lib.cardOL={};
-            var WebSocketServer=require('ws').Server;
-            var wss=new WebSocketServer({port:8080});
             ui.create.chat();
 
-            var interfaces = require('os').networkInterfaces();
-            for(var devName in interfaces){
-                var iface = interfaces[devName];
-                for(var i=0;i<iface.length;i++){
-                    var alias = iface[i];
-                    if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
-                        game.ip=alias.address;break;
-                    }
-                }
-                if(game.ip) break;
-            }
+            if(game.ws){
 
-            wss.on('connection',function(ws){
-                var client={
-                    ws:ws,
-                    id:get.id(),
-                    closed:false
-                };
-                lib.node.clients.push(client);
-                for(var i in lib.element.client){
-                    client[i]=lib.element.client[i];
+            }
+            else{
+                var WebSocketServer=require('ws').Server;
+                var wss=new WebSocketServer({port:8080});
+
+                var interfaces = require('os').networkInterfaces();
+                for(var devName in interfaces){
+                    var iface = interfaces[devName];
+                    for(var i=0;i<iface.length;i++){
+                        var alias = iface[i];
+                        if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
+                            game.ip=alias.address;break;
+                        }
+                    }
+                    if(game.ip) break;
                 }
-                ws.on('message',function(messagestr){
-                    var message;
-                    try{
-                        message=JSON.parse(messagestr);
-                        if(!Array.isArray(message)||
-                            typeof lib.message.server[message[0]]!=='function'){
-                            throw('err');
-                        }
-                        for(var i=1;i<message.length;i++){
-                            message[i]=get.parsedResult(message[i]);
-                        }
-                    }
-                    catch(e){
-                        console.log(e);
-                        console.log('invalid message: '+messagestr);
-                        return;
-                    }
-                    lib.message.server[message.shift()].apply(client,message);
-                });
-                ws.on('close',function(){
-                    client.close();
-                });
-            });
+
+                wss.on('connection',lib.init.connection);
+            }
         },
 		playAudio:function(){
 			if(_status.video&&arguments[1]!='video') return;
@@ -15658,6 +15737,106 @@
                 var mode=window.mode;
                 delete window.mode;
                 callback(mode[name]);
+            });
+        },
+        switchMode:function(name){
+            window.mode={};
+            var script=lib.init.js(lib.assetURL+'mode',name,function(){
+                script.remove();
+                var mode=window.mode;
+                delete window.mode;
+                lib.config.mode=name;
+
+                var i,j,k;
+                for(i in mode[lib.config.mode].element){
+                    if(!lib.element[i]) lib.element[i]=[];
+                    for(j in mode[lib.config.mode].element[i]){
+                        if(j=='init'){
+                            if(!lib.element[i].inits) lib.element[i].inits=[];
+                            lib.element[i].inits.push(lib.init.eval(mode[lib.config.mode].element[i][j]));
+                        }
+                        else{
+                            lib.element[i][j]=lib.init.eval(mode[lib.config.mode].element[i][j]);
+                        }
+                    }
+                }
+                for(i in mode[lib.config.mode].ai){
+                    if(typeof mode[lib.config.mode].ai[i]=='object'){
+                        if(ai[i]==undefined) ai[i]={};
+                        for(j in mode[lib.config.mode].ai[i]){
+                            ai[i][j]=lib.init.eval(mode[lib.config.mode].ai[i][j]);
+                        }
+                    }
+                    else{
+                        ai[i]=lib.init.eval(mode[lib.config.mode].ai[i]);
+                    }
+                }
+                for(i in mode[lib.config.mode].ui){
+                    if(typeof mode[lib.config.mode].ui[i]=='object'){
+                        if(ui[i]==undefined) ui[i]={};
+                        for(j in mode[lib.config.mode].ui[i]){
+                            ui[i][j]=lib.init.eval(mode[lib.config.mode].ui[i][j]);
+                        }
+                    }
+                    else{
+                        ui[i]=lib.init.eval(mode[lib.config.mode].ui[i]);
+                    }
+                }
+                for(i in mode[lib.config.mode].game){
+                    game[i]=lib.init.eval(mode[lib.config.mode].game[i]);
+                }
+                for(i in mode[lib.config.mode].get){
+                    get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
+                }
+                if(game.onwash){
+                    lib.onwash.push(game.onwash);
+                    delete game.onwash;
+                }
+                if(game.onover){
+                    lib.onover.push(game.onover);
+                    delete game.onover;
+                }
+                lib.config.current_mode=mode[lib.config.mode].config||[];
+                lib.config.banned=get.config('banned')||[];
+                lib.config.bannedcards=get.config('bannedcards')||[];
+
+                for(i in mode[lib.config.mode]){
+                    if(i=='element') continue;
+                    if(i=='game') continue;
+                    if(i=='ai') continue;
+                    if(i=='ui') continue;
+                    if(i=='get') continue;
+                    if(i=='config') continue;
+                    if(i=='start') continue;
+                    if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
+                    for(j in mode[lib.config.mode][i]){
+                        lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
+                    }
+                }
+
+                var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
+                if(pilecfg){
+                    lib.config.bannedpile=pilecfg[0]||{};
+                    lib.config.addedpile=pilecfg[1]||{};
+                }
+
+                try{
+                    lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
+                    if(typeof lib.storage!='object') throw('err');
+                    if(lib.storage==null) throw('err');
+                }
+                catch(err){
+                    lib.storage={};
+                    localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
+                }
+
+                _status.event={
+                    finished:true,
+                    next:[],
+                };
+                _status.paused=false;
+                game.createEvent('game',false).content=mode[lib.config.mode].start;
+                game.loop();
             });
         },
 		loadMode:function(mode){
@@ -22677,7 +22856,15 @@
 				if(_status.clicked) return;
 				if(ui.intro) return;
                 if(this.classList.contains('connect')){
-                    if(game.online) return;
+                    if(game.online){
+                        if(this.hasOwnProperty('roomindex')){
+                            if(!_status.enteringroom){
+                                _status.enteringroom=true;
+                                game.send('server','enter',this.roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
+                            }
+                        }
+                        return;
+                    }
                     if(this.playerid){
                         if(this.ws){
                             if(confirm('是否踢出'+this.nickname+'？')){
@@ -22984,6 +23171,9 @@
     						}
     					}
     					game.resume();
+                    }
+                    else if(_status.event.switchToAuto){
+                        _status.event.switchToAuto();
                     }
 
                     if(game.online){
@@ -23493,6 +23683,13 @@
 		},
 	};
 	var get={
+        trimip:function(str){
+            var len=str.length-5;
+            if(str.lastIndexOf(':8080')==len){
+                str=str.slice(0,len);
+            }
+            return str;
+        },
         mode:function(){
             if(_status.connectMode){
                 return lib.configOL.mode;

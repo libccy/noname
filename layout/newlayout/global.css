@@ -361,6 +361,10 @@
 #window>.player.connect[data-position='6']{left:calc(400% / 7 - 300px / 7);top:calc(400% / 7 - 40px + 5px);}
 #window>.player.connect[data-position='7']{left:calc(500% / 7 + 150px / 7);top:calc(400% / 7 - 40px + 5px);}
 
+#window>.player.connect[data-position='c0']{left:calc(50% - 255px);top:calc(50% - 90px)}
+#window>.player.connect[data-position='c1']{left:calc(50% - 75px);top:calc(50% - 90px)}
+#window>.player.connect[data-position='c2']{left:calc(50% + 105px);top:calc(50% - 90px)}
+
 .connectbutton{
 	top:calc(500% / 7 + 80px + 5px);
 }

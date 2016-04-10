@@ -271,7 +271,7 @@ table{table-layout: fixed;}
 .player.linked:not(.treasure).playerfocus{
 	transform: scale(1.1) rotate(-90deg);
 }
-.player.connect>div:not(.avatar):not(.name){
+.player.connect>div:not(.avatar):not(.name):not(.nameol){
 	display: none !important;
 }
 
@@ -1007,6 +1007,10 @@ margin-bottom: 5px;
 #window>.player.connect[data-position='5']{left:calc(25% - 180px);top:calc(500% / 7 + 5px);}
 #window>.player.connect[data-position='6']{left:calc(50% - 120px);top:calc(500% / 7 + 5px);}
 #window>.player.connect[data-position='7']{left:calc(75% - 60px);top:calc(500% / 7 + 5px);}
+
+#window>.player.connect[data-position='c0']{left:calc(50% - 120px);top:calc(50% - 200px)}
+#window>.player.connect[data-position='c1']{left:calc(50% - 120px);top:calc(50% - 60px)}
+#window>.player.connect[data-position='c2']{left:calc(50% - 120px);top:calc(50% + 80px)}
 
 .connectbutton{
 	top:calc(400% / 7 - 35px);
