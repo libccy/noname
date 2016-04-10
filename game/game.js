@@ -11084,6 +11084,7 @@
                     lib.message.client[message.shift()].apply(null,message);
                 },
                 onerror:function(e){
+                    if(this._nocallback) return;
                     if(_status.connectCallback){
                         _status.connectCallback(false);
                         delete _status.connectCallback;
@@ -21311,7 +21312,12 @@
 				});
 
                 var list=ui.create.div('.caption');
-                list.style.maxHeight='350px';
+                if(lib.config.layout=='phone'){
+                    list.style.maxHeight='250px';
+                }
+                else{
+                    list.style.maxHeight='350px';
+                }
                 list.style.overflow='scroll';
                 lib.setScroll(list);
                 uiintro.contentContainer.style.overflow='hidden';
