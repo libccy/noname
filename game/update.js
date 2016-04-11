@@ -1,6 +1,6 @@
 window.noname_update={
-    version:'1.8.4.2',
+    version:'1.8.5',
     changeLog:[
-        '修bug',
+        '联机大厅',
     ]
 }
