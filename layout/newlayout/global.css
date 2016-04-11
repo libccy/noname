@@ -153,7 +153,8 @@
 	z-index:3;
 	transform:rotate(180deg);
 }
-#arena.slim_player .player .hp{
+#arena.slim_player .player .hp,
+#window>.player .hp{
 	bottom: 15px;
 	left:121px;
 }

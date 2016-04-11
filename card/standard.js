@@ -1420,19 +1420,27 @@ card.standard={
 						state:state,
 						ai1:function(){
 							if(isJudge){
-								var info=lib.card[card.viewAs||card.name];
+								var name=card.viewAs||card.name;
+								var info=lib.card[name];
 								if(info&&info.ai&&info.ai.wuxie){
 									var aiii=info.ai.wuxie(source,card,source,_status.event.player,state);
 									if(typeof aiii=='number') return aiii;
 								}
 								if(Math.abs(ai.get.attitude(_status.event.player,source))<3) return 0;
 								if(source.skills.contains('guanxing')) return 0;
-								if(card.name!='lebu'&&card.name!='bingliang'){
+								if(name!='lebu'&&name!='bingliang'){
 									if(source!=_status.event.player){
 										return 0;
 									}
 								}
-								var eff=ai.get.effect(source,card,source,source);
+								var card2;
+								if(name!=card.name){
+									card2={name:name};
+								}
+								else{
+									card2=card;
+								}
+								var eff=ai.get.effect(source,card2,source,source);
 								if(eff>=0) return 0;
 								return state*ai.get.attitude(_status.event.player,source);
 							}

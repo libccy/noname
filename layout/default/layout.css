@@ -271,8 +271,14 @@ table{table-layout: fixed;}
 .player.linked:not(.treasure).playerfocus{
 	transform: scale(1.1) rotate(-90deg);
 }
-.player.connect>div:not(.avatar):not(.name):not(.nameol){
+.player.connect>div:not(.avatar):not(.name):not(.nameol):not(.hp.room):not(.gaming){
 	display: none !important;
+}
+.player.connect>.gaming{
+	left:16px;
+	top:auto;
+	bottom: 16px;
+	font-family: 'xinwei'
 }
 
 #arena #me>div>div>.card{

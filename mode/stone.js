@@ -657,24 +657,22 @@ mode.stone={
 				}
 			},
 			drawDeck:function(num,log){
-				if(this.isMin()){
-					this.draw(num,log);
-					return;
-				}
 				if(!num){
 					num=1;
 				}
+				var cards=this.getDeckCards(num);
 				if(log==false){
-					this.directgain(this.getDeckCards(num));
+					this.directgain(cards);
 				}
 				else if(log==true){
-					this.directgain(this.getDeckCards(num));
+					this.directgain(cards);
 					game.log(this,'从牌库中获得了'+get.cnNumber(num)+'张牌');
 				}
 				else{
-					this.gain(this.getDeckCards(num),'draw');
+					this.gain(cards,'draw');
 					game.log(this,'从牌库中获得了'+get.cnNumber(num)+'张牌');
 				}
+				return cards;
 			},
 			updateActCount:function(used,countx,current){
 				if(_status.video){
@@ -774,10 +772,13 @@ mode.stone={
 				return false;
 			},
 			getDeckCards:function(num){
-				var player=this;
 				if(typeof num!='number'){
 					num=1;
 				}
+				if(!this.deckCards){
+					return get.cards(num);
+				}
+				var player=this;
 				for(var i=0;i<5;i++){
 					if(player.deckCards.length<num){
 						get.deck(player,player.deck);

@@ -1727,7 +1727,7 @@ character.sp={
 			trigger:{global:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.storage.tunchu&&player.storage.tunchu.length>0&&event.player.num('h')==0;
+				return player.storage.tunchu&&player.storage.tunchu.length>0&&event.player.num('h')==0&&event.player.isAlive();
 			},
 			content:function(){
 				'step 0'

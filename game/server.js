@@ -20,10 +20,9 @@
                 }
                 else{
                     this.owner=room.owner;
-                    this.owner.send('connection');
-                    this.sendl('enterroom');
+                    this.owner.sendl('onconnection',this.wsid);
                 }
-                messages.updaterooms();
+                util.updaterooms();
             }
             else{
                 room.owner=this;
@@ -35,14 +34,16 @@
             if(room&&room.owner==this){
                 room.config=config;
             }
-            messages.updaterooms();
+            util.updaterooms();
         },
-        updaterooms:function(){
-            var roomlist=util.getroomlist();
-            for(var i in clients){
-                if(!clients[i].room){
-                    clients[i].sendl('updaterooms',roomlist);
-                }
+        send:function(id,message){
+            if(clients[id]&&clients[id].owner==this){
+                clients[id].send(message);
+            }
+        },
+        close:function(id){
+            if(clients[id]&&clients[id].owner==this){
+                clients[id].close();
             }
         }
     };
@@ -56,15 +57,33 @@
         getroomlist:function(){
             var roomlist=[];
             for(var i=0;i<3;i++){
+                rooms[i]._num=0;
+            }
+            for(var i in clients){
+                if(clients[i].room){
+                    clients[i].room._num++;
+                }
+            }
+            for(var i=0;i<3;i++){
                 if(rooms[i].owner&&rooms[i].config){
-                    roomlist[i]=[rooms[i].owner.nickname,rooms[i].owner.avatar,rooms[i].config];
+                    roomlist[i]=[rooms[i].owner.nickname,rooms[i].owner.avatar,
+                    rooms[i].config,rooms[i]._num];
                 }
                 else{
                     roomlist[i]=null;
                 }
+                delete rooms[i]._num;
             }
             return roomlist;
-        }
+        },
+        updaterooms:function(){
+            var roomlist=util.getroomlist();
+            for(var i in clients){
+                if(!clients[i].room){
+                    clients[i].sendl('updaterooms',roomlist);
+                }
+            }
+        },
     };
     wss.on('connection',function(ws){
         ws.sendl=util.sendl;
@@ -72,27 +91,33 @@
         clients[ws.wsid]=ws;
         ws.sendl('roomlist',util.getroomlist());
         ws.on('message',function(message){
-            var arr;
-            try{
-                arr=JSON.parse(message);
-                if(!Array.isArray(arr)){
-                    throw('err');
+            if(this.owner){
+                this.owner.sendl('onmessage',this.wsid,message);
+            }
+            else{
+                var arr;
+                try{
+                    arr=JSON.parse(message);
+                    if(!Array.isArray(arr)){
+                        throw('err');
+                    }
                 }
-            }
-            catch(e){
-                this.sendl('denied','banned');
-                return;
-            }
-            if(arr.shift()=='server'){
-                var type=arr.shift();
-                if(messages[type]){
-                    messages[type].apply(this,arr);
+                catch(e){
+                    this.sendl('denied','banned');
+                    return;
+                }
+                if(arr.shift()=='server'){
+                    var type=arr.shift();
+                    if(messages[type]){
+                        messages[type].apply(this,arr);
+                    }
                 }
             }
         });
         ws.on('close',function(){
+            if(!clients[this.wsid]) return;
             if(this.owner){
-
+                this.owner.sendl('onclose',this.wsid);
             }
             else{
                 var room=this.room;
@@ -102,12 +127,13 @@
                     for(var i in clients){
                         if(clients[i].room==room&&clients[i]!=this){
                             clients[i].close();
+                            delete clients[i];
                         }
                     }
                 }
                 delete clients[this.wsid];
             }
-            messages.updaterooms();
+            util.updaterooms();
         });
     });
 }());
