@@ -49,7 +49,11 @@
     };
     var util={
         sendl:function(){
-            this.send(JSON.stringify(Array.from(arguments)));
+            var args=[];
+            for(var i=0;i<arguments.length;i++){
+                args.push(arguments[i]);
+            }
+            this.send(JSON.stringify(args));
         },
         getid:function(){
             return (Math.floor(1000000000+9000000000*Math.random())).toString();
