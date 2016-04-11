@@ -45,10 +45,11 @@
             if(clients[id]&&clients[id].owner==this){
                 clients[id].close();
             }
-        }
+        },
     };
     var util={
         sendl:function(){
+            if(this.closed) return;
             var args=[];
             for(var i=0;i<arguments.length;i++){
                 args.push(arguments[i]);
@@ -94,8 +95,24 @@
         ws.wsid=util.getid();
         clients[ws.wsid]=ws;
         ws.sendl('roomlist',util.getroomlist());
+        ws.heartbeat=setInterval(function(){
+            if(ws.closed){
+                clearInterval(ws.heartbeat);
+            }
+            else if(ws.beat){
+                ws.close();
+                clearInterval(ws.heartbeat);
+            }
+            else{
+                ws.beat=true;
+                ws.send('heartbeat');
+            }
+        },60000);
         ws.on('message',function(message){
-            if(this.owner){
+            if(message=='heartbeat'){
+                this.beat=false;
+            }
+            else if(this.owner){
                 this.owner.sendl('onmessage',this.wsid,message);
             }
             else{
@@ -120,6 +137,7 @@
         });
         ws.on('close',function(){
             if(!clients[this.wsid]) return;
+            this.closed=true;
             if(this.owner){
                 this.owner.sendl('onclose',this.wsid);
             }
@@ -135,8 +153,8 @@
                         }
                     }
                 }
-                delete clients[this.wsid];
             }
+            delete clients[this.wsid];
             util.updaterooms();
         });
     });

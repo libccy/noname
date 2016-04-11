@@ -11149,6 +11149,10 @@
                     }
                 },
                 onmessage:function(messageevent){
+                    if(messageevent.data=='heartbeat'){
+                        this.send('heartbeat');
+                        return;
+                    }
                     var message;
                     try{
                         message=JSON.parse(messageevent.data);
