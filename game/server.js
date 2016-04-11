@@ -38,7 +38,12 @@
         },
         send:function(id,message){
             if(clients[id]&&clients[id].owner==this){
-                clients[id].send(message);
+                try{
+                    clients[id].send(message);
+                }
+                catch(e){
+                    clients[id].close();
+                }
             }
         },
         close:function(id){
@@ -49,12 +54,16 @@
     };
     var util={
         sendl:function(){
-            if(this.closed) return;
             var args=[];
             for(var i=0;i<arguments.length;i++){
                 args.push(arguments[i]);
             }
-            this.send(JSON.stringify(args));
+            try{
+                this.send(JSON.stringify(args));
+            }
+            catch(e){
+                this.close();
+            }
         },
         getid:function(){
             return (Math.floor(1000000000+9000000000*Math.random())).toString();
@@ -96,16 +105,18 @@
         clients[ws.wsid]=ws;
         ws.sendl('roomlist',util.getroomlist());
         ws.heartbeat=setInterval(function(){
-            if(ws.closed){
-                clearInterval(ws.heartbeat);
-            }
-            else if(ws.beat){
+            if(ws.beat){
                 ws.close();
                 clearInterval(ws.heartbeat);
             }
             else{
                 ws.beat=true;
-                ws.send('heartbeat');
+                try{
+                    ws.send('heartbeat');
+                }
+                catch(e){
+                    ws.close();
+                }
             }
         },60000);
         ws.on('message',function(message){
@@ -137,7 +148,6 @@
         });
         ws.on('close',function(){
             if(!clients[this.wsid]) return;
-            this.closed=true;
             if(this.owner){
                 this.owner.sendl('onclose',this.wsid);
             }
