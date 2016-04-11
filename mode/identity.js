@@ -107,11 +107,14 @@ mode.identity={
 							ui.controls[0].replace('在武将或卡牌一栏中，单击武将/卡牌可以将其禁用',function(){
 								ui.click.menuTab('战局');
 								ui.controls[0].replace('在战局中可以输入游戏命令，或者管理录像',function(){
-									ui.click.configMenu();
-									ui.window.classList.remove('noclick_important');
-									ui.control.classList.remove('noclick_click_important');
-									ui.control.style.top='';
-									step5();
+									ui.click.menuTab('帮助');
+									ui.controls[0].replace('在帮助中，可以检查更新和下载素材',function(){
+										ui.click.configMenu();
+										ui.window.classList.remove('noclick_important');
+										ui.control.classList.remove('noclick_click_important');
+										ui.control.style.top='';
+										step5();
+									});
 								});
 							});
 						});
@@ -131,7 +134,9 @@ mode.identity={
 			step1();
 		}
 		else{
-			game.showChangeLog();
+			if(!_status.connectMode){
+				game.showChangeLog();
+			}
 		}
 		"step 3"
 		if(lib.storage.test){
