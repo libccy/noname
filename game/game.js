@@ -6960,6 +6960,7 @@
                     this.node.name.innerHTML=get.verticalStr(name);
                     this.nickname=name;
                     this.avatar=character;
+                    this.node.nameol.innerHTML='';
                 },
                 uninitOL:function(){
                     this.node.avatar.hide();
@@ -11793,12 +11794,17 @@
                 },
                 createroom:function(){
                     game.online=false;
+                    game.onlineroom=true;
                     lib.node={};
                     for(var i=0;i<ui.rooms.length;i++){
                         ui.rooms[i].delete();
                     }
                     delete ui.rooms;
                     game.switchMode('identity');
+                },
+                enterroomfailed:function(){
+                    alert('请稍后再试');
+                    _status.enteringroom=false;
                 },
                 roomlist:function(list){
                     game.online=true;
@@ -11839,13 +11845,13 @@
                             player.dataset.position='c'+i;
                             player.classList.add('connect');
                             player.roomindex=i;
-                            if(!list[i]||!list[i].config){
+                            if(!list[i]){
                                 player.initOL('空房间',list2[i])
                             }
                             else{
-                                var config=list[i].config;
-                                player.initOL(get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode),list[i].owner[1]);
-                                player.setNickname(list[i].owner[0]);
+                                var config=list[i][2];
+                                player.initOL(get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode),list[i][1]);
+                                player.setNickname(list[i][0]);
                             }
                             ui.rooms.push(player);
                         }
@@ -11855,6 +11861,23 @@
                     }
                     else{
                         proceed();
+                    }
+                },
+                updaterooms:function(list){
+                    if(ui.rooms){
+                        var list2=['re_caocao','liubei','sunquan'];
+                        for(var i=0;i<ui.rooms.length;i++){
+                            var player=ui.rooms[i];
+                            if(!list[i]){
+                                player.initOL('空房间',list2[i])
+                            }
+                            else{
+                                var config=list[i][2];
+                                player.initOL(get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode),list[i][1]);
+                                player.setNickname(list[i][0]);
+                            }
+                            ui.rooms.push(player);
+                        }
                     }
                 },
                 init:function(id,config,ip){

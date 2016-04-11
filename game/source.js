@@ -34,6 +34,7 @@ window.noname_source_list=[
     'game/game.js',
     'game/jszip.js',
     'game/package.js',
+    'game/server.js',
     'game/source.js',
     'game/update.js',
     'layout/default/blur.css',
