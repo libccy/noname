@@ -50,6 +50,7 @@
         versionOL:3,
 		updateURL:localStorage.getItem('noname_download_source')||'http://isha.applinzi.com/',
 		assetURL:'',
+        hallURL:'23.105.208.119',
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -2737,6 +2738,28 @@
                             game.reload();
                         }
                     },
+                    hall_ip:{
+                        name:'联机大厅',
+                        input:true,
+                        frequent:true,
+                        init:'23.105.208.119'
+                    },
+                    hall_button:{
+                        name:'联机大厅按钮',
+                        init:true,
+                        frequent:true,
+                        onclick:function(bool){
+                            game.saveConfig('hall_button',bool,'connect');
+                            if(ui.hall_button){
+                                if(bool){
+                                    ui.hall_button.style.display='';
+                                }
+                                else{
+                                    ui.hall_button.style.display='none';
+                                }
+                            }
+                        }
+                    },
                     update:function(config,map){
                         if(lib.node){
                             map.connect_start.show();
@@ -4476,7 +4499,7 @@
                                 }
                                 return;
                             }
-                            if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&event.getParent().state){
+                            if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&event.state>0){
                                 event.result={
                                     bool:false
                                 }
@@ -12006,6 +12029,9 @@
         			}
                 },
                 reinit:function(config,state,state2,ip,observe){
+                    ui.auto.show();
+                    ui.pause.show();
+                    
                     game.clearConnect();
                     clearTimeout(_status.createNodeTimeout);
                     game.online=true;
@@ -16302,6 +16328,10 @@
                 ui.recentIP.remove();
                 delete ui.recentIP;
             }
+            if(ui.hall_button){
+                ui.hall_button.remove();
+                delete ui.hall_button;
+            }
             if(ui.rooms){
                 for(var i=0;i<ui.rooms.length;i++){
                     ui.rooms[i].remove();
@@ -18036,24 +18066,36 @@
                         else if(config.input){
                             node.classList.add('switcher');
                             var input=ui.create.div(node);
-                            input.innerHTML=config.init||'无名玩家';
                             input.contentEditable=true;
                             input.style.webkitUserSelect='text';
                             input.style.minWidth='10px';
                             input.onkeydown=function(e){
-            					if(e.keyCode==13){
-            						e.preventDefault();
-            						e.stopPropagation();
-            						input.blur();
-            					}
-            				};
-                            input.onblur=function(){
-                                input.innerHTML=input.innerHTML.replace(/\<br\>/g,'');
-                                if(!input.innerHTML){
-                                    input.innerHTML='无名玩家';
+                                if(e.keyCode==13){
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    input.blur();
                                 }
-                                game.saveConfig('connect_nickname',input.innerHTML);
-                                game.saveConfig('connect_nickname',input.innerHTML,'connect');
+                            };
+                            if(config.name=='联机昵称'){
+                                input.innerHTML=config.init||'无名玩家';
+                                input.onblur=function(){
+                                    input.innerHTML=input.innerHTML.replace(/\<br\>/g,'');
+                                    if(!input.innerHTML){
+                                        input.innerHTML='无名玩家';
+                                    }
+                                    game.saveConfig('connect_nickname',input.innerHTML);
+                                    game.saveConfig('connect_nickname',input.innerHTML,'connect');
+                                }
+                            }
+                            else if(config.name=='联机大厅'){
+                                input.innerHTML=config.init||lib.hallURL;
+                                input.onblur=function(){
+                                    if(!input.innerHTML){
+                                        input.innerHTML=lib.hallURL;
+                                    }
+                                    input.innerHTML=input.innerHTML.replace(/\<br\>/g,'');
+                                    game.saveConfig('hall_ip',input.innerHTML,'connect');
+                                }
                             }
                         }
 		                else{
@@ -24461,6 +24503,7 @@
 		},
 		cnNumber:function(num,two){
 			if(num==Infinity) return '∞';
+            if(isNaN(num)) return '';
 			if(typeof num!='number') return num;
 			if(num<0||num>99) return num;
 			if(num<=10){

@@ -54,6 +54,13 @@ mode.connect={
             ui.window.appendChild(button);
             ui.ipbutton=button;
 
+            ui.hall_button=ui.create.system('联机大厅',function(){
+                node.innerHTML=get.config('hall_ip')||lib.hallURL;
+                connect();
+            },true);
+            if(!get.config('hall_button')){
+                ui.hall_button.style.display='none';
+            }
             ui.recentIP=ui.create.system('最近连接',null,true);
             var clickLink=function(){
                 node.innerHTML=this.innerHTML;

@@ -1013,6 +1013,20 @@ card.standard={
 			notarget:true,
 			content:function(){
 				event.result='wuxied';
+				if(player.isOnline()){
+					player.send(function(player){
+						if(ui.tempnowuxie&&!player.hasWuxie()){
+							ui.tempnowuxie.close();
+							delete ui.tempnowuxie;
+						}
+					},player);
+				}
+				else if(player==game.me){
+					if(ui.tempnowuxie&&!player.hasWuxie()){
+						ui.tempnowuxie.close();
+						delete ui.tempnowuxie;
+					}
+				}
 			},
 		},
 		lebu:{
