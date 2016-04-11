@@ -12031,7 +12031,7 @@
                 reinit:function(config,state,state2,ip,observe){
                     ui.auto.show();
                     ui.pause.show();
-                    
+
                     game.clearConnect();
                     clearTimeout(_status.createNodeTimeout);
                     game.online=true;
