@@ -1,7 +1,7 @@
 'use strict';
 play.weather={
     arenaReady:function(){
-        if(_status.video) return;
+        if(_status.video||_status.connectMode) return;
         _status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
 
         ui.weather=ui.create.system('',null,true);

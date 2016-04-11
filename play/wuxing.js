@@ -1,6 +1,6 @@
 play.wuxing={
-	init:function(){
-		// lib.nature.push('metal','wood','water','soil');
+	arenaReady:function(){
+		if(_status.connectMode) return;
 		lib.card.list.splice(Math.floor(lib.card.list.length*Math.random()),0,['spade',5,'wuxingpan']);
 		if(!_status.video){
 			lib.video.push({
@@ -26,7 +26,7 @@ play.wuxing={
 				if(player.node.wuxing){
 					player.node.wuxing.remove();
 				}
-				if(_status.video) return;
+				if(_status.video||_status.connectMode) return;
 				var node=ui.create.div('.wunature',player);
 				var list=['metal','wood','water','fire','soil'];
 				var nature=list.randomGet();
@@ -38,7 +38,7 @@ play.wuxing={
 		},
 		card:{
 			init:function(card){
-				if(_status.video) return;
+				if(_status.video||_status.connectMode) return;
 				if(card.name=='wuxingpan') return;
 				if(card.wunature) return;
 				if(Math.random()>(parseFloat(lib.config.wuxing_num_playpackconfig)||0)) return;
@@ -61,6 +61,7 @@ play.wuxing={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
+				if(_status.connectMode) return false;
 				return event.card.wunature&&player.wunature;
 			},
 			content:function(){

@@ -6,7 +6,7 @@ play.coin={
 		}
 	},
 	arenaReady:function(){
-        if(_status.video) return;
+        if(_status.video||_status.connectMode) return;
 		if(lib.config.mode!='chess'||get.config('chess_mode')!='leader'){
 			var str;
 			if(lib.config.coin_display_playpackconfig=='text'){

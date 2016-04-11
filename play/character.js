@@ -1,12 +1,12 @@
 play.character={
 	// mode:['identity','guozhan','versus'],
 	video:function(list){
-		this.init(list);
+		this.arenaReady(list);
 		for(var i in this.skill){
 			lib.skill[i]=this.skill[i];
 		}
 	},
-	init:function(videolist){
+	arenaReady:function(videolist){
 		var list=[],list2=[];
 		var i,j,name;
 		for(i in lib.character){
@@ -15,7 +15,7 @@ play.character={
 			if(lib.config.banned.contains(i)) continue;
 			if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
 			if(lib.character[i][4]&&lib.character[i][4].contains('boss')) continue;
-			if(!get.config('double_character')&&get.config('ban_weak')&&lib.config.forbidsingle.contains(i)) continue;
+			if(lib.character[i][4]&&lib.character[i][4].contains('hiddenboss')) continue;
 			if(get.config('double_character')&&lib.config.forbiddouble.contains(i)) continue;
 			list.push(i);
 		}

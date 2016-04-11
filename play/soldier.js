@@ -18,6 +18,9 @@ play.soldier={
 			trigger:{global:'gameStart'},
 			forced:true,
 			popup:false,
+			filter:function(){
+				return !_status.connectMode;
+			},
 			content:function(){
 				if(_status.soldierList==undefined){
 					_status.soldierList=['qingbubing','zhongbubing','qingqibing','zhongqibing','gongjianbing',
