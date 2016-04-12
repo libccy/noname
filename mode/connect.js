@@ -1,8 +1,22 @@
 'use strict';
 mode.connect={
     start:function(){
+        var directstartmode=lib.config.directstartmode;
+        game.saveConfig('directstartmode');
+        ui.create.menu(true);
         var createNode=function(){
             if(event.created) return;
+            if(directstartmode){
+                game.switchMode(directstartmode);
+                return;
+            }
+            if(lib.node&&window.require){
+                ui.startServer=ui.create.system('启动服务器',function(e){
+                    e.stopPropagation();
+                    ui.click.connectMenu();
+                },true);
+            }
+
             event.created=true;
             var node=ui.create.div('.shadowed');
             node.style.width='400px';
@@ -11,7 +25,7 @@ mode.connect={
             node.style.fontFamily='xinwei';
             node.style.fontSize='30px';
             node.style.padding='10px';
-            node.style.left='calc(50% - 200px)';
+            node.style.left='calc(50% - 210px)';
             node.style.top='calc(50% - 20px)';
             node.style.whiteSpace='nowrap';
             node.innerHTML=lib.config.last_ip||'';

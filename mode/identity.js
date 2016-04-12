@@ -146,28 +146,11 @@ mode.identity={
 		}
 		if(_status.connectMode){
 			game.waitForPlayer(function(){
-				for(var i in lib.mode.identity.config){
-					if(lib.mode.identity.config[i].connect){
-						lib.configOL[i]=get.config(i);
-					}
-				}
 				if(_status.mode=='zhong'){
 					lib.configOL.number=8;
 				}
 				else{
 					lib.configOL.number=lib.configOL.player_number;
-				}
-				lib.configOL.characterPack=['standard','shenhua'];
-				lib.configOL.cardPack=['standard','ex','extra','refresh','mingzhong'];
-				lib.configOL.mode='identity';
-				var cardPackList=[];
-				for(var i=0;i<lib.configOL.cardPack.length;i++){
-					cardPackList=cardPackList.concat(lib.cardPack[lib.configOL.cardPack[i]]);
-				}
-				for(var i=0;i<lib.card.list.length;i++){
-					if(!cardPackList.contains(lib.card.list[i][2])){
-						lib.card.list.splice(i--,1);
-					}
 				}
 			});
 		}

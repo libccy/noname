@@ -40,10 +40,10 @@ mode.pack={
     identity:'身份',
     guozhan:'国战',
     versus:'对决',
+    connect:'联机',
     boss:'挑战',
     chess:'战棋',
     stone:'炉石',
-    connect:'联机',
 };
 background.pack={
     zhulian_bg:'璧合',

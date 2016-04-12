@@ -1,5 +1,6 @@
 'use strict';
 card.mingzhong={
+	connect:true,
 	card:{
 		shengdong:{
             fullskin:true,

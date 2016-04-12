@@ -1,5 +1,6 @@
 'use strict';
 character.shenhua={
+	connect:true,
 	character:{
 		xiahouyuan:['male','wei',4,['shensu']],
 		caoren:['male','wei',4,['jushou','jiewei']],
@@ -708,7 +709,7 @@ character.shenhua={
 				return (player!=zhu&&player.group=='wu'&&player.num('h')>0&&zhu.num('h')>0);
 			},
 			filterTarget:function(card,player,target){
-				return target.isZhu&&target.get('s').contains('zhiba');
+				return player!=target&&target.isZhu&&target.get('s').contains('zhiba');
 			},
 			usable:1,
 			content:function(){
@@ -2895,7 +2896,9 @@ character.shenhua={
 					player.$gain2(trigger.player.judging[0]);
 					player.gain(trigger.player.judging[0]);
 					trigger.player.judging[0]=result.cards[0];
-					trigger.position.appendChild(result.cards[0]);
+					if(!get.owner(result.cards[0],'judge')){
+						trigger.position.appendChild(result.cards[0]);
+					}
 					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 				}
 				"step 3"
@@ -2944,7 +2947,7 @@ character.shenhua={
 				return (card.name=='shan'||card.name=='shandian')
 			},
 			filterTarget:function(card,player,target){
-				return target.isZhu&&target.get('s').contains('huangtian');
+				return player!=target&&target.isZhu&&target.get('s').contains('huangtian');
 			},
 			usable:1,
 			forceaudio:true,

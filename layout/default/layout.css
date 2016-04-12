@@ -39,7 +39,7 @@ table{table-layout: fixed;}
 	position: absolute;
 	transition: all 1s;
 }
-#window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(.dialog){opacity: 0.3 !important}
+#window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(.dialog):not(.centermenu):not(.popup-container){opacity: 0.3 !important}
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden){opacity: 0.3 !important}
 #window.noclick_important *{pointer-events: none !important;}
 #window.noclick_important .noclick_click_important div{pointer-events: auto !important}

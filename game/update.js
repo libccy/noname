@@ -1,7 +1,8 @@
 window.noname_update={
-    version:'1.8.5.1',
+    version:'1.8.6',
     changeLog:[
-        '联机大厅',
+        '模式排序',
+        '国战联机',
         '修复bug'
     ]
 }

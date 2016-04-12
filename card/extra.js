@@ -1,4 +1,5 @@
 card.extra={
+	connect:true,
 	card:{
 		jiu:{
 			audio:true,

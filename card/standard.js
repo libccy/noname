@@ -1,5 +1,6 @@
 'use strict';
 card.standard={
+	connect:true,
 	card:{
 		damage:{
 			ai:{

@@ -1,5 +1,6 @@
 'use strict';
 character.standard={
+	connect:true,
 	character:{
 		caocao:['male','wei',4,['hujia','jianxiong'],['zhu']],
 		simayi:['male','wei',3,['fankui','guicai']],
@@ -183,7 +184,9 @@ character.standard={
 					}
 					ui.discardPile.appendChild(trigger.player.judging[0]);
 					trigger.player.judging[0]=result.cards[0];
-					trigger.position.appendChild(result.cards[0]);
+					if(!get.owner(result.cards[0],'judge')){
+						trigger.position.appendChild(result.cards[0]);
+					}
 					game.log(trigger.player,'的判定牌改为',result.cards[0]);
 					game.delay(2);
 				}

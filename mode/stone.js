@@ -1089,7 +1089,7 @@ mode.stone={
 			stone_xunmenglong:['male','wei',2,['druid_qicheng'],['minskin','stone'],[3,3,'druid']],
 
 			stone_caoyuanshi:['male','qun',5,['hunter_nuhou'],['minskin','stone'],[5,2,'hunter']],
-			stone_leiouke:['male','shu',3,['hunter_zhanhuo'],['minskin','stone'],[3,1,'hunter']],
+			stone_leiouke:['male','shu',2,['hunter_zhanhuo'],['minskin','stone'],[3,1,'hunter']],
 			stone_huofu:['male','qun',2,['stone_chongfeng'],['minskin','stone'],[3,4,'hunter']],
 			stone_misha:['male','shu',3,['chaofeng'],['minskin','stone'],[3,3,'hunter']],
 			stone_jiewangzhu:['male','wu',1,['hunter_jiewang'],['minskin','stone'],[1,2,'hunter']],
@@ -2195,17 +2195,15 @@ mode.stone={
 		},
 		spell_yongshizhufu:{
 			type:'stonecard',
-			stoneact:3,
+			stoneact:2,
 			career:'paladin',
 			enable:true,
 			fullimage:true,
 			filterTarget:function(card,player,target){
-				return target.isMin();
+				return target.isMin()&&target.num('h')>0;
 			},
 			content:function(){
-				target.hp*=2;
-				target.maxHp*=2;
-				target.update();
+				target.draw(target.num('h'));
 			},
 			ai:{
 				order:4,
@@ -2213,7 +2211,7 @@ mode.stone={
 				useful:2,
 				result:{
 					target:function(player,target){
-						return Math.max(0,target.hp-1);
+						return Math.max(0,target.num('h')-1);
 					}
 				}
 			}

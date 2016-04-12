@@ -1,5 +1,6 @@
 'use strict';
 card.ex={
+	connect:true,
 	card:{
 		hanbing:{
 			fullskin:true,

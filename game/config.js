@@ -259,6 +259,8 @@ window.config={
 
 	cards:['standard','ex','extra','refresh'],
 	characters:['standard','shenhua','refresh','sp','yijiang'],
+	connect_characters:[],
+	connect_cards:[],
 	plays:[],
 	extensions:[],
 	banned:[],

@@ -1,5 +1,6 @@
 'use strict';
 card.refresh={
+	connect:true,
 	card:{
 		muniu:{
 			fullskin:true,

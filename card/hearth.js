@@ -1,6 +1,5 @@
 'use strict';
 card.hearth={
-	// forbid:['stone'],
 	card:{
 		linghunzhihuo:{
 			fullskin:true,

@@ -1261,6 +1261,14 @@ character.swd={
 							}
 						}
 						else{
+							var hasFriend=false;
+							for(var i=0;i<game.players.length;i++){
+								if(get.distance(player,game.players[i],'attack')>1&&
+								player!=game.players[i]&&ai.get.attitude(player,game.players[i]>0)){
+									hasFriend=true;break;
+								}
+							}
+							if(!hasFriend) return;
 							var hs=target.num('h');
 							if(get.tag(card,'respondShan')){
 								var shans=target.num('h','shan');
