@@ -50,7 +50,7 @@
         versionOL:4,
 		updateURL:localStorage.getItem('noname_download_source')||'http://isha.applinzi.com/',
 		assetURL:'',
-        hallURL:'23.105.208.119',
+        hallURL:'123.206.77.253',
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -2328,13 +2328,11 @@
 		                name:'屏蔽弱将',
 						init:true,
 						restart:true,
-						// frequent:true,
 		            },
 		            ban_strong:{
 		                name:'屏蔽强将',
 						init:false,
 						restart:true,
-						// frequent:true,
 		            },
 				}
 			},
@@ -2361,7 +2359,7 @@
                         name:'联机大厅',
                         input:true,
                         frequent:true,
-                        init:'23.105.208.119'
+                        init:'123.206.77.253'
                     },
                     hall_button:{
                         name:'联机大厅按钮',
