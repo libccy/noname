@@ -2,7 +2,7 @@
     var WebSocketServer=require('ws').Server;
     var wss=new WebSocketServer({port:8080});
 
-    var rooms=[{},{},{}];
+    var rooms=[{},{},{},{},{},{}];
     var clients={};
     var messages={
         enter:function(index,nickname,avatar){
@@ -70,7 +70,7 @@
         },
         getroomlist:function(){
             var roomlist=[];
-            for(var i=0;i<3;i++){
+            for(var i=0;i<rooms.length;i++){
                 rooms[i]._num=0;
             }
             for(var i in clients){
@@ -78,7 +78,7 @@
                     clients[i].room._num++;
                 }
             }
-            for(var i=0;i<3;i++){
+            for(var i=0;i<rooms.length;i++){
                 if(rooms[i].owner&&rooms[i].config){
                     roomlist[i]=[rooms[i].owner.nickname,rooms[i].owner.avatar,
                     rooms[i].config,rooms[i]._num];

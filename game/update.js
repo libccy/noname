@@ -3,6 +3,6 @@ window.noname_update={
     changeLog:[
         '模式排序',
         '国战联机',
-        '修复bug'
+        '联机房间改进'
     ]
 }

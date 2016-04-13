@@ -1396,6 +1396,9 @@ card.standard={
 					event.targets=trigger.targets;
 				}
 				event.target=trigger.target;
+				if(event.triggername=='phaseJudge'){
+					event.target=trigger.player;
+				}
 				event.source=trigger.player;
 				event.state=true;
 				event.card=trigger.card;
@@ -1407,13 +1410,21 @@ card.standard={
 					if(mod!='unchanged') return mod;
 					return true;
 				};
-				event.send=function(player,state,isJudge,card,source,target,targets,id,id2,tempnowuxie){
+				event.send=function(player,state,isJudge,card,source,target,targets,id,id2,tempnowuxie,skillState){
+					if(skillState){
+						player.applySkills(skillState);
+					}
 					state=state?1:-1;
 					var str='';
 					if(isJudge){
 						str+=get.translation(source)+'的';
 					}
-					str+=get.translation(card);
+					if(isJudge){
+						str+=get.translation(card,'viewAs');
+					}
+					else{
+						str+=get.translation(card);
+					}
 					if(targets||target){
 						str+='对'+get.translation(targets||target);
 					}
@@ -1433,6 +1444,7 @@ card.standard={
 						prompt:str,
 						type:'wuxie',
 						state:state,
+						_global_waiting:true,
 						ai1:function(){
 							if(isJudge){
 								var name=card.viewAs||card.name;
@@ -1562,7 +1574,7 @@ card.standard={
 						withol=true;
 						list[i].wait(sendback);
 						list[i].send(event.send,list[i],event.state,event.triggername=='phaseJudge',
-						event.card,event.source,event.target,event.targets,event.id,trigger.parent.id,event.tempnowuxie);
+						event.card,event.source,event.target,event.targets,event.id,trigger.parent.id,event.tempnowuxie,get.skillState(list[i]));
 						list.splice(i--,1);
 					}
 					else if(list[i]==game.me){

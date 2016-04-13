@@ -2800,6 +2800,7 @@ character.shenhua={
 			},
 			content:function(){
 				"step 0"
+				player.line(trigger.player,'green');
 				player.loseHp();
 				"step 1"
 				trigger.player.draw(2);
