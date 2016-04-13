@@ -217,6 +217,8 @@ character.standard={
 					event.finish();return;
 				}
 				trigger.source.chooseToDiscard(2).set('ai',function(card){
+					if(card.name=='tao') return -10;
+					if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
 					return ai.get.unuseful(card)+2.5*(5-get.owner(card).hp);
 				});
 				"step 2"

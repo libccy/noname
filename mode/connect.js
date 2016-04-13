@@ -2,11 +2,14 @@
 mode.connect={
     start:function(){
         var directstartmode=lib.config.directstartmode;
-        game.saveConfig('directstartmode');
         ui.create.menu(true);
         var createNode=function(){
             if(event.created) return;
-            if(directstartmode){
+            if(directstartmode&&lib.node){
+                ui.exitroom=ui.create.system('退出房间',function(){
+                    game.saveConfig('directstartmode');
+                    game.reload();
+                },true);
                 game.switchMode(directstartmode);
                 return;
             }

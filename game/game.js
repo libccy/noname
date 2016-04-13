@@ -15420,11 +15420,6 @@
 			else if(!_status.connectMode&&get.config('continue_game')){
 				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 			}
-            if(_status.connectMode&&!game.online&&!game.onlineroom){
-                localStorage.setItem(lib.configprefix+'directstart',true);
-                game.saveConfig('directstartmode',lib.config.mode);
-                game.saveConfig('mode','connect');
-            }
 			if(!ui.restart){
 				ui.restart=ui.create.control('restart',game.reload);
 			}
@@ -17587,6 +17582,13 @@
                                     game.send('server','enter',_status.roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
                                 }
                                 else{
+                                    localStorage.setItem(lib.configprefix+'directstart',true);
+                                    game.saveConfig('directstartmode',active.mode);
+                                    game.saveConfig('mode','connect');
+                                    ui.exitroom=ui.create.system('退出房间',function(){
+                                        game.saveConfig('directstartmode');
+                                        game.reload();
+                                    },true);
                                     game.switchMode(active.mode);
                                 }
                                 clickContainer.call(menuContainer);

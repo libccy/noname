@@ -312,19 +312,21 @@ character.shenhua={
 				if(result.bool){
 					player.logSkill('qiaobian',result.targets);
 					player.discard(result.cards);
+					event.targets=result.targets;
+				}
+				else{
+					event.finish();
 				}
 				"step 2"
 				game.delay();
 				"step 3"
-				if(result.bool){
-					for(var i=0;i<result.targets.length;i++){
-						player.gain(result.targets[i].get('h').randomGet());
-						result.targets[i].$give(1,player);
-					}
-					trigger.finish();
-					trigger.untrigger();
-					game.delay();
+				for(var i=0;i<event.targets.length;i++){
+					player.gain(event.targets[i].get('h').randomGet());
+					event.targets[i].$give(1,player);
 				}
+				trigger.finish();
+				trigger.untrigger();
+				game.delay();
 				"step 4"
 				if(result.bool) game.delay();
 			},
@@ -358,7 +360,6 @@ character.shenhua={
 						check=true;
 					}
 				}
-
 				player.chooseCardTarget({
 					ai1:function(card){
 						if(!_status.event.check) return 0;
@@ -412,7 +413,7 @@ character.shenhua={
 					target:target
 				});
 				"step 1"
-				if(result.bool==false){
+				if(!result.bool){
 					event.finish();
 					return;
 				}
@@ -2046,6 +2047,7 @@ character.shenhua={
 				if(player.classList.contains('turnedover')) player.turnOver();
 			},
 			ai:{
+				order:1,
 				skillTagFilter:function(player){
 					if(player.storage.niepan) return false;
 					if(player.hp>0) return false;
@@ -2233,7 +2235,10 @@ character.shenhua={
 						return -2;
 					},
 					target:function(player,target){
-						if(player.hp<=2) return 0;
+						if(!ui.selected.cards.length){
+							if(player.hp<2) return 0;
+							if(player.hp==2&&target.hp>=2) return 0;
+						}
 						return ai.get.damageEffect(target,player);
 					}
 				}
@@ -2477,6 +2482,7 @@ character.shenhua={
 			content:function(){
 				"step 0";
 				player.chooseTarget('是否发动【新雷击】？').ai=function(target){
+					if(target.skills.contains('hongyan')) return 0;
 					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
 				"step 1"
@@ -2816,6 +2822,7 @@ character.shenhua={
 			content:function(){
 				"step 0";
 				player.chooseTarget('是否发动【雷击】？').ai=function(target){
+					if(target.skills.contains('hongyan')) return 0;
 					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
 				"step 1"
