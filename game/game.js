@@ -48,7 +48,7 @@
 	var lib={
 		configprefix:'noname_0.9_',
         versionOL:4,
-		updateURL:localStorage.getItem('noname_download_source')||'http://isha.applinzi.com/',
+		updateURL:localStorage.getItem('noname_download_source')||'http://123.206.77.253',
 		assetURL:'',
         hallURL:'123.206.77.253',
 		changeLog:[],
@@ -12521,6 +12521,11 @@
                 ui.click.configMenu();
             }
         },
+        closeConnectMenu:function(){
+            if(ui.connectMenuContainer&&!ui.connectMenuContainer.classList.contains('hidden')){
+                ui.click.connectMenu();
+            }
+        },
         closePopped:function(){
             if(ui.currentpopped){
                 if(ui.currentpopped._uiintro){
@@ -17496,6 +17501,7 @@
     				menu=menux.menu;
                 }
 				else{
+                    ui.connectMenuContainer=menuContainer;
     				ui.click.connectMenu=function(){
                         if(menuContainer.classList.contains('hidden')){
                             if(_status.waitingForPlayer){
@@ -22035,6 +22041,7 @@
 				}
 			},
 			roundmenu:function(){
+                game.closeConnectMenu();
 				switch(lib.config.round_menu_func){
 					case 'system':
                         game.closePopped();
@@ -22724,6 +22731,7 @@
 						var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
 						var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
 						var goswipe=function(action){
+                            game.closeConnectMenu();
 							switch(action){
 								case 'system':
                                     game.closePopped();
