@@ -15634,7 +15634,7 @@
 				if(ui.selected.buttons.length<range[0]){
 					if(!event.forced||get.selectableButtons().length)
 					ok=false;
-					if(event.complexSelect||event.getParent().name=='chooseCharacter') ok=false;
+					if(event.complexSelect||event.getParent().name=='chooseCharacter'||event.getParent().name=='chooseButtonOL') ok=false;
 				}
 				if(custom.add.button){
 					custom.add.button();
