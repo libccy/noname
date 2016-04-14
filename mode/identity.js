@@ -39,6 +39,7 @@ mode.identity={
 		}
 		"step 2"
 		if(!lib.config.new_tutorial){
+			_status.new_tutorial=true;
 			game.saveConfig('version',lib.version);
 			var clear=function(){
 				ui.dialog.close();
@@ -139,6 +140,10 @@ mode.identity={
 			}
 		}
 		"step 3"
+		if(typeof _status.new_tutorial=='function'){
+			_status.new_tutorial();
+		}
+		delete _status.new_tutorial;
 		if(lib.storage.test){
 			lib.config.game_speed='vfast';
 			_status.auto=true;
@@ -850,29 +855,29 @@ mode.identity={
 				}
 				else{
 					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
-					if(get.config('double_nei')){
-						switch(get.config('player_number')){
-							case '8':
+					if(lib.configOL.double_nei){
+						switch(lib.configOL.number){
+							case 8:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;
-							case '7':
+							case 7:
 							identityList.remove('zhong');
 							identityList.push('nei');
 							break;
-							case '6':
+							case 6:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;
-							case '5':
+							case 5:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;
-							case '4':
+							case 4:
 							identityList.remove('zhong');
 							identityList.push('nei');
 							break;
-							case '3':
+							case 3:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;

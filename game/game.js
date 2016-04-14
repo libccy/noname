@@ -48,7 +48,7 @@
 	var lib={
 		configprefix:'noname_0.9_',
         versionOL:4,
-		updateURL:localStorage.getItem('noname_download_source')||'http://123.206.77.253',
+		updateURL:localStorage.getItem('noname_download_source')||'http://123.206.77.253/',
 		assetURL:'',
         hallURL:'123.206.77.253',
 		changeLog:[],
@@ -2343,7 +2343,6 @@
                         name:'联机昵称',
                         input:true,
                         frequent:true,
-                        init:'无名玩家'
                     },
                     connect_avatar:{
                         name:'联机头像',
@@ -2359,7 +2358,6 @@
                         name:'联机大厅',
                         input:true,
                         frequent:true,
-                        init:'123.206.77.253'
                     },
                     hall_button:{
                         name:'联机大厅按钮',
@@ -13139,6 +13137,9 @@
 			}
 		},
         multiDownload:function(list,onsuccess,onerror,onfinish){
+            if(lib.updateURL[lib.updateURL.length-1]!='/'){
+                lib.updateURL+='/';
+            }
             list=list.slice(0);
             var download=function(){
                 if(list.length){
@@ -16834,11 +16835,21 @@
 				if(!lib.config.mode_config[localmode]){
 					lib.config.mode_config[localmode]={};
 				}
-				lib.config.mode_config[localmode][key]=value;
+                if(value==undefined){
+                    delete lib.config.mode_config[localmode][key];
+                }
+				else{
+                    lib.config.mode_config[localmode][key]=value;
+                }
 				key+='_mode_config_'+localmode;
 			}
 			else{
-				lib.config[key]=value;
+                if(value==undefined){
+                    delete lib.config[key];
+                }
+                else{
+                    lib.config[key]=value;
+                }
 			}
 			if(value===undefined){
 				delete config[key];
@@ -17278,6 +17289,7 @@
 	                }
 	            };
 	            var clickSwitcher=function(){
+                    if(this.classList.contains('disabled')) return;
 	                var node=this;
 	                this.classList.add('on');
 	                if(this._link.menu){
@@ -17781,6 +17793,18 @@
                                     infoconfig.update(config,map);
                                 }
                             }
+                        }
+                        if(connectMenu){
+                            menuUpdates.push(function(){
+                                if(_status.waitingForPlayer){
+                                    if(map.connect_player_number){
+                                        map.connect_player_number.style.display='none';
+                                    }
+                                    if(map.connect_versus_mode){
+                                        map.connect_versus_mode.style.display='none';
+                                    }
+                                }
+                            })
                         }
                         return node;
                     };
@@ -20365,7 +20389,7 @@
                             });
 						}
 					};
-					var checkForAssetUpdate=function(){
+					game.checkForAssetUpdate=function(type){
 						if(button2.disabled){
 							return;
 						}
@@ -20384,18 +20408,18 @@
 									return;
 								}
 								var n=updates.length;
+                                if(!ui.arena.classList.contains('menupaused')){
+                                    ui.click.configMenu();
+                                    ui.click.menuTab('帮助');
+                                }
 
 								var proceed=function(){
 									if(updates.length==0){
 										game.saveConfig('asset_version',asset_version);
-										alert('素材已是最新');
-										button2.disabled=false;
+                                        alert('素材已是最新');
+                                        button2.disabled=false;
 										button2.innerHTML='检查素材更新';
 										return;
-									}
-									if(!ui.arena.classList.contains('menupaused')){
-										ui.click.configMenu();
-										ui.click.menuTab('帮助');
 									}
 									var p=button2.parentNode;
 									button2.remove();
@@ -20477,7 +20501,7 @@
 					li1.lastChild.appendChild(button1);
 					button2=document.createElement('button');
 					button2.innerHTML='检查素材更新';
-					button2.onclick=checkForAssetUpdate;
+					button2.onclick=game.checkForAssetUpdate;
 					li2.lastChild.appendChild(button2);
 
 					ul.appendChild(li1);
@@ -20754,7 +20778,6 @@
 							}
 						}
 					}
-
 					if(e) e.stopPropagation();
 				};
 				for(i=0;i<namecapt.length;i++){
@@ -20825,6 +20848,9 @@
 					return aa>bb?1:-1;
 				});
 				dialog=ui.create.dialog('hidden');
+                dialog.classList.add('noupdate');
+                dialog.classList.add('scroll1');
+                dialog.classList.add('scroll2');
                 dialog.getCurrentCapt=function(link,capt){
                     if(lib.characterDialogGroup[this.currentcapt]){
                         return lib.characterDialogGroup[this.currentcapt](link,capt);
@@ -21518,6 +21544,28 @@
 						game.checkForUpdate(false);
 					},3000);
 				}
+                if(!lib.config.asset_version){
+                    setTimeout(function(){
+                        var func=function(){
+                            if(confirm('是否下载图片和音频素材？（约100MB）')){
+                                if(!ui.arena.classList.contains('menupaused')){
+                                    ui.click.configMenu();
+                                    ui.click.menuTab('帮助');
+                                }
+                                setTimeout(game.checkForAssetUpdate,500);
+                            }
+                            else{
+                                game.saveConfig('asset_version','无');
+                            }
+                        }
+                        if(_status.new_tutorial){
+                            _status.new_tutorial=func;
+                        }
+                        else{
+                            func();
+                        }
+                    },4000);
+                }
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;
 				delete window.resetExtension;

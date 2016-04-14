@@ -734,11 +734,7 @@ mode.guozhan={
 				}
 			},
 			dieAfter:function(source){
-				game.broadcastAll(function(player){
-					player.showCharacter(2);
-					player.classList.remove('unseen');
-					player.classList.remove('unseen2');
-				},this);
+				this.showCharacter(2);
 				if(source&&source.identity!='unknown'){
 					if(this.identity=='ye') source.draw(1);
 					else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
