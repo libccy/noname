@@ -129,7 +129,7 @@ character.standard={
 				}
 			},
 			ai:{
-				result:{
+				effect:{
 					target:function(card,player,target){
 						if(player.num('he')>1&&get.tag(card,'damage')){
 							if(player.skills.contains('jueqing')) return [1,-1.5];
@@ -309,6 +309,9 @@ character.standard={
 			audio:4,
 			trigger:{player:'judgeEnd'},
 			frequent:true,
+			filter:function(event,player){
+				return get.position(event.result.card)=='d'&&event.position==ui.discardPile;
+			},
 			content:function(){
 				player.gain(trigger.result.card);
 				player.$gain2(trigger.result.card);
@@ -346,6 +349,7 @@ character.standard={
 				});
 				"step 3"
 				if(result.bool){
+					player.line(result.targets,'green');
 					result.targets[0].gain(result.cards);
 					player.$give(result.cards.length,result.targets[0]);
 					for(var i=0;i<result.cards.length;i++){
@@ -1323,6 +1327,7 @@ character.standard={
 				player.draw(num);
 			},
 			ai:{
+				noe:true,
 				effect:{
 					target:function(card,player,target,current){
 						if(get.type(card)=='equip') return [1,3];

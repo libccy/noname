@@ -513,16 +513,7 @@ mode.guozhan={
 			var next=game.createEvent('chooseCharacter',false);
 			next.content=function(){
 				'step 0'
-				var list=[];
-				var libCharacter={};
-				for(var i=0;i<lib.configOL.characterPack.length;i++){
-					var pack=lib.characterPack[lib.configOL.characterPack[i]];
-					for(var j in pack){
-						if(j=='zuoci') continue;
-						if(lib.filter.characterDisabled(j)) continue;
-						if(lib.character[j]) list.push(j);
-					}
-				}
+				var list=get.charactersOL();
 				event.list=list.slice(0);
 				var list2=[];
 				var num;

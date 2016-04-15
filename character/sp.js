@@ -821,7 +821,7 @@ character.sp={
 						if(target.skills.contains('tuntian')) return 0;
 						var es=target.get('e');
 						var nh=target.num('h');
-						var noe=(es.length==0);
+						var noe=(es.length==0||target.hasSkillTag('noe'));
 						var noe2=(es.length==1&&es[0].name=='baiyin'&&target.hp<target.maxHp);
 						var noh=(nh==0||target.hasSkillTag('noh'));
 						if(noh&&noe) return 0;

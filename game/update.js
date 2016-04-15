@@ -1,6 +1,6 @@
 window.noname_update={
-    version:'1.8.6.1',
+    version:'1.8.7',
     changeLog:[
-        '修bug'
+        '界限武将、对决模式联机'
     ]
 }

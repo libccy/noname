@@ -927,7 +927,7 @@ card.standard={
 					target:function(player,target){
 						var es=target.get('e');
 						var nh=target.num('h');
-						var noe=(es.length==0);
+						var noe=(es.length==0||target.hasSkillTag('noe'));
 						var noe2=(es.length==1&&es[0].name=='baiyin'&&target.hp<target.maxHp);
 						var noh=(nh==0||target.hasSkillTag('noh'));
 						if(noh&&noe) return 0;
@@ -1425,7 +1425,7 @@ card.standard={
 					else{
 						str+=get.translation(card);
 					}
-					if(targets||target){
+					if((targets||target)&&!isJudge){
 						str+='对'+get.translation(targets||target);
 					}
 					str+='将'+(state>0?'生效':'失效')+'，是否无懈？';

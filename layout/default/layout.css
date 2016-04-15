@@ -187,6 +187,10 @@ table{table-layout: fixed;}
 	font-family:'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
 }
 
+#arena.playerhidden>.player,
+#arena.playerhidden>#mebg{
+	visibility: hidden;
+}
 #arena.chess>#arenalog{
 	display: none !important;
 }
@@ -1286,6 +1290,7 @@ div:hover>.intro{opacity: 1;}
 	-webkit-animation:identity 0.8s;
 }
 .player .identity[data-color="zhu"],
+.player .identity[data-color="truezhu"],
 div[data-nature='fire'],
 span[data-nature='fire']{
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px,
@@ -1345,6 +1350,7 @@ span[data-nature='woodmm']{
 }
 .player .identity[data-color="cai"],
 .player .identity[data-color="wei"],
+.player .identity[data-color="falsezhu"],
 div[data-nature='water'],
 span[data-nature='water']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 10px,

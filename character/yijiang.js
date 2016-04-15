@@ -4646,7 +4646,8 @@ character.yijiang={
 					target:function(card,player,target,current){
 						if(get.type(card)=='equip') return [1,3];
 					}
-				}
+				},
+				noe:true
 			}
 		},
 		jiangchi:{

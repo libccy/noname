@@ -438,7 +438,15 @@ character.shenhua={
 							if(get.position(button.link)=='j') return -10;
 							return ai.get.equipValue(button.link);
 						}
-					},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]);
+					},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+						var targets1=_status.event.targets1;
+						if(get.position(button.link)=='j'){
+							return !targets1.hasJudge(button.link.viewAs||button.link.name);
+						}
+						else{
+							return !targets1.num('e',{subtype:get.subtype(button.link)});
+						}
+					});
 				}
 				else{
 					event.finish();

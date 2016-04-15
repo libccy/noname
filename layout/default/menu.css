@@ -210,6 +210,9 @@
 .menu.main>.menu-content>div>.right.pane>.expanded{
 	padding-bottom:80px;
 }
+.menu.main>.menu-content>div>.right.pane>.expanded.expanded2{
+	padding-bottom:12px;
+}
 .menu.main>.menu-content>div>.right.pane>.morenodes{
 	padding-bottom:10px;
 }
