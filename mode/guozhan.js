@@ -222,7 +222,77 @@ mode.guozhan={
 				game.players[i].showCharacter(2,false);
 			}
 		},
+		tryResult:function(){
+			var hasunknown=false,check=true,unknown,giveup;
+			var group=game.players[0]._group;
+			for(var i=0;i<game.players.length;i++){
+				if(game.players[i].identity=='unknown'){
+					hasunknown=true;
+					if(unknown){
+						unknown='no';
+					}
+					else{
+						unknown=game.players[i];
+					}
+				}
+				if(game.players[i]._group!=group){
+					check=false;break;
+				}
+			}
+			if(check){
+				if(get.population('ye')){
+					if(game.players.length>1){
+						check=false;
+					}
+				}
+				else{
+					if(hasunknown){
+						var players=game.players.concat(game.dead);
+						var num=0;
+						for(var i=0;i<players.length;i++){
+							if(players[i]._group==group){
+								num++;
+							}
+						}
+						if(num>players.length/2){
+							check=false;
+						}
+					}
+				}
+			}
+			if(check){
+				game.checkResult();
+			}
+			else if(!hasunknown){
+				var ids=[];
+				var idmap={};
+				var idp={};
+				for(var i=0;i<game.players.length;i++){
+					var id=game.players[i].identity;
+					ids.add(id);
+					if(!idmap[id]){
+						idmap[id]=1;
+					}
+					else{
+						idmap[id]++;
+					}
+					idp[id]=game.players[i];
+				}
+				if(ids.length!=2) return;
+				var id1=ids[0],id2=ids[1];
+				if(idmap[id1]>1&&idmap[id2]>1) return;
+				if(idmap[id1]>1&&id1=='ye') return;
+				if(idmap[id2]>1&&id2=='ye') return;
+				if(idmap[id1]==1){
+					idp[id1].showGiveup();
+				}
+				if(idmap[id2]==1){
+					idp[id2].showGiveup();
+				}
+			}
+		},
 		checkResult:function(){
+			_status.overing=true;
 			if(lib.storage.test&&!_status.connectMode){
 				console.log(get.translation(game.players[0].identity)+'胜利');
 			}
@@ -489,6 +559,7 @@ mode.guozhan={
 					game.players[i].identity='unknown';
 					game.players[i].node.name.show();
 					game.players[i].node.name2.show();
+					game.players[i]._group=lib.character[game.players[i].name1][1];
 					for(var j=0;j<game.players[i].hiddenSkills.length;j++){
 						var ifo=get.info(game.players[i].hiddenSkills[j]);
 						if(ifo.init){
@@ -731,11 +802,7 @@ mode.guozhan={
 					else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
 					else source.discard(source.get('he'));
 				}
-				for(var i=1;i<game.players.length;i++){
-					if(game.players[i].identity=='unknown') return;
-					if(game.players[i].identity!=game.players[0].identity) return;
-				}
-				if(game.players[0].identity!='ye'||game.players.length===1) game.checkResult();
+				game.tryResult();
 			},
 			isUnseen:function(){
 				return (this.classList.contains('unseen')&&this.classList.contains('unseen2'));
@@ -829,7 +896,7 @@ mode.guozhan={
 				},this,this.name,this.sex,num,this.identity);
 				this.identityShown=true;
 				var initdraw=parseInt(get.config('initshow_draw'));
-				if(!_status.initshown&&initdraw&&this.isAlive()&&get.config('guozhan_mode')!='mingjiang'){
+				if(!_status.initshown&&!_status.overing&&initdraw&&this.isAlive()&&get.config('guozhan_mode')!='mingjiang'){
 					this.popup('首亮');
 					game.log(this,'首先明置武将，得到奖励');
 					game.log(this,'摸了'+get.cnNumber(initdraw)+'张牌');
@@ -872,13 +939,7 @@ mode.guozhan={
 						}
 					}
 				}
-				if(game.players[0].identity!='ye'){
-					for(var i=1;i<game.players.length;i++){
-						if(game.players[i].identity=='unknown') return;
-						if(game.players[i].identity!=game.players[0].identity) return;
-					}
-					game.checkResult();
-				}
+				game.tryResult();
 			},
 			perfectPair:function(){
 				if(!get.config('zhulian')) return false;
@@ -1132,6 +1193,7 @@ mode.guozhan={
 				return -0.5;
 			},
 			attitude:function(from,to){
+				if(to.identity=='unknown'&&game.players.length==2) return -5;
 				if(_status.currentPhase==from&&from.ai.tempIgnore&&
 					from.ai.tempIgnore.contains(to)&&to.identity=='unknown'&&
 					(!from.storage.zhibi||!from.storage.zhibi.contains(to))) return 0;

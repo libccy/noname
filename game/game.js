@@ -7143,6 +7143,8 @@
                         if(this.node.gaming){
                             this.node.gaming.hide();
                         }
+                        this.roomfull=false;
+                        this.roomgaming=false;
                     }
                     else{
                         this.roomempty=false;
@@ -7301,6 +7303,14 @@
                         else{
                             delete _status.addChatEntry;
                         }
+                    }
+                },
+                showGiveup:function(){
+                    if(this==game.me){
+                        ui.create.giveup();
+                    }
+                    else if(this.isOnline2()){
+                        this.send(ui.create.giveup);
                     }
                 },
                 applySkills:function(skills){
@@ -11706,6 +11716,9 @@
 				priority:20,
 				popup:false,
 				content:function(){
+                    while(ui.dialogs.length){
+                        ui.dialogs[0].close();
+                    }
 					if(!player.noPhaseDelay&&lib.config.show_phase_prompt){
 						player.popup('回合开始');
 					}
@@ -17822,7 +17835,7 @@
                                 };
                                 infoconfig.connect_observe={
                                     name:'允许旁观',
-                                    init:false,
+                                    init:true,
                                     connect:true
                                 };
                             }
@@ -20763,7 +20776,8 @@
 	            return node;
 			},
             giveup:function(){
-                ui.create.system('投降',function(){
+                if(ui.giveup) return;
+                ui.giveup=ui.create.system('投降',function(){
                     var player=game.me;
                     this.remove();
                     if(game.online){
@@ -23784,7 +23798,7 @@
                             alert('房间已满');
                         }
                         else if(this.roomgaming&&!game.onlineID){
-                            alert('游戏已开始')
+                            alert('房间不允许旁观')
                         }
                         else if(this.hasOwnProperty('roomindex')){
                             if(!_status.enteringroom){

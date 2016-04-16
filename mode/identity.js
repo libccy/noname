@@ -1160,12 +1160,7 @@ mode.identity={
 						giveup=game.zhu;
 					}
 					if(giveup){
-						if(giveup==game.me){
-							ui.create.giveup();
-						}
-						else if(giveup.isOnline2()){
-							giveup.send(ui.create.giveup);
-						}
+						giveup.showGiveup();
 					}
 				}
 
