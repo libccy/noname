@@ -5954,6 +5954,7 @@ mode.chess={
 	ai:{
 		get:{
 			attitude:function(from,to){
+				if(!from||!to) return 0;
 				var t=(from.side===to.side?1:-1);
 				if(from.isMad()){
 					t=-t;

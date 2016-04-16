@@ -1193,6 +1193,7 @@ mode.guozhan={
 				return -0.5;
 			},
 			attitude:function(from,to){
+				if(!from||!to) return 0;
 				if(to.identity=='unknown'&&game.players.length==2) return -5;
 				if(_status.currentPhase==from&&from.ai.tempIgnore&&
 					from.ai.tempIgnore.contains(to)&&to.identity=='unknown'&&

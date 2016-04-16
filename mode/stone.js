@@ -1142,7 +1142,7 @@ mode.stone={
 			stone_xukongkongmo:['male','qun',3,['warlock_tunshi'],['minskin','stone'],[3,3,'warlock']],
 			stone_fukongmoyan:['male','qun',4,['warlock_shijie'],['minskin','stone'],[5,4,'warlock']],
 
-			stone_zhihuiguan:['female','qun',2,['warrior_tongling'],['minskin','stone'],[2,2,'warrior']],
+			stone_zhihuiguan:['female','qun',2,['warrior_tongling'],['minskin','stone'],[3,2,'warrior']],
 			stone_kuangzhanshi:['male','qun',2,['warrior_baoluan'],['minskin','stone'],[3,1,'warrior']],
 			stone_zhujiashi:['male','qun',2,['warrior_zhujia'],['minskin','stone'],[2,1,'warrior']],
 			stone_jiangong:['male','qun',2,['warrior_jiangong'],['minskin','stone'],[2,2,'warrior']],
@@ -7154,7 +7154,7 @@ mode.stone={
 				trigger.finish();
 			},
 			ai:{
-				threaten:0
+				threaten:0.1
 			}
 		},
 		stone_jingxiang:{
@@ -7182,7 +7182,7 @@ mode.stone={
 				}
 			},
 			ai:{
-				threaten:0
+				threaten:0.1
 			}
 		},
 		priest_xundao:{
@@ -7423,26 +7423,18 @@ mode.stone={
 			}
 		},
 		warrior_tongling:{
-			trigger:{source:'fellow'},
+			trigger:{global:'fellow'},
 			forced:true,
 			unique:true,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isMin()&&game.players[i]!=player&&
-						game.players[i].side==player.side&&game.players[i].isTurnedOver()){
-						return true;
-					}
-				}
-				return false;
+				return event.source.side==player.side&&event.source!=player&&event.source.num('h')<=2;
 			},
 			content:function(){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isMin()&&game.players[i]!=player&&
-						game.players[i].side==player.side&&game.players[i].isTurnedOver()){
-						game.players[i].turnOver();
-						player.line(game.players[i],'green');
-					}
-				}
+				trigger.source.classList.remove('turnedover');
+				player.line(trigger.source,'green');
+			},
+			ai:{
+				threaten:1.3
 			}
 		},
 		warrior_baoluan:{
@@ -8976,10 +8968,11 @@ mode.stone={
 			}
 		},
 		stone_zhufu:{
-			trigger:{player:'phaseEnd'},
+			trigger:{global:'phaseEnd'},
 			forced:true,
 			unique:true,
 			filter:function(event,player){
+				if(event.player!=player.getLeader()) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isMin()&&game.players[i]!=player&&
 					game.players[i].side==player.side&&game.players[i].hp<game.players[i].maxHp){
@@ -9746,7 +9739,7 @@ mode.stone={
 		warrior_zhifu_info:'每当你受到一次伤害，对敌方主将造成一点伤害',
 
 		warrior_tongling:'统领',
-		warrior_tongling_info:'你出场时，将所有友方随从的武将牌翻至正面',
+		warrior_tongling_info:'每当你召唤一个初始手牌数不大于2的随从，令其获得冲锋',
 		warrior_baoluan:'暴乱',
 		warrior_baoluan_info:'每当一名随从受到一次伤害，摸一张牌',
 		warrior_jiangong:'监工',
@@ -10084,7 +10077,7 @@ mode.stone={
 		stone_mingguangjisi:'明光祭司',
 		stone_nianqingjisi:'年轻祭司',
 		stone_zhufu:'祝福',
-		stone_zhufu_info:'回合结束阶段，你令一名随机的受伤友方随从回复一点体力',
+		stone_zhufu_info:'己方主将的回合结束阶段，你令一名随机的受伤友方随从回复一点体力',
 		stone_aomishouwei:'奥秘守卫',
 		stone_yanjingshe:'眼镜蛇',
 		stone_yanjingshe1:'毒噬',
@@ -10141,6 +10134,7 @@ mode.stone={
 	ai:{
 		get:{
 			attitude:function(from,to){
+				if(!from||!to) return 0;
 				var num;
 				if(to.isMin()&&!to.skills.contains('chaofeng')){
 					num=5;

@@ -4512,7 +4512,8 @@ character.yijiang={
 				filter:function(button,player){
 					return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
 				},
-				check:function(button,player){
+				check:function(button){
+					var player=_status.event.player;
 					var recover=0,lose=1;
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].isOut()){
