@@ -4284,7 +4284,7 @@ character.swd={
 				if(result.judge>0){
 					event.cards.push(result.card);
 					if(event.cards.length==3){
-						player.gain(event.cards,'draw2');
+						player.gain(event.cards);
 						if(event.cards.length){
 							player.$draw(event.cards);
 						}
