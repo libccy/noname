@@ -47,7 +47,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:4,
+        versionOL:5,
 		updateURL:localStorage.getItem('noname_download_source')||'http://123.206.77.253/',
 		assetURL:'',
         hallURL:'123.206.77.253',
