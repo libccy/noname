@@ -254,7 +254,9 @@ character.standard={
 					return target.num('h')>0&&player!=target;
 				},function(target){
 					if(!_status.event.aicheck) return 0;
-					return (1-ai.get.attitude(_status.event.player,target));
+					var att=ai.get.attitude(_status.event.player,target);
+					if(target.skills.contains('tuntian')) return att/10;
+					return 1-att;
 				}).set('aicheck',check);
 				"step 1"
 				if(result.bool){
@@ -898,7 +900,15 @@ character.standard={
 					}
 				}
 			},
-			group:'kongcheng1'
+			group:'kongcheng1',
+			ai:{
+				noh:true,
+				skillTagFilter:function(player,tag){
+					if(tag=='noh'){
+						if(player.num('h')!=1) return false;
+					}
+				}
+			}
 		},
 		kongcheng1:{
 			audio:2,

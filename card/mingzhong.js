@@ -107,7 +107,10 @@ card.mingzhong={
 				useful:4,
 				value:10,
 				result:{
-					target:1
+					target:function(player,target){
+						if(target.num('j','lebu')) return 0;
+						return Math.max(1,2-target.num('h')/10);
+					}
 				}
 			}
         },

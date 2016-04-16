@@ -1506,7 +1506,15 @@ character.shenhua={
 				player.addSkill('haoshi2');
 			},
 			ai:{
-				threaten:2
+				threaten:2,
+				ai:{
+					noh:true,
+					skillTagFilter:function(player,tag){
+						if(tag=='noh'){
+							if(player.num('h')!=2) return false;
+						}
+					}
+				}
 			}
 		},
 		haoshi2:{

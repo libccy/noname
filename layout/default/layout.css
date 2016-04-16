@@ -188,8 +188,10 @@ table{table-layout: fixed;}
 }
 
 #arena.playerhidden>.player,
-#arena.playerhidden>#mebg{
+#arena.playerhidden>#mebg,
+#arena.markhidden>.player>.marks{
 	visibility: hidden;
+	opacity: 0;
 }
 #arena.chess>#arenalog{
 	display: none !important;

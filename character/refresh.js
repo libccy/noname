@@ -102,7 +102,9 @@ character.refresh={
 				player.chooseTarget('是否发动突袭?',[1,2],function(card,player,target){
 					return target.num('h')>0&&player!=target&&target.num('h')>=player.num('h');
 				},function(target){
-					return (1-ai.get.attitude(_status.event.player,target));
+					var att=ai.get.attitude(_status.event.player,target);
+					if(target.skills.contains('tuntian')) return att/10;
+					return 1-att;
 				});
 				"step 1"
 				if(result.bool){
