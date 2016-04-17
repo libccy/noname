@@ -27,6 +27,10 @@
             break;
         }
     }
+    if(window.location.href.indexOf('index.html?server')!=-1){
+        window.isNonameServer=true;
+        window.indexedDB=null;
+    }
 }());
 
 (function(){
@@ -3152,6 +3156,10 @@
 				lib.config.all.plays=[];
 				lib.config.all.mode=[];
 
+                if(window.isNonameServer){
+                    lib.config.mode='connect';
+                }
+
 				for(i in character.pack){
 					if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
 						lib.config.all.characters.push(i);
@@ -3909,7 +3917,10 @@
                     if(lib.config.mode=='connect'){
                         _status.connectMode=true;
                     }
-					if(lib.config.cheat&&!lib.storage.test&&(!_status.connectMode||lib.config.debug)){
+                    if(window.isNonameServer){
+                        lib.cheat.i();
+                    }
+					else if(lib.config.cheat&&!lib.storage.test&&(!_status.connectMode||lib.config.debug)){
                         lib.cheat.i();
                     }
 					lib.config.sort_card=get.sortCard(lib.config.sort);
@@ -7132,6 +7143,7 @@
                 uninitOL:function(){
                     this.node.avatar.hide();
                     this.node.name.innerHTML='';
+                    this.node.identity.firstChild.innerHTML='';
                     delete this.nickname;
                     delete this.avatar;
                 },
@@ -11333,6 +11345,9 @@
                                 delete game.connectPlayers[i].playerid;
                             }
                         }
+                        if(game.onlinezhu==this.id){
+                            game.onlinezhu=null;
+                        }
                         game.updateWaiting();
                     }
                     else if(lib.playerOL[this.id]){
@@ -12044,6 +12059,30 @@
                         player.unwait(result);
                     }
                 },
+                changeRoomConfig:function(config){
+                    if(this.id==game.onlinezhu){
+                        game.broadcastAll(function(config){
+                            for(var i in config){
+                                lib.configOL[i]=config[i];
+                            }
+                        },config);
+                        if(lib.configOL.mode=='identity'&&lib.configOL.identity_mode=='zhong'&&game.connectPlayers){
+                            for(var i=0;i<game.connectPlayers.length;i++){
+                                game.connectPlayers[i].classList.remove('unselectable2');
+                            }
+                            lib.configOL.number=8;
+                            game.updateWaiting();
+                        }
+                        if(game.onlineroom){
+                            game.send('server','config',lib.configOL);
+                        }
+                        for(var i=0;i<game.connectPlayers.length;i++){
+                            if(game.connectPlayers[i].playerid==this.id){
+                                game.connectPlayers[i].chat('房间设置已更改');
+                            }
+                        }
+                    }
+                },
                 chat:function(id,str){
                     var player;
                     if(lib.playerOL[id]){
@@ -12161,6 +12200,11 @@
                             if(ui.rooms) game.saveConfig('reconnect_info');
                             game.reload();
                         },true);
+
+                        if(window.isNonameServer){
+                            lib.configOL.mode='identity';
+                            game.send('server','enter',ui.rooms[0].roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
+                        }
                     }
                     if(_status.event.getParent()){
                         game.forceOver('noover',proceed);
@@ -12521,6 +12565,8 @@
                     if(!lib.translate.zhu){
                         lib.translate.zhu='主';
                     }
+                    game.onlinezhu=false;
+                    _status.waitingForPlayer=true;
                     for(var i=0;i<map.length;i++){
                         if(map[i]=='disabled'){
                             game.connectPlayers[i].classList.add('unselectable2');
@@ -12528,11 +12574,20 @@
                         else{
                             game.connectPlayers[i].classList.remove('unselectable2');
                             if(map[i]){
-                                if(i==0){
-                                    game.connectPlayers[i].setIdentity('zhu');
-                                }
                                 game.connectPlayers[i].initOL(map[i][0],map[i][1]);
                                 game.connectPlayers[i].playerid=map[i][2];
+                                if(map[i][3]=='zhu'){
+                                    game.connectPlayers[i].setIdentity('zhu');
+                                    if(map[i][2]==game.onlineID){
+                                        game.onlinezhu=true;
+                                        if(ui.roomInfo){
+                                            ui.roomInfo.innerHTML='房间设置';
+                                        }
+                                    }
+                                }
+                                else{
+                                    game.connectPlayers[i].node.identity.firstChild.innerHTML='';
+                                }
                             }
                             else{
                                 game.connectPlayers[i].uninitOL();
@@ -12724,7 +12779,13 @@
             for(var i=0;i<game.connectPlayers.length;i++){
                 var player=game.connectPlayers[i];
                 if(player.playerid){
+                    if(!game.onlinezhu){
+                        game.onlinezhu=player.playerid;
+                    }
                     map[i]=[player.nickname,player.avatar,player.playerid];
+                    if(player.playerid==game.onlinezhu){
+                        map[i].push('zhu');
+                    }
                 }
                 else if(player.classList.contains('unselectable2')){
                     map[i]='disabled';
@@ -12758,10 +12819,13 @@
                 }
 
                 ui.create.connectPlayers(game.ip);
-                var me=game.connectPlayers[0];
-                me.initOL(lib.config.connect_nickname,lib.config.connect_avatar);
-                me.playerid=1;
-                me.setIdentity('zhu');
+                if(!window.isNonameServer){
+                    var me=game.connectPlayers[0];
+                    me.setIdentity('zhu');
+                    me.initOL(lib.config.connect_nickname,lib.config.connect_avatar);
+                    me.playerid='1';
+                    game.onlinezhu='1';
+                }
                 _status.waitingForPlayer=true;
 
                 game.pause();
@@ -17389,7 +17453,11 @@
                 lib.setPopped(chat,ui.click.chat,220);
             },
             roomInfo:function(){
-                var chat=ui.create.system(game.online?'房间信息':'房间设置',game.online?null:ui.click.connectMenu,true);
+                var chat=ui.create.system(game.online?'房间信息':'房间设置',function(){
+                    if(!game.online||game.onlinezhu){
+                        ui.click.connectMenu();
+                    }
+                },true);
                 ui.roomInfo=chat;
                 lib.setPopped(chat,function(){
                     if(game.getRoomInfo){
@@ -17685,8 +17753,14 @@
                                 startButton.innerHTML='设';
                                 var start=menux.pages[0].firstChild;
                                 for(var i=0;i<start.childNodes.length;i++){
-                                    if(!start.childNodes[i].classList.contains('active')){
+                                    if(start.childNodes[i].mode!=lib.configOL.mode){
                                         start.childNodes[i].classList.add('unselectable');
+                                        start.childNodes[i].classList.remove('active');
+                                        start.childNodes[i].link.remove();
+                                    }
+                                    else{
+                                        start.childNodes[i].classList.add('active');
+                                        start.nextSibling.appendChild(start.childNodes[i].link);
                                     }
                                 }
                             }
@@ -17737,26 +17811,33 @@
                             if(connectMenu){
                                 if(_status.waitingForPlayer){
                                     var config={};
-                                    for(var i in lib.mode[lib.config.mode].connect){
+                                    for(var i in lib.mode[lib.configOL.mode].connect){
                                         if(i=='update') continue;
-                                        config[i.slice(8)]=get.config(i);
+                                        config[i.slice(8)]=get.config(i,lib.configOL.mode);
                                     }
-                                    game.broadcastAll(function(config){
-                                        for(var i in config){
-                                            lib.configOL[i]=config[i];
+                                    if(game.online){
+                                        if(game.onlinezhu){
+                                            game.send('changeRoomConfig',config);
                                         }
-                                    },config);
-                                    if(lib.configOL.mode=='identity'&&lib.configOL.identity_mode=='zhong'&&game.connectPlayers){
-                                        for(var i=0;i<game.connectPlayers.length;i++){
-                                            game.connectPlayers[i].classList.remove('unselectable2');
+                                    }
+                                    else{
+                                        game.broadcastAll(function(config){
+                                            for(var i in config){
+                                                lib.configOL[i]=config[i];
+                                            }
+                                        },config);
+                                        if(lib.configOL.mode=='identity'&&lib.configOL.identity_mode=='zhong'&&game.connectPlayers){
+                                            for(var i=0;i<game.connectPlayers.length;i++){
+                                                game.connectPlayers[i].classList.remove('unselectable2');
+                                            }
+                                            lib.configOL.number=8;
+                                            game.updateWaiting();
                                         }
-                                        lib.configOL.number=8;
-                                        game.updateWaiting();
+                                        if(game.onlineroom){
+                                            game.send('server','config',lib.configOL);
+                                        }
+                                        game.connectPlayers[0].chat('房间设置已更改');
                                     }
-                                    if(game.onlineroom){
-                                        game.send('server','config',lib.configOL);
-                                    }
-                                    game.connectPlayers[0].chat('房间设置已更改');
                                 }
                                 else if(_status.enteringroom){
                                     lib.configOL.mode=active.mode;
@@ -24733,9 +24814,10 @@
 			}
 			return null;
 		},
-		config:function(item){
-			if(!lib.config.mode_config[lib.config.mode]) return;
-			return lib.config.mode_config[lib.config.mode][item];
+		config:function(item,mode){
+            mode=mode||lib.config.mode;
+			if(!lib.config.mode_config[mode]) return;
+			return lib.config.mode_config[mode][item];
 		},
 		coinCoeff:function(list){
 			var num=0;
@@ -26908,6 +26990,17 @@
 			}
 			return list;
 		};
+        if(!Array.from){
+            Array.from=function(args){
+                var list=[];
+                if(args&&args.length){
+                    for(var i=0;i<args.length;i++){
+                        list.push(args[i]);
+                    }
+                }
+                return list;
+            }
+        }
 		window.countGroups=function(){
 			var a=0,b=0,c=0,d=0;
 			var sa=0,sb=0,sc=0,sd=0;

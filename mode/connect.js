@@ -109,7 +109,10 @@ mode.connect={
                 return uiintro;
             },220);
         }
-        if(lib.config.reconnect_info){
+        if(window.isNonameServer){
+            game.connect('localhost');
+        }
+        else if(lib.config.reconnect_info){
             var info=lib.config.reconnect_info;
             game.onlineID=info[1];
             var n=5;
