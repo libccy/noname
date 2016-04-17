@@ -1215,24 +1215,24 @@ mode.versus={
 					'sp_ganning','sp_zhangfei','sp_xiahoudun'].contains(name)){
 						return true;
 					}
-					if(lib.characterPack.refresh[name]){
+					if(lib.characterPack.refresh&&lib.characterPack.refresh[name]){
 						if(!lib.configOL.characterPack.contains('refresh')) return true;
 						return false;
 					}
-					if(lib.characterPack.standard[name]){
+					if(lib.characterPack.standard&&lib.characterPack.standard[name]){
 						if(!lib.configOL.characterPack.contains('standard')) return true;
 						if(lib.configOL.characterPack.contains('refresh')&&lib.characterPack.refresh['re_'+name]) return true;
 						return false;
 					}
-					if(lib.characterPack.shenhua[name]){
+					if(lib.characterPack.shenhua&&lib.characterPack.shenhua[name]){
 						if(!lib.configOL.characterPack.contains('shenhua')) return true;
 						return false;
 					}
-					if(lib.characterPack.sp[name]){
+					if(lib.characterPack.sp&&lib.characterPack.sp[name]){
 						if(!lib.configOL.characterPack.contains('sp')) return true;
 						return false;
 					}
-					if(lib.characterPack.yijiang[name]){
+					if(lib.characterPack.yijiang&&lib.characterPack.yijiang[name]){
 						if(!lib.configOL.characterPack.contains('yijiang')) return true;
 						return false;
 					}
@@ -1367,7 +1367,10 @@ mode.versus={
 						}
 						game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
 					}
-				},game.me,Math.random()<0.5);
+				},game.players[0],Math.random()<0.5);
+				if(game.me.side==undefined){
+					game.me.side=game.players[0].side;
+				}
 				_status.onreconnect=[function(){
 					var players=game.players.concat(game.dead);
 					for(var i=0;i<players.length;i++){
@@ -1475,7 +1478,7 @@ mode.versus={
 						}
 						game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
 					}
-				},game.me,Math.random()<0.5,Math.random()<0.5);
+				},game.players[0],Math.random()<0.5,Math.random()<0.5);
 				_status.onreconnect=[function(){
 					var players=game.players.concat(game.dead);
 					for(var i=0;i<players.length;i++){
@@ -1529,10 +1532,10 @@ mode.versus={
 				list.remove('sunquan');
 				event.videoId=lib.status.videoId++;
 				if(Math.random()<0.5){
-					event.choosing=game.me;
+					event.choosing=game.players[0];
 				}
 				else{
-					event.choosing=game.me.next;
+					event.choosing=game.players[1];
 				}
 				var createDialog=function(list,id,list1,list2){
 					var dialog=ui.create.dialog('选择角色',[list,'character']);
@@ -1560,8 +1563,8 @@ mode.versus={
 					}
 				};
 				game.broadcastAll(createDialog,list,event.videoId,event.choosing);
-				game.me.storage.versuslist=[];
-				game.me.next.storage.versuslist=[];
+				game.players[0].storage.versuslist=[];
+				game.players[1].storage.versuslist=[];
 				event.selected=[];
 				_status.firstChoose=event.choosing;
 				event.num=(parseInt(lib.configOL.replace_number)+1)*2;
@@ -1626,11 +1629,11 @@ mode.versus={
 				_status.friendDied=[];
 				_status.enemyDied=[];
 
-				_status.friend=game.me.storage.versuslist;
-				_status.enemy=game.me.next.storage.versuslist;
+				_status.friend=game.players[0].storage.versuslist;
+				_status.enemy=game.players[1].storage.versuslist;
 
-				delete game.me.storage.versuslist;
-				delete game.me.next.storage.versuslist;
+				delete game.players[0].storage.versuslist;
+				delete game.players[1].versuslist;
 
 				_status.enemyCount=ui.create.system('杀敌: '+get.cnNumber(0,true),null,true);
 				_status.friendCount=ui.create.system('阵亡: '+get.cnNumber(0,true),null,true);
@@ -1639,17 +1642,33 @@ mode.versus={
 				lib.setPopped(_status.enemyCount,game.versusHoverEnemy);
 
 				game.me.side=true;
-				game.me.next.side=false;
+				game.players[0].side=true;
+				game.players[1].side=false;
 
-				var func=function(list1,list2,list3,list4,func1,func2){
-					game.me.side=false;
-					game.me.nextSeat.side=true;
+				var func=function(list1,list2,list3,list4,func1,func2,playerid){
+					if(game.me.playerid==playerid){
+						game.me.side=true;
+						game.me.next.side=false;
+					}
+					else{
+						game.me.side=false;
+						game.me.next.side=true;
+					}
 
-					_status.friendDied=list1;
-					_status.enemyDied=list2;
+					if(game.me.side){
+						_status.enemyDied=list1;
+						_status.friendDied=list2;
 
-					_status.friend=list3;
-					_status.enemy=list4;
+						_status.enemy=list3;
+						_status.friend=list4;
+					}
+					else{
+						_status.friendDied=list1;
+						_status.enemyDied=list2;
+
+						_status.friend=list3;
+						_status.enemy=list4;
+					}
 
 					_status.enemyCount=ui.create.system('杀敌: '+get.cnNumber(_status.enemyDied.length,true),null,true);
 					_status.friendCount=ui.create.system('阵亡: '+get.cnNumber(_status.friendDied.length,true),null,true);
@@ -1658,33 +1677,48 @@ mode.versus={
 					lib.setPopped(_status.enemyCount,func2);
 				};
 				_status.onreconnect=[func,_status.enemyDied,_status.friendDied,
-					_status.enemy,_status.friend,game.versusHoverFriend,game.versusHoverEnemy];
-				game.me.next.send.apply(game.me.next,_status.onreconnect);
+					_status.enemy,_status.friend,game.versusHoverFriend,game.versusHoverEnemy,game.players[0].playerid];
+				game.broadcast(func,_status.enemyDied,_status.friendDied,
+					_status.enemy,_status.friend,game.versusHoverFriend,game.versusHoverEnemy,game.players[0].playerid);
 
-				var list=[[game.me,['选择出场角色',[_status.friend,'character']]],[game.me.next,['选择出场角色',[_status.enemy,'character']]]];
+				var list=[[game.players[0],['选择出场角色',[_status.friend,'character']]],[game.players[1],['选择出场角色',[_status.enemy,'character']]]];
 				game.me.chooseButtonOL(list,function(player,result){
 					if(game.online||player==game.me) player.init(result.links[0]);
 				});
 				'step 5'
-				var result1=result[game.me.playerid].links[0];
+				var result1;
+				var friend=result[game.players[0].playerid];
+				if(friend&&friend.links&&friend.links.length){
+					result1=friend.links[0];
+				}
+				else{
+					result1=_status.friend.randomGet();
+				}
 				var result2;
-				var enemy=result[game.me.next.playerid];
+				var enemy=result[game.players[1].playerid];
 				if(enemy&&enemy.links&&enemy.links.length){
 					result2=enemy.links[0];
 				}
 				else{
 					result2=_status.enemy.randomGet();
 				}
-				game.me.next.init(result2);
-				_status.enemy.remove(result2);
+				if(!game.players[0].name) game.players[0].init(result1);
+				if(!game.players[1].name) game.players[1].init(result2);
 				_status.friend.remove(result1);
-				game.me.next.send(function(result1,result2){
-					if(!game.me.name){
-						game.me.init(result2);
+				_status.enemy.remove(result2);
+				game.broadcast(function(result1,result2){
+					if(game.me.side){
+						if(!game.me.name) game.me.init(result1);
+						if(!game.me.next.name) game.me.next.init(result2);
+						_status.friend.remove(result1);
+						_status.enemy.remove(result2);
 					}
-					game.me.next.init(result1);
-					_status.friend.remove(result2);
-					_status.enemy.remove(result1);
+					else{
+						if(!game.me.name) game.me.init(result2);
+						if(!game.me.next.name) game.me.next.init(result1);
+						_status.friend.remove(result2);
+						_status.enemy.remove(result1);
+					}
 				},result1,result2);
 			}
 		},

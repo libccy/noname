@@ -176,11 +176,17 @@ mode.identity={
 		}
 		if(game.players.length==2){
 			game.showIdentity(true);
-			if(game.me.next.isOnline){
-				game.me.next.send(function(identity){
-					game.me.next.setIdentity(identity);
-				},game.me.identity);
+			var map={};
+			for(var i in lib.playerOL){
+				map[i]=lib.playerOL[i].identity;
 			}
+			game.broadcast(function(map){
+				for(var i in map){
+					lib.playerOL[i].identity=map[i];
+					lib.playerOL[i].setIdentity();
+					lib.playerOL[i].ai.shown=1;
+				}
+			},map);
 		}
 		else{
 			for(var i=0;i<game.players.length;i++){

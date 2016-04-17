@@ -27,8 +27,9 @@
             break;
         }
     }
-    if(window.location.href.indexOf('index.html?server')!=-1){
-        window.isNonameServer=true;
+    var index=window.location.href.indexOf('index.html?server=');
+    if(index!=-1){
+        window.isNonameServer=window.location.href.slice(index+18);
         window.indexedDB=null;
     }
 }());
@@ -11458,7 +11459,7 @@
                 if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
                 if(lib.config.forbidai.contains(i)) return true;
                 if(_status.connectMode){
-                    if(lib.config['connect_'+lib.config.mode+'_banned'].contains(i)) return true;
+                    if(lib.configOL.banned.contains(i)) return true;
                     var double_character=false;
                     if(lib.configOL.mode=='guozhan'){
                         double_character=true;
@@ -12228,7 +12229,12 @@
                         },true);
 
                         if(window.isNonameServer){
-                            game.send('server','server');
+                            switch(window.isNonameServer){
+                                case 'identity':lib.configOL.mode='identity';game.send('server','enter','auto','服务器','xunyu');break;
+                                case 'guozhan':lib.configOL.mode='guozhan';game.send('server','enter','auto','服务器','yuanshao');break;
+                                case 'versus':lib.configOL.mode='versus';lib.config.mode_config.versus.connect_versus_mode='2v2';game.send('server','enter','auto','服务器','diaochan');break;
+                                default:game.send('server','server');
+                            }
                         }
                     }
                     if(_status.event.getParent()){
@@ -12243,13 +12249,14 @@
                         var list2=['re_caocao','liubei','sunquan','sp_zhangjiao','yuanshao','dongzhuo'];
                         var more_room=false;
                         for(var i=0;i<ui.rooms.length;i++){
-                            if(list[i]&&i>=3){
+                            if(list[i]&&list[i]!='server'&&i>=3){
                                 more_room=true;
                             }
                             ui.rooms[i].initRoom(list[i],list2[i]);
                         }
                         if(!more_room){
-                            if(list[0]&&list[1]&&list[2]){
+                            if(list[0]&&list[1]&&list[2]&&
+                                list[0]!='server'&&list[1]!='server'&&list[2]!='server'){
                                 more_room=true;
                             }
                         }
@@ -15709,7 +15716,7 @@
 				game.addRecord(resultbool);
 			}
             if(window.isNonameServer){
-                setTimeout(game.reload,5000);
+                setTimeout(game.reload,7000);
             }
 		},
 		loop:function(){
@@ -16472,6 +16479,7 @@
                 if(_status.connectMode&&lib.mode[name].connect){
                     game.saveConfig('connect_mode',name);
                     game.clearConnect();
+                    lib.configOL.mode=name;
                     if(configx){
                         for(var i in configx){
                             lib.configOL[i]=configx[i];
@@ -16482,24 +16490,21 @@
                             if(i=='update') continue;
                             lib.configOL[i.slice(8)]=get.config(i);
                         }
+                        lib.configOL.characterPack=lib.connectCharacterPack.slice(0);
+                        lib.configOL.cardPack=lib.connectCardPack.slice(0);
+                        for(var i=0;i<lib.config.connect_characters.length;i++){
+                            lib.configOL.characterPack.remove(lib.config.connect_characters[i]);
+                        }
+                        for(var i=0;i<lib.config.connect_cards.length;i++){
+                            lib.configOL.cardPack.remove(lib.config.connect_cards[i]);
+                        }
+                        lib.configOL.banned=lib.config['connect_'+name+'_banned'];
                     }
-                    lib.configOL.mode=name;
-                    lib.configOL.characterPack=lib.connectCharacterPack.slice(0);
-                    lib.configOL.cardPack=lib.connectCardPack.slice(0);
-                    for(var i=0;i<lib.config.connect_characters.length;i++){
-                        lib.configOL.characterPack.remove(lib.config.connect_characters[i]);
-                    }
-                    for(var i=0;i<lib.config.connect_cards.length;i++){
-                        lib.configOL.cardPack.remove(lib.config.connect_cards[i]);
-                    }
-                    lib.configOL.banned=lib.config['connect_'+name+'_banned'];
-
                     for(var i in lib.cardPackList){
                         if(lib.configOL.cardPack.contains(i)){
                             lib.card.list=lib.card.list.concat(lib.cardPackList[i]);
                         }
                     }
-
                     for(i=0;i<lib.card.list.length;i++){
                         if(lib.card.list[i][2]=='huosha'){
                             lib.card.list[i]=lib.card.list[i].slice(0);
@@ -17885,11 +17890,23 @@
                                 else if(_status.enteringroom){
                                     lib.configOL.mode=active.mode;
                                     if(_status.enteringroomserver){
+                                        game.saveConfig('connect_mode',lib.configOL.mode);
+
                                         var config={};
                                         for(var i in lib.mode[lib.configOL.mode].connect){
                                             if(i=='update') continue;
                                             config[i.slice(8)]=get.config(i,lib.configOL.mode);
                                         }
+
+                                        config.characterPack=lib.connectCharacterPack.slice(0);
+                                        config.cardPack=lib.connectCardPack.slice(0);
+                                        for(var i=0;i<lib.config.connect_characters.length;i++){
+                                            config.characterPack.remove(lib.config.connect_characters[i]);
+                                        }
+                                        for(var i=0;i<lib.config.connect_cards.length;i++){
+                                            config.cardPack.remove(lib.config.connect_cards[i]);
+                                        }
+                                        config.banned=lib.config['connect_'+active.mode+'_banned'];
                                         game.send('server','enter',_status.roomindex,lib.config.connect_nickname,lib.config.connect_avatar,config,active.mode);
                                     }
                                     else{

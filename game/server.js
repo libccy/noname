@@ -6,6 +6,15 @@
     var clients={};
     var messages={
         enter:function(index,nickname,avatar,config,mode){
+            if(index=='auto'){
+                index=0;
+                this.servermode='auto';
+                for(var i=rooms.length-1;i>=0;i--){
+                    if(!rooms[i].owner){
+                        index=i;break;
+                    }
+                }
+            }
             this.nickname=nickname;
             this.avatar=avatar;
             var room=rooms[index];
@@ -36,7 +45,7 @@
             }
         },
         server:function(){
-            for(var i=0;i<rooms.length;i++){
+            for(var i=rooms.length-1;i>=0;i--){
                 if(!rooms[i].owner){
                     rooms[i].owner=this;
                     rooms[i].servermode=true;
@@ -112,7 +121,9 @@
                 }
                 else if(rooms[i].owner&&rooms[i].config){
                     if(rooms[i]._num==0){
-                        rooms[i].owner.sendl('reloadroom');
+                        if(rooms[i].owner.servermode!='auto'||rooms[i].config.gameStarted){
+                            rooms[i].owner.sendl('reloadroom');
+                        }
                     }
                     roomlist[i]=[rooms[i].owner.nickname,rooms[i].owner.avatar,
                     rooms[i].config,rooms[i]._num];
