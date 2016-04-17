@@ -12274,6 +12274,9 @@
                             if(list[0]&&list[1]&&list[2]){
                                 more_room=true;
                             }
+                            else if(list[0]=='server'||list[1]=='server'||list2=='server'){
+                                more_room=true;
+                            }
                         }
                         if(more_room){
                             ui.window.classList.add('more_room');
