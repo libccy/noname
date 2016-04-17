@@ -5,7 +5,7 @@
     var rooms=[{},{},{},{},{},{}];
     var clients={};
     var messages={
-        enter:function(index,nickname,avatar){
+        enter:function(index,nickname,avatar,config,mode){
             this.nickname=nickname;
             this.avatar=avatar;
             var room=rooms[index];
@@ -15,7 +15,13 @@
             }
             this.room=room;
             if(room.owner){
-                if(!room.config){
+                if(room.servermode&&!room.owner._onconfig&&config&&mode){
+                    room.owner.sendl('createroom',config,mode);
+                    room.owner._onconfig=this;
+                    room.owner.nickname=nickname;
+                    room.owner.avatar=avatar;
+                }
+                else if(!room.config){
                     this.sendl('enterroomfailed');
                 }
                 else{
@@ -29,9 +35,31 @@
                 this.sendl('createroom');
             }
         },
+        server:function(){
+            for(var i=0;i<rooms.length;i++){
+                if(!rooms[i].owner){
+                    rooms[i].owner=this;
+                    rooms[i].servermode=true;
+                    this.room=rooms[i];
+                    this.servermode=true;
+                    break;
+                }
+            }
+            util.updaterooms();
+        },
         config:function(config){
             var room=this.room;
             if(room&&room.owner==this){
+                if(room.servermode){
+                    room.servermode=false;
+                    if(this._onconfig){
+                        if(clients[this._onconfig.wsid]){
+                            this._onconfig.owner=this;
+                            this.sendl('onconnection',this._onconfig.wsid);
+                        }
+                        delete this._onconfig;
+                    }
+                }
                 room.config=config;
             }
             util.updaterooms();
@@ -74,12 +102,18 @@
                 rooms[i]._num=0;
             }
             for(var i in clients){
-                if(clients[i].room){
+                if(clients[i].room&&!clients[i].servermode){
                     clients[i].room._num++;
                 }
             }
             for(var i=0;i<rooms.length;i++){
-                if(rooms[i].owner&&rooms[i].config){
+                if(rooms[i].servermode){
+                    roomlist[i]='server';
+                }
+                else if(rooms[i].owner&&rooms[i].config){
+                    if(rooms[i]._num==0){
+                        rooms[i].owner.sendl('reloadroom');
+                    }
                     roomlist[i]=[rooms[i].owner.nickname,rooms[i].owner.avatar,
                     rooms[i].config,rooms[i]._num];
                 }
@@ -156,6 +190,7 @@
                 if(room&&room.owner==this){
                     room.owner=null;
                     room.config=null;
+                    room.servermode=false;
                     for(var i in clients){
                         if(clients[i].room==room&&clients[i]!=this){
                             clients[i].close();

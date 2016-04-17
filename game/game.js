@@ -7148,15 +7148,29 @@
                     delete this.avatar;
                 },
                 initRoom:function(info,info2){
-                    if(!info){
+                    if(!this.node.gaming){
+                        this.node.gaming=ui.create.div('.gaming','游戏中',this);
+                        this.node.gaming.dataset.nature='fire';
+                    }
+                    if(!this.node.serving){
+                        this.node.serving=ui.create.div('.gaming','服务器',this);
+                        this.node.serving.dataset.nature='water';
+                    }
+                    this.serving=false;
+                    if(!info||info=='server'){
                         this.roomempty=true;
                         this.initOL('空房间',info2||'room');
                         this.node.hp.innerHTML='';
-                        if(this.node.gaming){
-                            this.node.gaming.hide();
-                        }
                         this.roomfull=false;
                         this.roomgaming=false;
+                        if(info=='server'){
+                            this.serving=true;
+                            this.node.serving.show();
+                        }
+                        else{
+                            this.node.serving.hide();
+                        }
+                        this.node.gaming.hide();
                     }
                     else{
                         this.roomempty=false;
@@ -7177,16 +7191,13 @@
                             modetrans=get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode);
                         }
                         this.initOL(modetrans,info[1]);
-                        if(!this.node.gaming){
-                            this.node.gaming=ui.create.div('.gaming','游戏中',this);
-                            this.node.gaming.dataset.nature='fire';
-                        }
                         if(config.gameStarted){
                             this.node.gaming.show();
                         }
                         else{
                             this.node.gaming.hide();
                         }
+                        this.node.serving.hide();
                         this.setNickname(info[0]);
                         this.maxHp=parseInt(config.number);
                         this.hp=info[3];
@@ -9129,7 +9140,7 @@
                     bar.style.width=0;
                 },
                 hideTimer:function(){
-                    if(_status.connectMode&&!game.online){
+                    if(_status.connectMode&&!game.online&&this.playerid){
                         game.broadcast(function(player){
                             player.hideTimer();
                         },this);
@@ -12022,7 +12033,7 @@
                             this.closed=true;
                         }
                     }
-                    else if(lib.node.clients.length>=parseInt(lib.configOL.number)){
+                    else if(lib.node.clients.length-(window.isNonameServer?1:0)>=parseInt(lib.configOL.number)){
                         this.send('denied','number');
                         lib.node.clients.remove(this);
                         this.closed=true;
@@ -12057,6 +12068,11 @@
                     var player=lib.playerOL[this.id];
                     if(player){
                         player.unwait(result);
+                    }
+                },
+                startGame:function(){
+                    if(this.id==game.onlinezhu){
+                        game.resume();
                     }
                 },
                 changeRoomConfig:function(config){
@@ -12158,11 +12174,21 @@
                         lib.wsOL[id].onclose();
                     }
                 },
-                createroom:function(){
+                reloadroom:function(){
+                    if(window.isNonameServer){
+                        game.reload();
+                    }
+                },
+                createroom:function(config,mode){
                     game.online=false;
                     game.onlineroom=true;
                     lib.node={};
-                    game.switchMode(lib.configOL.mode);
+                    if(config&&mode&&window.isNonameServer){
+                        game.switchMode(mode,config);
+                    }
+                    else{
+                        game.switchMode(lib.configOL.mode);
+                    }
                 },
                 enterroomfailed:function(){
                     alert('请稍后再试');
@@ -12202,8 +12228,7 @@
                         },true);
 
                         if(window.isNonameServer){
-                            lib.configOL.mode='identity';
-                            game.send('server','enter',ui.rooms[0].roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
+                            game.send('server','server');
                         }
                     }
                     if(_status.event.getParent()){
@@ -12583,6 +12608,9 @@
                                         if(ui.roomInfo){
                                             ui.roomInfo.innerHTML='房间设置';
                                         }
+                                        if(ui.connectStartButton){
+                                            ui.connectStartButton.innerHTML='开始游戏';
+                                        }
                                     }
                                 }
                                 else{
@@ -12678,6 +12706,9 @@
                 ui.arena.classList.add('playerhidden');
             }
             game.prepareArena();
+            if(window.isNonameServer){
+                game.me=ui.create.player();
+            }
             var list=[];
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i]!=game.me){
@@ -12693,9 +12724,11 @@
 				current.nickname=current.ws.nickname;
 				current.setNickname();
 			}
-			game.me.playerid=get.id();
-			game.me.nickname=lib.config.connect_nickname;
-			game.me.setNickname();
+            if(!window.isNonameServer){
+                game.me.playerid=get.id();
+    			game.me.nickname=lib.config.connect_nickname;
+    			game.me.setNickname();
+            }
 			for(var i=0;i<game.players.length;i++){
 				if(!game.players[i].playerid){
 					game.players[i].playerid=get.id();
@@ -15675,6 +15708,9 @@
 			if(game.addRecord){
 				game.addRecord(resultbool);
 			}
+            if(window.isNonameServer){
+                setTimeout(game.reload,5000);
+            }
 		},
 		loop:function(){
 			var event=_status.event;
@@ -16336,7 +16372,7 @@
                 callback(mode[name]);
             });
         },
-        switchMode:function(name){
+        switchMode:function(name,configx){
             window.mode={};
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
                 script.remove();
@@ -16436,9 +16472,16 @@
                 if(_status.connectMode&&lib.mode[name].connect){
                     game.saveConfig('connect_mode',name);
                     game.clearConnect();
-                    for(var i in lib.mode[name].connect){
-                        if(i=='update') continue;
-                        lib.configOL[i.slice(8)]=get.config(i);
+                    if(configx){
+                        for(var i in configx){
+                            lib.configOL[i]=configx[i];
+                        }
+                    }
+                    else{
+                        for(var i in lib.mode[name].connect){
+                            if(i=='update') continue;
+                            lib.configOL[i.slice(8)]=get.config(i);
+                        }
                     }
                     lib.configOL.mode=name;
                     lib.configOL.characterPack=lib.connectCharacterPack.slice(0);
@@ -17841,7 +17884,17 @@
                                 }
                                 else if(_status.enteringroom){
                                     lib.configOL.mode=active.mode;
-                                    game.send('server','enter',_status.roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
+                                    if(_status.enteringroomserver){
+                                        var config={};
+                                        for(var i in lib.mode[lib.configOL.mode].connect){
+                                            if(i=='update') continue;
+                                            config[i.slice(8)]=get.config(i,lib.configOL.mode);
+                                        }
+                                        game.send('server','enter',_status.roomindex,lib.config.connect_nickname,lib.config.connect_avatar,config,active.mode);
+                                    }
+                                    else{
+                                        game.send('server','enter',_status.roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
+                                    }
                                 }
                                 else{
                                     localStorage.setItem(lib.configprefix+'directstart',true);
@@ -22128,8 +22181,13 @@
                 var button=ui.create.div('.menubutton.large.highlight.connectbutton',game.online?'退出联机':'开始游戏',ui.window,function(){
                     if(button.clicked) return;
                     if(game.online){
-                        game.saveConfig('reconnect_info');
-                        game.reload();
+                        if(game.onlinezhu){
+                            game.send('startGame');
+                        }
+                        else{
+                            game.saveConfig('reconnect_info');
+                            game.reload();
+                        }
                     }
                     else{
                         game.resume();
@@ -23884,6 +23942,7 @@
                         else if(this.hasOwnProperty('roomindex')){
                             if(!_status.enteringroom){
                                 _status.enteringroom=true;
+                                _status.enteringroomserver=this.serving;
                                 if(this.roomempty){
                                     _status.roomindex=this.roomindex;
                                     ui.click.connectMenu();
