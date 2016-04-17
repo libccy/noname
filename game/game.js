@@ -12836,6 +12836,7 @@
                 if(player.playerid){
                     if(!game.onlinezhu){
                         game.onlinezhu=player.playerid;
+                        game.send('server','changeAvatar',player.nickname,player.avatar);
                     }
                     map[i]=[player.nickname,player.avatar,player.playerid];
                     if(player.playerid==game.onlinezhu){

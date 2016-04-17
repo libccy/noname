@@ -44,6 +44,11 @@
                 this.sendl('createroom');
             }
         },
+        changeAvatar:function(nickname,avatar){
+            this.nickname=nickname;
+            this.avatar=avatar;
+            util.updaterooms();
+        },
         server:function(){
             for(var i=0;i<rooms.length;i++){
                 if(!rooms[i].owner){
