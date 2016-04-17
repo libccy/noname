@@ -12100,6 +12100,21 @@
                         }
                     }
                 },
+                changeNumConfig:function(num,index,bool){
+                    if(this.id==game.onlinezhu){
+                        lib.configOL.number=num;
+                        game.send('server','config',lib.configOL);
+                        if(game.connectPlayers&&game.connectPlayers[index]){
+                            if(bool){
+                                game.connectPlayers[index].classList.add('unselectable2');
+                            }
+                            else{
+                                game.connectPlayers[index].classList.remove('unselectable2');
+                            }
+                            game.updateWaiting();
+                        }
+                    }
+                },
                 chat:function(id,str){
                     var player;
                     if(lib.playerOL[id]){
@@ -12246,17 +12261,17 @@
                 },
                 updaterooms:function(list){
                     if(ui.rooms){
+                        ui.window.classList.add('more_room');
                         var list2=['re_caocao','liubei','sunquan','sp_zhangjiao','yuanshao','dongzhuo'];
                         var more_room=false;
                         for(var i=0;i<ui.rooms.length;i++){
-                            if(list[i]&&list[i]!='server'&&i>=3){
+                            if(list[i]&&i>=3){
                                 more_room=true;
                             }
                             ui.rooms[i].initRoom(list[i],list2[i]);
                         }
                         if(!more_room){
-                            if(list[0]&&list[1]&&list[2]&&
-                                list[0]!='server'&&list[1]!='server'&&list[2]!='server'){
+                            if(list[0]&&list[1]&&list[2]){
                                 more_room=true;
                             }
                         }
@@ -23950,22 +23965,40 @@
 				if(ui.intro) return;
                 if(this.classList.contains('connect')){
                     if(game.online){
-                        if(this.roomfull){
-                            alert('房间已满');
-                        }
-                        else if(this.roomgaming&&!game.onlineID){
-                            alert('房间不允许旁观')
-                        }
-                        else if(this.hasOwnProperty('roomindex')){
-                            if(!_status.enteringroom){
-                                _status.enteringroom=true;
-                                _status.enteringroomserver=this.serving;
-                                if(this.roomempty){
-                                    _status.roomindex=this.roomindex;
-                                    ui.click.connectMenu();
+                        if(game.onlinezhu){
+                            if(!this.playerid&&game.connectPlayers){
+                                if(lib.configOL.mode=='versus') return;
+                                if(lib.configOL.mode=='identity'&&lib.configOL.identity_mode=='zhong') return;
+                                if(!this.classList.contains('unselectable2')&&lib.configOL.number<=2) return;
+                                this.classList.toggle('unselectable2')
+                                if(this.classList.contains('unselectable2')){
+                                    lib.configOL.number--;
                                 }
                                 else{
-                                    game.send('server','enter',this.roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
+                                    lib.configOL.number++;
+                                }
+                                game.send('changeNumConfig',lib.configOL.number,
+                                game.connectPlayers.indexOf(this),this.classList.contains('unselectable2'));
+                            }
+                        }
+                        else{
+                            if(this.roomfull){
+                                alert('房间已满');
+                            }
+                            else if(this.roomgaming&&!game.onlineID){
+                                alert('房间不允许旁观')
+                            }
+                            else if(this.hasOwnProperty('roomindex')){
+                                if(!_status.enteringroom){
+                                    _status.enteringroom=true;
+                                    _status.enteringroomserver=this.serving;
+                                    if(this.roomempty){
+                                        _status.roomindex=this.roomindex;
+                                        ui.click.connectMenu();
+                                    }
+                                    else{
+                                        game.send('server','enter',this.roomindex,lib.config.connect_nickname,lib.config.connect_avatar);
+                                    }
                                 }
                             }
                         }

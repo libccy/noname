@@ -9,7 +9,7 @@
             if(index=='auto'){
                 index=0;
                 this.servermode='auto';
-                for(var i=rooms.length-1;i>=0;i--){
+                for(var i=0;i<rooms.length;i++){
                     if(!rooms[i].owner){
                         index=i;break;
                     }
@@ -45,7 +45,7 @@
             }
         },
         server:function(){
-            for(var i=rooms.length-1;i>=0;i--){
+            for(var i=0;i<rooms.length;i++){
                 if(!rooms[i].owner){
                     rooms[i].owner=this;
                     rooms[i].servermode=true;
