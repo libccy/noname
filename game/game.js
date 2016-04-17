@@ -52,7 +52,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:5,
+        versionOL:6,
 		updateURL:localStorage.getItem('noname_download_source')||'http://123.206.77.253/',
 		assetURL:'',
         hallURL:'123.206.77.253',
