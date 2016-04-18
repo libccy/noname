@@ -2904,7 +2904,7 @@
 			'触屏模式<br>可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
-			'<table><tr><td>a<td>切换托管<tr><td>c<td>打开设置<tr><td>w<td>切换不询问无懈<tr><td>i<td>显示身份<tr><td>▭<td>暂停</ul>',
+			'<table><tr><td>a<td>切换托管<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
 			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
 			'<li>玩家<br>game.me<li>玩家的上/下家<br>game.me.previous/next'+
 			'<li>玩家的上/下家（含阵亡）<br>game.me.previousSeat/<br>nextSeat'+
@@ -12252,7 +12252,15 @@
                         }
                         lib.message.client.updaterooms(list);
                         ui.exitroom=ui.create.system('退出房间',function(){
-                            if(ui.rooms) game.saveConfig('reconnect_info');
+                            if(ui.rooms){
+                                game.saveConfig('reconnect_info');
+                            }
+                            else{
+                                if(lib.config.reconnect_info){
+                                    lib.config.reconnect_info.length=1;
+                                }
+                                game.saveConfig('reconnect_info',lib.config.reconnect_info);
+                            }
                             game.reload();
                         },true);
 
@@ -13079,17 +13087,7 @@
                 var WebSocketServer=require('ws').Server;
                 var wss=new WebSocketServer({port:8080});
 
-                var interfaces = require('os').networkInterfaces();
-                for(var devName in interfaces){
-                    var iface = interfaces[devName];
-                    for(var i=0;i<iface.length;i++){
-                        var alias = iface[i];
-                        if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
-                            game.ip=alias.address;break;
-                        }
-                    }
-                    if(game.ip) break;
-                }
+                game.ip=get.ip();
 
                 wss.on('connection',lib.init.connection);
             }
@@ -24877,6 +24875,19 @@
 		},
 	};
 	var get={
+        ip:function(){
+            if(!require) return '';
+            var interfaces = require('os').networkInterfaces();
+            for(var devName in interfaces){
+                var iface = interfaces[devName];
+                for(var i=0;i<iface.length;i++){
+                    var alias = iface[i];
+                    if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
+                        return alias.address;
+                    }
+                }
+            }
+        },
         modetrans:function(config,server){
             if(config.mode=='versus'){
                 switch(config.versus_mode){
@@ -27311,13 +27322,13 @@
 				// }
 			}
 			else if(e.keyCode==67){
-				var node=ui.window.querySelector('#click');
-				if(node){
-					node.click();
-				}
-				else{
-					ui.click.config();
-				}
+				// var node=ui.window.querySelector('#click');
+				// if(node){
+				// 	node.click();
+				// }
+				// else{
+				// 	ui.click.config();
+				// }
 			}
 			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
 				if(e.shiftKey){
