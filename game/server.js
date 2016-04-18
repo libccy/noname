@@ -6,15 +6,6 @@
     var clients={};
     var messages={
         enter:function(index,nickname,avatar,config,mode){
-            if(index=='auto'){
-                index=0;
-                this.servermode='auto';
-                for(var i=0;i<rooms.length;i++){
-                    if(!rooms[i].owner){
-                        index=i;break;
-                    }
-                }
-            }
             this.nickname=nickname;
             this.avatar=avatar;
             var room=rooms[index];
@@ -25,7 +16,7 @@
             this.room=room;
             if(room.owner){
                 if(room.servermode&&!room.owner._onconfig&&config&&mode){
-                    room.owner.sendl('createroom',config,mode);
+                    room.owner.sendl('createroom',index,config,mode);
                     room.owner._onconfig=this;
                     room.owner.nickname=nickname;
                     room.owner.avatar=avatar;
@@ -41,7 +32,7 @@
             }
             else{
                 room.owner=this;
-                this.sendl('createroom');
+                this.sendl('createroom',index);
             }
         },
         changeAvatar:function(nickname,avatar){
@@ -126,9 +117,7 @@
                 }
                 else if(rooms[i].owner&&rooms[i].config){
                     if(rooms[i]._num==0){
-                        if(rooms[i].owner.servermode!='auto'||rooms[i].config.gameStarted){
-                            rooms[i].owner.sendl('reloadroom');
-                        }
+                        rooms[i].owner.sendl('reloadroom');
                     }
                     roomlist[i]=[rooms[i].owner.nickname,rooms[i].owner.avatar,
                     rooms[i].config,rooms[i]._num];

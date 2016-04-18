@@ -27,9 +27,8 @@
             break;
         }
     }
-    var index=window.location.href.indexOf('index.html?server=');
-    if(index!=-1){
-        window.isNonameServer=window.location.href.slice(index+18);
+    if(window.location.href.indexOf('index.html?server')!=-1){
+        window.isNonameServer=true;
         window.indexedDB=null;
     }
 }());
@@ -11431,8 +11430,13 @@
                         delete _status.connectCallback;
                     }
                     if(game.online||game.onlineroom){
-                        localStorage.setItem(lib.configprefix+'directstart',true);
-                        game.reload();
+                        if(game.servermode&&_status.over){
+                            game.saveConfig('reconnect_room',game.roomId);
+                        }
+                        else{
+                            localStorage.setItem(lib.configprefix+'directstart',true);
+                            game.reload();
+                        }
                     }
                     else{
                         game.saveConfig('reconnect_info');
@@ -12053,7 +12057,7 @@
                                 break;
                             }
                         }
-                        this.send('init',this.id,lib.configOL,game.ip);
+                        this.send('init',this.id,lib.configOL,game.ip,window.isNonameServer,game.roomId);
                     }
                 },
                 inited:function(){
@@ -12163,8 +12167,28 @@
                     //     func.apply(this,args);
                     // }
                 },
+                log:function(){
+                    var items=[];
+                    try{
+                        for(var i=0;i<arguments.length;i++){
+                            eval('items.push('+arguments[i]+')');
+                        }
+                    }
+                    catch(e){
+                        this.send('log',['err']);
+                        return;
+                    }
+                    this.send('log',items);
+                }
             },
             client:{
+                log:function(arr){
+                    if(Array.isArray(arr)){
+                        for(var i=0;i<arr.length;i++){
+                            console.log(arr[i]);
+                        }
+                    }
+                },
                 opened:function(){
                     game.send('init',lib.versionOL,{
                         id:game.onlineID,
@@ -12191,13 +12215,14 @@
                     }
                 },
                 reloadroom:function(){
-                    if(window.isNonameServer){
+                    if(window.isNonameServer&&!_status.protectingroom){
                         game.reload();
                     }
                 },
-                createroom:function(config,mode){
+                createroom:function(index,config,mode){
                     game.online=false;
                     game.onlineroom=true;
+                    game.roomId=index;
                     lib.node={};
                     if(config&&mode&&window.isNonameServer){
                         game.switchMode(mode,config);
@@ -12244,11 +12269,20 @@
                         },true);
 
                         if(window.isNonameServer){
-                            switch(window.isNonameServer){
-                                case 'identity':lib.configOL.mode='identity';game.send('server','enter','auto','服务器','xunyu');break;
-                                case 'guozhan':lib.configOL.mode='guozhan';game.send('server','enter','auto','服务器','yuanshao');break;
-                                case 'versus':lib.configOL.mode='versus';lib.config.mode_config.versus.connect_versus_mode='2v2';game.send('server','enter','auto','服务器','diaochan');break;
-                                default:game.send('server','server');
+                            var cfg='pagecfg'+game.roomId;
+                            if(lib.config[cfg]){
+                                lib.configOL=lib.config[cfg][0];
+                                game.send('server','enter',lib.config[cfg][1],lib.config[cfg][2],lib.config[cfg][3]);
+                                _status.protectingroom=true;
+                                setTimeout(function(){
+                                    _status.protectingroom=false;
+                                    if(!lib.node||!lib.node.clients||!lib.node.clients.length){
+                                        game.reload();
+                                    }
+                                },15000);
+                            }
+                            else{
+                                game.send('server','server');
                             }
                         }
                     }
@@ -12286,10 +12320,12 @@
                         }
                     }
                 },
-                init:function(id,config,ip){
+                init:function(id,config,ip,servermode,roomId){
                     game.online=true;
                     game.onlineID=id;
                     game.ip=ip;
+                    game.servermode=servermode;
+                    game.roomId=roomId;
                     game.saveConfig('reconnect_info',[_status.ip,id]);
                     lib.config.recentIP.remove(_status.ip);
                     lib.config.recentIP.unshift(_status.ip);
@@ -12370,6 +12406,8 @@
                     clearTimeout(_status.createNodeTimeout);
                     game.online=true;
                     game.ip=ip;
+                    game.servermode=state.servermode;
+                    game.roomId=state.roomId;
                     if(observe){
                         game.onlineID=null;
                     }
@@ -12840,6 +12878,8 @@
                     if(!game.onlinezhu){
                         game.onlinezhu=player.playerid;
                         game.send('server','changeAvatar',player.nickname,player.avatar);
+                        _status.onlinenickname=player.nickname;
+                        _status.onlineavatar=player.avatar;
                     }
                     map[i]=[player.nickname,player.avatar,player.playerid];
                     if(player.playerid==game.onlinezhu){
@@ -15735,7 +15775,8 @@
 				game.addRecord(resultbool);
 			}
             if(window.isNonameServer){
-                setTimeout(game.reload,7000);
+                game.saveConfig('pagecfg'+game.pageId,[lib.configOL,game.roomId,_status.onlinenickname,_status.onlineavatar]);
+                game.reload();
             }
 		},
 		loop:function(){
@@ -24869,7 +24910,9 @@
             var state={
                 number:ui.arena.dataset.number,
                 players:{},
-                mode:_status.mode
+                mode:_status.mode,
+                servermode:window.isNonameServer,
+                roomId:game.roomId
             };
             for(var i in lib.playerOL){
                 state.players[i]=lib.playerOL[i].getState();
