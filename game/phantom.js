@@ -6,7 +6,7 @@ page1.open('http://localhost/index.html?server=true', function(status) {
     }
     else{
         page.evaluate(function(){
-            game.pageId=1;
+            game.saveConfig('pageId',1);
         });
     }
 });
@@ -19,7 +19,7 @@ page2.open('http://localhost/index.html?server=true', function(status) {
     }
     else{
         page.evaluate(function(){
-            game.pageId=2;
+            game.saveConfig('pageId',2);
         });
     }
 });
@@ -32,7 +32,7 @@ page3.open('http://localhost/index.html?server=true', function(status) {
     }
     else{
         page.evaluate(function(){
-            game.pageId=3;
+            game.saveConfig('pageId',3);
         });
     }
 });

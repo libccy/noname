@@ -6766,10 +6766,7 @@
 						}
                         if(game.online&&player==game.me&&!_status.over&&!game.controlOver&&!ui.exit){
                             if(lib.mode[lib.configOL.mode].config.dierestart){
-                                ui.exit=ui.create.control('退出联机',function(){
-                                    game.saveConfig('reconnect_info');
-                                    game.reload();
-                                });
+                                ui.exit=ui.create.control('退出联机',ui.click.exit);
                             }
                         }
 
@@ -7175,22 +7172,7 @@
                     else{
                         this.roomempty=false;
                         var config=info[2];
-                        var modetrans;
-                        if(config.mode=='versus'){
-                            switch(config.versus_mode){
-                                case '1v1':modetrans='单人对决';break;
-                                case '2v2':modetrans='欢乐成双';break;
-                                case '3v3':modetrans='血战到底';break;
-                                case '4v4':modetrans='四人对决';break;
-                            }
-                        }
-                        else if(config.mode=='identity'&&config.identity_mode=='zhong'){
-                            modetrans='忠胆英杰';
-                        }
-                        else{
-                            modetrans=get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode);
-                        }
-                        this.initOL(modetrans,info[1]);
+                        this.initOL(get.modetrans(config),info[1]);
                         if(config.gameStarted){
                             this.node.gaming.show();
                         }
@@ -12086,6 +12068,9 @@
                             for(var i in config){
                                 lib.configOL[i]=config[i];
                             }
+                            if(ui.connectStartBar){
+                                ui.connectStartBar.firstChild.innerHTML=get.modetrans(lib.configOL,true);
+                            }
                         },config);
                         if(lib.configOL.mode=='identity'&&lib.configOL.identity_mode=='zhong'&&game.connectPlayers){
                             for(var i=0;i<game.connectPlayers.length;i++){
@@ -12214,8 +12199,8 @@
                         lib.wsOL[id].onclose();
                     }
                 },
-                reloadroom:function(){
-                    if(window.isNonameServer&&!_status.protectingroom){
+                reloadroom:function(forced){
+                    if(window.isNonameServer&&(forced||!_status.protectingroom)){
                         game.reload();
                     }
                 },
@@ -12225,6 +12210,9 @@
                     game.roomId=index;
                     lib.node={};
                     if(config&&mode&&window.isNonameServer){
+                        if(mode=='auto'){
+                            mode=lib.configOL.mode;
+                        }
                         game.switchMode(mode,config);
                     }
                     else{
@@ -12240,7 +12228,7 @@
                     lib.config.recentIP.remove(_status.ip);
                     lib.config.recentIP.unshift(_status.ip);
                     lib.config.recentIP.splice(5);
-                    game.saveConfig('reconnect_info',[_status.ip]);
+                    game.saveConfig('reconnect_info',[_status.ip,null]);
                     game.saveConfig('recentIP',lib.config.recentIP);
                     _status.connectMode=true;
 
@@ -12269,10 +12257,11 @@
                         },true);
 
                         if(window.isNonameServer){
-                            var cfg='pagecfg'+game.roomId;
+                            var cfg='pagecfg'+lib.config.pageId;
                             if(lib.config[cfg]){
                                 lib.configOL=lib.config[cfg][0];
-                                game.send('server','enter',lib.config[cfg][1],lib.config[cfg][2],lib.config[cfg][3]);
+                                game.send('server','server',lib.config[cfg].slice(1));
+                                game.saveConfig(cfg);
                                 _status.protectingroom=true;
                                 setTimeout(function(){
                                     _status.protectingroom=false;
@@ -12284,6 +12273,9 @@
                             else{
                                 game.send('server','server');
                             }
+                        }
+                        else if(typeof game.roomId=='number'){
+                            game.send('server','enter',game.roomId,lib.config.connect_nickname,lib.config.connect_avatar);
                         }
                     }
                     if(_status.event.getParent()){
@@ -12326,7 +12318,7 @@
                     game.ip=ip;
                     game.servermode=servermode;
                     game.roomId=roomId;
-                    game.saveConfig('reconnect_info',[_status.ip,id]);
+                    game.saveConfig('reconnect_info',[_status.ip,id,game.roomId]);
                     lib.config.recentIP.remove(_status.ip);
                     lib.config.recentIP.unshift(_status.ip);
                     lib.config.recentIP.splice(5);
@@ -12340,7 +12332,12 @@
                     game.finishCards();
                     ui.create.roomInfo();
                     ui.create.chat();
-                    ui.create.connectPlayers(ip);
+                    if(game.servermode){
+                        ui.create.connectPlayers(get.modetrans(config,true));
+                    }
+                    else{
+                        ui.create.connectPlayers(ip);
+                    }
                     ui.pause.hide();
                     ui.auto.hide();
                     game.clearConnect();
@@ -12410,8 +12407,9 @@
                     game.roomId=state.roomId;
                     if(observe){
                         game.onlineID=null;
+                        game.roomId=null;
                     }
-                    game.saveConfig('reconnect_info',[_status.ip,game.onlineID]);
+                    game.saveConfig('reconnect_info',[_status.ip,game.onlineID,game.roomId]);
                     _status.connectMode=true;
                     lib.configOL=config;
         			lib.playerOL={};
@@ -12567,10 +12565,7 @@
                         game.send('reinited');
                         _status.gameStarted=true;
                         if(!observe&&game.me&&game.me.isDead()){
-                            ui.exit=ui.create.control('退出联机',function(){
-                                game.saveConfig('reconnect_info');
-                                game.reload();
-                            });
+                            ui.exit=ui.create.control('退出联机',ui.click.exit);
                         }
                     });
                 },
@@ -15351,10 +15346,10 @@
     				}
     			}
                 if(!ui.exit){
-                    ui.exit=ui.create.control('退出联机',function(){
-                        game.saveConfig('reconnect_info');
-                        game.reload();
-                    });
+                    ui.exit=ui.create.control('退出联机',ui.click.exit);
+                }
+                if(game.servermode){
+                    ui.exit.firstChild.innerHTML='返回房间';
                 }
                 if(ui.tempnowuxie){
     				ui.tempnowuxie.close();
@@ -15775,7 +15770,8 @@
 				game.addRecord(resultbool);
 			}
             if(window.isNonameServer){
-                game.saveConfig('pagecfg'+game.pageId,[lib.configOL,game.roomId,_status.onlinenickname,_status.onlineavatar]);
+                lib.configOL.gameStarted=false;
+                game.saveConfig('pagecfg'+lib.config.pageId,[lib.configOL,game.roomId,_status.onlinenickname,_status.onlineavatar]);
                 game.reload();
             }
 		},
@@ -22399,6 +22395,16 @@
 			},
 		},
 		click:{
+            exit:function(){
+                if(game.servermode&&lib.config.reconnect_info&&_status.over){
+                    lib.config.reconnect_info[2]=game.roomId;
+                    game.saveConfig('reconnect_info',lib.config.reconnect_info);
+                }
+                else{
+                    game.saveConfig('reconnect_info');
+                }
+                game.reload();
+            },
             shortcut:function(show){
                 if(show===false){
                     ui.shortcut.classList.add('hidden');
@@ -24871,6 +24877,27 @@
 		},
 	};
 	var get={
+        modetrans:function(config,server){
+            if(config.mode=='versus'){
+                switch(config.versus_mode){
+                    case '1v1':return '单人对决';
+                    case '2v2':return '欢乐成双';
+                    case '3v3':return '血战到底';
+                    case '4v4':return '四人对决';
+                }
+            }
+            else if(config.mode=='identity'&&config.identity_mode=='zhong'){
+                return '忠胆英杰';
+            }
+            else{
+                if(server){
+                    return get.translation(config.mode)+'模式';
+                }
+                else{
+                    return get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode);
+                }
+            }
+        },
         charactersOL:function(){
             var list=[];
             for(var i=0;i<lib.configOL.characterPack.length;i++){

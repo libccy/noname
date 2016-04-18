@@ -40,17 +40,33 @@
             this.avatar=avatar;
             util.updaterooms();
         },
-        server:function(){
-            for(var i=0;i<rooms.length;i++){
-                if(!rooms[i].owner){
-                    rooms[i].owner=this;
-                    rooms[i].servermode=true;
-                    this.room=rooms[i];
-                    this.servermode=true;
-                    break;
+        server:function(cfg){
+            if(cfg){
+                this.servermode=true;
+                var room=rooms[cfg[0]];
+                if(!room||room.owner){
+                    this.sendl('reloadroom',true);
+                }
+                else{
+                    room.owner=this;
+                    this.room=room;
+                    this.nickname=cfg[1];
+                    this.avatar=cfg[2];
+                    this.sendl('createroom',cfg[0],{},'auto')
                 }
             }
-            util.updaterooms();
+            else{
+                for(var i=0;i<rooms.length;i++){
+                    if(!rooms[i].owner){
+                        rooms[i].owner=this;
+                        rooms[i].servermode=true;
+                        this.room=rooms[i];
+                        this.servermode=true;
+                        break;
+                    }
+                }
+                util.updaterooms();
+            }
         },
         config:function(config){
             var room=this.room;

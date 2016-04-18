@@ -115,6 +115,7 @@ mode.connect={
         else if(lib.config.reconnect_info){
             var info=lib.config.reconnect_info;
             game.onlineID=info[1];
+            game.roomId=info[2];
             var n=5;
             var connect=function(){
                 game.connect(info[0],function(success){
