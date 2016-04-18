@@ -11999,7 +11999,7 @@
                     else if(!_status.waitingForPlayer){
                         if(game.phaseNumber&&lib.configOL.observe){
                             lib.node.observing.push(this);
-                            this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.me.playerid);
+                            this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,game.players[0].playerid);
                             if(!ui.removeObserve){
                                 ui.removeObserve=ui.create.system('移除旁观',function(){
                                     lib.configOL.observe=false;
