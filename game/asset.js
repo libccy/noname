@@ -2201,7 +2201,7 @@ window.noname_asset_list=[
     'theme/style/hp/image/hp4.png',
 ];
 window.noname_skin_list={
-    bulianshu:4,
+    bulianshi:4,
     caifuren:2,
     caiwenji:2,
     caoang:2,
@@ -2236,7 +2236,7 @@ window.noname_skin_list={
     hetaihou:2,
     huangyueying:2,
     huatuo:2,
-    jiangqin:1,
+    jiangqing:1,
     jiangwei:4,
     jianyong:2,
     jiaxu:4,
@@ -2312,7 +2312,7 @@ window.noname_skin_list={
     xiahouyuan:1,
     xiaoqiao:3,
     xin_fazheng:2,
-    xin_xushu:1,
+    xin_masu:1,
     xuhuang:1,
     xunyou:4,
     xunyu:2,
