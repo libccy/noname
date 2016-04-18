@@ -12258,8 +12258,8 @@
                             else{
                                 if(lib.config.reconnect_info){
                                     lib.config.reconnect_info.length=1;
+                                    game.saveConfig('reconnect_info',lib.config.reconnect_info);
                                 }
-                                game.saveConfig('reconnect_info',lib.config.reconnect_info);
                             }
                             game.reload();
                         },true);
@@ -12297,21 +12297,21 @@
                     if(ui.rooms){
                         ui.window.classList.add('more_room');
                         var list2=['re_caocao','liubei','sunquan','sp_zhangjiao','yuanshao','dongzhuo'];
-                        var more_room=false;
+                        var more_room=true;
                         for(var i=0;i<ui.rooms.length;i++){
                             if(list[i]&&i>=3){
                                 more_room=true;
                             }
                             ui.rooms[i].initRoom(list[i],list2[i]);
                         }
-                        if(!more_room){
-                            if(list[0]&&list[1]&&list[2]){
-                                more_room=true;
-                            }
-                            else if(list[0]=='server'||list[1]=='server'||list2=='server'){
-                                more_room=true;
-                            }
-                        }
+                        // if(!more_room){
+                        //     if(list[0]&&list[1]&&list[2]){
+                        //         more_room=true;
+                        //     }
+                        //     else if(list[0]=='server'||list[1]=='server'||list2=='server'){
+                        //         more_room=true;
+                        //     }
+                        // }
                         if(more_room){
                             ui.window.classList.add('more_room');
                         }
@@ -12326,7 +12326,12 @@
                     game.ip=ip;
                     game.servermode=servermode;
                     game.roomId=roomId;
-                    game.saveConfig('reconnect_info',[_status.ip,id,game.roomId]);
+                    if(game.servermode){
+                        game.saveConfig('reconnect_info',[_status.ip,id,game.roomId]);
+                    }
+                    else{
+                        game.saveConfig('reconnect_info',[_status.ip,id]);
+                    }
                     lib.config.recentIP.remove(_status.ip);
                     lib.config.recentIP.unshift(_status.ip);
                     lib.config.recentIP.splice(5);
@@ -12417,7 +12422,12 @@
                         game.onlineID=null;
                         game.roomId=null;
                     }
-                    game.saveConfig('reconnect_info',[_status.ip,game.onlineID,game.roomId]);
+                    if(game.servermode){
+                        game.saveConfig('reconnect_info',[_status.ip,game.onlineID,game.roomId]);
+                    }
+                    else{
+                        game.saveConfig('reconnect_info',[_status.ip,game.onlineID]);
+                    }
                     _status.connectMode=true;
                     lib.configOL=config;
         			lib.playerOL={};
