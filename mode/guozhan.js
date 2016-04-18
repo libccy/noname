@@ -718,6 +718,7 @@ mode.guozhan={
 						game.players[i].identity='unknown';
 						game.players[i].node.name.show();
 						game.players[i].node.name2.show();
+						game.players[i]._group=lib.character[game.players[i].name1][1];
 					}
 				},result);
 			}

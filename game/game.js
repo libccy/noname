@@ -12422,7 +12422,7 @@
                         game.onlineID=null;
                         game.roomId=null;
                     }
-                    if(game.servermode){
+                    if(game.servermode&&!observe){
                         game.saveConfig('reconnect_info',[_status.ip,game.onlineID,game.roomId]);
                     }
                     else{
@@ -15358,6 +15358,12 @@
                 }
                 if(game.servermode){
                     ui.exit.firstChild.innerHTML='返回房间';
+                    setTimeout(function(){
+                        ui.exit.firstChild.innerHTML='退出房间';
+                        _status.roomtimeout=true;
+                        lib.config.reconnect_info[2]=null;
+                        game.saveConfig('reconnect_info',lib.config.reconnect_info);
+                    },10000);
                 }
                 if(ui.tempnowuxie){
     				ui.tempnowuxie.close();
@@ -22434,8 +22440,10 @@
 		click:{
             exit:function(){
                 if(game.servermode&&lib.config.reconnect_info&&_status.over){
-                    lib.config.reconnect_info[2]=game.roomId;
-                    game.saveConfig('reconnect_info',lib.config.reconnect_info);
+                    if(!_status.roomtimeout){
+                        lib.config.reconnect_info[2]=game.roomId;
+                        game.saveConfig('reconnect_info',lib.config.reconnect_info);
+                    }
                 }
                 else{
                     game.saveConfig('reconnect_info');
