@@ -20819,7 +20819,7 @@
 								}
                                 if(!lib.config.exclude_skin){
                                     for(var i in skins){
-                                        for(var j=0;j<skins[i];j++){
+                                        for(var j=1;j<=skins[i];j++){
                                             updates.push('image/skin/'+i+'/'+j+'.jpg');
                                         }
                                     }
