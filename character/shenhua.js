@@ -3156,6 +3156,7 @@ character.shenhua={
 		tianxiang:'天香',
 		hongyan:'红颜',
 		buqu:'不屈',
+		buqu_bg:'创',
 		leiji:'雷击',
 		spleiji:'新雷击',
 		guidao:'鬼道',

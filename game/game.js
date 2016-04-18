@@ -52,9 +52,9 @@
 	var lib={
 		configprefix:'noname_0.9_',
         versionOL:6,
-		updateURL:localStorage.getItem('noname_download_source')||'http://123.206.77.253/',
+		updateURL:localStorage.getItem('noname_update_url')||'http://123.206.55.178/',
 		assetURL:'',
-        hallURL:'123.206.77.253',
+        hallURL:'123.206.55.178',
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -20671,10 +20671,11 @@
                     li3.innerHTML='更新源<br><p style="margin-top:8px"><input type="text" style="width:120px" value="'+lib.updateURL+'"><button style="margin-left:5px">确定</button></p>';
                     li3.querySelector('button').onclick=function(){
                         lib.updateURL=this.previousSibling.value;
-                        localStorage.setItem('noname_download_source',lib.updateURL);
+                        localStorage.setItem('noname_update_url',lib.updateURL);
                     }
 
 					var button1,button2;
+                    var span1,includeskin;
 
 					game.checkForUpdate=function(forcecheck){
 						if(button1.disabled){
@@ -20807,13 +20808,22 @@
 								script.remove();
 								var updates=window.noname_asset_list;
 								delete window.noname_asset_list;
+                                var skins=window.noname_skin_list;
+                                delete window.noname_skin_list;
 								var asset_version=updates.shift();
-								if(asset_version==lib.config.asset_version){
+								if(asset_version==lib.config.asset_version&&lib.config.exclude_skin){
 									alert('素材已是最新');
 									button2.disabled=false;
 									button2.innerHTML='检查素材更新';
 									return;
 								}
+                                if(!lib.config.exclude_skin){
+                                    for(var i in skins){
+                                        for(var j=0;j<skins[i];j++){
+                                            updates.push('image/skin/'+i+'/'+j+'.jpg');
+                                        }
+                                    }
+                                }
 								var n=updates.length;
                                 if(!ui.arena.classList.contains('menupaused')){
                                     ui.click.configMenu();
@@ -20834,6 +20844,8 @@
 									var n1=0;
 									var n2=updates.length;
 									span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
+                                    span1.remove();
+                                    includeskin.remove();
 									p.appendChild(span);
 									var finish=function(){
 										if(n1==n2){
@@ -20910,6 +20922,23 @@
 					button2.innerHTML='检查素材更新';
 					button2.onclick=game.checkForAssetUpdate;
 					li2.lastChild.appendChild(button2);
+
+                    var span1=document.createElement('span');
+                    span1.innerHTML='包含皮肤';
+                    span1.style.fontSize='small';
+                    span1.style.marginLeft='10px';
+                    li2.lastChild.appendChild(span1);
+
+                    var includeskin=document.createElement('input');
+                    includeskin.type='checkbox';
+                    includeskin.name='包含皮肤';
+                    if(!lib.config.exclude_skin){
+                        includeskin.checked=true;
+                    }
+                    includeskin.onchange=function(){
+                        game.saveConfig('exclude_skin',!this.checked);
+                    }
+                    li2.lastChild.appendChild(includeskin);
 
 					ul.appendChild(li1);
                     ul.appendChild(li2);
