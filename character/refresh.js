@@ -28,9 +28,12 @@ character.refresh={
 		liyu:{
 			audio:2,
 			trigger:{source:'damageEnd'},
-			direct:true,
+			forced:true,
 			filter:function(event,player){
 				return event.card&&event.card.name=='sha'&&event.player.isAlive()&&event.player.num('he')>0;
+			},
+			check:function(){
+				return false;
 			},
 			content:function(){
 				'step 0'
@@ -44,7 +47,6 @@ character.refresh={
 				'step 1'
 				if(result.bool){
 					player.gainPlayerCard(trigger.player,'he',true);
-					player.logSkill('liyu');
 					event.target=result.targets[0];
 					trigger.player.line(player,'green');
 				}

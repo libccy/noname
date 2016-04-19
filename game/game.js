@@ -11413,7 +11413,7 @@
                     }
                     if(game.online||game.onlineroom){
                         if(game.servermode&&_status.over){
-                            
+
                         }
                         else{
                             localStorage.setItem(lib.configprefix+'directstart',true);

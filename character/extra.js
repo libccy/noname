@@ -1077,71 +1077,70 @@ character.extra={
 			},
 			content:function(){
 				"step 0"
-				if(event.isMine()){
-					var dialog=ui.create.dialog('攻心',target.get('h'));
-					for(var i=0;i<dialog.buttons.length;i++){
-						if(get.suit(dialog.buttons[i].link)=='heart')
-						dialog.buttons[i].classList.add('selectable');
-					}
-					event.custom.replace.button=function(button){
-						if(get.suit(button.link)!='heart') return;
-						if(button==ui.selected.buttons[0]){
-							button.classList.remove('selected');
-							ui.selected.buttons.remove(button);
-						}
-						else{
-							if(ui.selected.buttons.length){
-								ui.selected.buttons[0].classList.remove('selected')
-								ui.selected.buttons.length=0;
+				event.videoId=lib.status.videoId++;
+				var cards=target.get('h');
+				if(player.isOnline2()){
+					player.send(function(cards,id){
+						ui.create.dialog('攻心',cards).videoId=id;
+					},cards,event.videoId);
+				}
+				event.dialog=ui.create.dialog('攻心',cards);
+				event.dialog.videoId=event.videoId;
+				if(!event.isMine()){
+					event.dialog.style.display='none';
+				}
+				player.chooseButton().set('filterButton',function(button){
+					return get.suit(button.link)=='heart';
+				}).set('dialog',event.videoId);
+				"step 1"
+				if(result.bool){
+					event.card=result.links[0];
+					var func=function(card,id){
+						var dialog=get.idDialog(id);
+						if(dialog){
+							for(var i=0;i<dialog.buttons.length;i++){
+								if(dialog.buttons[i].link==card){
+									dialog.buttons[i].classList.add('selectedx');
+								}
+								else{
+									dialog.buttons[i].classList.add('unselectable');
+								}
 							}
-							button.classList.add('selected');
-							ui.selected.buttons.push(button);
 						}
 					}
-					event.control=ui.create.control('gongxin_discard','gongxin_top','cancel',function(link){
-						if(link!='cancel'&&ui.selected.buttons.length==0) return;
-						event._result={};
-						if(link=='gongxin_top'){
-							event._result.top=true;
-						}
-						if(link!='cancel'){
-							event._result.buttons=ui.selected.buttons.slice(0);
-						}
-						event.control.close();
-						dialog.close();
-						game.resume();
-					})
-					game.pause();
+					if(player.isOnline2()){
+						player.send(func,event.card,event.videoId);
+					}
+					else if(event.isMine()){
+						func(event.card,event.videoId);
+					}
+					player.chooseControl('gongxin_discard','gongxin_top');
 				}
 				else{
-					var dialog=ui.create.dialog(target.get('h'));
-					player.chooseButton(dialog).ai=function(button){
-						return get.suit(button.link)=='heart';
+					if(player.isOnline2()){
+						player.send('closeDialog',event.videoId);
 					}
-				}
-				"step 1"
-				if(result.buttons&&result.buttons.length){
-					var card=result.buttons[0].link;
-					if(result.top){
-						target.lose(card);
-						event.dialog=ui.create.dialog('置于牌堆顶',[card]);
-						event.insert=true;
-						event.card=card;
-					}
-					else{
-						target.discard(card);
-					}
+					event.dialog.close();
+					event.finish();
 				}
 				"step 2"
-				if(event.insert){
-					event.card.fix();
-					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
-					game.log(player,'将',event.card,'置于牌堆顶');
-					game.delay(2);
+				if(player.isOnline2()){
+					player.send('closeDialog',event.videoId);
+				}
+				event.dialog.close();
+				var card=event.card;
+				if(result.control=='gongxin_top'){
+					target.lose(card);
+					player.showCards(card,'置于牌堆顶');
+				}
+				else{
+					target.discard(card);
+					event.finish();
 				}
 				"step 3"
-				ui.selected.buttons.length=0;
-				if(event.dialog) event.dialog.close();
+				event.card.fix();
+				ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+				game.log(player,'将',event.card,'置于牌堆顶');
 			},
 			ai:{
 				threaten:1.5,
