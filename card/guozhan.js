@@ -1,5 +1,6 @@
 'use strict';
 card.guozhan={
+	connect:true,
 	card:{
 		yuanjiao:{
 			audio:true,
@@ -7,14 +8,14 @@ card.guozhan={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				if(lib.config.mode!='guozhan') return player!=target;
+				if(get.mode()!='guozhan') return player!=target;
 				if(target.identity=='unknown'||player.identity=='unknown') return false;
 				if(player==target) return false;
 				if(player.identity=='ye') return true;
 				return player.identity!=target.identity;
 			},
 			content:function(){
-				game.asyncDraw([target,player],[1,lib.config.mode=='guozhan'?3:1]);
+				game.asyncDraw([target,player],[1,get.mode()=='guozhan'?3:1]);
 			},
 			ai:{
 				basic:{
@@ -27,7 +28,6 @@ card.guozhan={
 					player:3,
 				},
 			},
-			// mode:['guozhan'],
 		},
 		zhibi:{
 			audio:true,
@@ -46,11 +46,7 @@ card.guozhan={
 				if(!player.storage.zhibi){
 					player.storage.zhibi=[];
 				}
-				player.storage.zhibi.push(target);
-				if(!event.isMine()){
-					event.finish();
-					return;
-				}
+				player.storage.zhibi.add(target);
 				var controls=[];
 				if(target.get('h').length) controls.push('手牌');
 				if(target.classList.contains('unseen')) controls.push('主将');
@@ -60,30 +56,30 @@ card.guozhan={
 				}
 				if(controls.length==0) event.finish();
 				"step 1"
-				game.pause();
-				ui.create.confirm('o');
 				var content;
+				var str=get.translation(target)+'的';
 				if(result.control){
-					if(result.control=='手牌') content=target.get('h');
-					else if(result.control=='主将') content=[[target.name1],'character'];
-					else content=[[target.name2],'character'];
+					if(result.control=='手牌') content=[str+'手牌',target.get('h')];
+					else if(result.control=='主将') content=[str+'主将',[[target.name1],'character']];
+					else content=[str+'副将',[[target.name2],'character']];
 				}
 				else if(target.get('h').length){
-					content=target.get('h');
+					content=[str+'手牌',target.get('h')];
 				}
 				else if(target.classList.contains('unseen')){
-					content=[[target.name1],'character'];
+					content=[str+'主将',[[target.name1],'character']];
 				}
 				else{
-					content=[[target.name2],'character'];
+					content=[str+'副将',[[target.name2],'character']];
 				}
-				event.dialog=ui.create.dialog(content);
-				"step 2"
-				event.dialog.close();
+				player.chooseControl('ok').set('dialog',content);
 			},
 			mode:['guozhan'],
 			ai:{
 				order:9.5,
+				wuxie:function(){
+					return 0;
+				},
 				result:{
 					player:function(player,target){
 						if(player.num('h')<=player.hp) return 0;
@@ -99,7 +95,7 @@ card.guozhan={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				if(lib.config.mode=='guozhan'){
+				if(get.mode()=='guozhan'){
 					if(player.identity=='unknown'||player.identity=='ye') return player==target;
 					return player.identity==target.identity;
 				}
@@ -108,7 +104,7 @@ card.guozhan={
 				}
 			},
 			selectTarget:function(){
-				if(lib.config.mode=='guozhan') return -1;
+				if(get.mode()=='guozhan') return -1;
 				return [1,3];
 			},
 			content:function(){
@@ -186,7 +182,7 @@ card.guozhan={
 						if(game.players[i]==from) continue;
 						if(game.players[i].identity=='unknown'||game.players[i].identity=='ye') continue;
 						if(game.players[i].identity!=from.identity) continue;
-						if(game.players[i].get('s').contains('wuliu_skill')) distance--;
+						if(game.players[i].num('e','wuliu')) distance--;
 					}
 					return distance;
 				}
@@ -202,25 +198,27 @@ card.guozhan={
 				if(event.card.name!='sha') return false;
 				var num=0;
 				for(var i=0;i<game.players.length;i++){
-					if(get.distance(event.player,game.players[i])<=1) num++;
+					if(game.players[i]!=event.player&&get.distance(event.player,game.players[i])<=1) num++;
 				}
-				return num>1;
+				return num>0;
 			},
 			content:function(){
 				"step 0"
 				var damaged=trigger.player;
 				player.chooseCardTarget({
 					filterTarget:function(card,player,target){
+						var damaged=_status.event.damaged;
 						return get.distance(damaged,target)<=1&&target!=damaged;
 					},
 					ai1:function(card){
 						return 9-ai.get.value(card);
 					},
 					ai2:function(target){
+						var player=_status.event.player;
 						return ai.get.damageEffect(target,player,player);
 					},
 					prompt:'是否发动三尖两刃刀？'
-				});
+				}).set('damaged',damaged);
 				"step 1"
 				if(result.bool){
 					player.logSkill('sanjian_skill',result.targets);
