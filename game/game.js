@@ -247,7 +247,7 @@
 					},
 					swipe_left:{
 						name:'左划操作',
-						init:'chat',
+						init:'system',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
