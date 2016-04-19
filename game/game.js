@@ -51,7 +51,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:6,
+        versionOL:7,
 		updateURL:localStorage.getItem('noname_update_url')||'http://123.206.55.178/',
 		assetURL:'',
         hallURL:'123.206.55.178',
