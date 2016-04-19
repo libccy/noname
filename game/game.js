@@ -3675,8 +3675,8 @@
 						}
 					}
 
-                    lib.connectCharacterPack=[];
-                    lib.connectCardPack=[];
+                    var connectCharacterPack=[];
+                    var connectCardPack=[];
 					for(i in character){
 						if(character[i].character){
 							lib.characterPack[i]=character[i].character
@@ -3684,7 +3684,7 @@
 						for(j in character[i]){
 							if(j=='mode'||j=='forbid') continue;
                             if(j=='connect'){
-                                lib.connectCharacterPack.push(i);
+                                connectCharacterPack.push(i);
                                 continue;
                             }
 							if(j=='character'&&!lib.config.characters.contains(i)&&lib.config.mode!='connect'){
@@ -3781,7 +3781,7 @@
 						for(j in card[i]){
 							if(j=='mode'||j=='forbid') continue;
                             if(j=='connect'){
-                                lib.connectCardPack.push(i);
+                                connectCardPack.push(i);
                                 continue;
                             }
 							if(j=='list'){
@@ -3882,6 +3882,20 @@
 						if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
 					}
 
+                    lib.connectCharacterPack=[];
+                    lib.connectCardPack=[];
+                    for(var i=0;i<lib.config.all.characters.length;i++){
+                        var packname=lib.config.all.characters[i];
+                        if(connectCharacterPack.contains(packname)){
+                            lib.connectCharacterPack.push(packname)
+                        }
+                    }
+                    for(var i=0;i<lib.config.all.cards.length;i++){
+                        var packname=lib.config.all.cards[i];
+                        if(connectCardPack.contains(packname)){
+                            lib.connectCardPack.push(packname)
+                        }
+                    }
                     if(lib.config.mode!='connect'){
                         for(i=0;i<lib.card.list.length;i++){
     						if(lib.card.list[i][2]=='huosha'){

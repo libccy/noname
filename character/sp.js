@@ -4844,15 +4844,10 @@ character.sp={
 					target.draw(2);
 				}
 				target.storage.songci=true;
-				target.mark('songci',{
-					name:'颂词',
-					content:'已发动'
-				});
-				game.addVideo('mark',target,{
-					name:'颂词',
-					content:'已发动',
-					id:'songci'
-				});
+				target.markSkill('songci');
+			},
+			intro:{
+				content:'已发动'
 			},
 			ai:{
 				order:7,
