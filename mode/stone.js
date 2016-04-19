@@ -8055,7 +8055,7 @@ mode.stone={
 			trigger:{global:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
-				return event.player.career&&player.side==event.player.side;
+				return event.player.career&&player.side==event.player.side&&event.player.isAlive();
 			},
 			content:function(){
 				trigger.player.drawDeck();

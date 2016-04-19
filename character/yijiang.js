@@ -2205,7 +2205,7 @@ character.yijiang={
 			audio:2,
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
-				return event.player!=player&&event.player.num('h')==player.num('h');
+				return event.player!=player&&event.player.num('h')==player.num('h')&&event.player.isAlive();
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>=0;
@@ -3303,7 +3303,7 @@ character.yijiang={
 			globalSilent:true,
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
-				return event.player!=player&&!event.player.tempSkills.qieting3;
+				return event.player!=player&&!event.player.tempSkills.qieting3&&event.player.isAlive();
 			},
 			frequent:true,
 			content:function(){

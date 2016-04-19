@@ -1,4 +1,5 @@
 character.guozhan={
+	connect:true,
 	character:{
 		ganfuren:['female','shu',3,['shushen','shenzhi']],
 		mifuren:['female','shu',3,['guixiu','cunsi']],

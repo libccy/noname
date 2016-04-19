@@ -514,7 +514,9 @@ character.shenhua={
 				player.judge(function(card){
 					if(get.suit(card)=='heart') return -1;
 					return 1;
-				},ui.special);
+				},ui.special).nogain=function(card){
+					return get.suit(card)!='heart';
+				};
 				"step 1"
 				if(result.bool){
 					result.card.goto(ui.special);

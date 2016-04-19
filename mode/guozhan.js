@@ -775,19 +775,16 @@ mode.guozhan={
 			setModeState:function(info){
 				if(info.mode.unseen) this.classList.add('unseen');
 				if(info.mode.unseen2) this.classList.add('unseen2');
-				var name='';
 				if(!info.name) return;
 				if(info.name.indexOf('unknown')==0){
 					if(this==game.me){
 						lib.translate[info.name]+='（你）';
 					}
-					name=info.name;
 				}
-				this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[this.name]),this);
 				this.init(info.name1,info.name2,false);
-				if(name){
-					this.name=name;
-				}
+				this.name1=info.name1;
+				this.name=info.name;
+				this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[this.name]),this);
 				if(info.identityShown){
 					this.setIdentity(info.identity);
 				}

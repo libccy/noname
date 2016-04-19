@@ -312,7 +312,13 @@ character.standard={
 			trigger:{player:'judgeEnd'},
 			frequent:true,
 			filter:function(event,player){
-				return get.position(event.result.card)=='d'&&event.position==ui.discardPile;
+				if(get.owner(event.result.card)){
+					return false;
+				}
+				if(event.nogain&&event.nogain(event.result.card)){
+					return false;
+				}
+				return true;
 			},
 			content:function(){
 				player.gain(trigger.result.card);

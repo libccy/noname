@@ -4927,7 +4927,7 @@
 					if(event.promptdiscard){
 						event.promptdiscard.close();
 					}
-					if(event.logSkill&&event.result.bool){
+					if(event.logSkill&&event.result.bool&&!game.online){
 						if(typeof event.logSkill=='string'){
 							player.logSkill(event.logSkill);
 						}
@@ -5357,6 +5357,9 @@
 					if(event.isMine()){
 						event.controlbar=ui.create.control(event.controls);
 						if(event.dialog){
+                            if(Array.isArray(event.dialog)){
+                                event.dialog=ui.create.dialog.apply(this,event.dialog);
+                            }
 							event.dialog.open();
 						}
 						else if(event.prompt){
@@ -5382,7 +5385,7 @@
 						else event.result.control=event.controls[event.choice];
                     }
 					_status.imchoosing=false;
-					if(event.dialog) event.dialog.close();
+					if(event.dialog&&event.dialog.close) event.dialog.close();
 					if(event.controlbar) event.controlbar.close();
 				},
 				chooseBool:function(){
@@ -8892,6 +8895,7 @@
 					else str=get.translation(_status.event.name);
 					next.judgestr=str;
 					next.content=lib.element.playerproto.judge;
+                    return next;
 				},
 				turnOver:function(){
 					var next=game.createEvent('turnOver');
@@ -15265,6 +15269,7 @@
         addRecentCharacter:function(){
             for(var i=0;i<arguments.length;i++){
                 if(lib.character[arguments[i]]){
+                    lib.config.recentCharacter.remove(arguments[i]);
                     lib.config.recentCharacter.unshift(arguments[i]);
                 }
             }
@@ -23768,6 +23773,7 @@
 					_status.dialogtouched=false;
 					dialogtouched=true;
 				}
+                if(!_status.event.parent) return;
 				if(_status.dragged) return;
 				if(_status.touchpopping) return;
 				if(_status.reloading) return;

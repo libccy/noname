@@ -940,7 +940,7 @@ character.hearth={
 					forced:true,
 					filter:function(event,player){
 						return typeof event.player.storage.shixu=='number'&&
-							event.player.storage.shixu>3000&&event.player.num('he')>0;
+							event.player.storage.shixu>3000&&event.player.num('he')>0&&event.player.isAlive();
 					},
 					content:function(){
 						player.line(trigger.player,'green');
