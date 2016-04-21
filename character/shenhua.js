@@ -161,7 +161,7 @@ character.shenhua={
 			audio:2,
 			trigger:{player:'phaseUseBefore'},
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.num('h')>0&&!player.hasSkill('fangquan3');
 			},
 			direct:true,
 			content:function(){
