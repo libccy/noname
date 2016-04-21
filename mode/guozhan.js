@@ -646,7 +646,7 @@ mode.guozhan={
 					}
 				}
 				for(var i in result){
-					if(result[i]=='ai'){
+					if(result[i]=='ai'||!reult[i].links||result[i].links.length<1){
 						if(sort){
 							sort=false;
 							event.list.randomSort();

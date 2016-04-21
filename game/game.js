@@ -5164,6 +5164,7 @@
                                 next.callback=callback;
                                 next.switchToAuto=switchToAuto;
                                 next.processAI=processAI;
+                                next.complexSelect=true;
                                 game.resume();
                             },current,event.callback,event.switchToAuto,event.processAI);
                             target._choose_button_ol=current;
