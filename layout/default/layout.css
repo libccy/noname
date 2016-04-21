@@ -1011,23 +1011,36 @@ margin-bottom: 5px;
 .card[data-position='0']{top:calc(100% - 130px);left:calc(50% - 52px);}
 .popup[data-position='0']{top:calc(100% - 176px);left:calc(50% - 106px);}
 
-#window>.player.connect[data-position='0']{left:calc(25% - 180px);top:calc(300% / 7 - 155px);}
-#window>.player.connect[data-position='1']{left:calc(50% - 120px);top:calc(300% / 7 - 155px);}
-#window>.player.connect[data-position='2']{left:calc(75% - 60px);top:calc(300% / 7 - 155px);}
-#window>.player.connect[data-position='3']{left:calc(25% - 180px);top:calc(400% / 7 - 75px);}
-#window>.player.connect[data-position='4']{left:calc(75% - 60px);top:calc(400% / 7 - 75px);}
-#window>.player.connect[data-position='5']{left:calc(25% - 180px);top:calc(500% / 7 + 5px);}
-#window>.player.connect[data-position='6']{left:calc(50% - 120px);top:calc(500% / 7 + 5px);}
-#window>.player.connect[data-position='7']{left:calc(75% - 60px);top:calc(500% / 7 + 5px);}
+
+
+
+#window>.player.connect[data-position='0']{left:calc(25% - 120px);top:calc(300% / 7 - 155px);}
+#window>.player.connect[data-position='1']{left:calc(50% - 60px);top:calc(300% / 7 - 155px);}
+#window>.player.connect[data-position='2']{left:calc(75% - 0px);top:calc(300% / 7 - 155px);}
+#window>.player.connect[data-position='3']{left:calc(25% - 120px);top:calc(400% / 7 - 75px);}
+#window>.player.connect[data-position='4']{left:calc(75% - 0px);top:calc(400% / 7 - 75px);}
+#window>.player.connect[data-position='5']{left:calc(25% - 120px);top:calc(500% / 7 + 5px);}
+#window>.player.connect[data-position='6']{left:calc(50% - 60px);top:calc(500% / 7 + 5px);}
+#window>.player.connect[data-position='7']{left:calc(75% - 0px);top:calc(500% / 7 + 5px);}
 
 #window>.player.connect[data-position='c0']{left:calc(50% - 120px);top:calc(50% - 200px)}
 #window>.player.connect[data-position='c1']{left:calc(50% - 120px);top:calc(50% - 60px)}
 #window>.player.connect[data-position='c2']{left:calc(50% - 120px);top:calc(50% + 80px)}
 
+#window>.player.connect[data-position='c0']{left:calc(50% - 140px);top:calc(50% - 200px)}
+#window>.player.connect[data-position='c1']{left:calc(50% - 140px);top:calc(50% - 60px)}
+#window>.player.connect[data-position='c2']{left:calc(50% - 140px);top:calc(50% + 80px)}
+#window>.player.connect[data-position='c3']{left:calc(50% + 20px);top:calc(50% - 200px)}
+#window>.player.connect[data-position='c4']{left:calc(50% + 20px);top:calc(50% - 60px)}
+#window>.player.connect[data-position='c5']{left:calc(50% + 20px);top:calc(50% + 80px)}
+
+#window>.player.connect{
+	width: 120px;
+}
 .connectbutton{
 	top:calc(400% / 7 - 35px);
 	width:130px;
-	left:calc(50% - 65px);
+	left:calc(50% - 70px);
 }
 
 

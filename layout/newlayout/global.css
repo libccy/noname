@@ -380,6 +380,9 @@
 #window.more_room>.player.connect[data-position='c4']{transform:translateY(105px);}
 #window.more_room>.player.connect[data-position='c5']{transform:translateY(105px);}
 
+#window>.player.connect{
+	width: 150px;
+}
 .connectbutton{
 	top:calc(500% / 7 + 80px + 5px);
 }
