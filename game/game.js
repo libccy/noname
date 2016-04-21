@@ -23788,7 +23788,6 @@
 					_status.dialogtouched=false;
 					dialogtouched=true;
 				}
-                if(!_status.event.parent) return;
 				if(_status.dragged) return;
 				if(_status.touchpopping) return;
 				if(_status.reloading) return;
@@ -23796,6 +23795,7 @@
 					_status.clicked=false;
 				}
 				else{
+                    if(!_status.event.isMine) return;
 					if(ui.controls.length){
 						ui.updatec();
 					}
