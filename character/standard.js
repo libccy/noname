@@ -33,7 +33,7 @@ character.standard={
 		zhenji:['caopi'],
 		caocao:['xuzhu','dianwei'],
 		huangzhong:['weiyan'],
-		zhugeliang:['huangyueying'],
+		zhugeliang:['huangyueying','pangtong'],
 		liubei:['guanyu','zhangfei','ganfuren'],
 		zhaoyun:['liushan'],
 		daqiao:['xiaoqiao'],
