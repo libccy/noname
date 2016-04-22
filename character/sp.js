@@ -4787,16 +4787,10 @@ character.sp={
 				if(player.storage.bifa[1].isAlive()){
 					player.chooseCard(get.translation(player.storage.bifa[1])+
 						'的笔伐牌为'+get.translation(player.storage.bifa[0]),function(card){
-						if(get.type(card)=='trick'||get.type(card)=='delay'){
-							return get.type(player.storage.bifa[0])=='trick'||
-							get.type(player.storage.bifa[0])=='delay'
-						}
-						else{
-							return get.type(card)==get.type(player.storage.bifa[0]);
-						}
-					}).ai=function(card){
+						return get.type(card,'trick')==_status.event.type;
+					}).set('ai',function(card){
 						return 8-ai.get.value(card);
-					};
+					}).set('type',get.type(player.storage.bifa[0],'trick'));
 				}
 				else{
 					event.directfalse=true;
@@ -5037,7 +5031,7 @@ character.sp={
 						return 6-ai.get.value(card);
 					},
 					ai2:function(target){
-						return ai.get.attitude(player,target)-3;
+						return ai.get.attitude(_status.event.player,target)-3;
 					},
 					prompt:'是否发动援护？'
 				});
@@ -5052,23 +5046,32 @@ character.sp={
 						player.$give(thisCard,thisTarget);
 					}
 					switch(get.subtype(thisCard)){
-						case 'equip1':
-						for(var i=0;i<game.players.length;i++){
-							if(get.distance(thisTarget,game.players[i])==1) break;
-						}
-						if(i==game.players.length) return;
-						game.delay();
-						player.chooseTarget(true,function(card,player,target){
-							return get.distance(thisTarget,target)==1&&target.num('hej');
-						}).ai=function(target){
-							var attitude=ai.get.attitude(player,target);
-							if(attitude>0&&target.num('j')){
-								return attitude;
+						case 'equip1':{
+							for(var i=0;i<game.players.length;i++){
+								if(get.distance(thisTarget,game.players[i])<=1) break;
 							}
-							return -attitude;
-						};return;
-						case 'equip2':thisTarget.draw();event.finish();return;
-						default:thisTarget.recover();event.finish();return;
+							if(i==game.players.length) return;
+							game.delay();
+							player.chooseTarget(true,function(card,player,target){
+								return get.distance(_status.event.thisTarget,target)<=1&&target.num('hej');
+							}).set('ai',function(target){
+								var attitude=ai.get.attitude(_status.event.player,target);
+								if(attitude>0&&target.num('j')){
+									return attitude*1.5;
+								}
+								return -attitude;
+							}).set('thisTarget',thisTarget);
+							return;
+						}
+						case 'equip2':{
+							thisTarget.draw();event.finish();
+							return;
+						}
+						default:{
+							thisTarget.recover();
+							event.finish();
+							return;
+						}
 					}
 				}
 				else{
@@ -5721,7 +5724,7 @@ character.sp={
 		duwu_info:'出牌阶段，你可以弃置X张牌对你攻击范围内的一名其他角色造成1点伤害(X为该角色的体力值)。若你以此法令该角色进入濒死状态，则濒死状态结算后你失去1点体力，且本回合不能再发动黩武。',
 		tianming_info:'当你成为【杀】的目标时，你可以弃置两张牌(不足则全弃，无牌则不弃)，然后摸两张牌;若此时全场体力值最多的角色仅有一名(且不是你)，该角色也可以如此做。',
 		mizhao_info:'出牌阶段，你可以将所有手牌(至少一张)交给一名其他角色。若如此做，你令该角色与你指定的另一名有手牌的角色拼点。视为拼点赢的角色对没赢的角色使用一张【杀】。每阶段限一次。',
-		yuanhu_info:'回合结束阶段开始时，你可以将一张装备牌置于一名角色的装备区里，然后根据此装备牌的种类执行以下效果。武器牌：弃置与该角色距离为1的一名角色区域中的一张牌；防具牌：该角色摸一张牌；坐骑牌：该角色回复1点体力。',
+		yuanhu_info:'回合结束阶段开始时，你可以将一张装备牌置于一名角色的装备区里，然后根据此装备牌的种类执行以下效果。武器牌：弃置距离该角色1以内的一名角色区域中的一张牌；防具牌：该角色摸一张牌；坐骑牌：该角色回复1点体力。',
 		lihun_info:'出牌阶段，你可以弃置一张牌并将你的武将牌翻面，若如此做，制定一名男性角色，获得其所有手牌。出牌阶段结束时，你需为该角色每一点体力分配给其一张牌。每回合限一次。',
 		chongzhen_info:'每当你发动“龙胆”使用或打出一张手牌时，你可以立即获得对方的一张手牌。',
 		bifa_info:'回合结束阶段开始时，你可以将一张手牌移出游戏并指定一名其他角色。该角色的回合开始时，其观看你移出游戏的牌并选择一项：交给你一张与此牌同类型的手牌并获得此牌；或将此牌置入弃牌堆，然后失去1点体力。',
