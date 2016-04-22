@@ -49,7 +49,6 @@ mode.chess={
 		game.finishCards();
 		ui.chessContainer=ui.create.div('#chess-container',ui.arena);
 		lib.setScroll(ui.chessContainer);
-		ui.chessContainer.style.WebkitOverflowScrolling='touch';
 		ui.chess=ui.create.div('#chess',ui.chessContainer);
 		ui.canvas2=document.createElement('canvas');
 		ui.canvas2.id='canvas2';

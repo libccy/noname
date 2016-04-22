@@ -22013,23 +22013,28 @@
 				}
                 if(!lib.config.asset_version){
                     setTimeout(function(){
-                        var func=function(){
-                            if(confirm('是否下载图片和音频素材？（约100MB）')){
-                                if(!ui.arena.classList.contains('menupaused')){
-                                    ui.click.configMenu();
-                                    ui.click.menuTab('帮助');
-                                }
-                                setTimeout(game.checkForAssetUpdate,500);
-                            }
-                            else{
-                                game.saveConfig('asset_version','无');
-                            }
-                        }
-                        if(_status.new_tutorial){
-                            _status.new_tutorial=func;
+                        if(!game.download){
+                            game.saveConfig('asset_version','无');
                         }
                         else{
-                            func();
+                            var func=function(){
+                                if(confirm('是否下载图片和音频素材？（约100MB）')){
+                                    if(!ui.arena.classList.contains('menupaused')){
+                                        ui.click.configMenu();
+                                        ui.click.menuTab('帮助');
+                                    }
+                                    setTimeout(game.checkForAssetUpdate,500);
+                                }
+                                else{
+                                    game.saveConfig('asset_version','无');
+                                }
+                            }
+                            if(_status.new_tutorial){
+                                _status.new_tutorial=func;
+                            }
+                            else{
+                                func();
+                            }
                         }
                     },4000);
                 }
