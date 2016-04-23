@@ -1015,7 +1015,7 @@ mode.chess={
 				}
 				game.over(game.me.side==game.players[0].side);
 			},
-			$draw:function(num){
+			$draw_old:function(num){
 				var cards;
 				if(get.itemtype(num)=='cards'){
 					cards=num;
@@ -1113,7 +1113,7 @@ mode.chess={
 					}
 				}
 			},
-			$throw:function(card,time,init){
+			$throw_old:function(card,time,init){
 				if(init!==false){
 					if(get.itemtype(card)!='cards'){
 						if(get.itemtype(card)=='card'){
@@ -1413,6 +1413,7 @@ mode.chess={
 	game:{
 		minskin:true,
 		singleHandcard:true,
+		chess:true,
 		treasures:[],
 		obstacles:[],
 		getVideoName:function(){
@@ -2283,7 +2284,7 @@ mode.chess={
 				var node=ui.create.div('.avatar',ui.chessinfo);
 				node.style.backgroundImage=p.node.avatar.style.backgroundImage;
 				node.link=p;
-				node.listen(game.clickChessInfo);
+				node.listen(ui.click.chessInfo);
 				p.instance=node;
 				if(_status.currentPhase==p){
 					node.classList.add('glow2');
@@ -2299,18 +2300,6 @@ mode.chess={
 				legend:0,
 				character:[]
 			});
-		},
-		clickChessInfo:function(e){
-			if(this.link.isAlive()){
-				this.link.chessFocus();
-				if(this.link.classList.contains('selectable')||
-				this.link.classList.contains('selected')){
-					// this.link.click();
-					ui.click.target.call(this.link,e);
-					ui.click.window.call(ui.window,e);
-				}
-				e.stopPropagation();
-			}
 		},
 		leaderView:function(){
 			var next=game.createEvent('leaderView',false);
@@ -5462,12 +5451,9 @@ mode.chess={
 				if(current){
 					current.classList.remove('glow2');
 				}
-				for(var i=0;i<ui.phasequeue.length;i++){
-					if(ui.phasequeue[i].link==player){
-						ui.phasequeue[i].classList.add('glow2');
-						ui.chessinfo.scrollTop=ui.phasequeue[i].offsetTop-8;
-						break;
-					}
+				if(player.instance){
+					player.instance.classList.add('glow2');
+					ui.chessinfo.scrollTop=player.instance.offsetTop-8;
 				}
 			}
 		},
@@ -5482,14 +5468,12 @@ mode.chess={
 					!player.movable(1,0)&&!player.movable(-1,0)){
 					return false;
 				}
-				// var move=player.skills.contains('noactpunish')?2:1;
 				var move=2;
 				move=game.checkMod(player,move,'chessMove',player.get('s'));
 				return move>0;
 			},
 			content:function(){
 				"step 0"
-				// var move=player.skills.contains('noactpunish')?2:1;
 				var move=2;
 				move=game.checkMod(player,move,'chessMove',player.get('s'));
 				player.chooseToMove(move).phasing=true;
@@ -5563,7 +5547,7 @@ mode.chess={
 			popup:false,
 			filter:function(event,player){
 				if(event.autochoose&&event.autochoose()) return false;
-				if(_status.mode=='combat'&&!get.config('single_control')) return false;
+				if(lib.config.mode=='chess'&&_status.mode=='combat'&&!get.config('single_control')) return false;
 				return player.isUnderControl();
 			},
 			content:function(){
@@ -5919,6 +5903,17 @@ mode.chess={
 			}
 		},
 		click:{
+			chessInfo:function(e){
+				if(this.link.isAlive()){
+					this.link.chessFocus();
+					if(this.link.classList.contains('selectable')||
+						this.link.classList.contains('selected')){
+						ui.click.target.call(this.link,e);
+						ui.click.window.call(ui.window,e);
+					}
+					e.stopPropagation();
+				}
+			},
 			playergrid:function(){
 				if(!_status.paused) return;
 				var pos=parseInt(this.dataset.position);

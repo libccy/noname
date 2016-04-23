@@ -140,7 +140,13 @@ table{table-layout: fixed;}
 	position: relative;
 	transition: all 0.8s;
 }
-#splash:not(.touch)>div:hover{
+#splash>div:first-child{
+	margin-left: 20px;
+}
+#splash>div:last-child{
+	margin-right: 20px;
+}
+#splash:not(.touch)>div:hover:not(.clicked){
 	transform: translateY(-20px);
 }
 #splash>div.clicked{
@@ -1306,6 +1312,7 @@ div:hover>.intro{opacity: 1;}
 }
 .player .identity[data-color="zhu"],
 .player .identity[data-color="truezhu"],
+.player .identity[data-color="enemy"],
 div[data-nature='fire'],
 span[data-nature='fire']{
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px,
@@ -1319,6 +1326,8 @@ span[data-nature='firem']{
 .player .identity[data-color="zhong"],
 .player .identity[data-color="mingzhong"],
 .player .identity[data-color="qun"],
+.player .identity[data-color="neutral"],
+.player .identity[data-color="friend2"],
 div[data-nature='metal'],
 span[data-nature='metal']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px,
@@ -1366,6 +1375,7 @@ span[data-nature='woodmm']{
 .player .identity[data-color="cai"],
 .player .identity[data-color="wei"],
 .player .identity[data-color="falsezhu"],
+.player .identity[data-color="friend"],
 div[data-nature='water'],
 span[data-nature='water']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 10px,

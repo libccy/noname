@@ -1869,6 +1869,7 @@ character.shenhua={
 				event.current.animate('target');
 				event.current.chooseToUse('乱舞：使用一张杀或流失一点体力',{name:'sha'},function(card,player,target){
 					if(player==target) return false;
+					if(!player.canUse('sha',target)) return false;
 					if(get.distance(player,target)<=1) return true;
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==player) continue;

@@ -2628,7 +2628,7 @@
 							var node=this;
 							if(node._clearing){
 								game.save(get.config('chess_leader_save'),null);
-								window.location.reload();
+								game.reload();
 								return;
 							}
 							node._clearing=true;
@@ -2746,6 +2746,65 @@
 					},
 				}
 			},
+            story:{
+                name:'剧情',
+                config:{
+                    save:{
+						name:'选择历程',
+						init:'save1',
+						item:{
+							save1:'一',
+							save2:'二',
+							save3:'三',
+							save4:'四',
+							save5:'五',
+						},
+						restart:true,
+						frequent:true,
+					},
+					clear:{
+						name:'清除进度',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								game.save(get.config('save'),null);
+								game.reload();
+								return;
+							}
+							node._clearing=true;
+							node.innerHTML='单击以确认 (3)';
+							setTimeout(function(){
+								node.innerHTML='单击以确认 (2)';
+								setTimeout(function(){
+									node.innerHTML='单击以确认 (1)';
+									setTimeout(function(){
+										node.innerHTML='清除进度';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true,
+						frequent:true,
+					},
+                    chessscroll_speed:{
+						name:'边缘滚动速度',
+						init:'20',
+						item:{
+							'0':'不滚动',
+							'10':'10格/秒',
+							'20':'20格/秒',
+							'30':'30格/秒',
+						}
+					},
+                }
+            },
+            realtime:{
+                name:'即时',
+                config:{
+
+                }
+            },
 			stone:{
 				name:'炉石',
 				config:{
@@ -2978,7 +3037,7 @@
 			dialog.style.top=idealtop+'px';
 		},
 		isMobileMe:function(player){
-			return (lib.config.layout=='mobile'||lib.config.layout=='phone')&&lib.config.mode!='chess'&&player.dataset.position==0;
+			return (lib.config.layout=='mobile'||lib.config.layout=='phone')&&!game.chess&&player.dataset.position==0;
 		},
 		isNewLayout:function(){
 			if(lib.config.layout!='default') return true;
@@ -3180,6 +3239,10 @@
 				if(!lib.config.gameRecord){
 					lib.config.gameRecord={};
 				}
+                if(lib.config.debug){
+                    mode.pack.story='剧情';
+                    mode.pack.realtime='即时';
+                }
 				for(i in mode.pack){
 					if(lib.config.hiddenModePack.indexOf(i)==-1){
 						lib.config.all.mode.push(i);
@@ -5449,7 +5512,7 @@
 							event.dialog.add('手牌');
 							var hs=target.get('h');
 							hs.randomSort();
-							if(event.visible||target==player){
+							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
 							}
 							else{
@@ -5524,7 +5587,7 @@
 							event.dialog.add('手牌');
 							var hs=target.get('h');
 							hs.randomSort();
-							if(event.visible||target==player){
+							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
 							}
 							else{
@@ -5615,7 +5678,7 @@
 							event.dialog.add('手牌');
 							var hs=target.get('h');
 							hs.randomSort();
-							if(event.visible||target==player){
+							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
 							}
 							else{
@@ -6900,12 +6963,12 @@
         					card.classList.remove('drawinghidden');
                             card.viewAs=viewAs;
                             player.node.judges.insertBefore(card,player.node.judges.firstChild);
-                            if(card.clone&&card.clone.parentNode==player.parentNode){
+                            if(card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
     							card.clone.moveDelete(player);
     							game.addVideo('gain2',player,get.cardsInfo([card]));
     						}
                         },player,cards[0],viewAs);
-						if(cards[0].clone&&cards[0].clone.parentNode==player.parentNode){
+						if(cards[0].clone&&(cards[0].clone.parentNode==player.parentNode||cards[0].clone.parentNode==ui.arena)){
 							cards[0].clone.moveDelete(player);
 							game.addVideo('gain2',player,get.cardsInfo(cards));
 						}
@@ -6940,7 +7003,7 @@
                         else{
                             event=_status.event;
                         }
-                        if(lib.config.mode=='chess'){
+                        if(game.chess){
     						event.node=card.copy('thrown','center',ui.arena).animate('start');
     					}
     					else{
@@ -9036,7 +9099,7 @@
 						this.checkShow(name);
 					}
 					game.trySkillAudio(name,this,true);
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						this.chessFocus();
 					}
 				},
@@ -9536,7 +9599,7 @@
 				isMin:function(distance){
 					if(distance&&lib.config.mode!='stone') return false;
 					if(this.forcemin) return true;
-					return this.classList.contains('minskin')&&lib.config.mode!='chess';
+					return this.classList.contains('minskin')&&!game.chess;
 				},
 				isIn:function(){
 					return this.classList.contains('dead')==false&&this.classList.contains('out')==false&&!this.removed;
@@ -9560,6 +9623,9 @@
 						if(_status.mode=='combat'&&!get.config('single_control')) return false;
 						return this.side==game.me.side;
 					}
+                    else if(lib.config.mode=='story'){
+                        return this.side==game.me.side;
+                    }
 					return false;
 				},
                 isOnline:function(){
@@ -9674,15 +9740,30 @@
 					node.fixed=true;
 					node.hide();
 
-					node.style.left='calc(50% - 52px)';
-					node.style.top='calc(50% - 52px)';
+                    if(game.chess){
+                        var rect=this.getBoundingClientRect();
 
-					this.parentNode.appendChild(node);
+                        var dx=rect.left+this.offsetWidth/2-ui.arena.offsetWidth/2;
+    					var dy=rect.top+this.offsetHeight/2-ui.arena.offsetHeight/2;
+
+                        var coeff=240/Math.sqrt(dx*dx+dy*dy);
+                        dx*=coeff;
+                        dy*=coeff;
+
+                        node.style.left=(this.offsetLeft+this.offsetWidth/2-52-dx)+'px';
+                        node.style.top=(this.offsetTop+this.offsetHeight/2-52-dy)+'px';
+                        this.parentNode.appendChild(node);
+                    }
+					else{
+                        this.parentNode.appendChild(node);
+                        node.style.left='calc(50% - 52px)';
+    					node.style.top='calc(50% - 52px)';
+
+                        var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
+    					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
+                    }
 					node.style.transitionDuration='0.8s';
 					ui.refresh(node);
-
-					var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
-					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
 					if(typeof num=='number'&&init!==false){
 						config={
 							total:num,
@@ -9842,6 +9923,9 @@
 						}
 						game.addVideo('throw',this,[get.cardsInfo(card),time]);
 					}
+                    if(game.chess){
+                        this.chessFocus();
+                    }
 					if(get.itemtype(card)=='cards'){
 						var node;
 						for(var i=0;i<card.length;i++){
@@ -9882,20 +9966,38 @@
 					ui.thrown.push(node);
 					var uithrowns=ui.thrown.slice(0);
 					var tops;
-					switch(Math.floor((ui.thrown.length-1)/4)){
-						case 0:
-							tops=['calc(50% - 52px)'];
-							break;
-						case 1:
-							tops=['calc(50% - 109px)','calc(50% + 5px)'];
-							break;
-						case 2:
-							tops=['calc(50% - 166px)','calc(50% - 52px)','calc(50% + 62px)'];
-							break;
-						default:
-							tops=['calc(50% - 223px)','calc(50% - 109px)',
-								'calc(50% + 5px)','calc(50% + 119px)'];
-					}
+                    if(game.chess){
+                        switch(Math.floor((ui.thrown.length-1)/4)){
+    						case 0:
+    							tops=['calc(50% - 82px)'];
+    							break;
+    						case 1:
+    							tops=['calc(50% - 139px)','calc(50% - 25px)'];
+    							break;
+    						case 2:
+    							tops=['calc(50% - 196px)','calc(50% - 82px)','calc(50% + 32px)'];
+    							break;
+    						default:
+    							tops=['calc(50% - 253px)','calc(50% - 139px)',
+    								'calc(50% - 25px)','calc(50% + 89px)'];
+    					}
+                    }
+					else{
+                        switch(Math.floor((ui.thrown.length-1)/4)){
+    						case 0:
+    							tops=['calc(50% - 52px)'];
+    							break;
+    						case 1:
+    							tops=['calc(50% - 109px)','calc(50% + 5px)'];
+    							break;
+    						case 2:
+    							tops=['calc(50% - 166px)','calc(50% - 52px)','calc(50% + 62px)'];
+    							break;
+    						default:
+    							tops=['calc(50% - 223px)','calc(50% - 109px)',
+    								'calc(50% + 5px)','calc(50% + 119px)'];
+    					}
+                    }
 					while(uithrowns.length){
 						var throwns=uithrowns.splice(0,Math.min(uithrowns.length,4));
 						switch(throwns.length){
@@ -9923,7 +10025,12 @@
 							top=tops.shift();
 						}
 						else{
-							top='calc(50% - 52px)';
+                            if(game.chess){
+                                top='calc(50% - 82px)';
+                            }
+							else{
+                                top='calc(50% - 52px)';
+                            }
 						}
 						for(var i=0;i<throwns.length;i++){
 							throwns[i].style.top=top;
@@ -9943,8 +10050,15 @@
 						var ny=parseCalc(node.style.top);
 						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
 						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
-						var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
-						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+                        if(game.chess){
+                            var rect=this.getBoundingClientRect();
+                            var dx=rect.left+this.offsetWidth/2-52-nx;
+    						var dy=rect.top+this.offsetHeight/2-52-ny;
+                        }
+						else{
+                            var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
+    						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+                        }
 						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 						}
@@ -9973,8 +10087,15 @@
 						var ny=[50,-52];
 						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
 						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
-						var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
-						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+                        if(game.chess){
+                            var rect=this.getBoundingClientRect();
+                            var dx=rect.left+this.offsetWidth/2-52-nx;
+    						var dy=rect.top+this.offsetHeight/2-52-ny;
+                        }
+						else{
+                            var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
+    						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+                        }
 						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
 						}
@@ -10036,6 +10157,9 @@
 						else{
 							top=0;
 						}
+                        if(game.chess){
+                            top-=30;
+                        }
 						for(var i=0;i<throwns.length;i++){
 							throwns[i].style.transform=throwns[i]._transthrown+top+'px)';
 							delete throwns[i]._transthrown;
@@ -10061,7 +10185,7 @@
 					return node;
 				},
 				$throwxy2:function(card,left,top,trans,flipx,flipy){
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						return this.$throwxy.apply(this,arguments);
 					}
 					var node=card.copy('thrown','thrownhighlight');
@@ -10339,7 +10463,7 @@
 					setTimeout(function(){
                         game.broadcastAll(function(that,type,name,color){
                             if(lib.config.animation&&!lib.config.low_performance){
-    							if(lib.config.mode=='chess'){
+    							if(game.chess){
     								that['$'+type+'2'](1200);
     							}
     							else{
@@ -10355,7 +10479,7 @@
 				$fire:function(){
 					game.addVideo('flame',this,'fire');
 					var left,top;
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						var rect=this.getBoundingClientRect();
 						left=rect.left;
 						top=rect.top;
@@ -10370,7 +10494,7 @@
 				$thunder:function(){
 					game.addVideo('flame',this,'thunder');
 					var left,top;
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						var rect=this.getBoundingClientRect();
 						left=rect.left;
 						top=rect.top;
@@ -10410,7 +10534,7 @@
 					time=time||700;
 					game.addVideo('flame',this,'rare');
 					var left,top;
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						left=this.offsetLeft-ui.arena.offsetLeft;
 						top=this.offsetTop-ui.arena.offsetTop;
 					}
@@ -10428,7 +10552,7 @@
 					time=time||700;
 					game.addVideo('flame',this,'epic');
 					var left,top;
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						left=this.offsetLeft-ui.arena.offsetLeft;
 						top=this.offsetTop-ui.arena.offsetTop;
 					}
@@ -10446,7 +10570,7 @@
 					time=time||700;
 					game.addVideo('flame',this,'legend');
 					var left,top;
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						left=this.offsetLeft-ui.arena.offsetLeft;
 						top=this.offsetTop-ui.arena.offsetTop;
 					}
@@ -10500,7 +10624,7 @@
                     },this);
 					game.addVideo('flame',this,'recover');
 					var left,top;
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						var rect=this.getBoundingClientRect();
 						left=rect.left;
 						top=rect.top;
@@ -11272,16 +11396,22 @@
 							node.classList.add('controlthundertext');
 							node.parentNode.classList.add('controlpressdown');
 							node.parentNode.classList.add('controlpressdownx');
+                            if(typeof node.parentNode._offset=='number'){
+                                node.parentNode.style.transform='translateX('+node.parentNode._offset+'px) scale(0.97)';
+                            }
 						});
 						node.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
+                            if(typeof node.parentNode._offset=='number'){
+                                node.parentNode.style.transform='translateX('+node.parentNode._offset+'px)';
+                            }
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
 							node.parentNode.classList.remove('controlpressdownx');
-							// setTimeout(function(){
-							// 	if(node.parentNode)
-							// },200);
 						});
 						node.addEventListener(lib.config.touchscreen?'touchmove':'mousemove',function(){
+                            if(typeof node.parentNode._offset=='number'){
+                                node.parentNode.style.transform='translateX('+node.parentNode._offset+'px)';
+                            }
 							node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
 							node.parentNode.classList.remove('controlpressdownx');
@@ -15035,7 +15165,7 @@
 			}
 			node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
 			node.style.height=get.xyDistance(from,to)+'px';
-			if(lib.config.mode=='chess'){
+			if(game.chess){
 				ui.chess.appendChild(node);
 			}
 			else{
@@ -15110,7 +15240,7 @@
 				ctx.lineTo(current[0],current[1]);
 				ctx.stroke();
 			};
-			if(arguments[2]&&lib.config.mode=='chess'){
+			if(arguments[2]&&game.chess){
 				game.draw2(drawfunc);
 			}
 			else{
@@ -16207,7 +16337,7 @@
 				_status.multitarget=true;
 			}
 			if(event.isMine()){
-				if(lib.config.mode=='chess'&&game.me&&get.config('show_distance')){
+				if(game.chess&&game.me&&get.config('show_distance')){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]==game.me){
 							game.players[i].node.action.hide();
@@ -16263,7 +16393,7 @@
 		uncheck:function(){
 			var i,j;
 			if(true){
-				if(lib.config.mode=='chess'){
+				if(game.chess){
 					var shadows=ui.chessContainer.getElementsByClassName('playergrid temp');
 					while(shadows.length){
 						shadows[0].remove();
@@ -16350,7 +16480,7 @@
 				player1.dataset.position=player2.dataset.position;
 				player2.dataset.position=temp1;
 				game.arrangePlayers();
-				if(lib.config.mode!='chess'){
+				if(!game.chess){
 					if(player1.dataset.position=='0'||player2.dataset.position=='0'){
 						pos=parseInt(player1.dataset.position);
 						if(pos==0) pos=parseInt(player2.dataset.position);
@@ -17079,7 +17209,7 @@
                 game.log(str);
             },str);
 			if(lib.config.title) document.title=str;
-			if(lib.config.show_log!='off'&&lib.config.mode!='chess'){
+			if(lib.config.show_log!='off'&&!game.chess){
 				ui.arenalog.insertBefore(node.cloneNode(true),ui.arenalog.firstChild);
 				while(ui.arenalog.childNodes.length&&ui.arenalog.scrollHeight>ui.arenalog.offsetHeight){
 					ui.arenalog.lastChild.remove();
@@ -23058,7 +23188,7 @@
 					e.preventDefault();
 					var item=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
 					while(item){
-						if(lib.config.enable_touchdragline&&_status.mouseleft&&lib.config.mode!='chess'){
+						if(lib.config.enable_touchdragline&&_status.mouseleft&&!game.chess){
 							ui.canvas.width=ui.arena.offsetWidth;
 							ui.canvas.height=ui.arena.offsetHeight;
 							var ctx=ui.ctx;
@@ -23111,7 +23241,7 @@
 							var ex=e.touches[0].clientX-ui.arena.offsetLeft;
 							var ey=e.touches[0].clientY-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
-							if(lib.config.mode=='chess'){
+							if(game.chess){
 								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
 								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
 							}
@@ -23163,7 +23293,7 @@
 												}
 												node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
 												node.style.height=get.xyDistance(from,to)+'px';
-												if(lib.config.mode=='chess'){
+												if(game.chess){
 													ui.chess.appendChild(node);
 												}
 												else{
@@ -23443,7 +23573,7 @@
 							var ex=e.x-ui.arena.offsetLeft;
 							var ey=e.y-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
-							if(lib.config.mode=='chess'){
+							if(game.chess){
 								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
 								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
 							}
@@ -23863,7 +23993,7 @@
 				else{
 					game.closePopped();
 				}
-				if(_status.event.custom.add.window){
+				if(_status.event.custom&&_status.event.custom.add.window){
 					_status.event.custom.add.window(clicked);
 				}
 			},
@@ -23984,7 +24114,7 @@
 				if(!notoggle){
 					this.classList.toggle('selected');
 				}
-                if(lib.config.mode=='chess'&&get.config('show_range')&&!_status.event.skill&&this.classList.contains('selected')&&
+                if(game.chess&&get.config('show_range')&&!_status.event.skill&&this.classList.contains('selected')&&
                 _status.event.isMine()&&_status.event.name=='chooseToUse'){
                     var player=_status.event.player;
                     var range=get.info(this).range;
@@ -24710,6 +24840,7 @@
 			var offset=-length/2;
 			var control=controls.shift();
 			control.style.transform='translateX('+offset+'px)';
+            control._offset=offset;
 			while(controls.length){
 				var control=controls.shift();
 				var width=widths.shift();
@@ -24718,6 +24849,7 @@
 					offset+=6;
 				}
 				control.style.transform='translateX('+offset+'px)';
+                control._offset=offset;
 			}
 		},
 		updatex:function(){
@@ -24862,7 +24994,7 @@
 				ui.updates[i]();
 			}
 			if(ui.dialog&&!ui.dialog.classList.contains('noupdate')){
-				if(lib.config.mode=='chess'){
+				if(game.chess){
 					if(ui.dialog.content.scrollHeight<240&&(!ui.dialog.buttons||!ui.dialog.buttons.length)){
 						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
 						ui.dialog.classList.add('slim');
@@ -25517,7 +25649,7 @@
 			if(!game.players.contains(to)&&!game.dead.contains(to)) return Infinity;
 			var player=from,m,n=1,i;
 			var fxy,txy;
-			if(lib.config.mode=='chess'){
+			if(game.chess){
 				fxy=from.getXY();
 				txy=to.getXY();
 				n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);

@@ -28,11 +28,11 @@ card.extra={
 							target.node.jiu=ui.create.div('.playerjiu',target.node.avatar);
 							target.node.jiu2=ui.create.div('.playerjiu',target.node.avatar2);
 						}
-						if(card.clone&&card.clone.parentNode==target.parentNode){
+						if(card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
 							card.clone.moveDelete(target);
 						}
 					},target,card);
-					if(card.clone&&card.clone.parentNode==target.parentNode){
+					if(card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
 						game.addVideo('gain2',target,get.cardsInfo([card]));
 					}
 				}
