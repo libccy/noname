@@ -2524,8 +2524,6 @@ character.sp={
 				player.chooseTarget(function(card,player,target){
 					return target==player||target==trigger.player;
 				},true,'礼下：选择一个目标摸一张牌').ai=function(target){
-					return target==player;
-				}.ai=function(target){
 					return player==target?1:0;
 				};
 				'step 1'
