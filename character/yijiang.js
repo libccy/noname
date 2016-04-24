@@ -3783,7 +3783,7 @@ character.yijiang={
 				"step 1"
 				if(result.bool){
 					event.target=result.targets[0];
-					player.logSkill('zhiyan');
+					player.logSkill('zhiyan',result.targets);
 				}
 				else{
 					event.finish();

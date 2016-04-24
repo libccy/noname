@@ -1032,42 +1032,6 @@ mode.chess={
 
 				return this.$gainmod(num);
 			},
-			$drawx:function(num){
-				var cards,node;
-				if(get.itemtype(num)=='cards'){
-					cards=num;
-					num=cards.length;
-				}
-				else if(get.itemtype(num)=='card'){
-					cards=[num];
-					num=1;
-				}
-				if(cards){
-					cards=cards.slice(0);
-					node=cards.shift().copy('drawing','thrown');
-				}
-				else{
-					node=ui.create.div('.card.drawing.thrown');
-				}
-				node.fixed=true;
-				game.$randomMove(this,node,100,30);
-				node.dataset.position=this.dataset.position;
-				this.parentNode.appendChild(node);
-				ui.refresh(node);
-				node.style.transform='';
-				setTimeout(function(){
-					node.remove();
-				},1000);
-				var that=this;
-				if(num&&num>1){
-					if(cards){
-						that.$draw(cards)
-					}
-					else{
-						that.$draw(num-1)
-					}
-				}
-			},
 			$gainmod:function(num){
 				var cards,node;
 				if(get.itemtype(num)=='cards'){
@@ -1086,7 +1050,7 @@ mode.chess={
 					node=ui.create.div('.card.thrown.hidden');
 				}
 				node.fixed=true;
-				game.$randomMove(this,node,100,30);
+				this.$randomMove(node,130,0);
 				var ot=node.style.transform;
 				if(node.style.transform&&node.style.transform!='none'){
 					node.style.transform+=' scale(0.6)';
@@ -1113,7 +1077,7 @@ mode.chess={
 					}
 				}
 			},
-			$throw_old:function(card,time,init){
+			$throw:function(card,time,init){
 				if(init!==false){
 					if(get.itemtype(card)!='cards'){
 						if(get.itemtype(card)=='card'){
@@ -1138,7 +1102,7 @@ mode.chess={
 					this.parentNode.appendChild(node);
 					ui.refresh(node);
 					node.show();
-					game.$randomMove(this,node,100,30);
+					this.$randomMove(node,130,0);
 					if(time!=undefined){
 						node.fixed=true;
 						setTimeout(function(){node.delete()},time);
@@ -1175,7 +1139,7 @@ mode.chess={
 					ui.refresh(node);
 					node.show();
 
-					game.$randomMove(this,node,100,30);
+					this.$randomMove(node,130,0);
 
 					setTimeout(function(){
 						node.removeAttribute('style');
@@ -1215,7 +1179,90 @@ mode.chess={
 					player.offsetLeft+player.offsetWidth/2,
 					player.offsetTop+player.offsetHeight/2
 				],{opacity:0.5,dashed:true},true);
-			}
+			},
+			$randomMove:function(node,length,rand){
+				if(!this.node.chessthrown){
+					this.node.chessthrown=[];
+				}
+				var thrown=this.node.chessthrown;
+				for(var i=0;i<thrown.length;i++){
+					if(thrown[i].parentNode!=this.parentNode||
+						thrown[i].classList.contains('removing')){
+						thrown.splice(i--,1);
+					}
+				}
+				thrown.push(node);
+
+				var rect=this.getBoundingClientRect();
+				var amax,amin;
+				if(rect.left<=80){
+					if(rect.top<=80){
+						amin=-90;
+						amax=0;
+					}
+					else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
+						amin=0;
+						amax=90;
+					}
+					else{
+						amin=-90;
+						amax=90;
+					}
+				}
+				else if(rect.left+rect.width+80>=ui.chessContainer.offsetWidth){
+					if(rect.top<=80){
+						amin=180;
+						amax=270;
+					}
+					else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
+						amin=90;
+						amax=180;
+					}
+					else{
+						amin=90;
+						amax=270;
+					}
+				}
+				else if(rect.top<=80){
+					amin=180;
+					amax=360;
+				}
+				else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
+					amin=0;
+					amax=180;
+				}
+				else{
+					var dx=ui.chessContainer.offsetWidth/2-(rect.left+rect.width/2);
+					var dy=-ui.chessContainer.offsetHeight/2+(rect.top+rect.height/2);
+					var ang=Math.abs(Math.atan(dy/dx))*180/Math.PI;
+					if(dx<0){
+						if(dy>0){
+							ang=180-ang;
+						}
+						else{
+							ang+=180;
+						}
+					}
+					else if(dy<0){
+						ang=360-ang;
+					}
+					amin=ang-180;
+					amax=ang+180;
+				}
+				var da=(amax-amin)/(thrown.length*2);
+				if(da>30&&thrown.length>1){
+					amin+=(da-30)*thrown.length;
+					da=30;
+				}
+				for(var i=0;i<thrown.length;i++){
+					var lengthi=length+Math.random()*rand;
+					var ang=amin+da*(2*i+1);
+					ang*=Math.PI/180;
+					var tx=lengthi*Math.cos(ang);
+					var ty=-lengthi*Math.sin(ang);
+					thrown[i].style.transform='translate('+tx+'px,'+ty+'px)';
+				}
+			},
 		},
 		playerproto:{
 			replaceChessPlayer:function(){
@@ -2212,27 +2259,6 @@ mode.chess={
 			if(ay==by&&Math.abs(ax-bx)==1) return true;
 
 			return false;
-		},
-		$randomMove:function(player,node,length,rand){
-			length=length+Math.random()*rand;
-			var ang=Math.random()*360;
-			ang*=Math.PI/180;
-			var tx=length*Math.cos(ang);
-			var ty=length*Math.sin(ang);
-			var rect=player.getBoundingClientRect();
-			if(rect.left<=80){
-				tx=Math.abs(tx);
-			}
-			else if(rect.left+rect.width+80>=ui.chessContainer.offsetWidth){
-				tx=-Math.abs(tx);
-			}
-			if(rect.top<=80){
-				ty=Math.abs(ty);
-			}
-			else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
-				ty=-Math.abs(ty);
-			}
-			node.style.transform='translate('+tx+'px,'+ty+'px)';
 		},
 		draw2:function(func){
 			lib.canvasUpdates2.push(func);
@@ -6128,19 +6154,19 @@ mode.chess={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'card/leader_easy'
+			image:'mode/chess/leader_easy'
 		},
 		leader_medium:{
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'card/leader_medium'
+			image:'mode/chess/leader_medium'
 		},
 		leader_hard:{
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'card/leader_hard'
+			image:'mode/chess/leader_hard'
 		}
 	},
 	characterPack:{

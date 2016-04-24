@@ -4,9 +4,7 @@ mode.story={
         'step 0'
         game.loadChess();
         'step 1'
-        game.combat({
-            size:[6,4]
-        });
+        game.loadScene();
     },
     game:{
         minskin:true,
@@ -173,7 +171,6 @@ mode.story={
                     }
                 }
                 ai.get.attitude=result.ai.get.attitude;
-                game.$randomMove=result.game.$randomMove;
                 game.modeSwapPlayer=result.game.modeSwapPlayer;
                 game.isChessNeighbour=result.game.isChessNeighbour;
                 get.chessDistance=result.get.chessDistance;
@@ -266,6 +263,16 @@ mode.story={
         		ui.chessscroll2.addEventListener('mouseenter',chessscroll);
         		ui.chessscroll2.addEventListener('mouseleave',leavescroll);
             }
+        },
+        loadScene:function(){
+            var next=game.createEvent('loadScene');
+            next.content=function(){
+                'step 0'
+                if(lib.storage.version!=lib.story.version){
+                    game.pause();
+                    
+                }
+            }
         }
     },
     element:{
@@ -339,6 +346,9 @@ mode.story={
 		},
     },
     posmap:{},
+    story:{
+        version:1
+    },
     translate:{
         friend:'友',
         friend2:'友',

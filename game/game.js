@@ -9740,11 +9740,46 @@
 					node.fixed=true;
 					node.hide();
 
+                    var dx,dy;
                     if(game.chess){
                         var rect=this.getBoundingClientRect();
 
-                        var dx=rect.left+this.offsetWidth/2-ui.arena.offsetWidth/2;
-    					var dy=rect.top+this.offsetHeight/2-ui.arena.offsetHeight/2;
+                        if(rect.left<=80){
+                            dx=-10;
+        					if(rect.top<=80){
+        						dy=-10;
+        					}
+        					else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
+        						dy=10;
+        					}
+        					else{
+        						dy=0;
+        					}
+        				}
+        				else if(rect.left+rect.width+80>=ui.chessContainer.offsetWidth){
+                            dx=10;
+        					if(rect.top<=80){
+        						dy=-10;
+        					}
+        					else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
+        						dy=10;
+        					}
+        					else{
+        						dy=0;
+        					}
+        				}
+        				else if(rect.top<=80){
+        					dx=0;
+                            dy=-10;
+        				}
+        				else if(rect.top+rect.height+80>=ui.chessContainer.offsetHeight){
+        					dx=0;
+                            dy=10;
+        				}
+        				else{
+                            dx=rect.left+this.offsetWidth/2-ui.arena.offsetWidth/2;
+        					dy=rect.top+this.offsetHeight/2-ui.arena.offsetHeight/2;
+        				}
 
                         var coeff=240/Math.sqrt(dx*dx+dy*dy);
                         dx*=coeff;
@@ -9759,8 +9794,8 @@
                         node.style.left='calc(50% - 52px)';
     					node.style.top='calc(50% - 52px)';
 
-                        var dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
-    					var dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
+                        dx=this.offsetLeft+this.offsetWidth/2-52-node.offsetLeft;
+    					dy=this.offsetTop+this.offsetHeight/2-52-node.offsetTop;
                     }
 					node.style.transitionDuration='0.8s';
 					ui.refresh(node);
@@ -20837,6 +20872,10 @@
 						if(button1.disabled){
 							return;
 						}
+                        else if(!game.download){
+                            alert('此版本不支持游戏内更新，请手动更新');
+                            return;
+                        }
 						else{
 							button1.innerHTML='正在检查更新';
 							button1.disabled=true;
