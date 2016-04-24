@@ -268,10 +268,7 @@ mode.story={
             var next=game.createEvent('loadScene');
             next.content=function(){
                 'step 0'
-                if(lib.storage.version!=lib.story.version){
-                    game.pause();
-                    
-                }
+                game.pause();
             }
         }
     },
