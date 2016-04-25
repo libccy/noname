@@ -1072,7 +1072,7 @@ margin-bottom: 5px;
 }
 .card.thrown{position: absolute;opacity: 1;margin:0;z-index: 3;}
 #arena>.card.thrown{pointer-events: none}
-#arena.thrownhighlight>.card.thrown:not(.thrownhighlight){
+#arena.thrownhighlight>.card.thrown:not(.thrownhighlight):not(.drawingcard){
 	opacity: 0.5;
 	transform:scale(0.95);
 	/*-webkit-filter:blur(3px);*/

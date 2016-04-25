@@ -3239,10 +3239,10 @@
 				if(!lib.config.gameRecord){
 					lib.config.gameRecord={};
 				}
-                if(lib.config.debug){
-                    mode.pack.story='剧情';
-                    mode.pack.realtime='即时';
-                }
+                // if(lib.config.debug){
+                //     mode.pack.story='剧情';
+                //     mode.pack.realtime='即时';
+                // }
 				for(i in mode.pack){
 					if(lib.config.hiddenModePack.indexOf(i)==-1){
 						lib.config.all.mode.push(i);
@@ -4711,6 +4711,14 @@
 				},
 				chooseToUse:function(){
 					"step 0"
+                    var skills=player.get('s');
+                    game.expandSkills(skills);
+                    for(var i=0;i<skills.length;i++){
+                        var info=lib.skill[skills[i]];
+                        if(info&&info.onChooseToUse){
+                            info.onChooseToUse(event);
+                        }
+                    }
                     _status.noclearcountdown=true;
 					if(event.isMine()){
                         if(event.type=='wuxie'){
@@ -4951,7 +4959,12 @@
 									}
 								});
 							}
-							if(event.prompt!=false){
+                            if(Array.isArray(event.dialog)){
+                                event.dialog=ui.create.dialog.apply(this,event.dialog);
+    							event.dialog.open();
+                                event.dialog.classList.add('noselect');
+                            }
+							else if(event.prompt!=false){
 								var str;
 								if(typeof(event.prompt)=='string') str=event.prompt;
 								else{
@@ -5013,7 +5026,7 @@
 						}
 					}
 					if(!game.online) player.discard(event.result.cards);
-					if(event.dialog) event.dialog.close();
+					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
 				chooseToCompare:function(){
 					"step 0"
@@ -6300,7 +6313,18 @@
 					game.log(player,'弃置了',cards);
 					player.lose(cards);
 					if(event.animate!=false){
-						player.$throw(cards,1000);
+                        event.discardid=lib.status.videoId++;
+                        game.broadcastAll(function(player,cards,id){
+                            player.$throw(cards,null,'nobroadcast');
+                            var cardnodes=[];
+                            cardnodes._discardtime=get.time();
+                            for(var i=0;i<cards.length;i++){
+                                if(cards[i].clone){
+                                    cardnodes.push(cards[i].clone);
+                                }
+                            }
+                            ui.todiscard[id]=cardnodes;
+                        },player,cards,event.discardid);
 						if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
 							if(event.delay!=false){
 								var waitingForTransition=get.time();
@@ -7984,7 +8008,7 @@
 							if(next.filterCard) next.ai=arguments[i];
 							else next.filterCard=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'){
+						else if(typeof arguments[i]=='object'&&arguments[i]){
 							next.filterCard=get.filter(arguments[i]);
 							filter=arguments[i];
 						}
@@ -8047,12 +8071,17 @@
 							if(next.filterCard) next.ai=arguments[i];
 							else next.filterCard=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'){
+						else if(typeof arguments[i]=='object'&&arguments[i]){
 							next.filterCard=get.filter(arguments[i]);
 						}
 						else if(typeof arguments[i]=='string'){
 							next.prompt=arguments[i];
 						}
+                        if(arguments[i]===null){
+                            for(var i=0;i<arguments.length;i++){
+                                console.log(arguments[i]);
+                            }
+                        }
 					}
 					if(next.isMine()==false&&next.dialog) next.dialog.style.display='none';
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
@@ -8167,7 +8196,7 @@
 							if(next.filterCard) next.ai=arguments[i];
 							else next.filterCard=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'){
+						else if(typeof arguments[i]=='object'&&arguments[i]){
 							next.filterCard=get.filter(arguments[i]);
 						}
 						else if(typeof arguments[i]=='string'){
@@ -8319,7 +8348,7 @@
 							if(next.ai) next.filterButton=arguments[i];
 							else next.ai=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'){
+						else if(typeof arguments[i]=='object'&&arguments[i]){
 							next.filterButton=get.filter(arguments[i]);
 						}
 						else if(typeof arguments[i]=='string'){
@@ -8364,7 +8393,7 @@
 							if(next.ai) next.filterButton=arguments[i];
 							else next.ai=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'){
+						else if(typeof arguments[i]=='object'&&arguments[i]){
 							next.filterButton=get.filter(arguments[i]);
 						}
 						else if(typeof arguments[i]=='string'){
@@ -8409,7 +8438,7 @@
 							if(next.ai) next.filterButton=arguments[i];
 							else next.ai=arguments[i];
 						}
-						else if(typeof arguments[i]=='object'){
+						else if(typeof arguments[i]=='object'&&arguments[i]){
 							next.filterButton=get.filter(arguments[i]);
 						}
 						else if(typeof arguments[i]=='string'){
@@ -9732,10 +9761,10 @@
 					}
 					if(cards){
 						cards=cards.slice(0);
-						node=cards.shift().copy('thrown');
+						node=cards.shift().copy('thrown','drawingcard');
 					}
 					else{
-						node=ui.create.div('.card.thrown');
+						node=ui.create.div('.card.thrown.drawingcard');
 					}
 					node.fixed=true;
 					node.hide();
@@ -9945,9 +9974,11 @@
 				},
 				$throw:function(card,time,init){
 					if(init!==false){
-                        game.broadcast(function(player,card,time,init){
-                            player.$throw(card,time,init);
-                        },this,card,time,init);
+                        if(init!=='nobroadcast'){
+                            game.broadcast(function(player,card,time,init){
+                                player.$throw(card,time,init);
+                            },this,card,time,init);
+                        }
 						if(get.itemtype(card)!='cards'){
 							if(get.itemtype(card)=='card'){
 								card=[card];
@@ -11152,7 +11183,8 @@
 						selectCard:this.selectCard,
 						position:this.position,
 						forced:this.forced,
-						aiexclude:this.aiexclude
+						aiexclude:this.aiexclude,
+                        complexSelect:this.complexSelect
 					}
 					if(skill){
 						var info=get.info(skill);
@@ -11166,7 +11198,8 @@
 							if(info.filterCard!=undefined) this.filterCard=get.filter(info.filterCard);
 							if(info.selectCard!=undefined) this.selectCard=info.selectCard;
 							if(info.position!=undefined) this.position=info.position;
-							if(info.forced!=undefined) this.forced=info.forced;
+                            if(info.forced!=undefined) this.forced=info.forced;
+							if(info.complexSelect!=undefined) this.complexSelect=info.complexSelect;
 						}
 						else{
 							this.filterButton=info.filterButton?get.filter(info.filterButton):undefined;
@@ -11176,7 +11209,8 @@
 							this.filterCard=info.filterCard?get.filter(info.filterCard):undefined;
 							this.selectCard=info.selectCard;
 							this.position=info.position;
-							this.forced=info.forced;
+                            this.forced=info.forced;
+							this.complexSelect=info.complexSelect;
 						}
 					}
 				},
@@ -11190,7 +11224,8 @@
 						this.selectCard=this._backup.selectCard;
 						this.position=this._backup.position;
 						this.forced=this._backup.forced;
-						this.aiexclude=this._backup.aiexclude;
+                        this.aiexclude=this._backup.aiexclude;
+						this.complexSelect=this._backup.complexSelect;
 					}
 					delete this.skill;
 				},
@@ -11957,6 +11992,35 @@
 					player.stat.push({card:{},skill:{}});
 				},
 			},
+            _discard:{
+                trigger:{global:'discardAfter'},
+                forced:true,
+                popup:false,
+                priority:-100,
+                filter:function(event){
+                    return ui.todiscard[event.discardid]?true:false;
+                },
+                content:function(){
+                    game.broadcastAll(function(id){
+                        var todiscard=ui.todiscard[id];
+                        delete ui.todiscard[id];
+                        if(todiscard){
+                            var time=1000;
+                            if(typeof todiscard._discardtime=='number'){
+                                time+=todiscard._discardtime-get.time();
+                            }
+                            if(time<0){
+                                time=0;
+                            }
+                            setTimeout(function(){
+                                for(var i=0;i<todiscard.length;i++){
+                                    todiscard[i].delete();
+                                }
+                            },time);
+                        }
+                    },trigger.discardid);
+                }
+            },
 			_save:{
 				trigger:{source:'dying',player:'dying'},
 				priority:5,
@@ -17692,6 +17756,7 @@
 		updates:[],
 		thrown:[],
 		touchlines:[],
+        todiscard:{},
 		refresh:function(node){
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
@@ -22284,7 +22349,7 @@
 
 					case 'card':
 					if(typeof item.copy=='function'){
-						node=item.copy();
+						node=item.copy(false);
 					}
 					else{
 						node=item.cloneNode(true);
@@ -24112,7 +24177,7 @@
 				if(this.classList.contains('selectable')==false) return;
 				if(this.classList.contains('selected')){
 					ui.selected.buttons.remove(this);
-					if(_status.multitarget){
+					if(_status.multitarget||_status.event.complexSelect){
 						game.uncheck();
 						game.check();
 					}
@@ -24141,7 +24206,7 @@
 				var notoggle=false;
 				if(this.classList.contains('selected')){
 					ui.selected.cards.remove(this);
-					if(_status.multitarget){
+					if(_status.multitarget||_status.event.complexSelect){
 						game.uncheck();
 						game.check();
 						notoggle=true;
@@ -24336,7 +24401,7 @@
 				this.unprompt();
 				if(this.classList.contains('selected')){
 					ui.selected.targets.remove(this);
-					if(_status.multitarget){
+					if(_status.multitarget||_status.event.complexSelect){
 						game.uncheck();
 						game.check();
 					}

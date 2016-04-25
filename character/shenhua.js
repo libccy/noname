@@ -1559,7 +1559,10 @@ character.shenhua={
 			enable:'phaseUse',
 			usable:1,
 			position:'he',
-			filterCard:true,
+			filterCard:function(){
+				if(ui.selected.targets.length==2) return false;
+				return true;
+			},
 			selectCard:[0,Infinity],
 			selectTarget:2,
 			filterTarget:function(card,player,target){
@@ -1734,7 +1737,7 @@ character.shenhua={
 			},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('h',{suit:'spade'})>0;
+					return player.num('h',{suit:'spade'})>0&&player.hp<=0;
 				},
 				threaten:1.5,
 				save:true,
