@@ -27,8 +27,9 @@
             break;
         }
     }
-    if(window.location.href.indexOf('index.html?server')!=-1){
-        window.isNonameServer=true;
+    var index=window.location.href.indexOf('index.html?server=');
+    if(index!=-1){
+        window.isNonameServer=window.location.href.slice(index+18);
         window.indexedDB=null;
     }
 }());
@@ -12513,7 +12514,7 @@
                         },true);
 
                         if(window.isNonameServer){
-                            var cfg='pagecfg'+lib.config.pageId;
+                            var cfg='pagecfg'+window.isNonameServer;
                             if(lib.config[cfg]){
                                 lib.configOL=lib.config[cfg][0];
                                 game.send('server','server',lib.config[cfg].slice(1));
@@ -16034,7 +16035,7 @@
 			}
             if(window.isNonameServer){
                 lib.configOL.gameStarted=false;
-                game.saveConfig('pagecfg'+lib.config.pageId,[lib.configOL,game.roomId,_status.onlinenickname,_status.onlineavatar]);
+                game.saveConfig('pagecfg'+window.isNonameServer,[lib.configOL,game.roomId,_status.onlinenickname,_status.onlineavatar]);
                 game.reload();
             }
 		},
