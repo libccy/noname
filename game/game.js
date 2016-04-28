@@ -4850,6 +4850,7 @@
                                 var next=player.chooseButton(dialog);
                                 next.set('ai',info.chooseButton.check||function(){return 1;});
                                 next.set('filterButton',info.chooseButton.filter||function(){return true;});
+                                next.set('selectButton',info.chooseButton.select||1);
                                 event.buttoned=event.result.skill;
                             }
                         }
