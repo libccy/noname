@@ -32,8 +32,8 @@ character.sp={
 		shixie:['male','qun',3,['biluan','lixia']],
 		mayunlu:['female','shu',4,['fengpo','mashu']],
 		zhanglu:['male','qun',3,['yishe','bushi','midao']],
-		//from here
 		wutugu:['male','qun',15,['ranshang','hanyong']],
+		//from here
 		sp_caiwenji:['female','wei',3,['chenqing','mozhi']],
 		zhugeguo:['female','shu',3,['yuhua','qirang']],
 		liuzan:['male','wu',4,['fenyin']],
@@ -2239,8 +2239,8 @@ character.sp={
 				}
 				else{
 					player.storage.ranshang=1;
-					player.markSkill('ranshang');
 				}
+				player.markSkill('ranshang');
 				game.addVideo('storage',player,['ranshang',player.storage.ranshang]);
 			},
 			intro:{
