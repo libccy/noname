@@ -457,7 +457,7 @@ character.shenhua={
 					if(get.position(link)=='e'){
 						event.targets[1].equip(link);
 					}
-					else if(result.buttons[0].link.viewAs){
+					else if(link.viewAs){
 						event.targets[1].addJudge({name:link.viewAs},[link]);
 					}
 					else{

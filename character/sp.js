@@ -4621,7 +4621,7 @@ character.sp={
 				}).set('judge',judge).set('attitude',attitude);
 				"step 1"
 				if(result.bool){
-					event.card=result.buttons[0].link;
+					event.card=result.links[0];
 					player.respond(event.card,'highlight');
 				}
 				else{

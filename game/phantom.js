@@ -1,7 +1,7 @@
 var load=function(id){
     var page = require('webpage').create();
     page.settings.userAgent = 'SpecialAgent';
-    page.open('file:///Users/widget/Documents/noname/index.html?server='+id, function(status) {
+    page.open('http://localhost/index.html?server='+id, function(status) {
         if(status !== 'success') {
             console.log('Unable to access network');
         }
