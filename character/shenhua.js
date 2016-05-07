@@ -2696,7 +2696,7 @@ character.shenhua={
 					},
 					ai2:function(target){
 						var att=ai.get.attitude(_status.event.player,target);
-						var trigger=_status.event.getParent()._trigger;
+						var trigger=_status.event.getTrigger();
 						var da=0;
 						if(_status.event.player.hp==1){
 							da=10;
@@ -2900,7 +2900,7 @@ character.shenhua={
 				get.translation(trigger.player.judging[0])+'，是否发动【鬼道】？','he',function(card){
 					return get.color(card)=='black';
 				}).set('ai',function(card){
-					var trigger=_status.event.getParent()._trigger;
+					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var judging=_status.event.judging;
 					var result=trigger.judge(card)-trigger.judge(judging);

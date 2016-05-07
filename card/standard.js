@@ -244,7 +244,7 @@ card.standard={
 						if(target.hp<0&&target!=player&&target.identity!='zhu') return 0;
 						var att=ai.get.attitude(player,target);
 						if(att<3&&att>=0&&player!=target) return 0;
-						var tri=_status.event.getParent()._trigger;
+						var tri=_status.event.getTrigger();
 						if(mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
 								var num=0;
@@ -1217,7 +1217,7 @@ card.standard={
 			content:function(){
 				"step 0"
 				trigger.target.chooseToDiscard().set('ai',function(card){
-					var trigger=_status.event.getParent()._trigger;
+					var trigger=_status.event.getTrigger();
 					return -ai.get.attitude(trigger.target,trigger.player)-ai.get.value(card);
 				});
 				"step 1"

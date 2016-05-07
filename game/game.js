@@ -4736,7 +4736,7 @@
                                 return;
                             }
                             if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
-                                var tw=event.getParent()._trigger.parent;
+                                var tw=event.getTrigger().parent;
                                 if(tw.player==player&&tw.targets&&tw.targets.length==1){
                                     event.result={
                                         bool:false
@@ -5485,6 +5485,16 @@
 					"step 0"
 					if(event.isMine()){
 						ui.create.confirm('oc');
+                        if(event.createDialog&&!event.dialog){
+                            if(Array.isArray(event.createDialog)){
+                                event.dialog=ui.create.dialog.apply(this,event.createDialog);
+                                if(event.dialogselectx){
+                                    for(var i=0;i<event.dialog.buttons.length;i++){
+                                        event.dialog.buttons[i].classList.add('selectedx');
+                                    }
+                                }
+                            }
+                        }
 						if(event.dialog){
 							event.dialog.open();
 						}
@@ -5899,7 +5909,7 @@
 					if(event.animate!=false){
 						if(card.name=='wuxie'&&event.getParent().target){
 							var lining=event.getParent().target2||event.getParent().target;
-							if(Array.isArray(lining)&&event.getParent()._trigger.name=='jiedao'){
+							if(Array.isArray(lining)&&event.getTrigger().name=='jiedao'){
 								player.line(lining[0],'green');
 							}
 							else{
@@ -11177,6 +11187,9 @@
                         }
                     }
                     return parent;
+                },
+                getTrigger:function(){
+                    return this.getTrigger();
                 },
 				backup:function(skill){
 					this._backup={

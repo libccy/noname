@@ -150,7 +150,7 @@ character.standard={
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？').set('ai',function(card){
-					var trigger=_status.event.getParent()._trigger;
+					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var judging=_status.event.judging;
 					var result=trigger.judge(card)-trigger.judge(judging);
@@ -1219,7 +1219,7 @@ character.standard={
 				var next=player.chooseCardTarget({
 					position:'he',
 					filterTarget:function(card,player,target){
-						var trigger=_status.event.getParent()._trigger;
+						var trigger=_status.event.getTrigger();
 						if(get.distance(player,target,'attack')<=1&&
 							target!=trigger.player&&target!=player){
 							if(player.canUse(trigger.card,target)) return true;

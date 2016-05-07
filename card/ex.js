@@ -37,7 +37,7 @@ card.ex={
 			content:function(){
 				"step 0"
 				player.choosePlayerCard('是否发动【寒冰剑】？','he',trigger.target,Math.min(2,trigger.target.num('he')),function(button){
-					var trigger=_status.event.getParent()._trigger;
+					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var eff=ai.get.damageEffect(trigger.target,player,player);
 					if(ai.get.attitude(player,trigger.target)>0){

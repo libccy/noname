@@ -134,7 +134,7 @@ character.refresh={
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？','he').set('ai',function(card){
-					var trigger=_status.event.getParent()._trigger;
+					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var judging=_status.event.judging;
 					var result=trigger.judge(card)-trigger.judge(judging);
@@ -675,7 +675,7 @@ character.refresh={
 				"step 0"
 				if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
 					player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel').ai=function(){
-						var trigger=_status.event.getParent()._trigger;
+						var trigger=_status.event.getTrigger();
 						if(trigger.cards.length==1&&trigger.cards[0].name=='sha') return 0;
 						return 1;
 					};
@@ -1210,9 +1210,9 @@ character.refresh={
 				"step 0"
 				player.chooseTarget('选择令'+get.translation(trigger.card)+'无效的目标',
 					[1,trigger.targets.length],function(card,player,target){
-					return _status.event.getParent()._trigger.targets.contains(target);
+					return _status.event.getTrigger().targets.contains(target);
 				}).set('ai',function(target){
-					var trigger=_status.event.getParent()._trigger;
+					var trigger=_status.event.getTrigger();
 					if(game.phaseNumber>game.players.length*2&&trigger.targets.length>=game.players.length-1){
 						return -ai.get.effect(target,trigger.card,trigger.player,_status.event.player);
 					}

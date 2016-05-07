@@ -130,7 +130,7 @@ card.refresh={
 			content:function(){
 				"step 0"
 				player.chooseButton(['木牛流马',player.get('e','5').cards]).set('filterButton',function(button){
-					var evt=_status.event.getParent()._trigger;
+					var evt=_status.event.getTrigger();
 					if(evt&&evt.filterCard){
 						return evt.filterCard(button.link,_status.event.player);
 					}
