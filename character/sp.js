@@ -1,5 +1,6 @@
 'use strict';
 character.sp={
+	connect:true,
 	character:{
 		yangxiu:['male','wei',3,['jilei','danlao']],
 		chenlin:['male','wei',3,['bifa','songci']],

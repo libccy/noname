@@ -52,7 +52,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:7,
+        versionOL:8,
 		updateURL:localStorage.getItem('noname_update_url')||'http://123.206.55.178/',
 		assetURL:'',
         hallURL:'123.206.55.178',
@@ -13136,7 +13136,12 @@
             game.broadcast.apply(this,arguments);
             var args=Array.from(arguments);
             args.shift();
-            func.apply(this,args);
+            if(typeof func=='string'){
+                func=lib.message.client[func];
+            }
+            if(typeof func=='function'){
+                func.apply(this,args);
+            }
         },
         syncState:function(){
             var state=null;
@@ -23263,7 +23268,7 @@
 					_status._swipeorigin={
 						clientX:e.touches[0].clientX,
 						clientY:e.touches[0].clientY,
-						time:get.currentTime()
+						time:get.utc()
 					}
 				}
 			},
@@ -23516,7 +23521,7 @@
 					},500);
 				}
 				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging){
-					 if(get.currentTime()-_status._swipeorigin.time<500){
+					 if(get.utc()-_status._swipeorigin.time<500){
 						var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
 						var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
 						var goswipe=function(action){
@@ -25600,8 +25605,8 @@
 				return lib.getUTC(new Date())-lib.getUTC(lib.status.date)-lib.status.dateDelayed;
 			}
 		},
-		currentTime:function(){
-			return lib.getUTC(new Date());
+		utc:function(){
+			return (new Date()).getTime();
 		},
 		evtDistance:function(e1,e2){
 			return Math.sqrt((e1.x-e2.x)*(e1.x-e2.x)+(e1.y-e2.y)*(e1.y-e2.y));

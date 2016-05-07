@@ -4658,6 +4658,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				player.chooseControl('jiangchi_less','jiangchi_more','cancel',function(){
+					var player=_status.event.player;
 					if(player.num('h')>3&&player.num('h','sha')>1){
 						return 'jiangchi_less';
 					}
@@ -5060,41 +5061,61 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				event.cards=get.cards(4);
-				if(event.isMine()==false){
-					event.dialog=ui.create.dialog('称象',event.cards);
-					game.delay(2);
-				}
+				event.videoId=lib.status.videoId++;
+				game.broadcastAll(function(player,id,cards){
+					var str;
+					if(player==game.me&&!_status.auto){
+						str='称象：选择任意张点数小于13的牌';
+					}
+					else{
+						str='称象';
+					}
+					var dialog=ui.create.dialog(str,cards);
+					dialog.videoId=id;
+				},player,event.videoId,event.cards);
+				event.time=get.utc();
 				game.addVideo('showCards',player,['称象',get.cardsInfo(event.cards)]);
 				game.addVideo('delay',null,2);
 				"step 1"
-				if(event.dialog) event.dialog.close();
-				var dialog=ui.create.dialog('称象：选择任意张点数小于13的牌',event.cards);
-				var next=player.chooseButton([0,4],dialog);
-				next.filterButton=function(button){
+				var next=player.chooseButton([0,4]);
+				next.set('dialog',event.videoId);
+				next.set('filterButton',function(button){
 					var num=0
 					for(var i=0;i<ui.selected.buttons.length;i++){
 						num+=get.number(ui.selected.buttons[i].link);
 					}
 					return (num+get.number(button.link)<=13);
-				}
-				next.ai=function(button){
+				});
+				next.set('ai',function(button){
 					return ai.get.value(button.link,_status.event.player);
-				};
+				});
 				"step 2"
-				if(result.bool&&result.buttons){
+				if(result.bool&&result.links){
 					player.logSkill('chengxiang');
 					var cards2=[];
-					for(var i=0;i<result.buttons.length;i++){
-						cards2.push(result.buttons[i].link);
-						cards.remove(result.buttons[i].link);
+					for(var i=0;i<result.links.length;i++){
+						cards2.push(result.links[i]);
+						cards.remove(result.links[i]);
 					}
-					player.gain(cards2);
-					player.$gain(cards2);
 					for(var i=0;i<cards.length;i++){
 						ui.discardPile.appendChild(cards[i]);
 					}
-					game.delay(2);
+					event.cards2=cards2;
 				}
+				else{
+					event.finish();
+				}
+				var time=1000-(get.utc()-event.time);
+				if(time>0){
+					game.delay(0,time);
+				}
+				"step 3"
+				game.broadcastAll('closeDialog',event.videoId);
+				var cards2=event.cards2;
+				player.gain(cards2);
+				player.$draw(cards2);
+				game.log(player,'获得了',cards2)
+				game.delay(2);
 			},
 			ai:{
 				maixie:true,
@@ -5129,12 +5150,13 @@ character.yijiang={
 				"step 0"
 				var next=player.chooseToDiscard('是否发动【仁心】？',{type:'equip'},'he');
 				next.logSkill=['renxin',trigger.player];
-				next.ai=function(card){
-					if(ai.get.attitude(player,trigger.player)>3){
+				next.set('ai',function(card){
+					var player=_status.event.player;
+					if(ai.get.attitude(player,_status.event.getTrigger().player)>3){
 						return 11-ai.get.value(card);
 					}
 					return -1;
-				}
+				});
 				"step 1"
 				if(result.bool){
 					player.turnOver();
