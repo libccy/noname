@@ -4880,7 +4880,7 @@
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
 					}
-					if(event.result.bool&&!game.online&&!event.nouse){
+					if(event.result&&event.result.bool&&!game.online&&!event.nouse){
                         player.useResult(event.result,event);
 					}
                     else if(event._sendskill){
@@ -11152,6 +11152,9 @@
                         var next=game.me[name].apply(game.me,args);
                         for(var i=0;i<set.length;i++){
                             next.set(set[i][0],set[i][1]);
+                        }
+                        if(next._backupevent){
+                            next.backup(next._backupevent);
                         }
                         next._modparent=event;
                         game.resume();
