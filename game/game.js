@@ -53,9 +53,9 @@
 	var lib={
 		configprefix:'noname_0.9_',
         versionOL:8,
-		updateURL:localStorage.getItem('noname_update_url')||'http://123.206.55.178/',
+		updateURL:localStorage.getItem('noname_update_url')||'http://websha.cn/',
 		assetURL:'',
-        hallURL:'123.206.55.178',
+        hallURL:'websha.cn',
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -15428,7 +15428,7 @@
 						var str;
 						var check=get.info(event.skill).check;
 						if(get.info(event.skill).prompt) str=get.info(event.skill).prompt;
-						else str='是否发动【'+get.translation(event.skill)+'】？';
+						else str='是否发动【'+get.skillTranslation(event.skill,player)+'】？';
 						if(typeof str=='function'){str=str(trigger,player)}
 						player.chooseBool(str).ai=function(){
 							return !check||check(trigger,player);
@@ -25949,9 +25949,15 @@
 			if(card.parentNode.id=='discardPile') return 'd';
 			if(card.parentNode.id=='special') return 's';
 		},
-        skillTranslation(str,player){
-            if(str.indexOf('re')==0&&player){
-                var str2=str.slice(2);
+        skillTranslation:function(str,player){
+            var str2;
+            if(str.indexOf('re')==0){
+                str2=str.slice(2);
+            }
+            else if(str.indexOf('xin')==0){
+                str2=str.slice(3);
+            }
+            if(str2){
                 if(lib.translate[str]==lib.translate[str2]){
                     if(player.hasSkill(str2)){
                         return '新'+lib.translate[str];

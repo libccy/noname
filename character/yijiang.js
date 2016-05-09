@@ -64,6 +64,7 @@ character.yijiang={
 		guotufengji:['male','qun',3,['jigong','shifei']],
 
 		xin_yujin:['male','wei',4,['jieyue']],
+		xin_liru:['male','qun',3,['xinjuece','xinmieji','xinfencheng']],
 	},
 	perfectPair:{
 		wuguotai:['sunjian','sunshangxiang'],
@@ -4198,7 +4199,7 @@ character.yijiang={
 						return att;
 					},
 					position:'he',
-					prompt:'是否发动【举荐】？'
+					prompt:'是否发动【'+get.skillTranslation('xinjujian',player)+'】？'
 				});
 				"step 1"
 				if(result.bool){
