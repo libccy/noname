@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.8.4',
+    '1.8.5',
     'image/background/huangtian_bg.jpg',
     'image/background/shengshi_bg.jpg',
     'image/background/xueji_bg.jpg',
@@ -1231,7 +1231,7 @@ window.noname_asset_list=[
     'audio/die/zhoutai.mp3',
     'audio/die/zhouyu.mp3',
     'audio/die/zhugedan.mp3',
-    'audio/die/zhugeguo.ogg',
+    'audio/die/zhugeguo.mp3',
     'audio/die/zhugejin.mp3',
     'audio/die/zhugeke.mp3',
     'audio/die/zhugeliang.mp3',

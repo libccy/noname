@@ -605,11 +605,10 @@ character.standard={
 			audio:2,
 			audioname:['liushan'],
 			enable:'chooseToUse',
-			usable:20,
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
 				if(!player.isZhu) return false;
-				if(player!=game.me&&player.skills.contains('jijiang3')) return false;
+				if(player.skills.contains('jijiang3')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].group=='shu'&&game.players[i]!=player){
 						return lib.filter.cardUsable({name:'sha'},player);
@@ -629,7 +628,7 @@ character.standard={
 				"step 0"
 				if(event.current==undefined) event.current=player.next;
 				if(event.current==player){
-					player.addTempSkill('jijiang3','phaseAfter');
+					player.addSkill('jijiang3');
 					event.getParent(2).step=0;
 					event.finish();
 				}
@@ -682,7 +681,18 @@ character.standard={
 				},
 			}
 		},
-		jijiang3:{},
+		jijiang3:{
+			trigger:{global:['useCardAfter','useSkillAfter','phaseAfter']},
+			forced:true,
+			popup:false,
+			silent:true,
+			filter:function(event){
+				return event.skill!='jijiang2'&&event.skill!='qinwang2';
+			},
+			content:function(){
+				player.removeSkill('jijiang3');
+			}
+		},
 		wusheng:{
 			audio:3,
 			enable:['chooseToRespond','chooseToUse'],

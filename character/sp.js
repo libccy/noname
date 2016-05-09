@@ -4872,7 +4872,7 @@ character.sp={
 			audio:false,
 			content:function(){
 				"step 0"
-				if(player.storage.bifa[1].isAlive()){
+				if(player.storage.bifa[1].isAlive()&&player.num('h')){
 					player.chooseCard(get.translation(player.storage.bifa[1])+
 						'的笔伐牌为'+get.translation(player.storage.bifa[0]),function(card){
 						return get.type(card,'trick')==_status.event.type;
@@ -4892,7 +4892,7 @@ character.sp={
 				else{
 					ui.discardPile.appendChild(player.storage.bifa[0]);
 					game.log(player.storage.bifa[0],'进入弃牌堆');
-					player.$throw(player.storage.bifa[0]);
+					player.$throw(player.storage.bifa[0],1000);
 					player.loseHp();
 				}
 				player.removeSkill('bifa2');

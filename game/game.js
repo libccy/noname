@@ -8143,7 +8143,7 @@
 						else if(get.itemtype(arguments[i])=='select'||typeof arguments[i]=='number') select=arguments[i];
 					}
 					if(prompt==undefined) prompt='请选择卡牌';
-					return this.chooseButton([prompt,cards,'hidden'],forced,select,'hidden');
+					return this.chooseButton(forced,select,'hidden',[prompt,cards,'hidden']);
 				},
 				chooseButton:function(){
 					var next=game.createEvent('chooseButton');
@@ -9645,9 +9645,10 @@
 				isIn:function(){
 					return this.classList.contains('dead')==false&&this.classList.contains('out')==false&&!this.removed;
 				},
-				isUnderControl:function(self){
+				isUnderControl:function(self,me){
+                    me=me||game.me;
 					if(this.isMad()) return false;
-					if(this===game.me){
+					if(this===me){
 						if(self) return true;
 						return false;
 					}
@@ -9655,17 +9656,17 @@
 					if(lib.config.mode=='versus'){
 						if(_status.mode=='four'||_status.mode=='jiange') return false;
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
-							this.side==game.me.side;
+							this.side==me.side;
 					}
 					else if(lib.config.mode=='boss'){
-						return this.side==game.me.side&&get.config('single_control');
+						return this.side==me.side&&get.config('single_control');
 					}
 					else if(lib.config.mode=='chess'){
 						if(_status.mode=='combat'&&!get.config('single_control')) return false;
-						return this.side==game.me.side;
+						return this.side==me.side;
 					}
                     else if(lib.config.mode=='story'){
-                        return this.side==game.me.side;
+                        return this.side==me.side;
                     }
 					return false;
 				},
@@ -11189,7 +11190,7 @@
                     return parent;
                 },
                 getTrigger:function(){
-                    return this.getTrigger();
+                    return this.getParent()._trigger;
                 },
 				backup:function(skill){
 					this._backup={
@@ -11985,11 +11986,11 @@
                         },player);
 					}
 					_status.currentPhase=player;
+					game.phaseNumber++;
                     game.syncState();
 					game.addVideo('phaseChange',player);
 					game.log();
 					game.log(player,'的回合开始');
-					game.phaseNumber++;
 					player._noVibrate=true;
 					if(get.config('identity_mode')!='zhong'&&!_status.connectMode){
 						var num;
