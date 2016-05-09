@@ -4953,7 +4953,7 @@
 						game.check();
 						if(event.isMine()){
 							game.pause();
-							if(range[1]>1){
+							if(range[1]>1&&typeof event.selectCard!='function'){
 								event.promptdiscard=ui.create.control('提示',function(){
 									ai.basic.chooseCard(event.ai);
 									if(_status.event.custom.add.card){
@@ -4980,11 +4980,13 @@
 									str+='牌';
 								}
 								event.dialog=ui.create.dialog(str);
-								event.dialog.add('0/'+event.selectCard[1]);
-								event.custom.add.card=function(){
-									_status.event.dialog.content.childNodes[1].innerHTML=
-									ui.selected.cards.length+'/'+_status.event.selectCard[1];
-								}
+                                if(Array.isArray(event.selectCard)){
+                                    event.dialog.add('0/'+get.numStr(event.selectCard[1]));
+    								event.custom.add.card=function(){
+    									_status.event.dialog.content.childNodes[1].innerHTML=
+    									ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1]);
+    								}
+                                }
 							}
 							else if(get.itemtype(event.dialog)=='dialog'){
 								event.dialog.style.display='';
@@ -5311,10 +5313,10 @@
 								str+='牌';
 							}
 							event.dialog=ui.create.dialog(str);
-							event.dialog.add('0/'+event.selectCard[1]);
+							event.dialog.add('0/'+get.numStr(event.selectCard[1]));
 							event.custom.add.card=function(){
 								_status.event.dialog.content.childNodes[1].innerHTML=
-								ui.selected.cards.length+'/'+_status.event.selectCard[1];
+								ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1]);
 							}
 						}
 					}
@@ -5366,10 +5368,10 @@
 								str+='个目标';
 							}
 							event.dialog=ui.create.dialog(str);
-							event.dialog.add('0/'+event.selectTarget[1]);
+							event.dialog.add('0/'+get.numStr(event.selectTarget[1]));
 							event.custom.add.target=function(){
 								_status.event.dialog.content.childNodes[1].innerHTML=
-								ui.selected.targets.length+'/'+_status.event.selectTarget[1];
+								ui.selected.targets.length+'/'+get.numStr(_status.event.selectTarget[1]);
 							}
 						}
 						else if(get.itemtype(event.dialog)=='dialog'){
@@ -8101,6 +8103,7 @@
 					if(next.ai==undefined) next.ai=ai.get.unuseful;
 					next.autochoose=function(){
 						if(!this.forced) return false;
+                        if(typeof this.selectCard=='function') return false;
 						return get.select(this.selectCard)[0]>=this.player.num(this.position||'h');
 					}
 					next.content=lib.element.playerproto.chooseToDiscard;
@@ -25546,6 +25549,9 @@
                     }
                 }
             }
+            else if(item===Infinity){
+                return '_noname_infinity';
+            }
             else{
                 return item;
             }
@@ -25561,6 +25567,9 @@
                 }
                 else if(item.indexOf('_noname_player:')==0){
                     return get.infoPlayerOL(item);
+                }
+                else if(item=='_noname_infinity'){
+                    return Infinity;
                 }
                 else{
                     return item;
@@ -25602,6 +25611,10 @@
 			}
 			return str2;
 		},
+        numStr:function(num){
+            if(num==Infinity) return '∞';
+            return num.toString();
+        },
 		slimName:function(str){
 			var str2=lib.translate[str];
 			if(!str2) return '';

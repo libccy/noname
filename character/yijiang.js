@@ -83,6 +83,89 @@ character.yijiang={
 		guanping:['guanyu'],
 	},
 	skill:{
+		xinfencheng:{
+			skillAnimation:'epic',
+			animationColor:'fire',
+			audio:2,
+			enable:'phaseUse',
+			filter:function(event,player){
+				return !player.storage.xinfencheng;
+			},
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			unique:true,
+			selectTarget:-1,
+			multitarget:true,
+			multiline:true,
+			mark:true,
+			line:'fire',
+			content:function(){
+				"step 0"
+				player.storage.xinfencheng=true;
+				player.unmarkSkill('xinfencheng');
+				event.num=1;
+				event.targets=targets.slice(0);
+				"step 1"
+				if(event.targets.length){
+					var target=event.targets.shift();
+					event.target=target;
+					var res=ai.get.damageEffect(target,player,target,'fire');
+					target.chooseToDiscard('he','弃置至少'+get.cnNumber(event.num)+'张牌或受到2点火焰伤害',[num,Infinity]).set('ai',function(card){
+						if(ui.selected.cards.length>=_status.event.getParent().num) return -1;
+						if(_status.event.player.hasSkillTag('nofire')) return -1;
+						if(_status.event.res>=0) return 6-ai.get.value(card);
+						if(get.type(card)!='basic'){
+							return 10-ai.get.value(card);
+						}
+						return 8-ai.get.value(card);
+					}).set('res',res);
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(!result.bool){
+					event.target.damage(2,'fire');
+					event.num=1;
+				}
+				else{
+					event.num=result.cards.length+1;
+				}
+				event.goto(1);
+			},
+			ai:{
+				order:1,
+				result:{
+					player:function(player){
+						var num=0;
+						for(var i=0;i<game.players.length;i++){
+							if(player!=game.players[i]&&ai.get.damageEffect(game.players[i],player,game.players[i],'fire')<0){
+								var att=ai.get.attitude(player,game.players[i]);
+								if(att>0){
+									num--;
+								}
+								else if(att<0){
+									num++;
+								}
+							}
+						}
+						if(game.players.length<5){
+							return num-1;
+						}
+						else{
+							return num-2;
+						}
+					}
+				}
+			},
+			init:function(player){
+				player.storage.xinfencheng=false;
+			},
+			intro:{
+				content:'limited'
+			}
+		},
 		xinjuece:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -103,6 +186,68 @@ character.yijiang={
 				if(result.bool){
 					player.logSkill('juece',result.targets);
 					result.targets[0].damage();
+				}
+			}
+		},
+		xinmieji:{
+			enable:'phaseUse',
+			usable:1,
+			filterCard:function(card){
+				return get.color(card)=='black'&&get.type(card,'trick')=='trick';
+			},
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('h')>0;
+			},
+			discard:false,
+			delay:false,
+			check:function(card){
+				return 8-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				player.showCards(cards);
+				'step 1'
+				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
+				var n1=target.get('he',function(card){
+					return get.type(card,'trick')=='trick';
+				});
+				var n2=target.get('he',function(card){
+					return get.type(card,'trick')!='trick';
+				});
+				if(n1.length>1||n2.length>2||(n1.length==1&&n2.length==2)){
+					target.chooseToDiscard('弃置一张锦囊牌，或两张非锦囊牌',true,'he',function(card){
+						if(!_status.event.nontrick){
+							return get.type(card,'trick')=='trick';
+						}
+						if(ui.selected.cards.length){
+							return get.type(card,'trick')!='trick';
+						}
+						return true;
+					}).set('ai',function(card){
+						if(get.type(card,'trick')=='trick'){
+							return 8-ai.get.value(card);
+						}
+						return -ai.get.value(card);
+					}).set('selectCard',function(){
+						if(ui.selected.cards.length==1&&get.type(ui.selected.cards[0],'trick')=='trick'){
+							return 1;
+						}
+						return 2;
+					}).set('nontrick',n2.length>=2);
+				}
+				else{
+					if(n1.length){
+						target.discard(n1);
+					}
+					else if(n2.length){
+						target.discard(n2);
+					}
+				}
+			},
+			ai:{
+				order:9,
+				result:{
+					target:-1
 				}
 			}
 		},

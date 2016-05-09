@@ -865,6 +865,7 @@ window.noname_asset_list=[
     'image/character/xiahouyuan.jpg',
     'image/character/xiaoqiao.jpg',
     'image/character/xin_fazheng.jpg',
+    'image/character/xin_liru.jpg',
     'image/character/xin_masu.jpg',
     'image/character/xin_xushu.jpg',
     'image/character/xin_yujin.jpg',
