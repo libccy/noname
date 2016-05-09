@@ -65,6 +65,11 @@ character.yijiang={
 
 		xin_yujin:['male','wei',4,['jieyue']],
 		xin_liru:['male','qun',3,['xinjuece','xinmieji','xinfencheng']],
+
+		guohuanghou:['female','qun',3,[]],
+		liuyu:['female','qun',3,[]],
+		liyan:['female','qun',3,[]],
+		sundeng:['female','qun',3,[]],
 	},
 	perfectPair:{
 		wuguotai:['sunjian','sunshangxiang'],

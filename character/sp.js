@@ -56,6 +56,9 @@ character.sp={
 		sp_xiahoudun:['male','wei',4,['fenyong','xuehen']],
 		sp_lvmeng:['male','wu',4,['tanhu','mouduan']],
 		wangji:['male','wei',3,['qizhi','jinqu']],
+		guansuo:['male','wei',3,['qizhi','jinqu']],
+		tadun:['male','wei',3,['qizhi','jinqu']],
+		yanbaihu:['male','wei',3,['qizhi','jinqu']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
