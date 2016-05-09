@@ -83,6 +83,29 @@ character.yijiang={
 		guanping:['guanyu'],
 	},
 	skill:{
+		xinjuece:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return game.hasPlayer(function(player){
+					return player.num('h')==0;
+				});
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【'+get.skillTranslation('xinjuece',player)+'】？',function(card,player,target){
+					return target.num('h')==0;
+				}).set('ai',function(target){
+					var player=_status.event.player;
+					return ai.get.damageEffect(target,player,player);
+				});
+				'step 1'
+				if(result.bool){
+					player.logSkill('juece',result.targets);
+					result.targets[0].damage();
+				}
+			}
+		},
 		qianju:{
 			mod:{
 				globalFrom:function(from,to,distance){
@@ -5925,7 +5948,14 @@ character.yijiang={
 		chengpu:'程普',
 		gaoshun:'高顺',
 		xin_yujin:'新于禁',
+		xin_liru:'新李儒',
 
+		xinjuece:'绝策',
+		xinjuece_info:'结束阶段开始时，你可以对没有手牌的一名角色造成1点伤害',
+		xinmieji:'灭计',
+		xinmieji_info:'出牌阶段限一次，你可以展示一张黑色锦囊牌并将之置于牌堆顶，然后令有手牌的一名其他角色选择一项：弃置一张锦囊牌；或弃置两张非锦囊牌',
+		xinfencheng:'焚城',
+		xinfencheng_info:'限定技。出牌阶段，你可以令所有其他角色各选择一项：弃置至少X张牌(X为该角色的上家以此法弃置牌的数量+1)；或受到你对其造成的2点火焰伤害',
 		qianju:'千驹',
 		qianju_info:'锁定技，若你已受伤，你计算与其他角色距离时-X（X为你已损失体力值）',
 		qingxi:'倾袭',

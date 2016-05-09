@@ -950,7 +950,7 @@ mode.identity={
 					}
 				}
 				for(i in libCharacter){
-					if(lib.filter.characterDisabled(i)) continue;
+					if(lib.filter.characterDisabled(i,libCharacter)) continue;
 					event.list.push(i);
 					event.list2.push(i);
 					if(libCharacter[i][4]&&libCharacter[i][4].contains('zhu')){

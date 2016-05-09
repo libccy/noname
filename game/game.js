@@ -11679,11 +11679,12 @@
 			filterButton:function(button){
 				return true;
 			},
-            characterDisabled:function(i){
+            characterDisabled:function(i,libCharacter){
                 if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) return true;
                 if(lib.config.forbidai.contains(i)) return true;
                 if(_status.connectMode){
                     if(lib.configOL.banned.contains(i)) return true;
+                    if(lib.config.replacecharacter[i]&&libCharacter&&libCharacter[lib.config.replacecharacter[i]]) return true;
                     var double_character=false;
                     if(lib.configOL.mode=='guozhan'){
                         double_character=true;
@@ -11709,6 +11710,7 @@
                 }
                 else{
                     if(lib.config.banned.contains(i)) return true;
+                    if(lib.config.replacecharacter[i]&&lib.character[lib.config.replacecharacter[i]]) return true;
                     var double_character=false;
                     if(lib.config.mode=='guozhan'){
                         double_character=true;
@@ -25253,13 +25255,17 @@
         },
         charactersOL:function(){
             var list=[];
+            var libCharacter={};
             for(var i=0;i<lib.configOL.characterPack.length;i++){
                 var pack=lib.characterPack[lib.configOL.characterPack[i]];
                 for(var j in pack){
                     if(j=='zuoci') continue;
-                    if(lib.filter.characterDisabled(j)) continue;
-                    if(lib.character[j]) list.push(j);
+                    if(lib.character[j]) libCharacter[j]=pack[j];
                 }
+            }
+            for(i in libCharacter){
+                if(lib.filter.characterDisabled(i,libCharacter)) continue;
+                list.push(i);
             }
             return list;
         },
