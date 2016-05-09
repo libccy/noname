@@ -167,6 +167,7 @@ character.yijiang={
 			}
 		},
 		xinjuece:{
+			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -190,6 +191,7 @@ character.yijiang={
 			}
 		},
 		xinmieji:{
+			audio:2,
 			enable:'phaseUse',
 			usable:1,
 			filterCard:function(card){
@@ -6166,7 +6168,7 @@ character.yijiang={
 		huomo_shan:'墨闪',
 		huomo_tao:'墨桃',
 		huomo_jiu:'墨酒',
-		huomo_info:'每当你需要使用一张你于此回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
+		huomo_info:'在出牌或濒死阶段，每当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
 		zuoding:'佐定',
 		zuoding_info:'每当一名其他角色于其出牌阶段内使用♠牌指定目标后，若此阶段没有角色受到过伤害，则你可以令其中一名目标角色摸一张牌',
 		taoxi:'讨袭',

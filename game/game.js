@@ -25972,14 +25972,21 @@
             var str2;
             if(str.indexOf('re')==0){
                 str2=str.slice(2);
+                if(str2){
+                    if(lib.translate[str]==lib.translate[str2]){
+                        if(player.hasSkill(str2)){
+                            return '界'+lib.translate[str];
+                        }
+                    }
+                }
             }
             else if(str.indexOf('xin')==0){
                 str2=str.slice(3);
-            }
-            if(str2){
-                if(lib.translate[str]==lib.translate[str2]){
-                    if(player.hasSkill(str2)){
-                        return '新'+lib.translate[str];
+                if(str2){
+                    if(lib.translate[str]==lib.translate[str2]){
+                        if(player.hasSkill(str2)){
+                            return '新'+lib.translate[str];
+                        }
                     }
                 }
             }

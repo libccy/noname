@@ -23,8 +23,153 @@ character.refresh={
 		re_lvbu:['male','qun',5,['wushuang','liyu']],
 		re_gongsunzan:['male','qun',4,['qiaomeng','reyicong']],
 		re_huatuo:['male','qun',3,['chulao','jijiu']],
+		re_liubei:['male','shu',4,['rerende','jijiang'],['zhu']],
 	},
 	skill:{
+		rerende:{
+			audio:2,
+			group:['rerende1'],
+			enable:'phaseUse',
+			filterCard:true,
+			selectCard:[1,Infinity],
+			discard:false,
+			prepare:function(cards,player,targets){
+				player.$give(cards.length,targets[0]);
+			},
+			filterTarget:function(card,player,target){
+				if(player.storage.rerende2&&player.storage.rerende2.contains(target)) return false;
+				return player!=target;
+			},
+			check:function(card){
+				var player=get.owner(card);
+				if(ui.selected.cards.length>=Math.max(2,player.num('h')-player.hp)) return 0;
+				if(player.hp==player.maxHp||player.storage.rerende<0||player.num('h')<=1){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].get('s').contains('haoshi')&&
+							!game.players[i].isTurnedOver()&&
+							!game.players[i].num('j','lebu')&&
+							ai.get.attitude(player,game.players[i])>=3&&
+							ai.get.attitude(game.players[i],player)>=3){
+							return 11-ai.get.value(card);
+						}
+					}
+					if(player.num('h')>player.hp) return 10-ai.get.value(card);
+					if(player.num('h')>2) return 6-ai.get.value(card);
+					return -1;
+				}
+				return 10-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				if(!Array.isArray(player.storage.rerende2)){
+					player.storage.rerende2=[];
+				}
+				player.storage.rerende2.push(target);
+				target.gain(cards);
+				game.delay();
+				if(typeof player.storage.rerende!='number'){
+					player.storage.rerende=0;
+				}
+				if(player.storage.rerende>=0){
+					player.storage.rerende+=cards.length;
+					if(player.storage.rerende>=2){
+						var list=[];
+						for(var i=0;i<game.players.length;i++){
+							if(player.canUse('sha',game.players[i],true,true)){
+								list.push('sha');break;
+							}
+						}
+						if(player.canUse('tao',player,true,true)){
+							list.push('tao');
+						};
+						if(player.canUse('jiu',player,true,true)){
+							list.push('jiu');
+						};
+						if(list.length){
+							list.push('cancel');
+							player.chooseControl(list,function(){
+								var controls=_status.event.controls;
+								if(controls.contains('tao')) return 'tao';
+								if(controls.contains('sha')) return 'sha';
+								return 'cancel';
+							}).set('prompt','是否视为使用一张基本牌？');
+						}
+						else{
+							event.finish();
+						}
+						player.storage.rerende=-1;
+					}
+					else{
+						event.finish();
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				if(result&&result.control&&result.control!='cancel'){
+					if(result.control=='sha'){
+						player.chooseTarget(function(card,player,target){
+							return player.canUse({name:'sha'},target,true,true);
+						},true,'选择出杀目标');
+					}
+					else{
+						player.useCard({name:result.control},player);
+						event.finish();
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool&&result.targets&&result.targets.length){
+					player.useCard({name:'sha'},result.targets);
+				}
+			},
+			ai:{
+				order:function(skill,player){
+					if(player.hp<player.maxHp&&player.storage.rerende<2&&player.num('h')>1){
+						return 10;
+					}
+					return 4;
+				},
+				result:{
+					target:function(player,target){
+						if(target.num('j','lebu')) return 0;
+						var nh=target.num('h');
+						var np=player.num('h');
+						if(player.hp==player.maxHp||player.storage.rerende<0||player.num('h')<=1){
+							if(nh>=np-1&&np<=player.hp&&!target.get('s').contains('haoshi')) return 0;
+						}
+						return Math.max(1,5-nh);
+					}
+				},
+				effect:{
+					target:function(card,player,target){
+						if(player==target&&get.type(card)=='equip'){
+							if(player.num('e',{subtype:get.subtype(card)})){
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>0){
+										return 0;
+									}
+								}
+							}
+						}
+					}
+				},
+				threaten:0.8
+			}
+		},
+		rerende1:{
+			trigger:{player:'phaseUseBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.storage.rerende=0;
+				player.storage.rerende2=[];
+			}
+		},
 		liyu:{
 			audio:2,
 			trigger:{source:'damageEnd'},
@@ -1341,6 +1486,7 @@ character.refresh={
 		re_ganning:'界甘宁',
 		re_huatuo:'界华佗',
 		re_lidian:'李典',
+		re_liubei:'界刘备',
 		qinxue:'勤学',
 		retuxi:'突袭',
 		reluoyi:'裸衣',
@@ -1383,6 +1529,8 @@ character.refresh={
 		chulao:'除疠',
 		rejizhi:'集智',
 		liyu:'利驭',
+		rerende:'仁德',
+		rerende_info:'出牌阶段，你可以将至少一张手牌交给其他角色，然后你于此阶段内不能再以此法交给该角色牌；若你于此阶段内给出的牌首次达到两张，你可以视为使用一张基本牌',
 		liyu_info:'当你使用【杀】对一名其他角色造成伤害后，该角色可令你获得其一张牌，若如此做，则视为你对其选择的另一名角色使用一张【决斗】',
 		rejizhi_info:'当你使用一张装备牌或锦囊牌时，你可以摸一张牌并展示之，若此牌是基本牌，你须弃置一张手牌',
 		xunxun_info:'摸牌阶段，你可以放弃摸牌，改为观看牌堆顶的四张牌，然后获得其中的两张牌，将其余的牌以任意顺序置于牌堆底。',
