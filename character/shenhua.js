@@ -9,7 +9,7 @@ character.shenhua={
 		xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 		zhoutai:['male','wu',4,['buqu','fenji']],
 		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
-		sp_zhangjiao:['male','qun',3,['diyleiji','guidao','huangtian'],['zhu']],
+		sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 		// yuji:['male','qun',3,['guhuo']],
 
 		sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
@@ -2494,7 +2494,7 @@ character.shenhua={
 				}
 			}
 		},
-		diyleiji:{
+		releiji:{
 			audio:2,
 			trigger:{player:'respond'},
 			filter:function(event,player){
@@ -2503,13 +2503,13 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动【新雷击】？').ai=function(target){
+				player.chooseTarget('是否发动【'+get.skillTranslation('releiji',player)+'】？').ai=function(target){
 					if(target.skills.contains('hongyan')) return 0;
 					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('diyleiji',result.targets,'thunder');
+					player.logSkill('releiji',result.targets,'thunder');
 					event.target=result.targets[0];
 					event.target.judge(function(card){
 						var suit=get.suit(card);
@@ -3164,16 +3164,15 @@ character.shenhua={
 		buqu:'不屈',
 		buqu_bg:'创',
 		leiji:'雷击',
-		spleiji:'新雷击',
 		guidao:'鬼道',
 		huangtian:'黄天',
 		huangtian2:'黄天',
 		guhuo:'蛊惑',
 		fenji:'奋激',
-		diyleiji:'雷击',
+		releiji:'雷击',
 		jiewei:'解围',
 		jiewei_info:'每当你翻面，你可以使用一张锦囊牌或装备牌，若如此做，此牌结算后，你可以弃置场上一张同类型的牌',
-		diyleiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害',
+		releiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害',
 		tiangong:'天公',
 		tiangong2:'天公',
 		tiangong_info:'锁定技，你防止即将受到的雷电伤害，每当你造成一次雷电伤害，你摸一张牌',
@@ -3195,8 +3194,6 @@ character.shenhua={
 		'称为“创”，若所有“创”的点数均不同，你不会死亡。你的手牌上限为“创”的个数',
 		leiji_info:
 		'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害',
-		spleiji_info:
-		'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑色，其受到一点雷电伤害，然后你回复一点体力',
 		guidao_info:
 		'任意一名角色的判定生效前，你可以打出一张黑色牌替换之',
 		huangtian_info:

@@ -83,7 +83,7 @@ card.standard={
 						var evt=_status.event.getParent();
 						var sks=target.get('s');
 						if(sks.contains('leiji')||
-							sks.contains('diyleiji')||
+							sks.contains('releiji')||
 							sks.contains('lingbo')){
 							return 1;
 						}

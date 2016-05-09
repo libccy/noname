@@ -6160,12 +6160,12 @@
 					}
 					str+='发动了';
 					if(!info.direct){
-						game.log(player,str,'【'+get.translation(skill)+'】');
+						game.log(player,str,'【'+get.skillTranslation(skill,player)+'】');
 						if(lib.config.skill_animation&&lib.skill[skill]&&lib.skill[skill].skillAnimation){
 							player.$skill(lib.skill[skill].animationStr||lib.translate[skill],lib.skill[skill].skillAnimation,lib.skill[skill].animationColor);
 						}
 						else{
-							player.popup(skill);
+							player.popup(get.skillTranslation(skill,player));
 						}
 					}
 					if(event.addCount!=false){
@@ -9119,12 +9119,12 @@
 						if(lib.config.skill_animation&&lib.skill[name]&&lib.skill[name].skillAnimation){
 							this.$skill(lib.skill[name].animationStr||lib.translate[name],lib.skill[name].skillAnimation,lib.skill[name].animationColor);
 						}
-						else if(!nopop) this.popup(name);
+						else if(!nopop) this.popup(get.skillTranslation(name,this));
 						if(typeof targets=='object'&&targets.length){
-							game.log(this,'对',targets,'发动了','【'+get.translation(name)+'】');
+							game.log(this,'对',targets,'发动了','【'+get.skillTranslation(name,this)+'】');
 						}
 						else{
-							game.log(this,'发动了','【'+get.translation(name)+'】');
+							game.log(this,'发动了','【'+get.skillTranslation(name,this)+'】');
 						}
 					}
 					if(nature!=false){
@@ -15447,7 +15447,7 @@
 				if(info.popup!=false&&!info.direct){
 					if(info.popup){
 						player.popup(info.popup);
-						game.log(player,'发动了','【'+get.translation(event.skill)+'】');
+						game.log(player,'发动了','【'+get.skillTranslation(event.skill,player)+'】');
 					}
 					else{
 						player.logSkill(event.skill);
@@ -21839,6 +21839,9 @@
 					_status.noupdatec=true;
 				}
 				ui.skills=ui.create.control(skills.concat([ui.click.skill]));
+                for(var i=0;i<ui.skills.childNodes.length;i++){
+                    ui.skills.childNodes[i].innerHTML=get.skillTranslation(ui.skills.childNodes[i].link,_status.event.player);
+                }
 				if(!_status.event.isMine()){
 					ui.skills.style.display='none';
 				}
@@ -21870,6 +21873,9 @@
 					_status.noupdatec=true;
 				}
 				ui.skills2=ui.create.control(skills.concat([ui.click.skill]));
+                for(var i=0;i<ui.skills2.childNodes.length;i++){
+                    ui.skills2.childNodes[i].innerHTML=get.skillTranslation(ui.skills2.childNodes[i].link,_status.event.player);
+                }
 				if(!_status.event.isMine()){
 					ui.skills2.style.display='none';
 				}
@@ -21901,6 +21907,9 @@
 					_status.noupdatec=true;
 				}
 				ui.skills3=ui.create.control(skills.concat([ui.click.skill]));
+                for(var i=0;i<ui.skills3.childNodes.length;i++){
+                    ui.skills3.childNodes[i].innerHTML=get.skillTranslation(ui.skills3.childNodes[i].link,_status.event.player);
+                }
 				if(!_status.event.isMine()){
 					ui.skills3.style.display='none';
 				}
@@ -25940,6 +25949,17 @@
 			if(card.parentNode.id=='discardPile') return 'd';
 			if(card.parentNode.id=='special') return 's';
 		},
+        skillTranslation(str,player){
+            if(str.indexOf('re')==0&&player){
+                var str2=str.slice(2);
+                if(lib.translate[str]==lib.translate[str2]){
+                    if(player.hasSkill(str2)){
+                        return '新'+lib.translate[str];
+                    }
+                }
+            }
+            return get.translation(str);
+        },
 		translation:function(str,arg){
 			if(str&&typeof str=='object'&&str.name){
 				var str2;
@@ -26287,13 +26307,7 @@
 					else{
 						opacity='';
 					}
-					var skilltrans=get.translation(skills[i]);
-					if(skilltrans&&skilltrans.length==3&&skilltrans[0]=='新'){
-						skilltrans=skilltrans.slice(1);
-					}
-					else{
-						skilltrans=skilltrans.slice(0,2);
-					}
+					var skilltrans=get.translation(skills[i]).slice(0,2);
 					str+='<div class="skill" style="'+opacity+
 					'">【'+skilltrans+'】</div><div style="'+opacity+'">'+
 					lib.translate[skills[i]+'_info']+'</div><div style="display:block;height:10px"></div>';
@@ -26430,13 +26444,7 @@
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
 					if(lib.translate[skills[i]+'_info']){
-						translation=get.translation(skills[i]);
-						if(translation.length==3&&translation[0]=='新'){
-							translation=translation.slice(1);
-						}
-						else{
-							translation=translation.slice(0,2);
-						}
+						translation=get.translation(skills[i]).slice(0,2);
 						if(!skills2.contains(skills[i])){
 							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
@@ -26706,13 +26714,7 @@
 				var skills=infoitem[3];
 				for(i=0;i<skills.length;i++){
 					if(lib.translate[skills[i]+'_info']){
-						translation=get.translation(skills[i]);
-						if(translation.length==3&&translation[0]=='新'){
-							translation=translation.slice(1);
-						}
-						else{
-							translation=translation.slice(0,2);
-						}
+						translation=get.translation(skills[i]).slice(0,2);
 						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 					}
 				}

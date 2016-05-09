@@ -133,7 +133,7 @@ character.refresh={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？','he').set('ai',function(card){
+				get.translation(trigger.player.judging[0])+'，是否发动【'+get.skillTranslation('reguicai',player)+'】？','he').set('ai',function(card){
 					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var judging=_status.event.judging;
@@ -197,7 +197,7 @@ character.refresh={
 					return;
 				}
 				event.num--;
-				player.choosePlayerCard('是否对'+get.translation(trigger.source)+'发动【反馈】？',trigger.source,ai.get.buttonValue,'he');
+				player.choosePlayerCard('是否对'+get.translation(trigger.source)+'发动【'+get.skillTranslation('refankui',player)+'】？',trigger.source,ai.get.buttonValue,'he');
 				"step 2"
 				if(result.bool){
 					player.logSkill('refankui',trigger.source);
@@ -1342,34 +1342,34 @@ character.refresh={
 		re_huatuo:'界华佗',
 		re_lidian:'李典',
 		qinxue:'勤学',
-		retuxi:'新突袭',
-		reluoyi:'新裸衣',
-		reluoyi2:'新裸衣',
-		reganglie:'新刚烈',
+		retuxi:'突袭',
+		reluoyi:'裸衣',
+		reluoyi2:'裸衣',
+		reganglie:'刚烈',
 		qingjian:'清俭',
-		reyingzi:'新英姿',
-		refanjian:'新反间',
+		reyingzi:'英姿',
+		refanjian:'反间',
 		refanjian_card:'弃牌',
 		refanjian_hp:'流失体力',
-		reqianxun:'新谦逊',
-		reqianxun2:'新谦逊',
-		relianying:'新连营',
+		reqianxun:'谦逊',
+		reqianxun2:'谦逊',
+		relianying:'连营',
 		retishen:'替身',
 		retishen2:'替身',
 		reyajiao:'涯角',
-		rejianxiong:'新奸雄',
+		rejianxiong:'奸雄',
 		rejianxiong_mopai:'摸牌',
 		rejianxiong_napai:'拿牌',
-		reyiji:'新遗计',
-		reyiji2:'新遗计',
+		reyiji:'遗计',
+		reyiji2:'遗计',
 		yijue:'义绝',
 		yijue2:'义绝',
-		retieji:'新铁骑',
-		retieji2:'新铁骑',
-		refankui:'新反馈',
+		retieji:'铁骑',
+		retieji2:'铁骑',
+		refankui:'反馈',
 		reyicong:'义从',
 		qiaomeng:'趫猛',
-		rekurou:'新苦肉',
+		rekurou:'苦肉',
 		zhaxiang:'诈降',
 		zhaxiang2:'诈降',
 		zhuhai:'诛害',
@@ -1378,7 +1378,7 @@ character.refresh={
 		reguicai:'新鬼才',
 		xunxun:'恂恂',
 		wangxi:'忘隙',
-		reguose:'新国色',
+		reguose:'国色',
 		fenwei:'奋威',
 		chulao:'除疠',
 		rejizhi:'集智',
