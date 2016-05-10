@@ -5462,6 +5462,7 @@
 						}
 						game.pause();
                         game.countChoose();
+                        event.choosing=true;
 					}
                     else if(event.isOnline()){
                         event.send();
@@ -5479,6 +5480,7 @@
 						}
 						else event.result.control=event.controls[event.choice];
                     }
+                    event.choosing=false;
 					_status.imchoosing=false;
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 					if(event.controlbar) event.controlbar.close();
@@ -5505,6 +5507,7 @@
 						}
 						game.pause();
                         game.countChoose();
+                        event.choosing=true;
 					}
                     else if(event.isOnline()){
                         event.send();
@@ -5520,6 +5523,7 @@
 						event.result={bool:event.choice};
                     }
 					_status.imchoosing=false;
+                    event.choosing=false;
 					if(event.dialog) event.dialog.close();
 				},
 				choosePlayerCard:function(){
@@ -5832,14 +5836,15 @@
                     game.broadcast('closeDialog',event.dialogid);
 					event.dialog.close();
 				},
-				viewHandcards:function(){
+				viewCards:function(){
 					"step 0"
-					if(player==game.me&&target){
-						event.dialog=ui.create.dialog(get.translation(target.name)+'的手牌',target.get('h'));
+					if(player==game.me){
+						event.dialog=ui.create.dialog(event.str,event.cards);
 						if(event.isMine()){
 							game.pause();
 							ui.create.confirm('o');
                             game.countChoose();
+                            event.choosing=true;
 						}
 						else{
 							event.finish();
@@ -5859,6 +5864,7 @@
 					"step 1"
                     event.result='viewed';
 					_status.imchoosing=false;
+                    event.choosing=false;
 					if(event.dialog) event.dialog.close();
 				},
 				useCard:function(){
@@ -8489,11 +8495,12 @@
 					next.content=lib.element.playerproto.showCards;
                     next._args=Array.from(arguments);
 				},
-				viewHandcards:function(target){
-					var next=game.createEvent('viewHandcards');
+				viewCards:function(str,cards){
+					var next=game.createEvent('viewCards');
 					next.player=this;
-					next.target=target;
-					next.content=lib.element.playerproto.viewHandcards;
+					next.str=str;
+                    next.cards=cards;
+					next.content=lib.element.playerproto.viewCards;
                     next._args=Array.from(arguments);
                     return next;
 				},
@@ -16222,7 +16229,12 @@
 			var custom=event.custom||{};
 			var ok=true,auto=true;
 			var player=event.player;
-			if(!event.filterButton&&!event.filterCard&&!event.filterTarget&&!event.skill) return;
+			if(!event.filterButton&&!event.filterCard&&!event.filterTarget&&!event.skill){
+                if(event.choosing){
+                    _status.imchoosing=true;
+                }
+                return;
+            }
 			if(event.filterButton){
 				var dialog=event.dialog;
 				range=get.select(event.selectButton);
@@ -24712,7 +24724,6 @@
                     else if(_status.event.switchToAuto){
                         _status.event.switchToAuto();
                     }
-
                     if(game.online){
                         game.send('auto');
                     }

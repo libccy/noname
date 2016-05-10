@@ -66,10 +66,10 @@ character.yijiang={
 		xin_yujin:['male','wei',4,['jieyue']],
 		xin_liru:['male','qun',3,['xinjuece','xinmieji','xinfencheng']],
 
-		guohuanghou:['female','qun',3,[]],
-		liuyu:['female','qun',3,[]],
-		liyan:['female','qun',3,[]],
-		sundeng:['female','qun',3,[]],
+		// guohuanghou:['female','wei',3,['jiaozhao','danxin']],
+		// liuyu:['male','qun',2,['zhige','zongzuo']],
+		liyan:['male','shu',3,['duliang','fulin']],
+		sundeng:['male','wu',4,['kuangbi']],
 	},
 	perfectPair:{
 		wuguotai:['sunjian','sunshangxiang'],
@@ -88,6 +88,171 @@ character.yijiang={
 		guanping:['guanyu'],
 	},
 	skill:{
+		kuangbi:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('he')>0;
+			},
+			content:function(){
+				'step 0'
+				target.chooseCard('he',[1,3],'匡弼：将1〜3张牌置于'+get.translation(player)+'的武将牌上').set('ai',function(card){
+					if(ai.get.attitude(_status.event.player,_status.event.getParent().player)>0){
+						return 7-ai.get.value(card);
+					}
+					return 0;
+				});
+				'step 1'
+				if(result.bool){
+					target.$give(result.cards,player);
+					target.lose(result.cards,ui.special);
+					player.storage.kuangbi_draw=result.cards;
+					player.storage.kuangbi_draw_source=target;
+					player.syncStorage('kuangbi_draw');
+					player.addSkill('kuangbi_draw');
+					game.delay();
+				}
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+						if(ai.get.attitude(player,target)>0){
+							return Math.sqrt(target.num('he'));
+						}
+						return 0;
+					},
+					player:1
+				}
+			},
+			subSkill:{
+				draw:{
+					trigger:{player:'phaseBegin'},
+					forced:true,
+					mark:true,
+					intro:{
+						content:'cards'
+					},
+					content:function(){
+						var cards=player.storage.kuangbi_draw;
+						if(cards){
+							player.gain(cards,'gain2');
+							var target=player.storage.kuangbi_draw_source;
+							if(target&&target.isAlive()){
+								target.draw(cards.length);
+							}
+						}
+						delete player.storage.kuangbi_draw;
+						delete player.storage.kuangbi_draw_source;
+						player.removeSkill('kuangbi_draw');
+					}
+				}
+			}
+		},
+		fulin:{
+			mod:{
+				maxHandcard:function(player,num){
+					if(player.storage.fulin&&player.storage.fulin.length){
+						var hs=player.get('h');
+						for(var i=0;i<player.storage.fulin.length;i++){
+							if(hs.contains(player.storage.fulin[i])){
+								num++;
+							}
+						}
+						return num;
+					}
+				}
+			},
+			group:['fulin_count','fulin_reset'],
+			subSkill:{
+				reset:{
+					trigger:{player:['phaseBegin','phaseEnd']},
+					forced:true,
+					popup:false,
+					silent:true,
+					priority:10,
+					content:function(){
+						player.storage.fulin=[];
+					}
+				},
+				count:{
+					trigger:{player:'gainEnd'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event,player){
+						return _status.currentPhase==player;
+					},
+					content:function(){
+						if(!player.storage.fulin){
+							player.storage.fulin=[];
+						}
+						for(var i=0;i<trigger.cards.length;i++){
+							player.storage.fulin.add(trigger.cards[i]);
+						}
+					}
+				}
+			}
+		},
+		duliang:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return player!=target&&target.num('h')>0;
+			},
+			content:function(){
+				'step 0'
+				player.gain(target.get('h').randomGet());
+				target.$give(1,player);
+				'step 1'
+				player.chooseControl('选项一','选项二',function(){
+					return Math.random()<0.5?'选项一':'选项二';
+				}).set('prompt','督粮<br><br><div class="text">选项一：令其观看牌堆顶的两张牌，然后获得其中的基本牌</div><br><div class="text">选项二：令其于下个摸牌阶段额外摸一张牌</br>');
+				'step 2'
+				if(result.control=='选项一'){
+					var cards=get.cards(2);
+					target.viewCards('督粮',cards);
+					event.cards2=[];
+					for(var i=0;i<cards.length;i++){
+						if(get.type(cards[i])=='basic'){
+							ui.special.appendChild(cards[i]);
+							event.cards2.push(cards[i]);
+						}
+						else{
+							ui.discardPile.appendChild(cards[i]);
+						}
+					}
+				}
+				else{
+					target.addSkill('duliang2');
+					event.finish();
+				}
+				'step 3'
+				if(event.cards2&&event.cards2.length){
+					target.gain(event.cards2,'draw');
+					game.log(target,'获得了'+get.cnNumber(event.cards2.length)+'张牌');
+				}
+			},
+			ai:{
+				order:4,
+				result:{
+					target:-1,
+					player:0.1
+				}
+			}
+		},
+		duliang2:{
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			mark:true,
+			intro:{
+				content:'下个摸牌阶段额外摸一张牌'
+			},
+			content:function(){
+				trigger.num++;
+				player.removeSkill('duliang2');
+			}
+		},
 		xinfencheng:{
 			skillAnimation:'epic',
 			animationColor:'fire',
@@ -6101,7 +6266,26 @@ character.yijiang={
 		gaoshun:'高顺',
 		xin_yujin:'新于禁',
 		xin_liru:'新李儒',
+		guohuanghou:'郭皇后',
+		liuyu:'刘虞',
+		sundeng:'孙登',
+		liyan:'李严',
 
+		jiaozhao:'矫诏',
+		jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。直到回合结束，你可以将此手牌当声明的牌使用且你不能被选择为目标',
+		danxin:'殚心',
+		danxin_info:'当你受到伤害后，你可以摸一张牌，或对“矫诏”的描述依次执行下列一项修改：1.将“基本牌”改为“基本牌或非延时类锦囊牌”；2.将“选择距离最近的一名其他角色，该角色”改为“你”',
+		duliang:'督粮',
+		duliang2:'督粮',
+		duliang_info:'出牌阶段限一次，你可以获得一名其他角色的一张手牌，然后选择一项：1.令其观看牌堆顶的两张牌，然后获得其中的基本牌；2.令其于下个摸牌阶段额外摸一张牌',
+		fulin:'腹鳞',
+		fulin_info:'锁定技，弃牌阶段内，你于此回合内获得的牌不计入你的手牌数',
+		kuangbi:'匡弼',
+		kuangbi_info:'出牌阶段限一次，你可以选择一名有牌的其他角色，该角色将其至多三张牌置于你的武将牌上。若如此做，你的下回合开始时，你获得武将牌上的所有牌，然后其摸等量的牌',
+		zhige:'止戈',
+		zhige_info:'出牌阶段限一次，若你的手牌数大于你的体力值，你可以选择攻击范围内含有你的一名其他角色，除非该角色使用一张【杀】，否则其将其装备区里的一张牌交给你',
+		zongzuo:'宗祚',
+		zongzuo_info:'锁定技，游戏的第一个回合开始前，你加X点体力上限和体力（X为全场势力数）；当一名角色死亡后，若没有与其势力相同的角色，你减1点体力上限',
 		xinjuece:'绝策',
 		xinjuece_info:'结束阶段开始时，你可以对没有手牌的一名角色造成1点伤害',
 		xinmieji:'灭计',

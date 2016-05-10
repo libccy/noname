@@ -322,7 +322,7 @@ play.soldier={
 				"step 1"
 				if(result.bool){
 					player.logSkill('chihou');
-					player.viewHandcards(result.targets[0]);
+					player.viewCards(get.translation(result.targets[0])+'的手牌',result.targets[0].get('h'));
 				}
 			}
 		},

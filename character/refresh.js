@@ -89,8 +89,17 @@ character.refresh={
 							list.push('cancel');
 							player.chooseControl(list,function(){
 								var controls=_status.event.controls;
+								var player=_status.event.player;
 								if(controls.contains('tao')) return 'tao';
-								if(controls.contains('sha')) return 'sha';
+								if(controls.contains('sha')){
+									for(var i=0;i<game.players.length;i++){
+										if(player.canUse('sha',game.players[i],true,true)){
+											if(ai.get.effect(game.players[i],{name:'sha'},player,player)>0){
+												return 'sha';
+											}
+										}
+									}
+								}
 								return 'cancel';
 							}).set('prompt','是否视为使用一张基本牌？');
 						}
@@ -111,7 +120,10 @@ character.refresh={
 					if(result.control=='sha'){
 						player.chooseTarget(function(card,player,target){
 							return player.canUse({name:'sha'},target,true,true);
-						},true,'选择出杀目标');
+						},true,'选择出杀目标').set('ai',function(target){
+							var player=_status.event.player;
+							return ai.get.effect(target,{name:'sha'},player,player);
+						});
 					}
 					else{
 						player.useCard({name:result.control},player);
