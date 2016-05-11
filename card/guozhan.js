@@ -14,6 +14,7 @@ card.guozhan={
 				if(player.identity=='ye') return true;
 				return player.identity!=target.identity;
 			},
+			multitarget:true,
 			content:function(){
 				game.asyncDraw([target,player],[1,get.mode()=='guozhan'?3:1]);
 			},

@@ -58,7 +58,7 @@ character.sp={
 
 		guansuo:['male','shu',4,['zhengnan','xiefang']],
 		tadun:['male','qun',4,['luanzhan']],
-		// yanbaihu:['male','qun',4,['zhidao','jili']],
+		yanbaihu:['male','qun',4,['zhidao','jili']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -79,6 +79,172 @@ character.sp={
 		cuiyan:['caocao'],
 	},
 	skill:{
+		jili:{
+			trigger:{global:'useCard'},
+			forced:true,
+			filter:function(event,player){
+				if(get.color(event.card)!='red') return false;
+				if(!event.targets) return false;
+				if(event.player==player) return false;
+				if(event.targets.contains(player)) return false;
+				var type=get.type(event.card);
+				if(type!='basic'&&type!='trick') return false;
+				if(lib.filter.targetEnabled2(event.card,event.player,player)){
+					for(var i=0;i<event.targets.length;i++){
+						if(get.distance(event.targets[i],player)<=1) return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				game.delay(0.5);
+				'step 1'
+				trigger.targets.add(player);
+				trigger.player.line(player,'green');
+			}
+		},
+		zhidao:{
+			trigger:{source:'damageEnd'},
+			filter:function(event,player){
+				return _status.currentPhase==player&&event.player.isAlive()&&
+				event.player.num('hej')>0&&event.player!=player&&!player.skills.contains('zhidao2');
+			},
+			forced:true,
+			content:function(){
+				var num=0;
+				if(trigger.player.num('h')) num++;
+				if(trigger.player.num('e')) num++;
+				if(trigger.player.num('j')) num++;
+				if(num){
+					player.gainPlayerCard(trigger.player,num,'hej',true).set('filterButton',function(button){
+						for(var i=0;i<ui.selected.buttons.length;i++){
+							if(get.position(button.link)==get.position(ui.selected.buttons[i].link)) return false;
+						}
+						return true;
+					});
+				}
+				player.addTempSkill('zhidao2','phaseAfter');
+			}
+		},
+		zhidao2:{
+			mod:{
+				playerEnabled:function(card,player,target){
+					if(player!=target) return false;
+				}
+			}
+		},
+		luanzhan:{
+			mod:{
+				selectTarget:function(card,player,range){
+					if(!player.storage.luanzhan) return;
+					if(range[1]==-1) return;
+					if(card.name=='sha') range[1]+=player.storage.luanzhan;
+					if(get.color(card)=='black'&&get.type(card)=='trick'){
+						var info=get.info(card);
+						if(info.multitarget) return false;
+						range[1]+=player.storage.luanzhan;
+					}
+				},
+			},
+			trigger:{source:'damageEnd'},
+			forced:true,
+			popup:false,
+			silent:true,
+			mark:true,
+			intro:{
+				content:function(storage){
+					return '可以额外指定'+storage+'个目标';
+				}
+			},
+			init:function(player){
+				player.storage.luanzhan=0;
+			},
+			content:function(){
+				if(typeof player.storage.luanzhan=='number'){
+					player.storage.luanzhan+=trigger.num;
+				}
+				else{
+					player.storage.luanzhan=trigger.num;
+				}
+				player.markSkill('luanzhan');
+			},
+			group:'luanzhan_cancel',
+			subSkill:{
+				cancel:{
+					trigger:{player:'useCard'},
+					forced:true,
+					filter:function(event,player){
+						if(!player.storage.luanzhan) return false;
+						var check=false;
+						var card=event.card;
+						if(card.name=='sha'){
+							check=true;
+						}
+						else if(get.color(card)=='black'&&get.type(card)=='trick'){
+							var info=get.info(card);
+							if(!info.multitarget){
+								check=true;
+								if(info.selectTarget==-1){
+									check=false;
+								}
+								else if(Array.isArray(info.selectTarget)&&info.selectTarget[1]==-1){
+									check=false;
+								}
+							}
+						}
+						if(check&&event.targets&&event.targets.length<player.storage.luanzhan){
+							return true;
+						}
+						return false;
+					},
+					content:function(){
+						player.storage.luanzhan=0;
+						player.markSkill('luanzhan');
+					}
+				}
+			}
+		},
+		zhengnan:{
+			trigger:{global:'dieAfter'},
+			frequent:true,
+			content:function(){
+				'step 0'
+				player.draw(3);
+				var list=[];
+				if(!player.hasSkill('wusheng')){
+					list.push('wusheng');
+				}
+				if(!player.hasSkill('dangxian')){
+					list.push('dangxian');
+				}
+				if(!player.hasSkill('zhiman')){
+					list.push('zhiman');
+				}
+				if(list.length){
+					player.chooseControl(list).set('prompt','选择获得一项技能');
+				}
+				'step 1'
+				player.addSkill(result.control);
+				player.popup(result.control);
+				game.log(player,'获得技能','【'+get.translation(result.control)+'】');
+			},
+			ai:{
+				threaten:1.4
+			}
+		},
+		xiefang:{
+			mod:{
+				globalFrom:function(from,to,distance){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].sex=='female'){
+							distance--;
+						}
+					}
+					return distance;
+				}
+			}
+		},
 		qizhi:{
 			trigger:{player:'useCard'},
 			direct:true,
@@ -5546,7 +5712,7 @@ character.sp={
 		yanbaihu:'严白虎',
 
 		zhidao:'雉盗',
-		zhidao_info:'锁定技，当你于出牌阶段内第一次对区域里有牌的其他角色造成伤害后，你获得其手牌、装备区和判定区里的各一张牌，然后直到回合结束，其他角色不能被选择为你使用牌的目标',
+		zhidao_info:'锁定技，当你于你的回合内第一次对区域里有牌的其他角色造成伤害后，你获得其手牌、装备区和判定区里的各一张牌，然后直到回合结束，其他角色不能被选择为你使用牌的目标',
 		jili:'寄篱',
 		jili_info:'锁定技，当一名其他角色成为红色基本牌或红色非延时类锦囊牌的目标时，若其与你的距离为1且你既不是此牌的使用者也不是目标，你也成为此牌的目标',
 		luanzhan:'乱战',

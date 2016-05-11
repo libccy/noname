@@ -11,6 +11,7 @@ card.extra={
 			},
 			usable:1,
 			selectTarget:-1,
+			modTarget:true,
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
@@ -22,18 +23,20 @@ card.extra={
 					}
 				}
 				else{
-					game.broadcastAll(function(target,card){
+					game.broadcastAll(function(target,card,gain2){
 						target.addSkill('jiu');
 						if(!target.node.jiu&&lib.config.jiu_effect){
 							target.node.jiu=ui.create.div('.playerjiu',target.node.avatar);
 							target.node.jiu2=ui.create.div('.playerjiu',target.node.avatar2);
 						}
-						if(card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
+						if(gain2&&card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
 							card.clone.moveDelete(target);
 						}
-					},target,card);
-					if(card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
-						game.addVideo('gain2',target,get.cardsInfo([card]));
+					},target,card,target==targets[0]);
+					if(target==targets[0]){
+						if(card.clone&&(card.clone.parentNode==target.parentNode||card.clone.parentNode==ui.arena)){
+							game.addVideo('gain2',target,get.cardsInfo([card]));
+						}
 					}
 				}
 			},

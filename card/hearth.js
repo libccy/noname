@@ -319,6 +319,7 @@ card.hearth={
 				return player==target;
 			},
 			selectTarget:-1,
+			modTarget:true,
 			content:function(){
 				target.changeHujia();
 				target.draw();
@@ -441,6 +442,7 @@ card.hearth={
 			type:'basic',
 			enable:true,
 			selectTarget:-1,
+			modTarget:true,
 			filterTarget:function(card,player,target){return player==target},
 			content:function(){
 				target.gainMaxHp();

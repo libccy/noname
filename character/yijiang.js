@@ -66,8 +66,8 @@ character.yijiang={
 		xin_yujin:['male','wei',4,['jieyue']],
 		xin_liru:['male','qun',3,['xinjuece','xinmieji','xinfencheng']],
 
-		// guohuanghou:['female','wei',3,['jiaozhao','danxin']],
-		// liuyu:['male','qun',2,['zhige','zongzuo']],
+		guohuanghou:['female','wei',3,['jiaozhao','danxin']],
+		liuyu:['male','qun',2,['zhige','zongzuo']],
 		liyan:['male','shu',3,['duliang','fulin']],
 		sundeng:['male','wu',4,['kuangbi']],
 	},
@@ -88,6 +88,283 @@ character.yijiang={
 		guanping:['guanyu'],
 	},
 	skill:{
+		jiaozhao:{
+			enable:'phaseUse',
+			usable:1,
+			check:function(card){
+				return 8-ai.get.value(card);
+			},
+			filterCard:true,
+			discard:false,
+			lose:false,
+			content:function(){
+				'step 0'
+				player.showCards(cards);
+				'step 1'
+				if(player.storage.jiaozhao2){
+					event.target=player;
+				}
+				else{
+					var targets=game.players.slice(0);
+					targets.remove(player);
+					targets.sort(function(a,b){
+						return Math.max(1,get.distance(player,a))-Math.max(1,get.distance(player,b));
+					});
+					var distance=Math.max(1,get.distance(player,targets[0]));
+					for(var i=1;i<targets.length;i++){
+						if(Math.max(1,get.distance(player,targets[i]))>distance){
+							targets.splice(i);break;
+						}
+					}
+					player.chooseTarget(true,function(card,player,target){
+						return _status.event.targets.contains(target);
+					}).set('ai',function(target){
+						return ai.get.attitude(_status.event.player,target);
+					}).set('targets',targets);
+				}
+				'step 2'
+				if(!event.target){
+					event.target=result.targets[0];
+					player.line(result.targets,'green');
+				}
+				if(!event.target){
+					event.finish();
+					return;
+				}
+				var list=['sha','shan','tao','jiu'];
+				if(player.storage.jiaozhao1){
+					list=list.concat(['taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman']);
+				}
+				for(var i=0;i<list.length;i++){
+					if(i<=4){
+						list[i]=['基本','',list[i]];
+					}
+					else{
+						list[i]=['锦囊','',list[i]];
+					}
+				}
+				var att=ai.get.attitude(event.target,player);
+				event.target.chooseButton(['矫诏',[list,'vcard']],true).set('ai',function(button){
+					if(att<=0){
+						return button.link=='shan'?1:0;
+					}
+					else{
+						if(!_status.event.trick){
+							return button.link=='sha'?1:0;
+						}
+						var player=_status.event.player;
+						var recover=0,lose=1;
+						for(var i=0;i<game.players.length;i++){
+							if(!game.players[i].isOut()&&game.players[i]!=player){
+								if(game.players[i].hp<game.players[i].maxHp){
+									if(ai.get.attitude(player,game.players[i])>0){
+										if(game.players[i].hp<2){
+											lose--;
+											recover+=0.5;
+										}
+										lose--;
+										recover++;
+									}
+									else if(ai.get.attitude(player,game.players[i])<0){
+										if(game.players[i].hp<2){
+											lose++;
+											recover-=0.5;
+										}
+										lose++;
+										recover--;
+									}
+								}
+								else{
+									if(ai.get.attitude(player,game.players[i])>0){
+										lose--;
+									}
+									else if(ai.get.attitude(player,game.players[i])<0){
+										lose++;
+									}
+								}
+							}
+						}
+						if(lose>recover&&lose>0) return (button.link[2]=='nanman')?1:-1;
+						if(lose<recover&&recover>0) return (button.link[2]=='taoyuan')?1:-1;
+						return (button.link[2]=='shunshou')?1:-1;
+					}
+				}).set('att',att).set('trick',player.storage.jiaozhao1);
+				'step 3'
+				event.target.showCards(game.createCard(result.links[0]),get.translation(event.target)+'声明了'+get.translation(result.links[0][2]));
+				player.storage.jiaozhao=cards[0];
+				player.storage.jiaozhao_card=result.links[0][2];
+				game.broadcastAll(function(name){
+					lib.skill.jiaozhao2.viewAs={name:name};
+				},result.links[0][2]);
+			},
+			ai:{
+				order:9,
+				result:{
+					player:1
+				}
+			},
+			intro:{
+				content:function(storage,player){
+					if(player.storage.jiaozhao2){
+						return '出牌阶段限一次，你可以展示一张手牌，然后你声明一张基本牌或非延时类锦囊牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标';
+					}
+					else{
+						return '出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌或非延时类锦囊牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标';
+					}
+				}
+			},
+			group:['jiaozhao2','jiaozhao3']
+		},
+		jiaozhao2:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(!player.storage.jiaozhao) return false;
+				var name=player.storage.jiaozhao_card;
+				if(name=='tao'||name=='shan'||name=='wuzhong'||name=='jiu') return false;
+				return player.get('h').contains(player.storage.jiaozhao);
+			},
+			filterCard:function(card,player){
+				return card==player.storage.jiaozhao;
+			},
+			selectCard:-1,
+			popname:true,
+			filterTarget:function(card,player,target){
+				if(player==target) return false;
+				return lib.filter.filterTarget({name:player.storage.jiaozhao_card},player,target);
+			},
+		},
+		jiaozhao3:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			popup:false,
+			content:function(){
+				delete player.storage.jiaozhao;
+				delete player.storage.jiaozhao2;
+			}
+		},
+		danxin:{
+			trigger:{player:'damageEnd'},
+			frequent:true,
+			content:function(){
+				'step 0'
+				if(player.storage.jiaozhao1&&player.storage.jiaozhao2){
+					player.draw();
+					event.finish();
+				}
+				else{
+					var list=['draw_card','更改描述'];
+					var prompt;
+					if(player.storage.jiaozhao1){
+						prompt='摸一张牌或更改矫诏的描述<br><br><div class="text">更改描述：将“选择距离最近的一名其他角色，该角色”改为“你”';
+					}
+					else{
+						prompt='摸一张牌或更改矫诏的描述<br><br><div class="text">更改描述：将“基本牌”改为“基本牌或非延时类锦囊牌”';
+					}
+					player.chooseControl(list,function(){
+						if(!_status.event.player.hasSkill('jiaozhao')) return 'draw_card';
+						return '更改描述';
+					}).set('prompt',prompt);
+				}
+				'step 1'
+				if(result.control=='draw_card'){
+					player.draw();
+				}
+				else{
+					game.log(player,'更改了','【矫诏】','的描述');
+					player.popup('更改描述');
+					player.markSkill('jiaozhao');
+					if(player.storage.jiaozhao1){
+						player.storage.jiaozhao2=true;
+					}
+					else{
+						player.storage.jiaozhao1=true;
+					}
+				}
+			}
+		},
+		zongzuo:{
+			trigger:{global:'phaseBefore'},
+			forced:true,
+			priority:10,
+			filter:function(event,player){
+				return !player.storage.zongzuo;
+			},
+			content:function(){
+				'step 0'
+				player.storage.zongzuo=true;
+				var list=['wei','shu','wu','qun'],num=0;
+				for(var i=0;i<game.players.length&&list.length;i++){
+					if(list.contains(game.players[i].group)){
+						list.remove(game.players[i].group);
+						num++;
+					}
+				}
+				player.gainMaxHp(num);
+				event.num=num;
+				'step 1'
+				player.hp+=event.num;
+				player.update();
+			},
+			group:'zongzuo_lose',
+			subSkill:{
+				lose:{
+					trigger:{global:'dieAfter'},
+					forced:true,
+					filter:function(event,player){
+						var list=['wei','shu','wu','qun'];
+						if(!list.contains(event.player.group)) return false;
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].group==event.player.group){
+								return false;
+							}
+						}
+						return true;
+					},
+					content:function(){
+						player.loseMaxHp();
+					}
+				}
+			}
+		},
+		zhige:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.num('h')>player.hp;
+			},
+			filterTarget:function(card,player,target){
+				return get.distance(target,player,'attack')<=1&&target.num('e')>0;
+			},
+			content:function(){
+				'step 0'
+				target.chooseToUse({name:'sha'},player,-1,'止戈：使用一张杀，或将其装备区里的一张牌交给'+get.translation(player));
+				'step 1'
+				if(!result.bool&&target.num('e')){
+					target.chooseCard('e',true,'将其装备区里的一张牌交给'+get.translation(player));
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool&&result.cards&&result.cards.length){
+					player.gain(result.cards);
+					target.$give(result.cards,player);
+				}
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+					player:function(player,target){
+						if(target.num('h')==0) return 0;
+						if(target.num('h')==1) return -0.1;
+						if(player.hp<=2) return -2;
+						if(player.num('h','shan')==0) return -1;
+						return -0.5;
+					}
+				}
+			}
+		},
 		kuangbi:{
 			enable:'phaseUse',
 			usable:1,
@@ -6272,7 +6549,8 @@ character.yijiang={
 		liyan:'李严',
 
 		jiaozhao:'矫诏',
-		jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。直到回合结束，你可以将此手牌当声明的牌使用且你不能被选择为目标',
+		jiaozhao2:'矫诏',
+		jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标',
 		danxin:'殚心',
 		danxin_info:'当你受到伤害后，你可以摸一张牌，或对“矫诏”的描述依次执行下列一项修改：1.将“基本牌”改为“基本牌或非延时类锦囊牌”；2.将“选择距离最近的一名其他角色，该角色”改为“你”',
 		duliang:'督粮',

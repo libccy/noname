@@ -206,6 +206,9 @@ card.standard={
 			filterTarget:function(card,player,target){
 				return target==player&&target.hp<target.maxHp;
 			},
+			modTarget:function(card,player,target){
+				return target.hp<target.maxHp;
+			},
 			content:function(){
 				target.recover();
 			},
@@ -726,6 +729,7 @@ card.standard={
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
+			modTarget:true,
 			content:function(){
 				target.draw(2);
 			},

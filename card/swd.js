@@ -252,6 +252,7 @@ card.swd={
 			},
 			usable:1,
 			selectTarget:-1,
+			modTarget:true,
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
@@ -260,7 +261,7 @@ card.swd={
 				if(target==_status.dying) target.recover();
 				else{
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
-					if(card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
+					if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
 						card.clone.moveDelete(target);
 						game.addVideo('gain2',target,get.cardsInfo([card]));
 					}

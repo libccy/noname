@@ -3828,6 +3828,8 @@
     					if(pilecfg){
     						lib.config.bannedpile=pilecfg[0]||{};
     						lib.config.addedpile=pilecfg[1]||{};
+                            lib.config.bannedpile=JSON.parse(JSON.stringify(lib.config.bannedpile));
+                            lib.config.addedpile=JSON.parse(JSON.stringify(lib.config.addedpile));
     					}
                     }
                     else{
@@ -5759,7 +5761,7 @@
                     }
 					event.dialog.close();
                     "step 2"
-                    if(game.online){
+                    if(game.online||!event.result.bool){
                         event.finish();
                     }
 					"step 3"
@@ -11790,6 +11792,14 @@
 				if(typeof filter=='boolean') return filter;
 				if(typeof filter=='function') return filter(card,player,target);
 			},
+            targetEnabled2:function(card,player,target){
+                if(lib.filter.targetEnabled(card,player,target)) return true;
+				if(card==undefined) return false;
+				var filter=get.info(card).modTarget;
+				if(typeof filter=='boolean') return filter;
+				if(typeof filter=='function') return filter(card,player,target);
+                return false;
+            },
 			targetInRange:function(card,player,target){
 				var mod=game.checkMod(card,player,target,'unchanged','targetInRange',player.get('s'));
 				var extra=0;
@@ -16814,11 +16824,11 @@
                     }
                 }
 
-                var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
-                if(pilecfg){
-                    lib.config.bannedpile=pilecfg[0]||{};
-                    lib.config.addedpile=pilecfg[1]||{};
-                }
+                // var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
+                // if(pilecfg){
+                //     lib.config.bannedpile=pilecfg[0]||{};
+                //     lib.config.addedpile=pilecfg[1]||{};
+                // }
 
                 try{
                     lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
@@ -19996,7 +20006,10 @@
 					var toggleCardPile=function(bool){
 						var name=this._link.config._name;
 						var number=this._link.config._number;
-						if(!bool){
+                        if(!lib.config.bannedpile[name]){
+                            lib.config.bannedpile[name]=[];
+                        }
+						if(bool){
 							lib.config.bannedpile[name].remove(number);
 						}
 						else{
@@ -20291,8 +20304,8 @@
 								that.innerHTML='使用默认牌堆';
 							},1000);
 							game.saveConfig('cardpilename',null,true);
-							game.saveConfig('bannedpile');
-							game.saveConfig('addedpile');
+							game.saveConfig('bannedpile',{});
+							game.saveConfig('addedpile',{});
 							updatePileConfig();
 						},page);
 						var exportCardPile;
@@ -20326,8 +20339,8 @@
 							lib.config.customcardpile[name]=[lib.config.bannedpile,lib.config.addedpile];
 							game.saveConfig('cardpilename',name,true);
 							game.saveConfig('customcardpile',lib.config.customcardpile);
-							game.saveConfig('bannedpile');
-							game.saveConfig('addedpile');
+							game.saveConfig('bannedpile',{});
+							game.saveConfig('addedpile',{});
 							createPileNode(name);
 							updatePileConfig();
 						};
