@@ -1,5 +1,6 @@
 'use strict';
 character.yijiang={
+	connect:true,
 	character:{
 		yujin:['male','wei',4,['yizhong']],
 		caozhang:['male','wei',4,['jiangchi']],
