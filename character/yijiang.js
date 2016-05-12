@@ -145,6 +145,7 @@ character.yijiang={
 				}
 				var att=ai.get.attitude(event.target,player);
 				event.target.chooseButton(['矫诏',[list,'vcard']],true).set('ai',function(button){
+					var att=_status.event.att;
 					if(att<=0){
 						return button.link=='shan'?1:0;
 					}
@@ -232,6 +233,12 @@ character.yijiang={
 				if(player==target) return false;
 				return lib.filter.filterTarget({name:player.storage.jiaozhao_card},player,target);
 			},
+			check:function(card){
+				return 8-ai.get.value(card);
+			},
+			ai:{
+				order:6
+			}
 		},
 		jiaozhao3:{
 			trigger:{player:'phaseEnd'},
@@ -3544,7 +3551,7 @@ character.yijiang={
 				"step 2"
 				if(result.bool){
 					player.gain(result.target,'gain2');
-					player.addTempSkill('jizhi','phaseAfter');
+					player.addTempSkill('qiaoshui3','phaseAfter');
 				}
 				else{
 					player.gain(result.player,'gain2');
@@ -3559,6 +3566,52 @@ character.yijiang={
 			mod:{
 				cardEnabled:function(card){
 					if(get.type(card,'trick')=='trick') return false;
+				}
+			}
+		},
+		qiaoshui3:{
+			trigger:{player:'useCard'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				var type=get.type(event.card);
+				return type=='basic'||type=='trick';
+			},
+			content:function(){
+				'step 0'
+				player.removeSkill('qiaoshui3');
+				var goon=false;
+				var info=get.info(trigger.card);
+				if(trigger.targets&&!info.multitarget){
+					for(var i=0;i<game.players.length;i++){
+						if(lib.filter.targetEnabled2(trigger.card,player,game.players[i])&&!trigger.targets.contains(game.players[i])){
+							goon=true;break;
+						}
+					}
+				}
+				if(goon){
+					player.chooseTarget('巧说：是否额外指定一名'+get.translation(trigger.card)+'的目标？',function(card,player,target){
+						var trigger=_status.event.getTrigger();
+						if(trigger.targets.contains(target)) return false;
+						return lib.filter.targetEnabled2(trigger.card,_status.event.player,target);
+					}).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return ai.get.effect(target,trigger.card,player,player);
+					});
+				}
+				'step 1'
+				if(result.bool){
+					game.delay(0.5);
+					event.target=result.targets[0];
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(event.target){
+					player.logSkill('qiaoshui',event.target);
+					trigger.targets.add(event.target);
 				}
 			}
 		},
@@ -6715,7 +6768,7 @@ character.yijiang={
 		jyzongshi:'纵适',
 		jyzongshi_info:'每当你成为其他角色的非延时锦囊牌的目标时，若你是此锦囊的唯一目标，你可以摸一张牌',
 		qiaoshui:'巧说',
-		qiaoshui_info:'出牌阶段开始时，你可以与一名其他角色拼点。若你赢，你获得对方的拼点牌，并获得技能【集智】直到回合结束；若你没赢，你收回拼点牌且不能使用锦囊牌直到回合结束。每阶段限一次。',
+		qiaoshui_info:'出牌阶段开始时，你可以与一名其他角色拼点。若你赢，你获得对方的拼点牌，且本回合内使用的下一张基本牌或非延时锦囊牌能额外（无距离限制）指定一个目标；若你没赢，你收回拼点牌且本回合不能使用锦囊牌',
 		junxing:'峻刑',
 		junxing_info:'出牌阶段限一次，你可以弃置至少一张手牌并选择一名其他角色，该角色需弃置一张与你弃置的牌类别均不同的手牌，否则其先将其武将牌翻面再摸X张牌（X为你以此法弃置的手牌数量）。',
 

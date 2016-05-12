@@ -26,7 +26,7 @@
 	margin-top:0;
 	margin-bottom:0;
 	background:linear-gradient(to right,rgba(0,0,0,0.3),transparent),
-			linear-gradient(135deg,rgba(0,0,0,0.5) ,transparent 80%,transparent);
+			linear-gradient(135deg,rgba(0,0,0,0.5) ,transparent 80%,transparent) !important;
 	box-shadow:none;
 	color:white;
 	text-shadow:black 0 0 2px;
