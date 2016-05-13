@@ -247,7 +247,7 @@ character.yijiang={
 			popup:false,
 			content:function(){
 				delete player.storage.jiaozhao;
-				delete player.storage.jiaozhao2;
+				delete player.storage.jiaozhao_card;
 			}
 		},
 		danxin:{
@@ -345,7 +345,7 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				target.chooseToUse({name:'sha'},player,-1,'止戈：使用一张杀，或将其装备区里的一张牌交给'+get.translation(player));
+				target.chooseToUse({name:'sha'},'止戈：使用一张杀，或将其装备区里的一张牌交给'+get.translation(player));
 				'step 1'
 				if(!result.bool&&target.num('e')){
 					target.chooseCard('e',true,'将其装备区里的一张牌交给'+get.translation(player));
@@ -360,6 +360,7 @@ character.yijiang={
 				}
 			},
 			ai:{
+				expose:0.2,
 				order:5,
 				result:{
 					target:-1,
@@ -730,26 +731,34 @@ character.yijiang={
 				if(info&&info.distance&&info.distance.attackFrom){
 					num-=info.distance.attackFrom;
 				}
-				trigger.player.chooseToDiscard(num,'弃置'+get.cnNumber(num)+'张牌，或令杀的伤害+1').set('ai',function(card){
-					var player=_status.event.player;
-					if(player.hp==1){
-						if(get.type(card)=='basic'){
-							return 8-ai.get.value(card);
+				if(trigger.player.num('h')<num){
+					event.directfalse=true;
+				}
+				else{
+					trigger.player.chooseToDiscard(num,'弃置'+get.cnNumber(num)+'张手牌，或令杀的伤害+1').set('ai',function(card){
+						var player=_status.event.player;
+						if(player.hp==1){
+							if(get.type(card)=='basic'){
+								return 8-ai.get.value(card);
+							}
+							else{
+								return 10-ai.get.value(card);
+							}
 						}
 						else{
-							return 10-ai.get.value(card);
+							if(num>2){
+								return 0;
+							}
+							return 8-ai.get.value(card);
 						}
-					}
-					else{
-						if(num>2){
-							return 0;
-						}
-						return 8-ai.get.value(card);
-					}
-				});
+					});
+				}
 				'step 1'
-				if(result.bool){
-					player.discard(player.get('e','1'));
+				if(!event.directfalse&&result.bool){
+					var e1=player.get('e','1');
+					if(e1){
+						player.discard(e1);
+					}
 				}
 				else{
 					trigger.num++;

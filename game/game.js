@@ -18684,8 +18684,16 @@
 															game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
 														}
 													}
-													if(game.importedPack.image&&lib.db){
-														for(var i=0;i<game.importedPack.image.length;i++){
+                                                    var imglist=[];
+                                                    for(var i in zip.files){
+                                                        if(i[0]!='.'&&i[0]!='_'){
+                                                            if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
+                                                                imglist.push(i);
+                                                            }
+                                                        }
+                                                    }
+													if(imglist.length&&lib.db){
+														for(var i=0;i<imglist.length;i++){
 															var buttons=page.querySelectorAll('.button.character');
 															for(var j=0;j<buttons.length;j++){
 																if(buttons[j].link==i){
@@ -18693,7 +18701,7 @@
 																	break;
 																}
 															}
-															var imgname=game.importedPack.image[i];
+															var imgname=imglist[i];
 															var str=zip.file(imgname).asArrayBuffer();
 															if(str){
 																var blob=new Blob([str]);
