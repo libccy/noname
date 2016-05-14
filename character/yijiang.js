@@ -297,6 +297,7 @@ character.yijiang={
 			trigger:{global:'phaseBefore'},
 			forced:true,
 			priority:10,
+			audio:2,
 			filter:function(event,player){
 				return !player.storage.zongzuo;
 			},
@@ -321,6 +322,7 @@ character.yijiang={
 				lose:{
 					trigger:{global:'dieAfter'},
 					forced:true,
+					audio:'zongzuo',
 					filter:function(event,player){
 						var list=['wei','shu','wu','qun'];
 						if(!list.contains(event.player.group)) return false;
@@ -340,6 +342,7 @@ character.yijiang={
 		zhige:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			filter:function(event,player){
 				return player.num('h')>player.hp;
 			},
