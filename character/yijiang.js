@@ -92,6 +92,7 @@ character.yijiang={
 		jiaozhao:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			check:function(card){
 				return 8-ai.get.value(card);
 			},
@@ -219,6 +220,7 @@ character.yijiang={
 		},
 		jiaozhao2:{
 			enable:'phaseUse',
+			audio:'jiaozhao',
 			filter:function(event,player){
 				if(!player.storage.jiaozhao) return false;
 				var name=player.storage.jiaozhao_card;
@@ -253,6 +255,7 @@ character.yijiang={
 		danxin:{
 			trigger:{player:'damageEnd'},
 			frequent:true,
+			audio:2,
 			content:function(){
 				'step 0'
 				if(player.storage.jiaozhao1&&player.storage.jiaozhao2){
@@ -382,11 +385,11 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				target.chooseCard('he',[1,3],'匡弼：将1〜3张牌置于'+get.translation(player)+'的武将牌上').set('ai',function(card){
+				target.chooseCard('he',[1,3],'匡弼：将1〜3张牌置于'+get.translation(player)+'的武将牌上',true).set('ai',function(card){
 					if(ai.get.attitude(_status.event.player,_status.event.getParent().player)>0){
 						return 7-ai.get.value(card);
 					}
-					return 0;
+					return -ai.get.value(card);
 				});
 				'step 1'
 				if(result.bool){
@@ -6622,7 +6625,7 @@ character.yijiang={
 		fulin:'腹鳞',
 		fulin_info:'锁定技，弃牌阶段内，你于此回合内获得的牌不计入你的手牌数',
 		kuangbi:'匡弼',
-		kuangbi_info:'出牌阶段限一次，你可以选择一名有牌的其他角色，该角色将其至多三张牌置于你的武将牌上。若如此做，你的下回合开始时，你获得武将牌上的所有牌，然后其摸等量的牌',
+		kuangbi_info:'出牌阶段限一次，你可以选择一名有牌的其他角色，该角色将其一至三张牌置于你的武将牌上。若如此做，你的下回合开始时，你获得武将牌上的所有牌，然后其摸等量的牌',
 		zhige:'止戈',
 		zhige_info:'出牌阶段限一次，若你的手牌数大于你的体力值，你可以选择攻击范围内含有你的一名其他角色，除非该角色使用一张【杀】，否则其将其装备区里的一张牌交给你',
 		zongzuo:'宗祚',
