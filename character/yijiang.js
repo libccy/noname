@@ -380,6 +380,7 @@ character.yijiang={
 		kuangbi:{
 			enable:'phaseUse',
 			usable:1,
+			audio:2,
 			filterTarget:function(card,player,target){
 				return target!=player&&target.num('he')>0;
 			},
