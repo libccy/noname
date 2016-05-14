@@ -1415,6 +1415,7 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
     					lib.config.hiddenPlayPack.add('character');
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
@@ -1430,6 +1431,7 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
     					lib.config.hiddenPlayPack.add('soldier');
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
@@ -1455,6 +1457,7 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
     					lib.config.hiddenPlayPack.add('wuxing');
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
@@ -1518,6 +1521,7 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
     					lib.config.hiddenPlayPack.add('weather');
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
@@ -1567,6 +1571,7 @@
     			    name:'隐藏此扩展',
     			    clear:true,
     			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
     					lib.config.hiddenPlayPack.add('coin');
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
@@ -13618,6 +13623,145 @@
                 game.importedPack=obj;
             }
 		},
+        importExtension:function(data,finishLoad){
+            var zip=new JSZip();
+            zip.load(data);
+            var str=zip.file('extension.js').asText();
+            try{
+                _status.importingExtension=true;
+                eval(str);
+                _status.importingExtension=false;
+                if(!game.importedPack) throw('err');
+                var extname=game.importedPack.name;
+                if(lib.config.all.plays.contains('extname')){
+                    throw('err');
+                }
+                if(lib.config.extensions.contains(extname)){
+                    game.removeExtension(extname,true);
+                }
+                lib.config.extensions.add(extname);
+                game.saveConfig('extensions',lib.config.extensions);
+                game.saveConfig('extension_'+extname+'_enable',true);
+                for(var i in game.importedPack.config){
+                    if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
+                        game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
+                    }
+                }
+                if(game.download){
+                    var filelist=[];
+                    for(var i in zip.files){
+                        if(i[0]!='.'&&i[0]!='_'){
+                            filelist.push(i);
+                        }
+                    }
+                    if(lib.node&&lib.node.fs){
+                        var access=function(){
+                            var dirname=__dirname+'/extension/'+extname;
+                            var finish=function(){
+                                dirname+='/';
+                                var writeFile=function(){
+                                    if(filelist.length){
+                                        var filename=filelist.shift();
+                                        lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
+                                    }
+                                    else{
+                                        finishLoad();
+                                    }
+                                }
+                                writeFile();
+                            };
+                            lib.node.fs.access(dirname,function(e){
+                                if(e){
+                                    try{
+                                        lib.node.fs.mkdir(dirname,finish);
+                                    }
+                                    catch(e){
+                                        throw('err');
+                                    }
+                                }
+                                else{
+                                    finish();
+                                }
+                            });
+                        };
+                        lib.node.fs.access(__dirname+'/extension',function(e){
+                            if(e){
+                                try{
+                                    lib.node.fs.mkdir(__dirname+'/extension',access);
+                                }
+                                catch(e){
+                                    throw('err');
+                                }
+                            }
+                            else{
+                                access();
+                            }
+                        });
+                    }
+                    else{
+                        window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+                            entry.getDirectory('extension/'+extname,{create:true},function(dirEntry){
+                                var writeFile=function(){
+                                    if(filelist.length){
+                                        var filename=filelist.shift();
+                                        dirEntry.getFile(filename,{create:true},function(fileEntry){
+                                            fileEntry.createWriter(function(fileWriter){
+                                                fileWriter.onwriteend=writeFile;
+                                                fileWriter.write(zip.files[filename].asArrayBuffer());
+                                            });
+                                        });
+                                    }
+                                    else{
+                                        finishLoad();
+                                    }
+                                };
+                                writeFile();
+                            });
+                        });
+                    }
+                }
+                else{
+                    localStorage.setItem(lib.configprefix+'extension_'+extname,str);
+                    var imglist=[];
+                    for(var i in zip.files){
+                        if(i[0]!='.'&&i[0]!='_'){
+                            if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
+                                imglist.push(i);
+                            }
+                        }
+                    }
+                    if(imglist.length&&lib.db){
+                        lib.config.extensionInfo[extname]={
+                            image:imglist
+                        }
+                        game.saveConfig('extensionInfo',lib.config.extensionInfo);
+                        for(var i=0;i<imglist.length;i++){
+                            var imgname=imglist[i];
+                            var str=zip.file(imgname).asArrayBuffer();
+                            if(str){
+                                var blob=new Blob([str]);
+                                var fileReader=new FileReader();
+                                fileReader.onload = (function(imgname){
+                                    return function(fileLoadedEvent)
+                                    {
+                                        var data = fileLoadedEvent.target.result;
+                                        game.putDB('image','extension-'+extname+':'+imgname,data);
+                                    };
+                                }(imgname))
+                                fileReader.readAsDataURL(blob, "UTF-8");
+                            }
+                        }
+                    }
+                    finishLoad();
+                }
+                delete game.importedPack;
+            }
+            catch(e){
+                console.log(e);
+                alert('导入失败');
+                return false;
+            }
+        },
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 			var fileNameToSaveAs = name||'noname';
@@ -13732,7 +13876,7 @@
 				zipReady();
 			}
 		},
-        multiDownload:function(list,onsuccess,onerror,onfinish){
+        multiDownload:function(list,onsuccess,onerror,onfinish,process){
             if(lib.updateURL[lib.updateURL.length-1]!='/'){
                 lib.updateURL+='/';
             }
@@ -13740,7 +13884,14 @@
             var download=function(){
                 if(list.length){
                     var current=list.shift();
-                    game.download(current,current,function(){
+                    var current2;
+                    if(typeof process=='function'){
+                        current2=process(current);
+                    }
+                    else{
+                        current2=current;
+                    }
+                    game.download(current,current2,function(){
                         if(onsuccess) onsuccess();
                         download();
                     },function(){
@@ -20376,10 +20527,14 @@
 				}());
 
                 (function(){
+                    if(connectMenu) return;
 					var start=menuxpages.shift();
 					var rightPane=start.lastChild;
 
 					var clickMode=function(){
+                        if(this.mode=='get'){
+                            this.update();
+                        }
 						var active=this.parentNode.querySelector('.active');
 						if(active===this){
 							return;
@@ -20484,6 +20639,7 @@
                         return node;
                     };
                     for(var i in lib.extensionMenu){
+                        if(lib.config.hiddenPlayPack.contains(i)) continue;
                         createModeConfig(i,start.firstChild);
                     }
                     (function(){
@@ -20492,7 +20648,6 @@
 						node.link=page;
 						node.mode='get';
                         var importextensionexpanded=false;
-                        page.style.textAlign='left';
                         page.style.paddingBottom='10px';
                         var importExtension;
                         var extensionnode=ui.create.div('.config.more','导入扩展 <div>&gt;</div>',page,function(){
@@ -20507,10 +20662,18 @@
                             importextensionexpanded=!importextensionexpanded;
                         });
                         importExtension=ui.create.div('.new_character.export.import',page);
+                        importExtension.style.float='left';
                         importExtension.style.marginLeft='5px';
                         importExtension.style.marginTop='5px';
+                        importExtension.style.marginBottom='5px';
                         importExtension.style.display='none';
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
+
+                        var reloadnode=ui.create.div('.config.toggle','重新启动',page,game.reload);
+                        reloadnode.style.display='none';
+                        var placeholder=ui.create.div('.config.toggle',page);
+                        placeholder.style.height=0;
+                        placeholder.style.marginTop='5px';
 
                         importExtension.firstChild.lastChild.onclick=function(){
                             var fileToLoad=this.previousSibling.files[0];
@@ -20530,144 +20693,9 @@
                                             },1000);
                                         };
                                         var data = fileLoadedEvent.target.result;
-                                        var zip=new JSZip();
-                                        zip.load(data);
-                                        var str=zip.file('extension.js').asText();
-                                        try{
-                                            _status.importingExtension=true;
-                                            eval(str);
-                                            _status.importingExtension=false;
-                                            if(!game.importedPack) throw('err');
-                                            var extname=game.importedPack.name;
-                                            if(lib.config.all.plays.contains('extname')){
-                                                throw('err');
-                                            }
-                                            if(lib.config.extensions.contains(extname)){
-                                                game.removeExtension(extname,true);
-                                            }
-                                            lib.config.extensions.add(extname);
-                                            game.saveConfig('extensions',lib.config.extensions);
-                                            game.saveConfig('extension_'+extname+'_enable',true);
-                                            for(var i in game.importedPack.config){
-                                                if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
-                                                    game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
-                                                }
-                                            }
-                                            if(game.download){
-                                                var filelist=[];
-                                                for(var i in zip.files){
-                                                    if(i[0]!='.'&&i[0]!='_'){
-                                                        filelist.push(i);
-                                                    }
-                                                }
-                                                if(lib.node&&lib.node.fs){
-                                                    var access=function(){
-                                                        var dirname=__dirname+'/extension/'+extname;
-                                                        var finish=function(){
-                                                            dirname+='/';
-                                                            var writeFile=function(){
-                                                                if(filelist.length){
-                                                                    var filename=filelist.shift();
-                                                                    lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
-                                                                }
-                                                                else{
-                                                                    finishLoad();
-                                                                }
-                                                            }
-                                                            writeFile();
-                                                        };
-                                                        lib.node.fs.access(dirname,function(e){
-                                                            if(e){
-                                                                try{
-                                                                    lib.node.fs.mkdir(dirname,finish);
-                                                                }
-                                                                catch(e){
-                                                                    throw('err');
-                                                                }
-                                                            }
-                                                            else{
-                                                                finish();
-                                                            }
-                                                        });
-                                                    };
-                                                    lib.node.fs.access(__dirname+'/extension',function(e){
-                                                        if(e){
-                                                            try{
-                                                                lib.node.fs.mkdir(__dirname+'/extension',access);
-                                                            }
-                                                            catch(e){
-                                                                throw('err');
-                                                            }
-                                                        }
-                                                        else{
-                                                            access();
-                                                        }
-                                                    });
-                                                }
-                                                else{
-                                                    window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
-                                                        entry.getDirectory('extension/'+extname,{create:true},function(dirEntry){
-                                                            var writeFile=function(){
-                                                                if(filelist.length){
-                                                                    var filename=filelist.shift();
-                                                                    dirEntry.getFile(filename,{create:true},function(fileEntry){
-                                                                        fileEntry.createWriter(function(fileWriter){
-                                                                            fileWriter.onwriteend=writeFile;
-                                                                            fileWriter.write(zip.files[filename].asArrayBuffer());
-                                                                        });
-                                                                    });
-                                                                }
-                                                                else{
-                                                                    finishLoad();
-                                                                }
-                                                            };
-                                                            writeFile();
-                                                        });
-                                                    });
-                                                }
-                                            }
-                                            else{
-                                                localStorage.setItem(lib.configprefix+'extension_'+extname,str);
-                                                var imglist=[];
-                                                for(var i in zip.files){
-                                                    if(i[0]!='.'&&i[0]!='_'){
-                                                        if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
-                                                            imglist.push(i);
-                                                        }
-                                                    }
-                                                }
-                                                if(imglist.length&&lib.db){
-                                                    lib.config.extensionInfo[extname]={
-                                                        image:imglist
-                                                    }
-                                                    game.saveConfig('extensionInfo',lib.config.extensionInfo);
-                                                    for(var i=0;i<imglist.length;i++){
-                                                        var imgname=imglist[i];
-                                                        var str=zip.file(imgname).asArrayBuffer();
-                                                        if(str){
-                                                            var blob=new Blob([str]);
-                                                            var fileReader=new FileReader();
-                                                            fileReader.onload = (function(imgname){
-                                                                return function(fileLoadedEvent)
-                                                                {
-                                                                    var data = fileLoadedEvent.target.result;
-                                                                    game.putDB('image','extension-'+extname+':'+imgname,data);
-                                                                };
-                                                            }(imgname))
-                                                            fileReader.readAsDataURL(blob, "UTF-8");
-                                                        }
-                                                    }
-                                                }
-                                                finishLoad();
-                                            }
-                                            delete game.importedPack;
+                                        if(game.importExtension(data,finishLoad)!==false){
+                                            importExtension.style.display='none';
                                         }
-                                        catch(e){
-                                            console.log(e);
-                                            alert('导入失败');
-                                            return;
-                                        }
-                                        importExtension.style.display='none';
                                     };
                                     fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
                                 }
@@ -20679,6 +20707,108 @@
                                 }
                             }
                         }
+
+                        var clickExtension=function(){
+                            var active=this.parentNode.querySelector('.active');
+                            if(active){
+                                active.classList.remove('active');
+                            }
+                            if(active!=this){
+                                this.classList.add('active');
+                            }
+                        };
+                        var importExtension=function(extname,onsuccess,onerror){
+                            try{
+                                if(lib.config.all.plays.contains(extname)){
+                                    throw('err');
+                                }
+                                _status.importingExtension=true;
+                                lib.init.js('extension/'+name,'extension',function(){
+                                    _status.importingExtension=false;
+                                    if(!game.importedPack) throw('err');
+                                    if(lib.config.extensions.contains(extname)){
+                                        game.removeExtension(extname,true);
+                                    }
+                                    lib.config.extensions.add(extname);
+                                    game.saveConfig('extensions',lib.config.extensions);
+                                    game.saveConfig('extension_'+extname+'_enable',true);
+                                    for(var i in game.importedPack.config){
+                                        if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
+                                            game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
+                                        }
+                                    }
+                                    delete game.importedPack;
+                                    onsuccess();
+                                },function(){
+                                    _status.importingExtension=false;
+                                    onerror();
+                                });
+                            }
+                            catch(e){
+                                console.log(e);
+                                onerror();
+                            }
+                        };
+                        var downloadExtension=function(){
+                            if(this.innerHTML!='下载扩展'||!window.JSZip) return;
+                            this.innerHTML='正在下载';
+                            if(lib.updateURL[lib.updateURL.length-1]!='/'){
+                                lib.updateURL+='/';
+                            }
+                            var that=this;
+                            var list=['web/'+this.link+'/extension.js'];
+                            for(var i=0;i<this.files.length;i++){
+                                list.push('web/'+this.link+'/'+this.files[i]);
+                            }
+                            game.multiDownload(list,null,function(){
+                                that.innerHTML='下载失败';
+                            },function(){
+                                if(that.innerHTML=='下载失败') return;
+                                importExtension(that.name,function(){
+                                    that.innerHTML='安装成功';
+                                    reloadnode.style.display='';
+                                },function(){
+                                    that.innerHTML='安装失败';
+                                });
+                            },function(str){
+                                return 'extension/'+that.name+'/'+str.slice(str.lastIndexOf('/')+1);
+                            });
+                        };
+
+                        node.update=function(){
+                            if(!game.download) return;
+                            if(!window.JSZip){
+                				lib.init.js(lib.assetURL+'game','jszip');
+                			}
+                            var toremove=[];
+                            for(var i=0;i<page.childElementCount;i++){
+                                if(page.childNodes[i].classList.contains('menubutton')||page.childNodes[i].classList.contains('loading')){
+                                    toremove.push(page.childNodes[i]);
+                                }
+                            }
+                            for(var i=0;i<toremove.length;i++){
+                                toremove[i].remove();
+                            }
+                            var loading=ui.create.div('.loading.config.toggle','载入中...',page);
+                            var script=lib.init.js(lib.updateURL,'web/list',function(){
+                                loading.remove();
+                                script.remove();
+                                var list=window.noname_extension_list;
+                                delete window.noname_extension_list;
+                                for(var i in list){
+                                    var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
+                                    ui.create.div('.caption',list[i].name,node);
+                                    ui.create.div('.text.author','作者：'+list[i].author,node);
+                                    ui.create.div('.text',list[i].description,node);
+                                    var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,downloadExtension);
+                                    download.link=i;
+                                    download.name=list[i].name;
+                                    download.files=list[i].files;
+                                }
+                            },function(){
+                                loading.innerHTML='连接失败';
+                            });
+                        };
                     }());
 					var active=start.firstChild.querySelector('.active');
                     if(!active){

@@ -593,8 +593,29 @@
 	margin-top: 6px;
 	overflow: hidden;
 }
+.videonode.menubutton.extension{
+	text-align: left;
+	height: auto;
+	max-height: 90px;
+}
+.videonode.menubutton.extension.active{
+	max-height: 200px;
+}
 .videonode.menubutton>div{
 	position: absolute;
+}
+.videonode.menubutton.extension>div{
+	position: relative;
+	display: block;
+}
+.videonode.menubutton.extension>.caption>.menubutton{
+	position: relative;
+	float: right;
+	font-size: 16px;
+	padding: 0;
+	text-align: center;
+	width: 80px;
+	font-family:'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif;
 }
 .videonode.menubutton>.videoavatar{
 	width: 56px;
@@ -618,6 +639,11 @@
 	padding-top: 0;
 	white-space: nowrap;
 }
+.videonode.menubutton.extension>.caption{
+	left: 0;
+	top: 0;
+	margin-left: 2px;
+}
 .videonode.menubutton>.text{
 	font-size: 14px;
 	left: 85px;
@@ -625,6 +651,11 @@
 	line-height: 20px;
 	text-align: left;
 	font-family:'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
+}
+.videonode.menubutton.extension>.text{
+	left: 0;
+	top: 0;
+	margin-left: 5px;
 }
 .videonode.menubutton>.victory{
 	font-family: 'huangcao','xinwei';
