@@ -1238,261 +1238,6 @@
 					}
 				}
 			},
-			extension:{
-				name:'扩展',
-				config:{
-					character:{
-					    name:'技能卡牌',
-					    init:false,
-					    restart:true,
-					    onclick:function(bool){
-					        if(bool){
-					            lib.config.plays.add('character');
-					        }
-					        else{
-					            lib.config.plays.remove('character');
-					        }
-					        game.saveConfig('plays',lib.config.plays);
-					    }
-					},
-					character_num_playpackconfig:{
-					    name:'卡牌比例',
-					    init:'0.05',
-					    item:{
-					        '0.02':'2%',
-					        '0.05':'5%',
-					        '0.1':'10%',
-					        '0.2':'20%',
-					    }
-					},
-					character_hide_playpackconfig:{
-					    name:'隐藏此扩展',
-					    clear:true,
-					    onclick:function(){
-							lib.config.hiddenPlayPack.add('character');
-							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-						}
-					},
-					soldier:{
-					    name:'士兵模式',
-					    init:false,
-					    restart:true,
-					    onclick:function(bool){
-					        if(bool){
-					            lib.config.plays.add('soldier');
-					        }
-					        else{
-					            lib.config.plays.remove('soldier');
-					        }
-					        game.saveConfig('plays',lib.config.plays);
-					    }
-					},
-					soldier_hide_playpackconfig:{
-					    name:'隐藏此扩展',
-					    clear:true,
-					    onclick:function(){
-							lib.config.hiddenPlayPack.add('soldier');
-							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-						}
-					},
-					wuxing:{
-					    name:'五行生克',
-					    init:false,
-					    restart:true,
-					    onclick:function(bool){
-					        if(bool){
-					            lib.config.plays.add('wuxing');
-					        }
-					        else{
-					            lib.config.plays.remove('wuxing');
-					        }
-					        game.saveConfig('plays',lib.config.plays);
-					    }
-					},
-					wuxing_num_playpackconfig:{
-					    name:'带属性卡牌',
-					    init:'0.3',
-					    item:{
-					        '0.1':'10%',
-					        '0.2':'20%',
-					        '0.3':'30%',
-					        '0.5':'50%',
-					    }
-					},
-					wuxing_hide_playpackconfig:{
-					    name:'隐藏此扩展',
-					    clear:true,
-					    onclick:function(){
-							lib.config.hiddenPlayPack.add('wuxing');
-							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-						}
-					},
-					weather:{
-					    name:'天气变化',
-					    init:false,
-					    restart:true,
-					    onclick:function(bool){
-					        if(bool){
-					            lib.config.plays.add('weather');
-					        }
-					        else{
-					            lib.config.plays.remove('weather');
-					        }
-					        game.saveConfig('plays',lib.config.plays);
-					    }
-					},
-					// weather_animation_playpackconfig:{
-					// 	name:'天气动画',
-					// 	init:true
-					// },
-					weather_noqing_playpackconfig:{
-					    name:'异常天气出现概率',
-					    init:'0.5',
-					    item:{
-					        '0.1':'10%',
-					        '0.3':'30%',
-					        '0.5':'50%',
-					        '0.7':'70%',
-					        '0.9':'90%',
-					    }
-					},
-					weather_chance_playpackconfig:{
-					    name:'天气效果触发概率',
-					    init:'0.5',
-					    item:{
-					        '0.1':'10%',
-					        '0.2':'20%',
-					        '0.3':'30%',
-					        '0.5':'50%',
-					        '0.8':'80%',
-					    },
-					    onclick:function(item){
-					        game.saveConfig('weather_chance_playpackconfig',item);
-					        _status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
-					    }
-					},
-					weather_duration_playpackconfig:{
-					    name:'异常天气持续时间',
-					    init:'[4,4]',
-					    item:{
-					        '[2,4]':'1~3回合',
-					        '[4,4]':'3~6回合',
-					        '[4,7]':'3~9回合',
-					        '[7,4]':'6~9回合',
-					        '[7,7]':'6~12回合',
-					    }
-					},
-					weather_qingduration_playpackconfig:{
-					    name:'晴朗天气持续时间',
-					    init:'[2,4]',
-					    item:{
-					        '[2,4]':'1~3回合',
-					        '[4,4]':'3~6回合',
-					        '[4,7]':'3~9回合',
-					        '[7,4]':'6~9回合',
-					        '[7,7]':'6~12回合',
-					    }
-					},
-					weather_hide_playpackconfig:{
-					    name:'隐藏此扩展',
-					    clear:true,
-					    onclick:function(){
-							lib.config.hiddenPlayPack.add('weather');
-							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-						}
-					},
-					coin:{
-					    name:'富甲天下',
-					    init:false,
-					    restart:true,
-					    onclick:function(bool){
-					        if(bool){
-					            lib.config.plays.add('coin');
-					        }
-					        else{
-					            lib.config.plays.remove('coin');
-					        }
-					        game.saveConfig('plays',lib.config.plays);
-					    }
-					},
-					coin_display_playpackconfig:{
-					    name:'金币显示',
-					    init:'text',
-					    item:{
-					        symbol:'符号',
-					        text:'文字'
-					    },
-					    onclick:function(item){
-					        game.saveConfig('coin_display_playpackconfig',item);
-					        if(game.changeCoin) game.changeCoin(0);
-					    }
-					},
-					coin_canvas_playpackconfig:{
-					    name:'特效置顶',
-					    init:false,
-					    onclick:function(bool){
-					        game.saveConfig('coin_canvas_playpackconfig',bool);
-					        if(bool){
-					            ui.window.classList.add('canvas_top');
-					        }
-					        else{
-					            ui.window.classList.remove('canvas_top');
-					        }
-					    }
-					},
-					coin_hide_playpackconfig:{
-					    name:'隐藏此扩展',
-					    clear:true,
-					    onclick:function(){
-							lib.config.hiddenPlayPack.add('coin');
-							game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-						}
-					},
-					update:function(config,map){
-						for(var i in map){
-							if(i.indexOf('extension_')==0) continue;
-					        if(i.indexOf('_playpackconfig')!=-1){
-								var packname=i.slice(0,i.indexOf('_'));
-					            map[i].classList.add('indent');
-					            if(!lib.config.hiddenPlayPack.contains(packname)&&
-									lib.config.plays.contains(packname)){
-					                map[i].show();
-					            }
-					            else{
-					                map[i].hide();
-					            }
-					        }
-					        else{
-								if(lib.config.hiddenPlayPack.contains(i)){
-									map[i].hide();
-								}
-								else{
-									if(lib.config.plays.contains(i)){
-						                map[i].classList.add('on');
-						            }
-						            else{
-						                map[i].classList.remove('on');
-						            }
-								}
-					        }
-					    }
-						for(var i=0;i<lib.config.extensions.length;i++){
-							var name='extension_'+lib.config.extensions[i];
-							for(var j in map){
-								if(j!=name&&j.indexOf(name)==0){
-									map[j].classList.add('indent');
-									if(config[name]){
-										map[j].show();
-									}
-									else{
-										map[j].hide();
-									}
-								}
-							}
-						}
-					}
-				}
-			},
 			skill:{
 				name:'技能',
 				config:{
@@ -1649,6 +1394,185 @@
 				}
 			}
 		},
+        extensionMenu:{
+            character:{
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			},
+    			num:{
+    			    name:'卡牌比例',
+    			    init:'0.05',
+    			    item:{
+    			        '0.02':'2%',
+    			        '0.05':'5%',
+    			        '0.1':'10%',
+    			        '0.2':'20%',
+    			    }
+    			},
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+    					lib.config.hiddenPlayPack.add('character');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
+            soldier:{
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			},
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+    					lib.config.hiddenPlayPack.add('soldier');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
+            wuxing:{
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			},
+                num:{
+    			    name:'带属性卡牌',
+    			    init:'0.3',
+    			    item:{
+    			        '0.1':'10%',
+    			        '0.2':'20%',
+    			        '0.3':'30%',
+    			        '0.5':'50%',
+    			    }
+    			},
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+    					lib.config.hiddenPlayPack.add('wuxing');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
+			weather:{
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			},
+    			noqing:{
+    			    name:'异常天气出现概率',
+    			    init:'0.5',
+    			    item:{
+    			        '0.1':'10%',
+    			        '0.3':'30%',
+    			        '0.5':'50%',
+    			        '0.7':'70%',
+    			        '0.9':'90%',
+    			    }
+    			},
+    			chance:{
+    			    name:'天气效果触发概率',
+    			    init:'0.5',
+    			    item:{
+    			        '0.1':'10%',
+    			        '0.2':'20%',
+    			        '0.3':'30%',
+    			        '0.5':'50%',
+    			        '0.8':'80%',
+    			    },
+    			    onclick:function(item){
+    			        game.saveConfig('weather_chance_playpackconfig',item);
+    			        _status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
+    			    }
+    			},
+    			duration:{
+    			    name:'异常天气持续时间',
+    			    init:'[4,4]',
+    			    item:{
+    			        '[2,4]':'1~3回合',
+    			        '[4,4]':'3~6回合',
+    			        '[4,7]':'3~9回合',
+    			        '[7,4]':'6~9回合',
+    			        '[7,7]':'6~12回合',
+    			    }
+    			},
+    			qingduration:{
+    			    name:'晴朗天气持续时间',
+    			    init:'[2,4]',
+    			    item:{
+    			        '[2,4]':'1~3回合',
+    			        '[4,4]':'3~6回合',
+    			        '[4,7]':'3~9回合',
+    			        '[7,4]':'6~9回合',
+    			        '[7,7]':'6~12回合',
+    			    }
+    			},
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+    					lib.config.hiddenPlayPack.add('weather');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
+            coin:{
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			    onclick:function(bool){
+    			        if(bool){
+    			            lib.config.plays.add('coin');
+    			        }
+    			        else{
+    			            lib.config.plays.remove('coin');
+    			        }
+    			        game.saveConfig('plays',lib.config.plays);
+    			    }
+    			},
+    			display:{
+    			    name:'金币显示',
+    			    init:'text',
+    			    item:{
+    			        symbol:'符号',
+    			        text:'文字'
+    			    },
+    			    onclick:function(item){
+    			        game.saveConfig('coin_display_playpackconfig',item);
+    			        if(game.changeCoin) game.changeCoin(0);
+    			    }
+    			},
+    			canvas:{
+    			    name:'特效置顶',
+    			    init:false,
+    			    onclick:function(bool){
+    			        game.saveConfig('coin_canvas_playpackconfig',bool);
+    			        if(bool){
+    			            ui.window.classList.add('canvas_top');
+    			        }
+    			        else{
+    			            ui.window.classList.remove('canvas_top');
+    			        }
+    			    }
+    			},
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+    					lib.config.hiddenPlayPack.add('coin');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
+        },
 		mode:{
 			identity:{
 		        name:'身份',
@@ -3318,7 +3242,7 @@
 						}
 					}
 				}
-                var extensionlist=[];
+                var extensionlist=lib.config.plays.slice(0);
 				for(var i=0;i<lib.config.extensions.length;i++){
                     var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
                     if(extcontent){
@@ -3336,7 +3260,7 @@
                     }
 				}
                 var loadPack=function(){
-                    var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+lib.config.plays.length+1;
+                    var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
     				var packLoaded=function(){
     					toLoad--;
     					if(toLoad==0){
@@ -3360,7 +3284,6 @@
     				}
     				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
-    				lib.init.js(lib.assetURL+'play',lib.config.plays,packLoaded,packLoaded);
     				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
                 };
                 if(extensionlist.length){
@@ -3940,7 +3863,7 @@
 							j=='game'||j=='get'||j=='ui'||j=='arenaReady') continue;
 							for(k in play[i][j]){
 								if(j=='translate'&&k==i){
-									lib[j][k+'_play_config']=play[i][j][k];
+									// lib[j][k+'_play_config']=play[i][j][k];
 								}
 								else{
 									if(lib[j][k]!=undefined){
@@ -4024,8 +3947,10 @@
                         for(var i=0;i<lib.extensions.length;i++){
                             try{
                                 _status.extension=lib.extensions[i][0];
+                                _status.evaluatingExtension=lib.extensions[i][3];
                                 lib.extensions[i][1](lib.extensions[i][2]);
                                 delete _status.extension;
+                                delete _status.evaluatingExtension;
                             }
                             catch(e){
                                 console.log(e);
@@ -13612,52 +13537,44 @@
 				game.saveConfig('customCharacterPack',lib.config.customCharacterPack);
 			}
 			else if(type=='extension'){
-				lib.configMenu.extension.config['extension_'+obj.name]={
-					name:obj.name,
-					init:true
-				}
+                lib.extensionMenu['extension_'+obj.name]={
+                    enable:{
+                        name:'开启',
+    					init:true
+                    }
+                };
 				for(var i in obj.config){
-					lib.configMenu.extension.config['extension_'+obj.name+'_'+i]=obj.config[i];
+					lib.extensionMenu['extension_'+obj.name][i]=obj.config[i];
 				}
 				for(var i in obj.help){
 					lib.help[i]=obj.help[i];
 				}
-				lib.configMenu.extension.config['extension_'+obj.name+'_delete']={
+				lib.extensionMenu['extension_'+obj.name].delete={
 					name:'删除此扩展',
 					clear:true,
 					onclick:function(){
 						if(this.innerHTML=='确认删除'){
 							var prefix='extension_'+obj.name;
 							var page=this.parentNode;
-							for(var i=0;i<page.childElementCount;i++){
-								if(page.childNodes[i]._link&&page.childNodes[i]._link.config._name.indexOf(prefix)==0){
-									page.childNodes[i].remove();
-									i--;
-								}
-							}
-							for(var i in lib.config){
-								if(i.indexOf(prefix)==0){
-									game.saveConfig(i);
-								}
-							}
-							localStorage.removeItem(lib.configprefix+prefix);
-							lib.config.extensions.remove(obj.name);
-							game.saveConfig('extensions',lib.config.extensions);
-                            var modelist=lib.config.extensionInfo[obj.name];
-                            if(modelist){
-                                if(modelist.image){
-                                    for(var i=0;i<modelist.image.length;i++){
-    									game.deleteDB('image','extension-'+obj.name+':'+modelist.image[i]);
-    								}
-                                }
-                                if(modelist.mode){
-                                    for(var i=0;i<modelist.mode.length;i++){
-                                        game.clearModeConfig(modelist.mode[i]);
+                            var start=page.parentNode.previousSibling;
+                            page.remove();
+                            if(start){
+                                for(var i=0;i<start.childElementCount;i++){
+                                    if(start.childNodes[i].link==page){
+                                        var active=false;
+                                        if(start.childNodes[i].classList.contains('active')){
+                                            active=true;
+                                        }
+                                        start.childNodes[i].remove();
+                                        if(active){
+                                            start.firstChild.classList.add('active');
+                                            start.nextSibling.appendChild(start.firstChild.link);
+                                        }
+                                        break;
                                     }
                                 }
-                                delete lib.config.extensionInfo[obj.name];
-                                game.saveConfig('extensionInfo',lib.config.extensionInfo);
                             }
+                            game.removeExtension(obj.name);
 							if(obj.onremove){
 								obj.onremove();
 							}
@@ -13673,7 +13590,7 @@
 				}
 			}
             if(type=='extension'&&!_status.importingExtension){
-                if(obj&&lib.config['extension_'+obj.name]){
+                if(obj&&lib.config['extension_'+obj.name+'_enable']){
                     lib.init.eval(obj);
                     var cfg={};
                     for(var j in lib.config){
@@ -13689,7 +13606,7 @@
                             delete _status.extension;
                         }
                         if(obj.content){
-                            lib.extensions.push([obj.name,obj.content,cfg]);
+                            lib.extensions.push([obj.name,obj.content,cfg,_status.evaluatingExtension]);
                         }
                     }
                     catch(e){
@@ -15647,6 +15564,59 @@
             }
             game.saveConfig('extensionMode',lib.config.extensionInfo);
 		},
+        removeExtension:function(extname,keepfile){
+            var prefix='extension_'+extname;
+            for(var i in lib.config){
+                if(i.indexOf(prefix)==0){
+                    game.saveConfig(i);
+                }
+            }
+            localStorage.removeItem(lib.configprefix+prefix);
+            lib.config.extensions.remove(extname);
+            game.saveConfig('extensions',lib.config.extensions);
+            var modelist=lib.config.extensionInfo[extname];
+            if(modelist){
+                if(modelist.image){
+                    for(var i=0;i<modelist.image.length;i++){
+                        game.deleteDB('image','extension-'+extname+':'+modelist.image[i]);
+                    }
+                }
+                if(modelist.mode){
+                    for(var i=0;i<modelist.mode.length;i++){
+                        game.clearModeConfig(modelist.mode[i]);
+                    }
+                }
+                delete lib.config.extensionInfo[extname];
+                game.saveConfig('extensionInfo',lib.config.extensionInfo);
+            }
+            if(game.download&&!keepfile){
+                if(lib.node&&lib.node.fs){
+                    try{
+                        lib.node.fs.readdir(__dirname+'/extension/'+extname,function(err,list){
+                            var removeFile=function(){
+                                if(list.length){
+                                    var filename=list.shift();
+                                    lib.node.fs.unlink(__dirname+'/extension/'+extname+'/'+filename,removeFile);
+                                }
+                                else{
+                                    try{
+                                        lib.node.fs.rmdir(__dirname+'/extension/'+extname);
+                                    }
+                                    catch(e){}
+                                }
+                            }
+                            removeFile();
+                        });
+                    }
+                    catch(e){}
+                }
+                else{
+                    window.resolveLocalFileSystemURL(lib.assetURL+'extension/'+extname,function(entry){
+                        entry.removeRecursively();
+                    });
+                }
+            }
+        },
         addRecentCharacter:function(){
             for(var i=0;i<arguments.length;i++){
                 if(lib.character[arguments[i]]){
@@ -18250,7 +18220,7 @@
                         }
     				}
 
-    				var menux=createMenu(['开始','选项','武将','卡牌','战局','帮助'],{
+    				var menux=createMenu(['开始','选项','武将','卡牌','扩展','其它'],{
                         position:menuContainer,bar:40
                     });
     				menu=menux.menu;
@@ -18729,193 +18699,8 @@
 							var banskillNodes=[];
 							var custombanskillNodes=[];
 							var banskill;
-							if(mode=='extension'){
-								var importextensionexpanded=false;
-								page.style.textAlign='left';
-								page.style.paddingBottom='10px';
-								var importExtension;
-                                var extensionnode=ui.create.div('.config.more','导入扩展 <div>&gt;</div>',page,function(){
-                                    if(importextensionexpanded){
-                                        this.classList.remove('on');
-                                        importExtension.style.display='none';
-                                    }
-                                    else{
-                                        this.classList.add('on');
-										importExtension.style.display='';
-                                    }
-                                    importextensionexpanded=!importextensionexpanded;
-                                });
-								importExtension=ui.create.div('.new_character.export.import',page);
-								importExtension.style.marginLeft='5px';
-								importExtension.style.marginTop='5px';
-								importExtension.style.display='none';
-								ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
-								importExtension.firstChild.lastChild.onclick=function(){
-									var fileToLoad=this.previousSibling.files[0];
-									if(fileToLoad){
-										var zipReady=function(){
-											var fileReader = new FileReader();
-											fileReader.onload = function(fileLoadedEvent)
-											{
-                                                var finishLoad=function(){
-                                                    extensionnode.innerHTML='导入成功，3秒后将重启';
-    												setTimeout(function(){
-														extensionnode.innerHTML='导入成功，2秒后将重启';
-														setTimeout(function(){
-															extensionnode.innerHTML='导入成功，1秒后将重启';
-															setTimeout(game.reload,1000);
-														},1000);
-    												},1000);
-                                                };
-												var data = fileLoadedEvent.target.result;
-												var zip=new JSZip();
-												zip.load(data);
-												var str=zip.file('extension.js').asText();
-												try{
-                                                    _status.importingExtension=true;
-													eval(str);
-                                                    _status.importingExtension=false;
-													if(!game.importedPack) throw('err');
-													var extname=game.importedPack.name;
-													lib.config.extensions.add(extname);
-													game.saveConfig('extensions',lib.config.extensions);
-													game.saveConfig('extension_'+extname,true);
-													for(var i in game.importedPack.config){
-														if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
-															game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
-														}
-													}
-
-                                                    if(game.download){
-                                                        localStorage.removeItem(lib.configprefix+'extension_'+extname);
-                                                        var filelist=[];
-                                                        for(var i in zip.files){
-                                                            if(i[0]!='.'&&i[0]!='_'){
-                                                                filelist.push(i);
-                                                            }
-                                                        }
-                                                        if(lib.node&&lib.node.fs){
-                                                            var access=function(){
-                                                                var dirname=__dirname+'/extension/'+extname;
-                                                                var finish=function(){
-                                                                    dirname+='/';
-                                                                    var writeFile=function(){
-                                                                        if(filelist.length){
-                                                                            var filename=filelist.shift();
-                                                                            lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
-                                                                        }
-                                                                        else{
-                                                                            finishLoad();
-                                                                        }
-                                                                    }
-                                                                    writeFile();
-                                                                };
-                                                                lib.node.fs.access(dirname,function(e){
-                                                                    if(e){
-                                                                        try{
-                                                                            lib.node.fs.mkdir(dirname,finish);
-                                                                        }
-                                                                        catch(e){
-                                                                            throw('err');
-                                                                        }
-                                                                    }
-                                                                    else{
-                                                                        finish();
-                                                                    }
-                                                                });
-                                                            };
-                                                            lib.node.fs.access(__dirname+'/extension',function(e){
-                                                                if(e){
-                                                                    try{
-                                                                        lib.node.fs.mkdir(__dirname+'/extension',access);
-                                                                    }
-                                                                    catch(e){
-                                                                        throw('err');
-                                                                    }
-                                                                }
-                                                                else{
-                                                                    access();
-                                                                }
-                                                            });
-                                                        }
-                                                        else{
-                                                            window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
-                                                                entry.getDirectory('extension',{create:true},function(dirEntry){
-                                                                    var writeFile=function(){
-                                                                        if(filelist.length){
-                                                                            var filename=filelist.shift();
-                                                                            dirEntry.getFile(filename,{create:true},function(fileEntry){
-                                                        						fileEntry.createWriter(function(fileWriter){
-                                                        							fileWriter.onwriteend=writeFile;
-                                                        							fileWriter.write(zip.files[filename].asNodeBuffer());
-                                                        						});
-                                                        					});
-                                                                        }
-                                                                        else{
-                                                                            finishLoad();
-                                                                        }
-                                                                    };
-                                                                    writeFile();
-                                                                });
-                                            				});
-                                                        }
-                                                    }
-                                                    else{
-                                                        localStorage.setItem(lib.configprefix+'extension_'+extname,str);
-                                                        var imglist=[];
-                                                        for(var i in zip.files){
-                                                            if(i[0]!='.'&&i[0]!='_'){
-                                                                if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
-                                                                    imglist.push(i);
-                                                                }
-                                                            }
-                                                        }
-    													if(imglist.length&&lib.db){
-                                                            lib.config.extensionInfo[extname]={
-                                                                image:imglist
-                                                            }
-                                                            game.saveConfig('extensionInfo',lib.config.extensionInfo);
-    														for(var i=0;i<imglist.length;i++){
-    															var imgname=imglist[i];
-    															var str=zip.file(imgname).asArrayBuffer();
-    															if(str){
-    																var blob=new Blob([str]);
-    																var fileReader=new FileReader();
-    																fileReader.onload = (function(imgname){
-    																	return function(fileLoadedEvent)
-    																	{
-    																		var data = fileLoadedEvent.target.result;
-    																		game.putDB('image','extension-'+extname+':'+imgname,data);
-    																	};
-    																}(imgname))
-    																fileReader.readAsDataURL(blob, "UTF-8");
-    															}
-    														}
-    													}
-                                                        finishLoad();
-                                                    }
-													delete game.importedPack;
-												}
-												catch(e){
-													console.log(e);
-													alert('导入失败');
-													return;
-												}
-		                                        importExtension.style.display='none';
-											};
-											fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-										}
-										if(!window.JSZip){
-											lib.init.js(lib.assetURL+'game','jszip',zipReady);
-										}
-										else{
-											zipReady();
-										}
-									}
-								}
-							}
-							else if(mode=='skill'){
+							if(mode=='skill'){
 								var autoskillexpanded=false;
 								var banskillexpanded=false;
                                 ui.create.div('.config.more','自动发动 <div>&gt;</div>',page,function(){
@@ -19240,6 +19025,62 @@
 					for(var i in lib.configMenu){
                         createModeConfig(i,start.firstChild);
                     }
+                    for(var i in lib.help){
+						var page=ui.create.div('');
+						var node=ui.create.div('.menubutton.large',i,start.firstChild,clickMode);
+                        node.type='help';
+						node.link=page;
+                        node.style.display='none';
+						page.classList.add('menu-help');
+						page.innerHTML=lib.help[i];
+					}
+
+                    if(!connectMenu){
+                        var node=ui.create.div('.menubutton.large','帮助',start.firstChild,function(){
+                            var activex=start.firstChild.querySelector('.active');
+                            if(this.innerHTML=='帮助'){
+                                this.innerHTML='返回';
+                                for(var i=0;i<start.firstChild.childElementCount;i++){
+                                    var nodex=start.firstChild.childNodes[i];
+                                    if(nodex==node) continue;
+                                    if(nodex.type=='help'){
+                                        nodex.style.display='';
+                                        if(activex&&activex.type!='help'){
+                                            activex.classList.remove('active');
+                                            activex.link.remove();
+                                            activex=null;
+                    						nodex.classList.add('active');
+                    						rightPane.appendChild(nodex.link);
+                                        }
+                                    }
+                                    else{
+                                        nodex.style.display='none';
+                                    }
+                                }
+                            }
+                            else{
+                                this.innerHTML='帮助';
+                                for(var i=0;i<start.firstChild.childElementCount;i++){
+                                    var nodex=start.firstChild.childNodes[i];
+                                    if(nodex==node) continue;
+                                    if(nodex.type!='help'){
+                                        nodex.style.display='';
+                                        if(activex&&activex.type=='help'){
+                                            activex.classList.remove('active');
+                                            activex.link.remove();
+                                            activex=null;
+                    						nodex.classList.add('active');
+                    						rightPane.appendChild(nodex.link);
+                                        }
+                                    }
+                                    else{
+                                        nodex.style.display='none';
+                                    }
+                                }
+                            }
+    					});
+                    }
+
 					var active=start.firstChild.querySelector('.active');
                     if(!active){
                         active=start.firstChild.firstChild;
@@ -20534,11 +20375,326 @@
 					updateNodes();
 				}());
 
+                (function(){
+					var start=menuxpages.shift();
+					var rightPane=start.lastChild;
+
+					var clickMode=function(){
+						var active=this.parentNode.querySelector('.active');
+						if(active===this){
+							return;
+						}
+						active.classList.remove('active');
+						active.link.remove();
+						active=this;
+						this.classList.add('active');
+						rightPane.appendChild(this.link);
+					};
+					var updateNodes=function(){
+						for(var i=0;i<start.firstChild.childNodes.length;i++){
+							var node=start.firstChild.childNodes[i];
+							if(node.link){
+                                if(node.mode=='get') continue;
+                                if(node.mode.indexOf('extension_')==0){
+                                    if(lib.config[node.mode+'_enable']){
+    									node.classList.remove('off');
+    									node.link.firstChild.classList.add('on');
+    								}
+    								else{
+    									node.classList.add('off');
+    									node.link.firstChild.classList.remove('on');
+    								}
+                                }
+                                else{
+                                    if(lib.config.plays.contains(node.mode)){
+    									node.classList.remove('off');
+    									node.link.firstChild.classList.add('on');
+    								}
+    								else{
+    									node.classList.add('off');
+    									node.link.firstChild.classList.remove('on');
+    								}
+                                }
+							}
+						}
+					}
+					var togglePack=function(bool){
+						var name=this._link.config._name;
+                        if(name.indexOf('extension_')==0){
+                            if(bool){
+                                game.saveConfig(name,true);
+                            }
+                            else{
+                                game.saveConfig(name,false);
+                            }
+                        }
+                        else{
+                            name=name.slice(0,name.indexOf('_enable_playpackconfig'));
+                            if(bool){
+    							lib.config.plays.add(name);
+    						}
+    						else{
+    							lib.config.plays.remove(name);
+    						}
+    						game.saveConfig('plays',lib.config.plays);
+                        }
+						updateNodes();
+					};
+
+					var createModeConfig=function(mode,position){
+                        var page=ui.create.div('');
+                        var node;
+                        if(mode.indexOf('extension_')==0){
+                            node=ui.create.div('.menubutton.large',mode.slice(10),position,clickMode);
+                        }
+                        else{
+                            node=ui.create.div('.menubutton.large',lib.translate[mode+'_play_config'],position,clickMode);
+                        }
+						node.link=page;
+						node.mode=mode;
+                        for(var i in lib.extensionMenu[mode]){
+                            var cfg=copyObj(lib.extensionMenu[mode][i]);
+                            var j;
+                            if(mode.indexOf('extension_')==0){
+                                j=mode+'_'+i;
+                            }
+                            else{
+                                j=mode+'_'+i+'_playpackconfig';
+                            }
+                            cfg._name=j;
+                            if(!lib.config.hasOwnProperty(j)){
+                                game.saveConfig(j,cfg.init);
+                            }
+                            else{
+                                cfg.init=lib.config[j];
+                            }
+
+                            if(i=='enable'){
+                                cfg.onclick=togglePack;
+                            }
+                            else if(!lib.extensionMenu[mode][i].onclick){
+                                cfg.onclick=function(result){
+                                    var cfg=this._link.config;
+                                    game.saveConfig(cfg._name,result);
+                                };
+                            }
+                            var cfgnode=createConfig(cfg);
+                            page.appendChild(cfgnode);
+                        }
+                        return node;
+                    };
+                    for(var i in lib.extensionMenu){
+                        createModeConfig(i,start.firstChild);
+                    }
+                    (function(){
+                        var page=ui.create.div('');
+                        var node=ui.create.div('.menubutton.large','获取扩展',start.firstChild,clickMode);
+						node.link=page;
+						node.mode='get';
+                        var importextensionexpanded=false;
+                        page.style.textAlign='left';
+                        page.style.paddingBottom='10px';
+                        var importExtension;
+                        var extensionnode=ui.create.div('.config.more','导入扩展 <div>&gt;</div>',page,function(){
+                            if(importextensionexpanded){
+                                this.classList.remove('on');
+                                importExtension.style.display='none';
+                            }
+                            else{
+                                this.classList.add('on');
+                                importExtension.style.display='';
+                            }
+                            importextensionexpanded=!importextensionexpanded;
+                        });
+                        importExtension=ui.create.div('.new_character.export.import',page);
+                        importExtension.style.marginLeft='5px';
+                        importExtension.style.marginTop='5px';
+                        importExtension.style.display='none';
+                        ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
+
+                        importExtension.firstChild.lastChild.onclick=function(){
+                            var fileToLoad=this.previousSibling.files[0];
+                            if(fileToLoad){
+                                var zipReady=function(){
+                                    var fileReader = new FileReader();
+                                    fileReader.onload = function(fileLoadedEvent)
+                                    {
+                                        var finishLoad=function(){
+                                            extensionnode.innerHTML='导入成功，3秒后将重启';
+                                            setTimeout(function(){
+                                                extensionnode.innerHTML='导入成功，2秒后将重启';
+                                                setTimeout(function(){
+                                                    extensionnode.innerHTML='导入成功，1秒后将重启';
+                                                    setTimeout(game.reload,1000);
+                                                },1000);
+                                            },1000);
+                                        };
+                                        var data = fileLoadedEvent.target.result;
+                                        var zip=new JSZip();
+                                        zip.load(data);
+                                        var str=zip.file('extension.js').asText();
+                                        try{
+                                            _status.importingExtension=true;
+                                            eval(str);
+                                            _status.importingExtension=false;
+                                            if(!game.importedPack) throw('err');
+                                            var extname=game.importedPack.name;
+                                            if(lib.config.all.plays.contains('extname')){
+                                                throw('err');
+                                            }
+                                            if(lib.config.extensions.contains(extname)){
+                                                game.removeExtension(extname,true);
+                                            }
+                                            lib.config.extensions.add(extname);
+                                            game.saveConfig('extensions',lib.config.extensions);
+                                            game.saveConfig('extension_'+extname+'_enable',true);
+                                            for(var i in game.importedPack.config){
+                                                if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
+                                                    game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
+                                                }
+                                            }
+                                            if(game.download){
+                                                var filelist=[];
+                                                for(var i in zip.files){
+                                                    if(i[0]!='.'&&i[0]!='_'){
+                                                        filelist.push(i);
+                                                    }
+                                                }
+                                                if(lib.node&&lib.node.fs){
+                                                    var access=function(){
+                                                        var dirname=__dirname+'/extension/'+extname;
+                                                        var finish=function(){
+                                                            dirname+='/';
+                                                            var writeFile=function(){
+                                                                if(filelist.length){
+                                                                    var filename=filelist.shift();
+                                                                    lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
+                                                                }
+                                                                else{
+                                                                    finishLoad();
+                                                                }
+                                                            }
+                                                            writeFile();
+                                                        };
+                                                        lib.node.fs.access(dirname,function(e){
+                                                            if(e){
+                                                                try{
+                                                                    lib.node.fs.mkdir(dirname,finish);
+                                                                }
+                                                                catch(e){
+                                                                    throw('err');
+                                                                }
+                                                            }
+                                                            else{
+                                                                finish();
+                                                            }
+                                                        });
+                                                    };
+                                                    lib.node.fs.access(__dirname+'/extension',function(e){
+                                                        if(e){
+                                                            try{
+                                                                lib.node.fs.mkdir(__dirname+'/extension',access);
+                                                            }
+                                                            catch(e){
+                                                                throw('err');
+                                                            }
+                                                        }
+                                                        else{
+                                                            access();
+                                                        }
+                                                    });
+                                                }
+                                                else{
+                                                    window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+                                                        entry.getDirectory('extension/'+extname,{create:true},function(dirEntry){
+                                                            var writeFile=function(){
+                                                                if(filelist.length){
+                                                                    var filename=filelist.shift();
+                                                                    dirEntry.getFile(filename,{create:true},function(fileEntry){
+                                                                        fileEntry.createWriter(function(fileWriter){
+                                                                            fileWriter.onwriteend=writeFile;
+                                                                            fileWriter.write(zip.files[filename].asArrayBuffer());
+                                                                        });
+                                                                    });
+                                                                }
+                                                                else{
+                                                                    finishLoad();
+                                                                }
+                                                            };
+                                                            writeFile();
+                                                        });
+                                                    });
+                                                }
+                                            }
+                                            else{
+                                                localStorage.setItem(lib.configprefix+'extension_'+extname,str);
+                                                var imglist=[];
+                                                for(var i in zip.files){
+                                                    if(i[0]!='.'&&i[0]!='_'){
+                                                        if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
+                                                            imglist.push(i);
+                                                        }
+                                                    }
+                                                }
+                                                if(imglist.length&&lib.db){
+                                                    lib.config.extensionInfo[extname]={
+                                                        image:imglist
+                                                    }
+                                                    game.saveConfig('extensionInfo',lib.config.extensionInfo);
+                                                    for(var i=0;i<imglist.length;i++){
+                                                        var imgname=imglist[i];
+                                                        var str=zip.file(imgname).asArrayBuffer();
+                                                        if(str){
+                                                            var blob=new Blob([str]);
+                                                            var fileReader=new FileReader();
+                                                            fileReader.onload = (function(imgname){
+                                                                return function(fileLoadedEvent)
+                                                                {
+                                                                    var data = fileLoadedEvent.target.result;
+                                                                    game.putDB('image','extension-'+extname+':'+imgname,data);
+                                                                };
+                                                            }(imgname))
+                                                            fileReader.readAsDataURL(blob, "UTF-8");
+                                                        }
+                                                    }
+                                                }
+                                                finishLoad();
+                                            }
+                                            delete game.importedPack;
+                                        }
+                                        catch(e){
+                                            console.log(e);
+                                            alert('导入失败');
+                                            return;
+                                        }
+                                        importExtension.style.display='none';
+                                    };
+                                    fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+                                }
+                                if(!window.JSZip){
+                                    lib.init.js(lib.assetURL+'game','jszip',zipReady);
+                                }
+                                else{
+                                    zipReady();
+                                }
+                            }
+                        }
+                    }());
+					var active=start.firstChild.querySelector('.active');
+                    if(!active){
+                        active=start.firstChild.firstChild;
+                        active.classList.add('active');
+                    }
+					rightPane.appendChild(active.link);
+					updateNodes();
+				}());
+
 				(function(){
                     if(connectMenu) return;
 					var start=menuxpages.shift();
 					var rightPane=start.lastChild;
 					var cheatButton=ui.create.div('.menubutton.round.highlight','作',start);
+                    cheatButton.style.display='none';
 					var runButton=ui.create.div('.menubutton.round.highlight','执',start);
 					runButton.style.display='none';
 					var playButton=ui.create.div('.menubutton.round.highlight','播',start);
@@ -20584,6 +20740,298 @@
 							deleteButton.style.display='none';
 						}
 					};
+                    (function(){
+                        var page=ui.create.div('');
+                        var node=ui.create.div('.menubutton.large','更新',start.firstChild,clickMode);
+    					node.link=page;
+    					page.classList.add('menu-help');
+    					var ul=document.createElement('ul');
+    					var li1=document.createElement('li');
+                        var li2=document.createElement('li');
+    					var li3=document.createElement('li');
+    					li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px"></p>';
+    					li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
+                        li3.innerHTML='更新源<br><p style="margin-top:8px"><input type="text" style="width:120px" value="'+lib.updateURL+'"><button style="margin-left:5px">确定</button></p>';
+                        li3.querySelector('button').onclick=function(){
+                            lib.updateURL=this.previousSibling.value;
+                            localStorage.setItem('noname_update_url',lib.updateURL);
+                        }
+
+    					var button1,button2;
+                        var span1,includeskin;
+
+    					game.checkForUpdate=function(forcecheck){
+    						if(button1.disabled){
+    							return;
+    						}
+                            else if(!game.download){
+                                alert('此版本不支持游戏内更新，请手动更新');
+                                return;
+                            }
+    						else{
+    							button1.innerHTML='正在检查更新';
+    							button1.disabled=true;
+
+    							var goupdate=function(){
+    								if(game.download){
+    									var script=lib.init.js(lib.updateURL,'game/source',function(){
+    										script.remove();
+    										var updates=window.noname_source_list;
+    										delete window.noname_source_list;
+                                            for(var i=0;i<updates.length;i++){
+                                                if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('style.css')==-1){
+                                                    updates.splice(i--,1);
+                                                }
+                                            }
+
+    										if(!ui.arena.classList.contains('menupaused')){
+    											ui.click.configMenu();
+    											ui.click.menuTab('帮助');
+    										}
+    										var p=button1.parentNode;
+    										button1.remove();
+    										var span=document.createElement('span');
+    										var n1=0;
+    										var n2=updates.length;
+    										span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+    										p.appendChild(span);
+    										var finish=function(){
+    											span.innerHTML='游戏更新完毕（'+n1+'/'+n2+'）';
+    											p.appendChild(document.createElement('br'));
+    											var button=document.createElement('button');
+    											button.innerHTML='重新启动';
+    											button.onclick=game.reload;
+    											p.appendChild(button);
+    										}
+                                            game.multiDownload(updates,function(){
+                                                n1++;
+                                                span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
+                                            },function(){
+                                                game.print('下载失败：'+e.source);
+                                            },function(){
+                                                setTimeout(finish,500);
+                                            });
+    									});
+    								}
+    								else{
+    									var layer=document.createElement('div');
+    									layer.classList.add('poplayer');
+    									layer.style.zIndex='25';
+    									layer.listen(function(){
+    										this.remove();
+    									});
+    									layer.style.background='rgba(0,0,0,0.5)';
+
+    									var iframe=document.createElement('iframe');
+    									iframe.src='http://pan.baidu.com/s/1jG5oK8e';
+    									iframe.width=Math.round(ui.window.offsetWidth*0.8)+'px';
+    									iframe.height=Math.round(ui.window.offsetHeight*0.9)+'px';
+    									iframe.style.left=Math.round(ui.window.offsetWidth*0.1)+'px';
+    									iframe.style.top=Math.round(ui.window.offsetHeight*0.05)+'px';
+    									iframe.style.position='absolute';
+    									layer.appendChild(iframe);
+
+    									ui.window.appendChild(layer);
+    								}
+    							};
+
+
+    							var script=lib.init.js(lib.updateURL,'game/update',function(){
+    								button1.disabled=false;
+    								button1.innerHTML='检查游戏更新';
+    								script.remove();
+    								var update=window.noname_update;
+    								delete window.noname_update;
+    								if(forcecheck===false&&update.version==lib.config.check_version){
+    									return;
+    								}
+    								game.saveConfig('check_version',update.version);
+    								if(update.version!=lib.version){
+    									var str='有新版本'+update.version+'可用，是否下载？';
+    									if(navigator.notification&&navigator.notification.confirm){
+    										var str2=update.changeLog[0];
+    										for(var i=1;i<update.changeLog.length;i++){
+    											str2+='；'+update.changeLog[i];
+    										}
+    										navigator.notification.confirm(
+    											str2,
+    											function(index){
+    												if(index==1){
+    													goupdate();
+    												}
+    											},
+    											str,
+    											['确定','取消']
+    										);
+    									}
+    									else{
+    										if(confirm(str)){
+    											goupdate();
+    										}
+    									}
+    								}
+    								else{
+    									alert('当前版本已是最新');
+    								}
+    							},function(){
+                                    if(forcecheck===false){
+                                        return;
+                                    }
+                                    alert('连接失败');
+                                    button1.disabled=false;
+    								button1.innerHTML='检查游戏更新';
+    								script.remove();
+                                });
+    						}
+    					};
+    					game.checkForAssetUpdate=function(type){
+    						if(button2.disabled){
+    							return;
+    						}
+    						else if(game.download){
+    							button2.innerHTML='正在检查更新';
+    							button2.disabled=true;
+    							var script=lib.init.js(lib.updateURL,'game/asset',function(){
+    								script.remove();
+    								var updates=window.noname_asset_list;
+    								delete window.noname_asset_list;
+                                    var skins=window.noname_skin_list;
+                                    delete window.noname_skin_list;
+    								var asset_version=updates.shift();
+    								if(asset_version==lib.config.asset_version&&lib.config.exclude_skin){
+    									alert('素材已是最新');
+    									button2.disabled=false;
+    									button2.innerHTML='检查素材更新';
+    									return;
+    								}
+                                    if(!lib.config.exclude_skin){
+                                        for(var i in skins){
+                                            for(var j=1;j<=skins[i];j++){
+                                                updates.push('image/skin/'+i+'/'+j+'.jpg');
+                                            }
+                                        }
+                                    }
+    								var n=updates.length;
+                                    if(!ui.arena.classList.contains('menupaused')){
+                                        ui.click.configMenu();
+                                        ui.click.menuTab('帮助');
+                                    }
+
+    								var proceed=function(){
+    									if(updates.length==0){
+    										game.saveConfig('asset_version',asset_version);
+                                            alert('素材已是最新');
+                                            button2.disabled=false;
+    										button2.innerHTML='检查素材更新';
+    										return;
+    									}
+    									var p=button2.parentNode;
+    									button2.remove();
+    									var span=document.createElement('span');
+    									var n1=0;
+    									var n2=updates.length;
+    									span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
+                                        span1.remove();
+                                        includeskin.remove();
+    									p.appendChild(span);
+    									var finish=function(){
+    										if(n1==n2){
+    											game.saveConfig('asset_version',asset_version);
+    										}
+    										span.innerHTML='素材更新完毕（'+n1+'/'+n2+'）';
+    										p.appendChild(document.createElement('br'));
+    										var button=document.createElement('button');
+    										button.innerHTML='重新启动';
+    										button.onclick=game.reload;
+    										p.appendChild(button);
+    									}
+                                        game.multiDownload(updates,function(){
+                                            n1++;
+                                            span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
+                                        },function(){
+                                            game.print('下载失败：'+e.source);
+                                        },function(){
+                                            setTimeout(finish,500);
+                                        });
+    								};
+    								for(var i=0;i<updates.length;i++){
+                                        if(lib.node&&lib.node.fs){
+                                            lib.node.fs.access(__dirname+'/'+updates[i],(function(entry){
+                                                return function(err){
+                                                    if(err){
+                                                        n--;
+            											if(n==0){
+            												proceed();
+            											}
+                                                    }
+                                                    else{
+                                                        n--;
+            											updates.remove(entry);
+            											if(n==0){
+            												proceed();
+            											}
+                                                    }
+        										}
+                                            }(updates[i])));
+                                        }
+                                        else{
+                                            resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
+    											n--;
+    											updates.remove(entry.toURL().slice(lib.assetURL.length));
+    											if(n==0){
+    												proceed();
+    											}
+    										},function(){
+    											n--;
+    											if(n==0){
+    												proceed();
+    											}
+    										});
+                                        }
+    								}
+    							},function(){
+                                    alert('连接失败');
+                                    button2.disabled=false;
+    								button2.innerHTML='检查游戏更新';
+    								script.remove();
+                                });
+    						}
+    						else{
+    							alert('此版本不支持游戏内更新素材，请手动更新');
+    						}
+    					};
+
+    					button1=document.createElement('button');
+    					button1.innerHTML='检查游戏更新';
+    					button1.onclick=game.checkForUpdate;
+    					li1.lastChild.appendChild(button1);
+    					button2=document.createElement('button');
+    					button2.innerHTML='检查素材更新';
+    					button2.onclick=game.checkForAssetUpdate;
+    					li2.lastChild.appendChild(button2);
+
+                        var span1=document.createElement('span');
+                        span1.innerHTML='包含皮肤';
+                        span1.style.fontSize='small';
+                        span1.style.marginLeft='10px';
+                        li2.lastChild.appendChild(span1);
+
+                        var includeskin=document.createElement('input');
+                        includeskin.type='checkbox';
+                        includeskin.name='包含皮肤';
+                        if(!lib.config.exclude_skin){
+                            includeskin.checked=true;
+                        }
+                        includeskin.onchange=function(){
+                            game.saveConfig('exclude_skin',!this.checked);
+                        }
+                        li2.lastChild.appendChild(includeskin);
+
+    					ul.appendChild(li1);
+                        ul.appendChild(li2);
+    					ul.appendChild(li3);
+    					page.appendChild(ul);
+                    }());
 					(function(){
 						var checkCheat=function(){
 							if(currentrow1&&currentrow2&&row3.querySelector('.glow')){
@@ -20692,7 +21140,7 @@
                                 if(node.classList.contains('active')){
                                     node.classList.remove('active');
 									node.link.remove();
-									active=start.firstChild.lastChild.previousSibling;
+									active=start.firstChild.firstChild;
 									active.classList.add('active');
 									rightPane.appendChild(active.link);
                                 }
@@ -20752,11 +21200,8 @@
 								if(active==node){
 									node.classList.remove('active');
 									node.link.remove();
-                                    if(_status.connectMode){
-                                        active=start.firstChild.lastChild;
-                                    }
-                                    else{
-                                        active=start.firstChild.firstChild.previousSibling;
+                                    active=start.firstChild.firstChild;
+                                    if(!_status.connectMode){
                                         cheatButton.style.display='';
                                     }
 									active.classList.add('active');
@@ -20808,7 +21253,7 @@
                                 if(node.classList.contains('active')){
                                     node.classList.remove('active');
 									node.link.remove();
-									active=start.firstChild.lastChild.previousSibling;
+									active=start.firstChild.firstChild;
 									active.classList.add('active');
 									rightPane.appendChild(active.link);
                                 }
@@ -21112,335 +21557,7 @@
 
 					var active=start.firstChild.querySelector('.active');
 					if(!active){
-                        if(_status.connectMode){
-                            active=start.firstChild.lastChild.previousSibling;
-                        }
-						else{
-                            active=start.firstChild.firstChild;
-                        }
-						active.classList.add('active');
-					}
-					rightPane.appendChild(active.link);
-				}());
-
-				(function(){
-                    if(connectMenu) return;
-					var start=menuxpages.shift();
-					var rightPane=start.lastChild;
-					var clickMode=function(){
-						if(this.classList.contains('off')) return;
-						var active=this.parentNode.querySelector('.active');
-						if(active===this){
-							return;
-						}
-						active.classList.remove('active');
-						active.link.remove();
-						active=this;
-						this.classList.add('active');
-						rightPane.appendChild(this.link);
-					};
-
-					var page=ui.create.div();
-					var node=ui.create.div('.menubutton.large','检查更新',start.firstChild,clickMode);
-					node.link=page;
-					page.classList.add('menu-help');
-					var ul=document.createElement('ul');
-					var li1=document.createElement('li');
-                    var li2=document.createElement('li');
-					var li3=document.createElement('li');
-					li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px"></p>';
-					li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
-                    li3.innerHTML='更新源<br><p style="margin-top:8px"><input type="text" style="width:120px" value="'+lib.updateURL+'"><button style="margin-left:5px">确定</button></p>';
-                    li3.querySelector('button').onclick=function(){
-                        lib.updateURL=this.previousSibling.value;
-                        localStorage.setItem('noname_update_url',lib.updateURL);
-                    }
-
-					var button1,button2;
-                    var span1,includeskin;
-
-					game.checkForUpdate=function(forcecheck){
-						if(button1.disabled){
-							return;
-						}
-                        else if(!game.download){
-                            alert('此版本不支持游戏内更新，请手动更新');
-                            return;
-                        }
-						else{
-							button1.innerHTML='正在检查更新';
-							button1.disabled=true;
-
-							var goupdate=function(){
-								if(game.download){
-									var script=lib.init.js(lib.updateURL,'game/source',function(){
-										script.remove();
-										var updates=window.noname_source_list;
-										delete window.noname_source_list;
-                                        for(var i=0;i<updates.length;i++){
-                                            if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('style.css')==-1){
-                                                updates.splice(i--,1);
-                                            }
-                                        }
-
-										if(!ui.arena.classList.contains('menupaused')){
-											ui.click.configMenu();
-											ui.click.menuTab('帮助');
-										}
-										var p=button1.parentNode;
-										button1.remove();
-										var span=document.createElement('span');
-										var n1=0;
-										var n2=updates.length;
-										span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
-										p.appendChild(span);
-										var finish=function(){
-											span.innerHTML='游戏更新完毕（'+n1+'/'+n2+'）';
-											p.appendChild(document.createElement('br'));
-											var button=document.createElement('button');
-											button.innerHTML='重新启动';
-											button.onclick=game.reload;
-											p.appendChild(button);
-										}
-                                        game.multiDownload(updates,function(){
-                                            n1++;
-                                            span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
-                                        },function(){
-                                            game.print('下载失败：'+e.source);
-                                        },function(){
-                                            setTimeout(finish,500);
-                                        });
-									});
-								}
-								else{
-									var layer=document.createElement('div');
-									layer.classList.add('poplayer');
-									layer.style.zIndex='25';
-									layer.listen(function(){
-										this.remove();
-									});
-									layer.style.background='rgba(0,0,0,0.5)';
-
-									var iframe=document.createElement('iframe');
-									iframe.src='http://pan.baidu.com/s/1jG5oK8e';
-									iframe.width=Math.round(ui.window.offsetWidth*0.8)+'px';
-									iframe.height=Math.round(ui.window.offsetHeight*0.9)+'px';
-									iframe.style.left=Math.round(ui.window.offsetWidth*0.1)+'px';
-									iframe.style.top=Math.round(ui.window.offsetHeight*0.05)+'px';
-									iframe.style.position='absolute';
-									layer.appendChild(iframe);
-
-									ui.window.appendChild(layer);
-								}
-							};
-
-
-							var script=lib.init.js(lib.updateURL,'game/update',function(){
-								button1.disabled=false;
-								button1.innerHTML='检查游戏更新';
-								script.remove();
-								var update=window.noname_update;
-								delete window.noname_update;
-								if(forcecheck===false&&update.version==lib.config.check_version){
-									return;
-								}
-								game.saveConfig('check_version',update.version);
-								if(update.version!=lib.version){
-									var str='有新版本'+update.version+'可用，是否下载？';
-									if(navigator.notification&&navigator.notification.confirm){
-										var str2=update.changeLog[0];
-										for(var i=1;i<update.changeLog.length;i++){
-											str2+='；'+update.changeLog[i];
-										}
-										navigator.notification.confirm(
-											str2,
-											function(index){
-												if(index==1){
-													goupdate();
-												}
-											},
-											str,
-											['确定','取消']
-										);
-									}
-									else{
-										if(confirm(str)){
-											goupdate();
-										}
-									}
-								}
-								else{
-									alert('当前版本已是最新');
-								}
-							},function(){
-                                if(forcecheck===false){
-                                    return;
-                                }
-                                alert('连接失败');
-                                button1.disabled=false;
-								button1.innerHTML='检查游戏更新';
-								script.remove();
-                            });
-						}
-					};
-					game.checkForAssetUpdate=function(type){
-						if(button2.disabled){
-							return;
-						}
-						else if(game.download){
-							button2.innerHTML='正在检查更新';
-							button2.disabled=true;
-							var script=lib.init.js(lib.updateURL,'game/asset',function(){
-								script.remove();
-								var updates=window.noname_asset_list;
-								delete window.noname_asset_list;
-                                var skins=window.noname_skin_list;
-                                delete window.noname_skin_list;
-								var asset_version=updates.shift();
-								if(asset_version==lib.config.asset_version&&lib.config.exclude_skin){
-									alert('素材已是最新');
-									button2.disabled=false;
-									button2.innerHTML='检查素材更新';
-									return;
-								}
-                                if(!lib.config.exclude_skin){
-                                    for(var i in skins){
-                                        for(var j=1;j<=skins[i];j++){
-                                            updates.push('image/skin/'+i+'/'+j+'.jpg');
-                                        }
-                                    }
-                                }
-								var n=updates.length;
-                                if(!ui.arena.classList.contains('menupaused')){
-                                    ui.click.configMenu();
-                                    ui.click.menuTab('帮助');
-                                }
-
-								var proceed=function(){
-									if(updates.length==0){
-										game.saveConfig('asset_version',asset_version);
-                                        alert('素材已是最新');
-                                        button2.disabled=false;
-										button2.innerHTML='检查素材更新';
-										return;
-									}
-									var p=button2.parentNode;
-									button2.remove();
-									var span=document.createElement('span');
-									var n1=0;
-									var n2=updates.length;
-									span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
-                                    span1.remove();
-                                    includeskin.remove();
-									p.appendChild(span);
-									var finish=function(){
-										if(n1==n2){
-											game.saveConfig('asset_version',asset_version);
-										}
-										span.innerHTML='素材更新完毕（'+n1+'/'+n2+'）';
-										p.appendChild(document.createElement('br'));
-										var button=document.createElement('button');
-										button.innerHTML='重新启动';
-										button.onclick=game.reload;
-										p.appendChild(button);
-									}
-                                    game.multiDownload(updates,function(){
-                                        n1++;
-                                        span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
-                                    },function(){
-                                        game.print('下载失败：'+e.source);
-                                    },function(){
-                                        setTimeout(finish,500);
-                                    });
-								};
-								for(var i=0;i<updates.length;i++){
-                                    if(lib.node&&lib.node.fs){
-                                        lib.node.fs.access(__dirname+'/'+updates[i],(function(entry){
-                                            return function(err){
-                                                if(err){
-                                                    n--;
-        											if(n==0){
-        												proceed();
-        											}
-                                                }
-                                                else{
-                                                    n--;
-        											updates.remove(entry);
-        											if(n==0){
-        												proceed();
-        											}
-                                                }
-    										}
-                                        }(updates[i])));
-                                    }
-                                    else{
-                                        resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
-											n--;
-											updates.remove(entry.toURL().slice(lib.assetURL.length));
-											if(n==0){
-												proceed();
-											}
-										},function(){
-											n--;
-											if(n==0){
-												proceed();
-											}
-										});
-                                    }
-								}
-							},function(){
-                                alert('连接失败');
-                                button2.disabled=false;
-								button2.innerHTML='检查游戏更新';
-								script.remove();
-                            });
-						}
-						else{
-							alert('此版本不支持游戏内更新素材，请手动更新');
-						}
-					};
-
-					button1=document.createElement('button');
-					button1.innerHTML='检查游戏更新';
-					button1.onclick=game.checkForUpdate;
-					li1.lastChild.appendChild(button1);
-					button2=document.createElement('button');
-					button2.innerHTML='检查素材更新';
-					button2.onclick=game.checkForAssetUpdate;
-					li2.lastChild.appendChild(button2);
-
-                    var span1=document.createElement('span');
-                    span1.innerHTML='包含皮肤';
-                    span1.style.fontSize='small';
-                    span1.style.marginLeft='10px';
-                    li2.lastChild.appendChild(span1);
-
-                    var includeskin=document.createElement('input');
-                    includeskin.type='checkbox';
-                    includeskin.name='包含皮肤';
-                    if(!lib.config.exclude_skin){
-                        includeskin.checked=true;
-                    }
-                    includeskin.onchange=function(){
-                        game.saveConfig('exclude_skin',!this.checked);
-                    }
-                    li2.lastChild.appendChild(includeskin);
-
-					ul.appendChild(li1);
-                    ul.appendChild(li2);
-					ul.appendChild(li3);
-					page.appendChild(ul);
-
-					for(var i in lib.help){
-						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large',i,start.firstChild,clickMode);
-						node.link=page;
-						page.classList.add('menu-help');
-						page.innerHTML=lib.help[i];
-					}
-					var active=start.firstChild.querySelector('.active');
-					if(!active){
-						active=start.firstChild.firstChild;
+                        active=start.firstChild.firstChild;
 						active.classList.add('active');
 					}
 					rightPane.appendChild(active.link);
