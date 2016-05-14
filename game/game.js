@@ -15685,6 +15685,15 @@
 			}
 			lib.cardPack[packname].push(name);
 		},
+        addSkill:function(name,info,translate,description){
+            if(lib.skill[name]){
+                return false;
+            }
+            lib.skill[name]=info;
+            lib.translate[name]=translate;
+            lib.translate[name+'_info']=description;
+            return true;
+        },
 		addMode:function(name,info,info2){
 			lib.config.all.mode.push(name);
 			lib.translate[name]=info2.translate;
@@ -20723,7 +20732,7 @@
                                     throw('err');
                                 }
                                 _status.importingExtension=true;
-                                lib.init.js('extension/'+name,'extension',function(){
+                                lib.init.js('extension/'+extname,'extension',function(){
                                     _status.importingExtension=false;
                                     if(!game.importedPack) throw('err');
                                     if(lib.config.extensions.contains(extname)){
@@ -20801,6 +20810,10 @@
                                     ui.create.div('.text.author','作者：'+list[i].author,node);
                                     ui.create.div('.text',list[i].description,node);
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,downloadExtension);
+                                    if(lib.config.extensions.contains(list[i].name)){
+                                        download.classList.add('transparent2');
+                                        download.innerHTML='已安装';
+                                    }
                                     download.link=i;
                                     download.name=list[i].name;
                                     download.files=list[i].files;

@@ -410,6 +410,7 @@ body>.background{z-index:-5}
 .removing,.hidden{opacity: 0 !important;}
 #system>div>div.hidden{opacity:0.5 !important;}
 .transparent{opacity:  0.3 !important;}
+.transparent2{opacity:  0.6 !important;}
 .out{opacity: 0.3 !important;
 	filter:blur(3px);
 	-webkit-filter:blur(3px)

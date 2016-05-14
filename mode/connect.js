@@ -6,7 +6,7 @@ mode.connect={
             game.saveConfig('hall_ip_186');
             game.saveConfig('hall_ip_188');
             game.saveConfig('hall_ip_189',true);
-            localStorage.setItem('noname_update_url',lib.hallURL);
+            localStorage.setItem('noname_update_url','http://'+lib.hallURL);
         }
         var directstartmode=lib.config.directstartmode;
         ui.create.menu(true);

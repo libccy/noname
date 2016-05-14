@@ -1,7 +1,6 @@
 window.noname_update={
-    version:'1.8.9',
+    version:'1.8.10',
     changeLog:[
-        '新武将',
-        'sp、一将联机'
+        '扩展改进'
     ]
 }
