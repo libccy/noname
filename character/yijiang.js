@@ -489,6 +489,7 @@ character.yijiang={
 			filterTarget:function(card,player,target){
 				return player!=target&&target.num('h')>0;
 			},
+			audio:2,
 			content:function(){
 				'step 0'
 				player.gain(target.get('h').randomGet());
