@@ -3538,7 +3538,7 @@
 							var fileTransfer = new FileTransfer();
 							url=lib.updateURL+url;
 							folder=lib.assetURL+folder;
-							fileTransfer.download(encodeURI(url),folder,onsuccess,onerror);
+							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
 						};
 					}
 				}
@@ -20732,7 +20732,13 @@
                                     throw('err');
                                 }
                                 _status.importingExtension=true;
-                                lib.init.js('extension/'+extname,'extension',function(){
+                                var deletegame=false;
+                                if(!window.game){
+                                    window.game=game;
+                                    deletegame=true;
+                                }
+                                lib.init.js(lib.assetURL+'extension/'+extname,'extension',function(){
+                                    if(deletegame) delete window.game;
                                     _status.importingExtension=false;
                                     if(!game.importedPack) throw('err');
                                     if(lib.config.extensions.contains(extname)){
@@ -20749,6 +20755,7 @@
                                     delete game.importedPack;
                                     onsuccess();
                                 },function(){
+                                    if(deletegame) delete window.game;
                                     _status.importingExtension=false;
                                     onerror();
                                 });
@@ -20786,6 +20793,12 @@
 
                         node.update=function(){
                             if(!game.download) return;
+                            var buttons=page.querySelectorAll('.menubutton.text.active');
+                            for(var i=0;i<buttons.length;i++){
+                                if(buttons[i].innerHTML=='正在下载'){
+                                    return;
+                                }
+                            }
                             if(!window.JSZip){
                 				lib.init.js(lib.assetURL+'game','jszip');
                 			}
@@ -20989,7 +21002,14 @@
     									return;
     								}
     								game.saveConfig('check_version',update.version);
-    								if(update.version!=lib.version){
+                                    var bool;
+                                    if(update.version.indexOf('beta')!=-1){
+                                        bool=lib.config.debug;
+                                    }
+                                    else{
+                                        bool=(update.version!=lib.version);
+                                    }
+    								if(bool){
     									var str='有新版本'+update.version+'可用，是否下载？';
     									if(navigator.notification&&navigator.notification.confirm){
     										var str2=update.changeLog[0];
@@ -21415,6 +21435,7 @@
                         text.style.left='30px';
                         text.style.top='50px';
                         text.style.wordBreak='break-all';
+                        lib.setScroll(text);
 						page.appendChild(text);
 
 						// var caption=ui.create.div('','输入命令',page);

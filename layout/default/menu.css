@@ -180,6 +180,7 @@
     height: 23px;
     font-size: 26px;
     line-height: 26px;
+	white-space: nowrap;
 }
 .menu.main>.menu-content>div>.left.pane>.menubutton.off{
 	opacity: 0.5;
