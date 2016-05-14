@@ -3318,63 +3318,69 @@
 						}
 					}
 				}
+                var extensionlist=[];
 				for(var i=0;i<lib.config.extensions.length;i++){
-					try{
-						eval(localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]));
-					}
-					catch(e){
-						console.log(e);
-					}
-					if(game.importedPack&&lib.config['extension_'+game.importedPack.name]){
-						var cfg={};
-						for(var j in lib.config){
-							if(j.indexOf('extension_'+game.importedPack.name)==0&&
-								j!='extension_'+game.importedPack.name){
-								cfg[j.slice(11+game.importedPack.name.length)]=lib.config[j];
-							}
-						}
-						try{
-                            if(game.importedPack.precontent){
-                                _status.extension=game.importedPack.name;
-    							game.importedPack.precontent(cfg);
-    							delete _status.extension;
-                            }
-                            if(game.importedPack.content){
-                                lib.extensions.push([game.importedPack.name,game.importedPack.content,cfg]);
-                            }
-						}
-						catch(e){
-							console.log(e);
-						}
-						delete game.importedPack;
-					}
+                    var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
+                    if(extcontent){
+                        _status.evaluatingExtension=true;
+                        try{
+    						eval(extcontent);
+    					}
+    					catch(e){
+    						console.log(e);
+    					}
+                        _status.evaluatingExtension=false;
+                    }
+                    else{
+                        extensionlist.push(lib.config.extensions[i]);
+                    }
 				}
-				var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+lib.config.plays.length+1;
-				var packLoaded=function(){
-					toLoad--;
-					if(toLoad==0){
-						if(_status.windowLoaded){
-							delete _status.windowLoaded;
-							lib.init.onload();
-						}
-						else{
-							_status.packLoaded=true;
-						}
-					}
-				};
-				if(localStorage.getItem(lib.configprefix+'playback')){
-					toLoad++;
-					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
-				}
-				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)&&
-					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
-					toLoad++;
-					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
-				}
-				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
-				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
-				lib.init.js(lib.assetURL+'play',lib.config.plays,packLoaded,packLoaded);
-				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
+                var loadPack=function(){
+                    var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+lib.config.plays.length+1;
+    				var packLoaded=function(){
+    					toLoad--;
+    					if(toLoad==0){
+    						if(_status.windowLoaded){
+    							delete _status.windowLoaded;
+    							lib.init.onload();
+    						}
+    						else{
+    							_status.packLoaded=true;
+    						}
+    					}
+    				};
+    				if(localStorage.getItem(lib.configprefix+'playback')){
+    					toLoad++;
+    					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+    				}
+    				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)&&
+    					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
+    					toLoad++;
+    					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+    				}
+    				lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
+    				lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
+    				lib.init.js(lib.assetURL+'play',lib.config.plays,packLoaded,packLoaded);
+    				lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
+                };
+                if(extensionlist.length){
+                    window.game=game;
+                    var extToLoad=extensionlist.length;
+                    var extLoaded=function(){
+                        extToLoad--;
+    					if(extToLoad==0){
+                            delete window.game;
+    						loadPack();
+    					}
+                    }
+                    for(var i=0;i<extensionlist.length;i++){
+                        lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,extLoaded);
+                    }
+                }
+                else{
+                    loadPack();
+                }
+
 				ui.css={};
 				lib.init.css(lib.assetURL+'layout/default','menu');
 				var layout=lib.config.layout;
@@ -4079,11 +4085,16 @@
 						else{
 							var avatarnode=ui.create.div(node,'.avatar');
                             var avatarbg=lib.mode[lib.config.all.mode[i]].splash;
-                            lib.onDB((function(avatarnode,avatarbg){
-                                return (function(){
-                                    avatarnode.setBackgroundDB(avatarbg);
-                                });
-                            }(avatarnode,avatarbg)));
+                            if(avatarbg.indexOf('ext:')==0){
+                                avatarnode.setBackgroundImage(avatarbg.replace(/ext:/,'extension/'));
+                            }
+                            else{
+                                lib.onDB((function(avatarnode,avatarbg){
+                                    return (function(){
+                                        avatarnode.setBackgroundDB(avatarbg);
+                                    });
+                                }(avatarnode,avatarbg)));
+                            }
 						}
                         if(!lib.config.touchscreen){
                             node.addEventListener('mousedown',downNode);
@@ -10914,22 +10925,27 @@
 						}
 					}
 					var bg=card[2];
-                    var nocard=false;
                     if(!lib.card[card[2]]){
-                        nocard=true;
                         lib.card[card[2]]={};
                     }
 					var img=lib.card[card[2]].image;
-					if(img&&img.indexOf('db:')==0){
-						img=img.slice(3);
-					}
-					else{
-						img=null;
-					}
+                    if(img){
+                        if(img.indexOf('db:')==0){
+    						img=img.slice(3);
+    					}
+                        else if(img.indexOf('ext:')!=0){
+    						img=null;
+    					}
+                    }
 					if(!lib.config.hide_card_image&&lib.card[card[2]].fullskin){
 						this.classList.add('fullskin');
 						if(img){
-							this.node.image.setBackgroundDB(img);
+                            if(img.indexOf('ext:')==0){
+                                this.node.image.setBackgroundImage(img.replace(/ext:/,'extension/'));
+                            }
+                            else{
+                                this.node.image.setBackgroundDB(img);
+                            }
 						}
 						else{
 							this.node.image.setBackgroundImage('image/card/'+card[2]+'.png');
@@ -10941,7 +10957,13 @@
 					}
 					else if(lib.card[card[2]].fullimage){
 						if(img){
-							this.setBackgroundDB(img);
+                            if(img.indexOf('ext:')==0){
+                                this.setBackgroundImage(img.replace(/ext:/,'extension/'));
+                                this.style.backgroundSize='cover';
+                            }
+                            else{
+                                this.setBackgroundDB(img);
+                            }
 						}
 						else{
 							this.setBackground('card/'+bg);
@@ -10953,7 +10975,13 @@
 					}
 					else if(typeof lib.card[card[2]].image=='string'&&!lib.card[card[2]].fullskin){
 						if(img){
-							this.setBackgroundDB(img);
+                            if(img.indexOf('ext:')==0){
+                                this.setBackgroundImage(img.replace(/ext:/,'extension/'));
+                                this.style.backgroundSize='cover';
+                            }
+                            else{
+                                this.setBackgroundDB(img);
+                            }
 						}
 						else{
 							this.setBackground(lib.card[card[2]].image);
@@ -11017,12 +11045,6 @@
 					for(var i=0;i<name.length;i++){
 						this.node.name.innerHTML+=name[i]+'<br/>';
 					}
-					// if(lib.card[card[2]].subtype=='equip3'){
-					// 	this.node.name.innerHTML+='+';
-					// }
-					// else if(lib.card[card[2]].subtype=='equip4'){
-					// 	this.node.name.innerHTML+='-';
-					// }
 					this.node.name2.innerHTML=get.translation(card[0])+card[1]+' '+name;
 					this.suit=card[0];
 					this.number=card[1];
@@ -11061,9 +11083,6 @@
 						case 'equip3':this.node.range.innerHTML='防御: 1';break;
 						case 'equip4':this.node.range.innerHTML='进攻: 1';break;
 					}
-                    // if(nocard){
-                    //     delete lib.card[card[2]];
-                    // }
                     if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
                         this.cardid=get.id();
                         lib.cardOL[this.cardid]=this;
@@ -13624,11 +13643,21 @@
 							localStorage.removeItem(lib.configprefix+prefix);
 							lib.config.extensions.remove(obj.name);
 							game.saveConfig('extensions',lib.config.extensions);
-							if(obj.image){
-								for(var i=0;i<obj.image.length;i++){
-									game.deleteDB('image','extension-'+obj.name+':'+obj.image[i]);
-								}
-							}
+                            var modelist=lib.config.extensionInfo[obj.name];
+                            if(modelist){
+                                if(modelist.image){
+                                    for(var i=0;i<modelist.image.length;i++){
+    									game.deleteDB('image','extension-'+obj.name+':'+modelist.image[i]);
+    								}
+                                }
+                                if(modelist.mode){
+                                    for(var i=0;i<modelist.mode.length;i++){
+                                        game.clearModeConfig(modelist.mode[i]);
+                                    }
+                                }
+                                delete lib.config.extensionInfo[obj.name];
+                                game.saveConfig('extensionInfo',lib.config.extensionInfo);
+                            }
 							if(obj.onremove){
 								obj.onremove();
 							}
@@ -13643,7 +13672,34 @@
 					}
 				}
 			}
-			game.importedPack=obj;
+            if(type=='extension'&&!_status.importingExtension){
+                if(obj&&lib.config['extension_'+obj.name]){
+                    lib.init.eval(obj);
+                    var cfg={};
+                    for(var j in lib.config){
+                        if(j.indexOf('extension_'+obj.name)==0&&
+                            j!='extension_'+obj.name){
+                            cfg[j.slice(11+obj.name.length)]=lib.config[j];
+                        }
+                    }
+                    try{
+                        if(obj.precontent){
+                            _status.extension=obj.name;
+                            obj.precontent(cfg);
+                            delete _status.extension;
+                        }
+                        if(obj.content){
+                            lib.extensions.push([obj.name,obj.content,cfg]);
+                        }
+                    }
+                    catch(e){
+                        console.log(e);
+                    }
+                }
+            }
+            else{
+                game.importedPack=obj;
+            }
 		},
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
@@ -15501,7 +15557,14 @@
 		},
 		addCharacter:function(name,info){
 			var extname=(_status.extension||info.extension);
-			var character=[info.sex,info.group,info.hp,info.skills||[],['db:extension-'+extname+':'+name+'.jpg']];
+            var imgsrc;
+            if(_status.evaluatingExtension){
+                imgsrc='db:extension-'+extname+':'+name+'.jpg';
+            }
+            else{
+                imgsrc='ext:'+extname+'/'+name+'.jpg';
+            }
+			var character=[info.sex,info.group,info.hp,info.skills||[],[imgsrc]];
 			if(info.tags){
 				character[4]=character[4].concat(info.tags);
 			}
@@ -15517,10 +15580,20 @@
 		addCard:function(name,info,info2){
 			var extname=(_status.extension||info2.extension);
 			if(info.fullskin){
-				info.image='db:extension-'+extname+':'+name+'.png';
+                if(_status.evaluatingExtension){
+                    info.image='db:extension-'+extname+':'+name+'.png';
+                }
+                else{
+                    info.image='ext:'+extname+'/'+name+'.png';
+                }
 			}
 			else if(info.fullimage){
-				info.image='db:extension-'+extname+':'+name+'.jpg';
+                if(_status.evaluatingExtension){
+                    info.image='db:extension-'+extname+':'+name+'.jpg';
+                }
+                else{
+                    info.image='ext:'+extname+'/'+name+'.jpg';
+                }
 			}
 			lib.card[name]=info;
 			lib.translate[name]=info2.translate;
@@ -15547,14 +15620,32 @@
 		addMode:function(name,info,info2){
 			lib.config.all.mode.push(name);
 			lib.translate[name]=info2.translate;
+            var imgsrc;
+            var extname=_status.extension||info2.extension;
+            if(_status.evaluatingExtension){
+                imgsrc='extension-'+extname+':'+name+'.jpg';
+            }
+            else{
+                imgsrc='ext:'+extname+'/'+name+'.jpg';
+            }
 			lib.mode[name]={
 				name:info2.translate,
 				config:info2.config,
-				splash:'extension-'+(_status.extension||info2.extension)+':'+name+'.jpg'
+				splash:imgsrc
 			}
 			lib.init['setMode_'+name]=function(){
 				mode[name]=info;
 			}
+            if(!lib.config.extensionInfo[extname]){
+                lib.config.extensionInfo[extname]={};
+            }
+            if(!lib.config.extensionInfo[extname].mode){
+                lib.config.extensionInfo[extname].mode=[];
+            }
+            if(lib.config.extensionInfo[extname].mode.indexOf(name)==-1){
+                lib.config.extensionInfo[extname].mode.push(name);
+            }
+            game.saveConfig('extensionMode',lib.config.extensionInfo);
 		},
         addRecentCharacter:function(){
             for(var i=0;i<arguments.length;i++){
@@ -18667,15 +18758,26 @@
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
 											{
+                                                var finishLoad=function(){
+                                                    extensionnode.innerHTML='导入成功，3秒后将重启';
+    												setTimeout(function(){
+														extensionnode.innerHTML='导入成功，2秒后将重启';
+														setTimeout(function(){
+															extensionnode.innerHTML='导入成功，1秒后将重启';
+															setTimeout(game.reload,1000);
+														},1000);
+    												},1000);
+                                                };
 												var data = fileLoadedEvent.target.result;
 												var zip=new JSZip();
 												zip.load(data);
 												var str=zip.file('extension.js').asText();
 												try{
+                                                    _status.importingExtension=true;
 													eval(str);
+                                                    _status.importingExtension=false;
 													if(!game.importedPack) throw('err');
 													var extname=game.importedPack.name;
-													localStorage.setItem(lib.configprefix+'extension_'+extname,str);
 													lib.config.extensions.add(extname);
 													game.saveConfig('extensions',lib.config.extensions);
 													game.saveConfig('extension_'+extname,true);
@@ -18684,39 +18786,115 @@
 															game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
 														}
 													}
-                                                    var imglist=[];
-                                                    for(var i in zip.files){
-                                                        if(i[0]!='.'&&i[0]!='_'){
-                                                            if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
-                                                                imglist.push(i);
+
+                                                    if(game.download){
+                                                        localStorage.removeItem(lib.configprefix+'extension_'+extname);
+                                                        var filelist=[];
+                                                        for(var i in zip.files){
+                                                            if(i[0]!='.'&&i[0]!='_'){
+                                                                filelist.push(i);
                                                             }
                                                         }
+                                                        if(lib.node&&lib.node.fs){
+                                                            var access=function(){
+                                                                var dirname=__dirname+'/extension/'+extname;
+                                                                var finish=function(){
+                                                                    dirname+='/';
+                                                                    var writeFile=function(){
+                                                                        if(filelist.length){
+                                                                            var filename=filelist.shift();
+                                                                            lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
+                                                                        }
+                                                                        else{
+                                                                            finishLoad();
+                                                                        }
+                                                                    }
+                                                                    writeFile();
+                                                                };
+                                                                lib.node.fs.access(dirname,function(e){
+                                                                    if(e){
+                                                                        try{
+                                                                            lib.node.fs.mkdir(dirname,finish);
+                                                                        }
+                                                                        catch(e){
+                                                                            throw('err');
+                                                                        }
+                                                                    }
+                                                                    else{
+                                                                        finish();
+                                                                    }
+                                                                });
+                                                            };
+                                                            lib.node.fs.access(__dirname+'/extension',function(e){
+                                                                if(e){
+                                                                    try{
+                                                                        lib.node.fs.mkdir(__dirname+'/extension',access);
+                                                                    }
+                                                                    catch(e){
+                                                                        throw('err');
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    access();
+                                                                }
+                                                            });
+                                                        }
+                                                        else{
+                                                            window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+                                                                entry.getDirectory('extension',{create:true},function(dirEntry){
+                                                                    var writeFile=function(){
+                                                                        if(filelist.length){
+                                                                            var filename=filelist.shift();
+                                                                            dirEntry.getFile(filename,{create:true},function(fileEntry){
+                                                        						fileEntry.createWriter(function(fileWriter){
+                                                        							fileWriter.onwriteend=writeFile;
+                                                        							fileWriter.write(zip.files[filename].asNodeBuffer());
+                                                        						});
+                                                        					});
+                                                                        }
+                                                                        else{
+                                                                            finishLoad();
+                                                                        }
+                                                                    };
+                                                                    writeFile();
+                                                                });
+                                            				});
+                                                        }
                                                     }
-													if(imglist.length&&lib.db){
-														for(var i=0;i<imglist.length;i++){
-															var buttons=page.querySelectorAll('.button.character');
-															for(var j=0;j<buttons.length;j++){
-																if(buttons[j].link==i){
-																	buttons[j].remove();
-																	break;
-																}
-															}
-															var imgname=imglist[i];
-															var str=zip.file(imgname).asArrayBuffer();
-															if(str){
-																var blob=new Blob([str]);
-																var fileReader=new FileReader();
-																fileReader.onload = (function(imgname){
-																	return function(fileLoadedEvent)
-																	{
-																		var data = fileLoadedEvent.target.result;
-																		game.putDB('image','extension-'+extname+':'+imgname,data);
-																	};
-																}(imgname))
-																fileReader.readAsDataURL(blob, "UTF-8");
-															}
-														}
-													}
+                                                    else{
+                                                        localStorage.setItem(lib.configprefix+'extension_'+extname,str);
+                                                        var imglist=[];
+                                                        for(var i in zip.files){
+                                                            if(i[0]!='.'&&i[0]!='_'){
+                                                                if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
+                                                                    imglist.push(i);
+                                                                }
+                                                            }
+                                                        }
+    													if(imglist.length&&lib.db){
+                                                            lib.config.extensionInfo[extname]={
+                                                                image:imglist
+                                                            }
+                                                            game.saveConfig('extensionInfo',lib.config.extensionInfo);
+    														for(var i=0;i<imglist.length;i++){
+    															var imgname=imglist[i];
+    															var str=zip.file(imgname).asArrayBuffer();
+    															if(str){
+    																var blob=new Blob([str]);
+    																var fileReader=new FileReader();
+    																fileReader.onload = (function(imgname){
+    																	return function(fileLoadedEvent)
+    																	{
+    																		var data = fileLoadedEvent.target.result;
+    																		game.putDB('image','extension-'+extname+':'+imgname,data);
+    																	};
+    																}(imgname))
+    																fileReader.readAsDataURL(blob, "UTF-8");
+    															}
+    														}
+    													}
+                                                        finishLoad();
+                                                    }
 													delete game.importedPack;
 												}
 												catch(e){
@@ -18724,20 +18902,6 @@
 													alert('导入失败');
 													return;
 												}
-		                                        extensionnode.innerHTML='导入成功，5秒后将重启';
-												setTimeout(function(){
-													extensionnode.innerHTML='导入成功，4秒后将重启';
-													setTimeout(function(){
-														extensionnode.innerHTML='导入成功，3秒后将重启';
-														setTimeout(function(){
-															extensionnode.innerHTML='导入成功，2秒后将重启';
-															setTimeout(function(){
-																extensionnode.innerHTML='导入成功，1秒后将重启';
-																setTimeout(game.reload,1000);
-															},1000);
-														},1000);
-													},1000);
-												},1000);
 		                                        importExtension.style.display='none';
 											};
 											fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
@@ -27398,15 +27562,21 @@
 			ext=ext||'.jpg';
 			subfolder=subfolder||'default'
 			if(type){
-				var dbimage=null;
+				var dbimage=null,extimage=null;
 				if(type=='character'&&lib.character[name]&&lib.character[name][4]){
 					for(var i=0;i<lib.character[name][4].length;i++){
-						if(lib.character[name][4][i].indexOf('db:')==0){
+                        if(lib.character[name][4][i].indexOf('ext:')==0){
+                            extimage=lib.character[name][4][i];break;
+                        }
+						else if(lib.character[name][4][i].indexOf('db:')==0){
 							dbimage=lib.character[name][4][i];break;
 						}
 					}
 				}
-				if(dbimage){
+                if(extimage){
+                    src=extimage.replace(/ext:/,'extension/');
+                }
+				else if(dbimage){
 					this.setBackgroundDB(dbimage.slice(3));
 					return this;
 				}

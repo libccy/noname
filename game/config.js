@@ -214,6 +214,7 @@ window.config={
 
 	skin:{},
 	gameRecord:{},
+	extensionInfo:{},
 	hiddenModePack:[],
 	hiddenCharacterPack:[],
 	hiddenCardPack:[],
