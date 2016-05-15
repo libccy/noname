@@ -479,8 +479,31 @@
 							else{
 								lib.init.layout(layout);
 							}
+                            if((lib.config.layout=='phone'||lib.config.layout=='mobile')&&lib.config.textequip=='text'){
+                                ui.arena.classList.add('textequip');
+                            }
+                            else{
+                                ui.arena.classList.remove('textequip');
+                            }
 						}
 					},
+                    textequip:{
+                        name:'装备显示',
+                        init:'image',
+                        item:{
+                            image:'图片',
+                            text:'文字',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('textequip',item);
+                            if((lib.config.layout=='phone'||lib.config.layout=='mobile')&&item=='text'){
+                                ui.arena.classList.add('textequip');
+                            }
+                            else{
+                                ui.arena.classList.remove('textequip');
+                            }
+                        }
+                    },
 					// background_color_music:{
 					// 	name:'背景色',
 					// 	init:'black',
@@ -1138,6 +1161,12 @@
                         else{
                             map.remember_round_button.hide();
                             map.reset_round_button.hide();
+                        }
+                        if(lib.config.layout=='phone'||lib.config.layout=='mobile'){
+                            map.textequip.show();
+                        }
+                        else{
+                            map.textequip.hide();
                         }
 						// if(config.theme=='woodden'&&config.image_background=='default'){
 						// 	map.background_color_wood.show();
@@ -20831,7 +20860,7 @@
                                     }
                                     download.link=i;
                                     download.name=list[i].name;
-                                    download.files=list[i].files;
+                                    download.files=list[i].files||[];
                                 }
                             },function(){
                                 loading.innerHTML='连接失败';
@@ -22448,6 +22477,9 @@
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
+                if((lib.config.layout=='phone'||lib.config.layout=='mobile')&&lib.config.textequip=='text'){
+                    ui.arena.classList.add('textequip');
+                }
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];

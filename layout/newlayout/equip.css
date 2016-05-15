@@ -55,7 +55,7 @@
 }
 .player .equips>.card.selected{
 	background:linear-gradient(to right,rgba(0, 133, 255,0.3),transparent),
-			linear-gradient(135deg,rgba(0, 133, 255,0.5) ,transparent 80%,transparent);
+			linear-gradient(135deg,rgba(0, 133, 255,0.5) ,transparent 80%,transparent) !important;
 	box-shadow:none !important;
 	border-width: 1px 0 0;
 	border-style:solid;
