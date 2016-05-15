@@ -20959,12 +20959,16 @@
     							button1.innerHTML='正在检查更新';
     							button1.disabled=true;
 
-    							var goupdate=function(){
+    							var goupdate=function(files){
     								if(game.download){
     									var script=lib.init.js(lib.updateURL,'game/source',function(){
     										script.remove();
     										var updates=window.noname_source_list;
     										delete window.noname_source_list;
+                                            if(Array.isArray(files)){
+                                                files.add('game/update.js');
+                                                updates=files;
+                                            }
                                             for(var i=0;i<updates.length;i++){
                                                 if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('style.css')==-1){
                                                     updates.splice(i--,1);
@@ -21041,6 +21045,14 @@
                                         bool=(update.version!=lib.version);
                                     }
     								if(bool){
+                                        var files;
+                                        var version=lib.version;
+                                        if(version.indexOf('beta')!=-1){
+                                            version=version.slice(0,version.indexOf('beta'));
+                                        }
+                                        if(update.files&&update.files[version]){
+                                            files=update.files.global.concat(update.files[version]);
+                                        }
     									var str='有新版本'+update.version+'可用，是否下载？';
     									if(navigator.notification&&navigator.notification.confirm){
     										var str2=update.changeLog[0];
@@ -21051,7 +21063,7 @@
     											str2,
     											function(index){
     												if(index==1){
-    													goupdate();
+    													goupdate(files);
     												}
     											},
     											str,
@@ -21060,7 +21072,7 @@
     									}
     									else{
     										if(confirm(str)){
-    											goupdate();
+    											goupdate(files);
     										}
     									}
     								}

@@ -1,13 +1,6 @@
 'use strict';
 mode.connect={
     start:function(){
-        if(!lib.config.hall_ip_189){
-            game.saveConfig('hall_ip',null,true);
-            game.saveConfig('hall_ip_186');
-            game.saveConfig('hall_ip_188');
-            game.saveConfig('hall_ip_189',true);
-            localStorage.setItem('noname_update_url','http://'+lib.hallURL);
-        }
         var directstartmode=lib.config.directstartmode;
         ui.create.menu(true);
         var createNode=function(){
