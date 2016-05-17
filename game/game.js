@@ -1157,8 +1157,14 @@
                         if(lib.config.layout=='phone'){
                             map.remember_round_button.show();
                             map.reset_round_button.show();
+                            map.show_pause.hide();
+                            map.show_auto.hide();
+                            map.show_replay.hide();
                         }
                         else{
+                            map.show_pause.show();
+                            map.show_auto.show();
+                            map.show_replay.show();
                             map.remember_round_button.hide();
                             map.reset_round_button.hide();
                         }
