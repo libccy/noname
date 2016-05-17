@@ -806,10 +806,10 @@ mode.guozhan={
 				return (this.classList.contains('unseen')&&this.classList.contains('unseen2'));
 			},
 			checkShow:function(skill){
-				var sourceSkill=get.info(skill).sourceSkill;
-				if(sourceSkill){
-					skill=sourceSkill;
-				}
+				var sourceSkill=get.info(skill);
+                if(sourceSkill&&sourceSkill.sourceSkill){
+					skill=sourceSkill.sourceSkill;
+                }
 				if(game.expandSkills(this.get('s')).contains(skill)) return false;
 				if(lib.skill.global.contains(skill)) return false;
 				if(this.classList.contains('unseen')){
