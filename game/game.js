@@ -20762,7 +20762,7 @@
                                 this.classList.add('active');
                             }
                         };
-                        var importExtensionf=function(extname,onsuccess,onerror){
+                        var importExtensionf=function(extname,extversion,onsuccess,onerror){
                             try{
                                 if(lib.config.all.plays.contains(extname)){
                                     throw('err');
@@ -20783,6 +20783,9 @@
                                     lib.config.extensions.add(extname);
                                     game.saveConfig('extensions',lib.config.extensions);
                                     game.saveConfig('extension_'+extname+'_enable',true);
+                                    if(extversion){
+                                        game.saveConfig('extension_'+extname+'_version',extversion);
+                                    }
                                     for(var i in game.importedPack.config){
                                         if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
                                             game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
@@ -20802,7 +20805,7 @@
                             }
                         };
                         var downloadExtension=function(e){
-                            if(this.innerHTML!='下载扩展'||!window.JSZip) return;
+                            if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展')||!window.JSZip) return;
                             if(e){
                                 e.stopPropagation();
                             }
@@ -20820,7 +20823,7 @@
                                 that.innerHTML='下载失败';
                             },function(){
                                 if(that.innerHTML=='下载失败') return;
-                                importExtensionf(that.name,function(){
+                                importExtensionf(that.name,that.version,function(){
                                     that.innerHTML='安装成功';
                                     that.classList.remove('active');
                                     that.classList.add('highlight');
@@ -20860,13 +20863,24 @@
                                     ui.create.div('.text',list[i].description,node);
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,downloadExtension);
                                     if(lib.config.extensions.contains(list[i].name)){
-                                        download.classList.add('transparent2');
                                         download.classList.remove('active');
-                                        download.innerHTML='已安装';
+                                        console.log(lib.config['extension_'+list[i].name+'_version'],list[i].version);
+                                        if(lib.config['extension_'+list[i].name+'_version']!=list[i].version){
+                                            download.innerHTML='更新扩展';
+                                            download.classList.add('highlight');
+                                        }
+                                        else{
+                                            download.classList.add('transparent2');
+                                            download.classList.remove('active');
+                                            download.innerHTML='已安装';
+                                        }
                                     }
                                     download.link=i;
                                     download.name=list[i].name;
                                     download.files=list[i].files||[];
+                                    if(list[i].version){
+                                        download.version=list[i].version;
+                                    }
                                 }
                             },function(){
                                 loading.innerHTML='连接失败';
