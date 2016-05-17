@@ -2,9 +2,10 @@ window.noname_update={
     version:'1.8.10.3',
     changeLog:[
         '扩展更新',
+        '修复明置bug'
     ],
     files:{
-        global:['game/game.js'],
+        global:['game/game.js','mode/guozhan.js'],
         '1.8.10.2':[],
     }
 }
