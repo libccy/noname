@@ -846,6 +846,9 @@ character.hearth={
 		hhudun:{
 			trigger:{player:'phaseBegin'},
 			forced:true,
+			filter:function(event,player){
+				return player.hujia<3;
+			},
 			content:function(){
 				player.changeHujia();
 				player.update();
@@ -3654,7 +3657,7 @@ character.hearth={
 		fushi:'缚誓',
 		fushi_info:'出牌阶段，你可以令一名已受伤角色失去一点体力上限并回复一点体力',
 		hhudun:'护盾',
-		hhudun_info:'锁定技，回合开始阶段，你获得一点护甲',
+		hhudun_info:'锁定技，回合开始阶段，若你的护甲值小于3，你获得一点护甲',
 		fenlie:'分裂',
 		fenlie_info:'锁定技，每当你于摸牌阶段外获得卡牌，你获得一张此牌的复制，每回合最多发动三次',
 		nianfu:'粘附',

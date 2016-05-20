@@ -1,11 +1,12 @@
 window.noname_update={
-    version:'1.8.10.4',
+    version:'1.8.10.5',
     changeLog:[
         '修bug',
     ],
     files:{
-        global:['game/game.js','character/sp.js','layout/default/layout.js'],
+        global:['game/phantom.js','mode/stone.js','character/hearth.js','theme/simple/style.css'],
         '1.8.10.2':['mode/guozhan.js'],
-        '1.8.10.3':[],
+        '1.8.10.3':['game/game.js','character/sp.js','layout/default/layout.css'],
+        '1.8.10.4':[],
     }
 }

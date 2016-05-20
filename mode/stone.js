@@ -1230,24 +1230,24 @@ mode.stone={
 			stone_tuteng2:['none','qun',2,['shaman_tuteng','shaman_zhuore'],['minskin','stone','stonehidden'],[2,0]],
 			stone_tuteng3:['none','qun',2,['shaman_tuteng','shaman_fali'],['minskin','stone','stonehidden'],[2,0]],
 			stone_tuteng4:['none','qun',2,['shaman_tuteng','shaman_zhiliao'],['minskin','stone','stonehidden'],[2,0]],
-			stone_xinbing:['none','qun',2,[],['minskin','stone','stonehidden'],[2,1]],
+			stone_xinbing:['none','qun',2,[],['minskin','stone','stonehidden'],[2,0]],
 
-			stone_siwangzhiyi:['male','qun',6,['stone_mieshi'],['minskin','stone','stonehidden','stonelegend'],[6,6]],
-			stone_alaikesita:['female','qun',5,['stone_fushi'],['minskin','stone','stonehidden','stonelegend'],[6,5]],
-			stone_yisela:['female','qun',6,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
-			stone_nuoziduomu:['male','qun',5,['stone_shixu'],['minskin','stone','stonehidden','stonelegend'],[6,5]],
-			stone_maligousi:['male','qun',6,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
+			stone_siwangzhiyi:['male','qun',4,['stone_mieshi'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
+			stone_alaikesita:['female','qun',4,['stone_fushi'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
+			stone_yisela:['female','qun',4,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
+			stone_nuoziduomu:['male','qun',4,['stone_shixu'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
+			stone_maligousi:['male','qun',5,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 
-			stone_aolajier:['male','qun',6,['stone_chongfeng','shaman_fengnu','paladin_hudun','chaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
-			stone_andongni:['male','qun',6,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
-			stone_jialakesi:['male','qun',6,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
-			stone_jialakesix:['male','qun',6,['stone_lianyu'],['stonehidden','stonespecial']],
-			stone_kelushi:['male','qun',8,['stone_chongfeng'],['minskin','stone','stonehidden','stonelegend_hunter'],[6,8]],
-			stone_geluomashi:['male','qun',6,['stone_chongfeng','stone_jinu'],['minskin','stone','stonehidden','stonelegend_warrior'],[6,4]],
-			stone_aidewen:['male','qun',3,['stone_lianji'],['minskin','stone','stonehidden','stonelegend_rogue'],[6,3]],
-			stone_sainaliusi:['male','qun',6,['stone_shenyu'],['minskin','stone','stonehidden','stonelegend_druid'],[6,4]],
-			stone_fuding:['male','qun',4,['paladin_hudun','chaofeng','stone_fuchou'],['minskin','stone','stonehidden','stonelegend_paladin'],[6,4]],
-			stone_weilun:['male','qun',6,['stone_shenyou'],['minskin','stone','stonehidden','stonelegend_priest'],[6,6]],
+			stone_aolajier:['male','qun',4,['stone_chongfeng','shaman_fengnu','paladin_hudun','chaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
+			stone_andongni:['male','qun',4,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
+			stone_jialakesi:['male','qun',4,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
+			stone_jialakesix:['male','qun',4,['stone_lianyu'],['stonehidden','stonespecial']],
+			stone_kelushi:['male','qun',5,['stone_chongfeng'],['minskin','stone','stonehidden','stonelegend_hunter'],[6,5]],
+			stone_geluomashi:['male','qun',4,['stone_chongfeng','stone_jinu'],['minskin','stone','stonehidden','stonelegend_warrior'],[6,4]],
+			stone_aidewen:['male','qun',2,['stone_lianji'],['minskin','stone','stonehidden','stonelegend_rogue'],[6,2]],
+			stone_sainaliusi:['male','qun',3,['stone_shenyu'],['minskin','stone','stonehidden','stonelegend_druid'],[6,3]],
+			stone_fuding:['male','qun',3,['paladin_hudun','chaofeng','stone_fuchou'],['minskin','stone','stonehidden','stonelegend_paladin'],[6,3]],
+			stone_weilun:['male','qun',4,['stone_shenyou'],['minskin','stone','stonehidden','stonelegend_priest'],[6,6]],
 		}
 	},
 	careerList:['mage','shaman','druid','paladin','rogue','priest','hunter','warrior','warlock'],
@@ -2757,10 +2757,10 @@ mode.stone={
 			enable:true,
 			stoneact:6,
 			career:'druid',
-			targetprompt:['造成四点伤害'],
+			targetprompt:['造成五点伤害'],
 			multitarget:true,
 			filterTarget:function(card,player,target){
-				return target.side!=player.side;
+				return target.side!=player.side&&target.isMin();
 			},
 			selectTarget:[0,1],
 			notarget:true,
@@ -5460,50 +5460,39 @@ mode.stone={
 		stone_mieshi:{
 			trigger:{source:'fellow'},
 			forced:true,
-			unique:false,
+			unique:true,
 			filter:function(event,player){
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isMin()&&game.players[i]!=player) return true;
+					if(game.players[i].isMin()&&game.players[i]!=player){
+						return true;
+					}
 				}
 				return false;
 			},
 			content:function(){
-				'step 0'
+				"step 0"
 				var list=[];
-				event.num=0;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isMin()&&game.players[i]!=player){
 						list.push(game.players[i]);
-						if(game.players[i].side!=player.side){
-							event.num+=game.players[i].hp;
-						}
-						else{
-							event.num-=game.players[i].hp;
-						}
 					}
 				}
 				list.sort(lib.sort.seat);
 				event.list=list;
-				'step 1'
+				"step 1"
 				if(event.list.length){
-					var target=event.list.shift();
-					if(target.isAlive()){
-						target.die();
-						player.line(target,'fire');
-					}
+					var current=event.list.shift();
+					current.damage(2,'fire');
+					player.line(current,'fire');
 					event.redo();
 				}
-				'step 2'
+				"step 2"
 				var target=player.getLeader();
 				var hs=target.get('h');
 				if(hs.length){
 					target.discard(hs);
 				}
 				game.delay();
-				'step 3'
-				if(event.num){
-					player.damage(event.num,'nosource');
-				}
 			}
 		},
 		stone_fushi:{
@@ -8419,12 +8408,9 @@ mode.stone={
 			}
 		},
 		shaman_zhiliao:{
-			trigger:{global:'phaseEnd'},
+			trigger:{player:'phaseEnd'},
 			forced:true,
 			direct:true,
-			filter:function(event,player){
-				return event.player==player.getLeader();
-			},
 			content:function(){
 				'step 0'
 				var players=get.players();
@@ -9183,7 +9169,7 @@ mode.stone={
 						list2.push(i);
 					}
 				}
-				var dialog=ui.create.dialog('hidden','召唤一名传说随从','<div class="text center">消耗100怒气值和3点行动值</div>',[list.concat(list2),'character']);
+				var dialog=ui.create.dialog('hidden','召唤一名传说随从','<div class="text center">消耗100怒气值和4点行动值</div>',[list.concat(list2),'character']);
 				var heilong=false;
 				var dc=player.getEnemy().countFellow()-player.countFellow();
 				if(dc>2){
@@ -9246,7 +9232,7 @@ mode.stone={
 					game.delay(2);
 					event.addname=result.links[0];
 					player.changeRage(-100);
-					player.actused+=3;
+					player.actused+=4;
 					player.updateActCount();
 				}
 				else{
@@ -9312,7 +9298,7 @@ mode.stone={
 		stone_fushi:'缚誓',
 		stone_fushi_info:'你出场时，为所有友方角色回复所有体力值',
 		stone_mieshi:'灭世',
-		stone_mieshi_info:'你出场时，消灭所有其他随从，弃置己方主将的所有手牌，并受到X点伤害，X为敌方与己方的随从数体力值之差',
+		stone_mieshi_info:'你出场时，对所有其他随从造成两点伤害，然后弃置己方主将的所有手牌',
 		stone_shixu:'时序',
 		stone_shixu_info:'你出场的回合内，己方主将获得4点行动值',
 		stone_chenshui:'沉睡',
@@ -9479,7 +9465,7 @@ mode.stone={
 		spell_fugen:'腐根',
 		spell_fugen_info:'令一名随从死亡，将一张随机随从置入对手的手牌',
 		spell_xingchenzhuiluo:'星辰坠落',
-		spell_xingchenzhuiluo_info:'对一名敌方角色造成四点伤害，或对所有敌方随从造成两点伤害',
+		spell_xingchenzhuiluo_info:'对一名敌方随从造成五点伤害，或对所有敌方随从造成两点伤害',
 		spell_fennu:'愤怒',
 		spell_fennu_info:'对一名随从造成两点伤害，或造成一点伤害并从牌库中获得一张牌',
 		spell_heiandiyu:'黑暗低语',
@@ -9986,7 +9972,7 @@ mode.stone={
 		shaman_fali:'空气',
 		shaman_fali_info:'已方主将的回合结束阶段，令所有手牌数不大于1的友方随从摸一张牌',
 		shaman_zhiliao:'治疗',
-		shaman_zhiliao_info:'已方主将的回合结束阶段，令所有友方随从回复一点体力',
+		shaman_zhiliao_info:'在你的回合结束阶段，令所有友方随从回复一点体力',
 		shaman_zhuore:'灼热',
 		shaman_zhuore_info:'已方主将的回合结束阶段，对一名随机敌方随从造成一点伤害',
 
@@ -10166,7 +10152,7 @@ mode.stone={
 		'<div style="margin:10px">怒气值</div><ul style="margin-top:0"><li>每当友方随从受到伤害获得3点怒气值，主将受到伤害获得6点怒气值'+
 		'<li>每有一个友方随从死亡，获得10点怒气值，主将死亡获得20点怒气值'+
 		'<li>回合结束阶段，若己方随从数少于对方会获得10X点怒气值，X为随从数之差'+
-		'<li>怒气值达到100时不再增加。回合开始阶段，若怒气值己满，可消耗全部怒气值并召唤一名传说随从</ul>'+
+		'<li>怒气值达到100时不再增加。回合开始阶段，若怒气值己满，可消耗全部怒气值和4点行动值并召唤一名传说随从</ul>'+
 		'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+1'+
 		'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段的卡牌'+
 		'<li>主将出牌阶段的出牌数量（行动值）有上限，从1开始递增，后手的首个回合有一点额外行动值，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
