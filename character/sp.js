@@ -2064,7 +2064,7 @@ character.sp={
 						player.setIdentity();
 					}
 					target.identity=identity;
-				},player,trigger.player,target.identityShown);
+				},player,trigger.player,trigger.player.identityShown);
 				player.line(trigger.player,'green');
 				player.storage.fenxin=true;
 				player.unmarkSkill('fenxin');

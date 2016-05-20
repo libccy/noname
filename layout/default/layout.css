@@ -1325,7 +1325,6 @@ span[data-nature='firem']{
 		rgba(232, 53, 53,1) 0 0 5px,black 0 0 1px;
 }
 .player .identity[data-color="zhong"],
-.player .identity[data-color="mingzhong"],
 .player .identity[data-color="qun"],
 .player .identity[data-color="neutral"],
 .player .identity[data-color="friend2"],
@@ -1333,6 +1332,10 @@ div[data-nature='metal'],
 span[data-nature='metal']{
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px,
 		rgba(255, 203, 0,1) 0 0 10px
+}
+.player .identity[data-color="mingzhong"]{
+	text-shadow: black 0 0 1px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 10px,
+		rgba(255, 120, 0,1) 0 0 10px
 }
 div[data-nature='metalm'],
 span[data-nature='metalm']{

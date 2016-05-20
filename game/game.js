@@ -15680,6 +15680,41 @@
 			lib.characterPack[packname][name]=character;
 			lib.translate[packname+'_character_config']=extname;
 		},
+        addCharacterPack:function(pack,packagename){
+            var extname=_status.extension||'扩展';
+            packagename=packagename||extname;
+            for(var i in pack){
+                if(i=='mode'||i=='forbid') continue;
+                for(var j in pack[i]){
+                    if(i=='character'){
+                        if(!pack[i][j][4]){
+                            pack[i][j][4]=[];
+                        }
+                        var imgsrc;
+                        if(_status.evaluatingExtension){
+                            imgsrc='db:extension-'+extname+':'+j+'.jpg';
+                        }
+                        else{
+                            imgsrc='ext:'+extname+'/'+j+'.jpg';
+                        }
+                        pack[i][j][4].push(imgsrc);
+                        if(pack[i][j][4].contains('boss')||
+                            pack[i][j][4].contains('hiddenboss')){
+                            lib.config.forbidai.add(j);
+                        }
+                        for(var l=0;l<pack[i][j][3].length;l++){
+                            lib.skilllist.add(pack[i][j][3][l]);
+                        }
+                    }
+                    if(lib[i][j]==undefined){
+                        lib[i][j]=lib.init.eval(pack[i][j]);
+                    }
+                }
+            }
+			var packname='mode_extension_'+extname;
+			lib.characterPack[packname]=pack.character;
+			lib.translate[packname+'_character_config']=packagename;
+        },
 		addCard:function(name,info,info2){
 			var extname=(_status.extension||info2.extension);
 			if(info.fullskin){
@@ -15720,6 +15755,44 @@
 			}
 			lib.cardPack[packname].push(name);
 		},
+        addCardPack:function(pack,packagename){
+            var extname=_status.extension||'扩展';
+            packagename=packagename||extname;
+			var packname='mode_extension_'+extname;
+			lib.cardPack[packname]=[];
+			lib.translate[packname+'_card_config']=packagename;
+            for(var i in pack){
+                if(i=='mode'||i=='forbid') continue;
+                if(i=='list'){
+                    for(var j=0;j<pack[i].length;j++){
+                        lib.card.list.push(pack[i][j]);
+                    }
+                    continue;
+                }
+                for(var j in pack[i]){
+                    if(i=='card'){
+                        if(pack[i][j].fullskin){
+                            if(_status.evaluatingExtension){
+                                pack[i][j].image='db:extension-'+extname+':'+j+'.png';
+                            }
+                            else{
+                                pack[i][j].image='ext:'+extname+'/'+j+'.png';
+                            }
+            			}
+            			else if(pack[i][j].fullimage){
+                            if(_status.evaluatingExtension){
+                                pack[i][j].image='db:extension-'+extname+':'+j+'.jpg';
+                            }
+                            else{
+                                pack[i][j].image='ext:'+extname+'/'+j+'.jpg';
+                            }
+            			}
+                        lib.cardPack[packname].push(j);
+                    }
+                    if(lib[i][j]==undefined) lib[i][j]=lib.init.eval(pack[i][j]);
+                }
+            }
+        },
         addSkill:function(name,info,translate,description){
             if(lib.skill[name]){
                 return false;
@@ -19380,7 +19453,7 @@
 								_status.clicked=false;
 								return;
 							}
-							if(mode.indexOf('mode_')==0){
+							if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0){
 								return;
 							}
 							this.classList.toggle('unselectable');
@@ -20251,7 +20324,7 @@
 								_status.clicked=false;
 								return;
 							}
-							if(mode.indexOf('mode_')==0){
+							if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0){
 								return;
 							}
 							this.classList.toggle('unselectable');
@@ -20864,7 +20937,6 @@
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,downloadExtension);
                                     if(lib.config.extensions.contains(list[i].name)){
                                         download.classList.remove('active');
-                                        console.log(lib.config['extension_'+list[i].name+'_version'],list[i].version);
                                         if(lib.config['extension_'+list[i].name+'_version']!=list[i].version){
                                             download.innerHTML='更新扩展';
                                             download.classList.add('highlight');
