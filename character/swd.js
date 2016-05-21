@@ -1173,7 +1173,7 @@ character.swd={
             popup:false,
             content:function(){
                 player.removeSkill('guaili2');
-                player.chooseToDiscard(true);
+                player.chooseToDiscard(2,true);
             }
         },
 		xingzhui:{
@@ -7554,7 +7554,7 @@ character.swd={
 		fuyan2:'覆岩',
 		fuyan_info:'每当你受到一次伤害，可以令一名没有护甲的角色获得一点护甲值',
 		guaili:'怪力',
-		guaili_info:'锁定技，你的杀造成的伤害+1，造成伤害后需弃置一张牌',
+		guaili_info:'锁定技，你的杀造成的伤害+1，造成伤害后需弃置两张牌',
 		pingshen:'凭神',
 		pingshen2:'凭神',
 		pingshen_info:'锁定技，受到过你的伤害的角色可在回合内对你发动一次【离魂】（每局限发动一次）',

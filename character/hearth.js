@@ -55,7 +55,7 @@ character.hearth={
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
 		hs_jinglinglong:['male','wu',3,['mianyi']],
-		hs_ruanniguai:['male','wu',3,['nianfu']],
+		// hs_ruanniguai:['male','wu',3,['nianfu']],
 		hs_hudunren:['male','shu',3,['hhudun']],
 		hs_nate:['male','wu',4,['chuidiao']],
 		hs_jiaziruila:['male','wu',4,['hannu']],
@@ -2810,8 +2810,7 @@ character.hearth={
 			forced:true,
 			unique:true,
 			content:function(){
-				var rand=['tuteng1','tuteng2','tuteng4',
-				'tuteng5','tuteng6','tuteng7'];
+				var rand=['tuteng2','tuteng4','tuteng5','tuteng6','tuteng7','tuteng8'];
 				if(player.storage.s_tuteng){
 
 					var rand2=player.storage.s_tuteng;
@@ -2852,6 +2851,13 @@ character.hearth={
 				}
 			},
 			position:'he',
+			filter:function(event,player){
+				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
+				for(var i=0;i<rand.length;i++){
+					if(!player.hasSkill(rand[i])) return true;
+				}
+				return false;
+			},
 			content:function(){
 				'step 0'
 				var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
@@ -2859,7 +2865,7 @@ character.hearth={
 				var randx=[];
 				var rand2x=[];
 				if(player.storage.tuteng_awake){
-					rand=rand.concat(['tuteng5','tuteng6','tuteng7','tuteng8']);
+					// rand=rand.concat(['tuteng5','tuteng6','tuteng7','tuteng8']);
 				}
 				for(var i=0;i<player.skills.length;i++){
 					if(rand.contains(player.skills[i])){
@@ -2867,8 +2873,14 @@ character.hearth={
 						rand2.push(player.skills[i]);
 					}
 				}
+				if(!player.storage.tuteng_awake){
+					player.addSkill(rand.randomGet());
+					game.delay();
+					event.finish();
+					return;
+				}
 				if(rand.length){
-					if(event.isMine()&&(rand.length>1||rand2.length>=3)){
+					if(event.isMine()&&(rand.length>1||rand2.length>=4)){
 						var dialog=ui.create.dialog();
 						for(var i=0;i<rand.length;i++){
 							randx[i]=['','',rand[i]];
@@ -2878,7 +2890,7 @@ character.hearth={
 						}
 						dialog.add('选择一个图腾');
 						dialog.add([randx,'vcard']);
-						if(rand2.length>=3){
+						if(rand2.length>=4){
 							dialog.add('替换一个已有图腾');
 							dialog.add([rand2x,'vcard']);
 							player.chooseButton(dialog,2,true).filterButton=function(button){
@@ -2915,9 +2927,9 @@ character.hearth={
 							}
 							player.addSkill(rand.randomGet());
 						}
-						if(rand2.length>=3){
-							player.removeSkill(rand2.randomGet());
-						}
+						// if(rand2.length>=3){
+						// 	player.removeSkill(rand2.randomGet());
+						// }
 						game.delay();
 						event.finish();
 					}
@@ -2971,7 +2983,7 @@ character.hearth={
 					var num=0;
 					for(var i=0;i<player.skills.length;i++){
 						if(rand.contains(player.skills[i])) num++;
-						if(num>=3){
+						if(num>=2){
 							return true;
 						}
 					}
@@ -2980,7 +2992,6 @@ character.hearth={
 			},
 			content:function(){
 				player.storage.tuteng_awake=true;
-				player.popup('图腾已解锁');
 				player.loseMaxHp();
 			}
 		},
@@ -3789,10 +3800,10 @@ character.hearth={
 		moying_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
 		jingxiang:'镜像',
 		jingxiang_info:'每当你需要打出卡牌时，你可以观看一名随机角色的手牌并将其视为你的手牌打出',
-		tuteng:'元素',
-		tuteng_info:'出牌阶段，你可以获得一个基础图腾，你最多可以同时拥有3个图腾；每当你受到一次伤害，你随机失去一个图腾',
+		tuteng:'图腾',
+		tuteng_info:'出牌阶段，你可以获得一个随机图腾；每当你受到一次伤害，你随机失去一个图腾',
 		zuling:'祖灵',
-		zuling_info:'觉醒技，回合开始阶段，若你拥有至少3个图腾，你失去一点体力上限，并解锁强化图腾',
+		zuling_info:'觉醒技，回合开始阶段，若你拥有至少2个图腾，你失去一点体力上限，并将图腾描述中的“获得一个随机图腾”改为“获得任意一个图腾”',
 		tuteng1:'治疗图腾',
 		tuteng2:'灼热图腾',
 		tuteng3:'石爪图腾',
