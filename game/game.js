@@ -15711,7 +15711,7 @@
                     }
                 }
             }
-			var packname='mode_extension_'+extname;
+			var packname='mode_extension_'+packagename;
 			lib.characterPack[packname]=pack.character;
 			lib.translate[packname+'_character_config']=packagename;
         },
@@ -15748,7 +15748,7 @@
 					lib.card.list.push([suits[Math.floor(Math.random()*suits.length)],Math.ceil(Math.random()*13),name]);
 				}
 			}
-			var packname='mode_extension_'+extname;
+			var packname='mode_extension_'+packagename;
 			if(!lib.cardPack[packname]){
 				lib.cardPack[packname]=[];
 				lib.translate[packname+'_card_config']=extname;
