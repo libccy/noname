@@ -38,6 +38,9 @@ mode.versus={
 			game.prepareArena(8);
 			// game.pause();
 		}
+		else if(_status.mode=='two'){
+			game.prepareArena(4);
+		}
 		else{
 			if(lib.storage.choice==undefined) game.save('choice',20);
 			if(lib.storage.zhu==undefined) game.save('zhu',true);
@@ -92,6 +95,9 @@ mode.versus={
 				game.players[i].node.identity.dataset.color=get.translation(game.players[i].side+'Color');
 			}
 			game.chooseCharacterFour();
+		}
+		else if(_status.mode=='two'){
+			game.chooseCharacterTwo();
 		}
 		else if(_status.mode=='jiange'){
 			var list=['shumech','shu','shuboss','shu','wei','weiboss','wei','weimech'];
@@ -177,7 +183,19 @@ mode.versus={
 			event.finish();
 		}
 		else{
-			if(_status.mode=='four'){
+			if(_status.mode=='two'){
+				_status.first_less=true;
+				var firstChoose=game.players.randomGet();
+				if(firstChoose.next.side==firstChoose.side){
+					firstChoose=firstChoose.next;
+				}
+				game.gameDraw(firstChoose);
+				if(get.config('replace_handcard_two')){
+					game.replaceHandcards(firstChoose.previous);
+				}
+				game.phaseLoop(firstChoose);
+			}
+			else if(_status.mode=='four'){
 				game.gameDraw(_status.firstAct,function(player){
 					if(player==_status.firstAct.previousSeat){
 						return 5;
@@ -510,6 +528,46 @@ mode.versus={
 				}
 				game.addRecentCharacter(game.me.name,game.me.name2);
 			};
+		},
+		chooseCharacterTwo:function(){
+			var next=game.createEvent('chooseCharacter',false);
+			next.content=function(){
+				'step 0'
+				var bool=Math.random()<0.5;
+				var bool2=Math.random()<0.5;
+				var ref=game.players[0];
+
+				ref.side=bool;
+				ref.next.side=bool2;
+				ref.next.next.side=!bool;
+				ref.previous.side=!bool2;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side==game.me.side){
+						game.players[i].node.identity.firstChild.innerHTML='友';
+					}
+					else{
+						game.players[i].node.identity.firstChild.innerHTML='敌';
+					}
+					game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
+				}
+				var list=[];
+				for(i in lib.character){
+					if(!lib.filter.characterDisabled(i)){
+						list.push(i);
+					}
+				}
+				var choose=[];
+				event.list=list;
+				var dialog=ui.create.dialog('选择角色',[list.randomRemove(7),'character']);
+				game.me.chooseButton(true,dialog);
+				'step 1'
+				game.me.init(result.links[0]);
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=game.me){
+						game.players[i].init(event.list.randomRemove());
+					}
+				}
+			}
 		},
 		chooseCharacterFour:function(){
 			var next=game.createEvent('chooseCharacter',false);
@@ -2452,6 +2510,30 @@ mode.versus={
 								}
 								source.draw(2+Math.max(0,num2-num1));
 							}
+						}
+						return;
+					}
+					else if(_status.mode=='two'){
+						var friend;
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].side==this.side){
+								friend=game.players[i];break;
+							}
+						}
+						if(friend){
+							var next=game.createEvent('versusDraw');
+							next.content=function(){
+								'step 0'
+								player.chooseBool('是否摸一张牌？');
+								'step 1'
+								if(result.bool){
+									player.draw();
+								}
+							};
+							next.player=friend;
+						}
+						else{
+							game.over(this.side!=game.me.side);
 						}
 						return;
 					}

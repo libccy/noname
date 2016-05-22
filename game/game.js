@@ -2309,6 +2309,12 @@
 							map.free_choose.hide();
 							map.double_character_jiange.hide();
 						}
+                        if(config.versus_mode=='two'){
+                            map.replace_handcard_two.show();
+                        }
+                        else{
+                            map.replace_handcard_two.hide();
+                        }
 					},
 					versus_mode:{
 						name:'游戏模式',
@@ -2316,6 +2322,7 @@
 						item:{
 							standard:'标准',
 							jiange:'剑阁',
+                            two:'<span style="display:inline-block;width:100%;text-align:center">2v2</span>',
 							four:'<span style="display:inline-block;width:100%;text-align:center">4v4</span>'
 						},
 						restart:true,
@@ -2367,6 +2374,11 @@
 						init:false,
 						frequent:true,
 					},
+                    replace_handcard_two:{
+                        name:'末位可换牌',
+                        init:true,
+                        frequent:true,
+                    },
 					ban_weak:{
 		                name:'屏蔽弱将',
 						init:true,
@@ -12995,43 +13007,64 @@
                     }
                 }
             }
-            next.content=function(){
-                'step 0'
-                var send=function(){
-                    game.me.chooseBool('是否置换手牌？');
-                    game.resume();
-                };
-                var sendback=function(result,player){
+            if(_status.connectMode){
+                next.content=function(){
+                    'step 0'
+                    var send=function(){
+                        game.me.chooseBool('是否置换手牌？');
+                        game.resume();
+                    };
+                    var sendback=function(result,player){
+                        if(result&&result.bool){
+                            var hs=player.get('h')
+                            game.broadcastAll(function(player,hs){
+                                for(var i=0;i<hs.length;i++){
+                                    ui.discardPile.appendChild(hs[i]);
+                                }
+                            },player,hs);
+                            player.directgain(get.cards(hs.length));
+                        }
+                    };
+                    for(var i=0;i<event.players.length;i++){
+                        if(event.players[i].isOnline()){
+                            event.withol=true;
+                            event.players[i].send(send);
+                            event.players[i].wait(sendback);
+                        }
+                        else if(event.players[i]==game.me){
+                            event.withme=true;
+                            game.me.chooseBool('是否置换手牌？');
+                            game.me.wait(sendback);
+                        }
+                    }
+                    'step 1'
+                    if(event.withme){
+                        game.me.unwait(result);
+                    }
+                    'step 2'
+                    if(event.withol&&!event.resultOL){
+    					game.pause();
+    				}
+                }
+            }
+            else{
+                next.content=function(){
+                    'step 0'
+                    if(event.players.contains(game.me)){
+                        game.me.chooseBool('是否置换手牌？');
+                    }
+                    else{
+                        event.finish();
+                    }
+                    'step 1'
                     if(result&&result.bool){
-                        var hs=player.get('h')
-                        game.broadcastAll(function(player,hs){
-                            for(var i=0;i<hs.length;i++){
-                                ui.discardPile.appendChild(hs[i]);
-                            }
-                        },player,hs);
-                        player.directgain(get.cards(hs.length));
-                    }
-                };
-                for(var i=0;i<event.players.length;i++){
-                    if(event.players[i].isOnline()){
-                        event.withol=true;
-                        event.players[i].send(send);
-                        event.players[i].wait(sendback);
-                    }
-                    else if(event.players[i]==game.me){
-                        event.withme=true;
-                        game.me.chooseBool('是否置换手牌?');
-                        game.me.wait(sendback);
+                        var hs=game.me.get('h')
+                        for(var i=0;i<hs.length;i++){
+                            ui.discardPile.appendChild(hs[i]);
+                        }
+                        game.me.directgain(get.cards(hs.length));
                     }
                 }
-                'step 1'
-                if(event.withme){
-                    game.me.unwait(result);
-                }
-                'step 2'
-                if(event.withol&&!event.resultOL){
-					game.pause();
-				}
             }
         },
         removeCard:function(name){
@@ -15748,7 +15781,7 @@
 					lib.card.list.push([suits[Math.floor(Math.random()*suits.length)],Math.ceil(Math.random()*13),name]);
 				}
 			}
-			var packname='mode_extension_'+packagename;
+			var packname='mode_extension_'+extname;
 			if(!lib.cardPack[packname]){
 				lib.cardPack[packname]=[];
 				lib.translate[packname+'_card_config']=extname;
@@ -15758,7 +15791,7 @@
         addCardPack:function(pack,packagename){
             var extname=_status.extension||'扩展';
             packagename=packagename||extname;
-			var packname='mode_extension_'+extname;
+			var packname='mode_extension_'+packagename;
 			lib.cardPack[packname]=[];
 			lib.translate[packname+'_card_config']=packagename;
             for(var i in pack){

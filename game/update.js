@@ -1,12 +1,10 @@
 window.noname_update={
-    version:'1.8.10.5',
+    version:'1.8.11',
     changeLog:[
-        '修bug',
+        '单机2v2',
     ],
     files:{
-        global:['game/game.js','game/phantom.js','mode/stone.js','character/hearth.js','character/swd.js','theme/simple/style.css'],
-        '1.8.10.2':['mode/guozhan.js'],
-        '1.8.10.3':['character/sp.js','layout/default/layout.css'],
-        '1.8.10.4':[],
+        global:['mode/versus.js'],
+        '1.8.10.5':[],
     }
 }
