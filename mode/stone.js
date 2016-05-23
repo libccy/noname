@@ -1019,7 +1019,12 @@ mode.stone={
 					}
 				}
 				if(source&&source.side!=this.side&&!source.isMin()){
-					source.draw(2);
+					if(_status.mode=='deck'){
+						source.drawDeck();
+					}
+					else{
+						source.draw();
+					}
 					source.actused--;
 					source.updateActCount();
 				}
@@ -1236,15 +1241,15 @@ mode.stone={
 			stone_alaikesita:['female','qun',4,['stone_fushi'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
 			stone_yisela:['female','qun',4,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 			stone_nuoziduomu:['male','qun',4,['stone_shixu'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
-			stone_maligousi:['male','qun',5,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
+			stone_maligousi:['male','qun',4,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 
 			stone_aolajier:['male','qun',4,['stone_chongfeng','shaman_fengnu','paladin_hudun','chaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
 			stone_andongni:['male','qun',4,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
-			stone_jialakesi:['male','qun',4,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
-			stone_jialakesix:['male','qun',4,['stone_lianyu'],['stonehidden','stonespecial']],
+			stone_jialakesi:['male','qun',5,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
+			stone_jialakesix:['male','qun',5,['stone_lianyu'],['stonehidden','stonespecial']],
 			stone_kelushi:['male','qun',5,['stone_chongfeng'],['minskin','stone','stonehidden','stonelegend_hunter'],[6,5]],
 			stone_geluomashi:['male','qun',4,['stone_chongfeng','stone_jinu'],['minskin','stone','stonehidden','stonelegend_warrior'],[6,4]],
-			stone_aidewen:['male','qun',2,['stone_lianji'],['minskin','stone','stonehidden','stonelegend_rogue'],[6,2]],
+			stone_aidewen:['male','qun',3,['stone_lianji'],['minskin','stone','stonehidden','stonelegend_rogue'],[6,3]],
 			stone_sainaliusi:['male','qun',3,['stone_shenyu'],['minskin','stone','stonehidden','stonelegend_druid'],[6,3]],
 			stone_fuding:['male','qun',3,['paladin_hudun','chaofeng','stone_fuchou'],['minskin','stone','stonehidden','stonelegend_paladin'],[6,3]],
 			stone_weilun:['male','qun',4,['stone_shenyou'],['minskin','stone','stonehidden','stonelegend_priest'],[6,6]],
@@ -1740,13 +1745,7 @@ mode.stone={
 			career:'warlock',
 			filterTarget:true,
 			content:function(){
-				'step 0'
 				target.damage(2);
-				'step 1'
-				var hs=player.get('h');
-				if(hs.length){
-					player.discard(hs.randomGet());
-				}
 			},
 			ai:{
 				order:8,
@@ -5554,7 +5553,12 @@ mode.stone={
 				event.card&&get.type(event.card)=='stonecard';
 			},
 			content:function(){
-				trigger.num+=2;
+				if(trigger.player.isMin()){
+					trigger.num+=4;
+				}
+				else{
+					trigger.num+=2;
+				}
 			},
 			ai:{
 				threaten:1.6
@@ -5586,6 +5590,10 @@ mode.stone={
 				'step 0'
 				var target=player.getLeader();
 				if(target.name=='stone_jialakesix'){
+					target.hp=target.maxHp;
+					target.update();
+					target.actused-=6;
+					target.updateActCount();
 					target.storage.stone_lianyu++;
 				}
 				else{
@@ -9242,6 +9250,10 @@ mode.stone={
 				if(event.addname){
 					if(event.addname=='stone_jialakesi'){
 						if(player.name=='stone_jialakesix'){
+							player.hp=player.maxHp;
+							player.update();
+							player.actused-=4;
+							player.updateActCount();
 							player.storage.stone_lianyu++;
 						}
 						else{
@@ -9304,7 +9316,7 @@ mode.stone={
 		stone_chenshui:'沉睡',
 		stone_chenshui_info:'在你的回合结束阶段，令己方主将获得一张梦境牌',
 		stone_mowang:'魔网',
-		stone_mowang_info:'己方法术伤害+2',
+		stone_mowang_info:'己方法术对主将伤害+2，对随从伤害+4',
 
 		stone_zhiyin:'指引',
 		stone_zhiyin_info:'每当己方主将使用一张法术牌，将一张火球术置于其手牌',
@@ -9534,7 +9546,7 @@ mode.stone={
 		spell_shenshengfennu:'神圣愤怒',
 		spell_shenshengfennu_info:'从牌库中获得一张牌，并造成等同于其行动值消耗的伤害',
 		spell_yongshizhufu:'勇士祝福',
-		spell_yongshizhufu_info:'令一名随从的体力值和体力上限翻倍',
+		spell_yongshizhufu_info:'令一名随从的手牌数翻倍',
 		spell_zhengqianghaosheng:'争强好胜',
 		paladin_zhengqianghaosheng:'争强好胜',
 		paladin_zhengqianghaosheng_info:'在你的下一回合开始时，令所有友方随从增加一点体力和体力上限并摸一张牌',
@@ -10158,7 +10170,7 @@ mode.stone={
 		'<li>主将出牌阶段的出牌数量（行动值）有上限，从1开始递增，后手的首个回合有一点额外行动值，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
 		'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
 		'随从与其他所有角色相互距离基数为1<li>'+
-		'主将杀死对方随从后获得一个额外的行动值并摸两张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
+		'主将杀死对方随从后获得一个额外的行动值并从牌库中获得一张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
 		'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为获得一张随机法术牌'+
 		'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀目标'+
 		'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'

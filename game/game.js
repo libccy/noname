@@ -5890,12 +5890,18 @@
                         game.broadcastAll(function(player,card){
                             if(lib.config.background_audio){
                                 var sex=player.sex=='female'?'female':'male';
-        						if(lib.card[card.name].audio||lib.config.background_ogg){
+                                var audioinfo=lib.card[card.name].audio;
+        						if(audioinfo||lib.config.background_ogg){
         							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
         								game.playAudio('card',sex,card.name+'_'+card.nature);
         							}
         							else{
-        								game.playAudio('card',sex,card.name);
+                                        if(typeof audioinfo=='string'&&audioinfo.indexOf('ext:')==0){
+                                            game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
+                                        }
+                                        else{
+                                            game.playAudio('card',sex,card.name);
+                                        }
         							}
         						}
         						else if(get.type(card)!='equip'){
@@ -6389,8 +6395,14 @@
                         game.broadcastAll(function(player,card){
                             if(lib.config.background_audio){
     							var sex=player.sex=='female'?'female':'male';
-    							if(lib.card[card.name].audio||lib.config.background_ogg){
-    								game.playAudio('card',sex,card.name);
+                                var audioinfo=lib.card[card.name].audio;
+    							if(audioinfo||lib.config.background_ogg){
+                                    if(typeof audioinfo=='string'&&audioinfo.indexOf('ext:')==0){
+                                        game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
+                                    }
+                                    else{
+                                        game.playAudio('card',sex,card.name);
+                                    }
     							}
     							else{
     								game.playAudio('card/default');
@@ -13455,10 +13467,27 @@
 				var audioname=skill;
 				var audioinfo=info.audio;
 				if(typeof audioinfo=='string'){
-					audioname=audioinfo;
-					if(lib.skill[audioinfo]){
-						audioinfo=lib.skill[audioinfo].audio;
-					}
+                    if(audioinfo.indexOf('ext:')==0){
+                        audioinfo=audioinfo.split(':');
+                        if(audioinfo.length==3){
+                            if(audioinfo[2]=='true'){
+                                game.playAudio('..','extension',audioinfo[1],audioname);
+                            }
+                            else{
+                                audioinfo[2]=parseInt(audioinfo[2]);
+                                if(audioinfo[2]){
+                                    game.playAudio('..','extension',audioinfo[1],audioname+Math.ceil(audioinfo[2]*Math.random()));
+                                }
+                            }
+                        }
+                        return;
+                    }
+                    else{
+                        audioname=audioinfo;
+    					if(lib.skill[audioinfo]){
+    						audioinfo=lib.skill[audioinfo].audio;
+    					}
+                    }
 				}
 				else if(Array.isArray(audioinfo)){
 					audioname=audioinfo[0];
@@ -15739,6 +15768,11 @@
                             lib.skilllist.add(pack[i][j][3][l]);
                         }
                     }
+                    else if(i=='skill'){
+                        if(typeof pack[i][j].audio=='number'||typeof pack[i][j].audio=='boolean'){
+                            pack[i][j].audio='ext:'+extname+':'+pack[i][j].audio;
+                        }
+                    }
                     if(lib[i][j]==undefined){
                         lib[i][j]=lib.init.eval(pack[i][j]);
                     }
@@ -15750,6 +15784,9 @@
         },
 		addCard:function(name,info,info2){
 			var extname=(_status.extension||info2.extension);
+            if(info.audio==true){
+                info.audio='ext:'+extname;
+            }
 			if(info.fullskin){
                 if(_status.evaluatingExtension){
                     info.image='db:extension-'+extname+':'+name+'.png';
@@ -15804,6 +15841,9 @@
                 }
                 for(var j in pack[i]){
                     if(i=='card'){
+                        if(pack[i][j].audio==true){
+                            pack[i][j].audio='ext:'+extname;
+                        }
                         if(pack[i][j].fullskin){
                             if(_status.evaluatingExtension){
                                 pack[i][j].image='db:extension-'+extname+':'+j+'.png';
@@ -15822,6 +15862,11 @@
             			}
                         lib.cardPack[packname].push(j);
                     }
+                    else if(i=='skill'){
+                        if(typeof pack[i][j].audio=='number'||typeof pack[i][j].audio=='boolean'){
+                            pack[i][j].audio='ext:'+extname+':'+pack[i][j].audio;
+                        }
+                    }
                     if(lib[i][j]==undefined) lib[i][j]=lib.init.eval(pack[i][j]);
                 }
             }
@@ -15829,6 +15874,9 @@
         addSkill:function(name,info,translate,description){
             if(lib.skill[name]){
                 return false;
+            }
+            if(typeof info.audio=='number'||typeof info.audio=='boolean'){
+                info.audio='ext:'+_status.extension+':'+info.audio;
             }
             lib.skill[name]=info;
             lib.translate[name]=translate;

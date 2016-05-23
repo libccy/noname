@@ -2,9 +2,10 @@ window.noname_update={
     version:'1.8.11',
     changeLog:[
         '单机2v2',
+        '扩展支持配音'
     ],
     files:{
-        global:['mode/versus.js'],
+        global:['mode/versus.js','game/game.js','mode/stone.js','character/shenhua.js'],
         '1.8.10.5':[],
     }
 }

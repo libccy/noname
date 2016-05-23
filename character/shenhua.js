@@ -2251,13 +2251,13 @@ character.shenhua={
 				order:8,
 				result:{
 					player:function(player,target){
-						if(ui.selected.cards.length) return 0;
+						if(player.get('e','1')) return 0;
 						if(player.hp>=target.hp) return -0.9;
 						if(player.hp<=2) return -10;
 						return -2;
 					},
 					target:function(player,target){
-						if(!ui.selected.cards.length){
+						if(!player.get('e','1')){
 							if(player.hp<2) return 0;
 							if(player.hp==2&&target.hp>=2) return 0;
 						}
