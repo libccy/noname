@@ -11223,7 +11223,9 @@
 						position:this.position,
 						forced:this.forced,
 						aiexclude:this.aiexclude,
-                        complexSelect:this.complexSelect
+                        complexSelect:this.complexSelect,
+                        ai1:this.ai1,
+                        ai2:this.ai2,
 					}
 					if(skill){
 						var info=get.info(skill);
@@ -11239,6 +11241,8 @@
 							if(info.position!=undefined) this.position=info.position;
                             if(info.forced!=undefined) this.forced=info.forced;
 							if(info.complexSelect!=undefined) this.complexSelect=info.complexSelect;
+                            if(info.ai1!=undefined) this.ai1=info.ai1;
+							if(info.ai2!=undefined) this.ai2=info.ai2;
 						}
 						else{
 							this.filterButton=info.filterButton?get.filter(info.filterButton):undefined;
@@ -11250,6 +11254,8 @@
 							this.position=info.position;
                             this.forced=info.forced;
 							this.complexSelect=info.complexSelect;
+                            if(info.ai1!=undefined) this.ai1=info.ai1;
+							if(info.ai2!=undefined) this.ai2=info.ai2;
 						}
 					}
 				},
@@ -11264,7 +11270,9 @@
 						this.position=this._backup.position;
 						this.forced=this._backup.forced;
                         this.aiexclude=this._backup.aiexclude;
-						this.complexSelect=this._backup.complexSelect;
+                        this.complexSelect=this._backup.complexSelect;
+                        this.ai1=this._backup.ai1;
+						this.ai2=this._backup.ai2;
 					}
 					delete this.skill;
 				},
