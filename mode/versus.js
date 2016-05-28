@@ -643,6 +643,7 @@ mode.versus={
 				}
 				game.me.init(result.links[0]);
 				game.addRecentCharacter(game.me.name);
+				event.list.remove(game.me.name);
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.me){
 						game.players[i].init(event.list.randomRemove());
