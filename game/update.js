@@ -11,8 +11,9 @@ window.noname_update={
             'game/game.js',
             'mode/versus.js',
             'character/yijiang.js',
-            'character/shenhua.js'
-            'character/hearth.js'
+            'character/shenhua.js',
+            'character/hearth.js',
+            'character/swd.js',
         ],
         '1.8.11':[],
         '1.8.12':[],

@@ -9536,6 +9536,13 @@
 							else if(lib.skill[skill].mark=='image'){
 									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]));
 							}
+							else if(lib.skill[skill].mark=='character'){
+                                var intro=lib.skill[skill].intro.content;
+                                if(typeof intro=='function'){
+                                    intro=intro(this.storage[skill],this);
+                                }
+                                this.markSkillCharacter(skill,this.storage[skill],get.translation(skill),intro);
+							}
 							else{
 								this.markSkill(skill);
 							}

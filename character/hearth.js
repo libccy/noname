@@ -41,6 +41,9 @@ character.hearth={
 		hs_lreno:['male','shu',4,['tanmi']],
 		hs_brann:['male','shu',4,['qianghua']],
 		hs_finley:['male','wu',3,['maoxian']],
+		hs_kcthun:['male','qun',4,['luanji','xianji']],
+		hs_anomalus:['male','wei',4,['mobao']],
+		hs_blingtron:['male','shu',3,['mobao']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
 		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -70,6 +73,125 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		mobao:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				if(!player.storage.mobao) return false;
+				if(!player.num('h',{color:'black'})) return false;
+				for(var i=0;i<player.storage.mobao.length;i++){
+					if(player.storage.mobao[i].isAlive()) return true;
+				}
+				return false;
+			},
+			filterTarget:function(card,player,target){
+				return player.storage.mobao.contains(target);
+			},
+			position:'he',
+			selectTarget:-1,
+			selectCard:[1,3],
+			check:function(card){
+				return 7-ai.get.value(card);
+			},
+			filterCard:{color:'black'},
+			line:'thunder',
+			content:function(){
+				target.damage('thunder',cards.length);
+			},
+			ai:{
+				order:9,
+				threaten:0.7,
+				result:{
+					target:function(player,target){
+						return ai.get.damageEffect(target,player,player,'thunder');
+					}
+				}
+			},
+			group:['mobao2','mobao3']
+		},
+		mobao2:{
+			trigger:{player:'damageEnd'},
+			forced:true,
+			silent:true,
+			popup:false,
+			filter:function(event,player){
+				return event.source&&event.source!=player;
+			},
+			content:function(){
+				if(!player.storage.mobao){
+					player.storage.mobao=[];
+				}
+				player.storage.mobao.add(trigger.source);
+			}
+		},
+		mobao3:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			silent:true,
+			popup:false,
+			content:function(){
+				delete player.storage.mobao;
+			}
+		},
+		xianji:{
+			unique:true,
+			forceunique:true,
+			global:'xianji2'
+		},
+		xianji2:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				if(player.hasSkill('xianji')) return false;
+				if(player.hasSkill('xianji3')) return true;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hasSkill('xianji')) return true;
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.removeSkill('xianji3');
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hasSkill('xianji')){
+						event.target=game.players[i];break;
+					}
+				}
+				if(event.target){
+					player.chooseToDiscard([1,2],'献祭：是否弃置1〜2张手牌并令'+get.translation(event.target)+'摸等量的牌？').set('ai',function(card){
+						if(ai.get.attitude(_status.event.player,_status.event.getParent().target)>1){
+							return 6-ai.get.value(card);
+						}
+						return 0;
+					}).set('logSkill',['xianji',event.target]);
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				if(result.bool){
+					event.target.draw(result.cards.length);
+					player.storage.xianji3=event.target;
+					player.addSkill('xianji3');
+				}
+			}
+		},
+		xianji3:{
+			mark:'character',
+			intro:{
+				content:function(storage,player){
+					return '每当'+get.translation(storage)+'对你使用一张牌，你摸一张牌';
+				}
+			},
+			trigger:{target:'useCardToBegin'},
+			filter:function(event,player){
+				return event.player==player.storage.xianji3;
+			},
+			forced:true,
+			content:function(){
+				player.draw();
+			},
+		},
 		tanmi:{
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
@@ -3610,6 +3732,9 @@ character.hearth={
 		hs_lreno:'雷诺',
 		hs_finley:'芬利',
 		hs_brann:'布莱恩',
+		hs_kcthun:'克苏恩',
+		hs_anomalus:'阿诺玛鲁斯',
+		hs_blingtron:'布林顿',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_shanlingjuren:'山岭巨人',
@@ -3629,6 +3754,15 @@ character.hearth={
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
 
+		lipin:'礼品',
+		lipin_info:'',
+		
+		mobao:'魔爆',
+		mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害',
+		xianji:'献祭',
+		xianji2:'献祭',
+		xianji3:'献祭',
+		xianji_info:'其他角色可以在其回合结束阶段弃置1〜2张手牌并令你摸等量的牌，若如此做，直到其下一回合结束，每当你使用卡牌指定其为目标时，其摸一张牌',
 		xueren:'血刃',
 		xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各流失一点体力，然后你摸两张牌',
 		maoxian:'冒险',

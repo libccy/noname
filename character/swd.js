@@ -3445,6 +3445,7 @@ character.swd={
 					var player=event.player;
 					if(player.hp>1) player.loseHp();
 				}
+				ui.updatehl();
 			}
 		},
 		kunlunjing2:{
