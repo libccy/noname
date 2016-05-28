@@ -2317,9 +2317,11 @@
 						}
                         if(config.versus_mode=='two'){
                             map.replace_handcard_two.show();
+                            map.change_identity.show();
                         }
                         else{
                             map.replace_handcard_two.hide();
+                            map.change_identity.remove();
                         }
 					},
 					versus_mode:{
@@ -2359,6 +2361,20 @@
 								ui.cheat2.close();
 								delete ui.cheat2;
 							}
+						}
+					},
+                    change_identity:{
+						name:'自由选择座位',
+						init:true,
+						onclick:function(bool){
+							game.saveConfig('change_identity',bool,this._link.config.mode);
+							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							var dialog;
+							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
+							else dialog=_status.event.dialog;
+							if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
+							else _status.event.getParent().removeSetting(dialog);
+							ui.update();
 						}
 					},
 					change_choice:{
@@ -7631,7 +7647,10 @@
 							lib.skill[i].intro&&!lib.skill[i].intro.nocount&&this.storage[i])){
 							this.marks[i].classList.add('overflowmark')
 							var num;
-							if(i=='ghujia'){
+                            if(typeof this.storage[i+'_markcount']=='number'){
+                                num=this.storage[i+'_markcount'];
+                            }
+							else if(i=='ghujia'){
 								num=this.hujia;
 							}
 							else if(typeof this.storage[i]=='number'){
@@ -14620,7 +14639,8 @@
 					console.log(player);
 				}
 			},
-			deletenode:function(player,cards){
+			deletenode:function(player,cards,method){
+                console.log(method);
 				if(cards){
 					var nodeList=document.querySelectorAll('#arena>.card,#chess>.card');
 					var nodes=[];
@@ -14631,6 +14651,9 @@
 						for(var j=0;j<nodes.length;j++){
 							if(cards[i][2]==nodes[j].name&&cards[i][0]==nodes[j].suit&&cards[i][1]==nodes[j].number){
 								nodes[j].delete();
+                                if(method=='zoom'){
+                                    nodes[j].style.transform='scale(0)';
+                                }
 								cards.splice(i--,1);
 								nodes.splice(j--,1);
 								break;

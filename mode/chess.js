@@ -555,7 +555,7 @@ mode.chess={
 			if(_status.mode=='leader'){
 				game.phaseLoopOrdered(p);
 			}
-			else if(get.config('seat_order')=='交替'){
+			else if(get.config('seat_order')=='指定'){
 				game.phaseLoopOrdered(p);
 			}
 			else{
@@ -1288,7 +1288,7 @@ mode.chess={
 						event.playername=_status.additionallist.randomRemove();
 					}
 				}
-				else if(!event.enemy&&get.config('seat_order')=='交替'&&!_status.auto&&_status.replacelist.length){
+				else if(!event.enemy&&get.config('seat_order')=='指定'&&!_status.auto&&_status.replacelist.length){
 					_status.replacelist.add(event.playername);
 					event.dialog=ui.create.dialog('选择替补角色',[_status.replacelist,'character']);
 					event.filterButton=function(){return true;};
@@ -3917,7 +3917,7 @@ mode.chess={
 					// this.dialog.versus_first_less=this.dialog.add(ui.create.switcher('versus_first_less',lib.storage.first_less)).querySelector('.toggle');
 					dialog.choice.reward=dialog.add(ui.create.switcher('reward',[0,1,2,3,4],get.config('reward'))).querySelector('.toggle');
 					dialog.choice.punish=dialog.add(ui.create.switcher('punish',['弃牌','无','摸牌'],get.config('punish'))).querySelector('.toggle');
-					dialog.choice.seat_order=dialog.add(ui.create.switcher('seat_order',['交替','随机'],get.config('seat_order'))).querySelector('.toggle');
+					dialog.choice.seat_order=dialog.add(ui.create.switcher('seat_order',['指定','交替'],get.config('seat_order'))).querySelector('.toggle');
 					dialog.choice.battle_number=dialog.add(ui.create.switcher('battle_number',[1,2,3,4,6,8],get.config('battle_number'))).querySelector('.toggle');
 					dialog.choice.replace_number=dialog.add(ui.create.switcher('replace_number',[0,1,2,3,5,7,9,17],get.config('replace_number'))).querySelector('.toggle');
 					dialog.choice.choice_number=dialog.add(ui.create.switcher('choice_number',[3,6,9],get.config('choice_number'))).querySelector('.toggle');
@@ -6433,7 +6433,7 @@ mode.chess={
 		'杀死对方阵营的角色可摸一张牌，杀死本方阵营无惩罚<li>'+
 		'若开启主将，双方各选择一名角色成为主将。主将体力上限加一，主将死亡后，若有副将，副将代替之成为主将，否则游戏结束<li>'+
 		'开启无尽模式后，任何一方有角色死亡都将选择一名新角色重新加入战场，直到点击左上角的结束游戏按钮手动结束游戏。结束游戏时，杀敌更多的一方获胜<li>'+
-		'开启交替行动时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
+		'行动顺序为指定时，双方无论存活角色角色多少都将轮流进行行动。在一方所有角色行动完毕进行下一轮行动时，若其人数比另一方少，另一方可指定至多X名角色名摸一张牌，X为人数之差<li>'+
 		'开启战场机关后，每个回合结束时有一定机率出现一个机关，该机关不参与战斗，并有一个影响周围或全体角色的效果。机关在出现后的5〜10个回合内消失<li>'+
 		'开启击退效果后，当一名角色对距离两格以内的目标造成伤害后，受伤害角色将沿反方向移动一格<li>'+
 		'战场上可设置出现随机路障，角色无法移动到路障处。当一名角色的周围四格有至少三格为路障或在战场外时，其可以在回合内清除一个相邻路障</ul>'+

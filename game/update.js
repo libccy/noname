@@ -12,6 +12,7 @@ window.noname_update={
             'mode/versus.js',
             'character/yijiang.js',
             'character/shenhua.js'
+            'character/hearth.js'
         ],
         '1.8.11':[],
         '1.8.12':[],

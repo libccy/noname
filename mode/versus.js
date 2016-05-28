@@ -528,6 +528,7 @@ mode.versus={
 		},
 		chooseCharacterTwo:function(){
 			var next=game.createEvent('chooseCharacter',false);
+			next.showConfig=true;
 			next.content=function(){
 				'step 0'
 				var bool=Math.random()<0.5;
@@ -566,8 +567,85 @@ mode.versus={
 				}
 				var choose=[];
 				event.list=list;
+
+				var addSetting=function(dialog){
+					dialog.add('选择座位');
+					var seats=document.createElement('table');
+					seats.style.margin='0 auto';
+					seats.style.width='200px';
+					var tr=document.createElement('tr');
+					seats.appendChild(tr);
+					for(var i=1;i<=game.players.length;i++){
+						var td=document.createElement('td');
+						tr.appendChild(td);
+						td.style.width='40px';
+						td.style.fontSize='25px';
+						td.style.fontFamily='xinwei';
+						td.innerHTML=get.cnNumber(i,true);
+						td.link=i-1;
+						if(get.distance(_status.firstAct,game.me,'absolute')===i-1){
+							td.classList.add('thundertext');
+						}
+						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+							if(_status.dragged) return;
+							if(_status.justdragged) return;
+							if(get.distance(_status.firstAct,game.me,'absolute')==this.link) return;
+							var current=this.parentNode.querySelector('.thundertext');
+							if(current){
+								current.classList.remove('thundertext');
+							}
+							this.classList.add('thundertext');
+							_status.firstAct=game.me;
+							for(var i=0;i<this.link;i++){
+								_status.firstAct=_status.firstAct.previous;
+							}
+							var firstChoose=_status.firstAct;
+							firstChoose.next.side=!firstChoose.side;
+							firstChoose.next.next.side=!firstChoose.side;
+							firstChoose.previous.side=firstChoose.side;
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].side==game.me.side){
+									game.players[i].node.identity.firstChild.innerHTML='友';
+								}
+								else{
+									game.players[i].node.identity.firstChild.innerHTML='敌';
+								}
+								game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
+							}
+							for(var i=0;i<4;i++){
+								firstChoose.node.name.innerHTML=get.verticalStr(get.cnNumber(i+1,true)+'号位');
+								firstChoose=firstChoose.next;
+							}
+						});
+					}
+					dialog.content.appendChild(seats);
+					if(game.me==game.zhu){
+						seats.previousSibling.style.display='none';
+						seats.style.display='none';
+					}
+
+					dialog.add(ui.create.div('.placeholder'));
+					dialog.add(ui.create.div('.placeholder'));
+					dialog.add(ui.create.div('.placeholder'));
+				};
+				var removeSetting=function(){
+					var dialog=_status.event.dialog;
+					if(dialog.querySelector('table')&&!get.config('change_identity')){
+						dialog.querySelector('table').previousSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').nextSibling.remove();
+						dialog.querySelector('table').remove();
+					}
+				};
+				event.addSetting=addSetting;
+				event.removeSetting=removeSetting;
+
 				var dialog=ui.create.dialog('选择角色',[list.randomGets(7),'character']);
 				game.me.chooseButton(true,dialog);
+				if(get.config('change_identity')){
+					addSetting(dialog);
+				}
 
 				ui.create.cheat=function(){
 					_status.createControl=ui.cheat2;
@@ -580,6 +658,9 @@ mode.versus={
 						}
 						_status.event.dialog.close();
 						_status.event.dialog=ui.create.dialog('选择角色',[list.randomGets(7),'character']);
+						if(get.config('change_identity')){
+							addSetting(dialog);
+						}
 						game.uncheck();
 						game.check();
 					});

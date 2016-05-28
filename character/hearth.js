@@ -369,19 +369,35 @@ character.hearth={
 			}
 		},
 		xunbao:{
-			enable:'phaseUse',
+			trigger:{player:'phaseUseBegin'},
+			frequent:true,
 			filter:function(event,player){
 				return !player.skills.contains('xunbao2');
 			},
-			filterCard:true,
-			check:function(card){
-				return 6-ai.get.value(card);
-			},
-			position:'he',
+			// filterCard:true,
+			// check:function(card){
+			// 	return 6-ai.get.value(card);
+			// },
+			// position:'he',
 			content:function(){
-				player.storage.xunbao2=game.createCard('hsbaowu_cangbaotu');
+				'step 0'
+				event.card=game.createCard('hsbaowu_cangbaotu');
+				player.storage.xunbao2=event.card;
+				player.storage.xunbao2_markcount=player.storage.xunbao2.number;
+				// player.$draw(player.storage.xunbao2);
 				player.addSkill('xunbao2');
-				player.popup(player.storage.xunbao2.number.toString());
+				game.delay(2);
+
+				event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).animate('start');
+				ui.arena.classList.add('thrownhighlight');
+				game.addVideo('thrownhighlight1');
+				game.addVideo('centernode',null,get.cardInfo(event.card));
+				'step 1'
+				game.addVideo('deletenode',player,[get.cardInfo(event.node)]);
+				event.node.delete();
+				event.node.style.transform='scale(0)';
+				game.addVideo('thrownhighlight2');
+				ui.arena.classList.remove('thrownhighlight');
 			},
 			ai:{
 				order:3,
@@ -391,7 +407,8 @@ character.hearth={
 			}
 		},
 		xunbao2:{
-			mark:'card',
+			mark:true,
+			marktext:'宝',
 			intro:{
 				content:'card',
 			},
@@ -3629,7 +3646,7 @@ character.hearth={
 		zhuizong_info:'出牌阶段限一次，你可以弃置任意张牌，观看牌堆顶的等同于弃牌数四倍的牌，然后获得其中的一张牌',
 		xunbao:'寻宝',
 		xunbao2:'寻宝',
-		xunbao_info:'出牌阶段，若你的武将牌上没有藏宝图，你可以弃置一手牌，并将一张藏宝图置于你的武将牌上；回合开始阶段，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图',
+		xunbao_info:'出牌阶段开始时，若你的武将牌上没有藏宝图，你可以将一张藏宝图置于你的武将牌上；回合开始阶段，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图',
 		xieneng:'邪能',
 		xieneng_info:'回合结束阶段，你可以将武将牌翻面，并获得一张神器牌',
 		fbeifa:'北伐',
