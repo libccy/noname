@@ -324,16 +324,6 @@ window.config={
 			dierestart:true
 		},
 	},
-
-	game_intro:{
-		identity:'主公：消灭所有的反贼和内奸，平定天下。<br/>忠臣：不惜一切保护主公，胜利条件与主公相同。'+
-		'<br/>反贼：杀死主公，推翻统治。<br/>内奸：前期在保护主公的情况下除掉其他人，最后杀死主公成为生还者。',
-		guozhan:'当全场只剩下一种势力存活时，该势力的角色获胜',
-		versus:'',
-		infinity:'',
-		boss:'',
-		character_card_config:'',
-	},
 	current_mode:{},
 	customforbid:[],
 	forbid:[

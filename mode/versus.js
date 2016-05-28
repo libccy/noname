@@ -185,10 +185,7 @@ mode.versus={
 		else{
 			if(_status.mode=='two'){
 				_status.first_less=true;
-				var firstChoose=game.players.randomGet();
-				if(firstChoose.next.side==firstChoose.side){
-					firstChoose=firstChoose.next;
-				}
+				var firstChoose=_status.firstAct;
 				game.gameDraw(firstChoose);
 				if(get.config('replace_handcard_two')){
 					game.replaceHandcards(firstChoose.previous);
@@ -541,6 +538,17 @@ mode.versus={
 				ref.next.side=bool2;
 				ref.next.next.side=!bool;
 				ref.previous.side=!bool2;
+
+				var firstChoose=game.players.randomGet();
+				if(firstChoose.next.side==firstChoose.side){
+					firstChoose=firstChoose.next;
+				}
+				_status.firstAct=firstChoose;
+				for(var i=0;i<4;i++){
+					firstChoose.node.name.innerHTML=get.verticalStr(get.cnNumber(i+1,true)+'号位');
+					firstChoose=firstChoose.next;
+				}
+
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].side==game.me.side){
 						game.players[i].node.identity.firstChild.innerHTML='友';

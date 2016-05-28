@@ -645,7 +645,7 @@
 							wood:'木纹',
 							music:'音乐',
                             simple:'原版',
-							new:'新版'
+							new:'新版',
 						},
 						onclick:function(layout){
 							game.saveConfig('card_style',layout);
@@ -664,6 +664,8 @@
 							music:'音乐',
                             official:'原版',
 							new:'新版',
+							feicheng:'废城',
+							liusha:'流沙',
 						},
 						onclick:function(layout){
 							game.saveConfig('cardback_style',layout);
