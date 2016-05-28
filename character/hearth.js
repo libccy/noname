@@ -43,7 +43,7 @@ character.hearth={
 		hs_finley:['male','wu',3,['maoxian']],
 		hs_kcthun:['male','qun',4,['luanji','xianji']],
 		hs_anomalus:['male','wei',4,['mobao']],
-		hs_blingtron:['male','shu',3,['mobao']],
+		hs_blingtron:['male','shu',3,['zengli','xiubu']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
 		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -73,6 +73,134 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		xiubu:{
+			trigger:{player:'equipEnd'},
+			frequent:true,
+			filter:function(event){
+				return get.subtype(event.card)=='equip1'
+			},
+			content:function(){
+				var num=1;
+				var info=get.info(trigger.card);
+				if(info&&info.distance&&typeof info.distance.attackFrom=='number'){
+					num=1-info.distance.attackFrom;
+				}
+				if(num<1){
+					num=1;
+				}
+				var list=['hslingjian_zhongxinghujia','hslingjian_xuanfengzhiren','hslingjian_yinmilichang',
+				'hslingjian_shengxiuhaojiao','hslingjian_jinjilengdong','hslingjian_xingtigaizao','hslingjian_shijianhuisu'];
+				var cards=[];
+				while(num--){
+					cards.push(game.createCard(list.randomGet()));
+				}
+				player.gain(cards,'gain2');
+			},
+			threaten:1.3
+		},
+		hslingjian_yinshen:{
+			mark:true,
+			intro:{
+				content:'锁定技，你不能成为其他角色的卡牌的目标'
+			},
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(player!=target) return false;
+				}
+			}
+		},
+		hslingjian_chaofeng:{
+			global:'hslingjian_chaofeng_disable',
+			unique:true,
+			gainnable:true,
+			mark:true,
+			intro:{
+				content:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
+			},
+			subSkill:{
+				disable:{
+					mod:{
+						targetEnabled:function(card,player,target){
+							if(player.skills.contains('hslingjian_chaofeng')) return;
+							if(card.name=='sha'){
+								if(target.skills.contains('hslingjian_chaofeng')) return;
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].skills.contains('hslingjian_chaofeng')){
+										if(game.players[i].hp<game.players[i].num('h')&&
+											get.distance(player,game.players[i],'attack')<=1){
+											return false;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		hslingjian_xingtigaizao:{
+			mod:{
+				maxHandcard:function(player,num){
+					if(typeof player.storage.hslingjian_xingtigaizao=='number'){
+						return num-player.storage.hslingjian_xingtigaizao;
+					}
+				},
+			},
+			mark:true,
+			intro:{
+				content:function(storage){
+					return '手牌上限-'+storage;
+				}
+			},
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.removeSkill('hslingjian_xingtigaizao');
+				player.storage.hslingjian_xingtigaizao=0;
+			}
+		},
+		zengli:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			delay:false,
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i=0;i<lib.inpile.length;i++){
+					if(lib.card[lib.inpile[i]].subtype=='equip1'){
+						list.push(lib.inpile[i]);
+					}
+				}
+				if(!list.length){
+					event.finish();
+					return;
+				}
+				event.card1=game.createCard(list.randomGet());
+				event.card2=game.createCard(list.randomGet());
+				player.$draw(event.card1);
+				target.$draw(event.card2);
+				game.delay();
+				'step 1'
+				player.equip(event.card1);
+				'step 2'
+				target.equip(event.card2);
+			},
+			ai:{
+				order:11,
+				result:{
+					player:1,
+					target:function(player,target){
+						if(target.get('e','1')) return 0;
+						return 1;
+					}
+				}
+			}
+		},
 		mobao:{
 			enable:'phaseUse',
 			usable:1,
@@ -3340,12 +3468,208 @@ character.hearth={
 		},
 	},
 	card:{
+		hslingjian_xuanfengzhiren:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_blingtron',
+			filterTarget:function(card,player,target){
+				return target.num('he')>0;
+			},
+			content:function(){
+				target.discard(target.get('he').randomGet());
+			},
+			ai:{
+				order:10.1,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_zhongxinghujia:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_blingtron',
+			filterTarget:true,
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i=0;i<lib.inpile.length;i++){
+					if(lib.card[lib.inpile[i]].subtype=='equip2'){
+						list.push(lib.inpile[i]);
+					}
+				}
+				if(list.length){
+					var card=game.createCard(list.randomGet());
+					target.$draw(card);
+					game.delay();
+					target.equip(card);
+				}
+				'step 1'
+				var hs=target.get('h');
+				if(hs.length){
+					target.discard(hs.randomGet());
+				}
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+						if(target.get('e','2')){
+							if(target.num('h')) return -0.6;
+							return 0;
+						}
+						else{
+							if(target.num('h')) return 0.5;
+							return 1;
+						}
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_xingtigaizao:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_blingtron',
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			content:function(){
+				target.draw();
+				target.addSkill('hslingjian_xingtigaizao');
+				if(typeof target.storage.hslingjian_xingtigaizao=='number'){
+					target.storage.hslingjian_xingtigaizao++;
+				}
+				else{
+					target.storage.hslingjian_xingtigaizao=1;
+				}
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+						if(target.num('h')<target.hp) return 1;
+						return 0;
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_shijianhuisu:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_blingtron',
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('e')>0;
+			},
+			content:function(){
+				var es=target.get('e');
+				target.gain(es);
+				target.$gain2(es);
+			},
+			ai:{
+				order:5,
+				result:{
+					target:function(player,target){
+						if(target.hasSkillTag('noe')) return target.num('e')*2;
+						return -target.num('e');
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+				tag:{
+					loseCard:1,
+				}
+			}
+		},
+		hslingjian_jinjilengdong:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_blingtron',
+			filterTarget:function(card,player,target){
+				return !target.isTurnedOver()&&target!=player;
+			},
+			content:function(){
+				target.draw(2);
+				target.turnOver();
+			},
+			ai:{
+				order:2,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_shengxiuhaojiao:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_blingtron',
+			filterTarget:true,
+			content:function(){
+				target.addTempSkill('hslingjian_chaofeng',{player:'phaseBegin'});
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						if(get.distance(player,target,'absolute')<=1) return 0;
+						if(target.num('h')<=target.hp) return -0.1;
+						return -1;
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_yinmilichang:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_blingtron',
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			content:function(){
+				target.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						if(get.distance(player,target,'absolute')<=1) return 0;
+						if(target.hp==1) return 2;
+						if(target.hp==2&&target.num('h')<=2) return 1.2;
+						return 1;
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
 		hsbaowu_cangbaotu:{
 			type:'hsbaowu',
 			image:'card/hsbaowu_cangbaotu',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_yelise',
@@ -3369,9 +3693,7 @@ character.hearth={
 		hsbaowu_huangjinyuanhou:{
 			type:'hsbaowu',
 			image:'card/hsbaowu_huangjinyuanhou',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_yelise',
@@ -3406,9 +3728,7 @@ character.hearth={
 		hsshenqi_nengliangzhiguang:{
 			type:'hsshenqi',
 			image:'card/hsshenqi_nengliangzhiguang',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_lafamu',
@@ -3434,9 +3754,7 @@ character.hearth={
 		hsshenqi_kongbusangzhong:{
 			type:'hsshenqi',
 			image:'card/hsshenqi_kongbusangzhong',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_lafamu',
@@ -3464,9 +3782,7 @@ character.hearth={
 		hsshenqi_morijingxiang:{
 			type:'hsshenqi',
 			image:'card/hsshenqi_morijingxiang',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_lafamu',
@@ -3493,9 +3809,7 @@ character.hearth={
 		hsmengjing_feicuiyoulong:{
 			type:'hsmengjing',
 			image:'card/hsmengjing_feicuiyoulong',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_ysera',
@@ -3518,9 +3832,7 @@ character.hearth={
 		hsmengjing_suxing:{
 			type:'hsmengjing',
 			image:'card/hsmengjing_suxing',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_ysera',
@@ -3547,9 +3859,7 @@ character.hearth={
 		hsmengjing_mengye:{
 			type:'hsmengjing',
 			image:'card/hsmengjing_mengye',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_ysera',
@@ -3573,9 +3883,7 @@ character.hearth={
 		hsmengjing_mengjing:{
 			type:'hsmengjing',
 			image:'card/hsmengjing_mengjing',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_ysera',
@@ -3612,9 +3920,7 @@ character.hearth={
 		hsmengjing_huanxiaojiemei:{
 			type:'hsmengjing',
 			image:'card/hsmengjing_huanxiaojiemei',
-			color:'white',
-			opacity:1,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 			vanish:true,
 			enable:true,
 			derivation:'hs_ysera',
@@ -3642,51 +3948,43 @@ character.hearth={
 		},
 		tuteng1:{
 			image:'card/tuteng1',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 		tuteng2:{
 			image:'card/tuteng2',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 		tuteng3:{
 			image:'card/tuteng3',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 		tuteng4:{
 			image:'card/tuteng4',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 		tuteng5:{
 			image:'card/tuteng5',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 		tuteng6:{
 			image:'card/tuteng6',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 		tuteng7:{
 			image:'card/tuteng7',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 		tuteng8:{
 			image:'card/tuteng8',
-			color:'white',
 			noname:true,
-			textShadow:'black 0 0 2px',
+			fullimage:true,
 		},
 	},
 	translate:{
@@ -3754,9 +4052,11 @@ character.hearth={
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
 
-		lipin:'礼品',
-		lipin_info:'',
-		
+		zengli:'赠礼',
+		zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
+		xiubu:'修补',
+		xiubu_info:'每当你装备一把武器，你可以获得数量等同于武器攻击范围的随机零件',
+
 		mobao:'魔爆',
 		mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害',
 		xianji:'献祭',
@@ -3801,6 +4101,26 @@ character.hearth={
 		hsbaowu_huangjinyuanhou_info:'弃置所有手牌，并获得等量的无中生有；直到下个回合开始，防上即将受到的一切伤害',
 		hsbaowu_cangbaotu:'藏宝图',
 		hsbaowu_cangbaotu_info:'回合结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
+		hslingjian:'零件',
+		hslingjian_xuanfengzhiren:'旋风之刃',
+		hslingjian_xuanfengzhiren_info:'随机弃置一名角色的一张牌',
+		hslingjian_zhongxinghujia:'重型护甲',
+		hslingjian_zhongxinghujia_info:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
+		hslingjian_jinjilengdong:'紧急冷冻',
+		hslingjian_jinjilengdong_info:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
+		hslingjian_yinmilichang:'隐秘力场',
+		hslingjian_yinmilichang_info:'令一名其他角色获得技能隐身，直到其下一回合开始',
+		hslingjian_xingtigaizao:'型体改造',
+		hslingjian_xingtigaizao_info:'摸一张牌，本回合手牌上限-1',
+		hslingjian_shengxiuhaojiao:'生锈号角',
+		hslingjian_shengxiuhaojiao_info:'令一名角色获得技能嘲讽，直到其下一回合开始',
+		hslingjian_shijianhuisu:'时间回溯',
+		hslingjian_shijianhuisu_info:'令一名其他角色将其装备牌收回手牌',
+		hslingjian_chaofeng:'嘲讽',
+		hslingjian_chaofeng_info:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
+		hslingjian_yinshen:'隐身',
+		hslingjian_yinshen_info:'锁定技，你不能成为其他角色的卡牌的目标',
+
 		shifa:'嗜法',
 		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
 		yuanzheng:'远征',
