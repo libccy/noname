@@ -566,10 +566,83 @@ mode.versus={
 				}
 				var choose=[];
 				event.list=list;
-				var dialog=ui.create.dialog('选择角色',[list.randomRemove(7),'character']);
+				var dialog=ui.create.dialog('选择角色',[list.randomGets(7),'character']);
 				game.me.chooseButton(true,dialog);
+
+				ui.create.cheat=function(){
+					_status.createControl=ui.cheat2;
+					ui.cheat=ui.create.control('更换',function(){
+						if(ui.cheat2&&ui.cheat2.dialog==_status.event.dialog){
+							return;
+						}
+						if(game.changeCoin){
+							game.changeCoin(-3);
+						}
+						_status.event.dialog.close();
+						_status.event.dialog=ui.create.dialog('选择角色',[list.randomGets(7),'character']);
+						game.uncheck();
+						game.check();
+					});
+					delete _status.createControl;
+				};
+				event.dialogxx=ui.create.characterDialog();
+				ui.create.cheat2=function(){
+					ui.cheat2=ui.create.control('自由选将',function(){
+						if(this.dialog==_status.event.dialog){
+							if(game.changeCoin){
+								game.changeCoin(50);
+							}
+							this.dialog.close();
+							_status.event.dialog=this.backup;
+							this.backup.open();
+							delete this.backup;
+							game.uncheck();
+							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=1;
+							}
+							if(ui.cheat2x){
+								ui.cheat2x.close();
+								delete ui.cheat2x;
+							}
+						}
+						else{
+							if(game.changeCoin){
+								game.changeCoin(-10);
+							}
+							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
+							this.backup=_status.event.dialog;
+							_status.event.dialog.close();
+							_status.event.dialog=_status.event.parent.dialogxx;
+							this.dialog=_status.event.dialog;
+							this.dialog.open();
+							game.uncheck();
+							game.check();
+							if(ui.cheat){
+								ui.cheat.style.opacity=0.6;
+							}
+						}
+					});
+				}
+				if(!ui.cheat&&get.config('change_choice'))
+				ui.create.cheat();
+				if(!ui.cheat2&&get.config('free_choose'))
+				ui.create.cheat2();
 				'step 1'
+				if(ui.cheat){
+					ui.cheat.close();
+					delete ui.cheat;
+				}
+				if(ui.cheat2){
+					ui.cheat2.close();
+					delete ui.cheat2;
+				}
+				if(ui.cheat2x){
+					ui.cheat2x.close();
+					delete ui.cheat2x;
+				}
 				game.me.init(result.links[0]);
+				game.addRecentCharacter(game.me.name);
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.me){
 						game.players[i].init(event.list.randomRemove());

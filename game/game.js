@@ -2303,12 +2303,16 @@
 							map.enable_all.hide();
 							map.four_assign.hide();
 						}
+                        if(config.versus_mode=='jiange'||config.versus_mode=='two'){
+                            map.free_choose.show();
+                        }
+                        else{
+                            map.free_choose.hide();
+                        }
 						if(config.versus_mode=='jiange'){
-							map.free_choose.show();
 							map.double_character_jiange.show();
 						}
 						else{
-							map.free_choose.hide();
 							map.double_character_jiange.hide();
 						}
                         if(config.versus_mode=='two'){

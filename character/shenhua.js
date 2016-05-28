@@ -2648,7 +2648,14 @@ character.shenhua={
 			content:function(){
 				player.draw(3);
 				player.turnOver();
-			}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(card.name=='guiyoujie') return [0,1];
+					}
+				}
+			},
 		},
 		liegong:{
 			audio:2,

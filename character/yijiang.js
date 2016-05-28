@@ -403,7 +403,6 @@ character.yijiang={
 					player.storage.kuangbi_draw_source=target;
 					player.syncStorage('kuangbi_draw');
 					player.addSkill('kuangbi_draw');
-					game.delay();
 				}
 			},
 			ai:{
@@ -4689,7 +4688,8 @@ character.yijiang={
 				}
 				if(get.type(card)=='equip'){
 					event.target.equip(card);
-					event.target.$draw(cards);
+					event.target.$draw(card);
+					game.delay();
 				}
 				else{
 					event.target.gain(cards,'gain2');
