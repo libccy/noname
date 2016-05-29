@@ -73,6 +73,7 @@
 		arenaReady:[],
         extensions:[],
         inpile:[],
+        cardType:{},
         characterDialogGroup:{
             '收藏':function(name,capt){
                 return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -22285,19 +22286,19 @@
 				var groupSort;
 				if(thisiscard){
 					groupSort=function(name){
-						if(lib.card[name[2]].type=='basic') return 0;
-						if(lib.card[name[2]].type=='stonecard') return -0.5;
-						if(lib.card[name[2]].type=='hsmengjing') return 0.3;
-                        if(lib.card[name[2]].type=='hsbaowu') return 0.3;
-						if(lib.card[name[2]].type=='hslingjian') return 0.3;
-						if(lib.card[name[2]].type=='hsshenqi') return 0.3;
-						if(lib.card[name[2]].type=='stonecharacter') return -1;
-						if(lib.card[name[2]].type=='chess') return 1.5;
-						if(lib.card[name[2]].type=='trick') return 2;
-						if(lib.card[name[2]].type=='delay') return 3;
-						if(lib.card[name[2]].type=='equip') return 4;
-						if(lib.card[name[2]].type=='zhenfa') return 5;
-						return 6;
+                        var type=lib.card[name[2]].type;
+                        if(lib.cardType[type]){
+                            return lib.cardType[type];
+                        }
+                        switch(type){
+                            case 'basic':return 0;
+                            case 'chess':return 1.5;
+                            case 'trick':return 2;
+                            case 'delay':return 3;
+                            case 'equip':return 4;
+                            case 'zhenfa':return 5;
+                            default:return 6;
+                        }
 					};
 				}
 				else{
@@ -26993,18 +26994,18 @@
 			var func;
 			if(sort=='type_sort'){
 				func=function(card){
-					if(get.type(card)=='basic') return 2;
-					if(get.type(card)=='stonecard') return -0.5;
-					if(get.type(card)=='hsmengjing') return 0.5;
-                    if(get.type(card)=='hsbaowu') return 0.5;
-					if(get.type(card)=='hslingjian') return 0.5;
-					if(get.type(card)=='hsshenqi') return 0.5;
-					if(get.type(card)=='stonecharacter') return 1;
-					if(get.type(card)=='chess') return 1.5;
-					if(get.type(card)=='trick') return -1;
-					if(get.type(card)=='delay') return -2;
-					if(get.type(card)=='equip') return -3;
-					return -4;
+                    var type=get.type(card);
+                    if(lib.cardType[type]){
+                        return lib.cardType[type];
+                    }
+                    switch(type){
+                        case 'basic':return 2;
+                        case 'chess':return 1.5;
+                        case 'trick':return -1;
+                        case 'delay':return -2;
+                        case 'equip':return -3;
+                        default:return -4;
+                    }
 				}
 			}
 			else if(sort=='suit_sort'){

@@ -1707,6 +1707,10 @@ mode.stone={
 			}
 		}
 	},
+	cardType:{
+		stonecard:-0.5,
+		stonecharacter:1
+	},
 	card:{
 		spell_siwangchanrao:{
 			type:'stonecard',

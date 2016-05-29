@@ -45,6 +45,7 @@ character.hearth={
 		hs_anomalus:['male','wei',4,['mobao']],
 		hs_blingtron:['male','shu',3,['zengli','xiubu']],
 		hs_yogg:['male','wu',4,['kuangluan']],
+		hs_xialikeer:['female','wu',3,['duxin']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
 		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -3513,7 +3514,109 @@ character.hearth={
 			}
 		},
 	},
+	cardType:{
+		hsmengjing:0.5,
+		hsbaowu:0.5,
+		hslingjian:0.5,
+		hsdusu:0.5,
+		hsshenqi:0.5,
+	},
 	card:{
+		hsdusu_xueji:{
+			type:'hsdusu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_xialikeer',
+			filterTarget:true,
+			content:function(){
+
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hsdusu_kuyecao:{
+			type:'hsdusu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_xialikeer',
+			filterTarget:true,
+			content:function(){
+
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hsdusu_huangxuecao:{
+			type:'hsdusu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_xialikeer',
+			filterTarget:true,
+			content:function(){
+
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hsdusu_huoyanhua:{
+			type:'hsdusu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_xialikeer',
+			filterTarget:true,
+			content:function(){
+
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hsdusu_shinancao:{
+			type:'hsdusu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_xialikeer',
+			filterTarget:true,
+			content:function(){
+
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
 		hslingjian_xuanfengzhiren:{
 			type:'hslingjian',
 			fullimage:true,
@@ -4096,7 +4199,20 @@ character.hearth={
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
 		hs_yogg:'尤格萨隆',
-
+		hs_xialikeer:'夏克里尔',
+		hsdusu:'毒素',
+		hsdusu_xueji:'血蓟',
+		hsdusu_xueji_info:'将一名角色区域内的所有牌返回其手牌',
+		hsdusu_shinancao:'石楠草',
+		hsdusu_shinancao_info:'令一名角色下一次造成的伤害+1',
+		hsdusu_kuyecao:'枯叶草',
+		hsdusu_kuyecao_info:'令一名角色获得技能潜行，直到其下一回合开始',
+		hsdusu_huoyanhua:'火焰花',
+		hsdusu_huoyanhua_info:'造成一点火焰伤害',
+		hsdusu_huangxuecao:'皇血草',
+		hsdusu_huangxuecao_info:'抽两张牌',
+		duxin:'毒心',
+		duxin_info:'锁定技，回合开始和结束阶段，你获得一张随机毒素牌',
 		hstuteng:'图腾',
 		kuangluan:'狂乱',
 		kuangluan2:'狂乱',
@@ -4157,7 +4273,7 @@ character.hearth={
 		hslingjian_jinjilengdong:'紧急冷冻',
 		hslingjian_jinjilengdong_info:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
 		hslingjian_yinmilichang:'隐秘力场',
-		hslingjian_yinmilichang_info:'令一名其他角色获得技能隐身，直到其下一回合开始',
+		hslingjian_yinmilichang_info:'令一名其他角色获得技能潜行，直到其下一回合开始',
 		hslingjian_xingtigaizao:'型体改造',
 		hslingjian_xingtigaizao_info:'摸一张牌，本回合手牌上限-1',
 		hslingjian_shengxiuhaojiao:'生锈号角',
@@ -4166,7 +4282,7 @@ character.hearth={
 		hslingjian_shijianhuisu_info:'令一名其他角色将其装备牌收回手牌',
 		hslingjian_chaofeng:'嘲讽',
 		hslingjian_chaofeng_info:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
-		hslingjian_yinshen:'隐身',
+		hslingjian_yinshen:'潜行',
 		hslingjian_yinshen_info:'锁定技，你不能成为其他角色的卡牌的目标',
 
 		shifa:'嗜法',
