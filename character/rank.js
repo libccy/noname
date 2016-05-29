@@ -75,7 +75,7 @@ window.characterRank={
         'hs_yngvar',
         're_huanggai',
         're_zhangliao',
-        'hs_edwin',
+        'hs_aedwin',
         'hs_antonidas',
         'chenlin',
         'swd_chenjingchou',

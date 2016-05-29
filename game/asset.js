@@ -429,7 +429,7 @@ window.noname_asset_list=[
     'image/character/hs_bilanyoulong.jpg',
     'image/character/hs_bolvar.jpg',
     'image/character/hs_brann.jpg',
-    'image/character/hs_edwin.jpg',
+    'image/character/hs_aedwin.jpg',
     'image/character/hs_finley.jpg',
     'image/character/hs_jaina.jpg',
     'image/character/hs_fuding.jpg',

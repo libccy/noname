@@ -6302,7 +6302,7 @@ mode.chess={
 	            'hs_bchillmaw',
 	            'swd_lanyin',
 	            'gjqt_xiayize',
-	            'hs_edwin',
+	            'hs_aedwin',
 	            'hs_antonidas',
 	            'swd_chenjingchou',
 	            'yxs_yangyuhuan',
