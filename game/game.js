@@ -8997,13 +8997,17 @@
 				isMad:function(){
 					return this.skills.contains('mad');
 				},
-				goMad:function(){
-					this.addSkill('mad');
+				goMad:function(end){
+                    if(end){
+                        this.addTempSkill('mad',end);
+                    }
+                    else{
+                        this.addSkill('mad');
+                    }
 					game.log(this,'进入混乱状态');
 				},
 				unMad:function(){
 					this.removeSkill('mad');
-					game.log(this,'解除混乱状态');
 				},
 				equip:function(card){
 					var next=game.createEvent('equip');
@@ -11015,7 +11019,7 @@
 						if(this.node.background.innerHTML.length>1) this.node.background.classList.add('tight');
 						else this.node.background.classList.remove('tight');
 					}
-					if(lib.card[card[2]].noname){
+					if(lib.card[card[2]].noname&&!this.classList.contains('button')){
 						this.node.name.style.display='none';
 					}
 					if(lib.card[card[2]].color){
@@ -11966,7 +11970,10 @@
 				mark:true,
 				intro:{
 					content:'已进入混乱状态',
-					name:'混乱'
+					name:'混乱',
+                    onunmark:function(storage,player){
+    					game.log(player,'解除混乱状态');
+                    }
 				}
 			},
 			ghujia:{
@@ -23151,8 +23158,9 @@
 					break;
 
 					case 'vcard':
-					node=ui.create.card(position,'noclick',noclick).init(item);
+					node=ui.create.card(position,'noclick',noclick);
 					node.classList.add('button');
+                    node.init(item);
 					node.link=item;
 					break;
 

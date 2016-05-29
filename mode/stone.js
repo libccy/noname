@@ -10140,6 +10140,9 @@ mode.stone={
 				else{
 					num=6;
 				}
+				if(from&&from.isMad()){
+					num=-num;
+				}
 				return num*(from.side==to.side?1:-1);
 			}
 		}

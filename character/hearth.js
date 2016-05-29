@@ -44,6 +44,7 @@ character.hearth={
 		hs_kcthun:['male','qun',4,['luanji','xianji']],
 		hs_anomalus:['male','wei',4,['mobao']],
 		hs_blingtron:['male','shu',3,['zengli','xiubu']],
+		hs_yogg:['male','wu',4,['kuangluan']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
 		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -73,6 +74,51 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		kuangluan:{
+			trigger:{player:'damageEnd'},
+			forced:true,
+			priority:10,
+			filter:function(event,player){
+				return event.source&&event.source.isAlive()&&event.source!=player;
+			},
+			intro:{
+				content:'players'
+			},
+			content:function(){
+				trigger.source.goMad('phaseAfter');
+				if(!player.storage.kuangluan){
+					player.storage.kuangluan=[];
+				}
+				player.storage.kuangluan.add(trigger.source);
+				player.markSkill('kuangluan');
+			},
+			ai:{
+				threaten:0.3
+			},
+			group:['kuangluan2','kuangluan3']
+		},
+		kuangluan2:{
+			trigger:{player:'phaseBegin'},
+			priority:10,
+			forced:true,
+			filter:function(event,player){
+				return player.storage.kuangluan&&player.storage.kuangluan.length>=2;
+			},
+			content:function(){
+				player.recover(player.maxHp);
+				player.goMad('phaseAfter');
+			}
+		},
+		kuangluan3:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.storage.kuangluan=[];
+				player.unmarkSkill('kuangluan');
+			}
+		},
 		xiubu:{
 			trigger:{player:'equipEnd'},
 			frequent:true,
@@ -3668,7 +3714,6 @@ character.hearth={
 		},
 		hsbaowu_cangbaotu:{
 			type:'hsbaowu',
-			image:'card/hsbaowu_cangbaotu',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3692,7 +3737,6 @@ character.hearth={
 		},
 		hsbaowu_huangjinyuanhou:{
 			type:'hsbaowu',
-			image:'card/hsbaowu_huangjinyuanhou',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3727,7 +3771,6 @@ character.hearth={
 		},
 		hsshenqi_nengliangzhiguang:{
 			type:'hsshenqi',
-			image:'card/hsshenqi_nengliangzhiguang',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3753,7 +3796,6 @@ character.hearth={
 		},
 		hsshenqi_kongbusangzhong:{
 			type:'hsshenqi',
-			image:'card/hsshenqi_kongbusangzhong',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3781,7 +3823,6 @@ character.hearth={
 		},
 		hsshenqi_morijingxiang:{
 			type:'hsshenqi',
-			image:'card/hsshenqi_morijingxiang',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3808,7 +3849,6 @@ character.hearth={
 		},
 		hsmengjing_feicuiyoulong:{
 			type:'hsmengjing',
-			image:'card/hsmengjing_feicuiyoulong',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3831,7 +3871,6 @@ character.hearth={
 		},
 		hsmengjing_suxing:{
 			type:'hsmengjing',
-			image:'card/hsmengjing_suxing',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3858,7 +3897,6 @@ character.hearth={
 		},
 		hsmengjing_mengye:{
 			type:'hsmengjing',
-			image:'card/hsmengjing_mengye',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3882,7 +3920,6 @@ character.hearth={
 		},
 		hsmengjing_mengjing:{
 			type:'hsmengjing',
-			image:'card/hsmengjing_mengjing',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3919,7 +3956,6 @@ character.hearth={
 		},
 		hsmengjing_huanxiaojiemei:{
 			type:'hsmengjing',
-			image:'card/hsmengjing_huanxiaojiemei',
 			fullimage:true,
 			vanish:true,
 			enable:true,
@@ -3947,44 +3983,52 @@ character.hearth={
 			}
 		},
 		tuteng1:{
-			image:'card/tuteng1',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 		tuteng2:{
-			image:'card/tuteng2',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 		tuteng3:{
-			image:'card/tuteng3',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 		tuteng4:{
-			image:'card/tuteng4',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 		tuteng5:{
-			image:'card/tuteng5',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 		tuteng6:{
-			image:'card/tuteng6',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 		tuteng7:{
-			image:'card/tuteng7',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 		tuteng8:{
-			image:'card/tuteng8',
 			noname:true,
 			fullimage:true,
+			type:'hstuteng',
+			// derivation:'hs_sthrall'
 		},
 	},
 	translate:{
@@ -4051,12 +4095,16 @@ character.hearth={
 		hs_hudunren:'护盾人',
 		hs_nate:'纳特',
 		hs_shifazhe:'嗜法者',
+		hs_yogg:'尤格萨隆',
 
+		hstuteng:'图腾',
+		kuangluan:'狂乱',
+		kuangluan2:'狂乱',
+		kuangluan_info:'锁定技，每当一名其他角色对你造成伤害，该角色进入混乱状态直到当前回合结束；回合开始阶段，若上轮有至少两名不同角色因你而进入混乱状态，你回复全部体力并进入混乱状态进到本回合结束',
 		zengli:'赠礼',
 		zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
 		xiubu:'修补',
 		xiubu_info:'每当你装备一把武器，你可以获得数量等同于武器攻击范围的随机零件',
-
 		mobao:'魔爆',
 		mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害',
 		xianji:'献祭',
@@ -4276,13 +4324,21 @@ character.hearth={
 		zuling:'祖灵',
 		zuling_info:'觉醒技，回合开始阶段，若你拥有至少2个图腾，你失去一点体力上限，并将图腾描述中的“获得一个随机图腾”改为“获得任意一个图腾”',
 		tuteng1:'治疗图腾',
+		tuteng1_info:'回合结束阶段，你回复一点体力',
 		tuteng2:'灼热图腾',
+		tuteng2_info:'每当你造成一点伤害，你摸一张牌',
 		tuteng3:'石爪图腾',
+		tuteng3_info:'你受到的伤害-1',
 		tuteng4:'空气之怒图腾',
+		tuteng4_info:'你的锦囊牌造成的伤害+1',
 		tuteng5:'法力之潮图腾',
+		tuteng5_info:'回合结束阶段，你摸一张牌',
 		tuteng6:'火舌图腾',
+		tuteng6_info:'你的杀造成的伤害+1',
 		tuteng7:'活力图腾',
+		tuteng7_info:'回合结束阶段，你令一名其他角色回复一点体力',
 		tuteng8:'图腾魔像',
+		tuteng8_info:'当计算你与其它角色的距离时，始终-1',
 		tzhenji:'震击',
 		tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成1点雷电伤害，并随机弃置其一张牌，每回合限发动一次',
 		fenliu:'分流',

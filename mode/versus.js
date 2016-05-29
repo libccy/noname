@@ -2761,7 +2761,12 @@ mode.versus={
 	},
 	ai:{
 		get:{
-			attitude:function(from,to){
+			attitude:function(from){
+				var att=ai.get.rawAttitude.apply(this,arguments);
+				if(from&&from.isMad()) return -att;
+				return att;
+			},
+			rawAttitude:function(from,to){
 				if(!from||!to) return 0;
 				if(from.side==to.side){
 					if(to.identity=='zhu'){
