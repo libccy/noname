@@ -28326,10 +28326,10 @@
 			var sa=0,sb=0,sc=0,sd=0;
 			for(var i in lib.character){
 				switch(lib.character[i][1]){
-					case 'wei':a++;if(lib.config.forbidsingle.contains(i)) sa++;break;
-					case 'shu':b++;if(lib.config.forbidsingle.contains(i)) sb++;break;
-					case 'wu':c++;if(lib.config.forbidsingle.contains(i)) sc++;break;
-					case 'qun':d++;if(lib.config.forbidsingle.contains(i)) sd++;break;
+					case 'wei':a++;if(lib.config.forbidall.contains(i)) sa++;break;
+					case 'shu':b++;if(lib.config.forbidall.contains(i)) sb++;break;
+					case 'wu':c++;if(lib.config.forbidall.contains(i)) sc++;break;
+					case 'qun':d++;if(lib.config.forbidall.contains(i)) sd++;break;
 				}
 			}
 			console.log('魏：'+(a-sa)+'/'+a);

@@ -45,7 +45,7 @@ character.hearth={
 		hs_anomalus:['male','wei',4,['mobao']],
 		hs_blingtron:['male','shu',3,['zengli','xiubu']],
 		hs_yogg:['male','wu',4,['kuangluan']],
-		hs_xialikeer:['female','wu',3,['duxin']],
+		hs_xialikeer:['female','shu',3,['duxin']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
 		hs_zhanzhenggushu:['male','wei',6,['biri']],
@@ -75,6 +75,37 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		duxin:{
+			trigger:{player:['phaseBegin','phaseEnd']},
+			frequent:true,
+			content:function(){
+				var list=['hsdusu_xueji','hsdusu_huangxuecao','hsdusu_kuyecao','hsdusu_shinancao','hsdusu_huoyanhua'];
+				var name=list.randomGet();
+				if(name=='hsdusu_huoyanhua'){
+					player.gain(game.createCard({name:name,nature:'fire'}),'draw');
+				}
+				else{
+					player.gain(game.createCard(name),'draw');
+				}
+			},
+			ai:{
+				threaten:1.6
+			}
+		},
+		hsdusu_shinancao:{
+			mark:true,
+			marktext:'楠',
+			nopop:true,
+			intro:{
+				content:'下一次造成的伤害+1'
+			},
+			trigger:{source:'damageBegin'},
+			forced:true,
+			content:function(){
+				trigger.num++;
+				player.removeSkill('hsdusu_shinancao');
+			}
+		},
 		kuangluan:{
 			trigger:{player:'damageEnd'},
 			forced:true,
@@ -147,6 +178,7 @@ character.hearth={
 		},
 		hslingjian_yinshen:{
 			mark:true,
+			nopop:true,
 			intro:{
 				content:'锁定技，你不能成为其他角色的卡牌的目标'
 			},
@@ -158,6 +190,7 @@ character.hearth={
 		},
 		hslingjian_chaofeng:{
 			global:'hslingjian_chaofeng_disable',
+			nopop:true,
 			unique:true,
 			gainnable:true,
 			mark:true,
@@ -186,6 +219,7 @@ character.hearth={
 			}
 		},
 		hslingjian_xingtigaizao:{
+			nopop:true,
 			mod:{
 				maxHandcard:function(player,num){
 					if(typeof player.storage.hslingjian_xingtigaizao=='number'){
@@ -3528,17 +3562,23 @@ character.hearth={
 			vanish:true,
 			enable:true,
 			derivation:'hs_xialikeer',
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return target.num('e')>0;
+			},
 			content:function(){
-
+				target.discard(target.get('e').randomGets(Math.ceil(Math.random()*2)));
 			},
 			ai:{
 				order:5,
 				result:{
-					target:-1,
+					target:function(player,target){
+						if(target.hasSkillTag('noe')) return 0;
+						if(target.num('e')>1) return -1.5;
+						return -1;
+					},
 				},
-				useful:[2,0.5],
-				value:[2,0.5],
+				useful:3,
+				value:5,
 			}
 		},
 		hsdusu_kuyecao:{
@@ -3547,17 +3587,28 @@ character.hearth={
 			vanish:true,
 			enable:true,
 			derivation:'hs_xialikeer',
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('hslingjian_yinshen');
+			},
 			content:function(){
-
+				target.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
 			},
 			ai:{
-				order:5,
+				order:2,
 				result:{
-					target:-1,
+					target:function(player,target){
+						if(player!=target&&get.distance(player,target,'absolute')<=1) return 0;
+						var num=1;
+						if(target==player){
+							num=1.5;
+						}
+						if(target.hp==1) return 2*num;
+						if(target.hp==2&&target.num('h')<=2) return 1.2*num;
+						return num;
+					}
 				},
-				useful:[2,0.5],
-				value:[2,0.5],
+				useful:4,
+				value:5,
 			}
 		},
 		hsdusu_huangxuecao:{
@@ -3566,17 +3617,21 @@ character.hearth={
 			vanish:true,
 			enable:true,
 			derivation:'hs_xialikeer',
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			modTarget:true,
 			content:function(){
-
+				target.draw(2);
 			},
 			ai:{
-				order:5,
+				order:9,
 				result:{
-					target:-1,
+					target:1,
 				},
-				useful:[2,0.5],
-				value:[2,0.5],
+				useful:5,
+				value:10,
 			}
 		},
 		hsdusu_huoyanhua:{
@@ -3585,17 +3640,23 @@ character.hearth={
 			vanish:true,
 			enable:true,
 			derivation:'hs_xialikeer',
+			range:{attack:1},
 			filterTarget:true,
 			content:function(){
-
+				target.damage('fire');
 			},
 			ai:{
 				order:5,
 				result:{
 					target:-1,
 				},
-				useful:[2,0.5],
-				value:[2,0.5],
+				useful:5,
+				value:8,
+				tag:{
+					damage:1,
+					fireDamage:1,
+					natureDamage:1,
+				}
 			}
 		},
 		hsdusu_shinancao:{
@@ -3604,17 +3665,25 @@ character.hearth={
 			vanish:true,
 			enable:true,
 			derivation:'hs_xialikeer',
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('hsdusu_shinancao');
+			},
 			content:function(){
-
+				target.addSkill('hsdusu_shinancao');
 			},
 			ai:{
-				order:5,
+				order:7,
 				result:{
-					target:-1,
+					target:function(player,target){
+						if(target.hp>1){
+							if(target.num('h')>2) return 1;
+							return 0.5;
+						}
+						return 0.2;
+					},
 				},
-				useful:[2,0.5],
-				value:[2,0.5],
+				useful:4,
+				value:5,
 			}
 		},
 		hslingjian_xuanfengzhiren:{
@@ -3772,7 +3841,9 @@ character.hearth={
 			vanish:true,
 			enable:true,
 			derivation:'hs_blingtron',
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('hslingjian_chaofeng');
+			},
 			content:function(){
 				target.addTempSkill('hslingjian_chaofeng',{player:'phaseBegin'});
 			},
@@ -3796,7 +3867,7 @@ character.hearth={
 			enable:true,
 			derivation:'hs_blingtron',
 			filterTarget:function(card,player,target){
-				return player!=target;
+				return player!=target&&!target.hasSkill('hslingjian_yinshen');
 			},
 			content:function(){
 				target.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
@@ -4202,17 +4273,17 @@ character.hearth={
 		hs_xialikeer:'夏克里尔',
 		hsdusu:'毒素',
 		hsdusu_xueji:'血蓟',
-		hsdusu_xueji_info:'将一名角色区域内的所有牌返回其手牌',
+		hsdusu_xueji_info:'随机弃至一名角色的1~2张装备牌',
 		hsdusu_shinancao:'石楠草',
 		hsdusu_shinancao_info:'令一名角色下一次造成的伤害+1',
 		hsdusu_kuyecao:'枯叶草',
 		hsdusu_kuyecao_info:'令一名角色获得技能潜行，直到其下一回合开始',
 		hsdusu_huoyanhua:'火焰花',
-		hsdusu_huoyanhua_info:'造成一点火焰伤害',
+		hsdusu_huoyanhua_info:'对攻击范围内的一名角色造成一点火焰伤害',
 		hsdusu_huangxuecao:'皇血草',
 		hsdusu_huangxuecao_info:'抽两张牌',
 		duxin:'毒心',
-		duxin_info:'锁定技，回合开始和结束阶段，你获得一张随机毒素牌',
+		duxin_info:'回合开始和结束阶段，你可以获得一张随机毒素牌',
 		hstuteng:'图腾',
 		kuangluan:'狂乱',
 		kuangluan2:'狂乱',

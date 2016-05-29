@@ -137,6 +137,8 @@ character.xianjian={
 			},
 			selectTarget:[1,Infinity],
 			discard:false,
+			line:false,
+			multiline:true,
 			prepare:function(cards,player,targets){
 				player.$throw(cards);
 				player.line(targets);

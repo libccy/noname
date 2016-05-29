@@ -737,7 +737,7 @@ card.standard={
 				basic:{
 					order:7.2,
 					useful:4,
-					value:10
+					value:9.2
 				},
 				result:{
 					target:2,
