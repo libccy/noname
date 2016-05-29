@@ -1101,7 +1101,9 @@ character.xianjian={
 			group:'zhimeng3',
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【织梦】？').ai=function(target){
+				player.chooseTarget('是否发动【织梦】？',function(card,player,target){
+					return player!=target;
+				}).ai=function(target){
 					var num=ai.get.attitude(player,target);
 					if(num>0){
 						if(player==target){
@@ -1418,7 +1420,7 @@ character.xianjian={
 		zhimeng:'织梦',
 		zhimeng2:'织梦',
 		zhimeng3:'织梦',
-		zhimeng_info:'回合结束阶段，你可以选择一名角色将牌堆顶的一张牌置于该角色的武将牌上，直到你的下个回合开始将其收入手牌。当一名角色武将牌上有牌时，每当其成为与此牌类型相同的卡牌的目标，可以摸一张牌',
+		zhimeng_info:'回合结束阶段，你可以选择一名其他角色将牌堆顶的一张牌置于该角色的武将牌上，直到你的下个回合开始将其收入手牌。当一名角色武将牌上有牌时，每当其成为与此牌类型相同的卡牌的目标，可以摸一张牌',
 		runxin:'润心',
 		runxin_info:'每当你使用或打出一张红桃牌，你可以令一名角色回复一点体力',
 		tannang:'探囊',

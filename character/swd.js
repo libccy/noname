@@ -790,7 +790,9 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【回气】？').ai=function(target){
+				player.chooseTarget('是否发动【回气】？',function(card,player,target){
+					return player!=target;
+				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(player.hp<=0){
 						if(player==target){
@@ -2588,7 +2590,7 @@ character.swd={
 				"step 1"
 				if(result.bool){
 					trigger.player.damage('thunder');
-					player.draw();
+					// player.draw();
 					player.addSkill('touxi2');
 					event.finish();
 				}
@@ -4591,8 +4593,9 @@ character.swd={
 			filter:function(event,player){
 				return event.player.num('e');
 			},
+			direct:true,
 			content:function(){
-				trigger.player.discard(trigger.player.get('e'));
+				player.discardPlayerCard(trigger.player,'e','是否发动【破浪】？').logSkill='polang';
 			},
 			ai:{
 				expose:0.3
@@ -7527,7 +7530,7 @@ character.swd={
 		xianghui:'祥晖',
 		xianghui_info:'出牌阶段限一次，你可以弃置一张红色手牌，然后令场上体力值最少的角色各回复一点体力',
 		huiqi:'回气',
-		huiqi_info:'每当你受到一次伤害，可令一名角色摸X张牌，X为你已损失的体力值',
+		huiqi_info:'每当你受到一次伤害，可令一名其他角色摸X张牌，X为你已损失的体力值',
 		toudan:'投弹',
 		toudan_info:'出牌阶段限一次，你可以弃置一张黑桃牌对一名其他角色造成一点火焰伤害，然后你与距离该角色1以内的所有角色各弃置一张牌',
 		shending:'神丁',
@@ -7653,7 +7656,7 @@ character.swd={
 		meihuo_info:'每当你失去最后一张装备牌，你可以获得一名其他角色的一张牌，若此牌来自装备区，你立即装备之',
 
 		touxi:'偷袭',
-		touxi_info:'在其他角色的回合结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害并摸一张牌，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方须弃置你的一张牌',
+		touxi_info:'在其他角色的回合结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方须弃置你的一张牌',
 		minjing:'明镜',
 		minjing_info:'锁定技，每当你受到伤害时，若你没有防具牌，有1/3的概率令伤害-1',
 		qimou:'奇谋',
@@ -7673,7 +7676,7 @@ character.swd={
 		miedao_info:'锁定技，摸牌阶段，你额外摸X张牌；弃牌阶段，你至少须弃X张牌（不足则全弃），X为你已损失的体力值。',
 
 		polang:'破浪',
-		polang_info:'每当你造成一次伤害，可以弃置对方装备区内的所有牌。',
+		polang_info:'每当你造成一次伤害，可以一张对方的装备牌',
 		jikong:'亟空',
 		jikong2:'亟空',
 		jikong_info:'每当你失去最后一手手牌，可以对一名角色造成一点雷电伤害；回合开始阶段，你可以指定一名角色视为对其使用一张雷杀',

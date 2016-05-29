@@ -1778,6 +1778,9 @@ character.hearth={
 			content:function(){
 				var num=player.num('h')-target.num('h');
 				if(num>0){
+					if(num>3){
+						num=3;
+					}
 					target.draw(num);
 				}
 				else if(num<0){
@@ -4429,7 +4432,7 @@ character.hearth={
 		xmojian:'魔箭',
 		xmojian_info:'每当你翻面时，你可以指定一名角色视为对其使用了一张杀，每回合最多发动一次',
 		enze:'恩泽',
-		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等',
+		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（至多摸三张牌）',
 		chongsheng:'重生',
 		chongsheng_bg:'生',
 		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动2次',

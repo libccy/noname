@@ -569,6 +569,7 @@ character.yijiang={
 				player.unmarkSkill('xinfencheng');
 				event.num=1;
 				event.targets=targets.slice(0);
+				event.targets.sort(lib.sort.seat);
 				"step 1"
 				if(event.targets.length){
 					var target=event.targets.shift();
