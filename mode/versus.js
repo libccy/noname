@@ -75,8 +75,10 @@ mode.versus={
 			}
 		}
 		else if(_status.mode=='four'){
-			var list=['zhu','zhong','zhong','zhong','ezhu','ezhong','ezhong','ezhong'];
-			list.randomSort();
+			var list=['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'];
+			list[2*Math.floor(Math.random()*4)]='zhu';
+			list[2*Math.floor(Math.random()*4)+1]='ezhu';
+			if(!get.config('four_cross')) list.randomSort();
 			var side=Math.random()<0.5;
 			for(var i=0;i<8;i++){
 				if(list[i][0]=='e'){
@@ -319,6 +321,9 @@ mode.versus={
 			}
 			else if(lib.configOL.versus_mode=='2v2'||lib.configOL.versus_mode=='3v3'){
 				uiintro.add('<div class="text chat">四号位换牌：'+(lib.configOL.replace_handcard?'开启':'关闭'));
+			}
+			else if(lib.configOL.versus_mode=='4v4'){
+				uiintro.add('<div class="text chat">交叉座位：'+(lib.configOL.four_cross?'开启':'关闭'));
 			}
 			uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
 			uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
@@ -1404,8 +1409,11 @@ mode.versus={
 			var next=game.createEvent('chooseCharacter',false);
 			next.content=function(){
 				"step 0"
-				var list=['zhu','zhong','zhong','zhong','ezhu','ezhong','ezhong','ezhong'];
-				list.randomSort();
+				var list=['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'];
+				list[2*Math.floor(Math.random()*4)]='zhu';
+				list[2*Math.floor(Math.random()*4)+1]='ezhu';
+				if(!lib.configOL.four_cross) list.randomSort();
+
 				var side=Math.random()<0.5;
 				var map={};
 				for(var i=0;i<8;i++){

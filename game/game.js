@@ -52,7 +52,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:8,
+        versionOL:9,
 		updateURL:localStorage.getItem('noname_update_url')||'http://websha.cn/',
 		assetURL:'',
         hallURL:'websha.cn',
@@ -2252,6 +2252,12 @@
                         },
                         frequent:true
                     },
+                    connect_four_cross:{
+                        name:'交叉座位',
+						init:false,
+						frequent:true,
+						restart:true,
+                    },
                     connect_replace_handcard:{
                         name:'末位可换牌',
                         init:true,
@@ -2299,11 +2305,13 @@
 							map.change_choice.hide();
 							map.enable_all.show();
 							map.four_assign.show();
+                            map.four_cross.show();
 						}
 						else{
 							map.change_choice.show();
 							map.enable_all.hide();
 							map.four_assign.hide();
+                            map.four_cross.hide();
 						}
                         if(config.versus_mode=='jiange'||config.versus_mode=='two'){
                             map.free_choose.show();
@@ -2346,7 +2354,13 @@
 					},
 					four_assign:{
 						name:'代替队友选将',
-						init:true,
+						init:false,
+						frequent:true,
+						restart:true,
+					},
+					four_cross:{
+						name:'交叉座位',
+						init:false,
 						frequent:true,
 						restart:true,
 					},

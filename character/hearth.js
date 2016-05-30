@@ -300,7 +300,7 @@ character.hearth={
 			selectTarget:-1,
 			selectCard:[1,3],
 			check:function(card){
-				return 7-ai.get.value(card);
+				return 8-ai.get.value(card);
 			},
 			filterCard:{color:'black'},
 			line:'thunder',
@@ -312,7 +312,7 @@ character.hearth={
 				threaten:0.7,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,player,'thunder');
+						return ai.get.damageEffect(target,player,target,'thunder');
 					}
 				}
 			},
@@ -2196,6 +2196,7 @@ character.hearth={
 			},
 			content:function(){
 				trigger.player.recover();
+				player.line(trigger.player,'green');
 				player.addTempSkill('shengyan2','phaseAfter');
 			},
 			ai:{

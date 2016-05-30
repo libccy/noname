@@ -56,7 +56,6 @@ card.yunchou={
 			multitarget:true,
 			multiline:true,
 			filterTarget:function(card,player,target){
-				if(player==target) return true;
 				var num=target.num('h');
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('h')<num) return false;
@@ -64,14 +63,26 @@ card.yunchou={
 				return true;
 			},
 			content:function(){
-				// target.draw();
-				game.asyncDraw(targets);
+				var num=[];
+				for(var i=0;i<targets.length;i++){
+					if(targets[i]==player){
+						num.push(2);
+					}
+					else{
+						num.push(1);
+					}
+				}
+				if(!targets.contains(player)){
+					targets.add(player);
+				}
+				game.asyncDraw(targets,num);
 			},
 			ai:{
 				order:1,
 				value:5,
 				result:{
-					target:1
+					target:1,
+					player:0.1,
 				}
 			}
 		},
