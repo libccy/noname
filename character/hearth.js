@@ -700,11 +700,12 @@ character.hearth={
 			}
 		},
 		xunbao:{
-			trigger:{player:'phaseUseBegin'},
+			trigger:{player:'phaseBegin'},
 			frequent:true,
 			filter:function(event,player){
 				return !player.skills.contains('xunbao2');
 			},
+			priority:1,
 			// filterCard:true,
 			// check:function(card){
 			// 	return 6-ai.get.value(card);
@@ -779,6 +780,7 @@ character.hearth={
 		},
 		hsbaowu_huangjinyuanhou:{
 			mark:'card',
+			nopup:true,
 			intro:{
 				content:'防止你受到的所有伤害'
 			},
@@ -3924,6 +3926,7 @@ character.hearth={
 			},
 			selectTarget:-1,
 			content:function(){
+				player.recover(player.maxHp);
 				var hs=target.get('h');
 				target.discard(hs);
 				var cs=[];
@@ -4319,7 +4322,7 @@ character.hearth={
 		zhuizong_info:'出牌阶段限一次，你可以弃置任意张牌，观看牌堆顶的等同于弃牌数四倍的牌，然后获得其中的一张牌',
 		xunbao:'寻宝',
 		xunbao2:'寻宝',
-		xunbao_info:'出牌阶段开始时，若你的武将牌上没有藏宝图，你可以将一张藏宝图置于你的武将牌上；回合开始阶段，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图',
+		xunbao_info:'回合开始阶段，若你的武将牌上没有藏宝图，你可以将一张藏宝图置于你的武将牌上；若你的武将牌上有藏宝图，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图',
 		xieneng:'邪能',
 		xieneng_info:'回合结束阶段，你可以将武将牌翻面，并获得一张神器牌',
 		fbeifa:'北伐',
@@ -4337,7 +4340,7 @@ character.hearth={
 		hsshenqi_nengliangzhiguang_info:'令一名角色增加一点体力上限，回复一点体力，并摸四张牌',
 		hsbaowu:'宝物',
 		hsbaowu_huangjinyuanhou:'黄金猿猴',
-		hsbaowu_huangjinyuanhou_info:'弃置所有手牌，并获得等量的无中生有；直到下个回合开始，防上即将受到的一切伤害',
+		hsbaowu_huangjinyuanhou_info:'回复全部体力，弃置所有手牌，并获得等量的无中生有；直到下个回合开始，防上即将受到的一切伤害',
 		hsbaowu_cangbaotu:'藏宝图',
 		hsbaowu_cangbaotu_info:'回合结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
 		hslingjian:'零件',
