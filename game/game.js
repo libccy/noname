@@ -15576,7 +15576,7 @@
 			node.style.transitionDuration=(total/3000)+'s';
 			node.style.left=from[0]+'px';
 			node.style.top=from[1]+'px';
-			node.style.backgroundColor='rgba('+color.toString()+','+opacity+')';
+			node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
 			var dy=to[1]-from[1];
 			var dx=to[0]-from[0];
 			var deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
@@ -15609,6 +15609,7 @@
 			node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
 			node.addEventListener('webkitTransitionEnd',function(){
 				setTimeout(function(){
+                    if(node.classList.contains('removing')) return;
 					node.delete();
 				},total/3);
 			});
