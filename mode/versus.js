@@ -78,7 +78,19 @@ mode.versus={
 			var list=['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'];
 			list[2*Math.floor(Math.random()*4)]='zhu';
 			list[2*Math.floor(Math.random()*4)+1]='ezhu';
-			if(!get.config('four_cross')) list.randomSort();
+			if(!get.config('four_cross')){
+				list.randomSort();
+			}
+			else{
+				for(var i in lib.skill){
+					if(lib.skill[i].changeSeat){
+						lib.skill[i]={};
+						if(lib.translate[i+'_info']){
+							lib.translate[i+'_info']='此模式下不可用';
+						}
+					}
+				}
+			}
 			var side=Math.random()<0.5;
 			for(var i=0;i<8;i++){
 				if(list[i][0]=='e'){
@@ -536,6 +548,14 @@ mode.versus={
 			next.showConfig=true;
 			next.content=function(){
 				'step 0'
+				for(var i in lib.skill){
+					if(lib.skill[i].changeSeat){
+						lib.skill[i]={};
+						if(lib.translate[i+'_info']){
+							lib.translate[i+'_info']='此模式下不可用';
+						}
+					}
+				}
 				var bool=Math.random()<0.5;
 				var bool2=Math.random()<0.5;
 				var ref=game.players[0];

@@ -64,7 +64,7 @@ character.hearth={
 		hs_hudunren:['male','shu',3,['hhudun']],
 		hs_nate:['male','wu',4,['chuidiao']],
 		hs_jiaziruila:['male','wu',4,['hannu']],
-		hs_shifazhe:['male','wei',3,['jizhi','shifa']],
+		// hs_shifazhe:['male','wei',3,['jizhi','shifa']],
 		hs_lafamu:['male','shu',4,['xieneng']],
 		hs_yelise:['female','wei',3,['xunbao','zhuizong']],
 	},

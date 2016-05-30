@@ -4955,8 +4955,8 @@ character.swd={
 					if(target.skills.contains('tanlin2')==false){
 						target.addSkill('tanlin2');
 						player.addSkill('tanlin3');
-						player.gain([result.player,result.target]);
-						player.$gain2([result.player,result.target]);
+						player.gain([result.target]);
+						player.$gain2([result.target]);
 					}
 				}
 				else{
@@ -7132,6 +7132,16 @@ character.swd={
 			},
 		},
 		ljifeng:{
+			mod:{
+				selectTarget:function(card,player,range){
+					if(card.name=='sha'&&range[1]!=-1) range[1]+=player.maxHp-player.hp;
+				},
+				attackFrom:function(from,to,distance){
+					return distance+from.hp-from.maxHp;
+				}
+			},
+		},
+		ljifeng_old:{
 			trigger:{player:'phaseUseBefore'},
 			direct:true,
 			filter:function(event,player){
@@ -7547,7 +7557,7 @@ character.swd={
 		zhenjiu2:'针灸',
 		zhenjiu_info:'出牌阶段限一次，你可以将一张红色手牌置于一名角色的武将牌上，该角色于下一个回合开始阶段回复一点体力，然后获得此牌',
 		ljifeng:'疾风',
-		ljifeng_info:'你可以弃置一张手牌并跳过出牌阶段，视为对至多两名角色使用一张杀',
+		ljifeng_info:'锁定技，你的攻击范围+X，杀可以额外指定X个目标，X为你已损失的体力值',
 		lxianglong_info:'每当你闪避一张杀，可以将此杀对攻击范围内的一名角色使用',
 		lxianglong:'翔龙',
 		shangxi:'伤袭',
@@ -7854,7 +7864,7 @@ character.swd={
 		ningjian_info:'你可以将一张红色牌当闪、黑色牌当杀使用或打出',
 		taixu_info:'限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1为其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1',
 		duoren_info:'每当你闪避一张杀，你可以立即获得来源的武器牌',
-		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得双方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
+		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
 		tianshu_info:'出牌阶段，你可以弃置一张手牌，并获得场上一名存活角色的一项技能直到你的下一出牌阶段开始',

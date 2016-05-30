@@ -7662,7 +7662,7 @@
 						if(i=='ghujia'||(!this.marks[i].querySelector('.image')&&lib.skill[i]&&
 							lib.skill[i].intro&&!lib.skill[i].intro.nocount&&this.storage[i])){
 							this.marks[i].classList.add('overflowmark')
-							var num;
+							var num=0;
                             if(typeof this.storage[i+'_markcount']=='number'){
                                 num=this.storage[i+'_markcount'];
                             }
