@@ -4964,6 +4964,10 @@
                     }
                     "step 2"
 					if(event.result.bool&&!game.online){
+                        var info=get.info(event.result.skill);
+                        if(info&&info.onrespond){
+                            info.onrespond(event.result,player);
+                        }
 						player.respond(event.result.cards,event.result.card,event.animate,event.result.skill,event.source);
 					}
 					if(event.dialog&&event.dialog.close) event.dialog.close();
@@ -6418,10 +6422,6 @@
 				respond:function(){
 					var cardaudio=true;
 					if(event.skill){
-                        var info=get.info(event.skill);
-                        if(info&&info.onrespond){
-                            info.onrespond(result,player);
-                        }
 						if(lib.skill[event.skill].audio){
 							cardaudio=false;
 						}
