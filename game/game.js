@@ -6418,6 +6418,10 @@
 				respond:function(){
 					var cardaudio=true;
 					if(event.skill){
+                        var info=get.info(event.skill);
+                        if(info&&info.onrespond){
+                            info.onrespond(result,player);
+                        }
 						if(lib.skill[event.skill].audio){
 							cardaudio=false;
 						}
