@@ -1,5 +1,9 @@
 "use strict";
 (function(){
+    if(window.cordovaLoadTimeout){
+        clearTimeout(window.cordovaLoadTimeout);
+        delete window.cordovaLoadTimeout;
+    }
     window.resetGameTimeout=setTimeout(function(){
         if(window.inSplash) return;
         if(window.resetExtension){
