@@ -6377,6 +6377,9 @@ character.yijiang={
 				if(att>0&&event.player.num('j','lebu')&&event.player.num('h')>event.player.hp+1) return true;
 				return false;
 			},
+            prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【权计】？';
+			},
 			filter:function(event,player){
 				return event.player!=player&&event.player.num('h')>0&&player.num('h')>0;
 			},

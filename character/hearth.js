@@ -36,7 +36,7 @@ character.hearth={
 		hs_ysera:['female','wu',4,['chenshui']],
 		hs_alextrasza:['female','shu',5,['fushi']],
 		hs_nozdormu:['male','qun',5,['shixu']],
-		hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
+		// hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
 		hs_kchromaggus:['male','wei',4,['fenlie']],
 		hs_lreno:['male','shu',4,['tanmi']],
 		hs_brann:['male','shu',4,['qianghua']],

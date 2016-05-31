@@ -2580,6 +2580,9 @@ character.swd={
 			filter:function(event,player){
 				return event.player!=player&&!player.skills.contains('touxi2')&&event.player.isAlive();
 			},
+            prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【偷袭】？';
+			},
 			content:function(){
 				"step 0"
 				player.line(trigger.player,'thunder');
@@ -2596,7 +2599,11 @@ character.swd={
 				}
 				else{
 					if(player.num('he')){
-						trigger.player.discardPlayerCard(player,'he',true,ai.get.buttonValue);
+                        var att=ai.get.attitude(trigger.player,player);
+						trigger.player.discardPlayerCard(player,'he',function(button){
+                            if(att>0) return 0;
+                            return ai.get.buttonValue(button);
+                        });
 					}
 				}
 			},
@@ -7535,7 +7542,7 @@ character.swd={
 		fuyan2:'覆岩',
 		fuyan_info:'每当你受到一次伤害，可以令一名没有护甲的角色获得一点护甲值',
 		guaili:'怪力',
-		guaili_info:'锁定技，你的杀造成的伤害+1，造成伤害后需弃置两张牌',
+		guaili_info:'锁定技，你的杀造成的伤害+1，造成伤害后需弃置两张手牌',
 		pingshen:'凭神',
 		pingshen2:'凭神',
 		pingshen_info:'锁定技，受到过你的伤害的角色可在回合内对你发动一次【离魂】（每局限发动一次）',
@@ -7633,7 +7640,7 @@ character.swd={
 		meihuo_info:'每当你失去最后一张装备牌，你可以获得一名其他角色的一张牌，若此牌来自装备区，你立即装备之',
 
 		touxi:'偷袭',
-		touxi_info:'在其他角色的回合结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方须弃置你的一张牌',
+		touxi_info:'在其他角色的回合结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以弃置你的一张牌',
 		minjing:'明镜',
 		minjing_info:'锁定技，每当你受到伤害时，若你没有防具牌，有1/3的概率令伤害-1',
 		qimou:'奇谋',
