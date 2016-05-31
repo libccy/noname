@@ -1737,7 +1737,7 @@ character.hearth={
 			trigger:{player:'turnOverAfter'},
 			direct:true,
 			filter:function(event,player){
-				return !player.skills.contains('xmojian2');
+				return player.isTurnedOver();
 			},
 			content:function(){
 				"step 0"
@@ -1750,14 +1750,12 @@ character.hearth={
 				if(result.bool){
 					player.logSkill('xmojian');
 					player.useCard({name:'sha'},result.targets,false);
-					player.addTempSkill('xmojian2','phaseAfter');
 				}
 			},
 			ai:{
 				expose:0.2,
 			}
 		},
-		xmojian2:{},
 		xshixin:{
 			trigger:{source:'damageEnd'},
 			forced:true,
@@ -4434,7 +4432,7 @@ character.hearth={
 		xshixin:'蚀心',
 		xshixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各流失一点体力',
 		xmojian:'魔箭',
-		xmojian_info:'每当你翻面时，你可以指定一名角色视为对其使用了一张杀，每回合最多发动一次',
+		xmojian_info:'每当你的武将牌翻至背面时，你可以指定一名角色视为对其使用了一张杀',
 		enze:'恩泽',
 		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（至多摸三张牌）',
 		chongsheng:'重生',

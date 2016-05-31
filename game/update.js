@@ -2,6 +2,7 @@ window.noname_update={
     version:'1.8.12',
     changeLog:[
         '新卡背',
+        '修bug',
     ],
     files:{
         global:[
@@ -14,6 +15,8 @@ window.noname_update={
             'mode/guozhan.js',
             'mode/stone.js',
             'card/standard.js',
+            'card/extra.js',
+            'card/yunchou.js',
             'character/yijiang.js',
             'character/shenhua.js',
             'character/hearth.js',

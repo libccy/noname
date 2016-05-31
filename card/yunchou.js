@@ -604,31 +604,25 @@ card.yunchou={
 			fullskin:true,
 			type:'trick',
 			enable:true,
-			filterTarget:function(card,player,target){
-				return target.num('he')>0;
-			},
+			filterTarget:true,
 			content:function(){
 				"step 0"
-				target.chooseToDiscard('he',[1,2]).ai=function(card){
+				target.chooseToDiscard('he',2).ai=function(card){
 					if(target.hasSkillTag('nofire')) return 0;
 					if(ai.get.damageEffect(target,player,target,'fire')>=0&&
 						!target.hasSkillTag('maixie')) return 0;
 					if(player.get('s').contains('xinwuyan')) return 0;
 					if(target.get('s').contains('xinwuyan')) return 0;
-					if(target.hasSkillTag('maixie')&&target.hp>1&&ui.selected.cards.length){
-						return 0;
-					}
 					if(card.name=='tao') return 0;
 					if(target.hp==1&&card.name=='jiu') return 0;
-					if(get.type(card)!='basic'){
+					if(target.hp==1&&get.type(card)!='basic'){
 						return 10-ai.get.value(card);
 					}
 					return 8-ai.get.value(card);
 				};
 				"step 1"
-				if(!result.bool||result.cards.length<2){
-					if(result.bool) target.damage(2-result.cards.length,'fire');
-					else target.damage(2,'fire');
+				if(!result.bool){
+					target.damage('fire');
 				}
 			},
 			ai:{
@@ -642,17 +636,20 @@ card.yunchou={
 						if(target.hasSkillTag('nofire')) return 0;
 						var nh=target.num('he');
 						if(target==player) nh--;
-						if(nh==2) return -5;
-						if(nh==1) return -6;
-						return -3;
+						switch(nh){
+							case 0:case 1:return -2;
+							case 2:return -1.5;
+							case 3:return -1;
+							default:return -0.7;
+						}
 					}
 				},
 				tag:{
-					damage:2,
-					fireDamage:2,
-					natureDamage:2,
-					discard:2,
-					loseCard:2,
+					damage:1,
+					fireDamage:1,
+					natureDamage:1,
+					discard:1,
+					loseCard:1,
 					position:'he',
 				}
 			}
@@ -912,7 +909,7 @@ card.yunchou={
 		hongshui:'洪水',
 		hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力，X至少为1',
 		liuxinghuoyu:'流星火羽',
-		liuxinghuoyu_info:'出牌阶段，对一名有手牌或装备牌的角色使用，令其弃置0~2张牌，并受到2-X点火焰伤害，X为弃置的卡牌数',
+		liuxinghuoyu_info:'出牌阶段，对一名角色使用，令目标弃置2张牌，或受到一点火焰伤害',
 		dujian:'毒箭',
 		dujian_info:'出牌阶段，对一名有手牌或装备牌的角色使用，令其展示一张手牌，若与你选择的手牌颜色相同，其流失一点体力',
 		qiankundai:'乾坤袋',

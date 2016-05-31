@@ -158,7 +158,7 @@ mode.versus={
 			});
 		}
 		_status.videoInited=true;
-		if(_status.mode=='four'||_status.mode=='jiange'||_status.connectMode){
+		if(_status.mode=='four'||_status.mode=='jiange'||_status.connectMode||_status.mode=='two'){
 			info.push(false);
 		}
 		else{

@@ -3402,11 +3402,13 @@ character.swd={
 						for(j=0;j<storage[i].equips.length;j++){
 							if(storage[i].equips[j].parentNode==ui.discardPile||
 							storage[i].equips[j].parentNode==ui.cardPile)
+							storage[i].equips[j].style.transform='';
 							player.node.equips.appendChild(storage[i].equips[j]);
 						}
 						for(j=0;j<storage[i].judges.length;j++){
 							if(storage[i].judges[j].parentNode==ui.discardPile||
 							storage[i].judges[j].parentNode==ui.cardPile){
+								storage[i].judges[j].style.transform='';
 								storage[i].judges[j].viewAs=storage[i].viewAs[j];
 								player.node.judges.appendChild(storage[i].judges[j]);
 							}
@@ -3438,14 +3440,10 @@ character.swd={
 				game.pause();
 				'step 4'
 				if(trigger.name=='phase'){
-					// for(var i=0;i<game.players.length;i++){
-					// 	if(game.players[i].hp<event.player.hp){
-					// 		event.player.loseHp();
-					// 		return;
-					// 	}
-					// }
 					var player=event.player;
-					if(player.hp>1) player.loseHp();
+					if(player.num('h')){
+						player.chooseToDiscard('h',true);
+					}
 				}
 				ui.updatehl();
 			}
@@ -4600,52 +4598,18 @@ character.swd={
 			ai:{
 				expose:0.3
 			},
-			// mod:{
-			// 	targetInRange:function(){
-			// 		return true;
-			// 	}
-			// }
-			// group:'polang2'
 		},
 		jikong:{
-			trigger:{player:'loseEnd'},
+			trigger:{player:['loseEnd','phaseBegin']},
 			direct:true,
 			filter:function(event,player){
+				if(event.name=='phase') return true;
 				if(player.num('h')) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].original=='h') return true;
 				}
 				return false;
 			},
-			content:function(){
-				"step 0"
-				player.chooseTarget('是否发动【亟空】？').ai=function(target){
-					var eff=ai.get.damageEffect(target,player,target,'thunder');
-					return ai.get.attitude(player,target)*(eff-target.num('e'));
-				}
-				"step 1"
-				if(result.bool){
-					player.logSkill('jikong',result.targets);
-					event.target=result.targets[0];
-					event.target.damage('thunder');
-				}
-				else{
-					event.finish();
-				}
-				// "step 2"
-				// player.recover();
-			},
-			group:'jikong2',
-			ai:{
-				threaten:function(player,target){
-					if(target.num('h')) return 0.8;
-					return 2;
-				}
-			}
-		},
-		jikong2:{
-			trigger:{player:'phaseBegin'},
-			direct:true,
 			content:function(){
 				"step 0"
 				player.chooseTarget('是否发动【亟空】？',function(card,player,target){
@@ -4660,7 +4624,10 @@ character.swd={
 				}
 			},
 			ai:{
-				expose:0.2,
+				threaten:function(player,target){
+					if(target.num('h')) return 0.8;
+					return 2;
+				}
 			}
 		},
 		xielei:{
@@ -7689,7 +7656,7 @@ character.swd={
 		polang_info:'每当你造成一次伤害，可以一张对方的装备牌',
 		jikong:'亟空',
 		jikong2:'亟空',
-		jikong_info:'每当你失去最后一手手牌，可以对一名角色造成一点雷电伤害；回合开始阶段，你可以指定一名角色视为对其使用一张雷杀',
+		jikong_info:'当你失去最后一手手牌，或在回合开始阶段时，你可以指定一名角色视为对其使用一张雷杀',
 		xiangu:'仙骨',
 		xiangu_info:'锁定技，你的手牌上限不会因体力值的减少而减少。',
 		yiesheng:'回雪',
@@ -7825,7 +7792,7 @@ character.swd={
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
-		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，若你此时的体力值大于1，你流失一点体力',
+		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，然后弃置一张手牌',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌，每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',

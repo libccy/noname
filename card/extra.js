@@ -66,7 +66,7 @@ card.extra={
 					target:function(player,target){
 						if(target&&target.hp<=0) return 2;
 						if(lib.config.mode=='stone'&&!player.isMin()){
-							if(player.getActCount()+1>=player.actcount) return false;
+							if(player.getActCount()+1>=player.actcount) return 0;
 						}
 						var shas=player.get('h','sha');
 						if(shas.length>1){
