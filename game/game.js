@@ -14059,6 +14059,7 @@
                     else{
                         current2=current;
                     }
+                    game.print(current);
                     game.download(current,current2,function(){
                         if(onsuccess) onsuccess();
                         download();

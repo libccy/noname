@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.12',
+    version:'1.8.12.1',
     changeLog:[
         '新卡背',
         '修bug',
