@@ -1403,6 +1403,10 @@ card.standard={
 				if(event.triggername=='phaseJudge'){
 					event.target=trigger.player;
 				}
+				event.sourcex=event.targets||event.target;
+				if(!event.targets&&trigger.targets&&trigger.targets.length==1){
+					event.sourcex2=trigger.player;
+				}
 				event.source=trigger.player;
 				event.state=true;
 				event.card=trigger.card;

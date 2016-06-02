@@ -6177,6 +6177,7 @@ character.swd={
 				}
 			},
 			multitarget:true,
+			line:false,
 			selectTarget:[1,3],
 			ai:{
 				order:function(){

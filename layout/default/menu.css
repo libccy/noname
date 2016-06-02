@@ -685,3 +685,6 @@
 .videonode.starred>.video_star{
 	opacity: 1
 }
+.loading{
+	pointer-events: none;
+}

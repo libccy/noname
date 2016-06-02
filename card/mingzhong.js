@@ -90,7 +90,7 @@ card.mingzhong={
 					target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
 						return get.type(card)!='basic';
 					}).ai=function(card){
-						return 6-ai.get.value(card);
+						return 7-ai.get.value(card);
 					};
 					event.more=true;
 				}

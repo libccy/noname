@@ -5957,8 +5957,11 @@
                         },player,card);
 					}
 					if(event.animate!=false){
-						if(card.name=='wuxie'&&event.getParent().target){
-							var lining=event.getParent().target2||event.getParent().target;
+						if(card.name=='wuxie'&&event.getParent().source){
+							var lining=event.getParent().sourcex||event.getParent().source2||event.getParent().source;
+                            if(lining==player&&event.getParent().sourcex2){
+                                lining=event.getParent().sourcex2;
+                            }
 							if(Array.isArray(lining)&&event.getTrigger().name=='jiedao'){
 								player.line(lining[0],'green');
 							}

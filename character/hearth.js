@@ -820,7 +820,7 @@ character.hearth={
 				var list=[['','','hsshenqi_morijingxiang'],
 					['','','hsshenqi_kongbusangzhong'],
 					['','','hsshenqi_nengliangzhiguang']];
-				var dialog=ui.create.dialog('将武将牌翻面并获得一张神器牌',[list,'vcard'],'hidden');
+				var dialog=ui.create.dialog('邪能：将武将牌翻面并获得一张神器牌',[list,'vcard'],'hidden');
 				player.chooseButton(dialog).ai=function(){return Math.random();};
 				'step 1'
 				if(result.buttons){
