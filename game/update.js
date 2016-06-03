@@ -9,6 +9,7 @@ window.noname_update={
             'character/hearth.js',
             'card/mingzhong.js',
             'layout/default/menu.css',
+            'layout/mobile/equip.css',
         ],
         '1.8.12.1':[],
     }

@@ -144,7 +144,7 @@
 }
 
 
-#arena:not(.chess).textequip .player[data-position='0'].linked .equips,
+#arena:not(.textequip):not(.chess).textequip .player[data-position='0'].linked .equips,
 .player:not([data-position='0']).linked .equips,
 #arena.chess .player.linked .equips{
 	transform:rotate(90deg) translate(-152px,-6px);
