@@ -6,12 +6,15 @@ window.noname_update={
     ],
     files:{
         global:[
-            'game/game.js',
+            'character/swd.js',
             'character/hearth.js',
+            'card/standard.js',
             'card/mingzhong.js',
             'mode/versus.js',
             'layout/default/menu.css',
             'layout/mobile/equip.css',
+            'theme/woodden/style.css',
+            'game/game.js',
         ],
         '1.8.12.1':[],
         '1.8.13':[]

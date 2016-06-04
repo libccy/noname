@@ -2244,6 +2244,12 @@
                         else{
                             map.connect_replace_handcard.hide();
                         }
+                        if(config.connect_versus_mode=='4v4'){
+                            map.connect_four_cross.show();
+                        }
+                        else{
+                            map.connect_four_cross.hide();
+                        }
                     },
                     connect_versus_mode:{
                         name:'游戏模式',
