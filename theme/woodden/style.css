@@ -24,6 +24,9 @@ html{
 	border-radius: 4px;
 }
 
+.button-downloading>.button-progress{
+	background: rgba(77,224,100,0.45);
+}
 
 .menu.main>.menu-tab>div:not(.active):not(*:hover),
 .menu.main>.menu-tab>.disabled{

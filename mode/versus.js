@@ -199,6 +199,7 @@ mode.versus={
 		else{
 			if(_status.mode=='two'){
 				_status.first_less=true;
+				_status.first_less_forced=true;
 				var firstChoose=_status.firstAct;
 				game.gameDraw(firstChoose);
 				if(get.config('replace_handcard_two')){

@@ -4704,7 +4704,7 @@
 						game.modPhaseDraw(player,event.num);
 					}
 					else{
-						if((get.config('first_less')||_status.connectMode)&&game.phaseNumber==1&&_status.first_less){
+						if((get.config('first_less')||_status.connectMode||_status.first_less_forced)&&game.phaseNumber==1&&_status.first_less){
 							event.num--;
 						}
 						if(event.num>0){
@@ -13080,6 +13080,44 @@
 	var game={
         online:false,
         onlineID:null,
+        checkFileList:function(updates,proceed){
+            var n=updates.length;
+            for(var i=0;i<updates.length;i++){
+                if(lib.node&&lib.node.fs){
+                    lib.node.fs.access(__dirname+'/'+updates[i],(function(entry){
+                        return function(err){
+                            if(err){
+                                n--;
+                                if(n==0){
+                                    proceed();
+                                }
+                            }
+                            else{
+                                n--;
+                                updates.remove(entry);
+                                if(n==0){
+                                    proceed();
+                                }
+                            }
+                        }
+                    }(updates[i])));
+                }
+                else{
+                    resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
+                        n--;
+                        updates.remove(entry.toURL().slice(lib.assetURL.length));
+                        if(n==0){
+                            proceed();
+                        }
+                    },function(){
+                        n--;
+                        if(n==0){
+                            proceed();
+                        }
+                    });
+                }
+            }
+        },
         replaceHandcards:function(){
             var next=game.createEvent('replaceHandcards');
             if(Array.isArray(arguments[0])){
@@ -14064,10 +14102,10 @@
                     }
                     game.print(current);
                     game.download(current,current2,function(){
-                        if(onsuccess) onsuccess();
+                        if(onsuccess) onsuccess(list.length);
                         download();
                     },function(){
-                        if(onerror) onerror();
+                        if(onerror) onerror(list.length);
                         download();
                     });
                 }
@@ -20941,11 +20979,12 @@
                             importextensionexpanded=!importextensionexpanded;
                         });
                         importExtension=ui.create.div('.new_character.export.import',page);
-                        importExtension.style.float='left';
                         importExtension.style.marginLeft='5px';
                         importExtension.style.marginTop='5px';
                         importExtension.style.marginBottom='5px';
                         importExtension.style.display='none';
+                        importExtension.style.width='100%';
+                        importExtension.style.textAlign='left';
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
                         var reloadnode=ui.create.div('.config.toggle','重新启动',page,game.reload);
@@ -20996,7 +21035,7 @@
                                 this.classList.add('active');
                             }
                         };
-                        var importExtensionf=function(extname,extversion,onsuccess,onerror){
+                        var importExtensionf=function(extname,extversion,noasset,onsuccess,onerror){
                             try{
                                 if(lib.config.all.plays.contains(extname)){
                                     throw('err');
@@ -21011,18 +21050,18 @@
                                     if(deletegame) delete window.game;
                                     _status.importingExtension=false;
                                     if(!game.importedPack) throw('err');
-                                    if(lib.config.extensions.contains(extname)){
-                                        game.removeExtension(extname,true);
-                                    }
-                                    lib.config.extensions.add(extname);
-                                    game.saveConfig('extensions',lib.config.extensions);
-                                    game.saveConfig('extension_'+extname+'_enable',true);
                                     if(extversion){
                                         game.saveConfig('extension_'+extname+'_version',extversion);
                                     }
-                                    for(var i in game.importedPack.config){
-                                        if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
-                                            game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
+                                    game.saveConfig('extension_'+extname+'_noasset',noasset);
+                                    if(!lib.config.extensions.contains(extname)){
+                                        lib.config.extensions.add(extname);
+                                        game.saveConfig('extensions',lib.config.extensions);
+                                        game.saveConfig('extension_'+extname+'_enable',true);
+                                        for(var i in game.importedPack.config){
+                                            if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
+                                                game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
+                                            }
                                         }
                                     }
                                     delete game.importedPack;
@@ -21039,34 +21078,60 @@
                             }
                         };
                         var downloadExtension=function(e){
-                            if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展')||!window.JSZip) return;
+                            if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展'&&this.innerHTML!='更新素材')||!window.JSZip) return;
                             if(e){
                                 e.stopPropagation();
                             }
                             node.updated=true;
-                            this.innerHTML='正在下载';
-                            if(lib.updateURL[lib.updateURL.length-1]!='/'){
-                                lib.updateURL+='/';
-                            }
                             var that=this;
-                            var list=['web/'+this.link+'/extension.js'];
-                            for(var i=0;i<this.files.length;i++){
-                                list.push('web/'+this.link+'/'+this.files[i]);
+                            var list=[];
+                            var noasset=false;
+                            if(this.files.length){
+                                if(!lib.config.no_extension_asset||this.innerHTML=='更新素材'){
+                                    for(var i=0;i<this.files.length;i++){
+                                        list.push('web/'+this.link+'/'+this.files[i]);
+                                    }
+                                }
+                                else{
+                                    noasset=true;
+                                }
                             }
-                            game.multiDownload(list,null,function(){
-                                that.innerHTML='下载失败';
-                            },function(){
-                                if(that.innerHTML=='下载失败') return;
-                                importExtensionf(that.name,that.version,function(){
-                                    that.innerHTML='安装成功';
-                                    that.classList.remove('active');
-                                    that.classList.add('highlight');
-                                    reloadnode.style.display='';
+                            this.classList.add('button-downloading');
+                            this.innerHTML='<span>正在下载</span><div>正在下载</div>';
+                            var progress=ui.create.div('.button-progress',this);
+                            list.push('web/'+this.link+'/extension.js');
+                            game.checkFileList(list,function(){
+                                game.multiDownload(list,function(num){
+                                    var length=100*(list.length-num)/list.length;
+                                    progress.style.width=length+'%';
+                                    if(length<10){
+                                        var width=8-progress.offsetWidth;
+                                        progress.style.transition='all 0s';
+                                        progress.style.height='calc(100% - '+width/2+'px)';
+                                        progress.style.top=width/4+'px';
+                                    }
+                                    else{
+                                        progress.style.transition='';
+                                        progress.style.height='';
+                                        progress.style.top='';
+                                    }
                                 },function(){
-                                    that.innerHTML='安装失败';
+                                    that.innerHTML='下载失败';
+                                },function(){
+                                    if(that.innerHTML=='下载失败') return;
+                                    progress.style.width='100%';
+                                    importExtensionf(that.name,that.version,noasset,function(){
+                                        that.childNodes[0].innerHTML='安装成功';
+                                        that.childNodes[1].innerHTML='安装成功';
+                                        // that.classList.remove('active');
+                                        // that.classList.add('highlight');
+                                        reloadnode.style.display='';
+                                    },function(){
+                                        that.innerHTML='安装失败';
+                                    });
+                                },function(str){
+                                    return 'extension/'+that.name+'/'+str.slice(str.lastIndexOf('/')+1);
                                 });
-                            },function(str){
-                                return 'extension/'+that.name+'/'+str.slice(str.lastIndexOf('/')+1);
                             });
                         };
 
@@ -21090,6 +21155,16 @@
                                 script.remove();
                                 var list=window.noname_extension_list;
                                 delete window.noname_extension_list;
+                                var cfgnode=createConfig({
+        							name:'不下载素材',
+        							init:lib.config.no_extension_asset,
+        							onclick:function(bool){
+                                        game.saveConfig('no_extension_asset',bool);
+                                    }
+        						});
+                                cfgnode.classList.add('loading');
+                                cfgnode.style.marginBottom='10px';
+        						page.appendChild(cfgnode);
                                 for(var i in list){
                                     var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
                                     ui.create.div('.caption',list[i].name,node);
@@ -21100,6 +21175,10 @@
                                         download.classList.remove('active');
                                         if(lib.config['extension_'+list[i].name+'_version']!=list[i].version){
                                             download.innerHTML='更新扩展';
+                                            download.classList.add('highlight');
+                                        }
+                                        else if(lib.config['extension_'+list[i].name+'_noasset']){
+                                            download.innerHTML='更新素材';
                                             download.classList.add('highlight');
                                         }
                                         else{
@@ -21370,7 +21449,6 @@
                                             }
                                         }
                                     }
-    								var n=updates.length;
                                     if(!ui.arena.classList.contains('menupaused')){
                                         ui.click.configMenu();
                                         ui.click.menuTab('帮助');
@@ -21413,41 +21491,7 @@
                                             setTimeout(finish,500);
                                         });
     								};
-    								for(var i=0;i<updates.length;i++){
-                                        if(lib.node&&lib.node.fs){
-                                            lib.node.fs.access(__dirname+'/'+updates[i],(function(entry){
-                                                return function(err){
-                                                    if(err){
-                                                        n--;
-            											if(n==0){
-            												proceed();
-            											}
-                                                    }
-                                                    else{
-                                                        n--;
-            											updates.remove(entry);
-            											if(n==0){
-            												proceed();
-            											}
-                                                    }
-        										}
-                                            }(updates[i])));
-                                        }
-                                        else{
-                                            resolveLocalFileSystemURL(lib.assetURL+updates[i],function(entry){
-    											n--;
-    											updates.remove(entry.toURL().slice(lib.assetURL.length));
-    											if(n==0){
-    												proceed();
-    											}
-    										},function(){
-    											n--;
-    											if(n==0){
-    												proceed();
-    											}
-    										});
-                                        }
-    								}
+                                    game.checkFileList(updates,proceed);
     							},function(){
                                     alert('连接失败');
                                     button2.disabled=false;

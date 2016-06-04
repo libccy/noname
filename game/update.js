@@ -2,15 +2,18 @@ window.noname_update={
     version:'1.8.13',
     changeLog:[
         '修bug',
+        '扩展下载改进'
     ],
     files:{
         global:[
             'game/game.js',
             'character/hearth.js',
             'card/mingzhong.js',
+            'mode/versus.js',
             'layout/default/menu.css',
             'layout/mobile/equip.css',
         ],
         '1.8.12.1':[],
+        '1.8.13':[]
     }
 }
