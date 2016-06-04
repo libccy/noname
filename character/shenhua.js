@@ -11,7 +11,7 @@ character.shenhua={
 		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
 		sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 		// yuji:['male','qun',3,['guhuo']],
-		xin_yuji:['male','qun',3,['guhuo']],
+		// xin_yuji:['male','qun',3,['guhuo']],
 
 		sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
 		pangtong:['male','shu',3,['lianhuan','niepan']],
@@ -2949,18 +2949,71 @@ character.shenhua={
 			}
 		},
 		guhuo:{
-			trigger:{player:'phaseBegin'},
-			forced:true,
-			content:function(){
-				player.draw();
-				player.chooseToDiscard('hej',true).ai=ai.get.disvalue;
+			enable:'phaseUse',
+			usable:1,
+			audio:2,
+			filter:function(event,player){
+				return player.num('h')>0
+			},
+			chooseButton:{
+				dialog:function(){
+					var list=['sha','tao','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
+					for(var i=0;i<list.length;i++){
+						if(i<3){
+							list[i]=['基本','',list[i]];
+						}
+						else{
+							list[i]=['锦囊','',list[i]];
+						}
+					}
+					return ui.create.dialog([list,'vcard']);
+				},
+				filter:function(button,player){
+					return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+				},
+				check:function(button){
+					var player=_status.event.player;
+					if(player.num('h','wuzhong')){
+						if(player.hp==1&&player.num('tao')){
+							return button.link=='tao'?1:0;
+						}
+						return button.link=='wuzhong'?1:0;
+					}
+					if(player.hp<player.maxHp){
+						if(player.num('h','tao')){
+							return button.link=='tao'?1:0;
+						}
+					}
+				},
+				backup:function(links,player){
+					return {
+						filterCard:true,
+						selectCard:-1,
+						audio:2,
+						popname:true,
+						viewAs:{name:links[0][2]},
+					}
+				},
+				prompt:function(links,player){
+					return '将全部手牌当'+get.translation(links[0][2])+'使用';
+				}
 			},
 			ai:{
-				effect:{
-					target:function(card){
-						if(get.type(card)=='delay') return [0,1];
+				order:1,
+				result:{
+					player:function(player){
+						var num=0;
+						var cards=player.get('h');
+						if(cards.length>=3&&player.hp>=3) return 0;
+						for(var i=0;i<cards.length;i++){
+							num+=Math.max(0,ai.get.value(cards[i],player,'raw'));
+						}
+						num/=cards.length;
+						num*=Math.min(cards.length,player.hp);
+						return 12-num;
 					}
-				}
+				},
+				threaten:1.6,
 			}
 		},
 		huangtian:{
@@ -3207,7 +3260,7 @@ character.shenhua={
 		huangtian_info:
 		'主公技，群雄角色可在他们各自的回合里给你一张【闪】或【闪电】。',
 		guhuo_info:
-		'锁定技，回合开始阶段，你摸一张牌并弃置区域内的一张牌',
+		'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或非延时类锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
 		fenji_info:
 		'每当一名角色的手牌于回合外被弃置时，你可以失去1点体力，然后该角色摸两张牌。'
 	},

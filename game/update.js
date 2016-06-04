@@ -15,7 +15,6 @@ window.noname_update={
             'theme/woodden/style.css',
             'game/game.js',
             'character/yijiang.js',
-            'character/shenhua.js',
             'character/sp.js',
         ],
         '1.8.12.1':[],

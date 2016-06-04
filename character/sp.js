@@ -59,7 +59,7 @@ character.sp={
 		guansuo:['male','shu',4,['zhengnan','xiefang']],
 		tadun:['male','qun',4,['luanzhan']],
 		yanbaihu:['male','qun',4,['zhidao','jili']],
-		chengyu:['male','wei',3,[]],
+		chengyu:['male','wei',3,['shefu','benyu']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -80,6 +80,85 @@ character.sp={
 		cuiyan:['caocao'],
 	},
 	skill:{
+		shefu:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			init:function(player){
+				player.storage.shefu=[];
+				player.storage.shefu2=[];
+			},
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			intro:{
+				content:'cards',
+				mark:function(dialog,content,player){
+					if(content&&content.length){
+						dialog.add(content);
+						if(player.isUnderControl(true)){
+							var str='';
+							for(var i=0;i<player.storage.shefu2.length;i++){
+								str+=get.translation(player.storage.shefu2[i]);
+								if(i<player.storage.shefu2.length-1){
+									str+='、';
+								}
+							}
+							dialog.add('<div class="text center">'+str+'</div>')
+						}
+					}
+				},
+			},
+			content:function(){
+				'step 0'
+				var list1=[],list2=[];
+				for(var i=0;i<lib.inpile.length;i++){
+					var type=get.type(lib.inpile[i]);
+					if(type=='basic'){
+						list1.push(['基本','',lib.inpile[i]]);
+					}
+					else if(type=='trick'){
+						list2.push(['锦囊','',lib.inpile[i]]);
+					}
+				}
+				player.chooseButton(['是否发动【设伏】？',[list1.concat(list2),'vcard']]).set('filterButton',function(button){
+					var player=_status.event.player;
+					if(player.storage.shefu2&&player.storage.shefu2.contains(button.link[2])) return false;
+					return true;
+				}).set('ai',function(button){
+					var rand=_status.event.rand;
+					switch(button.link[2]){
+						case 'sha':return 5+rand[1];
+						case 'tao':return 5+rand[2];
+						case 'lebu':return 3+rand[3];
+						case 'shan':return 4+rand[4];
+						case 'wuzhong':return 4+rand[5];
+						case 'shunshou':return 3+rand[6];
+						case 'nanman':return 2+rand[7];
+						case 'wanjian':return 2+rand[8];
+						default:return rand[9];
+					}
+				}).set('rand',[Math.random(),Math.random(),Math.random(),Math.random(),
+				Math.random(),Math.random(),Math.random(),Math.random()],Math.random());
+				'step 1'
+				if(result.bool){
+					player.storage.shefu2.push(result.links[0][2]);
+					player.logSkill('shefu');
+					player.chooseCard('h','选择一张手牌作为“伏兵”',true);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					var card=result.cards[0];
+					player.lose(card,ui.special);
+					player.storage.shefu.push(card);
+					player.syncStorage('shefu');
+					player.markSkill('shefu');
+					player.$give(card,player);
+				}
+			}
+		},
 		jili:{
 			trigger:{global:'useCard'},
 			forced:true,
@@ -5712,6 +5791,10 @@ character.sp={
 		tadun:'蹋顿',
 		yanbaihu:'严白虎',
 
+		shefu:'设伏',
+		shefu_info:'结束阶段开始时，你可以将一张手牌移出游戏，称为"伏兵"。然后为"伏兵"记录一个基本牌或锦囊牌名称（须与其他"伏兵"记录的名称均不同）。你的回合外，当有其他角色使用与你记录的"伏兵"牌名相同的牌时，你可以令此牌无效，然后将该"伏兵"置入弃牌堆',
+		benyu:'贲育',
+		benyu_info:'每当你受到伤害后，若你的手牌数不大于伤害来源手牌数，你可以将手牌摸至与伤害来源手牌数相同（最多摸至5张）；否则你可以弃置大于伤害来源手牌数的手牌，然后对其造成1点伤害',
 		zhidao:'雉盗',
 		zhidao_info:'锁定技，当你于你的回合内第一次对区域里有牌的其他角色造成伤害后，你获得其手牌、装备区和判定区里的各一张牌，然后直到回合结束，其他角色不能被选择为你使用牌的目标',
 		jili:'寄篱',
