@@ -71,6 +71,10 @@ character.yijiang={
 		liuyu:['male','qun',2,['zhige','zongzuo']],
 		liyan:['male','shu',3,['duliang','fulin']],
 		sundeng:['male','wu',4,['kuangbi']],
+
+		cenhun:['male','wu',3,[]],
+		huanghao:['male','wu',3,[]],
+		zhangrang:['male','wu',3,[]],
 	},
 	perfectPair:{
 		wuguotai:['sunjian','sunshangxiang'],

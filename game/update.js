@@ -1,8 +1,7 @@
 window.noname_update={
     version:'1.8.13',
     changeLog:[
-        '修bug',
-        '扩展下载改进'
+        '新武将',
     ],
     files:{
         global:[
@@ -15,6 +14,9 @@ window.noname_update={
             'layout/mobile/equip.css',
             'theme/woodden/style.css',
             'game/game.js',
+            'character/yijiang.js',
+            'character/shenhua.js',
+            'character/sp.js',
         ],
         '1.8.12.1':[],
         '1.8.13':[]

@@ -16936,7 +16936,7 @@
 			}
 			if(!event.skill&&get.noSelected()&&!_status.noconfirm){
 				var skills=[],enable,info;
-				var skills2=player.get('s').concat(player.hiddenSkills).concat(lib.skill.global);
+				var skills2=game.filterSkills(player.get('s').concat(player.hiddenSkills).concat(lib.skill.global),player);
 				game.expandSkills(skills2);
 				for(i=0;i<skills2.length;i++){
 					info=get.info(skills2[i]);

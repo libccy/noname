@@ -11,6 +11,7 @@ character.shenhua={
 		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
 		sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 		// yuji:['male','qun',3,['guhuo']],
+		xin_yuji:['male','qun',3,['guhuo']],
 
 		sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
 		pangtong:['male','shu',3,['lianhuan','niepan']],
