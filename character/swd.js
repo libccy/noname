@@ -2253,10 +2253,15 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					game.delay();
+					game.delay(2);
 					trigger.untrigger();
 					trigger.finish();
 				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				ui.clear();
 			},
 			ai:{
 				effect:{

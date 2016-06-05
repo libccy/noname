@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.13',
+    version:'1.8.14',
     changeLog:[
         '新武将',
     ],
@@ -10,6 +10,7 @@ window.noname_update={
             'card/standard.js',
             'card/mingzhong.js',
             'mode/versus.js',
+            'layout/newlayout/global.css',
             'layout/default/menu.css',
             'layout/mobile/equip.css',
             'theme/woodden/style.css',
@@ -18,6 +19,7 @@ window.noname_update={
             'character/sp.js',
         ],
         '1.8.12.1':[],
-        '1.8.13':[]
+        '1.8.13':[],
+        '1.8.14':[]
     }
 }

@@ -6,9 +6,15 @@
 	width:130px;
 	height:160px;
 }
-#window>.player>.avatar,#arena.slim_player .player:not(.minskin):not(.fakeme) .avatar{
+#window>.player:not(.minskin)>.avatar,#arena.slim_player .player:not(.minskin):not(.fakeme) .avatar{
 	width: 136px;
 	height: 166px;
+	left:7px;
+	top:7px;
+}
+#window>.player.minskin>.avatar{
+	width: 106px;
+	height: 106px;
 	left:7px;
 	top:7px;
 }
@@ -154,9 +160,12 @@
 	transform:rotate(180deg);
 }
 #arena.slim_player .player .hp,
-#window>.player .hp{
+#window>.player:not(.minskin) .hp{
 	bottom: 15px;
 	left:121px;
+}
+#window>.player.minskin .hp{
+	left: 91px;
 }
 .player .hp.text{
 	font-family:'huangcao','xinwei';

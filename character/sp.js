@@ -83,6 +83,7 @@ character.sp={
 		shefu:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
+			audio:2,
 			init:function(player){
 				player.storage.shefu=[];
 				player.storage.shefu2=[];
@@ -110,7 +111,7 @@ character.sp={
 			},
 			content:function(){
 				'step 0'
-				var list1=[],list2=[];
+				var list1=[],list2=[],list3=[];
 				for(var i=0;i<lib.inpile.length;i++){
 					var type=get.type(lib.inpile[i]);
 					if(type=='basic'){
@@ -119,18 +120,21 @@ character.sp={
 					else if(type=='trick'){
 						list2.push(['锦囊','',lib.inpile[i]]);
 					}
+					else if(type=='delay'){
+						list3.push(['锦囊','',lib.inpile[i]]);
+					}
 				}
-				player.chooseButton(['是否发动【设伏】？',[list1.concat(list2),'vcard']]).set('filterButton',function(button){
+				player.chooseButton(['是否发动【设伏】？',[list1.concat(list2).concat(list3),'vcard']]).set('filterButton',function(button){
 					var player=_status.event.player;
 					if(player.storage.shefu2&&player.storage.shefu2.contains(button.link[2])) return false;
 					return true;
 				}).set('ai',function(button){
-					var rand=_status.event.rand;
+					var rand=_status.event.rand*2;
 					switch(button.link[2]){
 						case 'sha':return 5+rand[1];
-						case 'tao':return 5+rand[2];
+						case 'tao':return 4+rand[2];
 						case 'lebu':return 3+rand[3];
-						case 'shan':return 4+rand[4];
+						case 'shan':return 4.5+rand[4];
 						case 'wuzhong':return 4+rand[5];
 						case 'shunshou':return 3+rand[6];
 						case 'nanman':return 2+rand[7];
@@ -144,6 +148,11 @@ character.sp={
 					player.storage.shefu2.push(result.links[0][2]);
 					player.logSkill('shefu');
 					player.chooseCard('h','选择一张手牌作为“伏兵”',true);
+					if(player.isOnline2()){
+						player.send(function(storage){
+							game.me.storage.shefu2=storage;
+						},player.storage.shefu2);
+					}
 				}
 				else{
 					event.finish();
@@ -157,7 +166,146 @@ character.sp={
 					player.markSkill('shefu');
 					player.$give(card,player);
 				}
+			},
+			group:['shefu2']
+		},
+		shefu2:{
+			trigger:{global:['useCard','respondEnd']},
+			priority:15,
+			audio:'shefu',
+			filter:function(event,player){
+				if(event.name=='respond'){
+					if(event.getParent(2).name!='sha') return false;
+				}
+				return player.storage.shefu2&&player.storage.shefu2.contains(event.card.name);
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				var effect=0;
+				if(trigger.card.name=='wuxie'||trigger.name=='respond'){
+					if(ai.get.attitude(player,trigger.player)<-1){
+						effect=-1;
+					}
+				}
+				else if(trigger.targets&&trigger.targets.length){
+					for(var i=0;i<trigger.targets.length;i++){
+						effect+=ai.get.effect(trigger.targets[i],trigger.card,trigger.player,player);
+					}
+				}
+				var str='设伏：是否令'+get.translation(trigger.player);
+				if(trigger.targets&&trigger.targets.length){
+					str+='对'+get.translation(trigger.targets);
+				}
+				str+='的'+get.translation(trigger.card)+'失效？'
+				var next=player.chooseBool(str,function(){
+					var player=_status.event.player;
+					var trigger=_status.event.getTrigger();
+					if(_status.event.effect<0){
+						if(trigger.card.name=='sha'){
+							var target=trigger.targets[0];
+							if(target==player){
+								return !player.num('h','shan');
+							}
+							else{
+								return target.hp==1||(target.num('h')<=2&&target.hp<=2);
+							}
+						}
+						else{
+							return true;
+						}
+					}
+					return false;
+				});
+				next.set('effect',effect);
+				"step 1"
+				if(result.bool){
+					player.logSkill('shefu');
+					var index=player.storage.shefu2.indexOf(trigger.card.name);
+					if(index!=-1){
+						var card=player.storage.shefu[index];
+						ui.discardPile.appendChild(card);
+						player.$throw(card);
+						player.storage.shefu.splice(index,1);
+						player.storage.shefu2.splice(index,1);
+						if(player.storage.shefu.length==0){
+							player.unmarkSkill('shefu');
+						}
+						else{
+							player.syncStorage('shefu');
+							player.markSkill('shefu');
+							if(player.isOnline2()){
+								player.send(function(storage){
+									game.me.storage.shefu2=storage;
+								},player.storage.shefu2);
+							}
+						}
+					}
+					game.delay(2);
+					if(trigger.name=='respond'){
+						if(trigger.parent.result){
+							trigger.parent.result.bool=false;
+						}
+					}
+					else{
+						trigger.untrigger();
+						trigger.finish();
+					}
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				game.broadcastAll(ui.clear);
+			},
+			ai:{
+				threaten:1.8,
+				expose:0.3
 			}
+		},
+		benyu:{
+			audio:2,
+			trigger:{player:'damageEnd'},
+			filter:function(event,player){
+				return event.source&&event.source.num('h')!=player.num('h');
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				var num1=player.num('h');
+				var num2=trigger.source.num('h');
+				if(num1>num2){
+					var next=player.chooseToDiscard([num2+1,num1],'贲育：是否弃置至少'+(num2+1)+'张手牌,并对'+get.translation(trigger.source)+'造成一点伤害？');
+					next.logSkill=['benyu',trigger.source];
+					next.set('ai',function(card){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						if(ui.selected.cards.length>=_status.event.num){
+							return -1;
+						}
+						if(ai.get.damageEffect(trigger.source,player,player)>0&&_status.event.num<=2){
+							return 8-ai.get.value(card);
+						}
+						return -1;
+					});
+					next.set('num',num2+1);
+				}
+				else{
+					event.draw=true;
+					event.num=num2-num1;
+					player.chooseBool('是否发动【贲育】？');
+				}
+				"step 1"
+				if(result.bool){
+					if(event.draw){
+						player.logSkill('benyu',trigger.source);
+						player.draw(event.num);
+					}
+					else{
+						trigger.source.damage(player);
+					}
+				}
+			},
 		},
 		jili:{
 			trigger:{global:'useCard'},
@@ -5794,6 +5942,7 @@ character.sp={
 		shefu:'设伏',
 		shefu_info:'结束阶段开始时，你可以将一张手牌移出游戏，称为"伏兵"。然后为"伏兵"记录一个基本牌或锦囊牌名称（须与其他"伏兵"记录的名称均不同）。你的回合外，当有其他角色使用与你记录的"伏兵"牌名相同的牌时，你可以令此牌无效，然后将该"伏兵"置入弃牌堆',
 		benyu:'贲育',
+		benyu2:'贲育',
 		benyu_info:'每当你受到伤害后，若你的手牌数不大于伤害来源手牌数，你可以将手牌摸至与伤害来源手牌数相同（最多摸至5张）；否则你可以弃置大于伤害来源手牌数的手牌，然后对其造成1点伤害',
 		zhidao:'雉盗',
 		zhidao_info:'锁定技，当你于你的回合内第一次对区域里有牌的其他角色造成伤害后，你获得其手牌、装备区和判定区里的各一张牌，然后直到回合结束，其他角色不能被选择为你使用牌的目标',
