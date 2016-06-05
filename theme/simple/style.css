@@ -28,6 +28,9 @@ body{
 #arena:not(.chess).textequip .player[data-position='0'] .equips>.card{
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)) !important;
 }
+#arena.observe .handcards>.card{
+	background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)) !important;
+}
 
 #window.reduce_radius #system>div>div,
 #window.reduce_radius #mebg,

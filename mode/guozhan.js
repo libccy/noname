@@ -784,7 +784,7 @@ mode.guozhan={
 				this.init(info.name1,info.name2,false);
 				this.name1=info.name1;
 				this.name=info.name;
-				this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[this.name]),this);
+				this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[this.name].slice(0,3)),this);
 				if(info.identityShown){
 					this.setIdentity(info.identity);
 				}

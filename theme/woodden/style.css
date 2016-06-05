@@ -67,6 +67,9 @@ html{
 #arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg{
 	background: url('wood.jpg');
 }
+#arena.observe .handcards>.card{
+	background: url('wood.jpg') !important;
+}
 #arena:not(.chess).textequip .player[data-position='0'] .equips>.card{
 	background: url('wood.jpg') !important;
 	color:rgb(77, 60, 51) !important;

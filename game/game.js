@@ -12863,6 +12863,9 @@
                                     game.reload();
                                 },true);
                             }
+                            if(!lib.configOL.observe_handcard){
+                                ui.arena.classList.add('observe');
+                            }
                         }
                         ui.arena.dataset.number=state.number;
                         _status.mode=state.mode;
@@ -12923,11 +12926,17 @@
                                     player.node.identity.innerHTML=info.identityNode[0];
                                     player.node.identity.dataset.color=info.identityNode[1];
                                 }
-                                else if(player==game.me||player.identityShown){
+                                else if(player==game.me||player.identityShown||observe){
                                     player.setIdentity();
+                                    player.forceShown=true;
                                 }
                                 else{
                                     player.setIdentity('cai');
+                                }
+                                if(!lib.configOL.observe_handcard&&(lib.configOL.mode=='identity'||lib.configOL.mode=='guozhan')){
+                                    if(observe&&!player.identityShown){
+                                        player.setIdentity('cai');
+                                    }
                                 }
                             }
                             player.update();
@@ -12948,7 +12957,16 @@
                         next.content=lib.init.startOnline;
                         if(observe){
                             next.custom.replace.target=function(player){
-                                if(player.isAlive()) game.swapPlayer(player);
+                                if(player.isAlive()){
+                                    if(!game.me.identityShown){
+                                        game.me.node.identity.firstChild.innerHTML='猜';
+                    					game.me.node.identity.dataset.color='unknown';
+                                    }
+                                    game.swapPlayer(player);
+                                    if(!game.me.identityShown){
+                                        game.me.node.identity.firstChild.innerHTML='';
+                                    }
+                                }
                             }
                         }
                         else{
@@ -17701,14 +17719,14 @@
 				}
 			}
 			for(i in lib.skill){
-				if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(lib.config.mode)){
+				if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(get.mode())){
 					lib.skill[i]={};
 					if(lib.translate[i+'_info']){
 						lib.translate[i+'_info']='此模式下不可用';
 					}
 					continue;
 				}
-				if(lib.skill[i].mode&&lib.skill[i].mode.contains(lib.config.mode)==false){
+				if(lib.skill[i].mode&&lib.skill[i].mode.contains(get.mode())==false){
 					lib.skill[i]={};
 					if(lib.translate[i+'_info']){
 						lib.translate[i+'_info']='此模式下不可用';
@@ -18891,6 +18909,11 @@
                                 };
                                 infoconfig.connect_observe={
                                     name:'允许旁观',
+                                    init:true,
+                                    connect:true
+                                };
+                                infoconfig.connect_observe_handcard={
+                                    name:'允许观看手牌',
                                     init:true,
                                     connect:true
                                 };
@@ -23631,6 +23654,7 @@
 				_status.clicked=true;
 				if(!game.getIdentityList) return;
 				if(_status.video) return;
+                if(this.parentNode.forceShown) return;
 				if(_status.clickingidentity){
 					for(var i=0;i<_status.clickingidentity[1].length;i++){
 						_status.clickingidentity[1][i].delete();

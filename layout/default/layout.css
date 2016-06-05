@@ -202,6 +202,9 @@ table{table-layout: fixed;}
 #arena.chess>#arenalog{
 	display: none !important;
 }
+#arena.observe .handcards>.card>div{
+	opacity: 0 !important;
+}
 #arenalog{
 	width: calc(50% - 210px);
 	height: calc(100% - 370px);

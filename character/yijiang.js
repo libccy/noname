@@ -209,14 +209,14 @@ character.yijiang={
 				},
 				threaten:1.6,
 			},
-			group:'taoluan2'
+			group:['taoluan2','taoluan4','taoluan5']
 		},
 		taoluan2:{
-			trigger:{player:'useCardAfter'},
+			trigger:{player:['useCardAfter','respondAfter']},
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.skill=='taoluan_backup';
+				return event.skill=='taoluan_backup'||event.skill=='taoluan5';
 			},
 			content:function(){
 				'step 0'
@@ -258,6 +258,53 @@ character.yijiang={
 			}
 		},
 		taoluan3:{},
+		taoluan4:{
+			trigger:{player:'chooseToRespondBegin'},
+			filter:function(event,player){
+				if(event.responded) return false;
+				if(!event.filterCard({name:'shan'})) return false;
+				if(player.storage.taoluan.contains('shan')) return false;
+				return true;
+			},
+			check:function(event,player){
+				if(player.hasSkill('taoluan3')) return 0;
+				var allshown=true;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].num('h')>1&&ai.get.attitude(player,game.players[i])>0){
+						return 1;
+					}
+				}
+				return 0;
+			},
+			content:function(){
+				trigger.untrigger();
+				trigger.responded=true;
+				trigger.result={bool:true,card:{name:'shan'},skill:'taoluan_backup'};
+				player.storage.taoluan.push('shan');
+			},
+		},
+		taoluan5:{
+			enable:'chooseToUse',
+			filter:function(event,player){
+				return event.type=='dying'&&!player.storage.taoluan.contains('tao');
+			},
+			onuse:function(result,player){
+				player.storage.taoluan.push('tao');
+			},
+			filterCard:function(){
+				return false;
+			},
+			selectCard:-1,
+			viewAs:{name:'tao'},
+			ai:{
+				skillTagFilter:function(player){
+					return !player.storage.taoluan.contains('tao');
+				},
+				threaten:1.5,
+				save:true,
+			}
+		},
+		taoluan_backup:{},
 		jishe:{
 			enable:'phaseUse',
 			filter:function(event,player){
@@ -303,7 +350,7 @@ character.yijiang={
             filter:function(event,player){
 				if(player.num('h')) return false;
                 for(var i=0;i<game.players.length;i++){
-                    if(!game.players[i].isLinked()&&player!=game.players[i]){
+                    if(!game.players[i].isLinked()){
                         return true;
                     }
                 }
@@ -312,12 +359,12 @@ character.yijiang={
                 "step 0"
                 var num=0;
                 for(var i=0;i<game.players.length;i++){
-                    if(!game.players[i].isLinked()&&player!=game.players[i]){
+                    if(!game.players[i].isLinked()){
                         num++;
                     }
                 }
                 player.chooseTarget('是否发动【极奢】？',[1,Math.min(num,player.hp)],function(card,player,target){
-                    return !target.isLinked()&&player!=target;
+                    return !target.isLinked();
                 }).set('ai',function(target){
                     return -ai.get.attitude(_status.event.player,target);
                 });
@@ -540,15 +587,17 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				var spade=true;
-				if(player.isTurnedOver()){
-					spade=false;
-				}
-				else if(ai.get.attitude(target,player)>0){
+				if(player.isTurnedOver()||ai.get.attitude(target,player)>0||target.hp<=2){
 					spade=false;
 				}
 				target.chooseToDiscard('h',true).set('ai',function(card){
-					if(_status.event.spade&&get.suit(card)=='spade'){
-						return 10-ai.get.value(card);
+					if(get.suit(card)=='spade'){
+						if(_status.event.spade){
+							return 10-ai.get.value(card);
+						}
+						else{
+							return -10-ai.get.value(card);
+						}
 					}
 					if(_status.event.getParent().player.storage.jiyu2.contains(get.suit(card))){
 						return -3-ai.get.value(card);
@@ -559,7 +608,7 @@ character.yijiang={
 				var card=result.cards[0];
 				if(get.suit(card)=='spade'){
 					player.turnOver();
-					player.loseHp();
+					target.loseHp();
 				}
 				player.storage.jiyu.push(target);
 				player.storage.jiyu2.add(get.suit(card));
@@ -7141,8 +7190,10 @@ character.yijiang={
 		lianhuo:'链祸',
 		lianhuo_info:'锁定技，当你受到火焰伤害时，若你处于“连环状态”且你是传导伤害的起点，则此伤害+1',
 		taoluan:'滔乱',
+		taoluan4:'滔乱',
+		taoluan5:'滔乱',
 		taoluan_backup:'滔乱',
-		taoluan_info:'你可视为使用任意一张基本牌或非延时类锦囊牌（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别相同的牌；2.你失去1点体力',
+		taoluan_info:'在出牌或濒死阶段，你可视为使用任意一张基本牌或非延时类锦囊牌（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别相同的牌；2.你失去1点体力',
 		jiaozhao:'矫诏',
 		jiaozhao2:'矫诏',
 		jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标',

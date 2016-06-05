@@ -10,6 +10,9 @@ html{
 	background-image: linear-gradient(#4b4b4b, #464646);
 	border-radius: 8px;
 }
+#arena.observe .handcards>.card{
+	background: linear-gradient(#4b4b4b, #464646) !important;
+}
 
 #window.reduce_radius #system>div>div,
 #window.reduce_radius #mebg,
