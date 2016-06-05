@@ -12957,6 +12957,9 @@
                         next.content=lib.init.startOnline;
                         if(observe){
                             next.custom.replace.target=function(player){
+                                if(!lib.configOL.observe_handcard&&lib.configOL.mode=='guozhan'){
+                                    return;
+                                }
                                 if(player.isAlive()){
                                     if(!game.me.identityShown){
                                         game.me.node.identity.firstChild.innerHTML='猜';
@@ -18914,7 +18917,7 @@
                                 };
                                 infoconfig.connect_observe_handcard={
                                     name:'允许观看手牌',
-                                    init:true,
+                                    init:false,
                                     connect:true
                                 };
                             }
