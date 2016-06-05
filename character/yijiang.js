@@ -96,9 +96,6 @@ character.yijiang={
 	skill:{
 		taoluan:{
 			enable:'phaseUse',
-			filter:function(event,player){
-				return player.num('h')>0
-			},
 			init:function(player){
 				player.storage.taoluan=[];
 			},
