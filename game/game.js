@@ -12936,6 +12936,7 @@
                                 if(!lib.configOL.observe_handcard&&(lib.configOL.mode=='identity'||lib.configOL.mode=='guozhan')){
                                     if(observe&&!player.identityShown){
                                         player.setIdentity('cai');
+                                        player.forceShown=false;
                                     }
                                 }
                             }
@@ -12961,12 +12962,12 @@
                                     return;
                                 }
                                 if(player.isAlive()){
-                                    if(!game.me.identityShown){
+                                    if(!game.me.identityShown&&lib.configOL.mode=='guozhan'){
                                         game.me.node.identity.firstChild.innerHTML='猜';
                     					game.me.node.identity.dataset.color='unknown';
                                     }
                                     game.swapPlayer(player);
-                                    if(!game.me.identityShown){
+                                    if(!game.me.identityShown&&lib.configOL.mode=='guozhan'){
                                         game.me.node.identity.firstChild.innerHTML='';
                                     }
                                 }

@@ -7,9 +7,9 @@ window.noname_update={
     files:{
         global:[
             'character/yijiang.js',
-            'mode/guoshan.js',
+            'mode/guozhan.js',
             'game/game.js',
-            'layout/default/layout.js',
+            'layout/default/layout.css',
             'theme/woodden/style.css',
             'theme/simple/style.css',
             'theme/music/style.css',
