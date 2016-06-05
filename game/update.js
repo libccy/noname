@@ -15,6 +15,7 @@ window.noname_update={
             'layout/mobile/equip.css',
             'theme/woodden/style.css',
             'game/game.js',
+            'game/asset.js',
             'character/yijiang.js',
             'character/sp.js',
         ],

@@ -56,7 +56,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:9,
+        versionOL:10,
 		updateURL:localStorage.getItem('noname_update_url')||'http://websha.cn/',
 		assetURL:'',
         hallURL:'websha.cn',
