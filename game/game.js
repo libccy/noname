@@ -26,7 +26,7 @@
     },5000);
     var links=document.head.querySelectorAll('link');
     for(var i=0;i<links.length;i++){
-        if(links[i].href='app/color.css'){
+        if(links[i].href=='app/color.css'){
             links[i].remove();
             break;
         }
@@ -10210,14 +10210,15 @@
 						var ny=parseCalc(node.style.top);
 						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
 						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
+                        var dx,dy;
                         if(game.chess){
                             var rect=this.getBoundingClientRect();
-                            var dx=rect.left+this.offsetWidth/2-52-nx;
-    						var dy=rect.top+this.offsetHeight/2-52-ny;
+                            dx=rect.left+this.offsetWidth/2-52-nx;
+    						dy=rect.top+this.offsetHeight/2-52-ny;
                         }
 						else{
-                            var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
-    						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+                            dx=this.offsetLeft+this.offsetWidth/2-52-nx;
+    						dy=this.offsetTop+this.offsetHeight/2-52-ny;
                         }
 						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
@@ -10247,14 +10248,15 @@
 						var ny=[50,-52];
 						nx=nx[0]*ui.arena.offsetWidth/100+nx[1];
 						ny=ny[0]*ui.arena.offsetHeight/100+ny[1];
+                        var dx,dy;
                         if(game.chess){
                             var rect=this.getBoundingClientRect();
-                            var dx=rect.left+this.offsetWidth/2-52-nx;
-    						var dy=rect.top+this.offsetHeight/2-52-ny;
+                            dx=rect.left+this.offsetWidth/2-52-nx;
+    						dy=rect.top+this.offsetHeight/2-52-ny;
                         }
 						else{
-                            var dx=this.offsetLeft+this.offsetWidth/2-52-nx;
-    						var dy=this.offsetTop+this.offsetHeight/2-52-ny;
+                            dx=this.offsetLeft+this.offsetWidth/2-52-nx;
+    						dy=this.offsetTop+this.offsetHeight/2-52-ny;
                         }
 						if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
 							node.style.transform+=' translate('+dx+'px,'+dy+'px)';
@@ -11562,7 +11564,7 @@
     				if(this.childNodes.length){
     					this.style.transition='opacity 0.5s';
     					ui.refresh(this);
-    					this.style.transform='translateX(-'+(control.offsetWidth/2)+'px)';
+    					this.style.transform='translateX(-'+(this.offsetWidth/2)+'px)';
     					this.style.opacity=1;
     					ui.refresh(this);
     					this.style.transition='';
@@ -12738,7 +12740,7 @@
                             for(var i in mode.ai){
         						if(typeof mode.ai[i]=='object'){
         							if(ai[i]==undefined) ai[i]={};
-        							for(j in mode.ai[i]){
+        							for(var j in mode.ai[i]){
         								ai[i][j]=lib.init.eval(mode.ai[i][j]);
         							}
         						}
@@ -12814,7 +12816,7 @@
                         for(var i in mode.ai){
                             if(typeof mode.ai[i]=='object'){
                                 if(ai[i]==undefined) ai[i]={};
-                                for(j in mode.ai[i]){
+                                for(var j in mode.ai[i]){
                                     ai[i][j]=lib.init.eval(mode.ai[i][j]);
                                 }
                             }
@@ -14002,7 +14004,7 @@
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 			var fileNameToSaveAs = name||'noname';
-			fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
+			fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'.');
 
 			if(lib.device){
 				var directory;
@@ -14043,7 +14045,7 @@
 				var load=function(img){
 					var blob = zip.generate({type:"blob"});
 					var fileNameToSaveAs = packname||'noname';
-					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|\<|\>|\|/g,'.');
+					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'.');
 					fileNameToSaveAs+='.zip';
 
 					if(lib.device){
@@ -18641,7 +18643,7 @@
                         if(config.name=='联机昵称'){
                             input.innerHTML=config.init||'无名玩家';
                             input.onblur=function(){
-                                input.innerHTML=input.innerHTML.replace(/\<br\>/g,'');
+                                input.innerHTML=input.innerHTML.replace(/<br>/g,'');
                                 if(!input.innerHTML){
                                     input.innerHTML='无名玩家';
                                 }
@@ -18655,7 +18657,7 @@
                                 if(!input.innerHTML){
                                     input.innerHTML=lib.hallURL;
                                 }
-                                input.innerHTML=input.innerHTML.replace(/\<br\>/g,'');
+                                input.innerHTML=input.innerHTML.replace(/<br>/g,'');
                                 game.saveConfig('hall_ip',input.innerHTML,'connect');
                             }
                         }
@@ -18698,6 +18700,7 @@
                 updateBanned._buttons=[];
                 var menuUpdates=[];
 				menuContainer=ui.create.div('.menu-container.hidden',ui.window,clickContainer);
+                var menux;
                 if(!connectMenu){
                     ui.menuContainer=menuContainer;
     				ui.click.configMenu=function(){
@@ -18715,7 +18718,7 @@
                         }
     				}
 
-    				var menux=createMenu(['开始','选项','武将','卡牌','扩展','其它'],{
+    				menux=createMenu(['开始','选项','武将','卡牌','扩展','其它'],{
                         position:menuContainer,bar:40
                     });
     				menu=menux.menu;
@@ -18750,7 +18753,7 @@
                         }
     				}
 
-    				var menux=createMenu(['模式','武将','卡牌'],{
+    				menux=createMenu(['模式','武将','卡牌'],{
                         position:menuContainer,bar:123
                     });
     				menu=menux.menu;
@@ -21362,7 +21365,7 @@
                                             game.multiDownload(updates,function(){
                                                 n1++;
                                                 span.innerHTML='正在下载文件（'+n1+'/'+n2+'）';
-                                            },function(){
+                                            },function(e){
                                                 game.print('下载失败：'+e.source);
                                             },function(){
                                                 setTimeout(finish,500);
@@ -21518,7 +21521,7 @@
                                         game.multiDownload(updates,function(){
                                             n1++;
                                             span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
-                                        },function(){
+                                        },function(e){
                                             game.print('下载失败：'+e.source);
                                         },function(){
                                             setTimeout(finish,500);

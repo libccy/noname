@@ -1,11 +1,11 @@
 window.noname_update={
-    version:'1.8.14.1',
+    version:'1.8.14.2',
     changeLog:[
         '修bug',
-        '观战设置'
     ],
     files:{
         global:[
+            'character/sp.js',
             'character/yijiang.js',
             'mode/guozhan.js',
             'game/game.js',
@@ -14,6 +14,7 @@ window.noname_update={
             'theme/simple/style.css',
             'theme/music/style.css',
         ],
-        '1.8.14':[]
+        '1.8.14':[],
+        '1.8.14.1':[]
     }
 }

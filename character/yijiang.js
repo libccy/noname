@@ -622,7 +622,7 @@ character.yijiang={
 			group:'jiyu2',
 			mod:{
 				cardEnabled:function(card,player){
-					if(player.storage.jiyu2.contains(get.suit(card))) return false;
+					if(player.storage.jiyu2&&player.storage.jiyu2.contains(get.suit(card))) return false;
 				}
 			}
 		},
