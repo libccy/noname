@@ -15,7 +15,7 @@ window.noname_update={
             'theme/music/style.css',
         ],
         '1.8.14':[],
-        '1.8.14.1':[]
+        '1.8.14.1':[],
         '1.8.14.2':[]
     }
 }
