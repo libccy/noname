@@ -24393,7 +24393,7 @@
 						_status.justdragged=false;
 					},500);
 				}
-				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging){
+				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging&&_status._swipeorigin.touches){
 					 if(get.utc()-_status._swipeorigin.time<500){
 						var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
 						var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
@@ -25507,6 +25507,7 @@
 					return;
 				}
 				var uiintro=get.nodeintro(this);
+                if(!uiintro) return;
 				uiintro.classList.add('popped');
 				uiintro.classList.add('static');
 				ui.window.appendChild(uiintro);
@@ -27537,6 +27538,9 @@
 				uiintro.add(ui.create.div('.placeholder.slim'));
 			}
 			else if(node.classList.contains('card')){
+                if(ui.arena.classList.contains('observe')&&node.parentNode.classList.contains('handcards')){
+                    return;
+                }
 				var name=node.name;
 				if(get.position(node)=='j'&&node.viewAs&&node.viewAs!=name){
 					uiintro.add(get.translation(node.viewAs)+'（'+get.translation(node)+'）');

@@ -238,7 +238,7 @@ character.yijiang={
 					return get.type(card)==_status.event.cardType;
 				}).set('cardType',type).set('ai',function(card){
 					if(_status.event.att){
-						return 10-ai.get.value(card);
+						return 11-ai.get.value(card);
 					}
 					return 0;
 				}).set('att',ai.get.attitude(target,player)>0);
@@ -579,7 +579,7 @@ character.yijiang={
 				return false;
 			},
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('h')&&!player.storage.jiyu.contains(target);
+				return target.num('h')&&!player.storage.jiyu.contains(target);
 			},
 			content:function(){
 				'step 0'
@@ -5647,8 +5647,7 @@ character.yijiang={
 					return lib.filter.filterCard({name:'jiu'},player,event);
 				}
 				if(event.type!='dying') return false;
-				if(player!=_status.dying) return false;
-				if(player.storage.niepan) return false;
+				if(player!=event.dying) return false;
 				return true;
 			},
 			content:function(){
