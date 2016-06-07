@@ -26,7 +26,7 @@
     },5000);
     var links=document.head.querySelectorAll('link');
     for(var i=0;i<links.length;i++){
-        if(links[i].href=='app/color.css'){
+        if(links[i].href.indexOf('app/color.css')!=-1){
             links[i].remove();
             break;
         }
