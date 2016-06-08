@@ -6,33 +6,28 @@ card.shenqi={
 			subtype:'equip5',
 			skills:['donghuangzhong'],
 			enable:function(card,player){return player==game.me;},
-			onEquip:function(){
-				//if(player==game.me) player.loseHp();
-			},
-			onLose:function(){
-				//if(player==game.me) player.loseHp();
+			ai:{
+				basic:{
+					equipValue:6
+				}
 			}
 		},
 		xuanyuanjian:{
 			fullskin:true,
 			type:'equip',
 			subtype:'equip1',
-			skills:['xuanyuanjian','xuanyuanjian2'],
+			skills:['xuanyuanjian','xuanyuanjian2','xuanyuanjian3'],
 			enable:function(card,player){
 				return player.skills.contains('xuanyuan')||player.hp>2;
 			},
 			distance:{attackFrom:-3},
 			onEquip:function(){
-				//player.loseHp();
 				if(!player.skills.contains('xuanyuan')&&player.hp<=2){
 					player.discard(card);
 				}
 			},
-			onLose:function(){
-				if(!player.skills.contains('xuanyuan')) player.loseHp();
-			},
 			ai:{
-				equipValue:20
+				equipValue:9
 			}
 		},
 		pangufu:{
@@ -49,9 +44,6 @@ card.shenqi={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
-			onLose:function(){
-				delete player.storage.lianhua;
-			},
 			ai:{
 				equipValue:8
 			},
@@ -62,15 +54,8 @@ card.shenqi={
 			type:'equip',
 			subtype:'equip5',
 			skills:['haotianta'],
-			enable:function(card,player){return player==game.me;},
-			onEquip:function(){
-				//player.loseHp();
-			},
-			onLose:function(){
-				//player.loseHp();
-			},
 			ai:{
-				equipValue:0
+				equipValue:5
 			}
 		},
 		fuxiqin:{
@@ -110,15 +95,9 @@ card.shenqi={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
-			skills:['kunlunjing'],
-			onEquip:function(){
-				//if(player==game.me) player.loseHp();
-			},
-			onLose:function(){
-				//if(player==game.me) player.loseHp();
-			},
+			skills:['kunlunjingc'],
 			ai:{
-				equipValue:5
+				equipValue:6
 			}
 		},
 		nvwashi:{
@@ -132,6 +111,49 @@ card.shenqi={
 		}
 	},
 	skill:{
+		kunlunjingc:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			delay:false,
+			content:function(){
+				'step 0'
+				var cards=get.cards(3);
+				event.cards=cards;
+				player.chooseCardButton('选择一张牌',cards,true);
+				'step 1'
+				event.card=result.links[0];
+				player.chooseCard('h',true,'用一张手牌替换'+get.translation(event.card));
+				'step 2'
+				if(result.bool){
+					event.cards[event.cards.indexOf(event.card)]=result.cards[0];
+					player.lose(result.cards,ui.special);
+					var cardx=ui.create.card();
+					cardx.classList.add('infohidden');
+					cardx.classList.add('infoflip');
+					player.$throw(cardx,1000,'nobroadcast');
+				}
+				else{
+					event.finish();
+				}
+				'step 3'
+				player.gain(event.card);
+				player.$draw();
+				for(var i=event.cards.length-1;i>=0;i--){
+					event.cards[i].fix();
+					ui.cardPile.insertBefore(event.cards[i],ui.cardPile.firstChild);
+				}
+				game.delay();
+			},
+			ai:{
+				order:10,
+				result:{
+					player:1
+				}
+			}
+		},
 		lianhua:{
 			enable:'phaseUse',
 			filter:function(event,player){
@@ -214,6 +236,50 @@ card.shenqi={
 		},
 		shouna2:{},
 		donghuangzhong:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			content:function(){
+				'step 0'
+				player.chooseCardTarget({
+					filterTarget:true,
+					filterCard:true,
+					ai1:function(card){
+						return 7-ai.get.useful(card);
+					},
+					ai2:function(target){
+						return -ai.get.attitude(player,target);
+					},
+					prompt:'是否发动【东皇钟】？'
+				});
+				'step 1'
+				if(result.bool){
+					player.logSkill('donghuangzhong',result.targets);
+					player.discard(result.cards);
+					event.target=result.targets[0];
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				var target=event.target;
+				var list=[];
+				for(var i=0;i<lib.inpile.length;i++){
+					if(get.type(lib.inpile[i])=='delay'&&!target.hasJudge(lib.inpile[i])){
+						list.push(lib.inpile[i]);
+					}
+				}
+				if(list.length){
+					var card=game.createCard(list.randomGet());
+					target.addJudge(card);
+					target.$draw(card);
+					game.delay();
+				}
+			}
+		},
+		donghuangzhong_old:{
 			mode:['identity','guozhan'],
 			enable:'phaseUse',
 			usable:1,
@@ -267,11 +333,6 @@ card.shenqi={
 			}
 		},
 		xuanyuanjian:{
-			mod:{
-				selectTarget:function(card,player,range){
-					if(card.name=='sha'&&range[1]!=-1) range[1]++;
-				},
-			},
 			trigger:{player:'changeHp'},
 			forced:true,
 			popup:false,
@@ -279,7 +340,10 @@ card.shenqi={
 				return !player.skills.contains('xuanyuan')&&player.hp<=2
 			},
 			content:function(){
-				player.discard(player.get('e','1'));
+				var e1=player.get('e','1');
+				if(e1&&e1.name=='xuanyuanjian'){
+					player.discard(e1);
+				}
 			},
 			ai:{
 				threaten:1.5
@@ -289,12 +353,23 @@ card.shenqi={
 			trigger:{source:'damageBefore'},
 			forced:true,
 			filter:function(event){
-				return Math.random()<0.5;
+				return event.notLink();
 			},
 			content:function(){
 				trigger.num++;
 				if(!trigger.nature) trigger.nature='thunder';
-				player.get('e','1').animate('thunder');
+			}
+		},
+		xuanyuanjian3:{
+			trigger:{source:'damageAfter'},
+			forced:true,
+			popup:false,
+			filter:function(event){
+				return event.notLink();
+			},
+			content:function(){
+				player.loseHp();
+				player.draw();
 			}
 		},
 		pangufu:{
@@ -372,16 +447,22 @@ card.shenqi={
 			direct:true,
 			content:function(){
 				"step 0"
-				event.cards=get.cards(9);
+				event.cards=get.cards(3);
 				player.chooseCardButton(event.cards,'昊天塔：选择一张牌作为'+get.translation(trigger.player)+'的'+trigger.judgestr+'判定结果').ai=function(button){
 					if(ai.get.attitude(player,trigger.player)>0){
-						return trigger.judge(button.link);
+						return 1+trigger.judge(button.link);
 					}
 					if(ai.get.attitude(player,trigger.player)<0){
-						return -trigger.judge(button.link);
+						return 1-trigger.judge(button.link);
 					}
+					return 0;
 				};
 				"step 1"
+				if(!result.bool){
+					event.finish();
+					return;
+				}
+				player.logSkill('haotianta',trigger.player);
 				var card=result.links[0];
 				event.cards.remove(card);
 				var judgestr=get.translation(trigger.player)+'的'+trigger.judgestr+'判定';
@@ -390,9 +471,18 @@ card.shenqi={
 				event.dialog.classList.add('center');
 				event.dialog.videoId=event.videoId;
 
-				game.addVideo('judge1',player,[get.cardInfo(card),trigger.judgestr,event.videoId]);
+				game.addVideo('judge1',player,[get.cardInfo(card),judgestr,event.videoId]);
 				for(var i=0;i<event.cards.length;i++) ui.discardPile.appendChild(event.cards[i]);
-				var node=card.copy('thrown','center',ui.arena).animate('start');
+				// var node=card.copy('thrown','center',ui.arena).animate('start');
+				var node;
+				if(game.chess){
+					node=card.copy('thrown','center',ui.arena).animate('start');
+				}
+				else{
+					node=player.$throwordered(card.copy(),true);
+				}
+				node.classList.add('thrownhighlight');
+				ui.arena.classList.add('thrownhighlight');
 				if(card){
 					trigger.untrigger();
 					trigger.finish();
@@ -421,6 +511,7 @@ card.shenqi={
 					event.finish();
 				}
 				"step 2"
+				ui.arena.classList.remove('thrownhighlight');
 				event.dialog.close();
 				game.addVideo('judge2',null,event.videoId);
 				ui.clear();
@@ -479,20 +570,16 @@ card.shenqi={
 			trigger:{global:'dying'},
 			priority:6,
 			filter:function(event,player){
-				return event.player.hp<=0;
+				return event.player.hp<=0&&player.hp>1;
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.player)>0;
+				return ai.get.attitude(player,event.player)>=3;
 			},
 			content:function(){
 				"step 0"
-				trigger.player.judge(function(card){
-					return get.suit(card)=='heart'?1:0;
-				});
+				trigger.player.recover();
 				"step 1"
-				if(result.bool){
-					trigger.player.recover();
-				}
+				player.loseHp();
 			},
 			ai:{
 				threaten:1.2,
@@ -653,14 +740,14 @@ card.shenqi={
 		lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		shouna:'收纳',
 		shouna_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你可以选择其中的一张放入炼妖壶，每名角色的回合限一次',
-		donghuangzhong_info:'出牌阶段，你可以将一名已死亡角色永久移出游戏，然后回复一点体力，或创建一名与你身份相同的新角色，然后流失X点体力，X为新角色的体力上限',
-		xuanyuanjian_info:'锁定技，你使用的杀无视距离，可以额外指定一个目标，每当你造成一次伤害，有50％的机率使伤害加一并变为雷属性。任何时候，若你体力值不超过2，则立即失去轩辕剑',
+		donghuangzhong_info:'回合结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机判定牌置入其判定区',
+		xuanyuanjian_info:'锁定技，每当你即将造成一次伤害，你令此伤害加一并变为雷属性，此伤害结算后，你流失一点体力并摸一张牌。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
-		haotianta_info:'任意一名角色进行判定前，你可以亮出牌堆顶的9张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',
+		haotianta_info:'任意一名角色进行判定前，你可以观看牌堆顶的3张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',
 		shennongding_info:'出牌阶段，你可以弃置两张手牌，然后回复一点体力。每阶段限一次',
 		kongdongyin_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌，发动后进入弃牌堆',
-		kunlunjingc_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束后的位置，然后流失一点体力',
-		nvwashi_info:'意一名角色濒死时，你可以令其进行一次判定，若结果为红桃，其回复一点体力',
+		kunlunjingc_info:'出牌阶段限一次，你可以观看牌堆顶的三张牌，然后用一张手牌替换其中的一张',
+		nvwashi_info:'当一名角色濒死时，若你的体力值大于1，你可以失去一点体力并令其回复一点体力',
 		kongxin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你可以指定另一名角色视为对方对该角色使用一张杀，否则对方可弃置你一张牌',
 		fuxiqin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你可以指定另一名角色视为对方对该角色使用一张杀，否则对方可弃置你一张牌',
 		lianyaohu_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你将其放入炼妖壶（每回合只发动一次）；出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',

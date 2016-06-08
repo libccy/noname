@@ -426,6 +426,9 @@ body>.background{z-index:-5}
 	filter:blur(6px) !important;
 	-webkit-filter:blur(6px) !important;
 }
+.invert-color{
+	-webkit-filter:invert(1);
+}
 .zoominanim{-webkit-animation:zoomin 0.5s;}
 .zoomin{transform: scale(1.05) !important;}
 .zoomout{transform: scale(0.95) !important;}
