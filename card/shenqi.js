@@ -5,11 +5,8 @@ card.shenqi={
 			type:'equip',
 			subtype:'equip5',
 			skills:['donghuangzhong'],
-			enable:function(card,player){return player==game.me;},
 			ai:{
-				basic:{
-					equipValue:6
-				}
+				equipValue:6
 			}
 		},
 		xuanyuanjian:{

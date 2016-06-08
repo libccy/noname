@@ -2438,17 +2438,11 @@ character.hearth={
 				return true;
 			},
 			content:function(){
-				'step 0'
 				if(player.storage.anying){
 					target.loseHp();
-					event.finish();
 				}
 				else{
 					target.recover();
-				}
-				'step 1'
-				if(target.hp<target.maxHp){
-					target.draw();
 				}
 			},
 			ai:{
@@ -4495,7 +4489,7 @@ character.hearth={
 		shijie:'视界',
 		shijie_info:'回合结束阶段，你可以获得一名其他角色的一张手牌，然后该角色摸一张牌',
 		shengguang:'圣光',
-		shengguang_info:'出牌阶段限一次，你可以弃置一张红色牌令一名角色回复一点体力，若其仍处于受伤状态则摸一张牌',
+		shengguang_info:'出牌阶段限一次，你可以弃置一张红色牌令一名角色回复一点体力',
 		bingjia:'冰甲',
 		bingjia2:'冰甲',
 		bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你将此牌置于弃牌堆，并获得一点护甲值',

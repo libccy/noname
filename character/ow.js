@@ -65,6 +65,7 @@ character.ow={
                 var n1=player.num('he');
                 var n2=player.storage.shanxian_h.length+player.storage.shanxian_e.length;
                 if(n1==n2+1) return true;
+                if(n2==n2+2&&player.hp<=1) return true;
                 if(n1<n2) return true;
                 return false;
             },
@@ -80,14 +81,12 @@ character.ow={
             content:function(){
                 game.addVideo('skill',player,'shanhui');
                 for(var i=0;i<player.storage.shanxian_h.length;i++){
-                    if(player.storage.shanxian_h[i].parentNode!=ui.cardPile&&
-                    player.storage.shanxian_h[i].parentNode!=ui.discardPile){
+                    if(get.position(player.storage.shanxian_h[i])=='s'){
                         player.storage.shanxian_h[i]=game.createCard(player.storage.shanxian_h[i]);
                     }
                 }
                 for(var i=0;i<player.storage.shanxian_e.length;i++){
-                    if(player.storage.shanxian_e[i].parentNode!=ui.cardPile&&
-                    player.storage.shanxian_e[i].parentNode!=ui.discardPile){
+                    if(get.position(player.storage.shanxian_e[i])=='s'){
                         player.storage.shanxian_e[i]=game.createCard(player.storage.shanxian_e[i]);
                     }
                 }
