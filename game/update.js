@@ -12,6 +12,7 @@ window.noname_update={
             'game/game.js',
             'game/source.js',
             'game/asset.js',
+            'image/card/fengxueren.png',
         ],
         '1.8.14.2':[]
     }

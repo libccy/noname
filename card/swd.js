@@ -37,6 +37,7 @@ card.swd={
 			},
 		},
 		fengxueren:{
+			fullskin:true,
 			type:"equip",
 			subtype:"equip1",
 			distance:{attackFrom:-1},
@@ -48,6 +49,7 @@ card.swd={
 			},
 		},
 		chilongya:{
+			fullskin:true,
 			type:"equip",
 			subtype:"equip1",
 			distance:{attackFrom:-1},
@@ -706,12 +708,12 @@ card.swd={
 				return att<=0;
 			},
 			filter:function(event,player){
-				return !event.target.isTurnedOver()&&!player.skills.contains('fengxueren2');
+				return !event.target.isTurnedOver();
 			},
 			content:function(){
 				trigger.unhurt=true;
+				trigger.target.draw();
 				trigger.target.turnOver();
-				player.addTempSkill('fengxueren2','phaseAfter')
 			}
 		},
 		fengxueren2:{},
@@ -1177,9 +1179,9 @@ card.swd={
 		baihupifeng_info:'回合结束阶段，若你的体力值是全场最小的之一，你可以回复一点体力',
 		fengxueren:'封雪刃',
 		fengxueren_bg:'雪',
-		// fengxueren_info:'你使用杀击中目标后，可以防止伤害并令目标翻面，每回合限发动一次',
+		fengxueren_info:'你使用杀击中目标后，若目标武将牌正面朝上，你可以防止伤害，然后令目标摸一张牌并翻面',
 		chilongya:'赤龙牙',
-		// chilongya_info:'锁定技，你即将造成的伤害均视为火焰伤害',
+		chilongya_info:'锁定技，你的火属性伤害+1',
 		daihuofenglun:'带火风轮',
 		daihuofenglun_bg:'轮',
 		// daihuofenglun_info:'你与其他角色的距离-2，其他角色与你的距离-1',
@@ -1274,6 +1276,9 @@ card.swd={
 		['heart',9,'tianxianjiu'],
 		['spade',5,'jiu'],
 		['diamond',2,'tianxianjiu'],
+
+		['spade',2,'qinglonglingzhu'],
+		['spade',7,'xingjunyan'],
 
 		//['spade',10,'qipoguyu'],
 		//['diamond',10,'xiangyuye','poison'],

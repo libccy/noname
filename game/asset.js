@@ -16,6 +16,7 @@ window.noname_asset_list=[
     'image/card/chess_chuzhang.png',
     'image/card/chess_shezhang.png',
     'image/card/chitu.png',
+    'image/card/chilongya.png',
     'image/card/chiyuxi.png',
     'image/card/chuansongmen.png',
     'image/card/cixiong.png',
