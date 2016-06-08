@@ -1425,7 +1425,7 @@
 								this.innerHTML='已隐藏';
 								game.saveConfig('hiddenModePack',['stone','chess','boss']);
 								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth','compensate']);
-								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','xiake','boss']);
+								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','xiake','boss','ow']);
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='隐藏非官方扩展包';
@@ -3397,7 +3397,16 @@
     					}
                     }
                     for(var i=0;i<extensionlist.length;i++){
-                        lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,extLoaded);
+                        lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
+                            return function(){
+                                game.removeExtension(i);
+                                extToLoad--;
+            					if(extToLoad==0){
+                                    delete window.game;
+            						loadPack();
+            					}
+                            }
+                        }(extensionlist[i])));
                     }
                 }
                 else{
@@ -5805,6 +5814,14 @@
                         event.finish();
                     }
 					"step 3"
+                    if(event.logSkill&&event.result.bool&&!game.online){
+						if(typeof event.logSkill=='string'){
+							player.logSkill(event.logSkill);
+						}
+						else if(Array.isArray(event.logSkill)){
+							player.logSkill.apply(player,event.logSkill);
+						}
+					}
 					var cards=[];
 					for(var i=0;i<event.result.links.length;i++){
 						cards.push(event.result.links[i]);
@@ -16090,6 +16107,9 @@
                 if(lib.node&&lib.node.fs){
                     try{
                         lib.node.fs.readdir(__dirname+'/extension/'+extname,function(err,list){
+                            if(err){
+                                return;
+                            }
                             var removeFile=function(){
                                 if(list.length){
                                     var filename=list.shift();

@@ -1,21 +1,18 @@
 window.noname_update={
-    version:'1.8.14.2',
+    version:'1.8.15',
     changeLog:[
         '修bug',
     ],
     files:{
         global:[
-            'character/sp.js',
-            'character/yijiang.js',
-            'mode/guozhan.js',
+            'character/ow.js',
+            'card/swd.js',
+            'card/hearth.js',
+            'game/package.js',
             'game/game.js',
-            'layout/default/layout.css',
-            'theme/woodden/style.css',
-            'theme/simple/style.css',
-            'theme/music/style.css',
+            'game/source.js',
+            'game/asset.js',
         ],
-        '1.8.14':[],
-        '1.8.14.1':[],
         '1.8.14.2':[]
     }
 }

@@ -9,6 +9,7 @@ character.pack={
     diy:'DIY',
     yxs:'英雄杀',
     hearth:'炉石传说',
+    ow:'守望先锋',
     swd:'轩辕剑',
     gujian:'古剑奇谭',
     xianjian:'仙剑',

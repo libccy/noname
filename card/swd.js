@@ -1,5 +1,27 @@
 card.swd={
 	card:{
+		xingjunyan:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip5',
+			skills:['xingjunyan'],
+			ai:{
+				basic:{
+					equipValue:4
+				},
+			},
+		},
+		qinglonglingzhu:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip5',
+			skills:['qinglonglingzhu'],
+			ai:{
+				basic:{
+					equipValue:5
+				},
+			},
+		},
 		baihupifeng:{
 			fullskin:true,
 			type:"equip",
@@ -614,6 +636,31 @@ card.swd={
 		},
 	},
 	skill:{
+		qinglonglingzhu:{
+			trigger:{source:'damageEnd'},
+			direct:true,
+			filter:function(event,player){
+				return event.nature&&event.player&&event.player.isAlive();
+			},
+			content:function(){
+				player.gainPlayerCard('是否对'+get.translation(trigger.player)+'发动【青龙灵珠】？',trigger.player,function(button){
+					if(ai.get.attitude(player,trigger.player)<=0){
+						return ai.get.buttonValue(button);
+					}
+					return 0;
+				},'he').logSkill=['qinglonglingzhu',trigger.player];
+			},
+		},
+		xingjunyan:{
+			trigger:{source:'damageBegin',player:'damageBegin'},
+			forced:true,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha';
+			},
+			content:function(){
+				trigger.num++;
+			}
+		},
 		baihupifeng:{
 			trigger:{player:'phaseEnd'},
 			frequent:true,
@@ -1091,6 +1138,10 @@ card.swd={
 		},
 	},
 	translate:{
+		qinglonglingzhu:'青龙灵珠',
+		qinglonglingzhu_info:'每当你造成一次属性伤害，你可以获得对方的一张牌',
+		xingjunyan:'星君眼',
+		xingjunyan_info:'你的杀造成的伤害+1；杀对你造成的伤害+1',
 		guiyanfadao:'鬼眼法刀',
 		guiyanfadao_bg:'眼',
 		// guiyanfadao_info:'你可以将一张普通杀当毒杀使用',

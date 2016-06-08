@@ -37,7 +37,7 @@ card.hearth={
 		},
 		jihuocard:{
 			fullskin:true,
-			type:'basic',
+			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
 				return player==target;
