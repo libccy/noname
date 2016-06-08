@@ -1,6 +1,7 @@
 card.shenqi={
 	card:{
 		donghuangzhong:{
+			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
 			skills:['donghuangzhong'],
@@ -13,13 +14,14 @@ card.shenqi={
 			}
 		},
 		xuanyuanjian:{
+			fullskin:true,
 			type:'equip',
 			subtype:'equip1',
 			skills:['xuanyuanjian','xuanyuanjian2'],
 			enable:function(card,player){
 				return player.skills.contains('xuanyuan')||player.hp>2;
 			},
-			distance:{attackFrom:-Infinity},
+			distance:{attackFrom:-3},
 			onEquip:function(){
 				//player.loseHp();
 				if(!player.skills.contains('xuanyuan')&&player.hp<=2){
@@ -56,6 +58,7 @@ card.shenqi={
 			skills:['lianhua','shouna']
 		},
 		haotianta:{
+			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
 			skills:['haotianta'],
@@ -103,20 +106,21 @@ card.shenqi={
 				}
 			}
 		},
-		// kunlunjing:{
-		// 	type:'equip',
-		// 	subtype:'equip5',
-		// 	skills:['kunlunjing'],
-		// 	onEquip:function(){
-		// 		//if(player==game.me) player.loseHp();
-		// 	},
-		// 	onLose:function(){
-		// 		//if(player==game.me) player.loseHp();
-		// 	},
-		// 	ai:{
-		// 		equipValue:5
-		// 	}
-		// },
+		kunlunjingc:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip5',
+			skills:['kunlunjing'],
+			onEquip:function(){
+				//if(player==game.me) player.loseHp();
+			},
+			onLose:function(){
+				//if(player==game.me) player.loseHp();
+			},
+			ai:{
+				equipValue:5
+			}
+		},
 		nvwashi:{
 			fullskin:true,
 			type:'equip',
@@ -365,10 +369,11 @@ card.shenqi={
 		},
 		haotianta:{
 			trigger:{global:'judgeBefore'},
+			direct:true,
 			content:function(){
 				"step 0"
 				event.cards=get.cards(9);
-				player.chooseCardButton(event.cards,'选择一张牌作为判定结果',true).ai=function(button){
+				player.chooseCardButton(event.cards,'昊天塔：选择一张牌作为'+get.translation(trigger.player)+'的'+trigger.judgestr+'判定结果').ai=function(button){
 					if(ai.get.attitude(player,trigger.player)>0){
 						return trigger.judge(button.link);
 					}
@@ -379,6 +384,13 @@ card.shenqi={
 				"step 1"
 				var card=result.links[0];
 				event.cards.remove(card);
+				var judgestr=get.translation(trigger.player)+'的'+trigger.judgestr+'判定';
+				event.videoId=lib.status.videoId++;
+				event.dialog=ui.create.dialog(judgestr);
+				event.dialog.classList.add('center');
+				event.dialog.videoId=event.videoId;
+
+				game.addVideo('judge1',player,[get.cardInfo(card),trigger.judgestr,event.videoId]);
 				for(var i=0;i<event.cards.length;i++) ui.discardPile.appendChild(event.cards[i]);
 				var node=card.copy('thrown','center',ui.arena).animate('start');
 				if(card){
@@ -388,6 +400,9 @@ card.shenqi={
 						card:card,
 						judge:trigger.judge(card),
 						node:node,
+						number:get.number(card),
+						suit:get.suit(card),
+						color:get.color(card),
 					};
 					if(trigger.result.judge>0){
 						trigger.result.bool=true;
@@ -406,15 +421,12 @@ card.shenqi={
 					event.finish();
 				}
 				"step 2"
+				event.dialog.close();
+				game.addVideo('judge2',null,event.videoId);
+				ui.clear();
 				var card=trigger.result.card;
-				if(trigger.position!=ui.discardPile){
-					trigger.position.appendChild(card);
-					trigger.result.node.delete();
-				}
-				else{
-					player.gain(card);
-					player.$gain2(card);
-				}
+				trigger.position.appendChild(card);
+				trigger.result.node.delete();
 				game.delay();
 			},
 			ai:{
@@ -626,8 +638,7 @@ card.shenqi={
 		fuxiqin:'伏羲琴',
 		shennongding:'神农鼎',
 		kongdongyin:'崆峒印',
-		//kunlunjing:'昆仑镜',
-		//kunlunjing1:'昆仑镜',
+		kunlunjingc:'昆仑镜',
 		nvwashi:'女娲石',
 		donghuangzhong_bg:'钟',
 		lianyaohu_bg:'壶',
@@ -635,20 +646,20 @@ card.shenqi={
 		fuxiqin_bg:'琴',
 		shennongding_bg:'鼎',
 		kongdongyin_bg:'印',
-		kunlunjing_bg:'镜',
+		kunlunjingc_bg:'镜',
 		nvwashi_bg:'石',
 		kongxin:'控心',
 		lianhua:'炼化',
 		lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		shouna:'收纳',
 		shouna_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你可以选择其中的一张放入炼妖壶，每名角色的回合限一次',
-		// donghuangzhong_info:'出牌阶段，你可以将一名已死亡角色永久移出游戏，然后回复一点体力，或创建一名与你身份相同的新角色，然后流失X点体力，X为新角色的体力上限',
-		// xuanyuanjian_info:'锁定技，你使用的杀无视距离，可以额外指定一个目标，每当你造成一次伤害，有50％的机率使伤害加一并变为雷属性。任何时候，若你体力值不超过2，则立即失去轩辕剑',
+		donghuangzhong_info:'出牌阶段，你可以将一名已死亡角色永久移出游戏，然后回复一点体力，或创建一名与你身份相同的新角色，然后流失X点体力，X为新角色的体力上限',
+		xuanyuanjian_info:'锁定技，你使用的杀无视距离，可以额外指定一个目标，每当你造成一次伤害，有50％的机率使伤害加一并变为雷属性。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
-		// haotianta_info:'任意一名角色进行判定前，你可以亮出牌堆顶的9张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',
+		haotianta_info:'任意一名角色进行判定前，你可以亮出牌堆顶的9张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',
 		shennongding_info:'出牌阶段，你可以弃置两张手牌，然后回复一点体力。每阶段限一次',
 		kongdongyin_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌，发动后进入弃牌堆',
-		//kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束后的位置，然后流失一点体力',
+		kunlunjingc_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束后的位置，然后流失一点体力',
 		nvwashi_info:'意一名角色濒死时，你可以令其进行一次判定，若结果为红桃，其回复一点体力',
 		kongxin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你可以指定另一名角色视为对方对该角色使用一张杀，否则对方可弃置你一张牌',
 		fuxiqin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你可以指定另一名角色视为对方对该角色使用一张杀，否则对方可弃置你一张牌',
@@ -657,13 +668,13 @@ card.shenqi={
 		// fuxiqin_info:'',
 	},
 	list:[
-		// ['diamond',13,'donghuangzhong'],
+		['diamond',13,'donghuangzhong'],
 		['diamond',13,'fuxiqin'],
-		// ['spade',13,'kunlunjing'],
-		// ['spade',13,'xuanyuanjian'],
+		['spade',13,'kunlunjingc'],
+		['spade',13,'xuanyuanjian'],
 		['spade',13,'pangufu'],
 		['club',13,'lianyaohu'],
-		// ['diamond',13,'haotianta'],
+		['diamond',13,'haotianta'],
 		['club',13,'shennongding'],
 		['heart',13,'nvwashi'],
 		['heart',13,'kongdongyin'],

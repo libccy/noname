@@ -44,7 +44,7 @@ card.swd={
 			skills:['fengxueren'],
 			ai:{
 				basic:{
-					equipValue:6
+					equipValue:5
 				},
 			},
 		},
@@ -677,24 +677,6 @@ card.swd={
 				player.recover();
 			},
 		},
-		// fengxueren:{
-		// 	trigger:{source:'damageEnd'},
-		// 	filter:function(event){
-		// 		return event.card&&event.card.name=='sha';
-		// 	},
-		// 	forced:true,
-		// 	content:function(){
-		// 		"step 0"
-		// 		trigger.player.turnOver();
-		// 		trigger.player.popup('fengxueren');
-		// 		"step 1"
-		// 		trigger.player.draw();
-		// 		"step 2"
-		// 		if(player.num('he')){
-		// 			player.chooseToDiscard(true);
-		// 		}
-		// 	}
-		// },
 		fengxueren:{
 			trigger:{player:'shaHit'},
 			check:function(event,player){
@@ -718,11 +700,13 @@ card.swd={
 		},
 		fengxueren2:{},
 		chilongya:{
-			trigger:{source:'damageBefore'},
+			trigger:{source:'damageBegin'},
 			forced:true,
-			priority:5,
+			filter:function(event){
+				return event.nature=='fire';
+			},
 			content:function(){
-				trigger.nature='fire';
+				trigger.num++;
 			}
 		},
 		chilongya2:{

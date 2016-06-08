@@ -25628,7 +25628,7 @@
 				if(_status.paused2) return;
 				if(_status.nopause) return;
 				if(ui.pause.classList.contains('hidden')) return;
-                if(!_status.gameStarted) return;
+                if(!_status.gameStarted&&!_status.video) return;
 				ui.system.hide();
 				game.pause2();
 				var node=ui.create.pause().animate('start');
