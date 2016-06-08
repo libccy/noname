@@ -13,6 +13,38 @@ character.gujian={
 		gjqt_aruan:['female','wu',3,['zhaolu','jiehuo','yuling']],
 	},
 	skill:{
+		meiying:{
+			global:'meiying2',
+			globalSilent:true,
+			trigger:{global:'phaseEnd'},
+			filter:function(event,player){
+				return event.player!=player&&!event.player.tempSkills.meiying3&&event.player.isAlive()&&player.num('he',{color:'red'})>0;
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseToDiscard('魅影：是否弃置一张红色牌视为对'+get.translation(trigger.player)+'使用一张杀？').logSkill=['meiying',trigger.player];
+				"step 1"
+				if(result.bool){
+					player.useCard({name:'sha'},trigger.player).animate=false;
+				}
+			},
+			ai:{
+				expose:0.1
+			}
+		},
+		meiying2:{
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				return _status.currentPhase==player&&event.targets&&(event.targets.length>1||event.targets[0]!=player);
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.addTempSkill('meiying3','phaseAfter');
+			}
+		},
+		meiying3:{},
 		jianwu:{
 			trigger:{player:'shaBegin'},
 			forced:true,
@@ -77,7 +109,7 @@ character.gujian={
 				threaten:1.3
 			}
 		},
-		meiying:{
+		meiying_old:{
 			trigger:{global:'phaseBefore'},
 			filter:function(event,player){
 				return event.player!=player&&!player.isTurnedOver()&&!player.storage.meiying;
@@ -1032,9 +1064,9 @@ character.gujian={
 		meihu2:'魅狐',
 		meihu_info:'当你受到伤害后，可令伤害来源交给你一张手牌',
 		jianwu:'剑舞',
-		jianwu_info:'锁定技，每当你使用一张杀，若你不在目标的攻击范围内，此杀不可闪避。',
+		jianwu_info:'锁定技，攻击范围不含你的角色无法闪避你的杀',
 		meiying:'魅影',
-		meiying_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以进行一个额外回合，并在回合结束后翻面（若已翻面则不翻回来）。若如此做，你对其使用卡牌无视距离直到回合结束。',
+		meiying_info:'一名其他角色的回合结束时，若其未于此回合内使用过指定另一名角色为目标的牌，你可以弃置一张红色牌视为对其使用一张杀',
 		zhongji:'重击',
 		zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1',
 		zuizhan:'醉斩',

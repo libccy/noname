@@ -3338,7 +3338,7 @@
 				if(lib.config.extensions.length){
 					window.resetExtension=function(){
 						for(var i=0;i<lib.config.extensions.length;i++){
-							game.saveConfig('extension_'+lib.config.extensions[i],false);
+							game.saveConfig('extension_'+lib.config.extensions[i]+'_enable',false);
 						}
 					}
 				}
@@ -10418,7 +10418,7 @@
 						}
 					}
 					if(get.itemtype(card)=='cards'){
-						if(log!=false){
+						if(log!=false&&!_status.video){
 							game.log(player,'从',this,'获得了',card);
 						}
 						if(this.$givemod){
@@ -10431,7 +10431,7 @@
 						}
 					}
 					else if(typeof card=='number'&&card>=0){
-						if(log!=false){
+						if(log!=false&&!_status.video){
 							game.log(player,'从',this,'获得了'+get.cnNumber(card)+'张牌');
 						}
 						if(this.$givemod){
@@ -10442,7 +10442,7 @@
 						}
 					}
 					else{
-						if(log!=false){
+						if(log!=false&&!_status.video){
 							if(get.itemtype(card)=='card'&&log!=false){
 								game.log(player,'从',this,'获得了',card);
 							}
@@ -10548,7 +10548,7 @@
 						}
 					}
 					if(get.itemtype(card)=='cards'){
-						if(log!=false){
+						if(log!=false&&!_status.video){
 							game.log(this,'获得了',card);
 						}
 						if(this.$gainmod){
@@ -10561,7 +10561,7 @@
 						}
 					}
 					else if(typeof card=='number'&&card>1){
-						if(log!=false){
+						if(log!=false&&!_status.video){
 							game.log(this,'获得了'+get.cnNumber(card)+'张牌');
 						}
 						if(this.$gainmod){
@@ -10574,7 +10574,7 @@
 						}
 					}
 					else{
-						if(get.itemtype(card)=='card'&&log!=false){
+						if(get.itemtype(card)=='card'&&log!=false&&!_status.video){
 							game.log(this,'获得了',card);
 						}
 						if(this.$gainmod){
@@ -15034,7 +15034,7 @@
 			},
 			equip:function(player,card){
 				if(player&&card){
-					player.equip(get.infoCard(card));
+					player.$equip(get.infoCard(card));
 				}
 				else{
 					console.log(player);
@@ -26486,6 +26486,7 @@
 				str2+=str[i];
                 if(nobreak) continue;
 				if(sp&&str[i]=='S'&&str[i+1]=='P') continue;
+                if(/[0-9]/.test(str[i])&&/[0-9]/.test(str[i+1])) continue;
 				if(i<str.length-1){
 					str2+='<br>';
 				}
