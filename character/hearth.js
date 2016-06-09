@@ -1223,6 +1223,15 @@ character.hearth={
 				player.storage.fenlie++;
 				player.gain(cards,'draw');
 			},
+			ai:{
+				effect:{
+					target:function(card){
+						if(card.name=='toulianghuanzhu'){
+							return [1,2];
+						}
+					}
+				}
+			},
 			group:'fenlie2'
 		},
 		fenlie2:{
@@ -1671,14 +1680,13 @@ character.hearth={
 			},
 			content:function(){
 				"step 0"
-				var noneed=(trigger.card.name=='tao'&&trigger.targets[0]==player&&player.hp==player.maxHp-1);
 				player.chooseTarget('是否发动【灵咒】？').ai=function(target){
 					var num=ai.get.attitude(player,target);
 					if(num>0){
-						if(noneed&&player==target){
-							num=0.5;
+						if(target==player){
+							num++;
 						}
-						else if(target.hp==1){
+						if(target.hp==1){
 							num+=3;
 						}
 						else if(target.hp==2){
@@ -2980,7 +2988,7 @@ character.hearth={
 			}
 		},
 		jihuo:{
-			trigger:{player:'phaseEnd'},
+			trigger:{player:'phaseAfter'},
 			filter:function(event,player){
 				return !player.storage.jihuo&&player.num('h')>0;
 			},
@@ -4532,7 +4540,7 @@ character.hearth={
 		hongxi:'虹吸',
 		hongxi_info:'锁定技，每当有一名角色死亡，你将体力回复至体力上限',
 		jihuo:'激活',
-		jihuo_info:'回合结束阶段，你可以弃置一张手牌并进行一个额外的回合',
+		jihuo_info:'在你的回合结束后，你可以弃置一张手牌并进行一个额外的回合',
 		jianren:'剑刃',
 		jianren_info:'出牌阶段限一次，你可以弃置装备区内的武器牌，对所有其他角色造成一点伤害',
 		mengun:'闷棍',

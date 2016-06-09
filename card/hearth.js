@@ -45,12 +45,10 @@ card.hearth={
 			selectTarget:-1,
 			content:function(){
 				target.skip('phaseDiscard');
-				if(target.num('h')<=target.hp){
-					target.draw();
-				}
+				target.draw();
 			},
 			ai:{
-				order:1,
+				order:10,
 				result:{
 					target:1
 				}
@@ -656,7 +654,7 @@ card.hearth={
 		zhaomingdan:'照明弹',
 		zhaomingdan_info:'弃置一名其他角色判定区内的所有牌，然后摸一张牌',
 		jihuocard:'激活',
-		jihuocard_info:'跳过本回合的弃牌阶段，若你手牌数不大于当前体力值，则摸一张牌',
+		jihuocard_info:'跳过本回合的弃牌阶段，摸一张牌',
 	},
 	list:[
 		['heart',2,'shenenshu'],

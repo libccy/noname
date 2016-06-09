@@ -9818,6 +9818,17 @@
 					}
 					return false;
 				},
+                hasUnknown:function(){
+                    var mode=get.mode();
+                    if(mode=='identity'||mode=='guozhan'){
+                        for(var i=0;i<game.players.length;i++){
+                            if(game.players[i].ai.shown==0&&game.players[i]!=this){
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                },
                 hasWuxie:function(){
                     if(this.num('h','wuxie')) return true;
 					var skills=this.get('s',true).concat(lib.skill.global);
@@ -25338,7 +25349,7 @@
 						else if(_status.event.skill&&!get.info(_status.event.skill).viewAs){
 							targetprompt=get.info(_status.event.skill).targetprompt;
 						}
-						else{
+						else if(_status.event.name=='chooseToUse'){
 							var currentcard=get.card();
 							if(currentcard){
 								targetprompt=get.info(currentcard).targetprompt;

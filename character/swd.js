@@ -3073,7 +3073,8 @@ character.swd={
 					target:function(card){
 						if(card.name=='guohe'||card.name=='liuxinghuoyu') return 0.5;
 					}
-				}
+				},
+				noh:true,
 			}
 		},
 		miejing:{
@@ -7078,7 +7079,10 @@ character.swd={
 					if(player.isTurnedOver()){
 						return 5-att;
 					}
-					return -att;
+					if(att<=-3){
+						return -att;
+					}
+					return 0;
 				};
 				"step 1"
 				if(result.bool){

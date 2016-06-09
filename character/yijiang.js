@@ -442,7 +442,7 @@ character.yijiang={
 					}
 					var forced=false;
 					var str='获得其中一张牌并防止伤害';
-					if(trigger.source.num('he')<num){
+					if(trigger.source.num('he')<event.num){
 						forced=true;
 					}
 					else{
@@ -989,18 +989,12 @@ character.yijiang={
 			}
 		},
 		fulin:{
-			mod:{
-				maxHandcard:function(player,num){
-					if(player.storage.fulin&&player.storage.fulin.length){
-						var hs=player.get('h');
-						for(var i=0;i<player.storage.fulin.length;i++){
-							if(hs.contains(player.storage.fulin[i])){
-								num++;
-							}
-						}
-						return num;
-					}
-				}
+			trigger:{player:'phaseDiscardBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.addTempSkill('fulin2','phaseDiscardAfter');
 			},
 			group:['fulin_count','fulin_reset'],
 			subSkill:{
@@ -1032,6 +1026,21 @@ character.yijiang={
 					}
 				}
 			}
+		},
+		fulin2:{
+			mod:{
+				maxHandcard:function(player,num){
+					if(player.storage.fulin&&player.storage.fulin.length){
+						var hs=player.get('h');
+						for(var i=0;i<player.storage.fulin.length;i++){
+							if(hs.contains(player.storage.fulin[i])){
+								num++;
+							}
+						}
+						return num;
+					}
+				}
+			},
 		},
 		duliang:{
 			enable:'phaseUse',

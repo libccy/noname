@@ -6,7 +6,10 @@ window.noname_update={
     files:{
         global:[
             'character/ow.js',
+            'character/swd.js',
             'character/gujian.js',
+            'character/hearth.js',
+            'character/yxs.js',
             'card/swd.js',
             'card/hearth.js',
             'card/shenqi.js',

@@ -1444,6 +1444,7 @@ character.yxs={
 				trigger.source.chooseToDiscard(2,'he',true);
 			},
 			ai:{
+				expose:0.3,
 				result:{
 					target:function(card,player,target){
 						if(player.num('he')>1&&get.tag(card,'damage')){
