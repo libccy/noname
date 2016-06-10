@@ -8454,7 +8454,7 @@
 						}
 					}
 					if(next.filterButton==undefined) next.filterButton=lib.filter.all;
-					if(next.position==undefined) next.position='hej';
+					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
 						var val=ai.get.buttonValue(button);
@@ -8499,7 +8499,7 @@
 						}
 					}
 					if(next.filterButton==undefined) next.filterButton=lib.filter.all;
-					if(next.position==undefined) next.position='hej';
+					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
 						var val=ai.get.buttonValue(button);
@@ -8544,7 +8544,7 @@
 						}
 					}
 					if(next.filterButton==undefined) next.filterButton=lib.filter.all;
-					if(next.position==undefined) next.position='h';
+					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
 						var val=ai.get.buttonValue(button);
