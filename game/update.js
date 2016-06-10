@@ -1,7 +1,8 @@
 window.noname_update={
-    version:'1.8.16',
+    version:'1.8.15beta',
     changeLog:[
         '修bug',
+        '新武将'
     ],
     files:{
         global:[

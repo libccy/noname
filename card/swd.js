@@ -1216,7 +1216,7 @@ card.swd={
 	},
 	list:[
 		['spade',1,'baihupifeng'],
-		// ['club',1,'fengxueren'],
+		['club',1,'fengxueren'],
 		['diamond',1,'langeguaiyi'],
 		// ['heart',1,'daihuofenglun','fire'],
 
@@ -1226,7 +1226,7 @@ card.swd={
 		//['club',2,'huanpodan'],
 
 		['club',3,'caoyao'],
-		// ['diamond',3,'chilongya','fire'],
+		['diamond',3,'chilongya','fire'],
 		['spade',3,'guiyoujie'],
 		//['heart',3,'xiangyuye','poison'],
 
