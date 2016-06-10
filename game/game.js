@@ -18376,6 +18376,14 @@
 			}
 			return list;
 		},
+        findPlayer:function(func){
+			for(var i=0;i<game.players.length;i++){
+				if(func(game.players[i])){
+					return game.players[i];
+				}
+			}
+			return null;
+		},
 		findCards:function(func){
 			var cards=[];
 			for(var i in lib.card){
@@ -27410,7 +27418,7 @@
 							if(typeof name=='function'){
 								name=name(storage[i],node);
 							}
-							translation='<div><div class="skill">『'+name[0]+name[1]+'』</div><div>';
+							translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
 							var stint=get.storageintro(intro.content,storage[i],node);
 							if(stint){
 								translation+=stint+'</div></div>';
@@ -27421,7 +27429,7 @@
 					var js=node.get('j');
 					for(var i=0;i<js.length;i++){
 						var name=lib.translate[js[i].viewAs||js[i].name];
-						translation='<div><div class="skill">『'+name[0]+name[1]+'』</div><div>'+
+						translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>'+
 						lib.translate[(js[i].viewAs||js[i].name)+'_info']+'</div></div>';
 						uiintro.add(translation);
 					}

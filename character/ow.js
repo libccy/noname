@@ -3,18 +3,434 @@ character.ow={
     character:{
         ow_liekong:['female','shu',3,['shanxian','shanhui']],
         // ow_heibaihe:['female','shu',3,[]],
-        ow_sishen:['male','shu',3,['hongxi','anying']],
+        ow_sishen:['male','shu',3,['xiandan','yihun','hongxi']],
         ow_tianshi:['female','qun',3,['shouhu','ziyu','feiying']],
-        ow_falaozhiying:['female','shu',3,['dangji','huoyu','feiying']],
+        ow_falaozhiying:['female','shu',3,['feidan','huoyu','feiying']],
         ow_zhixuzhiguang:['female','qun',3,['guangshu']],
         ow_luxiao:['male','wu',3,['yuedong','kuoyin','huhuan']],
-        ow_shibing:['female','shu',3,[]],
-        ow_yuanshi:['female','shu',3,[]],
+        ow_shibing:['male','shu',4,['tuji','mujing']],
+        ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
         // ow_mei:['female','shu',3,[]],
         // ow_baolei:['female','shu',3,[]],
-        ow_chanyata:['female','shu',3,[]],
+        ow_chanyata:['male','qun',3,['xie','luan','sheng']],
     },
     skill:{
+        tuji:{
+            mod:{
+                globalFrom:function(from,to,distance){
+                    if(_status.currentPhase==from){
+                        return distance-get.cardCount(true,from);
+                    }
+                },
+            },
+        },
+        mujing:{
+            trigger:{player:'useCardToBegin'},
+			filter:function(event,player){
+				return event.target&&event.target!=player&&get.distance(event.target,player,'attack')>1;
+			},
+            direct:true,
+			content:function(){
+				'step 0'
+                player.discardPlayerCard('是否发动【目镜】？',trigger.target).logSkill=['mujing'];
+                'step 1'
+                if(player.num('h')<trigger.target.num('h')){
+                    player.draw();
+                }
+			}
+        },
+        zhanlong:{
+            trigger:{player:'phaseBegin'},
+            unique:true,
+			mark:true,
+			skillAnimation:true,
+			init:function(player){
+				player.storage.zhanlong=false;
+			},
+			filter:function(event,player){
+				if(player.storage.zhanlong) return false;
+                if(player.num('he')==0) return false;
+                if(player.hp!=1) return false;
+                return true;
+			},
+			content:function(){
+                'step 0'
+                player.discard(player.get('he'));
+                'step 1'
+                player.addTempSkill('zhanlong2','phaseAfter');
+                player.unmarkSkill('zhanlong');
+				player.storage.zhanlong=true;
+                var cards=[];
+                for(var i=0;i<3;i++){
+                    cards.push(game.createCard('sha'));
+                }
+                player.gain(cards,'gain2');
+			},
+            ai:{
+                threaten:function(player,target){
+					if(target.hp==1) return 3;
+					return 1;
+				},
+                effect:{
+					target:function(card,player,target){
+						if(!target.hasFriend()) return;
+						if(get.tag(card,'damage')==1&&target.hp==2&&target.num('he')&&!target.isTurnedOver()&&
+                        _status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+					}
+				}
+            },
+			intro:{
+				content:'limited'
+			}
+        },
+        zhanlong2:{
+            mod:{
+                cardUsable:function(card){
+                    if(card.name=='sha') return Infinity;
+                }
+            }
+        },
+        feiren:{
+			trigger:{player:'useCard'},
+			forced:true,
+			priority:10,
+			filter:function(event){
+				return event.card.name=='sha';
+			},
+			content:function(){
+				player.addTempSkill('unequip','useCardAfter');
+			},
+            mod:{
+                targetInRange:function(card){
+                    if(card.name=='sha') return true;
+                },
+                selectTarget:function(card,player,range){
+                    if(card.name=='sha'&&range[1]!=-1&&get.suit(card)=='club'){
+                        range[1]++;
+                    }
+                },
+            },
+            group:['feiren2'],
+            ai:{
+                threaten:1.4
+            }
+		},
+        feiren2:{
+			trigger:{player:'useCardAfter'},
+			filter:function(event,player){
+                if(event.parent.name=='feiren2') return false;
+				if(event.card.name!='sha') return false;
+                if(get.suit(event.card)!='spade') return false;
+				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
+				for(var i=0;i<event.targets.length;i++){
+					if(!event.targets[i].isAlive()) return false;
+					if(!player.canUse({name:event.card.name},event.targets[i],false,false)){
+						return false;
+					}
+				}
+				return true;
+			},
+			content:function(){
+				var card=game.createCard(trigger.card.name,trigger.card.suit,trigger.card.number,trigger.card.nature);
+				player.useCard(card,trigger.targets);
+			},
+			ai:{
+				threaten:1.3
+			},
+		},
+        xie:{
+            enable:'phaseUse',
+            unique:true,
+            filterTarget:function(card,player,target){
+                return target!=player&&!target.hasSkill('xie2');
+            },
+            filter:function(event,player){
+                return player.num('h',{suit:'heart'});
+            },
+            filterCard:{suit:'heart'},
+            check:function(card){
+                return 7-ai.get.value(card);
+            },
+            content:function(){
+                var current=game.findPlayer(function(player){
+                    return player.hasSkill('xie2');
+                });
+                if(current){
+                    current.removeSkill('xie2');
+                }
+                target.addSkill('xie2');
+                target.storage.xie=0;
+                target.storage.xie2=player;
+            },
+            ai:{
+                order:9.1,
+                threaten:2,
+                result:{
+                    target:function(player,target){
+                        var current=game.findPlayer(function(player){
+                            return player.hasSkill('xie2');
+                        });
+                        if(current&&ai.get.recoverEffect(current,player,player)>0){
+                            return 0;
+                        }
+                        return ai.get.recoverEffect(target,player,target);
+                    }
+                }
+            }
+        },
+        xie2:{
+            mark:true,
+            trigger:{player:'phaseEnd'},
+            forced:true,
+            filter:function(event,player){
+                return player.storage.xie%2==1;
+            },
+            content:function(){
+                player.recover();
+            },
+            intro:{
+                content:function(storage){
+                    return '每隔两轮回复一点体力，直到'+get.translation(storage)+'死亡';
+                },
+                onunmark:function(storage,player){
+                    delete player.storage.xie;
+                    delete player.storage.xie2;
+                }
+            },
+            group:['xie3','xie4']
+        },
+        xie3:{
+            trigger:{player:'phaseBegin'},
+            forced:true,
+            popup:false,
+            content:function(){
+                player.storage.xie++;
+            }
+        },
+        xie4:{
+            trigger:{global:'dieAfter'},
+            forced:true,
+            popup:false,
+            filter:function(event,player){
+                return event.player==player.storage.xie2;
+            },
+            content:function(){
+                player.removeSkill('xie2');
+            }
+        },
+        luan:{
+            enable:'phaseUse',
+            unique:true,
+            filterTarget:function(card,player,target){
+                return target!=player&&!target.hasSkill('luan2');
+            },
+            filter:function(event,player){
+                return player.num('h',{suit:'spade'});
+            },
+            filterCard:{suit:'spade'},
+            check:function(card){
+                return 7-ai.get.value(card);
+            },
+            content:function(){
+                var current=game.findPlayer(function(player){
+                    return player.hasSkill('luan2');
+                });
+                if(current){
+                    current.removeSkill('luan2');
+                }
+                target.addSkill('luan2');
+                target.storage.luan=0;
+                target.storage.luan2=player;
+            },
+            ai:{
+                order:9.1,
+                threaten:2,
+                result:{
+                    target:function(player,target){
+                        var current=game.findPlayer(function(player){
+                            return player.hasSkill('luan2');
+                        });
+                        if(current){
+                            return 0;
+                        }
+                        return -Math.sqrt(3+target.hp);
+                    }
+                }
+            }
+        },
+        luan2:{
+            mark:true,
+            trigger:{player:'phaseEnd'},
+            forced:true,
+            filter:function(event,player){
+                return player.storage.luan%2==1;
+            },
+            content:function(){
+                player.loseHp();
+            },
+            intro:{
+                content:function(storage){
+                    return '每隔两轮失去一点体力，直到'+get.translation(storage)+'死亡';
+                },
+                onunmark:function(storage,player){
+                    delete player.storage.luan;
+                    delete player.storage.luan2;
+                }
+            },
+            group:['luan3','luan4']
+        },
+        luan3:{
+            trigger:{player:'phaseBegin'},
+            forced:true,
+            popup:false,
+            content:function(){
+                player.storage.luan++;
+            }
+        },
+        luan4:{
+            trigger:{global:'dieAfter'},
+            forced:true,
+            popup:false,
+            filter:function(event,player){
+                return event.player==player.storage.luan2;
+            },
+            content:function(){
+                player.removeSkill('luan2');
+            }
+        },
+        sheng:{
+            enable:'phaseUse',
+            unique:true,
+			mark:true,
+			skillAnimation:true,
+			animationColor:'metal',
+			init:function(player){
+				player.storage.sheng=false;
+			},
+			filter:function(event,player){
+				if(player.storage.sheng) return false;
+                return true;
+			},
+            filterTarget:function(card,player,target){
+                return target.isDamaged();
+            },
+            selectTarget:[1,Infinity],
+			content:function(){
+                if(target==targets[0]){
+                    player.turnOver();
+                    player.addSkill('sheng2');
+                    player.unmarkSkill('sheng');
+    				player.storage.sheng=true;
+                }
+				target.recover();
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+                        var eff=ai.get.recoverEffect(target,player,target);
+                        if(player.hp==1) return eff;
+                        if(player.hasUnknown()) return 0;
+                        var num1=0,num2=0,num3=0;
+                        for(var i=0;i<game.players.length;i++){
+                            if(ai.get.attitude(player,game.players[i])>0){
+                                num1++;
+                                if(game.players[i].isDamaged()){
+                                    num2++;
+                                    if(game.players[i].hp<=1){
+                                        num3++;
+                                    }
+                                }
+                            }
+                        }
+                        if(num1==num2) return eff;
+                        if(num2==num1-1&&num3) return eff;
+                        if(num3>=2) return eff;
+                        return 0;
+                    }
+				},
+			},
+			intro:{
+				content:'limited'
+			}
+        },
+        sheng2:{
+            trigger:{player:'phaseBegin'},
+            forced:true,
+            popup:false,
+            content:function(){
+                player.removeSkill('sheng2');
+            },
+            mod:{
+                targetEnabled:function(card,player,target){
+                    if(player!=target) return false;
+                }
+            }
+        },
+        xiandan:{
+            mod:{
+                selectTarget:function(card,player,range){
+                    if(card.name=='sha'&&range[1]!=-1){
+                        var num=0;
+                        var attack=false;
+                        for(var i=0;i<game.players.length;i++){
+                            if(player!=game.players[i]){
+                                if(get.distance(player,game.players[i])<=1){
+                                    num++;
+                                }
+                                else if(get.distance(player,game.players[i],'attack')<=1){
+                                    attack=true;
+                                }
+                            }
+                        }
+                        if(!attack){
+                            num--;
+                        }
+                        if(num>0){
+                            range[1]+=num;
+                        }
+                    }
+                },
+                playerEnabled:function(card,player,target){
+                    if(card.name=='sha'&&get.distance(player,target)>1){
+                        for(var i=0;i<ui.selected.targets.length;i++){
+                            if(get.distance(player,ui.selected.targets[i])>1){
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        yihun:{
+            trigger:{player:'phaseEnd'},
+            direct:true,
+            filter:function(event,player){
+                return player.num('he',{suit:'spade'})>0;
+            },
+            content:function(){
+                'step 0'
+                var next=player.chooseToDiscard('是否发动【移魂】？','he',{suit:'spade'});
+                next.ai=function(card){
+                    return 6-ai.get.value(card);
+                };
+                next.logSkill='yihun'
+                'step 1'
+                if(result.bool){
+                    player.addTempSkill('yihun2',{player:'phaseBegin'});
+                }
+            }
+        },
+        yihun2:{
+            mod:{
+				targetEnabled:function(){
+					return false;
+				},
+				cardEnabled:function(card,player){
+					return false;
+				}
+			}
+        },
         huoyu:{
             enable:'phaseUse',
             unique:true,
@@ -26,6 +442,7 @@ character.ow={
 			},
 			filter:function(event,player){
 				if(player.storage.huoyu) return false;
+                if(player.num('he',{color:'red'})<2) return false;
                 return true;
 			},
             filterTarget:function(card,player,target){
@@ -63,7 +480,7 @@ character.ow={
 				content:'limited'
 			}
         },
-        dangji:{
+        feidan:{
 			trigger:{source:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
@@ -86,10 +503,10 @@ character.ow={
                         targets.push(game.players[i]);
                     }
 				}
-                player.chooseToDiscard('是否发动【荡击】？').set('ai',function(card){
+                player.chooseToDiscard('是否发动【飞弹】？').set('ai',function(card){
                     if(eff>0) return 7-ai.get.value(card);
                     return 0;
-                }).set('logSkill',['dangji',targets]);
+                }).set('logSkill',['feidan',targets]);
 				"step 1"
 				if(result.bool){
 					event.targets.sort(lib.sort.seat);
@@ -549,8 +966,29 @@ character.ow={
         }
     },
     translate:{
-        dangji:'荡击',
-        dangji_info:'你的杀只能对距离1以外的角色使用；每当你使用杀造成伤害后，你可以弃置一张牌对距离目标1以内的其他角色各造成一点伤害',
+        tuji:'突击',
+        tuji_info:'锁定技，在你的回合内，你每使用一次牌后，你计算与其他角色的距离便减少1，直到回合结束',
+        mujing:'目镜',
+        mujing_info:'每当你对攻击范围不含你的角色使用一张牌，你可以弃置目标一张牌；若你的手牌数比目标少，你摸一张牌',
+        feiren:'飞刃',
+        feiren2:'飞刃',
+        feiren_info:'你的杀无视距离和防具；你的黑桃杀可以额外结算一次，梅花杀可以额外指定一个目标',
+        zhanlong:'斩龙',
+        zhanlong_info:'限定技，回合开始阶段，若你体力值为1，你可以弃置所有牌（至少一张），然后将三张杀置入你的手牌，若如此做，你本回合使用杀无次数限制',
+        xie:'谐',
+        xie2:'谐',
+        xie_info:'出牌阶段，你可以弃置一张红桃手牌并指定一名角色，该角色每隔两轮于回合结束阶段回复一点体力，直到你死亡。同一时间只能对一人发动',
+        luan:'乱',
+        luan2:'乱',
+        luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色每隔两轮于回合结束阶段失去一点体力，直到你死亡。同一时间只能对一人发动',
+        sheng:'圣',
+        sheng_info:'限定技，出牌阶段，你可以将你的武将牌翻面，然后令任意名角色回复一点体力，若如此做，你不能成为其他角色的卡牌目标直到下一回合开始',
+        xiandan:'霰弹',
+        xiandan_info:'你的杀可以指定距离1以内的角色为额外目标',
+        yihun:'移魂',
+        yihun_info:'回合结束阶段，你可以弃置一张黑桃牌，若如此做，你不能使用卡牌，也不能成为卡牌的目标，直到下一回合开始',
+        feidan:'飞弹',
+        feidan_info:'你的杀只能对距离1以外的角色使用；每当你使用杀造成伤害后，你可以弃置一张牌对距离目标1以内的其他角色各造成一点伤害',
         huoyu:'火雨',
         huoyu_info:'限定技，出牌阶段，你可以弃置两张红色牌，视为使用两张炽羽袭',
         yuedong:'乐动',

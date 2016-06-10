@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.15',
+    version:'1.8.16',
     changeLog:[
         '修bug',
     ],
@@ -10,6 +10,9 @@ window.noname_update={
             'character/gujian.js',
             'character/hearth.js',
             'character/yxs.js',
+            'character/boss.js',
+            'character/shenhua.js',
+            'character/sp.js',
             'card/swd.js',
             'card/hearth.js',
             'card/shenqi.js',

@@ -174,6 +174,7 @@ character.sp={
 			priority:15,
 			audio:'shefu',
 			filter:function(event,player){
+				if(_status.currentPhase==player) return false;
 				if(event.name=='respond'){
 					if(event.getParent(2).name!='sha') return false;
 				}

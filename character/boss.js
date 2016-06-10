@@ -2822,6 +2822,7 @@ character.boss={
 			unique:true,
 			mod:{
 				selectTarget:function(card,player,range){
+					if(range[1]==-1) return;
 					if(card.name=='sha'||card.name=='juedou') range[1]=3;
 				},
 			}

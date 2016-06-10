@@ -690,7 +690,8 @@ character.shenhua={
 							}
 						}
 						if(!hasfriend) return;
-						if(get.tag(card,'damage')==1&&target.hp==2&&_status.currentPhase!=target) return [0.5,1];
+						if(get.tag(card,'damage')==1&&target.hp==2&&!target.isTurnedOver()&&
+                        _status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
 					}
 				}
 			}

@@ -23,7 +23,15 @@ character.gujian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('魅影：是否弃置一张红色牌视为对'+get.translation(trigger.player)+'使用一张杀？').logSkill=['meiying',trigger.player];
+				var next=player.chooseToDiscard('魅影：是否弃置一张红色牌视为对'+get.translation(trigger.player)+'使用一张杀？');
+				next.logSkill=['meiying',trigger.player];
+				var eff=ai.get.effect(trigger.player,{name:'sha'},player,player);
+				next.ai=function(card){
+					if(eff>0){
+						return 7-ai.get.value(card);
+					}
+					return 0;
+				}
 				"step 1"
 				if(result.bool){
 					player.useCard({name:'sha'},trigger.player).animate=false;
