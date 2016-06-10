@@ -21440,8 +21440,13 @@
     								script.remove();
     								var update=window.noname_update;
     								delete window.noname_update;
-    								if(forcecheck===false&&update.version==lib.config.check_version){
-    									return;
+    								if(forcecheck===false){
+                                        if(update.version==lib.config.check_version){
+                                            return;
+                                        }
+                                        if(update.version.indexOf('beta')!=-1){
+                                            return;
+                                        }
     								}
     								game.saveConfig('check_version',update.version);
                                     var bool;

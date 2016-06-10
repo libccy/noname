@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.15beta',
+    version:'1.8.15',
     changeLog:[
         '修bug',
         '新武将'
@@ -10,6 +10,7 @@ window.noname_update={
             'character/swd.js',
             'character/gujian.js',
             'character/hearth.js',
+            'character/yijiang.js',
             'character/yxs.js',
             'character/boss.js',
             'character/shenhua.js',
@@ -23,7 +24,9 @@ window.noname_update={
             'game/source.js',
             'game/asset.js',
             'image/card/fengxueren.png',
+            'layout/default/layout.css'
         ],
-        '1.8.14.2':[]
+        '1.8.14.2':[],
+        '1.8.15':[]
     }
 }
