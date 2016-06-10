@@ -183,7 +183,7 @@ character.ow={
             trigger:{player:'phaseEnd'},
             forced:true,
             filter:function(event,player){
-                return player.storage.xie%2==1;
+                return player.storage.xie%2==1&&player.hp<player.maxHp;
             },
             content:function(){
                 player.recover();
@@ -609,6 +609,7 @@ character.ow={
             filterCard:true,
             selectCard:function(){
                 if(_status.event.player.storage.yuedong_eff) return 1;
+                if(_status.event.player.storage.yuedong_num) return 2;
                 return [1,2];
             },
             position:'he',
@@ -676,6 +677,7 @@ character.ow={
         guangshu:{
             enable:'phaseUse',
             check:function(card){
+                var player=_status.event.player;
                 var suit=get.suit(card);
                 if(suit=='heart'){
                     for(var i=0;i<game.players.length;i++){

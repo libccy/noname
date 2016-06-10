@@ -703,7 +703,7 @@ card.swd={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event){
-				return event.nature=='fire';
+				return event.nature=='fire'&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;

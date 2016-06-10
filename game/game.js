@@ -4784,7 +4784,7 @@
                             }
                             if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
                                 var tw=event.getTrigger().parent;
-                                if(tw.player==player&&tw.targets&&tw.targets.length==1){
+                                if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1){
                                     event.result={
                                         bool:false
                                     }

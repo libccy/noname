@@ -40,10 +40,10 @@ mode.chess={
 		}
 		if(get.config('chess_card')){
 			lib.card.list=lib.card.list.concat(lib.chess_cardlist);
-		}
-		if(parseFloat(get.config('chess_obstacle'))>0&&_status.mode!='tafang'){
-			lib.card.list=lib.card.list.concat(lib.chess_obstaclelist);
-			delete lib.chess_obstaclelist
+			if(parseFloat(get.config('chess_obstacle'))>0&&_status.mode!='tafang'){
+				lib.card.list=lib.card.list.concat(lib.chess_obstaclelist);
+				delete lib.chess_obstaclelist
+			}
 		}
 		ui.create.cards();
 		game.finishCards();
@@ -4126,7 +4126,9 @@ mode.chess={
 				ui.control.style.top='';
 				ui.control.style.transition='';
 
-
+				for(var i=0;i<result.links.length;i++){
+					game.addRecentCharacter(result.links[i]);
+				}
 				if(_status.mode=='combat'){
 					_status.mylist=result.links.slice(0,parseInt(get.config('battle_number')));
 					_status.replacelist=result.links.slice(parseInt(get.config('battle_number')));
@@ -6234,13 +6236,13 @@ mode.chess={
 	},
 	chess_cardlist:[],
 	chess_obstaclelist:[
-		['club',3,'chess_shezhang'],
-		['spade',5,'chess_shezhang'],
-		['spade',7,'chess_shezhang'],
-		['diamond',1,'chess_chuzhang'],
-		['diamond',4,'chess_chuzhang'],
-		['heart',8,'chess_chuzhang'],
-		// ['diamond',9,'chess_chuzhang'],
+		// ['club',3,'chess_shezhang'],
+		// ['spade',5,'chess_shezhang'],
+		// ['spade',7,'chess_shezhang'],
+		// ['diamond',1,'chess_chuzhang'],
+		// ['diamond',4,'chess_chuzhang'],
+		// ['heart',8,'chess_chuzhang'],
+		// // ['diamond',9,'chess_chuzhang'],
 	],
 	rank:{
 		rarity:{
@@ -6273,7 +6275,6 @@ mode.chess={
 	            'swd_murongshi',
 	            'shen_lvmeng',
 	            'chenlin',
-	            'hs_zhouzhuo',
 	            'diy_caiwenji',
 	            're_luxun',
 	            'shen_zhaoyun',
@@ -6282,8 +6283,24 @@ mode.chess={
 	            'shen_simayi',
 	            'shen_guanyu',
 	            'hs_siwangzhiyi',
+				'chengyu',
+				'yangxiu',
+				'hs_yogg',
+				'hs_malygos',
+				'hs_ysera',
+				'hanba',
 	        ],
 	        epic:[
+				'lingju',
+				'daxiaoqiao',
+				'sunxiu',
+				'swd_weida',
+				'swd_lilian',
+				'yxs_luban',
+				'hs_alextrasza',
+				'zhugeguo',
+				'sp_caiwenji',
+				'ow_yuanshi',
 	            'xk_fujianhan',
 	            'diy_zhenji',
 	            'swd_jipeng',
@@ -6333,8 +6350,64 @@ mode.chess={
 	            'gjqt_fanglansheng',
 	            'swd_qiner',
 	            'hs_xsylvanas',
+				'zhongyao',
+				'hs_blingtron',
+				'hs_fuding',
+				'shixie',
+				'hs_lafamu',
+				'hs_nozdormu',
+				'ow_tianshi',
+				'yxs_guiguzi',
+				'ow_zhixuzhiguang',
+				'hs_jiaziruila',
+				'hs_yelise',
+				'hs_xuefashi',
+				'hs_liadrin',
+				'yxs_libai',
 	        ],
 	        rare:[
+				'sunluban',
+				'sunluyu',
+				'zhangliang',
+				'zhangbao',
+				'sp_zhangjiao',
+				'swd_xiyan',
+				'sunluban',
+				'ow_falaozhiying',
+				'yxs_kaisa',
+				'yxs_napolun',
+				'hs_nate',
+				'yxs_jinke',
+				'yxs_yuefei',
+				'guyong',
+				'hs_anomalus',
+				'hs_jinglinglong',
+				'jiangqing',
+				'mayunlu',
+				're_liubei',
+				're_lidian',
+				'hs_alleria',
+				'jsp_huangyueying',
+				'hs_lreno',
+				'hs_zhouzhuo',
+				'cenhun',
+				'hs_loatheb',
+				'sunziliufang',
+				'hs_finley',
+				'ow_chanyata',
+				'yxs_huamulan',
+				'cuiyan',
+				'wangji',
+				'xin_liru',
+				'swd_quxian',
+				'caorui',
+				'ow_liekong',
+				'ow_zhixuzhiguang',
+				'lifeng',
+				'sundeng',
+				'hs_xialikeer',
+				'hs_sainaliusi',
+				'hs_lrhonin',
 	            'yxs_diaochan',
 	            'hs_anduin',
 	            'swd_hengai',
@@ -6349,6 +6422,7 @@ mode.chess={
 	            'diy_yuji',
 	            're_zhangliao',
 	            'caoang',
+				'hs_zhishigushu',
 	            'pal_jingtian',
 	            'swd_shanxiaoxiao',
 	            'yxs_caocao',

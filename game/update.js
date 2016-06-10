@@ -1,32 +1,16 @@
 window.noname_update={
-    version:'1.8.15',
+    version:'1.8.16',
     changeLog:[
         '修bug',
-        '新武将'
     ],
     files:{
         global:[
+            'character/rank.js',
             'character/ow.js',
-            'character/swd.js',
-            'character/gujian.js',
-            'character/hearth.js',
-            'character/yijiang.js',
-            'character/yxs.js',
-            'character/boss.js',
-            'character/shenhua.js',
-            'character/sp.js',
-            'card/swd.js',
-            'card/hearth.js',
-            'card/shenqi.js',
-            'card/guozhan.js',
-            'game/package.js',
+            'mode/chess.js',
             'game/game.js',
-            'game/source.js',
-            'game/asset.js',
-            'image/card/fengxueren.png',
-            'layout/default/layout.css'
+            'card/swd.js',
         ],
-        '1.8.14.2':[],
         '1.8.15':[]
     }
 }
