@@ -22720,8 +22720,8 @@
                         newlined2.style.display='none';
                     }
                 });
-
-                for(var i=0;i<lib.config.characters.length;i++){
+                for(var i=0;i<lib.config.all.characters.length;i++){
+                    if(!lib.config.characters.contains(lib.config.all.characters[i])) continue;
                     var span=document.createElement('div');
                     span.style.display='inline-block';
                     span.style.width='auto';
@@ -22732,8 +22732,8 @@
                     else{
                         span.style.fontSize='22px';
                     }
-                    span.innerHTML=lib.translate[lib.config.characters[i]+'_character_config'];
-                    span.link=lib.config.characters[i];
+                    span.innerHTML=lib.translate[lib.config.all.characters[i]+'_character_config'];
+                    span.link=lib.config.all.characters[i];
                     span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
                     newlined2.appendChild(span);
                 }
@@ -26205,14 +26205,14 @@
 					widths.push(ui.control.childNodes[i].offsetWidth);
 				}
 				controls.push(ui.control.childNodes[i]);
-				if(i>0){
-					if(lib.config.layout=='phone'){
-						width+=12;
-					}
-					else{
-						width+=6;
-					}
-				}
+				// if(i>0){
+				// 	if(lib.config.layout=='phone'){
+				// 		width+=12;
+				// 	}
+				// 	else{
+				// 		width+=6;
+				// 	}
+				// }
 			}
 			if(!controls.length) return;
 			var offset=-length/2;

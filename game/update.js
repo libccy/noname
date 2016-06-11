@@ -1,7 +1,7 @@
 window.noname_update={
-    version:'1.8.16',
+    version:'1.8.15.1',
     changeLog:[
-        '修bug',
+        '',
     ],
     files:{
         global:[
@@ -19,6 +19,7 @@ window.noname_update={
             'card/standard.js',
             'layout/default/layout.css',
         ],
-        '1.8.15':[]
+        '1.8.15':[],
+        '1.8.15.1':[]
     }
 }
