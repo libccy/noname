@@ -8,10 +8,16 @@ window.noname_update={
             'character/rank.js',
             'character/ow.js',
             'character/yijiang.js',
+            'mode/identity.js',
+            'mode/guozhan.js',
+            'mode/versus.js',
+            'mode/stone.js',
+            'mode/boss.js',
             'mode/chess.js',
             'game/game.js',
             'card/swd.js',
             'card/standard.js',
+            'layout/default/layout.css',
         ],
         '1.8.15':[]
     }

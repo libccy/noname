@@ -490,11 +490,12 @@ mode.guozhan={
 							event.list=event.list.concat(list);
 							event.list.randomSort();
 							list=event.list.splice(0,parseInt(get.config('choice_num')));
-							_status.event.dialog.close();
-							_status.event.dialog=ui.create.dialog('选择角色',[list,'character']);
-							if(get.config('change_identity')){
-								addSetting(_status.event.dialog);
-							}
+							var buttons=ui.create.div('.buttons');
+							var node=_status.event.dialog.buttons[0].parentNode;
+							_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
+							_status.event.dialog.content.insertBefore(buttons,node);
+							buttons.animate('start');
+							node.remove();
 							game.uncheck();
 							game.check();
 						});

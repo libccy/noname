@@ -398,6 +398,40 @@ table{table-layout: fixed;}
 	display: block;
 	position: relative;
 }
+.dialog.character>.content-container{
+	width: calc(100% - 136px);
+	left: 136px;
+}
+.dialog.character>.packnode{
+	width: 136px;
+	left: 0;
+	height: 100%;
+	position: absolute;
+	overflow: scroll;
+}
+.dialog.character>.packnode>div{
+	/*box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
+	border-radius: 4px;
+	font-family:'STXinwei','xinwei';
+
+	text-align:center;
+	display:inline-block;
+	padding:5px;*/
+
+	font-size:26px;
+	line-height:26px;
+
+	width: calc(100% - 30px);
+	margin-top: 9px;
+	margin-left: 10px;
+
+	white-space: nowrap;
+	position: relative;
+}
+.dialog.character>.packnode>div:last-child{
+	margin-bottom: 9px;
+}
 #sidebar>div,#sidebar3>div{margin: 10px;position: relative;display: block;min-height: 5px;}
 #scrollzone1{left: 0;}
 #scrollzone2{left: calc(50% - 140px);}
@@ -1386,6 +1420,7 @@ span[data-nature='woodmm']{
 .player .identity[data-color="wei"],
 .player .identity[data-color="falsezhu"],
 .player .identity[data-color="friend"],
+.water,
 div[data-nature='water'],
 span[data-nature='water']{
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 10px,
@@ -1586,6 +1621,9 @@ span[data-color="unknownm"]{
 .thundertext,
 .controlthundertext{
 	color: rgb(117,186,255);
+}
+.whitetext .thundertext{
+	color: white;
 }
 .poisontext{
 	color: rgb(104,221,127);

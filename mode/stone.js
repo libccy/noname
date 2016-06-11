@@ -1471,10 +1471,14 @@ mode.stone={
 						game.changeCoin(-3);
 					}
 					list.randomSort();
-					_status.event.dialog.close();
-					_status.event.dialog=ui.create.dialog('按顺序选择出场角色'+(get.config('double_character')?'（双将）':''));
-					_status.event.dialog.add('0/'+(get.config('double_character')?2:1)*get.config('battle_number'));
-					_status.event.dialog.add([list.slice(0,get.config('battle_number')*2+5),'character']);
+
+					var buttons=ui.create.div('.buttons');
+					var node=_status.event.dialog.buttons[0].parentNode;
+					_status.event.dialog.buttons=ui.create.buttons(list.slice(0,get.config('battle_number')*2+5),'character',buttons);
+					_status.event.dialog.content.insertBefore(buttons,node);
+					buttons.animate('start');
+					node.remove();
+					
 					game.uncheck();
 					game.check();
 				};

@@ -450,8 +450,12 @@ mode.versus={
 								if(game.changeCoin){
 									game.changeCoin(-3);
 								}
-								_status.event.dialog.close();
-								_status.event.dialog=ui.create.dialog('选择角色',[list[game.me.identity+'list'].randomGets(8),'character']);
+								var buttons=ui.create.div('.buttons');
+								var node=_status.event.dialog.buttons[0].parentNode;
+								_status.event.dialog.buttons=ui.create.buttons(list[game.me.identity+'list'].randomGets(8),'character',buttons);
+								_status.event.dialog.content.insertBefore(buttons,node);
+								buttons.animate('start');
+								node.remove();
 								game.uncheck();
 								game.check();
 							});
@@ -682,11 +686,12 @@ mode.versus={
 						if(game.changeCoin){
 							game.changeCoin(-3);
 						}
-						_status.event.dialog.close();
-						_status.event.dialog=ui.create.dialog('选择角色',[list.randomGets(7),'character']);
-						if(get.config('change_identity')){
-							addSetting(dialog);
-						}
+						var buttons=ui.create.div('.buttons');
+						var node=_status.event.dialog.buttons[0].parentNode;
+						_status.event.dialog.buttons=ui.create.buttons(list.randomGets(7),'character',buttons);
+						_status.event.dialog.content.insertBefore(buttons,node);
+						buttons.animate('start');
+						node.remove();
 						game.uncheck();
 						game.check();
 					});
@@ -1024,18 +1029,28 @@ mode.versus={
 				ui.create.cheat=function(){
 					_status.createControl=event.fill;
 					ui.cheat=ui.create.control('更换',function(){
+						if(_status.choosefinished){
+							return;
+						}
 						if(lib.storage.choice=='∞'){
 							list.sort(sortByGroup);
 						}
 						else{
 							list.randomSort();
 						}
-						event.dialog.close();
 						_status.friend.length=0;
 						_status.enemy.length=0;
 						var choice=(lib.storage.choice=='∞')?list.length:lib.storage.choice;
-						event.dialog=ui.create.dialog('选择角色',[list.slice(0,choice),'character']);
-						event.check();
+
+						ui.dialog.content.firstChild.innerHTML='选择角色';
+						var buttons=ui.create.div('.buttons');
+						var node=_status.event.dialog.buttons[0].parentNode;
+						_status.event.dialog.buttons=ui.create.buttons(list.slice(0,choice),'character',buttons);
+						_status.event.dialog.content.insertBefore(buttons,node);
+						buttons.animate('start');
+						node.remove();
+
+						// event.check();
 					});
 					delete _status.createControl;
 				}
@@ -1139,6 +1154,10 @@ mode.versus={
 					if(_status.friend.length==_status.enemy.length&&_status.friend.length>=dialog.versus_number.link+dialog.replace_number.link){
 						event.fill.firstChild.innerHTML='开始';
 						_status.choosefinished=true;
+						if(ui.cheat){
+							ui.cheat.close();
+							delete ui.cheat;
+						}
 					}
 					game.save('zhu',dialog.versus_zhu.link);
 					if(lib.storage.zhu){

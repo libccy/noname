@@ -181,6 +181,7 @@ mode.boss={
 		var boss=ui.create.player().init(event.current.name);
 		game.boss=boss;
 		boss.side=true;
+		boss.node.equips.style.opacity='0';
 		if(!event.noslide){
 			// boss.classList.add('bossplayer');
 			// boss.classList.add('highlight');
@@ -308,6 +309,9 @@ mode.boss={
 		boss.style.left='';
 		boss.style.top='';
 		boss.style.position='';
+		setTimeout(function(){
+			boss.node.equips.style.opacity='';
+		},500);
 
 		event.bosslist.delete();
 
@@ -550,14 +554,14 @@ mode.boss={
 						game.changeCoin(-3);
 					}
 					list.randomSort();
-					_status.event.dialog.close();
-					_status.event.dialog=ui.create.dialog('选择参战角色','hidden');
-					ui.window.appendChild(_status.event.dialog);
-					_status.event.dialog.classList.add('bosscharacter');
-					_status.event.dialog.classList.add('withbg');
-					_status.event.dialog.classList.add('fixed');
-					// _status.event.dialog.add('0/3');
-					_status.event.dialog.add([list.slice(0,20),'character']);
+
+					var buttons=ui.create.div('.buttons');
+					var node=_status.event.dialog.buttons[0].parentNode;
+					_status.event.dialog.buttons=ui.create.buttons(list.slice(0,20),'character',buttons);
+					_status.event.dialog.content.insertBefore(buttons,node);
+					buttons.animate('start');
+					node.remove();
+
 					game.uncheck();
 					game.check();
 				};

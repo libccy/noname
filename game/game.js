@@ -867,6 +867,15 @@
 							ui.click.resetround();
 						}
 					},
+                    character_dialog_style:{
+                        name:'自由选将样式',
+                        init:'old',
+                        item:{
+                            newstyle:'新版',
+                            old:'默认',
+                        },
+                        unfrequent:true,
+                    },
                     character_dialog_tool:{
                         name:'自由选将显示',
                         init:'最近',
@@ -874,7 +883,7 @@
                             '收藏':'收藏',
                             '最近':'最近',
                             '自创':'自创',
-                            all:'全部'
+                            all:'默认'
                         },
                         unfrequent:true,
                     },
@@ -11625,7 +11634,7 @@
 
 					if(lib.config.button_press){
 						node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
-							node.classList.add('controlthundertext');
+							// node.classList.add('controlthundertext');
 							node.parentNode.classList.add('controlpressdown');
 							node.parentNode.classList.add('controlpressdownx');
                             if(typeof node.parentNode._offset=='number'){
@@ -11636,7 +11645,7 @@
                             if(typeof node.parentNode._offset=='number'){
                                 node.parentNode.style.transform='translateX('+node.parentNode._offset+'px)';
                             }
-							node.classList.remove('controlthundertext');
+							// node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
 							node.parentNode.classList.remove('controlpressdownx');
 						});
@@ -11644,7 +11653,7 @@
                             if(typeof node.parentNode._offset=='number'){
                                 node.parentNode.style.transform='translateX('+node.parentNode._offset+'px)';
                             }
-							node.classList.remove('controlthundertext');
+							// node.classList.remove('controlthundertext');
 							node.parentNode.classList.remove('controlpressdown');
 							node.parentNode.classList.remove('controlpressdownx');
 						});
@@ -11994,6 +12003,27 @@
 			},
 		},
 		sort:{
+            character:function(a,b){
+                var groupSort=function(name){
+                    if(lib.character[name][1]=='wei') return 0;
+                    if(lib.character[name][1]=='shu') return 1;
+                    if(lib.character[name][1]=='wu') return 2;
+                    if(lib.character[name][1]=='qun') return 3;
+                }
+                var del=groupSort(a)-groupSort(b);
+                if(del!=0) return del;
+                var aa=a,bb=b;
+                if(a.indexOf('_')!=-1){
+                    a=a.slice(a.indexOf('_')+1);
+                }
+                if(b.indexOf('_')!=-1){
+                    b=b.slice(b.indexOf('_')+1);
+                }
+                if(a!=b){
+                    return a>b?1:-1;
+                }
+                return aa>bb?1:-1;
+            },
 			random:function(){
 				return (Math.random()-0.5);
 			},
@@ -19729,6 +19759,27 @@
 						for(var i in info){
 							list.push(i);
 						}
+                        var groupSort=function(name){
+                            if(info[name][1]=='wei') return 0;
+                            if(info[name][1]=='shu') return 1;
+                            if(info[name][1]=='wu') return 2;
+                            if(info[name][1]=='qun') return 3;
+                        }
+                        list.sort(function(a,b){
+                            var del=groupSort(a)-groupSort(b);
+                            if(del!=0) return del;
+                            var aa=a,bb=b;
+                            if(a.indexOf('_')!=-1){
+                                a=a.slice(a.indexOf('_')+1);
+                            }
+                            if(b.indexOf('_')!=-1){
+                                b=b.slice(b.indexOf('_')+1);
+                            }
+                            if(a!=b){
+                                return a>b?1:-1;
+                            }
+                            return aa>bb?1:-1;
+                        });
 						var cfgnode=createConfig({
 							name:'开启',
 							_name:mode,
@@ -22292,7 +22343,123 @@
 				}
 				return ui.create.characterDialog.apply(this,args);
 			},
+            characterDialog2:function(filter){
+                var list=[];
+                for(var i in lib.character){
+                    if(lib.character[i][4].contains('minskin')) continue;
+                    if(lib.character[i][4].contains('boss')||lib.character[i][4].contains('hiddenboss')){
+                        if(lib.config.mode=='boss') continue;
+                        if(!lib.character[i][4].contains('bossallowed')) continue;
+                    }
+
+                    if(lib.character[i][4].contains('stonehidden')) continue;
+                    if(lib.config.banned.contains(i)) continue;
+                    if(filter&&filter(i)) continue;
+                    list.push(i);
+                }
+				var dialog=ui.create.dialog('hidden');
+                dialog.classList.add('noupdate');
+                dialog.classList.add('scroll1');
+                dialog.classList.add('scroll2');
+                list.sort(lib.sort.character);
+                dialog.classList.add('character');
+                var getPack=function(name){
+                    for(var i in lib.characterPack){
+                        if(lib.characterPack[i][name]) return i;
+                    }
+                    if(lib.customCharacters.contains(name)) return 'custom';
+                    return null;
+                }
+                var packs={};
+                for(var i=0;i<list.length;i++){
+                    var pack=getPack(list[i]);
+                    if(pack){
+                        if(!packs[pack]){
+                            packs[pack]=[];
+                        }
+                        packs[pack].push(list[i]);
+                    }
+                }
+                var packnode=ui.create.div('.packnode',dialog);
+                lib.setScroll(packnode);
+                var clickCapt=function(){
+                    var active=this.parentNode.querySelector('.active');
+                    if(active){
+                        active.buttonnode.remove();
+                        active.classList.remove('active');
+                    }
+                    this.classList.add('active');
+                    dialog.content.appendChild(this.buttonnode);
+                    dialog.buttons=this.buttons;
+                    game.uncheck();
+                    game.check();
+                }
+                var createNode=function(packname){
+                    var translate;
+                    if(packname=='custom'){
+                        translate='自定义';
+                    }
+                    else if(packname=='recent'){
+                        translate='最近';
+                        packs[packname]=lib.config.recentCharacter;
+                    }
+                    else if(packname=='favourite'){
+                        translate='收藏';
+                        packs[packname]=lib.config.favouriteCharacter;
+                        packs[packname].sort(lib.sort.character);
+                    }
+                    else{
+                        translate=lib.translate[packname+'_character_config'];
+                    }
+                    var node=ui.create.div('.dialogbutton.menubutton.large',translate,packnode,clickCapt);
+                    node.buttonnode=ui.create.div('.buttons');
+                    node.buttons=ui.create.buttons(packs[packname],'character',node.buttonnode);
+                    return node;
+                }
+                var bool=true;
+                if(lib.config.recentCharacter.length){
+                    var node=createNode('recent');
+                    if(lib.config.character_dialog_tool=='最近'){
+                        clickCapt.call(node);
+                        bool=false;
+                    }
+                }
+                if(lib.config.favouriteCharacter.length){
+                    var node=createNode('favourite');
+                    if(lib.config.character_dialog_tool=='收藏'){
+                        clickCapt.call(node);
+                        bool=false;
+                    }
+                }
+                if(packs.custom){
+                    var node=createNode('custom');
+                    if(lib.config.character_dialog_tool=='自创'){
+                        clickCapt.call(node);
+                        bool=false;
+                    }
+                }
+                for(var i=0;i<lib.config.all.characters.length;i++){
+                    var packname=lib.config.all.characters[i];
+                    if(packs[packname]){
+                        createNode(packname);
+                    }
+                }
+                if(bool){
+                    clickCapt.call(packnode.firstChild);
+                }
+                return dialog;
+            },
 			characterDialog:function(){
+                if(lib.config.character_dialog_style=='newstyle'){
+                    for(var i=0;i<arguments.length;i++){
+                        if(arguments[i]=='thisiscard'){
+                            break;
+                        }
+                    }
+                    if(i==arguments.length){
+                        return ui.create.characterDialog2.apply(this,arguments);
+                    }
+                }
 				var filter,str,noclick,thisiscard,seperate,expandall;
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
@@ -22323,7 +22490,7 @@
 				var namecapt=[];
 				var getCapt=function(str){
 					if(lib.customCharacters.contains(str)){
-						return '自创';
+						return '自定义';
 					}
 					var capt;
 					if(str.indexOf('_')==-1){
@@ -22334,7 +22501,7 @@
 					}
 					capt=capt.toLowerCase();
 					if(!/[a-z]/i.test(capt)){
-                        capt='自创';
+                        capt='自定义';
 					}
 					return capt;
 				}
@@ -22369,20 +22536,25 @@
 					return a>b?1:-1;
 				});
                 if(!thisiscard){
-                    namecapt.remove('自创');
+                    namecapt.remove('自定义');
                     namecapt.push('newline');
                     for(var i in lib.characterDialogGroup){
                         namecapt.push(i);
                     }
-                    namecapt.push('自创');
                 }
                 var newlined=false;
+                var newlined2;
+                var packsource;
 				var clickCapt=function(e){
 					if(_status.dragged) return;
+                    newlined2.style.display='none';
+                    packsource.innerHTML='武将包';
+                    packsource.classList.remove('thundertext');
 					if(this.classList.contains('thundertext')){
 						dialog.currentcapt=null;
 						dialog.currentcaptnode=null;
 						this.classList.remove('thundertext');
+                        // this.dataset.nature='';
 						for(var i=0;i<dialog.buttons.length;i++){
 							if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
 								dialog.buttons[i].classList.add('nodisplay');
@@ -22393,12 +22565,18 @@
 						}
 					}
 					else{
+                        // this.dataset.nature=this._nature||'metalm';
 						if(dialog.currentcaptnode){
 							dialog.currentcaptnode.classList.remove('thundertext');
+                            // dialog.currentcaptnode.dataset.nature='';
 						}
 						dialog.currentcapt=this.link;
 						dialog.currentcaptnode=this;
 						this.classList.add('thundertext');
+                        if(this.parentNode==newlined2){
+                            packsource.innerHTML=this.innerHTML;
+                            packsource.classList.add('thundertext');
+                        }
 						for(var i=0;i<dialog.buttons.length;i++){
 							if(dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)||
 							(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup)){
@@ -22429,7 +22607,12 @@
                         newlined.style.marginTop='5px';
                         newlined.style.display='block';
                         newlined.style.fontFamily='xinwei';
-                        newlined.style.fontSize='22px';
+                        if(lib.config.layout=='phone'){
+                            newlined.style.fontSize='32px';
+                        }
+                        else{
+                            newlined.style.fontSize='22px';
+                        }
                         newlined.style.textAlign='center';
                         node.appendChild(newlined);
                     }
@@ -22441,6 +22624,12 @@
     					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
     					newlined.appendChild(span);
                         node[namecapt[i]]=span;
+                        if(namecapt[i]=='收藏'){
+                            span._nature='fire';
+                        }
+                        else{
+                            span._nature='wood';
+                        }
                     }
                     else{
                         var span=document.createElement('span');
@@ -22450,6 +22639,116 @@
     					node.appendChild(span);
                     }
 				}
+                var groups=['wei','shu','wu','qun'];
+                var natures=['water','soil','wood','metal'];
+                var span=document.createElement('span');
+                newlined.appendChild(span);
+                span.style.margin='8px';
+                var clickGroup=function(){
+                    var node=this,link=this.link;
+                    if(node.classList.contains('thundertext')){
+						dialog.currentgroup=null;
+						dialog.currentgroupnode=null;
+						node.classList.remove('thundertext');
+                        // node.dataset.nature='';
+						for(var i=0;i<dialog.buttons.length;i++){
+							if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
+								dialog.buttons[i].classList.add('nodisplay');
+							}
+							else{
+								dialog.buttons[i].classList.remove('nodisplay');
+							}
+						}
+					}
+					else{
+						if(dialog.currentgroupnode){
+							dialog.currentgroupnode.classList.remove('thundertext');
+							// dialog.currentgroupnode.dataset.nature='';
+						}
+						dialog.currentgroup=link;
+						dialog.currentgroupnode=node;
+						node.classList.add('thundertext');
+                        // node.dataset.nature=node._nature;
+						for(var i=0;i<dialog.buttons.length;i++){
+							if(dialog.buttons[i].group!=link||
+							(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt))){
+								dialog.buttons[i].classList.add('nodisplay');
+							}
+							else{
+								dialog.buttons[i].classList.remove('nodisplay');
+							}
+						}
+					}
+                };
+                for(var i=0;i<groups.length;i++){
+                    var span=document.createElement('span');
+                    span.style.margin='3px';
+                    newlined.appendChild(span);
+                    span.innerHTML=get.translation(groups[i]);
+                    span.link=groups[i];
+                    span._nature=natures[i];
+                    span.addEventListener(lib.config.touchscreen?'touchend':'click',clickGroup);
+                }
+
+                var span=document.createElement('span');
+                newlined.appendChild(span);
+                span.style.margin='8px';
+
+                packsource=document.createElement('span');
+                packsource.style.margin='3px';
+                newlined.appendChild(packsource);
+                packsource.innerHTML='武将包';
+
+                newlined2=document.createElement('div');
+                newlined2.style.marginTop='5px';
+                newlined2.style.display='none';
+                newlined2.style.fontFamily='xinwei';
+                if(lib.config.layout=='phone'){
+                    newlined2.style.fontSize='32px';
+                }
+                else{
+                    newlined2.style.fontSize='22px';
+                }
+                newlined2.style.textAlign='center';
+                node.appendChild(newlined2);
+
+                packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+                    if(newlined2.style.display=='none'){
+                        newlined2.style.display='block';
+                    }
+                    else{
+                        newlined2.style.display='none';
+                    }
+                });
+
+                for(var i=0;i<lib.config.characters.length;i++){
+                    var span=document.createElement('div');
+                    span.style.display='inline-block';
+                    span.style.width='auto';
+                    span.style.margin='5px';
+                    if(lib.config.layout=='phone'){
+                        span.style.fontSize='32px';
+                    }
+                    else{
+                        span.style.fontSize='22px';
+                    }
+                    span.innerHTML=lib.translate[lib.config.characters[i]+'_character_config'];
+                    span.link=lib.config.characters[i];
+                    span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+                    newlined2.appendChild(span);
+                }
+                if(lib.customCharacters.length){
+                    var span=document.createElement('div');
+                    span.style.display='inline-block';
+                    span.style.width='auto';
+                    span.style.margin='5px';
+                    // span.style.fontSize='20px';
+                    span.innerHTML='自定义';
+                    span.link='自定义';
+                    span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+                    newlined2.appendChild(span);
+                }
+
 				var groupSort;
 				if(thisiscard){
 					groupSort=function(name){
@@ -22498,6 +22797,12 @@
                 dialog.getCurrentCapt=function(link,capt){
                     if(lib.characterDialogGroup[this.currentcapt]){
                         return lib.characterDialogGroup[this.currentcapt](link,capt);
+                    }
+                    if(lib.characterPack[this.currentcapt]){
+                        if(lib.characterPack[this.currentcapt][link]){
+                            return capt;
+                        }
+                        return null;
                     }
                     return this.currentcapt;
                 }
@@ -24561,6 +24866,10 @@
 			},
 			checkdialogtranslate:function(translate,dialog){
 				var translate=translate||dialog._dragtransform;
+                if(Math.sqrt(translate[0]*translate[0]+translate[1]*translate[1])<10){
+                    translate[0]=0;
+                    translate[1]=0;
+                }
 				dialog.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 			},
 			windowmousewheel:function(e){
