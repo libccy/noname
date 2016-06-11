@@ -4777,10 +4777,17 @@
                                 return;
                             }
                             if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&event.state>0){
-                                event.result={
-                                    bool:false
+                                var triggerevent=event.getTrigger();
+                                if(ui.tempnowuxie._origin==triggerevent.parent.id){
+                                    event.result={
+                                        bool:false
+                                    }
+                                    if(triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
+                                        ui.tempnowuxie.close();
+                                    }
+                                    return;
                                 }
-                                return;
+
                             }
                             if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
                                 var tw=event.getTrigger().parent;
@@ -25645,6 +25652,12 @@
 				this.classList.toggle('glow');
 				if(this.classList.contains('glow')&&_status.event.type=='wuxie'&&
 				_status.event.isMine()&&ui.confirm&&_status.imchoosing){
+                    var triggerevent=_status.event.getTrigger();
+                    if(triggerevent&&this._origin==triggerevent.parent.id){
+                        if(triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
+                            this.close();
+                        }
+                    }
 					ui.click.cancel(ui.confirm.lastChild);
 				}
 			},
