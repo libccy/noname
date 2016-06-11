@@ -159,10 +159,11 @@ character.ow={
                     current.removeSkill('xie2');
                 }
                 target.addSkill('xie2');
-                target.storage.xie=0;
+                target.storage.xie='now';
                 target.storage.xie2=player;
             },
             ai:{
+                expose:0.2,
                 order:9.1,
                 threaten:2,
                 result:{
@@ -180,32 +181,42 @@ character.ow={
         },
         xie2:{
             mark:true,
-            trigger:{player:'phaseEnd'},
+            trigger:{global:'phaseEnd'},
             forced:true,
             filter:function(event,player){
-                return player.storage.xie%2==1&&player.hp<player.maxHp;
+                if(player.storage.xie=='now'){
+                    return event.player==player;
+                }
+                var num=game.phaseNumber-player.storage.xie;
+                return num&&num%6==0;
             },
             content:function(){
+                if(player.storage.xie=='now'){
+                    player.storage.xie=game.phaseNumber;
+                }
                 player.recover();
             },
             intro:{
-                content:function(storage){
-                    return '每隔两轮回复一点体力，直到'+get.translation(storage)+'死亡';
+                content:function(storage,player){
+                    var str='每隔六回合回复一点体力，直到'+get.translation(storage)+'死亡';
+                    if(typeof player.storage.xie=='number'){
+                        var num=game.phaseNumber-player.storage.xie;
+                        num=num%6;
+                        if(num==0){
+                            str+='（下次生效于本回合）'
+                        }
+                        else{
+                            str+='（下次生效于'+(6-num)+'回合后）'
+                        }
+                    }
+                    return str;
                 },
                 onunmark:function(storage,player){
                     delete player.storage.xie;
                     delete player.storage.xie2;
                 }
             },
-            group:['xie3','xie4']
-        },
-        xie3:{
-            trigger:{player:'phaseBegin'},
-            forced:true,
-            popup:false,
-            content:function(){
-                player.storage.xie++;
-            }
+            group:['xie4']
         },
         xie4:{
             trigger:{global:'dieAfter'},
@@ -239,10 +250,11 @@ character.ow={
                     current.removeSkill('luan2');
                 }
                 target.addSkill('luan2');
-                target.storage.luan=0;
+                target.storage.luan='now';
                 target.storage.luan2=player;
             },
             ai:{
+                expose:0.2,
                 order:9.1,
                 threaten:2,
                 result:{
@@ -260,32 +272,42 @@ character.ow={
         },
         luan2:{
             mark:true,
-            trigger:{player:'phaseEnd'},
+            trigger:{global:'phaseEnd'},
             forced:true,
             filter:function(event,player){
-                return player.storage.luan%2==1;
+                if(player.storage.luan=='now'){
+                    return event.player==player;
+                }
+                var num=game.phaseNumber-player.storage.luan;
+                return num&&num%6==0;
             },
             content:function(){
+                if(player.storage.luan=='now'){
+                    player.storage.luan=game.phaseNumber;
+                }
                 player.loseHp();
             },
             intro:{
-                content:function(storage){
-                    return '每隔两轮失去一点体力，直到'+get.translation(storage)+'死亡';
+                content:function(storage,player){
+                    var str='每隔六回合失去一点体力，直到'+get.translation(storage)+'死亡';
+                    if(typeof player.storage.luan=='number'){
+                        var num=game.phaseNumber-player.storage.luan;
+                        num=num%6;
+                        if(num==0){
+                            str+='（下次生效于本回合）'
+                        }
+                        else{
+                            str+='（下次生效于'+(6-num)+'回合后）'
+                        }
+                    }
+                    return str;
                 },
                 onunmark:function(storage,player){
                     delete player.storage.luan;
                     delete player.storage.luan2;
                 }
             },
-            group:['luan3','luan4']
-        },
-        luan3:{
-            trigger:{player:'phaseBegin'},
-            forced:true,
-            popup:false,
-            content:function(){
-                player.storage.luan++;
-            }
+            group:['luan4']
         },
         luan4:{
             trigger:{global:'dieAfter'},
@@ -979,10 +1001,10 @@ character.ow={
         zhanlong_info:'限定技，回合开始阶段，若你体力值为1，你可以弃置所有牌（至少一张），然后将三张杀置入你的手牌，若如此做，你本回合使用杀无次数限制',
         xie:'谐',
         xie2:'谐',
-        xie_info:'出牌阶段，你可以弃置一张红桃手牌并指定一名角色，该角色每隔两轮于回合结束阶段回复一点体力，直到你死亡。同一时间只能对一人发动',
+        xie_info:'出牌阶段，你可以弃置一张红桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合回复一点体力，直到你死亡。同一时间只能对一人发动',
         luan:'乱',
         luan2:'乱',
-        luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色每隔两轮于回合结束阶段失去一点体力，直到你死亡。同一时间只能对一人发动',
+        luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合失去一点体力，直到你死亡。同一时间只能对一人发动',
         sheng:'圣',
         sheng_info:'限定技，出牌阶段，你可以将你的武将牌翻面，然后令任意名角色回复一点体力，若如此做，你不能成为其他角色的卡牌目标直到下一回合开始',
         xiandan:'霰弹',

@@ -7,9 +7,11 @@ window.noname_update={
         global:[
             'character/rank.js',
             'character/ow.js',
+            'character/yijiang.js',
             'mode/chess.js',
             'game/game.js',
             'card/swd.js',
+            'card/standard.js',
         ],
         '1.8.15':[]
     }

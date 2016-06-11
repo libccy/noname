@@ -104,6 +104,8 @@ window.characterRank={
         'hs_shanlingjuren',
         'hs_tgolem',
         'zhangrang',
+        'ow_chanyata',
+        'ow_tianshi',
     ],
     am:[
         'guohuanghou',
@@ -111,9 +113,7 @@ window.characterRank={
         'hs_blingtron',
         'ow_shibing',
         'hs_kcthun',
-        'ow_tianshi',
         'ow_zhixuzhiguang',
-        'ow_chanyata',
         'ow_falaozhiying',
         'hs_bolvar',
         'lifeng',

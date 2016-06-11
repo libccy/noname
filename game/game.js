@@ -6161,6 +6161,9 @@
 						next.preResult=event.preResult;
 					}
 					"step 5"
+                    if(event.postAi){
+                        event.player.logAi(event.targets,event.card);
+                    }
                     if(event._result){
                         event.result=event._result;
                     }
@@ -8668,7 +8671,13 @@
 						}
 					}
 					if(typeof this.logAi=='function'){
-						this.logAi(next.targets,next.card);
+                        var postAi=get.info(next.card).postAi;
+                        if(postAi&&postAi(next.targets)){
+                            next.postAi=true;
+                        }
+                        else{
+                            this.logAi(next.targets,next.card);
+                        }
 					}
 					next.content=lib.element.playerproto.useCard;
 					return next;
@@ -9065,6 +9074,14 @@
 				unMad:function(){
 					this.removeSkill('mad');
 				},
+                addExpose:function(num){
+                    if(typeof this.ai.shown=='number'&&!this.identityShown){
+                        this.ai.shown+=num;
+                        if(this.ai.shown>1){
+                            this.ai.shown=1;
+                        }
+                    }
+                },
 				equip:function(card){
 					var next=game.createEvent('equip');
 					next.card=card;
@@ -9733,6 +9750,9 @@
 				isDamaged:function(){
 					return this.hp<this.maxHp;
 				},
+                isHealthy:function(){
+                    return this.hp==this.maxHp;
+                },
 				isLinked:function(){
 					return this.classList.contains('linked');
 				},
@@ -9832,6 +9852,15 @@
                             if(game.players[i].ai.shown==0&&game.players[i]!=this){
                                 return true;
                             }
+                        }
+                    }
+                    return false;
+                },
+                isUnknown:function(player){
+                    var mode=get.mode();
+                    if(mode=='identity'||mode=='guozhan'){
+                        if(this.ai.shown==0&&this!=player){
+                            return true;
                         }
                     }
                     return false;

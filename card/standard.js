@@ -847,6 +847,9 @@ card.standard={
 			enable:true,
 			range:{global:1},
 			selectTarget:1,
+			postAi:function(targets){
+				return targets.length==1&&targets[0].num('j');
+			},
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				return (target.num('hej')>0);
@@ -912,6 +915,9 @@ card.standard={
 			type:'trick',
 			enable:true,
 			selectTarget:1,
+			postAi:function(targets){
+				return targets.length==1&&targets[0].num('j');
+			},
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				return (target.num('hej')>0);
@@ -1480,6 +1486,12 @@ card.standard={
 								return state*ai.get.attitude(_status.event.player,source);
 							}
 							else{
+								var triggerevent=_status.event.getTrigger();
+								if(triggerevent&&triggerevent.parent&&
+									triggerevent.parent.postAi&&
+									triggerevent.player.isUnknown(_status.event.player)){
+									return 0;
+								}
 								var info=get.info(card);
 								if(info.ai&&info.ai.wuxie){
 									var aiii=info.ai.wuxie(target,card,source,_status.event.player,state);

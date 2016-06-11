@@ -2756,7 +2756,7 @@ character.yijiang={
 				if(!player.storage.jijianging){
 					for(var i=0;i<game.players.length;i++){
 						var nh=game.players[i].num('h');
-						if(ai.get.attitude(game.players[i],player)>1&&(nh>=4||(nh>=3&&game.players[i].num('h','sha')))){
+						if(game.players[i].group=='shu'&&ai.get.attitude(game.players[i],player)>1&&(nh>=4||(nh>=3&&game.players[i].num('h','sha')))){
 							yep=true;break;
 						}
 					}
@@ -2829,7 +2829,7 @@ character.yijiang={
 				var player=_status.event.player;
 				for(var i=0;i<game.players.length;i++){
 					var nh=game.players[i].num('h');
-					if(ai.get.attitude(game.players[i],player)>1&&(nh>=4||(nh>=3&&game.players[i].num('h','sha')))){
+					if(game.players[i].group=='shu'&&ai.get.attitude(game.players[i],player)>1&&(nh>=4||(nh>=3&&game.players[i].num('h','sha')))){
 						return 5-ai.get.value(card);
 					}
 				}
