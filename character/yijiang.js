@@ -2108,7 +2108,7 @@ character.yijiang={
 			mod:{
 				maxHandcard:function(player,num){
 					var damage=player.getStat().damage;
-					if(typeof damage=='number') return damage;
+					if(typeof damage=='number') return num-player.hp+damage;
 					return 0;
 				}
 			}

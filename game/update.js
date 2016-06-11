@@ -15,6 +15,7 @@ window.noname_update={
             'mode/boss.js',
             'mode/chess.js',
             'game/game.js',
+            'game/config.js',
             'card/swd.js',
             'card/standard.js',
             'layout/default/layout.css',

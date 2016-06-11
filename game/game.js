@@ -12005,6 +12005,7 @@
 		sort:{
             character:function(a,b){
                 var groupSort=function(name){
+                    if(!lib.character[name]) return 4;
                     if(lib.character[name][1]=='wei') return 0;
                     if(lib.character[name][1]=='shu') return 1;
                     if(lib.character[name][1]=='wu') return 2;
