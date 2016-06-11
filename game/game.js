@@ -1827,10 +1827,6 @@
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
 								delete ui.cheat2;
-								if(ui.cheat2x){
-									ui.cheat2x.close();
-									delete ui.cheat2;
-								}
 							}
 						}
 					},
@@ -2110,10 +2106,6 @@
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
 								delete ui.cheat2;
-								if(ui.cheat2x){
-									ui.cheat2x.close();
-									delete ui.cheat2;
-								}
 							}
 						}
 					},
@@ -2494,10 +2486,6 @@
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
 								delete ui.cheat2;
-								if(ui.cheat2x){
-									ui.cheat2x.close();
-									delete ui.cheat2;
-								}
 							}
 						}
 					},
@@ -2729,10 +2717,6 @@
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
 								delete ui.cheat2;
-								if(ui.cheat2x){
-									ui.cheat2x.close();
-									delete ui.cheat2;
-								}
 							}
 						},
 					},
@@ -2942,10 +2926,6 @@
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
 								delete ui.cheat2;
-								if(ui.cheat2x){
-									ui.cheat2x.close();
-									delete ui.cheat2;
-								}
 							}
 						},
 					},

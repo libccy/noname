@@ -794,16 +794,11 @@ mode.identity={
 							if(ui.cheat){
 								ui.cheat.style.opacity=1;
 							}
-							if(ui.cheat2x){
-								ui.cheat2x.close();
-								delete ui.cheat2x;
-							}
 						}
 						else{
 							if(game.changeCoin){
 								game.changeCoin(-10);
 							}
-							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
 							this.backup=_status.event.dialog;
 							_status.event.dialog.close();
 							_status.event.dialog=_status.event.parent.dialogxx;
@@ -829,10 +824,6 @@ mode.identity={
 				if(ui.cheat2){
 					ui.cheat2.close();
 					delete ui.cheat2;
-				}
-				if(ui.cheat2x){
-					ui.cheat2x.close();
-					delete ui.cheat2x;
 				}
 				if(event.chosen.length){
 					game.me.init(event.chosen[0],event.chosen[1]);

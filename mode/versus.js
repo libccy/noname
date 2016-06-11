@@ -708,16 +708,11 @@ mode.versus={
 							if(ui.cheat){
 								ui.cheat.style.opacity=1;
 							}
-							if(ui.cheat2x){
-								ui.cheat2x.close();
-								delete ui.cheat2x;
-							}
 						}
 						else{
 							if(game.changeCoin){
 								game.changeCoin(-10);
 							}
-							ui.cheat2x=ui.create.groupControl(_status.event.parent.dialogxx);
 							this.backup=_status.event.dialog;
 							_status.event.dialog.close();
 							_status.event.dialog=_status.event.parent.dialogxx;
@@ -743,10 +738,6 @@ mode.versus={
 				if(ui.cheat2){
 					ui.cheat2.close();
 					delete ui.cheat2;
-				}
-				if(ui.cheat2x){
-					ui.cheat2x.close();
-					delete ui.cheat2x;
 				}
 				game.me.init(result.links[0]);
 				game.addRecentCharacter(game.me.name);
@@ -841,9 +832,6 @@ mode.versus={
 							dialog.buttons[i].classList.add('noclick');
 						}
 					}
-					if(!event.groupControl){
-						event.groupControl=ui.create.groupControl(dialog);
-					}
 					game.me.chooseButton(dialog,true).closeDialog=false;
 					event.xdialog=dialog;
 					dialog.static=true;
@@ -903,9 +891,6 @@ mode.versus={
 					}
 				}
 				"step 3"
-				if(event.groupControl){
-					event.groupControl.close();
-				}
 				if(event.xdialog){
 					event.xdialog.close();
 				}
@@ -1483,7 +1468,6 @@ mode.versus={
 				var func=function(filter,id,selected,map){
 					var dialog=ui.create.characterDialog(filter,'expandall').open();
 					dialog.videoId=id;
-					dialog.groupControl=ui.create.groupControl(dialog);
 					for(var i in map){
 						var player=lib.playerOL[i];
 						if(player){
@@ -1580,7 +1564,6 @@ mode.versus={
 					var dialog=get.idDialog(id);
 					if(dialog){
 						dialog.close();
-						dialog.groupControl.close();
 					}
 				},event.videoId);
 			}
