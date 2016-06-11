@@ -216,7 +216,21 @@ character.ow={
                     delete player.storage.xie2;
                 }
             },
-            group:['xie4']
+            group:['xie3','xie4']
+        },
+        xie3:{
+            trigger:{global:'phaseBegin'},
+            forced:true,
+            popup:false,
+            content:function(){
+                var num=game.phaseNumber-player.storage.xie;
+                num=num%6;
+                if(num){
+                    num=6-num;
+                }
+                player.storage.xie2_markcount=num;
+                player.updateMarks();
+            }
         },
         xie4:{
             trigger:{global:'dieAfter'},
@@ -307,7 +321,21 @@ character.ow={
                     delete player.storage.luan2;
                 }
             },
-            group:['luan4']
+            group:['luan3','luan4']
+        },
+        luan3:{
+            trigger:{global:'phaseBegin'},
+            forced:true,
+            popup:false,
+            content:function(){
+                var num=game.phaseNumber-player.storage.luan;
+                num=num%6;
+                if(num){
+                    num=6-num;
+                }
+                player.storage.luan2_markcount=num;
+                player.updateMarks();
+            }
         },
         luan4:{
             trigger:{global:'dieAfter'},

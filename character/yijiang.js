@@ -6454,11 +6454,11 @@ character.yijiang={
 						check=true;
 					}
 				}
-				player.choosePlayerCard(trigger.player,'是否对'+get.translation(trigger.player)+'发动【补益】？','h').set('ai',function(card){
+				player.choosePlayerCard(trigger.player,'是否对'+get.translation(trigger.player)+'发动【补益】？','h').set('ai',function(button){
 					if(!_status.event.check) return 0;
 					if(_status.event.target.isUnderControl(true,_status.event.player)){
 						if(get.type(card)!='basic'){
-							return 10-ai.get.value(card);
+							return 10-ai.get.value(button.link);
 						}
 						return 0;
 					}
