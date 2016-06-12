@@ -22557,9 +22557,11 @@
                 var packsource;
 				var clickCapt=function(e){
 					if(_status.dragged) return;
-                    newlined2.style.display='none';
-                    packsource.innerHTML='武将包';
-                    packsource.classList.remove('thundertext');
+                    if(newlined2){
+                        newlined2.style.display='none';
+                        packsource.innerHTML='武将包';
+                        packsource.classList.remove('thundertext');
+                    }
 					if(this.classList.contains('thundertext')){
 						dialog.currentcapt=null;
 						dialog.currentcaptnode=null;
@@ -22649,117 +22651,120 @@
     					node.appendChild(span);
                     }
 				}
-                var groups=['wei','shu','wu','qun'];
-                var natures=['water','soil','wood','metal'];
-                var span=document.createElement('span');
-                newlined.appendChild(span);
-                span.style.margin='8px';
-                var clickGroup=function(){
-                    if(_status.dragged) return;
-                    var node=this,link=this.link;
-                    if(node.classList.contains('thundertext')){
-						dialog.currentgroup=null;
-						dialog.currentgroupnode=null;
-						node.classList.remove('thundertext');
-                        // node.dataset.nature='';
-						for(var i=0;i<dialog.buttons.length;i++){
-							if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
-								dialog.buttons[i].classList.add('nodisplay');
-							}
-							else{
-								dialog.buttons[i].classList.remove('nodisplay');
-							}
-						}
-					}
-					else{
-						if(dialog.currentgroupnode){
-							dialog.currentgroupnode.classList.remove('thundertext');
-							// dialog.currentgroupnode.dataset.nature='';
-						}
-						dialog.currentgroup=link;
-						dialog.currentgroupnode=node;
-						node.classList.add('thundertext');
-                        // node.dataset.nature=node._nature;
-						for(var i=0;i<dialog.buttons.length;i++){
-							if(dialog.buttons[i].group!=link||
-							(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt))){
-								dialog.buttons[i].classList.add('nodisplay');
-							}
-							else{
-								dialog.buttons[i].classList.remove('nodisplay');
-							}
-						}
-					}
-                };
-                for(var i=0;i<groups.length;i++){
+                if(!thisiscard){
+                    var groups=['wei','shu','wu','qun'];
+                    var natures=['water','soil','wood','metal'];
                     var span=document.createElement('span');
-                    span.style.margin='3px';
                     newlined.appendChild(span);
-                    span.innerHTML=get.translation(groups[i]);
-                    span.link=groups[i];
-                    span._nature=natures[i];
-                    span.addEventListener(lib.config.touchscreen?'touchend':'click',clickGroup);
-                }
-
-                var span=document.createElement('span');
-                newlined.appendChild(span);
-                span.style.margin='8px';
-
-                packsource=document.createElement('span');
-                packsource.style.margin='3px';
-                newlined.appendChild(packsource);
-                packsource.innerHTML='武将包';
-
-                newlined2=document.createElement('div');
-                newlined2.style.marginTop='5px';
-                newlined2.style.display='none';
-                newlined2.style.fontFamily='xinwei';
-                if(lib.config.layout=='phone'){
-                    newlined2.style.fontSize='32px';
-                }
-                else{
-                    newlined2.style.fontSize='22px';
-                }
-                newlined2.style.textAlign='center';
-                node.appendChild(newlined2);
-
-                packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
-                    if(_status.dragged) return;
-                    if(newlined2.style.display=='none'){
-                        newlined2.style.display='block';
+                    span.style.margin='8px';
+                    var clickGroup=function(){
+                        if(_status.dragged) return;
+                        var node=this,link=this.link;
+                        if(node.classList.contains('thundertext')){
+    						dialog.currentgroup=null;
+    						dialog.currentgroupnode=null;
+    						node.classList.remove('thundertext');
+                            // node.dataset.nature='';
+    						for(var i=0;i<dialog.buttons.length;i++){
+    							if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+    							else{
+    								dialog.buttons[i].classList.remove('nodisplay');
+    							}
+    						}
+    					}
+    					else{
+    						if(dialog.currentgroupnode){
+    							dialog.currentgroupnode.classList.remove('thundertext');
+    							// dialog.currentgroupnode.dataset.nature='';
+    						}
+    						dialog.currentgroup=link;
+    						dialog.currentgroupnode=node;
+    						node.classList.add('thundertext');
+                            // node.dataset.nature=node._nature;
+    						for(var i=0;i<dialog.buttons.length;i++){
+    							if(dialog.buttons[i].group!=link||
+    							(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt))){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+    							else{
+    								dialog.buttons[i].classList.remove('nodisplay');
+    							}
+    						}
+    					}
+                    };
+                    for(var i=0;i<groups.length;i++){
+                        var span=document.createElement('span');
+                        span.style.margin='3px';
+                        newlined.appendChild(span);
+                        span.innerHTML=get.translation(groups[i]);
+                        span.link=groups[i];
+                        span._nature=natures[i];
+                        span.addEventListener(lib.config.touchscreen?'touchend':'click',clickGroup);
                     }
-                    else{
-                        newlined2.style.display='none';
-                    }
-                });
-                for(var i=0;i<lib.config.all.characters.length;i++){
-                    if(!lib.config.characters.contains(lib.config.all.characters[i])) continue;
-                    var span=document.createElement('div');
-                    span.style.display='inline-block';
-                    span.style.width='auto';
-                    span.style.margin='5px';
+
+                    var span=document.createElement('span');
+                    newlined.appendChild(span);
+                    span.style.margin='8px';
+
+                    packsource=document.createElement('span');
+                    packsource.style.margin='3px';
+                    newlined.appendChild(packsource);
+                    packsource.innerHTML='武将包';
+
+                    newlined2=document.createElement('div');
+                    newlined2.style.marginTop='5px';
+                    newlined2.style.display='none';
+                    newlined2.style.fontFamily='xinwei';
                     if(lib.config.layout=='phone'){
-                        span.style.fontSize='32px';
+                        newlined2.style.fontSize='32px';
                     }
                     else{
-                        span.style.fontSize='22px';
+                        newlined2.style.fontSize='22px';
                     }
-                    span.innerHTML=lib.translate[lib.config.all.characters[i]+'_character_config'];
-                    span.link=lib.config.all.characters[i];
-                    span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
-                    newlined2.appendChild(span);
+                    newlined2.style.textAlign='center';
+                    node.appendChild(newlined2);
+
+                    packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+                        if(_status.dragged) return;
+                        if(newlined2.style.display=='none'){
+                            newlined2.style.display='block';
+                        }
+                        else{
+                            newlined2.style.display='none';
+                        }
+                    });
+                    for(var i=0;i<lib.config.all.characters.length;i++){
+                        if(!lib.config.characters.contains(lib.config.all.characters[i])) continue;
+                        var span=document.createElement('div');
+                        span.style.display='inline-block';
+                        span.style.width='auto';
+                        span.style.margin='5px';
+                        if(lib.config.layout=='phone'){
+                            span.style.fontSize='32px';
+                        }
+                        else{
+                            span.style.fontSize='22px';
+                        }
+                        span.innerHTML=lib.translate[lib.config.all.characters[i]+'_character_config'];
+                        span.link=lib.config.all.characters[i];
+                        span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+                        newlined2.appendChild(span);
+                    }
+                    if(lib.customCharacters.length){
+                        var span=document.createElement('div');
+                        span.style.display='inline-block';
+                        span.style.width='auto';
+                        span.style.margin='5px';
+                        // span.style.fontSize='20px';
+                        span.innerHTML='自定义';
+                        span.link='自定义';
+                        span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+                        newlined2.appendChild(span);
+                    }
                 }
-                if(lib.customCharacters.length){
-                    var span=document.createElement('div');
-                    span.style.display='inline-block';
-                    span.style.width='auto';
-                    span.style.margin='5px';
-                    // span.style.fontSize='20px';
-                    span.innerHTML='自定义';
-                    span.link='自定义';
-                    span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
-                    newlined2.appendChild(span);
-                }
+
 
 				var groupSort;
 				if(thisiscard){

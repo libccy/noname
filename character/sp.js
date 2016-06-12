@@ -3105,11 +3105,6 @@ character.sp={
 			audio:2,
 			trigger:{player:'phaseEnd'},
 			direct:true,
-			check:function(event,player){
-				if(player.hp>2) return true;
-				if(player.hp==2&&player.num('h')==0) return true;
-				return false;
-			},
 			content:function(){
 				"step 0"
 				if(player.storage.kunfen||
