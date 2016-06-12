@@ -752,6 +752,15 @@
 							}
 						}
 					},
+                    mark_identity_style:{
+                        name:'标记身份操作',
+						unfrequent:true,
+						init:'menu',
+						item:{
+							menu:'菜单',
+							click:'单击',
+						},
+                    },
 					slim_player:{
 						name:'窄边框',
 						init:true,
@@ -867,23 +876,23 @@
 							ui.click.resetround();
 						}
 					},
-                    character_dialog_style:{
-                        name:'自由选将样式',
-                        init:'old',
-                        item:{
-                            newstyle:'新版',
-                            old:'默认',
-                        },
-                        unfrequent:true,
-                    },
+                    // character_dialog_style:{
+                    //     name:'自由选将样式',
+                    //     init:'old',
+                    //     item:{
+                    //         newstyle:'新版',
+                    //         old:'默认',
+                    //     },
+                    //     unfrequent:true,
+                    // },
                     character_dialog_tool:{
                         name:'自由选将显示',
                         init:'最近',
                         item:{
                             '收藏':'收藏',
                             '最近':'最近',
-                            '自创':'自创',
-                            all:'默认'
+                            // '自创':'自创',
+                            all:'全部'
                         },
                         unfrequent:true,
                     },
@@ -22451,16 +22460,16 @@
                 return dialog;
             },
 			characterDialog:function(){
-                if(lib.config.character_dialog_style=='newstyle'){
-                    for(var i=0;i<arguments.length;i++){
-                        if(arguments[i]=='thisiscard'){
-                            break;
-                        }
-                    }
-                    if(i==arguments.length){
-                        return ui.create.characterDialog2.apply(this,arguments);
-                    }
-                }
+                // if(lib.config.character_dialog_style=='newstyle'){
+                //     for(var i=0;i<arguments.length;i++){
+                //         if(arguments[i]=='thisiscard'){
+                //             break;
+                //         }
+                //     }
+                //     if(i==arguments.length){
+                //         return ui.create.characterDialog2.apply(this,arguments);
+                //     }
+                // }
 				var filter,str,noclick,thisiscard,seperate,expandall;
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
@@ -24040,27 +24049,43 @@
 				}
 				var list=game.getIdentityList(this.parentNode);
 				if(!list) return;
-				var nodes=[];
-				_status.clickingidentity=[this.parentNode,nodes];
-				var num=1;
-				for(var i in list){
-					if(this.firstChild.innerHTML!=list[i]){
-						var node=ui.create.div('.identity.hidden',this.parentNode,ui.click.identity2);
-						ui.create.div(node).innerHTML=list[i];
-						node.dataset.color=i;
-						ui.refresh(node);
-						node.show();
-						var transstr='translateY('+((num++)*30)+'px)';
-						if(lib.config.layout=='phone'){
-							transstr+=' scale(1.3)';
-						}
-						if(lib.isNewLayout()&&this.parentNode.isLinked()){
-							transstr+=' rotate(90deg)';
-						}
-						node.style.transform=transstr;
-						nodes.push(node);
-					}
-				}
+                if(lib.config.mark_identity_style=='click'){
+                    var list2=[];
+                    for(var i in list){
+                        list2.push(i);
+                    }
+                    list2.push(list2[0]);
+                    for(var i=0;i<list2.length;i++){
+                        if(this.firstChild.innerHTML==list[list2[i]]){
+                            this.firstChild.innerHTML=list[list2[i+1]];
+                            this.dataset.color=list2[i+1];
+                            break;
+                        }
+                    }
+                }
+                else{
+                    var nodes=[];
+    				_status.clickingidentity=[this.parentNode,nodes];
+    				var num=1;
+    				for(var i in list){
+    					if(this.firstChild.innerHTML!=list[i]){
+    						var node=ui.create.div('.identity.hidden',this.parentNode,ui.click.identity2);
+    						ui.create.div(node).innerHTML=list[i];
+    						node.dataset.color=i;
+    						ui.refresh(node);
+    						node.show();
+    						var transstr='translateY('+((num++)*30)+'px)';
+    						if(lib.config.layout=='phone'){
+    							transstr+=' scale(1.3)';
+    						}
+    						if(lib.isNewLayout()&&this.parentNode.isLinked()){
+    							transstr+=' rotate(90deg)';
+    						}
+    						node.style.transform=transstr;
+    						nodes.push(node);
+    					}
+    				}
+                }
 			},
 			identity2:function(){
 				if(_status.clickingidentity){
@@ -25303,6 +25328,13 @@
 					_status.clicked=false;
 				}
 				else{
+                    if(_status.clickingidentity){
+    					for(var i=0;i<_status.clickingidentity[1].length;i++){
+    						_status.clickingidentity[1][i].delete();
+    						_status.clickingidentity[1][i].style.transform='';
+    					}
+    					delete _status.clickingidentity;
+    				}
                     if(!_status.event.isMine) return;
 					if(ui.controls.length){
 						ui.updatec();

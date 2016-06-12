@@ -1,7 +1,7 @@
 window.noname_update={
-    version:'1.8.15.1',
+    version:'1.8.15.2',
     changeLog:[
-        '选将界面',
+        '修bug',
     ],
     files:{
         global:[
