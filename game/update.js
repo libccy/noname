@@ -21,6 +21,7 @@ window.noname_update={
             'layout/default/layout.css',
         ],
         '1.8.15':[],
-        '1.8.15.1':[]
+        '1.8.15.1':[],
+        '1.8.15.2':[]
     }
 }

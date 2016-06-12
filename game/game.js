@@ -22655,6 +22655,7 @@
                 newlined.appendChild(span);
                 span.style.margin='8px';
                 var clickGroup=function(){
+                    if(_status.dragged) return;
                     var node=this,link=this.link;
                     if(node.classList.contains('thundertext')){
 						dialog.currentgroup=null;
@@ -22723,6 +22724,7 @@
                 node.appendChild(newlined2);
 
                 packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+                    if(_status.dragged) return;
                     if(newlined2.style.display=='none'){
                         newlined2.style.display='block';
                     }
