@@ -3262,10 +3262,10 @@
 				if(!lib.config.gameRecord){
 					lib.config.gameRecord={};
 				}
-                // if(lib.config.debug){
-                //     mode.pack.story='剧情';
-                //     mode.pack.realtime='即时';
-                // }
+                if(lib.config.debug){
+                    mode.pack.story='剧情';
+                    mode.pack.realtime='即时';
+                }
 				for(i in mode.pack){
 					if(lib.config.hiddenModePack.indexOf(i)==-1){
 						lib.config.all.mode.push(i);
@@ -13194,6 +13194,19 @@
 	var game={
         online:false,
         onlineID:null,
+        createBackground:function(src,blur){
+            var current=document.body.querySelector('.background.upper');
+            if(current){
+                current.delete();
+            }
+            var node=ui.create.div('.background.blurbg',document.body);
+            node.setBackgroundImage(src);
+            node.style.backgroundSize='cover';
+            if(blur){
+                node.classList.add('paused')
+            }
+            return node;
+        },
         checkFileList:function(updates,proceed){
             var n=updates.length;
             for(var i=0;i<updates.length;i++){

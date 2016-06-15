@@ -6,7 +6,10 @@ window.noname_update={
     files:{
         global:[
             'character/sp.js',
+            'character/yxs.js',
+            'character/ow.js',
             'game/game.js',
+            'layout/default/layout.css',
         ],
         '1.8.15.2':[]
     }

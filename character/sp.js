@@ -268,7 +268,13 @@ character.sp={
 			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
-				return event.source&&event.source.num('h')!=player.num('h');
+				if(!event.source) return false;
+				var nh1=player.num('h');
+				var nh2=event.source.num('h');
+				if(nh1==nh2) return false;
+				if(nh2<nh2&&nh1>=5) return false;
+				if(nh2>nh2&&event.source.isDead()) return false;
+				return true;
 			},
 			direct:true,
 			content:function(){
@@ -293,7 +299,7 @@ character.sp={
 				}
 				else{
 					event.draw=true;
-					event.num=num2-num1;
+					event.num=Math.min(num2,5)-num1;
 					player.chooseBool('是否发动【贲育】？');
 				}
 				"step 1"
@@ -778,6 +784,7 @@ character.sp={
 					var trigger=_status.event.getTrigger();
 					if(ai.get.attitude(player,trigger.player)<0){
 						var he=trigger.player.num('he');
+						if(he<2) return '出杀';
 						if(player.maxHp-player.hp>=2&&he<=3){
 							return '弃牌';
 						}
@@ -787,7 +794,7 @@ character.sp={
 						if(player.maxHp-player.hp>3){
 							return '弃牌';
 						}
-						return
+						return '出杀';
 					}
 					return '出杀';
 				}).set('prompt','弃置'+get.translation(trigger.player)+get.cnNumber(player.maxHp-player.hp)+'张牌，或对任意一名角色使用一张杀');

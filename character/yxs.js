@@ -504,7 +504,7 @@ character.yxs={
 				return !player.storage.heqin;
 			},
 			filterTarget:function(card,player,target){
-				return target.sex=='male';
+				return target.sex=='male'&&target!=player;
 			},
 			content:function(){
 				player.addSkill('heqin2');

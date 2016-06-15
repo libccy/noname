@@ -6,6 +6,32 @@ mode.story={
         'step 1'
         game.loadScene();
     },
+    story:{
+        version:1,
+        scene:{
+            taoyuanxiang:{
+                name:'桃源乡',
+            },
+            yingxiongting:{
+                name:'英雄亭',
+            },
+            nanyang:{
+                name:'南阳',
+            },
+            xujiacun:{
+                name:'许家村',
+            },
+            huanghedukou:{
+                name:'黄河渡口'
+            },
+            xinye:{
+                name:'新野'
+            },
+            changsha:{
+                name:'长沙'
+            }
+        }
+    },
     game:{
         minskin:true,
 		singleHandcard:true,
@@ -268,6 +294,129 @@ mode.story={
             var next=game.createEvent('loadScene');
             next.content=function(){
                 'step 0'
+                lib.init.css('layout/mode','story');
+                game.delay();
+                'step 1'
+                var sceneNode=ui.create.div('#storyscene',ui.window);
+                // sceneNode.addEventListener('mousewheel',function(e){
+                //     if(this.wheeling) return;
+                //     var current=this.querySelector('.flipped');
+                //     if(current){
+                //         if(e.wheelDelta>0){
+                //             if(current.nextSibling){
+                //                 this.wheeling=true;
+                //                 setTimeout(function(){
+                //                     sceneNode.wheeling=false;
+                //                 },500);
+                //                 clickScene.call(current.nextSibling);
+                //                 e.preventDefault();
+                //                 e.stopPropagation();
+                //             }
+                //         }
+                //         else{
+                //             if(current.previousSibling){
+                //                 this.wheeling=true;
+                //                 setTimeout(function(){
+                //                     sceneNode.wheeling=false;
+                //                 },500);
+                //                 clickScene.call(current.previousSibling);
+                //                 e.preventDefault();
+                //                 e.stopPropagation();
+                //             }
+                //         }
+                //     }
+                // });
+                var clickScene=function(e){
+                    if(this._clicking) return;
+                    if(this.classList.contains('flipped')){
+                        e.stopPropagation();
+                        return;
+                    }
+                    var current=document.querySelector('.player.flipped.scene');
+                    if(current){
+                        restoreScene(current,true);
+                    }
+                    sceneNode.classList.add('lockscroll');
+                    _status.clicked=true;
+                    var node=this;
+                    node._clicking=true;
+                    setTimeout(function(){
+                        node._clicking=false;
+                    },700);
+                    sceneNode.dx=ui.window.offsetWidth/2-(-sceneNode.scrollLeft+this.offsetLeft+this.offsetWidth/2);
+                    if(!sceneNode.interval){
+                        sceneNode.interval=setInterval(function(){
+                            var dx=sceneNode.dx;
+                            if(Math.abs(dx)<=2){
+                                sceneNode.scrollLeft+=dx;
+                                clearInterval(sceneNode.interval);
+                                delete sceneNode.interval;
+                            }
+                            else{
+                                var ddx=dx/Math.sqrt(Math.abs(dx))*1.5;
+                                sceneNode.scrollLeft-=ddx;
+                                sceneNode.dx-=ddx;
+                            }
+                        },16);
+                    }
+                    node.style.transition='all ease-in 0.2s';
+					node.style.transform='perspective(1600px) rotateY(-90deg) scale(0.75)';
+					var onEnd=function(){
+                        node.removeEventListener('webkitTransitionEnd',onEnd);
+                        node.classList.add('flipped');
+                        sceneNode.classList.add('lockscroll');
+                        node.style.transition='all ease-out 0.4s';
+						node.style.transform='perspective(1600px) rotateY(0) scale(1)'
+					};
+					node.addEventListener('webkitTransitionEnd',onEnd);
+                }
+                var restoreScene=function(node,forced){
+                    if(node._clicking&&!forced) return;
+                    if(node.transformInterval){
+                        clearInterval(node.transformInterval);
+                        delete node.transformInterval;
+                    }
+                    node._clicking=true;
+                    setTimeout(function(){
+                        node._clicking=false;
+                    },700);
+                    node.style.transition='all ease-in 0.2s';
+					node.style.transform='perspective(1600px) rotateY(-90deg) scale(0.75)';
+					var onEnd=function(){
+                        node.removeEventListener('webkitTransitionEnd',onEnd);
+                        node.classList.remove('flipped');
+                        if(!sceneNode.querySelector('.flipped')){
+                            sceneNode.classList.remove('lockscroll');
+                        }
+                        node.style.transition='all ease-out 0.4s';
+						node.style.transform='perspective(1600px) rotateY(-180deg) scale(0.7)'
+					};
+					node.addEventListener('webkitTransitionEnd',onEnd);
+                }
+                var createScene=function(name){
+                    var scene=lib.story.scene[name];
+                    var node=ui.create.div('.player.scene',clickScene).animate('start');
+                    node.style.transform='perspective(1600px) rotateY(-180deg) scale(0.7)';
+                    node.name=name;
+                    ui.create.div('.avatar',node).setBackground('mode/story/scene_'+name);
+                    ui.create.div('.name',node,get.verticalStr(scene.name)).dataset.nature='soilm';
+                    node.content=ui.create.div('.menu',node);
+                    sceneNode.appendChild(node);
+                }
+                event.custom.add.window=function(){
+                    var current=document.querySelector('.player.flipped.scene');
+                    if(current){
+                        restoreScene(current);
+                    }
+                }
+                var count=0;
+                for(var i in lib.story.scene){
+                    setTimeout((function(i){
+                        return function(){
+                            createScene(i);
+                        }
+                    }(i)),0*(count++));
+                }
                 game.pause();
             }
         }
@@ -343,9 +492,6 @@ mode.story={
 		},
     },
     posmap:{},
-    story:{
-        version:1
-    },
     translate:{
         friend:'友',
         friend2:'友',
