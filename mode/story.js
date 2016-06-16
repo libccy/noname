@@ -9,26 +9,104 @@ mode.story={
     story:{
         version:1,
         scene:{
-            taoyuanxiang:{
-                name:'桃源乡',
+            middle:{
+                taoyuanxiang:{
+                    name:'桃源乡',
+                },
+                yingxiongting:{
+                    name:'英雄亭',
+                },
+                nanyang:{
+                    name:'南阳',
+                },
+                xinye:{
+                    name:'新野'
+                },
+                xujiacun:{
+                    name:'许家村',
+                },
+                xiangyang:{
+                    name:'襄阳'
+                },
+                luoyang:{
+                    name:'洛阳'
+                },
+                changan:{
+                    name:'长安'
+                },
+                juyang:{
+                    name:'雎阳'
+                },
+                xiapi:{
+                    name:'下邳'
+                },
+                beihai:{
+                    name:'北海'
+                },
             },
-            yingxiongting:{
-                name:'英雄亭',
+            north:{
+                yecheng:{
+                    name:'邺城'
+                },
+                julu:{
+                    name:'钜鹿'
+                },
+                shangdang:{
+                    name:'上党'
+                },
+                beiping:{
+                    name:'北平'
+                },
+                xieliang:{
+                    name:'解良'
+                },
+                huashan:{
+                    name:'华山'
+                },
+                wuwei:{
+                    name:'武威'
+                },
+                xiqiang:{
+                    name:'西羌'
+                },
+                xiongnu:{
+                    name:'匈奴'
+                },
+                huanghedukou:{
+                    name:'黄河渡口'
+                }
             },
-            nanyang:{
-                name:'南阳',
-            },
-            xujiacun:{
-                name:'许家村',
-            },
-            huanghedukou:{
-                name:'黄河渡口'
-            },
-            xinye:{
-                name:'新野'
-            },
-            changsha:{
-                name:'长沙'
+            south:{
+                wulin:{
+                    name:'武陵'
+                },
+                changsha:{
+                    name:'长沙'
+                },
+                chengdu:{
+                    name:'成都'
+                },
+                jianye:{
+                    name:'建业'
+                },
+                chaisang:{
+                    name:'柴桑'
+                },
+                jiangxia:{
+                    name:'江夏'
+                },
+                shanyue:{
+                    name:'山越'
+                },
+                nanman:{
+                    name:'南蛮'
+                },
+                zhongshan:{
+                    name:'钟山'
+                },
+                changjiangdukou:{
+                    name:'长江渡口'
+                }
             }
         }
     },
@@ -36,6 +114,9 @@ mode.story={
         minskin:true,
 		singleHandcard:true,
 		chess:true,
+        saveData:function(){
+			game.save(get.config('save'),game.data);
+		},
         addChessPlayer:function(name,enemy,num,pos){
 			if(typeof num!='number'){
 				num=4;
@@ -294,44 +375,33 @@ mode.story={
             var next=game.createEvent('loadScene');
             next.content=function(){
                 'step 0'
+                var save=get.config('save');
+				if(!save){
+					save='save1';
+				}
+				if(!lib.storage[save]){
+					lib.storage[save]={};
+    				game.data=lib.storage[save];
+                    game.saveData();
+				}
+                else{
+    				game.data=lib.storage[save];
+                }
                 lib.init.css('layout/mode','story');
                 game.delay();
                 'step 1'
-                var sceneNode=ui.create.div('#storyscene',ui.window);
-                // sceneNode.addEventListener('mousewheel',function(e){
-                //     if(this.wheeling) return;
-                //     var current=this.querySelector('.flipped');
-                //     if(current){
-                //         if(e.wheelDelta>0){
-                //             if(current.nextSibling){
-                //                 this.wheeling=true;
-                //                 setTimeout(function(){
-                //                     sceneNode.wheeling=false;
-                //                 },500);
-                //                 clickScene.call(current.nextSibling);
-                //                 e.preventDefault();
-                //                 e.stopPropagation();
-                //             }
-                //         }
-                //         else{
-                //             if(current.previousSibling){
-                //                 this.wheeling=true;
-                //                 setTimeout(function(){
-                //                     sceneNode.wheeling=false;
-                //                 },500);
-                //                 clickScene.call(current.previousSibling);
-                //                 e.preventDefault();
-                //                 e.stopPropagation();
-                //             }
-                //         }
-                //     }
-                // });
+                var scenes={
+                    middle:ui.create.div('.storyscene'),
+                    north:ui.create.div('.storyscene'),
+                    south:ui.create.div('.storyscene',ui.window),
+                };
                 var clickScene=function(e){
                     if(this._clicking) return;
                     if(this.classList.contains('flipped')){
                         e.stopPropagation();
                         return;
                     }
+                    var sceneNode=this.parentNode;
                     var current=document.querySelector('.player.flipped.scene');
                     if(current){
                         restoreScene(current,true);
@@ -344,7 +414,10 @@ mode.story={
                         node._clicking=false;
                     },700);
                     sceneNode.dx=ui.window.offsetWidth/2-(-sceneNode.scrollLeft+this.offsetLeft+this.offsetWidth/2);
-                    if(!sceneNode.interval){
+                    if(Math.abs(sceneNode.dx)<20){
+                        sceneNode.dx=0;
+                    }
+                    if(!sceneNode.interval&&sceneNode.dx){
                         sceneNode.interval=setInterval(function(){
                             var dx=sceneNode.dx;
                             if(Math.abs(dx)<=2){
@@ -376,6 +449,7 @@ mode.story={
                         clearInterval(node.transformInterval);
                         delete node.transformInterval;
                     }
+                    var sceneNode=node.parentNode;
                     node._clicking=true;
                     setTimeout(function(){
                         node._clicking=false;
@@ -393,15 +467,16 @@ mode.story={
 					};
 					node.addEventListener('webkitTransitionEnd',onEnd);
                 }
-                var createScene=function(name){
-                    var scene=lib.story.scene[name];
+                var createScene=function(name,position){
+                    var scene=lib.story.scene[position][name];
                     var node=ui.create.div('.player.scene',clickScene).animate('start');
                     node.style.transform='perspective(1600px) rotateY(-180deg) scale(0.7)';
                     node.name=name;
-                    ui.create.div('.avatar',node).setBackground('mode/story/scene_'+name);
+                    ui.create.div('.avatar',node).setBackground('mode/story/scene/'+name);
                     ui.create.div('.name',node,get.verticalStr(scene.name)).dataset.nature='soilm';
                     node.content=ui.create.div('.menu',node);
-                    sceneNode.appendChild(node);
+                    scenes[position].appendChild(node);
+                    return node;
                 }
                 event.custom.add.window=function(){
                     var current=document.querySelector('.player.flipped.scene');
@@ -409,13 +484,14 @@ mode.story={
                         restoreScene(current);
                     }
                 }
-                var count=0;
-                for(var i in lib.story.scene){
-                    setTimeout((function(i){
-                        return function(){
-                            createScene(i);
-                        }
-                    }(i)),0*(count++));
+                for(var i in lib.story.scene.middle){
+                    createScene(i,'middle');
+                }
+                for(var i in lib.story.scene.north){
+                    createScene(i,'north');
+                }
+                for(var i in lib.story.scene.south){
+                    createScene(i,'south');
                 }
                 game.pause();
             }
