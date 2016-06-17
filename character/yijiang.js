@@ -448,6 +448,10 @@ character.yijiang={
 					else{
 						str+='，或取消并弃置'+get.cnNumber(result.cards.length)+'张牌';
 					}
+					if(!trigger.source.storage.huisheng){
+						trigger.source.storage.huisheng=[];
+					}
+					trigger.source.storage.huisheng.push(player);
 					trigger.source.chooseButton([str,result.cards],forced).set('ai',function(button){
 						if(_status.event.goon){
 							return ai.get.value(button.link);

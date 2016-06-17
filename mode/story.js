@@ -9,6 +9,28 @@ mode.story={
     story:{
         version:1,
         scene:{
+            connect:{
+                hulaoguan:{
+                    name:'虎牢关',
+                    to:['middle','east']
+                },
+                huanghedukou:{
+                    name:'黄河渡口',
+                    to:['east','north']
+                },
+                yanmenguan:{
+                    name:'雁门关',
+                    to:['north','northwest']
+                },
+                changjiangdukou:{
+                    name:'长江渡口',
+                    to:['east','southeast']
+                },
+                jiamengguan:{
+                    name:'葭萌关',
+                    to:['south','southeast']
+                }
+            },
             middle:{
                 taoyuanxiang:{
                     name:'桃源乡',
@@ -25,14 +47,10 @@ mode.story={
                 xujiacun:{
                     name:'许家村',
                 },
-                xiangyang:{
-                    name:'襄阳'
-                },
+            },
+            east:{
                 luoyang:{
                     name:'洛阳'
-                },
-                changan:{
-                    name:'长安'
                 },
                 juyang:{
                     name:'雎阳'
@@ -43,6 +61,9 @@ mode.story={
                 beihai:{
                     name:'北海'
                 },
+                tianshizhong:{
+                    name:'天师冢'
+                }
             },
             north:{
                 yecheng:{
@@ -60,9 +81,8 @@ mode.story={
                 xieliang:{
                     name:'解良'
                 },
-                huashan:{
-                    name:'华山'
-                },
+            },
+            northwest:{
                 wuwei:{
                     name:'武威'
                 },
@@ -72,19 +92,33 @@ mode.story={
                 xiongnu:{
                     name:'匈奴'
                 },
-                huanghedukou:{
-                    name:'黄河渡口'
-                }
+                huashan:{
+                    name:'华山'
+                },
+                changan:{
+                    name:'长安'
+                },
             },
             south:{
+                chengdu:{
+                    name:'成都'
+                },
                 wulin:{
                     name:'武陵'
+                },
+                nanman:{
+                    name:'南蛮'
+                },
+                shanyue:{
+                    name:'山越'
                 },
                 changsha:{
                     name:'长沙'
                 },
-                chengdu:{
-                    name:'成都'
+            },
+            southeast:{
+                xiangyang:{
+                    name:'襄阳'
                 },
                 jianye:{
                     name:'建业'
@@ -95,18 +129,9 @@ mode.story={
                 jiangxia:{
                     name:'江夏'
                 },
-                shanyue:{
-                    name:'山越'
-                },
-                nanman:{
-                    name:'南蛮'
-                },
                 zhongshan:{
                     name:'钟山'
                 },
-                changjiangdukou:{
-                    name:'长江渡口'
-                }
             }
         }
     },
@@ -380,7 +405,9 @@ mode.story={
 					save='save1';
 				}
 				if(!lib.storage[save]){
-					lib.storage[save]={};
+					lib.storage[save]={
+                        area:'middle'
+                    };
     				game.data=lib.storage[save];
                     game.saveData();
 				}
@@ -390,11 +417,14 @@ mode.story={
                 lib.init.css('layout/mode','story');
                 game.delay();
                 'step 1'
-                var scenes={
-                    middle:ui.create.div('.storyscene'),
-                    north:ui.create.div('.storyscene'),
-                    south:ui.create.div('.storyscene',ui.window),
-                };
+                var scenes={};
+                for(var i in lib.story.scene){
+                    if(i!='connect'){
+                        scenes[i]=ui.create.div('.storyscene')
+                    }
+                }
+                game.data.area=game.data.area||'middle';
+                ui.window.appendChild(scenes[game.data.area].animate('start'));
                 var clickScene=function(e){
                     if(this._clicking) return;
                     if(this.classList.contains('flipped')){
@@ -417,11 +447,18 @@ mode.story={
                     if(Math.abs(sceneNode.dx)<20){
                         sceneNode.dx=0;
                     }
+                    // else{
+                    //     console.log(sceneNode.scrollLeft,sceneNode.dx);
+                    //     if(sceneNode.scrollLeft<20&&sceneNode.dx<0){
+                    //         console.log(1);
+                    //         sceneNode.dx=0;
+                    //     }
+                    // }
                     if(!sceneNode.interval&&sceneNode.dx){
                         sceneNode.interval=setInterval(function(){
                             var dx=sceneNode.dx;
                             if(Math.abs(dx)<=2){
-                                sceneNode.scrollLeft+=dx;
+                                sceneNode.scrollLeft-=dx;
                                 clearInterval(sceneNode.interval);
                                 delete sceneNode.interval;
                             }
@@ -467,14 +504,38 @@ mode.story={
 					};
 					node.addEventListener('webkitTransitionEnd',onEnd);
                 }
-                var createScene=function(name,position){
-                    var scene=lib.story.scene[position][name];
-                    var node=ui.create.div('.player.scene',clickScene).animate('start');
+                var switchScene=function(){
+                    var to=this.parentNode.to;
+                    var current=this.parentNode.parentNode;
+                    restoreScene(current,true);
+                    current.parentNode.delete();
+                    ui.window.appendChild(scenes[to].animate('start'));
+                }
+                var createScene=function(name,position,connect){
+                    var scene;
+                    if(connect){
+                        scene=lib.story.scene.connect[name];
+                    }
+                    else{
+                        scene=lib.story.scene[position][name];
+                    }
+                    var node=ui.create.div('.player.scene',clickScene);
                     node.style.transform='perspective(1600px) rotateY(-180deg) scale(0.7)';
                     node.name=name;
                     ui.create.div('.avatar',node).setBackground('mode/story/scene/'+name);
                     ui.create.div('.name',node,get.verticalStr(scene.name)).dataset.nature='soilm';
-                    node.content=ui.create.div('.menu',node);
+                    var content=ui.create.div('.menu',node);
+                    node.content=content;
+                    if(connect){
+                        content.to=scene.to;
+                        if(content.to[0]==position){
+                            content.to=content.to[1];
+                        }
+                        else{
+                            content.to=content.to[0];
+                        }
+                        ui.create.div('.menubutton.large.enter','进入',node.content,switchScene);
+                    }
                     scenes[position].appendChild(node);
                     return node;
                 }
@@ -484,14 +545,16 @@ mode.story={
                         restoreScene(current);
                     }
                 }
-                for(var i in lib.story.scene.middle){
-                    createScene(i,'middle');
+                for(var i in lib.story.scene){
+                    if(i=='connect') continue;
+                    for(var j in lib.story.scene[i]){
+                        createScene(j,i);
+                    }
                 }
-                for(var i in lib.story.scene.north){
-                    createScene(i,'north');
-                }
-                for(var i in lib.story.scene.south){
-                    createScene(i,'south');
+                for(var i in lib.story.scene.connect){
+                    for(var j=0;j<lib.story.scene.connect[i].to.length;j++){
+                        createScene(i,lib.story.scene.connect[i].to[j],true)
+                    }
                 }
                 game.pause();
             }

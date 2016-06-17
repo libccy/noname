@@ -9,6 +9,10 @@
     text-align: center;
     white-space: nowrap;
 }
+.storyscene.removing{
+    pointer-events: none;
+    transform: translateY(500px);
+}
 .storyscene.lockscroll{
     overflow-x: hidden;
 }
@@ -66,6 +70,13 @@
 }
 .storyscene>.player.scene.startscene{
     -webkit-animation: scene_start 0.5s;
+}
+.player.scene>.menu>.menubutton.enter{
+    position: absolute;
+    top:auto;
+    bottom: 10px;
+    width: 70px;
+    left: calc(50% - 35px);
 }
 
 @-webkit-keyframes scene_start{

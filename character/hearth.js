@@ -75,6 +75,7 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		hsshenqi_forbid:{},
 		duxin:{
 			trigger:{player:['phaseBegin','phaseEnd']},
 			frequent:true,
@@ -820,12 +821,11 @@ character.hearth={
 				var list=[['','','hsshenqi_morijingxiang'],
 					['','','hsshenqi_kongbusangzhong'],
 					['','','hsshenqi_nengliangzhiguang']];
-				var dialog=ui.create.dialog('邪能：将武将牌翻面并获得一张神器牌',[list,'vcard'],'hidden');
+				var dialog=ui.create.dialog('邪能：选择一张神器牌并获得之',[list,'vcard'],'hidden');
 				player.chooseButton(dialog).ai=function(){return Math.random();};
 				'step 1'
 				if(result.buttons){
 					player.logSkill('xieneng');
-					player.turnOver();
 					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
 				}
 			},
@@ -3954,13 +3954,21 @@ character.hearth={
 			type:'hsshenqi',
 			fullimage:true,
 			vanish:true,
-			enable:true,
+			enable:function(card,player){
+				return !player.hasSkill('hsshenqi_forbid');
+			},
 			derivation:'hs_lafamu',
 			filterTarget:true,
 			content:function(){
 				target.gainMaxHp();
 				target.recover();
 				target.draw(4);
+			},
+			contentAfter:function(){
+				if(!player.isTurnedOver()){
+					player.turnOver();
+				}
+				player.addTempSkill('hsshenqi_forbid','phaseAfter');
 			},
 			ai:{
 				order:5,
@@ -3979,7 +3987,9 @@ character.hearth={
 			type:'hsshenqi',
 			fullimage:true,
 			vanish:true,
-			enable:true,
+			enable:function(card,player){
+				return !player.hasSkill('hsshenqi_forbid');
+			},
 			derivation:'hs_lafamu',
 			filterTarget:function(card,player,target){
 				return target!=player;
@@ -3987,6 +3997,12 @@ character.hearth={
 			selectTarget:-1,
 			content:function(){
 				target.damage(Math.ceil(Math.random()*2));
+			},
+			contentAfter:function(){
+				if(!player.isTurnedOver()){
+					player.turnOver();
+				}
+				player.addTempSkill('hsshenqi_forbid','phaseAfter');
 			},
 			ai:{
 				order:9,
@@ -4006,7 +4022,9 @@ character.hearth={
 			type:'hsshenqi',
 			fullimage:true,
 			vanish:true,
-			enable:true,
+			enable:function(card,player){
+				return !player.hasSkill('hsshenqi_forbid');
+			},
 			derivation:'hs_lafamu',
 			filterTarget:function(card,player,target){
 				return target!=player&&target.num('hej')>0;
@@ -4014,6 +4032,12 @@ character.hearth={
 			selectTarget:-1,
 			content:function(){
 				if(target.num('hej')) player.gainPlayerCard(target,'hej',true,Math.ceil(Math.random()*2));
+			},
+			contentAfter:function(){
+				if(!player.isTurnedOver()){
+					player.turnOver();
+				}
+				player.addTempSkill('hsshenqi_forbid','phaseAfter');
 			},
 			ai:{
 				order:9.5,
@@ -4324,7 +4348,7 @@ character.hearth={
 		xunbao2:'寻宝',
 		xunbao_info:'回合开始阶段，若你的武将牌上没有藏宝图，你可以将一张藏宝图置于你的武将牌上；若你的武将牌上有藏宝图，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图',
 		xieneng:'邪能',
-		xieneng_info:'回合结束阶段，你可以将武将牌翻面，并获得一张神器牌',
+		xieneng_info:'回合结束阶段，你可以选择一张神器牌并获得之',
 		fbeifa:'北伐',
 		fbeifa_info:'每当你失去最后一张手牌，你可以视为使用一张无视距离的杀，若此杀造成伤害，你摸一张牌，每回合最多发动3次',
 		yufa:'驭法',
@@ -4333,11 +4357,11 @@ character.hearth={
 		bingyan_info:'出牌阶段限一次，你可以将一张红色牌当作炽羽袭，或将一张黑色牌当作惊雷闪使用',
 		hsshenqi:'神器',
 		hsshenqi_morijingxiang:'末日镜像',
-		hsshenqi_morijingxiang_info:'从所有其他角色的区域内各获得1~2张牌',
+		hsshenqi_morijingxiang_info:'从所有其他角色的区域内各获得1~2张牌；使用后将武将牌翻至背面且本回合内无法继续使用神器牌',
 		hsshenqi_kongbusangzhong:'恐怖丧钟',
-		hsshenqi_kongbusangzhong_info:'对所有其他角色各造成1~2点伤害',
+		hsshenqi_kongbusangzhong_info:'对所有其他角色各造成1~2点伤害；使用后将武将牌翻至背面且本回合内无法继续使用神器牌',
 		hsshenqi_nengliangzhiguang:'能量之光',
-		hsshenqi_nengliangzhiguang_info:'令一名角色增加一点体力上限，回复一点体力，并摸四张牌',
+		hsshenqi_nengliangzhiguang_info:'令一名角色增加一点体力上限，回复一点体力，并摸四张牌；使用后将武将牌翻至背面且本回合内无法继续使用神器牌',
 		hsbaowu:'宝物',
 		hsbaowu_huangjinyuanhou:'黄金猿猴',
 		hsbaowu_huangjinyuanhou_info:'回复全部体力，弃置所有手牌，并获得等量的无中生有；直到下个回合开始，防上即将受到的一切伤害',

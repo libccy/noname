@@ -5038,6 +5038,7 @@ character.sp={
 			content:function(){
 				"step 0"
 				var target=trigger.player;
+				player.line(target,'green');
 				var judge=trigger.judge(target.judging[0]);
 				var attitude=ai.get.attitude(target,player);
 				target.choosePlayerCard('请选择代替判定的牌','he','visible',true,player).set('ai',function(button){
@@ -5086,7 +5087,7 @@ character.sp={
 					}
 					ui.discardPile.appendChild(trigger.player.judging[0]);
 					trigger.player.judging[0]=event.card;
-					if(!get.owner(result.cards[0],'judge')){
+					if(!get.owner(event.card,'judge')){
 						trigger.position.appendChild(event.card);
 					}
 					game.log(trigger.player,'的判定牌改为',event.card);

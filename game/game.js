@@ -28284,6 +28284,7 @@
 			useful:function(card){
 				if(get.position(card)=='j') return -1;
 				if(get.position(card)=='e') return ai.get.equipValue(card);
+                if(!lib.temp) lib.temp={};
 				if(lib.temp[card.name]==undefined) lib.temp[card.name]=[card];
 				else lib.temp[card.name].add(card);
 				var i=lib.temp[card.name].find(card);

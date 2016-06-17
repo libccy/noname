@@ -4032,24 +4032,32 @@ mode.chess={
 						game.changeCoin(-3);
 					}
 					list.randomSort();
-					_status.event.dialog.close();
-					var dialog=ui.create.dialog('选择出场角色','hidden');
-					_status.event.dialog=dialog;
-					dialog.classList.add('fullwidth');
-					dialog.classList.add('fullheight');
-					dialog.classList.add('fixed');
-					dialog.add('0/'+_status.event.selectButton());
-					dialog.add([list.slice(0,parseInt(get.config('battle_number'))*4+parseInt(get.config('replace_number'))+5),'character']);
-					if(bossbuttons.length){
-						dialog.add('挑战魔王');
-						dialog.add(bosses);
-					}
-					if(jiangebuttons.length){
-						dialog.add('守卫剑阁');
-						dialog.add(jiange);
-					}
-					event.addConfig(dialog);
-					dialog.open();
+
+					var buttons=ui.create.div('.buttons');
+					var node=_status.event.dialog.buttons[0].parentNode;
+					_status.event.dialog.buttons=ui.create.buttons(list.slice(0,parseInt(get.config('battle_number'))*4+parseInt(get.config('replace_number'))+5),'character',buttons);
+					_status.event.dialog.content.insertBefore(buttons,node);
+					buttons.animate('start');
+					node.remove();
+
+					// _status.event.dialog.close();
+					// var dialog=ui.create.dialog('选择出场角色','hidden');
+					// _status.event.dialog=dialog;
+					// dialog.classList.add('fullwidth');
+					// dialog.classList.add('fullheight');
+					// dialog.classList.add('fixed');
+					// dialog.add('0/'+_status.event.selectButton());
+					// dialog.add([list.slice(0,parseInt(get.config('battle_number'))*4+parseInt(get.config('replace_number'))+5),'character']);
+					// if(bossbuttons.length){
+					// 	dialog.add('挑战魔王');
+					// 	dialog.add(bosses);
+					// }
+					// if(jiangebuttons.length){
+					// 	dialog.add('守卫剑阁');
+					// 	dialog.add(jiange);
+					// }
+					// event.addConfig(dialog);
+					// dialog.open();
 					game.uncheck();
 					game.check();
 				};
