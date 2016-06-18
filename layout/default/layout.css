@@ -445,6 +445,7 @@ body>.background.paused{
 body>.background{z-index:-5}
 body>.background.upper{z-index:-4}
 .popup{padding: 5px;}
+.forcehide{display: none !important;}
 .removing,.hidden{opacity: 0 !important;}
 #system>div>div.hidden{opacity:0.5 !important;}
 .transparent{opacity:  0.3 !important;}
@@ -1766,6 +1767,9 @@ div:hover>.wunature{
 .glow2:not(.player.glow_phase)>.avatar{
 	/*-webkit-animation:control_glow 4s infinite;*/
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
+}
+.glow3{
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0) 0 0 40px, rgba(0, 133, 255, 0.8) 0 0 60px !important
 }
 .player:not(.glow_phase)>.avatar.glow2,
 .button.glow2:not(.selected){

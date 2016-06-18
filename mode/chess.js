@@ -1260,6 +1260,12 @@ mode.chess={
 					ang*=Math.PI/180;
 					var tx=lengthi*Math.cos(ang);
 					var ty=-lengthi*Math.sin(ang);
+					if(Math.abs(tx)<0.1){
+						tx=0;
+					}
+					if(Math.abs(ty)<0.1){
+						ty=0;
+					}
 					thrown[i].style.transform='translate('+tx+'px,'+ty+'px)';
 				}
 			},

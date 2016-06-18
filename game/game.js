@@ -23410,6 +23410,14 @@
                     ui.auto.hide();
                     ui.pause.hide();
                 }
+
+                if(lib.forcehide){
+                    if(lib.forcehide.contains('replay')) ui.replay.classList.add('forcehide');
+                    if(lib.forcehide.contains('auto')) ui.auto.classList.add('forcehide');
+                    if(lib.forcehide.contains('pause')) ui.pause.classList.add('forcehide');
+                    if(lib.forcehide.contains('wuxie')) ui.wuxie.classList.add('forcehide');
+                    if(lib.forcehide.contains('cardPileButton')) ui.cardPileButton.classList.add('forcehide');
+                }
 				ui.volumn=ui.create.system('♫');
 				lib.setPopped(ui.volumn,ui.click.volumn,200);
 				// if(lib.config.show_pause) ui.auto.style.marginLeft='10px';

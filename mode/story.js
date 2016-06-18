@@ -1,5 +1,6 @@
 'use strict';
 mode.story={
+    forcehide:['wuxie','cardPileButton','pause','auto','replay'],
     start:function(){
         'step 0'
         game.loadChess();
@@ -400,13 +401,18 @@ mode.story={
             var next=game.createEvent('loadScene');
             next.content=function(){
                 'step 0'
+                ui.auto.hide();
                 var save=get.config('save');
 				if(!save){
 					save='save1';
 				}
 				if(!lib.storage[save]){
 					lib.storage[save]={
-                        area:'middle'
+                        scene:{
+                            area:'middle',
+                            enabled:['taoyuanxiang'],
+                            new:['taoyuanxiang']
+                        }
                     };
     				game.data=lib.storage[save];
                     game.saveData();
@@ -414,25 +420,34 @@ mode.story={
                 else{
     				game.data=lib.storage[save];
                 }
-                lib.init.css('layout/mode','story');
+                lib.init.css(lib.assetURL+'layout/mode','story');
                 game.delay();
                 'step 1'
                 var scenes={};
                 for(var i in lib.story.scene){
                     if(i!='connect'){
-                        scenes[i]=ui.create.div('.storyscene')
+                        scenes[i]=ui.create.div('.storyscene');
+                        if(!lib.config.touchscreen&&lib.config.mousewheel){
+                			scenes[i]._scrollspeed=30;
+                			scenes[i]._scrollnum=10;
+                			scenes[i].onmousewheel=ui.click.mousewheel;
+                		}
+                        lib.setScroll(scenes[i]);
                     }
                 }
-                game.data.area=game.data.area||'middle';
-                ui.window.appendChild(scenes[game.data.area].animate('start'));
+                ui.window.appendChild(scenes[game.data.scene.area].animate('start'));
                 var clickScene=function(e){
+                    if(this.classList.contains('unselectable')) return;
                     if(this._clicking) return;
                     if(this.classList.contains('flipped')){
                         e.stopPropagation();
                         return;
                     }
+                    game.data.scene.new.remove(this.name);
+                    this.classList.remove('glow3');
+                    game.saveData();
                     var sceneNode=this.parentNode;
-                    var current=document.querySelector('.player.flipped.scene');
+                    var current=document.querySelector('.flipped.scene');
                     if(current){
                         restoreScene(current,true);
                     }
@@ -470,17 +485,18 @@ mode.story={
                         },16);
                     }
                     node.style.transition='all ease-in 0.2s';
-					node.style.transform='perspective(1600px) rotateY(-90deg) scale(0.75)';
+					node.style.transform='perspective(1600px) rotateY(90deg) scale(0.75)';
 					var onEnd=function(){
                         node.removeEventListener('webkitTransitionEnd',onEnd);
                         node.classList.add('flipped');
                         sceneNode.classList.add('lockscroll');
                         node.style.transition='all ease-out 0.4s';
-						node.style.transform='perspective(1600px) rotateY(0) scale(1)'
+						node.style.transform='perspective(1600px) rotateY(180deg) scale(1)'
 					};
 					node.addEventListener('webkitTransitionEnd',onEnd);
                 }
                 var restoreScene=function(node,forced){
+                    if(_status.lockScene) return;
                     if(node._clicking&&!forced) return;
                     if(node.transformInterval){
                         clearInterval(node.transformInterval);
@@ -492,7 +508,7 @@ mode.story={
                         node._clicking=false;
                     },700);
                     node.style.transition='all ease-in 0.2s';
-					node.style.transform='perspective(1600px) rotateY(-90deg) scale(0.75)';
+					node.style.transform='perspective(1600px) rotateY(90deg) scale(0.75)';
 					var onEnd=function(){
                         node.removeEventListener('webkitTransitionEnd',onEnd);
                         node.classList.remove('flipped');
@@ -500,7 +516,7 @@ mode.story={
                             sceneNode.classList.remove('lockscroll');
                         }
                         node.style.transition='all ease-out 0.4s';
-						node.style.transform='perspective(1600px) rotateY(-180deg) scale(0.7)'
+						node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)'
 					};
 					node.addEventListener('webkitTransitionEnd',onEnd);
                 }
@@ -519,11 +535,23 @@ mode.story={
                     else{
                         scene=lib.story.scene[position][name];
                     }
-                    var node=ui.create.div('.player.scene',clickScene);
-                    node.style.transform='perspective(1600px) rotateY(-180deg) scale(0.7)';
+                    var node=ui.create.div('.scene',clickScene);
+                    node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)';
                     node.name=name;
-                    ui.create.div('.avatar',node).setBackground('mode/story/scene/'+name);
-                    ui.create.div('.name',node,get.verticalStr(scene.name)).dataset.nature='soilm';
+                    node.bgnode=ui.create.div('.background.player',node);
+                    ui.create.div('.avatar',node.bgnode).setBackground('mode/story/scene/'+name);
+                    node.namenode=ui.create.div('.name',node,get.verticalStr(scene.name));
+                    // ui.create.div('',get.verticalStr('未开启'),ui.create.div('.mask',node));
+                    if(game.data.scene.enabled.contains(name)){
+                        if(game.data.scene.new.contains(name)){
+                            node.classList.add('glow3');
+                        }
+                        node.namenode.dataset.nature='soilm';
+                    }
+                    else{
+                        node.classList.add('unselectable');
+                        node.namenode.innerHTML=get.verticalStr('未开启');
+                    }
                     var content=ui.create.div('.menu',node);
                     node.content=content;
                     if(connect){
@@ -540,7 +568,7 @@ mode.story={
                     return node;
                 }
                 event.custom.add.window=function(){
-                    var current=document.querySelector('.player.flipped.scene');
+                    var current=document.querySelector('.flipped.scene');
                     if(current){
                         restoreScene(current);
                     }
