@@ -5,6 +5,8 @@ window.noname_update={
     ],
     files:{
         global:[
+            'character/hearth.js',
+            'character/yijiang.js',
             'mode/chess.js',
             'game/game.js',
         ],

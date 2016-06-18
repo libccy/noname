@@ -39,7 +39,7 @@ character.hearth={
 		// hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
 		hs_kchromaggus:['male','wei',4,['fenlie']],
 		hs_lreno:['male','shu',4,['tanmi']],
-		hs_brann:['male','shu',4,['qianghua']],
+		hs_brann:['male','shu',3,['mashu','qianghua']],
 		hs_finley:['male','wu',3,['maoxian']],
 		hs_kcthun:['male','qun',4,['luanji','xianji']],
 		hs_anomalus:['male','wei',4,['mobao']],
@@ -1002,24 +1002,27 @@ character.hearth={
 			trigger:{player:'useCardToBegin'},
 			direct:true,
 			filter:function(event,player){
+				if(event.getParent(2).name=='yuanzheng') return false;
 				return event.target&&event.target!=player&&get.distance(player,event.target,'attack')>1;
 			},
 			content:function(){
 				'step 0'
-				if(trigger.target.num('he')){
-					player.chooseControl('draw_card','discard_card','cancel').prompt='是否发动【远征】？';
-				}
-				else{
-					player.chooseControl('draw_card','cancel').prompt='是否发动【远征】？';
-				}
+				player.chooseControl('draw_card','出杀','cancel',function(){
+					if(ai.get.effect(trigger.target,{name:'sha'},player,player)>0){
+						return '出杀';
+					}
+					return 'draw_card';
+				}).prompt='是对'+get.translation(trigger.target)+'发动否发动【远征】？';
 				'step 1'
 				if(result.control!='cancel'){
-					player.logSkill('yuanzheng');
 					if(result.control=='draw_card'){
 						player.draw();
+						player.logSkill('yuanzheng');
 					}
 					else{
-						player.discardPlayerCard(trigger.target,'he',true);
+						player.logSkill('yuanzheng',trigger.target);
+						player.useCard({name:'sha'},trigger.target,false).animate=false;
+						// player.discardPlayerCard(trigger.target,'he',true);
 					}
 				}
 			}
@@ -1041,26 +1044,13 @@ character.hearth={
 				return true;
 			},
 			content:function(){
-				'step 0'
-				player.unmarkSkill('yuhuo');
 				player.storage.byuhuo=true;
-				player.addSkill('busi');
-				player.loseMaxHp();
-				'step 1'
-				player.recover(player.maxHp);
-				'step 2'
-				var targets=game.players.slice(0);
-				targets.remove(player);
-				targets.sort(lib.sort.seat);
-				event.targets=targets;
-				event.num=0;
-				'step 3'
-				if(num<event.targets.length){
-					if(event.targets[num].num('hej')){
-						player.gainPlayerCard(event.targets[num],'hej',true);
-					}
-					event.num++;
-					event.redo();
+				player.addSkill('byuhuo2');
+				player.maxHp=2;
+				player.hp=2;
+				player.update();
+				if(!player.isTurnedOver()){
+					player.turnOver();
 				}
 			},
 			ai:{
@@ -1069,8 +1059,46 @@ character.hearth={
 				}
 			},
 			intro:{
-				content:'limited'
+				content:function(storage,player){
+					if(storage){
+						if(player.hasSkill('byuhuo2')){
+							return '不能成为其他角色卡牌的目标；在下一回合开始时，对所有其他角色造成两点火焰伤害';
+						}
+						return '已发动';
+					}
+					else{
+						return '未发动';
+					}
+				}
 			}
+		},
+		byuhuo2:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			content:function(){
+				'step 0'
+				var targets=game.players.slice(0);
+				targets.remove(player);
+				targets.sort(lib.sort.seat);
+				event.targets=targets;
+				event.num=0;
+				player.unmarkSkill('byuhuo');
+				'step 1'
+				if(num<event.targets.length){
+					// if(event.targets[num].num('hej')){
+					// 	player.gainPlayerCard(event.targets[num],'hej',true);
+					// }
+					player.line(event.targets[num],'fire');
+					event.targets[num].damage(2,'fire');
+					event.num++;
+					event.redo();
+				}
+			},
+			mod:{
+                targetEnabled:function(card,player,target){
+                    if(player!=target) return false;
+                }
+            }
 		},
 		yulu:{
 			enable:'phaseUse',
@@ -4061,6 +4089,7 @@ character.hearth={
 			filterTarget:true,
 			content:function(){
 				target.damage(2);
+				player.loseHp();
 			},
 			ai:{
 				order:5,
@@ -4169,7 +4198,7 @@ character.hearth={
 				return target.hp<target.maxHp;
 			},
 			content:function(){
-				target.recover(target.maxHp-target.hp);
+				target.recover(2);
 			},
 			ai:{
 				order:6,
@@ -4390,9 +4419,10 @@ character.hearth={
 		shifa:'嗜法',
 		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
 		yuanzheng:'远征',
-		yuanzheng_info:'每当你对攻击范围外的一名角色使用一张牌，你可以选择一项：摸一张牌，或弃置目标一张牌',
+		yuanzheng_info:'每当你对攻击范围外的一名角色使用一张牌，你可以选择一项：摸一张牌，或视为对目标使用一张杀',
 		byuhuo:'浴火',
-		byuhuo_info:'觉醒技，当你进入濒死状态时，你须失去一点体力上限，回复所有体力，获得技能不死，然后从所有其他角色的区域内各获得一张牌',
+		byuhuo2:'浴火',
+		byuhuo_info:'觉醒技，当你进入濒死状态时，你须将体力和体力上限变为2，并将武将牌翻至背面；在你的下一回合开始时，你对所有其他角色造成两点火焰伤害，在此之前，你不能成为其他角色的卡牌的目标',
 		yulu:'雨露',
 		yulu_info:'出牌阶段限一次，你可以指定至多3名角色各摸两张牌，然后各弃置两张牌',
 		fengyin:'封印',
@@ -4435,9 +4465,9 @@ character.hearth={
 		hsmengjing:'梦境',
 		hsmengjing_card_config:'梦境',
 		hsmengjing_feicuiyoulong:'翡翠幼龙',
-		hsmengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成2点伤害',
+		hsmengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成2点伤害，然后流失一点体力',
 		hsmengjing_huanxiaojiemei:'欢笑姐妹',
-		hsmengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复所有体力值',
+		hsmengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复两点体力',
 		hsmengjing_suxing:'苏醒',
 		hsmengjing_suxing_info:'令所有其他角色流失一点体力并随机弃置两张牌',
 		hsmengjing_mengye:'梦魇',

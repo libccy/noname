@@ -4852,6 +4852,7 @@ character.yijiang={
 				}
 			},
 			ai:{
+				expose:0.2,
 				effect:{
 					target:function(card,player,target){
 						if(card.name!='sha') return;
