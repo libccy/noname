@@ -9,6 +9,17 @@ mode.story={
     },
     story:{
         version:1,
+        character:{
+            zuoci:{
+                name:'左慈'
+            },
+            yuji:{
+                name:'于吉'
+            },
+            nanhua:{
+                name:'南华'
+            }
+        },
         scene:{
             connect:{
                 hulaoguan:{
@@ -35,9 +46,45 @@ mode.story={
             middle:{
                 taoyuanxiang:{
                     name:'桃源乡',
+                    content:{
+                        default:[
+                            '东汉末年，桃源乡仙人南华预见了三国时代将会是纷扰的乱世，便施展“九天逆龙大法”扭转时序，打算将曹操、刘备、孙权三位天命王者的出现时间错开',
+                            '然而此举却造成上古魔神“刑天”逃脱，并与当世残虐的当权者董卓合而为一，顿时时空陷入前所未有的混乱中',
+                            '（洛阳郊外）',
+                            ['nanhua','完了，完了。。。'],
+                            ['yuji','倒底发生了什么'],
+                            ['nanhua','完了，完了。。。'],
+                            ['nanhua','完了。。。'],
+                            ['yuji','。。。'],
+                            ['zuoci','算了，这里魔气太重，我们回去再说'],
+                            '（第二天）',
+                            ['zuoci','快告诉我，外面的世界现在怎样了'],
+                            function(){
+                                _status.lockScene=false;
+                                var node=ui.window.querySelector('.storyscene');
+                                game.data.scene.enabled.push('yingxiongting');
+                                game.saveData();
+                                var scene=node.childNodes[1];
+                                scene.namenode.innerHTML='英雄亭';
+                                scene.classList.remove('unselectable')
+                                ui.click.scene.call(scene);
+                            }
+                        ]
+                    }
                 },
                 yingxiongting:{
                     name:'英雄亭',
+                    content:{
+                        default:[
+                            '（英雄亭）',
+                            function(){
+                                console.log(1);
+                                _status.lockScene=false;
+                                var node=ui.window.querySelector('.storyscene');
+                                ui.click.scene2(node.childNodes[1],true);
+                            }
+                        ]
+                    }
                 },
                 nanyang:{
                     name:'南阳',
@@ -104,11 +151,11 @@ mode.story={
                 chengdu:{
                     name:'成都'
                 },
-                wulin:{
-                    name:'武陵'
-                },
                 nanman:{
                     name:'南蛮'
+                },
+                wulin:{
+                    name:'武陵'
                 },
                 shanyue:{
                     name:'山越'
@@ -411,7 +458,8 @@ mode.story={
                         scene:{
                             area:'middle',
                             enabled:['taoyuanxiang'],
-                            new:['taoyuanxiang']
+                            new:['taoyuanxiang'],
+                            content:{}
                         }
                     };
     				game.data=lib.storage[save];
@@ -427,6 +475,7 @@ mode.story={
                 for(var i in lib.story.scene){
                     if(i!='connect'){
                         scenes[i]=ui.create.div('.storyscene');
+                        scenes[i].area=i;
                         if(!lib.config.touchscreen&&lib.config.mousewheel){
                 			scenes[i]._scrollspeed=30;
                 			scenes[i]._scrollnum=10;
@@ -437,10 +486,11 @@ mode.story={
                 }
                 ui.window.appendChild(scenes[game.data.scene.area].animate('start'));
                 var clickScene=function(e){
+                    if(_status.lockScene) return;
                     if(this.classList.contains('unselectable')) return;
                     if(this._clicking) return;
+                    if(e&&e.stopPropagation) e.stopPropagation();
                     if(this.classList.contains('flipped')){
-                        e.stopPropagation();
                         return;
                     }
                     game.data.scene.new.remove(this.name);
@@ -451,8 +501,18 @@ mode.story={
                     if(current){
                         restoreScene(current,true);
                     }
+                    this.content.innerHTML='';
+                    if(this.info.to){
+                        ui.create.div('.menubutton.large.enter','进入',this.content,switchScene);
+                    }
+                    else{
+                        var content=this.info.content[game.data.scene.content[this.name]||'default'];
+                        if(Array.isArray(content)){
+                            _status.lockScene=true;
+                            game.loadConversation(this.content,content);
+                        }
+                    }
                     sceneNode.classList.add('lockscroll');
-                    _status.clicked=true;
                     var node=this;
                     node._clicking=true;
                     setTimeout(function(){
@@ -462,13 +522,6 @@ mode.story={
                     if(Math.abs(sceneNode.dx)<20){
                         sceneNode.dx=0;
                     }
-                    // else{
-                    //     console.log(sceneNode.scrollLeft,sceneNode.dx);
-                    //     if(sceneNode.scrollLeft<20&&sceneNode.dx<0){
-                    //         console.log(1);
-                    //         sceneNode.dx=0;
-                    //     }
-                    // }
                     if(!sceneNode.interval&&sceneNode.dx){
                         sceneNode.interval=setInterval(function(){
                             var dx=sceneNode.dx;
@@ -495,6 +548,7 @@ mode.story={
 					};
 					node.addEventListener('webkitTransitionEnd',onEnd);
                 }
+                ui.click.scene=clickScene;
                 var restoreScene=function(node,forced){
                     if(_status.lockScene) return;
                     if(node._clicking&&!forced) return;
@@ -520,9 +574,16 @@ mode.story={
 					};
 					node.addEventListener('webkitTransitionEnd',onEnd);
                 }
+                ui.click.scene2=restoreScene;
                 var switchScene=function(){
-                    var to=this.parentNode.to;
                     var current=this.parentNode.parentNode;
+                    var to=current.info.to;
+                    if(to[0]==current.parentNode.area){
+                        to=to[1];
+                    }
+                    else{
+                        to=to[0];
+                    }
                     restoreScene(current,true);
                     current.parentNode.delete();
                     ui.window.appendChild(scenes[to].animate('start'));
@@ -539,9 +600,9 @@ mode.story={
                     node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)';
                     node.name=name;
                     node.bgnode=ui.create.div('.background.player',node);
+                    node.info=scene;
                     ui.create.div('.avatar',node.bgnode).setBackground('mode/story/scene/'+name);
                     node.namenode=ui.create.div('.name',node,get.verticalStr(scene.name));
-                    // ui.create.div('',get.verticalStr('未开启'),ui.create.div('.mask',node));
                     if(game.data.scene.enabled.contains(name)){
                         if(game.data.scene.new.contains(name)){
                             node.classList.add('glow3');
@@ -553,24 +614,22 @@ mode.story={
                         node.namenode.innerHTML=get.verticalStr('未开启');
                     }
                     var content=ui.create.div('.menu',node);
+                    lib.setScroll(content);
                     node.content=content;
-                    if(connect){
-                        content.to=scene.to;
-                        if(content.to[0]==position){
-                            content.to=content.to[1];
-                        }
-                        else{
-                            content.to=content.to[0];
-                        }
-                        ui.create.div('.menubutton.large.enter','进入',node.content,switchScene);
-                    }
                     scenes[position].appendChild(node);
                     return node;
                 }
                 event.custom.add.window=function(){
-                    var current=document.querySelector('.flipped.scene');
-                    if(current){
-                        restoreScene(current);
+                    if(_status.lockScene){
+                        if(typeof _status.lockScene=='function'){
+                            _status.lockScene();
+                        }
+                    }
+                    else{
+                        var current=document.querySelector('.flipped.scene');
+                        if(current){
+                            restoreScene(current);
+                        }
                     }
                 }
                 for(var i in lib.story.scene){
@@ -586,6 +645,63 @@ mode.story={
                 }
                 game.pause();
             }
+        },
+        loadConversation:function(node,content,onfinish){
+            content=content.slice(0);
+            var write=function(){
+                if(content.length){
+                    var item=content.shift();
+                    var node2;
+                    if(typeof item=='function'){
+                        item(node);
+                    }
+                    else if(typeof item=='string'){
+                        node.innerHTML='';
+                        node2=ui.create.div(node,'.conversation');
+                        if(item.length<=10){
+                            node2.classList.add('center');
+                        }
+                        ui.create.div('',item,node2);
+                    }
+                    else if(Array.isArray(item)){
+                        if(!node.firstChild||!node.firstChild.classList||!node.firstChild.classList.contains('avatarconversation')){
+                            node.innerHTML='';
+                        }
+                        node2=ui.create.div(node,'.avatarconversation');
+                        node2.name=item[0];
+                        var first=true;
+                        for(var i=0;i<node.childElementCount-1;i++){
+                            if(node.childNodes[i].name==node2.name){
+                                first=false;
+                                if(node.childNodes[i].classList.contains('swap')){
+                                    node2.classList.add('swap');
+                                }
+                                break;
+                            }
+                        }
+                        if(first){
+                            if(node2.previousSibling&&!node2.previousSibling.classList.contains('swap')){
+                                node2.classList.add('swap');
+                            }
+                        }
+                        ui.create.div('.avatar',node2).style.backgroundImage='url("image/mode/story/character/'+item[0]+'.jpg")';
+                        ui.create.div('',item[1],node2);
+                        if(node.scrollHeight>node.offsetHeight){
+                            node.scrollTop=node.scrollHeight-node.offsetHeight;
+                        }
+                    }
+                    else{
+                        write();
+                    }
+                }
+                else{
+                    if(typeof onfinish=='function'){
+                        onfinish();
+                    }
+                }
+            }
+            write();
+            _status.lockScene=write;
         }
     },
     element:{

@@ -2774,7 +2774,7 @@
 				}
 			},
             story:{
-                name:'剧情',
+                name:'群侠',
                 config:{
                     save:{
 						name:'选择历程',
@@ -3263,7 +3263,7 @@
 					lib.config.gameRecord={};
 				}
                 if(lib.config.debug){
-                    mode.pack.story='剧情';
+                    mode.pack.story='群侠';
                     mode.pack.realtime='即时';
                 }
 				for(i in mode.pack){

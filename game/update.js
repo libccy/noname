@@ -9,6 +9,7 @@ window.noname_update={
             'character/yijiang.js',
             'mode/chess.js',
             'game/game.js',
+            'game/asset.js',
         ],
         '1.8.15.4':[]
     }
