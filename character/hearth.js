@@ -67,11 +67,12 @@ character.hearth={
 		// hs_shifazhe:['male','wei',3,['jizhi','shifa']],
 		hs_lafamu:['male','shu',4,['xieneng']],
 		hs_yelise:['female','wei',3,['xunbao','zhuizong']],
-		hs_fandral:['male','shu',4,['nuyan']],
-		hs_hallazeal:['male','shu',4,['nuyan']],
-		hs_nzoth:['male','shu',4,['nuyan']],
-		hs_walian:['male','shu',4,['nuyan']],
-		hs_pengpeng:['male','shu',4,['nuyan']],
+
+		// hs_fandral:['male','shu',4,['nuyan']],
+		// hs_hallazeal:['male','shu',4,['nuyan']],
+		// hs_nzoth:['male','shu',4,['nuyan']],
+		// hs_walian:['male','shu',4,['zhanyi']],
+		// hs_pengpeng:['male','qun',4,['zhadan']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -80,6 +81,99 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		nuyan:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.num('he',{color:'red'})>0
+			},
+			init:function(player){
+				player.storage.nuyan=[];
+			},
+			chooseButton:{
+				dialog:function(event,player){
+					var list=[];
+					for(var i=0;i<lib.inpile.length;i++){
+						if(get.tag({name:lib.inpile[i]},'damage')){
+							list.push([get.type(lib.inpile[i]),'',lib.inpile[i]]);
+						}
+					}
+					return ui.create.dialog([list,'vcard']);
+				},
+				filter:function(button,player){
+					if(player.storage.nuyan.contains(button.link[2])) return false;
+					return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+				},
+				check:function(button){
+					var player=_status.event.player;
+					var recover=0,lose=1;
+					for(var i=0;i<game.players.length;i++){
+						if(!game.players[i].isOut()){
+							if(game.players[i].hp<game.players[i].maxHp){
+								if(ai.get.attitude(player,game.players[i])>0){
+									if(game.players[i].hp<2){
+										lose--;
+										recover+=0.5;
+									}
+									lose--;
+									recover++;
+								}
+								else if(ai.get.attitude(player,game.players[i])<0){
+									if(game.players[i].hp<2){
+										lose++;
+										recover-=0.5;
+									}
+									lose++;
+									recover--;
+								}
+							}
+							else{
+								if(ai.get.attitude(player,game.players[i])>0){
+									lose--;
+								}
+								else if(ai.get.attitude(player,game.players[i])<0){
+									lose++;
+								}
+							}
+						}
+					}
+					if(button.link[2]=='nanman'||button.link[2]=='nanman'||button.link[2]=='yuansuhuimie'||
+					button.link[2]=='chiyuxi'||button.link[2]=='jingleishan'){
+						if(lose>recover&&lose>0){
+							return 2;
+						}
+						else{
+							return 0;
+						}
+					}
+					return 1;
+				},
+				backup:function(links,player){
+					return {
+						filterCard:{color:'red'},
+						selectCard:1,
+						position:'he',
+						popname:true,
+						viewAs:{name:links[0][2]},
+						ai1:function(card){
+							return 6-ai.get.value(card);
+						},
+						onuse:function(result,player){
+							player.storage.nuyan.add(result.card.name);
+						}
+					}
+				},
+				prompt:function(links,player){
+					return '将一张红色牌当作'+get.translation(links[0][2])+'使用';
+				}
+			},
+			ai:{
+				order:6,
+				result:{
+					player:1
+				},
+			}
+		},
 		hsshenqi_forbid:{},
 		duxin:{
 			trigger:{player:['phaseBegin','phaseEnd']},
@@ -4316,6 +4410,11 @@ character.hearth={
 		hs_kcthun:'克苏恩',
 		hs_anomalus:'阿诺玛鲁斯',
 		hs_blingtron:'布林顿',
+		hs_fandral:'范达尔',
+		hs_hallazeal:'海拉泽尔',
+		hs_nzoth:'恩佐斯',
+		hs_walian:'瓦里安',
+		hs_pengpeng:'砰砰博士',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_shanlingjuren:'山岭巨人',
@@ -4336,6 +4435,14 @@ character.hearth={
 		hs_shifazhe:'嗜法者',
 		hs_yogg:'尤格萨隆',
 		hs_xialikeer:'夏克里尔',
+
+		nuyan:'怒焰',
+		nuyan2:'怒焰',
+		nuyan_backup:'怒焰',
+		nuyan_info:'出牌阶段限一次，你可以将一张红色牌当作任意一张能造成伤害的牌使用（不得是你本局以此法使用过的牌）',
+		nuyan2_info:'出牌阶段限三次，你可以失去一点体力，视为使用任意一张能造成伤害的牌”',
+		chouhuo:'仇火',
+		chouhuo_info:'觉醒技，出牌阶段开始时，若你的怒焰技能已将可用的牌用完，你失去一点体力上限，获得两点护甲，然后将怒焰的描述改为“出牌阶段限三次，你可以失去一点体力，视为使用任意一张能造成伤害的牌”',
 		hsdusu:'毒素',
 		hsdusu_xueji:'血蓟',
 		hsdusu_xueji_info:'随机弃至一名角色的1~2张装备牌',

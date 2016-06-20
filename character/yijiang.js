@@ -6011,7 +6011,7 @@ character.yijiang={
 					}
 				},
 				prompt:function(links,player){
-					return '将全部手牌当'+get.translation(links[0][2])+'使用';
+					return '将全部手牌当作'+get.translation(links[0][2])+'使用';
 				}
 			},
 			ai:{

@@ -106,6 +106,7 @@ window.characterRank={
         'zhangrang',
         'ow_chanyata',
         'ow_tianshi',
+        'hs_lafamu',
     ],
     am:[
         'guohuanghou',
@@ -318,7 +319,6 @@ window.characterRank={
     b:[
         'xin_liru',
         'sp_xiahoudun',
-        'hs_lafamu',
         'jsp_huangyueying',
         'cuiyan',
         'sp_zhangfei',

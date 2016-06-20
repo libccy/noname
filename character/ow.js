@@ -460,25 +460,55 @@ character.ow={
             },
             content:function(){
                 'step 0'
-                var next=player.chooseToDiscard('是否发动【移魂】？','he',{suit:'spade'});
-                next.ai=function(card){
-                    return 6-ai.get.value(card);
-                };
-                next.logSkill='yihun'
+                var next=player.chooseCardTarget({
+                    prompt:'是否发动【移魂】？',
+                    position:'he',
+                    filterCard:{suit:'spade'},
+                    ai1:function(card){
+                        return 7-ai.get.value(card);
+                    },
+                    ai2:function(target){
+                        var att=-ai.get.attitude(player,target);
+                        if(target==player.next){
+                            att/=10;
+                        }
+                        if(target==player.next.next){
+                            att/=2;
+                        }
+                        return att;
+                    },
+                    filterTarget:function(card,player,target){
+                        return player!=target;
+                    },
+                });
                 'step 1'
                 if(result.bool){
-                    player.addTempSkill('yihun2',{player:'phaseBegin'});
+                    player.discard(result.cards);
+                    player.logSkill('yihun',result.targets);
+                    player.addSkill('yihun2');
+                    player.storage.yihun2=result.targets[0];
+                    player.markSkillCharacter('yihun2',result.targets[0],'移魂','在'+get.translation(result.targets)+'的下一回合开始时视为对其使用一张杀');
                 }
-            }
+            },
         },
         yihun2:{
+            trigger:{global:'phaseBegin'},
+            forced:true,
+            filter:function(event,player){
+                return event.player==player.storage.yihun2;
+            },
+            content:function(){
+                player.useCard({name:'sha'},player.storage.yihun2);
+                player.removeSkill('yihun2');
+                delete player.storage.yihun2;
+            },
             mod:{
 				targetEnabled:function(){
 					return false;
 				},
 				cardEnabled:function(card,player){
 					return false;
-				}
+				},
 			}
         },
         huoyu:{
@@ -1057,7 +1087,7 @@ character.ow={
         xiandan:'霰弹',
         xiandan_info:'你的杀可以指定距离1以内的角色为额外目标',
         yihun:'移魂',
-        yihun_info:'回合结束阶段，你可以弃置一张黑桃牌，若如此做，你不能使用卡牌，也不能成为卡牌的目标，直到下一回合开始',
+        yihun_info:'回合结束阶段，你可以弃置一张黑桃牌并指定一名其他角色，你在该角色下一回合开始时视为对其使用一张杀；在此之前，你不能使用卡牌，也不能成为卡牌的目标',
         feidan:'飞弹',
         feidan_info:'你的杀只能对距离1以外的角色使用；每当你使用杀造成伤害后，你可以弃置一张牌对距离目标1以内的其他角色各造成一点伤害',
         huoyu:'火雨',
