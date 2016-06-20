@@ -68,8 +68,8 @@ character.hearth={
 		hs_lafamu:['male','shu',4,['xieneng']],
 		hs_yelise:['female','wei',3,['xunbao','zhuizong']],
 
-		// hs_fandral:['male','shu',4,['nuyan']],
-		// hs_hallazeal:['male','shu',4,['nuyan']],
+		hs_fandral:['male','shu',4,['nuyan','chouhuo']],
+		hs_hallazeal:['male','wei',3,['shengteng','yuansu']],
 		// hs_nzoth:['male','shu',4,['nuyan']],
 		// hs_walian:['male','shu',4,['zhanyi']],
 		// hs_pengpeng:['male','qun',4,['zhadan']],
@@ -81,6 +81,116 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		chouhuo:{
+			unique:true,
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			skillAnimation:true,
+			animationColor:'fire',
+			filter:function(event,player){
+				if(player.storage.nuyan&&player.storage.nuyan.length){
+					var num=0;
+					for(var i=0;i<lib.inpile.length;i++){
+						if(get.tag({name:lib.inpile[i]},'damage')){
+							num++;
+						}
+					}
+					return num<=player.storage.nuyan.length;
+				}
+				return false;
+			},
+			content:function(){
+				player.loseMaxHp();
+				player.changeHujia(2);
+				player.removeSkill('nuyan');
+				player.addSkill('nuyan2');
+			}
+		},
+		nuyan2:{
+			enable:'phaseUse',
+			usable:3,
+			chooseButton:{
+				dialog:function(event,player){
+					var list=[];
+					for(var i=0;i<lib.inpile.length;i++){
+						if(get.tag({name:lib.inpile[i]},'damage')){
+							list.push([get.type(lib.inpile[i]),'',lib.inpile[i]]);
+						}
+					}
+					return ui.create.dialog([list,'vcard']);
+				},
+				filter:function(button,player){
+					return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+				},
+				check:function(button){
+					var player=_status.event.player;
+					var recover=0,lose=1;
+					for(var i=0;i<game.players.length;i++){
+						if(!game.players[i].isOut()){
+							if(game.players[i].hp<game.players[i].maxHp){
+								if(ai.get.attitude(player,game.players[i])>0){
+									if(game.players[i].hp<2){
+										lose--;
+										recover+=0.5;
+									}
+									lose--;
+									recover++;
+								}
+								else if(ai.get.attitude(player,game.players[i])<0){
+									if(game.players[i].hp<2){
+										lose++;
+										recover-=0.5;
+									}
+									lose++;
+									recover--;
+								}
+							}
+							else{
+								if(ai.get.attitude(player,game.players[i])>0){
+									lose--;
+								}
+								else if(ai.get.attitude(player,game.players[i])<0){
+									lose++;
+								}
+							}
+						}
+					}
+					if(button.link[2]=='nanman'||button.link[2]=='nanman'||button.link[2]=='yuansuhuimie'||
+					button.link[2]=='chiyuxi'||button.link[2]=='jingleishan'){
+						if(lose>recover&&lose>0){
+							return 2;
+						}
+						else{
+							return 0;
+						}
+					}
+					return 1;
+				},
+				backup:function(links,player){
+					return {
+						filterCard:function(){return false},
+						selectCard:-1,
+						popname:true,
+						viewAs:{name:links[0][2]},
+						onuse:function(result,player){
+							player.loseHp();
+						}
+					}
+				},
+				prompt:function(links,player){
+					return '失去一点体力，视为使用一张'+get.translation(links[0][2]);
+				}
+			},
+			ai:{
+				order:6,
+				result:{
+					player:function(player){
+						if(player.hp>1) return 1;
+						return 0;
+					}
+				},
+			}
+		},
 		nuyan:{
 			enable:'phaseUse',
 			usable:1,
@@ -174,7 +284,6 @@ character.hearth={
 				},
 			}
 		},
-		hsshenqi_forbid:{},
 		duxin:{
 			trigger:{player:['phaseBegin','phaseEnd']},
 			frequent:true,
@@ -4082,7 +4191,7 @@ character.hearth={
 			fullimage:true,
 			vanish:true,
 			enable:function(card,player){
-				return !player.hasSkill('hsshenqi_forbid');
+				return !player.isTurnedOver();
 			},
 			derivation:'hs_lafamu',
 			filterTarget:true,
@@ -4095,7 +4204,6 @@ character.hearth={
 				if(!player.isTurnedOver()){
 					player.turnOver();
 				}
-				player.addTempSkill('hsshenqi_forbid','phaseAfter');
 			},
 			ai:{
 				order:5,
@@ -4115,7 +4223,7 @@ character.hearth={
 			fullimage:true,
 			vanish:true,
 			enable:function(card,player){
-				return !player.hasSkill('hsshenqi_forbid');
+				return !player.isTurnedOver();
 			},
 			derivation:'hs_lafamu',
 			filterTarget:function(card,player,target){
@@ -4129,7 +4237,6 @@ character.hearth={
 				if(!player.isTurnedOver()){
 					player.turnOver();
 				}
-				player.addTempSkill('hsshenqi_forbid','phaseAfter');
 			},
 			ai:{
 				order:9,
@@ -4150,7 +4257,7 @@ character.hearth={
 			fullimage:true,
 			vanish:true,
 			enable:function(card,player){
-				return !player.hasSkill('hsshenqi_forbid');
+				return !player.isTurnedOver();
 			},
 			derivation:'hs_lafamu',
 			filterTarget:function(card,player,target){
@@ -4164,7 +4271,6 @@ character.hearth={
 				if(!player.isTurnedOver()){
 					player.turnOver();
 				}
-				player.addTempSkill('hsshenqi_forbid','phaseAfter');
 			},
 			ai:{
 				order:9.5,
@@ -4436,6 +4542,10 @@ character.hearth={
 		hs_yogg:'尤格萨隆',
 		hs_xialikeer:'夏克里尔',
 
+		shengteng:'升腾',
+		shengteng_info:'锁定技，每当你使用锦囊牌造成伤害，你增加一点体力上限并回复一点体力',
+		yuansu:'元素',
+		yuansu_info:'出牌阶段限一次，若你已损失的体力值不少于存活角色数，你可以将体力上限降至与体力值相同，视为使用一张元素毁灭',
 		nuyan:'怒焰',
 		nuyan2:'怒焰',
 		nuyan_backup:'怒焰',
@@ -4498,11 +4608,11 @@ character.hearth={
 		bingyan_info:'出牌阶段限一次，你可以将一张红色牌当作炽羽袭，或将一张黑色牌当作惊雷闪使用',
 		hsshenqi:'神器',
 		hsshenqi_morijingxiang:'末日镜像',
-		hsshenqi_morijingxiang_info:'从所有其他角色的区域内各获得1~2张牌；使用后将武将牌翻至背面且本回合内无法继续使用神器牌',
+		hsshenqi_morijingxiang_info:'限武将牌正面朝上时使用，从所有其他角色的区域内各获得1~2张牌；使用后将武将牌翻至背面',
 		hsshenqi_kongbusangzhong:'恐怖丧钟',
-		hsshenqi_kongbusangzhong_info:'对所有其他角色各造成1~2点伤害；使用后将武将牌翻至背面且本回合内无法继续使用神器牌',
+		hsshenqi_kongbusangzhong_info:'限武将牌正面朝上时使用，对所有其他角色各造成1~2点伤害；使用后将武将牌翻至背面',
 		hsshenqi_nengliangzhiguang:'能量之光',
-		hsshenqi_nengliangzhiguang_info:'令一名角色增加一点体力上限，回复一点体力，并摸四张牌；使用后将武将牌翻至背面且本回合内无法继续使用神器牌',
+		hsshenqi_nengliangzhiguang_info:'限武将牌正面朝上时使用，令一名角色增加一点体力上限，回复一点体力，并摸四张牌；使用后将武将牌翻至背面',
 		hsbaowu:'宝物',
 		hsbaowu_huangjinyuanhou:'黄金猿猴',
 		hsbaowu_huangjinyuanhou_info:'回复全部体力，弃置所有手牌，并获得等量的无中生有；直到下个回合开始，防上即将受到的一切伤害',

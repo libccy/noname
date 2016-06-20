@@ -10,6 +10,7 @@ window.noname_update={
             'character/hearth.js',
             'character/yijiang.js',
             'mode/chess.js',
+            'mode/identity.js',
             'game/game.js',
             'game/asset.js',
         ],

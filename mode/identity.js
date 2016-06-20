@@ -579,24 +579,24 @@ mode.identity={
 					table.style.maxWidth='400px';
 					var tr=document.createElement('tr');
 					table.appendChild(tr);
-					var list;
+					var listi;
 					if(event.zhongmode){
-						list=['random','zhu','mingzhong','zhong','nei','fan'];
+						listi=['random','zhu','mingzhong','zhong','nei','fan'];
 					}
 					else{
-						list=['random','zhu','zhong','nei','fan'];
+						listi=['random','zhu','zhong','nei','fan'];
 					}
 
-					for(var i=0;i<list.length;i++){
+					for(var i=0;i<listi.length;i++){
 						var td=document.createElement('td');
 						tr.appendChild(td);
-						td.link=list[i];
+						td.link=listi[i];
 						td.style.fontSize='25px';
 						td.style.fontFamily='xinwei';
 						if(td.link===game.me.identity){
 							td.classList.add('thundertext');
 						}
-						td.innerHTML=get.translation(list[i]+'2');
+						td.innerHTML=get.translation(listi[i]+'2');
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 							if(_status.dragged) return;
 							if(_status.justdragged) return;
@@ -609,7 +609,31 @@ mode.identity={
 								delete game.zhu.isZhu;
 								delete game.zhu.identityShown;
 							}
-							dialog.close();
+
+							if(this.link!='zhu'&&game.me.identity!='zhu'){
+								var current=this.parentNode.querySelector('.thundertext');
+								if(current){
+									current.classList.remove('thundertext');
+								}
+								this.classList.add('thundertext');
+								event.list=event.list.concat(list);
+								event.list.randomSort();
+								num=get.config('choice_'+this.link);
+								list=event.list.splice(0,num);
+								var buttons=ui.create.div('.buttons');
+								var node=_status.event.dialog.buttons[0].parentNode;
+								_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
+								_status.event.dialog.content.insertBefore(buttons,node);
+								buttons.animate('start');
+								node.remove();
+								game.uncheck();
+								game.check();
+								_status.event.parent.swapnodialog=true;
+							}
+							else{
+								_status.event.parent.swapnodialog=false;
+								dialog.close();
+							}
 							_status.event=_status.event.parent;
 							_status.event.step=0;
 							if(this.link!='random'){
@@ -741,10 +765,17 @@ mode.identity={
 						list=list2.concat(list3.slice(0,num));
 					}
 				}
-				var dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
-				if(get.config('change_identity')){
-					addSetting(dialog);
+				var dialog;
+				if(event.swapnodialog){
+					dialog=ui.dialog;
 				}
+				else{
+					dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
+					if(get.config('change_identity')){
+						addSetting(dialog);
+					}
+				}
+
 				if(!event.chosen.length){
 					game.me.chooseButton(dialog,true).selectButton=function(){
 						return get.config('double_character')?2:1
