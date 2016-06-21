@@ -69,9 +69,9 @@ character.hearth={
 		hs_yelise:['female','wei',3,['xunbao','zhuizong']],
 
 		hs_fandral:['male','shu',4,['nuyan','chouhuo']],
-		hs_hallazeal:['male','wei',3,['shengteng','yuansu']],
+		hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
 		// hs_nzoth:['male','shu',4,['nuyan']],
-		// hs_walian:['male','shu',4,['zhanyi']],
+		hs_walian:['male','shu',4,['wzhanyi']],
 		// hs_pengpeng:['male','qun',4,['zhadan']],
 	},
 	perfectPair:{
@@ -81,6 +81,37 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		shengteng:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			filter:function(event){
+				return event.card&&get.type(event.card)=='trick';
+			},
+			content:function(){
+				player.gainMaxHp(true);
+				player.recover();
+			},
+		},
+		yuansu:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.maxHp-player.hp>=3;
+			},
+			filterTarget:function(card,player,target){
+				return player.canUse('yuansuhuimie',target);
+			},
+			selectTarget:-1,
+			multitarget:true,
+			multiline:true,
+			line:'thunder',
+			content:function(){
+				player.maxHp=player.hp;
+				player.update();
+				targets.sort(lib.sort.seat);
+                player.useCard({name:'yuansuhuimie'},targets).animate=false;
+			}
+		},
 		chouhuo:{
 			unique:true,
 			trigger:{player:'phaseBegin'},
@@ -4517,7 +4548,7 @@ character.hearth={
 		hs_anomalus:'阿诺玛鲁斯',
 		hs_blingtron:'布林顿',
 		hs_fandral:'范达尔',
-		hs_hallazeal:'海拉泽尔',
+		hs_hallazeal:'海纳泽尔',
 		hs_nzoth:'恩佐斯',
 		hs_walian:'瓦里安',
 		hs_pengpeng:'砰砰博士',
@@ -4542,10 +4573,12 @@ character.hearth={
 		hs_yogg:'尤格萨隆',
 		hs_xialikeer:'夏克里尔',
 
+		wzhanyi:'战意',
+		wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌，然后可以使用你摸到的牌',
 		shengteng:'升腾',
 		shengteng_info:'锁定技，每当你使用锦囊牌造成伤害，你增加一点体力上限并回复一点体力',
 		yuansu:'元素',
-		yuansu_info:'出牌阶段限一次，若你已损失的体力值不少于存活角色数，你可以将体力上限降至与体力值相同，视为使用一张元素毁灭',
+		yuansu_info:'出牌阶段限一次，若你已损失的体力值不少于3，你可以将体力上限降至与体力值相同，视为使用一张元素毁灭',
 		nuyan:'怒焰',
 		nuyan2:'怒焰',
 		nuyan_backup:'怒焰',
