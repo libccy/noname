@@ -609,38 +609,52 @@ mode.identity={
 								delete game.zhu.isZhu;
 								delete game.zhu.identityShown;
 							}
-
-							if(this.link!='zhu'&&game.me.identity!='zhu'){
-								var current=this.parentNode.querySelector('.thundertext');
-								if(current){
-									current.classList.remove('thundertext');
+							var current=this.parentNode.querySelector('.thundertext');
+							if(current){
+								current.classList.remove('thundertext');
+							}
+							current=seats.querySelector('.thundertext');
+							if(current){
+								current.classList.remove('thundertext');
+							}
+							var link=this.link;
+							if(link=='random'){
+								link=['zhu','zhong','nei','fan'].randomGet();
+								for(var i=0;i<this.parentNode.childElementCount;i++){
+									if(this.parentNode.childNodes[i].link==link){
+										this.parentNode.childNodes[i].classList.add('thundertext');
+									}
 								}
+							}
+							else{
 								this.classList.add('thundertext');
-								event.list=event.list.concat(list);
-								event.list.randomSort();
-								num=get.config('choice_'+this.link);
-								list=event.list.splice(0,num);
+							}
+							num=get.config('choice_'+link);
+							_status.event.parent.swapnodialog=function(dialog,list){
 								var buttons=ui.create.div('.buttons');
-								var node=_status.event.dialog.buttons[0].parentNode;
-								_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
-								_status.event.dialog.content.insertBefore(buttons,node);
+								var node=dialog.buttons[0].parentNode;
+								dialog.buttons=ui.create.buttons(list,'character',buttons);
+								dialog.content.insertBefore(buttons,node);
 								buttons.animate('start');
 								node.remove();
 								game.uncheck();
 								game.check();
-								_status.event.parent.swapnodialog=true;
-							}
-							else{
-								_status.event.parent.swapnodialog=false;
-								dialog.close();
+								for(var i=0;i<seats.firstChild.childElementCount;i++){
+									if(get.distance(game.zhu,game.me,'absolute')===seats.firstChild.childNodes[i].link){
+										seats.firstChild.childNodes[i].classList.add('thundertext');
+									}
+								}
 							}
 							_status.event=_status.event.parent;
 							_status.event.step=0;
-							if(this.link!='random'){
-								_status.event.identity=this.link;
+							_status.event.identity=link;
+							if(link!='zhu'){
+								seats.previousSibling.style.display='';
+								seats.style.display='';
 							}
 							else{
-								delete _status.event.identity;
+								seats.previousSibling.style.display='none';
+								seats.style.display='none';
 							}
 							game.resume();
 						});
@@ -755,7 +769,7 @@ mode.identity={
 					event.ai(game.zhu,event.list,list2)
 					event.list.remove(game.zhu.name);
 					event.list.remove(game.zhu.name2);
-					list=event.list.splice(0,num);
+					list=event.list.slice(0,num);
 				}
 				else{
 					if(event.zhongmode){
@@ -765,9 +779,12 @@ mode.identity={
 						list=list2.concat(list3.slice(0,num));
 					}
 				}
+				delete event.swapnochoose;
 				var dialog;
 				if(event.swapnodialog){
 					dialog=ui.dialog;
+					event.swapnodialog(dialog,list);
+					delete event.swapnodialog;
 				}
 				else{
 					dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
@@ -791,13 +808,12 @@ mode.identity={
 							game.changeCoin(-3);
 						}
 						if(game.zhu!=game.me){
-							event.list=event.list.concat(list);
 							event.list.randomSort();
-							list=event.list.splice(0,num);
+							list=event.list.slice(0,num);
 						}
 						else{
 							list3.randomSort();
-							list=list3.slice(0,num).concat(list2);
+							list=list2.concat(list3.slice(0,num));
 						}
 						var buttons=ui.create.div('.buttons');
 						var node=_status.event.dialog.buttons[0].parentNode;

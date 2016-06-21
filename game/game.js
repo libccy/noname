@@ -27793,7 +27793,7 @@
 					}
 				}
 
-                if(lib.config.show_favourite&&lib.character[node.name]){
+                if(lib.config.show_favourite&&lib.character[node.name]&&get.mode()!='story'){
                     var addFavourite=ui.create.div('.text.center');
                     addFavourite.link=node.link;
                     if(lib.config.favouriteCharacter.contains(node.name)){
@@ -28053,7 +28053,7 @@
 						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 					}
 				}
-                if((node.parentNode.classList.contains('menu-buttons')||lib.config.show_favourite)&&lib.character[node.link]){
+                if((node.parentNode.classList.contains('menu-buttons')||lib.config.show_favourite)&&lib.character[node.link]&&get.mode()!='story'){
                     var addFavourite=ui.create.div('.text.center');
                     addFavourite.link=node.link;
                     addFavourite.style.marginBottom='15px';
