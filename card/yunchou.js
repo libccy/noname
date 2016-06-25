@@ -17,17 +17,6 @@ card.yunchou={
 				},
 			},
 		},
-		huxinjing:{
-			fullskin:true,
-			type:"equip",
-			subtype:"equip2",
-			skills:['huxinjing'],
-			ai:{
-				basic:{
-					equipValue:6
-				},
-			},
-		},
 		chenhuodajie:{
 			fullskin:true,
 			type:'trick',
@@ -83,80 +72,6 @@ card.yunchou={
 				result:{
 					target:1,
 					player:0.1,
-				}
-			}
-		},
-		huoshaolianying:{
-			fullskin:true,
-			type:'trick',
-			filterTarget:function(card,player,target){
-				if(player==target) return false;
-				var link=false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isLinked()&&game.players[i]!=player){
-						link=true;break;
-					}
-				}
-				if(link){
-					if(!target.isLinked()) return false;
-					var distance=get.distance(player,target,'absolute');
-					for(var i=0;i<game.players.length;i++){
-						if(target!=game.players[i]&&
-							game.players[i]!=player&&
-							game.players[i].isLinked()){
-							if(get.distance(player,game.players[i],'absolute')<distance){
-								return false;
-							}
-							if(get.distance(player,game.players[i],'absolute')==distance&&
-								parseInt(game.players[i].dataset.position)<parseInt(target.dataset.position)){
-								return false;
-							}
-						}
-					}
-					return true;
-				}
-				else{
-					var dist=get.distance(player,target);
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i]!=player&&get.distance(player,game.players[i])<dist) return false;
-					}
-					return true;
-				}
-			},
-			enable:true,
-			selectTarget:-1,
-			content:function(){
-				target.damage('fire');
-			},
-			ai:{
-				order:5,
-				value:6,
-				tag:{
-					damage:1,
-					natureDamage:1,
-					fireDamage:1,
-				},
-				result:{
-					target:function(player,target){
-						if(target.hasSkillTag('nofire')||target.hasSkillTag('nodamage')) return 0;
-						if(target.skills.contains('xuying')&&target.num('h')==0) return 0;
-						if(!target.isLinked()){
-							return ai.get.damageEffect(target,player,target,'fire');
-						}
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].isLinked()){
-								var eff=ai.get.damageEffect(game.players[i],player,target,'fire');
-								if(eff>0){
-									num++;
-								}
-								else if(eff<0){
-									num--;
-								}
-							}
-						}
-						return num;
-					}
 				}
 			}
 		},
@@ -756,31 +671,6 @@ card.yunchou={
 		},
 	},
 	skill:{
-		huxinjing:{
-			trigger:{player:'damageBegin'},
-			priority:10,
-			forced:true,
-			filter:function(event){
-				return event.num>0;
-			},
-			content:function(){
-				trigger.num--;
-				player.addSkill('huxinjing2');
-				// player.discard(player.get('e','2'));
-			}
-		},
-		huxinjing2:{
-			trigger:{player:'damageEnd'},
-			priority:10,
-			forced:true,
-			popup:false,
-			content:function(){
-				var cards=player.get('e','huxinjing');
-				if(cards.length){
-					player.discard(cards);
-				}
-			}
-		},
 		suolianjia:{
 			trigger:{player:'damageBefore'},
 			filter:function(event){
@@ -883,9 +773,6 @@ card.yunchou={
 		suolianjia:'锁链甲',
 		suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
 		suolianjia_bg:'链',
-		huxinjing_bg:'镜',
-		huxinjing:'护心镜',
-		huxinjing_info:'抵消一点伤害',
 		geanguanhuo:'隔岸观火',
 		geanguanhuo_info:'指定任意两名角色进行拚点，拚点输的一方掉1点血；若点数一样则使用该锦囊的角色掉1点血。拚点的牌不用丢弃。',
 		toulianghuanzhu:'偷梁换柱',
@@ -895,13 +782,10 @@ card.yunchou={
 		yihuajiemu_info:'将一名角色的宝物牌转移至另一名角色',
 		fudichouxin:'釜底抽薪',
 		fudichouxin_info:'与一名角色进行拼点，若成功则获得双方拼点牌',
-		shuiyanqijun:'水淹七军',
+		shuiyanqijun:'水攻',
 		shuiyanqijun_info:'令所有有装备的角色各弃置一张装备牌',
 		shushangkaihua:'树上开花',
 		shushangkaihua_info:'使用者与手牌数最少的所有角色各摸一张牌',
-		huoshaolianying:'火烧连营',
-		huoshaolianying_bg:'烧',
-		huoshaolianying_info:'对离你最近的一名横置角色使用（若无横置角色则改为对距离你最近的所有角色使用），对目标造成一点火焰伤害',
 		chenhuodajie:'趁火打劫',
 		chenhuodajie_info:'任意一名其他角色受到伤害时对其使用，获得其一张牌',
 		huoshan:'火山',
@@ -949,8 +833,6 @@ card.yunchou={
 		['club',10,'toulianghuanzhu'],
 		['spade',11,'toulianghuanzhu'],
 		['spade',13,'guohe'],
-		['heart',7,'huoshaolianying','fire'],
-		['diamond',12,'huoshaolianying','fire'],
 		['heart',6,'shushangkaihua'],
 		['club',1,'shushangkaihua'],
 		['diamond',6,'chenhuodajie'],
@@ -958,6 +840,5 @@ card.yunchou={
 		['club',3,'chenhuodajie'],
 
 		['club',13,'suolianjia'],
-		['spade',9,'huxinjing'],
 	],
 }

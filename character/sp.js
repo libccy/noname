@@ -1016,7 +1016,12 @@ character.sp={
 				player.storage.xunzhi=0;
 			},
 			filter:function(event,player){
-				return player.hp!=player.previousSeat.hp&&player.hp!=player.nextSeat.hp;
+				var previous=player.getPrevious();
+				var next=player.getNext();
+				if(previous&&next){
+					return player.hp!=previous.hp&&player.hp!=next.hp;
+				}
+				return false;
 			},
 			check:function(event,player){
 				return player.hp>=3&&player.num('h')>player.hp+1;
@@ -4045,6 +4050,7 @@ character.sp={
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
 			popup:false,
+			silent:true,
 			content:function(){
 				delete player.storage.qiangwu;
 			}

@@ -6,6 +6,7 @@ card.extra={
 			fullskin:true,
 			type:"basic",
 			enable:true,
+			lianheng:true,
 			savable:function(card,player,dying){
 				return dying==player;
 			},
@@ -513,9 +514,6 @@ card.extra={
 		huogong_bg:'攻',
 		huogong_info:'目标角色展示一张手牌，然后若你能弃掉一张与所展示牌相同花色的手牌，则火攻对该角色造成1点火焰伤害。',
 		tiesuo_bg:'锁',
-		_chongzhu:'重铸',
-		_lianhuan:'连环',
-		_lianhuan2:'连环',
 		bingliang:'兵粮寸断',
 		hualiu:'骅骝',
 		zhuque:'朱雀羽扇',

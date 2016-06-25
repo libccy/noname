@@ -450,7 +450,7 @@ character.swd={
 					return -att/2;
 				};
 				"step 1"
-				if(result.bool){
+				if(result.bool&&result.targets[0]){
 					var target=result.targets[0];
 					player.logSkill('guozao',target);
 					var cards=target.get('h');

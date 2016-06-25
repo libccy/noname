@@ -992,6 +992,31 @@ mode.guozhan={
 				}
 				return true;
 			},
+			isMajor:function(){
+				if(this.identity=='ye'||this.identity=='unknown') return false;
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].num('e','yuxi')){
+						if(game.players[i].identity!='ye'&&game.players[i].identity!='unknown'){
+							list.add(game.players[i].identity);
+						}
+					}
+				}
+				if(list.length){
+					return list.contains(this.identity);
+				}
+				var wei=get.population('wei'),shu=get.population('shu'),wu=get.population('wu'),qun=get.population('qun');
+				if(wei<=1&&shu<=1&&wu<=1&&qun<=1) return false;
+				return get.population(this.identity)==Math.max(wei,shu,wu,qun);
+			},
+			isMinor:function(){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isMajor()){
+						return !this.isMajor();
+					}
+				}
+				return false;
+			},
 			logAi:function(targets,card){
 				if(this.ai.shown==1) return;
 				if(typeof targets=='number'){

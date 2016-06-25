@@ -1060,7 +1060,7 @@ character.yijiang={
 				'step 1'
 				player.chooseControl('选项一','选项二',function(){
 					return Math.random()<0.5?'选项一':'选项二';
-				}).set('prompt','督粮<br><br><div class="text">选项一：令其观看牌堆顶的两张牌，然后获得其中的基本牌</div><br><div class="text">选项二：令其于下个摸牌阶段额外摸一张牌</br>');
+				}).set('prompt','督粮<br><br><div class="text">选项一：令其观看牌堆顶的两张牌，然后获得其中的基本牌</div><br><div class="text">选项二：令其于下个摸牌阶段额外摸一张牌</div>');
 				'step 2'
 				if(result.control=='选项一'){
 					var cards=get.cards(2);

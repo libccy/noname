@@ -81,6 +81,39 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		wzhanyi:{
+			trigger:{player:'phaseUseBefore'},
+			check:function(event,player){
+				return player.num('h')+2<=player.hp;
+			},
+			content:function(){
+				'step 0'
+				event.cards=get.cards(3);
+				trigger.untrigger();
+				trigger.finish();
+				player.$draw(event.cards.slice(0));
+				for(var i=0;i<event.cards.length;i++){
+					if(get.type(event.cards[i])=='equip'){
+						player.equip(event.cards[i]);
+						event.cards.splice(i--,1);
+					}
+				}
+				player.gain(event.cards);
+				'step 1'
+				if(player.num('h','sha')){
+					player.chooseToUse('战意：使用一张杀').filterCard=function(card){
+						return card.name=='sha'&&get.itemtype(card)=='card';
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					event.goto(1);
+				}
+			}
+		},
 		shengteng:{
 			trigger:{source:'damageEnd'},
 			forced:true,
@@ -4574,7 +4607,7 @@ character.hearth={
 		hs_xialikeer:'夏克里尔',
 
 		wzhanyi:'战意',
-		wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌，然后可以使用你摸到的牌',
+		wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌并展示之，将摸到的装备牌置于装备区，然后可以使用手牌中的杀',
 		shengteng:'升腾',
 		shengteng_info:'锁定技，每当你使用锦囊牌造成伤害，你增加一点体力上限并回复一点体力',
 		yuansu:'元素',

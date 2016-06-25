@@ -56,7 +56,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:11,
+        versionOL:12,
 		updateURL:localStorage.getItem('noname_update_url')||'http://websha.cn/',
 		assetURL:'',
         hallURL:'websha.cn',
@@ -3658,9 +3658,9 @@
 						}
 					});
 				}
-                if(lib.config.debug&&window.require){
-                    window.require('remote').getCurrentWindow().openDevTools();
-                }
+                // if(lib.config.debug&&window.require){
+                //     window.require('remote').getCurrentWindow().openDevTools();
+                // }
 				ui.background=ui.create.div('.background');
 				ui.background.style.backgroundSize="cover";
 				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background!='custom'){
@@ -4619,7 +4619,8 @@
 			mad:'混乱',
 			mad_bg:'疯',
 			draw_card:'摸牌',
-			discard_card:'弃牌',
+            discard_card:'弃牌',
+			take_damage:'受伤害',
 			reset_character:'重置武将牌',
 			recover_hp:'回复体力',
 			lose_hp:'流失体力',
@@ -4650,6 +4651,9 @@
 			eight:'八',
 			nine:'九',
 			ten:'十',
+    		_chongzhu:'重铸',
+    		_lianhuan:'连环',
+    		_lianhuan2:'连环',
 		},
 		element:{
 			playerproto:{
@@ -4730,7 +4734,7 @@
 					"step 0";
 					player.chooseToUse();
 					"step 1"
-					if(result.bool){
+					if(result.bool&&!event.skipped){
 						event.goto(0);
 					}
                     game.broadcastAll(function(){
@@ -7779,6 +7783,26 @@
 						}(i));
 					}
 				},
+                getNext:function(){
+                    var target=this;
+                    for(var i=0;i<game.players.length-1;i++){
+                        target=target.next;
+                        if(!target.hasSkill('undist')){
+                            return target;
+                        }
+                    }
+                    return null;
+                },
+                getPrevious:function(){
+                    var target=this;
+                    for(var i=0;i<game.players.length-1;i++){
+                        target=target.previous;
+                        if(!target.hasSkill('undist')){
+                            return target;
+                        }
+                    }
+                    return null;
+                },
 				get:function(arg1,arg2,arg3,arg4){
 					var i,j;
 					if(arg1=='s'){
@@ -8663,6 +8687,9 @@
 					if(!next.targets){
 						next.targets=[];
 					}
+                    if(next.card&&get.info(next.card)&&get.info(next.card).changeTarget){
+                        get.info(next.card).changeTarget(next.player,next.targets);
+                    }
 					for(var i=0;i<next.targets.length;i++){
 						if(ai.get.attitude(this,next.targets[i])>=-1&&ai.get.attitude(this,next.targets[i])<0){
 							if(!this.ai.tempIgnore) this.ai.tempIgnore=[];
@@ -9813,7 +9840,7 @@
                     return false;
                 },
 				hasSkill:function(skill){
-					return this.get('s').contains(skill);
+					return game.expandSkills(this.get('s')).contains(skill);
 				},
 				hasSkillTag:function(tag,hidden){
 					var skills=game.expandSkills(this.get('s',hidden));
@@ -12085,6 +12112,7 @@
 			global:[],
 			storage:{},
 			unequip:{},
+            undist:{},
 			mad:{
 				mark:true,
 				intro:{
@@ -17769,7 +17797,11 @@
 		finishCards:function(){
 			_status.cardsFinished=true;
 			var i,j,k;
+            var mode=get.mode();
 			for(i in lib.card){
+                if(lib.translate[i+'_info_'+mode]){
+                    lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
+                }
 				var card=lib.card[i];
 				if(card.type=='equip'){
 					if(card.enable==undefined) card.enable=true;
@@ -17826,14 +17858,17 @@
 				}
 			}
 			for(i in lib.skill){
-				if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(get.mode())){
+                if(lib.translate[i+'_info_'+mode]){
+                    lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
+                }
+				if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(mode)){
 					lib.skill[i]={};
 					if(lib.translate[i+'_info']){
 						lib.translate[i+'_info']='此模式下不可用';
 					}
 					continue;
 				}
-				if(lib.skill[i].mode&&lib.skill[i].mode.contains(get.mode())==false){
+				if(lib.skill[i].mode&&lib.skill[i].mode.contains(mode)==false){
 					lib.skill[i]={};
 					if(lib.translate[i+'_info']){
 						lib.translate[i+'_info']='此模式下不可用';
@@ -21622,7 +21657,7 @@
                                     }
                                     if(!ui.arena.classList.contains('menupaused')){
                                         ui.click.configMenu();
-                                        ui.click.menuTab('帮助');
+                                        ui.click.menuTab('其它');
                                     }
 
     								var proceed=function(){
@@ -27119,14 +27154,14 @@
 				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
 					if(player.nextSeat!=to){
 						player=player.nextSeat;
-						if(player.isAlive()&&!player.isOut()&&!player.isMin(true)) n++;
+						if(player.isAlive()&&!player.isOut()&&!player.hasSkill('undist')&&!player.isMin(true)) n++;
 					}
 					else{
 						break;
 					}
 				}
 				for(i=0;i<game.players.length;i++){
-					if(game.players[i].isOut()||game.players[i].isMin(true)) length--;
+					if(game.players[i].isOut()||game.players[i].hasSkill('undist')||game.players[i].isMin(true)) length--;
 				}
 				if(method=='absolute') return n;
 				if(from.isDead()) length++;
