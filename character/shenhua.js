@@ -565,6 +565,7 @@ character.shenhua={
 						}
 						if(!hasfriend) return;
 						if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
+							if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
 							if(target.num('h')==0) return 2;
 							return [0.5,target.num('h','sha')+target.num('h','shan')];
 						}

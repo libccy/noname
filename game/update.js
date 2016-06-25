@@ -11,6 +11,7 @@ window.noname_update={
             'character/sp.js',
             'character/hearth.js',
             'character/yijiang.js',
+            'character/swd.js',
             'card/swd.js',
             'card/extra.js',
             'card/zhenfa.js',
@@ -22,6 +23,8 @@ window.noname_update={
             'mode/identity.js',
             'game/game.js',
             'game/asset.js',
+            'extension/coin/extension.js',
+            'layout/default/layout.css'
         ],
         '1.8.15.4':[]
     }

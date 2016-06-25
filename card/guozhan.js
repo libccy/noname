@@ -39,6 +39,8 @@ card.guozhan={
 			},
 			ai:{
 				order:0.5,
+				value:4,
+				useful:2,
 				result:{
 					target:function(player,target){
 						if(target.num('he')>=2) return 1;
@@ -74,6 +76,9 @@ card.guozhan={
 				}
 			},
 			ai:{
+				order:7,
+				value:4,
+				useful:2,
 				result:{
 					target:function(player,target){
 						return ai.get.damageEffect(target,player,target,'thunder')*target.num('e');
@@ -111,6 +116,8 @@ card.guozhan={
 			},
 			ai:{
 				order:7.5,
+				value:4,
+				useful:2,
 				wuxie:function(){
 					return 0;
 				},
@@ -119,7 +126,7 @@ card.guozhan={
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
 							if(target.isMajor()==game.players[i].isMajor()){
-								if(target.isLinked){
+								if(target.isLinked()){
 									num+=ai.get.attitude(player,target);
 								}
 								else{
@@ -184,6 +191,8 @@ card.guozhan={
 			},
 			ai:{
 				order:3,
+				value:4,
+				useful:2,
 				result:{
 					player:0.8,
 					target:1
@@ -225,6 +234,12 @@ card.guozhan={
 				else{
 					target.chooseToDiscard('he',{type:'equip'},true);
 				}
+			},
+			ai:{
+				order:6,
+				result:{
+					target:-1
+				}
 			}
 		},
 		diaohulishan:{
@@ -240,9 +255,12 @@ card.guozhan={
 			},
 			ai:{
 				order:10,
+				value:4,
+				useful:2,
 				result:{
 					player:1,
 					target:function(player,target){
+						if(target.hp==1) return 0;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i]==target) continue;
 							if(ai.get.attitude(player,game.players[i])<=ai.get.attitude(player,target)){
