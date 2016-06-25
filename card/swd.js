@@ -682,10 +682,10 @@ card.swd={
 			check:function(event,player){
 				var att=ai.get.attitude(player,event.target);
 				if(player.skills.contains('jiu')) return att>0;
+				if(event.target.hp==1) return att>0;
 				if(event.target.hasSkillTag('maixie')){
 					return att<=0;
 				}
-				if(event.target.hp==1) return att>0;
 				if(player.skills.contains('tianxianjiu')) return false;
 				return att<=0;
 			},

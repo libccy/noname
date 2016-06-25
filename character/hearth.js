@@ -1425,7 +1425,7 @@ character.hearth={
 				}
 				'step 1'
 				if(result.bool){
-					player.line(result.targets[0],'green');
+					player.logSkill('fengyin',result.targets);
 					result.targets[0].addTempSkill('fengyin2',{player:'phaseAfter'});
 				}
 			}

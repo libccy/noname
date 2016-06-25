@@ -4762,7 +4762,7 @@
 				},
 				chooseToUse:function(){
 					"step 0"
-                    var skills=player.get('s');
+                    var skills=player.get('s',true);
                     game.expandSkills(skills);
                     for(var i=0;i<skills.length;i++){
                         var info=lib.skill[skills[i]];

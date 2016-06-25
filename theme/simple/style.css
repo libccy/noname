@@ -65,6 +65,10 @@ body{
 .player.unseen .equips:not(*:empty){
 	border-radius:4px;
 }
+#arena.mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena:not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card{
+	background: none !important;
+}
 #arena:not(.chess) .player[data-position='0']>.equips>.equip5 {
     border-radius: 4px;
 }

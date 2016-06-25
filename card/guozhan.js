@@ -126,7 +126,7 @@ card.guozhan={
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
 							if(target.isMajor()==game.players[i].isMajor()){
-								if(target.isLinked()){
+								if(game.players[i].isLinked()){
 									num+=ai.get.attitude(player,target);
 								}
 								else{
@@ -257,8 +257,13 @@ card.guozhan={
 				order:10,
 				value:4,
 				useful:2,
+				wuxie:function(){
+					return 0;
+				},
 				result:{
-					player:1,
+					player:function(player,target){
+						if(target.hp==1) return 0;
+					},
 					target:function(player,target){
 						if(target.hp==1) return 0;
 						for(var i=0;i<game.players.length;i++){
