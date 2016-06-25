@@ -5141,7 +5141,7 @@ character.sp={
 			selectCard:[1,Infinity],
 			complexSelect:true,
 			filterTarget:function(card,player,target){
-				return get.distance(player,target,'attack')<=1&&ui.selected.cards.length==target.hp;
+				return target!=player&&get.distance(player,target,'attack')<=1&&ui.selected.cards.length==target.hp;
 			},
 			check:function(card){
 				switch(ui.selected.cards.length){

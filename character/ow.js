@@ -3,7 +3,7 @@ character.ow={
     character:{
         ow_liekong:['female','shu',3,['shanxian','shanhui']],
         // ow_heibaihe:['female','shu',3,[]],
-        ow_sishen:['male','shu',3,['xiandan','yihun','hongxi']],
+        ow_sishen:['male','shu',3,['xiandan','yihun','shouge']],
         ow_tianshi:['female','qun',3,['shouhu','ziyu','feiying']],
         ow_falaozhiying:['female','shu',3,['feidan','huoyu','feiying']],
         ow_zhixuzhiguang:['female','qun',3,['guangshu']],
@@ -15,6 +15,47 @@ character.ow={
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
     },
     skill:{
+        xiandan:{
+			trigger:{player:'shaBegin'},
+			direct:true,
+			content:function(){
+				"step 0"
+				var dis=trigger.target.num('h','shan')||trigger.target.num('e','bagua')||trigger.target.num('h')>2;
+				var next=player.chooseToDiscard('是否发动【霰弹】？');
+				next.ai=function(card){
+					if(dis) return 7-ai.get.value(card);
+					return 0;
+				}
+				next.logSkill='xiandan';
+				"step 1"
+				if(result.bool){
+                    if(get.color(result.cards[0])=='red'){
+                        trigger.directHit=true;
+                    }
+					else{
+                        player.addTempSkill('xiandan2','shaAfter');
+                    }
+				}
+			}
+		},
+        xiandan2:{
+			trigger:{source:'damageBegin'},
+			filter:function(event){
+				return event.card&&event.card.name=='sha'&&event.notLink();
+			},
+			forced:true,
+            popup:false,
+			content:function(){
+				trigger.num++;
+			}
+		},
+        shouge:{
+            trigger:{source:'dieAfter'},
+            frequent:true,
+            content:function(){
+                player.gain(game.createCard('zhiliaobo'),'gain2');
+            }
+        },
         tuji:{
             mod:{
                 globalFrom:function(from,to,distance){
@@ -417,7 +458,7 @@ character.ow={
                 }
             }
         },
-        xiandan:{
+        xiandan_old:{
             mod:{
                 selectTarget:function(card,player,range){
                     if(card.name=='sha'&&range[1]!=-1){
@@ -456,7 +497,7 @@ character.ow={
             trigger:{player:'phaseEnd'},
             direct:true,
             filter:function(event,player){
-                return player.num('he',{suit:'spade'})>0;
+                return player.num('he',{suit:'spade'})>0&&!player.hasSkill('yihun2');
             },
             content:function(){
                 'step 0'
@@ -492,13 +533,15 @@ character.ow={
             },
         },
         yihun2:{
-            trigger:{global:'phaseBegin'},
+            trigger:{global:['phaseBegin','dieAfter']},
             forced:true,
             filter:function(event,player){
                 return event.player==player.storage.yihun2;
             },
             content:function(){
-                player.useCard({name:'sha'},player.storage.yihun2);
+                if(player.storage.yihun2.isAlive()){
+                    player.useCard({name:'sha'},player.storage.yihun2);
+                }
                 player.removeSkill('yihun2');
                 delete player.storage.yihun2;
             },
@@ -1067,6 +1110,8 @@ character.ow={
         }
     },
     translate:{
+        shouge:'收割',
+        shouge_info:'每当你杀死一名角色，你可以获得一张治疗波',
         tuji:'突击',
         tuji_info:'锁定技，在你的回合内，你每使用一次牌后，你计算与其他角色的距离便减少1，直到回合结束',
         mujing:'目镜',
@@ -1085,7 +1130,7 @@ character.ow={
         sheng:'圣',
         sheng_info:'限定技，出牌阶段，你可以将你的武将牌翻面，然后令任意名角色回复一点体力，若如此做，你不能成为其他角色的卡牌目标直到下一回合开始',
         xiandan:'霰弹',
-        xiandan_info:'你的杀可以指定距离1以内的角色为额外目标',
+        xiandan_info:'每当你使用一张杀，你可以弃置一张红色牌令此杀不可闪避，或弃置一张黑色牌令此杀伤害+1',
         yihun:'移魂',
         yihun_info:'回合结束阶段，你可以弃置一张黑桃牌并指定一名其他角色，你在该角色下一回合开始时视为对其使用一张杀；在此之前，你不能使用卡牌，也不能成为卡牌的目标',
         feidan:'飞弹',

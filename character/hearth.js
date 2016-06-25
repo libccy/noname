@@ -56,7 +56,7 @@ character.hearth={
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
 		hs_tgolem:['male','wu',4,['xinwuyan','guozai']],
 		hs_totemic:['male','wu',3,['s_tuteng']],
-		hs_xsylvanas:['female','wei',3,['busi','xshixin','xmojian']],
+		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
 		hs_jinglinglong:['male','wu',3,['mianyi']],
@@ -2045,7 +2045,7 @@ character.hearth={
 			trigger:{player:'turnOverAfter'},
 			direct:true,
 			filter:function(event,player){
-				return player.isTurnedOver();
+				return !player.isTurnedOver();
 			},
 			content:function(){
 				"step 0"
@@ -4776,7 +4776,7 @@ character.hearth={
 		xshixin:'蚀心',
 		xshixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各流失一点体力',
 		xmojian:'魔箭',
-		xmojian_info:'每当你的武将牌翻至背面时，你可以指定一名角色视为对其使用了一张杀',
+		xmojian_info:'每当你的武将牌翻至正面时，你可以指定一名角色视为对其使用了一张杀',
 		enze:'恩泽',
 		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（至多摸三张牌）',
 		chongsheng:'重生',

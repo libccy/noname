@@ -6,9 +6,13 @@ window.noname_update={
     files:{
         global:[
             'character/hearth.js',
+            'character/ow.js',
+            'character/yijiang.js',
+            'character/sp.js',
             'card/swd.js',
+            'card/guozhan.js',
             'game/game.js',
         ],
-        '1.8.15.4':[]
+        '1.8.16.1':[]
     }
 }

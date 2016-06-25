@@ -233,9 +233,9 @@ character.yijiang={
 				var target=result.targets[0];
 				event.target=target;
 				player.line(target,'green');
-				var type=get.type(trigger.card);
+				var type=get.type(trigger.card,'trick');
 				target.chooseCard('滔乱<br><br><div class="text center">交给'+get.translation(player)+'一张'+get.translation(type)+'牌，或令其失去一点体力',function(card,player,target){
-					return get.type(card)==_status.event.cardType;
+					return get.type(card,'trick')==_status.event.cardType;
 				}).set('cardType',type).set('ai',function(card){
 					if(_status.event.att){
 						return 11-ai.get.value(card);
@@ -4492,6 +4492,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				player.chooseTarget('是否发动【谮毁】？',function(card,player,target){
+					if(player==target) return false;
 					var trigger=_status.event.getTrigger();
 					return player.canUse(trigger.card,target)&&trigger.targets.contains(target)==false;
 				}).set('ai',function(target){

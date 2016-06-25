@@ -655,6 +655,7 @@ card.guozhan={
 			},
 			content:function(){
 				'step 0'
+				_status.chiling=false;
 				var targets=game.filterPlayer(function(target){
 					return target.isUnseen();
 				});
@@ -666,7 +667,7 @@ card.guozhan={
 					event.current=target;
 					if(target.num('he',{type:'equip'})){
 						target.chooseControl('选项一','选项二','选项三',function(){
-							return Math.random()<0.5?'选项一':'选项二';
+							return Math.random()<0.5?'选项一':'选项三';
 						}).set('prompt','敕令<br><br><div class="text">选项一：明置一张武将牌，然后摸一张牌</div><br><div class="text">选项二：失去1点体力</div><br><div class="text">选项三：弃置一张装备牌</div>');
 					}
 					else{
@@ -769,7 +770,7 @@ card.guozhan={
 				player.$give(cards,targets[0]);
 			},
 			discard:false,
-			delay:0.5,
+			// delay:0.5,
 			content:function(){
 				"step 0"
 				target.gain(cards);
