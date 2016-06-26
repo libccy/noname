@@ -311,7 +311,7 @@
 					},
 					enable_vibrate:{
 						name:'开启震动',
-						init:true
+						init:false
 					},
 					right_click:{
 						name:'右键功能',
@@ -1092,7 +1092,7 @@
 					},
 					target_shake:{
 						name:'目标效果',
-						init:'shake',
+						init:'off',
 						item:{
 							off:'关闭',
 							zoom:'缩放',
