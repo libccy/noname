@@ -21510,7 +21510,7 @@
 
     										if(!ui.arena.classList.contains('menupaused')){
     											ui.click.configMenu();
-    											ui.click.menuTab('帮助');
+    											ui.click.menuTab('其它');
     										}
     										var p=button1.parentNode;
     										button1.remove();
@@ -23590,7 +23590,7 @@
                                 if(confirm('是否下载图片和音频素材？（约100MB）')){
                                     if(!ui.arena.classList.contains('menupaused')){
                                         ui.click.configMenu();
-                                        ui.click.menuTab('帮助');
+                                        ui.click.menuTab('其它');
                                     }
                                     setTimeout(game.checkForAssetUpdate,500);
                                 }
