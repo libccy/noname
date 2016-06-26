@@ -4890,6 +4890,10 @@
 							var skill=event.skill;
 							ui.click.cancel();
 							event.aiexclude.add(skill);
+                            var info=get.info(skill);
+                            if(info.sourceSkill){
+                                event.aiexclude.add(info.sourceSkill);
+                            }
 							event.redo();
 							game.resume();
 						}
