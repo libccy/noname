@@ -3586,6 +3586,21 @@ character.yijiang={
 					delete player.storage.xinpojun2;
 				}
 				player.removeSkill('xinpojun2');
+			},
+			group:'xinpojun3'
+		},
+		xinpojun3:{
+			trigger:{player:'dieBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.$throw(player.storage.xinpojun2,1000);
+				for(var i=0;i<player.storage.xinpojun2.length;i++){
+					ui.discardPile.appendChild(player.storage.xinpojun2[i]);
+				}
+				game.log(player,'弃置了',player.storage.xinpojun2);
+				delete player.storage.xinpojun2;
+				player.removeSkill('xinpojun2');
 			}
 		},
 		qiaoshi:{

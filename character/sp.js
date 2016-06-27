@@ -4214,7 +4214,8 @@ character.sp={
 			},
 			ai:{
 				threaten:1.3,
-				expose:0.2
+				expose:0.2,
+				noh:true,
 			}
 		},
 		hengzheng:{

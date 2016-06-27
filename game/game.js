@@ -26065,7 +26065,7 @@
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
 				};
 				uiintro.addEventListener('mouseleave',clickintro);
-				uiintro.addEventListener('click',clickintro);
+				uiintro.listen(clickintro);
 
 				game.pause2();
 				return uiintro;
