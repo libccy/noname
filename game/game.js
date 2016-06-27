@@ -26035,7 +26035,13 @@
 				if(this.classList.contains('player')&&!this.name){
 					return;
 				}
-				var uiintro=get.nodeintro(this);
+                var uiintro;
+                if(this.classList.contains('card')&&this.parentNode&&this.parentNode.classList.contains('equips')){
+                    if(!lib.isMobileMe(this.parentNode.parentNode)){
+                        uiintro=get.nodeintro(this.parentNode.parentNode,false,e);
+                    }
+                }
+				uiintro=uiintro||get.nodeintro(this,false,e);
                 if(!uiintro) return;
 				uiintro.classList.add('popped');
 				uiintro.classList.add('static');
@@ -27839,7 +27845,7 @@
 				}
 			}
 		},
-		nodeintro:function(node,simple){
+		nodeintro:function(node,simple,evt){
 			var uiintro=ui.create.dialog('hidden','notouchscroll');
 			if(node.classList.contains('player')&&!node.name){
 				return uiintro;
@@ -27902,30 +27908,64 @@
                 }
 
 				if(!simple||lib.config.touchscreen){
-					var storage=node.storage;
-					for(i in storage){
-						if(get.info(i)&&get.info(i).intro){
-							intro=get.info(i).intro;
-							if(node.get('s').concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
-							var name=intro.name?intro.name:get.translation(i);
-							if(typeof name=='function'){
-								name=name(storage[i],node);
-							}
-							translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
-							var stint=get.storageintro(intro.content,storage[i],node);
-							if(stint){
-								translation+=stint+'</div></div>';
-								uiintro.add(translation);
-							}
-						}
-					}
-					var js=node.get('j');
-					for(var i=0;i<js.length;i++){
-						var name=lib.translate[js[i].viewAs||js[i].name];
-						translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>'+
-						lib.translate[(js[i].viewAs||js[i].name)+'_info']+'</div></div>';
-						uiintro.add(translation);
-					}
+                    if(lib.config.touchscreen){
+                        var storage=node.storage;
+    					for(i in storage){
+    						if(get.info(i)&&get.info(i).intro){
+    							intro=get.info(i).intro;
+    							if(node.get('s').concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
+    							var name=intro.name?intro.name:get.translation(i);
+    							if(typeof name=='function'){
+    								name=name(storage[i],node);
+    							}
+    							translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
+    							var stint=get.storageintro(intro.content,storage[i],node);
+    							if(stint){
+    								translation+=stint+'</div></div>';
+    								uiintro.add(translation);
+    							}
+    						}
+    					}
+                        var es=node.get('e');
+                        var esnodes=[];
+    					for(var i=0;i<es.length;i++){
+                            esnodes.push(['装备','',es[i].name]);
+    					}
+    					var js=node.get('j');
+    					for(var i=0;i<js.length;i++){
+                            esnodes.push(['判定','',js[i].viewAs||js[i].name]);
+    					}
+
+                        if(esnodes.length){
+                            uiintro.addSmall([esnodes,'vcard'],true);
+                            uiintro.content.lastChild.style.display='block';
+                            for(var i=0;i<esnodes.length;i++){
+                                uiintro.content.lastChild.childNodes[i].listen(function(e){
+                                    e.stopPropagation();
+                                    uiintro.content.innerHTML='';
+                                    uiintro.add(this.str);
+                                    uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[this.link[2]+'_info']+'</div>');
+                                    uiintro.add(ui.create.div('.placeholder.slim'));
+                                    if(evt){
+                                        lib.placePoppedDialog(uiintro,evt);
+                                    }
+                                });
+                                if(i<es.length){
+                                    uiintro.content.lastChild.childNodes[i].str=get.translation(es[i]);
+                                }
+                                else{
+                                    var j=i-es.length;
+                                    if(js[j].viewAs&&js[j].viewAs!=js[j].name){
+                                        uiintro.content.lastChild.childNodes[i].str=get.translation(js[j].viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(js[j])+'）</div>'
+                                    }
+                                    else{
+                                        uiintro.content.lastChild.childNodes[i].str=get.translation(js[j]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
 					if(lib.falseitem){
 						uiintro.add(ui.create.div('.placeholder'));
 						var table,tr,td;
@@ -28079,7 +28119,7 @@
                 }
 				var name=node.name;
 				if(get.position(node)=='j'&&node.viewAs&&node.viewAs!=name){
-					uiintro.add(get.translation(node.viewAs)+'（'+get.translation(node)+'）');
+					uiintro.add(get.translation(node.viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(node)+'）</div>');
 					name=node.viewAs;
 				}
 				else{
