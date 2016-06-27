@@ -237,6 +237,10 @@ table{table-layout: fixed;}
 	display: block;
 	width: calc(100% - 20px);
 	left:20px;
+	line-height: 18px;
+}
+#arena:not(.low_performance) #arenalog>div{
+	-webkit-animation: game_start 0.5s;
 }
 /*#arena[data-font_size='14']{
 	font-size:14px;
@@ -575,6 +579,8 @@ div:not(.handcards)>.card>.info>span,
 #arena.low_performance .player .equips,
 #arena.low_performance .player .name{transition: all 0s}
 .judges>.card>.background,.marks>.card>.background{font-size: 20px;height: 20px;padding-top: 3px;}
+.judges>.card.fakejudge.fullskin>.image{display: none !important}
+.judges>.card.fakejudge.fullskin>.background{display: block !important;font-family: 'huangcao' !important;padding-top: 4px !important;}
 .button.card>.background{font-size: 68px;height: 68px;padding-top: 12px;}
 .card>.background{font-family:'xiaozhuan'}
 .card>.background.tight{letter-spacing: -0.2em}

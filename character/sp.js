@@ -317,6 +317,9 @@ character.sp={
 		jili:{
 			trigger:{global:'useCard'},
 			forced:true,
+			check:function(event,player){
+				return ai.get.effect(player,event.card,event.player,player)>0;
+			},
 			filter:function(event,player){
 				if(get.color(event.card)!='red') return false;
 				if(!event.targets) return false;

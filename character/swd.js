@@ -3311,7 +3311,7 @@ character.swd={
 						}
 						var js=get.infoCards(data[i].j);
 						for(var j=0;j<js.length;j++){
-							player.node.judges.appendChild(js[j]);
+							current.node.judges.appendChild(js[j]);
 						}
 					}
 					ui.window.classList.remove('zoomout3');
@@ -3423,6 +3423,10 @@ character.swd={
 							storage[i].judges[j].parentNode==ui.cardPile){
 								storage[i].judges[j].style.transform='';
 								storage[i].judges[j].viewAs=storage[i].viewAs[j];
+								if(storage[i].judges[j].viewAs&&storage[i].judges[j].viewAs!=storage[i].judges[j].name&&storage[i].judges[j].classList.contains('fullskin')){
+	                                storage[i].judges[j].classList.add('fakejudge');
+	                                storage[i].judges[j].node.background.innerHTML=lib.translate[storage[i].judges[j].viewAs+'_bg']||get.translation(storage[i].judges[j].viewAs)[0]
+	                            }
 								player.node.judges.appendChild(storage[i].judges[j]);
 							}
 						}

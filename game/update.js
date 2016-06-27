@@ -7,12 +7,15 @@ window.noname_update={
         global:[
             'character/hearth.js',
             'character/ow.js',
+            'character/swd.js',
             'character/yijiang.js',
             'character/sp.js',
             'card/swd.js',
             'card/guozhan.js',
             'game/game.js',
+            'layout/default/layout.css',
         ],
-        '1.8.16.1':[]
+        '1.8.16.1':[],
+        '1.8.16.2':[]
     }
 }

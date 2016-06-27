@@ -724,6 +724,11 @@
 							}
 						}
 					},
+                    clear_log:{
+                        name:'自动清除历史记录',
+                        init:false,
+						unfrequent:true,
+                    },
 					log_highlight:{
 						name:'历史记录高亮',
 						init:true,
@@ -1199,6 +1204,12 @@
                         }
                         else{
                             map.textequip.hide();
+                        }
+                        if(config.show_log!='off'){
+                            map.clear_log.show();
+                        }
+                        else{
+                            map.clear_log.hide();
                         }
 						// if(config.theme=='woodden'&&config.image_background=='default'){
 						// 	map.background_color_wood.show();
@@ -7097,6 +7108,13 @@
         					card.style.transform='';
         					card.classList.remove('drawinghidden');
                             card.viewAs=viewAs;
+                            if(viewAs&&viewAs!=card.name&&card.classList.contains('fullskin')){
+                                card.classList.add('fakejudge');
+                                card.node.background.innerHTML=lib.translate[viewAs+'_bg']||get.translation(viewAs)[0]
+                            }
+                            else{
+                                card.classList.remove('fakejudge');
+                            }
                             player.node.judges.insertBefore(card,player.node.judges.firstChild);
                             if(card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
     							card.clone.moveDelete(player);
@@ -7116,9 +7134,14 @@
 							delete cards[0].viewAs;
 						}
 						if(cards[0].viewAs&&cards[0].viewAs!=cards[0].name){
+                            if(cards[0].classList.contains('fullskin')){
+                                cards[0].classList.add('fakejudge');
+                                cards[0].node.background.innerHTML=lib.translate[cards[0].viewAs+'_bg']||get.translation(cards[0].viewAs)[0];
+                            }
 							game.log(player,'被贴上了<span class="yellowtext">'+get.translation(cards[0].viewAs)+'</span>（',cards,'）');
 						}
 						else{
+                            cards[0].classList.remove('fakejudge');
 							game.log(player,'被贴上了',cards);
 						}
 						game.addVideo('addJudge',player,[get.cardInfo(cards[0]),cards[0].viewAs]);
@@ -7569,6 +7592,7 @@
                         handcards:this.get('h'),
                         equips:this.get('e'),
                         judges:this.get('j'),
+                        views:[],
                         position:parseInt(this.dataset.position),
                         hujia:this.hujia,
                         side:this.side,
@@ -7578,6 +7602,9 @@
                         dead:this.isDead(),
                         linked:this.isLinked(),
                         turnedover:this.isTurnedOver(),
+                    }
+                    for(var i=0;i<state.judges.length;i++){
+                        state.views[i]=state.judges[i].viewAs;
                     }
                     if(this.getModeState){
                         state.mode=this.getModeState();
@@ -13038,6 +13065,11 @@
                                 player.$equip(info.equips[i]);
                             }
                             for(var i=0;i<info.judges.length;i++){
+                                if(info.views[i]&&info.views[i]!=info.judges[i]){
+                                    info.judges[i].classList.add('fakejudge');
+                                    info.judges[i].viewAs=info.views[i];
+                                    info.judges[i].node.background.innerHTML=lib.translate[info.views[i]+'_bg']||get.translation(info.views[i])[0]
+                                }
                                 player.node.judges.appendChild(info.judges[i]);
                             }
                             if(!player.setModeState){
@@ -15157,6 +15189,10 @@
 				if(player&&content){
 					var card=get.infoCard(content[0]);
 					card.viewAs=content[1];
+                    if(card.viewAs&&card.viewAs!=card.name&&card.classList.contains('fullskin')){
+                        card.classList.add('fakejudge');
+                        card.node.background.innerHTML=lib.translate[card.viewAs+'_bg']||get.translation(card.viewAs)[0]
+                    }
 					player.node.judges.insertBefore(card,player.node.judges.firstChild);
 				}
 				else{
@@ -18058,10 +18094,30 @@
             },str);
 			if(lib.config.title) document.title=str;
 			if(lib.config.show_log!='off'&&!game.chess){
-				ui.arenalog.insertBefore(node.cloneNode(true),ui.arenalog.firstChild);
-				while(ui.arenalog.childNodes.length&&ui.arenalog.scrollHeight>ui.arenalog.offsetHeight){
-					ui.arenalog.lastChild.remove();
-				}
+                var nodeentry=node.cloneNode(true);
+				ui.arenalog.insertBefore(nodeentry,ui.arenalog.firstChild);
+                if(!lib.config.clear_log){
+                    while(ui.arenalog.childNodes.length&&ui.arenalog.scrollHeight>ui.arenalog.offsetHeight){
+    					ui.arenalog.lastChild.remove();
+    				}
+                }
+                if(!lib.config.low_performance){
+                    nodeentry.style.transition='all 0s';
+                    nodeentry.style.marginBottom=(-nodeentry.offsetHeight)+'px';
+                    ui.refresh(nodeentry);
+                    nodeentry.style.transition='';
+                    nodeentry.style.marginBottom='';
+                }
+                if(lib.config.clear_log){
+                    nodeentry.timeout=setTimeout(function(){
+                        nodeentry.delete();
+                    },1000);
+                    for(var i=0;i<ui.arenalog.childElementCount;i++){
+                        if(!ui.arenalog.childNodes[i].timeout){
+                            ui.arenalog.childNodes[i].remove();
+                        }
+                    }
+                }
 			}
 		},
 		putDB:function(type,id,item,callback){
