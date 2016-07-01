@@ -6,12 +6,20 @@
     transition:all 0s !important;
 }
 #arena.chess>#me,
-#arena.chess>#mebg{
+#arena.chess>#mebg,
+#arena.chess>#autonode{
     bottom:0;
     top:auto;
     border-radius:0;
 }
-
+#me>.fakeme.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 0px;
+    top: 0;
+    left: 0;
+    background-size: cover;
+}
 #chess-container{
     width:100%;
     height :calc(100% - 120px);
@@ -45,7 +53,7 @@
 #handcards2{
     display:none;
 }
-#mebg,#me{
+#mebg,#me,#autonode{
     height:120px;
 }
 

@@ -399,7 +399,7 @@
 
 .card[data-position='0']{top:calc(100% - 130px);left:calc(50% - 52px);}
 .popup[data-position='0']{top:calc(100% - 206px);left:calc(50% - 61px);}
-#me,#mebg{top:calc(100% - 150px);}
+#me,#mebg,#autonode{top:calc(100% - 150px);}
 #handcards1,#handcards2{width: calc(50% - 95px);height: 127px;padding: 10px;}
 #handcards2{left: calc(50% + 75px);}
 .dialog{

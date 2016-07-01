@@ -357,6 +357,11 @@ table{table-layout: fixed;}
 }
 #me,#mebg{width: 100%;height: 140px;top:calc(100% - 140px);left:0;}
 #mebg{z-index:-1}
+#autonode{z-index: 10;width: 100%;height: 140px;top:calc(100% - 140px);left:0;display: table;text-align: center;font-size: 60px;font-family: 'xinwei';text-shadow: black 0 0 10px}
+#arena:not(.chess):not(.mobile)>#autonode{display: none}
+#arena:not(.auto)>#autonode{opacity: 0;pointer-events: none}
+#arena.auto #handcards1,#arena.auto #handcards2{opacity: 0.5}
+#autonode>div{display: table-cell;vertical-align: middle;position: relative}
 #handcards1,#handcards2{
 	width: calc(50% - 140px);height: 127px;padding: 10px;
 	text-align: left;

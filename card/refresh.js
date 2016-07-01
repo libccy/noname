@@ -104,6 +104,24 @@ card.refresh={
 				save:true,
 				respondSha:true,
 				respondShan:true,
+				skillTagFilter:function(player,tag){
+					var muniu=player.get('e','5');
+					if(!muniu||!muniu.cards) return false;
+					for(var i=0;i<muniu.cards.length;i++){
+						switch(tag){
+							case 'respondSha':if(muniu.cards[i].name=='sha') return true;break;
+							case 'respondShan':if(muniu.cards[i].name=='shan') return true;break;
+							case 'save':{
+								if(muniu.cards[i].name=='tao'||muniu.cards[i].name=='spell_zhiliaoshui') return true;
+								if(player==_status.event.dying){
+									if(muniu.cards[i].name=='jiu'||muniu.cards[i].name=='tianxianjiu') return true;
+								}
+								break;
+							}
+						}
+					}
+					return false;
+				},
 				order:1,
 				expose:0.1,
 				result:{

@@ -138,7 +138,9 @@ mode.stone={
 						career[lib.careerList[i]]=[];
 						careerspell[lib.careerList[i]]=[];
 					}
-					var result={}
+					var result={
+						list:{}
+					};
 					for(var i=0;i<list.length;i++){
 						if(lib.card[list[i][2]].type=='stonecard'){
 							if(lib.card[list[i][2]].career&&lib.careerList.contains(lib.card[list[i][2]].career)){
@@ -158,9 +160,11 @@ mode.stone={
 						}
 					}
 					for(var i=0;i<lib.careerList.length;i++){
+						result.list[get.translation(lib.careerList[i])]=careerspell[lib.careerList[i]].concat(career[lib.careerList[i]]);
 						result['法术·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=careerspell[lib.careerList[i]];
 						result['随从·'+get.translation(lib.careerList[i])+'_link:'+lib.careerList[i]]=career[lib.careerList[i]];
 					}
+					result.list['中立']=ns.concat(nl);
 					result['法术·中立']=ns;
 					result['随从·中立']=nl;
 					return result;

@@ -1462,9 +1462,11 @@ character.shenhua={
 			audio:2,
 			enable:'chooseToUse',
 			filterCard:function(card){
-				if(get.type(card)=='trick') return false;
-				if(get.type(card)=='delay') return false;
+				if(get.type(card)!='basic'&&get.type(card)!='equip') return false;
 				return get.color(card)=='black';
+			},
+			filter:function(event,player){
+				return player.num('he',{type:['basic','equip'],color:'black'})
 			},
 			position:'he',
 			viewAs:{name:'bingliang'},

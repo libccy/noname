@@ -7,7 +7,7 @@ character.swd={
 			swd_septem:['male','qun',4,['jiying','liaoyuan','yishan']],
 			swd_kama:['female','qun',3,['yueren','shangshi']],
 		// swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
-			swd_nicole:['female','wu',3,['huanjian','lingwu','minjing']],
+			swd_nicole:['female','qun',3,['huanjian','lingwu','minjing']],
 			swd_wangsiyue:['female','wei',3,['duishi','biyue']],
 			swd_weida:['female','qun',3,['yueren','zhenlie']],
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian']],
@@ -3209,6 +3209,9 @@ character.swd={
 			},
 			viewAs:{name:'dujian'},
 			position:'he',
+			filter:function(event,player){
+				return player.num('h',{color:'black'})>0;
+			},
 			viewAsFilter:function(player){
 				if(!player.num('he',{color:'black'})) return false;
 			},

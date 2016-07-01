@@ -20,7 +20,8 @@
     line-height: 34px;
 }*/
 #arena:not(.chess)>#me,
-#arena:not(.chess)>#mebg{
+#arena:not(.chess)>#mebg,
+#arena:not(.chess)>#autonode{
     bottom:30px;
     width: calc(5000% / 47);
     left:calc(-150% / 47);

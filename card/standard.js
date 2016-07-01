@@ -770,12 +770,14 @@ card.standard={
 						if(player.get('s').contains('xinwuyan')) return 0;
 						if(target.get('s').contains('xinwuyan')) return 0;
 						if(event.turn==target){
+							if(player.hasSkill('naman')) return -1;
 							if(ai.get.attitude(target,player)<0){
 								return ai.get.unuseful2(card)
 							}
 							return -1;
 						}
 						else{
+							if(target.hasSkill('naman')) return -1;
 							if(ai.get.attitude(player,target)<0){
 								return ai.get.unuseful2(card)
 							}
@@ -1279,6 +1281,9 @@ card.standard={
 			selectCard:2,
 			position:'h',
 			viewAs:{name:'sha'},
+			filter:function(event,player){
+				return player.num('h')>=2;
+			},
 			audio:true,
 			prompt:'将两张手牌当杀使用或打出',
 			check:function(card){
@@ -1287,6 +1292,9 @@ card.standard={
 			},
 			ai:{
 				respondSha:true,
+				skillTagFilter:function(event,player){
+					return player.num('h')>=2;
+				},
 			}
 		},
 		guanshi_skill:{

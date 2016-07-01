@@ -22698,48 +22698,95 @@
                 var packsource;
 				var clickCapt=function(e){
 					if(_status.dragged) return;
-                    if(newlined2){
-                        newlined2.style.display='none';
-                        packsource.innerHTML='武将包';
-                        packsource.classList.remove('thundertext');
+                    if(this.alphabet){
+                        if(this.classList.contains('thundertext')){
+    						dialog.currentcapt=null;
+    						dialog.currentcaptnode=null;
+    						this.classList.remove('thundertext');
+    						for(var i=0;i<dialog.buttons.length;i++){
+    							if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+                                else if(dialog.currentcapt2&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt,true)){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+    							else{
+    								dialog.buttons[i].classList.remove('nodisplay');
+    							}
+    						}
+    					}
+    					else{
+    						if(dialog.currentcaptnode){
+    							dialog.currentcaptnode.classList.remove('thundertext');
+    						}
+    						dialog.currentcapt=this.link;
+    						dialog.currentcaptnode=this;
+    						this.classList.add('thundertext');
+    						for(var i=0;i<dialog.buttons.length;i++){
+    							if(dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+                                else if(dialog.currentcapt2&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt,true)){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+                                else if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
+                                    dialog.buttons[i].classList.add('nodisplay');
+                                }
+    							else{
+    								dialog.buttons[i].classList.remove('nodisplay');
+    							}
+    						}
+    					}
                     }
-					if(this.classList.contains('thundertext')){
-						dialog.currentcapt=null;
-						dialog.currentcaptnode=null;
-						this.classList.remove('thundertext');
-                        // this.dataset.nature='';
-						for(var i=0;i<dialog.buttons.length;i++){
-							if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
-								dialog.buttons[i].classList.add('nodisplay');
-							}
-							else{
-								dialog.buttons[i].classList.remove('nodisplay');
-							}
-						}
-					}
 					else{
-                        // this.dataset.nature=this._nature||'metalm';
-						if(dialog.currentcaptnode){
-							dialog.currentcaptnode.classList.remove('thundertext');
-                            // dialog.currentcaptnode.dataset.nature='';
-						}
-						dialog.currentcapt=this.link;
-						dialog.currentcaptnode=this;
-						this.classList.add('thundertext');
-                        if(this.parentNode==newlined2){
-                            packsource.innerHTML=this.innerHTML;
-                            packsource.classList.add('thundertext');
+                        if(newlined2){
+                            newlined2.style.display='none';
+                            packsource.innerHTML='武将包';
+                            packsource.classList.remove('thundertext');
                         }
-						for(var i=0;i<dialog.buttons.length;i++){
-							if(dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)||
-							(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup)){
-								dialog.buttons[i].classList.add('nodisplay');
-							}
-							else{
-								dialog.buttons[i].classList.remove('nodisplay');
-							}
-						}
-					}
+                        if(this.classList.contains('thundertext')){
+                            dialog.currentcapt2=null;
+                            dialog.currentcaptnode2=null;
+                            this.classList.remove('thundertext');
+                            for(var i=0;i<dialog.buttons.length;i++){
+                                if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
+                                    dialog.buttons[i].classList.add('nodisplay');
+                                }
+                                else if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
+                                    dialog.buttons[i].classList.add('nodisplay');
+                                }
+                                else{
+                                    dialog.buttons[i].classList.remove('nodisplay');
+                                }
+                            }
+                        }
+                        else{
+                            if(dialog.currentcaptnode2){
+                                dialog.currentcaptnode2.classList.remove('thundertext');
+                            }
+                            dialog.currentcapt2=this.link;
+                            dialog.currentcaptnode2=this;
+                            this.classList.add('thundertext');
+                            if(this.parentNode==newlined2){
+                                packsource.innerHTML=this.innerHTML;
+                                packsource.classList.add('thundertext');
+                            }
+                            for(var i=0;i<dialog.buttons.length;i++){
+                                if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
+                                    dialog.buttons[i].classList.add('nodisplay');
+                                }
+                                else if(dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt,true)){
+                                    dialog.buttons[i].classList.add('nodisplay');
+                                }
+                                else if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
+                                    dialog.buttons[i].classList.add('nodisplay');
+                                }
+                                else{
+                                    dialog.buttons[i].classList.remove('nodisplay');
+                                }
+                            }
+                        }
+                    }
 					if(dialog.seperate){
 						for(var i=0;i<dialog.seperate.length;i++){
 							if(!dialog.seperate[i].nextSibling.querySelector('.button:not(.nodisplay)')){
@@ -22788,6 +22835,7 @@
                         var span=document.createElement('span');
     					span.innerHTML=' '+namecapt[i].toUpperCase()+' ';
     					span.link=namecapt[i];
+                        span.alphabet=true;
     					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
     					node.appendChild(span);
                     }
@@ -22805,9 +22853,11 @@
     						dialog.currentgroup=null;
     						dialog.currentgroupnode=null;
     						node.classList.remove('thundertext');
-                            // node.dataset.nature='';
     						for(var i=0;i<dialog.buttons.length;i++){
-    							if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
+                                if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+                                else if(dialog.currentcapt2&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt,true)){
     								dialog.buttons[i].classList.add('nodisplay');
     							}
     							else{
@@ -22818,17 +22868,20 @@
     					else{
     						if(dialog.currentgroupnode){
     							dialog.currentgroupnode.classList.remove('thundertext');
-    							// dialog.currentgroupnode.dataset.nature='';
     						}
     						dialog.currentgroup=link;
     						dialog.currentgroupnode=node;
     						node.classList.add('thundertext');
-                            // node.dataset.nature=node._nature;
     						for(var i=0;i<dialog.buttons.length;i++){
-    							if(dialog.buttons[i].group!=link||
-    							(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt))){
+                                if(dialog.currentcapt&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
     								dialog.buttons[i].classList.add('nodisplay');
     							}
+                                else if(dialog.currentcapt2&&dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt,true)){
+    								dialog.buttons[i].classList.add('nodisplay');
+    							}
+                                else if(dialog.buttons[i].group!=dialog.currentgroup){
+                                    dialog.buttons[i].classList.add('nodisplay');
+                                }
     							else{
     								dialog.buttons[i].classList.remove('nodisplay');
     							}
@@ -22952,12 +23005,17 @@
                 dialog.classList.add('noupdate');
                 dialog.classList.add('scroll1');
                 dialog.classList.add('scroll2');
-                dialog.getCurrentCapt=function(link,capt){
-                    if(lib.characterDialogGroup[this.currentcapt]){
-                        return lib.characterDialogGroup[this.currentcapt](link,capt);
+                dialog.getCurrentCapt=function(link,capt,noalph){
+                    var currentcapt=noalph?this.currentcapt2:this.currentcapt;
+                    if(this.seperatelist&&noalph){
+                        if(this.seperatelist[currentcapt].contains(link)) return capt;
+                        return null;
                     }
-                    if(lib.characterPack[this.currentcapt]){
-                        if(lib.characterPack[this.currentcapt][link]){
+                    if(lib.characterDialogGroup[currentcapt]){
+                        return lib.characterDialogGroup[currentcapt](link,capt);
+                    }
+                    if(lib.characterPack[currentcapt]){
+                        if(lib.characterPack[currentcapt][link]){
                             return capt;
                         }
                         return null;
@@ -22972,7 +23030,32 @@
 					if(seperate){
 						seperate=seperate(list);
 						dialog.seperate=[];
+                        dialog.seperatelist=seperate.list;
+                        if(dialog.seperatelist){
+                            newlined=document.createElement('div');
+                            newlined.style.marginTop='5px';
+                            newlined.style.display='block';
+                            newlined.style.fontFamily='xinwei';
+                            if(lib.config.layout=='phone'){
+                                newlined.style.fontSize='32px';
+                            }
+                            else{
+                                newlined.style.fontSize='22px';
+                            }
+                            newlined.style.textAlign='center';
+                            node.appendChild(newlined);
+                            for(var i in dialog.seperatelist){
+                                var span=document.createElement('span');
+                                span.style.margin='3px';
+            					span.innerHTML=i;
+            					span.link=i;
+                                span.seperate=true;
+            					span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
+            					newlined.appendChild(span);
+                            }
+                        }
 						for(var i in seperate){
+                            if(i=='list') continue;
 							var link='';
 							var linkcontent=seperate[i];
 							if(i.indexOf('_link:')!=-1){
@@ -23534,6 +23617,8 @@
 				}
 				ui.auto=ui.create.system('托管',ui.click.auto);
                 ui.auto.id='autobutton';
+                ui.autonode=ui.create.div('#autonode','<div>托管中...</div>',ui.arena);
+                ui.autonode.listen(ui.click.auto);
                 if(lib.config.mode=='connect'){
                     ui.auto.hide();
                     ui.pause.hide();
@@ -26121,6 +26206,7 @@
 				if(!_status.auto){
 					_status.auto=true;
 					ui.auto.classList.add('glow');
+                    ui.arena.classList.add('auto');
 
                     if(_status.imchoosing&&_status.paused){
                         if(ui.confirm) ui.confirm.close();
@@ -26147,6 +26233,7 @@
 					ui.control.show();
 					_status.auto=false;
 					ui.auto.classList.remove('glow');
+                    ui.arena.classList.remove('auto');
 
                     if(game.online){
                         game.send('unauto');
