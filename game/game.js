@@ -9499,9 +9499,6 @@
 					}
                     game.broadcastAll(function(player,target,name,content,id){
                         if(player.marks[id]){
-    						if(player.marks[id]._name==target){
-    							return player;
-    						}
     						player.marks[id].name=name+'_charactermark';
     						player.marks[id]._name=target;
     						player.marks[id].info={
@@ -9691,6 +9688,7 @@
 				},
 				checkMarks:function(){
 					var skills=this.get('s');
+                    game.expandSkills(skills);
 					for(var i in this.marks){
 						if(!skills.contains(i)&&!this.marks[i].info.fixed){
 							this.unmarkSkill(i);

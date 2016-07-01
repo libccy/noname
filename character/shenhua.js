@@ -1086,6 +1086,9 @@ character.shenhua={
 								}
 								mark.setBackground(currentname,'character');
 							}
+							if(player.additionalSkills.huashen){
+								player.removeSkill(player.additionalSkills.huashen);
+							}
 							player.addSkill(link);
 							player.skills.remove(link);
 							player.additionalSkills.huashen=link;

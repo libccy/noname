@@ -40,6 +40,10 @@ character.refresh={
 				if(player.storage.rerende2&&player.storage.rerende2.contains(target)) return false;
 				return player!=target;
 			},
+			onremove:function(player){
+				delete player.storage.rerende;
+				delete player.storage.rerende2;
+			},
 			check:function(card){
 				var player=get.owner(card);
 				if(ui.selected.cards.length>=Math.max(2,player.num('h')-player.hp)) return 0;

@@ -79,9 +79,14 @@ card.guozhan={
 				order:7,
 				value:4,
 				useful:2,
+				tag:{
+					damage:1,
+					thunderDamage:1,
+					natureDamage:1
+				},
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target,'thunder')*target.num('e');
+						return -target.num('e');
 					}
 				}
 			}
@@ -717,6 +722,9 @@ card.guozhan={
 		diaohulishan:{
 			mod:{
 				cardEnabled:function(){
+					return false;
+				},
+				cardSavable:function(){
 					return false;
 				},
 				targetEnabled:function(){

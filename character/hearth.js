@@ -769,6 +769,9 @@ character.hearth={
 					var link=result.control;
 					player.addSkill(link);
 					player.skills.remove(link);
+					if(player.additionalSkills.maoxian){
+						player.removeSkill(player.additionalSkills.maoxian);
+					}
 					player.additionalSkills.maoxian=link;
 					player.popup(link);
 					game.log(player,'获得了技能','【'+get.translation(link)+'】')

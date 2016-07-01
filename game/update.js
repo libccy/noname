@@ -12,6 +12,7 @@ window.noname_update={
             'character/yijiang.js',
             'character/sp.js',
             'character/xianjian.js',
+            'character/refresh.js',
             'card/swd.js',
             'card/guozhan.js',
             'card/yunchou.js',

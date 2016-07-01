@@ -278,7 +278,7 @@ table{table-layout: fixed;}
 	pointer-events: none;
 	position: absolute;
 }
-#arena.playerfocus>div:not(#timer):not(.playerfocus):not(#chess-container):not(.removing){
+#arena.playerfocus>div:not(#timer):not(.playerfocus):not(#chess-container):not(.removing):not(#autonode){
 	opacity: 0.3 !important;
 }
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){

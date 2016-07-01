@@ -1292,7 +1292,7 @@ card.standard={
 			},
 			ai:{
 				respondSha:true,
-				skillTagFilter:function(event,player){
+				skillTagFilter:function(player){
 					return player.num('h')>=2;
 				},
 			}

@@ -1568,6 +1568,7 @@ character.swd={
 				return event.source&&event.card&&event.card.name=='sha'&&event.source!=player;
 			},
 			content:function(){
+                player.line(trigger.source,'green');
 				trigger.source.draw();
 			},
 			ai:{
@@ -1582,6 +1583,9 @@ character.swd={
 			content:function(){
 				"step 0"
 				player.unmark(player.storage.huanxing+'_charactermark');
+                if(player.additionalSkills.huanxing){
+                    player.removeSkill(player.additionalSkills.huanxing);
+                }
 				delete player.storage.huanxing;
 				delete player.additionalSkills.huanxing;
 				player.checkMarks();
@@ -2513,10 +2517,64 @@ character.swd={
 				order:8,
 			}
 		},
-		mufeng:{
+        mufeng:{
+            init:function(player){
+                player.storage.mufeng=0;
+            },
+            group:['mufeng_gain','mufeng_lose'],
+            mark:true,
+			intro:{
+				content:function(storage){
+					if(storage>0){
+						return '防御距离+'+storage;
+					}
+					else if(storage<0){
+						return '防御距离'+storage;
+					}
+					else{
+						return '无距离变化';
+					}
+				}
+			},
+            subSkill:{
+                lose:{
+                    trigger:{global:'dieAfter'},
+                    forced:true,
+                    filter:function(event,player){
+                        return player.storage.mufeng>game.players.length/2;
+                    },
+                    content:function(){
+                        player.storage.mufeng=0;
+                        player.updateMarks();
+                    }
+                },
+                gain:{
+                    trigger:{player:'loseEnd'},
+                    forced:true,
+                    filter:function(event,player){
+                        return _status.currentPhase!=player;
+                    },
+                    content:function(){
+                        player.storage.mufeng++;
+                        if(player.storage.mufeng>game.players.length/2){
+                            player.storage.mufeng=0;
+                        }
+                        player.updateMarks();
+                    }
+                },
+            },
+            mod:{
+				globalTo:function(from,to,distance){
+					if(typeof to.storage.mufeng=='number'){
+						return distance+to.storage.mufeng;
+					}
+				}
+			}
+        },
+		mufeng_old:{
 			priority:9,
 			filter:function(event,player){
-				return event.player!=player&&get.type(event.card)=='trick'&&event.targets&&event.targets.length>1;
+				return event.player!=player&&event.targets&&event.targets.length>1;
 			},
 			check:function(event,player){
 				return get.tag(event.card,'multineg')||ai.get.effect(player,event.card,event.player,player)<=0;
@@ -2525,15 +2583,20 @@ character.swd={
 			content:function(){
 				trigger.untrigger();
 				trigger.finish();
-				player.draw();
+                player.draw();
 			},
 			ai:{
 				effect:{
-					target:function(card){
+					target:function(card,player,target){
 						if(get.type(card)!='trick') return;
-						if(card.name=='tiesuo') return [0,0];
-						if(card.name=='yihuajiemu') return [0,1];
-						if(get.tag(card,'multineg')) return [0,2];
+						if(card.name=='yihuajiemu'||card.name=='tiesuo'){
+							if(target.hp==target.maxHp) return [0,0];
+							return [0,1];
+						}
+						if(get.tag(card,'multineg')){
+							if(target.hp==target.maxHp) return [0,0];
+							return [0,2];
+						}
 					}
 				}
 			}
@@ -5117,13 +5180,186 @@ character.swd={
 				}
 			}
 		},
-		tianshu:{
+        tianshu:{
+            unique:true,
+            trigger:{player:'useCardAfter'},
+            frequent:true,
+            init:function(player){
+                player.storage.tianshu=[];
+                player.storage.tianshu2=[];
+            },
+            intro:{
+                content:function(storage){
+                    if(storage&&storage.length){
+                        var str='已学习技能：';
+                        for(var i=0;i<storage.length;i++){
+                            if(i){
+                                str+='、';
+                            }
+                            str+=get.translation(storage[i]);
+                        }
+                        return str;
+                    }
+                    else{
+                        return '暂无已学习技能';
+                    }
+                }
+            },
+            mark:true,
+            filter:function(event,player){
+                if(event.targets&&event.targets.length==1&&event.targets[0]!=player){
+                    var target=event.targets[0];
+                    var names=[];
+    				if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
+    				if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
+    				if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
+    				var pss=player.get('s');
+    				for(var i=0;i<names.length;i++){
+    					var info=lib.character[names[i]];
+    					if(info){
+    						var skills=info[3];
+    						for(var j=0;j<skills.length;j++){
+                                if(player.storage.tianshu.contains(skills[j])) continue;
+    							if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
+    								!lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
+    								return true;
+    							}
+    						}
+    					}
+    				}
+                }
+                return false;
+            },
+            content:function(){
+                var target=trigger.targets[0];
+                var names=[];
+                var list=[];
+                if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
+                if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
+                if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
+                var pss=player.get('s');
+                for(var i=0;i<names.length;i++){
+                    var info=lib.character[names[i]];
+                    if(info){
+                        var skills=info[3];
+                        for(var j=0;j<skills.length;j++){
+                            if(player.storage.tianshu.contains(skills[j])) continue;
+                            if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
+                                !lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
+                                list.add(skills[j]);
+                            }
+                        }
+                    }
+                }
+                var skill=list.randomGet();
+                player.storage.tianshu.push(skill);
+                player.storage.tianshu2.push(target);
+                player.popup(skill);
+                player.syncStorage('tianshu');
+                player.updateMarks();
+                game.log(player,'学习了','【'+get.translation(skill)+'】');
+            },
+            group:'tianshu2'
+        },
+        tianshu2:{
+            enable:'phaseUse',
+            filter:function(event,player){
+                return !player.hasSkill('tianshu3')&&player.storage.tianshu&&player.storage.tianshu.length>0;
+            },
+            intro:{
+                nocount:true
+            },
+            delay:0,
+            content:function(){
+                'step 0'
+                var list=player.storage.tianshu;
+                if(player.additionalSkills.tianshu){
+                    player.removeSkill(player.additionalSkills.tianshu);
+				}
+				event.skillai=function(list){
+					return list.randomGet();
+				};
+				if(event.isMine()){
+                    var dialog=ui.create.dialog();
+    				dialog.add('选择获得一项技能');
+    				_status.event.list=list;
+    				var clickItem=function(){
+    					_status.event._result=this.link;
+    					game.resume();
+    				};
+    				for(var i=0;i<list.length;i++){
+    					if(lib.translate[list[i]+'_info']){
+    						var translation=get.translation(list[i]);
+    						if(translation[0]=='新'&&translation.length==3){
+    							translation=translation.slice(1,3);
+    						}
+    						else{
+    							translation=translation.slice(0,2);
+    						}
+    						var item=dialog.add('<div class="popup" style="width:50%;display:inline-block"><div class="skill">【'+
+    						translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
+    						item.firstChild.addEventListener('click',clickItem);
+    						item.firstChild.link=list[i];
+    					}
+    				}
+    				dialog.add(ui.create.div('.placeholder'));
+                    event.dialog=dialog;
+					event.switchToAuto=function(){
+						event._result=event.skillai(list);
+						game.resume();
+					};
+					game.pause();
+                    _status.imchoosing=true;
+				}
+				else{
+					event._result=event.skillai(list);
+				}
+				"step 1"
+                _status.imchoosing=false;
+				if(event.dialog){
+					event.dialog.close();
+				}
+				var link=result;
+				player.addSkill(link);
+				player.skills.remove(link);
+				player.additionalSkills.tianshu=link;
+				player.popup(link);
+                var target=player.storage.tianshu2[player.storage.tianshu.indexOf(link)];
+                player.markSkillCharacter('tianshu2',target,get.translation(link),lib.translate[link+'_info']);
+				player.checkMarks();
+				player.addSkill('tianshu3');
+				player.addTempSkill('tianshu_ai','phaseAfter');
+            },
+            ai:{
+                order:10,
+                result:{
+                    player:function(player){
+                        if(player.skills.contains('tianshu_ai')) return 0;
+                        return 1;
+                    }
+                }
+            }
+        },
+        tianshu3:{
+			trigger:{global:['useCardAfter','useSkillAfter','phaseAfter']},
+			forced:true,
+			popup:false,
+			silent:true,
+			filter:function(event){
+				return event.skill!='tianshu2';
+			},
+			content:function(){
+				player.removeSkill('tianshu3');
+			}
+		},
+		tianshu_old:{
 			unique:true,
 			enable:'phaseUse',
 			priority:-9,
 			filterCard:true,
+            position:'he',
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.num('he')>0;
 			},
 			filterTarget:function(card,player,target){
 				var names=[];
@@ -5145,7 +5381,7 @@ character.swd={
 					return false;
 				}
 			},
-			group:'tianshu_remove',
+			// group:'tianshu_remove',
 			createDialog:function(player,target,onlylist){
 				var names=[];
 				var list=[];
@@ -5262,7 +5498,7 @@ character.swd={
 			}
 		},
 		tianshu_ai:{},
-		tianshu2:{
+		tianshu2_old:{
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			priority:-9,
@@ -7666,7 +7902,7 @@ character.swd={
 		qimou:'奇谋',
 		qimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并立即使用之',
 		mufeng:'沐风',
-		mufeng_info:'当你成为一张指定了多个目标的锦囊牌的目标时，你可以取消之，并摸一张牌。',
+		mufeng_info:'锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0',
 		lexue:'乐学',
 		lexue_info:'回合内，你随机获得制衡、集智、缔盟、驱虎中的一个技能；回合外，你随机获得遗计、急救、鬼道、反馈中的一个技能',
 		mingfu:'冥缚',
@@ -7758,7 +7994,8 @@ character.swd={
 		tanlin2:'探麟',
 		pozhen:'破阵',
 		yunchou:'运筹',
-		tianshu:'天书',
+        tianshu:'天书',
+		tianshu_bg:'书',
 		tianshu2:'天书',
 		xingdian:'星点',
 		luomei:'落梅',
@@ -7861,7 +8098,7 @@ character.swd={
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
-		tianshu_info:'出牌阶段，你可以弃置一张手牌，并获得场上一名存活角色的一项技能直到你的下一出牌阶段开始',
+		tianshu_info:'每当你使用卡牌指定惟一目标时，你可以学习该目标的一项随机技能；出牌阶段，你可以装备一项已学习的技能',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',

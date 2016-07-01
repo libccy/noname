@@ -541,7 +541,7 @@ card.yunchou={
 					};
 				}
 				"step 1"
-				if(event.directfalse&&!result.bool){
+				if(event.directfalse||!result.bool){
 					target.damage('fire');
 				}
 			},
@@ -554,6 +554,9 @@ card.yunchou={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nofire')) return 0;
+						if(ai.get.damageEffect(target,player,player)<0&&ai.get.attitude(player,target)>0){
+							return -2;
+						}
 						var nh=target.num('he');
 						if(target==player) nh--;
 						switch(nh){
