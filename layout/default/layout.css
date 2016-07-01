@@ -1510,6 +1510,29 @@ span[data-color="unknownm"]{
 	color:#631515;
 	border:1px solid #631515;
 }
+.card.fullskin.poison>.name{
+	color:#631515;
+	border:1px solid #631515;
+}
+.card.fullskin.epic>.name{
+	color: white;
+    background: rgba(0, 66, 165, 0.6);
+    border: 1px solid rgba(0, 66, 165, 1);
+    box-shadow: rgba(0,0,0,0.4) 0 0 10px inset;
+}
+.card.fullskin.epic>.name2{
+	color: rgb(117,186,255);
+}
+.card.fullskin.legend>.name{
+	color: white;
+    background: rgba(106, 27, 154, 0.6);
+    border: 1px solid rgba(106, 27, 154, 1);
+    box-shadow: rgba(0,0,0,0.4) 0 0 10px inset;
+}
+.card.fullskin.legend>.name2{
+	color: rgb(233, 131, 255);
+	/*color: rgb(117,186,0);*/
+}
 /*.card.fullskin.fire>.image{
 	-webkit-filter:saturate(2);
 }*/

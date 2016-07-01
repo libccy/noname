@@ -1,37 +1,16 @@
 window.noname_update={
-    version:'1.8.16.3',
+    version:'1.8.17',
     changeLog:[
         '修bug',
     ],
     files:{
         global:[
-            'character/hearth.js',
-            'character/ow.js',
-            'character/swd.js',
-            'character/shenhua.js',
-            'character/yijiang.js',
-            'character/sp.js',
-            'character/xianjian.js',
-            'character/refresh.js',
-            'character/gujian.js',
-            'character/standard.js',
-            'card/swd.js',
-            'card/guozhan.js',
-            'card/yunchou.js',
-            'card/shenqi.js',
-            'card/hearth.js',
-            'card/mingzhong.js',
-            'card/standard.js',
-            'card/refresh.js',
             'game/game.js',
-            'game/config.js',
-            'mode/stone.js',
+            'game/asset.js',
+            'card/swd.js',
             'layout/default/layout.css',
-            'layout/mobile/layout.css',
-            'layout/newlayout/global.css',
-            'layout/mode/chess.css',
+            'theme/woodden/style.css',
         ],
-        '1.8.16.1':[],
-        '1.8.16.2':[]
+        '1.8.16.3':[]
     }
 }
