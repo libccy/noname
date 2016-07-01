@@ -646,15 +646,11 @@ character.gujian={
 			},
 			content:function(){
 				game.swapSeat(player,target,true,true);
-				player.useCard({name:'sha'},target);
+				player.useCard({name:'sha'},target,false);
 			},
 			ai:{
 				result:{
 					target:function(player,target){
-						if(player.num('h','sha')&&
-						lib.filter.targetInRange({name:'sha'},player,target)){
-							return 0;
-						}
 						return ai.get.effect(target,{name:'sha'},player,target);
 					},
 				},
@@ -1110,7 +1106,7 @@ character.gujian={
 		boyun2:'拨云',
 		boyun_info:'在你的回合内，你可以弃置一张装备牌，并展示牌堆顶的一张牌，若其为装备牌，你须将其交给任意一张角色并对其造成一点伤害，否则你摸一张牌',
 		jizhan:'疾战',
-		jizhan_info:'出牌阶段限一次，你可以将移动到任意一名角色的前一位，视为对其使用了一张杀',
+		jizhan_info:'出牌阶段限一次，你可以将移动到任意一名角色的前一位，视为对其使用了一张不计入出杀次数的杀',
 		qianjun:'千军',
 		qianjun_info:'每当你使用一张杀，你可以弃置一张牌，令距离目标1以内的所有角色成为额外目标',
 		xuanning:'玄凝',

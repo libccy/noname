@@ -2787,7 +2787,7 @@ character.shenhua={
 			audio:2,
 			trigger:{player:'dieBefore'},
 			forced:true,
-			filter:function(event,player){return player.maxHp>0},
+			filter:function(event,player){return player.maxHp>0&&player.hp<=0},
 			content:function(){
 				"step 0"
 				event.card=get.cards()[0];
@@ -2802,7 +2802,10 @@ character.shenhua={
 				}
 				trigger.untrigger();
 				trigger.finish();
-				player.hp=0;
+				if(player.hp<=0){
+					player.hp=1;
+					player.update();
+				}
 			},
 			mod:{
 				maxHandcard:function(player){
@@ -3253,8 +3256,7 @@ character.shenhua={
 		hongyan_info:
 		'锁定技，你的黑桃牌均视为红桃',
 		buqu_info:
-		'锁定技，每当你扣减1点体力后，若你当前的体力值为0，你可以将牌堆顶的一张牌置于你的武将牌上，'+
-		'称为“创”，若所有“创”的点数均不同，你不会死亡。你的手牌上限为“创”的个数',
+		'锁定技，在你死亡前，若你的体力值不大于0，亮出牌堆顶的一张牌并置于你的武将牌上，若此牌的点数与你武将牌上已有的牌点数均不同，则你回复至1体力。只要你的武将牌上有牌，你的手牌上限便与这些牌数量相等',
 		leiji_info:
 		'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害',
 		guidao_info:

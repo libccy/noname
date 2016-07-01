@@ -585,16 +585,21 @@ card.guozhan={
 		xietianzi:{
 			trigger:{player:'phaseAfter'},
 			filter:function(event,player){
-				return player.num('he')>0;
+				return player.hasSkill('xietianzi');
 			},
 			forced:true,
 			popup:false,
 			content:function(){
 				"step 0"
 				player.removeSkill('xietianzi');
-				player.chooseToDiscard('he','是否弃置一张牌并获得一个额外回合？').set('ai',function(card){
-					return 10-ai.get.value(card);
-				});
+				if(player.num('he')>0){
+					player.chooseToDiscard('he','是否弃置一张牌并获得一个额外回合？').set('ai',function(card){
+						return 10-ai.get.value(card);
+					});
+				}
+				else{
+					event.finish();
+				}
 				"step 1"
 				if(result.bool){
 					player.phase();
@@ -788,7 +793,10 @@ card.guozhan={
 						if(target.isUnseen()) return 0;
 						return 0.5;
 					},
-					target:1
+					target:function(player,target){
+						if(target.isUnseen()) return 0;
+						return 1;
+					}
 				},
 			}
 		},

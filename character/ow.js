@@ -75,7 +75,7 @@ character.ow={
 				'step 0'
                 player.discardPlayerCard('是否发动【目镜】？',trigger.target).logSkill=['mujing'];
                 'step 1'
-                if(player.num('h')<trigger.target.num('h')){
+                if(result.bool&&player.num('h')<trigger.target.num('h')){
                     player.draw();
                 }
 			}
@@ -527,8 +527,11 @@ character.ow={
                     player.discard(result.cards);
                     player.logSkill('yihun',result.targets);
                     player.addSkill('yihun2');
-                    player.storage.yihun2=result.targets[0];
-                    player.markSkillCharacter('yihun2',result.targets[0],'移魂','在'+get.translation(result.targets)+'的下一回合开始时视为对其使用一张杀');
+                    var target=result.targets[0]
+                    player.storage.yihun2=target;
+                    if(target&&(get.mode()!='guozhan')||!target.isUnseen()){
+                        player.markSkillCharacter('yihun2',target,'移魂','在'+get.translation(target)+'的下一回合开始时视为对其使用一张杀');
+                    }
                 }
             },
         },

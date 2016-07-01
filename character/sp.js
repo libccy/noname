@@ -2415,16 +2415,15 @@ character.sp={
 			audio:2,
 			trigger:{player:'useCard'},
 			frequent:true,
+			usable:3,
 			filter:function(event,player){
 				if(!event.cards||event.cards.length!=1) return false;
 				if(_status.currentPhase!=player) return false;
 				if(!player.storage.fenyin) return false;
-				if(player.storage.fenyin2>=3) return false;
 				return get.color(player.storage.fenyin)!=get.color(event.cards[0]);
 			},
 			content:function(){
 				player.draw();
-				player.storage.fenyin2++;
 			},
 			intro:{
 				content:'card'
@@ -2454,7 +2453,6 @@ character.sp={
 			priority:10,
 			content:function(){
 				player.storage.fenyin=null;
-				player.storage.fenyin2=0;
 			}
 		},
 		dujin:{
@@ -3014,7 +3012,7 @@ character.sp={
 				return event.source&&event.nature=='thunder';
 			},
 			check:function(event,player){
-				return ai.get.attitude(player,event.source)>0;
+				return ai.get.attitude(player,event.source)>0&&ai.get.attitude(player,event.player)<0;
 			},
 			prompt:function(event){
 				return get.translation(event.source)+'即将对'+get.translation(event.player)+'造成伤害，是否发动【辅祭】？';
@@ -4085,6 +4083,15 @@ character.sp={
 				var nono=(Math.abs(ai.get.attitude(player,trigger.player))<3);
 				if(ai.get.damageEffect(trigger.player,player,player)<=0){
 					nono=true
+				}
+				else if(trigger.player.hp>2){
+					nono=true;
+				}
+				else if(trigger.player.hp>1&&player.num('h')<3){
+					nono=true;
+				}
+				else if(trigger.player.canUse('sha',player)&&!player.num('h','shan')&&trigger.player.num('h')>=3){
+					nono=true;
 				}
 				var next=player.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【鸩毒】？');
 				next.set('ai',function(card){

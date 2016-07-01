@@ -341,6 +341,7 @@ card.hearth={
 				return target==player;
 			},
 			usable:3,
+			forceUsable:true,
 			content:function(){
 				'step 0'
 				ui.special.appendChild(cards[0]);

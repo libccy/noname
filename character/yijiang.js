@@ -2342,6 +2342,7 @@ character.yijiang={
 				order:7,
 				result:{
 					target:function(player,target){
+						if(target.hasSkillTag('noe')) return 1;
 						if(target.get('e','1')||target.get('e','4')) return -1;
 						if(target.get('e','2')) return -0.7;
 						return -0.5;
@@ -5945,7 +5946,7 @@ character.yijiang={
 				}
 			},
 			ai:{
-				order:8,
+				order:8.6,
 				result:{
 					target:function(player,target){
 						var num=player.getStat().skill.danshou;

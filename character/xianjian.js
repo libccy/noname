@@ -1237,6 +1237,7 @@ character.xianjian={
 					if(ai.get.effect(player,trigger.card,trigger.player,player)<0){
 						if(get.tag(trigger.card,'respondSha')&&player.num('h','sha')) return 0;
 						if(get.tag(trigger.card,'respondShan')&&player.num('h','shan')) return 0;
+						if(card.name=='guohe') return 0;
 						return 4-ai.get.value(card);
 					}
 					return 0;

@@ -519,7 +519,7 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target!=player;
+				return target!=player&&!target.isMin();
 			},
 			delay:false,
 			content:function(){
@@ -1600,6 +1600,9 @@ character.hearth={
 				discard:{
 					trigger:{global:'phaseEnd'},
 					forced:true,
+					check:function(event,player){
+						return ai.get.attitude(player,event.player)<0;
+					},
 					filter:function(event,player){
 						return typeof event.player.storage.shixu=='number'&&
 							event.player.storage.shixu>3000&&event.player.num('he')>0&&event.player.isAlive();
@@ -2302,7 +2305,8 @@ character.hearth={
 		},
 		fengnu:{
 			mod:{
-				cardUsable:function(){
+				cardUsable:function(card){
+					if(get.info(card)&&get.info(card).forceUsable) return;
 					return Infinity;
 				},
 				targetInRange:function(){
@@ -3621,7 +3625,7 @@ character.hearth={
 						return 1.2;
 					}
 				},
-				threaten:1.3
+				threaten:2
 			},
 			group:'tuteng_lose'
 		},

@@ -1258,7 +1258,7 @@ mode.stone={
 	careerList:['mage','shaman','druid','paladin','rogue','priest','hunter','warrior','warlock'],
 	game:{
 		reserveDead:true,
-		bannedcards:['lebu','guiyoujie'],
+		bannedcards:['lebu','guiyoujie','xietianzi'],
 		onwash:function(){
 			if(_status.mode!='deck') return;
 			var list=[];
@@ -1478,7 +1478,7 @@ mode.stone={
 					_status.event.dialog.content.insertBefore(buttons,node);
 					buttons.animate('start');
 					node.remove();
-					
+
 					game.uncheck();
 					game.check();
 				};
@@ -5129,14 +5129,14 @@ mode.stone={
 				"step 0"
 				target.discard(target.get('he'));
 				"step 1"
-				if(target.maxHp>1){
-					target.loseMaxHp(target.maxHp-1);
+				if(target.maxHp>2){
+					target.loseMaxHp(target.maxHp-2);
 				}
 			},
 			ai:{
 				result:{
 					target:function(player,target){
-						return 1-target.hp-target.num('h')/2;
+						return Math.min(0,2-target.hp)-target.num('h')/2;
 					}
 				},
 				order:7
@@ -7940,8 +7940,8 @@ mode.stone={
 				}
 				else{
 					event.target.discard(event.target.get('h'));
-					if(event.target.maxHp>1){
-						event.target.loseMaxHp(event.target.maxHp-1);
+					if(event.target.maxHp>2){
+						event.target.loseMaxHp(event.target.maxHp-2);
 					}
 				}
 			}
@@ -9940,7 +9940,7 @@ mode.stone={
 		druid_chengzhang2:'成长',
 		druid_chengzhang_info:'你出场时，己方主将获得一点行动值；你死亡时，己方主将需弃置一张手牌',
 		druid_huwei:'护卫',
-		druid_huwei_info:'你出场时，己方主将可以选择一项：对一名随从造成一点伤害，或弃置一名随从的所有牌并将其体力上限改为1',
+		druid_huwei_info:'你出场时，己方主将可以选择一项：对一名随从造成一点伤害，或弃置一名随从的所有牌并将其体力上限改为2',
 
 
 		stone_fachao:'法潮图腾',
@@ -10116,7 +10116,7 @@ mode.stone={
 		spell_diyulieyan:'地狱烈焰',
 		spell_diyulieyan_info:'所有角色失去一点体力',
 		spell_chenmo:'沉默',
-		spell_chenmo_info:'弃置一名随从的所有牌，并令其体力上限减至1',
+		spell_chenmo_info:'弃置一名随从的所有牌，并令其体力上限减至2',
 		spell_zhiliaoshui:'治疗水',
 		spell_zhiliaoshui_info:'出牌阶段对自己使用，恢复两点体力值；或于濒死阶段对一名角色使用，令目标恢复一点体力',
 		spell_yanmie:'极恶之咒',

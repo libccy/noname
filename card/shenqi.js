@@ -442,6 +442,7 @@ card.shenqi={
 		haotianta:{
 			trigger:{global:'judgeBefore'},
 			direct:true,
+			usable:3,
 			content:function(){
 				"step 0"
 				event.cards=get.cards(3);
@@ -740,7 +741,7 @@ card.shenqi={
 		donghuangzhong_info:'回合结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机判定牌置入其判定区',
 		xuanyuanjian_info:'锁定技，每当你即将造成一次伤害，你令此伤害加一并变为雷属性，此伤害结算后，你流失一点体力并摸一张牌。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
-		haotianta_info:'任意一名角色进行判定前，你可以观看牌堆顶的3张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',
+		haotianta_info:'任意一名角色进行判定前，你可以观看牌堆顶的3张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能。每回合最多发动3次',
 		shennongding_info:'出牌阶段，你可以弃置两张手牌，然后回复一点体力。每阶段限一次',
 		kongdongyin_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌，发动后进入弃牌堆',
 		kunlunjingc_info:'出牌阶段限一次，你可以观看牌堆顶的三张牌，然后用一张手牌替换其中的一张',

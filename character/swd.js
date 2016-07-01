@@ -2936,7 +2936,10 @@ character.swd={
 				"step 0"
 				var next=player.chooseToDiscard('是否弃置两张手牌将'+get.translation(trigger.card)+'反弹？',2);
 				next.ai=function(card){
-					if(ai.get.effect(player,trigger.card)<0) return 4-ai.get.value(card);
+					if(ai.get.effect(player,trigger.card)<0){
+						if(card.name=='liuxinghuoyu') return 7-ai.get.value(card);
+						return 5-ai.get.value(card);
+					}
 					return 0;
 				}
 				next.logSkill='yihua';

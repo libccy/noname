@@ -7,7 +7,7 @@ window.config={
 	'gjqt_bailitusu','yuanshao','swd_anka','swd_nicole','daqiao','re_daqiao','hs_xuanzhuanjijia',
 	'zhuran','huatuo','swd_tuwei','hs_guldan','wangyi','caoang','swd_guyue','swd_rongshuang',
 	'swd_jiangziya','guojia','re_guojia','shen_caocao','swd_qiner','caopi','hs_yngvar',
-	'gjqt_aruan','swd_hanluo','hs_anduin','swd_huanglei','yxs_luzhishen','swd_muyun'],
+	'gjqt_aruan','swd_hanluo','hs_anduin','swd_huanglei','yxs_yujix','yxs_luzhishen','swd_muyun'],
 	replacecharacter:{
 		zhangjiao:'sp_zhangjiao',
 		caocao:'re_caocao',

@@ -7013,6 +7013,9 @@
 						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive){
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
 						}
+                        if(get.config('continue_game')&&lib.mode[lib.config.mode].config.continue_game){
+            				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
+            			}
 						if(get.config('dierestart')&&lib.mode[lib.config.mode].config.dierestart){
 							ui.restart=ui.create.control('restart',game.reload);
 						}
@@ -12161,6 +12164,17 @@
 					}
 				}
 			},
+            counttrigger:{
+                trigger:{global:'phaseAfter'},
+                forced:true,
+                popup:false,
+                silent:true,
+                priority:-50,
+                content:function(){
+                    player.removeSkill('counttrigger');
+                    delete player.storage.counttrigger;
+                }
+            },
 			_recoverCheck:{
 				trigger:{player:'recoverBefore'},
 				forced:true,
@@ -15943,6 +15957,10 @@
 				else if(event._trigger.notrigger.contains(player)&&!lib.skill.global.contains(event.skill)){
 					event.finish();
 				}
+                else if(typeof info.usable=='number'&&player.hasSkill('counttrigger')&&
+                    player.storage.counttrigger&&player.storage.counttrigger[event.skill]>=info.usable){
+                    event.finish();
+                }
 				else{
 					var hidden=player.hiddenSkills.slice(0);
 					game.expandSkills(hidden);
@@ -15996,6 +16014,20 @@
 				if(result&&result.bool==false) return;
 				var info=get.info(event.skill);
 				var next=game.createEvent(event.skill);
+                if(typeof info.usable=='number'){
+                    if(!player.hasSkill('counttrigger')){
+                        player.addSkill('counttrigger');
+                    }
+                    if(!player.storage.counttrigger){
+                        player.storage.counttrigger={};
+                    }
+                    if(!player.storage.counttrigger[event.skill]){
+                        player.storage.counttrigger[event.skill]=1;
+                    }
+                    else{
+                        player.storage.counttrigger[event.skill]++;
+                    }
+                }
 				next.player=player;
 				next._trigger=trigger;
 				next.triggername=event.triggername;
@@ -16780,7 +16812,7 @@
 					});
 				}
 			}
-			else if(!_status.connectMode&&get.config('continue_game')){
+			else if(!_status.connectMode&&get.config('continue_game')&&!ui.continue_game){
 				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 			}
 			if(!ui.restart){
@@ -25931,13 +25963,14 @@
 				if(event.skillDialog){
 					var str=get.translation(skill);
 					if(info.prompt){
+                        var str2;
 						if(typeof info.prompt=='function'){
-							str+='：'+info.prompt(event);
+							str2=info.prompt(event);
 						}
 						else{
-							str+='：'+info.prompt;
+							str2=info.prompt;
 						}
-						event.skillDialog=ui.create.dialog(str);
+						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%;text-align:center">'+str2+'</div></div>');
 					}
 					else if(info.promptfunc){
 						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%">'+info.promptfunc(event,event.player)+'</div></div>');
@@ -26065,7 +26098,7 @@
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
 				};
 				uiintro.addEventListener('mouseleave',clickintro);
-				uiintro.listen(clickintro);
+				uiintro.addEventListener('click',clickintro);
 
 				game.pause2();
 				return uiintro;
@@ -27941,14 +27974,15 @@
                             uiintro.content.lastChild.style.display='block';
                             for(var i=0;i<esnodes.length;i++){
                                 uiintro.content.lastChild.childNodes[i].listen(function(e){
+
                                     e.stopPropagation();
-                                    uiintro.content.innerHTML='';
-                                    uiintro.add(this.str);
-                                    uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[this.link[2]+'_info']+'</div>');
-                                    uiintro.add(ui.create.div('.placeholder.slim'));
-                                    if(evt){
-                                        lib.placePoppedDialog(uiintro,evt);
-                                    }
+                                    // uiintro.content.innerHTML='';
+                                    // uiintro.add(this.str);
+                                    // uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[this.link[2]+'_info']+'</div>');
+                                    // uiintro.add(ui.create.div('.placeholder.slim'));
+                                    // if(evt){
+                                    //     lib.placePoppedDialog(uiintro,evt);
+                                    // }
                                 });
                                 if(i<es.length){
                                     uiintro.content.lastChild.childNodes[i].str=get.translation(es[i]);

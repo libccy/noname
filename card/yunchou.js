@@ -522,21 +522,26 @@ card.yunchou={
 			filterTarget:true,
 			content:function(){
 				"step 0"
-				target.chooseToDiscard('he',2).ai=function(card){
-					if(target.hasSkillTag('nofire')) return 0;
-					if(ai.get.damageEffect(target,player,target,'fire')>=0&&
-						!target.hasSkillTag('maixie')) return 0;
-					if(player.get('s').contains('xinwuyan')) return 0;
-					if(target.get('s').contains('xinwuyan')) return 0;
-					if(card.name=='tao') return 0;
-					if(target.hp==1&&card.name=='jiu') return 0;
-					if(target.hp==1&&get.type(card)!='basic'){
-						return 10-ai.get.value(card);
-					}
-					return 8-ai.get.value(card);
-				};
+				if(target.num('he')<2){
+					event.directfalse=true;
+				}
+				else{
+					target.chooseToDiscard('he',2).ai=function(card){
+						if(target.hasSkillTag('nofire')) return 0;
+						if(ai.get.damageEffect(target,player,target,'fire')>=0&&
+							!target.hasSkillTag('maixie')) return 0;
+						if(player.get('s').contains('xinwuyan')) return 0;
+						if(target.get('s').contains('xinwuyan')) return 0;
+						if(card.name=='tao') return 0;
+						if(target.hp==1&&card.name=='jiu') return 0;
+						if(target.hp==1&&get.type(card)!='basic'){
+							return 10-ai.get.value(card);
+						}
+						return 8-ai.get.value(card);
+					};
+				}
 				"step 1"
-				if(!result.bool){
+				if(event.directfalse&&!result.bool){
 					target.damage('fire');
 				}
 			},
