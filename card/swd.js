@@ -1,86 +1,5 @@
 card.swd={
 	card:{
-		lingjiandai:{
-			fullskin:true,
-			enable:true,
-			type:'basic',
-			range:{global:1},
-			filterTarget:true,
-			content:function(){
-				var list=[];
-				for(var i in lib.card){
-					if(lib.card[i].type=='hslingjian'){
-						list.push(i);
-					}
-				}
-				if(list.length){
-					list=list.randomGets(3);
-					for(var i=0;i<list.length;i++){
-						list[i]=game.createCard(list[i]);
-					}
-				}
-				target.gain(list,'gain2');
-			},
-			ai:{
-				result:{
-					target:1
-				}
-			}
-		},
-		jiguanshu:{
-			fullskin:true,
-			enable:true,
-			type:'basic',
-			range:{global:1},
-			filterTarget:true,
-			content:function(){
-				var list=[];
-				for(var i in lib.card){
-					if(lib.card[i].type=='hslingjian'){
-						list.push(i);
-					}
-				}
-				if(list.length){
-					list=list.randomGets(3);
-					for(var i=0;i<list.length;i++){
-						list[i]=game.createCard(list[i]);
-					}
-				}
-				target.gain(list,'gain2');
-			},
-			ai:{
-				result:{
-					target:1
-				}
-			}
-		},
-		mujiaren:{
-			fullskin:true,
-			enable:true,
-			type:'basic',
-			range:{global:1},
-			filterTarget:true,
-			content:function(){
-				var list=[];
-				for(var i in lib.card){
-					if(lib.card[i].type=='hslingjian'){
-						list.push(i);
-					}
-				}
-				if(list.length){
-					list=list.randomGets(3);
-					for(var i=0;i<list.length;i++){
-						list[i]=game.createCard(list[i]);
-					}
-				}
-				target.gain(list,'gain2');
-			},
-			ai:{
-				result:{
-					target:1
-				}
-			}
-		},
 		xingjunyan:{
 			fullskin:true,
 			type:'equip',
@@ -719,34 +638,6 @@ card.swd={
 		},
 	},
 	skill:{
-		mujiaren:{},
-		_lingjianduanzao:{
-			enable:'phaseUse',
-			check:function(card){
-				return 1+ai.get.value(card);
-			},
-			lose:true,
-			discard:false,
-			process:function(cards){
-
-			},
-			selectCard:2,
-			filter:function(event,player){
-				return player.num('h',{type:'equip'})&&player.num('h',{type:'hslingjian'});
-			},
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
-			content:function(){
-
-			},
-			ai:{
-				result:{
-					player:1,
-					order:10,
-				}
-			}
-		},
 		qinglonglingzhu:{
 			trigger:{source:'damageEnd'},
 			direct:true,
@@ -1234,63 +1125,6 @@ card.swd={
 		},
 	},
 	translate:{
-		hslingjian_xuanfengzhiren_duanzao:'旋风',
-		hslingjian_xuanfengzhiren_duanzao2:'风',
-		hslingjian_xuanfengzhiren_equip1:'随机弃置一名角色的一张牌',
-		hslingjian_xuanfengzhiren_equip2:'随机弃置一名角色的一张牌',
-		hslingjian_xuanfengzhiren_equip3:'随机弃置一名角色的一张牌',
-		hslingjian_xuanfengzhiren_equip4:'随机弃置一名角色的一张牌',
-		hslingjian_xuanfengzhiren_equip5:'随机弃置一名角色的一张牌',
-		hslingjian_zhongxinghujia_duanzao:'重甲',
-		hslingjian_zhongxinghujia_duanzao2:'护',
-		hslingjian_zhongxinghujia_equip1:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
-		hslingjian_zhongxinghujia_equip2:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
-		hslingjian_zhongxinghujia_equip3:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
-		hslingjian_zhongxinghujia_equip4:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
-		hslingjian_zhongxinghujia_equip5:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
-		hslingjian_jinjilengdong_duanzao:'冷冻',
-		hslingjian_jinjilengdong_duanzao2:'冰',
-		hslingjian_jinjilengdong_equip1:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
-		hslingjian_jinjilengdong_equip2:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
-		hslingjian_jinjilengdong_equip3:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
-		hslingjian_jinjilengdong_equip4:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
-		hslingjian_jinjilengdong_equip5:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
-		hslingjian_yinmilichang_duanzao:'隐秘',
-		hslingjian_yinmilichang_duanzao2:'隐秘',
-		hslingjian_yinmilichang_equip1:'令一名其他角色获得技能潜行，直到其下一回合开始',
-		hslingjian_yinmilichang_equip2:'令一名其他角色获得技能潜行，直到其下一回合开始',
-		hslingjian_yinmilichang_equip3:'令一名其他角色获得技能潜行，直到其下一回合开始',
-		hslingjian_yinmilichang_equip4:'令一名其他角色获得技能潜行，直到其下一回合开始',
-		hslingjian_yinmilichang_equip5:'令一名其他角色获得技能潜行，直到其下一回合开始',
-		hslingjian_xingtigaizao_duanzao:'移形',
-		hslingjian_xingtigaizao_duanzao2:'形',
-		hslingjian_xingtigaizao_equip1:'摸一张牌，本回合手牌上限-1',
-		hslingjian_xingtigaizao_equip2:'摸一张牌，本回合手牌上限-1',
-		hslingjian_xingtigaizao_equip3:'摸一张牌，本回合手牌上限-1',
-		hslingjian_xingtigaizao_equip4:'摸一张牌，本回合手牌上限-1',
-		hslingjian_xingtigaizao_equip5:'摸一张牌，本回合手牌上限-1',
-		hslingjian_shengxiuhaojiao_duanzao:'号角',
-		hslingjian_shengxiuhaojiao_duanzao2:'角',
-		hslingjian_shengxiuhaojiao_equip1:'令一名角色获得技能嘲讽，直到其下一回合开始',
-		hslingjian_shengxiuhaojiao_equip2:'令一名角色获得技能嘲讽，直到其下一回合开始',
-		hslingjian_shengxiuhaojiao_equip3:'令一名角色获得技能嘲讽，直到其下一回合开始',
-		hslingjian_shengxiuhaojiao_equip4:'令一名角色获得技能嘲讽，直到其下一回合开始',
-		hslingjian_shengxiuhaojiao_equip5:'令一名角色获得技能嘲讽，直到其下一回合开始',
-		hslingjian_shijianhuisu_duanzao:'回溯',
-		hslingjian_shijianhuisu_duanzao2:'溯',
-		hslingjian_shijianhuisu_equip1:'令一名其他角色将其装备牌收回手牌',
-		hslingjian_shijianhuisu_equip2:'令一名其他角色将其装备牌收回手牌',
-		hslingjian_shijianhuisu_equip3:'令一名其他角色将其装备牌收回手牌',
-		hslingjian_shijianhuisu_equip4:'令一名其他角色将其装备牌收回手牌',
-		hslingjian_shijianhuisu_equip5:'令一名其他角色将其装备牌收回手牌',
-		_lingjianduanzao:'煅造',
-		_lingjianduanzao_info:'出牌阶段，你可以选择手牌中的一张零件牌和一张装备牌，将它们合成为一件强化装备，并装备给距离1以内的一名角色',
-		jiguanshu:'机关鼠',
-		jiguanshu_info:'出牌阶段对距离1以内的一名角色使用，用随机零件强化目标装备区内的装备',
-		lingjiandai:'零件袋',
-		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
-		mujiaren:'木甲人',
-		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，在本局游戏中，目标在煅造装备时可以额外加入一个零件',
 		qinglonglingzhu:'青龙灵珠',
 		qinglonglingzhu_info:'每当你造成一次属性伤害，你可以获得对方的一张牌',
 		xingjunyan:'星君眼',

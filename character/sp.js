@@ -3716,7 +3716,7 @@ character.sp={
 					player.discard(player.get('he'));
 				}
 				else if(num){
-					player.chooseToDiscard(num,true);
+					player.chooseToDiscard('he',num,true);
 				}
 				player.removeSkill('kuiwei2');
 			}

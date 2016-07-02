@@ -1,5 +1,81 @@
 card.yunchou={
 	card:{
+		lingjiandai:{
+			fullskin:true,
+			enable:true,
+			type:'basic',
+			range:{global:1},
+			filterTarget:true,
+			content:function(){
+				var list=get.typeCard('hslingjian');
+				if(list.length){
+					list=list.randomGets(3);
+					for(var i=0;i<list.length;i++){
+						list[i]=game.createCard(list[i]);
+					}
+				}
+				target.gain(list,'gain2');
+			},
+			ai:{
+				result:{
+					target:1
+				}
+			}
+		},
+		jiguanshu:{
+			fullskin:true,
+			enable:true,
+			type:'basic',
+			range:{global:1},
+			filterTarget:true,
+			content:function(){
+				var list=[];
+				for(var i in lib.card){
+					if(lib.card[i].type=='hslingjian'){
+						list.push(i);
+					}
+				}
+				if(list.length){
+					list=list.randomGets(3);
+					for(var i=0;i<list.length;i++){
+						list[i]=game.createCard(list[i]);
+					}
+				}
+				target.gain(list,'gain2');
+			},
+			ai:{
+				result:{
+					target:1
+				}
+			}
+		},
+		mujiaren:{
+			fullskin:true,
+			enable:true,
+			type:'basic',
+			range:{global:1},
+			filterTarget:true,
+			content:function(){
+				var list=[];
+				for(var i in lib.card){
+					if(lib.card[i].type=='hslingjian'){
+						list.push(i);
+					}
+				}
+				if(list.length){
+					list=list.randomGets(3);
+					for(var i=0;i<list.length;i++){
+						list[i]=game.createCard(list[i]);
+					}
+				}
+				target.gain(list,'gain2');
+			},
+			ai:{
+				result:{
+					target:1
+				}
+			}
+		},
 		suolianjia:{
 			fullskin:true,
 			type:"equip",
@@ -677,8 +753,302 @@ card.yunchou={
 				}
 			}
 		},
+		hslingjian_xuanfengzhiren:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:true,
+			filterTarget:function(card,player,target){
+				return target.num('he')>0;
+			},
+			content:function(){
+				target.discard(target.get('he').randomGet());
+			},
+			ai:{
+				order:10.1,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_zhongxinghujia:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:true,
+			filterTarget:true,
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i=0;i<lib.inpile.length;i++){
+					if(lib.card[lib.inpile[i]].subtype=='equip2'){
+						list.push(lib.inpile[i]);
+					}
+				}
+				if(list.length){
+					var card=game.createCard(list.randomGet());
+					target.$draw(card);
+					game.delay();
+					target.equip(card);
+				}
+				'step 1'
+				var hs=target.get('h');
+				if(hs.length){
+					target.discard(hs.randomGet());
+				}
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+						if(target.get('e','2')){
+							if(target.num('h')) return -0.6;
+							return 0;
+						}
+						else{
+							if(target.num('h')) return 0.5;
+							return 1;
+						}
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_xingtigaizao:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:true,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			content:function(){
+				target.draw();
+				target.addSkill('hslingjian_xingtigaizao');
+				if(typeof target.storage.hslingjian_xingtigaizao=='number'){
+					target.storage.hslingjian_xingtigaizao++;
+				}
+				else{
+					target.storage.hslingjian_xingtigaizao=1;
+				}
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+						if(target.num('h')<target.hp) return 1;
+						return 0;
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_shijianhuisu:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:true,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('e')>0;
+			},
+			content:function(){
+				var es=target.get('e');
+				target.gain(es);
+				target.$gain2(es);
+			},
+			ai:{
+				order:5,
+				result:{
+					target:function(player,target){
+						if(target.hasSkillTag('noe')) return target.num('e')*2;
+						return -target.num('e');
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+				tag:{
+					loseCard:1,
+				}
+			}
+		},
+		hslingjian_jinjilengdong:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:true,
+			filterTarget:function(card,player,target){
+				return !target.isTurnedOver()&&target!=player;
+			},
+			content:function(){
+				target.draw(2);
+				target.turnOver();
+			},
+			ai:{
+				order:2,
+				result:{
+					target:-1,
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_shengxiuhaojiao:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:true,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('hslingjian_chaofeng');
+			},
+			content:function(){
+				target.addTempSkill('hslingjian_chaofeng',{player:'phaseBegin'});
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						if(get.distance(player,target,'absolute')<=1) return 0;
+						if(target.num('h')<=target.hp) return -0.1;
+						return -1;
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
+		hslingjian_yinmilichang:{
+			type:'hslingjian',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:true,
+			filterTarget:function(card,player,target){
+				return player!=target&&!target.hasSkill('hslingjian_yinshen');
+			},
+			content:function(){
+				target.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						if(get.distance(player,target,'absolute')<=1) return 0;
+						if(target.hp==1) return 2;
+						if(target.hp==2&&target.num('h')<=2) return 1.2;
+						return 1;
+					}
+				},
+				useful:[2,0.5],
+				value:[2,0.5],
+			}
+		},
 	},
 	skill:{
+		mujiaren:{},
+		_lingjianduanzao:{
+			enable:'phaseUse',
+			check:function(card){
+				return 1+ai.get.value(card);
+			},
+			lose:true,
+			discard:false,
+			process:function(cards){
+
+			},
+			selectCard:2,
+			filter:function(event,player){
+				return player.num('h',{type:'equip'})&&player.num('h',{type:'hslingjian'});
+			},
+			prepare:function(cards,player){
+				player.$throw(cards);
+			},
+			content:function(){
+
+			},
+			ai:{
+				result:{
+					player:1,
+					order:10,
+				}
+			}
+		},
+		hslingjian_yinshen:{
+			mark:true,
+			nopop:true,
+			intro:{
+				content:'锁定技，你不能成为其他角色的卡牌的目标'
+			},
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(player!=target) return false;
+				}
+			}
+		},
+		hslingjian_chaofeng:{
+			global:'hslingjian_chaofeng_disable',
+			nopop:true,
+			unique:true,
+			gainnable:true,
+			mark:true,
+			intro:{
+				content:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
+			},
+			subSkill:{
+				disable:{
+					mod:{
+						targetEnabled:function(card,player,target){
+							if(player.skills.contains('hslingjian_chaofeng')) return;
+							if(card.name=='sha'){
+								if(target.skills.contains('hslingjian_chaofeng')) return;
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].skills.contains('hslingjian_chaofeng')){
+										if(game.players[i].hp<game.players[i].num('h')&&
+											get.distance(player,game.players[i],'attack')<=1){
+											return false;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		hslingjian_xingtigaizao:{
+			nopop:true,
+			mod:{
+				maxHandcard:function(player,num){
+					if(typeof player.storage.hslingjian_xingtigaizao=='number'){
+						return num-player.storage.hslingjian_xingtigaizao;
+					}
+				},
+			},
+			mark:true,
+			intro:{
+				content:function(storage){
+					return '手牌上限-'+storage;
+				}
+			},
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.removeSkill('hslingjian_xingtigaizao');
+				player.storage.hslingjian_xingtigaizao=0;
+			}
+		},
 		suolianjia:{
 			trigger:{player:'damageBefore'},
 			filter:function(event){
@@ -777,7 +1147,86 @@ card.yunchou={
 			check:function(){return 1},
 		},
 	},
+	cardType:{
+		hslingjian:0.5,
+	},
 	translate:{
+		hslingjian_xuanfengzhiren_duanzao:'旋风',
+		hslingjian_xuanfengzhiren_duanzao2:'风',
+		hslingjian_xuanfengzhiren_equip1_info:'每当你用杀造成一次伤害，受伤害角色随机弃置一张牌',
+		hslingjian_xuanfengzhiren_equip2_info:'每当你受到杀造成的伤害，伤害来源随机弃置一张牌',
+		hslingjian_xuanfengzhiren_equip3_info:'当你于回合外失去牌后，你本回合的防御距离+1',
+		hslingjian_xuanfengzhiren_equip4_info:'当你于回合内失去牌后，你本回合的进攻距离+1',
+		hslingjian_xuanfengzhiren_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后随机弃置一名其他角色的一张牌',
+		hslingjian_zhongxinghujia_duanzao:'重甲',
+		hslingjian_zhongxinghujia_duanzao2:'护',
+		hslingjian_zhongxinghujia_equip1_info:'每当你用杀造成一次伤害，你可以弃置目标的防具牌',
+		hslingjian_zhongxinghujia_equip2_info:'每当你受到杀造成的伤害，你可以随机装备一防具牌',
+		hslingjian_zhongxinghujia_equip3_info:'当你的装备区内有防具牌时，你的防御距离+1',
+		hslingjian_zhongxinghujia_equip4_info:'当你的装备区内有防具牌时，你的进攻距离+1',
+		hslingjian_zhongxinghujia_equip5_info:'出牌阶段限一次，你可以弃置两张牌，然后令一名角色随机装备一件防具',
+		hslingjian_jinjilengdong_duanzao:'冷冻',
+		hslingjian_jinjilengdong_duanzao2:'冰',
+		hslingjian_jinjilengdong_equip1_info:'每当你用杀造成一次伤害，若受伤害角色武将牌正面朝上，你可以令其摸两张牌并翻面',
+		hslingjian_jinjilengdong_equip2_info:'每当你受到杀造成的伤害，若伤害来源武将牌正面朝上，你可以令其摸两张牌并翻面',
+		hslingjian_jinjilengdong_equip3_info:'你的武将牌背面朝上时防御距离+2',
+		hslingjian_jinjilengdong_equip4_info:'你的武将牌背面朝上时进攻距离+2',
+		hslingjian_jinjilengdong_equip5_info:'回合结束后，若你的武将牌正面朝上，你可以与一名武将牌正面朝上的其他角色同时翻面，然后各摸两张牌',
+		hslingjian_yinmilichang_duanzao:'隐秘',
+		hslingjian_yinmilichang_duanzao2:'隐秘',
+		hslingjian_yinmilichang_equip1_info:'每当你用杀造成一次伤害，你获得潜行直到下一回合开始',
+		hslingjian_yinmilichang_equip2_info:'每当你受到杀造成的伤害，你本回合内获得潜行',
+		hslingjian_yinmilichang_equip3_info:'当你的体力值为1时，你的防御距离+1',
+		hslingjian_yinmilichang_equip4_info:'当你的体力值为1时，你的进攻距离+1',
+		hslingjian_yinmilichang_equip5_info:'当你没有手牌时，你不能成为杀或决斗的目标',
+		hslingjian_xingtigaizao_duanzao:'移形',
+		hslingjian_xingtigaizao_duanzao2:'形',
+		hslingjian_xingtigaizao_equip1_info:'每当你用杀造成一次伤害，你摸一张牌',
+		hslingjian_xingtigaizao_equip2_info:'每当你受到杀造成的伤害，你摸一张牌',
+		hslingjian_xingtigaizao_equip3_info:'你的防御距离+1，进攻距离-1',
+		hslingjian_xingtigaizao_equip4_info:'你的防御距离-1，进攻距离+1',
+		hslingjian_xingtigaizao_equip5_info:'你于摸牌阶段额外摸一张牌；你的手牌上限-1',
+		hslingjian_shengxiuhaojiao_duanzao:'号角',
+		hslingjian_shengxiuhaojiao_duanzao2:'角',
+		hslingjian_shengxiuhaojiao_equip1_info:'有嘲讽的角色不能闪避你的杀',
+		hslingjian_shengxiuhaojiao_equip2_info:'有嘲讽的角色不能对你使用杀',
+		hslingjian_shengxiuhaojiao_equip3_info:'若你的手牌数大于你的体力值，你的防御距离+1',
+		hslingjian_shengxiuhaojiao_equip4_info:'若你的手牌数大于你的体力值，你的进攻距离+1',
+		hslingjian_shengxiuhaojiao_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名角色获得或解除嘲讽',
+		hslingjian_shijianhuisu_duanzao:'回溯',
+		hslingjian_shijianhuisu_duanzao2:'溯',
+		hslingjian_shijianhuisu_equip1_info:'每当你使用杀指定目标后，你可以选择目标装备区内的一张牌，令其将此装备收回手牌',
+		hslingjian_shijianhuisu_equip2_info:'每当你成为杀的目标后，你可以选择使用者装备区内的一张牌，令其将此装备收回手牌，且本回合内不能再次装备',
+		hslingjian_shijianhuisu_equip3_info:'当你的装备区内没有其他牌时，你的防御距离+1',
+		hslingjian_shijianhuisu_equip4_info:'当你的装备区内没有其他牌时，你的进攻距离+1',
+		hslingjian_shijianhuisu_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色将其装备区内的牌收回手牌',
+		_lingjianduanzao:'煅造',
+		_lingjianduanzao_info:'出牌阶段，你可以选择手牌中的一张零件牌和一张装备牌，将它们合成为一件强化装备；强化装备可以装备给距离1以内的角色',
+		jiguanshu:'机关鼠',
+		jiguanshu_info:'出牌阶段对距离1以内的一名角色使用，用随机零件强化目标装备区内的装备',
+		lingjiandai:'零件袋',
+		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
+		mujiaren:'木甲人',
+		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，在本局游戏中，目标可以二次煅造装备',
+		hslingjian:'零件',
+		hslingjian_xuanfengzhiren:'旋风之刃',
+		hslingjian_xuanfengzhiren_info:'随机弃置一名角色的一张牌',
+		hslingjian_zhongxinghujia:'重型护甲',
+		hslingjian_zhongxinghujia_info:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
+		hslingjian_jinjilengdong:'紧急冷冻',
+		hslingjian_jinjilengdong_info:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
+		hslingjian_yinmilichang:'隐秘力场',
+		hslingjian_yinmilichang_info:'令一名其他角色获得技能潜行，直到其下一回合开始',
+		hslingjian_xingtigaizao:'型体改造',
+		hslingjian_xingtigaizao_info:'摸一张牌，本回合手牌上限-1',
+		hslingjian_shengxiuhaojiao:'生锈号角',
+		hslingjian_shengxiuhaojiao_info:'令一名角色获得技能嘲讽，直到其下一回合开始',
+		hslingjian_shijianhuisu:'时间回溯',
+		hslingjian_shijianhuisu_info:'令一名其他角色将其装备牌收回手牌',
+		hslingjian_chaofeng:'嘲讽',
+		hslingjian_chaofeng_info:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
+		hslingjian_yinshen:'潜行',
+		hslingjian_yinshen_info:'锁定技，你不能成为其他角色的卡牌的目标',
 		suolianjia:'锁链甲',
 		suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
 		suolianjia_bg:'链',

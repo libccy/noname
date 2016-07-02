@@ -3863,7 +3863,7 @@
                     }
 					if(lib.cardPack.mode_derivation){
 						for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
-							if(!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]){
+							if(typeof lib.card[lib.cardPack.mode_derivation[i]].derivation=='string'&&!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]){
 								lib.cardPack.mode_derivation.splice(i--,1);
 							}
 						}
@@ -9706,7 +9706,7 @@
 					return skill;
 				},
 				addTempSkill:function(skill,expire){
-					if(this.skills.contains(skill)&&this.tempSkills[skill]==undefined) return;
+					if(this.hasSkill(skill)&&this.tempSkills[skill]==undefined) return;
 					this.addSkill(skill);
 					this.tempSkills[skill]=expire;
 					this.checkConflict();
@@ -26739,6 +26739,32 @@
 		},
 	};
 	var get={
+        inpile:function(type,filter){
+            var list=[];
+            for(var i=0;i<lib.inpile.length;i++){
+                if(typeof filter=='function'&&!filter(lib.inpile[i])) continue;
+                if(type.indexOf('equip')==0&&type.length==6){
+                    if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
+                }
+                else{
+                    if(get.type(lib.inpile[i])==type) list.push(lib.inpile[i]);
+                }
+            }
+            return list;
+        },
+        typeCard:function(type,filter){
+            var list=[];
+            for(var i in lib.card){
+                if(typeof filter=='function'&&!filter(i)) continue;
+                if(type.indexOf('equip')==0&&type.length==6){
+                    if(get.subtype(i)==type) list.push(i);
+                }
+                else{
+                    if(get.type(i)==type) list.push(i);
+                }
+            }
+            return list;
+        },
         ip:function(){
             if(!require) return '';
             var interfaces = require('os').networkInterfaces();
@@ -28850,7 +28876,11 @@
 			}
 		},
 	};
-	lib.init.init();
+    lib.get=get;
+    lib.ui=ui;
+    lib.ai=ai;
+    lib.game=game;
+    lib.init.init();
 		HTMLDivElement.prototype.animate=function(name,time){
 			this.classList.add(name);
 			var that=this;

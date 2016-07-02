@@ -7,7 +7,11 @@ window.noname_update={
         global:[
             'game/game.js',
             'game/asset.js',
+            'character/hearth.js',
+            'character/swd.js',
+            'character/sp.js',
             'card/swd.js',
+            'card/yunchou.js',
             'layout/default/layout.css',
             'theme/woodden/style.css',
         ],
