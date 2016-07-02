@@ -17923,14 +17923,6 @@
 						}
 						var equipValue=info.ai.equipValue||info.ai.basic.equipValue;
 						if(typeof equipValue=='function') return equipValue(card,player)-value;
-                        if(card.classList){
-                            if(card.classList.contains('epic')){
-                                equipValue++;
-                            }
-                            else if(card.classList.contains('legend')){
-                                equipValue+=2;
-                            }
-                        }
 						return equipValue-value;
 					}
 					card.ai.result.target=function(player,target){
@@ -22720,6 +22712,12 @@
                 var packsource;
 				var clickCapt=function(e){
 					if(_status.dragged) return;
+                    if(dialog.currentcapt2=='最近'&&dialog.currentcaptnode2!=this&&!dialog.currentcaptnode2.inited){
+                        dialog.currentcapt2=null;
+                        dialog.currentcaptnode2.classList.remove('thundertext');
+                        dialog.currentcaptnode2.inited=true;
+                        dialog.currentcaptnode2=null;
+                    }
                     if(this.alphabet){
                         if(this.classList.contains('thundertext')){
     						dialog.currentcapt=null;

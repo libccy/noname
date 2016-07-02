@@ -17,8 +17,12 @@ card.yunchou={
 				target.gain(list,'gain2');
 			},
 			ai:{
+				order:10,
 				result:{
-					target:1
+					target:function(player,target){
+						if(target.hasSkill('mujiaren_skill')) return 2;
+						return 1;
+					}
 				}
 			}
 		},
@@ -27,25 +31,38 @@ card.yunchou={
 			enable:true,
 			type:'basic',
 			range:{global:1},
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				var es=target.get('e');
+				for(var i=0;i<es.length;i++){
+					if(lib.inpile.contains(es[i].name)) return true;
+				}
+				return false;
+			},
 			content:function(){
-				var list=[];
-				for(var i in lib.card){
-					if(lib.card[i].type=='hslingjian'){
-						list.push(i);
+				var es=target.get('e');
+				var list=get.typeCard('hslingjian');
+				var cards=[];
+				for(var i=0;i<es.length;i++){
+					if(lib.inpile.contains(es[i].name)){
+						var card=game.createCard(list.randomGet());
+						cards.push(card);
+						var name=lib.skill._lingjianduanzao.process([card,es[i]]);
+						es[i].init([es[i].suit,es[i].number,name,es[i].nature]);
 					}
 				}
-				if(list.length){
-					list=list.randomGets(3);
-					for(var i=0;i<list.length;i++){
-						list[i]=game.createCard(list[i]);
-					}
-				}
-				target.gain(list,'gain2');
+				player.$gain2(cards);
 			},
 			ai:{
+				order:7.5,
 				result:{
-					target:1
+					target:function(player,target){
+						var es=target.get('e');
+						var num=0;
+						for(var i=0;i<es.length;i++){
+							if(lib.inpile.contains(es[i].name)) num++;
+						}
+						return num;
+					}
 				}
 			}
 		},
@@ -54,23 +71,14 @@ card.yunchou={
 			enable:true,
 			type:'basic',
 			range:{global:1},
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('mujiaren_skill');
+			},
 			content:function(){
-				var list=[];
-				for(var i in lib.card){
-					if(lib.card[i].type=='hslingjian'){
-						list.push(i);
-					}
-				}
-				if(list.length){
-					list=list.randomGets(3);
-					for(var i=0;i<list.length;i++){
-						list[i]=game.createCard(list[i]);
-					}
-				}
-				target.gain(list,'gain2');
+				target.addSkill('mujiaren_skill');
 			},
 			ai:{
+				order:10.1,
 				result:{
 					target:1
 				}
@@ -766,7 +774,7 @@ card.yunchou={
 				target.discard(target.get('he').randomGet());
 			},
 			ai:{
-				order:10.1,
+				order:6.5,
 				result:{
 					target:-1,
 				},
@@ -990,9 +998,57 @@ card.yunchou={
 		hslingjian_shijianhuisu_equip3:{},
 		hslingjian_shijianhuisu_equip4:{},
 		hslingjian_shijianhuisu_equip5:{},
-		mujiaren_skill:{},
+		mujiaren_skill:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h',{type:'hslingjian'})>=2;
+			},
+			filterCard:{type:'hslingjian'},
+			selectCard:2,
+			content:function(){
+				player.gain(game.createCard('jiguanshu'));
+			},
+			ai:{
+				order:7,
+				result:{
+					player:function(player){
+						for(var i=0;i<game.players.length;i++){
+							if(player.canUse('jiguanshu',game.players[i])&&
+							ai.get.effect(game.players[i],{name:'jiguanshu'},player,player>0)){
+								return 1;
+							}
+							return 0;
+						}
+					}
+				}
+			}
+		},
 		_lingjianduanzao:{
 			enable:'phaseUse',
+			prompt:function(event){
+				var lingjians=[],types=[];
+				var hs=event.player.get('h');
+				for(var i=0;i<hs.length;i++){
+					switch(get.type(hs[i])){
+						case 'equip':types.add(get.subtype(hs[i]));break;
+						case 'hslingjian':lingjians.add(hs[i].name);break;
+					}
+				}
+				var str='';
+				for(var i=0;i<lingjians.length;i++){
+					for(var j=0;j<types.length;j++){
+						if(j==0){
+							str+='<p class="shadowed" style="text-align:left;padding:5px;border-radius:4px;margin-top:0px;margin-bottom:12px;">';
+						}
+						else{
+							str+='<p class="shadowed" style="text-align:left;padding:5px;border-radius:4px;margin-top:12px;margin-bottom:12px;">';
+						}
+						str+=''+lib.translate[lingjians[i]]+'+'+lib.translate[types[j]]+
+						'：'+lib.translate[lingjians[i]+'_'+types[j]+'_info']+'</p>';
+					}
+				}
+				return str;
+			},
 			check:function(card){
 				return 1+ai.get.value(card);
 			},
@@ -1015,25 +1071,80 @@ card.yunchou={
 					if(get.type(cards[i])=='equip'){
 						equip=cards[i];
 						cards.splice(i--,1);
+						break;
 					}
 				}
 				var name=equip.name;
+				var equipname=equip.name;
 				for(var i=0;i<cards.length;i++){
 					name+=cards[i].name.slice(10);
 				}
 				if(lib.card[name]) return name;
 				lib.card[name]={};
 				for(var i in lib.card[equip.name]){
-					lib.card[name][i]=lib.card[equip.name][i];
+					if(i=='ai'){
+						lib.card[name][i]={};
+						for(var j in lib.card[equip.name][i]){
+							if(j=='basic'){
+								lib.card[name][i][j]={};
+								for(var k in lib.card[equip.name][i][j]){
+									lib.card[name][i][j][k]=lib.card[equip.name][i][j][k];
+								}
+							}
+							else{
+								lib.card[name][i][j]=lib.card[equip.name][i][j];
+							}
+						}
+					}
+					else{
+						lib.card[name][i]=lib.card[equip.name][i];
+					}
 				}
 				lib.card[name].cardimage=equip.name;
 				if(cards.length==2){
 					lib.card[name].legend=true;
+					if(typeof lib.card[name].ai.equipValue=='number'){
+						lib.card[name].ai.equipValue=Math.min(10,lib.card[name].ai.equipValue+3);
+					}
+					else if(typeof lib.card[name].ai.equipValue=='function'){
+						lib.card[name].ai.equipValue=function(){
+							return lib.card[equipname].ai.equipValue.apply(this,arguments)+2;
+						}
+					}
+					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='number'){
+						lib.card[name].ai.basic.equipValue=Math.min(10,lib.card[name].ai.basic.equipValue+3);
+					}
+					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='function'){
+						lib.card[name].ai.basic.equipValue=function(){
+							return lib.card[equipname].ai.basic.equipValue.apply(this,arguments)+2;
+						}
+					}
 				}
 				else{
 					lib.card[name].epic=true;
+					if(typeof lib.card[name].ai.equipValue=='number'){
+						lib.card[name].ai.equipValue=Math.min(10,lib.card[name].ai.equipValue+1);
+					}
+					else if(typeof lib.card[name].ai.equipValue=='function'){
+						lib.card[name].ai.equipValue=function(){
+							return lib.card[equipname].ai.equipValue.apply(this,arguments)+1;
+						}
+					}
+					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='number'){
+						lib.card[name].ai.basic.equipValue=Math.min(10,lib.card[name].ai.basic.equipValue+1);
+					}
+					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='function'){
+						lib.card[name].ai.basic.equipValue=function(){
+							return lib.card[equipname].ai.basic.equipValue.apply(this,arguments)+1;
+						}
+					}
 				}
-				lib.card[name].skills=lib.card[name].skills.slice(0);
+				if(Array.isArray(lib.card[name].skills)){
+					lib.card[name].skills=lib.card[name].skills.slice(0);
+				}
+				else{
+					lib.card[name].skills=[];
+				}
 				lib.card[name].filterTarget=true;
 				lib.card[name].selectTarget=1;
 				lib.card[name].range={global:1};
@@ -1057,6 +1168,7 @@ card.yunchou={
 				for(var i=0;i<cards.length;i++){
 					var name2=cards[i].name+'_'+get.subtype(equip);
 					lib.card[name].skills.add(name2);
+					lib.translate[name2]=lib.translate[cards[i].name+'_duanzao2'];
 					str2+='；'+lib.translate[name2+'_info'];
 				}
 				lib.translate[name+'_info']=str2;
@@ -1074,9 +1186,9 @@ card.yunchou={
 				game.me.gain(game.createCard(name),'gain2');
 			},
 			ai:{
+				order:10,
 				result:{
 					player:1,
-					order:10,
 				}
 			}
 		},
@@ -1257,8 +1369,8 @@ card.yunchou={
 		hslingjian_xuanfengzhiren_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后随机弃置一名其他角色的一张牌',
 		hslingjian_zhongxinghujia_duanzao:'重甲',
 		hslingjian_zhongxinghujia_duanzao2:'护',
-		hslingjian_zhongxinghujia_equip1_info:'每当你用杀造成一次伤害，你可以弃置目标的防具牌',
-		hslingjian_zhongxinghujia_equip2_info:'每当你受到杀造成的伤害，你可以随机装备一防具牌',
+		hslingjian_zhongxinghujia_equip1_info:'每当你用杀造成一次伤害，你可以随机装备一件防具牌',
+		hslingjian_zhongxinghujia_equip2_info:'每当你受到杀造成的伤害，你可以弃置伤害来源的防具牌',
 		hslingjian_zhongxinghujia_equip3_info:'当你的装备区内有防具牌时，你的防御距离+1',
 		hslingjian_zhongxinghujia_equip4_info:'当你的装备区内有防具牌时，你的进攻距离+1',
 		hslingjian_zhongxinghujia_equip5_info:'出牌阶段限一次，你可以弃置两张牌，然后令一名角色随机装备一件防具',
@@ -1305,8 +1417,8 @@ card.yunchou={
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
 		mujiaren_skill:'木甲人',
-		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件',
-		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，在本局游戏中，目标在煅造装备时可以额外加入一个零件',
+		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以弃置两个零件并获得一个机关鼠',
+		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标获得技能木甲人（你在煅造装备时可以额外加入一个零件；你可以弃置两个零件并获得一个机关鼠）',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',
 		hslingjian_xuanfengzhiren_info:'随机弃置一名角色的一张牌',
