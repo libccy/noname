@@ -1298,7 +1298,7 @@ card.yunchou={
 		hslingjian_shijianhuisu_equip4_info:'当你的装备区内没有其他牌时，你的进攻距离+1',
 		hslingjian_shijianhuisu_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色将其装备区内的牌收回手牌',
 		_lingjianduanzao:'煅造',
-		_lingjianduanzao_info:'出牌阶段，你可以选择手牌中的一张零件牌和一张装备牌，将它们合成为一件强化装备；强化装备可以装备给距离1以内的角色',
+		_lingjianduanzao_info:'出牌阶段，你可以选择手牌中的一张装备牌和一张零件牌，将它们合成为一件强化装备；强化装备可以装备给距离1以内的角色',
 		jiguanshu:'机关鼠',
 		jiguanshu_info:'出牌阶段对距离1以内的一名角色使用，用随机零件强化目标装备区内的装备',
 		lingjiandai:'零件袋',

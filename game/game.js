@@ -26176,10 +26176,10 @@
 					return;
 				}
                 var uiintro;
-                if(this.classList.contains('card')&&this.parentNode&&this.parentNode.classList.contains('equips')){
-                    if(!lib.isMobileMe(this.parentNode.parentNode)){
-                        uiintro=get.nodeintro(this.parentNode.parentNode,false,e);
-                    }
+                if(this.classList.contains('card')&&this.parentNode&&
+                this.parentNode.classList.contains('equips')&&lib.config.touchscreen&&
+                !lib.isMobileMe(this.parentNode.parentNode)){
+                    uiintro=get.nodeintro(this.parentNode.parentNode,false,e);
                 }
 				uiintro=uiintro||get.nodeintro(this,false,e);
                 if(!uiintro) return;
