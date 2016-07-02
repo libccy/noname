@@ -3939,6 +3939,14 @@
 									else{
 										if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
 										else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+                                        if(j=='card'&&lib[j][k].derivation){
+											if(!lib.cardPack.mode_derivation){
+												lib.cardPack.mode_derivation=[k];
+											}
+											else{
+												lib.cardPack.mode_derivation.push(k);
+											}
+										}
 									}
 								}
 							}
@@ -11106,11 +11114,20 @@
 							card[3]='thunder';
 						}
 					}
-					var bg=card[2];
                     if(!lib.card[card[2]]){
                         lib.card[card[2]]={};
                     }
-					var img=lib.card[card[2]].image;
+                    if(lib.card[card[2]].epic){
+                        this.classList.add('epic');
+                    }
+                    else if(lib.card[card[2]].legend){
+                        this.classList.add('legend');
+                    }
+					var bg=card[2];
+                    if(lib.card[card[2]].cardimage){
+                        bg=lib.card[card[2]].cardimage;
+                    }
+					var img=lib.card[bg].image;
                     if(img){
                         if(img.indexOf('db:')==0){
     						img=img.slice(3);
@@ -11119,7 +11136,7 @@
     						img=null;
     					}
                     }
-					if(!lib.config.hide_card_image&&lib.card[card[2]].fullskin){
+					if(!lib.config.hide_card_image&&lib.card[bg].fullskin){
 						this.classList.add('fullskin');
 						if(img){
                             if(img.indexOf('ext:')==0){
@@ -11130,14 +11147,14 @@
                             }
 						}
 						else{
-							this.node.image.setBackgroundImage('image/card/'+card[2]+'.png');
+							this.node.image.setBackgroundImage('image/card/'+bg+'.png');
 						}
 					}
-					else if(lib.card[card[2]].image=='background'){
+					else if(lib.card[bg].image=='background'){
 						if(card[3]) this.node.background.setBackground(bg+'_'+card[3],'card');
 						else this.node.background.setBackground(bg,'card');
 					}
-					else if(lib.card[card[2]].fullimage){
+					else if(lib.card[bg].fullimage){
 						if(img){
                             if(img.indexOf('ext:')==0){
                                 this.setBackgroundImage(img.replace(/ext:/,'extension/'));
@@ -11151,11 +11168,11 @@
 							this.setBackground('card/'+bg);
 						}
 					}
-					else if(lib.card[card[2]].image=='card'){
+					else if(lib.card[bg].image=='card'){
 						if(card[3]) this.setBackground(bg+'_'+card[3],'card');
 						else this.setBackground(bg,'card');
 					}
-					else if(typeof lib.card[card[2]].image=='string'&&!lib.card[card[2]].fullskin){
+					else if(typeof lib.card[bg].image=='string'&&!lib.card[bg].fullskin){
 						if(img){
                             if(img.indexOf('ext:')==0){
                                 this.setBackgroundImage(img.replace(/ext:/,'extension/'));
@@ -11166,7 +11183,7 @@
                             }
 						}
 						else{
-							this.setBackground(lib.card[card[2]].image);
+							this.setBackground(lib.card[bg].image);
 						}
 					}
 					else{
@@ -17906,6 +17923,14 @@
 						}
 						var equipValue=info.ai.equipValue||info.ai.basic.equipValue;
 						if(typeof equipValue=='function') return equipValue(card,player)-value;
+                        if(card.classList){
+                            if(card.classList.contains('epic')){
+                                equipValue++;
+                            }
+                            else if(card.classList.contains('legend')){
+                                equipValue+=2;
+                            }
+                        }
 						return equipValue-value;
 					}
 					card.ai.result.target=function(player,target){
@@ -17915,8 +17940,7 @@
 						var value2=0;
 						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card)
 							value2=ai.get.value(target[get.subtype(card)],target);
-						if(value1>value2) return 1;
-						return -1;
+                        return value1-value2;
 					};
 				}
 				else if(card.type=='delay'){

@@ -955,26 +955,123 @@ card.yunchou={
 		},
 	},
 	skill:{
-		mujiaren:{},
+		hslingjian_xuanfengzhiren_equip1:{},
+		hslingjian_xuanfengzhiren_equip2:{},
+		hslingjian_xuanfengzhiren_equip3:{},
+		hslingjian_xuanfengzhiren_equip4:{},
+		hslingjian_xuanfengzhiren_equip5:{},
+		hslingjian_zhongxinghujia_equip1:{},
+		hslingjian_zhongxinghujia_equip2:{},
+		hslingjian_zhongxinghujia_equip3:{},
+		hslingjian_zhongxinghujia_equip4:{},
+		hslingjian_zhongxinghujia_equip5:{},
+		hslingjian_jinjilengdong_equip1:{},
+		hslingjian_jinjilengdong_equip2:{},
+		hslingjian_jinjilengdong_equip3:{},
+		hslingjian_jinjilengdong_equip4:{},
+		hslingjian_jinjilengdong_equip5:{},
+		hslingjian_yinmilichang_equip1:{},
+		hslingjian_yinmilichang_equip2:{},
+		hslingjian_yinmilichang_equip3:{},
+		hslingjian_yinmilichang_equip4:{},
+		hslingjian_yinmilichang_equip5:{},
+		hslingjian_xingtigaizao_equip1:{},
+		hslingjian_xingtigaizao_equip2:{},
+		hslingjian_xingtigaizao_equip3:{},
+		hslingjian_xingtigaizao_equip4:{},
+		hslingjian_xingtigaizao_equip5:{},
+		hslingjian_shengxiuhaojiao_equip1:{},
+		hslingjian_shengxiuhaojiao_equip2:{},
+		hslingjian_shengxiuhaojiao_equip3:{},
+		hslingjian_shengxiuhaojiao_equip4:{},
+		hslingjian_shengxiuhaojiao_equip5:{},
+		hslingjian_shijianhuisu_equip1:{},
+		hslingjian_shijianhuisu_equip2:{},
+		hslingjian_shijianhuisu_equip3:{},
+		hslingjian_shijianhuisu_equip4:{},
+		hslingjian_shijianhuisu_equip5:{},
+		mujiaren_skill:{},
 		_lingjianduanzao:{
 			enable:'phaseUse',
 			check:function(card){
 				return 1+ai.get.value(card);
 			},
-			lose:true,
-			discard:false,
-			process:function(cards){
-
+			filterCard:function(card){
+				var type=get.type(card);
+				if(!ui.selected.cards.length){
+					return type=='equip'&&lib.inpile.contains(card.name);
+				}
+				return type=='hslingjian';
 			},
-			selectCard:2,
+			process:function(cards){
+				if(cards.length==3){
+					cards.sort(function(a,b){
+						if(a.name<b.name) return 1;
+						return -1;
+					});
+				}
+				var equip;
+				for(var i=0;i<cards.length;i++){
+					if(get.type(cards[i])=='equip'){
+						equip=cards[i];
+						cards.splice(i--,1);
+					}
+				}
+				var name=equip.name;
+				for(var i=0;i<cards.length;i++){
+					name+=cards[i].name.slice(10);
+				}
+				if(lib.card[name]) return name;
+				lib.card[name]={};
+				for(var i in lib.card[equip.name]){
+					lib.card[name][i]=lib.card[equip.name][i];
+				}
+				lib.card[name].cardimage=equip.name;
+				if(cards.length==2){
+					lib.card[name].legend=true;
+				}
+				else{
+					lib.card[name].epic=true;
+				}
+				lib.card[name].skills=lib.card[name].skills.slice(0);
+				lib.card[name].filterTarget=true;
+				lib.card[name].selectTarget=1;
+				lib.card[name].range={global:1};
+				lib.card[name].vanish=true;
+				var str;
+				if(cards.length==2){
+					str=lib.translate[cards[0].name+'_duanzao2']+lib.translate[cards[1].name+'_duanzao2'];
+				}
+				else{
+					str=lib.translate[cards[0].name+'_duanzao'];
+				}
+				var str2=lib.translate[equip.name];
+				if(str2.length>2){
+					str2=str2.slice(0,2);
+				}
+				lib.translate[name]=str+str2;
+				str2=lib.translate[equip.name+'_info']||'';
+				if(str2[str2.length-1]=='.'||str2[str2.length-1]=='。'){
+					str2=str2.slice(0,str2.length-1);
+				}
+				for(var i=0;i<cards.length;i++){
+					var name2=cards[i].name+'_'+get.subtype(equip);
+					lib.card[name].skills.add(name2);
+					str2+='；'+lib.translate[name2+'_info'];
+				}
+				lib.translate[name+'_info']=str2;
+				return name;
+			},
+			selectCard:function(){
+				if(_status.event.player.hasSkill('mujiaren_skill')) return [2,3];
+				return 2;
+			},
 			filter:function(event,player){
 				return player.num('h',{type:'equip'})&&player.num('h',{type:'hslingjian'});
 			},
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
 			content:function(){
-
+				var name=lib.skill._lingjianduanzao.process(cards);
+				game.me.gain(game.createCard(name),'gain2');
 			},
 			ai:{
 				result:{
@@ -1165,7 +1262,7 @@ card.yunchou={
 		hslingjian_zhongxinghujia_equip3_info:'当你的装备区内有防具牌时，你的防御距离+1',
 		hslingjian_zhongxinghujia_equip4_info:'当你的装备区内有防具牌时，你的进攻距离+1',
 		hslingjian_zhongxinghujia_equip5_info:'出牌阶段限一次，你可以弃置两张牌，然后令一名角色随机装备一件防具',
-		hslingjian_jinjilengdong_duanzao:'冷冻',
+		hslingjian_jinjilengdong_duanzao:'冰冻',
 		hslingjian_jinjilengdong_duanzao2:'冰',
 		hslingjian_jinjilengdong_equip1_info:'每当你用杀造成一次伤害，若受伤害角色武将牌正面朝上，你可以令其摸两张牌并翻面',
 		hslingjian_jinjilengdong_equip2_info:'每当你受到杀造成的伤害，若伤害来源武将牌正面朝上，你可以令其摸两张牌并翻面',
@@ -1173,7 +1270,7 @@ card.yunchou={
 		hslingjian_jinjilengdong_equip4_info:'你的武将牌背面朝上时进攻距离+2',
 		hslingjian_jinjilengdong_equip5_info:'回合结束后，若你的武将牌正面朝上，你可以与一名武将牌正面朝上的其他角色同时翻面，然后各摸两张牌',
 		hslingjian_yinmilichang_duanzao:'隐秘',
-		hslingjian_yinmilichang_duanzao2:'隐秘',
+		hslingjian_yinmilichang_duanzao2:'隐',
 		hslingjian_yinmilichang_equip1_info:'每当你用杀造成一次伤害，你获得潜行直到下一回合开始',
 		hslingjian_yinmilichang_equip2_info:'每当你受到杀造成的伤害，你本回合内获得潜行',
 		hslingjian_yinmilichang_equip3_info:'当你的体力值为1时，你的防御距离+1',
@@ -1207,7 +1304,9 @@ card.yunchou={
 		lingjiandai:'零件袋',
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
-		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，在本局游戏中，目标可以二次煅造装备',
+		mujiaren_skill:'木甲人',
+		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件',
+		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，在本局游戏中，目标在煅造装备时可以额外加入一个零件',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',
 		hslingjian_xuanfengzhiren_info:'随机弃置一名角色的一张牌',

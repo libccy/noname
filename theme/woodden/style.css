@@ -157,10 +157,10 @@ html{
 	color:rgb(77, 60, 51);
 	text-shadow:none;
 }
-.card.fullskin.epic>.name2{
+#arena.mobile:not(.chess) .player[data-position='0'] .card.fullskin.epic>.name2{
 	color: rgba(0, 66, 165, 1);
 }
-.card.fullskin.legend>.name2{
+#arena.mobile:not(.chess) .player[data-position='0'] .card.fullskin.legend>.name2{
 	color: rgba(106, 27, 154, 1);
 	/*color: rgb(117,186,0);*/
 }

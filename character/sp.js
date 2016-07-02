@@ -53,7 +53,7 @@ character.sp={
 		sp_daqiao:['female','wu',3,['yanxiao','anxian']],
 		sp_ganning:['male','wu',4,['yinling','junwei']],
 		sp_xiahoudun:['male','wei',4,['fenyong','xuehen']],
-		sp_lvmeng:['male','wu',4,['tanhu','mouduan']],
+		sp_lvmeng:['male','wu',3,['tanhu','mouduan']],
 		wangji:['male','wei',3,['qizhi','jinqu']],
 
 		guansuo:['male','shu',4,['zhengnan','xiefang']],
