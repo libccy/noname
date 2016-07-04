@@ -16054,7 +16054,12 @@
 						game.log(player,'发动了','【'+get.skillTranslation(event.skill,player)+'】');
 					}
 					else{
-						player.logSkill(event.skill);
+                        if(info.logTarget){
+                            player.logSkill(event.skill,info.logTarget(trigger,player));
+                        }
+						else{
+                            player.logSkill(event.skill);
+                        }
 					}
 				}
 			}
@@ -26768,6 +26773,9 @@
                 if(type.indexOf('equip')==0&&type.length==6){
                     if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
                 }
+                else if(type.indexOf('hslingjian')==0&&type.length==11){
+                    if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
+                }
                 else{
                     if(get.type(lib.inpile[i])==type) list.push(lib.inpile[i]);
                 }
@@ -26779,6 +26787,9 @@
             for(var i in lib.card){
                 if(typeof filter=='function'&&!filter(i)) continue;
                 if(type.indexOf('equip')==0&&type.length==6){
+                    if(get.subtype(i)==type) list.push(i);
+                }
+                else if(type.indexOf('hslingjian')==0&&type.length==11){
                     if(get.subtype(i)==type) list.push(i);
                 }
                 else{
@@ -27286,6 +27297,8 @@
 			return lib.card[obj.name].type;
 		},
 		subtype:function(obj){
+			if(typeof obj=='string') obj={name:obj};
+			if(typeof obj!='object') return;
 			if(!lib.card[obj.name]) return;
 			return lib.card[obj.name].subtype;
 		},

@@ -608,7 +608,7 @@ div:not(.handcards)>.card>.info>span,
 	display: block !important;
 }
 /*--------窗口--------*/
-.dialog{text-align: center;z-index:4;transition-property:opacity,background,box-shadow;line-height: 18px;}
+.dialog{text-align: center;z-index:4;transition-property:opacity,background,box-shadow;}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}
 .dialog.fullheight{height:calc(100% - 80px) !important;top:40px !important}
 .dialog.fullwidth{left:calc(5% + 60px) !important;width:calc(90% - 120px) !important}

@@ -2400,7 +2400,13 @@ character.hearth={
 				return '是否对'+get.translation(event.player)+'发动【冰霜】？';
 			},
 			check:function(event,player){
+				if(event.player.isTurnedOver()){
+					return ai.get.attitude(player,event.player)>0;
+				}
 				return ai.get.attitude(player,event.player)<=0;
+			},
+			logTarget:function(event){
+				return event.player;
 			},
 			content:function(){
 				trigger.player.draw(2);

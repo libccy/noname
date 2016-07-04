@@ -11,6 +11,7 @@ window.noname_update={
             'character/swd.js',
             'character/sp.js',
             'card/swd.js',
+            'card/hearth.js',
             'card/yunchou.js',
             'layout/default/layout.css',
             'theme/woodden/style.css',

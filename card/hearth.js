@@ -379,14 +379,16 @@ card.hearth={
 		tanshezhiren:{
 			fullskin:true,
 			type:'trick',
-			enable:function(){
+			enable:function(card,player){
+				if(game.players.length<3) return false;
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('h')) return true;
+					if(game.players[i]!=player&&game.players[i].num('h')) return true;
 				}
 				return false;
 			},
+			chongzhu:true,
 			filterTarget:function(card,player,target){
-				return target.num('h')>0;
+				return target.num('h')>0&&target!=player;
 			},
 			selectTarget:-1,
 			multitarget:true,
@@ -639,7 +641,7 @@ card.hearth={
 		xingjiegoutong:'星界沟通',
 		xingjiegoutong_info:'增加一点体力上限并回复一点体力，弃置你的所有手牌',
 		tanshezhiren:'弹射之刃',
-		tanshezhiren_info:'弃置一名随机角色的手牌，重复此过程直到有一名角色失去最后一张手牌（最多重复10次）',
+		tanshezhiren_info:'限场存活角色不小于3时使用，弃置一名随机角色（不含你）的手牌，重复此过程直到有一名角色失去最后一张手牌（最多重复10次）',
 		chuansongmen:'传送门',
 		chuansongmen_info:'摸一张牌，若你能立即使用之，则将此牌回手（每回合最多使用3次）',
 		dunpaigedang:'盾牌格挡',
