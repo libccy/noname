@@ -9708,6 +9708,7 @@
 					this.unmarkSkill(skill);
 					this.skills.remove(skill);
 					this.checkConflict();
+                    delete this.tempSkills[skill];
 					if(lib.skill[skill]&&lib.skill[skill].onremove){
 						lib.skill[skill].onremove(this);
 					}
@@ -14592,6 +14593,23 @@
 					ui.updatehl();
 				}
 			},
+            newcard:function(content){
+                if(content){
+                    lib.translate[content.name]=content.translate;
+                    lib.translate[content.name+'_info']=content.info;
+                    lib.card[content.name]={};
+                    lib.card[content.name].cardimage=content.card
+                    for(var i in lib.card[content.card]){
+                        lib.card[content.name][i]=lib.card[content.card][i];
+                    }
+                    if(content.legend){
+                        lib.card[content.name].legend=true;
+                    }
+                    else if(content.epic){
+                        lib.card[content.name].epic=true;
+                    }
+                }
+            },
 			playAudio:function(str){
 				game.playAudio(str,'video');
 			},
@@ -20818,6 +20836,7 @@
 						node.mode=mode;
 						var list=[];
 						for(var i=0;i<info.length;i++){
+                            if(lib.card[info[i]].derivation&&mode!='mode_derivation') continue;
 							list.push(['',get.translation(get.type(info[i],'trick')),info[i]]);
 						}
 						var cfgnode=createConfig({

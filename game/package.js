@@ -18,11 +18,10 @@ character.pack={
 };
 card.pack={
     standard:'标准',
-    ex:'EX',
     extra:'军争',
     refresh:'界限突破',
     guozhan:'国战',
-    mingzhong:'忠胆英杰',
+    mingzhong:'SP',
     zhenfa:'阵法',
     yunchou:'运筹帷幄',
     swd:'轩辕剑',

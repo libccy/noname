@@ -1,6 +1,5 @@
 window.noname_source_list=[
     'card/compensate.js',
-    'card/ex.js',
     'card/extra.js',
     'card/guozhan.js',
     'card/hearth.js',

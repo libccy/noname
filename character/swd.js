@@ -4591,7 +4591,7 @@ character.swd={
 					target.discard(result.buttons[0].link);
 					target.draw();
 					if(player.num('he')) player.chooseToDiscard(true,'he');
-					player.logSkill('shengong');
+					player.logSkill('shengong',target);
 				}
 			},
 			ai:{
@@ -6283,24 +6283,14 @@ character.swd={
 		},
 		lanzhi:{
 			trigger:{source:'damageBefore'},
-			filter:function(event,player){
-				return event.player!=player;
-			},
 			prompt:function(event){
 				return '是否对'+get.translation(event.player)+'发动【兰芷】？';
 			},
 			check:function(event,player){
-				if(event.source==player){
-					if(player.hp==1&&event.player.hp>1) return true;
-					var att=ai.get.attitude(player,event.player);
-					if(player.hp==player.maxHp) return att>0;
-					return att>=0;
-				}
-				else{
-					if(player.hp==1||event.num>1) return true;
-					if(player.hp==2) return ai.get.attitude(player,event.player)>=-2;
-					return ai.get.attitude(player,event.player)>=0;
-				}
+				if(player.hp==1&&event.player.hp>1) return true;
+				var eff=ai.get.damageEffect(event.player,player,player);
+				if(player.hp==player.maxHp) return eff<0;
+				return eff<=0;
 			},
 			content:function(){
 				trigger.untrigger();
@@ -8065,7 +8055,7 @@ character.swd={
 		guxing_info:'出牌阶段，你可以将最后至多X张手牌当杀使用，此杀无视距离且可以指定至多3个目标，每造成一次伤害，你摸一张牌，Ｘ为你已损失的体力值且至少为１。',
 		tianlun_info:'任意一名角色的判定生效前，你可以弃置一张场上角色的判定牌代替之',
 		hlongyin_info:'出牌阶段，你可以弃置任意张颜色相同且点数不同的牌，并获得逆时针座位距离与卡牌点数相同的角色区域内的一张牌。每阶段限一次',
-		lanzhi_info:'你对一名其他角色造成伤害时，你可以防止此伤害，然后回复一点体力',
+		lanzhi_info:'每当你即将造成伤害，你可以防止此伤害，然后回复一点体力',
 		lanzhi_old_info:'每当你即将造成伤害，可以防止此伤害，然后摸两张牌。每回合限发动一次。',
 		tianhuo_info:'出牌阶段，你可以令所有角色弃置其判定区域内的牌，并受到没有来源的等量火焰伤害，每阶段限一次',
 		huanyin_info:'锁定技，每当你成为其他角色的卡牌的目标时，你进行一次判定，若为黑桃则取消之，若为红桃你摸一张牌',
