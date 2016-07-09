@@ -28148,15 +28148,14 @@
                             uiintro.content.lastChild.style.display='block';
                             for(var i=0;i<esnodes.length;i++){
                                 uiintro.content.lastChild.childNodes[i].listen(function(e){
-
                                     e.stopPropagation();
-                                    // uiintro.content.innerHTML='';
-                                    // uiintro.add(this.str);
-                                    // uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[this.link[2]+'_info']+'</div>');
-                                    // uiintro.add(ui.create.div('.placeholder.slim'));
-                                    // if(evt){
-                                    //     lib.placePoppedDialog(uiintro,evt);
-                                    // }
+                                    uiintro.content.innerHTML='';
+                                    uiintro.add(this.str);
+                                    uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[this.link[2]+'_info']+'</div>');
+                                    uiintro.add(ui.create.div('.placeholder.slim'));
+                                    if(evt){
+                                        lib.placePoppedDialog(uiintro,evt);
+                                    }
                                 });
                                 if(i<es.length){
                                     uiintro.content.lastChild.childNodes[i].str=get.translation(es[i]);
