@@ -45,6 +45,8 @@ character.refresh={
 				delete player.storage.rerende2;
 			},
 			check:function(card){
+				if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
+				if(!ui.selected.cards.length&&card.name=='du') return 20;
 				var player=get.owner(card);
 				if(ui.selected.cards.length>=Math.max(2,player.num('h')-player.hp)) return 0;
 				if(player.hp==player.maxHp||player.storage.rerende<0||player.num('h')<=1){
@@ -85,10 +87,10 @@ character.refresh={
 						}
 						if(player.canUse('tao',player,true,true)){
 							list.push('tao');
-						};
+						}
 						if(player.canUse('jiu',player,true,true)){
 							list.push('jiu');
-						};
+						}
 						if(list.length){
 							list.push('cancel');
 							player.chooseControl(list,function(){
@@ -151,6 +153,9 @@ character.refresh={
 				},
 				result:{
 					target:function(player,target){
+						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							return -10;
+						}
 						if(target.num('j','lebu')) return 0;
 						var nh=target.num('h');
 						var np=player.num('h');
@@ -469,9 +474,9 @@ character.refresh={
 			unique:true,
 			trigger:{player:'gainAfter'},
 			direct:true,
+			usable:4,
 			filter:function(event,player){
 				if(event.parent.parent.name=='phaseDraw') return false;
-				if(player.storage.qingjian>=4) return false;
 				return event.cards&&event.cards.length>0
 			},
 			content:function(){
@@ -488,11 +493,16 @@ character.refresh={
 					},
 					ai1:function(card){
 						if(ui.selected.cards.length>0) return -1;
+						if(card.name=='du') return 20;
 						return (_status.event.player.num('h')-_status.event.player.hp);
 					},
 					ai2:function(target){
+						var att=ai.get.attitude(_status.event.player,target);
+						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							return 1-att;
+						}
 						if(target.num('h')>_status.event.player.num('h')) return 0;
-						return ai.get.attitude(_status.event.player,target)-4;
+						return att-4;
 					},
 					prompt:'请选择要送人的卡牌'
 				});
@@ -511,16 +521,6 @@ character.refresh={
 			ai:{
 				expose:0.3
 			},
-			group:'qingjian2'
-		},
-		qingjian2:{
-			trigger:{global:'phaseBegin'},
-			forced:true,
-			popup:false,
-			silent:true,
-			content:function(){
-				player.storage.qingjian=0;
-			}
 		},
 		reyingzi:{
 			audio:2,
@@ -594,7 +594,7 @@ character.refresh={
 				order:9,
 				result:{
 					target:function(player,target){
-						return -target.num('he');
+						return -target.num('he')-(player.num('h','du')?1:0);
 					}
 				},
 				threaten:2,
@@ -760,13 +760,16 @@ character.refresh={
 				game.addVideo('thrownhighlight1');
 				game.addVideo('centernode',null,get.cardInfo(event.card));
 				if(get.type(event.card,'trick')==get.type(trigger.card,'trick')){
-					player.chooseTarget('选择获得此牌的角色').ai=function(target){
+					player.chooseTarget('选择获得此牌的角色').set('ai',function(target){
 						var att=ai.get.attitude(_status.event.player,target);
+						if(_status.event.du){
+							return -att;
+						}
 						if(att>0){
 							return att+Math.max(0,5-target.num('h'));
 						}
 						return att;
-					}
+					}).set('du',event.card.name=='du');
 				}
 				else{
 					player.chooseBool('是否弃置'+get.translation(event.card)+'？');
@@ -888,10 +891,15 @@ character.refresh={
 					},
 					ai1:function(card){
 						if(ui.selected.cards.length>0) return -1;
+						if(card.name=='du') return 20;
 						return (_status.event.player.num('h')-_status.event.player.hp);
 					},
 					ai2:function(target){
-						return ai.get.attitude(_status.event.player,target)-4;
+						var att=ai.get.attitude(_status.event.player,target);
+						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							return 1-att;
+						}
+						return att-4;
 					},
 					prompt:'请选择要送人的卡牌'
 				});
@@ -1233,6 +1241,7 @@ character.refresh={
 			trigger:{global:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
+				if(lib.filter.autoRespondSha.call({player:player})) return false;
 				return event.player.isAlive()&&event.player.getStat('damage')&&
 				lib.filter.targetEnabled({name:'sha'},player,event.player)&&
 				!lib.filter.autoRespondSha.call({player:player});

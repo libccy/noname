@@ -4961,6 +4961,14 @@
 						event.skillDialog.close();
 					}
 					if(event.result&&event.result.bool&&!game.online&&!event.nouse){
+                        if(event.logSkill){
+    						if(typeof event.logSkill=='string'){
+    							player.logSkill(event.logSkill);
+    						}
+    						else if(Array.isArray(event.logSkill)){
+    							player.logSkill.apply(player,event.logSkill);
+    						}
+    					}
                         player.useResult(event.result,event);
 					}
                     else if(event._sendskill){
@@ -8278,6 +8286,7 @@
 						var event=_status.event.getParent();
 						var to=(player==event.player?event.target:event.player);
 						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
+                        if(card.name=='du') addi+=5;
 						if(player==event.player){
 							if(ai.get.attitude(player,to)>0&&event.small){
 								return -get.number(card)-ai.get.value(card)/2+addi;
@@ -8378,7 +8387,7 @@
 					}
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
 					if(next.selectCard==undefined) next.selectCard=[1,1];
-					if(next.ai==undefined) next.ai=ai.get.unuseful2;
+					if(next.ai==undefined) next.ai=ai.get.unuseful3;
 					next.content=lib.element.playerproto.chooseCard;
                     next._args=Array.from(arguments);
 					return next;
@@ -20511,7 +20520,7 @@
 						selectname.style.maxWidth='85px';
 						var skillopt=ui.create.selectlist(list2,list2[0],addSkill);
 						var editSkillButton=document.createElement('button');
-						editSkillButton.innerHTML='编辑';
+						editSkillButton.innerHTML='引用';
 						editSkillButton.style.marginRight='3px';
 						addSkill.appendChild(editSkillButton);
 						var addSkillButton=document.createElement('button');
@@ -28649,6 +28658,10 @@
 				return -ai.get.useful(card);
 			},
 			unuseful2:function(card){
+				return 10-ai.get.useful(card);
+			},
+			unuseful3:function(card){
+                if(card.name=='du') return 20;
 				return 10-ai.get.useful(card);
 			},
 			value:function(card,player,method){

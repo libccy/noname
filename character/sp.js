@@ -960,8 +960,10 @@ character.sp={
 					player.chooseTarget('将'+get.translation(result.target)+'交给一名角色',function(card,player,target){
 						return target.hp<=player.hp;
 					}).set('ai',function(target){
-						return ai.get.attitude(_status.event.player,target);
-					});
+						var att=ai.get.attitude(_status.event.player,target);
+						if(_status.event.du) return -att;
+						return att;
+					}).set('du',event.card.name=='du');
 					target.addTempSkill('dahe2','phaseAfter');
 					event.card=result.target;
 				}
@@ -3919,8 +3921,10 @@ character.sp={
 				player.chooseTarget('是否发动【礼让】？',function(card,player,target){
 					return player!=target
 				}).set('ai',function(target){
-					return ai.get.attitude(_status.event.player,target);
-				});
+					var att=ai.get.attitude(_status.event.player,target);
+					if(_status.event.du) return -att;
+					return att;
+				}).set('du',(trigger.cards.length==1&&trigger.cards[0].name=='du'));
 				"step 2"
 				if(result.bool){
 					var target=result.targets[0];

@@ -270,6 +270,7 @@ window.noname_asset_list=[
     'image/card/xixueguizhihuan.png',
     'image/card/xuanyuanjian.png',
     'image/card/yihuajiemu.png',
+    'image/card/yinyueqiang.png',
     'image/card/yiyi.png',
     'image/card/yuanjiao.png',
     'image/card/yuxi.png',

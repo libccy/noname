@@ -1,7 +1,19 @@
 'use strict';
-card.refresh={
+card.sp={
 	connect:true,
 	card:{
+		yinyueqiang:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip1',
+			distance:{attackFrom:-2},
+			ai:{
+				basic:{
+					equipValue:4
+				}
+			},
+			skills:['yinyueqiang']
+		},
 		muniu:{
 			fullskin:true,
 			type:'equip',
@@ -15,14 +27,196 @@ card.refresh={
 					}
 				}
 			}
-		}
+		},
+		du:{
+			type:'basic',
+			fullskin:true,
+			ai:{
+				value:-5,
+				useful:6,
+			}
+		},
+		shengdong:{
+            fullskin:true,
+            enable:function(card,player){
+				var hs=player.get('h');
+				if(hs.length>1) return true;
+				if(hs.length==1&&hs[0]!=card) return true;
+				return false;
+			},
+            type:'trick',
+			selectTarget:2,
+			multitarget:true,
+			targetprompt:['交给其一张牌','得两张牌'],
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			content:function(){
+				'step 0'
+				if(!player.num('h')){
+					event.finish();
+				}
+				else{
+					event.target1=targets[0];
+					event.target2=targets[1];
+					player.chooseCard('h','将一张手牌交给'+get.translation(event.target1),true);
+				}
+				'step 1'
+				player.$give(1,event.target1);
+				event.target1.gain(result.cards);
+				'step 2'
+				if(!event.target1.num('h')){
+					event.finish();
+				}
+				else{
+					var he=event.target1.get('he');
+					if(he.length<=2){
+						event.directresult=he;
+					}
+					else{
+						event.target1.chooseCard('he','将两张牌交给'+get.translation(event.target2),2,true);
+					}
+				}
+				'step 3'
+				if(!event.directresult){
+					event.directresult=result.cards;
+				}
+				event.target1.$give(event.directresult.length,event.target2);
+				event.target2.gain(event.directresult);
+			},
+			ai:{
+				order:2.5,
+				value:[4,1],
+				useful:1,
+				wuxie:function(){
+					return 0;
+				},
+				result:{
+					target:function(player,target){
+						var ok=false;
+						var hs=player.get('h');
+						for(var i=0;i<hs.length;i++){
+							if(ai.get.value(hs[i])<=5){
+								ok=true;
+								break;
+							}
+						}
+						if(!ok) return 0;
+						if(ui.selected.targets.length==1) return 2;
+						if(target.num('he')==0) return 0;
+						if(player.hasFriend()) return -1;
+						return 0;
+					}
+				}
+			}
+        },
+        zengbin:{
+            fullskin:true,
+            enable:true,
+            type:'trick',
+            filterTarget:true,
+			content:function(){
+				'step 0'
+				target.draw(3);
+				'step 1'
+				if(target.num('he',{type:'basic'})<target.num('he')){
+					target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
+						return get.type(card)!='basic';
+					}).ai=function(card){
+						return 7-ai.get.value(card);
+					};
+					event.more=true;
+				}
+				else{
+					target.chooseToDiscard('he',2,true);
+				}
+				'step 2'
+				if(event.more&&!result.bool){
+					target.chooseToDiscard('he',2,true);
+				}
+			},
+			ai:{
+				order:7,
+				useful:4,
+				value:10,
+				result:{
+					target:function(player,target){
+						if(target.num('j','lebu')) return 0;
+						return Math.max(1,2-target.num('h')/10);
+					}
+				}
+			}
+        },
+        caomu:{
+            fullskin:true,
+            enable:true,
+            type:'delay',
+			filterTarget:function(card,player,target){
+				return (lib.filter.judge(card,player,target)&&player!=target);
+			},
+			judge:function(card){
+				if(get.suit(card)=='club') return 0;
+				return -3;
+			},
+			effect:function(){
+				if(result.bool==false){
+					player.addTempSkill('caomu_skill','phaseAfter');
+				}
+			},
+			ai:{
+				basic:{
+					order:1,
+					useful:1,
+					value:4.5,
+				},
+				result:{
+					player:function(player,target){
+						var num=0;
+						for(var i=0;i<game.players.length;i++){
+							if(get.distance(target,game.players[i])<=1&&game.players[i]!=target){
+								var att=ai.get.attitude(player,game.players[i]);
+								if(att>3){
+									num+=1.1;
+								}
+								else if(att>0){
+									num++;
+								}
+								else if(att<-3){
+									num-=1.1;
+								}
+								else if(att<0){
+									num--;
+								}
+							}
+						}
+						return num;
+					},
+					target:-1
+				},
+			}
+        }
 	},
 	skill:{
+		yinyueqiang:{
+			trigger:{player:['useCard','respondAfter']},
+			direct:true,
+			filter:function(event,player){
+				if(_status.currentPhase==player) return false;
+				if(!event.cards) return false;
+				if(event.cards.length!=1) return false;
+				if(lib.filter.autoRespondSha.call({player:player})) return false;
+				return get.color(event.cards[0])=='black';
+			},
+			content:function(){
+				player.chooseToUse('是否发动【银月枪】？',{name:'sha'}).logSkill='yinyueqiang';
+			}
+		},
 		muniu_skill:{
 			enable:'phaseUse',
 			usable:1,
 			filterCard:true,
 			check:function(card){
+				if(card.name=='du') return 20;
 				var player=_status.event.player;
 				var nh=player.num('h');
 				if(nh<=player.hp){
@@ -290,8 +484,52 @@ card.refresh={
 				}
 			}
 		},
+		_du:{
+			trigger:{player:['useCardAfter','respondAfter','discardAfter']},
+			popup:false,
+			forced:true,
+			filter:function(event,player){
+				if(event.cards){
+					for(var i=0;i<event.cards.length;i++){
+						if(event.cards[i].name=='du'&&event.cards[i].original!='j') return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				player.popup('毒','wood');
+				player.loseHp();
+			},
+		},
+		caomu_skill:{
+			unique:true,
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				trigger.num--;
+			},
+			group:'caomu_skill2'
+		},
+		caomu_skill2:{
+			trigger:{player:'phaseDrawAfter'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				var targets=game.filterPlayer(function(current){
+					return get.distance(player,current)<=1&&player!=current;
+				});
+				if(targets.length){
+					game.asyncDraw(targets);
+				}
+			}
+		}
 	},
 	translate:{
+		yinyueqiang:'银月枪',
+		yinyueqiang_info:'你的回合外，每当你使用或打出了一张黑色手牌（若为使用则在它结算之前），你可以立即对你攻击范围内的任意一名角色使用一张【杀】',
 		muniu:'木牛流马',
 		muniu_bg:'牛',
 		muniu_skill:'木牛',
@@ -302,8 +540,31 @@ card.refresh={
 		muniu_skill4_backup:'流马',
 		muniu_info:'出牌阶段限一次，你可以将一张手牌扣置于你装备区里的【木牛流马】下，若如此做，你可以将此装备移动到一名其他角色的装备区里；你可以将此装备牌下的牌如手牌般使用或打出。',
 		muniu_skill_info:'出牌阶段限一次，你可以将一张手牌扣置于你装备区里的【木牛流马】下，若如此做，你可以将此装备移动到一名其他角色的装备区里；你可以将此装备牌下的牌如手牌般使用或打出。',
+		du:'毒',
+		du_info:'当你因使用、打出或弃置而失去此牌时，你失去一点体力',
+        shengdong:'声东击西',
+		shengdong_info:'出牌阶段，对一名其他角色使用。你交给目标角色一张手牌，若如此做，其将两张牌交给另一名由你选择的其他角色',
+        zengbin:'增兵减灶',
+        zengbin_info:'出牌阶段，对一名角色使用。目标角色摸三张牌，然后选择一项：1.弃置一张非基本牌；2.弃置两张牌',
+        caomu:'草木皆兵',
+        caomu_info:'出牌阶段，对一名其他角色使用。将【草木皆兵】放置于该角色的判定区里，若判定结果不为梅花：摸牌阶段，目标角色少摸一张牌；摸牌阶段结束时，与其距离为1的角色各摸一张牌',
 	},
 	list:[
+		['spade',1,'caomu'],
+		['club',3,'caomu'],
+		['heart',12,'shengdong',],
+        ['club',9,'shengdong'],
+		['spade',9,'shengdong'],
+        ['diamond',4,'zengbin'],
+        ['heart',6,'zengbin'],
+        ['spade',7,'zengbin'],
+		['spade',3,'du'],
+		['spade',9,'du'],
+		['club',3,'du'],
+		['club',9,'du'],
+		['diamond',5,'du'],
+		['diamond',9,'du'],
 		["diamond",5,'muniu'],
+		["diamond",12,'yinyueqiang'],
 	],
 }

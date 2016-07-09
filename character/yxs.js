@@ -683,8 +683,10 @@ character.yxs={
 				"step 1"
 				player.chooseTarget('是否发动【仗义】？',function(card,player,target){
 					return player!=target
-				}).ai=function(target){
-					return ai.get.attitude(player,target);
+				}).set('du',(trigger.cards.length==1&&trigger.cards[0].name=='du')).ai=function(target){
+					var att=ai.get.attitude(_status.event.player,target);
+					if(_status.event.du) return -att;
+					return att;
 				};
 				"step 2"
 				if(result.bool){

@@ -1362,6 +1362,7 @@ character.yijiang={
 					var target=result.targets[0];
 					event.target=target;
 					target.chooseCard('将一张牌置于'+get.translation(player)+'的武将牌上，或令其弃置你的一张牌','he').set('ai',function(card){
+						if(card.name=='du') return 20;
 						var player=_status.event.player;
 						if(ai.get.attitude(player,_status.event.getParent().player)>0){
 							return 8-ai.get.value(card);
@@ -3385,6 +3386,7 @@ character.yijiang={
 				order:1,
 				result:{
 					target:function(player,target){
+						if(player.num('h')==1&&player.num('h','du')) return -1;
 						if(player.hp<=2&&player.num('h','shan')) return 0;
 						if(target.num('h')+player.num('h')>target.hp+2) return 0;
 						if(ai.get.attitude(player,target)>3) return 1;
@@ -5302,13 +5304,17 @@ character.yijiang={
 						return player!=target;
 					},
 					ai1:function(card){
+						var player=_status.event.player;
+						if(player.maxHp-player.hp==1&&card.name=='du') return 30;
 						var check=_status.event.check;
 						if(check<1) return 0;
-						if(_status.event.player.hp>1&&check<2) return 0;
+						if(player.hp>1&&check<2) return 0;
 						return ai.get.unuseful(card)+9;
 					},
 					ai2:function(target){
-						return ai.get.attitude(_status.event.player,target)-2;
+						var att=ai.get.attitude(_status.event.player,target);
+						if(ui.selected.cards.length==1&&ui.selected.cards[0].name=='du') return 1-att;
+						return att-2;
 					},
 					prompt:'将'+get.cnNumber(event.num)+'张手牌交给一名其他角色',
 				}).set('check',check);

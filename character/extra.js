@@ -663,7 +663,7 @@ character.extra={
 				}
 				"step 2"
 				player.chooseCardButton(player.storage.qixing,'选择'+event.num+'张牌作为手牌',event.num,true).ai=function(button){
-					if(player.skipList.contains('phaseUse')){
+					if(player.skipList.contains('phaseUse')&&button.link!='du'){
 						return -ai.get.value(button.link);
 					}
 					return ai.get.value(button.link);

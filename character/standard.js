@@ -348,10 +348,15 @@ character.standard={
 					},
 					ai1:function(card){
 						if(ui.selected.cards.length>0) return -1;
+						if(card.name=='du') return 20;
 						return (_status.event.player.num('h')-_status.event.player.hp);
 					},
 					ai2:function(target){
-						return ai.get.attitude(_status.event.player,target)-4;
+						var att=ai.get.attitude(_status.event.player,target);
+						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							return 1-att;
+						}
+						return att-4;
 					},
 					prompt:'请选择要送人的卡牌'
 				});
@@ -465,6 +470,8 @@ character.standard={
 			},
 			check:function(card){
 				if(ui.selected.cards.length>1) return 0;
+				if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
+				if(!ui.selected.cards.length&&card.name=='du') return 20;
 				var player=get.owner(card);
 				if(player.hp==player.maxHp||player.storage.rende<0||player.num('h')<=1){
 					if(ui.selected.cards.length){
@@ -508,6 +515,9 @@ character.standard={
 				},
 				result:{
 					target:function(player,target){
+						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							return -10;
+						}
 						if(target.num('j','lebu')) return 0;
 						var nh=target.num('h');
 						var np=player.num('h');

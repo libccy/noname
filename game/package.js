@@ -19,9 +19,8 @@ character.pack={
 card.pack={
     standard:'标准',
     extra:'军争',
-    refresh:'界限突破',
+    sp:'SP',
     guozhan:'国战',
-    mingzhong:'SP',
     zhenfa:'阵法',
     yunchou:'运筹帷幄',
     swd:'轩辕剑',

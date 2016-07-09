@@ -1478,9 +1478,13 @@ character.swd={
 					filterCard:true,
 					selectCard:[1,Infinity],
 					ai1:function(card){
-						if(ui.selected.cards.length==0&&player.hp==1) return 11-ai.get.value(card);
+						var useful=ai.get.useful(card);
+						if(card.name=='du'){
+							useful=-5;
+						}
+						if(ui.selected.cards.length==0&&player.hp==1) return 11-useful;
 						if(ui.selected.cards.length>1) return 0;
-						return 7-ai.get.useful(card);
+						return 7-useful;
 					},
 					ai2:function(target){
 						if(target.hp>ui.selected.cards.length){
@@ -2503,6 +2507,7 @@ character.swd={
 				return lib.filter.targetEnabled({name:'guiyoujie'},player,target);
 			},
 			check:function(card){
+				if(card.name=='du') return 20;
 				return Math.max(7-ai.get.value(card),7-ai.get.useful(card));
 			},
 			content:function(){
@@ -5666,6 +5671,7 @@ character.swd={
 			},
 			filterCard:true,
 			check:function(card){
+				if(card.name=='du') return 20;
 				if(get.owner(card).num('h')<get.owner(card).hp) return 0;
 				return 4-ai.get.value(card);
 			},
@@ -5689,7 +5695,12 @@ character.swd={
 			},
 			ai:{
 				result:{
-					target:1,
+					target:function(player,target){
+						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							return -1;
+						}
+						return 1;
+					},
 				},
 				order:1
 			}

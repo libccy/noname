@@ -1394,34 +1394,17 @@ card.swd={
 		mujiaren_skill:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{type:'hslingjian'})>=2;
+				return player.num('h',{type:'hslingjian'})>=1;
 			},
 			filterCard:{type:'hslingjian'},
-			selectCard:2,
-			content:function(){
-				player.gain(game.createCard('jiguanshu'));
-			},
-			ai:{
-				order:7,
-				result:{
-					player:function(player){
-						for(var i=0;i<game.players.length;i++){
-							if(player.canUse('jiguanshu',game.players[i])&&
-							ai.get.effect(game.players[i],{name:'jiguanshu'},player,player>0)){
-								return 1;
-							}
-							return 0;
-						}
-					}
-				}
-			}
+			viewAs:{name:'jiguanshu'}
 		},
 		_lingjianduanzao:{
 			enable:'phaseUse',
 			position:'he',
 			prompt:function(event){
 				var lingjians=[],types=[];
-				var hs=event.player.get('h');
+				var hs=event.player.get('he');
 				for(var i=0;i<hs.length;i++){
 					switch(get.type(hs[i])){
 						case 'equip':types.add(get.subtype(hs[i]));break;
@@ -1598,7 +1581,7 @@ card.swd={
 				return 2;
 			},
 			filter:function(event,player){
-				return player.num('h',{type:'equip'})&&player.num('h',{type:'hslingjian'});
+				return player.num('he',{type:'equip'})&&player.num('h',{type:'hslingjian'});
 			},
 			content:function(){
 				var name=lib.skill._lingjianduanzao.process(cards);
@@ -2224,7 +2207,7 @@ card.swd={
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
 		mujiaren_skill:'木甲人',
-		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以弃置两个零件并获得一个机关鼠',
+		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以将零件当作机关鼠使用',
 		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标获得技能木甲人（你在煅造装备时可以额外加入一个零件；你可以弃置两个零件并获得一个机关鼠）',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',

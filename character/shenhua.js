@@ -729,6 +729,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				player.chooseToCompare(target,function(card){
+					if(card.name=='du') return 20;
 					var player=get.owner(card);
 					var target=_status.event.getParent().target;
 					if(player!=target&&ai.get.attitude(player,target)>0){
@@ -749,7 +750,8 @@ character.shenhua={
 				expose:0.2,
 				result:{
 					target:function(player,target){
-						if(player.num('h')<=player.hp) return false;
+						if(player.num('h','du')&&ai.get.attitude(player,target)<0) return -1;
+						if(player.num('h')<=player.hp) return 0;
 						var maxnum=0;
 						var cards2=target.get('h');
 						for(var i=0;i<cards2.length;i++){
