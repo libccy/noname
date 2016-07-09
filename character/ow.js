@@ -1015,16 +1015,19 @@ character.ow={
 				return '是否对'+get.translation(event.player)+'发动【闪现】？'
 			},
 			content:function(){
-				"step 0"
+                "step 0"
+                player.draw(false);
+                player.$draw();
+				player.line(trigger.player,'green');
+				"step 1"
                 player.storage.shanxian_h=player.get('h');
                 player.storage.shanxian_e=player.get('e');
                 player.storage.shanxian_n=2;
                 player.syncStorage('shanxian_e');
-				player.line(trigger.player,'green');
 				player.phase();
 				player.storage.shanxian=trigger.player;
                 player.removeSkill('shanxian2');
-				"step 1"
+				"step 2"
 				if(!player.isTurnedOver()){
 					player.turnOver();
 				}
@@ -1157,9 +1160,9 @@ character.ow={
         shouhu:'守护',
         shouhu_info:'你不能使用杀；出牌阶段，你可以弃置一张杀令一名其他角色回复一点体力',
         shanxian:'闪现',
-        shanxian_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以进行一个额外回合，并在回合结束后将武将牌翻至背面。若如此做，你对其使用卡牌无视距离直到回合结束。',
+        shanxian_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以摸一张牌并进行一个额外回合，并在回合结束后将武将牌翻至背面。若如此做，你对其使用卡牌无视距离直到回合结束。',
         shanhui:'闪回',
-        shanhui_info:'每当你造成或受到一次伤害，你可以将你的牌重置为上次发动闪现前的状态，若你的牌数因此而减少，你回复一点体力。每个状态最多可重现两次',
+        shanhui_info:'每当你造成或受到一次伤害，你可以将你的牌重置为上次发动闪现时的状态，若你的牌数因此而减少，你回复一点体力。每个状态最多可重现两次',
         ow_liekong:'猎空',
         ow_sishen:'死神',
         ow_tianshi:'天使',
