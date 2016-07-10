@@ -103,6 +103,7 @@ card.swd={
 			vanish:true,
 			enable:true,
 			derivation:true,
+			derivationpack:'swd',
 			filterTarget:function(card,player,target){
 				return target.num('he')>0;
 			},
@@ -124,6 +125,7 @@ card.swd={
 			vanish:true,
 			enable:true,
 			derivation:true,
+			derivationpack:'swd',
 			filterTarget:true,
 			content:function(){
 				'step 0'
@@ -169,6 +171,7 @@ card.swd={
 			vanish:true,
 			enable:true,
 			derivation:true,
+			derivationpack:'swd',
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
@@ -201,6 +204,7 @@ card.swd={
 			vanish:true,
 			enable:true,
 			derivation:true,
+			derivationpack:'swd',
 			filterTarget:function(card,player,target){
 				return target!=player&&target.num('e')>0;
 			},
@@ -230,6 +234,7 @@ card.swd={
 			vanish:true,
 			enable:true,
 			derivation:true,
+			derivationpack:'swd',
 			filterTarget:function(card,player,target){
 				return !target.isTurnedOver()&&target!=player;
 			},
@@ -252,6 +257,7 @@ card.swd={
 			vanish:true,
 			enable:true,
 			derivation:true,
+			derivationpack:'swd',
 			filterTarget:function(card,player,target){
 				return !target.hasSkill('hslingjian_chaofeng');
 			},
@@ -277,6 +283,7 @@ card.swd={
 			vanish:true,
 			enable:true,
 			derivation:true,
+			derivationpack:'swd',
 			filterTarget:function(card,player,target){
 				return player!=target&&!target.hasSkill('hslingjian_yinshen');
 			},

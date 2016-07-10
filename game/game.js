@@ -3861,16 +3861,6 @@
                         var ia=connect_avatar_list[i];
                         lib.mode.connect.config.connect_avatar.item[ia]=lib.translate[ia];
                     }
-					if(lib.cardPack.mode_derivation){
-						for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
-							if(typeof lib.card[lib.cardPack.mode_derivation[i]].derivation=='string'&&!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]){
-								lib.cardPack.mode_derivation.splice(i--,1);
-							}
-						}
-						if(lib.cardPack.mode_derivation.length==0){
-							delete lib.cardPack.mode_derivation;
-						}
-					}
                     if(lib.config.mode!='connect'){
                         var pilecfg=lib.config.customcardpile[get.config('cardpilename')];
     					if(pilecfg){
@@ -3950,6 +3940,19 @@
 									}
 								}
 							}
+						}
+					}
+					if(lib.cardPack.mode_derivation){
+						for(var i=0;i<lib.cardPack.mode_derivation.length;i++){
+							if(typeof lib.card[lib.cardPack.mode_derivation[i]].derivation=='string'&&!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]){
+								lib.cardPack.mode_derivation.splice(i--,1);
+							}
+                            else if(typeof lib.card[lib.cardPack.mode_derivation[i]].derivationpack=='string'&&!lib.config.cards.contains(lib.card[lib.cardPack.mode_derivation[i]].derivationpack)){
+                                lib.cardPack.mode_derivation.splice(i--,1);
+                            }
+						}
+						if(lib.cardPack.mode_derivation.length==0){
+							delete lib.cardPack.mode_derivation;
 						}
 					}
 					for(i in play){
@@ -28372,6 +28375,14 @@
 					}
 					else if(lib.card[name]&&lib.card[name].addinfomenu){
 						uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
+					}
+					else if(lib.card[name]&&lib.card[name].derivation){
+                        if(typeof lib.card[name].derivation=='string'){
+                            uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivation)+'</div>');
+                        }
+						else if(lib.card[name].derivationpack){
+                            uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
+                        }
 					}
                     uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
 				}
