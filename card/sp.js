@@ -34,7 +34,14 @@ card.sp={
 			ai:{
 				value:-5,
 				useful:6,
-			}
+			},
+			enable:true,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			delay:false,
+			content:function(){},
+			selectTarget:-1
 		},
 		shengdong:{
             fullskin:true,

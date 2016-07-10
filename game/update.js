@@ -6,7 +6,8 @@ window.noname_update={
     files:{
         global:[
             'game/game.js',
-            'card/swd.js'
+            'card/swd.js',
+            'card/sp.js'
         ],
         '1.8.16.3':[]
     }
