@@ -3253,6 +3253,9 @@
                 if(window.isNonameServer){
                     lib.config.mode='connect';
                 }
+                if(lib.device=='android'&&lib.config.layout=='phone'&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<960){
+                    document.documentElement.style.zoom=document.documentElement.offsetWidth/960;
+                }
 
 				for(i in character.pack){
 					if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
