@@ -18875,7 +18875,7 @@
 	                        active._link.remove();
 	                    }
 	                    this.classList.add('active');
-                        if(game.deviceZoom!=1){
+                        if(game.deviceZoom!=1&&lib.config.layout=='phone'){
                             menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
                         }
 	                    else{
