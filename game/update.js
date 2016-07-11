@@ -8,6 +8,7 @@ window.noname_update={
             'game/game.js',
             'card/sp.js',
             'card/swd.js',
+            'mode/connect.js',
         ],
         '1.8.16.3':[]
     }
