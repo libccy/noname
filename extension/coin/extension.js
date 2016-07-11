@@ -189,12 +189,12 @@ play.coin={
 					{
 						//since the canvas = full page the position of the mouse
 						//relative to the document will suffice
-						mouse.x = e.pageX;
-						mouse.y = e.pageY;
+						mouse.x = e.pageX/game.documentZoom;
+						mouse.y = e.pageY/game.documentZoom;
 					});
 					ui.window.addEventListener('touchmove',function(e){
-						mouse.x = e.touches[0].clientX;
-						mouse.y = e.touches[0].clientY;
+						mouse.x = e.touches[0].clientX/game.documentZoom;
+						mouse.y = e.touches[0].clientY/game.documentZoom;
 					});
 
 					var particle=function()
@@ -1319,8 +1319,8 @@ play.coin={
 
 					if(lib.config.touchscreen){
 						ui.window.addEventListener( 'touchmove', function( e ) {
-							mx = e.touches[0].clientX - canvas.offsetLeft;
-							my = e.touches[0].clientY - canvas.offsetTop;
+							mx = e.touches[0].clientX/game.documentZoom - canvas.offsetLeft;
+							my = e.touches[0].clientY/game.documentZoom - canvas.offsetTop;
 						});
 						ui.window.addEventListener( 'touchstart', function( e ) {
 							mousedown = true;
@@ -1333,8 +1333,8 @@ play.coin={
 						// mouse event bindings
 						// update the mouse coordinates on mousemove
 						ui.window.addEventListener( 'mousemove', function( e ) {
-							mx = e.pageX - canvas.offsetLeft;
-							my = e.pageY - canvas.offsetTop;
+							mx = e.pageX/game.documentZoom - canvas.offsetLeft;
+							my = e.pageY/game.documentZoom - canvas.offsetTop;
 						});
 
 						// toggle mousedown state and prevent canvas from being selected

@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.17.1',
+    version:'1.8.17.3',
     changeLog:[
         '修bug',
     ],
@@ -9,7 +9,11 @@ window.noname_update={
             'card/sp.js',
             'card/swd.js',
             'mode/connect.js',
+            'extension/coin/extension.js',
+            'layout/phone/layout.css',
         ],
-        '1.8.16.3':[]
+        '1.8.17':[],
+        '1.8.17.1':[],
+        '1.8.17.2':[],
     }
 }

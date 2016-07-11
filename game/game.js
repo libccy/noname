@@ -562,14 +562,16 @@
 						onclick:function(zoom){
 							game.saveConfig('ui_zoom',zoom);
 							switch(zoom){
-								case 'esmall':ui.window.style.zoom=0.8;break;
-								case 'vsmall':ui.window.style.zoom=0.9;break;
-								case 'small':ui.window.style.zoom=0.95;break;
-								case 'big':ui.window.style.zoom=1.05;break;
-								case 'vbig':ui.window.style.zoom=1.1;break;
-								case 'ebig':ui.window.style.zoom=1.2;break;
-								default:ui.window.style.zoom=1;
+								case 'esmall':zoom=0.8;break;
+								case 'vsmall':zoom=0.9;break;
+								case 'small':zoom=0.95;break;
+								case 'big':zoom=1.05;break;
+								case 'vbig':zoom=1.1;break;
+								case 'ebig':zoom=1.2;break;
+								default:zoom=1;
 							}
+                            game.documentZoom=game.deviceZoom*zoom;
+                            document.documentElement.style.zoom=game.documentZoom;
 						}
 					},
 					image_background:{
@@ -3056,13 +3058,13 @@
                 height+=dialog._mod_height;
             }
 			dialog.style.height=height+'px';
-			if(e.clientX<ui.window.offsetWidth/2){
-				dialog.style.left=(e.clientX+10)+'px';
+			if(e.clientX/game.documentZoom<ui.window.offsetWidth/2){
+				dialog.style.left=(e.clientX/game.documentZoom+10)+'px';
 			}
 			else{
-				dialog.style.left=(e.clientX-dialog.offsetWidth-10)+'px';
+				dialog.style.left=(e.clientX/game.documentZoom-dialog.offsetWidth-10)+'px';
 			}
-			var idealtop=e.clientY-dialog.offsetHeight/2;
+			var idealtop=e.clientY/game.documentZoom-dialog.offsetHeight/2;
 			if(idealtop<10){
 				idealtop=10;
 			}
@@ -3345,7 +3347,13 @@
                     game.saveConfig('confirm_exit',true);
                 }
                 if(lib.device=='android'&&lib.config.layout=='phone'&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<960){
-                    document.documentElement.style.zoom=document.documentElement.offsetWidth/960;
+                    game.documentZoom=document.documentElement.offsetWidth/960;
+                    game.deviceZoom=game.documentZoom;
+                    document.documentElement.style.zoom=game.documentZoom;
+                }
+                else{
+                    game.documentZoom=1;
+                    game.deviceZoom=1;
                 }
 
 				if(lib.config.extensions.length){
@@ -3690,14 +3698,14 @@
 				document.body.onresize=ui.updatex;
 				if(lib.config.touchscreen){
 					document.body.addEventListener('touchstart',function(e){
-						this.startX=e.touches[0].clientX;
-						this.startY=e.touches[0].clientY;
+						this.startX=e.touches[0].clientX/game.documentZoom;
+						this.startY=e.touches[0].clientY/game.documentZoom;
 						_status.dragged=false;
 					});
 					document.body.addEventListener('touchmove',function(e){
 						if(_status.dragged) return;
-						if (Math.abs(e.touches[0].clientX - this.startX) > 10 ||
-							Math.abs(e.touches[0].clientY - this.startY) > 10) {
+						if (Math.abs(e.touches[0].clientX/game.documentZoom - this.startX) > 10 ||
+							Math.abs(e.touches[0].clientY/game.documentZoom - this.startY) > 10) {
 							_status.dragged=true;
 						}
 					});
@@ -7547,14 +7555,14 @@
                     }
                     if(refnode){
                         lib.placePoppedDialog(dialog,{
-                            clientX:ui.arena.offsetLeft+this.offsetLeft+refnode.offsetLeft+refnode.offsetWidth/2,
-                            clientY:ui.arena.offsetTop+this.offsetTop+refnode.offsetTop+refnode.offsetHeight/4
+                            clientX:(ui.arena.offsetLeft+this.offsetLeft+refnode.offsetLeft+refnode.offsetWidth/2)*game.documentZoom,
+                            clientY:(ui.arena.offsetTop+this.offsetTop+refnode.offsetTop+refnode.offsetHeight/4)*game.documentZoom
                         });
                     }
                     else{
                         lib.placePoppedDialog(dialog,{
-                            clientX:this.offsetLeft+this.offsetWidth/2,
-                            clientY:this.offsetTop+this.offsetHeight/4
+                            clientX:(this.offsetLeft+this.offsetWidth/2)*game.documentZoom,
+                            clientY:(this.offsetTop+this.offsetHeight/4)*game.documentZoom
                         });
                     }
                     if(dialog._mod_height){
@@ -12534,7 +12542,6 @@
 					return event.player.classList.contains('dead')&&event.getParent(2).name!='damage';
 				},
 				content:function(){
-					window.x=event;
 					trigger.player.classList.remove('linked');
 				}
 			}
@@ -23627,15 +23634,18 @@
 					ui.config.classList.add('right');
 				}
 
+                var zoom;
 				switch(lib.config.ui_zoom){
-					case 'esmall':ui.window.style.zoom=0.8;break;
-					case 'vsmall':ui.window.style.zoom=0.9;break;
-					case 'small':ui.window.style.zoom=0.95;break;
-					case 'big':ui.window.style.zoom=1.05;break;
-					case 'vbig':ui.window.style.zoom=1.1;break;
-					case 'ebig':ui.window.style.zoom=1.2;break;
-					default:ui.window.style.zoom=1;
+					case 'esmall':zoom=0.8;break;
+					case 'vsmall':zoom=0.9;break;
+					case 'small':zoom=0.95;break;
+					case 'big':zoom=1.05;break;
+					case 'vbig':zoom=1.1;break;
+					case 'ebig':zoom=1.2;break;
+					default:zoom=1;
 				}
+                game.documentZoom=game.deviceZoom*zoom;
+                document.documentElement.style.zoom=game.documentZoom;
 
 				var autoskill={};
 				ui.autoskill=autoskill;
@@ -24846,8 +24856,8 @@
 					delete _status._swipeorigin;
 					if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform&&e.touches.length){
 						var translate=ui.roundmenu._dragtransform.slice(0);
-						var dx=e.touches[0].clientX-ui.roundmenu._dragorigin.clientX;
-						var dy=e.touches[0].clientY-ui.roundmenu._dragorigin.clientY;
+						var dx=e.touches[0].clientX/game.documentZoom-ui.roundmenu._dragorigin.clientX/game.documentZoom;
+						var dy=e.touches[0].clientY/game.documentZoom-ui.roundmenu._dragorigin.clientY/game.documentZoom;
 						translate[0]+=dx;
 						translate[1]+=dy;
 						if(dx*dx+dy*dy>100){
@@ -24865,8 +24875,8 @@
 					delete _status._swipeorigin;
 					if(_status.draggingtouchdialog._dragorigin&&_status.draggingtouchdialog._dragtransform&&e.touches.length){
 						var translate=_status.draggingtouchdialog._dragtransform.slice(0);
-						var dx=e.touches[0].clientX-_status.draggingtouchdialog._dragorigin.clientX;
-						var dy=e.touches[0].clientY-_status.draggingtouchdialog._dragorigin.clientY;
+						var dx=e.touches[0].clientX/game.documentZoom-_status.draggingtouchdialog._dragorigin.clientX/game.documentZoom;
+						var dy=e.touches[0].clientY/game.documentZoom-_status.draggingtouchdialog._dragorigin.clientY/game.documentZoom;
 						translate[0]+=dx;
 						translate[1]+=dy;
 						_status.draggingtouchdialog._dragtouches=e.touches[0];
@@ -24894,7 +24904,7 @@
 
 							ctx.beginPath();
 
-							ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
+							ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
 
 							if(_status.multitarget){
 								for(var i=0;i<_status.lastdragchange.length;i++){
@@ -24903,12 +24913,12 @@
 								}
 							}
 							if(!_status.selectionfull){
-								ctx.lineTo(e.touches[0].clientX-ui.arena.offsetLeft,e.touches[0].clientY-ui.arena.offsetTop);
+								ctx.lineTo(e.touches[0].clientX/game.documentZoom-ui.arena.offsetLeft,e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop);
 							}
 							ctx.stroke();
 							if(!_status.multitarget){
 								for(var i=0;i<_status.lastdragchange.length;i++){
-									ctx.moveTo(_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop);
+									ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
 									var exy=_status.lastdragchange[i]._lastdragchange;
 									ctx.lineTo(exy[0],exy[1]);
 									ctx.stroke();
@@ -24932,8 +24942,8 @@
 						var itemtype=get.itemtype(item);
 						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
 							_status.mouseleft=true;
-							var ex=e.touches[0].clientX-ui.arena.offsetLeft;
-							var ey=e.touches[0].clientY-ui.arena.offsetTop;
+							var ex=e.touches[0].clientX/game.documentZoom-ui.arena.offsetLeft;
+							var ey=e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
 							if(game.chess){
 								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
@@ -24959,7 +24969,7 @@
 											_status.lastdragchange.push(item);
 											item._lastdragchange=[exx,eyy];
 											if(lib.falseitem){
-												var from=[_status.mousedragging.clientX-ui.arena.offsetLeft,_status.mousedragging.clientY-ui.arena.offsetTop];
+												var from=[_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop];
 												var to=[exx,eyy];
 												var node=ui.create.div('.linexy.hidden');
 												node.style.left=from[0]+'px';
@@ -25043,8 +25053,8 @@
 					}
 					var translate;
 					if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform&&ui.roundmenu._dragtouches){
-						var dx=ui.roundmenu._dragtouches.clientX-ui.roundmenu._dragorigin.clientX;
-						var dy=ui.roundmenu._dragtouches.clientY-ui.roundmenu._dragorigin.clientY;
+						var dx=ui.roundmenu._dragtouches.clientX/game.documentZoom-ui.roundmenu._dragorigin.clientX/game.documentZoom;
+						var dy=ui.roundmenu._dragtouches.clientY/game.documentZoom-ui.roundmenu._dragorigin.clientY/game.documentZoom;
 						if(dx*dx+dy*dy<1000){
 							ui.click.roundmenu();
 							ui.roundmenu._dragtransform=ui.roundmenu._dragorigintransform;
@@ -25070,8 +25080,8 @@
 					delete _status._swipeorigin;
 					var translate;
 					if(_status.draggingtouchdialog._dragorigin&&_status.draggingtouchdialog._dragtransform&&_status.draggingtouchdialog._dragtouches){
-						var dx=_status.draggingtouchdialog._dragtouches.clientX-_status.draggingtouchdialog._dragorigin.clientX;
-						var dy=_status.draggingtouchdialog._dragtouches.clientY-_status.draggingtouchdialog._dragorigin.clientY;
+						var dx=_status.draggingtouchdialog._dragtouches.clientX/game.documentZoom-_status.draggingtouchdialog._dragorigin.clientX/game.documentZoom;
+						var dy=_status.draggingtouchdialog._dragtouches.clientY/game.documentZoom-_status.draggingtouchdialog._dragorigin.clientY/game.documentZoom;
 						translate=_status.draggingtouchdialog._dragtransform;
 						translate[0]+=dx;
 						translate[1]+=dy;
@@ -25089,8 +25099,8 @@
 				}
 				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging&&_status._swipeorigin.touches){
 					 if(get.utc()-_status._swipeorigin.time<500){
-						var dx=_status._swipeorigin.touches.clientX-_status._swipeorigin.clientX;
-						var dy=_status._swipeorigin.touches.clientY-_status._swipeorigin.clientY;
+						var dx=_status._swipeorigin.touches.clientX/game.documentZoom-_status._swipeorigin.clientX/game.documentZoom;
+						var dy=_status._swipeorigin.touches.clientY/game.documentZoom-_status._swipeorigin.clientY/game.documentZoom;
 						var goswipe=function(action){
                             game.closeConnectMenu();
 							switch(action){
@@ -25229,7 +25239,7 @@
 
 						ctx.beginPath();
 
-						ctx.moveTo(_status.mousedragging.x-ui.arena.offsetLeft,_status.mousedragging.y-ui.arena.offsetTop);
+						ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
 						if(_status.multitarget){
 							for(var i=0;i<_status.lastdragchange.length;i++){
 								var exy=_status.lastdragchange[i]._lastdragchange;
@@ -25237,12 +25247,12 @@
 							}
 						}
 						if(!_status.selectionfull){
-							ctx.lineTo(e.x-ui.arena.offsetLeft,e.y-ui.arena.offsetTop);
+							ctx.lineTo(e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop);
 						}
 						ctx.stroke();
 						if(!_status.multitarget){
 							for(var i=0;i<_status.lastdragchange.length;i++){
-								ctx.moveTo(_status.mousedragging.x-ui.arena.offsetLeft,_status.mousedragging.y-ui.arena.offsetTop);
+								ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
 								var exy=_status.lastdragchange[i]._lastdragchange;
 								ctx.lineTo(exy[0],exy[1]);
 								ctx.stroke();
@@ -25268,8 +25278,8 @@
 						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
 							_status.mouseleft=true;
 							var item=e.path[i];
-							var ex=e.x-ui.arena.offsetLeft;
-							var ey=e.y-ui.arena.offsetTop;
+							var ex=e.clientX/game.documentZoom-ui.arena.offsetLeft;
+							var ey=e.clientY/game.documentZoom-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
 							if(game.chess){
 								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
@@ -25353,8 +25363,8 @@
 						var ddialog=_status.draggingdialog;
 						if(ddialog._dragorigin&&ddialog._dragtransform){
 							var translate=ddialog._dragtransform.slice(0);
-							translate[0]+=e.x-ddialog._dragorigin.x;
-							translate[1]+=e.y-ddialog._dragorigin.y;
+							translate[0]+=e.clientX/game.documentZoom-ddialog._dragorigin.clientX/game.documentZoom;
+							translate[1]+=e.clientY/game.documentZoom-ddialog._dragorigin.clientY/game.documentZoom;
 							ui.click.checkdialogtranslate(translate,ddialog);
 						}
 						_status.clicked=true;
@@ -25362,8 +25372,8 @@
 					if(_status.draggingroundmenu){
 						if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform){
 							var translate=ui.roundmenu._dragtransform.slice(0);
-							translate[0]+=e.x-ui.roundmenu._dragorigin.x;
-							translate[1]+=e.y-ui.roundmenu._dragorigin.y;
+							translate[0]+=e.clientX/game.documentZoom-ui.roundmenu._dragorigin.clientX/game.documentZoom;
+							translate[1]+=e.clientY/game.documentZoom-ui.roundmenu._dragorigin.clientY/game.documentZoom;
 							ui.click.checkroundtranslate(translate);
 						}
 						_status.clicked=true;
@@ -25439,7 +25449,10 @@
 				if(this.classList.contains('selectable')&&
 					!this.classList.contains('selected')&&
 					!this.classList.contains('noclick')){
-					this._waitingfordrag={clientX:e.touches[0].clientX,clientY:e.touches[0].clientY};
+					this._waitingfordrag={
+                        clientX:e.touches[0].clientX,
+                        clientY:e.touches[0].clientY
+                    };
 				}
 			},
 			cardtouchmove:function(e){
@@ -25470,8 +25483,8 @@
 					var translate;
 					if(ddialog._dragorigin&&ddialog._dragtransform){
 						translate=ddialog._dragtransform;
-						translate[0]+=e.x-ddialog._dragorigin.x;
-						translate[1]+=e.y-ddialog._dragorigin.y;
+						translate[0]+=e.clientX/game.documentZoom-ddialog._dragorigin.clientX/game.documentZoom;
+						translate[1]+=e.clientY/game.documentZoom-ddialog._dragorigin.clientY/game.documentZoom;
 						ui.click.checkdialogtranslate(null,ddialog);
 						delete ddialog._dragorigin;
 					}
@@ -25481,8 +25494,8 @@
 				if(_status.draggingroundmenu){
 					var translate;
 					if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform){
-						var dx=e.x-ui.roundmenu._dragorigin.x;
-						var dy=e.y-ui.roundmenu._dragorigin.y;
+						var dx=e.clientX/game.documentZoom-ui.roundmenu._dragorigin.clientX/game.documentZoom;
+						var dy=e.clientY/game.documentZoom-ui.roundmenu._dragorigin.clientY/game.documentZoom;
 						if(dx*dx+dy*dy<25){
 							ui.click.roundmenu();
 						}
@@ -26225,6 +26238,7 @@
 				ui.window.appendChild(uiintro);
 				var layer=ui.create.div('.poplayer',ui.window);
 				var clicklayer=function(e){
+                    if(_status.touchpopping) return;
 					uiintro.delete();
 					this.remove();
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
@@ -26237,6 +26251,7 @@
 				uiintro.style.zIndex=21;
 
 				var clickintro=function(){
+                    if(_status.touchpopping) return;
 					layer.remove();
 					this.delete();
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
@@ -26432,13 +26447,13 @@
 				}
 			},
 			touchStart:function(e){
-				this.startX=e.touches[0].clientX;
-				this.startY=e.touches[0].clientY;
+				this.startX=e.touches[0].clientX/game.documentZoom;
+				this.startY=e.touches[0].clientY/game.documentZoom;
 				_status.dragged=false;
 			},
 			dialogtouchStart:function(e){
-				this.startX=e.touches[0].clientX;
-				this.startY=e.touches[0].clientY;
+				this.startX=e.touches[0].clientX/game.documentZoom;
+				this.startY=e.touches[0].clientY/game.documentZoom;
 				_status.dragged=false;
 				_status.dialogtouched=true;
 			},
@@ -26446,8 +26461,8 @@
 				if(_status.mousedragging) return;
 				if(_status.draggingtouchdialog) return;
 				if(!_status.dragged){
-					if (Math.abs(e.touches[0].clientX - this.startX) > 10 ||
-						Math.abs(e.touches[0].clientY - this.startY) > 10) {
+					if (Math.abs(e.touches[0].clientX/game.documentZoom - this.startX) > 10 ||
+						Math.abs(e.touches[0].clientY/game.documentZoom - this.startY) > 10) {
 						_status.dragged=true;
 					}
 				}
@@ -27249,7 +27264,9 @@
 			return (new Date()).getTime();
 		},
 		evtDistance:function(e1,e2){
-			return Math.sqrt((e1.x-e2.x)*(e1.x-e2.x)+(e1.y-e2.y)*(e1.y-e2.y));
+            var dx=(e1.clientX-e2.clientX)/game.documentZoom;
+            var dy=(e1.clientY-e2.clientY)/game.documentZoom;
+			return Math.sqrt(dx*dx+dy*dy);
 		},
 		xyDistance:function(from,to){
 			return Math.sqrt((from[0]-to[0])*(from[0]-to[0])+(from[1]-to[1])*(from[1]-to[1]));
@@ -28154,6 +28171,10 @@
                             uiintro.content.lastChild.style.display='block';
                             for(var i=0;i<esnodes.length;i++){
                                 uiintro.content.lastChild.childNodes[i].listen(function(e){
+                                    _status.touchpopping=true;
+                					setTimeout(function(){
+                						_status.touchpopping=false;
+                					},500);
                                     e.stopPropagation();
                                     uiintro.content.innerHTML='';
                                     uiintro.add(this.str);

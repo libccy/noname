@@ -58,8 +58,12 @@
     display: none !important;
 }
 
-.menu-container>.menu.main{
+.menu-container>.menu.main,
+.popup-container>.menu{
     zoom:1.3;
+}
+.popup-container>.menu{
+    max-height: 307px;
 }
 .menu-container>.menu.main:not(.center){
     top: 12px !important;
