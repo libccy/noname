@@ -23497,7 +23497,7 @@
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
 				// }
 
-				ui.arena.dataset.target_shake=lib.config.target_shake||'shake';
+				ui.arena.dataset.target_shake=lib.config.target_shake||'off';
 
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
