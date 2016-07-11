@@ -18875,7 +18875,12 @@
 	                        active._link.remove();
 	                    }
 	                    this.classList.add('active');
-	                    menuTabBar.style.left=this.offsetLeft+'px';
+                        if(game.deviceZoom!=1){
+                            menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
+                        }
+	                    else{
+                            menuTabBar.style.left=this.offsetLeft+'px';
+                        }
 	                    menuContent.appendChild(this._link);
 	                };
 					ui.click.menuTab=function(tab){
