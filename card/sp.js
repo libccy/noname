@@ -504,8 +504,12 @@ card.sp={
 				return false;
 			},
 			content:function(){
+				var num=0;
+				for(var i=0;i<trigger.cards.length;i++){
+					if(trigger.cards[i].name=='du'&&trigger.cards[i].original!='j') num++;
+				}
 				player.popup('毒','wood');
-				player.loseHp();
+				player.loseHp(num);
 			},
 		},
 		caomu_skill:{

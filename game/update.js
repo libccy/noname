@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.17.4',
+    version:'1.8.17.5',
     changeLog:[
         '修bug',
     ],
@@ -16,5 +16,6 @@ window.noname_update={
         '1.8.17.1':[],
         '1.8.17.2':[],
         '1.8.17.3':[],
+        '1.8.17.4':[],
     }
 }
