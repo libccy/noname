@@ -273,6 +273,7 @@
 	position:absolute;
 	overflow:scroll;
 	max-height: 400px;
+	transition-property: opacity;
 }
 .popup-container>.menu>div{
 	padding-top:5px;

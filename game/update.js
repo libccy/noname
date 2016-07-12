@@ -11,6 +11,7 @@ window.noname_update={
             'mode/connect.js',
             'extension/coin/extension.js',
             'layout/phone/layout.css',
+            'layout/default/menu.css',
         ],
         '1.8.17':[],
         '1.8.17.1':[],

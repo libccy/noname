@@ -3186,18 +3186,8 @@
                     }
                     else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1){
                         lib.device='ios';
-                        var ua=navigator.userAgent.toLowerCase();
                         if(ua.indexOf('ipad')!=-1){
                             window.isIpad=true;
-                        }
-                        else{
-                            var metas=document.head.querySelectorAll('meta');
-                            for(var j=0;j<metas.length;j++){
-                                if(metas[j].name=='viewport'){
-                                    metas[j].content="user-scalable=no, initial-scale=0.6, maximum-scale=0.6, minimum-scale=0.6, width=device-width, height=device-height";
-                                    break;
-                                }
-                            }
                         }
                     }
 					lib.assetURL=noname_inited;
@@ -3343,10 +3333,12 @@
                     game.saveConfig('touchscreen',true);
                     game.saveConfig('confirmtouch',true);
                     game.saveConfig('low_performance',true);
-                    game.saveConfig('layout','phone');
                     game.saveConfig('confirm_exit',true);
+                    if(!window.isIpad){
+                        game.saveConfig('layout','phone');
+                    }
                 }
-                if(lib.device=='android'&&lib.config.layout=='phone'&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<960){
+                if(lib.device&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<960){
                     game.documentZoom=document.documentElement.offsetWidth/960;
                     game.deviceZoom=game.documentZoom;
                     document.documentElement.style.zoom=game.documentZoom;
@@ -18780,6 +18772,10 @@
 	                    node.style.top=e.y+'px';
 	                }
 	                popupContainer.appendChild(node);
+                    var rect=node.getBoundingClientRect();
+                    if(lib.config.layout=='phone'&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
+                        node.style.top=(ui.window.offsetHeight-20-rect.height*1.3)/1.3+'px';
+                    }
 	                popupContainer.classList.remove('hidden');
 	                popupContainer.onclose=onclose;
 	            };
