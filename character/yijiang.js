@@ -4567,6 +4567,9 @@ character.yijiang={
 			init:function(player){
 				player.storage.quanji=[];
 			},
+			filter:function(event){
+				return event.num>0;
+			},
 			content:function(){
 				"step 0"
 				player.draw(trigger.num);

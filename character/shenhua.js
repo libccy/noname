@@ -825,13 +825,23 @@ character.shenhua={
 				}
 			},
 			check:function(event,player){
-				if(ai.get.attitude(player,event.player)>0) return true;
+				var du=false;
 				var num=0;
 				for(var i=0;i<event.cards.length;i++){
 					if(get.position(event.cards[i])=='d'){
 						num++;
+						if(event.cards[i].name=='du'){
+							du=true;
+						}
 					}
 				}
+				if(ai.get.attitude(player,event.player)>0){
+					if(du&&num<=3){
+						return false;
+					}
+					return true;
+				}
+				if(du) return true;
 				return num>2;
 			},
 			direct:true,
@@ -849,7 +859,13 @@ character.shenhua={
 					event.finish();
 					return;
 				}
-				player.chooseCardButton(event.cards,'固政：选择令'+get.translation(trigger.player)+'收回的牌');
+				var check=lib.skill.guzheng.check(trigger,player);
+				player.chooseCardButton(event.cards,'固政：选择令'+get.translation(trigger.player)+'收回的牌').set('ai',function(button){
+					if(_status.event.check){
+						return 20-ai.get.value(button.link);
+					}
+					return 0;
+				}).set('check',check);
 				"step 2"
 				if(result.bool){
 					player.logSkill('guzheng',trigger.player);

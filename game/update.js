@@ -8,6 +8,8 @@ window.noname_update={
             'game/game.js',
             'card/sp.js',
             'card/swd.js',
+            'character/yijiang.js',
+            'character/shenhua.js',
             'mode/connect.js',
             'extension/coin/extension.js',
             'layout/phone/layout.css',

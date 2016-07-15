@@ -7032,13 +7032,13 @@
 
 					if(!_status.connectMode&&player==game.me&&!_status.over&&!game.controlOver){
 						ui.control.show();
-						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive){
+						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive&&!ui.revive){
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
 						}
-                        if(get.config('continue_game')&&lib.mode[lib.config.mode].config.continue_game){
+                        if(get.config('continue_game')&&!ui.continue_game&&lib.mode[lib.config.mode].config.continue_game){
             				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
             			}
-						if(get.config('dierestart')&&lib.mode[lib.config.mode].config.dierestart){
+						if(get.config('dierestart')&&lib.mode[lib.config.mode].config.dierestart&&!ui.restart){
 							ui.restart=ui.create.control('restart',game.reload);
 						}
 					}
