@@ -15,6 +15,7 @@ character.hearth={
 		hs_alleria:['male','wu',3,['fengxing','qiaodong','liegong']],
 		hs_magni:['male','shu',4,['zhongjia','dunji']],
 		hs_liadrin:['female','shu',4,['xueren']],
+		hs_morgl:['male','wu',3,['s_tuteng']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu']],
 		hs_wvelen:['male','qun',3,['shengyan','xianzhi']],
@@ -54,8 +55,9 @@ character.hearth={
 		hs_aedwin:['male','wu',3,['lianzhan']],
 		hs_mijiaojisi:['female','wu',3,['kuixin']],
 		hs_huzhixiannv:['female','wu',3,['jingmeng','qingliu']],
-		hs_tgolem:['male','wu',4,['xinwuyan','guozai']],
-		hs_totemic:['male','wu',3,['s_tuteng']],
+		// hs_tgolem:['male','wu',4,['xinwuyan','guozai']],
+		hs_totemic:['male','wu',3,['peiyu']],
+		// hs_wujiyuansu:['male','wu',3,['s_tuteng']],
 		hs_xsylvanas:['female','qun',3,['busi','xshixin','xmojian']],
 		hs_siwangzhiyi:['male','qun',12,['mieshi']],
 		hs_bilanyoulong:['male','wei',4,['lingzhou']],
@@ -81,6 +83,154 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		peiyu:{
+			enable:'phaseUse',
+			filterCard:true,
+			position:'he',
+			filterTarget:true,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				var rand=['tuteng1','tuteng2','tuteng3','tuteng4',
+					'tuteng5','tuteng6','tuteng7','tuteng8'];
+				var rand2=[];
+				for(var i=0;i<target.skills.length;i++){
+					if(rand.contains(target.skills[i])){
+						rand.remove(target.skills[i]);
+						rand2.push(target.skills[i]);
+					}
+				}
+				if(!rand.length){
+					event.finish();
+					return;
+				}
+				if(!target.storage.peiyu){
+					target.storage.peiyu={};
+				}
+				for(var i in target.storage.peiyu){
+					if(target.storage.peiyu[i]==player){
+						delete target.storage.peiyu[i];
+					}
+				}
+				if(rand2.length){
+					var randx=[];
+					var rand2x=[];
+					if(target.isUnderControl(true)){
+						var dialog=ui.create.dialog();
+						for(var i=0;i<rand.length;i++){
+							randx[i]=['','',rand[i]];
+						}
+						for(var i=0;i<rand2.length;i++){
+							rand2x[i]=['','',rand2[i]];
+						}
+						dialog.add('选择一个图腾');
+						dialog.add([randx,'vcard']);
+						dialog.add('替换一个已有图腾');
+						dialog.add([rand2x,'vcard']);
+						target.chooseButton(dialog,2,true).filterButton=function(button){
+							if(ui.selected.buttons.length){
+								var current=ui.selected.buttons[0].name;
+								if(rand.contains(current)){
+									return rand2.contains(button.name);
+								}
+								else{
+									return rand.contains(button.name);
+								}
+							}
+							return true;
+						};
+						for(var i=0;i<dialog.buttons.length;i++){
+							var item=dialog.buttons[i]
+							if(i==4){
+								item.parentNode.insertBefore(document.createElement('br'),item);
+							}
+							item.style.zoom=0.7;
+						}
+					}
+					else{
+						var gain;
+						if(target.hp<target.maxHp){
+							if(rand.contains('tuteng1')){
+								gain='tuteng1';
+							}
+							else if(rand.contains('tuteng3')){
+								gain='tuteng3';
+							}
+							else{
+								gain=rand.randomGet();
+							}
+							target.removeSkill(rand2.randomGet())
+						}
+						else{
+							if(rand2.contains('tuteng1')){
+								gain=rand.randomGet();
+								target.removeSkill('tuteng1');
+							}
+							else{
+								if(rand.length>1){
+									rand.remove('tuteng1');
+								}
+								gain=rand.randomGet();
+								target.removeSkill(rand2.randomGet())
+							}
+						}
+						target.addSkill(gain);
+						target.storage.peiyu[gain]=player;
+						game.delay();
+						event.finish();
+					}
+				}
+				else{
+					var gain=rand.randomGet();
+					target.addSkill(gain);
+					target.storage.peiyu[gain]=player;
+					game.delay();
+					event.finish();
+				}
+				'step 1'
+				var skill1=result.buttons[0].name;
+				var skill2=result.buttons[1].name;
+				if(target.skills.contains(skill1)){
+					target.removeSkill(skill1);
+					target.addSkill(skill2);
+					target.storage.peiyu[skill2]=player;
+				}
+				else{
+					target.removeSkill(skill2);
+					target.addSkill(skill1);
+					target.storage.peiyu[skill1]=player;
+				}
+			},
+			ai:{
+				expose:0.2,
+				order:5,
+				result:{
+					target:function(player,target){
+						for(var i=1;i<=8;i++){
+							if(target.hasSkill('tuteng'+i)) return 0;
+						}
+						return 1;
+					}
+				}
+			},
+			group:'peiyu2'
+		},
+		peiyu2:{
+			trigger:{player:'dieBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				for(var i=0;i<game.players.length;i++){
+					for(var j in game.players[i].storage.peiyu){
+						if(game.players[i].storage.peiyu[j]==player){
+							game.players[i].removeSkill(j);
+						}
+					}
+				}
+			}
+		},
 		wzhanyi:{
 			trigger:{player:'phaseUseBefore'},
 			check:function(event,player){
@@ -3416,7 +3566,6 @@ character.hearth={
 			content:function(){
 				var rand=['tuteng2','tuteng4','tuteng5','tuteng6','tuteng7','tuteng8'];
 				if(player.storage.s_tuteng){
-
 					var rand2=player.storage.s_tuteng;
 					for(var i=0;i<3;i++){
 						rand.remove(rand2[i]);
@@ -3542,7 +3691,6 @@ character.hearth={
 					event.finish();
 				}
 				'step 1'
-				game.stopCountChoose();
 				if(result.buttons.length==1){
 					player.addSkill(result.buttons[0].name);
 				}
@@ -3558,7 +3706,6 @@ character.hearth={
 						player.addSkill(skill1);
 					}
 				}
-				player.addSkill(event.choice);
 			},
 			ai:{
 				order:11,
@@ -4297,6 +4444,7 @@ character.hearth={
 		hs_sthrall:'萨尔',
 		hs_waleera:'瓦莉拉',
 		hs_liadrin:'莉亚德琳',
+		hs_morgl:'摩戈尔',
 
 		hs_neptulon:'耐普图隆',
 		hs_wvelen:'维纶',
@@ -4355,6 +4503,8 @@ character.hearth={
 		hs_yogg:'尤格萨隆',
 		hs_xialikeer:'夏克里尔',
 
+		peiyu:'培育',
+		peiyu_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾',
 		wzhanyi:'战意',
 		wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌并展示之，将摸到的装备牌置于装备区，然后可以使用手牌中的杀',
 		shengteng:'升腾',
@@ -4512,7 +4662,7 @@ character.hearth={
 		chongsheng:'重生',
 		chongsheng_bg:'生',
 		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动2次',
-		s_tuteng:'滋养',
+		s_tuteng:'神谕',
 		s_tuteng_info:'在你首个回合开始时，你获得三个随机图腾；在此后的每个回合开始阶段，你随机替换其中的一个图腾',
 		guozai:'过载',
 		guozai2:'过载',

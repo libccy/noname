@@ -2,7 +2,6 @@
 character.ow={
     character:{
         ow_liekong:['female','shu',3,['shanxian','shanhui']],
-        // ow_heibaihe:['female','shu',3,[]],
         ow_sishen:['male','shu',3,['xiandan','yihun','shouge']],
         ow_tianshi:['female','qun',3,['shouhu','ziyu','feiying']],
         ow_falaozhiying:['female','shu',3,['feidan','huoyu','feiying']],
@@ -10,9 +9,21 @@ character.ow={
         ow_luxiao:['male','wu',3,['yuedong','kuoyin','huhuan']],
         ow_shibing:['male','shu',4,['tuji','mujing']],
         ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
+        ow_chanyata:['male','qun',3,['xie','luan','sheng']],
+
+        // ow_heibaihe:['female','shu',3,[]],
         // ow_mei:['female','shu',3,[]],
         // ow_baolei:['female','shu',3,[]],
-        ow_chanyata:['male','qun',3,['xie','luan','sheng']],
+        // ow_ana:['female','shu',4,[]],
+        // ow_dva:['female','shu',4,[]],
+        // ow_maikelei:['male','shu',4,[]],
+        // ow_banzang:['male','shu',4,[]],
+        // ow_kuangshu:['male','shu',4,[]],
+        // ow_tuobiang:['male','shu',4,[]],
+        // ow_laiyinhate:['male','shu',4,[]],
+        // ow_luba:['male','shu',4,[]],
+        // ow_wensidun:['male','shu',4,[]],
+        // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
         xiandan:{
@@ -281,6 +292,7 @@ character.ow={
                 return event.player==player.storage.xie2;
             },
             content:function(){
+                game.log(player,'解除了','【谐】');
                 player.removeSkill('xie2');
             }
         },
@@ -305,7 +317,7 @@ character.ow={
                     current.removeSkill('luan2');
                 }
                 target.addSkill('luan2');
-                target.storage.luan='now';
+                // target.storage.luan='now';
                 target.storage.luan2=player;
             },
             ai:{
@@ -320,12 +332,36 @@ character.ow={
                         if(current){
                             return 0;
                         }
-                        return -Math.sqrt(3+target.hp);
+                        return -1;
                     }
                 }
             }
         },
         luan2:{
+            mark:true,
+            intro:{
+                content:'受到的伤害+1，直到首次进入濒死状态'
+            },
+            trigger:{player:'damageBegin'},
+            forced:true,
+            content:function(){
+                trigger.num++;
+            },
+            ai:{
+                threaten:1.2
+            },
+            group:['luan3','luan4']
+        },
+        luan3:{
+            trigger:{player:'dyingAfter'},
+            forced:true,
+            popup:false,
+            content:function(){
+                game.log(player,'解除了','【乱】');
+                player.removeSkill('luan2');
+            }
+        },
+        luan2_old:{
             mark:true,
             trigger:{global:'phaseEnd'},
             forced:true,
@@ -364,7 +400,7 @@ character.ow={
             },
             group:['luan3','luan4']
         },
-        luan3:{
+        luan3_old:{
             trigger:{global:'phaseBegin'},
             forced:true,
             popup:false,
@@ -386,6 +422,7 @@ character.ow={
                 return event.player==player.storage.luan2;
             },
             content:function(){
+                game.log(player,'解除了','【乱】');
                 player.removeSkill('luan2');
             }
         },
@@ -1132,7 +1169,8 @@ character.ow={
         xie_info:'出牌阶段，你可以弃置一张红桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合回复一点体力，直到你死亡。同一时间只能对一人发动',
         luan:'乱',
         luan2:'乱',
-        luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合失去一点体力，直到你死亡。同一时间只能对一人发动',
+        luan_old_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合失去一点体力，直到你死亡。同一时间只能对一人发动',
+        luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色受到的伤害+1，直到你死亡或其首次进入濒死状态。同一时间只能对一人发动',
         sheng:'圣',
         sheng_info:'限定技，出牌阶段，你可以将你的武将牌翻面，然后令任意名角色回复一点体力，若如此做，你不能成为其他角色的卡牌目标直到下一回合开始',
         xiandan:'霰弹',

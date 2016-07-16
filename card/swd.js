@@ -1324,6 +1324,10 @@ card.swd={
 			enable:'phaseUse',
 			usable:1,
 			filterCard:true,
+			selectCard:2,
+			check:function(card){
+				return 5-ai.get.value(card);
+			},
 			position:'he',
 			filterTarget:true,
 			content:function(){
@@ -1332,6 +1336,17 @@ card.swd={
 				}
 				else{
 					target.addSkill('hslingjian_chaofeng');
+				}
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						if(target.hasSkill('hslingjian_chaofeng')){
+							return -Math.sqrt(target.hp+target.num('h'));
+						}
+						return 0;
+					}
 				}
 			}
 		},
@@ -2198,7 +2213,7 @@ card.swd={
 		hslingjian_shengxiuhaojiao_equip2_info:'有嘲讽的角色不能对你使用杀',
 		hslingjian_shengxiuhaojiao_equip3_info:'若你的手牌数大于你的体力值，你的防御距离+1',
 		hslingjian_shengxiuhaojiao_equip4_info:'若你的手牌数大于你的体力值，你的进攻距离+1',
-		hslingjian_shengxiuhaojiao_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名角色获得或解除嘲讽',
+		hslingjian_shengxiuhaojiao_equip5_info:'出牌阶段限一次，你可以弃置两张牌，然后令一名角色获得或解除嘲讽',
 		hslingjian_shijianhuisu_duanzao:'回溯',
 		hslingjian_shijianhuisu_duanzao2:'溯',
 		hslingjian_shijianhuisu_equip1_info:'当你失去此牌时，你可以弃置一名角色的一张牌',

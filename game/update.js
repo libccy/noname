@@ -1,24 +1,16 @@
 window.noname_update={
-    version:'1.8.17.5',
+    version:'1.8.17.6',
     changeLog:[
         '修bug',
     ],
     files:{
         global:[
             'game/game.js',
-            'card/sp.js',
+            'game/asset.js',
             'card/swd.js',
-            'character/yijiang.js',
-            'character/shenhua.js',
-            'mode/connect.js',
-            'extension/coin/extension.js',
-            'layout/phone/layout.css',
-            'layout/default/menu.css',
+            'character/ow.js',
+            'character/hearth.js',
         ],
-        '1.8.17':[],
-        '1.8.17.1':[],
-        '1.8.17.2':[],
-        '1.8.17.3':[],
-        '1.8.17.4':[],
+        '1.8.17.5':[],
     }
 }

@@ -5643,7 +5643,14 @@ character.yijiang={
 				}
 				return false;
 			},
-			frequent:true,
+			check:function(event,player){
+				for(var i=0;i<event.cards.length;i++){
+					if(get.suit(event.cards[i])=='club'&&get.position(event.cards[i])=='d'){
+						if(event.cards[i].name=='du') return false;
+					}
+				}
+				return true;
+			},
 			content:function(){
 				"step 0"
 				if(trigger.delay==false) game.delay();
@@ -5664,7 +5671,14 @@ character.yijiang={
 		luoying2:{
 			audio:2,
 			trigger:{global:'judgeAfter'},
-			frequent:true,
+			check:function(event,player){
+				for(var i=0;i<event.cards.length;i++){
+					if(get.suit(event.cards[i])=='club'&&get.position(event.cards[i])=='d'){
+						if(event.cards[i].name=='du') return false;
+					}
+				}
+				return true;
+			},
 			filter:function(event,player){
 				if(event.player==player) return false;
 				if(event.result.card.parentNode.id!='discardPile') return false;

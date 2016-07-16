@@ -9084,7 +9084,7 @@
 					next.content=lib.element.playerproto.changeHp;
 				},
 				dying:function(reason){
-					var next=game.createEvent('dying',false);
+					var next=game.createEvent('dying');
 					next.player=this;
 					next.reason=reason;
 					next.source=reason.source;
