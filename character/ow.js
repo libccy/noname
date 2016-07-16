@@ -10,12 +10,12 @@ character.ow={
         ow_shibing:['male','shu',4,['tuji','mujing']],
         ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
+        ow_dva:['female','qun',2,['jijia','tuijin','zihui','chongzhuang']],
 
         // ow_heibaihe:['female','shu',3,[]],
         // ow_mei:['female','shu',3,[]],
         // ow_baolei:['female','shu',3,[]],
         // ow_ana:['female','shu',4,[]],
-        // ow_dva:['female','shu',4,[]],
         // ow_maikelei:['male','shu',4,[]],
         // ow_banzang:['male','shu',4,[]],
         // ow_kuangshu:['male','shu',4,[]],
@@ -26,6 +26,42 @@ character.ow={
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
+        jijia:{
+            mark:true,
+            init:function(player){
+                player.storage.jijia=4;
+                player.storage.jijia2=0;
+            },
+            intro:{
+                content:function(storage){
+                    return '机甲体力值：'+storage;
+                }
+            },
+            mod:{
+                maxHandcard:function(player,num){
+                    if(player.storage.jijia>0){
+                        return num+player.storage.jijia;
+                    }
+				}
+            },
+            trigger:{player:'changeHp'},
+            forced:true,
+            popup:false,
+            filter:function(event,player){
+                return player.storage.jijia>0&&event.parent.name=='damage'&&event.num<0;
+            },
+            content:function(){
+                player.hp-=trigger.num;
+                player.update();
+                player.storage.jijia+=trigger.num;
+                if(player.storage.jijia<=0){
+                    player.unmarkSkill('jijia');
+                }
+                else{
+                    player.updateMarks();
+                }
+            }
+        },
         xiandan:{
 			trigger:{player:'shaBegin'},
 			direct:true,
@@ -86,7 +122,7 @@ character.ow={
 				'step 0'
                 player.discardPlayerCard('是否发动【目镜】？',trigger.target).logSkill=['mujing'];
                 'step 1'
-                if(result.bool&&player.num('h')<trigger.target.num('h')){
+                if(result.bool&&player.num('h')<=trigger.target.num('h')){
                     player.draw();
                 }
 			}
@@ -1153,12 +1189,20 @@ character.ow={
         }
     },
     translate:{
+        jijia:'机甲',
+        jijia_info:'锁定技，游戏开始时，你获得一个体力为4的机甲；你的手牌上限为你和机甲的体力之和；你受到的伤害由机甲承担',
+        zihui:'自毁',
+        zihui_info:'出牌阶段，你可以摧毁你的机甲，然后令所有其他角色选择一项：弃置数量等同你机甲体力值的牌，或受到2点火焰伤害',
+        tuijin:'推进',
+        tuijin_info:'出牌阶段限一次，若你有机甲，你可以指定一名角色，本回合内视为与其距离为1',
+        chongzhuang:'重装',
+        chongzhuang_info:'若你没有机甲，在你回合结束或造成伤害时，你获得一个机甲标记；当你有4个机甲标记时，你立即重新获得机甲',
         shouge:'收割',
         shouge_info:'每当你杀死一名角色，你可以获得一张治疗波',
         tuji:'突击',
         tuji_info:'锁定技，在你的回合内，你每使用一次牌后，你计算与其他角色的距离便减少1，直到回合结束',
         mujing:'目镜',
-        mujing_info:'每当你对攻击范围不含你的角色使用一张牌，你可以弃置目标一张牌；若你的手牌数比目标少，你摸一张牌',
+        mujing_info:'每当你对攻击范围不含你的角色使用一张牌，你可以弃置目标一张牌；若你的手牌数不多于目标，你摸一张牌',
         feiren:'飞刃',
         feiren2:'飞刃',
         feiren_info:'你的杀无视距离和防具；你的黑桃杀可以额外结算一次，梅花杀可以额外指定一个目标',
@@ -1209,6 +1253,7 @@ character.ow={
         ow_luxiao:'卢西奥',
         ow_shibing:'士兵76',
         ow_yuanshi:'源氏',
-        ow_chanyata:'禅雅塔'
+        ow_chanyata:'禅雅塔',
+        ow_dva:'DVA',
     }
 };
