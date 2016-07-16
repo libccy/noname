@@ -11,7 +11,7 @@ character.ow={
         ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
         ow_dva:['female','qun',2,['jijia','tuijin','zihui','chongzhuang']],
-        ow_mei:['female','shu',3,[]],
+        ow_mei:['female','shu',3,['shuangqiang','bingqiang','jidong']],
 
         // ow_heibaihe:['female','shu',3,[]],
         // ow_baolei:['female','shu',3,[]],
@@ -26,6 +26,281 @@ character.ow={
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
+        bingqiang:{
+            enable:'phaseUse',
+            position:'he',
+            filterCard:function(card){
+                var color=get.color(card);
+                for(var i=0;i<ui.selected.cards.length;i++){
+                    if(get.color(ui.selected.cards[i])!=color) return false;
+                }
+                return true;
+            },
+            selectCard:[1,Infinity],
+            filterTarget:function(card,player,target){
+                return !target.hasSkill('bingqiang2')&&!target.hasSkill('bingqiang5')&&
+                !target.next.hasSkill('bingqiang2')&&!target.next.hasSkill('bingqiang5')&&
+                !target.previous.hasSkill('bingqiang2')&&!target.previous.hasSkill('bingqiang5');
+            },
+            check:function(card){
+                var player=_status.event.player;
+                var max=0,min=0;
+                for(var i=0;i<game.players.length;i++){
+                    if(!lib.skill.bingqiang.filterTarget(null,player,game.players[i])) continue;
+                    var num=lib.skill.bingqiang.ai.result.playerx(player,game.players[i]);
+                    if(num>max){
+                        max=num;
+                    }
+                    if(num<min){
+                        min=num;
+                    }
+                }
+                if(max==-min){
+                    return 5-ai.get.value(card);
+                }
+                else if(max>-min){
+                    if(get.color(card)=='red') return 5-ai.get.value(card);
+                }
+                else{
+                    if(get.color(card)=='black') return 5-ai.get.value(card);
+                }
+            },
+            changeTarget:function(player,targets){
+                var target=targets[0];
+                targets.push(target.next);
+                targets.push(target.previous);
+            },
+            content:function(){
+                if(get.color(cards[0])=='red'){
+                    target.storage.bingqiang2=cards.length;
+                    target.addSkill('bingqiang2');
+                }
+                else{
+                    target.storage.bingqiang5=cards.length;
+                    target.addSkill('bingqiang5');
+                }
+                if(!player.storage.bingqiang){
+                    player.storage.bingqiang=[];
+                }
+                player.storage.bingqiang.add(target);
+            },
+            ai:{
+                order:11,
+                result:{
+                    playerx:function(player,target){
+                        return ai.get.attitude(player,target)+ai.get.attitude(player,target.next)+ai.get.attitude(player,target.previous);
+                    },
+                    player:function(player,target){
+                        var num=lib.skill.bingqiang.ai.result.playerx(player,target);
+                        if(ui.selected.cards.length){
+                            if(get.color(ui.selected.cards[0])=='black'){
+                                return -num;
+                            }
+                            else{
+                                return num;
+                            }
+                        }
+                        return 0;
+                    }
+                }
+            },
+            group:'bingqiang_remove'
+        },
+        bingqiang_remove:{
+            trigger:{player:['phaseBegin','dieBegin']},
+            forced:true,
+            popup:false,
+            filter:function(event,player){
+                return player.storage.bingqiang&&player.storage.bingqiang.length>0;
+            },
+            content:function(){
+                for(var i=0;i<player.storage.bingqiang.length;i++){
+                    player.storage.bingqiang[i].removeSkill('bingqiang2');
+                    player.storage.bingqiang[i].removeSkill('bingqiang5');
+                }
+                player.storage.bingqiang=[];
+            }
+        },
+        bingqiang_old:{
+            trigger:{global:'phaseBegin'},
+            direct:true,
+            filter:function(event,player){
+                return player.num('he')>0;
+            },
+            content:function(){
+                'step 0'
+                var goon=false;
+                var goon2=false;
+                var att=ai.get.attitude(player,trigger.player);
+                if(att>0){
+                    if(trigger.player.hp==1) goon=true;
+                }
+                else{
+                    if(Math.random()<0.5) goon=true;
+                }
+                if(Math.random()<0.3) goon2=true;
+                player.chooseToDiscard([1,player.num('h')],'he','是否对'+get.translation(trigger.player)+'发动【冰墙】？').set('logSkill',['bingqiang',trigger.player]).ai=function(card){
+                    if(ui.selected.cards.length) return 0;
+                    if(goon) return 6-ai.get.value(card);
+                    if(goon2) return 4-ai.get.value(card);
+                    return 0;
+                }
+                'step 1'
+                if(result.bool){
+                    var num=result.cards.length;
+                    event.num=num;
+                    player.chooseControl('选项一','选项二','选项三','选项四',function(){
+                        if(ai.get.attitude(player,trigger.player)>0){
+                            if(Math.random()<0.7) return '选项一';
+                            return '选项三';
+                        }
+                        else{
+                            if(Math.random()<0.7) return '选项四';
+                            return '选项二';
+                        }
+                        return '';
+                    }).set('prompt','冰墙<br><br><div class="text center">选项一：防御距离+'+num+
+                    '</div><br><div class="text center">选项二：防御距离-'+num+
+                    '</div><br><div class="text center">选项三：进攻距离+'+num+
+                    '</div><br><div class="text center">选项四：进攻距离-'+num+'</div>');
+                }
+                else{
+                    event.finish();
+                }
+                'step 2'
+                switch(result.control){
+                    case '选项一':{
+                        trigger.player.storage.bingqiang2=event.num;
+                        trigger.player.addTempSkill('bingqiang2',{player:'phaseBegin'});
+                        break;
+                    }
+                    case '选项二':{
+                        trigger.player.storage.bingqiang3=event.num;
+                        trigger.player.addTempSkill('bingqiang3',{player:'phaseBegin'});
+                        break;
+                    }
+                    case '选项三':{
+                        trigger.player.storage.bingqiang4=event.num;
+                        trigger.player.addTempSkill('bingqiang4',{player:'phaseBegin'});
+                        break;
+                    }
+                    case '选项四':{
+                        trigger.player.storage.bingqiang5=event.num;
+                        trigger.player.addTempSkill('bingqiang5',{player:'phaseBegin'});
+                        break;
+                    }
+                }
+            },
+            ai:{
+                expose:0.1
+            }
+        },
+        bingqiang2:{
+            mark:true,
+            intro:{
+                content:function(storage){
+                    return '防御距离+'+storage;
+                }
+            },
+            mod:{
+				globalTo:function(from,to,distance){
+                    if(typeof to.storage.bingqiang2=='number') return distance+to.storage.bingqiang2;
+				},
+			}
+        },
+        bingqiang3:{
+            mark:true,
+            intro:{
+                content:function(storage){
+                    return '防御距离-'+storage;
+                }
+            },
+            mod:{
+				globalTo:function(from,to,distance){
+                    if(typeof to.storage.bingqiang3=='number') return distance-to.storage.bingqiang3;
+				},
+			}
+        },
+        bingqiang4:{
+            mark:true,
+            intro:{
+                content:function(storage){
+                    return '进攻距离+'+storage;
+                }
+            },
+            mod:{
+				globalFrom:function(from,to,distance){
+					if(typeof from.storage.bingqiang4=='number') return distance-from.storage.bingqiang4;
+				}
+			}
+        },
+        bingqiang5:{
+            mark:true,
+            intro:{
+                content:function(storage){
+                    return '进攻距离-'+storage;
+                }
+            },
+            mod:{
+				globalFrom:function(from,to,distance){
+					if(typeof from.storage.bingqiang5=='number') return distance+from.storage.bingqiang5;
+				}
+			}
+        },
+        shuangqiang:{
+			trigger:{source:'damageBegin'},
+			check:function(event,player){
+				var att=ai.get.attitude(player,event.target);
+				if(event.target.hp==1) return att>0;
+				return att<=0;
+			},
+			filter:function(event,player){
+				return !event.player.isTurnedOver()&&event.num>0;
+			},
+			content:function(){
+				trigger.num--;
+				trigger.player.draw();
+				trigger.player.turnOver();
+			}
+		},
+        jidong:{
+            trigger:{global:'phaseEnd'},
+            filter:function(event,player){
+                return player.hp==1&&!player.isTurnedOver();
+            },
+            content:function(){
+                'step 0'
+                player.turnOver();
+                player.recover(2);
+                'step 1'
+                if(player.isTurnedOver()){
+                    player.addTempSkill('jidong2',{player:'turnOverAfter'});
+                }
+            }
+        },
+        jidong2:{
+            trigger:{player:'damageBefore'},
+			forced:true,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				nofire:true,
+				nothunder:true,
+				nodamage:true,
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'damage')) return [0,0];
+					}
+				},
+			},
+            mod:{
+                targetEnabled:function(card,player,target){
+                    if(player!=target) return false;
+                }
+            }
+        },
         chongzhuang:{
             trigger:{source:'damageEnd'},
             forced:true,
@@ -52,9 +327,10 @@ character.ow={
             usable:1,
             unique:true,
             filter:function(event,player){
-                if(!(player.storage.jijia>0)) return false;
-                for(var i=0;i<game.players.length;i++){
-                    if(get.distance(player,game.players[i])>1) return true;
+                if(player.storage.jijia>0){
+                    for(var i=0;i<game.players.length;i++){
+                        if(get.distance(player,game.players[i])>1) return true;
+                    }
                 }
                 return false;
             },
@@ -153,7 +429,7 @@ character.ow={
             line:'fire',
             content:function(){
                 'step 0'
-                target.chooseToDiscard(player.storage.jijia,'弃置'+get.cnNumber(player.storage.jijia)+'张牌，或受到2点火焰伤害').ai=function(card){
+                target.chooseToDiscard(player.storage.jijia,'he','弃置'+get.cnNumber(player.storage.jijia)+'张牌，或受到2点火焰伤害').ai=function(card){
                     if(target.hasSkillTag('nofire')) return 0;
                     if(get.type(card)!='basic') return 11-ai.get.value(card);
                     if(target.hp>4) return 7-ai.get.value(card);
@@ -1340,6 +1616,20 @@ character.ow={
         }
     },
     translate:{
+        shuangqiang:'霜枪',
+        shuangqiang_info:'每当你对一名未翻面的角色造成伤害，你可以令伤害-1，然后令受伤害角色翻面',
+        bingqiang:'冰墙',
+        bingqiang2:'冰墙',
+        bingqiang2_bg:'墙',
+        bingqiang3:'冰墙',
+        bingqiang3_bg:'墙',
+        bingqiang4:'冰墙',
+        bingqiang4_bg:'墙',
+        bingqiang5:'冰墙',
+        bingqiang5_bg:'墙',
+        bingqiang_info:'出牌阶段，你可以弃置X张红色牌令一名角色和其相邻角色的防御离+X，或弃置X张黑色牌令一名角色和其相邻角色的进攻离-X，效果持续到你的下个回合开始',
+        jidong:'急冻',
+        jidong_info:'在一名角色的回合结束阶段，若你的体力值为1，你可以翻面并回复两点体力，在你的武将牌翻至正面前，你防止所有伤害，也不能成为其他角色卡牌的目标',
         jijia:'机甲',
         jijia_info:'锁定技，游戏开始时，你获得一个体力为4的机甲；你的手牌上限为你和机甲的体力之和；你受到的伤害由机甲承担',
         zihui:'自毁',
@@ -1406,5 +1696,6 @@ character.ow={
         ow_yuanshi:'源氏',
         ow_chanyata:'禅雅塔',
         ow_dva:'DVA',
+        ow_mei:'小美',
     }
 };

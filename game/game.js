@@ -8790,6 +8790,9 @@
 					if(next.cards==undefined){
 						next.cards=[];
 					}
+                    if(next.skill&&get.info(next.skill)&&get.info(next.skill).changeTarget){
+                        get.info(next.skill).changeTarget(next.player,next.targets);
+                    }
 					if(next.targets){
 						for(var i=0;i<next.targets.length;i++){
 							if(ai.get.attitude(this,next.targets[i])>=-1&&ai.get.attitude(this,next.targets[i])<0){
@@ -17051,7 +17054,7 @@
 			var custom=event.custom||{};
 			var ok=true,auto=true;
 			var player=event.player;
-			if(!event.filterButton&&!event.filterCard&&!event.filterTarget&&!event.skill){
+			if(!event.filterButton&&!event.filterCard&&!event.filterTarget&&(!event.skill||!event._backup)){
                 if(event.choosing){
                     _status.imchoosing=true;
                 }
