@@ -12,6 +12,7 @@ window.noname_update={
             'character/rank.js',
             'character/ow.js',
             'character/hearth.js',
+            'character/xianjian.js',
         ],
         '1.8.17.5':[],
     }

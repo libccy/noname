@@ -3338,15 +3338,6 @@
                         game.saveConfig('layout','phone');
                     }
                 }
-                if(lib.device&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<960){
-                    game.documentZoom=document.documentElement.offsetWidth/960;
-                    game.deviceZoom=game.documentZoom;
-                    document.documentElement.style.zoom=game.documentZoom;
-                }
-                else{
-                    game.documentZoom=1;
-                    game.deviceZoom=1;
-                }
 
 				if(lib.config.extensions.length){
 					window.resetExtension=function(){
@@ -3672,6 +3663,16 @@
 						}
 					});
 				}
+                if(lib.device&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&
+                    navigator.userAgent.toLowerCase().indexOf('crosswalk')==-1){
+                    game.documentZoom=document.documentElement.offsetWidth/960;
+                    game.deviceZoom=game.documentZoom;
+                    document.documentElement.style.zoom=game.documentZoom;
+                }
+                else{
+                    game.documentZoom=1;
+                    game.deviceZoom=1;
+                }
                 // if(lib.config.debug&&window.require){
                 //     window.require('remote').getCurrentWindow().openDevTools();
                 // }

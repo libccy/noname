@@ -376,6 +376,9 @@ character.xianjian={
 					player.logSkill('shuiyun5',trigger.player,'thunder');
 					game.addVideo('storage',player,['shuiyun',get.cardsInfo(player.storage.shuiyun),'cards']);
 				}
+				else{
+					event.finish();
+				}
 				"step 2"
 				if(trigger.player!=player){
 					game.delay();

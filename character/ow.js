@@ -11,9 +11,9 @@ character.ow={
         ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
         ow_dva:['female','qun',2,['jijia','tuijin','zihui','chongzhuang']],
+        ow_mei:['female','shu',3,[]],
 
         // ow_heibaihe:['female','shu',3,[]],
-        // ow_mei:['female','shu',3,[]],
         // ow_baolei:['female','shu',3,[]],
         // ow_ana:['female','shu',4,[]],
         // ow_maikelei:['male','shu',4,[]],
@@ -26,8 +26,78 @@ character.ow={
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
+        chongzhuang:{
+            trigger:{source:'damageEnd'},
+            forced:true,
+            filter:function(event,player){
+                return player.storage.jijia<=0&&event.num>0;
+            },
+            popup:false,
+            unique:true,
+            content:function(){
+                player.storage.jijia2+=trigger.num;
+                if(player.storage.jijia2>=4){
+                    player.storage.jijia=4;
+                    player.storage.jijia2=0;
+                    player.markSkill('jijia');
+                    if(lib.config.skill_animation){
+                        player.logSkill('chongzhuang');
+                        player.$skill('重装')
+                    }
+                }
+            }
+        },
+        tuijin:{
+            enable:'phaseUse',
+            usable:1,
+            unique:true,
+            filter:function(event,player){
+                if(!(player.storage.jijia>0)) return false;
+                for(var i=0;i<game.players.length;i++){
+                    if(get.distance(player,game.players[i])>1) return true;
+                }
+                return false;
+            },
+            filterTarget:function(card,player,target){
+                return target!=player&&get.distance(player,target)>1;
+            },
+            content:function(){
+                player.storage.tuijin2=target;
+                player.markSkillCharacter('tuijin2',target,'推进','与'+get.translation(target)+'的距离视为1，直到回合结束');
+                player.addSkill('tuijin2');
+            },
+            ai:{
+                order:11,
+                result:{
+                    target:function(player,target){
+                        if(ai.get.attitude(player,target)<0){
+                            if(get.distance(player,target)>2) return -1.5;
+                            return -1;
+                        }
+                        return 0.3;
+                    }
+                }
+            }
+        },
+        tuijin2:{
+            mod:{
+                globalFrom:function(from,to){
+                    if(to==from.storage.tuijin2) return -Infinity;
+                }
+            },
+            trigger:{player:'phaseEnd'},
+            priority:-1,
+            forced:true,
+            popup:false,
+            content:function(){
+                player.unmarkSkill('tuijin2');
+                player.removeSkill('tuijin2');
+                delete player.storage.tuijin2;
+            }
+        },
         jijia:{
             mark:true,
+            unique:true,
             init:function(player){
                 player.storage.jijia=4;
                 player.storage.jijia2=0;
@@ -59,6 +129,87 @@ character.ow={
                 }
                 else{
                     player.updateMarks();
+                }
+            },
+            ai:{
+                threaten:function(player,target){
+					if(target.storage.jijia<=0) return 2;
+					return 1;
+				}
+            }
+        },
+        zihui:{
+            enable:'phaseUse',
+            filter:function(event,player){
+                return player.storage.jijia>0;
+            },
+            filterTarget:function(card,player,target){
+                return target!=player&&get.distance(player,target)<=2;
+            },
+            unique:true,
+            selectTarget:-1,
+			skillAnimation:true,
+			animationColor:'fire',
+            line:'fire',
+            content:function(){
+                'step 0'
+                target.chooseToDiscard(player.storage.jijia,'弃置'+get.cnNumber(player.storage.jijia)+'张牌，或受到2点火焰伤害').ai=function(card){
+                    if(target.hasSkillTag('nofire')) return 0;
+                    if(get.type(card)!='basic') return 11-ai.get.value(card);
+                    if(target.hp>4) return 7-ai.get.value(card);
+                    if(target.hp==4&&player.storage.jijia>=3) return 7-ai.get.value(card);
+                    if(target.hp==3&&player.storage.jijia>=4) return 7-ai.get.value(card);
+                    if(player.storage.hujia>1) return 8-ai.get.value(card);
+                    return 10-ai.get.value(card);
+                };
+                'step 1'
+                if(!result.bool){
+                    target.damage(2,'fire');
+                }
+                if(target==targets[targets.length-1]){
+                    player.storage.jijia=0;
+                    player.unmarkSkill('jijia');
+                }
+            },
+            ai:{
+                order:2,
+                result:{
+                    player:function(player){
+                        var num=0;
+                        for(var i=0;i<game.players.length;i++){
+                            if(game.players[i]==player||game.players[i].hasSkillTag('nofire')||get.distance(player,game.players[i])>2) continue;
+                            var nh=game.players[i].num('h');
+                            var att=ai.get.attitude(player,game.players[i]);
+                            if(nh<player.storage.jijia){
+                                if(att<0){
+                                    if(game.players[i].hp<=2){
+                                        num+=2;
+                                    }
+                                    else{
+                                        num+=1.5;
+                                    }
+                                }
+                                else if(att>0){
+                                    if(game.players[i].hp<=2){
+                                        num-=2;
+                                    }
+                                    else{
+                                        num-=1.5;
+                                    }
+                                }
+                            }
+                            else if(nh==player.storage.jijia){
+                                if(att<0){
+                                    num+=0.5;
+                                }
+                                else if(att>0){
+                                    num-=0.5;
+                                }
+                            }
+                        }
+                        if(num>=2) return 1;
+                        return 0;
+                    }
                 }
             }
         },
@@ -1192,11 +1343,11 @@ character.ow={
         jijia:'机甲',
         jijia_info:'锁定技，游戏开始时，你获得一个体力为4的机甲；你的手牌上限为你和机甲的体力之和；你受到的伤害由机甲承担',
         zihui:'自毁',
-        zihui_info:'出牌阶段，你可以摧毁你的机甲，然后令所有其他角色选择一项：弃置数量等同你机甲体力值的牌，或受到2点火焰伤害',
+        zihui_info:'出牌阶段，你可以令距离2以内的所有其他角色选择一项：弃置数量等同你机甲体力值的牌，或受到2点火焰伤害，并在结算完毕后摧毁你的机甲',
         tuijin:'推进',
         tuijin_info:'出牌阶段限一次，若你有机甲，你可以指定一名角色，本回合内视为与其距离为1',
         chongzhuang:'重装',
-        chongzhuang_info:'若你没有机甲，在你回合结束或造成伤害时，你获得一个机甲标记；当你有4个机甲标记时，你立即重新获得机甲',
+        chongzhuang_info:'在你失去机甲后，当你累计造成了4点伤害时，你重新获得机甲',
         shouge:'收割',
         shouge_info:'每当你杀死一名角色，你可以获得一张治疗波',
         tuji:'突击',
