@@ -11,7 +11,7 @@ character.ow={
         ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
         ow_dva:['female','shu',2,['jijia','tuijin','zihui','chongzhuang']],
-        ow_mei:['female','wei',3,['shuangqiang','bingqiang','jidong']],
+        ow_mei:['female','wei',3,['bingqiang','jidong','baoxue']],
         ow_ana:['female','wei',3,['juji','zhiyuan','mianzhen']],
         ow_heibaihe:['female','qun',3,['juji','duwen','dulei']],
 
@@ -26,6 +26,74 @@ character.ow={
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
+        baoxue:{
+            enable:'phaseUse',
+            init:function(player){
+                player.storage.baoxue=false;
+            },
+            intro:{
+                content:'limited'
+            },
+            mark:true,
+            skillAnimation:true,
+            animationColor:'water',
+            line:'thunder',
+            filter:function(event,player){
+                return !player.storage.baoxue&&player.num('he',{color:'black'})>0;
+            },
+            filterTarget:function(card,player,target){
+                return target!=player;
+            },
+            selectTarget:function(){
+                return [1,_status.event.player.num('he',{color:'black'})];
+            },
+            content:function(){
+                'step 0'
+                if(target==targets[0]){
+                    player.storage.baoxue=true;
+                    player.unmarkSkill('baoxue');
+                    player.showHandcards();
+                    player.discard(player.get('he',{color:'black'}));
+                }
+                'step 1'
+                var he=target.get('he');
+                if(he.length){
+                    target.discard(he.randomGet());
+                }
+                'step 2'
+                target.loseHp();
+                'step 3'
+                if(!target.isTurnedOver()){
+                    target.turnOver();
+                }
+
+            },
+            ai:{
+                order:function(skill,player){
+                    var num=0;
+                    var nh=player.num('h',{color:'black'});
+                    for(var i=0;i<game.players.length;i++){
+                        if(ai.get.attitude(player,game.players[i])<0){
+                            num++;
+                        }
+                    }
+                    if(nh==1&&num>1) return 0;
+                    if(nh>num) return 1;
+                    return 11;
+                },
+                result:{
+                    target:function(player,target){
+                        var mode=get.mode();
+						if(mode=='identity'||mode=='guozhan'){
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].ai.shown<=0) return 0;
+							}
+						}
+                        return -1;
+                    }
+                }
+            }
+        },
         mianzhen:{
             enable:'phaseUse',
             usable:1,
@@ -543,6 +611,12 @@ character.ow={
                 'step 1'
                 if(player.isTurnedOver()){
                     player.addTempSkill('jidong2',{player:'turnOverAfter'});
+                }
+            },
+            ai:{
+                threaten:function(player,target){
+                    if(target.hp==1) return 2;
+                    return 1;
                 }
             }
         },
@@ -1902,6 +1976,8 @@ character.ow={
         dulei_info:'出牌阶段，若你武将牌上没有牌，你可以将一张牌背面朝上置于你的武将牌上，当一名角色使用与该牌花色相同的牌指定你为目标时，你展示并将此牌置于弃牌堆，然后该角色失去一点体力并随机弃置一张牌',
         shuangqiang:'霜枪',
         shuangqiang_info:'每当你对一名未翻面的角色造成伤害，你可以令伤害-1，然后令受伤害角色翻面',
+        baoxue:'暴雪',
+        baoxue_info:'限定技，出牌阶段，你可以展示并弃置你的所有黑色牌，然后令至多X名其他角色随机弃置一张牌、流失一点体力并将武将牌翻至背面，X为你的弃牌数',
         bingqiang:'冰墙',
         bingqiang2:'冰墙',
         bingqiang2_bg:'墙',
@@ -1910,7 +1986,7 @@ character.ow={
         bingqiang4:'冰墙',
         bingqiang4_bg:'墙',
         bingqiang5:'冰墙',
-        bingqiang5_bg:'墙',
+        bingqiang5_bg:'障',
         bingqiang_info:'出牌阶段，你可以弃置X张红色牌令一名角色和其相邻角色的防御离+X，或弃置X张黑色牌令一名角色和其相邻角色的进攻离-X，效果持续到你的下个回合开始',
         jidong:'急冻',
         jidong_info:'在一名角色的回合结束阶段，若你的体力值为1，你可以翻面并回复两点体力，在你的武将牌翻至正面前，你防止所有伤害，也不能成为其他角色卡牌的目标',
