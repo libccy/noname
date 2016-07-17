@@ -957,6 +957,7 @@ character.sp={
 				'step 1'
 				if(result.bool){
 					event.type=true;
+					event.card=result.target;
 					player.chooseTarget('将'+get.translation(result.target)+'交给一名角色',function(card,player,target){
 						return target.hp<=player.hp;
 					}).set('ai',function(target){
@@ -965,7 +966,6 @@ character.sp={
 						return att;
 					}).set('du',event.card.name=='du');
 					target.addTempSkill('dahe2','phaseAfter');
-					event.card=result.target;
 				}
 				else{
 					event.type=false;
@@ -4631,7 +4631,7 @@ character.sp={
 		junbing2:{
 			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
-				if(player.skills.contains('junbing')||player.num('h')>1) return false;
+				if(player.num('h')>1) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].skills.contains('junbing')){
 						return true;
@@ -4655,9 +4655,14 @@ character.sp={
 			content:function(){
 				"step 0"
 				player.draw();
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].skills.contains('junbing')){
-						event.target=game.players[i];break;
+				if(player.hasSkill('junbing')){
+					event.finish();
+				}
+				else{
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].skills.contains('junbing')){
+							event.target=game.players[i];break;
+						}
 					}
 				}
 				"step 1"
@@ -4677,7 +4682,8 @@ character.sp={
 		},
 		junbing:{
 			global:'junbing2',
-			unique:true
+			unique:true,
+			forceunique:true
 		},
 		xiongyi:{
 			skillAnimation:true,

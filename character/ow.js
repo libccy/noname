@@ -10,12 +10,12 @@ character.ow={
         ow_shibing:['male','shu',4,['tuji','mujing']],
         ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
-        ow_dva:['female','qun',2,['jijia','tuijin','zihui','chongzhuang']],
-        ow_mei:['female','shu',3,['shuangqiang','bingqiang','jidong']],
+        ow_dva:['female','shu',2,['jijia','tuijin','zihui','chongzhuang']],
+        ow_mei:['female','wei',3,['shuangqiang','bingqiang','jidong']],
+        ow_ana:['female','wei',3,['juji','zhiyuan','mianzhen']],
+        ow_heibaihe:['female','qun',3,['juji','duwen','dulei']],
 
-        // ow_heibaihe:['female','shu',3,[]],
         // ow_baolei:['female','shu',3,[]],
-        // ow_ana:['female','shu',4,[]],
         // ow_maikelei:['male','shu',4,[]],
         // ow_banzang:['male','shu',4,[]],
         // ow_kuangshu:['male','shu',4,[]],
@@ -26,6 +26,260 @@ character.ow={
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
+        mianzhen:{
+            enable:'phaseUse',
+            usable:1,
+            filter:function(event,player){
+                return player.num('he',{color:'black'})>0;
+            },
+            filterTarget:function(card,player,target){
+                return target!=player&&!target.hasSkill('mianzhen2');
+            },
+            filterCard:{color:'black'},
+            position:'he',
+            check:function(card){
+                return 8-ai.get.value(card);
+            },
+            content:function(){
+                target.addSkill('mianzhen2');
+            },
+            ai:{
+                order:2,
+                result:{
+                    target:function(player,target){
+                        return Math.min(-0.1,-1-target.num('h')+Math.sqrt(target.hp)/2);
+                    }
+                }
+            }
+        },
+        mianzhen2:{
+            mark:true,
+            intro:{
+                content:'不能使用或打出手牌直到受到伤害或下一回合结束'
+            },
+            trigger:{player:['damageEnd','phaseEnd']},
+            forced:true,
+            popup:false,
+			content:function(){
+				player.removeSkill('mianzhen2');
+			},
+			mod:{
+				cardEnabled:function(){
+					return false;
+				},
+				cardUsable:function(){
+					return false;
+				},
+				cardRespondable:function(){
+					return false;
+				},
+				cardSavable:function(){
+					return false;
+				}
+			},
+        },
+        zhiyuan:{
+            trigger:{source:'damageBefore'},
+            check:function(event,player){
+                if(event.player.hp<event.player.maxHp&&ai.get.attitude(player,event.player)<0) return false;
+                player.disabledSkills.temp='zhiyuan';
+                var num=ai.get.damageEffect(event.player,player,player,event.nature)<ai.get.recoverEffect(event.player,player,player);
+                delete player.disabledSkills.temp;
+                return num;
+            },
+            prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【支援】？';
+			},
+            filter:function(event,player){
+                return event.num>0;
+            },
+            content:function(){
+                trigger.untrigger();
+                trigger.finish();
+                trigger.player.recover(trigger.num);
+            },
+            ai:{
+                effect:{
+                    player:function(card,player,target){
+                        if(get.tag(card,'damage')&&ai.get.attitude(player,target)>0){
+                            if(target.hp==target.maxHp) return [0,0,0,0];
+                            return [0,0,0,1];
+                        }
+                    }
+                }
+            }
+        },
+        duwen:{
+            trigger:{source:'damageBegin'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)<=0;
+			},
+			forced:true,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&(player.hp==event.player.hp||player.num('h')==event.player.num('h'))&&
+					event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+			},
+			content:function(){
+                if(player.hp==trigger.player.hp) trigger.num++;
+				if(player.num('h')==trigger.player.num('h')) trigger.num++;
+                trigger._duwen=true;
+                player.addTempSkill('duwen2','phaseAfter');
+			},
+            ai:{
+                threaten:1.5
+            }
+        },
+        duwen2:{
+            trigger:{source:'damageEnd'},
+            forced:true,
+            popup:false,
+            filter:function(event){
+                return event._duwen&&event.num>=3;
+            },
+            content:function(){
+                player.loseHp(2);
+            }
+        },
+        dulei:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return !player.skills.contains('dulei2');
+			},
+			filterCard:true,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			discard:false,
+			prepare:function(cards,player){
+				player.$give(1,player);
+			},
+			content:function(){
+				player.storage.dulei=cards[0];
+				player.addSkill('dulei2');
+                player.syncStorage('dulei');
+			},
+			ai:{
+				order:1,
+				result:{
+					player:1
+				}
+			}
+		},
+		dulei2:{
+			mark:true,
+			trigger:{target:'useCardToBegin'},
+			forced:true,
+			filter:function(event,player){
+				return event.player!=player&&get.suit(event.card)==get.suit(player.storage.dulei);
+			},
+			content:function(){
+				'step 0'
+				player.showCards([player.storage.dulei],get.translation(player)+'发动了【毒雷】');
+				'step 1'
+				ui.discardPile.appendChild(player.storage.dulei);
+				delete player.storage.dulei;
+				player.removeSkill('dulei2');
+				game.addVideo('storage',player,['dulei',null]);
+				trigger.player.loseHp();
+                'step 2'
+                var he=trigger.player.get('he');
+                if(he.length){
+                    trigger.player.discard(he.randomGet());
+                }
+			},
+			intro:{
+				mark:function(dialog,content,player){
+					if(player==game.me||player.isUnderControl()){
+						dialog.add([player.storage.dulei]);
+					}
+					else{
+						return '已发动冰甲';
+					}
+				},
+				content:function(content,player){
+					if(player==game.me||player.isUnderControl()){
+						return get.translation(player.storage.dulei);
+					}
+					return '已发动冰甲';
+				}
+			}
+		},
+        juji:{
+			trigger:{player:'shaBegin'},
+			forced:true,
+			filter:function(event,player){
+				return get.distance(event.target,player,'attack')>1;
+			},
+			content:function(){
+				trigger.directHit=true;
+			},
+            group:'juji2'
+		},
+        juji2:{
+            enable:'phaseUse',
+            usable:1,
+            filterTarget:function(card,player,target){
+                return target!=player;
+            },
+            content:function(){
+                target.addTempSkill('juji3',{player:'phaseEnd'});
+                if(!target.storage.juji3){
+                    target.storage.juji3=[];
+                }
+                target.storage.juji3.push(player);
+            },
+            mod:{
+                targetInRange:function(card,player,target){
+                    if(target.hasSkill('juji3')&&Array.isArray(target.storage.juji3)&&target.storage.juji3.contains(player)){
+                        return true;
+                    }
+                }
+            }
+        },
+        juji3:{
+            mark:true,
+            intro:{
+                nocount:true,
+                content:function(storage){
+                    return '对'+get.translation(storage)+'使用卡牌无视距离';
+                }
+            },
+            mod:{
+                targetInRange:function(card,player,target){
+                    if(Array.isArray(player.storage.juji3)&&player.storage.juji3.contains(target)){
+                        return true;
+                    }
+                }
+            }
+        },
+        zhuagou:{
+			enable:'phaseUse',
+			usable:1,
+			changeSeat:true,
+			filterTarget:function(card,player,target){
+				return player!=target&&player.next!=target;
+			},
+			filterCard:true,
+			check:function(card){
+				return 4-ai.get.value(card);
+			},
+			content:function(){
+				while(player.next!=target){
+					game.swapSeat(player,player.next);
+				}
+			},
+			ai:{
+				order:5,
+				result:{
+					player:function(player,target){
+						var att=ai.get.attitude(player,target);
+						if(target==player.previous&&att>0) return 1;
+						if(target==player.next.next&&ai.get.attitude(player,player.next)<0) return 1;
+						return 0;
+					}
+				}
+			}
+		},
         bingqiang:{
             enable:'phaseUse',
             position:'he',
@@ -67,8 +321,12 @@ character.ow={
             },
             changeTarget:function(player,targets){
                 var target=targets[0];
-                targets.push(target.next);
-                targets.push(target.previous);
+                var add=game.filterPlayer(function(player){
+                    return get.distance(target,player,'pure')==1;
+                });
+                for(var i=0;i<add.length;i++){
+                    targets.add(add[i]);
+                }
             },
             content:function(){
                 if(get.color(cards[0])=='red'){
@@ -88,7 +346,14 @@ character.ow={
                 order:11,
                 result:{
                     playerx:function(player,target){
-                        return ai.get.attitude(player,target)+ai.get.attitude(player,target.next)+ai.get.attitude(player,target.previous);
+                        var targets=game.filterPlayer(function(player){
+                            return player==target||get.distance(target,player,'pure')==1;
+                        });
+                        var num=0;
+                        for(var i=0;i<targets.length;i++){
+                            num+=ai.get.attitude(player,targets[i]);
+                        }
+                        return num;
                     },
                     player:function(player,target){
                         var num=lib.skill.bingqiang.ai.result.playerx(player,target);
@@ -250,9 +515,12 @@ character.ow={
         shuangqiang:{
 			trigger:{source:'damageBegin'},
 			check:function(event,player){
-				var att=ai.get.attitude(player,event.target);
-				if(event.target.hp==1) return att>0;
+				var att=ai.get.attitude(player,event.player);
+				if(event.player.hp==1) return att>0;
 				return att<=0;
+			},
+            prompt:function(event,player){
+				return '是否对'+get.translation(event.player)+'发动【霜枪】？';
 			},
 			filter:function(event,player){
 				return !event.player.isTurnedOver()&&event.num>0;
@@ -1616,6 +1884,22 @@ character.ow={
         }
     },
     translate:{
+        mianzhen:'眠针',
+        mianzhen2:'眠针',
+        mianzhen_info:'出牌阶段限一次，你可以弃置一张黑色牌，并令一名其他角色不能使用或打出手牌直到其受到伤害或下一回合结束',
+        zhiyuan:'支援',
+        zhiyuan_info:'每当你即将造成伤害，你可以防止此伤害，改为令目标回复等量的体力',
+        juji:'狙击',
+        juji2:'狙击',
+        juji3:'狙击',
+        juji_info:'出牌阶段限一次，你可以指定一名角色，你对该角色使用卡牌无视距离且该角色对你使用卡牌无视距离，直到该角色的下一回合结束；锁定技，攻击范围不含你的角色无法闪避你的杀',
+        duwen:'毒吻',
+        duwen_info:'锁定技，当你使用杀造成伤害时，若你的手牌数与受伤害角色相等，此杀的伤害+1；若你的体力值与受伤害角色相等，此杀的伤害+1；在伤害结算后，若伤害值不小于3，你流失两点体力',
+        zhuagou:'抓钩',
+        zhuagou_info:'出牌阶段限一次，你可以弃置一张手牌并将你的座位移到任意位置',
+        dulei:'诡雷',
+        dulei2:'诡雷',
+        dulei_info:'出牌阶段，若你武将牌上没有牌，你可以将一张牌背面朝上置于你的武将牌上，当一名角色使用与该牌花色相同的牌指定你为目标时，你展示并将此牌置于弃牌堆，然后该角色失去一点体力并随机弃置一张牌',
         shuangqiang:'霜枪',
         shuangqiang_info:'每当你对一名未翻面的角色造成伤害，你可以令伤害-1，然后令受伤害角色翻面',
         bingqiang:'冰墙',
@@ -1697,5 +1981,16 @@ character.ow={
         ow_chanyata:'禅雅塔',
         ow_dva:'DVA',
         ow_mei:'小美',
+        ow_heibaihe:'黑百合',
+        ow_ana:'安娜',
+        ow_baolei:'堡垒',
+        ow_maikelei:'麦克雷',
+        ow_banzang:'半藏',
+        ow_kuangshu:'狂鼠',
+        ow_tuobiang:'托比昂',
+        ow_laiyinhate:'莱因哈特',
+        ow_luba:'路霸',
+        ow_wensidun:'温斯顿',
+        ow_zhaliya:'查莉娅',
     }
 };

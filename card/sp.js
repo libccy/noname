@@ -394,6 +394,7 @@ card.sp={
 					return true;
 				},
 				check:function(button){
+					if(button.link.name=='du') return -2;
 					var player=_status.event.player;
 					if(get.select(get.info(button.link).selectTarget)[1]==-1){
 						if(get.type(button.link)=='delay') return -1;

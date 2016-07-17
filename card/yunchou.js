@@ -528,8 +528,7 @@ card.yunchou={
 				else{
 					target.chooseToDiscard('he',2).ai=function(card){
 						if(target.hasSkillTag('nofire')) return 0;
-						if(ai.get.damageEffect(target,player,target,'fire')>=0&&
-							!target.hasSkillTag('maixie')) return 0;
+						if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
 						if(player.get('s').contains('xinwuyan')) return 0;
 						if(target.get('s').contains('xinwuyan')) return 0;
 						if(card.name=='tao') return 0;

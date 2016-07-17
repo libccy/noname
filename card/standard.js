@@ -1463,6 +1463,10 @@ card.standard={
 				return true;
 			},
 			audio:true,
+			check:function(event,player){
+				if(ai.get.damageEffect(player,event.player,player)>=0) return false;
+				return true;
+			},
 			content:function(){
 				"step 0"
 				player.judge('bagua',function(card){return (get.color(card)=='red')?1.5:-0.5});
