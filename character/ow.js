@@ -14,9 +14,9 @@ character.ow={
         ow_mei:['female','wei',3,['bingqiang','jidong','baoxue']],
         ow_ana:['female','wei',3,['juji','zhiyuan','mianzhen']],
         ow_heibaihe:['female','qun',3,['juji','duwen','dulei']],
+        ow_maikelei:['male','shu',4,['shanguang','tiandan','shenqiang']],
 
         // ow_baolei:['female','shu',3,[]],
-        // ow_maikelei:['male','shu',4,[]],
         // ow_banzang:['male','shu',4,[]],
         // ow_kuangshu:['male','shu',4,[]],
         // ow_tuobiang:['male','shu',4,[]],
@@ -26,6 +26,40 @@ character.ow={
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
+        shenqiang:{
+            trigger:{player:'shaHit'},
+            forced:true,
+            filter:function(event){
+                return event.targets&&event.targets.length>1&&_status.currentPhase==player;
+            },
+            content:function(){
+                player.getStat().card.sha--;
+            }
+        },
+        tiandan:{
+            trigger:{player:'phaseUseBefore'},
+            filter:function(event,player){
+                return player.maxHp>player.num('h');
+            },
+            check:function(event,player){
+                var nh=player.num('h');
+                if(player.maxHp-nh>=2) return true;
+                if(nh>player.hp) return true;
+                if(nh==player.hp) return nh<=2;
+                return false;
+            },
+            content:function(){
+                var num=player.maxHp-player.num('h');
+                var cards=[];
+                while(num--){
+                    cards.push(game.createCard('sha'));
+                }
+                player.gain(cards,'gain2');
+                trigger.untrigger();
+                trigger.finish();
+                player.skip('phaseDiscard');
+            }
+        },
         baoxue:{
             enable:'phaseUse',
             init:function(player){
@@ -1958,9 +1992,15 @@ character.ow={
         }
     },
     translate:{
+        shanguang:'闪光',
+        shanguang_info:'出牌阶段限一次，你可以弃置一张牌令一名其他角色本回合内不能使用或打出卡牌',
+        tiandan:'填弹',
+        tiandan_info:'你可以跳过出牌和弃牌阶段，然后获得若干张杀直到你的手牌数等于你的体力上限',
+        shenqiang:'神枪',
+        shenqiang_info:'若你使用杀指定了惟一目标且命中目标，则此杀不计入回合内的出杀次数限制',
         mianzhen:'眠针',
         mianzhen2:'眠针',
-        mianzhen_info:'出牌阶段限一次，你可以弃置一张黑色牌，并令一名其他角色不能使用或打出手牌直到其受到伤害或下一回合结束',
+        mianzhen_info:'出牌阶段限一次，你可以弃置一张黑色牌，并令一名其他角色不能使用或打出卡牌直到其受到伤害或下一回合结束',
         zhiyuan:'支援',
         zhiyuan_info:'每当你即将造成伤害，你可以防止此伤害，改为令目标回复等量的体力',
         juji:'狙击',
