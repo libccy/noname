@@ -60,6 +60,29 @@ character.ow={
                 player.skip('phaseDiscard');
             }
         },
+        shanguang:{
+            enable:'phaseUse',
+            usable:1,
+            filterCard:true,
+            position:'he',
+            filterTarget:function(card,player,target){
+                return target!=player;
+            },
+            check:function(card){
+                return 6-ai.get.value(card);
+            },
+            content:function(){
+                target.addTempSkill('shanguang2','phaseAfter');
+            },
+            ai:{
+                order:10,
+                result:{
+                    target:function(player,target){
+                        
+                    }
+                }
+            }
+        },
         baoxue:{
             enable:'phaseUse',
             init:function(player){
