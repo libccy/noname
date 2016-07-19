@@ -2465,5 +2465,7 @@ card.swd={
 		['spade',3,'mujiaren'],
 		['heart',3,'mujiaren'],
 		['diamond',3,'mujiaren'],
+
+		['spade',4,'sifeizhenmian'],
 	],
 }
