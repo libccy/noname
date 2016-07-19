@@ -755,9 +755,9 @@ card.guozhan={
 			forced:true,
 			popup:false,
 			content:function(){
-				var cards=player.get('e','huxinjing');
-				if(cards.length){
-					player.discard(cards);
+				var card=player.get('e','2');
+				if(card){
+					player.discard(card);
 				}
 			}
 		},

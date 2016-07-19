@@ -821,9 +821,9 @@ card.yunchou={
 		['diamond',3,'liuxinghuoyu','fire'],
 		['heart',6,'liuxinghuoyu','fire'],
 		['heart',9,'liuxinghuoyu','fire'],
-		['spade',3,'dujian'],
-		['club',11,'dujian'],
-		['club',12,'dujian'],
+		['spade',3,'dujian','poison'],
+		['club',11,'dujian','poison'],
+		['club',12,'dujian','poison'],
 		['heart',3,'yihuajiemu'],
 		["diamond",3,'guohe'],
 

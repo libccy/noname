@@ -6147,6 +6147,9 @@
 					next.skill=event.skill;
 					next.multitarget=info.multitarget;
 					next.preResult=event.preResult;
+                    if(info.targetDelay===false){
+                        event.targetDelay=false;
+                    }
 					if(num==0&&next.targets.length>1){
 						if(!info.multitarget){
 							lib.tempSortSeat=player;
@@ -6184,7 +6187,9 @@
 								}
 							}
 						}
-						else game.delayx(0.5);
+						else if(event.targetDelay!==false){
+                            game.delayx(0.5);
+                        }
 					}
 					"step 3"
 					if(!get.info(event.card).multitarget&&num<targets.length-1){

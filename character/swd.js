@@ -1042,6 +1042,7 @@ character.swd={
 				}).ai=function(target){
 					if(ai.get.attitude(player,target)<=0) return 0;
 					var eff=-ai.get.damageEffect(target,target,player)+(player==target?2:0);
+					if(target.hp==1) eff+=2;
 					return Math.min(1,eff);
 				};
 				"step 1"
@@ -7885,7 +7886,7 @@ character.swd={
 		touxi:'偷袭',
 		touxi_info:'在其他角色的回合结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以弃置你的一张牌',
 		minjing:'明镜',
-		minjing_info:'锁定技，每当你受到伤害时，若你没有防具牌，有1/3的概率令伤害-1',
+		minjing_info:'若你没有防具牌，你视为装备了光纱天衣',
 		qimou:'奇谋',
 		qimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并立即使用之',
 		mufeng:'沐风',

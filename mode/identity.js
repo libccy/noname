@@ -1211,7 +1211,7 @@ mode.identity={
 
 			},
 			logAi:function(targets,card){
-				if(this.ai.shown==1) return;
+				if(this.ai.shown==1||this.isMad()) return;
 				if(typeof targets=='number'){
 					this.ai.shown+=targets;
 				}

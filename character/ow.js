@@ -15,48 +15,195 @@ character.ow={
         ow_ana:['female','wei',3,['juji','zhiyuan','mianzhen']],
         ow_heibaihe:['female','qun',3,['juji','duwen','dulei']],
         ow_maikelei:['male','shu',4,['shanguang','tiandan','shenqiang']],
+        ow_kuangshu:['male','shu',3,['liudan','shoujia','shihuo']],
 
+        // ow_tuobiang:['male','shu',3,[]],
         // ow_baolei:['female','shu',3,[]],
         // ow_banzang:['male','shu',4,[]],
-        // ow_kuangshu:['male','shu',4,[]],
-        // ow_tuobiang:['male','shu',4,[]],
         // ow_laiyinhate:['male','shu',4,[]],
         // ow_luba:['male','shu',4,[]],
         // ow_wensidun:['male','shu',4,[]],
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
-        shenqiang:{
-            trigger:{player:'shaHit'},
+        shihuo:{
+            trigger:{global:'damageEnd'},
             forced:true,
             filter:function(event){
-                return event.targets&&event.targets.length>1&&_status.currentPhase==player;
+                return event.nature=='fire';
+            },
+            content:function(){
+                player.draw();
+            }
+        },
+        shoujia:{
+			enable:'phaseUse',
+            usable:1,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			filterCard:true,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			discard:false,
+			prepare:function(cards,player,targets){
+				player.$give(1,targets[0]);
+			},
+            filterTarget:function(card,player,target){
+                return target!=player&&!target.hasSkill('shoujia2');
+            },
+			content:function(){
+				target.storage.shoujia=cards[0];
+                target.storage.shoujia2=player;
+				target.addSkill('shoujia2');
+                target.syncStorage('shoujia');
+			},
+			ai:{
+				order:1,
+                expose:0.2,
+                threaten:1.4,
+				result:{
+					target:-1
+				}
+			}
+		},
+		shoujia2:{
+			mark:true,
+			trigger:{player:'useCardToBegin'},
+			forced:true,
+			filter:function(event,player){
+				return get.suit(event.card)==get.suit(player.storage.shoujia)&&event.target!=player;
+			},
+			content:function(){
+				'step 0'
+				player.showCards([player.storage.shoujia],get.translation(player)+'发动了【兽夹】');
+				'step 1'
+				ui.discardPile.appendChild(player.storage.shoujia);
+                delete player.storage.shoujia;
+				delete player.storage.shoujia2;
+				player.removeSkill('shoujia2');
+                game.addVideo('storage',player,['shoujia',null]);
+				game.addVideo('storage',player,['shoujia2',null]);
+				if(!player.isTurnedOver()){
+                    player.turnOver();
+                }
+			},
+			intro:{
+				mark:function(dialog,content,player){
+					if(player.storage.shoujia2&&player.storage.shoujia2.isUnderControl(true)){
+						dialog.add([player.storage.shoujia]);
+					}
+                    else{
+                        return '已成为'+get.translation(player.storage.shoujia2)+'的兽夹目标';
+                    }
+				},
+				content:function(content,player){
+					if(player.storage.shoujia2&&player.storage.shoujia2.isUnderControl(true)){
+						return get.translation(player.storage.shoujia);
+					}
+					return '已成为'+get.translation(player.storage.shoujia2)+'的兽夹目标';
+				}
+			},
+            group:'shoujia3'
+		},
+        shoujia3:{
+            trigger:{source:'damageEnd'},
+            forced:true,
+            filter:function(event,player){
+                return event.player==player.storage.shoujia2;
+            },
+            content:function(){
+                ui.discardPile.appendChild(player.storage.shoujia);
+                player.$throw(player.storage.shoujia);
+                delete player.storage.shoujia;
+				delete player.storage.shoujia2;
+				player.removeSkill('shoujia2');
+                game.addVideo('storage',player,['shoujia',null]);
+				game.addVideo('storage',player,['shoujia2',null]);
+            }
+        },
+        liudan:{
+			trigger:{player:'useCard'},
+			popup:false,
+            check:function(event,player){
+                var list=[];
+                for(var i=0;i<game.players.length;i++){
+					if(event.targets.contains(game.players[i])==false&&
+					game.players[i]!=player&&
+					lib.filter.targetEnabled(event.card,player,game.players[i])){
+						list.push(game.players[i]);
+					}
+				}
+				var num=0;
+                for(var i=0;i<list.length;i++){
+                    num+=ai.get.effect(list[i],event.card,player,player);
+                }
+                return num>=0;
+            },
+			filter:function(event,player){
+				if(event.card.name!='sha') return false;
+				for(var i=0;i<game.players.length;i++){
+					if(event.targets.contains(game.players[i])==false&&
+					game.players[i]!=player&&
+					lib.filter.targetEnabled(event.card,player,game.players[i])){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(trigger.targets.contains(game.players[i])==false&&
+					game.players[i]!=player&&
+					lib.filter.targetEnabled(trigger.card,player,game.players[i])){
+						list.push(game.players[i]);
+					}
+				}
+				if(list.length){
+                    var list2=[];
+                    for(var i=0;i<list.length;i++){
+                        if(Math.random()<0.5){
+                            list2.push(list[i]);
+                            trigger.targets.push(list[i]);
+                        }
+                    }
+                    if(list2.length){
+                        game.log(list2,'被追加为额外目标');
+                        player.line(list2,'green');
+                    }
+				}
+			}
+		},
+        shenqiang:{
+            trigger:{source:'damageEnd'},
+            forced:true,
+            filter:function(event,player){
+                return event.card&&event.card.name=='sha'&&_status.currentPhase==player;
             },
             content:function(){
                 player.getStat().card.sha--;
             }
         },
         tiandan:{
-            trigger:{player:'phaseUseBefore'},
+            trigger:{player:'phaseDrawBegin'},
             filter:function(event,player){
-                return player.maxHp>player.num('h');
+                return Math.min(5,player.hp)>player.num('h')&&!player.skipList.contains('phaseUse')&&!player.skipList.contains('phaseDiscard');
             },
             check:function(event,player){
                 var nh=player.num('h');
-                if(player.maxHp-nh>=2) return true;
-                if(nh>player.hp) return true;
-                if(nh==player.hp) return nh<=2;
+                if(Math.min(5,player.hp)-nh>=2) return true;
                 return false;
             },
             content:function(){
-                var num=player.maxHp-player.num('h');
+                var num=Math.min(5,player.hp)-player.num('h');
                 var cards=[];
                 while(num--){
                     cards.push(game.createCard('sha'));
                 }
                 player.gain(cards,'gain2');
-                trigger.untrigger();
-                trigger.finish();
+                player.skip('phaseUse');
                 player.skip('phaseDiscard');
             }
         },
@@ -75,10 +222,41 @@ character.ow={
                 target.addTempSkill('shanguang2','phaseAfter');
             },
             ai:{
-                order:10,
+                order:7.9,
                 result:{
                     target:function(player,target){
-                        
+                        var nh=target.num('h');
+                        if(ai.get.attitude(player,target)<0&&nh>=3&&
+                        player.canUse('sha',target)&&player.num('h','sha')&&
+                        ai.get.effect(target,{name:'sha'},player,player)>0){
+                            return -nh-5;
+                        }
+                        return -nh;
+                    }
+                }
+            }
+        },
+        shanguang2:{
+            mod:{
+				cardEnabled:function(){
+					return false;
+				},
+				cardUsable:function(){
+					return false;
+				},
+				cardRespondable:function(){
+					return false;
+				},
+				cardSavable:function(){
+					return false;
+				}
+			},
+            ai:{
+                effect:{
+                    target:function(card,player,target,current){
+                        if(get.tag(card,'respondShan')||get.tag(card,'respondSha')){
+                            if(current<0) return 1.5;
+                        }
                     }
                 }
             }
@@ -2015,12 +2193,20 @@ character.ow={
         }
     },
     translate:{
+        liudan:'榴弹',
+        liudan_info:'每当你使用一张杀，你可以令所有不是此杀目标的其他角色有50%概率成为此杀的额外目标',
+        shoujia:'兽夹',
+        shoujia2:'兽夹',
+        shoujia3:'兽夹',
+        shoujia_info:'出牌阶段限一次，你可以将一张牌背面朝上置于一名其他角色的武将牌上，当该角色使用一张与此牌花色相同的牌指定其他角色为目标时，将此牌置入弃牌堆，该角色将武将牌翻至背面；当该角色对你造成伤害时，将此牌置入弃牌堆',
+        shihuo:'嗜火',
+        shihuo_info:'锁定技，每当一名角色受到火焰伤害，你摸一张牌',
         shanguang:'闪光',
         shanguang_info:'出牌阶段限一次，你可以弃置一张牌令一名其他角色本回合内不能使用或打出卡牌',
         tiandan:'填弹',
-        tiandan_info:'你可以跳过出牌和弃牌阶段，然后获得若干张杀直到你的手牌数等于你的体力上限',
+        tiandan_info:'摸牌阶段开始时，你可以跳过出牌和弃牌阶段，然后获得若干张杀直到你的手牌数等于你的体值（最多为5）',
         shenqiang:'神枪',
-        shenqiang_info:'若你使用杀指定了惟一目标且命中目标，则此杀不计入回合内的出杀次数限制',
+        shenqiang_info:'若你使用杀指定了惟一目标且造成伤害，则此杀不计入回合内的出杀次数限制',
         mianzhen:'眠针',
         mianzhen2:'眠针',
         mianzhen_info:'出牌阶段限一次，你可以弃置一张黑色牌，并令一名其他角色不能使用或打出卡牌直到其受到伤害或下一回合结束',

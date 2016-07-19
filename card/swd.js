@@ -404,19 +404,18 @@ card.swd={
 				}
 			}
 		},
-		yuhuanghua:{
+		xianluhui:{
+			fullskin:true,
 			type:'basic',
 			enable:true,
 			selectTarget:-1,
-			// filterTarget:function(card,player,target){
-			// 	return target.hp<target.maxHp;
-			// },
 			filterTarget:true,
+			targetDelay:false,
 			content:function(){
-				"step 0"
 				target.recover();
-				"step 1"
-				target.draw();
+			},
+			contentAfter:function(){
+				game.asyncDraw(targets);
 			},
 			ai:{
 				basic:{
@@ -498,13 +497,15 @@ card.swd={
 			type:'basic',
 			enable:function(){return game.dead.length>0},
 			notarget:true,
+			mode:['identity','guozhan'],
+			fullskin:true,
 			content:function(){
 				"step 0"
 				var list=[];
 				for(var i=0;i<game.dead.length;i++){
 					list.push(game.dead[i].name);
 				}
-				player.chooseButton(ui.create.dialog([list,'character']),function(button){
+				player.chooseButton(ui.create.dialog('选择要复活的角色',[list,'character']),function(button){
 					for(var i=0;i<game.dead.length&&game.dead[i].name!=button.link;i++);
 					return ai.get.attitude(_status.event.player,game.dead[i]);
 				},true);
@@ -513,17 +514,21 @@ card.swd={
 					for(var i=0;i<game.dead.length&&game.dead[i].name!=result.buttons[0].link;i++);
 					var dead=game.dead[i];
 					dead.revive(1);
-					player.logSkill('huanpodan',dead);
-					player.loseHp();
+					game.addVideo('revive',dead);
+					event.dead=dead;
 				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(event.dead) event.dead.draw();
 			},
 			ai:{
 				basic:{
 					useful:[4,2],
-					value:[9,2],
+					value:[7,2],
 				},
 				order:function(card,player){
-					if(player.hp<=2) return -1;
 					for(var i=0;i<game.dead.length;i++){
 						if(ai.get.attitude(player,game.dead[i])>3) return 7;
 					}
@@ -531,7 +536,6 @@ card.swd={
 				},
 				result:{
 					player:function(player){
-						if(player.hp<=2) return -1;
 						for(var i=0;i<game.dead.length;i++){
 							if(ai.get.attitude(player,game.dead[i])>3) return 2;
 						}
@@ -864,6 +868,7 @@ card.swd={
 		guangshatianyi:{
 			fullskin:true,
 			type:'equip',
+			chongzhu:true,
 			enable:function(card,player){
 				return player.sex=='female';
 			},
@@ -878,8 +883,9 @@ card.swd={
 				}
 			}
 		},
-		guilingzhitao:{
+		guilingyupei:{
 			type:'equip',
+			fullskin:true,
 			subtype:'equip5',
 			skills:['nigong'],
 			ai:{
@@ -892,9 +898,11 @@ card.swd={
 			},
 			onLose:function(){
 				player.storage.nigong=0;
+				player.unmarkSkill('nigong');
 			},
 			onEquip:function(){
 				player.storage.nigong=0;
+				player.markSkill('nigong');
 			}
 		},
 		qipoguyu:{
@@ -919,6 +927,17 @@ card.swd={
 				}
 			},
 		},
+		sifeizhenmian:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip5',
+			skills:['yiluan'],
+			ai:{
+				basic:{
+					equipValue:5.5
+				}
+			},
+		},
 		ximohu:{
 			type:'equip',
 			subtype:'equip5',
@@ -930,6 +949,7 @@ card.swd={
 			},
 		},
 		guiyanfadao:{
+			fullskin:true,
 			type:'equip',
 			subtype:'equip1',
 			distance:{attackFrom:-1},
@@ -942,6 +962,30 @@ card.swd={
 		},
 	},
 	skill:{
+		yiluan:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:true,
+			content:function(){
+				'step 0'
+				target.judge(function(card){
+					return get.color(card)=='red'?1:-1;
+				});
+				'step 1'
+				if(result.color=='red'){
+					target.draw();
+				}
+				else{
+					target.goMad({player:'phaseAfter'});
+				}
+			},
+			ai:{
+				order:1,
+				result:{
+					target:-1
+				}
+			}
+		},
 		hslingjian_xuanfengzhiren_equip1:{
 			trigger:{source:'damageEnd'},
 			forced:true,
@@ -1351,26 +1395,24 @@ card.swd={
 			}
 		},
 		hslingjian_shijianhuisu_equip1:{
-			onLose:function(){
-				"step 0"
-				game.delay(0.5);
-				player.chooseTarget([1,1],'是否发动【回溯】？',function(card,player,target){
-					if(player==target) return false;
-					return target.num('he')>0;
-				}).ai=function(target){
-					return -ai.get.attitude(player,target);
-				};
-				"step 1"
-				if(result.bool){
-					player.line(result.targets,'green');
-					player.discardPlayerCard(result.targets[0],'he',true);
-				}
-			}
+			trigger:{player:'equipEnd'},
+			forced:true,
+			filter:function(event,player){
+				return get.subtype(event.card)=='equip2';
+			},
+			content:function(){
+				player.draw();
+			},
 		},
 		hslingjian_shijianhuisu_equip2:{
-			onLose:function(){
+			trigger:{player:'equipEnd'},
+			forced:true,
+			filter:function(event,player){
+				return get.subtype(event.card)=='equip1';
+			},
+			content:function(){
 				player.draw();
-			}
+			},
 		},
 		hslingjian_shijianhuisu_equip3:{
 			mod:{
@@ -1573,12 +1615,6 @@ card.swd={
 				for(var i=0;i<cards.length;i++){
 					var name2=cards[i].name+'_'+get.subtype(equip);
 					lib.card[name].skills.add(name2);
-					if(lib.skill[name2].onEquip){
-						lib.card[name].onEquip=lib.skill[name2].onEquip;
-					}
-					if(lib.skill[name2].onLose){
-						lib.card[name].onLose=lib.skill[name2].onLose;
-					}
 					lib.translate[name2]=lib.translate[cards[i].name+'_duanzao'];
 					str2+='；'+lib.translate[name2+'_info'];
 				}
@@ -2012,7 +2048,7 @@ card.swd={
 			trigger:{player:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				if(event.source&&event.source.num('s','unequip')) return;
+				if(event.source&&event.source.num('s','unequip')) return false;
 				if(Math.random()>1/3) return false;
 				if(event.parent.player.num('s','unequip')) return false;
 				return true;
@@ -2030,9 +2066,9 @@ card.swd={
 				if(player.storage.nigong>4){
 					player.storage.nigong=4;
 				}
+				player.updateMarks();
 			},
 			ai:{
-				threaten:0.6,
 				effect:function(card,player,target){
 					if(get.tag(card,'damage')) return [1,0.5];
 				}
@@ -2052,9 +2088,13 @@ card.swd={
 			filterTarget:function(card,player,target){
 				return player!=target;
 			},
+			prompt:function(event){
+				return '弃置所有逆攻标记，并对一名角色造成'+get.cnNumber(Math.floor(event.player.storage.nigong/2))+'点伤害';
+			},
 			content:function(){
 				target.damage(Math.floor(player.storage.nigong/2));
 				player.storage.nigong=0;
+				player.updateMarks();
 			},
 			ai:{
 				order:10,
@@ -2137,15 +2177,20 @@ card.swd={
 			}
 		},
 		guiyanfadao:{
-			trigger:{player:'useCardToBefore'},
-			priority:5,
-			filter:function(event,player){
-				if(event.card.name=='sha'&&!event.card.nature) return true;
+			trigger:{player:'shaHit'},
+			check:function(event,player){
+				var att=ai.get.attitude(player,event.target);
+				if(player.skills.contains('jiu')) return att>0;
+				if(event.target.hasSkillTag('maixie')){
+					return att<=0;
+				}
+				if(event.target.hp==1) return att>0;
+				if(player.skills.contains('tianxianjiu')) return false;
+				return att<=0;
 			},
 			content:function(){
-				trigger.card.nature='poison';
-				player.addSkill('guiyanfadao2');
-				player.storage.zhuque_skill=trigger.card;
+				trigger.unhurt=true;
+				trigger.target.loseHp();
 			}
 		},
 		guiyanfadao2:{
@@ -2216,8 +2261,8 @@ card.swd={
 		hslingjian_shengxiuhaojiao_equip5_info:'出牌阶段限一次，你可以弃置两张牌，然后令一名角色获得或解除嘲讽',
 		hslingjian_shijianhuisu_duanzao:'回溯',
 		hslingjian_shijianhuisu_duanzao2:'溯',
-		hslingjian_shijianhuisu_equip1_info:'当你失去此牌时，你可以弃置一名角色的一张牌',
-		hslingjian_shijianhuisu_equip2_info:'当你失去此牌时，你摸一张牌',
+		hslingjian_shijianhuisu_equip1_info:'当你装备一张防具牌时，你摸一张牌',
+		hslingjian_shijianhuisu_equip2_info:'当你装备一张武器牌时，你摸一张牌',
 		hslingjian_shijianhuisu_equip3_info:'当你的装备区内没有其他牌时，你的防御距离+1',
 		hslingjian_shijianhuisu_equip4_info:'当你的装备区内没有其他牌时，你的进攻距离+1',
 		hslingjian_shijianhuisu_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色将其装备区内的牌收回手牌',
@@ -2256,7 +2301,7 @@ card.swd={
 		xingjunyan_info:'你的杀造成的伤害+1；杀对你造成的伤害+1',
 		guiyanfadao:'鬼眼法刀',
 		guiyanfadao_bg:'眼',
-		// guiyanfadao_info:'每当你使用杀命中目标，你可以防止伤害，改为令目标失去一点体力',
+		guiyanfadao_info:'每当你使用杀命中目标，你可以防止伤害，改为令目标失去一点体力',
 		tianxianjiu:'天仙酒',
 		tianxianjiu_bg:'仙',
 		tianxianjiu_info:'出牌阶段对自己使用，你使用的下一张杀造成伤害后可以摸两张牌',
@@ -2264,25 +2309,24 @@ card.swd={
 		xiangyuye_info:'出牌阶段，对一名攻击范围外的角色使用，令其弃置一张黑色手牌或流失一点体力',
 		huanpodan:'还魄丹',
 		huanpodan_bg:'魄',
-		// huanpodan_info:'出牌阶段对一名已死亡角色使用，令其复活并回复一点体力，然后你流失一点体力',
+		huanpodan_info:'出牌阶段对一名已死亡角色使用，令其复活，将体力值变为1，并摸一张牌',
 		ximohu:'吸魔壶',
 		ximohu_bg:'魔',
 		// ximohu_info:'锁定技，你将即将受到的雷属性伤害转化为你的体力值',
 		sadengjinhuan:'萨登荆环',
 		sadengjinhuan_info:'当你的杀被闪避后，可以进行一次判定，若结果为红色目标需再打出一张闪',
-		// sadengjinhuan_info:'锁定技，每当你使用一张杀被闪避后，若此杀在弃牌堆，你有50%的机率对目标再使用一次此杀',
 		sadengjinhuan_bg:'荆',
 		qipoguyu:'奇魄古玉',
 		xujin:'蓄劲',
 		xujin2:'蓄劲',
 		// qipoguyu_info:'装备后获得蓄劲技能',
 		xujin_info:'回合开始前，若你的蓄劲标记数小于当前的体力值，你可以跳过此回合，并获得一枚蓄劲标记。锁定技，每当你即将造成伤害，你令此伤害+X，然后弃置一枚蓄劲标记，X为你拥有的蓄劲标记数',
-		guilingzhitao:'归灵指套',
+		guilingyupei:'归灵玉佩',
 		nigong:'逆攻',
 		nigong2:'逆攻',
 		nigong3:'逆攻',
 		nigong4:'逆攻',
-		// guilingzhitao_info:'装备后获得逆攻技能',
+		guilingyupei_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
 		nigong_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
 		baihupifeng:'白狐披风',
 		baihupifeng_bg:'狐',
@@ -2306,9 +2350,8 @@ card.swd={
 		pusafazhou:'菩萨发咒',
 		pusafazhou_bg:'发',
 		// pusafazhou_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌',
-		yuhuanghua:'雨皇花',
-		yuhuanghua_bg:'皇',
-		// yuhuanghua_info:'令所有角色回复一点体力并摸一张牌',
+		xianluhui:'仙炉灰',
+		xianluhui_info:'令所有角色回复一点体力并摸一张牌',
 		caoyao:'草药',
 		caoyao_info:'出牌阶段，对距离为1以内的角色使用，回复一点体力。',
 		pantao:'蟠桃',
@@ -2337,7 +2380,11 @@ card.swd={
 		chiyuxi_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到1点火焰伤害。',
 		guangshatianyi:'光纱天衣',
 		guangshatianyi_bg:'纱',
-		// guangshatianyi_info:'仅女性可装备，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
+		guangshatianyi_info:'仅女性可装备，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
+		sifeizhenmian:'四非真面',
+		sifeizhenmian_info:'出牌阶段限一次，你可以指定一名角色进行一次判定，若结果为红色，该角色摸一张牌，若结果为黑色，该角色进入混乱状态直到下一回合结束',
+		yiluan:'意乱',
+		yiluan_info:'出牌阶段限一次，你可以指定一名角色进行一次判定，若结果为红色，该角色摸一张牌，若结果为黑色，该角色进入混乱状态直到下一回合结束',
 	},
 	list:[
 		['spade',1,'baihupifeng'],
@@ -2348,7 +2395,7 @@ card.swd={
 //		['diamond',2,'xiayuncailing'],
 		// ['spade',2,'pusafazhou'],
 //		['heart',2,'pantao'],
-		//['club',2,'huanpodan'],
+		['club',2,'huanpodan'],
 
 		['club',3,'caoyao'],
 		['diamond',3,'chilongya','fire'],
@@ -2357,12 +2404,12 @@ card.swd={
 
 		['club',4,'caoyao'],
 		['spade',4,'zhufangshenshi'],
-		//['spade',4,'huanpodan'],
+		['spade',4,'huanpodan'],
 //		['diamond',4,'xiangyuye','poison'],
 
 		['club',5,'caoyao'],
 		['spade',5,'xixueguizhihuan'],
-		//['diamond',5,'huanpodan'],
+		['diamond',5,'huanpodan'],
 
 		['club',6,'shentoumianju'],
 		['spade',6,'yufulu'],
@@ -2371,16 +2418,16 @@ card.swd={
 
 		['diamond',7,'chiyuxi','fire'],
 		['club',7,'jingleishan','thunder'],
-		// ['spade',7,'guilingzhitao'],
+		['spade',7,'guilingyupei'],
 //		['heart',7,'xiangyuye','poison'],
 
 		['spade',8,'zhufangshenshi'],
-		['club',8,'xiangyuye'],
+		['club',8,'xiangyuye','poison'],
 		//['heart',8,'huanpodan'],
 
 		// ['spade',9,'ximohu','brown'],
 		['club',9,'guiyoujie'],
-		['diamond',9,'xiangyuye'],
+		['diamond',9,'xiangyuye','poison'],
 
 		// ['diamond',9,'tianxianjiu'],
 		['heart',9,'tianxianjiu'],
@@ -2393,14 +2440,14 @@ card.swd={
 		//['spade',10,'qipoguyu'],
 		//['diamond',10,'xiangyuye','poison'],
 
-		['spade',11,'xiangyuye'],
+		['spade',11,'xiangyuye','poison'],
 		// ['club',11,'xiangyuye','poison'],
 
 //		['diamond',12,'xiangyuye','poison'],
-		//['spade',12,'guiyanfadao','poison'],
+		['spade',12,'guiyanfadao','poison'],
 
-		// ['heart',13,'yuhuanghua'],
-		// ['diamond',13,'guangshatianyi'],
+		['spade',13,'xianluhui'],
+		['diamond',3,'guangshatianyi'],
 		['club',13,'sadengjinhuan'],
 		//['spade',6,'xiangyuye','poison'],
 

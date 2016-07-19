@@ -1316,11 +1316,13 @@ character.yxs={
 					if(trigger.player.skills.contains('wushuang')) return 0;
 					if(trigger.player.skills.contains('liegong')) return 0;
 					if(trigger.player.skills.contains('tieji')) return 0;
+					if(trigger.player.skills.contains('juji')) return 0;
 					if(trigger.player.skills.contains('retieji')) return 0;
 					if(trigger.player.skills.contains('roulin')&&trigger.target.sex=='female') return 0;
 					if(trigger.player.skills.contains('nvquan')&&trigger.target.sex=='male') return 0;
 					if(trigger.target.skills.contains('yijue2')) return 0;
 					if(trigger.target.skills.contains('shejie2')) return 0;
+					if(trigger.target.skills.contains('shanguang2')) return 0;
 
 					var equip=trigger.target.get('e','2');
 					if(equip&&equip.name=='bagua') return 1;
