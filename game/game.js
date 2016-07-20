@@ -6603,7 +6603,7 @@
 						event.finish();
 					}
 					"step 1"
-					if(event.source) game.delayx();
+					if(event.source&&event.delay!==false) game.delayx();
 					"step 2"
 					if(player.getStat().gain==undefined){
 						player.getStat().gain=cards.length;
@@ -20953,6 +20953,44 @@
                             if(lib.card[info[i]].derivation&&mode!='mode_derivation') continue;
 							list.push(['',get.translation(get.type(info[i],'trick')),info[i]]);
 						}
+                        var sortCard=function(card){
+                            var type=lib.card[card[2]].type;
+                            if(lib.cardType[type]){
+                                return lib.cardType[type];
+                            }
+                            switch(type){
+                                case 'basic':return 0;
+                                case 'chess':return 1.5;
+                                case 'trick':return 2;
+                                case 'delay':return 3;
+                                case 'equip':{
+                                    switch(lib.card[card[2]].subtype){
+                                        case 'equip1':return 4.1;
+                                        case 'equip2':return 4.2;
+                                        case 'equip3':return 4.3;
+                                        case 'equip4':return 4.4;
+                                        case 'equip5':return 4.5;
+                                        default:return 4;
+                                    }
+                                    break;
+                                }
+                                case 'zhenfa':return 5;
+                                default:return 6;
+                            }
+                        }
+                        list.sort(function(a,b){
+                            var sort1=sortCard(a);
+                            var sort2=sortCard(b);
+                            if(sort1==sort2){
+                                return (b[2]<a[2])?1:-1;
+                            }
+                            else if(sort1>sort2){
+                                return 1;
+                            }
+                            else{
+                                return -1;
+                            }
+                        });
 						var cfgnode=createConfig({
 							name:'开启',
 							_name:mode,
@@ -28491,6 +28529,9 @@
 							uiintro.add('<div class="text center">攻击范围：1</div>');
 						}
 					}
+                    else if(get.type(node)=='equip'){
+                        uiintro.add('<div class="text center">'+get.translation(get.subtype(node))+'</div>');
+                    }
 					else if(lib.card[name]&&lib.card[name].addinfomenu){
 						uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
 					}

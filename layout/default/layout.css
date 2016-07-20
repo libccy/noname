@@ -615,8 +615,8 @@ div:not(.handcards)>.card>.info>span,
 	z-index: 1;
 	display: block !important;
 }
-.player:not(.linked2) .marks>div:first-child,
-.marks .removing{
+#arena.oldlayout .player:not(.linked2) .marks>div:first-child,
+#arena.oldlayout .player .marks .removing{
 	margin-left: -12px;
 	margin-right:-12px;
 	opacity:0;

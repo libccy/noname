@@ -24,7 +24,6 @@ card.pack={
     zhenfa:'阵法',
     yunchou:'运筹帷幄',
     swd:'轩辕剑',
-    shenqi:'上古神器',
     hearth:'炉石传说',
     compensate:'补充卡牌',
 };

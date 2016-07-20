@@ -23,7 +23,7 @@ character.swd={
 			swd_shuijing:['female','qun',4,['mojian','duanyue']],
 			swd_quxian:['female','qun',3,['mojian','huanxia']],
 			swd_xiyan:['male','qun',3,['tianshu','daofa']],
-			swd_cheyun:['female','wu',3,['shengong','xianjiang3','qiaoxie']],
+			swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
 			swd_huanyuanzhi:['male','qun',3,['lanzhi','mufeng','tianshu']],
 			swd_murongshi:['female','shu',4,['duanyi','guxing']],
 			swd_jipeng:['male','wu',3,['reyingzi','guozao']],
@@ -3921,8 +3921,6 @@ character.swd={
 				else{
 					event.finish();
 				}
-				"step 2"
-				player.gain(game.createCard(get.typeCard('hslingjian').randomGet()),'gain2');
 			},
 		},
 		qiaoxie4:{
@@ -4459,7 +4457,7 @@ character.swd={
 				threaten:1.5
 			}
 		},
-		xianjiang:{
+		xianjiang_old:{
 			enable:'phaseUse',
 			position:'he',
 			usable:1,
@@ -4515,14 +4513,13 @@ character.swd={
 				player.storage.xianjiang=[];
 			}
 		},
-		xianjiang3:{
+		xianjiang:{
 			enable:'phaseUse',
 			filterCard:function(card){
 				return get.type(card,'trick')=='trick';
 			},
 			usable:1,
 			filter:function(event,player){
-				if(player.num('e')) return false;
 				if(player.num('h',{type:'trick'})) return true;
 				if(player.num('h',{type:'delay'})) return true;
 				return false;
@@ -4532,7 +4529,12 @@ character.swd={
 				return 8-ai.get.value(card);
 			},
 			content:function(){
-				player.gain(game.createCard(get.inpile('equip').randomGet()),'gain');
+				if(player.num('e')){
+					player.gain(game.createCard(['jiguanshu','jiguanyuan','jiguanfeng'].randomGet()),'gain');
+				}
+				else{
+					player.gain(game.createCard(get.inpile('equip').randomGet()),'gain');
+				}
 			},
 			ai:{
 				result:{
@@ -8048,7 +8050,7 @@ character.swd={
 		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，然后弃置一张手牌',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
-		qiaoxie_info:'每当你装备一张牌，可摸一张牌；每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌，然后获得一个随机零件',
+		qiaoxie_info:'每当你装备一张牌，可摸一张牌；每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',
 		mailun_info:'回合开始阶段，你可以选择一个脉轮效果直到下一回合开始',
 		guiyan_info:'出牌阶段，你可以观看一名角色的手牌，并获得其中一张梅花牌，每阶段限一次。当你首次进入濒死状态时，你须回复一点体力并失去技能鬼眼',
 		busi_info:'锁定技，当你进入濒死状态时，你进行一次判定，若结果不为黑桃，你将体力回复至1并将武将牌翻至背面',
@@ -8079,8 +8081,8 @@ character.swd={
 		daixing_info:'回合结束阶段，你可以任意张牌并获得等量的护甲，这些护甲将在你的下个回合开始阶段消失',
 		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
 		qingcheng_info:'回合结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
-		xianjiang_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
-		xianjiang3_info:'出牌阶段限一次，若你装备区内没有牌，你可以弃置一张锦囊牌，并随机获得一张装备牌',
+		xianjiang_old_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
+		xianjiang_info:'出牌阶段限一次，你可以弃置一张锦囊牌，若你装备区内没有牌，你获得一张装备牌，否则你获得一张机关牌',
 		shengong_info:'每当你需要打出一张杀或闪时，你可以弃置一名其他角色装备区内的一张武器牌或防具牌，视为打出一张杀或闪，然后该角色摸一张牌，你弃一张牌',
 		ningjian_info:'你可以将一张红色牌当闪、黑色牌当杀使用或打出',
 		taixu_info:'限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1为其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1',

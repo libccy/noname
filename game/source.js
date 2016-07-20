@@ -4,7 +4,6 @@ window.noname_source_list=[
     'card/guozhan.js',
     'card/hearth.js',
     'card/sp.js',
-    'card/shenqi.js',
     'card/standard.js',
     'card/swd.js',
     'card/yunchou.js',
