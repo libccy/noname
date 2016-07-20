@@ -3,6 +3,7 @@ window.noname_update={
     changeLog:[
         '修bug',
         '横置样式',
+        '结束后可看手牌',
     ],
     files:{
         global:[

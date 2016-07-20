@@ -16850,6 +16850,14 @@
 			}
 			dialog.add(ui.create.div('.placeholder'));
 			dialog.add(ui.create.div('.placeholder'));
+
+            for(var i=0;i<game.players.length;i++){
+                var hs=game.players[i].get('h');
+                if(hs.length){
+                    dialog.add('<div class="text center">'+get.translation(game.players[i])+'</div>');
+                    dialog.addSmall(hs);
+                }
+            }
             var clients=game.players.concat(game.dead);
             for(var i=0;i<clients.length;i++){
                 if(clients[i].isOnline2()){
@@ -28234,6 +28242,7 @@
 					capt+='&nbsp;&nbsp;'+lib.translate[lib.character[node.name][1]];
 				}
 				uiintro.add(capt);
+
 				var skills=node.skills;
 				var skills2=game.filterSkills(node.skills,node);
 				for(i=0;i<skills.length;i++){
