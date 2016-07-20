@@ -2090,9 +2090,9 @@ character.shenhua={
 				player.unmarkSkill('niepan');
 				player.storage.niepan=true;
 				'step 1'
-				if(player.classList.contains('linked')) player.link();
+				if(player.isLinked()) player.link();
 				'step 2'
-				if(player.classList.contains('turnedover')) player.turnOver();
+				if(player.isTurnedOver()) player.turnOver();
 			},
 			ai:{
 				order:1,

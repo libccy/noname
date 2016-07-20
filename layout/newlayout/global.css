@@ -136,6 +136,11 @@
 	margin-top: -12px;
 	margin-bottom:-12px
 }
+.player:not(.linked2) .marks>div:first-child{
+	margin-top: -12px;
+	margin-bottom:-12px;
+	opacity:0;
+}
 
 
 .player .judges>.card.removing,

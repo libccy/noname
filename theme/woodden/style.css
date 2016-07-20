@@ -177,3 +177,7 @@ html{
 	border:1px solid rgba(77, 60, 51,0);
 	box-shadow:none;
 }
+
+.player .marks>div:first-child>div{
+	-webkit-filter: invert(0.8) sepia(1);
+}

@@ -223,7 +223,7 @@ card.extra={
 				},
 				result:{
 					target:function(player,target){
-						if(target.classList.contains('linked')) return 1;
+						if(target.isLinked()) return 1;
 						if(ai.get.attitude(player,target)>=0) return -1;
 						if(player.isMin()) return -1;
 						if(ui.selected.targets.length) return -1;

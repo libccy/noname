@@ -2222,8 +2222,8 @@ character.hearth={
 				if(player.storage.chongsheng==2){
 					player.unmarkSkill('chongsheng');
 				}
-				if(player.classList.contains('linked')) player.link();
-				if(player.classList.contains('turnedover')) player.turnOver();
+				if(player.isLinked()) player.link();
+				if(player.isTurnedOver()) player.turnOver();
 				game.addVideo('storage',player,['chongsheng',player.storage.chongsheng]);
 			},
 			ai:{

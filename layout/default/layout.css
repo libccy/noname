@@ -615,6 +615,12 @@ div:not(.handcards)>.card>.info>span,
 	z-index: 1;
 	display: block !important;
 }
+.player:not(.linked2) .marks>div:first-child,
+.marks .removing{
+	margin-left: -12px;
+	margin-right:-12px;
+	opacity:0;
+}
 /*--------窗口--------*/
 .dialog{text-align: center;z-index:4;transition-property:opacity,background,box-shadow;}
 .dialog{width: calc(90% - 420px);height: calc(100% / 3 - 160px / 3 + 120px);}

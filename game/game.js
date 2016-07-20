@@ -1118,6 +1118,21 @@
                         item:{
                             rotate:'横置',
                             mark:'标记'
+                        },
+                        onclick:function(style){
+                            for(var i=0;i<game.players.length;i++){
+                                if(game.players[i].isLinked()){
+                                    if(style=='mark'){
+                                        game.players[i].classList.add('linked2');
+                                        game.players[i].classList.remove('linked');
+                                    }
+                                    else{
+                                        game.players[i].classList.add('linked');
+                                        game.players[i].classList.remove('linked2');
+                                    }
+                                }
+                            }
+                            game.saveConfig('link_style',style);
                         }
                     },
 					name_font:{
@@ -6997,12 +7012,12 @@
 						for(var mark in player.marks){
 							player.unmarkSkill(mark);
 						}
-						while(player.node.marks.childNodes.length){
-							player.node.marks.firstChild.remove();
+						while(player.node.marks.childNodes.length>1){
+							player.node.marks.lastChild.remove();
 						}
                         game.broadcast(function(player){
-                            while(player.node.marks.childNodes.length){
-    							player.node.marks.firstChild.remove();
+                            while(player.node.marks.childNodes.length>1){
+    							player.node.marks.lastChild.remove();
     						}
                         },player);
 					}
@@ -7277,12 +7292,32 @@
     					}
                     });
                     player.classList.remove('target');
-					player.classList.toggle('linked');
-                    game.broadcast(function(player){
+                    if(lib.config.link_style=='mark'){
+                        player.classList.toggle('linked2');
+                    }
+					else{
+                        player.classList.toggle('linked');
+                    }
+                    game.broadcast(function(player,linked){
                         player.classList.remove('target');
-    					player.classList.toggle('linked');
-                    },player);
-					game.addVideo('link',player,player.classList.contains('linked'));
+                        if(lib.config.link_style=='mark'){
+                            if(linked){
+                                player.classList.add('linked2');
+                            }
+                            else{
+                                player.classList.remove('linked2');
+                            }
+                        }
+                        else{
+                            if(linked){
+                                player.classList.add('linked');
+                            }
+                            else{
+                                player.classList.remove('linked');
+                            }
+                        }
+                    },player,player.isLinked());
+					game.addVideo('link',player,player.isLinked());
 				},
 			},
 			player:{
@@ -9673,6 +9708,22 @@
 						}
 					}
 				},
+                addLink:function(){
+                    if(lib.config.link_style=='mark'){
+                        this.classList.add('linked2');
+                    }
+                    else{
+                        this.classList.add('linked');
+                    }
+                },
+                removeLink:function(){
+                    if(lib.config.link_style=='mark'){
+                        this.classList.remove('linked2');
+                    }
+                    else{
+                        this.classList.remove('linked');
+                    }
+                },
 				canUse:function(card,player,distance,includecard){
 					if(typeof card=='string') card={name:card};
 					if(includecard&&!lib.filter.filterCard(card,this)) return false;
@@ -9858,6 +9909,9 @@
                     return this.hp==this.maxHp;
                 },
 				isLinked:function(){
+                    if(lib.config.link_style=='mark'){
+                        return this.classList.contains('linked2');
+                    }
 					return this.classList.contains('linked');
 				},
 				isTurnedOver:function(){
@@ -11044,7 +11098,7 @@
 						if(source.offsetLeft-this.offsetLeft>0) left=-left;
 						if(source.offsetTop-this.offsetTop>0) top=-top;
 						if(lib.isMobileMe(this)){
-							if(this.isLinked()){
+							if(this.classList.contains('linked')){
 								this.node.avatar.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
 								this.node.avatar2.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
 							}
@@ -11053,7 +11107,7 @@
 								this.node.avatar2.style.transform='translate('+left+'px,'+top+'px)';
 							}
 						}
-						else if(this.isLinked()&&lib.isNewLayout()){
+						else if(this.classList.contains('linked')&&lib.isNewLayout()){
 							this.style.transform='translate('+left+'px,'+top+'px) rotate(-90deg)';
 						}
 						else{
@@ -11067,7 +11121,7 @@
 							zoom2=1.05;
 						}
 						if(lib.isMobileMe(this)){
-							if(this.isLinked()){
+							if(this.classList.contains('linked')){
 								this.node.avatar.style.transform='scale('+zoom1+') rotate(-90deg)';
 								this.node.avatar2.style.transform='scale('+zoom1+') rotate(-90deg)';
 							}
@@ -11076,7 +11130,7 @@
 								this.node.avatar2.style.transform='scale('+zoom1+')';
 							}
 						}
-						else if(this.isLinked()&&lib.isNewLayout()){
+						else if(this.classList.contains('linked')&&lib.isNewLayout()){
 							this.style.transform='scale('+zoom2+') rotate(-90deg)';
 						}
 						else{
@@ -12494,7 +12548,7 @@
 			_lianhuan:{
 				trigger:{player:'damageAfter'},
 				filter:function(event,player){
-					return (event.nature&&lib.linked.contains(event.nature)&&event.player.classList.contains('linked'));
+					return (event.nature&&lib.linked.contains(event.nature)&&event.player.isLinked());
 				},
 				forced:true,
 				popup:false,
@@ -12507,7 +12561,7 @@
 					players.sort(lib.sort.seat);
 					delete lib.tempSortSeat;
 					for(var i=0;i<players.length;i++){
-						if(players[i].classList.contains('linked')){
+						if(players[i].isLinked()){
 							if(trigger.source){
 								players[i].damage(trigger.num,trigger.nature,trigger.source,trigger.cards,trigger.card);
 							}
@@ -12522,13 +12576,13 @@
 			_lianhuan2:{
 				trigger:{global:'damageAfter'},
 				filter:function(event,player){
-					return (event.nature&&lib.linked.contains(event.nature)&&event.player.classList.contains('linked')&&
-						event.player.classList.contains('dead')&&player.classList.contains('linked'));
+					return (event.nature&&lib.linked.contains(event.nature)&&event.player.isLinked()&&
+						event.player.classList.contains('dead')&&player.isLinked());
 				},
 				forced:true,
 				content:function(){
 					"step 0"
-					trigger.player.classList.remove('linked');
+					trigger.player.removeLink();
 					"step 1"
 					if(trigger.source){
 						player.damage(trigger.num,trigger.nature,trigger.source,trigger.cards,trigger.card);
@@ -12547,7 +12601,7 @@
 					return event.player.classList.contains('dead');
 				},
 				content:function(){
-					trigger.player.classList.remove('linked');
+					trigger.player.removeLink();
 				}
 			},
 			_lianhuan4:{
@@ -12559,7 +12613,7 @@
 					return event.player.classList.contains('dead')&&event.getParent(2).name!='damage';
 				},
 				content:function(){
-					trigger.player.classList.remove('linked');
+					trigger.player.removeLink();
 				}
 			}
 		},
@@ -13122,7 +13176,7 @@
                                 game.players.push(player);
                             }
                             if(info.linked){
-                                player.classList.add('linked');
+                                player.addLink();
                             }
                             if(info.turnedover){
                                 player.classList.add('turnedover');
@@ -15135,8 +15189,8 @@
 				for(var i=0;i<cards.length;i++){
 					cards[i].goto(ui.discardPile);
 				}
-				while(player.node.marks.childNodes.length){
-					player.node.marks.firstChild.remove();
+				while(player.node.marks.childNodes.length>1){
+					player.node.marks.lastChild.remove();
 				}
 				player.classList.add('dead');
 				player.classList.remove('turnedover');
@@ -15412,10 +15466,10 @@
 			link:function(player,bool){
 				if(player&&player.classList){
 					if(bool){
-						player.classList.add('linked');
+						player.addLink();
 					}
 					else{
-						player.classList.remove('linked');
+						player.removeLink();
 					}
 				}
 				else{
@@ -24139,6 +24193,9 @@
 				for(var i in lib.element.player){
 					node[i]=lib.element.player[i];
 				}
+                node.node.link=node.mark(' ',{mark:get.linkintro});
+                node.node.link.firstChild.setBackgroundImage('image/card/tiesuo_mark.png')
+                node.node.link.firstChild.style.backgroundSize='cover';
 				ui.create.div(node.node.identity);
 				node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.target);
 				node.node.identity.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.identity);
@@ -28504,6 +28561,19 @@
             }
             return uiintro;
 		},
+        linkintro:function(dialog,content,player){
+            dialog.content.firstChild.remove();
+            dialog.add('<div class="text center">已横置</div>');
+            var list=[];
+            for(var i=0;i<game.players.length;i++){
+                if(game.players[i].isLinked()&&game.players[i].name&&game.players[i].name.indexOf('unknown')!=0){
+                    list.push(game.players[i]);
+                }
+            }
+            if(list.length){
+                dialog.add(list,true,true);
+            }
+        },
 		groups:function(){
 			return ['wei','shu','wu','qun'];
 		},

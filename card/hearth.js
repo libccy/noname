@@ -440,7 +440,7 @@ card.hearth={
 		},
 		xingjiegoutong:{
 			fullskin:true,
-			type:'basic',
+			type:'trick',
 			enable:true,
 			selectTarget:-1,
 			modTarget:true,

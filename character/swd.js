@@ -3997,8 +3997,8 @@ character.swd={
 				player.maxHp--;
 				player.hp=player.maxHp;
 				player.discard(player.get('hej'));
-				if(player.classList.contains('linked')) player.link();
-				if(player.classList.contains('turnedover')) player.turnOver();
+				if(player.isLinked()) player.link();
+				if(player.isTurnedOver()) player.turnOver();
 				player.storage.yuhuo=true;
 				// player.addSkill('guanhong');
 				// player.addSkill('yishan2');
@@ -5747,7 +5747,7 @@ character.swd={
 		zhuyu:{
 			trigger:{global:'damageBegin'},
 			filter:function(event,player){
-				if(event.player.classList.contains('linked')==false) return false;
+				if(!event.player.isLinked()) return false;
 				if(event.nature=='fire') return false;
 				if(player.num('h',{color:'red'})) return true;
 				return false;
@@ -5778,8 +5778,7 @@ character.swd={
 				if(get.color(event.card)!='black') return false;
 				if(!event.player) return false;
 				if(event.player==player) return false;
-				if(event.player.classList.contains('linked')&&
-					event.player.classList.contains('turnedover')) return false;
+				if(event.player.isLinked()&&event.player.isTurnedOver()) return false;
 				if(player.num('h',{color:'black'})) return true;
 				return false;
 			},
@@ -5798,10 +5797,10 @@ character.swd={
 				};
 				"step 1"
 				if(result.bool){
-					if(trigger.player.classList.contains('turnedover')){
+					if(trigger.player.isTurnedOver()){
 						trigger.player.loseHp();
 					}
-					if(trigger.player.classList.contains('linked')){
+					if(trigger.player.isLinked()){
 						trigger.player.turnOver();
 					}
 					else{
