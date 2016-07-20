@@ -205,6 +205,12 @@ card.swd={
 				"step 1"
 				if(result.bool==false){
 					target.damage();
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(target.isAlive()){
 					target.loseHp();
 					player.loseHp();
 				}
