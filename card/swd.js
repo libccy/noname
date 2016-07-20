@@ -236,7 +236,7 @@ card.swd={
 			fullskin:true,
 			type:'trick',
 			enable:function(card,player){
-				var hs=player.get('h');
+				var hs=player.get('he');
 				return hs.length>1||(hs.length==1&&hs[0]!=card);
 			},
 			filterTarget:function(card,player,target){
@@ -244,8 +244,8 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				if(player.num('h')){
-					player.chooseCard(true);
+				if(player.num('he')){
+					player.chooseCard(true,'he');
 				}
 				else{
 					event.finish();
@@ -3187,7 +3187,7 @@ card.swd={
 		jiguanfeng:'机关蜂',
 		jiguanfeng_info:'出牌阶段对一名其他角色使用，目标需打出一张闪，否则受到一点伤害，然后与你各流失一点体力',
 		jiguanyuan:'机关鸢',
-		jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张手牌交给该角色，然后摸一张牌',
+		jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张其它牌交给该角色，然后摸一张牌',
 		jiguantong:'机关筒',
 		jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点伤害',
 		fengyinzhidan:'封印之蛋',
