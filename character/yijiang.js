@@ -4076,7 +4076,12 @@ character.yijiang={
 			trigger:{source:'damageBefore'},
 			check:function(event,player){
 				if(ai.get.damageEffect(event.player,player,player)<0) return true;
-				if(ai.get.attitude(player,event.player)>0&&event.player.num('j')) return true;
+				var att=ai.get.attitude(player,event.player);
+				if(att>0&&event.player.num('j')) return true;
+				if(event.num>1){
+					if(att<0) return false;
+					if(att>0) return true;
+				}
 				var cards=event.player.get('e');
 				for(var i=0;i<cards.length;i++){
 					if(ai.get.equipValue(cards[i])>=6) return true;
