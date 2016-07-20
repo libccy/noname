@@ -756,8 +756,8 @@ card.swd={
 				var next=target.chooseToRespond({name:'sha'});
 				next.ai=function(card){
 					if(ai.get.damageEffect(target,player,target,'thunder')>=0) return 0;
-					if(player.get('s').contains('xinwuyan')) return 0;
-					if(target.get('s').contains('xinwuyan')) return 0;
+					if(player.hasSkillTag('notricksource')) return 0;
+					if(target.hasSkillTag('notrick')) return 0;
 					return 1;
 				};
 				next.autochoose=lib.filter.autoRespondSha;
@@ -817,8 +817,8 @@ card.swd={
 				var next=target.chooseToRespond({name:'shan'});
 				next.ai=function(card){
 					if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
-					if(player.get('s').contains('xinwuyan')) return 0;
-					if(target.get('s').contains('xinwuyan')) return 0;
+					if(player.hasSkillTag('notricksource')) return 0;
+					if(target.hasSkillTag('notrick')) return 0;
 					return 1;
 				};
 				next.autochoose=lib.filter.autoRespondShan;
@@ -2326,8 +2326,8 @@ card.swd={
 		nigong2:'逆攻',
 		nigong3:'逆攻',
 		nigong4:'逆攻',
-		guilingyupei_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
-		nigong_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
+		guilingyupei_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超过4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
+		nigong_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超过4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
 		baihupifeng:'白狐披风',
 		baihupifeng_bg:'狐',
 		baihupifeng_info:'回合结束阶段，若你的体力值是全场最小的之一，你可以回复一点体力',

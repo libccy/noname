@@ -5430,6 +5430,8 @@ character.yijiang={
 				trigger.finish();
 			},
 			ai:{
+				notrick:true,
+				notricksource:true,
 				effect:{
 					target:function(card,player,target,current){
 						if(get.type(card)=='trick'&&get.tag(card,'damage')){

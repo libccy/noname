@@ -615,8 +615,8 @@ card.standard={
 				next.set('ai',function(card){
 					var evt=_status.event.getParent();
 					if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
-					if(evt.player.get('s').contains('xinwuyan')) return 0;
-					if(evt.target.get('s').contains('xinwuyan')) return 0;
+					if(evt.player.hasSkillTag('notricksource')) return 0;
+					if(evt.target.hasSkillTag('notrick')) return 0;
 					return 1;
 				});
 				next.autochoose=lib.filter.autoRespondSha;
@@ -675,8 +675,8 @@ card.standard={
 				next.set('ai',function(card){
 					var evt=_status.event.getParent();
 					if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
-					if(evt.player.get('s').contains('xinwuyan')) return 0;
-					if(evt.target.get('s').contains('xinwuyan')) return 0;
+					if(evt.player.hasSkillTag('notricksource')) return 0;
+					if(evt.target.hasSkillTag('notrick')) return 0;
 					return 1;
 				});
 				next.autochoose=lib.filter.autoRespondShan;
@@ -767,8 +767,8 @@ card.standard={
 				else{
 					var next=event.turn.chooseToRespond({name:'sha'});
 					next.ai=function(card){
-						if(player.get('s').contains('xinwuyan')) return 0;
-						if(target.get('s').contains('xinwuyan')) return 0;
+						if(player.hasSkillTag('notricksource')) return 0;
+						if(target.hasSkillTag('notrick')) return 0;
 						if(event.turn==target){
 							if(player.hasSkill('naman')) return -1;
 							if(ai.get.attitude(target,player)<0){

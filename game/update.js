@@ -1,29 +1,19 @@
 window.noname_update={
-    version:'1.8.18',
+    version:'1.8.18.1',
     changeLog:[
         '修bug',
     ],
     files:{
         global:[
             'game/game.js',
-            'game/asset.js',
-            'card/swd.js',
-            'card/standard.js',
-            'card/sp.js',
-            'card/yunchou.js',
-            'card/guozhan.js',
-            'character/rank.js',
             'character/ow.js',
-            'character/yxs.js',
-            'character/swd.js',
-            'character/sp.js',
-            'character/hearth.js',
-            'character/xianjian.js',
-            'character/gujian.js',
-            'mode/identity.js',
-            'mode/guozhan.js',
+            'character/yijiang.js',
+            'card/swd.js',
+            'card/hearth.js',
+            'card/standard.js',
+            'card/yunchou.js',
             'layout/default/layout.css',
         ],
-        '1.8.17.5':[],
+        '1.8.18':[],
     }
 }

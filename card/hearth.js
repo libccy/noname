@@ -569,8 +569,8 @@ card.hearth={
 					if(target.hasSkillTag('maixie')&&target.hp>1&&ui.selected.cards.length){
 						return 0;
 					}
-					if(player.get('s').contains('xinwuyan')) return 0;
-					if(target.get('s').contains('xinwuyan')) return 0;
+					if(player.hasSkillTag('notricksource')) return 0;
+					if(target.hasSkillTag('notrick')) return 0;
 					if(card.name=='tao') return 0;
 					if(target.hp==1&&card.name=='jiu') return 0;
 					if(get.type(card)!='basic'){

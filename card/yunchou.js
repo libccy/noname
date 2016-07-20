@@ -529,8 +529,8 @@ card.yunchou={
 					target.chooseToDiscard('he',2).ai=function(card){
 						if(target.hasSkillTag('nofire')) return 0;
 						if(ai.get.damageEffect(target,player,target,'fire')>=0) return 0;
-						if(player.get('s').contains('xinwuyan')) return 0;
-						if(target.get('s').contains('xinwuyan')) return 0;
+						if(player.hasSkillTag('notricksource')) return 0;
+						if(target.hasSkillTag('notrick')) return 0;
 						if(card.name=='tao') return 0;
 						if(target.hp==1&&card.name=='jiu') return 0;
 						if(target.hp==1&&get.type(card)!='basic'){

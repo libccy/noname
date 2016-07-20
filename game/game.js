@@ -1111,6 +1111,15 @@
 							ui.arena.dataset.target_shake=bool;
 						}
 					},
+                    link_style:{
+                        name:'横置样式',
+                        init:'rotate',
+                        unfrequent:true,
+                        item:{
+                            rotate:'横置',
+                            mark:'标记'
+                        }
+                    },
 					name_font:{
 						name:'人名字体',
 						init:'xinwei',
@@ -9149,6 +9158,10 @@
 							ui.restart.close();
 							delete ui.restart;
 						}
+        				if(ui.continue_game){
+        					ui.continue_game.close();
+        					delete ui.continue_game;
+        				}
 					}
 				},
 				isMad:function(){
@@ -11102,8 +11115,11 @@
                     if(lib.isMobileMe(this)){
                         this.node.avatar.style.transform=transform;
                         this.node.avatar2.style.transform=transform;
+                        this.style.transform='';
                     }
                     else{
+                        this.node.avatar.style.transform='';
+                        this.node.avatar2.style.transform='';
                         this.style.transform=transform;
                     }
                     this.queue(false);
@@ -17491,7 +17507,11 @@
 				}
 				game.me.node.handcards1.remove();
 				game.me.node.handcards2.remove();
+                var current=game.me;
 				game.me=player;
+                if(current.isDead()){
+                    current.$die();
+                }
 				ui.handcards1=player.node.handcards1.animate('start').fix();
 				ui.handcards2=player.node.handcards2.animate('start').fix();
 				ui.handcards1Container.appendChild(ui.handcards1);
@@ -17513,6 +17533,10 @@
 				if(ui.restart){
 					ui.restart.close();
 					delete ui.restart;
+				}
+				if(ui.continue_game){
+					ui.continue_game.close();
+					delete ui.continue_game;
 				}
 			}
 			if(lib.config.mode=='identity'){
@@ -17547,6 +17571,10 @@
 				if(ui.restart){
 					ui.restart.close();
 					delete ui.restart;
+				}
+				if(ui.continue_game){
+					ui.continue_game.close();
+					delete ui.continue_game;
 				}
 			}
 		},
@@ -23518,7 +23546,6 @@
 				// }
 
 				ui.arena.dataset.target_shake=lib.config.target_shake||'off';
-
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
 				ui.arena.dataset.cardtext_font=lib.config.cardtext_font||'default';
