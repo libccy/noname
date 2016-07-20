@@ -3139,8 +3139,7 @@ card.swd={
 					return att<=0;
 				}
 				if(event.target.hp==1) return att>0;
-				if(player.skills.contains('tianxianjiu')) return false;
-				return att<=0;
+				return false;
 			},
 			content:function(){
 				trigger.unhurt=true;
