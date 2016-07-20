@@ -1510,7 +1510,7 @@ card.swd={
 			},
 			content:function(){
 				var e1=player.get('e','1');
-				if(e1&&e1.name=='xuanyuanjian'){
+				if(e1&&e1.name.indexOf('xuanyuanjian')==0){
 					player.discard(e1);
 				}
 			},

@@ -477,7 +477,7 @@ character.ow={
 			},
 			content:function(){
 				'step 0'
-				player.showCards([player.storage.dulei],get.translation(player)+'发动了【毒雷】');
+				player.showCards([player.storage.dulei],get.translation(player)+'发动了【诡雷】');
 				'step 1'
 				ui.discardPile.appendChild(player.storage.dulei);
 				delete player.storage.dulei;
@@ -496,14 +496,14 @@ character.ow={
 						dialog.add([player.storage.dulei]);
 					}
 					else{
-						return '已发动冰甲';
+						return '已发动诡雷';
 					}
 				},
 				content:function(content,player){
 					if(player==game.me||player.isUnderControl()){
 						return get.translation(player.storage.dulei);
 					}
-					return '已发动冰甲';
+					return '已发动诡雷';
 				}
 			}
 		},

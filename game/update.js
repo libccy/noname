@@ -18,6 +18,7 @@ window.noname_update={
             'card/hearth.js',
             'card/standard.js',
             'card/yunchou.js',
+            'card/guozhan.js',
             'layout/default/layout.css',
             'layout/newlayout/global.css',
             'theme/woodden/style.css',
