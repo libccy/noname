@@ -2812,7 +2812,7 @@ character.yijiang={
 				}
 				else{
 					event.current=event.current.next;
-					event.goto(0);
+					event.goto(2);
 				}
 			}
 		},

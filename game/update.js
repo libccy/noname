@@ -1,28 +1,13 @@
 window.noname_update={
-    version:'1.8.18.1',
+    version:'1.8.18.2',
     changeLog:[
         '修bug',
-        '横置样式',
-        '结束后可看手牌',
     ],
     files:{
         global:[
             'game/game.js',
-            'game/asset.js',
-            'character/ow.js',
             'character/yijiang.js',
-            'character/shenhua.js',
-            'character/hearth.js',
-            'character/swd.js',
-            'card/swd.js',
-            'card/extra.js',
-            'card/hearth.js',
-            'card/standard.js',
-            'card/yunchou.js',
-            'card/guozhan.js',
-            'layout/default/layout.css',
-            'layout/newlayout/global.css',
-            'theme/woodden/style.css',
+            'character/ow.js',
         ],
         '1.8.18':[],
     }

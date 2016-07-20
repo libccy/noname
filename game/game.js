@@ -3874,7 +3874,7 @@
 										}
 									}
 									else{
-										alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+										game.print('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
 									}
 								}
 							}
@@ -3956,7 +3956,7 @@
 									}
 									else{
 										if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
-										else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+										else game.print('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
                                         if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
 												lib.cardPack.mode_derivation=[k];
@@ -4025,7 +4025,7 @@
 								}
 								else{
 									if(lib[j][k]!=undefined){
-										console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
+										game.print('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
 									}
 									lib[j][k]=lib.init.eval(play[i][j][k]);
 								}
@@ -17884,7 +17884,7 @@
 									lib[j][k]=lib.init.eval(character[i][j][k]);
 								}
 								else{
-									alert('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+									game.print('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
 								}
 							}
 						}
@@ -17908,7 +17908,7 @@
 							}
 							else{
 								if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
-								else alert('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+								else game.print('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
 							}
 						}
 					}

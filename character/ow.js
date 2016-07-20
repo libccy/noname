@@ -621,6 +621,7 @@ character.ow={
                 else{
                     if(get.color(card)=='black') return 5-ai.get.value(card);
                 }
+                return 0;
             },
             changeTarget:function(player,targets){
                 var target=targets[0];
