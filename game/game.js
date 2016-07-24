@@ -21451,6 +21451,7 @@
                         createModeConfig(i,start.firstChild);
                     }
                     (function(){
+                        if(!game.download) return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.link=page;
@@ -21485,14 +21486,15 @@
                         exportExtLine.querySelectorAll('span')[1].onclick=function(){
                             exportExtLine.style.display='none';
                         };
-                        var dashboard=ui.create.div('#extension-dashboard',pageboard);
+                        var dashboard=ui.create.div(pageboard);
                         var clickDash=function(){
                             pageboard.hide();
                             this.link.show();
                         };
                         var createDash=function(str1,str2,node){
+                            var dash=ui.create.div('.menubutton.large.dashboard');
+                            dashboard.appendChild(dash);
                             page.appendChild(node);
-                            var dash=ui.create.div('.menubutton.large',dashboard);
                             dash.link=node;
                             dash.listen(clickDash);
                             ui.create.div('',str1,dash);
@@ -21644,11 +21646,63 @@
                         var dash3=ui.create.div('.hidden',page);
                         var dash4=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
-                            ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                            ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
                                 page.hide();
                                 pageboard.show();
                             });
-
+                            var createCode=function(str1,str2,sub,func,link,str){
+                                var dash=ui.create.div('.menubutton.large.dashboard');
+                                sub.appendChild(dash);
+                                dash.listen(func);
+                                dash.link=link;
+                                ui.create.div('',str1,dash);
+                                ui.create.div('',str2,dash);
+                                var container=ui.create.div('.popup-container.editor');
+                                var editorpage=ui.create.div(container);
+                                var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+                                    ui.window.classList.remove('shortcutpaused');
+                                    ui.window.classList.remove('systempaused');
+                                    container.delete();
+                                });
+                                var saveConfig=ui.create.div('.editbutton','保存',editorpage,function(){
+                                    ui.window.classList.remove('shortcutpaused');
+                                    ui.window.classList.remove('systempaused');
+                                    container.delete();
+                                });
+                                var editor=ui.create.div('#editor-'+link,editorpage);
+                                editor.innerHTML=str;
+                                dash.editor=editor;
+                                dash.node=container;
+                            };
+                            var clickCode=function(){
+                                var node=this.node;
+                                ui.window.classList.add('shortcutpaused');
+                                ui.window.classList.add('systempaused');
+                                if(node.aced){
+                                    ui.window.appendChild(node);
+                                }
+                                else{
+                                    var id=this.editor.id;
+                                    var aceReady=function(){
+                                        ui.window.appendChild(node);
+                                        var editor=window.ace.edit(id);
+                                        editor.setTheme("ace/theme/chrome");
+                                        editor.getSession().setUseWorker(false);
+                                        editor.getSession().setMode("ace/mode/javascript");
+                                        node.aced=true;
+                                    }
+                                    if(!window.ace){
+                                        lib.init.js('game','ace',aceReady);
+                                    }
+                                    else{
+                                        aceReady();
+                                    }
+                                }
+                            };
+                            createCode('主','主代码',page,clickCode,'content','function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1为选项值；参数2为扩展定义的武将、卡牌和技能（可修改）\n}');
+                            createCode('启','启动代码',page,clickCode,'precontent','function(){\n\t\/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n\t\/\/除添加模式外请慎用\n}');
+                            createCode('选','选项代码',page,clickCode,'config','{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n\n\/\/传入主代码函数的参数为{switcher_example:"3",toggle_example:true}');
+                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t"帮助条目":"&lt;ul&gt;&lt;li&gt;列表1-条目1&lt;li&gt;列表1-条目2&lt;\/ul&gt;&lt;ol&gt;&lt;li&gt;列表2-条目1&lt;li&gt;列表2-条目2&lt;\/ul&gt;"\n}');
                             return page;
                         }());
                         createDash('将','编辑武将',dash1);

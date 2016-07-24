@@ -2959,7 +2959,7 @@ function DragdropHandler(mouseHandler) {
     var blankImage = dom.createElement("img");
     blankImage.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
     if (useragent.isOpera)
-        blankImage.style.cssText = "width:1px;height:1px;position:fixed;top:0;left:0;z-index:2147483647;opacity:0;";
+        blankImage.style.cssText = "width:1px;height:1px;position:fixed !important;top:0;left:0;z-index:2147483647;opacity:0;";
 
     var exports = ["dragWait", "dragWaitEnd", "startDrag", "dragReadyEnd", "onMouseDrag"];
 
@@ -10750,12 +10750,12 @@ exports.commands = [{
     },
     readOnly: true
 }, {
-    name: "find",
-    bindKey: bindKey("Ctrl-F", "Command-F"),
-    exec: function(editor) {
-        config.loadModule("ace/ext/searchbox", function(e) {e.Search(editor)});
-    },
-    readOnly: true
+    // name: "find",
+    // bindKey: bindKey("Ctrl-F", "Command-F"),
+    // exec: function(editor) {
+    //     config.loadModule("ace/ext/searchbox", function(e) {e.Search(editor)});
+    // },
+    // readOnly: true
 }, {
     name: "overwrite",
     bindKey: "Insert",
@@ -13001,7 +13001,7 @@ var Editor = function(renderer, session) {
         if (!this.$scrollAnchor)
             this.$scrollAnchor = document.createElement("div");
         var scrollAnchor = this.$scrollAnchor;
-        scrollAnchor.style.cssText = "position:absolute";
+        scrollAnchor.style.cssText = "position:absolute !important";
         this.container.insertBefore(scrollAnchor, this.container.firstChild);
         var onChangeSelection = this.on("changeSelection", function() {
             shouldScroll = true;
@@ -14753,13 +14753,13 @@ var RenderLoop = require("./renderloop").RenderLoop;
 var FontMetrics = require("./layer/font_metrics").FontMetrics;
 var EventEmitter = require("./lib/event_emitter").EventEmitter;
 var editorCss = ".ace_editor {\
-position: relative;\
+position: relative !important;\
 overflow: hidden;\
 font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;\
 direction: ltr;\
 }\
 .ace_scroller {\
-position: absolute;\
+position: absolute !important;\
 overflow: hidden;\
 top: 0;\
 bottom: 0;\
@@ -14771,14 +14771,14 @@ user-select: none;\
 cursor: text;\
 }\
 .ace_content {\
-position: absolute;\
+position: absolute !important;\
 -moz-box-sizing: border-box;\
 -webkit-box-sizing: border-box;\
 box-sizing: border-box;\
 min-width: 100%;\
 }\
 .ace_dragging .ace_scroller:before{\
-position: absolute;\
+position: absolute !important;\
 top: 0;\
 left: 0;\
 right: 0;\
@@ -14794,7 +14794,7 @@ background: rgba(0, 0, 0, 0.01);\
 cursor: text !important;\
 }\
 .ace_gutter {\
-position: absolute;\
+position: absolute !important;\
 overflow : hidden;\
 width: auto;\
 top: 0;\
@@ -14808,7 +14808,7 @@ z-index: 4;\
 user-select: none;\
 }\
 .ace_gutter-active-line {\
-position: absolute;\
+position: absolute !important;\
 left: 0;\
 right: 0;\
 }\
@@ -14837,13 +14837,13 @@ background-position: 2px center;\
 background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEUAAAChoaGAgIAqKiq+vr6tra1ZWVmUlJSbm5s8PDxubm56enrdgzg3AAAAAXRSTlMAQObYZgAAAClJREFUeNpjYMAPdsMYHegyJZFQBlsUlMFVCWUYKkAZMxZAGdxlDMQBAG+TBP4B6RyJAAAAAElFTkSuQmCC\");\
 }\
 .ace_scrollbar {\
-position: absolute;\
+position: absolute !important;\
 right: 0;\
 bottom: 0;\
 z-index: 6;\
 }\
 .ace_scrollbar-inner {\
-position: absolute;\
+position: absolute !important;\
 cursor: text;\
 left: 0;\
 top: 0;\
@@ -14859,11 +14859,11 @@ overflow-y: hidden;\
 left: 0;\
 }\
 .ace_print-margin {\
-position: absolute;\
+position: absolute !important;\
 height: 100%;\
 }\
 .ace_text-input {\
-position: absolute;\
+position: absolute !important;\
 z-index: 0;\
 width: 0.5em;\
 height: 1em;\
@@ -14894,7 +14894,7 @@ text-indent: 0;\
 }\
 .ace_layer {\
 z-index: 1;\
-position: absolute;\
+position: absolute !important;\
 overflow: hidden;\
 word-wrap: normal;\
 white-space: pre;\
@@ -14906,7 +14906,7 @@ box-sizing: border-box;\
 pointer-events: none;\
 }\
 .ace_gutter-layer {\
-position: relative;\
+position: relative !important;\
 width: auto;\
 text-align: right;\
 pointer-events: auto;\
@@ -14923,7 +14923,7 @@ z-index: 4;\
 }\
 .ace_cursor {\
 z-index: 4;\
-position: absolute;\
+position: absolute !important;\
 -moz-box-sizing: border-box;\
 -webkit-box-sizing: border-box;\
 box-sizing: border-box;\
@@ -14948,23 +14948,23 @@ transition: opacity 0.18s;\
 border-left-width: 1px;\
 }\
 .ace_marker-layer .ace_step, .ace_marker-layer .ace_stack {\
-position: absolute;\
+position: absolute !important;\
 z-index: 3;\
 }\
 .ace_marker-layer .ace_selection {\
-position: absolute;\
+position: absolute !important;\
 z-index: 5;\
 }\
 .ace_marker-layer .ace_bracket {\
-position: absolute;\
+position: absolute !important;\
 z-index: 6;\
 }\
 .ace_marker-layer .ace_active-line {\
-position: absolute;\
+position: absolute !important;\
 z-index: 2;\
 }\
 .ace_marker-layer .ace_selected-word {\
-position: absolute;\
+position: absolute !important;\
 z-index: 4;\
 -moz-box-sizing: border-box;\
 -webkit-box-sizing: border-box;\
@@ -15006,7 +15006,7 @@ box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);\
 color: black;\
 max-width: 100%;\
 padding: 3px 4px;\
-position: fixed;\
+position: fixed !important;\
 z-index: 999999;\
 -moz-box-sizing: border-box;\
 -webkit-box-sizing: border-box;\
@@ -15101,12 +15101,12 @@ font-style: italic;\
 }\
 .ace_error-marker {\
 background-color: rgba(255, 0, 0,0.2);\
-position: absolute;\
+position: absolute !important;\
 z-index: 9;\
 }\
 .ace_highlight-marker {\
 background-color: rgba(255, 255, 0,0.2);\
-position: absolute;\
+position: absolute !important;\
 z-index: 8;\
 }\
 .ace_br1 {border-top-left-radius    : 3px;}\
@@ -18592,7 +18592,7 @@ dom.importCssString("\
         border-color: #5aaa5a\
     }\
     .error_widget_arrow {\
-        position: absolute;\
+        position: absolute !important;\
         border: solid 5px;\
         border-top-color: transparent!important;\
         border-right-color: transparent!important;\
