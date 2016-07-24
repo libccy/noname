@@ -1062,10 +1062,10 @@
 						onclick:function(bool){
 							game.saveConfig('blur_ui',bool);
 							if(bool){
-								ui.css.blur_ui=lib.init.css(lib.assetURL+'layout/default','blur');
+								ui.window.classList.add('blur_ui');
 							}
-							else if(ui.css.blur_ui){
-								ui.css.blur_ui.remove();
+							else{
+								ui.window.classList.remove('blur_ui');
 							}
 						}
 					},
@@ -1395,7 +1395,7 @@
 						clear:true
 					},
 					reset_database:{
-						name:'重置自定义武将及录像',
+						name:'重置游戏录像',
 						onclick:function(){
 							var node=this;
 							if(node._clearing){
@@ -1410,7 +1410,7 @@
 								setTimeout(function(){
 									node.innerHTML='单击以确认 (1)';
 									setTimeout(function(){
-										node.innerHTML='重置自定义武将及录像';
+										node.innerHTML='重置游戏录像';
 										delete node._clearing;
 									},1000);
 								},1000);
@@ -3290,10 +3290,10 @@
 				if(!lib.config.gameRecord){
 					lib.config.gameRecord={};
 				}
-                if(lib.config.debug){
-                    mode.pack.story='群侠';
-                    mode.pack.realtime='即时';
-                }
+                // if(lib.config.debug){
+                //     mode.pack.story='群侠';
+                //     mode.pack.realtime='即时';
+                // }
 				for(i in mode.pack){
 					if(lib.config.hiddenModePack.indexOf(i)==-1){
 						lib.config.all.mode.push(i);
@@ -3450,7 +3450,6 @@
 					}
 				}
 				ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout');
-				if(lib.config.blur_ui) ui.css.blur_ui=lib.init.css(lib.assetURL+'layout/default','blur');
 				ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
 				ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
 				ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
@@ -3500,54 +3499,54 @@
 							db.createObjectStore('skill');
 						}
 					};
-					request.onsuccess=function(e){
-						var db=e.target.result;
-						lib.db=db;
-						for(var i=0;i<lib._onDB.length;i++){
-							lib._onDB[i]();
-						}
-						game.getDB('skill',null,function(skills){
-							if(skills){
-								for(var i in skills){
-									try{
-										eval('lib.skill["'+i+'"]={'+skills[i].content+'}');
-									}
-									catch(e){
-										console.log(e);
-										lib.skill[i]={};
-									}
-									lib.skill[i].createInfo=skills[i];
-									lib.setTranslate(i);
-									lib.translate[i+'_info']=skills[i].description;
-									if(lib.skill[i].marktext){
-										lib.translate[i+'_bg']=lib.skill[i].marktext;
-									}
-								}
-								if(_status.cardsFinished){
-									game.finishCards();
-								}
-							}
-							game.getDB('character',null,function(list){
-								for(var i in list){
-									if(!list[i][4]) list[i][4]=[];
-									lib.character[i]=list[i];
-									lib.customCharacters.push(i);
-									lib.setTranslate(i);
-								}
-								_status.characterLoaded=true;
-								if(_status.waitingForCharacters){
-									game.createEvent('game',false).content=lib.init.start;
-									delete lib.init.start;
-									game.loop();
-									delete _status.waitingForCharacters;
-								}
-								if(lib.onCharacterLoad){
-									lib.onCharacterLoad();
-									delete lib.onCharacterLoad;
-								}
-							});
-						});
-					}
+					// request.onsuccess=function(e){
+					// 	var db=e.target.result;
+					// 	lib.db=db;
+					// 	for(var i=0;i<lib._onDB.length;i++){
+					// 		lib._onDB[i]();
+					// 	}
+					// 	game.getDB('skill',null,function(skills){
+					// 		if(skills){
+					// 			for(var i in skills){
+					// 				try{
+					// 					eval('lib.skill["'+i+'"]={'+skills[i].content+'}');
+					// 				}
+					// 				catch(e){
+					// 					console.log(e);
+					// 					lib.skill[i]={};
+					// 				}
+					// 				lib.skill[i].createInfo=skills[i];
+					// 				lib.setTranslate(i);
+					// 				lib.translate[i+'_info']=skills[i].description;
+					// 				if(lib.skill[i].marktext){
+					// 					lib.translate[i+'_bg']=lib.skill[i].marktext;
+					// 				}
+					// 			}
+					// 			if(_status.cardsFinished){
+					// 				game.finishCards();
+					// 			}
+					// 		}
+					// 		game.getDB('character',null,function(list){
+					// 			for(var i in list){
+					// 				if(!list[i][4]) list[i][4]=[];
+					// 				lib.character[i]=list[i];
+					// 				lib.customCharacters.push(i);
+					// 				lib.setTranslate(i);
+					// 			}
+					// 			_status.characterLoaded=true;
+					// 			if(_status.waitingForCharacters){
+					// 				game.createEvent('game',false).content=lib.init.start;
+					// 				delete lib.init.start;
+					// 				game.loop();
+					// 				delete _status.waitingForCharacters;
+					// 			}
+					// 			if(lib.onCharacterLoad){
+					// 				lib.onCharacterLoad();
+					// 				delete lib.onCharacterLoad;
+					// 			}
+					// 		});
+					// 	});
+					// }
 				}
                 if(typeof window.require=='function'&&!lib.device){
                     lib.node={
@@ -4118,7 +4117,7 @@
                     delete lib.extensions;
 					ui.create.arena();
 
-                    if(window.indexedDB&&!_status.characterLoaded){
+                    if(window.indexedDB&&!_status.characterLoaded&&false){
 						_status.waitingForCharacters=true;
 					}
 					else{
@@ -20225,7 +20224,7 @@
 					rightPane.appendChild(active.link);
 
 					lib.onDB(function(){
-                        if(connectMenu) return;
+                        if(connectMenu||true) return;
 						var page=ui.create.div('.menu-buttons');
                         var node=ui.create.div('.menubutton.large','自定义',clickMode);
 						ui.customCharacter=node;
@@ -21357,6 +21356,7 @@
 							var node=start.firstChild.childNodes[i];
 							if(node.link){
                                 if(node.mode=='get') continue;
+                                if(node.mode=='create') continue;
                                 if(node.mode.indexOf('extension_')==0){
                                     if(lib.config[node.mode+'_enable']){
     									node.classList.remove('off');
@@ -21450,6 +21450,204 @@
                         if(lib.config.hiddenPlayPack.contains(i)) continue;
                         createModeConfig(i,start.firstChild);
                     }
+                    (function(){
+                        var page=ui.create.div('#create-extension');
+                        var node=ui.create.div('.menubutton.large','创建扩展',start.firstChild,clickMode);
+						node.link=page;
+						node.mode='create';
+                        var pageboard=ui.create.div(page);
+                        var inputExtLine=ui.create.div(pageboard);
+                        inputExtLine.style.padding='10px';
+                        inputExtLine.style.whiteSpace='nowrap';
+                        var inputExtName=document.createElement('input');
+                        inputExtName.type='text';
+                        inputExtName.value='无名扩展';
+                        inputExtName.style.width='120px';
+                        inputExtLine.appendChild(inputExtName);
+                        var buttonSave=document.createElement('button');
+                        buttonSave.innerHTML='保存';
+                        buttonSave.style.marginLeft='3px';
+                        buttonSave.onclick=function(){
+                            exportExtLine.style.display='';
+                        }
+                        inputExtLine.appendChild(buttonSave);
+                        var buttonExport=document.createElement('button');
+                        buttonExport.innerHTML='导出';
+                        buttonExport.style.marginLeft='3px';
+                        inputExtLine.appendChild(buttonExport);
+                        var exportExtLine=ui.create.div(pageboard);
+                        exportExtLine.style.display='none';
+                        exportExtLine.style.width='calc(100% - 40px)';
+                        exportExtLine.style.textAlign='left';
+                        exportExtLine.style.marginBottom='5px';
+                        exportExtLine.innerHTML='重启后生效。<span style="text-decoration:underline">立即重启</span><span style="float:right">×</span>';
+                        exportExtLine.querySelectorAll('span')[0].onclick=game.reload;
+                        exportExtLine.querySelectorAll('span')[1].onclick=function(){
+                            exportExtLine.style.display='none';
+                        };
+                        var dashboard=ui.create.div('#extension-dashboard',pageboard);
+                        var clickDash=function(){
+                            pageboard.hide();
+                            this.link.show();
+                        };
+                        var createDash=function(str1,str2,node){
+                            page.appendChild(node);
+                            var dash=ui.create.div('.menubutton.large',dashboard);
+                            dash.link=node;
+                            dash.listen(clickDash);
+                            ui.create.div('',str1,dash);
+                            ui.create.div('',str2,dash);
+                        };
+                        var dash1=(function(){
+                            var page=ui.create.div('.hidden.menu-buttons');
+                            ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                page.hide();
+                                pageboard.show();
+                            });
+    						var newCharacter;
+    						var toggle=ui.create.div('.config.more','创建武将 <div>&gt;</div>',page,function(){
+    							this.classList.toggle('on');
+    							if(this.classList.contains('on')){
+    								newCharacter.style.display='';
+    							}
+    							else{
+    								newCharacter.style.display='none';
+    							}
+    						});
+    						var resetEditor=function(){
+    							toggle.classList.remove('on');
+    							newCharacter.style.display='none';
+    							fakeme.classList.remove('inited');
+    							delete fakeme.image;
+    							fakeme.style.backgroundImage='';
+    							var inputs=newCharacter.querySelectorAll('input');
+    							for(var i=0;i<inputs.length;i++){
+    								inputs[i].value='';
+    							}
+    							inputs=newCharacter.querySelectorAll('textarea');
+    							for(var i=0;i<inputs.length;i++){
+    								inputs[i].value='';
+    							}
+    							skillList.firstChild.innerHTML='';
+    							toggle.innerHTML='创建武将 <div>&gt;</div>';
+    							var node=newCharacter.querySelector('.menubutton.large');
+    							node.innerHTML='创建武将';
+    							delete node._origin;
+    							if(node.nextSibling){
+    								node.nextSibling.remove();
+    							}
+    						}
+
+    						newCharacter=ui.create.div('.new_character',page);
+    						newCharacter.style.display='none';
+
+    						var fakeme=ui.create.div('.avatar',newCharacter);
+
+    						var input=document.createElement('input');
+    						input.type='file';
+    						input.accept='image/jpeg';
+    						input.onchange=function(){
+    							var fileToLoad=input.files[0];
+    							if(fileToLoad){
+    								var fileReader = new FileReader();
+    								fileReader.onload = function(fileLoadedEvent)
+    								{
+    									var data = fileLoadedEvent.target.result;
+    									fakeme.image=data;
+    									fakeme.style.backgroundImage='url('+data+')';
+    									fakeme.classList.add('inited');
+    								};
+    								fileReader.readAsDataURL(fileToLoad, "UTF-8");
+    							}
+    						}
+    						fakeme.appendChild(input);
+
+    						ui.create.div('.select_avatar','选择头像',fakeme);
+
+    						ui.create.div('.indent','姓名：<input class="new_name" type="text">',newCharacter).style.paddingTop='10px';
+    						ui.create.div('.indent','体力：<input class="new_hp" type="text">',newCharacter).style.paddingTop='10px';
+    						var sexes=ui.create.selectlist([
+    							['male','男'],
+    							['female','女'],
+    							['none','无'],
+    						],null,ui.create.div('.indent','性别：',newCharacter));
+    						var groups=ui.create.selectlist([
+    							['wei','魏'],
+    							['shu','蜀'],
+    							['wu','吴'],
+    							['qun','群'],
+    						],null,ui.create.div('.indent','势力：',newCharacter));
+    						var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
+    						var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
+    						var list=[];
+    						for(var i in lib.character){
+    							if(!lib.customCharacters.contains(i)&&lib.character[i][3].length)
+    							list.push([i,lib.translate[i]]);
+    						}
+    						list.sort(function(a,b){
+    							a=a[0];b=b[0];
+    							var aa=a,bb=b;
+    							if(aa.indexOf('_')!=-1){
+    								aa=aa.slice(aa.indexOf('_')+1);
+    							}
+    							if(bb.indexOf('_')!=-1){
+    								bb=bb.slice(bb.indexOf('_')+1);
+    							}
+    							if(aa!=bb){
+    								return aa>bb?1:-1;
+    							}
+    							return a>b?1:-1;
+    						});
+    						var list2=[];
+    						var skills=lib.character[list[0][0]][3];
+    						for(var i=0;i<skills.length;i++){
+    							list2.push([skills[i],lib.translate[skills[i]]]);
+    						}
+    						var selectname=ui.create.selectlist(list,list[0],addSkill);
+    						selectname.onchange=function(){
+    							var skills=lib.character[this.value][3];
+    							skillopt.innerHTML='';
+    							for(var i=0;i<skills.length;i++){
+    								var option=document.createElement('option');
+    								option.value=skills[i];
+    								option.innerHTML=lib.translate[skills[i]];
+    								skillopt.appendChild(option);
+    							}
+    						};
+    						selectname.style.maxWidth='85px';
+    						var skillopt=ui.create.selectlist(list2,list2[0],addSkill);
+    						var addSkillButton=document.createElement('button');
+    						addSkillButton.innerHTML='添加';
+    						addSkill.appendChild(addSkillButton);
+    						var deletenode=function(){
+    							this.remove();
+    						}
+    						addSkillButton.onclick=function(){
+    							for(var i=0;i<skillList.firstChild.childNodes.length;i++){
+    								if(skillList.firstChild.childNodes[i].skill==skillopt.value) return;
+    							}
+    							var node=document.createElement('button');
+    							node.skill=skillopt.value;
+                                node.onclick=deletenode;
+                                node.innerHTML=lib.translate[skillopt.value];
+                                skillList.firstChild.appendChild(node);
+    						};
+    						var skillList=ui.create.div('.skill_list',newCharacter);
+    						ui.create.div(skillList);
+    						ui.create.div('.menubutton.large','创建武将',ui.create.div(skillList),function(){
+
+    						});
+
+                            return page;
+                        }());
+                        var dash2=ui.create.div('.hidden',page);
+                        var dash3=ui.create.div('.hidden',page);
+                        var dash4=ui.create.div('.hidden',page);
+                        createDash('将','编辑武将',dash1);
+                        createDash('卡','编辑卡牌',dash2);
+                        createDash('技','编辑技能',dash3);
+                        createDash('码','编辑代码',dash4);
+                    }());
                     (function(){
                         var page=ui.create.div('');
                         var node=ui.create.div('.menubutton.large','获取扩展',start.firstChild,clickMode);
@@ -23635,6 +23833,10 @@
 				}
                 if((lib.config.layout=='phone'||lib.config.layout=='mobile')&&lib.config.textequip=='text'){
                     ui.arena.classList.add('textequip');
+                }
+
+				if(lib.config.blur_ui){
+                    ui.window.classList.add('blur_ui');
                 }
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){

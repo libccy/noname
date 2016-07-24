@@ -43,6 +43,23 @@ table{table-layout: fixed;}
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden):not(#autonode){opacity: 0.3 !important}
 #window.noclick_important *{pointer-events: none !important;}
 #window.noclick_important .noclick_click_important div{pointer-events: auto !important}
+
+#window.blur_ui #arena.paused,
+#window.blur_ui #arena.unfocus,
+#window.blur_ui #arena.right,
+#window.blur_ui #arena.menupaused,
+#window.blur_ui.shortcutpaused>#arena{
+    filter:blur(3px);
+    -webkit-filter:blur(3px);
+}
+#window.blur_ui #arena.menupaused{
+    opacity: 0.6;
+}
+#window.blur_ui #arena.thrownhighlight>.card.thrown:not(.thrownhighlight){
+    filter:blur(2px);
+    -webkit-filter:blur(2px);
+}
+
 #shortcut{
 	width:100%;
 	height:100%;
@@ -181,6 +198,9 @@ table{table-layout: fixed;}
 #arena[data-global_font='xiaozhuan']{
 	font-family: 'xiaozhuan';
 }
+#arena[data-global_font='lishu']{
+	font-family: 'lishu';
+}
 #arena[data-global_font='xinwei']{
 	font-family: 'xinwei';
 }
@@ -188,6 +208,7 @@ table{table-layout: fixed;}
 	font-family: 'huangcao','xinwei';
 }
 #arena[data-global_font='xiaozhuan'] #control,
+#arena[data-global_font='lishu'] #control,
 #arena[data-global_font='xinwei'] #control,
 #arena[data-global_font='huangcao'] #control{
 	font-family:'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
@@ -775,6 +796,10 @@ margin-bottom: 5px;
 #arena[data-name_font='xiaozhuan'] .button.character>.name{
 	font-family: 'xiaozhuan';
 }
+#arena[data-name_font='lishu'] .player>.name,
+#arena[data-name_font='lishu'] .button.character>.name{
+	font-family: 'lishu';
+}
 #arena[data-name_font='xinwei'] .player>.name,
 #arena[data-name_font='xinwei'] .button.character>.name{
 	font-family: 'xinwei';
@@ -1354,6 +1379,9 @@ div:hover>.intro{opacity: 1;}
 #arena[data-identity_font='xiaozhuan'] .player .identity>div{
 	font-family: 'xiaozhuan';
 }
+#arena[data-identity_font='lishu'] .player .identity>div{
+	font-family: 'lishu';
+}
 #arena[data-identity_font='xinwei'] .player .identity>div{
 	font-family: 'xinwei';
 }
@@ -1364,6 +1392,9 @@ div:hover>.intro{opacity: 1;}
 
 #arena[data-cardtext_font='xiaozhuan'] .card div:not(.info):not(.background){
 	font-family: 'xiaozhuan';
+}
+#arena[data-cardtext_font='lishu'] .card div:not(.info):not(.background){
+	font-family: 'lishu';
 }
 #arena[data-cardtext_font='xinwei'] .card div:not(.info):not(.background){
 	font-family: 'xinwei';

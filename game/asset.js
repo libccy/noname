@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.8.14',
+    '1.8.15',
     'image/background/huangtian_bg.jpg',
     'image/background/shengshi_bg.jpg',
     'image/background/xueji_bg.jpg',
@@ -2286,6 +2286,7 @@ window.noname_asset_list=[
     'audio/skill/zuoding1.mp3',
     'audio/skill/zuoding2.mp3',
     'font/xiaozhuan.ttf',
+    'font/lishu.ttf',
     'font/huangcao.ttf',
     'font/xinwei.ttf',
     'theme/music/grid.png',

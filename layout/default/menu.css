@@ -707,3 +707,62 @@
 	left: 0 !important;
 	top:0;
 }
+
+#extension-dashboard>.menubutton.large{
+	width: 80px;
+	height: 80px;
+	margin: 6px;
+}
+#extension-dashboard>.menubutton.large>div:first-child{
+	font-family: 'lishu','xiaozhuan';
+	font-size: 60px;
+	line-height: 60px;
+	position: absolute;
+	left: 0;
+	top: 10px;
+	width: 100%;
+	height: 60px;
+}
+#extension-dashboard>.menubutton.large>div:last-child{
+	font-size: 18px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+}
+#create-extension{
+	height: calc(100% - 5px);
+}
+#create-extension>div{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: scroll;
+	left: 0;
+	top: 0;
+}
+#create-extension>.menu-buttons{
+	left:10px;
+	height: calc(100% - 5px);
+}
+#create-extension>.menu-buttons>.config.more{
+	margin-left: 0px !important;
+	margin-top: 10px !important;
+}
+#create-extension>.hidden{
+	pointer-events: none;
+}
+#create-extension>div:not(*:first-child).hidden{
+	transform: translateX(200px);
+}
+#create-extension>.menu-buttons>.new_character>.skill_list{
+    top: 210px;
+}
+#create-extension>.menu-buttons>.new_character>.skill_list>div:first-child:not(*:empty){
+	margin-top: 10px;
+	margin-bottom: 17px;
+}
+#create-extension>.menu-buttons>.new_character>.skill_list>div:first-child>button{
+	margin-right: 3px;
+	margin-bottom: 3px;
+}

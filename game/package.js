@@ -60,6 +60,7 @@ font.pack={
     xiaozhuan:'小篆',
     xinwei:'新魏',
     huangcao:'黄草',
+    lishu:'隶书',
 };
 theme.pack={
     woodden:'木纹',
