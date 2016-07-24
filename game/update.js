@@ -2,7 +2,8 @@ window.noname_update={
     version:'1.8.19',
     changeLog:[
         '修bug',
-        '移除自定义武将功能、增加扩展制作向导'
+        '新字体',
+        '移除自定义武将、增加扩展制作工具',
     ],
     files:{
         global:[

@@ -21452,7 +21452,7 @@
                     }
                     (function(){
                         var page=ui.create.div('#create-extension');
-                        var node=ui.create.div('.menubutton.large','创建扩展',start.firstChild,clickMode);
+                        var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.link=page;
 						node.mode='create';
                         var pageboard=ui.create.div(page);
@@ -21642,7 +21642,15 @@
                         }());
                         var dash2=ui.create.div('.hidden',page);
                         var dash3=ui.create.div('.hidden',page);
-                        var dash4=ui.create.div('.hidden',page);
+                        var dash4=(function(){
+                            var page=ui.create.div('.hidden.menu-buttons');
+                            ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                page.hide();
+                                pageboard.show();
+                            });
+
+                            return page;
+                        }());
                         createDash('将','编辑武将',dash1);
                         createDash('卡','编辑卡牌',dash2);
                         createDash('技','编辑技能',dash3);
