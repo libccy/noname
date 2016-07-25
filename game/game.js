@@ -21501,7 +21501,7 @@
                         createModeConfig(i,start.firstChild);
                     }
                     (function(){
-                        if(!game.download&&!lib.db) return;
+                        if(!lib.device&&!lib.db) return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.link=page;
@@ -21657,6 +21657,7 @@
                             dash.link=node;
                             node.link=dash;
                             dash.listen(clickDash);
+                            lib.setScroll(node);
                             ui.create.div('',str1,dash);
                             ui.create.div('',str2,dash);
                         };
@@ -21772,11 +21773,27 @@
                     								fileReader.readAsArrayBuffer(blob, "UTF-8");
                                                 });
                                             };
-                                            img.src = data;
+                                            img.src=data;
                                         }
                                         if(game.download){
-                                            createButton(i,'extension/'+name+'/'+file);
-                                            loadImage(file,'extension/'+name+'/'+file);
+                                            var url=lib.assetURL+'extension/'+name+'/'+file;
+                                            createButton(i,url);
+                                            if(lib.device=='ios'||lib.device=='android'){
+                                                window.resolveLocalFileSystemURL(lib.assetURL+'extension/'+name,function(entry){
+                        							entry.getFile(file,{},function(fileEntry){
+                                                        fileEntry.file(function(fileToLoad){
+                                                            var fileReader = new FileReader();
+                            								fileReader.onload = function(e){
+                            									page.content.image[file]=e.target.result;
+                            								};
+                            								fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+                                                        });
+                        							});
+                        						});
+                                            }
+                                            else{
+                                                loadImage(file,url);
+                                            }
                                         }
                                         else{
                                             game.getDB('image','extension-'+name+':'+file,(function(file,name){
@@ -22089,6 +22106,10 @@
                                         container.code=container.editor.getValue();
                                         page.content[link]=container.code;
                                     }
+                                    else if(container.textarea){
+                                        container.code=container.textarea.value;
+                                        page.content[link]=container.code;
+                                    }
                                     delete window.saveNonameInput;
                                 };
                                 var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
@@ -22107,6 +22128,15 @@
                                 if(node.aced){
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
+                                }
+                                else if(lib.device=='ios'){
+                                    ui.window.appendChild(node);
+                                    if(!node.textarea){
+                                        var textarea=document.createElement('textarea');
+                                        this.editor.appendChild(textarea);
+                                        node.textarea=textarea;
+                                    }
+                                    node.textarea.value=node.code;
                                 }
                                 else{
                                     var id=this.editor.id;
