@@ -12,7 +12,7 @@ character.ow={
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
         ow_dva:['female','shu',2,['jijia','tuijin','zihui','chongzhuang']],
         ow_mei:['female','wei',3,['bingqiang','jidong','baoxue']],
-        ow_ana:['female','wei',3,['juji','zhiyuan','mianzhen']],
+        ow_ana:['female','wei',3,['zhiyuan','mianzhen','aqianghua']],
         ow_heibaihe:['female','qun',3,['juji','duwen','dulei']],
         ow_maikelei:['male','shu',4,['shanguang','tiandan','shenqiang']],
         ow_kuangshu:['male','shu',3,['liudan','shoujia','shihuo']],
@@ -26,6 +26,52 @@ character.ow={
         // ow_zhaliya:['female','shu',4,[]],
     },
     skill:{
+        aqianghua:{
+            enable:'phaseUse',
+            usable:1,
+            filter:function(event,player){
+                return player.num('h')>=2;
+            },
+            filterTarget:function(card,player,target){
+                return target!=player;
+            },
+            filterCard:true,
+            selectCard:-1,
+            discard:false,
+            prepare:function(cards,player,targets){
+                player.$give(cards,targets[0]);
+            },
+            content:function(){
+                target.gain(cards);
+                target.changeHujia();
+                target.addSkill('aqianghua2');
+            },
+            ai:{
+                threaten:1.5,
+                order:2.1,
+                    result:{
+                    target:function(player,target){
+                        if(ai.get.attitude(player,target)<3) return 0;
+                        if(target.num('j','lebu')) return 0;
+                        if(target.hasSkill('aqianghua2')) return 0.1;
+                        return 1;
+                    }
+                }
+            }
+        },
+        aqianghua2:{
+            trigger:{source:'damageBegin'},
+            forced:true,
+            content:function(){
+                trigger.num++;
+                player.unmarkSkill('aqianghua2');
+                player.removeSkill('aqianghua2');
+            },
+            mark:true,
+            intro:{
+                content:'下一次造成的伤害+1'
+            }
+        },
         shihuo:{
             trigger:{global:'damageEnd'},
             forced:true,
@@ -333,21 +379,24 @@ character.ow={
             enable:'phaseUse',
             usable:1,
             filter:function(event,player){
-                return player.num('he',{color:'black'})>0;
+                return player.num('he')>0;
             },
             filterTarget:function(card,player,target){
                 return target!=player&&!target.hasSkill('mianzhen2');
             },
-            filterCard:{color:'black'},
+            filterCard:true,
             position:'he',
             check:function(card){
                 return 8-ai.get.value(card);
             },
             content:function(){
-                target.addSkill('mianzhen2');
+                'step 0'
+                target.chooseToRespond({name:'shan'});
+                'step 1'
+                if(!result.bool) target.addSkill('mianzhen2');
             },
             ai:{
-                order:2,
+                order:2.2,
                 result:{
                     target:function(player,target){
                         return Math.min(-0.1,-1-target.num('h')+Math.sqrt(target.hp)/2);
@@ -419,14 +468,11 @@ character.ow={
 			},
 			forced:true,
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha'&&(player.hp==event.player.hp||player.num('h')==event.player.num('h'))&&
-					event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+				return event.card&&event.card.name=='sha'&&((player.hp==event.player.hp&&player.isDamaged())||player.num('h')==event.player.num('h'))&&event.notLink();
 			},
 			content:function(){
-                if(player.hp==trigger.player.hp) trigger.num++;
-				if(player.num('h')==trigger.player.num('h')) trigger.num++;
-                trigger._duwen=true;
-                player.addTempSkill('duwen2','phaseAfter');
+                if(player.num('h')==trigger.player.num('h')) trigger.num++;
+                if(player.hp==trigger.player.hp) player.recover();
 			},
             ai:{
                 threaten:1.5
@@ -441,6 +487,107 @@ character.ow={
             },
             content:function(){
                 player.loseHp(2);
+            }
+        },
+        juji:{
+            enable:'phaseUse',
+            usable:1,
+            filterCard:function(card){
+                var suit=get.suit(card);
+                for(var i=0;i<ui.selected.cards.length;i++){
+                    if(get.suit(ui.selected.cards[i])==suit) return false;
+                }
+                return true;
+            },
+            filterTarget:function(card,player,target){
+                return target!=player&&target.num('h')>0;
+            },
+            check:function(card){
+                if(ui.selected.cards.length>1) return 0;
+                return 5-ai.get.value(card);
+            },
+            selectCard:[1,4],
+            content:function(){
+                var suits=[];
+                for(var i=0;i<cards.length;i++){
+                    suits.push(get.suit(cards[i]));
+                }
+                var success=false;
+                for(var i=0;i<suits.length;i++){
+                    if(target.num('h',{suit:suits[i]})){
+                        success=true;break;
+                    }
+                }
+                if(!success){
+                    player.popup('失败');
+                }
+                else{
+                    player.popup('成功');
+                    player.addSkill('juji2');
+                    player.storage.juji2=target;
+                    player.markSkillCharacter('juji2',target,'狙击','与'+get.translation(target)+'的距离视为1且'+get.translation(target)+'不能闪避你的杀，直到回合结束');
+                }
+            },
+            ai:{
+                order:4,
+                result:{
+                    target:function(player,target){
+                        if(!player.num('h','sha')) return 0;
+                        if(target.num('h')<=1&&get.distance(player,target,'attack')<=1) return 0;
+                        var min=[];
+                        var num=0;
+                        for(var i=0;i<game.players.length;i++){
+                            if(game.players[i]!=player&&
+                                player.canUse('sha',game.players[i],false)){
+                                var eff=ai.get.effect(target,{name:'sha'},player,player);
+                                if(eff>num){
+                                    min.length=0;
+                                    min.push(game.players[i]);
+                                    num=eff;
+                                }
+                            }
+                        }
+                        for(var i=0;i<min.length;i++){
+                            if(ai.get.attitude(player,min[i])>0) return 0;
+                            if(min[i].num('h')<=1&&get.distance(player,min[i],'attack')<=1) return 0;
+                        }
+                        if(min.contains(target)) return -1;
+                        return 0;
+                    }
+                }
+            },
+        },
+        juji2:{
+            ai:{
+                effect:{
+                    player:function(card,player,target){
+                        if(card.name=='sha'&&target==player.storage.juji2) return [1,0,1,-1];
+                    }
+                }
+            },
+            trigger:{player:'phaseAfter'},
+            forced:true,
+            popup:false,
+            content:function(){
+                player.unmarkSkill('juji2');
+                player.removeSkill('juji2');
+                delete player.storage.juji2;
+            },
+            group:'juji3'
+        },
+        juji3:{
+            trigger:{player:'shaBegin'},
+			forced:true,
+			filter:function(event,player){
+				return event.target==player.storage.juji2;
+			},
+			content:function(){
+				trigger.directHit=true;
+			},
+            mod:{
+                globalFrom:function(from,to){
+                    if(to==from.storage.juji2) return -Infinity;
+                }
             }
         },
         dulei:{
@@ -518,7 +665,7 @@ character.ow={
 			},
             group:'juji2'
 		},
-        juji2:{
+        juji2_old:{
             enable:'phaseUse',
             usable:1,
             filterTarget:function(card,player,target){
@@ -539,7 +686,7 @@ character.ow={
                 }
             }
         },
-        juji3:{
+        juji3_old:{
             mark:true,
             intro:{
                 nocount:true,
@@ -2210,7 +2357,10 @@ character.ow={
         shenqiang_info:'若你使用杀指定了惟一目标且造成伤害，则此杀不计入回合内的出杀次数限制',
         mianzhen:'眠针',
         mianzhen2:'眠针',
-        mianzhen_info:'出牌阶段限一次，你可以弃置一张黑色牌，并令一名其他角色不能使用或打出卡牌直到其受到伤害或下一回合结束',
+        mianzhen_info:'出牌阶段限一次，你可以弃置一张牌并令一名其他角色打出一张闪，否则该角色不能使用或打出卡牌直到其受到伤害或下一回合结束',
+        aqianghua:'强化',
+        aqianghua2:'强化',
+        aqianghua_info:'出牌阶段限一次，你可以将你的全部手牌（至少两张）交给一名其他角色，该角色获得一点护甲且下一次造成的伤害+1',
         zhiyuan:'支援',
         zhiyuan_info:'每当你即将造成伤害，你可以防止此伤害，改为令目标回复等量的体力',
         juji:'狙击',
@@ -2218,7 +2368,7 @@ character.ow={
         juji3:'狙击',
         juji_info:'出牌阶段限一次，你可以弃置任意张花色不同的牌并指定一名有手牌的其他角色，若该角色的手牌中含有与你弃置的牌花色相同的牌，则本回合内你与其距离为1且该角色不能闪避你的杀',
         duwen:'毒吻',
-        duwen_info:'锁定技，当你使用杀造成伤害时，若你的手牌数与受伤害角色相等，此杀的伤害+1；若你的体力值与受伤害角色相等，此杀的伤害+1；在伤害结算后，若伤害值不小于3，你流失两点体力',
+        duwen_info:'锁定技，当你使用杀造成伤害时，若你的手牌数与受伤害角色相等，此杀的伤害+1；若你的体力值与受伤害角色相等，你回复一点体力',
         zhuagou:'抓钩',
         zhuagou_info:'出牌阶段限一次，你可以弃置一张手牌并将你的座位移到任意位置',
         dulei:'诡雷',

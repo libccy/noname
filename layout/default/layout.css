@@ -1552,6 +1552,9 @@ span[data-color="unknownm"]{
     text-align:center;
 	line-height: 18px;
 }
+.card.fullskin>.name.long{
+	top:5px;
+}
 .card.fullskin.thunder>.name{
 	color:#152E63;
 	border:1px solid #152E63;

@@ -75,8 +75,9 @@
 		onover:[],
         chatHistory:[],
 		arenaReady:[],
-        extensions:[],
         inpile:[],
+        extensions:[],
+        extensionPack:{},
         cardType:{},
         characterDialogGroup:{
             '收藏':function(name,capt){
@@ -3499,54 +3500,23 @@
 							db.createObjectStore('skill');
 						}
 					};
-					// request.onsuccess=function(e){
-					// 	var db=e.target.result;
-					// 	lib.db=db;
-					// 	for(var i=0;i<lib._onDB.length;i++){
-					// 		lib._onDB[i]();
-					// 	}
-					// 	game.getDB('skill',null,function(skills){
-					// 		if(skills){
-					// 			for(var i in skills){
-					// 				try{
-					// 					eval('lib.skill["'+i+'"]={'+skills[i].content+'}');
-					// 				}
-					// 				catch(e){
-					// 					console.log(e);
-					// 					lib.skill[i]={};
-					// 				}
-					// 				lib.skill[i].createInfo=skills[i];
-					// 				lib.setTranslate(i);
-					// 				lib.translate[i+'_info']=skills[i].description;
-					// 				if(lib.skill[i].marktext){
-					// 					lib.translate[i+'_bg']=lib.skill[i].marktext;
-					// 				}
-					// 			}
-					// 			if(_status.cardsFinished){
-					// 				game.finishCards();
-					// 			}
-					// 		}
-					// 		game.getDB('character',null,function(list){
-					// 			for(var i in list){
-					// 				if(!list[i][4]) list[i][4]=[];
-					// 				lib.character[i]=list[i];
-					// 				lib.customCharacters.push(i);
-					// 				lib.setTranslate(i);
-					// 			}
-					// 			_status.characterLoaded=true;
-					// 			if(_status.waitingForCharacters){
-					// 				game.createEvent('game',false).content=lib.init.start;
-					// 				delete lib.init.start;
-					// 				game.loop();
-					// 				delete _status.waitingForCharacters;
-					// 			}
-					// 			if(lib.onCharacterLoad){
-					// 				lib.onCharacterLoad();
-					// 				delete lib.onCharacterLoad;
-					// 			}
-					// 		});
-					// 	});
-					// }
+					request.onsuccess=function(e){
+						var db=e.target.result;
+						lib.db=db;
+						for(var i=0;i<lib._onDB.length;i++){
+							lib._onDB[i]();
+						}
+                        if(_status.waitingForDB){
+                            ui.create.arena();
+    						game.createEvent('game',false).content=lib.init.start;
+    						delete lib.init.start;
+    						delete _status.waitingForDB;
+    						game.loop();
+    					}
+                        else{
+                            _status.dbLoaded=true;
+                        }
+					}
 				}
                 if(typeof window.require=='function'&&!lib.device){
                     lib.node={
@@ -4105,7 +4075,15 @@
                             try{
                                 _status.extension=lib.extensions[i][0];
                                 _status.evaluatingExtension=lib.extensions[i][3];
-                                lib.extensions[i][1](lib.extensions[i][2]);
+                                lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]);
+                                if(lib.extensions[i][4]){
+                                    if(lib.extensions[i][4].character){
+                                        for(var j in lib.extensions[i][4].character.character){
+                                            game.addCharacterPack(get.copy(lib.extensions[i][4].character));
+                                            break;
+                                        }
+                                    }
+                                }
                                 delete _status.extension;
                                 delete _status.evaluatingExtension;
                             }
@@ -4115,14 +4093,15 @@
                         }
                     }
                     delete lib.extensions;
-					ui.create.arena();
 
-                    if(window.indexedDB&&!_status.characterLoaded&&false){
-						_status.waitingForCharacters=true;
+                    if(window.indexedDB&&!_status.dbLoaded){
+						_status.waitingForDB=true;
 					}
 					else{
+                        ui.create.arena();
 						game.createEvent('game',false).content=lib.init.start;
 						delete lib.init.start;
+                        delete _status.dbLoaded;
 						game.loop();
 					}
 				}
@@ -11338,6 +11317,9 @@
 					for(var i=0;i<name.length;i++){
 						this.node.name.innerHTML+=name[i]+'<br/>';
 					}
+                    if(name.length>=5){
+                        this.node.name.classList.add('long');
+                    }
 					this.node.name2.innerHTML=get.translation(card[0])+card[1]+' '+name;
 					this.suit=card[0];
 					this.number=card[1];
@@ -14077,6 +14059,13 @@
 				for(var i in obj.help){
 					lib.help[i]=obj.help[i];
 				}
+                lib.extensionMenu['extension_'+obj.name].edit={
+					name:'编辑此扩展',
+					clear:true,
+					onclick:function(){
+                        game.editExtension(obj.name);
+					}
+				}
 				lib.extensionMenu['extension_'+obj.name].delete={
 					name:'删除此扩展',
 					clear:true,
@@ -14128,13 +14117,35 @@
                         }
                     }
                     try{
+                        if(obj.package){
+                            lib.extensionPack[obj.name]=obj.package;
+                            lib.extensionPack[obj.name].files=obj.files||{};
+                            if(!lib.extensionPack[obj.name].files.character){
+                                lib.extensionPack[obj.name].files.character=[];
+                            }
+                            if(!lib.extensionPack[obj.name].files.card){
+                                lib.extensionPack[obj.name].files.card=[];
+                            }
+                            if(!lib.extensionPack[obj.name].files.skill){
+                                lib.extensionPack[obj.name].files.skill=[];
+                            }
+                        }
+                        else{
+                            lib.extensionPack[obj.name]={};
+                        }
+                        lib.extensionPack[obj.name].code={
+                            content:obj.content,
+                            precontent:obj.precontent,
+                            help:obj.help,
+                            config:obj.config
+                        }
                         if(obj.precontent){
                             _status.extension=obj.name;
                             obj.precontent(cfg);
                             delete _status.extension;
                         }
                         if(obj.content){
-                            lib.extensions.push([obj.name,obj.content,cfg,_status.evaluatingExtension]);
+                            lib.extensions.push([obj.name,obj.content,cfg,_status.evaluatingExtension,obj.package||{}]);
                         }
                     }
                     catch(e){
@@ -14146,143 +14157,196 @@
                 game.importedPack=obj;
             }
 		},
-        importExtension:function(data,finishLoad){
-            var zip=new JSZip();
-            zip.load(data);
-            var str=zip.file('extension.js').asText();
-            try{
-                _status.importingExtension=true;
-                eval(str);
-                _status.importingExtension=false;
-                if(!game.importedPack) throw('err');
-                var extname=game.importedPack.name;
-                if(lib.config.all.plays.contains('extname')){
-                    throw('err');
+        importExtension:function(data,finishLoad,exportext){
+            if(!window.JSZip){
+                lib.init.js(lib.assetURL+'game','jszip',function(){
+                    game.importExtension(data,finishLoad,exportext);
+                });
+            }
+            else if(get.objtype(data)=='object'){
+                var zip=new JSZip();
+                for(var i in data){
+                    zip.file(i,data[i]);
                 }
-                if(lib.config.extensions.contains(extname)){
-                    game.removeExtension(extname,true);
+                if(exportext){
+                    var blob = zip.generate({type:"blob"});
+					var fileNameToSaveAs = exportext;
+					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'.');
+					fileNameToSaveAs+='.zip';
+
+					if(lib.device){
+						var directory;
+						if(lib.device=='android'){
+							directory=cordova.file.externalDataDirectory;
+						}
+						else{
+							directory=cordova.file.documentsDirectory;
+						}
+						window.resolveLocalFileSystemURL(directory,function(entry){
+							entry.getFile(fileNameToSaveAs,{create:true},function(fileEntry){
+								fileEntry.createWriter(function(fileWriter){
+									fileWriter.onwriteend=function(){
+										alert('文件已导出至'+directory+fileNameToSaveAs);
+									}
+									fileWriter.write(blob)
+								});
+							});
+						});
+					}
+					else{
+						var downloadLink = document.createElement("a");
+						downloadLink.download = fileNameToSaveAs;
+						downloadLink.innerHTML = "Download File";
+						downloadLink.href = window.URL.createObjectURL(blob);
+						downloadLink.click();
+					}
+
+					if(typeof finishLoad=='function'){
+						finishLoad();
+					}
                 }
-                lib.config.extensions.add(extname);
-                game.saveConfig('extensions',lib.config.extensions);
-                game.saveConfig('extension_'+extname+'_enable',true);
-                for(var i in game.importedPack.config){
-                    if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
-                        game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
+                else{
+                    game.importExtension.apply(this,[zip.generate({type:'arraybuffer'}),finishLoad]);
+                }
+            }
+            else{
+                var zip=new JSZip();
+                zip.load(data);
+                var str=zip.file('extension.js').asText();
+                try{
+                    _status.importingExtension=true;
+                    eval(str);
+                    _status.importingExtension=false;
+                    if(!game.importedPack) throw('err');
+                    var extname=game.importedPack.name;
+                    if(lib.config.all.plays.contains('extname')){
+                        throw('err');
                     }
-                }
-                if(game.download){
-                    var filelist=[];
-                    for(var i in zip.files){
-                        if(i[0]!='.'&&i[0]!='_'){
-                            filelist.push(i);
+                    if(lib.config.extensions.contains(extname)){
+                        game.removeExtension(extname,true);
+                    }
+                    lib.config.extensions.add(extname);
+                    game.saveConfig('extensions',lib.config.extensions);
+                    game.saveConfig('extension_'+extname+'_enable',true);
+                    for(var i in game.importedPack.config){
+                        if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
+                            game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
                         }
                     }
-                    if(lib.node&&lib.node.fs){
-                        var access=function(){
-                            var dirname=__dirname+'/extension/'+extname;
-                            var finish=function(){
-                                dirname+='/';
-                                var writeFile=function(){
-                                    if(filelist.length){
-                                        var filename=filelist.shift();
-                                        lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
+                    if(game.download){
+                        var filelist=[];
+                        for(var i in zip.files){
+                            if(i[0]!='.'&&i[0]!='_'){
+                                filelist.push(i);
+                            }
+                        }
+                        if(lib.node&&lib.node.fs){
+                            var access=function(){
+                                var dirname=__dirname+'/extension/'+extname;
+                                var finish=function(){
+                                    dirname+='/';
+                                    var writeFile=function(){
+                                        if(filelist.length){
+                                            var filename=filelist.shift();
+                                            lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
+                                        }
+                                        else{
+                                            finishLoad();
+                                        }
+                                    }
+                                    writeFile();
+                                };
+                                lib.node.fs.access(dirname,function(e){
+                                    if(e){
+                                        try{
+                                            lib.node.fs.mkdir(dirname,finish);
+                                        }
+                                        catch(e){
+                                            throw('err');
+                                        }
                                     }
                                     else{
-                                        finishLoad();
+                                        finish();
                                     }
-                                }
-                                writeFile();
+                                });
                             };
-                            lib.node.fs.access(dirname,function(e){
+                            lib.node.fs.access(__dirname+'/extension',function(e){
                                 if(e){
                                     try{
-                                        lib.node.fs.mkdir(dirname,finish);
+                                        lib.node.fs.mkdir(__dirname+'/extension',access);
                                     }
                                     catch(e){
                                         throw('err');
                                     }
                                 }
                                 else{
-                                    finish();
+                                    access();
                                 }
                             });
-                        };
-                        lib.node.fs.access(__dirname+'/extension',function(e){
-                            if(e){
-                                try{
-                                    lib.node.fs.mkdir(__dirname+'/extension',access);
-                                }
-                                catch(e){
-                                    throw('err');
-                                }
-                            }
-                            else{
-                                access();
-                            }
-                        });
+                        }
+                        else{
+                            window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+                                entry.getDirectory('extension/'+extname,{create:true},function(dirEntry){
+                                    var writeFile=function(){
+                                        if(filelist.length){
+                                            var filename=filelist.shift();
+                                            dirEntry.getFile(filename,{create:true},function(fileEntry){
+                                                fileEntry.createWriter(function(fileWriter){
+                                                    fileWriter.onwriteend=writeFile;
+                                                    fileWriter.write(zip.files[filename].asArrayBuffer());
+                                                });
+                                            });
+                                        }
+                                        else{
+                                            finishLoad();
+                                        }
+                                    };
+                                    writeFile();
+                                });
+                            });
+                        }
                     }
                     else{
-                        window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
-                            entry.getDirectory('extension/'+extname,{create:true},function(dirEntry){
-                                var writeFile=function(){
-                                    if(filelist.length){
-                                        var filename=filelist.shift();
-                                        dirEntry.getFile(filename,{create:true},function(fileEntry){
-                                            fileEntry.createWriter(function(fileWriter){
-                                                fileWriter.onwriteend=writeFile;
-                                                fileWriter.write(zip.files[filename].asArrayBuffer());
-                                            });
-                                        });
-                                    }
-                                    else{
-                                        finishLoad();
-                                    }
-                                };
-                                writeFile();
-                            });
-                        });
-                    }
-                }
-                else{
-                    localStorage.setItem(lib.configprefix+'extension_'+extname,str);
-                    var imglist=[];
-                    for(var i in zip.files){
-                        if(i[0]!='.'&&i[0]!='_'){
-                            if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
-                                imglist.push(i);
+                        localStorage.setItem(lib.configprefix+'extension_'+extname,str);
+                        var imglist=[];
+                        for(var i in zip.files){
+                            if(i[0]!='.'&&i[0]!='_'){
+                                if(i.indexOf('.jpg')!=-1||i.indexOf('.png')!=-1){
+                                    imglist.push(i);
+                                }
                             }
                         }
-                    }
-                    if(imglist.length&&lib.db){
-                        lib.config.extensionInfo[extname]={
-                            image:imglist
-                        }
-                        game.saveConfig('extensionInfo',lib.config.extensionInfo);
-                        for(var i=0;i<imglist.length;i++){
-                            var imgname=imglist[i];
-                            var str=zip.file(imgname).asArrayBuffer();
-                            if(str){
-                                var blob=new Blob([str]);
-                                var fileReader=new FileReader();
-                                fileReader.onload = (function(imgname){
-                                    return function(fileLoadedEvent)
-                                    {
-                                        var data = fileLoadedEvent.target.result;
-                                        game.putDB('image','extension-'+extname+':'+imgname,data);
-                                    };
-                                }(imgname))
-                                fileReader.readAsDataURL(blob, "UTF-8");
+                        if(imglist.length&&lib.db){
+                            lib.config.extensionInfo[extname]={
+                                image:imglist
+                            }
+                            game.saveConfig('extensionInfo',lib.config.extensionInfo);
+                            for(var i=0;i<imglist.length;i++){
+                                var imgname=imglist[i];
+                                var str=zip.file(imgname).asArrayBuffer();
+                                if(str){
+                                    var blob=new Blob([str]);
+                                    var fileReader=new FileReader();
+                                    fileReader.onload = (function(imgname){
+                                        return function(fileLoadedEvent)
+                                        {
+                                            var data = fileLoadedEvent.target.result;
+                                            game.putDB('image','extension-'+extname+':'+imgname,data);
+                                        };
+                                    }(imgname))
+                                    fileReader.readAsDataURL(blob, "UTF-8");
+                                }
                             }
                         }
+                        finishLoad();
                     }
-                    finishLoad();
+                    delete game.importedPack;
                 }
-                delete game.importedPack;
-            }
-            catch(e){
-                console.log(e);
-                alert('导入失败');
-                return false;
+                catch(e){
+                    console.log(e);
+                    alert('导入失败');
+                    return false;
+                }
             }
         },
 		export:function(textToWrite,name){
@@ -19154,21 +19218,7 @@
                 }
                 var menuxpages=menux.pages.slice(0);
 
-				var copyObj=function(obj){
-					var copy={};
-					for(var i in obj){
-						if(get.objtype(obj[i])=='object'){
-							copy[i]=copyObj(obj[i]);
-						}
-						else if(Array.isArray(obj[i])){
-							copy[i]=obj[i].slice(0);
-						}
-						else{
-							copy[i]=obj[i];
-						}
-					}
-					return copy;
-				};
+				var copyObj=get.copy;
 
 				(function(){
 					var start=menuxpages.shift();
@@ -21451,7 +21501,7 @@
                         createModeConfig(i,start.firstChild);
                     }
                     (function(){
-                        if(!game.download) return;
+                        if(!game.download&&!lib.db) return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.link=page;
@@ -21463,18 +21513,127 @@
                         var inputExtName=document.createElement('input');
                         inputExtName.type='text';
                         inputExtName.value='无名扩展';
-                        inputExtName.style.width='120px';
+                        inputExtName.style.width='80px';
+                        inputExtName.style.textAlign='center';
                         inputExtLine.appendChild(inputExtName);
+                        game.editExtension=function(name){
+                            page.currentExtension=name||'无名扩展';
+                            inputExtName.value=page.currentExtension;
+                            if(name){
+                                inputExtName.disabled=true;
+                            }
+                            else{
+                                inputExtName.disabled=false;
+                            }
+                            exportExtLine.style.display='none';
+                            dash1.reset(name);
+                            dash2.reset(name);
+                            dash3.reset(name);
+                            dash4.reset(name);
+                            dash1.link.classList.remove('active');
+                            dash2.link.classList.remove('active');
+                            dash3.link.classList.remove('active');
+                            dash4.link.classList.remove('active');
+                            var active=node.parentNode.querySelector('.active');
+    						if(active===node){
+    							return;
+    						}
+    						active.classList.remove('active');
+    						active.link.remove();
+    						node.classList.add('active');
+    						rightPane.appendChild(node.link);
+                        }
+                        var processExtension=function(exportext){
+                            if(page.currentExtension){
+                                if(page.currentExtension!=inputExtName.value) return;
+                            }
+                            inputExtName.disabled=true;
+                            setTimeout(function(){
+                                var ext={};
+                                for(var i in dash4.content){
+                                    try{
+                                        eval('ext[i]='+dash4.content[i]);
+                                        if(i=='content'||i=='precontent'){
+                                            if(typeof ext[i]!='function'){
+                                                throw('err');
+                                            }
+                                            else{
+                                                ext[i]=ext[i].toString();
+                                            }
+                                        }
+                                        else{
+                                            if(typeof ext[i]!='object'){
+                                                throw('err');
+                                            }
+                                            else{
+                                                ext[i]=JSON.stringify(ext[i]);
+                                            }
+                                        }
+                                    }
+                                    catch(e){
+                                        delete ext[i];
+                                    }
+                                }
+                                page.currentExtension=inputExtName.value||'无名扩展';
+                                var str='{name:"'+page.currentExtension+'"';
+                                for(var i in ext){
+                                    str+=','+i+':'+ext[i];
+                                }
+                                str+=',package:'+JSON.stringify({
+                                    character:dash1.content.pack,
+                                    card:dash2.content.pack,
+                                    skill:dash3.content.pack
+                                });
+                                var files={character:[],card:[],skill:[]};
+                                for(var i in dash1.content.image){
+                                    files.character.push(i);
+                                }
+                                for(var i in dash2.content.image){
+                                    files.character.push(i);
+                                }
+                                for(var i in dash3.content.audio){
+                                    files.character.push(i);
+                                }
+                                str+=',files:'+JSON.stringify(files);
+                                str+='}';
+                                var extension={'extension.js':'game.import("extension",'+str+')'};
+                                for(var i in dash1.content.image){
+                                    extension[i]=dash1.content.image[i];
+                                }
+                                if(exportext){
+                                    game.importExtension(extension,null,page.currentExtension);
+                                }
+                                else{
+                                    game.importExtension(extension,function(){
+                                        exportExtLine.style.display='';
+                                    });
+                                }
+                            },500);
+                        };
                         var buttonSave=document.createElement('button');
                         buttonSave.innerHTML='保存';
                         buttonSave.style.marginLeft='3px';
                         buttonSave.onclick=function(){
-                            exportExtLine.style.display='';
-                        }
+                            dash1.link.classList.remove('active');
+                            dash2.link.classList.remove('active');
+                            dash3.link.classList.remove('active');
+                            dash4.link.classList.remove('active');
+                            processExtension();
+                        };
                         inputExtLine.appendChild(buttonSave);
+                        var buttonReset=document.createElement('button');
+                        buttonReset.innerHTML='重置';
+                        buttonReset.style.marginLeft='3px';
+                        buttonReset.onclick=function(){
+                            game.editExtension();
+                        };
+                        inputExtLine.appendChild(buttonReset);
                         var buttonExport=document.createElement('button');
                         buttonExport.innerHTML='导出';
                         buttonExport.style.marginLeft='3px';
+                        buttonExport.onclick=function(){
+                            processExtension(true);
+                        };
                         inputExtLine.appendChild(buttonExport);
                         var exportExtLine=ui.create.div(pageboard);
                         exportExtLine.style.display='none';
@@ -21496,16 +21655,160 @@
                             dashboard.appendChild(dash);
                             page.appendChild(node);
                             dash.link=node;
+                            node.link=dash;
                             dash.listen(clickDash);
                             ui.create.div('',str1,dash);
                             ui.create.div('',str2,dash);
                         };
                         var dash1=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
-                            ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                            var currentButton=null;
+                            var clickButton=function(){
+                                if(currentButton==this){
+                                    resetEditor();
+                                    return;
+                                }
+                                resetEditor();
+                                currentButton=this;
+    							toggle.classList.add('on');
+    							newCharacter.style.display='';
+    							fakeme.classList.add('inited');
+                                delete fakeme.image;
+    							delete fakeme.image64;
+    							fakeme.style.backgroundImage=this.style.backgroundImage;
+                                if(page.content.pack.translate[this.link]!=this.link){
+                                    newCharacter.querySelector('.new_name').value=this.link+'|'+page.content.pack.translate[this.link];
+                                }
+                                else{
+                                    newCharacter.querySelector('.new_name').value=this.link;
+                                }
+    							var info=page.content.pack.character[this.link];
+    							newCharacter.querySelector('.new_hp').value=info[2];
+    							sexes.value=info[0];
+    							groups.value=info[1];
+    							if(info[4]){
+    								for(var i=0;i<options.childNodes.length-1;i++){
+    									if(info[4].contains(options.childNodes[i].lastChild.name)){
+    										options.childNodes[i].lastChild.checked=true;
+    									}
+                                        else{
+                                            options.childNodes[i].lastChild.checked=false;
+                                        }
+    								}
+    							}
+
+    							var skills=info[3];
+    							for(var i=0;i<skills.length;i++){
+        							var node=document.createElement('button');
+        							node.skill=skills[i];
+                                    node.onclick=deletenode;
+                                    node.innerHTML=lib.translate[skills[i]];
+                                    skillList.firstChild.appendChild(node);
+    							}
+
+    							toggle.innerHTML='编辑武将 <div>&gt;</div>';
+    							var confirm=newCharacter.querySelector('.menubutton.large');
+    							confirm.innerHTML='编辑武将';
+    							confirm._origin=this;
+    							var button=this;
+    							var delnodefunc=function(){
+    								button.remove();
+                                    var name=button.link;
+                                    delete dash1.content.pack.character[name];
+                                    delete dash1.content.pack.translate[name];
+    								delete dash1.content.image[name];
+    								resetEditor();
+                                    dash1.link.classList.add('active');
+    							};
+    							var delnode=ui.create.div('.menubutton.large','删除',confirm.parentNode,delnodefunc);
+    							delnode.style.marginLeft='13px';
+    						}
+    						var createButton=function(name,image){
+    							var button=ui.create.div('.button.character');
+                                button.link=name;
+                                button.image=image;
+                                button.style.backgroundImage='url('+image+')';
+                                button.style.backgroundSize='cover';
+    							button.listen(clickButton);
+    							button.classList.add('noclick');
+                                button.nodename=ui.create.div(button,'.name',get.verticalStr(page.content.pack.translate[name]));
+                                button.nodename.style.top='8px';
+    							page.insertBefore(button,page.childNodes[1]);
+    						}
+                            page.reset=function(name){
+                                resetEditor();
+                                var buttons=page.querySelectorAll('.button.character');
+                                var list=[];
+                                for(var i=0;i<buttons.length;i++){
+                                    list.push(buttons[i]);
+                                }
+                                for(var i=0;i<list.length;i++){
+                                    list[i].remove();
+                                }
+                                if(lib.extensionPack[name]){
+                                    page.content.pack=lib.extensionPack[name].character||{
+                                        character:{},
+                                        translate:{}
+                                    };
+                                    page.content.image={};
+                                    for(var i in page.content.pack.character){
+                                        var file=i+'.jpg';
+                                        var loadImage=function(file,data){
+                                            var img = new Image();
+                                            img.crossOrigin = 'Anonymous';
+                                            img.onload = function() {
+                                                var canvas = document.createElement('CANVAS');
+                                                var ctx = canvas.getContext('2d');
+                                                var dataURL;
+                                                canvas.height = this.height;
+                                                canvas.width = this.width;
+                                                ctx.drawImage(this, 0, 0);
+                                                canvas.toBlob(function(blob){
+                                                    var fileReader = new FileReader();
+                    								fileReader.onload = function(e)
+                    								{
+                    									page.content.image[file]=e.target.result;
+                    								};
+                    								fileReader.readAsArrayBuffer(blob, "UTF-8");
+                                                });
+                                            };
+                                            img.src = data;
+                                        }
+                                        if(game.download){
+                                            createButton(i,'extension/'+name+'/'+file);
+                                            loadImage(file,'extension/'+name+'/'+file);
+                                        }
+                                        else{
+                                            game.getDB('image','extension-'+name+':'+file,(function(file,name){
+                                                return function(data){
+                                                    createButton(name,data);
+                                                    loadImage(file,data);
+                                                };
+                                            }(file,i)))
+                                        }
+                                    }
+                                }
+                                else{
+                                    page.content={
+                                        pack:{
+                                            character:{},
+                                            translate:{}
+                                        },
+                                        image:{}
+                                    };
+                                }
+                            };
+                            ui.create.div('.config.more.on','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
                                 page.hide();
                                 pageboard.show();
                             });
+                            page.content={
+                                pack:{
+                                    character:{},
+                                    translate:{}
+                                },
+                                image:{}
+                            };
     						var newCharacter;
     						var toggle=ui.create.div('.config.more','创建武将 <div>&gt;</div>',page,function(){
     							this.classList.toggle('on');
@@ -21517,6 +21820,7 @@
     							}
     						});
     						var resetEditor=function(){
+                                currentButton=null;
     							toggle.classList.remove('on');
     							newCharacter.style.display='none';
     							fakeme.classList.remove('inited');
@@ -21541,8 +21845,6 @@
     						}
 
     						newCharacter=ui.create.div('.new_character',page);
-    						newCharacter.style.display='none';
-
     						var fakeme=ui.create.div('.avatar',newCharacter);
 
     						var input=document.createElement('input');
@@ -21555,9 +21857,15 @@
     								fileReader.onload = function(fileLoadedEvent)
     								{
     									var data = fileLoadedEvent.target.result;
-    									fakeme.image=data;
     									fakeme.style.backgroundImage='url('+data+')';
+                                        fakeme.image64=data;
     									fakeme.classList.add('inited');
+                                        var fileReader = new FileReader();
+        								fileReader.onload = function(fileLoadedEvent)
+        								{
+        									fakeme.image=fileLoadedEvent.target.result;
+        								};
+        								fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
     								};
     								fileReader.readAsDataURL(fileToLoad, "UTF-8");
     							}
@@ -21637,21 +21945,125 @@
     						var skillList=ui.create.div('.skill_list',newCharacter);
     						ui.create.div(skillList);
     						ui.create.div('.menubutton.large','创建武将',ui.create.div(skillList),function(){
+                                var name=page.querySelector('input.new_name').value;
+                                if(!name) return;
+                                name=name.split('|');
+                                var translate=name[1]||name[0];
+                                name=name[0];
+                                if(currentButton){
+                                    if(currentButton.link!=name){
+                                        page.content.image[name+'.jpg']=page.content.image[currentButton.link+'.jpg'];
+                                        delete page.content.image[currentButton.link+'.jpg'];
+                                        delete page.content.pack.character[currentButton.link];
+                                        currentButton.link=name;
+                                    }
+                                }
+                                if(fakeme.image){
+                                    page.content.image[name+'.jpg']=fakeme.image;
+                                }
+                                else{
+                                    if(!page.content.image[name+'.jpg']) return;
+                                }
+                                var hp=page.querySelector('input.new_hp').value;
+                                hp=parseInt(hp)||1;
+                                var skills=[];
+                                for(var i=0;i<skillList.firstChild.childNodes.length;i++){
+                                    skills.add(skillList.firstChild.childNodes[i].skill);
+                                }
+                                var tags=[];
+                                for(var i=0;i<options.childNodes.length-1;i++){
+                                    if(options.childNodes[i].lastChild.checked){
+                                        tags.push(options.childNodes[i].lastChild.name);
+                                    }
+                                }
+                                if(tags.contains('boss')){
+                                    tags.add('bossallowed');
+                                }
 
+                                page.content.pack.translate[name]=translate;
+                                page.content.pack.character[name]=[sexes.value,groups.value,hp,skills,tags];
+                                if(this.innerHTML=='创建武将'){
+                                    createButton(name,fakeme.image64);
+                                }
+                                else if(currentButton){
+                                    if(fakeme.image64){
+                                        currentButton.image=fakeme.image64;
+                                        currentButton.style.backgroundImage='url('+fakeme.image64+')';
+                                    }
+                                    currentButton.nodename.innerHTML=get.verticalStr(translate);
+                                }
+                                resetEditor();
+                                dash1.link.classList.add('active');
     						});
 
                             return page;
                         }());
-                        var dash2=ui.create.div('.hidden',page);
-                        var dash3=ui.create.div('.hidden',page);
+                        var dash2=(function(){
+                            var page=ui.create.div('.hidden.menu-buttons');
+                            page.reset=function(name){
+
+                            };
+                            ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                page.hide();
+                                pageboard.show();
+                            });
+                            ui.create.div('.config.more','还没做好',page);
+                            page.content={
+                                pack:{
+                                    card:{},
+                                    translate:{},
+                                    list:[]
+                                },
+                                image:{}
+                            };
+                            return page;
+                        }());
+                        var dash3=(function(){
+                            var page=ui.create.div('.hidden.menu-buttons');
+                            page.reset=function(name){
+
+                            };
+                            ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                page.hide();
+                                pageboard.show();
+                            });
+                            ui.create.div('.config.more','还没做好',page);
+                            page.content={
+                                pack:{
+                                    skill:{},
+                                    translate:{}
+                                },
+                                audio:{}
+                            };
+                            return page;
+                        }());
                         var dash4=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
                                 page.hide();
                                 pageboard.show();
                             });
+                            page.reset=function(name){
+                                page.content={};
+                                for(var i in dashes){
+                                    dashes[i].node.code='';
+                                }
+                                if(lib.extensionPack[name]){
+                                    for(var i in lib.extensionPack[name].code){
+                                        switch(typeof lib.extensionPack[name].code[i]){
+                                            case 'function':page.content[i]=lib.extensionPack[name].code[i].toString();break;
+                                            case 'object':page.content[i]=JSON.stringify(lib.extensionPack[name].code[i]);break;
+                                        }
+                                    }
+                                    for(var i in page.content){
+                                        dashes[i].node.code=page.content[i]||'';
+                                    }
+                                }
+                            };
+                            var dashes={};
                             var createCode=function(str1,str2,sub,func,link,str){
                                 var dash=ui.create.div('.menubutton.large.dashboard');
+                                dashes[link]=dash;
                                 sub.appendChild(dash);
                                 dash.listen(func);
                                 dash.link=link;
@@ -21662,34 +22074,52 @@
                                 var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
                                     ui.window.classList.remove('shortcutpaused');
                                     ui.window.classList.remove('systempaused');
-                                    container.delete();
+                                    container.delete(null);
+                                    if(container.code&&container.editor){
+                                        container.editor.setValue(container.code,1);
+                                    }
+                                    delete window.saveNonameInput;
                                 });
-                                var saveConfig=ui.create.div('.editbutton','保存',editorpage,function(){
+                                var saveInput=function(){
+                                    dash4.link.classList.add('active');
                                     ui.window.classList.remove('shortcutpaused');
                                     ui.window.classList.remove('systempaused');
                                     container.delete();
-                                });
+                                    if(container.editor){
+                                        container.code=container.editor.getValue();
+                                        page.content[link]=container.code;
+                                    }
+                                    delete window.saveNonameInput;
+                                };
+                                var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
                                 var editor=ui.create.div('#editor-'+link,editorpage);
-                                editor.innerHTML=str;
+                                container.code=str;
                                 dash.editor=editor;
                                 dash.node=container;
+                                dash.saveInput=saveInput;
+                                page.content[link]=str;
                             };
                             var clickCode=function(){
                                 var node=this.node;
                                 ui.window.classList.add('shortcutpaused');
                                 ui.window.classList.add('systempaused');
+                                window.saveNonameInput=this.saveInput;
                                 if(node.aced){
                                     ui.window.appendChild(node);
+                                    node.editor.setValue(node.code,1);
                                 }
                                 else{
                                     var id=this.editor.id;
                                     var aceReady=function(){
                                         ui.window.appendChild(node);
                                         var editor=window.ace.edit(id);
+                                        editor.$blockScrolling=Infinity;
                                         editor.setTheme("ace/theme/chrome");
                                         editor.getSession().setUseWorker(false);
                                         editor.getSession().setMode("ace/mode/javascript");
                                         node.aced=true;
+                                        node.editor=editor;
+                                        editor.setValue(node.code,1);
                                     }
                                     if(!window.ace){
                                         lib.init.js('game','ace',aceReady);
@@ -21699,10 +22129,12 @@
                                     }
                                 }
                             };
-                            createCode('主','主代码',page,clickCode,'content','function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1为选项值；参数2为扩展定义的武将、卡牌和技能（可修改）\n}');
+                            page.content={}
+                            createCode('主','主代码',page,clickCode,'content','function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}');
                             createCode('启','启动代码',page,clickCode,'precontent','function(){\n\t\/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n\t\/\/除添加模式外请慎用\n}');
-                            createCode('选','选项代码',page,clickCode,'config','{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n\n\/\/传入主代码函数的参数为{switcher_example:"3",toggle_example:true}');
-                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t"帮助条目":"&lt;ul&gt;&lt;li&gt;列表1-条目1&lt;li&gt;列表1-条目2&lt;\/ul&gt;&lt;ol&gt;&lt;li&gt;列表2-条目1&lt;li&gt;列表2-条目2&lt;\/ul&gt;"\n}');
+                            createCode('选','选项代码',page,clickCode,'config','{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n\n\/\/此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n\/\/导出时本段代码中的换行、缩进以及注释将被清除');
+                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n\n\/\/帮助内容将显示在菜单－选项－帮助中\n\/\/导出时本段代码中的换行、缩进以及注释将被清除');
+
                             return page;
                         }());
                         createDash('将','编辑武将',dash1);
@@ -21747,33 +22179,25 @@
                         importExtension.firstChild.lastChild.onclick=function(){
                             var fileToLoad=this.previousSibling.files[0];
                             if(fileToLoad){
-                                var zipReady=function(){
-                                    var fileReader = new FileReader();
-                                    fileReader.onload = function(fileLoadedEvent)
-                                    {
-                                        var finishLoad=function(){
-                                            extensionnode.innerHTML='导入成功，3秒后将重启';
+                                var fileReader = new FileReader();
+                                fileReader.onload = function(fileLoadedEvent)
+                                {
+                                    var finishLoad=function(){
+                                        extensionnode.innerHTML='导入成功，3秒后将重启';
+                                        setTimeout(function(){
+                                            extensionnode.innerHTML='导入成功，2秒后将重启';
                                             setTimeout(function(){
-                                                extensionnode.innerHTML='导入成功，2秒后将重启';
-                                                setTimeout(function(){
-                                                    extensionnode.innerHTML='导入成功，1秒后将重启';
-                                                    setTimeout(game.reload,1000);
-                                                },1000);
+                                                extensionnode.innerHTML='导入成功，1秒后将重启';
+                                                setTimeout(game.reload,1000);
                                             },1000);
-                                        };
-                                        var data = fileLoadedEvent.target.result;
-                                        if(game.importExtension(data,finishLoad)!==false){
-                                            importExtension.style.display='none';
-                                        }
+                                        },1000);
                                     };
-                                    fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-                                }
-                                if(!window.JSZip){
-                                    lib.init.js(lib.assetURL+'game','jszip',zipReady);
-                                }
-                                else{
-                                    zipReady();
-                                }
+                                    var data = fileLoadedEvent.target.result;
+                                    if(game.importExtension(data,finishLoad)!==false){
+                                        importExtension.style.display='none';
+                                    }
+                                };
+                                fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
                             }
                         }
 
@@ -23393,8 +23817,17 @@
                             newlined2.style.display='none';
                         }
                     });
+                    var packlist=[];
                     for(var i=0;i<lib.config.all.characters.length;i++){
                         if(!lib.config.characters.contains(lib.config.all.characters[i])) continue;
+                        packlist.push(lib.config.all.characters[i]);
+                    }
+                    for(var i in lib.characterPack){
+                        if(!lib.config.all.characters.contains(i)){
+                            packlist.push(i);
+                        }
+                    }
+                    for(var i=0;i<packlist.length;i++){
                         var span=document.createElement('div');
                         span.style.display='inline-block';
                         span.style.width='auto';
@@ -23405,8 +23838,8 @@
                         else{
                             span.style.fontSize='22px';
                         }
-                        span.innerHTML=lib.translate[lib.config.all.characters[i]+'_character_config'];
-                        span.link=lib.config.all.characters[i];
+                        span.innerHTML=lib.translate[packlist[i]+'_character_config'];
+                        span.link=packlist[i];
                         span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
                         newlined2.appendChild(span);
                     }
@@ -27219,6 +27652,25 @@
 		},
 	};
 	var get={
+        copy:function(obj){
+            if(get.objtype(obj)=='object'){
+                var copy={};
+                for(var i in obj){
+                    copy[i]=get.copy(obj[i]);
+                }
+                return copy;
+            }
+            else if(Array.isArray(obj)){
+                var copy=[];
+                for(var i=0;i<obj.length;i++){
+                    copy.push(get.copy(obj[i]));
+                }
+                return copy;
+            }
+            else{
+                return obj;
+            }
+        },
         inpile:function(type,filter){
             var list=[];
             for(var i=0;i<lib.inpile.length;i++){
@@ -29427,7 +29879,7 @@
 			this.classList.remove('hidden');
 			return this;
 		};
-		HTMLDivElement.prototype.delete=function(time){
+		HTMLDivElement.prototype.delete=function(time,callback){
 			if(this.timeout){
 				clearTimeout(this.timeout);
 				delete this.timeout;
@@ -29439,6 +29891,9 @@
 				this.timeout=setTimeout(function(){
 					that.remove();
 					that.classList.remove('removing');
+                    if(typeof callback=='function'){
+                        callback();
+                    }
 				},time);
 			}
 			else{
@@ -29773,63 +30228,93 @@
 			return aa+bb+cc+dd;
 		}
 		window.onkeydown=function(e){
-			if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')) return;
-			game.closePopped();
-			var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
-			for(var i=0;i<dialogs.length;i++){
-				dialogs[i].delete();
-			}
-			if(e.keyCode==32){
-				var node=ui.window.querySelector('#paused');
-				if(node){
-					node.click();
-				}
-				else{
-					ui.click.pause();
-				}
-			}
-			else if(e.keyCode==65){
-				if(ui.auto) ui.auto.click();
-			}
-			else if(e.keyCode==87){
-				if(ui.wuxie&&ui.wuxie.style.display!='none'){
-					ui.wuxie.classList.toggle('glow')
-				}
-				else if(ui.tempnowuxie){
-					ui.tempnowuxie.classList.toggle('glow')
-				}
-			}
-			else if(e.keyCode==73){
-				// if(game.showIdentity){
-				// 	game.showIdentity();
-				// }
-			}
-			else if(e.keyCode==67){
-				// var node=ui.window.querySelector('#click');
-				// if(node){
-				// 	node.click();
-				// }
-				// else{
-				// 	ui.click.config();
-				// }
-			}
-			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
-				if(e.shiftKey){
-					if(confirm('是否重置游戏？')){
-						var noname_inited=localStorage.getItem('noname_inited');
-		                localStorage.clear();
-						if(noname_inited){
-							localStorage.setItem('noname_inited',noname_inited);
-						}
-						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-						game.reload();
-						return;
-					}
-				}
-				else{
-					game.reload();
-				}
-			}
+			if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
+                if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
+    				if(e.shiftKey){
+    					if(confirm('是否重置游戏？')){
+    						var noname_inited=localStorage.getItem('noname_inited');
+    		                localStorage.clear();
+    						if(noname_inited){
+    							localStorage.setItem('noname_inited',noname_inited);
+    						}
+    						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+    						game.reload();
+    						return;
+    					}
+    				}
+    				else{
+    					game.reload();
+    				}
+    			}
+    			else if(e.keyCode==83&&(e.ctrlKey||e.metaKey)){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+    			}
+            }
+            else{
+                game.closePopped();
+    			var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
+    			for(var i=0;i<dialogs.length;i++){
+    				dialogs[i].delete();
+    			}
+    			if(e.keyCode==32){
+    				var node=ui.window.querySelector('#paused');
+    				if(node){
+    					node.click();
+    				}
+    				else{
+    					ui.click.pause();
+    				}
+    			}
+    			else if(e.keyCode==65){
+    				if(ui.auto) ui.auto.click();
+    			}
+    			else if(e.keyCode==87){
+    				if(ui.wuxie&&ui.wuxie.style.display!='none'){
+    					ui.wuxie.classList.toggle('glow')
+    				}
+    				else if(ui.tempnowuxie){
+    					ui.tempnowuxie.classList.toggle('glow')
+    				}
+    			}
+    			else if(e.keyCode==73){
+    				// if(game.showIdentity){
+    				// 	game.showIdentity();
+    				// }
+    			}
+    			else if(e.keyCode==67){
+    				// var node=ui.window.querySelector('#click');
+    				// if(node){
+    				// 	node.click();
+    				// }
+    				// else{
+    				// 	ui.click.config();
+    				// }
+    			}
+    			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
+    				if(e.shiftKey){
+    					if(confirm('是否重置游戏？')){
+    						var noname_inited=localStorage.getItem('noname_inited');
+    		                localStorage.clear();
+    						if(noname_inited){
+    							localStorage.setItem('noname_inited',noname_inited);
+    						}
+    						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+    						game.reload();
+    						return;
+    					}
+    				}
+    				else{
+    					game.reload();
+    				}
+    			}
+    			else if(e.keyCode==83&&(e.ctrlKey||e.metaKey)){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+    			}
+            }
 		};
 		window.onload=function(){
 			if(_status.packLoaded){

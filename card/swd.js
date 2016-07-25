@@ -274,7 +274,18 @@ card.swd={
 					value:7
 				},
 				result:{
-					target:2,
+					target:function(player,target){
+						var players=[];
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i]!=player&&!game.players[i].isTurnedOver()&&
+								ai.get.attitude(player,game.players[i])>=3&&ai.get.attitude(game.players[i],player)>=3){
+								players.push(game.players[i]);
+							}
+						}
+						players.sort(lib.sort.seat);
+						if(target==players[0]) return 2;
+						return 0.5;
+					},
 					player:1,
 				},
 			}

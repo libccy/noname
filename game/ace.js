@@ -10750,12 +10750,14 @@ exports.commands = [{
     },
     readOnly: true
 }, {
-    // name: "find",
-    // bindKey: bindKey("Ctrl-F", "Command-F"),
-    // exec: function(editor) {
-    //     config.loadModule("ace/ext/searchbox", function(e) {e.Search(editor)});
-    // },
-    // readOnly: true
+    name: "save",
+    bindKey: bindKey("Ctrl-S", "Command-S"),
+    exec: function(editor) {
+        if(typeof window.saveNonameInput=='function'){
+            window.saveNonameInput();
+        }
+    },
+    readOnly: true
 }, {
     name: "overwrite",
     bindKey: "Insert",
