@@ -3666,8 +3666,10 @@
 						}
 					});
 				}
-                if(lib.device&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&
-                    navigator.userAgent.toLowerCase().indexOf('crosswalk')==-1){
+                if(navigator.userAgent.toLowerCase().indexOf('crosswalk')!=-1){
+                    lib.crosswalk=true;
+                }
+                if(lib.device&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&!lib.crosswalk){
                     game.documentZoom=document.documentElement.offsetWidth/960;
                     game.deviceZoom=game.documentZoom;
                     document.documentElement.style.zoom=game.documentZoom;
@@ -13949,6 +13951,7 @@
 			if(_status.video&&arguments[1]!='video') return;
 			if(_status.skillaudio.contains(name)) return;
 			game.addVideo('playSkillAudio',null,name);
+            game.print(name);
 			if(name.indexOf('|')<name.lastIndexOf('|')){
 				name=name.slice(name.lastIndexOf('|')+1);
 			}
@@ -19055,7 +19058,7 @@
 	                        active._link.remove();
 	                    }
 	                    this.classList.add('active');
-                        if(game.deviceZoom!=1&&lib.config.layout=='phone'){
+                        if((game.deviceZoom!=1||lib.crosswalk)&&lib.config.layout=='phone'){
                             menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
                         }
 	                    else{
