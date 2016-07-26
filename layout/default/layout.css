@@ -45,7 +45,7 @@ table{table-layout: fixed;}
 }
 #window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(.dialog):not(.centermenu):not(.popup-container){opacity: 0.3 !important}
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden):not(#autonode){opacity: 0.3 !important}
-#window.shortcutpaused>#system{opacity: 0.3 !important;}
+#window.systempaused>#system{opacity: 0.3 !important;}
 #window.noclick_important *{pointer-events: none !important;}
 #window.noclick_important .noclick_click_important div{pointer-events: auto !important}
 

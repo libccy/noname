@@ -1056,6 +1056,11 @@
 							if(!lib.config.title) document.title='无名杀';
 						}
 					},
+                    show_extensionmaker:{
+                        name:'显示制作扩展',
+                        init:true,
+                        unfrequent:true,
+                    },
 					blur_ui:{
 						name:'模糊效果',
 						init:false,
@@ -21519,6 +21524,7 @@
                     }
                     (function(){
                         if(!lib.device&&!lib.db) return;
+                        if(lib.config.show_extensionmaker==false) return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.link=page;
@@ -22380,6 +22386,10 @@
                                 confirmcontainer.style.display='none';
                                 container.code=get.stringify(lib.card[selectname.value]);
                                 codeButton.onclick.call(codeButton);
+                                var description=newCard.querySelector('input.new_description');
+                                if(!description.value){
+                                    description.value=lib.translate[selectname.value+'_info'];
+                                }
                             }
 
                             var citecancel=document.createElement('button');
@@ -22893,6 +22903,10 @@
                                 cancelSkillButton.style.display='none';
                                 container.code=get.stringify(lib.skill[skillopt.value]);
                                 editbutton.onclick.call(editbutton);
+                                var description=newSkill.querySelector('input.new_description');
+                                if(!description.value){
+                                    description.value=lib.translate[skillopt.value+'_info'];
+                                }
                             }
     						var cancelSkillButton=document.createElement('button');
                             cancelSkillButton.style.display='none';

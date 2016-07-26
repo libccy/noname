@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.19.1',
+    version:'1.8.19.2',
     changeLog:[
         '***注意：更新后将无法使用或导出自定义武将，请自行备份***',
         '修bug',
@@ -21,5 +21,7 @@ window.noname_update={
             'layout/default/menu.css',
         ],
         '1.8.18.1':[],
+        '1.8.19':[],
+        '1.8.19.1':[],
     }
 }
