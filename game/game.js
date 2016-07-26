@@ -4083,6 +4083,18 @@
                                             break;
                                         }
                                     }
+                                    if(lib.extensions[i][4].card){
+                                        for(var j in lib.extensions[i][4].card.card){
+                                            game.addCardPack(get.copy(lib.extensions[i][4].card));
+                                            break;
+                                        }
+                                    }
+                                    if(lib.extensions[i][4].skill){
+                                        for(var j in lib.extensions[i][4].skill.skill){
+                                            game.addSkill(j,lib.extensions[i][4].skill.skill[j],
+                                            lib.extensions[i][4].skill.translate[j],lib.extensions[i][4].skill.translate[j+'_info']);
+                                        }
+                                    }
                                 }
                                 delete _status.extension;
                                 delete _status.evaluatingExtension;
@@ -21510,6 +21522,7 @@
                         var inputExtLine=ui.create.div(pageboard);
                         inputExtLine.style.padding='10px';
                         inputExtLine.style.whiteSpace='nowrap';
+                        inputExtLine.style.overflow='visible';
                         var inputExtName=document.createElement('input');
                         inputExtName.type='text';
                         inputExtName.value='无名扩展';
@@ -21579,7 +21592,11 @@
                                 for(var i in ext){
                                     str+=','+i+':'+ext[i];
                                 }
-                                str+=',package:'+JSON.stringify({
+                                dash2.content.pack.list=[];
+                                for(var i=0;i<dash2.pile.childNodes.length;i++){
+                                    dash2.content.pack.list.push(dash2.pile.childNodes[i].link);
+                                }
+                                str+=',package:'+get.stringify({
                                     character:dash1.content.pack,
                                     card:dash2.content.pack,
                                     skill:dash3.content.pack
@@ -21589,16 +21606,19 @@
                                     files.character.push(i);
                                 }
                                 for(var i in dash2.content.image){
-                                    files.character.push(i);
+                                    files.card.push(i);
                                 }
                                 for(var i in dash3.content.audio){
-                                    files.character.push(i);
+                                    files.skill.push(i);
                                 }
                                 str+=',files:'+JSON.stringify(files);
                                 str+='}';
                                 var extension={'extension.js':'game.import("extension",'+str+')'};
                                 for(var i in dash1.content.image){
                                     extension[i]=dash1.content.image[i];
+                                }
+                                for(var i in dash2.content.image){
+                                    extension[i]=dash2.content.image[i];
                                 }
                                 if(exportext){
                                     game.importExtension(extension,null,page.currentExtension);
@@ -21674,8 +21694,6 @@
     							toggle.classList.add('on');
     							newCharacter.style.display='';
     							fakeme.classList.add('inited');
-                                delete fakeme.image;
-    							delete fakeme.image64;
     							fakeme.style.backgroundImage=this.style.backgroundImage;
                                 if(page.content.pack.translate[this.link]!=this.link){
                                     newCharacter.querySelector('.new_name').value=this.link+'|'+page.content.pack.translate[this.link];
@@ -21710,7 +21728,6 @@
     							toggle.innerHTML='编辑武将 <div>&gt;</div>';
     							var confirm=newCharacter.querySelector('.menubutton.large');
     							confirm.innerHTML='编辑武将';
-    							confirm._origin=this;
     							var button=this;
     							var delnodefunc=function(){
     								button.remove();
@@ -21815,7 +21832,7 @@
                                     };
                                 }
                             };
-                            ui.create.div('.config.more.on','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                            ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
                                 page.hide();
                                 pageboard.show();
                             });
@@ -21827,7 +21844,7 @@
                                 image:{}
                             };
     						var newCharacter;
-    						var toggle=ui.create.div('.config.more','创建武将 <div>&gt;</div>',page,function(){
+    						var toggle=ui.create.div('.config.more.on','创建武将 <div>&gt;</div>',page,function(){
     							this.classList.toggle('on');
     							if(this.classList.contains('on')){
     								newCharacter.style.display='';
@@ -21841,7 +21858,8 @@
     							toggle.classList.remove('on');
     							newCharacter.style.display='none';
     							fakeme.classList.remove('inited');
-    							delete fakeme.image;
+                                delete fakeme.image;
+    							delete fakeme.image64;
     							fakeme.style.backgroundImage='';
     							var inputs=newCharacter.querySelectorAll('input');
     							for(var i=0;i<inputs.length;i++){
@@ -21855,7 +21873,6 @@
     							toggle.innerHTML='创建武将 <div>&gt;</div>';
     							var node=newCharacter.querySelector('.menubutton.large');
     							node.innerHTML='创建武将';
-    							delete node._origin;
     							if(node.nextSibling){
     								node.nextSibling.remove();
     							}
@@ -21926,20 +21943,32 @@
     							return a>b?1:-1;
     						});
     						var list2=[];
-    						var skills=lib.character[list[0][0]][3];
+                            var skills=lib.character[list[0][0]][3];
     						for(var i=0;i<skills.length;i++){
     							list2.push([skills[i],lib.translate[skills[i]]]);
     						}
-    						var selectname=ui.create.selectlist(list,list[0],addSkill);
+                            list.unshift(['current_extension','此扩展']);
+
+    						var selectname=ui.create.selectlist(list,list[1],addSkill);
     						selectname.onchange=function(){
-    							var skills=lib.character[this.value][3];
-    							skillopt.innerHTML='';
-    							for(var i=0;i<skills.length;i++){
-    								var option=document.createElement('option');
-    								option.value=skills[i];
-    								option.innerHTML=lib.translate[skills[i]];
-    								skillopt.appendChild(option);
-    							}
+                                skillopt.innerHTML='';
+                                if(this.value=='current_extension'){
+                                    for(var i in dash3.content.pack.skill){
+                                        var option=document.createElement('option');
+        								option.value=i;
+        								option.innerHTML=dash3.content.pack.translate[i];
+        								skillopt.appendChild(option);
+                                    }
+                                }
+                                else{
+                                    var skills=lib.character[this.value][3];
+        							for(var i=0;i<skills.length;i++){
+        								var option=document.createElement('option');
+        								option.value=skills[i];
+        								option.innerHTML=lib.translate[skills[i]];
+        								skillopt.appendChild(option);
+        							}
+                                }
     						};
     						selectname.style.maxWidth='85px';
     						var skillopt=ui.create.selectlist(list2,list2[0],addSkill);
@@ -21956,7 +21985,11 @@
     							var node=document.createElement('button');
     							node.skill=skillopt.value;
                                 node.onclick=deletenode;
-                                node.innerHTML=lib.translate[skillopt.value];
+                                for(var i=0;i<skillopt.childElementCount;i++){
+                                    if(skillopt.childNodes[i].value==skillopt.value){
+                                        node.innerHTML=skillopt.childNodes[i].innerHTML;break;
+                                    }
+                                }
                                 skillList.firstChild.appendChild(node);
     						};
     						var skillList=ui.create.div('.skill_list',newCharacter);
@@ -21972,6 +22005,7 @@
                                         page.content.image[name+'.jpg']=page.content.image[currentButton.link+'.jpg'];
                                         delete page.content.image[currentButton.link+'.jpg'];
                                         delete page.content.pack.character[currentButton.link];
+                                        delete page.content.pack.translate[currentButton.link];
                                         currentButton.link=name;
                                     }
                                 }
@@ -22017,14 +22051,183 @@
                         }());
                         var dash2=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
-                            page.reset=function(name){
+                            var currentButton=null;
+                            var clickButton=function(){
+                                if(currentButton==this){
+                                    resetEditor();
+                                    return;
+                                }
+                                resetEditor();
+                                currentButton=this;
+    							toggle.classList.add('on');
+    							newCard.style.display='';
+    							fakeme.classList.add('inited');
+                                delete fakeme.image;
+    							delete fakeme.image64;
+                                if(this.classList.contains('fullskin')){
+                                    fakeme.imagenode.style.backgroundImage=this.imagenode.style.backgroundImage;
+                                    fakeme.classList.add('fullskin');
+                                }
+                                else{
+                                    fakeme.style.backgroundImage=this.style.backgroundImage;
+                                    fakeme.classList.remove('fullskin');
+                                }
+                                if(page.content.pack.translate[this.link]!=this.link){
+                                    newCard.querySelector('.new_name').value=this.link+'|'+page.content.pack.translate[this.link];
+                                }
+                                else{
+                                    newCard.querySelector('.new_name').value=this.link;
+                                }
+                                newCard.querySelector('.new_description').value=page.content.pack.translate[this.link+'_info'];
+    							var info=page.content.pack.card[this.link];
+                                container.code=get.stringify(info);
 
+    							toggle.innerHTML='编辑卡牌 <div>&gt;</div>';
+    							var confirm=newCard.querySelector('.menubutton.large');
+    							confirm.innerHTML='编辑卡牌';
+    							var button=this;
+    							var delnodefunc=function(){
+    								button.remove();
+                                    var name=button.link;
+                                    delete dash2.content.pack.card[name];
+                                    delete dash2.content.pack.translate[name];
+                                    delete dash2.content.pack.translate[name+'_info'];
+    								delete dash2.content.image[name];
+    								resetEditor();
+                                    updatePile();
+                                    dash2.link.classList.add('active');
+    							};
+    							var delnode=ui.create.div('.menubutton.large.new_card_delete','删除',confirm.parentNode,delnodefunc);
+    						}
+    						var createButton=function(name,image,fullskin){
+    							var button=ui.create.div('.button.card');
+                                button.link=name;
+                                button.image=image;
+                                button.imagenode=ui.create.div('.image',button);
+                                if(image){
+                                    if(fullskin){
+                                        button.imagenode.style.backgroundImage='url('+image+')';
+                                        button.style.backgroundImage='';
+                                        button.style.backgroundSize='';
+                                        button.classList.add('fullskin');
+                                    }
+                                    else{
+                                        button.style.color='white';
+                                        button.style.textShadow='black 0 0 2px';
+                                        button.imagenode.style.backgroundImage='';
+                                        button.style.backgroundImage='url('+image+')';
+                                        button.style.backgroundSize='cover';
+                                    }
+                                }
+    							button.listen(clickButton);
+    							button.classList.add('noclick');
+                                button.nodename=ui.create.div(button,'.name',get.verticalStr(page.content.pack.translate[name]));
+    							page.insertBefore(button,page.childNodes[1]);
+    						}
+                            page.reset=function(name){
+                                resetEditor();
+                                var buttons=page.querySelectorAll('.button.card');
+                                var list=[];
+                                for(var i=0;i<buttons.length;i++){
+                                    list.push(buttons[i]);
+                                }
+                                for(var i=0;i<list.length;i++){
+                                    list[i].remove();
+                                }
+                                if(lib.extensionPack[name]){
+                                    page.content.pack=lib.extensionPack[name].card||{
+                                        card:{},
+                                        translate:{}
+                                    };
+                                    page.content.image={};
+                                    if(Array.isArray(page.content.pack.list)){
+                                        for(var i=0;i<page.content.pack.list.length;i++){
+                                            var card=page.content.pack.list[i];
+                                            var node=document.createElement('button');
+                                            node.innerHTML=page.content.pack.translate[card[2]]+' '+lib.translate[card[0]]+card[1];
+                                            node.name=card[2];
+                                            node.link=card;
+                                            pile.appendChild(node);
+                                            node.onclick=function(){
+                                                this.remove();
+                                            }
+                                        }
+                                    }
+                                    for(var i in page.content.pack.card){
+                                        var file;
+                                        var fullskin=page.content.pack.card[i].fullskin?true:false;
+                                        if(fullskin){
+                                            file=i+'.png';
+                                        }
+                                        else{
+                                            file=i+'.jpg';
+                                        }
+                                        var loadImage=function(file,data){
+                                            var img = new Image();
+                                            img.crossOrigin = 'Anonymous';
+                                            img.onload = function() {
+                                                var canvas = document.createElement('CANVAS');
+                                                var ctx = canvas.getContext('2d');
+                                                var dataURL;
+                                                canvas.height = this.height;
+                                                canvas.width = this.width;
+                                                ctx.drawImage(this, 0, 0);
+                                                canvas.toBlob(function(blob){
+                                                    var fileReader = new FileReader();
+                    								fileReader.onload = function(e)
+                    								{
+                    									page.content.image[file]=e.target.result;
+                    								};
+                    								fileReader.readAsArrayBuffer(blob, "UTF-8");
+                                                });
+                                            };
+                                            img.src=data;
+                                        }
+                                        if(game.download){
+                                            var url=lib.assetURL+'extension/'+name+'/'+file;
+                                            createButton(i,url,fullskin);
+                                            if(lib.device=='ios'||lib.device=='android'){
+                                                window.resolveLocalFileSystemURL(lib.assetURL+'extension/'+name,function(entry){
+                        							entry.getFile(file,{},function(fileEntry){
+                                                        fileEntry.file(function(fileToLoad){
+                                                            var fileReader = new FileReader();
+                            								fileReader.onload = function(e){
+                            									page.content.image[file]=e.target.result;
+                            								};
+                            								fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+                                                        });
+                        							});
+                        						});
+                                            }
+                                            else{
+                                                loadImage(file,url);
+                                            }
+                                        }
+                                        else{
+                                            game.getDB('image','extension-'+name+':'+file,(function(file,name,fullskin){
+                                                return function(data){
+                                                    createButton(name,data,fullskin);
+                                                    loadImage(file,data);
+                                                };
+                                            }(file,i,fullskin)))
+                                        }
+                                    }
+                                }
+                                else{
+                                    page.content={
+                                        pack:{
+                                            card:{},
+                                            translate:{}
+                                        },
+                                        image:{}
+                                    };
+                                }
+                                updatePile();
                             };
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
                                 page.hide();
                                 pageboard.show();
                             });
-                            ui.create.div('.config.more','还没做好',page);
                             page.content={
                                 pack:{
                                     card:{},
@@ -22033,18 +22236,703 @@
                                 },
                                 image:{}
                             };
+                            var newCard;
+    						var toggle=ui.create.div('.config.more.on','创建卡牌 <div>&gt;</div>',page,function(){
+    							this.classList.toggle('on');
+    							if(this.classList.contains('on')){
+    								newCard.style.display='';
+    							}
+    							else{
+    								newCard.style.display='none';
+    							}
+    						});
+    						var resetEditor=function(){
+                                currentButton=null;
+    							toggle.classList.remove('on');
+    							newCard.style.display='none';
+                                fakeme.classList.remove('inited');
+    							fakeme.classList.add('fullskin');
+                                delete fakeme.image;
+                                delete fakeme.image64;
+                                fakeme.style.backgroundImage='';
+    							fakeme.imagenode.style.backgroundImage='';
+    							var inputs=newCard.querySelectorAll('input');
+    							for(var i=0;i<inputs.length;i++){
+    								inputs[i].value='';
+    							}
+    							toggle.innerHTML='创建卡牌 <div>&gt;</div>';
+    							var node=newCard.querySelector('.menubutton.large');
+    							node.innerHTML='创建卡牌';
+    							if(node.nextSibling){
+    								node.nextSibling.remove();
+    							}
+                                container.code='{\n\ttype:"basic",\n\tenable:true,\n\tfilterTarget:true,\n\tcontent:function(){\n\t\ttarget.draw()\n\t},\n\tai:{\n\t\torder:1,\n\t\tresult:{\n\t\t\ttarget:1\n\t\t}\n\t}\n}';
+    						}
+
+    						newCard=ui.create.div('.new_character',page);
+                            newCard.style.height='173px';
+    						var fakeme=ui.create.div('.card.fullskin',newCard);
+
+    						var input=document.createElement('input');
+    						input.type='file';
+    						input.accept='image/jpeg,image/png';
+    						input.onchange=function(){
+    							var fileToLoad=input.files[0];
+    							if(fileToLoad){
+    								var fileReader = new FileReader();
+                                    var fullimage=(fileToLoad.name.indexOf('.jpg')!=-1);
+    								fileReader.onload = function(fileLoadedEvent)
+    								{
+    									var data = fileLoadedEvent.target.result;
+                                        if(fullimage){
+                                            fakeme.imagenode.style.backgroundImage='';
+                                            fakeme.style.backgroundImage='url('+data+')';
+                                            fakeme.classList.remove('fullskin');
+                                        }
+    									else{
+                                            fakeme.style.backgroundImage='';
+                                            fakeme.imagenode.style.backgroundImage='url('+data+')';
+                                            fakeme.classList.add('fullskin');
+                                        }
+                                        fakeme.image64=data;
+    									fakeme.classList.add('inited');
+                                        var fileReader = new FileReader();
+        								fileReader.onload = function(fileLoadedEvent)
+        								{
+        									fakeme.image=fileLoadedEvent.target.result;
+        								};
+        								fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+    								};
+    								fileReader.readAsDataURL(fileToLoad, "UTF-8");
+    							}
+    						}
+    						fakeme.appendChild(input);
+
+                            fakeme.imagenode=ui.create.div('.image',fakeme);
+    						ui.create.div('.name','选<br>择<br>背<br>景',fakeme);
+
+    						ui.create.div('.indent','名称：<input class="new_name" type="text">',newCard).style.paddingTop='8px';
+    						ui.create.div('.indent','描述：<input class="new_description" type="text">',newCard).style.paddingTop='6px';
+                            var codeButton=document.createElement('button');
+                            newCard.appendChild(codeButton);
+                            codeButton.innerHTML='编辑代码';
+                            codeButton.style.left='123px';
+                            codeButton.style.top='66px';
+                            codeButton.style.position='absolute';
+
+                            var citeButton=document.createElement('button');
+                            newCard.appendChild(citeButton);
+                            citeButton.innerHTML='引用代码';
+                            citeButton.style.left='123px';
+                            citeButton.style.top='90px';
+                            citeButton.style.position='absolute';
+                            citeButton.onclick=function(){
+                                codeButton.style.display='none';
+                                citeButton.style.display='none';
+                                selectname.style.display='';
+                                confirmcontainer.style.display='';
+                            }
+
+                            var list=[];
+    						for(var i in lib.card){
+    							if(lib.translate[i]){
+                                    list.push([i,lib.translate[i]]);
+                                }
+    						}
+    						list.sort(function(a,b){
+    							a=a[0];b=b[0];
+    							var aa=a,bb=b;
+    							if(aa.indexOf('_')!=-1){
+    								aa=aa.slice(aa.indexOf('_')+1);
+    							}
+    							if(bb.indexOf('_')!=-1){
+    								bb=bb.slice(bb.indexOf('_')+1);
+    							}
+    							if(aa!=bb){
+    								return aa>bb?1:-1;
+    							}
+    							return a>b?1:-1;
+    						});
+    						var selectname=ui.create.selectlist(list,list[0],newCard);
+                            selectname.style.left='123px';
+                            selectname.style.top='66px';
+                            selectname.style.position='absolute';
+                            selectname.style.display='none';
+
+                            var confirmcontainer=ui.create.div(newCard);
+                            confirmcontainer.style.left='123px';
+                            confirmcontainer.style.top='90px';
+                            confirmcontainer.style.position='absolute';
+                            confirmcontainer.style.display='none';
+
+                            var citeconfirm=document.createElement('button');
+                            citeconfirm.innerHTML='引用';
+                            confirmcontainer.appendChild(citeconfirm);
+                            citeconfirm.onclick=function(){
+                                codeButton.style.display='';
+                                citeButton.style.display='';
+                                selectname.style.display='none';
+                                confirmcontainer.style.display='none';
+                                container.code=get.stringify(lib.card[selectname.value]);
+                                codeButton.onclick.call(codeButton);
+                            }
+
+                            var citecancel=document.createElement('button');
+                            citecancel.innerHTML='取消';
+                            citecancel.style.marginLeft='3px';
+                            confirmcontainer.appendChild(citecancel);
+                            citecancel.onclick=function(){
+                                codeButton.style.display='';
+                                citeButton.style.display='';
+                                selectname.style.display='none';
+                                confirmcontainer.style.display='none';
+                            }
+
+                            codeButton.onclick=function(){
+                                var node=container;
+                                ui.window.classList.add('shortcutpaused');
+                                ui.window.classList.add('systempaused');
+                                window.saveNonameInput=saveInput;
+                                if(node.aced){
+                                    ui.window.appendChild(node);
+                                    node.editor.setValue(node.code,1);
+                                }
+                                else if(lib.device=='ios'||lib.device=='android'){
+                                    ui.window.appendChild(node);
+                                    if(!node.textarea){
+                                        var textarea=document.createElement('textarea');
+                                        editor.appendChild(textarea);
+                                        node.textarea=textarea;
+                                    }
+                                    node.textarea.value=node.code;
+                                }
+                                else{
+                                    var id=editor.id;
+                                    var aceReady=function(){
+                                        ui.window.appendChild(node);
+                                        var editor=window.ace.edit(id);
+                                        editor.$blockScrolling=Infinity;
+                                        editor.setTheme("ace/theme/chrome");
+                                        editor.getSession().setUseWorker(false);
+                                        editor.getSession().setMode("ace/mode/javascript");
+                                        node.aced=true;
+                                        node.editor=editor;
+                                        editor.setValue(node.code,1);
+                                    }
+                                    if(!window.ace){
+                                        lib.init.js('game','ace',aceReady);
+                                    }
+                                    else{
+                                        aceReady();
+                                    }
+                                }
+                            }
+
+                            var container=ui.create.div('.popup-container.editor');
+                            var editorpage=ui.create.div(container);
+                            var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+                                ui.window.classList.remove('shortcutpaused');
+                                ui.window.classList.remove('systempaused');
+                                container.delete(null);
+                                if(container.code&&container.editor){
+                                    container.editor.setValue(container.code,1);
+                                }
+                                delete window.saveNonameInput;
+                            });
+                            var saveInput=function(){
+                                dash2.link.classList.add('active');
+                                ui.window.classList.remove('shortcutpaused');
+                                ui.window.classList.remove('systempaused');
+                                container.delete();
+                                if(container.editor){
+                                    container.code=container.editor.getValue();
+                                }
+                                else if(container.textarea){
+                                    container.code=container.textarea.value;
+                                }
+                                delete window.saveNonameInput;
+                            };
+                            var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+                            var editor=ui.create.div('#editor-card',editorpage);
+                            container.code='{\n\ttype:"basic",\n\tenable:true,\n\tfilterTarget:true,\n\tcontent:function(){\n\t\ttarget.draw()\n\t},\n\tai:{\n\t\torder:1,\n\t\tresult:{\n\t\t\ttarget:1\n\t\t}\n\t}\n}';
+
+                            ui.create.div('.menubutton.large.new_card','创建卡牌',newCard,function(){
+                                var name=page.querySelector('input.new_name').value;
+                                if(!name) return;
+                                name=name.split('|');
+                                var translate=name[1]||name[0];
+                                var info=page.querySelector('input.new_description').value;
+                                name=name[0];
+                                if(currentButton){
+                                    if(currentButton.link!=name){
+                                        var extname;
+                                        if(currentButton.classList.contains('fullskin')){
+                                            extname='.png';
+                                        }
+                                        else{
+                                            extname='.jpg';
+                                        }
+                                        page.content.image[name+extname]=page.content.image[currentButton.link+extname];
+                                        delete page.content.image[currentButton.link+extname];
+                                        delete page.content.pack.card[currentButton.link];
+                                        delete page.content.pack.translate[currentButton.link];
+                                        delete page.content.pack.translate[currentButton.link+'_info'];
+                                        currentButton.link=name;
+                                    }
+                                }
+                                if(fakeme.image){
+                                    if(fakeme.classList.contains('fullskin')){
+                                        page.content.image[name+'.png']=fakeme.image;
+                                        delete page.content.image[name+'.jpg'];
+                                    }
+                                    else{
+                                        page.content.image[name+'.jpg']=fakeme.image;
+                                        delete page.content.image[name+'.png'];
+                                    }
+                                }
+                                else if(!fakeme.classList.contains('inited')){
+                                    return;
+                                }
+                                page.content.pack.translate[name]=translate;
+                                page.content.pack.translate[name+'_info']=info;
+                                try{
+                                    eval('page.content.pack.card[name]='+container.code);
+                                }
+                                catch(e){
+                                    page.content.pack.card[name]={};
+                                }
+                                if(fakeme.classList.contains('inited')){
+                                    if(fakeme.classList.contains('fullskin')){
+                                        page.content.pack.card[name].fullskin=true;
+                                        delete page.content.pack.card[name].fullimage;
+                                    }
+                                    else{
+                                        page.content.pack.card[name].fullimage=true;
+                                        delete page.content.pack.card[name].fullskin;
+                                    }
+                                }
+                                if(this.innerHTML=='创建卡牌'){
+                                    createButton(name,fakeme.image64,fakeme.classList.contains('fullskin'));
+                                }
+                                else if(currentButton){
+                                    if(fakeme.image64){
+                                        if(fakeme.classList.contains('fullskin')){
+                                            currentButton.style.color='';
+                                            currentButton.style.textShadow='';
+                                            currentButton.imagenode.style.backgroundImage='url('+fakeme.image64+')';
+                                            currentButton.style.backgroundImage='';
+                                            currentButton.style.backgroundSize='';
+                                            currentButton.classList.add('fullskin');
+                                        }
+                                        else{
+                                            currentButton.style.color='white';
+                                            currentButton.style.textShadow='black 0 0 2px';
+                                            currentButton.imagenode.style.backgroundImage='';
+                                            currentButton.style.backgroundImage='url('+fakeme.image64+')';
+                                            currentButton.style.backgroundSize='cover';
+                                            currentButton.classList.remove('fullskin');
+                                        }
+                                    }
+                                    currentButton.nodename.innerHTML=get.verticalStr(translate);
+                                }
+                                resetEditor();
+                                updatePile();
+                                dash2.link.classList.add('active');
+    						});
+
+
+                            var editPile;
+    						var toggle2=ui.create.div('.config.more','编辑牌堆 <div>&gt;</div>',page,function(){
+    							this.classList.toggle('on');
+    							if(this.classList.contains('on')){
+    								editPile.style.display='';
+    							}
+    							else{
+    								editPile.style.display='none';
+    							}
+    						});
+
+    						editPile=ui.create.div('.edit_pile',page);
+                            editPile.style.display='none';
+
+
+                            var cardpileadd=ui.create.div('.config.toggle.cardpilecfg.cardpilecfgadd',editPile);
+                            var pile=ui.create.div(editPile);
+                            page.pile=pile;
+							var cardpileaddname=document.createElement('select');
+                            var updatePile=function(){
+                                cardpileaddname.innerHTML='';
+                                var list=[];
+                                var list2=[];
+                                for(var i in page.content.pack.card){
+                                    list.push([i,page.content.pack.translate[i]]);
+                                    list2.push(i);
+                                }
+                                if(list.length){
+                                    toggle2.style.display='';
+                                    if(toggle2.classList.contains('on')){
+        								editPile.style.display='';
+        							}
+        							else{
+        								editPile.style.display='none';
+        							}
+                                    for(var i=0;i<list.length;i++){
+                    					var option=document.createElement('option');
+                						option.value=list[i][0];
+                						option.innerHTML=list[i][1];
+                                        cardpileaddname.appendChild(option);
+                    				}
+                                    for(var i=0;i<pile.childNodes.length;i++){
+                                        if(!list2.contains(pile.childNodes[i].name)){
+                                            pile.childNodes[i].remove();i--;
+                                        }
+                                    }
+                                }
+                                else{
+                                    toggle2.style.display='none';
+                                    editPile.style.display='none';
+                                    pile.innerHTML='';
+                                }
+                            };
+                            updatePile();
+                            cardpileadd.appendChild(cardpileaddname);
+							cardpileaddname.style.width='75px';
+							cardpileaddname.style.marginRight='2px';
+							cardpileaddname.style.marginLeft='-1px';
+							var cardpileaddsuit=ui.create.selectlist([
+								['heart','红桃'],
+								['diamond','方片'],
+								['club','梅花'],
+								['spade','黑桃'],
+							],null,cardpileadd);
+							cardpileaddsuit.style.width='53px';
+							cardpileaddsuit.style.marginRight='2px';
+							var cardpileaddnumber=ui.create.selectlist([
+								1,2,3,4,5,6,7,8,9,10,11,12,13
+							],null,cardpileadd);
+							cardpileaddnumber.style.width='43px';
+							cardpileaddnumber.style.marginRight='2px';
+							var button=document.createElement('button');
+							button.innerHTML='确定';
+							button.style.width='40px';
+							button.onclick=function(){
+								var card=[
+									cardpileaddsuit.value,
+									cardpileaddnumber.value,
+									cardpileaddname.value,
+								];
+                                var node=document.createElement('button');
+                                node.innerHTML=page.content.pack.translate[card[2]]+' '+lib.translate[card[0]]+card[1];
+                                node.name=card[2];
+                                node.link=card;
+                                pile.appendChild(node);
+                                node.onclick=function(){
+                                    this.remove();
+                                }
+							};
+							cardpileadd.appendChild(button);
+                            cardpileadd.style.whiteSpace='nowrap';
+                            cardpileadd.style.position='relative';
+							cardpileadd.style.right='-4px';
+
                             return page;
                         }());
                         var dash3=(function(){
-                            var page=ui.create.div('.hidden.menu-buttons');
+                            var page=ui.create.div('.hidden.menu-buttons.new_skill');
                             page.reset=function(name){
-
+                                resetEditor();
+                                var buttons=page.querySelectorAll('.menubutton:not(.large)');
+                                var list=[];
+                                for(var i=0;i<buttons.length;i++){
+                                    list.push(buttons[i]);
+                                }
+                                for(var i=0;i<list.length;i++){
+                                    list[i].remove();
+                                }
+                                if(lib.extensionPack[name]){
+                                    page.content.pack=lib.extensionPack[name].skill||{
+                                        skill:{},
+                                        translate:{}
+                                    };
+                                    page.content.audio={};
+                                    for(var i in page.content.pack.skill){
+                                        createButton(i);
+                                    }
+                                }
+                                else{
+                                    page.content={
+                                        pack:{
+                                            skill:{},
+                                            translate:{}
+                                        },
+                                        audio:{}
+                                    };
+                                }
                             };
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
                                 page.hide();
                                 pageboard.show();
                             });
-                            ui.create.div('.config.more','还没做好',page);
+                            var currentButton=null;
+                            var clickButton=function(){
+                                if(currentButton==this){
+                                    resetEditor();
+                                    return;
+                                }
+                                resetEditor();
+                                currentButton=this;
+    							toggle.classList.add('on');
+    							newSkill.style.display='';
+                                if(page.content.pack.translate[this.link]!=this.link){
+                                    newSkill.querySelector('.new_name').value=this.link+'|'+page.content.pack.translate[this.link];
+                                }
+                                else{
+                                    newSkill.querySelector('.new_name').value=this.link;
+                                }
+                                newSkill.querySelector('.new_description').value=page.content.pack.translate[this.link+'_info'];
+    							var info=page.content.pack.skill[this.link];
+                                container.code=get.stringify(info);
+
+    							toggle.innerHTML='编辑技能 <div>&gt;</div>';
+    							var confirm=newSkill.querySelector('.menubutton.large');
+    							confirm.innerHTML='编辑技能';
+    							var button=this;
+    							var delnodefunc=function(){
+    								button.remove();
+                                    var name=button.link;
+                                    delete dash3.content.pack.skill[name];
+                                    delete dash3.content.pack.translate[name];
+                                    delete dash3.content.pack.translate[name+'_info'];
+    								resetEditor();
+                                    dash3.link.classList.add('active');
+    							};
+    							var delnode=ui.create.div('.menubutton.large.new_card_delete','删除',confirm.parentNode,delnodefunc);
+    						}
+    						var createButton=function(name){
+    							var button=ui.create.div('.menubutton');
+                                button.link=name;
+                                button.innerHTML=page.content.pack.translate[name];
+    							button.listen(clickButton);
+    							page.insertBefore(button,page.childNodes[1]);
+    						}
+                            var newSkill;
+    						var toggle=ui.create.div('.config.more.on','创建技能 <div>&gt;</div>',page,function(){
+    							this.classList.toggle('on');
+    							if(this.classList.contains('on')){
+    								newSkill.style.display='';
+    							}
+    							else{
+    								newSkill.style.display='none';
+    							}
+    						});
+    						var resetEditor=function(){
+                                currentButton=null;
+    							toggle.classList.remove('on');
+    							newSkill.style.display='none';
+    							var inputs=newSkill.querySelectorAll('input');
+    							for(var i=0;i<inputs.length;i++){
+    								inputs[i].value='';
+    							}
+    							var inputs=newSkill.querySelectorAll('textarea');
+    							for(var i=0;i<inputs.length;i++){
+    								inputs[i].value='';
+    							}
+    							toggle.innerHTML='创建技能 <div>&gt;</div>';
+    							var node=newSkill.querySelector('.menubutton.large');
+    							node.innerHTML='创建技能';
+    							if(node.nextSibling){
+    								node.nextSibling.remove();
+    							}
+                                container.code='{\n\ttrigger:{player:"phaseEnd"},\n\tfrequent:true,\n\tcontent:function(){\n\t\tplayer.draw()\n\t}\n}';
+    						}
+
+    						newSkill=ui.create.div('.new_character.new_skill',page);
+    						var namenode=ui.create.div('.config','名称：<input class="new_name" type="text" style="width:120px"></input>',newSkill);
+    						var descnode=ui.create.div('.config','描述：<input class="new_description" type="text" style="width:120px"></input>',newSkill);
+                            var commandline=ui.create.div('.config',newSkill);
+                            var editbutton=document.createElement('button');
+                            editbutton.innerHTML='编辑代码';
+                            commandline.appendChild(editbutton);
+                            editbutton.onclick=function(){
+                                var node=container;
+                                ui.window.classList.add('shortcutpaused');
+                                ui.window.classList.add('systempaused');
+                                window.saveNonameInput=saveInput;
+                                if(node.aced){
+                                    ui.window.appendChild(node);
+                                    node.editor.setValue(node.code,1);
+                                }
+                                else if(lib.device=='ios'||lib.device=='android'){
+                                    ui.window.appendChild(node);
+                                    if(!node.textarea){
+                                        var textarea=document.createElement('textarea');
+                                        editor.appendChild(textarea);
+                                        node.textarea=textarea;
+                                    }
+                                    node.textarea.value=node.code;
+                                }
+                                else{
+                                    var id=editor.id;
+                                    var aceReady=function(){
+                                        ui.window.appendChild(node);
+                                        var editor=window.ace.edit(id);
+                                        editor.$blockScrolling=Infinity;
+                                        editor.setTheme("ace/theme/chrome");
+                                        editor.getSession().setUseWorker(false);
+                                        editor.getSession().setMode("ace/mode/javascript");
+                                        node.aced=true;
+                                        node.editor=editor;
+                                        editor.setValue(node.code,1);
+                                    }
+                                    if(!window.ace){
+                                        lib.init.js('game','ace',aceReady);
+                                    }
+                                    else{
+                                        aceReady();
+                                    }
+                                }
+                            }
+
+                            var container=ui.create.div('.popup-container.editor');
+                            var editorpage=ui.create.div(container);
+                            var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+                                ui.window.classList.remove('shortcutpaused');
+                                ui.window.classList.remove('systempaused');
+                                container.delete(null);
+                                if(container.code&&container.editor){
+                                    container.editor.setValue(container.code,1);
+                                }
+                                delete window.saveNonameInput;
+                            });
+                            var saveInput=function(){
+                                dash3.link.classList.add('active');
+                                ui.window.classList.remove('shortcutpaused');
+                                ui.window.classList.remove('systempaused');
+                                container.delete();
+                                if(container.editor){
+                                    container.code=container.editor.getValue();
+                                }
+                                else if(container.textarea){
+                                    container.code=container.textarea.value;
+                                }
+                                delete window.saveNonameInput;
+                            };
+                            var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+                            var editor=ui.create.div('#editor-skill',editorpage);
+                            container.code='{\n\ttrigger:{player:"phaseEnd"},\n\tfrequent:true,\n\tcontent:function(){\n\t\tplayer.draw()\n\t}\n}';
+
+                            var citebutton=document.createElement('button');
+                            citebutton.innerHTML='引用代码';
+                            commandline.appendChild(citebutton);
+                            citebutton.onclick=function(){
+                                editbutton.style.display='none';
+                                citebutton.style.display='none';
+                                selectname.style.display='';
+                                skillopt.style.display='';
+                                addSkillButton.style.display='';
+                                cancelSkillButton.style.display='';
+                            }
+
+                            var list=[];
+    						for(var i in lib.character){
+    							if(lib.character[i][3].length){
+                                    list.push([i,lib.translate[i]]);
+                                }
+    						}
+    						list.sort(function(a,b){
+    							a=a[0];b=b[0];
+    							var aa=a,bb=b;
+    							if(aa.indexOf('_')!=-1){
+    								aa=aa.slice(aa.indexOf('_')+1);
+    							}
+    							if(bb.indexOf('_')!=-1){
+    								bb=bb.slice(bb.indexOf('_')+1);
+    							}
+    							if(aa!=bb){
+    								return aa>bb?1:-1;
+    							}
+    							return a>b?1:-1;
+    						});
+    						var list2=[];
+    						var skills=lib.character[list[0][0]][3];
+    						for(var i=0;i<skills.length;i++){
+    							list2.push([skills[i],lib.translate[skills[i]]]);
+    						}
+    						var selectname=ui.create.selectlist(list,list[0],commandline);
+    						selectname.onchange=function(){
+    							var skills=lib.character[this.value][3];
+    							skillopt.innerHTML='';
+    							for(var i=0;i<skills.length;i++){
+    								var option=document.createElement('option');
+    								option.value=skills[i];
+    								option.innerHTML=lib.translate[skills[i]];
+    								skillopt.appendChild(option);
+    							}
+    						};
+                            selectname.style.display='none';
+    						selectname.style.maxWidth='80px';
+    						var skillopt=ui.create.selectlist(list2,list2[0],commandline);
+                            skillopt.style.display='none';
+    						var addSkillButton=document.createElement('button');
+                            addSkillButton.style.display='none';
+    						addSkillButton.innerHTML='引用';
+    						commandline.appendChild(addSkillButton);
+                            addSkillButton.onclick=function(){
+                                editbutton.style.display='';
+                                citebutton.style.display='';
+                                selectname.style.display='none';
+                                skillopt.style.display='none';
+                                addSkillButton.style.display='none';
+                                cancelSkillButton.style.display='none';
+                                container.code=get.stringify(lib.skill[skillopt.value]);
+                                editbutton.onclick.call(editbutton);
+                            }
+    						var cancelSkillButton=document.createElement('button');
+                            cancelSkillButton.style.display='none';
+    						cancelSkillButton.innerHTML='取消';
+    						commandline.appendChild(cancelSkillButton);
+                            cancelSkillButton.onclick=function(){
+                                editbutton.style.display='';
+                                citebutton.style.display='';
+                                selectname.style.display='none';
+                                skillopt.style.display='none';
+                                addSkillButton.style.display='none';
+                                cancelSkillButton.style.display='none';
+                            }
+
+                            ui.create.div('.menubutton.large.new_skill','创建技能',function(){
+                                var name=page.querySelector('input.new_name').value;
+                                if(!name) return;
+                                name=name.split('|');
+                                var translate=name[1]||name[0];
+                                var info=page.querySelector('input.new_description').value;
+                                name=name[0];
+                                if(currentButton){
+                                    if(currentButton.link!=name){
+                                        delete page.content.pack.skill[currentButton.link];
+                                        delete page.content.pack.translate[currentButton.link];
+                                        delete page.content.pack.translate[currentButton.link+'_info'];
+                                        currentButton.link=name;
+                                    }
+                                }
+                                page.content.pack.translate[name]=translate;
+                                page.content.pack.translate[name+'_info']=info;
+                                try{
+                                    eval('page.content.pack.skill[name]='+container.code);
+                                }
+                                catch(e){
+                                    page.content.pack.skill[name]={};
+                                }
+                                if(this.innerHTML=='创建技能'){
+                                    createButton(name);
+                                }
+                                else if(currentButton){
+                                    currentButton.innerHTML=translate;
+                                }
+                                resetEditor();
+                                dash3.link.classList.add('active');
+                            },newSkill);
+
                             page.content={
                                 pack:{
                                     skill:{},
@@ -22129,7 +23017,7 @@
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
                                 }
-                                else if(lib.device=='ios'){
+                                else if(lib.device=='ios'||lib.device=='android'){
                                     ui.window.appendChild(node);
                                     if(!node.textarea){
                                         var textarea=document.createElement('textarea');
@@ -27682,6 +28570,40 @@
 		},
 	};
 	var get={
+        emptyobj:function(obj){
+            for(var i in obj) return false;
+            return true;
+        },
+        stringify:function(obj,level){
+            level=level||0;
+            var indent='';
+            var str;
+            for(var i=0;i<level;i++){
+                indent+='\t';
+            }
+            if(get.objtype(obj)=='object'){
+                str='{\n';
+                for(var i in obj){
+                    str+=indent+'\t'+i+':'+get.stringify(obj[i],level+1)+',\n';
+                }
+                str+=indent+'}';
+                return str;
+            }
+            else{
+                if(typeof obj=='function'){
+                    str=obj.toString();
+                }
+                else{
+                    try{
+                        str=JSON.stringify(obj)||'';
+                    }
+                    catch(e){
+                        str='';
+                    }
+                }
+                return str;
+            }
+        },
         copy:function(obj){
             if(get.objtype(obj)=='object'){
                 var copy={};

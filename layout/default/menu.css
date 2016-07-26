@@ -402,14 +402,29 @@
 	width: 100%;
 }
 .menu-buttons>.new_character>.avatar{
+	background-size: cover;
+}
+.menu-buttons>.new_character>.avatar,
+.menu-buttons>.new_character>.card{
 	top:8px;
 	left:12px;
 	position: absolute;
 	width: 100px;
 	height: 120px;
+	margin: 0;
+}
+.menu-buttons>.new_character>.card{
+	height: 100px;
+}
+.menu-buttons>.new_character>.card:not(.fullskin){
+	color: white;
+	text-shadow: black 0px 0px 2px;
+	transform: translateX(0px);
+	background-image: url("image/card/hslingjian_jinjilengdong.jpg");
 	background-size: cover;
 }
-.menu-buttons>.new_character>.avatar>input{
+.menu-buttons>.new_character>.avatar>input,
+.menu-buttons>.new_character>.card>input{
 	z-index: 3;
 	border-radius: 8px;
 	opacity: 0;
@@ -419,10 +434,12 @@
 	top:0;
 	position: absolute;
 }
-#window.reduce_radius .menu-buttons>.new_character>.avatar>input{
+#window.reduce_radius .menu-buttons>.new_character>.avatar>input,
+#window.reduce_radius .menu-buttons>.new_character>.card>input{
 	border-radius: 4px;
 }
-.menu-buttons>.new_character>.avatar>.select_avatar{
+.menu-buttons>.new_character>.avatar>.select_avatar,
+.menu-buttons>.new_character>.card>.select_avatar{
 	font-family: 'xinwei';
 	font-size: 20px;
 	width: 100%;
@@ -432,7 +449,11 @@
 	left:0;
 	text-align: center;
 }
-.menu-buttons>.new_character>.avatar.inited>.select_avatar{
+.menu-buttons>.new_character>.card>.select_avatar{
+	top:40px;
+}
+.menu-buttons>.new_character>.avatar.inited>.select_avatar,
+.menu-buttons>.new_character>.card.inited>.select_avatar{
 	display: none;
 }
 .menu-buttons>.new_character>.indent{
@@ -767,6 +788,9 @@
 #create-extension>.menu-buttons>.new_character>.skill_list{
     top: 210px;
 }
+#create-extension>.menu-buttons>.new_character>.skill_list>div:first-child{
+	transition: all 0s;
+}
 #create-extension>.menu-buttons>.new_character>.skill_list>div:first-child:not(*:empty){
 	margin-top: 10px;
 	margin-bottom: 17px;
@@ -821,4 +845,47 @@
 	transition: all 0s;
 	position: static;
 	display: block;
+}
+.menubutton.large.new_card,
+.menubutton.large.new_card_delete{
+	left: 12px;
+	top: 130px;
+	margin-bottom: 20px;
+}
+.menubutton.large.new_card_delete{
+	left: 155px;
+}
+.edit_pile{
+	width: 100%;
+	left: 0;
+	padding-bottom: 20px;
+}
+.edit_pile>div:last-child{
+	width: 100%;
+	position: relative;
+}
+.edit_pile>div:last-child>button{
+	margin-right: 3px;
+    margin-top: 3px;
+}
+.new_character.new_skill>div{
+	position: relative;
+	margin-top: 2px;
+	white-space: nowrap;
+	overflow: visible;
+}
+.new_character.new_skill>div>button{
+	margin-right: 3px;
+}
+.menu-buttons.new_skill>.menubutton{
+	position: relative;
+	margin:5px;
+}
+.new_character.new_skill>.menubutton.large{
+	left: 13px;
+	position: absolute;
+	top: 88px;
+}
+.new_character.new_skill>.menubutton.large.new_card_delete{
+	left: 155px;
 }
