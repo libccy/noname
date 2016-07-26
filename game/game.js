@@ -3615,7 +3615,12 @@
 							});
 							document.addEventListener("backbutton", function(){
 								if(ui.arena&&ui.arena.classList.contains('menupaused')){
-									ui.click.configMenu();
+                                    if(window.saveNonameInput){
+                                        window.saveNonameInput();
+                                    }
+                                    else{
+                                        ui.click.configMenu();
+                                    }
 								}
 								else if(lib.config.confirm_exit){
 									navigator.notification.confirm(
@@ -22403,6 +22408,7 @@
                                         var textarea=document.createElement('textarea');
                                         editor.appendChild(textarea);
                                         node.textarea=textarea;
+                                        lib.setScroll(textarea);
                                     }
                                     node.textarea.value=node.code;
                                 }
@@ -22768,6 +22774,7 @@
                                         var textarea=document.createElement('textarea');
                                         editor.appendChild(textarea);
                                         node.textarea=textarea;
+                                        lib.setScroll(textarea);
                                     }
                                     node.textarea.value=node.code;
                                 }
@@ -23023,6 +23030,7 @@
                                         var textarea=document.createElement('textarea');
                                         this.editor.appendChild(textarea);
                                         node.textarea=textarea;
+                                        lib.setScroll(textarea);
                                     }
                                     node.textarea.value=node.code;
                                 }
