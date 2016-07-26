@@ -22964,7 +22964,7 @@
                                     for(var i in lib.extensionPack[name].code){
                                         switch(typeof lib.extensionPack[name].code[i]){
                                             case 'function':page.content[i]=lib.extensionPack[name].code[i].toString();break;
-                                            case 'object':page.content[i]=JSON.stringify(lib.extensionPack[name].code[i]);break;
+                                            case 'object':page.content[i]=get.stringify(lib.extensionPack[name].code[i]);break;
                                         }
                                     }
                                     for(var i in page.content){
