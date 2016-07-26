@@ -468,30 +468,32 @@ character.ow={
 			},
 			forced:true,
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha'&&((player.hp==event.player.hp&&player.isDamaged())||player.num('h')==event.player.num('h'))&&event.notLink();
+				return player.num('h')==event.player.num('h')&&event.notLink();
 			},
 			content:function(){
-                if(player.num('h')==trigger.player.num('h')) trigger.num++;
-                if(player.hp==trigger.player.hp) player.recover();
+                trigger.num++;
 			},
             ai:{
                 threaten:1.5
-            }
+            },
         },
         duwen2:{
             trigger:{source:'damageEnd'},
             forced:true,
-            popup:false,
-            filter:function(event){
-                return event._duwen&&event.num>=3;
+            filter:function(event,player){
+                return event.card&&event.card.name=='sha'&&player.hp==event.player.hp&&event.notLink();
             },
             content:function(){
-                player.loseHp(2);
+                player.draw(2);
             }
         },
         juji:{
             enable:'phaseUse',
             usable:1,
+            position:'he',
+            filter:function(event,player){
+                return player.num('he')>0;
+            },
             filterCard:function(card){
                 var suit=get.suit(card);
                 for(var i=0;i<ui.selected.cards.length;i++){
@@ -2368,7 +2370,8 @@ character.ow={
         juji3:'狙击',
         juji_info:'出牌阶段限一次，你可以弃置任意张花色不同的牌并指定一名有手牌的其他角色，若该角色的手牌中含有与你弃置的牌花色相同的牌，则本回合内你与其距离为1且该角色不能闪避你的杀',
         duwen:'毒吻',
-        duwen_info:'锁定技，当你使用杀造成伤害时，若你的手牌数与受伤害角色相等，此杀的伤害+1；若你的体力值与受伤害角色相等，你回复一点体力',
+        duwen2:'毒吻',
+        duwen_info:'锁定技，当你造成伤害时，若你的手牌数与受伤害角色相等，此伤害+1',
         zhuagou:'抓钩',
         zhuagou_info:'出牌阶段限一次，你可以弃置一张手牌并将你的座位移到任意位置',
         dulei:'诡雷',

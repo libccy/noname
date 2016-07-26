@@ -4994,14 +4994,14 @@
 						event.skillDialog.close();
 					}
 					if(event.result&&event.result.bool&&!game.online&&!event.nouse){
-                        if(event.logSkill){
-    						if(typeof event.logSkill=='string'){
-    							player.logSkill(event.logSkill);
-    						}
-    						else if(Array.isArray(event.logSkill)){
-    							player.logSkill.apply(player,event.logSkill);
-    						}
-    					}
+                        // if(event.logSkill){
+    					// 	if(typeof event.logSkill=='string'){
+    					// 		player.logSkill(event.logSkill);
+    					// 	}
+    					// 	else if(Array.isArray(event.logSkill)){
+    					// 		player.logSkill.apply(player,event.logSkill);
+    					// 	}
+    					// }
                         player.useResult(event.result,event);
 					}
                     else if(event._sendskill){
@@ -13951,7 +13951,6 @@
 			if(_status.video&&arguments[1]!='video') return;
 			if(_status.skillaudio.contains(name)) return;
 			game.addVideo('playSkillAudio',null,name);
-            game.print(name);
 			if(name.indexOf('|')<name.lastIndexOf('|')){
 				name=name.slice(name.lastIndexOf('|')+1);
 			}
@@ -23075,8 +23074,8 @@
                             page.content={}
                             createCode('主','主代码',page,clickCode,'content','function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}');
                             createCode('启','启动代码',page,clickCode,'precontent','function(){\n\t\/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n\t\/\/除添加模式外请慎用\n}');
-                            createCode('选','选项代码',page,clickCode,'config','{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n\n\/\/此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n\/\/导出时本段代码中的换行、缩进以及注释将被清除');
-                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n\n\/\/帮助内容将显示在菜单－选项－帮助中\n\/\/导出时本段代码中的换行、缩进以及注释将被清除');
+                            createCode('选','选项代码',page,clickCode,'config','{\n\t\n}\n\/*\n示例：\n{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t\n}\n\/*\n示例：\n{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 
                             return page;
                         }());
