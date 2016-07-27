@@ -808,7 +808,7 @@
 	border-radius: 4px;
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 10px;
 	background: white;
-
+	overflow: hidden;
 }
 .popup-container.editor>div>.editbutton{
 	font-family: 'lishu';
@@ -839,12 +839,6 @@
 	margin:0;
 	padding: 0;
 	resize: none;
-}
-.popup-container.editor>div>div:last-child div{
-	text-shadow: none;
-	transition: all 0s;
-	position: static;
-	display: block;
 }
 .menubutton.large.new_card,
 .menubutton.large.new_card_delete{

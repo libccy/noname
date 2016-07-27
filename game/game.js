@@ -22485,20 +22485,29 @@
                                     node.textarea.value=node.code;
                                 }
                                 else{
-                                    var id=editor.id;
                                     var aceReady=function(){
                                         ui.window.appendChild(node);
-                                        var editor=window.ace.edit(id);
-                                        editor.$blockScrolling=Infinity;
-                                        editor.setTheme("ace/theme/chrome");
-                                        editor.getSession().setUseWorker(false);
-                                        editor.getSession().setMode("ace/mode/javascript");
-                                        node.aced=true;
-                                        node.editor=editor;
-                                        editor.setValue(node.code,1);
+                                        // var editor=window.ace.edit(id);
+                                        // editor.$blockScrolling=Infinity;
+                                        // editor.setTheme("ace/theme/chrome");
+                                        // editor.getSession().setUseWorker(false);
+                                        // editor.getSession().setMode("ace/mode/javascript");
+                                        // node.aced=true;
+                                        // node.editor=editor;
+                                        // editor.setValue(node.code,1);
+
+                                        var myCodeMirror = CodeMirror(editor, {
+                                            value:node.code,
+                                            mode:"javascript",
+                                            lineWrapping:true,
+                                            lineNumbers:true,
+                                            indentWithTabs:true,
+                                            theme:'mdn-like'
+                                        });
                                     }
-                                    if(!window.ace){
-                                        lib.init.js('game','ace',aceReady);
+                                    if(!window.CodeMirror){
+                                        lib.init.js('game','codemirror',aceReady);
+                                        lib.init.css('layout/default','codemirror')
                                     }
                                     else{
                                         aceReady();
@@ -22531,7 +22540,7 @@
                                 delete window.saveNonameInput;
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-                            var editor=ui.create.div('#editor-card',editorpage);
+                            var editor=ui.create.div(editorpage);
                             container.code='{\n\ttype:"basic",\n\tenable:true,\n\tfilterTarget:true,\n\tcontent:function(){\n\t\ttarget.draw()\n\t},\n\tai:{\n\t\torder:1,\n\t\tresult:{\n\t\t\ttarget:1\n\t\t}\n\t}\n}';
 
                             ui.create.div('.menubutton.large.new_card','创建卡牌',newCard,function(){
@@ -31291,6 +31300,9 @@
     				}
     			}
     			else if(e.keyCode==83&&(e.ctrlKey||e.metaKey)){
+                    if(window.saveNonameInput){
+                        window.saveNonameInput();
+                    }
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
