@@ -21534,8 +21534,13 @@
                         var pageboard=ui.create.div(page);
                         var inputExtLine=ui.create.div(pageboard);
                         inputExtLine.style.padding='10px';
+                        inputExtLine.style.height='22px';
+                        inputExtLine.style.lineHeight='22px';
                         inputExtLine.style.whiteSpace='nowrap';
                         inputExtLine.style.overflow='visible';
+                        var inputExtSpan=document.createElement('span');
+                        inputExtSpan.innerHTML='扩展名：';
+                        inputExtLine.appendChild(inputExtSpan);
                         var inputExtName=document.createElement('input');
                         inputExtName.type='text';
                         inputExtName.value='无名扩展';
@@ -21547,9 +21552,23 @@
                             inputExtName.value=page.currentExtension;
                             if(name){
                                 inputExtName.disabled=true;
+                                buttonConfirm.style.display='none';
+                                inputExtSpan.style.display='none';
+                                inputExtName.style.display='none';
+                                buttonRename.style.display='';
+                                buttonSave.style.display='';
+                                buttonReset.style.display='';
+                                buttonExport.style.display='';
                             }
                             else{
                                 inputExtName.disabled=false;
+                                buttonConfirm.style.display='';
+                                inputExtSpan.style.display='';
+                                inputExtName.style.display='';
+                                buttonRename.style.display='none';
+                                buttonSave.style.display='none';
+                                buttonReset.style.display='none';
+                                buttonExport.style.display='none';
                             }
                             exportExtLine.style.display='none';
                             dash1.reset(name);
@@ -21571,7 +21590,9 @@
                         }
                         var processExtension=function(exportext){
                             if(page.currentExtension){
-                                if(page.currentExtension!=inputExtName.value) return;
+                                if(page.currentExtension!=inputExtName.value&&!exportext){
+                                    game.removeExtension(page.currentExtension);
+                                }
                             }
                             inputExtName.disabled=true;
                             setTimeout(function(){
@@ -21643,9 +21664,40 @@
                                 }
                             },500);
                         };
+                        var buttonConfirm=document.createElement('button');
+                        buttonConfirm.innerHTML='确定';
+                        buttonConfirm.style.marginLeft='5px';
+                        buttonConfirm.onclick=function(){
+                            buttonConfirm.style.display='none';
+                            inputExtSpan.style.display='none';
+                            inputExtName.style.display='none';
+                            buttonRename.style.display='';
+                            buttonSave.style.display='';
+                            buttonReset.style.display='';
+                            buttonExport.style.display='';
+                        };
+                        inputExtLine.appendChild(buttonConfirm);
+                        var buttonRename=document.createElement('button');
+                        buttonRename.innerHTML='改名';
+                        buttonRename.style.marginLeft='2px';
+                        buttonRename.style.marginRight='2px';
+                        buttonRename.style.display='none';
+                        buttonRename.onclick=function(){
+                            buttonConfirm.style.display='';
+                            inputExtSpan.style.display='';
+                            inputExtName.style.display='';
+                            inputExtName.disabled=false;
+                            buttonRename.style.display='none';
+                            buttonSave.style.display='none';
+                            buttonReset.style.display='none';
+                            buttonExport.style.display='none';
+                        };
+                        inputExtLine.appendChild(buttonRename);
                         var buttonSave=document.createElement('button');
                         buttonSave.innerHTML='保存';
-                        buttonSave.style.marginLeft='3px';
+                        buttonSave.style.marginLeft='2px';
+                        buttonSave.style.marginRight='2px';
+                        buttonSave.style.display='none';
                         buttonSave.onclick=function(){
                             dash1.link.classList.remove('active');
                             dash2.link.classList.remove('active');
@@ -21656,14 +21708,18 @@
                         inputExtLine.appendChild(buttonSave);
                         var buttonReset=document.createElement('button');
                         buttonReset.innerHTML='重置';
-                        buttonReset.style.marginLeft='3px';
+                        buttonReset.style.marginLeft='2px';
+                        buttonReset.style.marginRight='2px';
+                        buttonReset.style.display='none';
                         buttonReset.onclick=function(){
                             game.editExtension();
                         };
                         inputExtLine.appendChild(buttonReset);
                         var buttonExport=document.createElement('button');
                         buttonExport.innerHTML='导出';
-                        buttonExport.style.marginLeft='3px';
+                        buttonExport.style.marginLeft='2px';
+                        buttonExport.style.marginRight='2px';
+                        buttonExport.style.display='none';
                         buttonExport.onclick=function(){
                             processExtension(true);
                         };
@@ -21843,6 +21899,8 @@
                                         },
                                         image:{}
                                     };
+                                    toggle.classList.add('on');
+                                    newCharacter.style.display='';
                                 }
                             };
                             ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
@@ -22234,6 +22292,8 @@
                                         },
                                         image:{}
                                     };
+                                    toggle.classList.add('on');
+                                    newCard.style.display='';
                                 }
                                 updatePile();
                             };
@@ -22685,6 +22745,8 @@
                                         },
                                         audio:{}
                                     };
+                                    toggle.classList.add('on');
+                                    newSkill.style.display='';
                                 }
                             };
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
@@ -22973,10 +23035,10 @@
                             });
                             page.reset=function(name){
                                 page.content={};
-                                for(var i in dashes){
-                                    dashes[i].node.code='';
-                                }
                                 if(lib.extensionPack[name]){
+                                    for(var i in dashes){
+                                        dashes[i].node.code='';
+                                    }
                                     for(var i in lib.extensionPack[name].code){
                                         switch(typeof lib.extensionPack[name].code[i]){
                                             case 'function':page.content[i]=lib.extensionPack[name].code[i].toString();break;
@@ -22986,6 +23048,12 @@
                                     for(var i in page.content){
                                         dashes[i].node.code=page.content[i]||'';
                                     }
+                                }
+                                else{
+                                    dashes.content.node.code='function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}';
+                                    dashes.precontent.node.code='function(){\n\t\/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n\t\/\/除添加模式外请慎用\n}';
+                                    dashes.config.node.code='{\n\t\n}\n\n\/*\n示例：\n{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                    dashes.help.node.code='{\n\t\n}\n\n\/*\n示例：\n{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
                                 }
                             };
                             var dashes={};
@@ -23074,8 +23142,8 @@
                             page.content={}
                             createCode('主','主代码',page,clickCode,'content','function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}');
                             createCode('启','启动代码',page,clickCode,'precontent','function(){\n\t\/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n\t\/\/除添加模式外请慎用\n}');
-                            createCode('选','选项代码',page,clickCode,'config','{\n\t\n}\n\/*\n示例：\n{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t\n}\n\/*\n示例：\n{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('选','选项代码',page,clickCode,'config','{\n\t\n}\n\n\/*\n示例：\n{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t\n}\n\n\/*\n示例：\n{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 
                             return page;
                         }());
