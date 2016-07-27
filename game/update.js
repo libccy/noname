@@ -1,7 +1,8 @@
 window.noname_update={
-    version:'1.8.19.3',
+    version:'1.8.19.4',
     changeLog:[
         '***注意：更新后将无法使用或导出自定义武将，请自行备份***',
+        '新代码编辑器',
         '修bug',
     ],
     files:{
@@ -10,7 +11,7 @@ window.noname_update={
             'game/source.js',
             'game/package.js',
             'game/asset.js',
-            'game/ace.js',
+            'game/codemirror.js',
             'character/yijiang.js',
             'character/ow.js',
             'character/swd.js',
@@ -18,10 +19,12 @@ window.noname_update={
             'card/swd.js',
             'layout/default/layout.css',
             'layout/default/menu.css',
+            'layout/default/codemirror.css',
         ],
         '1.8.18.1':[],
         '1.8.19':[],
         '1.8.19.1':[],
         '1.8.19.2':[],
+        '1.8.19.3':[],
     }
 }

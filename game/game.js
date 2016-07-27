@@ -3368,31 +3368,40 @@
                         game.saveConfig('layout','phone');
                     }
                 }
-
 				if(lib.config.extensions.length){
 					window.resetExtension=function(){
 						for(var i=0;i<lib.config.extensions.length;i++){
 							game.saveConfig('extension_'+lib.config.extensions[i]+'_enable',false);
 						}
+                        localStorage.setItem(lib.configprefix+'disable_extension',true);
 					}
 				}
-                var extensionlist=lib.config.plays.slice(0);
-				for(var i=0;i<lib.config.extensions.length;i++){
-                    var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
-                    if(extcontent){
-                        _status.evaluatingExtension=true;
-                        try{
-    						eval(extcontent);
-    					}
-    					catch(e){
-    						console.log(e);
-    					}
-                        _status.evaluatingExtension=false;
+                var extensionlist;
+                if(!localStorage.getItem(lib.configprefix+'disable_extension')){
+                    extensionlist=lib.config.plays.slice(0);
+                    for(var i=0;i<lib.config.extensions.length;i++){
+                        var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
+                        if(extcontent){
+                            _status.evaluatingExtension=true;
+                            try{
+        						eval(extcontent);
+        					}
+        					catch(e){
+        						console.log(e);
+        					}
+                            _status.evaluatingExtension=false;
+                        }
+                        else{
+                            extensionlist.push(lib.config.extensions[i]);
+                        }
+    				}
+                }
+                else{
+                    extensionlist=[];
+                    for(var i=0;i<lib.config.extensions.length;i++){
+                        game.import('extension',{name:lib.config.extensions[i]});
                     }
-                    else{
-                        extensionlist.push(lib.config.extensions[i]);
-                    }
-				}
+                }
                 var loadPack=function(){
                     var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
     				var packLoaded=function(){
@@ -22339,7 +22348,7 @@
     							if(node.nextSibling){
     								node.nextSibling.remove();
     							}
-                                container.code='{\n\ttype:"basic",\n\tenable:true,\n\tfilterTarget:true,\n\tcontent:function(){\n\t\ttarget.draw()\n\t},\n\tai:{\n\t\torder:1,\n\t\tresult:{\n\t\t\ttarget:1\n\t\t}\n\t}\n}';
+                                container.code='{\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}';
     						}
 
     						newCard=ui.create.div('.new_character',page);
@@ -22474,40 +22483,26 @@
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
                                 }
-                                else if(lib.device=='ios'||lib.device=='android'){
-                                    ui.window.appendChild(node);
-                                    if(!node.textarea){
-                                        var textarea=document.createElement('textarea');
-                                        editor.appendChild(textarea);
-                                        node.textarea=textarea;
-                                        lib.setScroll(textarea);
-                                    }
-                                    node.textarea.value=node.code;
-                                }
                                 else{
                                     var aceReady=function(){
                                         ui.window.appendChild(node);
-                                        // var editor=window.ace.edit(id);
-                                        // editor.$blockScrolling=Infinity;
-                                        // editor.setTheme("ace/theme/chrome");
-                                        // editor.getSession().setUseWorker(false);
-                                        // editor.getSession().setMode("ace/mode/javascript");
-                                        // node.aced=true;
-                                        // node.editor=editor;
-                                        // editor.setValue(node.code,1);
-
-                                        var myCodeMirror = CodeMirror(editor, {
+                                        var mirror = window.CodeMirror(editor, {
                                             value:node.code,
                                             mode:"javascript",
                                             lineWrapping:true,
                                             lineNumbers:true,
+                                            indentUnit:4,
+                                            autoCloseBrackets:true,
                                             indentWithTabs:true,
                                             theme:'mdn-like'
                                         });
+                                        lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
+                                        node.aced=true;
+                                        node.editor=mirror;
                                     }
                                     if(!window.CodeMirror){
-                                        lib.init.js('game','codemirror',aceReady);
-                                        lib.init.css('layout/default','codemirror')
+                                        lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+                                        lib.init.css(lib.assetURL+'layout/default','codemirror');
                                     }
                                     else{
                                         aceReady();
@@ -22521,9 +22516,6 @@
                                 ui.window.classList.remove('shortcutpaused');
                                 ui.window.classList.remove('systempaused');
                                 container.delete(null);
-                                if(container.code&&container.editor){
-                                    container.editor.setValue(container.code,1);
-                                }
                                 delete window.saveNonameInput;
                             });
                             var saveInput=function(){
@@ -22541,7 +22533,7 @@
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
                             var editor=ui.create.div(editorpage);
-                            container.code='{\n\ttype:"basic",\n\tenable:true,\n\tfilterTarget:true,\n\tcontent:function(){\n\t\ttarget.draw()\n\t},\n\tai:{\n\t\torder:1,\n\t\tresult:{\n\t\t\ttarget:1\n\t\t}\n\t}\n}';
+                            container.code='{\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}';
 
                             ui.create.div('.menubutton.large.new_card','创建卡牌',newCard,function(){
                                 var name=page.querySelector('input.new_name').value;
@@ -22832,7 +22824,7 @@
     							if(node.nextSibling){
     								node.nextSibling.remove();
     							}
-                                container.code='{\n\ttrigger:{player:"phaseEnd"},\n\tfrequent:true,\n\tcontent:function(){\n\t\tplayer.draw()\n\t}\n}';
+                                container.code='{\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}';
     						}
 
     						newSkill=ui.create.div('.new_character.new_skill',page);
@@ -22851,31 +22843,26 @@
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
                                 }
-                                else if(lib.device=='ios'||lib.device=='android'){
-                                    ui.window.appendChild(node);
-                                    if(!node.textarea){
-                                        var textarea=document.createElement('textarea');
-                                        editor.appendChild(textarea);
-                                        node.textarea=textarea;
-                                        lib.setScroll(textarea);
-                                    }
-                                    node.textarea.value=node.code;
-                                }
                                 else{
-                                    var id=editor.id;
                                     var aceReady=function(){
                                         ui.window.appendChild(node);
-                                        var editor=window.ace.edit(id);
-                                        editor.$blockScrolling=Infinity;
-                                        editor.setTheme("ace/theme/chrome");
-                                        editor.getSession().setUseWorker(false);
-                                        editor.getSession().setMode("ace/mode/javascript");
+                                        var mirror = window.CodeMirror(editor, {
+                                            value:node.code,
+                                            mode:"javascript",
+                                            lineWrapping:true,
+                                            lineNumbers:true,
+                                            indentUnit:4,
+                                            autoCloseBrackets:true,
+                                            indentWithTabs:true,
+                                            theme:'mdn-like'
+                                        });
+                                        lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
                                         node.aced=true;
-                                        node.editor=editor;
-                                        editor.setValue(node.code,1);
+                                        node.editor=mirror;
                                     }
                                     if(!window.ace){
-                                        lib.init.js('game','ace',aceReady);
+                                        lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+                                        lib.init.css(lib.assetURL+'layout/default','codemirror');
                                     }
                                     else{
                                         aceReady();
@@ -22889,9 +22876,6 @@
                                 ui.window.classList.remove('shortcutpaused');
                                 ui.window.classList.remove('systempaused');
                                 container.delete(null);
-                                if(container.code&&container.editor){
-                                    container.editor.setValue(container.code,1);
-                                }
                                 delete window.saveNonameInput;
                             });
                             var saveInput=function(){
@@ -22908,8 +22892,8 @@
                                 delete window.saveNonameInput;
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-                            var editor=ui.create.div('#editor-skill',editorpage);
-                            container.code='{\n\ttrigger:{player:"phaseEnd"},\n\tfrequent:true,\n\tcontent:function(){\n\t\tplayer.draw()\n\t}\n}';
+                            var editor=ui.create.div(editorpage);
+                            container.code='{\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}';
 
                             var citebutton=document.createElement('button');
                             citebutton.innerHTML='引用代码';
@@ -23059,10 +23043,10 @@
                                     }
                                 }
                                 else{
-                                    dashes.content.node.code='function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}';
-                                    dashes.precontent.node.code='function(){\n\t\/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n\t\/\/除添加模式外请慎用\n}';
-                                    dashes.config.node.code='{\n\t\n}\n\n\/*\n示例：\n{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-                                    dashes.help.node.code='{\n\t\n}\n\n\/*\n示例：\n{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                    dashes.content.node.code='function(config,pack){\n    \/\/执行时机为界面加载之后，其它扩展内容加载之前\n    \/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}';
+                                    dashes.precontent.node.code='function(){\n    \/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n    \/\/除添加模式外请慎用\n}';
+                                    dashes.config.node.code='{\n    \n}\n\n\/*\n示例：\n{\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                    dashes.help.node.code='{\n    \n}\n\n\/*\n示例：\n{\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
                                 }
                             };
                             var dashes={};
@@ -23080,9 +23064,6 @@
                                     ui.window.classList.remove('shortcutpaused');
                                     ui.window.classList.remove('systempaused');
                                     container.delete(null);
-                                    if(container.code&&container.editor){
-                                        container.editor.setValue(container.code,1);
-                                    }
                                     delete window.saveNonameInput;
                                 });
                                 var saveInput=function(){
@@ -23101,7 +23082,7 @@
                                     delete window.saveNonameInput;
                                 };
                                 var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-                                var editor=ui.create.div('#editor-'+link,editorpage);
+                                var editor=ui.create.div(editorpage);
                                 container.code=str;
                                 dash.editor=editor;
                                 dash.node=container;
@@ -23117,31 +23098,26 @@
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
                                 }
-                                else if(lib.device=='ios'||lib.device=='android'){
-                                    ui.window.appendChild(node);
-                                    if(!node.textarea){
-                                        var textarea=document.createElement('textarea');
-                                        this.editor.appendChild(textarea);
-                                        node.textarea=textarea;
-                                        lib.setScroll(textarea);
-                                    }
-                                    node.textarea.value=node.code;
-                                }
                                 else{
-                                    var id=this.editor.id;
+                                    var editor=this.editor;
                                     var aceReady=function(){
                                         ui.window.appendChild(node);
-                                        var editor=window.ace.edit(id);
-                                        editor.$blockScrolling=Infinity;
-                                        editor.setTheme("ace/theme/chrome");
-                                        editor.getSession().setUseWorker(false);
-                                        editor.getSession().setMode("ace/mode/javascript");
+                                        var mirror = window.CodeMirror(editor, {
+                                            value:node.code,
+                                            mode:"javascript",
+                                            lineWrapping:true,
+                                            lineNumbers:true,
+                                            indentUnit:4,
+                                            autoCloseBrackets:true,
+                                            theme:'mdn-like'
+                                        });
+                                        lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
                                         node.aced=true;
-                                        node.editor=editor;
-                                        editor.setValue(node.code,1);
+                                        node.editor=mirror;
                                     }
                                     if(!window.ace){
-                                        lib.init.js('game','ace',aceReady);
+                                        lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+                                        lib.init.css(lib.assetURL+'layout/default','codemirror');
                                     }
                                     else{
                                         aceReady();
@@ -23149,10 +23125,10 @@
                                 }
                             };
                             page.content={}
-                            createCode('主','主代码',page,clickCode,'content','function(config,pack){\n\t\/\/执行时机为界面加载之后，其它扩展内容加载之前\n\t\/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}');
-                            createCode('启','启动代码',page,clickCode,'precontent','function(){\n\t\/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n\t\/\/除添加模式外请慎用\n}');
-                            createCode('选','选项代码',page,clickCode,'config','{\n\t\n}\n\n\/*\n示例：\n{\n\tswitcher_example:{\n\t\tname:"示例列表选项",\n\t\tinit:"3",\n\t\titem:{"1":"一","2":"二","3":"三"}\n\t},\n\ttoggle_example:{\n\t\tname:"示例开关选项",\n\t\tinit:true\n\t}\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-                            createCode('帮','帮助代码',page,clickCode,'help','{\n\t\n}\n\n\/*\n示例：\n{\n\t"帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \/\/执行时机为界面加载之后，其它扩展内容加载之前\n    \/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}');
+                            createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n    \/\/除添加模式外请慎用\n}');
+                            createCode('选','选项代码',page,clickCode,'config','{\n    \n}\n\n\/*\n示例：\n{\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('帮','帮助代码',page,clickCode,'help','{\n    \n}\n\n\/*\n示例：\n{\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 
                             return page;
                         }());
@@ -25709,6 +25685,7 @@
 				clearTimeout(window.resetGameTimeout);
 				delete window.resetGameTimeout;
 				delete window.resetExtension;
+                localStorage.removeItem(lib.configprefix+'disable_extension',true);
 			},
 			system:function(str,func,right){
 				var node=ui.create.div(right?ui.system2:ui.system1);
@@ -28680,12 +28657,12 @@
             var indent='';
             var str;
             for(var i=0;i<level;i++){
-                indent+='\t';
+                indent+='    ';
             }
             if(get.objtype(obj)=='object'){
                 str='{\n';
                 for(var i in obj){
-                    str+=indent+'\t'+i+':'+get.stringify(obj[i],level+1)+',\n';
+                    str+=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
                 }
                 str+=indent+'}';
                 return str;
