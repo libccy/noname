@@ -21745,6 +21745,10 @@
                         };
                         var dashboard=ui.create.div(pageboard);
                         var clickDash=function(){
+                            var templayer=ui.create.div('.popup-container',ui.window);
+                            setTimeout(function(){
+                                templayer.remove();
+                            },500);
                             pageboard.hide();
                             this.link.show();
                         };
@@ -21913,6 +21917,10 @@
                                 }
                             };
                             ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                var templayer=ui.create.div('.popup-container',ui.window);
+                                setTimeout(function(){
+                                    templayer.remove();
+                                },500);
                                 page.hide();
                                 pageboard.show();
                             });
@@ -22307,6 +22315,10 @@
                                 updatePile();
                             };
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                var templayer=ui.create.div('.popup-container',ui.window);
+                                setTimeout(function(){
+                                    templayer.remove();
+                                },500);
                                 page.hide();
                                 pageboard.show();
                             });
@@ -22482,6 +22494,16 @@
                                 if(node.aced){
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
+                                }
+                                else if(lib.device=='ios'){
+                                    ui.window.appendChild(node);
+                                    if(!node.textarea){
+                                        var textarea=document.createElement('textarea');
+                                        editor.appendChild(textarea);
+                                        node.textarea=textarea;
+                                        lib.setScroll(textarea);
+                                    }
+                                    node.textarea.value=node.code;
                                 }
                                 else{
                                     var aceReady=function(){
@@ -22751,6 +22773,10 @@
                                 }
                             };
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                var templayer=ui.create.div('.popup-container',ui.window);
+                                setTimeout(function(){
+                                    templayer.remove();
+                                },500);
                                 page.hide();
                                 pageboard.show();
                             });
@@ -22842,6 +22868,16 @@
                                 if(node.aced){
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
+                                }
+                                else if(lib.device=='ios'){
+                                    ui.window.appendChild(node);
+                                    if(!node.textarea){
+                                        var textarea=document.createElement('textarea');
+                                        editor.appendChild(textarea);
+                                        node.textarea=textarea;
+                                        lib.setScroll(textarea);
+                                    }
+                                    node.textarea.value=node.code;
                                 }
                                 else{
                                     var aceReady=function(){
@@ -23023,6 +23059,10 @@
                         var dash4=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+                                var templayer=ui.create.div('.popup-container',ui.window);
+                                setTimeout(function(){
+                                    templayer.remove();
+                                },500);
                                 page.hide();
                                 pageboard.show();
                             });
@@ -23097,6 +23137,16 @@
                                 if(node.aced){
                                     ui.window.appendChild(node);
                                     node.editor.setValue(node.code,1);
+                                }
+                                else if(lib.device=='ios'){
+                                    ui.window.appendChild(node);
+                                    if(!node.textarea){
+                                        var textarea=document.createElement('textarea');
+                                        this.editor.appendChild(textarea);
+                                        node.textarea=textarea;
+                                        lib.setScroll(textarea);
+                                    }
+                                    node.textarea.value=node.code;
                                 }
                                 else{
                                     var editor=this.editor;
