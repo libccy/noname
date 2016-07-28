@@ -14092,13 +14092,15 @@
 				for(var i in obj.help){
 					lib.help[i]=obj.help[i];
 				}
-                lib.extensionMenu['extension_'+obj.name].edit={
-					name:'编辑此扩展',
-					clear:true,
-					onclick:function(){
-                        game.editExtension(obj.name);
-					}
-				}
+                if(obj.editable!==false){
+                    lib.extensionMenu['extension_'+obj.name].edit={
+    					name:'编辑此扩展',
+    					clear:true,
+    					onclick:function(){
+                            game.editExtension(obj.name);
+    					}
+    				}
+                }
 				lib.extensionMenu['extension_'+obj.name].delete={
 					name:'删除此扩展',
 					clear:true,
