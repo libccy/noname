@@ -21610,10 +21610,11 @@
                             inputExtName.disabled=true;
                             setTimeout(function(){
                                 var ext={};
+                                var config,help;
                                 for(var i in dash4.content){
                                     try{
-                                        eval('ext[i]='+dash4.content[i]);
                                         if(i=='content'||i=='precontent'){
+                                            eval('ext[i]='+dash4.content[i]);
                                             if(typeof ext[i]!='function'){
                                                 throw('err');
                                             }
@@ -21622,6 +21623,8 @@
                                             }
                                         }
                                         else{
+                                            eval(dash4.content[i]);
+                                            eval('ext[i]='+i);
                                             if(typeof ext[i]!='object'){
                                                 throw('err');
                                             }
@@ -21631,6 +21634,7 @@
                                         }
                                     }
                                     catch(e){
+                                        console.log(e);
                                         delete ext[i];
                                     }
                                 }
@@ -22172,7 +22176,7 @@
                                 }
                                 newCard.querySelector('.new_description').value=page.content.pack.translate[this.link+'_info'];
     							var info=page.content.pack.card[this.link];
-                                container.code=get.stringify(info);
+                                container.code='card='+get.stringify(info);
 
     							toggle.innerHTML='编辑卡牌 <div>&gt;</div>';
     							var confirm=newCard.querySelector('.menubutton.large');
@@ -22364,7 +22368,7 @@
     							if(node.nextSibling){
     								node.nextSibling.remove();
     							}
-                                container.code='{\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}';
+                                container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
     						}
 
     						newCard=ui.create.div('.new_character',page);
@@ -22471,7 +22475,7 @@
                                 citeButton.style.display='';
                                 selectname.style.display='none';
                                 confirmcontainer.style.display='none';
-                                container.code=get.stringify(lib.card[selectname.value]);
+                                container.code='card='+get.stringify(lib.card[selectname.value]);
                                 codeButton.onclick.call(codeButton);
                                 newCard.querySelector('input.new_description').value=lib.translate[selectname.value+'_info'];
                             }
@@ -22555,7 +22559,7 @@
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
                             var editor=ui.create.div(editorpage);
-                            container.code='{\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}';
+                            container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
                             ui.create.div('.menubutton.large.new_card','创建卡牌',newCard,function(){
                                 var name=page.querySelector('input.new_name').value;
@@ -22597,7 +22601,9 @@
                                 page.content.pack.translate[name]=translate;
                                 page.content.pack.translate[name+'_info']=info;
                                 try{
-                                    eval('page.content.pack.card[name]='+container.code);
+                                    var card;
+                                    eval(container.code);
+                                    page.content.pack.card[name]=card;
                                 }
                                 catch(e){
                                     page.content.pack.card[name]={};
@@ -22798,7 +22804,7 @@
                                 }
                                 newSkill.querySelector('.new_description').value=page.content.pack.translate[this.link+'_info'];
     							var info=page.content.pack.skill[this.link];
-                                container.code=get.stringify(info);
+                                container.code='skill='+get.stringify(info);
 
     							toggle.innerHTML='编辑技能 <div>&gt;</div>';
     							var confirm=newSkill.querySelector('.menubutton.large');
@@ -22850,7 +22856,7 @@
     							if(node.nextSibling){
     								node.nextSibling.remove();
     							}
-                                container.code='{\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}';
+                                container.code='skill={\n    \n}\n\n\/*\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
     						}
 
     						newSkill=ui.create.div('.new_character.new_skill',page);
@@ -22928,7 +22934,7 @@
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
                             var editor=ui.create.div(editorpage);
-                            container.code='{\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}';
+                            container.code='skill={\n    \n}\n\n\/*\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
                             var citebutton=document.createElement('button');
                             citebutton.innerHTML='引用代码';
@@ -22993,7 +22999,7 @@
                                 skillopt.style.display='none';
                                 addSkillButton.style.display='none';
                                 cancelSkillButton.style.display='none';
-                                container.code=get.stringify(lib.skill[skillopt.value]);
+                                container.code='skill='+get.stringify(lib.skill[skillopt.value]);
                                 editbutton.onclick.call(editbutton);
                                 newSkill.querySelector('input.new_description').value=lib.translate[skillopt.value+'_info'];
                             }
@@ -23028,7 +23034,9 @@
                                 page.content.pack.translate[name]=translate;
                                 page.content.pack.translate[name+'_info']=info;
                                 try{
-                                    eval('page.content.pack.skill[name]='+container.code);
+                                    var skill;
+                                    eval(container.code);
+                                    page.content.pack.skill[name]=skill;
                                 }
                                 catch(e){
                                     page.content.pack.skill[name]={};
@@ -23071,7 +23079,7 @@
                                     for(var i in lib.extensionPack[name].code){
                                         switch(typeof lib.extensionPack[name].code[i]){
                                             case 'function':page.content[i]=lib.extensionPack[name].code[i].toString();break;
-                                            case 'object':page.content[i]=get.stringify(lib.extensionPack[name].code[i]);break;
+                                            case 'object':page.content[i]=i+'='+get.stringify(lib.extensionPack[name].code[i]);break;
                                         }
                                     }
                                     for(var i in page.content){
@@ -23079,10 +23087,10 @@
                                     }
                                 }
                                 else{
-                                    dashes.content.node.code='function(config,pack){\n    \/\/执行时机为界面加载之后，其它扩展内容加载之前\n    \/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}';
-                                    dashes.precontent.node.code='function(){\n    \/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n    \/\/除添加模式外请慎用\n}';
-                                    dashes.config.node.code='{\n    \n}\n\n\/*\n示例：\n{\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-                                    dashes.help.node.code='{\n    \n}\n\n\/*\n示例：\n{\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                    dashes.content.node.code='function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                    dashes.precontent.node.code='function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n*\/';
+                                    dashes.config.node.code='config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                    dashes.help.node.code='help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
                                 }
                             };
                             var dashes={};
@@ -23171,10 +23179,10 @@
                                 }
                             };
                             page.content={}
-                            createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \/\/执行时机为界面加载之后，其它扩展内容加载之前\n    \/\/参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可修改）\n}');
-                            createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \/\/执行时机为游戏启动时，游戏包加载之前，且不受禁用扩展的限制\n    \/\/除添加模式外请慎用\n}');
-                            createCode('选','选项代码',page,clickCode,'config','{\n    \n}\n\n\/*\n示例：\n{\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-                            createCode('帮','帮助代码',page,clickCode,'help','{\n    \n}\n\n\/*\n示例：\n{\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n*\/');
+                            createCode('选','选项代码',page,clickCode,'config','config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+                            createCode('帮','帮助代码',page,clickCode,'help','help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 
                             return page;
                         }());
