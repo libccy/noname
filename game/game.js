@@ -19152,6 +19152,10 @@
                                 game.saveConfig('hall_ip',input.innerHTML,'connect');
                             }
                         }
+                        else{
+                            input.innerHTML=config.init;
+                            input.onblur=config.onblur;
+                        }
                     }
 	                else{
 	                    node.classList.add('toggle');
@@ -22469,10 +22473,7 @@
                                 confirmcontainer.style.display='none';
                                 container.code=get.stringify(lib.card[selectname.value]);
                                 codeButton.onclick.call(codeButton);
-                                var description=newCard.querySelector('input.new_description');
-                                if(!description.value){
-                                    description.value=lib.translate[selectname.value+'_info'];
-                                }
+                                newCard.querySelector('input.new_description').value=lib.translate[selectname.value+'_info'];
                             }
 
                             var citecancel=document.createElement('button');
@@ -22994,10 +22995,7 @@
                                 cancelSkillButton.style.display='none';
                                 container.code=get.stringify(lib.skill[skillopt.value]);
                                 editbutton.onclick.call(editbutton);
-                                var description=newSkill.querySelector('input.new_description');
-                                if(!description.value){
-                                    description.value=lib.translate[skillopt.value+'_info'];
-                                }
+                                newSkill.querySelector('input.new_description').value=lib.translate[skillopt.value+'_info'];
                             }
     						var cancelSkillButton=document.createElement('button');
                             cancelSkillButton.style.display='none';
