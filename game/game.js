@@ -22477,7 +22477,9 @@
                                 confirmcontainer.style.display='none';
                                 container.code='card='+get.stringify(lib.card[selectname.value]);
                                 codeButton.onclick.call(codeButton);
-                                newCard.querySelector('input.new_description').value=lib.translate[selectname.value+'_info'];
+                                if(lib.translate[selectname.value+'_info']){
+                                    newCard.querySelector('input.new_description').value=lib.translate[selectname.value+'_info'];
+                                }
                             }
 
                             var citecancel=document.createElement('button');
@@ -22968,26 +22970,46 @@
     							}
     							return a>b?1:-1;
     						});
+                            list.push(['others','其它']);
     						var list2=[];
     						var skills=lib.character[list[0][0]][3];
     						for(var i=0;i<skills.length;i++){
     							list2.push([skills[i],lib.translate[skills[i]]]);
     						}
     						var selectname=ui.create.selectlist(list,list[0],commandline);
+                            var list3=[];
+                            for(var i in lib.skill){
+                                if(i!='global'&&!get.emptyobj(lib.skill[i])&&!lib.skilllist.contains(i)){
+                                    list3.push(i);
+                                }
+                            }
     						selectname.onchange=function(){
-    							var skills=lib.character[this.value][3];
+                                var skills;
     							skillopt.innerHTML='';
-    							for(var i=0;i<skills.length;i++){
-    								var option=document.createElement('option');
-    								option.value=skills[i];
-    								option.innerHTML=lib.translate[skills[i]];
-    								skillopt.appendChild(option);
-    							}
+                                if(this.value=='others'){
+                                    skills=list3;
+                                    for(var i=0;i<skills.length;i++){
+        								var option=document.createElement('option');
+        								option.value=skills[i];
+        								option.innerHTML=skills[i];
+        								skillopt.appendChild(option);
+        							}
+                                }
+    							else{
+                                    skills=lib.character[this.value][3];
+                                    for(var i=0;i<skills.length;i++){
+        								var option=document.createElement('option');
+        								option.value=skills[i];
+        								option.innerHTML=lib.translate[skills[i]];
+        								skillopt.appendChild(option);
+        							}
+                                }
     						};
                             selectname.style.display='none';
     						selectname.style.maxWidth='80px';
     						var skillopt=ui.create.selectlist(list2,list2[0],commandline);
                             skillopt.style.display='none';
+                            skillopt.style.maxWidth='60px';
     						var addSkillButton=document.createElement('button');
                             addSkillButton.style.display='none';
     						addSkillButton.innerHTML='引用';
@@ -23001,7 +23023,9 @@
                                 cancelSkillButton.style.display='none';
                                 container.code='skill='+get.stringify(lib.skill[skillopt.value]);
                                 editbutton.onclick.call(editbutton);
-                                newSkill.querySelector('input.new_description').value=lib.translate[skillopt.value+'_info'];
+                                if(lib.translate[skillopt.value+'_info']){
+                                    newSkill.querySelector('input.new_description').value=lib.translate[skillopt.value+'_info'];
+                                }
                             }
     						var cancelSkillButton=document.createElement('button');
                             cancelSkillButton.style.display='none';
@@ -28724,6 +28748,16 @@
             else{
                 if(typeof obj=='function'){
                     str=obj.toString();
+                    str=str.replace(/\t/g,'    ');
+                    var i=str.lastIndexOf('\n');
+                    var num=0;
+                    for(var j=i+1;j<str.length&&str[j]==' ';j++){
+                        num++;
+                    }
+                    num=Math.floor(num/4);
+                    for(i=0;i<num-level;i++){
+                        str=str.replace(/\n    /g,'\n');
+                    }
                 }
                 else{
                     try{
