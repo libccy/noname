@@ -22511,11 +22511,10 @@
                                         var mirror = window.CodeMirror(editor, {
                                             value:node.code,
                                             mode:"javascript",
-                                            lineWrapping:true,
+                                            lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
                                             lineNumbers:true,
                                             indentUnit:4,
                                             autoCloseBrackets:true,
-                                            indentWithTabs:true,
                                             theme:'mdn-like'
                                         });
                                         lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
@@ -22885,11 +22884,10 @@
                                         var mirror = window.CodeMirror(editor, {
                                             value:node.code,
                                             mode:"javascript",
-                                            lineWrapping:true,
+                                            lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
                                             lineNumbers:true,
                                             indentUnit:4,
                                             autoCloseBrackets:true,
-                                            indentWithTabs:true,
                                             theme:'mdn-like'
                                         });
                                         lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
@@ -23155,7 +23153,7 @@
                                         var mirror = window.CodeMirror(editor, {
                                             value:node.code,
                                             mode:"javascript",
-                                            lineWrapping:true,
+                                            lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
                                             lineNumbers:true,
                                             indentUnit:4,
                                             autoCloseBrackets:true,
