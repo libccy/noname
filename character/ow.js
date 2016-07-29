@@ -171,7 +171,6 @@ character.ow={
         },
         liudan:{
 			trigger:{player:'useCard'},
-			popup:false,
             check:function(event,player){
                 var list=[];
                 for(var i=0;i<game.players.length;i++){

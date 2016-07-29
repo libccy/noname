@@ -3312,6 +3312,8 @@ character.sp={
 				return false;
 			},
 			direct:true,
+			unique:true,
+			gainable:true,
 			content:function(){
 				"step 0"
 				if(trigger.delay==false) game.delay();

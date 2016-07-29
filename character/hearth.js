@@ -3965,7 +3965,7 @@ character.hearth={
 				player.draw(3);
 			},
 			ai:{
-				order:1,
+				order:4,
 				result:{
 					player:function(player){
 						if(player.num('h')>=player.hp-1) return -1;

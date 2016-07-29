@@ -8,7 +8,10 @@ window.noname_update={
             'game/game.js',
             'character/hearth.js',
             'character/swd.js',
+            'character/ow.js',
+            'character/sp.js',
             'card/swd.js',
+            'card/hearth.js',
         ],
         '1.8.19.5':[],
     }

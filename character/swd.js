@@ -5328,13 +5328,11 @@ character.swd={
                 player.markSkillCharacter('tianshu2',target,get.translation(link),lib.translate[link+'_info']);
 				player.checkMarks();
 				player.addSkill('tianshu3');
-				player.addTempSkill('tianshu_ai','phaseAfter');
             },
             ai:{
                 order:10,
                 result:{
                     player:function(player){
-                        if(player.skills.contains('tianshu_ai')) return 0;
                         return 1;
                     }
                 }
@@ -5352,14 +5350,15 @@ character.swd={
 				player.removeSkill('tianshu3');
 			}
 		},
-		tianshu_old:{
+		tianshu:{
 			unique:true,
 			enable:'phaseUse',
-			priority:-9,
-			filterCard:true,
-            position:'he',
+			usable:1,
+			filterCard:function(card){
+				return get.type(card,'trick')=='trick';
+			},
 			filter:function(event,player){
-				return player.num('he')>0;
+				return player.num('h',{type:['trick','delay']})>0;
 			},
 			filterTarget:function(card,player,target){
 				var names=[];
@@ -5381,7 +5380,7 @@ character.swd={
 					return false;
 				}
 			},
-			// group:'tianshu_remove',
+			group:'tianshu_remove',
 			createDialog:function(player,target,onlylist){
 				var names=[];
 				var list=[];
@@ -5433,9 +5432,6 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				if(player.storage.tianshu){
-					player.unmark(player.storage.tianshu+'_charactermark');
-				}
 				event.skillai=function(list){
 					return list.randomGet();
 				};
@@ -5445,39 +5441,34 @@ character.swd={
 						event._result=event.skillai(event.list);
 						game.resume();
 					};
+					_status.imchoosing=true;
 					game.pause();
 				}
 				else{
 					event._result=event.skillai(lib.skill.tianshu.createDialog(player,target,true));
 				}
 				"step 1"
+				_status.imchoosing=false;
 				if(event.dialog){
 					event.dialog.close();
 				}
 				var link=result;
 				player.addSkill(link);
 				player.skills.remove(link);
+				if(player.additionalSkills.tianshu){
+					player.removeSkill(player.additionalSkills.tianshu);
+				}
 				player.additionalSkills.tianshu=link;
 				player.popup(link);
-				player.markCharacter(target.name,{
-					name:get.translation(link),
-					content:lib.translate[link+'_info']
-				});
-				game.addVideo('markCharacter',player,{
-					name:get.translation(link),
-					content:lib.translate[link+'_info'],
-					id:'tianshu',
-					target:target.name
-				});
-				player.storage.tianshu=target.name;
+				player.markSkillCharacter('tianshu',target,get.translation(link),lib.translate[link+'_info']);
+				player.storage.tianshu=target;
 				player.checkMarks();
-				player.addTempSkill('tianshu_ai','phaseAfter');
+				game.log(player,'获得了技能','【'+get.translation(link)+'】');
 			},
 			ai:{
 				order:1,
 				result:{
 					player:function(player){
-						if(player.skills.contains('tianshu_ai')) return 0;
 						if(player.num('h')>player.hp) return 1;
 						return 0;
 					}
@@ -5485,19 +5476,20 @@ character.swd={
 			}
 		},
 		tianshu_remove:{
-			trigger:{player:'phaseUseBegin'},
+			trigger:{global:'dieAfter'},
 			forced:true,
 			popup:false,
 			silent:true,
+			filter:function(event,player){
+				return event.player==player.storage.tianshu;
+			},
 			content:function(){
-				if(player.storage.tianshu){
-					player.unmark(player.storage.tianshu+'_charactermark');
-					delete player.storage.tianshu;
-					delete player.additionalSkills.tianshu;
-				}
+				player.unmarkSkill('tianshu');
+				player.removeSkill(player.additionalSkills.tianshu);
+				delete player.storage.tianshu;
+				delete player.additionalSkills.tianshu;
 			}
 		},
-		tianshu_ai:{},
 		tianshu2_old:{
 			trigger:{player:'phaseBegin'},
 			direct:true,
@@ -6301,7 +6293,7 @@ character.swd={
 				}
 			}
 		},
-		lanzhi:{
+		lanzhi_old:{
 			trigger:{source:'damageBefore'},
 			prompt:function(event){
 				return '是否对'+get.translation(event.player)+'发动【兰芷】？';
@@ -6317,6 +6309,68 @@ character.swd={
 				trigger.finish();
 				player.recover();
 			},
+		},
+		lanzhi:{
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				if(get.suit(event.card)=='club'){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].hp<game.players[i].maxHp&&game.players[i].hp<=player.hp){
+							return true;
+						}
+					}
+				}
+				return false;
+			},
+			prompt:function(event,player){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hp<game.players[i].maxHp&&game.players[i].hp<=player.hp){
+						list.push(game.players[i]);
+					}
+				}
+				return '是否对'+get.translation(list)+'发动【兰芷】？';
+			},
+			check:function(){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hp<game.players[i].maxHp&&game.players[i].hp<=player.hp){
+						list.push(game.players[i]);
+					}
+				}
+				var num=0;
+				for(var i=0;i<list.length;i++){
+					var eff=ai.get.recoverEffect(list[i],player,player);
+					if(eff>0){
+						num++;
+					}
+					else{
+						num--;
+					}
+				}
+				return num>0;
+			},
+			content:function(){
+				"step 0"
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hp<game.players[i].maxHp&&game.players[i].hp<=player.hp){
+						list.push(game.players[i]);
+					}
+				}
+				player.line(list,'green');
+				list.sort(lib.sort.seat);
+				event.list=list;
+				"step 1"
+				if(event.list.length){
+					event.list.shift().recover();
+					event.redo();
+				}
+			},
+			ai:{
+				expose:0.3,
+				threaten:1.5
+			}
 		},
 		lanzhi2:{},
 		duanyi:{
@@ -8075,7 +8129,7 @@ character.swd={
 		guxing_info:'出牌阶段，你可以将最后至多X张手牌当杀使用，此杀无视距离且可以指定至多3个目标，每造成一次伤害，你摸一张牌，Ｘ为你已损失的体力值且至少为１。',
 		tianlun_info:'任意一名角色的判定生效前，你可以弃置一张场上角色的判定牌代替之',
 		hlongyin_info:'出牌阶段，你可以弃置任意张颜色相同且点数不同的牌，并获得逆时针座位距离与卡牌点数相同的角色区域内的一张牌。每阶段限一次',
-		lanzhi_info:'每当你即将造成伤害，你可以防止此伤害，然后回复一点体力',
+		lanzhi_info:'每当你使用一张梅花牌，你可以令所有体力值不大于你的角色回复一点体力',
 		lanzhi_old_info:'每当你即将造成伤害，可以防止此伤害，然后摸两张牌。每回合限发动一次。',
 		tianhuo_info:'出牌阶段，你可以令所有角色弃置其判定区域内的牌，并受到没有来源的等量火焰伤害，每阶段限一次',
 		huanyin_info:'锁定技，每当你成为其他角色的卡牌的目标时，你进行一次判定，若为黑桃则取消之，若为红桃你摸一张牌',
@@ -8097,8 +8151,8 @@ character.swd={
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
-		tianshu_info_old:'回合结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
-		tianshu_info:'出牌阶段，你可以弃置一张牌，并根据弃牌的类别执行如下效果。基本牌：你获得一项随机技能；锦囊牌：你获得一张衍生牌；装备牌',
+		tianshu_old_info:'回合结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
+		tianshu_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后获得一名存活角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
 		zaowu_info:'出牌阶段限一次，你可以移除一个天书列表中的技能，然后随机获得一张衍生牌',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',

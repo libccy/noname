@@ -1920,11 +1920,6 @@ card.swd={
 							return 'zeroplayertarget';
 						}
 					},
-					player:function(card,player,target,current){
-						if(get.type(card)=='trick'&&get.tag(card,'damage')){
-							return 'zeroplayertarget';
-						}
-					}
 				}
 			}
 		},
@@ -3275,7 +3270,7 @@ card.swd={
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
 		mujiaren_skill:'巧匠',
-		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以非基本牌当作机关鼠使用',
+		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以将非基本牌当作机关鼠使用',
 		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标获得技能巧匠（你在煅造装备时可以额外加入一个零件；你可以将非基本牌当作机关鼠使用）',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',
