@@ -2424,9 +2424,14 @@ card.swd={
 		mujiaren_skill:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{type:'hslingjian'})>=1;
+				return player.num('h',{type:'basic'})<player.num('h');
 			},
-			filterCard:{type:'hslingjian'},
+			filterCard:function(card){
+				return get.type(card)!='basic';
+			},
+			check:function(card){
+				return 5-ai.get.value(card);
+			},
 			viewAs:{name:'jiguanshu'}
 		},
 		_lingjianduanzao:{
@@ -3269,9 +3274,9 @@ card.swd={
 		lingjiandai:'零件袋',
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
-		mujiaren_skill:'木甲人',
-		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以将零件当作机关鼠使用',
-		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标获得技能木甲人（你在煅造装备时可以额外加入一个零件；你可以将零件当作机关鼠使用）',
+		mujiaren_skill:'巧匠',
+		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以非基本牌当作机关鼠使用',
+		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标获得技能巧匠（你在煅造装备时可以额外加入一个零件；你可以将非基本牌当作机关鼠使用）',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',
 		hslingjian_xuanfengzhiren_info:'随机弃置一名角色的一张牌',

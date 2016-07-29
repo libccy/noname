@@ -22860,7 +22860,7 @@
     							if(node.nextSibling){
     								node.nextSibling.remove();
     							}
-                                container.code='skill={\n    \n}\n\n\/*\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
     						}
 
     						newSkill=ui.create.div('.new_character.new_skill',page);
@@ -22938,7 +22938,7 @@
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
                             var editor=ui.create.div(editorpage);
-                            container.code='skill={\n    \n}\n\n\/*\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                            container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
                             var citebutton=document.createElement('button');
                             citebutton.innerHTML='引用代码';
@@ -29703,6 +29703,19 @@
 			}
 			return skills;
 		},
+        gainableSkills:function(){
+            var list=[];
+            for(var i in lib.character){
+                if(lib.character[i][4]&&lib.character[i][4].contains('boss')) continue;
+                for(var j=0;j<lib.character[i][3].length;j++){
+                    var skill=lib.character[i][3][j];
+                    if(lib.skill[skill]&&!lib.skill[skill].unique){
+                        list.add(skill);
+                    }
+                }
+            }
+            return list;
+        },
 		selectableTargets:function(sort){
 			var selectable=[];
 			for(var i=0;i<game.players.length;i++){

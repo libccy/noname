@@ -24,7 +24,7 @@ character.swd={
 			swd_quxian:['female','qun',3,['mojian','huanxia']],
 			swd_xiyan:['male','qun',3,['tianshu','daofa']],
 			swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
-			swd_huanyuanzhi:['male','qun',3,['lanzhi','mufeng','tianshu']],
+			swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
 			swd_murongshi:['female','shu',4,['duanyi','guxing']],
 			swd_jipeng:['male','wu',3,['reyingzi','guozao']],
 			swd_qi:['male','qun',3,['yaotong','heihuo','pojian']],
@@ -4530,7 +4530,10 @@ character.swd={
 			},
 			content:function(){
 				if(player.num('e')){
-					player.gain(game.createCard(['jiguanshu','jiguanyuan','jiguanfeng'].randomGet()),'gain');
+					var list=get.typeCard('hslingjian');
+					if(list.length){
+						player.gain(game.createCard(list.randomGet()),'gain');
+					}
 				}
 				else{
 					player.gain(game.createCard(get.inpile('equip').randomGet()),'gain');
@@ -5170,13 +5173,13 @@ character.swd={
 				}
 			}
 		},
-        tianshu:{
+        tianshu_old:{
             unique:true,
-            trigger:{player:'useCardAfter'},
-            frequent:true,
+            trigger:{player:'phaseEnd'},
+            direct:true,
             init:function(player){
                 player.storage.tianshu=[];
-                player.storage.tianshu2=[];
+                player.storage.tianshu2={};
             },
             intro:{
                 content:function(storage){
@@ -5197,57 +5200,61 @@ character.swd={
             },
             mark:true,
             filter:function(event,player){
-                if(event.targets&&event.targets.length==1&&event.targets[0]!=player){
-                    var target=event.targets[0];
-                    var names=[];
-    				if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
-    				if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
-    				if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
-    				var pss=player.get('s');
-    				for(var i=0;i<names.length;i++){
-    					var info=lib.character[names[i]];
-    					if(info){
-    						var skills=info[3];
-    						for(var j=0;j<skills.length;j++){
-                                if(player.storage.tianshu.contains(skills[j])) continue;
-    							if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-    								!lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
-    								return true;
-    							}
-    						}
-    					}
-    				}
-                }
-                return false;
+                return player.num('he')>0;
             },
             content:function(){
-                var target=trigger.targets[0];
-                var names=[];
-                var list=[];
-                if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
-                if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
-                if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
-                var pss=player.get('s');
-                for(var i=0;i<names.length;i++){
-                    var info=lib.character[names[i]];
-                    if(info){
-                        var skills=info[3];
-                        for(var j=0;j<skills.length;j++){
-                            if(player.storage.tianshu.contains(skills[j])) continue;
-                            if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-                                !lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
-                                list.add(skills[j]);
-                            }
-                        }
-                    }
-                }
-                var skill=list.randomGet();
-                player.storage.tianshu.push(skill);
-                player.storage.tianshu2.push(target);
-                player.popup(skill);
-                player.syncStorage('tianshu');
-                player.updateMarks();
-                game.log(player,'学习了','【'+get.translation(skill)+'】');
+				'step 0'
+				player.chooseToDiscard('he','是否发动【天书】？').ai=function(card){
+					if(get.position(card)=='h') return 5-ai.get.useful(card);
+					return 4-ai.get.value(card);
+				}.logSkill='tianshu';
+				'step 1'
+				if(result.bool){
+					var list=[];
+					for(var i in lib.character){
+						if(lib.character[i][4]&&(lib.character[i][4].contains('boss')||lib.character[i][4].contains('hiddenboss'))) continue;
+						if(i==player.name||i==player.name1||i==player.name2) continue;
+						for(var j=0;j<lib.character[i][3].length;j++){
+							if(!lib.skill[lib.character[i][3][j]].unique){
+								list.push(i);break;
+							}
+						}
+					}
+					player.chooseButton(['选择角色',[list.randomGets(3),'character']],true);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				player.storage.tianshu_learn=result.links[0];
+				//
+                // var target=trigger.targets[0];
+                // var names=[];
+                // var list=[];
+                // if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
+                // if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
+                // if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
+                // var pss=player.get('s');
+                // for(var i=0;i<names.length;i++){
+                //     var info=lib.character[names[i]];
+                //     if(info){
+                //         var skills=info[3];
+                //         for(var j=0;j<skills.length;j++){
+                //             if(player.storage.tianshu.contains(skills[j])) continue;
+                //             if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
+                //                 !lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
+                //                 list.add(skills[j]);
+                //             }
+                //         }
+                //     }
+                // }
+                // var skill=list.randomGet();
+                // player.storage.tianshu.push(skill);
+                // player.storage.tianshu2.push(target);
+                // player.popup(skill);
+                // player.syncStorage('tianshu');
+                // player.updateMarks();
+                // game.log(player,'学习了','【'+get.translation(skill)+'】');
             },
             group:'tianshu2',
 			ai:{
@@ -5821,7 +5828,7 @@ character.swd={
 				}
 			}
 		},
-		zaowu:{
+		zaowu_old:{
 			enable:'phaseUse',
 			usable:1,
 			position:'he',
@@ -8082,7 +8089,7 @@ character.swd={
 		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
 		qingcheng_info:'回合结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
 		xianjiang_old_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
-		xianjiang_info:'出牌阶段限一次，你可以弃置一张锦囊牌，若你装备区内没有牌，你获得一张装备牌，否则你获得一张机关牌',
+		xianjiang_info:'出牌阶段限一次，你可以弃置一张锦囊牌，若你装备区内没有牌，你获得一张装备牌，否则你获得一张零件牌',
 		shengong_info:'每当你需要打出一张杀或闪时，你可以弃置一名其他角色装备区内的一张武器牌或防具牌，视为打出一张杀或闪，然后该角色摸一张牌，你弃一张牌',
 		ningjian_info:'你可以将一张红色牌当闪、黑色牌当杀使用或打出',
 		taixu_info:'限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1为其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1',
@@ -8090,7 +8097,9 @@ character.swd={
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
-		tianshu_info:'每当你使用卡牌结算完毕后，若此牌指定了惟一目标，你可以学习该目标的一项随机技能；出牌阶段，你可以装备一项已学习的技能',
+		tianshu_info_old:'回合结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
+		tianshu_info:'出牌阶段，你可以弃置一张牌，并根据弃牌的类别执行如下效果。基本牌：你获得一项随机技能；锦囊牌：你获得一张衍生牌；装备牌',
+		zaowu_info:'出牌阶段限一次，你可以移除一个天书列表中的技能，然后随机获得一张衍生牌',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
@@ -8098,7 +8107,7 @@ character.swd={
 		xuehuang_info:'出牌阶段限一次，你可以弃置一张红色手牌令距离你一以内的所有角色受到一点火焰伤害',
 		zhuyu_info:'每当有横置的角色即将受到非火焰伤害，你可以弃置一张红色牌使其额外受到一点火焰伤害',
 		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则将其翻面',
-		zaowu_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',
+		zaowu_old_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',
 		xielv_info:'弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后选择一项：1、回复一点体力；2、弃置场上所有与你手牌颜色不同的牌',
 	},
 }

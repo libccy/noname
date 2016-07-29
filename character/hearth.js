@@ -798,6 +798,52 @@ character.hearth={
 				player.draw(2);
 			}
 		},
+		maoxian_old:{
+			enable:'phaseUse',
+			usable:2,
+			direct:true,
+			delay:false,
+			unique:true,
+			onremove:function(player){
+				delete player.additionalSkills.maoxian;
+			},
+			content:function(){
+				'step 0'
+				var list=get.gainableSkills();
+				list.remove('maoxian');
+				player.chooseControl(list.randomGets(3)).prompt='选择一项作为你的技能';
+				'step 1'
+				if(result.control){
+					game.stopCountChoose();
+					var link=result.control;
+					player.addSkill(link);
+					player.skills.remove(link);
+					if(player.additionalSkills.maoxian){
+						player.removeSkill(player.additionalSkills.maoxian);
+					}
+					player.additionalSkills.maoxian=link;
+					player.popup(link);
+					game.log(player,'获得了技能','【'+get.translation(link)+'】');
+					player.checkMarks();
+					player.markSkill('maoxian');
+					game.delay();
+				}
+			},
+			intro:{
+				content:function(storage,player){
+					return '当前技能：'+get.translation(player.additionalSkills.maoxian);
+				}
+			},
+			ai:{
+				order:11,
+				result:{
+					player:function(player){
+						if(player.getStat().skill.maoxian) return 0;
+						return 1;
+					}
+				}
+			}
+		},
 		maoxian:{
 			enable:'phaseUse',
 			usable:2,
