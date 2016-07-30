@@ -581,7 +581,7 @@ character.hearth={
 			trigger:{player:'equipEnd'},
 			frequent:true,
 			filter:function(event){
-				return get.subtype(event.card)=='equip1'&&typeof lib.cardType.hslingjian=='number';
+				return lib.inpile.contains(event.card.name)&&get.subtype(event.card)=='equip1'&&typeof lib.cardType.hslingjian=='number';
 			},
 			content:function(){
 				var num=1;
@@ -4584,7 +4584,7 @@ character.hearth={
 		zengli:'赠礼',
 		zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
 		xiubu:'修补',
-		xiubu_info:'每当你装备一把武器，你可以获得数量等同于武器攻击范围的随机零件',
+		xiubu_info:'每当你装备一把未强化的武器，你可以获得数量等同于武器攻击范围的随机零件',
 		mobao:'魔爆',
 		mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害',
 		xianji:'献祭',

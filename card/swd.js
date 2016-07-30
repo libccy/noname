@@ -2601,6 +2601,11 @@ card.swd={
 				return name;
 			},
 			selectCard:function(){
+				if(ui.selected.cards.length==2&&
+					get.type(ui.selected.cards[0])=='hslingjian'&&
+					get.type(ui.selected.cards[1])=='hslingjian'){
+					return [3,3];
+				}
 				if(_status.event.player.hasSkill('mujiaren_skill')) return [2,3];
 				return 2;
 			},

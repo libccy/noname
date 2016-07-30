@@ -4155,7 +4155,6 @@ character.swd={
 				expose:0.2
 			}
 		},
-
 		chuanyang:{
 			trigger:{player:'shaBegin'},
 			check:function(event,player){
