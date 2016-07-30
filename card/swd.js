@@ -1941,7 +1941,7 @@ card.swd={
 				}
 			},
 			ai:{
-				order:1,
+				order:10,
 				result:{
 					target:-1
 				}

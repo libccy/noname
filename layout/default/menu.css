@@ -793,7 +793,7 @@
 }
 #create-extension>.menu-buttons>.new_character>.skill_list>div:first-child:not(*:empty){
 	margin-top: 10px;
-	margin-bottom: 17px;
+	margin-bottom: 10px;
 }
 #create-extension>.menu-buttons>.new_character>.skill_list>div:first-child>button{
 	margin-right: 3px;

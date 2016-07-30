@@ -11,8 +11,11 @@ window.noname_update={
             'character/swd.js',
             'character/ow.js',
             'character/sp.js',
+            'character/shenhua.js',
+            'character/yxs.js',
             'card/swd.js',
             'card/hearth.js',
+            'layout/default/menu.css',
         ],
         '1.8.19.5':[],
     }

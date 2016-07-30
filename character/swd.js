@@ -22,7 +22,7 @@ character.swd={
 			swd_jiliang:['male','wu',3,['yunchou','gongxin','qimou']],
 			swd_shuijing:['female','qun',4,['mojian','duanyue']],
 			swd_quxian:['female','qun',3,['mojian','huanxia']],
-			swd_xiyan:['male','qun',3,['tianshu','daofa']],
+			swd_xiyan:['male','qun',3,['zaowu','daofa']],
 			swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
 			swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
 			swd_murongshi:['female','shu',4,['duanyi','guxing']],
@@ -125,7 +125,7 @@ character.swd={
 		swd_yuli:['swd_chunyuheng'],
 		swd_jiuyou:['swd_zhiyin'],
 		swd_qiner:['swd_hengai'],
-		swd_huzhongxian:['swd_jiliang','swd_jipeng'],
+		swd_huzhongxian:['swd_jiliang','swd_jipeng','swd_xiyan'],
 		swd_anka:['swd_kama'],
 		swd_septem:['swd_nicole','swd_kama','swd_weida','swd_wangsiyue'],
 		swd_nicole:['swd_lilian'],
@@ -143,6 +143,21 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		zaowu:{
+			enable:'chooseToUse',
+			filter:function(event,player){
+				return player.num('he',{suit:'spade'})>0;
+			},
+			position:'he',
+			filterCard:{suit:'spade'},
+			viewAs:{name:'fengyinzhidan'},
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			ai:{
+				order:2,
+			}
+		},
 		huanxia:{
 			enable:'chooseToUse',
 			filterCard:function(card){
@@ -1672,6 +1687,9 @@ character.swd={
 			},
 			content:function(){
 				player.unmark(player.storage.huanxing+'_charactermark');
+				if(player.additionalSkills.yizhuang){
+					player.removeSkill(player.additionalSkills.yizhuang);
+				}
 				delete player.storage.huanxing;
 				delete player.additionalSkills.huanxing;
 				player.checkMarks();
@@ -2580,13 +2598,15 @@ character.swd={
 		mufeng:{
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
-				return event.player!=player&&event.player.num('h')>player.num('h');
+				return !player.hasSkill('mufeng2')&&event.player!=player&&
+				Math.min(5,event.player.num('h'))>player.num('h');
 			},
-			frequent:true,
 			content:function(){
-				player.draw();
+				player.draw(Math.min(5,trigger.player.num('h'))-player.num('h'));
+				player.addTempSkill('mufeng2',{player:'phaseBegin'});
 			},
 		},
+		mufeng2:{},
 		jiying:{
 			// trigger:{player:'respond'},
 			// filter:function(event,player){
@@ -3849,7 +3869,8 @@ character.swd={
 					target:function(card,player,target,current){
 						if(get.type(card)=='equip') return [1,3];
 					}
-				}
+				},
+				noe:true,
 			}
 		},
 		qiaoxie2:{
@@ -5353,9 +5374,12 @@ character.swd={
 		tianshu:{
 			unique:true,
 			enable:'phaseUse',
-			usable:1,
 			filterCard:function(card){
 				return get.type(card,'trick')=='trick';
+			},
+			discard:false,
+			prepare:function(cards,player,targets){
+				player.$give(cards,targets[0]);
 			},
 			filter:function(event,player){
 				return player.num('h',{type:['trick','delay']})>0;
@@ -5432,6 +5456,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
+				target.gain(cards);
 				event.skillai=function(list){
 					return list.randomGet();
 				};
@@ -5468,8 +5493,14 @@ character.swd={
 			ai:{
 				order:1,
 				result:{
-					player:function(player){
+					player:function(player,target){
+						if(ai.get.attitude(player,target)<0) return 0;
 						if(player.num('h')>player.hp) return 1;
+						return 0;
+					},
+					target:function(player,target){
+						if(ai.get.attitude(player,target)<0) return 0;
+						if(player.num('h')>target.num('h')) return 1;
 						return 0;
 					}
 				}
@@ -7952,7 +7983,7 @@ character.swd={
 		qimou:'奇谋',
 		qimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并立即使用之',
 		mufeng:'沐风',
-		mufeng_info:'在一名角色的回合结束阶段，若你的手牌数比其少，你可以摸一张牌',
+		mufeng_info:'在一名角色的回合结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
 		mufeng_old_info:'锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0',
 		lexue:'乐学',
 		lexue_info:'回合内，你随机获得制衡、集智、缔盟、驱虎中的一个技能；回合外，你随机获得遗计、急救、鬼道、反馈中的一个技能',
@@ -8152,8 +8183,8 @@ character.swd={
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
 		tianshu_old_info:'回合结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
-		tianshu_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后获得一名存活角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
-		zaowu_info:'出牌阶段限一次，你可以移除一个天书列表中的技能，然后随机获得一张衍生牌',
+		tianshu_info:'出牌阶段限，你可以交给一名其他角色一张锦囊牌，然后获得该角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
+		zaowu_info:'你可以将一张黑桃牌当作封印之蛋使用',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',

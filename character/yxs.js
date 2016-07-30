@@ -722,6 +722,9 @@ character.yxs={
 			content:function(){
 				"step 0"
 				player.unmark(player.storage.yizhuang+'_charactermark');
+				if(player.additionalSkills.yizhuang){
+					player.removeSkill(player.additionalSkills.yizhuang);
+				}
 				delete player.storage.yizhuang;
 				delete player.additionalSkills.yizhuang;
 				player.checkMarks();
@@ -803,6 +806,9 @@ character.yxs={
 			},
 			content:function(){
 				player.unmark(player.storage.yizhuang+'_charactermark');
+				if(player.additionalSkills.yizhuang){
+					player.removeSkill(player.additionalSkills.yizhuang);
+				}
 				delete player.storage.yizhuang;
 				delete player.additionalSkills.yizhuang;
 				player.checkMarks();

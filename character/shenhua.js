@@ -1381,6 +1381,12 @@ character.shenhua={
 			filter:function(event){
 				return event.playerCards&&event.playerCards.length>0
 			},
+			check:function(event){
+				for(var i=0;i<event.playerCards.length;i++){
+					if(event.playerCards[i].name=='du') return false;
+				}
+				return true;
+			},
 			content:function(){
 				"step 0"
 				player.gain(trigger.playerCards);

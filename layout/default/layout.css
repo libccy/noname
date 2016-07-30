@@ -1616,6 +1616,9 @@ span[data-color="unknownm"]{
 .config.disabled{
 	opacity:0.4;
 }
+.menubutton.large.disabled{
+	opacity: 0.5;
+}
 .config>.toggle.onoff>div>div{
 	width:8px;
 	height:8px;

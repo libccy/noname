@@ -9804,13 +9804,20 @@
 					return this;
 				},
 				removeSkill:function(skill){
-					this.unmarkSkill(skill);
-					this.skills.remove(skill);
-					this.checkConflict();
-                    delete this.tempSkills[skill];
-					if(lib.skill[skill]&&lib.skill[skill].onremove){
-						lib.skill[skill].onremove(this);
-					}
+                    if(Array.isArray(skill)){
+                        for(var i=0;i<skill.length;i++){
+                            this.removeSkill(skill[i]);
+                        }
+                    }
+                    else{
+                        this.unmarkSkill(skill);
+    					this.skills.remove(skill);
+    					this.checkConflict();
+                        delete this.tempSkills[skill];
+    					if(lib.skill[skill]&&lib.skill[skill].onremove){
+    						lib.skill[skill].onremove(this);
+    					}
+                    }
 					return skill;
 				},
 				addTempSkill:function(skill,expire){
@@ -21791,6 +21798,36 @@
                                     newCharacter.style.display='';
                                 }
                             };
+                            var updateButton=function(){
+                                var name=page.querySelector('input.new_name').value;
+                                if(!name){
+                                    editnode.classList.add('disabled');
+                                    return;
+                                }
+                                name=name.split('|');
+                                name=name[0];
+                                if(currentButton){
+                                    if(currentButton.link!=name){
+                                        if(lib.character[name]||page.content.pack.character[name]){
+                                            editnode.classList.add('disabled');
+                                            return;
+                                        }
+                                    }
+                                }
+                                else{
+                                    if(lib.character[name]||page.content.pack.character[name]){
+                                        editnode.classList.add('disabled');
+                                        return;
+                                    }
+                                }
+                                if(!fakeme.image){
+                                    if(!page.content.image[name+'.jpg']){
+                                        editnode.classList.add('disabled');
+                                        return;
+                                    }
+                                }
+                                editnode.classList.remove('disabled');
+                            };
                             var clickButton=function(){
                                 if(currentButton==this){
                                     resetEditor();
@@ -21834,6 +21871,7 @@
 
     							toggle.innerHTML='编辑武将 <div>&gt;</div>';
     							editnode.innerHTML='编辑武将';
+                                editnode.classList.remove('disabled');
                                 delnode.innerHTML='删除';
                                 delnode.button=this;
     						}
@@ -21971,6 +22009,7 @@
     							skillList.firstChild.innerHTML='';
     							toggle.innerHTML='创建武将 <div>&gt;</div>';
     							editnode.innerHTML='创建武将';
+                                editnode.classList.add('disabled');
     							delnode.innerHTML='取消';
                                 delete delnode.button;
     						}
@@ -21995,6 +22034,7 @@
         								fileReader.onload = function(fileLoadedEvent)
         								{
         									fakeme.image=fileLoadedEvent.target.result;
+                                            updateButton();
         								};
         								fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
     								};
@@ -22007,6 +22047,7 @@
 
     						ui.create.div('.indent','姓名：<input class="new_name" type="text">',newCharacter).style.paddingTop='10px';
     						ui.create.div('.indent','体力：<input class="new_hp" type="text">',newCharacter).style.paddingTop='10px';
+                            newCharacter.querySelector('input.new_name').onblur=updateButton;
     						var sexes=ui.create.selectlist([
     							['male','男'],
     							['female','女'],
@@ -22122,7 +22163,7 @@
                             };
     						var skillList=ui.create.div('.skill_list',newCharacter);
     						ui.create.div(skillList);
-    						var editnode=ui.create.div('.menubutton.large','创建武将',ui.create.div(skillList),function(){
+    						var editnode=ui.create.div('.menubutton.large.disabled','创建武将',ui.create.div(skillList),function(){
                                 var name=page.querySelector('input.new_name').value;
                                 if(!name){
                                     alert('请填写武将名\n提示：武将名格式为id+|+中文名，其中id必须惟一');
@@ -22214,6 +22255,34 @@
                                     newCard.style.display='';
                                 }
                             };
+                            var updateButton=function(){
+                                var name=page.querySelector('input.new_name').value;
+                                if(!name){
+                                    editnode.classList.add('disabled');
+                                    return;
+                                }
+                                name=name.split('|');
+                                name=name[0];
+                                if(currentButton){
+                                    if(currentButton.link!=name){
+                                        if(lib.card[name]||page.content.pack.card[name]){
+                                            editnode.classList.add('disabled');
+                                            return;
+                                        }
+                                    }
+                                }
+                                else{
+                                    if(lib.card[name]||page.content.pack.card[name]){
+                                        editnode.classList.add('disabled');
+                                        return;
+                                    }
+                                }
+                                if(!fakeme.image&&!fakeme.classList.contains('inited')){
+                                    editnode.classList.add('disabled');
+                                    return;
+                                }
+                                editnode.classList.remove('disabled');
+                            };
                             var clickButton=function(){
                                 if(currentButton==this){
                                     resetEditor();
@@ -22246,6 +22315,7 @@
 
     							toggle.innerHTML='编辑卡牌 <div>&gt;</div>';
     							editnode.innerHTML='编辑卡牌';
+                                editnode.classList.remove('disabled');
     							delnode.innerHTML='删除';
                                 delnode.button=this;
     						}
@@ -22415,6 +22485,7 @@
     							}
     							toggle.innerHTML='创建卡牌 <div>&gt;</div>';
     							editnode.innerHTML='创建卡牌';
+                                editnode.classList.add('disabled');
                                 delnode.innerHTML='取消';
                                 delete delnode.button;
                                 container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
@@ -22451,6 +22522,7 @@
         								fileReader.onload = function(fileLoadedEvent)
         								{
         									fakeme.image=fileLoadedEvent.target.result;
+                                            updateButton();
         								};
         								fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
     								};
@@ -22464,6 +22536,7 @@
 
     						ui.create.div('.indent','名称：<input class="new_name" type="text">',newCard).style.paddingTop='8px';
     						ui.create.div('.indent','描述：<input class="new_description" type="text">',newCard).style.paddingTop='6px';
+                            newCard.querySelector('input.new_name').onblur=updateButton;
                             var codeButton=document.createElement('button');
                             newCard.appendChild(codeButton);
                             codeButton.innerHTML='编辑代码';
@@ -22612,7 +22685,7 @@
                             var editor=ui.create.div(editorpage);
                             container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
-                            var editnode=ui.create.div('.menubutton.large.new_card','创建卡牌',newCard,function(){
+                            var editnode=ui.create.div('.menubutton.large.new_card.disabled','创建卡牌',newCard,function(){
                                 var name=page.querySelector('input.new_name').value;
                                 if(!name){
                                     alert('请填写卡牌名\n提示：卡牌名格式为id+|+中文名，其中id必须惟一');
@@ -22823,6 +22896,30 @@
                         }());
                         var dash3=(function(){
                             var page=ui.create.div('.hidden.menu-buttons.new_skill');
+                            var updateButton=function(){
+                                var name=page.querySelector('input.new_name').value;
+                                if(!name){
+                                    editnode.classList.add('disabled');
+                                    return;
+                                }
+                                name=name.split('|');
+                                name=name[0];
+                                if(currentButton){
+                                    if(currentButton.link!=name){
+                                        if(lib.skill[name]||page.content.pack.skill[name]){
+                                            editnode.classList.add('disabled');
+                                            return;
+                                        }
+                                    }
+                                }
+                                else{
+                                    if(lib.skill[name]||page.content.pack.skill[name]){
+                                        editnode.classList.add('disabled');
+                                        return;
+                                    }
+                                }
+                                editnode.classList.remove('disabled');
+                            };
                             page.init=function(){
                                 if(!page.querySelector('.menubutton:not(.large)')){
                                     toggle.classList.add('on');
@@ -22895,6 +22992,7 @@
 
     							toggle.innerHTML='编辑技能 <div>&gt;</div>';
     							editnode.innerHTML='编辑技能';
+                                editnode.classList.remove('disabled');
                                 delnode.button=this;
                                 delnode.innerHTML='删除';
     						}
@@ -22930,6 +23028,7 @@
     							}
     							toggle.innerHTML='创建技能 <div>&gt;</div>';
     							editnode.innerHTML='创建技能';
+                                editnode.classList.add('disabled');
     							delnode.innerHTML='取消';
                                 delete delnode.button;
                                 container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
@@ -22942,6 +23041,7 @@
                             page.newSkill=newSkill;
     						var namenode=ui.create.div('.config','名称：<input class="new_name" type="text" style="width:120px"></input>',newSkill);
     						var descnode=ui.create.div('.config','描述：<input class="new_description" type="text" style="width:120px"></input>',newSkill);
+                            namenode.querySelector('input.new_name').onblur=updateButton;
                             var commandline=ui.create.div('.config',newSkill);
                             var editbutton=document.createElement('button');
                             editbutton.innerHTML='编辑代码';
@@ -23118,7 +23218,7 @@
                                 cancelSkillButton.style.display='none';
                             }
 
-                            var editnode=ui.create.div('.menubutton.large.new_skill','创建技能',function(){
+                            var editnode=ui.create.div('.menubutton.large.new_skill.disabled','创建技能',function(){
                                 var name=page.querySelector('input.new_name').value;
                                 if(!name){
                                     alert('请填写技能名\n提示：技能名格式为id+|+中文名，其中id必须惟一');

@@ -30,7 +30,7 @@ character.ow={
             enable:'phaseUse',
             usable:1,
             filter:function(event,player){
-                return player.num('h')>=2;
+                return player.num('h')>=1;
             },
             filterTarget:function(card,player,target){
                 return target!=player;
@@ -2361,7 +2361,7 @@ character.ow={
         mianzhen_info:'出牌阶段限一次，你可以弃置一张牌并令一名其他角色打出一张闪，否则该角色不能使用或打出卡牌直到其受到伤害或下一回合结束',
         aqianghua:'强化',
         aqianghua2:'强化',
-        aqianghua_info:'出牌阶段限一次，你可以将你的全部手牌（至少两张）交给一名其他角色，该角色获得一点护甲且下一次造成的伤害+1',
+        aqianghua_info:'出牌阶段限一次，你可以将你的全部手牌（至少一张）交给一名其他角色，该角色获得一点护甲且下一次造成的伤害+1',
         zhiyuan:'支援',
         zhiyuan_info:'每当你即将造成伤害，你可以防止此伤害，改为令目标回复等量的体力',
         juji:'狙击',
