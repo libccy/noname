@@ -2,6 +2,7 @@ window.noname_update={
     version:'1.8.19.6',
     changeLog:[
         '修bug',
+        '扩展工具改进',
     ],
     files:{
         global:[

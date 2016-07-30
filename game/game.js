@@ -18928,6 +18928,15 @@
                     }
                 },180);
             },
+            templayer:function(time){
+                if(typeof time!='number'||isNaN(time)||time==Infinity){
+                    time=500;
+                }
+                var templayer=ui.create.div('.popup-container',ui.window);
+                setTimeout(function(){
+                    templayer.remove();
+                },time);
+            },
 			selectlist:function(list,init,position){
 				var select=document.createElement('select');
 				for(var i=0;i<list.length;i++){
@@ -21755,12 +21764,12 @@
                         };
                         var dashboard=ui.create.div(pageboard);
                         var clickDash=function(){
-                            var templayer=ui.create.div('.popup-container',ui.window);
-                            setTimeout(function(){
-                                templayer.remove();
-                            },500);
+                            ui.create.templayer();
                             pageboard.hide();
                             this.link.show();
+                            if(this.link.init){
+                                this.link.init();
+                            }
                         };
                         var createDash=function(str1,str2,node){
                             var dash=ui.create.div('.menubutton.large.dashboard');
@@ -21776,6 +21785,12 @@
                         var dash1=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
                             var currentButton=null;
+                            page.init=function(){
+                                if(!page.querySelector('.button.character')){
+                                    toggle.classList.add('on');
+                                    newCharacter.style.display='';
+                                }
+                            };
                             var clickButton=function(){
                                 if(currentButton==this){
                                     resetEditor();
@@ -21818,20 +21833,9 @@
     							}
 
     							toggle.innerHTML='编辑武将 <div>&gt;</div>';
-    							var confirm=newCharacter.querySelector('.menubutton.large');
-    							confirm.innerHTML='编辑武将';
-    							var button=this;
-    							var delnodefunc=function(){
-    								button.remove();
-                                    var name=button.link;
-                                    delete dash1.content.pack.character[name];
-                                    delete dash1.content.pack.translate[name];
-    								delete dash1.content.image[name];
-    								resetEditor();
-                                    dash1.link.classList.add('active');
-    							};
-    							var delnode=ui.create.div('.menubutton.large','删除',confirm.parentNode,delnodefunc);
-    							delnode.style.marginLeft='13px';
+    							editnode.innerHTML='编辑武将';
+                                delnode.innerHTML='删除';
+                                delnode.button=this;
     						}
     						var createButton=function(name,image){
     							var button=ui.create.div('.button.character');
@@ -21927,10 +21931,7 @@
                                 }
                             };
                             ui.create.div('.config.more','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                var templayer=ui.create.div('.popup-container',ui.window);
-                                setTimeout(function(){
-                                    templayer.remove();
-                                },500);
+                                ui.create.templayer();
                                 page.hide();
                                 pageboard.show();
                             });
@@ -21969,11 +21970,9 @@
     							}
     							skillList.firstChild.innerHTML='';
     							toggle.innerHTML='创建武将 <div>&gt;</div>';
-    							var node=newCharacter.querySelector('.menubutton.large');
-    							node.innerHTML='创建武将';
-    							if(node.nextSibling){
-    								node.nextSibling.remove();
-    							}
+    							editnode.innerHTML='创建武将';
+    							delnode.innerHTML='取消';
+                                delete delnode.button;
     						}
 
     						newCharacter=ui.create.div('.new_character',page);
@@ -22048,6 +22047,7 @@
                             list.unshift(['current_extension','此扩展']);
 
     						var selectname=ui.create.selectlist(list,list[1],addSkill);
+                            page.selectname=selectname;
     						selectname.onchange=function(){
                                 skillopt.innerHTML='';
                                 if(this.value=='current_extension'){
@@ -22070,9 +22070,12 @@
     						};
     						selectname.style.maxWidth='85px';
     						var skillopt=ui.create.selectlist(list2,list2[0],addSkill);
+                            skillopt.style.maxWidth='60px';
+                            page.skillopt=skillopt;
     						var addSkillButton=document.createElement('button');
     						addSkillButton.innerHTML='添加';
     						addSkill.appendChild(addSkillButton);
+                            page.addSkillButton=addSkillButton;
     						var deletenode=function(){
     							this.remove();
     						}
@@ -22090,16 +22093,50 @@
                                 }
                                 skillList.firstChild.appendChild(node);
     						};
+                            var createSkillButton=document.createElement('button');
+    						createSkillButton.innerHTML='创建';
+                            createSkillButton.style.marginLeft='3px';
+    						addSkill.appendChild(createSkillButton);
+    						createSkillButton.onclick=function(){
+                                ui.create.templayer();
+                                page.hide();
+                                dash3.show();
+                                dash3.fromchar='add';
+                                dash3.toggle.classList.add('on');
+                                dash3.newSkill.style.display='';
+                            };
+                            page.updateSkill=function(){
+                                for(var i=0;i<skillList.firstChild.childNodes.length;i++){
+                                    var node=skillList.firstChild.childNodes[i];
+                                    var skill=skillList.firstChild.childNodes[i].skill;
+                                    if(dash3.content.pack.skill[skill]){
+                                        node.innerHTML=dash3.content.pack.translate[skill];
+                                    }
+                                    else if(lib.skill[skill]){
+                                        node.innerHTML=lib.translate[skill];
+                                    }
+                                    else{
+                                        node.remove();i--;
+                                    }
+    							}
+                            };
     						var skillList=ui.create.div('.skill_list',newCharacter);
     						ui.create.div(skillList);
-    						ui.create.div('.menubutton.large','创建武将',ui.create.div(skillList),function(){
+    						var editnode=ui.create.div('.menubutton.large','创建武将',ui.create.div(skillList),function(){
                                 var name=page.querySelector('input.new_name').value;
-                                if(!name) return;
+                                if(!name){
+                                    alert('请填写武将名\n提示：武将名格式为id+|+中文名，其中id必须惟一');
+                                    return;
+                                }
                                 name=name.split('|');
                                 var translate=name[1]||name[0];
                                 name=name[0];
                                 if(currentButton){
                                     if(currentButton.link!=name){
+                                        if(lib.character[name]||page.content.pack.character[name]){
+                                            alert('武将名与现有武将重复，请更改\n提示：武将名格式为id+|+中文名，其中id必须惟一');
+                                            return;
+                                        }
                                         page.content.image[name+'.jpg']=page.content.image[currentButton.link+'.jpg'];
                                         delete page.content.image[currentButton.link+'.jpg'];
                                         delete page.content.pack.character[currentButton.link];
@@ -22107,11 +22144,20 @@
                                         currentButton.link=name;
                                     }
                                 }
+                                else{
+                                    if(lib.character[name]||page.content.pack.character[name]){
+                                        alert('武将名与现有武将重复，请更改\n提示：武将名格式为id+|+中文名，其中id必须惟一');
+                                        return;
+                                    }
+                                }
                                 if(fakeme.image){
                                     page.content.image[name+'.jpg']=fakeme.image;
                                 }
                                 else{
-                                    if(!page.content.image[name+'.jpg']) return;
+                                    if(!page.content.image[name+'.jpg']){
+                                        alert('请选择武将头像');
+                                        return;
+                                    }
                                 }
                                 var hp=page.querySelector('input.new_hp').value;
                                 hp=parseInt(hp)||1;
@@ -22144,12 +22190,30 @@
                                 resetEditor();
                                 dash1.link.classList.add('active');
     						});
+                            var delnode=ui.create.div('.menubutton.large','取消',editnode.parentNode,function(){
+                                if(this.innerHTML=='删除'){
+                                    this.button.remove();
+                                    var name=this.button.link;
+                                    delete dash1.content.pack.character[name];
+                                    delete dash1.content.pack.translate[name];
+                                    delete dash1.content.image[name];
+                                    dash1.link.classList.add('active');
+                                }
+                                resetEditor();
+                            });
+                            delnode.style.marginLeft='13px';
 
                             return page;
                         }());
                         var dash2=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
                             var currentButton=null;
+                            page.init=function(){
+                                if(!page.querySelector('.button.card')){
+                                    toggle.classList.add('on');
+                                    newCard.style.display='';
+                                }
+                            };
                             var clickButton=function(){
                                 if(currentButton==this){
                                     resetEditor();
@@ -22181,21 +22245,9 @@
                                 container.code='card='+get.stringify(info);
 
     							toggle.innerHTML='编辑卡牌 <div>&gt;</div>';
-    							var confirm=newCard.querySelector('.menubutton.large');
-    							confirm.innerHTML='编辑卡牌';
-    							var button=this;
-    							var delnodefunc=function(){
-    								button.remove();
-                                    var name=button.link;
-                                    delete dash2.content.pack.card[name];
-                                    delete dash2.content.pack.translate[name];
-                                    delete dash2.content.pack.translate[name+'_info'];
-    								delete dash2.content.image[name];
-    								resetEditor();
-                                    updatePile();
-                                    dash2.link.classList.add('active');
-    							};
-    							var delnode=ui.create.div('.menubutton.large.new_card_delete','删除',confirm.parentNode,delnodefunc);
+    							editnode.innerHTML='编辑卡牌';
+    							delnode.innerHTML='删除';
+                                delnode.button=this;
     						}
     						var createButton=function(name,image,fullskin){
     							var button=ui.create.div('.button.card');
@@ -22325,10 +22377,7 @@
                                 updatePile();
                             };
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                var templayer=ui.create.div('.popup-container',ui.window);
-                                setTimeout(function(){
-                                    templayer.remove();
-                                },500);
+                                ui.create.templayer();
                                 page.hide();
                                 pageboard.show();
                             });
@@ -22365,11 +22414,9 @@
     								inputs[i].value='';
     							}
     							toggle.innerHTML='创建卡牌 <div>&gt;</div>';
-    							var node=newCard.querySelector('.menubutton.large');
-    							node.innerHTML='创建卡牌';
-    							if(node.nextSibling){
-    								node.nextSibling.remove();
-    							}
+    							editnode.innerHTML='创建卡牌';
+                                delnode.innerHTML='取消';
+                                delete delnode.button;
                                 container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
     						}
 
@@ -22565,15 +22612,22 @@
                             var editor=ui.create.div(editorpage);
                             container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
-                            ui.create.div('.menubutton.large.new_card','创建卡牌',newCard,function(){
+                            var editnode=ui.create.div('.menubutton.large.new_card','创建卡牌',newCard,function(){
                                 var name=page.querySelector('input.new_name').value;
-                                if(!name) return;
+                                if(!name){
+                                    alert('请填写卡牌名\n提示：卡牌名格式为id+|+中文名，其中id必须惟一');
+                                    return;
+                                }
                                 name=name.split('|');
                                 var translate=name[1]||name[0];
                                 var info=page.querySelector('input.new_description').value;
                                 name=name[0];
                                 if(currentButton){
                                     if(currentButton.link!=name){
+                                        if(lib.card[name]||page.content.pack.card[name]){
+                                            alert('卡牌名与现有卡牌重复，请更改\n提示：卡牌名格式为id+|+中文名，其中id必须惟一');
+                                            return;
+                                        }
                                         var extname;
                                         if(currentButton.classList.contains('fullskin')){
                                             extname='.png';
@@ -22589,6 +22643,12 @@
                                         currentButton.link=name;
                                     }
                                 }
+                                else{
+                                    if(lib.card[name]||page.content.pack.card[name]){
+                                        alert('卡牌名与现有卡牌重复，请更改\n提示：卡牌名格式为id+|+中文名，其中id必须惟一');
+                                        return;
+                                    }
+                                }
                                 if(fakeme.image){
                                     if(fakeme.classList.contains('fullskin')){
                                         page.content.image[name+'.png']=fakeme.image;
@@ -22600,6 +22660,7 @@
                                     }
                                 }
                                 else if(!fakeme.classList.contains('inited')){
+                                    alert('请选择一个卡牌背景');
                                     return;
                                 }
                                 page.content.pack.translate[name]=translate;
@@ -22650,7 +22711,19 @@
                                 updatePile();
                                 dash2.link.classList.add('active');
     						});
-
+                            var delnode=ui.create.div('.menubutton.large.new_card_delete','取消',editnode.parentNode,function(){
+                                if(this.innerHTML=='删除'){
+                                    this.button.remove();
+                                    var name=this.button.link;
+                                    delete dash2.content.pack.card[name];
+                                    delete dash2.content.pack.translate[name];
+                                    delete dash2.content.pack.translate[name+'_info'];
+                                    delete dash2.content.image[name];
+                                    updatePile();
+                                    dash2.link.classList.add('active');
+                                }
+                                resetEditor();
+                            });
 
                             var editPile;
     						var toggle2=ui.create.div('.config.more','编辑牌堆 <div>&gt;</div>',page,function(){
@@ -22750,6 +22823,12 @@
                         }());
                         var dash3=(function(){
                             var page=ui.create.div('.hidden.menu-buttons.new_skill');
+                            page.init=function(){
+                                if(!page.querySelector('.menubutton:not(.large)')){
+                                    toggle.classList.add('on');
+                                    newSkill.style.display='';
+                                }
+                            };
                             page.reset=function(name){
                                 resetEditor();
                                 var buttons=page.querySelectorAll('.menubutton:not(.large)');
@@ -22769,6 +22848,7 @@
                                     for(var i in page.content.pack.skill){
                                         createButton(i);
                                     }
+                                    dash1.updateSkill();
                                 }
                                 else{
                                     page.content={
@@ -22783,12 +22863,15 @@
                                 }
                             };
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                var templayer=ui.create.div('.popup-container',ui.window);
-                                setTimeout(function(){
-                                    templayer.remove();
-                                },500);
+                                ui.create.templayer();
                                 page.hide();
-                                pageboard.show();
+                                if(page.fromchar){
+                                    dash1.show();
+                                    delete page.fromchar;
+                                }
+                                else{
+                                    pageboard.show();
+                                }
                             });
                             var currentButton=null;
                             var clickButton=function(){
@@ -22811,19 +22894,9 @@
                                 container.code='skill='+get.stringify(info);
 
     							toggle.innerHTML='编辑技能 <div>&gt;</div>';
-    							var confirm=newSkill.querySelector('.menubutton.large');
-    							confirm.innerHTML='编辑技能';
-    							var button=this;
-    							var delnodefunc=function(){
-    								button.remove();
-                                    var name=button.link;
-                                    delete dash3.content.pack.skill[name];
-                                    delete dash3.content.pack.translate[name];
-                                    delete dash3.content.pack.translate[name+'_info'];
-    								resetEditor();
-                                    dash3.link.classList.add('active');
-    							};
-    							var delnode=ui.create.div('.menubutton.large.new_card_delete','删除',confirm.parentNode,delnodefunc);
+    							editnode.innerHTML='编辑技能';
+                                delnode.button=this;
+                                delnode.innerHTML='删除';
     						}
     						var createButton=function(name){
     							var button=ui.create.div('.menubutton');
@@ -22842,6 +22915,7 @@
     								newSkill.style.display='none';
     							}
     						});
+                            page.toggle=toggle;
     						var resetEditor=function(){
                                 currentButton=null;
     							toggle.classList.remove('on');
@@ -22855,15 +22929,17 @@
     								inputs[i].value='';
     							}
     							toggle.innerHTML='创建技能 <div>&gt;</div>';
-    							var node=newSkill.querySelector('.menubutton.large');
-    							node.innerHTML='创建技能';
-    							if(node.nextSibling){
-    								node.nextSibling.remove();
-    							}
+    							editnode.innerHTML='创建技能';
+    							delnode.innerHTML='取消';
+                                delete delnode.button;
                                 container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseEnd"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+                                if(page.fromchar=='add'){
+                                    page.fromchar=true;
+                                }
     						}
 
     						newSkill=ui.create.div('.new_character.new_skill',page);
+                            page.newSkill=newSkill;
     						var namenode=ui.create.div('.config','名称：<input class="new_name" type="text" style="width:120px"></input>',newSkill);
     						var descnode=ui.create.div('.config','描述：<input class="new_description" type="text" style="width:120px"></input>',newSkill);
                             var commandline=ui.create.div('.config',newSkill);
@@ -23042,19 +23118,32 @@
                                 cancelSkillButton.style.display='none';
                             }
 
-                            ui.create.div('.menubutton.large.new_skill','创建技能',function(){
+                            var editnode=ui.create.div('.menubutton.large.new_skill','创建技能',function(){
                                 var name=page.querySelector('input.new_name').value;
-                                if(!name) return;
+                                if(!name){
+                                    alert('请填写技能名\n提示：技能名格式为id+|+中文名，其中id必须惟一');
+                                    return;
+                                }
                                 name=name.split('|');
                                 var translate=name[1]||name[0];
                                 var info=page.querySelector('input.new_description').value;
                                 name=name[0];
                                 if(currentButton){
                                     if(currentButton.link!=name){
+                                        if(lib.skill[name]||page.content.pack.skill[name]){
+                                            alert('技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一');
+                                            return;
+                                        }
                                         delete page.content.pack.skill[currentButton.link];
                                         delete page.content.pack.translate[currentButton.link];
                                         delete page.content.pack.translate[currentButton.link+'_info'];
                                         currentButton.link=name;
+                                    }
+                                }
+                                else{
+                                    if(lib.skill[name]||page.content.pack.skill[name]){
+                                        alert('技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一');
+                                        return;
                                     }
                                 }
                                 page.content.pack.translate[name]=translate;
@@ -23067,15 +23156,52 @@
                                 catch(e){
                                     page.content.pack.skill[name]={};
                                 }
+                                dash1.selectname.value='current_extension';
+                                dash1.selectname.onchange.call(dash1.selectname);
                                 if(this.innerHTML=='创建技能'){
                                     createButton(name);
+                                    if(page.fromchar=='add'){
+                                        ui.create.templayer();
+                                        page.hide();
+                                        dash1.show();
+                                        dash1.skillopt.value=name;
+                                        dash1.addSkillButton.onclick();
+                                        delete page.fromchar;
+                                    }
                                 }
                                 else if(currentButton){
                                     currentButton.innerHTML=translate;
                                 }
                                 resetEditor();
                                 dash3.link.classList.add('active');
+                                dash1.updateSkill();
                             },newSkill);
+                            var delnode=ui.create.div('.menubutton.large.new_card_delete','取消',editnode.parentNode,function(){
+                                if(this.innerHTML=='删除'){
+                                    this.button.remove();
+                                    var name=this.button.link;
+                                    delete dash3.content.pack.skill[name];
+                                    delete dash3.content.pack.translate[name];
+                                    delete dash3.content.pack.translate[name+'_info'];
+                                    dash3.link.classList.add('active');
+                                    if(get.emptyobj(dash3.content.pack.skill)){
+                                        dash1.selectname.value=dash1.selectname.childNodes[1].value;
+                                    }
+                                    dash1.selectname.onchange.call(dash1.selectname);
+                                    dash1.updateSkill();
+                                    resetEditor();
+                                }
+                                else if(page.fromchar=='add'){
+                                    ui.create.templayer();
+                                    page.hide();
+                                    dash1.show();
+                                    delete page.fromchar;
+                                    setTimeout(resetEditor,600);
+                                }
+                                else{
+                                    resetEditor();
+                                }
+                            });
 
                             page.content={
                                 pack:{
@@ -23089,10 +23215,7 @@
                         var dash4=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
                             ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                var templayer=ui.create.div('.popup-container',ui.window);
-                                setTimeout(function(){
-                                    templayer.remove();
-                                },500);
+                                ui.create.templayer();
                                 page.hide();
                                 pageboard.show();
                             });
