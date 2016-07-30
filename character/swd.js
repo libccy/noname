@@ -6361,7 +6361,7 @@ character.swd={
 				}
 				return '是否对'+get.translation(list)+'发动【兰芷】？';
 			},
-			check:function(){
+			check:function(event,player){
 				var list=[];
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].hp<game.players[i].maxHp&&game.players[i].hp<=player.hp){

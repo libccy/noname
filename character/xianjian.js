@@ -201,6 +201,7 @@ character.xianjian={
 			filter:function(event,player){
 				return player.num('h','shan')>0;
 			},
+			usable:1,
 			filterCard:{name:'shan'},
 			discard:false,
 			prepare:function(cards,player,targets){
@@ -240,13 +241,24 @@ character.xianjian={
 			},
 			content:function(){
 				"step 0"
-				player.damage(player.storage.tianfu3.isAlive()?player.storage.tianfu3:'nosource');
+				if(player.storage.tianfu3&&player.storage.tianfu3.isAlive()){
+					player.damage(player.storage.tianfu3);
+					player.storage.tianfu3.line(player,'thunder');
+				}
+				else{
+					player.damage('nosource');
+				}
 				"step 1"
+				var he=player.get('he');
+				if(he.length){
+					player.discard(he.randomGet());
+				}
+				"step 2"
 				player.$throw(player.storage.tianfu2);
 				ui.discardPile.appendChild(player.storage.tianfu2);
 				delete player.storage.tianfu2;
 				delete player.storage.tianfu3;
-				player.removeSkill('tianfu2')
+				player.removeSkill('tianfu2');
 			},
 			group:'tianfu3',
 			intro:{
@@ -258,12 +270,7 @@ character.xianjian={
 			forced:true,
 			popup:false,
 			content:function(){
-				if(player.storage.tianfu3.isAlive()){
-					player.storage.tianfu3.gain(player.storage.tianfu2,'gain2');
-				}
-				else{
-					ui.discardPile.appendChild(player.storage.tianfu2);
-				}
+				ui.discardPile.appendChild(player.storage.tianfu2);
 				delete player.storage.tianfu2;
 				delete player.storage.tianfu3;
 				player.removeSkill('tianfu2');
@@ -1382,7 +1389,7 @@ character.xianjian={
 		tianfu:'天符',
 		tianfu2:'天符',
 		tianfu3:'天符',
-		tianfu_info:'你可以将一张闪置于一名其他角色的武将牌上，该角色在下一次造成伤害时受到来自你的一点伤害，若该角色死亡，你将闪收回，否则将闪置于弃牌堆',
+		tianfu_info:'出牌阶段，你可以将一张闪置于一名其他角色的武将牌上，该角色在下一次造成伤害时受到来自你的一点雷属性伤害并随机弃置一张牌，然后将此牌置入弃牌堆',
 		shuiyun:'水蕴',
 		shuiyun_bg:'蕴',
 		shuiyun2:'水蕴',
