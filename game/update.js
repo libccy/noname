@@ -18,6 +18,9 @@ window.noname_update={
             'card/swd.js',
             'card/hearth.js',
             'layout/default/menu.css',
+            'layout/default/layout.css',
+            'layout/mobile/layout.css',
+            'layout/newlayout/global.css',
         ],
         '1.8.19.5':[],
     }
