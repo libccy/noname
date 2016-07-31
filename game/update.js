@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.8.19.6',
+    version:'1.8.19.7',
     changeLog:[
         '修bug',
         '扩展工具改进',
@@ -7,6 +7,9 @@ window.noname_update={
     files:{
         global:[
             'game/game.js',
+        ],
+        '1.8.19.6':[],
+        '1.8.19.5':[
             'character/hearth.js',
             'character/swd.js',
             'character/ow.js',
@@ -22,6 +25,5 @@ window.noname_update={
             'layout/mobile/layout.css',
             'layout/newlayout/global.css',
         ],
-        '1.8.19.5':[],
     }
 }

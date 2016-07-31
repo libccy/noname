@@ -21628,7 +21628,7 @@
                             inputExtName.disabled=true;
                             setTimeout(function(){
                                 var ext={};
-                                var config,help;
+                                var config=null,help=null;
                                 for(var i in dash4.content){
                                     try{
                                         if(i=='content'||i=='precontent'){
@@ -21643,7 +21643,7 @@
                                         else{
                                             eval(dash4.content[i]);
                                             eval('ext[i]='+i);
-                                            if(typeof ext[i]!='object'){
+                                            if(ext[i]==null||typeof ext[i]!='object'){
                                                 throw('err');
                                             }
                                             else{
@@ -22669,16 +22669,34 @@
                                 delete window.saveNonameInput;
                             });
                             var saveInput=function(){
+                                var code;
+                                if(container.editor){
+                                    code=container.editor.getValue();
+                                }
+                                else if(container.textarea){
+                                    code=container.textarea.value;
+                                }
+                                try{
+                                    var card=null;
+                                    eval(code);
+                                    if(card==null||typeof card!='object'){
+                                        throw('err');
+                                    }
+                                }
+                                catch(e){
+                                    if(e=='err'){
+                                        alert('代码格式有错误，请对比示例代码仔细检查');
+                                    }
+                                    else{
+                                        alert('代码语法有错误，请仔细检查（'+e+'）')
+                                    }
+                                    return;
+                                }
                                 dash2.link.classList.add('active');
                                 ui.window.classList.remove('shortcutpaused');
                                 ui.window.classList.remove('systempaused');
                                 container.delete();
-                                if(container.editor){
-                                    container.code=container.editor.getValue();
-                                }
-                                else if(container.textarea){
-                                    container.code=container.textarea.value;
-                                }
+                                container.code=code;
                                 delete window.saveNonameInput;
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
@@ -22739,8 +22757,11 @@
                                 page.content.pack.translate[name]=translate;
                                 page.content.pack.translate[name+'_info']=info;
                                 try{
-                                    var card;
+                                    var card=null;
                                     eval(container.code);
+                                    if(card==null||typeof card!='object'){
+                                        throw('err');
+                                    }
                                     page.content.pack.card[name]=card;
                                 }
                                 catch(e){
@@ -23100,16 +23121,34 @@
                                 delete window.saveNonameInput;
                             });
                             var saveInput=function(){
+                                var code;
+                                if(container.editor){
+                                    code=container.editor.getValue();
+                                }
+                                else if(container.textarea){
+                                    code=container.textarea.value;
+                                }
+                                try{
+                                    var skill=null;
+                                    eval(code);
+                                    if(skill==null||typeof skill!='object'){
+                                        throw('err');
+                                    }
+                                }
+                                catch(e){
+                                    if(e=='err'){
+                                        alert('代码格式有错误，请对比示例代码仔细检查');
+                                    }
+                                    else{
+                                        alert('代码语法有错误，请仔细检查（'+e+'）')
+                                    }
+                                    return;
+                                }
                                 dash3.link.classList.add('active');
                                 ui.window.classList.remove('shortcutpaused');
                                 ui.window.classList.remove('systempaused');
                                 container.delete();
-                                if(container.editor){
-                                    container.code=container.editor.getValue();
-                                }
-                                else if(container.textarea){
-                                    container.code=container.textarea.value;
-                                }
+                                container.code=code;
                                 delete window.saveNonameInput;
                             };
                             var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
@@ -23249,8 +23288,11 @@
                                 page.content.pack.translate[name]=translate;
                                 page.content.pack.translate[name+'_info']=info;
                                 try{
-                                    var skill;
+                                    var skill=null;
                                     eval(container.code);
+                                    if(skill==null||typeof skill!='object'){
+                                        throw('err');
+                                    }
                                     page.content.pack.skill[name]=skill;
                                 }
                                 catch(e){
@@ -23360,18 +23402,51 @@
                                     delete window.saveNonameInput;
                                 });
                                 var saveInput=function(){
+                                    var code;
+                                    if(container.editor){
+                                        code=container.editor.getValue();
+                                    }
+                                    else if(container.textarea){
+                                        code=container.textarea.value;
+                                    }
+                                    try{
+                                        if(link=='content'||link=='precontent'){
+                                            var func=null;
+                                            eval('func='+code);
+                                            if(typeof func!='function'){
+                                                throw('err');
+                                            }
+                                        }
+                                        else if(link=='config'){
+                                            var config=null;
+                                            eval(code);
+                                            if(config==null||typeof config!='object'){
+                                                throw('err');
+                                            }
+                                        }
+                                        else if(link=='help'){
+                                            var help=null;
+                                            eval(code);
+                                            if(help==null||typeof help!='object'){
+                                                throw('err');
+                                            }
+                                        }
+                                    }
+                                    catch(e){
+                                        if(e=='err'){
+                                            alert('代码格式有错误，请对比示例代码仔细检查');
+                                        }
+                                        else{
+                                            alert('代码语法有错误，请仔细检查（'+e+'）')
+                                        }
+                                        return;
+                                    }
                                     dash4.link.classList.add('active');
                                     ui.window.classList.remove('shortcutpaused');
                                     ui.window.classList.remove('systempaused');
                                     container.delete();
-                                    if(container.editor){
-                                        container.code=container.editor.getValue();
-                                        page.content[link]=container.code;
-                                    }
-                                    else if(container.textarea){
-                                        container.code=container.textarea.value;
-                                        page.content[link]=container.code;
-                                    }
+                                    container.code=code;
+                                    page.content[link]=code;
                                     delete window.saveNonameInput;
                                 };
                                 var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
