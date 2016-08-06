@@ -58,6 +58,7 @@
 		configprefix:'noname_0.9_',
         versionOL:12,
 		updateURL:localStorage.getItem('noname_update_url')||'http://websha.cn/',
+        devURL:'https://raw.githubusercontent.com/libccy/noname/master/',
 		assetURL:'',
         hallURL:'websha.cn',
 		changeLog:[],
@@ -146,7 +147,7 @@
 				name:'通用',
 				config:{
 					cheat:{
-						name:'控制台命令',
+						name:'开发者模式',
 						init:false,
 						onclick:function(bool){
                             game.saveConfig('cheat',bool);
@@ -23824,24 +23825,33 @@
                             localStorage.setItem('noname_update_url',lib.updateURL);
                         }
 
-    					var button1,button2;
+    					var button1,button2,button3;
                         var span1,includeskin;
 
-    					game.checkForUpdate=function(forcecheck){
-    						if(button1.disabled){
+    					game.checkForUpdate=function(forcecheck,dev){
+    						if(!dev&&button1.disabled){
     							return;
     						}
+                            else if(dev&&button3.disabled){
+                                return;
+                            }
                             else if(!game.download){
                                 alert('此版本不支持游戏内更新，请手动更新');
                                 return;
                             }
     						else{
-    							button1.innerHTML='正在检查更新';
-    							button1.disabled=true;
+                                if(dev){
+                                    button3.innerHTML='正在检查更新';
+        							button3.disabled=true;
+                                }
+                                else{
+                                    button1.innerHTML='正在检查更新';
+        							button1.disabled=true;
+                                }
 
-    							var goupdate=function(files){
+    							var goupdate=function(files,update){
     								if(game.download){
-    									var script=lib.init.js(lib.updateURL,'game/source',function(){
+    									var script=lib.init.js(dev?lib.devURL:lib.updateURL,'game/source',function(){
     										script.remove();
     										var updates=window.noname_source_list;
     										delete window.noname_source_list;
@@ -23853,6 +23863,9 @@
                                                 if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('style.css')==-1){
                                                     updates.splice(i--,1);
                                                 }
+                                                else if(updates[i].indexOf('node_modules/')==0&&!update.node){
+                                                    updates.splice(i--,1);
+                                                }
                                             }
 
     										if(!ui.arena.classList.contains('menupaused')){
@@ -23861,6 +23874,7 @@
     										}
     										var p=button1.parentNode;
     										button1.remove();
+                                            button3.remove();
     										var span=document.createElement('span');
     										var n1=0;
     										var n2=updates.length;
@@ -23910,6 +23924,8 @@
     							var script=lib.init.js(lib.updateURL,'game/update',function(){
     								button1.disabled=false;
     								button1.innerHTML='检查游戏更新';
+                                    button3.disabled=false;
+                                    button3.innerHTML='更新到开发版';
     								script.remove();
     								var update=window.noname_update;
     								delete window.noname_update;
@@ -23948,7 +23964,7 @@
     											str2,
     											function(index){
     												if(index==1){
-    													goupdate(files);
+    													goupdate(files,update);
     												}
     											},
     											str,
@@ -23957,7 +23973,7 @@
     									}
     									else{
     										if(confirm(str)){
-    											goupdate(files);
+    											goupdate(files,update);
     										}
     									}
     								}
@@ -23971,6 +23987,8 @@
                                     alert('连接失败');
                                     button1.disabled=false;
     								button1.innerHTML='检查游戏更新';
+                                    button3.disabled=false;
+    								button3.innerHTML='更新到开发版';
     								script.remove();
                                 });
     						}
@@ -24060,7 +24078,18 @@
     					button1=document.createElement('button');
     					button1.innerHTML='检查游戏更新';
     					button1.onclick=game.checkForUpdate;
-    					li1.lastChild.appendChild(button1);
+                        li1.lastChild.appendChild(button1);
+
+    					button3=document.createElement('button');
+    					button3.innerHTML='更新到开发版';
+                        button3.style.marginLeft='5px';
+    					button3.onclick=function(){
+                            game.checkForUpdate(null,true);
+                        };
+    					if(lib.config.cheat){
+                            li1.lastChild.appendChild(button3);
+                        }
+
     					button2=document.createElement('button');
     					button2.innerHTML='检查素材更新';
     					button2.onclick=game.checkForAssetUpdate;

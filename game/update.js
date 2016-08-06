@@ -1,29 +1,13 @@
 window.noname_update={
-    version:'1.8.19.7',
+    version:'1.8.20',
     changeLog:[
-        '修bug',
-        '扩展工具改进',
+        '新武将',
     ],
     files:{
         global:[
             'game/game.js',
+            'game/asset.js',
         ],
-        '1.8.19.6':[],
-        '1.8.19.5':[
-            'character/hearth.js',
-            'character/swd.js',
-            'character/ow.js',
-            'character/sp.js',
-            'character/shenhua.js',
-            'character/yxs.js',
-            'character/xianjian.js',
-            'character/rank.js',
-            'card/swd.js',
-            'card/hearth.js',
-            'layout/default/menu.css',
-            'layout/default/layout.css',
-            'layout/mobile/layout.css',
-            'layout/newlayout/global.css',
-        ],
+        '1.8.19.7':[],
     }
 }
