@@ -58,7 +58,7 @@
 		configprefix:'noname_0.9_',
         versionOL:12,
 		updateURL:localStorage.getItem('noname_update_url')||'http://websha.cn/',
-        devURL:'https://raw.githubusercontent.com/libccy/noname/master/',
+        devURL:'https://rawgit.com/libccy/noname/master/',
 		assetURL:'',
         hallURL:'websha.cn',
 		changeLog:[],
@@ -146,27 +146,6 @@
 			general:{
 				name:'通用',
 				config:{
-					cheat:{
-						name:'开发者模式',
-						init:false,
-						onclick:function(bool){
-                            game.saveConfig('cheat',bool);
-                            if(_status.connectMode) return;
-							if(bool){
-                                lib.cheat.i();
-							}
-							else{
-                                delete window.cheat;
-								delete window.game;
-								delete window.ui;
-								delete window.get;
-								delete window.ai;
-								delete window.lib;
-								delete window._status;
-							}
-						},
-						unfrequent:true,
-					},
 					low_performance:{
 						name:'流畅模式',
 						init:false,
@@ -388,6 +367,27 @@
 						name:'自动检查游戏更新',
 						init:false,
 						unfrequent:true
+					},
+					cheat:{
+						name:'开发者模式',
+						init:false,
+						onclick:function(bool){
+                            game.saveConfig('cheat',bool);
+                            if(_status.connectMode) return;
+							if(bool){
+                                lib.cheat.i();
+							}
+							else{
+                                delete window.cheat;
+								delete window.game;
+								delete window.ui;
+								delete window.get;
+								delete window.ai;
+								delete window.lib;
+								delete window._status;
+							}
+						},
+						unfrequent:true,
 					},
 					update:function(config,map){
 						if(config.touchscreen){
@@ -23921,7 +23921,7 @@
     							};
 
 
-    							var script=lib.init.js(lib.updateURL,'game/update',function(){
+    							var script=lib.init.js(dev?lib.devURL:lib.updateURL,'game/update',function(){
     								button1.disabled=false;
     								button1.innerHTML='检查游戏更新';
                                     button3.disabled=false;
@@ -23945,7 +23945,7 @@
                                     else{
                                         bool=(update.version!=lib.version);
                                     }
-    								if(bool){
+    								if(bool||dev){
                                         var files;
                                         var version=lib.version;
                                         if(version.indexOf('beta')!=-1){
@@ -23954,12 +23954,25 @@
                                         if(update.files&&update.files[version]){
                                             files=update.files.global.concat(update.files[version]);
                                         }
-    									var str='有新版本'+update.version+'可用，是否下载？';
+                                        var str;
+                                        if(dev){
+                                            str='开发版仅供测试使用，可能存在风险，是否确定更新？'
+                                        }
+    									else{
+                                            str='有新版本'+update.version+'可用，是否下载？';
+                                        }
     									if(navigator.notification&&navigator.notification.confirm){
-    										var str2=update.changeLog[0];
-    										for(var i=1;i<update.changeLog.length;i++){
-    											str2+='；'+update.changeLog[i];
-    										}
+                                            var str2;
+                                            if(dev){
+                                                str2=str;
+                                                str='更新到开发版';
+                                            }
+                                            else{
+                                                str2=update.changeLog[0];
+        										for(var i=1;i<update.changeLog.length;i++){
+        											str2+='；'+update.changeLog[i];
+        										}
+                                            }
     										navigator.notification.confirm(
     											str2,
     											function(index){
