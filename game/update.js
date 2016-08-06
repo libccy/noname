@@ -7,7 +7,11 @@ window.noname_update={
         global:[
             'game/asset.js',
             'game/game.js',
+            'character/swd.js',
+            'character/sp.js',
+            'card/swd.js',
         ],
         '1.8.19.7':[],
+        '1.8.19.20':[],
     }
 }
