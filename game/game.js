@@ -3536,13 +3536,13 @@
                 if(typeof window.require=='function'&&!lib.device){
                     lib.node={
                         fs:require('fs'),
-                        http:require('http'),
                         debug:function(){
                             require('remote').getCurrentWindow().toggleDevTools();
                         }
                     };
-                    game.download=function(url,folder,onsuccess,onerror){
-                        url=lib.updateURL+url;
+                    game.download=function(url,folder,onsuccess,onerror,dev){
+                        url=(dev?lib.devURL:lib.updateURL)+url;
+                        game.print(url);
                         var dir=folder.split('/');
                         var str='';
                         var download=function(){
@@ -3552,7 +3552,9 @@
                             catch(e){
                                 onerror();
                             }
-                            var request = lib.node.http.get(url, function(response) {
+                            if(!lib.node.http) lib.node.http=require('http');
+                            if(!lib.node.https) lib.node.http=require('https');
+                            var request = (url.indexOf('https'==0)?lib.node.https:lib.node.http).get(url, function(response) {
                                 var stream=response.pipe(file);
                                 stream.on('finish',onsuccess);
                                 stream.on('error',onerror);
@@ -3655,9 +3657,9 @@
 								}
 							});
 						}
-						game.download=function(url,folder,onsuccess,onerror){
+						game.download=function(url,folder,onsuccess,onerror,dev){
 							var fileTransfer = new FileTransfer();
-							url=lib.updateURL+url;
+							url=(dev?lib.devURL:lib.updateURL)+url;
 							folder=lib.assetURL+folder;
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
 						};
@@ -14506,7 +14508,7 @@
 				zipReady();
 			}
 		},
-        multiDownload:function(list,onsuccess,onerror,onfinish,process){
+        multiDownload:function(list,onsuccess,onerror,onfinish,process,dev){
             if(lib.updateURL[lib.updateURL.length-1]!='/'){
                 lib.updateURL+='/';
             }
@@ -14528,7 +14530,7 @@
                     },function(){
                         if(onerror) onerror(list.length);
                         download();
-                    });
+                    },dev);
                 }
                 else{
                     if(onfinish) onfinish();
@@ -23895,7 +23897,7 @@
                                                 game.print('下载失败：'+e.source);
                                             },function(){
                                                 setTimeout(finish,500);
-                                            });
+                                            },null,dev);
     									});
     								}
     								else{

@@ -5,8 +5,8 @@ window.noname_update={
     ],
     files:{
         global:[
-            'game/game.js',
             'game/asset.js',
+            'game/game.js',
         ],
         '1.8.19.7':[],
     }
