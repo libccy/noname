@@ -55,6 +55,12 @@
     border-radius: 4px;
     position: absolute;
 }
+#arena:not(.chess):not(.textequip) .player[data-position='0']>.equips>div.legend{
+    border: 1px solid rgb(192, 90, 255);
+}
+#arena:not(.chess):not(.textequip) .player[data-position='0']>.equips>div.epic{
+    border: 1px solid rgb(90, 171, 255);
+}
 #arena:not(.chess) .player[data-position='0']>.equips>.equip5{
     border-radius: 45px;
 }

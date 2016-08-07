@@ -1,9 +1,58 @@
 card.swd={
 	card:{
+		zhuquezhizhang:{
+			type:'jiqi',
+			fullskin:true,
+			ai:{
+				value:8,
+				useful:6.5,
+			}
+		},
+		xuanwuzhihuang:{
+			type:'jiqi',
+			fullskin:true,
+			ai:{
+				value:8,
+				useful:6.5,
+			}
+		},
+		huanglinzhicong:{
+			type:'jiqi',
+			fullskin:true,
+			ai:{
+				value:8,
+				useful:6.5,
+			}
+		},
+		cangchizhibi:{
+			type:'jiqi',
+			fullskin:true,
+			ai:{
+				value:8,
+				useful:6.5,
+			}
+		},
+		qinglongzhigui:{
+			type:'jiqi',
+			fullskin:true,
+			ai:{
+				value:8,
+				useful:6.5,
+			}
+		},
+		baishouzhihu:{
+			type:'jiqi',
+			fullskin:true,
+			ai:{
+				value:8,
+				useful:6.5,
+			}
+		},
 		jiguantong:{
 			fullskin:true,
 			type:'trick',
 			enable:true,
+			wuxieable:true,
 			selectTarget:-1,
 			filterTarget:function(card,player,target){
 				return target!=player;
@@ -193,8 +242,9 @@ card.swd={
 		},
 		jiguanfeng:{
 			fullskin:true,
-			type:'trick',
+			type:'jiguan',
 			enable:true,
+			wuxieable:true,
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
@@ -240,7 +290,8 @@ card.swd={
 		},
 		jiguanyuan:{
 			fullskin:true,
-			type:'trick',
+			type:'jiguan',
+			wuxieable:true,
 			enable:function(card,player){
 				var hs=player.get('he');
 				return hs.length>1||(hs.length==1&&hs[0]!=card);
@@ -335,7 +386,8 @@ card.swd={
 		lingjiandai:{
 			fullskin:true,
 			enable:true,
-			type:'trick',
+			type:'jiguan',
+			wuxieable:true,
 			range:{global:1},
 			filterTarget:true,
 			content:function(){
@@ -353,7 +405,6 @@ card.swd={
 				result:{
 					target:function(player,target){
 						if(target==player&&target.num('h',{type:'equip'})) return 2.5;
-						if(target.hasSkill('mujiaren_skill')) return 2;
 						return 1;
 					}
 				}
@@ -362,7 +413,8 @@ card.swd={
 		jiguanshu:{
 			fullskin:true,
 			enable:true,
-			type:'trick',
+			type:'jiguan',
+			wuxieable:true,
 			range:{global:1},
 			filterTarget:function(card,player,target){
 				var es=target.get('e');
@@ -414,12 +466,12 @@ card.swd={
 		mujiaren:{
 			fullskin:true,
 			enable:true,
-			type:'trick',
+			type:'jiguan',
 			range:{global:1},
-			filterTarget:function(card,player,target){
-				return !target.hasSkill('mujiaren_skill');
-			},
+			wuxieable:true,
+			filterTarget:true,
 			content:function(){
+				target.draw();
 				target.addSkill('mujiaren_skill');
 			},
 			ai:{
@@ -428,7 +480,10 @@ card.swd={
 				},
 				order:10.1,
 				result:{
-					target:1
+					target:function(player,target){
+						if(target.hasSkill('mujiaren_skill')) return 0.5;
+						return 1;
+					}
 				}
 			}
 		},
@@ -1297,6 +1352,58 @@ card.swd={
 		},
 	},
 	skill:{
+		baishouzhihu_equip1:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget([1,1],'是否发动【风牙】？',function(card,player,target){
+					if(player==target) return false;
+					return target.num('he')>0;
+				}).ai=function(target){
+					return -ai.get.attitude(player,target);
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('baishouzhihu_equip1',result.targets);
+					player.discardPlayerCard(result.targets[0],'he',true);
+				}
+				else{
+					event.finish();
+				}
+			},
+		},
+		baishouzhihu_equip2:{
+			inherit:'baishouzhihu_equip1'
+		},
+		baishouzhihu_equip3:{
+			inherit:'baishouzhihu_equip1'
+		},
+		baishouzhihu_equip4:{
+			inherit:'baishouzhihu_equip1'
+		},
+		baishouzhihu_equip5:{
+			inherit:'baishouzhihu_equip1'
+		},
+		qinglongzhigui_equip1:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				player.draw();
+			}
+		},
+		qinglongzhigui_equip2:{
+			inherit:'qinglongzhigui_equip1'
+		},
+		qinglongzhigui_equip3:{
+			inherit:'qinglongzhigui_equip1'
+		},
+		qinglongzhigui_equip4:{
+			inherit:'qinglongzhigui_equip1'
+		},
+		qinglongzhigui_equip5:{
+			inherit:'qinglongzhigui_equip1'
+		},
 		kunlunjingc:{
 			enable:'phaseUse',
 			usable:1,
@@ -2419,13 +2526,11 @@ card.swd={
 		mujiaren_skill:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{type:'basic'})<player.num('h');
+				return player.num('h',{type:'hslingjian'})>0;
 			},
-			filterCard:function(card){
-				return get.type(card)!='basic';
-			},
+			filterCard:{type:'hslingjian'},
 			check:function(card){
-				return 5-ai.get.value(card);
+				return 10-ai.get.value(card);
 			},
 			viewAs:{name:'jiguanshu'}
 		},
@@ -2439,47 +2544,69 @@ card.swd={
 					switch(get.type(hs[i])){
 						case 'equip':types.add(get.subtype(hs[i]));break;
 						case 'hslingjian':lingjians.add(hs[i].name);break;
+						case 'jiqi':if(!lingjians.contains(hs[i].name)) lingjians.unshift(hs[i].name);break;
 					}
 				}
 				var str='';
 				for(var i=0;i<lingjians.length;i++){
-					for(var j=0;j<types.length;j++){
-						if(j==0){
-							str+='<p class="shadowed" style="text-align:left;line-height:18px;padding:5px;border-radius:4px;margin-top:0px;margin-bottom:12px;">';
+
+						var color;
+						var type=get.type(lingjians[i]);
+						if(type=='jiqi'){
+							color='rgba(233, 131, 255,0.2);';
 						}
 						else{
-							str+='<p class="shadowed" style="text-align:left;line-height:18px;padding:5px;border-radius:4px;margin-top:12px;margin-bottom:12px;">';
+							color='rgba(117,186,255,0.2);';
 						}
-						str+=''+lib.translate[lingjians[i]]+'+'+lib.translate[types[j]]+
-						'：'+lib.translate[lingjians[i]+'_'+types[j]+'_info']+'</p>';
-					}
+						str+='<div style="text-align:left;line-height:18px;border-radius:4px;margin-top:7px;margin-bottom:10px;position:relative;width:100%">';
+						str+='<div class="shadowed" style="position:absolute;left0;top:0;padding:5px;border-radius:4px;background:'+color+'">'+lib.translate[lingjians[i]]+'</div>';
+						for(var j=0;j<types.length;j++){
+							str+='<div class="shadowed" style="position:relative;left:85px;width:calc(100% - 95px);height:100%;padding:5px;border-radius: 4px;margin-bottom:10px">'+
+							(type!='jiqi'?(lib.translate[types[j]]+'：'):'')+
+							lib.translate[lingjians[i]+'_'+types[j]+'_info']+'</div>';
+							if(type=='jiqi') break;
+						}
+						str+='</div>';
 				}
 				return str;
 			},
 			check:function(card){
+				if(get.type(card)=='jiqi'){
+					if(_status.event.player.num('h')>_status.event.player.hp){
+						return 0.5;
+					}
+					return 0;
+				}
 				return 1+ai.get.value(card);
 			},
 			filterCard:function(card){
 				var type=get.type(card);
 				if(type=='equip'&&!lib.inpile.contains(card.name)) return false;
-				for(var i=0;i<ui.selected.cards.length;i++){
-					if(get.type(ui.selected.cards[i])=='equip') return type=='hslingjian';
-				}
-				if(_status.event.player.hasSkill('mujiaren_skill')){
-					if(ui.selected.cards.length==2) return type=='equip';
+				if(ui.selected.cards.length){
+					var type2=get.type(ui.selected.cards[0]);
+					if(type2=='equip'){
+						return type=='hslingjian'||type=='jiqi';
+					}
+					else{
+						return type=='equip';
+					}
 				}
 				else{
-					if(ui.selected.cards.length==1) return type=='equip';
+					return type=='equip'||type=='hslingjian'||type=='jiqi';
 				}
-				return type=='equip'||type=='hslingjian';
+				// if(type=='equip'&&!lib.inpile.contains(card.name)) return false;
+				// for(var i=0;i<ui.selected.cards.length;i++){
+				// 	if(get.type(ui.selected.cards[i])=='equip') return type=='hslingjian'||type=='jiqi';
+				// }
+				// if(_status.event.player.hasSkill('mujiaren_skill')){
+				// 	if(ui.selected.cards.length==2) return type=='equip';
+				// }
+				// else{
+				// 	if(ui.selected.cards.length==1) return type=='equip';
+				// }
+				// return type=='equip'||type=='hslingjian';
 			},
 			process:function(cards){
-				if(cards.length==3){
-					cards.sort(function(a,b){
-						if(a.name<b.name) return 1;
-						return -1;
-					});
-				}
 				var equip;
 				for(var i=0;i<cards.length;i++){
 					if(get.type(cards[i])=='equip'){
@@ -2489,9 +2616,13 @@ card.swd={
 					}
 				}
 				var name=equip.name;
+				var type=get.type(cards[0]);
 				var equipname=equip.name;
-				for(var i=0;i<cards.length;i++){
-					name+=cards[i].name.slice(10);
+				if(type=='hslingjian'){
+					name+=cards[0].name.slice(10);
+				}
+				else{
+					name+=cards[0].name;
 				}
 				if(lib.card[name]) return name;
 				lib.card[name]={};
@@ -2515,42 +2646,61 @@ card.swd={
 						lib.card[name][i]=lib.card[equip.name][i];
 					}
 				}
-				if(cards.length==2){
+				// if(cards.length==2){
+				// 	lib.card[name].legend=true;
+				// 	if(typeof lib.card[name].ai.equipValue=='number'){
+				// 		lib.card[name].ai.equipValue=Math.min(10,lib.card[name].ai.equipValue+3);
+				// 	}
+				// 	else if(typeof lib.card[name].ai.equipValue=='function'){
+				// 		lib.card[name].ai.equipValue=function(){
+				// 			return lib.card[equipname].ai.equipValue.apply(this,arguments)+2;
+				// 		}
+				// 	}
+				// 	else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='number'){
+				// 		lib.card[name].ai.basic.equipValue=Math.min(10,lib.card[name].ai.basic.equipValue+3);
+				// 	}
+				// 	else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='function'){
+				// 		lib.card[name].ai.basic.equipValue=function(){
+				// 			return lib.card[equipname].ai.basic.equipValue.apply(this,arguments)+2;
+				// 		}
+				// 	}
+				// }
+				if(type=='jiqi'){
 					lib.card[name].legend=true;
-					if(typeof lib.card[name].ai.equipValue=='number'){
-						lib.card[name].ai.equipValue=Math.min(10,lib.card[name].ai.equipValue+3);
-					}
-					else if(typeof lib.card[name].ai.equipValue=='function'){
-						lib.card[name].ai.equipValue=function(){
-							return lib.card[equipname].ai.equipValue.apply(this,arguments)+2;
-						}
-					}
-					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='number'){
-						lib.card[name].ai.basic.equipValue=Math.min(10,lib.card[name].ai.basic.equipValue+3);
-					}
-					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='function'){
-						lib.card[name].ai.basic.equipValue=function(){
-							return lib.card[equipname].ai.basic.equipValue.apply(this,arguments)+2;
-						}
-					}
 				}
 				else{
 					lib.card[name].epic=true;
-					if(typeof lib.card[name].ai.equipValue=='number'){
-						lib.card[name].ai.equipValue=Math.min(10,lib.card[name].ai.equipValue+1);
+				}
+				var dvalue=(type=='jiqi'?3:1);
+				var getValue=function(value,dvalue){
+					if(dvalue==1) return Math.min(10,value+dvalue);
+					value+=dvalue;
+					if(value>10) return 10+(value-10)/10;
+					if(value<9) return 8+value/10;
+					return value;
+				};
+				if(typeof lib.card[name].ai.equipValue=='number'){
+					lib.card[name].ai.equipValue=getValue(lib.card[name].ai.equipValue,dvalue);
+				}
+				else if(typeof lib.card[name].ai.equipValue=='function'){
+					lib.card[name].ai.equipValue=function(){
+						return getValue(lib.card[equipname].ai.equipValue.apply(this,arguments),dvalue);
 					}
-					else if(typeof lib.card[name].ai.equipValue=='function'){
-						lib.card[name].ai.equipValue=function(){
-							return lib.card[equipname].ai.equipValue.apply(this,arguments)+1;
-						}
+				}
+				else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='number'){
+					lib.card[name].ai.basic.equipValue=getValue(lib.card[name].ai.basic.equipValue,dvalue);
+				}
+				else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='function'){
+					lib.card[name].ai.basic.equipValue=function(){
+						return getValue(lib.card[equipname].ai.basic.equipValue.apply(this,arguments),dvalue);
 					}
-					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='number'){
-						lib.card[name].ai.basic.equipValue=Math.min(10,lib.card[name].ai.basic.equipValue+1);
+				}
+				else{
+					if(dvalue==3){
+						lib.card[name].ai.equipValue=7;
 					}
-					else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='function'){
-						lib.card[name].ai.basic.equipValue=function(){
-							return lib.card[equipname].ai.basic.equipValue.apply(this,arguments)+1;
-						}
+					else{
+						lib.card[name].ai.equipValue=dvalue;
 					}
 				}
 				if(Array.isArray(lib.card[name].skills)){
@@ -2562,13 +2712,7 @@ card.swd={
 				lib.card[name].filterTarget=true;
 				lib.card[name].selectTarget=1;
 				lib.card[name].range={global:1};
-				var str;
-				if(cards.length==2){
-					str=lib.translate[cards[0].name+'_duanzao2']+lib.translate[cards[1].name+'_duanzao2'];
-				}
-				else{
-					str=lib.translate[cards[0].name+'_duanzao'];
-				}
+				var str=lib.translate[cards[0].name+'_duanzao'];
 				var str2=lib.translate[equip.name];
 				if(str2.length>2){
 					str2=str2.slice(0,2);
@@ -2591,8 +2735,8 @@ card.swd={
 						translate:lib.translate[name],
 						info:str2,
 						card:equip.name,
-						legend:cards.length==2,
-						epic:cards.length==1
+						legend:type=='jiqi',
+						epic:type=='hslingjian'
 					});
 				}
 				catch(e){
@@ -2600,17 +2744,18 @@ card.swd={
 				}
 				return name;
 			},
-			selectCard:function(){
-				if(ui.selected.cards.length==2&&
-					get.type(ui.selected.cards[0])=='hslingjian'&&
-					get.type(ui.selected.cards[1])=='hslingjian'){
-					return [3,3];
-				}
-				if(_status.event.player.hasSkill('mujiaren_skill')) return [2,3];
-				return 2;
-			},
+			selectCard:2,
+			// selectCard:function(){
+			// 	if(ui.selected.cards.length==2&&
+			// 		get.type(ui.selected.cards[0])=='hslingjian'&&
+			// 		get.type(ui.selected.cards[1])=='hslingjian'){
+			// 		return [3,3];
+			// 	}
+			// 	if(_status.event.player.hasSkill('mujiaren_skill')) return [2,3];
+			// 	return 2;
+			// },
 			filter:function(event,player){
-				if(!player.num('h',{type:'hslingjian'})) return false;
+				if(!player.num('h',{type:['hslingjian','jiqi']})) return false;
 				var es=player.get('he',{type:'equip'});
 				for(var i=0;i<es.length;i++){
 					if(lib.inpile.contains(es[i].name)) return true;
@@ -2622,7 +2767,10 @@ card.swd={
 				player.gain(game.createCard(name),'gain2');
 			},
 			ai:{
-				order:10,
+				order:function(card,player){
+					if(player.num('h',{type:'hslingjian'})) return 10;
+					return 1;
+				},
 				result:{
 					player:1,
 				}
@@ -3190,28 +3338,50 @@ card.swd={
 	},
 	cardType:{
 		hslingjian:0.5,
+		jiqi:0.4,
+		jiguan:0.45
 	},
 	translate:{
+		jiguan:'机关',
+		jiqi:'祭器',
 		qinglongzhigui:'青龙之圭',
-		qinglongzhigui_info:'',
+		qinglongzhigui_info:'可用于煅造装备；此牌在你手牌中时，你摸牌阶段摸牌数+2',
+		qinglongzhigui_duanzao:'云屏',
+		qinglongzhigui_equip1_info:'回合结束阶段，你摸一张牌',
+		qinglongzhigui_equip2_info:'回合结束阶段，你摸一张牌',
+		qinglongzhigui_equip3_info:'回合结束阶段，你摸一张牌',
+		qinglongzhigui_equip4_info:'回合结束阶段，你摸一张牌',
+		qinglongzhigui_equip5_info:'回合结束阶段，你摸一张牌',
 		baishouzhihu:'白兽之琥',
-		baishouzhihu_info:'',
+		baishouzhihu_info:'可用于煅造装备；此牌在你手牌中时，每当你弃置卡牌，你可以弃置一名其他角色的一张牌',
+		baishouzhihu_duanzao:'风牙',
+		baishouzhihu_equip1_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
+		baishouzhihu_equip2_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
+		baishouzhihu_equip3_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
+		baishouzhihu_equip4_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
+		baishouzhihu_equip5_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
 		zhuquezhizhang:'朱雀之璋',
-		zhuquezhizhang_info:'',
+		zhuquezhizhang_info:'可用于煅造装备；此牌在你手牌中时，每当你受到伤害，你对伤害来源造成一点火属性伤害',
+		zhuquezhizhang_duanzao:'炽翎',
+		zhuquezhizhang_equip1_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
+		zhuquezhizhang_equip2_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
+		zhuquezhizhang_equip3_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
+		zhuquezhizhang_equip4_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
+		zhuquezhizhang_equip5_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
 		xuanwuzhihuang:'玄武之璜',
-		xuanwuzhihuang_info:'',
+		xuanwuzhihuang_info:'可用于煅造装备',
 		huanglinzhicong:'黄麟之琮',
-		huanglinzhicong_info:'',
+		huanglinzhicong_info:'可用于煅造装备',
 		cangchizhibi:'苍螭之璧',
-		cangchizhibi_info:'',
+		cangchizhibi_info:'可煅造装备',
 		guisheqi:'龟蛇旗',
 		guisheqi_info:'出牌阶段对一名角色使用，目标获得一点护甲',
 		jiguanfeng:'机关蜂',
 		jiguanfeng_info:'出牌阶段对一名其他角色使用，目标需打出一张闪，否则受到一点伤害，然后与你各流失一点体力',
 		jiguanyuan:'机关鸢',
 		jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张其它牌交给该角色，然后摸一张牌',
-		jiguantong:'机关筒',
-		// jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点伤害',
+		jiguantong:'机关火筒',
+		jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点火焰伤害',
 		jiutiansuanchi:'九天算尺',
 		jiutiansuanchi_info:'每当你使用杀造成伤害，你可以弃置一张牌并展示受伤害角色的一张手牌，若此牌与你弃置的牌花色或点数相同，此杀的伤害+2',
 		fengyinzhidan:'封印之蛋',
@@ -3268,30 +3438,30 @@ card.swd={
 		hslingjian_shijianhuisu_equip4_info:'当你的装备区内没有其他牌时，你的进攻距离+1',
 		hslingjian_shijianhuisu_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色将其装备区内的牌收回手牌',
 		_lingjianduanzao:'煅造',
-		_lingjianduanzao_info:'出牌阶段，你可以弃置一张装备牌和一张零件牌，并获得一件强化装备；强化装备可以装备给距离1以内的角色',
+		_lingjianduanzao_info:'出牌阶段，你可以弃置一张装备牌和一张可煅造的牌，并获得一件强化装备；强化装备可以装备给距离1以内的角色',
 		jiguanshu:'机关鼠',
 		jiguanshu_info:'出牌阶段对距离1以内的一名角色使用，用随机零件强化目标装备区内的装备',
 		lingjiandai:'零件袋',
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
 		mujiaren_skill:'巧匠',
-		mujiaren_skill_info:'你在煅造装备时可以额外加入一个零件；你可以将非基本牌当作机关鼠使用',
-		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标获得技能巧匠（你在煅造装备时可以额外加入一个零件；你可以将非基本牌当作机关鼠使用）',
+		mujiaren_skill_info:'你可以将零件牌当作机关鼠使用',
+		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标摸一张牌并获得技能巧匠（你可以将零件牌当作机关鼠使用）',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',
-		hslingjian_xuanfengzhiren_info:'随机弃置一名角色的一张牌',
+		hslingjian_xuanfengzhiren_info:'可用于煅造装备；随机弃置一名角色的一张牌',
 		hslingjian_zhongxinghujia:'重型护甲',
-		hslingjian_zhongxinghujia_info:'令一名角色装备一件随机防具，然后随机弃置其一张手牌',
+		hslingjian_zhongxinghujia_info:'可用于煅造装备；令一名角色装备一件随机防具，然后随机弃置其一张手牌',
 		hslingjian_jinjilengdong:'紧急冷冻',
-		hslingjian_jinjilengdong_info:'令一名武将牌正面朝上的其他角色摸两张牌并翻面',
+		hslingjian_jinjilengdong_info:'可用于煅造装备；令一名武将牌正面朝上的其他角色摸两张牌并翻面',
 		hslingjian_yinmilichang:'隐秘力场',
-		hslingjian_yinmilichang_info:'令一名其他角色获得技能潜行，直到其下一回合开始',
+		hslingjian_yinmilichang_info:'可用于煅造装备；令一名其他角色获得技能潜行，直到其下一回合开始',
 		hslingjian_xingtigaizao:'型体改造',
-		hslingjian_xingtigaizao_info:'摸一张牌，本回合手牌上限-1',
+		hslingjian_xingtigaizao_info:'可用于煅造装备；摸一张牌，本回合手牌上限-1',
 		hslingjian_shengxiuhaojiao:'生锈号角',
-		hslingjian_shengxiuhaojiao_info:'令一名角色获得技能嘲讽，直到其下一回合开始',
+		hslingjian_shengxiuhaojiao_info:'可用于煅造装备；令一名角色获得技能嘲讽，直到其下一回合开始',
 		hslingjian_shijianhuisu:'时间回溯',
-		hslingjian_shijianhuisu_info:'令一名其他角色将其装备牌收回手牌',
+		hslingjian_shijianhuisu_info:'可用于煅造装备；令一名其他角色将其装备牌收回手牌',
 		hslingjian_chaofeng:'嘲讽',
 		hslingjian_chaofeng_info:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
 		hslingjian_yinshen:'潜行',
@@ -3506,6 +3676,8 @@ card.swd={
 		['heart',13,'qinglianxindeng'],
 		['club',3,'jiguanyuan'],
 		['diamond',2,'jiguanyuan'],
+		['diamond',4,'jiguantong'],
+		['club',7,'jiguantong'],
 		['spade',1,'fengyinzhidan'],
 		['spade',2,'fengyinzhidan'],
 		['heart',1,'fengyinzhidan'],

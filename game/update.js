@@ -1,7 +1,7 @@
 window.noname_update={
     version:'1.8.20',
     changeLog:[
-        '新武将',
+        '新武将、新卡',
     ],
     files:{
         global:[
@@ -9,7 +9,13 @@ window.noname_update={
             'game/game.js',
             'character/swd.js',
             'character/sp.js',
+            'character/yijiang.js',
+            'character/yxs.js',
+            'character/hearth.js',
+            'character/xianjian.js',
             'card/swd.js',
+            'card/standard.js',
+            'layout/mobile/layout.css',
         ],
         '1.8.19.7':[],
         '1.8.19.20':[],

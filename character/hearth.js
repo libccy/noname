@@ -1191,23 +1191,12 @@ character.hearth={
 			mark:'card',
 			nopup:true,
 			intro:{
-				content:'防止你受到的所有伤害'
+				content:'锁定技，你不能成为其他角色的卡牌的目标'
 			},
-			trigger:{player:'damageBefore'},
-			forced:true,
-			content:function(){
-				trigger.untrigger();
-				trigger.finish();
-			},
-			ai:{
-				nofire:true,
-				nothunder:true,
-				nodamage:true,
-				effect:{
-					target:function(card,player,target,current){
-						if(get.tag(card,'damage')) return [0,0];
-					}
-				},
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(player!=target) return false;
+				}
 			},
 			group:'hsbaowu_huangjinyuanhou2'
 		},
@@ -4168,7 +4157,7 @@ character.hearth={
 			},
 			selectTarget:-1,
 			content:function(){
-				player.recover(player.maxHp);
+				player.recover();
 				var hs=target.get('h');
 				target.discard(hs);
 				var cs=[];
@@ -4626,7 +4615,7 @@ character.hearth={
 		hsshenqi_nengliangzhiguang_info:'限武将牌正面朝上时使用，令一名角色增加一点体力上限，回复一点体力，并摸四张牌；使用后将武将牌翻至背面',
 		hsbaowu:'宝物',
 		hsbaowu_huangjinyuanhou:'黄金猿猴',
-		hsbaowu_huangjinyuanhou_info:'回复全部体力，弃置所有手牌，并获得等量的无中生有；直到下个回合开始，防上即将受到的一切伤害',
+		hsbaowu_huangjinyuanhou_info:'回复一点体力并弃置所有手牌，然后获得等量的无中生有；直到下个回合开始，不能成为其他角色的卡牌目标',
 		hsbaowu_cangbaotu:'藏宝图',
 		hsbaowu_cangbaotu_info:'回合结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
 

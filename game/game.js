@@ -1708,7 +1708,7 @@
 						name:'游戏模式',
 						init:'normal',
 						item:{
-							normal:'普通',
+							normal:'标准',
 							zhong:'明忠'
 						},
 						restart:true,
@@ -1789,7 +1789,7 @@
 						name:'游戏模式',
 						init:'normal',
 						item:{
-							normal:'普通',
+							normal:'标准',
 							zhong:'明忠'
 						},
 						restart:true,
@@ -2101,7 +2101,7 @@
 						name:'游戏模式',
 						init:'normal',
 						item:{
-							normal:'普通',
+							normal:'标准',
 							mingjiang:'明将'
 						},
 						frequent:true,
@@ -26348,7 +26348,7 @@
 				node.tempSkills={};
 				node.storage={};
 				node.marks={};
-				node.ai={friend:[],enemy:[],neutral:[]};
+				node.ai={friend:[],enemy:[],neutral:[],handcards:{global:[],source:[],viewed:[]}};
 				node.queueCount=0;
 
 				for(var i in lib.element.player){

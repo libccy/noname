@@ -12,8 +12,8 @@ character.xianjian={
 
 		pal_jingtian:['male','wu',3,['sajin','jubao']],
 		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci']],
-		// pal_longkui:['female','shu',3,['shuangren','shenmu','duci']],
-		// pal_longkuigui:['female','shu',3,['shuangren','shenmu','duci']],
+		pal_longkui:['female','wei',3,['shuangren','shenmu','duci']],
+		pal_longkuigui:['female','shu',3,['shuangren','shenmu','duci']],
 		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
 		pal_changqing:['male','wei',4,['luanjian','tianfu']],
 

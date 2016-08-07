@@ -614,6 +614,8 @@ window.noname_asset_list=[
     'image/character/pal_jingtian.jpg',
     'image/character/pal_linyueru.jpg',
     'image/character/pal_liumengli.jpg',
+    'image/character/pal_longkui.jpg',
+    'image/character/pal_longkuigui.jpg',
     'image/character/pal_lixiaoyao.jpg',
     'image/character/pal_murongziying.jpg',
     'image/character/pal_xuanxiao.jpg',

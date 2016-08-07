@@ -1255,7 +1255,7 @@ character.yxs={
 				}
 				if(result.control&&result.control.indexOf('2')!=-1){
 					player.logSkill('sheshi');
-					game.log(player,'指定的花色为',result.control);
+					game.log(player,'指定的花色为'+get.translation(result.control));
 					var suit=result.control.slice(0,result.control.length-1);
 					var cards=[];
 					for(var i=0;i<ui.cardPile.childNodes.length;i++){
