@@ -5,23 +5,23 @@ character.xianjian={
 		pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 		pal_linyueru:['female','wei',3,['guiyuan','qijian']],
 
-		// pal_wangxiaohu:['male','qun',4,['guiyuan','qijian']],
-		// pal_sumei:['female','shu',3,['guiyuan','qijian']],
-		// pal_shenqishuang:['female','wei',3,['guiyuan','qijian']],
+		pal_wangxiaohu:['male','qun',4,['guiyuan','qijian']],
+		pal_sumei:['female','shu',3,['guiyuan','qijian']],
+		pal_shenqishuang:['female','wei',3,['guiyuan','qijian']],
 
 
 		pal_jingtian:['male','wu',3,['sajin','jubao']],
 		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci']],
 		pal_longkui:['female','wei',3,['shuangren','shenmu','duci']],
-		pal_longkuigui:['female','shu',3,['shuangren','shenmu','duci']],
+		// pal_longkuigui:['female','shu',3,['shuangren','shenmu','duci']],
 		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
 		pal_changqing:['male','wei',4,['luanjian','tianfu']],
 
-		// pal_nangonghuang:['male','wei',3,[]],
-		// pal_wenhui:['female','shu',4,[]],
-		// pal_wangpengxu:['female','shu',3,[]],
-		// pal_xingxuan:['male','wei',3,[]],
-		// pal_xingxuan:['male','wei',3,[]],
+		pal_nangonghuang:['male','wei',3,[]],
+		pal_wenhui:['female','shu',4,[]],
+		pal_wangpengxu:['female','shu',3,[]],
+		pal_xingxuan:['male','wei',3,[]],
+		pal_leiyuange:['male','wei',3,[]],
 
 		pal_yuntianhe:['male','wu',4,['longxi','zhuyue','guanri']],
 		pal_hanlingsha:['female','shu',3,['tannang','tuoqiao']],
