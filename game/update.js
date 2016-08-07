@@ -15,6 +15,7 @@ window.noname_update={
             'character/xianjian.js',
             'card/swd.js',
             'card/standard.js',
+            'card/hearth.js',
             'layout/mobile/layout.css',
         ],
         '1.8.19.7':[],

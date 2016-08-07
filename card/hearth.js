@@ -463,6 +463,9 @@ card.hearth={
 						return 0;
 					},
 				},
+				tag:{
+					recover:1
+				}
 			}
 		},
 		shenenshu:{
@@ -551,6 +554,9 @@ card.hearth={
 						if(target.hp==1) return 2.5;
 						return 2;
 					}
+				},
+				tag:{
+					recover:1
 				}
 			}
 		},
@@ -563,7 +569,14 @@ card.hearth={
 			content:function(){
 				"step 0"
 				target.chooseToDiscard([1,2],'he').ai=function(card){
-					if(ai.get.damageEffect(target,player,target,'thunder')>=0) return 0;
+					if(ai.get.damageEffect(target,player,target,'thunder')>=0){
+						if(target.hasSkillTag('maixie')){
+							if(ui.selected.cards.length) return 0;
+						}
+						else{
+							return 0;
+						}
+					}
 					if(target.hasSkillTag('maixie')&&target.hp>1&&ui.selected.cards.length){
 						return 0;
 					}

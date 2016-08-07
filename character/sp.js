@@ -60,6 +60,7 @@ character.sp={
 		tadun:['male','qun',4,['luanzhan']],
 		yanbaihu:['male','qun',4,['zhidao','jili']],
 		chengyu:['male','wei',3,['shefu','benyu']],
+		wanglang:['male','wei',3,[]],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],

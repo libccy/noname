@@ -832,7 +832,7 @@ character.yxs={
 		tuqiang:{
 			trigger:{player:'respond'},
 			filter:function(event,player){
-				return event.card.name=='shan';
+				return event.card&&event.card.name=='shan';
 			},
 			frequent:true,
 			content:function(){

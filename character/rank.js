@@ -121,6 +121,7 @@ window.characterRank={
         'ow_kuangshu',
     ],
     am:[
+        'pal_wangpengxu',
         'guohuanghou',
         'sunziliufang',
         'hs_blingtron',

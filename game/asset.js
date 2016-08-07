@@ -960,6 +960,7 @@ window.noname_asset_list=[
     'image/character/treasure_shiyuansu.jpg',
     'image/character/treasure_wuyashenxiang.jpg',
     'image/character/wangji.jpg',
+    'image/character/wanglang.jpg',
     'image/character/wangyi.jpg',
     'image/character/weiyan.jpg',
     'image/character/wenpin.jpg',

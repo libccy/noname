@@ -5,21 +5,20 @@ character.xianjian={
 		pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 		pal_linyueru:['female','wei',3,['guiyuan','qijian']],
 
-		pal_wangxiaohu:['male','qun',4,['guiyuan','qijian']],
-		pal_sumei:['female','shu',3,['guiyuan','qijian']],
-		pal_shenqishuang:['female','wei',3,['guiyuan','qijian']],
+		pal_wangxiaohu:['male','qun',4,[]],
+		pal_sumei:['female','shu',3,[]],
+		pal_shenqishuang:['female','wei',3,[]],
 
 
 		pal_jingtian:['male','wu',3,['sajin','jubao']],
 		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci']],
-		pal_longkui:['female','wei',3,['shuangren','shenmu','duci']],
-		// pal_longkuigui:['female','shu',3,['shuangren','shenmu','duci']],
+		pal_longkui:['female','wei',3,['fenxing','diewu','lingyu']],
 		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
 		pal_changqing:['male','wei',4,['luanjian','tianfu']],
 
 		pal_nangonghuang:['male','wei',3,[]],
 		pal_wenhui:['female','shu',4,[]],
-		pal_wangpengxu:['female','shu',3,[]],
+		pal_wangpengxu:['female','shu',3,['duxinshu','feixu']],
 		pal_xingxuan:['male','wei',3,[]],
 		pal_leiyuange:['male','wei',3,[]],
 
@@ -31,6 +30,240 @@ character.xianjian={
 
 	},
 	skill:{
+		diesha:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			filter:function(event){
+				return event.player.isAlive()&&event.card&&event.card.name=='sha';
+			},
+			content:function(){
+				trigger.player.loseHp();
+				player.recover();
+			},
+			ai:{
+				threaten:1.5
+			}
+		},
+		guijiang:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&!target.hasSkill('guijiang2');
+			},
+			filterCard:{color:'black'},
+			filter:function(event,player){
+				return player.num('h',{color:'black'});
+			},
+			check:function(card){
+				return 5-ai.get.value(card);
+			},
+			content:function(){
+				target.addSkill('guijiang2');
+				target.storage.guijiang2=player;
+			},
+			ai:{
+				order:4,
+				threaten:1.2,
+				expose:0.2,
+				result:{
+					target:function(player,target){
+						if(target.hp==1) return -1;
+						if(target.hp==2) return -0.5;
+						return 0;
+					}
+				}
+			}
+		},
+		guijiang2:{
+			mark:true,
+			intro:{
+				content:'不能成为回复牌的目标'
+			},
+			trigger:{global:['dieBegin','phaseBegin']},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.player==player.storage.guijiang2;
+			},
+			content:function(){
+				player.removeSkill('guijiang2');
+			},
+			mod:{
+				targetEnabled:function(card){
+					if(get.tag(card,'recover')) return false;
+				},
+			}
+		},
+		_guijiang2:{
+			mod:{
+				cardSavable:function(card,player){
+					if(_status.event.dying.hasSkill('guijiang2')) return false;
+				}
+			}
+		},
+		fenxing:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			unique:true,
+			forceunique:true,
+			filter:function(){
+				return Math.random()<5;
+			},
+			content:function(){
+				var node;
+				if(player.name=='pal_longkui'){
+					node=player.node.avatar;
+				}
+				else if(player.name2=='pal_longkui'){
+					node=player.node.avatar2;
+				}
+				if(player.storage.fenxing){
+					player.storage.fenxing=false;
+					player.removeSkill('guijiang');
+					player.removeSkill('diesha');
+					player.addSkill('diewu');
+					player.addSkill('lingyu');
+					node.setBackground('pal_longkui','character');
+				}
+				else{
+					player.storage.fenxing=true;
+					player.removeSkill('diewu');
+					player.removeSkill('lingyu');
+					player.addSkill('guijiang');
+					player.addSkill('diesha');
+					node.setBackground('pal_longkuigui','character');
+				}
+			},
+		},
+		diewu:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h','sha')>0;
+			},
+			filterCard:{name:'sha'},
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			prepare:function(cards,player,targets){
+				player.$give(cards,targets[0]);
+			},
+			discard:false,
+			content:function(){
+				target.gain(cards);
+				if(!player.hasSkill('diewu2')){
+					player.draw();
+					player.addTempSkill('diewu2','phaseAfter');
+				}
+			},
+			ai:{
+				order:2,
+				expose:0.2,
+				result:{
+					target:function(player,target){
+						if(!player.hasSkill('diewu2')) return 1;
+						return 0;
+					}
+				}
+			}
+		},
+		diewu2:{},
+		lingyu:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].hp<game.players[i].maxHp){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('灵愈：令一名其他角色回复一点体力',function(card,player,target){
+					return target!=player&&target.hp<target.maxHp;
+				}).ai=function(target){
+					return ai.get.recoverEffect(target,player,player);
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('lingyu',result.targets[0]);
+					result.targets[0].recover();
+				}
+			},
+			ai:{
+				threaten:1.5,
+				expose:0.2,
+			}
+		},
+		duxinshu:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('h');
+			},
+			content:function(){
+				'step 0'
+				if(player.num('h')){
+					player.chooseCardButton('读心',target.get('h')).ai=function(button){
+						return ai.get.value(button.link)-5;
+					}
+				}
+				else{
+					player.viewCards('读心',target.get('h'));
+					event.finish();
+				}
+				'step 1'
+				if(result.bool){
+					event.card=result.links[[0]];
+					player.chooseCard('h',true,'用一张手牌替换'+get.translation(event.card)).ai=function(card){
+						return -ai.get.value(card);
+					};
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					player.gain(event.card);
+					target.gain(result.cards);
+					player.$give(1,target);
+					target.$give(1,player);
+					game.log(player,'与',target,'交换了一张手牌');
+				}
+			},
+			ai:{
+				threaten:1.3,
+				result:{
+					target:function(player,target){
+						return -target.num('h');
+					}
+				},
+				order:10,
+				expose:0.2,
+			}
+		},
+		feixu:{
+			trigger:{global:'respond'},
+			filter:function(event,player){
+				return event.card&&event.card.name=='shan';
+			},
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)>0;
+			},
+			prompt:function(event){
+				return '是否对'+get.translation(event.player)+'发动【飞絮】？'
+			},
+			content:function(){
+				player.line(trigger.player,'green');
+				trigger.player.draw();
+			},
+			ai:{
+				mingzhi:false,
+				threaten:2,
+				expose:0.2,
+			}
+		},
 		xuanyan:{
 			// trigger:{source:'damageBefore'},
 			// forced:true,
@@ -1363,6 +1596,16 @@ character.xianjian={
 		}
 	},
 	translate:{
+		pal_wangxiaohu:'王小虎',
+		pal_sumei:'苏媚',
+		pal_shenqishuang:'沈欺霜',
+		pal_longkui:'龙葵',
+		pal_nangonghuang:'南宫煌',
+		pal_wenhui:'温慧',
+		pal_wangpengxu:'王蓬絮',
+		pal_xingxuan:'星璇',
+		pal_leiyuange:'雷元戈',
+
 		pal_zhaoliner:'赵灵儿',
 		pal_linyueru:'林月如',
 		pal_xuejian:'雪见',
@@ -1376,6 +1619,21 @@ character.xianjian={
 		pal_changqing:'长卿',
 		pal_xuanxiao:'玄霄',
 
+		fenxing:'分形',
+		fenxing_info:'锁定技，回合开始阶段，你有50%概率变身为另一形态',
+		guijiang:'鬼降',
+		guijiang2:'鬼降',
+		guijiang_info:'出牌阶段限一次，你可以弃置一张黑色牌，令一名其他角色无法成为回复牌的目标直到你下一回合开始',
+		diesha:'叠杀',
+		diesha_info:'锁定技，每当你使用杀造成伤害，受伤害角色失去一点体力，你回复一点体力',
+		lingyu:'灵愈',
+		lingyu_info:'回合结束阶段，你可以令一名其他角色回复一点体力',
+		diewu:'蝶舞',
+		diewu_info:'出牌阶段，你可以将一张【杀】交给一名角色，若你于此阶段内首次如此做，你摸一张牌',
+		duxinshu:'读心',
+		duxinshu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后可以用一张手牌替换其中的一张',
+		feixu:'飞絮',
+		feixu_info:'每当一名角色使用或打出一张闪，你可以令其摸一张牌',
 		xuanyan:'玄炎',
 		xuanyan2:'玄炎',
 		xuanyan_info:'锁定技，你的火属性伤害+1；你造成火属性伤害后流失1点体力',

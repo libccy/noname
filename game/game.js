@@ -3867,7 +3867,7 @@
 										}
 									}
 									else{
-										game.print('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+										console.log('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
 									}
 								}
 							}
@@ -3949,7 +3949,7 @@
 									}
 									else{
 										if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
-										else game.print('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+										else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
                                         if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
 												lib.cardPack.mode_derivation=[k];
@@ -4018,7 +4018,7 @@
 								}
 								else{
 									if(lib[j][k]!=undefined){
-										game.print('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
+										console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
 									}
 									lib[j][k]=lib.init.eval(play[i][j][k]);
 								}
@@ -16960,6 +16960,7 @@
 			dialog.add(ui.create.div('.placeholder'));
 
             for(var i=0;i<game.players.length;i++){
+                if(game.players[i].isUnderControl(true)) continue;
                 var hs=game.players[i].get('h');
                 if(hs.length){
                     dialog.add('<div class="text center">'+get.translation(game.players[i])+'</div>');
@@ -17992,7 +17993,7 @@
 									lib[j][k]=lib.init.eval(character[i][j][k]);
 								}
 								else{
-									game.print('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+									console.log('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
 								}
 							}
 						}
@@ -18016,7 +18017,7 @@
 							}
 							else{
 								if(lib[j][k]==undefined) lib[j][k]=lib.init.eval(card[i][j][k]);
-								else game.print('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+								else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
 							}
 						}
 					}
@@ -26719,6 +26720,7 @@
                 }
                 if(modes.length==7){
                     modes.pop();
+                    rows--;
                 }
 				for(var k=0;k<rows;k++){
 					var node=ui.create.div('.newgame');
