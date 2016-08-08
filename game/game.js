@@ -5169,6 +5169,21 @@
 					if(!game.online) player.discard(event.result.cards);
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
+                chooseToCompareMultiple:function(){
+                    if(player.num('h')==0){
+                        event.result={cancelled:true,bool:false}
+                        event.finish();
+                        return;
+                    }
+                    for(var i=0;i<targets.length;i++){
+                        if(targets[i].num('h')==0){
+                            event.result={cancelled:true,bool:false}
+                            event.finish();
+                            return;
+                        }
+                    }
+                    game.log(player,'对',target,'发起拼点');
+                },
 				chooseToCompare:function(){
 					"step 0"
 					if(player.num('h')==0||target.num('h')==0){
@@ -8349,28 +8364,40 @@
 				chooseToCompare:function(target,check){
 					var next=game.createEvent('chooseToCompare');
 					next.player=this;
-					next.target=target;
-					if(check) next.ai=check;
-					else next.ai=function(card){
-						var player=get.owner(card);
-						var event=_status.event.getParent();
-						var to=(player==event.player?event.target:event.player);
-						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
-                        if(card.name=='du') addi+=5;
-						if(player==event.player){
-							if(ai.get.attitude(player,to)>0&&event.small){
-								return -get.number(card)-ai.get.value(card)/2+addi;
-							}
-							return get.number(card)-ai.get.value(card)/2+addi;
-						}
-						else{
-							if(ai.get.attitude(player,to)>0&&!event.small){
-								return -get.number(card)-ai.get.value(card)/2+addi;
-							}
-							return get.number(card)-ai.get.value(card)/2+addi;
-						}
-					}
-					next.content=lib.element.playerproto.chooseToCompare;
+                    if(Array.isArray(target)){
+                        next.targets=target;
+                        if(check) next.ai=check;
+                        else next.ai=function(card){
+    						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
+                            if(card.name=='du') addi+=5;
+                            return get.number(card)-ai.get.value(card)/2+addi;
+                        }
+                        next.content=lib.element.playerproto.chooseToCompareMultiple;
+                    }
+                    else{
+                        next.target=target;
+    					if(check) next.ai=check;
+    					else next.ai=function(card){
+    						var player=get.owner(card);
+    						var event=_status.event.getParent();
+    						var to=(player==event.player?event.target:event.player);
+    						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
+                            if(card.name=='du') addi+=5;
+    						if(player==event.player){
+    							if(ai.get.attitude(player,to)>0&&event.small){
+    								return -get.number(card)-ai.get.value(card)/2+addi;
+    							}
+    							return get.number(card)-ai.get.value(card)/2+addi;
+    						}
+    						else{
+    							if(ai.get.attitude(player,to)>0&&!event.small){
+    								return -get.number(card)-ai.get.value(card)/2+addi;
+    							}
+    							return get.number(card)-ai.get.value(card)/2+addi;
+    						}
+    					}
+    					next.content=lib.element.playerproto.chooseToCompare;
+                    }
                     next._args=Array.from(arguments);
 					return next;
 				},
