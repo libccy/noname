@@ -1344,7 +1344,9 @@ character.refresh={
 					target.discard(target.getJudge('lebu'));
 				}
 				else{
-					player.useCard({name:'lebu'},target,cards).animate=false;
+					var next=player.useCard({name:'lebu'},target,cards);
+					next.animate=false;
+					next.audio=false;
 				}
 				player.draw();
 			},
