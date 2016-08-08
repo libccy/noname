@@ -496,6 +496,9 @@ character.yxs={
 				trigger.finish();
 				player.loseHp();
 			},
+			ai:{
+				noDirectDamage:true,
+			}
 		},
 		heqin:{
 			skillAnimation:true,

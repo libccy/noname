@@ -313,6 +313,7 @@ card.extra={
 				basic:{
 					equipValue:function(card,player){
 						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
+						if(player.hasSkillTag('noDirectDamage')) return 10;
 						if(ai.get.damageEffect(player,player,player,'fire')>=0) return 10;
 						var num=3;
 						for(var i=0;i<game.players.length;i++){

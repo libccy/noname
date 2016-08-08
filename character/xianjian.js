@@ -16,10 +16,10 @@ character.xianjian={
 		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
 		pal_changqing:['male','wei',4,['luanjian','tianfu']],
 
-		pal_nangonghuang:['male','wei',3,[]],
+		pal_nangonghuang:['male','wei',3,['zhaoyao','sheling','zhangmu']],
 		pal_wenhui:['female','shu',4,[]],
 		pal_wangpengxu:['female','shu',3,['duxinshu','feixu']],
-		pal_xingxuan:['male','wei',3,[]],
+		pal_xingxuan:['male','wei',3,['feizhua','leiyu','lingxue']],
 		pal_leiyuange:['male','wei',3,[]],
 
 		pal_yuntianhe:['male','wu',4,['longxi','zhuyue','guanri']],
@@ -30,6 +30,13 @@ character.xianjian={
 
 	},
 	skill:{
+		lingxue:{
+			trigger:{player:'dyingAfter'},
+			forced:true,
+			content:function(){
+				player.changeHujia();
+			}
+		},
 		diesha:{
 			trigger:{source:'damageEnd'},
 			forced:true,
@@ -1619,6 +1626,18 @@ character.xianjian={
 		pal_changqing:'长卿',
 		pal_xuanxiao:'玄霄',
 
+		zhangmu:'障目',
+		zhangmu_info:'每回合限一次，当使用需要使用或打出一张闪时，你可以展示一张闪，视为使用或打出了此闪',
+		feizhua:'飞爪',
+		feizhua_info:'当你使用一张杀时，你可以将目标两侧的角色追加为额外目标',
+		leiyu:'雷狱',
+		leiyu_info:'出牌阶段结束时，你可以失去一点体力，视为对本阶段内所有成为过你的卡牌目标的角色使用一张惊雷闪，若你杀死任意一名角色，你回复一点体力',
+		lingxue:'灵血',
+		lingxue_info:'锁定技，当你解除濒死状态时，你获得一点护甲',
+		zhaoyao:'招摇',
+		zhaoyao_info:'其他角色的摸牌阶段开始时，你可以与其拼点，若你赢，你摸两张牌，然后将两张牌置于牌堆顶',
+		sheling:'摄灵',
+		sheling_info:'其他角色于你的回合内失去牌时，你可以获得之（每回合最多发动三次）',
 		fenxing:'分形',
 		fenxing_info:'锁定技，回合开始阶段，你有50%概率变身为另一形态',
 		guijiang:'鬼降',

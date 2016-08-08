@@ -13,6 +13,7 @@ window.noname_update={
             'character/yxs.js',
             'character/hearth.js',
             'character/xianjian.js',
+            'card/extra.js',
             'card/swd.js',
             'card/standard.js',
             'card/hearth.js',
