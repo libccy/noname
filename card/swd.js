@@ -2221,9 +2221,7 @@ card.swd={
 			filter:function(event){
 				return event.card&&event.card.name=='sha'&&event.player&&event.player.isAlive();
 			},
-			logTarget:function(event){
-				return event.player;
-			},
+			logTarget:'player',
 			content:function(){
 				trigger.player.draw(2);
 				trigger.player.turnOver();
@@ -2240,9 +2238,7 @@ card.swd={
 			filter:function(event){
 				return event.card&&event.card.name=='sha'&&event.source&&event.source.isAlive();
 			},
-			logTarget:function(event){
-				return event.source;
-			},
+			logTarget:'source',
 			content:function(){
 				player.line(trigger.source,'green');
 				trigger.source.draw(2);

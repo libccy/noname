@@ -2590,9 +2590,7 @@ character.hearth={
 				}
 				return ai.get.attitude(player,event.player)<=0;
 			},
-			logTarget:function(event){
-				return event.player;
-			},
+			logTarget:'player',
 			content:function(){
 				trigger.player.draw(2);
 				trigger.player.turnOver();

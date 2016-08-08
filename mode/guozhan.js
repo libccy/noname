@@ -114,6 +114,38 @@ mode.guozhan={
 		game.phaseLoop(player);
 	},
 	game:{
+		getCharacterChoice:function(list,num){
+			var choice=list.splice(0,num);
+			var map={wei:[],shu:[],wu:[],qun:[]};
+			for(var i=0;i<choice.length;i++){
+				var group=lib.character[choice[i]][1];
+				if(map[group]){
+					map[group].push(choice[i]);
+				}
+			}
+			for(var i in map){
+				if(map[i].length<2){
+					if(map[i].length==1){
+						console.log(map[i][0]);
+						choice.remove(map[i][0]);
+						list.push(map[i][0]);
+					}
+					delete map[i];
+				}
+			}
+			if(choice.length<num){
+				for(var i=0;i<list.length;i++){
+					if(map[lib.character[list[i]][1]]){
+						choice.push(list[i]);
+						list.splice(i--,1);
+						if(choice.length>=num){
+							break;
+						}
+					}
+				}
+			}
+			return choice;
+		},
 		getState:function(){
 			var state={};
 			for(var i in lib.playerOL){
@@ -411,7 +443,8 @@ mode.guozhan={
 					event.list.push(i);
 				}
 				event.list.randomSort();
-				var list=event.list.splice(0,parseInt(get.config('choice_num')));
+				// var list=event.list.splice(0,parseInt(get.config('choice_num')));
+				var list=game.getCharacterChoice(event.list,parseInt(get.config('choice_num')));
 				if(_status.auto){
 					event.ai(game.me,list);
 				}
@@ -489,7 +522,8 @@ mode.guozhan={
 							}
 							event.list=event.list.concat(list);
 							event.list.randomSort();
-							list=event.list.splice(0,parseInt(get.config('choice_num')));
+							// list=event.list.splice(0,parseInt(get.config('choice_num')));
+							list=game.getCharacterChoice(event.list,parseInt(get.config('choice_num')));
 							var buttons=ui.create.div('.buttons');
 							var node=_status.event.dialog.buttons[0].parentNode;
 							_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
@@ -608,7 +642,7 @@ mode.guozhan={
 					return (lib.character[button.link][1]==lib.character[ui.selected.buttons[0].link][1]);
 				};
 				for(var i=0;i<game.players.length;i++){
-					list2.push([game.players[i],['选择角色',[list.randomRemove(num),'character']],2,
+					list2.push([game.players[i],['选择角色',[game.getCharacterChoice(list,num),'character']],2,
 					true,function(){return Math.random()},filterButton]);
 				}
 				game.me.chooseButtonOL(list2,function(player,result){

@@ -291,7 +291,7 @@ mode.identity={
 			}
 		},
 		getRoomInfo:function(uiintro){
-			uiintro.add('<div class="text chat">游戏模式：'+(lib.configOL.identity_mode=='zhong'?'明忠':'普通'));
+			uiintro.add('<div class="text chat">游戏模式：'+(lib.configOL.identity_mode=='zhong'?'明忠':'标准'));
 			uiintro.add('<div class="text chat">双将模式：'+(lib.configOL.double_character?'开启':'关闭'));
 			if(lib.configOL.identity_mode!='zhong'){
 				uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));

@@ -5,9 +5,9 @@ character.xianjian={
 		pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 		pal_linyueru:['female','wei',3,['guiyuan','qijian']],
 
-		pal_wangxiaohu:['male','qun',4,[]],
-		pal_sumei:['female','shu',3,[]],
-		pal_shenqishuang:['female','wei',3,[]],
+		// pal_wangxiaohu:['male','qun',4,[]],
+		// pal_sumei:['female','shu',3,[]],
+		// pal_shenqishuang:['female','wei',3,[]],
 
 
 		pal_jingtian:['male','wu',3,['sajin','jubao']],
@@ -17,10 +17,10 @@ character.xianjian={
 		pal_changqing:['male','wei',4,['luanjian','tianfu']],
 
 		pal_nangonghuang:['male','wei',3,['zhaoyao','sheling','zhangmu']],
-		pal_wenhui:['female','shu',4,[]],
+		// pal_wenhui:['female','shu',4,[]],
 		pal_wangpengxu:['female','shu',3,['duxinshu','feixu']],
 		pal_xingxuan:['male','wei',3,['feizhua','leiyu','lingxue']],
-		pal_leiyuange:['male','wei',3,[]],
+		// pal_leiyuange:['male','wei',3,[]],
 
 		pal_yuntianhe:['male','wu',4,['longxi','zhuyue','guanri']],
 		pal_hanlingsha:['female','shu',3,['tannang','tuoqiao']],
@@ -30,6 +30,142 @@ character.xianjian={
 
 	},
 	skill:{
+		sheling:{
+			trigger:{global:['useCardAfter','respondAfter','discardAfter']},
+			filter:function(event,player){
+				if(player!=_status.currentPhase||player==event.player) return false;
+				if(event.cards){
+					for(var i=0;i<event.cards.length;i++){
+						if(get.position(event.cards[i])=='d') return true;
+					}
+				}
+				return false;
+			},
+			frequent:'check',
+			check:function(event){
+				for(var i=0;i<event.cards.length;i++){
+					if(get.position(event.cards[i])=='d'&&event.cards[i].name=='du') return false;
+				}
+				return true;
+			},
+			usable:3,
+			content:function(){
+				var cards=[];
+				for(var i=0;i<trigger.cards.length;i++){
+					if(get.position(trigger.cards[i])=='d'){
+						cards.push(trigger.cards[i]);
+					}
+				}
+				player.gain(cards,'gain2');
+			}
+		},
+		zhaoyao:{
+			trigger:{global:'phaseDrawBegin'},
+			filter:function(event,player){
+				return event.player!=player&&event.player.num('h')>0&&player.num('h')>0;
+			},
+			check:function(event,player){
+				if(ai.get.attitude(player,event.player)>=0) return false;
+				var hs=player.get('h');
+				if(hs.length<event.player.num('h')) return false;
+				for(var i=0;i<hs.length;i++){
+					var val=ai.get.value(hs[0]);
+					if(hs[i].number>=10&&val<=6) return true;
+					if(hs[i].number>=8&&val<=3) return true;
+				}
+				return false;
+			},
+			logTarget:'player',
+			content:function(){
+				'step 0'
+				player.chooseToCompare(trigger.player);
+				'step 1'
+				if(result.bool){
+					player.draw(2);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				player.chooseCard('将两张牌置于牌堆顶（先选择的在上）',2,true);
+				'step 3'
+				if(result.bool){
+					player.lose(result.cards,ui.special);
+					event.cards=result.cards;
+				}
+				else{
+					event.finish();
+				}
+				'step 4'
+				game.delay();
+				var nodes=[];
+				for(var i=0;i<event.cards.length;i++){
+					var cardx=ui.create.card();
+					cardx.classList.add('infohidden');
+					cardx.classList.add('infoflip');
+					nodes.push(cardx);
+				}
+				player.$throw(nodes,700,'nobroadcast');
+				game.log(player,'将'+get.cnNumber(event.cards.length)+'张牌置于牌堆顶');
+				'step 5'
+				for(var i=event.cards.length-1;i>=0;i--){
+					ui.cardPile.insertBefore(event.cards[i],ui.cardPile.firstChild);
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		zhangmu:{
+			trigger:{player:'chooseToRespondBegin'},
+			filter:function(event,player){
+				if(event.responded) return false;
+				if(!event.filterCard({name:'shan'})) return false;
+				return player.num('h','shan')>0;
+			},
+			direct:true,
+			check:function(event,player){
+				if(ai.get.damageEffect(player,event.player,player)>=0) return false;
+				return true;
+			},
+			content:function(){
+				"step 0"
+				var goon=(ai.get.damageEffect(player,trigger.player,player)<=0);
+				player.chooseCard('是否发动【障目】？',{name:'shan'}).ai=function(){
+					return goon?1:0;
+				}
+				"step 1"
+				if(result.bool){
+					player.showCards(result.cards);
+					trigger.untrigger();
+					trigger.responded=true;
+					trigger.result={bool:true,card:{name:'shan'}}
+					player.addSkill('zhangmu_ai');
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,effect){
+						if(get.tag(card,'respondShan')&&effect<0){
+							if(target.hasSkill('zhangmu_ai')) return 0;
+							if(target.num('h')>=2) return 0.5;
+						}
+					}
+				}
+			}
+		},
+		zhangmu_ai:{
+			trigger:{player:'loseAfter'},
+			forced:true,
+			popup:false,
+			silent:true,
+			filter:function(event,player){
+				return player.num('h','shan')==0;
+			},
+			content:function(){
+				player.removeSkill('zhangmu_ai');
+			}
+		},
         leiyu:{
             trigger:{player:'phaseEnd'},
             check:function(event,player){
@@ -1753,7 +1889,7 @@ character.xianjian={
 		zhaoyao:'招摇',
 		zhaoyao_info:'其他角色的摸牌阶段开始时，你可以与其拼点，若你赢，你摸两张牌，然后将两张牌置于牌堆顶',
 		sheling:'摄灵',
-		sheling_info:'其他角色于你的回合内失去牌时，你可以获得之（每回合最多发动三次）',
+		sheling_info:'其他角色于你的回合内因使用、打出或弃置而失去牌时，你可以获得之（每回合最多发动三次）',
 		fenxing:'分形',
 		fenxing_info:'锁定技，回合开始阶段，你有50%概率变身为另一形态',
 		guijiang:'鬼降',

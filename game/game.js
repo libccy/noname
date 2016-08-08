@@ -16199,7 +16199,7 @@
 					var hidden=player.hiddenSkills.slice(0);
 					game.expandSkills(hidden);
 					if(hidden.contains(event.skill)){
-                        if(!get.info(event.skill).direct){
+                        if(!info.direct){
                             event.trigger('triggerHidden');
                         }
 						else{
@@ -16215,29 +16215,46 @@
 					event.trigger('triggerBefore');
 				}
 				"step 2"
+                var info=get.info(event.skill);
 				if(event.cancelled){
 					event.finish();
 					return;
 				}
-				if(!event.revealed&&!get.info(event.skill).forced){
-					if(get.info(event.skill).direct&&player.isUnderControl()){
+				if(!event.revealed&&!info.forced){
+                    var checkFrequent=function(info){
+                        if(typeof info.frequent=='boolean') return info.frequent;
+                        if(typeof info.frequent=='function') return info.frequent(trigger,player);
+                        if(info.frequent=='check'&&typeof info.check=='function') return info.check(trigger,player);
+                        return false;
+                    }
+					if(info.direct&&player.isUnderControl()){
 						game.modeSwapPlayer(player);
 						event._result={bool:true};
 					}
-					else if(get.info(event.skill).frequent&&!lib.config.autoskilllist.contains(event.skill)){
+					else if(checkFrequent(info)&&!lib.config.autoskilllist.contains(event.skill)){
 						event._result={bool:true};
 					}
-					else if(get.info(event.skill).direct&&player==game.me&&!_status.auto){
+					else if(info.direct&&player==game.me&&!_status.auto){
 						event._result={bool:true};
 					}
-                    else if(get.info(event.skill).direct&&player.isOnline()){
+                    else if(info.direct&&player.isOnline()){
                         event._result={bool:true};
                     }
 					else{
 						var str;
-						var check=get.info(event.skill).check;
-						if(get.info(event.skill).prompt) str=get.info(event.skill).prompt;
-						else str='是否发动【'+get.skillTranslation(event.skill,player)+'】？';
+						var check=info.check;
+						if(info.prompt) str=info.prompt;
+						else{
+                            if(typeof info.logTarget=='string'){
+                                str='是否对'+get.translation(trigger[info.logTarget])+'发动【'+get.skillTranslation(event.skill,player)+'】？';
+                            }
+                            else if(typeof info.logTarget=='function'){
+                                str='是否对'+get.translation(info.logTarget(trigger,player))+'发动【'+get.skillTranslation(event.skill,player)+'】？';
+                            }
+                            else{
+                                str='是否发动【'+get.skillTranslation(event.skill,player)+'】？';
+                            }
+                        }
 						if(typeof str=='function'){str=str(trigger,player)}
 						player.chooseBool(str).ai=function(){
 							return !check||check(trigger,player);
@@ -16274,7 +16291,12 @@
 					}
 					else{
                         if(info.logTarget){
-                            player.logSkill(event.skill,info.logTarget(trigger,player));
+                            if(typeof info.logTarget=='string'){
+                                player.logSkill(event.skill,trigger[info.logTarget]);
+                            }
+                            else if(typeof info.logTarget=='function'){
+                                player.logSkill(event.skill,info.logTarget(trigger,player));
+                            }
                         }
 						else{
                             player.logSkill(event.skill);
@@ -19640,11 +19662,12 @@
 						}
 						game.saveConfig('autoskilllist',list);
 					};
+                    var skilllistexpanded=game.expandSkills(lib.skilllist);
 					for(var i in lib.skill){
-						if(!lib.skilllist.contains(i)) continue;
+						if(!skilllistexpanded.contains(i)) continue;
 						if(lib.skill[i].frequent&&lib.translate[i]){
 							lib.configMenu.skill.config[i]={
-								name:lib.translate[i],
+								name:lib.translate[i+'_noconf']||lib.translate[i],
 								init:true,
 								type:'autoskill',
 								onclick:clickAutoSkill
@@ -25908,7 +25931,7 @@
 				var nodex;
 				for(i in lib.skill){
 					if(lib.skill[i].frequent&&lib.translate[i]){
-						lib.translate[i+'_forbid_config']=lib.translate[i];
+						lib.translate[i+'_forbid_config']=lib.translate[i+'_noconf']||lib.translate[i];
 						nodex=ui.create.switcher(i+'_forbid',
 							!lib.config.autoskilllist.contains(i),ui.click.autoskill);
 						nodex.link=i;

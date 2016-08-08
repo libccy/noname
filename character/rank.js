@@ -58,6 +58,9 @@ window.characterRank={
         'ow_luxiao',
     ],
     a:[
+        'pal_longkui',
+        'pal_nangonghuang',
+        'pal_xingxuan',
         'hs_walian',
         'hs_fandral',
         'hs_totemic',

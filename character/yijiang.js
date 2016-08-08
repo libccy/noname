@@ -5237,7 +5237,7 @@ character.yijiang={
 						cards.push(trigger.cards[i]);
 					}
 				}
-				player.chooseCardButton(cards,[1,cards.length],'是否发动【纵玄】？').set('ai',function(){
+				player.chooseCardButton(cards,[1,cards.length],'纵玄：将弃置的牌按任意顺序置于牌堆顶（先选择的在上）').set('ai',function(){
 					return -1;
 				});
 				"step 1"
@@ -5650,6 +5650,7 @@ character.yijiang={
 				}
 				return false;
 			},
+			frequent:'check',
 			check:function(event,player){
 				for(var i=0;i<event.cards.length;i++){
 					if(get.suit(event.cards[i])=='club'&&get.position(event.cards[i])=='d'){
@@ -5678,6 +5679,7 @@ character.yijiang={
 		luoying2:{
 			audio:2,
 			trigger:{global:'judgeAfter'},
+			frequent:'check',
 			check:function(event,player){
 				return event.result.card.name!='du';
 			},
@@ -7424,6 +7426,7 @@ character.yijiang={
 		luoying:'落英',
 		luoying1:'落英',
 		luoying2:'落英',
+		luoying2_noconf:'落英·判定',
 		jiushi:'酒诗',
 		jiushi1:'酒诗',
 		jiushi2:'酒诗',
