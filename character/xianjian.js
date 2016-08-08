@@ -30,8 +30,124 @@ character.xianjian={
 
 	},
 	skill:{
+        leiyu:{
+            trigger:{player:'phaseEnd'},
+            check:function(event,player){
+                if(player.hp==1) return 0;
+                var num=0;
+                var num2=0;
+                for(var i=0;i<player.storage.leiyu.length;i++){
+                    var eff=ai.get.effect(player.storage.leiyu[i],{name:'jingleishan',nature:'thunder'},player,player);
+                    num+=eff;
+                    if(eff>0){
+                        num2++;
+                    }
+                    else if(eff<0){
+                        num2--;
+                    }
+                }
+                return num>0&&num2>=2;
+            },
+			prompt:function(event,player){
+				return '是否对'+get.translation(player.storage.leiyu)+'发动【雷狱】？'
+			},
+            filter:function(event,player){
+                return player.storage.leiyu&&player.storage.leiyu.length>0;
+            },
+            content:function(){
+                'step 0'
+                player.loseHp();
+                'step 1'
+                player.storage.leiyu2=true;
+                player.storage.leiyu.sort(lib.sort.seat);
+                player.useCard({name:'jingleishan',nature:'thunder'},player.storage.leiyu);
+                'step 1'
+                delete player.storage.leiyu2;
+            },
+            group:['leiyu2','leiyu3','leiyu4'],
+            ai:{
+                threaten:1.3
+            }
+        },
+        leiyu2:{
+            trigger:{player:'phaseUseBegin'},
+            forced:true,
+            popup:false,
+            silent:true,
+            content:function(){
+                player.storage.leiyu=[];
+            }
+        },
+        leiyu3:{
+            trigger:{source:'dieAfter'},
+            forced:true,
+            popup:false,
+            filter:function(event,player){
+                return player.storage.leiyu2?true:false;
+            },
+            content:function(){
+                player.recover();
+                delete player.storage.leiyu2;
+            }
+        },
+        leiyu4:{
+            trigger:{player:'useCardToBegin'},
+            forced:true,
+            popup:false,
+            silent:true,
+            filter:function(event,player){
+                return _status.currentPhase==player&&Array.isArray(player.storage.leiyu)&&event.target&&event.target!=player;
+            },
+            content:function(){
+                player.storage.leiyu.add(trigger.target);
+            }
+        },
+		feizhua:{
+            trigger:{player:'useCard'},
+			filter:function(event,player){
+				if(event.card.name!='sha') return false;
+				if(event.targets.length!=1) return false;
+				var target=event.targets[0];
+                var players=[target.next,target.previous];
+				for(var i=0;i<players.length;i++){
+					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
+						return true;
+					}
+				}
+				return false;
+			},
+			prompt:function(event,player){
+                var targets=[];
+                var target=event.targets[0];
+                if(player.canUse('sha',target.next,false)) targets.push(target.next);
+                if(player.canUse('sha',target.previous,false)) targets.push(target.previous);
+				return '是否对'+get.translation(targets)+'发动【飞爪】？'
+			},
+            check:function(event,player){
+                var target=event.targets[0];
+                var num=0;
+                var players=[target.next,target.previous];
+				for(var i=0;i<players.length;i++){
+					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
+						num+=ai.get.effect(players[i],{name:'sha'},player,player);
+					}
+				}
+                return num>0;
+            },
+			content:function(){
+				"step 0"
+                var target=trigger.targets[0];
+                var players=[target.previous,target.next];
+				for(var i=0;i<players.length;i++){
+					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
+						trigger.targets.push(players[i]);
+                        player.line(players[i],'green');
+					}
+				}
+			}
+		},
 		lingxue:{
-			trigger:{player:'dyingAfter'},
+			trigger:{player:'recoverEnd'},
 			forced:true,
 			content:function(){
 				player.changeHujia();
@@ -1631,9 +1747,9 @@ character.xianjian={
 		feizhua:'飞爪',
 		feizhua_info:'当你使用一张杀时，你可以将目标两侧的角色追加为额外目标',
 		leiyu:'雷狱',
-		leiyu_info:'出牌阶段结束时，你可以失去一点体力，视为对本阶段内所有成为过你的卡牌目标的角色使用一张惊雷闪，若你杀死任意一名角色，你回复一点体力',
+		leiyu_info:'回合结束阶段，你可以失去一点体力，视为对本回合内所有成为过你的卡牌目标的角色使用一张惊雷闪，若你杀死任意一名角色，你回复一点体力',
 		lingxue:'灵血',
-		lingxue_info:'锁定技，当你解除濒死状态时，你获得一点护甲',
+		lingxue_info:'锁定技，每当你回复一点体力，你获得一点护甲',
 		zhaoyao:'招摇',
 		zhaoyao_info:'其他角色的摸牌阶段开始时，你可以与其拼点，若你赢，你摸两张牌，然后将两张牌置于牌堆顶',
 		sheling:'摄灵',

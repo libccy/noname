@@ -50,7 +50,7 @@ card.swd={
 		},
 		jiguantong:{
 			fullskin:true,
-			type:'trick',
+			type:'jiguan',
 			enable:true,
 			wuxieable:true,
 			selectTarget:-1,
@@ -64,8 +64,6 @@ card.swd={
 					next.set('ai',function(card){
 						var evt=_status.event.getParent();
 						if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
-						if(evt.player.hasSkillTag('notricksource')) return 0;
-						if(evt.target.hasSkillTag('notrick')) return 0;
 						return 8-ai.get.useful(card);
 					});
 				}

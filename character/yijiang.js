@@ -5679,12 +5679,7 @@ character.yijiang={
 			audio:2,
 			trigger:{global:'judgeAfter'},
 			check:function(event,player){
-				for(var i=0;i<event.cards.length;i++){
-					if(get.suit(event.cards[i])=='club'&&get.position(event.cards[i])=='d'){
-						if(event.cards[i].name=='du') return false;
-					}
-				}
-				return true;
+				return event.result.card.name!='du';
 			},
 			filter:function(event,player){
 				if(event.player==player) return false;
