@@ -16,8 +16,8 @@ var load=function(id){
 }
 
 load(1);
-load(2);
-load(3);
+// load(2);
+// load(3);
 
 setTimeout(function(){
     phantom.exit();

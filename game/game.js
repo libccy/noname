@@ -5170,6 +5170,7 @@
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
                 chooseToCompareMultiple:function(){
+                    "step 0"
                     if(player.num('h')==0){
                         event.result={cancelled:true,bool:false}
                         event.finish();
@@ -5182,7 +5183,64 @@
                             return;
                         }
                     }
-                    game.log(player,'对',target,'发起拼点');
+                    game.log(player,'对',targets,'发起拼点');
+                    "step 1"
+                    event.list=targets.slice(0);
+                    event.list.unshift(player);
+                    player.chooseCardOL(event.list,'请选择拼点牌',true).set('ai',event.ai).aiCard=function(target){
+                        var hs=target.get('h');
+                        _status.event.player=target;
+                        hs.sort(function(a,b){
+                            return event.ai(b)-event.ai(a);
+                        });
+                        delete _status.event.player;
+                        return {bool:true,cards:[hs[0]]};
+                    };
+                    "step 2"
+                    var cards=[];
+                    player.lose(result[0].cards);
+                    for(var i=1;i<result.length;i++){
+                        event.list[i].lose(result[i].cards);
+                        cards.push(result[i].cards[0]);
+                    }
+                    event.list2=cards;
+                    event.card1=result[0].cards[0];
+                    event.result={player:event.card1,targets:cards.slice(0)};
+                    event.list.shift();
+					game.log(player,'的拼点牌为',event.card1);
+                    "step 3"
+                    if(event.list.length){
+                        game.broadcastAll(function(){
+                            ui.arena.classList.add('thrownhighlight');
+                        });
+    					game.addVideo('thrownhighlight1');
+                        event.current=event.list.shift();
+                        event.current.animate('target');
+                        player.animate('target');
+                        event.card2=event.list2.shift();
+    					game.log(event.current,'的拼点牌为',event.card2);
+                        player.$compare(event.card1,event.current,event.card2);
+                        game.delay(4);
+                    }
+                    else{
+                        event.finish();
+                    }
+                    "step 4"
+                    if(event.callback){
+                        var next=game.createEvent('compareMultiple');
+                        next.player=player;
+                        next.target=event.current;
+                        next.card1=event.card1;
+                        next.card2=event.card2;
+                        next.content=event.callback;
+                    }
+                    "step 5"
+                    game.broadcastAll(function(id){
+                        ui.arena.classList.remove('thrownhighlight');
+                        ui.clear();
+                    });
+					game.addVideo('thrownhighlight2');
+                    event.goto(3);
                 },
 				chooseToCompare:function(){
 					"step 0"
@@ -5382,6 +5440,80 @@
                         event.callback(event.player,event.result);
                     }
 				},
+                chooseCardOL:function(){
+                    'step 0'
+                    event.targets=event.list.slice(0);
+                    if(!_status.connectMode){
+                        event.result=[];
+                        event.goto(7);
+                    }
+                    else{
+                        for(var i=0;i<event.list.length;i++){
+                            var target=event.list[i];
+                            target.wait();
+                            if(target.isOnline()){
+                                target.send(function(args,set){
+                                    game.me.chooseCard.apply(game.me,args).set(set);
+                                    game.resume();
+                                },event._args,event._set);
+                                event.list.splice(i--,1);
+                            }
+                            else if(target==game.me){
+                                event.withme=true;
+                                event.list.splice(i--,1);
+                            }
+                        }
+                    }
+                    'step 1'
+                    if(event.list.length){
+                        event.target=event.list.shift();
+                        event.target.chooseCard.apply(event.target,event._args).set(event._set);
+                    }
+                    else{
+                        event.goto(3);
+                    }
+                    'step 2'
+                    event.target.unwait(result);
+                    event.goto(1);
+                    'step 3'
+                    if(event.withme){
+                        game.me.chooseCard.apply(game.me,event._args).set(event._set);
+                    }
+                    else{
+                        event.goto(5);
+                    }
+                    'step 4'
+                    game.me.unwait(result);
+                    'step 5'
+                    if(!event.resultOL){
+                        game.pause();
+                    }
+                    'step 6'
+                    event.result=[];
+                    for(var i=0;i<event.targets.length;i++){
+                        event.result[i]=event.resultOL[event.targets[i].playerid]||{};
+                        if(event.result[i]=='ai'&&event.aiCard){
+                            event.result[i]=event.aiCard(event.targets[i]);
+                        }
+                    }
+                    event.finish();
+                    'step 7'
+                    if(event.list.length){
+                        event.target=event.list.shift();
+                        event.target.chooseCard.apply(event.target,event._args).set(event._set);
+                    }
+                    else{
+                        for(var i=0;i<event.targets.length;i++){
+                            if(!event.result[i]){
+                                event.result[i]={};
+                            }
+                        }
+                        event.finish();
+                    }
+                    'step 8'
+                    event.result[event.targets.indexOf(event.target)]=result;
+                    event.goto(7);
+                },
                 chooseButtonOL:function(){
                     'step 0'
                     ui.arena.classList.add('markhidden');
@@ -5496,7 +5628,7 @@
 						}
                     }
                     "step 2"
-                    if(event.glow_result){
+                    if(event.glow_result&&event.result.cards){
                         for(var i=0;i<event.result.cards.length;i++){
                             event.result.cards[i].classList.add('glow');
                         }
@@ -8455,6 +8587,21 @@
                     next._args=Array.from(arguments);
                     return next;
                 },
+                chooseCardOL:function(){
+                    var next=game.createEvent('chooseCardOL');
+                    next._args=[];
+					for(var i=0;i<arguments.length;i++){
+						if(get.itemtype(arguments[i])=='players'){
+							next.list=arguments[i].slice(0);
+						}
+                        else{
+                            next._args.push(arguments[i]);
+                        }
+					}
+					next.content=lib.element.playerproto.chooseCardOL;
+                    next._args.add('glow_result');
+					return next;
+                },
 				chooseCard:function(){
 					var next=game.createEvent('chooseCard');
 					next.player=this;
@@ -8478,6 +8625,9 @@
 						else if(typeof arguments[i]=='object'&&arguments[i]){
 							next.filterCard=get.filter(arguments[i]);
 						}
+                        else if(arguments[i]=='glow_result'){
+                            next.glow_result=true;
+                        }
 						else if(typeof arguments[i]=='string'){
 							next.prompt=arguments[i];
 						}
@@ -10258,6 +10408,99 @@
 						}
 					}
 				},
+                $compareMultiple:function(card1,targets,cards){
+                    game.broadcast(function(player,card1,targets,cards){
+                        player.$compareMultiple(card1,targets,cards);
+                    },this,card1,targets,cards);
+					game.addVideo('compareMultiple',this,[get.cardInfo(card1),get.targetsInfo(targets),get.cardsInfo(cards)]);
+                    var player=this;
+					var node1=player.$throwxy2(card1,
+						'calc(50% - 52px)','calc(50% + 10px)','perspective(600px) rotateY(180deg)',true
+					);
+                    if(lib.config.cardback_style!='default'){
+						node1.style.transitionProperty='none';
+						ui.refresh(node1);
+						node1.classList.add('infohidden');
+						ui.refresh(node1);
+						node1.style.transitionProperty='';
+					}
+					else{
+						node1.classList.add('infohidden');
+					}
+
+					node1.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
+					var onEnd01=function(){
+						node1.removeEventListener('webkitTransitionEnd',onEnd01);
+						setTimeout(function(){
+							node1.style.transition='all ease-in 0.3s';
+							node1.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+							var onEnd=function(){
+								node1.classList.remove('infohidden');
+								node1.style.transition='all 0s';
+								ui.refresh(node1);
+								node1.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+								ui.refresh(node1);
+								node1.style.transition='';
+								ui.refresh(node1);
+								node1.style.transform='';
+								node1.removeEventListener('webkitTransitionEnd',onEnd);
+							}
+							node1.addEventListener('webkitTransitionEnd',onEnd);
+						},300);
+					};
+					node1.addEventListener('webkitTransitionEnd',onEnd01);
+
+                    setTimeout(function(){
+                        var left0=-targets.length*52-(targets.length-1)*8;
+                        for(var i=0;i<targets.length;i++){
+                            (function(target,card2,i){
+                                var left=left0+i*120;
+                                var node2;
+                                if(left<0){
+                                    node2=target.$throwxy2(card2,
+            							'calc(50% - '+(-left)+'px)','calc(50% - 114px)','perspective(600px) rotateY(180deg)',true
+            						);
+                                }
+                                else{
+                                    node2=target.$throwxy2(card2,
+            							'calc(50% + '+left+'px)','calc(50% - 114px)','perspective(600px) rotateY(180deg)',true
+            						);
+                                }
+        						if(lib.config.cardback_style!='default'){
+        							node2.style.transitionProperty='none';
+        							ui.refresh(node2);
+        							node2.classList.add('infohidden');
+        							ui.refresh(node2);
+        							node2.style.transitionProperty='';
+        						}
+        						else{
+        							node2.classList.add('infohidden');
+        						}
+        						node2.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
+        						var onEnd02=function(){
+        							node2.removeEventListener('webkitTransitionEnd',onEnd02);
+        							setTimeout(function(){
+        								node2.style.transition='all ease-in 0.3s';
+        								node2.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+        								var onEnd=function(){
+        									node2.classList.remove('infohidden');
+        									node2.style.transition='all 0s';
+        									ui.refresh(node2);
+        									node2.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+        									ui.refresh(node2);
+        									node2.style.transition='';
+        									ui.refresh(node2);
+        									node2.style.transform='';
+        									node2.removeEventListener('webkitTransitionEnd',onEnd);
+        								}
+        								node2.addEventListener('webkitTransitionEnd',onEnd);
+        							},200);
+        						};
+        						node2.addEventListener('webkitTransitionEnd',onEnd02);
+                            }(targets[i],cards[i],i))
+                        }
+					},200);
+                },
 				$compare:function(card1,target,card2){
                     game.broadcast(function(player,target,card1,card2){
                         player.$compare(card1,target,card2);
@@ -11529,8 +11772,17 @@
 					this.step--;
 				},
                 set:function(key,value){
-                    this[key]=value;
-                    this._set.push([key,value]);
+                    if(arguments.length==1&&Array.isArray(arguments[0])){
+                        for(var i=0;i<arguments[0].length;i++){
+                            if(Array.isArray(arguments[0][i])){
+                                this.set(arguments[0][i][0],arguments[0][i][1]);
+                            }
+                        }
+                    }
+                    else{
+                        this[key]=value;
+                        this._set.push([key,value]);
+                    }
                     return this;
                 },
                 send:function(){
@@ -15129,6 +15381,14 @@
 					console.log(player);
 				}
 			},
+            compareMultiple:function(player,info){
+                if(player&&info){
+					player.$compareMultiple(get.infoCard(info[0]),get.infoTargets(info[1]),get.infoCards(info[2]));
+				}
+				else{
+					console.log(player);
+				}
+            },
 			give:function(player,info){
 				if(player&&info){
 					player.$give(info[0],game.playerMap[info[1]]);
@@ -23870,7 +24130,7 @@
     					var li1=document.createElement('li');
                         var li2=document.createElement('li');
     					var li3=document.createElement('li');
-    					li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px"></p>';
+    					li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px;white-space:nowrap"></p>';
     					li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
                         li3.innerHTML='更新源<br><p style="margin-top:8px"><input type="text" style="width:120px" value="'+lib.updateURL+'"><button style="margin-left:5px">确定</button></p>';
                         li3.querySelector('button').onclick=function(){
@@ -29394,6 +29654,20 @@
 			if(lib.characterPack.boss&&lib.characterPack.boss[name]) return num?10:'sp';
 			return num?1:'x';
 		},
+        targetsInfo:function(targets){
+            var info=[];
+            for(var i=0;i<targets.length;i++){
+                info.push(targets[i].dataset.position);
+            }
+            return info;
+        },
+        infoTargets:function(info){
+            var targets=[];
+            for(var i=0;i<info.length;i++){
+                targets.push(game.playerMap[info[i]]);
+            }
+            return targets;
+        },
 		cardInfo:function(card){
 			return [card.suit,card.number,card.name,card.nature];
 		},

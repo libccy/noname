@@ -7,6 +7,7 @@ window.noname_update={
         global:[
             'game/asset.js',
             'game/game.js',
+            'game/phantom.js',
             'character/swd.js',
             'character/rank.js',
             'character/sp.js',
