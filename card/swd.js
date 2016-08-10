@@ -1354,6 +1354,7 @@ card.swd={
 				return player.num('h','qinglongzhigui')>0;
 			},
 			content:function(){
+				player.showCards(get.translation(player)+'发动了【青龙之圭】',player.get('h','qinglongzhigui'));
 				trigger.num+=2;
 			}
 		},
@@ -1373,6 +1374,7 @@ card.swd={
 				};
 				"step 1"
 				if(result.bool){
+					player.showCards(get.translation(player)+'发动了【白兽之琥】',player.get('h','baishouzhihu'));
 					player.logSkill('_baishouzhihu',result.targets);
 					player.discardPlayerCard(result.targets[0],'he',true);
 				}
@@ -1391,7 +1393,10 @@ card.swd={
 				return ai.get.damageEffect(event.source,player,player,'fire')>0;
 			},
 			content:function(){
+				'step 0'
+				player.showCards(get.translation(player)+'发动了【朱雀之璋】',player.get('h','zhuquezhizhang'));
 				trigger.source.damage('fire');
+				'step 1'
 				game.delay();
 			}
 		},
@@ -1402,6 +1407,7 @@ card.swd={
 				return player.num('h','xuanwuzhihuang')>0&&event.num>0&&player.hp<player.maxHp;
 			},
 			content:function(){
+				player.showCards(get.translation(player)+'发动了【玄武之璜】',player.get('h','xuanwuzhihuang'));
 				player.recover(trigger.num);
 			}
 		},
@@ -1412,6 +1418,7 @@ card.swd={
 				return !player.hujia&&player.num('h','huanglinzhicong')>0;
 			},
 			content:function(){
+				player.showCards(get.translation(player)+'发动了【黄麟之琮】',player.get('h','huanglinzhicong'));
 				player.changeHujia();
 				player.update();
 			},
@@ -1433,6 +1440,7 @@ card.swd={
 				};
 				'step 1'
 				if(result.bool){
+					player.showCards(get.translation(player)+'发动了【苍螭之璧】',player.get('h','cangchizhibi'));
 					player.logSkill('_cangchizhibi',result.targets);
 					for(var i=0;i<result.targets.length;i++){
 						result.targets[i].link();

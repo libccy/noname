@@ -8916,6 +8916,11 @@
 					var next=game.createEvent('showCards');
 					next.player=this;
 					next.str=str;
+                    if(typeof cards=='string'){
+                        str=cards;
+                        cards=next.str;
+                        next.str=str;
+                    }
 					if(get.itemtype(cards)=='card') next.cards=[cards];
 					else if(get.itemtype(cards)=='cards') next.cards=cards;
 					else _status.event.next.remove(next);
