@@ -1494,6 +1494,7 @@ card.standard={
 			filter:function(event,player){
 				if(event.name!='phaseJudge'){
 					if(!event.target) return false;
+					if(event.player.hasSkillTag('playernowuxie')) return false;
 					if(get.type(event.card)!='trick'&&!get.info(event.card).wuxieable) return false;
 				}
 				return true;

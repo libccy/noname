@@ -61,6 +61,7 @@
         devURL:'https://rawgit.com/libccy/noname/master/',
 		assetURL:'',
         hallURL:'websha.cn',
+        reserveSkillName:['others'],
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -197,10 +198,6 @@
 						init:false,
 						restart:true,
 						unfrequent:true,
-					},
-					change_skin:{
-						name:'双击换肤',
-						init:true
 					},
 					swipe:{
 						name:'滑动手势',
@@ -646,6 +643,10 @@
                                 ui.background.style.transform='';
                             }
 						},
+					},
+					change_skin:{
+						name:'双击换肤',
+						init:true
 					},
 					card_style:{
 						name:'卡牌样式',
@@ -5210,10 +5211,6 @@
 					game.log(player,'的拼点牌为',event.card1);
                     "step 3"
                     if(event.list.length){
-                        game.broadcastAll(function(){
-                            ui.arena.classList.add('thrownhighlight');
-                        });
-    					game.addVideo('thrownhighlight1');
                         event.current=event.list.shift();
                         event.current.animate('target');
                         player.animate('target');
@@ -5227,6 +5224,10 @@
                     }
                     "step 4"
                     if(event.callback){
+                        game.broadcastAll(function(card1,card2){
+                            if(card1.clone) card1.clone.style.opacity=0.5;
+                            if(card2.clone) card2.clone.style.opacity=0.5;
+                        },event.card1,event.card2);
                         var next=game.createEvent('compareMultiple');
                         next.player=player;
                         next.target=event.current;
@@ -5235,11 +5236,7 @@
                         next.content=event.callback;
                     }
                     "step 5"
-                    game.broadcastAll(function(id){
-                        ui.arena.classList.remove('thrownhighlight');
-                        ui.clear();
-                    });
-					game.addVideo('thrownhighlight2');
+                    game.broadcastAll(ui.clear);
                     event.goto(3);
                 },
 				chooseToCompare:function(){
@@ -10168,6 +10165,12 @@
                         return true;
                     }
                     return false;
+                },
+                distanceTo:function(target,method){
+                    return get.distance(this,target,method);
+                },
+                distanceFrom:function(target,method){
+                    return get.distance(target,this,method);
                 },
 				hasSkill:function(skill){
 					return game.expandSkills(this.get('s')).contains(skill);
@@ -23241,14 +23244,14 @@
                                 name=name[0];
                                 if(currentButton){
                                     if(currentButton.link!=name){
-                                        if(lib.skill[name]||page.content.pack.skill[name]){
+                                        if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
                                             editnode.classList.add('disabled');
                                             return;
                                         }
                                     }
                                 }
                                 else{
-                                    if(lib.skill[name]||page.content.pack.skill[name]){
+                                    if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
                                         editnode.classList.add('disabled');
                                         return;
                                     }
@@ -23583,7 +23586,7 @@
                                 name=name[0];
                                 if(currentButton){
                                     if(currentButton.link!=name){
-                                        if(lib.skill[name]||page.content.pack.skill[name]){
+                                        if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
                                             alert('技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一');
                                             return;
                                         }
@@ -23594,7 +23597,7 @@
                                     }
                                 }
                                 else{
-                                    if(lib.skill[name]||page.content.pack.skill[name]){
+                                    if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
                                         alert('技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一');
                                         return;
                                     }

@@ -60,7 +60,7 @@ character.sp={
 		tadun:['male','qun',4,['luanzhan']],
 		yanbaihu:['male','qun',4,['zhidao','jili']],
 		chengyu:['male','wei',3,['shefu','benyu']],
-		
+
 		wanglang:['male','wei',3,['gushe','jici']],
 		sp_pangde:['male','wei',4,['mashu','juesi']],
 		sp_jiaxu:['male','wei',3,['zhenlue','jianshu','yongdi']],
@@ -82,8 +82,242 @@ character.sp={
 		caohong:['caoren'],
 		daxiaoqiao:['zhouyu','sunce'],
 		cuiyan:['caocao'],
+		guansuo:['guanyu'],
 	},
 	skill:{
+		zhenlue:{
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(get.type(card)=='delay'&&player!=target){
+						return false;
+					}
+				}
+			},
+			ai:{
+				playernowuxie:true
+			}
+		},
+		jianshu:{
+			unique:true,
+			enable:'phaseUse',
+			animationColor:'thunder',
+			skillAnimation:'epic',
+			filter:function(event,player){
+				return !player.storage.jianshu&&player.num('h',{color:'black'})>0;
+			},
+			init:function(player){
+				player.storage.jianshu=false;
+			},
+			filterTarget:function(card,player,target){
+				if(ui.selected.targets.length){
+					return target.num('h')>0&&target.distanceTo(ui.selected.targets[0])<=1;
+				}
+				return true;
+			},
+			filterCard:{color:'black'},
+			mark:true,
+			discard:false,
+			prepare:function(cards,player,targets){
+				player.$give(cards,targets[0]);
+			},
+			check:function(card){return 6-ai.get.value(card);},
+			selectTarget:2,
+			multitarget:true,
+			content:function(){
+				'step 0'
+				player.unmark('jianshu');
+				player.storage.jianshu=true;
+				targets[0].gain(cards);
+				'step 1'
+				targets[0].chooseToCompare(targets[1]);
+				'step 2'
+				if(result.bool){
+					targets[0].chooseToDiscard('he',2,true);
+					targets[1].loseHp();
+				}
+				else{
+					targets[1].chooseToDiscard('he',2,true);
+					targets[0].loseHp();
+				}
+			},
+			intro:{
+				content:'limited'
+			},
+			ai:{
+				expose:0.4,
+				order:4,
+				result:{
+					target:function(player,target){
+						if(player.hasUnknown()) return 0;
+						if(ui.selected.targets.length) return -1;
+						return -0.5;
+					}
+				}
+			}
+		},
+		yongdi:{
+			unique:true,
+			trigger:{player:'damageEnd'},
+			animationColor:'fire',
+			skillAnimation:'legend',
+			filter:function(event,player){
+				return !player.storage.yongdi;
+			},
+			init:function(player){
+				player.storage.yongdi=false;
+			},
+			mark:true,
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【拥嫡】？',function(card,player,target){
+					return target.sex=='male';
+				}).set('ai',function(target){
+					if(!_status.event.goon) return 0;
+					var att=ai.get.attitude(player,target);
+					if(att<=1) return 0;
+					if(target.disabledSkills.zhu&&!target.isZhu) return att*2;
+					return att;
+				}).set('goon',player.hasUnknown());
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		gushe:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('h')>0;
+			},
+			selectTarget:[1,3],
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			multitarget:true,
+			multiline:true,
+			content:function(){
+				player.chooseToCompare(targets).callback=lib.skill.gushe.callback;
+			},
+			init:function(player){
+				player.storage.gushe=0;
+			},
+			intro:{
+				name:'饶舌',
+				content:'mark'
+			},
+			chat:['粗鄙之语','天地不容','谄谀之臣','皓首匹夫，苍髯老贼','二臣贼子','断脊之犬','我从未见过有如此厚顔无耻之人！'],
+			callback:function(){
+				'step 0'
+				event.num1=event.card1.number;
+				event.num2=event.card2.number;
+				if(player.hasSkill('jici')&&event.num1<=player.storage.gushe){
+					player.chooseBool('是否发动【激词】？');
+				}
+				else{
+					event.goto(2);
+				}
+				'step 1'
+				if(result.bool){
+					if(event.num1<player.storage.gushe){
+						event.num1+=player.storage.gushe;
+					}
+					else{
+						player.getStat().skill.gushe--;
+					}
+				}
+				'step 2'
+				if(event.num1>event.num2){
+					target.chooseToDiscard('he','弃置一张牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
+						return 6-ai.get.value(card);
+					});
+				}
+				else{
+					target.chat(lib.skill.gushe.chat[player.storage.gushe]);
+					game.delay();
+					player.storage.gushe++;
+					player.markSkill('gushe');
+					if(player.storage.gushe>=7){
+						player.die();
+					}
+					else{
+						player.chooseToDiscard('弃置一张牌，或摸一张牌').set('ai',function(){return -1;});
+					}
+				}
+				'step 3'
+				if(!result.bool){
+					player.draw();
+				}
+			},
+			ai:{
+				order:7,
+				result:{
+					target:function(player,target){
+						var num=0;
+						for(var i=0;i<game.players.length;i++){
+							if(ai.get.attitude(player,game.players[i])<0&&game.players[i]!=player&&game.players[i].num('h')){
+								num++;
+							}
+						}
+						if(num>3) num=3;
+						var hs=player.get('h');
+						for(var i=0;i<hs.length;i++){
+							if(ai.get.value(hs[i])<=6){
+								switch(hs[i].number){
+									case 13:return -1;
+									case 12:if(player.storage.gushe+num<=8) return -1;break;
+									case 11:if(player.storage.gushe+num<=7) return -1;break;
+									default:if(hs[i].number>5&&player.storage.gushe+num<=6) return -1;
+								}
+							}
+						}
+						return 0;
+					},
+				}
+			}
+		},
+		jici:{},
+		juesi:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h','sha')>0;
+			},
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('he')>0;
+			},
+			filterCard:{name:'sha'},
+			content:function(){
+				'step 0'
+				target.chooseToDiscard('he',true);
+				'step 1'
+				if(target.hp>=player.hp&&result.bool&&result.cards[0].name!='sha'){
+					player.useCard({name:'juedou'},target);
+				}
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						if(ai.get.effect(target,{name:'juedou'},player,player)<=0){
+							return 0;
+						}
+						if(target.hp<player.hp){
+							if(player.num('h')>player.hp) return -0.1;
+							return 0;
+						}
+						var hs1=target.get('h','sha');
+						var hs2=player.get('h','sha');
+						if(hs1.length-1>hs2.length+1){
+							return 0;
+						}
+						if(hs1.length-1>hs2.length&&(!hs2.length||hs1[0].number>hs2[0].number)){
+							return 0;
+						}
+						return -1;
+					}
+				}
+			}
+		},
 		shefu:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -815,13 +1049,13 @@ character.sp={
 				else{
 					player.chooseTarget('选择一个出杀目标',function(card,player,target){
 						return lib.filter.targetEnabled({name:'sha'},player,target);
-					}).set('ai',function(target){
+					},true).set('ai',function(target){
 						return ai.get.effect(target,{name:'sha'},_status.event.player);
 					});
 					event.sha=true;
 				}
 				'step 2'
-				if(event.sha){
+				if(event.sha&&result.targets&&result.targets.length){
 					player.useCard({name:'sha'},result.targets);
 				}
 			}
@@ -959,7 +1193,7 @@ character.sp={
 				'step 0'
 				player.chooseToCompare(target);
 				'step 1'
-				if(result.bool){
+				if(result.bool&&result.target){
 					event.type=true;
 					event.card=result.target;
 					player.chooseTarget('将'+get.translation(result.target)+'交给一名角色',function(card,player,target){
@@ -5976,16 +6210,18 @@ character.sp={
 		guansuo:'关索',
 		tadun:'蹋顿',
 		yanbaihu:'严白虎',
+		wanglang:'王朗',
 
 		juesi:'决死',
 		juesi_info:'出牌阶段，你可以弃置一张杀并选择你攻击范围内的一名有牌的其他角色，该角色弃置一张牌，然后若弃置的牌不是杀且你的体力值不大于该角色，你视为对其使用决斗',
 		zhenlue:'缜略',
-		zhenlue_info:'锁定技，你使用的非延时类锦囊牌不能被无懈可击响应；你不能被选择为延时类锦囊牌的目标',
+		zhenlue_info:'锁定技，你使用的非延时类锦囊牌不能被无懈可击响应；你不能成为其他角色的延时类锦囊的目标',
 		jianshu:'间书',
 		jianshu_info:'限定技，出牌阶段，你可以将一张黑色手牌交给一名其他角色，并选择一名攻击范围内含有其的另一名其他角色，然后令这两名角色拼点，赢的角色弃置两张牌，没赢的角色失去一点体力',
 		yongdi:'拥嫡',
 		yongdi_info:'限定技，当你受到伤害后，你可令一名其他男性角色增加一点体力上限，然后若该角色的武将牌上有主公技且其不为主公，其获得此主公技',
 		gushe:'鼓舌',
+		gushe_bg:'舌',
 		gushe_info:'出牌阶段限一次，你可以用一张手牌与至多三名角色同时拼点，然后依次结算拼点结果，没赢的角色选择一项：1.弃置一张牌；2.令你摸一张牌。若拼点没赢的角色是你，你需先获得一个“饶舌”标记（你有7个饶舌标记时，你死亡）',
 		jici:'激词',
 		jici_info:'当你发动“鼓舌”拼点的牌亮出后，若点数小于X，你可令点数+X；若点数等于X，你可令你本回合发动“鼓舌”的次数上限+1（X为你“饶舌”标记的数量）',

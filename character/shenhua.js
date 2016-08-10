@@ -3052,7 +3052,8 @@ character.shenhua={
 		},
 		huangtian:{
 			unique:true,
-			global:'huangtian2'
+			global:'huangtian2',
+			zhuSkill:true
 		},
 		huangtian2:{
 			audio:2,
