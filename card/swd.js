@@ -1347,6 +1347,243 @@ card.swd={
 		},
 	},
 	skill:{
+		_qinglongzhigui:{
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('h','qinglongzhigui')>0;
+			},
+			content:function(){
+				trigger.num+=2;
+			}
+		},
+		_baishouzhihu:{
+			trigger:{player:'discardEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h','baishouzhihu')>0;
+			},
+			content:function(){
+				"step 0"
+				player.chooseTarget([1,1],'是否发动【白兽之琥】？',function(card,player,target){
+					if(player==target) return false;
+					return target.num('he')>0;
+				}).ai=function(target){
+					return -ai.get.attitude(player,target);
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('_baishouzhihu',result.targets);
+					player.discardPlayerCard(result.targets[0],'he',true);
+				}
+				else{
+					event.finish();
+				}
+			},
+		},
+		_zhuquezhizhang:{
+			trigger:{player:'damageEnd'},
+			filter:function(event,player){
+				return event.source&&event.source.isAlive()&&player.num('h','zhuquezhizhang')>0;
+			},
+			logTarget:'source',
+			check:function(event,player){
+				return ai.get.damageEffect(event.source,player,player,'fire')>0;
+			},
+			content:function(){
+				trigger.source.damage('fire');
+				game.delay();
+			}
+		},
+		_xuanwuzhihuang:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			filter:function(event,player){
+				return player.num('h','xuanwuzhihuang')>0&&event.num>0&&player.hp<player.maxHp;
+			},
+			content:function(){
+				player.recover(trigger.num);
+			}
+		},
+		_huanglinzhicong:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return !player.hujia&&player.num('h','huanglinzhicong')>0;
+			},
+			content:function(){
+				player.changeHujia();
+				player.update();
+			},
+		},
+		_cangchizhibi:{
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h','cangchizhibi')>0;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget([1,3],'是否发动【苍螭之璧】？').ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(target.isLinked()){
+						return att;
+					}
+					return -att;
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('_cangchizhibi',result.targets);
+					for(var i=0;i<result.targets.length;i++){
+						result.targets[i].link();
+					}
+				}
+			}
+		},
+		cangchizhibi_equip1:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否发动【灵枢】？').ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(target.isLinked()){
+						return att;
+					}
+					return -att;
+				};
+				'step 1'
+				if(result.bool){
+					player.logSkill('cangchizhibi_equip1',result.targets);
+					result.targets[0].link();
+				}
+			}
+		},
+		cangchizhibi_equip2:{
+			inherit:'cangchizhibi_equip1'
+		},
+		cangchizhibi_equip3:{
+			inherit:'cangchizhibi_equip1'
+		},
+		cangchizhibi_equip4:{
+			inherit:'cangchizhibi_equip1'
+		},
+		cangchizhibi_equip5:{
+			inherit:'cangchizhibi_equip1'
+		},
+		huanglinzhicong_equip1:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he',{color:'black'})>0&&player.hujia==0
+			},
+			content:function(){
+				'step 0'
+				var next=player.chooseToDiscard('he',{color:'black'},'是否发动【玄甲】？');
+				next.ai=function(card){
+					return 8-ai.get.value(card);
+				};
+				next.logSkill='huanglinzhicong_equip1'
+				'step 1'
+				if(result.bool){
+					player.changeHujia();
+				}
+			}
+		},
+		huanglinzhicong_equip2:{
+			inherit:'huanglinzhicong_equip1'
+		},
+		huanglinzhicong_equip3:{
+			inherit:'huanglinzhicong_equip1'
+		},
+		huanglinzhicong_equip4:{
+			inherit:'huanglinzhicong_equip1'
+		},
+		huanglinzhicong_equip5:{
+			inherit:'huanglinzhicong_equip1'
+		},
+		xuanwuzhihuang_equip1:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he',{suit:'spade'})>0&&player.hp<player.maxHp;
+			},
+			content:function(){
+				'step 0'
+				var next=player.chooseToDiscard('he',{suit:'spade'},'是否发动【寒晶】？');
+				next.ai=function(card){
+					return 8-ai.get.value(card);
+				};
+				next.logSkill='xuanwuzhihuang_equip1'
+				'step 1'
+				if(result.bool){
+					player.recover();
+				}
+			}
+		},
+		xuanwuzhihuang_equip2:{
+			inherit:'xuanwuzhihuang_equip1'
+		},
+		xuanwuzhihuang_equip3:{
+			inherit:'xuanwuzhihuang_equip1'
+		},
+		xuanwuzhihuang_equip4:{
+			inherit:'xuanwuzhihuang_equip1'
+		},
+		xuanwuzhihuang_equip5:{
+			inherit:'xuanwuzhihuang_equip1'
+		},
+		zhuquezhizhang_equip1:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he',{color:'red'})>0;
+			},
+			content:function(){
+				"step 0"
+				player.chooseCardTarget({
+					position:'he',
+					filterTarget:function(card,player,target){
+						return player!=target&&target.hp>=player.hp;
+					},
+					filterCard:function(card){
+						return get.color(card)=='red';
+					},
+					ai1:function(card){
+						return 9-ai.get.value(card);
+					},
+					ai2:function(target){
+						return ai.get.damageEffect(target,player,player,'fire');
+					},
+					prompt:'是否发动【炽翎】？'
+				});
+				"step 1"
+				if(result.bool){
+					event.target=result.targets[0];
+					player.logSkill('zhuquezhizhang_equip1',event.target,'fire');
+					player.discard(result.cards);
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(event.target){
+					event.target.damage('fire');
+				}
+			},
+		},
+		zhuquezhizhang_equip2:{
+			inherit:'zhuquezhizhang_equip1'
+		},
+		zhuquezhizhang_equip3:{
+			inherit:'zhuquezhizhang_equip1'
+		},
+		zhuquezhizhang_equip4:{
+			inherit:'zhuquezhizhang_equip1'
+		},
+		zhuquezhizhang_equip5:{
+			inherit:'zhuquezhizhang_equip1'
+		},
 		baishouzhihu_equip1:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -2543,7 +2780,6 @@ card.swd={
 				}
 				var str='';
 				for(var i=0;i<lingjians.length;i++){
-
 						var color;
 						var type=get.type(lingjians[i]);
 						if(type=='jiqi'){
@@ -2621,6 +2857,7 @@ card.swd={
 				if(lib.card[name]) return name;
 				lib.card[name]={};
 				lib.card[name].cardimage=equip.name;
+				lib.card[name].vanish=true;
 				for(var i in lib.card[equip.name]){
 					if(i=='ai'){
 						lib.card[name][i]={};
@@ -2717,9 +2954,11 @@ card.swd={
 					str2=str2.slice(0,str2.length-1);
 				}
 				for(var i=0;i<cards.length;i++){
+					for(var j=1;j<=5;j++){
+						lib.translate[cards[i].name+'_equip'+j]=lib.translate[cards[i].name+'_duanzao'];
+					}
 					var name2=cards[i].name+'_'+get.subtype(equip);
 					lib.card[name].skills.add(name2);
-					lib.translate[name2]=lib.translate[cards[i].name+'_duanzao'];
 					str2+='；'+lib.translate[name2+'_info'];
 				}
 				lib.translate[name+'_info']=str2;
@@ -3339,6 +3578,7 @@ card.swd={
 		jiguan:'机关',
 		jiqi:'祭器',
 		qinglongzhigui:'青龙之圭',
+		_qinglongzhigui:'青龙之圭',
 		qinglongzhigui_info:'可用于煅造装备；此牌在你手牌中时，你摸牌阶段摸牌数+2',
 		qinglongzhigui_duanzao:'云屏',
 		qinglongzhigui_equip1_info:'回合结束阶段，你摸一张牌',
@@ -3347,6 +3587,7 @@ card.swd={
 		qinglongzhigui_equip4_info:'回合结束阶段，你摸一张牌',
 		qinglongzhigui_equip5_info:'回合结束阶段，你摸一张牌',
 		baishouzhihu:'白兽之琥',
+		_baishouzhihu:'白兽之琥',
 		baishouzhihu_info:'可用于煅造装备；此牌在你手牌中时，每当你弃置卡牌，你可以弃置一名其他角色的一张牌',
 		baishouzhihu_duanzao:'风牙',
 		baishouzhihu_equip1_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
@@ -3355,6 +3596,7 @@ card.swd={
 		baishouzhihu_equip4_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
 		baishouzhihu_equip5_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
 		zhuquezhizhang:'朱雀之璋',
+		_zhuquezhizhang:'朱雀之璋',
 		zhuquezhizhang_info:'可用于煅造装备；此牌在你手牌中时，每当你受到伤害，你对伤害来源造成一点火属性伤害',
 		zhuquezhizhang_duanzao:'炽翎',
 		zhuquezhizhang_equip1_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
@@ -3363,11 +3605,33 @@ card.swd={
 		zhuquezhizhang_equip4_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
 		zhuquezhizhang_equip5_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
 		xuanwuzhihuang:'玄武之璜',
-		xuanwuzhihuang_info:'可用于煅造装备',
+		_xuanwuzhihuang:'玄武之璜',
+		xuanwuzhihuang_duanzao:'寒晶',
+		xuanwuzhihuang_info:'可用于煅造装备；此牌在你手牌中时，每当你造成伤害，你回复等量的体力',
+		xuanwuzhihuang_equip1_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
+		xuanwuzhihuang_equip2_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
+		xuanwuzhihuang_equip3_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
+		xuanwuzhihuang_equip4_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
+		xuanwuzhihuang_equip5_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
 		huanglinzhicong:'黄麟之琮',
-		huanglinzhicong_info:'可用于煅造装备',
+		_huanglinzhicong:'黄麟之琮',
+		huanglinzhicong_duanzao:'玄甲',
+		huanglinzhicong_info:'可用于煅造装备；此牌在你手牌中时，回合开始阶段，若你没有护甲，你获得一点护甲',
+		huanglinzhicong_equip1_info:'回合结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
+		huanglinzhicong_equip2_info:'回合结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
+		huanglinzhicong_equip3_info:'回合结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
+		huanglinzhicong_equip4_info:'回合结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
+		huanglinzhicong_equip5_info:'回合结束阶段，若你没有护甲，你可以弃置一张黑色牌并获得一点护甲',
 		cangchizhibi:'苍螭之璧',
-		cangchizhibi_info:'可煅造装备',
+		_cangchizhibi:'苍螭之璧',
+		cangchizhibi_duanzao:'灵枢',
+		cangchizhibi_info:'可用于煅造装备；此牌在你手牌中时，回合开始阶段，你可以选择至多3名角色横置或重置之',
+		cangchizhibi_equip1_info:'回合结束阶段，你可以横置或重置一名角色',
+		cangchizhibi_equip2_info:'回合结束阶段，你可以横置或重置一名角色',
+		cangchizhibi_equip3_info:'回合结束阶段，你可以横置或重置一名角色',
+		cangchizhibi_equip4_info:'回合结束阶段，你可以横置或重置一名角色',
+		cangchizhibi_equip5_info:'回合结束阶段，你可以横置或重置一名角色',
+
 		guisheqi:'龟蛇旗',
 		guisheqi_info:'出牌阶段对一名角色使用，目标获得一点护甲',
 		jiguanfeng:'机关蜂',
@@ -3690,5 +3954,12 @@ card.swd={
 		['club',13,'shennongding'],
 		['heart',13,'nvwashi'],
 		['heart',13,'kongdongyin'],
+
+		['heart',6,'qinglongzhigui'],
+		['diamond',6,'zhuquezhizhang'],
+		['spade',6,'baishouzhihu'],
+		['club',6,'xuanwuzhihuang'],
+		['spade',7,'cangchizhibi'],
+		['heart',5,'huanglinzhicong'],
 	],
 }

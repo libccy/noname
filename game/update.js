@@ -22,6 +22,7 @@ window.noname_update={
             'card/extra.js',
             'card/swd.js',
             'card/standard.js',
+            'card/sp.js',
             'card/hearth.js',
             'mode/guozhan.js',
             'mode/identity.js',

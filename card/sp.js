@@ -215,7 +215,12 @@ card.sp={
 				return get.color(event.cards[0])=='black';
 			},
 			content:function(){
+				'step 0'
 				player.chooseToUse('是否发动【银月枪】？',{name:'sha'}).logSkill='yinyueqiang';
+				'step 1'
+				if(result.bool){
+					game.delay();
+				}
 			}
 		},
 		muniu_skill:{
@@ -396,6 +401,7 @@ card.sp={
 				check:function(button){
 					if(button.link.name=='du') return -2;
 					var player=_status.event.player;
+					if(button.link.name=='xingjiegoutong'&&player.num('h')>1) return -2;
 					if(get.select(get.info(button.link).selectTarget)[1]==-1){
 						if(get.type(button.link)=='delay') return -1;
 						if(get.type(button.link)=='equip'){

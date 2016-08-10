@@ -485,7 +485,7 @@ character.gujian={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.maxHp>player.hp;
+				return player.maxHp>player.hp&&player.num('he',{color:'red'})>0;
 			},
 			content:function(){
 				"step 0"
