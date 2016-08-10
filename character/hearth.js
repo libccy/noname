@@ -1589,6 +1589,7 @@ character.hearth={
 				}
 			},
 			ai:{
+				maixie:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){

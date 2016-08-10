@@ -61,7 +61,7 @@
         devURL:'https://rawgit.com/libccy/noname/master/',
 		assetURL:'',
         hallURL:'websha.cn',
-        reserveSkillName:['others'],
+        reserveSkillName:['others','zhu'],
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -4846,16 +4846,23 @@
                             }
                             if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&event.state>0){
                                 var triggerevent=event.getTrigger();
-                                if(ui.tempnowuxie._origin==triggerevent.parent.id){
+                                if(triggerevent){
+                                    if(ui.tempnowuxie._origin==triggerevent.parent.id){
+                                        event.result={
+                                            bool:false
+                                        }
+                                        if(triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
+                                            ui.tempnowuxie.close();
+                                        }
+                                        return;
+                                    }
+                                }
+                                else if(ui.tempnowuxie._origin==_status.event.id2){
                                     event.result={
                                         bool:false
                                     }
-                                    if(triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
-                                        ui.tempnowuxie.close();
-                                    }
                                     return;
                                 }
-
                             }
                             if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
                                 var tw=event.getTrigger().parent;
@@ -8083,6 +8090,9 @@
 							else if(this.additionalSkills[i]&&typeof this.additionalSkills[i]=='string'){
 								skills.add(this.additionalSkills[i]);
 							}
+                            else if(typeof this.additionalSkills[i]=='function'){
+                                skills.addArray(this.additionalSkills[i](this));
+                            }
 						}
 						if(arg2) skills=skills.concat(this.hiddenSkills);
 						if(arg3!==false){
@@ -10175,6 +10185,20 @@
 				hasSkill:function(skill){
 					return game.expandSkills(this.get('s')).contains(skill);
 				},
+                hasZhuSkill:function(skill,player){
+                    if(!this.hasSkill(skill)) return false;
+                    var mode=get.mode();
+                    if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+                        if(mode!='identity'){
+                            if(player&&this.side!=player.side) return false;
+                        }
+                        if(this.isZhu) return true;
+                        for(var i in this.storage){
+                            if(i.indexOf('zhuSkill_')==0&&this.storage[i].contains(skill)) return true;
+                        }
+                    }
+                    return false;
+                },
 				hasSkillTag:function(tag,hidden){
 					var skills=game.expandSkills(this.get('s',hidden));
 					for(var i=0;i<skills.length;i++){
@@ -31660,11 +31684,17 @@
     lib.game=game;
     lib.init.init();
 		HTMLDivElement.prototype.animate=function(name,time){
-			this.classList.add(name);
-			var that=this;
-			setTimeout(function(){
-				that.classList.remove(name);
-			},time||1000);
+            var that;
+            if(lib.isMobileMe(this)&&name=='target'){
+                that=ui.mebg;
+            }
+            else{
+    			that=this;
+            }
+            that.classList.add(name);
+            setTimeout(function(){
+                that.classList.remove(name);
+            },time||1000);
 			return this;
 		};
 		HTMLDivElement.prototype.hide=function(){
@@ -31871,6 +31901,12 @@
 			}
 			return this;
 		};
+        Array.prototype.addArray=function(arr){
+            for(var i=0;i<arr.length;i++){
+                this.add(arr[i]);
+            }
+            return this;
+        };
 		Array.prototype.remove=function(item){
 			if(get.objtype(item)=='array'){
 				for(var i=0;i<item.length;i++) this.remove(item[i]);

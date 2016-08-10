@@ -45,10 +45,11 @@ character.standard={
 		hujia:{
 			audio:2,
 			unique:true,
+			zhuSkill:true,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
-				if(!player.isZhu) return false;
+				if(!player.hasZhuSkill('jianxiong')) return false;
 				if(event.filterCard({name:'shan'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='wei') return true;
@@ -555,6 +556,7 @@ character.standard={
 		jijiang:{
 			unique:true,
 			group:['jijiang1','jijiang2'],
+			zhuSkill:true,
 		},
 		jijiang1:{
 			audio:2,
@@ -562,7 +564,7 @@ character.standard={
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
-				if(!player.isZhu) return false;
+				if(!player.hasZhuSkill('jijiang')) return false;
 				if(event.filterCard({name:'sha'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='shu') return true;
@@ -617,7 +619,7 @@ character.standard={
 			enable:'chooseToUse',
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
-				if(!player.isZhu) return false;
+				if(!player.hasZhuSkill('jijiang')) return false;
 				if(player.skills.contains('jijiang3')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].group=='shu'&&game.players[i]!=player){
@@ -1082,10 +1084,11 @@ character.standard={
 			audio:2,
 			unique:true,
 			trigger:{target:'taoBegin'},
+			zhuSkill:true,
 			forced:true,
 			filter:function(event,player){
 				if(event.player==player) return false;
-				if(!player.isZhu) return false;
+				if(!player.hasZhuSkill('jiuyuan')) return false;
 				if(player.hp>0) return false;
 				if(event.player.group!='wu') return false;
 				return true;

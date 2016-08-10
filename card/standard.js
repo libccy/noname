@@ -829,6 +829,13 @@ card.standard={
 						if(hs1.length>hs2.length+1){
 							return -2;
 						}
+						var hsx=target.get('h');
+						if(hsx.length>2&&hs2.length==0&&hsx[0].number<6){
+							return -2;
+						}
+						if(hsx.length>3&&hs2.length==0){
+							return -2;
+						}
 						if(hs1.length>hs2.length&&(!hs2.length||hs1[0].number>hs2[0].number)){
 							return -2;
 						}
@@ -1613,7 +1620,8 @@ card.standard={
 						},
 						source:target,
 						source2:targets,
-						id:id
+						id:id,
+						id2:id2
 					});
 					if(game.online){
 						_status.event._resultid=id;

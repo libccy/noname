@@ -2353,21 +2353,19 @@ character.yijiang={
 		},
 		zhaofu:{
 			unique:true,
-			global:'zhaofu2'
+			global:'zhaofu2',
+			zhuSkill:true
 		},
 		zhaofu2:{
 			mod:{
 				attackTo:function(from,to,distance){
 					if(from.group!='wu') return;
-					var zhu;
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isZhu&&game.players[i].skills.contains('zhaofu')){
-							zhu=game.players[i];break;
+						if(from!=game.players[i]&&to!=game.players[i]&&
+							game.players[i].hasZhuSkill('zhaofu',from)){
+							if(get.distance(game.players[i],to)<=1) return distance-100;
 						}
 					}
-					if(!zhu) return;
-					if(from==zhu||to==zhu) return;
-					if(get.distance(zhu,to)<=1) return distance-100;
 				}
 			}
 		},
@@ -2741,13 +2739,14 @@ character.yijiang={
 		qinwang:{
 			unique:true,
 			group:['qinwang1','qinwang2'],
+			zhuSkill:true
 		},
 		qinwang1:{
 			audio:2,
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
-				if(!player.isZhu) return false;
+				if(!player.hasZhuSkill('qinwang')) return false;
 				if(!player.num('he')) return false;
 				if(event.filterCard({name:'sha'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
@@ -2821,7 +2820,7 @@ character.yijiang={
 			enable:'chooseToUse',
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
-				if(!player.isZhu) return false;
+				if(!player.hasZhuSkill('qinwang')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].group=='shu'&&game.players[i]!=player){
 						return lib.filter.cardUsable({name:'sha'},player);
@@ -3301,17 +3300,18 @@ character.yijiang={
 			audio:2,
 			trigger:{player:'dying'},
 			priority:6,
+			zhuSkill:true,
 			filter:function(event,player){
 				if(player.storage.xingshuai) return false;
 				if(player.hp>0) return false;
-				if(!player.isZhu) return false;
+				if(!player.hasZhuSkill('xingshuai')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='wei') return true;
 				}
 				return false;
 			},
 			init:function(player){
-				if(player.isZhu){
+				if(player.hasZhuSkill('xingshuai')){
 					player.markSkill('xingshuai');
 					player.storage.xingshuai=false;
 				}

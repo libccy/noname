@@ -126,7 +126,6 @@ mode.guozhan={
 			for(var i in map){
 				if(map[i].length<2){
 					if(map[i].length==1){
-						console.log(map[i][0]);
 						choice.remove(map[i][0]);
 						list.push(map[i][0]);
 					}

@@ -335,7 +335,6 @@ card.swd={
 						if(target==players[0]) return 2;
 						return 0.5;
 					},
-					player:1,
 				},
 			}
 		},
@@ -794,16 +793,14 @@ card.swd={
 		},
 		xianluhui:{
 			fullskin:true,
-			type:'basic',
+			type:'trick',
 			enable:true,
 			selectTarget:-1,
-			filterTarget:true,
-			targetDelay:false,
-			content:function(){
-				target.recover();
+			filterTarget:function(card,player,target){
+				return target.isDamaged();
 			},
-			contentAfter:function(){
-				game.asyncDraw(targets);
+			content:function(){
+				target.draw(Math.min(3,target.maxHp-target.hp));
 			},
 			ai:{
 				basic:{
@@ -813,12 +810,9 @@ card.swd={
 				},
 				result:{
 					target:function(player,target){
-						target.hp<target.maxHp?2:1;
+						Math.min(3,target.maxHp-target.hp)
 					},
 				},
-				tag:{
-					recover:1
-				}
 			}
 		},
 		xiangyuye:{
@@ -3519,7 +3513,7 @@ card.swd={
 		pusafazhou_bg:'发',
 		// pusafazhou_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌',
 		xianluhui:'仙炉灰',
-		xianluhui_info:'令所有角色回复一点体力并摸一张牌',
+		xianluhui_info:'令所有已受伤角色摸数量等同于其已损失体力值的牌（最多3张）',
 		caoyao:'草药',
 		caoyao_info:'出牌阶段，对距离为1以内的角色使用，回复一点体力。',
 		pantao:'蟠桃',

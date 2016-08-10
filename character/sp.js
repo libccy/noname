@@ -7,7 +7,7 @@ character.sp={
 		caohong:['male','wei',4,['yuanhu']],
 		xiahouba:['male','shu',4,['baobian']],
 		gongsunzan:['male','qun',4,['yicong']],
-		yuanshu:['male','qun',4,['yongsi']],
+		yuanshu:['male','qun',4,['yongsi','weidi']],
 		sp_diaochan:['female','qun',3,['lihun','biyue']],
 		sp_zhaoyun:['male','qun',3,['longdan','chongzhen']],
 		jsp_zhaoyun:['male','qun',3,['chixin','yicong','suiren']],
@@ -85,6 +85,26 @@ character.sp={
 		guansuo:['guanyu'],
 	},
 	skill:{
+		weidi:{
+			init:function(player){
+				var mode=get.mode();
+				if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+					player.additionalSkills.weidi=function(player){
+						var list=[];
+						var zhu=get.zhu(player);
+						if(zhu&&zhu!=player&&zhu.skills){
+							for(var i=0;i<zhu.skills.length;i++){
+								if(lib.skill[zhu.skills[i]]&&lib.skill[zhu.skills[i]].zhuSkill){
+									list.push(zhu.skills[i]);
+								}
+							}
+						}
+						player.storage.zhuSkill_weidi=list;
+						return list;
+					}
+				}
+			}
+		},
 		zhenlue:{
 			mod:{
 				targetEnabled:function(card,player,target){
@@ -174,11 +194,48 @@ character.sp={
 					return target.sex=='male';
 				}).set('ai',function(target){
 					if(!_status.event.goon) return 0;
+					var player=_status.event.player;
 					var att=ai.get.attitude(player,target);
 					if(att<=1) return 0;
-					if(target.disabledSkills.zhu&&!target.isZhu) return att*2;
+					var mode=get.mode();
+					if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+						if(target.name&&lib.character[target.name]){
+							for(var i=0;i<lib.character[target.name][3].length;i++){
+								if(lib.skill[lib.character[target.name][3][i]].zhuSkill){
+									return att*2;
+								}
+							}
+						}
+					}
 					return att;
-				}).set('goon',player.hasUnknown());
+				}).set('goon',!player.hasUnknown());
+				'step 1'
+				if(result.bool){
+					player.unmarkSkill('yongdi');
+					player.storage.yongdi=true;
+					player.logSkill('yongdi',result.targets);
+					var target=result.targets[0];
+					target.gainMaxHp(true);
+					var mode=get.mode();
+					if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+						if(target.name&&lib.character[target.name]){
+							var skills=lib.character[target.name][3];
+							target.storage.zhuSkill_yongdi=[];
+							for(var i=0;i<skills.length;i++){
+								var info=lib.skill[skills[i]];
+								if(info.zhuSkill){
+									target.storage.zhuSkill_yongdi.push(skills[i]);
+									if(info.init){
+										info.init(target);
+									}
+									if(info.init2){
+										info.init2(target);
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			ai:{
 				expose:0.2
@@ -307,10 +364,17 @@ character.sp={
 						}
 						var hs1=target.get('h','sha');
 						var hs2=player.get('h','sha');
-						if(hs1.length-1>hs2.length+1){
+						if(hs1.length>hs2.length){
 							return 0;
 						}
-						if(hs1.length-1>hs2.length&&(!hs2.length||hs1[0].number>hs2[0].number)){
+						var hsx=target.get('h');
+						if(hsx.length>2&&hs2.length<=1&&hsx[0].number<6){
+							return 0;
+						}
+						if(hsx.length>3&&hs2.length<=1){
+							return 0;
+						}
+						if(hs1.length>hs2.length-1&&hs1.length>0&&(hs2.length<=1||hs1[0].number>hs2[0].number)){
 							return 0;
 						}
 						return -1;
@@ -6212,6 +6276,8 @@ character.sp={
 		yanbaihu:'严白虎',
 		wanglang:'王朗',
 
+		weidi:'伪帝',
+		weidi_info:'锁定技，你视为拥有当前主公的主公技',
 		juesi:'决死',
 		juesi_info:'出牌阶段，你可以弃置一张杀并选择你攻击范围内的一名有牌的其他角色，该角色弃置一张牌，然后若弃置的牌不是杀且你的体力值不大于该角色，你视为对其使用决斗',
 		zhenlue:'缜略',

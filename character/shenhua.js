@@ -35,7 +35,7 @@ character.shenhua={
 		liushan:['male','shu',3,['xiangle','fangquan','ruoyu'],['zhu']],
 		zhanghe:['male','wei',4,['qiaobian']],
 		dengai:['male','wei',4,['tuntian','zaoxian']],
-		sunce:['male','wu',4,['jiang','hunzi','zhiba'],['zhu','fullskin']],
+		sunce:['male','wu',4,['jiang','hunzi','zhiba'],['zhu']],
 		zhangzhang:['male','wu',3,['zhijian','guzheng']],
 		caiwenji:['female','qun',3,['beige','duanchang']],
 		zuoci:['male','qun',3,['huashen','xinsheng']],
@@ -216,10 +216,11 @@ character.shenhua={
 			skillAnimation:true,
 			audio:2,
 			unique:true,
+			zhuSkill:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				if(!player.isZhu)return false;
+				if(!player.hasZhuSkill('ruoyu'))return false;
 				if(player.storage.ruoyu) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].hp<player.hp) return false;
@@ -231,7 +232,15 @@ character.shenhua={
 				player.maxHp++;
 				player.update();
 				player.recover();
-				player.addSkill('jijiang');
+				if(player.skills.contains('ruoyu')){
+					player.addSkill('jijiang');
+				}
+				else{
+					player.additionalSkills.ruoyu='jijiang';
+				}
+				if(!player.isZhu){
+					player.storage.zhuSkill_ruoyu=['jijiang'];
+				}
 			}
 		},
 		qiaobian:{
@@ -675,6 +684,7 @@ character.shenhua={
 				player.addSkill('reyingzi');
 				delete player.tempSkills.yinghun;
 				player.removeSkill('hunzi');
+				player.storage.hunzi=true;
 			},
 			ai:{
 				threaten:function(player,target){
@@ -712,22 +722,37 @@ character.shenhua={
 		zhiba:{
 			unique:true,
 			global:'zhiba2',
+			zhuSkill:true,
 		},
 		zhiba2:{
 			audio:2,
 			forceaudio:true,
 			enable:'phaseUse',
 			filter:function(event,player){
-				var zhu=get.zhu('zhiba');
-				if(!zhu) return false;
-				return (player!=zhu&&player.group=='wu'&&player.num('h')>0&&zhu.num('h')>0);
+				if(player.group!='wu'||player.num('h')==0) return false;
+				return game.hasPlayer(function(target){
+					return target!=player&&target.hasZhuSkill('zhiba',player)&&target.num('h')>0;
+				});
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&target.isZhu&&target.get('s').contains('zhiba');
+				return target!=player&&target.hasZhuSkill('zhiba',player)&&target.num('h')>0;
 			},
 			usable:1,
 			content:function(){
 				"step 0"
+				if(target.storage.hunzi){
+					target.chooseBool('是否拒绝制霸拼点？').set('choice',ai.get.attitude(target,player)<=0);
+				}
+				else{
+					event.forced=true;
+				}
+				"step 1"
+				if(!event.forced&&!result.bool){
+					game.log(target,'拒绝了拼点');
+					target.chat('拒绝');
+					event.finish();
+					return;
+				}
 				player.chooseToCompare(target,function(card){
 					if(card.name=='du') return 20;
 					var player=get.owner(card);
@@ -737,7 +762,7 @@ character.shenhua={
 					}
 					return get.number(card);
 				});
-				"step 1"
+				"step 2"
 				if(result.bool==false){
 					target.gain([result.player,result.target]);
 					target.$gain2([result.player,result.target]);
@@ -1462,21 +1487,44 @@ character.shenhua={
 		songwei:{
 			unique:true,
 			global:'songwei2',
+			zhuSkill:true,
 		},
 		songwei2:{
 			audio:2,
 			forceaudio:true,
 			trigger:{player:'judgeEnd'},
 			filter:function(event,player){
-				var zhu=get.zhu('songwei');
-				if(!zhu) return false;
-				return (player!=zhu&&player.group=='wei'&&get.color(event.result.card)=='black');
+				if(player.group!='wei') return false;
+				if(get.color(event.result.card)!='black') return false;
+				return game.hasPlayer(function(target){
+					return player!=target&&target.hasZhuSkill('songwei',player);
+				});
 			},
-			check:function(event,player){
-				return ai.get.attitude(player,get.zhu('songwei'))>0;
-			},
+			direct:true,
 			content:function(){
-				get.zhu('songwei').draw();
+				'step 0'
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].hasZhuSkill('songwei',player)){
+						list.push(game.players[i]);
+					}
+				}
+				event.list=list;
+				'step 1'
+				if(event.list.length){
+					var current=event.list.shift();
+					event.current=current;
+					player.chooseBool('是否对'+get.translation(current)+'发动【颂威】？').set('choice',ai.get.attitude(player,current)>0);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					player.logSkill('songwei',event.current);
+					event.current.draw();
+				}
+				event.goto(1);
 			}
 		},
 		duanliang:{
@@ -1840,35 +1888,54 @@ character.shenhua={
 		},
 		baonue:{
 			unique:true,
-			global:'baonue2'
+			global:'baonue2',
+			zhuSkill:true,
 		},
 		baonue2:{
 			audio:2,
 			forceaudio:true,
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
-				var zhu=get.zhu('baonue');
-				if(!zhu) return false;
-				return (player!=zhu&&player.group=='qun'&&zhu.hp<zhu.maxHp);
+				if(player.group!='qun') return false;
+				return game.hasPlayer(function(target){
+					return player!=target&&target.hp<target.maxHp&&target.hasZhuSkill('baonue',player);
+				});
 			},
-			check:function(event,player){
-				var zhu=get.zhu('baonue');
-				if(!zhu) return false;
-				return ai.get.attitude(player,zhu)>0;
-			},
+			direct:true,
 			content:function(){
-				"step 0"
-				player.judge(function(card){
-					if(get.suit(card)=='spade') return 4;
-					return 0;
-				})
-				"step 1"
-				if(result.bool){
-					var zhu=get.zhu('baonue');
-					if(zhu){
-						zhu.recover();
+				'step 0'
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].hp<game.players[i].maxHp&&game.players[i].hasZhuSkill('baonue',player)){
+						list.push(game.players[i]);
 					}
 				}
+				event.list=list;
+				'step 1'
+				if(event.list.length){
+					var current=event.list.shift();
+					event.current=current;
+					player.chooseBool('是否对'+get.translation(current)+'发动【暴虐】？').set('choice',ai.get.attitude(player,current)>0);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					player.logSkill('baonue',event.current);
+					player.judge(function(card){
+						if(get.suit(card)=='spade') return 4;
+						return 0;
+					});
+				}
+				else{
+					event.goto(1);
+				}
+				'step 3'
+				if(result.suit=='spade'){
+					event.current.recover();
+				}
+				event.goto(1);
 			}
 		},
 		luanwu:{
@@ -2435,14 +2502,15 @@ character.shenhua={
 		xueyi:{
 			mod:{
 				maxHandcard:function(player,num){
-					if(player.isZhu){
+					if(player.hasZhuSkill('xueyi')){
 						for(var i=0;i<game.players.length;i++){
 							if(player!=game.players[i]&&game.players[i].group=='qun') num+=2;
 						}
 					}
 					return num;
 				}
-			}
+			},
+			zhuSkill:true,
 		},
 		mengjin:{
 			audio:2,
@@ -3053,7 +3121,7 @@ character.shenhua={
 		huangtian:{
 			unique:true,
 			global:'huangtian2',
-			zhuSkill:true
+			zhuSkill:true,
 		},
 		huangtian2:{
 			audio:2,
@@ -3064,16 +3132,17 @@ character.shenhua={
 				player.$give(cards,targets[0]);
 			},
 			filter:function(event,player){
-				var zhu=get.zhu('huangtian');
-				if(!zhu) return false;
-				return (player!=zhu&&player.group=='qun'&&
-				(player.num('h','shan')+player.num('h','shandian')>0))
+				if(player.group!='qun') return false;
+				if(player.num('h','shan')+player.num('h','shandian')==0) return 0;
+				return game.hasPlayer(function(target){
+					return target!=player&&target.hasZhuSkill('huangtian',player);
+				});
 			},
 			filterCard:function(card){
 				return (card.name=='shan'||card.name=='shandian')
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&target.isZhu&&target.get('s').contains('huangtian');
+				return target!=player&&target.hasZhuSkill('huangtian',player);
 			},
 			usable:1,
 			forceaudio:true,

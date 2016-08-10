@@ -128,6 +128,7 @@ character.xianjian={
 				if(ai.get.damageEffect(player,event.player,player)>=0) return false;
 				return true;
 			},
+			usable:1,
 			content:function(){
 				"step 0"
 				var goon=(ai.get.damageEffect(player,trigger.player,player)<=0);
@@ -1879,7 +1880,7 @@ character.xianjian={
 		pal_xuanxiao:'玄霄',
 
 		zhangmu:'障目',
-		zhangmu_info:'每回合限一次，当使用需要使用或打出一张闪时，你可以展示一张闪，视为使用或打出了此闪',
+		zhangmu_info:'每回合限一次，当你需要使用或打出一张闪时，你可以展示一张闪，视为使用或打出了此闪',
 		feizhua:'飞爪',
 		feizhua_info:'当你使用一张杀时，你可以将目标两侧的角色追加为额外目标',
 		leiyu:'雷狱',
