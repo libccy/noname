@@ -515,7 +515,7 @@ character.shenhua={
 			filter:function(event,player){
 				if(player==_status.currentPhase) return false;
 				for(var i=0;i<event.cards.length;i++){
-					if(event.cards[i].original!='j') return true;
+					if(event.cards[i].original&&event.cards[i].original!='j') return true;
 				}
 				return false;
 			},

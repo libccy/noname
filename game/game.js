@@ -3682,12 +3682,24 @@
                 if(navigator.userAgent.toLowerCase().indexOf('crosswalk')!=-1){
                     lib.crosswalk=true;
                 }
-                if(lib.device&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&!lib.crosswalk){
+                if(lib.device=='android'&&window.devicePixelRatio>1&&document.documentElement.offsetWidth<900&&!lib.crosswalk){
                     game.documentZoom=document.documentElement.offsetWidth/960;
                     game.deviceZoom=game.documentZoom;
                     document.documentElement.style.zoom=game.documentZoom;
                 }
                 else{
+                    if(lib.device=='ios'){
+                        if(document.documentElement.offsetWidth<900){
+                            var zoom=Math.round(document.documentElement.offsetWidth/96)/10;
+                            var metas=document.head.querySelectorAll('meta');
+                            for(var j=0;j<metas.length;j++){
+                                if(metas[j].name=='viewport'){
+                                    metas[j].content="user-scalable=no, initial-scale="+zoom+", maximum-scale="+zoom+", minimum-scale="+zoom+", width=device-width, height=device-height";
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     game.documentZoom=1;
                     game.deviceZoom=1;
                 }
@@ -19424,7 +19436,7 @@
 	                        active._link.remove();
 	                    }
 	                    this.classList.add('active');
-                        if((game.deviceZoom!=1||lib.crosswalk)&&lib.config.layout=='phone'){
+                        if((game.deviceZoom!=1||lib.crosswalk||lib.device=='ios')&&lib.config.layout=='phone'){
                             menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
                         }
 	                    else{

@@ -2045,7 +2045,10 @@ card.swd={
 			ai:{
 				order:10,
 				result:{
-					target:-1
+					target:function(player,target){
+						if(target.isMad()) return 0;
+						return -1;
+					}
 				}
 			}
 		},
