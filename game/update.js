@@ -19,6 +19,8 @@ window.noname_update={
             'character/refresh.js',
             'character/shenhua.js',
             'character/standard.js',
+            'character/ow.js',
+            'character/gujian.js',
             'card/extra.js',
             'card/swd.js',
             'card/standard.js',
