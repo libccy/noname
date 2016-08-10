@@ -2517,7 +2517,7 @@ card.swd={
 		},
 		hslingjian_yinmilichang_equip1:{
 			trigger:{source:'damageEnd'},
-			forced:true,
+			direct:true,
 			filter:function(event){
 				return event.card&&event.card.name=='sha';
 			},

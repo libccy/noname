@@ -31,6 +31,6 @@ window.noname_update={
             'layout/mobile/layout.css',
         ],
         '1.8.19.7':[],
-        '1.8.19.20':[],
+        '1.8.20':[],
     }
 }
