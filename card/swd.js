@@ -2929,7 +2929,9 @@ card.swd={
 				else{
 					lib.card[name].skills=[];
 				}
-				lib.card[name].filterTarget=true;
+				lib.card[name].filterTarget=function(card,player,target){
+					return !target.isMin();
+				};
 				lib.card[name].selectTarget=1;
 				lib.card[name].range={global:1};
 				var str=lib.translate[cards[0].name+'_duanzao'];
