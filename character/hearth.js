@@ -798,14 +798,14 @@ character.hearth={
 				player.draw(2);
 			}
 		},
-		maoxian_old:{
+		maoxian:{
 			enable:'phaseUse',
 			usable:2,
 			direct:true,
 			delay:false,
 			unique:true,
 			onremove:function(player){
-				delete player.additionalSkills.maoxian;
+				player.removeAdditionalSkill('maoxian');
 			},
 			content:function(){
 				'step 0'
@@ -816,12 +816,7 @@ character.hearth={
 				if(result.control){
 					game.stopCountChoose();
 					var link=result.control;
-					player.addSkill(link);
-					player.skills.remove(link);
-					if(player.additionalSkills.maoxian){
-						player.removeSkill(player.additionalSkills.maoxian);
-					}
-					player.additionalSkills.maoxian=link;
+					player.addAdditionalSkill('maoxian',link);
 					player.popup(link);
 					game.log(player,'获得了技能','【'+get.translation(link)+'】');
 					player.checkMarks();
@@ -844,7 +839,7 @@ character.hearth={
 				}
 			}
 		},
-		maoxian:{
+		maoxian_old:{
 			enable:'phaseUse',
 			usable:2,
 			direct:true,
@@ -2385,6 +2380,7 @@ character.hearth={
 		bingshi2:{
 			trigger:{global:'dieAfter'},
 			forced:true,
+			globalFixed:true,
 			filter:function(event,player){
 				return event.player.skills.contains('bingshi')&&event.player.isDead();
 			},
@@ -4583,7 +4579,7 @@ character.hearth={
 		xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各流失一点体力，然后你摸两张牌',
 		maoxian:'冒险',
 		maoxian2:'冒险',
-		maoxian_info:'出牌阶段限两次，你可以从三个来自其他存活角色的技能中选择一个作为你的技能',
+		maoxian_info:'出牌阶段限两次，你可以从三个随机技能中选择一个作为你的技能',
 		tanmi:'探秘',
 		tanmi_info:'在一名其他角色的回合结束阶段，若你没有手牌，你可以摸两张牌并进行一个出牌阶段',
 		yiwen:'轶闻',

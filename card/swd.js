@@ -2860,7 +2860,7 @@ card.swd={
 					name+=cards[0].name.slice(10);
 				}
 				else{
-					name+=cards[0].name;
+					name+='_'+cards[0].name;
 				}
 				if(lib.card[name]) return name;
 				lib.card[name]={};
@@ -2885,25 +2885,6 @@ card.swd={
 						lib.card[name][i]=lib.card[equip.name][i];
 					}
 				}
-				// if(cards.length==2){
-				// 	lib.card[name].legend=true;
-				// 	if(typeof lib.card[name].ai.equipValue=='number'){
-				// 		lib.card[name].ai.equipValue=Math.min(10,lib.card[name].ai.equipValue+3);
-				// 	}
-				// 	else if(typeof lib.card[name].ai.equipValue=='function'){
-				// 		lib.card[name].ai.equipValue=function(){
-				// 			return lib.card[equipname].ai.equipValue.apply(this,arguments)+2;
-				// 		}
-				// 	}
-				// 	else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='number'){
-				// 		lib.card[name].ai.basic.equipValue=Math.min(10,lib.card[name].ai.basic.equipValue+3);
-				// 	}
-				// 	else if(lib.card[name].ai.basic&&typeof lib.card[name].ai.basic.equipValue=='function'){
-				// 		lib.card[name].ai.basic.equipValue=function(){
-				// 			return lib.card[equipname].ai.basic.equipValue.apply(this,arguments)+2;
-				// 		}
-				// 	}
-				// }
 				if(type=='jiqi'){
 					lib.card[name].legend=true;
 				}

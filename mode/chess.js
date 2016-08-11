@@ -289,6 +289,7 @@ mode.chess={
 		_status.friendCount=_status.mylist.length;
 		while(_status.mylist.length){
 			friend=ui.create.player().animate('start');
+			friend.playerid=get.id();
 			if(!event.friendZhu){
 				event.friendZhu=friend;
 			}
@@ -319,6 +320,7 @@ mode.chess={
 		}
 		while(_status.enemylist.length){
 			enemy=ui.create.player().animate('start');
+			enemy.playerid=get.id();
 			enemy.init(_status.enemylist.shift());
 			enemy.side=!side;
 			enemy.setIdentity('enemy');
@@ -1482,6 +1484,7 @@ mode.chess={
 				num=4;
 			}
 			var player=ui.create.player();
+			player.playerid=get.id();
 			if(enemy=='treasure'){
 				player.animate('judgestart');
 				player.side=null;
@@ -4895,7 +4898,7 @@ mode.chess={
 							str+='、'+get.translation(list[i]);
 						}
 					}
-					var skill=player.additionalSkills.tongshuai;
+					var skill=player.additionalSkills.tongshuai[0];
 					if(skill){
 						str+='<p>当前技能：'+get.translation(skill);
 					}
@@ -4910,7 +4913,7 @@ mode.chess={
 					if(list.length){
 						dialog.addSmall([list,'character']);
 					}
-					var skill=player.additionalSkills.tongshuai;
+					var skill=player.additionalSkills.tongshuai[0];
 					if(skill){
 						dialog.add('<div><div class="skill">【'+get.translation(skill)+
 						'】</div><div>'+lib.translate[skill+'_info']+'</div></div>');
@@ -4994,7 +4997,7 @@ mode.chess={
 							}
 							mark.setBackground(currentname,'character');
 
-							player.additionalSkills.tongshuai=link;
+							player.addAdditionalSkill('tongshuai',link);
 							game.addVideo('chess_tongshuai_skill',player,[currentname,link]);
 							player.logSkill('tongshuai2');
 							game.log(player,'获得技能','【'+get.translation(link)+'】');

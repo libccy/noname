@@ -86,23 +86,25 @@ character.sp={
 	},
 	skill:{
 		weidi:{
-			init:function(player){
+			trigger:{global:['gameStart','zhuUpdate']},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
 				var mode=get.mode();
-				if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
-					player.additionalSkills.weidi=function(player){
-						var list=[];
-						var zhu=get.zhu(player);
-						if(zhu&&zhu!=player&&zhu.skills){
-							for(var i=0;i<zhu.skills.length;i++){
-								if(lib.skill[zhu.skills[i]]&&lib.skill[zhu.skills[i]].zhuSkill){
-									list.push(zhu.skills[i]);
-								}
-							}
+				return (mode=='identity'||(mode=='versus'&&_status.mode=='four'));
+			},
+			content:function(){
+				var list=[];
+				var zhu=get.zhu(player);
+				if(zhu&&zhu!=player&&zhu.skills){
+					for(var i=0;i<zhu.skills.length;i++){
+						if(lib.skill[zhu.skills[i]]&&lib.skill[zhu.skills[i]].zhuSkill){
+							list.push(zhu.skills[i]);
 						}
-						player.storage.zhuSkill_weidi=list;
-						return list;
 					}
 				}
+				player.addAdditionalSkill('weidi',list);
+				player.storage.zhuSkill_weidi=list;
 			}
 		},
 		zhenlue:{
@@ -191,7 +193,7 @@ character.sp={
 			content:function(){
 				'step 0'
 				player.chooseTarget('是否发动【拥嫡】？',function(card,player,target){
-					return target.sex=='male';
+					return target.sex=='male'&&target!=player;
 				}).set('ai',function(target){
 					if(!_status.event.goon) return 0;
 					var player=_status.event.player;
@@ -286,8 +288,9 @@ character.sp={
 				'step 2'
 				if(event.num1>event.num2){
 					target.chooseToDiscard('he','弃置一张牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
-						return 6-ai.get.value(card);
-					});
+						if(_status.event.goon) return 6-ai.get.value(card);
+						return 0;
+					}).set('goon',ai.get.attitude(target,player)<0);
 				}
 				else{
 					target.chat(lib.skill.gushe.chat[player.storage.gushe]);
@@ -865,7 +868,7 @@ character.sp={
 						content:'拥有技能【激昂】、【谦逊】'
 					});
 				},player);
-				player.additionalSkills.mouduan=['jiang','qianxun'];
+				player.addAdditionalSkill('mouduan',['jiang','qianxun']);
 			},
 			onremove:function(player){
 				game.broadcastAll(function(player){
@@ -874,7 +877,7 @@ character.sp={
 						delete player._mouduan_mark;
 					}
 				},player);
-				delete player.additionalSkills.mouduan;
+				player.removeAdditionalSkill('mouduan');
 			},
 			trigger:{player:'loseEnd'},
 			forced:true,
@@ -889,7 +892,7 @@ character.sp={
 					player._mouduan_mark.firstChild.innerHTML='文';
 					player._mouduan_mark.info.content='拥有技能【英姿】、【克己】';
 				},player);
-				player.additionalSkills.mouduan=['yingzi','keji'];
+				player.addAdditionalSkill('mouduan',['yingzi','keji']);
 			},
 			group:'mouduan2'
 		},
@@ -914,7 +917,7 @@ character.sp={
 						player._mouduan_mark.firstChild.innerHTML='武';
 						player._mouduan_mark.info.content='拥有技能【激昂】、【谦逊】';
 					},player);
-					player.additionalSkills.mouduan=['jiang','qianxun'];
+					player.addAdditionalSkill('mouduan',['jiang','qianxun']);
 				}
 			}
 		},

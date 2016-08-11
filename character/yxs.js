@@ -724,13 +724,6 @@ character.yxs={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.unmark(player.storage.yizhuang+'_charactermark');
-				if(player.additionalSkills.yizhuang){
-					player.removeSkill(player.additionalSkills.yizhuang);
-				}
-				delete player.storage.yizhuang;
-				delete player.additionalSkills.yizhuang;
-				player.checkMarks();
 				if(player.num('he')){
 					player.chooseCardTarget({
 						prompt:'是否发动【易装】？',
@@ -740,6 +733,7 @@ character.yxs={
 							if(target==player) return false;
 							if(target.sex!='male') return false;
 							var name=target.name.indexOf('unknown')==0?target.name2:target.name;
+							if(name==player.storage.yizhuang) return false;
 
 							var info=lib.character[name];
 							if(info){
@@ -754,6 +748,7 @@ character.yxs={
 							return false;
 						},
 						ai1:function(card){
+							if(player.additionalSkills.yizhuang&&player.additionalSkills.yizhuang.length>0) return 0;
 							return 7-ai.get.value(card);
 						},
 						ai2:function(target){
@@ -767,6 +762,7 @@ character.yxs={
 				}
 				"step 1"
 				if(result.bool){
+					player.unmark(player.storage.yizhuang+'_charactermark');
 					player.discard(result.cards);
 					player.logSkill('yizhuang',result.targets);
 					var name=result.targets[0].name;
@@ -781,14 +777,10 @@ character.yxs={
 							list.push(skills[j]);
 						}
 					}
-					for(var i=0;i<list.length;i++){
-						player.addSkill(list[i]);
-						player.skills.remove(list[i]);
-					}
-					player.additionalSkills.yizhuang=list;
+					player.addAdditionalSkill('yizhuang',list);
 					player.markCharacter(name,null,true,true);
 					game.addVideo('markCharacter',player,{
-						name:'易装',
+						name:'幻形',
 						content:'',
 						id:'yizhuang',
 						target:name
@@ -805,15 +797,12 @@ character.yxs={
 			priority:-15,
 			forced:true,
 			filter:function(event,player){
-				return player.additionalSkills.yizhuang?true:false;
+				return player.additionalSkills.yizhuang&&player.additionalSkills.yizhuang.length>0;
 			},
 			content:function(){
 				player.unmark(player.storage.yizhuang+'_charactermark');
-				if(player.additionalSkills.yizhuang){
-					player.removeSkill(player.additionalSkills.yizhuang);
-				}
+				player.removeAdditionalSkill('yizhuang');
 				delete player.storage.yizhuang;
-				delete player.additionalSkills.yizhuang;
 				player.checkMarks();
 			}
 		},

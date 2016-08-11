@@ -49,6 +49,7 @@ mode.guozhan={
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].node.name.hide();
 				game.players[i].node.name2.hide();
+				game.players[i].playerid=get.id();
 			}
 			game.chooseCharacter();
 		}
@@ -586,21 +587,7 @@ mode.guozhan={
 					game.players[i].node.name2.show();
 					game.players[i]._group=lib.character[game.players[i].name1][1];
 					for(var j=0;j<game.players[i].hiddenSkills.length;j++){
-						var ifo=get.info(game.players[i].hiddenSkills[j]);
-						if(ifo.init){
-							ifo.init(game.players[i]);
-							game.players[i].initedSkills.push(game.players[i].hiddenSkills[j]);
-						}
-						if(ifo.globalSilent){
-							if(typeof ifo.global=='string'){
-								lib.skill.global.add(ifo.global);
-							}
-							else{
-								for(var j=0;j<ifo.global.length;j++){
-									lib.skill.global.add(ifo.global[j]);
-								}
-							}
-						}
+						game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
 					}
 				}
 			}
@@ -706,21 +693,7 @@ mode.guozhan={
 						}
 					}
 					for(var j=0;j<game.players[i].hiddenSkills.length;j++){
-						var ifo=get.info(game.players[i].hiddenSkills[j]);
-						if(ifo.init){
-							ifo.init(game.players[i]);
-							game.players[i].initedSkills.push(game.players[i].hiddenSkills[j]);
-						}
-						if(ifo.globalSilent){
-							if(typeof ifo.global=='string'){
-								lib.skill.global.add(ifo.global);
-							}
-							else{
-								for(var j=0;j<ifo.global.length;j++){
-									lib.skill.global.add(ifo.global[j]);
-								}
-							}
-						}
+						game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
 					}
 				}
 				game.broadcastAll(function(result){

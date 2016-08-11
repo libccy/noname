@@ -1602,13 +1602,6 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.unmark(player.storage.huanxing+'_charactermark');
-                if(player.additionalSkills.huanxing){
-                    player.removeSkill(player.additionalSkills.huanxing);
-                }
-				delete player.storage.huanxing;
-				delete player.additionalSkills.huanxing;
-				player.checkMarks();
 				if(player.num('he')){
 					player.chooseCardTarget({
 						prompt:'是否发动【幻形】？',
@@ -1618,6 +1611,7 @@ character.swd={
 							if(target==player) return false;
 							if(target.sex!='male') return false;
 							var name=target.name.indexOf('unknown')==0?target.name2:target.name;
+							if(name==player.storage.huanxing) return false;
 
 							var info=lib.character[name];
 							if(info){
@@ -1632,6 +1626,7 @@ character.swd={
 							return false;
 						},
 						ai1:function(card){
+							if(player.additionalSkills.huanxing&&player.additionalSkills.huanxing.length>0) return 0;
 							return 7-ai.get.value(card);
 						},
 						ai2:function(target){
@@ -1645,6 +1640,7 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
+					player.unmark(player.storage.huanxing+'_charactermark');
 					player.discard(result.cards);
 					player.logSkill('huanxing',result.targets);
 					var name=result.targets[0].name;
@@ -1659,11 +1655,7 @@ character.swd={
 							list.push(skills[j]);
 						}
 					}
-					for(var i=0;i<list.length;i++){
-						player.addSkill(list[i]);
-						player.skills.remove(list[i]);
-					}
-					player.additionalSkills.huanxing=list;
+					player.addAdditionalSkill('huanxing',list);
 					player.markCharacter(name,null,true,true);
 					game.addVideo('markCharacter',player,{
 						name:'幻形',
@@ -1683,15 +1675,12 @@ character.swd={
 			priority:-15,
 			forced:true,
 			filter:function(event,player){
-				return player.additionalSkills.huanxing?true:false;
+				return player.additionalSkills.huanxing&&player.additionalSkills.huanxing.length>0;
 			},
 			content:function(){
 				player.unmark(player.storage.huanxing+'_charactermark');
-				if(player.additionalSkills.yizhuang){
-					player.removeSkill(player.additionalSkills.yizhuang);
-				}
+				player.removeAdditionalSkill('huanxing');
 				delete player.storage.huanxing;
-				delete player.additionalSkills.huanxing;
 				player.checkMarks();
 			}
 		},
@@ -5477,12 +5466,7 @@ character.swd={
 					event.dialog.close();
 				}
 				var link=result;
-				player.addSkill(link);
-				player.skills.remove(link);
-				if(player.additionalSkills.tianshu){
-					player.removeSkill(player.additionalSkills.tianshu);
-				}
-				player.additionalSkills.tianshu=link;
+				player.addAdditionalSkill('tianshu',link);
 				player.popup(link);
 				player.markSkillCharacter('tianshu',target,get.translation(link),lib.translate[link+'_info']);
 				player.storage.tianshu=target;
@@ -5515,9 +5499,8 @@ character.swd={
 			},
 			content:function(){
 				player.unmarkSkill('tianshu');
-				player.removeSkill(player.additionalSkills.tianshu);
+				player.removeAdditionalSkill('tianshu');
 				delete player.storage.tianshu;
-				delete player.additionalSkills.tianshu;
 			}
 		},
 		tianshu2_old:{

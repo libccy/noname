@@ -66,9 +66,7 @@ play.character={
 						var skill=list.randomGet();
 						target.popup(skill);
 						game.log(target,'获得技能','【'+get.translation(skill)+'】');
-						target.addSkill(skill);
-						target.skills.remove(skill);
-						target.additionalSkills.charactercard=skill;
+						target.addAdditionalSkill('charactercard',skill);
 						target.checkMarks();
 						target.storage.charactercard=card;
 						target.addSkill('charactercard');
@@ -82,7 +80,8 @@ play.character={
 					result:{
 						target:(function(name){
 							return function(player,target){
-								if(target.additionalSkills.charactercard) return 0;
+								if(target.additionalSkills.charactercard&&
+									target.additionalSkills.charactercard.length>0) return 0;
 								return lib.character[name][2]<=4?1:0;
 							}
 						}(list[i]))
@@ -121,7 +120,7 @@ play.character={
 						return '';
 					}
 					else{
-						return get.translation(player.additionalSkills.charactercard);
+						return get.translation(player.additionalSkills.charactercard[0]);
 					}
 				},
 				content:function(storage,player){
@@ -136,11 +135,11 @@ play.character={
 						return '';
 					}
 					else{
-						return lib.translate[player.additionalSkills.charactercard+'_info'];
+						return lib.translate[player.additionalSkills.charactercard[0]+'_info'];
 					}
 				},
 				onunmark:function(storage,player){
-					delete player.additionalSkills.charactercard;
+					player.removeAdditionalSkill('charactercard');
 					delete player.storage.charactercard;
 				}
 			},

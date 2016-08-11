@@ -36,7 +36,6 @@ mode.versus={
 		}
 		else if(_status.mode=='jiange'||_status.mode=='four'){
 			game.prepareArena(8);
-			// game.pause();
 		}
 		else if(_status.mode=='two'){
 			game.prepareArena(4);
@@ -107,10 +106,14 @@ mode.versus={
 				}
 				game.players[i].setIdentity(game.players[i].identity);
 				game.players[i].node.identity.dataset.color=get.translation(game.players[i].side+'Color');
+				game.players[i].playerid=get.id();
 			}
 			game.chooseCharacterFour();
 		}
 		else if(_status.mode=='two'){
+			for(var i=0;i<game.players.length;i++){
+				game.players[i].playerid=get.id();
+			}
 			game.chooseCharacterTwo();
 		}
 		else if(_status.mode=='jiange'){
@@ -140,6 +143,7 @@ mode.versus={
 				else{
 					game.players[j].type='human';
 				}
+				game.players[i].playerid=get.id();
 			}
 			game.chooseCharacterJiange();
 		}
@@ -279,7 +283,7 @@ mode.versus={
 				_status.first_less=true;
 				_status.round=0;
 				if(lib.storage.single_control){
-					lib.skill.global.push('versus_swap');
+					game.addGlobalSkill('versus_swap');
 					ui.autoreplace=ui.create.div('.caption.normal');
 					ui.autoreplace.innerHTML='<div class="underline">自动换人</div>';
 					ui.autoreplace.style.textAlign='center';
@@ -1259,6 +1263,7 @@ mode.versus={
 				var num=lib.storage.number;
 				ui.create.players(num*2);
 				for(var i=0;i<game.players.length;i++){
+					game.players[i].id=get.id();
 					game.players[i].node.action.innerHTML='行动';
 				}
 				if(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4){

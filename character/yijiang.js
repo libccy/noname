@@ -6809,15 +6809,10 @@ character.yijiang={
 			audio:2,
 			forceaudio:true,
 			filter:function(event,player){
-				var remove=true;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].storage.xiansi){
-						remove=false;
 						return game.players[i].storage.xiansi.length>1&&player.canUse('sha',game.players[i],true,true);
 					}
-				}
-				if(remove){
-					lib.skill.global.remove('xiansi2');
 				}
 				return false;
 			},

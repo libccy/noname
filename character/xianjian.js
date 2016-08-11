@@ -1145,10 +1145,10 @@ character.xianjian={
 					player.storage.shuangren=card;
 					var info=get.info(card);
 					if(info.skills){
-						player.additionalSkills.shuangren=info.skills;
+						player.addAdditionalSkill('shuangren',info.skills);
 					}
 					else{
-						delete player.additionalSkills.shuangren;
+						player.removeAdditionalSkill('shuangren');
 					}
 				}
 

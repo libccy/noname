@@ -61,7 +61,7 @@
         devURL:'https://rawgit.com/libccy/noname/master/',
 		assetURL:'',
         hallURL:'websha.cn',
-        reserveSkillName:['others','zhu'],
+        reserveSkillName:['others','zhu','zhuSkill'],
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -3026,6 +3026,7 @@
 			delayed:0,
 			frameId:0,
 			videoId:0,
+            globalId:0,
 		},
 		help:{
 			'游戏选项':'<ul><li>控制台命令<br>开启后可用浏览器控制台控制游戏<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
@@ -5207,13 +5208,14 @@
                     "step 1"
                     event.list=targets.slice(0);
                     event.list.unshift(player);
-                    player.chooseCardOL(event.list,'请选择拼点牌',true).set('ai',event.ai).aiCard=function(target){
+                    player.chooseCardOL(event.list,'请选择拼点牌',true).set('ai',event.ai).set('source',player).aiCard=function(target){
                         var hs=target.get('h');
-                        _status.event.player=target;
+                        var event=_status.event;
+                        event.player=target;
                         hs.sort(function(a,b){
                             return event.ai(b)-event.ai(a);
                         });
-                        delete _status.event.player;
+                        delete event.player;
                         return {bool:true,cards:[hs[0]]};
                     };
                     "step 2"
@@ -7199,9 +7201,16 @@
                         },player);
 					}
 					for(var i in player.tempSkills){
-						player.skills.remove(i);
-						delete player.tempSkills[i];
+                        player.removeSkill(i);
 					}
+                    for(var i in lib.skill.globalmap){
+                        if(lib.skill.globalmap[i].contains(player)){
+                            lib.skill.globalmap[i].remove(player);
+                            if(lib.skill.globalmap[i].length==0&&!lib.skill[i].globalFixed){
+                                game.removeGlobalSkill(i);
+                            }
+                        }
+                    }
 
                     game.broadcastAll(function(player,cards){
                         player.classList.add('dead');
@@ -7512,7 +7521,7 @@
                         info[4]=[];
                     }
 					var skills=info[3];
-					this.skills.length=0;
+					this.clearSkills();
 					this.classList.add('fullskin');
 					if(!game.minskin&&lib.isNewLayout()&&!info[4].contains('minskin')){
 						this.classList.remove('minskin');
@@ -7702,7 +7711,7 @@
 					delete this.hp;
 					delete this.maxHp;
 					delete this.hujia;
-					this.skills.length=0;
+					this.clearSkills();
 					this.node.identity.style.backgroundColor='';
 					this.node.intro.innerHTML='';
 					this.node.name.innerHTML='';
@@ -7724,7 +7733,6 @@
 					this.disabledSkills={};
 					this.hiddenSkills=[];
 					this.forbiddenSkills=[];
-					this.modeSkills=[];
 					this.stat=[{card:{},skill:{}}];
 					this.tempSkills={};
 					this.storage={};
@@ -8521,6 +8529,11 @@
                         else next.ai=function(card){
     						var addi=(ai.get.value(card)>=8&&get.type(card)!='equip')?-10:0;
                             if(card.name=='du') addi+=5;
+                            var source=_status.event.source;
+                            var player=_status.event.player;
+                            if(source&&source!=player&&ai.get.attitude(player,source)>1){
+                                return -get.number(card)-ai.get.value(card)/2+addi;
+                            }
                             return get.number(card)-ai.get.value(card)/2+addi;
                         }
                         next.content=lib.element.playerproto.chooseToCompareMultiple;
@@ -9945,6 +9958,25 @@
 					if(distance==false) return lib.filter.targetEnabled(card,this,player);
 					return lib.filter.filterTarget(card,this,player);
 				},
+                addSkillTrigger:function(skill,hidden){
+                    var info=lib.skill[skill];
+                    if(!info) return;
+                    if(info.global&&(!hidden||info.globalSilent)){
+                        if(typeof info.global=='string'){
+                            game.addGlobalSkill(info.global,this);
+                        }
+                        else{
+                            for(var j=0;j<info.global.length;j++){
+                                game.addGlobalSkill(info.global[j],this);
+                            }
+                        }
+                    }
+                    if(this.initedSkills.contains(skill)) return;
+                    this.initedSkills.push(skill);
+                    if(info.init){
+                        info.init(this);
+                    }
+                },
 				addSkill:function(skill){
 					if(get.objtype(skill)=='array'){
 						for(var i=0;i<skill.length;i++){
@@ -9952,38 +9984,24 @@
 						}
 					}
 					else{
-						if(!lib.skill[skill]) return;
 						if(this.skills.contains(skill)) return;
+                        var info=lib.skill[skill];
+                        if(!info) return;
 						this.skills.add(skill);
-						if(lib.skill[skill].global){
-							if(typeof lib.skill[skill].global=='string'){
-								lib.skill.global.add(lib.skill[skill].global);
-							}
-							else{
-								for(var j=0;j<lib.skill[skill].global.length;j++){
-									lib.skill.global.add(lib.skill[skill].global[j])
-								}
-							}
+						this.addSkillTrigger(skill);
+						if(info.init2){
+							info.init2(this);
 						}
-						if(lib.skill[skill].init){
-							if(!this.initedSkills.contains(skill)){
-								lib.skill[skill].init(this);
-								this.initedSkills.push(skill);
-							}
-						}
-						if(lib.skill[skill].init2){
-							lib.skill[skill].init2(this);
-						}
-						if(lib.skill[skill].mark){
-							if(lib.skill[skill].mark=='card'&&
+						if(info.mark){
+							if(info.mark=='card'&&
 								get.itemtype(this.storage[skill])=='card'){
 									this.markSkill(skill,null,this.storage[skill]);
 							}
-							else if(lib.skill[skill].mark=='image'){
+							else if(info.mark=='image'){
 									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]));
 							}
-							else if(lib.skill[skill].mark=='character'){
-                                var intro=lib.skill[skill].intro.content;
+							else if(info.mark=='character'){
+                                var intro=info.intro.content;
                                 if(typeof intro=='function'){
                                     intro=intro(this.storage[skill],this);
                                 }
@@ -9997,6 +10015,43 @@
 					this.checkConflict();
 					return skill;
 				},
+                addAdditionalSkill:function(skill,skills,keep){
+                    if(this.additionalSkills[skill]){
+                        if(keep){
+                            if(typeof this.additionalSkills[skill]=='string'){
+                                this.additionalSkills[skill]=[this.additionalSkills[skill]];
+                            }
+                        }
+                        else{
+                            this.removeAdditionalSkill(skill);
+                            this.additionalSkills[skill]=[];
+                        }
+                    }
+                    else{
+                        this.additionalSkills[skill]=[];
+                    }
+                    if(typeof skills=='string'){
+                        skills=[skills];
+                    }
+                    for(var i=0;i<skills.length;i++){
+                        this.addSkill(skills[i]);
+                        this.skills.remove(skills[i]);
+                        this.additionalSkills[skill].push(skills[i]);
+                    }
+                },
+                removeAdditionalSkill:function(skill){
+                    if(this.additionalSkills[skill]){
+                        if(typeof this.additionalSkills[skill]=='string'){
+                            this.removeSkill(this.additionalSkills[skill]);
+                        }
+                        else if(Array.isArray(this.additionalSkills[skill])){
+                            for(var i=0;i<this.additionalSkills[skill].length;i++){
+                                this.removeSkill(this.additionalSkills[skill][i]);
+                            }
+                        }
+                        delete this.additionalSkills[skill];
+                    }
+                },
 				checkMarks:function(){
 					var skills=this.get('s');
                     game.expandSkills(skills);
@@ -10038,17 +10093,15 @@
 				clearSkills:function(){
 					var list=[];
 					var exclude=[];
-					for(var i=0;i<arguments.length;i++) exclude.push(arguments[i]);
+					for(var i=0;i<arguments.length;i++){
+                        exclude.push(arguments[i]);
+                    }
 					for(i=0;i<this.skills.length;i++){
-						if(this.modeSkills.contains(this.skills[i])==false&&
-							exclude.contains(this.skills[i])==false){
-							list.push(this.skills[i]);
-							if(lib.skill[this.skills[i]]&&lib.skill[this.skills[i]].onremove){
-								lib.skill[this.skills[i]].onremove(this);
-							}
+						if(!exclude.contains(this.skills[i])){
+                            list.push(this.skills[i]);
 						}
 					}
-					this.skills.remove(list);
+                    this.removeSkill(list);
 					this.checkConflict();
 					this.checkMarks();
 					return list;
@@ -12601,6 +12654,7 @@
 		},
 		skill:{
 			global:[],
+            globalmap:{},
 			storage:{},
 			unequip:{},
             undist:{},
@@ -16851,6 +16905,22 @@
             }
             game.saveConfig('extensionMode',lib.config.extensionInfo);
 		},
+        addGlobalSkill:function(skill,player){
+            var info=lib.skill[skill];
+            if(!info) return false;
+            lib.skill.global.add(skill);
+            if(player){
+                if(!lib.skill.globalmap[skill]){
+                    lib.skill.globalmap[skill]=[];
+                }
+                lib.skill.globalmap[skill].add(player);
+            }
+            return true;
+        },
+        removeGlobalSkill:function(skill){
+            lib.skill.global.remove(skill);
+            delete lib.skill.globalmap[skill];
+        },
         removeExtension:function(extname,keepfile){
             var prefix='extension_'+extname;
             for(var i in lib.config){
@@ -18530,7 +18600,7 @@
 						var value2=0;
 						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card)
 							value2=ai.get.value(target[get.subtype(card)],target);
-                        return value1-value2;
+                        return Math.max(0,value1-value2);
 					};
 				}
 				else if(card.type=='delay'){
@@ -18610,7 +18680,7 @@
 					lib.translate[i+'_bg']=lib.skill[i].marktext;
 				}
 				if(i[0]=='_'){
-					lib.skill.global.add(i);
+                    game.addGlobalSkill(i);
 				}
 			}
 		},
@@ -26695,7 +26765,6 @@
 				node.disabledSkills={};
 				node.hiddenSkills=[];
 				node.forbiddenSkills=[];
-				node.modeSkills=[];
 				node.popups=[];
 				node.damagepopups=[];
 				node.judging=[];
@@ -29634,7 +29703,7 @@
             return skills;
         },
         id:function(){
-            return (Math.floor(1000000000+9000000000*Math.random())).toString();
+            return (Math.floor(1000000+9000000*Math.random())).toString()+(10+lib.status.globalId++);
         },
 		zhu:function(player,skill){
 			if(typeof player=='string'){

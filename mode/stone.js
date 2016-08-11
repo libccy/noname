@@ -411,6 +411,7 @@ mode.stone={
 		ui.arena.classList.add('stone');
 		"step 1"
 		for(var i=0;i<game.players.length;i++){
+			game.players[i].playerid=get.id();
 			game.players[i].classList.add('noidentity');
 		}
 		game.enemy=game.me.next;
@@ -918,6 +919,7 @@ mode.stone={
 						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
+							player.playerid=get.id();
 							player.classList.add('noidentity');
 							player.dataset.position=dead.dataset.position;
 							player.side=dead.side;
@@ -977,6 +979,7 @@ mode.stone={
 						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
+							player.playerid=get.id();
 							player.classList.add('noidentity');
 							player.dataset.position=dead.dataset.position;
 							player.side=dead.side;
@@ -2967,7 +2970,7 @@ mode.stone={
 					for(var i=0;i<cards.length;i++){
 						target.deckCards.push(cards[i]);
 					}
-					lib.skill.global.add('rogue_zhumo');
+					game.addGlobalSkill('rogue_zhumo');
 				}
 			},
 			ai:{

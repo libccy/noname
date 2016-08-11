@@ -168,6 +168,9 @@ mode.identity={
 			game.randomMapOL();
 		}
 		else{
+			for(var i=0;i<game.players.length;i++){
+				game.players[i].playerid=get.id();
+			}
 			game.chooseCharacter();
 		}
 		"step 5"
@@ -1190,6 +1193,7 @@ mode.identity={
 					},game.zhu);
 					game.delay(2);
 					game.zhu.playerfocus(1000);
+					_status.event.trigger('zhuUpdate');
 				}
 
 				if(!_status.over){

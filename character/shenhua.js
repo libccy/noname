@@ -236,10 +236,13 @@ character.shenhua={
 					player.addSkill('jijiang');
 				}
 				else{
-					player.additionalSkills.ruoyu='jijiang';
+					player.addAdditionalSkill('ruoyu','jijiang');
 				}
 				if(!player.isZhu){
 					player.storage.zhuSkill_ruoyu=['jijiang'];
+				}
+				else{
+					event.trigger('zhuUpdate');
 				}
 			}
 		},
@@ -1019,7 +1022,7 @@ character.shenhua={
 							str+='、'+get.translation(list[i]);
 						}
 					}
-					var skill=player.additionalSkills.huashen;
+					var skill=player.additionalSkills.huashen[0];
 					if(skill){
 						str+='<p>当前技能：'+get.translation(skill);
 					}
@@ -1034,7 +1037,7 @@ character.shenhua={
 					if(list.length){
 						dialog.addSmall([list,'character']);
 					}
-					var skill=player.additionalSkills.huashen;
+					var skill=player.additionalSkills.huashen[0];
 					if(skill){
 						dialog.add('<div><div class="skill">【'+get.translation(skill)+
 						'】</div><div>'+lib.translate[skill+'_info']+'</div></div>');
@@ -1129,12 +1132,7 @@ character.shenhua={
 								}
 								mark.setBackground(currentname,'character');
 							}
-							if(player.additionalSkills.huashen){
-								player.removeSkill(player.additionalSkills.huashen);
-							}
-							player.addSkill(link);
-							player.skills.remove(link);
-							player.additionalSkills.huashen=link;
+							player.addAdditionalSkill('huashen',link);
 							player.logSkill('huashen2');
 							game.log(player,'获得技能','【'+get.translation(link)+'】');
 							player.popup(link);

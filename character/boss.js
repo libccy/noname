@@ -1398,6 +1398,7 @@ character.boss={
 			trigger:{global:'dieAfter'},
 			forced:true,
 			priority:-10,
+			globalFixed:true,
 			filter:function(event){
 				if(lib.config.mode!='boss') return false;
 				return event.player==game.boss&&event.player.skills.contains('boss_bianshen2');
@@ -1417,6 +1418,7 @@ character.boss={
 			trigger:{global:'dieAfter'},
 			forced:true,
 			priority:-10,
+			globalFixed:true,
 			filter:function(event){
 				if(lib.config.mode!='boss') return false;
 				return event.player==game.boss&&event.player.skills.contains('boss_bianshen3');
@@ -1436,6 +1438,7 @@ character.boss={
 			trigger:{global:'dieAfter'},
 			forced:true,
 			priority:-10,
+			globalFixed:true,
 			filter:function(event){
 				if(lib.config.mode!='boss') return false;
 				return event.player==game.boss&&event.player.skills.contains('boss_bianshen4');
@@ -1751,6 +1754,7 @@ character.boss={
 		boss_minbao2:{
 			trigger:{global:'dieAfter'},
 			forced:true,
+			globalFixed:true,
 			filter:function(event,player){
 				return event.player.skills.contains('boss_minbao')&&event.player.isDead();
 			},
@@ -1826,6 +1830,7 @@ character.boss={
 		boss_shanbeng2:{
 			trigger:{global:'dieAfter'},
 			forced:true,
+			globalFixed:true,
 			filter:function(event,player){
 				return player.num('e')>0&&event.player.skills.contains('boss_shanbeng')&&event.player.isDead();
 			},
@@ -2847,8 +2852,7 @@ character.boss={
 				}
 				for(var i=0;i<game.players.length;i++){
 					for(var j in game.players[i].tempSkills){
-						game.players[i].skills.remove(j);
-						delete game.players[i].tempSkills[j];
+						game.players[i].removeSkill(j);
 					}
 				}
 				_status.paused=false;
