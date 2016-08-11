@@ -150,7 +150,6 @@ mode.guozhan={
 							choice.push(list[i]);
 							list.splice(i--,1);
 							if(choice.length>=num){
-								console.log(group);
 								break;
 							}
 						}
@@ -647,6 +646,7 @@ mode.guozhan={
 					if(!lib.character[button.link]) return false;
 					return (lib.character[button.link][1]==lib.character[ui.selected.buttons[0].link][1]);
 				};
+				list.randomSort();
 				for(var i=0;i<game.players.length;i++){
 					list2.push([game.players[i],['选择角色',[game.getCharacterChoice(list,num),'character']],2,
 					true,function(){return Math.random()},filterButton]);

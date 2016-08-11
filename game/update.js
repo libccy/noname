@@ -1,9 +1,13 @@
 window.noname_update={
-    version:'1.8.20.1',
+    version:'1.8.20.2',
     changeLog:[
         '修bug',
     ],
     files:{
-        global:[],
+        global:[
+            'mode/guozhan.js',
+            'character/xianjian.js',
+        ],
+        '1.8.20.1':[],
     }
 }
