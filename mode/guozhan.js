@@ -133,13 +133,33 @@ mode.guozhan={
 					delete map[i];
 				}
 			}
-			if(choice.length<num){
+			if(choice.length==num-1){
 				for(var i=0;i<list.length;i++){
 					if(map[lib.character[list[i]][1]]){
 						choice.push(list[i]);
 						list.splice(i--,1);
-						if(choice.length>=num){
-							break;
+						break;
+					}
+				}
+			}
+			else if(choice.length<num-1){
+				var group=null
+				for(var i=0;i<list.length;i++){
+					if(group){
+						if(lib.character[list[i]][1]==group){
+							choice.push(list[i]);
+							list.splice(i--,1);
+							if(choice.length>=num){
+								console.log(group);
+								break;
+							}
+						}
+					}
+					else{
+						if(!map[lib.character[list[i]][1]]){
+							group=lib.character[list[i]][1];
+							choice.push(list[i]);
+							list.splice(i--,1);
 						}
 					}
 				}

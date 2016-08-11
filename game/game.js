@@ -3539,7 +3539,7 @@
                     lib.node={
                         fs:require('fs'),
                         debug:function(){
-                            require('remote').getCurrentWindow().toggleDevTools();
+                            require('electron').remote.getCurrentWindow().toggleDevTools();
                         }
                     };
                     game.download=function(url,folder,onsuccess,onerror,dev){
