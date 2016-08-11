@@ -352,12 +352,13 @@ character.xianjian={
 				targetEnabled:function(card){
 					if(get.tag(card,'recover')) return false;
 				},
-			}
+			},
+			global:'guijiang3'
 		},
-		_guijiang2:{
+		guijiang3:{
 			mod:{
 				cardSavable:function(card,player){
-					if(_status.event.dying.hasSkill('guijiang2')) return false;
+					if(_status.event.dying&&_status.event.dying.hasSkill('guijiang2')) return false;
 				}
 			}
 		},
