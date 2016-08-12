@@ -4085,9 +4085,7 @@ character.sp={
 			filter:function(event,player){
 				return event.player!=player&&!player.storage.wangzun;
 			},
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【妄尊】？';
-			},
+			logTarget:'player',
 			content:function(){
 				player.draw();
 				player.markSkill('wangzun');

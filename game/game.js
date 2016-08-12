@@ -12073,38 +12073,83 @@
 				notLink:function(){
 					return this.getParent().name!='_lianhuan'&&this.getParent().name!='_lianhuan2';
 				},
-                // triggerx:function(name){
-                //     if(_status.video) return;
-                //     if(name=='gameStart'){
-                //         _status.gameStarted=true;
-                //     }
-                //     for(i=0;i<game.players.length;i++){
-				// 		for(j in game.players[i].tempSkills){
-				// 			var expire=game.players[i].tempSkills[j];
-				// 			if(expire==name||
-				// 				(get.objtype(expire)=='array'&&expire.contains(name))||
-				// 				(typeof expire=='function'&&expire(event,game.players[i],name))){
-				// 				delete game.players[i].tempSkills[j];
-				// 				game.players[i].removeSkill(j);
-				// 			}
-				// 			else if(typeof expire=='object'){
-				// 				if(expire.player==name&&event.player==game.players[i]||
-				// 					expire.target==name&&event.target==game.players[i]||
-				// 					expire.source==name&&event.source==game.players[i]){
-				// 					delete game.players[i].tempSkills[j];
-				// 					game.players[i].removeSkill(j);
-				// 				}
-				// 			}
-				// 		}
-				// 	}
-                //     var event=this;
-                //     var start=event.player||game.me||game.players[0];
-                //     if(!game.players.contains(start)){
-				// 		start=game.findNext(start);
-				// 	}
-                //     var list=[];
-                //
-                // },
+                triggerx:function(name){
+                    if(_status.video) return;
+                    if(name=='gameStart'){
+                        _status.gameStarted=true;
+                    }
+                    for(var i=0;i<game.players.length;i++){
+						for(var j in game.players[i].tempSkills){
+							var expire=game.players[i].tempSkills[j];
+							if(expire==name||
+								(get.objtype(expire)=='array'&&expire.contains(name))||
+								(typeof expire=='function'&&expire(event,game.players[i],name))){
+								delete game.players[i].tempSkills[j];
+								game.players[i].removeSkill(j);
+							}
+							else if(typeof expire=='object'){
+								if(expire.player==name&&event.player==game.players[i]||
+									expire.target==name&&event.target==game.players[i]||
+									expire.source==name&&event.source==game.players[i]){
+									delete game.players[i].tempSkills[j];
+									game.players[i].removeSkill(j);
+								}
+							}
+						}
+					}
+                    var event=this;
+                    var start=event.player||game.me||game.players[0];
+                    if(!game.players.contains(start)){
+						start=game.findNext(start);
+					}
+                    var list=[];
+                    var roles=['player','source','target'];
+                    for(var i=0;i<roles.length;i++){
+                        if(event[roles[i]]){
+                            var triggername=event[roles[i]].playerid+'_'+roles[i]+'_'+name;
+                            if(lib.hook[triggername]){
+                                for(var j=0;j<lib.hook[triggername].length;j++){
+                                    list.push([lib.hook[triggername][j],event[roles[i]]]);
+                                }
+                            }
+                            triggername=roles[i]+'_'+name;
+                            if(lib.hook.globalskill[triggername]){
+                                for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
+                                    list.push([lib.hook.globalskill[triggername][j],event[roles[i]]]);
+                                }
+                            }
+                        }
+                    }
+                    var triggername='global_'+name;
+                    if(lib.hook.globalskill[triggername]){
+                        for(var i=0;i<game.players.length;i++){
+                            for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
+                                list.push([lib.hook.globalskill[triggername][j],game.players[i]]);
+                            }
+                        }
+                    }
+                    var map=_status.connectMode?lib.playerOL:game.playerMap;
+                    for(var i in lib.hook.globaltrigger[name]){
+                        if(map[i]&&map[i].isAlive()){
+                            for(var j=0;j<lib.hook.globaltrigger[name][i].length;j++){
+                                list.push([lib.hook.globaltrigger[name][i][j],map[i]]);
+                            }
+                        }
+                    }
+                    list.sort(function(a,b){
+                        var priority=lib.sort.priority(a,b);
+                        if(priority) return priority;
+                        if(start){
+                            return get.distance(start,a[1],'absolute')-get.distance(start,b[1],'absolute');
+                        }
+                        return 0;
+                    });
+                    if(list.length){
+						for(i=0;i<list.length;i++){
+							game.createTrigger(name,list[i][0],list[i][1],event);
+						}
+					}
+                },
 				trigger:function(name){
 					if(_status.video) return;
                     if(name=='gameStart'){
@@ -28605,15 +28650,16 @@
 				if(this.classList.contains('selectable')==false) return;
 				if(this.classList.contains('selected')){
 					ui.selected.buttons.remove(this);
+    				this.classList.remove('selected');
 					if(_status.multitarget||_status.event.complexSelect){
 						game.uncheck();
 						game.check();
 					}
 				}
 				else{
+    				this.classList.add('selected');
 					ui.selected.buttons.add(this);
 				}
-				this.classList.toggle('selected');
 				if(custom.add.button){
 					custom.add.button();
 				}

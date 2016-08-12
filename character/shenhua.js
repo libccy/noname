@@ -685,6 +685,7 @@ character.shenhua={
 				player.loseMaxHp();
 				if(player.hp>player.maxHp) player.loseHp();
 				player.addSkill('reyingzi');
+				player.addSkill('yinghun');
 				delete player.tempSkills.yinghun;
 				player.removeSkill('hunzi');
 				player.storage.hunzi=true;
