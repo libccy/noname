@@ -1348,14 +1348,17 @@ card.swd={
 	},
 	skill:{
 		_qinglongzhigui:{
-			trigger:{player:'phaseDrawBegin'},
+			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
 				return player.num('h','qinglongzhigui')>0;
 			},
 			content:function(){
+				'step 0'
 				player.showCards(get.translation(player)+'发动了【青龙之圭】',player.get('h','qinglongzhigui'));
-				trigger.num+=2;
+				player.draw(2);
+				'step 1'
+				player.chooseToDiscard('he',true);
 			}
 		},
 		_baishouzhihu:{
@@ -3570,7 +3573,7 @@ card.swd={
 		jiqi:'祭器',
 		qinglongzhigui:'青龙之圭',
 		_qinglongzhigui:'青龙之圭',
-		qinglongzhigui_info:'可用于煅造装备；此牌在你手牌中时，你摸牌阶段摸牌数+2',
+		qinglongzhigui_info:'可用于煅造装备；此牌在你手牌中时，回合开始阶段，你摸两张牌然后弃置一张牌',
 		qinglongzhigui_duanzao:'云屏',
 		qinglongzhigui_equip1_info:'回合结束阶段，你摸一张牌',
 		qinglongzhigui_equip2_info:'回合结束阶段，你摸一张牌',
