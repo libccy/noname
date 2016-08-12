@@ -470,7 +470,7 @@ card.sp={
 			filter:function(event,player){
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].name=='muniu'&&event.cards[i].original=='e'&&
-						player.skills.contains('muniu_skill6')==false&&
+						player.hasSkill('muniu_skill6')==false&&
 						get.position(event.cards[i])==='d') return true;
 				}
 				return false;
@@ -478,7 +478,7 @@ card.sp={
 			content:function(){
 				for(var i=0;i<trigger.cards.length;i++){
 					if(trigger.cards[i].name=='muniu'&&trigger.cards[i].original=='e'&&
-						player.skills.contains('muniu_skill6')==false){
+						player.hasSkill('muniu_skill6')==false){
 						var card=trigger.cards[i];
 						var card2;
 						if(card.cards&&card.cards.length){

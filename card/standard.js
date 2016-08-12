@@ -119,7 +119,7 @@ card.standard={
 				order:3,
 				result:{
 					target:function(player,target){
-						if(player.skills.contains('jiu')&&!target.num('e','baiyin')){
+						if(player.hasSkill('jiu')&&!target.num('e','baiyin')){
 							if(ai.get.attitude(player,target)>0){
 								return -6;
 							}
@@ -1259,8 +1259,8 @@ card.standard={
 					}
 					if(eff<=0) return ai.get.buttonValue(button);
 					if(trigger.target.hp==1) return false;
-					if(player.skills.contains('jiu')||player.skills.contains('tianxianjiu')||
-					player.skills.contains('luoyi2')||player.skills.contains('reluoyi2')) return false;
+					if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')||
+					player.hasSkill('luoyi2')||player.hasSkill('reluoyi2')) return false;
 					if(_status.event.dialog.buttons.length<2) return -1;
 					var num=0;
 					for(var i=0;i<_status.event.dialog.buttons.length;i++){
@@ -1348,7 +1348,7 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				if(player.skills.contains('jiu')){
+				if(player.hasSkill('jiu')){
 					game.broadcastAll(function(player){
 						player.removeSkill('jiu');
 						if(player.node.jiu){
@@ -1406,8 +1406,8 @@ card.standard={
 				next.set('ai',function(card){
 					var evt=_status.event.getParent();
 					if(ai.get.attitude(evt.player,evt._trigger.target)<0){
-						if(evt.player.skills.contains('jiu')||
-						evt.player.skills.contains('tianxianjiu')||
+						if(evt.player.hasSkill('jiu')||
+						evt.player.hasSkill('tianxianjiu')||
 						evt._trigger.target.hp==1){
 							return 8-ai.get.value(card)
 						}
@@ -1578,7 +1578,7 @@ card.standard={
 									if(typeof aiii=='number') return aiii;
 								}
 								if(Math.abs(ai.get.attitude(_status.event.player,source))<3) return 0;
-								if(source.skills.contains('guanxing')) return 0;
+								if(source.hasSkill('guanxing')) return 0;
 								if(name!='lebu'&&name!='bingliang'){
 									if(source!=_status.event.player){
 										return 0;

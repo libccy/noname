@@ -574,7 +574,7 @@ character.xianjian={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'thunderDamage')){
-							if(target.hp<=1||!target.skills.contains('xfenxin')) return [0,0];
+							if(target.hp<=1||!target.hasSkill('xfenxin')) return [0,0];
 							return [0,1.5];
 						}
 					}
@@ -642,7 +642,7 @@ character.xianjian={
 			},
 			content:function(){
 				"step 0"
-				if(!player.skills.contains('unequip')){
+				if(!player.hasSkill('unequip')){
 					event.added=true;
 					player.skills.push('unequip');
 				}
@@ -661,7 +661,7 @@ character.xianjian={
 				result:{
 					target:function(player,target){
 						var added=false;
-						if(!player.skills.contains('unequip')){
+						if(!player.hasSkill('unequip')){
 							added=true;
 							player.skills.push('unequip');
 						}
@@ -703,7 +703,7 @@ character.xianjian={
 				game.delay();
 			},
 			filterTarget:function(card,player,target){
-				return target!=player&&!target.skills.contains('tianfu2');
+				return target!=player&&!target.hasSkill('tianfu2');
 			},
 			check:function(card){
 				if(_status.event.player.hp>=3) return 8-ai.get.value(card);
@@ -898,7 +898,7 @@ character.xianjian={
 				if(!player.num('he')) return false;
 				if(player==event.player) return false;
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].skills.contains('wangyou3')) return true;
+					if(game.players[i].hasSkill('wangyou3')) return true;
 				}
 				return false;
 			},
@@ -907,7 +907,7 @@ character.xianjian={
 				var targets=[];
 				var num=0;
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].skills.contains('wangyou3')){
+					if(game.players[i].hasSkill('wangyou3')){
 						var att=ai.get.attitude(player,game.players[i]);
 						if(att>0) num++;
 						else if(att<0) num--;
@@ -1041,7 +1041,7 @@ character.xianjian={
 		jubao:{
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
-				if(player.skills.contains('jubao2')) return false;
+				if(player.hasSkill('jubao2')) return false;
 				if(event.player==player) return false;
 				if(_status.currentPhase==player) return false;
 				for(var i=0;i<event.cards.length;i++){

@@ -486,7 +486,7 @@ character.swd={
 		heihuo:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h')>0&&player.num('he',{type:'equip'})>0&&!player.skills.contains('heihuo2');
+				return player.num('h')>0&&player.num('he',{type:'equip'})>0&&!player.hasSkill('heihuo2');
 			},
 			filterCard:function(card){
 				return get.type(card)=='equip';
@@ -777,7 +777,7 @@ character.swd={
 			trigger:{player:'shaAfter'},
 			direct:true,
 			filter:function(event,player){
-				return event.target.isAlive()&&player.num('he')>0&&!player.skills.contains('lianda2');
+				return event.target.isAlive()&&player.num('he')>0&&!player.hasSkill('lianda2');
 			},
 			content:function(){
 				"step 0"
@@ -1071,7 +1071,7 @@ character.swd={
 				effect:{
 					target:function(card,player){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							return 0.7;
 						}
 					}
@@ -1434,7 +1434,7 @@ character.swd={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.parent.skill=='linyun'&&!player.skills.contains('linyun4');
+				return event.parent.skill=='linyun'&&!player.hasSkill('linyun4');
 			},
 			content:function(){
 				player.draw();
@@ -1566,7 +1566,7 @@ character.swd={
 			trigger:{player:['phaseEnd','dieBegin']},
 			forced:true,
 			filter:function(event,player){
-				if(player.skills.contains('hutian4')) return false;
+				if(player.hasSkill('hutian4')) return false;
 				return player.storage.hutian?true:false;
 			},
 			priority:-1,
@@ -1618,7 +1618,7 @@ character.swd={
 								var skills=info[3];
 								for(var j=0;j<skills.length;j++){
 									if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-										!lib.skill[skills[j]].unique&&!player.skills.contains(skills[j])){
+										!lib.skill[skills[j]].unique&&!player.hasSkill(skills[j])){
 										return true;
 									}
 								}
@@ -1651,7 +1651,7 @@ character.swd={
 					var skills=lib.character[name][3];
 					for(var j=0;j<skills.length;j++){
 						if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-							!lib.skill[skills[j]].unique&&!player.skills.contains(skills[j])){
+							!lib.skill[skills[j]].unique&&!player.hasSkill(skills[j])){
 							list.push(skills[j]);
 						}
 					}
@@ -1781,7 +1781,7 @@ character.swd={
 				maixie:true,
 				effect:function(card,player,target){
 					if(get.tag(card,'damage')){
-						if(player.skills.contains('jueqing')) return [1,-0.5];
+						if(player.hasSkill('jueqing')) return [1,-0.5];
 						if(!target.hasFriend()){
 							if(lib.config.mode=='guozhan'){
 								if(!player.hasFriend()) return;
@@ -1904,7 +1904,7 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-1.5];
+							if(player.hasSkill('jueqing')) return [1,-1.5];
 							if(player.hp>=4) return [1,1.5];
 							if(target.hp==3) return [1,1];
 							if(target.hp==2) return [1,0.5];
@@ -2155,7 +2155,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				if(!player.skills.contains('unequip')){
+				if(!player.hasSkill('unequip')){
 					event.added=true
 					player.skills.push('unequip');
 				}
@@ -2174,7 +2174,7 @@ character.swd={
 				result:{
 					target:function(player,target){
 						var added=false;
-						if(!player.skills.contains('unequip')){
+						if(!player.hasSkill('unequip')){
 							added=true;
 							player.skills.push('unequip');
 						}
@@ -2210,7 +2210,7 @@ character.swd={
 			viewAs:{name:'chiyuxi',nature:'fire'},
 			check:function(card){
 				var player=_status.event.player;
-				if(player.skills.contains('jianji')&&get.type(card)=='equip'&&
+				if(player.hasSkill('jianji')&&get.type(card)=='equip'&&
 					lib.filter.filterCard({name:'sha'},player)){
 					return 0;
 				}
@@ -2382,7 +2382,7 @@ character.swd={
 			trigger:{source:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
-				return event.parent.name!='dangping'&&!player.skills.contains('dangping2');
+				return event.parent.name!='dangping'&&!player.hasSkill('dangping2');
 			},
 			content:function(){
 				"step 0"
@@ -2417,10 +2417,10 @@ character.swd={
 			enable:'phaseUse',
 			usable:2,
 			filter:function(event,player){
-				return player.num('h')>0&&!player.skills.contains('duishi3');
+				return player.num('h')>0&&!player.hasSkill('duishi3');
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('h')&&!target.skills.contains('duishi2');
+				return player!=target&&target.num('h')&&!target.hasSkill('duishi2');
 			},
 			filterCard:true,
 			check:function(card){return 8-ai.get.value(card)},
@@ -2641,7 +2641,7 @@ character.swd={
 				return ai.get.damageEffect(event.player,player,player,'thunder')>0;
 			},
 			filter:function(event,player){
-				return event.player!=player&&!player.skills.contains('touxi2')&&event.player.isAlive();
+				return event.player!=player&&!player.hasSkill('touxi2')&&event.player.isAlive();
 			},
             prompt:function(event,player){
 				return '是否对'+get.translation(event.player)+'发动【偷袭】？';
@@ -3326,7 +3326,7 @@ character.swd={
 				return player.attitudeTo(event.player)>3;
 			},
 			filter:function(event,player){
-				return player.num('h')>0&&!player.skills.contains('susheng2');
+				return player.num('h')>0&&!player.hasSkill('susheng2');
 			},
 			content:function(){
 				"step 0"
@@ -4061,7 +4061,7 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							if(target.storage.yishan.length==0) return 1.5;
 							if(target.storage.yishan[0]=='tao'||target.storage.yishan[1]=='tao'){
 								return [0,2];
@@ -4337,7 +4337,7 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return;
+							if(player.hasSkill('jueqing')) return;
 							if(target.storage.daixing>1) return 0.1;
 							if(target.storage.daixing==1) return 0.5;
 						}
@@ -4516,7 +4516,7 @@ character.swd={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return player.skills.contains('xianjiang');
+				return player.hasSkill('xianjiang');
 			},
 			content:function(){
 				player.storage.xianjiang=[];
@@ -4947,7 +4947,7 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-1];
+							if(player.hasSkill('jueqing')) return [1,-1];
 							var num=player.num('h')-target.num('h');
 							if(num>0){
 								return [1,0,0,-num/2];
@@ -5007,7 +5007,7 @@ character.swd={
 				player.chooseToCompare(target);
 				"step 1"
 				if(result.bool){
-					if(target.skills.contains('tanlin2')==false){
+					if(target.hasSkill('tanlin2')==false){
 						target.addSkill('tanlin2');
 						player.addSkill('tanlin3');
 						player.gain([result.target]);
@@ -5072,7 +5072,7 @@ character.swd={
 		tanlin4:{
 			mod:{
 				targetInRange:function(card,player,target,now){
-					if(target.skills.contains('tanlin2')) return true;
+					if(target.hasSkill('tanlin2')) return true;
 				},
 			},
 		},
@@ -5144,7 +5144,7 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')&&_status.currentPhase!=target){
-							if(player.skills.contains('jueqing')) return [1,-1.5];
+							if(player.hasSkill('jueqing')) return [1,-1.5];
 							return [1,0.5];
 						}
 					}
@@ -5979,7 +5979,7 @@ character.swd={
 			priority:1,
 			forced:true,
 			filter:function(event,player){
-				return !player.skills.contains('xiaomoyu2');
+				return !player.hasSkill('xiaomoyu2');
 			},
 			content:function(){
 				"step 0"
@@ -6800,7 +6800,7 @@ character.swd={
 		yueren:{
 			trigger:{player:'shaBegin'},
 			filter:function(event,player){
-				return !player.skills.contains('yueren2');
+				return !player.hasSkill('yueren2');
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
@@ -6861,7 +6861,7 @@ character.swd={
 			popup:false,
 			content:function(){
 				var target=player.nextSeat;
-				while(target.isDead()&&target.skills.contains('busi')==false){
+				while(target.isDead()&&target.hasSkill('busi')==false){
 					target=target.nextSeat;
 				}
 				if(target.isDead()){
@@ -6900,7 +6900,7 @@ character.swd={
 				if(event.player==player||event.source==player) return false;
 				if(!event.source) return false;
 				if(player.num('he')==0) return false;
-				if(player.skills.contains('yinguo2')) return false;
+				if(player.hasSkill('yinguo2')) return false;
 				return true;
 			},
 			content:function(){
@@ -6939,10 +6939,10 @@ character.swd={
 				effect:{
 					target:function(card,player,target){
 						if(!get.tag(card,'damage')) return;
-						if(target.skills.contains('yinguo')) return;
+						if(target.hasSkill('yinguo')) return;
 						var source=null;
 						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].skills.contains('yinguo')){
+							if(game.players[i].hasSkill('yinguo')){
 								source=game.players[i];
 								break;
 							}
@@ -7501,7 +7501,7 @@ character.swd={
 			usable:1,
 			filterCard:{color:'red'},
 			filterTarget:function(card,player,target){
-				return !target.skills.contains('zhenjiu2');
+				return !target.hasSkill('zhenjiu2');
 			},
 			check:function(card){
 				return 8-ai.get.value(card);

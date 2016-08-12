@@ -289,7 +289,7 @@ mode.chess={
 		_status.friendCount=_status.mylist.length;
 		while(_status.mylist.length){
 			friend=ui.create.player().animate('start');
-			friend.playerid=get.id();
+			friend.getId();
 			if(!event.friendZhu){
 				event.friendZhu=friend;
 			}
@@ -320,7 +320,7 @@ mode.chess={
 		}
 		while(_status.enemylist.length){
 			enemy=ui.create.player().animate('start');
-			enemy.playerid=get.id();
+			enemy.getId();
 			enemy.init(_status.enemylist.shift());
 			enemy.side=!side;
 			enemy.setIdentity('enemy');
@@ -1484,7 +1484,7 @@ mode.chess={
 				num=4;
 			}
 			var player=ui.create.player();
-			player.playerid=get.id();
+			player.getId();
 			if(enemy=='treasure'){
 				player.animate('judgestart');
 				player.side=null;
@@ -4769,7 +4769,7 @@ mode.chess={
 			},
 			chance:function(target,player){
 				var chance;
-				var renyi=player.skills.contains('leader_renyi');
+				var renyi=player.hasSkill('leader_renyi');
 				switch(target.hp){
 					case 1:chance=0.7;break;
 					case 2:chance=0.4;break;
@@ -4963,7 +4963,7 @@ mode.chess={
 			audio:2,
 			trigger:{player:['phaseBegin','phaseEnd'],global:'gameStart'},
 			filter:function(event,player,name){
-				if(!player.skills.contains('tongshuai')) return false;
+				if(!player.hasSkill('tongshuai')) return false;
 				if(name=='phaseBegin'&&game.phaseNumber==1) return false;
 				return true;
 			},
@@ -5141,7 +5141,7 @@ mode.chess={
 							if(card.name=='shunshou') return;
 							if(card.name=='yuanjiao') return;
 							if(card.name=='yiyi') return;
-							if(!player.skills.contains('cangming2')) return [0,0,0,0];
+							if(!player.hasSkill('cangming2')) return [0,0,0,0];
 						}
 					}
 				},
@@ -5305,7 +5305,7 @@ mode.chess={
 				result:{
 					target:function(player,target){
 						var added=false;
-						if(!player.skills.contains('unequip')){
+						if(!player.hasSkill('unequip')){
 							added=true;
 							player.skills.push('unequip');
 						}

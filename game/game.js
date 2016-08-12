@@ -56,7 +56,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:12,
+        versionOL:13,
 		updateURL:localStorage.getItem('noname_update_url')||'http://websha.cn/',
         devURL:'https://rawgit.com/libccy/noname/master/',
 		assetURL:'',
@@ -81,6 +81,7 @@
         extensions:[],
         extensionPack:{},
         cardType:{},
+        hook:{globaltrigger:{},globalskill:{}},
         characterDialogGroup:{
             '收藏':function(name,capt){
                 return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -7204,14 +7205,14 @@
 					for(var i in player.tempSkills){
                         player.removeSkill(i);
 					}
-                    for(var i in lib.skill.globalmap){
-                        if(lib.skill.globalmap[i].contains(player)){
-                            lib.skill.globalmap[i].remove(player);
-                            if(lib.skill.globalmap[i].length==0&&!lib.skill[i].globalFixed){
-                                game.removeGlobalSkill(i);
-                            }
-                        }
-                    }
+                    // for(var i in lib.skill.globalmap){
+                    //     if(lib.skill.globalmap[i].contains(player)){
+                    //         lib.skill.globalmap[i].remove(player);
+                    //         if(lib.skill.globalmap[i].length==0&&!lib.skill[i].globalFixed){
+                    //             game.removeGlobalSkill(i);
+                    //         }
+                    //     }
+                    // }
 
                     game.broadcastAll(function(player,cards){
                         player.classList.add('dead');
@@ -7747,6 +7748,15 @@
                     this.ws.send.apply(this.ws,arguments);
                     return this;
                 },
+                getId:function(){
+                    if(_status.video||_status.connectMode) return this;
+                    if(this.playerid){
+                        delete game.playerMap[this.playerid];
+                    }
+                    this.playerid=get.id();
+                    game.playerMap[this.playerid]=this;
+                    return this;
+                },
                 chat:function(str){
                     lib.element.player.say.call(this,str);
                     game.broadcast(function(id,str){
@@ -7987,7 +7997,7 @@
 					if(!_status.video){
 						game.addVideo('update',this,[this.num('h'),this.hp,this.maxHp,this.hujia]);
 					}
-					if(this.node.jiu&&!this.skills.contains('jiu')){
+					if(this.node.jiu&&!this.hasSkill('jiu')){
 						this.node.jiu.delete();
 						this.node.jiu2.delete();
 						delete this.node.jiu;
@@ -8115,6 +8125,9 @@
                                 skills.addArray(this.additionalSkills[i](this));
                             }
 						}
+                        for(var i in this.tempSkills){
+                            skills.add(i);
+                        }
 						if(arg2) skills=skills.concat(this.hiddenSkills);
 						if(arg3!==false){
 							for(i=0;i<this.node.equips.childNodes.length;i++){
@@ -9429,7 +9442,7 @@
 					}
 				},
 				isMad:function(){
-					return this.skills.contains('mad');
+					return this.hasSkill('mad');
 				},
 				goMad:function(end){
                     if(end){
@@ -9977,6 +9990,37 @@
                     if(info.init){
                         info.init(this);
                     }
+                    if(info.trigger&&this.playerid){
+                        var playerid=this.playerid;
+                        var setTrigger=function(i,evt){
+                            if(i=='global'){
+                                if(!lib.hook.globaltrigger[evt]){
+                                    lib.hook.globaltrigger[evt]={};
+                                }
+                                if(!lib.hook.globaltrigger[evt][playerid]){
+                                    lib.hook.globaltrigger[evt][playerid]=[];
+                                }
+                                lib.hook.globaltrigger[evt][playerid].add(skill);
+                            }
+                            else{
+                                var name=playerid+'_'+i+'_'+evt;
+                                if(!lib.hook[name]){
+                                    lib.hook[name]=[];
+                                }
+                                lib.hook[name].add(skill);
+                            }
+                        }
+                        for(var i in info.trigger){
+                            if(typeof info.trigger[i]=='string'){
+                                setTrigger(i,info.trigger[i]);
+                            }
+                            else if(Array.isArray(info.trigger)){
+                                for(var j=0;j<info.trigger.length;j++){
+                                    setTrigger(i,info.trigger[i][j]);
+                                }
+                            }
+                        }
+                    }
                 },
 				addSkill:function(skill){
 					if(get.objtype(skill)=='array'){
@@ -10074,15 +10118,53 @@
     					this.skills.remove(skill);
     					this.checkConflict();
                         delete this.tempSkills[skill];
-    					if(lib.skill[skill]&&lib.skill[skill].onremove){
-    						lib.skill[skill].onremove(this);
-    					}
+                        var info=lib.skill[skill];
+                        if(info){
+                            if(info.onremove){
+        						info.onremove(this);
+        					}
+                            if(info.trigger){
+                                var playerid=this.playerid;
+                                var removeTrigger=function(i,evt){
+                                    if(i=='global'){
+                                        for(var j in lib.hook.globaltrigger){
+                                            if(lib.hook.globaltrigger[j][playerid]){
+                                                lib.hook.globaltrigger[j][playerid].remove(skill);
+                                                if(lib.hook.globaltrigger[j][playerid].length==0){
+                                                    delete lib.hook.globaltrigger[j][playerid];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        var name=playerid+'_'+i+'_'+evt;
+                                        if(lib.hook[name]){
+                                            lib.hook[name].remove(skill);
+                                            if(lib.hook[name].length==0){
+                                                delete lib.hook[name];
+                                            }
+                                        }
+                                    }
+                                }
+                                for(var i in info.trigger){
+                                    if(typeof info.trigger[i]=='string'){
+                                        removeTrigger(i,info.trigger[i]);
+                                    }
+                                    else if(Array.isArray(info.trigger)){
+                                        for(var j=0;j<info.trigger.length;j++){
+                                            removeTrigger(i,info.trigger[i][j]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 					return skill;
 				},
 				addTempSkill:function(skill,expire){
 					if(this.hasSkill(skill)&&this.tempSkills[skill]==undefined) return;
 					this.addSkill(skill);
+                    this.skills.remove(skill);
 					this.tempSkills[skill]=expire;
 					this.checkConflict();
 					return skill;
@@ -11991,6 +12073,9 @@
 				notLink:function(){
 					return this.getParent().name!='_lianhuan'&&this.getParent().name!='_lianhuan2';
 				},
+                triggerx:function(name){
+
+                },
 				trigger:function(name){
 					if(_status.video) return;
                     if(name=='gameStart'){
@@ -16916,11 +17001,33 @@
                 }
                 lib.skill.globalmap[skill].add(player);
             }
+            if(info.trigger){
+                var setTrigger=function(i,evt){
+                    var name=i+'_'+evt;
+                    if(!lib.hook.globalskill[name]){
+                        lib.hook.globalskill[name]=[];
+                    }
+                    lib.hook.globalskill[name].add(skill);
+                }
+                for(var i in info.trigger){
+                    if(typeof info.trigger[i]=='string'){
+                        setTrigger(i,info.trigger[i]);
+                    }
+                    else if(Array.isArray(info.trigger)){
+                        for(var j=0;j<info.trigger.length;j++){
+                            setTrigger(i,info.trigger[i][j]);
+                        }
+                    }
+                }
+            }
             return true;
         },
         removeGlobalSkill:function(skill){
             lib.skill.global.remove(skill);
             delete lib.skill.globalmap[skill];
+            for(var i in lib.hook.globalskill){
+                lib.hook.globalskill.remove(skill);
+            }
         },
         removeExtension:function(extname,keepfile){
             var prefix='extension_'+extname;
@@ -19278,6 +19385,7 @@
 		players:[],
 		dead:[],
 		imported:[],
+        playerMap:{},
 		phaseNumber:0
 	};
 	var ui={

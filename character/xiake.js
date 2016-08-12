@@ -106,7 +106,7 @@ character.xiake={
 			},
             mod:{
 				attackFrom:function(from,to,distance){
-					if(from.skills.contains('jiu')) return distance-1;
+					if(from.hasSkill('jiu')) return distance-1;
 				}
 			},
 			ai:{

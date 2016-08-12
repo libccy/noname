@@ -411,7 +411,7 @@ mode.stone={
 		ui.arena.classList.add('stone');
 		"step 1"
 		for(var i=0;i<game.players.length;i++){
-			game.players[i].playerid=get.id();
+			game.players[i].getId();
 			game.players[i].classList.add('noidentity');
 		}
 		game.enemy=game.me.next;
@@ -750,7 +750,7 @@ mode.stone={
 			hasFellowSkill:function(skill,exclude){
 				for(var i=0;i<game.players.length;i++){
 					if(exclude&&game.players[i]==this) continue;
-					if(game.players[i].skills.contains(skill)&&
+					if(game.players[i].hasSkill(skill)&&
 					game.players[i].side==this.side){
 						return true;
 					}
@@ -761,7 +761,7 @@ mode.stone={
 				var num=0;
 				for(var i=0;i<game.players.length;i++){
 					if(exclude&&game.players[i]==this) continue;
-					if(game.players[i].skills.contains(skill)&&
+					if(game.players[i].hasSkill(skill)&&
 					game.players[i].side==this.side){
 						num++;
 					}
@@ -919,7 +919,7 @@ mode.stone={
 						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
-							player.playerid=get.id();
+							player.getId();
 							player.classList.add('noidentity');
 							player.dataset.position=dead.dataset.position;
 							player.side=dead.side;
@@ -979,7 +979,7 @@ mode.stone={
 						game.additionaldead.push(this);
 						setTimeout(function(){
 							var player=ui.create.player();
-							player.playerid=get.id();
+							player.getId();
 							player.classList.add('noidentity');
 							player.dataset.position=dead.dataset.position;
 							player.side=dead.side;
@@ -1867,7 +1867,7 @@ mode.stone={
 			enable:true,
 			fullimage:true,
 			filterTarget:function(card,player,target){
-				return target.isMin()&&!target.skills.contains('warlock_fushishu');
+				return target.isMin()&&!target.hasSkill('warlock_fushishu');
 			},
 			content:function(){
 				target.addSkill('warlock_fushishu');
@@ -2151,7 +2151,7 @@ mode.stone={
 			},
 			fullimage:true,
 			filterTarget:function(card,player,target){
-				return target.isMin()&&!target.skills.contains('paladin_zhihuizhufu');
+				return target.isMin()&&!target.hasSkill('paladin_zhihuizhufu');
 			},
 			content:function(){
 				target.addSkill('paladin_zhihuizhufu');
@@ -2250,7 +2250,7 @@ mode.stone={
 			stoneact:2,
 			career:'paladin',
 			enable:function(card,player){
-				return !player.skills.contains('paladin_zhengqianghaosheng');
+				return !player.hasSkill('paladin_zhengqianghaosheng');
 			},
 			fullimage:true,
 			filterTarget:function(card,player,target){
@@ -2650,7 +2650,7 @@ mode.stone={
 			enable:true,
 			fullimage:true,
 			filterTarget:function(card,player,target){
-				return player.side==target.side&&target.isMin()&&!target.skills.contains('druid_conglinzhihun');
+				return player.side==target.side&&target.isMin()&&!target.hasSkill('druid_conglinzhihun');
 			},
 			selectTarget:-1,
 			content:function(){
@@ -2665,7 +2665,7 @@ mode.stone={
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].isMin()&&game.players[i].side==player.side&&
-							!game.players[i].skills.contains('druid_conglinzhihun')){
+							!game.players[i].hasSkill('druid_conglinzhihun')){
 								num++;
 								if(num>=2) return 1;
 							}
@@ -2729,7 +2729,7 @@ mode.stone={
 			selectTarget:-1,
 			content:function(){
 				'step 0'
-				if(player.skills.contains('druid_ziyang')){
+				if(player.hasSkill('druid_ziyang')){
 					player.drawDeck(3);
 					event.finish();
 				}
@@ -3277,7 +3277,7 @@ mode.stone={
 			enable:true,
 			fullimage:true,
 			filterTarget:function(card,player,target){
-				return target.isMin()&&!target.skills.contains('shaman_fengnu');
+				return target.isMin()&&!target.hasSkill('shaman_fengnu');
 			},
 			content:function(){
 				target.addSkill('shaman_fengnu');
@@ -3288,7 +3288,7 @@ mode.stone={
 				useful:4,
 				result:{
 					target:function(player,target){
-						if(target.skills.contains('shaman_tuteng')) return 0;
+						if(target.hasSkill('shaman_tuteng')) return 0;
 						if(target.hp>1) return target.hp;
 						return 0;
 					}
@@ -3302,7 +3302,7 @@ mode.stone={
 			enable:true,
 			fullimage:true,
 			filterTarget:function(card,player,target){
-				return target.isMin()&&!target.skills.contains('shaman_shihuawuqi');
+				return target.isMin()&&!target.hasSkill('shaman_shihuawuqi');
 			},
 			content:function(){
 				target.addSkill('shaman_shihuawuqi');
@@ -3315,7 +3315,7 @@ mode.stone={
 					target:function(player,target){
 						if(target.isTurnedOver()) return 0;
 						var num=0;
-						if(target.skills.contains('shaman_fengnu')){
+						if(target.hasSkill('shaman_fengnu')){
 							num=3;
 						}
 						if(target.isMin()) return target.hp+num;
@@ -3381,7 +3381,7 @@ mode.stone={
 			enable:true,
 			fullimage:true,
 			filterTarget:function(card,player,target){
-				return target.isMin()&&!target.skills.contains('shaman_xianzuzhihun');
+				return target.isMin()&&!target.hasSkill('shaman_xianzuzhihun');
 			},
 			content:function(){
 				target.addSkill('shaman_xianzuzhihun');
@@ -4029,7 +4029,7 @@ mode.stone={
 				useful:5,
 				result:{
 					target:function(player,target){
-						if(target.skills.contains('warlock_yongsheng')) return 2;
+						if(target.hasSkill('warlock_yongsheng')) return 2;
 						if(target.hp==1&&target.num('h')<=2) return 1;
 						return 0;
 					}
@@ -4209,7 +4209,7 @@ mode.stone={
 			fullimage:true,
 			chongzhu:true,
 			enable:function(event,player){
-				return !player.skills.contains('druid_yexingchengzhang')&&!player.isMin();
+				return !player.hasSkill('druid_yexingchengzhang')&&!player.isMin();
 			},
 			stoneact:2,
 			career:'druid',
@@ -4263,7 +4263,7 @@ mode.stone={
 			type:'stonecard',
 			fullimage:true,
 			enable:function(event,player){
-				return !player.skills.contains('spell_yemanpaoxiao');
+				return !player.hasSkill('spell_yemanpaoxiao');
 			},
 			stoneact:2,
 			career:'druid',
@@ -4456,7 +4456,7 @@ mode.stone={
 			type:'stonecard',
 			fullimage:true,
 			enable:function(event,player){
-				return !player.skills.contains('spell_sijidaifa');
+				return !player.hasSkill('spell_sijidaifa');
 			},
 			stoneact:0,
 			career:'rogue',
@@ -5289,7 +5289,7 @@ mode.stone={
 			stoneact:1,
 			filterTarget:function(card,player,target){
 				return target.isMin()&&target.side==player.side&&
-				(!target.skills.contains('chaofeng')||target.hp<target.maxHp);
+				(!target.hasSkill('chaofeng')||target.hp<target.maxHp);
 			},
 			content:function(){
 				if(target.hp<target.maxHp){
@@ -5714,7 +5714,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('stone_fuchou');
+				return event.player.hasSkill('stone_fuchou');
 			},
 			content:function(){
 				game.delay();
@@ -5772,7 +5772,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('warlock_zhaohuan');
+				return event.player.hasSkill('warlock_zhaohuan');
 			},
 			content:function(){
 				game.delay();
@@ -5903,7 +5903,7 @@ mode.stone={
 			filter:function(event,player){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].isMin()&&
-					!game.players[i].skills.contains('chaofeng')) return true;
+					!game.players[i].hasSkill('chaofeng')) return true;
 				}
 				return false;
 			},
@@ -5911,7 +5911,7 @@ mode.stone={
 				"step 0"
 				event.chooser=player.getLeader();
 				event.chooser.chooseTarget('陪练：令一名随从获得嘲讽',function(card,playerx,target){
-					return player!=target&&target.isMin()&&!target.skills.contains('chaofeng');
+					return player!=target&&target.isMin()&&!target.hasSkill('chaofeng');
 				}).ai=function(target){
 					return ai.get.attitude(event.chooser,target)*target.hp;
 				};
@@ -6331,7 +6331,7 @@ mode.stone={
 			forced:true,
 			unique:true,
 			filter:function(event,player){
-				return event.player.side!=player.side&&!player.skills.contains('stone_qianxing');
+				return event.player.side!=player.side&&!player.hasSkill('stone_qianxing');
 			},
 			content:function(){
 				player.addSkill('stone_qianxing');
@@ -6649,7 +6649,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('druid_qicheng');
+				return event.player.hasSkill('druid_qicheng');
 			},
 			content:function(){
 				game.delay();
@@ -6759,7 +6759,7 @@ mode.stone={
 			filter:function(event,player){
 				var fellows=player.getLeader().getFellow();
 				for(var i=0;i<fellows.length;i++){
-					if(fellows[i].skills.contains('shaman_tuteng')) return true;
+					if(fellows[i].hasSkill('shaman_tuteng')) return true;
 				}
 				return false;
 			},
@@ -6767,7 +6767,7 @@ mode.stone={
 				var num=0;
 				var fellows=player.getLeader().getFellow();
 				for(var i=0;i<fellows.length;i++){
-					if(fellows[i].skills.contains('shaman_tuteng')) num++;
+					if(fellows[i].hasSkill('shaman_tuteng')) num++;
 				}
 				player.maxHp+=num;
 				player.hp+=num;
@@ -6878,7 +6878,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('hunter_tanxianmao');
+				return event.player.hasSkill('hunter_tanxianmao');
 			},
 			content:function(){
 				player.gain(game.createCard('spell_tanxianmao'),'gain2');
@@ -6934,7 +6934,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('druid_conglinzhihun');
+				return event.player.hasSkill('druid_conglinzhihun');
 			},
 			content:function(){
 				game.delay();
@@ -6978,7 +6978,7 @@ mode.stone={
 			popup:false,
 			filter:function(event,player){
 				if(!player.storage.shaman_xianzuzhihun) return false;
-				return event.player.skills.contains('shaman_xianzuzhihun');
+				return event.player.hasSkill('shaman_xianzuzhihun');
 			},
 			content:function(){
 				game.delay();
@@ -7083,7 +7083,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('hunter_jiewang');
+				return event.player.hasSkill('hunter_jiewang');
 			},
 			content:function(){
 				player.gain(game.createCard(lib.beastList.randomGet()+'_stonecharacter'),'draw');
@@ -7116,7 +7116,7 @@ mode.stone={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				return player.getLeader().skills.contains('spell_yemanpaoxiao')&&event.notLink();
+				return player.getLeader().hasSkill('spell_yemanpaoxiao')&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;
@@ -7378,7 +7378,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('rogue_xunbao');
+				return event.player.hasSkill('rogue_xunbao');
 			},
 			content:function(){
 				player.gain(game.createCard('spell_sijidaifa'),'gain2');
@@ -7545,7 +7545,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('warlock_yongsheng');
+				return event.player.hasSkill('warlock_yongsheng');
 			},
 			content:function(){
 				game.delay();
@@ -7869,7 +7869,7 @@ mode.stone={
 			popup:false,
 			unique:true,
 			filter:function(event,player){
-				return player.skills.contains('hunter_nuhou2');
+				return player.hasSkill('hunter_nuhou2');
 			},
 			content:function(){
 				player.damage('nosource');
@@ -8003,7 +8003,7 @@ mode.stone={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return event.player.skills.contains('druid_chengzhang');
+				return event.player.hasSkill('druid_chengzhang');
 			},
 			content:function(){
 				if(player.num('h')){
@@ -8071,7 +8071,7 @@ mode.stone={
 			filter:function(event,player){
 				if(event.player.career&&player.side==event.player.side){
 					for(var i=0;i<game.players.length;i++){
-						if(!game.players[i].career&&game.players[i].skills.contains('shaman_tuteng')&&
+						if(!game.players[i].career&&game.players[i].hasSkill('shaman_tuteng')&&
 						game.players[i].side==player.side){
 							return true;
 						}
@@ -8082,7 +8082,7 @@ mode.stone={
 			content:function(){
 				var list=[];
 				for(var i=0;i<game.players.length;i++){
-					if(!game.players[i].career&&game.players[i].skills.contains('shaman_tuteng')&&
+					if(!game.players[i].career&&game.players[i].hasSkill('shaman_tuteng')&&
 					game.players[i].side==player.side){
 						list.push(game.players[i]);
 					}
@@ -8212,7 +8212,7 @@ mode.stone={
 		_warlock_skill:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				if(player.skills.contains('stone_lianyu')) return false;
+				if(player.hasSkill('stone_lianyu')) return false;
 				if(player.career!='warlock') return false;
 				if(player.getActCount()+2>player.actcount) return false;
 				return true;
@@ -8234,7 +8234,7 @@ mode.stone={
 		_warlock_skillx:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				if(!player.skills.contains('stone_lianyu')) return false;
+				if(!player.hasSkill('stone_lianyu')) return false;
 				if(player.career!='warlock') return false;
 				if(player.getActCount()+2>player.actcount) return false;
 				if(!player.canAddFellow()) return false;
@@ -8557,10 +8557,10 @@ mode.stone={
 		_chaofeng:{
 			mod:{
 				targetEnabled:function(card,player,target){
-					if(target.skills.contains('chaofeng')) return;
+					if(target.hasSkill('chaofeng')) return;
 					if(card.name=='sha'){
 						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].side==target.side&&game.players[i].skills.contains('chaofeng')){
+							if(game.players[i].side==target.side&&game.players[i].hasSkill('chaofeng')){
 								return false;
 							}
 						}
@@ -8612,7 +8612,7 @@ mode.stone={
 			popup:false,
 			unique:true,
 			filter:function(event,player){
-				return player.skills.contains('stone_juxingchanchu2');
+				return player.hasSkill('stone_juxingchanchu2');
 			},
 			content:function(){
 				player.loseHp();
@@ -8646,7 +8646,7 @@ mode.stone={
 			popup:false,
 			unique:true,
 			filter:function(event,player){
-				return player.skills.contains('stone_shishigui2');
+				return player.hasSkill('stone_shishigui2');
 			},
 			content:function(){
 				player.loseHp();
@@ -8960,7 +8960,7 @@ mode.stone={
 			popup:false,
 			unique:true,
 			filter:function(event,player){
-				return player.skills.contains('stone_mafengzhuru2');
+				return player.hasSkill('stone_mafengzhuru2');
 			},
 			content:function(){
 				player.loseHp();
@@ -10140,7 +10140,7 @@ mode.stone={
 			attitude:function(from,to){
 				if(!from||!to) return 0;
 				var num;
-				if(to.isMin()&&!to.skills.contains('chaofeng')){
+				if(to.isMin()&&!to.hasSkill('chaofeng')){
 					num=5;
 				}
 				else{

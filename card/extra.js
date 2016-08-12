@@ -72,11 +72,11 @@ card.extra={
 						var shas=player.get('h','sha');
 						if(shas.length>1){
 							if(player.num('e','zhuge')) return 0;
-							if(player.skills.contains('paoxiao')) return 0;
-							if(player.skills.contains('fengnu')) return 0;
+							if(player.hasSkill('paoxiao')) return 0;
+							if(player.hasSkill('fengnu')) return 0;
 							if(!player.getStat().card.sha){
-								if(player.skills.contains('tanlnin3')) return 0;
-								if(player.skills.contains('zhaxiang2')) return 0;
+								if(player.hasSkill('tanlin3')) return 0;
+								if(player.hasSkill('zhaxiang2')) return 0;
 							}
 						}
 						var card;
@@ -177,7 +177,7 @@ card.extra={
 						return 0;
 					},
 					target:function(player,target){
-						if(target.skills.contains('huogong2')||target.num('h')==0) return 0;
+						if(target.hasSkill('huogong2')||target.num('h')==0) return 0;
 						if(player.num('h')<=1) return 0;
 						if(target==player){
 							if(typeof _status.event.filterCard=='function'&&
@@ -456,7 +456,7 @@ card.extra={
 				effect:{
 					target:function(card,player,target,current){
 						if(card.name=='sha'){
-							if(card.nature=='fire'||player.skills.contains('zhuque_skill')) return 2;
+							if(card.nature=='fire'||player.hasSkill('zhuque_skill')) return 2;
 						}
 						if(get.tag(card,'fireDamage')&&current<0) return 2;
 					}

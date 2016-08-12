@@ -320,7 +320,7 @@ character.diy={
 				result:{
 					target:function(card,player,target,current){
 						if(target.hp<=1&&get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-5];
+							if(player.hasSkill('jueqing')) return [1,-5];
 							return [1,0,0,-2];
 						}
 					}
@@ -512,7 +512,7 @@ character.diy={
 		ciqiu2:{
 			trigger:{source:'damage'},
 			filter:function(event,player){
-				return player.skills.contains('ciqiu3')&&event.player.hp<=0;
+				return player.hasSkill('ciqiu3')&&event.player.hp<=0;
 			},
 			forced:true,
 			content:function(){

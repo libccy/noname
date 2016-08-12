@@ -126,11 +126,11 @@ card.swd={
 			subtype:'equip1',
 			skills:['xuanyuanjian','xuanyuanjian2','xuanyuanjian3'],
 			enable:function(card,player){
-				return player.skills.contains('xuanyuan')||player.hp>2;
+				return player.hasSkill('xuanyuan')||player.hp>2;
 			},
 			distance:{attackFrom:-3},
 			onEquip:function(){
-				if(!player.skills.contains('xuanyuan')&&player.hp<=2){
+				if(!player.hasSkill('xuanyuan')&&player.hp<=2){
 					player.discard(card);
 				}
 			},
@@ -1734,7 +1734,7 @@ card.swd={
 		shouna:{
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
-				if(player.skills.contains('shouna2')) return false;
+				if(player.hasSkill('shouna2')) return false;
 				if(_status.currentPhase==event.player) return false;
 				if(event.player==player) return false;
 				for(var i=0;i<event.cards.length;i++){
@@ -1870,7 +1870,7 @@ card.swd={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				return !player.skills.contains('xuanyuan')&&player.hp<=2
+				return !player.hasSkill('xuanyuan')&&player.hp<=2
 			},
 			content:function(){
 				var e1=player.get('e','1');
@@ -3025,11 +3025,11 @@ card.swd={
 				disable:{
 					mod:{
 						targetEnabled:function(card,player,target){
-							if(player.skills.contains('hslingjian_chaofeng')) return;
+							if(player.hasSkill('hslingjian_chaofeng')) return;
 							if(card.name=='sha'){
-								if(target.skills.contains('hslingjian_chaofeng')) return;
+								if(target.hasSkill('hslingjian_chaofeng')) return;
 								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].skills.contains('hslingjian_chaofeng')){
+									if(game.players[i].hasSkill('hslingjian_chaofeng')){
 										if(game.players[i].hp<game.players[i].num('h')&&
 											get.distance(player,game.players[i],'attack')<=1){
 											return false;
@@ -3109,12 +3109,12 @@ card.swd={
 			trigger:{player:'shaHit'},
 			check:function(event,player){
 				var att=ai.get.attitude(player,event.target);
-				if(player.skills.contains('jiu')) return att>0;
+				if(player.hasSkill('jiu')) return att>0;
 				if(event.target.hp==1) return att>0;
 				if(event.target.hasSkillTag('maixie')){
 					return att<=0;
 				}
-				if(player.skills.contains('tianxianjiu')) return false;
+				if(player.hasSkill('tianxianjiu')) return false;
 				return att<=0;
 			},
 			filter:function(event,player){
@@ -3528,7 +3528,7 @@ card.swd={
 			trigger:{player:'shaHit'},
 			check:function(event,player){
 				var att=ai.get.attitude(player,event.target);
-				if(player.skills.contains('jiu')) return att>0;
+				if(player.hasSkill('jiu')) return att>0;
 				if(event.target.hasSkillTag('maixie')){
 					return att<=0;
 				}

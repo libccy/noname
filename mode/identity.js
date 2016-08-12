@@ -169,7 +169,7 @@ mode.identity={
 		}
 		else{
 			for(var i=0;i<game.players.length;i++){
-				game.players[i].playerid=get.id();
+				game.players[i].getId();
 			}
 			game.chooseCharacter();
 		}
@@ -1578,7 +1578,7 @@ mode.identity={
 				for(i=0;i<game.players.length;i++){
 					player=game.players[i];
 					var php=player.hp;
-					if(player.skills.contains('benghuai')&&php>4){
+					if(player.hasSkill('benghuai')&&php>4){
 						php=4;
 					}
 					else if(php>6){

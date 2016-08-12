@@ -156,7 +156,7 @@ character.zhuogui={
 					target:function(card,player,target,current){
                         if(target.get('e','2')) return;
 						if(card.name=='sha'){
-							if(card.nature=='fire'||player.skills.contains('zhuque_skill')) return 2;
+							if(card.nature=='fire'||player.hasSkill('zhuque_skill')) return 2;
 						}
 						if(get.tag(card,'fireDamage')&&current<0) return 2;
 					}

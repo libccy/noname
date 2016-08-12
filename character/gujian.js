@@ -207,7 +207,7 @@ character.gujian={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-1.5];
+							if(player.hasSkill('jueqing')) return [1,-1.5];
 							return [1,0,0,-0.5];
 						}
 					}
@@ -371,7 +371,7 @@ character.gujian={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')&&target.num('h')==0){
-							if(player.skills.contains('jueqing')) return;
+							if(player.hasSkill('jueqing')) return;
 							return 0.1;
 						}
 					}

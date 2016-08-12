@@ -179,7 +179,7 @@ mode.boss={
 		},500);
 		var rect=event.current.getBoundingClientRect();
 		var boss=ui.create.player();
-		boss.playerid=get.id();
+		boss.getId();
 		boss.init(event.current.name);
 		game.boss=boss;
 		boss.side=true;
@@ -200,7 +200,7 @@ mode.boss={
 		}
 		for(var i=0;i<result.links.length;i++){
 			var player=ui.create.player(ui.arena);
-			player.playerid=get.id();
+			player.getId();
 			player.init(result.links[i]).animate('start');
 			player.setIdentity('cai');
 			player.identity='cai';
@@ -384,7 +384,7 @@ mode.boss={
 			game.boss.delete();
 			game.dead.remove(game.boss);
 			var boss=ui.create.player();
-			boss.playerid=get.id();
+			boss.getId();
 			boss.init(name);
 			game.addVideo('bossSwap',game.boss,boss.name);
 			if(game.me==game.boss){

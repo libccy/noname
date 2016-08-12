@@ -49,7 +49,7 @@ mode.guozhan={
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].node.name.hide();
 				game.players[i].node.name2.hide();
-				game.players[i].playerid=get.id();
+				game.players[i].getId();
 			}
 			game.chooseCharacter();
 		}

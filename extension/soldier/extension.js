@@ -357,16 +357,16 @@ play.soldier={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				if(player.skills.contains('tongxinbing')) return false;
+				if(player.hasSkill('tongxinbing')) return false;
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].skills.contains('tongxinbing')) return true;
+					if(game.players[i].hasSkill('tongxinbing')) return true;
 				}
 				return false;
 			},
 			filterCard:true,
 			discard:false,
 			filterTarget:function(card,player,target){
-				return player!=target&&target.skills.contains('tongxinbing');
+				return player!=target&&target.hasSkill('tongxinbing');
 			},
 			check:function(card){
 				return 10-ai.get.value(card);

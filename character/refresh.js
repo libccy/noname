@@ -271,7 +271,7 @@ character.refresh={
 					return target.num('h')>0&&player!=target&&target.num('h')>=player.num('h');
 				},function(target){
 					var att=ai.get.attitude(_status.event.player,target);
-					if(target.skills.contains('tuntian')) return att/10;
+					if(target.hasSkill('tuntian')) return att/10;
 					return 1-att;
 				});
 				"step 1"
@@ -376,7 +376,7 @@ character.refresh={
 				effect:{
 					target:function(card,player,target){
 						if(player.num('he')>1&&get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-1.5];
+							if(player.hasSkill('jueqing')) return [1,-1.5];
 							if(ai.get.attitude(target,player)<0) return [1,1];
 						}
 					}
@@ -862,7 +862,7 @@ character.refresh={
 				maixie:true,
 				effect:{
 					target:function(card,player,target){
-						if(player.skills.contains('jueqing')) return [1,-1];
+						if(player.hasSkill('jueqing')) return [1,-1];
 						if(get.tag(card,'damage')&&player!=target) return [1,1];
 					}
 				}
@@ -906,7 +906,7 @@ character.refresh={
 				"step 3"
 				if(result.bool){
 					player.lose(result.cards,ui.special);
-					if(result.targets[0].skills.contains('reyiji2')){
+					if(result.targets[0].hasSkill('reyiji2')){
 						result.targets[0].storage.reyiji2=result.targets[0].storage.reyiji2.concat(result.cards);
 					}
 					else{
@@ -940,7 +940,7 @@ character.refresh={
 				result:{
 					effect:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							if(player.hp>=4) return [1,get.tag(card,'damage')*2];
 							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
 							if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
@@ -982,7 +982,7 @@ character.refresh={
 				player.chooseToCompare(target).set('small',true);
 				"step 1"
 				if(result.bool){
-					if(target.skills.contains('yijue2')==false){
+					if(target.hasSkill('yijue2')==false){
 						target.disabledSkills.yijue=[];
 						for(var i=0;i<target.skills.length;i++){
 							if(!get.skillLocked(target.skills[i])){
@@ -1079,7 +1079,7 @@ character.refresh={
 				"step 0"
 				player.judge(function(){return 0});
 				var target=trigger.target;
-				if(target.skills.contains('retieji2')==false){
+				if(target.hasSkill('retieji2')==false){
 					target.disabledSkills.retieji=[];
 					for(var i=0;i<target.skills.length;i++){
 						if(!get.skillLocked(target.skills[i])){
@@ -1195,7 +1195,7 @@ character.refresh={
 				},
 				effect:function(card,player){
 					if(get.tag(card,'damage')){
-						if(player.skills.contains('jueqing')) return [1,1];
+						if(player.hasSkill('jueqing')) return [1,1];
 						return 1.2;
 					}
 					if(get.tag(card,'loseHp')){

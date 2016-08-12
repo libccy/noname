@@ -355,7 +355,7 @@ card.guozhan={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nofire')||target.hasSkillTag('nodamage')) return 0;
-						if(target.skills.contains('xuying')&&target.num('h')==0) return 0;
+						if(target.hasSkill('xuying')&&target.num('h')==0) return 0;
 						if(!target.isLinked()){
 							return ai.get.damageEffect(target,player,target,'fire');
 						}

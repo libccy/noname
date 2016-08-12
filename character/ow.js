@@ -594,7 +594,7 @@ character.ow={
         dulei:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return !player.skills.contains('dulei2');
+				return !player.hasSkill('dulei2');
 			},
 			filterCard:true,
 			check:function(card){

@@ -112,7 +112,7 @@ character.jiange={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return !player.skills.contains('huodi3');
+				return !player.hasSkill('huodi3');
 			},
 			content:function(){
 				"step 0"
@@ -289,7 +289,7 @@ character.jiange={
 			popup:false,
 			content:function(){
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].skills.contains('biantian3')){
+					if(game.players[i].hasSkill('biantian3')){
 						game.players[i].removeSkill('biantian3');
 						game.players[i].popup('biantian3');
 					}
@@ -305,7 +305,7 @@ character.jiange={
                 "step 0"
                 player.removeSkill('biantian2');
                 for(var i=0;i<game.players.length;i++){
-					if(game.players[i].skills.contains('biantian3')){
+					if(game.players[i].hasSkill('biantian3')){
 						game.players[i].removeSkill('biantian3');
 						game.players[i].popup('biantian3');
 					}

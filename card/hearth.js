@@ -224,7 +224,7 @@ card.hearth={
 						return 0;
 					},
 					target:function(player,target){
-						if(target.skills.contains('shandianjian2')||target.num('h')==0) return 0;
+						if(target.hasSkill('shandianjian2')||target.num('h')==0) return 0;
 						if(player.num('h')<=1) return 0;
 						if(target==player){
 							if(typeof _status.event.filterCard=='function'&&
@@ -496,7 +496,7 @@ card.hearth={
 				result:{
 					target:function(player,target){
 						var nh=player.num('h')-target.num('h');
-						if(!player.skills.contains('jizhi')){
+						if(!player.hasSkill('jizhi')){
 							nh--;
 						}
 						if(nh>0) return nh;
@@ -505,7 +505,7 @@ card.hearth={
 					},
 					player:function(player,target){
 						var nh=target.num('h')-player.num('h');
-						if(!player.skills.contains('jizhi')){
+						if(!player.hasSkill('jizhi')){
 							nh++;
 						}
 						if(nh>0) return nh;

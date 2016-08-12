@@ -1521,7 +1521,7 @@ character.yijiang={
 				},
 				result:{
 					player:function(player){
-						if(player.num('h','sha')>0) return 0.6;
+						if(player.num('h','sha')>0) return 0;
 						var num=player.num('h');
 						if(num>player.hp) return 0;
 						if(num==1) return -2;
@@ -1841,10 +1841,10 @@ character.yijiang={
 			silent:true,
 			priority:5,
 			filter:function(event,player){
-				return player.skills.contains('benxi');
+				return player.hasSkill('benxi');
 			},
 			content:function(){
-				player.storage.benxi=!player.skills.contains('unequip');
+				player.storage.benxi=!player.hasSkill('unequip');
 				if(player.storage.benxi){
 					for(var i=0;i<game.players.length;i++){
 						if(get.distance(player,game.players[i])>1){
@@ -1901,7 +1901,7 @@ character.yijiang={
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)>=0) return false;
 				if(event.player.num('e','zhuge')) return false;
-				if(event.player.skills.contains('paoxiao')) return false;
+				if(event.player.hasSkill('paoxiao')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(event.player.canUse('sha',game.players[i])&&
 					ai.get.attitude(player,game.players[i])>0) break;
@@ -1996,7 +1996,7 @@ character.yijiang={
 					event.finish();
 				}
 				"step 2"
-				if(player.skills.contains('jiu')){
+				if(player.hasSkill('jiu')){
 					game.broadcastAll(function(player){
 						player.removeSkill('jiu');
 						if(player.node.jiu){
@@ -2041,10 +2041,10 @@ character.yijiang={
 					if(get.color(trigger.card)=='red'){
 						go=true;
 					}
-					else if(!trigger.player.skills.contains('paoxiao')&&
-						!trigger.player.skills.contains('tanlnin3')&&
-						!trigger.player.skills.contains('zhaxiang2')&&
-						!trigger.player.skills.contains('fengnu')&&
+					else if(!trigger.player.hasSkill('paoxiao')&&
+						!trigger.player.hasSkill('tanlin3')&&
+						!trigger.player.hasSkill('zhaxiang2')&&
+						!trigger.player.hasSkill('fengnu')&&
 						!trigger.player.num('e','zhuge')){
 						var nh=trigger.player.num('h');
 						if(player==trigger.player){
@@ -2269,7 +2269,7 @@ character.yijiang={
 			trigger:{player:'damageEnd',source:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
-				if(player.skills.contains('yaoming2')) return false;
+				if(player.hasSkill('yaoming2')) return false;
 				var nh=player.num('h');
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('h')!=nh) return true;
@@ -2376,7 +2376,7 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				var num=player.hp;
-				if(!player.skills.contains('yanzhu')){
+				if(!player.hasSkill('yanzhu')){
 					num=player.maxHp;
 				}
 				player.chooseTarget([1,num],'是否发动【兴学】？').set('ai',function(target){
@@ -2897,7 +2897,7 @@ character.yijiang={
 			ai:{
 				result:{
 					target:function(player,target){
-						if(player.skills.contains('jijiang3')) return 0;
+						if(player.hasSkill('jijiang3')) return 0;
 						return ai.get.effect(target,{name:'sha'},player,target);
 					}
 				},
@@ -2909,7 +2909,7 @@ character.yijiang={
 		zuoding:{
 			trigger:{global:'useCard'},
 			filter:function(event,player){
-				return !player.skills.contains('zuoding2')&&get.suit(event.card)=='spade'&&
+				return !player.hasSkill('zuoding2')&&get.suit(event.card)=='spade'&&
 					event.targets&&event.targets.length&&event.player!=player;
 			},
 			direct:true,
@@ -2947,7 +2947,7 @@ character.yijiang={
 			filter:function(event,player){
 				if(event.responded) return false;
 				if(!event.filterCard({name:'shan'})) return false;
-				if(player.skills.contains('huomo2')) return false;
+				if(player.hasSkill('huomo2')) return false;
 				if(event.parent.name!='sha') return false;
 				var hs=player.get('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
@@ -3209,7 +3209,7 @@ character.yijiang={
 			trigger:{player:'useCardToBegin'},
 			filter:function(event,player){
 				return _status.currentPhase==player&&event.targets.length==1&&
-					event.target.num('h')>0&&!player.skills.contains('taoxi4')&&player!=event.target;
+					event.target.num('h')>0&&!player.hasSkill('taoxi4')&&player!=event.target;
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<0;
@@ -3723,7 +3723,7 @@ character.yijiang={
 			ai:{
 				respondSha:true,
 				order:function(item,player){
-					if(player.skills.contains('wusheng')&&player.skills.contains('paoxiao')){
+					if(player.hasSkill('wusheng')&&player.hasSkill('paoxiao')){
 						return 1;
 					}
 					if(player.num('h')<4){
@@ -4451,6 +4451,7 @@ character.yijiang={
 				}
 			}
 		},
+		dingpin2:{},
 		faen:{
 			audio:2,
 			trigger:{global:['turnOverAfter','linkAfter']},
@@ -4504,7 +4505,7 @@ character.yijiang={
 			trigger:{player:'useCard'},
 			filter:function(event,player){
 				if(_status.currentPhase!=player) return false;
-				if(player.skills.contains('chanhui2')) return false;
+				if(player.hasSkill('chanhui2')) return false;
 				if(event.targets.length>1) return false;
 				var card=event.card;
 				if(card.name=='sha') return true;
@@ -4608,7 +4609,7 @@ character.yijiang={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							var hasfriend=false;
 							for(var i=0;i<game.players.length;i++){
 								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
@@ -4617,7 +4618,7 @@ character.yijiang={
 							}
 							if(!hasfriend) return;
 							if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
-							if(!target.skills.contains('paiyi')&&target.hp>1) return [0.5,get.tag(card,'damage')*1.5];
+							if(!target.hasSkill('paiyi')&&target.hp>1) return [0.5,get.tag(card,'damage')*1.5];
 							if(target.hp==3) return [0.5,get.tag(card,'damage')*1.5];
 							if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
 						}
@@ -4632,7 +4633,7 @@ character.yijiang={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				return !player.skills.contains('paiyi')&&player.storage.quanji&&player.storage.quanji.length>=3;
+				return !player.hasSkill('paiyi')&&player.storage.quanji&&player.storage.quanji.length>=3;
 			},
 			content:function(){
 				"step 0"
@@ -5607,9 +5608,9 @@ character.yijiang={
 				trigger.finish();
 				var ex=0;
 				if(trigger.card&&trigger.card.name=='sha'){
-					if(player.skills.contains('jiu')) ex++;
-					if(player.skills.contains('luoyi2')) ex++;
-					if(player.skills.contains('reluoyi2')) ex++;
+					if(player.hasSkill('jiu')) ex++;
+					if(player.hasSkill('luoyi2')) ex++;
+					if(player.hasSkill('reluoyi2')) ex++;
 				}
 				trigger.player.loseHp(trigger.num+ex);
 			}
@@ -5769,7 +5770,7 @@ character.yijiang={
 						if(card.name=='guiyoujie') return [0,0.5];
 						if(target.isTurnedOver()){
 							if(get.tag(card,'damage')){
-								if(player.skills.contains('jueqing')) return [1,-2];
+								if(player.hasSkill('jueqing')) return [1,-2];
 								if(target.hp==1) return;
 								return [1,target.num('h')/2];
 							}
@@ -6277,7 +6278,7 @@ character.yijiang={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(player.skills.contains('jueqing')) return [1,-1.5];
+						if(player.hasSkill('jueqing')) return [1,-1.5];
 						var hasfriend=false;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
@@ -6296,7 +6297,7 @@ character.yijiang={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(player.skills.contains('jueqing')) return [1,-2];
+						if(player.hasSkill('jueqing')) return [1,-2];
 						var hasfriend=false;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
@@ -6639,7 +6640,7 @@ character.yijiang={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							var hasfriend=false;
 							for(var i=0;i<game.players.length;i++){
 								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
@@ -6876,7 +6877,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				player.judge(function(card){
-					if(player.skills.contains('shibei2')){
+					if(player.hasSkill('shibei2')){
 						if(get.color(card)=='black') return -1;
 					}
 					else{
@@ -6891,7 +6892,7 @@ character.yijiang={
 				else if(result.judge<0){
 					player.loseHp();
 				}
-				if(!player.skills.contains('shibei2')){
+				if(!player.hasSkill('shibei2')){
 					player.addTempSkill('shibei2','phaseAfter');
 				}
 			}

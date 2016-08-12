@@ -106,13 +106,13 @@ mode.versus={
 				}
 				game.players[i].setIdentity(game.players[i].identity);
 				game.players[i].node.identity.dataset.color=get.translation(game.players[i].side+'Color');
-				game.players[i].playerid=get.id();
+				game.players[i].getId();
 			}
 			game.chooseCharacterFour();
 		}
 		else if(_status.mode=='two'){
 			for(var i=0;i<game.players.length;i++){
-				game.players[i].playerid=get.id();
+				game.players[i].getId();
 			}
 			game.chooseCharacterTwo();
 		}
@@ -143,7 +143,7 @@ mode.versus={
 				else{
 					game.players[j].type='human';
 				}
-				game.players[i].playerid=get.id();
+				game.players[i].getId();
 			}
 			game.chooseCharacterJiange();
 		}
