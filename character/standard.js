@@ -49,7 +49,7 @@ character.standard={
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
-				if(!player.hasZhuSkill('jianxiong')) return false;
+				if(!player.hasZhuSkill('hujia')) return false;
 				if(event.filterCard({name:'shan'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='wei') return true;

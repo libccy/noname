@@ -1,12 +1,12 @@
 window.noname_update={
-    version:'1.9.0',
+    version:'1.8.20.3',
     changeLog:[
-        '半成品，建议退回1.8',
-        // '性能提升',
+        '修bug'
     ],
     files:{
         global:[
-            'game/game.js',
+            // 'game/game.js',
+            'character/standard.js',
         ],
     }
 }

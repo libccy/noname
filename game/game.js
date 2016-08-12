@@ -12073,9 +12073,38 @@
 				notLink:function(){
 					return this.getParent().name!='_lianhuan'&&this.getParent().name!='_lianhuan2';
 				},
-                triggerx:function(name){
-
-                },
+                // triggerx:function(name){
+                //     if(_status.video) return;
+                //     if(name=='gameStart'){
+                //         _status.gameStarted=true;
+                //     }
+                //     for(i=0;i<game.players.length;i++){
+				// 		for(j in game.players[i].tempSkills){
+				// 			var expire=game.players[i].tempSkills[j];
+				// 			if(expire==name||
+				// 				(get.objtype(expire)=='array'&&expire.contains(name))||
+				// 				(typeof expire=='function'&&expire(event,game.players[i],name))){
+				// 				delete game.players[i].tempSkills[j];
+				// 				game.players[i].removeSkill(j);
+				// 			}
+				// 			else if(typeof expire=='object'){
+				// 				if(expire.player==name&&event.player==game.players[i]||
+				// 					expire.target==name&&event.target==game.players[i]||
+				// 					expire.source==name&&event.source==game.players[i]){
+				// 					delete game.players[i].tempSkills[j];
+				// 					game.players[i].removeSkill(j);
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+                //     var event=this;
+                //     var start=event.player||game.me||game.players[0];
+                //     if(!game.players.contains(start)){
+				// 		start=game.findNext(start);
+				// 	}
+                //     var list=[];
+                //
+                // },
 				trigger:function(name){
 					if(_status.video) return;
                     if(name=='gameStart'){
