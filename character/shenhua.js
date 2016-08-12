@@ -680,15 +680,13 @@ character.shenhua={
 			},
 			forced:true,
 			priority:3,
-			group:'hunzi2',
 			content:function(){
 				player.loseMaxHp();
-				if(player.hp>player.maxHp) player.loseHp();
 				player.addSkill('reyingzi');
 				player.addSkill('yinghun');
-				delete player.tempSkills.yinghun;
 				player.removeSkill('hunzi');
 				player.storage.hunzi=true;
+				game.createTrigger('phaseBegin','yinghun',player,trigger);
 			},
 			ai:{
 				threaten:function(player,target){
