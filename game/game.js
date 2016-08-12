@@ -3220,7 +3220,7 @@
                     else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1){
                         lib.device='ios';
                         if(ua.indexOf('ipad')!=-1){
-                            window.isIpad=true;
+                            lib.ipad=true;
                         }
                     }
 					lib.assetURL=noname_inited;
@@ -3367,10 +3367,11 @@
                     game.saveConfig('confirmtouch',true);
                     game.saveConfig('low_performance',true);
                     game.saveConfig('confirm_exit',true);
-                    if(!window.isIpad){
+                    if(lib.ipad){
                         game.saveConfig('layout','phone');
                     }
                 }
+                delete lib.ipad;
 				if(lib.config.extensions.length){
 					window.resetExtension=function(){
 						for(var i=0;i<lib.config.extensions.length;i++){
@@ -6607,14 +6608,14 @@
 					ui.clear();
 				},
 				draw:function(){
-					if(lib.config.background_audio){
-						game.playAudio('effect','draw');
-					}
-                    game.broadcast(function(){
-                        if(lib.config.background_audio){
-    						game.playAudio('effect','draw');
-    					}
-                    });
+					// if(lib.config.background_audio){
+					// 	game.playAudio('effect','draw');
+					// }
+                    // game.broadcast(function(){
+                    //     if(lib.config.background_audio){
+    				// 		game.playAudio('effect','draw');
+    				// 	}
+                    // });
 					if(event.drawDeck){
 						if(event.drawDeck>num){
 							event.drawDeck=num;
@@ -6649,14 +6650,14 @@
 				},
 				discard:function(){
 					"step 0"
-					if(lib.config.background_audio){
-						game.playAudio('effect','discard');
-					}
-                    game.broadcast(function(){
-                        if(lib.config.background_audio){
-    						game.playAudio('effect','discard');
-    					}
-                    });
+					// if(lib.config.background_audio){
+					// 	game.playAudio('effect','discard');
+					// }
+                    // game.broadcast(function(){
+                    //     if(lib.config.background_audio){
+    				// 		game.playAudio('effect','discard');
+    				// 	}
+                    // });
 					game.log(player,'弃置了',cards);
 					player.lose(cards);
 					if(event.animate!=false){
@@ -7326,14 +7327,14 @@
 					"step 0"
 					if(cards&&get.owner(cards[0])) get.owner(cards[0]).lose(cards);
 					"step 1"
-					if(lib.config.background_audio){
-						game.playAudio('effect','judge');
-					}
-                    game.broadcast(function(){
-                        if(lib.config.background_audio){
-    						game.playAudio('effect','judge');
-    					}
-                    });
+					// if(lib.config.background_audio){
+					// 	game.playAudio('effect','judge');
+					// }
+                    // game.broadcast(function(){
+                    //     if(lib.config.background_audio){
+    				// 		game.playAudio('effect','judge');
+    				// 	}
+                    // });
 					cards[0].fix();
 					cards[0].style.transform='';
 					cards[0].classList.remove('drawinghidden');
@@ -26128,10 +26129,6 @@
 			arena:function(){
 				var i,j;
 				ui.window=ui.create.div('#window.hidden',document.body);
-				if(window.isIpad){
-					ui.window.classList.add('ipad');
-					delete window.isIpad;
-				}
 				ui.refresh(ui.window);
 				if(!localStorage.getItem(lib.configprefix+'playback')){
 					ui.window.show();
