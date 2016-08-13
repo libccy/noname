@@ -1,7 +1,7 @@
 window.noname_update={
-    version:'1.8.20.5',
+    version:'1.9.0',
     changeLog:[
-        '修bug'
+        ''
     ],
     files:{
         global:[

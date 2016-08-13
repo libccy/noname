@@ -1335,7 +1335,7 @@ character.sp={
 				return false;
 			},
 			check:function(event,player){
-				return player.hp>=3&&player.num('h')>player.hp+1;
+				return player.hp>=3&&player.num('h')>player.hp+1+player.storage.xunzhi;
 			},
 			content:function(){
 				player.loseHp();

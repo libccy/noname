@@ -4364,7 +4364,7 @@
 					},100);
 				},500);
 			},
-			parse:function(func){
+			parsex:function(func){
 				var k;
 				var str='(';
 				str+=func.toString();
@@ -4382,6 +4382,23 @@
 				str+='})';
 				return str;
 			},
+            parse:function(func){
+				var str=func.toString();
+                str=str.slice(str.indexOf('{')+1);
+				if(str.indexOf('step 0')==-1){
+                    str='{if(event.step==1) {event.finish();return;}'+str;
+				}
+				else{
+					for(var k=1;k<99;k++){
+						if(str.indexOf('step '+k)==-1) break;
+						str=str.replace(new RegExp("'step "+k+"'",'g'),"break;case "+k+":");
+						str=str.replace(new RegExp('"step '+k+'"','g'),"break;case "+k+":");
+					}
+					str=str.replace(/'step 0'|"step 0"/,'if(event.step=='+k+') {event.finish();return;}switch(step){case 0:');
+				}
+				return (new Function('event','step','source','player','target','targets',
+                    'card','cards','skill','forced','num','trigger','result',str));
+            },
 			eval:function(func){
 				if(typeof func=='function'){
 					return eval('('+func.toString()+')');
@@ -12553,9 +12570,13 @@
                 },
                 setContent:function(name){
                     if(typeof name=='function'){
-                        this.content=name;
+                        this.content=lib.init.parse(name);
                     }
                     else{
+                        if(!lib.element.content[name]._parsed){
+                            lib.element.content[name]=lib.init.parse(lib.element.content[name]);
+                            lib.element.content[name]._parsed=true;
+                        }
                         this.content=lib.element.content[name];
                     }
                     return this;
@@ -18032,7 +18053,9 @@
 						event.finish();
 					}
 					else{
-						eval(lib.init.parse(event.content))();
+                        event.content(event,step,source,player,target,targets,
+                            card,cards,skill,forced,num,trigger,result);
+						// eval(lib.init.parse(event.content))();
 					}
 					event.step++;
 				}
@@ -26011,6 +26034,9 @@
                 dialog.classList.add('noupdate');
                 dialog.classList.add('scroll1');
                 dialog.classList.add('scroll2');
+                dialog.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
+                    _status.clicked=true;
+                });
                 dialog.getCurrentCapt=function(link,capt,noalph){
                     var currentcapt=noalph?this.currentcapt2:this.currentcapt;
                     if(this.seperatelist&&noalph){
