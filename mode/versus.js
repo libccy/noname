@@ -383,7 +383,7 @@ mode.versus={
 		chooseCharacterJiange:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.showConfig=true;
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				if(lib.config.hiddenCharacterPack.contains('boss')){
 					game.loadPackage('character/boss');
@@ -550,12 +550,12 @@ mode.versus={
 					}
 				}
 				game.addRecentCharacter(game.me.name,game.me.name2);
-			};
+			});
 		},
 		chooseCharacterTwo:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.showConfig=true;
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				for(var i in lib.skill){
 					if(lib.skill[i].changeSeat){
@@ -756,7 +756,7 @@ mode.versus={
 						game.players[i].init(event.list.randomRemove());
 					}
 				}
-			}
+			});
 		},
 		chooseCharacterFour:function(){
 			var next=game.createEvent('chooseCharacter',false);
@@ -790,7 +790,7 @@ mode.versus={
 				this.list.remove(player.name);
 				this.list2.remove(player.name);
 			}
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var i;
 				var list;
@@ -904,12 +904,12 @@ mode.versus={
 					event.xdialog.close();
 				}
 				game.addRecentCharacter(game.me.name,game.me.name2);
-			}
+			});
 		},
 		chooseCharacter:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.showConfig=true;
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				if(lib.config.continue_name_versus){
 					_status.friend=lib.config.continue_name_versus.friend;
@@ -1425,7 +1425,7 @@ mode.versus={
 					// ui.fakemebg.show();
 					game.onSwapControl();
 				}
-			}
+			});
 		},
 		chooseCharacterOL:function(){
 			switch(lib.configOL.versus_mode){
@@ -1437,7 +1437,7 @@ mode.versus={
 		},
 		chooseCharacterOL4:function(){
 			var next=game.createEvent('chooseCharacter',false);
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var list=['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'];
 				list[2*Math.floor(Math.random()*4)]='zhu';
@@ -1590,11 +1590,11 @@ mode.versus={
 						dialog.close();
 					}
 				},event.videoId);
-			}
+			});
 		},
 		chooseCharacterOL3:function(){
 			var next=game.createEvent('chooseCharacterOL',false);
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				game.additionaldead=[];
 				game.broadcastAll(function(ref,bool){
@@ -1703,11 +1703,11 @@ mode.versus={
 				},_status.friendDied,_status.enemyDied,
 					_status.friend,_status.enemy,game.me.side,
 					game.versusHoverFriend,game.versusHoverEnemy];
-			}
+			});
 		},
 		chooseCharacterOL2:function(){
 			var next=game.createEvent('chooseCharacterOL',false);
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				game.broadcastAll(function(ref,bool,bool2){
 					ref.side=bool;
@@ -1763,11 +1763,11 @@ mode.versus={
 						}
 					}
 				},result);
-			}
+			});
 		},
 		chooseCharacterOL1:function(){
 			var next=game.createEvent('chooseCharacterOL',false);
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				game.removeCard('shengdong');
 				game.additionaldead=[];
@@ -1965,12 +1965,12 @@ mode.versus={
 						_status.enemy.remove(result1);
 					}
 				},result1,result2);
-			}
+			});
 		},
 		versusPhaseLoop:function(player){
 			var next=game.createEvent('phaseLoop');
 			next.player=player;
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				if(lib.storage.zhu){
 					player.classList.add('acted');
@@ -2014,12 +2014,12 @@ mode.versus={
 				"step 2"
 				event.player=result.targets[0];
 				event.goto(0);
-			}
+			});
 		},
 		phaseLoopJiange:function(){
 			var next=game.createEvent('phaseLoop');
 			next.num=0;
-			next.content=function(){
+			next.setContent(function(){
 				if(event.num>=8){
 					event.num-=8;
 				}
@@ -2029,205 +2029,17 @@ mode.versus={
 				}
 				event.num++;
 				event.redo();
-			}
+			});
 		},
 		replacePlayerOL:function(player){
 			var next=game.createEvent('replacePlayer');
 			next.source=player;
-			next.content=function(){
-				'step 0'
-				game.delay();
-				'step 1'
-				if(event.source.side==game.me.side){
-					if(_status.friend.length==1){
-						event.directresult=_status.friend[0];
-					}
-					else if(event.source==game.me){
-						if(_status.auto){
-							event.directresult=_status.friend.randomGet();
-						}
-					}
-					else{
-						if(!event.source.isOnline()){
-							event.directresult=_status.friend.randomGet();
-						}
-					}
-				}
-				else{
-					if(_status.enemy.length==1){
-						event.directresult=_status.enemy[0];
-					}
-					else{
-						if(!event.source.isOnline()){
-							event.directresult=_status.enemy.randomGet();
-						}
-					}
-				}
-				if(!event.directresult){
-					if(event.source==game.me){
-						event.dialog=ui.create.dialog('选择替补角色',[_status.friend,'character']);
-						event.filterButton=function(){return true};
-						event.player=game.me;
-						event.forced=true;
-						event.custom.replace.confirm=function(){
-							event.directresult=ui.selected.buttons[0].link;
-							event.dialog.close();
-							if(ui.confirm) ui.confirm.close();
-							delete event.player;
-							game.resume();
-						}
-						event.switchToAuto=function(){
-							event.directresult=_status.friend.randomGet();
-							event.dialog.close();
-							if(ui.confirm) ui.confirm.close();
-							delete event.player;
-						};
-						game.check();
-						game.pause();
-					}
-					else{
-						event.source.send(function(player){
-							if(_status.auto){
-								_status.event._result=_status.friend.randomGet();
-							}
-							else{
-								var next=game.createEvent('replacePlayer');
-								next.source=player;
-								next.content=function(){
-									event.dialog=ui.create.dialog('选择替补角色',[_status.friend,'character']);
-									event.filterButton=function(){return true};
-									event.player=event.source;
-									event.forced=true;
-									event.custom.replace.confirm=function(){
-										event.result=ui.selected.buttons[0].link;
-										event.dialog.close();
-										if(ui.confirm) ui.confirm.close();
-										delete event.player;
-										game.resume();
-									}
-									event.switchToAuto=function(){
-										event.result=_status.friend.randomGet();
-										event.dialog.close();
-										if(ui.confirm) ui.confirm.close();
-										delete event.player;
-									};
-									game.check();
-									game.pause();
-								}
-							}
-							game.resume();
-						},event.source);
-						event.source.wait();
-						game.pause();
-					}
-				}
-				'step 2'
-				if(!event.directresult){
-					if(event.resultOL){
-						event.directresult=event.resultOL[source.playerid];
-					}
-					if(!event.directresult||event.directresult=='ai'){
-						if(source.side==game.me.side){
-							event.directresult=_status.friend.randomGet();
-						}
-						else{
-							event.directresult=_status.enemy.randomGet();
-						}
-					}
-				}
-				var name=event.directresult;
-				var color=source.node.identity.dataset.color;
-				game.additionaldead.push({
-					name:source.name,
-					stat:source.stat
-				});
-
-				game.broadcastAll(function(source,name,color){
-					_status.friend.remove(name);
-					_status.enemy.remove(name);
-					source.revive();
-					source.uninit();
-					source.init(name);
-					source.node.identity.dataset.color=color;
-					if(source==game.me){
-						ui.arena.classList.remove('selecting');
-					}
-				},source,name,color);
-
-				source.draw(4);
-				_status.event.parent.parent.parent.untrigger(false,source);
-				game.addVideo('reinit',source,[name,color]);
-			}
+			next.setContent('replacePlayerOL');
 		},
 		replacePlayer:function(player){
 			var next=game.createEvent('replacePlayer');
 			next.source=player;
-			next.content=function(){
-				"step 0"
-				var list=(source.side==game.me.side)?_status.friend:_status.enemy;
-				if(list.length==0){
-					// if(game.friend.contains(source)){
-					// 	game.over(false);
-					// }
-					// else{
-					// 	game.over(true);
-					// }
-					game.friend.remove(source);
-					game.enemy.remove(source);
-					if(game.friend.length==0) game.over(false);
-					else if(game.enemy.length==0) game.over(true);
-					if(game.friendZhu&&game.friendZhu.classList.contains('dead')&&game.friend.length){
-						game.friendZhu=game.friend[0];
-						game.friendZhu.setIdentity(_status.color+'Zhu');
-					}
-					if(game.enemyZhu&&game.enemyZhu.classList.contains('dead')&&game.enemy.length){
-						game.enemyZhu=game.enemy[0];
-						game.enemyZhu.setIdentity(!_status.color+'Zhu');
-					}
-					event.finish();
-					return;
-				}
-				if(source.side==game.me.side&&list.length>1&&(game.me==game.friendZhu||(lib.storage.zhu&&lib.storage.single_control))&&
-					!_status.auto){
-					event.dialog=ui.create.dialog('选择替补角色',[list,'character']);
-					event.filterButton=function(){return true;};
-					event.player=game.me;
-					event.forced=true;
-					event.custom.replace.confirm=function(){
-						event.character=ui.selected.buttons[0].link;
-						event.dialog.close();
-						if(ui.confirm) ui.confirm.close();
-						delete event.player;
-						game.resume();
-					}
-					game.check();
-					game.pause();
-				}
-				else{
-					event.character=list[Math.floor(Math.random()*list.length)];
-				}
-				"step 1"
-				_status.friend.remove(event.character);
-				_status.enemy.remove(event.character);
-				source.revive();
-				game.additionaldead.push({
-					name:source.name,
-					stat:source.stat
-				});
-				game.addVideo('reinit',source,[event.character,get.translation(source.side+'Color')]);
-				source.uninit();
-				source.init(event.character);
-				source.node.identity.dataset.color=get.translation(source.side+'Color');
-				source.draw(4);
-				_status.event.parent.parent.parent.untrigger(false,source);
-				if(lib.storage.single_control&&lib.storage.control_all){
-					game.onSwapControl();
-				}
-				"step 2"
-				// if(_status.currentPhase==source){
-				// 	source.skip('phase');
-				// }
-			}
+			next.setContent('replacePlayer');
 		},
 		versusClickToSwap:function(e){
 			if(_status.dragged) return;
@@ -2609,6 +2421,198 @@ mode.versus={
 		},
 	},
 	element:{
+		content:{
+			replacePlayer:function(){
+				"step 0"
+				var list=(source.side==game.me.side)?_status.friend:_status.enemy;
+				if(list.length==0){
+					// if(game.friend.contains(source)){
+					// 	game.over(false);
+					// }
+					// else{
+					// 	game.over(true);
+					// }
+					game.friend.remove(source);
+					game.enemy.remove(source);
+					if(game.friend.length==0) game.over(false);
+					else if(game.enemy.length==0) game.over(true);
+					if(game.friendZhu&&game.friendZhu.classList.contains('dead')&&game.friend.length){
+						game.friendZhu=game.friend[0];
+						game.friendZhu.setIdentity(_status.color+'Zhu');
+					}
+					if(game.enemyZhu&&game.enemyZhu.classList.contains('dead')&&game.enemy.length){
+						game.enemyZhu=game.enemy[0];
+						game.enemyZhu.setIdentity(!_status.color+'Zhu');
+					}
+					event.finish();
+					return;
+				}
+				if(source.side==game.me.side&&list.length>1&&(game.me==game.friendZhu||(lib.storage.zhu&&lib.storage.single_control))&&
+					!_status.auto){
+					event.dialog=ui.create.dialog('选择替补角色',[list,'character']);
+					event.filterButton=function(){return true;};
+					event.player=game.me;
+					event.forced=true;
+					event.custom.replace.confirm=function(){
+						event.character=ui.selected.buttons[0].link;
+						event.dialog.close();
+						if(ui.confirm) ui.confirm.close();
+						delete event.player;
+						game.resume();
+					}
+					game.check();
+					game.pause();
+				}
+				else{
+					event.character=list[Math.floor(Math.random()*list.length)];
+				}
+				"step 1"
+				_status.friend.remove(event.character);
+				_status.enemy.remove(event.character);
+				source.revive();
+				game.additionaldead.push({
+					name:source.name,
+					stat:source.stat
+				});
+				game.addVideo('reinit',source,[event.character,get.translation(source.side+'Color')]);
+				source.uninit();
+				source.init(event.character);
+				source.node.identity.dataset.color=get.translation(source.side+'Color');
+				source.draw(4);
+				_status.event.parent.parent.parent.untrigger(false,source);
+				if(lib.storage.single_control&&lib.storage.control_all){
+					game.onSwapControl();
+				}
+				"step 2"
+				// if(_status.currentPhase==source){
+				// 	source.skip('phase');
+				// }
+			},
+			replacePlayerOL:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				if(event.source.side==game.me.side){
+					if(_status.friend.length==1){
+						event.directresult=_status.friend[0];
+					}
+					else if(event.source==game.me){
+						if(_status.auto){
+							event.directresult=_status.friend.randomGet();
+						}
+					}
+					else{
+						if(!event.source.isOnline()){
+							event.directresult=_status.friend.randomGet();
+						}
+					}
+				}
+				else{
+					if(_status.enemy.length==1){
+						event.directresult=_status.enemy[0];
+					}
+					else{
+						if(!event.source.isOnline()){
+							event.directresult=_status.enemy.randomGet();
+						}
+					}
+				}
+				if(!event.directresult){
+					if(event.source==game.me){
+						event.dialog=ui.create.dialog('选择替补角色',[_status.friend,'character']);
+						event.filterButton=function(){return true};
+						event.player=game.me;
+						event.forced=true;
+						event.custom.replace.confirm=function(){
+							event.directresult=ui.selected.buttons[0].link;
+							event.dialog.close();
+							if(ui.confirm) ui.confirm.close();
+							delete event.player;
+							game.resume();
+						}
+						event.switchToAuto=function(){
+							event.directresult=_status.friend.randomGet();
+							event.dialog.close();
+							if(ui.confirm) ui.confirm.close();
+							delete event.player;
+						};
+						game.check();
+						game.pause();
+					}
+					else{
+						event.source.send(function(player){
+							if(_status.auto){
+								_status.event._result=_status.friend.randomGet();
+							}
+							else{
+								var next=game.createEvent('replacePlayer');
+								next.source=player;
+								next.setContent(function(){
+									event.dialog=ui.create.dialog('选择替补角色',[_status.friend,'character']);
+									event.filterButton=function(){return true};
+									event.player=event.source;
+									event.forced=true;
+									event.custom.replace.confirm=function(){
+										event.result=ui.selected.buttons[0].link;
+										event.dialog.close();
+										if(ui.confirm) ui.confirm.close();
+										delete event.player;
+										game.resume();
+									}
+									event.switchToAuto=function(){
+										event.result=_status.friend.randomGet();
+										event.dialog.close();
+										if(ui.confirm) ui.confirm.close();
+										delete event.player;
+									};
+									game.check();
+									game.pause();
+								});
+							}
+							game.resume();
+						},event.source);
+						event.source.wait();
+						game.pause();
+					}
+				}
+				'step 2'
+				if(!event.directresult){
+					if(event.resultOL){
+						event.directresult=event.resultOL[source.playerid];
+					}
+					if(!event.directresult||event.directresult=='ai'){
+						if(source.side==game.me.side){
+							event.directresult=_status.friend.randomGet();
+						}
+						else{
+							event.directresult=_status.enemy.randomGet();
+						}
+					}
+				}
+				var name=event.directresult;
+				var color=source.node.identity.dataset.color;
+				game.additionaldead.push({
+					name:source.name,
+					stat:source.stat
+				});
+
+				game.broadcastAll(function(source,name,color){
+					_status.friend.remove(name);
+					_status.enemy.remove(name);
+					source.revive();
+					source.uninit();
+					source.init(name);
+					source.node.identity.dataset.color=color;
+					if(source==game.me){
+						ui.arena.classList.remove('selecting');
+					}
+				},source,name,color);
+
+				source.draw(4);
+				_status.event.parent.parent.parent.untrigger(false,source);
+				game.addVideo('reinit',source,[name,color]);
+			},
+		},
 		player:{
 			dieAfter:function(source){
 				if(_status.connectMode){
@@ -2646,14 +2650,14 @@ mode.versus={
 						}
 						if(friend){
 							var next=game.createEvent('versusDraw');
-							next.content=function(){
+							next.setContent(function(){
 								'step 0'
 								player.chooseBool('是否摸一张牌？');
 								'step 1'
 								if(result.bool){
 									player.draw();
 								}
-							};
+							});
 							next.player=friend;
 						}
 						else{
@@ -2721,14 +2725,14 @@ mode.versus={
 						}
 						if(friend){
 							var next=game.createEvent('versusDraw');
-							next.content=function(){
+							next.setContent(function(){
 								'step 0'
 								player.chooseBool('是否摸一张牌？');
 								'step 1'
 								if(result.bool){
 									player.draw();
 								}
-							};
+							});
 							next.player=friend;
 						}
 						else{

@@ -546,6 +546,45 @@ mode.stone={
 		}
 	},
 	element:{
+		content:{
+			addFellowAuto:function(){
+				"step 0"
+				if(!player.canAddFellow()){
+					event.finish();
+					return;
+				}
+				var name=event.fellowName;
+				var added=false;
+				var i;
+				for(i=0;i<player.actcharacterlist.length;i++){
+					if(player.actcharacterlist[i]===null){
+						added=true;
+						break;
+					}
+				}
+				var pos=i+4;
+				if(player!=game.me){
+					pos+=4;
+				}
+				var fellow=game.addFellow(pos,name,'zoominanim');
+				fellow.side=player.side;
+				fellow.classList.add('turnedover');
+				player.actcharacterlist[i]=fellow;
+				event.source=fellow;
+				var num=lib.character[name][5][1];
+				if(num){
+					fellow.draw(num,false);
+				}
+				player.updateActCount();
+				if(fellow.hasSkillTag('noPhaseDelay')||event.delay===false){
+					fellow.noPhaseDelay=true;
+				}
+				// player.line(fellow,'green');
+				"step 1"
+				event.trigger('fellow');
+				event.result=event.source;
+			}
+		},
 		stonecharacter:{
 			type:'stonecharacter',
 			color:'white',
@@ -860,43 +899,7 @@ mode.stone={
 				if(typeof delay=='boolean'){
 					next.delay=delay;
 				}
-				next.content=function(){
-					"step 0"
-					if(!player.canAddFellow()){
-						event.finish();
-						return;
-					}
-					var name=event.fellowName;
-					var added=false;
-					var i;
-					for(i=0;i<player.actcharacterlist.length;i++){
-						if(player.actcharacterlist[i]===null){
-							added=true;
-							break;
-						}
-					}
-					var pos=i+4;
-					if(player!=game.me){
-						pos+=4;
-					}
-					var fellow=game.addFellow(pos,name,'zoominanim');
-					fellow.side=player.side;
-					fellow.classList.add('turnedover');
-					player.actcharacterlist[i]=fellow;
-					event.source=fellow;
-					var num=lib.character[name][5][1];
-					if(num){
-						fellow.draw(num,false);
-					}
-					player.updateActCount();
-					if(fellow.hasSkillTag('noPhaseDelay')||event.delay===false){
-						fellow.noPhaseDelay=true;
-					}
-					// player.line(fellow,'green');
-					"step 1"
-					event.trigger('fellow');
-					event.result=event.source;
-				}
+				next.setContent('addFellowAuto');
 			},
 			removeFellow:function(fellow){
 				if(!this.actcharacterlist) return this;
@@ -1296,7 +1299,7 @@ mode.stone={
 		stoneLoop:function(player){
 			var next=game.createEvent('phaseLoop');
 			next.player=player;
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				player.phase();
 				event.num=0;
@@ -1317,7 +1320,7 @@ mode.stone={
 					event.player=game.me;
 				}
 				event.goto(0);
-			}
+			});
 		},
 		initStone:function(){
 			var list=[],list2=[],list3={},list4={};
@@ -1441,7 +1444,7 @@ mode.stone={
 		chooseCharacter:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.showConfig=true;
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var i;
 				var list=[];
@@ -1647,7 +1650,7 @@ mode.stone={
 					get.deck(game.me,_status.deck.shift());
 					get.deck(game.enemy,'random');
 				}
-			}
+			});
 		},
 	},
 	get:{

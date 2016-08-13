@@ -529,7 +529,7 @@ mode.identity={
 					}
 				}
 			}
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var i;
 				var list;
@@ -898,11 +898,11 @@ mode.identity={
 						event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
 					}
 				}
-			}
+			});
 		},
 		chooseCharacterOL:function(){
 			var next=game.createEvent('chooseCharacter',false);
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var i;
 				var identityList;
@@ -1103,7 +1103,7 @@ mode.identity={
 						}
 					}
 				},result);
-			}
+			});
 		},
 	},
 	translate:{

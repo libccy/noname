@@ -426,7 +426,7 @@ mode.boss={
 			var next=game.createEvent('phaseLoop');
 			next.player=game.boss;
 			_status.looped=true;
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				if(player.chongzheng){
 					player.chongzheng=false;
@@ -484,7 +484,7 @@ mode.boss={
 					event.player=event.player.nextSeat;
 				}
 				event.goto(0);
-			}
+			});
 		},
 		onSwapControl:function(){
 			if(game.me==game.boss) return;
@@ -520,7 +520,7 @@ mode.boss={
 					player.init(list[0]);
 				}
 			}
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var i;
 				var list=[];
@@ -659,7 +659,7 @@ mode.boss={
 					};
 					_status.coinCoeff=get.coinCoeff(result.links);
 				}
-			}
+			});
 			return next;
 		},
 	},

@@ -395,7 +395,7 @@ mode.guozhan={
 					}
 				}
 			}
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var addSetting=function(dialog){
 					dialog.add('选择座位');
@@ -609,11 +609,11 @@ mode.guozhan={
 						game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
 					}
 				}
-			}
+			});
 		},
 		chooseCharacterOL:function(){
 			var next=game.createEvent('chooseCharacter',false);
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				var list=get.charactersOL();
 				event.list=list.slice(0);
@@ -739,7 +739,7 @@ mode.guozhan={
 						game.players[i]._group=lib.character[game.players[i].name1][1];
 					}
 				},result);
-			}
+			});
 		}
 	},
 	ui:{
@@ -783,6 +783,31 @@ mode.guozhan={
 		tongshimingzhi:'同时明置',
 	},
 	element:{
+		content:{
+			zhulian:function(){
+				"step 0"
+				player.popup('珠联璧合');
+				game.log(player,'发动了【珠联璧合】');
+				if(player.hp==player.maxHp){
+					player.draw(2);
+					event.finish();
+				}
+				else{
+					player.chooseControl('draw_card','recover_hp',function(){
+						if(player.hp>=2||player.hp>=player.maxHp-1) return 'draw_card';
+						if(player.hp==2&&player.num('h')==0) return 'draw_card';
+						return 'recover_hp';
+					},ui.create.dialog('hidden','珠联璧合：选择一项奖励'));
+				}
+				"step 1"
+				if(result.control=='draw_card'){
+					player.draw(2);
+				}
+				else{
+					player.recover();
+				}
+			}
+		},
 		player:{
 			getModeState:function(){
 				return {
@@ -934,29 +959,7 @@ mode.guozhan={
 					if(this.perfectPair()){
 						var next=game.createEvent('guozhanDraw');
 						next.player=this;
-						next.content=function(){
-							"step 0"
-							player.popup('珠联璧合');
-							game.log(player,'发动了【珠联璧合】');
-							if(player.hp==player.maxHp){
-								player.draw(2);
-								event.finish();
-							}
-							else{
-								player.chooseControl('draw_card','recover_hp',function(){
-									if(player.hp>=2||player.hp>=player.maxHp-1) return 'draw_card';
-									if(player.hp==2&&player.num('h')==0) return 'draw_card';
-									return 'recover_hp';
-								},ui.create.dialog('hidden','珠联璧合：选择一项奖励'));
-							}
-							"step 1"
-							if(result.control=='draw_card'){
-								player.draw(2);
-							}
-							else{
-								player.recover();
-							}
-						}
+						next.setContent('zhulian');
 					}
 				}
 				game.tryResult();

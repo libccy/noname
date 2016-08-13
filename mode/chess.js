@@ -629,7 +629,7 @@ mode.chess={
 				var next=game.createEvent('chooseToMove');
 				next.num=num||1;
 				next.player=this;
-				next.content=lib.element.playerproto.chooseToMove;
+				next.content=lib.element.content.chooseToMove;
 				next.prompt=prompt;
 				return next;
 			},
@@ -1557,7 +1557,7 @@ mode.chess={
 			var next=game.createEvent('replaceChessPlayer');
 			next.playername=name;
 			next.enemy=enemy;
-			next.content=lib.element.playerproto.replaceChessPlayer;
+			next.content=lib.element.content.replaceChessPlayer;
 		},
 		removeTreasure:function(player){
 			game.addVideo('removeTreasure',null,player.dataset.position);
@@ -1667,7 +1667,7 @@ mode.chess={
 		},
 		phaseLoopTafang:function(){
 			var next=game.createEvent('phaseLoop');
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				_status.turnCount++;
 				ui.turnCount.innerHTML='回合'+get.cnNumber(_status.turnCount,true);
@@ -2113,12 +2113,12 @@ mode.chess={
 					event.goto(0);
 					game.delay();
 				}
-			}
+			});
 		},
 		phaseLoopOrdered:function(player){
 			var next=game.createEvent('phaseLoop');
 			next.player=player;
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				var passed=false;
 				for(var i=0;i<game.players.length;i++){
@@ -2249,7 +2249,7 @@ mode.chess={
 						game.removeTreasure(game.treasures[i--]);
 					}
 				}
-			}
+			});
 		},
 		isChessNeighbour:function(a,b){
 			if(a&&a.dataset){
@@ -2338,7 +2338,7 @@ mode.chess={
 		},
 		leaderView:function(){
 			var next=game.createEvent('leaderView',false);
-			next.content=function(){
+			next.setContent(function(){
 				'step 0'
 				var save=get.config('chess_leader_save');
 				if(!save){
@@ -3726,7 +3726,7 @@ mode.chess={
 				ui.wuxie.show();
 				ui.auto.show();
 				game.delay();
-			}
+			});
 		},
 		saveData:function(){
 			game.save(get.config('chess_leader_save'),game.data);
@@ -3788,7 +3788,7 @@ mode.chess={
 					player.init(list[0]);
 				}
 			}
-			next.content=function(){
+			next.setContent(function(){
 				"step 0"
 				ui.wuxie.hide();
 				var i;
@@ -4184,7 +4184,7 @@ mode.chess={
 				if(_status.mode=='combat'&&get.config('additional_player')){
 					_status.additionallist=event.list;
 				}
-			}
+			});
 		},
 		modeSwapPlayer:function(player){
 			var content=[game.me.dataset.position,player.dataset.position];
