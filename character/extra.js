@@ -100,7 +100,7 @@ character.extra={
 			trigger:{source:'dieAfter'},
 			forced:true,
 			filter:function(event,player){
-				return !player.skills.contains('lianpo2');
+				return !player.hasSkill('lianpo2');
 			},
 			content:function(){
 				player.addSkill('lianpo2');
@@ -193,7 +193,7 @@ character.extra={
 			audio:2,
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.storage.baonu>=2&&!player.skills.contains('wushuang');
+				return player.storage.baonu>=2&&!player.hasSkill('wushuang');
 			},
 			content:function(){
 				player.storage.baonu-=2;
@@ -244,10 +244,10 @@ character.extra={
 				maixie:true,
 				effect:{
 					target:function(card,player,target){
-						if(player.skills.contains('jueqing')) return [1,-2];
+						if(player.hasSkill('jueqing')) return [1,-2];
 						if(get.tag(card,'damage')){
 							if(target.hp==target.maxHp){
-								if(!target.skills.contains('jilue')){
+								if(!target.hasSkill('jilue')){
 									return [0,1];
 								}
 								return [0.7,1];
@@ -259,7 +259,7 @@ character.extra={
 						if(_status.currentPhase!=player) return;
 						if(get.type(card)=='basic'||get.type(card,'trick')=='trick') return;
 						if(player.hp<=2) return;
-						if(!player.skills.contains('jilue')||player.storage.renjie==0){
+						if(!player.hasSkill('jilue')||player.storage.renjie==0){
 							return [0,0,0,0];
 						}
 					}
@@ -497,7 +497,7 @@ character.extra={
 				effect:{
 					target:function(card,player,target,current){
 						if(target.hp<=1&&get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-5];
+							if(player.hasSkill('jueqing')) return [1,-5];
 							var hasfriend=false;
 							for(var i=0;i<game.players.length;i++){
 								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
@@ -569,7 +569,7 @@ character.extra={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							if(target.hp==1) return;
 							if(target.isTurnedOver()) return [0,3];
 							var num=0;
@@ -696,7 +696,7 @@ character.extra={
 				player.chooseTarget('选择角色获得大雾标记',
 				[1,Math.min(game.players.length,player.storage.qixing.length)]).ai=function(target){
 					if(target.isMin()) return 0;
-					if(target.skills.contains('biantian2')) return 0;
+					if(target.hasSkill('biantian2')) return 0;
 					var att=ai.get.attitude(player,target);
 					if(att>=4){
 						if(target.hp==1&&target.maxHp>2) return att;
@@ -763,11 +763,11 @@ character.extra={
 			silent:true,
 			content:function(){
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].skills.contains('dawu2')){
+					if(game.players[i].hasSkill('dawu2')){
 						game.players[i].removeSkill('dawu2');
 						game.players[i].popup('dawu2');
 					}
-					if(game.players[i].skills.contains('kuangfeng2')){
+					if(game.players[i].hasSkill('kuangfeng2')){
 						game.players[i].removeSkill('kuangfeng2');
 						game.players[i].popup('kuangfeng2');
 					}

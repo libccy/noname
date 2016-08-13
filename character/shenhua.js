@@ -143,7 +143,7 @@ character.shenhua={
 							if(_status.event.name=='xiangle') return;
 							var bs=player.get('h',{type:'basic'});
 							if(bs.length<2) return 0;
-							if(player.skills.contains('jiu')||player.skills.contains('tianxianjiu')) return;
+							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
 							if(bs.length<=3&&player.num('h','sha')<=1){
 								for(var i=0;i<bs.length;i++){
 									if(bs[i].name!='sha'&&ai.get.value(bs[i])<7){
@@ -232,7 +232,7 @@ character.shenhua={
 				player.maxHp++;
 				player.update();
 				player.recover();
-				if(player.skills.contains('ruoyu')){
+				if(player.hasSkill('ruoyu')){
 					player.addSkill('jijiang');
 				}
 				else{
@@ -1455,7 +1455,7 @@ character.shenhua={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							if(target.hp<=1) return;
 							var hastarget=false;
 							var hasfriend=false;
@@ -2072,7 +2072,7 @@ character.shenhua={
 							if(ai.get.equipValue(card)<=8) return 0;
 						}
 						if(target.get('e','2')) return;
-						if(player.skills.contains('unequip')) return;
+						if(player.hasSkill('unequip')) return;
 						if(get.tag(card,'respondShan')) return [0.5,0];
 					}
 				}
@@ -2243,7 +2243,7 @@ character.shenhua={
 						return 0;
 					},
 					player:function(player,target){
-						if(target.skills.contains('jueqing')) return -10;
+						if(target.hasSkill('jueqing')) return -10;
 						var mn=1;
 						var hs=player.get('h');
 						for(var i=0;i<hs.length;i++){
@@ -2299,7 +2299,7 @@ character.shenhua={
 				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'damage')&&target.hp>1){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							var max=0;
 							for(var i=0;i<game.players.length;i++){
 								if(ai.get.attitude(target,game.players[i])>0){
@@ -2601,7 +2601,7 @@ character.shenhua={
 			content:function(){
 				"step 0";
 				player.chooseTarget('是否发动【'+get.skillTranslation('releiji',player)+'】？').ai=function(target){
-					if(target.skills.contains('hongyan')) return 0;
+					if(target.hasSkill('hongyan')) return 0;
 					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
 				"step 1"
@@ -2639,11 +2639,11 @@ character.shenhua={
 							}
 							var be=target.num('e',{color:'black'});
 							if(target.num('h','shan')&&be){
-								if(!target.skills.contains('guidao')) return 0;
+								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.num('he')/2:0];
 							}
 							if(target.num('h','shan')&&target.num('h')>2){
-								if(!target.skills.contains('guidao')) return 0;
+								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.num('h')/4:0];
 							}
 							if(target.num('h')>3||(be&&target.num('h')>=2)){
@@ -2655,7 +2655,7 @@ character.shenhua={
 							if(target.num('h')==1&&!be){
 								return [1.2,0];
 							}
-							if(!target.skills.contains('guidao')) return [1,0.05];
+							if(!target.hasSkill('guidao')) return [1,0.05];
 							return [1,Math.min(0.5,(target.num('h')+be)/4)];
 						}
 					}
@@ -2850,7 +2850,7 @@ character.shenhua={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(player.skills.contains('jueqing')) return;
+						if(player.hasSkill('jueqing')) return;
 						if(get.tag(card,'damage')&&target.num('h')>1) return 0.7;
 					}
 				},
@@ -2951,7 +2951,7 @@ character.shenhua={
 			content:function(){
 				"step 0";
 				player.chooseTarget('是否发动【雷击】？').ai=function(target){
-					if(target.skills.contains('hongyan')) return 0;
+					if(target.hasSkill('hongyan')) return 0;
 					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
 				"step 1"

@@ -106,7 +106,7 @@ character.standard={
 				maixie:true,
 				effect:{
 					target:function(card,player){
-						if(player.skills.contains('jueqing')) return [1,-1];
+						if(player.hasSkill('jueqing')) return [1,-1];
 						if(get.tag(card,'damage')) return [1,0.5];
 					}
 				}
@@ -133,7 +133,7 @@ character.standard={
 				effect:{
 					target:function(card,player,target){
 						if(player.num('he')>1&&get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-1.5];
+							if(player.hasSkill('jueqing')) return [1,-1.5];
 							if(ai.get.attitude(target,player)<0) return [1,1];
 						}
 					}
@@ -230,7 +230,7 @@ character.standard={
 			ai:{
 				result:{
 					target:function(card,player,target){
-						if(player.skills.contains('jueqing')) return [1,-1];
+						if(player.hasSkill('jueqing')) return [1,-1];
 						if(get.tag(card,'damage')&&ai.get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
 					}
 				}
@@ -256,7 +256,7 @@ character.standard={
 				},function(target){
 					if(!_status.event.aicheck) return 0;
 					var att=ai.get.attitude(_status.event.player,target);
-					if(target.skills.contains('tuntian')) return att/10;
+					if(target.hasSkill('tuntian')) return att/10;
 					return 1-att;
 				}).set('aicheck',check);
 				"step 1"
@@ -377,7 +377,7 @@ character.standard={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.skills.contains('jueqing')) return [1,-2];
+							if(player.hasSkill('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,get.tag(card,'damage')*2];
 							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
@@ -620,7 +620,7 @@ character.standard={
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
 				if(!player.hasZhuSkill('jijiang')) return false;
-				if(player.skills.contains('jijiang3')) return false;
+				if(player.hasSkill('jijiang3')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].group=='shu'&&game.players[i]!=player){
 						return lib.filter.cardUsable({name:'sha'},player);
@@ -684,7 +684,7 @@ character.standard={
 			ai:{
 				result:{
 					target:function(player,target){
-						if(player.skills.contains('jijiang3')) return 0;
+						if(player.hasSkill('jijiang3')) return 0;
 						return ai.get.effect(target,{name:'sha'},player,target);
 					}
 				},

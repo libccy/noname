@@ -230,7 +230,7 @@ card.yunchou={
 							if(target==player&&target.num('h')<=1) return 0;
 							return 0.5;
 						}
-						if(target.skills.contains('toulianghuanzhu2')) return 0;
+						if(target.hasSkill('toulianghuanzhu2')) return 0;
 						return -0.5;
 					}
 				},
@@ -648,7 +648,7 @@ card.yunchou={
 						return 0;
 					},
 					target:function(player,target){
-						if(target.skills.contains('dujian2')||target.num('h')==0) return 0;
+						if(target.hasSkill('dujian2')||target.num('h')==0) return 0;
 						if(player.num('h')<=1) return 0;
 						return -1.5;
 					}

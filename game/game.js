@@ -3558,7 +3558,7 @@
                             }
                             if(!lib.node.http) lib.node.http=require('http');
                             if(!lib.node.https) lib.node.https=require('https');
-                            var request = (url.indexOf('https'==0)?lib.node.https:lib.node.http).get(url, function(response) {
+                            var request = (url.indexOf('https')==0?lib.node.https:lib.node.http).get(url, function(response) {
                                 var stream=response.pipe(file);
                                 stream.on('finish',onsuccess);
                                 stream.on('error',onerror);
@@ -9975,6 +9975,14 @@
                 addSkillTrigger:function(skill,hidden){
                     var info=lib.skill[skill];
                     if(!info) return;
+                    if(typeof info.group=='string'){
+                        this.addSkillTrigger(info.group,hidden);
+                    }
+                    else if(Array.isArray(info.group)){
+                        for(var i=0;i<info.group.length;i++){
+                            this.addSkillTrigger(info.group[i],hidden);
+                        }
+                    }
                     if(info.global&&(!hidden||info.globalSilent)){
                         if(typeof info.global=='string'){
                             game.addGlobalSkill(info.global,this);
@@ -10107,6 +10115,55 @@
 					}
 					return this;
 				},
+                removeSkillTrigger:function(skill){
+                    var info=lib.skill[skill];
+                    if(!info) return;
+                    if(typeof info.group=='string'){
+                        this.removeSkillTrigger(info.group);
+                    }
+                    else if(Array.isArray(info.group)){
+                        for(var i=0;i<info.group.length;i++){
+                            this.removeSkillTrigger(info.group[i]);
+                        }
+                    }
+                    if(info.trigger){
+                        var playerid=this.playerid;
+                        var removeTrigger=function(i,evt){
+                            if(i=='global'){
+                                for(var j in lib.hook.globaltrigger){
+                                    if(lib.hook.globaltrigger[j][playerid]){
+                                        lib.hook.globaltrigger[j][playerid].remove(skill);
+                                        if(lib.hook.globaltrigger[j][playerid].length==0){
+                                            delete lib.hook.globaltrigger[j][playerid];
+                                        }
+                                        if(get.emptyobj(lib.hook.globaltrigger[j])){
+                                            delete lib.hook.globaltrigger[j];
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                var name=playerid+'_'+i+'_'+evt;
+                                if(lib.hook[name]){
+                                    lib.hook[name].remove(skill);
+                                    if(lib.hook[name].length==0){
+                                        delete lib.hook[name];
+                                    }
+                                }
+                            }
+                        }
+                        for(var i in info.trigger){
+                            if(typeof info.trigger[i]=='string'){
+                                removeTrigger(i,info.trigger[i]);
+                            }
+                            else if(Array.isArray(info.trigger)){
+                                for(var j=0;j<info.trigger.length;j++){
+                                    removeTrigger(i,info.trigger[i][j]);
+                                }
+                            }
+                        }
+                    }
+                },
 				removeSkill:function(skill){
                     if(Array.isArray(skill)){
                         for(var i=0;i<skill.length;i++){
@@ -10117,46 +10174,14 @@
                         this.unmarkSkill(skill);
     					this.skills.remove(skill);
     					this.checkConflict();
+                        this.initedSkills.remove(skill);
                         delete this.tempSkills[skill];
                         var info=lib.skill[skill];
                         if(info){
                             if(info.onremove){
         						info.onremove(this);
         					}
-                            if(info.trigger){
-                                var playerid=this.playerid;
-                                var removeTrigger=function(i,evt){
-                                    if(i=='global'){
-                                        for(var j in lib.hook.globaltrigger){
-                                            if(lib.hook.globaltrigger[j][playerid]){
-                                                lib.hook.globaltrigger[j][playerid].remove(skill);
-                                                if(lib.hook.globaltrigger[j][playerid].length==0){
-                                                    delete lib.hook.globaltrigger[j][playerid];
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else{
-                                        var name=playerid+'_'+i+'_'+evt;
-                                        if(lib.hook[name]){
-                                            lib.hook[name].remove(skill);
-                                            if(lib.hook[name].length==0){
-                                                delete lib.hook[name];
-                                            }
-                                        }
-                                    }
-                                }
-                                for(var i in info.trigger){
-                                    if(typeof info.trigger[i]=='string'){
-                                        removeTrigger(i,info.trigger[i]);
-                                    }
-                                    else if(Array.isArray(info.trigger)){
-                                        for(var j=0;j<info.trigger.length;j++){
-                                            removeTrigger(i,info.trigger[i][j]);
-                                        }
-                                    }
-                                }
-                            }
+                            this.removeSkillTrigger(skill);
                         }
                     }
 					return skill;
@@ -12078,25 +12103,6 @@
                     if(name=='gameStart'){
                         _status.gameStarted=true;
                     }
-                    for(var i=0;i<game.players.length;i++){
-						for(var j in game.players[i].tempSkills){
-							var expire=game.players[i].tempSkills[j];
-							if(expire==name||
-								(get.objtype(expire)=='array'&&expire.contains(name))||
-								(typeof expire=='function'&&expire(event,game.players[i],name))){
-								delete game.players[i].tempSkills[j];
-								game.players[i].removeSkill(j);
-							}
-							else if(typeof expire=='object'){
-								if(expire.player==name&&event.player==game.players[i]||
-									expire.target==name&&event.target==game.players[i]||
-									expire.source==name&&event.source==game.players[i]){
-									delete game.players[i].tempSkills[j];
-									game.players[i].removeSkill(j);
-								}
-							}
-						}
-					}
                     var event=this;
                     var start=event.player||game.me||game.players[0];
                     if(!game.players.contains(start)){
@@ -12104,48 +12110,77 @@
 					}
                     var list=[];
                     var roles=['player','source','target'];
-                    for(var i=0;i<roles.length;i++){
-                        if(event[roles[i]]){
-                            var triggername=event[roles[i]].playerid+'_'+roles[i]+'_'+name;
-                            if(lib.hook[triggername]){
-                                for(var j=0;j<lib.hook[triggername].length;j++){
-                                    list.push([lib.hook[triggername][j],event[roles[i]]]);
-                                }
-                            }
-                            triggername=roles[i]+'_'+name;
-                            if(lib.hook.globalskill[triggername]){
-                                for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
-                                    list.push([lib.hook.globalskill[triggername][j],event[roles[i]]]);
-                                }
-                            }
+                    var addList=function(skill,player){
+                        var info=lib.skill[skill];
+                        var num=0;
+                        if(info.priority){
+                            num=info.priority*100;
                         }
-                    }
-                    var triggername='global_'+name;
-                    if(lib.hook.globalskill[triggername]){
-                        for(var i=0;i<game.players.length;i++){
-                            for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
-                                list.push([lib.hook.globalskill[triggername][j],game.players[i]]);
-                            }
+                        if(info.forced){
+                            num+=50;
                         }
-                    }
+                        list.push([skill,player,num]);
+                    };
+                    var totalPopulation=game.players.length+game.dead.length+1;
+                    var player=start;
+                    var globalskill='global_'+name;
                     var map=_status.connectMode?lib.playerOL:game.playerMap;
-                    for(var i in lib.hook.globaltrigger[name]){
-                        if(map[i]&&map[i].isAlive()){
-                            for(var j=0;j<lib.hook.globaltrigger[name][i].length;j++){
-                                list.push([lib.hook.globaltrigger[name][i][j],map[i]]);
+                    for(var iwhile=0;iwhile<totalPopulation;iwhile++){
+                        for(var j in player.tempSkills){
+							var expire=player.tempSkills[j];
+							if(expire==name||
+								(get.objtype(expire)=='array'&&expire.contains(name))||
+								(typeof expire=='function'&&expire(event,player,name))){
+								delete player.tempSkills[j];
+								player.removeSkill(j);
+							}
+							else if(typeof expire=='object'){
+								if(expire.player==name&&event.player==player||
+									expire.target==name&&event.target==player||
+									expire.source==name&&event.source==player){
+									delete player.tempSkills[j];
+									player.removeSkill(j);
+								}
+							}
+						}
+                        for(var i=0;i<roles.length;i++){
+                            if(event[roles[i]]==player){
+                                var triggername=player.playerid+'_'+roles[i]+'_'+name;
+                                if(lib.hook[triggername]){
+                                    for(var j=0;j<lib.hook[triggername].length;j++){
+                                        addList(lib.hook[triggername][j],player);
+                                    }
+                                }
+                                triggername=roles[i]+'_'+name;
+                                if(lib.hook.globalskill[triggername]){
+                                    for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
+                                        addList(lib.hook.globalskill[triggername][j],player);
+                                    }
+                                }
                             }
                         }
-                    }
-                    list.sort(function(a,b){
-                        var priority=lib.sort.priority(a,b);
-                        if(priority) return priority;
-                        if(start){
-                            return get.distance(start,a[1],'absolute')-get.distance(start,b[1],'absolute');
+                        if(lib.hook.globalskill[globalskill]){
+                            for(var j=0;j<lib.hook.globalskill[globalskill].length;j++){
+                                addList(lib.hook.globalskill[globalskill][j],player);
+                            }
                         }
-                        return 0;
+                        for(var i in lib.hook.globaltrigger[name]){
+                            if(map[i]==player){
+                                for(var j=0;j<lib.hook.globaltrigger[name][i].length;j++){
+                                    addList(lib.hook.globaltrigger[name][i][j],map[i]);
+                                }
+                            }
+                        }
+						player=player.next;
+						if(!player||player==start){
+							break;
+						}
+					}
+                    list.sort(function(a,b){
+                        return b[2]-a[2];
                     });
                     if(list.length){
-						for(i=0;i<list.length;i++){
+						for(var i=0;i<list.length;i++){
 							game.createTrigger(name,list[i][0],list[i][1],event);
 						}
 					}
@@ -21756,7 +21791,7 @@
 							}
 						}
 						page.classList.add('menu-buttons');
-						if(mode.indexOf('mode_')!=0&&!lib.config.customCardPack[mode]){
+						if(!connectMenu&&mode.indexOf('mode_')!=0&&!lib.config.customCardPack[mode]){
 							ui.create.div('.config.more','隐藏卡牌包',page,function(){
 								if(this.innerHTML=='隐藏卡牌包'){
 									this.innerHTML='卡牌包将在重启后隐藏';
