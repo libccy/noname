@@ -82,6 +82,7 @@
         extensionPack:{},
         cardType:{},
         hook:{globaltrigger:{},globalskill:{}},
+        hookmap:{},
         characterDialogGroup:{
             '收藏':function(name,capt){
                 return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -8108,7 +8109,6 @@
 				get:function(arg1,arg2,arg3,arg4){
 					var i,j;
 					if(arg1=='s'){
-						this.checkConflict();
 						var skills=this.skills.slice(0);
 						for(var i in this.additionalSkills){
 							if(Array.isArray(this.additionalSkills[i])){
@@ -8121,19 +8121,17 @@
 							else if(this.additionalSkills[i]&&typeof this.additionalSkills[i]=='string'){
 								skills.add(this.additionalSkills[i]);
 							}
-                            else if(typeof this.additionalSkills[i]=='function'){
-                                skills.addArray(this.additionalSkills[i](this));
-                            }
 						}
                         for(var i in this.tempSkills){
                             skills.add(i);
                         }
 						if(arg2) skills=skills.concat(this.hiddenSkills);
 						if(arg3!==false){
-							for(i=0;i<this.node.equips.childNodes.length;i++){
+							for(i=0;i<this.node.equips.childElementCount;i++){
 								if(this.node.equips.childNodes[i].classList.contains('removing')) continue;
-								if(get.info(this.node.equips.childNodes[i]).skills){
-									skills=skills.concat(get.info(this.node.equips.childNodes[i]).skills);
+                                var equipskills=get.info(this.node.equips.childNodes[i]).skills;
+								if(equipskills){
+									skills=skills.concat(equipskills);
 								}
 							}
 						}
@@ -8145,20 +8143,26 @@
 						}
 						return skills;
 					}
-					else if(get.itemtype(arg1)=='position'){
+					else if(get.is.pos(arg1)){
 						var cards=[],cards1=[];
 						for(i=0;i<arg1.length;i++){
 							if(arg1[i]=='h'){
-								for(j=0;j<this.node.handcards1.childNodes.length;j++){
-									cards.push(this.node.handcards1.childNodes[j]);
+								for(j=0;j<this.node.handcards1.childElementCount;j++){
+                                    if(!this.node.handcards1.childNodes[j].classList.contains('removing')){
+                                        cards.push(this.node.handcards1.childNodes[j]);
+                                    }
 								}
-								for(j=0;j<this.node.handcards2.childNodes.length;j++){
-									cards.push(this.node.handcards2.childNodes[j]);
+								for(j=0;j<this.node.handcards2.childElementCount;j++){
+                                    if(!this.node.handcards2.childNodes[j].classList.contains('removing')){
+                                        cards.push(this.node.handcards2.childNodes[j]);
+                                    }
 								}
 							}
 							else if(arg1[i]=='e'){
-								for(j=0;j<this.node.equips.childNodes.length;j++){
-									cards.push(this.node.equips.childNodes[j]);
+								for(j=0;j<this.node.equips.childElementCount;j++){
+                                    if(!this.node.equips.childNodes[j].classList.contains('removing')){
+                                        cards.push(this.node.equips.childNodes[j]);
+                                    }
 								}
 								if(arguments.length==2&&typeof arg2=='string'&&/1|2|3|4|5/.test(arg2)){
 									for(j=0;j<cards.length;j++){
@@ -8168,21 +8172,21 @@
 								}
 							}
 							else if(arg1[i]=='j'){
-								for(j=0;j<this.node.judges.childNodes.length;j++){
-									cards.push(this.node.judges.childNodes[j]);
-									if(this.node.judges.childNodes[j].viewAs){
-										this.node.judges.childNodes[j].tempJudge=this.node.judges.childNodes[j].name;
-										this.node.judges.childNodes[j].name=this.node.judges.childNodes[j].viewAs;
-										cards1.push(this.node.judges.childNodes[j]);
-									}
+								for(j=0;j<this.node.judges.childElementCount;j++){
+                                    if(!this.node.judges.childNodes[j].classList.contains('removing')){
+                                        cards.push(this.node.judges.childNodes[j]);
+    									if(this.node.judges.childNodes[j].viewAs&&arguments.length>1){
+    										this.node.judges.childNodes[j].tempJudge=this.node.judges.childNodes[j].name;
+    										this.node.judges.childNodes[j].name=this.node.judges.childNodes[j].viewAs;
+    										cards1.push(this.node.judges.childNodes[j]);
+    									}
+                                    }
 								}
 							}
 						}
-						for(i=0;i<cards.length;i++){
-							if(cards[i].classList.contains('removing')){
-								cards.splice(i,1);i--;
-							}
-						}
+                        if(arguments.length==1){
+                            return cards;
+                        }
 						if(arg2!=undefined){
 							if(typeof arg3=='function'){
 								var cards2=cards.slice(0);
@@ -10017,13 +10021,14 @@
                                 }
                                 lib.hook[name].add(skill);
                             }
+                            lib.hookmap[evt]=true;
                         }
                         for(var i in info.trigger){
                             if(typeof info.trigger[i]=='string'){
                                 setTrigger(i,info.trigger[i]);
                             }
-                            else if(Array.isArray(info.trigger)){
-                                for(var j=0;j<info.trigger.length;j++){
+                            else if(Array.isArray(info.trigger[i])){
+                                for(var j=0;j<info.trigger[i].length;j++){
                                     setTrigger(i,info.trigger[i][j]);
                                 }
                             }
@@ -10126,6 +10131,7 @@
                             this.removeSkillTrigger(info.group[i]);
                         }
                     }
+                    this.initedSkills.remove(skill);
                     if(info.trigger){
                         var playerid=this.playerid;
                         var removeTrigger=function(i,evt){
@@ -10136,7 +10142,7 @@
                                         if(lib.hook.globaltrigger[j][playerid].length==0){
                                             delete lib.hook.globaltrigger[j][playerid];
                                         }
-                                        if(get.emptyobj(lib.hook.globaltrigger[j])){
+                                        if(get.is.empty(lib.hook.globaltrigger[j])){
                                             delete lib.hook.globaltrigger[j];
                                         }
                                     }
@@ -10156,8 +10162,8 @@
                             if(typeof info.trigger[i]=='string'){
                                 removeTrigger(i,info.trigger[i]);
                             }
-                            else if(Array.isArray(info.trigger)){
-                                for(var j=0;j<info.trigger.length;j++){
+                            else if(Array.isArray(info.trigger[i])){
+                                for(var j=0;j<info.trigger[i].length;j++){
                                     removeTrigger(i,info.trigger[i][j]);
                                 }
                             }
@@ -10174,7 +10180,6 @@
                         this.unmarkSkill(skill);
     					this.skills.remove(skill);
     					this.checkConflict();
-                        this.initedSkills.remove(skill);
                         delete this.tempSkills[skill];
                         var info=lib.skill[skill];
                         if(info){
@@ -12098,8 +12103,9 @@
 				notLink:function(){
 					return this.getParent().name!='_lianhuan'&&this.getParent().name!='_lianhuan2';
 				},
-                triggerx:function(name){
+                trigger:function(name){
                     if(_status.video) return;
+                    if(!lib.hookmap[name]) return;
                     if(name=='gameStart'){
                         _status.gameStarted=true;
                     }
@@ -12185,7 +12191,7 @@
 						}
 					}
                 },
-				trigger:function(name){
+				triggerx:function(name){
 					if(_status.video) return;
                     if(name=='gameStart'){
                         _status.gameStarted=true;
@@ -17117,13 +17123,14 @@
                         lib.hook.globalskill[name]=[];
                     }
                     lib.hook.globalskill[name].add(skill);
+                    lib.hookmap[evt]=true;
                 }
                 for(var i in info.trigger){
                     if(typeof info.trigger[i]=='string'){
                         setTrigger(i,info.trigger[i]);
                     }
-                    else if(Array.isArray(info.trigger)){
-                        for(var j=0;j<info.trigger.length;j++){
+                    else if(Array.isArray(info.trigger[i])){
+                        for(var j=0;j<info.trigger[i].length;j++){
                             setTrigger(i,info.trigger[i][j]);
                         }
                     }
@@ -23842,7 +23849,7 @@
     						var selectname=ui.create.selectlist(list,list[0],commandline);
                             var list3=[];
                             for(var i in lib.skill){
-                                if(i!='global'&&!get.emptyobj(lib.skill[i])&&!lib.skilllist.contains(i)){
+                                if(i!='global'&&!get.is.empty(lib.skill[i])&&!lib.skilllist.contains(i)){
                                     list3.push(i);
                                 }
                             }
@@ -23972,7 +23979,7 @@
                                     delete dash3.content.pack.translate[name];
                                     delete dash3.content.pack.translate[name+'_info'];
                                     dash3.link.classList.add('active');
-                                    if(get.emptyobj(dash3.content.pack.skill)){
+                                    if(get.is.empty(dash3.content.pack.skill)){
                                         dash1.selectname.value=dash1.selectname.childNodes[1].value;
                                     }
                                     dash1.selectname.onchange.call(dash1.selectname);
@@ -29710,9 +29717,45 @@
 		},
 	};
 	var get={
-        emptyobj:function(obj){
-            for(var i in obj) return false;
-            return true;
+        is:{
+            empty:function(obj){
+                for(var i in obj) return false;
+                return true;
+            },
+            pos:function(str){
+                return (str=='h'||str=='e'||str=='j'||str=='he'||str=='hj'||str=='ej'||str=='hej');
+            },
+        },
+        benchmark:function(func1,func2,arg,iteration){
+            var tic,toc;
+            if(Array.isArray(func2)){
+                tic=get.utc();
+                for(var i=0;i<iteration;i++){
+                    func1[func2[0]](arg.randomGet());
+                }
+                toc=get.utc();
+                console.log('time1: '+(toc-tic));
+                tic=get.utc();
+                for(var i=0;i<iteration;i++){
+                    func1[func2[1]](arg.randomGet());
+                }
+                toc=get.utc();
+                console.log('time2: '+(toc-tic));
+            }
+            else{
+                tic=get.utc();
+                for(var i=0;i<iteration;i++){
+                    func1(arg.randomGet());
+                }
+                toc=get.utc();
+                console.log('time1: '+(toc-tic));
+                tic=get.utc();
+                for(var i=0;i<iteration;i++){
+                    func2(arg.randomGet());
+                }
+                toc=get.utc();
+                console.log('time2: '+(toc-tic));
+            }
         },
         stringify:function(obj,level){
             level=level||0;
