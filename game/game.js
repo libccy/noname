@@ -12031,6 +12031,7 @@
                     return this.getParent()._trigger;
                 },
 				backup:function(skill){
+                    delete this._cardRange;
 					this._backup={
 						filterButton:this.filterButton,
 						selectButton:this.selectButton,
@@ -12078,6 +12079,7 @@
 					}
 				},
 				restore:function(){
+                    delete this._cardRange;
 					if(this._backup){
 						this.filterButton=this._backup.filterButton;
 						this.selectButton=this._backup.selectButton;
@@ -12105,10 +12107,10 @@
 				},
                 trigger:function(name){
                     if(_status.video) return;
-                    if(!lib.hookmap[name]) return;
                     if(name=='gameStart'){
                         _status.gameStarted=true;
                     }
+                    if(!lib.hookmap[name]) return;
                     var event=this;
                     var start=event.player||game.me||game.players[0];
                     if(!game.players.contains(start)){
@@ -17902,6 +17904,7 @@
 			if(event.filterButton){
 				var dialog=event.dialog;
 				range=get.select(event.selectButton);
+                var selectableButtons=false;
 				if(range[0]!=range[1]||range[0]>1) auto=false;
 				for(i=0;i<dialog.buttons.length;i++){
 					if(dialog.buttons[i].classList.contains('unselectable')) continue;
@@ -17927,11 +17930,17 @@
 					if(dialog.buttons[i].classList.contains('selected')){
 						dialog.buttons[i].classList.add('selectable');
 					}
+                    else if(!selectableButtons&&dialog.buttons[i].classList.contains('selectable')){
+                        selectableButtons=true;
+                    }
 				}
 				if(ui.selected.buttons.length<range[0]){
-					if(!event.forced||get.selectableButtons().length)
-					ok=false;
-					if(event.complexSelect||event.getParent().name=='chooseCharacter'||event.getParent().name=='chooseButtonOL') ok=false;
+					if(!event.forced||selectableButtons){
+                        ok=false;
+                    }
+					if(event.complexSelect||event.getParent().name=='chooseCharacter'||event.getParent().name=='chooseButtonOL'){
+                        ok=false;
+                    }
 				}
 				if(custom.add.button){
 					custom.add.button();
@@ -17943,13 +17952,20 @@
 				}
 				else{
 					var cards;
-					if(event.position){
-						cards=player.get(event.position);
-					}
-					else{
-						cards=player.get('h');
-					}
+                    if(event._cardRange){
+                        cards=event._cardRange;
+                    }
+                    else{
+                        if(event.position){
+    						cards=player.get(event.position);
+    					}
+    					else{
+    						cards=player.get('h');
+    					}
+                        event._cardRange=cards;
+                    }
 					range=get.select(event.selectCard);
+                    var selectableCards=false;
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<cards.length;i++){
 						if(event.filterCard(cards[i],player)&&
@@ -17977,11 +17993,14 @@
 						if(cards[i].classList.contains('selected')){
 							cards[i].classList.add('selectable');
 						}
+                        else if(!selectableCards&&cards[i].classList.contains('selectable')){
+                            selectableCards=true;
+                        }
 					}
 					if(ui.selected.cards.length<range[0]){
-						if(!event.forced||get.selectableCards().length)
-						ok=false;
-						if(event.complexSelect) ok=false;
+						if(!event.forced||selectableCards||event.complexSelect){
+                            ok=false;
+                        }
 					}
 				}
 				if(custom.add.card){
@@ -17995,6 +18014,7 @@
 				else{
 					var card=get.card();
 					range=get.select(event.selectTarget);
+                    var selectableTargets=false;
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<game.players.length;i++){
 						var nochess=true;
@@ -18026,6 +18046,9 @@
 						if(game.players[i].classList.contains('selected')){
 							game.players[i].classList.add('selectable');
 						}
+                        else if(!selectableTargets&&game.players[i].classList.contains('selectable')){
+                            selectableTargets=true;
+                        }
 						if(game.players[i].instance){
 							if(game.players[i].classList.contains('selected')){
 								game.players[i].instance.classList.add('selected');
@@ -18042,9 +18065,9 @@
 						}
 					}
 					if(ui.selected.targets.length<range[0]){
-						if(!event.forced||get.selectableTargets().length)
-						ok=false;
-						if(event.complexSelect) ok=false;
+						if(!event.forced||selectableTargets||event.complexSelect){
+                            ok=false;
+                        }
 					}
 					if(range[1]==-1&&ui.selected.targets.length==0&&event.targetRequired){
 						ok=false;
@@ -18056,7 +18079,7 @@
 			}
 			if(!event.skill&&get.noSelected()&&!_status.noconfirm){
 				var skills=[],enable,info;
-				var skills2=game.filterSkills(player.get('s').concat(player.hiddenSkills).concat(lib.skill.global),player);
+				var skills2=game.filterSkills(player.get('s',true,true,false).concat(lib.skill.global),player);
 				game.expandSkills(skills2);
 				for(i=0;i<skills2.length;i++){
 					info=get.info(skills2[i]);
@@ -18076,7 +18099,6 @@
 						skills.add(skills2[i]);
 					}
 				}
-
 
 				var globalskills=[];
 				var globallist=lib.skill.global.slice(0);
