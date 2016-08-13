@@ -629,7 +629,7 @@ mode.chess={
 				var next=game.createEvent('chooseToMove');
 				next.num=num||1;
 				next.player=this;
-				next.content=lib.element.content.chooseToMove;
+				next.setContent('chooseToMove');
 				next.prompt=prompt;
 				return next;
 			},
@@ -1557,7 +1557,7 @@ mode.chess={
 			var next=game.createEvent('replaceChessPlayer');
 			next.playername=name;
 			next.enemy=enemy;
-			next.content=lib.element.content.replaceChessPlayer;
+			next.setContent('replaceChessPlayer');
 		},
 		removeTreasure:function(player){
 			game.addVideo('removeTreasure',null,player.dataset.position);
@@ -2084,7 +2084,7 @@ mode.chess={
 					if(!info.filter||info.filter(mech)){
 						var next=game.createEvent('chessMech');
 						next.player=mech;
-						next.content=info.content;
+						next.setContent(info.content);
 						mech.chessFocus();
 						if(lib.config.animation&&!lib.config.low_performance){
 							mech.$epic2();
