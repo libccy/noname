@@ -3157,6 +3157,7 @@
 				lib.status.canvas=false;
 				return false;
 			}
+            _status.canvasChanged=true;
 			ui.canvas.width=ui.arena.offsetWidth;
 			ui.canvas.height=ui.arena.offsetHeight;
 			var ctx=ui.ctx;
@@ -18278,8 +18279,11 @@
 					ui.touchlines.shift().delete();
 				}
 			}
-			ui.canvas.width=ui.arena.offsetWidth;
-			ui.canvas.height=ui.arena.offsetHeight;
+            if(_status.canvasChanged){
+                ui.canvas.width=ui.arena.offsetWidth;
+    			ui.canvas.height=ui.arena.offsetHeight;
+                delete _status.canvasChanged;
+            }
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].unprompt();
 			}
@@ -28099,8 +28103,11 @@
 				while(ui.touchlines.length){
 					ui.touchlines.shift().delete();
 				}
-				ui.canvas.width=ui.arena.offsetWidth;
-				ui.canvas.height=ui.arena.offsetHeight;
+                if(_status.canvasChanged){
+                    ui.canvas.width=ui.arena.offsetWidth;
+    				ui.canvas.height=ui.arena.offsetHeight;
+                    delete _status.canvasChanged;
+                }
 				if(tmpflag){
 					game.check();
 				}
@@ -28537,8 +28544,6 @@
 							_status.clicked=false;
 							game.uncheck();
 							game.check();
-							ui.canvas.width=ui.arena.offsetWidth;
-							ui.canvas.height=ui.arena.offsetHeight;
 							_status.clicked=true;
 						}
 					}
