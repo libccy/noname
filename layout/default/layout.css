@@ -1831,7 +1831,7 @@ div:hover>.wunature{
 .timerbar[data-color="orange"]>div:last-child{background: linear-gradient(#FFDA47, #CE0404)}*/
 
 .player.selectable{
-	/*box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.5) 0 0 5px, rgba(0, 133, 255, 0.6) 0 0 12px, rgba(0, 133, 255, 0.8) 0 0 15px;*/\
+	/*box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.5) 0 0 5px, rgba(0, 133, 255, 0.6) 0 0 12px, rgba(0, 133, 255, 0.8) 0 0 15px;*/
 	-webkit-filter:drop-shadow(blue 0 0 5px);
 }
 .selected,.selectedx{
