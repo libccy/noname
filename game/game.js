@@ -26035,7 +26035,7 @@
                 dialog.classList.add('scroll1');
                 dialog.classList.add('scroll2');
                 dialog.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
-                    _status.clicked=true;
+                    _status.clicked2=true;
                 });
                 dialog.getCurrentCapt=function(link,capt,noalph){
                     var currentcapt=noalph?this.currentcapt2:this.currentcapt;
@@ -28607,8 +28607,9 @@
 				if(_status.dragged) return;
 				if(_status.touchpopping) return;
 				if(_status.reloading) return;
-				if(_status.clicked){
-					_status.clicked=false;
+				if(_status.clicked||_status.clicked2){
+                    _status.clicked=false;
+					_status.clicked2=false;
 				}
 				else{
                     if(_status.clickingidentity){

@@ -1,11 +1,12 @@
 window.noname_update={
-    version:'1.9.0',
+    version:'1.8.21',
     changeLog:[
         'bug增加'
     ],
     files:{
         global:[
-            // 'game/game.js',
+            'game/game.js',
         ],
+        '1.8.21':[]
     }
 }
