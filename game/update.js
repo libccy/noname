@@ -8,6 +8,5 @@ window.noname_update={
             'game/game.js',
             'layout/default/layout.css',
         ],
-        '1.8.21':[]
     }
 }
