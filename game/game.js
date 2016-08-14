@@ -37,7 +37,6 @@
         window.indexedDB=null;
     }
 }());
-
 (function(){
 	var _status={
 		paused:false,
@@ -3370,7 +3369,7 @@
                     game.saveConfig('confirmtouch',true);
                     game.saveConfig('low_performance',true);
                     game.saveConfig('confirm_exit',true);
-                    if(!lib.ipad){
+                    if(lib.ipad){
                         game.saveConfig('layout','phone');
                     }
                 }
@@ -4397,7 +4396,8 @@
 					str=str.replace(/'step 0'|"step 0"/,'if(event.step=='+k+') {event.finish();return;}switch(step){case 0:');
 				}
 				return (new Function('event','step','source','player','target','targets',
-                    'card','cards','skill','forced','num','trigger','result',str));
+                    'card','cards','skill','forced','num','trigger','result',
+                    '_status','lib','game','ui','get','ai',str));
             },
 			eval:function(func){
 				if(typeof func=='function'){
@@ -10701,7 +10701,12 @@
                 clearEquipTrigger:function(){
                     var es=this.get('e');
                     for(var i=0;i<es.length;i++){
-                        var info=get.info(es)
+                        var info=get.info(es[i]);
+                        if(info.skills){
+                            for(var j=0;j<info.skills.length;j++){
+                                this.removeSkillTrigger(info.skills[j]);
+                            }
+                        }
                     }
                 },
                 removeSkillTrigger:function(skill){
@@ -18071,7 +18076,8 @@
 					}
 					else{
                         event.content(event,step,source,player,target,targets,
-                            card,cards,skill,forced,num,trigger,result);
+                            card,cards,skill,forced,num,trigger,result,
+                            _status,lib,game,ui,get,ai);
 						// eval(lib.init.parse(event.content))();
 					}
 					event.step++;
@@ -19326,6 +19332,7 @@
 			game.addVideo('addFellow',null,[position,character]);
 			var player=ui.create.player(ui.arena).animate(animation||'start');
 			player.dataset.position=position||game.players.length+game.dead.length;
+            player.getId();
 			if(character) player.init(character);
 			game.players.push(player);game.arrangePlayers();
 			return player;
