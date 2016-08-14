@@ -4396,7 +4396,8 @@
 					str=str.replace(/'step 0'|"step 0"/,'if(event.step=='+k+') {event.finish();return;}switch(step){case 0:');
 				}
 				return (new Function('event','step','source','player','target','targets',
-                    'card','cards','skill','forced','num','trigger','result',str));
+                    'card','cards','skill','forced','num','trigger','result',
+                    '_status','lib','game','ui','get','ai',str));
             },
 			eval:function(func){
 				if(typeof func=='function'){
@@ -18075,7 +18076,8 @@
 					}
 					else{
                         event.content(event,step,source,player,target,targets,
-                            card,cards,skill,forced,num,trigger,result);
+                            card,cards,skill,forced,num,trigger,result,
+                            _status,lib,game,ui,get,ai);
 						// eval(lib.init.parse(event.content))();
 					}
 					event.step++;
