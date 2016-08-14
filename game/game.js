@@ -37,7 +37,6 @@
         window.indexedDB=null;
     }
 }());
-
 (function(){
 	var _status={
 		paused:false,
