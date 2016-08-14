@@ -6,7 +6,6 @@ window.noname_update={
     files:{
         global:[
             'game/game.js',
-            'layout/default/layout.css',
         ],
     }
 }
