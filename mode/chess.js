@@ -1272,7 +1272,7 @@ mode.chess={
 				}
 			},
 		},
-		playerproto:{
+		content:{
 			replaceChessPlayer:function(){
 				'step 0'
 				if(get.config('additional_player')){

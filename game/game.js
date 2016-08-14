@@ -19332,6 +19332,7 @@
 			game.addVideo('addFellow',null,[position,character]);
 			var player=ui.create.player(ui.arena).animate(animation||'start');
 			player.dataset.position=position||game.players.length+game.dead.length;
+            player.getId();
 			if(character) player.init(character);
 			game.players.push(player);game.arrangePlayers();
 			return player;
