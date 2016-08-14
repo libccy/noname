@@ -7508,6 +7508,11 @@
 					if(num<cards.length){
 						if(cards[num].original=='e'){
 							var info=get.info(cards[num]);
+                            if(info.skills){
+                                for(var i=0;i<info.skills.length;i++){
+                                    player.removeSkillTrigger(info.skills[i]);
+                                }
+                            }
 							if(info.onLose&&(!info.filterLose||info.filterLose(cards[num],player))){
 								event.goto(2);
 								return;
@@ -10693,6 +10698,17 @@
 					}
 					return this;
 				},
+                clearEquipTrigger:function(){
+                    var es=this.get('e');
+                    for(var i=0;i<es.length;i++){
+                        var info=get.info(es[i]);
+                        if(info.skills){
+                            for(var j=0;j<info.skills.length;j++){
+                                this.removeSkillTrigger(info.skills[j]);
+                            }
+                        }
+                    }
+                },
                 removeSkillTrigger:function(skill){
                     var info=lib.skill[skill];
                     if(!info) return;
@@ -11804,6 +11820,12 @@
 					if(!equipped){
 						player.node.equips.appendChild(card);
 					}
+                    var info=get.info(card);
+                    if(info.skills){
+                        for(var i=0;i<info.skills.length;i++){
+                            player.addSkillTrigger(info.skills[i]);
+                        }
+                    }
 					return player;
 				},
 				$gain:function(card,log,init){

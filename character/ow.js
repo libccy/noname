@@ -2318,6 +2318,7 @@ character.ow={
                         player.storage.shanxian_e[i]=game.createCard(player.storage.shanxian_e[i]);
                     }
                 }
+                player.clearEquipTrigger();
                 var cards=player.get('he');
                 for(var i=0;i<cards.length;i++){
                     ui.discardPile.appendChild(cards[i]);
