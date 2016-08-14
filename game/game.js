@@ -3369,7 +3369,7 @@
                     game.saveConfig('confirmtouch',true);
                     game.saveConfig('low_performance',true);
                     game.saveConfig('confirm_exit',true);
-                    if(lib.ipad){
+                    if(!lib.ipad){
                         game.saveConfig('layout','phone');
                     }
                 }
