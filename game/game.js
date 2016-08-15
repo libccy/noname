@@ -16764,6 +16764,12 @@
 					game.playerMap[players[i].dataset.position]=players[i];
 				}
 			},
+            removeTafangPlayer:function(){
+                ui.fakeme.hide();
+                ui.handcards1Container.innerHTML='';
+                ui.handcards2Container.innerHTML='';
+                game.me=ui.create.player();
+            },
 			swapControl:function(player,hs){
 				if(player&&player.node){
 					var cards=get.infoCards(hs);
