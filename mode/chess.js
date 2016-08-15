@@ -296,28 +296,31 @@ mode.chess={
 			lib.posmap[enemy.dataset.position]=enemy;
 		}
 
-		lib.setPopped(ui.create.system('手牌',null,true),function(){
-			var uiintro=ui.create.dialog('hidden');
-			var added=false;
-			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
-					added=true;
-					uiintro.add(get.translation(game.players[i]));
-					var cards=game.players[i].get('h');
-					if(cards.length){
-						uiintro.addSmall(cards,true);
-					}
-					else{
-						uiintro.add('（无）');
+		if(lib.config.show_handcardbutton){
+			lib.setPopped(ui.create.system('手牌',null,true),function(){
+				var uiintro=ui.create.dialog('hidden');
+				var added=false;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
+						added=true;
+						uiintro.add(get.translation(game.players[i]));
+						var cards=game.players[i].get('h');
+						if(cards.length){
+							uiintro.addSmall(cards,true);
+						}
+						else{
+							uiintro.add('（无）');
+						}
 					}
 				}
-			}
-			if(!added){
-				uiintro.add('无队友');
-			}
+				if(!added){
+					uiintro.add('无队友');
+				}
 
-			return uiintro;
-		},220);
+				return uiintro;
+			},220);
+		}
+
 		if(!event.video&&_status.mode=='combat'&&!_status.vsboss&&(_status.replacelist.length||get.config('additional_player'))){
 			_status.enemyDied=0;
 			_status.friendDied=0;

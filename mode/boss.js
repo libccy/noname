@@ -233,25 +233,27 @@ mode.boss={
 			game.onSwapControl();
 			// ui.fakemebg.show();
 
-			lib.setPopped(ui.create.system('手牌',null,true),function(){
-				var uiintro=ui.create.dialog('hidden');
+			if(lib.config.show_handcardbutton){
+				lib.setPopped(ui.create.system('手牌',null,true),function(){
+					var uiintro=ui.create.dialog('hidden');
 
-				var players=game.players.concat(game.dead);
-				for(var i=0;i<players.length;i++){
-					if(players[i].side==game.me.side&&players[i]!=game.me){
-						uiintro.add(get.translation(players[i]));
-						var cards=players[i].get('h');
-						if(cards.length){
-							uiintro.addSmall(cards,true);
-						}
-						else{
-							uiintro.add('（无）');
+					var players=game.players.concat(game.dead);
+					for(var i=0;i<players.length;i++){
+						if(players[i].side==game.me.side&&players[i]!=game.me){
+							uiintro.add(get.translation(players[i]));
+							var cards=players[i].get('h');
+							if(cards.length){
+								uiintro.addSmall(cards,true);
+							}
+							else{
+								uiintro.add('（无）');
+							}
 						}
 					}
-				}
 
-				return uiintro;
-			},220);
+					return uiintro;
+				},220);
+			}
 		}
 		lib.setPopped(ui.create.system('重整',null,true),function(){
 			var uiintro=ui.create.dialog('hidden');

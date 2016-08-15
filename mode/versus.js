@@ -294,7 +294,7 @@ mode.versus={
 
 					// ui.versusreplace=ui.create.system('换人',null,true);
 					// lib.setPopped(ui.versusreplace,game.versusHoverReplace);
-					if(game.players.length>2){
+					if(game.players.length>2&&lib.config.show_handcardbutton){
 						ui.versushs=ui.create.system('手牌',null,true);
 						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
 					}

@@ -1031,6 +1031,14 @@
 							}
 						}
 					},
+					show_handcardbutton:{
+						name:'显示手牌按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_handcardbutton',bool);
+						}
+					},
 					show_wuxie:{
 						name:'显示不询问无懈',
 						init:false,
@@ -1245,6 +1253,12 @@
                         }
                         else{
                             map.clear_log.hide();
+                        }
+                        if(lib.config.mode=='versus'||lib.config.mode=='chess'||lib.config.mode=='tafang'||lib.config.mode=='boss'){
+                            map.show_handcardbutton.show();
+                        }
+                        else{
+                            map.show_handcardbutton.hide();
                         }
 						// if(config.theme=='woodden'&&config.image_background=='default'){
 						// 	map.background_color_wood.show();
@@ -31317,6 +31331,11 @@
 				}
 				uiintro.add(capt);
 
+                if(node.isUnderControl()){
+                    uiintro.add('<div class="text center">手牌</div>');
+                    uiintro.addSmall(node.get('h'));
+                }
+
 				var skills=node.skills;
 				var skills2=game.filterSkills(node.skills,node);
 				for(i=0;i<skills.length;i++){
@@ -31342,13 +31361,6 @@
 						}
 					}
 				}
-				// var forbidden=node.forbiddenSkills;
-				// for(i=0;i<forbidden.length;i++){
-				// 	if(lib.translate[forbidden[i]+'_info']){
-				// 		translation=get.translation(forbidden[i]).slice(0,2);
-				// 		uiintro.add('<div><div class="skill">『'+translation+'』</div><div>'+'已禁用'+'</div></div>');
-				// 	}
-				// }
 
                 if(lib.config.show_favourite&&lib.character[node.name]&&get.mode()!='story'){
                     var addFavourite=ui.create.div('.text.center');
