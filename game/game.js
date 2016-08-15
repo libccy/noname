@@ -2604,7 +2604,6 @@
 						item:{
 							combat:'对战',
 							leader:'君主',
-							tafang:'塔防'
 						},
 						restart:true,
 						frequent:true,
@@ -2632,20 +2631,6 @@
 							map.free_choose.hide();
 							map.change_choice.hide();
 						}
-						if(config.chess_mode=='tafang'){
-							map.chess_treasure.hide();
-							map.chess_obstacle.hide();
-							map.tafang_size.show();
-							map.tafang_turn.show();
-							map.tafang_difficulty.show();
-						}
-						else{
-							map.chess_treasure.show();
-							map.chess_obstacle.show();
-							map.tafang_size.hide();
-							map.tafang_turn.hide();
-							map.tafang_difficulty.hide();
-						}
 						if(config.chess_mode!='leader'){
 							map.ban_weak.show();
 							map.ban_strong.show();
@@ -2653,37 +2638,6 @@
 						else{
 							map.ban_weak.hide();
 							map.ban_strong.hide();
-						}
-					},
-					tafang_turn:{
-						name:'游戏胜利',
-						init:'20',
-						frequent:true,
-						item:{
-							'10':'十回合',
-							'20':'二十回合',
-							'30':'三十回合',
-							'1000':'无限',
-						}
-					},
-					tafang_size:{
-						name:'战场大小',
-						init:'9',
-						frequent:true,
-						item:{
-							'6':'小',
-							'9':'中',
-							'12':'大',
-						}
-					},
-					tafang_difficulty:{
-						name:'战斗难度',
-						init:'2',
-						frequent:true,
-						item:{
-							'1':'简单',
-							'2':'普通',
-							'3':'困难',
 						}
 					},
 					chess_leader_save:{
@@ -2746,10 +2700,6 @@
 							'0.5':'大量',
 						},
 						frequent:true,
-					},
-					attack_move:{
-						name:'击退效果',
-						init:true,
 					},
 					show_range:{
 						name:'显示卡牌范围',
@@ -2883,6 +2833,10 @@
 					},
 				}
 			},
+            brawl:{
+                name:'乱斗',
+                config:{}
+            },
             story:{
                 name:'群侠',
                 config:{

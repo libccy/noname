@@ -1,22 +1,33 @@
 'use strict';
 mode.tafang={
 	canvasUpdates2:[],
-	importChess:{
-		element:{
-			card:['moveTo'],
-			player:['createRangeShadow','move']
-		}
-	},
 	start:function(){
 		"step 0"
+		lib.init.css(lib.assetURL+'layout/mode','chess');
 		game.loadMode('chess');
 		"step 1"
 		for(var i in result.element){
 			for(var j in result.element[i]){
 				if(j!='dieAfter'){
-					lib.element[i][j]=result.element[i][j];
+					lib.element[i][j]=lib.init.eval(result.element[i][j]);
 				}
 			}
+		}
+		for(var i in result.ui){
+			for(var j in result.ui[i]){
+				ui[i][j]=lib.init.eval(result.ui[i][j]);
+			}
+		}
+		get.chessDistance=lib.init.eval(result.get.chessDistance);
+		ai.get.attitude=lib.init.eval(result.ai.get.attitude);
+		var toLoad=['addChessPlayer','addObstacle','removeObstacle','isChessNeighbour',
+			'draw2','updateCanvas2','setChessInfo','modeSwapPlayer'];
+		for(var i=0;i<toLoad.length;i++){
+			game[toLoad[i]]=lib.init.eval(result.game[toLoad[i]]);
+		}
+		toLoad=['_attackmove','_phasequeue','_chessswap','_chessmove','_chesscenter'];
+		for(var i=0;i<toLoad.length;i++){
+			lib.skill[toLoad[i]]=lib.init.eval(result.skill[toLoad[i]]);
 		}
 		for(var i in lib.skill){
 			if(lib.skill[i].changeSeat){
@@ -26,7 +37,6 @@ mode.tafang={
 				}
 			}
 		}
-		lib.init.css(lib.assetURL+'layout/mode','chess');
 		ui.chesssheet=document.createElement('style');
 		document.head.appendChild(ui.chesssheet);
 		var playback=localStorage.getItem(lib.configprefix+'playback');
@@ -326,7 +336,7 @@ mode.tafang={
 						}
 					}
 				}
-				if(_status.friends.length==0&&ui.fakeme){
+				if(_status.friends.length==0){
 					ui.fakeme.hide();
 					this.node.handcards1.delete();
 					this.node.handcards2.delete();
@@ -345,115 +355,6 @@ mode.tafang={
 		obstacles:[],
 		getVideoName:function(){
 			return [get.translation(game.me.name),'塔防'];
-		},
-		addChessPlayer:function(name,enemy,num,pos){
-			if(typeof num!='number'){
-				num=4;
-			}
-			var player=ui.create.player();
-			player.getId();
-			if(enemy=='treasure'){
-				player.animate('judgestart');
-				player.side=null;
-				player.identity='neutral';
-				player.setIdentity();
-				player.node.identity.dataset.color='zhong';
-				player.classList.add('treasure');
-				player.life=6+Math.floor(Math.random()*6);
-				game.treasures.add(player);
-			}
-			else{
-				player.animate('start');
-				if(enemy){
-					player.side=true;
-					player.setIdentity('enemy');
-					player.identity='enemy';
-				}
-				else{
-					player.side=false;
-					player.setIdentity('friend');
-					player.identity='friend';
-				}
-				player.node.identity.dataset.color=get.translation(player.side+'Color');
-				game.players.push(player);
-				// if(lib.config.animation){
-				// 	setTimeout(function(){
-				// 		player.$rare2();
-				// 	},300);
-				// }
-			}
-			ui.chess.appendChild(player);
-			if(_status.video||(pos&&!lib.posmap[pos])){
-				player.dataset.position=pos;
-			}
-			else{
-				var grids=[];
-				var gridnum=ui.chessheight*ui.chesswidth;
-				for(var i=0;i<gridnum;i++){
-					grids.push(i);
-				}
-				for(var i=0;i<game.players.length;i++){
-					grids.remove(parseInt(game.players[i].dataset.position));
-				}
-				for(var i=0;i<game.obstacles.length;i++){
-					grids.remove(parseInt(game.obstacles[i].dataset.position));
-				}
-				for(var i=0;i<game.treasures.length;i++){
-					grids.remove(parseInt(game.treasures[i].dataset.position));
-				}
-				player.dataset.position=grids.randomGet();
-			}
-			lib.posmap[player.dataset.position]=player;
-			game.addVideo('addChessPlayer',null,[name,enemy,num,player.dataset.position]);
-			player.init(name);
-			if(num&&!_status.video){
-				player.directgain(get.cards(num));
-			}
-			game.arrangePlayers();
-			player.chessFocus();
-			if(game.me&&game.me.name){
-				game.setChessInfo();
-			}
-			else if(game.players.length){
-				game.setChessInfo(game.players[0]);
-			}
-
-			return player;
-		},
-		addObstacle:function(x,y){
-			if(y!==false){
-				game.addVideo('addObstacle',null,[x,y]);
-			}
-			var pos;
-			if(typeof x=='string'){
-				pos=x;
-			}
-			else{
-				if(x>=ui.chesswidth){
-					x=ui.chesswidth-1;
-				}
-				if(y>=ui.chessheight){
-					y=ui.chessheight-1;
-				}
-
-				pos=y*ui.chesswidth+x;
-			}
-			if(!lib.posmap[pos]){
-				var grid=ui.create.div('.player.minskin.obstacle',ui.chess).animate('start');
-				grid.dataset.position=pos;
-				grid.listen(ui.click.obstacle);
-				lib.posmap[pos]=grid;
-				game.obstacles.push(grid);
-			}
-		},
-		removeObstacle:function(pos){
-			var node=lib.posmap[pos];
-			if(node&&game.obstacles.contains(node)){
-				game.addVideo('removeObstacle',null,pos);
-				game.obstacles.remove(node);
-				delete lib.posmap[pos];
-				node.delete();
-			}
 		},
 		addOverDialog:function(dialog){
 			dialog.classList.add('center');
@@ -763,9 +664,6 @@ mode.tafang={
 							clickGrid.call(event.playergrids.randomGet());
 						},50);
 					}
-					event.switchToAuto=function(){
-						clickGrid.call(event.playergrids.randomGet());
-					}
 				}
 				else{
 					delete event.zhaomu;
@@ -908,92 +806,6 @@ mode.tafang={
 				}
 			});
 		},
-		isChessNeighbour:function(a,b){
-			if(a&&a.dataset){
-				a=a.dataset.position;
-			}
-			if(b&&b.dataset){
-				b=b.dataset.position;
-			}
-			var ax=a%ui.chesswidth;
-			var ay=Math.floor(a/ui.chesswidth);
-
-			var bx=b%ui.chesswidth;
-			var by=Math.floor(b/ui.chesswidth);
-
-			if(ax==bx&&Math.abs(ay-by)==1) return true;
-			if(ay==by&&Math.abs(ax-bx)==1) return true;
-
-			return false;
-		},
-		draw2:function(func){
-			lib.canvasUpdates2.push(func);
-			if(!lib.status.canvas2){
-				lib.status.canvas2=true;
-				game.update(game.updateCanvas2);
-			}
-		},
-		updateCanvas2:function(time){
-			if(lib.canvasUpdates2.length===0){
-				lib.status.canvas2=false;
-				return false;
-			}
-			ui.canvas2.width=ui.chess.offsetWidth;
-			ui.canvas2.height=ui.chess.offsetHeight;
-			ui.canvas2.style.left=0;
-			ui.canvas2.style.top=0;
-			var ctx=ui.ctx2;
-			ctx.shadowBlur=5;
-			ctx.shadowColor='rgba(0,0,0,0.3)';
-			ctx.fillStyle='white';
-			ctx.strokeStyle='white';
-			ctx.lineWidth=3;
-			ctx.save();
-			for(var i=0;i<lib.canvasUpdates2.length;i++){
-				ctx.restore();
-				ctx.save();
-				var update=lib.canvasUpdates2[i];
-				if(!update.starttime){
-					update.starttime=time;
-				}
-				if(update(time-update.starttime,ctx)===false){
-					lib.canvasUpdates2.splice(i--,1);
-				}
-			}
-		},
-		setChessInfo:function(p){
-			if(!p){
-				if(ui.phasequeue&&ui.phasequeue.length){
-					p=ui.phasequeue[0].link;
-				}
-				else{
-					p=game.me;
-				}
-			}
-			ui.chessinfo.innerHTML='';
-			ui.phasequeue=[];
-			for(var i=0;i<game.players.length;i++){
-				var node=ui.create.div('.avatar',ui.chessinfo);
-				node.style.backgroundImage=p.node.avatar.style.backgroundImage;
-				node.link=p;
-				node.listen(ui.click.chessInfo);
-				p.instance=node;
-				if(_status.currentPhase==p){
-					node.classList.add('glow2');
-				}
-				ui.phasequeue.push(node);
-				p=p.next;
-			}
-		},
-		modeSwapPlayer:function(player){
-			var content=[game.me.dataset.position,player.dataset.position];
-			game.me.classList.remove('current_action');
-			player.classList.add('current_action');
-			game.addVideo('chessSwap',null,content);
-			game.swapControl(player);
-			player.chessFocus();
-			ui.create.fakeme();
-		}
 	},
 	skill:{
 		chess_mech_weixingxianjing_skill:{
@@ -1156,7 +968,6 @@ mode.tafang={
 				return false;
 			},
 			content:function(){
-				'step 0'
 				var list=[];
 				for(var i=0;i<_status.enemies.length;i++){
 					if(get.chessDistance(player,_status.enemies[i])<=2){
@@ -1165,180 +976,12 @@ mode.tafang={
 				}
 				if(list.length){
 					game.log('攻城车发动');
-					event.target=list.randomGet();
-					player.playerfocus(1000);
-					player.line(event.target,'fire');
-					game.delay(2);
-				}
-				else{
-					event.finish();
-				}
-				'step 1'
-				if(event.target){
-					event.target.damage('fire','nosource');
-					event.target.moveUp();
+					var target=list.randomGet();
+					player.line(target,'fire');
+					target.damage('fire','nosource');
+					target.moveUp();
 				}
 			}
-		},
-		_attackmove:{
-			trigger:{player:'damageEnd'},
-			forced:true,
-			popup:false,
-			priority:50,
-			filter:function(event,player){
-				if(!get.config('attack_move')) return false;
-				if(!event.source) return false;
-				if(get.distance(event.source,player,'pure')>2) return false;
-				var xy1=event.source.getXY();
-				var xy2=player.getXY();
-				var dx=xy2[0]-xy1[0];
-				var dy=xy2[1]-xy1[1];
-				// if(dx*dy!=0) return false;
-				if(dx==0&&Math.abs(dy)==2){
-					dy/=2;
-				}
-				if(dy==0&&Math.abs(dx)==2){
-					dx/=2;
-				}
-				return player.movable(dx,dy);
-			},
-			content:function(){
-				var xy1=trigger.source.getXY();
-				var xy2=player.getXY();
-				var dx=xy2[0]-xy1[0];
-				var dy=xy2[1]-xy1[1];
-				if(dx==0&&Math.abs(dy)==2){
-					dy/=2;
-				}
-				if(dy==0&&Math.abs(dx)==2){
-					dx/=2;
-				}
-				if(player.movable(dx,dy)){
-					player.move(dx,dy);
-				}
-			}
-		},
-		_phasequeue:{
-			trigger:{player:'phaseBegin'},
-			forced:true,
-			popup:false,
-			content:function(){
-				var current=ui.chessinfo.querySelector('.glow2');
-				if(current){
-					current.classList.remove('glow2');
-				}
-				if(player.instance){
-					player.instance.classList.add('glow2');
-					ui.chessinfo.scrollTop=player.instance.offsetTop-8;
-				}
-			}
-		},
-		_chessmove:{
-			enable:'phaseUse',
-			usable:1,
-			direct:true,
-			delay:false,
-			preservecancel:true,
-			filter:function(event,player){
-				if(!player.movable(0,1)&&!player.movable(0,-1)&&
-					!player.movable(1,0)&&!player.movable(-1,0)){
-					return false;
-				}
-				var move=2;
-				move=game.checkMod(player,move,'chessMove',player.get('s'));
-				return move>0;
-			},
-			content:function(){
-				"step 0"
-				var move=2;
-				move=game.checkMod(player,move,'chessMove',player.get('s'));
-				player.chooseToMove(move).phasing=true;
-				"step 1"
-				if(!result.bool){
-					var skill=player.getStat().skill;
-					skill._chessmove--;
-					if(typeof skill._chessmovetried=='number'){
-						skill._chessmovetried++;
-					}
-					else{
-						skill._chessmovetried=1;
-					}
-				}
-			},
-			ai:{
-				order:5,
-				result:{
-					playerx:function(player){
-						if(_status.mode=='tafang'&&_status.enemies.contains(player)){
-							return 1;
-						}
-						var nh=player.num('h');
-						if(!player.num('h','sha')&&
-						!player.num('h','shunshou')&&
-						!player.num('h','bingliang')){
-							if(nh<=Math.min(3,player.hp)) return Math.random()-0.3;
-							else if(nh<=Math.min(2,player.hp)) return Math.random()-0.4;
-							return Math.random()-0.5;
-						}
-						var neighbour;
-						neighbour=player.getNeighbour(0,1);
-						if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
-							if(get.distance(player,neighbour,'attack')<1) return 1;
-							return 0;
-						}
-						neighbour=player.getNeighbour(0,-1);
-						if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
-							if(get.distance(player,neighbour,'attack')<1) return 1;
-							return 0;
-						}
-						neighbour=player.getNeighbour(1,0);
-						if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
-							if(get.distance(player,neighbour,'attack')<1) return 1;
-							return 0;
-						}
-						neighbour=player.getNeighbour(-1,0);
-						if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
-							if(get.distance(player,neighbour,'attack')<1) return 1;
-							return 0;
-						}
-						return 1;
-					},
-					player:function(player){
-						if(player.getStat().skill._chessmovetried>=10){
-							return 0;
-						}
-						var x=lib.skill._chessmove.ai.result.playerx(player);
-						if(player.isMad()) return -x;
-						return x;
-					}
-				}
-			}
-		},
-		_chessswap:{
-			trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
-			'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
-			'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
-			forced:true,
-			priority:100,
-			popup:false,
-			filter:function(event,player){
-				if(event.autochoose&&event.autochoose()) return false;
-				if(lib.config.mode=='chess'&&_status.mode=='combat'&&!get.config('single_control')) return false;
-				return player.isUnderControl();
-			},
-			content:function(){
-				game.modeSwapPlayer(player);
-			},
-		},
-		_chesscenter:{
-			trigger:{player:['phaseBegin','useCardBegin','useSkillBegin','respondBegin','damageBegin','loseHpBegin'],
-			target:'useCardToBegin'},
-			forced:true,
-			priority:100,
-			popup:false,
-			content:function(){
-				player.chessFocus();
-			},
 		},
 	},
 	translate:{
@@ -1371,85 +1014,6 @@ mode.tafang={
 		chess_mech_guangmingquan_skill:'圣疗',
 		chess_mech_guangmingquan_skill_info:'每一轮令距离2格以内的所有友方角色各回复一点体力',
 	},
-	ui:{
-		create:{
-			playergrid:function(player,x,y){
-				var pos=player.getDataPos(x,y);
-				if(_status.mode=='tafang'){
-					if(pos<ui.chesswidth) return false;
-					if(pos/ui.chesswidth>=ui.chessheight-1) return false;
-				}
-				var node=ui.create.div('.player.minskin.playergrid',player.parentNode);
-				node.link=player;
-				node.dataset.position=pos;
-				return node;
-			},
-			fakeme:function(){
-				if(ui.fakeme){
-					ui.fakeme.delete();
-				}
-				ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
-				ui.fakeme.style.backgroundImage=game.me.node.avatar.style.backgroundImage;
-			}
-		},
-		click:{
-			chessInfo:function(e){
-				if(this.link.isAlive()){
-					this.link.chessFocus();
-					if(this.link.classList.contains('selectable')||
-						this.link.classList.contains('selected')){
-						ui.click.target.call(this.link,e);
-						ui.click.window.call(ui.window,e);
-					}
-					e.stopPropagation();
-				}
-			},
-			playergrid:function(){
-				if(!_status.paused) return;
-				var pos=parseInt(this.dataset.position);
-				this.link.moveTo(pos%ui.chesswidth,Math.floor(pos/ui.chesswidth));
-				if(ui.movegrids){
-					while(ui.movegrids.length){
-						ui.movegrids.shift().delete();
-					}
-				}
-				_status.event.result={
-					bool:true,
-					move:this.link.dataset.position
-				};
-				game.resume();
-			},
-			obstacle:function(){
-				if(_status.event.chooseObstacle&&_status.paused&&
-					_status.event.obstacles&&_status.event.obstacles.contains(this)){
-					_status.event.obstacle=this;
-					game.resume();
-				}
-			}
-		}
-	},
-	get:{
-		chessDistance:function(from,to){
-			var fxy=from.getXY();
-			var txy=to.getXY();
-			return Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
-		},
-	},
-	ai:{
-		get:{
-			attitude:function(from,to){
-				if(!from||!to) return 0;
-				var t=(from.side===to.side?1:-1);
-				if(from.isMad()){
-					t=-t;
-				}
-				else if(to.isMad()){
-					t=0;
-				}
-				return 6*t;
-			}
-		}
-	},
 	characterPack:{
 		mode_tafang:{
 			chess_mech_guangmingquan:['','',0,['chess_mech_guangmingquan_skill'],['boss']],
@@ -1467,7 +1031,7 @@ mode.tafang={
 	help:{
 		'塔防模式':
 		'<ul><li>阻上敌人到达最下方的出口，坚持到给定的回合数即获得胜利<li>'+
-		'每轮可获得10个行动点，用来布置机关、招募武将，或令武将行动。游戏难度将影响不同操作消耗的行动点数。未用完的行动点将减半并累积到下一轮<li>'+
+		'每轮可获得10个行动点，用来布置机关、招募武将，或令武将行动。游戏难度将影响不同操作消耗的行动点数。未用完的行动点将减半（向上取整）并累积到下一轮<li>'+
 		'每一轮在最上方的一个随机位置增加一名敌人，若最上方已有角色，则将其下移一格<li>'+
 		'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募10名友方角色。<li>'+
 		'敌方角色到达底部出口时游戏失败，已方角色到达底部出口，将被移出游戏',
