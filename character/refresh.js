@@ -983,12 +983,13 @@ character.refresh={
 				"step 1"
 				if(result.bool){
 					if(target.hasSkill('yijue2')==false){
-						target.disabledSkills.yijue=[];
+						var list=[];
 						for(var i=0;i<target.skills.length;i++){
-							if(!get.skillLocked(target.skills[i])){
-								target.disabledSkills.yijue.push(target.skills[i]);
+							if(!get.is.locked(target.skills[i])){
+								list.push(target.skills[i]);
 							}
 						}
+						target.disableSkill('yijue',list);
 						target.addSkill('yijue2');
 					}
 					event.finish();
@@ -1036,8 +1037,9 @@ character.refresh={
 			forced:true,
 			mark:true,
 			audio:false,
+			popup:false,
 			content:function(){
-				delete player.disabledSkills.yijue;
+				player.enableSkill('yijue');
 				player.removeSkill('yijue2');
 			},
 			mod:{
@@ -1080,12 +1082,13 @@ character.refresh={
 				player.judge(function(){return 0});
 				var target=trigger.target;
 				if(target.hasSkill('retieji2')==false){
-					target.disabledSkills.retieji=[];
+					var list=[];
 					for(var i=0;i<target.skills.length;i++){
-						if(!get.skillLocked(target.skills[i])){
-							target.disabledSkills.retieji.push(target.skills[i]);
+						if(!get.is.locked(target.skills[i])){
+							list.push(target.skills[i]);
 						}
 					}
+					target.disableSkill('retieji',list);
 					target.addSkill('retieji2');
 				}
 				"step 1"
@@ -1110,11 +1113,12 @@ character.refresh={
 			trigger:{global:'phaseAfter'},
 			forced:true,
 			content:function(){
-				delete player.disabledSkills.retieji;
+				player.enableSkill('retieji');
 				player.removeSkill('retieji2');
 			},
 			audio:false,
 			mark:true,
+			popup:false,
 			intro:{
 				content:function(st,player){
 					var storage=player.disabledSkills.retieji;

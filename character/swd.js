@@ -1927,18 +1927,20 @@ character.swd={
 				return '是否弃置一枚破咒标记令'+get.translation(event.player)+
 				'的非锁定技失效？（剩余'+player.storage.pozhou+'枚）';
 			},
+			popup:false,
 			content:function(){
 				player.storage.pozhou--;
 				if(!player.storage.pozhou){
 					player.unmarkSkill('pozhou');
 				}
 				var target=trigger.player;
-				target.disabledSkills.pozhou=[];
+				var list=[];
 				for(var i=0;i<target.skills.length;i++){
-					if(!get.skillLocked(target.skills[i])){
-						target.disabledSkills.pozhou.push(target.skills[i]);
+					if(!get.is.locked(target.skills[i])){
+						list.push(target.skills[i]);
 					}
 				}
+				target.disableSkill('pozhou',list);
 				target.addSkill('pozhou3');
 				player.line(target,'green');
 			}
@@ -1948,7 +1950,7 @@ character.swd={
 			forced:true,
 			mark:true,
 			content:function(){
-				delete player.disabledSkills.pozhou;
+				player.enableSkill('pouzhou');
 				player.removeSkill('pozhou3');
 			},
 			intro:{

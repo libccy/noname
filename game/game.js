@@ -2819,6 +2819,70 @@
 					},
 				}
 			},
+			tafang:{
+				name:'塔防',
+				config:{
+					tafang_turn:{
+						name:'游戏胜利',
+						init:'20',
+						frequent:true,
+						item:{
+							'10':'十回合',
+							'20':'二十回合',
+							'30':'三十回合',
+							'1000':'无限',
+						}
+					},
+					tafang_size:{
+						name:'战场大小',
+						init:'9',
+						frequent:true,
+						item:{
+							'6':'小',
+							'9':'中',
+							'12':'大',
+						}
+					},
+					tafang_difficulty:{
+						name:'战斗难度',
+						init:'2',
+						frequent:true,
+						item:{
+							'1':'简单',
+							'2':'普通',
+							'3':'困难',
+						}
+					},
+					show_range:{
+						name:'显示卡牌范围',
+						init:true,
+					},
+					show_distance:{
+						name:'显示距离',
+						init:true,
+					},
+					ban_weak:{
+		                name:'屏蔽弱将',
+						init:true,
+						restart:true,
+		            },
+		            ban_strong:{
+		                name:'屏蔽强将',
+						init:false,
+						restart:true,
+		            },
+					chessscroll_speed:{
+						name:'边缘滚动速度',
+						init:'20',
+						item:{
+							'0':'不滚动',
+							'10':'10格/秒',
+							'20':'20格/秒',
+							'30':'30格/秒',
+						}
+					},
+				}
+			},
             story:{
                 name:'群侠',
                 config:{
@@ -2871,12 +2935,6 @@
 							'30':'30格/秒',
 						}
 					},
-                }
-            },
-            realtime:{
-                name:'即时',
-                config:{
-
                 }
             },
 			stone:{
@@ -3303,7 +3361,7 @@
 				}
                 // if(lib.config.debug){
                 //     mode.pack.story='群侠';
-                //     mode.pack.realtime='即时';
+                //     mode.pack.tafang='即时';
                 // }
 				for(i in mode.pack){
 					if(lib.config.hiddenModePack.indexOf(i)==-1){
@@ -4631,7 +4689,7 @@
 				}
 			},
 			s:function(skill){
-				game.me.addSkill(skill);
+				game.me.addSkill(skill,true);
 				game.check();
 			},
 			t:function(num){
@@ -5028,9 +5086,7 @@
     				var info=get.info(event.skill);
     				var next=game.createEvent(event.skill);
                     if(typeof info.usable=='number'){
-                        if(!player.hasSkill('counttrigger')){
-                            player.addSkill('counttrigger');
-                        }
+                        player.addSkill('counttrigger');
                         if(!player.storage.counttrigger){
                             player.storage.counttrigger={};
                         }
@@ -5070,7 +5126,7 @@
     				'step 0'
     				game.delay(0,500);
     				'step 1'
-    				if(lib.config.mode!='chess'){
+    				if(!game.chess){
     					ui.control.innerHTML='';
     					var nodes=[];
     					for(var i=0;i<ui.arena.childNodes.length;i++){
@@ -5139,7 +5195,7 @@
     					ui.refresh(ui.arena);
     					ui.arena.show();
     				}
-    				if(lib.config.mode!='chess'){
+    				if(!game.chess){
     					game.playerMap={};
     				}
     				game.finishCards();
@@ -8191,6 +8247,7 @@
 						for(var i=0;i<skills.length;i++){
 							this.addSkill(skills[i]);
 						}
+                        this.checkConflict();
 					}
 					lib.group.add(this.group);
 					if(this.inits){
@@ -8304,7 +8361,7 @@
 					this.additionalSkills={};
 					this.disabledSkills={};
 					this.hiddenSkills=[];
-					this.forbiddenSkills=[];
+					this.forbiddenSkills={};
 					this.stat=[{card:{},skill:{}}];
 					this.tempSkills={};
 					this.storage={};
@@ -8704,9 +8761,9 @@
 								}
 							}
 						}
-						for(i=0;i<this.forbiddenSkills.length;i++){
-							skills.remove(this.forbiddenSkills[i]);
-						}
+                        for(var i in this.forbiddenSkills){
+                            skills.remove(i);
+                        }
 						if(arg4!==false){
 							skills=game.filterSkills(skills,this);
 						}
@@ -10554,7 +10611,7 @@
 					if(distance==false) return lib.filter.targetEnabled(card,this,player);
 					return lib.filter.filterTarget(card,this,player);
 				},
-                addSkillTrigger:function(skill,hidden){
+                addSkillTrigger:function(skill,hidden,triggeronly){
                     var info=lib.skill[skill];
                     if(!info) return;
                     if(typeof info.group=='string'){
@@ -10565,20 +10622,22 @@
                             this.addSkillTrigger(info.group[i],hidden);
                         }
                     }
-                    if(info.global&&(!hidden||info.globalSilent)){
-                        if(typeof info.global=='string'){
-                            game.addGlobalSkill(info.global,this);
-                        }
-                        else{
-                            for(var j=0;j<info.global.length;j++){
-                                game.addGlobalSkill(info.global[j],this);
+                    if(!triggeronly){
+                        if(info.global&&(!hidden||info.globalSilent)){
+                            if(typeof info.global=='string'){
+                                game.addGlobalSkill(info.global,this);
+                            }
+                            else{
+                                for(var j=0;j<info.global.length;j++){
+                                    game.addGlobalSkill(info.global[j],this);
+                                }
                             }
                         }
-                    }
-                    if(this.initedSkills.contains(skill)) return;
-                    this.initedSkills.push(skill);
-                    if(info.init){
-                        info.init(this);
+                        if(this.initedSkills.contains(skill)) return;
+                        this.initedSkills.push(skill);
+                        if(info.init){
+                            info.init(this);
+                        }
                     }
                     if(info.trigger&&this.playerid){
                         var playerid=this.playerid;
@@ -10613,7 +10672,7 @@
                         }
                     }
                 },
-				addSkill:function(skill){
+				addSkill:function(skill,checkConflict){
 					if(get.objtype(skill)=='array'){
 						for(var i=0;i<skill.length;i++){
 							this.addSkill(skill[i]);
@@ -10648,7 +10707,7 @@
 							}
 						}
 					}
-					this.checkConflict();
+					if(checkConflict) this.checkConflict();
 					return skill;
 				},
                 addAdditionalSkill:function(skill,skills,keep){
@@ -10674,6 +10733,7 @@
                         this.skills.remove(skills[i]);
                         this.additionalSkills[skill].push(skills[i]);
                     }
+                    this.checkConflict();
                 },
                 removeAdditionalSkill:function(skill){
                     if(this.additionalSkills[skill]){
@@ -10687,6 +10747,30 @@
                         }
                         delete this.additionalSkills[skill];
                     }
+                },
+                disableSkill:function(skill,skills){
+                    this.disabledSkills[skill]=skills;
+                    if(typeof skills=='string'){
+                        this.removeSkillTrigger(skills,true);
+                    }
+                    else if(Array.isArray(skills)){
+                        for(var i=0;i<skills.length;i++){
+                            this.removeSkillTrigger(skills[i],true);
+                        }
+                    }
+                },
+                enableSkill:function(skill){
+                    var skills=this.disabledSkills[skill];
+                    this.disabledSkills[skill]=skills;
+                    if(typeof skills=='string'){
+                        this.addSkillTrigger(skills,false,true);
+                    }
+                    else if(Array.isArray(skills)){
+                        for(var i=0;i<skills.length;i++){
+                            this.addSkillTrigger(skills[i],false,true);
+                        }
+                    }
+                    delete this.disabledSkills[skill];
                 },
 				checkMarks:function(){
 					var skills=this.get('s');
@@ -10709,7 +10793,7 @@
                         }
                     }
                 },
-                removeSkillTrigger:function(skill){
+                removeSkillTrigger:function(skill,triggeronly){
                     var info=lib.skill[skill];
                     if(!info) return;
                     if(typeof info.group=='string'){
@@ -10720,7 +10804,7 @@
                             this.removeSkillTrigger(info.group[i]);
                         }
                     }
-                    this.initedSkills.remove(skill);
+                    if(!triggeronly) this.initedSkills.remove(skill);
                     if(info.trigger){
                         var playerid=this.playerid;
                         var removeTrigger=function(i,evt){
@@ -10768,7 +10852,7 @@
                     else{
                         this.unmarkSkill(skill);
     					this.skills.remove(skill);
-    					this.checkConflict();
+    					this.checkConflict(skill);
                         delete this.tempSkills[skill];
                         var info=lib.skill[skill];
                         if(info){
@@ -10780,12 +10864,44 @@
                     }
 					return skill;
 				},
-				addTempSkill:function(skill,expire){
+				addTempSkill:function(skill,expire,checkConflict){
 					if(this.hasSkill(skill)&&this.tempSkills[skill]==undefined) return;
-					this.addSkill(skill);
+					this.addSkill(skill,checkConflict);
                     this.skills.remove(skill);
 					this.tempSkills[skill]=expire;
-					this.checkConflict();
+
+                    if(typeof expire=='string'){
+                        lib.hookmap[expire]=true;
+                    }
+                    else if(Array.isArray(expire)){
+                        for(var i=0;i<expire.length;i++){
+                            lib.hookmap[expire[i]]=true;
+                        }
+                    }
+                    else if(get.objtype(expire)=='object'){
+                        var roles=['player','source','target'];
+                        for(var i=0;i<roles.length;i++){
+                            if(typeof expire[roles[i]]=='string'){
+                                lib.hookmap[expire]=true;
+                            }
+                            else if(Array.isArray(expire[roles[i]])){
+                                for(var j=0;j<expire[roles[i]].length;j++){
+                                    lib.hookmap[expire[roles[i]][j]]=true;
+                                }
+                            }
+                        }
+                    }
+
+                    for(var i in expire){
+                        if(typeof expire[i]=='string'){
+                            lib.hookmap[expire[i]]=true;
+                        }
+                        else if(Array.isArray(expire[i])){
+                            for(var j=0;j<expire.length;j++){
+                                lib.hookmap[expire[i][j]]=true;
+                            }
+                        }
+                    }
 					return skill;
 				},
 				attitudeTo:function(target){
@@ -10808,9 +10924,23 @@
 					this.checkMarks();
 					return list;
 				},
-				checkConflict:function(){
-					if(this.name&&this.name2){
-						this.forbiddenSkills.length=0;
+				checkConflict:function(skill){
+                    if(skill){
+                        if(this.forbiddenSkills[skill]){
+                            delete this.forbiddenSkills[skill];
+                        }
+                        else{
+                            for(var i in this.forbiddenSkills){
+                                if(this.forbiddenSkills[i].remove(skill)){
+                                    if(!this.forbiddenSkills[i].length){
+                                        delete this.forbiddenSkills[i];
+                                    }
+                                }
+                            }
+                        }
+                    }
+					else{
+                        this.forbiddenSkills={};
 						var forbid=[];
 						var getName=function(arr){
 							var str='';
@@ -10820,11 +10950,12 @@
 							return str.slice(0,str.length-1);
 						}
 						var forbidlist=lib.config.forbid.concat(lib.config.customforbid);
+                        var skills=this.get('s');
 						for(var i=0;i<forbidlist.length;i++){
 							if(lib.config.customforbid.contains(forbidlist[i])||
 								!lib.config.forbidlist.contains(getName(forbidlist[i]))){
 								for(var j=0;j<forbidlist[i].length;j++){
-									if(this.skills.contains(forbidlist[i][j])==false) break;
+									if(!skills.contains(forbidlist[i][j])) break;
 								}
 								if(j==forbidlist[i].length){
 									forbid.push(forbidlist[i]);
@@ -10832,7 +10963,12 @@
 							}
 						}
 						for(var i=0;i<forbid.length;i++){
-							this.forbiddenSkills.add(forbid[i][0]);
+                            if(forbid[i][1]||this.name2){
+                                this.forbiddenSkills[forbid[i][0]]=this.forbiddenSkills[forbid[i][0]]||[];
+                                if(forbid[i][1]){
+                                    this.forbiddenSkills[forbid[i][0]].add(forbid[i][1]);
+                                }
+                            }
 						}
 					}
 				},
@@ -10921,8 +11057,10 @@
 					else if(lib.config.mode=='boss'){
 						return this.side==me.side&&get.config('single_control');
 					}
-					else if(lib.config.mode=='chess'){
-						if(_status.mode=='combat'&&!get.config('single_control')) return false;
+					else if(game.chess){
+                        if(lib.config.mode=='chess'){
+                            if(_status.mode=='combat'&&!get.config('single_control')) return false;
+                        }
 						return this.side==me.side;
 					}
                     else if(lib.config.mode=='story'){
@@ -12725,6 +12863,7 @@
                     var list=[];
                     var roles=['player','source','target'];
                     var addList=function(skill,player){
+                        if(player.forbiddenSkills[skill]) return;
                         var info=lib.skill[skill];
                         var num=0;
                         if(info.priority){
@@ -12743,18 +12882,19 @@
                         for(var j in player.tempSkills){
 							var expire=player.tempSkills[j];
 							if(expire==name||
-								(get.objtype(expire)=='array'&&expire.contains(name))||
+								(Array.isArray(expire)&&expire.contains(name))||
 								(typeof expire=='function'&&expire(event,player,name))){
 								delete player.tempSkills[j];
 								player.removeSkill(j);
 							}
-							else if(typeof expire=='object'){
-								if(expire.player==name&&event.player==player||
-									expire.target==name&&event.target==player||
-									expire.source==name&&event.source==player){
-									delete player.tempSkills[j];
-									player.removeSkill(j);
-								}
+							else if(get.objtype(expire)=='object'){
+                                for(var i=0;i<roles.length;i++){
+                                    if(expire[roles[i]]&&player==event[roles[i]]&&
+                                        (expire[roles[i]]==name||(Array.isArray(expire[roles[i]])&&expire[roles[i]].contains(name)))){
+                                        delete player.tempSkills[j];
+    									player.removeSkill(j);
+                                    }
+                                }
 							}
 						}
                         for(var i=0;i<roles.length;i++){
@@ -15648,7 +15788,7 @@
 		},
 		videoContent:{
 			init:function(players){
-				if(lib.config.mode=='chess') return;
+				if(game.chess) return;
 				if(lib.config.mode=='versus'){
 					players.bool=players.pop();
 				}
@@ -16171,7 +16311,7 @@
 			judge1:function(player,content){
 				if(player&&content){
 					var judging=get.infoCard(content[0]);
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						judging.copy('thrown','center','thrownhighlight',ui.arena).animate('start');
 					}
 					else{
@@ -16315,7 +16455,7 @@
 					return;
 				}
 				player.$die();
-				if(lib.config.mode=='chess'){
+				if(game.chess){
 					delete lib.posmap[player.dataset.position];
 					setTimeout(function(){
 						player.delete();
@@ -16641,7 +16781,7 @@
 
 					game.me=player;
 					ui.updatehl();
-					if(lib.config.mode=='chess'){
+					if(game.chess){
 						ui.create.fakeme();
 					}
 				}
@@ -16692,7 +16832,7 @@
 				var dialog=ui.create.dialog('hidden');
 				dialog.content.innerHTML=str;
 				dialog.open();
-				if(lib.config.mode=='chess'){
+				if(game.chess){
 					dialog.classList.add('center');
 				}
 			}
@@ -18247,7 +18387,7 @@
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<game.players.length;i++){
 						var nochess=true;
-						if(lib.config.mode=='chess'&&!event.chessForceAll){
+						if(game.chess&&!event.chessForceAll){
 							if(player&&get.distance(player,game.players[i],'pure')>7){
 								nochess=false;
 							}
@@ -19415,7 +19555,7 @@
 			return player2;
 		},
 		arrangePlayers:function(){
-			if(lib.config.mode=='chess'&&game.me){
+			if(game.chess&&game.me){
 				var friendCount=0;
 				var enemyCount=0;
 				var rand=Math.random()<0.5;
@@ -19502,20 +19642,14 @@
 		},
 		filterSkills:function(skills,player){
 			var out=skills.slice(0);
-			var filter=[];
 			for(var i in player.disabledSkills){
 				if(typeof player.disabledSkills[i]=='string'){
-					filter.add(player.disabledSkills[i]);
+					out.remove(player.disabledSkills[i]);
 				}
 				else if(Array.isArray(player.disabledSkills[i])){
 					for(var j=0;j<player.disabledSkills[i].length;j++){
-						filter.add(player.disabledSkills[i][j]);
+						out.remove(player.disabledSkills[i][j]);
 					}
-				}
-			}
-			for(var i=0;i<filter.length;i++){
-				if(filter[i]){
-					out.remove(filter[i]);
 				}
 			}
 			return out;
@@ -20401,7 +20535,6 @@
 						game.saveConfig('forbidlist',list);
 					};
 					var forbid=lib.config.forbid;
-					lib.config.forbidmap={};
 					if(!lib.config.forbidlist){
 						game.saveConfig('forbidlist',[]);
 					}
@@ -20418,7 +20551,6 @@
 							str2+=forbid[i][j]+'+';
 						}
 						if(skip) continue;
-						lib.config.forbidmap[str2]=forbid[i];
 						str=str.slice(0,str.length-1);
 						str2=str2.slice(0,str2.length-1);
 
@@ -27077,7 +27209,7 @@
 				node.additionalSkills={};
 				node.disabledSkills={};
 				node.hiddenSkills=[];
-				node.forbiddenSkills=[];
+				node.forbiddenSkills={};
 				node.popups=[];
 				node.damagepopups=[];
 				node.judging=[];
@@ -29819,6 +29951,14 @@
             pos:function(str){
                 return (str=='h'||str=='e'||str=='j'||str=='he'||str=='hj'||str=='ej'||str=='hej');
             },
+            locked:function(skill){
+    			var info=lib.skill[skill];
+    			if(info.locked==false) return false;
+    			if(info.trigger&&info.forced) return true;
+    			if(info.mod) return true;
+    			if(info.locked) return true;
+    			return false;
+    		},
         },
         benchmark:function(func1,func2,arg,iteration){
             var tic,toc;
@@ -30380,14 +30520,6 @@
 		xyDistance:function(from,to){
 			return Math.sqrt((from[0]-to[0])*(from[0]-to[0])+(from[1]-to[1])*(from[1]-to[1]));
 		},
-		skillLocked:function(skill){
-			var info=lib.skill[skill];
-			if(info.locked==false) return false;
-			if(info.trigger&&info.forced) return true;
-			if(info.mod) return true;
-			if(info.locked) return true;
-			return false;
-		},
 		itemtype:function(obj){
 			var i,j;
 			if(typeof obj=='string'){
@@ -30758,7 +30890,7 @@
 				}
 				return str2;
 			}
-			if(get.itemtype(str)=='cards'||get.itemtype(str)=='players'){
+			if(Array.isArray(str)){
 				var str2=get.translation(str[0],arg);
 				for(var i=1;i<str.length;i++){
 					str2+='、'+get.translation(str[i],arg);
@@ -31231,7 +31363,18 @@
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
 					if(lib.translate[skills[i]+'_info']){
 						translation=get.translation(skills[i]).slice(0,2);
-						if(!skills2.contains(skills[i])){
+                        if(node.forbiddenSkills[skills[i]]){
+                            var forbidstr='<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>';
+                            if(node.forbiddenSkills[skills[i]].length){
+                                forbidstr+='（与'+get.translation(node.forbiddenSkills[skills[i]])+'冲突）<br>';
+                            }
+                            else{
+                                forbidstr+='（双将禁用）<br>';
+                            }
+                            forbidstr+=lib.translate[skills[i]+'_info']+'</div></div>'
+                            uiintro.add(forbidstr);
+                        }
+						else if(!skills2.contains(skills[i])){
 							uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
 						else{
@@ -31239,13 +31382,13 @@
 						}
 					}
 				}
-				var forbidden=node.forbiddenSkills;
-				for(i=0;i<forbidden.length;i++){
-					if(lib.translate[forbidden[i]+'_info']){
-						translation=get.translation(forbidden[i]).slice(0,2);
-						uiintro.add('<div><div class="skill">『'+translation+'』</div><div>'+'已禁用'+'</div></div>');
-					}
-				}
+				// var forbidden=node.forbiddenSkills;
+				// for(i=0;i<forbidden.length;i++){
+				// 	if(lib.translate[forbidden[i]+'_info']){
+				// 		translation=get.translation(forbidden[i]).slice(0,2);
+				// 		uiintro.add('<div><div class="skill">『'+translation+'』</div><div>'+'已禁用'+'</div></div>');
+				// 	}
+				// }
 
                 if(lib.config.show_favourite&&lib.character[node.name]&&get.mode()!='story'){
                     var addFavourite=ui.create.div('.text.center');

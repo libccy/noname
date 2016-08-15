@@ -2298,7 +2298,7 @@ character.boss={
 						target.loseMaxHp();
 					}
 					else{
-						target.disabledSkills.boss_hujia=lib.character[target.name][3];
+						target.disableSkill('boss_hujia',lib.character[target.name][3]);
 					}
 					player.discard(result.cards);
 				}
@@ -2330,7 +2330,7 @@ character.boss={
 				player.draw(4);
 				"step 2"
 				for(var i=0;i<game.players.length;i++){
-					delete game.players[i].disabledSkills.boss_hujia;
+					game.players[i].enableSkill('boss_hujia');
 				}
 				if(game.bossinfo){
 					game.bossinfo.loopType=1;

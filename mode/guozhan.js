@@ -952,6 +952,7 @@ mode.guozhan={
 					this.hiddenSkills.remove(skills[i]);
 					this.addSkill(skills[i]);
 				}
+				this.checkConflict();
 				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
 					if(this.singleHp){
 						this.doubleDraw();

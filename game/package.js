@@ -41,7 +41,9 @@ mode.pack={
     connect:'联机',
     boss:'挑战',
     chess:'战棋',
+    tafang:'塔防',
     stone:'炉石',
+    brawl:'乱斗',
 };
 background.pack={
     zhulian_bg:'璧合',
