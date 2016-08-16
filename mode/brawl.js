@@ -37,6 +37,7 @@ mode.brawl={
                 showcase.action(showcase._showcased?false:true);
                 showcase._showcased=true;
             }
+            game.save('currentBrawl',this.link);
         }
         var createNode=function(name){
             var info=lib.brawl[name];
@@ -67,12 +68,17 @@ mode.brawl={
                 showcase
             ];
             node.link=name;
+            if(lib.storage.currentBrawl==name){
+                clickCapt.call(node);
+            }
             return node;
         }
         for(var i in lib.brawl){
             createNode(i);
         }
-        clickCapt.call(packnode.firstChild);
+        if(!lib.storage.currentBrawl){
+            clickCapt.call(packnode.firstChild);
+        }
         var start=ui.create.div('.menubutton.round.highlight','斗',dialog.content,function(){
             var active=packnode.querySelector('.active');
             if(active){
@@ -131,13 +137,15 @@ mode.brawl={
                     card.style.position='absolute';
                     var rand1=Math.round(Math.random()*100);
                     var rand2=Math.round(Math.random()*100);
+                    var rand3=Math.round(Math.random()*360);
                     card.style.left='calc('+rand1+'% - '+rand1+'px)';
                     card.style.top='calc('+rand2+'% - '+rand2+'px)';
-                    card.style.transform='rotate('+Math.round(Math.random()*360)+'deg)';
+                    card.style.transform='scale(0.8) rotate('+rand3+'deg)';
                     card.style.opacity=0;
                     node.appendChild(card);
                     ui.refresh(card);
                     card.style.opacity=1;
+                    card.style.transform='scale(1) rotate('+rand3+'deg)';
                     if(node.nodes.length>7){
                         setTimeout(function(){
                             while(node.nodes.length>5){
@@ -170,12 +178,14 @@ mode.brawl={
                     player1.style.left='20px';
                     player1.style.top='20px';
                     player1.style.transform='scale(0.9)';
-                    player1.node.count.remove();
+                    player1.node.count.innerHTML='2';
+                    player1.node.count.dataset.condition='mid';
                     player2.style.left='auto';
                     player2.style.right='20px';
                     player2.style.top='20px';
                     player2.style.transform='scale(0.9)';
-                    player2.node.count.remove();
+                    player2.node.count.innerHTML='2';
+                    player2.node.count.dataset.condition='mid';
                     this.appendChild(player1);
                     this.appendChild(player2);
                     this.player1=player1;
@@ -191,9 +201,89 @@ mode.brawl={
                 var left2=rect2.left+rect2.width/2-ui.arena.offsetLeft;
                 var top1=rect1.top+rect1.height/2-ui.arena.offsetTop;
                 var top2=rect2.top+rect2.height/2-ui.arena.offsetTop;
-                node.showcaseinterval=setInterval(function(){
+
+                var createCard=function(wuxie){
+                    var card;
+                    if(wuxie){
+                        card=game.createCard('wuxie');
+                        card.style.transform='scale(0.9)';
+                    }
+                    else{
+                        card=ui.create.card();
+                    }
+                    card.style.opacity=0;
+                    card.style.position='absolute';
+                    card.style.zIndex=2;
+                    card.style.margin=0;
+                    return card;
+                }
+
+                var func=function(){
                     game.linexy([left1,top1,left2,top2]);
-                },1000);
+                    var card=createCard(true);
+                    card.style.left='43px';
+                    card.style.top='58px';
+                    node.appendChild(card);
+                    ui.refresh(card);
+                    card.style.opacity=1;
+                    card.style.transform='scale(0.9) translate(137px,152px)';
+                    setTimeout(function(){
+                        card.delete();
+                    },1000);
+                    player1.node.count.innerHTML='1';
+
+                    setTimeout(function(){
+                        if(!node.showcaseinterval) return;
+                        player1.node.count.innerHTML='2';
+                        var card=createCard();
+                        card.style.left='43px';
+                        card.style.top='58px';
+                        card.style.transform='scale(0.9) translate(137px,152px)';
+                        node.appendChild(card);
+                        ui.refresh(card);
+                        card.style.opacity=1;
+                        card.style.transform='scale(0.9)';
+                        setTimeout(function(){
+                            card.delete();
+                        },1000);
+                    },300);
+
+                    setTimeout(function(){
+                        if(!node.showcaseinterval) return;
+                        player2.node.count.innerHTML='1';
+                        game.linexy([left2,top2,left1,top1]);
+                        var card=createCard(true);
+                        card.style.left='auto';
+                        card.style.right='43px';
+                        card.style.top='58px';
+                        node.appendChild(card);
+                        ui.refresh(card);
+                        card.style.opacity=1;
+                        card.style.transform='scale(0.9) translate(-137px,152px)';
+                        setTimeout(function(){
+                            card.delete();
+                        },700);
+
+                        setTimeout(function(){
+                            if(!node.showcaseinterval) return;
+                            player2.node.count.innerHTML='2';
+                            var card=createCard();
+                            card.style.left='auto';
+                            card.style.right='43px';
+                            card.style.top='58px';
+                            card.style.transform='scale(0.9) translate(-137px,152px)';
+                            node.appendChild(card);
+                            ui.refresh(card);
+                            card.style.opacity=1;
+                            card.style.transform='scale(0.9)';
+                            setTimeout(function(){
+                                card.delete();
+                            },700);
+                        },300);
+                    },1000);
+                };
+                node.showcaseinterval=setInterval(func,2200);
+                func();
             },
             init:function(){
                 for(var i in lib.character){
