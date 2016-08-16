@@ -6,6 +6,9 @@ mode.identity={
 			ui.arena.classList.add('only_dialog');
 		}
 		_status.mode=get.config('identity_mode');
+		if(_status.brawl&&_status.brawl.submode){
+			_status.mode=_status.brawl.submode;
+		}
 		"step 1"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 		if(playback){
@@ -442,6 +445,11 @@ mode.identity={
 				return game.players.randomGet(game.me,game.zhu);
 			};
 			next.ai=function(player,list,list2,back){
+				if(_status.brawl&&_status.brawl.chooseCharacterAi){
+					if(_status.brawl.chooseCharacterAi(player,list,list2,back)!==false){
+						return;
+					}
+				}
 				if(_status.event.zhongmode){
 					if(get.config('double_character')){
 						player.init(list[0],list[1]);
@@ -746,6 +754,9 @@ mode.identity={
 				}
 				event.list.randomSort();
 				list3.randomSort();
+				if(_status.brawl&&_status.brawl.chooseCharacterFilter){
+					_status.brawl.chooseCharacterFilter(event.list,list2,list3);
+				}
 				var num=get.config('choice_'+game.me.identity);
 				if(event.zhongmode){
 					num=3;
@@ -754,14 +765,24 @@ mode.identity={
 					event.ai(game.zhu,event.list,list2)
 					event.list.remove(game.zhu.name);
 					event.list.remove(game.zhu.name2);
-					list=event.list.slice(0,num);
-				}
-				else{
-					if(event.zhongmode){
-						list=list3.slice(0,6);
+					if(_status.brawl&&_status.brawl.chooseCharacter){
+						list=_status.brawl.chooseCharacter(event.list,num);
 					}
 					else{
-						list=list2.concat(list3.slice(0,num));
+						list=event.list.slice(0,num);
+					}
+				}
+				else{
+					if(_status.brawl&&_status.brawl.chooseCharacter){
+						list=_status.brawl.chooseCharacter(list2,list3,num);
+					}
+					else{
+						if(event.zhongmode){
+							list=list3.slice(0,6);
+						}
+						else{
+							list=list2.concat(list3.slice(0,num));
+						}
 					}
 				}
 				delete event.swapnochoose;
@@ -845,10 +866,12 @@ mode.identity={
 						}
 					});
 				}
-				if(!ui.cheat&&get.config('change_choice'))
-				ui.create.cheat();
-				if(!ui.cheat2&&get.config('free_choose'))
-				ui.create.cheat2();
+				if(!_status.brawl||!_status.brawl.chooseCharacterFixed){
+					if(!ui.cheat&&get.config('change_choice'))
+					ui.create.cheat();
+					if(!ui.cheat2&&get.config('free_choose'))
+					ui.create.cheat2();
+				}
 				"step 1"
 				if(ui.cheat){
 					ui.cheat.close();

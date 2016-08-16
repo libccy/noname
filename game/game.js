@@ -1951,7 +1951,7 @@
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
 							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over){
+								if(!ui.continue_game&&_status.over&&!_status.brawl){
 									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 								}
 							}
@@ -2230,7 +2230,7 @@
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
 							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over){
+								if(!ui.continue_game&&_status.over&&!_status.brawl){
 									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 								}
 							}
@@ -7848,7 +7848,7 @@
 						if(get.config('revive')&&lib.mode[lib.config.mode].config.revive&&!ui.revive){
 							ui.revive=ui.create.control('revive',ui.click.dierevive);
 						}
-                        if(get.config('continue_game')&&!ui.continue_game&&lib.mode[lib.config.mode].config.continue_game){
+                        if(get.config('continue_game')&&!ui.continue_game&&lib.mode[lib.config.mode].config.continue_game&&!_status.brawl){
             				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
             			}
 						if(get.config('dierestart')&&lib.mode[lib.config.mode].config.dierestart&&!ui.restart){
@@ -12822,6 +12822,9 @@
                     if(_status.video) return;
                     if(name=='gameStart'){
                         _status.gameStarted=true;
+                        if(_status.brawl&&_status.brawl.gameStart){
+                            _status.brawl.gameStart();
+                        }
                     }
                     if(!lib.hookmap[name]) return;
                     var event=this;
@@ -18031,40 +18034,42 @@
 			if(game.controlOver){
 				game.controlOver();return;
 			}
-			if(lib.config.mode=='boss'){
-				ui.create.control('再战',function(){
-					var pointer=game.boss;
-					var map={boss:game.me==game.boss,links:[]};
-					for(var iwhile=0;iwhile<10;iwhile++){
-						pointer=pointer.nextSeat;
-						if(pointer==game.boss){
-							break;
-						}
-						map.links.push(pointer.name);
-					}
-					game.saveConfig('continue_name_boss',map);
-					game.saveConfig('mode',lib.config.mode);
-					localStorage.setItem(lib.configprefix+'directstart',true);
-					game.reload();
-				});
-			}
-			else if(lib.config.mode=='versus'){
-				if(_status.mode=='standard'){
-					ui.create.control('再战',function(){
-						game.saveConfig('continue_name_versus',{
-							friend:_status.friendBackup,
-							enemy:_status.enemyBackup,
-							color:_status.color
-						});
-						game.saveConfig('mode',lib.config.mode);
-						localStorage.setItem(lib.configprefix+'directstart',true);
-						game.reload();
-					});
-				}
-			}
-			else if(!_status.connectMode&&get.config('continue_game')&&!ui.continue_game){
-				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
-			}
+            if(!_status.brawl){
+                if(lib.config.mode=='boss'){
+    				ui.create.control('再战',function(){
+    					var pointer=game.boss;
+    					var map={boss:game.me==game.boss,links:[]};
+    					for(var iwhile=0;iwhile<10;iwhile++){
+    						pointer=pointer.nextSeat;
+    						if(pointer==game.boss){
+    							break;
+    						}
+    						map.links.push(pointer.name);
+    					}
+    					game.saveConfig('continue_name_boss',map);
+    					game.saveConfig('mode',lib.config.mode);
+    					localStorage.setItem(lib.configprefix+'directstart',true);
+    					game.reload();
+    				});
+    			}
+    			else if(lib.config.mode=='versus'){
+    				if(_status.mode=='standard'){
+    					ui.create.control('再战',function(){
+    						game.saveConfig('continue_name_versus',{
+    							friend:_status.friendBackup,
+    							enemy:_status.enemyBackup,
+    							color:_status.color
+    						});
+    						game.saveConfig('mode',lib.config.mode);
+    						localStorage.setItem(lib.configprefix+'directstart',true);
+    						game.reload();
+    					});
+    				}
+    			}
+    			else if(!_status.connectMode&&get.config('continue_game')&&!ui.continue_game&&!_status.brawl){
+    				ui.continue_game=ui.create.control('再战',game.reloadCurrent);
+    			}
+            }
 			if(!ui.restart){
 				ui.restart=ui.create.control('restart',game.reload);
 			}
@@ -18930,6 +18935,13 @@
                             lib.card.list.splice(i,1);i--;
                         }
                     }
+                }
+
+                if(!lib.config.show_playerids||!game.showIdentity){
+					ui.playerids.style.display='none';
+				}
+                else{
+                    ui.playerids.style.display='';
                 }
 
                 game.createEvent('game',false).setContent(mode[lib.config.mode].start);

@@ -29,6 +29,12 @@ mode.guozhan={
 			game.delay();
 			game.showChangeLog();
 		}
+		if(!_status.connectMode){
+			_status.mode=get.config('guozhan_mode');
+			if(_status.brawl&&_status.brawl.submode){
+				_status.mode=_status.brawl.submode;
+			}
+		}
 		"step 1"
 		if(_status.connectMode){
 			game.randomMapOL();
@@ -97,7 +103,7 @@ mode.guozhan={
 		}
 		_status.videoInited=true,
 		game.addVideo('init',null,info);
-		if(get.config('guozhan_mode')=='mingjiang'){
+		if(_status.mode=='mingjiang'){
 			game.showIdentity(true);
 		}
 		else{
@@ -369,6 +375,11 @@ mode.guozhan={
 			next.showConfig=true;
 			next.addPlayer=true;
 			next.ai=function(player,list,back){
+				if(_status.brawl&&_status.brawl.chooseCharacterAi){
+					if(_status.brawl.chooseCharacterAi(player,list,back)!==false){
+						return;
+					}
+				}
 				for(var i=0;i<list.length-1;i++){
 					for(var j=i+1;j<list.length;j++){
 						if(lib.character[list[i]][1]==lib.character[list[j]][1]){
@@ -451,9 +462,18 @@ mode.guozhan={
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);
 				}
+				if(_status.brawl&&_status.brawl.chooseCharacterFilter){
+					event.list=_status.brawl.chooseCharacterFilter(event.list);
+				}
 				event.list.randomSort();
 				// var list=event.list.splice(0,parseInt(get.config('choice_num')));
-				var list=game.getCharacterChoice(event.list,parseInt(get.config('choice_num')));
+				var list;
+				if(_status.brawl&&_status.brawl.chooseCharacter){
+					list=_status.brawl.chooseCharacter(event.list,game.me);
+				}
+				else{
+					list=game.getCharacterChoice(event.list,parseInt(get.config('choice_num')));
+				}
 				if(_status.auto){
 					event.ai(game.me,list);
 				}
@@ -544,10 +564,12 @@ mode.guozhan={
 						});
 						delete _status.createControl;
 					}
-					if(!ui.cheat&&get.config('change_choice'))
-					ui.create.cheat();
-					if(!ui.cheat2&&get.config('free_choose'))
-					ui.create.cheat2();
+					if(!_status.brawl||!_status.brawl.chooseCharacterFixed){
+						if(!ui.cheat&&get.config('change_choice'))
+						ui.create.cheat();
+						if(!ui.cheat2&&get.config('free_choose'))
+						ui.create.cheat2();
+					}
 				}
 				"step 1"
 				if(ui.cheat){
@@ -931,7 +953,7 @@ mode.guozhan={
 				},this,this.name,this.sex,num,this.identity);
 				this.identityShown=true;
 				var initdraw=parseInt(get.config('initshow_draw'));
-				if(!_status.initshown&&!_status.overing&&initdraw&&this.isAlive()&&get.config('guozhan_mode')!='mingjiang'){
+				if(!_status.initshown&&!_status.overing&&initdraw&&this.isAlive()&&_status.mode!='mingjiang'){
 					this.popup('首亮');
 					game.log(this,'首先明置武将，得到奖励');
 					game.log(this,'摸了'+get.cnNumber(initdraw)+'张牌');

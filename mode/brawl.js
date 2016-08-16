@@ -117,27 +117,26 @@ mode.brawl={
         start.style.width='80px';
         start.style.height='80px';
         start.style.lineHeight='80px';
+        start.style.margin='0';
+        start.style.padding='5px';
         start.style.fontSize='72px';
-        start.style.zIndex=2;
-    },
-    game:{
-
+        start.style.zIndex=3;
+        start.style.transition='all 0s';
     },
     brawl:{
         duzhansanguo:{
             name:'毒战三国',
             mode:'identity',
             intro:'牌堆中额外添加10%的毒',
-            showcase:function(){
+            showcase:function(init){
                 var node=this;
-                node.nodes=node.nodes||[];
-                node.showcaseinterval=setInterval(function(){
+                var func=function(){
                     var card=game.createCard('du');
                     node.nodes.push(card);
                     card.style.position='absolute';
                     var rand1=Math.round(Math.random()*100);
                     var rand2=Math.round(Math.random()*100);
-                    var rand3=Math.round(Math.random()*360);
+                    var rand3=Math.round(Math.random()*40)-20;
                     card.style.left='calc('+rand1+'% - '+rand1+'px)';
                     card.style.top='calc('+rand2+'% - '+rand2+'px)';
                     card.style.transform='scale(0.8) rotate('+rand3+'deg)';
@@ -153,7 +152,14 @@ mode.brawl={
                             }
                         },500);
                     }
-                },1000);
+                };
+                if(init){
+                    node.nodes=[];
+                    for(var i=0;i<5;i++){
+                        func();
+                    }
+                }
+                node.showcaseinterval=setInterval(func,1000);
             },
             content:{
                 cardPile:function(list){
@@ -310,17 +316,258 @@ mode.brawl={
             name:'唯我独尊',
             mode:'identity',
             intro:[
-                '牌堆中杀的数量增加30',
+                '牌堆中杀的数量增加30%',
                 '游戏开始时，主公获得一枚战神标记',
                 '拥有战神标记的角色杀造成的伤害+1',
                 '受到杀造成的伤害后战神印记将移到伤害来源的武将牌上'
-            ]
+            ],
+            showcase:function(init){
+                var node=this;
+                var player;
+                if(init){
+                    player=ui.create.player();
+                    player.init('boss_lvbu2');
+                    player.style.left='calc(50% - 75px)';
+                    player.style.top='20px';
+                    player.node.count.remove();
+                    player.node.hp.remove();
+                    player.style.transition='all 0.5s';
+                    node.appendChild(player);
+                    node.playernode=player;
+                }
+                else{
+                    player=node.playernode;
+                }
+                var num=0;
+                var num2=0;
+                this.showcaseinterval=setInterval(function(){
+                    var dx,dy
+                    if(num2%3==0){
+                        player.animate('target');
+                        player.animate('zoomin');
+                    }
+                    num2++;
+                    switch(num++){
+                        case 0:dx=-150;dy=0;break;
+                        case 1:dx=-120;dy=100;break;
+                        case 2:dx=0;dy=155;break;
+                        case 3:dx=120;dy=100;break;
+                        case 4:dx=150;dy=0;break;
+                    }
+                    if(num>=5){
+                        num=0;
+                    }
+                    var card=game.createCard('sha');
+                    card.style.left='calc(50% - 52px)';
+                    card.style.top='68px';
+                    card.style.position='absolute';
+                    card.style.margin=0;
+                    card.style.zIndex=2;
+                    card.style.opacity=0;
+                    node.appendChild(card);
+                    ui.refresh(card);
+                    card.style.opacity=1;
+                    card.style.transform='translate('+dx+'px,'+dy+'px)';
+                    setTimeout(function(){
+                        card.delete();
+                    },700);
+                },700);
+            },
+            init:function(){
+                lib.skill.weiwoduzun={
+                    mark:true,
+                    intro:{
+                        content:'杀造成的伤害+1'
+                    },
+                    group:['weiwoduzun_damage','weiwoduzun_lose'],
+                    subSkill:{
+                        damage:{
+                            trigger:{source:'damageBegin'},
+                            forced:true,
+                            filter:function(event){
+                                return event.card&&event.card.name=='sha'&&event.notLink();
+                            },
+                            content:function(){
+                                trigger.num++;
+                            }
+                        },
+                        lose:{
+                            trigger:{player:'damageEnd'},
+                            forced:true,
+                            filter:function(event){
+                                return event.source&&event.source.isAlive();
+                            },
+                            content:function(){
+                                player.removeSkill('weiwoduzun');
+                                trigger.source.addSkill('weiwoduzun');
+                            }
+                        }
+                    }
+                };
+                lib.translate.weiwoduzun='战神';
+                lib.translate.weiwoduzun_bg='尊';
+            },
+            content:{
+                cardPile:function(list){
+                    var num=0;
+                    for(var i=0;i<list.length;i++){
+                        if(list[i][2]=='sha') num++;
+                    }
+                    num=Math.round(num*0.3);
+                    if(num<=0) return list;
+                    while(num--){
+                        var nature='';
+                        var rand=Math.random();
+                        if(rand<0.15){
+                            nature='fire';
+                        }
+                        else if(rand<0.3){
+                            nature='thunder';
+                        }
+                        var suit=['heart','spade','club','diamond'].randomGet();
+                        var number=Math.ceil(Math.random()*13);
+                        if(nature){
+                            list.push([suit,number,'sha',nature]);
+                        }
+                        else{
+                            list.push([suit,number,'sha']);
+                        }
+                    }
+                    return list;
+                },
+                gameStart:function(){
+                    if(_status.mode=='zhong'){
+                        game.zhong.addSkill('weiwoduzun');
+                    }
+                    else{
+                        game.zhu.addSkill('weiwoduzun');
+                    }
+                }
+            }
         },
         tongxingzhizheng:{
             name:'同姓之争',
             mode:'versus',
             submode:'2v2',
-            intro:'姓氏相同的武将组合一队'
+            intro:'姓氏相同的武将组合一队',
+            showcase:function(init){
+                var node=this;
+                var getList=function(){
+                    var list=[['guanyu','guanping','guansuo','guanyinping'],
+                    ['caocao','caopi','caozhi','caorui'],['liubei','liushan','liuchen'],
+                    ['xiahouyuan','xiahouba','xiahoushi'],['sunjian','sunquan','sunce'],
+                    ['zhangjiao','zhangliang','zhangbao'],['zhugeliang','zhugeguo','zhugejin','zhugeke'],
+                    ['mateng','machao','madai','mayunlu']];
+                    list.randomSort();
+                    var list2=[];
+                    for(var i=0;i<list.length;i++){
+                        list2=list2.concat(list[i]);
+                    }
+                    node.list=list2;
+                };
+                var func=function(){
+                    if(!node.list.length){
+                        getList();
+                    }
+                    var card=ui.create.player();
+                    card.init(node.list.shift());
+                    card.node.marks.remove();
+                    card.node.count.remove();
+                    card.node.hp.remove();
+                    node.nodes.push(card);
+                    card.style.position='absolute';
+                    var rand1=Math.round(Math.random()*100);
+                    var rand2=Math.round(Math.random()*100);
+                    var rand3=Math.round(Math.random()*40)-20;
+                    card.style.left='calc('+rand1+'% - '+(rand1*1.5)+'px)';
+                    card.style.top='calc('+rand2+'% - '+(rand2*1.8)+'px)';
+                    card.style.transform='scale(1.2) rotate('+rand3+'deg)';
+                    card.style.opacity=0;
+                    ui.refresh(card);
+                    node.appendChild(card);
+                    ui.refresh(card);
+                    card.style.transform='scale(0.9) rotate('+rand3+'deg)';
+                    card.style.opacity=1;
+                    if(node.nodes.length>4){
+                        setTimeout(function(){
+                            while(node.nodes.length>3){
+                                node.nodes.shift().delete();
+                            }
+                        },500);
+                    }
+                };
+                node.list=[];
+                if(init){
+                    node.nodes=[];
+                    for(var i=0;i<3;i++){
+                        func();
+                    }
+                }
+                node.showcaseinterval=setInterval(func,1000);
+            },
+            init:function(){
+                var map={};
+                var map3=[];
+                var list1=['司','夏','诸'];
+                var list2=['马','侯','葛'];
+                var exclude=['界','新','大'];
+                for(var i in lib.character){
+                    if(lib.filter.characterDisabled(i)) continue;
+                    var surname=lib.translate[i];
+                    for(var j=0;j<surname.length;j++){
+                        if(exclude.contains(surname[j])) continue;
+                        if(!/[a-z]/i.test(surname[j])){
+                            var index=list1.indexOf(surname[j]);
+                            if(index!=-1&&surname[j+1]==list2[index]){
+                                surname=surname[j]+surname[j+1];
+                            }
+                            else{
+                                surname=surname[j];
+                            }
+                            break;
+                        }
+                    }
+                    if(!map[surname]){
+                        map[surname]=[];
+                    }
+                    map[surname].push(i);
+                }
+                for(var i in map){
+                    if(map[i].length<4){
+                        delete map[i];
+                    }
+                    else{
+                        map3.push(i);
+                    }
+                }
+                _status.brawl.map=map;
+                _status.brawl.map3=map3;
+            },
+            content:{
+                submode:'two',
+                chooseCharacterFixed:true,
+                chooseCharacter:function(list,player){
+                    if(player.side==game.me.side){
+                        if(_status.brawl.mylist){
+                            return _status.brawl.mylist.randomGets(2);
+                        }
+                    }
+                    else{
+                        if(_status.brawl.enemylist){
+                            return _status.brawl.enemylist.randomGets(2);
+                        }
+                    }
+                    var surname=_status.brawl.map3.randomRemove();
+                    var list=_status.brawl.map[surname];
+                    if(player==game.me){
+                        _status.brawl.mylist=list;
+                    }
+                    else{
+                        _status.brawl.enemylist=list;
+                    }
+                    return list.randomRemove(2);
+                }
+            }
         },
         tongqueduopao:{
             name:'铜雀夺袍',
@@ -329,7 +576,84 @@ mode.brawl={
                 '主公必选曹操',
                 '其余玩家从曹休、文聘、曹洪、张郃、夏侯渊、徐晃、许褚这些武将中随机选中一个',
                 '游戏开始时将麒麟弓和爪黄飞电各置于每名角色的装备区内，大宛马洗入牌堆，移除其他的武器牌和坐骑牌'
-            ]
+            ],
+            init:function(){
+                game.saveConfig('player_number','8','identity');
+                game.saveConfig('double_character',false,'identity');
+            },
+            showcase:function(init){
+                var node=this;
+                var list=['caoxiu','wenpin','caohong','zhanghe','xiahouyuan','xuhuang','re_xuzhu'];
+                list.randomSort();
+                list.push('re_caocao');
+                var func=function(){
+                    var card=ui.create.player();
+                    card.init(list.shift());
+                    card.node.marks.remove();
+                    card.node.count.remove();
+                    card.node.hp.remove();
+                    node.nodes.push(card);
+                    card.style.position='absolute';
+                    var rand1=Math.round(Math.random()*100);
+                    var rand2=Math.round(Math.random()*100);
+                    var rand3=Math.round(Math.random()*40)-20;
+                    card.style.left='calc('+rand1+'% - '+(rand1*1.5)+'px)';
+                    card.style.top='calc('+rand2+'% - '+(rand2*1.8)+'px)';
+                    card.style.transform='scale(0.8) rotate('+rand3+'deg)';
+                    node.appendChild(card);
+                };
+                if(init){
+                    node.nodes=[];
+                }
+                else{
+                    while(node.nodes.length){
+                        node.nodes.shift().remove();
+                    }
+                }
+                for(var i=0;i<8;i++){
+                    func();
+                }
+            },
+            content:{
+                cardPile:function(list){
+                    for(var i=0;i<list.length;i++){
+                        var subtype=get.subtype(list[i][2]);
+                        if(subtype=='equip1'||subtype=='equip3'||subtype=='equip4'){
+                            list.splice(i--,1);
+                        }
+                    }
+                    for(var i=0;i<8;i++){
+                        list.push([['heart','diamond','club','spade'].randomGet(),Math.ceil(Math.random()*13),'dawan']);
+                    }
+                    return list;
+                },
+                gameStart:function(){
+                    for(var i=0;i<game.players.length;i++){
+                        game.players[i].$equip(game.createCard('qilin'));
+                        game.players[i].$equip(game.createCard('zhuahuang'));
+                    }
+                },
+                submode:'normal',
+                list:['caoxiu','wenpin','caohong','zhanghe','xiahouyuan','xuhuang','re_xuzhu'],
+                chooseCharacterFixed:true,
+                chooseCharacterAi:function(player){
+                    if(player==game.zhu){
+                        player.init('re_caocao');
+                    }
+                    else{
+                        _status.brawl.list.remove(game.me.name);
+                        player.init(_status.brawl.list.randomRemove());
+                    }
+                },
+                chooseCharacter:function(){
+                    if(game.me==game.zhu){
+                        return ['re_caocao'];
+                    }
+                    else{
+                        return _status.brawl.list.randomGets(1);
+                    }
+                }
+            }
         },
         // shenrudihou:{
         //     name:'深入敌后',
@@ -340,17 +664,100 @@ mode.brawl={
         tongjiangmoshi:{
             name:'同将模式',
             mode:'identity',
-            intro:'主公选择一个武将，所有角色均使用此武将',
+            intro:'玩家选择一个武将，所有角色均使用此武将',
+            showcase:function(init){
+                if(init){
+                    this.nodes=[];
+                }
+                else{
+                    while(this.nodes.length){
+                        this.nodes.shift().remove();
+                    }
+                }
+                var lx=this.offsetWidth/2-120;
+                var ly=Math.min(lx,this.offsetHeight/2-60);
+                var setPos=function(node){
+                    var i=node.index;
+                    var deg=Math.PI/4*i;
+                    var dx=lx*Math.cos(deg);
+                    var dy=ly*Math.sin(deg);
+                    node.style.transform='translate('+dx+'px,'+dy+'px)';
+                }
+                for(var i=0;i<8;i++){
+                    var node=ui.create.player();
+                    this.nodes.push(node);
+                    node.init('zuoci');
+                    node.classList.add('minskin');
+                    node.node.marks.remove();
+                    node.node.hp.remove();
+                    node.node.count.remove();
+                    node.style.left='calc(50% - 60px)';
+                    node.style.top='calc(50% - 60px)';
+                    node.index=i;
+                    setPos(node);
+                    this.appendChild(node);
+                }
+                var nodes=this.nodes;
+                this.showcaseinterval=setInterval(function(){
+                    for(var i=0;i<nodes.length;i++){
+                        nodes[i].index++;
+                        if(nodes[i].index>7){
+                            nodes[i].index=0;
+                        }
+                        setPos(nodes[i]);
+                    }
+                },1000);
+            },
+            content:{
+                gameStart:function(){
+                    var target=(_status.mode=='zhong')?game.zhong:game.zhu;
+                    if(get.config('double_character')){
+                        target.init(game.me.name,game.me.name2);
+                    }
+                    else{
+                        target.init(game.me.name);
+                    }
+                    target.hp++;
+                    target.maxHp++;
+                    target.update();
+                },
+                chooseCharacterAi:function(player,list,list2,back){
+                    if(player==game.zhu){
+                        return;
+                    }
+                    else{
+                        if(get.config('double_character')){
+                            player.init(game.me.name,game.me.name2);
+                        }
+                        else{
+                            player.init(game.me.name);
+                        }
+                    }
+                },
+                chooseCharacter:function(list,list2,num){
+                    if(game.me!=game.zhu){
+                        return list.slice(0,list2);
+                    }
+                    else{
+                        if(_status.event.zhongmode){
+    						return list.slice(0,6);
+    					}
+    					else{
+    						return list.concat(list2.slice(0,num));
+    					}
+                    }
+                }
+            }
         },
-        baiyudujiang:{
-            name:'白衣渡江',
-            mode:'versus',
-            submode:'2v2',
-            intro:[
-                '玩家在选将时可从6-8张的武将牌里选择两张武将牌，一张面向大家可见（加入游戏），另一张是隐藏面孔（暗置）',
-                '选择的两张武将牌需满足以下至少两个条件：1.性别相同；2.体力上限相同；3.技能数量相同',
-                '每名玩家在其回合开始或回合结束时，可以选择将自己的武将牌弃置，然后使用暗置的武将牌进行剩余的游戏'
-            ]
-        }
+        // baiyudujiang:{
+        //     name:'白衣渡江',
+        //     mode:'versus',
+        //     submode:'2v2',
+        //     intro:[
+        //         '玩家在选将时可从6-8张的武将牌里选择两张武将牌，一张面向大家可见（加入游戏），另一张是隐藏面孔（暗置）',
+        //         '选择的两张武将牌需满足以下至少两个条件：1.性别相同；2.体力上限相同；3.技能数量相同',
+        //         '每名玩家在其回合开始或回合结束时，可以选择将自己的武将牌弃置，然后使用暗置的武将牌进行剩余的游戏'
+        //     ]
+        // }
     }
 };

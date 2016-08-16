@@ -3,6 +3,9 @@ mode.versus={
 	start:function(){
 		"step 0"
 		_status.mode=get.config('versus_mode');
+		if(_status.brawl&&_status.brawl.submode){
+			_status.mode=_status.brawl.submode;
+		}
 		"step 1"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 		if(playback){
@@ -505,8 +508,10 @@ mode.versus={
 								}
 							});
 						}
-						if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
-						if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+						if(!_status.brawl||!_status.brawl.chooseCharacterFixed){
+							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
+							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
+						}
 						break;
 					case 'mech':
 						dialog=ui.create.dialog('选择角色',[list[game.me.identity+'mech'],'character']);
@@ -675,7 +680,14 @@ mode.versus={
 				event.addSetting=addSetting;
 				event.removeSetting=removeSetting;
 
-				var dialog=ui.create.dialog('选择角色',[list.randomGets(7),'character']);
+				var characterChoice;
+				if(_status.brawl&&_status.brawl.chooseCharacter){
+					characterChoice=_status.brawl.chooseCharacter(list,game.me);
+				}
+				else{
+					characterChoice=list.randomGets(7);
+				}
+				var dialog=ui.create.dialog('选择角色',[characterChoice,'character']);
 				game.me.chooseButton(true,dialog);
 				if(get.config('change_identity')){
 					addSetting(dialog);
@@ -735,10 +747,14 @@ mode.versus={
 						}
 					});
 				}
-				if(!ui.cheat&&get.config('change_choice'))
-				ui.create.cheat();
-				if(!ui.cheat2&&get.config('free_choose'))
-				ui.create.cheat2();
+				if(!_status.brawl||!_status.brawl.chooseCharacterFixed){
+					if(!ui.cheat&&get.config('change_choice')){
+						ui.create.cheat();
+					}
+					if(!ui.cheat2&&get.config('free_choose')){
+						ui.create.cheat2();
+					}
+				}
 				'step 1'
 				if(ui.cheat){
 					ui.cheat.close();
@@ -753,7 +769,14 @@ mode.versus={
 				event.list.remove(game.me.name);
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.me){
-						game.players[i].init(event.list.randomRemove());
+						if(_status.brawl&&_status.brawl.chooseCharacter){
+							var list=_status.brawl.chooseCharacter(event.list,game.players[i]);
+							game.players[i].init(list.randomGet());
+							event.list.remove(game.players[i].name);
+						}
+						else{
+							game.players[i].init(event.list.randomRemove());
+						}
 					}
 				}
 			});
@@ -819,6 +842,9 @@ mode.versus={
 					if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 						list2.push(i);
 					}
+				}
+				if(_status.brawl&&_status.brawl.chooseCharacterFilter){
+					event.list=_status.brawl.chooseCharacterFilter(event.list);
 				}
 				event.list.randomSort();
 				event.list2=list2;
