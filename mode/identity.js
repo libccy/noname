@@ -234,13 +234,6 @@ mode.identity={
 				if(Math.random()<0.5) game.me.next.init(lib.storage.test);
 				else game.me.init(lib.storage.test);
 			}
-			var str='';
-			for(var i=0;i<game.players.length;i++){
-				str+=get.translation(game.players[i]);
-				if(game.players[i]==game.zhu) str+='（主）';
-				str+=' ';
-			}
-			console.log(str);
 			game.showIdentity();
 		}
 		game.syncState();
@@ -396,17 +389,6 @@ mode.identity={
 			if(game.zhu.isAlive()&&get.population('fan')+get.population('nei')>0) return;
 			if(game.zhong){
 				game.zhong.identity='zhong';
-			}
-			if(lib.storage.test){
-				if(game.zhu.isAlive()){
-					console.log('主忠胜利');
-				}
-				else if(game.players[0].identity=='nei'&&game.players.length==1){
-					console.log('内奸胜利');
-				}
-				else{
-					console.log('反贼胜利');
-				}
 			}
 			game.showIdentity();
 			if(game.me.identity=='zhu'||game.me.identity=='zhong'){

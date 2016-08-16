@@ -7799,6 +7799,7 @@
 					for(var i in player.tempSkills){
                         player.removeSkill(i);
 					}
+                    player.clearEquipTrigger();
                     // for(var i in lib.skill.globalmap){
                     //     if(lib.skill.globalmap[i].contains(player)){
                     //         lib.skill.globalmap[i].remove(player);
@@ -9997,8 +9998,8 @@
                     next.setContent('die');
 					return next;
 				},
-				revive:function(hp){
-					game.log(this,'复活');
+				revive:function(hp,log){
+					if(log!==false) game.log(this,'复活');
 					if(this.maxHp<1) this.maxHp=1;
 					if(hp) this.hp=hp;
 					else{
@@ -10850,7 +10851,7 @@
                         var roles=['player','source','target'];
                         for(var i=0;i<roles.length;i++){
                             if(typeof expire[roles[i]]=='string'){
-                                lib.hookmap[expire]=true;
+                                lib.hookmap[expire[roles[i]]]=true;
                             }
                             else if(Array.isArray(expire[roles[i]])){
                                 for(var j=0;j<expire[roles[i]].length;j++){
@@ -18789,6 +18790,7 @@
                 script.remove();
                 var mode=window.mode;
                 delete window.mode;
+                _status.sourcemode=lib.config.mode;
                 lib.config.mode=name;
 
                 var i,j,k;
@@ -27364,6 +27366,14 @@
 				return node;
 			},
 			cards:function(random){
+                if(_status.brawl){
+                    if(_status.brawl.cardPile){
+                        lib.card.list=_status.brawl.cardPile(lib.card.list);
+                    }
+                    if(_status.brawl.orderedPile){
+                        random=false;
+                    }
+                }
 				if(!random){
 					lib.card.list.randomSort();
 				}
@@ -27568,7 +27578,7 @@
 					var node=ui.create.div('.newgame');
 					for(var i=0;i<3&&i+k*3<modes.length;i++){
 						var thismode=modes[i+k*3];
-						var div=ui.create.div(thismode==lib.config.mode?'.underlinenode.on':'.underlinenode',node);
+						var div=ui.create.div(thismode==(_status.sourcemode||lib.config.mode)?'.underlinenode.on':'.underlinenode',node);
 						div.innerHTML=lib.translate[thismode];
 						div.link=thismode;
 						div.addEventListener(lib.config.touchscreen?'touchend':'click',function(){

@@ -1263,7 +1263,7 @@ mode.versus={
 				var num=lib.storage.number;
 				ui.create.players(num*2);
 				for(var i=0;i<game.players.length;i++){
-					game.players[i].id=get.id();
+					game.players[i].getId();
 					game.players[i].node.action.innerHTML='行动';
 				}
 				if(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4){
@@ -2469,7 +2469,7 @@ mode.versus={
 				"step 1"
 				_status.friend.remove(event.character);
 				_status.enemy.remove(event.character);
-				source.revive();
+				source.revive(null,false);
 				game.additionaldead.push({
 					name:source.name,
 					stat:source.stat
@@ -2477,6 +2477,7 @@ mode.versus={
 				game.addVideo('reinit',source,[event.character,get.translation(source.side+'Color')]);
 				source.uninit();
 				source.init(event.character);
+				game.log(source,'出场');
 				source.node.identity.dataset.color=get.translation(source.side+'Color');
 				source.draw(4);
 				_status.event.parent.parent.parent.untrigger(false,source);
@@ -2599,7 +2600,7 @@ mode.versus={
 				game.broadcastAll(function(source,name,color){
 					_status.friend.remove(name);
 					_status.enemy.remove(name);
-					source.revive();
+					source.revive(null,false);
 					source.uninit();
 					source.init(name);
 					source.node.identity.dataset.color=color;
@@ -2607,6 +2608,7 @@ mode.versus={
 						ui.arena.classList.remove('selecting');
 					}
 				},source,name,color);
+				game.log(source,'出场');
 
 				source.draw(4);
 				_status.event.parent.parent.parent.untrigger(false,source);

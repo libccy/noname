@@ -57,13 +57,6 @@ mode.guozhan={
 		if(ui.coin){
 			_status.coinCoeff=get.coinCoeff([game.me.name1,game.me.name2]);
 		}
-		if(lib.storage.test&&!_status.connectMode){
-			var str='';
-			for(var i=0;i<game.players.length;i++){
-				str+=get.translation(game.players[i].name1)+' '+get.translation(game.players[i].name2)+'; ';
-			}
-			console.log(str);
-		}
 		var player;
 		if(_status.cheat_seat){
 			var seat=_status.cheat_seat.link;
@@ -344,9 +337,6 @@ mode.guozhan={
 		},
 		checkResult:function(){
 			_status.overing=true;
-			if(lib.storage.test&&!_status.connectMode){
-				console.log(get.translation(game.players[0].identity)+'胜利');
-			}
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].showCharacter(2);
 			}
