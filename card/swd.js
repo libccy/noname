@@ -1517,11 +1517,11 @@ card.swd={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{suit:'spade'})>0&&player.hp<player.maxHp;
+				return player.num('he',{color:'red'})>0&&player.hp<player.maxHp;
 			},
 			content:function(){
 				'step 0'
-				var next=player.chooseToDiscard('he',{suit:'spade'},'是否发动【寒晶】？');
+				var next=player.chooseToDiscard('he',{color:'red'},'是否发动【寒晶】？');
 				next.ai=function(card){
 					return 8-ai.get.value(card);
 				};
@@ -3602,11 +3602,11 @@ card.swd={
 		_xuanwuzhihuang:'玄武之璜',
 		xuanwuzhihuang_duanzao:'寒晶',
 		xuanwuzhihuang_info:'可用于煅造装备；此牌在你手牌中时，每当你造成伤害，你回复等量的体力',
-		xuanwuzhihuang_equip1_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
-		xuanwuzhihuang_equip2_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
-		xuanwuzhihuang_equip3_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
-		xuanwuzhihuang_equip4_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
-		xuanwuzhihuang_equip5_info:'回合结束阶段，你可以弃置一张黑桃牌并回复一点体力',
+		xuanwuzhihuang_equip1_info:'回合结束阶段，你可以弃置一张红色牌并回复一点体力',
+		xuanwuzhihuang_equip2_info:'回合结束阶段，你可以弃置一张红色牌并回复一点体力',
+		xuanwuzhihuang_equip3_info:'回合结束阶段，你可以弃置一张红色牌并回复一点体力',
+		xuanwuzhihuang_equip4_info:'回合结束阶段，你可以弃置一张红色牌并回复一点体力',
+		xuanwuzhihuang_equip5_info:'回合结束阶段，你可以弃置一张红色牌并回复一点体力',
 		huanglinzhicong:'黄麟之琮',
 		_huanglinzhicong:'黄麟之琮',
 		huanglinzhicong_duanzao:'玄甲',

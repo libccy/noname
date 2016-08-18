@@ -2261,12 +2261,16 @@ character.sp={
 				'step 1'
 				var choice=event.choice||result.control;
 				if(choice=='武器牌'){
-					target.discard(event.e1);
+					if(event.e1){
+						target.discard(event.e1);
+					}
 					player.draw();
 				}
 				else{
-					player.equip(event.e2);
-					target.$give(event.e2,player);
+					if(event.e2){
+						player.equip(event.e2);
+						target.$give(event.e2,player);
+					}
 				}
 			},
 			ai:{

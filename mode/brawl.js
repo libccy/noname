@@ -18,6 +18,7 @@ mode.brawl={
         var clickCapt=function(){
             var active=this.parentNode.querySelector('.active');
             if(active){
+                if(active==this) return;
                 for(var i=0;i<active.nodes.length;i++){
                     active.nodes[i].remove();
                     if(active.nodes[i].showcaseinterval){
@@ -37,6 +38,8 @@ mode.brawl={
                 showcase.action(showcase._showcased?false:true);
                 showcase._showcased=true;
             }
+            if(this._nostart) start.style.display='none';
+            else start.style.display='';
             game.save('currentBrawl',this.link);
         }
         var createNode=function(name){
@@ -68,16 +71,11 @@ mode.brawl={
                 showcase
             ];
             node.link=name;
+            node._nostart=info.nostart;
             if(lib.storage.currentBrawl==name){
                 clickCapt.call(node);
             }
             return node;
-        }
-        for(var i in lib.brawl){
-            createNode(i);
-        }
-        if(!lib.storage.currentBrawl){
-            clickCapt.call(packnode.firstChild);
         }
         var start=ui.create.div('.menubutton.round.highlight','斗',dialog.content,function(){
             var active=packnode.querySelector('.active');
@@ -122,6 +120,12 @@ mode.brawl={
         start.style.fontSize='72px';
         start.style.zIndex=3;
         start.style.transition='all 0s';
+        for(var i in lib.brawl){
+            createNode(i);
+        }
+        if(!lib.storage.currentBrawl){
+            clickCapt.call(packnode.firstChild);
+        }
     },
     brawl:{
         duzhansanguo:{
@@ -215,7 +219,7 @@ mode.brawl={
                         card.style.transform='scale(0.9)';
                     }
                     else{
-                        card=ui.create.card();
+                        card=ui.create.card(null,null,true);
                     }
                     card.style.opacity=0;
                     card.style.position='absolute';
@@ -348,11 +352,11 @@ mode.brawl={
                     }
                     num2++;
                     switch(num++){
-                        case 0:dx=-150;dy=0;break;
-                        case 1:dx=-120;dy=100;break;
+                        case 0:dx=-180;dy=0;break;
+                        case 1:dx=-140;dy=100;break;
                         case 2:dx=0;dy=155;break;
-                        case 3:dx=120;dy=100;break;
-                        case 4:dx=150;dy=0;break;
+                        case 3:dx=140;dy=100;break;
+                        case 4:dx=180;dy=0;break;
                     }
                     if(num>=5){
                         num=0;
@@ -594,6 +598,8 @@ mode.brawl={
                     card.node.hp.remove();
                     node.nodes.push(card);
                     card.style.position='absolute';
+                    card.style.zIndex=2;
+                    card.style.transition='all 2s';
                     var rand1=Math.round(Math.random()*100);
                     var rand2=Math.round(Math.random()*100);
                     var rand3=Math.round(Math.random()*40)-20;
@@ -601,7 +607,26 @@ mode.brawl={
                     card.style.top='calc('+rand2+'% - '+(rand2*1.8)+'px)';
                     card.style.transform='scale(0.8) rotate('+rand3+'deg)';
                     node.appendChild(card);
+                    ui.refresh(card);
                 };
+
+                var list2=['qilin','dawan','zhuahuang'];
+                var func2=function(){
+                    var card=game.createCard(list2.shift());
+                    node.nodes.push(card);
+                    card.style.position='absolute';
+                    card.style.zIndex=2;
+                    card.style.transition='all 2s';
+                    var rand1=Math.round(Math.random()*100);
+                    var rand2=Math.round(Math.random()*100);
+                    var rand3=Math.round(Math.random()*40)-20;
+                    card.style.left='calc('+rand1+'% - '+rand1+'px)';
+                    card.style.top='calc('+rand2+'% - '+rand2+'px)';
+                    card.style.transform='rotate('+rand3+'deg)';
+                    node.appendChild(card);
+                    ui.refresh(card);
+                };
+
                 if(init){
                     node.nodes=[];
                 }
@@ -610,9 +635,36 @@ mode.brawl={
                         node.nodes.shift().remove();
                     }
                 }
-                for(var i=0;i<8;i++){
+                for(var i=0;i<5;i++){
                     func();
                 }
+                for(var i=0;i<3;i++){
+                    func2();
+                    func();
+                }
+                var func3=function(){
+                    for(var i=0;i<node.nodes.length;i++){
+                        var card=node.nodes[i];
+                        if(card.classList.contains('player')){
+                            var rand1=Math.round(Math.random()*100);
+                            var rand2=Math.round(Math.random()*100);
+                            var rand3=Math.round(Math.random()*40)-20;
+                            card.style.left='calc('+rand1+'% - '+(rand1*1.5)+'px)';
+                            card.style.top='calc('+rand2+'% - '+(rand2*1.8)+'px)';
+                            card.style.transform='scale(0.8) rotate('+rand3+'deg)';
+                        }
+                        else{
+                            var rand1=Math.round(Math.random()*100);
+                            var rand2=Math.round(Math.random()*100);
+                            var rand3=Math.round(Math.random()*40)-20;
+                            card.style.left='calc('+rand1+'% - '+rand1+'px)';
+                            card.style.top='calc('+rand2+'% - '+rand2+'px)';
+                            card.style.transform='rotate('+rand3+'deg)';
+                        }
+                    }
+                }
+                func3();
+                node.showcaseinterval=setInterval(func3,5000);
             },
             content:{
                 cardPile:function(list){
@@ -650,7 +702,9 @@ mode.brawl={
                         return ['re_caocao'];
                     }
                     else{
-                        return _status.brawl.list.randomGets(1);
+                        _status.brawl.list.randomSort();
+                        return _status.brawl.list;
+                        // return _status.brawl.list.randomGets(1);
                     }
                 }
             }
@@ -757,7 +811,368 @@ mode.brawl={
         //         '玩家在选将时可从6-8张的武将牌里选择两张武将牌，一张面向大家可见（加入游戏），另一张是隐藏面孔（暗置）',
         //         '选择的两张武将牌需满足以下至少两个条件：1.性别相同；2.体力上限相同；3.技能数量相同',
         //         '每名玩家在其回合开始或回合结束时，可以选择将自己的武将牌弃置，然后使用暗置的武将牌进行剩余的游戏'
-        //     ]
+        //     ],
+        //     content:{
+        //         submode:'two',
+        //         chooseCharacterNum:2,
+        //         chooseCharacterAfter:function(){
+        //
+        //         }
+        //     }
         // }
+        scene:{
+            name:'自创场景',
+            mode:'identity',
+            intro:'场景名称：<input name="scenename" type="text" style="width:120px"><br>场景说明：<input name="sceneintro" type="text" style="width:120px">',
+            content:{
+                submode:'normal'
+            },
+            nostart:true,
+            showcase:function(init){
+                if(init){
+                    this.style.transition='all 0s';
+                    this.style.height=(this.offsetHeight-10)+'px';
+                    this.style.overflow='scroll';
+                    lib.setScroll(this);
+                    this.style.paddingTop='10px';
+                    var style={marginLeft:'3px',marginRight:'3px'};
+                    var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
+                    var line1=ui.create.div(style2,this);
+                    var current=null;
+                    var addCharacter=ui.create.node('button','添加角色',line1,function(){
+                        line1.style.display='none';
+                        line7.style.display='none';
+                        line2.style.display='block';
+                        line2_t.style.display='block';
+                        line3.style.display='block';
+                        line4.style.display='block';
+                        line5.style.display='block';
+                        line6_h.style.display='block';
+                        line6_e.style.display='block';
+                        line6_j.style.display='block';
+                        capt1.style.display='block';
+                        capt2.style.display='block';
+                        if(line6_h.childElementCount) capt_h.style.display='block';
+                        if(line6_e.childElementCount) capt_e.style.display='block';
+                        if(line6_j.childElementCount) capt_j.style.display='block';
+                    },style);
+                    var editPile=ui.create.node('button','编辑牌堆',line1,function(){
+                        console.log(1);
+                    },style);
+                    var saveButton=ui.create.node('button','保存',line1,function(){
+                        console.log(1);
+                    },style);
+
+                    var capt1=ui.create.div(style2,'','角色信息',this);
+                    var line2=ui.create.div(style2,this);
+                    line2.style.display='none';
+                    var identity=ui.create.selectlist([['zhu','主公'],['zhong','忠臣'],['nei','内奸'],['fan','反贼']],'zhu',line2);
+                    identity.style.marginLeft='3px';
+                    identity.style.marginRight='3px';
+                    var position=ui.create.selectlist([['1','一号位'],['2','二号位'],['3','三号位'],['4','四号位'],['5','五号位'],['6','六号位'],['7','七号位'],['8','八号位']],'1',line2);
+                    position.style.marginLeft='3px';
+                    position.style.marginRight='3px';
+                    var line2_t=ui.create.div(style2,this);
+                    line2_t.style.display='none';
+                    ui.create.node('span','体力：',line2_t);
+                    var hp=ui.create.node('input',line2_t,{width:'40px'});
+                    hp.type='text';
+                    ui.create.node('span','体力上限：',line2_t,{marginLeft:'20px'});
+                    var maxHp=ui.create.node('input',line2_t,{width:'40px'});
+                    maxHp.type='text';
+
+                    var list=[];
+                    for(var i in lib.character){
+                        list.push([i,lib.translate[i]]);
+                    }
+
+                    list.sort(function(a,b){
+                        a=a[0];b=b[0];
+                        var aa=a,bb=b;
+                        if(aa.indexOf('_')!=-1){
+                            aa=aa.slice(aa.indexOf('_')+1);
+                        }
+                        if(bb.indexOf('_')!=-1){
+                            bb=bb.slice(bb.indexOf('_')+1);
+                        }
+                        if(aa!=bb){
+                            return aa>bb?1:-1;
+                        }
+                        return a>b?1:-1;
+                    });
+                    list.unshift(['random','随机主将']);
+                    var name1=ui.create.selectlist(list,list[0],line2);
+                    name1.style.marginLeft='3px';
+                    name1.style.marginRight='3px';
+                    name1.style.maxWidth='80px';
+                    list[0][1]='随机副将';
+                    list.unshift(['none','无副将']);
+                    var name2=ui.create.selectlist(list,list[0],line2);
+                    name2.style.marginLeft='3px';
+                    name2.style.marginRight='3px';
+                    name2.style.maxWidth='80px';
+
+                    var capt2=ui.create.div(style2,'','添加卡牌',this);
+                    var line3=ui.create.div(style2,this);
+                    line3.style.display='none';
+                    capt1.style.display='none';
+                    capt2.style.display='none';
+
+                    var line5=ui.create.div(style2,this);
+                    line5.style.display='none';
+                    var pileaddlist=[];
+                    for(var i=0;i<lib.config.cards.length;i++){
+                        if(!lib.cardPack[lib.config.cards[i]]) continue;
+                        for(var j=0;j<lib.cardPack[lib.config.cards[i]].length;j++){
+                            var cname=lib.cardPack[lib.config.cards[i]][j];
+                            pileaddlist.push([cname,get.translation(cname)]);
+                            if(cname=='sha'){
+                                pileaddlist.push(['huosha','火杀']);
+                                pileaddlist.push(['leisha','雷杀']);
+                            }
+                        }
+                    }
+                    for(var i in lib.cardPack){
+                        if(lib.config.all.cards.contains(i)) continue;
+                        for(var j=0;j<lib.cardPack[i].length;j++){
+                            var cname=lib.cardPack[i][j];
+                            pileaddlist.push([cname,get.translation(cname)]);
+                        }
+                    }
+                    pileaddlist.unshift(['random',['随机卡牌']])
+                    var cardpileaddname=ui.create.selectlist(pileaddlist,null,line3);
+                    cardpileaddname.style.marginLeft='3px';
+                    cardpileaddname.style.marginRight='3px';
+                    cardpileaddname.style.maxWidth='80px';
+                    var cardpileaddsuit=ui.create.selectlist([
+                        ['random','随机花色'],
+                        ['heart','红桃'],
+                        ['diamond','方片'],
+                        ['club','梅花'],
+                        ['spade','黑桃'],
+                    ],null,line3);
+                    cardpileaddsuit.style.marginLeft='3px';
+                    cardpileaddsuit.style.marginRight='3px';
+                    var cardpileaddnumber=ui.create.selectlist([
+                        ['random','随机点数'],1,2,3,4,5,6,7,8,9,10,11,12,13
+                    ],null,line3);
+                    cardpileaddnumber.style.marginLeft='3px';
+                    cardpileaddnumber.style.marginRight='3px';
+                    var cc_h=ui.create.node('button','加入手牌',line5,function(){
+                        var card=ui.create.card(null,'noclick',true);
+                        card.style.zoom=0.6;
+                        var name=cardpileaddname.value;
+                        var suit=cardpileaddsuit.value;
+                        var number=parseInt(cardpileaddnumber.value);
+                        var name2=name;
+                        var suit2=suit;
+                        var number2=number;
+                        if(name2=='random') name2='sha';
+                        if(suit2=='random') suit2='?';
+                        if(!number2){
+                            number='random';
+                            number2='?';
+                        }
+                        card.init([suit2,number2,name2]);
+                        card.name=name;
+                        card.suit=suit;
+                        card.number=number;
+                        if(name=='random'){
+                            card.node.name.innerHTML=get.verticalStr('随机卡牌');
+                        }
+                        card.listen(function(){
+                            this.remove();
+                            if(!line6_h.childElementCount) capt_h.style.display='none';
+                        });
+                        line6_h.appendChild(card);
+                        capt_h.style.display='block';
+                    });
+                    var cc_e=ui.create.node('button','加入装备',line5,function(){
+                        if(get.type(cardpileaddname.value)!='equip') return;
+                        var subtype=get.subtype(cardpileaddname.value);
+                        for(var i=0;i<line6_e.childElementCount;i++){
+                            if(get.subtype(line6_e.childNodes[i].name)==subtype){
+                                line6_e.childNodes[i].remove();break;
+                            }
+                        }
+                        var card=ui.create.card(null,'noclick',true);
+                        card.style.zoom=0.6;
+                        var name=cardpileaddname.value;
+                        var suit=cardpileaddsuit.value;
+                        var number=parseInt(cardpileaddnumber.value);
+                        var name2=name;
+                        var suit2=suit;
+                        var number2=number;
+                        if(name2=='random') name2='sha';
+                        if(suit2=='random') suit2='?';
+                        if(!number2){
+                            number='random';
+                            number2='?';
+                        }
+                        card.init([suit2,number2,name2]);
+                        card.name=name;
+                        card.suit=suit;
+                        card.number=number;
+                        if(name=='random'){
+                            card.node.name.innerHTML=get.verticalStr('随机卡牌');
+                        }
+                        card.listen(function(){
+                            this.remove();
+                            if(!line6_e.childElementCount) capt_e.style.display='none';
+                        });
+                        line6_e.appendChild(card);
+                        capt_e.style.display='block';
+                    });
+                    var cc_j=ui.create.node('button','加入判定',line5,function(){
+                        if(get.type(cardpileaddname.value)!='delay') return;
+                        for(var i=0;i<line6_j.childElementCount;i++){
+                            if(line6_j.childNodes[i].name==cardpileaddname.value){
+                                line6_j.childNodes[i].remove();break;
+                            }
+                        }
+                        var card=ui.create.card(null,'noclick',true);
+                        card.style.zoom=0.6;
+                        var name=cardpileaddname.value;
+                        var suit=cardpileaddsuit.value;
+                        var number=parseInt(cardpileaddnumber.value);
+                        var name2=name;
+                        var suit2=suit;
+                        var number2=number;
+                        if(name2=='random') name2='sha';
+                        if(suit2=='random') suit2='?';
+                        if(!number2){
+                            number='random';
+                            number2='?';
+                        }
+                        card.init([suit2,number2,name2]);
+                        card.name=name;
+                        card.suit=suit;
+                        card.number=number;
+                        if(name=='random'){
+                            card.node.name.innerHTML=get.verticalStr('随机卡牌');
+                        }
+                        card.listen(function(){
+                            this.remove();
+                            if(!line6_j.childElementCount) capt_j.style.display='none';
+                        });
+                        line6_j.appendChild(card);
+                        capt_j.style.display='block';
+                    });
+                    cc_h.style.marginLeft='3px';
+                    cc_h.style.marginRight='3px';
+                    cc_e.style.marginLeft='3px';
+                    cc_e.style.marginRight='3px';
+                    cc_j.style.marginLeft='3px';
+                    cc_j.style.marginRight='3px';
+
+                    var capt_h=ui.create.div(style2,'','手牌区',this);
+                    var line6_h=ui.create.div(style2,this);
+                    var capt_e=ui.create.div(style2,'','装备区',this);
+                    var line6_e=ui.create.div(style2,this);
+                    var capt_j=ui.create.div(style2,'','判定区',this);
+                    var line6_j=ui.create.div(style2,this);
+                    line6_j.style.marginBottom='10px';
+                    capt_h.style.display='none';
+                    capt_e.style.display='none';
+                    capt_j.style.display='none';
+
+                    var line4=ui.create.div(style2,this);
+                    line4.style.display='none';
+                    var resetCharacter=function(){
+                        line1.style.display='block';
+                        line7.style.display='block';
+                        line2.style.display='none';
+                        line2_t.style.display='none';
+                        line3.style.display='none';
+                        line4.style.display='none';
+                        line5.style.display='none';
+                        line6_h.style.display='none';
+                        line6_e.style.display='none';
+                        line6_j.style.display='none';
+                        capt1.style.display='none';
+                        capt2.style.display='none';
+                        capt_h.style.display='none';
+                        capt_e.style.display='none';
+                        capt_j.style.display='none';
+
+                        name1.value='random';
+                        name2.value='none';
+                        identity.value='zhu';
+                        position.value='1';
+                        hp.value='';
+                        maxHp.value='';
+                        line6_h.innerHTML='';
+                        line6_e.innerHTML='';
+                        line6_j.innerHTML='';
+                        cardpileaddname.value='random';
+                        cardpileaddsuit.value='random';
+                        cardpileaddnumber.value='random';
+                    };
+                    ui.create.node('button','确定',line4,style,function(){
+                        var info={
+                            name:name1.value,
+                            name2:name2.value,
+                            identity:identity.value,
+                            position:position.value,
+                            hp:hp.value,
+                            maxHp:maxHp.value,
+                            handcards:[],
+                            equips:[],
+                            judges:[]
+                        };
+                        for(var i=0;i<line6_h.childElementCount;i++){
+                            info.handcards.push([line6_h.childNodes[i].name,line6_h.childNodes[i].suit,line6_h.childNodes[i].number]);
+                        }
+                        for(var i=0;i<line6_e.childElementCount;i++){
+                            info.equips.push([line6_e.childNodes[i].name,line6_e.childNodes[i].suit,line6_e.childNodes[i].number]);
+                        }
+                        for(var i=0;i<line6_j.childElementCount;i++){
+                            info.judges.push([line6_j.childNodes[i].name,line6_j.childNodes[i].suit,line6_j.childNodes[i].number]);
+                        }
+                        var player=ui.create.player();
+                        var name=info.name,name3=info.name2;
+                        if(name=='random'){
+                            name='re_caocao';
+                        }
+                        if(name3!='none'){
+                            if(name3=='random'){
+                                name3='liubei';
+                            }
+                            player.init(name,name3);
+                            if(info.name2=='random'){
+                                player.node.name2.innerHTML=get.verticalStr('随机副将');
+                            }
+                        }
+                        else{
+                            player.init(name);
+                        }
+                        if(info.name=='random'){
+                            player.node.name.innerHTML=get.verticalStr('随机主将');
+                        }
+                        if(info.maxHp){
+                            player.maxHp=info.maxHp;
+                        }
+                        if(info.hp){
+                            player.hp=Math.min(info.hp,player.maxHp);
+                        }
+                        for(var i=0;i<info.handcards.length;i++){
+                            player.node.handcards.appendChild(ui.create.card());
+                        }
+                        player.update();
+                        player.style.zoom=0.6;
+                        player.style.position='relative';
+                        player.style.left=0;
+                        player.style.top=0;
+                        player.style.margin='8px';
+                        player.node.marks.remove();
+                        line7.appendChild(player);
+                        resetCharacter();
+                    });
+                    ui.create.node('button','取消',line4,style,resetCharacter);
+                    var line7=ui.create.div(style2,this);
+                    line7.style.marginTop='12px';
+                }
+            }
+        }
     }
 };

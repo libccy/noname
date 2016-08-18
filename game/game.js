@@ -4511,6 +4511,12 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+            b:function(){
+                if(!ui.dialog||!ui.dialog.buttons) return;
+                for(var i=0;i<Math.min(arguments.length,ui.dialog.buttons.length);i++){
+                    ui.dialog.buttons[i].link=arguments[i];
+                }
+            },
 			uy:function(me){
 				if(me){
 					game.me.useCard({name:'spell_yexinglanghun'},game.me);
@@ -4629,13 +4635,23 @@
 				target.update();
 				ui.updatehl();
 			},
-			ge:function(){
-				cheat.g('zhuge');
-				cheat.g('qilin');
-				cheat.g('bagua');
-				cheat.g('dilu');
-				cheat.g('chitu');
-				cheat.g('muniu');
+			ge:function(target){
+                if(target){
+                    cheat.gx('zhuge',target);
+    				cheat.gx('qilin',target);
+    				cheat.gx('bagua',target);
+    				cheat.gx('dilu',target);
+    				cheat.gx('chitu',target);
+    				cheat.gx('muniu',target);
+                }
+                else{
+                    cheat.g('zhuge');
+    				cheat.g('qilin');
+    				cheat.g('bagua');
+    				cheat.g('dilu');
+    				cheat.g('chitu');
+    				cheat.g('muniu');
+                }
 			},
 			gj:function(){
 				cheat.g('shandian');
@@ -12580,8 +12596,8 @@
 								this.node.range.innerHTML='范围: 1';
 							}
 							break;
-						case 'equip3':this.node.range.innerHTML='防御: 1';break;
-						case 'equip4':this.node.range.innerHTML='进攻: 1';break;
+						case 'equip3':this.node.range.innerHTML='防御: 1';this.node.name2.innerHTML+='+';break;
+						case 'equip4':this.node.range.innerHTML='进攻: 1';this.node.name2.innerHTML+='-';break;
 					}
                     if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
                         this.cardid=get.id();
@@ -18443,6 +18459,7 @@
 						if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
 						if(!event.isMine()&&event.aiexclude.contains(skills2[i])) enable=false;
 						if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
+                        if(info.chooseButton&&_status.event.noButton) enable=false;
 					}
 					if(enable){
 						skills.add(skills2[i]);
@@ -19778,6 +19795,43 @@
 				if(listen) node.listen(listen);
 	            return node;
 			},
+            node:function(){
+                var tagName,innerHTML,position,position2,style,divposition,listen;
+				for(var i=0;i<arguments.length;i++){
+					if(typeof arguments[i]=='string'){
+						if(typeof tagName=='string'){
+							innerHTML=arguments[i];
+						}
+						else{
+							tagName=arguments[i];
+						}
+					}
+					else if(get.objtype(arguments[i])=='div'||
+						get.objtype(arguments[i])=='table'||
+						get.objtype(arguments[i])=='tr'||
+						get.objtype(arguments[i])=='td'||
+						get.objtype(arguments[i])=='body') position=arguments[i];
+					else if(typeof arguments[i]=='number') position2=arguments[i];
+					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
+					else if(typeof arguments[i]=='object') style=arguments[i];
+					else if(typeof arguments[i]=='function') listen=arguments[i];
+				}
+				if(tagName==undefined) tagName='div';
+				var node=document.createElement(tagName);
+	            if(position){
+	            	if(typeof position2=='number'&&position.childNodes.length>position2){
+	            		position.insertBefore(node,position.childNodes[position2]);
+	            	}
+	            	else{
+	            		position.appendChild(node);
+	            	}
+	            }
+	            if(style) HTMLDivElement.prototype.css.call(node,style);
+	            if(divposition) HTMLDivElement.prototype.setPosition.call(node,divposition);
+				if(innerHTML) node.innerHTML=innerHTML;
+				if(listen) node.onclick=listen;
+	            return node;
+            },
             chat:function(){
                 var chat=ui.create.system('聊天',null,true);
                 ui.chatButton=chat;
@@ -29426,6 +29480,11 @@
                     if(game.online){
                         game.send('auto');
                     }
+                    else if(_status.connectMode){
+                        game.broadcastAll(function(player){
+                            player.setNickname(player.nickname+' - 托管');
+                        },game.me);
+                    }
 				}
 				else{
 					ui.control.show();
@@ -29435,6 +29494,11 @@
 
                     if(game.online){
                         game.send('unauto');
+                    }
+                    else if(_status.connectMode){
+                        game.broadcastAll(function(player){
+                            player.setNickname(player.nickname);
+                        },game.me);
                     }
 				}
 			},

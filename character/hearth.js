@@ -1632,16 +1632,15 @@ character.hearth={
 			filter:function(event,player){
 				if(event.parent.parent.name=='phaseDraw') return false;
 				if(event.parent.name=='fenlie') return false;
-				if(player.storage.fenlie>=3) return false;
 				if(!event.cards) return false;
 				return true;
 			},
+			usable:2,
 			content:function(){
 				var cards=[];
 				for(var i=0;i<trigger.cards.length;i++){
 					cards.push(game.createCard(trigger.cards[i]));
 				}
-				player.storage.fenlie++;
 				player.gain(cards,'draw');
 			},
 			ai:{
@@ -1652,16 +1651,6 @@ character.hearth={
 						}
 					}
 				}
-			},
-			group:'fenlie2'
-		},
-		fenlie2:{
-			trigger:{global:'phaseBegin'},
-			forced:true,
-			popup:false,
-			silent:true,
-			content:function(){
-				player.storage.fenlie=0;
 			}
 		},
 		nianfu:{
@@ -4055,6 +4044,9 @@ character.hearth={
 			selectTarget:-1,
 			modTarget:true,
 			content:function(){
+				'step 0'
+				target.chooseToDiscard('he',true);
+				'step 1'
 				target.draw(2);
 			},
 			ai:{
@@ -4558,7 +4550,7 @@ character.hearth={
 		hsdusu_huoyanhua:'火焰花',
 		hsdusu_huoyanhua_info:'对攻击范围内的一名角色造成一点火焰伤害',
 		hsdusu_huangxuecao:'皇血草',
-		hsdusu_huangxuecao_info:'抽两张牌',
+		hsdusu_huangxuecao_info:'弃置一张牌并摸两张牌',
 		duxin:'毒心',
 		duxin_info:'回合开始和结束阶段，你可以获得一张随机毒素牌',
 		hstuteng:'图腾',
@@ -4635,7 +4627,7 @@ character.hearth={
 		hhudun:'护盾',
 		hhudun_info:'锁定技，回合开始阶段，若你的护甲值小于3，你获得一点护甲',
 		fenlie:'分裂',
-		fenlie_info:'锁定技，每当你于摸牌阶段外获得卡牌，你获得一张此牌的复制，每回合最多发动三次',
+		fenlie_info:'锁定技，每当你于摸牌阶段外获得卡牌，你获得一张此牌的复制，每回合最多发动两次',
 		nianfu:'粘附',
 		nianfu_info:'出牌阶段限一次，你可以指定一名其他角色，随机弃置其1~2张装备牌',
 		shixu:'时序',

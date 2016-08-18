@@ -249,6 +249,7 @@ mode.versus={
 			else{
 				var firstAct;
 				if(lib.storage.zhu){
+					_status.currentSide=true;
 					firstAct=(_status.currentSide==game.me.side)?game.friendZhu:game.enemyZhu;
 				}
 				else{
@@ -309,7 +310,6 @@ mode.versus={
 				lib.setPopped(_status.enemyCount,game.versusHoverEnemy);
 
 				if(lib.storage.zhu){
-					_status.currentSide=true;
 					game.versusPhaseLoop(firstAct);
 				}
 				else{
@@ -2493,6 +2493,7 @@ mode.versus={
 					event.character=list[Math.floor(Math.random()*list.length)];
 				}
 				"step 1"
+				game.uncheck();
 				_status.friend.remove(event.character);
 				_status.enemy.remove(event.character);
 				source.revive(null,false);
@@ -2507,6 +2508,16 @@ mode.versus={
 				source.node.identity.dataset.color=get.translation(source.side+'Color');
 				source.draw(4);
 				_status.event.parent.parent.parent.untrigger(false,source);
+				var evt=_status.event.parent.parent.parent;
+				for(var i=0;i<100;i++){
+					evt=evt.parent;
+					if(evt.player==source){
+						evt.finish();
+					}
+					if(evt.name=='phase'){
+						break;
+					}
+				}
 				if(lib.storage.single_control&&lib.storage.control_all){
 					game.onSwapControl();
 				}
@@ -2585,12 +2596,14 @@ mode.versus={
 										if(ui.confirm) ui.confirm.close();
 										delete event.player;
 										game.resume();
+										game.uncheck();
 									}
 									event.switchToAuto=function(){
 										event.result=_status.friend.randomGet();
 										event.dialog.close();
 										if(ui.confirm) ui.confirm.close();
 										delete event.player;
+										game.uncheck();
 									};
 									game.check();
 									game.pause();
@@ -2603,6 +2616,7 @@ mode.versus={
 					}
 				}
 				'step 2'
+				game.uncheck();
 				if(!event.directresult){
 					if(event.resultOL){
 						event.directresult=event.resultOL[source.playerid];

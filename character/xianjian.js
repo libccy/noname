@@ -174,6 +174,7 @@ character.xianjian={
                 var num=0;
                 var num2=0;
                 for(var i=0;i<player.storage.leiyu.length;i++){
+					if(player.storage.leiyu[i].isDead()) continue;
                     var eff=ai.get.effect(player.storage.leiyu[i],{name:'jingleishan',nature:'thunder'},player,player);
                     num+=eff;
                     if(eff>0){
@@ -186,15 +187,30 @@ character.xianjian={
                 return num>0&&num2>=2;
             },
 			prompt:function(event,player){
+				for(var i=0;i<player.storage.leiyu.length;i++){
+					if(player.storage.leiyu[i].isDead()){
+						player.storage.leiyu.splice(i--,1);
+					}
+				}
 				return '是否对'+get.translation(player.storage.leiyu)+'发动【雷狱】？'
 			},
             filter:function(event,player){
-                return player.storage.leiyu&&player.storage.leiyu.length>0;
+				if(player.storage.leiyu){
+					for(var i=0;i<player.storage.leiyu.length;i++){
+						if(player.storage.leiyu[i].isAlive()) return true;
+					}
+				}
+                return false;
             },
             content:function(){
                 'step 0'
                 player.loseHp();
                 'step 1'
+				for(var i=0;i<player.storage.leiyu.length;i++){
+					if(player.storage.leiyu[i].isDead()){
+						player.storage.leiyu.splice(i--,1);
+					}
+				}
                 player.storage.leiyu2=true;
                 player.storage.leiyu.sort(lib.sort.seat);
                 player.useCard({name:'jingleishan',nature:'thunder'},player.storage.leiyu);

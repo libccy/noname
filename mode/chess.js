@@ -84,7 +84,6 @@ mode.chess={
 						lib.config.game_speed='vfast';
 						_status.auto=true;
 						setTimeout(function(){
-							console.log(get.translation(game.players));
 							ui.updatehl();
 						},500);
 						ui.auto.classList.add('glow');
@@ -1240,6 +1239,7 @@ mode.chess={
 					event.swapNow=true;
 				}
 				'step 1'
+				game.uncheck();
 				var player=game.addChessPlayer(event.playername,event.enemy);
 				game.log(player,'加入游戏');
 				player.chessFocus();
