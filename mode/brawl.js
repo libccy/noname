@@ -135,7 +135,7 @@ mode.brawl={
             showcase:function(init){
                 var node=this;
                 var func=function(){
-                    var card=game.createCard('du');
+                    var card=game.createCard('du','noclick');
                     node.nodes.push(card);
                     card.style.position='absolute';
                     var rand1=Math.round(Math.random()*100);
@@ -183,8 +183,8 @@ mode.brawl={
                 var node=this;
                 var player1,player2;
                 if(init){
-                    player1=ui.create.player().init('huangyueying');
-                    player2=ui.create.player().init('re_huangyueying');
+                    player1=ui.create.player(null,true).init('huangyueying');
+                    player2=ui.create.player(null,true).init('re_huangyueying');
                     player1.style.left='20px';
                     player1.style.top='20px';
                     player1.style.transform='scale(0.9)';
@@ -215,11 +215,11 @@ mode.brawl={
                 var createCard=function(wuxie){
                     var card;
                     if(wuxie){
-                        card=game.createCard('wuxie');
+                        card=game.createCard('wuxie','noclick');
                         card.style.transform='scale(0.9)';
                     }
                     else{
-                        card=ui.create.card(null,null,true);
+                        card=ui.create.card(null,'noclick',true);
                     }
                     card.style.opacity=0;
                     card.style.position='absolute';
@@ -329,7 +329,7 @@ mode.brawl={
                 var node=this;
                 var player;
                 if(init){
-                    player=ui.create.player();
+                    player=ui.create.player(null,true);
                     player.init('boss_lvbu2');
                     player.style.left='calc(50% - 75px)';
                     player.style.top='20px';
@@ -361,7 +361,7 @@ mode.brawl={
                     if(num>=5){
                         num=0;
                     }
-                    var card=game.createCard('sha');
+                    var card=game.createCard('sha','noclick');
                     card.style.left='calc(50% - 52px)';
                     card.style.top='68px';
                     card.style.position='absolute';
@@ -473,7 +473,7 @@ mode.brawl={
                     if(!node.list.length){
                         getList();
                     }
-                    var card=ui.create.player();
+                    var card=ui.create.player(null,true);
                     card.init(node.list.shift());
                     card.node.marks.remove();
                     card.node.count.remove();
@@ -591,7 +591,7 @@ mode.brawl={
                 list.randomSort();
                 list.push('re_caocao');
                 var func=function(){
-                    var card=ui.create.player();
+                    var card=ui.create.player(null,true);
                     card.init(list.shift());
                     card.node.marks.remove();
                     card.node.count.remove();
@@ -612,7 +612,7 @@ mode.brawl={
 
                 var list2=['qilin','dawan','zhuahuang'];
                 var func2=function(){
-                    var card=game.createCard(list2.shift());
+                    var card=game.createCard(list2.shift(),'noclick');
                     node.nodes.push(card);
                     card.style.position='absolute';
                     card.style.zIndex=2;
@@ -738,7 +738,7 @@ mode.brawl={
                     node.style.transform='translate('+dx+'px,'+dy+'px)';
                 }
                 for(var i=0;i<8;i++){
-                    var node=ui.create.player();
+                    var node=ui.create.player(null,true);
                     this.nodes.push(node);
                     node.init('zuoci');
                     node.classList.add('minskin');
@@ -823,7 +823,7 @@ mode.brawl={
         scene:{
             name:'自创场景',
             mode:'identity',
-            intro:'场景名称：<input name="scenename" type="text" style="width:120px"><br>场景说明：<input name="sceneintro" type="text" style="width:120px">',
+            intro:'<div style="position:relative;display:block;margin-bottom:5px">场景名称：<input name="scenename" type="text" style="width:120px"></div><div style="position:relative;display:block">场景说明：<input name="sceneintro" type="text" style="width:120px"></div>',
             content:{
                 submode:'normal'
             },
@@ -856,7 +856,7 @@ mode.brawl={
                         if(line6_e.childElementCount) capt_e.style.display='block';
                         if(line6_j.childElementCount) capt_j.style.display='block';
                     },style);
-                    var editPile=ui.create.node('button','编辑牌堆',line1,function(){
+                    var editPile=ui.create.node('button','游戏状态',line1,function(){
                         console.log(1);
                     },style);
                     var saveButton=ui.create.node('button','保存',line1,function(){
@@ -869,17 +869,24 @@ mode.brawl={
                     var identity=ui.create.selectlist([['zhu','主公'],['zhong','忠臣'],['nei','内奸'],['fan','反贼']],'zhu',line2);
                     identity.style.marginLeft='3px';
                     identity.style.marginRight='3px';
-                    var position=ui.create.selectlist([['1','一号位'],['2','二号位'],['3','三号位'],['4','四号位'],['5','五号位'],['6','六号位'],['7','七号位'],['8','八号位']],'1',line2);
+                    var position=ui.create.selectlist([['0','随机位置'],['1','一号位'],['2','二号位'],['3','三号位'],['4','四号位'],['5','五号位'],['6','六号位'],['7','七号位'],['8','八号位']],'1',line2);
                     position.style.marginLeft='3px';
                     position.style.marginRight='3px';
                     var line2_t=ui.create.div(style2,this);
                     line2_t.style.display='none';
+                    line2_t.style.marginBottom='10px';
                     ui.create.node('span','体力：',line2_t);
                     var hp=ui.create.node('input',line2_t,{width:'40px'});
                     hp.type='text';
-                    ui.create.node('span','体力上限：',line2_t,{marginLeft:'20px'});
+                    ui.create.node('span','体力上限：',line2_t,{marginLeft:'15px'});
                     var maxHp=ui.create.node('input',line2_t,{width:'40px'});
                     maxHp.type='text';
+                    ui.create.node('span','横置 ',line2_t,{marginLeft:'20px'});
+                    var linked=ui.create.node('input',line2_t);
+                    linked.type='checkbox';
+                    ui.create.node('span','翻面 ',line2_t,{marginLeft:'15px'});
+                    var turnedover=ui.create.node('input',line2_t);
+                    turnedover.type='checkbox';
 
                     var list=[];
                     for(var i in lib.character){
@@ -900,12 +907,12 @@ mode.brawl={
                         }
                         return a>b?1:-1;
                     });
-                    list.unshift(['random','随机主将']);
+                    list.unshift(['random','自选主将']);
                     var name1=ui.create.selectlist(list,list[0],line2);
                     name1.style.marginLeft='3px';
                     name1.style.marginRight='3px';
                     name1.style.maxWidth='80px';
-                    list[0][1]='随机副将';
+                    list[0][1]='自选副将';
                     list.unshift(['none','无副将']);
                     var name2=ui.create.selectlist(list,list[0],line2);
                     name2.style.marginLeft='3px';
@@ -939,7 +946,7 @@ mode.brawl={
                             pileaddlist.push([cname,get.translation(cname)]);
                         }
                     }
-                    pileaddlist.unshift(['random',['随机卡牌']])
+                    pileaddlist.unshift(['random',['随机卡牌']]);
                     var cardpileaddname=ui.create.selectlist(pileaddlist,null,line3);
                     cardpileaddname.style.marginLeft='3px';
                     cardpileaddname.style.marginRight='3px';
@@ -958,12 +965,11 @@ mode.brawl={
                     ],null,line3);
                     cardpileaddnumber.style.marginLeft='3px';
                     cardpileaddnumber.style.marginRight='3px';
-                    var cc_h=ui.create.node('button','加入手牌',line5,function(){
+
+                    var fakecard=function(name,suit,number){
                         var card=ui.create.card(null,'noclick',true);
                         card.style.zoom=0.6;
-                        var name=cardpileaddname.value;
-                        var suit=cardpileaddsuit.value;
-                        var number=parseInt(cardpileaddnumber.value);
+                        number=parseInt(cardpileaddnumber.value);
                         var name2=name;
                         var suit2=suit;
                         var number2=number;
@@ -980,6 +986,10 @@ mode.brawl={
                         if(name=='random'){
                             card.node.name.innerHTML=get.verticalStr('随机卡牌');
                         }
+                        return card;
+                    };
+                    var cc_h=ui.create.node('button','加入手牌',line5,function(){
+                        var card=fakecard(cardpileaddname.value,cardpileaddsuit.value,cardpileaddnumber.value);
                         card.listen(function(){
                             this.remove();
                             if(!line6_h.childElementCount) capt_h.style.display='none';
@@ -995,27 +1005,7 @@ mode.brawl={
                                 line6_e.childNodes[i].remove();break;
                             }
                         }
-                        var card=ui.create.card(null,'noclick',true);
-                        card.style.zoom=0.6;
-                        var name=cardpileaddname.value;
-                        var suit=cardpileaddsuit.value;
-                        var number=parseInt(cardpileaddnumber.value);
-                        var name2=name;
-                        var suit2=suit;
-                        var number2=number;
-                        if(name2=='random') name2='sha';
-                        if(suit2=='random') suit2='?';
-                        if(!number2){
-                            number='random';
-                            number2='?';
-                        }
-                        card.init([suit2,number2,name2]);
-                        card.name=name;
-                        card.suit=suit;
-                        card.number=number;
-                        if(name=='random'){
-                            card.node.name.innerHTML=get.verticalStr('随机卡牌');
-                        }
+                        var card=fakecard(cardpileaddname.value,cardpileaddsuit.value,cardpileaddnumber.value);
                         card.listen(function(){
                             this.remove();
                             if(!line6_e.childElementCount) capt_e.style.display='none';
@@ -1030,27 +1020,7 @@ mode.brawl={
                                 line6_j.childNodes[i].remove();break;
                             }
                         }
-                        var card=ui.create.card(null,'noclick',true);
-                        card.style.zoom=0.6;
-                        var name=cardpileaddname.value;
-                        var suit=cardpileaddsuit.value;
-                        var number=parseInt(cardpileaddnumber.value);
-                        var name2=name;
-                        var suit2=suit;
-                        var number2=number;
-                        if(name2=='random') name2='sha';
-                        if(suit2=='random') suit2='?';
-                        if(!number2){
-                            number='random';
-                            number2='?';
-                        }
-                        card.init([suit2,number2,name2]);
-                        card.name=name;
-                        card.suit=suit;
-                        card.number=number;
-                        if(name=='random'){
-                            card.node.name.innerHTML=get.verticalStr('随机卡牌');
-                        }
+                        var card=fakecard(cardpileaddname.value,cardpileaddsuit.value,cardpileaddnumber.value);
                         card.listen(function(){
                             this.remove();
                             if(!line6_j.childElementCount) capt_j.style.display='none';
@@ -1129,7 +1099,7 @@ mode.brawl={
                         for(var i=0;i<line6_j.childElementCount;i++){
                             info.judges.push([line6_j.childNodes[i].name,line6_j.childNodes[i].suit,line6_j.childNodes[i].number]);
                         }
-                        var player=ui.create.player();
+                        var player=ui.create.player(null,true);
                         var name=info.name,name3=info.name2;
                         if(name=='random'){
                             name='re_caocao';
@@ -1156,16 +1126,27 @@ mode.brawl={
                             player.hp=Math.min(info.hp,player.maxHp);
                         }
                         for(var i=0;i<info.handcards.length;i++){
-                            player.node.handcards.appendChild(ui.create.card());
+                            player.node.handcards1.appendChild(ui.create.card());
+                        }
+                        for(var i=0;i<info.equips.length;i++){
+                            player.$equip(fakecard.apply(this,info.equips[i]));
+                        }
+                        for(var i=0;i<info.judges.length;i++){
+                            player.node.judges.appendChild(fakecard.apply(this,info.judges[i]));
                         }
                         player.update();
-                        player.style.zoom=0.6;
+                        player.style.transform='scale(0.6)';
                         player.style.position='relative';
                         player.style.left=0;
                         player.style.top=0;
-                        player.style.margin='8px';
+                        player.style.margin='-26px';
                         player.node.marks.remove();
                         line7.appendChild(player);
+                        player.listen(function(){
+                            if(confirm('是否删除此角色？')){
+                                this.remove();
+                            }
+                        });
                         resetCharacter();
                     });
                     ui.create.node('button','取消',line4,style,resetCharacter);

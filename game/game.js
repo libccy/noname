@@ -17613,6 +17613,11 @@
 			if(typeof name!='string'){
 				name='sha';
 			}
+            var noclick=false;
+            if(suit=='noclick'){
+                noclick=true;
+                suit=null;
+            }
 			if(typeof suit!='string'){
 				suit=['heart','diamond','club','spade'].randomGet();
 			}
@@ -17625,7 +17630,14 @@
 			if(typeof number!='number'){
 				number=Math.ceil(Math.random()*13);
 			}
-			return ui.create.card(ui.special).init([suit,number,name,nature]);
+            var card;
+            if(noclick){
+                card=ui.create.card(ui.special,'noclick',true);
+            }
+            else{
+                card=ui.create.card(ui.special);
+            }
+			return card.init([suit,number,name,nature]);
 		},
 		forceOver:function(bool,callback){
 			_status.event.next.length=0;
@@ -27225,7 +27237,7 @@
 				}
 				return buttons;
 			},
-			player:function(position){
+			player:function(position,noclick){
 				var node=ui.create.div('.player',position);
 				node.node={
 					avatar:ui.create.div('.avatar',node,ui.click.avatar).hide(),
@@ -27269,12 +27281,13 @@
                 node.node.link.firstChild.setBackgroundImage('image/card/tiesuo_mark.png')
                 node.node.link.firstChild.style.backgroundSize='cover';
 				ui.create.div(node.node.identity);
-				node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.target);
-				node.node.identity.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.identity);
-
-				if(lib.config.touchscreen){
-					node.addEventListener('touchstart',ui.click.playertouchstart);
-				}
+                if(!noclick){
+                    node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.target);
+    				node.node.identity.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.identity);
+    				if(lib.config.touchscreen){
+    					node.addEventListener('touchstart',ui.click.playertouchstart);
+    				}
+                }
 
 				return node;
 			},
