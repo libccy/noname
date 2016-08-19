@@ -739,8 +739,8 @@ mode.brawl={
                 var setPos=function(node){
                     var i=node.index;
                     var deg=Math.PI/4*i;
-                    var dx=lx*Math.cos(deg);
-                    var dy=ly*Math.sin(deg);
+                    var dx=Math.round(lx*Math.cos(deg));
+                    var dy=Math.round(ly*Math.sin(deg));
                     node.style.transform='translate('+dx+'px,'+dy+'px)';
                 }
                 for(var i=0;i<8;i++){
@@ -865,7 +865,7 @@ mode.brawl={
                         // line1.style.display='none';
                         resetStatus();
                         editPile.disabled=true;
-                        editCode.disabled=true;
+                        // editCode.disabled=true;
                         saveButton.disabled=true;
                         exportButton.disabled=true;
                         line7.style.display='none';
@@ -886,7 +886,7 @@ mode.brawl={
                     var editPile=ui.create.node('button','设置状态',line1,function(){
                         resetCharacter();
                         addCharacter.disabled=true;
-                        editCode.disabled=true;
+                        // editCode.disabled=true;
                         saveButton.disabled=true;
                         exportButton.disabled=true;
                         line7.style.display='none';
@@ -905,13 +905,13 @@ mode.brawl={
                         if(line6_b.childElementCount) capt_b.style.display='block';
                         if(line6_d.childElementCount) capt_d.style.display='block';
                     },style);
-                    var editCode=ui.create.node('button','编辑代码',line1,function(){
+                    // var editCode=ui.create.node('button','编辑代码',line1,function(){
+                    //     console.log(1);
+                    // },style);
+                    var saveButton=ui.create.node('button','保存场景',line1,function(){
                         console.log(1);
                     },style);
-                    var saveButton=ui.create.node('button','保存',line1,function(){
-                        console.log(1);
-                    },style);
-                    var exportButton=ui.create.node('button','导出',line1,function(){
+                    var exportButton=ui.create.node('button','导出扩展',line1,function(){
                         console.log(1);
                     },style);
 
@@ -1170,7 +1170,7 @@ mode.brawl={
                     var resetCharacter=function(){
                         // line1.style.display='block';
                         editPile.disabled=false;
-                        editCode.disabled=false;
+                        // editCode.disabled=false;
                         saveButton.disabled=false;
                         exportButton.disabled=false;
                         line7.style.display='block';
@@ -1275,7 +1275,6 @@ mode.brawl={
                             maxHp:parseInt(maxHp.value),
                             linked:linked.checked,
                             turnedover:turnedover.checked,
-                            position:position.value,
                             handcards:[],
                             equips:[],
                             judges:[]
@@ -1336,7 +1335,7 @@ mode.brawl={
                     line9.style.marginTop='20px';
                     var resetStatus=function(){
                         addCharacter.disabled=false;
-                        editCode.disabled=false;
+                        // editCode.disabled=false;
                         saveButton.disabled=false;
                         exportButton.disabled=false;
                         cardpileaddname.value='random';
