@@ -49,12 +49,17 @@ character.standard={
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
+				if(player.storage.hujiaing) return false;
 				if(!player.hasZhuSkill('hujia')) return false;
 				if(event.filterCard({name:'shan'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='wei') return true;
 				}
 				return false;
+			},
+			check:function(event,player){
+				if(ai.get.damageEffect(player,event.player,player)>=0) return false;
+				return true;
 			},
 			content:function(){
 				"step 0"
@@ -66,6 +71,7 @@ character.standard={
 					if((event.current==game.me&&!_status.auto)||(
 						ai.get.attitude(event.current,player)>2)||
 						event.current.isOnline()){
+						player.storage.hujiaing=true;
 						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
 						next.set('ai',function(){
 							var event=_status.event;
@@ -76,6 +82,7 @@ character.standard={
 					}
 				}
 				"step 1"
+				player.storage.hujiaing=false;
 				if(result.bool){
 					event.finish();
 					trigger.result=result;
@@ -564,16 +571,13 @@ character.standard={
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
+				if(player.storage.jijianging) return false;
 				if(!player.hasZhuSkill('jijiang')) return false;
 				if(event.filterCard({name:'sha'})==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='shu') return true;
 				}
 				return false;
-			},
-			check:function(event,player){
-				if(player.storage.jijianging) return false;
-				return true;
 			},
 			content:function(){
 				"step 0"

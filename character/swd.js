@@ -2063,7 +2063,7 @@ character.swd={
 				}
 			},
 			ai:{
-				order:9,
+				order:9.5,
 				expose:0.2,
 				result:{
 					target:function(player,target){

@@ -65,11 +65,17 @@ mode.brawl={
             showcase.style.width='100%';
             showcase.style.display='block'
             showcase.action=info.showcase;
-            node.nodes=[
-                ui.create.div('.caption',caption),
-                ui.create.div('.text center',intro),
-                showcase
-            ];
+            if(info.fullshow){
+                node.nodes=[showcase];
+                showcase.style.height='100%';
+            }
+            else{
+                node.nodes=[
+                    ui.create.div('.caption',caption),
+                    ui.create.div('.text center',intro),
+                    showcase
+                ];
+            }
             node.link=name;
             node._nostart=info.nostart;
             if(lib.storage.currentBrawl==name){
@@ -828,19 +834,40 @@ mode.brawl={
                 submode:'normal'
             },
             nostart:true,
+            fullshow:true,
             showcase:function(init){
                 if(init){
+                    lib.translate.zhu=lib.translate.zhu||'主';
+                    lib.translate.zhong=lib.translate.zhong||'忠';
+                    lib.translate.nei=lib.translate.nei||'内';
+                    lib.translate.fan=lib.translate.fan||'反';
+
+
                     this.style.transition='all 0s';
                     this.style.height=(this.offsetHeight-10)+'px';
                     this.style.overflow='scroll';
                     lib.setScroll(this);
-                    this.style.paddingTop='10px';
                     var style={marginLeft:'3px',marginRight:'3px'};
                     var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
+                    var style3={marginLeft:'4px',marginRight:'4px',position:'relative'}
+
+
+                    var scenename=ui.create.node('input',ui.create.div(style2,'','场景名称：',this),{width:'120px'});
+                    scenename.type='text';
+                    scenename.style.marginTop='20px';
+                    var sceneintro=ui.create.node('input',ui.create.div(style2,'','场景名称：',this),{width:'120px'});
+                    sceneintro.type='text';
+                    sceneintro.style.marginBottom='10px';
+
                     var line1=ui.create.div(style2,this);
                     var current=null;
                     var addCharacter=ui.create.node('button','添加角色',line1,function(){
-                        line1.style.display='none';
+                        // line1.style.display='none';
+                        resetStatus();
+                        editPile.disabled=true;
+                        editCode.disabled=true;
+                        saveButton.disabled=true;
+                        exportButton.disabled=true;
                         line7.style.display='none';
                         line2.style.display='block';
                         line2_t.style.display='block';
@@ -856,17 +883,44 @@ mode.brawl={
                         if(line6_e.childElementCount) capt_e.style.display='block';
                         if(line6_j.childElementCount) capt_j.style.display='block';
                     },style);
-                    var editPile=ui.create.node('button','游戏状态',line1,function(){
+                    var editPile=ui.create.node('button','设置状态',line1,function(){
+                        resetCharacter();
+                        addCharacter.disabled=true;
+                        editCode.disabled=true;
+                        saveButton.disabled=true;
+                        exportButton.disabled=true;
+                        line7.style.display='none';
+                        line8.style.display='block';
+                        capt8.style.display='block';
+                        line9.style.display='block';
+                        line10.style.display='block';
+                        line11.style.display='block';
+                        capt9.style.display='block';
+                        line3.style.display='block';
+
+                        line6_t.style.display='block';
+                        line6_b.style.display='block';
+                        line6_d.style.display='block';
+                        if(line6_t.childElementCount) capt_t.style.display='block';
+                        if(line6_b.childElementCount) capt_b.style.display='block';
+                        if(line6_d.childElementCount) capt_d.style.display='block';
+                    },style);
+                    var editCode=ui.create.node('button','编辑代码',line1,function(){
                         console.log(1);
                     },style);
                     var saveButton=ui.create.node('button','保存',line1,function(){
                         console.log(1);
                     },style);
+                    var exportButton=ui.create.node('button','导出',line1,function(){
+                        console.log(1);
+                    },style);
+
 
                     var capt1=ui.create.div(style2,'','角色信息',this);
                     var line2=ui.create.div(style2,this);
                     line2.style.display='none';
                     var identity=ui.create.selectlist([['zhu','主公'],['zhong','忠臣'],['nei','内奸'],['fan','反贼']],'zhu',line2);
+                    identity.value='fan';
                     identity.style.marginLeft='3px';
                     identity.style.marginRight='3px';
                     var position=ui.create.selectlist([['0','随机位置'],['1','一号位'],['2','二号位'],['3','三号位'],['4','四号位'],['5','五号位'],['6','六号位'],['7','七号位'],['8','八号位']],'1',line2);
@@ -874,7 +928,7 @@ mode.brawl={
                     position.style.marginRight='3px';
                     var line2_t=ui.create.div(style2,this);
                     line2_t.style.display='none';
-                    line2_t.style.marginBottom='10px';
+                    // line2_t.style.marginBottom='10px';
                     ui.create.node('span','体力：',line2_t);
                     var hp=ui.create.node('input',line2_t,{width:'40px'});
                     hp.type='text';
@@ -919,6 +973,10 @@ mode.brawl={
                     name2.style.marginRight='3px';
                     name2.style.maxWidth='80px';
 
+                    var capt9=ui.create.div(style2,'','编辑牌堆',this);
+                    capt9.style.display='none';
+
+
                     var capt2=ui.create.div(style2,'','添加卡牌',this);
                     var line3=ui.create.div(style2,this);
                     line3.style.display='none';
@@ -950,7 +1008,7 @@ mode.brawl={
                     var cardpileaddname=ui.create.selectlist(pileaddlist,null,line3);
                     cardpileaddname.style.marginLeft='3px';
                     cardpileaddname.style.marginRight='3px';
-                    cardpileaddname.style.maxWidth='80px';
+                    cardpileaddname.style.width='85px';
                     var cardpileaddsuit=ui.create.selectlist([
                         ['random','随机花色'],
                         ['heart','红桃'],
@@ -960,11 +1018,13 @@ mode.brawl={
                     ],null,line3);
                     cardpileaddsuit.style.marginLeft='3px';
                     cardpileaddsuit.style.marginRight='3px';
+                    cardpileaddsuit.style.width='85px';
                     var cardpileaddnumber=ui.create.selectlist([
                         ['random','随机点数'],1,2,3,4,5,6,7,8,9,10,11,12,13
                     ],null,line3);
                     cardpileaddnumber.style.marginLeft='3px';
                     cardpileaddnumber.style.marginRight='3px';
+                    cardpileaddnumber.style.width='85px';
 
                     var fakecard=function(name,suit,number){
                         var card=ui.create.card(null,'noclick',true);
@@ -988,7 +1048,7 @@ mode.brawl={
                         }
                         return card;
                     };
-                    var cc_h=ui.create.node('button','加入手牌',line5,function(){
+                    var cc_h=ui.create.node('button','加入手牌区',line5,function(){
                         var card=fakecard(cardpileaddname.value,cardpileaddsuit.value,cardpileaddnumber.value);
                         card.listen(function(){
                             this.remove();
@@ -997,7 +1057,7 @@ mode.brawl={
                         line6_h.appendChild(card);
                         capt_h.style.display='block';
                     });
-                    var cc_e=ui.create.node('button','加入装备',line5,function(){
+                    var cc_e=ui.create.node('button','加入装备区',line5,function(){
                         if(get.type(cardpileaddname.value)!='equip') return;
                         var subtype=get.subtype(cardpileaddname.value);
                         for(var i=0;i<line6_e.childElementCount;i++){
@@ -1013,7 +1073,7 @@ mode.brawl={
                         line6_e.appendChild(card);
                         capt_e.style.display='block';
                     });
-                    var cc_j=ui.create.node('button','加入判定',line5,function(){
+                    var cc_j=ui.create.node('button','加入判定区',line5,function(){
                         if(get.type(cardpileaddname.value)!='delay') return;
                         for(var i=0;i<line6_j.childElementCount;i++){
                             if(line6_j.childNodes[i].name==cardpileaddname.value){
@@ -1030,10 +1090,13 @@ mode.brawl={
                     });
                     cc_h.style.marginLeft='3px';
                     cc_h.style.marginRight='3px';
+                    cc_h.style.width='85px';
                     cc_e.style.marginLeft='3px';
                     cc_e.style.marginRight='3px';
+                    cc_e.style.width='85px';
                     cc_j.style.marginLeft='3px';
                     cc_j.style.marginRight='3px';
+                    cc_j.style.width='85px';
 
                     var capt_h=ui.create.div(style2,'','手牌区',this);
                     var line6_h=ui.create.div(style2,this);
@@ -1046,10 +1109,70 @@ mode.brawl={
                     capt_e.style.display='none';
                     capt_j.style.display='none';
 
+                    var line10=ui.create.div(style2,this);
+                    line10.style.display='none';
+                    var ac_h=ui.create.node('button','加入牌堆顶',line10,function(){
+                        var card=fakecard(cardpileaddname.value,cardpileaddsuit.value,cardpileaddnumber.value);
+                        card.listen(function(){
+                            this.remove();
+                            if(!line6_t.childElementCount) capt_t.style.display='none';
+                        });
+                        line6_t.appendChild(card);
+                        capt_t.style.display='block';
+                    });
+                    var ac_e=ui.create.node('button','加入牌堆底',line10,function(){
+                        var card=fakecard(cardpileaddname.value,cardpileaddsuit.value,cardpileaddnumber.value);
+                        card.listen(function(){
+                            this.remove();
+                            if(!line6_b.childElementCount) capt_b.style.display='none';
+                        });
+                        line6_b.appendChild(card);
+                        capt_b.style.display='block';
+                    });
+                    var ac_j=ui.create.node('button','加入弃牌堆',line10,function(){
+                        var card=fakecard(cardpileaddname.value,cardpileaddsuit.value,cardpileaddnumber.value);
+                        card.listen(function(){
+                            this.remove();
+                            if(!line6_d.childElementCount) capt_d.style.display='none';
+                        });
+                        line6_d.appendChild(card);
+                        capt_d.style.display='block';
+                    });
+                    ac_h.style.marginLeft='3px';
+                    ac_h.style.marginRight='3px';
+                    ac_h.style.width='85px';
+                    ac_e.style.marginLeft='3px';
+                    ac_e.style.marginRight='3px';
+                    ac_e.style.width='85px';
+                    ac_j.style.marginLeft='3px';
+                    ac_j.style.marginRight='3px';
+                    ac_j.style.width='85px';
+
+                    var line11=ui.create.div(style2,this,'','替换牌堆');
+                    line11.style.display='none';
+                    var replacepile=ui.create.node('input',line11);
+                    replacepile.type='checkbox';
+
+                    var capt_t=ui.create.div(style2,'','牌堆顶',this);
+                    var line6_t=ui.create.div(style2,this);
+                    var capt_b=ui.create.div(style2,'','牌堆底',this);
+                    var line6_b=ui.create.div(style2,this);
+                    var capt_d=ui.create.div(style2,'','弃牌堆',this);
+                    var line6_d=ui.create.div(style2,this);
+                    line6_d.style.marginBottom='10px';
+                    capt_t.style.display='none';
+                    capt_b.style.display='none';
+                    capt_d.style.display='none';
+
                     var line4=ui.create.div(style2,this);
                     line4.style.display='none';
+                    line4.style.marginTop='20px';
                     var resetCharacter=function(){
-                        line1.style.display='block';
+                        // line1.style.display='block';
+                        editPile.disabled=false;
+                        editCode.disabled=false;
+                        saveButton.disabled=false;
+                        exportButton.disabled=false;
                         line7.style.display='block';
                         line2.style.display='none';
                         line2_t.style.display='none';
@@ -1067,8 +1190,8 @@ mode.brawl={
 
                         name1.value='random';
                         name2.value='none';
-                        identity.value='zhu';
-                        position.value='1';
+                        identity.value='fan';
+                        position.value='0';
                         hp.value='';
                         maxHp.value='';
                         line6_h.innerHTML='';
@@ -1077,29 +1200,12 @@ mode.brawl={
                         cardpileaddname.value='random';
                         cardpileaddsuit.value='random';
                         cardpileaddnumber.value='random';
+                        linked.checked=false;
+                        turnedover.checked=false;
                     };
-                    ui.create.node('button','确定',line4,style,function(){
-                        var info={
-                            name:name1.value,
-                            name2:name2.value,
-                            identity:identity.value,
-                            position:position.value,
-                            hp:hp.value,
-                            maxHp:maxHp.value,
-                            handcards:[],
-                            equips:[],
-                            judges:[]
-                        };
-                        for(var i=0;i<line6_h.childElementCount;i++){
-                            info.handcards.push([line6_h.childNodes[i].name,line6_h.childNodes[i].suit,line6_h.childNodes[i].number]);
-                        }
-                        for(var i=0;i<line6_e.childElementCount;i++){
-                            info.equips.push([line6_e.childNodes[i].name,line6_e.childNodes[i].suit,line6_e.childNodes[i].number]);
-                        }
-                        for(var i=0;i<line6_j.childElementCount;i++){
-                            info.judges.push([line6_j.childNodes[i].name,line6_j.childNodes[i].suit,line6_j.childNodes[i].number]);
-                        }
+                    var createCharacter=function(info){
                         var player=ui.create.player(null,true);
+                        player.info=info;
                         var name=info.name,name3=info.name2;
                         if(name=='random'){
                             name='re_caocao';
@@ -1134,13 +1240,66 @@ mode.brawl={
                         for(var i=0;i<info.judges.length;i++){
                             player.node.judges.appendChild(fakecard.apply(this,info.judges[i]));
                         }
+                        player.setIdentity(info.identity);
+                        var pos=parseInt(info.position);
+                        if(pos==0){
+                            pos='随机位置';
+                        }
+                        else{
+                            pos=get.cnNumber(pos,true)+'号位'
+                        }
+                        if(info.linked&&info.turnedover){
+                            pos+='<br>横置 - 翻面'
+                        }
+                        else{
+                            if(info.linked) pos+=' - 横置';
+                            if(info.turnedover) pos+=' - 翻面';
+                        }
+                        player.setNickname(pos);
                         player.update();
-                        player.style.transform='scale(0.6)';
+                        player.style.transform='scale(0.7)';
                         player.style.position='relative';
                         player.style.left=0;
                         player.style.top=0;
-                        player.style.margin='-26px';
+                        player.style.margin='-18px';
                         player.node.marks.remove();
+                        return player;
+                    };
+                    ui.create.div('.menubutton.large','确定',line4,style3,function(){
+                        var info={
+                            name:name1.value,
+                            name2:name2.value,
+                            identity:identity.value,
+                            position:position.value,
+                            hp:parseInt(hp.value),
+                            maxHp:parseInt(maxHp.value),
+                            linked:linked.checked,
+                            turnedover:turnedover.checked,
+                            position:position.value,
+                            handcards:[],
+                            equips:[],
+                            judges:[]
+                        };
+                        for(var i=0;i<line7.childElementCount;i++){
+                            if(info.identity=='zhu'&&line7.childNodes[i].info.identity=='zhu'){
+                                alert('不能有两个主公');
+                                return;
+                            }
+                            if(info.position!='0'&&info.position==line7.childNodes[i].info.position){
+                                alert('座位与现在角色相同');
+                                return;
+                            }
+                        }
+                        for(var i=0;i<line6_h.childElementCount;i++){
+                            info.handcards.push([line6_h.childNodes[i].name,line6_h.childNodes[i].suit,line6_h.childNodes[i].number]);
+                        }
+                        for(var i=0;i<line6_e.childElementCount;i++){
+                            info.equips.push([line6_e.childNodes[i].name,line6_e.childNodes[i].suit,line6_e.childNodes[i].number]);
+                        }
+                        for(var i=0;i<line6_j.childElementCount;i++){
+                            info.judges.push([line6_j.childNodes[i].name,line6_j.childNodes[i].suit,line6_j.childNodes[i].number]);
+                        }
+                        var player=createCharacter(info);
                         line7.appendChild(player);
                         player.listen(function(){
                             if(confirm('是否删除此角色？')){
@@ -1149,11 +1308,64 @@ mode.brawl={
                         });
                         resetCharacter();
                     });
-                    ui.create.node('button','取消',line4,style,resetCharacter);
+                    ui.create.div('.menubutton.large','取消',line4,style3,resetCharacter);
                     var line7=ui.create.div(style2,this);
                     line7.style.marginTop='12px';
+
+
+                    var capt8=ui.create.div(style2,'','胜负条件',this);
+                    capt8.style.display='none';
+                    var line8=ui.create.div(style2,this);
+                    line8.style.display='none';
+                    line8.style.marginTop='10px';
+                    line8.style.marginBottom='10px';
+                    var turnslist=[['1','一'],['2','二'],['3','三'],['4','四'],['5','五'],['6','六'],['7','七'],['8','八'],['9','九'],['10','十']];
+                    var results=[['none','无'],['win','胜利'],['lose','失败'],['tie','平局']];
+                    var turns=ui.create.selectlist(turnslist,'1',line8);
+                    ui.create.node('span','个回合后',line8,style);
+                    var turnsresult=ui.create.selectlist(results,'none',line8);
+
+
+                    var washes=ui.create.selectlist(turnslist,'1',line8);
+                    washes.style.marginLeft='20px';
+                    ui.create.node('span','次洗牌后',line8,style);
+                    var washesresult=ui.create.selectlist(results,'none',line8);
+
+                    var line9=ui.create.div(style2,this);
+                    line9.style.display='none';
+                    line9.style.marginTop='20px';
+                    var resetStatus=function(){
+                        addCharacter.disabled=false;
+                        editCode.disabled=false;
+                        saveButton.disabled=false;
+                        exportButton.disabled=false;
+                        cardpileaddname.value='random';
+                        cardpileaddsuit.value='random';
+                        cardpileaddnumber.value='random';
+
+                        line8.style.display='none';
+                        capt8.style.display='none';
+                        capt9.style.display='none';
+                        line9.style.display='none';
+                        line10.style.display='none';
+                        line11.style.display='none';
+                        line3.style.display='none';
+                        line7.style.display='block';
+
+
+                        line6_t.style.display='none';
+                        line6_b.style.display='none';
+                        line6_d.style.display='none';
+                        capt_t.style.display='none';
+                        capt_b.style.display='none';
+                        capt_d.style.display='none';
+                    }
+
+
+
+                    ui.create.div('.menubutton.large','确定',line9,style3,resetStatus);
                 }
             }
         }
-    }
+    },
 };

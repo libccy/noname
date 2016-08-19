@@ -60,7 +60,7 @@ card.swd={
 			content:function(){
 				"step 0"
 				if(target.num('h')){
-					var next=target.chooseToDiscard('机关筒：弃置一张手牌或受到一点伤害');
+					var next=target.chooseToDiscard('机关火筒：弃置一张手牌或受到一点火焰伤害');
 					next.set('ai',function(card){
 						var evt=_status.event.getParent();
 						if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
@@ -68,13 +68,18 @@ card.swd={
 					});
 				}
 				else{
-					target.damage();
+					target.damage('fire');
+					event.parent.preResult=true;
 					event.finish();
 				}
 				"step 1"
 				if(result.bool==false){
-					target.damage();
+					target.damage('fire');
+					event.parent.preResult=true;
 				}
+			},
+			contentAfter:function(){
+				if(!event.preResult) player.draw();
 			},
 			ai:{
 				wuxie:function(target,card,player,viewer){
@@ -106,6 +111,8 @@ card.swd={
 					discard:1,
 					loseCard:1,
 					damage:1,
+					natureDamage:1,
+					fireDamage:1,
 					multitarget:1,
 					multineg:1,
 				}
@@ -3633,7 +3640,8 @@ card.swd={
 		jiguanyuan:'机关鸢',
 		jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张其它牌交给该角色，然后摸一张牌',
 		jiguantong:'机关火筒',
-		jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点火焰伤害',
+		jiguantong_ab:'火筒',
+		jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点火焰伤害；若没有人因此受到伤害，使用者摸一张牌',
 		jiutiansuanchi:'九天算尺',
 		jiutiansuanchi_info:'每当你使用杀造成伤害，你可以弃置一张牌并展示受伤害角色的一张手牌，若此牌与你弃置的牌花色或点数相同，此杀的伤害+2',
 		fengyinzhidan:'封印之蛋',

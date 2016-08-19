@@ -3,7 +3,7 @@ mode.stone={
 	start:function(){
 		"step 0"
 		lib.init.css(lib.assetURL+'layout/mode/','stone');
-		_status.mode=get.config('stone_mode');
+		_status.mode='deck';
 		game.initStone();
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 
@@ -1268,7 +1268,7 @@ mode.stone={
 	careerList:['mage','shaman','druid','paladin','rogue','priest','hunter','warrior','warlock'],
 	game:{
 		reserveDead:true,
-		bannedcards:['lebu','guiyoujie','xietianzi'],
+		bannedcards:['lebu','guiyoujie','xietianzi','lingjiandai','jiguanshu','sifeizhenmian','mujiaren'],
 		onwash:function(){
 			if(_status.mode!='deck') return;
 			var list=[];
@@ -9086,17 +9086,25 @@ mode.stone={
 			unique:true,
 			enable:['chooseToRespond'],
 			viewAs:{name:'shan'},
-			filterCard:{type:'stonecharacter'},
+			filterCard:{type:['stonecharacter','stonecard']},
+			mod:{
+				cardEnabled:function(card){
+					if(get.type(card)=='stonecard') return false;
+				},
+				cardSavable:function(card){
+					if(get.type(card)=='stonecard') return false;
+				},
+			},
 			check:function(){return 1},
 			filter:function(event,player){
-				return player.num('h',{type:'stonecharacter'})>0;
+				return player.num('h',{type:['stonecharacter','stonecard']})>0;
 			},
 			viewAsFilter:function(player){
-				return player.num('h',{type:'stonecharacter'})>0;
+				return player.num('h',{type:['stonecharacter','stonecard']})>0;
 			},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('h',{type:'stonecharacter'})>0;
+					return player.num('h',{type:['stonecharacter','stonecard']})>0;
 				},
 				respondShan:true,
 				order:4,
@@ -10102,15 +10110,15 @@ mode.stone={
 		stonesha:'进攻',
 		stonesha_info:'锁定技，你的装备牌均视为杀',
 		stoneshan:'格挡',
-		stoneshan_info:'锁定技，你的随从牌均视为闪',
+		stoneshan_info:'锁定技，你的随从和法术牌均视为闪',
 
 		stonecharacter:'随从',
 		spell_shengerpingdeng:'生而平等',
 		spell_shengerpingdeng_info:'将所有随从体力上限降为1',
 		spell_jingshenkongzhi:'精神控制',
-		spell_jingshenkongzhi_info:'限主将使用，将一名敌方随从吸收为己方',
+		spell_jingshenkongzhi_info:'将一名敌方随从吸收为己方',
 		spell_anyingkuangluan:'暗影狂乱',
-		spell_anyingkuangluan_info:'限主将使用，将一名敌方随从吸收为己方，并令其于下个回合结束后死亡',
+		spell_anyingkuangluan_info:'将一名敌方随从吸收为己方，并令其于下个回合结束后死亡',
 		spell_anyingkuangluan_die:'暗影狂乱',
 		spell_anyingkuangluan_die_info:'下个回合结束后死亡',
 		spell_binghuan:'冰环',
@@ -10180,7 +10188,7 @@ mode.stone={
 		'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+1'+
 		'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段的卡牌'+
 		'<li>主将出牌阶段的出牌数量（行动值）有上限，从1开始递增，后手的首个回合有一点额外行动值，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
-		'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的随从牌均视为闪，装备牌均视为杀<li>'+
+		'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的法术和随从牌均视为闪，装备牌均视为杀<li>'+
 		'随从与其他所有角色相互距离基数为1<li>'+
 		'主将杀死对方随从后获得一个额外的行动值并从牌库中获得一张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
 		'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为获得一张随机法术牌'+

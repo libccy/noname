@@ -1553,7 +1553,7 @@ card.standard={
 					if(player.isUnderControl(true)&&!_status.auto&&!ui.tempnowuxie&&tempnowuxie){
 						var translation=get.translation(card.name);
 						if(translation.length>=4){
-							translation=translation.slice(0,2);
+							translation=lib.translate[card.name+'_ab']||translation.slice(0,2);
 						}
 						ui.tempnowuxie=ui.create.control('不无懈'+translation,ui.click.tempnowuxie);
 						ui.tempnowuxie._origin=id2;

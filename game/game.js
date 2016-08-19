@@ -2922,16 +2922,16 @@
 							map.skill_bar.hide();
 						}
 					},
-					stone_mode:{
-						name:'游戏模式',
-						init:'deck',
-						item:{
-							deck:'构筑',
-							random:'随机'
-						},
-						restart:true,
-						frequent:true,
-					},
+					// stone_mode:{
+					// 	name:'游戏模式',
+					// 	init:'deck',
+					// 	item:{
+					// 		deck:'构筑',
+					// 		random:'随机'
+					// 	},
+					// 	restart:true,
+					// 	frequent:true,
+					// },
 					// deck_length:{
 					// 	name:'卡组长度',
 					// 	init:'30',
@@ -31435,7 +31435,7 @@
                     uiintro.addSmall(node.get('h'));
                 }
 
-				var skills=node.skills;
+				var skills=node.get('s');
 				var skills2=game.filterSkills(node.skills,node);
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
