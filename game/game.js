@@ -1917,8 +1917,10 @@
 							var dialog;
 							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
 							else dialog=_status.event.dialog;
-							if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
-							else _status.event.getParent().removeSetting(dialog);
+                            if(!_status.brawl||!_status.brawl.noAddSetting){
+                                if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
+    							else _status.event.getParent().removeSetting(dialog);
+                            }
 							ui.update();
 						}
 					},
@@ -2196,8 +2198,10 @@
 							var dialog;
 							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
 							else dialog=_status.event.dialog;
-							if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
-							else _status.event.getParent().removeSetting(dialog);
+                            if(!_status.brawl||!_status.brawl.noAddSetting){
+                                if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
+    							else _status.event.getParent().removeSetting(dialog);
+                            }
 							ui.update();
 						}
 					},
@@ -2468,8 +2472,10 @@
 							var dialog;
 							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
 							else dialog=_status.event.dialog;
-							if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
-							else _status.event.getParent().removeSetting(dialog);
+                            if(!_status.brawl||!_status.brawl.noAddSetting){
+                                if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
+    							else _status.event.getParent().removeSetting(dialog);
+                            }
 							ui.update();
 						}
 					},

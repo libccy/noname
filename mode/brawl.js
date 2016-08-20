@@ -875,35 +875,67 @@ mode.brawl={
                 },
                 content:{
                     submode:'normal',
-                    chooseCharacterFixed:true,
+                    noAddSetting:true,
+                    identityShown:true,
                     chooseCharacterBefore:function(){
                         var scene=_status.brawl.scene;
                         var playercontrol=[];
-                        var withseat=[],withoutseat=[];
+                        var maxpos=0;
                         for(var i=0;i<scene.players.length;i++){
                             if(scene.players[i].playercontrol){
                                 playercontrol.push(scene.players[i]);
                             }
-                            if(scene.players[i].position=='0'){
-                                withoutseat.push(game.players[i]);
+                            maxpos=Math.max(maxpos,scene.players[i].position);
+                        }
+
+                        if(maxpos<scene.players.length){
+                            maxpos=scene.players.length;
+                        }
+                        var posmap=[];
+                        for(var i=0;i<maxpos;i++){
+                            posmap[i]=i;
+                        }
+                        for(var i=0;i<scene.players.length;i++){
+                            if(scene.players[i].pos){
+                                posmap.remove(scene.players[i].pos);
                             }
-                            else{
-                                withseat.push(game.players[i]);
+                        }
+                        for(var i=0;i<scene.players.length;i++){
+                            if(!scene.players[i].pos){
+                                scene.players[i].pos=posmap.randomRemove();
                             }
                         }
                         if(playercontrol.length){
                             game.me.brawlinfo=playercontrol.randomGet();
                         }
-                        if(game.me.brawlinfo&&game.me.brawlinfo.position!='0'){
-
-                        }
                         else{
-
+                            game.me.brawlinfo=scene.players.randomGet();
+                        }
+                        var getpos=function(info){
+                            var dp=info.position-game.me.brawlinfo.position;
+                            if(dp<0){
+                                dp+=maxpos;
+                            }
+                            return dp;
+                        };
+                        scene.players.sort(function(a,b){
+                            return getpos(a)-getpos(b);
+                        });
+                        var target=game.me;
+                        for(var i=0;i<scene.players.length;i++){
+                            target.brawlinfo=scene.players[i];
+                            target.identity=scene.players[i].identity;
+                            target.setIdentity(scene.players[i].identity);
+                            target=target.next;
                         }
                     },
                     chooseCharacterAi:function(player){
-                        var scene=_status.brawl.scene;
-                        
+                        if(player.brawlinfo&&player.brawlinfo.name!='random'){
+                            player.init(player.brawlinfo.name)
+                        }
+                        else{
+                            return false;
+                        }
                     }
                 }
             },
@@ -1362,7 +1394,7 @@ mode.brawl={
                             player.node.judges.appendChild(fakecard.apply(this,info.judges[i]));
                         }
                         player.setIdentity(info.identity);
-                        var pos=parseInt(info.position);
+                        var pos=info.position;
                         if(pos==0){
                             pos='随机位置';
                         }
@@ -1391,7 +1423,7 @@ mode.brawl={
                             name:name1.value,
                             name2:name2.value,
                             identity:identity.value,
-                            position:position.value,
+                            position:parseInt(position.value),
                             hp:parseInt(hp.value),
                             maxHp:parseInt(maxHp.value),
                             linked:linked.checked,
@@ -1406,7 +1438,7 @@ mode.brawl={
                                 alert('不能有两个主公');
                                 return;
                             }
-                            if(info.position!='0'&&info.position==line7.childNodes[i].info.position){
+                            if(info.position!=0&&info.position==line7.childNodes[i].info.position){
                                 alert('座位与现在角色相同');
                                 return;
                             }
@@ -1425,8 +1457,14 @@ mode.brawl={
                         player.listen(function(){
                             if(confirm('是否删除此角色？')){
                                 this.remove();
+                                if(line7.childElementCount<8){
+                                    addCharacter.disabled=false;
+                                }
                             }
                         });
+                        if(line7.childElementCount>=8){
+                            addCharacter.disabled=true;
+                        }
                         resetCharacter();
                     });
                     ui.create.div('.menubutton.large','取消',line4,style3,resetCharacter);
@@ -1456,7 +1494,12 @@ mode.brawl={
                     line9.style.display='none';
                     line9.style.marginTop='20px';
                     var resetStatus=function(){
-                        addCharacter.disabled=false;
+                        if(line7.childElementCount>=8){
+                            addCharacter.disabled=true;
+                        }
+                        else{
+                            addCharacter.disabled=false;
+                        }
                         // editCode.disabled=false;
                         saveButton.disabled=false;
                         exportButton.disabled=false;

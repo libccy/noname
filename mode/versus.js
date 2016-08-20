@@ -692,8 +692,10 @@ mode.versus={
 				}
 				var dialog=ui.create.dialog('选择角色',[characterChoice,'character']);
 				game.me.chooseButton(true,dialog);
-				if(get.config('change_identity')){
-					addSetting(dialog);
+				if(!_status.brawl||!_status.brawl.noAddSetting){
+					if(get.config('change_identity')){
+						addSetting(dialog);
+					}
 				}
 
 				ui.create.cheat=function(){

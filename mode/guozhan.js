@@ -485,8 +485,10 @@ mode.guozhan={
 				}
 				else{
 					var dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
-					if(get.config('change_identity')){
-						addSetting(dialog);
+					if(!_status.brawl||!_status.brawl.noAddSetting){
+						if(get.config('change_identity')){
+							addSetting(dialog);
+						}
 					}
 					var next=game.me.chooseButton(dialog,true,2);
 					next.filterButton=function(button){
