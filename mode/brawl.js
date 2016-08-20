@@ -1,6 +1,9 @@
 'use strict';
 mode.brawl={
     start:function(){
+        if(!lib.storage.scene){
+            lib.storage.scene={};
+        }
         var dialog=ui.create.dialog();
         dialog.classList.add('fixed');
         dialog.classList.add('scroll1');
@@ -45,6 +48,7 @@ mode.brawl={
         var createNode=function(name){
             var info=lib.brawl[name];
             var node=ui.create.div('.dialogbutton.menubutton.large',info.name,packnode,clickCapt);
+            node.style.transition='all 0s';
             var caption=get.translation(info.mode)+'模式';
             if(info.submode){
                 caption+=' - '+info.submode;
@@ -126,8 +130,38 @@ mode.brawl={
         start.style.fontSize='72px';
         start.style.zIndex=3;
         start.style.transition='all 0s';
+        game.addScene=function(name){
+            var scene=lib.storage.scene[name];
+            var brawl={
+                name:name,
+                intro:scene.intro,
+                mode:'identity',
+            };
+            for(var i in lib.brawl.scene.template){
+                brawl[i]=lib.brawl.scene.template[i];
+            }
+            brawl.content.scene=scene;
+            lib.brawl['scene_'+name]=brawl;
+            createNode('scene_'+name);
+        };
+        game.removeScene=function(name){
+            delete lib.storage.scene[name];
+            game.save('scene',lib.storage.scene);
+            for(var i=0;i<packnode.childElementCount;i++){
+                if(packnode.childNodes[i].link=='scene_'+name){
+                    if(packnode.childNodes[i].classList.contains('active')){
+                        clickCapt.call(packnode.childNodes[i].previousSibling);
+                    }
+                    packnode.childNodes[i].remove();
+                    break;
+                }
+            }
+        }
         for(var i in lib.brawl){
             createNode(i);
+        }
+        for(var i in lib.storage.scene){
+            game.addScene(i);
         }
         if(!lib.storage.currentBrawl){
             clickCapt.call(packnode.firstChild);
@@ -835,6 +869,44 @@ mode.brawl={
             },
             nostart:true,
             fullshow:true,
+            template:{
+                init:function(){
+                    game.saveConfig('player_number',_status.brawl.scene.players.length,'identity');
+                },
+                content:{
+                    submode:'normal',
+                    chooseCharacterFixed:true,
+                    chooseCharacterBefore:function(){
+                        var scene=_status.brawl.scene;
+                        var playercontrol=[];
+                        var withseat=[],withoutseat=[];
+                        for(var i=0;i<scene.players.length;i++){
+                            if(scene.players[i].playercontrol){
+                                playercontrol.push(scene.players[i]);
+                            }
+                            if(scene.players[i].position=='0'){
+                                withoutseat.push(game.players[i]);
+                            }
+                            else{
+                                withseat.push(game.players[i]);
+                            }
+                        }
+                        if(playercontrol.length){
+                            game.me.brawlinfo=playercontrol.randomGet();
+                        }
+                        if(game.me.brawlinfo&&game.me.brawlinfo.position!='0'){
+
+                        }
+                        else{
+
+                        }
+                    },
+                    chooseCharacterAi:function(player){
+                        var scene=_status.brawl.scene;
+                        
+                    }
+                }
+            },
             showcase:function(init){
                 if(init){
                     lib.translate.zhu=lib.translate.zhu||'主';
@@ -909,7 +981,54 @@ mode.brawl={
                     //     console.log(1);
                     // },style);
                     var saveButton=ui.create.node('button','保存场景',line1,function(){
-                        console.log(1);
+                        if(!scenename.value){
+                            alert('请填写场景名称');
+                            return;
+                        }
+                        var scene={
+                            name:scenename.value,
+                            intro:sceneintro.value,
+                            players:[],
+                            cardPileTop:[],
+                            cardPileBottom:[],
+                            discardPile:[],
+                        };
+                        for(var i=0;i<line7.childElementCount;i++){
+                            scene.players.push(line7.childNodes[i].info);
+                        }
+                        if(scene.players.length<2){
+                            alert('请添加至少两名角色');
+                            return;
+                        }
+                        if(!_status.currentScene){
+                            if(lib.storage.scene[scenename.value]){
+                                if(!confirm('场景名与现有场景重复，是否覆盖？')){
+                                    return;
+                                }
+                                game.removeScene(scenename.value);
+                            }
+                        }
+                        for(var i=0;i<line6_t.childElementCount;i++){
+                            scene.cardPileTop.push(line6_t.childNodes[i].info);
+                        }
+                        for(var i=0;i<line6_b.childElementCount;i++){
+                            scene.cardPileBottom.push(line6_b.childNodes[i].info);
+                        }
+                        for(var i=0;i<line6_d.childElementCount;i++){
+                            scene.discardPile.push(line6_d.childNodes[i].info);
+                        }
+                        if(replacepile.checked){
+                            scene.replacePile=true;
+                        }
+                        if(turnsresult.value!='none'){
+                            scene.turns=[parseInt(turns.value),turnsresult.value]
+                        }
+                        if(washesresult.value!='none'){
+                            scene.washes=[parseInt(washes.value),washesresult.value]
+                        }
+                        lib.storage.scene[scene.name]=scene;
+                        game.save('scene',lib.storage.scene);
+                        game.addScene(scene.name);
                     },style);
                     var exportButton=ui.create.node('button','导出扩展',line1,function(){
                         console.log(1);
@@ -932,15 +1051,18 @@ mode.brawl={
                     ui.create.node('span','体力：',line2_t);
                     var hp=ui.create.node('input',line2_t,{width:'40px'});
                     hp.type='text';
-                    ui.create.node('span','体力上限：',line2_t,{marginLeft:'15px'});
+                    ui.create.node('span','体力上限：',line2_t,{marginLeft:'10px'});
                     var maxHp=ui.create.node('input',line2_t,{width:'40px'});
                     maxHp.type='text';
                     ui.create.node('span','横置 ',line2_t,{marginLeft:'20px'});
                     var linked=ui.create.node('input',line2_t);
                     linked.type='checkbox';
-                    ui.create.node('span','翻面 ',line2_t,{marginLeft:'15px'});
+                    ui.create.node('span','翻面 ',line2_t,{marginLeft:'10px'});
                     var turnedover=ui.create.node('input',line2_t);
                     turnedover.type='checkbox';
+                    ui.create.node('span','玩家 ',line2_t,{marginLeft:'10px'});
+                    var playercontrol=ui.create.node('input',line2_t);
+                    playercontrol.type='checkbox';
 
                     var list=[];
                     for(var i in lib.character){
@@ -1040,9 +1162,7 @@ mode.brawl={
                             number2='?';
                         }
                         card.init([suit2,number2,name2]);
-                        card.name=name;
-                        card.suit=suit;
-                        card.number=number;
+                        card.info=[name,suit,number];
                         if(name=='random'){
                             card.node.name.innerHTML=get.verticalStr('随机卡牌');
                         }
@@ -1202,6 +1322,7 @@ mode.brawl={
                         cardpileaddnumber.value='random';
                         linked.checked=false;
                         turnedover.checked=false;
+                        playercontrol.checked=false;
                     };
                     var createCharacter=function(info){
                         var player=ui.create.player(null,true);
@@ -1275,6 +1396,7 @@ mode.brawl={
                             maxHp:parseInt(maxHp.value),
                             linked:linked.checked,
                             turnedover:turnedover.checked,
+                            playercontrol:playercontrol.checked,
                             handcards:[],
                             equips:[],
                             judges:[]
@@ -1359,8 +1481,6 @@ mode.brawl={
                         capt_b.style.display='none';
                         capt_d.style.display='none';
                     }
-
-
 
                     ui.create.div('.menubutton.large','确定',line9,style3,resetStatus);
                 }

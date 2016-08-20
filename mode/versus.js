@@ -153,6 +153,9 @@ mode.versus={
 		else{
 			game.chooseCharacter();
 		}
+		if(!_status.connectMode&&_status.brawl&&_status.brawl.chooseCharacterBefore){
+			_status.brawl.chooseCharacterBefore();
+		}
 		"step 3"
 		var players=get.players(lib.sort.position);
 		var info=[];

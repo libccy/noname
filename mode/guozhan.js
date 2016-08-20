@@ -57,6 +57,9 @@ mode.guozhan={
 				game.players[i].node.name2.hide();
 				game.players[i].getId();
 			}
+			if(_status.brawl&&_status.brawl.chooseCharacterBefore){
+				_status.brawl.chooseCharacterBefore();
+			}
 			game.chooseCharacter();
 		}
 		"step 2"

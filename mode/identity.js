@@ -174,6 +174,9 @@ mode.identity={
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].getId();
 			}
+			if(_status.brawl&&_status.brawl.chooseCharacterBefore){
+				_status.brawl.chooseCharacterBefore();
+			}
 			game.chooseCharacter();
 		}
 		"step 5"
@@ -389,6 +392,27 @@ mode.identity={
 			}
 		},
 		checkResult:function(){
+			if(_status.brawl&&_status.brawl.checkResult){
+				_status.brawl.checkResult();
+				return;
+			}
+			if(!game.zhu){
+				if(get.population('fan')==0){
+					switch(game.me.identity){
+						case 'fan':game.over(false);break;
+						case 'zhong':game.over(true);break;
+						default:game.over();break;
+					}
+				}
+				else if(get.population('zhong')==0){
+					switch(game.me.identity){
+						case 'fan':game.over(true);break;
+						case 'zhong':game.over(false);break;
+						default:game.over();break;
+					}
+				}
+				return;
+			}
 			if(game.zhu.isAlive()&&get.population('fan')+get.population('nei')>0) return;
 			if(game.zhong){
 				game.zhong.identity='zhong';
@@ -1165,7 +1189,7 @@ mode.identity={
 					},this);
 				}
 				game.checkResult();
-				if(game.zhu.isZhu){
+				if(game.zhu&&game.zhu.isZhu){
 					if(get.population('zhong')+get.population('nei')==0||
 					get.population('zhong')+get.population('fan')==0){
 						game.broadcastAll(game.showIdentity);
@@ -1175,7 +1199,7 @@ mode.identity={
 				else if(this.identity=='zhong'&&source&&source.identity=='zhu'&&source.isZhu){
 					source.discard(source.get('he'));
 				}
-				if(game.zhu.storage.enhance_zhu&&get.population('fan')<3){
+				if(game.zhu&&game.zhu.storage.enhance_zhu&&get.population('fan')<3){
 					game.zhu.removeSkill(game.zhu.storage.enhance_zhu);
 					delete game.zhu.storage.enhance_zhu;
 				}
