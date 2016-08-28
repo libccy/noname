@@ -24950,7 +24950,7 @@
                                 toremove[i].remove();
                             }
                             var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-                            var script=lib.init.js(lib.hallURL,'web/list',function(){
+                            var script=lib.init.js('http://'+lib.hallURL,'web/list',function(){
                                 loading.remove();
                                 script.remove();
                                 var list=window.noname_extension_list;
