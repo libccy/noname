@@ -218,7 +218,7 @@ character.ow={
             filter:function(event,player){
                 return player.num('he',{suit:'spade'})>0;
             },
-            check:function(){
+            check:function(card){
                 return 7-ai.get.value(card);
             },
             content:function(){
