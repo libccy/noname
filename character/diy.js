@@ -19,6 +19,9 @@ character.diy={
 		re_huangyueying:['female','shu',3,['rejizhi','qicai']],
 		old_zhonghui:['male','wei',3,['zzhenggong','zquanji','zbaijiang']],
 	},
+	perfectPair:{
+		yuji:['zuoci']
+	},
 	skill:{
 		zaiqix:{
 			trigger:{player:'phaseDrawBefore'},

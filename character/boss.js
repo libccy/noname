@@ -1765,6 +1765,10 @@ character.boss={
 				if(lib.config.animation&&!lib.config.low_performance){
 					player.$fire();
 				}
+				if(!event.parent.parent.boss_minbao_logv){
+					event.parent.parent.boss_minbao_logv=true;
+					game.logv(trigger.player,'boss_minbao',game.players.slice(0),event.parent.parent);
+				}
 			}
 		},
 		boss_guihuo:{
@@ -1818,13 +1822,17 @@ character.boss={
 			global:'boss_shanbeng2',
 			trigger:{player:'dieBegin'},
 			forced:true,
+			logv:false,
 			content:function(){
+				var targets=[];
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('e')){
 						player.line(game.players[i],'green');
+						targets.push(game.players[i]);
 					}
 				}
 				game.delay();
+				game.logv(player,'boss_shanbeng',targets,null,true);
 			}
 		},
 		boss_shanbeng2:{

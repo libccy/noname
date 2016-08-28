@@ -46,6 +46,7 @@ window.noname_source_list=[
     'layout/mode/boss.css',
     'layout/mode/chess.css',
     'layout/mode/stone.css',
+    'layout/mode/tafang.css',
     'layout/newlayout/equip.css',
     'layout/newlayout/global.css',
     'layout/newlayout/layout.css',

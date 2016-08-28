@@ -6,6 +6,9 @@ mode.versus={
 		if(_status.brawl&&_status.brawl.submode){
 			_status.mode=_status.brawl.submode;
 		}
+		if(lib.storage.test){
+			_status.mode='standard';
+		}
 		"step 1"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 		if(playback){

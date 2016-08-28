@@ -5,6 +5,9 @@ mode.chess={
 	start:function(){
 		"step 0"
 		_status.mode=get.config('chess_mode');
+		if(lib.storage.test){
+			_status.mode='combat';
+		}
 		if(_status.mode=='combat'){
 			_status.first_less=true;
 		}

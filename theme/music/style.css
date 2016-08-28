@@ -5,7 +5,7 @@ html{
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
 .player.unseen .equips:not(*:empty),.menu,#splash>div,
-#arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg{
+#arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg,.menubg,.mebg{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(#4b4b4b, #464646);
 	border-radius: 8px;
@@ -70,7 +70,10 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 .card{
 	color:white;
 }
-.card:not(*:empty){
+.cardbg{
+	background-size: initial !important;
+}
+.card:not(*:empty),.cardbg{
 	color:rgb(77, 60, 51);
 	text-shadow:none;
 	background: url('wood3.png');

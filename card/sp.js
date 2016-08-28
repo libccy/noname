@@ -348,7 +348,7 @@ card.sp={
 				if(!muniu.cards) return false;
 				lib.skill.muniu_skill.sync(muniu);
 				for(var i=0;i<muniu.cards.length;i++){
-					if(event.filterCard(muniu.cards[i])) return true;
+					if(event.filterCard(muniu.cards[i],player,event)) return true;
 				}
 				return false;
 			},
@@ -358,9 +358,19 @@ card.sp={
 				player.chooseButton(['木牛流马',player.get('e','5').cards]).set('filterButton',function(button){
 					var evt=_status.event.getTrigger();
 					if(evt&&evt.filterCard){
-						return evt.filterCard(button.link,_status.event.player);
+						return evt.filterCard(button.link,_status.event.player,evt);
 					}
 					return true;
+				}).set('ai',function(button){
+					var evt=_status.event.getTrigger();
+					if(evt&&evt.ai){
+						var tmp=_status.event;
+						_status.event=evt;
+						var result=evt.ai(button.link,_status.event.player,evt);
+						_status.event=tmp;
+						return result;
+					}
+					return 1;
 				});
 				"step 1"
 				if(result.bool){
@@ -396,7 +406,7 @@ card.sp={
 				filter:function(button,player){
 					var evt=_status.event.getParent();
 					if(evt&&evt.filterCard){
-						return evt.filterCard(button.link,player,_status.event.getParent());
+						return evt.filterCard(button.link,player,evt);
 					}
 					return true;
 				},

@@ -92,6 +92,9 @@ character.yijiang={
 		xiahoushi:['zhangfei'],
 		zhoucang:['guanyu'],
 		guanping:['guanyu'],
+		sundeng:['sunquan'],
+		liru:['dongzhuo'],
+		liuchen:['liushan'],
 	},
 	skill:{
 		taoluan:{

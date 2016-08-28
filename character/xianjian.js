@@ -12,7 +12,7 @@ character.xianjian={
 
 		pal_jingtian:['male','wu',3,['sajin','jubao']],
 		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci']],
-		pal_longkui:['female','wei',3,['fenxing','diewu','lingyu']],
+		pal_longkui:['female','qun',3,['fenxing','diewu','lingyu']],
 		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
 		pal_changqing:['male','wei',4,['luanjian','tianfu']],
 
@@ -384,15 +384,15 @@ character.xianjian={
 			unique:true,
 			forceunique:true,
 			filter:function(){
-				return Math.random()<5;
+				return Math.random()<0.5;
 			},
 			content:function(){
 				var node;
-				if(player.name=='pal_longkui'){
-					node=player.node.avatar;
-				}
-				else if(player.name2=='pal_longkui'){
+				if(player.name2=='pal_longkui'){
 					node=player.node.avatar2;
+				}
+				else if(player.name=='pal_longkui'){
+					node=player.node.avatar;
 				}
 				if(player.storage.fenxing){
 					player.storage.fenxing=false;
@@ -400,7 +400,7 @@ character.xianjian={
 					player.removeSkill('diesha');
 					player.addSkill('diewu');
 					player.addSkill('lingyu');
-					node.setBackground('pal_longkui','character');
+					if(node) node.setBackground('pal_longkui','character');
 				}
 				else{
 					player.storage.fenxing=true;
@@ -408,7 +408,7 @@ character.xianjian={
 					player.removeSkill('lingyu');
 					player.addSkill('guijiang');
 					player.addSkill('diesha');
-					node.setBackground('pal_longkuigui','character');
+					if(node) node.setBackground('pal_longkuigui','character');
 				}
 			},
 		},

@@ -50,19 +50,35 @@ table{table-layout: fixed;}
 #window.noclick_important .noclick_click_important div{pointer-events: auto !important}
 
 #window.blur_ui #arena.paused,
+#window.blur_ui #arena.menupaused,
+#window.blur_ui #historybar.paused,
+#window.blur_ui #historybar.menupaused,
 #window.blur_ui #arena.unfocus,
 #window.blur_ui #arena.right,
-#window.blur_ui #arena.menupaused,
-#window.blur_ui.shortcutpaused>#arena{
+#window.blur_ui.shortcutpaused>#arena,
+#window.blur_ui.shortcutpaused>#historybar{
     filter:blur(3px);
     -webkit-filter:blur(3px);
 }
-#window.blur_ui #arena.menupaused{
+#window.blur_ui #arena.menupaused,
+#window.blur_ui #historybar.menupaused{
     opacity: 0.6;
 }
 #window.blur_ui #arena.thrownhighlight>.card.thrown:not(.thrownhighlight){
     filter:blur(2px);
     -webkit-filter:blur(2px);
+}
+
+#time{
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	position: absolute;
+	left: 0;
+	top: 16px;
+	text-align: center;
+	pointer-events: none;
+	display: block;
 }
 
 #shortcut{
@@ -283,8 +299,10 @@ table{table-layout: fixed;}
 #arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;}
 #arena.right:not(.noleft){left:240px;opacity: 0.6;}
 #arena.left:not(.noleft){left:calc(10% - 240px);opacity: 0.6;}
+#window.leftbar #arena:not(.chess){left:calc(5% + 50px);width: calc(90% - 50px)}
+#window.rightbar #arena:not(.chess){width: calc(90% - 50px)}
 #arena.top{top:-100%;}
-#arena.paused,#arena.unfocus{opacity:  0.3 !important;}
+#arena.paused,#arena.unfocus,#historybar.paused{opacity:  0.3 !important;}
 #arena.paused2{opacity:  0.1 !important;}
 #arena>.poplayer,
 #window>.poplayer{
@@ -309,6 +327,98 @@ table{table-layout: fixed;}
 }
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing){
 	opacity: 0.3 !important;
+}
+#historybar{
+	left: 2.5%;
+	width: 50px;
+	height: calc(90% - 20px);
+	top: calc(5% + 25px);
+	border-radius: 4px;
+	visibility: hidden;
+	opacity: 0;
+	overflow: scroll;
+	z-index: 2;
+	transition-property: opacity,visibility;
+}
+#historybar.hidden{
+	pointer-events: none;
+}
+#historybar>div{
+	width: 42px;
+	height: 42px;
+	margin: 0;
+	padding: 4px;
+	display: block;
+	position: relative;
+}
+#historybar>div:not(.nozoom){
+	animation: history_start 0.5s;
+	-webkit-animation: history_start 0.5s;
+}
+#historybar>div>.card{
+	transform: scale(0.403846);
+	transform-origin: top left;
+	margin: 0;
+	left: 4px;
+	top: 4px;
+	position: absolute;
+}
+#historybar>div>.avatar{
+	padding: 0;
+    margin: 0;
+    position: absolute;
+	left: 4px;
+	top: 4px;
+	width: 42px;
+	height: 42px;
+	border-radius: 3.230768px;
+}
+#historybar>div>.avatar>div{
+	position: absolute;
+    margin: 0;
+    padding: 0;
+    left: 0;
+    bottom: 2px;
+    height: auto;
+    font-family: 'xinwei';
+    font-size: 18px;
+    text-align: center;
+    width: 100%;
+}
+#historybar>div>.avatar>.avatarbg{
+	bottom: 0;
+	height: 100%;
+	background-size: cover;
+}
+#historybar>div>.avatar2{
+	width: 20px;
+    height: 20px;
+    left: 28px;
+    top: 28px;
+    border-radius: 100%;
+	font-family: 'xinwei';
+	font-size: 20px;
+	line-height: 20px;
+	z-index: 1;
+}
+#window.rightbar #historybar,
+#window.rightbar2:not(.leftbar) #historybar{
+	left: calc(97.5% - 50px);
+}
+#window.leftbar #historybar,
+#window.rightbar #historybar{
+	opacity: 1;
+	visibility: visible;
+}
+.dialog .button.character.cardbg>.avatar_name{
+	font-family: 'xinwei';
+	font-size: 20px;
+	width: 100%;
+	height: 20px;
+	line-height: 20px;
+	top:44px;
+	left:0;
+	text-align: center;
 }
 .player:not(.treasure).playerfocus{
 	transform: scale(1.1);
@@ -342,6 +452,7 @@ table{table-layout: fixed;}
 	border-radius:100%;*/
 	z-index: 7;
 	transition-property: opacity;
+	overflow: hidden;
 }
 #roundmenu>div{
 	width: 26px;
@@ -352,25 +463,153 @@ table{table-layout: fixed;}
 	border-radius: 2px;
 	box-shadow: black 0 0 2px;
 }
-#roundmenu>div:nth-of-type(even){
+#roundmenu.clock>div:nth-of-type(1){
+	width: 2px;
+	height: 2px;
+	left: 24px;
+    top: 2px;
+	opacity: 1;
+}
+#roundmenu.clock>div:nth-of-type(2){
+	width: 2px;
+	height: 2px;
+	left: 24px;
+    top: 46px;
+	opacity: 1;
+}
+#roundmenu.clock>div:nth-of-type(3){
+	width: 2px;
+	height: 2px;
+	top: 24px;
+    left: 2px;
+	opacity: 1;
+}
+#roundmenu.clock>div:nth-of-type(4){
+	width: 2px;
+	height: 2px;
+	top: 24px;
+    left: 46px;
+	opacity: 1;
+}
+#roundmenu.clock>div:nth-of-type(5){
+	width: 2px;
+	height: 2px;
+	left: 24px;
+    top: 2px;
+	opacity: 0.4;
+	transform: rotate(30deg);
+	transform-origin: 1px 23px;
+}
+#roundmenu.clock>div:nth-of-type(9){
+	width: 2px;
+	height: 2px;
+	left: 24px;
+    top: 2px;
+	opacity: 0.4;
+	transform: rotate(60deg);
+	transform-origin: 1px 23px;
+}
+#roundmenu.clock>div:nth-of-type(6){
+	width: 2px;
+	height: 2px;
+	left: 24px;
+    top: 46px;
+	opacity: 0.4;
+	transform: rotate(30deg);
+	transform-origin: 1px -23px;
+}
+#roundmenu.clock>div:nth-of-type(10){
+	width: 2px;
+	height: 2px;
+	left: 24px;
+    top: 46px;
+	opacity: 0.4;
+	transform: rotate(60deg);
+	transform-origin: 1px -23px;
+}
+#roundmenu.clock>div:nth-of-type(7){
+	width: 2px;
+	height: 2px;
+	top: 24px;
+    left: 2px;
+	opacity: 0.4;
+	transform: rotate(30deg);
+	transform-origin: 23px 1px;
+}
+#roundmenu.clock>div:nth-of-type(11){
+	width: 2px;
+	height: 2px;
+	top: 24px;
+    left: 2px;
+	opacity: 0.4;
+	transform: rotate(60deg);
+	transform-origin: 23px 1px;
+}
+#roundmenu.clock>div:nth-of-type(8){
+	width: 2px;
+	height: 2px;
+	top: 24px;
+    left: 46px;
+	opacity: 0.4;
+	transform: rotate(30deg);
+	transform-origin: -23px 1px;
+}
+#roundmenu.clock>div:nth-of-type(12){
+	width: 2px;
+	height: 2px;
+	top: 24px;
+    left: 46px;
+	opacity: 0.4;
+	transform: rotate(60deg);
+	transform-origin: -23px 1px;
+}
+#roundmenu.clock>div:nth-of-type(13){
+	width: 22px;
+	height: 2px;
+	top: 24px;
+    left: 24px;
+	transform-origin: 1px 1px;
+	border-radius: 4px 40px 40px 4px/4px 4px 4px 4px;
+}
+#roundmenu.clock>div:nth-of-type(14){
+	width: 16px;
+	height: 4px;
+	top: 23px;
+    left: 23px;
+	transform-origin: 2px 2px;
+	border-radius: 4px 23px 23px 4px/4px 4px 4px 4px;
+}
+
+#roundmenu:not(.clock)>div:nth-of-type(even){
 	width: 20px;
 	left:18px;
 }
-#roundmenu>div:nth-of-type(odd){
+#roundmenu:not(.clock)>div:nth-of-type(odd){
 	width: 4px;
 }
 
-#roundmenu>div:nth-of-type(1),
-#roundmenu>div:nth-of-type(2){
+#roundmenu:not(.clock)>div:nth-of-type(1),
+#roundmenu:not(.clock)>div:nth-of-type(2){
 	top:14px;
 }
-#roundmenu>div:nth-of-type(3),
-#roundmenu>div:nth-of-type(4){
+#roundmenu:not(.clock)>div:nth-of-type(3),
+#roundmenu:not(.clock)>div:nth-of-type(4){
 	top:23px;
 }
-#roundmenu>div:nth-of-type(5),
-#roundmenu>div:nth-of-type(6){
+#roundmenu:not(.clock)>div:nth-of-type(5),
+#roundmenu:not(.clock)>div:nth-of-type(6){
 	top:32px;
+	transform: none !important;
+}
+#roundmenu:not(.clock)>div:nth-of-type(7),
+#roundmenu:not(.clock)>div:nth-of-type(8),
+#roundmenu:not(.clock)>div:nth-of-type(9),
+#roundmenu:not(.clock)>div:nth-of-type(10),
+#roundmenu:not(.clock)>div:nth-of-type(11),
+#roundmenu:not(.clock)>div:nth-of-type(12),
+#roundmenu:not(.clock)>div:nth-of-type(13),
+#roundmenu:not(.clock)>div:nth-of-type(14){
+	opacity: 0;
 }
 
 .linexy{
@@ -732,6 +971,7 @@ margin-bottom: 5px;
 .caption>.text.textlink:hover{text-decoration: underline;}
 .caption>div>div{font-size: 16px;position: relative;width: calc(100% - 70px);vertical-align: top;margin: 0;padding: 0;}
 .skill{left: 0 !important;width: 70px !important;}
+.skill>.card{transform: scale(0.56);transform-origin: top left;margin-left: 2px;margin-top: 6px;margin-bottom: -52px}
 .caption>.ctext{text-align:center;font-size:16px;}
 .button.character,.button.card{width: 90px;height: 90px;position: relative;margin: 6px;}
 .button.card{font-size: 14px;}
@@ -792,7 +1032,7 @@ margin-bottom: 5px;
 	-webkit-animation:replaceenemy 0.5s
 }
 .player>div{z-index: 2;}
-.player.dead,.player.likedead{z-index: 1;
+.player.dead,.player.likedead,.grayscale1{z-index: 1;
 	filter:grayscale(1);
 	-webkit-filter:grayscale(1);
 }
@@ -1553,6 +1793,10 @@ span[data-color="unknownm"]{
     text-align:center;
 	line-height: 18px;
 }
+.cardbg,.button.character.cardbg{
+	color:rgb(74, 29, 1);
+	text-shadow: none;
+}
 .card.fullskin>.name.long{
 	top:5px;
 }
@@ -1728,6 +1972,9 @@ span[data-color="unknownm"]{
 }
 .browntext{
 	color: rgb(195,161,223);
+}
+.legendtext{
+	color: rgb(233, 131, 255);
 }
 #window>canvas.fun{
 	position: absolute;
@@ -1969,6 +2216,8 @@ div:hover>.wunature{
 @-webkit-keyframes drawing2{0% {opacity: 0}50%{opacity: 1}100%{opacity: 0}}
 @keyframes card_start{from {opacity: 0;transform:scale(0);}}
 @-webkit-keyframes card_start{from {opacity: 0;transform:scale(0);}}
+@keyframes history_start{from {opacity: 0;margin-bottom: -50px}}
+@-webkit-keyframes history_start{from {opacity: 0;margin-bottom: -50px}}
 @keyframes card_start2{from {opacity: 0;transform:scale(0);margin-left: -52px;margin-right: -52px;}}
 @-webkit-keyframes card_start2{from {opacity: 0;transform:scale(0);margin-left: -52px;margin-right: -52px;}}
 @keyframes card_judgestart{from {opacity: 0;transform:scale(0) rotateY(-180deg) perspective(600px);}}
@@ -1993,13 +2242,3 @@ div:hover>.wunature{
 @-webkit-keyframes flip{from{transform:perspective(1000px) rotateY(0);}to{transform:perspective(1000px) rotateY(360deg);}}
 /*--------其它--------*/
 ::-webkit-scrollbar{display: none;}
-@media screen and (min-height: 800px) and (orientation:landscape)  {
-	#arena{height: 720px;top: calc(50% - 350px);}
-}
-@media screen and (min-width: 1280px) {
-	#arena{width: 1152px;left: calc(50% - 576px);}
-}
-@media screen and (min-width: 1600px) {
-	#arena.right:not(.noleft){left: calc(50% - 576px);}
-	#arena.left:not(.noleft){left: calc(50% - 576px);}
-}

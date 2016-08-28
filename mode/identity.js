@@ -346,7 +346,7 @@ mode.identity={
 			}
 			var name=[
 				str,
-				get.cnNumber(parseInt(get.config('player_number')))+'人'+
+				get.cnNumber(get.playerNumber())+'人'+
 					get.translation(lib.config.mode)+' - '+lib.translate[game.me.identity+'2']
 			];
 			return name;
@@ -565,7 +565,7 @@ mode.identity={
 				else{
 					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
 					if(get.config('double_nei')){
-						switch(get.config('player_number')){
+						switch(get.playerNumber()){
 							case '8':
 							identityList.remove('fan');
 							identityList.push('nei');
@@ -652,6 +652,7 @@ mode.identity={
 								this.classList.add('thundertext');
 							}
 							num=get.config('choice_'+link);
+							if(event.zhongmode) num=3;
 							_status.event.parent.swapnodialog=function(dialog,list){
 								var buttons=ui.create.div('.buttons');
 								var node=dialog.buttons[0].parentNode;
@@ -686,7 +687,7 @@ mode.identity={
 					dialog.add('选择座位');
 					var seats=document.createElement('table');
 					seats.style.margin='0 auto';
-					seats.style.maxWidth=(60*(parseInt(get.config('player_number'))-1))+'px';
+					seats.style.maxWidth=(60*get.playerNumber()-1)+'px';
 					var tr=document.createElement('tr');
 					seats.appendChild(tr);
 					for(var i=2;i<=game.players.length;i++){
@@ -804,6 +805,9 @@ mode.identity={
 					event.list.remove(game.zhu.name2);
 					if(_status.brawl&&_status.brawl.chooseCharacter){
 						list=_status.brawl.chooseCharacter(event.list,num);
+						if(list===false||list==='nozhu'){
+							list=event.list.slice(0,num);
+						}
 					}
 					else{
 						list=event.list.slice(0,num);
@@ -812,6 +816,17 @@ mode.identity={
 				else{
 					if(_status.brawl&&_status.brawl.chooseCharacter){
 						list=_status.brawl.chooseCharacter(list2,list3,num);
+						if(list===false){
+							if(event.zhongmode){
+								list=list3.slice(0,6);
+							}
+							else{
+								list=list2.concat(list3.slice(0,num));
+							}
+						}
+						else if(list==='nozhu'){
+							list=event.list.slice(0,num);
+						}
 					}
 					else{
 						if(event.zhongmode){
@@ -830,16 +845,20 @@ mode.identity={
 					delete event.swapnodialog;
 				}
 				else{
-					dialog=ui.create.dialog('选择角色','hidden',[list,'character']);
+					var str='选择角色';
+					if(_status.brawl&&_status.brawl.chooseCharacterStr){
+						str=_status.brawl.chooseCharacterStr;
+					}
+					dialog=ui.create.dialog(str,'hidden',[list,'character']);
 					if(!_status.brawl||!_status.brawl.noAddSetting){
 						if(get.config('change_identity')){
 							addSetting(dialog);
 						}
 					}
 				}
-
 				if(!event.chosen.length){
 					game.me.chooseButton(dialog,true).selectButton=function(){
+						if(_status.brawl&&_status.brawl.doubleCharacter) return 2;
 						return get.config('double_character')?2:1
 					};
 				}
@@ -854,11 +873,41 @@ mode.identity={
 						}
 						if(game.zhu!=game.me){
 							event.list.randomSort();
-							list=event.list.slice(0,num);
+							if(_status.brawl&&_status.brawl.chooseCharacter){
+								list=_status.brawl.chooseCharacter(event.list,num);
+								if(list===false||list==='nozhu'){
+									list=event.list.slice(0,num);
+								}
+							}
+							else{
+								list=event.list.slice(0,num);
+							}
 						}
 						else{
 							list3.randomSort();
-							list=list2.concat(list3.slice(0,num));
+							if(_status.brawl&&_status.brawl.chooseCharacter){
+								list=_status.brawl.chooseCharacter(list2,list3,num);
+								if(list===false){
+									if(event.zhongmode){
+										list=list3.slice(0,6);
+									}
+									else{
+										list=list2.concat(list3.slice(0,num));
+									}
+								}
+								else if(list==='nozhu'){
+									event.list.randomSort();
+									list=event.list.slice(0,num);
+								}
+							}
+							else{
+								if(event.zhongmode){
+									list=list3.slice(0,6);
+								}
+								else{
+									list=list2.concat(list3.slice(0,num));
+								}
+							}
 						}
 						var buttons=ui.create.div('.buttons');
 						var node=_status.event.dialog.buttons[0].parentNode;
@@ -922,6 +971,11 @@ mode.identity={
 				}
 				if(event.chosen.length){
 					game.me.init(event.chosen[0],event.chosen[1]);
+				}
+				else if(event.modchosen){
+					if(event.modchosen[0]=='random') event.modchosen[0]=result.buttons[0].link;
+					else event.modchosen[1]=result.buttons[0].link;
+					game.me.init(event.modchosen[0],event.modchosen[1]);
 				}
 				else if(result.buttons.length==2){
 					game.me.init(result.buttons[0].link,result.buttons[1].link)

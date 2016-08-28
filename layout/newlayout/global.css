@@ -6,6 +6,9 @@
 	width:130px;
 	height:160px;
 }
+#historybar{
+	height: calc(90% - 25px);
+}
 #window>.player:not(.minskin)>.avatar,#arena.slim_player .player:not(.minskin):not(.fakeme) .avatar{
 	width: 136px;
 	height: 166px;

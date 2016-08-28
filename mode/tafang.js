@@ -4,6 +4,7 @@ mode.tafang={
 	start:function(){
 		"step 0"
 		lib.init.css(lib.assetURL+'layout/mode','chess');
+		lib.init.css(lib.assetURL+'layout/mode','tafang');
 		game.loadMode('chess');
 		"step 1"
 		for(var i in result.element){
@@ -37,6 +38,13 @@ mode.tafang={
 				}
 			}
 		}
+        // if(!localStorage.getItem(lib.configprefix+'playback')){
+        //     game.loadMap();
+        // }
+		"step 2"
+		var result='basic_medium';
+		_status.map=lib.tafang.map[result];
+        _status.mapname=result;
 		ui.chesssheet=document.createElement('style');
 		document.head.appendChild(ui.chesssheet);
 		var playback=localStorage.getItem(lib.configprefix+'playback');
@@ -84,36 +92,20 @@ mode.tafang={
 		}
 		_status.mylist=[];
         _status.enemylist=[];
-		"step 2"
+		"step 3"
 		ui.arena.classList.add('chess');
-		var mylistmap,enemylistmap;
 		if(event.video){
-			var videocontent;
 			for(var ii=0;ii<event.video.length;ii++){
 				if(event.video[ii].type=='init'){
-					videocontent=event.video[ii].content;
+					_status.mapname=event.video[ii].content;
 					break;
 				}
 			}
-			mylistmap=[];
-			enemylistmap=[];
-			for(var i=0;i<videocontent.length;i++){
-				if(videocontent[i].lord){
-					_status.lord=videocontent[i].name;
-				}
-				if(videocontent[i].identity=='friend'){
-					_status.mylist.push(videocontent[i].name);
-					mylistmap.push(videocontent[i].position);
-				}
-				else{
-					_status.enemylist.push(videocontent[i].name);
-					enemylistmap.push(videocontent[i].position);
-				}
-			}
+            _status.map=lib.tafang.map[_status.mapname];
 			game.playerMap=lib.posmap;
 		}
-		ui.chesswidth=parseInt(get.config('tafang_size'));
-		ui.chessheight=11;
+		ui.chesswidth=_status.map.size[0];
+		ui.chessheight=_status.map.size[1];
 		ui.chess.style.height=148*ui.chessheight+'px';
 		ui.chess.style.width=148*ui.chesswidth+'px';
 		if(!lib.config.touchscreen){
@@ -255,7 +247,7 @@ mode.tafang={
 		lib.setScroll(ui.chessinfo);
 
 		game.arrangePlayers();
-		"step 3"
+		"step 4"
 		ui.control.style.display='';
 		if(event.video){
 			game.playVideoContent(event.video);
@@ -263,7 +255,7 @@ mode.tafang={
 			return;
 		}
 		_status.videoInited=true;
-		game.addVideo('init',null,[]);
+		game.addVideo('init',null,_status.mapname);
 		if(game.friendZhu){
 			game.addVideo('identityText',game.friendZhu,'将');
 			game.addVideo('identityText',game.enemyZhu,'帅');
@@ -346,6 +338,23 @@ mode.tafang={
 				}
 			},
 		},
+	},
+	tafang:{
+		map:{
+            basic_small:{
+                name:'小型战场',
+				size:[6,11],
+				obstacle:[]
+            },
+            basic_medium:{
+                name:'中型战场',
+				size:[9,11],
+            },
+            basic_large:{
+                name:'大型战场',
+				size:[12,11],
+            },
+		}
 	},
 	game:{
 		minskin:true,
@@ -806,6 +815,150 @@ mode.tafang={
 				}
 			});
 		},
+		loadMap:function(){
+            var next=game.createEvent('loadMap');
+            next.setContent(function(){
+				if(!lib.storage.map){
+					lib.storage.map=['basic_small','basic_medium','basic_large'];
+				}
+				if(!lib.storage.newmap){
+					lib.storage.newmap=[];
+				}
+				var sceneview=ui.create.div('.storyscene');
+				if(!lib.config.touchscreen&&lib.config.mousewheel){
+					sceneview._scrollspeed=30;
+					sceneview._scrollnum=10;
+					sceneview.onmousewheel=function(){
+	                    if(!this.classList.contains('lockscroll')){
+	                        ui.click.mousewheel.apply(this,arguments);
+	                    }
+	                };
+				}
+				lib.setScroll(sceneview);
+				var switchScene=function(){
+					event.result=this.link;
+					sceneview.delete();
+					setTimeout(game.resume,300);
+				}
+                var clickScene=function(e){
+                    if(this.classList.contains('unselectable')) return;
+                    if(this._clicking) return;
+                    if(e&&e.stopPropagation) e.stopPropagation();
+                    if(this.classList.contains('flipped')){
+                        return;
+                    }
+					if(this.classList.contains('glow3')){
+						this.classList.remove('glow3');
+						lib.storage.newmap.remove(this.name);
+						game.save('newmap',lib.storage.newmap);
+					}
+                    var sceneNode=this.parentNode;
+                    var current=document.querySelector('.flipped.scene');
+                    if(current){
+                        restoreScene(current,true);
+                    }
+                    this.content.innerHTML='';
+					ui.create.div('.menubutton.large.enter','进入',this.content,switchScene).link=this.name;
+                    sceneNode.classList.add('lockscroll');
+                    var node=this;
+                    node._clicking=true;
+                    setTimeout(function(){
+                        node._clicking=false;
+                    },700);
+                    sceneNode.dx=ui.window.offsetWidth/2-(-sceneNode.scrollLeft+this.offsetLeft+this.offsetWidth/2);
+                    if(Math.abs(sceneNode.dx)<20){
+                        sceneNode.dx=0;
+                    }
+                    if(!sceneNode.sceneInterval&&sceneNode.dx){
+                        sceneNode.sceneInterval=setInterval(function(){
+                            var dx=sceneNode.dx;
+                            if(Math.abs(dx)<=2){
+                                sceneNode.scrollLeft-=dx;
+                                clearInterval(sceneNode.sceneInterval);
+                                delete sceneNode.sceneInterval;
+                            }
+                            else{
+                                var ddx=dx/Math.sqrt(Math.abs(dx))*1.5;
+                                sceneNode.scrollLeft-=ddx;
+                                sceneNode.dx-=ddx;
+                            }
+                        },16);
+                    }
+                    node.style.transition='all ease-in 0.2s';
+					node.style.transform='perspective(1600px) rotateY(90deg) scale(0.75)';
+					var onEnd=function(){
+                        node.removeEventListener('webkitTransitionEnd',onEnd);
+                        node.classList.add('flipped');
+                        sceneNode.classList.add('lockscroll');
+                        node.style.transition='all ease-out 0.4s';
+						node.style.transform='perspective(1600px) rotateY(180deg) scale(1)'
+					};
+					node.addEventListener('webkitTransitionEnd',onEnd);
+                }
+                ui.click.scene=clickScene;
+                var restoreScene=function(node,forced){
+                    if(node._clicking&&!forced) return;
+                    if(node.transformInterval){
+                        clearInterval(node.transformInterval);
+                        delete node.transformInterval;
+                    }
+                    var sceneNode=node.parentNode;
+                    node._clicking=true;
+                    setTimeout(function(){
+                        node._clicking=false;
+                    },700);
+                    node.style.transition='all ease-in 0.2s';
+					node.style.transform='perspective(1600px) rotateY(90deg) scale(0.75)';
+					var onEnd=function(){
+                        node.removeEventListener('webkitTransitionEnd',onEnd);
+                        node.classList.remove('flipped');
+                        if(!sceneNode.querySelector('.flipped')){
+                            sceneNode.classList.remove('lockscroll');
+                        }
+                        node.style.transition='all ease-out 0.4s';
+						node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)'
+					};
+					node.addEventListener('webkitTransitionEnd',onEnd);
+                }
+                ui.click.scene2=restoreScene;
+                var createScene=function(name){
+                    var scene=lib.tafang.map[name];
+                    var node=ui.create.div('.scene',clickScene);
+                    node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)';
+                    node.name=name;
+                    node.bgnode=ui.create.div('.background.player',node);
+                    node.info=scene;
+                    ui.create.div('.avatar.menu',node.bgnode);
+                    node.namenode=ui.create.div('.name',node,(scene.name));
+                    if(lib.storage.map.contains(name)){
+                        if(lib.storage.newmap.contains(name)){
+                            node.classList.add('glow3');
+                        }
+                        node.namenode.dataset.nature='soilm';
+                    }
+                    else{
+                        node.classList.add('unselectable');
+                        node.namenode.innerHTML=('未开启');
+                    }
+                    var content=ui.create.div('.menu',node);
+                    lib.setScroll(content);
+                    node.content=content;
+                    sceneview.appendChild(node);
+                    return node;
+                }
+                event.custom.add.window=function(){
+                    var current=document.querySelector('.flipped.scene');
+                    if(current){
+                        restoreScene(current);
+                    }
+                }
+                for(var i in lib.tafang.map){
+                    createScene(i);
+                }
+                ui.window.appendChild(sceneview.animate('start'));
+                game.pause();
+            });
+        },
 	},
 	skill:{
 		chess_mech_weixingxianjing_skill:{
@@ -979,7 +1132,10 @@ mode.tafang={
 					var target=list.randomGet();
 					player.line(target,'fire');
 					target.damage('fire','nosource');
-					target.moveUp();
+					var he=target.get('he');
+					if(he.length){
+						target.discard(he.randomGet());
+					}
 				}
 			}
 		},
@@ -1009,7 +1165,7 @@ mode.tafang={
 		chess_mech_jiguanren_skill_info:'每一轮弃置3格以内的所有敌方角色各1~2张牌',
 		chess_mech_gongchengche:'攻城车',
 		chess_mech_gongchengche_skill:'攻坚',
-		chess_mech_gongchengche_skill_info:'每一轮对距离2格以内的一名随机敌方角色造成1点火焰伤害，并将目标击退1格',
+		chess_mech_gongchengche_skill_info:'每一轮对距离2格以内的一名随机敌方角色造成1点火焰伤害，并随机弃置其一张牌',
 		chess_mech_guangmingquan:'光明泉',
 		chess_mech_guangmingquan_skill:'圣疗',
 		chess_mech_guangmingquan_skill_info:'每一轮令距离2格以内的所有友方角色各回复一点体力',

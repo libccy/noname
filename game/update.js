@@ -1,7 +1,10 @@
 window.noname_update={
-    version:'1.8.21',
+    version:'1.9.0',
     changeLog:[
-        'bug增加'
+        '增加乱斗模式',
+        '显示时间选项',
+        '历史记录栏',
+        '更新源调整',
     ],
     files:{
         global:[

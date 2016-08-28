@@ -650,9 +650,9 @@ character.standard={
 				}
 				else if(event.current.group=='shu'){
 					var next=event.current.chooseToRespond('是否替'+get.translation(player)+'对'+get.translation(target)+'使用一张杀',
-					function(card){
-						var evt=_status.event.getParent();
-						return evt.player.canUse(card,evt.target)&&card.name=='sha';
+					function(card,player,event){
+						event=event||_status.event;
+						return card.name=='sha'&&event.source.canUse(card,event.target);
 					});
 					next.set('ai',function(card){
 						var event=_status.event;

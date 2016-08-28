@@ -17,15 +17,243 @@ character.ow={
         ow_maikelei:['male','shu',4,['shanguang','tiandan','shenqiang']],
         ow_kuangshu:['male','shu',3,['liudan','shoujia','shihuo']],
 
-        // ow_tuobiang:['male','shu',3,[]],
+        ow_tuobiang:['male','shu',3,['paotai','maoding']],
         // ow_baolei:['female','shu',3,[]],
-        // ow_banzang:['male','shu',4,[]],
-        // ow_laiyinhate:['male','shu',4,[]],
+        ow_banzang:['male','qun',4,['fengshi','yinbo']],
+        ow_laiyinhate:['male','qun',4,['lzhongjia','mengji']],
         // ow_luba:['male','shu',4,[]],
         // ow_wensidun:['male','shu',4,[]],
-        // ow_zhaliya:['female','shu',4,[]],
+        // ow_zhaliya:['female','shu',4,['pingzhang','lichang']],
     },
     skill:{
+        mengji:{
+            trigger:{source:'damageBegin'},
+            forced:true,
+            filter:function(event,player){
+                return !player.hujia&&event.card&&event.card.name=='sha'&&event.notLink();
+            },
+            content:function(){
+                trigger.num++;
+            }
+        },
+        lzhongjia:{
+            init2:function(player){
+                if(!player.storage.zhongjia){
+                    player.changeHujia(8);
+                    player.storage.zhongjia=true;
+                }
+            },
+            enable:'phaseUse',
+            usable:1,
+            filter:function(event,player){
+                return player.hujia>0;
+            },
+            filterTarget:function(card,player,target){
+                return !target.hujia;
+            },
+            filterCard:true,
+            position:'he',
+            check:function(card){
+                var player=_status.event.player;
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i].hp==1&&ai.get.attitude(player,game.players[i])>2){
+                        return 7-ai.get.value(card);
+                    }
+                }
+                return 5-ai.get.value(card);
+            },
+            content:function(){
+                player.changeHujia(-1);
+                target.changeHujia();
+            },
+            ai:{
+                order:5,
+                expose:0.2,
+                return:{
+                    target:function(player,target){
+                        return 1/Math.max(1,target.hp);
+                    }
+                }
+            }
+        },
+        maoding:{
+            trigger:{player:'damageEnd',source:'damageEnd'},
+            frequent:true,
+            content:function(){
+                player.gain(game.createCard(get.typeCard('hslingjian').randomGet()),'gain2');
+            },
+            group:'maoding2'
+        },
+        maoding2:{
+            enable:'phaseUse',
+            filter:function(event,player){
+                return player.num('h',{type:'hslingjian'})>1;
+            },
+            filterCard:{type:'hslingjian'},
+            filterTarget:true,
+            selectCard:2,
+            usable:1,
+            content:function(){
+                target.changeHujia();
+            },
+            ai:{
+				order:9,
+				result:{
+					target:function(player,target){
+						return 2/Math.max(1,Math.sqrt(target.hp));
+					},
+				},
+			}
+        },
+        paotai:{
+            enable:'phaseUse',
+            intro:{
+                content:function(storage){
+                    var num;
+                    switch(storage){
+                        case 1:num=30;break;
+                        case 2:num=60;break;
+                        case 3:num=100;break;
+                    }
+                    return '回合结束阶段，有'+num+'%机率对一名随机敌人造成一点火焰伤害';
+                }
+            },
+            init:function(player){
+                player.storage.paotai=0;
+            },
+            filter:function(event,player){
+                return player.num('h','sha')>0&&player.storage.paotai<3;
+            },
+            filterCard:{name:'sha'},
+            content:function(){
+                player.storage.paotai++;
+                player.markSkill('paotai');
+            },
+            ai:{
+                order:5,
+                threaten:1.5,
+                result:{
+                    player:1
+                }
+            },
+            group:['paotai2','paotai3']
+        },
+        paotai2:{
+            trigger:{player:'phaseEnd'},
+            forced:true,
+            filter:function(event,player){
+                var num=0;
+                switch(player.storage.paotai){
+                    case 1:num=30;break;
+                    case 2:num=60;break;
+                    case 3:num=100;break;
+                }
+                return 100*Math.random()<num;
+            },
+            content:function(){
+                var targets=player.getEnemies();
+                if(targets.length){
+                    var target=targets.randomGet();
+                    target.addExpose(0.3);
+                    player.addExpose(0.3);
+                    target.damage('fire');
+                    player.line(target,'fire');
+                }
+            }
+        },
+        paotai3:{
+            trigger:{player:'damageEnd'},
+            forced:true,
+            popup:false,
+            filter:function(event,player){
+                return event.card&&event.card.name=='sha'&&player.storage.paotai>0;
+            },
+            content:function(){
+                player.storage.paotai--;
+                if(player.storage.paotai==0){
+                    player.unmarkSkill('paotai');
+                }
+                else{
+                    player.updateMarks();
+                }
+            }
+        },
+        fengshi:{
+            trigger:{player:'shaBegin'},
+            forced:true,
+			check:function(event,player){
+				return ai.get.attitude(player,event.target)<=0;
+			},
+			filter:function(event,player){
+				return Math.random()<0.2*get.cardCount(true,player);
+			},
+			content:function(){
+				trigger.directHit=true;
+			},
+            mod:{
+                attackFrom:function(from,to,distance){
+                    return distance-get.cardCount(true,from);
+                }
+            },
+            group:'fengshi2'
+        },
+        fengshi2:{
+            trigger:{source:'damageBegin'},
+            forced:true,
+			check:function(event,player){
+				return ai.get.attitude(player,event.target)<=0;
+			},
+            filter:function(event,player){
+                return event.card&&event.card.name=='sha'&&Math.random()<0.2*get.cardCount(true,player);
+            },
+            content:function(){
+                trigger.num++;
+            }
+        },
+        yinbo:{
+            enable:'phaseUse',
+            usable:1,
+            filterCard:{suit:'spade'},
+            position:'he',
+            filter:function(event,player){
+                return player.num('he',{suit:'spade'})>0;
+            },
+            check:function(){
+                return 7-ai.get.value(card);
+            },
+            content:function(){
+                'step 0'
+                var targets=player.getEnemies(function(target){
+                    return target.num('he')>0;
+                });
+                if(targets.length){
+                    event.targets=targets.randomGets(3);
+                    event.targets.sort(lib.sort.seat);
+                    player.line(event.targets,'green');
+                    if(lib.config.mode=='identity'||lib.config.mode=='guozhan'){
+                        for(var i=0;i<event.targets.length;i++){
+                            event.targets[i].addExpose(0.3);
+                        }
+                    }
+                }
+                'step 1'
+                if(event.targets.length){
+                    var target=event.targets.shift();
+                    var he=target.get('he');
+                    if(he.length){
+                        target.discard(he.randomGet());
+                    }
+                    event.redo();
+                }
+            },
+            ai:{
+                order:10,
+                expose:0.3,
+                result:{
+                    player:1
+                }
+            }
+        },
         aqianghua:{
             enable:'phaseUse',
             usable:1,
@@ -341,8 +569,6 @@ character.ow={
                     target.discard(he.randomGet());
                 }
                 'step 2'
-                target.loseHp();
-                'step 3'
                 if(!target.isTurnedOver()){
                     target.turnOver();
                 }
@@ -748,6 +974,7 @@ character.ow={
                 !target.previous.hasSkill('bingqiang2')&&!target.previous.hasSkill('bingqiang5');
             },
             check:function(card){
+                if(ui.selected.cards.length) return 0;
                 var player=_status.event.player;
                 var max=0,min=0;
                 for(var i=0;i<game.players.length;i++){
@@ -1531,10 +1758,10 @@ character.ow={
             intro:{
                 content:'受到的伤害+1，直到首次进入濒死状态'
             },
-            trigger:{player:'damageBegin'},
+            trigger:{player:'damageEnd'},
             forced:true,
             content:function(){
-                trigger.num++;
+                player.loseHp();
             },
             ai:{
                 threaten:1.2
@@ -2090,9 +2317,9 @@ character.ow={
         guangshu_heart:{
             mark:true,
             intro:{
-                content:'进入濒死状态时回复一点体力'
+                content:'下次受到伤害时回复一点体力'
             },
-            trigger:{player:'dying'},
+            trigger:{player:'damageEnd'},
             priority:6,
             forced:true,
             content:function(){
@@ -2343,6 +2570,21 @@ character.ow={
         }
     },
     translate:{
+        mengji:'猛击',
+        mengji_info:'锁定技，当你没有护甲时，你的杀造成的伤害+1',
+        lzhongjia:'重甲',
+        lzhongjia_info:'游戏开始时，你获得8点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
+        paotai:'炮台',
+        paotai2:'炮台',
+        paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到杀造成的伤害，炮台降低一级',
+        maoding:'铆钉',
+        maoding2:'铆钉',
+        maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌限阶段限一次，你可以弃置两张零件牌令一名角色获得一点护甲',
+        fengshi:'风矢',
+        fengshi2:'风矢',
+        fengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加20%的概率强制命中；你的杀造成伤害后增加20%的概率令伤害+1',
+        yinbo:'音波',
+        yinbo_info:'出牌阶段限一次，你可以弃置一张黑桃牌，然后随机弃置三名敌人各一张牌',
         liudan:'榴弹',
         liudan_info:'每当你使用一张杀，你可以令所有不是此杀目标的其他角色有50%概率成为此杀的额外目标',
         shoujia:'兽夹',
@@ -2380,7 +2622,7 @@ character.ow={
         shuangqiang:'霜枪',
         shuangqiang_info:'每当你对一名未翻面的角色造成伤害，你可以令伤害-1，然后令受伤害角色翻面',
         baoxue:'暴雪',
-        baoxue_info:'限定技，出牌阶段，你可以展示并弃置你的所有黑色牌，然后令至多X名其他角色随机弃置一张牌、流失一点体力并将武将牌翻至背面，X为你的弃牌数',
+        baoxue_info:'限定技，出牌阶段，你可以展示并弃置你的所有黑色牌，然后令至多X名其他角色随机弃置一张牌并将武将牌翻至背面，X为你的弃牌数',
         bingqiang:'冰墙',
         bingqiang2:'冰墙',
         bingqiang2_bg:'墙',
@@ -2418,7 +2660,7 @@ character.ow={
         luan:'乱',
         luan2:'乱',
         luan_old_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合失去一点体力，直到你死亡。同一时间只能对一人发动',
-        luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色受到的伤害+1，直到你死亡或其首次进入濒死状态。同一时间只能对一人发动',
+        luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色受到伤害后流失一点体力，直到你死亡或其首次进入濒死状态。同一时间只能对一人发动',
         sheng:'圣',
         sheng_info:'限定技，出牌阶段，你可以将你的武将牌翻面，然后令任意名角色回复一点体力，若如此做，你不能成为其他角色的卡牌目标直到下一回合开始',
         xiandan:'霰弹',
@@ -2440,7 +2682,7 @@ character.ow={
         guangshu_spade:'光塔',
         guangshu_club:'光井',
         guangshu_diamond:'光流',
-        guangshu_info:'出牌阶段，你可以弃置一张牌，并指定一名角色，根据弃置牌的花色执行如下效果：♥该角色进入濒死状态时回复一点体力；♦︎该角色下次造成伤害时摸两张牌；♣该角色无法使用杀直到下一回合结束；♠该角色于下个回合结束阶段受到一点无来源的雷电伤害',
+        guangshu_info:'出牌阶段，你可以弃置一张牌，并指定一名角色，根据弃置牌的花色执行如下效果：♥该角色下次受到伤害时回复一点体力；♦︎该角色下次造成伤害时摸两张牌；♣该角色无法使用杀直到下一回合结束；♠该角色于下个回合结束阶段受到一点无来源的雷电伤害',
         ziyu:'自愈',
         ziyu_info:'在一名角色的回合结束阶段，你可以回复一点体力或摸一张牌，每隔四回合发动一次',
         shouhu:'守护',

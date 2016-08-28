@@ -766,10 +766,13 @@ card.standard={
 				}
 				else{
 					var next=event.turn.chooseToRespond({name:'sha'});
-					next.ai=function(card){
+					next.set('ai',function(card){
+						var event=_status.event;
+						var player=event.splayer;
+						var target=event.starget;
 						if(player.hasSkillTag('notricksource')) return 0;
 						if(target.hasSkillTag('notrick')) return 0;
-						if(event.turn==target){
+						if(event.player==target){
 							if(player.hasSkill('naman')) return -1;
 							if(ai.get.attitude(target,player)<0){
 								return ai.get.unuseful2(card)
@@ -783,7 +786,9 @@ card.standard={
 							}
 							return -1;
 						}
-					};
+					});
+					next.set('splayer',player);
+					next.set('starget',target);
 					next.autochoose=lib.filter.autoRespondSha;
 					if(event.turn==target){
 						next.source=player;

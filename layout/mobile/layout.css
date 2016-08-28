@@ -7,6 +7,21 @@
     height: calc(95% + 20px);
     left: 3%;
 }
+#window.leftbar #arena:not(.chess){
+    left: calc(3% + 50px);
+    width: calc(94% - 50px);
+}
+#window.rightbar #arena:not(.chess){
+    width: calc(94% - 50px);
+}
+#historybar{
+    left: 1.5%;
+    height: calc(95% - 160px);
+}
+#window.rightbar #historybar,
+#window.rightbar2:not(.leftbar) #historybar{
+	left: calc(98.5% - 50px);
+}
 #control{
     width: calc(5000% / 47 - 240px);
     left:calc(-150% / 47 + 120px);
@@ -28,6 +43,20 @@
     top:auto;
     border-radius:0 !important;
     height:120px;
+}
+#window.leftbar #arena:not(.chess)>#me,
+#window.leftbar #arena:not(.chess)>#mebg,
+#window.leftbar #arena:not(.chess)>#autonode,
+#window.leftbar #arena:not(.chess) .player[data-position='0']{
+    width: calc(5000% / 47 + 2500px / 47);
+    left:calc(-150% / 47 - 50px - 75px / 47);
+}
+#window.rightbar #arena:not(.chess)>#me,
+#window.rightbar #arena:not(.chess)>#mebg,
+#window.rightbar #arena:not(.chess)>#autonode,
+#window.rightbar #arena:not(.chess) .player[data-position='0']{
+    width: calc(5000% / 47 + 2500px / 47);
+    left:calc(-150% / 47 - 75px / 47);
 }
 #arena:not(.chess) #handcards1{
     height:120px;
@@ -225,17 +254,4 @@
     top:0;
     left:0;
     background-size:cover;
-}
-
-@media screen and (min-height: 800px) and (orientation:landscape)  {
-    /*#arena{height: 780px;top: calc(50% - 350px);}
-    #arena:not(.chess)>#me,
-    #arena:not(.chess)>#mebg{
-        bottom:30px;
-    }
-	#arena:not(.chess) .player[data-position='0']{
-        top: calc(100% - 150px);
-    }*/
-
-    #arena{height: calc(95% + 20px);top: calc(5% + 10px);}
 }

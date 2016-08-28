@@ -525,6 +525,7 @@ character.hearth={
 			intro:{
 				content:'下一次造成的伤害+1'
 			},
+			logv:false,
 			trigger:{source:'damageBegin'},
 			forced:true,
 			content:function(){
@@ -1759,6 +1760,8 @@ character.hearth={
 			},
 			check:function(event,player){
 				if(event.card.name=='tiesuo') return false;
+				if(event.card.name=='jiu') return false;
+				if(event.card.name=='tianxianjiu') return false;
 				if(event.card.name=='toulianghuanzhu') return false;
 				return true;
 			},
@@ -2267,7 +2270,7 @@ character.hearth={
 		},
 		guozai:{
 			enable:'phaseUse',
-			usable:2,
+			usable:1,
 			filter:function(event,player){
 				return player.num('h')<4;
 			},
@@ -2379,6 +2382,10 @@ character.hearth={
 				player.$damage(trigger.player);
 				if(lib.config.animation&&!lib.config.low_performance){
 					player.$thunder();
+				}
+				if(!event.parent.parent.bingshi_logv){
+					event.parent.parent.bingshi_logv=true;
+					game.logv(trigger.player,'bingshi',game.players.slice(0),event.parent.parent);
 				}
 			}
 		},
@@ -3222,9 +3229,12 @@ character.hearth={
 		},
 		xianzhi:{
 			trigger:{global:'judgeBegin'},
-			direct:true,
+			frequent:true,
 			filter:function(){
 				return ui.cardPile.childNodes.length>1;
+			},
+			check:function(){
+				return false;
 			},
 			content:function(){
 				'step 0'
@@ -3243,7 +3253,6 @@ character.hearth={
 				};
 				'step 1'
 				if(result.control=='调换顺序'){
-					player.logSkill('xianzhi');
 					var card=ui.cardPile.firstChild;
 					ui.cardPile.removeChild(card);
 					ui.cardPile.insertBefore(card,ui.cardPile.firstChild.nextSibling);
@@ -3363,6 +3372,9 @@ character.hearth={
 				trigger.player.storage.mengun2=trigger.cards[0];
 				game.addVideo('storage',player,['mengun2',get.cardInfo(trigger.cards[0]),'card']);
 				trigger.player.addTempSkill('mengun2','phaseEnd');
+			},
+			ai:{
+				expose:0.2
 			}
 		},
 		mengun2:{
@@ -3852,7 +3864,7 @@ character.hearth={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event){
-				return event.card&&get.type(event.card)=='trick'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+				return event.card&&get.type(event.card)=='trick'&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;
@@ -3879,7 +3891,7 @@ character.hearth={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			filter:function(event){
-				return event.card&&event.card.name=='sha'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
+				return event.card&&event.card.name=='sha'&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;
@@ -4689,7 +4701,7 @@ character.hearth={
 		guozai:'过载',
 		guozai2:'过载',
 		guozai2_bg:'载',
-		guozai_info:'出牌阶段限两次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
+		guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
 		guozaix:'重载',
 		guozaix2:'重载',
 		guozaix2_bg:'载',

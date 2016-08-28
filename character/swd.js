@@ -16,7 +16,7 @@ character.swd={
 			swd_duguningke:['female','qun',3,['lianji','touxi']],
 			swd_guyue:['male','wei',3,['tiandao','qinyin','wangchen']],
 			swd_tuobayuer:['female','shu',4,['liuhong','poyue','niepan']],
-			swd_yuwentuo:['male','qun',4,['wushuang','xielei','kunlunjing']],
+			swd_yuwentuo:['male','shu',4,['wushuang','xielei','kunlunjing']],
 			swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue']],
 
 			swd_jiliang:['male','wu',3,['yunchou','gongxin','qimou']],
@@ -401,6 +401,7 @@ character.swd={
 		guozao:{
 			trigger:{global:'damageEnd'},
 			forced:true,
+			logv:false,
 			check:function(event,player){
 				for(var i=0;i<game.players.length;i++){
 					if(ai.get.attitude(player,game.players[i])>2&&game.players[i].num('h')==1){
@@ -467,7 +468,7 @@ character.swd={
 				"step 1"
 				if(result.bool&&result.targets[0]){
 					var target=result.targets[0];
-					player.logSkill('guozao',target);
+					player.logSkill('guozao',target,'green',true);
 					var cards=target.get('h');
 					target.lose(cards)._triggered=null;
 					game.log(target,'弃置了',cards,'，并获得三张牌');
@@ -1818,7 +1819,7 @@ character.swd={
 				}
 				var dialog=ui.create.dialog('极略：选择一张基本牌或锦囊牌牌使用',cards);
 				var trigger=event.parent.parent;
-				player.chooseButton(dialog,function(){return 1}).filterButton=function(button){
+				player.chooseButton(dialog,function(card){if(card.name=='du') return 0;return 1}).filterButton=function(button){
 					var type=get.type(button.link,'trick');
 					return (type=='trick'||type=='basic')&&trigger.filterCard(button.link,player,trigger);
 				};
@@ -2417,12 +2418,12 @@ character.swd={
 		dangping2:{},
 		duishi:{
 			enable:'phaseUse',
-			usable:2,
+			usable:1,
 			filter:function(event,player){
-				return player.num('h')>0&&!player.hasSkill('duishi3');
+				return player.num('h')>0;
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('h')&&!target.hasSkill('duishi2');
+				return player!=target&&target.num('h')>0;
 			},
 			filterCard:true,
 			check:function(card){return 8-ai.get.value(card)},
@@ -2430,22 +2431,19 @@ character.swd={
 				"step 0"
 				var suit=get.suit(cards[0]);
 				target.chooseToDiscard({suit:suit},'h','弃置一张'+get.translation(suit)+
-					'牌，或令'+get.translation(player)+'获得你的一张牌').ai=function(card){
-					if(ai.get.attitude(target,player)>0){
-						return -1;
-					}
-					return 11-ai.get.value(card);
+					'牌并令'+get.translation(player)+'摸一张牌，或随机弃置两张牌').ai=function(card){
+					return 8-ai.get.value(card);
 				}
 
 				"step 1"
-				if(!result.bool){
-					player.addTempSkill('duishi3','phaseAfter');
-					if(target.num('he')){
-						player.gainPlayerCard(target,'he',true,ai.get.buttonValue);
-					}
+				if(result.bool){
+					player.draw();
 				}
 				else{
-					target.addTempSkill('duishi2','phaseAfter');
+					var he=target.get('he');
+					if(he.length){
+						target.discard(he.randomGets(2));
+					}
 				}
 			},
 			ai:{
@@ -3398,30 +3396,25 @@ character.swd={
 					ui.window.hide();
 				}
 			},
-			intro:{
-				content:function(storage,player){
-					if(true){
-						return player.storage.kunlunjing3;
-					}
-				}
-			}
 		},
 		kunlunjing1:{
-			trigger:{player:['phaseBefore']},
+			trigger:{player:'phaseBegin'},
+			priority:10,
 			filter:function(event,player){
-				if(player.storage.kunlunjing2) return false;
-				if(player.storage.kunlunjing) return true;
-				return false;
+				if(!player.storage.kunlunjing) return false;
+				return player.hp<player.storage.kunlunjing2;
+			},
+			onremove:function(player){
+				delete player.storage.kunlunjing;
+				delete player.storage.kunlunjing2;
 			},
 			check:function(event,player){
-				// if(event.name=='phase'&&player.hp<3) return false;
-				var storage=event.player.storage.kunlunjing;
+				var storage=player.storage.kunlunjing;
 				var num=0;
 				for(var i=0;i<storage.length;i++){
 					if(game.players.contains(storage[i].player)){
 						var att=ai.get.attitude(player,storage[i].player);
 						var num2=storage[i].value-storage[i].player.num('he')+storage[i].player.num('j');
-						// console.log(storage[i].player.name,storage[i].value,storage[i].player.num('he')-storage[i].player.num('j'))
 						if(att>0){
 							num+=num2;
 						}
@@ -3430,15 +3423,12 @@ character.swd={
 						}
 					}
 				}
-				// return num>2;
-				if(player.hp==2) return num>4;
-				return num>Math.min(3,game.players.length);
+				return num>Math.min(2,game.players.length/2);
 			},
 			content:function(){
 				"step 0"
 				game.delay(0.5);
 				"step 1"
-				event.player.storage.kunlunjing2=true;
 				ui.window.style.transition='all 0.5s';
 				ui.window.classList.add('zoomout3');
 				ui.window.delete();
@@ -3470,19 +3460,31 @@ character.swd={
 						player=storage[i].player;
 						for(j=0;j<storage[i].handcards1.length;j++){
 							if(storage[i].handcards1[j].parentNode==ui.discardPile||
-							storage[i].handcards1[j].parentNode==ui.cardPile)
-							player.node.handcards1.appendChild(storage[i].handcards1[j]);
+							storage[i].handcards1[j].parentNode==ui.cardPile){
+								player.node.handcards1.appendChild(storage[i].handcards1[j]);
+							}
+							else{
+								player.node.handcards1.appendChild(game.createCard(storage[i].handcards1[j]));
+							}
 						}
 						for(j=0;j<storage[i].handcards2.length;j++){
 							if(storage[i].handcards2[j].parentNode==ui.discardPile||
-							storage[i].handcards2[j].parentNode==ui.cardPile)
-							player.node.handcards2.appendChild(storage[i].handcards2[j]);
+							storage[i].handcards2[j].parentNode==ui.cardPile){
+								player.node.handcards2.appendChild(storage[i].handcards2[j]);
+							}
+							else{
+								player.node.handcards2.appendChild(game.createCard(storage[i].handcards2[j]));
+							}
 						}
 						for(j=0;j<storage[i].equips.length;j++){
 							if(storage[i].equips[j].parentNode==ui.discardPile||
-							storage[i].equips[j].parentNode==ui.cardPile)
-							storage[i].equips[j].style.transform='';
-							player.node.equips.appendChild(storage[i].equips[j]);
+							storage[i].equips[j].parentNode==ui.cardPile){
+								storage[i].equips[j].style.transform='';
+								player.$equip(storage[i].equips[j]);
+							}
+							else{
+								player.$equip(game.createCard(storage[i].equips[j]));
+							}
 						}
 						for(j=0;j<storage[i].judges.length;j++){
 							if(storage[i].judges[j].parentNode==ui.discardPile||
@@ -3519,15 +3521,8 @@ character.swd={
 					ui.window.style.transition='';
 					game.resume();
 				},500);
-				event.player.storage.kunlunjing3='已发动';
 				game.pause();
 				'step 4'
-				if(trigger.name=='phase'){
-					var player=event.player;
-					if(player.num('h')){
-						player.chooseToDiscard('h',true);
-					}
-				}
 				ui.updatehl();
 			}
 		},
@@ -3539,10 +3534,7 @@ character.swd={
 			content:function(){
 				var handcards1,handcards2,judges,equips,viewAs,i,j;
 				player.storage.kunlunjing=[];
-				player.storage.kunlunjing2=false;
-
-				var table=document.createElement('table');
-				var tr,td,str,st;
+				player.storage.kunlunjing2=player.hp;
 
 				for(i=0;i<game.players.length;i++){
 					viewAs=[];
@@ -3565,35 +3557,6 @@ character.swd={
 					for(j=0;j<game.players[i].node.equips.childNodes.length;j++)
 						equips.push(game.players[i].node.equips.childNodes[j]);
 
-					tr=document.createElement('tr');
-					tr.style.verticalAlign='top';
-					table.appendChild(tr);
-					td=document.createElement('td');
-					td.innerHTML=get.translation(game.players[i]);
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=(handcards1.length+handcards2.length);
-					tr.appendChild(td);
-
-					str='';
-					if(equips.length+judges.length){
-						if(equips.length){
-							str+=get.translation(equips);
-							if(judges.length){
-								str+='、';
-							}
-						}
-						if(judges.length){
-							str+=get.translation(judges,'viewAs');
-						}
-					}
-					else{
-						str='';
-					}
-					td=document.createElement('td');
-					td.innerHTML=str;
-					tr.appendChild(td);
-
 					player.storage.kunlunjing.push({
 						player:game.players[i],
 						handcards1:handcards1,
@@ -3604,9 +3567,6 @@ character.swd={
 						value:handcards1.length+handcards2.length+equips.length-judges.length
 					});
 				}
-				table.firstChild.firstChild.style.width='85px';
-				table.firstChild.childNodes[1].style.width='48px';
-				player.storage.kunlunjing3='未发动';
 			}
 		},
 		oldliaoyuan:{
@@ -5765,13 +5725,13 @@ character.swd={
 			filter:function(event,player){
 				if(!event.player.isLinked()) return false;
 				if(event.nature=='fire') return false;
-				if(player.num('h',{color:'red'})) return true;
+				if(player.num('he',{color:'red'})) return true;
 				return false;
 			},
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('朱羽：是否弃置一张红色手牌使其受到一点火焰伤害？',function(card){
+				var next=player.chooseToDiscard('朱羽：是否弃置一张红色牌使其受到一点火焰伤害？','he',function(card){
 					return get.color(card)=='red';
 				});
 				next.logSkill=['zhuyu',trigger.player,'fire'];
@@ -5795,13 +5755,13 @@ character.swd={
 				if(!event.player) return false;
 				if(event.player==player) return false;
 				if(event.player.isLinked()&&event.player.isTurnedOver()) return false;
-				if(player.num('h',{color:'black'})) return true;
+				if(player.num('he',{color:'black'})) return true;
 				return false;
 			},
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否弃置一张黑色手牌使其横置或翻面？',function(card){
+				var next=player.chooseToDiscard('是否弃置一张黑色牌使其横置或翻面？','he',function(card){
 					return get.color(card)=='black';
 				});
 				next.logSkill='ningshuang';
@@ -6963,7 +6923,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			intro:{
-				content:''
+				content:'濒死时回复一点体力并失去鬼眼'
 			},
 			mark:true,
 			filterTarget:function(card,player,target){
@@ -7897,7 +7857,7 @@ character.swd={
 		guisi:'归思',
 		guisi_info:'每当你成为杀的目标，你可以交给对方一张手牌并取消之',
 		duishi:'对诗',
-		duishi_info:'出牌阶段，你可以弃置一张手牌，并指定一名有手牌的角色弃置一张与之花色相同的手牌，否则你获得其一张牌。若其弃置了手牌，你可对一名其他目标再发动一次',
+		duishi_info:'出牌阶段限一次，你可以弃置一张手牌，并指定一名有手牌的角色选择一项：弃置一张与之花色相同的手牌并令你摸一张牌，或随机弃置两张牌',
 		anlianying:'连营',
 		anlianying_info:'每当你失去最后一张手牌，可摸两张牌',
 		lianwu:'连舞',
@@ -8123,7 +8083,7 @@ character.swd={
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
-		kunlunjing_info:'回合开始前，你可以令场上所有牌还原到你上一回合结束时的位置，然后弃置一张手牌',
+		kunlunjing_info:'回合开始阶段，若你的体力值小于上回合结束时的体力值，你可以将场上所有牌还原到你上一回合结束时的位置',
 		swd_xiuluo_info:'回合开始阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌；每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',
@@ -8175,7 +8135,7 @@ character.swd={
 		funiao_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
 		xuehuang_info:'出牌阶段限一次，你可以弃置一张红色手牌令距离你一以内的所有角色受到一点火焰伤害',
 		zhuyu_info:'每当有横置的角色即将受到非火焰伤害，你可以弃置一张红色牌使其额外受到一点火焰伤害',
-		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则将其翻面',
+		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则改为将其翻面',
 		zaowu_old_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',
 		xielv_info:'弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后选择一项：1、回复一点体力；2、弃置场上所有与你手牌颜色不同的牌',
 	},

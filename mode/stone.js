@@ -1268,7 +1268,7 @@ mode.stone={
 	careerList:['mage','shaman','druid','paladin','rogue','priest','hunter','warrior','warlock'],
 	game:{
 		reserveDead:true,
-		bannedcards:['lebu','guiyoujie','xietianzi','lingjiandai','jiguanshu','sifeizhenmian','mujiaren'],
+		bannedcards:['lebu','guiyoujie','xietianzi','lingjiandai','jiguanshu','sifeizhenmian','mujiaren','fengxueren','chuansongmen'],
 		onwash:function(){
 			if(_status.mode!='deck') return;
 			var list=[];
@@ -4210,7 +4210,6 @@ mode.stone={
 		spell_yexingchengzhang:{
 			type:'stonecard',
 			fullimage:true,
-			chongzhu:true,
 			enable:function(event,player){
 				return !player.hasSkill('druid_yexingchengzhang')&&!player.isMin();
 			},
@@ -10185,13 +10184,13 @@ mode.stone={
 		'<li>每有一个友方随从死亡，获得10点怒气值，主将死亡获得20点怒气值'+
 		'<li>回合结束阶段，若己方随从数少于对方会获得10X点怒气值，X为随从数之差'+
 		'<li>怒气值达到100时不再增加。回合开始阶段，若怒气值己满，可消耗全部怒气值和4点行动值并召唤一名传说随从</ul>'+
-		'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>游戏流程类似1v1，场上有两名主将进行对抗，主将的体力上限+1'+
-		'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段的卡牌'+
-		'<li>主将出牌阶段的出牌数量（行动值）有上限，从1开始递增，后手的首个回合有一点额外行动值，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，超过6时减至3并重新累加'+
+		'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>场上有两名主将进行对抗，主将的体力上限+1'+
+		'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段以及包含翻面功能的卡牌'+
+		'<li>主将出牌阶段的出牌数量（行动值）有上限，从1开始递增，后手的首个回合有一点额外行动值，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，直到增加至6'+
 		'<li>使用随从牌可召唤一个随从，随从出场时背面朝上。每一方在场的随从数不能超过4<li>随从于摸牌阶段摸牌基数为1，随从的法术和随从牌均视为闪，装备牌均视为杀<li>'+
 		'随从与其他所有角色相互距离基数为1<li>'+
 		'主将杀死对方随从后获得一个额外的行动值并从牌库中获得一张牌，杀死己方随从无惩罚，随从杀死随从无效果'+
-		'<li>主将可重铸随从牌，但回合内总的重铸次数不能超过3，随从不能重铸任何牌（包括铁索等默认可以重铸的牌）；若重铸的牌为随从牌或法术牌，则摸牌改为获得一张随机法术牌'+
+		'<li>主将在随从满员时可重铸随从牌，但回合内总的重铸次数不能超过3；若重铸的牌为随从牌或法术牌，则摸牌改为获得一张随机法术牌'+
 		'<li>嘲讽：若一方阵营中有嘲讽角色，则同阵营的无嘲讽角色不以能成为杀目标'+
 		'<li>行动顺序为先主将后随从。主将或随从死亡后立即移出游戏，主将死亡后替补登场，替补登场时摸3+X张牌，X为对方存活的随从数，无替补时游戏结束'
 	}

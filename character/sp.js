@@ -83,6 +83,10 @@ character.sp={
 		daxiaoqiao:['zhouyu','sunce'],
 		cuiyan:['caocao'],
 		guansuo:['guanyu'],
+		mateng:['machao','madai','mayunlu'],
+		madai:['mayunlu'],
+		chengpu:['zhouyu'],
+		hanba:['swd_muyun'],
 	},
 	skill:{
 		weidi:{

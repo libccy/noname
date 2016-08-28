@@ -432,6 +432,7 @@ card.swd={
 				var list=get.typeCard('hslingjian');
 				var cards=[];
 				var time=0;
+				target.clearEquipTrigger();
 				for(var i=0;i<es.length;i++){
 					if(lib.inpile.contains(es[i].name)){
 						var card=game.createCard(list.randomGet());
@@ -439,9 +440,16 @@ card.swd={
 						time+=200;
 						setTimeout((function(card,name){
 							return function(){
+								ui.discardPile.appendChild(game.createCard(card));
 								card.init([card.suit,card.number,name,card.nature]);
 								card.style.transform='scale(1.1)';
 								card.classList.add('glow');
+								var info=get.info(card);
+			                    if(info.skills){
+			                        for(var i=0;i<info.skills.length;i++){
+			                            target.addSkillTrigger(info.skills[i]);
+			                        }
+			                    }
 								setTimeout(function(){
 									card.style.transform='';
 									card.classList.remove('glow');
@@ -976,6 +984,7 @@ card.swd={
 			},
 			usable:1,
 			selectTarget:-1,
+			logv:false,
 			modTarget:true,
 			filterTarget:function(card,player,target){
 				return target==player;
@@ -1395,6 +1404,7 @@ card.swd={
 		},
 		_zhuquezhizhang:{
 			trigger:{player:'damageEnd'},
+			forced:true,
 			filter:function(event,player){
 				return event.source&&event.source.isAlive()&&player.num('h','zhuquezhizhang')>0;
 			},
@@ -2775,11 +2785,11 @@ card.swd={
 		mujiaren_skill:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('h',{type:'hslingjian'})>0;
+				return player.num('h',{type:['trick','delay']})>0;
 			},
-			filterCard:{type:'hslingjian'},
+			filterCard:{type:['trick','delay']},
 			check:function(card){
-				return 10-ai.get.value(card);
+				return 5-ai.get.value(card);
 			},
 			viewAs:{name:'jiguanshu'}
 		},
@@ -3002,7 +3012,7 @@ card.swd={
 			},
 			ai:{
 				order:function(card,player){
-					if(player.num('h',{type:'hslingjian'})) return 10;
+					if(player.num('h',{type:'hslingjian'})) return 8.5;
 					return 1;
 				},
 				result:{
@@ -3128,15 +3138,14 @@ card.swd={
 				return att<=0;
 			},
 			filter:function(event,player){
-				return !event.target.hasSkill('fengxueren2')&&!event.target.isTurnedOver();
+				return !event.target.isTurnedOver();
 			},
 			content:function(){
 				trigger.unhurt=true;
 				trigger.target.turnOver();
-				trigger.target.addTempSkill('fengxueren2',{player:'phaseBegin'});
+				trigger.target.draw();
 			}
 		},
-		fengxueren2:{},
 		chilongya:{
 			trigger:{source:'damageBegin'},
 			forced:true,
@@ -3543,6 +3552,7 @@ card.swd={
 					return att<=0;
 				}
 				if(event.target.hp==1) return att>0;
+				if(event.target.hujia>0) return att<0;
 				return false;
 			},
 			content:function(){
@@ -3564,6 +3574,7 @@ card.swd={
 				return (event.card&&(event.card.name=='sha'));
 			},
 			forced:true,
+			temp:true,
 			content:function(){
 				player.draw(2);
 				player.removeSkill('tianxianjiu');
@@ -3705,8 +3716,8 @@ card.swd={
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
 		mujiaren_skill:'巧匠',
-		mujiaren_skill_info:'你可以将零件牌当作机关鼠使用',
-		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标摸一张牌并获得技能巧匠（你可以将零件牌当作机关鼠使用）',
+		mujiaren_skill_info:'你可以将锦囊牌当作机关鼠使用',
+		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标摸一张牌并获得技能巧匠（你可以将锦囊牌当作机关鼠使用）',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',
 		hslingjian_xuanfengzhiren_info:'可用于煅造装备；随机弃置一名角色的一张牌',
@@ -3764,7 +3775,7 @@ card.swd={
 		baihupifeng_info:'回合结束阶段，若你的体力值是全场最小的之一，你可以回复一点体力',
 		fengxueren:'封雪刃',
 		fengxueren_bg:'雪',
-		fengxueren_info:'你使用杀击中目标后，若目标武将牌正面朝上，你可以防止伤害，然后令目标翻面，若如此做，该角色在下一回合开始前不受封雪刃效果影响',
+		fengxueren_info:'你使用杀击中目标后，若目标武将牌正面朝上，你可以防止伤害，然后令目标摸一张牌并翻面',
 		chilongya:'赤龙牙',
 		chilongya_info:'锁定技，你的火属性伤害+1',
 		daihuofenglun:'带火风轮',

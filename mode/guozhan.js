@@ -88,9 +88,9 @@ mode.guozhan={
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
 				game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
-				if(game.players[i]==game.me){
-					lib.translate[game.players[i].name]+='（你）';
-				}
+				// if(game.players[i]==game.me){
+				// 	lib.translate[game.players[i].name]+='（你）';
+				// }
 			}
 		},player);
 
@@ -836,11 +836,11 @@ mode.guozhan={
 				if(info.mode.unseen) this.classList.add('unseen');
 				if(info.mode.unseen2) this.classList.add('unseen2');
 				if(!info.name) return;
-				if(info.name.indexOf('unknown')==0){
-					if(this==game.me){
-						lib.translate[info.name]+='（你）';
-					}
-				}
+				// if(info.name.indexOf('unknown')==0){
+				// 	if(this==game.me){
+				// 		lib.translate[info.name]+='（你）';
+				// 	}
+				// }
 				this.init(info.name1,info.name2,false);
 				this.name1=info.name1;
 				this.name=info.name;
