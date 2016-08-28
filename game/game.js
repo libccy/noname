@@ -12988,6 +12988,7 @@
                         if(_status.brawl&&_status.brawl.gameStart){
                             _status.brawl.gameStart();
                         }
+                        _status.gameStarted=true;
                         game.showHistory();
                     }
                     if(!lib.hookmap[name]) return;
@@ -13078,6 +13079,7 @@
 				triggerx:function(name){
 					if(_status.video) return;
                     if(name=='gameStart'){
+                        _status.gameStarted=true;
                         game.showHistory();
                     }
 					var event=this;
@@ -14743,6 +14745,7 @@
                         game.loop();
                         game.send('reinited');
                         game.showHistory();
+                        _status.gameStarted=true;
                         if(!observe&&game.me&&game.me.isDead()){
                             ui.exit=ui.create.control('退出联机',ui.click.exit);
                         }
@@ -14820,6 +14823,7 @@
                     if(lib.config.show_cardpile){
                         ui.cardPileButton.style.display='';
                     }
+                    _status.gameStarted=true;
                     game.showHistory();
                 },
                 updateWaiting:function(map){
@@ -14871,7 +14875,6 @@
         online:false,
         onlineID:null,
         showHistory:function(){
-            _status.gameStarted=true;
             if(lib.config.show_history=='left'){
                 ui.window.classList.add('leftbar');
             }
