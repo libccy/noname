@@ -19333,6 +19333,7 @@
 			return arg[arg.length-1];
 		},
 		prepareArena:function(num){
+            game.showHistory();
 			ui.create.players(num);
 			ui.create.me();
 			ui.create.cards();

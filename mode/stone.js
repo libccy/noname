@@ -25,6 +25,7 @@ mode.stone={
 						ui.system.style.opacity='';
 						ui.auto.show();
 						ui.pause.show();
+						ui.historybar.show();
 					}
 				});
 				var clickNode=function(){
@@ -382,6 +383,7 @@ mode.stone={
 				ui.deckBuilder.classList.add('shown');
 				ui.auto.hide();
 				ui.pause.hide();
+				ui.historybar.hide();
 			},true);
 
 		}
