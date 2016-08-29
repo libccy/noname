@@ -12,6 +12,10 @@
     top:auto;
     border-radius:0;
 }
+#arena.chess>#autonode{
+    width: calc(100% - 240px);
+    left: 120px;
+}
 #me>.fakeme.avatar {
     width: 120px;
     height: 120px;

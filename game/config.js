@@ -24,7 +24,7 @@ window.config={
 	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
 	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','jg_simayi','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
-	layoutfixed:['chess'],
+	layoutfixed:['chess','brawl'],
 	all:{
 		stockmode:['identity','guozhan','versus','boss','chess','stone','connect','brawl','tafang'],
 		layout:['default','newlayout'],

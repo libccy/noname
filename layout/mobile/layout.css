@@ -3,24 +3,10 @@
 @import "equip.css";
 
 #arena{
-    width: 94%;
     height: calc(95% + 20px);
-    left: 3%;
-}
-#window.leftbar #arena:not(.chess){
-    left: calc(3% + 50px);
-    width: calc(94% - 50px);
-}
-#window.rightbar #arena:not(.chess){
-    width: calc(94% - 50px);
 }
 #historybar{
-    left: 1.5%;
     height: calc(95% - 160px);
-}
-#window.rightbar #historybar,
-#window.rightbar2:not(.leftbar) #historybar{
-	left: calc(98.5% - 50px);
 }
 #control{
     width: calc(5000% / 47 - 240px);
@@ -44,6 +30,10 @@
     border-radius:0 !important;
     height:120px;
 }
+#arena:not(.chess)>#autonode{
+    width: calc(5000% / 47 - 240px);
+    left:calc(-150% / 47 + 120px);
+}
 #window.leftbar #arena:not(.chess)>#me,
 #window.leftbar #arena:not(.chess)>#mebg,
 #window.leftbar #arena:not(.chess)>#autonode,
@@ -51,12 +41,20 @@
     width: calc(5000% / 47 + 2500px / 47);
     left:calc(-150% / 47 - 50px - 75px / 47);
 }
+#window.leftbar #arena:not(.chess)>#autonode{
+    width: calc(5000% / 47 + 2500px / 47 - 240px);
+    left:calc(-150% / 47 - 50px - 75px / 47 + 120px);
+}
 #window.rightbar #arena:not(.chess)>#me,
 #window.rightbar #arena:not(.chess)>#mebg,
 #window.rightbar #arena:not(.chess)>#autonode,
 #window.rightbar #arena:not(.chess) .player[data-position='0']{
     width: calc(5000% / 47 + 2500px / 47);
     left:calc(-150% / 47 - 75px / 47);
+}
+#window.rightbar #arena:not(.chess)>#autonode{
+    width: calc(5000% / 47 + 2500px / 47 - 240px);
+    left:calc(-150% / 47 - 75px / 47 + 120px);
 }
 #arena:not(.chess) #handcards1{
     height:120px;

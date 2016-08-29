@@ -1,14 +1,21 @@
 window.noname_update={
-    version:'1.9.0',
+    version:'1.9.0.1',
     changeLog:[
-        '增加乱斗模式',
-        '显示时间选项',
-        '历史记录栏',
-        '更新源调整',
+        'bug修复',
     ],
     files:{
         global:[
             'game/game.js',
+            'game/config.js',
+            'card/standard.js',
+            'character/hearth.js',
+            'character/ow.js',
+            'character/yijiang.js',
+            'mode/brawl.js',
+            'layout/mode/chess.css',
+            'layout/default/layout.css',
+            'layout/mobile/layout.css',
         ],
+        '1.9.0':[]
     }
 }

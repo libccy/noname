@@ -6527,6 +6527,7 @@
 					else{
 						event.dialog.add('选择'+get.translation(target)+'的一张牌');
 					}
+                    var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.num('h')){
 							event.dialog.add('手牌');
@@ -6534,6 +6535,7 @@
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
+                                directh=false;
 							}
 							else{
 								event.dialog.add([hs,'blank']);
@@ -6542,10 +6544,12 @@
 						else if(event.position[i]=='e'&&target.num('e')){
 							event.dialog.add('装备牌');
 							event.dialog.add(target.get('e'));
+                            directh=false;
 						}
 						else if(event.position[i]=='j'&&target.num('j')){
 							event.dialog.add('判定牌');
 							event.dialog.add(target.get('j'));
+                            directh=false;
 						}
 					}
 					if(event.dialog.buttons.length==0){
@@ -6553,13 +6557,24 @@
 						return;
 					}
 					var cs=target.get(event.position||'h');
-					if(event.forced&&get.select(event.selectButton)[0]>=cs.length){
+                    var select=get.select(event.selectButton);
+					if(event.forced&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
+                    else if(event.forced&&directh&&select[0]==select[1]){
+                        event.result={
+							bool:true,
+							buttons:event.dialog.buttons.randomGets(select[0]),
+                            links:[]
+						}
+                        for(var i=0;i<event.result.buttons.length;i++){
+                            event.result.links[i]=event.result.buttons[i].link;
+                        }
+                    }
 					else{
 						if(event.isMine()){
 							event.dialog.open();
@@ -6602,6 +6617,7 @@
 					if(event.prompt){
 						event.dialog.add(event.prompt);
 					}
+                    var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.num('h')){
 							event.dialog.add('手牌');
@@ -6609,6 +6625,7 @@
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
+                                directh=false;
 							}
 							else{
 								event.dialog.add([hs,'blank']);
@@ -6617,10 +6634,12 @@
 						else if(event.position[i]=='e'&&target.num('e')){
 							event.dialog.add('装备牌');
 							event.dialog.add(target.get('e'));
+                            directh=false;
 						}
 						else if(event.position[i]=='j'&&target.num('j')){
 							event.dialog.add('判定牌');
 							event.dialog.add(target.get('j'));
+                            directh=false;
 						}
 					}
 					if(event.dialog.buttons.length==0){
@@ -6628,13 +6647,24 @@
 						return;
 					}
 					var cs=target.get(event.position||'h');
-					if(event.forced&&get.select(event.selectButton)[0]>=cs.length){
+                    var select=get.select(event.selectButton);
+					if(event.forced&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
+                    else if(event.forced&&directh&&select[0]==select[1]){
+                        event.result={
+							bool:true,
+							buttons:event.dialog.buttons.randomGets(select[0]),
+                            links:[]
+						}
+                        for(var i=0;i<event.result.buttons.length;i++){
+                            event.result.links[i]=event.result.buttons[i].link;
+                        }
+                    }
 					else{
 						if(event.isMine()){
 							event.dialog.open();
@@ -6693,6 +6723,7 @@
 					if(event.prompt){
 						event.dialog.add(event.prompt);
 					}
+                    var directh=true;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'&&target.num('h')){
 							event.dialog.add('手牌');
@@ -6700,6 +6731,7 @@
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
+                                directh=false;
 							}
 							else{
 								event.dialog.add([hs,'blank']);
@@ -6708,10 +6740,12 @@
 						else if(event.position[i]=='e'&&target.num('e')){
 							event.dialog.add('装备牌');
 							event.dialog.add(target.get('e'));
+                            directh=false;
 						}
 						else if(event.position[i]=='j'&&target.num('j')){
 							event.dialog.add('判定牌');
 							event.dialog.add(target.get('j'));
+                            directh=false;
 						}
 					}
 					if(event.dialog.buttons.length==0){
@@ -6720,13 +6754,24 @@
 						return;
 					}
 					var cs=target.get(event.position||'h');
-					if(event.forced&&get.select(event.selectButton)[0]>=cs.length){
+                    var select=get.select(event.selectButton);
+					if(event.forced&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
+                    else if(event.forced&&directh&&select[0]==select[1]){
+                        event.result={
+							bool:true,
+							buttons:event.dialog.buttons.randomGets(select[0]),
+                            links:[]
+						}
+                        for(var i=0;i<event.result.buttons.length;i++){
+                            event.result.links[i]=event.result.buttons[i].link;
+                        }
+                    }
 					else{
 						if(event.isMine()){
 							event.dialog.open();
@@ -10362,7 +10407,7 @@
                     if(logv===true){
                         game.logv(this,name,targets,null,true);
                     }
-                    else if(info.logv!==false){
+                    else if(info&&info.logv!==false){
                         game.logv(this,name,targets);
                     }
 				},
@@ -18981,6 +19026,9 @@
             });
         },
         switchMode:function(name,configx){
+            if(lib.config.layout=='default'&&lib.config.layoutfixed.contains(lib.config.mode)&&!lib.config.layoutfixed.contains(name)){
+                lib.init.layout('default');
+            }
             window.mode={};
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
                 script.remove();
@@ -30326,7 +30374,7 @@
 					}
 				}
 				else{
-					if(!ui.dialog.buttons||!ui.dialog.buttons.length){
+					if((!ui.dialog.buttons||!ui.dialog.buttons.length)&&ui.dialog.classList.contains('fullheight')==false){
 						ui.dialog.classList.add('nobutton');
 						if(ui.dialog.content.offsetHeight<240){
 							if(!ui.dialog._heightset){

@@ -2012,7 +2012,7 @@ character.yijiang={
 					event.jiu=true;
 				}
 				player.chooseToUse('是否对'+get.translation(trigger.target)+'再使用一张杀？',
-					{name:'sha'},trigger.target,-1).logSkill='qinglong';
+					{name:'sha'},trigger.target,-1).logSkill='qinglong_skill';
 				"step 3"
 				if(result.bool);
 				else if(event.jiu){

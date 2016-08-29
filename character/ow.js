@@ -2572,7 +2572,7 @@ character.ow={
     translate:{
         mengji:'猛击',
         mengji_info:'锁定技，当你没有护甲时，你的杀造成的伤害+1',
-        lzhongjia:'重甲',
+        lzhongjia:'重盾',
         lzhongjia_info:'游戏开始时，你获得8点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
         paotai:'炮台',
         paotai2:'炮台',

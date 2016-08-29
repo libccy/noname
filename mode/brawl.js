@@ -4,7 +4,7 @@ mode.brawl={
         if(!lib.storage.scene){
             lib.storage.scene={};
         }
-        var dialog=ui.create.dialog();
+        var dialog=ui.create.dialog('hidden');
         dialog.classList.add('fixed');
         dialog.classList.add('scroll1');
         dialog.classList.add('scroll2');
@@ -16,6 +16,7 @@ mode.brawl={
         dialog.style.overflow='hidden';
         dialog.content.style.height='100%';
         dialog.contentContainer.style.transition='all 0s';
+        dialog.open();
         var packnode=ui.create.div('.packnode',dialog);
         lib.setScroll(packnode);
         var clickCapt=function(){

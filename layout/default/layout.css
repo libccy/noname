@@ -296,11 +296,11 @@ table{table-layout: fixed;}
 #arena[data-font_size='20']{
 	font-size:20px;
 }*/
-#arena{width:90%;height: 90%;top: calc(5% + 10px);left: 5%;}
+#arena{width:94%;height: 90%;top: calc(5% + 10px);left: 3%;}
 #arena.right:not(.noleft){left:240px;opacity: 0.6;}
 #arena.left:not(.noleft){left:calc(10% - 240px);opacity: 0.6;}
-#window.leftbar #arena:not(.chess){left:calc(5% + 50px);width: calc(90% - 50px)}
-#window.rightbar #arena:not(.chess){width: calc(90% - 50px)}
+#window.leftbar #arena:not(.chess){left: calc(3% + 50px);width: calc(94% - 50px);}
+#window.rightbar #arena:not(.chess){width: calc(94% - 50px);}
 #arena.top{top:-100%;}
 #arena.paused,#arena.unfocus,#historybar.paused{opacity:  0.3 !important;}
 #arena.paused2{opacity:  0.1 !important;}
@@ -329,7 +329,7 @@ table{table-layout: fixed;}
 	opacity: 0.3 !important;
 }
 #historybar{
-	left: 2.5%;
+	left: 1.5%;
 	width: 50px;
 	height: calc(90% - 20px);
 	top: calc(5% + 25px);
@@ -403,7 +403,7 @@ table{table-layout: fixed;}
 }
 #window.rightbar #historybar,
 #window.rightbar2:not(.leftbar) #historybar{
-	left: calc(97.5% - 50px);
+	left: calc(98.5% - 50px);
 }
 #window.leftbar #historybar,
 #window.rightbar #historybar{

@@ -1365,7 +1365,7 @@ card.standard={
 					},player);
 					event.jiu=true;
 				}
-				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1).logSkill='qinglong';
+				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1).logSkill='qinglong_skill';
 				"step 1"
 				if(result.bool);
 				else if(event.jiu){
