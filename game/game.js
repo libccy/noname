@@ -449,6 +449,12 @@
 						else{
 							map.round_menu_func.show();
 						}
+                        if(lib.device=='ios'||lib.device=='android'){
+                            map.confirm_exit.show();
+                        }
+                        else{
+                            map.confirm_exit.hide();
+                        }
 					}
 				}
 			},
@@ -1565,7 +1571,7 @@
 						onclick:function(){
 							if(this.innerHTML!='已隐藏'){
 								this.innerHTML='已隐藏';
-								game.saveConfig('hiddenModePack',['stone','chess','boss']);
+								game.saveConfig('hiddenModePack',['stone','chess','boss','tafang']);
 								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth','compensate']);
 								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','xiake','boss','ow']);
 								var that=this;
@@ -3642,7 +3648,12 @@
                         }
                     };
                     game.download=function(url,folder,onsuccess,onerror){
-                        url=get.url()+url;
+                        if(url.indexOf('web/')==0){
+                            url='http://'+lib.hallURL+'/'+url;
+                        }
+                        else{
+                            url=get.url()+url;
+                        }
                         game.print(url);
                         var dir=folder.split('/');
                         var str='';
@@ -28053,17 +28064,13 @@
 					e.stopPropagation();
 				});
 
-				var rows=Math.ceil(lib.config.all.mode.length/3);
+				var rows=Math.floor(lib.config.all.mode.length/3);
 				uiintro.type='config';
                 var modes=lib.config.modeorder||lib.config.all.mode.slice(0);
                 for(var i=0;i<modes.length;i++){
                     if(!lib.config.all.mode.contains(modes[i])){
                         modes.splice(i--,1);
                     }
-                }
-                if(modes.length==7){
-                    modes.pop();
-                    rows--;
                 }
 				for(var k=0;k<rows;k++){
 					var node=ui.create.div('.newgame');
@@ -33335,12 +33342,12 @@
 			document.ontouchend=ui.click.windowtouchend;
 			document.ontouchmove=ui.click.windowtouchmove;
 		}
-		window.onbeforeunload=function(){
-			if(lib.config.confirm_exit&&!_status.reloading){
-				return '是否离开游戏？'
-			}
-			else{
-				return null;
-			}
-		}
+		// window.onbeforeunload=function(){
+		// 	if(lib.config.confirm_exit&&!_status.reloading){
+		// 		return '是否离开游戏？'
+		// 	}
+		// 	else{
+		// 		return null;
+		// 	}
+		// }
 }());

@@ -1,21 +1,19 @@
 window.noname_update={
-    version:'1.9.0.1',
+    version:'1.9.0.2',
     changeLog:[
         'bug修复',
     ],
     files:{
         global:[
             'game/game.js',
-            'game/config.js',
-            'card/standard.js',
-            'character/hearth.js',
+            'card/extra.js',
+            'card/swd.js',
             'character/ow.js',
-            'character/yijiang.js',
+            'character/gujian.js',
             'mode/brawl.js',
-            'layout/mode/chess.css',
+            'mode/tafang.js',
             'layout/default/layout.css',
-            'layout/mobile/layout.css',
         ],
-        '1.9.0':[]
+        '1.9.0.1':[]
     }
 }
