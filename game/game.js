@@ -14067,7 +14067,10 @@
 					})>0);
 				},
 				filterCard:function(card){
-					return get.info(card).chongzhu;
+                    var info=get.info(card);
+                    var player=_status.event.player;
+                    if(info.type=='stonecharacter'&&lib.config.mode=='stone') return !player.isMin()&&!player.canAddFellow();
+					return info.chongzhu;
 				},
 				prepare:function(cards,player){
 					player.$throw(cards,1000);
