@@ -17,3 +17,8 @@ window.noname_update={
         '1.9.0.1':[]
     }
 }
+
+/*
+card/sp.js
+character/xianjian.js
+*/

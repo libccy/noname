@@ -129,9 +129,10 @@ card.sp={
 				if(target.num('he',{type:'basic'})<target.num('he')){
 					target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
 						return get.type(card)!='basic';
-					}).ai=function(card){
-						return 7-ai.get.value(card);
-					};
+					}).set('ai',function(card){
+						if(_status.event.goon) return 7-ai.get.value(card);
+						return 8-ai.get.value(card);
+					}).set('goon',target.num('h','basic')>2);
 					event.more=true;
 				}
 				else{

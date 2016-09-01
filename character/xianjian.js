@@ -9,7 +9,6 @@ character.xianjian={
 		// pal_sumei:['female','shu',3,[]],
 		// pal_shenqishuang:['female','wei',3,[]],
 
-
 		pal_jingtian:['male','wu',3,['sajin','jubao']],
 		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci']],
 		pal_longkui:['female','qun',3,['fenxing','diewu','lingyu']],
@@ -27,7 +26,6 @@ character.xianjian={
 		pal_liumengli:['female','wei',3,['tianxian','runxin','zhimeng']],
 		pal_murongziying:['male','wei',4,['xuanning','poyun','qianfang']],
 		pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','xfenxin']],
-
 	},
 	skill:{
 		sheling:{
