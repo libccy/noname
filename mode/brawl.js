@@ -39,8 +39,9 @@ mode.brawl={
             var showcase=this.nodes[this.nodes.length-1];
             showcase.style.height=(dialog.content.offsetHeight-showcase.offsetTop)+'px';
             if(typeof showcase.action=='function'){
-                showcase.action(showcase._showcased?false:true);
-                showcase._showcased=true;
+                if(showcase.action(showcase._showcased?false:true)!==false){
+                    showcase._showcased=true;
+                }
             }
             if(this._nostart) start.style.display='none';
             else start.style.display='';
@@ -140,7 +141,10 @@ mode.brawl={
                 mode:'identity',
             };
             for(var i in lib.brawl.scene.template){
-                brawl[i]=lib.brawl.scene.template[i];
+                brawl[i]=get.copy(lib.brawl.scene.template[i]);
+            }
+            if(!scene.gameDraw){
+                brawl.content.noGameDraw=true;
             }
             brawl.content.scene=scene;
             lib.brawl['scene_'+name]=brawl;
@@ -1192,7 +1196,6 @@ mode.brawl={
                         if(game.me.identity=='zhu') return false;
                         return 'nozhu';
                     },
-                    noGameDraw:true,
                 }
             },
             showcase:function(init){
@@ -1215,7 +1218,7 @@ mode.brawl={
                     var scenename=ui.create.node('input',ui.create.div(style2,'','场景名称：',this),{width:'120px'});
                     scenename.type='text';
                     scenename.style.marginTop='20px';
-                    var sceneintro=ui.create.node('input',ui.create.div(style2,'','场景名称：',this),{width:'120px'});
+                    var sceneintro=ui.create.node('input',ui.create.div(style2,'','场景描述：',this),{width:'120px'});
                     sceneintro.type='text';
                     sceneintro.style.marginBottom='10px';
 
@@ -1307,6 +1310,9 @@ mode.brawl={
                         }
                         if(replacepile.checked){
                             scene.replacepile=true;
+                        }
+                        if(gameDraw.checked){
+                            scene.gameDraw=true;
                         }
                         if(turnsresult.value!='none'){
                             scene.turns=[parseInt(turns.value),turnsresult.value]
@@ -1531,10 +1537,15 @@ mode.brawl={
                     ac_j.style.marginRight='3px';
                     ac_j.style.width='85px';
 
-                    var line11=ui.create.div(style2,this,'','替换牌堆');
+                    var line11=ui.create.div(style2,this,'','<span>替换牌堆</span>');
                     line11.style.display='none';
                     var replacepile=ui.create.node('input',line11);
                     replacepile.type='checkbox';
+
+                    ui.create.node('span',line11,'开局摸牌',{marginLeft:'10px'});
+                    var gameDraw=ui.create.node('input',line11);
+                    gameDraw.type='checkbox';
+                    gameDraw.checked=true;
 
                     var capt_t=ui.create.div(style2,'','牌堆顶',this);
                     var line6_t=ui.create.div(style2,this);
@@ -1589,6 +1600,19 @@ mode.brawl={
                     };
                     var createCharacter=function(info){
                         var player=ui.create.player(null,true);
+                        player._customintro=function(uiintro){
+                            if(info.handcards.length){
+                                uiintro.addText('手牌',true);
+                                var hs=ui.create.div('.buttons');
+                                for(var i=0;i<info.handcards.length;i++){
+                                    hs.appendChild(fakecard(info.handcards[i]));
+                                }
+                                uiintro.add(hs);
+                            }
+                            else{
+                                return false;
+                            }
+                        }
                         player.info=info;
                         var name=info.name,name3=info.name2;
                         if(name=='random'){
@@ -1760,6 +1784,7 @@ mode.brawl={
 
                         if(all===true){
                             replacepile.checked=false;
+                            gameDraw.checked=true;
                             turns.value='1';
                             turnsresult.value='none';
                             washes.value='1';
@@ -1788,6 +1813,8 @@ mode.brawl={
                         _status.currentScene=scene.name;
                         line7.innerHTML='';
                         if(scene.replacepile) replacepile.checked=true;
+                        if(scene.gameDraw) gameDraw.checked=true;
+                        else gameDraw.checked=false;
                         if(scene.turns){
                             turns.value=scene.turns[0].toString();
                             turnsresult.value=scene.turns[1];

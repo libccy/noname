@@ -302,7 +302,7 @@ card.swd={
 				return hs.length>1||(hs.length==1&&hs[0]!=card);
 			},
 			filterTarget:function(card,player,target){
-				return target!=player;
+				return target!=player&&!target.hasSkill('jiguanyuan');
 			},
 			content:function(){
 				'step 0'
@@ -315,12 +315,15 @@ card.swd={
 				'step 1'
 				player.$throw(result.cards);
 				player.lose(result.cards,ui.special);
+				ui.special.appendChild(cards[0]);
 				event.togive=[cards[0],result.cards[0]];
 				game.delay();
 				'step 2'
-				target.gain(event.togive).delay=false;
+				// target.gain(event.togive).delay=false;
 				target.$gain2(event.togive);
-				game.log(target,'从',player,'获得了',event.togive)
+				target.storage.jiguanyuan=event.togive;
+				target.addSkill('jiguanyuan');
+				game.log(target,'从',player,'获得了',event.togive);
 				player.draw();
 			},
 			ai:{
@@ -1363,6 +1366,21 @@ card.swd={
 		},
 	},
 	skill:{
+		jiguanyuan:{
+			mark:'card',
+			intro:{
+				content:'cards'
+			},
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			temp:true,
+			popup:false,
+			content:function(){
+				player.gain(player.storage.jiguanyuan,'gain2');
+				player.removeSkill('jiguanyuan');
+				delete player.storage.jiguanyuan;
+			}
+		},
 		_qinglongzhigui:{
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -3649,7 +3667,7 @@ card.swd={
 		jiguanfeng:'机关蜂',
 		jiguanfeng_info:'出牌阶段对一名其他角色使用，目标需打出一张闪，否则受到一点伤害，然后与你各流失一点体力',
 		jiguanyuan:'机关鸢',
-		jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张其它牌交给该角色，然后摸一张牌',
+		jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张其它牌置于一名其他角色的武将牌上，然后摸一张牌；该角色于下一回合结束时获得武将牌上的牌',
 		jiguantong:'机关火筒',
 		jiguantong_ab:'火筒',
 		jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点火焰伤害；若没有人因此受到伤害，使用者摸一张牌',

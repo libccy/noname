@@ -297,10 +297,22 @@ mode.tafang={
 				_status.tafangend.push(tafangdes.toString());
 			}
 		}
-        _status.gameStarted=true;
+        event.trigger('gameStart');
 		game.phaseLoopTafang();
 	},
 	element:{
+		content:{
+			chessMechRemove:function(){
+				game.treasures.remove(player);
+				setTimeout(function(){
+					player.delete();
+				},500);
+				delete lib.posmap[player.dataset.position];
+				game.addVideo('deleteChessPlayer',player);
+				game.addObstacle(player.dataset.position);
+				game.log(get.translation(player)+'使用期限已到');
+			}
+		},
 		player:{
 			dieAfter:function(source){
 				var player=this;
@@ -386,7 +398,7 @@ mode.tafang={
 				var difficulty=parseInt(get.config('tafang_difficulty'));
 				for(var i=0;i<map.bufang.length;i++){
 					var button=map.bufang[i];
-					button.node.name.style.top='8px';
+					// button.node.name.style.top='8px';
 					button.node.intro.classList.add('showintro');
 					button.node.intro.classList.add('tafang');
 					if(button.link=='chess_mech_nengliangqiu'||
@@ -612,7 +624,7 @@ mode.tafang={
 				}
 				if(event.chooseObstacle){
 					game.removeObstacle(event.obstacle.dataset.position);
-					game.addChessPlayer(event.currentBufang,'treasure',0,event.obstacle.dataset.position).life=3;
+					var mech=game.addChessPlayer(event.currentBufang,'treasure',0,event.obstacle.dataset.position);
 					event.chooseObstacle=false;
 					event.goto(2);
 				}
@@ -791,15 +803,13 @@ mode.tafang={
 						}
 						game.delay();
 					}
-					if(mech.life--<=0){
-						game.treasures.remove(mech);
-						setTimeout(function(){
-							mech.delete();
-						},500);
-						delete lib.posmap[mech.dataset.position];
-						game.addVideo('deleteChessPlayer',mech);
-						game.addObstacle(mech.dataset.position);
-						game.log(get.translation(mech)+'使用期限已到');
+					if(--mech.hp<=0){
+						var next=game.createEvent('chessMechRemove');
+						next.player=mech;
+						next.setContent('chessMechRemove');
+					}
+					else{
+						mech.update();
 					}
 					event.redo();
 				}
@@ -983,6 +993,7 @@ mode.tafang={
 					game.log('小型陷阱发动');
 					var target=list.randomGet();
 					target.turnOver();
+					game.logv(player,'chess_mech_weixingxianjing_skill',[target]).node.text.style.display='none';
 					player.line(target,'green');
 				}
 			}
@@ -1019,6 +1030,7 @@ mode.tafang={
 				}
 				if(list1.length||list2.length){
 					game.log('能量球发动');
+					game.logv(player,'chess_mech_nengliangqiu_skill',list1.concat(list2)).node.text.style.display='none';
 				}
 			}
 		},
@@ -1041,6 +1053,7 @@ mode.tafang={
 				if(list.length){
 					game.log('木桶发动');
 					var targets=list.randomGets(1);
+					game.logv(player,'chess_mech_mutong_skill',targets).node.text.style.display='none';
 					player.line(targets,'green');
 					for(var i=0;i<targets.length;i++){
 						targets[i].damage('nosource');
@@ -1069,6 +1082,7 @@ mode.tafang={
 				if(list.length){
 					game.log('光明泉发动');
 					player.line(list,'green');
+					game.logv(player,'chess_mech_guangmingquan_skill',list.slice(0)).node.text.style.display='none';
 					while(list.length){
 						list.shift().recover();
 					}
@@ -1095,6 +1109,7 @@ mode.tafang={
 				if(list.length){
 					game.log('机关人发动');
 					player.line(list,'green');
+					game.logv(player,'chess_mech_jiguanren_skill',list.slice(0)).node.text.style.display='none';
 					event.list=list;
 				}
 				else{
@@ -1136,6 +1151,7 @@ mode.tafang={
 					if(he.length){
 						target.discard(he.randomGet());
 					}
+					game.logv(player,'chess_mech_gongchengche_skill',[target]).node.text.style.display='none';
 				}
 			}
 		},
@@ -1172,12 +1188,12 @@ mode.tafang={
 	},
 	characterPack:{
 		mode_tafang:{
-			chess_mech_guangmingquan:['','',0,['chess_mech_guangmingquan_skill'],['boss']],
-			chess_mech_nengliangqiu:['','',0,['chess_mech_nengliangqiu_skill'],['boss']],
-			chess_mech_jiguanren:['','',0,['chess_mech_jiguanren_skill'],['boss']],
-			chess_mech_weixingxianjing:['','',0,['chess_mech_weixingxianjing_skill'],['boss']],
-			chess_mech_mutong:['','',0,['chess_mech_mutong_skill'],['boss']],
-			chess_mech_gongchengche:['','',0,['chess_mech_gongchengche_skill'],['boss']],
+			chess_mech_guangmingquan:['','',3,['chess_mech_guangmingquan_skill'],['boss']],
+			chess_mech_nengliangqiu:['','',3,['chess_mech_nengliangqiu_skill'],['boss']],
+			chess_mech_jiguanren:['','',3,['chess_mech_jiguanren_skill'],['boss']],
+			chess_mech_weixingxianjing:['','',3,['chess_mech_weixingxianjing_skill'],['boss']],
+			chess_mech_mutong:['','',3,['chess_mech_mutong_skill'],['boss']],
+			chess_mech_gongchengche:['','',3,['chess_mech_gongchengche_skill'],['boss']],
 		}
 	},
 	cardPack:{

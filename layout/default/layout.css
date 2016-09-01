@@ -1206,6 +1206,10 @@ margin-bottom: 5px;
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(31, 82, 131, 1);
 }
+.treasure>.hp>div:not(.lost){
+	background: rgba(63, 119, 173,1) !important;
+	border: 1px solid rgba(31, 82, 131, 1) !important;
+}
 .hp.actcount>div.overflow:not(.lost){
 	background: rgb(154, 154, 154);
 	border: 1px solid rgb(109, 109, 109);

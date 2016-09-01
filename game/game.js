@@ -4284,6 +4284,7 @@
 					var splash=ui.create.div('#splash',document.body);
                     if(lib.config.touchscreen){
                         splash.classList.add('touch');
+                        lib.setScroll(splash);
                     }
 					for(var i=0;i<lib.config.all.mode.length;i++){
 						var node=ui.create.div('.hidden',splash,clickNode);
@@ -5633,7 +5634,7 @@
 						else if(ai.basic.chooseCard(event.ai1)){
 							if(ai.basic.chooseTarget(event.ai2)){
 								ui.click.ok();
-								_status.event.aiexclude.length=0;
+                                event.aiexcludeclear=true;
 							}
 							else{
 								if(!event.norestore){
@@ -5709,19 +5710,15 @@
                         delete event.buttoned;
                     }
                     "step 4"
+                    if(event.aiexcludeclear){
+                        delete event.aiexcludeclear;
+                        event.aiexclude.length=0;
+                    }
                     delete _status.noclearcountdown;
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
 					}
 					if(event.result&&event.result.bool&&!game.online&&!event.nouse){
-                        // if(event.logSkill){
-    					// 	if(typeof event.logSkill=='string'){
-    					// 		player.logSkill(event.logSkill);
-    					// 	}
-    					// 	else if(Array.isArray(event.logSkill)){
-    					// 		player.logSkill.apply(player,event.logSkill);
-    					// 	}
-    					// }
                         player.useResult(event.result,event);
 					}
                     else if(event._sendskill){
@@ -10823,6 +10820,10 @@
 								get.itemtype(this.storage[skill])=='card'){
 									this.markSkill(skill,null,this.storage[skill]);
 							}
+                            else if(info.mark=='card'&&
+								get.itemtype(this.storage[skill])=='cards'){
+									this.markSkill(skill,null,this.storage[skill][0]);
+							}
 							else if(info.mark=='image'){
 									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]));
 							}
@@ -11046,6 +11047,7 @@
                         exclude.push(arguments[i]);
                     }
 					for(i=0;i<this.skills.length;i++){
+                        if(lib.skill[this.skills[i]].temp) continue;
 						if(!exclude.contains(this.skills[i])){
                             list.push(this.skills[i]);
 						}
@@ -12919,6 +12921,13 @@
                     }
                     return this;
                 },
+                getLogv:function(){
+                    for(var i=1;i<=3;i++){
+                        var event=this.getParent(i);
+                        if(event&&event.logvid) return event.logvid;
+                    }
+                    return null;
+                },
                 send:function(){
                     this.player.send(function(name,args,set,event,skills){
                         game.me.applySkills(skills);
@@ -13258,6 +13267,15 @@
 					ui.update();
 					return item;
 				},
+                addText:function(str,center){
+                    if(center!==false){
+                        this.add('<div class="text center">'+str+'</div>');
+                    }
+                    else{
+                        this.add('<div class="text">'+str+'</div>');
+                    }
+                    return this;
+                },
 				addSmall:function(item,noclick){
 					return this.add(item,noclick,true);
 				},
@@ -14087,9 +14105,11 @@
 				},
 				forced:true,
 				popup:false,
+                logv:false,
 				content:function(){
 					"step 0"
 					player.link();
+                    event.logvid=trigger.getLogv();
 					"step 1"
 					var players=game.players.slice(0);
 					lib.tempSortSeat=player;
@@ -19487,19 +19507,7 @@
                 game.log(str);
             },str);
             if(!_status.video&&!game.online){
-                var logvid=_status.event.getParent().logvid;
-                if(!logvid){
-                    logvid=_status.event.getParent(2);
-                    if(logvid){
-                        logvid=logvid.logvid;
-                    }
-                }
-                if(!logvid){
-                    logvid=_status.event.getParent(3);
-                    if(logvid){
-                        logvid=logvid.logvid;
-                    }
-                }
+                var logvid=_status.event.getLogv();
                 if(logvid){
                     game.logv(logvid,'<div class="text center">'+str+'</div>');
                 }
@@ -19534,6 +19542,7 @@
 		},
         logv:function(player,card,targets,event,forced,logvid){
             var node=ui.create.div();
+            node.node={};
             logvid=logvid||get.id();
             if(!player){
                 player=_status.event.getParent().logvid;
@@ -19565,6 +19574,7 @@
                 else{
                     return;
                 }
+                node.node.avatar=avatar;
                 avatar.style.transform='';
                 avatar.className='avatar';
                 if(card=='die'){
@@ -19576,7 +19586,8 @@
                     avatar.style.opacity=0.6;
                 }
                 else{
-                    ui.create.div('',get.translation(card,'skill'),avatar).dataset.nature='water';
+                    node.node.text=ui.create.div('',get.translation(card,'skill'),avatar);
+                    node.node.text.dataset.nature='water';
                     node.skill=card;
                 }
                 node.appendChild(avatar);
@@ -19598,6 +19609,7 @@
                         return;
                     }
                     avatar.style.transform='';
+                    node.node.avatar2=avatar;
                     avatar.classList.add('avatar2');
                     node.appendChild(avatar);
                 }
@@ -19641,6 +19653,7 @@
                 else{
                     return;
                 }
+                node.node.avatar=avatar;
                 avatar.style.transform='';
                 avatar.classList.add('avatar2');
                 node.appendChild(avatar);
@@ -19672,6 +19685,7 @@
                 event=event||_status.event;
                 event.logvid=node.logvid;
             }
+            return node;
         },
 		putDB:function(type,id,item,callback){
 			if(!lib.db) return item;
@@ -28936,15 +28950,17 @@
 							}
 							if(node._hoverfunc&&!node._nopup){
 								var dialog=node._hoverfunc.call(node,e);
-								dialog.classList.add('popped');
-								ui.window.appendChild(dialog);
-								lib.placePoppedDialog(dialog,e);
-								if(node._hoverwidth){
-									dialog.style.width=node._hoverwidth+'px';
-									dialog._hovercustomed=true;
-								}
-								node._mouseenterdialog=dialog;
-								node._mouseentercreated=true;
+                                if(dialog){
+                                    dialog.classList.add('popped');
+    								ui.window.appendChild(dialog);
+    								lib.placePoppedDialog(dialog,e);
+    								if(node._hoverwidth){
+    									dialog.style.width=node._hoverwidth+'px';
+    									dialog._hovercustomed=true;
+    								}
+    								node._mouseenterdialog=dialog;
+    								node._mouseentercreated=true;
+                                }
 							}
 						},hoveration);
 					}
@@ -29178,7 +29194,7 @@
 			},
 			hoverplayer:function(e){
 				var node=get.nodeintro(this,true);
-				node.style.zIndex=21;
+                if(node) node.style.zIndex=21;
 				return node;
 			},
 			longpressdown:function(e){
@@ -29795,19 +29811,6 @@
 					event.custom.add.confirm(true);
 				}
 				game.resume();
-			},
-			oldintro:function(e){
-				if(_status.dragged) return;
-				_status.clicked=true;
-				if(this.classList.contains('player')&&!this.name){
-					return;
-				}
-				var i,translation,intro,str;
-				ui.click.intro2.call(this);
-				game.pause2();
-				ui.control.hide();
-				ui.intro=get.nodeintro(this).open();
-				ui.intro.source=this;
 			},
 			intro:function(e){
 				if(_status.dragged) return;
@@ -31892,7 +31895,7 @@
 			}
 			var i,translation,intro,str;
 			if(typeof node._customintro=='function'){
-				node._customintro(uiintro);
+				if(node._customintro(uiintro)===false) return;
 			}
 			else if(Array.isArray(node._customintro)){
 				var caption=node._customintro[0];
@@ -31914,8 +31917,11 @@
 				uiintro.add(capt);
 
                 if(node.isUnderControl()){
-                    uiintro.add('<div class="text center">手牌</div>');
-                    uiintro.addSmall(node.get('h'));
+                    var hs=node.get('h');
+                    if(hs.length){
+                        uiintro.add('<div class="text center">手牌</div>');
+                        uiintro.addSmall(node.get('h'));
+                    }
                 }
 
 				var skills=node.get('s',false,false);
@@ -31984,7 +31990,7 @@
                         }
                     }
                 }
-                if(lib.config.show_favourite&&lib.character[node.name]&&get.mode()!='story'){
+                if(lib.config.show_favourite&&lib.character[node.name]&&get.mode()!='story'&&!node.isMin()&&game.players.contains(node)){
                     var addFavourite=ui.create.div('.text.center');
                     addFavourite.link=node.link;
                     if(lib.config.favouriteCharacter.contains(node.name)){
