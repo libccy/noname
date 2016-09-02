@@ -2768,18 +2768,18 @@
 						clear:true,
 						frequent:true,
 					},
-					chess_treasure:{
-						name:'战场机关',
-						init:'0',
-						frequent:true,
-						item:{
-							'0':'关闭',
-							'0.1':'较少出现',
-							'0.2':'偶尔出现',
-							'0.333':'时常出现',
-							'0.5':'频繁出现',
-						}
-					},
+					// chess_treasure:{
+					// 	name:'战场机关',
+					// 	init:'0',
+					// 	frequent:true,
+					// 	item:{
+					// 		'0':'关闭',
+					// 		'0.1':'较少出现',
+					// 		'0.2':'偶尔出现',
+					// 		'0.333':'时常出现',
+					// 		'0.5':'频繁出现',
+					// 	}
+					// },
 					chess_obstacle:{
 						name:'随机路障',
 						init:'0.2',
@@ -8283,7 +8283,6 @@
 					}
 					else{
 						this.node.avatar.setBackground(character,'character');
-
 						if(info[4].contains('minskin')){
 							this.classList.add('minskin');
 						}
@@ -12684,6 +12683,9 @@
                                 this.setBackgroundDB(img);
                             }
 						}
+                        else if(lib.card[bg].image){
+                            this.setBackground(lib.card[bg].image);
+                        }
 						else{
 							this.setBackground('card/'+bg);
 						}
@@ -32000,7 +32002,8 @@
                         }
                     }
                 }
-                if(lib.config.show_favourite&&lib.character[node.name]&&get.mode()!='story'&&!node.isMin()&&game.players.contains(node)){
+                var modepack=lib.characterPack['mode_'+get.mode()];
+                if(lib.config.show_favourite&&lib.character[node.name]&&game.players.contains(node)&&(!modepack||!modepack[node.name])){
                     var addFavourite=ui.create.div('.text.center');
                     addFavourite.link=node.link;
                     if(lib.config.favouriteCharacter.contains(node.name)){
@@ -32246,7 +32249,8 @@
 						uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 					}
 				}
-                if((node.parentNode.classList.contains('menu-buttons')||lib.config.show_favourite)&&lib.character[node.link]&&get.mode()!='story'){
+                var modepack=lib.characterPack['mode_'+get.mode()];
+                if((node.parentNode.classList.contains('menu-buttons')||lib.config.show_favourite)&&lib.character[node.link]&&(!modepack||!modepack[node.link])){
                     var addFavourite=ui.create.div('.text.center');
                     addFavourite.link=node.link;
                     addFavourite.style.marginBottom='15px';
@@ -32930,14 +32934,24 @@
 			ext=ext||'.jpg';
 			subfolder=subfolder||'default'
 			if(type){
-				var dbimage=null,extimage=null;
-				if(type=='character'&&lib.character[name]&&lib.character[name][4]){
-					for(var i=0;i<lib.character[name][4].length;i++){
-                        if(lib.character[name][4][i].indexOf('ext:')==0){
-                            extimage=lib.character[name][4][i];break;
+				var dbimage=null,extimage=null,modeimage=null;
+                var nameinfo;
+                var mode=get.mode();
+                if(type=='character'){
+                    if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
+                        modeimage=true;
+                    }
+                    else if(lib.character[name]){
+                        nameinfo=lib.character[name];
+                    }
+                }
+				if(!modeimage&&nameinfo&&nameinfo[4]){
+					for(var i=0;i<nameinfo[4].length;i++){
+                        if(nameinfo[4][i].indexOf('ext:')==0){
+                            extimage=nameinfo[4][i];break;
                         }
-						else if(lib.character[name][4][i].indexOf('db:')==0){
-							dbimage=lib.character[name][4][i];break;
+						else if(nameinfo[4][i].indexOf('db:')==0){
+							dbimage=nameinfo[4][i];break;
 						}
 					}
 				}
@@ -32948,6 +32962,9 @@
 					this.setBackgroundDB(dbimage.slice(3));
 					return this;
 				}
+                else if(modeimage){
+                    src='image/mode/'+get.mode()+'/character/'+name+ext;
+                }
 				else if(type=='character'&&lib.customCharacters.contains(name)){
 					src="";
 					var node=this;

@@ -50,7 +50,7 @@ mode.tafang={
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 		lib.mechlist=[];
         for(var i in lib.characterPack.mode_tafang){
-            if(i.indexOf('chess_mech_')==0){
+            if(i.indexOf('tafang_mech_')==0){
                 lib.mechlist.push(i);
             }
             lib.character[i]=lib.characterPack.mode_tafang[i];
@@ -274,7 +274,7 @@ mode.tafang={
 		var list=[];
 		for(i in lib.character){
 			if(i.indexOf('treasure_')==0) continue;
-			if(i.indexOf('chess_mech_')==0) continue;
+			if(i.indexOf('tafang_mech_')==0) continue;
 			if(lib.character[i][4].contains('minskin')) continue;
 			if(lib.config.forbidchess.contains(i)) continue;
 			if(lib.character[i][4].contains('boss')) continue;
@@ -401,9 +401,9 @@ mode.tafang={
 					// button.node.name.style.top='8px';
 					button.node.intro.classList.add('showintro');
 					button.node.intro.classList.add('tafang');
-					if(button.link=='chess_mech_nengliangqiu'||
-						button.link=='chess_mech_guangmingquan'||
-						button.link=='chess_mech_jiguanren'){
+					if(button.link=='tafang_mech_nengliangqiu'||
+						button.link=='tafang_mech_guangmingquan'||
+						button.link=='tafang_mech_jiguanren'){
 						button.count=difficulty+1;
 						button.node.intro.innerHTML=get.cnNumber(button.count,true);
 					}
@@ -971,7 +971,7 @@ mode.tafang={
         },
 	},
 	skill:{
-		chess_mech_weixingxianjing_skill:{
+		tafang_mech_weixingxianjing_skill:{
 			filter:function(player){
 				for(var i=0;i<_status.enemies.length;i++){
 					if(!_status.enemies[i].isTurnedOver()&&
@@ -993,12 +993,12 @@ mode.tafang={
 					game.log('小型陷阱发动');
 					var target=list.randomGet();
 					target.turnOver();
-					game.logv(player,'chess_mech_weixingxianjing_skill',[target]).node.text.style.display='none';
+					game.logv(player,'tafang_mech_weixingxianjing_skill',[target]).node.text.style.display='none';
 					player.line(target,'green');
 				}
 			}
 		},
-		chess_mech_nengliangqiu_skill:{
+		tafang_mech_nengliangqiu_skill:{
 			filter:function(player){
 				for(var i=0;i<_status.friends.length;i++){
 					if(get.chessDistance(player,_status.friends[i])<=3){
@@ -1030,11 +1030,11 @@ mode.tafang={
 				}
 				if(list1.length||list2.length){
 					game.log('能量球发动');
-					game.logv(player,'chess_mech_nengliangqiu_skill',list1.concat(list2)).node.text.style.display='none';
+					game.logv(player,'tafang_mech_nengliangqiu_skill',list1.concat(list2)).node.text.style.display='none';
 				}
 			}
 		},
-		chess_mech_mutong_skill:{
+		tafang_mech_mutong_skill:{
 			filter:function(player){
 				for(var i=0;i<_status.enemies.length;i++){
 					if(get.chessDistance(player,_status.enemies[i])<=3){
@@ -1053,7 +1053,7 @@ mode.tafang={
 				if(list.length){
 					game.log('木桶发动');
 					var targets=list.randomGets(1);
-					game.logv(player,'chess_mech_mutong_skill',targets).node.text.style.display='none';
+					game.logv(player,'tafang_mech_mutong_skill',targets).node.text.style.display='none';
 					player.line(targets,'green');
 					for(var i=0;i<targets.length;i++){
 						targets[i].damage('nosource');
@@ -1061,7 +1061,7 @@ mode.tafang={
 				}
 			}
 		},
-		chess_mech_guangmingquan_skill:{
+		tafang_mech_guangmingquan_skill:{
 			filter:function(player){
 				for(var i=0;i<_status.friends.length;i++){
 					if(_status.friends[i].hp<_status.friends[i].maxHp&&
@@ -1082,14 +1082,14 @@ mode.tafang={
 				if(list.length){
 					game.log('光明泉发动');
 					player.line(list,'green');
-					game.logv(player,'chess_mech_guangmingquan_skill',list.slice(0)).node.text.style.display='none';
+					game.logv(player,'tafang_mech_guangmingquan_skill',list.slice(0)).node.text.style.display='none';
 					while(list.length){
 						list.shift().recover();
 					}
 				}
 			}
 		},
-		chess_mech_jiguanren_skill:{
+		tafang_mech_jiguanren_skill:{
 			filter:function(player){
 				for(var i=0;i<_status.enemies.length;i++){
 					if(get.chessDistance(player,_status.enemies[i])<=3){
@@ -1109,7 +1109,7 @@ mode.tafang={
 				if(list.length){
 					game.log('机关人发动');
 					player.line(list,'green');
-					game.logv(player,'chess_mech_jiguanren_skill',list.slice(0)).node.text.style.display='none';
+					game.logv(player,'tafang_mech_jiguanren_skill',list.slice(0)).node.text.style.display='none';
 					event.list=list;
 				}
 				else{
@@ -1126,7 +1126,7 @@ mode.tafang={
 				}
 			}
 		},
-		chess_mech_gongchengche_skill:{
+		tafang_mech_gongchengche_skill:{
 			filter:function(player){
 				for(var i=0;i<_status.enemies.length;i++){
 					if(get.chessDistance(player,_status.enemies[i])<=2){
@@ -1151,7 +1151,7 @@ mode.tafang={
 					if(he.length){
 						target.discard(he.randomGet());
 					}
-					game.logv(player,'chess_mech_gongchengche_skill',[target]).node.text.style.display='none';
+					game.logv(player,'tafang_mech_gongchengche_skill',[target]).node.text.style.display='none';
 				}
 			}
 		},
@@ -1167,33 +1167,47 @@ mode.tafang={
 		mode_tafang_character_config:'塔防模式',
 		mode_tafang_card_config:'塔防模式',
 
-		chess_mech_weixingxianjing:'小型陷阱',
-		chess_mech_weixingxianjing_skill:'捕猎',
-		chess_mech_weixingxianjing_skill_info:'每一轮令距离你2格以内的一名随机敌人翻面',
-		chess_mech_mutong:'木桶',
-		chess_mech_mutong_skill:'飞滚',
-		chess_mech_mutong_skill_info:'每一轮对距离3格以内的一名随机敌人造成一点伤害',
-		chess_mech_nengliangqiu:'能量球',
-		chess_mech_nengliangqiu_skill:'充能',
-		chess_mech_nengliangqiu_skill_info:'每一轮令距离3格以内的所有友方角色摸1张牌，距离1以内改为摸2张',
-		chess_mech_jiguanren:'机关人',
-		chess_mech_jiguanren_skill:'掠夺',
-		chess_mech_jiguanren_skill_info:'每一轮弃置3格以内的所有敌方角色各1~2张牌',
-		chess_mech_gongchengche:'攻城车',
-		chess_mech_gongchengche_skill:'攻坚',
-		chess_mech_gongchengche_skill_info:'每一轮对距离2格以内的一名随机敌方角色造成1点火焰伤害，并随机弃置其一张牌',
-		chess_mech_guangmingquan:'光明泉',
-		chess_mech_guangmingquan_skill:'圣疗',
-		chess_mech_guangmingquan_skill_info:'每一轮令距离2格以内的所有友方角色各回复一点体力',
+		tafang_mech_weixingxianjing:'小型陷阱',
+		tafang_mech_weixingxianjing_skill:'捕猎',
+		tafang_mech_weixingxianjing_skill_info:'每一轮令距离你2格以内的一名随机敌人翻面',
+		tafang_mech_mutong:'木桶',
+		tafang_mech_mutong_skill:'飞滚',
+		tafang_mech_mutong_skill_info:'每一轮对距离3格以内的一名随机敌人造成一点伤害',
+		tafang_mech_nengliangqiu:'能量球',
+		tafang_mech_nengliangqiu_skill:'充能',
+		tafang_mech_nengliangqiu_skill_info:'每一轮令距离3格以内的所有友方角色摸1张牌，距离1以内改为摸2张',
+		tafang_mech_jiguanren:'机关人',
+		tafang_mech_jiguanren_skill:'掠夺',
+		tafang_mech_jiguanren_skill_info:'每一轮弃置3格以内的所有敌方角色各1~2张牌',
+		tafang_mech_gongchengche:'攻城车',
+		tafang_mech_gongchengche_skill:'攻坚',
+		tafang_mech_gongchengche_skill_info:'每一轮对距离2格以内的一名随机敌方角色造成1点火焰伤害，并随机弃置其一张牌',
+		tafang_mech_guangmingquan:'光明泉',
+		tafang_mech_guangmingquan_skill:'圣疗',
+		tafang_mech_guangmingquan_skill_info:'每一轮令距离2格以内的所有友方角色各回复一点体力',
+
+		tafang_mech_dubiaoxianjing:'毒镖陷阱',
+		tafang_mech_jiqishi:'集气石',
+		tafang_mech_shenmidiaoxiang:'神秘雕像',
+		tafang_mech_shenpanxianjing:'审判之刃',
+		tafang_mech_shiyuansu:'石元素',
+		tafang_mech_wuyashenxiang:'乌鸦神像',
 	},
 	characterPack:{
 		mode_tafang:{
-			chess_mech_guangmingquan:['','',3,['chess_mech_guangmingquan_skill'],['boss']],
-			chess_mech_nengliangqiu:['','',3,['chess_mech_nengliangqiu_skill'],['boss']],
-			chess_mech_jiguanren:['','',3,['chess_mech_jiguanren_skill'],['boss']],
-			chess_mech_weixingxianjing:['','',3,['chess_mech_weixingxianjing_skill'],['boss']],
-			chess_mech_mutong:['','',3,['chess_mech_mutong_skill'],['boss']],
-			chess_mech_gongchengche:['','',3,['chess_mech_gongchengche_skill'],['boss']],
+			tafang_mech_dubiaoxianjing:['','',4,[],['boss']],
+			tafang_mech_jiqishi:['','',4,[],['boss']],
+			tafang_mech_shenmidiaoxiang:['','',4,[],['boss']],
+			tafang_mech_shenpanxianjing:['','',4,[],['boss']],
+			tafang_mech_shiyuansu:['','',4,[],['boss']],
+			tafang_mech_wuyashenxiang:['','',4,[],['boss']],
+
+			tafang_mech_guangmingquan:['','',3,['tafang_mech_guangmingquan_skill'],['boss']],
+			tafang_mech_nengliangqiu:['','',3,['tafang_mech_nengliangqiu_skill'],['boss']],
+			tafang_mech_jiguanren:['','',3,['tafang_mech_jiguanren_skill'],['boss']],
+			tafang_mech_weixingxianjing:['','',3,['tafang_mech_weixingxianjing_skill'],['boss']],
+			tafang_mech_mutong:['','',3,['tafang_mech_mutong_skill'],['boss']],
+			tafang_mech_gongchengche:['','',3,['tafang_mech_gongchengche_skill'],['boss']],
 		}
 	},
 	cardPack:{

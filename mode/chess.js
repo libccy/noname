@@ -5455,13 +5455,6 @@ mode.chess={
 	},
 	characterPack:{
 		mode_chess:{
-			treasure_dubiaoxianjing:['','',0,['dubiaoxianjing'],['boss']],
-			treasure_jiqishi:['','',0,['jiqishi'],['boss']],
-			treasure_shenmidiaoxiang:['','',0,['shenmidiaoxiang'],['boss']],
-			treasure_shenpanxianjing:['','',0,['shenpanxianjing'],['boss']],
-			treasure_shiyuansu:['','',0,['shiyuansu'],['boss']],
-			treasure_wuyashenxiang:['','',0,['wuyashenxiang'],['boss']],
-
 			leader_caocao:['male','wei',4,['leader_xiaoxiong']],
 			leader_liubei:['male','shu',4,['leader_renyi']],
 			leader_sunquan:['male','wu',4,['leader_mouduan']],

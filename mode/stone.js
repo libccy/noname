@@ -589,13 +589,11 @@ mode.stone={
 		},
 		stonecharacter:{
 			type:'stonecharacter',
-			color:'white',
-			opacity:1,
+			fullimage:true,
 			enable:function(event,player){
 				return player.canAddFellow();
 			},
 			chongzhu:true,
-			textShadow:'black 0 0 2px',
 			notarget:true,
 			content:function(){
 				"step 0"
@@ -1258,7 +1256,7 @@ mode.stone={
 			stone_aolajier:['male','qun',4,['stone_chongfeng','shaman_fengnu','paladin_hudun','chaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
 			stone_andongni:['male','qun',4,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
 			stone_jialakesi:['male','qun',5,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
-			stone_jialakesix:['male','qun',5,['stone_lianyu'],['stonehidden','stonespecial']],
+			stone_jialakesix:['male','qun',5,['stone_lianyu'],['modeimage','stonehidden','stonespecial']],
 			stone_kelushi:['male','qun',5,['stone_chongfeng'],['minskin','stone','stonehidden','stonelegend_hunter'],[6,5]],
 			stone_geluomashi:['male','qun',4,['stone_chongfeng','stone_jinu'],['minskin','stone','stonehidden','stonelegend_warrior'],[6,4]],
 			stone_aidewen:['male','qun',3,['stone_lianji'],['minskin','stone','stonehidden','stonelegend_rogue'],[6,3]],
@@ -1339,7 +1337,7 @@ mode.stone={
 				lib.character[i][3].add('stonedraw');
 				name=i+'_stonecharacter';
 				lib.card[name]={
-					image:'character/'+i,
+					image:'mode/stone/character/'+i,
 					stoneact:lib.character[i][5][0],
 					career:lib.character[i][5][2]||null
 				};
