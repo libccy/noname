@@ -1067,7 +1067,7 @@ mode.stone={
 			'spell_xianzuzhihun','spell_xianzuzhaohuan','spell_fengnu','spell_shihuawuqi','spell_xianzuzhishi','spell_rongyanbaolie',
 			'spell_laojiuhuoba','spell_chirehuoba','spell_aoshufeidan','spell_canying','spell_yanbaoshu','spell_hanbingpingzhang','spell_jingxiang',
 			'spell_mengun','spell_jipao','spell_beici','spell_weijisifu','spell_anzhongpohuai','spell_piaoqie',
-			'spell_conglinzhihun','spell_heiandiyu','spell_fugen','spell_xingchenzhuiluo','spell_fengnu','spell_ziyang',
+			'spell_conglinzhihun','spell_heiandiyu','spell_fugen','spell_xingchenzhuiluo','spell_fennu','spell_ziyang',
 			'spell_shalumingling','spell_tianjiangzhuqun','spell_tanxianmao','spell_dubiao','spell_qiangfengsheji','spell_zhuizongshu',
 			'spell_zhenyanshu','spell_enzeshu','spell_anyingxingtai','spell_kuaisuzhiliao','spell_kongxinshu','spell_xinlinghanbao',
 			'spell_jinyingduijue','spell_zhihuizhufu','spell_shenshengfennu','spell_yongshizhufu','spell_shenpan','spell_zhengqianghaosheng',

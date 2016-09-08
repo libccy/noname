@@ -37,13 +37,13 @@ mode.chess={
 				}
 			}
 		}
-		if(get.config('chess_card')){
-			lib.card.list=lib.card.list.concat(lib.chess_cardlist);
-			if(parseFloat(get.config('chess_obstacle'))>0){
-				lib.card.list=lib.card.list.concat(lib.chess_obstaclelist);
-				delete lib.chess_obstaclelist
-			}
-		}
+		// if(get.config('chess_card')){
+		// 	lib.card.list=lib.card.list.concat(lib.chess_cardlist);
+		// 	if(parseFloat(get.config('chess_obstacle'))>0){
+		// 		lib.card.list=lib.card.list.concat(lib.chess_obstaclelist);
+		// 		delete lib.chess_obstaclelist
+		// 	}
+		// }
 		ui.create.cards();
 		game.finishCards();
 		ui.chessContainer=ui.create.div('#chess-container',ui.arena);
@@ -5438,19 +5438,19 @@ mode.chess={
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'mode/chess/leader_easy'
+			image:'mode/chess/difficulty/leader_easy'
 		},
 		leader_medium:{
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'mode/chess/leader_medium'
+			image:'mode/chess/difficulty/leader_medium'
 		},
 		leader_hard:{
 			color:'white',
 			opacity:1,
 			textShadow:'black 0 0 2px',
-			image:'mode/chess/leader_hard'
+			image:'mode/chess/difficulty/leader_hard'
 		}
 	},
 	characterPack:{
@@ -5499,9 +5499,9 @@ mode.chess={
 			chess_xingtian:['male','qun',99,['boss_moyan','wushuang'],['boss','chessboss']],
 		}
 	},
-	cardPack:{
-		mode_chess:['chess_shezhang','chess_chuzhang']
-	},
+	// cardPack:{
+	// 	mode_chess:['chess_shezhang','chess_chuzhang']
+	// },
 	chess_cardlist:[],
 	chess_obstaclelist:[
 		// ['club',3,'chess_shezhang'],

@@ -727,7 +727,7 @@
 						onclick:function(bool){
                             if(lib.config.show_history=='right') ui.window.animate('rightbar2');
 							game.saveConfig('show_history',bool);
-                            if(_status.video||!_status.gameStarted) return;
+                            if(_status.video||!_status.prepareArena) return;
                             if(bool=='left'){
                                 ui.window.classList.add('leftbar');
                                 ui.window.classList.remove('rightbar');
@@ -1572,7 +1572,7 @@
 							if(this.innerHTML!='已隐藏'){
 								this.innerHTML='已隐藏';
 								game.saveConfig('hiddenModePack',['stone','chess','boss','tafang']);
-								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth','compensate']);
+								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth']);
 								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','xiake','boss','ow']);
 								var that=this;
 								setTimeout(function(){
@@ -1586,6 +1586,70 @@
 			}
 		},
         extensionMenu:{
+            cardpile:{
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			},
+    			sha:{
+    			    name:'杀',
+                    init:true,
+    			},
+                huosha:{
+                    name:'火杀',
+                    init:true,
+                },
+                leisha:{
+                    name:'雷杀',
+                    init:true,
+                },
+                shan:{
+                    name:'闪',
+                    init:true,
+                },
+                tao:{
+                    name:'桃',
+                    init:true,
+                },
+                jiu:{
+                    name:'酒',
+                    init:true,
+                },
+                wuxie:{
+                    name:'无懈可击',
+                    init:false,
+                },
+                nanman:{
+                    name:'南蛮入侵',
+                    init:false,
+                },
+                wanjian:{
+                    name:'万箭齐发',
+                    init:false,
+                },
+                guohe:{
+                    name:'过河拆桥',
+                    init:false,
+                },
+                shunshou:{
+                    name:'顺手牵羊',
+                    init:false,
+                },
+                tiesuo:{
+                    name:'铁索连环',
+                    init:false,
+                },
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
+    					lib.config.hiddenPlayPack.add('cardpile');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
             character:{
                 enable:{
     			    name:'开启',
@@ -2807,10 +2871,10 @@
 					// 	name:'守卫剑阁',
 					// 	init:true,
 					// },
-					chess_card:{
-						name:'战棋卡牌',
-						init:true,
-					},
+					// chess_card:{
+					// 	name:'战棋卡牌',
+					// 	init:true,
+					// },
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -4100,57 +4164,59 @@
 							delete lib.cardPack.mode_derivation;
 						}
 					}
-					for(i in play){
-						if(lib.config.hiddenPlayPack.contains(i)) continue;
-						if(play[i].forbid&&play[i].forbid.contains(lib.config.mode)) continue;
-						if(play[i].mode&&play[i].mode.contains(lib.config.mode)==false) continue;
-						for(j in play[i].element){
-							if(!lib.element[j]) lib.element[j]=[];
-							for(k in play[i].element[j]){
-								if(k=='init'){
-									if(!lib.element[j].inits) lib.element[j].inits=[];
-									lib.element[j].inits.push(lib.init.eval(play[i].element[j][k]));
-								}
-								else{
-									lib.element[j][k]=lib.init.eval(play[i].element[j][k]);
-								}
-							}
-						}
-						for(j in play[i].ui){
-							if(typeof play[i].ui[j]=='object'){
-								if(ui[j]==undefined) ui[j]={};
-								for(k in play[i].ui[j]){
-									ui[j][k]=lib.init.eval(play[i].ui[j][k]);
-								}
-							}
-							else{
-								ui[j]=lib.init.eval(play[i].ui[j]);
-							}
-						}
-						for(j in play[i].game){
-							game[j]=lib.init.eval(play[i].game[j]);
-						}
-						for(j in play[i].get){
-							get[j]=lib.init.eval(play[i].get[j]);
-						}
-						for(j in play[i]){
-							if(j=='mode'||j=='forbid'||j=='init'||j=='element'||
-							j=='game'||j=='get'||j=='ui'||j=='arenaReady') continue;
-							for(k in play[i][j]){
-								if(j=='translate'&&k==i){
-									// lib[j][k+'_play_config']=play[i][j][k];
-								}
-								else{
-									if(lib[j][k]!=undefined){
-										console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
-									}
-									lib[j][k]=lib.init.eval(play[i][j][k]);
-								}
-							}
-						}
-						if(typeof play[i].init=='function') (lib.init.eval(play[i].init))();
-						if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
-					}
+                    if(lib.config.mode!='connect'){
+                        for(i in play){
+    						if(lib.config.hiddenPlayPack.contains(i)) continue;
+    						if(play[i].forbid&&play[i].forbid.contains(lib.config.mode)) continue;
+    						if(play[i].mode&&play[i].mode.contains(lib.config.mode)==false) continue;
+    						for(j in play[i].element){
+    							if(!lib.element[j]) lib.element[j]=[];
+    							for(k in play[i].element[j]){
+    								if(k=='init'){
+    									if(!lib.element[j].inits) lib.element[j].inits=[];
+    									lib.element[j].inits.push(lib.init.eval(play[i].element[j][k]));
+    								}
+    								else{
+    									lib.element[j][k]=lib.init.eval(play[i].element[j][k]);
+    								}
+    							}
+    						}
+    						for(j in play[i].ui){
+    							if(typeof play[i].ui[j]=='object'){
+    								if(ui[j]==undefined) ui[j]={};
+    								for(k in play[i].ui[j]){
+    									ui[j][k]=lib.init.eval(play[i].ui[j][k]);
+    								}
+    							}
+    							else{
+    								ui[j]=lib.init.eval(play[i].ui[j]);
+    							}
+    						}
+    						for(j in play[i].game){
+    							game[j]=lib.init.eval(play[i].game[j]);
+    						}
+    						for(j in play[i].get){
+    							get[j]=lib.init.eval(play[i].get[j]);
+    						}
+    						for(j in play[i]){
+    							if(j=='mode'||j=='forbid'||j=='init'||j=='element'||
+    							j=='game'||j=='get'||j=='ui'||j=='arenaReady') continue;
+    							for(k in play[i][j]){
+    								if(j=='translate'&&k==i){
+    									// lib[j][k+'_play_config']=play[i][j][k];
+    								}
+    								else{
+    									if(lib[j][k]!=undefined){
+    										console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
+    									}
+    									lib[j][k]=lib.init.eval(play[i][j][k]);
+    								}
+    							}
+    						}
+    						if(typeof play[i].init=='function') (lib.init.eval(play[i].init))();
+    						if(typeof play[i].arenaReady=='function') lib.arenaReady.push(play[i].arenaReady);
+    					}
+                    }
 
                     lib.connectCharacterPack=[];
                     lib.connectCardPack=[];
@@ -12687,7 +12753,13 @@
                             this.setBackground(lib.card[bg].image);
                         }
 						else{
-							this.setBackground('card/'+bg);
+                            var cardPack=lib.cardPack['mode_'+get.mode()];
+                            if(Array.isArray(cardPack)&&cardPack.contains(bg)){
+                                this.setBackground('mode/'+get.mode()+'/card/'+bg);
+                            }
+							else{
+                                this.setBackground('card/'+bg);
+                            }
 						}
 					}
 					else if(lib.card[bg].image=='card'){
@@ -19417,6 +19489,7 @@
 			return arg[arg.length-1];
 		},
 		prepareArena:function(num){
+            _status.prepareArena=true;
             game.showHistory();
 			ui.create.players(num);
 			ui.create.me();

@@ -811,16 +811,25 @@ card.swd={
 		},
 		xianluhui:{
 			fullskin:true,
-			type:'trick',
+			type:'basic',
 			enable:true,
 			selectTarget:-1,
 			filterTarget:function(card,player,target){
 				return target.isDamaged();
 			},
 			content:function(){
-				target.draw(Math.min(3,target.maxHp-target.hp));
+				targets.sort(lib.sort.seat);
+				var list=[];
+				for(var i=0;i<targets.length;i++){
+					list.push(Math.min(3,targets[i].maxHp-targets[i].hp));
+				}
+				game.asyncDraw(targets,list);
 			},
+			multitarget:true,
 			ai:{
+				tag:{
+					multitarget:1,
+				},
 				basic:{
 					order:7,
 					useful:3,
@@ -3926,7 +3935,6 @@ card.swd={
 
 		// ['diamond',9,'tianxianjiu'],
 		['heart',9,'tianxianjiu'],
-		['spade',5,'jiu'],
 		['diamond',2,'tianxianjiu'],
 
 		['spade',2,'qinglonglingzhu'],

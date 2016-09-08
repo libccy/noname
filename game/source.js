@@ -1,5 +1,4 @@
 window.noname_source_list=[
-    'card/compensate.js',
     'card/extra.js',
     'card/guozhan.js',
     'card/hearth.js',
@@ -60,6 +59,7 @@ window.noname_source_list=[
     'mode/brawl.js',
     'mode/versus.js',
     'mode/connect.js',
+    'extension/cardpile/extension.js',
     'extension/character/extension.js',
     'extension/coin/extension.js',
     'extension/soldier/extension.js',

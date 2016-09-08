@@ -25,9 +25,9 @@ card.pack={
     yunchou:'运筹帷幄',
     swd:'轩辕剑',
     hearth:'炉石传说',
-    compensate:'补充卡牌',
 };
 play.pack={
+    cardpile:'牌堆补充',
     character:'技能卡牌',
     soldier:'士兵模式',
     wuxing:'五行生克',
