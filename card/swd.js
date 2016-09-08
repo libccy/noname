@@ -814,6 +814,7 @@ card.swd={
 			type:'basic',
 			enable:true,
 			selectTarget:-1,
+			multiline:true,
 			filterTarget:function(card,player,target){
 				return target.isDamaged();
 			},
