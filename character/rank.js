@@ -122,6 +122,10 @@ window.characterRank={
         'ow_heibaihe',
         'ow_maikelei',
         'ow_kuangshu',
+        'ow_tuobiang',
+        'ow_banzang',
+        'ow_laiyinhate',
+        'wanglang',
     ],
     am:[
         'pal_wangpengxu',
@@ -205,6 +209,7 @@ window.characterRank={
         'hs_brann',
         're_liubei',
         'liyan',
+        'yanbaihu',
     ],
     bp:[
         'hs_hallazeal',
@@ -327,7 +332,8 @@ window.characterRank={
         'hs_zhouzhuo',
         'hs_liadrin',
         'hs_anomalus',
-        'yanbaihu',
+        'sp_pangde',
+        'sp_jiaxu',
     ],
     b:[
         'xin_liru',

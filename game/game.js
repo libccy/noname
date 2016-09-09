@@ -4733,7 +4733,7 @@
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
-		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&!list.contains(i)&&!lib.customCharacters.contains(i)) console.log(i);
+		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)&&!lib.customCharacters.contains(i)) console.log(i);
 		        }
 		    },
 			h:function(player){
@@ -30871,19 +30871,21 @@
 			return num/list.length;
 		},
 		rank:function(name,num){
-			if(name==_status.lord) return num?8:'ap';
+            if(num==true) num=9;
+            if(typeof num!='number') num=false;
+			if(name==_status.lord) return num?Math.round(7*(num-1)/8+1):'ap';
 			var rank=lib.rank;
-			if(rank.s.contains(name)) return num?9:'s';
-			if(rank.ap.contains(name)) return num?8:'ap';
-			if(rank.a.contains(name)) return num?7:'a';
-			if(rank.am.contains(name)) return num?6:'am';
-			if(rank.bp.contains(name)) return num?5:'bp';
-			if(rank.b.contains(name)) return num?4:'b';
-			if(rank.bm.contains(name)) return num?3:'bm';
-			if(rank.c.contains(name)) return num?2:'c';
-			if(rank.d.contains(name)) return num?1:'d';
-			if(lib.customCharacters.contains(name)) return num?9:'s';
-			if(lib.characterPack.boss&&lib.characterPack.boss[name]) return num?10:'sp';
+			if(rank.s.contains(name)) return num?Math.round(8*(num-1)/8+1):'s';
+			if(rank.ap.contains(name)) return num?Math.round(7*(num-1)/8+1):'ap';
+			if(rank.a.contains(name)) return num?Math.round(6*(num-1)/8+1):'a';
+			if(rank.am.contains(name)) return num?Math.round(5*(num-1)/8+1):'am';
+			if(rank.bp.contains(name)) return num?Math.round(4*(num-1)/8+1):'bp';
+			if(rank.b.contains(name)) return num?Math.round(3*(num-1)/8+1):'b';
+			if(rank.bm.contains(name)) return num?Math.round(2*(num-1)/8+1):'bm';
+			if(rank.c.contains(name)) return num?Math.round(1*(num-1)/8+1):'c';
+			if(rank.d.contains(name)) return num?Math.round(0*(num-1)/8+1):'d';
+			if(lib.customCharacters.contains(name)) return num?Math.round(8*(num-1)/8+1):'s';
+			if(lib.characterPack.boss&&lib.characterPack.boss[name]) return num?Math.round(9*(num-1)/8+1):'sp';
 			return num?1:'x';
 		},
         targetsInfo:function(targets){

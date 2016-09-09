@@ -10,7 +10,7 @@ play.cardpile={
             },
             huosha:{
                 diamond:2,
-                hearth:3
+                heart:3
             },
             leisha:{
                 spade:5,
@@ -76,9 +76,12 @@ play.cardpile={
                     for(var j in data[i]){
                         var n=Math.round(dn*data[i][j]/num);
                         while(n--){
-                            if(i=='huosha'||i=='leisha'){
-                                lib.card.list.push([j,rand(),'sha',i.slice(0,3)]);
+                            if(i=='huosha'){
+                                lib.card.list.push([j,rand(),'sha','fire']);
                             }
+							else if(i=='leisha'){
+								lib.card.list.push([j,rand(),'sha','thunder']);
+							}
                             else{
                                 lib.card.list.push([j,rand(),i]);
                             }

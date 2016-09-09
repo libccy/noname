@@ -385,6 +385,7 @@ mode.tafang={
 			next.setContent(function(){
 				'step 0'
 				_status.turnCount++;
+				_status.remainingCount-=_status.friends.length;
 				ui.turnCount.innerHTML='回合'+get.cnNumber(_status.turnCount,true);
 				var dialog=ui.create.dialog('剩余行动点：'+(10+_status.remainingCount),'hidden');
 				dialog.style.height='260px';
@@ -393,6 +394,9 @@ mode.tafang={
 				dialog.classList.add('noupdate');
 				event.dialog=dialog;
 				var list=_status.characterList.splice(0,6);
+				list.sort(function(a,b){
+					return get.rank(a,true)-get.rank(b,true);
+				});
 				var map={};
 				map.bufang=ui.create.buttons(lib.mechlist,'character',dialog.content);
 				var difficulty=parseInt(get.config('tafang_difficulty'));
@@ -418,7 +422,7 @@ mode.tafang={
 					var button=map.zhaomu[i];
 					button.node.intro.classList.add('showintro');
 					button.node.intro.classList.add('tafang');
-					button.count=difficulty+4;
+					button.count=difficulty+get.rank(button.link,3.9)+3;
 					button.node.intro.innerHTML=get.cnNumber(button.count,true);
 					button._link='招募';
 				}
@@ -457,7 +461,7 @@ mode.tafang={
 							if(map[i][j].count>count){
 								map[i][j].classList.add('unselectable');
 							}
-							else if(i=='zhaomu'&&_status.friends.length+selectedZhaomu>=ui.chesswidth){
+							else if(i=='zhaomu'&&_status.friends.length+selectedZhaomu>=5){
 								map[i][j].classList.add('unselectable');
 							}
 							else if(i=='bufang'){
@@ -514,9 +518,8 @@ mode.tafang={
 					}
 					_status.lastTafangCommand=link;
 				}
-				event.control=ui.create.control('布防','招募','行动',function(link,node){
-					if(link=='行动'&&_status.friends.length==0) return;
-					if(link=='招募'&&_status.friends.length>=ui.chesswidth) return;
+				event.control=ui.create.control('布防','招募',function(link,node){
+					if(node.disabled) return;
 					var current=node.parentNode.querySelector('.thundertext');
 					if(current==node) return;
 					if(current){
@@ -524,16 +527,17 @@ mode.tafang={
 					}
 					update(link);
 				});
-				if(!_status.friends.length){
-					event.control.lastChild.style.opacity=0.5;
-					if(_status.lastTafangCommand=='行动'){
-						_status.lastTafangCommand='招募';
-					}
-				}
-				if(_status.friends.length>=ui.chesswidth){
+				// if(!_status.friends.length){
+				// 	event.control.lastChild.style.opacity=0.5;
+				// 	if(_status.lastTafangCommand=='行动'){
+				// 		_status.lastTafangCommand='招募';
+				// 	}
+				// }
+				if(_status.friends.length>=5){
 					event.control.childNodes[1].style.opacity=0.5;
+					event.control.childNodes[1].disabled=true;
 					if(_status.lastTafangCommand=='招募'){
-						_status.lastTafangCommand='行动';
+						_status.lastTafangCommand='布防';
 					}
 				}
 				_status.imchoosing=true;
@@ -542,24 +546,24 @@ mode.tafang={
 					var selected=dialog.querySelectorAll('.button.selected');
 					event.bufang=[];
 					event.zhaomu=[];
-					event.xingdong=[];
-					var xingdongs=[];
+					event.xingdong=_status.friends.slice(0);
+					// var xingdongs=[];
 					_status.remainingCount+=10;
 					for(var i=0;i<selected.length;i++){
 						switch(selected[i]._link){
 							case '布防':event.bufang.push(selected[i].link);break;
 							case '招募':event.zhaomu.push(selected[i].link);break;
-							case '行动':xingdongs.push(selected[i]);break;
+							// case '行动':xingdongs.push(selected[i]);break;
 						}
 						_status.remainingCount-=selected[i].count;
 					}
-					_status.remainingCount=Math.ceil(_status.remainingCount/2);
-					xingdongs.sort(function(a,b){
-						return a._clickOrder-b._clickOrder;
-					});
-					for(var i=0;i<xingdongs.length;i++){
-						event.xingdong.push(xingdongs[i].link);
-					}
+					_status.remainingCount=Math.floor(_status.remainingCount/2);
+					// xingdongs.sort(function(a,b){
+					// 	return a._clickOrder-b._clickOrder;
+					// });
+					// for(var i=0;i<xingdongs.length;i++){
+					// 	event.xingdong.push(xingdongs[i].link);
+					// }
 					game.resume();
 				};
 				event.done=ui.create.control('完成',eventdong);
@@ -580,7 +584,7 @@ mode.tafang={
 					updateSelected();
 				},50);
 				event.switchToAuto=eventdong;
-				if(!_status.auto){
+				if(!_status.auto&&10+_status.remainingCount>0){
 					game.pause();
 				}
 				else{
@@ -1195,12 +1199,12 @@ mode.tafang={
 	},
 	characterPack:{
 		mode_tafang:{
-			tafang_mech_dubiaoxianjing:['','',4,[],['boss']],
-			tafang_mech_jiqishi:['','',4,[],['boss']],
-			tafang_mech_shenmidiaoxiang:['','',4,[],['boss']],
-			tafang_mech_shenpanxianjing:['','',4,[],['boss']],
-			tafang_mech_shiyuansu:['','',4,[],['boss']],
-			tafang_mech_wuyashenxiang:['','',4,[],['boss']],
+			// tafang_mech_dubiaoxianjing:['','',4,[],['boss']],
+			// tafang_mech_jiqishi:['','',4,[],['boss']],
+			// tafang_mech_shenmidiaoxiang:['','',4,[],['boss']],
+			// tafang_mech_shenpanxianjing:['','',4,[],['boss']],
+			// tafang_mech_shiyuansu:['','',4,[],['boss']],
+			// tafang_mech_wuyashenxiang:['','',4,[],['boss']],
 
 			tafang_mech_guangmingquan:['','',3,['tafang_mech_guangmingquan_skill'],['boss']],
 			tafang_mech_nengliangqiu:['','',3,['tafang_mech_nengliangqiu_skill'],['boss']],
@@ -1217,9 +1221,9 @@ mode.tafang={
 	help:{
 		'塔防模式':
 		'<ul><li>阻上敌人到达最下方的出口，坚持到给定的回合数即获得胜利<li>'+
-		'每轮可获得10个行动点，用来布置机关、招募武将，或令武将行动。游戏难度将影响不同操作消耗的行动点数。未用完的行动点将减半（向上取整）并累积到下一轮<li>'+
+		'每轮可获得10个行动点，用来布置机关、招募武将。场上每有一个友方武将，行动点数-1。游戏难度将影响不同操作消耗的行动点数。未用完的行动点将减半（向下取整）并累积到下一轮<li>'+
 		'每一轮在最上方的一个随机位置增加一名敌人，若最上方已有角色，则将其下移一格<li>'+
-		'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募10名友方角色。<li>'+
+		'战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募5名友方角色。<li>'+
 		'敌方角色到达底部出口时游戏失败，已方角色到达底部出口，将被移出游戏',
 	},
 }

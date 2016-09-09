@@ -4095,12 +4095,7 @@ character.swd={
 				return ai.get.attitude(player,event.player)<0;
 			},
 			content:function(){
-				"step 0"
-				player.discardPlayerCard(trigger.player);
-				"step 1"
-				if(result.bool){
-					player.logSkill('guanhu',trigger.player);
-				}
+				player.discardPlayerCard(trigger.player).logSkill=['guanhu',trigger.player];
 			},
 			ai:{
 				expose:0.2
@@ -5731,7 +5726,7 @@ character.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('朱羽：是否弃置一张红色牌使其受到一点火焰伤害？','he',function(card){
+				var next=player.chooseToDiscard('朱羽：是否弃置一张红色牌使'+get.translation(trigger.player)+'受到一点火焰伤害？','he',function(card){
 					return get.color(card)=='red';
 				});
 				next.logSkill=['zhuyu',trigger.player,'fire'];
