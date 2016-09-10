@@ -483,10 +483,13 @@ character.ow={
         shanguang:{
             enable:'phaseUse',
             usable:1,
-            filterCard:true,
+            filterCard:{suit:'diamond'},
             position:'he',
+            filter:function(event,player){
+                return player.num('he',{suit:'diamond'})>0;
+            },
             filterTarget:function(card,player,target){
-                return target!=player;
+                return target!=player&&get.distance(player,target,'attack')<=1;
             },
             check:function(card){
                 return 6-ai.get.value(card);
@@ -2594,7 +2597,7 @@ character.ow={
         shihuo:'嗜火',
         shihuo_info:'锁定技，每当一名角色受到火焰伤害，你摸一张牌',
         shanguang:'闪光',
-        shanguang_info:'出牌阶段限一次，你可以弃置一张牌令一名其他角色本回合内不能使用或打出卡牌',
+        shanguang_info:'出牌阶段限一次，你可以弃置一张方片牌令攻击范围内的一名其他角色本回合内不能使用或打出卡牌',
         tiandan:'填弹',
         tiandan_info:'摸牌阶段开始时，你可以跳过出牌和弃牌阶段，然后获得若干张杀直到你的手牌数等于你的体值（最多为5）',
         shenqiang:'神枪',

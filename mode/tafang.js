@@ -51,6 +51,7 @@ mode.tafang={
 		lib.mechlist=[];
         for(var i in lib.characterPack.mode_tafang){
             if(i.indexOf('tafang_mech_')==0){
+				lib.characterPack.mode_tafang[i][3].push(i+'_skill');
                 lib.mechlist.push(i);
             }
             lib.character[i]=lib.characterPack.mode_tafang[i];
@@ -398,23 +399,19 @@ mode.tafang={
 					return get.rank(a,true)-get.rank(b,true);
 				});
 				var map={};
-				map.bufang=ui.create.buttons(lib.mechlist,'character',dialog.content);
+				var mechlist=lib.mechlist.randomGets(6);
+				mechlist.sort(function(a,b){
+					return lib.character[a][5]-lib.character[b][5];
+				});
+				map.bufang=ui.create.buttons(mechlist,'character',dialog.content);
 				var difficulty=parseInt(get.config('tafang_difficulty'));
 				for(var i=0;i<map.bufang.length;i++){
 					var button=map.bufang[i];
 					// button.node.name.style.top='8px';
 					button.node.intro.classList.add('showintro');
 					button.node.intro.classList.add('tafang');
-					if(button.link=='tafang_mech_nengliangqiu'||
-						button.link=='tafang_mech_guangmingquan'||
-						button.link=='tafang_mech_jiguanren'){
-						button.count=difficulty+1;
-						button.node.intro.innerHTML=get.cnNumber(button.count,true);
-					}
-					else{
-						button.count=difficulty+2;
-						button.node.intro.innerHTML=get.cnNumber(button.count,true);
-					}
+					button.count=difficulty+lib.character[button.link][5]-2;
+					button.node.intro.innerHTML=get.cnNumber(button.count,true);
 					button._link='布防';
 				}
 				map.zhaomu=ui.create.buttons(list,'character',dialog.content);
@@ -1191,6 +1188,8 @@ mode.tafang={
 		tafang_mech_guangmingquan_skill_info:'每一轮令距离2格以内的所有友方角色各回复一点体力',
 
 		tafang_mech_dubiaoxianjing:'毒镖陷阱',
+		tafang_mech_dubiaoxianjing_skill:'毒镖',
+		tafang_mech_dubiaoxianjing_skill_info:'每当距离2格以内的一名敌方角色',
 		tafang_mech_jiqishi:'集气石',
 		tafang_mech_shenmidiaoxiang:'神秘雕像',
 		tafang_mech_shenpanxianjing:'审判之刃',
@@ -1199,19 +1198,19 @@ mode.tafang={
 	},
 	characterPack:{
 		mode_tafang:{
-			// tafang_mech_dubiaoxianjing:['','',4,[],['boss']],
-			// tafang_mech_jiqishi:['','',4,[],['boss']],
-			// tafang_mech_shenmidiaoxiang:['','',4,[],['boss']],
-			// tafang_mech_shenpanxianjing:['','',4,[],['boss']],
-			// tafang_mech_shiyuansu:['','',4,[],['boss']],
-			// tafang_mech_wuyashenxiang:['','',4,[],['boss']],
+			// tafang_mech_dubiaoxianjing:['','',4,[],['boss'],2],
+			// tafang_mech_wuyashenxiang:['','',4,[],['boss'],2],
+			// tafang_mech_shenpanxianjing:['','',4,[],['boss'],2],
+			// tafang_mech_shenmidiaoxiang:['','',4,[],['boss'],5],
+			// tafang_mech_shiyuansu:['','',4,[],['boss'],5],
+			// tafang_mech_jiqishi:['','',4,[],['boss'],5],
 
-			tafang_mech_guangmingquan:['','',3,['tafang_mech_guangmingquan_skill'],['boss']],
-			tafang_mech_nengliangqiu:['','',3,['tafang_mech_nengliangqiu_skill'],['boss']],
-			tafang_mech_jiguanren:['','',3,['tafang_mech_jiguanren_skill'],['boss']],
-			tafang_mech_weixingxianjing:['','',3,['tafang_mech_weixingxianjing_skill'],['boss']],
-			tafang_mech_mutong:['','',3,['tafang_mech_mutong_skill'],['boss']],
-			tafang_mech_gongchengche:['','',3,['tafang_mech_gongchengche_skill'],['boss']],
+			tafang_mech_guangmingquan:['','',3,[],['boss'],3],
+			tafang_mech_nengliangqiu:['','',3,[],['boss'],3],
+			tafang_mech_jiguanren:['','',3,[],['boss'],3],
+			tafang_mech_weixingxianjing:['','',3,[],['boss'],4],
+			tafang_mech_mutong:['','',3,[],['boss'],4],
+			tafang_mech_gongchengche:['','',3,[],['boss'],4],
 		}
 	},
 	cardPack:{
