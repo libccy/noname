@@ -210,6 +210,7 @@ window.characterRank={
         're_liubei',
         'liyan',
         'yanbaihu',
+        'hs_kchromaggus',
     ],
     bp:[
         'hs_hallazeal',
@@ -228,7 +229,6 @@ window.characterRank={
         'hs_nate',
         'hs_finley',
         'hs_shifazhe',
-        'hs_kchromaggus',
         'hs_yelise',
         'hs_loatheb',
         'hs_alextrasza',

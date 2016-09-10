@@ -873,7 +873,7 @@ character.xianjian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseCardButton(player.storage.shuiyun,'是否发动【水蕴】？').ai=function(button){
+				player.chooseCardButton(player.storage.shuiyun,'是否对'+get.translation(trigger.player)+'发动【水蕴】？').ai=function(button){
 					return ai.get.attitude(player,trigger.player)>2?1:0;
 				}
 				"step 1"

@@ -2983,10 +2983,7 @@ card.swd={
 				lib.card[name].selectTarget=1;
 				lib.card[name].range={global:1};
 				var str=lib.translate[cards[0].name+'_duanzao'];
-				var str2=lib.translate[equip.name];
-				if(str2.length>2){
-					str2=str2.slice(0,2);
-				}
+				var str2=get.translation(equip.name,'skill');
 				lib.translate[name]=str+str2;
 				str2=lib.translate[equip.name+'_info']||'';
 				if(str2[str2.length-1]=='.'||str2[str2.length-1]=='。'){
@@ -3766,6 +3763,7 @@ card.swd={
 		hslingjian_yinshen:'潜行',
 		hslingjian_yinshen_info:'锁定技，你不能成为其他角色的卡牌的目标',
 		qinglonglingzhu:'青龙灵珠',
+		qinglonglingzhu_ab:'灵珠',
 		qinglonglingzhu_info:'每当你造成一次属性伤害，你可以获得对方的一张牌',
 		xingjunyan:'星君眼',
 		xingjunyan_info:'你的杀造成的伤害+1；杀对你造成的伤害+1',
