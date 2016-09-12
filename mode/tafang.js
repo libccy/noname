@@ -1190,7 +1190,7 @@ mode.tafang={
 		tafang_mech_dubiaoxianjing:'毒镖陷阱',
 		tafang_mech_dubiaoxianjing_skill:'毒镖',
 		tafang_mech_dubiaoxianjing_skill_info:'每当距离2格以内的一名敌方角色',
-		tafang_mech_jiqishi:'集气石',
+		tafang_mech_jiqishi:'集合石',
 		tafang_mech_shenmidiaoxiang:'神秘雕像',
 		tafang_mech_shenpanxianjing:'审判之刃',
 		tafang_mech_shiyuansu:'石元素',

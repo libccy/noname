@@ -12876,8 +12876,8 @@
 								this.node.range.innerHTML='范围: 1';
 							}
 							break;
-						case 'equip3':this.node.range.innerHTML='防御: 1';this.node.name2.innerHTML+='+';break;
-						case 'equip4':this.node.range.innerHTML='进攻: 1';this.node.name2.innerHTML+='-';break;
+						case 'equip3':this.node.range.innerHTML='防御: '+lib.card[card[2]].distance.globalTo;this.node.name2.innerHTML+='+';break;
+						case 'equip4':this.node.range.innerHTML='进攻: '+(-lib.card[card[2]].distance.globalFrom);this.node.name2.innerHTML+='-';break;
 					}
                     if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
                         this.cardid=get.id();

@@ -1268,7 +1268,7 @@ mode.stone={
 	careerList:['mage','shaman','druid','paladin','rogue','priest','hunter','warrior','warlock'],
 	game:{
 		reserveDead:true,
-		bannedcards:['lebu','guiyoujie','xietianzi','lingjiandai','jiguanshu','sifeizhenmian','mujiaren','fengxueren','chuansongmen'],
+		bannedcards:['lebu','guiyoujie','xietianzi','lingjiandai','jiguanshu','sifeizhenmian','fengxueren','chuansongmen'],
 		onwash:function(){
 			if(_status.mode!='deck') return;
 			var list=[];

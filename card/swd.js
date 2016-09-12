@@ -1,5 +1,121 @@
 card.swd={
 	card:{
+		mujiaren:{
+			fullskin:true,
+			enable:true,
+			type:'jiguan',
+			usable:1,
+			forceUsable:true,
+			wuxieable:true,
+			selectTarget:-1,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			content:function(){
+				'step 0'
+				var cards=player.get('h',function(card){
+					return get.type(card)!='basic';
+				});
+				if(cards.length){
+					player.lose(cards)._triggered=null;
+				}
+				event.num=1+cards.length;
+				'step 1'
+				var cards=[];
+				var list=[];
+				for(var i in lib.card){
+					if(lib.card[i].type=='jiguan') list.push(i);
+				}
+				if(list.length){
+					for(var i=0;i<event.num;i++){
+						cards.push(game.createCard(list.randomGet()));
+					}
+					player.directgain(cards);
+				}
+			},
+			ai:{
+				wuxie:function(){
+					return 0;
+				},
+				order:1,
+				result:{
+					target:1
+				}
+			}
+		},
+		zhiluxiaohu:{
+			enable:true,
+			fullskin:true,
+			type:'jiguan',
+			wuxieable:true,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			content:function(){
+				'step 0'
+				var targets=player.getEnemies();
+				if(targets.length){
+					var target=targets.randomGet();
+					target.addExpose(0.2);
+					player.useCard({name:'sha'},target);
+				}
+				'step 1'
+				player.draw();
+			},
+			ai:{
+				result:{
+					target:1
+				},
+				order:3.1
+			}
+		},
+		xuejibingbao:{
+			enable:true,
+			fullskin:true,
+			type:'basic',
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('xuejibingbao');
+			},
+			content:function(){
+				target.storage.xuejibingbao=2;
+				target.addSkill('xuejibingbao');
+			},
+			ai:{
+				order:2,
+				value:6,
+				result:{
+					target:function(player,target){
+						var num=1;
+						if(target.hp<2) num=0.5;
+						return num/Math.sqrt(Math.max(1,target.num('h')));
+					}
+				}
+			}
+		},
+		gouhunluo:{
+			enable:true,
+			fullskin:true,
+			type:'jiguan',
+			wuxieable:true,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('gouhunluo');
+			},
+			content:function(){
+				target.storage.gouhunluo=Math.max(1,target.hp);
+				target.storage.gouhunluo2=player;
+				target.addSkill('gouhunluo');
+			},
+			ai:{
+				order:2,
+				value:5,
+				result:{
+					target:function(player,target){
+						return -1/Math.max(1,target.hp);
+					}
+				}
+			}
+		},
 		zhuquezhizhang:{
 			type:'jiqi',
 			fullskin:true,
@@ -478,16 +594,21 @@ card.swd={
 				}
 			}
 		},
-		mujiaren:{
+		jiguanyaoshu:{
 			fullskin:true,
 			enable:true,
 			type:'jiguan',
 			range:{global:1},
 			wuxieable:true,
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('jiguanyaoshu_skill');
+			},
 			content:function(){
-				target.draw();
-				target.addSkill('mujiaren_skill');
+				var card=game.createCard(get.inpile('equip').randomGet());
+				target.$gain2(card);
+				target.equip(card);
+				target.addSkill('jiguanyaoshu_skill');
+				game.delay();
 			},
 			ai:{
 				wuxie:function(){
@@ -496,7 +617,7 @@ card.swd={
 				order:10.1,
 				result:{
 					target:function(player,target){
-						if(target.hasSkill('mujiaren_skill')) return 0.5;
+						if(target.hasSkill('jiguanyaoshu_skill')) return 0.5;
 						return 1;
 					}
 				}
@@ -772,6 +893,7 @@ card.swd={
 		daihuofenglun:{
 			type:'equip',
 			subtype:'equip4',
+			fullskin:true,
 			distance:{globalFrom:-2,globalTo:-1},
 			ai:{
 				basic:{
@@ -782,6 +904,7 @@ card.swd={
 		xiayuncailing:{
 			type:'equip',
 			subtype:'equip3',
+			fullskin:true,
 			distance:{globalFrom:1,globalTo:2},
 		},
 		shentoumianju:{
@@ -1376,6 +1499,71 @@ card.swd={
 		},
 	},
 	skill:{
+		xuejibingbao:{
+			trigger:{player:'phaseDrawBegin'},
+			forced:true,
+			mark:true,
+			intro:{
+				content:'摸牌阶段摸牌数+1'
+			},
+			nopop:true,
+			content:function(){
+				trigger.num++;
+				player.storage.xuejibingbao--;
+				if(player.storage.xuejibingbao<=0){
+					player.removeSkill('xuejibingbao');
+					delete player.storage.xuejibingbao;
+				}
+				else{
+					player.updateMarks();
+				}
+			}
+		},
+		gouhunluo:{
+			mark:true,
+			intro:{
+				content:function(storage,player){
+					if(storage==1){
+						'在'+get.translation(player.storage.gouhunluo2)+'的下个回合开始时失去两点体力'
+					}
+					return '在'+get.translation(player.storage.gouhunluo2)+'的第'+storage+'个回合开始时失去两点体力'
+				}
+			},
+			nopop:true,
+			trigger:{global:'phaseBegin'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return player.storage.gouhunluo2==event.player;
+			},
+			content:function(){
+				player.storage.gouhunluo--;
+				if(player.storage.gouhunluo<=0){
+					player.logSkill('gouhunluo');
+					player.loseHp(2);
+					player.removeSkill('gouhunluo');
+					delete player.storage.gouhunluo;
+					delete player.storage.gouhunluo2;
+				}
+				else{
+					player.updateMarks();
+				}
+			},
+			group:'gouhunluo2'
+		},
+		gouhunluo2:{
+			trigger:{global:'dieBegin'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return player.storage.gouhunluo2==event.player;
+			},
+			content:function(){
+				player.removeSkill('gouhunluo');
+				delete player.storage.gouhunluo;
+				delete player.storage.gouhunluo2;
+			}
+		},
 		jiguanyuan:{
 			mark:'card',
 			intro:{
@@ -2324,11 +2512,11 @@ card.swd={
 			filterTarget:true,
 			content:function(){
 				'step 0'
-				target.judge(function(card){
-					return get.color(card)=='red'?1:-1;
-				});
+				var card=get.cards(0);
+				player.showCards('意乱',card);
+				event.bool=(get.color(card)=='black');
 				'step 1'
-				if(result.color=='red'){
+				if(!event.bool){
 					target.draw();
 				}
 				else{
@@ -2810,7 +2998,7 @@ card.swd={
 				},
 			}
 		},
-		mujiaren_skill:{
+		jiguanyaoshu_skill_old:{
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.num('h',{type:['trick','delay']})>0;
@@ -2820,6 +3008,31 @@ card.swd={
 				return 5-ai.get.value(card);
 			},
 			viewAs:{name:'jiguanshu'}
+		},
+		jiguanyaoshu_skill:{
+			trigger:{player:'loseEnd'},
+			forced:true,
+			filter:function(event,player){
+				if(_status.currentPhase==player) return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].original=='e') return true;
+				}
+				return false;
+			},
+			content:function(){
+				var num=0;
+				for(var i=0;i<trigger.cards.length;i++){
+					if(trigger.cards[i].original=='e') num++;
+				}
+				var list=get.typeCard('hslingjian');
+				if(list.length){
+					list=list.randomGets(num);
+					for(var i=0;i<list.length;i++){
+						list[i]=game.createCard(list[i]);
+					}
+				}
+				player.gain(list,'gain2');
+			}
 		},
 		_lingjianduanzao:{
 			enable:'phaseUse',
@@ -2884,7 +3097,7 @@ card.swd={
 				// for(var i=0;i<ui.selected.cards.length;i++){
 				// 	if(get.type(ui.selected.cards[i])=='equip') return type=='hslingjian'||type=='jiqi';
 				// }
-				// if(_status.event.player.hasSkill('mujiaren_skill')){
+				// if(_status.event.player.hasSkill('jiguanyaoshu_skill')){
 				// 	if(ui.selected.cards.length==2) return type=='equip';
 				// }
 				// else{
@@ -3020,7 +3233,7 @@ card.swd={
 			// 		get.type(ui.selected.cards[1])=='hslingjian'){
 			// 		return [3,3];
 			// 	}
-			// 	if(_status.event.player.hasSkill('mujiaren_skill')) return [2,3];
+			// 	if(_status.event.player.hasSkill('jiguanyaoshu_skill')) return [2,3];
 			// 	return 2;
 			// },
 			filter:function(event,player){
@@ -3612,6 +3825,12 @@ card.swd={
 		jiguan:0.45
 	},
 	translate:{
+		zhiluxiaohu:'指路小狐',
+		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机角色使用一张杀，然后摸一张牌',
+		xuejibingbao:'雪肌冰鲍',
+		xuejibingbao_info:'出牌阶段对一名角色使用，该角色摸牌阶段摸牌数+1，持续2个回合',
+		gouhunluo:'勾魂锣',
+		gouhunluo_info:'出牌阶段对一名角色使用，在你的第X个回合开始时令该角色失去2点体力，若你死亡则失效（X为该角色的当前体力值且至少为1）',
 		jiguan:'机关',
 		jiqi:'祭器',
 		qinglongzhigui:'青龙之圭',
@@ -3740,9 +3959,11 @@ card.swd={
 		lingjiandai:'零件袋',
 		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
 		mujiaren:'木甲人',
-		mujiaren_skill:'巧匠',
-		mujiaren_skill_info:'你可以将锦囊牌当作机关鼠使用',
-		mujiaren_info:'出牌阶段对距离1以内的一名角色使用，目标摸一张牌并获得技能巧匠（你可以将锦囊牌当作机关鼠使用）',
+		mujiaren_info:'出牌阶段限用一次，将你手牌中的非基本牌（含此张）替换为随机的机关牌',
+		jiguanyaoshu:'机关要术',
+		jiguanyaoshu_skill:'巧匠',
+		jiguanyaoshu_skill_info:'每当你于回合外失去装备区内的牌，你获得一个随机零件',
+		jiguanyaoshu_info:'出牌阶段对距离1以内的一名角色使用，目标随机装备一件装备牌并获得技能巧匠（每当你于回合外失去装备区内的牌，你获得一个随机零件）',
 		hslingjian:'零件',
 		hslingjian_xuanfengzhiren:'旋风之刃',
 		hslingjian_xuanfengzhiren_info:'可用于煅造装备；随机弃置一名角色的一张牌',
@@ -3806,10 +4027,10 @@ card.swd={
 		chilongya_info:'锁定技，你的火属性伤害+1',
 		daihuofenglun:'带火风轮',
 		daihuofenglun_bg:'轮',
-		// daihuofenglun_info:'你与其他角色的距离-2，其他角色与你的距离-1',
+		daihuofenglun_info:'你与其他角色的距离-2，其他角色与你的距离-1',
 		xiayuncailing:'霞云彩绫',
 		xiayuncailing_bg:'云',
-		// xiayuncailing_info:'你与其他角色的距离+1，其他角色与你的距离+2',
+		xiayuncailing_info:'你与其他角色的距离+1，其他角色与你的距离+2',
 		shentoumianju:'神偷面具',
 		shentoumianju_bg:'偷',
 		shentoumianju_info:'出牌阶段，你可以指定一名手牌比你多的角色进行一次判定，若结果不为梅花，你获得其一张手牌',
@@ -3850,9 +4071,9 @@ card.swd={
 		guangshatianyi_bg:'纱',
 		guangshatianyi_info:'仅女性可装备，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
-		sifeizhenmian_info:'出牌阶段限一次，你可以指定一名角色进行一次判定，若结果为红色，该角色摸一张牌，若结果为黑色，该角色进入混乱状态直到下一回合结束',
+		sifeizhenmian_info:'出牌阶段限一次，你可以指定一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		yiluan:'意乱',
-		yiluan_info:'出牌阶段限一次，你可以指定一名角色进行一次判定，若结果为红色，该角色摸一张牌，若结果为黑色，该角色进入混乱状态直到下一回合结束',
+		yiluan_info:'出牌阶段限一次，你可以指定一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		donghuangzhong:'东皇钟',
 		xuanyuanjian:'轩辕剑',
 		xuanyuanjian2:'轩辕剑',
@@ -3893,9 +4114,9 @@ card.swd={
 		['spade',1,'baihupifeng'],
 		['club',1,'fengxueren'],
 		['diamond',1,'langeguaiyi'],
-		// ['heart',1,'daihuofenglun','fire'],
+		['heart',1,'daihuofenglun','fire'],
 
-//		['diamond',2,'xiayuncailing'],
+		['diamond',2,'xiayuncailing'],
 		// ['spade',2,'pusafazhou'],
 //		['heart',2,'pantao'],
 		['club',2,'huanpodan'],
@@ -3963,10 +4184,10 @@ card.swd={
 		['heart',2,'jiguanshu'],
 		['diamond',2,'jiguanshu'],
 
-		['club',3,'mujiaren'],
-		['spade',3,'mujiaren'],
-		['heart',3,'mujiaren'],
-		['diamond',3,'mujiaren'],
+		['club',3,'jiguanyaoshu'],
+		['spade',3,'jiguanyaoshu'],
+		['heart',3,'jiguanyaoshu'],
+		['diamond',3,'jiguanyaoshu'],
 
 		['spade',4,'sifeizhenmian'],
 		['heart',13,'qinglianxindeng'],
@@ -3999,5 +4220,11 @@ card.swd={
 		['club',6,'xuanwuzhihuang'],
 		['spade',7,'cangchizhibi'],
 		['heart',5,'huanglinzhicong'],
+
+		['spade',9,'gouhunluo'],
+		['club',7,'gouhunluo'],
+
+		['spade',1,'xuejibingbao'],
+		['club',1,'xuejibingbao'],
 	],
 }
