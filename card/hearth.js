@@ -668,8 +668,8 @@ card.hearth={
 		jihuocard_info:'跳过本回合的弃牌阶段，摸一张牌',
 	},
 	list:[
-		['heart',2,'shenenshu'],
-		['diamond',12,'shenenshu'],
+		// ['heart',2,'shenenshu'],
+		// ['diamond',12,'shenenshu'],
 		['club',7,'zhiliaobo'],
 		['spade',1,'zhiliaobo'],
 		['spade',13,'yuansuhuimie'],

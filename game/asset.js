@@ -127,6 +127,7 @@ window.noname_asset_list=[
     'image/card/shentoumianju.png',
     'image/card/shihuawuqi.png',
     'image/card/shijieshu.png',
+    'image/card/shuchui.png',
     'image/card/shuiyanqijun.png',
     'image/card/shuiyanqijunx.png',
     'image/card/shunshou.png',

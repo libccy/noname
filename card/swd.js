@@ -44,7 +44,9 @@ card.swd={
 			}
 		},
 		zhiluxiaohu:{
-			enable:true,
+			enable:function(card,player){
+				return lib.filter.filterCard({name:'sha'},player);
+			},
 			fullskin:true,
 			type:'jiguan',
 			wuxieable:true,
@@ -102,7 +104,7 @@ card.swd={
 				return !target.hasSkill('gouhunluo');
 			},
 			content:function(){
-				target.storage.gouhunluo=Math.max(1,target.hp);
+				target.storage.gouhunluo=3;
 				target.storage.gouhunluo2=player;
 				target.addSkill('gouhunluo');
 			},
@@ -1473,6 +1475,17 @@ card.swd={
 			skills:['yiluan'],
 			ai:{
 				basic:{
+					equipValue:7
+				}
+			},
+		},
+		shuchui:{
+			fullskin:true,
+			type:'equip',
+			subtype:'equip5',
+			skills:['shuchui'],
+			ai:{
+				basic:{
 					equipValue:5.5
 				}
 			},
@@ -1501,6 +1514,57 @@ card.swd={
 		},
 	},
 	skill:{
+		shuchui:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return player.canUse('sha',target);
+			},
+			filter:function(event,player){
+				return player.num('h','sha')>0;
+			},
+			content:function(){
+				'step 0'
+				player.addSkill('shuchui2');
+				event.num=0;
+				'step 1'
+				var card=player.get('h','sha')[0];
+				if(card){
+					player.useCard(card,target);
+				}
+				else{
+					player.removeSkill('shuchui2');
+					event.finish();
+				}
+				'step 2'
+				event.num++;
+				if(event.num<4&&target.isAlive()){
+					event.goto(1);
+				}
+				else{
+					player.removeSkill('shuchui2');
+				}
+			},
+			ai:{
+				order:3.11,
+				result:{
+					target:function(player,target){
+						return ai.get.effect(target,{name:'sha'},player,target);
+					}
+				}
+			}
+		},
+		shuchui2:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha';
+			},
+			content:function(){
+				player.draw();
+			}
+		},
 		xuejibingbao:{
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
@@ -1528,7 +1592,7 @@ card.swd={
 					if(storage==1){
 						'在'+get.translation(player.storage.gouhunluo2)+'的下个回合开始时失去两点体力'
 					}
-					return '在'+get.translation(player.storage.gouhunluo2)+'的第'+storage+'个回合开始时失去两点体力'
+					return '在'+storage+'轮后'+get.translation(player.storage.gouhunluo2)+'的回合开始时失去两点体力'
 				}
 			},
 			nopop:true,
@@ -3827,12 +3891,14 @@ card.swd={
 		jiguan:0.45
 	},
 	translate:{
+		shuchui:'鼠槌',
+		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的所有杀对该角色使用，杀每造成一次伤害你摸一张牌（最多使用4张杀）',
 		zhiluxiaohu:'指路小狐',
 		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机敌方角色使用一张杀，然后摸一张牌',
 		xuejibingbao:'雪肌冰鲍',
 		xuejibingbao_info:'出牌阶段对一名角色使用，该角色摸牌阶段摸牌数+1，持续2个回合',
 		gouhunluo:'勾魂锣',
-		gouhunluo_info:'出牌阶段对一名角色使用，在你的第X个回合开始时令该角色失去2点体力，若你死亡则失效（X为该角色的当前体力值且至少为1）',
+		gouhunluo_info:'出牌阶段对一名角色使用，在3轮后你的回合开始时令该角色失去2点体力，若你死亡则失效',
 		jiguan:'机关',
 		jiqi:'祭器',
 		qinglongzhigui:'青龙之圭',
@@ -3995,7 +4061,7 @@ card.swd={
 		guiyanfadao_info:'每当你使用杀命中目标，你可以防止伤害，改为令目标失去一点体力',
 		tianxianjiu:'天仙酒',
 		tianxianjiu_bg:'仙',
-		tianxianjiu_info:'出牌阶段对自己使用，你使用的下一张杀造成伤害后可以摸两张牌',
+		tianxianjiu_info:'出牌阶段对自己使用，你使用的下一张杀造成伤害后可以摸两张牌；濒死阶段，对自己使用，回复1点体力',
 		xiangyuye:'翔羽叶',
 		xiangyuye_info:'出牌阶段，对一名攻击范围外的角色使用，令其弃置一张黑色手牌或流失一点体力',
 		huanpodan:'还魄丹',
@@ -4225,5 +4291,7 @@ card.swd={
 		['club',7,'mujiaren'],
 		['heart',6,'mujiaren'],
 		['diamond',11,'mujiaren'],
+
+		['club',6,'shuchui'],
 	],
 }
