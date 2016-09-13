@@ -4751,6 +4751,13 @@
 					}
 				}
 			},
+            gg:function(){
+                for(var i=0;i<game.players.length;i++){
+                    for(var j=0;j<arguments.length;j++){
+                        cheat.gx(arguments[j],game.players[i]);
+                    }
+                }
+            },
 			gx:function(name,target){
 				target=target||game.me;
 				var nature=null;
@@ -13173,20 +13180,26 @@
                                 }
 							}
 						}
+                        var listAdded=false;
                         for(var i=0;i<roles.length;i++){
                             if(event[roles[i]]==player){
                                 var triggername=player.playerid+'_'+roles[i]+'_'+name;
                                 if(lib.hook[triggername]){
                                     for(var j=0;j<lib.hook[triggername].length;j++){
                                         addList(lib.hook[triggername][j],player);
+                                        listAdded=true;
+                                        break;
                                     }
                                 }
                                 triggername=roles[i]+'_'+name;
                                 if(lib.hook.globalskill[triggername]){
                                     for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
                                         addList(lib.hook.globalskill[triggername][j],player);
+                                        listAdded=true;
+                                        break;
                                     }
                                 }
+                                if(listAdded) break;
                             }
                         }
                         if(lib.hook.globalskill[globalskill]){
@@ -14069,8 +14082,19 @@
 				content:function(){
 					"step 0"
 					event.dying=_status.dying;
+                    if(!event.acted) event.acted=[];
 					"step 1"
-					trigger.start=trigger.source||trigger.player;
+                    if(trigger.player.isDead()){
+                        event.finish();
+                        return;
+                    }
+                    event.acted.push(player);
+                    // else if(trigger.source&&trigger.source.isDead()){
+                    //     trigger.start=game.findNext(trigger.source);
+                    // }
+					// else{
+                    //     trigger.start=trigger.source||trigger.player;
+                    // }
 					var str=get.translation(trigger.player.name)+'濒死，是否帮助？';
 					_status.dying=event.dying;
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
@@ -14106,15 +14130,15 @@
 					}
 					else{
 						for(var i=0;i<20;i++){
-							if(event.player.next!=trigger.start){
-								event.player=event.player.next;
+							if(event.acted.contains(event.player.next)){
+								break;
+							}
+							else{
+                                event.player=event.player.next;
 								if(!event.player.isOut()){
 									event.goto(1);
 									break;
 								}
-							}
-							else{
-								break;
 							}
 						}
 					}

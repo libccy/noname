@@ -511,8 +511,11 @@ card.swd={
 			enable:true,
 			type:'jiguan',
 			wuxieable:true,
-			range:{global:1},
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			modTarget:true,
 			content:function(){
 				var list=get.typeCard('hslingjian');
 				if(list.length){
@@ -538,7 +541,6 @@ card.swd={
 			enable:true,
 			type:'jiguan',
 			wuxieable:true,
-			range:{global:1},
 			filterTarget:function(card,player,target){
 				var es=target.get('e');
 				for(var i=0;i<es.length;i++){
@@ -1127,7 +1129,7 @@ card.swd={
 			},
 			content:function(){
 				"step 0"
-				if(target==_status.dying) target.recover();
+				if(target==_status.event.getParent(2).dying) target.recover();
 				else{
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
 					if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
@@ -3826,7 +3828,7 @@ card.swd={
 	},
 	translate:{
 		zhiluxiaohu:'指路小狐',
-		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机角色使用一张杀，然后摸一张牌',
+		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机敌方角色使用一张杀，然后摸一张牌',
 		xuejibingbao:'雪肌冰鲍',
 		xuejibingbao_info:'出牌阶段对一名角色使用，该角色摸牌阶段摸牌数+1，持续2个回合',
 		gouhunluo:'勾魂锣',
@@ -3955,9 +3957,9 @@ card.swd={
 		_lingjianduanzao:'煅造',
 		_lingjianduanzao_info:'出牌阶段，你可以弃置一张装备牌和一张可煅造的牌，并获得一件强化装备；强化装备可以装备给距离1以内的角色',
 		jiguanshu:'机关鼠',
-		jiguanshu_info:'出牌阶段对距离1以内的一名角色使用，用随机零件强化目标装备区内的装备',
+		jiguanshu_info:'出牌阶段对一名角色使用，用随机零件强化目标装备区内的装备',
 		lingjiandai:'零件袋',
-		lingjiandai_info:'出牌阶段对距离1以内的一名角色使用，目标获得3张随机零件',
+		lingjiandai_info:'出牌阶段对自己使用，获得3张随机零件',
 		mujiaren:'木甲人',
 		mujiaren_info:'出牌阶段限用一次，将你手牌中的非基本牌（含此张）替换为随机的机关牌',
 		jiguanyaoshu:'机关要术',
@@ -4117,19 +4119,16 @@ card.swd={
 		['heart',1,'daihuofenglun','fire'],
 
 		['diamond',2,'xiayuncailing'],
-		// ['spade',2,'pusafazhou'],
 //		['heart',2,'pantao'],
 		['club',2,'huanpodan'],
 
 		['club',3,'caoyao'],
 		['diamond',3,'chilongya','fire'],
 		['spade',3,'guiyoujie'],
-		//['heart',3,'xiangyuye','poison'],
 
 		['club',4,'caoyao'],
 		['spade',4,'zhufangshenshi'],
 		['spade',4,'huanpodan'],
-//		['diamond',4,'xiangyuye','poison'],
 
 		['club',5,'caoyao'],
 		['spade',5,'xixueguizhihuan'],
@@ -4137,17 +4136,13 @@ card.swd={
 
 		['club',6,'shentoumianju'],
 		['spade',6,'yufulu'],
-//		['heart',6,'xiangyuye','poison'],
-		//['diamond',6,'xiangyuye','poison'],
 
 		['diamond',7,'chiyuxi','fire'],
 		['club',7,'jingleishan','thunder'],
 		['spade',7,'guilingyupei'],
-//		['heart',7,'xiangyuye','poison'],
 
 		['spade',8,'zhufangshenshi'],
 		['club',8,'xiangyuye','poison'],
-		//['heart',8,'huanpodan'],
 
 		// ['spade',9,'ximohu','brown'],
 		['club',9,'guiyoujie'],
@@ -4164,15 +4159,12 @@ card.swd={
 		//['diamond',10,'xiangyuye','poison'],
 
 		['spade',11,'xiangyuye','poison'],
-		// ['club',11,'xiangyuye','poison'],
 
-//		['diamond',12,'xiangyuye','poison'],
 		['spade',12,'guiyanfadao','poison'],
 
 		['spade',13,'xianluhui'],
 		['diamond',3,'guangshatianyi'],
 		['club',13,'sadengjinhuan'],
-		//['spade',6,'xiangyuye','poison'],
 
 		['club',1,'lingjiandai'],
 		['spade',1,'lingjiandai'],
@@ -4181,13 +4173,13 @@ card.swd={
 
 		['club',2,'jiguanshu'],
 		['spade',2,'jiguanshu'],
-		['heart',2,'jiguanshu'],
+		// ['heart',2,'jiguanshu'],
 		['diamond',2,'jiguanshu'],
 
 		['club',3,'jiguanyaoshu'],
 		['spade',3,'jiguanyaoshu'],
-		['heart',3,'jiguanyaoshu'],
-		['diamond',3,'jiguanyaoshu'],
+		// ['heart',3,'jiguanyaoshu'],
+		// ['diamond',3,'jiguanyaoshu'],
 
 		['spade',4,'sifeizhenmian'],
 		['heart',13,'qinglianxindeng'],
@@ -4226,5 +4218,12 @@ card.swd={
 
 		['spade',1,'xuejibingbao'],
 		['club',1,'xuejibingbao'],
+
+		['heart',3,'zhiluxiaohu'],
+		['diamond',4,'zhiluxiaohu'],
+
+		['club',7,'mujiaren'],
+		['heart',6,'mujiaren'],
+		['diamond',11,'mujiaren'],
 	],
 }

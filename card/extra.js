@@ -18,7 +18,7 @@ card.extra={
 				return target==player;
 			},
 			content:function(){
-				if(target==_status.dying){
+				if(target==_status.event.getParent(2).dying){
 					target.recover();
 					if(_status.currentPhase==target){
 						target.getStat().card.jiu--;
