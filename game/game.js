@@ -13215,8 +13215,11 @@
 					}
                     var list=[];
                     var roles=['player','source','target'];
+                    var listAdded;
                     var addList=function(skill,player){
+                        if(listAdded[skill]) return;
                         if(player.forbiddenSkills[skill]) return;
+                        listAdded[skill]=true;
                         var info=lib.skill[skill];
                         var num=0;
                         if(info.priority){
@@ -13232,6 +13235,7 @@
                     var globalskill='global_'+name;
                     var map=_status.connectMode?lib.playerOL:game.playerMap;
                     for(var iwhile=0;iwhile<totalPopulation;iwhile++){
+                        listAdded={};
                         for(var j in player.tempSkills){
 							var expire=player.tempSkills[j];
 							if(expire==name||
@@ -13250,26 +13254,20 @@
                                 }
 							}
 						}
-                        var listAdded=false;
                         for(var i=0;i<roles.length;i++){
                             if(event[roles[i]]==player){
                                 var triggername=player.playerid+'_'+roles[i]+'_'+name;
                                 if(lib.hook[triggername]){
                                     for(var j=0;j<lib.hook[triggername].length;j++){
                                         addList(lib.hook[triggername][j],player);
-                                        listAdded=true;
-                                        break;
                                     }
                                 }
                                 triggername=roles[i]+'_'+name;
                                 if(lib.hook.globalskill[triggername]){
                                     for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
                                         addList(lib.hook.globalskill[triggername][j],player);
-                                        listAdded=true;
-                                        break;
                                     }
                                 }
-                                if(listAdded) break;
                             }
                         }
                         if(lib.hook.globalskill[globalskill]){

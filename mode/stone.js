@@ -9018,7 +9018,6 @@ mode.stone={
 			popup:false,
 			priority:15,
 			filter:function(event,player){
-				console.log(1);
 				return !player.isMin();
 			},
 			content:function(){
