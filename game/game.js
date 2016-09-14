@@ -1594,51 +1594,111 @@
     			},
     			sha:{
     			    name:'杀',
-                    init:true,
+                    init:'1',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
     			},
                 huosha:{
                     name:'火杀',
-                    init:true,
+                    init:'1',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 leisha:{
                     name:'雷杀',
-                    init:true,
+                    init:'1',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 shan:{
                     name:'闪',
-                    init:true,
+                    init:'1',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 tao:{
                     name:'桃',
-                    init:true,
+                    init:'0.5',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 jiu:{
                     name:'酒',
-                    init:true,
+                    init:'0.5',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 wuxie:{
                     name:'无懈可击',
-                    init:false,
+                    init:'0.5',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 nanman:{
                     name:'南蛮入侵',
-                    init:false,
+                    init:'0',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 wanjian:{
                     name:'万箭齐发',
-                    init:false,
+                    init:'0',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 guohe:{
                     name:'过河拆桥',
-                    init:false,
+                    init:'0',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 shunshou:{
                     name:'顺手牵羊',
-                    init:false,
+                    init:'0',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
                 tiesuo:{
                     name:'铁索连环',
-                    init:false,
+                    init:'0',
+                    item:{
+                        '1':'补充全部',
+                        '0.5':'补充一半',
+                        '0':'不补充'
+                    }
                 },
     			hide:{
     			    name:'隐藏此扩展',
@@ -3711,6 +3771,10 @@
                             require('electron').remote.getCurrentWindow().toggleDevTools();
                         }
                     };
+                    if(ui.updatep1){
+                        ui.updatep1.style.display='';
+                        ui.updatep2.style.display='';
+                    }
                     game.download=function(url,folder,onsuccess,onerror){
                         if(url.indexOf('web/')==0){
                             url='http://'+lib.hallURL+'/'+url;
@@ -3833,6 +3897,10 @@
 								}
 							});
 						}
+                        if(ui.updatep1){
+                            ui.updatep1.style.display='';
+                            ui.updatep2.style.display='';
+                        }
 						game.download=function(url,folder,onsuccess,onerror){
 							var fileTransfer = new FileTransfer();
 							url=get.url()+url;
@@ -8348,7 +8416,7 @@
                         info[4]=[];
                     }
 					var skills=info[3];
-					this.clearSkills();
+					this.clearSkills(true);
 					this.classList.add('fullskin');
 					if(!game.minskin&&lib.isNewLayout()&&!info[4].contains('minskin')){
 						this.classList.remove('minskin');
@@ -8538,7 +8606,7 @@
 					delete this.hp;
 					delete this.maxHp;
 					delete this.hujia;
-					this.clearSkills();
+					this.clearSkills(true);
 					this.node.identity.style.backgroundColor='';
 					this.node.intro.innerHTML='';
 					this.node.name.innerHTML='';
@@ -11123,14 +11191,14 @@
 					if(typeof ai.get.attitude=='function') return ai.get.attitude(this,target);
 					return 0;
 				},
-				clearSkills:function(){
+				clearSkills:function(all){
 					var list=[];
 					var exclude=[];
 					for(var i=0;i<arguments.length;i++){
                         exclude.push(arguments[i]);
                     }
 					for(i=0;i<this.skills.length;i++){
-                        if(lib.skill[this.skills[i]].temp) continue;
+                        if(!all&&lib.skill[this.skills[i]].temp) continue;
 						if(!exclude.contains(this.skills[i])){
                             list.push(this.skills[i]);
 						}
@@ -13045,9 +13113,11 @@
                     else{
                         parent=this.parent;
                     }
+                    if(!parent) return {};
                     if(typeof level=='number'){
                         for(var i=1;i<level;i++){
                             parent=parent.parent;
+                            if(!parent) return {};
                         }
                     }
                     return parent;
@@ -25244,7 +25314,12 @@
                         var li2=document.createElement('li');
     					li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px;white-space:nowrap"></p>';
     					li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
-
+                        ui.updatep1=li1.querySelector('p');
+                        ui.updatep2=li2;
+                        if(!game.download){
+                            ui.updatep1.style.display='none';
+                            ui.updatep2.style.display='none';
+                        }
     					var button1,button2,button3;
                         var span1,includeskin;
 
@@ -25356,14 +25431,14 @@
                                         }
     								}
     								game.saveConfig('check_version',update.version);
-    								if(update.version!=lib.version||lib.config.dev){
+    								if(update.version!=lib.version||lib.config.debug){
                                         var files;
                                         var version=lib.version;
                                         if(update.files&&update.files[version]){
                                             files=update.files.global.concat(update.files[version]);
                                         }
                                         var str;
-                                        if(lib.config.dev){
+                                        if(lib.config.debug){
                                             str='开发版仅供测试使用，可能存在风险，是否确定更新？'
                                         }
     									else{
@@ -30579,7 +30654,7 @@
     		},
         },
         url:function(tag){
-            if(lib.config.dev){
+            if(lib.config.debug){
                 switch(tag){
                     case 'version':return lib.sourceURL.replace(/\$version\$/,'master');
                     case 'source':return lib.sourceURL.replace(/\$version\$/,'master');

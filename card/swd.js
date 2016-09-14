@@ -1569,6 +1569,7 @@ card.swd={
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
 			mark:true,
+			temp:true,
 			intro:{
 				content:'摸牌阶段摸牌数+1'
 			},
@@ -1596,6 +1597,7 @@ card.swd={
 				}
 			},
 			nopop:true,
+			temp:true,
 			trigger:{global:'phaseBegin'},
 			forced:true,
 			popup:false,

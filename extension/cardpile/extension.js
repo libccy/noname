@@ -59,12 +59,13 @@ play.cardpile={
         var rand=function(){
             return Math.ceil(Math.random()*13);
         };
+		var getn=function(i,j){
+			return Math.round(data[i][j]*parseFloat(lib.config['cardpile_'+i+'_playpackconfig']));
+		};
         var num=0;
         for(var i in data){
-            if(lib.config['cardpile_'+i+'_playpackconfig']){
-                for(var j in data[i]){
-                    num+=data[i][j];
-                }
+            for(var j in data[i]){
+                num+=getn(i,j);
             }
         }
         var dn=num*(lib.card.list.length-data.total)/(data.total-num);
@@ -72,19 +73,17 @@ play.cardpile={
         if(dn>0){
             var p=0;
             for(var i in data){
-                if(lib.config['cardpile_'+i+'_playpackconfig']){
-                    for(var j in data[i]){
-                        var n=Math.round(dn*data[i][j]/num);
-                        while(n--){
-                            if(i=='huosha'){
-                                lib.card.list.push([j,rand(),'sha','fire']);
-                            }
-							else if(i=='leisha'){
-								lib.card.list.push([j,rand(),'sha','thunder']);
-							}
-                            else{
-                                lib.card.list.push([j,rand(),i]);
-                            }
+                for(var j in data[i]){
+                    var n=Math.round(dn*getn(i,j)/num);
+                    while(n--){
+                        if(i=='huosha'){
+                            lib.card.list.push([j,rand(),'sha','fire']);
+                        }
+						else if(i=='leisha'){
+							lib.card.list.push([j,rand(),'sha','thunder']);
+						}
+                        else{
+                            lib.card.list.push([j,rand(),i]);
                         }
                     }
                 }

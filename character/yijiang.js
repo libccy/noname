@@ -99,6 +99,9 @@ character.yijiang={
 	skill:{
 		taoluan:{
 			enable:'phaseUse',
+			filter:function(event,player){
+				return !player.hasSkill('taoluan3');
+			},
 			init:function(player){
 				player.storage.taoluan=[];
 			},
@@ -115,6 +118,9 @@ character.yijiang={
 						else{
 							list[i]=['锦囊','',list[i]];
 						}
+					}
+					if(list.length==0){
+						return ui.create.dialog('滔乱已无可用牌');
 					}
 					return ui.create.dialog([list,'vcard']);
 				},
@@ -193,7 +199,6 @@ character.yijiang={
 				order:4,
 				result:{
 					player:function(player){
-						if(player.hasSkill('taoluan3')) return 0;
 						var allshown=true;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].ai.shown==0){
@@ -209,7 +214,7 @@ character.yijiang={
 				},
 				threaten:1.6,
 			},
-			group:['taoluan2','taoluan4','taoluan5']
+			group:['taoluan2']
 		},
 		taoluan2:{
 			trigger:{player:['useCardAfter','respondAfter']},
@@ -237,7 +242,7 @@ character.yijiang={
 				event.target=target;
 				player.line(target,'green');
 				var type=get.type(trigger.card,'trick');
-				target.chooseCard('滔乱<br><br><div class="text center">交给'+get.translation(player)+'一张'+get.translation(type)+'牌，或令其失去一点体力',function(card,player,target){
+				target.chooseCard('滔乱<br><br><div class="text center">交给'+get.translation(player)+'一张'+get.translation(type)+'牌，或令其失去一点体力且滔乱无效直到回合',function(card,player,target){
 					return get.type(card,'trick')==_status.event.cardType;
 				}).set('cardType',type).set('ai',function(card){
 					if(_status.event.att){
@@ -267,7 +272,6 @@ character.yijiang={
 				return true;
 			},
 			check:function(event,player){
-				if(player.hasSkill('taoluan3')) return 0;
 				var allshown=true;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].num('h')>1&&ai.get.attitude(player,game.players[i])>0){
@@ -7246,7 +7250,7 @@ character.yijiang={
 		taoluan4:'滔乱',
 		taoluan5:'滔乱',
 		taoluan_backup:'滔乱',
-		taoluan_info:'在出牌或濒死阶段，你可视为使用任意一张基本牌或非延时类锦囊牌（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别相同的牌；2.你失去1点体力',
+		taoluan_info:'出牌阶段，你可视为使用任意一张基本牌或非延时类锦囊牌（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别相同的牌；2.你失去1点体力且滔乱无效直到回合结束',
 		jiaozhao:'矫诏',
 		jiaozhao2:'矫诏',
 		jiaozhao_info:'出牌阶段限一次，你可以展示一张手牌，然后选择距离最近的一名其他角色，该角色声明一张基本牌的牌名。在此出牌阶段内，你可以将此手牌当声明的牌使用且你不能被选择为目标',

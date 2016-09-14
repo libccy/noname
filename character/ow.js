@@ -1748,7 +1748,7 @@ character.ow={
                         var current=game.findPlayer(function(player){
                             return player.hasSkill('luan2');
                         });
-                        if(current){
+                        if(current&&ai.get.attitude(player,current)<0){
                             return 0;
                         }
                         return -1;
