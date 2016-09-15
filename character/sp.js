@@ -64,6 +64,10 @@ character.sp={
 		wanglang:['male','wei',3,['gushe','jici']],
 		sp_pangde:['male','wei',4,['mashu','juesi']],
 		sp_jiaxu:['male','wei',3,['zhenlue','jianshu','yongdi']],
+
+		litong:['male','wei',4,['tuifeng']],
+		mizhu:['male','shu',4,['ziyuan','jugu']],
+		buzhi:['male','wu',4,['hongde','dingpan']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -6210,6 +6214,9 @@ character.sp={
 		},
 	},
 	translate:{
+		litong:'李通',
+		mizhu:'糜竺',
+		buzhi:'步骘',
 		chenlin:'陈琳',
 		yuanshu:'袁术',
 		re_yuanshu:'新袁术',
@@ -6286,6 +6293,16 @@ character.sp={
 		yanbaihu:'严白虎',
 		wanglang:'王朗',
 
+		tuifeng:'推锋',
+		tuifeng_info:'1.当你受到1点伤害后，你可以将一张牌置于武将牌上，称为“锋”。2.准备阶段开始时，若你的武将牌上有“锋”，你将所有“锋”置入弃牌堆，摸2X张牌，然后你于此回合的出牌阶段内使用【杀】的次数上限+X（X为你此次置入弃牌堆的“锋”数）',
+		ziyuan:'资援',
+		ziyuan_info:'出牌阶段限一次，你可以将任意张点数之和为13的手牌交给一名其他角色，然后该角色回复1点体力',
+		jugu:'巨贾',
+		jugu_info:'锁定技，1.你的手牌上限+X。2.游戏开始时，你摸X张牌（X为你的体力上限）',
+		hongde:'弘德',
+		hongde_info:'当你一次获得或失去至少两张牌后，你可以令一名其他角色摸一张牌',
+		dingpan:'定叛',
+		dingpan_info:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害（X为场上存活的反贼数）',
 		weidi:'伪帝',
 		weidi_info:'锁定技，你视为拥有当前主公的主公技',
 		juesi:'决死',

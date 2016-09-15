@@ -14667,7 +14667,7 @@
                             game.send('server','enter',game.roomId,lib.config.connect_nickname,lib.config.connect_avatar);
                         }
                     }
-                    if(_status.event.getParent()){
+                    if(_status.event.parent){
                         game.forceOver('noover',proceed);
                     }
                     else{
