@@ -98,7 +98,7 @@ character.swd={
 			swd_youzhao:['male','shu',4,['longdan','yuchen']],
 		// swd_qingming:['male','shu',3,['mingfu','tianlun']],
 			swd_shangzhang:['male','shu',4,['lianwu']],
-			swd_situqiang:['female','shu',3,['qingnang','chulao']],
+			swd_situqiang:['female','shu',3,['fengze','jidian','jinlin']],
 
 			swd_chunyuheng:['male','wei',2,['jueqing','shengshou','xuying']],
 			swd_hanlong:['male','wei',4,['ciqiu','siji']],
@@ -7739,6 +7739,10 @@ character.swd={
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
 
+		fengze:'风泽',
+		fengze_info:'出牌阶段限一次，你可以将两张黑色牌当作桃园结义使用',
+		jinlin:'金鳞',
+		jinlin_info:'限定技，出牌阶段，你可以令至多3名角色各获得3点护甲，获得护甲的角色于每个回合开始阶段失去1点护甲直到首次失去所有护甲',
 		huanxia:'幻霞',
 		huanxia_info:'你可以将一张红色牌当作杀使用，若此杀未造成伤害，你可以在其进入弃牌堆后收回此牌',
 		jingjie:'镜界',
