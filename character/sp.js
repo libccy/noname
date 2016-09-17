@@ -65,9 +65,9 @@ character.sp={
 		sp_pangde:['male','wei',4,['mashu','juesi']],
 		sp_jiaxu:['male','wei',3,['zhenlue','jianshu','yongdi']],
 
-		litong:['male','wei',4,['tuifeng']],
-		mizhu:['male','shu',4,['ziyuan','jugu']],
-		buzhi:['male','wu',4,['hongde','dingpan']],
+		// litong:['male','wei',4,['tuifeng']],
+		// mizhu:['male','shu',4,['ziyuan','jugu']],
+		// buzhi:['male','wu',4,['hongde','dingpan']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],

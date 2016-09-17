@@ -9064,6 +9064,7 @@ mode.stone={
 			enable:['chooseToUse','chooseToRespond'],
 			filterCard:{type:'equip'},
 			viewAs:{name:'sha'},
+			nopop:true,
 			check:function(){return 1},
 			filter:function(event,player){
 				return player.num('h',{type:'equip'})>0;
@@ -9094,6 +9095,7 @@ mode.stone={
 					if(get.type(card)=='stonecard') return false;
 				},
 			},
+			nopop:true,
 			check:function(){return 1},
 			filter:function(event,player){
 				return player.num('h',{type:['stonecharacter','stonecard']})>0;

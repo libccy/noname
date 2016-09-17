@@ -4727,6 +4727,98 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+    		c:function(){
+                (function(){
+                    var a=0,b=0,c=0,d=0;
+        			var sa=0,sb=0,sc=0,sd=0;
+        			for(var i in lib.character){
+        				switch(lib.character[i][1]){
+        					case 'wei':a++;if(lib.config.forbidall.contains(i)) sa++;break;
+        					case 'shu':b++;if(lib.config.forbidall.contains(i)) sb++;break;
+        					case 'wu':c++;if(lib.config.forbidall.contains(i)) sc++;break;
+        					case 'qun':d++;if(lib.config.forbidall.contains(i)) sd++;break;
+        				}
+        			}
+        			console.log('魏：'+(a-sa)+'/'+a);
+        			console.log('蜀：'+(b-sb)+'/'+b);
+        			console.log('吴：'+(c-sc)+'/'+c);
+        			console.log('群：'+(d-sd)+'/'+d);
+        			console.log(((a+b+c+d)-(sa+sb+sc+sd))+'/'+(a+b+c+d));
+                }());
+                (function(){
+                    var a=0,b=0,c=0,d=0;
+        			var aa=0,bb=0,cc=0,dd=0;
+        			var sa=0,sb=0,sc=0,sd=0;
+        			var sha=0,shan=0,tao=0,jiu=0,wuxie=0,heisha=0,hongsha=0;
+        			var num={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0};
+        			for(var i in lib.card){
+        				if(typeof lib.card[i]=='object'){
+        					switch(lib.card[i].type){
+        						case 'basic':a++;break;
+        						case 'trick':b++;break;
+        						case 'equip':c++;break;
+        						default:d++;break;
+        					}
+        				}
+        			}
+        			for(var i=0;i<lib.card.list.length;i++){
+        				if(typeof lib.card[lib.card.list[i][2]]=='object'){
+        					switch(lib.card[lib.card.list[i][2]].type){
+        						case 'basic':aa++;break;
+        						case 'trick':case 'delay':bb++;break;
+        						case 'equip':cc++;break;
+        						default:dd++;break;
+        					}
+        					switch(lib.card.list[i][0]){
+        						case 'heart':sa++;break;
+        						case 'diamond':sb++;break;
+        						case 'club':sc++;break;
+        						case 'spade':sd++;break;
+        					}
+        					if(lib.card.list[i][2]=='sha'){
+        						sha++;
+        						if(lib.card.list[i][0]=='club'||lib.card.list[i][0]=='spade'){
+        							heisha++;
+        						}
+        						else{
+        							hongsha++;
+        						}
+        					}
+        					if(lib.card.list[i][2]=='shan'){
+        						shan++;
+        					}
+        					if(lib.card.list[i][2]=='tao'){
+        						tao++;
+        					}
+        					if(lib.card.list[i][2]=='jiu'){
+        						jiu++;
+        					}
+        					if(lib.card.list[i][2]=='wuxie'){
+        						wuxie++;
+        					}
+        					num[lib.card.list[i][1]]++;
+        				}
+        			}
+        			var str='基本牌'+aa+'； '+'锦囊牌'+bb+'； '+'装备牌'+cc+'； '+'其它牌'+dd
+        			console.log(str);
+        			str='红桃牌'+sa+'； '+'方片牌'+sb+'； '+'梅花牌'+sc+'； '+'黑桃牌'+sd
+        			console.log(str);
+        			str='杀'+sha+'； '+'黑杀'+heisha+'； '+'红杀'+hongsha+'； '+'闪'+shan+'； '+'桃'+tao+'； '+'酒'+jiu+'； '+'无懈'+wuxie
+        			console.log(str);
+                    if(arguments[1]){
+                        for(var i=1;i<=13;i++){
+            				if(i<10){
+            					console.log(i+' ',num[i]);
+            				}
+            				else{
+            					console.log(i,num[i]);
+            				}
+            			}
+                    }
+                    console.log(a+b+c+d);
+        			console.log(aa+bb+cc+dd);
+                }());
+    		},
             id:function(){
                 game.showIdentity();
             },
@@ -7335,7 +7427,12 @@
 					}
 					else{
 						if(info.lose!=false){
-							player.lose(cards,ui.special);
+                            if(info.losetrigger==false){
+                                player.lose(cards,ui.special)._triggered=null;
+                            }
+							else{
+                                player.lose(cards,ui.special);
+                            }
 						}
 						if(info.prepare){
 							info.prepare(cards,player,targets);
@@ -33327,100 +33424,6 @@
                 return list;
             }
         }
-		window.countGroups=function(){
-			var a=0,b=0,c=0,d=0;
-			var sa=0,sb=0,sc=0,sd=0;
-			for(var i in lib.character){
-				switch(lib.character[i][1]){
-					case 'wei':a++;if(lib.config.forbidall.contains(i)) sa++;break;
-					case 'shu':b++;if(lib.config.forbidall.contains(i)) sb++;break;
-					case 'wu':c++;if(lib.config.forbidall.contains(i)) sc++;break;
-					case 'qun':d++;if(lib.config.forbidall.contains(i)) sd++;break;
-				}
-			}
-			console.log('魏：'+(a-sa)+'/'+a);
-			console.log('蜀：'+(b-sb)+'/'+b);
-			console.log('吴：'+(c-sc)+'/'+c);
-			console.log('群：'+(d-sd)+'/'+d);
-			return ((a+b+c+d)-(sa+sb+sc+sd))+'/'+(a+b+c+d);
-		}
-		window.countSkills=function(){
-			for(var i in lib.skill){
-			if(lib.translate[i+'_info']){
-			console.log(lib.translate[i],lib.translate[i+'_info'])
-			}
-			}
-		}
-		window.countCards=function(){
-			var a=0,b=0,c=0,d=0;
-			var aa=0,bb=0,cc=0,dd=0;
-			var sa=0,sb=0,sc=0,sd=0;
-			var sha=0,shan=0,tao=0,jiu=0,wuxie=0,heisha=0,hongsha=0;
-			var num={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0};
-			for(var i in lib.card){
-				if(typeof lib.card[i]=='object'){
-					switch(lib.card[i].type){
-						case 'basic':a++;break;
-						case 'trick':b++;break;
-						case 'equip':c++;break;
-						default:d++;break;
-					}
-				}
-			}
-			for(var i=0;i<lib.card.list.length;i++){
-				if(typeof lib.card[lib.card.list[i][2]]=='object'){
-					switch(lib.card[lib.card.list[i][2]].type){
-						case 'basic':aa++;break;
-						case 'trick':case 'delay':bb++;break;
-						case 'equip':cc++;break;
-						default:dd++;break;
-					}
-					switch(lib.card.list[i][0]){
-						case 'heart':sa++;break;
-						case 'diamond':sb++;break;
-						case 'club':sc++;break;
-						case 'spade':sd++;break;
-					}
-					if(lib.card.list[i][2]=='sha'){
-						sha++;
-						if(lib.card.list[i][0]=='club'||lib.card.list[i][0]=='spade'){
-							heisha++;
-						}
-						else{
-							hongsha++;
-						}
-					}
-					if(lib.card.list[i][2]=='shan'){
-						shan++;
-					}
-					if(lib.card.list[i][2]=='tao'){
-						tao++;
-					}
-					if(lib.card.list[i][2]=='jiu'){
-						jiu++;
-					}
-					if(lib.card.list[i][2]=='wuxie'){
-						wuxie++;
-					}
-					num[lib.card.list[i][1]]++;
-				}
-			}
-			var str='基本牌'+aa+'； '+'锦囊牌'+bb+'； '+'装备牌'+cc+'； '+'其它牌'+dd
-			console.log(str);
-			str='红桃牌'+sa+'； '+'方片牌'+sb+'； '+'梅花牌'+sc+'； '+'黑桃牌'+sd
-			console.log(str);
-			str='杀'+sha+'； '+'黑杀'+heisha+'； '+'红杀'+hongsha+'； '+'闪'+shan+'； '+'桃'+tao+'； '+'酒'+jiu+'； '+'无懈'+wuxie
-			console.log(str);
-			for(var i=1;i<=13;i++){
-				if(i<10){
-					console.log(i+' ',num[i]);
-				}
-				else{
-					console.log(i,num[i]);
-				}
-			}
-			return aa+bb+cc+dd;
-		}
 		window.onkeydown=function(e){
 			if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
                 if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){

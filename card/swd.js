@@ -2577,7 +2577,9 @@ card.swd={
 		yiluan:{
 			enable:'phaseUse',
 			usable:1,
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return get.distance(player,target,'attack')<=1;
+			},
 			content:function(){
 				'step 0'
 				var card=get.cards(0);
@@ -3105,6 +3107,8 @@ card.swd={
 		_lingjianduanzao:{
 			enable:'phaseUse',
 			position:'he',
+			discard:false,
+			losetrigger:false,
 			prompt:function(event){
 				var lingjians=[],types=[];
 				var hs=event.player.get('he');
@@ -3312,7 +3316,13 @@ card.swd={
 				}
 				return false;
 			},
+			prepare:function(cards,player){
+				player.$throw(cards);
+			},
 			content:function(){
+				for(var i=0;i<cards.length;i++){
+					ui.discardPile.appendChild(cards[i]);
+				}
 				var name=lib.skill._lingjianduanzao.process(cards);
 				player.gain(game.createCard(name),'gain2');
 			},
@@ -4023,7 +4033,7 @@ card.swd={
 		hslingjian_shijianhuisu_equip4_info:'当你的装备区内没有其他牌时，你的进攻距离+1',
 		hslingjian_shijianhuisu_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色将其装备区内的牌收回手牌',
 		_lingjianduanzao:'煅造',
-		_lingjianduanzao_info:'出牌阶段，你可以弃置一张装备牌和一张可煅造的牌，并获得一件强化装备；强化装备可以装备给距离1以内的角色',
+		_lingjianduanzao_info:'出牌阶段，你可以将一张装备牌和一张可煅造的牌合成为一件强化装备；强化装备可以装备给距离1以内的角色',
 		jiguanshu:'机关鼠',
 		jiguanshu_info:'出牌阶段对一名角色使用，用随机零件强化目标装备区内的装备',
 		lingjiandai:'零件袋',
@@ -4141,9 +4151,9 @@ card.swd={
 		guangshatianyi_bg:'纱',
 		guangshatianyi_info:'仅女性可装备，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
-		sifeizhenmian_info:'出牌阶段限一次，你可以指定一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
+		sifeizhenmian_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		yiluan:'意乱',
-		yiluan_info:'出牌阶段限一次，你可以指定一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
+		yiluan_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		donghuangzhong:'东皇钟',
 		xuanyuanjian:'轩辕剑',
 		xuanyuanjian2:'轩辕剑',

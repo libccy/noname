@@ -98,7 +98,7 @@ character.swd={
 			swd_youzhao:['male','shu',4,['longdan','yuchen']],
 		// swd_qingming:['male','shu',3,['mingfu','tianlun']],
 			swd_shangzhang:['male','shu',4,['lianwu']],
-			swd_situqiang:['female','shu',3,['fengze','jidian','jinlin']],
+			swd_situqiang:['female','shu',3,['fengze','lingyue','jinlin']],
 
 			swd_chunyuheng:['male','wei',2,['jueqing','shengshou','xuying']],
 			swd_hanlong:['male','wei',4,['ciqiu','siji']],
@@ -143,6 +143,94 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		jinlin:{
+            enable:'phaseUse',
+            unique:true,
+			mark:true,
+			skillAnimation:true,
+			animationColor:'metal',
+			init:function(player){
+				player.storage.jinlin=false;
+			},
+			filter:function(event,player){
+				if(player.storage.jinlin) return false;
+                return true;
+			},
+            filterTarget:true,
+            selectTarget:[1,Infinity],
+			content:function(){
+                if(target==targets[0]){
+                    player.unmarkSkill('jinlin');
+    				player.storage.jinlin=true;
+                }
+				target.changeHujia(3);
+				target.addSkill('jinlin2');
+				target.storage.jinlin2=3;
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+                        if(player.hp==1) return 1;
+						var num=0;
+						for(var i=0;i<game.players.length;i++){
+							if(ai.get.attitude(player,game.players[i])>2){
+								if(game.players[i].hp==1) return 1;
+								if(game.players[i].hp==2) num++;
+							}
+						}
+                        if(player.hasUnknown()) return 0;
+						if(num>1) return 1;
+                        return 0;
+                    }
+				},
+			},
+			intro:{
+				content:'limited'
+			}
+        },
+		jinlin2:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				if(player.hujia>0){
+					player.changeHujia(-1);
+				}
+				player.storage.jinlin2--;
+				if(player.hujia==0||player.storage.jinlin2==0){
+					player.removeSkill('jinlin2');
+					delete player.storage.jinlin2;
+				}
+			},
+		},
+		lingyue:{
+			trigger:{player:'shaBegin'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.target)<0;
+			},
+			filter:function(event,player){
+				return event.target.num('he')>0;
+			},
+			content:function(){
+				trigger.target.chooseToDiscard('he',true);
+			}
+		},
+		fengze:{
+			enable:'phaseUse',
+			filterCard:true,
+			selectCard:2,
+			position:'he',
+			viewAs:{name:'taoyuan'},
+			filter:function(event,player){
+				return player.num('he',{color:'black'})>=2;
+			},
+			audio:true,
+			prompt:'将两张黑色牌当作桃园结义使用',
+			check:function(card){
+				return 6-ai.get.useful(card)
+			}
+		},
 		zaowu:{
 			enable:'chooseToUse',
 			filter:function(event,player){
@@ -4495,15 +4583,10 @@ character.swd={
 				return 8-ai.get.value(card);
 			},
 			content:function(){
-				if(player.num('e')){
-					var list=get.typeCard('hslingjian');
-					if(list.length){
-						player.gain(game.createCard(list.randomGet()),'gain');
-					}
-				}
-				else{
-					player.gain(game.createCard(get.inpile('equip').randomGet()),'gain');
-				}
+				var card=game.createCard(get.inpile('equip').randomGet());
+				player.equip(card);
+				player.$gain2(card);
+				game.delay();
 			},
 			ai:{
 				result:{
@@ -7740,9 +7823,11 @@ character.swd={
 		swd_xiyan:'犀衍',
 
 		fengze:'风泽',
-		fengze_info:'出牌阶段限一次，你可以将两张黑色牌当作桃园结义使用',
+		fengze_info:'出牌阶段，你可以将两张黑色牌当作桃园结义使用',
+		lingyue:'凌月',
+		lingyue_info:'每当你使用一张杀，你可以令目标弃置一张牌',
 		jinlin:'金鳞',
-		jinlin_info:'限定技，出牌阶段，你可以令至多3名角色各获得3点护甲，获得护甲的角色于每个回合开始阶段失去1点护甲直到首次失去所有护甲',
+		jinlin_info:'限定技，出牌阶段，你可以令任意名角色各获得3点护甲，获得护甲的角色于每个回合开始阶段失去1点护甲直到首次失去所有护甲或累计以此法失去3点护甲',
 		huanxia:'幻霞',
 		huanxia_info:'你可以将一张红色牌当作杀使用，若此杀未造成伤害，你可以在其进入弃牌堆后收回此牌',
 		jingjie:'镜界',
@@ -8117,7 +8202,7 @@ character.swd={
 		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
 		qingcheng_info:'回合结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
 		xianjiang_old_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
-		xianjiang_info:'出牌阶段限一次，你可以弃置一张锦囊牌，若你装备区内没有牌，你获得一张装备牌，否则你获得一张零件牌',
+		xianjiang_info:'出牌阶段限一次，你可以弃置一张锦囊牌并随机装备一件装备',
 		shengong_info:'每当你需要打出一张杀或闪时，你可以弃置一名其他角色装备区内的一张武器牌或防具牌，视为打出一张杀或闪，然后该角色摸一张牌，你弃一张牌',
 		ningjian_info:'你可以将一张红色牌当闪、黑色牌当杀使用或打出',
 		taixu_info:'限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1为其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1',
