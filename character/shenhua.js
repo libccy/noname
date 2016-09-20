@@ -2151,6 +2151,7 @@ character.shenhua={
 				if(event.type!='dying') return false;
 				if(player!=event.dying) return false;
 				if(player.storage.niepan) return false;
+				return true;
 			},
 			content:function(){
 				'step 0'
