@@ -605,7 +605,7 @@ character.yxs={
 			content:function(){
 				'step 0'
 				player.chooseCardTarget({
-					prompt:'是否发动【铁腕】？',
+					prompt:get.prompt('tiewan'),
 					filterCard:{color:'red'},
 					position:'he',
 					filterTarget:function(card,player,target){
@@ -684,7 +684,7 @@ character.yxs={
 				"step 0"
 				if(trigger.delay==false) game.delay();
 				"step 1"
-				player.chooseTarget('是否发动【仗义】？',function(card,player,target){
+				player.chooseTarget(get.prompt('lzhangyi'),function(card,player,target){
 					return player!=target
 				}).set('du',(trigger.cards.length==1&&trigger.cards[0].name=='du')).ai=function(target){
 					var att=ai.get.attitude(_status.event.player,target);
@@ -726,7 +726,7 @@ character.yxs={
 				"step 0"
 				if(player.num('he')){
 					player.chooseCardTarget({
-						prompt:'是否发动【易装】？',
+						prompt:get.prompt('yizhuang'),
 						filterCard:true,
 						position:'he',
 						filterTarget:function(card,player,target){
@@ -1227,7 +1227,7 @@ character.yxs={
 			content:function(){
 				"step 0"
 				if(event.isMine()){
-					event.dialog=ui.create.dialog('是否发动【蛇噬】？');
+					event.dialog=ui.create.dialog(get.prompt('sheshi'));
 				}
 				if(ui.cardPile.childNodes.length<4){
 					var discardcards=get.cards(4);
@@ -1541,30 +1541,6 @@ character.yxs={
 			}
 		},
 		nvquan3:{
-			// trigger:{target:'useCardToBegin'},
-			// filter:function(event){
-			// 	return event.player.sex=='male'&&(event.card.name=='sha'||event.card.name=='juedou');
-			// },
-			// check:function(event,player){
-			// 	return ai.get.attitude(player,event.player)<=0;
-			// },
-			// direct:true,
-			// content:function(){
-			// 	"step 0"
-			// 	var bool=(ai.get.attitude(player,trigger.player)<=0);
-			// 	player.choosePlayerCard(trigger.player,'是否发动【女权】？','he').ai=function(button){
-			// 		if(bool){
-			// 			return ai.get.buttonValue(button);
-			// 		}
-			// 		else{
-			// 			return 0;
-			// 		}
-			// 	}
-			// 	"step 1"
-			// 	if(result.bool){
-			// 		trigger.player.discard(result.links);
-			// 	}
-			// }
 			mod:{
 				targetEnabled:function(card,player,target){
 					if(card.name=='juedou'&&player.sex=='male'){
@@ -1841,7 +1817,7 @@ character.yxs={
 				"step 0"
 				var val=ai.get.value(trigger.card);
 				var suit=get.suit(trigger.card);
-				var next=player.chooseToDiscard('he','逐鹿：是否发动弃置一张'+get.translation(suit)+
+				var next=player.chooseToDiscard('he','逐鹿：是否弃置一张'+get.translation(suit)+
 					'牌并获得'+get.translation(trigger.card)+'？',{suit:suit});
 				next.ai=function(card){
 					return val-ai.get.value(card);

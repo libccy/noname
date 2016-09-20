@@ -206,7 +206,7 @@ character.refresh={
 				trigger.player.chooseTarget(function(card,player,target){
 					var evt=_status.event.getParent();
 					return evt.player.canUse({name:'juedou'},target)&&target!=_status.event.player;
-				},'是否发动【利驭】？').set('ai',function(target){
+				},get.prompt('liyu')).set('ai',function(target){
 					var evt=_status.event.getParent();
 					return ai.get.effect(target,{name:'juedou'},evt.player,_status.event.player)-2;
 				});
@@ -267,7 +267,7 @@ character.refresh={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动突袭?',[1,2],function(card,player,target){
+				player.chooseTarget(get.prompt('retuxi'),[1,2],function(card,player,target){
 					return target.num('h')>0&&player!=target&&target.num('h')>=player.num('h');
 				},function(target){
 					var att=ai.get.attitude(_status.event.player,target);
@@ -299,7 +299,7 @@ character.refresh={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging[0])+'，是否发动【'+get.skillTranslation('reguicai',player)+'】？','he').set('ai',function(card){
+				get.translation(trigger.player.judging[0])+'，'+get.prompt('reguicai'),'he').set('ai',function(card){
 					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var judging=_status.event.judging;
@@ -363,7 +363,7 @@ character.refresh={
 					return;
 				}
 				event.num--;
-				player.choosePlayerCard('是否对'+get.translation(trigger.source)+'发动【'+get.skillTranslation('refankui',player)+'】？',trigger.source,ai.get.buttonValue,'he');
+				player.choosePlayerCard(get.prompt('refankui',trigger.source),trigger.source,ai.get.buttonValue,'he');
 				"step 2"
 				if(result.bool){
 					player.logSkill('refankui',trigger.source);
@@ -1251,7 +1251,7 @@ character.refresh={
 				!lib.filter.autoRespondSha.call({player:player});
 			},
 			content:function(){
-				player.chooseToUse({name:'sha'},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀',
+				player.chooseToUse({name:'sha'},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀？',
 					trigger.player).set('logSkill','zhuhai');
 			}
 		},
@@ -1552,7 +1552,7 @@ character.refresh={
 		zhuhai:'诛害',
 		qianxin:'潜心',
 		jianyan:'荐言',
-		reguicai:'新鬼才',
+		reguicai:'鬼才',
 		xunxun:'恂恂',
 		wangxi:'忘隙',
 		reguose:'国色',

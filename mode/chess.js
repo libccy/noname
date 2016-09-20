@@ -4658,7 +4658,7 @@ mode.chess={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToMove(2,'是否发动【翩仪】？');
+				player.chooseToMove(2,get.prompt('pianyi'));
 				"step 1"
 				if(result.bool){
 					player.logSkill('pianyi');
@@ -4673,7 +4673,7 @@ mode.chess={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToMove(get.cardCount('sha',player),'是否发动【移动射击】？');
+				player.chooseToMove(get.cardCount('sha',player),get.prompt('lingdong'));
 				"step 1"
 				if(result.bool){
 					player.logSkill('lingdong');

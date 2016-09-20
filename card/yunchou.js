@@ -719,7 +719,7 @@ card.yunchou={
 				return false;
 			},
 			content:function(){
-				player.chooseToUse('是否对'+get.translation(trigger.player)+'使用趁火打劫？',function(card,player){
+				player.chooseToUse(get.prompt('chenhuodajie',trigger.player),function(card,player){
 					if(card.name!='chenhuodajie') return false;
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
 					if(mod!='unchanged') return mod;

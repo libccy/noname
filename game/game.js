@@ -5375,13 +5375,13 @@
     						if(info.prompt) str=info.prompt;
     						else{
                                 if(typeof info.logTarget=='string'){
-                                    str='是否对'+get.translation(trigger[info.logTarget])+'发动【'+get.skillTranslation(event.skill,player)+'】？';
+                                    str=get.prompt(event.skill,trigger[info.logTarget],player);
                                 }
                                 else if(typeof info.logTarget=='function'){
-                                    str='是否对'+get.translation(info.logTarget(trigger,player))+'发动【'+get.skillTranslation(event.skill,player)+'】？';
+                                    str=get.prompt(event.skill,info.logTarget(trigger,player),player);
                                 }
                                 else{
-                                    str='是否发动【'+get.skillTranslation(event.skill,player)+'】？';
+                                    str=get.prompt(event.skill,null,player);
                                 }
                             }
     						if(typeof str=='function'){str=str(trigger,player)}
@@ -30747,6 +30747,15 @@
     			if(info.locked) return true;
     			return false;
     		},
+        },
+        prompt:function(skill,target,player){
+            player=player||_status.event.player;
+            if(target){
+                return '是否对'+get.translation(target)+'发动【'+get.skillTranslation(skill,player)+'】？';
+            }
+            else{
+                return '是否发动【'+get.skillTranslation(skill,player)+'】？';
+            }
         },
         url:function(tag){
             if(lib.config.debug){

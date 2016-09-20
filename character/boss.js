@@ -69,7 +69,7 @@ character.boss={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging[0])+'，是否发动【天道】？','he').ai=function(card){
+				get.translation(trigger.player.judging[0])+'，'+get.prompt('tiandao'),'he').ai=function(card){
 					var trigger=_status.event.parent._trigger;
 					var player=_status.event.player;
 					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
@@ -911,9 +911,7 @@ character.boss={
             filter:function(event,player){
                 return event.player.isEnemyOf(player)&&event.card.name=='wuxie';
             },
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【精妙】？';
-			},
+			logTarget:'player',
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0;
 			},
@@ -1173,9 +1171,7 @@ character.boss={
 				}
                 return event.num>0&&event.player!=player&&event.player.hp<event.player.maxHp;
             },
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【惑敌】？'
-			},
+			logTarget:'player',
             content:function(){
 				player.line(trigger.player,'green');
                 trigger.num--;
@@ -1199,7 +1195,7 @@ character.boss={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【惑敌】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_huodi'),function(card,player,target){
 					return !target.isFriendOf(player);
 				}).ai=function(target){
 					return -ai.get.attitude(player,target);
@@ -1220,7 +1216,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【穿云】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_chuanyun'),function(card,player,target){
 					return player.hp<target.hp;
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player);
@@ -1241,7 +1237,7 @@ character.boss={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【雷厉】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_leili'),function(card,player,target){
 					if(target==trigger.player) return false;
 					return target.isEnemyOf(player);
 				}).ai=function(target){
@@ -1264,7 +1260,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【风行】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_fengxing'),function(card,player,target){
 					if(target.isFriendOf(player)) return false;
 					return lib.filter.targetEnabled({name:'sha'},player,target);
 				}).ai=function(target){
@@ -1568,7 +1564,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【吸星】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_xixing'),function(card,player,target){
 					return player!=target&&target.isLinked();
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'thunder');
@@ -1599,7 +1595,7 @@ character.boss={
                         num++;
                     }
                 }
-                player.chooseTarget('是否发动【索命】？',[1,num],function(card,player,target){
+                player.chooseTarget(get.prompt('boss_suoming'),[1,num],function(card,player,target){
                     return !target.isLinked()&&player!=target;
                 }).ai=function(target){
                     return -ai.get.attitude(player,target);
@@ -1640,7 +1636,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【枭首】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_xiaoshou'),function(card,player,target){
 					return player!=target&&target.hp>=player.hp;
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'fire');
@@ -1776,7 +1772,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【鬼火】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_guihuo'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'fire');
@@ -1793,7 +1789,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【落雷】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_luolei'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'thunder');
@@ -1851,7 +1847,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【地动】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_didong'),function(card,player,target){
 					return target.isEnemyOf(player);
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
@@ -1947,7 +1943,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动雷击？').ai=function(target){
+				player.chooseTarget(get.prompt('boss_leiji')).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'thunder');
 				};
 				"step 1"
@@ -2243,7 +2239,7 @@ character.boss={
 			unique:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【亟电】？',function(card,player,target){
+				player.chooseTarget(get.prompt('jidian'),function(card,player,target){
 					return get.distance(trigger.player,target)<=1&&trigger.player!=target;
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'thunder')+0.1;
@@ -2296,7 +2292,7 @@ character.boss={
 						if(target.disabledSkills.boss_hujia) return Math.max(1,10-target.maxHp);
 						return 1/target.maxHp;
 					},
-					prompt:'是否发动【胡笳】？'
+					prompt:get.prompt('boss_hujia')
 				});
 				"step 1"
 				if(result.bool){
@@ -2525,7 +2521,7 @@ character.boss={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【天陨】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_tianyun'),function(card,player,target){
 					return target.isEnemyOf(player);
 				}).ai=function(target){
 					if(player.hp<=1) return 0;
@@ -2634,7 +2630,7 @@ character.boss={
 			content:function(){
 				"step 0"
 				var noneed=(trigger.card.name=='tao'&&trigger.targets[0]==player&&player.hp==player.maxHp-1);
-				player.chooseTarget('是否发动【栖梧】？',function(card,player,target){
+				player.chooseTarget(get.prompt('boss_qiwu'),function(card,player,target){
 					return target.hp<target.maxHp&&target.isFriendOf(player);
 				}).ai=function(target){
 					var num=ai.get.attitude(player,target);
@@ -2745,7 +2741,7 @@ character.boss={
 			content:function(){
 				"step 0"
 				game.delay(0.5);
-				player.chooseTarget('是否发动【踏水】？',function(card,player,target){
+				player.chooseTarget(get.prompt('tashui'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
 					if(target.isTurnedOver()) return -1;
@@ -2927,7 +2923,7 @@ character.boss={
                         num++;
                     }
                 }
-                player.chooseTarget('是否发动【激阵】？',[1,2],function(card,player,target){
+                player.chooseTarget(get.prompt('jizhen'),[1,2],function(card,player,target){
                     return target.hp<target.maxHp&&player!=target;
                 }).ai=function(target){
                     return ai.get.attitude(player,target);

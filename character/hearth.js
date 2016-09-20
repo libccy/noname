@@ -1244,7 +1244,7 @@ character.hearth={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【北伐】？',function(card,player,target){
+				player.chooseTarget(get.prompt('fbeifa'),function(card,player,target){
 					return lib.filter.targetEnabled({name:'sha'},player,target);
 				}).ai=function(target){
 					return ai.get.effect(target,{name:'sha'},player);
@@ -1289,7 +1289,7 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【驭法】？',function(card,player,target){
+				player.chooseTarget(get.prompt('yufa'),function(card,player,target){
 					return target!=trigger.player;
 				}).ai=function(target){
 					return ai.get.attitude(player,target);
@@ -1539,7 +1539,7 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【封印】？',function(card,player,target){
+				player.chooseTarget(get.prompt('fengyin'),function(card,player,target){
 					return target!=player;
 				}).ai=function(target){
 					return -ai.get.attitude(player,target)*Math.sqrt(target.num('h'));
@@ -1973,7 +1973,7 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【教诲】？').ai=function(target){
+				player.chooseTarget(get.prompt('jiaohui')).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(att>1&&target.hp<=1){
 						att+=2;
@@ -2096,7 +2096,7 @@ character.hearth={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【灵咒】？').ai=function(target){
+				player.chooseTarget(get.prompt('lingzhou')).ai=function(target){
 					var num=ai.get.attitude(player,target);
 					if(num>0){
 						if(target==player){
@@ -2165,7 +2165,7 @@ character.hearth={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【魔箭】？',function(card,player,target){
+				player.chooseTarget(get.prompt('xmojian'),function(card,player,target){
 					return lib.filter.targetEnabled({name:'sha'},player,target);
 				}).ai=function(target){
 					return ai.get.effect(target,{name:'sha'},player);
@@ -2529,7 +2529,7 @@ character.hearth={
 				else if(player.num('h','shan')&&player.num('h','wuxie')){
 					check=false;
 				}
-				player.chooseTarget('是否发动【窥心】？',function(card,player,target){
+				player.chooseTarget(get.prompt('kuixin'),function(card,player,target){
 					return target!=player&&Math.abs(target.num('h')-nh)<=nm;
 				}).ai=function(target){
 					if(!check) return 0;
@@ -2573,9 +2573,6 @@ character.hearth={
 			filter:function(event,player){
 				return event.card&&get.type(event.card)=='trick'&&
 				event.player.isAlive()&&!event.player.isTurnedOver();
-			},
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【冰霜】？';
 			},
 			check:function(event,player){
 				if(event.player.isTurnedOver()){
@@ -2622,15 +2619,12 @@ character.hearth={
 			filter:function(event,player){
 				return !player.hasSkill('shengyan2')&&event.player.hp<event.player.maxHp;
 			},
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【圣言】？';
-			},
+			logTarget:'player',
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>0;
 			},
 			content:function(){
 				trigger.player.recover();
-				player.line(trigger.player,'green');
 				player.addTempSkill('shengyan2','phaseAfter');
 			},
 			ai:{
@@ -2835,7 +2829,7 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【视界】',function(card,player,target){
+				player.chooseTarget(get.prompt('shijie'),function(card,player,target){
 					return player!=target&&target.num('h')>0;
 				}).ai=function(target){
 					return 11-ai.get.attitude(player,target);
@@ -2972,7 +2966,7 @@ character.hearth={
 				'step 0'
 				var eff=ai.get.effect(trigger.targets[0],trigger.card,trigger.player,player);
 				var att=ai.get.attitude(player,trigger.player);
-				player.chooseCard('是否发动【变形】？',function(card){
+				player.chooseCard(get.prompt('bianxing'),function(card){
 					if(card.name!=trigger.card.name){
 						if(get.type(card)=='basic'&&get.info(card).enable){
 							return true;
@@ -3209,7 +3203,7 @@ character.hearth={
 			},
 			prompt:function(event,player){
 				var target=(player==event.player)?event.source:event.player;
-				return '是否对'+get.translation(target)+'发动【魔影】？';
+				return get.prompt('moying',target);
 			},
 			content:function(){
 				"step 0"
@@ -3426,7 +3420,7 @@ character.hearth={
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否发动【激活】？');
+				var next=player.chooseToDiscard(get.prompt('jihuo'));
 				next.ai=ai.get.unuseful2;
 				next.logSkill='jihuo';
 				"step 1"
@@ -3461,7 +3455,7 @@ character.hearth={
 			},
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动【震击】？').ai=function(target){
+				player.chooseTarget(get.prompt('tzhenji')).ai=function(target){
 					var bool=ai.get.attitude(player,target)>0;
 					return ai.get.damageEffect(target,player,player,'thunder')-(bool?1:0);
 				};
@@ -3499,7 +3493,7 @@ character.hearth={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动【震击】？').ai=function(target){
+				player.chooseTarget(get.prompt('tzhenji_old')).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'thunder')-1;
 				};
 				"step 1"

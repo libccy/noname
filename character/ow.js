@@ -667,9 +667,7 @@ character.ow={
                 delete player.disabledSkills.temp;
                 return num;
             },
-            prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【支援】？';
-			},
+            logTarget:'player',
             filter:function(event,player){
                 return event.num>0;
             },
@@ -1086,7 +1084,7 @@ character.ow={
                     if(Math.random()<0.5) goon=true;
                 }
                 if(Math.random()<0.3) goon2=true;
-                player.chooseToDiscard([1,player.num('h')],'he','是否对'+get.translation(trigger.player)+'发动【冰墙】？').set('logSkill',['bingqiang',trigger.player]).ai=function(card){
+                player.chooseToDiscard([1,player.num('h')],'he',get.prompt('bingqiang',trigger.player)).set('logSkill',['bingqiang',trigger.player]).ai=function(card){
                     if(ui.selected.cards.length) return 0;
                     if(goon) return 6-ai.get.value(card);
                     if(goon2) return 4-ai.get.value(card);
@@ -1201,9 +1199,7 @@ character.ow={
 				if(event.player.hp==1) return att>0;
 				return att<=0;
 			},
-            prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【霜枪】？';
-			},
+            logTarget:'player',
 			filter:function(event,player){
 				return !event.player.isTurnedOver()&&event.num>0;
 			},
@@ -1451,7 +1447,7 @@ character.ow={
 			content:function(){
 				"step 0"
 				var dis=trigger.target.num('h','shan')||trigger.target.num('e','bagua')||trigger.target.num('h')>2;
-				var next=player.chooseToDiscard('是否发动【霰弹】？');
+				var next=player.chooseToDiscard(get.prompt('xiandan'));
 				next.ai=function(card){
 					if(dis) return 7-ai.get.value(card);
 					return 0;
@@ -1503,7 +1499,7 @@ character.ow={
             direct:true,
 			content:function(){
 				'step 0'
-                player.discardPlayerCard('是否发动【目镜】？',trigger.target).logSkill=['mujing'];
+                player.discardPlayerCard(get.prompt('mujing'),trigger.target).logSkill=['mujing'];
                 'step 1'
                 if(result.bool&&player.num('h')<=trigger.target.num('h')){
                     player.draw();
@@ -1958,7 +1954,7 @@ character.ow={
             content:function(){
                 'step 0'
                 var next=player.chooseCardTarget({
-                    prompt:'是否发动【移魂】？',
+                    prompt:get.prompt('yihun'),
                     position:'he',
                     filterCard:{suit:'spade'},
                     ai1:function(card){
@@ -2085,7 +2081,7 @@ character.ow={
                         targets.push(game.players[i]);
                     }
 				}
-                player.chooseToDiscard('是否发动【飞弹】？').set('ai',function(card){
+                player.chooseToDiscard(get.prompt('feidan')).set('ai',function(card){
                     if(eff>0) return 7-ai.get.value(card);
                     return 0;
                 }).set('logSkill',['feidan',targets]);
@@ -2117,7 +2113,7 @@ character.ow={
             content:function(){
                 'step 0'
                 var num=1+player.storage.yuedong_num;
-                player.chooseTarget('是否发动【乐动】？',[1,num],function(card,player,target){
+                player.chooseTarget(get.prompt('yuedong'),[1,num],function(card,player,target){
                     if(player.storage.yuedong_recover){
                         return target.hp<target.maxHp;
                     }
@@ -2372,7 +2368,7 @@ character.ow={
 					controls.push('recover_hp');
 				}
 				controls.push('cancel');
-				player.chooseControl(controls).set('prompt','是否发动【自愈】？').set('ai',function(event,player){
+				player.chooseControl(controls).set('prompt',get.prompt('ziyu')).set('ai',function(event,player){
 					if(player.hp<player.maxHp) return 'recover_hp';
 					return 'draw_card';
 				});
@@ -2401,7 +2397,7 @@ character.ow={
 					controls.push('recover_hp');
 				}
 				controls.push('cancel');
-				player.chooseControl(controls).set('prompt','是否发动【自愈】？').set('ai',function(event,player){
+				player.chooseControl(controls).set('prompt',get.prompt('ziyu')).set('ai',function(event,player){
 					if(player.hp<player.maxHp) return 'recover_hp';
 					return 'draw_card';
 				});
@@ -2467,14 +2463,11 @@ character.ow={
 				return ai.get.attitude(player,event.player)<0&&
 				((player.num('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
 			},
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【闪现】？'
-			},
+            logTarget:'player',
 			content:function(){
                 "step 0"
                 player.draw(false);
                 player.$draw();
-				player.line(trigger.player,'green');
 				"step 1"
                 player.storage.shanxian_h=player.get('h');
                 player.storage.shanxian_e=player.get('e');

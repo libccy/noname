@@ -168,7 +168,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				var fang=player.hp>=2&&player.num('h')<=player.hp+1;
-				player.chooseTarget('是否发动【放权】？',function(card,player,target){
+				player.chooseTarget(get.prompt('fangquan'),function(card,player,target){
 					return target!=player;
 				}).set('ai',function(target){
 					if(!_status.event.fang) return -1;
@@ -928,7 +928,7 @@ character.shenhua={
 			},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('he','是否发动【悲歌】？');
+				var next=player.chooseToDiscard('he',get.prompt('beige'));
 				next.set('ai',ai.get.unuseful2);
 				next.set('logSkill','beige');
 				"step 1"
@@ -1427,7 +1427,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【放逐】？',function(card,player,target){
+				player.chooseTarget(get.prompt('fangzhu'),function(card,player,target){
 					return player!=target
 				}).ai=function(target){
 					var player=_status.event.player;
@@ -1511,7 +1511,7 @@ character.shenhua={
 				if(event.list.length){
 					var current=event.list.shift();
 					event.current=current;
-					player.chooseBool('是否对'+get.translation(current)+'发动【颂威】？').set('choice',ai.get.attitude(player,current)>0);
+					player.chooseBool(get.prompt('songwei',current)).set('choice',ai.get.attitude(player,current)>0);
 				}
 				else{
 					event.finish();
@@ -1742,7 +1742,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【英魂】？',function(card,player,target){
+				player.chooseTarget(get.prompt('yinghun'),function(card,player,target){
 					return player!=target;
 				}).set('ai',function(target){
 					var player=_status.event.player;
@@ -1912,7 +1912,7 @@ character.shenhua={
 				if(event.list.length){
 					var current=event.list.shift();
 					event.current=current;
-					player.chooseBool('是否对'+get.translation(current)+'发动【暴虐】？').set('choice',ai.get.attitude(player,current)>0);
+					player.chooseBool(get.prompt('baonue',current)).set('choice',ai.get.attitude(player,current)>0);
 				}
 				else{
 					event.finish();
@@ -2277,7 +2277,7 @@ character.shenhua={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【节命】？',[1,trigger.num],function(card,player,target){
+				player.chooseTarget(get.prompt('jieming'),[1,trigger.num],function(card,player,target){
 					return target.num('h')<Math.min(target.maxHp,5);
 				}).set('ai',function(target){
 					var att=ai.get.attitude(_status.event.player,target);
@@ -2600,7 +2600,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动【'+get.skillTranslation('releiji',player)+'】？').ai=function(target){
+				player.chooseTarget(get.prompt('releiji')).ai=function(target){
 					if(target.hasSkill('hongyan')) return 0;
 					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
@@ -2673,7 +2673,7 @@ character.shenhua={
 				"step 0"
 				player.addSkill('shensu3');
 				var check= player.num('h')>2;
-				player.chooseTarget('是否发动【神速】？',function(card,player,target){
+				player.chooseTarget(get.prompt('shensu'),function(card,player,target){
 					if(player==target) return false;
 					return player.canUse({name:'sha'},target);
 				}).ai=function(target){
@@ -2702,7 +2702,7 @@ character.shenhua={
 				player.addSkill('shensu3');
 				var check=player.num('h')<=player.hp;
 				player.chooseCardTarget({
-					prompt:'是否发动【神速】？',
+					prompt:get.prompt('shensu'),
 					filterCard:function(card){
 						return get.type(card)=='equip'
 					},
@@ -2950,7 +2950,7 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0";
-				player.chooseTarget('是否发动【雷击】？').ai=function(target){
+				player.chooseTarget(get.prompt('leiji')).ai=function(target){
 					if(target.hasSkill('hongyan')) return 0;
 					return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
 				};
@@ -3004,7 +3004,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging[0])+'，是否发动【鬼道】？','he',function(card){
+				get.translation(trigger.player.judging[0])+'，'+get.prompt('guidao'),'he',function(card){
 					return get.color(card)=='black';
 				}).set('ai',function(card){
 					var trigger=_status.event.getTrigger();

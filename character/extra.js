@@ -54,10 +54,9 @@ character.extra={
 						}
 					}
 				}
-				var prompt='是否发动【琴音】（剩余'+get.cnNumber(event.count)+'次）';
+				var prompt=get.prompt('qinyin')+'（剩余'+get.cnNumber(event.count)+'次）';
 				player.chooseControl('失去体力','回复体力','cancel',
-				ui.create.dialog('是否发动【琴音】？','hidden')).ai=function(){
-					// console.log(lose,recover);
+				ui.create.dialog(get.prompt('qinyin'),'hidden')).ai=function(){
 					if(lose>recover&&lose>0) return 0;
 					if(lose<recover&&recover>0) return 1;
 					return 2;

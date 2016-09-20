@@ -317,6 +317,7 @@ character.yijiang={
 			init:function(player){
 				player.storage.jishe=0;
 			},
+			usable:20,
 			content:function(){
 				player.draw();
 				player.storage.jishe++;
@@ -367,7 +368,7 @@ character.yijiang={
                         num++;
                     }
                 }
-                player.chooseTarget('是否发动【极奢】？',[1,Math.min(num,player.hp)],function(card,player,target){
+                player.chooseTarget(get.prompt('jishe'),[1,Math.min(num,player.hp)],function(card,player,target){
                     return !target.isLinked();
                 }).set('ai',function(target){
                     return -ai.get.attitude(_status.event.player,target);
@@ -430,7 +431,7 @@ character.yijiang={
 						}
 					}
 				}
-				player.chooseCard('he',[1,player.num('he')],'是否对'+get.translation(trigger.source)+'发动【贿生】？').set('ai',function(card){
+				player.chooseCard('he',[1,player.num('he')],get.prompt('huisheng',trigger.source)).set('ai',function(card){
 					if(_status.event.att){
 						return 10-ai.get.value(card);
 					}
@@ -503,7 +504,7 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【寝情】？',function(card,player,target){
+				player.chooseTarget(get.prompt('qinqing'),function(card,player,target){
 					if(target==player||target==game.zhu) return false;
 					return get.distance(target,game.zhu,'attack')<=1&&target.num('he')>0;
 				}).set('ai',function(target){
@@ -562,7 +563,7 @@ character.yijiang={
 					controls.push('recover_hp');
 				}
 				controls.push('cancel');
-				player.chooseControl(controls).set('prompt','是否发动【瑰藻】？').set('ai',function(event,player){
+				player.chooseControl(controls).set('prompt',get.prompt('guizao')).set('ai',function(event,player){
 					if(player.hp<player.maxHp) return 'recover_hp';
 					return 'draw_card';
 				});
@@ -1208,7 +1209,7 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【'+get.skillTranslation('xinjuece',player)+'】？',function(card,player,target){
+				player.chooseTarget(get.prompt('xinjuece'),function(card,player,target){
 					return target.num('h')==0;
 				}).set('ai',function(target){
 					var player=_status.event.player;
@@ -1360,7 +1361,7 @@ character.yijiang={
 					ai2:function(target){
 						return 1-ai.get.attitude(_status.event.player,target);
 					},
-					prompt:'是否发动【节钺】？'
+					prompt:get.prompt('jieyue')
 				});
 				'step 1'
 				if(result.bool){
@@ -1619,7 +1620,7 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				player.chooseCard([1,player.num('h','sha')],'是否发动【醇醪】？',{name:'sha'}).set('ai',function(){
+				player.chooseCard([1,player.num('h','sha')],get.prompt('chunlao'),{name:'sha'}).set('ai',function(){
 					return 1;
 				});
 				'step 1'
@@ -1655,7 +1656,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				var att=ai.get.attitude(player,trigger.player);
-				player.chooseCardButton('是否对'+get.translation(trigger.player)+'发动【醇醪】？',player.storage.chunlao).set('ai',function(button){
+				player.chooseCardButton(get.prompt('chunlao',trigger.player),player.storage.chunlao).set('ai',function(button){
 					if(_status.event.att>0) return 1;
 					return 0;
 				}).set('att',att);
@@ -1708,7 +1709,7 @@ character.yijiang={
 				}
 				'step 1'
 				if(event.cards.length){
-					player.chooseTarget('是否发动【慎断】？',function(card,player,target){
+					player.chooseTarget(get.prompt('shenduan'),function(card,player,target){
 						return player.canUse({name:'bingliang'},target,false);
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -1760,7 +1761,7 @@ character.yijiang={
 				var att=ai.get.attitude(player,trigger.player);
 				var nh=trigger.player.num('h');
 				var eff=ai.get.effect(trigger.player,{name:'sha'},player,player);
-				player.chooseCardButton('是否对'+get.translation(trigger.player)+'发动【勇略】？',trigger.player.get('j')).set('ai',function(button){
+				player.chooseCardButton(get.prompt('yonglve',trigger.player),trigger.player.get('j')).set('ai',function(button){
 					var name=button.link.viewAs||button.link.name;
 					var att=_status.event.att;
 					var nh=_status.event.nh;
@@ -2078,7 +2079,7 @@ character.yijiang={
 						}
 					}
 				}
-				var next=player.chooseToDiscard('是否发动【龙吟】？','he');
+				var next=player.chooseToDiscard(get.prompt('longyin'),'he');
 				next.logSkill=['longyin',trigger.player];
 				next.set('ai',function(card){
 					if(_status.event.go){
@@ -2286,7 +2287,7 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				var nh=player.num('h');
-				player.chooseTarget('是否发动【邀名】？',function(card,player,target){
+				player.chooseTarget(get.prompt('yaoming'),function(card,player,target){
 					return _status.event.nh!=target.num('h');
 				}).set('ai',function(target){
 					var att=ai.get.attitude(_status.event.player,target);
@@ -2386,7 +2387,7 @@ character.yijiang={
 				if(!player.hasSkill('yanzhu')){
 					num=player.maxHp;
 				}
-				player.chooseTarget([1,num],'是否发动【兴学】？').set('ai',function(target){
+				player.chooseTarget([1,num],get.prompt('xingxue')).set('ai',function(target){
 					var att=ai.get.attitude(_status.event.player,target);
 					if(target.num('he')) return att;
 					return att/10;
@@ -2773,7 +2774,7 @@ character.yijiang={
 						}
 					}
 				}
-				var next=player.chooseToDiscard('是否发动【勤王】？','he');
+				var next=player.chooseToDiscard(get.prompt('qinwang'),'he');
 				next.set('ai',function(card){
 					if(_status.event.yep) return 5-ai.get.value(card);
 					return 0;
@@ -2922,7 +2923,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【佐定】？',function(card,player,target){
+				player.chooseTarget(get.prompt('zuoding'),function(card,player,target){
 					return _status.event.getTrigger().targets.contains(target);
 				}).set('ai',function(target){
 					return ai.get.attitude(_status.event.player,target);
@@ -2968,7 +2969,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseCard('是否发动【活墨】？','he',function(card){
+				player.chooseCard(get.prompt('huomo'),'he',function(card){
 					return get.type(card)!='basic'&&get.color(card)=='black';
 				}).set('ai',function(card){
 					if(!_status.event.player.num('h','shan')){
@@ -3426,7 +3427,7 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				var go=Math.random()<0.5;
-				player.chooseTarget('是否发动【明鉴】？',function(card,player,target){
+				player.chooseTarget(get.prompt('mingjian'),function(card,player,target){
 					return player!=target
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
@@ -3475,7 +3476,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【恢拓】？').set('ai',function(target){
+				player.chooseTarget(get.prompt('huituo')).set('ai',function(target){
 					var player=_status.event.player;
 					if(ai.get.attitude(player,target)>0){
 						return ai.get.recoverEffect(target,player,player)+1;
@@ -3523,7 +3524,7 @@ character.yijiang={
 			audio:2,
 			content:function(){
 				'step 0'
-				var next=player.chooseToDiscard('he','是否发动【夺刀】？');
+				var next=player.chooseToDiscard('he',get.prompt('duodao'));
 				next.logSkill=['duodao',trigger.source];
 				next.set('ai',function(card){
 					if(ai.get.attitude(_status.event.player,_status.event.getTrigger().source)<0){
@@ -3563,7 +3564,7 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				player.choosePlayerCard(trigger.target,'he',
-					[1,Math.min(trigger.target.num('he'),trigger.target.hp)],'是否发动【破军】？');
+					[1,Math.min(trigger.target.num('he'),trigger.target.hp)],get.prompt('pojun',trigger.target));
 				'step 1'
 				if(result.bool&&result.links.length){
 					player.logSkill('xinpojun');
@@ -3668,7 +3669,7 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【燕语】？',function(card,player,target){
+				player.chooseTarget(get.prompt('yanyu'),function(card,player,target){
 					return target.sex=='male'&&target!=player;
 				}).set('ai',function(target){
 					return ai.get.attitude(_status.event.player,target);
@@ -3689,7 +3690,7 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【诱敌】？',function(card,player,target){
+				player.chooseTarget(get.prompt('youdi'),function(card,player,target){
 					return player!=target;
 				}).set('ai',function(target){
 					if(target.num('he')==0) return 0;
@@ -3832,7 +3833,7 @@ character.yijiang={
 			position:'he',
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【灭计】？',function(card,player,target){
+				player.chooseTarget(get.prompt('mieji'),function(card,player,target){
 					var trigger=_status.event.getTrigger();
 					return lib.filter.filterTarget(trigger.card,player,target)&&target!=trigger.targets[0];
 				}).set('ai',function(target){
@@ -4143,7 +4144,7 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【巧说】？',function(card,player,target){
+				player.chooseTarget(get.prompt('qiaoshui'),function(card,player,target){
 					return player!=target&&target.num('h')>0;
 				}).set('ai',function(target){
 					return -ai.get.attitude(_status.event.player,target)/target.num('h');
@@ -4299,9 +4300,7 @@ character.yijiang={
 			filter:function(event,player){
 				return event.player!=player;
 			},
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【献图】？'
-			},
+			logTarget:'player',
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)<5) return false;
 				if(player.maxHp-player.hp>=2) return false;
@@ -4366,7 +4365,7 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【强识】？',function(card,player,target){
+				player.chooseTarget(get.prompt('qiangzhi'),function(card,player,target){
 					return target!=player&&target.num('h')>0;
 				}).set('ai',function(){
 					return Math.random();
@@ -4522,7 +4521,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【谮毁】？',function(card,player,target){
+				player.chooseTarget(get.prompt('chanhui'),function(card,player,target){
 					if(player==target) return false;
 					var trigger=_status.event.getTrigger();
 					return player.canUse(trigger.card,target)&&trigger.targets.contains(target)==false;
@@ -4831,9 +4830,7 @@ character.yijiang={
 				}
 				return false;
 			},
-			prompt:function(event){
-				return '是否对'+get.translation(event.player)+'发动【惴恐】？';
-			},
+			logTarget:'player',
 			filter:function(event,player){
 				return player.hp<player.maxHp&&event.player!=player&&
 					player.num('h')>0&&event.player.num('h')>0;
@@ -4854,7 +4851,7 @@ character.yijiang={
 			priority:11,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【求援】？',function(card,player,target){
+				player.chooseTarget(get.prompt('qiuyuan'),function(card,player,target){
 					return target!=player&&_status.event.getTrigger().player.canUse('sha',target,false);
 				}).set('ai',function(target){
 					var trigger=_status.event.getTrigger();
@@ -4962,7 +4959,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【追忆】？',function(card,player,target){
+				player.chooseTarget(get.prompt('zhuiyi'),function(card,player,target){
 					return player!=target&&_status.event.source!=target;
 				}).set('ai',function(target){
 					var num=ai.get.attitude(_status.event.player,target);
@@ -5143,7 +5140,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【眩惑】',function(card,player,target){
+				player.chooseTarget(get.prompt('xinxuanhuo'),function(card,player,target){
 					return player!=target;
 				}).set('ai',function(target){
 					var att=ai.get.attitude(_status.event.player,target);
@@ -5264,7 +5261,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【直言】？').set('ai',function(target){
+				player.chooseTarget(get.prompt('zhiyan')).set('ai',function(target){
 					return ai.get.attitude(_status.event.player,target);
 				});
 				"step 1"
@@ -5490,7 +5487,7 @@ character.yijiang={
 						return att;
 					},
 					position:'he',
-					prompt:'是否发动【'+get.skillTranslation('xinjujian',player)+'】？'
+					prompt:get.prompt('xinjujian')
 				});
 				"step 1"
 				if(result.bool){
@@ -6511,7 +6508,7 @@ character.yijiang={
 						check=true;
 					}
 				}
-				player.choosePlayerCard(trigger.player,'是否对'+get.translation(trigger.player)+'发动【补益】？','h').set('ai',function(button){
+				player.choosePlayerCard(trigger.player,get.prompt('buyi',trigger.player),'h').set('ai',function(button){
 					if(!_status.event.check) return 0;
 					if(_status.event.target.isUnderControl(true,_status.event.player)){
 						if(get.type(card)!='basic'){
@@ -6673,7 +6670,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否发动【仁心】？',{type:'equip'},'he');
+				var next=player.chooseToDiscard(get.prompt('renxin',trigger.player),{type:'equip'},'he');
 				next.logSkill=['renxin',trigger.player];
 				next.set('ai',function(card){
 					var player=_status.event.player;
@@ -6706,7 +6703,7 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否发动御策？');
+				var next=player.chooseToDiscard(get.prompt('yuce'));
 				next.logSkill='yuce';
 				next.set('ai',function(card){
 					return 7-ai.get.value(card);
@@ -6763,7 +6760,7 @@ character.yijiang={
 			forceunique:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动陷嗣？',[1,2],function(card,player,target){
+				player.chooseTarget(get.prompt('xiansi'),[1,2],function(card,player,target){
 					return target.num('he')>0;
 				},function(target){
 					return -ai.get.attitude(_status.event.player,target);
@@ -6957,7 +6954,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				var att=ai.get.attitude(player,trigger.source);
-				player.choosePlayerCard('e','是否发动【争功】？',trigger.source).ai=function(button){
+				player.choosePlayerCard('e',get.prompt('zzhenggong'),trigger.source).ai=function(button){
 					if(att<=0){
 						return ai.get.equipValue(button.link);
 					}
@@ -6984,9 +6981,7 @@ character.yijiang={
 				if(att>0&&event.player.num('j','lebu')&&event.player.num('h')>event.player.hp+1) return true;
 				return false;
 			},
-            prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【权计】？';
-			},
+			logTarget:'player',
 			filter:function(event,player){
 				return event.player!=player&&event.player.num('h')>0&&player.num('h')>0;
 			},
@@ -7113,7 +7108,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				var next=player.chooseCardButton('是否发动【排异】？',player.storage.zyexin);
+				var next=player.chooseCardButton(get.prompt('zpaiyi'),player.storage.zyexin);
 				next.filterButton=function(button){
 					var type=get.type(button.link);
 					if(type=='delay'||type=='equip') return true;

@@ -32,7 +32,7 @@ character.jiange={
             },
             content:function(){
                 "step 0"
-                player.chooseTarget('是否发动【控魂】？',function(card,player,target){
+                player.chooseTarget(get.prompt('konghun'),function(card,player,target){
                     return player!=target;
                 },[1,Math.min(4,Math.floor((game.players.length-1)/2))]).ai=function(target){
                     return ai.get.damageEffect(target,player,player,'thunder')+1;
@@ -116,7 +116,7 @@ character.jiange={
 			},
 			content:function(){
 				"step 0"
-                player.chooseTarget('是否发动【惑敌】？',function(card,player,target){
+                player.chooseTarget(get.prompt('huodi'),function(card,player,target){
                     return target.num('he')&&player!=target;
                 }).ai=function(target){
                     return -ai.get.attitude(player,target);
@@ -234,7 +234,7 @@ character.jiange={
             content:function(){
                 "step 0"
                 game.delay(0.5);
-                player.chooseTarget('是否发动【绝尘】？',function(card,player,target){
+                player.chooseTarget(get.prompt('juechen'),function(card,player,target){
                     return player!=target&&!trigger.targets.contains(target)&&target.num('he')>0;
                 }).ai=function(target){
                     return -ai.get.attitude(player,target);
@@ -387,8 +387,7 @@ character.jiange={
             },
             content:function(){
                 "step 0"
-                player.choosePlayerCard(trigger.player,'是否发动【精妙】弃置'+
-                    get.translation(trigger.player)+'一张牌？','he');
+                player.choosePlayerCard(trigger.player,get.prompt('jingmiao',trigger.player),'he');
                 "step 1"
                 if(result.bool){
                     player.logSkill('jingmiao',trigger.player);
@@ -473,7 +472,7 @@ character.jiange={
                         num++;
                     }
                 }
-                player.chooseTarget('是否发动【天狱】？',[1,num],function(card,player,target){
+                player.chooseTarget(get.prompt('tianyu'),[1,num],function(card,player,target){
                     return !target.isLinked()&&player!=target;
                 }).ai=function(target){
                     return -ai.get.attitude(player,target);
@@ -516,7 +515,7 @@ character.jiange={
                         num++;
                     }
                 }
-                player.chooseTarget('是否发动【激阵】？',[1,2],function(card,player,target){
+                player.chooseTarget(get.prompt('jizhen'),[1,2],function(card,player,target){
                     return target.hp<target.maxHp&&player!=target;
                 }).ai=function(target){
                     return ai.get.attitude(player,target);

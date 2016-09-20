@@ -217,7 +217,7 @@ card.sp={
 			},
 			content:function(){
 				'step 0'
-				var next=player.chooseToUse('是否发动【银月枪】？',{name:'sha'});
+				var next=player.chooseToUse(get.prompt('yinyueqiang'),{name:'sha'});
 				next.logSkill='yinyueqiang';
 				next.noButton=true;
 				'step 1'

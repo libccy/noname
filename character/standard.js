@@ -128,7 +128,7 @@ character.standard={
 			},
 			content:function(){
 				"step 0"
-				player.choosePlayerCard('是否对'+get.translation(trigger.source)+'发动【反馈】？',trigger.source,ai.get.buttonValue,'he');
+				player.choosePlayerCard(get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he');
 				"step 1"
 				if(result.bool){
 					player.logSkill('fankui',trigger.source);
@@ -157,7 +157,7 @@ character.standard={
 			content:function(){
 				"step 0"
 				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-				get.translation(trigger.player.judging[0])+'，是否发动【鬼才】？').set('ai',function(card){
+				get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai')).set('ai',function(card){
 					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var judging=_status.event.judging;
@@ -258,7 +258,7 @@ character.standard={
 					}
 				}
 				check=(num>=2);
-				player.chooseTarget('是否发动【突袭】？',[1,2],function(card,player,target){
+				player.chooseTarget(get.prompt('tuxi'),[1,2],function(card,player,target){
 					return target.num('h')>0&&player!=target;
 				},function(target){
 					if(!_status.event.aicheck) return 0;
@@ -1271,7 +1271,7 @@ character.standard={
 						}
 						return -1;
 					},
-					prompt:'是否发动【流离】？'
+					prompt:get.prompt('liuli')
 				});
 				"step 1"
 				if(result.bool){

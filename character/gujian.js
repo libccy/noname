@@ -126,9 +126,7 @@ character.gujian={
 				return ai.get.attitude(player,event.player)<0&&
 				((player.num('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
 			},
-			prompt:function(event,player){
-				return '是否对'+get.translation(event.player)+'发动【魅影】？'
-			},
+			logTarget:'player',
 			content:function(){
 				"step 0"
 				player.line(trigger.player,'green');
@@ -161,7 +159,7 @@ character.gujian={
 			},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否发动【戏蝶】？',[1,Math.min(3,player.num('h')-player.hp)]);
+				var next=player.chooseToDiscard(get.prompt('xidie'),[1,Math.min(3,player.num('h')-player.hp)]);
 				next.ai=function(card){
 					return 6-ai.get.value(card);
 				}
@@ -243,12 +241,12 @@ character.gujian={
 				return event.source&&ai.get.attitude(player,event.source)<0;
 			},
 			filter:function(event,player){
-				return player.num('h',{color:'red'})>1||player.num('h',{color:'black'})>1;
+				return event.source&&event.source.isAlive()&&player.num('h',{color:'red'})>1||player.num('h',{color:'black'})>1;
 			},
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否发动伏魔？',2,function(card){
+				player.chooseToDiscard(get.prompt('fumo',trigger.source),2,function(card){
 					if(ui.selected.cards.length){
 						return get.color(card)==get.color(ui.selected.cards[0]);
 					}
@@ -275,7 +273,7 @@ character.gujian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【梵音】？',function(card,player,target){
+				player.chooseTarget(get.prompt('fanyin'),function(card,player,target){
 					if(player==target) return false;
 					if(target.isLinked()) return true;
 					if(target.isTurnedOver()) return true;
@@ -421,8 +419,8 @@ character.gujian={
 			priority:-5,
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否对'+get.translation(trigger.player)+'发动【晴岚】？','he');
-				next.logSkill='qinglan';
+				var next=player.chooseToDiscard(get.prompt('qinglan',trigger.player),'he');
+				next.logSkill=['qinglan',trigger.player];
 				next.ai=function(card){
 					if(trigger.num>1||!trigger.source){
 						if(ai.get.attitude(player,trigger.player)>0){
@@ -503,7 +501,7 @@ character.gujian={
 					ai2:function(target){
 						return ai.get.damageEffect(target,player,player,'fire');
 					},
-					prompt:'是否发动【血戮】？'
+					prompt:get.prompt('xuelu')
 				});
 				"step 1"
 				if(result.bool){
@@ -684,7 +682,7 @@ character.gujian={
 				for(var i=0;i<event.targets.length;i++){
 					num+=ai.get.effect(event.targets[i],{name:'sha'},player,player);
 				}
-				var next=player.chooseToDiscard('是否对'+get.translation(event.targets)+'发动千军？','he');
+				var next=player.chooseToDiscard(get.prompt('qianjun',event.targets),'he');
 				next.logSkill=['qianjun',event.targets];
 				next.ai=function(card){
 					if(num<=0) return -1;
@@ -768,7 +766,7 @@ character.gujian={
 				"step 0"
 				player.chooseTarget(function(card,player,target){
 					return player!=target;
-				},'是否发动【流光】？',[1,3]).ai=function(target){
+				},get.prompt('liuguang'),[1,3]).ai=function(target){
 					return ai.get.damageEffect(target,player,player);
 				}
 				"step 1"

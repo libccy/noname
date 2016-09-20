@@ -13,9 +13,7 @@ character.xiake={
             filter:function(event,player){
                 return event.parent.name!='lingfeng'&&event.player.isAlive();
             },
-            prompt:function(event,player){
-                return '是否对'+get.translation(event.player)+'发动【凌锋】？';
-            },
+            logTarget:'player',
             check:function(event,player){
                 if(ai.get.damageEffect(event.player,player,player)>0&&
                     ai.get.attitude(player,event.player)<0){
@@ -25,7 +23,6 @@ character.xiake={
             },
             content:function(){
                 game.delay();
-                player.line(trigger.player,'green');
                 player.loseHp();
                 trigger.player.damage();
             }

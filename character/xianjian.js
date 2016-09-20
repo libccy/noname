@@ -130,7 +130,7 @@ character.xianjian={
 			content:function(){
 				"step 0"
 				var goon=(ai.get.damageEffect(player,trigger.player,player)<=0);
-				player.chooseCard('是否发动【障目】？',{name:'shan'}).ai=function(){
+				player.chooseCard(get.prompt('zhangmu'),{name:'shan'}).ai=function(){
 					return goon?1:0;
 				}
 				"step 1"
@@ -190,7 +190,7 @@ character.xianjian={
 						player.storage.leiyu.splice(i--,1);
 					}
 				}
-				return '是否对'+get.translation(player.storage.leiyu)+'发动【雷狱】？'
+				return get.prompt('leiyu',player.storage.leiyu);
 			},
             filter:function(event,player){
 				if(player.storage.leiyu){
@@ -272,7 +272,7 @@ character.xianjian={
                 var target=event.targets[0];
                 if(player.canUse('sha',target.next,false)) targets.push(target.next);
                 if(player.canUse('sha',target.previous,false)) targets.push(target.previous);
-				return '是否对'+get.translation(targets)+'发动【飞爪】？'
+				return get.prompt('feizhua',targets);
 			},
             check:function(event,player){
                 var target=event.targets[0];
@@ -526,11 +526,8 @@ character.xianjian={
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>0;
 			},
-			prompt:function(event){
-				return '是否对'+get.translation(event.player)+'发动【飞絮】？'
-			},
+			logTarget:'player',
 			content:function(){
-				player.line(trigger.player,'green');
 				trigger.player.draw();
 			},
 			ai:{
@@ -811,7 +808,7 @@ character.xianjian={
 				for(var i=0;i<player.storage.shuiyun.length;i++){
 					types.add(get.type(player.storage.shuiyun[i],'trick'));
 				}
-				player.chooseCard('是否发动【水蕴】？',function(card){
+				player.chooseCard(get.prompt('shuiyun'),function(card){
 					return !types.contains(get.type(card,'trick'));
 				}).ai=function(card){
 					return 11-ai.get.value(card);
@@ -873,7 +870,7 @@ character.xianjian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseCardButton(player.storage.shuiyun,'是否对'+get.translation(trigger.player)+'发动【水蕴】？').ai=function(button){
+				player.chooseCardButton(player.storage.shuiyun,get.prompt('shuiyun',trigger.player)).ai=function(button){
 					return ai.get.attitude(player,trigger.player)>2?1:0;
 				}
 				"step 1"
@@ -928,7 +925,8 @@ character.xianjian={
 						targets.push(game.players[i]);
 					}
 				}
-				var next=player.chooseToDiscard('是否对'+get.translation(targets)+'发动【忘忧】？','he');
+				event.targets=targets;
+				var next=player.chooseToDiscard(get.prompt('wangyou',targets),'he');
 				next.logSkill=['wangyou',event.targets];
 				next.ai=function(card){
 					if(num<=0) return 0;
@@ -938,7 +936,6 @@ character.xianjian={
 						default:return 8-ai.get.value(card);
 					}
 				}
-				event.targets=targets;
 				"step 1"
 				if(result.bool){
 					event.targets.sort(lib.sort.seat);
@@ -974,7 +971,7 @@ character.xianjian={
 			unique:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【长念】？',function(card,player,target){
+				player.chooseTarget(get.prompt('changnian'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
 					return ai.get.attitude(player,target);
@@ -1100,7 +1097,7 @@ character.xianjian={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【毒刺】？',function(card,player,target){
+				player.chooseTarget(get.prompt('duci'),function(card,player,target){
 					return player!=target&&get.distance(player,target)<=1;
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player);
@@ -1220,7 +1217,7 @@ character.xianjian={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget([1,trigger.cards.length],'是否发动【气剑】？',function(card,player,target){
+				player.chooseTarget([1,trigger.cards.length],get.prompt('qijian'),function(card,player,target){
 					return player.canUse({name:'sha'},target,false);
 				}).ai=function(target){
 					return ai.get.effect(target,{name:'sha'},player);
@@ -1281,7 +1278,7 @@ character.xianjian={
 					}
 				}
 				if(num){
-					var next=player.chooseToDiscard(num,'是否发动【千方】？','he');
+					var next=player.chooseToDiscard(num,get.prompt('qianfang'),'he');
 					next.ai=function(card){
 						if(ainum>=0){
 							switch(num){
@@ -1296,7 +1293,7 @@ character.xianjian={
 					event.logged=true;
 				}
 				else{
-					player.chooseBool('是否发动【千方】？').ai=function(){
+					player.chooseBool(get.prompt('qianfang')).ai=function(){
 						return ainum>=0;
 					}
 				}
@@ -1336,7 +1333,7 @@ character.xianjian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.discardPlayerCard(trigger.player,'he','是否发动【破云】',[1,2]).logSkill=['poyun',trigger.player];
+				player.discardPlayerCard(trigger.player,'he',get.prompt('poyun'),[1,2]).logSkill=['poyun',trigger.player];
 				"step 1"
 				if(result.bool){
 					player.storage.xuanning--;
@@ -1582,7 +1579,7 @@ character.xianjian={
 			content:function(){
 				"step 0"
 				var noneed=(trigger.card.name=='tao'&&trigger.targets[0]==player&&player.hp==player.maxHp-1);
-				player.chooseTarget('是否发动【润心】？',function(card,player,target){
+				player.chooseTarget(get.prompt('runxin'),function(card,player,target){
 					return target.hp<target.maxHp
 				}).ai=function(target){
 					var num=ai.get.attitude(player,target);
@@ -1619,7 +1616,7 @@ character.xianjian={
 			group:'zhimeng3',
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【织梦】？',function(card,player,target){
+				player.chooseTarget(get.prompt('zhimeng'),function(card,player,target){
 					return player!=target;
 				}).ai=function(target){
 					var num=ai.get.attitude(player,target);

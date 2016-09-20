@@ -1254,7 +1254,7 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				player.choosePlayerCard('是否发动【寒冰剑】？','he',trigger.target,Math.min(2,trigger.target.num('he')),function(button){
+				player.choosePlayerCard(get.prompt('hanbing'),'he',trigger.target,Math.min(2,trigger.target.num('he')),function(button){
 					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var eff=ai.get.damageEffect(trigger.target,player,player);
@@ -1365,7 +1365,7 @@ card.standard={
 					},player);
 					event.jiu=true;
 				}
-				player.chooseToUse('是否发动青龙偃月刀？',{name:'sha'},trigger.target,-1).logSkill='qinglong_skill';
+				player.chooseToUse(get.prompt('qinglong'),{name:'sha'},trigger.target,-1).logSkill='qinglong_skill';
 				"step 1"
 				if(result.bool);
 				else if(event.jiu){
@@ -1404,7 +1404,7 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否发动贯石斧？',2,'he',function(card){
+				var next=player.chooseToDiscard(get.prompt('guanshi'),2,'he',function(card){
 					return _status.event.player.get('e',{subtype:'equip1'}).contains(card)==false;
 				});
 				next.logSkill='guanshi_skill';

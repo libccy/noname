@@ -339,7 +339,7 @@ character.diy={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard('是否发动【纵火】？').ai=function(card){
+				player.chooseToDiscard(get.prompt('zonghuo')).ai=function(card){
 					var att=ai.get.attitude(player,trigger.player);
 					if(trigger.player.hasSkillTag('nofire')){
 						if(att>0) return 8-ai.get.value(card);
@@ -365,7 +365,7 @@ character.diy={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【烧营】？',function(card,player,target){
+				player.chooseTarget(get.prompt('shaoying'),function(card,player,target){
 					return get.distance(trigger.player,target)<=1&&trigger.player!=target;
 				}).ai=function(target){
 					return ai.get.damageEffect(target,player,player,'fire');

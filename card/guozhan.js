@@ -851,7 +851,7 @@ card.guozhan={
 						var player=_status.event.player;
 						return ai.get.damageEffect(target,player,player);
 					},
-					prompt:'是否发动【三尖两刃刀】？'
+					prompt:get.prompt('sanjian')
 				}).set('damaged',damaged);
 				"step 1"
 				if(result.bool){

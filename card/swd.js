@@ -1669,7 +1669,7 @@ card.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget([1,1],'是否发动【白兽之琥】？',function(card,player,target){
+				player.chooseTarget([1,1],get.prompt('baishouzhihu'),function(card,player,target){
 					if(player==target) return false;
 					return target.num('he')>0;
 				}).ai=function(target){
@@ -1735,7 +1735,7 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget([1,3],'是否发动【苍螭之璧】？').ai=function(target){
+				player.chooseTarget([1,3],get.prompt('cangchizhibi')).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(target.isLinked()){
 						return att;
@@ -1757,7 +1757,7 @@ card.swd={
 			direct:true,
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【灵枢】？').ai=function(target){
+				player.chooseTarget(get.prompt('cangchizhibi_duanzao')).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(target.isLinked()){
 						return att;
@@ -1791,7 +1791,7 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				var next=player.chooseToDiscard('he',{color:'black'},'是否发动【玄甲】？');
+				var next=player.chooseToDiscard('he',{color:'black'},get.prompt('huanglinzhicong_duanzao'));
 				next.ai=function(card){
 					return 8-ai.get.value(card);
 				};
@@ -1822,7 +1822,7 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				var next=player.chooseToDiscard('he',{color:'red'},'是否发动【寒晶】？');
+				var next=player.chooseToDiscard('he',{color:'red'},get.prompt('xuanwuzhihuang_duanzao'));
 				next.ai=function(card){
 					return 8-ai.get.value(card);
 				};
@@ -1867,7 +1867,7 @@ card.swd={
 					ai2:function(target){
 						return ai.get.damageEffect(target,player,player,'fire');
 					},
-					prompt:'是否发动【炽翎】？'
+					prompt:get.prompt('zhuquezhizhang_duanzao')
 				});
 				"step 1"
 				if(result.bool){
@@ -1901,7 +1901,7 @@ card.swd={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget([1,1],'是否发动【风牙】？',function(card,player,target){
+				player.chooseTarget([1,1],get.prompt('baishouzhihu_duanzao'),function(card,player,target){
 					if(player==target) return false;
 					return target.num('he')>0;
 				}).ai=function(target){
@@ -2089,7 +2089,7 @@ card.swd={
 					ai2:function(target){
 						return -ai.get.attitude(player,target);
 					},
-					prompt:'是否发动【东皇钟】？'
+					prompt:get.prompt('donghuangzhong')
 				});
 				'step 1'
 				if(result.bool){
@@ -2815,7 +2815,7 @@ card.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget('是否发动【冰冻】？',function(card,player,target){
+				player.chooseTarget(get.prompt('hslingjian_jinjilengdong_duanzao'),function(card,player,target){
 					return player!=target&&!target.isTurnedOver();
 				}).ai=function(target){
 					return Math.max(0,-ai.get.attitude(player,target)-2);
@@ -2837,7 +2837,7 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget('是否发动【隐力】？',function(card,player,target){
+				player.chooseTarget(get.prompt('hslingjian_yinmilichang_duanzao'),function(card,player,target){
 					return target!=player&&!target.hasSkill('hslingjian_yinshen');
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
@@ -3409,7 +3409,7 @@ card.swd={
 				return event.nature&&event.player&&event.player.isAlive();
 			},
 			content:function(){
-				player.gainPlayerCard('是否对'+get.translation(trigger.player)+'发动【青龙灵珠】？',trigger.player,function(button){
+				player.gainPlayerCard(get.prompt('qinglonglingzhu',trigger.player),trigger.player,function(button){
 					if(ai.get.attitude(player,trigger.player)<=0){
 						return ai.get.buttonValue(button);
 					}
