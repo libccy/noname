@@ -5714,6 +5714,9 @@ character.yijiang={
 				return true;
 			},
 			content:function(){
+				if(_status.event.getParent(2).type=='dying'){
+					event.dying=player;
+				}
 				player.turnOver();
 				player.useCard({name:'jiu'},player);
 			},

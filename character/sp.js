@@ -288,7 +288,10 @@ character.sp={
 			intro:{
 				content:'cards'
 			},
-			group:'tuifeng2'
+			group:'tuifeng2',
+			ai:{
+				threaten:0.8
+			}
 		},
 		tuifeng2:{
 			trigger:{player:'phaseBegin'},

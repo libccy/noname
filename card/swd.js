@@ -1131,7 +1131,7 @@ card.swd={
 			},
 			content:function(){
 				"step 0"
-				if(target==_status.event.getParent(2).dying) target.recover();
+				if(target==_status.event.getParent(2).dying||target==_status.dying) target.recover();
 				else{
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
 					if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){

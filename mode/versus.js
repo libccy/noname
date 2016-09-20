@@ -694,7 +694,14 @@ mode.versus={
 					characterChoice=list.randomGets(7);
 				}
 				var dialog=ui.create.dialog('选择角色',[characterChoice,'character']);
-				game.me.chooseButton(true,dialog);
+				if(get.config('replace_character_two')){
+					game.me.chooseButton(true,dialog,2);
+					_status.replacetwo=true;
+					game.additionaldead=[];
+				}
+				else{
+					game.me.chooseButton(true,dialog);
+				}
 				if(!_status.brawl||!_status.brawl.noAddSetting){
 					if(get.config('change_identity')){
 						addSetting(dialog);
@@ -773,6 +780,9 @@ mode.versus={
 					delete ui.cheat2;
 				}
 				game.me.init(result.links[0]);
+				if(_status.replacetwo){
+					game.me.replacetwo=result.links[1];
+				}
 				game.addRecentCharacter(game.me.name);
 				event.list.remove(game.me.name);
 				for(var i=0;i<game.players.length;i++){
@@ -781,9 +791,14 @@ mode.versus={
 							var list=_status.brawl.chooseCharacter(event.list,game.players[i]);
 							game.players[i].init(list.randomGet());
 							event.list.remove(game.players[i].name);
+							if(_status.replacetwo){
+								game.players[i].replacetwo=list.randomGet(game.players[i].name);
+								event.list.remove(game.players[i].replacetwo);
+							}
 						}
 						else{
 							game.players[i].init(event.list.randomRemove());
+							game.players[i].replacetwo=event.list.randomRemove();
 						}
 					}
 				}
@@ -2075,6 +2090,12 @@ mode.versus={
 			next.source=player;
 			next.setContent('replacePlayer');
 		},
+		replacePlayerTwo:function(player,character){
+			var next=game.createEvent('replacePlayerTwo');
+			next.source=player;
+			next.character=character;
+			next.setContent('replacePlayerTwo');
+		},
 		versusClickToSwap:function(e){
 			if(_status.dragged) return;
 			if(this.link==game.me){
@@ -2534,6 +2555,33 @@ mode.versus={
 				// 	source.skip('phase');
 				// }
 			},
+			replacePlayerTwo:function(){
+				'step 0'
+				game.delay();
+				'step 1'
+				source.revive(null,false);
+				game.additionaldead.push({
+					name:source.name,
+					stat:source.stat
+				});
+				game.addVideo('reinit',source,[event.character,get.translation(source.side+'Color')]);
+				source.uninit();
+				source.init(event.character);
+				game.log(source,'出场');
+				// source.node.identity.dataset.color=source.side+'zhu';
+				source.draw(4);
+				_status.event.parent.parent.parent.untrigger(false,source);
+				var evt=_status.event.parent.parent.parent;
+				for(var i=0;i<100;i++){
+					evt=evt.parent;
+					if(evt.player==source){
+						evt.finish();
+					}
+					if(evt.name=='phase'){
+						break;
+					}
+				}
+			},
 			replacePlayerOL:function(){
 				'step 0'
 				game.delay();
@@ -2692,6 +2740,9 @@ mode.versus={
 						 game.replacePlayerOL(this);
 					}
 					else if(_status.mode=='2v2'){
+						if(_status.replacetwo){
+
+						}
 						var friend;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].side==this.side){
@@ -2773,20 +2824,57 @@ mode.versus={
 								friend=game.players[i];break;
 							}
 						}
-						if(friend){
-							var next=game.createEvent('versusDraw');
-							next.setContent(function(){
-								'step 0'
-								player.chooseBool('是否摸一张牌？');
-								'step 1'
-								if(result.bool){
-									player.draw();
+						if(_status.replacetwo){
+							if(this.replacetwo){
+								if(source){
+									if(source.side==this.side){
+										var he=source.get('he');
+										if(he.length){
+											source.discard(he);
+										}
+									}
+									else{
+										source.draw(3);
+									}
 								}
-							});
-							next.player=friend;
+								game.replacePlayerTwo(this,this.replacetwo);
+								delete this.replacetwo;
+							}
+							else if(friend&&friend.replacetwo){
+								if(source){
+									if(source.side==this.side){
+										var he=source.get('he');
+										if(he.length){
+											source.discard(he);
+										}
+									}
+									else{
+										source.draw(3);
+									}
+								}
+								game.replacePlayerTwo(this,friend.replacetwo);
+								delete friend.replacetwo;
+							}
+							else{
+								game.over(this.side!=game.me.side);
+							}
 						}
 						else{
-							game.over(this.side!=game.me.side);
+							if(friend){
+								var next=game.createEvent('versusDraw');
+								next.setContent(function(){
+									'step 0'
+									player.chooseBool('是否摸一张牌？');
+									'step 1'
+									if(result.bool){
+										player.draw();
+									}
+								});
+								next.player=friend;
+							}
+							else{
+								game.over(this.side!=game.me.side);
+							}
 						}
 						return;
 					}
@@ -2884,7 +2972,10 @@ mode.versus={
 		}
 	},
 	help:{
-		'对决模式':'<div style="margin:10px">4v4</div><ul style="margin-top:0"><li>双方各有一名主公和三名忠臣，杀死对方主公获胜<li>'+
+		'对决模式':
+		'<div style="margin:10px">2v2 替补模式</div><ul style="margin-top:0"><li>选将时额外选择一名替补武将，阵亡时使用自己的替补武将上场，无替补时改为用队友的替补武将，两人均无替补时游戏结束'+
+		'<li>杀死敌方武将摸3张牌，杀死友方武将弃置所有牌</ul>'+
+		'<div style="margin:10px">4v4</div><ul style="margin-top:0"><li>双方各有一名主公和三名忠臣，杀死对方主公获胜<li>'+
 		'8号位游戏开始时额外摸一张牌，7、8号位可在游戏开始时置换一次手牌<li>'+
 		'杀死对方忠臣摸2+x张牌，x为对方（含刚被杀的忠臣）与己方的存活人数之差；主公杀死己方忠臣须弃置所有牌',
 	}

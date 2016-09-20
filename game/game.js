@@ -2697,6 +2697,11 @@
                         init:true,
                         frequent:true,
                     },
+                    replace_character_two:{
+                        name:'替补模式',
+                        init:false,
+                        frequent:true,
+                    },
 					ban_weak:{
 		                name:'屏蔽弱将',
 						init:true,
@@ -14259,6 +14264,7 @@
                         event.finish();
                         return;
                     }
+                    _status.dying=event.dying;
                     event.acted.push(player);
                     // else if(trigger.source&&trigger.source.isDead()){
                     //     trigger.start=game.findNext(trigger.source);
