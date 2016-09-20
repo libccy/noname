@@ -4034,6 +4034,7 @@ character.swd={
 				if(event.type!='dying') return false;
 				if(player!=_status.dying) return false;
 				if(player.storage.yuhuo) return false;
+				return true;
 			},
 			content:function(){
 				player.maxHp--;
