@@ -4328,6 +4328,7 @@ character.swd={
 			filter:function(event,player){
 				return event.source&&event.source!=player&&event.source.num('he');
 			},
+			logTarget:'source',
 			content:function(){
 				trigger.source.chooseToDiscard('he',true);
 			},

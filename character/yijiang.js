@@ -312,7 +312,7 @@ character.yijiang={
 		jishe:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return game.checkMod(player,player.hp,'maxHandcard',player.get('s'))>0;
+				return player.getHandcardLimit()>0;
 			},
 			init:function(player){
 				player.storage.jishe=0;

@@ -5757,7 +5757,7 @@
 				},
 				phaseDiscard:function(){
 					"step 0"
-					event.num=player.num('h')-game.checkMod(player,player.hp,'maxHandcard',player.get('s'));
+					event.num=player.num('h')-player.getHandcardLimit();
 					if(event.num<=0) event.finish();
 					else{
 						if(lib.config.show_phase_prompt){
@@ -11376,6 +11376,9 @@
 						}
 					},time)
 				},
+                getHandcardLimit:function(){
+                    return game.checkMod(this,this.hp,'maxHandcard',this.get('s'))
+                },
                 getEnemies:function(func){
                     var player=this;
                     var targets;
@@ -11513,6 +11516,9 @@
                         return true;
                     }
                     return false;
+                },
+                needsToDiscard:function(){
+                    return Math.max(0,this.num('h')-this.getHandcardLimit());
                 },
                 distanceTo:function(target,method){
                     return get.distance(this,target,method);
@@ -18970,7 +18976,7 @@
 					else if(info.enable=='phaseUse') enable=(event.getParent().name=='phaseUse');
 					else if(typeof info.enable=='string') enable=(info.enable==event.name);
 					if(enable){
-						if(info.filter&&info.filter(event,player)==false) enable=false;
+						if(info.filter&&!info.filter(event,player)) enable=false;
 						if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player)) enable=false;
 						if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
 						if(!event.isMine()&&event.aiexclude.contains(skills2[i])) enable=false;
@@ -19556,7 +19562,7 @@
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=7;
 					}
 					else if(card.subtype=='equip4'){
-						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=5;
+						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=4;
 					}
 					else{
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;

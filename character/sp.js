@@ -65,9 +65,9 @@ character.sp={
 		sp_pangde:['male','wei',4,['mashu','juesi']],
 		sp_jiaxu:['male','wei',3,['zhenlue','jianshu','yongdi']],
 
-		// litong:['male','wei',4,['tuifeng']],
-		// mizhu:['male','shu',4,['ziyuan','jugu']],
-		// buzhi:['male','wu',4,['hongde','dingpan']],
+		litong:['male','wei',4,['tuifeng']],
+		mizhu:['male','shu',3,['ziyuan','jugu']],
+		buzhi:['male','wu',3,['hongde','dingpan']],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -93,15 +93,228 @@ character.sp={
 		hanba:['swd_muyun'],
 	},
 	skill:{
+		dingpan:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				var num;
+				if(get.mode()=='identity'){
+					num=get.population('fan');
+				}
+				else{
+					num=1;
+				}
+				if(player.getStat().skill.dingpan>=num) return false;
+				return true;
+			},
+			filterTarget:function(card,player,target){
+				return target.num('e')>0;
+			},
+			content:function(){
+				'step 0'
+				target.draw();
+				'step 1'
+				var goon=ai.get.damageEffect(target,player,target)>0&&ai.get.attitude(target,player)>=0;
+				target.chooseControl('选项一','选项二',function(){
+					if(_status.event.goon) return '选项二';
+					return '选项一';
+				}).set('goon',goon).set('prompt','定叛<br><br><div class="text">选项一：令'+get.translation(player)+'弃置你装备区里的一张牌</div><br><div class="text">选项二：令'+get.translation(player)+'获得你装备区内的所有牌并对你造成一点伤害</div>');
+				'step 2'
+				if(result.control=='选项一'){
+					player.discardPlayerCard(target,true,'e');
+					event.finish();
+				}
+				else{
+					var es=target.get('e');
+					player.gain(es);
+					target.$give(es,player);
+				}
+				'step 3'
+				game.delay(0.5);
+				target.damage();
+			},
+			ai:{
+				order:7,
+				result:{
+					target:function(player,target){
+						if(ai.get.damageEffect(target,player,target)>0) return 2;
+						var att=ai.get.attitude(player,target);
+						if(att==0) return 0;
+						var es=target.get('e');
+						var goon=false;
+						if(att>0&&target.num('h')<target.hp){
+							goon=true;
+						}
+						for(var i=0;i<es.length;i++){
+							var val=ai.get.equipValue(es[i],target);
+							if(val>=7&&att<0) return -1;
+							if(val<=4&&att>0&&goon) return 1;
+						}
+						return 0;
+					}
+				}
+			}
+		},
+		hongde:{
+			trigger:{player:['gainEnd','loseEnd']},
+			direct:true,
+			filter:function(event,player){
+				return event.cards&&event.cards.length>1;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('hongde'),function(card,player,target){
+					return target!=player;
+				}).set('ai',function(target){
+					return ai.get.attitude(player,target);
+				});
+				'step 1'
+				if(result.bool){
+					player.logSkill('hongde',result.targets);
+					result.targets[0].draw();
+				}
+			}
+		},
+		ziyuan:{
+			enable:'phaseUse',
+			usable:1,
+			filterCard:function(card){
+				var num=0;
+				for(var i=0;i<ui.selected.cards.length;i++){
+					num+=get.number(ui.selected.cards[i]);
+				}
+				return get.number(card)+num<=13;
+			},
+			selectCard:function(){
+				var num=0;
+				for(var i=0;i<ui.selected.cards.length;i++){
+					num+=get.number(ui.selected.cards[i]);
+				}
+				if(num==13) return ui.selected.cards.length;
+				return ui.selected.cards.length+2;
+			},
+			discard:false,
+			prepare:function(cards,player,targets){
+				player.$give(cards,targets[0]);
+			},
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			check:function(card){
+				var num=0;
+				for(var i=0;i<ui.selected.cards.length;i++){
+					num+=get.number(ui.selected.cards[i]);
+				}
+				if(num+get.number(card)==13) return 9-ai.get.value(card);
+				if(ui.selected.cards.length==0){
+					var cards=_status.event.player.get('h');
+					for(var i=0;i<cards.length;i++){
+						for(var j=i+1;j<cards.length;j++){
+							if(cards[i].number+cards[j].number==13){
+								if(cards[i]==card||cards[j]==card) return 8.5-ai.get.value(card);
+							}
+						}
+					}
+				}
+				return 0;
+			},
+			content:function(){
+				target.gain(cards);
+				target.recover();
+				game.delay();
+			},
+			ai:{
+				order:function(skill,player){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].hp<game.players[i].maxHp&&
+							game.players[i]!=player&&
+							ai.get.recoverEffect(game.players[i],player,player)>0){
+							return 10;
+						}
+					}
+					return 1;
+				},
+				result:{
+					player:function(player,target){
+						var eff=ai.get.recoverEffect(target,player,player);
+						if(eff<0) return 0;
+						if(eff>0){
+							if(target.hp==1) return 3;
+							return 2;
+						}
+						if(player.needsToDiscard()) return 1;
+						return 0;
+					}
+				},
+				threaten:1.3
+			}
+		},
+		jugu:{
+			mod:{
+				maxHandcard:function(player,num){
+					return num+player.maxHp;
+				}
+			},
+			trigger:{global:'gameStart'},
+			forced:true,
+			content:function(){
+				player.draw(player.maxHp);
+			}
+		},
 		tuifeng:{
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
 				return player.num('h')>0;
 			},
+			init:function(player){
+				player.storage.tuifeng=[];
+			},
 			content:function(){
 				'step 0'
-				player.chooseCard(get.prompt('tuifeng'))
+				player.chooseCard(get.prompt('tuifeng')).set('ai',function(card){
+					if(card.name=='du') return 20;
+					return 7-ai.get.useful(card);
+				});
+				'step 1'
+				if(result.bool){
+					player.logSkill('tuifeng');
+					player.lose(result.cards,ui.special);
+					player.$give(result.cards,player);
+					player.storage.tuifeng.push(result.cards[0]);
+					player.markSkill('tuifeng');
+				}
+			},
+			marktext:'锋',
+			intro:{
+				content:'cards'
+			},
+			group:'tuifeng2'
+		},
+		tuifeng2:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return player.storage.tuifeng.length>0;
+			},
+			content:function(){
+				player.draw(2*player.storage.tuifeng.length);
+				player.addTempSkill('tuifeng3','phaseAfter');
+				player.$throw(player.storage.tuifeng.slice(0),1000);
+				player.storage.tuifeng3=player.storage.tuifeng.length;
+				while(player.storage.tuifeng.length){
+					ui.discardPile.appendChild(player.storage.tuifeng.shift());
+				}
+				player.unmarkSkill('tuifeng')
+			}
+		},
+		tuifeng3:{
+			mod:{
+				cardUsable:function(card,player,num){
+					if(card.name=='sha'&&player.storage.tuifeng3) return num+player.storage.tuifeng3;
+				}
+			},
+			onremove:function(player){
+				delete player.storage.tuifeng3;
 			}
 		},
 		weidi:{
@@ -6302,6 +6515,7 @@ character.sp={
 		wanglang:'王朗',
 
 		tuifeng:'推锋',
+		tuifeng2:'推锋',
 		tuifeng_info:'1.当你受到1点伤害后，你可以将一张牌置于武将牌上，称为“锋”。2.准备阶段开始时，若你的武将牌上有“锋”，你将所有“锋”置入弃牌堆，摸2X张牌，然后你于此回合的出牌阶段内使用【杀】的次数上限+X（X为你此次置入弃牌堆的“锋”数）',
 		ziyuan:'资援',
 		ziyuan_info:'出牌阶段限一次，你可以将任意张点数之和为13的手牌交给一名其他角色，然后该角色回复1点体力',
@@ -6310,7 +6524,7 @@ character.sp={
 		hongde:'弘德',
 		hongde_info:'当你一次获得或失去至少两张牌后，你可以令一名其他角色摸一张牌',
 		dingpan:'定叛',
-		dingpan_info:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害（X为场上存活的反贼数）',
+		dingpan_info:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害（X为场上存活的反贼数，非身体份模式改为1）',
 		weidi:'伪帝',
 		weidi_info:'锁定技，你视为拥有当前主公的主公技',
 		juesi:'决死',

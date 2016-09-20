@@ -278,7 +278,7 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			ai:{
-				equipValue:8
+				equipValue:7
 			},
 			skills:['lianhua','shouna']
 		},
@@ -288,7 +288,7 @@ card.swd={
 			subtype:'equip5',
 			skills:['haotianta'],
 			ai:{
-				equipValue:5
+				equipValue:7
 			}
 		},
 		fuxiqin:{
