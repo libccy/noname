@@ -1,23 +1,15 @@
 window.noname_update={
-    version:'1.9.0.2',
+    version:'1.9.1',
     changeLog:[
         'bug修复',
+        '增加牌堆补充扩展',
+        '塔防模式调整',
+        '新武将'
     ],
     files:{
         global:[
-            'game/game.js',
-            'card/extra.js',
-            'card/swd.js',
-            'character/ow.js',
-            'character/gujian.js',
-            'mode/brawl.js',
-            'mode/tafang.js',
-            'layout/default/layout.css',
+
         ],
-        '1.9.0.1':[]
+        // '1.9.1':[]
     }
 }
-
-//增加牌堆补充扩展
-//塔防模式调整
-//新武将
