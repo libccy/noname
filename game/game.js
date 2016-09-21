@@ -3787,7 +3787,7 @@
                         else{
                             url=get.url()+url;
                         }
-                        game.print(url);
+                        if(lib.config.debug) game.print(url);
                         var dir=folder.split('/');
                         var str='';
                         var download=function(){
@@ -3907,8 +3907,14 @@
                             ui.updatep2.style.display='';
                         }
 						game.download=function(url,folder,onsuccess,onerror){
+                            if(url.indexOf('web/')==0){
+                                url='http://'+lib.hallURL+'/'+url;
+                            }
+                            else{
+                                url=get.url()+url;
+                            }
+                            if(lib.config.debug) game.print(url);
 							var fileTransfer = new FileTransfer();
-							url=get.url()+url;
 							folder=lib.assetURL+folder;
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
 						};
