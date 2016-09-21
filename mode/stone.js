@@ -1255,8 +1255,8 @@ mode.stone={
 
 			stone_aolajier:['male','qun',4,['stone_chongfeng','shaman_fengnu','paladin_hudun','chaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
 			stone_andongni:['male','qun',4,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
-			stone_jialakesi:['male','qun',5,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
-			stone_jialakesix:['male','qun',5,['stone_lianyu'],['modeimage','stonehidden','stonespecial']],
+			stone_jialakesi:['male','qun',6,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
+			stone_jialakesix:['male','qun',6,['stone_lianyu'],['modeimage','stonehidden','stonespecial']],
 			stone_kelushi:['male','qun',5,['stone_chongfeng'],['minskin','stone','stonehidden','stonelegend_hunter'],[6,5]],
 			stone_geluomashi:['male','qun',4,['stone_chongfeng','stone_jinu'],['minskin','stone','stonehidden','stonelegend_warrior'],[6,4]],
 			stone_aidewen:['male','qun',3,['stone_lianji'],['minskin','stone','stonehidden','stonelegend_rogue'],[6,3]],
@@ -1803,7 +1803,7 @@ mode.stone={
 		},
 		spell_heianqiyue:{
 			type:'stonecard',
-			stoneact:3,
+			stoneact:4,
 			career:'warlock',
 			enable:true,
 			fullimage:true,
@@ -5631,9 +5631,19 @@ mode.stone={
 			},
 			ai:{
 				threaten:function(player,target){
-					if(target.hp==target.maxHp) return 0.5;
-					return 1.8;
+					if(target.hp<target.maxHp) return 2;
+					return 0.5;
 				},
+				maixie:true,
+				effect:{
+					target:function(card,player,target){
+						if(target.maxHp<=3) return;
+						if(get.tag(card,'damage')){
+							if(target.hp==target.maxHp) return [0,1];
+						}
+						if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];
+					}
+				}
 			}
 		},
 		stone_lianyu:{

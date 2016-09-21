@@ -19,3 +19,11 @@ window.noname_update={
         '1.9.1':[]
     }
 }
+
+//'character/diy.js',
+//'character/sp.js',
+//'character/yxs.js',
+//'character/hearth.js',
+//'card/swd.js',
+//'mode/stone.js',
+//'game/config.js',

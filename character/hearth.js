@@ -595,6 +595,9 @@ character.hearth={
 				}
 				var list=['hslingjian_zhongxinghujia','hslingjian_xuanfengzhiren','hslingjian_yinmilichang',
 				'hslingjian_shengxiuhaojiao','hslingjian_jinjilengdong','hslingjian_xingtigaizao','hslingjian_shijianhuisu'];
+				if(get.mode()=='stone'){
+					list.remove('hslingjian_jinjilengdong');
+				}
 				var cards=[];
 				while(num--){
 					cards.push(game.createCard(list.randomGet()));

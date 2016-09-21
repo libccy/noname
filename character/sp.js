@@ -271,7 +271,7 @@ character.sp={
 			},
 			content:function(){
 				'step 0'
-				player.chooseCard(get.prompt('tuifeng')).set('ai',function(card){
+				player.chooseCard(get.prompt('tuifeng'),'he').set('ai',function(card){
 					if(card.name=='du') return 20;
 					return 7-ai.get.useful(card);
 				});

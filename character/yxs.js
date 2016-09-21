@@ -883,7 +883,10 @@ character.yxs={
 			unique:true,
 			forceunique:true,
 			check:function(card){
-				return 5-ai.get.value(card);
+				if(_status.event.player.num('h')>=3){
+					return 5-ai.get.value(card);
+				}
+				return 0;
 			},
 			position:'he',
 			filterCard:true,

@@ -250,6 +250,9 @@ character.diy={
 			enable:'chooseToUse',
 			filterCard:{type:'equip'},
 			position:'he',
+			filter:function(event,player){
+				return player.num('he',{type:'equip'}>0);
+			},
 			viewAs:{name:'shuiyanqijun'},
 			prompt:'将一张装备牌当水淹七军使用',
 			check:function(card){return 8-ai.get.equipValue(card)},

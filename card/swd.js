@@ -482,6 +482,9 @@ card.swd={
 						list.push(i);
 					}
 				}
+				if(get.mode()=='stone'){
+					list.remove('hslingjian_jinjilengdong');
+				}
 				if(list.length){
 					target.gain(game.createCard(list.randomGet()),'draw');
 				}
@@ -605,7 +608,7 @@ card.swd={
 			range:{global:1},
 			wuxieable:true,
 			filterTarget:function(card,player,target){
-				return !target.hasSkill('jiguanyaoshu_skill');
+				return !target.hasSkill('jiguanyaoshu_skill')&&!target.isMin();
 			},
 			content:function(){
 				var card=game.createCard(get.inpile('equip').randomGet());
@@ -656,7 +659,9 @@ card.swd={
 			enable:true,
 			derivation:true,
 			derivationpack:'swd',
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return !target.isMin();
+			},
 			content:function(){
 				'step 0'
 				var list=[];
@@ -1538,7 +1543,7 @@ card.swd={
 				}
 				'step 2'
 				event.num++;
-				if(event.num<4&&target.isAlive()){
+				if(event.num<3&&target.isAlive()){
 					event.goto(1);
 				}
 				else{
@@ -3095,6 +3100,9 @@ card.swd={
 					if(trigger.cards[i].original=='e') num++;
 				}
 				var list=get.typeCard('hslingjian');
+				if(get.mode()=='stone'){
+					list.remove('hslingjian_jinjilengdong');
+				}
 				if(list.length){
 					list=list.randomGets(num);
 					for(var i=0;i<list.length;i++){
@@ -3904,7 +3912,7 @@ card.swd={
 	},
 	translate:{
 		shuchui:'鼠槌',
-		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的所有杀对该角色使用，杀每造成一次伤害你摸一张牌（最多使用4张杀）',
+		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的所有杀对该角色使用，杀每造成一次伤害你摸一张牌（最多使用3张杀）',
 		zhiluxiaohu:'指路小狐',
 		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机敌方角色使用一张杀，然后摸一张牌',
 		xuejibingbao:'雪肌冰鲍',
