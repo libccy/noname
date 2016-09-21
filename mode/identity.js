@@ -566,27 +566,27 @@ mode.identity={
 					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
 					if(get.config('double_nei')){
 						switch(get.playerNumber()){
-							case '8':
+							case 8:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;
-							case '7':
+							case 7:
 							identityList.remove('zhong');
 							identityList.push('nei');
 							break;
-							case '6':
+							case 6:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;
-							case '5':
+							case 5:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;
-							case '4':
+							case 4:
 							identityList.remove('zhong');
 							identityList.push('nei');
 							break;
-							case '3':
+							case 3:
 							identityList.remove('fan');
 							identityList.push('nei');
 							break;
