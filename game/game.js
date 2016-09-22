@@ -11311,6 +11311,11 @@
                             list.push(this.skills[i]);
 						}
 					}
+                    if(all){
+                        for(var i in this.additionalSkills){
+                            this.removeAdditionalSkill(i);
+                        }
+                    }
                     this.removeSkill(list);
 					this.checkConflict();
 					this.checkMarks();
