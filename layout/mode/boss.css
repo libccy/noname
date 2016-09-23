@@ -8,6 +8,15 @@
     z-index:1;
     overflow-x:scroll;
 }
+#bosslist.slim>.player{
+    border-radius: 10px;
+}
+#bosslist.slim>.player>.avatar{
+    left: 8px;
+    top: 8px;
+    width: 164px;
+    height: 200px;
+}
 .bosspaused>#bosslist,
 .bosspaused>#control,
 .bosspaused>.dialog.bosscharacter{

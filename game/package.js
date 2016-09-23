@@ -14,7 +14,6 @@ character.pack={
     gujian:'古剑奇谭',
     xianjian:'仙剑',
     xiake:'侠客',
-    // boss:'BOSS'
 };
 card.pack={
     standard:'标准',
@@ -27,6 +26,7 @@ card.pack={
     hearth:'炉石传说',
 };
 play.pack={
+    boss:'挑战武将',
     cardpile:'牌堆补充',
     character:'技能卡牌',
     soldier:'士兵模式',

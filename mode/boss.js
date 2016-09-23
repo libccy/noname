@@ -40,6 +40,9 @@ mode.boss={
 		game.delay(0.1);
 		"step 1"
 		var bosslist=ui.create.div('#bosslist.hidden');
+		if(lib.config.slim_player){
+			bosslist.classList.add('slim');
+		}
 		event.bosslist=bosslist;
 		bosslist.ontouchmove = ui.click.touchScroll;
 		bosslist.style.WebkitOverflowScrolling='touch';
@@ -88,6 +91,9 @@ mode.boss={
 					init:true,
 				}
 				var player=ui.create.player(bosslist).init(i);
+				if(player.hp==0){
+					player.node.hp.style.display='none';
+				}
 				list.push(player);
 				player.node.hp.classList.add('text');
 				player.node.hp.dataset.condition='';

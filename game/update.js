@@ -26,3 +26,5 @@ window.noname_update={
 // 'character/swd.js',
 // 'mode/boss.js',
 // 'mode/versus.js',
+// 'extension/boss/extension.js',
+// 'layout/mode/boss.css',

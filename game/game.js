@@ -717,7 +717,7 @@
 					},
 					show_history:{
 						name:'出牌记录栏',
-						init:'right',
+						init:'off',
 						unfrequent:true,
 						item:{
 							off:'关闭',
@@ -1592,6 +1592,10 @@
     			    init:false,
     			    restart:true,
     			},
+                intro:{
+                    name:'将杀闪等牌在牌堆中的比例维持在与军争牌堆相同，防止开启扩展包后重要的牌被过多地稀释',
+                    clear:true,
+                },
     			sha:{
     			    name:'杀',
                     init:'1',
@@ -1710,12 +1714,36 @@
     				}
     			},
             },
+            boss:{
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			},
+    			intro:{
+    			    name:'在非挑战模式中使用挑战武将',
+                    clear:true,
+    			},
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
+    					lib.config.hiddenPlayPack.add('boss');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
             character:{
                 enable:{
     			    name:'开启',
     			    init:false,
     			    restart:true,
     			},
+                intro:{
+                    name:'牌堆中随机加入5%的技能牌；使用技能牌可获得额外技能',
+                    clear:true,
+                },
     			num:{
     			    name:'卡牌比例',
     			    init:'0.05',
@@ -1742,6 +1770,10 @@
     			    init:false,
     			    restart:true,
     			},
+                intro:{
+                    name:'每名角色在游戏开始时获得3个士兵，每个士兵对应一个技能',
+                    clear:true,
+                },
     			hide:{
     			    name:'隐藏此扩展',
     			    clear:true,
@@ -1758,6 +1790,10 @@
     			    init:false,
     			    restart:true,
     			},
+                intro:{
+                    name:'每名角色和部分卡牌在游戏开始时随机获得一个属性',
+                    clear:true,
+                },
                 num:{
     			    name:'带属性卡牌',
     			    init:'0.3',
@@ -1857,6 +1893,10 @@
     			        game.saveConfig('plays',lib.config.plays);
     			    }
     			},
+                intro:{
+                    name:'每完成一次对局，可获得一定数量的金币；金币可用于购买游戏特效',
+                    clear:true,
+                },
     			display:{
     			    name:'金币显示',
     			    init:'text',
@@ -20621,6 +20661,7 @@
 	                popupContainer.onclose=onclose;
 	            };
 	            var clickToggle=function(){
+                    if(this.classList.contains('disabled')) return;
 	                this.classList.toggle('on');
 	                var config=this._link.config;
 	                if(config.onclick){
@@ -20763,6 +20804,7 @@
 
 	                }
 					else if(config.clear){
+                        if(node.innerHTML.length>=15) node.style.height='auto';
 						node.listen(clickToggle);
 					}
                     else if(config.input){

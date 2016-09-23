@@ -181,7 +181,7 @@ card.swd={
 					var next=target.chooseToDiscard('机关火筒：弃置一张手牌或受到一点火焰伤害');
 					next.set('ai',function(card){
 						var evt=_status.event.getParent();
-						if(ai.get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
+						if(ai.get.damageEffect(evt.target,evt.player,evt.target,'fire')>=0) return 0;
 						return 8-ai.get.useful(card);
 					});
 				}
