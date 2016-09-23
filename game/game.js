@@ -1724,6 +1724,10 @@
     			    name:'在非挑战模式中使用挑战武将',
                     clear:true,
     			},
+                enableai:{
+                    name:'AI可选',
+                    init:false
+                },
     			hide:{
     			    name:'隐藏此扩展',
     			    clear:true,
@@ -4803,7 +4807,7 @@
         			var sha=0,shan=0,tao=0,jiu=0,wuxie=0,heisha=0,hongsha=0;
         			var num={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0};
         			for(var i in lib.card){
-        				if(typeof lib.card[i]=='object'){
+        				if(get.objtype(lib.card[i])=='object'&&lib.translate[i+'_info']){
         					switch(lib.card[i].type){
         						case 'basic':a++;break;
         						case 'trick':b++;break;
@@ -4866,8 +4870,7 @@
             				}
             			}
                     }
-                    console.log(a+b+c+d);
-        			console.log(aa+bb+cc+dd);
+                    console.log((a+b+c+d)+'/'+(aa+bb+cc+dd));
                 }());
     		},
             id:function(){
@@ -19602,6 +19605,80 @@
 				players[i].$draw(num2);
 			}
 		},
+        finishSkill:function(i){
+            var j;
+            var mode=get.mode();
+            if(lib.translate[i+'_info_'+mode]){
+                lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
+            }
+            if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(mode)){
+                lib.skill[i]={};
+                if(lib.translate[i+'_info']){
+                    lib.translate[i+'_info']='此模式下不可用';
+                }
+                return;
+            }
+            if(lib.skill[i].mode&&lib.skill[i].mode.contains(mode)==false){
+                lib.skill[i]={};
+                if(lib.translate[i+'_info']){
+                    lib.translate[i+'_info']='此模式下不可用';
+                }
+                return;
+            }
+            if(lib.skill[i].viewAs){
+                if(typeof lib.skill[i].viewAs=='string'){
+                    lib.skill[i].viewAs={name:lib.skill[i].viewAs};
+                }
+                if(lib.skill[i].ai==undefined) lib.skill[i].ai={};
+                var skill=lib.skill[i].ai;
+                if(!lib.card[lib.skill[i].viewAs.name]){
+                    lib.skill[i]={};
+                    lib.translate[i+'_info']='技能不可用';
+                    return;
+                }
+                var card=lib.card[lib.skill[i].viewAs.name].ai;
+                for(j in card){
+                    if(skill[j]==undefined) skill[j]=card[j];
+                    else if(typeof skill[j]=='object'){
+                        for(var k in card[j]){
+                            if(skill[j][k]==undefined) skill[j][k]=card[j][k];
+                        }
+                    }
+                }
+            }
+            if(lib.skill[i].inherit){
+                var skill=lib.skill[lib.skill[i].inherit];
+                for(j in skill){
+                    if(lib.skill[i][j]==undefined) lib.skill[i][j]=skill[j];
+                }
+                if(lib.translate[i+'_info']==undefined){
+                    lib.translate[i+'_info']=lib.translate[lib.skill[i].inherit+'_info'];
+                }
+            }
+            if(lib.skill[i].subSkill){
+                for(var j in lib.skill[i].subSkill){
+                    lib.skill[i+'_'+j]=lib.skill[i].subSkill[j];
+                    if(lib.skill[i].subSkill[j].name){
+                        lib.translate[i+'_'+j]=lib.skill[i].subSkill[j].name;
+                    }
+                    else{
+                        lib.translate[i+'_'+j]=lib.translate[i];
+                    }
+                    if(lib.skill[i].subSkill[j].description){
+                        lib.translate[i+'_'+j+'_info']=lib.skill[i].subSkill[j].description;
+                    }
+                    if(lib.skill[i].subSkill[j].marktext){
+                        lib.translate[i+'_'+j+'_bg']=lib.skill[i].subSkill[j].marktext;
+                    }
+                }
+            }
+            if(lib.skill[i].marktext){
+                lib.translate[i+'_bg']=lib.skill[i].marktext;
+            }
+            if(i[0]=='_'){
+                game.addGlobalSkill(i);
+            }
+        },
 		finishCards:function(){
 			_status.cardsFinished=true;
 			var i,j,k;
@@ -19665,76 +19742,7 @@
 				}
 			}
 			for(i in lib.skill){
-                if(lib.translate[i+'_info_'+mode]){
-                    lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
-                }
-				if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(mode)){
-					lib.skill[i]={};
-					if(lib.translate[i+'_info']){
-						lib.translate[i+'_info']='此模式下不可用';
-					}
-					continue;
-				}
-				if(lib.skill[i].mode&&lib.skill[i].mode.contains(mode)==false){
-					lib.skill[i]={};
-					if(lib.translate[i+'_info']){
-						lib.translate[i+'_info']='此模式下不可用';
-					}
-					continue;
-				}
-				if(lib.skill[i].viewAs){
-					if(typeof lib.skill[i].viewAs=='string'){
-						lib.skill[i].viewAs={name:lib.skill[i].viewAs};
-					}
-					if(lib.skill[i].ai==undefined) lib.skill[i].ai={};
-					var skill=lib.skill[i].ai;
-					if(!lib.card[lib.skill[i].viewAs.name]){
-						lib.skill[i]={};
-						lib.translate[i+'_info']='技能不可用';
-						continue;
-					}
-					var card=lib.card[lib.skill[i].viewAs.name].ai;
-					for(j in card){
-						if(skill[j]==undefined) skill[j]=card[j];
-						else if(typeof skill[j]=='object'){
-							for(var k in card[j]){
-								if(skill[j][k]==undefined) skill[j][k]=card[j][k];
-							}
-						}
-					}
-				}
-				if(lib.skill[i].inherit){
-					var skill=lib.skill[lib.skill[i].inherit];
-					for(j in skill){
-						if(lib.skill[i][j]==undefined) lib.skill[i][j]=skill[j];
-					}
-					if(lib.translate[i+'_info']==undefined){
-						lib.translate[i+'_info']=lib.translate[lib.skill[i].inherit+'_info'];
-					}
-				}
-				if(lib.skill[i].subSkill){
-					for(var j in lib.skill[i].subSkill){
-						lib.skill[i+'_'+j]=lib.skill[i].subSkill[j];
-						if(lib.skill[i].subSkill[j].name){
-							lib.translate[i+'_'+j]=lib.skill[i].subSkill[j].name;
-						}
-						else{
-							lib.translate[i+'_'+j]=lib.translate[i];
-						}
-						if(lib.skill[i].subSkill[j].description){
-							lib.translate[i+'_'+j+'_info']=lib.skill[i].subSkill[j].description;
-						}
-						if(lib.skill[i].subSkill[j].marktext){
-							lib.translate[i+'_'+j+'_bg']=lib.skill[i].subSkill[j].marktext;
-						}
-					}
-				}
-				if(lib.skill[i].marktext){
-					lib.translate[i+'_bg']=lib.skill[i].marktext;
-				}
-				if(i[0]=='_'){
-                    game.addGlobalSkill(i);
-				}
+                game.finishSkill(i);
 			}
 		},
 		checkMod:function(){
@@ -33296,7 +33304,7 @@
                 var mode=get.mode();
                 if(type=='character'){
                     if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
-                        modeimage=true;
+                        modeimage=mode;
                     }
                     else if(lib.character[name]){
                         nameinfo=lib.character[name];
@@ -33310,6 +33318,9 @@
 						else if(nameinfo[4][i].indexOf('db:')==0){
 							dbimage=nameinfo[4][i];break;
 						}
+                        else if(nameinfo[4][i].indexOf('mode:')==0){
+                            modeimage=nameinfo[4][i].slice(5);break;
+                        }
 					}
 				}
                 if(extimage){
@@ -33320,7 +33331,7 @@
 					return this;
 				}
                 else if(modeimage){
-                    src='image/mode/'+get.mode()+'/character/'+name+ext;
+                    src='image/mode/'+modeimage+'/character/'+name+ext;
                 }
 				else if(type=='character'&&lib.customCharacters.contains(name)){
 					src="";
