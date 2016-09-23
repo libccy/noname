@@ -21,3 +21,8 @@ window.noname_update={
 
 // 'card/swd.js',
 // 'game/package.js',
+// 'game/asset.js',
+// 'character/diy.js',
+// 'character/swd.js',
+// 'mode/boss.js',
+// 'mode/versus.js',

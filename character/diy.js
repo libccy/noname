@@ -14,7 +14,7 @@ character.diy={
 		// diy_dianwei:['male','wei',4,['diyqiangxi']],
 		diy_huangzhong:['male','shu',4,['liegong','fuli']],
 		diy_weiyan:['male','shu',4,['diykuanggu']],
-		diy_zhenji:['female','wei',3,['jiaoxia','yiesheng']],
+		diy_zhenji:['female','wei',3,['diy_jiaoxia','yiesheng']],
 		// diy_menghuo:['male','shu',4,['huoshou','zaiqix']],
 		re_huangyueying:['female','shu',3,['rejizhi','qicai']],
 		old_zhonghui:['male','wei',3,['zzhenggong','zquanji','zbaijiang']],
@@ -23,6 +23,22 @@ character.diy={
 		yuji:['zuoci']
 	},
 	skill:{
+		diy_jiaoxia:{
+			audio:['jiaoxia',2],
+			trigger:{target:'useCardToBegin'},
+			filter:function(event,player){
+				return event.card&&get.color(event.card)=='red';
+			},
+			frequent:true,
+			content:function(){
+				player.draw();
+			},
+			ai:{
+				effect:function(card,player,target){
+					if(get.color(card)=='red') return [1,1];
+				},
+			}
+		},
 		zaiqix:{
 			trigger:{player:'phaseDrawBefore'},
 			filter:function(event,player){
@@ -693,6 +709,8 @@ character.diy={
 		diyzaiqi:'再起',
 		batu:'霸图',
 		zaiqix:'再起',
+		diy_jiaoxia:'皎霞',
+		diy_jiaoxia_info:'每当你成为红色牌的目标，你可以摸一张牌',
 		zaiqix_info:'摸牌阶段，若你已受伤，你可以放弃摸牌并展示牌堆顶的X+1张牌，X为你已损失的体力值，其中每有一张♥牌，你回复1点体力，然后弃掉这些♥牌，将其余的牌收入手牌。',
 		batu_info:'回合结束阶段，你可以将手牌数补至X，X为现存的势力数',
 		diyzaiqi_info:'锁定技，你摸牌阶段额外摸X张牌，X为你已损失的体力值',

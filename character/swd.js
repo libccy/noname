@@ -13,8 +13,8 @@ character.swd={
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian']],
 
 			swd_chenjingchou:['male','wu',3,['youyin','yihua']],
-			swd_duguningke:['female','qun',3,['lianji','touxi']],
-			swd_guyue:['male','wei',3,['tiandao','qinyin','wangchen']],
+			swd_duguningke:['female','qun',3,['nlianji','touxi']],
+			swd_guyue:['male','wei',3,['gtiandao','qinyin','wangchen']],
 			swd_tuobayuer:['female','shu',4,['liuhong','poyue','niepan']],
 			swd_yuwentuo:['male','shu',4,['wushuang','xielei','kunlunjing']],
 			swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue']],
@@ -34,7 +34,7 @@ character.swd={
 			swd_moye:['female','wu',3,['rexue','liuli']],
 
 			swd_zhaoyun:['male','shu',4,['longdan','pozhen','tanlin']],
-			swd_hengai:['female','shu',3,['funiao','ningxian','lingbo']],
+			swd_hengai:['female','shu',3,['funiao','ningxian','hlingbo']],
 			swd_duanmeng:['female','shu',4,['jizhan','lieren']],
 			swd_jiangwu:['male','shu',4,['yijue','dangping']],
 			swd_tuwei:['male','shu',3,['zhanlu','susheng']],
@@ -48,7 +48,7 @@ character.swd={
 			swd_duopeng:['male','wu',3,['luanji','reyingzi']],
 
 			swd_fengtianling:['male','shu',4,['guiyan','jiang']],
-			swd_huyue:['female','wu',3,['yunshen','fengming']],
+			swd_huyue:['female','wu',3,['hyunshen','fengming']],
 			swd_jialanduo:['male','qun',4,['xianyin','mailun']],
 			swd_rongshuang:['female','wu',3,['suiyan','duanxing']],
 			swd_zhuoshanzhu:['male','wu',4,['suiyan','wanjun']],
@@ -88,7 +88,7 @@ character.swd={
 
 			swd_hanluo:['male','qun',5,['hzhenwei']],
 			swd_fu:['male','qun',5,['yudun','paoxiao']],
-			swd_linyue:['male','wei',3,['zhenjiu','mazui']],
+			swd_linyue:['male','wei',3,['zhenjiu','lmazui']],
 			swd_zidashu:['male','wu',3,['shoulie','hudun']],
 			swd_maixing:['male','wu',3,['toudan','shending']],
 			swd_fuyan:['male','qun',4,['lianda']],
@@ -143,6 +143,198 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		lmazui:{
+			audio:'mazui',
+			enable:'phaseUse',
+			usable:1,
+			filterCard:{color:'black'},
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('lmazui2');
+			},
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			discard:false,
+			prepare:function(cards,player,targets){
+				player.$give(cards,targets[0]);
+				player.line(targets[0],'green');
+			},
+			content:function(){
+				"step 0"
+				game.delay();
+				"step 1"
+				target.storage.lmazui2=cards[0];
+				target.addSkill('lmazui2');
+				game.addVideo('storage',target,['lmazui2',get.cardInfo(target.storage.lmazui2),'card']);
+			},
+			ai:{
+				expose:0.2,
+				result:{
+					target:function(player,target){
+						return -target.hp;
+					}
+				},
+				order:4,
+				threaten:1.2
+			}
+		},
+		lmazui2:{
+			trigger:{source:'damageBegin'},
+			forced:true,
+			mark:'card',
+			filter:function(event){
+				return event.num>0;
+			},
+			content:function(){
+				trigger.num--;
+				player.addSkill('lmazui3');
+				player.removeSkill('lmazui2');
+			},
+			intro:{
+				content:'card'
+			}
+		},
+		lmazui3:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.gain(player.storage.lmazui2,'gain2');
+				game.log(player,'获得了',player.storage.lmazui2);
+				player.removeSkill('lmazui3');
+				delete player.storage.lmazui2;
+			}
+		},
+		hyunshen:{
+			trigger:{player:'respond'},
+			filter:function(event,player){
+				return event.card.name=='shan';
+			},
+			frequent:true,
+			init:function(player){
+				player.storage.hyunshen=0;
+			},
+			content:function(){
+				player.storage.hyunshen++;
+				player.markSkill('hyunshen');
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'respondShan')){
+							var shans=target.num('h','shan');
+							var hs=target.num('h');
+							if(shans>1) return [1,1];
+							if(shans&&hs>2) return [1,1];
+							if(shans) return [1,0.5];
+							if(hs>2) return [1,0.3];
+							if(hs>1) return [1,0.2];
+							return [1.2,0];
+						}
+					}
+				},
+				threaten:0.8
+			},
+			intro:{
+				content:'mark'
+			},
+			group:'hyunshen2'
+		},
+		hyunshen2:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return player.storage.hyunshen>0;
+			},
+			content:function(){
+				player.draw(player.storage.hyunshen);
+				player.storage.hyunshen=0;
+				player.unmarkSkill('hyunshen');
+			},
+			mod:{
+				globalTo:function(from,to,distance){
+					if(typeof to.storage.hyunshen=='number') return distance+to.storage.hyunshen;
+				}
+			}
+		},
+		hlingbo:{
+			audio:['lingbo',2],
+			trigger:{player:'respond'},
+			filter:function(event,player){
+				return event.card.name=='shan';
+			},
+			frequent:true,
+			content:function(){
+				player.draw(2);
+			},
+			ai:{
+				mingzhi:false,
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'respondShan')){
+							var shans=target.num('h','shan');
+							var hs=target.num('h');
+							if(shans>1) return [0,1];
+							if(shans&&hs>2) return [0,1];
+							if(shans) return [0,0];
+							if(hs>2) return [0,0];
+							if(hs>1) return [1,0.5];
+							return [1.5,0];
+						}
+					}
+				},
+				threaten:0.8
+			}
+		},
+		gtiandao:{
+			audio:true,
+			trigger:{global:'judge'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he')>0;
+			},
+			content:function(){
+				"step 0"
+				player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+				get.translation(trigger.player.judging[0])+'，'+get.prompt('gtiandao'),'he').ai=function(card){
+					var trigger=_status.event.parent._trigger;
+					var player=_status.event.player;
+					var result=trigger.judge(card)-trigger.judge(trigger.player.judging[0]);
+					var attitude=ai.get.attitude(player,trigger.player);
+					if(attitude==0||result==0) return 0;
+					if(attitude>0){
+						return result;
+					}
+					else{
+						return -result;
+					}
+				};
+				"step 1"
+				if(result.bool){
+					player.respond(result.cards,'highlight');
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.bool){
+					player.logSkill('gtiandao');
+					player.$gain2(trigger.player.judging[0]);
+					player.gain(trigger.player.judging[0]);
+					trigger.player.judging[0]=result.cards[0];
+					trigger.position.appendChild(result.cards[0]);
+					game.log(trigger.player,'的判定牌改为',result.cards[0]);
+				}
+				"step 3"
+				game.delay(2);
+			},
+			ai:{
+				tag:{
+					rejudge:1
+				},
+				threaten:1.5
+			}
+		},
 		jinlin:{
             enable:'phaseUse',
             unique:true,
@@ -2754,6 +2946,58 @@ character.swd={
 			content:function(){
 				player.removeSkill('touxi2');
 			}
+		},
+		nlianji:{
+			audio:'lianji',
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				if(player==target) return false;
+				return target.num('h')>0;
+			},
+			selectTarget:2,
+			multitarget:true,
+			multiline:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			prepare:function(cards,player,targets){
+				player.$throw(cards);
+				player.line(targets);
+			},
+			discard:false,
+			filterCard:true,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			content:function(){
+				"step 0"
+				if(targets[0].num('h')&&targets[1].num('h')){
+					targets[0].chooseToCompare(targets[1]);
+				}
+				else{
+					event.finish();
+				}
+				"step 1"
+				if(result.bool){
+					targets[0].gain(cards);
+					targets[0].$gain2(cards);
+					targets[1].damage(targets[0]);
+				}
+				else{
+					targets[1].gain(cards);
+					targets[1].$gain2(cards);
+					targets[0].damage(targets[1]);
+				}
+			},
+			ai:{
+				expose:0.3,
+				threaten:2,
+				order:9,
+				result:{
+					target:-1
+				}
+			},
 		},
 		lianji2:{
 			group:['lianji3','lianji4']
@@ -7804,6 +8048,18 @@ character.swd={
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
 
+		lmazui:'麻醉',
+		lmazui2:'麻醉',
+		lmazui_info:'出牌阶段限一次，你可以将一张黑色手牌置于一名角色的武将牌上，该角色造成的下一次伤害-1，然后获得此牌',
+		hyunshen:'云身',
+		hyunshen2:'云身',
+		hyunshen_info:'每当你打出一张闪，你可以令其他角色与你的距离+1；回合开始阶段，你将累计的防御距离清零，然后摸等量的牌',
+		hlingbo:'凌波',
+		hlingbo_info:'每当你使用或打出一张闪，你可以摸两张牌',
+		gtiandao:'天道',
+		gtiandao_info:'任意一名角色的判定生效前，你可以打出一张牌替换之',
+		nlianji:'连计',
+		nlianji_info:'出牌阶段限一次，你可以选择一张手牌并指定两名角色进行拼点，拼点赢的角色获得此牌，并对没赢的角色造成一点伤害',
 		fengze:'风泽',
 		fengze_info:'出牌阶段限一次，你可以将一张黑色牌当作桃园结义使用',
 		lingyue:'凌月',

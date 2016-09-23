@@ -394,8 +394,11 @@ mode.versus={
 			next.showConfig=true;
 			next.setContent(function(){
 				'step 0'
-				if(lib.config.hiddenCharacterPack.contains('boss')){
-					game.loadPackage('character/boss');
+				for(var i in lib.characterPack.mode_versus){
+					lib.character[i]=lib.characterPack.mode_versus[i];
+					if(!lib.character[i][4]){
+						lib.character[i][4]=[];
+					}
 				}
 				'step 1'
 				for(var i in lib.skill){
@@ -438,12 +441,6 @@ mode.versus={
 					else if(lib.character[i][1]=='shu'){
 						list.shulist.push(i);
 					}
-				}
-				if(!list.weiboss.length){
-					alert('剑阁模式不可隐藏boss武将包，请在选项－其它中选择“重置隐藏扩展包”');
-					event.finish();
-					_status.over=true;
-					return;
 				}
 				var dialog;
 				switch(game.me.type){
@@ -2395,6 +2392,27 @@ mode.versus={
 			ctx.stroke();
 		},
 	},
+	characterPack:{
+		mode_versus:{
+			boss_liedixuande:['male','shu',5,['boss_lingfeng','boss_jizhen'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+			boss_gongshenyueying:['male','shu',4,['boss_gongshenjg','boss_jingmiao','boss_zhinang'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+			boss_tianhoukongming:['male','shu',4,['boss_biantian','bazhen'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+			boss_yuhuoshiyuan:['male','shu',4,['boss_yuhuojg','boss_qiwu','boss_tianyujg'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+			boss_qiaokuijunyi:['male','wei',4,['boss_huodi','boss_jueji'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+			boss_jiarenzidan:['male','wei',5,['boss_chiying','boss_jingfan'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+			boss_duanyuzhongda:['male','wei',5,['boss_fanshi','boss_xuanlei','boss_skonghun'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+			boss_juechenmiaocai:['male','wei',4,['boss_chuanyun','boss_leili','boss_fengxing'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+
+			boss_jileibaihu:['male','shu',4,['boss_jiguan','boss_zhenwei','boss_benlei'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+			boss_yunpingqinglong:['male','shu',4,['boss_jiguan','boss_mojianjg'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+			boss_lingjiaxuanwu:['male','shu',5,['boss_jiguan','yizhong','boss_lingyu'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+			boss_chiyuzhuque:['male','shu',5,['boss_jiguan','boss_yuhuojg','boss_tianyun'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+			boss_fudibian:['male','wei',4,['boss_jiguan','boss_didongjg'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+			boss_tuntianchiwen:['male','wei',5,['boss_jiguan','boss_tanshi','boss_tunshi'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+			boss_shihuosuanni:['male','wei',3,['boss_jiguan','boss_lianyujg'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+			boss_lieshiyazi:['male','wei',4,['boss_jiguan','boss_nailuo'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+		}
+	},
 	banFour:[
 		'yuanshu','re_yuanshu','zhangxingcai','hetaiyou','wenpin','yuji',
 		'lusu','guanping','zhangzong','zhoutai','sp_zhangjiao','zhangjiao',
@@ -2432,9 +2450,1022 @@ mode.versus={
 		versus_punish_config:'杀死队友',
 		versus_number_config:'对阵人数',
 		replace_number_config:'替补人数',
-		choice_config:'候选人数'
+		choice_config:'候选人数',
+		mode_versus_character_config:'剑阁武将',
+
+		boss_liedixuande:'烈帝玄德',
+		boss_gongshenyueying:'工神月英',
+		boss_tianhoukongming:'天侯孔明',
+		boss_yuhuoshiyuan:'浴火士元',
+		boss_qiaokuijunyi:'巧魁儁乂',
+		boss_jiarenzidan:'佳人子丹',
+		boss_duanyuzhongda:'断狱仲达',
+		boss_juechenmiaocai:'绝尘妙才',
+
+		boss_jileibaihu:'机雷白虎',
+		boss_yunpingqinglong:'云屏青龙',
+		boss_lingjiaxuanwu:'灵甲玄武',
+		boss_chiyuzhuque:'炽羽朱雀',
+		boss_fudibian:'缚地狴犴',
+		boss_tuntianchiwen:'吞天螭吻',
+		boss_shihuosuanni:'食火狻猊',
+		boss_lieshiyazi:'裂石睚眦',
+
+		boss_lianyujg:'炼狱',
+		boss_lianyujg_info:'结束阶段，你可以对所有敌方角色造成1点火焰伤害',
+		boss_didongjg:'地动',
+		boss_didongjg_info:'结束阶段，你可以选择一名敌方角色将其武将牌翻面',
+		boss_mojianjg:'魔箭',
+		boss_mojianjg_info:'出牌阶段开始时，你可以对所有敌方角色使用一张万箭齐发',
+		boss_jiguan:'机关',
+		boss_jiguan_info:'锁定技，你不能成为【乐不思蜀】的目标',
+		boss_lingyu:'灵愈',
+		boss_lingyu_info:'结束阶段，你可以将自己的武将牌翻面，然后令所有已受伤的己方其他角色回复1点体力',
+		boss_tianyun:'天陨',
+		boss_tianyun_info:'结束阶段，你可以失去1点体力，然后令一名敌方角色受到2点火焰伤害并弃置其装备区里的所有牌',
+		boss_zhenwei:'镇卫',
+		boss_zhenwei_info:'锁定技，对方角色计算与其他己方角色的距离时，始终+1',
+		boss_benlei:'奔雷',
+		boss_benlei_info:'锁定技，准备阶段，对敌方攻城器械造成2点雷电伤害',
+		boss_nailuo:'奈落',
+		boss_nailuo_info:'结束阶段，你可以将你的武将牌翻面，令所有敌方角色弃置装备区内的所有牌',
+		boss_tanshi:'贪食',
+		boss_tanshi_info:'锁定技，结束阶段开始时，你须弃置一张手牌',
+		boss_tunshi:'吞噬',
+		boss_tunshi_info:'锁定技，准备阶段，你对所有手牌数量大于你的敌方角色造成1点伤害',
+		boss_yuhuojg:'浴火',
+		boss_yuhuojg_info:'锁定技，每当你受到火焰伤害时，防止此伤害',
+		boss_qiwu:'栖梧',
+		boss_qiwu_info:'每当你使用一张梅花牌，你可以令一名友方角色回复一点体力',
+		boss_tianyujg:'天狱',
+		boss_tianyujg_info:'锁定技，回合结束阶段，你令所有未横置的敌方角色横置',
+		boss_gongshenjg:'工神',
+		boss_gongshenjg_info:'结束阶段，若已方器械已受伤，你可以为其回复一点体力；否则你可以对敌方器械造成一点火焰伤害',
+		boss_zhinang:'智囊',
+		boss_zhinang_info:'准备阶段，你可以亮出牌堆顶的三张牌，你可以将其中锦囊或装备牌交给一名己方角色，然后将其余牌置入弃牌堆',
+		boss_jingmiao:'精妙',
+		boss_jingmiao_info:'锁定技，每当敌方角色使用的无懈可击生效后，你令其失去1点体力',
+		boss_biantian:'变天',
+		boss_biantian_info:'锁定技，准备阶段，你进行一次判定，若为红色，直到下个回合开始前，令敌方所有角色处于“狂风”状态，若为黑桃，直到下个回合开始前，令己方所有角色处于“大雾”状态',
+        boss_biantian2:'大雾',
+        boss_biantian3:'狂风',
+		boss_lingfeng:'灵锋',
+		boss_lingfeng_info:'摸牌阶段，你可以放弃摸牌，亮出牌堆顶的两张牌，然后获得之，若这些牌的颜色不同，你令一名敌方角色失去1点体力',
+		boss_jizhen:'激阵',
+		boss_jizhen_info:'锁定技，结束阶段，你令所有已受伤的己方角色摸一张牌',
+		boss_huodi:'惑敌',
+		boss_huodi_info:'结束阶段，若有武将牌背面朝上的己方角色，你可以令一名敌方角色将其身份牌翻面',
+		boss_jueji:'绝汲',
+		boss_jueji_info:'敌方角色摸牌阶段，若其已受伤，你可以令其少摸一张牌',
+		boss_chuanyun:'穿云',
+		boss_chuanyun_info:'结束阶段，你可以对体力比你多的一名其他角色造成1点伤害',
+		boss_leili:'雷厉',
+		boss_leili_info:'每当你的[杀]造成伤害后，你可以对另一名敌方角色造成1点雷电伤害',
+		boss_fengxing:'风行',
+		boss_fengxing_info:'准备阶段，你可以选择一名敌方角色，若如此做，视为对其使用了一张[杀]',
+		boss_skonghun:'控魂',
+		boss_skonghun_info:'出牌阶段开始时，若你已损失体力值不小于敌方角色数，你可以对所有敌方角色各造成1点雷电伤害，然后你恢复X点体力（X为受到伤害的角色数）',
+		boss_fanshi:'反噬',
+		boss_fanshi_info:'锁定技，结束阶段，你失去1点体力',
+		boss_xuanlei:'玄雷',
+		boss_xuanlei_info:'锁定技，准备阶段，令所有判定区内有牌的敌方角色受到1点雷电伤害',
+		boss_chiying:'持盈',
+		boss_chiying_info:'锁定技，每当己方角色受到多于1伤害时，你防止其余伤害',
+		boss_jingfan:'惊帆',
+		boss_jingfan_info:'锁定技，己方其他角色计算与敌方角色距离时，始终-1',
 	},
 	skill:{
+		boss_didongjg:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('boss_didongjg'),function(card,player,target){
+					return target.isEnemyOf(player);
+				}).ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(target.isTurnedOver()){
+						if(att>0){
+							return att+5;
+						}
+						return -1;
+					}
+					if(player.isTurnedOver()){
+						return 5-att;
+					}
+					return -att;
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_didongjg',result.targets);
+					result.targets[0].turnOver();
+				}
+			},
+			ai:{
+				threaten:1.7
+			}
+		},
+		boss_lianyujg:{
+			trigger:{player:'phaseEnd'},
+			unique:true,
+			content:function(){
+				"step 0"
+				event.players=get.players(player);
+				"step 1"
+				if(event.players.length){
+					var current=event.players.shift();
+					if(current.isEnemyOf(player)){
+						player.line(current,'fire');
+						current.damage('fire');
+					}
+					event.redo();
+				}
+			},
+			ai:{
+				threaten:2
+			}
+		},
+		boss_mojianjg:{
+			trigger:{player:'phaseUseBegin'},
+			content:function(){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(player.canUse('wanjian',game.players[i])&&game.players[i].isEnemyOf(player)){
+						list.push(game.players[i]);
+					}
+				}
+				list.sort(lib.sort.seat);
+				player.useCard({name:'wanjian'},list);
+			},
+			ai:{
+				threaten:1.8
+			}
+		},
+		boss_qiwu:{
+			audio:true,
+			trigger:{player:'useCard'},
+			direct:true,
+			filter:function(event,player){
+				if(get.suit(event.card)=='club'){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isFriendOf(player)&&game.players[i].hp<game.players[i].maxHp){
+							return true;
+						}
+					}
+				}
+				return false;
+			},
+			content:function(){
+				"step 0"
+				var noneed=(trigger.card.name=='tao'&&trigger.targets[0]==player&&player.hp==player.maxHp-1);
+				player.chooseTarget(get.prompt('boss_qiwu'),function(card,player,target){
+					return target.hp<target.maxHp&&target.isFriendOf(player);
+				}).ai=function(target){
+					var num=ai.get.attitude(player,target);
+					if(num>0){
+						if(noneed&&player==target){
+							num=0.5;
+						}
+						else if(target.hp==1){
+							num+=3;
+						}
+						else if(target.hp==2){
+							num+=1;
+						}
+					}
+					return num;
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('qiwu',result.targets);
+					result.targets[0].recover();
+				}
+			},
+			ai:{
+				expose:0.3,
+				threaten:1.5
+			}
+		},
+		boss_tianyujg:{
+			audio:true,
+			trigger:{player:'phaseEnd'},
+            forced:true,
+            filter:function(event,player){
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i].isEnemyOf(player)&&!game.players[i].isLinked()){
+                        return true;
+                    }
+                }
+                return false;
+            },
+            content:function(){
+                "step 0"
+                event.targets=game.players.slice(0);
+                event.targets.sort(lib.sort.seat);
+                "step 1"
+                if(event.targets.length){
+                    var target=event.targets.shift();
+                    if(!target.isLinked()&&target.isEnemyOf(player)){
+						player.line(target,'green');
+                        target.link();
+                    }
+                    event.redo();
+                }
+            }
+		},
+		boss_jueji:{
+			audio:2,
+            trigger:{global:'phaseDrawBegin'},
+            filter:function(event,player){
+				if(event.player.isFriendOf(player)){
+					return false;
+				}
+                return event.num>0&&event.player!=player&&event.player.hp<event.player.maxHp;
+            },
+			logTarget:'player',
+            content:function(){
+				player.line(trigger.player,'green');
+                trigger.num--;
+            },
+            ai:{
+                expose:0.2,
+                threaten:1.4
+            }
+        },
+		boss_huodi:{
+			audio:2,
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isFriendOf(player)&&game.players[i].isTurnedOver()){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('boss_huodi'),function(card,player,target){
+					return !target.isFriendOf(player);
+				}).ai=function(target){
+					return -ai.get.attitude(player,target);
+				};
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_huodi',result.targets);
+					result.targets[0].turnOver();
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		boss_chuanyun:{
+			audio:true,
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('boss_chuanyun'),function(card,player,target){
+					return player.hp<target.hp;
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_chuanyun',result.targets);
+					result.targets[0].damage();
+				}
+			},
+		},
+		boss_leili:{
+			audio:2,
+			trigger:{source:'damageEnd'},
+			direct:true,
+			filter:function(event){
+				return event.card&&event.card.name=='sha';
+			},
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('boss_leili'),function(card,player,target){
+					if(target==trigger.player) return false;
+					return target.isEnemyOf(player);
+				}).ai=function(target){
+					return ai.get.damageEffect(target,player,player,'thunder');
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_leili',result.targets);
+					result.targets[0].damage('thunder');
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.3
+			}
+		},
+		boss_fengxing:{
+			audio:true,
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('boss_fengxing'),function(card,player,target){
+					if(target.isFriendOf(player)) return false;
+					return lib.filter.targetEnabled({name:'sha'},player,target);
+				}).ai=function(target){
+					return ai.get.effect(target,{name:'sha'},player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_fengxing');
+					player.useCard({name:'sha'},result.targets,false);
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.3
+			}
+		},
+		boss_xuanlei:{
+			audio:true,
+            trigger:{player:'phaseBegin'},
+            forced:true,
+            filter:function(event,player){
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i].isEnemyOf(player)&&game.players[i].num('j')) return true;
+                }
+                return false;
+            },
+            content:function(){
+                "step 0"
+                event.targets=[];
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i].isEnemyOf(player)&&game.players[i].num('j')){
+                        event.targets.push(game.players[i]);
+                    }
+                }
+                event.targets.sort(lib.sort.seat);
+				player.line(event.targets,'thunder');
+                "step 1"
+                if(event.targets.length){
+                    event.targets.shift().damage('thunder');
+                    event.redo();
+                }
+            }
+        },
+		boss_fanshi:{
+			audio:true,
+            trigger:{player:'phaseEnd'},
+            forced:true,
+            check:function(){
+                return false;
+            },
+            content:function(){
+                player.loseHp();
+            }
+        },
+		boss_skonghun:{
+			audio:true,
+			trigger:{player:'phaseUseBegin'},
+			filter:function(event,player){
+				var num=player.maxHp-player.hp;
+				if(num==0) return false;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side!=player.side){
+						num--;
+					}
+				}
+				return num>=0;
+			},
+			forced:true,
+			content:function(){
+				'step 0'
+				var targets=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].side!=player.side){
+						targets.push(game.players[i]);
+					}
+				}
+				targets.sort(lib.sort.seat);
+				event.targets=targets;
+				player.line(targets,'thunder');
+				event.num=targets.length;
+				'step 1'
+				if(event.targets.length){
+					event.targets.shift().damage('thunder');
+					event.redo();
+				}
+				'step 2'
+				player.recover(event.num);
+			},
+			ai:{
+				threaten:function(player,target){
+					if(target.hp==1) return 2;
+					if(target.hp==2&&game.players.length<8) return 1.5;
+					return 0.5;
+				},
+			}
+		},
+		boss_chiying:{
+			audio:2,
+            trigger:{global:'damageBegin'},
+            forced:true,
+            filter:function(event,player){
+                if(event.num<=1) return false;
+				return event.player.isFriendOf(player);
+            },
+            priority:-11,
+            content:function(){
+                trigger.num=1;
+            }
+        },
+		boss_jingfan:{
+			global:'boss_jingfan2',
+		},
+		boss_jingfan2:{
+			mod:{
+				globalFrom:function(from,to,distance){
+					if(to.isEnemyOf(from)) return;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].hasSkill('boss_jingfan')&&
+							game.players[i].isFriendOf(from)&&game.players[i]!=from){
+							return distance-1;
+						}
+					}
+				}
+			}
+		},
+		boss_lingyu:{
+			trigger:{player:'phaseEnd'},
+			check:function(event,player){
+				if(player.isTurnedOver()) return true;
+				var num=0;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hp<game.players[i].maxHp&&
+						game.players[i].isFriendOf(player)&&ai.get.recoverEffect(game.players[i])>0){
+						if(game.players[i].hp==1){
+							return true;
+						}
+						num++;
+						if(num>=2) return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.turnOver();
+				'step 1'
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hp<game.players[i].maxHp&&game.players[i].isFriendOf(player)){
+						list.push(game.players[i]);
+					}
+				}
+				player.line(list,'green');
+				event.targets=list;
+				'step 2'
+				if(event.targets.length){
+					event.targets.shift().recover();
+					event.redo();
+				}
+			},
+			ai:{
+				threaten:1.5,
+				effect:{
+					target:function(card,player,target){
+						if(card.name=='guiyoujie') return [0,1];
+					}
+				}
+			},
+		},
+		boss_zhenwei:{
+			global:'boss_zhenwei2',
+			ai:{
+				threaten:1.5
+			}
+		},
+		boss_zhenwei2:{
+			mod:{
+				globalTo:function(from,to,distance){
+					if(to.isFriendOf(from)) return;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].hasSkill('boss_zhenwei')&&
+							game.players[i].isFriendOf(to)&&game.players[i]!=to){
+							return distance+1;
+						}
+					}
+				}
+			}
+		},
+		boss_benlei:{
+			mode:['versus'],
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				if(_status.mode!='jiange') return false;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].type=='mech'&&game.players[i].isEnemyOf(player)){
+						return true;
+					}
+				}
+			},
+			content:function(){
+				var target;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].type=='mech'&&game.players[i].isEnemyOf(player)){
+						target=game.players[i];break;
+					}
+				}
+				if(target){
+					player.line(target,'thunder');
+					target.damage(2,'thunder');
+				}
+			},
+			ai:{
+				threaten:function(player,target){
+					if(_status.mode=='jiange'){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].type=='mech'&&game.players[i].isEnemyOf(target)){
+								return 2;
+							}
+						}
+					}
+					return 1;
+				}
+			}
+		},
+		boss_nailuo:{
+			trigger:{player:'phaseEnd'},
+			check:function(event,player){
+				if(player.isTurnedOver()) return true;
+				var num=0;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isEnemyOf(player)){
+						var es=game.players[i].get('e');
+						for(var j=0;j<es.length;j++){
+							switch(get.subtype(es[j])){
+								case 'equip1':num+=1;break;
+								case 'equip2':num+=2;break;
+								case 'equip3':num+=2;break;
+								case 'equip4':num+=1;break;
+								case 'equip5':num+=1.5;break;
+							}
+						}
+					}
+				}
+				if(_status.mode=='jiange'){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isFriendOf(player)&&game.players[i].hasSkill('huodi')){
+							return num>0;
+						}
+					}
+				}
+				return num>=4;
+			},
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isEnemyOf(player)&&game.players[i].num('e')){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.turnOver();
+				'step 1'
+				event.targets=get.players();
+				'step 2'
+				if(event.targets.length){
+					var current=event.targets.shift();
+					if(current.isEnemyOf(player)){
+						var es=current.get('e');
+						if(es.length){
+							current.discard(es);
+							player.line(current,'green');
+						}
+					}
+					event.redo();
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(card.name=='guiyoujie') return [0,1];
+					}
+				}
+			},
+		},
+		boss_tanshi:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			check:function(){
+				return false;
+			},
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			content:function(){
+				player.chooseToDiscard('h',true);
+			}
+		},
+		boss_tunshi:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				var nh=player.num('h');
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isEnemyOf(player)&&game.players[i].num('h')>nh){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				var targets=[];
+				var nh=player.num('h');
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isEnemyOf(player)&&game.players[i].num('h')>nh){
+						targets.push(game.players[i]);
+					}
+				}
+				targets.sort(lib.sort.seat);
+				event.targets=targets;
+				'step 1'
+				if(event.targets.length){
+					var current=event.targets.shift();
+					current.damage('thunder');
+					player.line(current,'thunder');
+					event.redo();
+				}
+			}
+		},
+		boss_jiguan:{
+			mod:{
+				targetEnabled:function(card,player,target){
+					if(card.name=='lebu'){
+						return false;
+					}
+				}
+			}
+		},
+		boss_gongshenjg:{
+			audio:2,
+			trigger:{player:'phaseEnd'},
+			mode:['versus'],
+			filter:function(event,player){
+				if(_status.mode!='jiange') return false;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].type=='mech'){
+						if(game.players[i].isEnemyOf(player)) return true;
+						if(game.players[i].hp<game.players[i].maxHp) return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				var enemy;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].type=='mech'){
+						if(game.players[i].isFriendOf(player)){
+							if(game.players[i].hp<game.players[i].maxHp){
+								player.line(game.players[i],'green');
+								game.players[i].recover();
+								return;
+							}
+						}
+						else{
+							enemy=game.players[i];
+						}
+					}
+				}
+				if(enemy){
+					player.line(enemy,'fire');
+					enemy.damage('fire');
+				}
+			},
+		},
+		boss_jingmiao:{
+			trigger:{global:'useCardAfter'},
+            filter:function(event,player){
+                return event.player.isEnemyOf(player)&&event.card.name=='wuxie';
+            },
+			logTarget:'player',
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)<0;
+			},
+            content:function(){
+				player.line(trigger.player,'green');
+				trigger.player.loseHp();
+            },
+            ai:{
+                expose:0.2,
+				threaten:1.3
+            }
+		},
+		boss_zhinang:{
+			trigger:{player:'phaseBegin'},
+            frequent:true,
+            content:function(){
+                "step 0"
+                event.cards=get.cards(3);
+                event.cards2=[];
+                for(var i=0;i<event.cards.length;i++){
+                    var type=get.type(event.cards[i]);
+                    if(type=='trick'||type=='equip'){
+                        event.cards2.push(event.cards[i]);
+                    }
+                }
+                if(!event.isMine()||event.cards2.length==0){
+                    player.showCards(event.cards);
+                }
+                "step 1"
+                if(event.cards2.length==0){
+                    event.finish();
+                }
+                else{
+                    var dialog=ui.create.dialog('将三张牌中的锦囊牌或装备牌交给一己方名角色','hidden');
+                    dialog.add(event.cards);
+                    for(var i=0;i<dialog.buttons.length;i++){
+                        if(event.cards2.contains(dialog.buttons[i].link)){
+                            dialog.buttons[i].style.opacity=1;
+                        }
+                        else{
+                            dialog.buttons[i].style.opacity=0.5;
+                        }
+                    }
+                    var next=player.chooseTarget(true,dialog,function(card,player,target){
+						return target.isFriendOf(player);
+					});
+                    next.ai=function(target){
+                        var att=ai.get.attitude(player,target);
+						if(att>0&&target.num('j','lebu')){
+							return 0.1;
+						}
+                        if(player.num('h')>player.hp){
+                            if(target==player) return Math.max(1,att-2);
+                        }
+                        if(target==player) return att+5;
+                        return att;
+                    }
+                }
+                "step 2"
+                if(result&&result.targets&&result.targets.length){
+                    event.target=result.targets[0];
+                }
+                if(event.cards2.length){
+					player.line(event.target,'green');
+					game.log(event.target,'获得了',event.cards2);
+                    event.target.gain(event.cards2,'gain2');
+                }
+            },
+            ai:{
+                threaten:1.3
+            }
+		},
+		boss_biantian4:{
+			trigger:{player:'dieBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hasSkill('boss_biantian3')){
+						game.players[i].removeSkill('boss_biantian3');
+						game.players[i].popup('boss_biantian3');
+					}
+					if(game.players[i].hasSkill('boss_biantian2')){
+						game.players[i].removeSkill('boss_biantian2');
+						game.players[i].popup('boss_biantian2');
+					}
+				}
+			}
+		},
+        boss_biantian:{
+            trigger:{player:'phaseBegin'},
+            forced:true,
+            unique:true,
+			audio:false,
+            group:'boss_biantian4',
+            content:function(){
+                "step 0"
+                for(var i=0;i<game.players.length;i++){
+					if(game.players[i].hasSkill('boss_biantian3')){
+						game.players[i].removeSkill('boss_biantian3');
+						game.players[i].popup('boss_biantian3');
+					}
+					if(game.players[i].hasSkill('boss_biantian2')){
+						game.players[i].removeSkill('boss_biantian2');
+						game.players[i].popup('boss_biantian2');
+					}
+				}
+                player.judge(function(card){
+                    if(get.suit(card)=='spade') return 1;
+					if(get.color(card)=='red') return 0;
+                    return -1;
+                });
+                "step 1"
+				var targets=[];
+                if(result.color=='red'){
+					game.trySkillAudio('boss_biantianx2');
+					for(var i=0;i<game.players.length;i++){
+						if(!game.players[i].isFriendOf(player)){
+							game.players[i].addSkill('boss_biantian3');
+							game.players[i].popup('kuangfeng');
+							targets.push(game.players[i]);
+						}
+					}
+					player.logSkill('kuangfeng',targets,'fire');
+                }
+                else if(result.suit=='spade'){
+					game.trySkillAudio('boss_biantianx1');
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isFriendOf(player)){
+							game.players[i].addSkill('boss_biantian2');
+							game.players[i].popup('dawu');
+							targets.push(game.players[i]);
+						}
+					}
+					player.logSkill('dawu',targets,'thunder');
+                }
+            },
+			ai:{
+				threaten:1.6
+			}
+        },
+        boss_biantian2:{
+			audio:false,
+            trigger:{player:'damageBefore'},
+            filter:function(event){
+                if(event.nature!='thunder') return true;
+                return false;
+            },
+            forced:true,
+			mark:true,
+			marktext:'雾',
+			intro:{
+				content:'已获得大雾标记'
+			},
+            content:function(){
+                trigger.untrigger();
+                trigger.finish();
+            },
+            ai:{
+				nofire:true,
+				nodamage:true,
+                effect:{
+                    target:function(card,player,target,current){
+                        if(get.tag(card,'damage')&&!get.tag(card,'thunderDamage')) return [0,0];
+                    }
+                }
+            }
+        },
+        boss_biantian3:{
+            trigger:{player:'damageBegin'},
+            filter:function(event){
+                if(event.nature=='fire') return true;
+                return false;
+            },
+			mark:true,
+			marktext:'风',
+			intro:{
+				content:'已获得狂风标记'
+			},
+            forced:true,
+            content:function(){
+                trigger.num++;
+            },
+            ai:{
+                effect:{
+                    target:function(card,player,target,current){
+                        if(get.tag(card,'fireDamage')) return 1.5;
+                    }
+                }
+            }
+        },
+		boss_jizhen:{
+			audio:2,
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isFriendOf(player)&&game.players[i].hp<game.players[i].maxHp){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isFriendOf(player)&&game.players[i].hp<game.players[i].maxHp){
+						list.push(game.players[i]);
+					}
+				}
+				if(list.length){
+					player.line(list,'green');
+					game.asyncDraw(list);
+				}
+			},
+			ai:{
+				threaten:1.4
+			}
+		},
+		boss_lingfeng:{
+			audio:2,
+			trigger:{player:'phaseDrawBefore'},
+            content:function(){
+                "step 0"
+                trigger.untrigger();
+                trigger.finish();
+                event.cards=get.cards(2);
+                player.showCards(event.cards);
+                "step 1"
+                if(get.color(event.cards[0])!=get.color(event.cards[1])){
+                    player.chooseTarget('是否令一名敌方角色失去1点体力？',function(card,player,target){
+						return !target.isFriendOf(player);
+                    }).ai=function(target){
+                        return -ai.get.attitude(player,target);
+                    }
+                }
+                "step 2"
+                if(result.bool&&result.targets&&result.targets.length){
+					player.line(result.targets,'green');
+                    result.targets[0].loseHp();
+                }
+                "step 3"
+                player.gain(event.cards);
+                player.$draw(event.cards);
+                game.delay();
+            },
+            ai:{
+                threaten:1.4
+            }
+		},
+		boss_yuhuojg:{
+			audio:true,
+			trigger:{player:'damageBefore'},
+			filter:function(event){
+				return event.nature=='fire';
+			},
+			forced:true,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				nofire:true,
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'fireDamage')) return 0;
+					}
+				}
+			}
+		},
+		boss_tianyun:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('boss_tianyun'),function(card,player,target){
+					return target.isEnemyOf(player);
+				}).ai=function(target){
+					if(player.hp<=1) return 0;
+					if(ai.get.attitude(player,target)>-3) return 0;
+					var eff=ai.get.damageEffect(target,player,player,'fire');
+					if(eff>0){
+						return eff+target.num('e')/2;
+					}
+					return 0;
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('boss_tianyun',result.targets,'fire');
+					player.loseHp();
+					event.target=result.targets[0];
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(event.target){
+					event.target.damage(2,'fire');
+				}
+				"step 3"
+				if(event.target){
+					var es=event.target.get('e');
+					if(es.length){
+						event.target.discard(es);
+					}
+				}
+			},
+			ai:{
+				threaten:2
+			}
+		},
 		versus_swap:{
 			trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 			'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',

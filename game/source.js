@@ -7,7 +7,6 @@ window.noname_source_list=[
     'card/swd.js',
     'card/yunchou.js',
     'card/zhenfa.js',
-    'character/boss.js',
     'character/diy.js',
     'character/extra.js',
     'character/gujian.js',
