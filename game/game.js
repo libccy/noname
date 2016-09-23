@@ -11173,13 +11173,23 @@
 					}
 					return this;
 				},
-                clearEquipTrigger:function(){
-                    var es=this.get('e');
-                    for(var i=0;i<es.length;i++){
-                        var info=get.info(es[i]);
+                clearEquipTrigger:function(card){
+                    if(card){
+                        var info=get.info(card);
                         if(info.skills){
                             for(var j=0;j<info.skills.length;j++){
                                 this.removeSkillTrigger(info.skills[j]);
+                            }
+                        }
+                    }
+                    else{
+                        var es=this.get('e');
+                        for(var i=0;i<es.length;i++){
+                            var info=get.info(es[i]);
+                            if(info.skills){
+                                for(var j=0;j<info.skills.length;j++){
+                                    this.removeSkillTrigger(info.skills[j]);
+                                }
                             }
                         }
                     }
@@ -19594,15 +19604,19 @@
 						if(typeof equipValue=='function') return equipValue(card,player)-value;
 						return equipValue-value;
 					}
-					card.ai.result.target=function(player,target){
-						var card=get.card();
-						if(card==undefined) return 0;
-						var value1=ai.get.value(card,target);
-						var value2=0;
-						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card)
-							value2=ai.get.value(target[get.subtype(card)],target);
-                        return Math.max(0,value1-value2);
-					};
+					card.ai.result.target=(function(name){
+                        return (function(player,target){
+    						var card=get.card();
+    						if(card==undefined){
+                                card={name:name};
+                            }
+    						var value1=ai.get.value(card,target);
+    						var value2=0;
+    						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card)
+    							value2=ai.get.value(target[get.subtype(card)],target);
+                            return Math.max(0,value1-value2);
+    					});
+                    }(i));
 				}
 				else if(card.type=='delay'){
 					if(card.enable==undefined) card.enable=true;

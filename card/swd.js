@@ -644,7 +644,7 @@ card.swd={
 				target.discard(target.get('he').randomGet());
 			},
 			ai:{
-				order:6.5,
+				order:9,
 				result:{
 					target:-1,
 				},
@@ -722,7 +722,7 @@ card.swd={
 				}
 			},
 			ai:{
-				order:1,
+				order:9,
 				result:{
 					target:function(player,target){
 						if(target.num('h')<target.hp) return 1;
@@ -778,7 +778,7 @@ card.swd={
 				target.turnOver();
 			},
 			ai:{
-				order:2,
+				order:9,
 				result:{
 					target:-1,
 				},
@@ -3156,7 +3156,11 @@ card.swd={
 					}
 					return 0;
 				}
-				return 1+ai.get.value(card);
+				var num=1+ai.get.value(card);
+				if(get.position(card)=='e'){
+					num+=0.1;
+				}
+				return num;
 			},
 			filterCard:function(card){
 				var type=get.type(card);
@@ -3173,17 +3177,6 @@ card.swd={
 				else{
 					return type=='equip'||type=='hslingjian'||type=='jiqi';
 				}
-				// if(type=='equip'&&!lib.inpile.contains(card.name)) return false;
-				// for(var i=0;i<ui.selected.cards.length;i++){
-				// 	if(get.type(ui.selected.cards[i])=='equip') return type=='hslingjian'||type=='jiqi';
-				// }
-				// if(_status.event.player.hasSkill('jiguanyaoshu_skill')){
-				// 	if(ui.selected.cards.length==2) return type=='equip';
-				// }
-				// else{
-				// 	if(ui.selected.cards.length==1) return type=='equip';
-				// }
-				// return type=='equip'||type=='hslingjian';
 			},
 			process:function(cards){
 				var equip;
@@ -3204,28 +3197,9 @@ card.swd={
 					name+='_'+cards[0].name;
 				}
 				if(lib.card[name]) return name;
-				lib.card[name]={};
-				lib.card[name].cardimage=equip.name;
+				lib.card[name]=get.copy(lib.card[equip.name]);
+				lib.card[name].cardimage=lib.card[name].cardimage||equip.name;
 				lib.card[name].vanish=true;
-				for(var i in lib.card[equip.name]){
-					if(i=='ai'){
-						lib.card[name][i]={};
-						for(var j in lib.card[equip.name][i]){
-							if(j=='basic'){
-								lib.card[name][i][j]={};
-								for(var k in lib.card[equip.name][i][j]){
-									lib.card[name][i][j][k]=lib.card[equip.name][i][j][k];
-								}
-							}
-							else{
-								lib.card[name][i][j]=lib.card[equip.name][i][j];
-							}
-						}
-					}
-					else{
-						lib.card[name][i]=lib.card[equip.name][i];
-					}
-				}
 				if(type=='jiqi'){
 					lib.card[name].legend=true;
 				}
@@ -3270,11 +3244,11 @@ card.swd={
 				else{
 					lib.card[name].skills=[];
 				}
-				lib.card[name].filterTarget=function(card,player,target){
-					return !target.isMin();
-				};
-				lib.card[name].selectTarget=1;
-				lib.card[name].range={global:1};
+				// lib.card[name].filterTarget=function(card,player,target){
+				// 	return !target.isMin();
+				// };
+				// lib.card[name].selectTarget=1;
+				// lib.card[name].range={global:1};
 				var str=lib.translate[cards[0].name+'_duanzao'];
 				var str2=get.translation(equip.name,'skill');
 				lib.translate[name]=str+str2;
@@ -3307,15 +3281,6 @@ card.swd={
 				return name;
 			},
 			selectCard:2,
-			// selectCard:function(){
-			// 	if(ui.selected.cards.length==2&&
-			// 		get.type(ui.selected.cards[0])=='hslingjian'&&
-			// 		get.type(ui.selected.cards[1])=='hslingjian'){
-			// 		return [3,3];
-			// 	}
-			// 	if(_status.event.player.hasSkill('jiguanyaoshu_skill')) return [2,3];
-			// 	return 2;
-			// },
 			filter:function(event,player){
 				if(!player.num('h',{type:['hslingjian','jiqi']})) return false;
 				var es=player.get('he',{type:'equip'});
@@ -3328,11 +3293,29 @@ card.swd={
 				player.$throw(cards);
 			},
 			content:function(){
+				'step 0'
 				for(var i=0;i<cards.length;i++){
 					ui.discardPile.appendChild(cards[i]);
 				}
 				var name=lib.skill._lingjianduanzao.process(cards);
-				player.gain(game.createCard(name),'gain2');
+				var card=game.createCard(name);
+				player.chooseTarget(function(card,player,target){
+					return !target.isMin()&&get.distance(player,target)<=1;
+				},'选择一个目标装备'+get.translation(card.name)).ai=function(target){
+					return ai.get.effect(target,card,player,player);
+				}
+				event.card=card;
+				'step 1'
+				if(result.bool){
+					var target=result.targets[0];
+					player.line(target,'green');
+					target.equip(event.card);
+					target.$gain2(event.card);
+					game.delay();
+				}
+				else{
+					player.gain(event.card,'gain2');
+				}
 			},
 			ai:{
 				order:function(card,player){
@@ -4041,7 +4024,7 @@ card.swd={
 		hslingjian_shijianhuisu_equip4_info:'当你的装备区内没有其他牌时，你的进攻距离+1',
 		hslingjian_shijianhuisu_equip5_info:'出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色将其装备区内的牌收回手牌',
 		_lingjianduanzao:'煅造',
-		_lingjianduanzao_info:'出牌阶段，你可以将一张装备牌和一张可煅造的牌合成为一件强化装备；强化装备可以装备给距离1以内的角色',
+		_lingjianduanzao_info:'出牌阶段，你可以将一张装备牌和一张可煅造的牌合成为一件强化装备，并可装备给距离1以内的一名角色',
 		jiguanshu:'机关鼠',
 		jiguanshu_info:'出牌阶段对一名角色使用，用随机零件强化目标装备区内的装备',
 		lingjiandai:'零件袋',

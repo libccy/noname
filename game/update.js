@@ -18,3 +18,6 @@ window.noname_update={
         '1.9.1.1':[]
     }
 }
+
+// 'card/swd.js',
+// 'game/package.js',

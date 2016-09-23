@@ -14,7 +14,7 @@ character.pack={
     gujian:'古剑奇谭',
     xianjian:'仙剑',
     xiake:'侠客',
-    boss:'BOSS'
+    // boss:'BOSS'
 };
 card.pack={
     standard:'标准',
