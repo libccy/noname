@@ -2418,6 +2418,7 @@ card.swd={
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>=3;
 			},
+			logTarget:'player',
 			content:function(){
 				"step 0"
 				trigger.player.recover();
@@ -4140,7 +4141,7 @@ card.swd={
 		chiyuxi_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到1点火焰伤害。',
 		guangshatianyi:'光纱天衣',
 		guangshatianyi_bg:'纱',
-		guangshatianyi_info:'仅女性可装备，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
+		guangshatianyi_info:'仅女性角色可使用，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
 		sifeizhenmian_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		yiluan:'意乱',

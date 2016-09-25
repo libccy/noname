@@ -459,7 +459,7 @@ character.swd={
 					if(!player.num('he',{color:'red'})) return false;
 				},
 			},
-			group:['huanxia_expire','huanxia_draw'],
+			group:['huanxia_expire','huanxia_draw','huanxia_gain'],
 			subSkill:{
 				expire:{
 					trigger:{source:'damageAfter'},
@@ -474,15 +474,31 @@ character.swd={
 				},
 				draw:{
 					trigger:{player:'shaAfter'},
-					direct:true,
+					forced:true,
+					popup:false,
 					content:function(){
 						if(trigger.parent.skill=='huanxia'){
 							var card=trigger.cards[0];
 							if(get.itemtype(card)=='card'&&get.position(card)=='d'&&!player.storage.huanxia){
-								player.gain(card,'gain2');
+								ui.special.appendChild(card);
+								if(!player.storage.huanxia_draw){
+									player.storage.huanxia_draw=[];
+								}
+								player.storage.huanxia_draw.push(card);
 							}
 						}
 						delete player.storage.huanxia;
+					}
+				},
+				gain:{
+					trigger:{player:'phaseEnd'},
+					forced:true,
+					filter:function(event,player){
+						return player.storage.huanxia_draw;
+					},
+					content:function(){
+						player.gain(player.storage.huanxia_draw,'gain2');
+						delete player.storage.huanxia_draw;
 					}
 				}
 			}
@@ -8067,7 +8083,7 @@ character.swd={
 		jinlin:'金鳞',
 		jinlin_info:'限定技，出牌阶段，你可以令任意名角色各获得3点护甲，获得护甲的角色于每个回合开始阶段失去1点护甲直到首次失去所有护甲或累计以此法失去3点护甲',
 		huanxia:'幻霞',
-		huanxia_info:'你可以将一张红色牌当作杀使用，若此杀未造成伤害，你可以在其进入弃牌堆后收回此牌',
+		huanxia_info:'你可以将一张红色牌当作杀使用，若此杀未造成伤害，你在回合结束时收回此牌',
 		jingjie:'镜界',
 		jingjie_info:'回合开始阶段，你可以流失一点体力，并',
 		jingjie_old_info:'限定技，出牌阶段，你可以令所有角色弃置所有牌，然后摸两张牌（不触发任何技能）',

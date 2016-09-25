@@ -3431,7 +3431,6 @@
 				lib.status.canvas=false;
 				return false;
 			}
-            _status.canvasChanged=true;
 			ui.canvas.width=ui.arena.offsetWidth;
 			ui.canvas.height=ui.arena.offsetHeight;
 			var ctx=ui.ctx;
@@ -19236,11 +19235,8 @@
 					ui.touchlines.shift().delete();
 				}
 			}
-            if(_status.canvasChanged||!lib.config.low_performance){
-                ui.canvas.width=ui.arena.offsetWidth;
-    			ui.canvas.height=ui.arena.offsetHeight;
-                delete _status.canvasChanged;
-            }
+            ui.canvas.width=ui.arena.offsetWidth;
+    		ui.canvas.height=ui.arena.offsetHeight;
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].unprompt();
 			}
@@ -28899,8 +28895,6 @@
 								_status.clicked=false;
 								game.uncheck();
 								game.check();
-								ui.canvas.width=ui.arena.offsetWidth;
-								ui.canvas.height=ui.arena.offsetHeight;
 								_status.clicked=true;
 							}
 							return;
@@ -29125,6 +29119,8 @@
 							ui.confirm.close();
 						}
 						ui.click.ok();
+                        ui.canvas.width=ui.arena.offsetWidth;
+        				ui.canvas.height=ui.arena.offsetHeight;
 					}
 					else{
 						game.uncheck();
@@ -29142,11 +29138,6 @@
 				while(ui.touchlines.length){
 					ui.touchlines.shift().delete();
 				}
-                if(_status.canvasChanged){
-                    ui.canvas.width=ui.arena.offsetWidth;
-    				ui.canvas.height=ui.arena.offsetHeight;
-                    delete _status.canvasChanged;
-                }
 				if(tmpflag){
 					game.check();
 				}
@@ -29237,8 +29228,6 @@
 								_status.clicked=false;
 								game.uncheck();
 								game.check();
-								ui.canvas.width=ui.arena.offsetWidth;
-								ui.canvas.height=ui.arena.offsetHeight;
 								_status.clicked=true;
 							}
 							return;
@@ -29485,8 +29474,6 @@
 						_status.mouseleft=false;
 						_status.mousedragorigin=null;
 						_status.dragstatuschanged=false;
-						ui.canvas.width=ui.arena.offsetWidth;
-						ui.canvas.height=ui.arena.offsetHeight;
 						game.uncheck();
 						game.check();
 						_status.noright=true;
@@ -32192,13 +32179,13 @@
 				}
 				case 'turn':{
 					if(content>0){
-						return '还剩'+content+'个回合';
+						return '剩余'+content+'个回合';
 					}
 					return false;
 				}
 				case 'time':{
 					if(content>0){
-						return '还剩'+content+'次';
+						return '剩余'+content+'次';
 					}
 					return false;
 				}

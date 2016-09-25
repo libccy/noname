@@ -2232,29 +2232,30 @@ character.hearth={
 			enable:'chooseToUse',
 			mark:true,
 			init:function(player){
-				player.storage.chongsheng=0;
-				game.addVideo('storage',player,['chongsheng',player.storage.chongsheng]);
+				player.storage.chongsheng=2;
+				player.syncStorage('chongsheng');
 			},
 			filter:function(event,player){
 				if(event.type!='dying') return false;
 				if(player!=_status.dying) return false;
-				if(player.storage.chongsheng==2) return false;
+				if(player.storage.chongsheng<=0) return false;
+				return true;
 			},
 			content:function(){
-				player.hp=Math.min(2-player.storage.chongsheng,player.maxHp);
+				player.hp=Math.min(player.storage.chongsheng,player.maxHp);
 				player.discard(player.get('hej'));
-				player.draw(2-player.storage.chongsheng);
-				player.storage.chongsheng++;
-				if(player.storage.chongsheng==2){
+				player.draw(player.storage.chongsheng);
+				player.storage.chongsheng--;
+				if(player.storage.chongsheng<=0){
 					player.unmarkSkill('chongsheng');
 				}
 				if(player.isLinked()) player.link();
 				if(player.isTurnedOver()) player.turnOver();
-				game.addVideo('storage',player,['chongsheng',player.storage.chongsheng]);
+				player.syncStorage('chongsheng');
 			},
 			ai:{
 				skillTagFilter:function(player){
-					if(player.storage.chongsheng==2) return false;
+					if(player.storage.chongsheng<=0) return false;
 					if(player.hp>0) return false;
 				},
 				save:true,
@@ -2262,13 +2263,11 @@ character.hearth={
 					player:10
 				},
 				threaten:function(player,target){
-					if(target.storage.chongsheng<2) return 0.6;
+					if(target.storage.chongsheng>0) return 0.6;
 				}
 			},
 			intro:{
-				content:function(storage){
-					return '剩余'+get.cnNumber(2-storage)+'次';
-				}
+				content:'time'
 			}
 		},
 		guozai:{
