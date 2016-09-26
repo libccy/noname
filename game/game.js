@@ -3098,7 +3098,43 @@
 			},
             brawl:{
                 name:'乱斗',
-                config:{}
+                config:{
+                    duzhansanguo:{
+                        name:'毒战三国',
+                        init:true,
+                        frequent:true
+                    },
+                    daozhiyueying:{
+                        name:'导师月英',
+                        init:true,
+                        frequent:true
+                    },
+                    weiwoduzun:{
+                        name:'唯我独尊',
+                        init:true,
+                        frequent:true
+                    },
+                    tongxingzhizheng:{
+                        name:'同姓之争',
+                        init:true,
+                        frequent:true
+                    },
+                    tongqueduopao:{
+                        name:'铜雀夺袍',
+                        init:true,
+                        frequent:true
+                    },
+                    tongjiangmoshi:{
+                        name:'同将模式',
+                        init:true,
+                        frequent:true
+                    },
+                    scene:{
+                        name:'创建场景',
+                        init:true,
+                        frequent:true
+                    }
+                }
             },
             story:{
                 name:'群侠',
@@ -4090,6 +4126,9 @@
 						get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
 					}
 					lib.init.start=mode[lib.config.mode].start;
+                    if(typeof mode[lib.config.mode].init=='function'){
+                        mode[lib.config.mode].init();
+                    }
 					if(game.onwash){
 						lib.onwash.push(game.onwash);
 						delete game.onwash;

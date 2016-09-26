@@ -26,6 +26,16 @@ character.xianjian={
 		pal_liumengli:['female','wei',3,['tianxian','runxin','zhimeng']],
 		pal_murongziying:['male','wei',4,['xuanning','poyun','qianfang']],
 		pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','xfenxin']],
+
+		pal_jiangyunfan:['male','wei',4,[]],
+		pal_tangyurou:['male','wei',4,[]],
+		pal_longyou:['male','wei',4,[]],
+		pal_xiaoman:['male','wei',4,[]],
+
+		pal_xiahoujinxuan:['male','wei',4,[]],
+		pal_muchanglan:['male','wei',4,[]],
+		pal_xia:['male','wei',4,[]],
+		pal_jiangcheng:['male','wei',4,[]],
 	},
 	skill:{
 		sheling:{
@@ -1868,6 +1878,16 @@ character.xianjian={
 		}
 	},
 	translate:{
+		pal_xiahoujinxuan:'夏侯瑾轩',
+		pal_muchanglan:'暮菖兰',
+		pal_xia:'瑕',
+		pal_jiangcheng:'姜承',
+
+		pal_jiangyunfan:'姜云凡',
+		pal_tangyurou:'唐雨柔',
+		pal_longyou:'龙幽',
+		pal_xiaoman:'小蛮',
+
 		pal_wangxiaohu:'王小虎',
 		pal_sumei:'苏媚',
 		pal_shenqishuang:'沈欺霜',

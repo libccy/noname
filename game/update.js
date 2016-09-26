@@ -28,5 +28,6 @@ window.noname_update={
 // 'character/hearth.js',
 // 'mode/boss.js',
 // 'mode/versus.js',
+// 'mode/brawl.js',
 // 'extension/boss/extension.js',
 // 'layout/mode/boss.css',

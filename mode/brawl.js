@@ -167,6 +167,7 @@ mode.brawl={
         }
         var sceneNode;
         for(var i in lib.brawl){
+            if(get.config(i)===false) continue;
             if(i=='scene'){
                 sceneNode=createNode(i);
             }
