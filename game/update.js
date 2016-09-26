@@ -26,6 +26,7 @@ window.noname_update={
 // 'character/diy.js',
 // 'character/swd.js',
 // 'character/hearth.js',
+// 'character/xianjian.js',
 // 'mode/boss.js',
 // 'mode/versus.js',
 // 'mode/brawl.js',

@@ -27,15 +27,15 @@ character.xianjian={
 		pal_murongziying:['male','wei',4,['xuanning','poyun','qianfang']],
 		pal_xuanxiao:['male','wei',4,['xuanyan','ningbin','xfenxin']],
 
-		pal_jiangyunfan:['male','wei',4,[]],
-		pal_tangyurou:['male','wei',4,[]],
-		pal_longyou:['male','wei',4,[]],
-		pal_xiaoman:['male','wei',4,[]],
-
-		pal_xiahoujinxuan:['male','wei',4,[]],
-		pal_muchanglan:['male','wei',4,[]],
-		pal_xia:['male','wei',4,[]],
-		pal_jiangcheng:['male','wei',4,[]],
+		// pal_jiangyunfan:['male','wei',4,[]],
+		// pal_tangyurou:['male','wei',4,[]],
+		// pal_longyou:['male','wei',4,[]],
+		// pal_xiaoman:['male','wei',4,[]],
+		//
+		// pal_xiahoujinxuan:['male','wei',4,[]],
+		// pal_muchanglan:['male','wei',4,[]],
+		// pal_xia:['male','wei',4,[]],
+		// pal_jiangcheng:['male','wei',4,[]],
 	},
 	skill:{
 		sheling:{
