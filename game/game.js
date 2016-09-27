@@ -11342,6 +11342,9 @@
         						info.onremove(this);
         					}
                             this.removeSkillTrigger(skill);
+                            if(!info.keepSkill){                                
+                                this.removeAdditionalSkill(skill);
+                            }
                         }
                     }
 					return skill;

@@ -1106,6 +1106,7 @@ character.yijiang={
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
 			mark:true,
+			audio:false,
 			intro:{
 				content:'下个摸牌阶段额外摸一张牌'
 			},

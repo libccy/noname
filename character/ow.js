@@ -546,6 +546,7 @@ character.ow={
                 content:'limited'
             },
             mark:true,
+            unique:true,
             skillAnimation:true,
             animationColor:'water',
             line:'thunder',

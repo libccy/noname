@@ -1,5 +1,8 @@
 card.swd={
 	card:{
+		shenmiguo:{
+			fullskin:true,
+		},
 		// yuchanqian:{
 		// 	fullskin:true,
 		// },
@@ -3927,6 +3930,7 @@ card.swd={
 		yuchanli:'离玉蝉',
 		yuchangen:'艮玉蝉',
 		yuchandui:'兑玉蝉',
+		shenmiguo:'神秘果',
 		shuchui:'鼠槌',
 		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的所有杀对该角色使用，杀每造成一次伤害你摸一张牌（最多使用3张杀）',
 		zhiluxiaohu:'指路小狐',

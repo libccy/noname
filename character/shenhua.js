@@ -217,6 +217,7 @@ character.shenhua={
 			audio:2,
 			unique:true,
 			zhuSkill:true,
+			keepSkill:true,
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){

@@ -20,6 +20,7 @@ window.noname_update={
 }
 
 // 'card/swd.js',
+// 'card/guozhan.js',
 // 'game/package.js',
 // 'game/asset.js',
 // 'game/game.js',
@@ -27,6 +28,9 @@ window.noname_update={
 // 'character/swd.js',
 // 'character/hearth.js',
 // 'character/xianjian.js',
+// 'character/shenhua.js',
+// 'character/ow.js',
+// 'character/yijiang.js',
 // 'mode/boss.js',
 // 'mode/versus.js',
 // 'mode/brawl.js',

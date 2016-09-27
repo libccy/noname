@@ -123,6 +123,7 @@ window.noname_asset_list=[
     'image/card/chiling.png',
     'image/card/shenenshu.png',
     'image/card/shengdong.png',
+    'image/card/shenmiguo.png',
     'image/card/shennongding.png',
     'image/card/shentoumianju.png',
     'image/card/shihuawuqi.png',

@@ -808,25 +808,58 @@ character.hearth={
 			direct:true,
 			delay:false,
 			unique:true,
-			onremove:function(player){
-				player.removeAdditionalSkill('maoxian');
-			},
 			content:function(){
 				'step 0'
 				var list=get.gainableSkills();
 				list.remove('maoxian');
-				player.chooseControl(list.randomGets(3)).prompt='选择一项作为你的技能';
-				'step 1'
-				if(result.control){
-					game.stopCountChoose();
-					var link=result.control;
-					player.addAdditionalSkill('maoxian',link);
-					player.popup(link);
-					game.log(player,'获得了技能','【'+get.translation(link)+'】');
-					player.checkMarks();
-					player.markSkill('maoxian');
-					game.delay();
+				list=list.randomGets(3);
+				event.skillai=function(){
+					return list.randomGet();
+				};
+				if(event.isMine()){
+					var dialog=ui.create.dialog();
+					dialog.add('选择获得一项技能');
+					var clickItem=function(){
+						_status.event._result=this.link;
+						dialog.close();
+						game.resume();
+					};
+					for(var i=0;i<list.length;i++){
+						if(lib.translate[list[i]+'_info']){
+							var translation=get.translation(list[i]);
+							if(translation[0]=='新'&&translation.length==3){
+								translation=translation.slice(1,3);
+							}
+							else{
+								translation=translation.slice(0,2);
+							}
+							var item=dialog.add('<div class="popup" style="width:50%;display:inline-block"><div class="skill">【'+
+							translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
+							item.firstChild.addEventListener('click',clickItem);
+							item.firstChild.link=list[i];
+						}
+					}
+					dialog.add(ui.create.div('.placeholder'));
+					event.switchToAuto=function(){
+						event._result=event.skillai();
+						dialog.close();
+						game.resume();
+					};
+					_status.imchoosing=true;
+					game.pause();
 				}
+				else{
+					event._result=event.skillai();
+				}
+				'step 1'
+				_status.imchoosing=false;
+				var link=result;
+				player.addAdditionalSkill('maoxian',link);
+				player.popup(link);
+				game.log(player,'获得了技能','【'+get.translation(link)+'】');
+				player.checkMarks();
+				player.markSkill('maoxian');
+				game.delay();
 			},
 			intro:{
 				content:function(storage,player){
@@ -3754,6 +3787,7 @@ character.hearth={
 			animationColor:'thunder',
 			trigger:{player:'phaseBegin'},
 			forced:true,
+			unique:true,
 			filter:function(event,player){
 				if(!player.storage.tuteng_awake){
 					var rand=['tuteng1','tuteng2','tuteng3','tuteng4',
