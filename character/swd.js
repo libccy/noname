@@ -428,7 +428,8 @@ character.swd={
 			}
 		},
 		zaowu:{
-			enable:'chooseToUse',
+			enable:'phaseUse',
+			usable:1,
 			filter:function(event,player){
 				return player.num('he',{suit:'spade'})>0;
 			},
@@ -8466,7 +8467,7 @@ character.swd={
 		yunchou_info:'出牌阶段限一次，你可以弃置任意张手牌，并弃置一张其他角色的手牌，你弃置的手牌中每有一张与此牌的颜色相同，你摸一张牌，否则对方摸一张牌',
 		tianshu_old_info:'回合结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
 		tianshu_info:'出牌阶段，你可以交给一名其他角色一张锦囊牌，然后获得该角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
-		zaowu_info:'你可以将一张黑桃牌当作封印之蛋使用',
+		zaowu_info:'出牌阶段限一次，你可以将一张黑桃牌当作封印之蛋使用',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',

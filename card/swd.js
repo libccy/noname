@@ -11,8 +11,8 @@ card.swd={
 				}
 			},
 		},
-		shenmiguo:{
-			type:'basic',
+		fengyinzhidan:{
+			type:'trick',
 			enable:true,
 			fullskin:true,
 			notarget:true,
@@ -562,7 +562,7 @@ card.swd={
 				},
 			}
 		},
-		fengyinzhidan:{
+		shenmiguo_old:{
 			fullskin:true,
 			type:'trick',
 			enable:true,
@@ -593,6 +593,23 @@ card.swd={
 				},
 				result:{
 					target:2,
+				},
+			}
+		},
+		shenmiguo:{
+			fullskin:true,
+			type:'basic',
+			content:function(){
+				if(Array.isArray(player.storage.shenmiguo)){
+					player.useCard(player.storage.shenmiguo[0],player.storage.shenmiguo[1]);
+				}
+			},
+			ai:{
+				order:1,
+				useful:6,
+				value:6,
+				result:{
+					player:1
 				},
 			}
 		},
@@ -1615,6 +1632,53 @@ card.swd={
 		},
 	},
 	skill:{
+		_shenmiguo:{
+			trigger:{player:'useCardAfter'},
+			direct:true,
+			filter:function(event,player){
+				if(event.parent.name=='_shenmiguo') return false;
+				if(_status.currentPhase!=player) return false;
+				if(event.parent.parent.name!='phaseUse') return false;
+				if(!event.targets||!event.card) return false;
+				if(event.card.name=='shenmiguo') return false;
+				var type=get.type(event.card);
+				if(type!='basic'&&type!='trick') return false;
+				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
+				for(var i=0;i<event.targets.length;i++){
+					if(!event.targets[i].isAlive()) return false;
+					if(!player.canUse({name:event.card.name},event.targets[i],false,false)){
+						return false;
+					}
+				}
+				if(player.num('h','shenmiguo')) return true;
+				var mn=player.get('e','5');
+				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){
+					for(var i=0;i<mn.cards.length;i++){
+						if(mn.cards[i].name=='shenmiguo') return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				var card=game.createCard(trigger.card.name,trigger.card.suit,trigger.card.number,trigger.card.nature);
+				player.storage.shenmiguo=[card,trigger.targets];
+				player.chooseToUse('是否使用神秘果？',function(card,player){
+					if(card.name!='shenmiguo') return false;
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					if(mod!='unchanged') return mod;
+					return true;
+				},trigger.player,-1).set('ai',function(){
+					if(trigger.card.name=='tiesuo') return 0;
+					if(trigger.card.name=='jiu') return 0;
+					if(trigger.card.name=='tianxianjiu') return 0;
+					if(trigger.card.name=='toulianghuanzhu') return 0;
+					return 1;
+				}).targetRequired=true;
+				'step 1'
+				delete player.storage.shenmiguo;
+			}
+		},
 		yuruyi:{
 			trigger:{player:'drawBegin'},
 			forced:true,
@@ -4073,8 +4137,8 @@ card.swd={
 		yuchandui:'兑玉蝉',
 		yuruyi:'玉如意',
 		yuruyi_info:'你有更高的机率摸到好牌',
-		shenmiguo:'神秘果',
-		shenmiguo_info:'随机使用三张非延时锦囊牌（随机指定目标）',
+		fengyinzhidan:'封印之蛋',
+		fengyinzhidan_info:'随机使用三张非延时锦囊牌（随机指定目标）',
 		shuchui:'鼠槌',
 		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的所有杀对该角色使用，杀每造成一次伤害你摸一张牌（最多使用3张杀）',
 		zhiluxiaohu:'指路小狐',
@@ -4151,8 +4215,8 @@ card.swd={
 		jiguantong_info:'出牌阶段对所有其他角色使用，目标弃置一张手牌，或受到一点火焰伤害；若没有人因此受到伤害，使用者摸一张牌',
 		jiutiansuanchi:'九天算尺',
 		jiutiansuanchi_info:'每当你使用杀造成伤害，你可以弃置一张牌并展示受伤害角色的一张手牌，若此牌与你弃置的牌花色或点数相同，此杀的伤害+2',
-		fengyinzhidan:'封印之蛋',
-		fengyinzhidan_info:'随机获得一张衍生牌',
+		shenmiguo:'神秘果',
+		shenmiguo_info:'出牌阶段内，当你使用一张基本牌或非延时锦囊牌后使用，令此牌再结算一次',
 		qinglianxindeng:'青莲心灯',
 		qinglianxindeng_info:'你防止锦囊牌造成的伤害',
 		hslingjian_xuanfengzhiren_duanzao:'风刃',
@@ -4437,9 +4501,9 @@ card.swd={
 		['diamond',2,'jiguanyuan'],
 		['diamond',4,'jiguantong'],
 		['club',7,'jiguantong'],
-		['spade',1,'fengyinzhidan'],
-		['spade',2,'fengyinzhidan'],
-		['heart',1,'fengyinzhidan'],
+		['spade',1,'shenmiguo'],
+		['spade',2,'shenmiguo'],
+		['heart',1,'shenmiguo'],
 		['club',3,'jiguanfeng'],
 		['spade',4,'jiguanfeng'],
 		['spade',9,'guisheqi'],
@@ -4478,10 +4542,10 @@ card.swd={
 
 		['club',6,'shuchui'],
 
-		['club',1,'shenmiguo'],
-		['diamond',1,'shenmiguo'],
-		['heart',1,'shenmiguo'],
-		['spade',1,'shenmiguo'],
+		['club',1,'fengyinzhidan'],
+		['diamond',1,'fengyinzhidan'],
+		['heart',1,'fengyinzhidan'],
+		['spade',1,'fengyinzhidan'],
 
 		['club',4,'yuruyi'],
 	],
