@@ -2904,8 +2904,8 @@ character.shenhua={
 				}
 			},
 			mod:{
-				maxHandcard:function(player){
-					if(player.storage.buqu&&player.storage.buqu.length) return player.storage.buqu.length;
+				maxHandcard:function(player,num){
+					if(player.storage.buqu&&player.storage.buqu.length) return num-player.hp+player.storage.buqu.length;
 				}
 			},
 			intro:{

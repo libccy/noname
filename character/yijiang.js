@@ -326,7 +326,7 @@ character.yijiang={
 				order:10,
 				result:{
 					player:function(player){
-						if(player.num('h')<game.checkMod(player,player.hp,'maxHandcard',player.get('s'))){
+						if(player.num('h')<player.getHandcardLimit()){
 							return 1;
 						}
 						return 0;
@@ -4005,6 +4005,7 @@ character.yijiang={
 				if(event.type!='dying') return false;
 				if(player!=event.dying) return false;
 				if(player.storage.fuli) return false;
+				return true;
 			},
 			content:function(){
 				"step 0"

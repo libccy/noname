@@ -11342,7 +11342,7 @@
         						info.onremove(this);
         					}
                             this.removeSkillTrigger(skill);
-                            if(!info.keepSkill){                                
+                            if(!info.keepSkill){
                                 this.removeAdditionalSkill(skill);
                             }
                         }
@@ -19726,6 +19726,9 @@
                     lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
                 }
 				var card=lib.card[i];
+                if(card.filterTarget&&!card.selectTarget){
+                    card.selectTarget=1;
+                }
 				if(card.type=='equip'){
 					if(card.enable==undefined) card.enable=true;
 					if(card.selectTarget==undefined) card.selectTarget=-1;

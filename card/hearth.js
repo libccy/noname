@@ -342,7 +342,6 @@ card.hearth={
 			forceUsable:true,
 			content:function(){
 				'step 0'
-				ui.special.appendChild(cards[0]);
 				player.storage.chuansongmen=cards[0];
 				var gained=get.cards()[0];
 				target.gain(gained,'gain2');
@@ -352,9 +351,17 @@ card.hearth={
 						return card==gained;
 					};
 					next.prompt='是否使用'+get.translation(gained)+'？';
+					if(cards[0]){
+						ui.special.appendChild(cards[0]);
+					}
+					else{
+						event.finish();
+					}
 				}
 				else{
-					ui.discardPile.appendChild(cards[0]);
+					if(cards[0]){
+						ui.discardPile.appendChild(cards[0]);
+					}
 					event.finish();
 				}
 				'step 1'

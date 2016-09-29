@@ -1,7 +1,76 @@
 card.swd={
 	card:{
-		shenmiguo:{
+		yuruyi:{
+			type:'equip',
+			subtype:'equip5',
+			skills:['yuruyi'],
 			fullskin:true,
+			ai:{
+				basic:{
+					equipValue:5
+				}
+			},
+		},
+		shenmiguo:{
+			type:'basic',
+			enable:true,
+			fullskin:true,
+			notarget:true,
+			content:function(){
+				var list=[];
+				for(var i=0;i<lib.inpile.length;i++){
+					if(lib.filter.filterCard({name:lib.inpile[i]},player)){
+						var info=lib.card[lib.inpile[i]];
+						if(info.type=='trick'&&!info.multitarget&&!info.notarget){
+							if(Array.isArray(info.selectTarget)){
+								if(info.selectTarget[0]>0&&info.selectTarget[1]>=info.selectTarget[0]){
+									list.push(lib.inpile[i]);
+								}
+							}
+							else if(typeof info.selectTarget=='number'){
+								list.push(lib.inpile[i]);
+							}
+						}
+					}
+				}
+				var n=3;
+				while(list.length){
+					var card={name:list.randomRemove()};
+					var info=get.info(card);
+					var targets=[];
+					for(var i=0;i<game.players.length;i++){
+						if(lib.filter.filterTarget(card,player,game.players[i])){
+							targets.push(game.players[i]);
+						}
+					}
+					if(targets.length){
+						targets.sort(lib.sort.seat);
+						if(info.selectTarget==-1){
+							player.useCard(card,targets);
+						}
+						else{
+							var num=info.selectTarget;
+							if(Array.isArray(num)){
+								if(targets.length<num[0]) continue;
+								num=num[0]+Math.floor(Math.random()*(num[1]-num[0]+1));
+							}
+							else{
+								if(targets.length<num) continue;
+							}
+							player.useCard(card,targets.randomGets(num));
+						}
+						if(--n<=0) break;
+					}
+				}
+			},
+			ai:{
+				order:9,
+				value:8,
+				useful:3,
+				result:{
+					player:1
+				}
+			}
 		},
 		// yuchanqian:{
 		// 	fullskin:true,
@@ -1456,7 +1525,7 @@ card.swd={
 				}
 			}
 		},
-		guilingyupei:{
+		guilingzhitao:{
 			type:'equip',
 			fullskin:true,
 			subtype:'equip5',
@@ -1546,6 +1615,45 @@ card.swd={
 		},
 	},
 	skill:{
+		yuruyi:{
+			trigger:{player:'drawBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			filter:function(){
+				return ui.cardPile.childElementCount>1;
+			},
+			content:function(){
+				var value=ai.get.value(ui.cardPile.firstChild);
+				var num=Math.min(20,ui.cardPile.childElementCount);
+				var list=[],list2=[],list3=[];
+				for(var i=1;i<num;i++){
+					var val=ai.get.value(ui.cardPile.childNodes[i]);
+					if(val>value){
+						list.push(ui.cardPile.childNodes[i]);
+						if(val>value+1&&val>=7){
+							list2.push(ui.cardPile.childNodes[i]);
+						}
+						if(val>value+1&&val>=8){
+							list3.push(ui.cardPile.childNodes[i]);
+						}
+					}
+				}
+				var card;
+				if(list3.length){
+					card=list3.randomGet();
+				}
+				else if(list2.length){
+					card=list2.randomGet();
+				}
+				else if(list.length){
+					card=list.randomGet();
+				}
+				if(card){
+					ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+				}
+			}
+		},
 		shuchui:{
 			enable:'phaseUse',
 			usable:1,
@@ -2610,6 +2718,11 @@ card.swd={
 		yiluan:{
 			enable:'phaseUse',
 			usable:1,
+			filterCard:true,
+			position:'he',
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
 			filterTarget:function(card,player,target){
 				return get.distance(player,target,'attack')<=1;
 			},
@@ -3761,7 +3874,7 @@ card.swd={
 		},
 		nigong:{
 			trigger:{player:'damageAfter'},
-			group:['nigong2'],
+			group:['nigong2','nigong3'],
 			forced:true,
 			content:function(){
 				player.storage.nigong+=trigger.num;
@@ -3783,7 +3896,6 @@ card.swd={
 		},
 		nigong2:{
 			enable:'phaseUse',
-			usable:1,
 			filter:function(event,player){
 				return player.storage.nigong>1;
 			},
@@ -3791,9 +3903,17 @@ card.swd={
 				return player!=target;
 			},
 			prompt:function(event){
-				return '弃置所有逆攻标记，并对一名角色造成'+get.cnNumber(Math.floor(event.player.storage.nigong/2))+'点伤害';
+				var str='弃置所有逆攻标记，';
+				if(event.player.storage.nigong%2!=0){
+					str+='摸一张牌，';
+				}
+				str+='并对一名其他角色造成'+get.cnNumber(Math.floor(event.player.storage.nigong/2))+'点伤害';
+				return str;
 			},
 			content:function(){
+				if(player.storage.nigong%2!=0){
+					player.draw();
+				}
 				target.damage(Math.floor(player.storage.nigong/2));
 				player.storage.nigong=0;
 				player.updateMarks();
@@ -3802,8 +3922,29 @@ card.swd={
 				order:10,
 				result:{
 					target:function(player,target){
-						return -Math.floor(player.storage.nigong/2);
+						var num=ai.get.damageEffect(target,player,target);
+						if(player.storage.nigong>=4&&num>0){
+							num=0;
+						}
+						return num;
 					}
+				}
+			}
+		},
+		nigong3:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.storage.nigong==1;
+			},
+			content:function(){
+				player.draw();
+				player.storage.nigong=0;
+				player.updateMarks();
+			},
+			ai:{
+				order:10,
+				result:{
+					player:1
 				}
 			}
 		},
@@ -3930,7 +4071,10 @@ card.swd={
 		yuchanli:'离玉蝉',
 		yuchangen:'艮玉蝉',
 		yuchandui:'兑玉蝉',
+		yuruyi:'玉如意',
+		yuruyi_info:'你有更高的机率摸到好牌',
 		shenmiguo:'神秘果',
+		shenmiguo_info:'随机使用三张非延时锦囊牌（随机指定目标）',
 		shuchui:'鼠槌',
 		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的所有杀对该角色使用，杀每造成一次伤害你摸一张牌（最多使用3张杀）',
 		zhiluxiaohu:'指路小狐',
@@ -4118,13 +4262,13 @@ card.swd={
 		xujin2:'蓄劲',
 		// qipoguyu_info:'装备后获得蓄劲技能',
 		xujin_info:'回合开始前，若你的蓄劲标记数小于当前的体力值，你可以跳过此回合，并获得一枚蓄劲标记。锁定技，每当你即将造成伤害，你令此伤害+X，然后弃置一枚蓄劲标记，X为你拥有的蓄劲标记数',
-		guilingyupei:'归灵玉佩',
+		guilingzhitao:'归灵指套',
 		nigong:'逆攻',
 		nigong2:'逆攻',
 		nigong3:'逆攻',
 		nigong4:'逆攻',
-		guilingyupei_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超过4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
-		nigong_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超过4。出牌阶段，你可以弃置所有逆攻标记并令任意一名其他角色X/2点伤害，X为逆攻标记的数量且向下取整',
+		guilingzhitao_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超过4。出牌阶段，你可以弃置所有逆攻标记并令对一名其他角色造成标记数一半的伤害（若非整数则向下取整并摸一张牌）',
+		nigong_info:'每当你受到一点伤害，你获得一个逆攻标记，标记数不能超过4。出牌阶段，你可以弃置所有逆攻标记并令对一名其他角色造成标记数一半的伤害（若非整数则向下取整并摸一张牌）',
 		baihupifeng:'白狐披风',
 		baihupifeng_bg:'狐',
 		baihupifeng_info:'回合结束阶段，若你的体力值是全场最小的之一，你可以回复一点体力',
@@ -4141,7 +4285,7 @@ card.swd={
 		xiayuncailing_info:'你与其他角色的距离+1，其他角色与你的距离+2',
 		shentoumianju:'神偷面具',
 		shentoumianju_bg:'偷',
-		shentoumianju_info:'出牌阶段，你可以指定一名手牌比你多的角色进行一次判定，若结果不为梅花，你获得其一张手牌',
+		shentoumianju_info:'出牌阶段，你可以指定一名手牌比你多的角色，弃置一张手牌并进行一次判定，若结果不为梅花，你获得其一张手牌',
 		shentou:'神偷',
 		shentou_info:'出牌阶段，你可以进行一次判定，若结果不为梅花，你获得任意一名角色的一张手牌',
 		pusafazhou:'菩萨发咒',
@@ -4179,7 +4323,7 @@ card.swd={
 		guangshatianyi_bg:'纱',
 		guangshatianyi_info:'仅女性角色可使用，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
-		sifeizhenmian_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
+		sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌，然后指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		yiluan:'意乱',
 		yiluan_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		donghuangzhong:'东皇钟',
@@ -4245,7 +4389,7 @@ card.swd={
 
 		['diamond',7,'chiyuxi','fire'],
 		['club',7,'jingleishan','thunder'],
-		['spade',7,'guilingyupei'],
+		['spade',7,'guilingzhitao'],
 
 		['spade',8,'zhufangshenshi'],
 		['club',8,'xiangyuye','poison'],
@@ -4272,10 +4416,10 @@ card.swd={
 		['diamond',3,'guangshatianyi'],
 		['club',13,'sadengjinhuan'],
 
-		['club',1,'lingjiandai'],
-		['spade',1,'lingjiandai'],
-		['heart',1,'lingjiandai'],
-		['diamond',1,'lingjiandai'],
+		['club',2,'lingjiandai'],
+		['spade',3,'lingjiandai'],
+		['heart',5,'lingjiandai'],
+		['diamond',8,'lingjiandai'],
 
 		['club',2,'jiguanshu'],
 		['spade',2,'jiguanshu'],
@@ -4333,5 +4477,12 @@ card.swd={
 		['diamond',11,'mujiaren'],
 
 		['club',6,'shuchui'],
+
+		['club',1,'shenmiguo'],
+		['diamond',1,'shenmiguo'],
+		['heart',1,'shenmiguo'],
+		['spade',1,'shenmiguo'],
+
+		['club',4,'yuruyi'],
 	],
 }

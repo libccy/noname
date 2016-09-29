@@ -533,6 +533,87 @@ character.hearth={
 				player.removeSkill('hsdusu_shinancao');
 			}
 		},
+		kuangluan_old:{
+			group:['kuangluan_count1','kuangluan_count2','kuangluan_use'],
+			subSkill:{
+				count1:{
+					trigger:{player:'useCard'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event,player){
+						return _status.currentPhase==player&&get.type(event.card)=='trick';
+					},
+					content:function(){
+						player.storage.kuangluan++;
+					}
+				},
+				count2:{
+					trigger:{player:'phaseBegin'},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:function(){
+						player.storage.kuangluan=0;
+					}
+				},
+				use:{
+					trigger:{player:'phaseUseEnd'},
+					forced:true,
+					filter:function(event,player){
+						return player.storage.kuangluan>0;
+					},
+					content:function(){
+						var list=[];
+						for(var i=0;i<lib.inpile.length;i++){
+							if(lib.filter.filterCard({name:lib.inpile[i]},player)){
+								var info=lib.card[lib.inpile[i]];
+								if(info.type=='trick'&&!info.multitarget&&!info.notarget){
+									if(Array.isArray(info.selectTarget)){
+										if(info.selectTarget[0]>0&&info.selectTarget[1]>=info.selectTarget[0]){
+											list.push(lib.inpile[i]);
+										}
+									}
+									else if(typeof info.selectTarget=='number'){
+										list.push(lib.inpile[i]);
+									}
+								}
+							}
+						}
+						var n=player.storage.kuangluan;
+						delete player.storage.kuangluan;
+						while(list.length){
+							var card={name:list.randomRemove()};
+							var info=get.info(card);
+							var targets=[];
+							for(var i=0;i<game.players.length;i++){
+								if(lib.filter.filterTarget(card,player,game.players[i])){
+									targets.push(game.players[i]);
+								}
+							}
+							if(targets.length){
+								targets.sort(lib.sort.seat);
+								if(info.selectTarget==-1){
+									player.useCard(card,targets);
+								}
+								else{
+									var num=info.selectTarget;
+									if(Array.isArray(num)){
+										if(targets.length<num[0]) continue;
+										num=num[0]+Math.floor(Math.random()*(num[1]-num[0]+1));
+									}
+									else{
+										if(targets.length<num) continue;
+									}
+									player.useCard(card,targets.randomGets(num));
+								}
+								if(--n<=0) break;
+							}
+						}
+					}
+				}
+			}
+		},
 		kuangluan:{
 			trigger:{player:'damageEnd'},
 			forced:true,
@@ -4598,6 +4679,7 @@ character.hearth={
 		hstuteng:'图腾',
 		kuangluan:'狂乱',
 		kuangluan2:'狂乱',
+		// kuangluan_info:'锁定技，每当你于回合内使用一张非延时锦囊牌，便于出牌阶段结束时随机使用一张非延时锦囊牌（随机指定目标）',
 		kuangluan_info:'锁定技，每当一名其他角色对你造成伤害，该角色进入混乱状态直到当前回合结束；回合开始阶段，若上轮有至少两名不同角色因你而进入混乱状态，你回复全部体力并进入混乱状态进到本回合结束',
 		zengli:'赠礼',
 		zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
