@@ -21,6 +21,17 @@ mode.brawl={
         lib.setScroll(packnode);
         var clickCapt=function(){
             var active=this.parentNode.querySelector('.active');
+            if(this.link=='stage'){
+                var num=0;
+                for(var i in lib.storage.scene){
+                    num++;
+                    if(num>=2) break;
+                }
+                if(num<2){
+                    alert('请创建至少2个场景');
+                    return;
+                }
+            }
             if(active){
                 if(active==this) return;
                 for(var i=0;i<active.nodes.length;i++){
@@ -51,19 +62,21 @@ mode.brawl={
             var info=lib.brawl[name];
             var node=ui.create.div('.dialogbutton.menubutton.large',info.name,packnode,clickCapt);
             node.style.transition='all 0s';
-            var caption=get.translation(info.mode)+'模式';
+            var caption=info.name;
+            var modeinfo=get.translation(info.mode)+'模式';
             if(info.submode){
-                caption+=' - '+info.submode;
+                modeinfo+=' - '+info.submode;
             }
             var intro;
             if(Array.isArray(info.intro)){
                 intro='<ul style="text-align:left;margin-top:0;width:450px">';
+                intro+='<li>'+modeinfo;
                 for(var i=0;i<info.intro.length;i++){
                     intro+='<li>'+info.intro[i];
                 }
             }
             else{
-                intro=info.intro;
+                intro='（'+modeinfo+'）'+info.intro;
             }
             var showcase=ui.create.div();
             showcase.style.margin='0px';
@@ -149,16 +162,25 @@ mode.brawl={
             brawl.content.scene=scene;
             lib.brawl['scene_'+name]=brawl;
             var node=createNode('scene_'+name);
-            if(clear) game.addSceneClear();
-            clickCapt.call(node);
+            if(clear){
+                game.addSceneClear();
+                clickCapt.call(node);
+                _status.sceneChanged=true;
+            }
         };
         game.removeScene=function(name){
             delete lib.storage.scene[name];
             game.save('scene',lib.storage.scene);
+            _status.sceneChanged=true;
             for(var i=0;i<packnode.childElementCount;i++){
                 if(packnode.childNodes[i].link=='scene_'+name){
                     if(packnode.childNodes[i].classList.contains('active')){
-                        clickCapt.call(packnode.childNodes[i].previousSibling);
+                        if(packnode.childNodes[i].previousSibling.link=='stage'){
+                            clickCapt.call(packnode.childNodes[i].previousSibling.previousSibling);
+                        }
+                        else{
+                            clickCapt.call(packnode.childNodes[i].previousSibling);
+                        }
                     }
                     packnode.childNodes[i].remove();
                     break;
@@ -390,8 +412,9 @@ mode.brawl={
                 var player;
                 if(init){
                     player=ui.create.player(null,true);
+                    player.node.avatar.style.backgroundSize='cover';
+                    player.node.avatar.setBackgroundImage('image/mode/boss/character/boss_lvbu2.jpg');
                     player.node.avatar.show();
-                    player.node.avatar.setBackground('boss_lvbu2','character');
                     player.style.left='calc(50% - 75px)';
                     player.style.top='20px';
                     player.node.count.remove();
@@ -895,8 +918,6 @@ mode.brawl={
         // }
         scene:{
             name:'创建场景',
-            mode:'identity',
-            intro:'<div style="position:relative;display:block;margin-bottom:5px">场景名称：<input name="scenename" type="text" style="width:120px"></div><div style="position:relative;display:block">场景说明：<input name="sceneintro" type="text" style="width:120px"></div>',
             content:{
                 submode:'normal'
             },
@@ -1224,7 +1245,6 @@ mode.brawl={
                     sceneintro.style.marginBottom='10px';
 
                     var line1=ui.create.div(style2,this);
-                    var current=null;
                     var addCharacter=ui.create.node('button','添加角色',line1,function(){
                         // line1.style.display='none';
                         resetStatus();
@@ -1843,6 +1863,108 @@ mode.brawl={
                     var scene=_status.sceneToLoad;
                     delete _status.sceneToLoad;
                     game.loadScene(scene);
+                }
+            }
+        },
+        stage:{
+            name:'创建关卡',
+            content:{
+                submode:'normal'
+            },
+            nostart:true,
+            fullshow:true,
+            template:{},
+            showcase:function(init){
+                if(_status.sceneChanged){
+                    init=true;
+                    this.innerHTML='';
+                    delete _status.sceneChanged;
+                }
+                if(init){
+                    this.style.transition='all 0s';
+                    this.style.height=(this.offsetHeight-10)+'px';
+                    this.style.overflow='scroll';
+                    lib.setScroll(this);
+                    var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
+
+                    var scenename=ui.create.node('input',ui.create.div(style2,'','关卡名称：',this),{width:'120px'});
+                    scenename.type='text';
+                    scenename.style.marginTop='20px';
+                    var sceneintro=ui.create.node('input',ui.create.div(style2,'','关卡描述：',this),{width:'120px'});
+                    sceneintro.type='text';
+                    sceneintro.style.marginBottom='10px';
+
+                    var line1=ui.create.div(style2,this);
+                    var scenes=[];
+                    for(var i in lib.storage.scene){
+                        scenes.push([i,lib.storage.scene[i].name]);
+                    }
+                    if(scenes.length<2){
+                        alert('请创建至少2个场景');
+                        return;
+                    }
+                    ui.create.selectlist(scenes,null,line1);
+                    var addButton=ui.create.node('button','添加场景',line1,function(){
+
+                    },{marginLeft:'6px',marginRight:'12px'});
+                    ui.create.selectlist([
+                        ['normal','默认模式'],
+                        ['sequal','连续闯关'],
+                        ['free','自由选关']
+                    ],null,line1);
+                    var saveButton=ui.create.node('button','保存关卡',line1,function(){
+                        if(!scenename.value){
+                            alert('请填写关卡名称');
+                            return;
+                        }
+                        // var scene={
+                        //     name:scenename.value,
+                        //     intro:sceneintro.value,
+                        //     players:[],
+                        //     cardPileTop:[],
+                        //     cardPileBottom:[],
+                        //     discardPile:[],
+                        // };
+                        // for(var i=0;i<line7.childElementCount;i++){
+                        //     scene.players.push(line7.childNodes[i].info);
+                        // }
+                        // if(scene.players.length<2){
+                        //     alert('请添加至少两名角色');
+                        //     return;
+                        // }
+                        // if(lib.storage.scene[scenename.value]){
+                        //     if(_status.currentScene!=scenename.value){
+                        //         if(!confirm('场景名与现有场景重复，是否覆盖？')){
+                        //             return;
+                        //         }
+                        //     }
+                        //     game.removeScene(scenename.value);
+                        // }
+                        // for(var i=0;i<line6_t.childElementCount;i++){
+                        //     scene.cardPileTop.push(line6_t.childNodes[i].info);
+                        // }
+                        // for(var i=0;i<line6_b.childElementCount;i++){
+                        //     scene.cardPileBottom.push(line6_b.childNodes[i].info);
+                        // }
+                        // for(var i=0;i<line6_d.childElementCount;i++){
+                        //     scene.discardPile.push(line6_d.childNodes[i].info);
+                        // }
+                        // if(replacepile.checked){
+                        //     scene.replacepile=true;
+                        // }
+                        // if(gameDraw.checked){
+                        //     scene.gameDraw=true;
+                        // }
+                        // if(turnsresult.value!='none'){
+                        //     scene.turns=[parseInt(turns.value),turnsresult.value]
+                        // }
+                        // if(washesresult.value!='none'){
+                        //     scene.washes=[parseInt(washes.value),washesresult.value]
+                        // }
+                        // lib.storage.scene[scene.name]=scene;
+                        // game.save('scene',lib.storage.scene);
+                        // game.addScene(scene.name,true);
+                    },{marginLeft:'6px'});
                 }
             }
         }

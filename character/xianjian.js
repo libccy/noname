@@ -1261,7 +1261,7 @@ character.xianjian={
 				event.num=cards.length;
 				player.discard(cards);
 				"step 2"
-				trigger.player.recover(1-trigger.player.hp);
+				trigger.player.recover();
 				trigger.player.draw(event.num);
 			},
 			ai:{
@@ -1974,7 +1974,7 @@ character.xianjian={
 		duci:'毒刺',
 		duci_info:'每当你失去一次装备牌，可以对距离1以内的一名其他角色造成一点伤害',
 		shenmu:'神木',
-		shenmu_info:'任意一名角色濒死时，你可以展示你的手牌并弃置其中的所有红色牌（至少一张），若如此做，该角色将体力回复至1，然后摸X张牌，X为你弃置的手牌数',
+		shenmu_info:'任意一名角色濒死时，你可以展示你的手牌并弃置其中的所有红色牌（至少一张），若如此做，该角色回复一点体力，然后摸X张牌，X为你弃置的手牌数',
 		qijian:'气剑',
 		qijian_info:'弃牌阶段结束时，你可以指定至多X名目标视为使用一张杀，X为你于此阶段弃置的卡牌数',
 		poyun:'破云',

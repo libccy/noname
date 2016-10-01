@@ -10089,6 +10089,7 @@
 					var next=game.createEvent('useCard');
 					next.player=this;
 					next.num=0;
+                    var noai=false;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
 							next.cards=arguments[i];
@@ -10106,7 +10107,12 @@
 							next.card=arguments[i];
 						}
 						else if(typeof arguments[i]=='string'){
-							next.skill=arguments[i];
+                            if(arguments[i]=='noai'){
+                                noai=true;
+                            }
+                            else{
+                                next.skill=arguments[i];
+                            }
 						}
 						else if(typeof arguments[i]=='boolean'){
 							next.addCount=arguments[i];
@@ -10135,7 +10141,7 @@
 							this.ai.tempIgnore.add(next.targets[i]);
 						}
 					}
-					if(typeof this.logAi=='function'){
+					if(typeof this.logAi=='function'&&!noai){
                         var postAi=get.info(next.card).postAi;
                         if(postAi&&postAi(next.targets)){
                             next.postAi=true;
@@ -19726,7 +19732,7 @@
                     lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
                 }
 				var card=lib.card[i];
-                if(card.filterTarget&&!card.selectTarget){
+                if(card.filterTarget&&card.selectTarget==undefined){
                     card.selectTarget=1;
                 }
 				if(card.type=='equip'){

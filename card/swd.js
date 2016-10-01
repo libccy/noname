@@ -17,7 +17,10 @@ card.swd={
 			fullskin:true,
 			notarget:true,
 			content:function(){
+				'step 0'
+				event.num=3;
 				var list=[];
+				event.list=list;
 				for(var i=0;i<lib.inpile.length;i++){
 					if(lib.filter.filterCard({name:lib.inpile[i]},player)){
 						var info=lib.card[lib.inpile[i]];
@@ -33,7 +36,8 @@ card.swd={
 						}
 					}
 				}
-				var n=3;
+				'step 1'
+				var list=event.list;
 				while(list.length){
 					var card={name:list.randomRemove()};
 					var info=get.info(card);
@@ -57,9 +61,12 @@ card.swd={
 							else{
 								if(targets.length<num) continue;
 							}
-							player.useCard(card,targets.randomGets(num));
+							player.useCard(card,targets.randomGets(num),'noai');
 						}
-						if(--n<=0) break;
+						if(--event.num>0){
+							event.redo();
+						}
+						break;
 					}
 				}
 			},
