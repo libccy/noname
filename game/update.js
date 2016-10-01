@@ -22,6 +22,7 @@ window.noname_update={
 // 'card/swd.js',
 // 'card/guozhan.js',
 // 'card/hearth.js',
+// 'card/yunchou.js',
 // 'game/package.js',
 // 'game/asset.js',
 // 'game/game.js',

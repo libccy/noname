@@ -14388,8 +14388,11 @@
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
 						event._result={bool:false}
 					}
-					else if(player.isOnline()||(_status.connectMode&&player==game.me)||player.hasSkillTag('save',true)||player.num('h','tao')||player.num('h','spell_zhiliaoshui')||
-					(player==event.dying&&(player.num('h','jiu')||player.num('h','hufu')||player.num('h','tianxianjiu')))){
+					else if(player.isOnline()||(_status.connectMode&&player==game.me)||player.hasSkillTag('save',true)||player.num('h',function(card){
+                        var savable=get.info(card).savable;
+                        if(typeof savable=='function') savable=savable(card,player,event.dying);
+                        return savable;
+                    })){
 						player.chooseToUse({
 							filterCard:function(card,player,event){
                                 event=event||_status.event;

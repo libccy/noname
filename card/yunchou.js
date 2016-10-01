@@ -719,7 +719,7 @@ card.yunchou={
 				return false;
 			},
 			content:function(){
-				player.chooseToUse(get.prompt('chenhuodajie',trigger.player),function(card,player){
+				player.chooseToUse(get.prompt('chenhuodajie',trigger.player).replace(/发动/,'使用'),function(card,player){
 					if(card.name!='chenhuodajie') return false;
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
 					if(mod!='unchanged') return mod;

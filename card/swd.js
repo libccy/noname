@@ -1,5 +1,113 @@
 card.swd={
 	card:{
+		yangpijuan:{
+			fullskin:true,
+		},
+		pantao:{
+			fullskin:true,
+			type:'basic',
+			enable:function(card,player){
+				return player.hp<player.maxHp;
+			},
+			savable:true,
+			selectTarget:-1,
+			filterTarget:function(card,player,target){
+				return target==player&&target.hp<target.maxHp;
+			},
+			modTarget:function(card,player,target){
+				return target.hp<target.maxHp;
+			},
+			content:function(){
+				target.recover(2);
+				target.changeHujia();
+			},
+			ai:{
+				basic:{
+					order:function(card,player){
+						if(player.hasSkillTag('pretao')) return 5;
+						return 2;
+					},
+					useful:11,
+					value:11,
+				},
+				result:{
+					target:function(player,target){
+						// if(player==target&&player.hp<=0) return 2;
+						var nh=target.num('h');
+						var keep=false;
+						if(nh<=target.hp){
+							keep=true;
+						}
+						else if(nh==target.hp+1&&target.hp>=2&&target.num('h','tao')<=1){
+							keep=true;
+						}
+						var mode=get.mode();
+						if(target.hp>=2&&keep&&target.hasFriend()){
+							if(target.hp>2) return 0;
+							if(target.hp==2){
+								for(var i=0;i<game.players.length;i++){
+									if(target!=game.players[i]&&ai.get.attitude(target,game.players[i])>=3){
+										if(game.players[i].hp<=1) return 0;
+										if(mode=='identity'&&game.players[i].isZhu&&game.players[i].hp<=2) return 0;
+									}
+								}
+							}
+						}
+						if(target.hp<0&&target!=player&&target.identity!='zhu') return 0;
+						var att=ai.get.attitude(player,target);
+						if(att<3&&att>=0&&player!=target) return 0;
+						var tri=_status.event.getTrigger();
+						if(mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
+							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
+								var num=0;
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].identity=='fan'){
+										num+=game.players[i].num('h','tao');
+										if(num>2) return 2;
+									}
+								}
+								if(num>1&&player==target) return 2;
+								return 0;
+							}
+						}
+						if(mode=='identity'&&player.identity=='zhu'&&target.identity=='nei'){
+							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='zhong'){
+								return 0;
+							}
+						}
+						if(mode=='stone'&&target.isMin()&&
+						player!=target&&tri&&tri.name=='dying'&&player.side==target.side&&
+						tri.source!=target.getEnemy()){
+							return 0;
+						}
+						return 2;
+					},
+				},
+				tag:{
+					recover:2,
+					save:2,
+				}
+			}
+		},
+		shencaojie:{
+			fullskin:true,
+			type:'trick',
+			content:function(){
+				event.getParent(3)._trigger.num++;
+			},
+			ai:{
+				order:1,
+				useful:1,
+				value:5,
+				result:{
+					target:function(player,target){
+						if(ai.get.attitude(player,target)>0) return 0;
+						if(ai.get.damageEffect(target,player,player)>=0) return 0;
+						return -1;
+					}
+				},
+			}
+		},
 		yuruyi:{
 			type:'equip',
 			subtype:'equip5',
@@ -1209,37 +1317,6 @@ card.swd={
 				},
 			}
 		},
-		pantao:{
-			type:'basic',
-			enable:function(card,player){
-				return player.hp<player.maxHp;
-			},
-			savable:true,
-			selectTarget:-1,
-			filterTarget:function(card,player,target){
-				return target==player;
-			},
-			content:function(){
-				target.recover(2);
-			},
-			ai:{
-				order:7,
-				basic:{
-					useful:[10,6],
-					value:[10,6],
-				},
-				result:{
-					target:function(player,target){
-						if(target.get('h').length<=target.hp) return 0;
-						return 2;
-					},
-				},
-				tag:{
-					recover:2,
-					save:2
-				}
-			}
-		},
 		tianxianjiu:{
 			fullskin:true,
 			type:'basic',
@@ -1639,6 +1716,28 @@ card.swd={
 		},
 	},
 	skill:{
+		_shencaojie:{
+			trigger:{source:'damageBegin'},
+			direct:true,
+			filter:function(event,player){
+				if(player.num('h','shencaojie')) return true;
+				var mn=player.get('e','5');
+				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){
+					for(var i=0;i<mn.cards.length;i++){
+						if(mn.cards[i].name=='shencaojie') return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				player.chooseToUse(get.prompt('shencaojie',trigger.player).replace(/发动/,'使用'),function(card,player){
+					if(card.name!='shencaojie') return false;
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					if(mod!='unchanged') return mod;
+					return true;
+				},trigger.player,-1).targetRequired=true;
+			}
+		},
 		_shenmiguo:{
 			trigger:{player:'useCardAfter'},
 			direct:true,
@@ -4142,6 +4241,12 @@ card.swd={
 		yuchanli:'离玉蝉',
 		yuchangen:'艮玉蝉',
 		yuchandui:'兑玉蝉',
+		yangpijuan:'羊皮卷',
+		yangpijuan_info:'将一张蟠桃洗入牌库，在你下将摸牌时，若其仍在牌库，则你会摸到它',
+		pantao:'蟠桃',
+		pantao_info:'出牌阶段对自己使用，或对濒死角色使用，目标回复两点体力并获得一点护甲',
+		shencaojie:'神草结',
+		shencaojie_info:'你的锦囊牌即将造成伤害时对目标使用，令此伤害+1',
 		yuruyi:'玉如意',
 		yuruyi_info:'你有更高的机率摸到好牌',
 		fengyinzhidan:'封印之蛋',
@@ -4366,8 +4471,6 @@ card.swd={
 		xianluhui_info:'令所有已受伤角色摸数量等同于其已损失体力值的牌（最多3张）',
 		caoyao:'草药',
 		caoyao_info:'出牌阶段，对距离为1以内的角色使用，回复一点体力。',
-		pantao:'蟠桃',
-		// pantao_info:'出牌阶段，对自己使用，回复两点体力。',
 		langeguaiyi:'蓝格怪衣',
 		langeguaiyi_bg:'格',
 		langeguaiyi_info:'出牌阶段限一次，你可以进行一次判定，然后按花色执行以下效果。红桃：你回复一点体力；方片：你摸一张牌；梅花：你弃置一名其他角色的一张牌；黑桃：无事发生',
@@ -4554,6 +4657,10 @@ card.swd={
 		['heart',1,'fengyinzhidan'],
 		['spade',1,'fengyinzhidan'],
 
-		['club',4,'yuruyi'],
+		['heart',9,'yuruyi'],
+
+		['club',4,'shencaojie'],
+		['diamond',4,'shencaojie'],
+		['spade',4,'shencaojie'],
 	],
 }
