@@ -93,7 +93,7 @@ card.swd={
 			fullskin:true,
 			type:'trick',
 			content:function(){
-				event.getParent(3)._trigger.num++;
+				event.getParent('_shencaojie')._trigger.num++;
 			},
 			ai:{
 				order:1,
@@ -1720,6 +1720,7 @@ card.swd={
 			trigger:{source:'damageBegin'},
 			direct:true,
 			filter:function(event,player){
+				if(get.type(event.card)!='trick') return false;
 				if(player.num('h','shencaojie')) return true;
 				var mn=player.get('e','5');
 				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){

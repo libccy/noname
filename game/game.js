@@ -13339,6 +13339,13 @@
                             if(!parent) return {};
                         }
                     }
+                    else if(typeof level=='string'){
+                        for(var i=0;i<20;i++){
+                            if(parent.name==level) return parent;
+                            parent=parent.parent;
+                        }
+                        if(!parent) return {};
+                    }
                     return parent;
                 },
                 getTrigger:function(){
