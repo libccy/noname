@@ -33,6 +33,7 @@ window.noname_update={
 // 'character/shenhua.js',
 // 'character/ow.js',
 // 'character/yijiang.js',
+// 'character/yxs.js',
 // 'mode/boss.js',
 // 'mode/versus.js',
 // 'mode/brawl.js',

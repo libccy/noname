@@ -1980,7 +1980,50 @@ character.yxs={
 			}
 		},
 		zhexian:{
-			inherit:'niepan',
+			unique:true,
+			enable:'chooseToUse',
+			mark:true,
+			skillAnimation:true,
+			animationStr:'谪仙',
+			animationColor:'metal',
+			init:function(player){
+				player.storage.zhexian=false;
+			},
+			filter:function(event,player){
+				if(event.type!='dying') return false;
+				if(player!=event.dying) return false;
+				if(player.storage.zhexian) return false;
+				return true;
+			},
+			content:function(){
+				'step 0'
+				player.hp=Math.min(3,player.maxHp);
+				player.discard(player.get('hej'));
+				player.draw(3);
+				player.unmarkSkill('zhexian');
+				player.storage.zhexian=true;
+				'step 1'
+				if(player.isLinked()) player.link();
+				'step 2'
+				if(player.isTurnedOver()) player.turnOver();
+			},
+			ai:{
+				order:1,
+				skillTagFilter:function(player){
+					if(player.storage.zhexian) return false;
+					if(player.hp>0) return false;
+				},
+				save:true,
+				result:{
+					player:10
+				},
+				threaten:function(player,target){
+					if(!target.storage.zhexian) return 0.6;
+				}
+			},
+			intro:{
+				content:'limited'
+			}
 		},
 		guifu:{
 			enable:'phaseUse',
