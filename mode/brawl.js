@@ -1932,12 +1932,17 @@ mode.brawl={
                     if(init){
                         var name=lib.brawl[this.link].name;
                         var stage=lib.storage.stage[name];
-                        ui.create.node('button','删除关卡',this,function(){
+                        var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'10px',padding:0,width:'100%'};
+                        var style3={marginLeft:'4px',marginRight:'4px',position:'relative'}
+                        var line1=ui.create.div(style2,this);
+                        var line2=ui.create.div(style2,this);
+                        line2.style.lineHeight='50px';
+                        ui.create.node('button','删除关卡',line1,function(){
                             if(confirm('确定删除'+name+'？')){
                                 game.removeStage(name);
                             }
                         },{marginLeft:'6px'});
-                        ui.create.node('button','导出扩展',this,function(){
+                        ui.create.node('button','导出扩展',line1,function(){
                             var str='{name:"'+name+'",content:function(){\nif(lib.config.mode=="brawl"){\n'+
                             'if(!lib.storage.stage) lib.storage.stage={};\n'+
                             'if(!lib.storage.stage["'+name+'"]) lib.storage.stage["'+name+'"]='+get.stringify(stage)+
@@ -1945,6 +1950,10 @@ mode.brawl={
                             var extension={'extension.js':'game.import("extension",'+str+')'};
                             game.importExtension(extension,null,name);
                         },{marginLeft:'6px'});
+
+                        for(var i=0;i<stage.scenes.length;i++){
+                            ui.create.div('.menubutton.large',line2,stage.scenes[i].name,style3);
+                        }
                     }
                 },
             },
@@ -1974,7 +1983,6 @@ mode.brawl={
                     for(var i in lib.storage.scene){
                         scenes.push([i,i]);
                     }
-                    var defaultscene=scenes[0][0];
                     if(scenes.length<2){
                         alert('请创建至少2个场景');
                         return;
@@ -2034,10 +2042,11 @@ mode.brawl={
                             name:scenename.value,
                             intro:sceneintro.value,
                             scenes:[],
-                            mode:sceneconfig.value
+                            mode:sceneconfig.value,
+                            level:0
                         };
                         for(var i=0;i<line2.childElementCount;i++){
-                            stage.scenes.push(line2.childNodes[i].innerHTML);
+                            stage.scenes.push(lib.storage.scene[line2.childNodes[i].innerHTML]);
                         }
                         if(lib.storage.stage[scenename.value]){
                             if(!confirm('关卡名与现有关卡重复，是否覆盖？')){
@@ -2049,14 +2058,14 @@ mode.brawl={
                         game.save('stage',lib.storage.stage);
                         game.addStage(stage.name,true);
                     },{marginLeft:'6px'});
+                    game.addStageClear=function(){
+                        scenelist.value=scenes[0][0];
+                        sceneconfig.value='normal';
+                        scenename.value='';
+                        sceneintro.value='';
+                        line2.innerHTML='';
+                    };
                 }
-                game.addStageClear=function(){
-                    scenelist.value=defaultscene;
-                    sceneconfig.value='normal';
-                    scenename.value='';
-                    sceneintro.value='';
-                    line2.innerHTML='';
-                };
             }
         }
     },
