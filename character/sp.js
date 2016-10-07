@@ -841,7 +841,7 @@ character.sp={
 				else{
 					event.draw=true;
 					event.num=Math.min(num2,5)-num1;
-					player.chooseBool(get.prompt('fenyu'));
+					player.chooseBool(get.prompt('benyu'));
 				}
 				"step 1"
 				if(result.bool){

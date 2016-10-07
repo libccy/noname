@@ -3970,12 +3970,13 @@ character.hearth={
 			mark:'image',
 			nopop:true,
 			intro:{
-				content:'你的锦囊牌造成的伤害+1'
+				content:'在你的回合内，你的锦囊牌造成的首次伤害+1'
 			},
 			trigger:{source:'damageBegin'},
 			forced:true,
-			filter:function(event){
-				return event.card&&get.type(event.card)=='trick'&&event.notLink();
+			usable:1,
+			filter:function(event,player){
+				return _status.currentPhase==player&&event.card&&get.type(event.card)=='trick'&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;
@@ -3997,13 +3998,14 @@ character.hearth={
 			mark:'image',
 			nopop:true,
 			intro:{
-				content:'你的杀造成的伤害+1'
+				content:'在你的回合内，你的杀造成的首次伤害+1'
 			},
 			trigger:{source:'damageBegin'},
 			forced:true,
-			filter:function(event){
-				return event.card&&event.card.name=='sha'&&event.notLink();
+			filter:function(event,player){
+				return _status.currentPhase==player&&event.card&&event.card.name=='sha'&&event.notLink();
 			},
+			usable:1,
 			content:function(){
 				trigger.num++;
 			}
@@ -4892,11 +4894,11 @@ character.hearth={
 		tuteng3:'石爪图腾',
 		tuteng3_info:'你受到的伤害-1',
 		tuteng4:'空气之怒图腾',
-		tuteng4_info:'你的锦囊牌造成的伤害+1',
+		tuteng4_info:'在你的回合内，你的锦囊牌造成的首次伤害+1',
 		tuteng5:'法力之潮图腾',
 		tuteng5_info:'回合结束阶段，你摸一张牌',
 		tuteng6:'火舌图腾',
-		tuteng6_info:'你的杀造成的伤害+1',
+		tuteng6_info:'在你的回合内，你的杀造成的首次伤害+1',
 		tuteng7:'活力图腾',
 		tuteng7_info:'回合结束阶段，你令一名其他角色回复一点体力',
 		tuteng8:'图腾魔像',

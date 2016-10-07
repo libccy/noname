@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.2',
+    version:'1.9.2.1',
     changeLog:[
         'bug修复',
         '乱斗创建关卡',
@@ -15,6 +15,7 @@ window.noname_update={
             'game/game.js',
             'character/diy.js',
             'character/swd.js',
+            'character/sp.js',
             'character/hearth.js',
             'character/xianjian.js',
             'character/shenhua.js',
@@ -27,7 +28,10 @@ window.noname_update={
             'mode/stone.js',
             'extension/boss/extension.js',
             'layout/mode/boss.css',
+            'layout/default/layout.css',
+            'layout/newlayout/global.css',
         ],
-        '1.9.1.2':[]
+        '1.9.1.2':[],
+        '1.9.2':[],
     }
 }

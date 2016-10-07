@@ -143,6 +143,7 @@
 	margin-top: -12px;
 	margin-bottom:-12px;
 	opacity:0;
+	pointer-events: none;
 }
 
 

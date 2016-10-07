@@ -4249,6 +4249,7 @@ card.swd={
 		shencaojie:'神草结',
 		shencaojie_info:'你的锦囊牌即将造成伤害时对目标使用，令此伤害+1',
 		yuruyi:'玉如意',
+		yuruyi_ab:'如意',
 		yuruyi_info:'你有更高的机率摸到好牌',
 		fengyinzhidan:'封印之蛋',
 		fengyinzhidan_info:'随机使用三张非延时锦囊牌（随机指定目标）',
