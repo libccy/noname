@@ -37,5 +37,6 @@ window.noname_update={
 // 'mode/boss.js',
 // 'mode/versus.js',
 // 'mode/brawl.js',
+// 'mode/stone.js',
 // 'extension/boss/extension.js',
 // 'layout/mode/boss.css',

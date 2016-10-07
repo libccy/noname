@@ -8,6 +8,15 @@ mode.brawl={
         if(!lib.storage.stage){
             lib.storage.stage={};
         }
+        if(!_status.extensionmade){
+            _status.extensionmade=[];
+        }
+        if(_status.extensionscene){
+            game.save('scene',lib.storage.scene);
+        }
+        if(_status.extensionstage){
+            game.save('stage',lib.storage.stage);
+        }
         var dialog=ui.create.dialog('hidden');
         dialog.classList.add('fixed');
         dialog.classList.add('scroll1');
@@ -20,19 +29,14 @@ mode.brawl={
         dialog.style.overflow='hidden';
         dialog.content.style.height='100%';
         dialog.contentContainer.style.transition='all 0s';
-        dialog.open();
+        if(!lib.storage.directStage) dialog.open();
         var packnode=ui.create.div('.packnode',dialog);
         lib.setScroll(packnode);
         var clickCapt=function(){
             var active=this.parentNode.querySelector('.active');
             if(this.link=='stage'){
-                var num=0;
-                for(var i in lib.storage.scene){
-                    num++;
-                    if(num>=2) break;
-                }
-                if(num<2){
-                    alert('请创建至少2个场景');
+                if(get.is.empty(lib.storage.scene)){
+                    alert('请创建至少1个场景');
                     return;
                 }
             }
@@ -119,7 +123,7 @@ mode.brawl={
             }
             return node;
         }
-        var start=ui.create.div('.menubutton.round.highlight','斗',dialog.content,function(){
+        var clickStart=function(){
             var active=packnode.querySelector('.active');
             if(active){
                 for(var i=0;i<active.nodes.length;i++){
@@ -128,13 +132,92 @@ mode.brawl={
                         delete active.nodes[i].showcaseinterval;
                     }
                 }
+                var info;
+                if(active.link.indexOf('stage_')==0){
+                    var level;
+                    if(Array.isArray(arguments[0])){
+                        level={index:arguments[0][1]};
+                    }
+                    else{
+                        level=dialog.content.querySelector('.menubutton.large.active');
+                    }
+                    if(level){
+                        var stagesave=lib.storage.stage;
+                        var stage=stagesave[active.link.slice(6)];
+                        game.save('lastStage',level.index);
+                        lib.onover.push(function(bool){
+                            _status.createControl=ui.controls[0];
+                            if(bool&&level.index+1<stage.scenes.length){
+                                ui.create.control('下一关',function(){
+                                    game.save('directStage',[stage.name,level.index+1],'brawl');
+                                    game.reload();
+                                });
+                                if(level.index+1>stage.level){
+                                    stage.level=level.index+1;
+                                    game.save('stage',stagesave,'brawl');
+                                }
+                                if(stage.mode!='sequal'){
+                                    game.save('lastStage',level.index+1,'brawl');
+                                }
+                            }
+                            else{
+                                ui.create.control('重新开始',function(){
+                                    if(stage.mode=='sequal'&&bool&&level.index==stage.scenes.length-1){
+                                        game.save('directStage',[stage.name,0],'brawl');
+                                    }
+                                    else{
+                                        game.save('directStage',[stage.name,level.index],'brawl');
+                                    }
+                                    game.reload();
+                                });
+                                if(stage.mode=='sequal'&&level.index==stage.scenes.length-1){
+                                    stage.level=0;
+                                    game.save('stage',stagesave,'brawl');
+                                }
+                                if(stage.mode!='sequal'){
+                                    game.save('lastStage',level.index,'brawl');
+                                }
+                            }
+                            delete _status.createControl;
+                        });
+                        var scene=stage.scenes[level.index];
+                        info={
+                            name:scene.name,
+                            intro:scene.intro,
+                        };
+                        for(var i in lib.brawl.scene.template){
+                            info[i]=get.copy(lib.brawl.scene.template[i]);
+                        }
+                        if(!scene.gameDraw){
+                            info.content.noGameDraw=true;
+                        }
+                        info.content.scene=scene;
+                    }
+                    else{
+                        return;
+                    }
+                }
+                else{
+                    info=lib.brawl[active.link];
+                }
+                lib.translate.restart='返回';
                 dialog.delete();
-                var info=lib.brawl[active.link];
                 ui.brawlinfo=ui.create.system('乱斗',null,true);
                 lib.setPopped(ui.brawlinfo,function(){
                     var uiintro=ui.create.dialog('hidden');
                     uiintro.add(info.name);
-                    uiintro.add('<div class="text center">'+active.nodes[1].innerHTML+'</div>');
+                    var intro;
+                    if(Array.isArray(info.intro)){
+                        intro='<ul style="text-align:left;margin-top:0;width:450px">';
+                        for(var i=0;i<info.intro.length;i++){
+                            intro+='<li>'+info.intro[i];
+                        }
+                        intro+='</ul>'
+                    }
+                    else{
+                        intro=info.intro;
+                    }
+                    uiintro.add('<div class="text center">'+intro+'</div>');
                     var ul=uiintro.querySelector('ul');
                     if(ul){
                         ul.style.width='180px';
@@ -149,7 +232,8 @@ mode.brawl={
                     info.init();
                 }
             }
-        });
+        };
+        var start=ui.create.div('.menubutton.round.highlight','斗',dialog.content,clickStart);
         start.style.position='absolute';
         start.style.left='auto';
         start.style.right='10px';
@@ -193,7 +277,6 @@ mode.brawl={
             };
             for(var i in lib.brawl.stage.template){
                 brawl[i]=get.copy(lib.brawl.stage.template[i]);
-
             }
             brawl.content.stage=stage;
             lib.brawl['stage_'+name]=brawl;
@@ -261,6 +344,12 @@ mode.brawl={
         }
         if(!lib.storage.currentBrawl){
             clickCapt.call(packnode.firstChild);
+        }
+        game.save('lastStage');
+        if(lib.storage.directStage){
+            var directStage=lib.storage.directStage;
+            game.save('directStage');
+            clickStart(directStage);
         }
     },
     brawl:{
@@ -978,6 +1067,7 @@ mode.brawl={
             nostart:true,
             fullshow:true,
             template:{
+                mode:'identity',
                 init:function(){
                     game.saveConfig('double_character',false,'identity');
                     _status.brawl.playerNumber=_status.brawl.scene.players.length;
@@ -990,16 +1080,25 @@ mode.brawl={
                             _status.sceneToLoad=scene;
                             game.switchScene();
                         });
-                        ui.create.node('button','删除场景',this,function(){
-                            if(confirm('确定删除'+name+'？')){
-                                game.removeScene(name);
-                            }
-                        },{marginLeft:'6px'});
+                        if(_status.extensionmade.contains(name)){
+                            ui.create.node('button','管理扩展',this,function(){
+                                ui.click.configMenu();
+                                ui.click.extensionTab(name);
+                            },{marginLeft:'6px'});
+                        }
+                        else{
+                            ui.create.node('button','删除场景',this,function(){
+                                if(confirm('确定删除'+name+'？')){
+                                    game.removeScene(name);
+                                }
+                            },{marginLeft:'6px'});
+                        }
                         ui.create.node('button','导出扩展',this,function(){
                             var str='{name:"'+name+'",content:function(){\nif(lib.config.mode=="brawl"){\n'+
                             'if(!lib.storage.scene) lib.storage.scene={};\n'+
-                            'if(!lib.storage.scene["'+name+'"]) lib.storage.scene["'+name+'"]='+get.stringify(scene)+
-                            '\n}}\n}';
+                            'if(!lib.storage.scene["'+name+'"]){\nlib.storage.scene["'+name+'"]='+get.stringify(scene)+';\n_status.extensionscene=true;}\n'+
+                            'if(!_status.extensionmade) _status.extensionmade=[];\n'+
+                            '_status.extensionmade.push("'+name+'");\n}}\n}';
                             var extension={'extension.js':'game.import("extension",'+str+')'};
                             game.importExtension(extension,null,name);
                         },{marginLeft:'6px'});
@@ -1937,22 +2036,67 @@ mode.brawl={
                         var line1=ui.create.div(style2,this);
                         var line2=ui.create.div(style2,this);
                         line2.style.lineHeight='50px';
-                        ui.create.node('button','删除关卡',line1,function(){
-                            if(confirm('确定删除'+name+'？')){
-                                game.removeStage(name);
-                            }
-                        },{marginLeft:'6px'});
+                        if(_status.extensionmade.contains(name)){
+                            ui.create.node('button','管理扩展',line1,function(){
+                                ui.click.configMenu();
+                                ui.click.extensionTab(name);
+                            },{marginLeft:'6px'});
+                        }
+                        else{
+                            ui.create.node('button','删除关卡',line1,function(){
+                                if(confirm('确定删除'+name+'？')){
+                                    game.removeStage(name);
+                                }
+                            },{marginLeft:'6px'});
+                        }
                         ui.create.node('button','导出扩展',line1,function(){
+                            var level=stage.level;
+                            stage.level=0;
                             var str='{name:"'+name+'",content:function(){\nif(lib.config.mode=="brawl"){\n'+
                             'if(!lib.storage.stage) lib.storage.stage={};\n'+
-                            'if(!lib.storage.stage["'+name+'"]) lib.storage.stage["'+name+'"]='+get.stringify(stage)+
-                            '\n}}\n}';
+                            'if(!lib.storage.stage["'+name+'"]){\nlib.storage.stage["'+name+'"]='+get.stringify(stage)+';\n_status.extensionstage=true;}\n'+
+                            'if(!_status.extensionmade) _status.extensionmade=[];\n'+
+                            '_status.extensionmade.push("'+name+'");\n}}\n}';
+                            stage.level=level;
                             var extension={'extension.js':'game.import("extension",'+str+')'};
                             game.importExtension(extension,null,name);
                         },{marginLeft:'6px'});
-
+                        var noactive=true;
+                        var clickNode=function(){
+                            if(this.classList.contains('unselectable')) return;
+                            if(!this.classList.contains('active')){
+                                var active=this.parentNode.querySelector('.menubutton.large.active');
+                                if(active){
+                                    active.classList.remove('active');
+                                }
+                                this.classList.add('active');
+                            }
+                        }
                         for(var i=0;i<stage.scenes.length;i++){
-                            ui.create.div('.menubutton.large',line2,stage.scenes[i].name,style3);
+                            var node=ui.create.div('.menubutton.large',line2,stage.scenes[i].name,style3,clickNode);
+                            node.index=i;
+                            if(stage.mode=='sequal'){
+                                if(i==stage.level){
+                                    node.classList.add('active');
+                                    noactive=false;
+                                }
+                                else{
+                                    node.classList.add('unselectable');
+                                }
+                            }
+                            else if(stage.mode=='normal'){
+                                if(i>stage.level){
+                                    node.classList.add('unselectable');
+                                }
+                            }
+                            if(lib.storage.lastStage==i&&!node.classList.contains('unselectable')){
+                                node.classList.add('active');
+                                noactive=false;
+                            }
+                            else if(lib.storage.lastStage==undefined&&noactive&&!node.classList.contains('unselectable')){
+                                node.classList.add('active');
+                                noactive=false;
+                            }
                         }
                     }
                 },
@@ -1968,7 +2112,8 @@ mode.brawl={
                     this.style.height=(this.offsetHeight-10)+'px';
                     this.style.overflow='scroll';
                     lib.setScroll(this);
-                    var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'8px',padding:0,width:'100%'};
+                    var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
+                    var style3={marginLeft:'4px',marginRight:'4px',position:'relative'}
 
                     var scenename=ui.create.node('input',ui.create.div(style2,'','关卡名称：',this),{width:'120px'});
                     scenename.type='text';
@@ -1979,12 +2124,14 @@ mode.brawl={
 
                     var line1=ui.create.div(style2,this);
                     var line2=ui.create.div(style2,this);
+                    line1.style.marginBottom='10px';
+                    line2.style.lineHeight='50px';
                     var scenes=[];
                     for(var i in lib.storage.scene){
                         scenes.push([i,i]);
                     }
-                    if(scenes.length<2){
-                        alert('请创建至少2个场景');
+                    if(!scenes.length){
+                        alert('请创建至少1个场景');
                         return;
                     }
                     var scenelist=ui.create.selectlist(scenes,null,line1);
@@ -2004,7 +2151,7 @@ mode.brawl={
                         delete this.movetimeout;
                     }
                     var e4=function(value){
-                        var node=ui.create.node('button',value,line2,{marginLeft:'3px',marginRight:'3px'},function(){
+                        var node=ui.create.div('.menubutton.large',value,line2,style3,function(){
                             if(confirm('是否移除'+this.innerHTML+'？')){
                                 this.remove();
                             }

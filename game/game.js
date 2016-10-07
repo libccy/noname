@@ -3193,20 +3193,20 @@
 			stone:{
 				name:'炉石',
 				config:{
-					update:function(config,map){
-						if(config.stone_mode=='deck'){
-							// map.deck_length.show();
-							// map.deck_repeat.show();
-							map.random_length.hide();
-							map.skill_bar.show();
-						}
-						else{
-							// map.deck_length.hide();
-							// map.deck_repeat.hide();
-							map.random_length.show();
-							map.skill_bar.hide();
-						}
-					},
+					// update:function(config,map){
+					// 	if(config.stone_mode=='deck'){
+					// 		// map.deck_length.show();
+					// 		// map.deck_repeat.show();
+					// 		map.random_length.hide();
+					// 		map.skill_bar.show();
+					// 	}
+					// 	else{
+					// 		// map.deck_length.hide();
+					// 		// map.deck_repeat.hide();
+					// 		map.random_length.show();
+					// 		map.skill_bar.hide();
+					// 	}
+					// },
 					// stone_mode:{
 					// 	name:'游戏模式',
 					// 	init:'deck',
@@ -3238,16 +3238,16 @@
 					// 	},
 					// 	frequent:true,
 					// },
-					random_length:{
-						name:'随从牌数量',
-						init:'1/80',
-						item:{
-							'1/120':'少',
-							'1/80':'中',
-							'1/50':'多',
-						},
-						frequent:true,
-					},
+					// random_length:{
+					// 	name:'随从牌数量',
+					// 	init:'1/80',
+					// 	item:{
+					// 		'1/120':'少',
+					// 		'1/80':'中',
+					// 		'1/50':'多',
+					// 	},
+					// 	frequent:true,
+					// },
 					battle_number:{
 						name:'出场人数',
 						init:'1',
@@ -20148,12 +20148,13 @@
 			var store=lib.db.transaction([type],'readwrite').objectStore(type);
 			store.delete(id).onsuccess=callback;
 		},
-		save:function(key,value){
+		save:function(key,value,mode){
 			if(_status.reloading) return;
 			var config={};
+            mode=mode||lib.config.mode;
 			if(arguments.length>0){
 				try{
-					config=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
+					config=JSON.parse(localStorage.getItem(lib.configprefix+mode));
 					if(typeof config!='object') throw 'err';
 				}
 				catch(err){
@@ -20161,15 +20162,15 @@
 				}
 				if(value==undefined){
 					delete config[key];
-					delete lib.storage[key];
+					if(mode==lib.config.mode) delete lib.storage[key];
 				}
 				else{
 					config[key]=value;
-					lib.storage[key]=value;
+					if(mode==lib.config.mode) lib.storage[key]=value;
 				}
 			}
 			config.version=lib.version;
-			localStorage.setItem(lib.configprefix+lib.config.mode,JSON.stringify(config));
+			localStorage.setItem(lib.configprefix+mode,JSON.stringify(config));
 		},
 		showChangeLog:function(){
 			if(lib.version!=lib.config.version){
@@ -23192,6 +23193,15 @@
 						this.classList.add('active');
 						rightPane.appendChild(this.link);
 					};
+                    ui.click.extensionTab=function(name){
+                        ui.click.menuTab('扩展');
+                        for(var i=0;i<start.firstChild.childElementCount;i++){
+                            if(start.firstChild.childNodes[i].innerHTML==name){
+                                clickMode.call(start.firstChild.childNodes[i]);
+                                break;
+                            }
+                        }
+                    }
 					var updateNodes=function(){
 						for(var i=0;i<start.firstChild.childNodes.length;i++){
 							var node=start.firstChild.childNodes[i];
@@ -25278,6 +25288,13 @@
                         importExtension.style.width='100%';
                         importExtension.style.textAlign='left';
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
+
+
+                        if(!game.download){
+                            extensionnode.classList.add('on');
+                            importExtension.style.display='';
+                            importextensionexpanded=true;
+                        }
 
                         var reloadnode=ui.create.div('.config.toggle','重新启动',page,game.reload);
                         reloadnode.style.display='none';
