@@ -311,8 +311,15 @@ mode.brawl={
                 if(packnode.childNodes[i].link=='stage_'+name){
                     if(packnode.childNodes[i].classList.contains('active')){
                         for(var j=0;j<packnode.childElementCount;j++){
-                            if(packnode.childNodes[j].link=='stage'){
-                                clickCapt.call(packnode.childNodes[j]);
+                            if(get.is.empty(lib.storage.scene)){
+                                if(packnode.childNodes[j].link=='scene'){
+                                    clickCapt.call(packnode.childNodes[j]);
+                                }
+                            }
+                            else{
+                                if(packnode.childNodes[j].link=='stage'){
+                                    clickCapt.call(packnode.childNodes[j]);
+                                }
                             }
                         }
                     }
