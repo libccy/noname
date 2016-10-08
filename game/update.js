@@ -1,8 +1,7 @@
 window.noname_update={
-    version:'1.9.2.1',
+    version:'1.9.2.2',
     changeLog:[
         'bug修复',
-        '乱斗创建关卡',
     ],
     files:{
         global:[
@@ -33,5 +32,6 @@ window.noname_update={
         ],
         '1.9.1.2':[],
         '1.9.2':[],
+        '1.9.2.1':[],
     }
 }

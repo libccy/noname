@@ -104,7 +104,7 @@ play.boss={
 					lib.translate[i]=lib.translate[i]||mode.boss.translate[i];
 				}
 				for(var i in mode.boss.skill){
-					lib.skill[i]=mode.boss.skill[i];
+					lib.skill[i]=lib.init.eval(mode.boss.skill[i]);
 					game.finishSkill(i);
 				}
 			});
