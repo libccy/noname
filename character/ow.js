@@ -29,6 +29,7 @@ character.ow={
         mengji:{
             trigger:{source:'damageBegin'},
             forced:true,
+            unique:true,
             filter:function(event,player){
                 return player.storage.zhongjia&&!player.hujia&&event.card&&event.card.name=='sha'&&event.notLink();
             },
@@ -37,6 +38,7 @@ character.ow={
             }
         },
         lzhongjia:{
+            unique:true,
             init2:function(player){
                 if(!player.storage.zhongjia){
                     player.changeHujia(8);

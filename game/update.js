@@ -35,3 +35,6 @@ window.noname_update={
         '1.9.2.1':[],
     }
 }
+
+// 'character/ow.js',
+// 'card/swd.js',

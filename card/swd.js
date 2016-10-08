@@ -2001,7 +2001,7 @@ card.swd={
 			trigger:{player:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return event.source&&event.source.isAlive()&&player.num('h','zhuquezhizhang')>0;
+				return event.source&&event.source!=player&&event.source.isAlive()&&player.num('h','zhuquezhizhang')>0;
 			},
 			logTarget:'source',
 			check:function(event,player){
@@ -4283,7 +4283,7 @@ card.swd={
 		baishouzhihu_equip5_info:'回合结束阶段，你可以弃置一名其他角色的一张牌',
 		zhuquezhizhang:'朱雀之璋',
 		_zhuquezhizhang:'朱雀之璋',
-		zhuquezhizhang_info:'可用于煅造装备；此牌在你手牌中时，每当你受到伤害，你对伤害来源造成一点火属性伤害',
+		zhuquezhizhang_info:'可用于煅造装备；此牌在你手牌中时，每当你受到其他角色造成的伤害，你对伤害来源造成一点火属性伤害',
 		zhuquezhizhang_duanzao:'炽翎',
 		zhuquezhizhang_equip1_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
 		zhuquezhizhang_equip2_info:'回合结束阶段，你可以弃置一张红色牌并对一名体力值不小于你的角色造成一点火属性伤害',
