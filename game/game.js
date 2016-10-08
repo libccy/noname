@@ -2649,10 +2649,12 @@
 						}
                         if(config.versus_mode=='two'){
                             map.replace_handcard_two.show();
+                            map.replace_character_two.show();
                             map.change_identity.show();
                         }
                         else{
                             map.replace_handcard_two.hide();
+                            map.replace_character_two.hide();
                             map.change_identity.remove();
                         }
 					},
