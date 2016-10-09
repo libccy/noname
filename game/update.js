@@ -38,4 +38,5 @@ window.noname_update={
 
 // 'character/ow.js',
 // 'character/sp.js',
+// 'character/rank.js',
 // 'card/swd.js',
