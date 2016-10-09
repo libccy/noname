@@ -271,7 +271,7 @@ character.sp={
 			},
 			content:function(){
 				'step 0'
-				player.chooseCard(get.prompt('tuifeng'),'he').set('ai',function(card){
+				player.chooseCard(get.prompt('tuifeng'),'he',[1,trigger.num]).set('ai',function(card){
 					if(card.name=='du') return 20;
 					return 7-ai.get.useful(card);
 				});
@@ -280,7 +280,9 @@ character.sp={
 					player.logSkill('tuifeng');
 					player.lose(result.cards,ui.special);
 					player.$give(result.cards,player);
-					player.storage.tuifeng.push(result.cards[0]);
+					for(var i=0;i<result.cards.length;i++){
+						player.storage.tuifeng.push(result.cards[i]);
+					}
 					player.markSkill('tuifeng');
 				}
 			},

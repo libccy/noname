@@ -37,4 +37,5 @@ window.noname_update={
 }
 
 // 'character/ow.js',
+// 'character/sp.js',
 // 'card/swd.js',
