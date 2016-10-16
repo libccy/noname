@@ -32969,6 +32969,13 @@
 			}
 		},
 		get:{
+            attitude:function(from,to){
+				if(!from||!to) return 0;
+				var att=ai.get.rawAttitude.apply(this,arguments);
+				if(from.isMad()) return -att;
+                if(to.isMad()) return 0;
+				return att;
+			},
 			useful:function(card){
 				if(get.position(card)=='j') return -1;
 				if(get.position(card)=='e') return ai.get.equipValue(card);

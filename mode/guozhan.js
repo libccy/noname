@@ -1258,13 +1258,7 @@ mode.guozhan={
 				if(to_p<max-1) return 0;
 				return -0.5;
 			},
-			attitude:function(from){
-				var att=ai.get.rawAttitude.apply(this,arguments);
-				if(from&&from.isMad()) return -att;
-				return att;
-			},
 			rawAttitude:function(from,to){
-				if(!from||!to) return 0;
 				if(to.identity=='unknown'&&game.players.length==2) return -5;
 				if(_status.currentPhase==from&&from.ai.tempIgnore&&
 					from.ai.tempIgnore.contains(to)&&to.identity=='unknown'&&

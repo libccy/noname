@@ -38,5 +38,13 @@ window.noname_update={
 
 // 'character/ow.js',
 // 'character/sp.js',
+// 'character/swd.js',
 // 'character/rank.js',
 // 'card/swd.js',
+// 'card/hearth.js',
+// 'mode/boss.js',
+// 'mode/chess.js',
+// 'mode/guozhan.js',
+// 'mode/identity.js',
+// 'mode/stone.js',
+// 'mode/versus.js',

@@ -1433,13 +1433,7 @@ mode.identity={
 	},
 	ai:{
 		get:{
-			attitude:function(from){
-				var att=ai.get.rawAttitude.apply(this,arguments);
-				if(from&&from.isMad()) return -att;
-				return att;
-			},
 			rawAttitude:function(from,to){
-				if(!from||!to) return 0;
 				var x=0,num=0,temp,i;
 				if(_status.ai.customAttitude){
 					for(i=0;i<_status.ai.customAttitude.length;i++){

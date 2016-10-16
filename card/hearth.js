@@ -57,38 +57,55 @@ card.hearth={
 		zhaomingdan:{
 			fullskin:true,
 			type:'trick',
-			chongzhu:true,
-			enable:function(card,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('j')) return true;
-				}
-				return false;
-			},
+			enable:true,
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('j')>0;
+				return player!=target&&target.num('hej')>0;
 			},
 			content:function(){
-				target.discard(target.get('j'));
+				'step 0'
+				if(target.num('hej')){
+					player.choosePlayerCard('hej','重铸'+get.translation(target)+'的一张牌',target,true).visible=true;
+				}
+				else{
+					event.goto(2);
+				}
+				'step 1'
+				if(result.bool){
+					target.$throw(result.links,1000);
+					target.lose(result.links);
+					game.delay(0.5);
+				}
+				'step 2'
+				target.draw(false);
+				target.$draw();
+				game.delay(0.5);
+				'step 3'
 				player.draw();
 			},
 			ai:{
 				order:9.5,
-				value:1,
+				value:6,
+				useful:3,
 				result:{
 					target:function(player,target){
+						var es=target.get('e');
+						var nh=target.num('h');
+						var noe=(es.length==0||target.hasSkillTag('noe'));
+						var noe2=(es.length==1&&es[0].name=='baiyin'&&target.hp<target.maxHp);
+						var noh=(nh==0||target.hasSkillTag('noh'));
+						if(noh&&noe) return 0;
+						if(noh&&noe2) return 0.01;
+						if(ai.get.attitude(player,target)<=0) return (target.num('he'))?-1.5:1.5;
 						var js=target.get('j');
-						var num=0;
-						for(var i=0;i<js.length;i++){
-							var jj=js[i].viewAs?{name:js[i].viewAs}:js[i];
-							if(jj.name=='zhaomingdan') num++;
-							else if(js.length==1&&ai.get.effect(target,jj,target,target)>=0){
-								num--;
+						if(js.length){
+							var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
+							if(jj.name=='guohe') return 3;
+							if(js.length==1&&ai.get.effect(target,jj,target,player)>=0){
+								return -1.5;
 							}
-							else{
-								num++;
-							}
+							return 3;
 						}
-						return num;
+						return -1.5;
 					}
 				}
 			}
@@ -670,7 +687,7 @@ card.hearth={
 		shijieshu:'视界术',
 		shijieshu_info:'目标随机装备牌堆中的两张装备牌，然后弃置一张手牌',
 		zhaomingdan:'照明弹',
-		zhaomingdan_info:'弃置一名其他角色判定区内的所有牌，然后摸一张牌',
+		zhaomingdan_info:'观看一名其他角色的手牌，并重置其区域内的一张牌，然后摸一张牌',
 		jihuocard:'激活',
 		jihuocard_info:'跳过本回合的弃牌阶段，摸一张牌',
 	},
@@ -688,8 +705,8 @@ card.hearth={
 		['club',3,'shandianjian','thunder'],
 		['spade',1,'shandianjian','thunder'],
 		['spade',7,'shijieshu'],
-		// ['diamond',5,'zhaomingdan'],
-		// ['heart',10,'zhaomingdan'],
+		['diamond',5,'zhaomingdan'],
+		['heart',10,'zhaomingdan'],
 		['diamond',2,'jihuocard'],
 		['diamond',1,'linghunzhihuo'],
 	],

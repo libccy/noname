@@ -10159,17 +10159,13 @@ mode.stone={
 	},
 	ai:{
 		get:{
-			attitude:function(from,to){
-				if(!from||!to) return 0;
+			rawAttitude:function(from,to){
 				var num;
 				if(to.isMin()&&!to.hasSkill('chaofeng')){
 					num=5;
 				}
 				else{
 					num=6;
-				}
-				if(from&&from.isMad()){
-					num=-num;
 				}
 				return num*(from.side==to.side?1:-1);
 			}

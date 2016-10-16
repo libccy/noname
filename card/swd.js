@@ -277,6 +277,7 @@ card.swd={
 				player.draw();
 			},
 			ai:{
+				value:6,
 				result:{
 					target:1
 				},
@@ -724,7 +725,14 @@ card.swd={
 				useful:6,
 				value:6,
 				result:{
-					player:1
+					player:function(){
+						var cardname=_status.event.cardname;
+						if(cardname=='tiesuo') return 0;
+						if(cardname=='jiu') return 0;
+						if(cardname=='tianxianjiu') return 0;
+						if(cardname=='toulianghuanzhu') return 0;
+						return 1;
+					}
 				},
 			}
 		},
@@ -1775,13 +1783,7 @@ card.swd={
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
 					if(mod!='unchanged') return mod;
 					return true;
-				},trigger.player,-1).set('ai',function(){
-					if(trigger.card.name=='tiesuo') return 0;
-					if(trigger.card.name=='jiu') return 0;
-					if(trigger.card.name=='tianxianjiu') return 0;
-					if(trigger.card.name=='toulianghuanzhu') return 0;
-					return 1;
-				}).targetRequired=true;
+				},trigger.player,-1).set('cardname',trigger.card.name).targetRequired=true;
 				'step 1'
 				delete player.storage.shenmiguo;
 			}

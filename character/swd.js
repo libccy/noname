@@ -9,7 +9,7 @@ character.swd={
 		// swd_miles:['male','qun',4,['aojian','miles_xueyi','mohua2']],
 			swd_nicole:['female','qun',3,['huanjian','lingwu','minjing']],
 			swd_wangsiyue:['female','wei',3,['duishi','biyue']],
-			swd_weida:['female','qun',3,['yueren','zhenlie']],
+			swd_weida:['female','qun',3,['yueren','duijue']],
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian']],
 
 			swd_chenjingchou:['male','wu',3,['youyin','yihua']],
@@ -7039,7 +7039,10 @@ character.swd={
 		},
 		duijue:{
 			enable:'phaseUse',
-			usable:1,
+			mark:true,
+			unique:true,
+			forceunique:true,
+			skillAnimation:true,
 			filter:function(event,player){
 				return !player.storage.duijue;
 			},
@@ -7047,38 +7050,95 @@ character.swd={
 				return player!=target&&target!=game.zhu;
 			},
 			content:function(){
-				var players=game.players.concat(game.dead);
-				players.remove(player);
-				players.remove(target);
-				for(var i=0;i<players.length;i++){
-					players[i].classList.add('out');
-					players[i].storage.duijue2=true;
-				}
-				player.addSkill('duijue2');
-				target.addSkill('duijue2');
 				player.storage.duijue=true;
+				player.unmarkSkill('duijue');
+				var evt=_status.event;
+				for(var i=0;i<10;i++){
+					if(evt&&evt.getParent){
+						evt=evt.getParent();
+					}
+					if(evt.name=='phaseUse'){
+						evt.skipped=true;
+						break;
+					}
+				}
+				player.storage.duijue3=target;
+				player.addSkill('duijue3');
 			},
 			init:function(player){
 				player.storage.duijue=false;
 			},
 			intro:{
 				content:'limited'
+			},
+			ai:{
+				order:1,
+				result:{
+					target:function(player,target){
+						if(target.hp==1&&player.hp>=3) return -1;
+						if(target.hp<player.hp&&target.num('h')<=player.num('h')) return -1;
+						return 0;
+					}
+				}
 			}
 		},
-		duijue2:{
-			trigger:{global:'dieAfter'},
+		duijue3:{
+			trigger:{player:'phaseAfter'},
 			forced:true,
 			popup:false,
 			content:function(){
-				var players=game.players.concat(game.dead);
-				for(var i=0;i<players.length;i++){
-					if(players[i].storage.duijue2&&players[i].isOut()){
-						players[i].classList.remove('out');
-						delete players[i].storage.duijue2;
+				'step 0'
+				event.target=player.storage.duijue3;
+				delete player.storage.duijue3;
+				player.removeSkill('duijue3');
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i]!=event.target){
+						game.players[i].addSkill('duijue2');
 					}
-					players[i].removeSkill('duijue2');
+				}
+				'step 1'
+				target.phase();
+				'step 2'
+				if(target.isAlive()){
+					player.phase();
+				}
+				else{
+					event.goto(4);
+				}
+				'step 3'
+				if(target.isAlive()){
+					event.goto(1);
+				}
+				'step 4'
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i]!=target){
+						game.players[i].removeSkill('duijue2');
+					}
 				}
 			}
+		},
+		duijue2:{
+			mod:{
+				cardEnabled:function(){
+					return false;
+				},
+				cardSavable:function(){
+					return false;
+				},
+				targetEnabled:function(){
+					return false;
+				}
+			},
+			init:function(player){
+				player.classList.add('transparent');
+			},
+			onremove:function(player){
+				player.classList.remove('transparent');
+			},
+			intro:{
+				content:'不计入距离的计算且不能使用牌且不是牌的合法目标'
+			},
+			group:'undist'
 		},
 		yueren:{
 			trigger:{player:'shaBegin'},
@@ -8432,7 +8492,7 @@ character.swd={
 		xuying_info:'锁定技，每当你即将受到伤害，你防止此伤害，若你此时有手牌，你流失一点体力',
 		yinguo_info:'除你之外的任意一名角色即将受到受到伤害时，若有伤害来源，你可以弃置一张牌将伤害来源和目标对调',
 		yueren_info:'每当你使用一张杀，可以进行一次判定，若结果为黑色，你弃置目标一张牌，若结果为红色，你将此杀收回，每回合限发动一次',
-		duijue_info:'限定技，出牌阶段，你可以指定一名角色与其单挑，直到一方死亡为止',
+		duijue_info:'限定技，出牌阶段，你可以指定一名非主公的其他角色，你结束出牌阶段，然后该角色与你轮流进行回合，直到一方死亡为止；在此之前，所有其他角色不计入距离的计算且不能使用牌且不是牌的合法目标',
 		wuying_info:'锁定技，你的杀和单体x锦囊目标锁定为范围内的所有角色',
 		xiehun_info:'锁定技，受到来自你伤害的角色进入混乱状态，行为不受控制，且会攻击队友，直到你的下一回合开始',
 		jumo_info:'锁定技，回合结束阶段，你摸X-1张牌，X为未进入混乱状态的角色数与进入混乱状态的角色数之差（若为双将则改为X）',
