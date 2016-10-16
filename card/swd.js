@@ -2,6 +2,7 @@ card.swd={
 	card:{
 		yangpijuan:{
 			fullskin:true,
+			type:'trick'
 		},
 		pantao:{
 			fullskin:true,

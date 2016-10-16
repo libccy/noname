@@ -40,7 +40,7 @@ character.hearth={
 		// hs_sapphiron:['male','wei',4,['bingdong','stuxi']],
 		hs_kchromaggus:['male','wei',4,['fenlie']],
 		hs_lreno:['male','shu',4,['tanmi']],
-		hs_brann:['male','shu',3,['mashu','qianghua']],
+		hs_brann:['male','shu',3,['qianghua']],
 		hs_finley:['male','wu',3,['maoxian']],
 		hs_kcthun:['male','qun',4,['luanji','xianji']],
 		hs_anomalus:['male','wei',4,['mobao']],
