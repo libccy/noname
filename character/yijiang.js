@@ -1441,7 +1441,7 @@ character.yijiang={
 				skillTagFilter:function(player){
 					if(!player.num('h',{color:'red'})) return false;
 				},
-				result:{
+				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')&&current<0) return 0.8
 					}
@@ -2686,27 +2686,16 @@ character.yijiang={
 				if(player.storage.zhanjue>=2) return false;
 				return true;
 			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-				player.line(targets);
-			},
-			discard:false,
-			filterTarget:function(card,player,target){
-				return player.canUse('juedou',target);
-			},
-			content:function(){
-				targets.sort(lib.sort.seat);
-				player.useCard({name:'juedou'},cards,targets,'zhanjue').animate=false;
-			},
-			group:['zhanjue2','zhanjue3'],
+			viewAs:{name:'juedou'},
+			group:['zhanjue2','zhanjue3','zhanjue4'],
 			ai:{
 				order:1,
 				result:{
 					target:function(player,target){
-						if(player.num('h')>3) return 0;
-						if(target.num('h','sha')) return 0;
+						if(player.num('h')>=3||target.num('h')>=3) return 0;
 						if(player.num('h','tao')) return 0;
-						return ai.get.effect(target,{name:'juedou'},player,target);
+						if(target.num('h','sha')>1) return 0;
+						return -1.5;
 					}
 				}
 			}
@@ -2730,9 +2719,25 @@ character.yijiang={
 				return event.parent.skill=='zhanjue';
 			},
 			content:function(){
-				if(player==trigger.source){
-					if(trigger.player.isAlive()){
-						game.asyncDraw([player,trigger.player]);
+				player.storage.zhanjue2=trigger.player;
+			}
+		},
+		zhanjue4:{
+			audio:false,
+			trigger:{player:'juedouAfter'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.skill=='zhanjue';
+			},
+			content:function(){
+				if(player.storage.zhanjue2==player){
+					player.draw(2);
+					player.storage.zhanjue+=2;
+				}
+				else if(player.storage.zhanjue2){
+					if(player.storage.zhanjue2.isAlive()){
+						game.asyncDraw([player,player.storage.zhanjue2]);
 					}
 					else{
 						player.draw();
@@ -2740,9 +2745,10 @@ character.yijiang={
 					player.storage.zhanjue++;
 				}
 				else{
-					player.draw(2);
-					player.storage.zhanjue+=2;
+					player.draw();
+					player.storage.zhanjue++;
 				}
+				delete player.storage.zhanjue2;
 			}
 		},
 		qinwang:{

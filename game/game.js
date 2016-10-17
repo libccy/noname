@@ -32973,7 +32973,7 @@
 				if(!from||!to) return 0;
 				var att=ai.get.rawAttitude.apply(this,arguments);
 				if(from.isMad()) return -att;
-                if(to.isMad()) return 0;
+                if(to.isMad()&&att>0) return 0;
 				return att;
 			},
 			useful:function(card){
@@ -33072,21 +33072,38 @@
 				}
 				return order;
 			},
-			result:function(item){
+			result:function(item,skill){
 				var result;
-				if(get.info(item).ai) result=get.info(item).ai.result;
-				if(result==undefined) return {};
-				if(typeof(result)=='function') return result(item);
+                var info=get.info(item);
+				if(info.ai) result=info.ai.result;
+				if(typeof(result)=='function') result=result(item);
+				if(!result) result={};
+                if(skill){
+                    var info2=get.info(skill);
+                    if(info2.ai){
+                        info2=info2.ai.result;
+                        for(var i in info2){
+                            result[i]=info2[i];
+                        }
+                    }
+                }
 				return result;
 			},
 			effect:function(target,card,player,player2){
 				var event=_status.event;
+                var eventskill=null;
 				if(player==undefined) player=_status.event.player;
 				if(typeof card!='string'&&(typeof card!='object'||!card.name)){
-					if(event.skill&&get.info(event.skill).viewAs==undefined) card=_status.event.skill;
-					else card=get.card();
+                    var skillinfo=get.info(event.skill);
+					if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
+					else{
+                        card=get.card();
+                        if(skillinfo&&card===skillinfo.viewAs){
+                            eventskill=event.skill;
+                        }
+                    }
 				}
-				var result=ai.get.result(card);
+				var result=ai.get.result(card,eventskill);
 				var result1=result.player,result2=result.target;
 				if(typeof result1=='function') result1=result1(player,target,card);
 				if(typeof result2=='function') result2=result2(player,target,card);

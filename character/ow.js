@@ -1544,8 +1544,11 @@ character.ow={
                 effect:{
 					target:function(card,player,target){
 						if(!target.hasFriend()) return;
-						if(get.tag(card,'damage')==1&&target.hp==2&&target.num('he')&&!target.isTurnedOver()&&
-                        _status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+						if(get.tag(card,'damage')==1&&target.hp==2&&target.num('he')&&
+                        !target.isTurnedOver()&&_status.currentPhase!=target){
+                            if(get.distance(_status.currentPhase,target,'absolute')<=2) return [0.5,1];
+                            return 0.8;
+                        }
 					}
 				}
             },

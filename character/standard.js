@@ -456,7 +456,7 @@ character.standard={
 				skillTagFilter:function(player){
 					if(!player.num('h',{color:'black'})) return false;
 				},
-				result:{
+				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')&&current<0) return 0.6
 					}

@@ -661,7 +661,7 @@ character.yxs={
 					if(!player.num('h')) return false;
 					if(player.num('e')) return false;
 				},
-				result:{
+				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')&&current<0&&!target.num('e')) return 0.6
 					}
