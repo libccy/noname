@@ -59,7 +59,8 @@ mode.hearthpack={
     hs_combat:'对战',
     hs_arena:'竞技',
     hs_brawl:'乱斗',
-    hs_connect:'联机'
+    hs_connect:'联机',
+    hs_deck:'收藏',
 };
 background.pack={
     zhulian_bg:'璧合',

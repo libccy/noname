@@ -3618,10 +3618,6 @@
 				if(!lib.config.gameRecord){
 					lib.config.gameRecord={};
 				}
-                // if(lib.config.debug){
-                //     mode.pack.story='群侠';
-                //     mode.pack.tafang='即时';
-                // }
 				for(i in mode.pack){
 					if(lib.config.hiddenModePack.indexOf(i)==-1){
 						lib.config.all.mode.push(i);
@@ -3676,6 +3672,10 @@
 				delete card.pack;
 				delete play.pack;
 				delete mode.pack;
+				delete character.hearthpack;
+				delete card.hearthpack;
+				delete play.hearthpack;
+				delete mode.hearthpack;
 				delete window.background;
 				delete window.music;
 				delete window.font;
