@@ -3592,7 +3592,12 @@
                 if(window.isNonameServer){
                     lib.config.mode='connect';
                 }
-
+                if(lib.config.hearth){
+                    character.pack=character.hearthpack;
+                    card.pack=card.hearthpack;
+                    play.pack=play.hearthpack;
+                    mode.pack=mode.hearthpack;
+                }
 				for(i in character.pack){
 					if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
 						lib.config.all.characters.push(i);

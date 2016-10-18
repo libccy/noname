@@ -15,6 +15,9 @@ character.pack={
     xianjian:'仙剑',
     xiake:'侠客',
 };
+character.hearthpack={
+    hs_classic:'经典',
+};
 card.pack={
     standard:'标准',
     extra:'军争',
@@ -25,6 +28,10 @@ card.pack={
     swd:'轩辕剑',
     hearth:'炉石传说',
 };
+card.hearthpack={
+    hs_classic:'经典',
+    hs_naxx:'NAXX',
+};
 play.pack={
     boss:'挑战武将',
     cardpile:'牌堆补充',
@@ -33,6 +40,9 @@ play.pack={
     wuxing:'五行生克',
     weather:'天气变化',
     coin:'富甲天下',
+};
+play.hearthpack={
+    hs_mod:'规则调整'
 };
 mode.pack={
     identity:'身份',
@@ -44,6 +54,12 @@ mode.pack={
     tafang:'塔防',
     stone:'炉石',
     brawl:'乱斗',
+};
+mode.hearthpack={
+    hs_combat:'对战',
+    hs_arena:'竞技',
+    hs_brawl:'乱斗',
+    hs_connect:'联机'
 };
 background.pack={
     zhulian_bg:'璧合',
