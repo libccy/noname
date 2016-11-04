@@ -328,3 +328,65 @@ div[data-career='knight']{
     background-image: url('../../../image/class/knight.png');
     background-size:cover;
 }
+
+div[data-careercolor='mage']{
+    background-image: linear-gradient(rgba(139, 216, 245,0.8),rgba(90, 172, 204,0.8));
+    box-shadow: rgb(62, 137, 167) 0 0 0 1px;
+}
+div[data-careercolor='druid']{
+    background-image: linear-gradient(rgba(158, 87, 13,0.8),rgba(140, 77, 11,0.8));
+    box-shadow: rgb(101, 54, 5) 0 0 0 1px;
+}
+div[data-careercolor='hunter']{
+    background-image: linear-gradient(rgba(70, 162, 1,0.8),rgba(62, 138, 5,0.8));
+    box-shadow: rgb(39, 86, 3) 0 0 0 1px;
+}
+div[data-careercolor='shaman']{
+    background-image: linear-gradient(rgba(11, 99, 230,0.8),rgba(0, 85, 212,0.8));
+    box-shadow: rgb(4, 60, 142) 0 0 0 1px;
+}
+div[data-careercolor='paladin']{
+    background-image: linear-gradient(rgba(255, 236, 11,0.8),rgba(214, 182, 66,0.8));
+    box-shadow: rgb(177, 138, 53) 0 0 0 1px;
+}
+div[data-careercolor='rogue']{
+    background-image: linear-gradient(rgba(107, 120, 150,0.8),rgba(97, 109, 138,0.8));
+    box-shadow: rgb(75, 85, 111) 0 0 0 1px;
+}
+div[data-careercolor='priest']{
+    background-image: linear-gradient(rgba(255, 255, 255,0.8),rgba(224, 224, 224,0.8));
+    box-shadow: rgb(200, 200, 200) 0 0 0 1px;
+}
+div[data-careercolor='warrior']{
+    background-image: linear-gradient(rgba(187, 60, 60,0.8),rgba(165, 40, 40,0.8));
+    box-shadow: rgb(123, 23, 23) 0 0 0 1px;
+}
+div[data-careercolor='warlock']{
+    background-image: linear-gradient(rgba(132, 60, 187,0.8),rgba(114, 48, 165,0.8));
+    box-shadow: rgb(90, 31, 136) 0 0 0 1px;
+}
+
+.card>.info{
+    /*display: none;*/
+}
+.card>.name{
+    padding: 2px;
+    border-radius: 4px;
+    top: 8px;
+    left: 6px;
+}
+.card>.name,
+div:not(.handcards)>.card>.name,
+.handcards>.card:last-child>.name{
+    transform: scale(0.8) !important;
+}
+.card>.name.longlong{
+    top: 5px;
+}
+.card>.cost{
+    bottom: 6px;
+    right: 6px;
+    text-align: center;
+    font-family: 'xinwei';
+    border: none;
+}

@@ -16,7 +16,7 @@ character.pack={
     xiake:'侠客',
 };
 character.hearthpack={
-    hs_classic:'经典',
+    classic:'经典',
 };
 card.pack={
     standard:'标准',
@@ -29,8 +29,9 @@ card.pack={
     hearth:'炉石传说',
 };
 card.hearthpack={
-    hs_classic:'经典',
-    hs_naxx:'NAXX',
+    basic:'基本',
+    classic:'经典',
+    naxx:'纳克萨玛斯',
 };
 play.pack={
     boss:'挑战武将',
@@ -42,7 +43,7 @@ play.pack={
     coin:'富甲天下',
 };
 play.hearthpack={
-    hs_mod:'规则调整'
+    hsmod:'规则调整'
 };
 mode.pack={
     identity:'身份',
@@ -54,13 +55,6 @@ mode.pack={
     tafang:'塔防',
     stone:'炉石',
     brawl:'乱斗',
-};
-mode.hearthpack={
-    hs_combat:'对战',
-    hs_arena:'竞技',
-    hs_brawl:'乱斗',
-    hs_connect:'联机',
-    hs_deck:'收藏',
 };
 background.pack={
     zhulian_bg:'璧合',

@@ -35,20 +35,3 @@ window.noname_update={
         '1.9.2.1':[],
     }
 }
-
-// 'character/ow.js',
-// 'character/sp.js',
-// 'character/swd.js',
-// 'character/rank.js',
-// 'character/standard.js',
-// 'character/yijiang.js',
-// 'character/yxs.js',
-// 'card/swd.js',
-// 'card/hearth.js',
-// 'mode/boss.js',
-// 'mode/chess.js',
-// 'mode/guozhan.js',
-// 'mode/identity.js',
-// 'mode/stone.js',
-// 'mode/versus.js',
-// 'game/game.js',

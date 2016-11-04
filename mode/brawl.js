@@ -150,6 +150,7 @@ mode.brawl={
                             if(bool&&level.index+1<stage.scenes.length){
                                 ui.create.control('下一关',function(){
                                     game.save('directStage',[stage.name,level.index+1],'brawl');
+                                    localStorage.setItem(lib.configprefix+'directstart',true);
                                     game.reload();
                                 });
                                 if(level.index+1>stage.level){
@@ -168,6 +169,7 @@ mode.brawl={
                                     else{
                                         game.save('directStage',[stage.name,level.index],'brawl');
                                     }
+                                    localStorage.setItem(lib.configprefix+'directstart',true);
                                     game.reload();
                                 });
                                 if(stage.mode=='sequal'&&level.index==stage.scenes.length-1){

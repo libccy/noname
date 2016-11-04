@@ -1870,6 +1870,10 @@ span[data-color="unknownm"]{
 .menubutton.large.disabled{
 	opacity: 0.5;
 }
+.menubutton.large.smallfont{
+	font-size: 22px !important;
+	text-indent: -2px;
+}
 .config>.toggle.onoff>div>div{
 	width:8px;
 	height:8px;
