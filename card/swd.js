@@ -145,6 +145,7 @@ card.swd={
 						}
 					}
 				}
+				list.remove('fengyinzhidan');
 				'step 1'
 				var list=event.list;
 				while(list.length){
@@ -1905,9 +1906,9 @@ card.swd={
 			intro:{
 				content:function(storage,player){
 					if(storage==1){
-						'在'+get.translation(player.storage.gouhunluo2)+'的下个回合开始时失去两点体力'
+						'在'+get.translation(player.storage.gouhunluo2)+'的下个回合开始时失去一点体力并弃置所有装备牌'
 					}
-					return '在'+storage+'轮后'+get.translation(player.storage.gouhunluo2)+'的回合开始时失去两点体力'
+					return '在'+storage+'轮后'+get.translation(player.storage.gouhunluo2)+'的回合开始时失去一点体力并弃置所有装备牌'
 				}
 			},
 			nopop:true,
@@ -1922,7 +1923,11 @@ card.swd={
 				player.storage.gouhunluo--;
 				if(player.storage.gouhunluo<=0){
 					player.logSkill('gouhunluo');
-					player.loseHp(2);
+					player.loseHp();
+					var es=player.get('e');
+					if(es.length){
+						player.discard(es);
+					}
 					player.removeSkill('gouhunluo');
 					delete player.storage.gouhunluo;
 					delete player.storage.gouhunluo2;
@@ -4263,7 +4268,7 @@ card.swd={
 		xuejibingbao:'雪肌冰鲍',
 		xuejibingbao_info:'出牌阶段对一名角色使用，该角色摸牌阶段摸牌数+1，持续2个回合',
 		gouhunluo:'勾魂锣',
-		gouhunluo_info:'出牌阶段对一名角色使用，在3轮后你的回合开始时令该角色失去2点体力，若你死亡则失效',
+		gouhunluo_info:'出牌阶段对一名角色使用，在3轮后你的回合开始时令该角色失去1点体力并弃置所有装备牌，若你死亡则失效',
 		jiguan:'机关',
 		jiqi:'祭器',
 		qinglongzhigui:'青龙之圭',
@@ -4459,9 +4464,11 @@ card.swd={
 		chilongya:'赤龙牙',
 		chilongya_info:'锁定技，你的火属性伤害+1',
 		daihuofenglun:'带火风轮',
+		daihuofenglun_ab:'风轮',
 		daihuofenglun_bg:'轮',
 		daihuofenglun_info:'你与其他角色的距离-2，其他角色与你的距离-1',
 		xiayuncailing:'霞云彩绫',
+		xiayuncailing_ab:'彩绫',
 		xiayuncailing_bg:'云',
 		xiayuncailing_info:'你与其他角色的距离+1，其他角色与你的距离+2',
 		shentoumianju:'神偷面具',

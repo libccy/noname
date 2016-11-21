@@ -1,37 +1,11 @@
 window.noname_update={
     version:'1.9.2.2',
     changeLog:[
-        'bug修复',
+        '新虎牢关、武将修改',
     ],
     files:{
         global:[
-            'card/swd.js',
-            'card/guozhan.js',
-            'card/hearth.js',
-            'card/yunchou.js',
-            'game/package.js',
-            'game/asset.js',
-            'game/game.js',
-            'character/diy.js',
-            'character/swd.js',
-            'character/sp.js',
-            'character/hearth.js',
-            'character/xianjian.js',
-            'character/shenhua.js',
-            'character/ow.js',
-            'character/yijiang.js',
-            'character/yxs.js',
-            'mode/boss.js',
-            'mode/versus.js',
-            'mode/brawl.js',
-            'mode/stone.js',
-            'extension/boss/extension.js',
-            'layout/mode/boss.css',
-            'layout/default/layout.css',
-            'layout/newlayout/global.css',
+
         ],
-        '1.9.1.2':[],
-        '1.9.2':[],
-        '1.9.2.1':[],
     }
 }

@@ -289,42 +289,42 @@
 }
 
 div[data-career='mage']{
-    background-image: url('../../../image/class/mage.png');
+    background-image: url('../../../image/mode/stone/career/mage.png');
     background-size:cover;
 }
 div[data-career='druid']{
-    background-image: url('../../../image/class/druid.png');
+    background-image: url('../../../image/mode/stone/career/druid.png');
     background-size:cover;
 }
 div[data-career='hunter']{
-    background-image: url('../../../image/class/hunter.png');
+    background-image: url('../../../image/mode/stone/career/hunter.png');
     background-size:cover;
 }
 div[data-career='shaman']{
-    background-image: url('../../../image/class/shaman.png');
+    background-image: url('../../../image/mode/stone/career/shaman.png');
     background-size:cover;
 }
 div[data-career='paladin']{
-    background-image: url('../../../image/class/paladin.png');
+    background-image: url('../../../image/mode/stone/career/paladin.png');
     background-size:cover;
 }
 div[data-career='rogue']{
-    background-image: url('../../../image/class/rogue.png');
+    background-image: url('../../../image/mode/stone/career/rogue.png');
     background-size:cover;
 }
 div[data-career='priest']{
-    background-image: url('../../../image/class/priest.png');
+    background-image: url('../../../image/mode/stone/career/priest.png');
     background-size:cover;
 }
 div[data-career='warrior']{
-    background-image: url('../../../image/class/warrior.png');
+    background-image: url('../../../image/mode/stone/career/warrior.png');
     background-size:cover;
 }
 div[data-career='warlock']{
-    background-image: url('../../../image/class/warlock.png');
+    background-image: url('../../../image/mode/stone/career/warlock.png');
     background-size:cover;
 }
 div[data-career='knight']{
-    background-image: url('../../../image/class/knight.png');
+    background-image: url('../../../image/mode/stone/career/knight.png');
     background-size:cover;
 }

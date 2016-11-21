@@ -6269,10 +6269,12 @@ character.yijiang={
 				return false;
 			},
 			filter:function(event,player){
-				return event.source&&event.source!=player;
+				return event.source&&event.source!=player&&event.num>0&&event.source.isAlive();
 			},
 			content:function(){
 				"step 0"
+				event.num=trigger.num;
+				"step 1"
 				trigger.source.chooseCard('交给'+get.translation(player)+'一张手牌或流失一点体力').set('ai',function(card){
 					if(ai.get.attitude(_status.event.player,_status.event.getParent().player)>0){
 						return 11-ai.get.value(card);
@@ -6281,13 +6283,17 @@ character.yijiang={
 						return 7-ai.get.value(card);
 					}
 				});
-				"step 1"
+				"step 2"
 				if(result.bool){
 					player.gain(result.cards[0]);
 					trigger.source.$give(1,player);
 				}
 				else{
 					trigger.source.loseHp();
+				}
+				if(event.num>1){
+					event.num--;
+					event.goto(1);
 				}
 			},
 			ai:{
@@ -7307,6 +7313,8 @@ character.yijiang={
 		sidi2:'司敌',
 		sidi3:'司敌',
 		sidi_info:'每当你使用或其他角色在你的回合内使用闪时，你可以将牌堆顶的一张牌正面向上置于你的武将牌上；一名其他角色的出牌阶段开始时，你可以将你武将牌上的一张牌置入弃牌堆，然后该角色本阶段可使用杀的次数上限-1',
+		xinsidi:'司敌',
+		xinsidi_info:'其他角色出牌阶段开始时，你可以弃置一张与你装备区里的牌颜色相同的非基本牌，然后该角色于此阶段内不能使用和打出与此牌颜色相同的牌。此阶段结束时，若其此阶段没有使用【杀】，视为你对其使用了【杀】',
 		dangxian:'当先',
 		dangxian_info:'锁定技，回合开始时，你执行一个额外的出牌阶段',
 		longyin:'龙吟',

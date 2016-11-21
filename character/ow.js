@@ -660,6 +660,9 @@ character.ow={
 					return false;
 				}
 			},
+            ai:{
+                threaten:0.6
+            }
         },
         zhiyuan:{
             trigger:{source:'damageBefore'},
