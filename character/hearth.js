@@ -2703,6 +2703,21 @@ character.hearth={
 			}
 		},
 		yanshu:{
+			trigger:{player:'discardAfter'},
+			frequent:true,
+			usable:1,
+			filter:function(event,player){
+				if(!event.cards) return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(get.type(event.cards[i])!='basic') return true;
+				}
+				return false;
+			},
+			content:function(){
+				player.gain(game.createCard('liuxinghuoyu','red'),'gain2');
+			},
+		},
+		yanshu_old:{
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
@@ -4838,7 +4853,7 @@ character.hearth={
 		lianzhan:'连斩',
 		lianzhan_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
 		yanshu:'炎术',
-		yanshu_info:'出牌阶段限一次，你可以弃置一张非基本牌，并获得一张流星火雨',
+		yanshu_info:'每回合限一次，当你弃置非基本牌后，你可以获得一张流星火雨',
 		bingshuang:'冰霜',
 		bingshuang_info:'你使用锦囊牌造成伤害后，可令目标摸两张牌并翻面',
 		shengyan:'圣言',

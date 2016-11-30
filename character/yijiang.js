@@ -44,12 +44,12 @@ character.yijiang={
 		xiahoushi:['female','shu',3,['qiaoshi','yanyu']],
 
 		panzhangmazhong:['male','wu',4,['anjian','duodao']],
-		zhoucang:['male','shu',4,['zhongyong']],
+		zhoucang:['male','shu',4,['xinzhongyong']],
 		guanping:['male','shu',4,['longyin']],
 		liaohua:['male','shu',4,['dangxian','fuli']],
 		chengpu:['male','wu',4,['lihuo','chunlao']],
 		gaoshun:['male','qun',4,['xianzhen','jinjiu']],
-		caozhen:['male','wei',4,['sidi']],
+		caozhen:['male','wei',4,['xinsidi']],
 		wuyi:['male','shu',4,['benxi']],
 		hanhaoshihuan:['male','wei',4,['shenduan','yonglve']],
 
@@ -97,6 +97,103 @@ character.yijiang={
 		liuchen:['liushan'],
 	},
 	skill:{
+		xinsidi:{
+			trigger:{global:'phaseUseBegin'},
+			direct:true,
+			filter:function(event,player){
+				if(event.player==player) return false;
+				var hs=player.get('h');
+				if(!hs.length) return false;
+				var es=player.get('e');
+				if(!es.length) return false;
+				var color=[];
+				for(var i=0;i<es.length;i++){
+					color.add(get.color(es[i]));
+				}
+				if(color.length==2) return true;
+				color=color[0];
+				for(var i=0;i<hs.length;i++){
+					if(get.color(hs[i])==color) return true;
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				var goon=true;
+				if(ai.get.attitude(player,trigger.player)>=-0.8) goon=false;
+				else if(trigger.player.num('h')<=3) goon=false;
+				else if(player.num('h','shan')==0) goon=false;
+				var es=player.get('e');
+				var color=[];
+				for(var i=0;i<es.length;i++){
+					color.add(get.color(es[i]));
+				}
+				if(color.length==2) color='all';
+				else color=color[0];
+				player.chooseToDiscard(get.prompt('xinsidi',trigger.player),function(card){
+					if(_status.event.color=='all') return true;
+					return get.color(card)==_status.event.color;
+				}).set('ai',function(card){
+					if(_status.event.goon) return 6-ai.get.value(card);
+					return 0;
+				}).set('goon',goon).set('color',color).set('logSkill',['xinsidi',trigger.player]);
+				'step 1'
+				if(result.bool){
+					trigger.player.addSkill('xinsidi2');
+					trigger.player.storage.xinsidi2=get.color(result.cards[0]);
+					trigger.player.storage.xinsidi4=player;
+					trigger.player.syncStorage('xinsidi2');
+				}
+			}
+		},
+		xinsidi2:{
+			mark:true,
+			group:['xinsidi2_sha','xinsidi2_end'],
+			subSkill:{
+				sha:{
+					trigger:{player:'shaBegin'},
+					forced:true,
+					popup:false,
+					content:function(){
+						player.storage.xinsidi3=true;
+					}
+				},
+				end:{
+					trigger:{player:'phaseUseAfter'},
+					forced:true,
+					popup:false,
+					audio:false,
+					content:function(){
+						if(!player.storage.xinsidi3&&player.storage.xinsidi4.isAlive()){
+							player.useCard({name:'sha'},player.storage.xinsidi4);
+						}
+						delete player.storage.xinsidi2;
+						delete player.storage.xinsidi3;
+						delete player.storage.xinsidi4;
+						player.removeSkill('xinsidi2');
+					}
+				}
+			},
+			mod:{
+				cardEnabled:function(card,player){
+					if(get.color(card)==player.storage.xinsidi2) return false;
+				},
+				cardUsable:function(card,player){
+					if(get.color(card)==player.storage.xinsidi2) return false;
+				},
+				cardRespondable:function(card,player){
+					if(get.color(card)==player.storage.xinsidi2) return false;
+				},
+				cardSavable:function(card,player){
+					if(get.color(card)==player.storage.xinsidi2) return false;
+				}
+			},
+			intro:{
+				content:function(color){
+					return '不能使用或打出'+get.translation(color)+'的牌';
+				}
+			}
+		},
 		taoluan:{
 			enable:'phaseUse',
 			filter:function(event,player){
@@ -2026,6 +2123,59 @@ character.yijiang={
 				}
 			}
 		},
+		xinzhongyong:{
+			trigger:{player:'shaMiss'},
+			direct:true,
+			filter:function(event,player){
+				return event.responded&&get.itemtype(event.cards)=='cards'&&get.itemtype(event.responded.cards)=='cards';
+			},
+			content:function(){
+				"step 0"
+				event.cards1=trigger.cards.slice(0);
+				event.cards2=trigger.responded.cards.slice(0);
+				player.chooseTarget('忠勇：将杀或闪交给一名其他角色',function(card,player,target){
+					return target!=_status.event.getTrigger().target&&target!=player;
+				}).set('ai',function(target){
+					return ai.get.attitude(_status.event.player,target);
+				});
+				"step 1"
+				if(result.bool){
+					var sha=false;
+					if(event.cards1.length==1&&get.color(event.cards1[0])=='red'){
+						sha=true;
+					}
+					player.chooseControl('杀','闪',function(event,player){
+						if(_status.event.choosesha) return '杀';
+						return '闪';
+					}).set('prompt','选择交给'+get.translation(result.targets)+'的牌').set('choosesha',sha);
+					event.target=result.targets[0];
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				player.logSkill('zhongyong',event.target);
+				event.sha=false;
+				if(result.control=='杀'){
+					event.target.gain(event.cards1,'gain2');
+					if(event.cards1.length==1&&get.color(event.cards1[0])=='red'){
+						event.sha=true;
+					}
+				}
+				else{
+					event.target.gain(event.cards2,'gain2');
+					if(event.cards2.length==1&&get.color(event.cards2[0])=='red'){
+						event.sha=true;
+					}
+				}
+				"step 3"
+				if(event.sha){
+					event.target.chooseToUse('是否使用一张杀？',{name:'sha'}).set('filterTarget',function(card,player,target){
+						return target!=_status.event.source&&get.distance(_status.event.source,target,'attack')<=1&&player.canUse('sha',target,false);
+					}).set('source',player);
+				}
+			}
+		},
 		dangxian:{
 			trigger:{player:'phaseBegin'},
 			forced:true,
@@ -2763,7 +2913,7 @@ character.yijiang={
 				if(event.responded) return false;
 				if(!player.hasZhuSkill('qinwang')) return false;
 				if(!player.num('he')) return false;
-				if(event.filterCard({name:'sha'})==false) return false;
+				if(event.filterCard({name:'sha'},player,event)==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='shu') return true;
 				}
@@ -2834,7 +2984,7 @@ character.yijiang={
 			audio:2,
 			enable:'chooseToUse',
 			filter:function(event,player){
-				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
+				if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
 				if(!player.hasZhuSkill('qinwang')) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].group=='shu'&&game.players[i]!=player){
@@ -4083,7 +4233,7 @@ character.yijiang={
 			},
 			intro:{
 				content:function(color){
-					return '不能使用或打出'+get.translation(color)+'的手牌';
+					return '不能使用或打出'+get.translation(color)+'的牌';
 				}
 			}
 		},
@@ -7314,6 +7464,7 @@ character.yijiang={
 		sidi3:'司敌',
 		sidi_info:'每当你使用或其他角色在你的回合内使用闪时，你可以将牌堆顶的一张牌正面向上置于你的武将牌上；一名其他角色的出牌阶段开始时，你可以将你武将牌上的一张牌置入弃牌堆，然后该角色本阶段可使用杀的次数上限-1',
 		xinsidi:'司敌',
+		xinsidi2:'司敌',
 		xinsidi_info:'其他角色出牌阶段开始时，你可以弃置一张与你装备区里的牌颜色相同的非基本牌，然后该角色于此阶段内不能使用和打出与此牌颜色相同的牌。此阶段结束时，若其此阶段没有使用【杀】，视为你对其使用了【杀】',
 		dangxian:'当先',
 		dangxian_info:'锁定技，回合开始时，你执行一个额外的出牌阶段',
@@ -7321,6 +7472,8 @@ character.yijiang={
 		longyin_info:'每当一名角色在其出牌阶段使用【杀】时，你可弃置一张牌令此【杀】不计入出牌阶段使用次数，若此【杀】为红色，你摸一张牌',
 		zhongyong:'忠勇',
 		zhongyong_info:'当你于出牌阶段内使用的【杀】被目标角色使用的【闪】抵消时，你可以将此【闪】交给除该角色外的一名角色。若获得此【闪】的角色不是你，你可以对相同的目标再使用一张【杀】',
+		xinzhongyong:'忠勇',
+		xinzhongyong_info:'当你使用的【杀】结算完毕后，你可以将此【杀】或目标角色使用的【闪】交给一名该角色以外的其他角色，以此法获得红色牌的角色可以对你攻击范围内的角色使用一张【杀】',
 		jigong:'急攻',
 		jigong_info:'出牌阶段开始时，你可以摸两张牌。若如此做，此回合你的手牌上限改为X(X为你此阶段造成的伤害数)',
 		shifei:'饰非',

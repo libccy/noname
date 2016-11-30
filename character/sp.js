@@ -2281,7 +2281,10 @@ character.sp={
 						}
 					}
 				},
-				threaten:1.2
+				threaten:function(player,target){
+					if(target.storage.yinbing&&target.storage.yinbing.length) return 2;
+					return 1;
+				}
 			},
 			subSkill:{
 				discard:{
@@ -2322,7 +2325,10 @@ character.sp={
 					return player.hp>=target.hp;
 				}).set('ai',function(target){
 					var player=_status.event.player;
-					if(target==player) return 0.5;
+					if(target==player){
+						if(player.num('h')>=player.maxHp) return 0;
+						return 0.5;
+					}
 					var att=ai.get.attitude(player,target);
 					if(att<2) return 0;
 					if(target.hp==1&&att>2){
@@ -2343,7 +2349,8 @@ character.sp={
 					player.logSkill('juedi',result.targets);
 					if(result.targets[0]==player){
 						player.$throw(player.storage.yinbing,1000);
-						player.draw(player.storage.yinbing.length);
+						var num=player.maxHp-player.num('h');
+						if(num>0) player.draw(num);
 						while(player.storage.yinbing.length){
 							ui.discardPile.appendChild(player.storage.yinbing.shift());
 						}
@@ -2355,6 +2362,7 @@ character.sp={
 						game.log(target,'获得了',player.storage.yinbing);
 						target.recover();
 						target.gain(player.storage.yinbing.slice(0),'gain2');
+						target.draw(player.storage.yinbing.length);
 						player.storage.yinbing.length=0;
 					}
 					player.syncStorage('yinbing');
@@ -6607,7 +6615,7 @@ character.sp={
 		yinbing:'引兵',
 		yinbing_info:'结束阶段开始时，你可以将至少一张非基本牌置于武将牌上。每当你受到【杀】或【决斗】的伤害后，你将一张“引兵牌”置入弃牌堆。',
 		juedi:'绝地',
-		juedi_info:'准备阶段开始时，若你有“引兵牌”，你可以选择一项：1.将这些牌置入弃牌堆并摸等量的牌；2.令一名体力值不大于你的其他角色回复1点体力并获得这些牌',
+		juedi_info:'锁定技，准备阶段，你选择一项：1.移去“引兵”牌，将手牌补至体力上限数；2.将“引兵”牌交给一名体力值不大于你的其他角色，其回复1点体力，摸等量的牌',
 		kuangfu:'狂斧',
 		kuangfu_info:'每当你使用杀造成伤害，可以将对方的一张装备牌移到你的装备区',
 		xintan:'心惔',

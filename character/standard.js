@@ -573,7 +573,7 @@ character.standard={
 				if(event.responded) return false;
 				if(player.storage.jijianging) return false;
 				if(!player.hasZhuSkill('jijiang')) return false;
-				if(event.filterCard({name:'sha'})==false) return false;
+				if(event.filterCard({name:'sha'},player,event)==false) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i].group=='shu') return true;
 				}
@@ -622,7 +622,7 @@ character.standard={
 			audioname:['liushan'],
 			enable:'chooseToUse',
 			filter:function(event,player){
-				if(event.filterCard&&!event.filterCard({name:'sha'},player)) return false;
+				if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
 				if(!player.hasZhuSkill('jijiang')) return false;
 				if(player.hasSkill('jijiang3')) return false;
 				for(var i=0;i<game.players.length;i++){
