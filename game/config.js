@@ -190,6 +190,7 @@ window.config={
 		auto:'托管'
 	},
 
+	game:'sgs',
 	duration:500,
 	hoveration:1000,
 	cheat:false,

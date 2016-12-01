@@ -1,11 +1,12 @@
 window.noname_update={
-    version:'1.9.3',
+    version:'1.9.3.1',
     changeLog:[
-        '新虎牢关、武将修改',
+        'bug修复',
     ],
     files:{
         global:[
-
+            'game/config.js'
         ],
+        '1.9.3':[],
     }
 }
