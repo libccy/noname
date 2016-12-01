@@ -412,7 +412,8 @@ mode.boss={
 			boss_liang:['female','qun',5,['boss_guimei','boss_guihuo','boss_minbao','boss_bianshen2'],['hiddenboss','bossallowed']],
 
 			boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['boss','bossallowed'],'wei'],
-			boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['hiddenboss','bossallowed'],'qun'],
+			boss_lvbu2:['male','qun',4,['mashu','wushuang','xiuluo','shenwei','shenji'],['hiddenboss','bossallowed'],'qun'],
+			boss_lvbu3:['male','qun',4,['wushuang','shenqu','jiwu'],['hiddenboss','bossallowed'],'qun'],
 			boss_caiwenji:['female','qun',4,['beige','boss_hujia','boss_guihan'],['boss','bossallowed'],'wei'],
 			boss_zhangjiao:['male','qun',8,['boss_leiji','tiandao','jidian'],['boss','bossallowed'],'shu'],
 			boss_zuoci:['male','qun',0,['huanhua'],['boss','bossallowed'],'shu'],
@@ -2649,6 +2650,39 @@ mode.boss={
 				noh:true,
 			}
 		},
+		xiuluo:{
+			audio:2,
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('j')>0;
+			},
+			content:function(){
+				"step 0"
+				player.chooseToDiscard(2,'hj',function(card){
+					if(ui.selected.cards.length==0) return true;
+					if(get.position(ui.selected.cards[0])=='h'){
+						if(get.position(card)!='j') return false;
+					}
+					if(get.position(ui.selected.cards[0])=='j'){
+						if(get.position(card)!='h') return false;
+					}
+					return get.suit(card)==get.suit(ui.selected.cards[0])
+				},'是否一张手牌来弃置一张花色相同的判定牌？').ai=function(card){
+					if(get.position(card)=='h'){
+						return 11-ai.get.value(card);
+					}
+					if(card.name=='lebu') return 5;
+					if(card.name=='bingliang') return 4;
+					if(card.name=='guiyoujie') return 3;
+					return 2;
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('xiuluo');
+				}
+			}
+		},
 		shangshix2:{
 			trigger:{player:'phaseEnd'},
 			forced:true,
@@ -2678,11 +2712,11 @@ mode.boss={
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
 			content:function(){
-				trigger.num+=Math.max(2,game.players.length-1);
+				trigger.num+=3;
 			},
 			mod:{
 				maxHandcard:function(player,current){
-					return current+Math.max(2,game.players.length-1);
+					return current+3;
 				}
 			}
 		},
@@ -2691,25 +2725,78 @@ mode.boss={
 			mod:{
 				selectTarget:function(card,player,range){
 					if(range[1]==-1) return;
-					if(card.name=='sha'||card.name=='juedou') range[1]=3;
+					if(player.get('e','1')) return;
+					if(card.name=='sha') range[1]+=2;
 				},
+				cardUsable:function(card,player,num){
+					if(player.get('e','1')) return;
+					if(card.name=='sha') return num+1;
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(get.subtype(card)=='equip1') return -1;
+					}
+				}
 			}
 		},
 		boss_baonu:{
 			unique:true,
 			group:'boss_baonu2',
-			trigger:{player:'changeHp'},
+			trigger:{player:'changeHp',global:'boss_baonuwash'},
 			forced:true,
 			priority:100,
 			audio:2,
 			mode:['identity','guozhan','boss','stone'],
+			init:function(){
+				if(get.mode()=='boss'){
+					lib.onwash.push(function(){
+						if(!_status.boss_baonuwash){
+							_status.boss_baonuwash=true;
+							_status.event.parent.trigger('boss_baonuwash');
+						}
+					});
+					_status.maxShuffle=2;
+					_status.maxShuffleCheck=function(){
+						return game.me==game.boss;
+					}
+					for(var i in lib.card){
+						if(lib.card[i].subtype=='equip1') lib.card[i].chongzhu=true;
+					}
+				}
+			},
 			filter:function(event,player){
-				return player.hp<=4
+				return player.hp<=4||_status.boss_baonuwash;
 			},
 			content:function(){
-				player.init('boss_lvbu2');
+				'step 0'
+				if(player.hp>4){
+					game.delay();
+				}
+				'step 1'
+				player.chooseControl('暴怒战神','神鬼无前',function(){
+					if(Math.random()<0.5) return '神鬼无前';
+					return '暴怒战神';
+				}).set('prompt','选择一个形态');
+				'step 2'
+				var hp=player.hp;
+				if(result.control=='暴怒战神'){
+					player.init('boss_lvbu2');
+				}
+				else{
+					player.init('boss_lvbu3');
+				}
+				if(hp>4){
+					player.maxHp=hp;
+					player.hp=hp;
+				}
 				player.update();
 				ui.clear();
+				if(player.isLinked()) player.link();
+				if(player.isTurnedOver()) player.turnOver();
+				player.discard(player.get('ej'));
+				'step 3'
 				while(_status.event.name!='phaseLoop'){
 					_status.event=_status.event.parent;
 				}
@@ -2798,6 +2885,103 @@ mode.boss={
                 threaten:1.3
             }
         },
+		shenqu:{
+			group:'shenqu2',
+			trigger:{global:'phaseBegin'},
+			filter:function(event,player){
+				return player.num('h')<=player.maxHp;
+			},
+			frequent:true,
+			content:function(){
+				player.draw(2);
+			}
+		},
+		shenqu2:{
+			trigger:{player:'damageAfter'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h','tao')>0;
+			},
+			content:function(){
+				player.chooseToUse({name:'tao'},'神躯：是否使用一张桃？').logSkill='shenqu';
+			}
+		},
+		jiwu:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.num('h')==0) return false;
+				if(!player.hasSkill('qiangxi')) return true;
+				if(!player.hasSkill('lieren')) return true;
+				if(!player.hasSkill('xuanfeng')) return true;
+				if(!player.hasSkill('wansha')) return true;
+				return false;
+			},
+			filterCard:true,
+			check:function(card){
+				return 7-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				var list=[];
+				if(!player.hasSkill('qiangxi')) list.push('qiangxi');
+				if(!player.hasSkill('lieren')) list.push('lieren');
+				if(!player.hasSkill('xuanfeng')) list.push('xuanfeng');
+				if(!player.hasSkill('wansha')) list.push('wansha');
+				if(list.length==1){
+					player.addTempSkill(list[0],'phaseAfter');
+					event.finish();
+				}
+				else{
+					player.chooseControl(list,function(){
+						if(!player.getStat().skill.qiangxi){
+							if(player.hasSkill('qiangxi')&&player.get('e','1')&&list.contains('xuanfeng')) return 'xuanfeng';
+							if(list.contains('wansha')||list.contains('qiangxi')){
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].hp==1&&ai.get.attitude(player,game.players[i])<0){
+										if(list.contains('wansha')) return 'wansha';
+										if(list.contains('qiangxi')) return 'qiangxi';
+									}
+								}
+							}
+						}
+						if(list.contains('xuanfeng')) return 'xuanfeng';
+						if(list.contains('qiangxi')) return 'qiangxi';
+						if(list.contains('wansha')) return 'wansha';
+						return 'lieren';
+					}).set('prompt','选择获得一项技能直到回合结束');
+				}
+				'step 1'
+				player.addTempSkill(result.control,'phaseAfter');
+				player.popup(get.translation(result.control));
+			},
+			ai:{
+				order:function(){
+					var player=_status.event.player;
+					if(!player.getStat().skill.qiangxi){
+						if(player.hasSkill('qiangxi')&&player.get('e','1')&&!player.hasSkill('xuanfeng')) return 10;
+						if(player.hasSkill('wansha')) return 1;
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].hp==1&&ai.get.attitude(player,game.players[i])<0) return 10;
+						}
+					}
+					return 1;
+				},
+				result:{
+					player:function(player){
+						if(!player.getStat().skill.qiangxi){
+							if(player.hasSkill('qiangxi')&&player.get('e','1')&&!player.hasSkill('xuanfeng')) return 1;
+							if(!player.hasSkill('wansha')||!player.hasSkill('qiangxi')){
+								for(var i=0;i<game.players.length;i++){
+									if(game.players[i].hp==1&&ai.get.attitude(player,game.players[i])<0) return 1;
+								}
+							}
+						}
+						if(!player.hasSkill('xuanfeng')&&player.needsToDiscard()>=3) return 1;
+						return 0;
+					}
+				}
+			}
+		}
 	},
 	translate:{
 		zhu:'神',
@@ -2829,6 +3013,7 @@ mode.boss={
 		boss_dongzhuo:'乱世魔王',
 		boss_lvbu1:'最强神话',
 		boss_lvbu2:'暴怒战神',
+		boss_lvbu3:'神鬼无前',
 		boss_zhouyu:'赤壁火神',
 		boss_pangtong:'涅盘凤雏',
 		boss_zhugeliang:'祭风卧龙',
@@ -3015,9 +3200,15 @@ mode.boss={
 		boss_baonu:'暴怒',
 		boss_baonu_info:'锁定技，当你的体力值降至4或更低时，你变身为暴怒战神，并立即开始你的回合',
 		shenwei:'神威',
-		shenwei_info:'锁定技，摸牌阶段，你额外摸X张牌，你的手牌上限+X，X为敌方存活角色个数且至少为2',
+		shenwei_info:'锁定技，摸牌阶段，你额外摸3张牌，你的手牌上限+3',
 		shenji:'神戟',
-		shenji_info:'你使用的杀或决斗可指定至多3名角色为目标',
+		shenji_info:'锁定技，若你未装备武器，你使用【杀】指定的目标数上限+2，次数上限+1',
+		xiuluo:'修罗',
+		xiuluo_info:'回合开始阶段，你可以弃置一张牌，然后弃置你判定区内一张同花色的牌',
+		shenqu:'神躯',
+		shenqu_info:'每名角色的回合开始时，若你的手牌数少于或等于你的体力上限数，你可以摸两张牌；当你受到伤害后，你可以使用一张【桃】',
+		jiwu:'极武',
+		jiwu_info:'出牌阶段，你可以弃置一张手牌，然后获得一项：“强袭”、“烈刃”、“旋风”、“完杀”，直到回合结束',
 
 		mode_boss_character_config:'挑战武将',
 	},

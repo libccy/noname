@@ -685,7 +685,7 @@ card.hearth={
 		shandianjian:'闪电箭',
 		shandianjian_info:'目标角色展示一张手牌，然后若你能弃掉一张与所展示牌相同花色的手牌，则对该角色造成1点雷电伤害。',
 		shijieshu:'视界术',
-		shijieshu_info:'目标随机装备牌堆中的两张装备牌，然后弃置一张手牌',
+		shijieshu_info:'目标随机装备两张装备牌，然后弃置一张手牌',
 		zhaomingdan:'照明弹',
 		zhaomingdan_info:'观看一名其他角色的手牌，并重置其区域内的一张牌，然后摸一张牌',
 		jihuocard:'激活',

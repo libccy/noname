@@ -31,6 +31,7 @@ play.boss={
 
 				boss_lvbu1:['male','qun',8,['mashu','wushuang','boss_baonu'],['boss','bossallowed'],'wei'],
 				boss_lvbu2:['male','qun',4,['mashu','wushuang','swd_xiuluo','shenwei','shenji'],['hiddenboss','bossallowed'],'qun'],
+				boss_lvbu3:['male','qun',4,['mashu','wushuang','shenqu','jiwu'],['hiddenboss','bossallowed'],'qun'],
 				boss_caiwenji:['female','qun',4,['beige','boss_hujia','boss_guihan'],['boss','bossallowed'],'wei'],
 				boss_zhangjiao:['male','qun',8,['boss_leiji','tiandao','jidian'],['boss','bossallowed'],'shu'],
 				boss_zuoci:['male','qun',0,['huanhua'],['boss','bossallowed'],'shu'],
@@ -73,6 +74,7 @@ play.boss={
 				boss_dongzhuo:'乱世魔王',
 				boss_lvbu1:'最强神话',
 				boss_lvbu2:'暴怒战神',
+				boss_lvbu3:'神鬼无前',
 				boss_zhouyu:'赤壁火神',
 				boss_pangtong:'涅盘凤雏',
 				boss_zhugeliang:'祭风卧龙',

@@ -31774,7 +31774,12 @@
 				if(ui.cardPile.hasChildNodes()==false){
 					if(_status.maxShuffle!=undefined){
 						if(_status.maxShuffle==0){
-							game.over('平局');
+                            if(_status.maxShuffleCheck){
+                                game.over(_status.maxShuffleCheck());
+                            }
+                            else{
+                                game.over('平局');
+                            }
 							return [];
 						}
 						_status.maxShuffle--;
