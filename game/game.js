@@ -15148,7 +15148,7 @@
                             game.send('inited');
                         });
                     }
-                    if(_status.event.getParent()){
+                    if(_status.event.parent){
                         game.forceOver('noover',proceed);
                     }
                     else{
