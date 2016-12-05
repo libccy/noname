@@ -5,8 +5,12 @@ window.noname_update={
     ],
     files:{
         global:[
-            'game/config.js'
+            'game/config.js',
+            'mode/boss.js',
+            'character/yijiang.js',
+            'character/hearth.js',
         ],
         '1.9.3':[],
+        '1.9.3.1':[],
     }
 }

@@ -1995,31 +1995,31 @@
     				}
     			},
             },
-            hsmod:{
-                enable:{
-    			    name:'开启',
-    			    init:false,
-    			    restart:true,
-    			    onclick:function(bool){
-    			        if(bool){
-    			            lib.config.plays.add('hsmod');
-    			        }
-    			        else{
-    			            lib.config.plays.remove('hsmod');
-    			        }
-    			        game.saveConfig('plays',lib.config.plays);
-    			    }
-    			},
-    			hide:{
-    			    name:'隐藏此扩展',
-    			    clear:true,
-    			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('hsmod');
-    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-    				}
-    			},
-            },
+            // hsmod:{
+            //     enable:{
+    		// 	    name:'开启',
+    		// 	    init:false,
+    		// 	    restart:true,
+    		// 	    onclick:function(bool){
+    		// 	        if(bool){
+    		// 	            lib.config.plays.add('hsmod');
+    		// 	        }
+    		// 	        else{
+    		// 	            lib.config.plays.remove('hsmod');
+    		// 	        }
+    		// 	        game.saveConfig('plays',lib.config.plays);
+    		// 	    }
+    		// 	},
+    		// 	hide:{
+    		// 	    name:'隐藏此扩展',
+    		// 	    clear:true,
+    		// 	    onclick:function(){
+            //             this.innerHTML='此扩展将在重启后隐藏';
+    		// 			lib.config.hiddenPlayPack.add('hsmod');
+    		// 			game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    		// 		}
+    		// 	},
+            // },
         },
 		mode:{
 			identity:{
@@ -6877,16 +6877,27 @@
 						return;
 					}
 					if(event.isMine()){
-						event.controlbar=ui.create.control(event.controls);
-						if(event.dialog){
-                            if(Array.isArray(event.dialog)){
-                                event.dialog=ui.create.dialog.apply(this,event.dialog);
+                        if(event.dialogcontrol){
+                            event.dialog=ui.create.dialog(event.prompt||'选择一项','hidden');
+                            for(var i=0;i<event.controls.length;i++){
+                                var item=event.dialog.add('<div class="popup" style="width:calc(100% - 10px);display:inline-block">'+event.controls[i]+'</div>');
+        						item.firstChild.listen(ui.click.dialogcontrol);
+        						item.firstChild.link=event.controls[i];
                             }
-							event.dialog.open();
-						}
-						else if(event.prompt){
-							event.dialog=ui.create.dialog(event.prompt);
-						}
+                            event.dialog.open();
+                        }
+                        else{
+                            event.controlbar=ui.create.control(event.controls);
+    						if(event.dialog){
+                                if(Array.isArray(event.dialog)){
+                                    event.dialog=ui.create.dialog.apply(this,event.dialog);
+                                }
+    							event.dialog.open();
+    						}
+    						else if(event.prompt){
+    							event.dialog=ui.create.dialog(event.prompt);
+    						}
+                        }
 						game.pause();
                         game.countChoose();
                         event.choosing=true;
@@ -6907,6 +6918,7 @@
 						}
 						else event.result.control=event.controls[event.choice];
                     }
+                    event.result.index=event.controls.indexOf(event.result.control);
                     event.choosing=false;
 					_status.imchoosing=false;
 					if(event.dialog&&event.dialog.close) event.dialog.close();
@@ -9948,7 +9960,10 @@
 					var next=game.createEvent('chooseControl');
 					next.controls=[];
 					for(var i=0;i<arguments.length;i++){
-						if(typeof arguments[i]=='string'){
+                        if(arguments[i]=='dialogcontrol'){
+                            next.dialogcontrol=true;
+                        }
+						else if(typeof arguments[i]=='string'){
 							next.controls.push(arguments[i]);
 						}
 						else if(get.objtype(arguments[i])=='array'){
@@ -30292,6 +30307,16 @@
 					game.resume();
 				}
 			},
+            dialogcontrol:function(){
+				_status.event.result={
+					buttons:ui.selected.buttons.slice(0),
+					cards:ui.selected.cards.slice(0),
+					targets:ui.selected.targets.slice(0),
+					control:this.link,
+					links:get.links(ui.selected.buttons)
+				};
+				game.resume();
+            },
 			skill:function(skill){
 				var info=get.info(skill);
 				var event=_status.event;

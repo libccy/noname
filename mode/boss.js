@@ -2741,6 +2741,14 @@ mode.boss={
 				}
 			}
 		},
+		boss_baonuwash:{
+			trigger:{player:'phaseAfter'},
+			forced:true,
+			content:function(){
+				game.over(game.me==game.boss);
+			},
+			temp:true,
+		},
 		boss_baonu:{
 			unique:true,
 			group:'boss_baonu2',
@@ -2756,11 +2764,10 @@ mode.boss={
 							_status.boss_baonuwash=true;
 							_status.event.parent.trigger('boss_baonuwash');
 						}
+						else{
+							_status.event.player.addSkill('boss_baonuwash');
+						}
 					});
-					_status.maxShuffle=2;
-					_status.maxShuffleCheck=function(){
-						return game.me==game.boss;
-					}
 					for(var i in lib.card){
 						if(lib.card[i].subtype=='equip1') lib.card[i].chongzhu=true;
 					}

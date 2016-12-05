@@ -117,6 +117,9 @@ character.yijiang={
 				}
 				return false;
 			},
+			ai:{
+				threaten:1.5
+			},
 			content:function(){
 				'step 0'
 				var goon=true;
@@ -165,7 +168,7 @@ character.yijiang={
 					audio:false,
 					content:function(){
 						if(!player.storage.xinsidi3&&player.storage.xinsidi4.isAlive()){
-							player.useCard({name:'sha'},player.storage.xinsidi4);
+							player.storage.xinsidi4.useCard({name:'sha'},player);
 						}
 						delete player.storage.xinsidi2;
 						delete player.storage.xinsidi3;

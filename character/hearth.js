@@ -75,17 +75,17 @@ character.hearth={
 		// hs_nzoth:['male','shu',4,['nuyan']],
 		hs_walian:['male','shu',4,['wzhanyi']],
 		// hs_pengpeng:['male','qun',4,['zhadan']],
-
+		// hs_yashaji:['male','wei',3,[]],
 		// hs_wolazi:['male','wei',3,[]],
+
 		// hs_tanghangu:['male','wei',3,[]],
 		// hs_aya:['male','wei',3,[]],
 		// hs_barnes:['male','wei',3,[]],
 		// hs_nuogefu:['male','wei',3,[]],
-		// hs_kazhakusi:['male','wei',3,[]],
+		hs_kazhakusi:['male','shu',3,['lianjin']],
 		// hs_lazi:['male','wei',3,[]],
-		// hs_shaku:['male','wei',3,[]],
-		// hs_laxiao:['male','wei',3,[]],
-		// hs_yashaji:['male','wei',3,[]],
+		hs_shaku:['male','wei',3,['shouji']],
+		hs_laxiao:['male','qun',3,['guimou','yingxi']],
 		// hs_xiangyaqishi:['male','wei',3,[]],
 	},
 	perfectPair:{
@@ -95,6 +95,120 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		lianjin:{
+			enable:'phaseUse',
+			usable:2,
+			filterCard:true,
+			check:function(card){
+				return 7-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				var list=get.inpile('trick');
+				list=list.randomGets(3);
+				for(var i=0;i<list.length;i++){
+					list[i]=['锦囊','',list[i]];
+				}
+				var dialog=ui.create.dialog('选择一张锦囊牌加入你的手牌',[list,'vcard'],'hidden');
+				player.chooseButton(dialog,true);
+				'step 1'
+				if(result.buttons){
+					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
+				}
+			},
+			ai:{
+				order:9,
+				result:{
+					player:1
+				}
+			}
+		},
+		shouji:{
+			group:['shouji_begin','shouji_miss'],
+			subSkill:{
+				begin:{
+					trigger:{player:'shaBegin'},
+					frequent:true,
+					filter:function(event){
+						return event.target.num('h')>0;
+					},
+					content:function(){
+						player.gain(game.createCard(trigger.target.get('h').randomGet()),'draw');
+					}
+				},
+				miss:{
+					trigger:{player:'shaMiss'},
+					frequent:true,
+					filter:function(event){
+						return event.target.num('e')>0;
+					},
+					content:function(){
+						player.gain(game.createCard(trigger.target.get('e').randomGet()),'draw');
+					}
+				}
+			}
+		},
+		yingxi:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return !player.getStat('damage')&&player.num('he',{color:'black'})>0;
+			},
+			content:function(){
+				'step 0'
+				player.chooseCardTarget({
+					prompt:get.prompt('yingxi'),
+					filterCard:{color:'black'},
+					filterTarget:function(card,player,target){
+						return lib.filter.targetEnabled({name:'sha'},player,target);
+					},
+					position:'he',
+					ai1:function(card){
+						return 8-ai.get.value(card);
+					},
+					ai2:function(target){
+						return ai.get.effect(target,{name:'sha'},player,player);
+					}
+				});
+				'step 1'
+				if(result.bool){
+					player.logSkill('yingxi',event.target);
+					player.useCard({name:'sha'},result.cards,result.targets);
+				}
+			},
+		},
+		guimou:{
+			trigger:{player:'damageEnd'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.source)<=0;
+			},
+			filter:function(event,player){
+				return event.source&&event.source.isAlive()&&event.source.num('h')>0;
+			},
+			content:function(){
+				var card=trigger.source.get('h').randomGet();
+				if(card){
+					player.gain(card);
+					if(get.color(card)=='black'){
+						trigger.source.$give(card,player);
+						event.redo();
+					}
+					else{
+						trigger.source.$give(1,player);
+					}
+					game.delay(0.5);
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(player.hasSkill('jueqing')) return [1,-2];
+						if(!target.hasFriend()) return false;
+						if(get.tag(card,'damage')) return [1,0,0,-1];
+					}
+				}
+			}
+		},
 		peiyu:{
 			enable:'phaseUse',
 			filterCard:true,
@@ -2201,20 +2315,7 @@ character.hearth={
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
 			content:function(){
-				'step 0'
-				var list=[];
-				for(var i in lib.card){
-					if(!lib.translate[i+'_info']) continue;
-					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
-					if(lib.card[i].type=='trick') list.push(['锦囊','',i]);
-				}
-				list=list.randomGets(3);
-				var dialog=ui.create.dialog('选择一张锦囊牌加入你的手牌',[list,'vcard'],'hidden');
-				player.chooseButton(dialog,true);
-				'step 1'
-				if(result.buttons){
-					player.gain(game.createCard(result.buttons[0].link[2]),'gain2');
-				}
+				player.gain(game.createCard(get.inpile('trick').randomGet()),'draw');
 			}
 		},
 		lingzhou:{
@@ -4688,6 +4789,14 @@ character.hearth={
 		hs_laxiao:'拉希奥',
 		hs_yashaji:'亚煞极',
 
+		lianjin:'炼金',
+		lianjin_info:'出牌阶段限两次，你可以弃置一张手牌，并从3张随机锦囊牌中选择一张加入手牌',
+		shouji:'收集',
+		shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制',
+		guimou:'鬼谋',
+		guimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程',
+		yingxi:'影袭',
+		yingxi_info:'回合结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用',
 		peiyu:'培育',
 		peiyu_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾',
 		wzhanyi:'战意',
@@ -4834,7 +4943,7 @@ character.hearth={
 		liehun_info:'锁定技，回合结束阶段，你获得手牌中所有非基本牌的复制',
 		malymowang:'魔网',
 		malymowang2:'魔网',
-		malymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你观看随机3张锦囊牌，并将其中一张加入你的手牌',
+		malymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你随机获得一张锦囊牌',
 		lingzhou:'灵咒',
 		lingzhou_info:'每当你使用一张锦囊牌，可令一名角色摸一张牌或回复一点体力',
 		mieshi:'灭世',
