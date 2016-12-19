@@ -34,7 +34,7 @@ card.hearthpack={
     naxx:'纳克萨玛斯',
 };
 play.pack={
-    boss:'挑战武将',
+    boss:'剑阁挑战',
     cardpile:'牌堆补充',
     character:'技能卡牌',
     soldier:'士兵模式',

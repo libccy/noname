@@ -129,6 +129,7 @@ character.hearth={
 				begin:{
 					trigger:{player:'shaBegin'},
 					frequent:true,
+					usable:1,
 					filter:function(event){
 						return event.target.num('h')>0;
 					},
@@ -139,6 +140,7 @@ character.hearth={
 				miss:{
 					trigger:{player:'shaMiss'},
 					frequent:true,
+					usable:1,
 					filter:function(event){
 						return event.target.num('e')>0;
 					},
@@ -3289,12 +3291,13 @@ character.hearth={
 			content:function(){
 				'step 0'
 				player.showCards([player.storage.bingjia],get.translation(player)+'发动了【冰甲】');
+				player.removeSkill('bingjia2');
+				game.addVideo('storage',player,['bingjia',null]);
 				'step 1'
 				ui.discardPile.appendChild(player.storage.bingjia);
 				delete player.storage.bingjia;
 				player.changeHujia();
-				player.removeSkill('bingjia2');
-				game.addVideo('storage',player,['bingjia',null]);
+				player.addTempSkill('bingjia3','phaseAfter');
 			},
 			intro:{
 				mark:function(dialog,content,player){
@@ -3311,6 +3314,28 @@ character.hearth={
 					}
 					return '已发动冰甲';
 				}
+			}
+		},
+		bingjia3:{
+			trigger:{player:'damageBefore'},
+			mark:true,
+			forced:true,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				nofire:true,
+				nothunder:true,
+				nodamage:true,
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'damage')) return [0,0];
+					}
+				},
+			},
+			intro:{
+				content:'防止所有伤害'
 			}
 		},
 		bianxing2:{},
@@ -4792,7 +4817,7 @@ character.hearth={
 		lianjin:'炼金',
 		lianjin_info:'出牌阶段限两次，你可以弃置一张手牌，并从3张随机锦囊牌中选择一张加入手牌',
 		shouji:'收集',
-		shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制',
+		shouji_info:'每回合限发动一次，每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制',
 		guimou:'鬼谋',
 		guimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程',
 		yingxi:'影袭',
@@ -5017,7 +5042,9 @@ character.hearth={
 		shengguang_info:'出牌阶段限一次，你可以弃置一张红色牌令一名角色回复一点体力',
 		bingjia:'冰甲',
 		bingjia2:'冰甲',
-		bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你将此牌置于弃牌堆，并获得一点护甲值',
+		bingjia3:'冰甲',
+		bingjia3_bg:'免',
+		bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你将此牌置于弃牌堆，获得一点护甲，并且本回合内防止所有伤害',
 		bianxing:'变形',
 		bianxing_info:'当一其他角色于回合内使用卡牌指定了惟一的其他目标后，你可以用一张合理的基本牌替代此牌，每名角色的回合限一次',
 		xianzhi:'先知',

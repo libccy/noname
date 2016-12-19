@@ -551,17 +551,12 @@ card.hearth={
 				'step 0'
 				target.recover();
 				'step 1'
-				if(target.hp<target.maxHp){
-					target.judge(function(card){
-						return get.color(card)=='red'?1:0;
-					});
-				}
-				else{
-					event.finish();
-				}
+				target.judge(function(card){
+					return get.color(card)=='red'?1:0;
+				});
 				'step 2'
 				if(result.bool){
-					target.recover();
+					target.draw();
 				}
 			},
 			ai:{
@@ -667,7 +662,7 @@ card.hearth={
 		shenenshu:'神恩术',
 		shenenshu_info:'对一名其他角色使用，令你与目标中手牌数较少的摸若干张牌，直到手牌数相等（X不大于3），若手牌数已相等，改为你与目标各摸一张牌',
 		zhiliaobo:'治疗波',
-		zhiliaobo_info:'对一名受伤角色使用，令其回复一点体力，若其仍处于受伤状态，则进行一次判定，若结果为红色则再回复一点体力',
+		zhiliaobo_info:'对一名受伤角色使用，令其回复一点体力，并进行一次判定，若结果为红色则目标摸一张牌',
 		yuansuhuimie:'元素毁灭',
 		yuansuhuimie_info:'对所有角色使用，令目标弃置0~2张牌，并受到2-X点雷电伤害，X为其弃置的手牌数',
 		xingjiegoutong:'星界沟通',

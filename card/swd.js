@@ -1752,6 +1752,7 @@ card.swd={
 		_shenmiguo:{
 			trigger:{player:'useCardAfter'},
 			direct:true,
+			usable:1,
 			filter:function(event,player){
 				if(event.parent.name=='_shenmiguo') return false;
 				if(_status.currentPhase!=player) return false;
@@ -2143,6 +2144,7 @@ card.swd={
 				'step 0'
 				var next=player.chooseToDiscard('he',{color:'red'},get.prompt('xuanwuzhihuang_duanzao'));
 				next.ai=function(card){
+					if(ai.get.recoverEffect(player,player,player)<=0) return 0;
 					return 8-ai.get.value(card);
 				};
 				next.logSkill='xuanwuzhihuang_equip1'
@@ -2915,6 +2917,10 @@ card.swd={
 					target.draw();
 				}
 				else{
+					var e5=player.get('e','5');
+					if(e5&&e5.name=='sifeizhenmian'){
+						player.discard(e5);
+					}
 					target.goMad({player:'phaseAfter'});
 				}
 			},
@@ -4338,7 +4344,7 @@ card.swd={
 		jiutiansuanchi:'九天算尺',
 		jiutiansuanchi_info:'每当你使用杀造成伤害，你可以弃置一张牌并展示受伤害角色的一张手牌，若此牌与你弃置的牌花色或点数相同，此杀的伤害+2',
 		shenmiguo:'神秘果',
-		shenmiguo_info:'出牌阶段内，当你使用一张基本牌或非延时锦囊牌后使用，令此牌再结算一次',
+		shenmiguo_info:'出牌阶段内，当你使用一张基本牌或非延时锦囊牌后使用，令此牌再结算一次。每阶段限用一次',
 		qinglianxindeng:'青莲心灯',
 		qinglianxindeng_info:'你防止锦囊牌造成的伤害',
 		hslingjian_xuanfengzhiren_duanzao:'风刃',
@@ -4509,9 +4515,9 @@ card.swd={
 		guangshatianyi_bg:'纱',
 		guangshatianyi_info:'仅女性角色可使用，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
-		sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌，然后指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
+		sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌，然后指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		yiluan:'意乱',
-		yiluan_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
+		yiluan_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		donghuangzhong:'东皇钟',
 		xuanyuanjian:'轩辕剑',
 		xuanyuanjian2:'轩辕剑',

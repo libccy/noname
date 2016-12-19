@@ -48,6 +48,44 @@ play.boss={
 					lib.config.forbidai.push(i);
 				}
 			}
+			var list2={
+				boss_liedixuande:['male','shu',5,['boss_lingfeng','boss_jizhen'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+				boss_gongshenyueying:['male','shu',4,['boss_gongshenjg','boss_jingmiao','boss_zhinang'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+				boss_tianhoukongming:['male','shu',4,['boss_biantian','bazhen'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+				boss_yuhuoshiyuan:['male','shu',4,['boss_yuhuojg','boss_qiwu','boss_tianyujg'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
+				boss_qiaokuijunyi:['male','wei',4,['boss_huodi','boss_jueji'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+				boss_jiarenzidan:['male','wei',5,['boss_chiying','boss_jingfan'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+				boss_duanyuzhongda:['male','wei',5,['boss_fanshi','boss_xuanlei','boss_skonghun'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+				boss_juechenmiaocai:['male','wei',4,['boss_chuanyun','boss_leili','boss_fengxing'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
+
+				boss_jileibaihu:['male','shu',4,['boss_jiguan','boss_zhenwei','boss_benlei'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+				boss_yunpingqinglong:['male','shu',4,['boss_jiguan','boss_mojianjg'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+				boss_lingjiaxuanwu:['male','shu',5,['boss_jiguan','yizhong','boss_lingyu'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+				boss_chiyuzhuque:['male','shu',5,['boss_jiguan','boss_yuhuojg','boss_tianyun'],['jiangemech','hiddenboss','bossallowed'],'shu'],
+				boss_fudibian:['male','wei',4,['boss_jiguan','boss_didongjg'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+				boss_tuntianchiwen:['male','wei',5,['boss_jiguan','boss_tanshi','boss_tunshi'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+				boss_shihuosuanni:['male','wei',3,['boss_jiguan','boss_lianyujg'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+				boss_lieshiyazi:['male','wei',4,['boss_jiguan','boss_nailuo'],['jiangemech','hiddenboss','bossallowed'],'wei'],
+			}
+			if(get.mode()!='versus'){
+				lib.characterPack.mode_extension_jiange=list2;
+				for(var i in list2){
+					lib.characterPack.mode_extension_jiange[i]=list2[i];
+					lib.characterPack.mode_extension_jiange[i][4].push('mode:versus');
+					lib.character[i]=list2[i];
+					if(!lib.config.boss_enableai_playpackconfig){
+						lib.config.forbidai.push(i);
+					}
+				}
+			}
+			else if(_status.mode!='jiange'){
+				for(var i in list2){
+					lib.character[i]=list2[i];
+					if(!lib.config.boss_enableai_playpackconfig){
+						lib.config.forbidai.push(i);
+					}
+				}
+			}
 			var list={
 				boss_chi:'魑',
 				boss_mo:'魅',
@@ -90,15 +128,51 @@ play.boss={
 				boss_zhaoyun:'高达一号',
 				boss_zhuoguiquxie:'捉鬼驱邪',
 
-				mode_extension_boss_character_config:'挑战模式'
+				boss_liedixuande:'烈帝玄德',
+				boss_gongshenyueying:'工神月英',
+				boss_tianhoukongming:'天侯孔明',
+				boss_yuhuoshiyuan:'浴火士元',
+				boss_qiaokuijunyi:'巧魁儁乂',
+				boss_jiarenzidan:'佳人子丹',
+				boss_duanyuzhongda:'断狱仲达',
+				boss_juechenmiaocai:'绝尘妙才',
+
+				boss_jileibaihu:'机雷白虎',
+				boss_yunpingqinglong:'云屏青龙',
+				boss_lingjiaxuanwu:'灵甲玄武',
+				boss_chiyuzhuque:'炽羽朱雀',
+				boss_fudibian:'缚地狴犴',
+				boss_tuntianchiwen:'吞天螭吻',
+				boss_shihuosuanni:'食火狻猊',
+				boss_lieshiyazi:'裂石睚眦',
+
+				mode_extension_boss_character_config:'挑战武将',
+				mode_extension_jiange_character_config:'剑阁武将',
 			};
 
 			for(var i in list){
-				lib.translate[i]=list[i];
+				lib.translate[i]=lib.translate[i]||list[i];
 			}
 		}
 	},
 	arenaReady:function(){
+		var loadversus=function(){
+			if(get.mode()!='versus'){
+				window.mode={};
+				lib.init.js(lib.assetURL+'mode','versus',function(){
+					for(var i in mode.versus.translate){
+						lib.translate[i]=lib.translate[i]||mode.versus.translate[i];
+					}
+					for(var i in mode.versus.skill){
+						if(i!='versus_swap'){
+							lib.skill[i]=lib.init.eval(mode.versus.skill[i]);
+							game.finishSkill(i);
+						}
+					}
+					delete window.mode;
+				});
+			}
+		};
 		if(get.mode()!='boss'){
 			window.mode={};
 			lib.init.js(lib.assetURL+'mode','boss',function(){
@@ -106,10 +180,17 @@ play.boss={
 					lib.translate[i]=lib.translate[i]||mode.boss.translate[i];
 				}
 				for(var i in mode.boss.skill){
-					lib.skill[i]=lib.init.eval(mode.boss.skill[i]);
-					game.finishSkill(i);
+					if(i!='_bossswap'){
+						lib.skill[i]=lib.init.eval(mode.boss.skill[i]);
+						game.finishSkill(i);
+					}
 				}
+				delete window.mode;
+				loadversus();
 			});
+		}
+		else{
+			loadversus();
 		}
 	},
 	help:{

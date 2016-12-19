@@ -1,16 +1,23 @@
 window.noname_update={
-    version:'1.9.3.2',
+    version:'1.9.3.3',
     changeLog:[
         'bug修复',
     ],
     files:{
         global:[
             'game/config.js',
+            'game/game.js',
+            'game/package.js',
             'mode/boss.js',
             'character/yijiang.js',
             'character/hearth.js',
+            'character/swd.js',
+            'card/hearth.js',
+            'card/swd.js',
+            'extension/boss/extension.js',
         ],
         '1.9.3':[],
         '1.9.3.1':[],
+        '1.9.3.2':[],
     }
 }

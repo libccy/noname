@@ -1780,7 +1780,7 @@
     			    restart:true,
     			},
     			intro:{
-    			    name:'在非挑战模式中使用挑战武将',
+    			    name:'在非挑战模式中使用剑阁和挑战模式的武将',
                     clear:true,
     			},
                 enableai:{
@@ -1995,31 +1995,32 @@
     				}
     			},
             },
-            // hsmod:{
-            //     enable:{
-    		// 	    name:'开启',
-    		// 	    init:false,
-    		// 	    restart:true,
-    		// 	    onclick:function(bool){
-    		// 	        if(bool){
-    		// 	            lib.config.plays.add('hsmod');
-    		// 	        }
-    		// 	        else{
-    		// 	            lib.config.plays.remove('hsmod');
-    		// 	        }
-    		// 	        game.saveConfig('plays',lib.config.plays);
-    		// 	    }
-    		// 	},
-    		// 	hide:{
-    		// 	    name:'隐藏此扩展',
-    		// 	    clear:true,
-    		// 	    onclick:function(){
-            //             this.innerHTML='此扩展将在重启后隐藏';
-    		// 			lib.config.hiddenPlayPack.add('hsmod');
-    		// 			game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-    		// 		}
-    		// 	},
-            // },
+            hsmod:{
+                game:'hs',
+                enable:{
+    			    name:'开启',
+    			    init:false,
+    			    restart:true,
+    			    onclick:function(bool){
+    			        if(bool){
+    			            lib.config.plays.add('hsmod');
+    			        }
+    			        else{
+    			            lib.config.plays.remove('hsmod');
+    			        }
+    			        game.saveConfig('plays',lib.config.plays);
+    			    }
+    			},
+    			hide:{
+    			    name:'隐藏此扩展',
+    			    clear:true,
+    			    onclick:function(){
+                        this.innerHTML='此扩展将在重启后隐藏';
+    					lib.config.hiddenPlayPack.add('hsmod');
+    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
+    				}
+    			},
+            },
         },
 		mode:{
 			identity:{
@@ -13701,41 +13702,43 @@
 						}
 					}
 					for(iwhile=0;iwhile<totalPopulation;iwhile++){
-						var skills=player.get('s',true).concat(lib.skill.global);
-						game.expandSkills(skills);
-						for(i=0;i<skills.length;i++){
-							var trigger=get.info(skills[i]).trigger;
-							if(trigger){
-								add=false;
-								if(player==event.player&&trigger.player){
-									if(typeof trigger.player=='string'){
-										if(trigger.player==name) add=true;
-									}
-									else if(trigger.player.contains(name)) add=true;
-								}
-								if((player==event.target||
-									(event.multitarget&&event.targets&&event.targets.contains(player)))&&
-									trigger.target){
-									if(typeof trigger.target=='string'){
-										if(trigger.target==name) add=true;
-									}
-									else if(trigger.target.contains(name)) add=true;
-								}
-								if(player==event.source&&trigger.source){
-									if(typeof trigger.source=='string'){
-										if(trigger.source==name) add=true;
-									}
-									else if(trigger.source.contains(name)) add=true;
-								}
-								if(trigger.global){
-									if(typeof trigger.global=='string'){
-										if(trigger.global==name) add=true;
-									}
-									else if(trigger.global.contains(name)) add=true;
-								}
-								if(add&&player.isOut()==false) list.push([skills[i],player]);
-							}
-						}
+                        if(!player.isOut()){
+                            var skills=player.get('s',true).concat(lib.skill.global);
+    						game.expandSkills(skills);
+    						for(i=0;i<skills.length;i++){
+    							var trigger=get.info(skills[i]).trigger;
+    							if(trigger){
+    								add=false;
+    								if(player==event.player&&trigger.player){
+    									if(typeof trigger.player=='string'){
+    										if(trigger.player==name) add=true;
+    									}
+    									else if(trigger.player.contains(name)) add=true;
+    								}
+    								if((player==event.target||
+    									(event.multitarget&&event.targets&&event.targets.contains(player)))&&
+    									trigger.target){
+    									if(typeof trigger.target=='string'){
+    										if(trigger.target==name) add=true;
+    									}
+    									else if(trigger.target.contains(name)) add=true;
+    								}
+    								if(player==event.source&&trigger.source){
+    									if(typeof trigger.source=='string'){
+    										if(trigger.source==name) add=true;
+    									}
+    									else if(trigger.source.contains(name)) add=true;
+    								}
+    								if(trigger.global){
+    									if(typeof trigger.global=='string'){
+    										if(trigger.global==name) add=true;
+    									}
+    									else if(trigger.global.contains(name)) add=true;
+    								}
+    								if(add) list.push([skills[i],player]);
+    							}
+    						}
+                        }
 						player=player.next;
 						if(!player||player==event._endTrigger){
 							break;
@@ -23428,6 +23431,7 @@
 						node.link=page;
 						node.mode=mode;
                         for(var i in lib.extensionMenu[mode]){
+                            if(i=='game') continue;
                             var cfg=copyObj(lib.extensionMenu[mode][i]);
                             var j;
                             if(mode.indexOf('extension_')==0){
@@ -23461,11 +23465,13 @@
                     for(var i in lib.extensionMenu){
                         if(lib.config.all.stockextension.contains(i)&&!lib.config.all.plays.contains(i)) continue;
                         if(lib.config.hiddenPlayPack.contains(i)) continue;
+                        if(lib.extensionMenu[i].game&&lib.extensionMenu[i].game!=lib.config.game) continue;
                         createModeConfig(i,start.firstChild);
                     }
                     (function(){
                         if(!lib.device&&!lib.db) return;
                         if(lib.config.show_extensionmaker==false) return;
+                        if(lib.config.game!='sgs') return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.link=page;
