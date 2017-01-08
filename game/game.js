@@ -1032,6 +1032,12 @@
                         game:'sgs',
                         unfrequent:true
                     },
+                    show_favourite_menu:{
+                        name:'显示收藏菜单',
+                        init:true,
+                        game:'sgs',
+                        unfrequent:true
+                    },
 					hide_card_image:{
 						name:'隐藏卡牌背景',
 						init:false,
@@ -2107,6 +2113,8 @@
 							map.choice_zhong.hide();
 							map.choice_nei.hide();
 							map.choice_fan.hide();
+                            map.ban_identity.hide();
+                            map.ban_identity2.hide();
 						}
 						else{
 							map.player_number.show();
@@ -2122,6 +2130,13 @@
 							map.choice_zhong.show();
 							map.choice_nei.show();
 							map.choice_fan.show();
+                            map.ban_identity.show();
+                            if(config.ban_identity=='off'){
+                                map.ban_identity2.hide();
+                            }
+                            else{
+                                map.ban_identity2.show();
+                            }
 						}
 					},
 					identity_mode:{
@@ -2318,6 +2333,28 @@
 							}
 						}
 					},
+                    ban_identity:{
+                        name:'屏蔽身份',
+						init:'off',
+						item:{
+                            off:'关闭',
+							zhu:'主公',
+							zhong:'忠臣',
+							nei:'内奸',
+							fan:'反贼',
+						},
+                    },
+                    ban_identity2:{
+                        name:'屏蔽身份2',
+						init:'off',
+						item:{
+                            off:'关闭',
+							zhu:'主公',
+							zhong:'忠臣',
+							nei:'内奸',
+							fan:'反贼',
+						},
+                    },
 					ai_strategy:{
 						name:'内奸策略',
 						init:'ai_strategy_1',
@@ -4926,6 +4963,15 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+            m:function(){
+                if(lib.config.game!='sgs'){
+                    game.saveConfig('game','sgs');
+                }
+                else{
+                    game.saveConfig('game','hs');
+                }
+                game.reload();
+            },
     		c:function(){
                 (function(){
                     var a=0,b=0,c=0,d=0;
@@ -5242,6 +5288,7 @@
 			'default':"默认",
 			zhenfa:'阵法',
 			mode_derivation_card_config:'衍生',
+            mode_favourite_character_config:'收藏',
 			heart:"♥︎",
 			diamond:"♦︎",
 			spade:"♠︎",
@@ -22204,6 +22251,19 @@
                         }
                         return node;
                     };
+                    if(lib.config.show_favourite_menu&&!connectMenu&&Array.isArray(lib.config.favouriteCharacter)){
+                        lib.characterPack.mode_favourite={};
+                        for(var i=0;i<lib.config.favouriteCharacter.length;i++){
+                            var favname=lib.config.favouriteCharacter[i];
+                            if(lib.character[favname]){
+                                lib.characterPack.mode_favourite[favname]=lib.character[favname];
+                            }
+                        }
+                        if(!get.is.empty(lib.characterPack.mode_favourite)){
+                            ui.favouriteCharacter=createModeConfig('mode_favourite',start.firstChild).link;
+                        }
+                        delete lib.characterPack.mode_favourite;
+                    }
                     var characterlist=connectMenu?lib.connectCharacterPack:lib.config.all.characters;
 					for(var i=0;i<characterlist.length;i++){
                         createModeConfig(characterlist[i],start.firstChild);
@@ -28526,15 +28586,37 @@
                 }
             },
             favouriteCharacter:function(e){
-                if(this.innerHTML=='添加收藏'){
-                    this.innerHTML='移除收藏';
-                    lib.config.favouriteCharacter.add(this.link);
+                if(typeof this.link=='string'){
+                    if(this.innerHTML=='添加收藏'){
+                        this.innerHTML='移除收藏';
+                        lib.config.favouriteCharacter.add(this.link);
+                    }
+                    else{
+                        this.innerHTML='添加收藏';
+                        lib.config.favouriteCharacter.remove(this.link);
+                    }
+                    if(ui.favouriteCharacter){
+                        if(lib.config.favouriteCharacter.contains(this.link)){
+                            for(var i=0;i<ui.favouriteCharacter.childElementCount;i++){
+                                if(ui.favouriteCharacter.childNodes[i].link==this.link){
+                                    break;
+                                }
+                            }
+                            if(i==ui.favouriteCharacter.childElementCount){
+                                ui.create.button(this.link,'character',ui.favouriteCharacter).classList.add('noclick');
+                            }
+                        }
+                        else{
+                            for(var i=0;i<ui.favouriteCharacter.childElementCount;i++){
+                                if(ui.favouriteCharacter.childNodes[i].link==this.link){
+                                    ui.favouriteCharacter.childNodes[i].remove();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
                 }
-                else{
-                    this.innerHTML='添加收藏';
-                    lib.config.favouriteCharacter.remove(this.link);
-                }
-                game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
                 e.stopPropagation();
             },
 			dragtouchdialog:function(e){
@@ -31082,6 +31164,14 @@
     			return false;
     		},
         },
+        rand:function(num,num2){
+            if(typeof num2=='number'){
+                return num+Math.floor(Math.random()*(num2-num+1));
+            }
+            else{
+                return Math.floor(Math.random()*num);
+            }
+        },
         prompt:function(skill,target,player){
             player=player||_status.event.player;
             if(target){
@@ -32792,7 +32882,7 @@
 				else{
 					uiintro.add(get.translation(node));
 				}
-				if(node.name=='muniu'&&get.position(node)=='e'){
+				if(node.name.indexOf('muniu')==0&&get.position(node)=='e'){
 					var num=0;
 					if(node.cards){
 						num=node.cards.length;
@@ -32803,6 +32893,9 @@
 					else{
 						uiintro.add('<div class="text center">'+'共有'+get.cnNumber(num)+'张牌'+'</div>');
 					}
+                    if(node.name!='muniu'){
+                        uiintro.add('<div class="text">'+lib.translate[node.name+'_info'].slice(81)+'</div>');
+                    }
 				}
 				else if(node.name=='lianyaohu'&&get.position(node)=='e'){
 					var num=0;

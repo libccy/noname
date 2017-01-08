@@ -852,6 +852,10 @@ div:not(.handcards)>.card>.info>span,
 	height:108px;
 	background-size: cover;
 }
+.dialog .buttons>.button.character>.name,
+.button.character.longcharacter>.name{
+	overflow: visible;
+}
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
 .equips>.card>.background{font-size: 36px;height: 36px;padding-top: 3px;}
@@ -977,7 +981,12 @@ margin-bottom: 5px;
 .caption>.ctext{text-align:center;font-size:16px;}
 .button.character,.button.card{width: 90px;height: 90px;position: relative;margin: 6px;}
 .button.card{font-size: 14px;}
-.button.character>.name{left:5px;top:22px;}
+.button.character>.name{
+	left:5px;
+	top:22px;
+	max-height: 68px;
+	overflow: hidden;
+}
 .button.character>.hp{left:5px;top:3px;}
 .button.character>.hp.text{
 	top:8px;

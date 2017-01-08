@@ -134,19 +134,23 @@ mode.hearthstone={
 					};
 					for(var i=0;i<lib.careerList.length;i++){
 						var className=get.translation(lib.careerList[i]);
-						result[className]=[];
+						result[className+'_link:'+lib.careerList[i]]=[];
 						result.list[className]=[];
 					}
 					result['中立']=[];
 					result.list['中立']=[];
 					for(var i=0;i<list.length;i++){
 						var className=get.translation(lib.card[list[i][2]].class);
-						if(!result[className]){
-							result[className]=[];
+						var className2=className;
+						if(lib.card[list[i][2]].class!='neutral'){
+							className2+='_link:'+lib.card[list[i][2]].class
+						}
+						if(!result[className2]){
+							result[className2]=[];
 							result.list[className]=[];
 						}
 						result.list[className].push(list[i]);
-						result[className].push(list[i]);
+						result[className2].push(list[i]);
 					}
 					return result;
 				}});

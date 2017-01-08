@@ -748,6 +748,23 @@ mode.identity={
 					identityList.unshift(event.identity);
 					delete event.identity;
 				}
+				else if(_status.mode!='zhong'&&(!_status.brawl||!_status.brawl.identityShown)){
+					var ban_identity=[];
+					ban_identity.push(get.config('ban_identity')||'off');
+					if(ban_identity[0]!='off'){
+						ban_identity.push(get.config('ban_identity2')||'off');
+					}
+					ban_identity.remove('off');
+					if(ban_identity.length){
+						var identityList2=identityList.slice(0);
+						for(var i=0;i<ban_identity.length;i++){
+							while(identityList2.remove(ban_identity[i]));
+						}
+						ban_identity=identityList2.randomGet();
+						identityList.remove(ban_identity);
+						identityList.splice(game.players.indexOf(game.me),0,ban_identity);
+					}
+				}
 				for(i=0;i<game.players.length;i++){
 					if(_status.brawl&&_status.brawl.identityShown){
 						if(game.players[i].identity=='zhu') game.zhu=game.players[i];

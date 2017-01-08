@@ -20,7 +20,7 @@ character.ow={
         ow_tuobiang:['male','shu',3,['paotai','maoding']],
         // ow_baolei:['female','shu',3,[]],
         ow_banzang:['male','qun',4,['fengshi','yinbo']],
-        ow_laiyinhate:['male','qun',4,['lzhongjia','mengji']],
+        ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
         // ow_luba:['male','shu',4,[]],
         // ow_wensidun:['male','shu',4,[]],
         // ow_zhaliya:['female','shu',4,['pingzhang','lichang']],
@@ -31,18 +31,18 @@ character.ow={
             forced:true,
             unique:true,
             filter:function(event,player){
-                return player.storage.zhongjia&&!player.hujia&&event.card&&event.card.name=='sha'&&event.notLink();
+                return player.storage.zhongdun&&!player.hujia&&event.card&&event.card.name=='sha'&&event.notLink();
             },
             content:function(){
                 trigger.num++;
             }
         },
-        lzhongjia:{
+        zhongdun:{
             unique:true,
             init2:function(player){
-                if(!player.storage.zhongjia){
-                    player.changeHujia(8);
-                    player.storage.zhongjia=true;
+                if(!player.storage.zhongdun){
+                    player.changeHujia(game.players.length);
+                    player.storage.zhongdun=true;
                 }
             },
             enable:'phaseUse',
@@ -363,6 +363,7 @@ character.ow={
 				game.addVideo('storage',player,['shoujia2',null]);
 				if(!player.isTurnedOver()){
                     player.turnOver();
+                    player.draw();
                 }
 			},
 			intro:{
@@ -2577,8 +2578,8 @@ character.ow={
     translate:{
         mengji:'猛击',
         mengji_info:'锁定技，若你已发动重盾，当你没有护甲时，你的杀造成的伤害+1',
-        lzhongjia:'重盾',
-        lzhongjia_info:'游戏开始时，你获得8点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
+        zhongdun:'重盾',
+        zhongdun_info:'游戏开始时，你获得等同于游戏人数护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
         paotai:'炮台',
         paotai2:'炮台',
         paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到杀造成的伤害，炮台降低一级',
@@ -2595,7 +2596,7 @@ character.ow={
         shoujia:'兽夹',
         shoujia2:'兽夹',
         shoujia3:'兽夹',
-        shoujia_info:'出牌阶段限一次，你可以将一张牌背面朝上置于一名其他角色的武将牌上，当该角色使用一张与此牌花色相同的牌指定其他角色为目标时，将此牌置入弃牌堆，该角色将武将牌翻至背面；当该角色对你造成伤害时，将此牌置入弃牌堆',
+        shoujia_info:'出牌阶段限一次，你可以将一张牌背面朝上置于一名其他角色的武将牌上，当该角色使用一张与此牌花色相同的牌指定其他角色为目标时，将此牌置入弃牌堆，该角色将武将牌翻至背面并摸一张牌；当该角色对你造成伤害时，将此牌置入弃牌堆',
         shihuo:'嗜火',
         shihuo_info:'锁定技，每当一名角色受到火焰伤害，你摸一张牌',
         shanguang:'闪光',

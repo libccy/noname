@@ -1,5 +1,6 @@
 play.boss={
 	init:function(){
+		if(get.mode()=='tafang') return;
 		if(get.mode()!='boss'){
 			lib.characterPack.mode_extension_boss={
 				boss_zhangchunhua:['female','wei',4,['jueqing','wuxin','shangshix'],['boss','bossallowed'],'wei'],
@@ -156,6 +157,7 @@ play.boss={
 		}
 	},
 	arenaReady:function(){
+		if(get.mode()=='tafang') return;
 		var loadversus=function(){
 			if(get.mode()!='versus'){
 				window.mode={};

@@ -31,7 +31,7 @@ character.hearth={
 		hs_trueheart:['female','qun',3,['qianghuax']],
 		hs_sainaliusi:['male','wu',4,['chongsheng','yulu']],
 		hs_lrhonin:['male','wei',4,['bingyan','yufa']],
-		hs_bolvar:['male','wei',4,['yuanzheng','byuhuo']],
+		hs_bolvar:['male','wei',4,['yuanzheng','bzhuiji']],
 		hs_fuding:['male','wei',4,['shengdun','fbeifa']],
 		hs_xuanzhuanjijia:['male','shu',3,['jixuan']],
 		hs_ysera:['female','wu',4,['chenshui']],
@@ -95,6 +95,23 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		bzhuiji:{
+			trigger:{global:'dieAfter'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.source)<=0;
+			},
+			filter:function(event,player){
+				return event.source&&event.source.isAlive()&&event.source!=player;
+			},
+			content:function(){
+				player.draw(2);
+				player.useCard({name:'juedou'},trigger.source);
+			},
+			ai:{
+				threaten:1.5,
+				expose:0.1
+			}
+		},
 		lianjin:{
 			enable:'phaseUse',
 			usable:2,
@@ -955,6 +972,7 @@ character.hearth={
 					event.target.draw(result.cards.length);
 					player.storage.xianji3=event.target;
 					player.addSkill('xianji3');
+					player.addExpose(0.2);
 				}
 			}
 		},
@@ -1637,6 +1655,16 @@ character.hearth={
 			}
 		},
 		yuanzheng:{
+			trigger:{player:'useCardToBegin'},
+			direct:true,
+			filter:function(event,player){
+				return event.target&&event.target!=player&&get.distance(player,event.target)>1&&event.target.num('he')>0;
+			},
+			content:function(){
+				player.discardPlayerCard(trigger.target,get.prompt('yuanzheng',trigger.target),'hej').logSkill=['yuanzheng',trigger.target];
+			}
+		},
+		yuanzheng_old:{
 			trigger:{player:'useCardToBegin'},
 			direct:true,
 			filter:function(event,player){
@@ -4907,7 +4935,9 @@ character.hearth={
 		shifa:'嗜法',
 		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
 		yuanzheng:'远征',
-		yuanzheng_info:'每当你对攻击范围外的一名角色使用一张牌，你可以选择一项：摸一张牌，或视为对目标使用一张杀',
+		yuanzheng_info:'每当你对距离1以外的角色使用一张牌，你可以弃置目标区域内的一张牌',
+		bzhuiji:'追击',
+		bzhuiji_info:'每当一名角色死亡，你可以摸两张牌，并视为对杀死该角色的人使用一张决斗',
 		byuhuo:'浴火',
 		byuhuo2:'浴火',
 		byuhuo_info:'觉醒技，当你进入濒死状态时，你须将体力和体力上限变为2，并将武将牌翻至背面；在你的下一回合开始时，你对所有其他角色造成两点火焰伤害，在此之前，你不能成为其他角色的卡牌的目标',

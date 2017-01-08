@@ -2719,32 +2719,30 @@ character.swd={
 		dangping2:{},
 		duishi:{
 			enable:'phaseUse',
-			usable:1,
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.num('h')>0&&!player.hasSkill('duishi2');
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('h')>0;
+				return player!=target&&target.num('h')>0&&!target.hasSkill('duishi3');
 			},
 			filterCard:true,
 			check:function(card){return 8-ai.get.value(card)},
 			content:function(){
 				"step 0"
 				var suit=get.suit(cards[0]);
-				target.chooseToDiscard({suit:suit},'h','弃置一张'+get.translation(suit)+
-					'牌并令'+get.translation(player)+'摸一张牌，或随机弃置两张牌').ai=function(card){
-					return 8-ai.get.value(card);
+				target.chooseToDiscard({suit:suit},'h','对诗：弃置一张'+get.translation(suit)+
+					'牌，或令'+get.translation(player)+'获得你一张牌').ai=function(card){
+					if(ai.get.attitude(target,player)>0) return 0;
+					return 9-ai.get.value(card);
 				}
 
 				"step 1"
 				if(result.bool){
-					player.draw();
+					target.addTempSkill('duishi3','phaseAfter');
 				}
 				else{
-					var he=target.get('he');
-					if(he.length){
-						target.discard(he.randomGets(2));
-					}
+					player.gainPlayerCard(target,'he',true);
+					player.addTempSkill('duishi2','phaseAfter');
 				}
 			},
 			ai:{
@@ -8256,7 +8254,7 @@ character.swd={
 		guisi:'归思',
 		guisi_info:'每当你成为杀的目标，你可以交给对方一张手牌并取消之',
 		duishi:'对诗',
-		duishi_info:'出牌阶段限一次，你可以弃置一张手牌，并指定一名有手牌的角色选择一项：弃置一张与之花色相同的手牌并令你摸一张牌，或随机弃置两张牌',
+		duishi_info:'出牌阶段，你可以弃置一张手牌，并指定一名有手牌的角色选择一项：1)弃置一张与之花色相同的手牌，本回合内对诗不能再次指定其为目标，2)令你获得其一张牌，对诗失效直到回合结束',
 		anlianying:'连营',
 		anlianying_info:'每当你失去最后一张手牌，可摸两张牌',
 		lianwu:'连舞',

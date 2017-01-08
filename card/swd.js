@@ -785,57 +785,72 @@ card.swd={
 			type:'jiguan',
 			wuxieable:true,
 			filterTarget:function(card,player,target){
-				var es=target.get('e');
-				for(var i=0;i<es.length;i++){
-					if(lib.inpile.contains(es[i].name)) return true;
-				}
-				return false;
+				return target==player;
+				// var es=target.get('e');
+				// for(var i=0;i<es.length;i++){
+				// 	if(lib.inpile.contains(es[i].name)) return true;
+				// }
+				// return false;
 			},
+			selectTarget:-1,
 			content:function(){
 				var es=target.get('e');
 				var list=get.typeCard('hslingjian');
+				var list2=get.typeCard('jiqi');
 				var cards=[];
 				var time=0;
-				target.clearEquipTrigger();
 				for(var i=0;i<es.length;i++){
-					if(lib.inpile.contains(es[i].name)){
-						var card=game.createCard(list.randomGet());
-						cards.push(card);
-						time+=200;
-						setTimeout((function(card,name){
-							return function(){
-								ui.discardPile.appendChild(game.createCard(card));
-								card.init([card.suit,card.number,name,card.nature]);
-								card.style.transform='scale(1.1)';
-								card.classList.add('glow');
-								var info=get.info(card);
-			                    if(info.skills){
-			                        for(var i=0;i<info.skills.length;i++){
-			                            target.addSkillTrigger(info.skills[i]);
-			                        }
-			                    }
-								setTimeout(function(){
-									card.style.transform='';
-									card.classList.remove('glow');
-								},500);
-							}
-						}(es[i],lib.skill._lingjianduanzao.process([card,es[i]]))),i*200);
+					if(!lib.inpile.contains(es[i].name)){
+						es.splice(i--,1);
 					}
+				}
+				var num=get.rand(es.length);
+				var card;
+				for(var i=0;i<es.length;i++){
+					target.clearEquipTrigger(es[i]);
+					if(i==num){
+						card=game.createCard(list2.randomGet());
+					}
+					else{
+						card=game.createCard(list.randomGet());
+					}
+					cards.push(card);
+					time+=200;
+					setTimeout((function(card,name){
+						return function(){
+							ui.discardPile.appendChild(game.createCard(card));
+							card.init([card.suit,card.number,name,card.nature]);
+							card.style.transform='scale(1.1)';
+							card.classList.add('glow');
+							var info=get.info(card);
+		                    if(info.skills){
+		                        for(var i=0;i<info.skills.length;i++){
+		                            target.addSkillTrigger(info.skills[i]);
+		                        }
+		                    }
+							setTimeout(function(){
+								card.style.transform='';
+								card.classList.remove('glow');
+							},500);
+						}
+					}(es[i],lib.skill._lingjianduanzao.process([card,es[i]]))),i*200);
 				}
 				target.$gain2(cards);
 				game.delay(0,time)
 			},
 			ai:{
+				value:7,
 				order:7.5,
 				result:{
-					target:function(player,target){
-						var es=target.get('e');
-						var num=0;
-						for(var i=0;i<es.length;i++){
-							if(lib.inpile.contains(es[i].name)) num++;
-						}
-						return num;
-					}
+					// target:function(player,target){
+					// 	var es=target.get('e');
+					// 	var num=0;
+					// 	for(var i=0;i<es.length;i++){
+					// 		if(lib.inpile.contains(es[i].name)) num++;
+					// 	}
+					// 	return num;
+					// }
+					target:1
 				}
 			}
 		},
@@ -1752,13 +1767,13 @@ card.swd={
 		_shenmiguo:{
 			trigger:{player:'useCardAfter'},
 			direct:true,
-			usable:1,
 			filter:function(event,player){
 				if(event.parent.name=='_shenmiguo') return false;
 				if(_status.currentPhase!=player) return false;
 				if(event.parent.parent.name!='phaseUse') return false;
 				if(!event.targets||!event.card) return false;
 				if(event.card.name=='shenmiguo') return false;
+				if(player.hasSkill('shenmiguo2')) return false;
 				var type=get.type(event.card);
 				if(type!='basic'&&type!='trick') return false;
 				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
@@ -1788,9 +1803,13 @@ card.swd={
 					return true;
 				},trigger.player,-1).set('cardname',trigger.card.name).targetRequired=true;
 				'step 1'
+				if(result.bool){
+					player.addTempSkill('shenmiguo2','phaseAfter');
+				}
 				delete player.storage.shenmiguo;
 			}
 		},
+		shenmiguo2:{},
 		yuruyi:{
 			trigger:{player:'drawBegin'},
 			forced:true,
@@ -4399,7 +4418,7 @@ card.swd={
 		_lingjianduanzao:'煅造',
 		_lingjianduanzao_info:'出牌阶段，你可以将一张装备牌和一张可煅造的牌合成为一件强化装备，并可装备给距离1以内的一名角色',
 		jiguanshu:'机关鼠',
-		jiguanshu_info:'出牌阶段对一名角色使用，用随机零件强化目标装备区内的装备',
+		jiguanshu_info:'出牌阶段对自己使用，用随机祭器强化装备区内的一张随机装备，然后用随机零件强化其余的装备',
 		lingjiandai:'零件袋',
 		lingjiandai_info:'出牌阶段对自己使用，获得3张随机零件',
 		mujiaren:'木甲人',
