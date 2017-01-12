@@ -4,8 +4,8 @@ character.shenhua={
 	character:{
 		xiahouyuan:['male','wei',4,['shensu']],
 		caoren:['male','wei',4,['jushou','jiewei']],
-		huangzhong:['male','shu',4,['liegong']],
-		weiyan:['male','shu',4,['kuanggu']],
+		huangzhong:['male','shu',4,['xinliegong']],
+		weiyan:['male','shu',4,['xinkuanggu']],
 		xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 		zhoutai:['male','wu',4,['buqu','fenji']],
 		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
@@ -45,6 +45,70 @@ character.shenhua={
 		menghuo:['zhurong'],
 	},
 	skill:{
+		xinkuanggu:{
+			trigger:{source:'damageEnd'},
+			filter:function(event,player){
+				return get.distance(player,event.player)<=1;
+			},
+			direct:true,
+			audio:'kuanggu',
+			content:function(){
+				'step 0'
+				var controls=['draw_card','cancel'];
+				if(player.hp<player.maxHp) controls.unshift('recover_hp');
+				player.chooseControl(controls).set('prompt',get.prompt('xinkuanggu')).set('ai',function(event,player){
+					if(player.hp==player.maxHp) return 'draw_card';
+					if(player.hp>=3&&player.num('h')<player.hp) return 'draw_card';
+					if(player.hp==2&&player.num('h')==0) return 'draw_card';
+					return 'recover_hp';
+				});
+				'step 1'
+				if(result.control!='cancel'){
+					player.logSkill('xinkuanggu');
+					if(result.control=='draw_card'){
+						player.draw();
+					}
+					else{
+						player.recover();
+					}
+				}
+			}
+		},
+		xinliegong:{
+			mod:{
+				targetInRange:function(card,player,target){
+					if(card.name=='sha'&&card.number){
+						if(get.distance(player,target)<=card.number) return true;
+					}
+				}
+			},
+			audio:'liegong',
+			trigger:{player:'shaBegin'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.target)<=0;
+			},
+			logTarget:'target',
+			filter:function(event,player){
+				if(event.target.num('h')<player.num('h')) return true;
+				if(event.target.hp<player.hp) return true;
+				return false;
+			},
+			content:function(){
+				if(trigger.target.num('h')<=player.num('h')) trigger.directHit=true;
+				if(trigger.target.hp>=player.hp) player.addTempSkill('xinliegong2','shaAfter');
+			}
+		},
+		xinliegong2:{
+			trigger:{source:'damageBegin'},
+			filter:function(event){
+				return event.card&&event.card.name=='sha'&&event.notLink();
+			},
+			forced:true,
+			audio:false,
+			content:function(){
+				trigger.num++;
+			}
+		},
         tiaoxin:{
 			audio:4,
 			enable:'phaseUse',
@@ -2358,6 +2422,7 @@ character.shenhua={
 						if(!player.get('e','1')){
 							if(player.hp<2) return 0;
 							if(player.hp==2&&target.hp>=2) return 0;
+							if(target.hp>player.hp) return 0;
 						}
 						return ai.get.damageEffect(target,player);
 					}
@@ -3335,35 +3400,27 @@ character.shenhua={
 		fenji:'奋激',
 		releiji:'雷击',
 		jiewei:'解围',
-		jiewei_info:'每当你翻面，你可以使用一张锦囊牌或装备牌，若如此做，此牌结算后，你可以弃置场上一张同类型的牌',
-		releiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害',
 		tiangong:'天公',
 		tiangong2:'天公',
+		xinliegong:'烈弓',
+		xinkuanggu:'狂骨',
+		xinkuanggu_info:'当你对距离1以内的一名角色造成1点伤害后，你可以回复1点体力或摸一张牌',
+		xinliegong_info:'你使用【杀】可以选择你距离不大于此【杀】点数的角色为目标；当你使用【杀】指定一个目标后，你可以根据下列条件执行相应的效果：1.其手牌数小于等于你的手牌数，此【杀】不可被【闪】响应 2.其体力值大于等于你的体力值，此【杀】伤害+1',
+		jiewei_info:'每当你翻面，你可以使用一张锦囊牌或装备牌，若如此做，此牌结算后，你可以弃置场上一张同类型的牌',
+		releiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害',
 		tiangong_info:'锁定技，你防止即将受到的雷电伤害，每当你造成一次雷电伤害，你摸一张牌',
-		shensu_info:
-		'你可以跳过摸牌阶段，或跳过出牌阶段并弃置一张装备牌，'+
-		'若如此则视为对任意一名使用一张【杀】',
-		jushou_info:
-		'回合结束阶段，你可以摸3张牌并将武将牌翻面',
-		liegong_info:
-		'当你使用【杀】时，若目标的手牌数大于等于你的体力值，或小于等于你的攻击范围，你可令此【杀】不能闪避',
-		kuanggu_info:
-		'锁定技，每当你造成一点伤害，若受伤害角色与你的距离不大于1，你回复一点体力',
-		tianxiang_info:
-		'当你即将受到伤害时，你可以弃置一张红桃牌将伤害转移给任意一名其他角色，然后该角色摸x张牌，x为其已损失体力值',
-		hongyan_info:
-		'锁定技，你的黑桃牌均视为红桃',
-		buqu_info:
-		'锁定技，在你死亡前，若你的体力值不大于0，亮出牌堆顶的一张牌并置于你的武将牌上，若此牌的点数与你武将牌上已有的牌点数均不同，则你回复至1体力。只要你的武将牌上有牌，你的手牌上限便与这些牌数量相等',
-		leiji_info:
-		'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害',
-		guidao_info:
-		'任意一名角色的判定生效前，你可以打出一张黑色牌替换之',
-		huangtian_info:
-		'主公技，群雄角色可在他们各自的回合里给你一张【闪】或【闪电】。',
-		guhuo_info:
-		'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或非延时类锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
-		fenji_info:
-		'每当一名角色的手牌于回合外被弃置时，你可以失去1点体力，然后该角色摸两张牌。'
+		shensu_info:'你可以跳过摸牌阶段，或跳过出牌阶段并弃置一张装备牌，若如此则视为对任意一名使用一张【杀】',
+		jushou_info:'回合结束阶段，你可以摸3张牌并将武将牌翻面',
+		liegong_info:'当你使用【杀】时，若目标的手牌数大于等于你的体力值，或小于等于你的攻击范围，你可令此【杀】不能闪避',
+		kuanggu_info:'锁定技，每当你造成一点伤害，若受伤害角色与你的距离不大于1，你回复一点体力',
+		tianxiang_info:'当你即将受到伤害时，你可以弃置一张红桃牌将伤害转移给任意一名其他角色，然后该角色摸x张牌，x为其已损失体力值',
+		hongyan_info:'锁定技，你的黑桃牌均视为红桃',
+		buqu_info:'锁定技，在你死亡前，若你的体力值不大于0，亮出牌堆顶的一张牌并置于你的武将牌上，若此牌的点数与你武将牌上已有的牌点数均不同，则你回复至1体力。只要你的武将牌上有牌，你的手牌上限便与这些牌数量相等',
+		leiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害',
+		guidao_info:'任意一名角色的判定生效前，你可以打出一张黑色牌替换之',
+		huangtian_info:'主公技，群雄角色可在他们各自的回合里给你一张【闪】或【闪电】。',
+		guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或非延时类锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
+		fenji_info:'每当一名角色的手牌于回合外被弃置时，你可以失去1点体力，然后该角色摸两张牌。',
+
 	},
 }

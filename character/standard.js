@@ -1189,7 +1189,7 @@ character.standard={
 				player.$give(event.card,target);
 				game.delay();
 				"step 2"
-				if(get.suit(event.card)+'2'!=event.choice) target.damage();
+				if(get.suit(event.card)+'2'!=event.choice) target.damage('nocard');
 			},
 			ai:{
 				order:1,

@@ -269,7 +269,13 @@ character.xianjian={
 				if(event.card.name!='sha') return false;
 				if(event.targets.length!=1) return false;
 				var target=event.targets[0];
-                var players=[target.next,target.previous];
+				var players;
+				if(get.mode()=='chess'){
+					players=target.getNeighbours();
+				}
+                else{
+					players=[target.next,target.previous];
+				}
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
 						return true;
@@ -280,14 +286,30 @@ character.xianjian={
 			prompt:function(event,player){
                 var targets=[];
                 var target=event.targets[0];
-                if(player.canUse('sha',target.next,false)) targets.push(target.next);
-                if(player.canUse('sha',target.previous,false)) targets.push(target.previous);
+				var players;
+				if(get.mode()=='chess'){
+					players=target.getNeighbours();
+				}
+                else{
+					players=[target.next,target.previous];
+				}
+				for(var i=0;i<players.length;i++){
+					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
+						targets.push(players[i]);
+					}
+				}
 				return get.prompt('feizhua',targets);
 			},
             check:function(event,player){
                 var target=event.targets[0];
                 var num=0;
-                var players=[target.next,target.previous];
+				var players;
+				if(get.mode()=='chess'){
+					players=target.getNeighbours();
+				}
+                else{
+					players=[target.next,target.previous];
+				}
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
 						num+=ai.get.effect(players[i],{name:'sha'},player,player);
@@ -298,7 +320,13 @@ character.xianjian={
 			content:function(){
 				"step 0"
                 var target=trigger.targets[0];
-                var players=[target.previous,target.next];
+				var players;
+				if(get.mode()=='chess'){
+					players=target.getNeighbours();
+				}
+                else{
+					players=[target.next,target.previous];
+				}
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
 						trigger.targets.push(players[i]);

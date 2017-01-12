@@ -244,6 +244,9 @@ card.yunchou={
 		hufu:{
 			fullskin:true,
 			type:'basic',
+			savable:function(card,player,dying){
+				return dying==player;
+			},
 			ai:{
 				value:[7.5,5,2],
 				useful:[7.5,5,2],

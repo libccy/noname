@@ -4192,11 +4192,14 @@ character.yijiang={
 			trigger:{player:'phaseBegin'},
 			content:function(){
 				"step 0"
-				player.judge(function(card){
-					return get.color(card)=='red'?1:0;
-				})
+				player.draw();
+				player.chooseToDiscard('he',true);
 				"step 1"
-				event.color=result.color;
+				if(!result.bool){
+					event.finish();
+					return;
+				}
+				event.color=get.color(result.cards[0]);
 				player.chooseTarget(function(card,player,target){
 					return player!=target&&get.distance(player,target)<=1;
 				},true).set('ai',function(target){
@@ -7667,7 +7670,7 @@ character.yijiang={
 		juece_info:'每当一名其他角色在你回合内失去最后一张手牌，你可以对其造成一点伤害',
 		jiefan_info:'限定技，出牌阶段，你可以选择一名角色，令攻击范围内含有该角色的所有角色各选择一项：1.弃置一张武器牌；2.令其摸一张牌。',
 		fuli_info:'限定技，当你处于濒死状态时，可以将体力回复至体力上限，然后翻面',
-		qianxi_info:'回合开始阶段开始时，你可以进行一次判定，然后令一名距离为1的角色不能使用或打出与判定结果颜色相同的手牌，直到回合结束。',
+		qianxi_info:'回合开始阶段，你可以摸一张牌，并弃置一张牌，然后令一名距离为1的角色不能使用或打出与你弃置的牌颜色相同的手牌，直到回合结束。',
 		yaowu_info:'锁定技，当任意一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。',
 		zhiman_info:'当你对一名其他角色造成伤害时，你可以防止此伤害，然后获得其装备区或判定区的一张牌。',
 		sanyao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名体力最多(或之一)的角色，你对其造成1点伤害。',

@@ -361,7 +361,7 @@ card.extra={
 		jiu:{
 			trigger:{source:'damageBegin'},
 			filter:function(event){
-				return (event.card&&(event.card.name=='sha')&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2');
+				return event.card&&event.card.name=='sha'&&event.notLink();
 			},
 			forced:true,
 			content:function(){

@@ -3099,15 +3099,13 @@
 					chess_character:{
 						name:'战棋武将',
 						init:true,
+						frequent:true,
 					},
-					// chess_jiange:{
-					// 	name:'守卫剑阁',
-					// 	init:true,
-					// },
-					// chess_card:{
-					// 	name:'战棋卡牌',
-					// 	init:true,
-					// },
+					chess_card:{
+						name:'战棋卡牌',
+						init:true,
+						frequent:true,
+					},
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -13194,7 +13192,12 @@
                             }
 						}
 						else{
-							this.node.image.setBackgroundImage('image/card/'+bg+'.png');
+                            if(lib.card[bg].modeimage){
+                                this.node.image.setBackgroundImage('image/mode/'+lib.card[bg].modeimage+'/card/'+bg+'.png');
+                            }
+                            else{
+                                this.node.image.setBackgroundImage('image/card/'+bg+'.png');
+                            }
 						}
 					}
 					else if(lib.card[bg].image=='background'){
@@ -22145,6 +22148,9 @@
 						if(mode.indexOf('mode_')!=0&&!lib.config.customCharacterPack[mode]){
 							page.appendChild(cfgnode);
 						}
+                        else{
+                            page.style.paddingTop='8px';
+                        }
 						var banCharacter=function(){
 							if(_status.clicked){
 								_status.clicked=false;

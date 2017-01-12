@@ -38,7 +38,7 @@ character.sp={
 		zhugeguo:['female','shu',3,['yuhua','qirang']],
 		liuzan:['male','wu',4,['fenyin']],
 		lingcao:['male','wu',4,['dujin']],
-		sunru:['female','wu',3,['shixin','qingyi']],
+		sunru:['female','wu',3,['yingjian','shixin']],
 		lingju:['female','qun',3,['jieyuan','fenxin']],
 		lifeng:['male','shu',3,['tunchu','shuliang']],
 		cuiyan:['male','wei',3,['yawang','xunzhi']],
@@ -93,6 +93,28 @@ character.sp={
 		hanba:['swd_muyun'],
 	},
 	skill:{
+		yingjian:{
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('yingjian'),function(card,player,target){
+					return lib.filter.targetEnabled({name:'sha'},player,target);
+				}).ai=function(target){
+					return ai.get.effect(target,{name:'sha'},player);
+				}
+				"step 1"
+				if(result.bool){
+					player.logSkill('yingjian');
+					player.useCard({name:'sha'},result.targets,false);
+				}
+			},
+			ai:{
+				threaten:function(player,target){
+					return 1.6;
+				}
+			}
+		},
 		dingpan:{
 			enable:'phaseUse',
 			filter:function(event,player){
@@ -6761,6 +6783,8 @@ character.sp={
 		fenyin:'奋音',
 		yawang:'雅望',
 		xunzhi:'殉志',
+		yingjian:'影箭',
+		yingjian_info:'回合开始阶段，你可以视为使用一张无视距离的杀',
 		xunzhi_info:'准备阶段开始时，若你的上家和下家与你的体力值均不相等，你可以失去1点体力。若如此做，你的手牌上限+2',
 		yawang_info:'锁定技，摸牌阶段开始时，你放弃摸牌，改为摸x张牌，然后你于出牌阶段内至多使用x张牌（x为与你体力值相等的角色数）',
 		fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌，每回合最多发动3次',

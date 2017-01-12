@@ -733,6 +733,8 @@ card.swd={
 						if(cardname=='jiu') return 0;
 						if(cardname=='tianxianjiu') return 0;
 						if(cardname=='toulianghuanzhu') return 0;
+						if(cardname=='shijieshu') return 0;
+						if(cardname=='xietianzi') return 0;
 						return 1;
 					}
 				},
@@ -781,9 +783,11 @@ card.swd={
 		},
 		jiguanshu:{
 			fullskin:true,
-			enable:true,
 			type:'jiguan',
 			wuxieable:true,
+			enable:function(card,player){
+				return player.num('e')>0;
+			},
 			filterTarget:function(card,player,target){
 				return target==player;
 				// var es=target.get('e');
@@ -2937,7 +2941,7 @@ card.swd={
 				}
 				else{
 					var e5=player.get('e','5');
-					if(e5&&e5.name=='sifeizhenmian'){
+					if(e5){
 						player.discard(e5);
 					}
 					target.goMad({player:'phaseAfter'});

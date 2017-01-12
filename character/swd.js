@@ -19,12 +19,12 @@ character.swd={
 			swd_yuwentuo:['male','shu',4,['wushuang','xielei','kunlunjing']],
 			swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue']],
 
-			swd_jiliang:['male','wu',3,['yunchou','gongxin','qimou']],
+			swd_jiliang:['male','wu',3,['yunchou','gongxin','jqimou']],
 			swd_shuijing:['female','qun',4,['mojian','duanyue']],
 			swd_quxian:['female','qun',3,['mojian','huanxia']],
 			swd_xiyan:['male','qun',3,['zaowu','daofa']],
 			swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
-			swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
+			swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','hjifeng']],
 			swd_murongshi:['female','shu',4,['duanyi','guxing']],
 			swd_jipeng:['male','wu',3,['reyingzi','guozao']],
 			swd_qi:['male','qun',3,['yaotong','heihuo','pojian']],
@@ -143,6 +143,30 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		hjifeng:{
+			trigger:{player:'phaseUseEnd'},
+			filter:function(event,player){
+				if(!player.num('e')) return false;
+				if(player.num('h',{type:'jiqi'})) return false;
+				if(get.cardPile(function(card){return get.type(card)=='jiqi'})) return true;
+				return false;
+			},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseToDiscard('e','祭风：是否弃置一张装备牌并获得一张祭器牌？').set('ai',function(card){
+					if(player.needsToDiscard()) return 0;
+					return 6-ai.get.value(card);
+				}).logSkill='hjifeng';
+				'step 1'
+				if(result.bool){
+					var card=get.cardPile(function(card){return get.type(card)=='jiqi'});
+					if(card){
+						player.gain(card,'draw');
+					}
+				}
+			}
+		},
 		lmazui:{
 			audio:'mazui',
 			enable:'phaseUse',
@@ -5398,7 +5422,7 @@ character.swd={
 				threaten:1.3
 			}
 		},
-		qimou:{
+		jqimou:{
 			trigger:{player:'damageEnd'},
 			frequent:true,
 			filter:function(event,player){
@@ -8321,10 +8345,12 @@ character.swd={
 		touxi_info:'在其他角色的回合结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以弃置你的一张牌',
 		minjing:'明镜',
 		minjing_info:'若你没有防具牌，你视为装备了光纱天衣',
-		qimou:'奇谋',
-		qimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并立即使用之',
+		jqimou:'奇谋',
+		jqimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并立即使用之',
 		mufeng:'沐风',
 		mufeng_info:'在一名角色的回合结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
+		hjifeng:'祭风',
+		hjifeng_info:'出牌阶段结束时，若时手牌中没有祭器牌，你可以弃置一张装备区内的牌，并从牌堆中获得一张随机祭器',
 		mufeng_old_info:'锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0',
 		lexue:'乐学',
 		lexue_info:'回合内，你随机获得制衡、集智、缔盟、驱虎中的一个技能；回合外，你随机获得遗计、急救、鬼道、反馈中的一个技能',

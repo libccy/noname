@@ -37,13 +37,9 @@ mode.chess={
 				}
 			}
 		}
-		// if(get.config('chess_card')){
-		// 	lib.card.list=lib.card.list.concat(lib.chess_cardlist);
-		// 	if(parseFloat(get.config('chess_obstacle'))>0){
-		// 		lib.card.list=lib.card.list.concat(lib.chess_obstaclelist);
-		// 		delete lib.chess_obstaclelist
-		// 	}
-		// }
+		if(get.config('chess_card')){
+			lib.card.list=lib.card.list.concat(lib.chess_cardlist);
+		}
 		ui.create.cards();
 		game.finishCards();
 		ui.chessContainer=ui.create.div('#chess-container',ui.arena);
@@ -763,6 +759,15 @@ mode.chess={
 				if(xy[0]+x>=ui.chesswidth) return null;
 				if(xy[1]+y>=ui.chessheight) return null;
 				return lib.posmap[this.getDataPos(x,y)]||null;
+			},
+			getNeighbours:function(){
+				var players=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.isChessNeighbour(game.players[i],this)){
+						players.push(game.players[i]);
+					}
+				}
+				return players;
 			},
 			movable:function(x,y){
 				var xy=this.getXY();
@@ -3445,6 +3450,9 @@ mode.chess={
 					if(bossnum){
 						return 3*bossnum;
 					}
+					if(!get.config('single_control')){
+						return 1;
+					}
 					if(get.config('additional_player')){
 						return parseInt(get.config('battle_number'));
 					}
@@ -3613,6 +3621,22 @@ mode.chess={
 				ui.control.style.top='';
 				ui.control.style.transition='';
 
+				var glows=event.bosses.querySelectorAll('.glow');
+				var glows2=event.jiange.querySelectorAll('.glow2');
+				if(!glows.length&&!glows2.length){
+					if(!get.config('single_control')){
+						var addnum;
+						if(get.config('additional_player')){
+							addnum=parseInt(get.config('battle_number'));
+						}
+						else{
+							addnum=parseInt(get.config('battle_number'))+parseInt(get.config('replace_number'));
+						}
+						for(var i=0;i<addnum-1;i++){
+							result.links.push(event.list.randomRemove());
+						}
+					}
+				}
 				for(var i=0;i<result.links.length;i++){
 					game.addRecentCharacter(result.links[i]);
 				}
@@ -3629,8 +3653,6 @@ mode.chess={
 				for(var i=0;i<result.links.length;i++){
 					event.list.remove(result.links[i]);
 				}
-				var glows=event.bosses.querySelectorAll('.glow');
-				var glows2=event.jiange.querySelectorAll('.glow2');
 				if(glows.length){
 					_status.vsboss=true;
 					_status.enemylist=[];
@@ -5158,15 +5180,15 @@ mode.chess={
 
 		pianyi:'翩仪',
 		pianyi_info:'回合结束阶段，若你没有于本回合内造成伤害，你获得一次移动机会',
-		lingdong:'移动射击',
+		lingdong:'灵动',
 		lingdong_info:'回合结束阶段，你可以移动X个格，X为你回合内出杀的次数',
-		lianshe:'连续射击',
+		lianshe:'箭舞',
 		lianshe_info:'你的攻击范围+1；回合内，你回合内，每当你使用一张不是杀的牌，你可以额外使用一张杀',
-		zhiming:'致命射击',
+		zhiming:'穿杨',
 		zhiming_info:'锁定技，当你使用杀造成伤害时，若你不在目标的攻击范围内，此伤害+1',
-		sanjiansheji:'散箭射击',
+		sanjiansheji:'散箭',
 		sanjiansheji_info:'你可以将两张杀当杀使用，此杀可以指定距离你5格以内任意名目标',
-		guanchuan:'贯穿射击',
+		guanchuan:'强弩',
 		guanchuan_info:'当你使用杀指定惟一的目标后，可将攻击射线内的其他角色也加入目标',
 
 		boss_stoneqiangzheng:'强征',
@@ -5266,6 +5288,7 @@ mode.chess={
 		chess_shezhang:{
 			type:'basic',
 			fullskin:true,
+			modeimage:'chess',
 			enable:function(card,player){
 				if(player.movable(-1,0)) return true;
 				if(player.movable(1,0)) return true;
@@ -5339,6 +5362,7 @@ mode.chess={
 		chess_chuzhang:{
 			type:'basic',
 			fullskin:true,
+			modeimage:'chess',
 			filterTarget:function(card,player,target){
 				return player==target;
 			},
@@ -5491,19 +5515,10 @@ mode.chess={
 			chess_xingtian:['male','qun',99,['boss_moyan','wushuang'],['boss','chessboss']],
 		}
 	},
-	// cardPack:{
-	// 	mode_chess:['chess_shezhang','chess_chuzhang']
-	// },
+	cardPack:{
+		mode_chess:['chess_shezhang','chess_chuzhang']
+	},
 	chess_cardlist:[],
-	chess_obstaclelist:[
-		// ['club',3,'chess_shezhang'],
-		// ['spade',5,'chess_shezhang'],
-		// ['spade',7,'chess_shezhang'],
-		// ['diamond',1,'chess_chuzhang'],
-		// ['diamond',4,'chess_chuzhang'],
-		// ['heart',8,'chess_chuzhang'],
-		// // ['diamond',9,'chess_chuzhang'],
-	],
 	rank:{
 		rarity:{
 	        legend:[

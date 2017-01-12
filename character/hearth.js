@@ -82,7 +82,7 @@ character.hearth={
 		// hs_aya:['male','wei',3,[]],
 		// hs_barnes:['male','wei',3,[]],
 		// hs_nuogefu:['male','wei',3,[]],
-		hs_kazhakusi:['male','shu',3,['lianjin']],
+		// hs_kazhakusi:['male','shu',3,['lianjin']],
 		// hs_lazi:['male','wei',3,[]],
 		hs_shaku:['male','wei',3,['shouji']],
 		hs_laxiao:['male','qun',3,['guimou','yingxi']],
@@ -229,6 +229,40 @@ character.hearth={
 			}
 		},
 		peiyu:{
+			trigger:{player:['phaseBegin','phaseEnd']},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('peiyu'),function(card,player,target){
+					for(var i=1;i<=8;i++){
+						if(target.hasSkill('tuteng'+i)) return false;
+					}
+					return true;
+				}).ai=function(target){
+					if(player==target&&ai.get.attitude(player,target)>0&&event.parent.triggername=='phaseBegin'){
+						return ai.get.attitude(player,target)+10;
+					}
+					return ai.get.attitude(player,target);
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('peiyu',result.targets);
+					var rand=['tuteng1','tuteng2','tuteng3','tuteng4',
+						'tuteng5','tuteng6','tuteng7','tuteng8'];
+					result.targets[0].addAdditionalSkill('peiyu',['peiyu2',rand.randomGet()]);
+				}
+			}
+		},
+		peiyu2:{
+			trigger:{player:'damageAfter'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				player.removeAdditionalSkill('peiyu');
+			}
+		},
+		peiyu_old:{
 			enable:'phaseUse',
 			filterCard:true,
 			position:'he',
@@ -360,9 +394,9 @@ character.hearth={
 					}
 				}
 			},
-			group:'peiyu2'
+			group:'peiyu_old2'
 		},
-		peiyu2:{
+		peiyu_old2:{
 			trigger:{player:'dieBegin'},
 			forced:true,
 			popup:false,
@@ -4851,7 +4885,8 @@ character.hearth={
 		yingxi:'影袭',
 		yingxi_info:'回合结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用',
 		peiyu:'培育',
-		peiyu_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾',
+		peiyu_info:'回合开始和结束阶段，你可以令一名没有图腾的角色获得一个随机图腾直到其首次受到伤害',
+		peiyu_old_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾',
 		wzhanyi:'战意',
 		wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌并展示之，将摸到的装备牌置于装备区，然后可以使用手牌中的杀',
 		shengteng:'升腾',
