@@ -6281,8 +6281,22 @@
 							bool:true,
 							cards:player.get(event.position||'h')
 						}
+                        for(var i=0;i<event.result.cards.length;i++){
+                            if(!lib.filter.cardDiscardable(event.result.cards[i],player,event)){
+                                event.result.cards.splice(i--,1);
+                            }
+                        }
 					}
 					else{
+                        event.rangecards=player.get(event.position||'h');
+                        for(var i=0;i<event.rangecards.length;i++){
+                            if(lib.filter.cardDiscardable(event.rangecards[i],player,event)){
+                                event.rangecards.splice(i--,1);
+                            }
+                            else{
+                                event.rangecards[i].uncheck('chooseToDiscard');
+                            }
+                        }
 						var range=get.select(event.selectCard);
 						game.check();
 						if(event.isMine()){
@@ -6335,6 +6349,11 @@
 						}
 					}
 					"step 1"
+                    if(event.rangecards){
+                        for(var i=0;i<event.rangecards.length;i++){
+                            event.rangecards[i].recheck('chooseToDiscard');
+                        }
+                    }
                     if(event.result=='ai'){
                         game.check();
                         if(ai.basic.chooseCard(event.ai)||forced){
@@ -7679,7 +7698,11 @@
 					if(info.discard!=false&&info.lose!=false&&!info.viewAs){
 						player.discard(cards).delay=false;
 						if(info.prepare){
-							info.prepare(cards,player,targets);
+                            switch(info.prepare){
+                                case 'give':player.$give(cards,targets[0]);break;
+                                case 'throw':player.$throw(cards);break;
+                                default:info.prepare(cards,player,targets);
+                            }
 						}
 						if(lib.config.low_performance){
 							event.discardTransition=true;
@@ -7695,7 +7718,11 @@
                             }
 						}
 						if(info.prepare){
-							info.prepare(cards,player,targets);
+                            switch(info.prepare){
+                                case 'give':player.$give(cards,targets[0]);break;
+                                case 'throw':player.$throw(cards);break;
+                                default:info.prepare(cards,player,targets);
+                            }
 						}
 						else if(info.viewAs){
 							player.$throw(cards);
@@ -8136,6 +8163,7 @@
 						}
 						cards[i].style.transform+=' scale(0.2)';
                         cards[i].classList.remove('glow');
+                        cards[i].recheck();
 						if(event.position){
 							cards[i].goto(event.position);
 						}
@@ -9796,7 +9824,12 @@
 					next.autochoose=function(){
 						if(!this.forced) return false;
                         if(typeof this.selectCard=='function') return false;
-						return get.select(this.selectCard)[0]>=this.player.num(this.position||'h');
+                        var cards=this.player.num(this.position||'h');
+                        var num=cards.length;
+                        for(var i=0;i<cards.length;i++){
+                            if(!lib.filter.cardDiscardable(cards[i],this.player,this)) num--;
+                        }
+						return get.select(this.selectCard)[0]>=num;
 					}
                     next.setContent('chooseToDiscard');
                     next._args=Array.from(arguments);
@@ -13459,7 +13492,16 @@
 					if(clone) this.clone=node;
 					if(position) position.appendChild(node);
 					return node;
-				}
+				},
+                uncheck:function(skill){
+                    if(skill) this.storage.uncheck.add(skill);
+                    this.classList.add('uncheck');
+                },
+                recheck:function(skill){
+                    if(skill) this.storage.uncheck.remove(skill);
+                    else this.storage.uncheck.length=0;
+                    if(this.storage.uncheck.length==0) this.classList.remove('uncheck');
+                }
 			},
 			button:{
 				exclude:function(){
@@ -14245,6 +14287,12 @@
 				if(typeof num!='number') return true;
 				else return(get.cardCount(card,player)<num);
 			},
+            cardDiscardable:function(card,player,event){
+                event=event||_status.event;
+                var mod=game.checkMod(card,player,event.getParent().name,'unchanged','cardDiscardable',player.get('s'));
+                if(mod!='unchanged') return mod;
+                return true;
+            },
 			cardAiIncluded:function(card){
 				if(_status.event.isMine()) return true;
 				return (_status.event.aiexclude.contains(card)==false);
@@ -19193,7 +19241,8 @@
 						if(event.filterCard(cards[i],player)&&
 							lib.filter.cardAiIncluded(cards[i])&&
 							(player.isOut()==false||event.includeOutCard)&&
-							lib.filter.cardRespondable(cards[i],player)){
+							lib.filter.cardRespondable(cards[i],player)&&
+                            !cards[i].classList.contains('uncheck')){
 							if(ui.selected.cards.length<range[1]){
 								cards[i].classList.add('selectable');
 							}
@@ -28538,7 +28587,7 @@
 						}
 					}
 				}
-				node.storage={};
+				node.storage={uncheck:[]};
 				if(info!='noclick'){
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
 					if(lib.config.touchscreen){

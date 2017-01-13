@@ -839,6 +839,7 @@ card.guozhan={
 				"step 0"
 				var damaged=trigger.player;
 				player.chooseCardTarget({
+					filterCard:lib.filter.cardDiscardable,
 					filterTarget:function(card,player,target){
 						var damaged=_status.event.damaged;
 						return get.distance(damaged,target)<=1&&target!=damaged;

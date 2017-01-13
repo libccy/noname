@@ -1254,7 +1254,7 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				player.choosePlayerCard(get.prompt('hanbing'),'he',trigger.target,Math.min(2,trigger.target.num('he')),function(button){
+				player.discardPlayerCard(get.prompt('hanbing'),'he',trigger.target,Math.min(2,trigger.target.num('he')),function(button){
 					var trigger=_status.event.getTrigger();
 					var player=_status.event.player;
 					var eff=ai.get.damageEffect(trigger.target,player,player);
@@ -1272,15 +1272,11 @@ card.standard={
 						if(ai.get.buttonValue(_status.event.dialog.buttons[i])>1.5) num++;
 					}
 					if(num>=2) return ai.get.buttonValue(button)-1.5;
-				});
+				}).set('logSkill','hanbing_skill');
 				"step 1"
 				if(result.bool){
 					trigger.untrigger();
-					var cards=[];
-					for(var i=0;i<result.links.length;i++) cards.push(result.links[i]);
-					player.logSkill('hanbing_skill');
 					trigger.unhurt=true;
-					trigger.target.discard(cards);
 				}
 			}
 		},

@@ -220,6 +220,7 @@ window.characterRank={
         'yxs_nandinggeer',
     ],
     bp:[
+        'dongbai',
         'yxs_zhaoyong',
         'yxs_yangguang',
         'litong',
@@ -347,6 +348,9 @@ window.characterRank={
         'sp_jiaxu',
     ],
     b:[
+        'caochun',
+        'sp_liubei',
+        'zhuling',
         'xin_liru',
         'weiyan',
         'sp_xiahoudun',

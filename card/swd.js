@@ -2189,7 +2189,7 @@ card.swd={
 						return player!=target&&target.hp>=player.hp;
 					},
 					filterCard:function(card){
-						return get.color(card)=='red';
+						return get.color(card)=='red'&&lib.filter.cardDiscardable(card,player);
 					},
 					ai1:function(card){
 						return 9-ai.get.value(card);
@@ -2412,7 +2412,7 @@ card.swd={
 				'step 0'
 				player.chooseCardTarget({
 					filterTarget:true,
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
 						return 7-ai.get.useful(card);
 					},
