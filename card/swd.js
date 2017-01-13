@@ -1463,18 +1463,11 @@ card.swd={
 		yufulu:{
 			fullskin:true,
 			type:'equip',
-			chongzhu:true,
-			enable:function(card,player){
-				return player.sex=='female';
-			},
 			subtype:'equip5',
 			skills:['touzhi'],
 			ai:{
 				basic:{
-					equipValue:function(card,player){
-						if(player.sex=='female') return 5;
-						return 0;
-					},
+					equipValue:5
 				}
 			}
 		},
@@ -1640,18 +1633,11 @@ card.swd={
 		guangshatianyi:{
 			fullskin:true,
 			type:'equip',
-			chongzhu:true,
-			enable:function(card,player){
-				return player.sex=='female';
-			},
 			subtype:'equip2',
 			skills:['guangshatianyi'],
 			ai:{
 				basic:{
-					equipValue:function(card,player){
-						if(player.sex=='female') return 6;
-						return 0;
-					},
+					equipValue:6
 				}
 			}
 		},
@@ -4521,7 +4507,7 @@ card.swd={
 		guiyoujie:'鬼幽结',
 		guiyoujie_info:'出牌阶段，对一名其他角色使用。若判定结果为黑色，则将其翻面。',
 		yufulu:'御夫录',
-		yufulu_info:'仅女性角色可以使用，出牌阶段，可弃置一张武器牌令一名角色受到一点伤害，然后该角色获得此武器牌',
+		yufulu_info:'出牌阶段，可弃置一张武器牌令一名角色受到一点伤害，然后该角色获得此武器牌',
 		touzhi:'投掷',
 		touzhi_info:'出牌阶段，可弃置一张武器牌令一名角色受到一点伤害，然后该角色获得此武器牌',
 		xixueguizhihuan:'吸血鬼指环',
@@ -4536,7 +4522,7 @@ card.swd={
 		chiyuxi_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到1点火焰伤害。',
 		guangshatianyi:'光纱天衣',
 		guangshatianyi_bg:'纱',
-		guangshatianyi_info:'仅女性角色可使用，锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
+		guangshatianyi_info:'锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
 		sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌，然后指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
 		yiluan:'意乱',

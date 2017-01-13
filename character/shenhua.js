@@ -5,7 +5,7 @@ character.shenhua={
 		xiahouyuan:['male','wei',4,['shensu']],
 		caoren:['male','wei',4,['jushou','jiewei']],
 		huangzhong:['male','shu',4,['xinliegong']],
-		weiyan:['male','shu',4,['xinkuanggu']],
+		weiyan:['male','shu',4,['xinkuanggu','qimou']],
 		xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 		zhoutai:['male','wu',4,['buqu','fenji']],
 		zhangjiao:['male','qun',3,['leiji','guidao','huangtian'],['zhu']],
@@ -45,6 +45,103 @@ character.shenhua={
 		menghuo:['zhurong'],
 	},
 	skill:{
+		qimou:{
+			unique:true,
+			enable:'phaseUse',
+			filter:function(event,player){
+				return !player.storage.qimou;
+			},
+			init:function(player){
+				player.storage.qimou=false;
+			},
+			mark:true,
+			intro:{
+				content:'limited'
+			},
+			skillAnimation:'legend',
+			animationColor:'metal',
+			content:function(){
+				'step 0'
+				var shas=player.get('h','sha');
+				var num;
+				if(player.hp>=4&&shas.length>=3){
+					num=3;
+				}
+				else if(player.hp>=3&&shas.length>=2){
+					num=2;
+				}
+				else{
+					num=1
+				}
+				player.unmarkSkill('qimou');
+				player.storage.qimou=true;
+				player.chooseControl('一','二','三','四','五','六',function(){
+					return get.cnNumber(_status.event.goon,true);
+				}).set('prompt','失去任意点体力').set('goon',num);
+				'step 1'
+				var num;
+				switch(result.control){
+					case '一':num=1;break;
+					case '二':num=2;break;
+					case '三':num=3;break;
+					case '四':num=4;break;
+					case '五':num=5;break;
+					case '六':num=6;break;
+				}
+				player.storage.qimou=num;
+				player.loseHp(num);
+				player.addTempSkill('qimou2','phaseAfter');
+			},
+			ai:{
+				order:2,
+				result:{
+					player:function(player){
+						if(player.hp==1) return 0;
+						var shas=player.get('h','sha');
+						if(!shas.length) return 0;
+						var card=shas[0];
+						if(!lib.filter.cardEnabled(card,player)) return 0;
+						if(lib.filter.cardUsable(card,player)) return 0;
+						var mindist;
+						if(player.hp>=4&&shas.length>=3){
+							mindist=4;
+						}
+						else if(player.hp>=3&&shas.length>=2){
+							mindist=3;
+						}
+						else{
+							mindist=2;
+						}
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].hp<=mindist-1&&
+							get.distance(player,game.players[i],'attack')<=mindist&&
+							player.canUse(card,game.players[i],false)&&
+							ai.get.effect(game.players[i],card,player,player)>0){
+								return 1;
+							}
+						}
+						return 0;
+					}
+				}
+			}
+		},
+		qimou2:{
+			onremove:function(player){
+				delete player.storage.qimou;
+			},
+			mod:{
+				cardUsable:function(card,player,num){
+					if(typeof player.storage.qimou=='number'&&card.name=='sha'){
+						return num+player.storage.qimou;
+					}
+				},
+				attackFrom:function(from,to,distance){
+					if(typeof from.storage.qimou=='number'){
+						return distance-from.storage.qimou;
+					}
+				}
+			}
+		},
 		xinkuanggu:{
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
@@ -3252,6 +3349,8 @@ character.shenhua={
 		huashen1:'化身',
 		huashen2:'化身',
 		xinsheng:'新生',
+		qimou:'奇谋',
+		qimou_info:'限定技，出牌阶段，你可以失去任意点体力，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你失去的体力值）',
 		tiaoxin_info:'出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色需对你使用一张【杀】，若该角色不如此做，你弃掉他的一张牌，每回合限一次。',
 		zhiji_info:'觉醒技，回合开始阶段，若你没有手牌，你须回复1点体力或摸两张牌，然后减1点体力上限，并永久获得技能“观星”。',
 		xiangle_info:'锁定技，当其他玩家使用【杀】指定你为目标时，需额外弃掉一张基本牌，否则该【杀】对你无效。',

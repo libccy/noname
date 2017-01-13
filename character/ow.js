@@ -92,7 +92,9 @@ character.ow={
                 return player.num('h',{type:'hslingjian'})>1;
             },
             filterCard:{type:'hslingjian'},
-            filterTarget:true,
+            filterTarget:function(card,player,target){
+                return !target.hujia;
+            },
             selectCard:2,
             usable:1,
             content:function(){
@@ -363,7 +365,6 @@ character.ow={
 				game.addVideo('storage',player,['shoujia2',null]);
 				if(!player.isTurnedOver()){
                     player.turnOver();
-                    player.draw();
                 }
 			},
 			intro:{
@@ -385,7 +386,7 @@ character.ow={
             group:'shoujia3'
 		},
         shoujia3:{
-            trigger:{source:'damageEnd'},
+            trigger:{global:'damageEnd'},
             forced:true,
             filter:function(event,player){
                 return event.player==player.storage.shoujia2;
@@ -393,6 +394,7 @@ character.ow={
             content:function(){
                 ui.discardPile.appendChild(player.storage.shoujia);
                 player.$throw(player.storage.shoujia);
+                game.log(player.storage.shoujia,'被置入弃牌堆')
                 delete player.storage.shoujia;
 				delete player.storage.shoujia2;
 				player.removeSkill('shoujia2');
@@ -2585,7 +2587,7 @@ character.ow={
         paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到杀造成的伤害，炮台降低一级',
         maoding:'铆钉',
         maoding2:'铆钉',
-        maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌限阶段限一次，你可以弃置两张零件牌令一名角色获得一点护甲',
+        maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌限阶段限一次，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
         fengshi:'风矢',
         fengshi2:'风矢',
         fengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加20%的概率强制命中；你的杀造成伤害后增加20%的概率令伤害+1',
@@ -2596,7 +2598,7 @@ character.ow={
         shoujia:'兽夹',
         shoujia2:'兽夹',
         shoujia3:'兽夹',
-        shoujia_info:'出牌阶段限一次，你可以将一张牌背面朝上置于一名其他角色的武将牌上，当该角色使用一张与此牌花色相同的牌指定其他角色为目标时，将此牌置入弃牌堆，该角色将武将牌翻至背面并摸一张牌；当该角色对你造成伤害时，将此牌置入弃牌堆',
+        shoujia_info:'出牌阶段限一次，你可以将一张牌背面朝上置于一名其他角色的武将牌上，当该角色使用一张与此牌花色相同的牌指定其他角色为目标时，将此牌置入弃牌堆，该角色将武将牌翻至背面；当你受到伤害时，将此牌置入弃牌堆',
         shihuo:'嗜火',
         shihuo_info:'锁定技，每当一名角色受到火焰伤害，你摸一张牌',
         shanguang:'闪光',

@@ -5971,6 +5971,7 @@
 					event.goto(0);
 				},
 				phaseDraw:function(){
+                    "step 0"
 					if(game.modPhaseDraw){
 						game.modPhaseDraw(player,event.num);
 					}
@@ -5982,6 +5983,10 @@
 							player.draw(event.num);
 						}
 					}
+                    "step 1"
+                    if(Array.isArray(result)){
+                        event.cards=result;
+                    }
 				},
 				phaseUse:function(){
 					"step 0";
@@ -9130,6 +9135,16 @@
                 setNickname:function(str){
                     this.node.nameol.innerHTML=str||this.nickname||'';
                     return this;
+                },
+                setAvatar:function(name,name2){
+                    var node;
+    				if(this.name2==name){
+    					node=this.node.avatar2;
+    				}
+    				else if(this.name==name){
+    					node=this.node.avatar;
+    				}
+                    if(node) node.setBackground(name2,'character');
                 },
 				update:function(){
 					if(_status.video&&arguments.length==0) return;

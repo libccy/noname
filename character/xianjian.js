@@ -423,20 +423,13 @@ character.xianjian={
 				return Math.random()<0.5;
 			},
 			content:function(){
-				var node;
-				if(player.name2=='pal_longkui'){
-					node=player.node.avatar2;
-				}
-				else if(player.name=='pal_longkui'){
-					node=player.node.avatar;
-				}
 				if(player.storage.fenxing){
 					player.storage.fenxing=false;
 					player.removeSkill('guijiang');
 					player.removeSkill('diesha');
 					player.addSkill('diewu');
 					player.addSkill('lingyu');
-					if(node) node.setBackground('pal_longkui','character');
+					player.setAvatar('pal_longkui','pal_longkui');
 				}
 				else{
 					player.storage.fenxing=true;
@@ -444,7 +437,7 @@ character.xianjian={
 					player.removeSkill('lingyu');
 					player.addSkill('guijiang');
 					player.addSkill('diesha');
-					if(node) node.setBackground('pal_longkuigui','character');
+					player.setAvatar('pal_longkui','pal_longkuigui');
 				}
 			},
 		},
