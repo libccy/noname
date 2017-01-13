@@ -71,7 +71,7 @@ character.refresh={
 					player.storage.rerende2=[];
 				}
 				player.storage.rerende2.push(target);
-				target.gain(cards);
+				target.gain(cards,player);
 				game.delay();
 				if(typeof player.storage.rerende!='number'){
 					player.storage.rerende=0;
@@ -368,7 +368,7 @@ character.refresh={
 				"step 2"
 				if(result.bool){
 					player.logSkill('refankui',trigger.source);
-					player.gain(result.links[0]);
+					player.gain(result.links[0],trigger.source);
 					trigger.source.$give(1,player);
 					event.goto(1);
 				}
@@ -511,7 +511,7 @@ character.refresh={
 				if(result.bool){
 					player.storage.qingjian++;
 					player.logSkill('qingjian',result.targets);
-					result.targets[0].gain(result.cards);
+					result.targets[0].gain(result.cards,player);
 					player.$give(result.cards.length,result.targets[0]);
 					for(var i=0;i<result.cards.length;i++){
 						event.cards.remove(result.cards[i]);
@@ -561,7 +561,7 @@ character.refresh={
 			content:function(){
 				"step 0"
 				target.storage.refanjian=cards[0];
-				target.gain(cards[0]);
+				target.gain(cards[0],player);
 				"step 1"
 				target.chooseControl('refanjian_card','refanjian_hp').ai=function(event,player){
 					var cards=player.get('he',{suit:get.suit(player.storage.refanjian)});
@@ -1171,7 +1171,7 @@ character.refresh={
 				"step 2"
 				if(get.position(card)=='d'){
 					if(get.subtype(card)=='equip3'||get.subtype(card)=='equip4'){
-						player.gain(card);
+						player.gain(card,trigger.player);
 						player.$gain2(card);
 					}
 				}

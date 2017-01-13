@@ -1968,7 +1968,9 @@ character.ow={
                 var next=player.chooseCardTarget({
                     prompt:get.prompt('yihun'),
                     position:'he',
-                    filterCard:{suit:'spade'},
+                    filterCard:function(card,player){
+                        return get.suit(card)=='spade'&&lib.filter.cardDiscardable(card,player);
+                    },
                     ai1:function(card){
                         return 7-ai.get.value(card);
                     },

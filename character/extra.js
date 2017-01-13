@@ -553,7 +553,7 @@ character.extra={
 					var hej=event.targets[num].get('hej')
 					if(hej.length){
 						var card=hej.randomGet();
-						player.gain(card);
+						player.gain(card,event.targets[num]);
 						if(get.position(card)=='h'){
 							event.targets[num].$give(1,player);
 						}

@@ -207,7 +207,7 @@ character.hearth={
 			content:function(){
 				var card=trigger.source.get('h').randomGet();
 				if(card){
-					player.gain(card);
+					player.gain(card,trigger.source);
 					if(get.color(card)=='black'){
 						trigger.source.$give(card,player);
 						event.redo();
@@ -2837,8 +2837,8 @@ character.hearth={
 					player.logSkill('kuixin',result.targets);
 					var cards0=target.get('h');
 					var cards1=player.get('h');
-					target.gain(cards1);
-					player.gain(cards0);
+					target.gain(cards1,player);
+					player.gain(cards0,target);
 					target.$give(cards0.length,player);
 					player.$give(cards1.length,target);
 				}
@@ -3146,7 +3146,7 @@ character.hearth={
 				if(result.bool){
 					player.logSkill('shijie',result.targets);
 					var target=result.targets[0];
-					player.gain(target.get('h').randomGet());
+					player.gain(target.get('h').randomGet(),target);
 					event.target=target;
 					target.$give(1,player);
 					game.delay();

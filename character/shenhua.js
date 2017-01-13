@@ -478,7 +478,7 @@ character.shenhua={
 						return target.num('h')>0;
 					},
 					selectTarget:[0,2],
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					prompt:'是否发动巧变跳过摸牌阶段？',
 					check:check,
 					target:target
@@ -581,7 +581,7 @@ character.shenhua={
 						}
 					},
 					selectTarget:2,
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					prompt:'是否发动巧变跳过出牌阶段？',
 					targetprompt:['被移走','移动目标'],
 					check:check,
@@ -1788,7 +1788,7 @@ character.shenhua={
 				}).set('temp',temp);
 				"step 1"
 				if(result.targets&&result.targets[0]){
-					result.targets[0].gain(result.cards);
+					result.targets[0].gain(result.cards,player);
 					player.$give(result.cards.length,result.targets[0]);
 				}
 			}
@@ -1818,8 +1818,8 @@ character.shenhua={
 				targets[0].lose(event.cards0,ui.special);
 				targets[1].lose(event.cards1,ui.special);
 				'step 1'
-				targets[0].gain(event.cards1);
-				targets[1].gain(event.cards0);
+				targets[0].gain(event.cards1,targets[1]);
+				targets[1].gain(event.cards0,targets[0]);
 				targets[0].$give(event.cards0.length,targets[1]);
 				targets[1].$give(event.cards1.length,targets[0]);
 			},
@@ -2867,8 +2867,8 @@ character.shenhua={
 				var check=player.num('h')<=player.hp;
 				player.chooseCardTarget({
 					prompt:get.prompt('shensu'),
-					filterCard:function(card){
-						return get.type(card)=='equip'
+					filterCard:function(card,player){
+						return get.type(card)=='equip'&&lib.filter.cardDiscardable(card,player)
 					},
 					position:'he',
 					filterTarget:function(card,player,target){
@@ -2953,8 +2953,8 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				player.chooseCardTarget({
-					filterCard:function(card){
-						return get.suit(card)=='heart';
+					filterCard:function(card,player){
+						return get.suit(card)=='heart'&&lib.filter.cardDiscardable(card,player);
 					},
 					filterTarget:function(card,player,target){
 						return player!=target;
@@ -3308,7 +3308,7 @@ character.shenhua={
 			usable:1,
 			forceaudio:true,
 			content:function(){
-				target.gain(cards);
+				target.gain(cards,player);
 			},
 			ai:{
 				expose:0.3,

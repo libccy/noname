@@ -353,7 +353,7 @@ character.yijiang={
 				'step 2'
 				var target=event.target;
 				if(result.bool){
-					player.gain(result.cards);
+					player.gain(result.cards,target);
 					target.$give(result.cards,player);
 				}
 				else{
@@ -573,7 +573,7 @@ character.yijiang={
 				'step 2'
 				if(result.bool){
 					var card=result.links[0];
-					trigger.source.gain(card);
+					trigger.source.gain(card,player);
 					if(get.position(card)=='e'){
 						player.$give(card,trigger.source);
 					}
@@ -1020,7 +1020,7 @@ character.yijiang={
 				}
 				'step 2'
 				if(result.bool&&result.cards&&result.cards.length){
-					player.gain(result.cards);
+					player.gain(result.cards,target);
 					target.$give(result.cards,player);
 				}
 			},
@@ -1163,7 +1163,7 @@ character.yijiang={
 			audio:2,
 			content:function(){
 				'step 0'
-				player.gain(target.get('h').randomGet());
+				player.gain(target.get('h').randomGet(),target);
 				target.$give(1,player);
 				'step 1'
 				player.chooseControl('选项一','选项二',function(){
@@ -1344,13 +1344,16 @@ character.yijiang={
 				'step 1'
 				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
 				var n1=target.get('he',function(card){
+					if(!lib.filter.cardDiscardable(card,player)) return false;
 					return get.type(card,'trick')=='trick';
 				});
 				var n2=target.get('he',function(card){
+					if(!lib.filter.cardDiscardable(card,player)) return false;
 					return get.type(card,'trick')!='trick';
 				});
 				if(n1.length>1||n2.length>2||(n1.length==1&&n2.length==2)){
-					target.chooseToDiscard('弃置一张锦囊牌，或两张非锦囊牌',true,'he',function(card){
+					target.chooseToDiscard('弃置一张锦囊牌，或两张非锦囊牌',true,'he',function(card,player){
+						if(!lib.filter.cardDiscardable(card,player)) return false;
 						if(!_status.event.nontrick){
 							return get.type(card,'trick')=='trick';
 						}
@@ -1455,7 +1458,7 @@ character.yijiang={
 					filterTarget:function(card,player,target){
 						return target!=player&&target.num('he')>0;
 					},
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
 						return 7-ai.get.useful(card);
 					},
@@ -2617,7 +2620,7 @@ character.yijiang={
 				'step 1'
 				if(result.bool){
 					var es=target.get('e');
-					player.gain(es);
+					player.gain(es,target);
 					target.$give(es,player);
 					player.removeSkill('yanzhu');
 				}
@@ -3547,7 +3550,7 @@ character.yijiang={
 			lose:true,
 			content:function(){
 				player.$give(cards.length,target);
-				target.gain(cards);
+				target.gain(cards,player);
 				target.addTempSkill('mingjian2',{player:'phaseAfter'});
 			},
 			ai:{
@@ -3605,7 +3608,7 @@ character.yijiang={
 					var target=result.targets[0];
 					target.addSkill('mingjian2');
 					var hs=player.get('h');
-					target.gain(hs);
+					target.gain(hs,player);
 					player.$give(hs.length,target);
 				}
 			}
@@ -3695,7 +3698,7 @@ character.yijiang={
 				'step 1'
 				if(result.bool){
 					trigger.source.$give(trigger.source.get('e','1'),player);
-					player.gain(trigger.source.get('e','1'));
+					player.gain(trigger.source.get('e','1'),trigger.source);
 				}
 			},
 		},
@@ -4484,7 +4487,7 @@ character.yijiang={
 					return 0;
 				});
 				"step 2"
-				trigger.player.gain(result.cards);
+				trigger.player.gain(result.cards,player);
 				if(player==game.me||trigger.player==game.me)
 				player.$give(result.cards,trigger.player);
 				else
@@ -4712,7 +4715,7 @@ character.yijiang={
 				});
 				"step 3"
 				if(result.bool){
-					player.gain(result.cards);
+					player.gain(result.cards,event.target);
 					event.target.$give(1,player);
 					game.delay();
 					trigger.untrigger();
@@ -4882,7 +4885,7 @@ character.yijiang={
 				"step 0"
 				player.unmarkSkill('xianzhou');
 				var cards=player.get('e');
-				target.gain(cards);
+				target.gain(cards,player);
 				event.num=cards.length;
 				player.$give(cards,target);
 				player.storage.xianzhou=true;
@@ -5038,7 +5041,7 @@ character.yijiang={
 				}
 				"step 2"
 				if(result.bool){
-					player.gain(result.cards);
+					player.gain(result.cards,event.target);
 					event.target.$give(result.cards,player);
 					game.delay();
 				}
@@ -5182,7 +5185,7 @@ character.yijiang={
 				event.giver=giver;
 				'step 1'
 				var card=result.cards[0];
-				event.gainner.gain(card,'give');
+				event.gainner.gain(card,event.giver);
 				event.giver.$give(1,event.gainner);
 				'step 2'
 				if(event.gainner.num('h')==event.giver.num('h')){
@@ -5259,7 +5262,7 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				targets[0].gain(cards);
+				targets[0].gain(cards,player);
 				game.delay(2);
 				"step 1"
 				targets[0].chooseControl('draw_card','出杀').set('ai',function(){
@@ -5497,7 +5500,7 @@ character.yijiang={
 				}).set('check',check);
 				"step 2"
 				if(result.bool){
-					result.targets[0].gain(result.cards);
+					result.targets[0].gain(result.cards,event.player);
 					event.player.$give(result.cards.length,result.targets[0]);
 				}
 			},
@@ -5633,8 +5636,8 @@ character.yijiang={
 					filterTarget:function(card,player,target){
 						return player!=target;
 					},
-					filterCard:function(card){
-						return get.type(card)!='basic';
+					filterCard:function(card,player){
+						return get.type(card)!='basic'&&lib.filter.cardDiscardable(card,player);
 					},
 					ai1:function(card){
 						if(get.tag(card,'damage')&&get.type(card)=='trick'){
@@ -6140,7 +6143,7 @@ character.yijiang={
 				if(num!=2) event.finish();
 				'step 1'
 				if(result.cards){
-					player.gain(result.cards);
+					player.gain(result.cards,target);
 					target.$give(result.cards.length,player);
 				}
 			},
@@ -6441,7 +6444,7 @@ character.yijiang={
 				});
 				"step 2"
 				if(result.bool){
-					player.gain(result.cards[0]);
+					player.gain(result.cards[0],trigger.source);
 					trigger.source.$give(1,player);
 				}
 				else{
@@ -6519,7 +6522,7 @@ character.yijiang={
 				});
 				"step 1"
 				if(result.bool){
-					player.gain(result.cards[0]);
+					player.gain(result.cards[0],trigger.source);
 					trigger.source.$give(1,player);
 				}
 				else{
@@ -6552,7 +6555,7 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				target.gain(cards);
+				target.gain(cards,player);
 				game.delay();
 				"step 1"
 				player.gainPlayerCard(target,'he',true);
@@ -6566,7 +6569,7 @@ character.yijiang={
 				}).set('source',target);
 				"step 3"
 				if(result.bool){
-					result.targets[0].gain(card);
+					result.targets[0].gain(card,player);
 					player.$give(1,result.targets[0]);
 					game.delay();
 				}
@@ -6692,7 +6695,12 @@ character.yijiang={
 					else{
 						return Math.random();
 					}
-				}).set('check',check);
+				}).set('check',check).set('filterButton',function(button){
+					if(_status.event.player==_status.event.target){
+						return lib.filter.cardDiscardable(button.link,_status.event.player);
+					}
+					return true;
+				});
 				"step 1"
 				if(result.bool){
 					player.logSkill('buyi',trigger.player);

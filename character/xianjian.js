@@ -455,7 +455,7 @@ character.xianjian={
 			},
 			discard:false,
 			content:function(){
-				target.gain(cards);
+				target.gain(cards,player);
 				if(!player.hasSkill('diewu2')){
 					player.draw();
 					player.addTempSkill('diewu2','phaseAfter');
@@ -531,8 +531,8 @@ character.xianjian={
 				}
 				'step 2'
 				if(result.bool){
-					player.gain(event.card);
-					target.gain(result.cards);
+					player.gain(event.card,target);
+					target.gain(result.cards,player);
 					player.$give(1,target);
 					target.$give(1,player);
 					game.log(player,'与',target,'交换了一张手牌');

@@ -132,7 +132,7 @@ character.standard={
 				"step 1"
 				if(result.bool){
 					player.logSkill('fankui',trigger.source);
-					player.gain(result.links[0]);
+					player.gain(result.links[0],trigger.source);
 					trigger.source.$give(1,player);
 				}
 			},
@@ -270,7 +270,7 @@ character.standard={
 				if(result.bool){
 					player.logSkill('tuxi',result.targets);
 					for(var i=0;i<result.targets.length;i++){
-						player.gain(result.targets[i].get('h').randomGet());
+						player.gain(result.targets[i].get('h').randomGet(),result.targets[i]);
 						result.targets[i].$give(1,player);
 					}
 					trigger.finish();
@@ -371,7 +371,7 @@ character.standard={
 				"step 3"
 				if(result.bool){
 					player.line(result.targets,'green');
-					result.targets[0].gain(result.cards);
+					result.targets[0].gain(result.cards,player);
 					player.$give(result.cards.length,result.targets[0]);
 					for(var i=0;i<result.cards.length;i++){
 						event.cards.remove(result.cards[i]);
@@ -501,7 +501,7 @@ character.standard={
 				return 10-ai.get.value(card);
 			},
 			content:function(){
-				target.gain(cards);
+				target.gain(cards,player);
 				game.delay();
 				if(typeof player.storage.rende!='number'){
 					player.storage.rende=0;
@@ -1185,7 +1185,7 @@ character.standard={
 				event.choice=result.control;
 				target.popup(event.choice);
 				event.card=player.get('h').randomGet();
-				target.gain(event.card);
+				target.gain(event.card,player);
 				player.$give(event.card,target);
 				game.delay();
 				"step 2"
@@ -1245,6 +1245,7 @@ character.standard={
 				"step 0"
 				var next=player.chooseCardTarget({
 					position:'he',
+					filterCard:lib.filter.cardDiscardable,
 					filterTarget:function(card,player,target){
 						var trigger=_status.event.getTrigger();
 						if(get.distance(player,target,'attack')<=1&&

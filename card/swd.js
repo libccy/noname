@@ -2188,7 +2188,7 @@ card.swd={
 					filterTarget:function(card,player,target){
 						return player!=target&&target.hp>=player.hp;
 					},
-					filterCard:function(card){
+					filterCard:function(card,player){
 						return get.color(card)=='red'&&lib.filter.cardDiscardable(card,player);
 					},
 					ai1:function(card){
@@ -3850,7 +3850,7 @@ card.swd={
 				});
 				"step 1"
 				if(result.bool){
-					player.gain(target.get('h').randomGet());
+					player.gain(target.get('h').randomGet(),target);
 					target.$give(1,player);
 				}
 			},
@@ -4027,7 +4027,7 @@ card.swd={
 			},
 			content:function(){
 				target.damage();
-				target.gain(cards);
+				target.gain(cards,player);
 				game.delay();
 			},
 			check:function(card){

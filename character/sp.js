@@ -97,13 +97,73 @@ character.sp={
 		madai:['mayunlu'],
 		chengpu:['zhouyu'],
 		hanba:['swd_muyun'],
+		dongbai:['dongzhuo']
 	},
 	skill:{
 		xiehui:{
 			mod:{
-				cardDiscardable:function(card,player){
-					return get.color(card)=='red';
+				maxHandcard:function(player,num){
+					var hs=player.get('h');
+					for(var i=0;i<hs.length;i++){
+						if(get.color(hs[i])=='black'){
+							num++;
+						}
+					}
+					return num;
+				},
+			},
+			trigger:{global:'gainBegin'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				if(event.player!=player&&event.cards&&event.cards[0]&&get.owner(event.cards[0])==player){
+					for(var i=0;i<event.cards.length;i++){
+						if(get.color(event.cards[i])=='black') return true;
+					}
 				}
+				return false;
+			},
+			content:function(){
+				trigger.player.addSkill('xiehui2');
+				if(!trigger.player.storage.xiehui2){
+					trigger.player.storage.xiehui2=[];
+				}
+			}
+		},
+		xiehui2:{
+			mark:true,
+			intro:{
+				content:'cards'
+			},
+			mod:{
+				cardDiscardable:function(card,player){
+					if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
+				},
+				cardEnabled:function(card,player){
+					if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
+				},
+				cardUsable:function(card,player){
+					if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
+				},
+				cardRespondable:function(card,player){
+					if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
+				},
+				cardSavable:function(card,player){
+					if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
+				},
+			},
+			group:'xiehui3'
+		},
+		xiehui3:{
+			trigger:{player:'changeHp'},
+			forced:true,
+			popup:false,
+			filter:function(event){
+				return event.num<0;
+			},
+			content:function(){
+				player.removeSkill('xiehui2');
+				delete player.storage.xiehui2;
 			}
 		},
 		shanjia:{
@@ -314,7 +374,7 @@ character.sp={
 			content:function(){
 				player.storage.shichou=true;
 				player.unmarkSkill('shichou');
-				target.gain(cards);
+				target.gain(cards,player);
 				player.storage.shichou_target=target;
 				player.addSkill('shichou2');
 				target.markSkillCharacter('shichou',player,'誓仇','代替'+get.translation(player)+'承受伤害直到首次进入濒死状态');
@@ -576,7 +636,7 @@ character.sp={
 				}
 				else{
 					var es=target.get('e');
-					player.gain(es);
+					player.gain(es,target);
 					target.$give(es,player);
 				}
 				'step 3'
@@ -667,7 +727,7 @@ character.sp={
 				return 0;
 			},
 			content:function(){
-				target.gain(cards);
+				target.gain(cards,player);
 				target.recover();
 				game.delay();
 			},
@@ -833,7 +893,7 @@ character.sp={
 				'step 0'
 				player.unmark('jianshu');
 				player.storage.jianshu=true;
-				targets[0].gain(cards);
+				targets[0].gain(cards,player);
 				'step 1'
 				targets[0].chooseToCompare(targets[1]);
 				'step 2'
@@ -2394,8 +2454,8 @@ character.sp={
 					content:function(){
 						"step 0"
 						player.chooseCardTarget({
-							filterCard:function(card){
-								return get.suit(card)=='heart';
+							filterCard:function(card,player){
+								return get.suit(card)=='heart'&&lib.filter.cardDiscardable(card,player);
 							},
 							filterTarget:function(card,player,target){
 								return player!=target;
@@ -2485,6 +2545,7 @@ character.sp={
 						"step 0"
 						var next=player.chooseCardTarget({
 							position:'he',
+							filterCard:lib.filter.cardDiscardable,
 							filterTarget:function(card,player,target){
 								var trigger=_status.event.getTrigger();
 								if(get.distance(player,target,'attack')<=1&&
@@ -3354,8 +3415,8 @@ character.sp={
 				var check=player.num('h')<=player.hp;
 				player.chooseCardTarget({
 					prompt:get.prompt('qingyi'),
-					filterCard:function(card){
-						return get.type(card)=='equip'
+					filterCard:function(card,player){
+						return get.type(card)=='equip'&&lib.filter.cardDiscardable(card,player);
 					},
 					position:'he',
 					filterTarget:function(card,player,target){
@@ -4541,7 +4602,7 @@ character.sp={
 			content:function(){
 				"step 0"
 				player.chooseCardTarget({
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					filterTarget:function(card,player,target){
 						var trigger=_status.event.getTrigger();
 						return lib.filter.targetEnabled(trigger.card,player,target)&&target!=trigger.targets[0];
@@ -4814,7 +4875,7 @@ character.sp={
 					event.finish();
 				}
 				"step 1"
-				trigger.target.gain(result.cards);
+				trigger.target.gain(result.cards,player);
 				player.$give(result.cards,trigger.target);
 				game.delay();
 				event.card=result.cards[0];
@@ -5312,7 +5373,7 @@ character.sp={
 				"step 0"
 				player.unmarkSkill('cunsi');
 				var cards=player.get('h');
-				target.gain(cards);
+				target.gain(cards,player);
 				player.$give(cards.length,target);
 				player.storage.cunsi=true;
 				game.delay();
@@ -5646,7 +5707,7 @@ character.sp={
 				}
 				"step 1"
 				var cards=player.get('h');
-				target.gain(cards);
+				target.gain(cards,player);
 				event.num=cards.length;
 				player.$give(event.num,target);
 				game.delay();
@@ -5654,7 +5715,7 @@ character.sp={
 				target.chooseCard('选择还给'+get.translation(player)+'的牌',true,event.num);
 				game.delay(0.2);
 				"step 3"
-				player.gain(result.cards);
+				player.gain(result.cards,target);
 				target.$give(result.cards.length,player);
 				game.delay();
 			}
@@ -6292,7 +6353,7 @@ character.sp={
 				}
 				"step 1"
 				if(result.bool&&!event.directfalse){
-					player.storage.bifa[1].gain(result.cards);
+					player.storage.bifa[1].gain(result.cards,player);
 					player.$give(result.cards,player.storage.bifa[1]);
 					player.gain(player.storage.bifa[0],'draw2');
 				}
@@ -6431,7 +6492,7 @@ character.sp={
 				return event.target.num('h')>0;
 			},
 			content:function(){
-				player.gain(trigger.target.get('h').randomGet());
+				player.gain(trigger.target.get('h').randomGet(),trigger.target);
 				trigger.target.$give(1,player);
 				game.delay();
 			}
@@ -6444,7 +6505,7 @@ character.sp={
 				return event.source&&event.source.num('h')>0;
 			},
 			content:function(){
-				player.gain(trigger.source.get('h').randomGet());
+				player.gain(trigger.source.get('h').randomGet(),trigger.source);
 				trigger.source.$give(1,player);
 				game.delay();
 			}
@@ -6459,7 +6520,7 @@ character.sp={
 			filterCard:true,
 			position:'he',
 			content:function(){
-				player.gain(target.get('h'));
+				player.gain(target.get('h'),target);
 				target.$give(target.num('h'),player);
 				player.turnOver();
 				player.addSkill('lihun2');
@@ -6501,7 +6562,7 @@ character.sp={
 					player.chooseCard('he',true,player.storage.lihun.hp);
 				}
 				"step 1"
-				player.storage.lihun.gain(result.cards);
+				player.storage.lihun.gain(result.cards,player);
 				player.$give(result.cards.length,player.storage.lihun);
 			}
 		},
@@ -6635,7 +6696,7 @@ character.sp={
 				return player!=target;
 			},
 			discard:false,
-			prepare:'give',
+			prepare:'give2',
 			ai:{
 				order:1,
 				result:{
@@ -6659,7 +6720,7 @@ character.sp={
 			content:function(){
 				"step 0"
 				event.target1=targets[0];
-				targets[0].gain(cards);
+				targets[0].gain(cards,player);
 				game.delay();
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('h')&&game.players[i]!=event.target1&&game.players[i]!=player){
@@ -6953,6 +7014,11 @@ character.sp={
 		sp_liubei:'sp刘备',
 		caochun:'曹纯',
 
+		xiehui:'黠慧',
+		xiehui2:'黠慧',
+		xiehui_info:'锁定技，你的黑色牌不占用手牌上限；其他角色获得你的黑色牌时，其不能使用、打出、弃置这些牌直到其体力值减少为止',
+		lianzhu:'连诛',
+		lianzhu_info:'出牌阶段限一次，你可以展示并交给一名其他角色一张牌，若该牌为黑色，其选择一项：1.你摸两张牌；2.弃置两张牌',
 		zhaolie:'昭烈',
 		zhaolie_info:'摸牌阶段摸牌时，你可以少摸一张，指定你攻击范围内的一名角色亮出牌堆顶上3张牌，将其中的非基本牌和【桃】置于弃牌堆，该角色进行二选一：你对其造成X点伤害，然后他获得这些基本牌；或他弃置X张牌，然后你获得这些基本牌。（X为其中非基本牌的数量）',
 		shichou:'誓仇',

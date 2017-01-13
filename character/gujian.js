@@ -197,7 +197,7 @@ character.gujian={
 				};
 				"step 1"
 				if(result.bool){
-					player.gain(result.cards[0]);
+					player.gain(result.cards[0],trigger.source);
 					trigger.source.$give(1,player);
 				}
 			},
@@ -492,8 +492,8 @@ character.gujian={
 					filterTarget:function(card,player,target){
 						return player!=target;
 					},
-					filterCard:function(card){
-						return get.color(card)=='red';
+					filterCard:function(card,player){
+						return get.color(card)=='red'&&lib.filter.cardDiscardable(card,player);
 					},
 					ai1:function(card){
 						return 9-ai.get.value(card);

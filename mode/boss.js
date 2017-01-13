@@ -1897,7 +1897,7 @@ mode.boss={
 					if(game.players[i]!=player){
 						var e=game.players[i].get('e','qinggang');
 						if(e.length){
-							player.gain(e);
+							player.gain(e,game.players[i]);
 							game.players[i].$give(e,player);
 							break;
 						}
@@ -2030,7 +2030,7 @@ mode.boss={
 					var current=event.players.shift();
 					var hs=current.get('h')
 					if(hs.length){
-						player.gain(hs.randomGet());
+						player.gain(hs.randomGet(),current);
 						current.$give(1,player);
 					}
 					event.redo();
@@ -2277,7 +2277,7 @@ mode.boss={
 						if(!lib.character[target.name]) return false;
 						return player!=target&&!target.storage.boss_hujia;
 					},
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
 						return ai.get.unuseful(card)+9;
 					},

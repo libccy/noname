@@ -339,7 +339,7 @@ play.soldier={
 				return 10-ai.get.value(card);
 			},
 			content:function(){
-				target.gain(cards);
+				target.gain(cards,player);
 				player.$give(cards.length,target);
 				game.delay();
 				player.draw(cards.length);
@@ -372,7 +372,7 @@ play.soldier={
 				return 10-ai.get.value(card);
 			},
 			content:function(){
-				target.gain(cards);
+				target.gain(cards,player);
 				player.$give(cards.length,target);
 				game.delay();
 				player.draw(cards.length);

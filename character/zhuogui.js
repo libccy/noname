@@ -238,7 +238,7 @@ character.zhuogui={
                 "step 1"
                 if(result.targets&&result.targets.length){
                     player.logSkill('qiangzheng',result.targets);
-                    player.gain(result.targets[0].get('h').randomGet());
+                    player.gain(result.targets[0].get('h').randomGet(),result.targets[0]);
                     result.targets[0].$give(1,player);
                     game.delay();
                 }

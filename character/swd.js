@@ -1350,7 +1350,7 @@ character.swd={
 						return get.distance(player,target,'attack')<=1&&
 							player!=target&&player.hp<=target.hp;
 					},
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
 						return 9-ai.get.value(card);
 					},
@@ -1452,7 +1452,7 @@ character.swd={
 			content:function(){
 				player.storage.pingshen2=true;
 				player.unmarkSkill('pingshen2');
-				player.gain(target.get('h'));
+				player.gain(target.get('h'),target);
 				target.$give(target.num('h'),player);
 				player.turnOver();
 				player.addSkill('pingshen3');
@@ -1496,7 +1496,7 @@ character.swd={
 					player.chooseCard('he',true,player.storage.pingshen.hp);
 				}
 				"step 1"
-				player.storage.pingshen.gain(result.cards);
+				player.storage.pingshen.gain(result.cards,player);
 				player.$give(result.cards.length,player.storage.pingshen);
 			}
 		},
@@ -1931,7 +1931,7 @@ character.swd={
 				if(player.num('he')){
 					player.chooseCardTarget({
 						prompt:get.prompt('huanxing'),
-						filterCard:true,
+						filterCard:lib.filter.cardDiscardable,
 						position:'he',
 						filterTarget:function(card,player,target){
 							if(target==player) return false;
@@ -2077,7 +2077,9 @@ character.swd={
 						}
 						return ui.selected.cards.length;
 					},
-					filterCard:{color:'black'},
+					filterCard:function(card,player){
+						return get.color(card)=='black'&&lib.filter.cardDiscardable(card,player);
+					},
 					ai1:function(card){
 						if(ui.selected.cards.length>=enemy) return 0;
 						return 9-ai.get.value(card);
@@ -2719,7 +2721,7 @@ character.swd={
 					filterTarget:function(card,player,target){
 						return player!=target&&trigger.player!=target&&get.distance(trigger.player,target)<=1;
 					},
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
 						return ai.get.unuseful(card)+9;
 					},
@@ -2800,7 +2802,7 @@ character.swd={
 				"step 1"
 				if(result.bool){
 					player.logSkill('guisi');
-					trigger.player.gain(result.cards);
+					trigger.player.gain(result.cards,player);
 					player.$give(result.cards,trigger.player);
 					trigger.untrigger();
 					trigger.finish();
@@ -4106,7 +4108,9 @@ character.swd={
 				"step 1"
 				var suit=get.suit(trigger.cards);
 				event.suit=suit;
-				player.chooseCard('he',get.prompt('liaoyuan'),{suit:suit}).ai=function(card){
+				player.chooseCard('he',get.prompt('liaoyuan'),function(card,player){
+					return get.suit(card)==suit&&lib.filter.cardDiscardable(card,player);
+				}).ai=function(card){
 					if(ai.get.attitude(player,trigger.target)>=0) return 0;
 					if(ai.get.effect(trigger.target,{name:'sha'},player,player)>0){
 						return 7-ai.get.value(card);
@@ -4304,7 +4308,7 @@ character.swd={
 						player.equip(result.buttons[0].link);
 					}
 					else{
-						player.gain(result.buttons[0].link);
+						player.gain(result.buttons[0].link,event.target);
 					}
 					event.target.$give(1,player);
 					game.delay();
@@ -5036,7 +5040,7 @@ character.swd={
 				game.delay(0.5);
 				player.chooseCardTarget({
 					prompt:get.prompt('xielei'),
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					position:'he',
 					filterTarget:function(card,player,target){
 						if(player==target) return false;
@@ -5152,7 +5156,7 @@ character.swd={
 			priority:5,
 			content:function(){
 				trigger.player.$give(trigger.player.get('e','1'),player);
-				player.gain(trigger.player.get('e','1'));
+				player.gain(trigger.player.get('e','1'),trigger.player);
 			},
 			ai:{
 				effect:{
@@ -5751,7 +5755,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				target.gain(cards);
+				target.gain(cards,player);
 				event.skillai=function(list){
 					return list.randomGet();
 				};
@@ -5999,7 +6003,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				target.gain(cards);
+				target.gain(cards,player);
 				target.storage.funiao=true;
 				target.addSkill('funiao2');
 				game.delay();
@@ -7339,7 +7343,7 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					player.gain(result.links[0]);
+					player.gain(result.links[0],target);
 					target.$give(1,player);
 					game.delay(0,500);
 				}
@@ -7437,7 +7441,7 @@ character.swd={
 				}
 				"step 3"
 				if(result.bool){
-					player.gain(result.cards[0]);
+					player.gain(result.cards[0],target);
 					target.$give(1,player);
 				}
 				event.goto(1);
@@ -7810,7 +7814,7 @@ character.swd={
 				var check=player.num('h')<=player.hp+(player.hp>2?2:1);
 				player.chooseCardTarget({
 					prompt:get.prompt('ljifeng'),
-					filterCard:true,
+					filterCard:lib.filter.cardDiscardable,
 					filterTarget:function(card,player,target){
 						if(player==target) return false;
 						return player.canUse({name:'sha'},target,false);

@@ -7353,7 +7353,7 @@
 					else{
 						game.delayx();
 					}
-					player.gain(event.cards);
+					player.gain(event.cards,target);
 				},
 				showHandcards:function(){
 					"step 0"
@@ -7700,7 +7700,9 @@
 						if(info.prepare){
                             switch(info.prepare){
                                 case 'give':player.$give(cards,targets[0]);break;
+                                case 'give2':player.$give(cards.length,targets[0]);break;
                                 case 'throw':player.$throw(cards);break;
+                                case 'throw2':player.$throw(cards.length);break;
                                 default:info.prepare(cards,player,targets);
                             }
 						}
@@ -7720,7 +7722,9 @@
 						if(info.prepare){
                             switch(info.prepare){
                                 case 'give':player.$give(cards,targets[0]);break;
+                                case 'give2':player.$give(cards.length,targets[0]);break;
                                 case 'throw':player.$throw(cards);break;
+                                case 'throw2':player.$throw(cards.length);break;
                                 default:info.prepare(cards,player,targets);
                             }
 						}
@@ -8045,7 +8049,7 @@
 				gain:function(){
 					"step 0"
 					if(cards){
-						event.source=get.owner(cards[0]);
+                        event.source=event.source||get.owner(cards[0]);
 						if(event.source){
 							event.source.lose(cards,ui.special);
 						}
@@ -30479,6 +30483,14 @@
 				var info=get.info(skill);
 				var event=_status.event;
 				event.backup(skill);
+                if(info.filterCard&&info.discard!=false&&info.lose!=false&&!info.viewAs){
+                    var cards=event.player.get(event.position||'h');
+                    for(var i=0;i<cards.length;i++){
+                        if(!lib.filter.cardDiscardable(cards[i],event.player)){
+                            cards[i].uncheck('useSkill');
+                        }
+                    }
+                }
 				if(typeof event.skillDialog=='object'){
 					event.skillDialog.close();
 				}
@@ -30533,6 +30545,10 @@
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
 					}
+                    var cards=event.player.get('hej');
+                    for(var i=0;i<cards.length;i++){
+                        cards[i].recheck('useSkill');
+                    }
 					event.restore();
 				}
 				if(ui.skills) ui.skills.close();
@@ -30557,6 +30573,10 @@
 						event.dialog=ui.create.dialog(event.dialog);
 					}
 					event.restore();
+                    var cards=event.player.get('hej');
+                    for(var i=0;i<cards.length;i++){
+                        cards[i].recheck('useSkill');
+                    }
 					game.uncheck();
 					game.check();
 					return;
@@ -34065,7 +34085,7 @@
 			}
 		};
 		if(!lib.config.touchscreen){
-			document.onmousewheel=ui.click.windowmousewheel;
+            document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
 			document.onmousemove=ui.click.windowmousemove;
 			document.onmousedown=ui.click.windowmousedown;
 			document.onmouseup=ui.click.windowmouseup;

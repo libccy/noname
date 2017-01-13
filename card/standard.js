@@ -996,7 +996,7 @@ card.standard={
 					{name:'sha'},targets[1],-1).set('targetRequired',true);
 				"step 1"
 				if(result.bool==false){
-					player.gain(targets[0].get('e',{subtype:'equip1'}));
+					player.gain(targets[0].get('e',{subtype:'equip1'}),targets[0]);
 					targets[0].$give(targets[0].get('e',{subtype:'equip1'}),player);
 				}
 			},

@@ -785,7 +785,7 @@ card.guozhan={
 			// delay:0.5,
 			content:function(){
 				"step 0"
-				target.gain(cards);
+				target.gain(cards,player);
 				"step 1"
 				if(!target.isUnseen()){
 					player.draw();

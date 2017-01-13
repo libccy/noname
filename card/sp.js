@@ -70,7 +70,7 @@ card.sp={
 				}
 				'step 1'
 				player.$give(1,event.target1);
-				event.target1.gain(result.cards);
+				event.target1.gain(result.cards,player);
 				'step 2'
 				if(!event.target1.num('h')){
 					event.finish();
@@ -89,7 +89,7 @@ card.sp={
 					event.directresult=result.cards;
 				}
 				event.target1.$give(event.directresult.length,event.target2);
-				event.target2.gain(event.directresult);
+				event.target2.gain(event.directresult,event.target1);
 			},
 			ai:{
 				order:2.5,

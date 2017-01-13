@@ -196,7 +196,7 @@ card.yunchou={
 				var hs=targets[0].get('h');
 				event.num=Math.min(2,hs.length);
 				if(event.num){
-					targets[1].gain(hs.randomGets(event.num));
+					targets[1].gain(hs.randomGets(event.num),targets[0]);
 					targets[0].$give(event.num,targets[1]);
 					game.delay();
 				}
@@ -214,7 +214,7 @@ card.yunchou={
 					event.finish();
 				}
 				"step 2"
-				targets[0].gain(result.cards);
+				targets[0].gain(result.cards,targets[1]);
 				targets[1].$give(event.num,targets[0]);
 			},
 			ai:{

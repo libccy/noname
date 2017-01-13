@@ -4524,7 +4524,7 @@ mode.chess={
 					var current=event.players.shift();
 					var hs=current.get('h')
 					if(hs.length){
-						player.gain(hs.randomGet());
+						player.gain(hs.randomGet(),current);
 						current.$give(1,player);
 					}
 					event.redo();
@@ -5032,7 +5032,7 @@ mode.chess={
 				}
 				"step 2"
 				if(result.cards.length){
-					player.gain(result.cards);
+					player.gain(result.cards,event.current);
 					event.current.$give(1,player);
 					event.goto(1);
 				}

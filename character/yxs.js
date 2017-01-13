@@ -175,7 +175,7 @@ character.yxs={
 				"step 1"
 				if(result.bool){
 					player.line(result.targets,'green');
-					result.targets[0].gain(result.cards);
+					result.targets[0].gain(result.cards,player);
 					player.$give(result.cards.length,result.targets[0]);
 					game.delay(0.7);
 				}
@@ -252,7 +252,7 @@ character.yxs={
 				"step 3"
 				if(result.bool){
 					player.line(result.targets,'green');
-					result.targets[0].gain(result.cards);
+					result.targets[0].gain(result.cards,player);
 					player.$give(result.cards.length,result.targets[0]);
 					for(var i=0;i<result.cards.length;i++){
 						event.cards.remove(result.cards[i]);
@@ -300,7 +300,7 @@ character.yxs={
 				'step 3'
 				if(result.bool&&result.cards&&result.cards.length){
 					event.target.$give(1,player);
-					player.gain(result.cards);
+					player.gain(result.cards,event.target);
 				}
 				event.goto(2);
 			},
@@ -656,7 +656,7 @@ character.yxs={
 				});
 				"step 3"
 				if(result.bool){
-					result.targets[0].gain(result.cards);
+					result.targets[0].gain(result.cards,player);
 					player.$give(result.cards.length,result.targets[0]);
 					for(var i=0;i<result.cards.length;i++){
 						event.cards.remove(result.cards[i]);
@@ -862,9 +862,8 @@ character.yxs={
 				var hs=target.get('h');
 				if(hs.length){
 					event.card=hs.randomGet();
-					player.gain(event.card);
+					player.gain(event.card,target);
 					target.$give(1,player);
-
 				}
 				else{
 					event.finish();
@@ -882,7 +881,7 @@ character.yxs={
 				}
 				"step 2"
 				if(result.bool){
-					result.targets[0].gain(card);
+					result.targets[0].gain(card,player);
 					player.$give(1,result.targets[0]);
 					game.delay();
 				}
@@ -1129,7 +1128,7 @@ character.yxs={
 				'step 1'
 				if(result.bool){
 					player.logSkill('xiadao',result.targets);
-					result.targets[0].gain(trigger.player.get('h').randomGet());
+					result.targets[0].gain(trigger.player.get('h').randomGet(),trigger.player);
 					trigger.player.$give(1,result.targets[0]);
 				}
 			},
@@ -1197,7 +1196,7 @@ character.yxs={
 				if(player.num('he')){
 					player.chooseCardTarget({
 						prompt:get.prompt('yizhuang'),
-						filterCard:true,
+						filterCard:lib.filter.cardDiscardable,
 						position:'he',
 						filterTarget:function(card,player,target){
 							if(target==player) return false;
@@ -1645,7 +1644,7 @@ character.yxs={
 				"step 2"
 				if(event.targets.length){
 					var target=event.targets.shift();
-					player.gain(target.get('h').randomGet(),'give');
+					player.gain(target.get('h').randomGet(),target);
 					target.$give(1,player);
 					event.redo();
 				}
@@ -2100,7 +2099,7 @@ character.yxs={
 				};
 				"step 1"
 				if(result.bool){
-					player.gain(result.cards[0]);
+					player.gain(result.cards[0],trigger.source);
 					trigger.source.$give(1,player);
 				}
 				else{
