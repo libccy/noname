@@ -70,7 +70,6 @@ character.refresh={
 				}
 				player.storage.rerende2.push(target);
 				target.gain(cards,player);
-				game.delay();
 				if(typeof player.storage.rerende!='number'){
 					player.storage.rerende=0;
 				}

@@ -500,7 +500,6 @@ character.standard={
 			},
 			content:function(){
 				target.gain(cards,player);
-				game.delay();
 				if(typeof player.storage.rende!='number'){
 					player.storage.rende=0;
 				}

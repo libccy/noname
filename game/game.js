@@ -7329,7 +7329,6 @@
 					for(var i=0;i<event.result.links.length;i++){
 						cards.push(event.result.links[i]);
 					}
-					target.lose(cards);
 					event.cards=cards;
 					var hs=[],oths=[];
 					for(var i=0;i<cards.length;i++){
@@ -7347,12 +7346,6 @@
 						target.$give(oths,player);
 					}
 					"step 4"
-					if(player==game.me){
-						game.delay(2);
-					}
-					else{
-						game.delayx();
-					}
 					player.gain(event.cards,target);
 				},
 				showHandcards:function(){
@@ -8049,8 +8042,9 @@
 				gain:function(){
 					"step 0"
 					if(cards){
-                        event.source=event.source||get.owner(cards[0]);
-						if(event.source){
+                        var owner=get.owner(cards[0]);
+                        event.source=event.source;
+						if(event.source&&event.source==owner){
 							event.source.lose(cards,ui.special);
 						}
 					}
@@ -8564,7 +8558,8 @@
 				},
 				equip:function(){
 					"step 0"
-					if(get.owner(card)) get.owner(card).lose(card,ui.special);
+                    var owner=get.owner(card)
+					if(owner) owner.lose(card,ui.special);
 					if(card.clone){
                         game.broadcast(function(card,player){
                             if(card.clone){
@@ -8608,7 +8603,12 @@
 				},
 				addJudge:function(){
 					"step 0"
-					if(cards&&get.owner(cards[0])) get.owner(cards[0]).lose(cards);
+                    if(cards){
+                        var owner=get.owner(cards[0]);
+                        if(owner){
+                            owner.lose(cards);
+                        }
+                    }
 					"step 1"
 					// if(lib.config.background_audio){
 					// 	game.playAudio('effect','judge');
@@ -10544,6 +10544,9 @@
 						else if(typeof arguments[i]=='string'){
 							next.animate=arguments[i];
 						}
+                        else if(typeof arguments[i]=='boolean'){
+                            next.delay=arguments[i];
+                        }
 					}
                     next.setContent('gain');
 					return next;

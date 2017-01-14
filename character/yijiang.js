@@ -5338,10 +5338,6 @@ character.yijiang={
 				"step 3"
 				if(event.bool||result.bool==false){
 					player.gainPlayerCard('he',event.target,Math.min(2,event.target.num('he')),true);
-					event.target.draw();
-				}
-				else{
-					player.draw();
 				}
 			},
 			ai:{
@@ -6460,6 +6456,20 @@ character.yijiang={
 						if(get.tag(card,'damage')) return [1,0,0,-0.7];
 					}
 				}
+			},
+			group:'xinenyuan2'
+		},
+		xinenyuan2:{
+			trigger:{player:'gainEnd'},
+			filter:function(event,player){
+				return event.source&&event.source.isAlive()&&event.source!=player&&event.cards.length>=2;
+			},
+			logTarget:'source',
+			check:function(event,player){
+				return ai.get.attitude(player,event.source)>0;
+			},
+			content:function(){
+				trigger.source.draw();
 			}
 		},
 		enyuan:{
@@ -7554,9 +7564,10 @@ character.yijiang={
 		jianying:'渐营',
 		jianying_info:'每当你于出牌阶段内使用的牌与此阶段你使用的上一张牌点数或花色相同时，你可以摸一张牌',
 		xinenyuan:'恩怨',
-		xinenyuan_info:'每当你受到1点伤害后，你可以令伤害来源选择一项：交给你一张手牌，或失去1点体力。',
+		xinenyuan2:'恩怨',
+		xinenyuan_info:'当你获得一名其他角色两张或更多的牌后，你可以令其摸一张牌；当你受到1点伤害后，你可以令伤害来源选择一项：1、将一张手牌交给你；2、失去1点体力',
 		xinxuanhuo:'眩惑',
-		xinxuanhuo_info:'摸牌阶段开始时，你可以放弃摸牌并选择一名其他角色，改为令其摸两张牌，然后该角色需对其攻击范围内你选择的另一名角色使用一张杀，若其未如此做或其攻击范围内没有使用杀的目标，你获得其两张牌，然后其摸一张牌',
+		xinxuanhuo_info:'摸牌阶段开始时，你可以放弃摸牌并选择一名其他角色。若如此做，该角色摸两张牌，然后该角色需对其攻击范围内你选择的另一名角色使用一张【杀】，否则你获得其两张牌',
 		fuhun:'父魂',
 		fuhun2:'父魂',
 		fuhun_info:'你可以将两张手牌当杀使用或打出；出牌阶段，若你以此法使用的杀造成了伤害，你获得技能“武圣”、“咆哮”直到回合结束。',

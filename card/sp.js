@@ -306,6 +306,7 @@ card.sp={
 					result.targets[0].equip(card);
 					player.addTempSkill('muniu_skill6','equipAfter');
 					player.$give(card,result.targets[0]);
+					player.line(result.targets,'green');
 					game.delay();
 				}
 			},

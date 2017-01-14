@@ -1811,6 +1811,7 @@ character.shenhua={
 					ui.selected.cards.length);
 			},
 			multitarget:true,
+			multiline:true,
 			content:function(){
 				'step 0'
 				event.cards0=targets[0].get('h');
