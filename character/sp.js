@@ -700,20 +700,26 @@ character.sp={
 				'step 0'
 				target.draw();
 				'step 1'
-				var goon=ai.get.damageEffect(target,player,target)>0&&ai.get.attitude(target,player)>=0;
+				var goon=ai.get.damageEffect(target,player,target)>=0;
+				if(!goon&&target.hp>=4&&ai.get.attitude(player,target)<0){
+					var es=target.get('e');
+					for(var i=0;i<es.length;i++){
+						if(ai.get.equipValue(es[i],target)>=8){
+							goon=true;break;
+						}
+					}
+				}
 				target.chooseControl('选项一','选项二',function(){
 					if(_status.event.goon) return '选项二';
 					return '选项一';
-				}).set('goon',goon).set('prompt','定叛<br><br><div class="text">选项一：令'+get.translation(player)+'弃置你装备区里的一张牌</div><br><div class="text">选项二：令'+get.translation(player)+'获得你装备区内的所有牌并对你造成一点伤害</div>');
+				}).set('goon',goon).set('prompt','定叛<br><br><div class="text">选项一：令'+get.translation(player)+'弃置你装备区里的一张牌</div><br><div class="text">选项二：获得你装备区内的所有牌并受到一点伤害</div>');
 				'step 2'
 				if(result.control=='选项一'){
 					player.discardPlayerCard(target,true,'e');
 					event.finish();
 				}
 				else{
-					var es=target.get('e');
-					player.gain(es,target);
-					target.$give(es,player);
+					target.gain(target.get('e'),'gain2');
 				}
 				'step 3'
 				game.delay(0.5);
@@ -723,18 +729,22 @@ character.sp={
 				order:7,
 				result:{
 					target:function(player,target){
-						if(ai.get.damageEffect(target,player,target)>0) return 2;
+						if(ai.get.damageEffect(target,player,target)>=0) return 2;
 						var att=ai.get.attitude(player,target);
 						if(att==0) return 0;
 						var es=target.get('e');
-						var goon=false;
-						if(att>0&&target.num('h')<target.hp){
-							goon=true;
-						}
 						for(var i=0;i<es.length;i++){
 							var val=ai.get.equipValue(es[i],target);
-							if(val>=7&&att<0) return -1;
-							if(val<=4&&att>0&&goon) return 1;
+							if(val<=4){
+								if(att>0){
+									return 1;
+								}
+							}
+							else if(val>=7){
+								if(att<0){
+									return -1;
+								}
+							}
 						}
 						return 0;
 					}
@@ -4329,41 +4339,57 @@ character.sp={
 			trigger:{player:'damageEnd'},
 			priority:9,
 			audio:2,
-			check:function(event,player){
-				return ai.get.attitude(player,event.source)<0;
-			},
+			direct:true,
 			filter:function(event){
 				return event&&event.source;
 			},
 			content:function(){
-				trigger.source.addSkill('jilei2');
+				'step 0'
+				player.chooseControl('basic','trick','equip','cancel',function(){
+					var source=_status.event.source;
+					if(_status.currentPhase!=source) return 'trick';
+					if(lib.filter.cardUsable({name:'sha'},source)&&source.num('h')>=2) return 'basic';
+					return 'trick';
+				}).set('prompt',get.prompt('jilei',trigger.source)).set('source',trigger.source);
+				'step 1'
+				if(result.control!='cancel'){
+					player.logSkill('jilei',trigger.source);
+					player.popup(get.translation(result.control)+'牌');
+					trigger.source.storage.jilei2=result.control;
+					trigger.source.addTempSkill('jilei2','phaseAfter');
+				}
 			},
 			ai:{
-				threaten:0.6
+				threaten:0.7
 			}
 		},
 		jilei2:{
 			unique:true,
-			trigger:{global:'phaseAfter'},
-			forced:true,
-			priority:10,
-			audio:2,
-			mod:{
-				cardEnabled:function(){
-					return false;
-				},
-				cardUsable:function(){
-					return false;
-				},
-				cardRespondable:function(){
-					return false;
-				},
-				cardSavable:function(){
-					return false;
+			intro:{
+				content:function(storage){
+					return '不能使用、打出或弃置'+get.translation(storage)+'牌';
 				}
 			},
-			content:function(){
-				player.removeSkill('jilei2')
+			mark:true,
+			onremove:function(player){
+				delete player.storage.jilei2;
+			},
+			mod:{
+				cardDiscardable:function(card,player){
+					if(player.storage.jilei2==get.type(card,'trick')) return false;
+				},
+				cardEnabled:function(card,player){
+					if(player.storage.jilei2==get.type(card,'trick')) return false;
+				},
+				cardUsable:function(card,player){
+					if(player.storage.jilei2==get.type(card,'trick')) return false;
+				},
+				cardRespondable:function(card,player){
+					if(player.storage.jilei2==get.type(card,'trick')) return false;
+				},
+				cardSavable:function(card,player){
+					if(player.storage.jilei2==get.type(card,'trick')) return false;
+				},
 			},
 		},
 		danlao:{
@@ -5394,11 +5420,11 @@ character.sp={
 		yongjue:{
 			audio:2,
 			trigger:{global:'useCardEnd'},
+			usable:1,
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
 				if(event.player==player) return false;
 				if(event.targets.contains(player)) return false;
-				if(player.tempSkills.yongjue2) return false;
 				if(event.cards){
 					for(var i=0;i<event.cards.length;i++){
 						if(get.position(event.cards[i])=='d') return true;
@@ -5415,10 +5441,8 @@ character.sp={
 					}
 				}
 				player.gain(cards,'gain2');
-				player.addTempSkill('yongjue2','phaseAfter');
 			},
 		},
-		yongjue2:{},
 		guixiu:{
 			audio:2,
 			trigger:{target:'shaBegin'},
@@ -5454,10 +5478,9 @@ character.sp={
 				player.storage.cunsi=true;
 				game.delay();
 				target.addSkill('yongjue');
-				target.markSkillCharacter('yongjue',player,'存嗣','$<div><div class="skill">【勇决】</div><div>每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之（每回合最多能以此法获得一张杀）</div></div>');
+				target.markSkillCharacter('yongjue',player,'存嗣','$<div><div class="skill">【勇决】</div><div>每当其他角色于回合内使用一张杀，若目标不是你，你可以获得之，每回合限一次</div></div>');
 				"step 1"
 				player.turnOver();
-				player.removeSkill('guixiu');
 			},
 			intro:{
 				content:'limited'
@@ -7335,6 +7358,7 @@ character.sp={
 		taichen:'抬榇',
 		jilei:'鸡肋',
 		jilei2:'鸡肋',
+		jilei2_bg:'肋',
 		fulu:'符箓',
 		fuji:'助祭',
 		fenyin:'奋音',
@@ -7347,7 +7371,7 @@ character.sp={
 		fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌颜色不同，则你可以摸一张牌，每回合最多发动3次',
 		fuji_info:'当一名角色造成雷电伤害时，你可以令其进行一次判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得此牌。',
 		fulu_info:'你可以将【杀】当雷【杀】使用。',
-		jilei_info:'每当你受到一次伤害，可以令伤害来源不能使用或打出其手牌直到回合结束',
+		jilei_info:'每当你受到有来源的伤害时，你可以选择一种牌的类别，令伤害来源不能使用、打出或弃置其此类别的手牌，直到回合结束',
 		danlao:'啖酪',
 		danlao_info:'当你成为一张指定了多个目标的锦囊牌的目标时，你可以取消之，并摸一张牌。',
 		gongao:'功獒',
@@ -7403,7 +7427,7 @@ character.sp={
 		shoucheng_info:'每当一名其他角色在其回合外失去最后的手牌时，你可令该角色摸一张牌。',
 		shengxi_info:'若你于出牌阶段未造成伤害，你可在弃牌阶段开始时摸两张牌。',
 		hengzheng_info:'摸牌阶段开始时，若你的体力值为1或你没有手牌，你可以放弃摸牌，获得每名其他角色区域里的一张牌。',
-		cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色，令该角色获得技能【勇决】，然后翻面并失去技能【闺秀】',
+		cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色，令该角色获得技能【勇决】，然后将武将牌翻面',
 		guixiu_info:'每当你成为杀的目标，若你的手牌数小于体力值，可以摸一张牌',
 		fenming_info:'结束阶段开始时，若你处于连环状态，你可以弃置处于连环状态的每名角色的一张牌。',
 		duanxie_info:'出牌阶段限一次，你可以令一名其他角色横置武将牌，若如此做，你横置武将牌。',

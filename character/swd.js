@@ -3564,6 +3564,8 @@ character.swd={
 		},
 		huopu:{
 			enable:'phaseUse',
+			usable:1,
+			position:'he',
 			filterCard:function(card){
 				return get.suit(card)=='heart';
 			},
@@ -8274,7 +8276,7 @@ character.swd={
 		rexue:'热血',
 		rexue_info:'任意一名角色的回合开始阶段，你可以对其使用一张杀，然后摸一张牌',
 		huopu:'火瀑',
-		huopu_info:'你可以将一张红桃手牌当作流星火羽使用',
+		huopu_info:'出牌阶段限一次，你可以将一张红桃牌当作流星火羽使用',
 		benlei:'奔雷',
 		benlei2:'奔雷',
 		benlei_info:'你可以将三张牌当惊雷闪使用；每当你造成一次雷属性伤害，你回复一点体力',

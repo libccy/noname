@@ -5117,11 +5117,14 @@
 				game.reload();
 			},
 			u:function(){
-				var card={name:'sha'},source=game.me.next;
+				var card={name:'sha'},source=game.me.next,targets=[];
 				for(var i=0;i<arguments.length;i++){
 					if(get.itemtype(arguments[i])=='player'){
 						source=arguments[i];
 					}
+                    else if(Array.isArray(arguments[i])){
+                        targets=arguments[i];
+                    }
 					else if(typeof arguments[i]=='object'){
 						card=arguments[i];
 					}
@@ -5129,7 +5132,8 @@
 						card={name:arguments[i]}
 					}
 				}
-				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),game.me);
+                targets.add(game.me);
+				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),targets);
 			},
 			rank:function(){
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
@@ -5232,8 +5236,10 @@
 					ui.updatehl();
 				}
 			},
-			s:function(skill){
-				game.me.addSkill(skill,true);
+			s:function(){
+                for(var i=0;i<arguments.length;i++){
+                    game.me.addSkill(arguments[i],true);
+                }
 				game.check();
 			},
 			t:function(num){
@@ -8042,10 +8048,9 @@
 				gain:function(){
 					"step 0"
 					if(cards){
-                        var owner=get.owner(cards[0]);
-                        event.source=event.source;
-						if(event.source&&event.source==owner){
-							event.source.lose(cards,ui.special);
+                        var owner=event.source||get.owner(cards[0]);
+						if(owner){
+							owner.lose(cards,ui.special);
 						}
 					}
 					else{

@@ -1,7 +1,7 @@
 'use strict';
 character.hearth={
 	character:{
-		hs_jaina:['female','wei',3,['huopu','bianxing','bingjia']],
+		hs_jaina:['female','wei',3,['huopu','aoshu','bingjia']],
 		hs_lrexxar:['male','shu',4,['shoulie','gongji']],
 		hs_wuther:['male','qun',4,['fengxian','jieming']],
 		hs_jgarrosh:['male','shu',4,['zhanhou','qiangxi']],
@@ -95,6 +95,24 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		aoshu:{
+			enable:'phaseUse',
+			usable:1,
+			position:'he',
+			filterCard:function(card){
+				return get.suit(card)=='spade';
+			},
+			viewAs:{name:'wuzhong'},
+			viewAsFilter:function(player){
+				if(!player.num('he',{suit:'spade'})) return false;
+			},
+			prompt:'将一张黑桃手牌当作无中生有使用',
+			check:function(card){return 7-ai.get.value(card)},
+			ai:{
+				threaten:1.4,
+				order:9,
+			}
+		},
 		bzhuiji:{
 			trigger:{global:'dieAfter'},
 			check:function(event,player){
@@ -5072,9 +5090,9 @@ character.hearth={
 		kuixin_info:'回合结束阶段，你可以将你的手牌与一名其他角色交换（手牌数之差不能多于1）',
 		lianzhan:'连斩',
 		lianzhan_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
-		yanshu:'炎术',
+		yanshu:'炎爆',
 		yanshu_info:'每回合限一次，当你弃置非基本牌后，你可以获得一张流星火雨',
-		bingshuang:'冰霜',
+		bingshuang:'冰枪',
 		bingshuang_info:'你使用锦囊牌造成伤害后，可令目标摸两张牌并翻面',
 		shengyan:'圣言',
 		shengyan_info:'任意一名角色回复体力后，你可以令其额外回复一点体力，每回合限发动一次',
@@ -5082,6 +5100,8 @@ character.hearth={
 		qingliu_info:'锁定技，你防止即将受到的火焰伤害',
 		liechao:'猎潮',
 		liechao_info:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸四张牌，若如此做，你跳过本回合的弃牌阶段',
+		aoshu:'奥术',
+		aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用',
 
 		fengxing:'风行',
 		fengxing_info:'每当你使用一张杀，你可以摸一张牌',
