@@ -786,7 +786,11 @@ card.swd={
 			type:'jiguan',
 			wuxieable:true,
 			enable:function(card,player){
-				return player.num('e')>0;
+				var es=player.get('e');
+				for(var i=0;i<es.length;i++){
+					if(lib.inpile.contains(es[i].name)) return true;
+				}
+				return false;
 			},
 			filterTarget:function(card,player,target){
 				return target==player;
@@ -2565,9 +2569,7 @@ card.swd={
 				return ai.get.value(card);
 			},
 			discard:false,
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			content:function(){
 				"step 0"
 				target.$turn2();
@@ -3624,9 +3626,7 @@ card.swd={
 				}
 				return false;
 			},
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			content:function(){
 				'step 0'
 				for(var i=0;i<cards.length;i++){
@@ -4018,9 +4018,7 @@ card.swd={
 				return player.num('he',{subtype:'equip1'})>0;
 			},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-			},
+			prepare:'give',
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				return true;

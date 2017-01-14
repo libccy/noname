@@ -887,10 +887,7 @@ mode.boss={
 			filter:function(event,player){
 				return player.num('h')>0;
 			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-				player.line(targets);
-			},
+			prepare:'throw',
 			discard:false,
 			filterCard:true,
 			check:function(card){
@@ -937,10 +934,7 @@ mode.boss={
 				return 6-ai.get.value(card);
 			},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-				player.line(targets[0],'green');
-			},
+			prepare:'give',
 			content:function(){
 				"step 0"
 				game.delay();

@@ -39,7 +39,7 @@ character.xiake={
                 return player.num('e')>0;
             },
             filterCard:true,
-            prompt:'弃置要重铸的牌并摸一张牌',
+            prompt:'将要重铸的牌置于弃牌堆并摸一张牌',
             discard:false,
             delay:0.5,
             check:function(card,player){

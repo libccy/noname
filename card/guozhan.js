@@ -778,9 +778,7 @@ card.guozhan={
 				if(player.identity=='ye') return true;
 				return target.identity!=player.identity;
 			},
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-			},
+			prepare:'give',
 			discard:false,
 			// delay:0.5,
 			content:function(){

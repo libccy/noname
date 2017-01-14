@@ -6349,11 +6349,6 @@
 						}
 					}
 					"step 1"
-                    if(event.rangecards){
-                        for(var i=0;i<event.rangecards.length;i++){
-                            event.rangecards[i].recheck('chooseToDiscard');
-                        }
-                    }
                     if(event.result=='ai'){
                         game.check();
                         if(ai.basic.chooseCard(event.ai)||forced){
@@ -6368,6 +6363,11 @@
                         }
                         else{
                             ui.click.cancel();
+                        }
+                    }
+                    if(event.rangecards){
+                        for(var i=0;i<event.rangecards.length;i++){
+                            event.rangecards[i].recheck('chooseToDiscard');
                         }
                     }
                     "step 2"

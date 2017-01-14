@@ -3329,7 +3329,7 @@ character.hearth={
 			},
 			discard:false,
 			prepare:function(cards,player){
-				player.$give(1,player);
+				player.$give(1,player,false);
 			},
 			content:function(){
 				player.storage.bingjia=cards[0];
@@ -3458,9 +3458,7 @@ character.hearth={
 			filterTarget:function(card,player,target){
 				return player!=target&&!target.hasSkill('mdzhoufu2');
 			},
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			discard:false,
 			content:function(){
 				target.$gain2(cards);

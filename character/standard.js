@@ -470,9 +470,7 @@ character.standard={
 			filterCard:true,
 			selectCard:[1,Infinity],
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards.length,targets[0]);
-			},
+			prepare:'give',
 			filterTarget:function(card,player,target){
 				return player!=target;
 			},

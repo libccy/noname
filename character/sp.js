@@ -100,6 +100,60 @@ character.sp={
 		dongbai:['dongzhuo']
 	},
 	skill:{
+		lianzhu:{
+			enable:'phaseUse',
+			usable:1,
+			filterCard:true,
+			position:'he',
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			check:function(card){
+				var num=ai.get.value(card);
+				if(get.color(card)=='black'){
+					if(num>=6) return 0;
+					return 20-num;
+				}
+				else{
+					if(_status.event.player.needsToDiscard()){
+						return 7-num;
+					}
+				}
+				return 0;
+			},
+			discard:false,
+			prepare:'give',
+			content:function(){
+				'step 0'
+				target.gain(cards,player);
+				if(get.color(cards[0])=='black'){
+					target.chooseToDiscard(2,'he','弃置两张牌，或令'+get.translation(player)+'摸两张牌').set('ai',function(card){
+						if(_status.event.goon) return 7-ai.get.value(card);
+						return 0;
+					}).set('goon',ai.get.attitude(target,player)<0);
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				if(!result.bool){
+					player.draw(2);
+				}
+			},
+			ai:{
+				order:8,
+				expose:0.2,
+				result:{
+					target:function(player,target){
+						if(ui.selected.cards.length&&get.color(ui.selected.cards[0])=='red'){
+							if(target.num('h')<player.num('h')) return 1;
+							return 0.5;
+						}
+						return -1;
+					}
+				}
+			}
+		},
 		xiehui:{
 			mod:{
 				maxHandcard:function(player,num){
@@ -116,7 +170,7 @@ character.sp={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				if(event.player!=player&&event.cards&&event.cards[0]&&get.owner(event.cards[0])==player){
+				if(event.source==player&&event.player!=player){
 					for(var i=0;i<event.cards.length;i++){
 						if(get.color(event.cards[i])=='black') return true;
 					}
@@ -128,12 +182,18 @@ character.sp={
 				if(!trigger.player.storage.xiehui2){
 					trigger.player.storage.xiehui2=[];
 				}
+				for(var i=0;i<trigger.cards.length;i++){
+					if(get.color(trigger.cards[i])=='black'){
+						trigger.player.storage.xiehui2.add(trigger.cards[i]);
+					}
+				}
 			}
 		},
 		xiehui2:{
 			mark:true,
 			intro:{
-				content:'cards'
+				content:'不能使用、打出或弃置获得的黑色牌',
+				nocount:true
 			},
 			mod:{
 				cardDiscardable:function(card,player){
@@ -152,7 +212,7 @@ character.sp={
 					if(player.storage.xiehui2&&player.storage.xiehui2.contains(card)) return false;
 				},
 			},
-			group:'xiehui3'
+			group:['xiehui3','xiehui4']
 		},
 		xiehui3:{
 			trigger:{player:'changeHp'},
@@ -164,6 +224,22 @@ character.sp={
 			content:function(){
 				player.removeSkill('xiehui2');
 				delete player.storage.xiehui2;
+			}
+		},
+		xiehui4:{
+			trigger:{player:'loseEnd'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				if(player.storage.xiehui2){
+					for(var i=0;i<player.storage.xiehui2.length;i++){
+						if(trigger.cards.contains(player.storage.xiehui2[i])){
+							player.storage.xiehui2.splice(i--,1);
+						}
+					}
+				}
+				// player.updateMarks();
 			}
 		},
 		shanjia:{
@@ -7013,6 +7089,7 @@ character.sp={
 		wanglang:'王朗',
 		sp_liubei:'sp刘备',
 		caochun:'曹纯',
+		dongbai:'董白',
 
 		xiehui:'黠慧',
 		xiehui2:'黠慧',

@@ -270,9 +270,7 @@ character.ow={
             filterCard:true,
             selectCard:-1,
             discard:false,
-            prepare:function(cards,player,targets){
-                player.$give(cards,targets[0]);
-            },
+            prepare:'give',
             content:function(){
                 target.gain(cards);
                 target.changeHujia();
@@ -325,9 +323,7 @@ character.ow={
 				return 6-ai.get.value(card);
 			},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(1,targets[0]);
-			},
+			prepare:'give2',
             filterTarget:function(card,player,target){
                 return target!=player&&!target.hasSkill('shoujia2');
             },
@@ -838,7 +834,7 @@ character.ow={
 			},
 			discard:false,
 			prepare:function(cards,player){
-				player.$give(1,player);
+				player.$give(1,player,false);
 			},
 			content:function(){
 				player.storage.dulei=cards[0];

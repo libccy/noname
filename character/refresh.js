@@ -33,9 +33,7 @@ character.refresh={
 			filterCard:true,
 			selectCard:[1,Infinity],
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards.length,targets[0]);
-			},
+			prepare:'give2',
 			filterTarget:function(card,player,target){
 				if(player.storage.rerende2&&player.storage.rerende2.contains(target)) return false;
 				return player!=target;
@@ -555,9 +553,7 @@ character.refresh={
 				return 8-ai.get.value(card);
 			},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-			},
+			prepare:'give',
 			content:function(){
 				"step 0"
 				target.storage.refanjian=cards[0];
@@ -1330,9 +1326,7 @@ character.refresh={
 			filter:function(event,player){
 				return player.num('he',{suit:'diamond'})>0;
 			},
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			position:'he',
 			filterCard:{suit:'diamond'},
 			filterTarget:function(card,player,target){

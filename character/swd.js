@@ -179,10 +179,7 @@ character.swd={
 				return 6-ai.get.value(card);
 			},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-				player.line(targets[0],'green');
-			},
+			prepare:'give',
 			content:function(){
 				"step 0"
 				game.delay();
@@ -2476,9 +2473,7 @@ character.swd={
 				return 6-ai.get.equipValue(card);
 			},
 			discard:false,
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			delay:false,
 			filterTarget:function(card,player,target){
 				return lib.filter.targetEnabled({name:'sha'},player,target);
@@ -2668,9 +2663,7 @@ character.swd={
 			selectCard:2,
 			filterCard:true,
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			filterTarget:function(card,player,target){
 				return lib.filter.targetEnabled({name:'juedou'},player,target);
 			},
@@ -2833,9 +2826,7 @@ character.swd={
 			position:'he',
 			filterCard:{suit:'club'},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			filterTarget:function(card,player,target){
 				return lib.filter.targetEnabled({name:'guiyoujie'},player,target);
 			},
@@ -3002,10 +2993,7 @@ character.swd={
 			filter:function(event,player){
 				return player.num('h')>0;
 			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-				player.line(targets);
-			},
+			prepare:'throw',
 			discard:false,
 			filterCard:true,
 			check:function(card){
@@ -3947,9 +3935,7 @@ character.swd={
 				}
 				return false;
 			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			// selectTarget:[1,2],
 			selectCard:[2,2],
 			check:function(card){return 6-ai.get.useful(card)},
@@ -5677,9 +5663,7 @@ character.swd={
 				return get.type(card,'trick')=='trick';
 			},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-			},
+			prepare:'give',
 			filter:function(event,player){
 				return player.num('h',{type:['trick','delay']})>0;
 			},
@@ -5986,9 +5970,7 @@ character.swd={
 		funiao:{
 			enable:'phaseUse',
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(1,targets[0]);
-			},
+			prepare:'give2',
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				if(player.num('h')==0) return false;
@@ -6465,9 +6447,7 @@ character.swd={
 			filter:function(event,player){
 				return player.num('he',{type:'trick'})>0;
 			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			position:'he',
 			filterCard:{type:'trick'},
 			filterTarget:function(card,player,target){
@@ -6782,10 +6762,7 @@ character.swd={
 			selectCard:-1,
 			// viewAs:{name:'sha'},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-				player.line(targets);
-			},
+			prepare:'throw',
 			filterTarget:function(card,player,target){
 				return lib.filter.targetEnabled({name:'sha'},player,target);
 			},
@@ -7876,10 +7853,7 @@ character.swd={
 				return 8-ai.get.value(card);
 			},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-				player.line(targets[0],'green');
-			},
+			prepare:'give',
 			content:function(){
 				"step 0"
 				game.delay();

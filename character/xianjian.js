@@ -450,9 +450,7 @@ character.xianjian={
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-			},
+			prepare:'give',
 			discard:false,
 			content:function(){
 				target.gain(cards,player);
@@ -675,10 +673,7 @@ character.xianjian={
 			discard:false,
 			line:false,
 			multiline:true,
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-				player.line(targets);
-			},
+			prepare:'throw',
 			filterTarget:function(card,player,target){
 				return lib.filter.targetEnabled({name:'sha'},player,target);
 			},
@@ -740,10 +735,7 @@ character.xianjian={
 			usable:1,
 			filterCard:{name:'shan'},
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-				game.delay();
-			},
+			prepare:'give',
 			filterTarget:function(card,player,target){
 				return target!=player&&!target.hasSkill('tianfu2');
 			},
@@ -758,11 +750,12 @@ character.xianjian={
 				target.addSkill('tianfu2');
 			},
 			ai:{
+				order:2,
 				result:{
 					target:function(player,target){
 						var att=ai.get.attitude(player,target);
 						if(att>=0) return 0;
-						return ai.get.damageEffect(target,player,target);
+						return ai.get.damageEffect(target,player,target,'thunder');
 					}
 				},
 				expose:0.2

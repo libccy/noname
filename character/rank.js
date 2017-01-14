@@ -58,6 +58,7 @@ window.characterRank={
         'ow_luxiao',
     ],
     a:[
+        'dongbai',
         'pal_longkui',
         'pal_nangonghuang',
         'pal_xingxuan',

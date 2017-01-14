@@ -58,9 +58,7 @@ character.yxs={
 				}
 				return false;
 			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			content:function(){
 				player.useCard({name:'tao'},cards,targets[0]).animate=false;
 			},
@@ -2552,9 +2550,6 @@ character.yxs={
 			},
 			discard:false,
 			lose:false,
-			prepare:function(cards,player,targets){
-				player.line(targets,'green');
-			},
 			content:function(){
 				'step 0'
 				player.choosePlayerCard(target,'e',true).ai=ai.get.buttonValue;

@@ -2286,8 +2286,10 @@ character.shenhua={
 				player.draw();
 			},
 			discard:false,
+			prompt:'将要重铸的牌置于弃牌堆并摸一张牌',
+			delay:0.5,
 			prepare:function(cards,player){
-				player.$throw(cards);
+				player.$throw(cards,1000);
 			},
 			ai:{
 				basic:{
@@ -3289,9 +3291,7 @@ character.shenhua={
 			enable:'phaseUse',
 			discard:false,
 			line:true,
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-			},
+			prepare:'give',
 			filter:function(event,player){
 				if(player.group!='qun') return false;
 				if(player.num('h','shan')+player.num('h','shandian')==0) return 0;

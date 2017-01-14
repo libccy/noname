@@ -3194,9 +3194,7 @@ character.yijiang={
 		huomo_sha:{
 			enable:'phaseUse',
 			discard:false,
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			filter:function(event,player){
 				if(!player.storage.huomo) player.storage.huomo={};
 				if(player.storage.huomo.sha) return false;
@@ -3242,9 +3240,7 @@ character.yijiang={
 		huomo_tao:{
 			enable:'chooseToUse',
 			discard:false,
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			filter:function(event,player){
 				if(!player.storage.huomo) player.storage.huomo={};
 				if(player.storage.huomo.tao) return false;
@@ -3308,9 +3304,7 @@ character.yijiang={
 		huomo_jiu:{
 			enable:'chooseToUse',
 			discard:false,
-			prepare:function(cards,player){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			filter:function(event,player){
 				if(!lib.filter.filterCard({name:'jiu'},player,event)){
 					return false;
@@ -5248,10 +5242,7 @@ character.yijiang={
 			multitarget:true,
 			discard:false,
 			targetprompt:['得到牌','出杀目标'],
-			prepare:function(cards,player,targets){
-				player.$give(cards,targets[0]);
-				player.line2(targets);
-			},
+			prepare:'give',
 			filterTarget:function(card,player,target){
 				if(ui.selected.targets.length==0){
 					return player!=target;
@@ -6535,9 +6526,7 @@ character.yijiang={
 			enable:'phaseUse',
 			usable:1,
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$give(1,targets[0]);
-			},
+			prepare:'give2',
 			filterCard:function(card){
 				return get.suit(card)=='heart';
 			},

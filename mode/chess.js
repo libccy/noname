@@ -4601,10 +4601,7 @@ mode.chess={
 			},
 			selectTarget:[1,Infinity],
 			discard:false,
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-				player.line(targets);
-			},
+			prepare:'throw',
 			filterTarget:function(card,player,target){
 				return lib.filter.targetEnabled({name:'sha'},player,target)&&
 				get.distance(player,target,'pure')<=5;

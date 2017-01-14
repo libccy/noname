@@ -171,9 +171,7 @@ character.diy={
 				}
 				return false;
 			},
-			prepare:function(cards,player,targets){
-				player.$throw(cards);
-			},
+			prepare:'throw',
 			position:'he',
 			filterCard:function(card){
 				if(get.color(card)!='black') return false;
