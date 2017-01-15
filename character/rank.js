@@ -59,7 +59,7 @@ window.characterRank={
         'ow_luxiao',
     ],
     a:[
-        'dongbai',
+        'hs_aya',
         'pal_longkui',
         'pal_nangonghuang',
         'pal_xingxuan',
@@ -135,7 +135,6 @@ window.characterRank={
         'yxs_luobinhan',
     ],
     am:[
-        'guohuanghou',
         'swd_duanmeng',
         'sunziliufang',
         'hs_blingtron',
@@ -225,6 +224,7 @@ window.characterRank={
     ],
     bp:[
         'dongbai',
+        'guohuanghou',
         'yxs_zhaoyong',
         'yxs_yangguang',
         'litong',

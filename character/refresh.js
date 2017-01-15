@@ -276,7 +276,7 @@ character.refresh={
 				if(result.bool){
 					player.logSkill('retuxi',result.targets);
 					for(var i=0;i<result.targets.length;i++){
-						player.gain(result.targets[i].get('h').randomGet());
+						player.gain(result.targets[i].get('h').randomGet(),result.targets[i]);
 						result.targets[i].$give(1,player);
 					}
 					trigger.num-=result.targets.length

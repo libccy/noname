@@ -658,6 +658,13 @@ card.hearth={
 			}
 		},
 		shandianjian2:{},
+		jihuocard2:{
+			mod:{
+				maxHandcard:function(player,num){
+					return num+2;
+				}
+			}
+		}
 	},
 	translate:{
 		linghunzhihuo:'灵魂之火',
@@ -687,7 +694,7 @@ card.hearth={
 		zhaomingdan:'照明弹',
 		zhaomingdan_info:'观看一名其他角色的手牌，并重置其区域内的一张牌，然后摸一张牌',
 		jihuocard:'激活',
-		jihuocard_info:'跳过本回合的弃牌阶段，摸一张牌',
+		jihuocard_info:'摸一张牌，本回合手牌上限+1',
 	},
 	list:[
 		// ['heart',2,'shenenshu'],

@@ -16,6 +16,8 @@ character.hearth={
 		hs_magni:['male','shu',4,['zhongjia','dunji']],
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
+		// hs_khadgar:['male','shu',3,['s_tuteng']],
+		// hs_tyrande:['female','wei',3,['s_tuteng']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu']],
 		hs_wvelen:['male','qun',3,['shengyan','xianzhi']],
@@ -79,7 +81,7 @@ character.hearth={
 		// hs_wolazi:['male','wei',3,[]],
 
 		// hs_tanghangu:['male','wei',3,[]],
-		// hs_aya:['male','wei',3,[]],
+		hs_aya:['female','wu',3,['ayuling']],
 		// hs_barnes:['male','wei',3,[]],
 		// hs_nuogefu:['male','wei',3,[]],
 		hs_kazhakusi:['male','shu',3,['lianjin']],
@@ -87,6 +89,7 @@ character.hearth={
 		hs_shaku:['male','wei',3,['shouji']],
 		hs_laxiao:['male','qun',3,['guimou','yingxi']],
 		// hs_xiangyaqishi:['male','wei',3,[]],
+		// hs_fenjie:['male','shu',3,['guimou','yingxi']],
 	},
 	perfectPair:{
 		hs_sthrall:['hs_totemic','hs_alakir','hs_neptulon','hs_yngvar','hs_tgolem'],
@@ -95,6 +98,86 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		ayuling:{
+			trigger:{player:'damageEnd'},
+			frequent:true,
+			content:function(){
+				var list=['feibiao','hufu','zhao','zhanfang','shandian'];
+				player.gain(game.createCard('hsqingyu_'+list.randomGet()),'draw');
+			},
+			init:function(player){
+				player.storage.ayuling=0;
+			},
+			mark:true,
+			intro:{
+				content:function(storage,player){
+					if(!storage) return '未使用过青玉牌';
+					var str='手牌上限+'+storage;
+					if(storage>=6){
+						str+='；回合开始和结束阶段，你可以摸一张牌'
+					}
+					else if(storage>=2){
+						str+='；回合开始阶段，你可以摸一张牌'
+					}
+					return str;
+				}
+			},
+			subSkill:{
+				count:{
+					trigger:{player:'useCard'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event,player){
+						return event.card.name.indexOf('hsqingyu_')==0;
+					},
+					content:function(){
+						player.storage.ayuling++;
+						player.updateMarks();
+					}
+				},
+				draw1:{
+					trigger:{player:'phaseBegin'},
+					filter:function(event,player){
+						return player.storage.ayuling>=2;
+					},
+					frequent:true,
+					content:function(){
+						player.draw();
+					}
+				},
+				draw2:{
+					trigger:{player:'phaseEnd'},
+					filter:function(event,player){
+						return player.storage.ayuling>=6;
+					},
+					frequent:true,
+					content:function(){
+						player.draw();
+					}
+				},
+			},
+			mod:{
+				maxHandcard:function(player,num){
+					return num+player.storage.ayuling;
+				}
+			},
+			group:['ayuling_count','ayuling_draw1','ayuling_draw2'],
+			ai:{
+				maixie:true,
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'damage')){
+							if(player.hasSkill('jueqing')) return [1,-2];
+							if(!target.hasFriend()) return;
+							if(target.hp>=4) return [1,get.tag(card,'damage')*1.5];
+							if(target.hp==3) return [1,get.tag(card,'damage')*1];
+							if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
+						}
+					}
+				}
+			}
+		},
 		aoshu:{
 			enable:'phaseUse',
 			usable:1,
@@ -161,7 +244,6 @@ character.hearth={
 		lianjin:{
 			enable:'phaseUse',
 			usable:2,
-			position:'he',
 			filterCard:true,
 			check:function(card){
 				return 8-ai.get.value(card)
@@ -852,6 +934,9 @@ character.hearth={
 		duxin:{
 			trigger:{player:['phaseBegin','phaseEnd']},
 			frequent:true,
+			filter:function(event,player){
+				return !player.num('h',{type:'hsdusu'});
+			},
 			content:function(){
 				var list=['hsdusu_xueji','hsdusu_huangxuecao','hsdusu_kuyecao','hsdusu_shinancao','hsdusu_huoyanhua'];
 				if(typeof lib.cardType.hslingjian!='number'){
@@ -4485,9 +4570,129 @@ character.hearth={
 		hsbaowu:0.5,
 		hsdusu:0.5,
 		hsshenqi:0.5,
-		hsyaoshui:0.5
+		hsyaoshui:0.5,
+		hsqingyu:0.5,
 	},
 	card:{
+		hsqingyu_feibiao:{
+			type:'hsqingyu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_aya',
+			filterTarget:function(card,player,target){
+				return target.num('he')>0;
+			},
+			content:function(){
+				var cards=[];
+				var hs=target.get('h');
+				var es=target.get('e');
+				if(hs.length) cards.push(hs.randomGet());
+				if(es.length) cards.push(es.randomGet());
+				target.discard(cards);
+			},
+			ai:{
+				order:8,
+				useful:3,
+				value:6,
+				result:{
+					target:function(player,target){
+						var num=0;
+						if(target.num('h')) num--;
+						if(target.num('e')) num--;
+						return num;
+					},
+				},
+			}
+		},
+		hsqingyu_zhanfang:{
+			type:'hsqingyu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_aya',
+			filterTarget:true,
+			content:function(){
+				target.gainMaxHp();
+				target.draw();
+			},
+			ai:{
+				order:5,
+				useful:3,
+				value:4,
+				result:{
+					target:function(player,target){
+						if(target.hp==target.maxHp){
+							if(target.maxHp<3) return 2;
+							if(target.maxHp==3) return 1.5;
+							return 1.2;
+						}
+						return 1;
+					},
+				},
+			}
+		},
+		hsqingyu_hufu:{
+			type:'hsqingyu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_aya',
+			filterTarget:true,
+			content:function(){
+				target.changeHujia();
+			},
+			ai:{
+				order:5,
+				useful:3,
+				value:6,
+				result:{
+					target:function(player,target){
+						return 2/Math.max(1,Math.sqrt(target.hp));
+					},
+				},
+			}
+		},
+		hsqingyu_shandian:{
+			type:'hsqingyu',
+			fullimage:true,
+			vanish:true,
+			enable:true,
+			derivation:'hs_aya',
+			filterTarget:true,
+			content:function(){
+				target.damage('thunder');
+			},
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+				},
+				useful:5,
+				value:8,
+				tag:{
+					damage:1,
+					thunderDamage:1,
+					natureDamage:1,
+				}
+			}
+		},
+		hsqingyu_zhao:{
+			type:'equip',
+			subtype:'equip1',
+			distance:{attackFrom:-1},
+			fullimage:true,
+			vanish:true,
+			derivation:'hs_aya',
+			onEquip:function(){
+				player.draw();
+			},
+			ai:{
+				order:9,
+				useful:5,
+				value:4
+			}
+		},
 		hsdusu_xueji:{
 			type:'hsdusu',
 			fullimage:true,
@@ -4498,7 +4703,7 @@ character.hearth={
 				return target.num('e')>0;
 			},
 			content:function(){
-				target.discard(target.get('e').randomGets(Math.ceil(Math.random()*2)));
+				target.discard(target.get('e').randomGets(2));
 			},
 			ai:{
 				order:5,
@@ -4509,7 +4714,6 @@ character.hearth={
 						return -1;
 					},
 				},
-				useful:3,
 				value:5,
 			}
 		},
@@ -4539,7 +4743,6 @@ character.hearth={
 						return num;
 					}
 				},
-				useful:4,
 				value:5,
 			}
 		},
@@ -4555,9 +4758,6 @@ character.hearth={
 			selectTarget:-1,
 			modTarget:true,
 			content:function(){
-				'step 0'
-				target.chooseToDiscard('he',true);
-				'step 1'
 				target.draw(2);
 			},
 			ai:{
@@ -4565,7 +4765,6 @@ character.hearth={
 				result:{
 					target:1,
 				},
-				useful:5,
 				value:10,
 			}
 		},
@@ -4617,7 +4816,6 @@ character.hearth={
 						return 0.2;
 					},
 				},
-				useful:4,
 				value:5,
 			}
 		},
@@ -5009,6 +5207,7 @@ character.hearth={
 		hs_nzoth:'恩佐斯',
 		hs_walian:'瓦里安',
 		hs_pengpeng:'砰砰博士',
+		hs_aya:'艾雅',
 
 		hs_ronghejuren:'熔核巨人',
 		hs_shanlingjuren:'山岭巨人',
@@ -5029,7 +5228,6 @@ character.hearth={
 		hs_shifazhe:'嗜法者',
 		hs_yogg:'尤格萨隆',
 		hs_xialikeer:'夏克里尔',
-		hs_aya:'艾雅',
 		hs_wolazi:'沃拉兹',
 		hs_tanghangu:'唐·汉古',
 		hs_barnes:'巴内斯',
@@ -5040,7 +5238,22 @@ character.hearth={
 		hs_shaku:'沙库尔',
 		hs_laxiao:'拉希奥',
 		hs_yashaji:'亚煞极',
+		hs_khadgar:'卡德加',
+		hs_tyrande:'泰兰德',
+		hs_fenjie:'芬杰',
 
+		hsqingyu_hufu:'青玉护符',
+		hsqingyu_hufu_info:'令一名角色获得一点护甲',
+		hsqingyu_zhao:'青玉之爪',
+		hsqingyu_zhao_info:'当你装备此装备时，摸一张牌',
+		hsqingyu_feibiao:'青玉飞镖',
+		hsqingyu_feibiao_info:'弃置一名角色的一张随机手牌和一张随机装备牌',
+		hsqingyu_shandian:'青玉闪电',
+		hsqingyu_shandian_info:'对一名角色造成一点雷电伤害',
+		hsqingyu_zhanfang:'青玉绽放',
+		hsqingyu_zhanfang_info:'令一名角色增加一点体力上限并摸一张牌',
+		ayuling:'玉灵',
+		ayuling_info:'每当你受到一次伤害，你可以获得一张随机青玉牌；每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于回合开始阶段摸一张牌；当你累计使用六张青玉牌后，你可以于回合结束阶段摸一张牌',
 		lianjin:'炼金',
 		lianjin_info:'出牌阶段限两次，将一张手牌永久转化为一张由三张随机牌组成的药水',
 		shouji:'收集',
@@ -5067,7 +5280,7 @@ character.hearth={
 		chouhuo_info:'觉醒技，出牌阶段开始时，若你的怒焰技能已将可用的牌用完，你失去一点体力上限，获得两点护甲，然后将怒焰的描述改为“出牌阶段限三次，你可以失去一点体力，视为使用任意一张能造成伤害的牌”',
 		hsdusu:'毒素',
 		hsdusu_xueji:'血蓟',
-		hsdusu_xueji_info:'随机弃至一名角色的1~2张装备牌',
+		hsdusu_xueji_info:'随机弃置一名角色的2张装备牌',
 		hsdusu_shinancao:'石楠草',
 		hsdusu_shinancao_info:'令一名角色下一次造成的伤害+1',
 		hsdusu_kuyecao:'枯叶草',
@@ -5075,9 +5288,9 @@ character.hearth={
 		hsdusu_huoyanhua:'火焰花',
 		hsdusu_huoyanhua_info:'对攻击范围内的一名角色造成一点火焰伤害',
 		hsdusu_huangxuecao:'皇血草',
-		hsdusu_huangxuecao_info:'弃置一张牌并摸两张牌',
+		hsdusu_huangxuecao_info:'摸两张牌',
 		duxin:'毒心',
-		duxin_info:'回合开始和结束阶段，你可以获得一张随机毒素牌',
+		duxin_info:'回合开始和结束阶段，若你的手中没有毒素牌，你可以获得一张随机毒素牌',
 		hstuteng:'图腾',
 		kuangluan:'狂乱',
 		kuangluan2:'狂乱',
@@ -5132,6 +5345,7 @@ character.hearth={
 		hsbaowu_cangbaotu:'藏宝图',
 		hsbaowu_cangbaotu_info:'回合结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
 		hsyaoshui:'药水',
+		hsqingyu:'青玉',
 
 		shifa:'嗜法',
 		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',
