@@ -226,11 +226,11 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				var cards=player.get('h',function(card){
+				var cards=target.get('h',function(card){
 					return get.type(card)!='basic';
 				});
 				if(cards.length){
-					player.lose(cards)._triggered=null;
+					target.lose(cards)._triggered=null;
 				}
 				event.num=1+cards.length;
 				'step 1'
@@ -243,7 +243,7 @@ card.swd={
 					for(var i=0;i<event.num;i++){
 						cards.push(game.createCard(list.randomGet()));
 					}
-					player.directgain(cards);
+					target.directgain(cards);
 				}
 			},
 			ai:{
@@ -266,17 +266,18 @@ card.swd={
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
+			modTarget:true,
 			selectTarget:-1,
 			content:function(){
 				'step 0'
-				var targets=player.getEnemies();
+				var targets=target.getEnemies();
 				if(targets.length){
-					var target=targets.randomGet();
-					target.addExpose(0.2);
-					player.useCard({name:'sha'},target);
+					var target2=targets.randomGet();
+					target2.addExpose(0.2);
+					target.useCard({name:'sha'},target2);
 				}
 				'step 1'
-				player.draw();
+				target.draw();
 			},
 			ai:{
 				value:6,
@@ -785,6 +786,7 @@ card.swd={
 			fullskin:true,
 			type:'jiguan',
 			wuxieable:true,
+			modTarget:true,
 			enable:function(card,player){
 				var es=player.get('e');
 				for(var i=0;i<es.length;i++){

@@ -82,7 +82,7 @@ character.hearth={
 		// hs_aya:['male','wei',3,[]],
 		// hs_barnes:['male','wei',3,[]],
 		// hs_nuogefu:['male','wei',3,[]],
-		// hs_kazhakusi:['male','shu',3,['lianjin']],
+		hs_kazhakusi:['male','shu',3,['lianjin']],
 		// hs_lazi:['male','wei',3,[]],
 		hs_shaku:['male','wei',3,['shouji']],
 		hs_laxiao:['male','qun',3,['guimou','yingxi']],
@@ -130,7 +130,7 @@ character.hearth={
 				expose:0.1
 			}
 		},
-		lianjin:{
+		lianjin_old:{
 			enable:'phaseUse',
 			usable:2,
 			filterCard:true,
@@ -157,6 +157,160 @@ character.hearth={
 					player:1
 				}
 			}
+		},
+		lianjin:{
+			enable:'phaseUse',
+			usable:2,
+			position:'he',
+			filterCard:true,
+			check:function(card){
+				return 8-ai.get.value(card)
+			},
+			discard:false,
+			lose:false,
+			delay:false,
+			content:function(){
+				'step 0'
+				var names=[];
+				var inpile=lib.inpile.slice(0);
+				inpile.randomSort();
+				var single=false;
+				var equip=Math.random()<0.5;
+				var equips=[];
+				for(var i=0;i<inpile.length;i++){
+					if(lib.inpile[i]=='chuansongmen') continue;
+					var info=lib.card[inpile[i]];
+					if(!info.enable) continue;
+					if(!info.filterTarget) continue;
+					if(typeof info.selectTarget=='function') continue;
+					if(inpile[i].indexOf('_')!=-1) continue;
+					if(info.type=='equip'){
+						equips.push(inpile[i]);
+						continue;
+					}
+					if(equip&&names.length>=2) continue;
+					if(names.length>=3) continue;
+					var select=get.select(info.selectTarget);
+					if(select[0]==-1&&select[1]==-1){
+						names.push(inpile[i]);
+						if(info.modTarget) single=true;
+					}
+					else if(select[0]==1&&select[1]==1){
+						names.push(inpile[i]);
+						single=true;
+					}
+				}
+				if(equip){
+					names.push(equips.randomGet());
+				}
+				names.sort(lib.sort.name);
+				var name='hsyaoshui_'+names[0]+'_'+names[1]+'_'+names[2];
+				if(!lib.card[name]){
+					lib.card[name]=get.copy(lib.skill.lianjin.template);
+					lib.card[name].names=names;
+					lib.card[name].selectTarget=single?1:-1;
+					lib.translate[name]='药水';
+					lib.translate[name+'_info']=get.translation(names[0])+'、'+
+					get.translation(names[1])+'、'+get.translation(names[2]);
+				}
+				cards[0].style.transitionDuration='0.2s';
+				ui.refresh(cards[0]);
+				cards[0].classList.add('opaque');
+				event.cardname=name;
+				if(player!=game.me){
+					var fakecard=game.createCard(name);
+					fakecard.node.info.remove();
+					player.$draw(fakecard);
+				}
+				game.delay(0,200);
+				'step 1'
+				cards[0].style.transitionDuration='0s';
+				ui.refresh(cards[0]);
+				cards[0].classList.remove('fullskin');
+				cards[0].init([cards[0].suit,cards[0].number,event.cardname]);
+				game.delay(0,100);
+				'step 2'
+				cards[0].style.transitionDuration='';
+				ui.refresh(cards[0]);
+				cards[0].classList.remove('opaque');
+				game.delay(0,200);
+			},
+			template:{
+				type:'hsyaoshui',
+				enable:true,
+				fullimage:true,
+				image:'card/hsyaoshui',
+				vanish:true,
+				derivation:'hs_kazhakusi',
+				multitarget:true,
+				multiline:true,
+				filterTarget:function(card,player,target){
+					var info=get.info(card);
+					var names=info.names;
+					for(var i=0;i<names.length;i++){
+						var info2=lib.card[names[i]];
+						if(get.select(info2.selectTarget)[0]==-1&&!info2.modTarget) continue;
+						if(!lib.filter.targetEnabled2({name:names[i]},player,target)) return false;
+					}
+					return true;
+				},
+				content:function(){
+					'step 0'
+					event.names=get.info(card).names.slice(0);
+					'step 1'
+					if(event.names.length){
+						var name=event.names.shift();
+						var info=lib.card[name];
+						var targets=[];
+						if(get.select(info.selectTarget)[0]==-1&&!info.modTarget){
+							var targets=[];
+							for(var i=0;i<game.players.length;i++){
+								if(player.canUse(name,game.players[i])){
+									targets.push(game.players[i]);
+								}
+							}
+							targets.sort(lib.sort.seat);
+						}
+						else{
+							targets.push(target);
+						}
+						player.useCard(game.createCard({name:name,suit:get.suit(card),number:card.number}),targets);
+						event.redo();
+					}
+				},
+				ai:{
+					order:9.1,
+					result:{
+						target:function(player,target,card){
+							var info=get.info(card);
+							if(!info) return 0;
+							if(!Array.isArray(info.names)) return 0;
+							var names=info.names;
+							if(names.contains('xingjiegoutong')&&target.num('h')>=3) return -1;
+							var num=0;
+							for(var i=0;i<names.length;i++){
+								var info2=lib.card[names[i]];
+								if(get.select(info2.selectTarget)[0]==-1&&!info2.modTarget) continue;
+								var eff=ai.get.effect(target,{name:names[i]},player,target);
+								if(eff>0){
+									num++;
+								}
+								else if(eff<0){
+									num-=0.9;
+								}
+							}
+							return num;
+						}
+					}
+				}
+			},
+			ai:{
+				order:9,
+				result:{
+					player:1
+				},
+				threaten:1.4
+			},
 		},
 		shouji:{
 			group:['shouji_begin','shouji_miss'],
@@ -4331,6 +4485,7 @@ character.hearth={
 		hsbaowu:0.5,
 		hsdusu:0.5,
 		hsshenqi:0.5,
+		hsyaoshui:0.5
 	},
 	card:{
 		hsdusu_xueji:{
@@ -4887,7 +5042,7 @@ character.hearth={
 		hs_yashaji:'亚煞极',
 
 		lianjin:'炼金',
-		lianjin_info:'出牌阶段限两次，你可以弃置一张手牌，并从3张随机锦囊牌中选择一张加入手牌',
+		lianjin_info:'出牌阶段限两次，将一张手牌永久转化为一张由三张随机牌组成的药水',
 		shouji:'收集',
 		shouji_info:'每回合限发动一次，每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制',
 		guimou:'鬼谋',
@@ -4976,6 +5131,7 @@ character.hearth={
 		hsbaowu_huangjinyuanhou_info:'回复一点体力并弃置所有手牌，然后获得等量的无中生有；直到下个回合开始，不能成为其他角色的卡牌目标',
 		hsbaowu_cangbaotu:'藏宝图',
 		hsbaowu_cangbaotu_info:'回合结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
+		hsyaoshui:'药水',
 
 		shifa:'嗜法',
 		shifa_info:'锁定技，出牌阶段开始时，你令场上所有角色各获得一张随机锦囊牌',

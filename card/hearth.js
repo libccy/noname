@@ -43,8 +43,11 @@ card.hearth={
 				return player==target;
 			},
 			selectTarget:-1,
+			modTarget:true,
 			content:function(){
-				target.skip('phaseDiscard');
+				if(_status.currentPhase==target){
+					target.addTempSkill('jihuocard2','phaseAfter');
+				}
 				target.draw();
 			},
 			ai:{

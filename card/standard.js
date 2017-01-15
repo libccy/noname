@@ -1101,6 +1101,9 @@ card.standard={
 			audio:true,
 			fullskin:true,
 			type:'delay',
+			modTarget:function(card,player,target){
+				return lib.filter.judge(card,player,target);
+			},
 			enable:function(card,player){
 				return (lib.filter.judge(card,player,player));
 			},

@@ -221,6 +221,7 @@ window.characterRank={
         'sunru',
         'yxs_zhangsanfeng',
         'yxs_nandinggeer',
+        'hs_kazhakusi',
     ],
     bp:[
         'dongbai',

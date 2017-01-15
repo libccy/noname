@@ -14425,7 +14425,7 @@
 			judge:function(card,player,target){
 				var judges=target.get('j');
 				for(var i=0;i<judges.length;i++){
-					if(judges[i].name==card.name||judges[i].viewAs==card.name) return false;
+					if((judges[i].viewAs||judges[i].name)==card.name) return false;
 				}
 				return true;
 			},
@@ -14509,6 +14509,11 @@
                     return aa>bb?1:-1;
                 }
                 return a>b?1:-1;
+            },
+            name:function(a,b){
+                if(a>b) return 1;
+                if(a<b) return -1;
+                return 0;
             }
 		},
 		skill:{
@@ -20069,6 +20074,7 @@
 					if(card.filterTarget==undefined) card.filterTarget=function(card,player,target){
 						return target==player;
 					};
+                    if(card.modTarget==undefined) card.modTarget=true;
 					if(card.content==undefined) card.content=lib.element.content.equipCard;
 					if(card.ai==undefined) card.ai={basic:{}};
 					if(card.ai.basic==undefined) card.ai.basic={};

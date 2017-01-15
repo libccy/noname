@@ -36,6 +36,7 @@ card.sp={
 				useful:6,
 			},
 			enable:true,
+			modTarget:true,
 			filterTarget:function(card,player,target){
 				return target==player;
 			},

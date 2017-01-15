@@ -70,6 +70,7 @@ window.noname_asset_list=[
     'image/card/hsshenqi_kongbusangzhong.jpg',
     'image/card/hsshenqi_morijingxiang.jpg',
     'image/card/hsshenqi_nengliangzhiguang.jpg',
+    'image/card/hsyaoshui.jpg',
     'image/card/hualiu.png',
     'image/card/huanpodan.png',
     'image/card/huanglinzhicong.png',
