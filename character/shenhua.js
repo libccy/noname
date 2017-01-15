@@ -1541,7 +1541,7 @@ character.shenhua={
 			filter:function(event,player){
 				return (event.card&&event.card.name=='sha'&&
 					event.player.classList.contains('dead')==false&&
-					event.player.num('h')&&player.num('h'));
+					event.player.num('h')&&player.num('h'))&&event.player!=player;
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0&&player.num('h')>1;

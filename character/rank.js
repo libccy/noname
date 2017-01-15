@@ -136,6 +136,7 @@ window.characterRank={
     ],
     am:[
         'guohuanghou',
+        'swd_duanmeng',
         'sunziliufang',
         'hs_blingtron',
         'hs_kcthun',
@@ -220,7 +221,6 @@ window.characterRank={
         'sunru',
         'yxs_zhangsanfeng',
         'yxs_nandinggeer',
-        'swd_duanmeng',
     ],
     bp:[
         'dongbai',

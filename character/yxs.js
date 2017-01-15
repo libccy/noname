@@ -182,8 +182,7 @@ character.yxs={
 		taiji:{
 			trigger:{player:'respond'},
 			filter:function(event,player){
-				if(lib.filter.autoRespondSha.call({player:player})) return false;
-				return event.card.name=='shan';
+				return event.card.name=='shan'&&player.hasSha();
 			},
 			direct:true,
 			content:function(){
@@ -2661,7 +2660,7 @@ character.yxs={
 		zyhufu:'胡服',
 		zyhufu_info:'锁定技，当你的装备区内没有防具牌时，你摸牌阶段额外摸一张牌；当你装备区内有防具牌时，你的手牌上限+5',
 		hanbei:'捍北',
-		hanbei_info:'你的装备区有马时，你的杀不可闪避',
+		hanbei_info:'锁定技，你的装备区有马时，你的杀不可闪避',
 		kuangchan:'狂禅',
 		kuangchan_info:'锁定技，你做主公时，不增加体力上限',
 		dili:'底力',

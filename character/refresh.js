@@ -1242,8 +1242,7 @@ character.refresh={
 			direct:true,
 			filter:function(event,player){
 				return event.player.isAlive()&&event.player.getStat('damage')&&
-				lib.filter.targetEnabled({name:'sha'},player,event.player)&&
-				!lib.filter.autoRespondSha.call({player:player});
+				lib.filter.targetEnabled({name:'sha'},player,event.player)&&player.hasSha();
 			},
 			content:function(){
 				player.chooseToUse({name:'sha'},'诛害：是否对'+get.translation(trigger.player)+'使用一张杀？',

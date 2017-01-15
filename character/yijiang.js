@@ -3184,6 +3184,7 @@ character.yijiang={
 			popup:false,
 			silent:true,
 			content:function(){
+				if(!player.storage.huomo) player.storage.huomo={};
 				switch(trigger.card.name){
 					case 'sha':player.storage.huomo.sha=true;break;
 					case 'tao':player.storage.huomo.tao=true;break;
@@ -3192,6 +3193,145 @@ character.yijiang={
 			}
 		},
 		huomo_sha:{
+			enable:'chooseToUse',
+			viewAs:{name:'sha'},
+			viewAsFilter:function(player){
+				if(!player.storage.huomo) player.storage.huomo={};
+				if(player.storage.huomo.sha) return false;
+				var hs=player.get('he',{color:'black'});
+				for(var i=0;i<hs.length;i++){
+					if(get.type(hs[i])!='basic'){
+						return true;
+					}
+				}
+				return false;
+			},
+			precontent:function(){
+				'step 0'
+				var card=event.result.cards[0];
+				event.card=card;
+				player.$throw(card,1000);
+				game.log(player,'将',card,'置于牌堆顶');
+				event.result.cards.length=0;
+				player.lose(card);
+				'step 1'
+				game.delay();
+				'step 2'
+				ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+			},
+			filterCard:function(card){
+				return get.type(card)!='basic'&&get.color(card)=='black';
+			},
+			ai:{
+				skillTagFilter:function(player,tag,arg){
+					if(arg!='use') return false;
+					if(!player.storage.huomo) player.storage.huomo={};
+					if(player.storage.huomo.sha) return false;
+					var hs=player.get('he',{color:'black'});
+					for(var i=0;i<hs.length;i++){
+						if(get.type(hs[i])!='basic'){
+							return true;
+						}
+					}
+					return false;
+				},
+				order:2.9,
+				respondSha:true,
+			},
+		},
+		huomo_tao:{
+			enable:'chooseToUse',
+			viewAs:{name:'tao'},
+			viewAsFilter:function(player){
+				if(!player.storage.huomo) player.storage.huomo={};
+				if(player.storage.huomo.tao) return false;
+				var hs=player.get('he',{color:'black'});
+				for(var i=0;i<hs.length;i++){
+					if(get.type(hs[i])!='basic'){
+						return true;
+					}
+				}
+				return false;
+			},
+			precontent:function(){
+				'step 0'
+				var card=event.result.cards[0];
+				event.card=card;
+				player.$throw(card,1000);
+				game.log(player,'将',card,'置于牌堆顶');
+				event.result.cards.length=0;
+				player.lose(card);
+				'step 1'
+				game.delay();
+				'step 2'
+				ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+			},
+			filterCard:function(card){
+				return get.type(card)!='basic'&&get.color(card)=='black';
+			},
+			ai:{
+				order:4,
+				skillTagFilter:function(player){
+					if(!player.storage.huomo) player.storage.huomo={};
+					if(player.storage.huomo.tao) return false;
+					var hs=player.get('he',{color:'black'});
+					for(var i=0;i<hs.length;i++){
+						if(get.type(hs[i])!='basic'){
+							return true;
+						}
+					}
+					return false;
+				},
+				save:true,
+			},
+		},
+		huomo_jiu:{
+			enable:'chooseToUse',
+			viewAs:{name:'jiu'},
+			viewAsFilter:function(player){
+				if(!player.storage.huomo) player.storage.huomo={};
+				if(player.storage.huomo.jiu) return false;
+				var hs=player.get('he',{color:'black'});
+				for(var i=0;i<hs.length;i++){
+					if(get.type(hs[i])!='basic'){
+						return true;
+					}
+				}
+				return false;
+			},
+			precontent:function(){
+				'step 0'
+				var card=event.result.cards[0];
+				event.card=card;
+				player.$throw(card,1000);
+				game.log(player,'将',card,'置于牌堆顶');
+				event.result.cards.length=0;
+				player.lose(card);
+				'step 1'
+				game.delay();
+				'step 2'
+				ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+			},
+			filterCard:function(card){
+				return get.type(card)!='basic'&&get.color(card)=='black';
+			},
+			ai:{
+				skillTagFilter:function(player){
+					if(!player.storage.huomo) player.storage.huomo={};
+					if(player.storage.huomo.jiu) return false;
+					if(player.hp>0) return false;
+					var hs=player.get('he',{color:'black'});
+					for(var i=0;i<hs.length;i++){
+						if(get.type(hs[i])!='basic'){
+							return true;
+						}
+					}
+					return false;
+				},
+				save:true,
+			},
+		},
+		huomo_sha_old:{
 			enable:'phaseUse',
 			discard:false,
 			prepare:'throw',
@@ -3237,7 +3377,7 @@ character.yijiang={
 				}
 			}
 		},
-		huomo_tao:{
+		huomo_tao_old:{
 			enable:'chooseToUse',
 			discard:false,
 			prepare:'throw',
@@ -3301,7 +3441,7 @@ character.yijiang={
 				}
 			}
 		},
-		huomo_jiu:{
+		huomo_jiu_old:{
 			enable:'chooseToUse',
 			discard:false,
 			prepare:'throw',
@@ -7518,7 +7658,7 @@ character.yijiang={
 		huomo_shan:'墨闪',
 		huomo_tao:'墨桃',
 		huomo_jiu:'墨酒',
-		huomo_info:'在出牌或濒死阶段，每当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
+		huomo_info:'每当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
 		zuoding:'佐定',
 		zuoding_info:'每当一名其他角色于其出牌阶段内使用♠牌指定目标后，若此阶段没有角色受到过伤害，则你可以令其中一名目标角色摸一张牌',
 		taoxi:'讨袭',

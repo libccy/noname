@@ -4631,16 +4631,15 @@ character.hearth={
 			derivation:'hs_ysera',
 			filterTarget:true,
 			content:function(){
-				target.damage(2);
-				player.loseHp();
+				target.damage();
 			},
 			ai:{
 				order:5,
 				result:{
-					target:-2
+					target:-1
 				},
 				tag:{
-					damage:2
+					damage:1
 				},
 				useful:5,
 				value:10,
@@ -4741,7 +4740,7 @@ character.hearth={
 				return target.hp<target.maxHp;
 			},
 			content:function(){
-				target.recover(2);
+				target.recover();
 			},
 			ai:{
 				order:6,
@@ -4749,12 +4748,7 @@ character.hearth={
 				useful:[7,4],
 				result:{
 					target:function(player,target){
-						var eff=ai.get.recoverEffect(target,player,target);
-						if(eff<=0) return 0;
-						var num=target.maxHp-target.hp;
-						if(num<1) return 0;
-						if(target.hp==1) return num+0.5;
-						return num;
+						return ai.get.recoverEffect(target,player,target);
 					}
 				}
 			}
@@ -5034,9 +5028,9 @@ character.hearth={
 		hsmengjing:'梦境',
 		hsmengjing_card_config:'梦境',
 		hsmengjing_feicuiyoulong:'翡翠幼龙',
-		hsmengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成2点伤害，然后流失一点体力',
+		hsmengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成一点伤害',
 		hsmengjing_huanxiaojiemei:'欢笑姐妹',
-		hsmengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复两点体力',
+		hsmengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复一点体力',
 		hsmengjing_suxing:'苏醒',
 		hsmengjing_suxing_info:'令所有其他角色流失一点体力并随机弃置两张牌',
 		hsmengjing_mengye:'梦魇',

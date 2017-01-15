@@ -217,7 +217,7 @@ card.sp={
 			},
 			content:function(){
 				'step 0'
-				var next=player.chooseToUse(get.prompt('yinyueqiang'),{name:'sha'});
+				var next=player.chooseToUse(get.prompt('yinyueqiang'),{name:'sha'}).aidelay=true;
 				next.logSkill='yinyueqiang';
 				next.noButton=true;
 				'step 1'

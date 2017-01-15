@@ -992,10 +992,15 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				targets[0].chooseToUse('对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
-					{name:'sha'},targets[1],-1).set('targetRequired',true);
+				if(!targets[0].hasSha()){
+					event.directfalse=true;
+				}
+				else{
+					targets[0].chooseToUse('对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
+						{name:'sha'},targets[1],-1).set('targetRequired',true);
+				}
 				"step 1"
-				if(result.bool==false){
+				if(event.directfalse||result.bool==false){
 					player.gain(targets[0].get('e',{subtype:'equip1'}),targets[0]);
 					targets[0].$give(targets[0].get('e',{subtype:'equip1'}),player);
 				}

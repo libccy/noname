@@ -4961,6 +4961,29 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+            e:function(){
+                var cards=[],target;
+                for(var i=0;i<arguments.length;i++){
+                    if(get.itemtype(arguments[i])=='player'){
+                        target=arguments[i];
+                    }
+                    else{
+                        cards.push(game.createCard(arguments[i]));
+                    }
+                }
+                target=target||game.me;
+                for(var i=0;i<cards.length;i++){
+                    var str=get.subtype(cards[i])[5];
+                    if(!str) continue;
+                    var card=target.get('e',str);
+                    if(card){
+                        console.log(card);
+                        ui.discardPile.appendChild(card);
+                        target.clearEquipTrigger(card);
+                    }
+                    target.$equip(cards[i]);
+                }
+            },
             m:function(){
                 if(lib.config.game!='sgs'){
                     game.saveConfig('game','sgs');
@@ -6171,6 +6194,9 @@
 						else{
 							ui.click.cancel();
 						}
+                        if(event.aidelay&&event.result&&event.result.bool){
+                            game.delayx();
+                        }
                     }
                     "step 2"
                     if(event.result){
@@ -6188,7 +6214,7 @@
                             else if(info&&info.precontent){
                                 var next=game.createEvent('pre_'+event.result.skill);
                                 next.setContent(info.precontent);
-                                next.set('argresult',event.result);
+                                next.set('result',event.result);
                                 next.set('player',player);
                             }
                         }
@@ -11891,14 +11917,19 @@
                     }
                     return false;
                 },
-				hasSkillTag:function(tag,hidden){
+				hasSkillTag:function(tag,hidden,arg){
 					var skills=game.expandSkills(this.get('s',hidden));
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
 						if(info&&info.ai){
 							if(info.ai.skillTagFilter&&
-								info.ai.skillTagFilter(this,tag)===false) continue;
-							if(info.ai[tag]) return true;
+                                info.ai.skillTagFilter(this,tag,arg)===false) continue;
+                            if(typeof info.ai[tag]=='string'){
+                                if(info.ai[tag]==arg) return true;
+                            }
+                            else if(info.ai[tag]){
+                                return true;
+                            }
 						}
 					}
 					return false;
@@ -11960,6 +11991,18 @@
 					}
                     return false;
                 },
+                hasSha:function(respond){
+                    if(this.num('h','sha')) return true;
+    				if(this.num('h','hufu')) return true;
+    				if(this.hasSkillTag('respondSha',true,respond?'respond':'use')) return true;
+    				return false;
+                },
+                hasShan:function(){
+    				if(this.num('h','shan')) return true;
+    				if(this.num('h','hufu')) return true;
+    				if(this.hasSkillTag('respondShan',true)) return true;
+    				return false;
+    			},
 				getJudge:function(name){
 					var judges=this.node.judges.childNodes;
 					for(var i=0;i<judges.length;i++){
@@ -14389,7 +14432,7 @@
 			autoRespondSha:function(){
 				if(this.player.num('h','sha')) return false;
 				if(this.player.num('h','hufu')) return false;
-				if(this.player.hasSkillTag('respondSha',true)) return false;
+				if(this.player.hasSkillTag('respondSha',true,'respond')) return false;
 				return true;
 			},
 			autoRespondShan:function(){

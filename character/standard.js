@@ -975,7 +975,7 @@ character.standard={
 						skillTagFilter:function(player){
 							if(!player.num('h','shan')) return false;
 						},
-						order:4,
+						order:3.1,
 						useful:-1,
 						value:-1
 					}

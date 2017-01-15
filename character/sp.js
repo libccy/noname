@@ -322,7 +322,7 @@ character.sp={
 					return 6-ai.get.value(card);
 				}
 				else if(type=='equip'){
-					if(!lib.filter.autoRespondSha.call({player:player})){
+					if(player.hasSha()){
 						for(var i=0;i<game.players.length;i++){
 							if(player.canUse('sha',game.players[i])&&
 							ai.get.attitude(player,game.players[i])<0&&

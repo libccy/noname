@@ -153,12 +153,18 @@ character.swd={
 					},
 					precontent:function(){
 						player.link();
+						// player.getStat().card.sha--;
 					},
 					filterCard:function(){return false},
 					selectCard:-1,
 					prompt:'横置武将牌，视为使用一张无视距离的杀',
 					ai:{
-						skillTagFilter:function(player){
+						order:function(){
+							// if(_status.event.player.num('h',{type:'equip'})) return 9;
+							return 3.15;
+						},
+						skillTagFilter:function(player,tag,arg){
+							if(arg!='use') return false;
 							if(player.isLinked()) return false;
 						},
 						respondSha:true,
@@ -197,11 +203,55 @@ character.swd={
 						}
 					}
 				},
+				damage:{
+					trigger:{player:'damageEnd'},
+					filter:function(event,player){
+						return event.source&&event.source.isAlive()&&player.isLinked()&&
+						lib.filter.targetEnabled({name:'sha'},player,event.source);
+					},
+					check:function(event,player){
+						return ai.get.effect(event.source,{name:'sha'},player,player)>0;
+					},
+					logTarget:'source',
+					content:function(){
+						'step 0'
+						player.link();
+						'step 1'
+						player.useCard({name:'sha'},trigger.source);
+					}
+				},
+				use:{
+					trigger:{player:'loseEnd'},
+					direct:true,
+					filter:function(event,player){
+						return _status.currentPhase!=player&&player.isLinked()&&event.cards&&event.cards.length;
+					},
+					content:function(){
+						'step 0'
+						player.chooseTarget(get.prompt('xuanying'),function(card,player,target){
+							return lib.filter.targetEnabled({name:'sha'},player,target);
+						}).set('ai',function(target){
+							return ai.get.effect(target,{name:'sha'},_status.event.player);
+						});
+						'step 1'
+						if(result.bool){
+							player.logSkill('xuanying');
+							if(!event.isMine()) game.delay(0.5);
+							player.link();
+							player.useCard({name:'sha'},result.targets,false);
+						}
+					},
+				}
 			},
-			group:['xuanying_sha','xuanying_shan']
+			group:['xuanying_sha','xuanying_use'],
+			ai:{
+				threaten:function(player,target){
+					if(target.isLinked()) return 0.7;
+					return 1.4;
+				}
+			}
 		},
 		wendao:{
-			audio:2,
 			trigger:{player:['useCardAfter','respondAfter',]},
 			check:function(event,player){
 				return ai.get.attitude(player,_status.currentPhase)<=0;
@@ -313,13 +363,16 @@ character.swd={
 						if(!player.hasFriend()) return 0;
 						var enemies=player.getEnemies();
 						if(enemies.length+1==game.players.length) return 0;
-						if('h',player.num(function(card){
+						var num=player.num('h',function(card){
 							return card.name=='sha'||get.color(card)=='red';
-						})<3) return 0;
+						});
+						if(num<2) return 0;
 						for(var i=0;i<enemies.length;i++){
 							if(player.canUse('sha',enemies[i])&&
 							ai.get.effect(enemies[i],{name:'sha'},player,player)>0&&
-							enemies[i].hp<=2&&!enemies[i].get('e','2')) return 1;
+							!enemies[i].get('e','2')&&num>enemies[i].hp&&enemies[i].hp<=2){
+								return 1;
+							}
 						}
 						return 0;
 					}
@@ -666,6 +719,7 @@ character.swd={
 			prompt:'将一张红色牌当杀使用',
 			check:function(card){return 5-ai.get.value(card)},
 			ai:{
+				order:3.1,
 				skillTagFilter:function(player){
 					if(!player.num('he',{color:'red'})) return false;
 				},
@@ -3773,7 +3827,7 @@ character.swd={
 			trigger:{global:'phaseBegin'},
 			direct:true,
 			filter:function(event,player){
-				return lib.filter.targetEnabled({name:'sha'},player,event.player)&&!lib.filter.autoRespondSha.call({player:player});
+				return lib.filter.targetEnabled({name:'sha'},player,event.player)&&player.hasSha();
 			},
 			content:function(){
 				"step 0"
@@ -8314,7 +8368,7 @@ character.swd={
 		swd_xiyan:'犀衍',
 
 		xuanying:'旋影',
-		xuanying_info:'出牌阶段，你可以横置你的武将牌视为使用一张无视距离的杀；你可以竖置你的武将牌视为使用一张闪',
+		xuanying_info:'你可以横置你的武将牌，视为使用一张无视距离的杀；每当你于回合外失去牌，你可以竖置你的武将牌，视为使用一张无视距离的杀',
 		wendao:'问道',
 		wendao_info:'每当你于回合外使用或打出一张牌，你可以令当前回合角色弃置一张与之花色相同的牌，否则你获得其一张牌',
 		lingfeng:'凌锋',
