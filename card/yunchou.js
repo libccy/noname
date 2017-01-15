@@ -20,6 +20,7 @@ card.yunchou={
 		chenhuodajie:{
 			fullskin:true,
 			type:'trick',
+			filterTarget:true,
 			content:function(){
 				if(target.num('he')){
 					player.gainPlayerCard('he',target,true);
@@ -712,6 +713,7 @@ card.yunchou={
 			filter:function(event,player){
 				if(event.player==player) return false;
 				if(!event.player.num('he')) return false;
+				if(!lib.filter.targetEnabled({name:'chenhuodajie'},player,event.player)) return false;
 				if(player.num('h','chenhuodajie')) return true;
 				var mn=player.get('e','5');
 				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){

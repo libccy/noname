@@ -35,7 +35,7 @@ character.swd={
 
 			swd_zhaoyun:['male','shu',4,['longdan','pozhen','tanlin']],
 			swd_hengai:['female','shu',3,['funiao','ningxian','hlingbo']],
-			swd_duanmeng:['female','shu',4,['jizhan','lieren']],
+			swd_duanmeng:['female','shu',4,['xuanying','lieren']],
 			swd_jiangwu:['male','shu',4,['yijue','dangping']],
 			swd_tuwei:['male','shu',3,['zhanlu','susheng']],
 			swd_yeyaxi:['female','shu',3,['rexue','huopu']],
@@ -71,7 +71,7 @@ character.swd={
 		// swd_pepin:['male','qun',4,['rejianxiong','quhu']],
 			swd_kangnalishi:['male','qun',1,['busi','xuying','yinguo']],
 			swd_xuanyuanjiantong:['male','qun',3,['chengjian','huanling']],
-		// swd_huiyan:['male','qun',3,['wendao','xiaozhan','xunzhi']],
+		swd_huiyan:['male','qun',4,['wendao','lingfeng','hxunzhi']],
 
 		// swd_chenfu:['male','qun',4,['xuanzhou','bingfeng']],
 		// swd_chengyaojin:['male','qun',4,['jiuchi','jufu']],
@@ -127,7 +127,7 @@ character.swd={
 		swd_qiner:['swd_hengai'],
 		swd_huzhongxian:['swd_jiliang','swd_jipeng','swd_xiyan'],
 		swd_anka:['swd_kama'],
-		swd_septem:['swd_nicole','swd_kama','swd_weida','swd_wangsiyue'],
+		swd_septem:['swd_nicole','swd_kama','swd_weida','swd_wangsiyue','swd_huiyan'],
 		swd_nicole:['swd_lilian'],
 		swd_xuanyuanjianxian:['swd_xuanyuanjiantong'],
 		swd_chenjingchou:['swd_yuxiaoxue','swd_tuobayuer'],
@@ -143,6 +143,198 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		xuanying:{
+			subSkill:{
+				sha:{
+					enable:'chooseToUse',
+					viewAs:{name:'sha'},
+					viewAsFilter:function(player){
+						if(player.isLinked()) return false;
+					},
+					precontent:function(){
+						player.link();
+					},
+					filterCard:function(){return false},
+					selectCard:-1,
+					prompt:'横置武将牌，视为使用一张无视距离的杀',
+					ai:{
+						skillTagFilter:function(player){
+							if(player.isLinked()) return false;
+						},
+						respondSha:true,
+					},
+					mod:{
+						targetInRange:function(card){
+							if(_status.event.skill=='xuanying_sha') return true;
+						}
+					},
+				},
+				shan:{
+					trigger:{player:'chooseToRespondBegin'},
+					filter:function(event,player){
+						if(!player.isLinked()) return false;
+						if(event.responded) return false;
+						if(!event.filterCard({name:'shan'})) return false;
+						return true;
+					},
+					check:function(event,player){
+						if(ai.get.damageEffect(player,event.player,player)>=0) return false;
+						return true;
+					},
+					content:function(){
+						'step 0'
+						player.link();
+						'step 1'
+						trigger.untrigger();
+						trigger.responded=true;
+						trigger.result={bool:true,card:{name:'shan'}}
+					},
+					ai:{
+						effect:{
+							target:function(card,player,target,effect){
+								if(get.tag(card,'respondShan')) return 0.1;
+							}
+						}
+					}
+				},
+			},
+			group:['xuanying_sha','xuanying_shan']
+		},
+		wendao:{
+			audio:2,
+			trigger:{player:['useCardAfter','respondAfter',]},
+			check:function(event,player){
+				return ai.get.attitude(player,_status.currentPhase)<=0;
+			},
+			logTarget:function(){
+				return _status.currentPhase;
+			},
+			filter:function(event,player){
+				if(player==_status.currentPhase) return false;
+				if(!_status.currentPhase.num('he')) return false;
+				return event.cards&&event.cards.length==1;
+			},
+			content:function(){
+				'step 0'
+				var suit=get.suit(trigger.cards[0]);
+				var goon=(ai.get.attitude(_status.currentPhase,player)<=0);
+				_status.currentPhase.chooseToDiscard('弃置一张'+get.translation(suit+'2')+
+				'牌，或令'+get.translation(player)+'获得你的一张牌',{suit:suit}).ai=function(card){
+					if(goon) return 8-ai.get.value(card);
+					return 0;
+				}
+				'step 1'
+				if(!result.bool){
+					player.gainPlayerCard(_status.currentPhase,'he',true);
+				}
+			},
+			ai:{
+				threaten:0.7
+			}
+		},
+		lingfeng:{
+			trigger:{player:'phaseEnd'},
+			frequent:true,
+			filter:function(event,player){
+				return get.cardCount(true,player)>=Math.min(3,player.hp);
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('凌锋：造成一点伤害，或取消并获得一点护甲',function(card,player,target){
+					return player!=target&&get.distance(player,target,'attack')<=1;
+				}).ai=function(target){
+					if(player.hp==1) return 0;
+					if(player.hp==2&&target.hp>=3) return 0;
+					return ai.get.damageEffect(target,player,player);
+				}
+				'step 1'
+				if(result.bool){
+					player.line(result.targets[0]);
+					result.targets[0].damage();
+				}
+				else{
+					player.changeHujia();
+				}
+			},
+			ai:{
+				order:-10,
+				result:{
+					target:2
+				},
+				threaten:1.5
+			}
+		},
+		hxunzhi:{
+			unique:true,
+			enable:'phaseUse',
+			filter:function(event,player){
+				return !player.storage.hxunzhi;
+			},
+			init:function(player){
+				player.storage.hxunzhi=false;
+			},
+			mark:true,
+			intro:{
+				content:'limited'
+			},
+			skillAnimation:true,
+			animationColor:'fire',
+			content:function(){
+				'step 0'
+				player.unmarkSkill('hxunzhi');
+				player.storage.hxunzhi=true;
+				var targets=[];
+				for(var i=0;i<game.players.length;i++){
+					if(player.canUse({name:'wanjian'},game.players[i])){
+						targets.push(game.players[i]);
+					}
+				}
+				targets.sort(lib.sort.seat);
+                player.useCard({name:'wanjian'},targets);
+				'step 1'
+				player.addSkill('wusheng');
+				player.addSkill('paoxiao');
+				player.addSkill('hxunzhi2');
+			},
+			ai:{
+				order:2,
+				result:{
+					player:function(player){
+						if(get.mode()=='identity'){
+							if(player.identity=='zhu') return 0;
+							if(player.identity=='nei') return 0;
+						}
+						else if(get.mode()=='guozhan'){
+							if(player.identity=='ye') return 0;
+							if(player.isUnseen()) return 0;
+						}
+						if(player.hp==1) return 1;
+						if(player.hasUnknown()) return 0;
+						if(!player.hasFriend()) return 0;
+						var enemies=player.getEnemies();
+						if(enemies.length+1==game.players.length) return 0;
+						if('h',player.num(function(card){
+							return card.name=='sha'||get.color(card)=='red';
+						})<3) return 0;
+						for(var i=0;i<enemies.length;i++){
+							if(player.canUse('sha',enemies[i])&&
+							ai.get.effect(enemies[i],{name:'sha'},player,player)>0&&
+							enemies[i].hp<=2&&!enemies[i].get('e','2')) return 1;
+						}
+						return 0;
+					}
+				}
+			}
+		},
+		hxunzhi2:{
+			trigger:{player:'phaseUseEnd'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.removeSkill('xunzhi2');
+				player.die();
+			}
+		},
 		hjifeng:{
 			trigger:{player:'phaseUseEnd'},
 			filter:function(event,player){
@@ -181,9 +373,6 @@ character.swd={
 			discard:false,
 			prepare:'give',
 			content:function(){
-				"step 0"
-				game.delay();
-				"step 1"
 				target.storage.lmazui2=cards[0];
 				target.addSkill('lmazui2');
 				game.addVideo('storage',target,['lmazui2',get.cardInfo(target.storage.lmazui2),'card']);
@@ -5990,7 +6179,7 @@ character.swd={
 				target.gain(cards,player);
 				target.storage.funiao=true;
 				target.addSkill('funiao2');
-				game.delay();
+				// game.delay();
 				"step 1"
 				if(event.isMine()){
 					event.dialog=ui.create.dialog(get.translation(target.name)+'的手牌',target.get('h'));
@@ -7857,9 +8046,6 @@ character.swd={
 			discard:false,
 			prepare:'give',
 			content:function(){
-				"step 0"
-				game.delay();
-				"step 1"
 				target.storage.zhenjiu2=cards[0];
 				game.addVideo('storage',target,['zhenjiu2',get.cardInfo(target.storage.zhenjiu2),'card']);
 				target.addSkill('zhenjiu2');
@@ -8127,6 +8313,14 @@ character.swd={
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
 
+		xuanying:'旋影',
+		xuanying_info:'出牌阶段，你可以横置你的武将牌视为使用一张无视距离的杀；你可以竖置你的武将牌视为使用一张闪',
+		wendao:'问道',
+		wendao_info:'每当你于回合外使用或打出一张牌，你可以令当前回合角色弃置一张与之花色相同的牌，否则你获得其一张牌',
+		lingfeng:'凌锋',
+		lingfeng_info:'回合结束阶段，若你本回合内使用了至少X张牌，你可以选择一项：获得一点护甲，或对攻击范围内的一名角色造成一点伤害（X为你当前的体力值且最多为3）',
+		hxunzhi:'殉志',
+		hxunzhi_info:'限定技，出牌阶段，你可以视为使用一张万箭齐发并获得技能武圣、咆哮，若如此做，你在此阶段结束时死亡',
 		lmazui:'麻醉',
 		lmazui2:'麻醉',
 		lmazui_info:'出牌阶段限一次，你可以将一张黑色手牌置于一名角色的武将牌上，该角色造成的下一次伤害-1，然后获得此牌',

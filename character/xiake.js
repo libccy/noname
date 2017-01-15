@@ -3,16 +3,13 @@ character.xiake={
     character:{
 		// xk_dongfangweiming:['male','shu',4,[]],
 		xk_guyuexuan:['male','qun',4,['rouquan','gzhenji']],
-		xk_jinji:['male','shu',4,['lingfeng','lianpo']],
+		xk_jinji:['male','shu',4,['zhongzhan','lianpo']],
         // xk_shenxiangyun:['female','wei',3,['zhenjiu']],
 		xk_fujianhan:['male','qun',4,['zuijian','zitong']],
     },
     skill:{
-        lingfeng:{
-            trigger:{source:'damageEnd'},
-            filter:function(event,player){
-                return event.parent.name!='lingfeng'&&event.player.isAlive();
-            },
+        zhongzhan:{
+            trigger:{source:'damageBegin'},
             logTarget:'player',
             check:function(event,player){
                 if(ai.get.damageEffect(event.player,player,player)>0&&
@@ -22,9 +19,8 @@ character.xiake={
                 return false;
             },
             content:function(){
-                game.delay();
                 player.loseHp();
-                trigger.player.damage();
+                trigger.num++;
             }
         },
         rouquan:{
@@ -137,8 +133,8 @@ character.xiake={
 		xk_jinji:'荆棘',
         xk_shenxiangyun:'沈湘芸',
         xk_fujianhan:'傅剑寒',
-        lingfeng:'凌锋',
-        lingfeng_info:'每当你造成一次伤害，你可流失一点体力并对目标再造成一点伤害',
+        zhongzhan:'重斩',
+        zhongzhan_info:'每当你即将造成伤害，你可流失一点体力令伤害+1',
         gzhenji:'震击',
         gzhenji_info:'你使用杀造成伤害后，可以摸一张牌，并且本回合内可以额外使用一张杀',
         rouquan:'柔拳',

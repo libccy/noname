@@ -563,6 +563,7 @@ window.noname_asset_list=[
     'image/character/swd_hengai.jpg',
     'image/character/swd_huanglei.jpg',
     'image/character/swd_huanyuanzhi.jpg',
+    'image/character/swd_huiyan.jpg',
     'image/character/swd_hupo.jpg',
     'image/character/swd_huyue.jpg',
     'image/character/swd_huzhongxian.jpg',

@@ -971,12 +971,13 @@ character.sp={
 			filterCard:{color:'black'},
 			mark:true,
 			discard:false,
-			prepare:'give',
+			delay:0,
 			check:function(card){return 6-ai.get.value(card);},
 			selectTarget:2,
 			multitarget:true,
 			content:function(){
 				'step 0'
+				player.$give(cards,targets[0]);
 				player.unmark('jianshu');
 				player.storage.jianshu=true;
 				targets[0].gain(cards,player);
@@ -4347,6 +4348,7 @@ character.sp={
 				'step 0'
 				player.chooseControl('basic','trick','equip','cancel',function(){
 					var source=_status.event.source;
+					if(ai.get.attitude(_status.event.player,source)>0) return 'cancel';
 					if(_status.currentPhase!=source) return 'trick';
 					if(lib.filter.cardUsable({name:'sha'},source)&&source.num('h')>=2) return 'basic';
 					return 'trick';
@@ -6820,7 +6822,7 @@ character.sp={
 				"step 0"
 				event.target1=targets[0];
 				targets[0].gain(cards,player);
-				game.delay();
+				// game.delay();
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('h')&&game.players[i]!=event.target1&&game.players[i]!=player){
 						break;

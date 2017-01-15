@@ -4026,7 +4026,7 @@ card.swd={
 			content:function(){
 				target.damage();
 				target.gain(cards,player);
-				game.delay();
+				// game.delay();
 			},
 			check:function(card){
 				return 10-ai.get.value(card);

@@ -936,9 +936,6 @@ mode.boss={
 			discard:false,
 			prepare:'give',
 			content:function(){
-				"step 0"
-				game.delay();
-				"step 1"
 				target.storage.mazui2=cards[0];
 				target.addSkill('mazui2');
 				game.addVideo('storage',target,['mazui2',get.cardInfo(target.storage.mazui2),'card']);

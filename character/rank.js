@@ -18,6 +18,7 @@ window.characterRank={
         'pal_liumengli',
     ],
     ap:[
+        'swd_huiyan',
         'ow_dva',
         'ow_mei',
         'ow_yuanshi',
@@ -219,6 +220,7 @@ window.characterRank={
         'sunru',
         'yxs_zhangsanfeng',
         'yxs_nandinggeer',
+        'swd_duanmeng',
     ],
     bp:[
         'dongbai',
@@ -268,7 +270,6 @@ window.characterRank={
         'yxs_bole',
         'swd_zhiyin',
         're_machao',
-        'swd_duanmeng',
         'yuanshao',
         'hs_waleera',
         'gjqt_yinqianshang',

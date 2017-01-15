@@ -873,7 +873,7 @@ character.gujian={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('yangming');
+					player.logSkill('yangming',result.targets);
 					for(var i=0;i<result.targets.length;i++){
 						result.targets[i].recover();
 					}

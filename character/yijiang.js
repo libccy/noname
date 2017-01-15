@@ -5254,7 +5254,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				targets[0].gain(cards,player);
-				game.delay(2);
+				game.delay();
 				"step 1"
 				targets[0].chooseControl('draw_card','出杀').set('ai',function(){
 					var event=_status.event;
@@ -6555,7 +6555,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				target.gain(cards,player);
-				game.delay();
+				// game.delay();
 				"step 1"
 				player.gainPlayerCard(target,'he',true);
 				"step 2"

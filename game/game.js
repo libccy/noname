@@ -6185,6 +6185,12 @@
                                 next.set('selectButton',info.chooseButton.select||1);
                                 event.buttoned=event.result.skill;
                             }
+                            else if(info&&info.precontent){
+                                var next=game.createEvent('pre_'+event.result.skill);
+                                next.setContent(info.precontent);
+                                next.set('argresult',event.result);
+                                next.set('player',player);
+                            }
                         }
                     }
                     "step 3"
@@ -9833,7 +9839,7 @@
 					next.autochoose=function(){
 						if(!this.forced) return false;
                         if(typeof this.selectCard=='function') return false;
-                        var cards=this.player.num(this.position||'h');
+                        var cards=this.player.get(this.position||'h');
                         var num=cards.length;
                         for(var i=0;i<cards.length;i++){
                             if(!lib.filter.cardDiscardable(cards[i],this.player,this)) num--;
@@ -11908,7 +11914,7 @@
 				},
 				hasFriend:function(){
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i]!=this&&ai.get.attitude(game.players[i],this)>=0){
+						if(game.players[i]!=this&&ai.get.attitude(game.players[i],this)>0){
 							return true;
 						}
 					}
