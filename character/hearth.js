@@ -3246,7 +3246,7 @@ character.hearth={
 			ai:{
 				nohujia:true,
 				skillTagFilter:function(player){
-					return player.hp>1;
+					return player.hp>player.num('h');
 				},
 				threaten:function(player,target){
 					if(!target.hujia) return 0.8;
@@ -3263,6 +3263,7 @@ character.hearth={
 		},
 		dunji:{
 			enable:'phaseUse',
+			usable:1,
 			filter:function(event,player){
 				return player.hujia?true:false;
 			},
@@ -3282,7 +3283,9 @@ character.hearth={
 				order:9,
 				result:{
 					target:function(player,target){
-						return ai.get.damageEffect(target,player,target)+0.5;
+						var eff=ai.get.damageEffect(target,player,target)+0.5;
+						if(eff>0&&eff<=0.5) return 0;
+						return eff;
 					}
 				}
 			}
@@ -5454,7 +5457,7 @@ character.hearth={
 		kuixin_info:'回合结束阶段，你可以将你的手牌与一名其他角色交换（手牌数之差不能多于1）',
 		lianzhan:'连斩',
 		lianzhan_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
-		yanshu:'炎爆',
+		yanshu:'炎舞',
 		yanshu_info:'每回合限一次，当你弃置非基本牌后，你可以获得一张流星火雨',
 		bingshuang:'冰枪',
 		bingshuang_info:'你使用锦囊牌造成伤害后，可令目标摸两张牌并翻面',
@@ -5472,9 +5475,9 @@ character.hearth={
 		xinci:'心刺',
 		xinci_info:'出牌阶段限一次，你可以弃置一张黑色牌令一名角色流失一点体力',
 		zhongjia:'战甲',
-		zhongjia_info:'锁定技，每当你受到一次伤害，你获得一点护甲；当你的体力值大于1时，你的护甲不为你抵挡伤害',
+		zhongjia_info:'锁定技，每当你受到一次伤害，你获得一点护甲；当你的体力值大于手牌数时，你的护甲不为你抵挡伤害',
 		dunji:'盾击',
-		dunji_info:'出牌阶段，你可以失去你的所有护甲，并对等量的其他角色各造成一点伤害',
+		dunji_info:'出牌阶段限一次，你可以失去你的所有护甲，并对等量的其他角色各造成一点伤害',
 		qiaodong:'巧动',
 		qiaodong_info:'你可以将一张装备牌当作闪使用或打出',
 		fengxian:'奉献',

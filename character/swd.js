@@ -31,14 +31,14 @@ character.swd={
 
 			swd_luchengxuan:['male','wu',4,['ljifeng','lxianglong']],
 			swd_xiarou:['female','shu',3,['xianghui','huiqi']],
-			swd_moye:['female','wu',3,['rexue','liuli']],
+			swd_moye:['female','wu',3,['rexue','liuli','senluo']],
 
 			swd_zhaoyun:['male','shu',4,['longdan','pozhen','tanlin']],
 			swd_hengai:['female','shu',3,['funiao','ningxian','hlingbo']],
 			swd_duanmeng:['female','shu',4,['xuanying','lieren']],
 			swd_jiangwu:['male','shu',4,['yijue','dangping']],
 			swd_tuwei:['male','shu',3,['zhanlu','susheng']],
-			swd_yeyaxi:['female','shu',3,['rexue','huopu']],
+			swd_yeyaxi:['female','shu',3,['rexue','huopu','shenyan']],
 
 			swd_muyun:['male','wei',4,['zhuhai','polang','jikong']],
 			swd_lanyin:['female','wei',3,['xingdian','yulin','luomei']],
@@ -87,7 +87,7 @@ character.swd={
 
 
 			swd_hanluo:['male','qun',5,['hzhenwei']],
-			swd_fu:['male','qun',5,['yudun','paoxiao']],
+			swd_fu:['male','qun',5,['yudun']],
 			swd_linyue:['male','wei',3,['zhenjiu','lmazui']],
 			swd_zidashu:['male','wu',3,['shoulie','hudun']],
 			swd_maixing:['male','wu',3,['toudan','shending']],
@@ -143,6 +143,100 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		shenyan:{
+			trigger:{source:'damageBegin'},
+			skillAnimation:true,
+			animationColor:'fire',
+			filter:function(event,player){
+				return !player.storage.shenyan&&event.nature=='fire';
+			},
+			intro:{
+				content:'limited'
+			},
+			mark:true,
+			logTarget:'player',
+			init:function(player){
+				player.storage.shenyan=false;
+			},
+			check:function(event,player){
+				if(ai.get.attitude(player,event.player)>=0) return 0;
+				if(player.hasUnknown()) return 0;
+				var num=0;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&
+						game.players[i]!=event.player&&
+						get.distance(event.player,game.players[i])<=1){
+						var eff=ai.get.damageEffect(game.players[i],player,player,'fire');
+						if(eff>0){
+							num++;
+						}
+						else if(eff<0){
+							num--;
+						}
+					}
+				}
+				return num>0;
+			},
+			content:function(){
+				trigger.num++;
+				player.addSkill('shenyan2');
+				player.storage.shenyan=true;
+				player.unmarkSkill('shenyan');
+				player.storage.shenyan2=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&
+						game.players[i]!=trigger.player&&
+						get.distance(trigger.player,game.players[i])<=1){
+						player.storage.shenyan2.push(game.players[i]);
+					}
+				}
+				player.storage.shenyan2.sort(lib.sort.seat);
+			}
+		},
+		shenyan2:{
+			trigger:{global:'damageAfter'},
+			forced:true,
+			popup:false,
+			content:function(){
+				'step 0'
+				if(player.storage.shenyan2&&player.storage.shenyan2.length){
+					var target=player.storage.shenyan2.shift();
+					player.line(target,'fire');
+					target.damage('fire');
+					event.redo();
+				}
+				'step 1'
+				delete player.storage.shenyan2;
+				player.removeSkill('shenyan2');
+			}
+		},
+		senluo:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				var nh=player.num('h');
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].num('h')<nh) return false;
+				}
+				return true;
+			},
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('h')>0;
+			},
+			content:function(){
+				'step 0'
+				target.draw();
+				'step 1'
+				target.chooseToDiscard(2,'h',true);
+			},
+			selectTarget:-1,
+			ai:{
+				order:9,
+				result:{
+					target:-1
+				}
+			}
+		},
 		xuanying:{
 			subSkill:{
 				sha:{
@@ -944,23 +1038,39 @@ character.swd={
 					if(get.type(card,'trick')=='trick') return false;
 				},
 			},
-			enable:['chooseToUse','chooseToRespond'],
+			enable:'chooseToUse',
 			filterCard:function(card){
 				return get.type(card,'trick')=='trick';
 			},
 			selectCard:2,
 			viewAs:{name:'sha'},
+			viewAsFilter:function(player){
+				if(player.num('h',{type:['trick','delay']})<2) return false;
+			},
 			check:function(){return 1},
 			ai:{
-				effect:{
-					target:function(card,player,target,current){
-						if(get.tag(card,'respondSha')&&current<0) return 0.6
-					}
+				skillTagFilter:function(player,tag,arg){
+					if(arg!='use') return false;
+					if(player.num('h',{type:['trick','delay']})<2) return false;
 				},
 				respondSha:true,
-				order:4,
+				order:3.1,
 				useful:-1,
 				value:-1
+			},
+			group:'yudun_count',
+			subSkill:{
+				count:{
+					trigger:{player:'useCard'},
+					forced:true,
+					popup:false,
+					filter:function(event,player){
+						return event.skill=='yudun'&&_status.currentPhase==player;
+					},
+					content:function(){
+						player.getStat().card.sha--;
+					}
+				}
 			}
 		},
 		guozao:{
@@ -2501,6 +2611,9 @@ character.swd={
 				if(!player.storage.pozhou){
 					player.unmarkSkill('pozhou');
 				}
+				else{
+					player.updateMarks();
+				}
 				var target=trigger.player;
 				var list=[];
 				for(var i=0;i<target.skills.length;i++){
@@ -2518,7 +2631,7 @@ character.swd={
 			forced:true,
 			mark:true,
 			content:function(){
-				player.enableSkill('pouzhou');
+				player.enableSkill('pozhou');
 				player.removeSkill('pozhou3');
 			},
 			intro:{
@@ -3831,7 +3944,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToUse({name:'sha'},'热血：是否对'+get.translation(trigger.player)+'使用一张杀',trigger.player).logSkill='rexue';
+				player.chooseToUse({name:'sha'},'热血：是否对'+get.translation(trigger.player)+'使用一张杀',trigger.player,-1).logSkill='rexue';
 				"step 1"
 				if(result.bool){
 					player.draw();
@@ -8367,6 +8480,8 @@ character.swd={
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
 
+		shenyan:'神炎',
+		shenyan_info:'限定技，当你即将造成火焰伤害时，你可以令此伤害+1，并对目标距离1以内的所有其他角色各造成一点火焰伤害',
 		xuanying:'旋影',
 		xuanying_info:'你可以横置你的武将牌，视为使用一张无视距离的杀；每当你于回合外失去牌，你可以竖置你的武将牌，视为使用一张无视距离的杀',
 		wendao:'问道',
@@ -8395,7 +8510,7 @@ character.swd={
 		jinlin_info:'限定技，出牌阶段，你可以令任意名角色各获得3点护甲，获得护甲的角色于每个回合开始阶段失去1点护甲直到首次失去所有护甲或累计以此法失去3点护甲',
 		huanxia:'幻霞',
 		huanxia_info:'你可以将一张红色牌当作杀使用，若此杀未造成伤害，你在回合结束时收回此牌',
-		jingjie:'镜界',
+		jingjie:'幻镜',
 		jingjie_info:'回合开始阶段，你可以流失一点体力，并',
 		jingjie_old_info:'限定技，出牌阶段，你可以令所有角色弃置所有牌，然后摸两张牌（不触发任何技能）',
 		kongmo:'恐魔',
@@ -8407,7 +8522,7 @@ character.swd={
 		pingxu:'冯虚',
 		pingxu_info:'锁定技，当你没有武器牌时，与其他角色的距离-1；当你没有防具牌时，其他角色与你的距离+1',
 		yudun:'愚钝',
-		yudun_info:'锁定技，你无法使用锦囊牌，你可以将两张锦囊牌当作杀使用',
+		yudun_info:'锁定技，你无法使用锦囊牌；你可以将两张锦囊牌当作一张不计入出杀次数的杀使用',
 		bingfeng:'冰封',
 		bingfeng2:'冰封',
 		bingfeng2_info:'不能使用或打出手牌',
@@ -8592,6 +8707,8 @@ character.swd={
 		miedao2:'灭道',
 		miedao_info:'锁定技，摸牌阶段，你额外摸X张牌；弃牌阶段，你至少须弃X张牌（不足则全弃），X为你已损失的体力值。',
 
+		senluo:'森罗',
+		senluo_info:'出牌阶段限一次，若你的手牌数为全场最少或之一，你可以令所有有手牌的其他角色摸一张牌并弃置两张手牌',
 		polang:'破浪',
 		polang_info:'每当你造成一次伤害，可以一张对方的装备牌',
 		jikong:'亟空',
@@ -8724,9 +8841,9 @@ character.swd={
 		mailun32:'脉轮',
 		mailun41:'脉轮',
 		mailun42:'脉轮',
-		kunlunjing:'镜界',
-		kunlunjing1:'镜界',
-		kunlunjing2:'镜界',
+		kunlunjing:'幻镜',
+		kunlunjing1:'幻镜',
+		kunlunjing2:'幻镜',
 		susheng:'苏生',
 		shengshou:'圣手',
 		huanjian:'幻箭',

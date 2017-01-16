@@ -1353,7 +1353,7 @@ card.standard={
 			trigger:{player:'shaMiss'},
 			direct:true,
 			filter:function(event,player){
-				return player.canUse('sha',event.target);
+				return player.canUse('sha',event.target)&&player.hasSha();
 			},
 			content:function(){
 				"step 0"

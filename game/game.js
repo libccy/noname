@@ -8890,6 +8890,9 @@
 					}
 					// var name=get.translation(character);
 					this.node.name.innerHTML=get.slimName(character);
+                    if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
+                        this.node.name.classList.add('long');
+                    }
 					if(!lib.config.show_name||lib.config.game=='hs'){
 						this.node.name.style.display='none';
 					}
@@ -28389,6 +28392,11 @@
 						}
 						// var name=get.translation(item);
 						node.node.name.innerHTML=get.slimName(item);
+                        if(node.node.name.querySelectorAll('br').length>=4){
+                            node.node.name.classList.add('long');
+                            node.addEventListener('mouseenter',ui.click.buttonnameenter);
+                            node.addEventListener('mouseleave',ui.click.buttonnameleave);
+                        }
 						// for(var i=0;i<name.length;i++){
 						// 	node.node.name.innerHTML+=name[i]+'<br/>';
 						// }
@@ -28755,6 +28763,42 @@
                     game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
                 }
                 e.stopPropagation();
+            },
+            buttonnameenter:function(){
+                if(this.buttonscrollinterval){
+                    clearInterval(this.buttonscrollinterval);
+                }
+                var node=this.node.name;
+                if(node.offsetHeight<node.scrollHeight){
+                    var that=this;
+                    that.buttonscrollinterval=setInterval(function(){
+                        if(node.scrollTop+node.offsetHeight>=node.scrollHeight){
+                            clearInterval(that.buttonscrollinterval);
+                            delete that.buttonscrollinterval;
+                        }
+                        else{
+                            node.scrollTop+=2;
+                        }
+                    },16);
+                }
+            },
+            buttonnameleave:function(){
+                if(this.buttonscrollinterval){
+                    clearInterval(this.buttonscrollinterval);
+                }
+                var node=this.node.name;
+                if(node.offsetHeight<node.scrollHeight){
+                    var that=this;
+                    that.buttonscrollinterval=setInterval(function(){
+                        if(node.scrollTop==0){
+                            clearInterval(that.buttonscrollinterval);
+                            delete that.buttonscrollinterval;
+                        }
+                        else{
+                            node.scrollTop-=2;
+                        }
+                    },16);
+                }
             },
 			dragtouchdialog:function(e){
 				if(e.touches.length>1&&
@@ -33090,6 +33134,9 @@
                             uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
                         }
 					}
+                    else{
+                        uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
+                    }
                     uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
 				}
 				uiintro.add(ui.create.div('.placeholder.slim'));

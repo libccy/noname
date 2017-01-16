@@ -857,6 +857,10 @@ div:not(.handcards)>.card>.info>span,
 .button.character.longcharacter>.name{
 	overflow: visible;
 }
+.dialog .buttons>.button.character>.name.long{
+	transform: scale(0.95);
+    transform-origin: top left;
+}
 .card.center{top:calc(50% - 52px);left:calc(50% - 52px);}
 .card>.background{font-size: 80px;height: 80px;padding-top: 14px;text-align: center;}
 .equips>.card>.background{font-size: 36px;height: 36px;padding-top: 3px;}
@@ -1090,6 +1094,12 @@ margin-bottom: 5px;
 #arena .player.minskin>.name,
 #arena.slim_player .player.minskin>.name{
     top:17px;
+}
+#arena .player.minskin>.name.long,
+#arena.slim_player .player.minskin>.name.long{
+	transform: scale(0.9);
+	transform-origin: top left;
+	top: 13px;
 }
 #arena .player.linked.minskin>.name,
 #arena.slim_player .player.linked.minskin>.name{
