@@ -736,6 +736,8 @@ card.swd={
 						if(cardname=='toulianghuanzhu') return 0;
 						if(cardname=='shijieshu') return 0;
 						if(cardname=='xietianzi') return 0;
+						if(cardname=='huogong') return 0;
+						if(cardname=='shandianjian') return 0;
 						return 1;
 					}
 				},
