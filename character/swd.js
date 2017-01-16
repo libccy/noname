@@ -767,7 +767,7 @@ character.swd={
 		},
 		fengze:{
 			enable:'phaseUse',
-			filterCard:true,
+			filterCard:{color:'black'},
 			selectCard:1,
 			position:'he',
 			usable:1,
