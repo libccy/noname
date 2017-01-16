@@ -666,11 +666,22 @@ character.ow={
         zhiyuan:{
             trigger:{source:'damageBefore'},
             check:function(event,player){
-                if(event.player.hp<event.player.maxHp&&ai.get.attitude(player,event.player)<0) return false;
-                player.disabledSkills.temp='zhiyuan';
-                var num=ai.get.damageEffect(event.player,player,player,event.nature)<ai.get.recoverEffect(event.player,player,player);
-                delete player.disabledSkills.temp;
-                return num;
+                player.disableSkill('tmp','zhiyuan');
+                var eff=ai.get.damageEffect(event.player,player,player);
+                var att=ai.get.attitude(player,event.player);
+                var bool=false;
+                if(att>0){
+                    if(eff<=0||event.player.hp<event.player.maxHp){
+                        bool=true;
+                    }
+                }
+                else{
+                    if(eff<0&&event.player.hp==event.player.maxHp){
+                        bool=true;
+                    }
+                }
+                player.enableSkill('tmp','zhiyuan');
+                return bool;
             },
             logTarget:'player',
             filter:function(event,player){

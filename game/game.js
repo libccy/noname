@@ -18848,7 +18848,7 @@
                     else if(mmr<10){
                         mmr=10;
                     }
-                    dialog.add(ui.create.div('','获得'+mmr+'积分'));
+                    dialog.add(ui.create.div('','获得 '+mmr+' 积分'));
                 }
                 else{
                     mmr=-30+Math.round(mmr/2);
@@ -18870,7 +18870,7 @@
                     else if(lib.storage.ladder.current>2500){
                         mmr=Math.round(mmr*1.5);
                     }
-                    dialog.add(ui.create.div('','失去'+(-mmr)+'积分'));
+                    dialog.add(ui.create.div('','失去 '+(-mmr)+' 积分'));
                 }
                 if(_status.ladder_tmp){
                     lib.storage.ladder.current+=40;
