@@ -166,7 +166,7 @@ play.boss={
 						lib.translate[i]=lib.translate[i]||mode.versus.translate[i];
 					}
 					for(var i in mode.versus.skill){
-						if(i!='versus_swap'){
+						if(i!='versus_swap'&&i!='versus_ladder'){
 							lib.skill[i]=lib.init.eval(mode.versus.skill[i]);
 							game.finishSkill(i);
 						}

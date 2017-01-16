@@ -55,14 +55,14 @@ character.extra={
 					}
 				}
 				var prompt=get.prompt('qinyin')+'（剩余'+get.cnNumber(event.count)+'次）';
-				player.chooseControl('失去体力','回复体力','cancel',
+				player.chooseControl('失去体力','回复体力','cancel2',
 				ui.create.dialog(get.prompt('qinyin'),'hidden')).ai=function(){
 					if(lose>recover&&lose>0) return 0;
 					if(lose<recover&&recover>0) return 1;
 					return 2;
 				}
 				"step 1"
-				if(result.bool==false||result.control=='cancel'){
+				if(result.control=='cancel2'){
 					event.finish();
 				}
 				else{

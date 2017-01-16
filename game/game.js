@@ -1638,7 +1638,7 @@
 								this.innerHTML='已隐藏';
 								game.saveConfig('hiddenModePack',['stone','chess','boss','tafang']);
 								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth']);
-								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','xiake','boss','ow']);
+								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','boss','ow']);
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='隐藏非官方扩展包';
@@ -2747,15 +2747,29 @@
 					update:function(config,map){
 						if(config.versus_mode=='four'){
 							map.change_choice.hide();
-							map.enable_all.show();
-							map.four_assign.show();
-                            map.four_cross.show();
+                            map.ladder.show();
+                            if(config.ladder){
+                                map.ladder_monthly.show();
+                                map.ladder_reset.show();
+                            }
+                            else{
+                                map.ladder_monthly.hide();
+                                map.ladder_reset.hide();
+                            }
+                            map.enable_all.show();
+                            map.four_assign.show();
+							map.expand_dialog.show();
+                            // map.four_cross.show();
 						}
 						else{
 							map.change_choice.show();
+                            map.ladder.hide();
+                            map.ladder_monthly.hide();
+                            map.ladder_reset.hide();
 							map.enable_all.hide();
 							map.four_assign.hide();
-                            map.four_cross.hide();
+                            map.expand_dialog.show();
+                            // map.four_cross.hide();
 						}
                         if(config.versus_mode=='jiange'||config.versus_mode=='two'){
                             map.free_choose.show();
@@ -2792,6 +2806,17 @@
 						restart:true,
 						frequent:true,
 					},
+                    ladder:{
+                        name:'天梯模式',
+                        init:true,
+                        frequent:true,
+                        restart:true
+                    },
+                    ladder_monthly:{
+                        name:'每月重置天梯',
+                        init:true,
+                        frequent:true,
+                    },
 					enable_all:{
 						name:'启用全部武将',
 						init:false,
@@ -2804,12 +2829,12 @@
 						frequent:true,
 						restart:true,
 					},
-					four_cross:{
-						name:'交叉座位',
-						init:false,
-						frequent:true,
-						restart:true,
-					},
+					// four_cross:{
+					// 	name:'交叉座位',
+					// 	init:false,
+					// 	frequent:true,
+					// 	restart:true,
+					// },
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -2870,6 +2895,10 @@
                         init:false,
                         frequent:true,
                     },
+                    expand_dialog:{
+                        name:'默认展开选将框',
+                        init:false,
+                    },
 					ban_weak:{
 		                name:'屏蔽弱将',
 						init:true,
@@ -2878,8 +2907,38 @@
 		            ban_strong:{
 		                name:'屏蔽强将',
 						init:false,
-						restart:true,
+						restart:true
 		            },
+                    ladder_reset:{
+						name:'重置天梯数据',
+						onclick:function(){
+							var node=this;
+							if(node._clearing){
+								game.save('ladder',{
+        							current:900,
+        							top:900,
+        							month:(new Date()).getMonth()
+        						});
+								ui.ladder.innerHTML='卫士五';
+                                clearTimeout(node._clearing);
+                                node.innerHTML='重置天梯数据';
+                                delete node._clearing;
+								return;
+							}
+							node.innerHTML='单击以确认 (3)';
+							node._clearing=setTimeout(function(){
+								node.innerHTML='单击以确认 (2)';
+								node._clearing=setTimeout(function(){
+									node.innerHTML='单击以确认 (1)';
+									node._clearing=setTimeout(function(){
+										node.innerHTML='重置天梯数据';
+										delete node._clearing;
+									},1000);
+								},1000);
+							},1000);
+						},
+						clear:true,
+					},
 				}
 			},
             connect:{
@@ -4961,6 +5020,16 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+            p:function(name,i){
+                var target;
+                if(typeof i=='number'){
+                    target=game.players[i];
+                }
+                else{
+                    target=game.me.next;
+                }
+                target.init(name);
+            },
             e:function(){
                 var cards=[],target;
                 for(var i=0;i<arguments.length;i++){
@@ -5329,7 +5398,8 @@
 			red:'红色',
 			black:'黑色',
 			ok:"确定",
-			cancel:"取消",
+            cancel:"取消",
+			cancel2:"取消",
 			restart:"重新开始",
 			setting:"设置",
 			start:"开始",
@@ -10985,7 +11055,12 @@
 						}
 						else if(!nopop) this.popup(get.skillTranslation(name,this));
 						if(typeof targets=='object'&&targets.length){
-							game.log(this,'对',targets,'发动了','【'+get.skillTranslation(name,this)+'】');
+    						var str='对<span class="bluetext">'+(targets[0]==this?'自己':get.translation(targets[0]));
+    						for(var i=1;i<targets.length;i++){
+    							str+='、'+(targets[i]==this?'自己':get.translation(targets[i]));
+    						}
+    						str+='</span>发动了【'+get.skillTranslation(name,this)+'】';
+							game.log(this,str);
 						}
 						else{
 							game.log(this,'发动了','【'+get.skillTranslation(name,this)+'】');
@@ -18762,6 +18837,54 @@
 				}
 				game.changeCoin(_status.coin);
 			}
+            if(get.mode()=='versus'&&_status.ladder){
+                var mmr=_status.ladder_mmr;
+                mmr+=10-get.rank(game.me.name,true)*2;
+                if(result=='战斗胜利'){
+                    mmr=20+Math.round(mmr);
+                    if(mmr>40){
+                        mmr=40;
+                    }
+                    else if(mmr<10){
+                        mmr=10;
+                    }
+                    dialog.add(ui.create.div('','获得'+mmr+'积分'));
+                }
+                else{
+                    mmr=-30+Math.round(mmr/2);
+                    if(mmr>-20){
+                        mmr=-20;
+                    }
+                    else if(mmr<-35){
+                        mmr=-35;
+                    }
+                    if(lib.storage.ladder.current<900){
+                        mmr=Math.round(mmr/4);
+                    }
+                    else if(lib.storage.ladder.current<1400){
+                        mmr=Math.round(mmr/2);
+                    }
+                    else if(lib.storage.ladder.current<2000){
+                        mmr=Math.round(mmr/1.5);
+                    }
+                    else if(lib.storage.ladder.current>2500){
+                        mmr=Math.round(mmr*1.5);
+                    }
+                    dialog.add(ui.create.div('','失去'+(-mmr)+'积分'));
+                }
+                if(_status.ladder_tmp){
+                    lib.storage.ladder.current+=40;
+                    delete _status.ladder_tmp;
+                }
+                lib.storage.ladder.current+=mmr;
+                if(lib.storage.ladder.top<lib.storage.ladder.current){
+                    lib.storage.ladder.top=lib.storage.ladder.current;
+                }
+                game.save('ladder',lib.storage.ladder);
+                if(ui.ladder&&game.getLadderName){
+                    ui.ladder.innerHTML=game.getLadderName(lib.storage.ladder.current);
+                }
+            }
 			if(true){
 				if(game.players.length){
 					table=document.createElement('table');
@@ -21203,8 +21326,10 @@
                     else if(config.input){
                         node.classList.add('switcher');
                         var input=ui.create.div(node);
-                        input.contentEditable=true;
-                        input.style.webkitUserSelect='text';
+                        if(!config.fixed){
+                            input.contentEditable=true;
+                            input.style.webkitUserSelect='text';
+                        }
                         input.style.minWidth='10px';
                         input.onkeydown=function(e){
                             if(e.keyCode==13){
@@ -21676,7 +21801,7 @@
                                     morenodes._onclick.call(morenodes,'unexpand');
                                 }
                             }
-                        });
+                        },{passive:true});
                     }
 				}());
 
@@ -31708,8 +31833,13 @@
 			if(rank.bm.contains(name)) return num?Math.round(2*(num-1)/8+1):'bm';
 			if(rank.c.contains(name)) return num?Math.round(1*(num-1)/8+1):'c';
 			if(rank.d.contains(name)) return num?Math.round(0*(num-1)/8+1):'d';
-			if(lib.customCharacters.contains(name)) return num?Math.round(8*(num-1)/8+1):'s';
-			if(lib.characterPack.boss&&lib.characterPack.boss[name]) return num?Math.round(9*(num-1)/8+1):'sp';
+            if(lib.character[name]&&lib.character[name][4]){
+                if(lib.character[name][4].contains('boss')||
+                lib.character[name][4].contains('bossallowed')||
+                lib.character[name][4].contains('hiddenboss')){
+                    return num?Math.round(9*(num-1)/8+1):'sp';
+                }
+            }
 			return num?1:'x';
 		},
         targetsInfo:function(targets){

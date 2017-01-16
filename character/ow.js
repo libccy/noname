@@ -2377,13 +2377,13 @@ character.ow={
 				if(player.hp<player.maxHp){
 					controls.push('recover_hp');
 				}
-				controls.push('cancel');
+				controls.push('cancel2');
 				player.chooseControl(controls).set('prompt',get.prompt('ziyu')).set('ai',function(event,player){
 					if(player.hp<player.maxHp) return 'recover_hp';
 					return 'draw_card';
 				});
 				"step 1"
-				if(result.control!='cancel'){
+				if(result.control!='cancel2'){
 					player.logSkill('ziyu');
 					if(result.control=='draw_card'){
 						player.draw();
@@ -2406,13 +2406,13 @@ character.ow={
 				if(player.hp<player.maxHp){
 					controls.push('recover_hp');
 				}
-				controls.push('cancel');
+				controls.push('cancel2');
 				player.chooseControl(controls).set('prompt',get.prompt('ziyu')).set('ai',function(event,player){
 					if(player.hp<player.maxHp) return 'recover_hp';
 					return 'draw_card';
 				});
 				"step 1"
-				if(result.control!='cancel'){
+				if(result.control!='cancel2'){
 					player.logSkill('ziyu');
 					if(result.control=='draw_card'){
 						player.draw();

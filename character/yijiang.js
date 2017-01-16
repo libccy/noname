@@ -662,13 +662,13 @@ character.yijiang={
 				if(player.hp<player.maxHp){
 					controls.push('recover_hp');
 				}
-				controls.push('cancel');
+				controls.push('cancel2');
 				player.chooseControl(controls).set('prompt',get.prompt('guizao')).set('ai',function(event,player){
 					if(player.hp<player.maxHp) return 'recover_hp';
 					return 'draw_card';
 				});
 				"step 1"
-				if(result.control!='cancel'){
+				if(result.control!='cancel2'){
 					player.logSkill('guizao');
 					if(result.control=='draw_card'){
 						player.draw();
@@ -6455,7 +6455,7 @@ character.yijiang={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseControl('jiangchi_less','jiangchi_more','cancel',function(){
+				player.chooseControl('jiangchi_less','jiangchi_more','cancel2',function(){
 					var player=_status.event.player;
 					if(player.num('h')>3&&player.num('h','sha')>1){
 						return 'jiangchi_less';
@@ -6466,7 +6466,7 @@ character.yijiang={
 					if(player.hp-player.num('h')>1){
 						return 'jiangchi_more';
 					}
-					return 'cancel';
+					return 'cancel2';
 				});
 				"step 1"
 				if(result.control=='jiangchi_less'){

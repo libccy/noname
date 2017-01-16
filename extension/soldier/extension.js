@@ -71,10 +71,10 @@ play.soldier={
 				if(event.isMine()){
 					event.dialog=ui.create.dialog('选择替你承受伤害的士兵');
 				}
-				player.chooseControl(player.storage.soldier,'cancel');
+				player.chooseControl(player.storage.soldier,'cancel2');
 				"step 1"
 				if(event.dialog) event.dialog.close();
-				if(result.control!='cancel'&&result.control){
+				if(result.control!='cancel2'&&result.control){
 					game.log(player,'牺牲了'+get.translation(result.control));
 					player.storage.soldier.remove(result.control);
 					player.removeSkill(result.control);

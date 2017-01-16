@@ -80,23 +80,43 @@ mode.versus={
 			}
 		}
 		else if(_status.mode=='four'){
-			var list=['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'];
-			list[2*Math.floor(Math.random()*4)]='zhu';
-			list[2*Math.floor(Math.random()*4)+1]='ezhu';
-			if(!get.config('four_cross')){
-				list.randomSort();
+			var list=[
+				['zhong','ezhong','ezhong','zhong','zhong','ezhong','ezhong','zhong'],
+				['zhong','ezhong','zhong','ezhong','ezhong','zhong','ezhong','zhong'],
+				['zhong','ezhong','ezhong','zhong','ezhong','zhong','zhong','ezhong'],
+				['zhong','ezhong','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
+				['zhong','ezhong','ezhong','zhong','ezhong','zhong','ezhong','zhong'],
+			].randomGet();
+			var rand1=Math.floor(Math.random()*4);
+			var rand2=Math.floor(Math.random()*4);
+			for(var i=0;i<list.length;i++){
+				if(list[i]=='zhong'){
+					if(rand1==0){
+						list[i]='zhu';
+					}
+					rand1--;
+				}
+				else{
+					if(rand2==0){
+						list[i]='ezhu';
+					}
+					rand2--;
+				}
 			}
-			else{
-				for(var i in lib.skill){
-					if(lib.skill[i].changeSeat){
-						lib.skill[i]={};
-						if(lib.translate[i+'_info']){
-							lib.translate[i+'_info']='此模式下不可用';
-						}
+
+			for(var i in lib.skill){
+				if(lib.skill[i].changeSeat){
+					lib.skill[i]={};
+					if(lib.translate[i+'_info']){
+						lib.translate[i+'_info']='此模式下不可用';
 					}
 				}
 			}
+
 			var side=Math.random()<0.5;
+			var num=Math.floor(Math.random()*8);
+			list=list.splice(8-num).concat(list);
+			_status.firstAct=game.players[num];
 			for(var i=0;i<8;i++){
 				if(list[i][0]=='e'){
 					game.players[i].side=side;
@@ -334,9 +354,35 @@ mode.versus={
 			}
 			game.me.directgain(get.cards(hs.length));
 		}
+		if(_status.ladder){
+			lib.storage.ladder.current-=40;
+			_status.ladder_tmp=true;
+			game.save('ladder',lib.storage.ladder);
+			game.addGlobalSkill('versus_ladder');
+		}
 		game.phaseLoop(_status.firstAct);
 	},
 	game:{
+		getLadderName:function(score){
+			if(score<900) return '平民';
+			if(score<1000) return '卫士五';
+			if(score<1100) return '卫士四';
+			if(score<1200) return '卫士三';
+			if(score<1300) return '卫士二';
+			if(score<1400) return '卫士一';
+			if(score<1500) return '校尉三';
+			if(score<1600) return '校尉二';
+			if(score<1700) return '校尉一';
+			if(score<1800) return '中郎将三';
+			if(score<1900) return '中郎将二';
+			if(score<2000) return '中郎将一';
+			if(score<2100) return '大将五';
+			if(score<2200) return '大将四';
+			if(score<2300) return '大将三';
+			if(score<2400) return '大将二';
+			if(score<2500) return '大将一';
+			return '枭雄';
+		},
 		checkOnlineResult:function(player){
 			return game.players[0].side==player.side;
 		},
@@ -842,18 +888,7 @@ mode.versus={
 				event.list=[];
 				event.filterChoice=function(name){
 					if(get.config('enable_all')) return false;
-					if(lib.banFour.contains(name)){
-						return true;
-					}
-					if(lib.characterPack.refresh[name]) return false;
-					if(lib.characterPack.standard[name]){
-						if(lib.characterPack.refresh['re_'+name]) return true;
-						return false;
-					}
-					if(lib.characterPack.shenhua[name]) return false;
-					if(lib.characterPack.sp[name]) return false;
-					if(lib.characterPack.yijiang[name]) return false;
-					return true;
+					return !lib.choiceFour.contains(name);
 				}
 				for(i in lib.character){
 					if(event.filterChoice(i)) continue;
@@ -868,13 +903,46 @@ mode.versus={
 				}
 				event.list.randomSort();
 				event.list2=list2;
-				event.current=game.players.randomGet();
-				_status.firstAct=event.current;
+				event.current=_status.firstAct;
 				event.four_assign=get.config('four_assign');
 				event.flipassign=true;
+				if(get.config('ladder')){
+					var date=new Date();
+					if(!lib.storage.ladder){
+						lib.storage.ladder={
+							current:900,
+							top:900,
+							month:date.getMonth()
+						};
+						game.save('ladder',lib.storage.ladder);
+					}
+					else if(date.getMonth()!=lib.storage.ladder.month&&get.config('ladder_monthly')){
+						lib.storage.ladder.month=date.getMonth();
+						lib.storage.ladder.current=900;
+						game.save('ladder',lib.storage.ladder);
+					}
+					ui.ladder=ui.create.system(game.getLadderName(lib.storage.ladder.current),null,true);
+					lib.setPopped(ui.ladder,function(uiintro){
+						var uiintro=ui.create.dialog('hidden');
+						uiintro.add('<div class="text center">当前分数：<div style="width:40px;text-align:left;font-family:xinwei">'+(lib.storage.ladder.current+(_status.ladder_tmp?40:0))+'</div></div>');
+						uiintro.add('<div class="text center">历史最高：<div style="width:40px;text-align:left;font-family:xinwei">'+lib.storage.ladder.top+'</div></div>');
+						uiintro.content.lastChild.style.paddingBottom='8px';
+						return uiintro;
+					},180);
+					_status.ladder=true;
+					_status.ladder_mmr=0;
+				}
 				"step 1"
 				if(event.current==game.me||(event.four_assign&&event.current.side==game.me.side)){
-					var dialog=event.xdialog||ui.create.characterDialog(event.filterChoice,'expandall');
+					var dialog=event.xdialog;
+					if(!dialog){
+						if(get.config('expand_dialog')){
+							dialog=event.xdialog||ui.create.characterDialog(event.filterChoice,'expandall');
+						}
+						else{
+							dialog=event.xdialog||ui.create.characterDialog(event.filterChoice);
+						}
+					}
 					var names=[];
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].name){
@@ -1505,7 +1573,7 @@ mode.versus={
 				}
 				var filterChoice=function(name){
 					if(name=='zuoci') return true;
-					if(lib.banFour.contains(name)){
+					if(!lib.choiceFour.contains(name)){
 						return true;
 					}
 					if(lib.characterPack.refresh&&lib.characterPack.refresh[name]){
@@ -2413,16 +2481,21 @@ mode.versus={
 			boss_lieshiyazi:['male','wei',4,['boss_jiguan','boss_nailuo'],['jiangemech','hiddenboss','bossallowed'],'wei'],
 		}
 	},
-	banFour:[
-		'yuanshu','re_yuanshu','zhangxingcai','hetaiyou','wenpin','yuji',
-		'lusu','guanping','zhangzong','zhoutai','sp_zhangjiao','zhangjiao',
-		'shixie','zhanglu','chenlin','mayunlu','yangxiu','zhugeke','chengyu',
-		'zhangbao','zhangliang','sunhao','wutugu','zhugeguo','liuzan','lingcao',
-		'sunru','lingju','lifeng','hanba','sunluyu','zhuling','daxiaoqiao',
-		'sp_zhaoyun','sp_diaochan','sp_pangtong','sp_caoren','sp_daqiao',
-		'sp_ganning','sp_zhangfei','sp_xiahoudun',
-		'zuoci','yuanshao','caopi','zhangzhang',
-		'huaxiong','guanzhang','liuxie','fuwan','sp_sunshangxiang','hanhaoshihuan',
+	choiceFour:[
+		'sunquan','re_ganning','re_lvmeng','re_zhouyu','re_luxun','sunshangxiang',
+		're_liubei','re_guanyu','re_zhangfei','zhugeliang','re_zhaoyun','re_machao','huangyueying','re_xushu',
+		're_caocao','re_simayi','re_zhangliao','re_xuzhu','re_guojia','zhenji','re_lidian',
+		're_lvbu','diaochan','re_huatuo',
+		'xiahouyuan','huangzhong','xiaoqiao',
+		'dianwei','pangtong','sp_zhugeliang','taishici','pangde','yanwen',
+		'xuhuang','sunjian','jiaxu','dongzhuo',
+		'zhanghe','dengai','jiangwei','liushan','sunce',
+		'caozhi','zhangchunhua','masu','fazheng','xushu','lingtong','wuguotai','xusheng','chengong','gaoshun',
+		'xunyou','wangyi','zhonghui','madai','liaohua','chengpu','handang','bulianshi',
+		'jianyong','panzhangmazhong','yufan','liru','fuhuanghou',
+		'caozhen','chenqun','hanhaoshihuan','wuyi','zhoucang','guyong','sunluban','jushou','caifuren',
+		'caoxiu','liuchen','gongsunyuan',
+		'guohuanghou','liyan','cenhun','liuyu'
 	],
 	translate:{
 		zhu:'主',
@@ -3505,6 +3578,86 @@ mode.versus={
 				}
 			},
 		},
+		versus_ladder:{
+			trigger:{global:['damageEnd','recoverEnd','dieEnd','gainEnd','phaseDiscardEnd']},
+			forced:true,
+			popup:false,
+			silent:true,
+			filter:function(event,player){
+				if(!_status.ladder) return false;
+				if(event._ladder_mmr_counted) return false;
+				return event.source==game.me||event.player==game.me;
+			},
+			content:function(){
+				switch(event.triggername){
+					case 'damageEnd':{
+						if(trigger.source.side!=trigger.player.side){
+							if(trigger.source==game.me){
+								_status.ladder_mmr+=0.5*Math.max(1,trigger.num);
+							}
+							else{
+								_status.ladder_mmr+=0.2*Math.max(1,trigger.num);
+							}
+						}
+						break;
+					}
+					case 'recoverEnd':{
+						if(trigger.source!=trigger.player){
+							if(trigger.source==game.me){
+								if(trigger.player.side==game.me.side){
+									_status.ladder_mmr+=0.5*trigger.num;
+								}
+								else{
+									_status.ladder_mmr-=0.3*trigger.num;
+								}
+							}
+						}
+						else{
+							_status.ladder_mmr+=0.3*trigger.num;
+						}
+						break;
+					}
+					case 'dieEnd':{
+						if(trigger.source==game.me&&trigger.player.side!=game.me.side){
+							_status.ladder_mmr+=2;
+						}
+						break;
+					}
+					case 'gainEnd':{
+						if(trigger.cards&&trigger.cards.length){
+							if(trigger.source==game.me&&trigger.player!=game.me){
+								if(trigger.player.side==game.me.side){
+									_status.ladder_mmr+=0.3*trigger.cards.length;
+								}
+								else{
+									_status.ladder_mmr-=0.1*trigger.cards.length;
+								}
+							}
+							else{
+								if(trigger.source){
+									if(trigger.source.side!=game.me.side){
+										_status.ladder_mmr+=0.3*trigger.cards.length;
+									}
+								}
+								else{
+									_status.ladder_mmr+=0.1*trigger.cards.length;
+								}
+							}
+						}
+						break;
+					}
+					case 'phaseDiscardEnd':{
+						if(trigger.player==player){
+							if(trigger.cards&&trigger.cards.length){
+								_status.ladder_mmr-=0.2*trigger.cards.length;
+							}
+						}
+						break;
+					}
+				}
+				trigger._ladder_mmr_counted=true;
+			}
+		}
 	},
 	element:{
 		content:{

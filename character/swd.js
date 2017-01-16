@@ -6576,7 +6576,7 @@ character.swd={
 				if(todiscard.length){
 					choice.push('discard_card');
 				}
-				choice.push('cancel');
+				choice.push('cancel2');
 				if(choice.length>1){
 					if(event.isMine()){
 						event.dialog=ui.create.dialog(get.prompt('xielv'));
@@ -6584,7 +6584,7 @@ character.swd={
 					player.chooseControl(choice).ai=function(){
 						if(choice.contains('recover_hp')) return 'recover_hp';
 						else if(ainum>0) return 'discard_card';
-						else return 'cancel';
+						else return 'cancel2';
 					}
 					event.todiscard=todiscard;
 					event.filter=filter;

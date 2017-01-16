@@ -18,7 +18,7 @@ character.sp={
 		simalang:['male','wei',3,['junbing','quji']],
 		zhangxingcai:['female','shu',3,['shenxian','qiangwu']],
 		fuwan:['male','qun',4,['moukui']],
-		sp_sunshangxiang:['female','shu',3,['liangzhu','xiaoji']],
+		sp_sunshangxiang:['female','shu',3,['liangzhu','fanxiang']],
 		caoang:['male','wei',4,['kaikang']],
 		re_yuanshu:['male','qun',4,['wangzun','tongji']],
 		sp_caoren:['male','wei',4,['kuiwei','yanzheng']],
@@ -4012,9 +4012,9 @@ character.sp={
 			content:function(){
 				'step 0'
 				player.addTempSkill('fengpo3','phaseAfter');
-				player.chooseControl('draw_card','加伤害','cancel').set('prompt',get.prompt('fengpo'));
+				player.chooseControl('draw_card','加伤害','cancel2').set('prompt',get.prompt('fengpo'));
 				'step 1'
-				if(result.control&&result.control!='cancel'){
+				if(result.control&&result.control!='cancel2'){
 					player.logSkill('fengpo');
 					var nd=trigger.target.num('h',{suit:'diamond'});
 					if(result.control=='draw_card'){
@@ -4346,15 +4346,15 @@ character.sp={
 			},
 			content:function(){
 				'step 0'
-				player.chooseControl('basic','trick','equip','cancel',function(){
+				player.chooseControl('basic','trick','equip','cancel2',function(){
 					var source=_status.event.source;
-					if(ai.get.attitude(_status.event.player,source)>0) return 'cancel';
+					if(ai.get.attitude(_status.event.player,source)>0) return 'cancel2';
 					if(_status.currentPhase!=source) return 'trick';
 					if(lib.filter.cardUsable({name:'sha'},source)&&source.num('h')>=2) return 'basic';
 					return 'trick';
 				}).set('prompt',get.prompt('jilei',trigger.source)).set('source',trigger.source);
 				'step 1'
-				if(result.control!='cancel'){
+				if(result.control!='cancel2'){
 					player.logSkill('jilei',trigger.source);
 					player.popup(get.translation(result.control)+'牌');
 					trigger.source.storage.jilei2=result.control;
@@ -5009,18 +5009,78 @@ character.sp={
 		liangzhu:{
 			audio:2,
 			trigger:{global:'recoverAfter'},
-			check:function(event,player){
-				return ai.get.attitude(player,event.player)>=0;
-			},
+			direct:true,
 			filter:function(event,player){
-				return event.player!=player&&_status.currentPhase==event.player;
+				return _status.currentPhase==event.player;
 			},
 			content:function(){
-				game.asyncDraw([trigger.player,player]);
+				'step 0'
+				if(player==trigger.player){
+					player.chooseControl('摸一张','摸两张','cancel2',function(){
+						return '摸两张';
+					}).set('prompt',get.prompt('liangzhu'));
+					event.single=true;
+				}
+				else{
+					player.chooseTarget(get.prompt('liangzhu'),function(card,player,target){
+						return target==_status.event.player||target==_status.event.target;
+					}).set('target',trigger.player).set('ai',function(target){
+						var player=_status.event.player;
+						if(player==target) return 1;
+						return ai.get.attitude(player,target)-1.5;
+					});
+				}
+				'step 1'
+				if(event.single){
+					if(result.control!='cancel2'){
+						player.logSkill('liangzhu',player);
+						if(result.control=='摸一张'){
+							player.draw();
+						}
+						else{
+							player.draw(2);
+							player.storage.liangzhu=player;
+						}
+					}
+				}
+				else if(result.bool){
+					var target=result.targets[0];
+					player.logSkill('liangzhu',target);
+					if(target==player){
+						target.draw();
+					}
+					else{
+						target.draw(2);
+						target.storage.liangzhu=player;
+					}
+				}
 			},
 			ai:{
-				expose:0.2
+				expose:0.1
 			}
+		},
+		fanxiang:{
+			skillAnimation:true,
+			animationColor:'fire',
+			audio:2,
+			unique:true,
+			forceunique:true,
+			trigger:{player:'phaseBegin'},
+			filter:function(event,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].storage.liangzhu==player&&game.players[i].isDamaged()){
+						return true;
+					}
+				}
+				return false;
+			},
+			forced:true,
+			content:function(){
+				player.gainMaxHp();
+				player.recover();
+				player.removeSkill('liangzhu');
+				player.addSkill('xiaoji');
+			},
 		},
 		mingshi:{
 			audio:2,
@@ -6457,6 +6517,7 @@ character.sp={
 					player.storage.bifa[1].gain(result.cards,player);
 					player.$give(result.cards,player.storage.bifa[1]);
 					player.gain(player.storage.bifa[0],'draw2');
+					game.log(player,'获得了',player.storage.bifa[0]);
 				}
 				else{
 					ui.discardPile.appendChild(player.storage.bifa[0]);
@@ -7367,6 +7428,8 @@ character.sp={
 		yawang:'雅望',
 		xunzhi:'殉志',
 		yingjian:'影箭',
+		fanxiang:'返乡',
+		fanxiang_info:'觉醒技，准备阶段开始时，若全场有至少一名已受伤且你曾发动【良助】令其摸牌的角色，则你回复1点体力和体力上限，失去技能【良助】并获得技能【枭姬】',
 		yingjian_info:'回合开始阶段，你可以视为使用一张无视距离的杀',
 		xunzhi_info:'准备阶段开始时，若你的上家和下家与你的体力值均不相等，你可以失去1点体力。若如此做，你的手牌上限+2',
 		yawang_info:'锁定技，摸牌阶段开始时，你放弃摸牌，改为摸x张牌，然后你于出牌阶段内至多使用x张牌（x为与你体力值相等的角色数）',
@@ -7417,7 +7480,7 @@ character.sp={
 		tongji_info:'锁定技。若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
 		wangzun_info:'其他角色的回合开始时，你可以摸一张牌，然后令该角色此回合的手牌上限-1；直到你的回合开始，你不能再次发动此技',
 		kaikang_info:'每当你距离1以内的角色成为杀的目标后，你可以摸一张牌。若如此做，你交给其一张牌并展示之，若该牌为装备牌，该角色可以使用此牌。',
-		liangzhu_info:'其他角色在其回合内回复体力时，你可以与其各摸一张牌 ',
+		liangzhu_info:'当一名角色于其出牌阶段内回复体力时，你可以选择一项：1、摸一张牌；2、令该角色摸两张牌 ',
 		mingshi_info:'当你即将受到伤害时，若伤害来源的体力值大于你，你可以弃置一张黑色手牌令伤害-1 ',
 		lirang_info:'你可以将你弃置的卡牌交给一名其他角色 ',
 		moukui_info:'当你使用【杀】指定一名角色为目标后，你可以选择一项：摸一张牌，或弃置其一张牌。若如此做，此【杀】被【闪】抵消时，该角色弃置你的一张牌。 ',

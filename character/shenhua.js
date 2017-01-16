@@ -151,7 +151,7 @@ character.shenhua={
 			audio:'kuanggu',
 			content:function(){
 				'step 0'
-				var controls=['draw_card','cancel'];
+				var controls=['draw_card','cancel2'];
 				if(player.hp<player.maxHp) controls.unshift('recover_hp');
 				player.chooseControl(controls).set('prompt',get.prompt('xinkuanggu')).set('ai',function(event,player){
 					if(player.hp==player.maxHp) return 'draw_card';
@@ -160,7 +160,7 @@ character.shenhua={
 					return 'recover_hp';
 				});
 				'step 1'
-				if(result.control!='cancel'){
+				if(result.control!='cancel2'){
 					player.logSkill('xinkuanggu');
 					if(result.control=='draw_card'){
 						player.draw();
@@ -1263,10 +1263,10 @@ character.shenhua={
 						event.control=ui.create.control();
 					}
 					else{
-						event.control=ui.create.control(['cancel']);
+						event.control=ui.create.control(['cancel2']);
 					}
 					event.clickControl=function(link){
-						if(link!='cancel'){
+						if(link!='cancel2'){
 							var currentname=event.dialog.querySelector('.selected.button').link;
 							var mark=player.marks.huashen;
 							if(trigger.name=='game'){
@@ -1358,7 +1358,7 @@ character.shenhua={
 								event.control.style.opacity=0;
 							}
 							else{
-								event.control.replace(['cancel']);
+								event.control.replace(['cancel2']);
 							}
 						}
 						else{
@@ -1388,7 +1388,7 @@ character.shenhua={
 									event.control.style.opacity=0;
 								}
 								else{
-									event.control.replace(['cancel']);
+									event.control.replace(['cancel2']);
 								}
 								event.control.custom=event.clickControl;
 								return;

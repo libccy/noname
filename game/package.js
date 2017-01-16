@@ -13,7 +13,7 @@ character.pack={
     swd:'轩辕剑',
     gujian:'古剑奇谭',
     xianjian:'仙剑',
-    xiake:'侠客',
+    // xiake:'侠客',
 };
 character.hearthpack={
     classic:'经典',

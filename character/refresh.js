@@ -89,7 +89,7 @@ character.refresh={
 							list.push('jiu');
 						}
 						if(list.length){
-							list.push('cancel');
+							list.push('cancel2');
 							player.chooseControl(list,function(){
 								var controls=_status.event.controls;
 								var player=_status.event.player;
@@ -103,7 +103,7 @@ character.refresh={
 										}
 									}
 								}
-								return 'cancel';
+								return 'cancel2';
 							}).set('prompt','是否视为使用一张基本牌？');
 						}
 						else{
@@ -119,7 +119,7 @@ character.refresh={
 					event.finish();
 				}
 				'step 1'
-				if(result&&result.control&&result.control!='cancel'){
+				if(result&&result.control&&result.control!='cancel2'){
 					if(result.control=='sha'){
 						player.chooseTarget(function(card,player,target){
 							return player.canUse({name:'sha'},target,true,true);
@@ -834,14 +834,14 @@ character.refresh={
 			content:function(){
 				"step 0"
 				if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0])=='d'){
-					player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel').ai=function(){
+					player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel2').ai=function(){
 						var trigger=_status.event.getTrigger();
 						if(trigger.cards.length==1&&trigger.cards[0].name=='sha') return 0;
 						return 1;
 					};
 				}
 				else{
-					player.chooseControl('rejianxiong_mopai','cancel');
+					player.chooseControl('rejianxiong_mopai','cancel2');
 				}
 				"step 1"
 				if(result.control=='rejianxiong_napai'){

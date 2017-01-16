@@ -1964,14 +1964,14 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				player.chooseControl('draw_card','出杀','cancel',function(){
+				player.chooseControl('draw_card','出杀','cancel2',function(){
 					if(ai.get.effect(trigger.target,{name:'sha'},player,player)>0){
 						return '出杀';
 					}
 					return 'draw_card';
 				}).prompt='是对'+get.translation(trigger.target)+'发动否发动【远征】？';
 				'step 1'
-				if(result.control!='cancel'){
+				if(result.control!='cancel2'){
 					if(result.control=='draw_card'){
 						player.draw();
 						player.logSkill('yuanzheng');
@@ -3829,10 +3829,10 @@ character.hearth={
 				var cards=[ui.cardPile.childNodes[0],ui.cardPile.childNodes[1]];
 				var att=ai.get.attitude(player,trigger.player);
 				var delta=trigger.judge(ui.cardPile.childNodes[1])-trigger.judge(ui.cardPile.childNodes[0]);
-				player.chooseControl('调换顺序','cancel',
+				player.chooseControl('调换顺序','cancel2',
 				ui.create.dialog('先知：'+get.translation(trigger.player)+'的'+str+'判定',cards,'hidden')).ai=function(){
 					if(att*delta>0) return '调换顺序';
-					else return 'cancel';
+					else return 'cancel2';
 				};
 				'step 1'
 				if(result.control=='调换顺序'){
@@ -5258,7 +5258,7 @@ character.hearth={
 		ayuling:'玉灵',
 		ayuling_info:'每当你受到一次伤害，你可以获得一张随机青玉牌；每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于回合开始阶段摸一张牌；当你累计使用六张青玉牌后，你可以于回合结束阶段摸一张牌',
 		lianjin:'炼金',
-		lianjin_info:'出牌阶段限两次，将一张手牌永久转化为一张由三张随机牌组成的药水',
+		lianjin_info:'出牌阶段限两次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水',
 		shouji:'收集',
 		shouji_info:'每回合限发动一次，每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制',
 		guimou:'鬼谋',

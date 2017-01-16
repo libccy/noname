@@ -1,7 +1,8 @@
 window.noname_update={
     version:'1.9.4',
     changeLog:[
-        '新武将',
+        '武将修改',
+        '4v4改进',
     ],
     files:{
         global:[

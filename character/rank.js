@@ -350,6 +350,7 @@ window.characterRank={
         'hs_liadrin',
         'hs_anomalus',
         'mifuren',
+        'hanba',
     ],
     b:[
         'caochun',
@@ -366,7 +367,6 @@ window.characterRank={
         'hs_nozdormu',
         'yxs_lishimin',
         'hs_ruanniguai',
-        'hanba',
         'daxiaoqiao',
         'pal_linyueru',
         'zhuran',
