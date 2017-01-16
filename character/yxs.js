@@ -66,7 +66,7 @@ character.yxs={
 				order:9.5,
 				result:{
 					target:function(player,target){
-						return ai.get.recoverEffect(target,player,player);
+						return ai.get.recoverEffect(target,player,target);
 					}
 				},
 				threaten:1.6
