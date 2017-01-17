@@ -103,7 +103,7 @@ card.swd={
 				result:{
 					target:function(player,target){
 						if(ai.get.attitude(player,target)>0) return 0;
-						if(ai.get.damageEffect(target,player,player)>=0) return 0;
+						if(ai.get.damageEffect(target,player,target)>=0) return 0;
 						return -1;
 					}
 				},
