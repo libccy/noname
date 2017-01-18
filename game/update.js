@@ -1,26 +1,15 @@
 window.noname_update={
-    version:'1.9.4.1',
+    version:'1.9.4.2',
+    update:'1.9.4.1',
     changeLog:[
         'bug修复',
     ],
-    files:{
-        global:[
-            'game/game.js',
-            'game/config.js',
-            'character/shenhua.js',
-            'character/gujian.js',
-            'character/ow.js',
-            'character/swd.js',
-            'character/yijiang.js',
-            'character/yxs.js',
-            'character/sp.js',
-            'character/hearth.js',
-            'character/gujian.js',
-            'character/extra.js',
-            'card/guozhan.js',
-            'card/sp.js',
-            'card/swd.js',
-        ],
-        '1.9.4':[],
-    }
+    files:[
+        'game/game.js',
+        'character/gujian.js',
+        'character/swd.js',
+        'character/hearth.js',
+        'character/shenhua.js',
+        'character/rank.js',
+    ]
 }

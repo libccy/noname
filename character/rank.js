@@ -19,6 +19,7 @@ window.characterRank={
     ],
     ap:[
         'swd_huiyan',
+        'hs_medivh',
         'ow_dva',
         'ow_mei',
         'ow_yuanshi',
@@ -82,7 +83,6 @@ window.characterRank={
         'swd_hengai',
         'jg_liubei',
         're_huangyueying',
-        'hs_medivh',
         'hs_bchillmaw',
         'shen_zhugeliang',
         'gjqt_fanglansheng',
@@ -133,6 +133,7 @@ window.characterRank={
         'huangzhong',
         'pal_wangpengxu',
         'yxs_luobinhan',
+        'hs_alleria',
     ],
     am:[
         'swd_duanmeng',
@@ -294,7 +295,6 @@ window.characterRank={
         'wutugu',
         'swd_chunyuheng',
         'hetaihou',
-        'hs_alleria',
         'swd_fengtianling',
         'kongrong',
         'swd_qiner',

@@ -2,7 +2,7 @@
 character.hearth={
 	character:{
 		hs_jaina:['female','wei',3,['huopu','aoshu','bingjia']],
-		hs_lrexxar:['male','shu',4,['shoulie','gongji']],
+		hs_lrexxar:['male','shu',4,['yushou']],
 		hs_wuther:['male','qun',4,['fengxian','jieming']],
 		hs_jgarrosh:['male','shu',4,['zhanhou','qiangxi']],
 		hs_malfurion:['male','wu',4,['jihuo']],
@@ -11,8 +11,8 @@ character.hearth={
 		hs_sthrall:['male','wu',4,['tuteng','guozai','zuling']],
 		hs_waleera:['female','shu',3,['jianren','mengun','wlianji']],
 
-		hs_medivh:['male','wei',3,['jingxiang','moying','mdzhoufu']],
-		hs_alleria:['male','wu',3,['fengxing','qiaodong','liegong']],
+		hs_medivh:['male','wei',3,['jingxiang','zuzhou','mdzhoufu']],
+		hs_alleria:['male','wu',3,['fengxing','xinliegong']],
 		hs_magni:['male','shu',4,['zhongjia','dunji']],
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
@@ -25,7 +25,7 @@ character.hearth={
 		hs_alakir:['male','wei',3,['fengnu','shengdun']],
 		hs_zhouzhuo:['male','qun',4,['yiwen']],
 		hs_yngvar:['male','qun',3,['huanwu']],
-		hs_bchillmaw:['male','wei',6,['hanshuang','bingshi']],
+		hs_bchillmaw:['male','wei',5,['hanshuang','bingshi']],
 		hs_malorne:['male','wu',3,['enze','chongsheng']],
 		hs_malygos:['male','wei',4,['malymowang']],
 		hs_xuefashi:['male','wei',2,['liehun','xjumo']],
@@ -35,7 +35,7 @@ character.hearth={
 		hs_lrhonin:['male','wei',4,['bingyan','yufa']],
 		hs_bolvar:['male','wei',4,['yuanzheng','bzhuiji']],
 		hs_fuding:['male','wei',4,['shengdun','fbeifa']],
-		hs_xuanzhuanjijia:['male','shu',3,['jixuan']],
+		hs_xuanzhuanjijia:['male','shu',2,['jixuan']],
 		hs_ysera:['female','wu',4,['chenshui']],
 		hs_alextrasza:['female','shu',5,['fushi']],
 		hs_nozdormu:['male','qun',5,['shixu']],
@@ -98,6 +98,93 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		yushou:{
+			enable:'phaseUse',
+			filterCard:true,
+			position:'he',
+			check:function(card){
+				return 5-ai.get.value(card);
+			},
+			filter:function(event,player){
+				if(player.hasSkill('yushou_misha')&&player.hasSkill('yushou_huofu')&&player.hasSkill('yushou_leiouke')) return false;
+				return true;
+			},
+			content:function(){
+				if(!lib.character.stone_misha){
+					lib.character.stone_misha=['male','shu',3,['chaofeng'],['minskin','stone','mode:stone'],[3,3,'hunter']];
+				}
+				if(!lib.character.stone_huofu){
+					lib.character.stone_huofu=['male','qun',2,['stone_chongfeng'],['minskin','stone','mode:stone'],[3,4,'hunter']];
+				}
+				if(!lib.character.stone_leiouke){
+					lib.character.stone_leiouke=['male','shu',2,['hunter_zhanhuo'],['minskin','stone','mode:stone'],[3,1,'hunter']];
+				}
+				var list=['misha','leiouke','huofu'];
+				for(var i=0;i<list.length;i++){
+					if(player.hasSkill('yushou_'+list[i])){
+						list.splice(i--,1);
+					}
+				}
+				var skill=list.randomGet();
+				var name='yushou_'+skill;
+				player.addTempSkill(name,{player:'phaseBegin'});
+				player.markSkillCharacter(name,'stone_'+skill,lib.translate[name],lib.translate[name+'_info']);
+			},
+			ai:{
+				order:9.5,
+				result:{
+					player:1
+				}
+			}
+		},
+		yushou_misha:{
+			trigger:{player:'damageBegin'},
+			forced:true,
+			filter:function(event,player){
+				return event.num>=1;
+			},
+			usable:1,
+			content:function(){
+				if(trigger.num>=1){
+					trigger.num--;
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'damage')){
+							if(player.hasSkill('jueqing')) return;
+							return 0.5;
+						}
+					}
+				}
+			},
+		},
+		yushou_huofu:{
+			enable:'phaseUse',
+			viewAs:{name:'juedou'},
+			filterCard:{color:'black'},
+			position:'he',
+			viewAsFilter:function(player){
+				if(!player.num('he',{color:'black'})) return false;
+			},
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			ai:{
+				basic:{
+					order:10
+				}
+			}
+		},
+		yushou_leiouke:{
+			trigger:{source:'damageBegin'},
+			forced:true,
+			usable:1,
+			content:function(){
+				trigger.num++;
+			}
+		},
 		qingzun:{
 			subSkill:{
 				count:{
@@ -2300,6 +2387,7 @@ character.hearth={
 				return event.parent.name!='jixuan';
 			},
 			content:function(){
+				player.draw();
 				player.phase();
 			},
 			ai:{
@@ -3294,15 +3382,27 @@ character.hearth={
 			}
 		},
 		fengxing:{
-			trigger:{player:['useCard']},
-			frequent:true,
-			filter:function(event){
-				return event.card&&event.card.name=='sha';
+			trigger:{player:'loseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return _status.currentPhase!=player&&!player.hasSkill('fengxing2')&&player.num('he')>0;
 			},
 			content:function(){
-				player.draw();
+				'step 0'
+				player.addTempSkill('fengxing2','phaseAfter');
+				player.chooseToDiscard('he',get.prompt('fengxing')).set('ai',function(card){
+					return 7-ai.get.value(card);
+				}).logSkill='fengxing';
+				'step 1'
+				if(result.bool){
+					player.draw(2);
+				}
+			},
+			ai:{
+				threaten:0.6
 			}
 		},
+		fengxing2:{},
 		fengxian:{
 			enable:'phaseUse',
 			usable:1,
@@ -3664,9 +3764,9 @@ character.hearth={
 			}
 		},
 		bianxing2:{},
-		moying:{
+		zuzhou:{
 			trigger:{player:'phaseBegin'},
-			skillcheck:function(event,player){
+			filter:function(event,player){
 				if(!player.num('h',{suit:'spade'})) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].num('j','shandian')){
@@ -3681,26 +3781,11 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				if(!lib.skill.moying.skillcheck(trigger,player)){
-					player.draw();
-					event.finish();
-					return;
-				}
-				var card=null;
-				for(var i=0;i<ui.cardPile.childNodes.length;i++){
-					if(ui.cardPile.childNodes[i].name=='shandian'){
-						card=ui.cardPile.childNodes[i];break;
-					}
-				}
-				if(!card){
-					for(var i=0;i<ui.discardPile.childNodes.length;i++){
-						if(ui.discardPile.childNodes[i].name=='shandian'){
-							card=ui.discardPile.childNodes[i];break;
-						}
-					}
-				}
+				var card=get.cardPile('shandian',true);
 				if(card){
 					player.addJudge(card);
+					player.$draw(card);
+					game.delay();
 				}
 				else{
 					event.finish();
@@ -3764,18 +3849,19 @@ character.hearth={
 				}
 				if(player.storage.mdzhoufu3.isAlive()){
 					// player.storage.mdzhoufu3.draw();
-					player.storage.mdzhoufu3.gain(player.judging[0],'gain2');
+					player.storage.mdzhoufu3.gain(player.judging[0]);
+					player.storage.mdzhoufu3.$gain2(player.judging[0]);
 				}
 				else{
 					ui.discardPile.appendChild(player.judging[0]);
 					game.delay(1.5);
 				}
+				player.removeSkill('mdzhoufu2');
 				"step 1"
 				player.judging[0]=player.storage.mdzhoufu2;
 				trigger.position.appendChild(player.storage.mdzhoufu2);
 				// trigger.untrigger();
 				game.log(player,'的判定牌改为',player.storage.mdzhoufu2);
-				player.removeSkill('mdzhoufu2');
 				delete player.storage.mdzhoufu2;
 				delete player.storage.mdzhoufu3;
 			},
@@ -3783,7 +3869,7 @@ character.hearth={
 				content:'card'
 			},
 		},
-		moying_old:{
+		zuzhou_old:{
 			trigger:{player:'damageEnd',source:'damageEnd'},
 			check:function(event,player){
 				var target=(player==event.player)?event.source:event.player;
@@ -3795,7 +3881,7 @@ character.hearth={
 			},
 			prompt:function(event,player){
 				var target=(player==event.player)?event.source:event.player;
-				return get.prompt('moying',target);
+				return get.prompt('zuzhou',target);
 			},
 			content:function(){
 				"step 0"
@@ -3855,6 +3941,7 @@ character.hearth={
 		jingxiang:{
 			trigger:{player:'chooseToRespondBegin'},
 			direct:true,
+			usable:1,
 			filter:function(event,player){
 				if(event.responded) return false;
 				for(var i=0;i<game.players.length;i++){
@@ -3866,27 +3953,31 @@ character.hearth={
 			},
 			content:function(){
 				"step 0"
-				var players=[];
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')){
-						players.push(game.players[i]);
-					}
-				}
-				if(!players.length){
-					event.finish();
-					return;
-				}
-				var target=players.randomGet();
-				event.target=target;
-				var cards=target.get('h');
-				player.chooseCardButton('镜像：选择'+get.translation(target)+'的一张卡手牌打出',cards).filterButton=function(button){
-					return trigger.filterCard(button.link);
-				}
+				player.chooseTarget(get.prompt('jingxiang'),function(card,player,target){
+					return target!=player&&target.num('h')>0;
+				}).ai=function(target){
+					return 1-ai.get.attitude(player,target);
+				};
 				"step 1"
 				if(result.bool){
-					player.logSkill('jingxiang',event.target);
+					var target=result.targets[0];
+					player.logSkill('jingxiang',target);
+					event.target=target;
+					var cards=target.get('h');
+					player.chooseCardButton('选择'+get.translation(target)+'的一张卡手牌打出',cards).filterButton=function(button){
+						return trigger.filterCard(button.link);
+					}
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.bool){
+					game.log(player,'使用了',event.target,'的手牌');
+					event.target.$throw(result.links);
 					event.target.lose(result.links);
 					trigger.untrigger();
+					trigger.animate=false;
 					trigger.responded=true;
 					result.buttons[0].link.remove();
 					trigger.result={bool:true,card:result.buttons[0].link}
@@ -3895,8 +3986,8 @@ character.hearth={
 			ai:{
 				effect:{
 					target:function(card){
-						if(get.tag(card,'respondShan')) return 0.7;
-						if(get.tag(card,'respondSha')) return 0.7;
+						if(get.tag(card,'respondShan')) return 0.4;
+						if(get.tag(card,'respondSha')) return 0.4;
 					}
 				}
 			},
@@ -5248,6 +5339,14 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
+		yushou:'御兽',
+		yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，效果持续到你的下一回合开始',
+		yushou_misha:'米莎',
+		yushou_misha_info:'你每回合受到的首次伤害-1',
+		yushou_huofu:'霍弗',
+		yushou_huofu_info:'你可以将一张黑色牌当作决斗使用',
+		yushou_leiouke:'雷欧克',
+		yushou_leiouke_info:'你每回合造成的首次伤害+1',
 		hsqingyu_hufu:'青玉护符',
 		hsqingyu_hufu_info:'令一名角色获得一点护甲',
 		hsqingyu_zhao:'青玉之爪',
@@ -5320,7 +5419,7 @@ character.hearth={
 		maoxian2:'冒险',
 		maoxian_info:'出牌阶段限两次，你可以从三个随机技能中选择一个作为你的技能',
 		tanmi:'探秘',
-		tanmi_info:'在一名其他角色的回合结束阶段，若你没有手牌，你可以摸两张牌并进行一个出牌阶段',
+		tanmi_info:'在一名其他角色的回合结束阶段，若你没有手牌，你可以摸两张牌并可以使用摸到的牌',
 		yiwen:'轶闻',
 		yiwen_info:'锁定技，每当其他角色于回合内首次使用卡牌指定你为惟一目标，你获得一张此牌的复制',
 		tanbao_old:'探宝',
@@ -5386,7 +5485,7 @@ character.hearth={
 		qianghua:'绝手',
 		qianghua_info:'出牌阶段内，你可以令一张你使用的基本牌或非延时锦囊牌额外结算一次，每回合限一次',
 		jixuan:'疾旋',
-		jixuan_info:'锁定技，回合结束后，你进行一个额外的回合',
+		jixuan_info:'锁定技，回合结束后，你摸一张牌进行一个额外的回合',
 		biri:'蔽日',
 		biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张闪取消之',
 		stuxi:'吐息',
@@ -5476,7 +5575,7 @@ character.hearth={
 		aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用',
 
 		fengxing:'风行',
-		fengxing_info:'每当你使用一张杀，你可以摸一张牌',
+		fengxing_info:'每当你于回合外首次失去牌，你可以弃置一张牌并摸两张牌',
 		xinci:'心刺',
 		xinci_info:'出牌阶段限一次，你可以弃置一张黑色牌令一名角色流失一点体力',
 		zhongjia:'战甲',
@@ -5507,11 +5606,11 @@ character.hearth={
 		mdzhoufu:'缚魂',
 		mdzhoufu2:'缚魂',
 		mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果，然后你获得亮出的判定牌',
-		moying:'诅咒',
-		moying_info:'锁定技，回合开始阶段，若场上没有闪电且你手牌中有黑桃牌，你将牌堆中的一张闪电置于你的判定区，否则你摸一张牌',
-		moying_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
+		zuzhou:'诅咒',
+		zuzhou_info:'锁定技，回合开始阶段，若场上没有闪电且你手牌中有黑桃牌，你将牌堆中的一张闪电置于你的判定区',
+		zuzhou_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
 		jingxiang:'镜像',
-		jingxiang_info:'每当你需要打出卡牌时，你可以观看一名随机角色的手牌并将其视为你的手牌打出',
+		jingxiang_info:'每回合限一次，当你需要打出卡牌时，你可以观看一名角色的手牌并将其视为你的手牌打出',
 		tuteng:'图腾',
 		tuteng_info:'出牌阶段，你可以获得一个随机图腾；每当你受到一次伤害，你随机失去一个图腾',
 		zuling:'祖灵',

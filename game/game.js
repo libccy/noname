@@ -5021,6 +5021,14 @@
 				window._status=_status;
 			},
             p:function(name,i){
+                var list=['swd','hs','pal','gjqt','ow'];
+                if(!lib.character[name]){
+                    for(var j=0;j<list.length;j++){
+                        if(lib.character[list[j]+'_'+name]){
+                            name=list[j]+'_'+name;break;
+                        }
+                    }
+                }
                 var target;
                 if(typeof i=='number'){
                     target=game.players[i];
@@ -21003,11 +21011,12 @@
 			}
 			return null;
 		},
-		findCards:function(func){
+		findCards:function(func,all){
 			var cards=[];
 			for(var i in lib.card){
 				if(!lib.translate[i+'_info']) continue;
 				if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
+                if(!all&&!lib.inpile.contains(i)) continue;
 				if(func(i,lib.card[i])){
 					cards.push(i);
 				}
@@ -26217,9 +26226,9 @@
     								if(update.version!=lib.version||lib.config.debug){
                                         var files=null;
                                         var version=lib.version;
-                                        if(Array.isArray(update.files)&&update.minversion){
+                                        if(Array.isArray(update.files)&&update.update){
                                             var version1=version.split('.');
-                                            var version2=update.minversion.split('.');
+                                            var version2=update.update.split('.');
                                             for(var i=0;i<version1.length&&i<version2.length;i++){
                                                 if(version2[i]>version1[i]){
                                                     files=false;break;
@@ -28563,16 +28572,12 @@
 						if(node.node.hp.childNodes.length==0){
 							node.node.name.style.top='8px';
 						}
-						// var name=get.translation(item);
 						node.node.name.innerHTML=get.slimName(item);
                         if(node.node.name.querySelectorAll('br').length>=4){
                             node.node.name.classList.add('long');
                             node.addEventListener('mouseenter',ui.click.buttonnameenter);
                             node.addEventListener('mouseleave',ui.click.buttonnameleave);
                         }
-						// for(var i=0;i<name.length;i++){
-						// 	node.node.name.innerHTML+=name[i]+'<br/>';
-						// }
 						node.node.intro.innerHTML=lib.config.intro;
 						if(!noclick){
 							if(lib.config.touchscreen){
@@ -32816,7 +32821,7 @@
 				default: return 1;
 			}
 		},
-		cardPile:function(name){
+		cardPile:function(name,create){
 			var card;
 			for(var i=0;i<ui.cardPile.childNodes.length;i++){
 				card=ui.cardPile.childNodes[i];
@@ -32844,6 +32849,9 @@
 					}
 				}
 			}
+            if(create){
+                return game.createCard(name);
+            }
 			return null;
 		},
 		aiStrategy:function(){

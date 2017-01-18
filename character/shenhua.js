@@ -193,6 +193,9 @@ character.shenhua={
 			content:function(){
 				if(trigger.target.num('h')<=player.num('h')) trigger.directHit=true;
 				if(trigger.target.hp>=player.hp) player.addTempSkill('xinliegong2','shaAfter');
+			},
+			ai:{
+				threaten:0.5
 			}
 		},
 		xinliegong2:{

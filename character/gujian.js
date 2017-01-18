@@ -8,11 +8,50 @@ character.gujian={
 		gjqt_hongyu:['female','shu',4,['jianwu','meiying']],
 
 		gjqt_yuewuyi:['male','wei',4,['yanjia','xiuhua','liuying']],
-		gjqt_wenrenyu:['female','shu',4,['jizhan','qianjun']],
+		gjqt_wenrenyu:['female','shu',4,['chizhen','dangping']],
 		gjqt_xiayize:['male','qun',3,['xuanning','liuguang','yangming']],
 		gjqt_aruan:['female','wu',3,['zhaolu','jiehuo','yuling']],
 	},
 	skill:{
+		chizhen:{
+			trigger:{player:'phaseUseBegin'},
+			frequent:true,
+			content:function(){
+				'step 0'
+				event.num=Math.max(1,player.maxHp-player.hp);
+				player.draw(event.num);
+				'step 1'
+				player.chooseToDiscard('he',event.num,true);
+				'step 2'
+				var useCard=false;
+				if(result.bool&&result.cards){
+					for(var i=0;i<result.cards.length;i++){
+						if(result.cards[i].name=='sha'){
+							useCard=true;break;
+						}
+					}
+				}
+				if(useCard){
+					player.chooseTarget('是否视为使用一张决斗？',function(card,player,target){
+						return lib.filter.targetEnabled({name:'juedou'},player,target);
+					}).set('ai',function(target){
+						return ai.get.effect(target,{name:'juedou'},_status.event.player);
+					});
+				}
+				else{
+					event.finish();
+				}
+				'step 3'
+				if(result.bool){
+					player.useCard({name:'juedou'},result.targets);
+				}
+			},
+			ai:{
+				threaten:function(player,target){
+					return Math.sqrt(Math.max(1,target.maxHp-target.hp));
+				}
+			}
+		},
 		xiuhua:{
 			trigger:{global:'loseEnd'},
 			filter:function(event,player){
@@ -1295,6 +1334,8 @@ character.gujian={
 		gjqt_xiayize:'夏夷则',
 		gjqt_aruan:'阿阮',
 
+		chizhen:'驰阵',
+		chizhen_info:'出牌阶段开始时，你可以摸X张牌并弃置X张牌，若你弃置了杀，可以视为使用一张决斗（X为你已损失的体力值+1）',
 		xidie:'戏蝶',
 		xidie2:'戏蝶',
 		xidie_info:'回合开始阶段，若你的手牌数大于体力值，可以弃置至多X张牌，并于回合结束阶段摸等量的牌，X为你的体力值与手牌数之差且不超过3',
@@ -1314,7 +1355,7 @@ character.gujian={
 		fumo:'伏魔',
 		fumo_info:'每当你受到一次伤害，可以弃置两张颜色相同的手牌并对伤害来源造成一点雷电伤害',
 		fanyin:'梵音',
-		fanyin_info:'回合结束阶段，你可以令一名角色重置武将牌。若其体力值是全场最少的之一，其回复一点体力。',
+		fanyin_info:'回合结束阶段，你可以令其他一名角色重置武将牌。若其体力值是全场最少的之一，其回复一点体力。',
 		mingkong:'明空',
 		mingkong_info:'锁定技，若你没有手牌，你受到的伤害-1，然后伤害来源摸一张牌',
 		qinglan:'晴岚',

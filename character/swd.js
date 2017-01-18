@@ -3060,7 +3060,7 @@ character.swd={
 			trigger:{source:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
-				return event.parent.name!='dangping'&&!player.hasSkill('dangping2');
+				return event.parent.name!='dangping'&&!player.hasSkill('dangping2')&&player.num('he')>0;
 			},
 			content:function(){
 				"step 0"
@@ -8619,7 +8619,7 @@ character.swd={
 		xielei:'挟雷',
 		xielei_info:'每当你使用或打出一张杀，可以弃置一张牌并对目标以外的一名角色造成一点雷电伤害',
 		dangping:'荡平',
-		dangping_info:'每当你造成一次伤害，可以弃置一张手牌对其距离1以内的另一名角色造成一点伤害',
+		dangping_info:'每当你造成一次伤害，可以弃置一张手牌对其距离1以内的另一名角色造成一点伤害，每回合限一次',
 		guisi:'归思',
 		guisi_info:'每当你成为杀的目标，你可以交给对方一张手牌并取消之',
 		duishi:'对诗',
