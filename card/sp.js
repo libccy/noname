@@ -18,6 +18,7 @@ card.sp={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
+			nomod:true,
 			skills:['muniu_skill','muniu_skill2','muniu_skill7'],
 			ai:{
 				basic:{

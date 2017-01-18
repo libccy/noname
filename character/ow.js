@@ -1602,6 +1602,17 @@ character.ow={
             }
 		},
         feiren2:{
+            trigger:{source:'damageBegin'},
+			forced:true,
+            popup:false,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&get.suit(event.card)=='spade';
+			},
+			content:function(){
+				trigger.num++;
+			}
+        },
+        feiren3:{
 			trigger:{player:'useCardAfter'},
 			filter:function(event,player){
                 if(event.parent.name=='feiren2') return false;
@@ -2668,7 +2679,7 @@ character.ow={
         mujing_info:'每当你对攻击范围不含你的角色使用一张牌，你可以弃置目标一张牌；若你的手牌数不多于目标，你摸一张牌',
         feiren:'飞刃',
         feiren2:'飞刃',
-        feiren_info:'你的杀无视距离和防具；你的黑桃杀可以额外结算一次，梅花杀可以额外指定一个目标',
+        feiren_info:'你的杀无视距离和防具；你的黑桃杀造成的伤害+1，梅花杀可以额外指定一个目标',
         zhanlong:'斩龙',
         zhanlong_info:'限定技，回合开始阶段，若你体力值为1，你可以弃置所有牌（至少一张），然后将三张杀置入你的手牌，若如此做，你本回合使用杀无次数限制',
         xie:'谐',

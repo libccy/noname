@@ -7,12 +7,248 @@ character.gujian={
 		gjqt_yinqianshang:['male','qun',4,['zhongji','zuizhan']],
 		gjqt_hongyu:['female','shu',4,['jianwu','meiying']],
 
-		gjqt_yuewuyi:['male','wei',4,['yanjia','xiuhua']],
+		gjqt_yuewuyi:['male','wei',4,['yanjia','xiuhua','liuying']],
 		gjqt_wenrenyu:['female','shu',4,['jizhan','qianjun']],
 		gjqt_xiayize:['male','qun',3,['xuanning','liuguang','yangming']],
 		gjqt_aruan:['female','wu',3,['zhaolu','jiehuo','yuling']],
 	},
 	skill:{
+		xiuhua:{
+			trigger:{global:'loseEnd'},
+			filter:function(event,player){
+				if(event.player==player) return false;
+				if(event.parent.name!='equip'&&event.parent.name!='discard') return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(get.type(event.cards[i])=='equip'&&get.position(event.cards[i])=='d'){
+						return true;
+					}
+				}
+			},
+			frequent:true,
+			content:function(){
+				"step 0"
+				game.delay();
+				"step 1"
+				var cards=[];
+				for(var i=0;i<trigger.cards.length;i++){
+					if(get.type(trigger.cards[i])=='equip'&&get.position(trigger.cards[i])=='d'){
+						cards.push(trigger.cards[i]);
+					}
+				}
+				if(cards.length){
+					player.gain(cards,'gain2');
+					game.log(player,'获得了',cards);
+				}
+			}
+		},
+		liuying:{
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				if(event.card.name!='sha') return false;
+				for(var i=0;i<game.players.length;i++){
+					if(event.targets.contains(game.players[i])==false&&game.players[i]!=player&&
+					lib.filter.targetEnabled(event.card,player,game.players[i])){
+						return true;
+					}
+				}
+				return false;
+			},
+			direct:true,
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(trigger.targets.contains(game.players[i])==false&&game.players[i]!=player&&
+					lib.filter.targetEnabled(trigger.card,player,game.players[i])){
+						list.push(game.players[i]);
+					}
+				}
+				event.list=list;
+				'step 1'
+				if(event.list.length){
+					player.chooseTarget(get.prompt('liuying'),function(card,player,target){
+						return event.list.contains(target);
+					}).ai=function(target){
+						return ai.get.effect(target,trigger.card,player,player);
+					};
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					event.current=result.targets[0];
+					event.current.judge(function(card){
+						if(get.color(card)=='black') return -1;
+						return 0;
+					});
+					event.list.remove(event.current);
+					player.logSkill('liuying',event.current);
+				}
+				else{
+					event.finish();
+				}
+				'step 3'
+				if(result.color=='black'){
+					trigger.targets.push(event.current);
+					game.log(event.current,'被追加为额外目标');
+					event.goto(1);
+				}
+			}
+		},
+		yanjia:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				var he=player.get('he');
+				var num=0;
+				for(var i=0;i<he.length;i++){
+					var info=lib.card[he[i].name];
+					if(info.type=='equip'&&!info.nomod&&lib.inpile.contains(he[i].name)){
+						num++;
+						if(num>=2) return true;
+					}
+				}
+			},
+			filterCard:function(card){
+				var info=get.info(card);
+				return info.type=='equip'&&!info.nomod&&lib.inpile.contains(card.name);
+			},
+			selectCard:2,
+			position:'he',
+			check:function(card){
+				return ai.get.value(card);
+			},
+			content:function(){
+				var name=cards[0].name+'_'+cards[1].name;
+				var info1=get.info(cards[0]),info2=get.info(cards[1]);
+				if(!lib.card[name]){
+					var info={
+						enable:true,
+						type:'equip',
+						subtype:get.subtype(cards[0]),
+						vanish:true,
+						cardimage:info1.cardimage||cards[0].name,
+						filterTarget:function(card,player,target){
+							return target==player;
+						},
+						selectTarget:-1,
+						modTarget:true,
+						content:lib.element.content.equipCard,
+						legend:true,
+						onEquip:[],
+						onLose:[],
+						skills:[],
+						distance:{},
+						ai:{
+							order:8.9,
+							equipValue:10,
+							useful:2.5,
+							value:function(card,player){
+								var value=0;
+								var info=get.info(card);
+								if(player.get('e',info.subtype[5])&&card!=player.get('e',info.subtype[5])){
+									value=ai.get.value(player.get('e',info.subtype[5]),player);
+								}
+								var equipValue=info.ai.equipValue||info.ai.basic.equipValue;
+								if(typeof equipValue=='function') return equipValue(card,player)-value;
+								return equipValue-value;
+							},
+							result:{
+								target:function(player,target){
+		    						var card=get.card();
+		    						if(card==undefined){
+		                                card={name:name};
+		                            }
+		    						var value1=ai.get.value(card,target);
+		    						var value2=0;
+		    						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card){
+										value2=ai.get.value(target[get.subtype(card)],target);
+									}
+		                            return Math.max(0,value1-value2);
+		    					}
+							}
+						}
+					}
+					for(var i in info1.distance){
+						info.distance[i]=info1.distance[i];
+					}
+					for(var i in info2.distance){
+						if(typeof info.distance[i]=='number'){
+							info.distance[i]+=info2.distance[i];
+						}
+						else{
+							info.distance[i]=info2.distance[i];
+						}
+					}
+					if(info1.skills){
+						info.skills=info.skills.concat(info1.skills);
+					}
+					if(info2.skills){
+						info.skills=info.skills.concat(info2.skills);
+					}
+					if(info1.onEquip){
+						if(Array.isArray(info1.onEquip)){
+							info.onEquip=info.onEquip.concat(info1.onEquip);
+						}
+						else{
+							info.onEquip.push(info1.onEquip);
+						}
+					}
+					if(info2.onEquip){
+						if(Array.isArray(info2.onEquip)){
+							info.onEquip=info.onEquip.concat(info2.onEquip);
+						}
+						else{
+							info.onEquip.push(info2.onEquip);
+						}
+					}
+					if(info1.onLose){
+						if(Array.isArray(info1.onLose)){
+							info.onLose=info.onLose.concat(info1.onLose);
+						}
+						else{
+							info.onLose.push(info1.onLose);
+						}
+					}
+					if(info2.onLose){
+						if(Array.isArray(info2.onLose)){
+							info.onLose=info.onLose.concat(info2.onLose);
+						}
+						else{
+							info.onLose.push(info2.onLose);
+						}
+					}
+					if(info.onEquip.length==0) delete info.onEquip;
+					if(info.onLose.length==0) delete info.onLose;
+					lib.card[name]=info;
+					lib.translate[name]=get.translation(cards[0].name,'skill')+get.translation(cards[1].name,'skill');
+					var str=lib.translate[cards[0].name+'_info'];
+					if(str[str.length-1]=='.'||str[str.length-1]=='。'){
+						str=str.slice(0,str.length-1);
+					}
+					lib.translate[name+'_info']=str+'；'+lib.translate[cards[1].name+'_info'];
+					try{
+						game.addVideo('newcard',null,{
+							name:name,
+							translate:lib.translate[name],
+							info:lib.translate[name+'_info'],
+							card:cards[0].name,
+							legend:true,
+						});
+					}
+					catch(e){
+						console.log(e);
+					}
+				}
+				player.gain(game.createCard({name:name,suit:cards[0].suit,number:cards[0].number}),'gain2');
+			},
+			ai:{
+				order:9.5,
+				result:{
+					player:1
+				}
+			}
+		},
 		meiying:{
 			global:'meiying2',
 			globalSilent:true,
@@ -538,7 +774,7 @@ character.gujian={
 				}
 			}
 		},
-		xiuhua:{
+		xiuhua_old:{
 			changeSeat:true,
 			trigger:{player:'shaHit'},
 			filter:function(event,player){
@@ -605,7 +841,7 @@ character.gujian={
 				}
 			}
 		},
-		yanjia:{
+		yanjia_old:{
 			enable:'chooseToUse',
 			filter:function(event,player){
 				return player.num('he',{type:'equip'})>0;
@@ -1093,12 +1329,12 @@ character.gujian={
 		shahun2:'煞魂',
 		shahun_info:'限定技，濒死阶段，你可以重置武将牌，弃置所有牌并摸三张牌，然后将体力回复至1；若如此做，你失去技能【反噬】，获得技能【绝境】，并于三回合后立即死亡',
 
-		xiuhua:'袖花',
-		xiuhua_info:'每当你使用杀击中目标，你可以将其拉至你的旁边',
-		liuying:'流影',
-		liuying_info:'你可以将一张装备牌当顺手牵羊使用',
 		yanjia:'偃甲',
-		yanjia_info:'你可以将一张装备牌当无中生有使用',
+		yanjia_info:'出牌阶段，你可以将两张装备牌合成为一张强化装备',
+		xiuhua:'袖花',
+		xiuhua_info:'每当一件装备因被替换或弃置进入弃牌堆，你可以获得之',
+		liuying:'流影',
+		liuying_info:'每当你使用一张杀，你可以指定一名不是此杀目标的角色并进行一次判定，若结果是黑色，将其追加为杀的额外目标并可以再次判定',
 		boyun:'拨云',
 		boyun1:'拨云',
 		boyun2:'拨云',

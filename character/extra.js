@@ -854,7 +854,7 @@ character.extra={
 			},
 			filterTarget:function(card,player,target){
 				var length=ui.selected.cards.length;
-				return player!=target&&(length==0||length==4);
+				return (length==0||length==4);
 			},
 			filterCard:function(card){
 				var suit=get.suit(card);

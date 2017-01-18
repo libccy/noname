@@ -285,7 +285,7 @@ character.sp={
 				}
 				'step 3'
 				if(result.bool){
-					player.useCard({name:'sha'},result.targets);
+					player.useCard({name:'sha'},result.targets,false);
 				}
 			},
 			ai:{

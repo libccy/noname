@@ -290,6 +290,7 @@ card.guozhan={
 			fullskin:true,
 			type:"equip",
 			subtype:"equip2",
+			nomod:true,
 			skills:['huxinjing'],
 			ai:{
 				basic:{

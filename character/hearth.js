@@ -81,7 +81,7 @@ character.hearth={
 		// hs_wolazi:['male','wei',3,[]],
 
 		// hs_tanghangu:['male','wei',3,[]],
-		hs_aya:['female','wu',3,['ayuling']],
+		hs_aya:['female','wu',3,['ayuling','qingzun']],
 		// hs_barnes:['male','wei',3,[]],
 		// hs_nuogefu:['male','wei',3,[]],
 		hs_kazhakusi:['male','shu',3,['lianjin']],
@@ -98,17 +98,52 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
-		ayuling:{
-			trigger:{player:'damageEnd'},
-			frequent:true,
-			content:function(){
-				var list=['feibiao','hufu','zhao','zhanfang','shandian'];
-				player.gain(game.createCard('hsqingyu_'+list.randomGet()),'draw');
+		qingzun:{
+			subSkill:{
+				count:{
+					trigger:{player:'useCard'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event,player){
+						return event.card.name.indexOf('hsqingyu_')==0;
+					},
+					content:function(){
+						player.storage.qingzun++;
+						player.updateMarks();
+					}
+				},
+				draw1:{
+					trigger:{player:'phaseBegin'},
+					filter:function(event,player){
+						return player.storage.qingzun>=2;
+					},
+					frequent:true,
+					content:function(){
+						player.draw();
+					}
+				},
+				draw2:{
+					trigger:{player:'phaseEnd'},
+					filter:function(event,player){
+						return player.storage.qingzun>=6;
+					},
+					frequent:true,
+					content:function(){
+						player.draw();
+					}
+				},
+			},
+			mod:{
+				maxHandcard:function(player,num){
+					return num+player.storage.qingzun;
+				}
 			},
 			init:function(player){
-				player.storage.ayuling=0;
+				player.storage.qingzun=0;
 			},
 			mark:true,
+			marktext:'玉',
 			intro:{
 				content:function(storage,player){
 					if(!storage) return '未使用过青玉牌';
@@ -122,47 +157,15 @@ character.hearth={
 					return str;
 				}
 			},
-			subSkill:{
-				count:{
-					trigger:{player:'useCard'},
-					forced:true,
-					popup:false,
-					silent:true,
-					filter:function(event,player){
-						return event.card.name.indexOf('hsqingyu_')==0;
-					},
-					content:function(){
-						player.storage.ayuling++;
-						player.updateMarks();
-					}
-				},
-				draw1:{
-					trigger:{player:'phaseBegin'},
-					filter:function(event,player){
-						return player.storage.ayuling>=2;
-					},
-					frequent:true,
-					content:function(){
-						player.draw();
-					}
-				},
-				draw2:{
-					trigger:{player:'phaseEnd'},
-					filter:function(event,player){
-						return player.storage.ayuling>=6;
-					},
-					frequent:true,
-					content:function(){
-						player.draw();
-					}
-				},
+			group:['qingzun_count','qingzun_draw1','qingzun_draw2'],
+		},
+		ayuling:{
+			trigger:{player:'damageEnd'},
+			frequent:true,
+			content:function(){
+				var list=['feibiao','hufu','zhao','zhanfang','shandian'];
+				player.gain(game.createCard('hsqingyu_'+list.randomGet()),'draw');
 			},
-			mod:{
-				maxHandcard:function(player,num){
-					return num+player.storage.ayuling;
-				}
-			},
-			group:['ayuling_count','ayuling_draw1','ayuling_draw2'],
 			ai:{
 				maixie:true,
 				effect:{
@@ -1248,7 +1251,7 @@ character.hearth={
 					}
 				}
 				if(event.target){
-					player.chooseToDiscard([1,2],'献祭：是否弃置1〜2张手牌并令'+get.translation(event.target)+'摸等量的牌？').set('ai',function(card){
+					player.chooseToDiscard([1,2],'献祭：是否弃置1~2张手牌并令'+get.translation(event.target)+'摸等量的牌？').set('ai',function(card){
 						if(ai.get.attitude(_status.event.player,_status.event.getParent().target)>1){
 							return 6-ai.get.value(card);
 						}
@@ -5256,7 +5259,9 @@ character.hearth={
 		hsqingyu_zhanfang:'青玉绽放',
 		hsqingyu_zhanfang_info:'令一名角色增加一点体力上限并摸一张牌',
 		ayuling:'玉灵',
-		ayuling_info:'每当你受到一次伤害，你可以获得一张随机青玉牌；每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于回合开始阶段摸一张牌；当你累计使用六张青玉牌后，你可以于回合结束阶段摸一张牌',
+		ayuling_info:'每当你受到一次伤害，你可以获得一张随机青玉牌',
+		qingzun:'青樽',
+		qingzun_info:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于回合开始阶段摸一张牌；当你累计使用六张青玉牌后，你可以于回合结束阶段摸一张牌',
 		lianjin:'炼金',
 		lianjin_info:'出牌阶段限两次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水',
 		shouji:'收集',
@@ -5308,7 +5313,7 @@ character.hearth={
 		xianji:'献祭',
 		xianji2:'献祭',
 		xianji3:'献祭',
-		xianji_info:'其他角色可以在其回合结束阶段弃置1〜2张手牌并令你摸等量的牌，若如此做，直到其下一回合结束，每当你使用卡牌指定其为目标时，其摸一张牌',
+		xianji_info:'其他角色可以在其回合结束阶段弃置1~2张手牌并令你摸等量的牌，若如此做，直到其下一回合结束，每当你使用卡牌指定其为目标时，其摸一张牌',
 		xueren:'血刃',
 		xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各流失一点体力，然后你摸两张牌',
 		maoxian:'冒险',

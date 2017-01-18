@@ -8337,11 +8337,21 @@
 					}
 					"step 2"
 					player.popup(cards[num].name);
-					var next=game.createEvent('lose_'+cards[num].name);
-					var info=get.info(cards[num]);
-					next.setContent(info.onLose);
-					next.player=player;
-					next.card=cards[num];
+                    var info=get.info(cards[num]);
+                    if(Array.isArray(info.onLose)){
+                        for(var i=0;i<info.onLose.length;i++){
+                            var next=game.createEvent('lose_'+cards[num].name);
+        					next.setContent(info.onLose[i]);
+        					next.player=player;
+        					next.card=cards[num];
+                        }
+                    }
+                    else{
+                        var next=game.createEvent('lose_'+cards[num].name);
+    					next.setContent(info.onLose);
+    					next.player=player;
+    					next.card=cards[num];
+                    }
 					game.delayx();
 					event.num++;
 					event.goto(1);
@@ -8700,10 +8710,20 @@
 					"step 2"
 					var info=get.info(card);
 					if(info.onEquip&&(!info.filterEquip||info.filterEquip(card,player))){
-						var next=game.createEvent('equip_'+card.name);
-						next.setContent(info.onEquip);
-						next.player=player;
-						next.card=card;
+                        if(Array.isArray(info.onEquip)){
+                            for(var i=0;i<info.onEquip.length;i++){
+                                var next=game.createEvent('equip_'+card.name);
+        						next.setContent(info.onEquip[i]);
+        						next.player=player;
+        						next.card=card;
+                            }
+                        }
+                        else{
+                            var next=game.createEvent('equip_'+card.name);
+    						next.setContent(info.onEquip);
+    						next.player=player;
+    						next.card=card;
+                        }
 						game.delayx();
 					}
 					delete player.equiping;
@@ -11059,8 +11079,8 @@
     						for(var i=1;i<targets.length;i++){
     							str+='、'+(targets[i]==this?'自己':get.translation(targets[i]));
     						}
-    						str+='</span>发动了【'+get.skillTranslation(name,this)+'】';
-							game.log(this,str);
+    						str+='</span>发动了';
+							game.log(this,str,'【'+get.skillTranslation(name,this)+'】');
 						}
 						else{
 							game.log(this,'发动了','【'+get.skillTranslation(name,this)+'】');
@@ -20236,8 +20256,9 @@
                             }
     						var value1=ai.get.value(card,target);
     						var value2=0;
-    						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card)
-    							value2=ai.get.value(target[get.subtype(card)],target);
+    						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card){
+                                value2=ai.get.value(target[get.subtype(card)],target);
+                            }
                             return Math.max(0,value1-value2);
     					});
                     }(i));
@@ -26102,7 +26123,20 @@
     										delete window.noname_source_list;
                                             if(Array.isArray(files)){
                                                 files.add('game/update.js');
-                                                updates=files;
+                                                var files2=[];
+                                                for(var i=0;i<files.length;i++){
+                                                    var str=files[i].indexOf('*');
+                                                    if(str!=-1){
+                                                        str=files[i].slice(0,str);
+                                                    }
+                                                    files.splice(i--,1);
+                                                    for(var j=0;j<updates.length;j++){
+                                                        if(updates[j].indexOf(str)==0){
+                                                            files2.push(updates[j]);
+                                                        }
+                                                    }
+                                                }
+                                                updates=files.concat(files2);
                                             }
                                             for(var i=0;i<updates.length;i++){
                                                 if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('style.css')==-1){
@@ -26181,10 +26215,24 @@
     								}
     								game.saveConfig('check_version',update.version);
     								if(update.version!=lib.version||lib.config.debug){
-                                        var files;
+                                        var files=null;
                                         var version=lib.version;
-                                        if(update.files&&update.files[version]){
-                                            files=update.files.global.concat(update.files[version]);
+                                        if(Array.isArray(update.files)&&update.minversion){
+                                            var version1=version.split('.');
+                                            var version2=update.minversion.split('.');
+                                            for(var i=0;i<version1.length&&i<version2.length;i++){
+                                                if(version2[i]>version1[i]){
+                                                    files=false;break;
+                                                }
+                                                else if(version1[i]>version2[i]){
+                                                    files=update.files.slice(0);break;
+                                                }
+                                            }
+                                            if(files===null){
+                                                if(version1.length>=version2.length){
+                                                    files=update.files.slice(0);
+                                                }
+                                            }
                                         }
                                         var str;
                                         if(lib.config.debug){

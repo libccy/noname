@@ -4551,6 +4551,9 @@ character.swd={
 		duanxing:{
 			trigger:{player:'equipEnd'},
 			direct:true,
+			filter:function(event){
+				return lib.inpile.contains(event.card.name);
+			},
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('duanxing'),function(card,player,target){
@@ -8754,7 +8757,7 @@ character.swd={
 		fengming:'凤鸣',
 		fengming_info:'出牌阶段限一次，你可以弃置一张装备牌，令一名角色恢复一点体力并摸一张牌',
 		duanxing:'锻星',
-		duanxing_info:'每当你装备一张装备牌，可以视为一名角色使用一张杀',
+		duanxing_info:'每当你装备一张未强化的装备牌，可以视为一名角色使用一张杀',
 		wanjun:'万钧',
 		wanjun_info:'你可以将一张装备牌当作南蛮入侵使用',
 		dunxing:'遁形',

@@ -1048,7 +1048,7 @@ character.yijiang={
 			},
 			content:function(){
 				'step 0'
-				target.chooseCard('he',[1,3],'匡弼：将1〜3张牌置于'+get.translation(player)+'的武将牌上',true).set('ai',function(card){
+				target.chooseCard('he',[1,3],'匡弼：将1~3张牌置于'+get.translation(player)+'的武将牌上',true).set('ai',function(card){
 					if(ai.get.attitude(_status.event.player,_status.event.getParent().player)>0){
 						return 7-ai.get.value(card);
 					}
@@ -3787,10 +3787,10 @@ character.yijiang={
 					event.target=target;
 					target.judge(function(card){
 						if(target.hp==target.maxHp){
-							if(get.color(card)=='red') return 0;
+							if(get.color(card)=='red') return -1;
 						}
-						if(get.color(card)=='red') return 1.5;
-						return 1;
+						if(get.color(card)=='red') return 1;
+						return 0;
 					});
 				}
 				else{

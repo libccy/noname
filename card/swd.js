@@ -492,6 +492,7 @@ card.swd={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
+			nomod:true,
 			ai:{
 				equipValue:7
 			},
@@ -1697,6 +1698,7 @@ card.swd={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
+			nomod:true,
 			skills:['yiluan'],
 			ai:{
 				basic:{

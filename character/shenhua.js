@@ -135,7 +135,7 @@ character.shenhua={
 						return num+player.storage.qimou;
 					}
 				},
-				attackFrom:function(from,to,distance){
+				globalFrom:function(from,to,distance){
 					if(typeof from.storage.qimou=='number'){
 						return distance-from.storage.qimou;
 					}
@@ -186,8 +186,8 @@ character.shenhua={
 			},
 			logTarget:'target',
 			filter:function(event,player){
-				if(event.target.num('h')<player.num('h')) return true;
-				if(event.target.hp<player.hp) return true;
+				if(event.target.num('h')<=player.num('h')) return true;
+				if(event.target.hp<=player.hp) return true;
 				return false;
 			},
 			content:function(){

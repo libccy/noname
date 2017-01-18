@@ -364,6 +364,11 @@ window.config={
 		// ['jiang','chongzhen'],
 		// ['fenji','yuling'],
 		['jiushi','guixin'],
+		['xiuhua','qiaoxie'],
+		['xiuhua','xuanfeng'],
+		['xiuhua','duanxing'],
+		['xiuhua','xiaoji'],
+		['xiuhua','xiaoji'],
 		// ['jiushi','jushou'],
 		// ['jiushi','kuiwei'],
 	]
