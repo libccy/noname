@@ -31,13 +31,83 @@ character.xianjian={
 		// pal_tangyurou:['male','wei',4,[]],
 		// pal_longyou:['male','wei',4,[]],
 		// pal_xiaoman:['male','wei',4,[]],
-		//
-		// pal_xiahoujinxuan:['male','wei',4,[]],
+
+		// pal_xiahoujinxuan:['male','shu',3,['lingyan','danqing']],
 		// pal_muchanglan:['male','wei',4,[]],
 		// pal_xia:['male','wei',4,[]],
 		// pal_jiangcheng:['male','wei',4,[]],
 	},
 	skill:{
+		lingyan:{
+			trigger:{player:'useCard'},
+			filter:function(event,player){
+				console.log(event.card.name);
+				return lib.skill.lingyan.filterx(event.card)&&event.target==player;
+			},
+			direct:true,
+			filterx:function(card){
+				if(!lib.inpile.contains(card.name)) return false;
+				var info=get.info(card);
+				if(info.type!='equip') return false;
+				if(info.nomod) return false;
+				return true;
+			},
+			group:'lingyan_lose',
+			content:function(){
+				'step 0'
+				var list=['equip1','equip2','equip3','equip4','equip5','cancelx'];
+				var list2=[];
+				var subtype=get.subtype(trigger.card);
+				list.remove(subtype);
+				for(var i=0;i<4;i++){
+					if(!player.get('e',subtype[5])){
+						list2.push(list[i]);
+					}
+				}
+				player.chooseControl(list,function(){
+					if(!player.get('e',subtype[5])) return 'cancelx';
+					return list2.randomGet();
+				}).prompt=get.prompt('灵砚：是否改变装备牌的位置？');
+				'step 1'
+				if(result.control!='cancelx'){
+					player.logSkill('lingyan');
+					var name=trigger.card.name+'_lingyan_'+result.control;
+					if(!lib.card[name]){
+						lib.card[name]=get.copy(get.info(trigger.card));
+						lib.card[name].subtype=result.control;
+						lib.card[name].vanish=true;
+						lib.card[name].epic=true;
+						lib.translate[name]=lib.translate[trigger.card.name];
+						lib.translate[name+'_info']=lib.translate[trigger.card.name+'_info'];
+					}
+					trigger.card.storage.lingyan=trigger.card.name;
+					trigger.card.init([trigger.card.suit,trigger.card.number,name,trigger.card.nature]);
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(lib.skill.lingyan.filterx(card)&&target.num('e')<5){
+							return [1,3];
+						}
+					}
+				}
+			}
+		},
+		lingyan_lose:{
+			trigger:{player:'loseEnd'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				for(var i=0;i<trigger.cards.length;i++){
+					var card=trigger.cards[i];
+					if(card.storage.lingyan){
+						card.init([card.suit,card.number,card.storage.lingyan,card.nature]);
+					}
+				}
+			}
+		},
 		sheling:{
 			trigger:{global:['useCardAfter','respondAfter','discardAfter']},
 			filter:function(event,player){
@@ -1925,6 +1995,10 @@ character.xianjian={
 		pal_changqing:'长卿',
 		pal_xuanxiao:'玄霄',
 
+		lingyan:'灵砚',
+		lingyan_info:'你可以将装备牌装备至装备区的任意位置',
+		danqing:'丹青',
+		danqing_info:'当你累计使用或打出了4张花色不同的牌后，你可以依次将以下4种效果分配给4名不同的角色：1. 摸两张牌；2. 获得一点护甲；3. 装备一件宝物；4. 获得潜行直到下一回合开始',
 		zhangmu:'障目',
 		zhangmu_info:'每回合限一次，当你需要使用或打出一张闪时，你可以展示一张闪，视为使用或打出了此闪',
 		feizhua:'飞爪',

@@ -8,6 +8,7 @@ window.noname_update={
         'game/game.js',
         'character/gujian.js',
         'character/swd.js',
+        'character/refresh.js',
         'character/hearth.js',
         'character/shenhua.js',
         'character/rank.js',

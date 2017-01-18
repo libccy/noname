@@ -424,18 +424,21 @@ character.refresh={
 			audio:2,
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
-				return (event.source!=undefined);
+				return (event.source!=undefined&&event.num>0);
 			},
 			check:function(event,player){
 				return (ai.get.attitude(player,event.source)<=0);
 			},
+			logTarget:'source',
 			content:function(){
 				"step 0"
+				event.num=trigger.num;
+				"step 1"
 				player.judge(function(card){
 					if(get.color(card)=='red') return 2;
 					return 1;
 				})
-				"step 1"
+				"step 2"
 				if(result.judge==1&&trigger.source.num('he')){
 					player.discardPlayerCard(trigger.source,'he',true);
 				}
@@ -443,6 +446,17 @@ character.refresh={
 					if(result.judge==2){
 						trigger.source.damage();
 					}
+				}
+				event.num--;
+				if(event.num>0){
+					player.chooseBool('是否继续发动？');
+				}
+				else{
+					event.finish();
+				}
+				"step 3"
+				if(result.bool){
+					event.goto(1);
 				}
 			},
 			ai:{

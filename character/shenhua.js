@@ -88,7 +88,7 @@ character.shenhua={
 					case '五':num=5;break;
 					case '六':num=6;break;
 				}
-				player.storage.qimou=num;
+				player.storage.qimou2=num;
 				player.loseHp(num);
 				player.addTempSkill('qimou2','phaseAfter');
 			},
@@ -127,17 +127,17 @@ character.shenhua={
 		},
 		qimou2:{
 			onremove:function(player){
-				delete player.storage.qimou;
+				delete player.storage.qimou2;
 			},
 			mod:{
 				cardUsable:function(card,player,num){
-					if(typeof player.storage.qimou=='number'&&card.name=='sha'){
-						return num+player.storage.qimou;
+					if(typeof player.storage.qimou2=='number'&&card.name=='sha'){
+						return num+player.storage.qimou2;
 					}
 				},
 				globalFrom:function(from,to,distance){
-					if(typeof from.storage.qimou=='number'){
-						return distance-from.storage.qimou;
+					if(typeof from.storage.qimou2=='number'){
+						return distance-from.storage.qimou2;
 					}
 				}
 			}
@@ -145,12 +145,14 @@ character.shenhua={
 		xinkuanggu:{
 			trigger:{source:'damageEnd'},
 			filter:function(event,player){
-				return get.distance(player,event.player)<=1;
+				return get.distance(player,event.player)<=1&&event.num>0;
 			},
 			direct:true,
 			audio:'kuanggu',
 			content:function(){
 				'step 0'
+				event.num=trigger.num;
+				'step 1'
 				var controls=['draw_card','cancel2'];
 				if(player.hp<player.maxHp) controls.unshift('recover_hp');
 				player.chooseControl(controls).set('prompt',get.prompt('xinkuanggu')).set('ai',function(event,player){
@@ -159,7 +161,7 @@ character.shenhua={
 					if(player.hp==2&&player.num('h')==0) return 'draw_card';
 					return 'recover_hp';
 				});
-				'step 1'
+				'step 2'
 				if(result.control!='cancel2'){
 					player.logSkill('xinkuanggu');
 					if(result.control=='draw_card'){
@@ -167,6 +169,10 @@ character.shenhua={
 					}
 					else{
 						player.recover();
+					}
+					event.num--;
+					if(event.num>0){
+						event.goto(1);
 					}
 				}
 			}

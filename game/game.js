@@ -28562,7 +28562,7 @@
 							node.node.hp.classList.add('text');
 						}
 						else{
-							for(var i =0;i<infoitem[2];i++){
+							for(var i=0;i<infoitem[2];i++){
 								ui.create.div('',node.node.hp);
 							}
 						}
