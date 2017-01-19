@@ -426,7 +426,6 @@ character.sp={
 			skillAnimation:true,
 			unique:true,
 			enable:'phaseUse',
-			mark:true,
 			zhuSkill:true,
 			filter:function(event,player){
 				if(!player.hasZhuSkill('shichou'))return false;
@@ -435,7 +434,10 @@ character.sp={
 			},
 			selectCard:2,
 			init:function(player){
-				player.storage.shichou=false;
+				if(player.hasZhuSkill('shichou')){
+					player.markSkill('shichou');
+					player.storage.shichou=false;
+				}
 			},
 			filterTarget:function(card,player,target){
 				return target.group=='shu'&&target!=player;
@@ -2735,6 +2737,7 @@ character.sp={
 			trigger:{player:'phaseDiscardBegin'},
 			direct:true,
 			filter:function(event,player){
+				if(!player.storage.xingwu_color) return false;
 				var length=player.storage.xingwu_color.length;
 				if(length==0) return false;
 				var hs=player.get('h');

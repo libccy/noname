@@ -1548,7 +1548,8 @@ card.swd={
 				},
 				basic:{
 					order:9,
-					useful:[5,1]
+					useful:[5,1],
+					value:5
 				},
 				result:{
 					target:function(player,target){
@@ -1609,7 +1610,8 @@ card.swd={
 				},
 				basic:{
 					order:9,
-					useful:1
+					useful:1,
+					value:5
 				},
 				result:{
 					target:function(player,target){
@@ -1861,6 +1863,7 @@ card.swd={
 			content:function(){
 				'step 0'
 				player.addSkill('shuchui2');
+				player.storage.shuchui2=0;
 				event.num=0;
 				'step 1'
 				var card=player.get('h','sha')[0];
@@ -1868,15 +1871,20 @@ card.swd={
 					player.useCard(card,target);
 				}
 				else{
+					if(player.storage.shuchui2){
+						player.draw(player.storage.shuchui2);
+					}
 					player.removeSkill('shuchui2');
 					event.finish();
 				}
 				'step 2'
-				event.num++;
-				if(event.num<3&&target.isAlive()){
+				if(event.num++<2&&target.isAlive()){
 					event.goto(1);
 				}
 				else{
+					if(player.storage.shuchui2){
+						player.draw(player.storage.shuchui2);
+					}
 					player.removeSkill('shuchui2');
 				}
 			},
@@ -1893,11 +1901,14 @@ card.swd={
 			trigger:{source:'damageEnd'},
 			forced:true,
 			popup:false,
+			onremove:function(player){
+				delete player.storage.shuchui2;
+			},
 			filter:function(event,player){
 				return event.card&&event.card.name=='sha';
 			},
 			content:function(){
-				player.draw();
+				player.storage.shuchui2++;
 			}
 		},
 		xuejibingbao:{
@@ -4281,7 +4292,7 @@ card.swd={
 		fengyinzhidan:'封印之蛋',
 		fengyinzhidan_info:'随机使用三张非延时锦囊牌（随机指定目标）',
 		shuchui:'鼠槌',
-		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的所有杀对该角色使用，杀每造成一次伤害你摸一张牌（最多使用3张杀）',
+		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，杀每造成一次伤害你摸一张牌',
 		zhiluxiaohu:'指路小狐',
 		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机敌方角色使用一张杀，然后摸一张牌',
 		xuejibingbao:'雪肌冰鲍',

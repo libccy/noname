@@ -170,7 +170,7 @@ character.ow={
             forced:true,
             popup:false,
             filter:function(event,player){
-                return event.card&&event.card.name=='sha'&&player.storage.paotai>0;
+                return player.storage.paotai>0;
             },
             content:function(){
                 player.storage.paotai--;
@@ -1785,7 +1785,7 @@ character.ow={
         luan2:{
             mark:true,
             intro:{
-                content:'受到的伤害+1，直到首次进入濒死状态'
+                content:'受到的伤害后流失一点体力，直到首次进入濒死状态'
             },
             trigger:{player:'damageEnd'},
             forced:true,
@@ -2604,7 +2604,7 @@ character.ow={
         zhongdun_info:'游戏开始时，你获得等同于游戏人数护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
         paotai:'炮台',
         paotai2:'炮台',
-        paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到杀造成的伤害，炮台降低一级',
+        paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到一次伤害，炮台降低一级',
         maoding:'铆钉',
         maoding2:'铆钉',
         maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌限阶段限一次，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',

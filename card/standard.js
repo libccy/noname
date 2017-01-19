@@ -633,7 +633,8 @@ card.standard={
 				},
 				basic:{
 					order:9,
-					useful:[5,1]
+					useful:[5,1],
+					value:5
 				},
 				result:{
 					target:function(player,target){
@@ -693,7 +694,8 @@ card.standard={
 				},
 				basic:{
 					order:9,
-					useful:1
+					useful:1,
+					value:5
 				},
 				result:{
 					target:function(player,target){

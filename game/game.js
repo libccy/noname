@@ -8713,6 +8713,9 @@
     					}
                     },get.subtype(card));
 					player.$equip(card);
+                    if(event.draw){
+                        player.$draw(card);
+                    }
 					game.addVideo('equip',player,get.cardInfo(card));
 					game.log(player,'装备了',card);
 					"step 2"
@@ -8735,6 +8738,10 @@
 						game.delayx();
 					}
 					delete player.equiping;
+                    "step 3"
+                    if(event.draw){
+                        game.delay();
+                    }
 				},
 				addJudge:function(){
 					"step 0"
@@ -10931,6 +10938,7 @@
 					next.card=card;
 					next.player=this;
 					next.setContent(lib.element.content.equip);
+                    return next;
 				},
 				addJudge:function(card,cards){
 					var next=game.createEvent('addJudge');
@@ -13377,15 +13385,24 @@
                     if(!lib.card[card[2]]){
                         lib.card[card[2]]={};
                     }
-                    if(lib.card[card[2]].epic){
+                    var info=lib.card[card[2]];
+                    if(this.name){
+                        this.classList.remove('epic');
+                        this.classList.remove('legend');
+                        var subtype=get.subtype(this);
+                        if(subtype){
+                            this.classList.remove(subtype);
+                        }
+                    }
+                    if(info.epic){
                         this.classList.add('epic');
                     }
-                    else if(lib.card[card[2]].legend){
+                    else if(info.legend){
                         this.classList.add('legend');
                     }
 					var bg=card[2];
-                    if(lib.card[card[2]].cardimage){
-                        bg=lib.card[card[2]].cardimage;
+                    if(info.cardimage){
+                        bg=info.cardimage;
                     }
 					var img=lib.card[bg].image;
                     if(img){
@@ -13466,38 +13483,38 @@
 						if(this.node.background.innerHTML.length>1) this.node.background.classList.add('tight');
 						else this.node.background.classList.remove('tight');
 					}
-					if(lib.card[card[2]].noname&&!this.classList.contains('button')){
+					if(info.noname&&!this.classList.contains('button')){
 						this.node.name.style.display='none';
 					}
-					if(lib.card[card[2]].color){
-						this.style.color=lib.card[card[2]].color;
+					if(info.color){
+						this.style.color=info.color;
 					}
-					else if(lib.card[card[2]].fullimage){
+					else if(info.fullimage){
 						this.style.color='white';
 					}
-					if(lib.card[card[2]].textShadow){
-						this.style.textShadow=lib.card[card[2]].textShadow;
+					if(info.textShadow){
+						this.style.textShadow=info.textShadow;
 					}
-					else if(lib.card[card[2]].fullimage){
+					else if(info.fullimage){
 						this.style.textShadow='black 0 0 2px';
 					}
-					if(lib.card[card[2]].opacity){
-						this.node.info.style.opacity=lib.card[card[2]].opacity;
-						this.node.name.style.opacity=lib.card[card[2]].opacity;
+					if(info.opacity){
+						this.node.info.style.opacity=info.opacity;
+						this.node.name.style.opacity=info.opacity;
 					}
-					else if(lib.card[card[2]].fullimage){
+					else if(info.fullimage){
 						this.node.info.style.opacity=1;
 						this.node.name.style.opacity=1;
 					}
-					if(lib.card[card[2]].modinfo){
-						this.node.info.innerHTML=lib.card[card[2]].modinfo;
+					if(info.modinfo){
+						this.node.info.innerHTML=info.modinfo;
 					}
 					else{
 						this.node.info.innerHTML=get.translation(card[0])+'<span> </span>'+card[1];
 					}
-					if(lib.card[card[2]].addinfo){
+					if(info.addinfo){
 						this.node.addinfo=ui.create.div('.range',this);
-						this.node.addinfo.innerHTML=lib.card[card[2]].addinfo;
+						this.node.addinfo.innerHTML=info.addinfo;
 					}
 					if(card[0]=='heart'||card[0]=='diamond'){
 						this.node.info.classList.add('red');
@@ -13537,13 +13554,13 @@
 						this.classList.remove(this.nature);
 						delete this.nature;
 					}
-					if(lib.card[card[2]].subtype) this.classList.add(lib.card[card[2]].subtype);
+					if(info.subtype) this.classList.add(info.subtype);
 					if(this.inits){
 						for(var i=0;i<lib.element.card.inits.length;i++){
 							lib.element.card.inits[i](this);
 						}
 					}
-					if(typeof lib.card[card[2]].init=='function') lib.card[card[2]].init();
+					if(typeof info.init=='function') info.init();
 
 					switch(get.subtype(this)){
 						case 'equip1':
@@ -13559,15 +13576,24 @@
 								this.node.range.innerHTML='范围: 1';
 							}
 							break;
-						case 'equip3':this.node.range.innerHTML='防御: '+lib.card[card[2]].distance.globalTo;this.node.name2.innerHTML+='+';break;
-						case 'equip4':this.node.range.innerHTML='进攻: '+(-lib.card[card[2]].distance.globalFrom);this.node.name2.innerHTML+='-';break;
+						case 'equip3':
+                        if(info.distance&&info.distance.globalTo){
+                            this.node.range.innerHTML='防御: '+info.distance.globalTo;
+                            this.node.name2.innerHTML+='+';
+                        }
+                        break;
+						case 'equip4':
+                        if(info.distance&&info.distance.globalFrom){
+                            this.node.range.innerHTML='进攻: '+(-info.distance.globalFrom);
+                            this.node.name2.innerHTML+='-';
+                        }
+                        break;
 					}
                     if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
                         this.cardid=get.id();
                         lib.cardOL[this.cardid]=this;
                     }
                     if(lib.config.game=='hs'){
-                        var info=lib.card[card[2]];
     					if(info.class!='neutral'){
     						this.node.name.dataset.careercolor=info.class;
     					}
@@ -31681,16 +31707,20 @@
         },
         inpile:function(type,filter){
             var list=[];
-            for(var i=0;i<lib.inpile.length;i++){
-                if(typeof filter=='function'&&!filter(lib.inpile[i])) continue;
-                if(type.indexOf('equip')==0&&type.length==6){
-                    if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
+            if(filter=='trick'){
+                for(var i=0;i<lib.inpile.length;i++){
+                    if(get.type(lib.inpile[i],'trick')==type) list.push(lib.inpile[i]);
                 }
-                else if(type.indexOf('hslingjian')==0&&type.length==11){
-                    if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
-                }
-                else{
-                    if(get.type(lib.inpile[i])==type) list.push(lib.inpile[i]);
+            }
+            else{
+                for(var i=0;i<lib.inpile.length;i++){
+                    if(typeof filter=='function'&&!filter(lib.inpile[i])) continue;
+                    if(type.indexOf('equip')==0&&type.length==6){
+                        if(get.subtype(lib.inpile[i])==type) list.push(lib.inpile[i]);
+                    }
+                    else{
+                        if(get.type(lib.inpile[i])==type) list.push(lib.inpile[i]);
+                    }
                 }
             }
             return list;

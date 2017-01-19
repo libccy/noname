@@ -6872,6 +6872,7 @@ character.yijiang={
 			filter:function(event){
 				return event.card&&event.card.name=='sha'&&event.player.isAlive();
 			},
+			logTarget:'player',
 			content:function(){
 				"step 0"
 				trigger.player.draw(Math.min(5,trigger.player.hp));
@@ -7866,6 +7867,6 @@ character.yijiang={
 		mingce_info:'出牌阶段，你可以交给任一其他角色一张装备牌或【杀】，该角色进行二选一：1. 视为对其攻击范围内的另一名由你指定的角色使用一张【杀】。2. 摸一张牌。每回合限一次。',
 		zhichi_info:'锁定技，你的回合外，你每受到一次伤害，任何【杀】或非延时类锦囊均对你无效，直到该回合结束。',
 		zhichi2_info:'智迟已发动',
-		pojun_info:'你每使用【杀】造成一次伤害，可令受到该伤害的角色多摸X张牌，X为改角色当前的体力值(X最多为5)，然后该角色将其武将牌翻面。',
+		pojun_info:'你每使用【杀】造成一次伤害，可令受到该伤害的角色多摸X张牌，X为该角色当前的体力值(X最多为5)，然后该角色将其武将牌翻面。',
 	},
 }

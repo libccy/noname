@@ -18,6 +18,7 @@ window.characterRank={
         'pal_liumengli',
     ],
     ap:[
+        'pal_xiahoujinxuan',
         'swd_huiyan',
         'hs_medivh',
         'ow_dva',
@@ -134,6 +135,7 @@ window.characterRank={
         'pal_wangpengxu',
         'yxs_luobinhan',
         'hs_alleria',
+        'pal_wenhui',
     ],
     am:[
         'swd_duanmeng',
