@@ -500,8 +500,9 @@ card.guozhan={
 				},
 				result:{
 					target:function(player,target){
-						if(target.num('h')<=1){
-							if(target==player){
+						var hs=target.get('h');
+						if(hs.length<=1){
+							if(target==player&&hs[0].name=='yiyi'){
 								return 0;
 							}
 							return 0.3;

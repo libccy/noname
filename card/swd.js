@@ -2933,16 +2933,17 @@ card.swd={
 				return 6-ai.get.value(card);
 			},
 			filterTarget:function(card,player,target){
-				return get.distance(player,target,'attack')<=1;
+				return target.num('h')<player.num('h');
 			},
 			content:function(){
 				'step 0'
 				var card=get.cards(0);
+				ui.discardPile.appendChild(card);
 				player.showCards('意乱',card);
 				event.bool=(get.color(card)=='black');
 				'step 1'
 				if(!event.bool){
-					target.draw();
+					// target.draw();
 				}
 				else{
 					var e5=player.get('e','5');
@@ -4539,9 +4540,9 @@ card.swd={
 		guangshatianyi_bg:'纱',
 		guangshatianyi_info:'锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
-		sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌，然后指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
+		sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌并指定一名手牌数少于你的角色，你亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束',
 		yiluan:'意乱',
-		yiluan_info:'出牌阶段限一次，你可以指定攻击范围内的一名角色并亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束；否则该角色摸一张牌',
+		yiluan_info:'出牌阶段限一次，你可以弃置一张牌并指定一名手牌数少于你的角色，你亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束',
 		donghuangzhong:'东皇钟',
 		xuanyuanjian:'轩辕剑',
 		xuanyuanjian2:'轩辕剑',

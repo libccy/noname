@@ -80,6 +80,7 @@ table{table-layout: fixed;}
 	text-align: center;
 	pointer-events: none;
 	display: block;
+	font-family: 'xinwei'
 }
 
 #shortcut{
@@ -580,6 +581,34 @@ table{table-layout: fixed;}
 	transform-origin: 2px 2px;
 	border-radius: 4px 23px 23px 4px/4px 4px 4px 4px;
 }
+#roundmenu.clock>div:nth-of-type(15){
+	width: 80%;
+	height: 80%;
+	left: 10%;
+	top: 10%;
+	border-radius: 100%;
+	margin: 0;
+	padding: 0;
+	z-index: -1;
+	opacity: 0;
+}
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(1),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(2),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(3),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(4),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(5),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(6),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(7),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(8),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(9),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(10),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(11),
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(12){
+	opacity: 0;
+}
+#roundmenu.clock[data-watchface="simple"]>div:nth-of-type(15){
+	opacity: 1;
+}
 
 #roundmenu:not(.clock)>div:nth-of-type(even){
 	width: 20px;
@@ -609,7 +638,8 @@ table{table-layout: fixed;}
 #roundmenu:not(.clock)>div:nth-of-type(11),
 #roundmenu:not(.clock)>div:nth-of-type(12),
 #roundmenu:not(.clock)>div:nth-of-type(13),
-#roundmenu:not(.clock)>div:nth-of-type(14){
+#roundmenu:not(.clock)>div:nth-of-type(14),
+#roundmenu:not(.clock)>div:nth-of-type(15){
 	opacity: 0;
 }
 

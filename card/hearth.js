@@ -213,7 +213,7 @@ card.hearth={
 					target.damage('thunder');
 				}
 				else{
-					target.addTempSkill('shandianjian2','phaseBegin');
+					target.addTempSkill('huogong2','phaseBegin');
 				}
 				game.addVideo('cardDialog',null,event.videoId);
 				event.dialog.close();
@@ -244,7 +244,7 @@ card.hearth={
 						return 0;
 					},
 					target:function(player,target){
-						if(target.hasSkill('shandianjian2')||target.num('h')==0) return 0;
+						if(target.hasSkill('huogong2')||target.num('h')==0) return 0;
 						if(player.num('h')<=1) return 0;
 						if(target==player){
 							if(typeof _status.event.filterCard=='function'&&
@@ -657,7 +657,6 @@ card.hearth={
 				}
 			}
 		},
-		shandianjian2:{},
 		jihuocard2:{
 			mod:{
 				maxHandcard:function(player,num){

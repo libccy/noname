@@ -104,3 +104,8 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 .brown{
 	color: rgb(195,161,223);
 }
+
+#roundmenu.clock>div:nth-of-type(15){
+	background: linear-gradient(#4b4b4b, #464646);
+	box-shadow: rgba(0,0,0,0.6) 0 0 5px inset;
+}

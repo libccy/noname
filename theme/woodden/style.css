@@ -194,3 +194,8 @@ html{
 .player .marks>div:first-child>div{
 	-webkit-filter: invert(0.8) sepia(1);
 }
+
+#roundmenu.clock>div:nth-of-type(15){
+	background: url('wood2.png');
+	box-shadow: rgba(0,0,0,0.5) 0 0 5px inset;
+}

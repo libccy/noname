@@ -133,3 +133,7 @@ body{
 .brown{
 	color: rgb(195,161,223);
 }
+#roundmenu.clock>div:nth-of-type(15){
+	background: rgba(0,0,0,0.3);
+	box-shadow: rgba(0,0,0,0.6) 0 0 5px inset;
+}

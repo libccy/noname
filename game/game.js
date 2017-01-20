@@ -908,6 +908,19 @@
 							}
 						}
 					},
+                    watchface:{
+                        name:'表盘样式',
+                        init:'none',
+                        unfrequent:true,
+                        item:{
+                            none:'默认',
+                            simple:'简约',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('watchface',item);
+                            ui.roundmenu.dataset.watchface=item;
+                        }
+                    },
 					show_card_prompt:{
 						name:'显示出牌提示',
 						init:true,
@@ -28120,9 +28133,12 @@
 				ui.create.div(ui.roundmenu);
 				ui.create.div(ui.roundmenu);
 
+                ui.create.div(ui.roundmenu);
+
                 if(lib.config.show_time2){
                     ui.roundmenu.classList.add('clock');
                 }
+                ui.roundmenu.dataset.watchface=lib.config.watchface||'none';
 
 				var resetround=function(e){
 					_status.draggingroundmenu=false;
@@ -28339,7 +28355,12 @@
                     var date=new Date();
                     var hours=date.getHours();
                     var minutes=date.getMinutes();
-                    ui.roundmenu.childNodes[13].style.transform='rotate('+get.round((hours+minutes/60+9)*30,2)+'deg)';
+                    if(lib.config.watchface=='simple'){
+                        ui.roundmenu.childNodes[13].style.transform='rotate('+get.round((hours+9)*30,2)+'deg)';
+                    }
+                    else{
+                        ui.roundmenu.childNodes[13].style.transform='rotate('+get.round((hours+minutes/60+9)*30,2)+'deg)';
+                    }
                     ui.roundmenu.childNodes[12].style.transform='rotate('+(minutes+45)*6+'deg)';
                     if(minutes<10){
                         minutes='0'+minutes.toString();
