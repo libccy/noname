@@ -30970,6 +30970,10 @@
 				}
 				layer.addEventListener(lib.config.touchscreen?'touchend':'click',clicklayer);
 				if(!lib.config.touchscreen) layer.oncontextmenu=clicklayer;
+                if(this.parentNode==ui.historybar&&lib.config.touchscreen){
+                    var rect=this.getBoundingClientRect();
+                    e={clientX:0,clientY:rect.top+30};
+                }
 				lib.placePoppedDialog(uiintro,e);
                 if(this.parentNode==ui.historybar){
                     if(lib.config.show_history=='right'){
