@@ -202,12 +202,10 @@
 					wuxie_self:{
 						name:'不无懈自己',
 						init:true,
-                        game:'sgs',
 					},
 					tao_enemy:{
 						name:'不对敌将使用桃',
 						init:false,
-                        game:'sgs',
 					},
 					touchscreen:{
 						name:'触屏模式',
@@ -286,7 +284,6 @@
 					show_splash:{
 						name:'显示开始界面',
 						init:false,
-                        game:'sgs',
 					},
 					game_speed:{
 						name:'游戏速度',
@@ -494,7 +491,6 @@
 					layout:{
 						name:'布局',
 						init:'mobile',
-                        game:'sgs',
 						item:{
 							default:'旧版',
 							newlayout:'对称',
@@ -519,7 +515,6 @@
                     textequip:{
                         name:'装备显示',
                         init:'image',
-                        game:'sgs',
                         item:{
                             image:'图片',
                             text:'文字',
@@ -676,7 +671,6 @@
 					card_style:{
 						name:'卡牌样式',
 						init:'default',
-                        game:'sgs',
 						item:{
 							default:'默认',
 							wood:'木纹',
@@ -715,7 +709,6 @@
 					hp_style:{
 						name:'体力条样式',
 						init:'default',
-                        game:'sgs',
 						item:{
 							default:'默认',
 							official:'勾玉',
@@ -764,7 +757,6 @@
 					show_log:{
 						name:'历史记录栏',
 						init:'off',
-                        game:'sgs',
 						unfrequent:true,
 						item:{
 							off:'关闭',
@@ -787,7 +779,6 @@
                     clear_log:{
                         name:'自动清除历史记录',
                         init:false,
-                        game:'sgs',
 						unfrequent:true,
                     },
 					log_highlight:{
@@ -799,7 +790,6 @@
 						name:'当前回合角色高亮',
 						unfrequent:true,
 						init:'yellow',
-                        game:'sgs',
 						item:{
 							none:'无',
 							yellow:'黄色',
@@ -822,7 +812,6 @@
                     mark_identity_style:{
                         name:'标记身份操作',
 						unfrequent:true,
-                        game:'sgs',
 						init:'menu',
 						item:{
 							menu:'菜单',
@@ -914,19 +903,16 @@
 					},
 					hide_card_prompt_basic:{
 						name:'隐藏基本牌提示',
-                        game:'sgs',
 						init:false,
 						unfrequent:true,
 					},
 					hide_card_prompt_equip:{
 						name:'隐藏装备牌提示',
-                        game:'sgs',
 						init:false,
 						unfrequent:true,
 					},
 					show_phase_prompt:{
 						name:'显示阶段提示',
-                        game:'sgs',
 						init:true,
 						unfrequent:true,
 					},
@@ -943,25 +929,21 @@
 					auto_popped_config:{
 						name:'自动弹出选项',
 						init:true,
-                        game:'sgs',
 						unfrequent:true,
 					},
 					auto_popped_history:{
 						name:'自动弹出历史',
 						init:false,
-                        game:'sgs',
 						unfrequent:true,
 					},
 					remember_dialog:{
 						name:'记住对话框位置',
 						init:false,
-                        game:'sgs',
 						unfrequent:true,
 					},
 					reset_dialog:{
 						name:'重置对话框位置',
 						clear:true,
-                        game:'sgs',
 						unfrequent:true,
 						onclick:function(){
 							if(ui.dialog){
@@ -1004,7 +986,6 @@
                     character_dialog_tool:{
                         name:'自由选将显示',
                         init:'最近',
-                        game:'sgs',
                         item:{
                             '收藏':'收藏',
                             '最近':'最近',
@@ -1016,7 +997,6 @@
                     recent_character_number:{
                         name:'最近使用武将',
                         init:'12',
-                        game:'sgs',
                         item:{
                             '6':'6',
                             '12':'12',
@@ -1028,13 +1008,11 @@
                     show_favourite:{
                         name:'显示添加收藏',
                         init:true,
-                        game:'sgs',
                         unfrequent:true
                     },
                     show_favourite_menu:{
                         name:'显示收藏菜单',
                         init:true,
-                        game:'sgs',
                         unfrequent:true
                     },
 					hide_card_image:{
@@ -1042,12 +1020,10 @@
 						init:false,
 						unfrequent:true,
 						restart:true,
-                        game:'sgs',
 					},
 					show_name:{
 						name:'显示武将名',
 						init:false,
-                        game:'sgs',
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_name',bool);
@@ -1080,7 +1056,6 @@
 					show_playerids:{
 						name:'显示身份按钮',
 						init:true,
-                        game:'sgs',
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_playerids',bool);
@@ -1137,7 +1112,6 @@
 					show_cardpile:{
 						name:'显示牌堆按钮',
 						init:true,
-                        game:'sgs',
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_cardpile',bool);
@@ -1152,7 +1126,6 @@
 					show_handcardbutton:{
 						name:'显示手牌按钮',
 						init:true,
-                        game:'sgs',
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_handcardbutton',bool);
@@ -1161,7 +1134,6 @@
 					show_wuxie:{
 						name:'显示不询问无懈',
 						init:false,
-                        game:'sgs',
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_wuxie',bool);
@@ -1176,7 +1148,6 @@
 					show_discardpile:{
 						name:'暂停时显示弃牌堆',
 						init:false,
-                        game:'sgs',
 						unfrequent:true,
 					},
 					title:{
@@ -1220,7 +1191,6 @@
 					jiu_effect:{
 						name:'喝酒效果',
 						init:true,
-                        game:'sgs',
 						unfrequent:true,
 					},
 					die_flip:{
@@ -1253,7 +1223,6 @@
                     link_style:{
                         name:'横置样式',
                         init:'rotate',
-                        game:'sgs',
                         unfrequent:true,
                         item:{
                             rotate:'横置',
@@ -1287,7 +1256,6 @@
 					},
 					identity_font:{
 						name:'身份字体',
-                        game:'sgs',
 						init:'huangcao',
 						unfrequent:true,
 						item:{},
@@ -1575,7 +1543,6 @@
 					},
 					reset_hiddenpack:{
 						name:'重置隐藏扩展包',
-                        game:'sgs',
 						onclick:function(){
 							if(this.innerHTML!='已重置'){
 								this.innerHTML='已重置'
@@ -1631,7 +1598,6 @@
 					},
 					trim_game:{
 						name:'隐藏非官方扩展包',
-                        game:'sgs',
 						onclick:function(){
 							if(this.innerHTML!='已隐藏'){
 								this.innerHTML='已隐藏';
