@@ -495,6 +495,7 @@
 							default:'旧版',
 							newlayout:'对称',
 							mobile:'默认',
+                            long:'手杀'
 						},
 						onclick:function(layout){
 							if(lib.config.layoutfixed.contains(lib.config.mode)&&layout=='default'){
@@ -818,7 +819,7 @@
 							if(bool){
 								ui.arena.classList.add('slim_player');
 							}
-							else{
+							else if(lib.config.layout!='long'){
 								ui.arena.classList.remove('slim_player');
 							}
 						}
@@ -4841,17 +4842,9 @@
 					}
                     if(lib.config.cardshape=='oblong'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
                         ui.arena.classList.add('oblongcard');
-                        if(game.me&&game.me.classList.contains('linked')){
-                            game.me.classList.remove('linked');
-                            game.me.classList.add('linked2');
-                        }
                     }
                     else{
                         ui.arena.classList.remove('oblongcard');
-                        if(game.me&&lib.config.link_style!='mark'&&game.me.classList.contains('linked2')){
-                            game.me.classList.remove('linked2');
-                            game.me.classList.add('linked');
-                        }
                     }
                     if(lib.config.textequip=='text'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
                         ui.arena.classList.add('textequip');
@@ -4866,6 +4859,26 @@
                     else{
                         ui.css.phone.href='';
                         ui.roundmenu.style.display='none';
+                    }
+                    for(var i=0;i<game.players.length;i++){
+                        if(get.is.linked2(game.players[i])){
+                            if(game.players[i].classList.contains('linked')){
+                                game.players[i].classList.remove('linked');
+                                game.players[i].classList.add('linked2');
+                            }
+                        }
+                        else{
+                            if(game.players[i].classList.contains('linked2')){
+                                game.players[i].classList.remove('linked2');
+                                game.players[i].classList.add('linked');
+                            }
+                        }
+                    }
+                    if(lib.config.slim_player||lib.config.layout=='long'){
+    					ui.arena.classList.add('slim_player');
+    				}
+                    else{
+                        ui.arena.classList.remove('slim_player');
                     }
 					setTimeout(function(){
 						ui.arena.show();
@@ -27990,7 +28003,7 @@
 				if(lib.config.low_performance){
 					ui.arena.classList.add('low_performance');
 				}
-				if(lib.config.slim_player){
+				if(lib.config.slim_player||lib.config.layout=='long'){
 					ui.arena.classList.add('slim_player');
 				}
 				if(lib.config.reduce_radius){
@@ -31491,7 +31504,13 @@
 	var get={
         is:{
             linked2:function(player){
-                return lib.config.link_style=='mark'||(player==game.me&&ui.arena.classList.contains('oblongcard'));
+                if(lib.config.link_style=='mark') return true;
+                if(player==game.me){
+                    return ui.arena.classList.contains('oblongcard');
+                }
+                else{
+                    return lib.config.layout=='long';
+                }
             },
             empty:function(obj){
                 for(var i in obj) return false;
