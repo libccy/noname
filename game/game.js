@@ -506,8 +506,16 @@
 							}
                             if(lib.config.cardshape=='oblong'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
                                 ui.arena.classList.add('oblongcard');
+                                if(game.me.classList.contains('linked')){
+                                    game.me.classList.remove('linked');
+                                    game.me.classList.add('linked2');
+                                }
                             }
                             else{
+                                if(game.me.classList.contains('linked2')){
+                                    game.me.classList.remove('linked2');
+                                    game.me.classList.add('linked');
+                                }
                                 ui.arena.classList.remove('oblongcard');
                             }
                             if(lib.config.textequip=='text'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
@@ -529,9 +537,17 @@
                             game.saveConfig('cardshape',item);
                             if(item=='oblong'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
                                 ui.arena.classList.add('oblongcard');
+                                if(game.me.classList.contains('linked')){
+                                    game.me.classList.remove('linked');
+                                    game.me.classList.add('linked2');
+                                }
                             }
                             else{
                                 ui.arena.classList.remove('oblongcard');
+                                if(game.me.classList.contains('linked2')){
+                                    game.me.classList.remove('linked2');
+                                    game.me.classList.add('linked');
+                                }
                             }
                         }
                     },
@@ -1235,6 +1251,7 @@
                         },
                         onclick:function(style){
                             for(var i=0;i<game.players.length;i++){
+                                if(ui.arena.classList.contains('oblongcard')&&game.players[i]==game.me) continue;
                                 if(game.players[i].isLinked()){
                                     if(style=='mark'){
                                         game.players[i].classList.add('linked2');
@@ -8826,7 +8843,7 @@
     					}
                     });
                     player.classList.remove('target');
-                    if(lib.config.link_style=='mark'){
+                    if(get.is.linked2(player)){
                         player.classList.toggle('linked2');
                     }
 					else{
@@ -8834,7 +8851,7 @@
                     }
                     game.broadcast(function(player,linked){
                         player.classList.remove('target');
-                        if(lib.config.link_style=='mark'){
+                        if(get.is.linked2(player)){
                             if(linked){
                                 player.classList.add('linked2');
                             }
@@ -11358,7 +11375,7 @@
 					}
 				},
                 addLink:function(){
-                    if(lib.config.link_style=='mark'){
+                    if(get.is.linked2(this)){
                         this.classList.add('linked2');
                     }
                     else{
@@ -11366,7 +11383,7 @@
                     }
                 },
                 removeLink:function(){
-                    if(lib.config.link_style=='mark'){
+                    if(get.is.linked2(this)){
                         this.classList.remove('linked2');
                     }
                     else{
@@ -11863,7 +11880,7 @@
                     return this.hp==this.maxHp;
                 },
 				isLinked:function(){
-                    if(lib.config.link_style=='mark'){
+                    if(get.is.linked2(this)){
                         return this.classList.contains('linked2');
                     }
 					return this.classList.contains('linked');
@@ -27929,7 +27946,7 @@
 
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
-				ui.arena=ui.create.div('#arena',ui.window);
+				ui.arena=ui.create.div('#arena.nome',ui.window);
 
 				if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
 					ui.arena.classList.add('mobile');
@@ -28708,6 +28725,7 @@
 				ui.me=ui.create.div('#me',ui.arena).animate('start');
 				ui.handcards1Container=ui.create.div('#handcards1',ui.me);
 				ui.handcards2Container=ui.create.div('#handcards2',ui.me);
+                ui.arena.classList.remove('nome');
 				if(lib.config.mousewheel&&!lib.config.touchscreen){
 					ui.handcards1Container.onmousewheel=ui.click.mousewheel;
 					ui.handcards2Container.onmousewheel=ui.click.mousewheel;
@@ -31447,6 +31465,9 @@
 	};
 	var get={
         is:{
+            linked2:function(player){
+                return lib.config.link_style=='mark'||(player==game.me&&ui.arena.classList.contains('oblongcard'));
+            },
             empty:function(obj){
                 for(var i in obj) return false;
                 return true;

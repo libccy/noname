@@ -5,6 +5,14 @@
 #arena{
     height: calc(95% + 20px);
 }
+#arena.oblongcard:not(.chess):not(.nome){
+    height: 95%;
+}
+#arena.oblongcard:not(.chess):not(.nome) #me,
+#arena.oblongcard:not(.chess):not(.nome) #mebg{
+    height: 140px;
+    bottom: 10px;
+}
 #historybar{
     height: calc(95% - 160px);
 }
@@ -101,6 +109,9 @@
     border-radius: 0 !important;
     pointer-events: none;
 }
+#arena.oblongcard:not(.chess) .player[data-position='0']{
+    height: 144px;
+}
 
 #arena:not(.chess) .player[data-position='0'].linked>.damage{
 	transform:scale(0.7) rotate(0);
@@ -115,7 +126,7 @@
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.avatar2,
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.equips{
     width:120px;
-    height:120px;
+    height:100%;
     border-radius:0px !important;
     top:0;
     left:0;
