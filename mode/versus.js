@@ -1381,7 +1381,7 @@ mode.versus={
 					game.players[i].node.action.innerHTML='行动';
 				}
 				if(lib.storage.single_control&&lib.storage.control_all&&game.players.length>=4){
-					ui.arena.dataset.number=parseInt(ui.arena.dataset.number)+1;
+					ui.arena.setNumber(parseInt(ui.arena.dataset.number)+1);
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].dataset.position=parseInt(game.players[i].dataset.position)+1;
 					}

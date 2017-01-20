@@ -130,7 +130,7 @@ mode.boss={
 		lib.translate.boss_pangtong='涅槃凤雏';
 		ui.create.cards();
 		game.finishCards();
-		ui.arena.dataset.number=8;
+		ui.arena.setNumber(8);
 		ui.control.style.transitionProperty='opacity';
 		ui.control.classList.add('bosslist');
 		setTimeout(function(){

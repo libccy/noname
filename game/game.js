@@ -1180,6 +1180,24 @@
 						name:'技能特效',
 						init:true,
 					},
+                    fewplayer:{
+                        name:'手杀布局启用人数',
+                        init:'3',
+                        unfrequent:true,
+                        item:{
+                            '2':'两人',
+                            '3':'三人',
+                            '4':'四人',
+                            '5':'五人',
+                            '6':'六人',
+                            '7':'七人',
+                            '8':'八人',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('fewplayer',item);
+                            if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
+                        }
+                    },
 					target_shake:{
 						name:'目标特效',
 						init:'off',
@@ -1384,6 +1402,12 @@
                         }
                         else{
                             map.show_handcardbutton.hide();
+                        }
+                        if(lib.config.layout=='long'){
+                            map.fewplayer.show();
+                        }
+                        else{
+                            map.fewplayer.hide();
                         }
 						// if(config.theme=='woodden'&&config.image_background=='default'){
 						// 	map.background_color_wood.show();
@@ -15524,7 +15548,7 @@
                                 ui.arena.classList.add('observe');
                             }
                         }
-                        ui.arena.dataset.number=state.number;
+                        ui.arena.setNumber(state.number);
                         _status.mode=state.mode;
                         var pos=state.players[observe||game.onlineID].position;
                         for(var i in state.players){
@@ -16840,7 +16864,7 @@
 				if(lib.config.mode=='versus'){
 					players.bool=players.pop();
 				}
-				ui.arena.dataset.number=players.length;
+                ui.arena.setNumber(players.length);
 				ui.arena.classList.add('video');
 				game.players.length=0;
 				game.dead.length=0;
@@ -16852,7 +16876,7 @@
 				ui.handcards2Container.appendChild(ui.handcards2);
 				if(lib.config.mode=='versus'){
 					if(players.bool){
-						ui.arena.dataset.number=parseInt(ui.arena.dataset.number)+1;
+                        ui.arena.setNumber(parseInt(ui.arena.dataset.number)+1);
 						for(var i=0;i<game.players.length;i++){
 							game.players[i].dataset.position=parseInt(game.players[i].dataset.position)+1;
 						}
@@ -16870,7 +16894,7 @@
 						ui.arena.classList.add('single-handcard');
 						ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
 					}
-					ui.arena.dataset.number=8;
+                    ui.arena.setNumber(8);
 				}
 				ui.updatehl();
 				for(var i=0;i<players.length;i++){
@@ -20751,7 +20775,7 @@
 				position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
 			}
 			var players=game.players.concat(game.dead);
-			ui.arena.dataset.number=players.length+1;
+            ui.arena.setNumber(players.length+1);
 			for(var i=0;i<players.length;i++){
 				if(parseInt(players[i].dataset.position)>=position){
 					players[i].dataset.position=parseInt(players[i].dataset.position)+1;
@@ -20780,7 +20804,7 @@
 				position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
 			}
 			var players=game.players.concat(game.dead);
-			ui.arena.dataset.number=players.length+1;
+			ui.arena.setNumber(players.length+1);
 			for(var i=0;i<players.length;i++){
 				if(parseInt(players[i].dataset.position)>=position){
 					players[i].dataset.position=parseInt(players[i].dataset.position)+1;
@@ -20814,7 +20838,7 @@
 			player.delete();
 			game.players.remove(player);
 			game.dead.remove(player);
-			ui.arena.dataset.number=players.length-1;
+			ui.arena.setNumber(players.length-1);
 			player.removed=true;
 			if(player==game.me){
 				ui.me.hide();
@@ -27993,6 +28017,15 @@
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.window);
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena.nome',ui.window);
+                ui.arena.setNumber=function(num){
+                    this.dataset.number=num;
+                    if(parseInt(num)<parseInt(lib.config.fewplayer)){
+                        this.classList.add('fewplayer');
+                    }
+                    else{
+                        this.classList.remove('fewplayer');
+                    }
+                }
 
 				if(lib.config.layout=='mobile'||lib.config.layout=='long'){
 					ui.arena.classList.add('mobile');
@@ -28763,7 +28796,7 @@
 				players[0].previousSeat=players[players.length-1];
 				players[players.length-1].next=players[0];
 				players[players.length-1].nextSeat=players[0];
-				ui.arena.dataset.number=num;
+				ui.arena.setNumber(num);
 				return players;
 			},
 			me:function(hasme){

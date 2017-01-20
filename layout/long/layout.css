@@ -1,129 +1,91 @@
 @import "../mobile/layout.css";
-#arena:not(.stone)>.player:not(.minskin):not(*[data-position='0']){
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0']){
     width: 120px !important;
     height: 220px !important;
 }
-#arena:not(.stone)>.player:not(.minskin):not(*[data-position='0'])>.avatar,
-#arena:not(.stone)>.player:not(.minskin):not(*[data-position='0'])>.avatar2{
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.equips{
+    transform: scale(0.8);
+    transform-origin: bottom left;
+}
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.avatar,
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.avatar2{
     width: 106px !important;
     height: 206px !important;
     background-position: 50% !important;
 }
-#arena:not(.stone)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar,
-#arena:not(.stone)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
+#arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar,
+#arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
     height: 103px !important;
     background-position: 0 0 !important;
     border-radius: 8px !important;
 }
-#window.reduce_radius #arena:not(.stone)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar,
-#window.reduce_radius #arena:not(.stone)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
+#window.reduce_radius #arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar,
+#window.reduce_radius #arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
     border-radius: 4px !important;
 }
-#arena:not(.stone)>.player.fullskin2:not(.minskin):not(.unseen2):not(*[data-position='0'])>.avatar{
+#arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(.unseen2):not(*[data-position='0'])>.avatar{
     border-radius: 8px 8px 0 0 !important;
-    height: 125px !important;
-    -webkit-clip-path: polygon(-10px -10px, 116px -10px, 116px 103px, 106px 103px, 0px 125px, -10px 125px);
+    height: 124px !important;
+    -webkit-clip-path: polygon(-10px -10px, 116px -10px, 116px 92px, 106px 92px, 0px 114px, -10px 114px);
 }
-#window.reduce_radius #arena:not(.stone)>.player.fullskin2:not(.minskin):not(.unseen2):not(*[data-position='0'])>.avatar{
+#window.reduce_radius #arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(.unseen2):not(*[data-position='0'])>.avatar{
     border-radius: 4px 4px 0 0 !important;
 }
-#arena:not(.stone)>.player.fullskin2:not(.minskin):not(.unseen):not(*[data-position='0'])>.avatar2{
+#arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(.unseen):not(*[data-position='0'])>.avatar2{
     border-radius: 0 0 8px 8px !important;
-    top: 100px !important;
-    height: 113px !important;
+    top: 89px !important;
+    height: 124px !important;
     background-position: 0 10px !important;
     -webkit-clip-path: polygon(-10px 32px, 0 32px, 106px 10px, 116px 10px, 116px 125px, -10px 125px);
 }
-#window.reduce_radius #arena:not(.stone)>.player.fullskin2:not(.minskin):not(.unseen):not(*[data-position='0'])>.avatar2{
+#window.reduce_radius #arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(.unseen):not(*[data-position='0'])>.avatar2{
     border-radius: 0 0 4px 4px !important;
 }
-#arena:not(.stone)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
+#arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
     top: 110px !important;
 }
-#arena:not(.stone)>.player:not(.minskin):not(*[data-position='0'])>.identity{
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.identity{
     left: 102px;
 }
-#arena:not(.stone)>.player:not(.minskin):not(*[data-position='0'])>.hp{
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.hp:not(.actcount){
     left: 93px;
 }
-#arena:not(.stone)>.player:not(.minskin):not(*[data-position='0'])>.hp.text{
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.hp:not(.actcount).text{
     left: 89px;
 }
 
 /*--------位置(8人)------*/
-[data-number='8']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
-[data-number='8']>.player[data-position='2']{top:calc(60% / 3 - 108px);left:calc(500% / 6 - 100px);}
-[data-number='8']>.player[data-position='3']{top:0;left:calc(400% / 6 - 80px);}
-[data-number='8']>.player[data-position='4']{top:0;left:calc(300% / 6 - 60px);}
-[data-number='8']>.player[data-position='5']{top:0;left:calc(200% / 6 - 40px);}
-[data-number='8']>.player[data-position='6']{top:calc(60% / 3 - 108px);left:calc(100% / 6 - 20px);}
-[data-number='8']>.player[data-position='7']{top:calc(200% / 3 - 340px);left:0;}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='2']{top:calc(60% / 3 - 108px);left:calc(500% / 6 - 100px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='3']{top:0;left:calc(400% / 6 - 80px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='4']{top:0;left:calc(300% / 6 - 60px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='5']{top:0;left:calc(200% / 6 - 40px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='6']{top:calc(60% / 3 - 108px);left:calc(100% / 6 - 20px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='7']{top:calc(200% / 3 - 340px);left:0;}
 /*--------位置(7人)------*/
-[data-number='7']>.player[data-position='1']{top:calc(200% / 3 - 160px);left:calc(100% - 150px);}
-[data-number='7']>.player[data-position='2']{top:calc(100% / 3 - 170px);left:calc(100% - 150px);}
-[data-number='7']>.player[data-position='3']{top:0;left:calc(62.5% - 75px);}
-[data-number='7']>.player[data-position='4']{top:0;left:calc(37.5% - 75px);}
-[data-number='7']>.player[data-position='5']{top:calc(100% / 3 - 170px);left:0;}
-[data-number='7']>.player[data-position='6']{top:calc(200% / 3 - 160px);left:0;}
-[data-number='7']>.card[data-position='1']{top:calc(200% / 3 - 122px);left:calc(100% - 127px);}
-[data-number='7']>.card[data-position='2']{top:calc(100% / 3 - 132px);left:calc(100% - 127px);}
-[data-number='7']>.card[data-position='3']{top:38px;left:calc(62.5% - 52px);}
-[data-number='7']>.card[data-position='4']{top:38px;left:calc(37.5% - 52px);}
-[data-number='7']>.card[data-position='5']{top:calc(100% / 3 - 132px);left:23px;}
-[data-number='7']>.card[data-position='6']{top:calc(200% / 3 - 122px);left:23px;}
-[data-number='7']>.popup[data-position='1']{top:calc(200% / 3 - 150px);left:calc(100% - 186px);}
-[data-number='7']>.popup[data-position='2']{top:calc(100% / 3 - 160px);left:calc(100% - 186px);}
-[data-number='7']>.popup[data-position='3']{top:190px;left:calc(62.5% + 48px);}
-[data-number='7']>.popup[data-position='4']{top:190px;left:calc(37.5% - 75px);}
-[data-number='7']>.popup[data-position='5']{top:calc(100% / 3 - 160px);left:160px;}
-[data-number='7']>.popup[data-position='6']{top:calc(200% / 3 - 150px);left:160px;}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='2']{top:calc(60% / 3 - 108px);left:calc(80% - 96px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='3']{top:0;left:calc(60% - 72px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='4']{top:0;left:calc(40% - 48px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='5']{top:calc(60% / 3 - 108px);left:calc(20% - 24px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='6']{top:calc(200% / 3 - 340px);left:0;}
 /*--------位置(6人)------*/
-[data-number='6']>.player[data-position='1']{top:calc(200% / 3 - 160px);left:calc(100% - 150px);}
-[data-number='6']>.player[data-position='2']{top:calc(100% / 3 - 170px);left:calc(100% - 150px);}
-[data-number='6']>.player[data-position='3']{top:0;left:calc(50% - 75px);}
-[data-number='6']>.player[data-position='4']{top:calc(100% / 3 - 170px);left:0;}
-[data-number='6']>.player[data-position='5']{top:calc(200% / 3 - 160px);left:0;}
-[data-number='6']>.card[data-position='1']{top:calc(200% / 3 - 122px);left:calc(100% - 127px);}
-[data-number='6']>.card[data-position='2']{top:calc(100% / 3 - 132px);left:calc(100% - 127px);}
-[data-number='6']>.card[data-position='3']{top:38px;left:calc(50% - 52px);}
-[data-number='6']>.card[data-position='4']{top:calc(100% / 3 - 132px);left:23px;}
-[data-number='6']>.card[data-position='5']{top:calc(200% / 3 - 122px);left:23px;}
-[data-number='6']>.popup[data-position='1']{top:calc(200% / 3 - 150px);left:calc(100% - 186px);}
-[data-number='6']>.popup[data-position='2']{top:calc(100% / 3 - 160px);left:calc(100% - 186px);}
-[data-number='6']>.popup[data-position='3']{top:190px;left:calc(50% - 61px);}
-[data-number='6']>.popup[data-position='4']{top:calc(100% / 3 - 160px);left:160px;}
-[data-number='6']>.popup[data-position='5']{top:calc(200% / 3 - 150px);left:160px;}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='2']{top:calc(60% / 3 - 108px);left:calc(75% - 90px);}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='3']{top:0;left:calc(50% - 60px);}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='4']{top:calc(60% / 3 - 108px);left:calc(25% - 30px);}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='5']{top:calc(200% / 3 - 340px);left:0;}
 /*--------位置(5人)------*/
-[data-number='5']>.player[data-position='1']{top:calc(200% / 3 - 220px);left:calc(100% - 150px);}
-[data-number='5']>.player[data-position='2']{top:0;left:calc(200% / 3 - 50px);}
-[data-number='5']>.player[data-position='3']{top:0;left:calc(100% / 3 - 100px);}
-[data-number='5']>.player[data-position='4']{top:calc(200% / 3 - 220px);left:0;}
-[data-number='5']>.card[data-position='1']{top:calc(150% / 3 - 65px);left:calc(100% - 127px);}
-[data-number='5']>.card[data-position='2']{top:38px;left:calc(200% / 3 - 27px);}
-[data-number='5']>.card[data-position='3']{top:38px;left:calc(100% / 3 - 77px);}
-[data-number='5']>.card[data-position='4']{top:calc(150% / 3 - 65px);left:23px;}
-[data-number='5']>.popup[data-position='1']{top:calc(200% / 3 - 210px);left:calc(100% - 186px);}
-[data-number='5']>.popup[data-position='2']{top:190px;left:calc(200% / 3 + 73px);}
-[data-number='5']>.popup[data-position='3']{top:190px;left:calc(100% / 3 - 100px);}
-[data-number='5']>.popup[data-position='4']{top:calc(200% / 3 - 210px);left:160px;}
+#arena:not(.fewplayer)[data-number='5']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='5']>.player[data-position='2']{top:0;left:calc(200% / 3 - 80px);}
+#arena:not(.fewplayer)[data-number='5']>.player[data-position='3']{top:0;left:calc(100% / 3 - 40px);}
+#arena:not(.fewplayer)[data-number='5']>.player[data-position='4']{top:calc(200% / 3 - 340px);left:0;}
 /*--------位置(4人)------*/
-[data-number='4']>.player[data-position='1']{top:calc(100% / 3 - 40px);left:calc(100% - 150px);}
-[data-number='4']>.player[data-position='2']{top:0;left:calc(50% - 75px);}
-[data-number='4']>.player[data-position='3']{top:calc(100% / 3 - 40px);left:0;}
-[data-number='4']>.card[data-position='1']{top:calc(100% / 3 - 2px);left:calc(100% - 127px);}
-[data-number='4']>.card[data-position='2']{top:38px;left:calc(50% - 52px);}
-[data-number='4']>.card[data-position='3']{top:calc(100% / 3 - 2px);left:23px;}
-[data-number='4']>.popup[data-position='1']{top:calc(100% / 3 - 30px);left:calc(100% - 186px);}
-[data-number='4']>.popup[data-position='2']{top:190px;left:calc(50% - 61px);}
-[data-number='4']>.popup[data-position='3']{top:calc(100% / 3 - 30px);left:160px;}
+#arena:not(.fewplayer)[data-number='4']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='4']>.player[data-position='2']{top:0;left:calc(50% - 60px);}
+#arena:not(.fewplayer)[data-number='4']>.player[data-position='3']{top:calc(200% / 3 - 340px);left:0;}
 /*--------位置(3人)------*/
-[data-number='3']>.player[data-position='1']{top:20px;left:calc(75% + 30px);}
-[data-number='3']>.player[data-position='2']{top:20px;left:calc(25% - 180px);}
-[data-number='3']>.card[data-position='1']{top:58px;left:calc(75% + 53px);}
-[data-number='3']>.card[data-position='2']{top:58px;left:calc(25% - 157px);}
-[data-number='3']>.popup[data-position='1']{top:210px;left:calc(75% + 153px);}
-[data-number='3']>.popup[data-position='2']{top:210px;left:calc(25% - 180px);}
+#arena:not(.fewplayer)[data-number='3']>.player[data-position='1']{top:calc(60% / 3 - 88px);left:calc(75% + 80px);}
+#arena:not(.fewplayer)[data-number='3']>.player[data-position='2']{top:calc(60% / 3 - 88px);left:calc(25% - 200px);}
 /*--------位置(2人)------*/
-[data-number='2']>.player[data-position='1']{top:0;left:calc(50% - 75px);}
-[data-number='2']>.card[data-position='1']{top:0;left:calc(50% - 52px);}
-[data-number='2']>.popup[data-position='1']{top:190px;left:calc(50% - 61px);}
+#arena:not(.fewplayer)[data-number='2']>.player[data-position='1']{top:0;left:calc(50% - 60px);}
