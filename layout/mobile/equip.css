@@ -114,6 +114,9 @@
 	display:block;
 	margin-left:5px;
 }
+#arena.oblongcard:not(.chess).textequip .player[data-position='0'] .equips>.card>.name2{
+	line-height: 29px;
+}
 #arena:not(.chess).textequip .player[data-position='0'] .equips>.card>div,
 .player:not([data-position='0']) .equips>.card>div,
 #arena.chess .player .equips>.card>div{

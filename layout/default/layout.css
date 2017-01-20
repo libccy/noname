@@ -1209,16 +1209,16 @@ margin-bottom: 5px;
 .equips>.equip5{top: calc(50% - 21px);left:calc(50% - 21px);border-radius: 21px;z-index: 1}
 .equips>div>div:not(.image),.judges>div>div:not(.image),.marks>div>div:not(.image){display: none;}
 .equips>div>.image,.judges>div>.image,.marks>div>.image{width:120%;height:120%;left:-20%;top:-20%;}
-.equips>div:hover>.info{display: inline-block;
+/*.equips>div:hover>.info{display: inline-block;
 	animation:equip_hover 1s;
 	-webkit-animation:equip_hover 1s;
-	left: 0;right: auto;width: 42px;text-align: center;}
-.equips>div:hover>.background {
+	left: 0;right: auto;width: 42px;text-align: center;}*/
+/*.equips>div:hover>.background {
 	animation:equip_hover2 1s;
 	animation-fill-mode: forwards;
 	-webkit-animation:equip_hover2 1s;
 	-webkit-animation-fill-mode: forwards;
-}
+}*/
 .judges{height: 24px;left: 14px;top: -18px;}
 .marks{height: 24px;left: 14px;top: 112px;}
 .player>.marks{z-index: 4}

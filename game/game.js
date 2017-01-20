@@ -5241,7 +5241,7 @@
 			ge:function(target){
                 if(target){
                     cheat.gx('zhuge',target);
-    				cheat.gx('qilin',target);
+    				cheat.gx('qinglong',target);
     				cheat.gx('bagua',target);
     				cheat.gx('dilu',target);
     				cheat.gx('chitu',target);
@@ -5249,7 +5249,7 @@
                 }
                 else{
                     cheat.g('zhuge');
-    				cheat.g('qilin');
+    				cheat.g('qinglong');
     				cheat.g('bagua');
     				cheat.g('dilu');
     				cheat.g('chitu');

@@ -91,7 +91,7 @@ html{
 #arena:not(.chess).textequip .player[data-position='0'] .equips>.card{
 	background: url('wood.jpg') !important;
 	color:rgb(77, 60, 51) !important;
-	text-shadow: none;
+	text-shadow: none !important;
 	box-shadow: rgba(0,0,0,0.4) 1px 0 0 1px;
 }
 #arena:not(.chess).textequip .player[data-position='0'] .equips>.card:first-child{
