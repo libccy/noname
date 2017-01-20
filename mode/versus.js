@@ -1094,14 +1094,14 @@ mode.versus={
 					game.resume();
 				};
 				ui.control.style.transition='all 0s';
-				if(lib.config.layout=='mobile'){
-					ui.control.style.top='calc(100% - 70px)';
-				}
-				else if(lib.config.layout=='phone'){
+				if(lib.isPhoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
 				}
-				else{
+				else if(lib.config.layout=='newlayout'){
 					ui.control.style.top='calc(100% - 30px)';
+				}
+				else{
+					ui.control.style.top='calc(100% - 70px)';
 				}
 				_status.friend=[];
 				_status.enemy=[];

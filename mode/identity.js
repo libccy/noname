@@ -65,19 +65,21 @@ mode.identity={
 				ui.create.control('继续',step2);
 			}
 			var step2=function(){
-				if(lib.config.layout!='phone'){
+				if(!lib.config.phonelayout){
 					clear();
 					ui.create.dialog('如果你在使用手机，可能会觉得按钮有点小'+
 					'，将布局改成移动可以使按钮变大');
 					ui.dialog.add('<div class="text center">你可以在选项-外观-布局中更改此设置');
 					var lcontrol=ui.create.control('使用移动布局',function(){
-						if(lib.config.layout=='phone'){
+						if(lib.config.phonelayout){
 							ui.control.firstChild.firstChild.innerHTML='使用移动布局';
+							game.saveConfig('phonelayout',false);
 							lib.init.layout('mobile');
 						}
 						else{
 							ui.control.firstChild.firstChild.innerHTML='使用默认布局';
-							lib.init.layout('phone');
+							game.saveConfig('phonelayout',true);
+							lib.init.layout('mobile');
 						}
 					});
 					ui.create.control('继续',step3);

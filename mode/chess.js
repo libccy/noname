@@ -1887,14 +1887,14 @@ mode.chess={
 				delete window.characterRank;
 
 				ui.control.style.transition='all 0s';
-				if(lib.config.layout=='mobile'||lib.config.layout=='default'){
-					ui.control.style.top='calc(100% - 70px)';
-				}
-				else if(lib.config.layout=='phone'){
+				if(lib.isPhoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
 				}
-				else{
+				else if(lib.config.layout=='newlayout'){
 					ui.control.style.top='calc(100% - 30px)';
+				}
+				else{
+					ui.control.style.top='calc(100% - 70px)';
 				}
 				var cardNode=function(i,name,load){
 					var node=ui.create.player(ui.window);
@@ -3433,14 +3433,15 @@ mode.chess={
 					jiange.childNodes[i].classList.add('squarebutton');
 				}
 				ui.control.style.transition='all 0s';
-				if(lib.config.layout=='mobile'||lib.config.layout=='default'){
-					ui.control.style.top='calc(100% - 70px)';
-				}
-				else if(lib.config.layout=='phone'){
+
+				if(lib.isPhoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
 				}
-				else{
+				else if(lib.config.layout=='newlayout'){
 					ui.control.style.top='calc(100% - 30px)';
+				}
+				else{
+					ui.control.style.top='calc(100% - 70px)';
 				}
 
 				var next=game.me.chooseButton(dialog,true);

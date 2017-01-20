@@ -455,7 +455,7 @@
 							map.enable_dragline.hide();
 							map.enable_touchdragline.hide();
 						}
-						if(lib.config.layout!='phone'){
+						if(!lib.isPhoneLayout()){
 							map.round_menu_func.hide();
 						}
 						else{
@@ -495,7 +495,6 @@
 							default:'旧版',
 							newlayout:'对称',
 							mobile:'默认',
-							phone:'移动'
 						},
 						onclick:function(layout){
 							if(lib.config.layoutfixed.contains(lib.config.mode)&&layout=='default'){
@@ -504,70 +503,8 @@
 							else{
 								lib.init.layout(layout);
 							}
-                            if(lib.config.cardshape=='oblong'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
-                                ui.arena.classList.add('oblongcard');
-                                if(game.me.classList.contains('linked')){
-                                    game.me.classList.remove('linked');
-                                    game.me.classList.add('linked2');
-                                }
-                            }
-                            else{
-                                if(game.me.classList.contains('linked2')){
-                                    game.me.classList.remove('linked2');
-                                    game.me.classList.add('linked');
-                                }
-                                ui.arena.classList.remove('oblongcard');
-                            }
-                            if(lib.config.textequip=='text'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
-                                ui.arena.classList.add('textequip');
-                            }
-                            else{
-                                ui.arena.classList.remove('textequip');
-                            }
 						}
 					},
-                    cardshape:{
-                        name:'手牌显示',
-                        init:'default',
-                        item:{
-                            default:'默认',
-                            oblong:'长方',
-                        },
-                        onclick:function(item){
-                            game.saveConfig('cardshape',item);
-                            if(item=='oblong'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
-                                ui.arena.classList.add('oblongcard');
-                                if(game.me.classList.contains('linked')){
-                                    game.me.classList.remove('linked');
-                                    game.me.classList.add('linked2');
-                                }
-                            }
-                            else{
-                                ui.arena.classList.remove('oblongcard');
-                                if(game.me.classList.contains('linked2')){
-                                    game.me.classList.remove('linked2');
-                                    game.me.classList.add('linked');
-                                }
-                            }
-                        }
-                    },
-                    textequip:{
-                        name:'装备显示',
-                        init:'image',
-                        item:{
-                            image:'图片',
-                            text:'文字',
-                        },
-                        onclick:function(item){
-                            game.saveConfig('textequip',item);
-                            if(item=='text'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
-                                ui.arena.classList.add('textequip');
-                            }
-                            else{
-                                ui.arena.classList.remove('textequip');
-                            }
-                        }
-                    },
 					// background_color_music:{
 					// 	name:'背景色',
 					// 	init:'black',
@@ -703,6 +640,21 @@
                             }
 						},
 					},
+                    phonelayout:{
+                        name:'触屏布局',
+                        init:false,
+                        onclick:function(bool){
+                            game.saveConfig('phonelayout',bool);
+        					if(lib.isPhoneLayout()){
+                                ui.css.phone.href=lib.assetURL+'layout/default/phone.css';
+        						ui.roundmenu.style.display='';
+        					}
+        					else{
+                                ui.css.phone.href='';
+        						ui.roundmenu.style.display='none';
+        					}
+                        }
+                    },
 					change_skin:{
 						name:'双击换肤',
 						init:true,
@@ -1228,7 +1180,7 @@
 						init:true,
 					},
 					target_shake:{
-						name:'目标效果',
+						name:'目标特效',
 						init:'off',
 						item:{
 							off:'关闭',
@@ -1264,6 +1216,50 @@
                                 }
                             }
                             game.saveConfig('link_style',style);
+                        }
+                    },
+                    cardshape:{
+                        name:'手牌显示',
+                        init:'default',
+                        unfrequent:true,
+                        item:{
+                            default:'默认',
+                            oblong:'长方',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('cardshape',item);
+                            if(item=='oblong'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                                ui.arena.classList.add('oblongcard');
+                                if(game.me&&game.me.classList.contains('linked')){
+                                    game.me.classList.remove('linked');
+                                    game.me.classList.add('linked2');
+                                }
+                            }
+                            else{
+                                ui.arena.classList.remove('oblongcard');
+                                if(game.me&&game.me.classList.contains('linked2')){
+                                    game.me.classList.remove('linked2');
+                                    game.me.classList.add('linked');
+                                }
+                            }
+                        }
+                    },
+                    textequip:{
+                        name:'装备显示',
+                        init:'image',
+                        unfrequent:true,
+                        item:{
+                            image:'图片',
+                            text:'文字',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('textequip',item);
+                            if(item=='text'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                                ui.arena.classList.add('textequip');
+                            }
+                            else{
+                                ui.arena.classList.remove('textequip');
+                            }
                         }
                     },
 					name_font:{
@@ -1322,13 +1318,15 @@
 					// 	}
 					// },
 					update:function(config,map){
-                        if(config.layout=='phone'){
+                        if(lib.isPhoneLayout()){
                             map.show_time2.show();
                             map.show_time.hide();
+                            map.watchface.show();
                         }
                         else{
                             map.show_time2.hide();
                             map.show_time.show();
+                            map.watchface.hide();
                         }
 						if(lib.config.image_background=='default'){
 							map.image_background_blur.hide();
@@ -1350,7 +1348,7 @@
 							map.hide_card_prompt_basic.hide();
 							map.hide_card_prompt_equip.hide();
 						}
-                        if(lib.config.layout=='phone'){
+                        if(lib.isPhoneLayout()){
                             map.remember_round_button.show();
                             map.reset_round_button.show();
                             map.show_pause.hide();
@@ -1364,13 +1362,15 @@
                             map.remember_round_button.hide();
                             map.reset_round_button.hide();
                         }
-                        if(lib.config.layout=='phone'||lib.config.layout=='mobile'){
+                        if(lib.config.layout=='long'||lib.config.layout=='mobile'){
                             map.textequip.show();
                             map.cardshape.show();
+                            map.phonelayout.show();
                         }
                         else{
                             map.textequip.hide();
                             map.cardshape.hide();
+                            map.phonelayout.hide();
                         }
                         if(config.show_log!='off'){
                             map.clear_log.show();
@@ -3563,15 +3563,19 @@
 			dialog.style.top=idealtop+'px';
 		},
 		isMobileMe:function(player){
-			return (lib.config.layout=='mobile'||lib.config.layout=='phone')&&!game.chess&&player.dataset.position==0;
+			return (lib.config.layout=='mobile'||lib.config.layout=='long')&&!game.chess&&player.dataset.position==0;
 		},
 		isNewLayout:function(){
 			if(lib.config.layout!='default') return true;
 			if(lib.config.layoutfixed.contains(lib.config.mode)) return true;
 			return false;
 		},
+        isPhoneLayout:function(){
+            if(!lib.config.phonelayout) return false;
+            return (lib.config.layout=='mobile'||lib.config.layout=='long');
+        },
 		isSingleHandcard:function(){
-			if(game.singleHandcard||lib.config.layout=='mobile'||lib.config.layout=='phone'){
+			if(game.singleHandcard||lib.config.layout=='mobile'||lib.config.layout=='long'){
 				return true;
 			}
 			if(lib.config.layout=='default'&&lib.config.layoutfixed.contains(lib.config.mode)){
@@ -3823,8 +3827,7 @@
                     game.saveConfig('low_performance',true);
                     game.saveConfig('confirm_exit',true);
                     if(!lib.ipad){
-                        game.saveConfig('layout','phone');
-                        game.saveConfig('layouths','phone');
+                        game.saveConfig('phonelayout',true);
                     }
                 }
                 delete lib.ipad;
@@ -3927,7 +3930,16 @@
 						layout='mobile';
 					}
 				}
+                if(layout=='phone'){
+                    layout='mobile';
+                    game.saveConfig('layout','mobile');
+                    game.saveConfig('phonelayout',true);
+                }
 				ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout');
+                ui.css.phone=lib.init.css();
+                if(lib.isPhoneLayout()){
+                    ui.css.phone.href=lib.assetURL+'layout/default/phone.css';
+                }
 				ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
 				ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
 				ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
@@ -3943,8 +3955,7 @@
 						if(totouch){
 							game.saveConfig('touchscreen',true);
 							game.saveConfig('low_performance',true);
-                            game.saveConfig('layout','phone');
-							game.saveConfig('layouths','phone');
+                            game.saveConfig('phonelayout',true);
 							game.saveConfig('confirm_exit',true);
 							game.reload();
 						}
@@ -4764,7 +4775,9 @@
 			css:function(path,file,before){
 				var style = document.createElement("link");
 			    style.rel = "stylesheet";
-			    style.href = path+'/'+file+".css";
+                if(path){
+                    style.href = path+'/'+file+".css";
+                }
 				if(before){
 					document.head.insertBefore(style,before);
 				}
@@ -4802,9 +4815,8 @@
 				if(!nosave) game.saveConfig('layout',layout);
 				ui.arena.hide();
 				setTimeout(function(){
-					var layout=ui.css.layout;
-					ui.css.layout=lib.init.css(lib.assetURL+'layout/'+lib.config.layout,'layout',layout);
-					if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
+					ui.css.layout.href=lib.assetURL+'layout/'+lib.config.layout+'/layout.css';
+					if(lib.config.layout=='mobile'||lib.config.layout=='long'){
 						ui.arena.classList.add('mobile');
 						if(game.me&&game.me.node.handcards2.childNodes.length){
 							while(game.me.node.handcards2.childNodes.length){
@@ -4827,14 +4839,35 @@
 					else{
 						ui.arena.classList.remove('hpimage');
 					}
-					if(lib.config.layout=='phone'){
-						ui.roundmenu.style.display='';
-					}
-					else{
-						ui.roundmenu.style.display='none';
-					}
+                    if(lib.config.cardshape=='oblong'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                        ui.arena.classList.add('oblongcard');
+                        if(game.me&&game.me.classList.contains('linked')){
+                            game.me.classList.remove('linked');
+                            game.me.classList.add('linked2');
+                        }
+                    }
+                    else{
+                        ui.arena.classList.remove('oblongcard');
+                        if(game.me&&lib.config.link_style!='mark'&&game.me.classList.contains('linked2')){
+                            game.me.classList.remove('linked2');
+                            game.me.classList.add('linked');
+                        }
+                    }
+                    if(lib.config.textequip=='text'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                        ui.arena.classList.add('textequip');
+                    }
+                    else{
+                        ui.arena.classList.remove('textequip');
+                    }
+                    if(lib.isPhoneLayout()){
+                        ui.css.phone.href=lib.assetURL+'layout/default/phone.css';
+                        ui.roundmenu.style.display='';
+                    }
+                    else{
+                        ui.css.phone.href='';
+                        ui.roundmenu.style.display='none';
+                    }
 					setTimeout(function(){
-						layout.remove();
 						ui.arena.show();
 						if(game.me) game.me.update();
 						setTimeout(function(){
@@ -9292,7 +9325,7 @@
 					(
 						this.maxHp>9||
 						(this.maxHp>5&&this.classList.contains('minskin'))||
-						((lib.config.layout=='mobile'||lib.config.layout=='phone')&&this.dataset.position==0&&this.maxHp>7)
+						((lib.config.layout=='mobile'||lib.config.layout=='long')&&this.dataset.position==0&&this.maxHp>7)
 					)){
 						hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp;
 						hp.classList.add('text');
@@ -21149,7 +21182,7 @@
 	                }
 	                popupContainer.appendChild(node);
                     var rect=node.getBoundingClientRect();
-                    if(lib.config.layout=='phone'&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
+                    if(lib.isPhoneLayout()&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
                         node.style.top=(ui.window.offsetHeight-20-rect.height*1.3)/1.3+'px';
                     }
 	                popupContainer.classList.remove('hidden');
@@ -21249,7 +21282,7 @@
 	                        active._link.remove();
 	                    }
 	                    this.classList.add('active');
-                        if((game.deviceZoom!=1||lib.crosswalk||lib.device=='ios')&&lib.config.layout=='phone'){
+                        if((game.deviceZoom!=1||lib.crosswalk||lib.device=='ios')&&lib.isPhoneLayout()){
                             menuTabBar.style.left=(this.offsetLeft/game.documentZoom)+'px';
                         }
 	                    else{
@@ -27158,7 +27191,7 @@
 				var list=[];
 				var dialog;
 				var node=ui.create.div('.caption');
-				if(lib.config.layout=='phone'){
+				if(lib.isPhoneLayout()){
 					node.style.fontSize='30px';
 				}
 				var namecapt=[];
@@ -27336,7 +27369,7 @@
                         newlined.style.marginTop='5px';
                         newlined.style.display='block';
                         newlined.style.fontFamily='xinwei';
-                        if(lib.config.layout=='phone'){
+                        if(lib.isPhoneLayout()){
                             newlined.style.fontSize='32px';
                         }
                         else{
@@ -27440,7 +27473,7 @@
                     newlined2.style.marginTop='5px';
                     newlined2.style.display='none';
                     newlined2.style.fontFamily='xinwei';
-                    if(lib.config.layout=='phone'){
+                    if(lib.isPhoneLayout()){
                         newlined2.style.fontSize='32px';
                     }
                     else{
@@ -27473,7 +27506,7 @@
                         span.style.display='inline-block';
                         span.style.width='auto';
                         span.style.margin='5px';
-                        if(lib.config.layout=='phone'){
+                        if(lib.isPhoneLayout()){
                             span.style.fontSize='32px';
                         }
                         else{
@@ -27577,7 +27610,7 @@
                             newlined.style.marginTop='5px';
                             newlined.style.display='block';
                             newlined.style.fontFamily='xinwei';
-                            if(lib.config.layout=='phone'){
+                            if(lib.isPhoneLayout()){
                                 newlined.style.fontSize='32px';
                             }
                             else{
@@ -27948,7 +27981,7 @@
 				ui.system=ui.create.div("#system.",ui.window);
 				ui.arena=ui.create.div('#arena.nome',ui.window);
 
-				if(lib.config.layout=='mobile'||lib.config.layout=='phone'){
+				if(lib.config.layout=='mobile'||lib.config.layout=='long'){
 					ui.arena.classList.add('mobile');
 				}
 				if(lib.config.layout=='default'){
@@ -27966,7 +27999,7 @@
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
-                if(lib.config.layout=='phone'||lib.config.layout=='mobile'){
+                if(lib.config.layout=='long'||lib.config.layout=='mobile'){
                     if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
                     if(lib.config.cardshape=='oblong') ui.arena.classList.add('oblongcard');
                 }
@@ -28078,7 +28111,7 @@
 					ui.roundmenu.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 					ui.click.checkroundtranslate();
 				}
-				if(lib.config.layout!='phone'){
+				if(!lib.isPhoneLayout()){
 					ui.roundmenu.style.display='none';
 				}
 
@@ -28980,7 +29013,7 @@
     						ui.refresh(node);
     						node.show();
     						var transstr='translateY('+((num++)*30)+'px)';
-    						if(lib.config.layout=='phone'){
+    						if(lib.isPhoneLayout()){
     							transstr+=' scale(1.3)';
     						}
     						if(lib.isNewLayout()&&this.parentNode.isLinked()){
@@ -29042,7 +29075,7 @@
 			},
 			pauseconfig:function(){
 				if(!lib.config.auto_popped_config) return;
-                if(lib.config.layout=='phone') return;
+                if(lib.isPhoneLayout()) return;
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.listen(function(e){
 					e.stopPropagation();
@@ -29142,7 +29175,7 @@
 				});
 
                 var list=ui.create.div('.caption');
-                if(lib.config.layout=='phone'){
+                if(lib.isPhoneLayout()){
                     list.style.maxHeight='250px';
                 }
                 else{
@@ -29322,7 +29355,7 @@
 				ui.window.appendChild(uiintro);
 				var width=this._poppedwidth||330;
 				uiintro.style.width=width+'px';
-                if(lib.config.layout=='phone'){
+                if(lib.isPhoneLayout()){
                     width*=1.3;
                 }
 
@@ -29332,12 +29365,12 @@
                 else{
                     var height=this._poppedheight||uiintro.content.scrollHeight;
                     var height2=ui.window.offsetHeight-260;
-                    if(lib.config.layout=='phone'){
+                    if(lib.isPhoneLayout()){
                         height2=(ui.window.offsetHeight-80)/1.3;
                     }
     				uiintro.style.height=Math.min(height2,height)+'px';
                 }
-				if(lib.config.layout=='phone'){
+				if(lib.isPhoneLayout()){
 					uiintro.style.top='70px';
 				}
 				else{
@@ -30276,7 +30309,7 @@
                     if(!ui.shortcut.classList.contains('hidden')){
                         ui.click.shortcut(false);
                     }
-					if(lib.config.layout=='phone'&&ui.menuContainer.classList.contains('hidden')){
+					if(lib.isPhoneLayout()&&ui.menuContainer.classList.contains('hidden')){
 						if(ui.system2.classList.contains('shown')){
 							_status.removinground=true;
 							setTimeout(function(){
@@ -30839,7 +30872,7 @@
                 }
                 var uiintro;
                 if(this.classList.contains('card')&&this.parentNode&&
-                this.parentNode.classList.contains('equips')&&lib.config.layout=='phone'&&
+                this.parentNode.classList.contains('equips')&&lib.isPhoneLayout()&&
                 !lib.isMobileMe(this.parentNode.parentNode)){
                     uiintro=get.nodeintro(this.parentNode.parentNode,false,e);
                 }
@@ -31211,14 +31244,6 @@
 					widths.push(ui.control.childNodes[i].offsetWidth);
 				}
 				controls.push(ui.control.childNodes[i]);
-				// if(i>0){
-				// 	if(lib.config.layout=='phone'){
-				// 		width+=12;
-				// 	}
-				// 	else{
-				// 		width+=6;
-				// 	}
-				// }
 			}
 			if(!controls.length) return;
 			var offset=-length/2;
@@ -31229,7 +31254,7 @@
 				var control=controls.shift();
 				var width=widths.shift();
 				offset+=width+6;
-				if(lib.config.layout=='phone'){
+				if(lib.isPhoneLayout()){
 					offset+=6;
 				}
 				control.style.transform='translateX('+offset+'px)';
@@ -33007,7 +33032,7 @@
 						}
 					}
 				}
-                if(lib.config.layout=='phone'){
+                if(lib.isPhoneLayout()){
                     var storage=node.storage;
                     for(i in storage){
                         if(get.info(i)&&get.info(i).intro){
@@ -33026,7 +33051,7 @@
                         }
                     }
                 }
-                if(!simple||lib.config.layout=='phone'){
+                if(!simple||lib.isPhoneLayout()){
                     var es=node.get('e');
                     for(var i=0;i<es.length;i++){
                         uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+lib.translate[es[i].name+'_info']+'</div></div>');
@@ -33055,7 +33080,7 @@
                     uiintro.add(addFavourite);
                 }
 
-				if(!simple||lib.config.layout=='phone'){
+				if(!simple||lib.isPhoneLayout()){
 					if(lib.falseitem){
 						uiintro.add(ui.create.div('.placeholder'));
 						var table,tr,td;
