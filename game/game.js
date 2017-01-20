@@ -504,7 +504,13 @@
 							else{
 								lib.init.layout(layout);
 							}
-                            if((lib.config.layout=='phone'||lib.config.layout=='mobile')&&lib.config.textequip=='text'){
+                            if(lib.config.cardshape=='oblong'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
+                                ui.arena.classList.add('oblongcard');
+                            }
+                            else{
+                                ui.arena.classList.remove('oblongcard');
+                            }
+                            if(lib.config.textequip=='text'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
                                 ui.arena.classList.add('textequip');
                             }
                             else{
@@ -512,6 +518,23 @@
                             }
 						}
 					},
+                    cardshape:{
+                        name:'手牌显示',
+                        init:'default',
+                        item:{
+                            default:'默认',
+                            oblong:'长方',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('cardshape',item);
+                            if(item=='oblong'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
+                                ui.arena.classList.add('oblongcard');
+                            }
+                            else{
+                                ui.arena.classList.remove('oblongcard');
+                            }
+                        }
+                    },
                     textequip:{
                         name:'装备显示',
                         init:'image',
@@ -521,7 +544,7 @@
                         },
                         onclick:function(item){
                             game.saveConfig('textequip',item);
-                            if((lib.config.layout=='phone'||lib.config.layout=='mobile')&&item=='text'){
+                            if(item=='text'&&(lib.config.layout=='phone'||lib.config.layout=='mobile')){
                                 ui.arena.classList.add('textequip');
                             }
                             else{
@@ -846,15 +869,6 @@
 							}
 						}
 					},
-					// popup_style:{
-					// 	name:'提示样式',
-					// 	init:'newstyle',
-					// 	item:{
-					// 		newstyle:'默认',
-					// 		old:'旧版'
-					// 	},
-					// 	unfrequent:true,
-					// },
                     show_time:{
 						name:'显示时间',
 						init:false,
@@ -974,15 +988,6 @@
 							ui.click.resetround();
 						}
 					},
-                    // character_dialog_style:{
-                    //     name:'自由选将样式',
-                    //     init:'old',
-                    //     item:{
-                    //         newstyle:'新版',
-                    //         old:'默认',
-                    //     },
-                    //     unfrequent:true,
-                    // },
                     character_dialog_tool:{
                         name:'自由选将显示',
                         init:'最近',
@@ -1344,9 +1349,11 @@
                         }
                         if(lib.config.layout=='phone'||lib.config.layout=='mobile'){
                             map.textequip.show();
+                            map.cardshape.show();
                         }
                         else{
                             map.textequip.hide();
+                            map.cardshape.hide();
                         }
                         if(config.show_log!='off'){
                             map.clear_log.show();
@@ -22167,7 +22174,6 @@
                     };
 
 					for(var i in lib.configMenu){
-                        if(i=='skill') continue;
                         createModeConfig(i,start.firstChild);
                     }
                     for(var i in lib.help){
@@ -27943,8 +27949,9 @@
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
-                if((lib.config.layout=='phone'||lib.config.layout=='mobile')&&lib.config.textequip=='text'){
-                    ui.arena.classList.add('textequip');
+                if(lib.config.layout=='phone'||lib.config.layout=='mobile'){
+                    if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
+                    if(lib.config.cardshape=='oblong') ui.arena.classList.add('oblongcard');
                 }
 
 				if(lib.config.blur_ui){
