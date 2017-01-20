@@ -516,20 +516,6 @@
                             }
 						}
 					},
-					layouths:{
-						name:'布局',
-						init:'mobile',
-                        game:'hs',
-						item:{
-							mobile:'默认',
-							phone:'移动'
-						},
-						onclick:function(layout){
-                            game.saveConfig('layouths',layout);
-                            lib.config.layout=layout;
-							lib.init.layout(layout,true);
-						}
-					},
                     textequip:{
                         name:'装备显示',
                         init:'image',
@@ -2010,32 +1996,6 @@
     			    onclick:function(){
                         this.innerHTML='此扩展将在重启后隐藏';
     					lib.config.hiddenPlayPack.add('coin');
-    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-    				}
-    			},
-            },
-            hsmod:{
-                game:'hs',
-                enable:{
-    			    name:'开启',
-    			    init:false,
-    			    restart:true,
-    			    onclick:function(bool){
-    			        if(bool){
-    			            lib.config.plays.add('hsmod');
-    			        }
-    			        else{
-    			            lib.config.plays.remove('hsmod');
-    			        }
-    			        game.saveConfig('plays',lib.config.plays);
-    			    }
-    			},
-    			hide:{
-    			    name:'隐藏此扩展',
-    			    clear:true,
-    			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('hsmod');
     					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
     				}
     			},
@@ -3784,13 +3744,6 @@
                 if(window.isNonameServer){
                     lib.config.mode='connect';
                 }
-                if(lib.config.game=='hs'){
-                    character.pack=character.hearthpack;
-                    card.pack=card.hearthpack;
-                    play.pack=play.hearthpack;
-                    mode.pack=[];
-                    lib.config.mode='hearthstone';
-                }
 				for(i in character.pack){
 					if(lib.config.hiddenCharacterPack.indexOf(i)==-1){
 						lib.config.all.characters.push(i);
@@ -3820,7 +3773,7 @@
 						}
 					}
 				}
-				if(lib.config.all.mode.length==0&&lib.config.game=='sgs'){
+				if(lib.config.all.mode.length==0){
 					lib.config.all.mode.push('identity');
 					lib.translate.identity='身份';
 					if(!lib.config.gameRecord.identity){
@@ -3940,10 +3893,6 @@
     					toLoad++;
     					lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
     				}
-                    else if(lib.config.game=='hs'){
-                        toLoad++;
-    					lib.init.js(lib.assetURL+'mode','hearthstone',packLoaded,packLoaded);
-                    }
     				else if((localStorage.getItem(lib.configprefix+'directstart')||!lib.config.show_splash)&&
     					lib.config.all.mode.indexOf(lib.config.mode)!=-1){
     					toLoad++;
@@ -3983,11 +3932,7 @@
 				ui.css={};
 				lib.init.css(lib.assetURL+'layout/default','menu');
 				var layout=lib.config.layout;
-                if(lib.config.game=='hs'){
-                    layout=lib.config.layouths;
-                    lib.config.layout=layout;
-                }
-				else if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
+                if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
 					if(layout=='default'){
 						layout='mobile';
 					}
@@ -5073,15 +5018,6 @@
                     }
                     target.$equip(cards[i]);
                 }
-            },
-            m:function(){
-                if(lib.config.game!='sgs'){
-                    game.saveConfig('game','sgs');
-                }
-                else{
-                    game.saveConfig('game','hs');
-                }
-                game.reload();
             },
     		c:function(){
                 (function(){
@@ -9011,7 +8947,7 @@
                     if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
                         this.node.name.classList.add('long');
                     }
-					if(!lib.config.show_name||lib.config.game=='hs'){
+					if(!lib.config.show_name){
 						this.node.name.style.display='none';
 					}
 					// for(var i=0;i<name.length;i++){
@@ -9049,7 +8985,7 @@
 
 						// var name=get.translation(character2);
 						this.node.name2.innerHTML=get.slimName(character2);
-						if(!lib.config.show_name||lib.config.game=='hs'){
+						if(!lib.config.show_name){
 							this.node.name2.style.display='none';
 						}
 						// for(var i=0;i<name.length;i++){
@@ -13605,22 +13541,6 @@
                     if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
                         this.cardid=get.id();
                         lib.cardOL[this.cardid]=this;
-                    }
-                    if(lib.config.game=='hs'){
-    					if(info.class!='neutral'){
-    						this.node.name.dataset.careercolor=info.class;
-    					}
-    					if(info.health){
-    						this.node.info.innerHTML=info.attack+'/'+info.health;
-    					}
-    					else if(info.duration){
-    						this.node.info.innerHTML=info.attack+'/'+info.duration;
-    					}
-    					else{
-    						this.node.info.innerHTML='';
-    					}
-    					this.node.cost=ui.create.div('.cost',this);
-    					this.node.cost.innerHTML=info.cost;
                     }
 					return this;
 				},
@@ -21489,17 +21409,9 @@
     						clickContainer.call(menuContainer);
                         }
     				}
-                    if(lib.config.game=='hs'){
-                        menux=createMenu(['选项','卡牌','扩展','其它'],{
-                            position:menuContainer,bar:95
-                        });
-                    }
-                    else{
-                        menux=createMenu(['开始','选项','武将','卡牌','扩展','其它'],{
-                            position:menuContainer,bar:40
-                        });
-                    }
-    				menu=menux.menu;
+                    menux=createMenu(['开始','选项','武将','卡牌','扩展','其它'],{
+                        position:menuContainer,bar:40
+                    });
                 }
 				else{
                     ui.connectMenuContainer=menuContainer;
@@ -21541,7 +21453,6 @@
 				var copyObj=get.copy;
 
 				(function(){
-                    if(lib.config.game=='hs') return;
 					var start=menuxpages.shift();
 					var rightPane=start.lastChild;
 
@@ -22175,9 +22086,6 @@
 									// cfgnode.hide();
 									cfgnode.style.display='none';
 								}
-                                if(cfg.game&&cfg.game!=lib.config.game){
-                                    cfgnode.style.display='none';
-                                }
 								if(j=='import_data_button'){
 									ui.import_data_button=cfgnode;
 									cfgnode.hide();
@@ -22293,7 +22201,7 @@
                     };
 
 					for(var i in lib.configMenu){
-                        if(i=='skill'&&lib.config.game=='hs') continue;
+                        if(i=='skill') continue;
                         createModeConfig(i,start.firstChild);
                     }
                     for(var i in lib.help){
@@ -22361,7 +22269,6 @@
 				}());
 
 				(function(){
-                    if(lib.config.game=='hs') return;
 					var start=menuxpages.shift();
 					var rightPane=start.lastChild;
 
@@ -23605,7 +23512,7 @@
 					rightPane.appendChild(active.link);
 
 					(function(){
-                        if(connectMenu||lib.config.game=='hs') return;
+                        if(connectMenu) return;
 						var page=ui.create.div('.menu-buttons');
                         var node=ui.create.div('.menubutton.large','牌堆',clickMode);
 						start.firstChild.insertBefore(node,start.firstChild.querySelector('.lefttext'));
@@ -23859,13 +23766,11 @@
                     for(var i in lib.extensionMenu){
                         if(lib.config.all.stockextension.contains(i)&&!lib.config.all.plays.contains(i)) continue;
                         if(lib.config.hiddenPlayPack.contains(i)) continue;
-                        if(lib.extensionMenu[i].game&&lib.extensionMenu[i].game!=lib.config.game) continue;
                         createModeConfig(i,start.firstChild);
                     }
                     (function(){
                         if(!lib.device&&!lib.db) return;
                         if(lib.config.show_extensionmaker==false) return;
-                        if(lib.config.game!='sgs') return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.link=page;
@@ -26458,7 +26363,6 @@
     					page.appendChild(ul);
                     }());
 					(function(){
-                        if(lib.config.game=='hs') return;
 						var checkCheat=function(){
 							if(currentrow1&&currentrow2&&row3.querySelector('.glow')){
 								cheatButton.classList.add('glowing');
@@ -26602,7 +26506,6 @@
 						});
 					}());
 					(function(){
-                        if(lib.config.game=='hs') return;
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large','换人',start.firstChild,clickMode);
 						node.link=page;
@@ -28105,7 +28008,7 @@
 				ui.window.appendChild(ui.backgroundMusic);
 
 				ui.arenalog=ui.create.div('#arenalog',ui.arena);
-				if(lib.config.show_log=='off'||lib.config.game!='sgs'){
+				if(lib.config.show_log=='off'){
 					ui.arenalog.style.display='none';
 				}
 				else{
@@ -28311,10 +28214,10 @@
 				if(!lib.config.show_auto){
 					ui.auto.style.display='none';
 				}
-				if(!lib.config.show_wuxie||lib.config.game!='sgs'){
+				if(!lib.config.show_wuxie){
 					ui.wuxie.style.display='none';
 				}
-				if(!lib.config.show_cardpile||_status.connectMode||lib.config.game!='sgs'){
+				if(!lib.config.show_cardpile||_status.connectMode){
 					ui.cardPileButton.style.display='none';
 				}
 				if(lib.config.touchscreen&&!lib.config.confirmtouch){
@@ -28336,7 +28239,7 @@
 						_status.identityShown=true;
 					}
 				},true);
-				if(!lib.config.show_playerids||!game.showIdentity||lib.config.game!='sgs'){
+				if(!lib.config.show_playerids||!game.showIdentity){
 					ui.playerids.style.display='none';
 				}
 				if(!lib.config.show_replay){
@@ -28613,7 +28516,7 @@
 								ui.create.div('',node.node.hp);
 							}
 						}
-						if(!lib.config.show_name||lib.config.game=='hs'){
+						if(!lib.config.show_name){
 							node.node.name.style.display='none';
 						}
 						if(node.node.hp.childNodes.length==0){
@@ -29141,7 +29044,6 @@
 			pausehistory:function(){
 				if(!lib.config.auto_popped_history) return;
 				if(!ui.sidebar.childNodes.length) return;
-                if(lib.config.game=='hs') return;
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.style.maxHeight='400px';
 				uiintro.add(ui.sidebar);
@@ -29150,8 +29052,6 @@
 			pauseconfig:function(){
 				if(!lib.config.auto_popped_config) return;
                 if(lib.config.layout=='phone') return;
-                if(lib.config.game=='hs') return;
-				// if(!ui.config.childNodes.length) return;
 				var uiintro=ui.create.dialog('hidden');
 				uiintro.listen(function(e){
 					e.stopPropagation();
@@ -31099,7 +30999,7 @@
 				game.pause2();
 				var node=ui.create.pause().animate('start');
 				ui.sidebar3.innerHTML='';
-				if(lib.config.show_discardpile&&lib.config.game=='sgs'){
+				if(lib.config.show_discardpile){
 					for(var i=0;i<ui.discardPile.childNodes.length;i++){
 						var div=ui.create.div(ui.sidebar3);
 						div.innerHTML=get.translation(ui.discardPile.childNodes[i]);
@@ -33148,7 +33048,7 @@
                     }
                 }
                 var modepack=lib.characterPack['mode_'+get.mode()];
-                if(lib.config.show_favourite&&lib.config.game=='sgs'&&lib.character[node.name]&&game.players.contains(node)&&(!modepack||!modepack[node.name])){
+                if(lib.config.show_favourite&&lib.character[node.name]&&game.players.contains(node)&&(!modepack||!modepack[node.name])){
                     var addFavourite=ui.create.div('.text.center');
                     addFavourite.link=node.link;
                     if(lib.config.favouriteCharacter.contains(node.name)){
@@ -33402,7 +33302,7 @@
 				}
                 var modepack=lib.characterPack['mode_'+get.mode()];
                 if((node.parentNode.classList.contains('menu-buttons')||lib.config.show_favourite)&&
-                lib.config.game=='sgs'&&lib.character[node.link]&&(!modepack||!modepack[node.link])){
+                lib.character[node.link]&&(!modepack||!modepack[node.link])){
                     var addFavourite=ui.create.div('.text.center');
                     addFavourite.link=node.link;
                     addFavourite.style.marginBottom='15px';
