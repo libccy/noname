@@ -142,7 +142,7 @@
     pointer-events: none;
 }
 #arena.oblongcard:not(.chess) .player[data-position='0']{
-    height: 144px;
+    height: 140px;
 }
 
 #arena:not(.chess) .player[data-position='0'].linked>.damage{
@@ -297,6 +297,24 @@
     background-size:cover;
 }
 
+#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip1,
+#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip2{
+    top:20px;
+}
+#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip3,
+#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip4{
+    bottom:20px;
+}
+
+
+#arena.mobile.oblongcard.textequip:not(.chess) .player[data-position='0'] .equips>.removing{
+	margin-top:-14px !important;
+	margin-bottom:-14px !important;
+	transform:scale(1);
+}
+
+
+
 #arena.mobile.oblongcard:not(.chess) #handcards1{
     height: 100%;
     top: 2px;
@@ -305,12 +323,9 @@
 #arena.mobile.oblongcard:not(.chess) .handcards>.card{
     height: 120px;
 }
-
-#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip1,
-#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip2{
-    top:20px;
-}
-#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip3,
-#arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip4{
-    bottom:20px;
+#arena.mobile.oblongcard:not(.chess)>.card>.image,
+#arena.mobile.oblongcard:not(.chess) .handcards>.card>.image{
+    height: 110px;
+    top: 10px;
+    background-position-x: -3px;
 }
