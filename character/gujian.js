@@ -11,6 +11,9 @@ character.gujian={
 		gjqt_wenrenyu:['female','shu',4,['chizhen','dangping']],
 		gjqt_xiayize:['male','qun',3,['xuanning','liuguang','yangming']],
 		gjqt_aruan:['female','wu',3,['zhaolu','jiehuo','yuling']],
+
+		// gjqt_xunfang:['female','shu',3,['zhaolu','jiehuo','yuling']],
+		// gjqt_ouyangshaogong:['male','shu',3,['zhaolu','jiehuo','yuling']],
 	},
 	skill:{
 		chizhen:{
@@ -1335,7 +1338,7 @@ character.gujian={
 		gjqt_aruan:'阿阮',
 
 		chizhen:'驰阵',
-		chizhen_info:'出牌阶段开始时，你可以摸X张牌并弃置X张牌，若你弃置了杀，可以视为使用一张决斗（X为你已损失的体力值+1）',
+		chizhen_info:'出牌阶段开始时，你可以摸X张牌并弃置X张牌，若你弃置了杀，可以视为使用一张决斗（X为你已损失的体力值且至少为1）',
 		xidie:'戏蝶',
 		xidie2:'戏蝶',
 		xidie_info:'回合开始阶段，若你的手牌数大于体力值，可以弃置至多X张牌，并于回合结束阶段摸等量的牌，X为你的体力值与手牌数之差且不超过3',
@@ -1365,7 +1368,7 @@ character.gujian={
 		xuelu:'血戮',
 		xuelu_info:'回合结束阶段，你可以弃置一张红色牌并对一名其他角色造成X点火焰伤害，X为你已损失体力值的一半，向上取整且不超过2',
 		fanshi:'反噬',
-		fanshi_info:'锁定技，若你于回合内造成过伤害，你于弃牌阶段结束时流失一点体力并摸一张牌',
+		fanshi_info:'锁定技，弃牌阶段结束时，若你本回合内造成过伤害，你流失一点体力并摸一张牌',
 		shahun:'煞魂',
 		shahun2:'煞魂',
 		shahun_info:'限定技，濒死阶段，你可以重置武将牌，弃置所有牌并摸三张牌，然后将体力回复至1；若如此做，你失去技能【反噬】，获得技能【绝境】，并于三回合后立即死亡',

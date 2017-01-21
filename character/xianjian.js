@@ -32,7 +32,7 @@ character.xianjian={
 		// pal_longyou:['male','wei',4,[]],
 		// pal_xiaoman:['male','wei',4,[]],
 
-		pal_xiahoujinxuan:['male','shu',3,['xuanmo','lingyan','danqing']],
+		pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
 		// pal_muchanglan:['male','wei',4,[]],
 		// pal_xia:['male','wei',4,[]],
 		// pal_jiangcheng:['male','wei',4,[]],
@@ -129,9 +129,9 @@ character.xianjian={
 					}
 				}
 			},
-			// filter:function(event,player){
-			// 	return player.storage.danqing.length==4;
-			// },
+			filter:function(event,player){
+				return player.storage.danqing.length==4;
+			},
 			content:function(){
 				'step 0'
 				player.storage.danqing.length=0;
@@ -157,7 +157,10 @@ character.xianjian={
 								current.equip(card);
 								current.$draw(card);
 								break;
-							case 'stealth':current.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});break;
+							case 'stealth':
+								current.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
+								game.log(current,'获得了','【潜行】');
+								break;
 						}
 					}
 					if(effs.contains('draw')){

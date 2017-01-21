@@ -502,17 +502,12 @@ character.shenhua={
 					event.finish();
 				}
 				"step 2"
-				game.delay();
-				"step 3"
 				for(var i=0;i<event.targets.length;i++){
-					player.gain(event.targets[i].get('h').randomGet());
+					player.gain(event.targets[i].get('h').randomGet(),event.targets[i]);
 					event.targets[i].$give(1,player);
 				}
 				trigger.finish();
 				trigger.untrigger();
-				game.delay();
-				"step 4"
-				if(result.bool) game.delay();
 			},
 			ai:{
 				expose:0.2

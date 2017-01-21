@@ -7,7 +7,7 @@ character.ow={
         ow_falaozhiying:['female','shu',3,['feidan','huoyu','feiying']],
         ow_zhixuzhiguang:['female','qun',3,['guangshu']],
         ow_luxiao:['male','wu',3,['yuedong','kuoyin','huhuan']],
-        ow_shibing:['male','shu',4,['tuji','mujing']],
+        ow_shibing:['male','shu',4,['tuji','mujing','lichang']],
         ow_yuanshi:['male','qun',3,['feiren','lianpo','zhanlong']],
         ow_chanyata:['male','qun',3,['xie','luan','sheng']],
         ow_dva:['female','shu',2,['jijia','tuijin','zihui','chongzhuang']],
@@ -1508,6 +1508,104 @@ character.ow={
             },
         },
         mujing:{
+			enable:['chooseToRespond','chooseToUse'],
+			filterCard:function(card){
+				return get.color(card)=='black';
+			},
+			position:'he',
+			viewAs:{name:'sha'},
+			viewAsFilter:function(player){
+				if(!player.num('he',{color:'black'})) return false;
+			},
+			prompt:'将一张黑色牌当杀使用或打出',
+			check:function(card){return 4-ai.get.value(card)},
+			ai:{
+				skillTagFilter:function(player){
+					if(!player.num('he',{color:'black'})) return false;
+				},
+				respondSha:true,
+			},
+            group:'mujing2'
+		},
+        mujing2:{
+            trigger:{player:'shaMiss'},
+            forced:true,
+            popup:false,
+            filter:function(event){
+                return !event.parent._mujinged;
+            },
+            content:function(){
+                trigger.parent._mujinged=true;
+                player.getStat().card.sha--;
+            }
+        },
+        lichang:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+            filter:function(event,player){
+                return player.num('he',{color:'red'})>0;
+            },
+			content:function(){
+				"step 0"
+				var next=player.chooseToDiscard(get.prompt('lichang'),'he',{color:'red'});
+				next.logSkill='lichang';
+				next.ai=function(card){
+					return 6-ai.get.value(card);
+				};
+				"step 1"
+				if(result.bool){
+					player.addSkill('lichang2');
+				}
+			},
+		},
+        lichang2:{
+            trigger:{player:'phaseBegin'},
+            direct:true,
+            mark:true,
+            intro:{
+                content:'下个回合开始时令一名距离1以内的角色回复一点体力或摸两张牌'
+            },
+            content:function(){
+                'step 0'
+                player.chooseTarget('力场：令一名角色回复一点体力或摸两张牌',function(card,player,target){
+                    return get.distance(player,target)<=1;
+                }).ai=function(target){
+                    var att=ai.get.attitude(player,target);
+                    if(att>0){
+                        if(target.hp==1&&target.maxHp>1) return att*2;
+                    }
+                    return att;
+                };
+                player.removeSkill('lichang2');
+                'step 1'
+                if(result.bool){
+                    player.logSkill('lichang',result.targets);
+                    event.target=result.targets[0];
+                    if(event.target.isHealthy()){
+                        event.target.draw(2);
+                        event.finish();
+                    }
+                    else{
+                        event.target.chooseControl('draw_card','recover_hp',function(event,player){
+        					if(player.hp>=3&&player.num('h')<=player.hp) return 'draw_card';
+        					if(player.hp==2&&player.num('h')<=1) return 'draw_card';
+        					return 'recover_hp';
+        				});
+                    }
+                }
+                else{
+                    event.finish();
+                }
+                'step 2'
+                if(result.control=='draw_card'){
+                    event.target.draw(2);
+                }
+                else{
+                    event.target.recover();
+                }
+            }
+        },
+        mujing_old:{
             trigger:{player:'useCardToBegin'},
 			filter:function(event,player){
 				return event.target&&event.target!=player&&get.distance(event.target,player,'attack')>1;
@@ -2623,6 +2721,9 @@ character.ow={
         }
     },
     translate:{
+        lichang:'力场',
+        lichang2:'力场',
+        lichang_info:'回合结束阶段，你可以弃置一张红色牌，若如此做，你可以在下个回合开始时令一名距离1以内的角色回复一点体力或摸两张牌',
         mengji:'猛击',
         mengji_info:'锁定技，若你已发动重盾，当你没有护甲时，你的杀造成的伤害+1',
         zhongdun:'重盾',
@@ -2699,9 +2800,11 @@ character.ow={
         shouge:'收割',
         shouge_info:'每当你杀死一名角色，你可以获得一张治疗波',
         tuji:'突击',
-        tuji_info:'锁定技，在你的回合内，你每使用一次牌后，你计算与其他角色的距离便减少1，直到回合结束',
+        tuji_info:'锁定技，在你的回合内，每当你使用一张牌，你计算与其他角色的距离便减少1',
         mujing:'目镜',
-        mujing_info:'每当你对攻击范围不含你的角色使用一张牌，你可以弃置目标一张牌；若你的手牌数不多于目标，你摸一张牌',
+        mujing2:'目镜',
+        mujing_info:'你可以将一张黑色牌当作杀使用或打出；当你的杀被闪避后，此杀不计入出杀次数',
+        mujing_old_info:'每当你对攻击范围不含你的角色使用一张牌，你可以弃置目标一张牌；若你的手牌数不多于目标，你摸一张牌',
         feiren:'飞刃',
         feiren2:'飞刃',
         feiren_info:'你的杀无视距离和防具；你的黑桃杀造成的伤害+1，梅花杀可以额外指定一个目标',

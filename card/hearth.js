@@ -358,15 +358,16 @@ card.hearth={
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
-			usable:3,
-			forceUsable:true,
+			modTarget:true,
+			// usable:3,
+			// forceUsable:true,
 			content:function(){
 				'step 0'
-				player.storage.chuansongmen=cards[0];
 				var gained=get.cards()[0];
 				target.gain(gained,'gain2');
-				if(lib.filter.filterCard(gained,player,event.parent.parent)){
-					var next=player.chooseToUse();
+				if(event.getParent(3).name=='phaseUse'&&_status.currentPhase==target&&
+				lib.filter.filterCard(gained,target,event.getParent(2))){
+					var next=target.chooseToUse();
 					next.filterCard=function(card){
 						return card==gained;
 					};
@@ -385,8 +386,14 @@ card.hearth={
 					event.finish();
 				}
 				'step 1'
-				if(result.bool){
-					player.gain(cards,'gain2');
+				if(result.bool&&!target.hasSkill('chuansongmen3')){
+					if(target.hasSkill('chuansongmen2')){
+						target.addTempSkill('chuansongmen3','phaseAfter');
+					}
+					else{
+						target.addTempSkill('chuansongmen2','phaseAfter');
+					}
+					target.gain(cards,'gain2');
 				}
 				else{
 					ui.discardPile.appendChild(cards[0]);
@@ -650,6 +657,8 @@ card.hearth={
 		}
 	},
 	skill:{
+		chuansongmen2:{},
+		chuansongmen3:{},
 		shihuawuqi:{
 			mod:{
 				attackFrom:function(from,to,distance){
@@ -679,7 +688,7 @@ card.hearth={
 		tanshezhiren:'弹射之刃',
 		tanshezhiren_info:'限场存活角色不小于3时使用，弃置一名随机角色（不含你）的手牌，重复此过程直到有一名角色失去最后一张手牌（最多重复10次）',
 		chuansongmen:'传送门',
-		chuansongmen_info:'摸一张牌，若你能立即使用之，则将此牌回手（每回合最多使用3次）',
+		chuansongmen_info:'摸一张牌并展示，若发生在出牌阶段，你可以立即使用摸到的牌，若如此做，你将传送门收回手牌（每阶段最多收回2张传送门）',
 		dunpaigedang:'盾牌格挡',
 		dunpaigedang_info:'获得一点护甲值，摸一张牌',
 		siwangchanrao:'死亡缠绕',
