@@ -810,18 +810,21 @@
 							click:'单击',
 						},
                     },
-					slim_player:{
-						name:'窄边框',
-						init:true,
+					player_border:{
+						name:'边框宽度',
+						init:'normal',
 						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('slim_player',bool);
-							if(bool){
-								ui.arena.classList.add('slim_player');
-							}
-							else if(lib.config.layout!='long'){
-								ui.arena.classList.remove('slim_player');
-							}
+                        item:{
+                            slim:'窄',
+                            normal:'中',
+                            wide:'宽'
+                        },
+						onclick:function(item){
+							game.saveConfig('player_border',item);
+                            if(item=='wide'&&lib.config.layout=='long'){
+                                item='normal';
+                            }
+                            ui.arena.dataset.player_border=item;
 						}
 					},
 					reduce_radius:{
@@ -4898,11 +4901,11 @@
                             }
                         }
                     }
-                    if(lib.config.slim_player||lib.config.layout=='long'){
-    					ui.arena.classList.add('slim_player');
+                    if(lib.config.player_border=='wide'&&lib.config.layout=='long'){
+    					ui.arena.dataset.player_border='normal';
     				}
                     else{
-                        ui.arena.classList.remove('slim_player');
+                        ui.arena.dataset.player_border=lib.config.player_border;
                     }
 					setTimeout(function(){
 						ui.arena.show();
@@ -28052,9 +28055,12 @@
 				if(lib.config.low_performance){
 					ui.arena.classList.add('low_performance');
 				}
-				if(lib.config.slim_player||lib.config.layout=='long'){
-					ui.arena.classList.add('slim_player');
-				}
+                if(lib.config.player_border=='wide'&&lib.config.layout=='long'){
+                    ui.arena.dataset.player_border='normal';
+                }
+                else{
+                    ui.arena.dataset.player_border=lib.config.player_border;
+                }
 				if(lib.config.reduce_radius){
 					ui.window.classList.add('reduce_radius');
 				}

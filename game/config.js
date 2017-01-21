@@ -261,8 +261,8 @@ window.config={
 	right_sidebar:false,
 	button_press:true,
 	damage_shake:true,
-	slim_player:true,
 	log_highlight:true,
+	player_border:'normal',
 
 	modeconfig:false,
 	gameconfig:false,
