@@ -263,6 +263,7 @@ window.config={
 	damage_shake:true,
 	log_highlight:true,
 	player_border:'normal',
+	radius_size:'default',
 
 	modeconfig:false,
 	gameconfig:false,

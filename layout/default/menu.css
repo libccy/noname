@@ -434,9 +434,17 @@
 	top:0;
 	position: absolute;
 }
-#window.reduce_radius .menu-buttons>.new_character>.avatar>input,
-#window.reduce_radius .menu-buttons>.new_character>.card>input{
-	border-radius: 4px;
+#window[data-radius_size='reduce'] .menu-buttons>.new_character>.avatar>input,
+#window[data-radius_size='reduce'] .menu-buttons>.new_character>.card>input{
+	border-radius:4px;
+}
+#window[data-radius_size='off'] .menu-buttons>.new_character>.avatar>input,
+#window[data-radius_size='off'] .menu-buttons>.new_character>.card>input{
+	border-radius:0px;
+}
+#window[data-radius_size='increase'] .menu-buttons>.new_character>.avatar>input,
+#window[data-radius_size='increase'] .menu-buttons>.new_character>.card>input{
+	border-radius:16px;
 }
 .menu-buttons>.new_character>.avatar>.select_avatar,
 .menu-buttons>.new_character>.card>.select_avatar{

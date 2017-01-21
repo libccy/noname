@@ -8,6 +8,15 @@
     z-index:1;
     overflow-x:scroll;
 }
+#window[data-radius_size='reduce'] #bosslist.slim>.player{
+	border-radius:4px;
+}
+#window[data-radius_size='off'] #bosslist.slim>.player{
+	border-radius:0px;
+}
+#window[data-radius_size='increase'] #bosslist.slim>.player{
+	border-radius:20px;
+}
 #bosslist.slim>.player{
     border-radius: 10px;
 }

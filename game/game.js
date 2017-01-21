@@ -835,20 +835,21 @@
                             }
 						}
 					},
-					reduce_radius:{
-						name:'减小圆角',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('reduce_radius',bool);
-							if(bool){
-								ui.window.classList.add('reduce_radius');
-							}
-							else{
-								ui.window.classList.remove('reduce_radius');
-							}
-						}
-					},
+                    radius_size:{
+                        name:'圆角大小',
+                        init:'default',
+                        item:{
+                            off:'关闭',
+                            reduce:'减小',
+                            default:'默认',
+                            increase:'增大',
+                        },
+                        unfrequent:true,
+                        onclick:function(item){
+                            game.saveConfig('radius_size',item);
+                            ui.window.dataset.radius_size=item;
+                        }
+                    },
                     show_time:{
 						name:'显示时间',
 						init:false,
@@ -28075,9 +28076,7 @@
                 if(lib.config.player_border=='slim'){
                     ui.arena.classList.add('uslim_player');
                 }
-				if(lib.config.reduce_radius){
-					ui.window.classList.add('reduce_radius');
-				}
+				ui.window.dataset.radius_size=lib.config.radius_size||'default';
 				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}

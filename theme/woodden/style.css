@@ -9,21 +9,6 @@ html{
 	border-radius: 8px;
 }
 
-#window.reduce_radius #system>div>div,
-#window.reduce_radius #mebg,
-#window.reduce_radius .control,
-#window.reduce_radius .player,
-#window.reduce_radius .card,
-#window.reduce_radius .avatar,
-#window.reduce_radius .avatar2,
-#window.reduce_radius .button,
-#window.reduce_radius .dialog>.bar,
-#window.reduce_radius .menu,
-#window.reduce_radius #splash>div,
-#window.reduce_radius.mobile:not(.chess) .player[data-position='0'] .equips{
-	border-radius: 4px;
-}
-
 .button-downloading>.button-progress{
 	background: rgba(77,224,100,0.45);
 }

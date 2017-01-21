@@ -949,8 +949,14 @@ div:not(.handcards)>.card>.info>span,
 	border-radius:6px;
 	transition: opacity 0.3s;
 }
-#window.reduce_radius>.dialog.popped{
+#window[data-radius_size='reduce']>.dialog.popped{
 	border-radius:4px;
+}
+#window[data-radius_size='off']>.dialog.popped{
+	border-radius:0px;
+}
+#window[data-radius_size='increase']>.dialog.popped{
+	border-radius:12px;
 }
 #window>.dialog.popped>.bar{
 	display:none !important;
@@ -1504,8 +1510,14 @@ margin-bottom: 5px;
     left:10px;
     background-size:cover;
 }
-#window.reduce_radius #me>.fakeme.avatar{
+#window[data-radius_size='reduce'] #me>.fakeme.avatar{
 	border-radius:4px;
+}
+#window[data-radius_size='off'] #me>.fakeme.avatar{
+	border-radius:0px;
+}
+#window[data-radius_size='increase'] #me>.fakeme.avatar{
+	border-radius:16px;
 }
 
 .card.removing{transform:scale(0);}
@@ -1636,8 +1648,14 @@ div:hover>.intro{opacity: 1;}
 	border-radius:8px;
 	color: white !important;
 }
-#window.reduce_radius .shadowed{
-	border-radius: 4px;
+#window[data-radius_size='reduce'] .shadowed{
+	border-radius:4px;
+}
+#window[data-radius_size='off'] .shadowed{
+	border-radius:0px;
+}
+#window[data-radius_size='increase'] .shadowed{
+	border-radius:16px;
 }
 .underline,.underlinenode{
 	padding:3px;
@@ -2204,10 +2222,68 @@ div:hover>.wunature{
 	border-radius:8px;
 	min-height:240px;
 }
-#window.reduce_radius .dialog.scroll1,
-#window.reduce_radius .dialog.scroll2,
-#window.reduce_radius .dialog.withbg{
+#window[data-radius_size='reduce'] .dialog.scroll1,
+#window[data-radius_size='reduce'] .dialog.scroll2,
+#window[data-radius_size='reduce'] .dialog.withbg{
 	border-radius:4px;
+}
+#window[data-radius_size='off'] .dialog.scroll1,
+#window[data-radius_size='off'] .dialog.scroll2,
+#window[data-radius_size='off'] .dialog.withbg{
+	border-radius:0px;
+}
+#window[data-radius_size='increase'] .dialog.scroll1,
+#window[data-radius_size='increase'] .dialog.scroll2,
+#window[data-radius_size='increase'] .dialog.withbg{
+	border-radius:16px;
+}
+
+
+
+#window[data-radius_size='reduce'] #system>div>div,
+#window[data-radius_size='reduce'] #mebg,
+#window[data-radius_size='reduce'] .control,
+#window[data-radius_size='reduce'] .player,
+#window[data-radius_size='reduce'] .card,
+#window[data-radius_size='reduce'] .avatar,
+#window[data-radius_size='reduce'] .avatar2,
+#window[data-radius_size='reduce'] .button,
+#window[data-radius_size='reduce'] #window>.dialog.popped,
+#window[data-radius_size='reduce'] .player.unseen .equips:not(*:empty),
+#window[data-radius_size='reduce'] .menu,
+#window[data-radius_size='reduce'] #splash>div,
+#window[data-radius_size='reduce'].mobile:not(.chess) .player[data-position='0'] .equips{
+	border-radius: 4px;
+}
+#window[data-radius_size='off'] #system>div>div,
+#window[data-radius_size='off'] #mebg,
+#window[data-radius_size='off'] .control,
+#window[data-radius_size='off'] .player,
+#window[data-radius_size='off'] .card,
+#window[data-radius_size='off'] .avatar,
+#window[data-radius_size='off'] .avatar2,
+#window[data-radius_size='off'] .button,
+#window[data-radius_size='off'] #window>.dialog.popped,
+#window[data-radius_size='off'] .player.unseen .equips:not(*:empty),
+#window[data-radius_size='off'] .menu,
+#window[data-radius_size='off'] #splash>div,
+#window[data-radius_size='off'].mobile:not(.chess) .player[data-position='0'] .equips{
+	border-radius: 0px;
+}
+#window[data-radius_size='increase'] #system>div>div,
+#window[data-radius_size='increase'] #mebg,
+#window[data-radius_size='increase'] .control,
+#window[data-radius_size='increase'] .player,
+#window[data-radius_size='increase'] .card,
+#window[data-radius_size='increase'] .avatar,
+#window[data-radius_size='increase'] .avatar2,
+#window[data-radius_size='increase'] .button,
+#window[data-radius_size='increase'] #window>.dialog.popped,
+#window[data-radius_size='increase'] .player.unseen .equips:not(*:empty),
+#window[data-radius_size='increase'] .menu,
+#window[data-radius_size='increase'] #splash>div,
+#window[data-radius_size='increase'].mobile:not(.chess) .player[data-position='0'] .equips{
+	border-radius: 16px;
 }
 
 /*--------动画--------*/

@@ -73,8 +73,14 @@
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 }
-#window.reduce_radius>.dialog{
-    border-radius:4px;
+#window[data-radius_size='reduce']>.dialog{
+	border-radius:4px;
+}
+#window[data-radius_size='off']>.dialog{
+	border-radius:0px;
+}
+#window[data-radius_size='increase']>.dialog{
+	border-radius:16px;
 }
 #arena>.dialog.slim:not(.center){
     top:40px;
@@ -154,9 +160,17 @@
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 }
-#window.reduce_radius .player.playergrid,
-#window.reduce_radius .player.obstacle{
+#window[data-radius_size='reduce'] .player.playergrid,
+#window[data-radius_size='reduce'] .player.obstacle{
     border-radius:4px;
+}
+#window[data-radius_size='off'] .player.playergrid,
+#window[data-radius_size='off'] .player.obstacle{
+    border-radius:0px;
+}
+#window[data-radius_size='increase'] .player.playergrid,
+#window[data-radius_size='increase'] .player.obstacle{
+    border-radius:16px;
 }
 .player.playerblank{
     background: none;
