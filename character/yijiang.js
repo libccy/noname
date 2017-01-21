@@ -5397,13 +5397,14 @@ character.yijiang={
 				targets[0].gain(cards,player);
 				game.delay();
 				"step 1"
-				targets[0].chooseControl('draw_card','出杀').set('ai',function(){
-					var event=_status.event;
-					if(ai.get.effect(event.target,{name:'sha'},event.player,event.player)>0){
+				targets[0].chooseControl('draw_card','出杀',function(){
+					var player=_status.event.player;
+					var target=_status.event.target;
+					if(ai.get.effect(_status.event.target,{name:'sha'},player,player)>0){
 						return 1;
 					}
 					return 0;
-				}).set(target,targets[1]).set('prompt','对'+get.translation(targets[1])+'使用一张杀，或摸一张牌');
+				}).set('target',targets[1]).set('prompt','对'+get.translation(targets[1])+'使用一张杀，或摸一张牌');
 				"step 2"
 				if(result.control=='draw_card'){
 					targets[0].draw();

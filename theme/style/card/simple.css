@@ -2,7 +2,7 @@
 	color:rgb(77, 60, 51);
 	text-shadow:none;
 	background: url('../../simple/card.png');
-	background-size:cover;
+	background-size:100% 100%;
 }
 #arena.mobile:not(.chess) .player[data-position='0']>.equips>.equip5 {
     border-radius: 4px;
