@@ -821,10 +821,18 @@
                         },
 						onclick:function(item){
 							game.saveConfig('player_border',item);
-                            if(item=='wide'&&lib.config.layout=='long'){
-                                item='normal';
+                            if(item!='wide'||lib.config.layout=='long'){
+                                ui.arena.classList.add('slim_player');
                             }
-                            ui.arena.dataset.player_border=item;
+                            else{
+                                ui.arena.classList.remove('slim_player');
+                            }
+                            if(item=='slim'){
+                                ui.arena.classList.add('uslim_player');
+                            }
+                            else{
+                                ui.arena.classList.remove('uslim_player');
+                            }
 						}
 					},
 					reduce_radius:{
@@ -4901,11 +4909,17 @@
                             }
                         }
                     }
-                    if(lib.config.player_border=='wide'&&lib.config.layout=='long'){
-    					ui.arena.dataset.player_border='normal';
-    				}
+                    if(lib.config.player_border!='wide'||lib.config.layout=='long'){
+                        ui.arena.classList.add('slim_player');
+                    }
                     else{
-                        ui.arena.dataset.player_border=lib.config.player_border;
+                        ui.arena.classList.remove('slim_player');
+                    }
+                    if(lib.config.player_border=='slim'){
+                        ui.arena.classList.add('uslim_player');
+                    }
+                    else{
+                        ui.arena.classList.remove('uslim_player');
                     }
 					setTimeout(function(){
 						ui.arena.show();
@@ -28055,11 +28069,11 @@
 				if(lib.config.low_performance){
 					ui.arena.classList.add('low_performance');
 				}
-                if(lib.config.player_border=='wide'&&lib.config.layout=='long'){
-                    ui.arena.dataset.player_border='normal';
+                if(lib.config.player_border!='wide'||lib.config.layout=='long'){
+                    ui.arena.classList.add('slim_player');
                 }
-                else{
-                    ui.arena.dataset.player_border=lib.config.player_border;
+                if(lib.config.player_border=='slim'){
+                    ui.arena.classList.add('uslim_player');
                 }
 				if(lib.config.reduce_radius){
 					ui.window.classList.add('reduce_radius');
