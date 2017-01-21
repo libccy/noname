@@ -2495,6 +2495,29 @@ character.ow={
 				return ai.get.attitude(player,event.player)<0&&
 				((player.num('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
 			},
+            intro:{
+                content:function(storage,player){
+                    var str='';
+                    if(player.storage.shanxian_h.length){
+                        str+='手牌区：'+get.translation(player.storage.shanxian_h);
+                    }
+                    if(player.storage.shanxian_e.length){
+                        if(str.length) str+='、';
+                        str+='装备区：'+get.translation(player.storage.shanxian_e);
+                    }
+                    return str;
+                },
+                mark:function(dialog,content,player){
+                    if(player.storage.shanxian_h.length){
+                        dialog.add('<div class="text center">手牌区</div>');
+                        dialog.addSmall(player.storage.shanxian_h);
+                    }
+                    if(player.storage.shanxian_e.length){
+                        dialog.add('<div class="text center">装备区</div>');
+                        dialog.addSmall(player.storage.shanxian_e);
+                    }
+				},
+            },
             logTarget:'player',
 			content:function(){
                 "step 0"
@@ -2503,11 +2526,12 @@ character.ow={
 				"step 1"
                 player.storage.shanxian_h=player.get('h');
                 player.storage.shanxian_e=player.get('e');
-                player.storage.shanxian_n=2;
+                player.storage.shanxian_n=1;
                 player.syncStorage('shanxian_e');
 				player.phase();
 				player.storage.shanxian=trigger.player;
                 player.removeSkill('shanxian2');
+                player.markSkill('shanxian');
 				"step 2"
 				if(!player.isTurnedOver()){
 					player.turnOver();
@@ -2590,6 +2614,7 @@ character.ow={
                     delete player.storage.shanxian_h;
                     delete player.storage.shanxian_e;
                     delete player.storage.shanxian_n;
+                    player.unmarkSkill('shanxian');
                 }
                 else{
                     player.addSkill('shanxian2');
@@ -2718,7 +2743,7 @@ character.ow={
         shanxian:'闪现',
         shanxian_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以摸一张牌并进行一个额外回合，并在回合结束后将武将牌翻至背面。若如此做，你对其使用卡牌无视距离直到回合结束。',
         shanhui:'闪回',
-        shanhui_info:'每当你造成或受到一次伤害，你可以将你的牌重置为上次发动闪现时的状态，若你的牌数因此而减少，你回复一点体力。每个状态最多可重现两次',
+        shanhui_info:'每当你造成或受到一次伤害，你可以将你的牌重置为上次发动闪现时的状态，若你的牌数因此而减少，你回复一点体力',
         ow_liekong:'猎空',
         ow_sishen:'死神',
         ow_tianshi:'天使',

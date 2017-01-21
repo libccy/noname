@@ -456,6 +456,9 @@ table{table-layout: fixed;}
 	transition-property: opacity;
 	overflow: hidden;
 }
+#arena:not(.phone) #roundmenu{
+	display: none !important;
+}
 #roundmenu>div{
 	width: 26px;
 	height: 4px;

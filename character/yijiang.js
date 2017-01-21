@@ -3921,6 +3921,7 @@ character.yijiang={
 				return ai.get.attitude(player,event.player)>=0;
 			},
 			priority:-5,
+			logTarget:'player',
 			content:function(){
 				game.asyncDraw([trigger.player,player]);
 			},
@@ -5506,6 +5507,10 @@ character.yijiang={
 				game.log(player,'发动了智迟，',trigger.card,'对',trigger.target,'失效')
 				trigger.untrigger();
 				trigger.finish();
+			},
+			mark:true,
+			intro:{
+				content:'杀或非延时类锦囊对你无效'
 			},
 			ai:{
 				effect:{

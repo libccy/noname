@@ -2151,24 +2151,25 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:true,
-			selectTarget:[1,3],
+			selectTarget:[1,Infinity],
 			content:function(){
 				'step 0'
 				if(target==targets[0]){
-					game.asyncDraw(targets,2);
+					game.asyncDraw(targets);
 				}
 				'step 1'
 				if(target==targets[0]){
 					game.delay();
 				}
 				'step 2'
-				target.chooseToDiscard(2,true);
+				target.chooseToDiscard('hej',true);
 			},
 			ai:{
 				order:10,
 				result:{
 					target:function(player,target){
-						switch(target.num('he')==0){
+						if(target.num('j')) return 2;
+						switch(target.num('he')){
 							case 0:return 0;
 							case 1:return 0.5;
 							case 2:return 0.8;
@@ -2856,7 +2857,22 @@ character.hearth={
 			ai:{
 				threaten:1.8,
 				order:function(name,player){
-					return 10;
+					var max=true,num=0;
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]==player) continue;
+						var att=ai.get.attitude(player,game.players[i]);
+						var dh=player.num('h')-game.players[i].num('h');
+						if(att*dh>num){
+							if(att>0){
+								max=true;
+							}
+							else if(att<0){
+								max=false;
+							}
+						}
+					}
+					if(max) return 10;
+					return 0.5;
 				},
 				result:{
 					target:function(player,target){
@@ -5464,7 +5480,7 @@ character.hearth={
 		byuhuo2:'浴火',
 		byuhuo_info:'觉醒技，当你进入濒死状态时，你须将体力和体力上限变为2，并将武将牌翻至背面；在你的下一回合开始时，你对所有其他角色造成两点火焰伤害，在此之前，你不能成为其他角色的卡牌的目标',
 		yulu:'雨露',
-		yulu_info:'出牌阶段限一次，你可以指定至多3名角色各摸两张牌，然后各弃置两张牌',
+		yulu_info:'出牌阶段限一次，你可以指定任意名角色各摸一张牌，然后各弃置一区域内的一张牌',
 		fengyin:'封印',
 		fengyin2:'封印',
 		fengyin_info:'回合结束阶段，若你于本回合内未使用过锦囊牌，你可以指定一名其他角色令其下个回合无法使用锦囊牌',

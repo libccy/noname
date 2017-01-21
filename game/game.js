@@ -648,11 +648,11 @@
                             game.saveConfig('phonelayout',bool);
         					if(lib.isPhoneLayout()){
                                 ui.css.phone.href=lib.assetURL+'layout/default/phone.css';
-        						ui.roundmenu.style.display='';
+                                ui.arena.classList.add('phone');
         					}
         					else{
                                 ui.css.phone.href='';
-        						ui.roundmenu.style.display='none';
+                                ui.arena.classList.remove('phone');
         					}
                         }
                     },
@@ -4878,11 +4878,11 @@
                     }
                     if(lib.isPhoneLayout()){
                         ui.css.phone.href=lib.assetURL+'layout/default/phone.css';
-                        ui.roundmenu.style.display='';
+                        ui.arena.classList.add('phone');
                     }
                     else{
                         ui.css.phone.href='';
-                        ui.roundmenu.style.display='none';
+                        ui.arena.classList.remove('phone');
                     }
                     for(var i=0;i<game.players.length;i++){
                         if(get.is.linked2(game.players[i])){
@@ -11141,7 +11141,23 @@
 						delete this.node.prompt;
 					}
 				},
-				prompt:function(name2,className){
+                prompt:function(str,nature){
+                    var node;
+                    if(this.node.prompt){
+						node=this.node.prompt;
+						node.innerHTML='';
+						node.className='damage normal-font damageadded';
+					}
+					else{
+						node=ui.create.div('.damage.normal-font',this);
+						this.node.prompt=node;
+						ui.refresh(node);
+						node.classList.add('damageadded');
+					}
+                    node.innerHTML=str;
+                    node.dataset.nature=nature||'soil';
+                },
+				prompt_old:function(name2,className){
 					var node;
 					if(this.node.prompt){
 						node=this.node.prompt;
@@ -28157,8 +28173,8 @@
 					ui.roundmenu.style.transform='translate('+translate[0]+'px,'+translate[1]+'px)';
 					ui.click.checkroundtranslate();
 				}
-				if(!lib.isPhoneLayout()){
-					ui.roundmenu.style.display='none';
+				if(lib.isPhoneLayout()){
+					ui.arena.classList.add('phone');
 				}
 
 				ui.sidebar=ui.create.div('#sidebar');
@@ -31538,7 +31554,7 @@
         is:{
             linked2:function(player){
                 if(lib.config.link_style=='mark') return true;
-                if(player==game.me){
+                if(player.dataset.position=='0'){
                     return ui.arena.classList.contains('oblongcard');
                 }
                 else{

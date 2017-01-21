@@ -55,35 +55,44 @@
 }
 
 /*--------位置(8人)------*/
-#arena:not(.fewplayer)[data-number='8']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
-#arena:not(.fewplayer)[data-number='8']>.player[data-position='2']{top:calc(60% / 3 - 108px);left:calc(500% / 6 - 100px);}
-#arena:not(.fewplayer)[data-number='8']>.player[data-position='3']{top:0;left:calc(400% / 6 - 80px);}
-#arena:not(.fewplayer)[data-number='8']>.player[data-position='4']{top:0;left:calc(300% / 6 - 60px);}
-#arena:not(.fewplayer)[data-number='8']>.player[data-position='5']{top:0;left:calc(200% / 6 - 40px);}
-#arena:not(.fewplayer)[data-number='8']>.player[data-position='6']{top:calc(60% / 3 - 108px);left:calc(100% / 6 - 20px);}
-#arena:not(.fewplayer)[data-number='8']>.player[data-position='7']{top:calc(200% / 3 - 340px);left:0;}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='1']{top:calc(30% - 120px);left:calc(-300% / 94 + 4375% / 47 - 735px + 720px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='2']{top:calc(8% - 32px);left:calc(-300% / 94 + 3750% / 47 - 630px + 600px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='3']{top:0;left:calc(-300% / 94 + 3125% / 47 - 525px + 480px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='4']{top:0;left:calc(-300% / 94 + 2500% / 47 - 420px + 360px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='5']{top:0;left:calc(-300% / 94 + 1875% / 47 - 315px + 240px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='6']{top:calc(8% - 32px);left:calc(-300% / 94 + 1250% / 47 - 210px + 120px);}
+#arena:not(.fewplayer)[data-number='8']>.player[data-position='7']{top:calc(30% - 120px);left:calc(-300% / 94 + 625% / 47 - 105px);}
+@media screen and (min-width: 1105px){
+    #arena:not(.fewplayer)[data-number='8']>.player[data-position='1']{left:calc(100% - 120px);}
+    #arena:not(.fewplayer)[data-number='8']>.player[data-position='2']{left:calc(500% / 6 - 100px);}
+    #arena:not(.fewplayer)[data-number='8']>.player[data-position='3']{left:calc(400% / 6 - 80px);}
+    #arena:not(.fewplayer)[data-number='8']>.player[data-position='4']{left:calc(300% / 6 - 60px);}
+    #arena:not(.fewplayer)[data-number='8']>.player[data-position='5']{left:calc(200% / 6 - 40px);}
+    #arena:not(.fewplayer)[data-number='8']>.player[data-position='6']{left:calc(100% / 6 - 20px);}
+    #arena:not(.fewplayer)[data-number='8']>.player[data-position='7']{left:0;}
+}
 /*--------位置(7人)------*/
-#arena:not(.fewplayer)[data-number='7']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
-#arena:not(.fewplayer)[data-number='7']>.player[data-position='2']{top:calc(60% / 3 - 108px);left:calc(80% - 96px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='2']{top:calc(8% - 32px);left:calc(80% - 96px);}
 #arena:not(.fewplayer)[data-number='7']>.player[data-position='3']{top:0;left:calc(60% - 72px);}
 #arena:not(.fewplayer)[data-number='7']>.player[data-position='4']{top:0;left:calc(40% - 48px);}
-#arena:not(.fewplayer)[data-number='7']>.player[data-position='5']{top:calc(60% / 3 - 108px);left:calc(20% - 24px);}
-#arena:not(.fewplayer)[data-number='7']>.player[data-position='6']{top:calc(200% / 3 - 340px);left:0;}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='5']{top:calc(8% - 32px);left:calc(20% - 24px);}
+#arena:not(.fewplayer)[data-number='7']>.player[data-position='6']{top:calc(30% - 120px);left:0;}
 /*--------位置(6人)------*/
-#arena:not(.fewplayer)[data-number='6']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
-#arena:not(.fewplayer)[data-number='6']>.player[data-position='2']{top:calc(60% / 3 - 108px);left:calc(75% - 90px);}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='2']{top:0px;left:calc(75% - 90px);}
 #arena:not(.fewplayer)[data-number='6']>.player[data-position='3']{top:0;left:calc(50% - 60px);}
-#arena:not(.fewplayer)[data-number='6']>.player[data-position='4']{top:calc(60% / 3 - 108px);left:calc(25% - 30px);}
-#arena:not(.fewplayer)[data-number='6']>.player[data-position='5']{top:calc(200% / 3 - 340px);left:0;}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='4']{top:0px;left:calc(25% - 30px);}
+#arena:not(.fewplayer)[data-number='6']>.player[data-position='5']{top:calc(30% - 120px);left:0;}
 /*--------位置(5人)------*/
-#arena:not(.fewplayer)[data-number='5']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='5']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
 #arena:not(.fewplayer)[data-number='5']>.player[data-position='2']{top:0;left:calc(200% / 3 - 80px);}
 #arena:not(.fewplayer)[data-number='5']>.player[data-position='3']{top:0;left:calc(100% / 3 - 40px);}
-#arena:not(.fewplayer)[data-number='5']>.player[data-position='4']{top:calc(200% / 3 - 340px);left:0;}
+#arena:not(.fewplayer)[data-number='5']>.player[data-position='4']{top:calc(30% - 120px);left:0;}
 /*--------位置(4人)------*/
-#arena:not(.fewplayer)[data-number='4']>.player[data-position='1']{top:calc(200% / 3 - 340px);left:calc(100% - 120px);}
+#arena:not(.fewplayer)[data-number='4']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
 #arena:not(.fewplayer)[data-number='4']>.player[data-position='2']{top:0;left:calc(50% - 60px);}
-#arena:not(.fewplayer)[data-number='4']>.player[data-position='3']{top:calc(200% / 3 - 340px);left:0;}
+#arena:not(.fewplayer)[data-number='4']>.player[data-position='3']{top:calc(30% - 120px);left:0;}
 /*--------位置(3人)------*/
 #arena:not(.fewplayer)[data-number='3']>.player[data-position='1']{top:calc(60% / 3 - 88px);left:calc(75% + 80px);}
 #arena:not(.fewplayer)[data-number='3']>.player[data-position='2']{top:calc(60% / 3 - 88px);left:calc(25% - 200px);}

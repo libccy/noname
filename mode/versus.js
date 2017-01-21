@@ -823,10 +823,11 @@ mode.versus={
 					delete ui.cheat2;
 				}
 				game.me.init(result.links[0]);
+				game.addRecentCharacter(game.me.name);
 				if(_status.replacetwo){
 					game.me.replacetwo=result.links[1];
+					game.addRecentCharacter(game.me.replacetwo);
 				}
-				game.addRecentCharacter(game.me.name);
 				event.list.remove(game.me.name);
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=game.me){
