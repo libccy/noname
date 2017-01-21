@@ -221,6 +221,11 @@
     z-index: 3;
     text-align: right;
 }
+#arena.uslim_player .player:not([data-position='0'])>.count{
+    z-index: 3;
+    border-radius: 2px;
+    text-align: center;
+}
 #arena:not(.chess) .player[data-position='0']>.hp.actcount{
     top:10px;
     left:2px;

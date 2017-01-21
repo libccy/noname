@@ -1,8 +1,9 @@
 window.noname_update={
-    version:'1.9.4.2',
-    update:'1.9.4.1',
+    version:'1.9.5',
+    update:'1.9.5',
     changeLog:[
-        'bug修复',
+        '新外观选项',
+        '塔防模式修复',
     ],
     files:[
         'game/game.js',

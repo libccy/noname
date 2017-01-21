@@ -15,6 +15,12 @@
 	left:7px;
 	top:7px;
 }
+#window>.player:not(.minskin)>.avatar,#arena.uslim_player .player:not(.minskin):not(.fakeme) .avatar{
+	width: 144px;
+	height: 174px;
+	left:3px;
+	top:3px;
+}
 #window>.player.minskin>.avatar{
 	width: 106px;
 	height: 106px;
@@ -35,6 +41,12 @@
 	height: 106px;
 	left:7px;
 	top:7px;
+}
+#arena.uslim_player .player.minskin:not(.fakeme) .avatar:not(.fakeme){
+	width: 114px;
+	height: 114px;
+	left:3px;
+	top:3px;
 }
 .player.minskin .hp,
 .player.minskin .hp.text{
@@ -82,6 +94,10 @@
 #arena.slim_player .player.fullskin2:not(.minskin) .avatar2{
 	width: 68px;
 }
+#arena.uslim_player .player.fullskin2:not(.minskin) .avatar,
+#arena.uslim_player .player.fullskin2:not(.minskin) .avatar2{
+	width: 72px;
+}
 .player.fullskin2 .avatar{
 	border-radius:8px 0 0 8px;
 }
@@ -100,6 +116,11 @@
 	top:7px;
 	right:7px;
 	height: 166px;
+}
+#arena.uslim_player .player.fullskin2:not(.minskin) .avatar2{
+	top:3px;
+	right:3px;
+	height: 174px;
 }
 .player .marks,
 .player .judges{

@@ -40,7 +40,7 @@ mode.boss={
 		game.delay(0.1);
 		"step 1"
 		var bosslist=ui.create.div('#bosslist.hidden');
-		if(lib.config.slim_player){
+		if(lib.config.player_border!='wide'){
 			bosslist.classList.add('slim');
 		}
 		event.bosslist=bosslist;

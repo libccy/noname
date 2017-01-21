@@ -20,7 +20,7 @@ mode.tafang={
 			}
 		}
 		get.chessDistance=lib.init.eval(result.get.chessDistance);
-		ai.get.attitude=lib.init.eval(result.ai.get.attitude);
+		ai.get.rawAttitude=lib.init.eval(result.ai.get.rawAttitude);
 		var toLoad=['addChessPlayer','addObstacle','removeObstacle','isChessNeighbour',
 			'draw2','updateCanvas2','setChessInfo','modeSwapPlayer'];
 		for(var i=0;i<toLoad.length;i++){
