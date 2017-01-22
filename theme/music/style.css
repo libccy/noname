@@ -4,7 +4,8 @@ html{
 	background: url('grid.png'),linear-gradient(#333333, #222222) fixed;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
-.player.unseen .equips:not(*:empty),.menu,#splash>div,
+#arena:not(.long) .player.unseen .equips:not(*:empty),
+#arena.long .player.unseen2 .equips:not(*:empty),.menu,#splash>div,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg,.menubg,.mebg{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(#4b4b4b, #464646);
@@ -40,12 +41,15 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 	border-radius: 6px;
 }
 .control,#system>div>div,.judges>div,.marks>div,
-.player.unseen .equips:not(*:empty){
+#arena:not(.long) .player.unseen .equips:not(*:empty),
+#arena.long .player.unseen2 .equips:not(*:empty){
 	border-radius:4px;
 }
 
-#arena.mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
-#arena:not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card{
+#arena:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card,
+#arena.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty)>.card{
 	background: none !important;
 }
 

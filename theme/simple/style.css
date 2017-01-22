@@ -15,7 +15,8 @@ body{
 	display: block;
 }
 #system>div>div,#mebg,.control,.player,.card,.avatar,.avatar2,.button,#window>.dialog.popped,
-.player.unseen .equips:not(*:empty),.menu,.menubutton,#splash>div,
+#arena:not(.long) .player.unseen .equips:not(*:empty),
+#arena.long .player.unseen2 .equips:not(*:empty),.menu,.menubutton,#splash>div,
 #arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg,.menubg,.mebg{
 	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
@@ -32,22 +33,6 @@ body{
 	background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)) !important;
 }
 
-#window.reduce_radius #system>div>div,
-#window.reduce_radius #mebg,
-#window.reduce_radius .control,
-#window.reduce_radius .player,
-#window.reduce_radius .card,
-#window.reduce_radius .avatar,
-#window.reduce_radius .avatar2,
-#window.reduce_radius .button,
-#window.reduce_radius #window>.dialog.popped,
-#window.reduce_radius .player.unseen .equips:not(*:empty),
-#window.reduce_radius .menu,.menubutton,
-#window.reduce_radius #splash>div,
-#window.reduce_radius.mobile:not(.chess) .player[data-position='0'] .equips{
-	border-radius: 4px;
-}
-
 /*.player.current_action{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 }*/
@@ -62,11 +47,14 @@ body{
 	border-radius: 6px;
 }
 .control,#system>div>div,.judges>div,.marks>div,
-.player.unseen .equips:not(*:empty){
+#arena:not(.long) .player.unseen .equips:not(*:empty),
+#arena.long .player.unseen2 .equips:not(*:empty){
 	border-radius:4px;
 }
-#arena.mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
-#arena:not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card{
+#arena:not(.long_.mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena:not(.long_:not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card,
+#arena.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty)>.card{
 	background: none !important;
 }
 #arena.mobile:not(.chess) .player[data-position='0']>.equips>.equip5 {

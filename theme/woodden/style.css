@@ -29,14 +29,18 @@ html{
 	background:url('wood2.png');
 }
 
-#arena.mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty),
-#arena:not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty){
+#arena:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty),
+#arena:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty),
+#arena.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty),
+#arena.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty){
 	background: url('wood.png');
 	border-radius:4px;
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 2px 10px;
 }
-#arena.mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
-#arena:not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card{
+#arena:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card,
+#arena.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty)>.card{
 	background: none !important;
 }
 

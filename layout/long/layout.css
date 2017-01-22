@@ -21,7 +21,7 @@
 }
 #arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar,
 #arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
-    height: 103px !important;
+    height: 110px !important;
     background-position: 0 0 !important;
     border-radius: 8px !important;
 }
@@ -81,7 +81,7 @@
     border-radius: 0 0 16px 16px !important;
 }
 #arena:not(.fewplayer)>.player.fullskin2:not(.minskin):not(*[data-position='0'])>.avatar2{
-    top: 110px !important;
+    top: 103px !important;
 }
 #arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.identity{
     left: 102px;
@@ -91,6 +91,17 @@
 }
 #arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.hp:not(.actcount).text{
     left: 89px;
+}
+.player.fullskin2 .avatar2{
+    z-index: 2;
+}
+.player.unseen:not(.unseen2) .count{
+    text-align: left;
+	border-radius:3px 0 0 3px;
+}
+.player.unseen2 .count{
+	border-radius: 3px;
+	text-align: center;
 }
 
 .timerbar>div{

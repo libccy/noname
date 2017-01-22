@@ -12,5 +12,8 @@ window.noname_update={
         'card/swd.js',
         'mode/tafang.js',
         'layout/newlayout/global.css',
+        'theme/woodden/style.css',
+        'theme/music/style.css',
+        'theme/simple/style.css',
     ]
 }

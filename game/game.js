@@ -495,7 +495,8 @@
 							default:'旧版',
 							newlayout:'对称',
 							mobile:'默认',
-                            long:'手杀'
+                            long:'手杀',
+                            // long2:'新版',
 						},
 						onclick:function(layout){
 							if(lib.config.layoutfixed.contains(lib.config.mode)&&layout=='default'){
@@ -821,7 +822,7 @@
                         },
 						onclick:function(item){
 							game.saveConfig('player_border',item);
-                            if(item!='wide'||lib.config.layout=='long'){
+                            if(item!='wide'||lib.config.layout=='long'||lib.config.layout=='long2'){
                                 ui.arena.classList.add('slim_player');
                             }
                             else{
@@ -1401,7 +1402,12 @@
                         else{
                             map.textequip.hide();
                             map.cardshape.hide();
-                            map.phonelayout.hide();
+                            if(lib.config.layout=='long2'){
+                                map.phonelayout.show();
+                            }
+                            else{
+                                map.phonelayout.hide();
+                            }
                         }
                         if(config.show_log!='off'){
                             map.clear_log.show();
@@ -3609,10 +3615,10 @@
 		},
         isPhoneLayout:function(){
             if(!lib.config.phonelayout) return false;
-            return (lib.config.layout=='mobile'||lib.config.layout=='long');
+            return (lib.config.layout=='mobile'||lib.config.layout=='long'||lib.config.layout=='long2');
         },
 		isSingleHandcard:function(){
-			if(game.singleHandcard||lib.config.layout=='mobile'||lib.config.layout=='long'){
+			if(game.singleHandcard||lib.config.layout=='mobile'||lib.config.layout=='long'||lib.config.layout=='long2'){
 				return true;
 			}
 			if(lib.config.layout=='default'&&lib.config.layoutfixed.contains(lib.config.mode)){
@@ -4910,7 +4916,13 @@
                             }
                         }
                     }
-                    if(lib.config.player_border!='wide'||lib.config.layout=='long'){
+                    if(lib.config.layout=='long'||lib.config.layout=='long2'){
+                        ui.arena.classList.add('long');
+                    }
+                    else{
+                        ui.arena.classList.remove('long');
+                    }
+                    if(lib.config.player_border!='wide'||lib.config.layout=='long'||lib.config.layout=='long2'){
                         ui.arena.classList.add('slim_player');
                     }
                     else{
@@ -28064,13 +28076,16 @@
 				if(lib.config.layout=='mobile'||lib.config.layout=='long'){
 					ui.arena.classList.add('mobile');
 				}
+                if(lib.config.layout=='long'||lib.config.layout=='long2'){
+					ui.arena.classList.add('long');
+				}
 				if(lib.config.layout=='default'){
 					ui.arena.classList.add('oldlayout');
 				}
 				if(lib.config.low_performance){
 					ui.arena.classList.add('low_performance');
 				}
-                if(lib.config.player_border!='wide'||lib.config.layout=='long'){
+                if(lib.config.player_border!='wide'||lib.config.layout=='long'||lib.config.layout=='long2'){
                     ui.arena.classList.add('slim_player');
                 }
                 if(lib.config.player_border=='slim'){
@@ -31577,7 +31592,7 @@
                     return ui.arena.classList.contains('oblongcard');
                 }
                 else{
-                    return lib.config.layout=='long';
+                    return lib.config.layout=='long'||lib.config.layout=='long2';
                 }
             },
             empty:function(obj){

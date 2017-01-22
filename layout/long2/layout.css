@@ -1,0 +1,239 @@
+@import "../newlayout/layout.css";
+#arena{
+    height: calc(95% + 20px);
+}
+#arena.oblongcard:not(.chess):not(.nome){
+    height: 95%;
+}
+#arena.oblongcard:not(.chess):not(.nome) #me,
+#arena.oblongcard:not(.chess):not(.nome) #mebg{
+    height: 140px;
+    bottom: 10px;
+}
+#historybar{
+    height: calc(95% - 160px);
+}
+#control{
+    width: calc(5000% / 47 - 240px);
+    left:calc(-150% / 47 + 120px);
+    bottom:150px;
+    height: 40px;
+}
+#arena:not(.chess)>#me,
+#arena:not(.chess)>#mebg,
+#arena:not(.chess)>#autonode{
+    bottom: 50px;
+    width: calc(100% - 20px);
+    left: 20px;
+    top: auto;
+    height: 120px;
+}
+#arena:not(.chess)>#autonode{
+    width: calc(5000% / 47 - 240px);
+    left:calc(-150% / 47 + 120px);
+}
+#window.leftbar #arena:not(.chess)>#me,
+#window.leftbar #arena:not(.chess)>#mebg,
+#window.leftbar #arena:not(.chess)>#autonode,
+#window.leftbar #arena:not(.chess) .player[data-position='0']{
+    width: calc(5000% / 47 + 2500px / 47);
+    left:calc(-150% / 47 - 50px - 75px / 47);
+}
+#window.leftbar #arena:not(.chess)>#autonode{
+    width: calc(5000% / 47 + 2500px / 47 - 240px);
+    left:calc(-150% / 47 - 50px - 75px / 47 + 120px);
+}
+#window.rightbar #arena:not(.chess)>#me,
+#window.rightbar #arena:not(.chess)>#mebg,
+#window.rightbar #arena:not(.chess)>#autonode,
+#window.rightbar #arena:not(.chess) .player[data-position='0']{
+    width: calc(5000% / 47 + 2500px / 47);
+    left:calc(-150% / 47 - 75px / 47);
+}
+#window.rightbar #arena:not(.chess)>#autonode{
+    width: calc(5000% / 47 + 2500px / 47 - 240px);
+    left:calc(-150% / 47 - 75px / 47 + 120px);
+}
+#arena:not(.chess) #handcards1{
+    height:120px;
+    padding:0;
+    top:calc(100% - 120px);
+}
+#arena:not(.chess):not(.single-handcard) #handcards1{
+    width: calc(100% - 100px);
+    left: 100px;
+}
+#handcards2{
+    display:none;
+}
+.dialog{
+	height:calc(100% - 370px);
+    bottom:170px;
+}
+.dialog.fullheight {
+    height: calc(100% - 123px) !important;
+    top: 40px !important;
+}
+
+#me>.fakeme.avatar{
+    width:120px;
+    height:100%;
+    border-radius:0px;
+    top:0;
+    left:0;
+    background-size:cover;
+}
+#window[data-radius_size='increase'] #me>.fakeme.avatar,
+#window[data-radius_size='reduce'] #me>.fakeme.avatar{
+    border-radius:0px;
+}
+#arena>.player[data-position='0']{
+    left: 0;
+    top: calc(100% - 220px);
+}
+#arena:not(.mobile):not(.single-handcard) #handcards1>div{
+    left: 0;
+}
+
+
+#arena>.player:not(.minskin){
+    width: 120px !important;
+    height: 180px !important;
+}
+#arena>.player:not(.minskin)>.equips{
+    transform: scale(0.8);
+    transform-origin: bottom left;
+}
+#arena>.player:not(.minskin)>.avatar,
+#arena>.player:not(.minskin)>.avatar2{
+    width: 106px !important;
+    height: 166px !important;
+    background-position: 50% !important;
+}
+#arena.uslim_player>.player:not(.minskin)>.avatar,
+#arena.uslim_player>.player:not(.minskin)>.avatar2{
+    width: 114px !important;
+    height: 194px !important;
+    background-position: 50% !important;
+}
+#arena>.player.fullskin2:not(.minskin)>.avatar,
+#arena>.player.fullskin2:not(.minskin)>.avatar2{
+    height: 93px !important;
+    background-position: 0 0 !important;
+    border-radius: 8px !important;
+}
+#arena.uslim_player>.player.fullskin2:not(.minskin)>.avatar,
+#arena.uslim_player>.player.fullskin2:not(.minskin)>.avatar2{
+    height: 97px !important;
+}
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin)>.avatar,
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
+    border-radius: 4px !important;
+}
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin)>.avatar,
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
+    border-radius: 0px !important;
+}
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin)>.avatar,
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
+    border-radius: 16px !important;
+}
+#arena>.player.fullskin2:not(.minskin)>.avatar{
+    border-radius: 8px 8px 0 0 !important;
+    height: 114px !important;
+    -webkit-clip-path: polygon(-10px -10px, 116px -10px, 116px 82px, 106px 82px, 0px 104px, -10px 104px);
+}
+#arena.uslim_player>.player.fullskin2:not(.minskin)>.avatar{
+    height: 118px !important;
+    -webkit-clip-path: polygon(-10px -10px, 124px -10px, 124px 86px, 114px 86px, 0px 108px, -10px 108px);
+}
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin)>.avatar{
+    border-radius: 4px 4px 0 0 !important;
+}
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin)>.avatar{
+    border-radius: 0 0 0 0 !important;
+}
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin)>.avatar{
+    border-radius: 16px 16px 0 0 !important;
+}
+#arena>.player.fullskin2:not(.minskin)>.avatar2{
+    border-radius: 0 0 8px 8px !important;
+    top: 79px !important;
+    height: 114px !important;
+    background-position: 0 10px !important;
+    -webkit-clip-path: polygon(-10px 32px, 0 32px, 106px 10px, 116px 10px, 116px 134px, -10px 134px);
+}
+#arena.uslim_player>.player.fullskin2:not(.minskin)>.avatar2{
+    top: 79px !important;
+    height: 118px !important;
+    -webkit-clip-path: polygon(-10px 32px, 0 32px, 114px 10px, 124px 10px, 124px 138px, -10px 138px);
+}
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
+    border-radius: 0 0 4px 4px !important;
+}
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
+    border-radius: 0 0 0 0 !important;
+}
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
+    border-radius: 0 0 16px 16px !important;
+}
+#arena>.player:not(.minskin)>.identity{
+    left: 102px;
+}
+#arena>.player:not(.minskin)>.hp:not(.actcount){
+    left: 93px;
+}
+#arena>.player:not(.minskin)>.hp:not(.actcount).text{
+    left: 89px;
+}
+
+.timerbar>div{
+    top: 205px;
+    width: 96px;
+    left: 12px;
+}
+
+/*--------位置(8人)------*/
+#arena[data-number='8']>.player[data-position='1']{top:calc(30% - 120px);left:calc(-300% / 94 + 4375% / 47 - 735px + 720px);}
+#arena[data-number='8']>.player[data-position='2']{top:calc(8% - 32px);left:calc(-300% / 94 + 3750% / 47 - 630px + 600px);}
+#arena[data-number='8']>.player[data-position='3']{top:0;left:calc(-300% / 94 + 3125% / 47 - 525px + 480px);}
+#arena[data-number='8']>.player[data-position='4']{top:0;left:calc(-300% / 94 + 2500% / 47 - 420px + 360px);}
+#arena[data-number='8']>.player[data-position='5']{top:0;left:calc(-300% / 94 + 1875% / 47 - 315px + 240px);}
+#arena[data-number='8']>.player[data-position='6']{top:calc(8% - 32px);left:calc(-300% / 94 + 1250% / 47 - 210px + 120px);}
+#arena[data-number='8']>.player[data-position='7']{top:calc(30% - 120px);left:calc(-300% / 94 + 625% / 47 - 105px);}
+@media screen and (min-width: 1105px){
+    #arena[data-number='8']>.player[data-position='1']{left:calc(100% - 120px);}
+    #arena[data-number='8']>.player[data-position='2']{left:calc(500% / 6 - 100px);}
+    #arena[data-number='8']>.player[data-position='3']{left:calc(400% / 6 - 80px);}
+    #arena[data-number='8']>.player[data-position='4']{left:calc(300% / 6 - 60px);}
+    #arena[data-number='8']>.player[data-position='5']{left:calc(200% / 6 - 40px);}
+    #arena[data-number='8']>.player[data-position='6']{left:calc(100% / 6 - 20px);}
+    #arena[data-number='8']>.player[data-position='7']{left:0;}
+}
+/*--------位置(7人)------*/
+#arena[data-number='7']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
+#arena[data-number='7']>.player[data-position='2']{top:calc(8% - 32px);left:calc(80% - 96px);}
+#arena[data-number='7']>.player[data-position='3']{top:0;left:calc(60% - 72px);}
+#arena[data-number='7']>.player[data-position='4']{top:0;left:calc(40% - 48px);}
+#arena[data-number='7']>.player[data-position='5']{top:calc(8% - 32px);left:calc(20% - 24px);}
+#arena[data-number='7']>.player[data-position='6']{top:calc(30% - 120px);left:0;}
+/*--------位置(6人)------*/
+#arena[data-number='6']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
+#arena[data-number='6']>.player[data-position='2']{top:0px;left:calc(75% - 90px);}
+#arena[data-number='6']>.player[data-position='3']{top:0;left:calc(50% - 60px);}
+#arena[data-number='6']>.player[data-position='4']{top:0px;left:calc(25% - 30px);}
+#arena[data-number='6']>.player[data-position='5']{top:calc(30% - 120px);left:0;}
+/*--------位置(5人)------*/
+#arena[data-number='5']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
+#arena[data-number='5']>.player[data-position='2']{top:0;left:calc(200% / 3 - 80px);}
+#arena[data-number='5']>.player[data-position='3']{top:0;left:calc(100% / 3 - 40px);}
+#arena[data-number='5']>.player[data-position='4']{top:calc(30% - 120px);left:0;}
+/*--------位置(4人)------*/
+#arena[data-number='4']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}
+#arena[data-number='4']>.player[data-position='2']{top:0;left:calc(50% - 60px);}
+#arena[data-number='4']>.player[data-position='3']{top:calc(30% - 120px);left:0;}
+/*--------位置(3人)------*/
+#arena[data-number='3']>.player[data-position='1']{top:calc(60% / 3 - 88px);left:calc(75% + 80px);}
+#arena[data-number='3']>.player[data-position='2']{top:calc(60% / 3 - 88px);left:calc(25% - 200px);}
+/*--------位置(2人)------*/
+#arena[data-number='2']>.player[data-position='1']{top:0;left:calc(50% - 60px);}
