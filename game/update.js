@@ -5,8 +5,9 @@ window.noname_update={
         'bug修复',
     ],
     files:[
-        // 'game/server.js',
-        // 'character/swd.js',
+        'game/game.js',
+        'character/gujian.js',
+        'character/swd.js',
         'character/rank.js',
         'character/xianjian.js',
         'card/swd.js',

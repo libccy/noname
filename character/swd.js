@@ -7053,22 +7053,14 @@ character.swd={
 				"step 0"
 				target.damage();
 				"step 1"
-				if(target.isAlive()){
-					target.turnOver();
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				target.draw(target.maxHp-target.hp);
+				var he=target.get('he');
+				target.discard(he.randomGets(target.maxHp-target.hp));
 			},
 			ai:{
 				expose:0.3,
 				result:{
 					target:function(player,target){
-						var eff=ai.get.damageEffect(target,player);
-						if(target.hp==1) return eff;
-						return target.maxHp-target.hp-2+eff;
+						return ai.get.damageEffect(target,player)-(target.maxHp-target.hp)/2;
 					}
 				},
 				order:5
@@ -7138,7 +7130,7 @@ character.swd={
 				}
 			},
 			multitarget:true,
-			line:false,
+			multiline:true,
 			selectTarget:[1,3],
 			ai:{
 				order:function(){
@@ -8871,7 +8863,7 @@ character.swd={
 		jifeng_info:'你的杀和单体锦囊可以额外指定任意个目标，若如此做，此卡牌有一定机率失效，指定的目标越多失效的概率越大',
 		mohua_info:'锁定技，在身份局中，当你进入濒死状态时，你立即变身为撒旦，体力上限变为现存角色数（至少为4），并成为其他所有角色的共同敌人',
 		miles_xueyi_info:'锁定技，你防止即将受到的伤害，然后流失一点体力',
-		duanyi_info:'出牌阶段限一次，你可以弃置两张杀，对一名角色造成一点伤害，然后其翻面并摸X张牌，X为其已损失的体力值',
+		duanyi_info:'出牌阶段限一次，你可以弃置两张杀，对一名角色造成一点伤害，然后其随机弃置X张牌，X为其已损失的体力值',
 		guxing_info:'出牌阶段，你可以将最后至多X张手牌当杀使用，此杀无视距离且可以指定至多3个目标，每造成一次伤害，你摸一张牌，Ｘ为你已损失的体力值且至少为１。',
 		tianlun_info:'任意一名角色的判定生效前，你可以弃置一张场上角色的判定牌代替之',
 		hlongyin_info:'出牌阶段，你可以弃置任意张颜色相同且点数不同的牌，并获得逆时针座位距离与卡牌点数相同的角色区域内的一张牌。每阶段限一次',

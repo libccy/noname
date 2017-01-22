@@ -60,7 +60,6 @@
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',
         hallURL:'websha.cn',
-        reserveSkillName:['others','zhu','zhuSkill'],
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -5274,7 +5273,7 @@
                 targets.add(game.me);
 				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),targets);
 			},
-			rank:function(){
+			r:function(){
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
@@ -5424,7 +5423,7 @@
 				cheat.z('liushan');
 			},
 			lb:function(){
-				cheat.z('liubei');
+				cheat.z('re_liubei');
 			}
 		},
 		translate:{
@@ -7020,10 +7019,10 @@
 								str+='个目标';
 							}
 							event.dialog=ui.create.dialog(str);
-							event.dialog.add('0/'+get.numStr(event.selectTarget[1]));
+							event.dialog.add('0/'+get.numStr(get.select(event.selectTarget)[1]));
 							event.custom.add.target=function(){
 								_status.event.dialog.content.childNodes[1].innerHTML=
-								ui.selected.targets.length+'/'+get.numStr(_status.event.selectTarget[1]);
+								ui.selected.targets.length+'/'+get.numStr(get.select(event.selectTarget)[1]);
 							}
 						}
 						else if(get.itemtype(event.dialog)=='dialog'){
@@ -14693,6 +14692,9 @@
 			storage:{},
 			unequip:{},
             undist:{},
+            others:{},
+            zhu:{},
+            zhuSkill:{},
 			mad:{
 				mark:true,
 				intro:{
@@ -20332,7 +20334,7 @@
     						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card){
                                 value2=ai.get.value(target[get.subtype(card)],target);
                             }
-                            return Math.max(0,value1-value2);
+                            return Math.max(0,value1-value2)/5;
     					});
                     }(i));
 				}
@@ -25245,14 +25247,14 @@
                                 name=name[0];
                                 if(currentButton){
                                     if(currentButton.link!=name){
-                                        if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
+                                        if(lib.skill[name]||page.content.pack.skill[name]){
                                             editnode.classList.add('disabled');
                                             return;
                                         }
                                     }
                                 }
                                 else{
-                                    if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
+                                    if(lib.skill[name]||page.content.pack.skill[name]){
                                         editnode.classList.add('disabled');
                                         return;
                                     }
@@ -25587,7 +25589,7 @@
                                 name=name[0];
                                 if(currentButton){
                                     if(currentButton.link!=name){
-                                        if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
+                                        if(lib.skill[name]||page.content.pack.skill[name]){
                                             alert('技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一');
                                             return;
                                         }
@@ -25598,7 +25600,7 @@
                                     }
                                 }
                                 else{
-                                    if(lib.reserveSkillName.contains(name)||lib.skill[name]||page.content.pack.skill[name]){
+                                    if(lib.skill[name]||page.content.pack.skill[name]){
                                         alert('技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一');
                                         return;
                                     }
@@ -32517,6 +32519,9 @@
 				var card=get.info(_status.event.skill).viewAs;
 				if(card) return card;
 			}
+            if(_status.event._get_card){
+                return _status.event._get_card;
+            }
 			return ui.selected.cards[0];
 		},
 		player:function(){

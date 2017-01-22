@@ -58,6 +58,7 @@ window.characterRank={
         'hs_alakir',
         'hs_morgl',
         'ow_luxiao',
+        'gjqt_ouyangshaogong',
     ],
     a:[
         'hs_aya',
@@ -134,6 +135,7 @@ window.characterRank={
         'yxs_luobinhan',
         'hs_alleria',
         'pal_wenhui',
+        'gjqt_xunfang',
     ],
     am:[
         'swd_duanmeng',
