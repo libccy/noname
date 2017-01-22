@@ -2723,7 +2723,7 @@ card.swd={
 				return 7-ai.get.value(card);
 			},
 			filter:function(event,player){
-				return player.hp<player.maxHp;
+				return player.hp<player.maxHp&&player.num('h')>=2;
 			},
 			content:function(){
 				player.recover();

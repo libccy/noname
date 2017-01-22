@@ -142,7 +142,7 @@ mode.tafang={
 					clearInterval(_status.currentChessFocus);
 					delete _status.currentChessFocus;
 				}
-			});
+			},{passive:true});
 		}
 
 		ui.chessscroll1=ui.create.div('.chessscroll.left',ui.chessContainer);

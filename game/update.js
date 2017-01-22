@@ -1,13 +1,16 @@
 window.noname_update={
-    version:'1.9.5.2',
-    // update:'1.9.5',
+    version:'1.9.5.3',
+    update:'1.9.5.2',
     changeLog:[
         'bug修复',
     ],
     files:[
         // 'game/server.js',
         // 'character/swd.js',
-        // 'character/xianjian.js',
-        // 'layout/long/layout.css',
+        'character/rank.js',
+        'character/xianjian.js',
+        'card/swd.js',
+        'mode/tafang.js',
+        'layout/newlayout/global.css',
     ]
 }

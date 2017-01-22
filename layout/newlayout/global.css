@@ -9,13 +9,14 @@
 #historybar{
 	height: calc(90% - 25px);
 }
-#window>.player:not(.minskin)>.avatar,#arena.slim_player .player:not(.minskin):not(.fakeme) .avatar{
+#window>.player:not(.minskin)>.avatar,
+#arena.slim_player .player:not(.minskin):not(.fakeme) .avatar{
 	width: 136px;
 	height: 166px;
 	left:7px;
 	top:7px;
 }
-#window>.player:not(.minskin)>.avatar,#arena.uslim_player .player:not(.minskin):not(.fakeme) .avatar{
+#arena.uslim_player .player:not(.minskin):not(.fakeme) .avatar{
 	width: 144px;
 	height: 174px;
 	left:3px;

@@ -225,6 +225,7 @@ window.characterRank={
         'swd_yeyaxi',
     ],
     bp:[
+        'pal_leiyuange',
         'dongbai',
         'swd_moye',
         'guohuanghou',

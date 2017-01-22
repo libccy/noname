@@ -19,7 +19,7 @@ character.xianjian={
 		pal_wenhui:['female','shu',4,['huxi','longxiang']],
 		pal_wangpengxu:['female','shu',3,['duxinshu','feixu']],
 		pal_xingxuan:['male','wei',3,['feizhua','leiyu','lingxue']],
-		// pal_leiyuange:['male','wei',3,[]],
+		pal_leiyuange:['male','shu',4,['feng','ya','song']],
 
 		pal_yuntianhe:['male','wu',4,['longxi','zhuyue','guanri']],
 		pal_hanlingsha:['female','shu',3,['tannang','tuoqiao']],
@@ -38,6 +38,88 @@ character.xianjian={
 		// pal_jiangcheng:['male','wei',4,[]],
 	},
 	skill:{
+		feng:{
+			unique:true,
+			init:function(player){
+				player.storage.feng=0;
+			},
+			mark:true,
+			intro:{
+				content:function(storage){
+					return '已累计摸'+storage+'次牌';
+				}
+			},
+			trigger:{player:'drawBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				if(player.storage.feng<2){
+					player.storage.feng++;
+				}
+				else{
+					trigger.num++;
+					player.storage.feng=0;
+					player.logSkill('feng');
+				}
+				player.updateMarks();
+			}
+		},
+		ya:{
+			unique:true,
+			init:function(player){
+				player.storage.ya=0;
+			},
+			mark:true,
+			intro:{
+				content:function(storage){
+					return '已累计受到'+storage+'次伤害';
+				}
+			},
+			trigger:{player:'damageBegin'},
+			filter:function(event,player){
+				if(player.storage.ya==2) return event.num>0;
+				return true;
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				if(player.storage.ya<2){
+					player.storage.ya++;
+				}
+				else if(trigger.num>0){
+					trigger.num--;
+					player.storage.ya=0;
+					player.logSkill('ya');
+				}
+				player.updateMarks();
+			}
+		},
+		song:{
+			unique:true,
+			init:function(player){
+				player.storage.song=0;
+			},
+			mark:true,
+			intro:{
+				content:function(storage){
+					return '已累计造成'+storage+'次伤害';
+				}
+			},
+			trigger:{source:'damageBegin'},
+			forced:true,
+			popup:false,
+			content:function(){
+				if(player.storage.song<2){
+					player.storage.song++;
+				}
+				else{
+					trigger.num++;
+					player.storage.song=0;
+					player.logSkill('song');
+				}
+				player.updateMarks();
+			}
+		},
 		longxiang:{
 			trigger:{player:'shaBegin'},
 			filter:function(event,player){
@@ -2228,6 +2310,12 @@ character.xianjian={
 		pal_changqing:'长卿',
 		pal_xuanxiao:'玄霄',
 
+		feng:'风',
+		feng_info:'锁定技，当你累计摸2次牌后，你下一次摸牌时摸牌数+1',
+		ya:'雅',
+		ya_info:'锁定技，当你累计受到2次伤害后，你下一次受到的伤害-1',
+		song:'颂',
+		song_info:'锁定技，当你累计造成2次伤害后，你下一次造成的伤害+1',
 		longxiang:'龙翔',
 		longxiang_info:'当你使用杀指定目标后，你可以弃置目标若干张手牌直到其手牌数与你相同',
 		huxi:'虎袭',
