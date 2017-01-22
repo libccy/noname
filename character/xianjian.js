@@ -101,6 +101,7 @@ character.xianjian={
 				player.gain(list,'draw');
 			},
 			ai:{
+				threaten:1.5,
 				order:5,
 				result:{
 					player:1
@@ -131,6 +132,9 @@ character.xianjian={
 			},
 			filter:function(event,player){
 				return player.storage.danqing.length==4;
+			},
+			ai:{
+				threaten:1.2,
 			},
 			content:function(){
 				'step 0'

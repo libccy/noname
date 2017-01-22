@@ -4637,7 +4637,7 @@ character.hearth={
 		},
 		fenliu:{
 			enable:'phaseUse',
-			prompt:'流失1点体力并摸两张牌',
+			prompt:'流失1点体力并摸三张牌',
 			usable:1,
 			content:function(){
 				"step 0"
@@ -4649,8 +4649,12 @@ character.hearth={
 				order:4,
 				result:{
 					player:function(player){
-						if(player.num('h')>=player.hp-1) return -1;
-						if(player.hp<3) return -1;
+						var nh=player.num('h');
+						if(nh>=player.hp) return -1;
+						if(player.hp<=2){
+							if(player.hp==2&&nh==0) return 1;
+							return -1;
+						}
 						return 1;
 					}
 				},

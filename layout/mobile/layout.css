@@ -301,6 +301,10 @@
     left:0;
     background-size:cover;
 }
+#window[data-radius_size='increase'] #me>.fakeme.avatar,
+#window[data-radius_size='reduce'] #me>.fakeme.avatar{
+    border-radius:0px;
+}
 
 #arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip1,
 #arena.mobile.oblongcard:not(.chess):not(.textequip) .player[data-position='0']>.equips>.equip2{

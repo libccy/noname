@@ -1,17 +1,17 @@
 window.noname_update={
-    version:'1.9.5',
+    version:'1.9.5.1',
     update:'1.9.5',
     changeLog:[
-        '新外观选项',
-        '塔防模式修复',
+        'bug修复',
     ],
     files:[
-        'game/game.js',
-        'character/gujian.js',
-        'character/swd.js',
-        'character/refresh.js',
+        'game/server.js',
         'character/hearth.js',
-        'character/shenhua.js',
-        'character/rank.js',
+        'character/sp.js',
+        'character/xianjian.js',
+        'layout/default/layout.css',
+        'layout/mobile/layout.css',
+        'layout/mode/chess.css',
+        'layout/newlayout/global.css',
     ]
 }

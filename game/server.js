@@ -203,25 +203,25 @@
             }
         });
         ws.on('close',function(){
-            if(!clients[this.wsid]) return;
-            if(this.owner){
-                this.owner.sendl('onclose',this.wsid);
-            }
-            else{
-                var room=this.room;
-                if(room&&room.owner==this){
-                    room.owner=null;
-                    room.config=null;
-                    room.servermode=false;
-                    for(var i in clients){
-                        if(clients[i].room==room&&clients[i]!=this){
-                            clients[i].close();
-                            delete clients[i];
+            for(var i=0;i<rooms.length;i++){
+                if(rooms[i].owner==this){
+                    rooms[i].owner=null;
+                    rooms[i].config=null;
+                    rooms[i].servermode=false;
+                    for(var j in clients){
+                        if(clients[j].room==rooms[i]&&clients[j]!=this){
+                            clients[j].close();
+                            delete clients[j];
                         }
                     }
                 }
             }
-            delete clients[this.wsid];
+            if(clients[this.wsid]){
+                if(this.owner){
+                    this.owner.sendl('onclose',this.wsid);
+                }
+                delete clients[this.wsid];
+            }
             util.updaterooms();
         });
     });

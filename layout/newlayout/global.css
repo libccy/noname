@@ -20,6 +20,7 @@
 	height: 174px;
 	left:3px;
 	top:3px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
 }
 #window>.player.minskin>.avatar{
 	width: 106px;
@@ -47,6 +48,7 @@
 	height: 114px;
 	left:3px;
 	top:3px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
 }
 .player.minskin .hp,
 .player.minskin .hp.text{
@@ -136,6 +138,7 @@
 	top:3px;
 	right:3px;
 	height: 174px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
 }
 .player .marks,
 .player .judges{

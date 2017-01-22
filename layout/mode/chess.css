@@ -97,6 +97,10 @@
     border-radius:0px;
     top:0;
 }
+#window[data-radius_size='increase'] .fakeme,
+#window[data-radius_size='reduce'] .fakeme{
+    border-radius:0px;
+}
 .fakeme.avatar{
     left:0;
     background-size:cover;

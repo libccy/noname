@@ -5070,6 +5070,7 @@ character.sp={
 			forceunique:true,
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
+				if(player.storage.fanxiang) return false;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].storage.liangzhu==player&&game.players[i].isDamaged()){
 						return true;
@@ -5079,6 +5080,7 @@ character.sp={
 			},
 			forced:true,
 			content:function(){
+				player.storage.fanxiang=true;
 				player.gainMaxHp();
 				player.recover();
 				player.removeSkill('liangzhu');
