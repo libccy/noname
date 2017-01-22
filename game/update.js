@@ -1,17 +1,13 @@
 window.noname_update={
-    version:'1.9.5.1',
-    update:'1.9.5',
+    version:'1.9.5.2',
+    // update:'1.9.5',
     changeLog:[
         'bug修复',
     ],
     files:[
-        'game/server.js',
-        'character/hearth.js',
-        'character/sp.js',
-        'character/xianjian.js',
-        'layout/default/layout.css',
-        'layout/mobile/layout.css',
-        'layout/mode/chess.css',
-        'layout/newlayout/global.css',
+        // 'game/server.js',
+        // 'character/swd.js',
+        // 'character/xianjian.js',
+        // 'layout/long/layout.css',
     ]
 }

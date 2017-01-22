@@ -93,6 +93,12 @@
     left: 89px;
 }
 
+.timerbar>div{
+    top: 205px;
+    width: 96px;
+    left: 12px;
+}
+
 /*--------位置(8人)------*/
 #arena:not(.fewplayer)[data-number='8']>.player[data-position='1']{top:calc(30% - 120px);left:calc(-300% / 94 + 4375% / 47 - 735px + 720px);}
 #arena:not(.fewplayer)[data-number='8']>.player[data-position='2']{top:calc(8% - 32px);left:calc(-300% / 94 + 3750% / 47 - 630px + 600px);}

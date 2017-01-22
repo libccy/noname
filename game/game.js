@@ -26174,11 +26174,11 @@
                                                     var str=files[i].indexOf('*');
                                                     if(str!=-1){
                                                         str=files[i].slice(0,str);
-                                                    }
-                                                    files.splice(i--,1);
-                                                    for(var j=0;j<updates.length;j++){
-                                                        if(updates[j].indexOf(str)==0){
-                                                            files2.push(updates[j]);
+                                                        files.splice(i--,1);
+                                                        for(var j=0;j<updates.length;j++){
+                                                            if(updates[j].indexOf(str)==0){
+                                                                files2.push(updates[j]);
+                                                            }
                                                         }
                                                     }
                                                 }
