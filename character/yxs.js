@@ -96,7 +96,7 @@ character.yxs={
 				return 7-ai.get.value(card);
 			},
 			content:function(){
-				player.unmarkSkill('yixin');
+				player.awakenSkill('yixin');
 				player.storage.yixin=true;
 				var num=Math.min(4,target.maxHp-target.hp);
 				target.recover(num);
@@ -938,6 +938,8 @@ character.yxs={
 				return target.sex=='male'&&target!=player;
 			},
 			content:function(){
+				player.awakenSkill('heqin');
+
 				player.addSkill('heqin2');
 				target.addSkill('heqin2');
 
@@ -1664,7 +1666,7 @@ character.yxs={
 			filterTarget:true,
 			content:function(){
 				"step 0"
-				player.unmarkSkill('seyou');
+				player.awakenSkill('seyou');
 				player.storage.seyou=true;
 				event.targets=game.players.slice(0);
 				event.targets.remove(player);
@@ -2487,7 +2489,7 @@ character.yxs={
 				player.hp=Math.min(3,player.maxHp);
 				player.discard(player.get('hej'));
 				player.draw(3);
-				player.unmarkSkill('zhexian');
+				player.awakenSkill('zhexian');
 				player.storage.zhexian=true;
 				'step 1'
 				if(player.isLinked()) player.link();

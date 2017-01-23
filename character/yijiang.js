@@ -1230,7 +1230,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				player.storage.xinfencheng=true;
-				player.unmarkSkill('xinfencheng');
+				player.awakenSkill('xinfencheng');
 				event.num=1;
 				event.targets=targets.slice(0);
 				event.targets.sort(lib.sort.seat);
@@ -3623,7 +3623,7 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				player.storage.xingshuai=true;
-				player.unmarkSkill('xingshuai');
+				player.awakenSkill('xingshuai');
 				var targets=get.players();
 				targets.remove(player);
 				event.targets=targets;
@@ -4064,7 +4064,7 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				player.storage.fencheng=true;
-				player.unmarkSkill('fencheng');
+				player.awakenSkill('fencheng');
 				var res=ai.get.damageEffect(target,player,target,'fire');
 				var num=Math.max(1,target.num('e'));
 				target.chooseToDiscard(num,'he','弃置'+get.cnNumber(num)+'张牌或受到1点火焰伤害').set('ai',function(card){
@@ -4230,7 +4230,7 @@ character.yijiang={
 			filterTarget:true,
 			content:function(){
 				"step 0"
-				player.unmarkSkill('jiefan');
+				player.awakenSkill('jiefan');
 				player.storage.jiefan=true;
 				event.players=[];
 				for(var i=0;i<game.players.length;i++){
@@ -4301,7 +4301,7 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				player.unmarkSkill('fuli');
+				player.awakenSkill('fuli');
 				player.recover(player.maxHp);
 				"step 1"
 				player.turnOver();
@@ -5013,7 +5013,7 @@ character.yijiang={
 			mark:true,
 			content:function(){
 				"step 0"
-				player.unmarkSkill('xianzhou');
+				player.awakenSkill('xianzhou');
 				var cards=player.get('e');
 				target.gain(cards,player);
 				event.num=cards.length;

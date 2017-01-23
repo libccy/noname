@@ -425,7 +425,7 @@ character.swd={
 			animationColor:'fire',
 			content:function(){
 				'step 0'
-				player.unmarkSkill('hxunzhi');
+				player.awakenSkill('hxunzhi');
 				player.storage.hxunzhi=true;
 				var targets=[];
 				for(var i=0;i<game.players.length;i++){
@@ -708,7 +708,7 @@ character.swd={
             selectTarget:[1,Infinity],
 			content:function(){
                 if(target==targets[0]){
-                    player.unmarkSkill('jinlin');
+                    player.awakenSkill('jinlin');
     				player.storage.jinlin=true;
                 }
 				target.changeHujia(3);
@@ -938,7 +938,7 @@ character.swd={
 			selectTarget:[1,3],
 			content:function(){
 				"step 0"
-				player.unmarkSkill('bingfeng');
+				player.awakenSkill('bingfeng');
 				player.removeSkill('xuanzhou');
 				player.loseMaxHp();
 				player.storage.bingfeng=true;
@@ -2005,7 +2005,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.unmarkSkill('shouyin');
+				player.awakenSkill('shouyin');
 				player.storage.shouyin=true;
 				player.turnOver();
 				"step 1"
@@ -7406,7 +7406,7 @@ character.swd={
 			},
 			content:function(){
 				player.storage.duijue=true;
-				player.unmarkSkill('duijue');
+				player.awakenSkill('duijue');
 				var evt=_status.event;
 				for(var i=0;i<10;i++){
 					if(evt&&evt.getParent){
