@@ -1213,7 +1213,7 @@ character.shenhua={
 						return -get.number(card);
 					}
 					return get.number(card);
-				});
+				}).set('preserve','lose');
 				"step 2"
 				if(result.bool==false){
 					target.gain([result.player,result.target]);

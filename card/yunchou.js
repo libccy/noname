@@ -125,7 +125,7 @@ card.yunchou={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToCompare(target).clear=false;
+				player.chooseToCompare(target).set('preserve','win').clear=false;
 				"step 1"
 				if(result.bool){
 					player.gain([result.player,result.target]);

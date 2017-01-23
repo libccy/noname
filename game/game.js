@@ -6768,6 +6768,15 @@
 					if(event.clear!==false){
                         game.broadcastAll(ui.clear);
                     }
+                    if(typeof event.preserve=='function'){
+                        event.preserve=event.preserve(event.result);
+                    }
+                    else if(event.preserve=='win'){
+                        event.preserve=event.result.bool;
+                    }
+                    else if(event.preserve=='lose'){
+                        event.preserve=!event.result.bool;
+                    }
 					event.dialog.close();
 				},
 				chooseButton:function(){

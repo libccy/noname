@@ -14,8 +14,89 @@ character.old={
         old_lingtong:['male','wu',4,['oldxuanfeng']],
         old_madai:['male','shu',4,['mashu','oldqianxi']],
         old_caoxiu:['male','wei',4,['taoxi']],
+        old_huaxiong:['male','qun',6,['shiyong']],
+        old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
+        old_caozhen:['male','wei',4,['sidi']],
+        old_quancong:['male','wu',4,['zhenshan']],
     },
     skill:{
+        oldzhenlie:{
+			audio:'zhenlie',
+			trigger:{player:'judge'},
+			check:function(event,player){
+                return event.judge(player.judging[0])<0;
+            },
+			content:function(){
+                var card=get.cards()[0];
+				player.$throw(card);
+                card.clone.classList.add('thrownhighlight');
+				if(trigger.player.judging[0].clone){
+					trigger.player.judging[0].clone.classList.remove('thrownhighlight');
+					game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
+				}
+				ui.discardPile.appendChild(trigger.player.judging[0]);
+				trigger.player.judging[0]=card;
+				trigger.position.appendChild(card);
+				game.log(trigger.player,'的判定牌改为',card);
+				game.delay(2);
+			},
+		},
+        oldmiji:{
+            trigger:{player:['phaseBegin','phaseEnd']},
+            filter:function(event,player){
+                return player.isDamaged();
+            },
+            content:function(){
+                'step 0'
+                player.judge(function(card){
+                    return get.color(card)=='black'?1:-1;
+                });
+                'step 1'
+                if(result.bool&&player.maxHp>player.hp){
+                    var cards=get.cards(player.maxHp-player.hp);
+                    event.cards=cards;
+    				var dialog=ui.create.dialog('选择获得卡牌的目标',cards,'hidden');
+    				dialog.classList.add('noselect');
+    				player.chooseTarget(true,dialog).ai=function(target){
+                        return ai.get.attitude(player,target)/Math.sqrt(1+target.num('h'));
+                    }
+                }
+                else{
+                    event.finish();
+                }
+                'step 2'
+                result.targets[0].gain(event.cards,'draw');
+            },
+            ai:{
+                effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'recover')&&target.hp==target.maxHp-1) return [0,0];
+                        if(target.hasFriend()){
+                            if((get.tag(card,'damage')==1||get.tag(card,'loseHp'))&&target.hp==target.maxHp) return [0,1];
+                        }
+					}
+				},
+				threaten:function(player,target){
+					if(target.hp==1) return 3;
+					if(target.hp==2) return 2;
+                    return 1;
+				},
+            }
+        },
+        shiyong:{
+            audio:2,
+            trigger:{player:'damageEnd'},
+            forced:true,
+            check:function(){
+                return false;
+            },
+            filter:function(event,player){
+                return event.card.name=='sha'&&(get.color(event.card)=='red'||event.player.hasSkill('jiu'));
+            },
+            content:function(){
+                player.loseMaxHp();
+            }
+        },
         oldqianxi:{
             trigger:{source:'damageBefore'},
             check:function(event,player){
@@ -115,7 +196,17 @@ character.old={
         old_zhuran:'旧朱然',
         old_madai:'旧马岱',
         old_caoxiu:'旧曹休',
+        old_huaxiong:'旧华雄',
+        old_wangyi:'旧王异',
+        old_caozhen:'旧曹真',
+        old_quancong:'旧全琮',
 
+        oldzhenlie:'贞烈',
+        oldzhenlie_info:'在你的判定牌生效前，你可以亮出牌堆顶的一张牌代替之',
+        oldmiji:'秘计',
+        oldmiji_info:'准备/结束阶段开始时，若你已受伤，你可以判定，若判定结果为黑色，你观看牌堆顶的X张牌（X为你已损失的体力值），然后将这些牌交给一名角色',
+        shiyong:'恃勇',
+        shiyong_info:'锁定技，当你受到一次红色【杀】或【酒】【杀】造成的伤害后，须减1点体力上限',
         oldqianxi:'潜袭',
         oldqianxi_info:'当你使用【杀】对距离为1的目标角色造成伤害时，你可以进行一次判定，若判定结果不为红桃，你防止此伤害，令其减1点体力上限',
         oldxuanfeng:'旋风',

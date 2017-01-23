@@ -92,6 +92,49 @@ character.yijiang={
 		liuchen:['liushan'],
 	},
 	skill:{
+		jyzongshi:{
+			audio:2,
+			trigger:{player:['chooseToCompareAfter','compareMultipleAfter'],target:['chooseToCompareAfter','compareMultipleAfter']},
+			filter:function(event){
+				return !event.preserve;
+			},
+			check:function(event,player){
+				if(player==event.player){
+					if(event.card1.number>event.card2.number){
+						return event.card2.name!='du';
+					}
+					else{
+						return event.card1.name!='du';
+					}
+				}
+				else{
+					if(event.card1.number<event.card2.number){
+						return event.card1.name!='du';
+					}
+					else{
+						return event.card2.name!='du';
+					}
+				}
+			},
+			content:function(){
+				if(player==trigger.player){
+					if(trigger.card1.number>trigger.card2.number){
+						player.gain(trigger.card2,'gain2');
+					}
+					else{
+						player.gain(trigger.card1,'gain2');
+					}
+				}
+				else{
+					if(trigger.card1.number<trigger.card2.number){
+						player.gain(trigger.card1,'gain2');
+					}
+					else{
+						player.gain(trigger.card2,'gain2');
+					}
+				}
+			}
+		},
 		xinsidi:{
 			trigger:{global:'phaseUseBegin'},
 			direct:true,
@@ -4456,11 +4499,9 @@ character.yijiang={
 				}
 				"step 2"
 				if(result.bool){
-					player.gain(result.target,'gain2');
 					player.addTempSkill('qiaoshui3','phaseAfter');
 				}
 				else{
-					player.gain(result.player,'gain2');
 					player.addTempSkill('qiaoshui2','phaseAfter');
 				}
 			},
@@ -4521,7 +4562,7 @@ character.yijiang={
 				}
 			}
 		},
-		jyzongshi:{
+		jyzongshi_old:{
 			audio:2,
 			trigger:{target:'useCardToBegin'},
 			filter:function(event,player){
@@ -6197,19 +6238,6 @@ character.yijiang={
 				}
 			}
 		},
-		shiyong2:{
-			trigger:{player:'damageEnd'},
-			forced:true,
-			audio:false,
-			check:function(){
-				return false;
-			},
-			content:function(){
-				player.maxHp--;
-				player.removeSkill('shiyong2');
-				player.update();
-			},
-		},
 		olddanshou:{
 			trigger:{source:'damageEnd'},
 			priority:9,
@@ -7739,9 +7767,9 @@ character.yijiang={
 		faen:'法恩',
 		faen_info:'每当一名角色的武将牌翻面或横置时，你可以令其摸一张牌。',
 		jyzongshi:'纵适',
-		jyzongshi_info:'每当你成为其他角色的非延时锦囊牌的目标时，若你是此锦囊的唯一目标，你可以摸一张牌',
+		jyzongshi_info:'每当你拼点赢，你可以获得对方此次拼点的牌；每当你拼点没赢，你可以收回你此次拼点的牌',
 		qiaoshui:'巧说',
-		qiaoshui_info:'出牌阶段开始时，你可以与一名其他角色拼点。若你赢，你获得对方的拼点牌，且本回合内使用的下一张基本牌或非延时锦囊牌能额外（无距离限制）指定一个目标；若你没赢，你收回拼点牌且本回合不能使用锦囊牌',
+		qiaoshui_info:'出牌阶段开始时，你可与一名其他角色拼点。若你赢，你使用的下一张基本牌或非延时类锦囊牌可以额外指定任意一名其他角色为目标或减少指定一个目标；若你没赢，你不能使用锦囊牌直到回合结束',
 		junxing:'峻刑',
 		junxing_info:'出牌阶段限一次，你可以弃置至少一张手牌并选择一名其他角色，该角色需弃置一张与你弃置的牌类别均不同的手牌，否则其先将其武将牌翻面再摸X张牌（X为你以此法弃置的手牌数量）。',
 
@@ -7768,8 +7796,6 @@ character.yijiang={
 		jiangchi_more:'多摸一张',
 		zishou:'自守',
 		zongshi:'宗室',
-		shiyong:'恃勇',
-		shiyong2:'恃勇',
 		danshou:'胆守',
 		olddanshou:'胆守',
 		yizhong:'毅重',
@@ -7856,7 +7882,6 @@ character.yijiang={
 		jiangchi_info:'摸牌阶段摸牌时，你可以选择一项：1、额外摸一张牌，若如此做，你不能使用或打出【杀】，直到回合结束。 2、少摸一张牌，若如此做，出牌阶段你使用【杀】无距离限制且你可以额外使用一张【杀】，直到回合结束。',
 		zishou_info:'摸牌阶段摸牌时，你可以额外摸X张牌（X为现存势力数）。若如此做，你于本回合出牌阶段内使用的牌不能指定其他角色为目标。',
 		zongshi_info:'锁定技，场上每有一种势力，你的手牌上限便＋1。',
-		shiyong_info:'锁定技，每当你受到一次红色【杀】或【酒】【杀】造成的伤害后，你减1点体力上限。',
 		danshou_info:'出牌阶段，你可以选择你攻击范围内的一名其他角色，然后弃置X张牌（X为此前你于此阶段你发动“胆守”的次数+1）。若X：为1，你弃置该角色的一张牌；为2，令该角色交给你一张牌；为3，你对该角色造成1点伤害；不小于4，你与该角色各摸两张牌。',
 		olddanshou_info:'每当你造成一次伤害后，你可以摸一张牌。若如此做，终止一切结算，当前回合结束。',
 		yizhong_info:'锁定技，当你没有防具时，黑色的杀对你无效',

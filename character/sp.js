@@ -2092,7 +2092,7 @@ character.sp={
 			},
 			content:function(){
 				'step 0'
-				player.chooseToCompare(target);
+				player.chooseToCompare(target).set('preserve','win');
 				'step 1'
 				if(result.bool&&result.target){
 					event.type=true;

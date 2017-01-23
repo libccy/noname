@@ -5661,7 +5661,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToCompare(target);
+				player.chooseToCompare(target).set('preserve','win');
 				"step 1"
 				if(result.bool){
 					if(target.hasSkill('tanlin2')==false){
