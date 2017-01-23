@@ -19414,10 +19414,7 @@
 				}
 				else{
 					if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
-						while(_status.dieClose.length){
-							_status.dieClose.shift().close();
-						}
-                        game.broadcast(function(){
+                        game.broadcastAll(function(){
                             while(_status.dieClose.length){
     							_status.dieClose.shift().close();
     						}

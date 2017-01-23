@@ -65,22 +65,125 @@ character.shenhua={
 			multiline:true,
 			content:function(){
 				'step 0'
-				event.cards0=targets[0].get('h');
-				event.cards1=targets[1].get('h');
-				targets[0].lose(event.cards0,ui.special);
-				targets[1].lose(event.cards1,ui.special);
+				var cards=targets[0].get('h').concat(targets[1].get('h'));
+				var dialog=ui.create.dialog('缔盟',true);
+				if(player.isUnderControl(true)||targets[0].isUnderControl(true)||targets[1].isUnderControl(true)){
+					dialog.add(cards);
+					dialog.seeing=true;
+				}
+				else{
+					dialog.add([cards,'blank']);
+				}
+				_status.dieClose.push(dialog);
+				dialog.videoId=lib.status.videoId++;
+				game.addVideo('cardDialog',null,['缔盟',get.cardsInfo(cards),dialog.videoId]);
+				game.broadcast(function(cards,id,player,targets){
+					var dialog=ui.create.dialog('缔盟',true);
+					if(player.isUnderControl(true)||targets[0].isUnderControl(true)||targets[1].isUnderControl(true)){
+						dialog.add(cards);
+						dialog.seeing=true;
+					}
+					else{
+						dialog.add([cards,'blank']);
+					}
+					_status.dieClose.push(dialog);
+					dialog.videoId=id;
+				},cards,dialog.videoId,player,targets);
+
+				event.current=targets[0];
+				event.dialog=dialog;
+				game.delay();
 				'step 1'
-				targets[0].gain(event.cards1,targets[1]);
-				targets[1].gain(event.cards0,targets[0]);
-				targets[0].$give(event.cards0.length,targets[1]);
-				targets[1].$give(event.cards1.length,targets[0]);
+				if(event.dialog.buttons.length>1){
+					var next=event.current.chooseButton(true,function(button){
+						return ai.get.value(button.link,_status.event.player);
+					});
+					next.set('dialog',event.dialog.videoId);
+					next.set('closeDialog',false);
+					next.set('dialogdisplay',true);
+				}
+				else{
+					event.directButton=event.dialog.buttons[0];
+				}
+				'step 2'
+				var dialog=event.dialog;
+				var card;
+				if(event.directButton){
+					card=event.directButton.link;
+				}
+				else{
+					card=result.links[0];
+				}
+				for(var i=0;i<dialog.buttons.length;i++){
+					if(dialog.buttons[i].link==card){
+						var button=dialog.buttons[i];
+						if(dialog.seeing){
+							button.querySelector('.info').innerHTML=get.translation(event.current.name);
+							if(!_status.connectMode){
+								game.log(event.current,'选择了',button.link);
+							}
+						}
+						dialog.buttons.remove(button);
+						break;
+					}
+				}
+				if(card){
+					event.current.gain(card);
+					if(dialog.seeing){
+						event.current.$draw(card,'nobroadcast');
+					}
+					else{
+						event.current.$draw(1,'nobroadcast');
+					}
+					event.current.$gain2(card);
+					game.broadcast(function(card,id,target){
+						var dialog=get.idDialog(id);
+						if(dialog&&dialog.seeing){
+							for(var i=0;i<dialog.buttons.length;i++){
+								if(dialog.buttons[i].link==card){
+									dialog.buttons[i].querySelector('.info').innerHTML=get.translation(target.name);
+									dialog.buttons.splice(i--,1);
+									break;
+								}
+							}
+							target.$draw(card,'nobroadcast');
+						}
+						else{
+							target.$draw(1,'nobroadcast');
+						}
+					},card,dialog.videoId,event.current);
+				}
+				game.delay(2);
+				if(dialog.buttons.length){
+					if(event.current==targets[0]){
+						event.current=targets[1];
+					}
+					else{
+						event.current=targets[0];
+					}
+					event.goto(1);
+				}
+				'step 3'
+				var dialog=event.dialog;
+				dialog.close();
+				_status.dieClose.remove(dialog);
+				game.broadcast(function(id){
+					var dialog=get.idDialog(id);
+					if(dialog){
+						dialog.close();
+						_status.dieClose.remove(dialog);
+					}
+				},dialog.videoId);
+				game.addVideo('cardDialog',null,dialog.videoId);
 			},
 			targetprompt:['先拿牌','后拿牌'],
 			find:function(type){
 				var list=[];
 				var player=_status.event.player;
-				var num=player.num('he');
-				var count=0;
+				var num=player.num('he',function(card){
+					return ai.get.value(card)<7;
+				});
+				var count=null;
 				var from,nh;
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>3){
@@ -111,15 +214,14 @@ character.shenhua={
 						count=nh2-nh;break;
 					}
 				}
-				if(count<=0) return null;
-				if(count==1&&nh>=2) return null;
+				if(count==null||count<0) return null;
 				if(type==3) return count;
 				return list[i];
 			},
 			check:function(card){
 				var count=lib.skill.redimeng.find(3);
-				if(!count) return -1;
-				if(ui.selected.cards.length<count) return 11-ai.get.value(card);
+				if(count==null) return -1;
+				if(ui.selected.cards.length<count) return 7-ai.get.value(card);
 				return -1;
 			},
 			ai:{
