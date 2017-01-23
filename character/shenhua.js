@@ -13,7 +13,7 @@ character.shenhua={
 		// xin_yuji:['male','qun',3,['guhuo']],
 
 		sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
-		pangtong:['male','shu',3,['lianhuan','niepan']],
+		pangtong:['male','shu',3,['xinlianhuan','niepan']],
 		xunyu:['male','wei',3,['quhu','jieming']],
 		dianwei:['male','wei',4,['xinqiangxi']],
 		taishici:['male','wu',4,['tianyi']],
@@ -25,7 +25,7 @@ character.shenhua={
 		zhurong:['female','shu',4,['juxiang','lieren']],
 		caopi:['male','wei',3,['xingshang','fangzhu','songwei'],['zhu']],
 		xuhuang:['male','wei',4,['duanliang']],
-		lusu:['male','wu',3,['haoshi','dimeng']],
+		re_lusu:['male','wu',3,['haoshi','redimeng']],
 		sunjian:['male','wu',4,['yinghun']],
 		dongzhuo:['male','qun',8,['jiuchi','roulin','benghuai','baonue'],['zhu']],
 		jiaxu:['male','qun',3,['luanwu','wansha','weimu']],
@@ -44,6 +44,136 @@ character.shenhua={
 		menghuo:['zhurong'],
 	},
 	skill:{
+		redimeng:{
+			audio:'dimeng',
+			enable:'phaseUse',
+			usable:1,
+			position:'he',
+			filterCard:function(){
+				if(ui.selected.targets.length==2) return false;
+				return true;
+			},
+			selectCard:[0,Infinity],
+			selectTarget:2,
+			filterTarget:function(card,player,target){
+				if(player==target) return false;
+				if(ui.selected.targets.length==0) return true;
+				return (Math.abs(ui.selected.targets[0].num('h')-target.num('h'))==
+					ui.selected.cards.length);
+			},
+			multitarget:true,
+			multiline:true,
+			content:function(){
+				'step 0'
+				event.cards0=targets[0].get('h');
+				event.cards1=targets[1].get('h');
+				targets[0].lose(event.cards0,ui.special);
+				targets[1].lose(event.cards1,ui.special);
+				'step 1'
+				targets[0].gain(event.cards1,targets[1]);
+				targets[1].gain(event.cards0,targets[0]);
+				targets[0].$give(event.cards0.length,targets[1]);
+				targets[1].$give(event.cards1.length,targets[0]);
+			},
+			targetprompt:['先拿牌','后拿牌'],
+			find:function(type){
+				var list=[];
+				var player=_status.event.player;
+				var num=player.num('he');
+				var count=0;
+				var from,nh;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>3){
+						list.push(game.players[i]);
+					}
+				}
+				if(list.length==0) return null;
+				list.sort(function(a,b){
+					return a.num('h')-b.num('h');
+				});
+				if(type==1) return list[0];
+				from=list[0];
+				nh=from.num('h');
+
+				list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])<1){
+						list.push(game.players[i]);
+					}
+				}
+				if(list.length==0) return null;
+				list.sort(function(a,b){
+					return b.num('h')-a.num('h');
+				});
+				for(var i=0;i<list.length;i++){
+					var nh2=list[i].num('h');
+					if(nh2-nh<=num){
+						count=nh2-nh;break;
+					}
+				}
+				if(count<=0) return null;
+				if(count==1&&nh>=2) return null;
+				if(type==3) return count;
+				return list[i];
+			},
+			check:function(card){
+				var count=lib.skill.redimeng.find(3);
+				if(!count) return -1;
+				if(ui.selected.cards.length<count) return 11-ai.get.value(card);
+				return -1;
+			},
+			ai:{
+				order:8,
+				threaten:1.6,
+				expose:0.5,
+				result:{
+					player:function(player,target){
+						if(ui.selected.targets.length==0){
+							if(target==lib.skill.redimeng.find(1)) return 1;
+							return 0;
+						}
+						else{
+							if(target==lib.skill.redimeng.find(2)) return 1;
+							return 0;
+						}
+					}
+				}
+			}
+		},
+		xinlianhuan:{
+			group:['lianhuan3','lianhuan2','lianhuan4'],
+		},
+		lianhuan3:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h',{suit:'club'})>0;
+			},
+			filterCard:{suit:'club'},
+			viewAs:{name:'tiesuo'},
+			prompt:'将一张梅花牌当铁锁连环使用',
+			check:function(card){return 6-ai.get.value(card)},
+			ai:{
+				order:7.5,
+				result:{
+					target:function(player,target){
+						if(ui.selected.targets.length) return 0;
+						if(target.isLinked()) return 1;
+						return -1;
+					}
+				}
+			}
+		},
+		lianhuan4:{
+			trigger:{player:'useCard'},
+			filter:function(event){
+				return event.skill=='lianhuan3'&&event.targets.length==1;
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.draw();
+			}
+		},
 		reluanji:{
 			audio:'luanji',
 			enable:'phaseUse',
@@ -2419,7 +2549,7 @@ character.shenhua={
 				player.draw();
 			},
 			discard:false,
-			prompt:'将要重铸的牌置于弃牌堆并摸一张牌',
+			prompt:'将一张梅花牌置于弃牌堆并摸一张牌',
 			delay:0.5,
 			prepare:function(cards,player){
 				player.$throw(cards,1000);
@@ -2445,10 +2575,15 @@ character.shenhua={
 				player.storage.niepan=false;
 			},
 			filter:function(event,player){
-				if(event.type!='dying') return false;
-				if(player!=event.dying) return false;
 				if(player.storage.niepan) return false;
-				return true;
+				if(event.type=='dying'){
+					if(player!=event.dying) return false;
+					return true;
+				}
+				else if(event.parent.name=='phaseUse'){
+					return true;
+				}
+				return false;
 			},
 			content:function(){
 				'step 0'
@@ -2470,7 +2605,11 @@ character.shenhua={
 				},
 				save:true,
 				result:{
-					player:10
+					player:function(player){
+						if(player.hp<=1) return 10;
+						if(player.hp==2&&player.num('he')<=1) return 10;
+						return 0;
+					}
 				},
 				threaten:function(player,target){
 					if(!target.storage.niepan) return 0.6;
@@ -3701,6 +3840,10 @@ character.shenhua={
 	},
 	translate:{
 		re_yuanshao:'袁绍',
+		re_lusu:'鲁肃',
+
+		redimeng:'缔盟',
+		redimeng_info:'出牌阶段限一次，你可以弃置X张牌选择两名其他角色（X为这两名角色的手牌差），你混合他们的手牌，然后令其中一名角色获得其中的一张牌，并令另一名角色获得其中的一张牌，然后重复此流程，直到这些牌均被获得为止',
 		reluanji:'乱击',
 		reluanji_info:'你可以将两张与你本回合以此法转化的花色均不相同的手牌当【万箭齐发】使用，然后当一名已受伤的角色因响应此牌而打出【闪】时，该角色摸一张牌',
 		xintianxiang:'天香',
@@ -3840,9 +3983,11 @@ character.shenhua={
 		huoji:'火计',
 		bazhen:'八阵',
 		kanpo:'看破',
+		xinlianhuan:'连环',
 		lianhuan:'连环',
 		lianhuan1:'连环',
-		lianhuan2:'重铸♣︎',
+		lianhuan3:'连环',
+		lianhuan2:'连铸',
 		niepan:'涅槃',
 		quhu:'驱虎',
 		jieming:'节命',
@@ -3853,11 +3998,12 @@ character.shenhua={
 		luanji:'乱击',
 		xueyi:'血裔',
 		mengjin:'猛进',
+		xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用，若以此法使用的【铁索连环】仅指定一个目标，你摸一张牌；你可以重铸♣牌',
 		huoji_info:'出牌阶段，你可以将你的任意一张♥或♦手牌当【火攻】使用。',
 		bazhen_info:'当你没装备防具时，始终视为你装备着【八卦阵】。',
 		kanpo_info:'你可以将你的任意一张♠或♣手牌当【无懈可击】使用。',
 		lianhuan_info:'出牌阶段，你可以将你任意一张梅花手牌当【铁索连环】使用或重铸。',
-		niepan_info:'限定技，当你处于濒死状态时，你可以丢弃你所有的牌和你判定区里的牌，并重置你的武将牌，然后摸三张牌且体力回复至3点。',
+		niepan_info:'限定技，出牌阶段或当你处于濒死状态时，你可以丢弃你所有的牌和你判定区里的牌，并重置你的武将牌，然后摸三张牌且体力回复至3点。',
 		quhu_info:'出牌阶段，你可以与一名体力比你多的角色拼点，若你赢，则该角色对其攻击范围内另一名由你指定的角色造成1点伤害。若你没赢，他/她对你造成一点伤害。每回合限用一次。',
 		jieming_info:'你每受到1点伤害，可令任意一名角色将手牌补至其体力上限的张数(不能超过五张)。',
 		qiangxi_info:'出牌阶段，你可以自减一点体力或弃一张武器牌，然后你对你攻击范围内的一名角色造成一点伤害，每回合限一次。',

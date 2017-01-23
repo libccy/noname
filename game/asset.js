@@ -496,6 +496,7 @@ window.noname_asset_list=[
     'image/character/re_huatuo.jpg',
     'image/character/re_lidian.jpg',
     'image/character/re_liubei.jpg',
+    'image/character/re_lusu.jpg',
     'image/character/re_luxun.jpg',
     'image/character/re_lvbu.jpg',
     'image/character/re_lvmeng.jpg',
