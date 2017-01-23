@@ -7608,10 +7608,12 @@
 						if(lib.skill[event.skill].audio){
 							cardaudio=false;
 						}
-						player.logSkill(event.skill);
-						if(get.info(event.skill).popname){
-							player.popup(event.card.name);
-						}
+                        if(lib.skill[event.skill].log!=false){
+                            player.logSkill(event.skill);
+    						if(get.info(event.skill).popname){
+    							player.popup(event.card.name);
+    						}
+                        }
 					}
 					else if(lib.config.show_card_prompt){
 						if(get.type(event.card)=='equip'&&lib.config.hide_card_prompt_equip);
@@ -14946,7 +14948,20 @@
 							},
 							filterTarget:trigger.player,
 							prompt:str,
-							ai1:function(){return 1;},
+							ai1:function(card){
+                                if(typeof card=='string'){
+                                    var info=get.info(card);
+                                    if(info.ai&&info.ai.order){
+                                        if(typeof info.ai.order=='number'){
+                                            return info.ai.order;
+                                        }
+                                        else if(typeof info.ai.order=='function'){
+                                            return info.ai.order();
+                                        }
+                                    }
+                                }
+                                return 1;
+                            },
 							ai2:ai.get.effect,
 							type:'dying',
 							targetRequired:true,
@@ -33507,7 +33522,7 @@
                                 }
                                 else{
                                     delete lib.config.skin[node.link];
-                                    node.node.avatar.setBackground(node.link,'character');
+                                    node.setBackground(node.link,'character');
                                     game.saveConfig('skin',lib.config.skin);
                                 }
                             });

@@ -2433,6 +2433,7 @@ window.noname_skin_list={
     caoren:1,
     caoxiu:1,
     caozhang:2,
+    caozhen:1,
     caozhi:3,
     chengong:1,
     chengpu:1,
