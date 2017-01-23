@@ -11945,6 +11945,7 @@
                             case 'nei':targets=game.filterPlayer(function(target){
                                 if(func&&!func(target)) return false;
                                 if(num>=3) return target.identity=='fan';
+                                if(game.players.length==2) return target!=player;
                                 return target.identity=='zhong'||target.identity=='mingzhong'||target.identity=='fan';
                             });break;
                             case 'fan':targets=game.filterPlayer(function(target){

@@ -116,7 +116,7 @@ card.swd={
 			fullskin:true,
 			ai:{
 				basic:{
-					equipValue:5
+					equipValue:6
 				}
 			},
 		},
@@ -457,7 +457,7 @@ card.swd={
 			subtype:'equip5',
 			skills:['donghuangzhong'],
 			ai:{
-				equipValue:6
+				equipValue:7
 			}
 		},
 		xuanyuanjian:{
@@ -2435,7 +2435,7 @@ card.swd={
 					filterTarget:true,
 					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
-						return 7-ai.get.useful(card);
+						return 8-ai.get.useful(card);
 					},
 					ai2:function(target){
 						return -ai.get.attitude(player,target);
@@ -2455,7 +2455,8 @@ card.swd={
 				var target=event.target;
 				var list=[];
 				for(var i=0;i<lib.inpile.length;i++){
-					if(get.type(lib.inpile[i])=='delay'&&!target.hasJudge(lib.inpile[i])){
+					var info=lib.card[lib.inpile[i]];
+					if(info.type=='delay'&&!info.cancel&&!target.hasJudge(lib.inpile[i])){
 						list.push(lib.inpile[i]);
 					}
 				}
@@ -4553,7 +4554,7 @@ card.swd={
 		lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		shouna:'收纳',
 		shouna_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你可以选择其中的一张放入炼妖壶，每名角色的回合限一次',
-		donghuangzhong_info:'回合结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机判定牌置入其判定区',
+		donghuangzhong_info:'回合结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机单体延时锦囊置入其判定区',
 		xuanyuanjian_info:'锁定技，每当你即将造成一次伤害，你令此伤害加一并变为雷属性，此伤害结算后，你流失一点体力并摸一张牌。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
 		haotianta_info:'锁定技，任意一名角色进行判定前，你观看牌堆顶的3张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能。每回合最多发动一次',

@@ -267,17 +267,16 @@ card.guozhan={
 				},
 				result:{
 					player:function(player,target){
-						if(target.hp==1) return 0;
-					},
-					target:function(player,target){
-						if(target.hp==1) return 0;
+						var att=ai.get.attitude(player,target);
+						if(target.hp==1&&att<0) return 0;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i]==target) continue;
-							if(ai.get.attitude(player,game.players[i])<=ai.get.attitude(player,target)){
+							if(ai.get.attitude(player,game.players[i])<att){
+								var num=1;
 								if(target==player.next||target==player.previous){
-									return -1.5;
+									num+=0.5;
 								}
-								return -1;
+								return num;
 							}
 						}
 						return 0;

@@ -38,6 +38,15 @@ character.xianjian={
 		// pal_jiangcheng:['male','wei',4,[]],
 	},
 	skill:{
+		yujian:{
+			enable:'phaseUse',
+			viewAs:{name:'wanjian'},
+			filterCard:{name:'sha'},
+			filter:function(event,player){
+				return player.num('h','sha')>0;
+			},
+			usable:1
+		},
 		feng:{
 			unique:true,
 			init:function(player){
@@ -2142,7 +2151,7 @@ character.xianjian={
 				threaten:1.5
 			}
 		},
-		xiaoyao:{
+		xiaoyao_old:{
 			group:'feiying',
 			direct:true,
 			filter:function(event,player){
@@ -2168,6 +2177,28 @@ character.xianjian={
 					trigger.finish();
 				}
 			}
+		},
+		xiaoyao:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he',{type:'equip'})>0;
+			},
+			content:function(){
+				"step 0"
+				var next=player.chooseToDiscard(get.prompt('xiaoyao'),'he',{type:'equip'});
+				next.logSkill='xiaoyao';
+				next.ai=function(card){
+					if(player.hp==1) return 8-ai.get.value(card);
+					if(player.isZhu) return 7-ai.get.value(card);
+					if(player.hp==2) return 6-ai.get.value(card);
+					return 5-ai.get.value(card);
+				};
+				"step 1"
+				if(result.bool){
+					player.addTempSkill('qianxing',{player:'phaseBegin'});
+				}
+			},
 		},
 		tuoqiao:{
 			filter:function(event,player){
@@ -2200,7 +2231,7 @@ character.xianjian={
 				}
 			}
 		},
-		yujian:{
+		yujian_old:{
 			enable:'phaseUse',
 			usable:1,
 			changeSeat:true,
@@ -2408,13 +2439,13 @@ character.xianjian={
 		runxin:'润心',
 		runxin_info:'每当你使用或打出一张红桃牌，你可以令一名角色回复一点体力',
 		tannang:'探囊',
-		tannang_info:'你可以将一张梅花手牌当顺手牵羊使用（每回合最多发动1次）；你的顺手牵羊无距离限制',
+		tannang_info:'出牌阶段限一次，你可以将一张梅花手牌当顺手牵羊使用；你的顺手牵羊无距离限制',
 		tuoqiao:'脱壳',
 		tuoqiao_info:'每当你成为身边角色的卡牌的目标，你可以将座位后移一位，然后取消之',
 		xiaoyao:'逍遥',
 		xiaoyao_info:'回合结束阶段，你可以弃置一张装备牌并获得潜行直到下一回合开始',
 		yujian:'御剑',
-		yujian_info:'出牌阶段，你可以弃置一张手牌并将你的座位移到任意位置，每阶段限一次',
+		yujian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用',
 		huimeng:'回梦',
 		huimeng_info:'每当你回复一点体力，可以摸两张牌',
 		tianshe:'天蛇',

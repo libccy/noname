@@ -14,6 +14,7 @@ window.noname_update={
         'character/xianjian.js',
         'character/shenhua.js',
         'card/swd.js',
+        'card/guozhan.js',
         'mode/tafang.js',
         'layout/newlayout/global.css',
         'theme/woodden/style.css',

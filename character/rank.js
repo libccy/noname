@@ -354,6 +354,7 @@ window.characterRank={
         'hs_anomalus',
         'mifuren',
         'hanba',
+        'pal_lixiaoyao',
     ],
     b:[
         'caochun',
@@ -443,7 +444,6 @@ window.characterRank={
         'guohuai',
         'sunluban',
         'caozhang',
-        'pal_lixiaoyao',
         'zhouyu',
         'guanyinping',
         'dingfeng',
