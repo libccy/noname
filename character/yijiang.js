@@ -6210,7 +6210,7 @@ character.yijiang={
 				player.update();
 			},
 		},
-		danshou_old:{
+		olddanshou:{
 			trigger:{source:'damageEnd'},
 			priority:9,
 			content:function(){
@@ -6416,7 +6416,7 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				player.chooseTarget([1,2],'请选择旋风的目标',function(card,player,target){
+				player.chooseTarget([1,2],get.prompt('xuanfeng'),function(card,player,target){
 					if(player==target) return false;
 					return target.num('he');
 				}).set('ai',function(target){
@@ -7771,6 +7771,7 @@ character.yijiang={
 		shiyong:'恃勇',
 		shiyong2:'恃勇',
 		danshou:'胆守',
+		olddanshou:'胆守',
 		yizhong:'毅重',
 		xinzhan:'心战',
 		xinzhan_gain:'获得',
@@ -7857,7 +7858,7 @@ character.yijiang={
 		zongshi_info:'锁定技，场上每有一种势力，你的手牌上限便＋1。',
 		shiyong_info:'锁定技，每当你受到一次红色【杀】或【酒】【杀】造成的伤害后，你减1点体力上限。',
 		danshou_info:'出牌阶段，你可以选择你攻击范围内的一名其他角色，然后弃置X张牌（X为此前你于此阶段你发动“胆守”的次数+1）。若X：为1，你弃置该角色的一张牌；为2，令该角色交给你一张牌；为3，你对该角色造成1点伤害；不小于4，你与该角色各摸两张牌。',
-		danshou_infox:'每当你造成一次伤害后，你可以摸一张牌。若如此做，终止一切结算，当前回合结束。',
+		olddanshou_info:'每当你造成一次伤害后，你可以摸一张牌。若如此做，终止一切结算，当前回合结束。',
 		yizhong_info:'锁定技，当你没有防具时，黑色的杀对你无效',
 		xinzhan_info:'出牌阶段限一次，你可以观看牌堆顶的3张牌，然后展示其中任意数量♥的牌并获得之',
 		huilei_info:'锁定技，杀死你的角色立即弃置所有的牌。',

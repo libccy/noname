@@ -4023,7 +4023,7 @@ character.shenhua={
 		menghuo:'孟获',
 		caopi:'曹丕',
 		xuhuang:'徐晃',
-		lusu:'鲁肃',
+		lusu:'旧鲁肃',
 		sunjian:'孙坚',
 		dongzhuo:'董卓',
 		jiaxu:'贾诩',
