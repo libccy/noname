@@ -147,7 +147,7 @@ character.extra={
 			mark:true,
 			content:function(){
 				"step 0"
-				player.unmark('shenfen');
+				player.awakenSkill('shenfen');
 				player.storage.shenfen=true;
 				player.storage.baonu-=6;
 				event.targets=game.players.slice(0);
@@ -289,7 +289,7 @@ character.extra={
 			content:function(){
 				player.loseMaxHp();
 				player.addSkill('jilue');
-				player.removeSkill('sbaiyin');
+				player.awakenSkill('sbaiyin');
 			}
 		},
 		jilue:{
@@ -874,7 +874,7 @@ character.extra={
 				return [1,3];
 			},
 			content:function(){
-				player.unmark('yeyan');
+				player.awakenSkill('yeyan');
 				player.storage.yeyan=true;
 				if(cards.length==4){
 					player.loseHp(3);

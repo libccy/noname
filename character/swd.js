@@ -181,7 +181,7 @@ character.swd={
 				trigger.num++;
 				player.addSkill('shenyan2');
 				player.storage.shenyan=true;
-				player.unmarkSkill('shenyan');
+				player.awakenSkill('shenyan');
 				player.storage.shenyan2=[];
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&

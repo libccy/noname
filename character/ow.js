@@ -564,7 +564,7 @@ character.ow={
                 'step 0'
                 if(target==targets[0]){
                     player.storage.baoxue=true;
-                    player.unmarkSkill('baoxue');
+                    player.awakenSkill('baoxue');
                     player.showHandcards();
                     player.discard(player.get('he',{color:'black'}));
                 }
@@ -1639,7 +1639,7 @@ character.ow={
                 player.discard(player.get('he'));
                 'step 1'
                 player.addTempSkill('zhanlong2','phaseAfter');
-                player.unmarkSkill('zhanlong');
+                player.awakenSkill('zhanlong');
 				player.storage.zhanlong=true;
                 var cards=[];
                 for(var i=0;i<3;i++){
@@ -1990,7 +1990,7 @@ character.ow={
                 if(target==targets[0]){
                     player.turnOver();
                     player.addSkill('sheng2');
-                    player.unmarkSkill('sheng');
+                    player.awakenSkill('sheng');
     				player.storage.sheng=true;
                 }
 				target.recover();
@@ -2169,7 +2169,7 @@ character.ow={
 			content:function(){
 				'step 0'
                 targets.sort(lib.sort.seat);
-				player.unmarkSkill('huoyu');
+				player.awakenSkill('huoyu');
 				player.storage.huoyu=true;
                 player.useCard({name:'chiyuxi'},targets).animate=false;
 				'step 1'

@@ -5,7 +5,7 @@ character.jiange={
         jg_huangyueying:['female','shu',3,['zhinang','jingmiao']],
         jg_zhugeliang:['male','shu',3,['biantian','bazhen']],
         jg_liubei:['male','shu',4,['jizhen','lingfeng']],
-        jg_xiahouyuan:['male','wei',4,['shensu','juechen']],
+        jg_xiahouyuan:['male','wei',4,['xinshensu','juechen']],
         jg_caozhen:['male','wei',4,['chiying','jingfan']],
         jg_zhanghe:['male','wei',4,['huodi','jueji']],
         jg_simayi:['male','wei',5,['xuanlei','sfanshi','konghun']],

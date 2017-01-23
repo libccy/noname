@@ -841,6 +841,7 @@ character.hearth={
 				player.changeHujia(2);
 				player.removeSkill('nuyan');
 				player.addSkill('nuyan2');
+				player.awakenSkill('chouhuo');
 			}
 		},
 		nuyan2:{
@@ -3618,6 +3619,7 @@ character.hearth={
 			},
 			content:function(){
 				player.storage.anying=true;
+				player.awakenSkill('anying');
 				player.removeSkill('shengguang');
 				player.addSkill('xinci');
 			},
@@ -4469,6 +4471,7 @@ character.hearth={
 			content:function(){
 				player.storage.tuteng_awake=true;
 				player.loseMaxHp();
+				player.awakenSkill('zuling');
 			}
 		},
 		tuteng_h:{

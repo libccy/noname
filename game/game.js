@@ -7113,7 +7113,7 @@
                         if(event.dialogcontrol){
                             event.dialog=ui.create.dialog(event.prompt||'选择一项','hidden');
                             for(var i=0;i<event.controls.length;i++){
-                                var item=event.dialog.add('<div class="popup" style="width:calc(100% - 10px);display:inline-block">'+event.controls[i]+'</div>');
+                                var item=event.dialog.add('<div class="popup text" style="width:calc(100% - 10px);display:inline-block">'+event.controls[i]+'</div>');
         						item.firstChild.listen(ui.click.dialogcontrol);
         						item.firstChild.link=event.controls[i];
                             }
@@ -9208,6 +9208,7 @@
 					this.additionalSkills={};
 					this.disabledSkills={};
 					this.hiddenSkills=[];
+                    this.awakenedSkills=[];
 					this.forbiddenSkills={};
 					this.stat=[{card:{},skill:{}}];
 					this.tempSkills={};
@@ -11660,6 +11661,11 @@
                         }
                         delete this.additionalSkills[skill];
                     }
+                },
+                awakenSkill:function(skill,nounmark){
+                    if(!nounmark) this.unmarkSkill(skill);
+                    this.disableSkill(skill,skill);
+                    this.awakenedSkills.add(skill);
                 },
                 disableSkill:function(skill,skills){
                     this.disabledSkills[skill]=skills;
@@ -28768,6 +28774,7 @@
 				node.additionalSkills={};
 				node.disabledSkills={};
 				node.hiddenSkills=[];
+                node.awakenedSkills=[];
 				node.forbiddenSkills={};
 				node.popups=[];
 				node.damagepopups=[];
@@ -33137,6 +33144,9 @@
 				var skills2=game.filterSkills(skills,node);
                 if(node==game.me&&node.hiddenSkills.length){
                     skills.addArray(node.hiddenSkills);
+                }
+                if(node.awakenedSkills.length){
+                    skills.addArray(node.awakenedSkills);
                 }
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;

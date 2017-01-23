@@ -224,7 +224,7 @@ character.diy={
 			},
 			content:function(){
 				"step 0"
-				player.unmarkSkill('guihan');
+				player.awakenSkill('guihan');
 				player.recover();
 				player.storage.guihan=true;
 				"step 1"

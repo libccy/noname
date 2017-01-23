@@ -92,19 +92,19 @@
 #arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.hp:not(.actcount).text{
     left: 89px;
 }
-.player.fullskin2 .avatar2{
+#arena:not(.fewplayer).player.fullskin2 .avatar2{
     z-index: 2;
 }
-.player.unseen:not(.unseen2) .count{
+#arena:not(.fewplayer).player.unseen:not(.unseen2) .count{
     text-align: left;
 	border-radius:3px 0 0 3px;
 }
-.player.unseen2 .count{
+#arena:not(.fewplayer).player.unseen2 .count{
 	border-radius: 3px;
 	text-align: center;
 }
 
-.timerbar>div{
+#arena:not(.fewplayer) .timerbar>div{
     top: 205px;
     width: 96px;
     left: 12px;

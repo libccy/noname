@@ -479,6 +479,7 @@ character.refresh={
 				player.storage.qinxue=true;
 				player.loseMaxHp();
 				player.addSkill('gongxin');
+				player.awakenSkill('qinxue');
 			}
 		},
 		qingjian:{
@@ -714,7 +715,7 @@ character.refresh={
 				return player.hp<player.storage.retishen2-1;
 			},
 			content:function(){
-				player.unmarkSkill('retishen');
+				player.awakenSkill('retishen');
 				player.recover(player.storage.retishen2-player.hp);
 				player.draw(player.storage.retishen2-player.hp);
 				player.storage.retishen=true;
@@ -1273,7 +1274,7 @@ character.refresh={
 				return player.hp<player.maxHp;
 			},
 			content:function(){
-				player.removeSkill('qianxin');
+				player.awakenSkill('qianxin');
 				player.addSkill('jianyan');
 				player.loseMaxHp();
 			}
@@ -1402,7 +1403,7 @@ character.refresh={
 				});
 				"step 1"
 				if(result.bool){
-					player.unmarkSkill('fenwei');
+					player.awakenSkill('fenwei');
 					player.logSkill('fenwei',result.targets);
 					player.storage.fenwei=true;
 					for(var i=0;i<result.targets.length;i++){

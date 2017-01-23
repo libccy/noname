@@ -451,7 +451,7 @@ character.sp={
 			prepare:'give',
 			content:function(){
 				player.storage.shichou=true;
-				player.unmarkSkill('shichou');
+				player.awakenSkill('shichou');
 				target.gain(cards,player);
 				player.storage.shichou_target=target;
 				player.addSkill('shichou2');
@@ -980,7 +980,7 @@ character.sp={
 			content:function(){
 				'step 0'
 				player.$give(cards,targets[0]);
-				player.unmark('jianshu');
+				player.awakenSkill('jianshu');
 				player.storage.jianshu=true;
 				targets[0].gain(cards,player);
 				'step 1'
@@ -1046,7 +1046,7 @@ character.sp={
 				}).set('goon',!player.hasUnknown());
 				'step 1'
 				if(result.bool){
-					player.unmarkSkill('yongdi');
+					player.awakenSkill('yongdi');
 					player.storage.yongdi=true;
 					player.logSkill('yongdi',result.targets);
 					var target=result.targets[0];
@@ -3191,6 +3191,7 @@ character.sp={
 				player.loseMaxHp();
 				player.addSkill('xintan');
 				player.storage.zhiri=true;
+				player.awakenSkill('zhiri');
 			}
 		},
 		xintan:{
@@ -3236,6 +3237,7 @@ character.sp={
 				player.loseMaxHp();
 				player.addSkill('mashu');
 				player.addSkill('nuzhan');
+				player.awakenSkill('danji');
 			}
 		},
 		nuzhan:{
@@ -3461,7 +3463,7 @@ character.sp={
 				},player,trigger.player,trigger.player.identityShown);
 				player.line(trigger.player,'green');
 				player.storage.fenxin=true;
-				player.unmarkSkill('fenxin');
+				player.awakenSkill('fenxin');
 			}
 		},
 		qingyi:{
@@ -4305,6 +4307,7 @@ character.sp={
 				"step 2"
 				player.addSkill('tiaoxin');
 				player.storage.kunfen=true;
+				player.awakenSkill('fengliang');
 			},
 		},
 		zhuiji:{
@@ -4521,7 +4524,7 @@ character.sp={
 				"step 0"
 				player.storage.zuixiang=get.cards(3);
 				player.showCards(player.storage.zuixiang);
-				player.markSkill('zuixiang');
+				player.awakenSkill('zuixiang');
 				player.syncStorage('zuixiang');
 				"step 1"
 				var cards=player.storage.zuixiang;
@@ -5085,6 +5088,7 @@ character.sp={
 				player.recover();
 				player.removeSkill('liangzhu');
 				player.addSkill('xiaoji');
+				player.awakenSkill('fanxiang');
 			},
 		},
 		mingshi:{
@@ -5538,7 +5542,7 @@ character.sp={
 			},
 			content:function(){
 				"step 0"
-				player.unmarkSkill('cunsi');
+				player.awakenSkill('cunsi');
 				var cards=player.get('h');
 				target.gain(cards,player);
 				player.$give(cards.length,target);
@@ -5921,7 +5925,7 @@ character.sp={
 			content:function(){
 				"step 0"
 				player.storage.xiongyi=true;
-				player.unmarkSkill('xiongyi');
+				player.awakenSkill('xiongyi');
 				game.asyncDraw(targets,3);
 				"step 1"
 				if(targets.length<=2){
@@ -6028,7 +6032,7 @@ character.sp={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
-				return player.getStat('damage')>=3&&player.hasSkill('huxiao');
+				return player.getStat('damage')>=3&&!player.storage.wuji;
 			},
 			content:function(){
 				"step 0"
@@ -6036,6 +6040,8 @@ character.sp={
 				player.gainMaxHp();
 				"step 1"
 				player.recover();
+				player.awakenSkill('wuji');
+				player.storage.wuji=true;
 			}
 		},
 		xueji:{
@@ -6596,8 +6602,8 @@ character.sp={
 					if(player.hasSkill('paoxiao')){
 						player.storage.baobian.push('paoxiao');
 					}
-					if(player.hasSkill('shensu')){
-						player.storage.baobian.push('shensu');
+					if(player.hasSkill('xinshensu')){
+						player.storage.baobian.push('xinshensu');
 					}
 				}
 				if(player.storage.baobian.contains('tiaoxin')==false){
@@ -6606,8 +6612,8 @@ character.sp={
 				if(player.storage.baobian.contains('paoxiao')==false){
 					player.removeSkill('paoxiao');
 				}
-				if(player.storage.baobian.contains('shensu')==false){
-					player.removeSkill('shensu');
+				if(player.storage.baobian.contains('xinshensu')==false){
+					player.removeSkill('xinshensu');
 				}
 				if(player.hp<=3){
 					player.addSkill('tiaoxin');
@@ -6616,7 +6622,7 @@ character.sp={
 					player.addSkill('paoxiao');
 				}
 				if(player.hp==1){
-					player.addSkill('shensu');
+					player.addSkill('xinshensu');
 				}
 			},
 			ai:{
@@ -6957,6 +6963,7 @@ character.sp={
 				player.addSkill('benghuai');
 				player.addSkill('weizhong');
 				player.storage.juyi=true;
+				player.awakenSkill('juyi');
 			}
 		},
 		weizhong:{
@@ -7064,7 +7071,7 @@ character.sp={
 				"step 1"
 				if(result.bool){
 					player.storage.suiren=true;
-					player.unmarkSkill('suiren');
+					player.awakenSkill('suiren');
 					player.logSkill('suiren',result.targets);
 					player.removeSkill('yicong');
 					player.gainMaxHp();
