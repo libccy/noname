@@ -8,6 +8,7 @@ window.noname_update={
     files:[
         'game/game.js',
         'game/config.js',
+        'game/package.js',
         'game/asset.js',
         'game/source.js',
         'character/*',
