@@ -17,6 +17,7 @@ window.noname_source_list=[
     'character/guozhan.js',
     'character/hearth.js',
     // 'character/jiange.js',
+    'character/old.js',
     'character/ow.js',
     'character/rank.js',
     'character/refresh.js',

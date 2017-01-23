@@ -7,6 +7,7 @@ character.pack={
     extra:'神将',
     guozhan:'国战',
     diy:'DIY',
+    old:'怀旧',
     yxs:'英雄杀',
     hearth:'炉石传说',
     ow:'守望先锋',
