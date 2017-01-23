@@ -2428,7 +2428,7 @@ window.noname_skin_list={
     chenlin:3,
     chenqun:2,
     dengai:4,
-    dianwei:1,
+    dianwei:2,
     diaochan:4,
     dingfeng:3,
     dongzhuo:3,

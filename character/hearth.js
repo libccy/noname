@@ -4841,10 +4841,10 @@ character.hearth={
 			enable:true,
 			derivation:'hs_xialikeer',
 			filterTarget:function(card,player,target){
-				return !target.hasSkill('hslingjian_yinshen');
+				return !target.hasSkill('qianxing');
 			},
 			content:function(){
-				target.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
+				target.addTempSkill('qianxing',{player:'phaseBegin'});
 			},
 			ai:{
 				order:2,

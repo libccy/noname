@@ -16,7 +16,7 @@ character.shenhua={
 		sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
 		pangtong:['male','shu',3,['lianhuan','niepan']],
 		xunyu:['male','wei',3,['quhu','jieming']],
-		dianwei:['male','wei',4,['qiangxi']],
+		dianwei:['male','wei',4,['xinqiangxi']],
 		taishici:['male','wu',4,['tianyi']],
 		yanwen:['male','qun',4,['shuangxiong']],
 		yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
@@ -2534,6 +2534,67 @@ character.shenhua={
 			},
 			threaten:1.3
 		},
+		xinqiangxi:{
+			audio:'qiangxi',
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(player.hasSkill('xinqiangxi2')){
+					return !player.hasSkill('xinqiangxi3');
+				}
+				else if(player.hasSkill('xinqiangxi3')){
+					return !player.hasSkill('xinqiangxi2')&&player.num('he',{type:'equip'})>0;
+				}
+				else{
+					return true;
+				}
+			},
+			filterCard:function(card){
+				var player=_status.event.player;
+				if(player.hasSkill('xinqiangxi2')) return false;
+				return get.type(card)=='equip';
+			},
+			selectCard:function(){
+				var player=_status.event.player;
+				if(player.hasSkill('xinqiangxi2')) return -1;
+				if(player.hasSkill('xinqiangxi3')) return [1,1];
+				return [0,1];
+			},
+			filterTarget:function(card,player,target){
+				if(player==target) return false;
+				return get.distance(player,target,'attack')<=1;
+			},
+			content:function(){
+				"step 0"
+				if(cards.length==0){
+					player.loseHp();
+					player.addTempSkill('xinqiangxi3','phaseAfter');
+				}
+				else{
+					player.addTempSkill('xinqiangxi2','phaseAfter');
+				}
+				"step 1"
+				target.damage();
+			},
+			check:function(card){
+				return 10-ai.get.value(card);
+			},
+			position:'he',
+			ai:{
+				order:8.5,
+				result:{
+					target:function(player,target){
+						if(player.hasSkill('xinqiangxi2')||!player.num('he',{type:'equip'})){
+							if(player.hp<2) return 0;
+							if(target.hp>=player.hp) return 0;
+						}
+						return ai.get.damageEffect(target,player);
+					}
+				}
+			},
+			threaten:1.5
+		},
+		xinqiangxi2:{},
+		xinqiangxi3:{},
 		tianyi:{
 			audio:2,
 			enable:'phaseUse',
@@ -3355,6 +3416,8 @@ character.shenhua={
 		huashen2:'化身',
 		xinsheng:'新生',
 		qimou:'奇谋',
+		xinqiangxi:'强袭',
+		xinqiangxi_info:'出牌阶段各限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张装备牌并对你攻击范围内的一名其他角色造成一点伤害 ',
 		qimou_info:'限定技，出牌阶段，你可以失去任意点体力，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你失去的体力值）',
 		tiaoxin_info:'出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色需对你使用一张【杀】，若该角色不如此做，你弃掉他的一张牌，每回合限一次。',
 		zhiji_info:'觉醒技，回合开始阶段，若你没有手牌，你须回复1点体力或摸两张牌，然后减1点体力上限，并永久获得技能“观星”。',

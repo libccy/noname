@@ -147,7 +147,7 @@ character.gujian={
 			group:['yunyin_count','yunyin_set'],
 			content:function(){
 				'step 0'
-				player.chooseToDiscard('he',get.prompt('yunyin'),function(card){
+				player.chooseToDiscard(get.prompt('yunyin'),function(card){
 					if(!player.storage.yunyin) return true;
 					return !player.storage.yunyin.contains(get.suit(card));
 				}).set('logSkill','yunyin').ai=function(card){

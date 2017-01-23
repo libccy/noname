@@ -228,10 +228,7 @@ character.xianjian={
 				'step 1'
 				if(result.bool){
 					player.logSkill('danqing',result.targets);
-					var effs=['draw','hujia','equip'];
-					if(lib.skill.hslingjian_yinshen){
-						effs.add('stealth');
-					}
+					var effs=['draw','hujia','equip','stealth'];
 					for(var i=0;i<result.targets.length;i++){
 						var eff=effs.randomRemove();
 						var current=result.targets[i];
@@ -244,8 +241,7 @@ character.xianjian={
 								current.$draw(card);
 								break;
 							case 'stealth':
-								current.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
-								game.log(current,'获得了','【潜行】');
+								current.addTempSkill('qianxing',{player:'phaseBegin'});
 								break;
 						}
 					}
@@ -349,7 +345,7 @@ character.xianjian={
 					result.targets[0].equip(card);
 					result.targets[0].$draw(card);
 					event.targets.push(result.targets[0]);
-					if(event.targets.length==game.players.length||!lib.skill.hslingjian_yinshen){
+					if(event.targets.length==game.players.length){
 						event.finish();
 					}
 					else{
@@ -371,7 +367,7 @@ character.xianjian={
 				if(result.bool){
 					player.line(result.targets[0],'green');
 					game.delay();
-					result.targets[0].addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
+					result.targets[0].addTempSkill('qianxing',{player:'phaseBegin'});
 				}
 			}
 		},
@@ -2416,7 +2412,7 @@ character.xianjian={
 		tuoqiao:'脱壳',
 		tuoqiao_info:'每当你成为身边角色的卡牌的目标，你可以将座位后移一位，然后取消之',
 		xiaoyao:'逍遥',
-		xiaoyao_info:'锁定技，计算其他角色与你的距离时始终+1；每当你成为其他角色的卡牌目标时，你可以弃置两张牌使其失效',
+		xiaoyao_info:'回合结束阶段，你可以弃置一张装备牌并获得潜行直到下一回合开始',
 		yujian:'御剑',
 		yujian_info:'出牌阶段，你可以弃置一张手牌并将你的座位移到任意位置，每阶段限一次',
 		huimeng:'回梦',

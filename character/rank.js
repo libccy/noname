@@ -225,6 +225,7 @@ window.characterRank={
         'yxs_nandinggeer',
         'hs_kazhakusi',
         'swd_yeyaxi',
+        'dianwei',
     ],
     bp:[
         'pal_leiyuange',
@@ -393,7 +394,6 @@ window.characterRank={
         'hs_huzhixiannv',
         'jg_simayi',
         'jg_zhugeliang',
-        'diy_dianwei',
         'sp_sunshangxiang',
         're_lidian',
         'jiangqing',
@@ -496,7 +496,6 @@ window.characterRank={
         'lvbu',
         'xiaoqiao',
         'yanwen',
-        'dianwei',
         'yujin',
     ],
     d:[

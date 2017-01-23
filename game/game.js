@@ -3777,6 +3777,14 @@
 				lib.config.all.plays=[];
 				lib.config.all.mode=[];
 
+                if(lib.config.debug){
+                    lib.init.js('game','asset',function(){
+                        lib.skin=window.noname_skin_list;
+                        delete window.noname_skin_list;
+                        delete window.noname_asset_list;
+                    });
+                }
+
                 if(window.isNonameServer){
                     lib.config.mode='connect';
                 }
@@ -5501,6 +5509,7 @@
     		_chongzhu:'重铸',
     		_lianhuan:'连环',
     		_lianhuan2:'连环',
+            qianxing:'潜行',
 		},
 		element:{
 			content:{
@@ -14695,6 +14704,21 @@
             others:{},
             zhu:{},
             zhuSkill:{},
+            qianxing:{
+                mark:true,
+    			nopop:true,
+                init:function(player){
+                    game.log(player,'获得了','【潜行】');
+                },
+    			intro:{
+    				content:'锁定技，你不能成为其他角色的卡牌的目标'
+    			},
+    			mod:{
+    				targetEnabled:function(card,player,target){
+    					if(player!=target) return false;
+    				}
+    			}
+            },
 			mad:{
 				mark:true,
 				intro:{
@@ -33218,9 +33242,9 @@
 
 						uiintro.content.appendChild(table);
 					}
-					if(lib.config.change_skin&&(
-						!node.classList.contains('unseen')||!node.classList.contains('unseen2')
-					)){
+					if(lib.config.change_skin&&
+						(!node.classList.contains('unseen')||!node.classList.contains('unseen2'))
+					){
 						var num=1;
 						var introadded=false;
 						var loadImage=function(avatar2){
@@ -33284,6 +33308,9 @@
 						if(!node.classList.contains('unseen')){
 							loadImage();
 						}
+                        else{
+                            loadImage(true);
+                        }
 					}
 				}
 
@@ -33444,6 +33471,63 @@
                 else{
                     uiintro.add(ui.create.div('.placeholder.slim'));
                 }
+                if(lib.config.change_skin||lib.skin){
+					var num=1;
+					var introadded=false;
+                    var createButtons=function(num){
+                        if(!num) return;
+                        if(!introadded){
+                            introadded=true;
+                            uiintro.add('<div class="text center">更改皮肤</div>');
+                        }
+                        var buttons=ui.create.div('.buttons.smallzoom');
+                        for(var i=0;i<=num;i++){
+                            var button=ui.create.div('.button.character',buttons,function(){
+                                if(this._link){
+                                    lib.config.skin[node.link]=this._link;
+                                    node.style.backgroundImage=this.style.backgroundImage;
+                                    game.saveConfig('skin',lib.config.skin);
+                                }
+                                else{
+                                    delete lib.config.skin[node.link];
+                                    node.node.avatar.setBackground(node.link,'character');
+                                    game.saveConfig('skin',lib.config.skin);
+                                }
+                            });
+                            button._link=i;
+                            if(i){
+                                button.setBackgroundImage('image/skin/'+node.link+'/'+i+'.jpg');
+                            }
+                            else{
+                                button.setBackgroundImage('image/character/'+node.link+'.jpg');
+                            }
+                        }
+                        uiintro.add(buttons);
+                    };
+					var loadImage=function(){
+						var img=new Image();
+						img.onload=function(){
+							num++;
+							loadImage();
+						}
+						img.onerror=function(){
+							num--;
+							createButtons(num);
+						}
+						img.src=lib.assetURL+'image/skin/'+node.link+'/'+num+'.jpg';
+					}
+                    if(lib.config.change_skin){
+                        if(!node.classList.contains('unseen')){
+							loadImage();
+						}
+                        else{
+                            loadImage(true);
+                        }
+                    }
+					else{
+                        createButtons(lib.skin[node.link]);
+                    }
+				}
 			}
 			else if(node.classList.contains('identity')&&node.dataset.career){
 				var career=node.dataset.career;

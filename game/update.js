@@ -6,10 +6,13 @@ window.noname_update={
     ],
     files:[
         'game/game.js',
+        'game/asset.js',
         'character/gujian.js',
+        'character/hearth.js',
         'character/swd.js',
         'character/rank.js',
         'character/xianjian.js',
+        'character/shenhua.js',
         'card/swd.js',
         'mode/tafang.js',
         'layout/newlayout/global.css',

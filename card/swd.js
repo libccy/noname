@@ -1086,10 +1086,10 @@ card.swd={
 			derivation:true,
 			derivationpack:'swd',
 			filterTarget:function(card,player,target){
-				return player!=target&&!target.hasSkill('hslingjian_yinshen');
+				return player!=target&&!target.hasSkill('qianxing');
 			},
 			content:function(){
-				target.addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
+				target.addTempSkill('qianxing',{player:'phaseBegin'});
 			},
 			ai:{
 				order:2,
@@ -3198,7 +3198,7 @@ card.swd={
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('hslingjian_yinmilichang_duanzao'),function(card,player,target){
-					return target!=player&&!target.hasSkill('hslingjian_yinshen');
+					return target!=player&&!target.hasSkill('qianxing');
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(get.distance(player,target,'absolute')<=1) return 0;
@@ -3209,7 +3209,7 @@ card.swd={
 				'step 1'
 				if(result.bool){
 					player.logSkill('hslingjian_yinmilichang_equip1',result.targets);
-					result.targets[0].addTempSkill('hslingjian_yinshen',{player:'phaseBegin'});
+					result.targets[0].addTempSkill('qianxing',{player:'phaseBegin'});
 				}
 			}
 		},
@@ -3217,10 +3217,10 @@ card.swd={
 			trigger:{player:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return !player.hasSkill('hslingjian_yinshen');
+				return !player.hasSkill('qianxing');
 			},
 			content:function(){
-				player.addTempSkill('hslingjian_yinshen','phaseAfter');
+				player.addTempSkill('qianxing','phaseAfter');
 			}
 		},
 		hslingjian_yinmilichang_equip3:{
@@ -3677,18 +3677,6 @@ card.swd={
 				},
 				result:{
 					player:1,
-				}
-			}
-		},
-		hslingjian_yinshen:{
-			mark:true,
-			nopop:true,
-			intro:{
-				content:'锁定技，你不能成为其他角色的卡牌的目标'
-			},
-			mod:{
-				targetEnabled:function(card,player,target){
-					if(player!=target) return false;
 				}
 			}
 		},
@@ -4450,8 +4438,6 @@ card.swd={
 		hslingjian_shijianhuisu_info:'可用于煅造装备；令一名其他角色将其装备牌收回手牌',
 		hslingjian_chaofeng:'嘲讽',
 		hslingjian_chaofeng_info:'锁定技，若你的手牌数大于你的体力值，则只要你在任一其他角色的攻击范围内，该角色使用【杀】时便不能指定你以外的角色为目标',
-		hslingjian_yinshen:'潜行',
-		hslingjian_yinshen_info:'锁定技，你不能成为其他角色的卡牌的目标',
 		qinglonglingzhu:'青龙灵珠',
 		qinglonglingzhu_ab:'灵珠',
 		qinglonglingzhu_info:'每当你造成一次属性伤害，你可以获得对方的一张牌',
