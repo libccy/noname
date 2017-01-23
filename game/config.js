@@ -21,6 +21,7 @@ window.config={
 		lvbu:'re_lvbu',
 		gongsunzan:'re_gongsunzan',
 		liubei:'re_liubei',
+		yuanshao:'re_yuanshao',
 	},
 	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],

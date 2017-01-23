@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.5',
+    '1.9.6',
     'image/background/huangtian_bg.jpg',
     'image/background/shengshi_bg.jpg',
     'image/background/xueji_bg.jpg',
@@ -504,6 +504,7 @@ window.noname_asset_list=[
     'image/character/re_xiahoudun.jpg',
     'image/character/re_xushu.jpg',
     'image/character/re_xuzhu.jpg',
+    'image/character/re_yuanshao.jpg',
     'image/character/re_yuanshu.jpg',
     'image/character/re_zhangfei.jpg',
     'image/character/re_zhangliao.jpg',

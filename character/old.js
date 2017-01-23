@@ -7,6 +7,7 @@ character.old={
 		liru:['male','qun',3,['juece','mieji','fencheng']],
         yujin:['male','wei',4,['jieyue']],
 		old_zhonghui:['male','wei',3,['zzhenggong','zquanji','zbaijiang']],
+		yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
     },
     skill:{
 

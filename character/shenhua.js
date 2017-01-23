@@ -18,7 +18,7 @@ character.shenhua={
 		dianwei:['male','wei',4,['xinqiangxi']],
 		taishici:['male','wu',4,['tianyi']],
 		yanwen:['male','qun',4,['shuangxiong']],
-		yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
+		re_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
 		pangde:['male','qun',4,['mashu','mengjin']],
 
         menghuo:['male','shu',4,['huoshou','zaiqi']],
@@ -44,6 +44,68 @@ character.shenhua={
 		menghuo:['zhurong'],
 	},
 	skill:{
+		reluanji:{
+			audio:'luanji',
+			enable:'phaseUse',
+			viewAs:{name:'wanjian'},
+			filterCard:function(card,player){
+				if(!player.storage.reluanji) return true;
+				return !player.storage.reluanji.contains(get.suit(card));
+			},
+			selectCard:2,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			ai:{
+				basic:{
+					order:10
+				}
+			},
+			group:['reluanji_count','reluanji_reset','reluanji_respond'],
+			subSkill:{
+				reset:{
+					trigger:{player:'phaseAfter'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event,player){
+						return player.storage.reluanji?true:false;
+					},
+					content:function(){
+						delete player.storage.reluanji;
+					}
+				},
+				count:{
+					trigger:{player:'useCard'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event){
+						return event.skill=='reluanji';
+					},
+					content:function(){
+						if(!player.storage.reluanji){
+							player.storage.reluanji=[];
+						}
+						for(var i=0;i<trigger.cards.length;i++){
+							player.storage.reluanji.add(get.suit(trigger.cards[i]));
+						}
+					}
+				},
+				respond:{
+					trigger:{global:'respond'},
+					forced:true,
+					popup:false,
+					silent:true,
+					filter:function(event){
+						return event.getParent(2).skill=='reluanji'&&event.player.isDamaged();
+					},
+					content:function(){
+						trigger.player.draw();
+					}
+				}
+			}
+		},
 		qimou:{
 			unique:true,
 			enable:'phaseUse',
@@ -3385,6 +3447,10 @@ character.shenhua={
 		}
 	},
 	translate:{
+		re_yuanshao:'袁绍',
+		reluanji:'乱击',
+		reluanji_info:'你可以将两张与你本回合以此法转化的花色均不相同的手牌当【万箭齐发】使用，然后当一名已受伤的角色因响应此牌而打出【闪】时，该角色摸一张牌',
+
         tiaoxin:'挑衅',
 		zhiji:'志继',
 		zhiji_draw:'摸牌',
@@ -3507,7 +3573,7 @@ character.shenhua={
 		dianwei:'典韦',
 		taishici:'太史慈',
 		yanwen:'颜良文丑',
-		yuanshao:'袁绍',
+		yuanshao:'旧袁绍',
 		pangde:'庞德',
 		huoji:'火计',
 		bazhen:'八阵',
