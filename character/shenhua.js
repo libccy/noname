@@ -926,7 +926,7 @@ character.shenhua={
 					event.finish();
 				}
 				"step 4"
-				if(result.bool){
+				if(result.bool&&result.links.length){
 					var link=result.links[0];
 					if(get.position(link)=='e'){
 						event.targets[1].equip(link);
