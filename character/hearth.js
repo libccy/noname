@@ -2898,6 +2898,7 @@ character.hearth={
 				return true;
 			},
 			content:function(){
+				'step 0'
 				player.hp=Math.min(player.storage.chongsheng,player.maxHp);
 				player.discard(player.get('hej'));
 				player.draw(player.storage.chongsheng);
@@ -2905,7 +2906,9 @@ character.hearth={
 				if(player.storage.chongsheng<=0){
 					player.unmarkSkill('chongsheng');
 				}
+				'step 1'
 				if(player.isLinked()) player.link();
+				'step 2'
 				if(player.isTurnedOver()) player.turnOver();
 				player.syncStorage('chongsheng');
 			},

@@ -3586,7 +3586,9 @@ character.yijiang={
 				return player.canUse(player.storage.taoxi,target);
 			},
 			selectTarget:function(){
-				return get.select(get.info(_status.event.player.storage.taoxi).selectTarget);
+				var info=get.info(_status.event.player.storage.taoxi);
+				if(info.notarget) return -1;
+				return get.select(info.selectTarget);
 			},
 			multitarget:true,
 			multiline:true,
@@ -3627,10 +3629,8 @@ character.yijiang={
 				return player.storage.taoxi?true:false;
 			},
 			content:function(){
-				if(get.owner(player.storage.taoxi)==player.storage.taoxi2&&player.num('he')){
-					game.log(player,'发动了','【讨袭】');
-					player.popup('taoxi');
-					player.chooseToDiscard('he',true);
+				if(get.owner(player.storage.taoxi)==player.storage.taoxi2){
+					player.loseHp();
 				}
 				delete player.storage.taoxi;
 				delete player.storage.taoxi2;
@@ -7694,7 +7694,7 @@ character.yijiang={
 		taoxi:'讨袭',
 		taoxi2:'讨袭',
 		taoxi3:'讨袭',
-		taoxi_info:'出牌阶段限一次，你使用牌指定一名其他角色为唯一目标后，你可以亮出其一张手牌直到回合结束，并且你可以于此回合内将此牌如手牌般使用。回合结束时，若该角色未失去此手牌，则你须弃置一张牌',
+		taoxi_info:'出牌阶段限一次，当你使用牌指定一名其他角色为唯一目标后，你可以亮出其一张手牌直到回合结束，并且你可以于此回合内将此牌如手牌般使用。回合结束时，若该角色未失去此手牌，则你失去1点体力',
 		huituo:'恢拓',
 		huituo_info:'每当你受到伤害后，你可以令一名角色进行一次判定，若结果为红色，该角色回复1点体力；若结果为黑色，该角色摸X张牌（X为此次伤害的伤害数）',
 		mingjian:'明鉴',

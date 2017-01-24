@@ -51,8 +51,8 @@ body{
 #arena.long .player.unseen2 .equips:not(*:empty){
 	border-radius:4px;
 }
-#arena:not(.long_.mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
-#arena:not(.long_:not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card,
+#arena:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
+#arena:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card,
 #arena.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty)>.card,
 #arena.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty)>.card{
 	background: none !important;

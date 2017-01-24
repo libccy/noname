@@ -5,7 +5,7 @@ character.old={
 		xushu:['male','shu',3,['wuyan','jujian']],
 		fazheng:['male','shu',3,['enyuan','xuanhuo']],
 		liru:['male','qun',3,['juece','mieji','fencheng']],
-        yujin:['male','wei',4,['jieyue']],
+        yujin:['male','wei',4,['yizhong']],
 		lusu:['male','wu',3,['haoshi','dimeng']],
 		yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
 		old_zhonghui:['male','wei',3,['zzhenggong','zquanji','zbaijiang']],
