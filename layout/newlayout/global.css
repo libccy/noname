@@ -21,6 +21,9 @@
 	height: 174px;
 	left:3px;
 	top:3px;
+}
+#arena:not(.mobile).uslim_player .player:not(.minskin):not(.fakeme) .avatar,
+#arena.mobile.uslim_player .player:not(.minskin):not(.fakeme):not(*[data-position='0']) .avatar{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
 }
 #window>.player.minskin>.avatar{

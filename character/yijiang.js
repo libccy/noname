@@ -3233,6 +3233,7 @@ character.yijiang={
 		huomo_sha:{
 			enable:'chooseToUse',
 			viewAs:{name:'sha'},
+			position:'he',
 			viewAsFilter:function(player){
 				if(!player.storage.huomo) player.storage.huomo={};
 				if(player.storage.huomo.sha) return false;
@@ -3291,6 +3292,7 @@ character.yijiang={
 				}
 				return false;
 			},
+			position:'he',
 			precontent:function(){
 				'step 0'
 				var card=event.result.cards[0];
@@ -3350,6 +3352,7 @@ character.yijiang={
 				'step 2'
 				ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
 			},
+			position:'he',
 			filterCard:function(card){
 				return get.type(card)!='basic'&&get.color(card)=='black';
 			},

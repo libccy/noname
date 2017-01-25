@@ -4675,10 +4675,19 @@ mode.chess={
 						return num+get.cardCount(true,player)-get.cardCount('sha',player);
 					}
 				},
-				attackFrom:function(from,to,distance){
-					return distance-1;
-				}
 			},
+			trigger:{player:'useCard'},
+			frequent:true,
+			filter:function(event){
+				return event.card&&event.card.name=='sha';
+			},
+			usable:1,
+			content:function(){
+				player.draw();
+			},
+			ai:{
+				threaten:1.5
+			}
 		},
 		pianyi:{
 			trigger:{player:'phaseEnd'},
@@ -5191,7 +5200,7 @@ mode.chess={
 		lingdong:'灵动',
 		lingdong_info:'回合结束阶段，你可以移动X个格，X为你回合内出杀的次数',
 		lianshe:'箭舞',
-		lianshe_info:'你的攻击范围+1；回合内，你回合内，每当你使用一张不是杀的牌，你可以额外使用一张杀',
+		lianshe_info:'当你于一个回合中首次使用杀时，你可以摸一张牌；在你的回合内，每当你使用一张不是杀的牌，你可以额外使用一张杀',
 		zhiming:'穿杨',
 		zhiming_info:'锁定技，当你使用杀造成伤害时，若你不在目标的攻击范围内，此伤害+1',
 		sanjiansheji:'散箭',
@@ -5511,7 +5520,7 @@ mode.chess={
 			//
 			// chess_lvbu:['male','qun',3,['']],
 			chess_sunshangxiang:['female','wu',3,['lingdong','lianshe','gongji']],
-			chess_diaochan:['female','qun',3,['xingzhui','pianyi']],
+			chess_diaochan:['female','qun',3,['xingzhui','pianyi','biyue']],
 			// chess_huatuo:['male','qun',3,['zhenjiu','mazui']],
 			// chess_zhangjiao:['male','qun',3,['']],
 			// chess_menghuo:['male','qun',3,['']],

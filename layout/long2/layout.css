@@ -19,18 +19,28 @@
     bottom:150px;
     height: 40px;
 }
+/*#control>div{
+    height: 40px;
+    font-family: 'xinwei';
+    font-size: 30px;
+    line-height: 34px;
+}*/
 #arena:not(.chess)>#me,
 #arena:not(.chess)>#mebg,
 #arena:not(.chess)>#autonode{
-    bottom: 50px;
-    width: calc(100% - 20px);
-    left: 20px;
-    top: auto;
-    height: 120px;
+    bottom:30px;
+    width: calc(5000% / 47);
+    left:calc(-150% / 47);
+    top:auto;
+    border-radius:0 !important;
+    height:120px;
 }
 #arena:not(.chess)>#autonode{
     width: calc(5000% / 47 - 240px);
     left:calc(-150% / 47 + 120px);
+}
+#arena:not(.mobile).single-handcard #handcards1{
+    width: calc(100% - 120px);
 }
 #window.leftbar #arena:not(.chess)>#me,
 #window.leftbar #arena:not(.chess)>#mebg,
@@ -60,8 +70,8 @@
     top:calc(100% - 120px);
 }
 #arena:not(.chess):not(.single-handcard) #handcards1{
-    width: calc(100% - 100px);
-    left: 100px;
+    width:calc(100% - 240px);
+    left:calc(150% / 47 - 300% / 94 + 625% / 47 - 105px + 120px);
 }
 #handcards2{
     display:none;
@@ -87,18 +97,14 @@
 #window[data-radius_size='reduce'] #me>.fakeme.avatar{
     border-radius:0px;
 }
-#arena>.player[data-position='0']{
-    left: 0;
-    top: calc(100% - 220px);
-}
-#arena:not(.mobile):not(.single-handcard) #handcards1>div{
-    left: 0;
+#arena>.player[data-position='0']:not(.minskin){
+    top: calc(100% - 238px);
 }
 
 
 #arena>.player:not(.minskin){
     width: 120px !important;
-    height: 180px !important;
+    height: 200px !important;
 }
 #arena>.player:not(.minskin)>.equips{
     transform: scale(0.8);
@@ -186,6 +192,14 @@
 #arena>.player:not(.minskin)>.hp:not(.actcount).text{
     left: 89px;
 }
+#arena>.player.fullskin2 .avatar2{
+    z-index: 2;
+}
+#arena>.player .count{
+    text-align: center;
+	border-radius: 3px;
+    z-index: 3;
+}
 
 .timerbar>div{
     top: 205px;
@@ -201,6 +215,8 @@
 #arena[data-number='8']>.player[data-position='5']{top:0;left:calc(-300% / 94 + 1875% / 47 - 315px + 240px);}
 #arena[data-number='8']>.player[data-position='6']{top:calc(8% - 32px);left:calc(-300% / 94 + 1250% / 47 - 210px + 120px);}
 #arena[data-number='8']>.player[data-position='7']{top:calc(30% - 120px);left:calc(-300% / 94 + 625% / 47 - 105px);}
+#arena[data-number='8']>.player[data-position='0']{left:calc(-300% / 94 + 625% / 47 - 105px);}
+#arena>.player[data-position='0']{left:0;}
 @media screen and (min-width: 1105px){
     #arena[data-number='8']>.player[data-position='1']{left:calc(100% - 120px);}
     #arena[data-number='8']>.player[data-position='2']{left:calc(500% / 6 - 100px);}
@@ -209,6 +225,7 @@
     #arena[data-number='8']>.player[data-position='5']{left:calc(200% / 6 - 40px);}
     #arena[data-number='8']>.player[data-position='6']{left:calc(100% / 6 - 20px);}
     #arena[data-number='8']>.player[data-position='7']{left:0;}
+    #arena[data-number='8']>.player[data-position='0']{left:0;}
 }
 /*--------位置(7人)------*/
 #arena[data-number='7']>.player[data-position='1']{top:calc(30% - 120px);left:calc(100% - 120px);}

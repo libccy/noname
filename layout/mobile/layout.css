@@ -222,9 +222,9 @@
     text-align: right;
 }
 #arena.uslim_player .player:not([data-position='0'])>.count{
-    z-index: 3;
-    border-radius: 2px;
-    text-align: center;
+    z-index: 3 !important;
+    border-radius: 2px !important;
+    text-align: center !important;
 }
 #arena:not(.chess) .player[data-position='0']>.hp.actcount{
     top:10px;

@@ -84,7 +84,10 @@ character.ow={
             content:function(){
                 player.gain(game.createCard(get.typeCard('hslingjian').randomGet()),'gain2');
             },
-            group:'maoding2'
+            group:'maoding2',
+            ai:{
+                threaten:1.5
+            }
         },
         maoding2:{
             enable:'phaseUse',
@@ -96,7 +99,7 @@ character.ow={
                 return !target.hujia;
             },
             selectCard:2,
-            usable:1,
+            // usable:1,
             content:function(){
                 target.changeHujia();
             },
@@ -170,11 +173,12 @@ character.ow={
             forced:true,
             popup:false,
             filter:function(event,player){
-                return player.storage.paotai>0;
+                return player.storage.paotai>0&&event.num>0;
             },
             content:function(){
-                player.storage.paotai--;
-                if(player.storage.paotai==0){
+                player.storage.paotai-=trigger.num;
+                if(player.storage.paotai<=0){
+                    player.storage.paotai=0;
                     player.unmarkSkill('paotai');
                 }
                 else{
@@ -2597,22 +2601,42 @@ character.ow={
                 content:function(storage,player){
                     var str='';
                     if(player.storage.shanxian_h.length){
-                        str+='手牌区：'+get.translation(player.storage.shanxian_h);
+                        if(player.isUnderControl(true)){
+                            str+='手牌区：'+get.translation(player.storage.shanxian_h);
+                        }
+                        else{
+                            str+='手牌区：'+(player.storage.shanxian_h.length)+'张牌';
+                        }
                     }
                     if(player.storage.shanxian_e.length){
                         if(str.length) str+='、';
-                        str+='装备区：'+get.translation(player.storage.shanxian_e);
+                        if(player.isUnderControl(true)){
+                            str+='装备区：'+get.translation(player.storage.shanxian_e);
+                        }
+                        else{
+                            str+='装备区：'+(player.storage.shanxian_e.length)+'张牌';
+                        }
                     }
                     return str;
                 },
                 mark:function(dialog,content,player){
                     if(player.storage.shanxian_h.length){
-                        dialog.add('<div class="text center">手牌区</div>');
-                        dialog.addSmall(player.storage.shanxian_h);
+                        if(player.isUnderControl(true)){
+                            dialog.add('<div class="text center">手牌区</div>');
+                            dialog.addSmall(player.storage.shanxian_h);
+                        }
+                        else{
+                            dialog.add('<div class="text center">手牌区：'+player.storage.shanxian_h.length+'张牌</div>');
+                        }
                     }
                     if(player.storage.shanxian_e.length){
-                        dialog.add('<div class="text center">装备区</div>');
-                        dialog.addSmall(player.storage.shanxian_e);
+                        if(player.isUnderControl(true)){
+                            dialog.add('<div class="text center">装备区</div>');
+                            dialog.addSmall(player.storage.shanxian_e);
+                        }
+                        else{
+                            dialog.add('<div class="text center">装备区：'+player.storage.shanxian_e.length+'张牌</div>');
+                        }
                     }
 				},
             },
@@ -2730,10 +2754,10 @@ character.ow={
         zhongdun_info:'游戏开始时，你获得等同于游戏人数护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
         paotai:'炮台',
         paotai2:'炮台',
-        paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到一次伤害，炮台降低一级',
+        paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到一点伤害，炮台降低一级',
         maoding:'铆钉',
         maoding2:'铆钉',
-        maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌限阶段限一次，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
+        maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌限阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
         fengshi:'风矢',
         fengshi2:'风矢',
         fengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加20%的概率强制命中；你的杀造成伤害后增加20%的概率令伤害+1',

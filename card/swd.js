@@ -4418,7 +4418,7 @@ card.swd={
 		lingjiandai:'零件袋',
 		lingjiandai_info:'出牌阶段对自己使用，获得3张随机零件',
 		mujiaren:'木甲人',
-		mujiaren_info:'出牌阶段限用一次，将你手牌中的非基本牌（含此张）替换为随机的机关牌',
+		mujiaren_info:'出牌阶段限用一次，获得一张随机机关牌，并将你手牌中的非基本牌替换为随机的机关牌',
 		jiguanyaoshu:'机关要术',
 		jiguanyaoshu_skill:'巧匠',
 		jiguanyaoshu_skill_info:'每当你于回合外失去装备区内的牌，你获得一个随机零件',

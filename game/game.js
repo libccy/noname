@@ -1210,6 +1210,20 @@
                             if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
                         }
                     },
+                    player_height:{
+                        name:'手杀布局角色高度',
+                        init:'default',
+                        unfrequent:true,
+                        item:{
+                            short:'减短',
+                            default:'默认',
+                            long:'增长',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('player_height',item);
+                            ui.arena.dataset.player_height=item;
+                        }
+                    },
 					target_shake:{
 						name:'目标特效',
 						init:'off',
@@ -1233,20 +1247,23 @@
                             mark:'标记'
                         },
                         onclick:function(style){
+                            var list=[];
                             for(var i=0;i<game.players.length;i++){
-                                if(ui.arena.classList.contains('oblongcard')&&game.players[i]==game.me) continue;
                                 if(game.players[i].isLinked()){
-                                    if(style=='mark'){
-                                        game.players[i].classList.add('linked2');
-                                        game.players[i].classList.remove('linked');
-                                    }
-                                    else{
-                                        game.players[i].classList.add('linked');
-                                        game.players[i].classList.remove('linked2');
-                                    }
+                                    list.push(game.players[i]);
                                 }
                             }
                             game.saveConfig('link_style',style);
+                            for(var i=0;i<list.length;i++){
+                                if(get.is.linked2(list[i])){
+                                    list[i].classList.add('linked2');
+                                    list[i].classList.remove('linked');
+                                }
+                                else{
+                                    list[i].classList.add('linked');
+                                    list[i].classList.remove('linked2');
+                                }
+                            }
                         }
                     },
                     cardshape:{
@@ -9138,7 +9155,11 @@
                     }
                     if(!this.node.serving){
                         this.node.serving=ui.create.div('.gaming','服务器',this);
-                        this.node.serving.dataset.nature='water';
+                        this.node.serving.dataset.nature='wood';
+                    }
+                    if(!this.node.waiting){
+                        this.node.waiting=ui.create.div('.gaming','等待中',this);
+                        this.node.waiting.dataset.nature='water';
                     }
                     this.serving=false;
                     if(!info||info=='server'){
@@ -9155,6 +9176,7 @@
                             this.node.serving.hide();
                         }
                         this.node.gaming.hide();
+                        this.node.waiting.hide();
                     }
                     else{
                         this.roomempty=false;
@@ -9162,9 +9184,11 @@
                         this.initOL(get.modetrans(config),info[1]);
                         if(config.gameStarted){
                             this.node.gaming.show();
+                            this.node.waiting.hide();
                         }
                         else{
                             this.node.gaming.hide();
+                            this.node.waiting.show();
                         }
                         this.node.serving.hide();
                         this.setNickname(info[0]);
@@ -28153,7 +28177,6 @@
                     if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
                     if(lib.config.cardshape=='oblong') ui.arena.classList.add('oblongcard');
                 }
-
 				if(lib.config.blur_ui){
                     ui.window.classList.add('blur_ui');
                 }
@@ -28166,6 +28189,7 @@
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
 				// }
 
+                ui.arena.dataset.player_height=lib.config.player_height||'default';
 				ui.arena.dataset.target_shake=lib.config.target_shake||'off';
 				ui.arena.dataset.name_font=lib.config.name_font||'xinwei';
 				ui.arena.dataset.identity_font=lib.config.identity_font||'huangcao';
@@ -31643,12 +31667,11 @@
         is:{
             linked2:function(player){
                 if(lib.config.link_style=='mark') return true;
+                if(lib.config.layout=='long'||lib.config.layout=='long2') return true;
                 if(player.dataset.position=='0'){
                     return ui.arena.classList.contains('oblongcard');
                 }
-                else{
-                    return lib.config.layout=='long'||lib.config.layout=='long2';
-                }
+                return false;
             },
             empty:function(obj){
                 for(var i in obj) return false;

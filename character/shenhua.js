@@ -2708,8 +2708,8 @@ character.shenhua={
 				save:true,
 				result:{
 					player:function(player){
-						if(player.hp<=1) return 10;
-						if(player.hp==2&&player.num('he')<=1) return 10;
+						if(player.hp==0) return 10;
+						if(player.hp<=2&&player.num('he')<=1) return 10;
 						return 0;
 					}
 				},

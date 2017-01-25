@@ -5,13 +5,18 @@ window.noname_update={
         'bug修复',
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
+        'character/ow.js',
         'character/hearth.js',
         'character/old.js',
         'character/rank.js',
+        'character/xianjian.js',
         'character/yijiang.js',
-        // 'card/swd.js',
-        // 'mode/tafang.js',
+        'card/swd.js',
+        'mode/chess.js',
         'theme/simple/style.css',
+        'layout/long/layout.css',
+        'layout/mobile/layout.css',
+        'layout/newlayout/global.css',
     ]
 }

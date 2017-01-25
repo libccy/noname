@@ -334,7 +334,9 @@ character.hearth={
 		lianjin:{
 			enable:'phaseUse',
 			usable:2,
-			filterCard:true,
+			filterCard:function(card){
+				return get.type(card)!='hsyaoshui';
+			},
 			check:function(card){
 				return 8-ai.get.value(card)
 			},
@@ -444,6 +446,9 @@ character.hearth={
 							targets.sort(lib.sort.seat);
 						}
 						else{
+							if(target.isDead()){
+								return;
+							}
 							targets.push(target);
 						}
 						player.useCard(game.createCard({name:name,suit:get.suit(card),number:card.number}),targets);
@@ -452,6 +457,7 @@ character.hearth={
 				},
 				ai:{
 					order:9.1,
+					threaten:1.5,
 					result:{
 						target:function(player,target,card){
 							var info=get.info(card);
@@ -563,6 +569,7 @@ character.hearth={
 				}
 			},
 			ai:{
+				maixie:true,
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-2];

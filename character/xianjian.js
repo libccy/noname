@@ -490,7 +490,7 @@ character.xianjian={
 					event.finish();
 				}
 				'step 2'
-				player.chooseCard('将两张牌置于牌堆顶（先选择的在上）',2,true);
+				player.chooseCard('将两张牌置于牌堆顶（先选择的在上）',2,'he',true);
 				'step 3'
 				if(result.bool){
 					player.lose(result.cards,ui.special);
@@ -540,6 +540,7 @@ character.xianjian={
 				}
 				"step 1"
 				if(result.bool){
+					player.logSkill('zhangmu');
 					player.showCards(result.cards);
 					trigger.untrigger();
 					trigger.responded=true;
