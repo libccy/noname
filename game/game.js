@@ -7803,7 +7803,7 @@
 							next.target.animate('target');
 						}
 					}
-					if(event.animate!=false||num>0){
+					if(!info.nodelay&&(event.animate!=false||num>0)){
 						if(num==0){
 							if(event.delayx!==false){
 								if(event.waitingForTransition){
@@ -33937,7 +33937,7 @@
 			result:function(item,skill){
 				var result;
                 var info=get.info(item);
-				if(info.ai) result=info.ai.result;
+				if(info.ai) result=get.copy(info.ai.result);
 				if(typeof(result)=='function') result=result(item);
 				if(!result) result={};
                 if(skill){

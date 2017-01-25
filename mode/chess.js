@@ -629,7 +629,7 @@ mode.chess={
 				if(dy>0&&this.movable(0,1)) return true;
 				return false;
 			},
-			moveTowards:function(target){
+			moveTowards:function(target,forbid){
 				var fxy=this.getXY();
 				var txy;
 				if(Array.isArray(target)){
@@ -644,55 +644,56 @@ mode.chess={
 				}
 				var dx=txy[0]-fxy[0];
 				var dy=txy[1]-fxy[1];
+				forbid=forbid||[];
 				if(Math.abs(dx)>Math.abs(dy)){
 					if(dx<0){
-						if(this.movable(-1,0)){
+						if(!forbid.contains('moveLeft')&&this.movable(-1,0)){
 							this.moveLeft();
-							return true;
+							return 'moveLeft';
 						}
 					}
 					else if(dx>0){
-						if(this.movable(1,0)){
+						if(!forbid.contains('moveRight')&&this.movable(1,0)){
 							this.moveRight();
-							return true;
+							return 'moveRight';
 						}
 					}
 					if(dy<0){
-						if(this.movable(0,-1)){
+						if(!forbid.contains('moveUp')&&this.movable(0,-1)){
 							this.moveUp();
-							return true;
+							return 'moveUp';
 						}
 					}
 					else if(dy>0){
-						if(this.movable(0,1)){
+						if(!forbid.contains('moveDown')&&this.movable(0,1)){
 							this.moveDown();
-							return true;
+							return 'moveDown';
 						}
 					}
 				}
 				else{
 					if(dy<0){
-						if(this.movable(0,-1)){
+						if(!forbid.contains('moveUp')&&this.movable(0,-1)){
 							this.moveUp();
-							return true;
+							return 'moveUp';
 						}
 					}
 					else if(dy>0){
-						if(this.movable(0,1)){
+						if(!forbid.contains('moveDown')&&this.movable(0,1)){
 							this.moveDown();
-							return true;
+							return 'moveDown';
 						}
 					}
 					if(dx<0){
-						if(this.movable(-1,0)){
+						if(!forbid.contains('moveLeft')&&this.movable(-1,0)){
 							this.moveLeft();
-							return true;
+							return 'moveLeft';
 						}
 					}
 					else if(dx>0){
-						if(this.movable(1,0)){
+						if(!forbid.contains('moveRight')&&this.movable(1,0)){
 							this.moveRight();
-							return true;
+							return 'moveRight';
 						}
 					}
 				}
@@ -1271,8 +1272,16 @@ mode.chess={
 					}
 					var list=[];
 					var randomMove=['moveUp','moveDown','moveLeft','moveRight'];
+					var getMove=function(move){
+						switch(move){
+							case 'moveUp':return 'moveDown';
+							case 'moveDown':return 'moveUp';
+							case 'moveLeft':return 'moveRight';
+							case 'moveRight':return 'moveLeft';
+						}
+					}
+					var dontMove=null;
 					for(var iwhile=0;iwhile<num;iwhile++){
-						var targets=[];
 						if(get.mode()=='tafang'&&_status.enemies.contains(player)){
 							var targets2=[];
 							for(var i=0;i<ui.chesswidth;i++){
@@ -1294,45 +1303,46 @@ mode.chess={
 							if(tafangmoved){
 								event.moved=true;
 							}
-							continue;
 						}
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].side!=player.side){
-								targets.push(game.players[i]);
+						else{
+							var targets=[];
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].side!=player.side){
+									targets.push(game.players[i]);
+								}
 							}
-						}
-						targets.sort(function(a,b){
-							return get.distance(player,a)-get.distance(player,b);
-						});
-						while(targets.length){
-							var target=targets.shift();
-							if(player.moveTowards(target)){
-								event.moved=true;break;
-							}
-							if(targets.length==0){
-								if(randomMove.length){
-									var list=randomMove.slice(0);
-									while(list.length){
-										var thismove=list.randomRemove();
-										if(player[thismove]()){
-											event.moved=true;
-											switch(thismove){
-												case 'moveUp':randomMove.remove('moveDown');break;
-												case 'moveDown':randomMove.remove('moveUp');break;
-												case 'moveLeft':randomMove.remove('moveRight');break;
-												case 'moveRight':randomMove.remove('moveLeft');break;
+							targets.sort(function(a,b){
+								return get.distance(player,a)-get.distance(player,b);
+							});
+							while(targets.length){
+								var target=targets.shift();
+								var moveTowards=player.moveTowards(target,[dontMove]);
+								if(moveTowards){
+									dontMove=getMove(moveTowards);
+									randomMove.remove(dontMove);
+									event.moved=true;break;
+								}
+								if(targets.length==0){
+									if(randomMove.length){
+										var list=randomMove.slice(0);
+										while(true){
+											var thismove=list.randomRemove();
+											if(player[thismove]()){
+												event.moved=true;
+												dontMove=getMove(thismove);
+												randomMove.remove(dontMove);
+												break;
 											}
-											break;
+											if(list.length==0) return;
 										}
 									}
-									if(!event.moved) return;
-								}
-								else{
-									return;
+									else{
+										return;
+									}
 								}
 							}
+							if(lib.skill._chessmove.ai.result.player(player)<=0) break;
 						}
-						if(lib.skill._chessmove.ai.result.player(player)<=0) break;
 					}
 				};
 				if(event.isMine()){

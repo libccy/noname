@@ -93,6 +93,7 @@ card.swd={
 		shencaojie:{
 			fullskin:true,
 			type:'trick',
+			nodelay:true,
 			content:function(){
 				event.getParent('_shencaojie')._trigger.num++;
 			},
