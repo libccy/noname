@@ -1446,6 +1446,7 @@ mode.stone={
 			next.showConfig=true;
 			next.setContent(function(){
 				"step 0"
+				ui.arena.classList.add('choose-character');
 				var i;
 				var list=[];
 				event.list=list;
@@ -1650,6 +1651,12 @@ mode.stone={
 					get.deck(game.me,_status.deck.shift());
 					get.deck(game.enemy,'random');
 				}
+				ui.control.style.transitionDuration='0s';
+				ui.refresh(ui.control);
+				ui.arena.classList.remove('choose-character');
+				setTimeout(function(){
+					ui.control.style.transitionDuration='';
+				},500);
 			});
 		},
 	},

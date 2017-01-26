@@ -16,11 +16,15 @@ window.noname_update={
         'character/yijiang.js',
         'mode/chess.js',
         'mode/versus.js',
+        'mode/guozhan.js',
+        'mode/identity.js',
+        'mode/stone.js',
         'theme/simple/style.css',
         'layout/default/layout.css',
         'layout/long/layout.css',
         'layout/long2/layout.css',
         'layout/mobile/layout.css',
         'layout/newlayout/global.css',
+        'layout/mode/stone.css',
     ]
 }

@@ -123,9 +123,15 @@
 }
 
 #arena:not(.fewplayer) .timerbar>div{
-    top: calc(100% - 15px);
+    top: 205px;
     width: 96px;
     left: 12px;
+}
+#arena:not(.fewplayer)[data-player_height='default'] .timerbar>div{
+    top: 185px;
+}
+#arena:not(.fewplayer)[data-player_height='short'] .timerbar>div{
+    top: 165px;
 }
 
 /*--------位置(8人)------*/

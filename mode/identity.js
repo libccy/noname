@@ -552,6 +552,7 @@ mode.identity={
 			}
 			next.setContent(function(){
 				"step 0"
+				ui.arena.classList.add('choose-character');
 				var i;
 				var list;
 				var list2=[];
@@ -1015,12 +1016,16 @@ mode.identity={
 						event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
 					}
 				}
+				setTimeout(function(){
+					ui.arena.classList.remove('choose-character');
+				},500);
 			});
 		},
 		chooseCharacterOL:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.setContent(function(){
 				"step 0"
+				ui.arena.classList.add('choose-character');
 				var i;
 				var identityList;
 				if(_status.mode=='zhong'){
@@ -1091,6 +1096,7 @@ mode.identity={
 						zhu.identity=zhuid;
 						zhu.setIdentity();
 						me.setIdentity(identity);
+						ui.arena.classList.add('choose-character');
 					},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
 				}
 
@@ -1219,7 +1225,13 @@ mode.identity={
 							lib.playerOL[i].init(result[i][0],result[i][1]);
 						}
 					}
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
 				},result);
+				setTimeout(function(){
+					ui.arena.classList.remove('choose-character');
+				},500);
 			});
 		},
 	},

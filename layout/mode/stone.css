@@ -148,6 +148,10 @@
     white-space: nowrap;
     transition: all 0s;
 }
+.dialog .deckitem{
+    margin-left: 8px;
+    margin-right: 9px;
+}
 .deckitem.random{
     border-radius: 4px;
     text-align: center;

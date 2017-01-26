@@ -440,6 +440,7 @@ mode.versus={
 			next.showConfig=true;
 			next.setContent(function(){
 				'step 0'
+				ui.arena.classList.add('choose-character');
 				for(var i in lib.characterPack.mode_versus){
 					lib.character[i]=lib.characterPack.mode_versus[i];
 					if(!lib.character[i][4]){
@@ -604,6 +605,9 @@ mode.versus={
 					}
 				}
 				game.addRecentCharacter(game.me.name,game.me.name2);
+				setTimeout(function(){
+					ui.arena.classList.remove('choose-character');
+				},500);
 			});
 		},
 		chooseCharacterTwo:function(){
@@ -611,6 +615,7 @@ mode.versus={
 			next.showConfig=true;
 			next.setContent(function(){
 				'step 0'
+				ui.arena.classList.add('choose-character');
 				for(var i in lib.skill){
 					if(lib.skill[i].changeSeat){
 						lib.skill[i]={};
@@ -846,6 +851,9 @@ mode.versus={
 						}
 					}
 				}
+				setTimeout(function(){
+					ui.arena.classList.remove('choose-character');
+				},500)
 			});
 		},
 		chooseCharacterFour:function(){
@@ -882,6 +890,7 @@ mode.versus={
 			}
 			next.setContent(function(){
 				"step 0"
+				ui.arena.classList.add('choose-character');
 				var i;
 				var list;
 				var list2=[];
@@ -1019,6 +1028,9 @@ mode.versus={
 					event.xdialog.close();
 				}
 				game.addRecentCharacter(game.me.name,game.me.name2);
+				setTimeout(function(){
+					ui.arena.classList.remove('choose-character');
+				},500)
 			});
 		},
 		chooseCharacter:function(){
@@ -1605,7 +1617,8 @@ mode.versus={
 				_status.firstAct=event.current;
 				event.flipassign=true;
 				event.videoId=lib.status.videoId++;
-				var func=function(filter,id,selected,map){
+				var func=function(filter,id,selected,map,choiceFour){
+					lib.choiceFour=choiceFour;
 					var dialog=ui.create.characterDialog(filter,'expandall').open();
 					dialog.videoId=id;
 					for(var i in map){
@@ -1621,11 +1634,12 @@ mode.versus={
 							}
 						}
 					}
+					ui.arena.classList.add('choose-character');
 				};
 				event.map=map;
 				event.selected=[];
-				game.broadcastAll(func,filterChoice,event.videoId,event.selected,map);
-				_status.onreconnect=[func,filterChoice,event.videoId,event.selected,map];
+				game.broadcastAll(func,filterChoice,event.videoId,event.selected,map,lib.choiceFour);
+				_status.onreconnect=[func,filterChoice,event.videoId,event.selected,map,lib.choiceFour];
 				"step 1"
 				game.broadcastAll(function(player){
 					player.classList.add('selectedx');
@@ -1705,6 +1719,9 @@ mode.versus={
 					if(dialog){
 						dialog.close();
 					}
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
 				},event.videoId);
 			});
 		},
@@ -1714,6 +1731,7 @@ mode.versus={
 				'step 0'
 				game.additionaldead=[];
 				game.broadcastAll(function(ref,bool){
+					ui.arena.classList.add('choose-character');
 					for(var i=0;i<6;i++){
 						ref.side=bool;
 						ref=ref.next;
@@ -1762,6 +1780,9 @@ mode.versus={
 					}
 				}
 				game.broadcastAll(function(result,func1,func2){
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500)
 					_status.friendDied=[];
 					_status.enemyDied=[];
 
@@ -1839,6 +1860,7 @@ mode.versus={
 						}
 						game.players[i].node.identity.dataset.color=game.players[i].side+'zhu';
 					}
+					ui.arena.classList.add('choose-character');
 				},game.players[0],Math.random()<0.5,Math.random()<0.5);
 				_status.onreconnect=[function(){
 					var players=game.players.concat(game.dead);
@@ -1878,7 +1900,13 @@ mode.versus={
 							lib.playerOL[i].init(result[i]);
 						}
 					}
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500)
 				},result);
+				setTimeout(function(){
+					ui.arena.classList.remove('choose-character');
+				},500)
 			});
 		},
 		chooseCharacterOL1:function(){

@@ -494,8 +494,8 @@
 							default:'旧版',
 							newlayout:'对称',
 							mobile:'默认',
-                            long:'手杀',
-                            long2:'新版',
+                            long:'新版',
+                            long2:'手杀',
 						},
 						onclick:function(layout){
 							if(lib.config.layoutfixed.contains(lib.config.mode)&&layout=='default'){

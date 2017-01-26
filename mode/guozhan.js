@@ -401,6 +401,7 @@ mode.guozhan={
 			}
 			next.setContent(function(){
 				"step 0"
+				ui.arena.classList.add('choose-character');
 				var addSetting=function(dialog){
 					dialog.add('选择座位');
 					var seats=document.createElement('table');
@@ -626,12 +627,18 @@ mode.guozhan={
 						game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
 					}
 				}
+				setTimeout(function(){
+					ui.arena.classList.remove('choose-character');
+				},500);
 			});
 		},
 		chooseCharacterOL:function(){
 			var next=game.createEvent('chooseCharacter',false);
 			next.setContent(function(){
 				'step 0'
+				game.broadcastAll(function(){
+					ui.arena.classList.add('choose-character');
+				});
 				var list=get.charactersOL();
 				event.list=list.slice(0);
 				var list2=[];
@@ -755,6 +762,9 @@ mode.guozhan={
 						game.players[i].node.name2.show();
 						game.players[i]._group=lib.character[game.players[i].name1][1];
 					}
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
 				},result);
 			});
 		}

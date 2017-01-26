@@ -89,6 +89,14 @@
 	height:calc(100% - 370px);
     bottom:170px;
 }
+#arena.choose-character>.dialog{
+    height:calc(100% - 280px);
+    bottom:80px;
+}
+#arena.choose-character>#control{
+    bottom: 30px;
+    transition: all 0s;
+}
 .dialog.fullheight {
     height: calc(100% - 123px) !important;
     top: 40px !important;
@@ -242,9 +250,15 @@
 }
 
 #arena .timerbar>div{
-    top: calc(100% - 15px);
+    top: 205px;
     width: 96px;
     left: 12px;
+}
+#arena[data-player_height='default'] .timerbar>div{
+    top: 185px;
+}
+#arena[data-player_height='short'] .timerbar>div{
+    top: 165px;
 }
 
 /*--------位置(8人)------*/

@@ -477,7 +477,7 @@
 	bottom:auto !important;
 	top:200px !important;
 }
-#arena.stone .dialog{
+#arena.stone:not(.choose-character) .dialog{
 	width: calc(90% - 440px);
 	left: calc(5% + 220px);
 }
@@ -527,7 +527,7 @@
 		width: 735px;
 		left: calc(50% - 367.5px);
 	}
-	#arena.stone .dialog{
+	#arena.stone:not(.choose-character) .dialog{
 		width: calc(90% - 440px);
 		left: calc(5% + 220px);
 	}
