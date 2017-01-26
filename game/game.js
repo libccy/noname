@@ -55,7 +55,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:14,
+        versionOL:15,
         sourceURL:'https://rawgit.com/libccy/noname/$version$/',
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',

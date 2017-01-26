@@ -8,6 +8,9 @@
     bottom:150px;
     height: 40px;
 }
+#arena.phone #control{
+    bottom:160px;
+}
 #arena:not(.chess)>#me,
 #arena:not(.chess)>#mebg,
 #arena:not(.chess)>#autonode{
@@ -93,9 +96,15 @@
     height:calc(100% - 280px);
     bottom:80px;
 }
+#arena.phone.choose-character>.dialog{
+    bottom:93px;
+}
 #arena.choose-character>#control{
     bottom: 30px;
     transition: all 0s;
+}
+#arena.phone.choose-character>#control{
+    bottom: 43px;
 }
 .dialog.fullheight {
     height: calc(100% - 123px) !important;
