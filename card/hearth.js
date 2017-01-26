@@ -104,11 +104,11 @@ card.hearth={
 							var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
 							if(jj.name=='guohe') return 3;
 							if(js.length==1&&ai.get.effect(target,jj,target,player)>=0){
-								return -1.5;
+								return 0.5;
 							}
 							return 3;
 						}
-						return -1.5;
+						return 0.5;
 					}
 				}
 			}

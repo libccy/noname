@@ -3105,6 +3105,7 @@ character.hearth={
 				return get.cardCount(event.card,player)>1;
 			},
 			forced:true,
+			usable:3,
 			content:function(){
 				player.draw();
 			}
@@ -5584,7 +5585,7 @@ character.hearth={
 		huanwu:'唤雾',
 		huanwu_info:'出牌阶段限一次，你可以令一名角色增加一点体力上限，回复一点体力，并摸两张牌（每名角色限发动一次）',
 		fengnu:'风怒',
-		fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用同名卡牌时，你摸一张牌',
+		fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用同名卡牌时，你摸一张牌（每回合最多以此法摸3张牌）',
 		shengdun:'圣盾',
 		shengdun2:'圣盾',
 		shengdun_info:'锁定技，回合开始阶段，若你没有护甲，你获得一点护甲',

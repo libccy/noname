@@ -65,7 +65,7 @@
     width: calc(9700% / 94) !important;
 }
 #arena:not(.single-handcard):not(.chess)>#mebg{
-    opacity: 0;
+    visibility: hidden;
 }
 #arena:not(.single-handcard):not(.chess)>#me #handcards1{
     left: 120px !important;

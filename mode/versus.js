@@ -1028,9 +1028,12 @@ mode.versus={
 					event.xdialog.close();
 				}
 				game.addRecentCharacter(game.me.name,game.me.name2);
+				ui.control.style.transitionDuration='0s';
+				ui.refresh(ui.control);
+				ui.arena.classList.remove('choose-character');
 				setTimeout(function(){
-					ui.arena.classList.remove('choose-character');
-				},500)
+					ui.control.style.transitionDuration='';
+				},500);
 			});
 		},
 		chooseCharacter:function(){

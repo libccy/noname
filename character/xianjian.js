@@ -227,6 +227,8 @@ character.xianjian={
 			ai:{
 				threaten:1.2,
 			},
+			skillAnimation:true,
+			animationColor:'wood',
 			content:function(){
 				'step 0'
 				player.storage.danqing.length=0;
