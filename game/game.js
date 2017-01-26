@@ -13989,7 +13989,7 @@
                             num=info.priority*100;
                         }
                         if(info.forced){
-                            num+=50;
+                            num++;
                         }
                         list.push([skill,player,num]);
                     };

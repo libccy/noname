@@ -4524,7 +4524,7 @@ character.sp={
 				"step 0"
 				player.storage.zuixiang=get.cards(3);
 				player.showCards(player.storage.zuixiang);
-				player.awakenSkill('zuixiang');
+				player.markSkill('zuixiang');
 				player.syncStorage('zuixiang');
 				"step 1"
 				var cards=player.storage.zuixiang;
@@ -4533,7 +4533,7 @@ character.sp={
 					cards[2].number==cards[1].number){
 					player.gain(player.storage.zuixiang,'draw2');
 					player.storage.zuixiang=[];
-					player.unmarkSkill('zuixiang');
+					player.awakenSkill('zuixiang');
 					delete player.storage.zuixiang2;
 				}
 				else{
@@ -4608,7 +4608,7 @@ character.sp={
 					cards[2].number==cards[1].number){
 					player.gain(player.storage.zuixiang,'draw2');
 					player.storage.zuixiang=[];
-					player.unmarkSkill('zuixiang');
+					player.awakenSkill('zuixiang');
 					delete player.storage.zuixiang2;
 				}
 				else{
