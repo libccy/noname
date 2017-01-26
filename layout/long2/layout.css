@@ -130,6 +130,9 @@
     width: 120px !important;
     height: 220px !important;
 }
+#arena>.player:not(.minskin)>.damage.dieidentity{
+    font-size: 60px;
+}
 #arena[data-player_height='default']>.player:not(.minskin){
     height: 200px !important;
 }

@@ -629,6 +629,7 @@
 							document.body.insertBefore(ui.background,document.body.firstChild);
 							if(animate) ui.background.animate('start');
 							if(lib.config.image_background=='default'){
+                                document.documentElement.style.backgroundImage='';
 								ui.background.style.backgroundImage="none";
 							}
 							else if(lib.config.image_background=='custom'){
@@ -924,25 +925,30 @@
                         }
                     },
 					show_card_prompt:{
-						name:'显示出牌提示',
+						name:'显示出牌信息',
 						init:true,
 						unfrequent:true,
 					},
 					hide_card_prompt_basic:{
-						name:'隐藏基本牌提示',
+						name:'隐藏基本牌信息',
 						init:false,
 						unfrequent:true,
 					},
 					hide_card_prompt_equip:{
-						name:'隐藏装备牌提示',
+						name:'隐藏装备牌信息',
 						init:false,
 						unfrequent:true,
 					},
 					show_phase_prompt:{
-						name:'显示阶段提示',
+						name:'显示阶段信息',
 						init:true,
 						unfrequent:true,
 					},
+                    show_phaseuse_prompt:{
+                        name:'出牌阶段显示提示',
+                        init:true,
+                        unfrequent:true,
+                    },
 					fold_card:{
 						name:'折叠手牌',
 						init:true,
@@ -4009,6 +4015,9 @@
                     game.saveConfig('layout','mobile');
                     game.saveConfig('phonelayout',true);
                 }
+                if(lib.config.image_background!='default'&&lib.config.image_background!='custom'&&lib.config.theme=='simple'){
+                    document.documentElement.style.backgroundImage='url("image/background/'+lib.config.image_background+'.jpg")';
+                }
 				ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout');
                 ui.css.phone=lib.init.css();
                 if(lib.isPhoneLayout()){
@@ -4310,6 +4319,11 @@
 							{
 								var data = fileLoadedEvent.target.result;
 								ui.background.style.backgroundImage='url('+data+')';
+                                if(lib.config.image_background_blur){
+                                    ui.background.style.filter='blur(8px)';
+                                    ui.background.style.webkitFilter='blur(8px)';
+                                    ui.background.style.transform='scale(1.05)';
+                                }
 							};
 							fileReader.readAsDataURL(fileToLoad, "UTF-8");
 						});
@@ -6168,7 +6182,10 @@
 				},
 				phaseUse:function(){
 					"step 0";
-					player.chooseToUse();
+					var next=player.chooseToUse();
+                    if(!lib.config.show_phaseuse_prompt){
+                        next.set('prompt',' ');
+                    }
 					"step 1"
 					if(result.bool&&!event.skipped){
 						event.goto(0);
@@ -26250,12 +26267,12 @@
     						else{
                                 if(dev){
                                     button3.innerHTML='正在检查更新';
-        							button3.disabled=true;
                                 }
                                 else{
                                     button1.innerHTML='正在检查更新';
-        							button1.disabled=true;
                                 }
+                                button3.disabled=true;
+                                button1.disabled=true;
 
     							var goupdate=function(files,update){
     								if(game.download){
@@ -26344,10 +26361,6 @@
 
 
     							var script=lib.init.js(get.url('version'),'game/update',function(){
-    								button1.disabled=false;
-    								button1.innerHTML='检查游戏更新';
-                                    button3.disabled=false;
-                                    button3.innerHTML='更新到开发版';
     								script.remove();
     								var update=window.noname_update;
     								delete window.noname_update;
@@ -26357,7 +26370,7 @@
                                         }
     								}
     								game.saveConfig('check_version',update.version);
-    								if(update.version!=lib.version||lib.config.debug){
+    								if(update.version!=lib.version||dev){
                                         var files=null;
                                         var version=lib.version;
                                         if(Array.isArray(update.files)&&update.update){
@@ -26378,7 +26391,7 @@
                                             }
                                         }
                                         var str;
-                                        if(lib.config.debug){
+                                        if(dev){
                                             str='开发版仅供测试使用，可能存在风险，是否确定更新？'
                                         }
     									else{
@@ -26402,6 +26415,12 @@
     												if(index==1){
     													goupdate(files,update);
     												}
+                                                    else{
+                                                        button1.disabled=false;
+                        								button1.innerHTML='检查游戏更新';
+                                                        button3.disabled=false;
+                                                        button3.innerHTML='更新到开发版';
+                                                    }
     											},
     											str,
     											['确定','取消']
@@ -26411,10 +26430,20 @@
     										if(confirm(str)){
     											goupdate(files,update);
     										}
+                                            else{
+                                                button1.disabled=false;
+                								button1.innerHTML='检查游戏更新';
+                                                button3.disabled=false;
+                                                button3.innerHTML='更新到开发版';
+                                            }
     									}
     								}
     								else{
     									alert('当前版本已是最新');
+                                        button1.disabled=false;
+        								button1.innerHTML='检查游戏更新';
+                                        button3.disabled=false;
+                                        button3.innerHTML='更新到开发版';
     								}
     							},function(){
                                     if(forcecheck===false){
@@ -26522,7 +26551,7 @@
     					button3.onclick=function(){
                             game.checkForUpdate(null,true);
                         };
-    					if(false){
+    					if(lib.config.debug){
                             li1.lastChild.appendChild(button3);
                         }
 

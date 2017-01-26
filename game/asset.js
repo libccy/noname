@@ -1,7 +1,9 @@
 window.noname_asset_list=[
-    '1.9.6',
+    '1.9.6.1',
     'image/background/huangtian_bg.jpg',
+    'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
+    'image/background/taoyuan_bg.jpg',
     'image/background/xueji_bg.jpg',
     'image/background/yinxiang_bg.jpg',
     'image/background/zhulian_bg.jpg',
@@ -443,6 +445,7 @@ window.noname_asset_list=[
     'image/character/ow_yuanshi.jpg',
     'image/character/ow_zhixuzhiguang.jpg',
     'image/character/ow_falaozhiying.jpg',
+    'image/character/ow_heiying.jpg',
     'image/character/ow_luxiao.jpg',
     'image/character/ow_shibing.jpg',
     'image/character/ow_tianshi.jpg',

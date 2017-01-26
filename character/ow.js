@@ -24,6 +24,7 @@ character.ow={
         // ow_luba:['male','shu',4,[]],
         // ow_wensidun:['male','shu',4,[]],
         // ow_zhaliya:['female','shu',4,['pingzhang','lichang']],
+        // ow_heiying:['female','wei',3,[]],
     },
     skill:{
         mengji:{
