@@ -4027,6 +4027,9 @@ character.yijiang={
 			filter:function(event,player){
 				return player.num('he')>0;
 			},
+			check:function(event,player){
+				return player.num('h','sha')<=player.num('h')/3;
+			},
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('youdi'),function(card,player,target){

@@ -495,7 +495,7 @@ card.swd={
 			subtype:'equip5',
 			nomod:true,
 			ai:{
-				equipValue:7
+				equipValue:6
 			},
 			skills:['lianhua','shouna']
 		},
@@ -1952,20 +1952,23 @@ card.swd={
 				return player.storage.gouhunluo2==event.player;
 			},
 			content:function(){
+				'step 0'
 				player.storage.gouhunluo--;
 				if(player.storage.gouhunluo<=0){
 					player.logSkill('gouhunluo');
 					player.loseHp();
-					var es=player.get('h');
-					if(es.length){
-						player.discard(es);
-					}
 					player.removeSkill('gouhunluo');
 					delete player.storage.gouhunluo;
 					delete player.storage.gouhunluo2;
 				}
 				else{
 					player.updateMarks();
+					event.finish();
+				}
+				'step 1'
+				var es=player.get('h');
+				if(es.length){
+					player.discard(es);
 				}
 			},
 			group:'gouhunluo2'
