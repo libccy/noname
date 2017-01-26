@@ -676,8 +676,8 @@ table{table-layout: fixed;}
 	margin-left: 2px;
 	margin-right: 10px;
 }
-#arena:not(.mobile):not(.single-handcard) #handcards1>div,
-#arena:not(.mobile):not(.single-handcard) #handcards2>div{
+#arena:not(.mobile):not(.single-handcard):not(.chess) #handcards1>div,
+#arena:not(.mobile):not(.single-handcard):not(.chess) #handcards2>div{
 	left:-10px;
 }
 #arena.single-handcard #handcards1{width: calc(100% - 120px);left:120px;}

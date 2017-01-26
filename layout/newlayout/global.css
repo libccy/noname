@@ -257,6 +257,13 @@
 	border-radius:3px 0 0 3px;
 	box-shadow: rgba(0,0,0,0.2) 1px -1px 2px inset,rgba(255,255,255,0.15) -1px 1px 5px inset;
 }
+
+#arena.mobile.uslim_player .player:not([data-position='0'])>.count,
+#arena:not(.mobile).uslim_player .player>.count{
+    z-index: 3 !important;
+    border-radius: 2px !important;
+    text-align: center !important;
+}
 .player.unseen .count{
 	border-radius: 3px;
 	text-align: center;

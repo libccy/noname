@@ -495,7 +495,7 @@
 							newlayout:'对称',
 							mobile:'默认',
                             long:'手杀',
-                            // long2:'新版',
+                            long2:'新版',
 						},
 						onclick:function(layout){
 							if(lib.config.layoutfixed.contains(lib.config.mode)&&layout=='default'){
@@ -506,6 +506,38 @@
 							}
 						}
 					},
+                    fewplayer:{
+                        name:'启用人数',
+                        init:'3',
+                        // unfrequent:true,
+                        item:{
+                            '2':'两人',
+                            '3':'三人',
+                            '4':'四人',
+                            '5':'五人',
+                            '6':'六人',
+                            '7':'七人',
+                            '8':'八人',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('fewplayer',item);
+                            if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
+                        }
+                    },
+                    player_height:{
+                        name:'角色高度',
+                        init:'long',
+                        // unfrequent:true,
+                        item:{
+                            short:'矮',
+                            default:'中',
+                            long:'高',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('player_height',item);
+                            ui.arena.dataset.player_height=item;
+                        }
+                    },
 					// background_color_music:{
 					// 	name:'背景色',
 					// 	init:'black',
@@ -1192,38 +1224,6 @@
 						name:'技能特效',
 						init:true,
 					},
-                    fewplayer:{
-                        name:'手杀布局启用人数',
-                        init:'3',
-                        unfrequent:true,
-                        item:{
-                            '2':'两人',
-                            '3':'三人',
-                            '4':'四人',
-                            '5':'五人',
-                            '6':'六人',
-                            '7':'七人',
-                            '8':'八人',
-                        },
-                        onclick:function(item){
-                            game.saveConfig('fewplayer',item);
-                            if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
-                        }
-                    },
-                    player_height:{
-                        name:'手杀布局角色高度',
-                        init:'default',
-                        unfrequent:true,
-                        item:{
-                            short:'减短',
-                            default:'默认',
-                            long:'增长',
-                        },
-                        onclick:function(item){
-                            game.saveConfig('player_height',item);
-                            ui.arena.dataset.player_height=item;
-                        }
-                    },
 					target_shake:{
 						name:'目标特效',
 						init:'off',
@@ -1439,9 +1439,16 @@
                         }
                         if(lib.config.layout=='long'){
                             map.fewplayer.show();
+                            map.player_height.show();
                         }
                         else{
                             map.fewplayer.hide();
+                            if(lib.config.layout=='long2'){
+                                map.player_height.show();
+                            }
+                            else{
+                                map.player_height.hide();
+                            }
                         }
 						// if(config.theme=='woodden'&&config.image_background=='default'){
 						// 	map.background_color_wood.show();

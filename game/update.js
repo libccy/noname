@@ -1,21 +1,25 @@
 window.noname_update={
-    version:'1.9.6.1',
+    version:'1.9.6.2',
     update:'1.9.6',
     changeLog:[
         'bug修复',
     ],
     files:[
         'game/game.js',
+        'card/swd.js',
         'character/ow.js',
         'character/hearth.js',
         'character/old.js',
         'character/rank.js',
         'character/xianjian.js',
+        'character/shenhua.js',
         'character/yijiang.js',
-        'card/swd.js',
         'mode/chess.js',
+        'mode/versus.js',
         'theme/simple/style.css',
+        'layout/default/layout.css',
         'layout/long/layout.css',
+        'layout/long2/layout.css',
         'layout/mobile/layout.css',
         'layout/newlayout/global.css',
     ]

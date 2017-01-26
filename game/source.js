@@ -44,6 +44,7 @@ window.noname_source_list=[
     'layout/default/menu.css',
     'layout/default/phone.css',
     'layout/long/layout.css',
+    'layout/long2/layout.css',
     'layout/mobile/equip.css',
     'layout/mobile/layout.css',
     'layout/mode/boss.css',

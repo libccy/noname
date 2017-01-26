@@ -1392,6 +1392,7 @@ mode.versus={
 					// ui.fakeme.line=lib.element.player.line;
 					// ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();
 				}
+				_status.prepareArena=true;
 				ui.create.me();
 				if(ui.fakeme){
 					ui.me.appendChild(ui.fakeme);
