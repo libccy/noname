@@ -92,6 +92,8 @@ character.shenhua={
 
 				event.current=targets[0];
 				event.dialog=dialog;
+				event.num1=0;
+				event.num2=0;
 				game.delay();
 				'step 1'
 				if(event.dialog.buttons.length>1){
@@ -135,7 +137,6 @@ character.shenhua={
 					else{
 						event.current.$draw(1,'nobroadcast');
 					}
-					event.current.$gain2(card);
 					game.broadcast(function(card,id,target){
 						var dialog=get.idDialog(id);
 						if(dialog&&dialog.seeing){
@@ -154,16 +155,22 @@ character.shenhua={
 					},card,dialog.videoId,event.current);
 				}
 				game.delay(2);
+				if(event.current==targets[0]){
+					event.num1++;
+					event.current=targets[1];
+				}
+				else{
+					event.num2++;
+					event.current=targets[0];
+				}
 				if(dialog.buttons.length){
-					if(event.current==targets[0]){
-						event.current=targets[1];
-					}
-					else{
-						event.current=targets[0];
-					}
 					event.goto(1);
 				}
 				'step 3'
+				if(!_status.connectMode){
+					game.log(targets[0],'获得了'+get.cnNumber(event.num1)+'张牌');
+					game.log(targets[1],'获得了'+get.cnNumber(event.num2)+'张牌');
+				}
 				var dialog=event.dialog;
 				dialog.close();
 				_status.dieClose.remove(dialog);

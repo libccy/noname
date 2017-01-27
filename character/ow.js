@@ -1880,6 +1880,7 @@ character.ow={
                         if(current&&ai.get.attitude(player,current)<0){
                             return 0;
                         }
+                        if(target.hp==1) return 0.5;
                         return -1;
                     }
                 }

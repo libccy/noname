@@ -299,6 +299,7 @@ character.old={
                     event.finish();
                 }
                 'step 2'
+                player.line(result.targets);
                 result.targets[0].gain(event.cards,'draw');
             },
             ai:{
