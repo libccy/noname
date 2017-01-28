@@ -15546,7 +15546,7 @@
                 updaterooms:function(list){
                     if(ui.rooms){
                         ui.window.classList.add('more_room');
-                        var list2=['re_caocao','liubei','sunquan','sp_zhangjiao','yuanshao','dongzhuo'];
+                        var list2=['re_caocao','re_liubei','sunquan','sp_zhangjiao','re_yuanshao','dongzhuo'];
                         var more_room=true;
                         for(var i=0;i<ui.rooms.length;i++){
                             if(list[i]&&i>=3){
