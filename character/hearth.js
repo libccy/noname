@@ -17,7 +17,7 @@ character.hearth={
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
 		// hs_khadgar:['male','shu',3,['s_tuteng']],
-		// hs_tyrande:['female','wei',3,['s_tuteng']],
+		// hs_tyrande:['female','wei',3,['yuelu','xingluo']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu']],
 		hs_wvelen:['male','qun',3,['shengyan','xianzhi']],
@@ -5386,6 +5386,10 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
+		yuelu:'月印',
+		yuelu_info:'出牌阶段限一次，你可以弃置一张红桃牌令一名角色回复一点体力并获得一点护甲',
+		xingluo:'星落',
+		xingluo_info:'星落',
 		yushou:'御兽',
 		yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，效果持续到你的下一回合开始',
 		yushou_misha:'米莎',

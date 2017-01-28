@@ -1281,19 +1281,25 @@
                             oblong:'长方',
                         },
                         onclick:function(item){
+                            var linked=false;
+                            if(game.me&&game.me.isLinked()){
+                                linked=true;
+                            }
                             game.saveConfig('cardshape',item);
                             if(item=='oblong'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
                                 ui.arena.classList.add('oblongcard');
-                                if(game.me&&game.me.classList.contains('linked')){
-                                    game.me.classList.remove('linked');
-                                    game.me.classList.add('linked2');
-                                }
                             }
                             else{
                                 ui.arena.classList.remove('oblongcard');
-                                if(game.me&&game.me.classList.contains('linked2')){
-                                    game.me.classList.remove('linked2');
+                            }
+                            if(linked){
+                                if(get.is.linked2(game.me)){
+                                    game.me.classList.remove('linked');
+                                    game.me.classList.add('linked2');
+                                }
+                                else{
                                     game.me.classList.add('linked');
+                                    game.me.classList.remove('linked2');
                                 }
                             }
                         }
@@ -31731,6 +31737,7 @@
         is:{
             linked2:function(player){
                 if(lib.config.link_style=='mark') return true;
+                if(game.chess) return false;
                 if(lib.config.layout=='long'||lib.config.layout=='long2') return true;
                 if(player.dataset.position=='0'){
                     return ui.arena.classList.contains('oblongcard');
