@@ -55,7 +55,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:15,
+        versionOL:16,
         sourceURL:'https://rawgit.com/libccy/noname/$version$/',
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',
@@ -14842,7 +14842,7 @@
                 forced:true,
                 popup:false,
                 silent:true,
-                priority:-50,
+                priority:-25,
                 content:function(){
                     player.removeSkill('counttrigger');
                     delete player.storage.counttrigger;

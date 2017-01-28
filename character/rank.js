@@ -61,6 +61,7 @@ window.characterRank={
         'gjqt_ouyangshaogong',
     ],
     a:[
+        'pal_muchanglan',
         'hs_aya',
         'ow_heiying',
         'pal_longkui',

@@ -657,10 +657,11 @@ character.shenhua={
 			}
 		},
 		fangquan2:{
-			trigger:{player:'phaseEnd'},
+			trigger:{player:'phaseAfter'},
 			forced:true,
 			popup:false,
 			audio:false,
+			priority:-50,
 			content:function(){
 				"step 0"
 				player.chooseToDiscard(true);

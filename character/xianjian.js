@@ -33,11 +33,84 @@ character.xianjian={
 		// pal_xiaoman:['male','wei',4,[]],
 
 		pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
-		// pal_muchanglan:['female','shu',3,['feixia','lueying']],
+		pal_muchanglan:['female','wu',3,['feixia','lueying']],
 		// pal_xia:['male','wei',4,[]],
 		// pal_jiangcheng:['male','wei',4,[]],
 	},
 	skill:{
+		feixia:{
+			enable:'phaseUse',
+			usable:1,
+			filterCard:{color:'red'},
+			position:'he',
+			filter:function(event,player){
+				return player.num('he',{color:'red'})>0;
+			},
+			check:function(card){
+				return 7-ai.get.value(card);
+			},
+			content:function(){
+				var targets=player.getEnemies();
+				if(targets.length){
+					var target=targets.randomGet();
+					target.addExpose(0.2);
+					player.useCard({name:'sha'},target,false);
+				}
+			},
+			ai:{
+				order:2.9,
+				result:{
+					player:1
+				}
+			}
+		},
+		lueying:{
+			trigger:{player:'shaBegin'},
+			filter:function(event,player){
+				if(event.target.num('he')>0){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i]!=player&&game.players[i]!=event.target&&
+							game.players[i].num('he')){
+							return true;
+						}
+					}
+				}
+				return false;
+			},
+			logTarget:'target',
+			usable:1,
+			content:function(){
+				'step 0'
+				var card=trigger.target.get('he').randomGet();
+				player.gain(card,trigger.target);
+				if(get.position(card)=='e'){
+					trigger.target.$give(card,player);
+				}
+				else{
+					trigger.target.$give(1,player);
+				}
+				'step 1'
+				if(game.players.length>2){
+					trigger.target.chooseTarget(function(card,player,target){
+						return target!=player&&target!=_status.event.parent.player&&target.num('he')>0;
+					},'选择一名角色并令'+get.translation(player)+'弃置其一张牌').ai=function(target){
+						return -ai.get.attitude(_status.event.player,target);
+					};
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					trigger.target.line(result.targets[0],'green');
+					player.discardPlayerCard(result.targets[0],true,'he');
+				}
+			},
+			ai:{
+				threaten:1.5,
+				expose:0.2,
+			}
+		},
 		yujian:{
 			enable:'phaseUse',
 			viewAs:{name:'wanjian'},
@@ -2318,6 +2391,10 @@ character.xianjian={
 		pal_changqing:'长卿',
 		pal_xuanxiao:'玄霄',
 
+		feixia:'飞霞',
+		feixia_info:'出牌阶段限一次，你可以弃置一张红色牌视为对一名随机敌人使用一张不计入出杀次数的杀',
+		lueying:'掠影',
+		lueying_info:'每当你使用一张杀，你可以随机获得目标的一张牌，然后目标可以指定一名其他角色，你弃置该角色一张牌（每回合限发动一次，没有弃牌目标时无法发动）',
 		feng:'风',
 		feng_info:'锁定技，当你累计摸2次牌后，你下一次摸牌时摸牌数+1',
 		ya:'雅',

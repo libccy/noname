@@ -108,6 +108,7 @@ character.extra={
 		lianpo2:{
 			trigger:{global:'phaseAfter'},
 			forced:true,
+			priority:-50,
 			content:function(){
 				player.removeSkill('lianpo2');
 				player.phase();

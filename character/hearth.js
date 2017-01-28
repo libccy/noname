@@ -2403,6 +2403,7 @@ character.hearth={
 		jixuan:{
 			trigger:{player:'phaseAfter'},
 			forced:true,
+			priority:-50,
 			filter:function(event,player){
 				return event.parent.name!='jixuan';
 			},
@@ -4141,6 +4142,7 @@ character.hearth={
 				return !player.storage.jihuo&&player.num('h')>0;
 			},
 			direct:true,
+			priority:-50,
 			content:function(){
 				"step 0"
 				var next=player.chooseToDiscard(get.prompt('jihuo'));

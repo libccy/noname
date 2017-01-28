@@ -5940,16 +5940,10 @@ character.sp={
 					target:function(player){
 						var num=player.num('h');
 						if(player.hp==1) return 1;
-						if(player.hp==2&&num<=1) return 1;
-						if(player.hp==3&&num==0) return 1;
-						if(player.hp>=3&&num>=3) return 0;
-						var mode=get.mode();
-						if(mode=='identity'||mode=='guozhan'){
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].ai.shown<=0) return 0;
-							}
-						}
+						if(player.hp==2&&num<=2) return 1;
+						if(player.hp==3&&num<=1) return 1;
 						if(game.phaseNumber<game.players.length*2) return 0;
+						if(player.hasUnknown()) return 0;
 						return 1;
 					},
 				}

@@ -594,6 +594,7 @@ card.guozhan={
 			},
 			forced:true,
 			popup:false,
+			priority:-50,
 			content:function(){
 				"step 0"
 				player.removeSkill('xietianzi');
