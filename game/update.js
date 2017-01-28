@@ -18,6 +18,7 @@ window.noname_update={
         'character/refresh.js',
         'character/shenhua.js',
         'character/swd.js',
+        'character/yxs.js',
         'character/yijiang.js',
         'mode/boss.js',
         'mode/versus.js',

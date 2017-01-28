@@ -2591,6 +2591,44 @@ character.swd={
 			}
 		},
 		pozhou2:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.storage.pozhou>0;
+			},
+			filterTarget:function(card,player,target){
+				return target!=player&&!target.hasSkill('fengyin');
+			},
+			selectTarget:function(){
+				return [1,_status.event.player.storage.pozhou];
+			},
+			prompt:'出牌阶段，你可以指定任意名其他角色并弃置等量的破咒标记，令目标的非锁定技失效直到其下一回合结束',
+			content:function(){
+				player.storage.pozhou--;
+				if(!player.storage.pozhou){
+					player.unmarkSkill('pozhou');
+				}
+				else{
+					player.updateMarks();
+				}
+				target.addTempSkill('fengyin',{player:'phaseAfter'});
+			},
+			ai:{
+				order:11,
+				result:{
+					target:function(player,target){
+						var skills=target.get('s');
+						for(var i=0;i<skills.length;i++){
+							if(!get.is.locked(skills[i])){
+								if(target.hasSkillTag('maixie')) return -2;
+								return -ai.get.threaten(target);
+							}
+						}
+						return 0;
+					}
+				}
+			}
+		},
+		pozhou2_old:{
 			trigger:{global:'phaseBegin'},
 			priority:-5,
 			check:function(event,player){
@@ -8703,7 +8741,7 @@ character.swd={
 		pozhou:'破咒',
 		pozhou_bg:'破',
 		pozhou2:'破咒',
-		pozhou_info:'每当你受到一次伤害，你获得一枚破咒标记。在其他角色的回合开始阶段，你可以弃置一枚破咒标记令其所有非锁定技失效直到下一回合开始',
+		pozhou_info:'每当你受到一次伤害，你获得一枚破咒标记。出牌阶段，你可以指定任意名其他角色并弃置等量的破咒标记，令目标的非锁定技失效直到其下一回合结束',
 		xuanzhou:'玄咒',
 		xuanzhou_info:'出牌阶段限一次，你可以将一张非延时锦囊牌当作任意一张延时锦囊，对任意一名角色使用（无视锦囊使用范围限制）',
 		ningxian:'凝霰',

@@ -199,17 +199,24 @@ character.yxs={
 			},
 			forced:true,
 			content:function(){
+				var num=0;
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].sex=='female') trigger.num++;
+					if(game.players[i].sex=='female') num++;
 				}
+				if(num>2) num=2;
+				trigger.num+=num;
 			},
 			ai:{
 				threaten:function(){
-					var num=1;
+					var num=0;
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].sex=='female') num++;
 					}
-					return Math.sqrt(num);
+					switch(num){
+						case 0:return 1;
+						case 1:return 1.3;
+						default:return 2;
+					}
 				}
 			},
 		},
@@ -375,32 +382,19 @@ character.yxs={
 			}
 		},
 		sheshu:{
-			trigger:{player:'useCard'},
+			trigger:{player:'shaBegin'},
 			forced:true,
-			priority:10,
-			filter:function(event){
-				return event.card.name=='sha';
+			filter:function(event,player){
+				return event.target.hp>=3;
 			},
 			content:function(){
-				player.addTempSkill('unequip','useCardAfter');
+				trigger.directHit=true;
 			},
             mod:{
                 targetInRange:function(card){
                     if(card.name=='sha') return true;
                 },
             },
-			group:'sheshu2'
-		},
-		sheshu2:{
-			trigger:{player:'shaBegin'},
-			forced:true,
-			popup:false,
-			filter:function(event,player){
-				return event.target.hp>=3;
-			},
-			content:function(){
-				trigger.directHit=true;
-			}
 		},
 		lguiyin:{
 			unique:true,
@@ -2715,7 +2709,7 @@ character.yxs={
 		jimin:'机敏',
 		jimin_info:'当你的装备区内没有牌时，你可以将一张手牌当作闪使用或打出',
 		sheshu:'射术',
-		sheshu_info:'锁定技，你的杀无视距离和防具；体力值不小于3的角色不能闪避你的杀',
+		sheshu_info:'锁定技，你的杀无视距离；体力值不小于3的角色不能闪避你的杀',
 		tongyu:'统御',
 		tongyu_info:'出牌阶段，你可以弃置一张牌，并转变为罗宾汉（每回合只能转变一次）',
 		lguiyin:'归隐',

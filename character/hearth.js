@@ -87,7 +87,7 @@ character.hearth={
 		hs_kazhakusi:['male','shu',3,['lianjin']],
 		// hs_lazi:['male','wei',3,[]],
 		hs_shaku:['male','wei',3,['shouji']],
-		hs_laxiao:['male','qun',3,['guimou','yingxi']],
+		hs_laxiao:['male','shu',3,['guimou','yingxi']],
 		// hs_xiangyaqishi:['male','wei',3,[]],
 		// hs_fenjie:['male','shu',3,['guimou','yingxi']],
 	},
@@ -541,10 +541,21 @@ character.hearth={
 				});
 				'step 1'
 				if(result.bool){
-					player.logSkill('yingxi',event.target);
-					player.useCard({name:'sha'},result.cards,result.targets);
+					player.useCard({name:'sha'},result.cards,result.targets,'yingxi');
 				}
 			},
+			group:'yingxi2',
+		},
+		yingxi2:{
+			trigger:{player:'shaBegin'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.skill=='yingxi'&&event.target.isHealthy();
+			},
+			content:function(){
+				trigger.directHit=true;
+			}
 		},
 		guimou:{
 			trigger:{player:'damageEnd'},
@@ -552,7 +563,7 @@ character.hearth={
 				return ai.get.attitude(player,event.source)<=0;
 			},
 			filter:function(event,player){
-				return event.source&&event.source.isAlive()&&event.source.num('h')>0;
+				return event.source&&event.source.isAlive()&&event.source!=player&&event.source.num('h')>0;
 			},
 			content:function(){
 				var card=trigger.source.get('h').randomGet();
@@ -574,7 +585,7 @@ character.hearth={
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-2];
 						if(!target.hasFriend()) return false;
-						if(get.tag(card,'damage')) return [1,0,0,-1];
+						if(get.tag(card,'damage')&&player.num('h')>1) return [1,0,0,-1];
 					}
 				}
 			}
@@ -5402,7 +5413,7 @@ character.hearth={
 		guimou:'鬼谋',
 		guimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程',
 		yingxi:'影袭',
-		yingxi_info:'回合结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用',
+		yingxi_info:'回合结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用，若目标未受到伤害，此杀不可闪避',
 		peiyu:'培育',
 		peiyu_info:'回合开始和结束阶段，你可以令一名没有图腾的角色获得一个随机图腾直到其首次受到伤害',
 		peiyu_old_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾',

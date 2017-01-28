@@ -11606,7 +11606,7 @@
                         if(this.initedSkills.contains(skill)) return;
                         this.initedSkills.push(skill);
                         if(info.init){
-                            info.init(this);
+                            info.init(this,skill);
                         }
                     }
                     if(info.trigger&&this.playerid){
@@ -11655,7 +11655,7 @@
 						this.skills.add(skill);
 						this.addSkillTrigger(skill);
 						if(info.init2){
-							info.init2(this);
+							info.init2(this,skill);
 						}
 						if(info.mark){
 							if(info.mark=='card'&&
@@ -11845,7 +11845,7 @@
                         var info=lib.skill[skill];
                         if(info){
                             if(info.onremove){
-        						info.onremove(this);
+        						info.onremove(this,skill);
         					}
                             this.removeSkillTrigger(skill);
                             if(!info.keepSkill){
@@ -14772,24 +14772,24 @@
             zhu:{},
             zhuSkill:{},
             fengyin:{
-                init:function(player){
+                init:function(player,skill){
                     var skills=player.get('s');
                     for(var i=0;i<skills.length;i++){
                         if(get.is.locked(skills[i])){
                             skills.splice(i--,1);
                         }
                     }
-                    player.disableSkill('fengyin',skills);
+                    player.disableSkill(skill,skills);
                 },
-                onremove:function(player){
-                    player.enableSkill('fengyin');
+                onremove:function(player,skill){
+                    player.enableSkill(skill);
                 },
                 mark:true,
                 intro:{
-                    content:function(storage,player){
+                    content:function(storage,player,skill){
     					var list=[];
                         for(var i in player.disabledSkills){
-                            if(player.disabledSkills[i].contains('fengyin')){
+                            if(player.disabledSkills[i].contains(skill)){
                                 list.push(i)
                             }
                         }
@@ -33128,7 +33128,7 @@
 			}
 			return str;
 		},
-		storageintro:function(type,content,player,dialog){
+		storageintro:function(type,content,player,dialog,skill){
 			switch(type){
 				case 'mark':{
 					if(content>0){
@@ -33202,10 +33202,12 @@
 				}
 				default:{
 					if(typeof type=='string'){
-						return type.replace(/#/g,content);
+                        type=type.replace(/#/g,content);
+                        type.replace(/\$/g,get.cnNumber(content));
+						return type;
 					}
 					else if(typeof type=='function'){
-						return type(content,player);
+						return type(content,player,skill);
 					}
 					return false;
 				}
@@ -33293,7 +33295,7 @@
                                 name=name(storage[i],node);
                             }
                             translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
-                            var stint=get.storageintro(intro.content,storage[i],node);
+                            var stint=get.storageintro(intro.content,storage[i],node,null,i);
                             if(stint){
                                 translation+=stint+'</div></div>';
                                 uiintro.add(translation);
@@ -33465,7 +33467,7 @@
 					}
 				}
 				else{
-					var stint=get.storageintro(info.content,player.storage[node.skill],player,uiintro);
+					var stint=get.storageintro(info.content,player.storage[node.skill],player,uiintro,node.skill);
 					if(stint){
 						if(stint[0]=='$'){
 							uiintro.add('<div class="caption">'+stint.slice(1)+'</div>');
