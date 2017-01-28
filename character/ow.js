@@ -24,9 +24,155 @@ character.ow={
         // ow_luba:['male','shu',4,[]],
         // ow_wensidun:['male','shu',4,[]],
         // ow_zhaliya:['female','shu',4,['pingzhang','lichang']],
-        // ow_heiying:['female','wei',3,[]],
+        ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
     },
     skill:{
+        qinru:{
+            trigger:{player:'useCardToBegin'},
+            filter:function(event,player){
+                return event.target!=player&&event.targets&&event.targets.length==1&&!event.target.hasSkill('qinru2');
+            },
+            logTarget:'target',
+            check:function(event,player){
+                return ai.get.attitude(player,event.player)<0;
+            },
+            content:function(){
+                'step 0'
+                trigger.target.judge(function(card){
+                    return get.suit(card)=='heart'?0:-1;
+                });
+                'step 1'
+                if(result.suit!='heart'){
+                    var target=trigger.target;
+                    var skills=target.get('s');
+                    var list=[];
+                    for(var i=0;i<skills.length;i++){
+                        if(!get.is.locked(skills[i])){
+                            list.push(skills[i]);
+                        }
+                    }
+                    if(!player.storage.qinru){
+                        player.storage.qinru=[];
+                    }
+                    for(var i=0;i<player.storage.qinru.length;i++){
+                        if(!game.players.contains(player.storage.qinru[i])){
+                            player.storage.qinru.splice(i--,1);
+                        }
+                    }
+                    player.storage.qinru.remove(target);
+                    player.storage.qinru.push(target);
+                    if(player.storage.qinru.length>2){
+                        player.storage.qinru.shift();
+                    }
+                    target.disableSkill('qinru',list);
+                    target.addSkill('qinru2');
+                }
+            },
+            ai:{
+                expose:0.2,
+                threaten:1.3,
+            }
+        },
+        qinru2:{
+			trigger:{player:'phaseAfter'},
+			forced:true,
+			mark:true,
+			audio:false,
+			popup:false,
+			content:function(){
+				player.enableSkill('qinru');
+				player.removeSkill('qinru2');
+			},
+			intro:{
+				content:function(st,player){
+					var storage=player.disabledSkills.qinru;
+					if(storage&&storage.length){
+						var str='失效技能：';
+						for(var i=0;i<storage.length;i++){
+							if(lib.translate[storage[i]+'_info']){
+								str+=get.translation(storage[i])+'、';
+							}
+						}
+						return str.slice(0,str.length-1);
+					}
+				}
+			}
+		},
+        yinshen:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he',{type:'equip'})>0;
+			},
+			content:function(){
+				"step 0"
+				var next=player.chooseToDiscard(get.prompt('yinshen'),'he',{type:'equip'});
+				next.logSkill='yinshen';
+				next.ai=function(card){
+					if(player.hp==1) return 8-ai.get.value(card);
+					if(player.isZhu) return 7-ai.get.value(card);
+					if(player.hp==2) return 6-ai.get.value(card);
+					return 5-ai.get.value(card);
+				};
+				"step 1"
+				if(result.bool){
+					player.addTempSkill('qianxing',{player:'phaseBegin'});
+				}
+			},
+		},
+        maichong:{
+            trigger:{player:'phaseBegin'},
+            filter:function(event,player){
+                if(player.storage.qinru){
+                    for(var i=0;i<player.storage.qinru.length;i++){
+                        if(player.storage.qinru[i].isAlive()&&player.storage.qinru[i].num('he')) return true;
+                    }
+                }
+            },
+            logTarget:function(event,player){
+                var list=[];
+                if(player.storage.qinru){
+                    for(var i=0;i<player.storage.qinru.length;i++){
+                        if(player.storage.qinru[i].isAlive()&&player.storage.qinru[i].num('he')){
+                            list.push(player.storage.qinru[i]);
+                        }
+                    }
+                }
+                return list;
+            },
+            content:function(){
+                'step 0'
+                var list=[];
+                if(player.storage.qinru){
+                    for(var i=0;i<player.storage.qinru.length;i++){
+                        if(player.storage.qinru[i].isAlive()&&player.storage.qinru[i].num('he')){
+                            list.push(player.storage.qinru[i]);
+                        }
+                    }
+                }
+                event.list=list;
+                'step 1'
+                if(event.list.length){
+                    var current=event.list.shift();
+                    var he=current.get('he');
+                    if(he.length){
+                        var card=he.randomGet();
+                        current.discard(card);
+                        if(get.type(card)!='basic'){
+                            event.bool=true;
+                        }
+                    }
+                    event.redo();
+                }
+                'step 2'
+                if(event.bool){
+                    player.draw();
+                }
+            },
+            ai:{
+                threaten:1.5
+            }
+        },
         mengji:{
             trigger:{source:'damageBegin'},
             forced:true,
@@ -2747,6 +2893,14 @@ character.ow={
         }
     },
     translate:{
+        ow_heiying:'黑影',
+        qinru:'侵入',
+        qinru2:'侵入',
+        qinru_info:'每当你使用卡牌指定惟一目标时，你可以令目标进行一次判定，若结果不为红桃，该角色的非锁定技失效直到其下一回合结束',
+        yinshen:'隐身',
+		yinshen_info:'回合结束阶段，你可以弃置一张装备牌并获得潜行直到下一回合开始',
+        maichong:'脉冲',
+        maichong_info:'回合开始阶段，你可以令最近两名被你侵入的角色各随机弃置一张牌，若弃置的牌中有非基本牌，你摸一张牌',
         lichang:'力场',
         lichang2:'力场',
         lichang_info:'回合结束阶段，你可以弃置一张红色牌，若如此做，你可以在下个回合开始时令一名距离1以内的角色回复一点体力或摸两张牌',

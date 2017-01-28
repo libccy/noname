@@ -62,6 +62,7 @@ window.characterRank={
     ],
     a:[
         'hs_aya',
+        'ow_heiying',
         'pal_longkui',
         'pal_nangonghuang',
         'pal_xingxuan',

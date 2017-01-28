@@ -719,6 +719,7 @@ character.yijiang={
 		},
 		jiyu:{
 			enable:'phaseUse',
+			locked:false,
 			filter:function(event,player){
 				var hs=player.get('h');
 				for(var i=0;i<hs.length;i++){

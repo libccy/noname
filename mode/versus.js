@@ -3619,6 +3619,7 @@ mode.versus={
 			filter:function(event,player){
 				if(!_status.ladder) return false;
 				if(event._ladder_mmr_counted) return false;
+				if(!event.source) return false;
 				return event.source==game.me||event.player==game.me;
 			},
 			content:function(){

@@ -1859,7 +1859,7 @@ card.swd={
 				return player.canUse('sha',target);
 			},
 			filter:function(event,player){
-				return player.num('h','sha')>0;
+				return player.num('h','sha')>0&&lib.filter.cardUsable({name:'sha'},player);
 			},
 			content:function(){
 				'step 0'

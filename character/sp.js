@@ -817,7 +817,6 @@ character.sp={
 			content:function(){
 				target.gain(cards,player);
 				target.recover();
-				game.delay();
 			},
 			ai:{
 				order:function(skill,player){

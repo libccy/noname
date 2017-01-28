@@ -11739,16 +11739,20 @@
                 },
                 enableSkill:function(skill){
                     var skills=this.disabledSkills[skill];
-                    this.disabledSkills[skill]=skills;
+                    delete this.disabledSkills[skill];
+                    var list=this.get('s');
                     if(typeof skills=='string'){
-                        this.addSkillTrigger(skills,false,true);
+                        if(list.contains(skills)){
+                            this.addSkillTrigger(skills,false,true);
+                        }
                     }
                     else if(Array.isArray(skills)){
                         for(var i=0;i<skills.length;i++){
-                            this.addSkillTrigger(skills[i],false,true);
+                            if(list.contains(skills[i])){
+                                this.addSkillTrigger(skills[i],false,true);
+                            }
                         }
                     }
-                    delete this.disabledSkills[skill];
                 },
 				checkMarks:function(){
 					var skills=this.get('s');
@@ -33890,6 +33894,25 @@
 			}
 		},
 		get:{
+            threaten:function(target,player){
+                var threaten=1;
+                var skills=target.get('s');
+                for(var i=0;i<skills.length;i++){
+                    var info=get.info(skills[i]);
+                    if(info&&info.ai&&info.ai.threaten){
+                        if(typeof info.ai.threaten=='function'&&player){
+                            var tmp=info.ai.threaten(player,target);
+                            if(typeof tmp=='number'){
+                                threaten*=tmp;
+                            }
+                        }
+                        else if(typeof info.ai.threaten=='number'){
+                            threaten*=info.ai.threaten;
+                        }
+                    }
+                }
+                return threaten;
+            },
             attitude:function(from,to){
 				if(!from||!to) return 0;
 				var att=ai.get.rawAttitude.apply(this,arguments);

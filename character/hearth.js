@@ -1209,10 +1209,10 @@ character.hearth={
 					num=1;
 				}
 				var list=['hslingjian_zhongxinghujia','hslingjian_xuanfengzhiren','hslingjian_yinmilichang',
-				'hslingjian_shengxiuhaojiao','hslingjian_jinjilengdong','hslingjian_xingtigaizao','hslingjian_shijianhuisu'];
-				if(get.mode()=='stone'){
-					list.remove('hslingjian_jinjilengdong');
-				}
+				'hslingjian_shengxiuhaojiao','hslingjian_xingtigaizao','hslingjian_shijianhuisu'];
+				// if(get.mode()=='stone'){
+				// 	list.remove('hslingjian_jinjilengdong');
+				// }
 				var cards=[];
 				while(num--){
 					cards.push(game.createCard(list.randomGet()));
@@ -2656,7 +2656,7 @@ character.hearth={
 						});
 					}
 					else{
-						event.target.draw(2);
+						event.target.draw();
 						event.finish();
 					}
 				}
@@ -5440,7 +5440,7 @@ character.hearth={
 		zengli:'赠礼',
 		zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
 		xiubu:'修补',
-		xiubu_info:'每当你装备一把未强化的武器，你可以获得数量等同于武器攻击范围的随机零件',
+		xiubu_info:'每当你装备一把未强化的武器，你可以获得数量等同于武器攻击范围的随机零件（冰冻零件除外）',
 		mobao:'魔爆',
 		mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害',
 		xianji:'献祭',
@@ -5533,7 +5533,7 @@ character.hearth={
 		mianyi:'免疫',
 		mianyi_info:'锁定技，你不能成为其他角色的非延时锦囊的目标',
 		jiaohui:'教诲',
-		jiaohui_info:'回合结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸两张牌或回复一点体力',
+		jiaohui_info:'回合结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸一张牌或回复一点体力',
 		chenshui:'沉睡',
 		chenshui_info:'回合结束阶段，你可以将一张随机梦境牌加入你的手牌',
 		hsmengjing:'梦境',

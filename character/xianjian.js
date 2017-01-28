@@ -2154,23 +2154,23 @@ character.xianjian={
 				threaten:1.5
 			}
 		},
-		xiaoyao_old:{
-			group:'feiying',
+		xiaoyao:{
 			direct:true,
 			filter:function(event,player){
-				return event.player!=player&&player.num('he')>1;
+				if(event.player==player) return false;
+				if(event.cards&&event.cards.length==1){
+					return player.num('h',{suit:get.suit(event.cards[0])})>0;
+				}
+				return false;
 			},
 			trigger:{target:'useCardToBefore'},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否弃置两张牌使'+get.translation(trigger.card)+'失效？','he',2);
+				var next=player.chooseToDiscard('逍遥：是否弃置一张牌使'+get.translation(trigger.card)+'失效？',{suit:get.suit(trigger.cards[0])});
 				next.logSkill='xiaoyao';
 				next.ai=function(card){
 					if(ai.get.effect(player,trigger.card,trigger.player,player)<0){
-						if(get.tag(trigger.card,'respondSha')&&player.num('h','sha')) return 0;
-						if(get.tag(trigger.card,'respondShan')&&player.num('h','shan')) return 0;
-						if(card.name=='guohe') return 0;
-						return 4-ai.get.value(card);
+						return 7-ai.get.value(card);
 					}
 					return 0;
 				}
@@ -2180,28 +2180,6 @@ character.xianjian={
 					trigger.finish();
 				}
 			}
-		},
-		xiaoyao:{
-			trigger:{player:'phaseEnd'},
-			direct:true,
-			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
-			},
-			content:function(){
-				"step 0"
-				var next=player.chooseToDiscard(get.prompt('xiaoyao'),'he',{type:'equip'});
-				next.logSkill='xiaoyao';
-				next.ai=function(card){
-					if(player.hp==1) return 8-ai.get.value(card);
-					if(player.isZhu) return 7-ai.get.value(card);
-					if(player.hp==2) return 6-ai.get.value(card);
-					return 5-ai.get.value(card);
-				};
-				"step 1"
-				if(result.bool){
-					player.addTempSkill('qianxing',{player:'phaseBegin'});
-				}
-			},
 		},
 		tuoqiao:{
 			filter:function(event,player){
@@ -2446,7 +2424,7 @@ character.xianjian={
 		tuoqiao:'脱壳',
 		tuoqiao_info:'每当你成为身边角色的卡牌的目标，你可以将座位后移一位，然后取消之',
 		xiaoyao:'逍遥',
-		xiaoyao_info:'回合结束阶段，你可以弃置一张装备牌并获得潜行直到下一回合开始',
+		xiaoyao_info:'每当你成为其他角色的卡牌目标，你可以弃置一张与之花色相同的手牌取消之',
 		yujian:'御剑',
 		yujian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用',
 		huimeng:'回梦',
