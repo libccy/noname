@@ -29,7 +29,7 @@ character.hearth={
 		hs_malorne:['male','wu',3,['enze','chongsheng']],
 		hs_malygos:['male','wei',4,['malymowang']],
 		hs_xuefashi:['male','wei',2,['liehun','xjumo']],
-		hs_loatheb:['male','wu',5,['fengyin']],
+		hs_loatheb:['male','wu',5,['duzhang']],
 		hs_trueheart:['female','qun',3,['qianghuax']],
 		hs_sainaliusi:['male','wu',4,['chongsheng','yulu']],
 		hs_lrhonin:['male','wei',4,['bingyan','yufa']],
@@ -2188,7 +2188,7 @@ character.hearth={
 				threaten:1.2
 			}
 		},
-		fengyin:{
+		duzhang:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
@@ -2202,19 +2202,19 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				player.chooseTarget(get.prompt('fengyin'),function(card,player,target){
+				player.chooseTarget(get.prompt('duzhang'),function(card,player,target){
 					return target!=player;
 				}).ai=function(target){
 					return -ai.get.attitude(player,target)*Math.sqrt(target.num('h'));
 				}
 				'step 1'
 				if(result.bool){
-					player.logSkill('fengyin',result.targets);
-					result.targets[0].addTempSkill('fengyin2',{player:'phaseAfter'});
+					player.logSkill('duzhang',result.targets);
+					result.targets[0].addTempSkill('duzhang2',{player:'phaseAfter'});
 				}
 			}
 		},
-		fengyin2:{
+		duzhang2:{
 			mod:{
 				cardEnabled:function(card){
 					if(get.type(card,'trick')=='trick') return false;
@@ -5499,9 +5499,9 @@ character.hearth={
 		byuhuo_info:'觉醒技，当你进入濒死状态时，你须将体力和体力上限变为2，并将武将牌翻至背面；在你的下一回合开始时，你对所有其他角色造成两点火焰伤害，在此之前，你不能成为其他角色的卡牌的目标',
 		yulu:'雨露',
 		yulu_info:'出牌阶段限一次，你可以指定任意名角色各摸一张牌，然后各弃置一区域内的一张牌',
-		fengyin:'封印',
-		fengyin2:'封印',
-		fengyin_info:'回合结束阶段，若你于本回合内未使用过锦囊牌，你可以指定一名其他角色令其下个回合无法使用锦囊牌',
+		duzhang:'毒瘴',
+		duzhang2:'毒瘴',
+		duzhang_info:'回合结束阶段，若你于本回合内未使用过锦囊牌，你可以指定一名其他角色令其下个回合无法使用锦囊牌',
 		hannu:'寒怒',
 		hannu_info:'锁定技，每当你受到一次伤害，你将手牌数翻倍；若你的手牌数因此超过10张，你随机弃置若干张手牌直到手牌数等于你当前的体力值',
 		chuidiao:'垂钓',

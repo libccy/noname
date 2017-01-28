@@ -2265,15 +2265,16 @@ mode.boss={
 				player.chooseCardTarget({
 					position:'he',
 					filterTarget:function(card,player,target){
+						if(player==target) return false;
 						if(!lib.character[target.name]) return false;
-						return player!=target&&!target.storage.boss_hujia;
+						return true;
 					},
 					filterCard:lib.filter.cardDiscardable,
 					ai1:function(card){
 						return ai.get.unuseful(card)+9;
 					},
 					ai2:function(target){
-						if(target.disabledSkills.boss_hujia) return Math.max(1,10-target.maxHp);
+						if(target.storage.boss_hujia) return Math.max(1,10-target.maxHp);
 						return 1/target.maxHp;
 					},
 					prompt:get.prompt('boss_hujia')
@@ -2282,11 +2283,12 @@ mode.boss={
 				if(result.bool){
 					var target=result.targets[0];
 					player.logSkill('boss_hujia',target);
-					if(target.disabledSkills.boss_hujia){
+					if(target.storage.boss_hujia){
 						target.loseMaxHp();
 					}
 					else{
 						target.disableSkill('boss_hujia',lib.character[target.name][3]);
+						target.storage.boss_hujia=true;
 					}
 					player.discard(result.cards);
 				}
@@ -2319,6 +2321,7 @@ mode.boss={
 				"step 2"
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].enableSkill('boss_hujia');
+					delete game.players[i].storage.boss_hujia;
 				}
 				if(game.bossinfo){
 					game.bossinfo.loopType=1;

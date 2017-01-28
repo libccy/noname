@@ -2604,7 +2604,7 @@ character.swd={
 				return '是否弃置一枚破咒标记令'+get.translation(event.player)+
 				'的非锁定技失效？（剩余'+player.storage.pozhou+'枚）';
 			},
-			popup:false,
+			logTarget:'player',
 			content:function(){
 				player.storage.pozhou--;
 				if(!player.storage.pozhou){
@@ -2613,39 +2613,7 @@ character.swd={
 				else{
 					player.updateMarks();
 				}
-				var target=trigger.player;
-				var list=[];
-				for(var i=0;i<target.skills.length;i++){
-					if(!get.is.locked(target.skills[i])){
-						list.push(target.skills[i]);
-					}
-				}
-				target.disableSkill('pozhou',list);
-				target.addSkill('pozhou3');
-				player.line(target,'green');
-			}
-		},
-		pozhou3:{
-			trigger:{player:'phaseBegin'},
-			forced:true,
-			mark:true,
-			content:function(){
-				player.enableSkill('pozhou');
-				player.removeSkill('pozhou3');
-			},
-			intro:{
-				content:function(st,player){
-					var storage=player.disabledSkills.pozhou;
-					if(storage&&storage.length){
-						var str='失效技能：';
-						for(var i=0;i<storage.length;i++){
-							if(lib.translate[storage[i]+'_info']){
-								str+=get.translation(storage[i])+'、';
-							}
-						}
-						return str.slice(0,str.length-1);
-					}
-				}
+				trigger.player.addTempSkill('fengyin',{player:'phaseBegin'});
 			}
 		},
 		fengmo:{
@@ -8735,8 +8703,6 @@ character.swd={
 		pozhou:'破咒',
 		pozhou_bg:'破',
 		pozhou2:'破咒',
-		pozhou3:'破咒',
-		pozhou3_bg:'咒',
 		pozhou_info:'每当你受到一次伤害，你获得一枚破咒标记。在其他角色的回合开始阶段，你可以弃置一枚破咒标记令其所有非锁定技失效直到下一回合开始',
 		xuanzhou:'玄咒',
 		xuanzhou_info:'出牌阶段限一次，你可以将一张非延时锦囊牌当作任意一张延时锦囊，对任意一名角色使用（无视锦囊使用范围限制）',

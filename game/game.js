@@ -5548,6 +5548,7 @@
     		_lianhuan:'连环',
     		_lianhuan2:'连环',
             qianxing:'潜行',
+            fengyin:'封印',
 		},
 		element:{
 			content:{
@@ -11727,32 +11728,27 @@
                     this.awakenedSkills.add(skill);
                 },
                 disableSkill:function(skill,skills){
-                    this.disabledSkills[skill]=skills;
                     if(typeof skills=='string'){
-                        this.removeSkillTrigger(skills,true);
+                        if(!this.disabledSkills[skills]){
+                            this.disabledSkills[skills]=[];
+                        }
+                        this.disabledSkills[skills].add(skill);
                     }
                     else if(Array.isArray(skills)){
                         for(var i=0;i<skills.length;i++){
-                            this.removeSkillTrigger(skills[i],true);
+                            this.disableSkill(skill,skills[i]);
                         }
                     }
+                    return this;
                 },
                 enableSkill:function(skill){
-                    var skills=this.disabledSkills[skill];
-                    delete this.disabledSkills[skill];
-                    var list=this.get('s');
-                    if(typeof skills=='string'){
-                        if(list.contains(skills)){
-                            this.addSkillTrigger(skills,false,true);
+                    for(var i in this.disabledSkills){
+                        this.disabledSkills[i].remove(skill);
+                        if(this.disabledSkills[i].length==0){
+                            delete this.disabledSkills[i];
                         }
                     }
-                    else if(Array.isArray(skills)){
-                        for(var i=0;i<skills.length;i++){
-                            if(list.contains(skills[i])){
-                                this.addSkillTrigger(skills[i],false,true);
-                            }
-                        }
-                    }
+                    return this;
                 },
 				checkMarks:function(){
 					var skills=this.get('s');
@@ -14003,6 +13999,7 @@
                     var addList=function(skill,player){
                         if(listAdded[skill]) return;
                         if(player.forbiddenSkills[skill]) return;
+                        if(player.disabledSkills[skill]) return;
                         listAdded[skill]=true;
                         var info=lib.skill[skill];
                         var num=0;
@@ -14774,6 +14771,40 @@
             others:{},
             zhu:{},
             zhuSkill:{},
+            fengyin:{
+                init:function(player){
+                    var skills=player.get('s');
+                    for(var i=0;i<skills.length;i++){
+                        if(get.is.locked(skills[i])){
+                            skills.splice(i--,1);
+                        }
+                    }
+                    player.disableSkill('fengyin',skills);
+                },
+                onremove:function(player){
+                    player.enableSkill('fengyin');
+                },
+                mark:true,
+                intro:{
+                    content:function(storage,player){
+    					var list=[];
+                        for(var i in player.disabledSkills){
+                            if(player.disabledSkills[i].contains('fengyin')){
+                                list.push(i)
+                            }
+                        }
+    					if(list.length){
+    						var str='失效技能：';
+    						for(var i=0;i<list.length;i++){
+    							if(lib.translate[list[i]+'_info']){
+    								str+=get.translation(list[i])+'、';
+    							}
+    						}
+    						return str.slice(0,str.length-1);
+    					}
+    				}
+                }
+            },
             qianxing:{
                 mark:true,
     			nopop:true,
@@ -21115,14 +21146,7 @@
 		filterSkills:function(skills,player){
 			var out=skills.slice(0);
 			for(var i in player.disabledSkills){
-				if(typeof player.disabledSkills[i]=='string'){
-					out.remove(player.disabledSkills[i]);
-				}
-				else if(Array.isArray(player.disabledSkills[i])){
-					for(var j=0;j<player.disabledSkills[i].length;j++){
-						out.remove(player.disabledSkills[i][j]);
-					}
-				}
+                out.remove(i);
 			}
 			return out;
 		},

@@ -30,11 +30,14 @@ character.ow={
         qinru:{
             trigger:{player:'useCardToBegin'},
             filter:function(event,player){
-                return event.target!=player&&event.targets&&event.targets.length==1&&!event.target.hasSkill('qinru2');
+                return event.target!=player&&event.targets&&event.targets.length==1;
             },
             logTarget:'target',
             check:function(event,player){
                 return ai.get.attitude(player,event.player)<0;
+            },
+            intro:{
+                content:'players'
             },
             content:function(){
                 'step 0'
@@ -44,13 +47,6 @@ character.ow={
                 'step 1'
                 if(result.suit!='heart'){
                     var target=trigger.target;
-                    var skills=target.get('s');
-                    var list=[];
-                    for(var i=0;i<skills.length;i++){
-                        if(!get.is.locked(skills[i])){
-                            list.push(skills[i]);
-                        }
-                    }
                     if(!player.storage.qinru){
                         player.storage.qinru=[];
                     }
@@ -64,8 +60,8 @@ character.ow={
                     if(player.storage.qinru.length>2){
                         player.storage.qinru.shift();
                     }
-                    target.disableSkill('qinru',list);
-                    target.addSkill('qinru2');
+                    target.addTempSkill('fengyin',{player:'phaseAfter'});
+                    player.markSkill('qinru');
                 }
             },
             ai:{
@@ -73,31 +69,6 @@ character.ow={
                 threaten:1.3,
             }
         },
-        qinru2:{
-			trigger:{player:'phaseAfter'},
-			forced:true,
-			mark:true,
-			audio:false,
-			popup:false,
-			content:function(){
-				player.enableSkill('qinru');
-				player.removeSkill('qinru2');
-			},
-			intro:{
-				content:function(st,player){
-					var storage=player.disabledSkills.qinru;
-					if(storage&&storage.length){
-						var str='失效技能：';
-						for(var i=0;i<storage.length;i++){
-							if(lib.translate[storage[i]+'_info']){
-								str+=get.translation(storage[i])+'、';
-							}
-						}
-						return str.slice(0,str.length-1);
-					}
-				}
-			}
-		},
         yinshen:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -2895,7 +2866,6 @@ character.ow={
     translate:{
         ow_heiying:'黑影',
         qinru:'侵入',
-        qinru2:'侵入',
         qinru_info:'每当你使用卡牌指定惟一目标时，你可以令目标进行一次判定，若结果不为红桃，该角色的非锁定技失效直到其下一回合结束',
         yinshen:'隐身',
 		yinshen_info:'回合结束阶段，你可以弃置一张装备牌并获得潜行直到下一回合开始',

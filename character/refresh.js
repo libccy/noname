@@ -993,16 +993,10 @@ character.refresh={
 				player.chooseToCompare(target).set('small',true);
 				"step 1"
 				if(result.bool){
-					if(target.hasSkill('yijue2')==false){
-						var list=[];
-						for(var i=0;i<target.skills.length;i++){
-							if(!get.is.locked(target.skills[i])){
-								list.push(target.skills[i]);
-							}
-						}
-						target.disableSkill('yijue',list);
-						target.addSkill('yijue2');
+					if(!target.hasSkill('fengyin')){
+						target.addTempSkill('fengyin','phaseAfter');
 					}
+					target.addTempSkill('yijue2','phaseAfter');
 					event.finish();
 				}
 				else if(target.hp<target.maxHp){
@@ -1044,15 +1038,7 @@ character.refresh={
 			}
 		},
 		yijue2:{
-			trigger:{global:'phaseAfter'},
-			forced:true,
 			mark:true,
-			audio:false,
-			popup:false,
-			content:function(){
-				player.enableSkill('yijue');
-				player.removeSkill('yijue2');
-			},
 			mod:{
 				cardEnabled:function(){
 					return false;
@@ -1068,18 +1054,7 @@ character.refresh={
 				}
 			},
 			intro:{
-				content:function(st,player){
-					var storage=player.disabledSkills.yijue;
-					if(storage&&storage.length){
-						var str='失效技能：';
-						for(var i=0;i<storage.length;i++){
-							if(lib.translate[storage[i]+'_info']){
-								str+=get.translation(storage[i])+'、';
-							}
-						}
-						return str.slice(0,str.length-1);
-					}
-				}
+				content:'不能使用或打出卡牌'
 			}
 		},
 		retieji:{
@@ -1091,16 +1066,8 @@ character.refresh={
 			content:function(){
 				"step 0"
 				player.judge(function(){return 0});
-				var target=trigger.target;
-				if(target.hasSkill('retieji2')==false){
-					var list=[];
-					for(var i=0;i<target.skills.length;i++){
-						if(!get.is.locked(target.skills[i])){
-							list.push(target.skills[i]);
-						}
-					}
-					target.disableSkill('retieji',list);
-					target.addSkill('retieji2');
+				if(!trigger.target.hasSkill('fengyin')){
+					trigger.target.addTempSkill('fengyin','phaseAfter');
 				}
 				"step 1"
 				var suit=get.suit(result.card);
@@ -1117,31 +1084,6 @@ character.refresh={
 				"step 2"
 				if(!result.bool){
 					trigger.directHit=true;
-				}
-			}
-		},
-		retieji2:{
-			trigger:{global:'phaseAfter'},
-			forced:true,
-			content:function(){
-				player.enableSkill('retieji');
-				player.removeSkill('retieji2');
-			},
-			audio:false,
-			mark:true,
-			popup:false,
-			intro:{
-				content:function(st,player){
-					var storage=player.disabledSkills.retieji;
-					if(storage&&storage.length){
-						var str='失效技能：';
-						for(var i=0;i<storage.length;i++){
-							if(lib.translate[storage[i]+'_info']){
-								str+=get.translation(storage[i])+'、';
-							}
-						}
-						return str.slice(0,str.length-1);
-					}
 				}
 			}
 		},
@@ -1549,7 +1491,6 @@ character.refresh={
 		yijue:'义绝',
 		yijue2:'义绝',
 		retieji:'铁骑',
-		retieji2:'铁骑',
 		refankui:'反馈',
 		reyicong:'义从',
 		qiaomeng:'趫猛',
