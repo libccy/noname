@@ -231,6 +231,7 @@ window.characterRank={
         'dianwei',
     ],
     bp:[
+        'ow_luba',
         'pal_leiyuange',
         'dongbai',
         'swd_moye',

@@ -140,23 +140,7 @@ character.yijiang={
 			direct:true,
 			filter:function(event,player){
 				if(event.player==player) return false;
-				var hs=player.get('h');
-				if(!hs.length) return false;
-				var es=player.get('e');
-				if(!es.length) return false;
-				var color=[];
-				for(var i=0;i<es.length;i++){
-					color.add(get.color(es[i]));
-				}
-				if(color.length==2) return true;
-				color=color[0];
-				for(var i=0;i<hs.length;i++){
-					if(get.color(hs[i])==color) return true;
-				}
-				return false;
-			},
-			ai:{
-				threaten:1.5
+				return player.num('e')>0;
 			},
 			content:function(){
 				'step 0'
@@ -171,7 +155,8 @@ character.yijiang={
 				}
 				if(color.length==2) color='all';
 				else color=color[0];
-				player.chooseToDiscard(get.prompt('xinsidi',trigger.player),function(card){
+				player.chooseToDiscard(get.prompt('xinsidi',trigger.player),'he',function(card){
+					if(get.type(card)=='basic') return false;
 					if(_status.event.color=='all') return true;
 					return get.color(card)==_status.event.color;
 				}).set('ai',function(card){
@@ -185,7 +170,10 @@ character.yijiang={
 					trigger.player.storage.xinsidi4=player;
 					trigger.player.syncStorage('xinsidi2');
 				}
-			}
+			},
+			ai:{
+				threaten:1.5
+			},
 		},
 		xinsidi2:{
 			mark:true,

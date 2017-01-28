@@ -18,15 +18,104 @@ character.ow={
         ow_kuangshu:['male','shu',3,['liudan','shoujia','shihuo']],
 
         ow_tuobiang:['male','shu',3,['paotai','maoding']],
-        // ow_baolei:['female','shu',3,[]],
+        // ow_baolei:['male','qun',4,[]],
         ow_banzang:['male','qun',4,['fengshi','yinbo']],
         ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
-        // ow_luba:['male','shu',4,[]],
+        ow_luba:['male','shu',4,['liangou','xiyang']],
         // ow_wensidun:['male','shu',4,[]],
         // ow_zhaliya:['female','shu',4,['pingzhang','lichang']],
         ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
     },
     skill:{
+        liangou:{
+            enable:'phaseUse',
+            usable:1,
+            filterTarget:function(card,player,target){
+                return target!=player&&target.hp>=2;
+            },
+            filterCard:true,
+            position:'he',
+            check:function(card){
+                return 5-ai.get.value(card);
+            },
+            content:function(){
+                'step 0'
+                player.judge(function(card){
+                    return get.color(card)=='black'?1:-1;
+                });
+                'step 1'
+                if(result.bool){
+                    target.addTempSkill('liangou2','phaseAfter');
+                    target.storage.liangou2=player;
+                }
+            },
+            ai:{
+                order:10,
+                expose:0.2,
+                result:{
+                    target:function(player,target){
+                        if(ai.get.damageEffect(target,player,target)<0&&player.num('h',function(card){
+                            return get.tag(card,'damage')?true:false;
+                        })){
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }
+            }
+        },
+        liangou2:{
+            mod:{
+				cardEnabled:function(card,player){
+					return false;
+				},
+				cardUsable:function(card,player){
+					return false;
+				},
+				cardRespondable:function(card,player){
+					return false;
+				},
+				cardSavable:function(card,player){
+					return false;
+				},
+                globalTo:function(from,to){
+                    if(from==to.storage.liangou2) return -Infinity;
+                }
+			},
+            onremove:function(player){
+                delete player.storage.liangou2;
+            },
+            trigger:{player:'damageBegin'},
+            usable:1,
+            forced:true,
+            popup:false,
+            content:function(){
+                trigger.num++;
+            },
+            ai:{
+                effect:{
+                    target:function(card,player,target){
+                        if(get.tag(card,'damage')) return [1,-2];
+                        if(get.tag(card,'respond')) return [1,-1];
+                    }
+                }
+            }
+        },
+        xiyang:{
+            trigger:{player:'phaseEnd'},
+            filter:function(event,player){
+                return !player.isTurnedOver()&&player.isDamaged();
+            },
+            check:function(event,player){
+                return player.hp<=1;
+            },
+            content:function(){
+                'step 0'
+                player.turnOver();
+                'step 1'
+                player.recover(2);
+            }
+        },
         qinru:{
             trigger:{player:'useCardToBegin'},
             filter:function(event,player){
@@ -34,7 +123,7 @@ character.ow={
             },
             logTarget:'target',
             check:function(event,player){
-                return ai.get.attitude(player,event.player)<0;
+                return ai.get.attitude(player,event.target)<0;
             },
             intro:{
                 content:'players'
@@ -2864,7 +2953,10 @@ character.ow={
         }
     },
     translate:{
-        ow_heiying:'黑影',
+        liangou:'链钩',
+        liangou_info:'出牌阶段限一次，你可以弃置一张牌，指定一名体力值不小于2的角色并进行一次判定，若结果为黑色，该角色不能使用或打出卡牌、与你距离为1且受到的首次伤害+1直到回合结束',
+        xiyang:'吸氧',
+        xiyang_info:'回合结束阶段，若你武将牌正面朝上，你可以翻面并回复两点体力',
         qinru:'侵入',
         qinru_info:'每当你使用卡牌指定惟一目标时，你可以令目标进行一次判定，若结果不为红桃，该角色的非锁定技失效直到其下一回合结束',
         yinshen:'隐身',
@@ -3019,5 +3111,6 @@ character.ow={
         ow_luba:'路霸',
         ow_wensidun:'温斯顿',
         ow_zhaliya:'查莉娅',
+        ow_heiying:'黑影',
     }
 };

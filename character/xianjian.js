@@ -33,7 +33,7 @@ character.xianjian={
 		// pal_xiaoman:['male','wei',4,[]],
 
 		pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
-		// pal_muchanglan:['male','wei',4,[]],
+		// pal_muchanglan:['female','shu',3,['feixia','lueying']],
 		// pal_xia:['male','wei',4,[]],
 		// pal_jiangcheng:['male','wei',4,[]],
 	},
