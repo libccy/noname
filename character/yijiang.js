@@ -6982,7 +6982,7 @@ character.yijiang={
 				player.gain(cards2);
 				player.$draw(cards2);
 				game.log(player,'获得了',cards2)
-				game.delay(2);
+				game.delay();
 			},
 			ai:{
 				maixie:true,

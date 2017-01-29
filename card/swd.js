@@ -2,7 +2,54 @@ card.swd={
 	card:{
 		yangpijuan:{
 			fullskin:true,
-			type:'trick'
+			type:'trick',
+			enable:true,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			content:function(){
+				'step 0'
+				var choice;
+				if(player.num('h','shan')==0||player.num('h','sha')==0||player.hp<=1){
+					choice='basic';
+				}
+				else{
+					var e2=player.get('e','2');
+					var e3=player.get('e','3');
+					if((e2&&e3)||((e2||e3)&&player.needsToDiscard()<=1)||Math.random()<0.5){
+						choice='trick';
+					}
+					else{
+						choice='equip';
+					}
+				}
+				player.chooseControl('basic','trick','equip',function(){
+					return choice;
+				}).set('prompt','选择一种卡牌类型');
+				'step 1'
+				var list=get.inpile(result.control,'trick');
+				list=list.randomGets(3);
+				for(var i=0;i<list.length;i++){
+					list[i]=[get.translation(result.control),'',list[i]];
+				}
+				var dialog=ui.create.dialog('选择一张加入你的手牌',[list,'vcard'],'hidden');
+				player.chooseButton(dialog,true).ai=function(button){
+					return ai.get.value({name:button.link[2]});
+				};
+				'step 2'
+				if(result.buttons){
+					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
+				}
+			},
+			selectTarget:-1,
+			ai:{
+				order:7,
+				value:7,
+				useful:4,
+				result:{
+					target:1
+				}
+			}
 		},
 		pantao:{
 			fullskin:true,
@@ -190,30 +237,82 @@ card.swd={
 				}
 			}
 		},
-		// yuchanqian:{
-		// 	fullskin:true,
-		// },
-		// yuchankun:{
-		// 	fullskin:true,
-		// },
-		// yuchanzhen:{
-		// 	fullskin:true,
-		// },
-		// yuchanxun:{
-		// 	fullskin:true,
-		// },
-		// yuchankan:{
-		// 	fullskin:true,
-		// },
-		// yuchanli:{
-		// 	fullskin:true,
-		// },
-		// yuchangen:{
-		// 	fullskin:true,
-		// },
-		// yuchandui:{
-		// 	fullskin:true,
-		// },
+		yuchanqian:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'sha',
+			ai:{
+				value:6,
+				useful:[5,1]
+			}
+		},
+		yuchankun:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'caoyao',
+			ai:{
+				value:6,
+				useful:[7,2]
+			}
+		},
+		yuchanzhen:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'jiu',
+			savable:function(card,player,dying){
+				return dying==player;
+			},
+			ai:{
+				value:6,
+				useful:[4,1]
+			}
+		},
+		yuchanxun:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'tao',
+			savable:true,
+			ai:{
+				value:6,
+				useful:[8,6.5]
+			}
+		},
+		yuchankan:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'xiangyuye',
+			ai:{
+				value:6,
+				useful:1
+			}
+		},
+		yuchanli:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'dujian',
+			ai:{
+				value:6,
+				useful:1
+			}
+		},
+		yuchangen:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'huanpodan',
+			ai:{
+				value:6,
+				useful:1
+			}
+		},
+		yuchandui:{
+			fullskin:true,
+			type:'jiqi',
+			autoViewAs:'xuejibingbao',
+			ai:{
+				value:6,
+				useful:4
+			}
+		},
 		mujiaren:{
 			fullskin:true,
 			enable:true,
@@ -817,6 +916,22 @@ card.swd={
 				var es=target.get('e');
 				var list=get.typeCard('hslingjian');
 				var list2=get.typeCard('jiqi');
+				var list3=[];
+				var list4=[];
+				for(var i=0;i<list2.length;i++){
+					if(list2[i].indexOf('yuchan')==0){
+						list4.push(list2[i]);
+					}
+					else{
+						list3.push(list2[i]);
+					}
+				}
+				if(Math.random()<1/3){
+					list2=list4;
+				}
+				else{
+					list2=list3;
+				}
 				var cards=[];
 				var time=0;
 				for(var i=0;i<es.length;i++){
@@ -1216,22 +1331,15 @@ card.swd={
 		},
 		xianluhui:{
 			fullskin:true,
-			type:'basic',
+			type:'trick',
 			enable:true,
 			selectTarget:-1,
-			multiline:true,
 			filterTarget:function(card,player,target){
 				return target.isDamaged();
 			},
 			content:function(){
-				targets.sort(lib.sort.seat);
-				var list=[];
-				for(var i=0;i<targets.length;i++){
-					list.push(Math.min(3,targets[i].maxHp-targets[i].hp));
-				}
-				game.asyncDraw(targets,list);
+				target.changeHujia();
 			},
-			multitarget:true,
 			ai:{
 				tag:{
 					multitarget:1,
@@ -1243,7 +1351,9 @@ card.swd={
 				},
 				result:{
 					target:function(player,target){
-						Math.min(3,target.maxHp-target.hp)
+						if(target.hp<=1) return 1.5;
+						if(target.hp==2) return 1.2;
+						return 1;
 					},
 				},
 			}
@@ -1750,6 +1860,89 @@ card.swd={
 		},
 	},
 	skill:{
+		_yuchan_swap:{
+			trigger:{player:'useCardAfter'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				var hs=player.get('h');
+				var list=['yuchanqian','yuchankun','yuchanzhen','yuchanxun','yuchangen','yuchanli','yuchankan','yuchandui'];
+				for(var i=0;i<hs.length;i++){
+					if(hs[i].name.indexOf('yuchan')==0){
+						hs[i].init([hs[i].suit,hs[i].number,list.randomGet(hs[i].name)]);
+					}
+				}
+			}
+		},
+		_yuchan_equip:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				var skills=player.get('s');
+				for(var i=0;i<skills.length;i++){
+					if(skills[i].indexOf('yuchan')==0&&skills[i].indexOf('_equip')!=-1){
+						return true;
+					}
+				}
+				return false;
+			},
+			filterCard:{type:'basic'},
+			selectCard:[1,Infinity],
+			prompt:'弃置任意张基本牌并摸等量的牌',
+			check:function(card){
+				return 6-ai.get.value(card)
+			},
+			content:function(){
+				player.draw(cards.length);
+			},
+			ai:{
+				order:1,
+				result:{
+					player:1
+				},
+			},
+		},
+		yuchanqian_equip1:{},
+		yuchanqian_equip2:{},
+		yuchanqian_equip3:{},
+		yuchanqian_equip4:{},
+		yuchanqian_equip5:{},
+		yuchankun_equip1:{},
+		yuchankun_equip2:{},
+		yuchankun_equip3:{},
+		yuchankun_equip4:{},
+		yuchankun_equip5:{},
+		yuchanzhen_equip1:{},
+		yuchanzhen_equip2:{},
+		yuchanzhen_equip3:{},
+		yuchanzhen_equip4:{},
+		yuchanzhen_equip5:{},
+		yuchanxun_equip1:{},
+		yuchanxun_equip2:{},
+		yuchanxun_equip3:{},
+		yuchanxun_equip4:{},
+		yuchanxun_equip5:{},
+		yuchankan_equip1:{},
+		yuchankan_equip2:{},
+		yuchankan_equip3:{},
+		yuchankan_equip4:{},
+		yuchankan_equip5:{},
+		yuchanli_equip1:{},
+		yuchanli_equip2:{},
+		yuchanli_equip3:{},
+		yuchanli_equip4:{},
+		yuchanli_equip5:{},
+		yuchangen_equip1:{},
+		yuchangen_equip2:{},
+		yuchangen_equip3:{},
+		yuchangen_equip4:{},
+		yuchangen_equip5:{},
+		yuchandui_equip1:{},
+		yuchandui_equip2:{},
+		yuchandui_equip3:{},
+		yuchandui_equip4:{},
+		yuchandui_equip5:{},
 		lianyaohu_skill:{
 			mark:true,
 			intro:{
@@ -3579,7 +3772,7 @@ card.swd={
 			},
 			check:function(card){
 				if(get.type(card)=='jiqi'){
-					if(_status.event.player.num('h')>_status.event.player.hp){
+					if(_status.event.player.needsToDiscard()){
 						return 0.5;
 					}
 					return 0;
@@ -4334,16 +4527,73 @@ card.swd={
 		jiguan:0.45
 	},
 	translate:{
+		_yuchan_equip:'玉蝉',
+		yuchanqian_duanzao:'玉蝉',
+		yuchanqian_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanqian_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanqian_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanqian_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanqian_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankun_duanzao:'玉蝉',
+		yuchankun_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankun_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankun_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankun_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankun_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanzhen_duanzao:'玉蝉',
+		yuchanzhen_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanzhen_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanzhen_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanzhen_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanzhen_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanxun_duanzao:'玉蝉',
+		yuchanxun_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanxun_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanxun_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanxun_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanxun_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankan_duanzao:'玉蝉',
+		yuchankan_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankan_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankan_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankan_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchankan_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanli_duanzao:'玉蝉',
+		yuchanli_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanli_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanli_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanli_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchanli_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchangen_duanzao:'玉蝉',
+		yuchangen_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchangen_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchangen_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchangen_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchangen_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchandui_duanzao:'玉蝉',
+		yuchandui_equip1_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchandui_equip2_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchandui_equip3_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchandui_equip4_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
+		yuchandui_equip5_info:'出牌阶段限一次，你可以弃置任意张基本牌并摸等量的牌',
 		yuchanqian:'乾玉蝉',
+		yuchanqian_info:'在你行动时可当作杀使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchankun:'坤玉蝉',
+		yuchankun_info:'在你行动时可当作草药使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchanzhen:'震玉蝉',
+		yuchanzhen_info:'在你行动时可当作酒使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchanxun:'巽玉蝉',
+		yuchanxun_info:'在你行动时可当作桃使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchankan:'坎玉蝉',
+		yuchankan_info:'在你行动时可当作翔羽叶使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchanli:'离玉蝉',
+		yuchanli_info:'在你行动时可当作毒箭使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchangen:'艮玉蝉',
+		yuchangen_info:'在你行动时可当作还魄丹使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchandui:'兑玉蝉',
+		yuchandui_info:'在你行动时可当作雪肌冰鲍使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yangpijuan:'羊皮卷',
-		yangpijuan_info:'将一张蟠桃洗入牌库，在你下将摸牌时，若其仍在牌库，则你会摸到它',
+		yangpijuan_info:'出牌阶段对自己使用，选择一种卡牌类别，从3张随机该类别的卡牌中选择一张加入手牌',
 		pantao:'蟠桃',
 		pantao_info:'出牌阶段对自己使用，或对濒死角色使用，目标回复两点体力并获得一点护甲',
 		shencaojie:'神草结',
@@ -4570,7 +4820,7 @@ card.swd={
 		pusafazhou_bg:'发',
 		// pusafazhou_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌',
 		xianluhui:'仙炉灰',
-		xianluhui_info:'令所有已受伤角色摸数量等同于其已损失体力值的牌（最多3张）',
+		xianluhui_info:'令所有已受伤角色获得一点护甲',
 		caoyao:'草药',
 		caoyao_info:'出牌阶段，对距离为1以内的角色使用，回复一点体力。',
 		langeguaiyi:'蓝格怪衣',
@@ -4648,7 +4898,7 @@ card.swd={
 
 		['diamond',2,'xiayuncailing'],
 //		['heart',2,'pantao'],
-		['club',2,'huanpodan'],
+		// ['club',2,'huanpodan'],
 
 		['club',3,'caoyao'],
 		['diamond',3,'chilongya','fire'],
@@ -4660,7 +4910,7 @@ card.swd={
 
 		['club',5,'caoyao'],
 		['spade',5,'xixueguizhihuan'],
-		['diamond',5,'huanpodan'],
+		// ['diamond',5,'huanpodan'],
 
 		['club',6,'shentoumianju'],
 		['spade',6,'yufulu'],
@@ -4672,7 +4922,7 @@ card.swd={
 		['spade',8,'zhufangshenshi'],
 		['club',8,'xiangyuye','poison'],
 
-		// ['spade',9,'ximohu','brown'],
+		['spade',9,'yangpijuan'],
 		['club',9,'guiyoujie'],
 		['diamond',9,'xiangyuye','poison'],
 
@@ -4685,6 +4935,7 @@ card.swd={
 
 		//['spade',10,'qipoguyu'],
 		//['diamond',10,'xiangyuye','poison'],
+		['club',7,'yangpijuan'],
 
 		['spade',11,'xiangyuye','poison'],
 
@@ -4766,5 +5017,14 @@ card.swd={
 		['club',4,'shencaojie'],
 		['diamond',4,'shencaojie'],
 		['spade',4,'shencaojie'],
+
+		['spade',1,'yuchanqian'],
+		['club',2,'yuchankun'],
+		['diamond',3,'yuchanzhen'],
+		['heart',4,'yuchanxun'],
+		['spade',5,'yuchankan'],
+		['club',6,'yuchanli'],
+		['diamond',7,'yuchangen'],
+		['heart',8,'yuchandui'],
 	],
 }

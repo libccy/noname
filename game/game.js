@@ -10610,6 +10610,12 @@
 					else if(next.card==undefined){
 						if(next.cards){
 							next.card=next.cards[0];
+                            if(!next.skill){
+                                var info=get.info(next.card);
+                                if(info.autoViewAs){
+                                    next.card={name:info.autoViewAs,suit:next.card.suit,number:next.card.number};
+                                }
+                            }
 						}
 					}
 					if(!next.targets){
@@ -10759,6 +10765,12 @@
 					else if(next.card==undefined){
 						if(next.cards){
 							next.card=next.cards[0];
+                            if(!next.skill){
+                                var info=get.info(next.card);
+                                if(info.autoViewAs){
+                                    next.card={name:info.autoViewAs,suit:next.card.suit,number:next.card.number};
+                                }
+                            }
 						}
 					}
                     next.setContent('respond');
@@ -12249,12 +12261,14 @@
                 hasSha:function(respond){
                     if(this.num('h','sha')) return true;
     				if(this.num('h','hufu')) return true;
+    				if(this.num('h','yuchanqian')) return true;
     				if(this.hasSkillTag('respondSha',true,respond?'respond':'use')) return true;
     				return false;
                 },
                 hasShan:function(){
     				if(this.num('h','shan')) return true;
     				if(this.num('h','hufu')) return true;
+    				if(this.num('h','yuchankun')) return true;
     				if(this.hasSkillTag('respondShan',true)) return true;
     				return false;
     			},
@@ -14588,6 +14602,10 @@
                 }
             },
 			cardEnabled:function(card,player,event){
+                var info=get.info(card);
+                if(info.autoViewAs){
+                    card={name:info.autoViewAs,suit:card.suit,number:card.number};
+                }
 				if(player==undefined) player=_status.event.player;
 				var filter=get.info(card).enable;
 				if(!filter) return;
@@ -14604,6 +14622,10 @@
 				return true;
 			},
 			cardUsable:function(card,player,event){
+                var info=get.info(card);
+                if(info.autoViewAs){
+                    card={name:info.autoViewAs,suit:card.suit,number:card.number};
+                }
 				if(player!=_status.event.player) return true;
 				event=event||_status.event;
 				if(event.getParent().name!='phaseUse') return true;
@@ -14696,16 +14718,10 @@
 				return true;
 			},
 			autoRespondSha:function(){
-				if(this.player.num('h','sha')) return false;
-				if(this.player.num('h','hufu')) return false;
-				if(this.player.hasSkillTag('respondSha',true,'respond')) return false;
-				return true;
+                return !this.player.hasSha(true);
 			},
 			autoRespondShan:function(){
-				if(this.player.num('h','shan')) return false;
-				if(this.player.num('h','hufu')) return false;
-				if(this.player.hasSkillTag('respondShan',true)) return false;
-				return true;
+                return !this.player.hasShan();
 			},
 		},
 		sort:{
@@ -32683,7 +32699,14 @@
             if(_status.event._get_card){
                 return _status.event._get_card;
             }
-			return ui.selected.cards[0];
+            var card=ui.selected.cards[0];
+            if(card){
+                var info=get.info(card);
+                if(info.autoViewAs){
+                    card={name:info.autoViewAs,suit:card.suit,number:card.number};
+                }
+            }
+			return card;
 		},
 		player:function(){
 			return _status.event.player;

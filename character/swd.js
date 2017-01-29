@@ -498,7 +498,11 @@ character.swd={
 				}).logSkill='hjifeng';
 				'step 1'
 				if(result.bool){
-					var card=get.cardPile(function(card){return get.type(card)=='jiqi'});
+					var card=get.cardPile(function(card){
+						return get.type(card)=='jiqi'&&card.name.indexOf('yuchan')!=0;
+					})||get.cardPile(function(card){
+						return get.type(card)=='jiqi';
+					});
 					if(card){
 						player.gain(card,'draw');
 					}
@@ -8693,7 +8697,7 @@ character.swd={
 		mufeng:'沐风',
 		mufeng_info:'在一名角色的回合结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
 		hjifeng:'祭风',
-		hjifeng_info:'回合结束阶段，若时手牌中没有祭器牌，你可以弃置一张装备区内的牌，并从牌堆中获得一张随机祭器',
+		hjifeng_info:'回合结束阶段，若你手牌中没有祭器牌，你可以弃置一张装备区内的牌，并从牌堆中获得一张随机祭器',
 		mufeng_old_info:'锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0',
 		lexue:'乐学',
 		lexue_info:'回合内，你随机获得制衡、集智、缔盟、驱虎中的一个技能；回合外，你随机获得遗计、急救、鬼道、反馈中的一个技能',
