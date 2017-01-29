@@ -945,7 +945,7 @@
 						unfrequent:true,
 					},
                     show_phaseuse_prompt:{
-                        name:'出牌阶段显示提示',
+                        name:'出牌阶段提示',
                         init:true,
                         unfrequent:true,
                     },
@@ -2387,6 +2387,17 @@
                     },
                     ban_identity2:{
                         name:'屏蔽身份2',
+						init:'off',
+						item:{
+                            off:'关闭',
+							zhu:'主公',
+							zhong:'忠臣',
+							nei:'内奸',
+							fan:'反贼',
+						},
+                    },
+                    ban_identity3:{
+                        name:'屏蔽身份3',
 						init:'off',
 						item:{
                             off:'关闭',
@@ -13668,7 +13679,9 @@
 						this.node.info.innerHTML=get.translation(card[0])+'<span> </span>'+card[1];
 					}
 					if(info.addinfo){
-						this.node.addinfo=ui.create.div('.range',this);
+						if(!this.node.addinfo){
+                            this.node.addinfo=ui.create.div('.range',this);
+                        }
 						this.node.addinfo.innerHTML=info.addinfo;
 					}
 					if(card[0]=='heart'||card[0]=='diamond'){

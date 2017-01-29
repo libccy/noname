@@ -240,6 +240,7 @@ card.swd={
 		yuchanqian:{
 			fullskin:true,
 			type:'jiqi',
+			addinfo:'杀',
 			autoViewAs:'sha',
 			ai:{
 				value:6,
@@ -249,6 +250,7 @@ card.swd={
 		yuchankun:{
 			fullskin:true,
 			type:'jiqi',
+			addinfo:'药',
 			autoViewAs:'caoyao',
 			ai:{
 				value:6,
@@ -259,6 +261,7 @@ card.swd={
 			fullskin:true,
 			type:'jiqi',
 			autoViewAs:'jiu',
+			addinfo:'酒',
 			savable:function(card,player,dying){
 				return dying==player;
 			},
@@ -271,6 +274,7 @@ card.swd={
 			fullskin:true,
 			type:'jiqi',
 			autoViewAs:'tao',
+			addinfo:'桃',
 			savable:true,
 			ai:{
 				value:6,
@@ -281,6 +285,7 @@ card.swd={
 			fullskin:true,
 			type:'jiqi',
 			autoViewAs:'xiangyuye',
+			addinfo:'叶',
 			ai:{
 				value:6,
 				useful:1
@@ -290,6 +295,7 @@ card.swd={
 			fullskin:true,
 			type:'jiqi',
 			autoViewAs:'dujian',
+			addinfo:'箭',
 			ai:{
 				value:6,
 				useful:1
@@ -298,6 +304,7 @@ card.swd={
 		yuchangen:{
 			fullskin:true,
 			type:'jiqi',
+			addinfo:'丹',
 			autoViewAs:'huanpodan',
 			ai:{
 				value:6,
@@ -307,6 +314,7 @@ card.swd={
 		yuchandui:{
 			fullskin:true,
 			type:'jiqi',
+			addinfo:'雪',
 			autoViewAs:'xuejibingbao',
 			ai:{
 				value:6,

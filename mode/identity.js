@@ -756,6 +756,9 @@ mode.identity={
 					ban_identity.push(get.config('ban_identity')||'off');
 					if(ban_identity[0]!='off'){
 						ban_identity.push(get.config('ban_identity2')||'off');
+						if(ban_identity[1]!='off'){
+							ban_identity.push(get.config('ban_identity3')||'off');
+						}
 					}
 					ban_identity.remove('off');
 					if(ban_identity.length){
