@@ -6191,7 +6191,7 @@
 					"step 0";
 					var next=player.chooseToUse();
                     if(!lib.config.show_phaseuse_prompt){
-                        next.set('prompt',' ');
+                        next.set('prompt',false);
                     }
 					"step 1"
 					if(result.bool&&!event.skipped){
@@ -8266,7 +8266,7 @@
 					if(cards){
                         var owner=event.source||get.owner(cards[0]);
 						if(owner){
-							owner.lose(cards,ui.special);
+							owner.lose(cards,ui.special).set('type','gain');
 						}
 					}
 					else{
@@ -8450,8 +8450,11 @@
 						event.finish();
 					}
 					"step 2"
-					player.popup(cards[num].name);
                     var info=get.info(cards[num]);
+                    if(info.loseDelay!=false){
+                        player.popup(cards[num].name);
+    					game.delayx();
+                    }
                     if(Array.isArray(info.onLose)){
                         for(var i=0;i<info.onLose.length;i++){
                             var next=game.createEvent('lose_'+cards[num].name);
@@ -8466,7 +8469,6 @@
     					next.player=player;
     					next.card=cards[num];
                     }
-					game.delayx();
 					event.num++;
 					event.goto(1);
 				},
@@ -8790,7 +8792,7 @@
 				equip:function(){
 					"step 0"
                     var owner=get.owner(card)
-					if(owner) owner.lose(card,ui.special);
+					if(owner) owner.lose(card,ui.special).set('type','equip');
 					if(card.clone){
                         game.broadcast(function(card,player){
                             if(card.clone){
@@ -8841,7 +8843,7 @@
     						next.player=player;
     						next.card=card;
                         }
-						game.delayx();
+						if(info.equipDelay!='false') game.delayx();
 					}
 					delete player.equiping;
                     "step 3"
@@ -9560,10 +9562,14 @@
 				updateMarks:function(){
 					for(var i in this.marks){
 						if(i=='ghujia'||(!this.marks[i].querySelector('.image')&&lib.skill[i]&&
-							lib.skill[i].intro&&!lib.skill[i].intro.nocount&&this.storage[i])){
+							lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
+                            (this.storage[i]||lib.skill[i].intro.markcount))){
 							this.marks[i].classList.add('overflowmark')
 							var num=0;
-                            if(typeof this.storage[i+'_markcount']=='number'){
+                            if(typeof lib.skill[i].intro.markcount=='function'){
+                                num=lib.skill[i].intro.markcount(this.storage[i],this);
+                            }
+                            else if(typeof this.storage[i+'_markcount']=='number'){
                                 num=this.storage[i+'_markcount'];
                             }
 							else if(i=='ghujia'){
@@ -14234,6 +14240,14 @@
 				addSmall:function(item,noclick){
 					return this.add(item,noclick,true);
 				},
+                addAuto:function(content){
+                    if(content&&content.length>4&&!this._hovercustomed){
+                        this.addSmall(content);
+                    }
+                    else{
+                        this.add(content);
+                    }
+                },
 				open:function(){
 					if(this.noopen) return;
 					for(var i=0;i<ui.dialogs.length;i++){
@@ -33172,12 +33186,7 @@
 						content=[content];
 					}
 					if(dialog&&get.itemtype(content)=='cards'){
-						if(content.length>6&&!dialog._hovercustomed){
-							dialog.addSmall(content);
-						}
-						else{
-							dialog.add(content);
-						}
+						dialog.addAuto(content);
 					}
 					else{
 						if(content&&content.length){
@@ -33191,12 +33200,7 @@
 						content=[content];
 					}
 					if(dialog&&get.itemtype(content)=='players'){
-						if(content.length>6&&!dialog._hovercustomed){
-							dialog.addSmall(content);
-						}
-						else{
-							dialog.add(content);
-						}
+                        dialog.addAuto(content);
 						return false;
 					}
 					else{
@@ -33501,34 +33505,7 @@
 				else{
 					uiintro.add(get.translation(node));
 				}
-				if(node.name.indexOf('muniu')==0&&get.position(node)=='e'){
-					var num=0;
-					if(node.cards){
-						num=node.cards.length;
-					}
-					if(get.owner(node)==game.me&&num){
-						uiintro.add(node.cards,true,num>4);
-					}
-					else{
-						uiintro.add('<div class="text center">'+'共有'+get.cnNumber(num)+'张牌'+'</div>');
-					}
-                    if(node.name!='muniu'){
-                        uiintro.add('<div class="text">'+lib.translate[node.name+'_info'].slice(81)+'</div>');
-                    }
-				}
-				else if(node.name=='lianyaohu'&&get.position(node)=='e'){
-					var num=0;
-					if(node.storage.shouna){
-						num=node.storage.shouna.length;
-					}
-					if(num){
-						uiintro.add(node.storage.shouna,true,num>4);
-					}
-					else{
-						uiintro.add('<div class="text center">炼妖壶内没有牌</div>');
-					}
-				}
-				else if(lib.translate[name+'_info']){
+				if(lib.translate[name+'_info']){
 					if(get.subtype(node)=='equip1'){
 						var added=false;
 						if(lib.card[node.name]&&lib.card[node.name].distance){

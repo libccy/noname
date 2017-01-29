@@ -629,7 +629,7 @@ character.extra={
 				mark:function(dialog,content,player){
 					if(content&&content.length){
 						if(player==game.me||player.isUnderControl()){
-							dialog.add(content);
+							dialog.addAuto(content);
 						}
 						else{
 							return '共有'+get.cnNumber(content.length)+'张星';

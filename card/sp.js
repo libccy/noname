@@ -19,7 +19,15 @@ card.sp={
 			type:'equip',
 			subtype:'equip5',
 			nomod:true,
-			skills:['muniu_skill','muniu_skill2','muniu_skill7'],
+			onEquip:function(){
+				player.markSkill('muniu_skill6');
+			},
+			onLose:function(){
+				player.unmarkSkill('muniu_skill6');
+			},
+			equipDelay:false,
+			loseDelay:false,
+			skills:['muniu_skill','muniu_skill2','muniu_skill6','muniu_skill7'],
 			ai:{
 				basic:{
 					equipValue:function(card){
@@ -306,10 +314,12 @@ card.sp={
 				if(result.bool){
 					var card=player.get('e','5');
 					result.targets[0].equip(card);
-					player.addTempSkill('muniu_skill6','equipAfter');
 					player.$give(card,result.targets[0]);
 					player.line(result.targets,'green');
 					game.delay();
+				}
+				else{
+					player.updateMarks();
 				}
 			},
 			ai:{
@@ -384,6 +394,7 @@ card.sp={
 					var muniu=player.get('e','5');
 					muniu.cards.remove(result.links[0]);
 					lib.skill.muniu_skill.sync(muniu);
+					player.updateMarks();
 				}
 			},
 			ai:{
@@ -447,6 +458,7 @@ card.sp={
 								muniu.cards.remove(result.card);
 								lib.skill.muniu_skill.sync(muniu);
 							}
+							player.updateMarks();
 						}
 					}
 				},
@@ -466,7 +478,36 @@ card.sp={
 				value:-1
 			}
 		},
-		muniu_skill6:{},
+		muniu_skill6:{
+			mark:true,
+			intro:{
+				content:function(storage,player){
+					var muniu=player.get('e','5');
+					if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
+					if(player.isUnderControl(true)){
+						return get.translation(muniu.cards);
+					}
+					else{
+						return '共有'+get.cnNumber(muniu.cards.length)+'张牌';
+					}
+				},
+				mark:function(dialog,storage,player){
+					var muniu=player.get('e','5');
+					if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
+					if(player.isUnderControl(true)){
+						dialog.addAuto(muniu.cards);
+					}
+					else{
+						return '共有'+get.cnNumber(muniu.cards.length)+'张牌';
+					}
+				},
+				markcount:function(storage,player){
+					var muniu=player.get('e','5');
+					if(muniu&&muniu.cards) return muniu.cards.length;
+					return 0;
+				}
+			}
+		},
 		muniu_skill7:{
 			filter:function(){return false},
 			hiddenCard:function(player,name){
@@ -484,17 +525,17 @@ card.sp={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
+				if(event.type=='equip') return false;
 				for(var i=0;i<event.cards.length;i++){
-					if(event.cards[i].name=='muniu'&&event.cards[i].original=='e'&&
-						player.hasSkill('muniu_skill6')==false&&
-						get.position(event.cards[i])==='d') return true;
+					if(event.cards[i].name.indexOf('muniu')==0&&event.cards[i].original=='e'){
+						return true;
+					}
 				}
 				return false;
 			},
 			content:function(){
 				for(var i=0;i<trigger.cards.length;i++){
-					if(trigger.cards[i].name=='muniu'&&trigger.cards[i].original=='e'&&
-						player.hasSkill('muniu_skill6')==false){
+					if(trigger.cards[i].name.indexOf('muniu')==0&&trigger.cards[i].original=='e'){
 						var card=trigger.cards[i];
 						var card2;
 						if(card.cards&&card.cards.length){
@@ -570,7 +611,8 @@ card.sp={
 		muniu_skill2:'流马',
 		muniu_skill3:'流马',
 		muniu_skill4:'流马',
-		muniu_skill6:'流马',
+		muniu_skill6:'木牛流马',
+		muniu_skill6_bg:'辎',
 		muniu_skill4_backup:'流马',
 		muniu_info:'出牌阶段限一次，你可以将一张手牌扣置于你装备区里的【木牛流马】下，若如此做，你可以将此装备移动到一名其他角色的装备区里；你可以将此装备牌下的牌如手牌般使用或打出。',
 		muniu_skill_info:'出牌阶段限一次，你可以将一张手牌扣置于你装备区里的【木牛流马】下，若如此做，你可以将此装备移动到一名其他角色的装备区里；你可以将此装备牌下的牌如手牌般使用或打出。',

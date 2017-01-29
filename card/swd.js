@@ -494,10 +494,16 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			nomod:true,
+			onEquip:function(){
+				player.markSkill('lianyaohu_skill');
+			},
+			onLose:function(){
+				player.unmarkSkill('lianyaohu_skill');
+			},
 			ai:{
 				equipValue:6
 			},
-			skills:['lianhua','shouna']
+			skills:['lianhua','shouna','lianyaohu_skill']
 		},
 		haotianta:{
 			fullskin:true,
@@ -1744,6 +1750,32 @@ card.swd={
 		},
 	},
 	skill:{
+		lianyaohu_skill:{
+			mark:true,
+			intro:{
+				content:function(storage,player){
+					var card=player.get('e','5');
+					if(card&&card.storage.shouna&&card.storage.shouna.length){
+						return '共有'+get.cnNumber(card.storage.shouna.length)+'张牌';
+					}
+					return '共有〇张牌';
+				},
+				mark:function(dialog,storage,player){
+					var card=player.get('e','5');
+					if(card&&card.storage.shouna&&card.storage.shouna.length){
+						dialog.addAuto(card.storage.shouna);
+					}
+					else{
+						return '共有〇张牌';
+					}
+				},
+				markcount:function(storage,player){
+					var card=player.get('e','5');
+					if(card&&card.storage.shouna) return card.storage.shouna.length;
+					return 0;
+				}
+			}
+		},
 		_shencaojie:{
 			trigger:{source:'damageBegin'},
 			direct:true,
@@ -1864,7 +1896,7 @@ card.swd={
 			content:function(){
 				'step 0'
 				player.addSkill('shuchui2');
-				player.storage.shuchui2=0;
+				player.storage.shuchui2=false;
 				event.num=0;
 				'step 1'
 				var card=player.get('h','sha')[0];
@@ -1873,7 +1905,7 @@ card.swd={
 				}
 				else{
 					if(player.storage.shuchui2){
-						player.draw(player.storage.shuchui2);
+						player.draw();
 					}
 					player.removeSkill('shuchui2');
 					event.finish();
@@ -1884,7 +1916,7 @@ card.swd={
 				}
 				else{
 					if(player.storage.shuchui2){
-						player.draw(player.storage.shuchui2);
+						player.draw();
 					}
 					player.removeSkill('shuchui2');
 				}
@@ -1906,10 +1938,10 @@ card.swd={
 				delete player.storage.shuchui2;
 			},
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha';
+				return event.card&&event.card.name=='sha'&&!player.storage.shuchui2;
 			},
 			content:function(){
-				player.storage.shuchui2++;
+				player.storage.shuchui2=true;
 			}
 		},
 		xuejibingbao:{
@@ -2356,6 +2388,7 @@ card.swd={
 				return false;
 			},
 			usable:1,
+			delay:false,
 			content:function(){
 				"step 0"
 				event.hu=player.get('e','5');
@@ -2391,6 +2424,41 @@ card.swd={
 			}
 		},
 		shouna:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			usable:1,
+			filterCard:true,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('h')>0;
+			},
+			content:function(){
+				var card=target.get('h').randomGet();
+				var hu=player.get('e','5');
+				if(card&&hu){
+					if(!hu.storage.shouna){
+						hu.storage.shouna=[];
+					}
+					target.$give(card,player);
+					target.lose(card,ui.special);
+					hu.storage.shouna.push(card);
+					player.updateMarks();
+				}
+			},
+			ai:{
+				order:5,
+				result:{
+					target:function(player,target){
+						return -1/Math.sqrt(1+target.num('h'));
+					}
+				}
+			}
+		},
+		shouna_old:{
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
 				if(player.hasSkill('shouna2')) return false;
@@ -4286,7 +4354,7 @@ card.swd={
 		fengyinzhidan:'封印之蛋',
 		fengyinzhidan_info:'随机使用三张非延时锦囊牌（随机指定目标）',
 		shuchui:'鼠槌',
-		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，杀每造成一次伤害你摸一张牌',
+		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，若杀造成了伤害，你摸一张牌',
 		zhiluxiaohu:'指路小狐',
 		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机敌方角色使用一张杀，然后摸一张牌',
 		xuejibingbao:'雪肌冰鲍',
@@ -4539,6 +4607,8 @@ card.swd={
 		xuanyuanjian2:'轩辕剑',
 		pangufu:'盘古斧',
 		lianyaohu:'炼妖壶',
+		lianyaohu_skill:'炼妖壶',
+		lianyaohu_skill_bg:'壶',
 		haotianta:'昊天塔',
 		fuxiqin:'伏羲琴',
 		shennongding:'神农鼎',
@@ -4557,7 +4627,7 @@ card.swd={
 		lianhua:'炼化',
 		lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		shouna:'收纳',
-		shouna_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你可以选择其中的一张放入炼妖壶，每名角色的回合限一次',
+		shouna_info:'出牌阶段限一次，你可以弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶',
 		donghuangzhong_info:'回合结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机单体延时锦囊置入其判定区',
 		xuanyuanjian_info:'锁定技，每当你即将造成一次伤害，你令此伤害加一并变为雷属性，此伤害结算后，你流失一点体力并摸一张牌。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
@@ -4568,7 +4638,7 @@ card.swd={
 		nvwashi_info:'当一名角色濒死时，若你的体力值大于1，你可以失去一点体力并令其回复一点体力',
 		kongxin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你可以指定另一名角色视为对方对该角色使用一张杀，否则对方可弃置你一张牌',
 		fuxiqin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你可以指定另一名角色视为对方对该角色使用一张杀，否则对方可弃置你一张牌',
-		lianyaohu_info:'当一名其他角色于回合外弃置的卡牌进入弃牌堆后，你将其放入炼妖壶（每回合只发动一次）；出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
+		lianyaohu_info:'出牌阶段各限一次，你可以选择一项：1.弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶；2.弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 	},
 	list:[
 		['spade',1,'baihupifeng'],

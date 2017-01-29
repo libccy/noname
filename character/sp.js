@@ -1233,7 +1233,7 @@ character.sp={
 				content:'cards',
 				mark:function(dialog,content,player){
 					if(content&&content.length){
-						dialog.add(content);
+						dialog.addAuto(content);
 						if(player.isUnderControl(true)){
 							var str='';
 							for(var i=0;i<player.storage.shefu2.length;i++){
