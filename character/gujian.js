@@ -12,11 +12,11 @@ character.gujian={
 		gjqt_xiayize:['male','qun',3,['xuanning','liuguang','yangming']],
 		gjqt_aruan:['female','wu',3,['zhaolu','jiehuo','yuling']],
 
-		gjqt_xunfang:['female','shu',3,['qingwu','xfanghua']],
+		gjqt_xunfang:['female','shu',3,['manwu','xfanghua']],
 		gjqt_ouyangshaogong:['male','shu',3,['yunyin','shishui','duhun']],
 	},
 	skill:{
-		qingwu:{
+		manwu:{
 			trigger:{global:'phaseEnd'},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>0;
@@ -1588,10 +1588,10 @@ character.gujian={
 		gjqt_xiayize:'夏夷则',
 		gjqt_aruan:'阿阮',
 
-		qingwu:'轻舞',
-		qingwu_info:'在一名角色的回合结束阶段，若其手牌数为全场最少或之一，你可以令其摸一张牌',
+		manwu:'曼舞',
+		manwu_info:'在一名角色的回合结束阶段，若其手牌数为全场最少或之一，你可以令其摸一张牌',
 		xfanghua:'芳华',
-		xfanghua_info:'每当你成为红色牌的目标后，你可以回复一点体力',
+		xfanghua_info:'在你成为红色牌的目标后，你可以回复一点体力',
 		yunyin:'云音',
 		yunyin_info:'回合结束阶段，你可以弃置一张与本回合使用过的卡牌花色均不相同的手牌，视为使用一张基本牌或非延时锦囊牌',
 		shishui:'逝水',

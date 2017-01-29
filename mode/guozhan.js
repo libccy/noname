@@ -1083,7 +1083,14 @@ mode.guozhan={
 					var effect=0,c,shown;
 					var info=get.info(card);
 					if(info.ai&&info.ai.expose){
-						this.ai.shown+=info.ai.expose;
+						if(_status.event.name=='_wuxie'){
+							if(_status.event.source&&_status.event.source.ai.shown){
+								this.ai.shown+=0.2;
+							}
+						}
+						else{
+							this.ai.shown+=info.ai.expose;
+						}
 					}
 					if(targets.length>0){
 						for(var i=0;i<targets.length;i++){
