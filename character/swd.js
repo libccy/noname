@@ -2479,7 +2479,35 @@ character.swd={
 				},
 			}
 		},
-		xuanyuan:{},
+		xuanyuan:{
+			trigger:{global:'discardAfter'},
+			filter:function(event,player){
+				if(event.player==player) return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].name=='xuanyuanjian'&&get.position(event.cards[i])=='d'){
+						return true;
+					}
+				}
+				return false;
+			},
+			frequent:true,
+			content:function(){
+				"step 0"
+				if(trigger.delay==false) game.delay();
+				"step 1"
+				var cards=[];
+				for(var i=0;i<trigger.cards.length;i++){
+					if(event.cards[i].name=='xuanyuanjian'&&get.position(trigger.cards[i])=='d'){
+						cards.push(trigger.cards[i]);
+					}
+				}
+				if(cards.length){
+					player.gain(cards);
+					player.$gain2(cards);
+					game.log(player,'发动','【轩辕】','，获得了',cards);
+				}
+			},
+		},
 		jilve:{
 			enable:'phaseUse',
 			group:'jilve6',

@@ -6008,7 +6008,7 @@ character.yijiang={
 				if(cards.length){
 					player.gain(cards);
 					player.$gain2(cards);
-					game.log(player,'发动落英，获得了',cards);
+					game.log(player,'发动','【落英】','，获得了',cards);
 				}
 			},
 		},

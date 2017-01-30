@@ -581,6 +581,9 @@ card.swd={
 				if(!player.hasSkill('xuanyuan')&&player.hp<=2){
 					player.discard(card);
 				}
+				else{
+					player.changeHujia();
+				}
 			},
 			ai:{
 				equipValue:9
@@ -2819,6 +2822,7 @@ card.swd={
 			},
 			content:function(){
 				trigger.num++;
+				trigger._xuanyuanjian=true;
 				if(!trigger.nature) trigger.nature='thunder';
 			}
 		},
@@ -2826,12 +2830,11 @@ card.swd={
 			trigger:{source:'damageAfter'},
 			forced:true,
 			popup:false,
-			filter:function(event){
-				return event.notLink();
+			filter:function(event,player){
+				return event._xuanyuanjian&&!player.hasSkill('xuanyuan');
 			},
 			content:function(){
 				player.loseHp();
-				player.draw();
 			}
 		},
 		pangufu:{
@@ -4887,7 +4890,7 @@ card.swd={
 		shouna:'收纳',
 		shouna_info:'出牌阶段限一次，你可以弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶',
 		donghuangzhong_info:'回合结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机单体延时锦囊置入其判定区',
-		xuanyuanjian_info:'锁定技，每当你即将造成一次伤害，你令此伤害加一并变为雷属性，此伤害结算后，你流失一点体力并摸一张牌。任何时候，若你体力值不超过2，则立即失去轩辕剑',
+		xuanyuanjian_info:'装备时获得一点护甲；每当你即将造成一次伤害，你令此伤害加一并变为雷属性，并在伤害结算后流失一点体力。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
 		haotianta_info:'锁定技，任意一名角色进行判定前，你观看牌堆顶的3张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能。每回合最多发动一次',
 		shennongding_info:'出牌阶段，你可以弃置两张手牌，然后回复一点体力。每阶段限一次',

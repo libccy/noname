@@ -1839,6 +1839,10 @@ character.ow={
 			init:function(player){
 				player.storage.zhanlong=false;
 			},
+            check:function(event,player){
+                if(player.num('j','lebu')) return false;
+                return true;
+            },
 			filter:function(event,player){
 				if(player.storage.zhanlong) return false;
                 if(player.num('he')==0) return false;
