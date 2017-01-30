@@ -5,7 +5,7 @@ window.noname_update={
         'bug修复',
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
         // 'game/package.js',
         // 'game/asset.js',
         // 'card/hearth.js',

@@ -6353,7 +6353,7 @@
                                         }
 									}
 									else{
-										get.card().aiexclude();
+										get.card(true).aiexclude();
 										game.uncheck();
 									}
 									event.redo();
@@ -7153,7 +7153,7 @@
 								_status.event.aiexclude.length=0;
 							}
 							else{
-								get.card().aiexclude();
+								get.card(true).aiexclude();
 								game.uncheck();
 								event.redo();
 								game.resume();
@@ -32704,7 +32704,7 @@
 			if(typeof select=='function') return get.select(select());
 			return [1,1]
 		},
-		card:function(){
+		card:function(original){
 			if(_status.event.skill){
 				var card=get.info(_status.event.skill).viewAs;
 				if(card) return card;
@@ -32713,6 +32713,7 @@
                 return _status.event._get_card;
             }
             var card=ui.selected.cards[0];
+            if(original) return card;
             if(card){
                 var info=get.info(card);
                 if(info.autoViewAs){

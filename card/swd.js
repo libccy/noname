@@ -7,23 +7,24 @@ card.swd={
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
+			modTarget:true,
 			content:function(){
 				'step 0'
 				var choice;
-				if(player.num('h','shan')==0||player.num('h','sha')==0||player.hp<=1){
+				if(target.num('h','shan')==0||target.num('h','sha')==0||target.hp<=1){
 					choice='basic';
 				}
 				else{
-					var e2=player.get('e','2');
-					var e3=player.get('e','3');
-					if((e2&&e3)||((e2||e3)&&player.needsToDiscard()<=1)||Math.random()<0.5){
+					var e2=target.get('e','2');
+					var e3=target.get('e','3');
+					if((e2&&e3)||((e2||e3)&&target.needsToDiscard()<=1)||Math.random()<0.5){
 						choice='trick';
 					}
 					else{
 						choice='equip';
 					}
 				}
-				player.chooseControl('basic','trick','equip',function(){
+				target.chooseControl('basic','trick','equip',function(){
 					return choice;
 				}).set('prompt','选择一种卡牌类型');
 				'step 1'
@@ -33,12 +34,12 @@ card.swd={
 					list[i]=[get.translation(result.control),'',list[i]];
 				}
 				var dialog=ui.create.dialog('选择一张加入你的手牌',[list,'vcard'],'hidden');
-				player.chooseButton(dialog,true).ai=function(button){
+				target.chooseButton(dialog,true).ai=function(button){
 					return ai.get.value({name:button.link[2]});
 				};
 				'step 2'
 				if(result.buttons){
-					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
+					target.gain(game.createCard(result.buttons[0].link[2]),'draw');
 				}
 			},
 			selectTarget:-1,
