@@ -1007,6 +1007,11 @@
                         init:true,
                         unfrequent:true
                     },
+                    show_ban_menu:{
+                        name:'显示禁将菜单',
+                        init:true,
+                        unfrequent:true
+                    },
 					hide_card_image:{
 						name:'隐藏卡牌背景',
 						init:false,
@@ -3788,13 +3793,11 @@
 				lib.config.all.plays=[];
 				lib.config.all.mode=[];
 
-                if(lib.config.debug){
-                    lib.init.js('game','asset',function(){
-                        lib.skin=window.noname_skin_list;
-                        delete window.noname_skin_list;
-                        delete window.noname_asset_list;
-                    });
-                }
+                lib.init.js(lib.assetURL+'game','asset',function(){
+                    lib.skin=window.noname_skin_list;
+                    delete window.noname_skin_list;
+                    delete window.noname_asset_list;
+                });
 
                 if(window.isNonameServer){
                     lib.config.mode='connect';
@@ -5456,8 +5459,10 @@
 		translate:{
 			'default':"默认",
 			zhenfa:'阵法',
-			mode_derivation_card_config:'衍生',
+            mode_derivation_card_config:'衍生',
+			mode_ban_card_config:'禁卡',
             mode_favourite_character_config:'收藏',
+            mode_ban_character_config:'禁将',
 			heart:"♥︎",
 			diamond:"♦︎",
 			spade:"♠︎",
@@ -22471,6 +22476,7 @@
 						}
 						node.link=page;
 						node.mode=mode;
+                        page.node=node;
 						var list=[];
 						for(var i in info){
 							list.push(i);
@@ -22542,7 +22548,7 @@
                         updateBanned._buttons=updateBanned._buttons.concat(buttons);
                         for(var i=0;i<buttons.length;i++){
                             buttons[i].classList.add('noclick');
-                            buttons[i].listen(banCharacter);
+                            buttons[i].listen(ui.click.intro);
                             buttons[i].node.hp.style.transition='all 0s';
                             buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
                         }
@@ -22572,10 +22578,19 @@
                                 lib.characterPack.mode_favourite[favname]=lib.character[favname];
                             }
                         }
-                        if(!get.is.empty(lib.characterPack.mode_favourite)){
-                            ui.favouriteCharacter=createModeConfig('mode_favourite',start.firstChild).link;
+                        ui.favouriteCharacter=createModeConfig('mode_favourite',start.firstChild).link;
+                        if(get.is.empty(lib.characterPack.mode_favourite)){
+                            ui.favouriteCharacter.node.style.display='none';
                         }
                         delete lib.characterPack.mode_favourite;
+                    }
+                    if(lib.config.show_ban_menu){
+                        for(var i=0;i<lib.config.all.mode.length;i++){
+                            var modecfg=lib.config.mode_config[lib.config.all.mode[i]];
+                            if(modecfg&&modecfg.banned&&modecfg.banned.length){
+
+                            }
+                        }
                     }
                     var characterlist=connectMenu?lib.connectCharacterPack:lib.config.all.characters;
 					for(var i=0;i<characterlist.length;i++){
@@ -22592,6 +22607,9 @@
 					var active=start.firstChild.querySelector('.active');
                     if(!active){
                         active=start.firstChild.firstChild;
+                        if(active.style.display=='none'){
+                            active=active.nextSibling;
+                        }
                         active.classList.add('active');
                     }
 					rightPane.appendChild(active.link);
@@ -28334,7 +28352,7 @@
                                 }
                             }
                             if(i==ui.favouriteCharacter.childElementCount){
-                                ui.create.button(this.link,'character',ui.favouriteCharacter).classList.add('noclick');
+                                ui.create.button(this.link,'character',ui.favouriteCharacter).listen(ui.click.intro).classList.add('noclick');
                             }
                         }
                         else{
@@ -28344,6 +28362,19 @@
                                     break;
                                 }
                             }
+                        }
+                        var shownode=false;
+                        for(var i=0;i<lib.config.favouriteCharacter.length;i++){
+                            var favname=lib.config.favouriteCharacter[i];
+                            if(lib.character[favname]){
+                                shownode=true;break;
+                            }
+                        }
+                        if(shownode){
+                            ui.favouriteCharacter.node.style.display='';
+                        }
+                        else{
+                            ui.favouriteCharacter.node.style.display='none';
                         }
                     }
                     game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
@@ -32759,7 +32790,7 @@
                 else{
                     uiintro.add(ui.create.div('.placeholder.slim'));
                 }
-                if(lib.config.change_skin||lib.skin){
+                if(lib.config.change_skin||(lib.skin&&node.parentNode.classList.contains('menu-buttons'))){
 					var num=1;
 					var introadded=false;
                     var createButtons=function(num){
