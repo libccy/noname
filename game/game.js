@@ -82,6 +82,7 @@
         cardType:{},
         hook:{globaltrigger:{},globalskill:{}},
         hookmap:{},
+        layoutfixed:['chess','stone'],
         characterDialogGroup:{
             '收藏':function(name,capt){
                 return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -498,7 +499,7 @@
                             long2:'手杀',
 						},
 						onclick:function(layout){
-							if(lib.config.layoutfixed.contains(lib.config.mode)){
+							if(lib.layoutfixed.contains(lib.config.mode)){
 								game.saveConfig('layout',layout);
 							}
 							else{
@@ -4018,7 +4019,7 @@
 				ui.css={};
 				lib.init.css(lib.assetURL+'layout/default','menu');
 				var layout=lib.config.layout;
-                if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
+                if(lib.layoutfixed.indexOf(lib.config.mode)!==-1){
 					layout='mobile';
 				}
                 if(layout=='phone'){
@@ -20177,7 +20178,7 @@
             });
         },
         switchMode:function(name,configx){
-            if(lib.config.layout!=game.layout&&!lib.config.layoutfixed.contains(name)){
+            if(lib.config.layout!=game.layout&&!lib.layoutfixed.contains(name)){
                 lib.init.layout(lib.config.layout);
             }
             window.mode={};
