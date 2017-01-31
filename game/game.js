@@ -498,7 +498,7 @@
                             long2:'手杀',
 						},
 						onclick:function(layout){
-							if(lib.config.layoutfixed.contains(lib.config.mode)&&layout=='default'){
+							if(lib.config.layoutfixed.contains(lib.config.mode)){
 								game.saveConfig('layout',layout);
 							}
 							else{
@@ -743,7 +743,7 @@
 							var style=ui.css.hp_style;
 							ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
 							style.remove();
-							if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
+							if(game.layout=='default'&&lib.config.hp_style=='official'){
 								ui.arena.classList.add('hpimage');
 							}
 							else{
@@ -854,7 +854,7 @@
                         },
 						onclick:function(item){
 							game.saveConfig('player_border',item);
-                            if(item!='wide'||lib.config.layout=='long'||lib.config.layout=='long2'){
+                            if(item!='wide'||game.layout=='long'||game.layout=='long2'){
                                 ui.arena.classList.add('slim_player');
                             }
                             else{
@@ -1286,7 +1286,7 @@
                                 linked=true;
                             }
                             game.saveConfig('cardshape',item);
-                            if(item=='oblong'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                            if(item=='oblong'&&(game.layout=='long'||game.layout=='mobile')){
                                 ui.arena.classList.add('oblongcard');
                             }
                             else{
@@ -1314,7 +1314,7 @@
                         },
                         onclick:function(item){
                             game.saveConfig('textequip',item);
-                            if(item=='text'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                            if(item=='text'&&(game.layout=='long'||game.layout=='mobile')){
                                 ui.arena.classList.add('textequip');
                             }
                             else{
@@ -3652,22 +3652,18 @@
 			dialog.style.top=idealtop+'px';
 		},
 		isMobileMe:function(player){
-			return (lib.config.layout=='mobile'||lib.config.layout=='long')&&!game.chess&&player.dataset.position==0;
+			return (game.layout=='mobile'||game.layout=='long')&&!game.chess&&player.dataset.position==0;
 		},
 		isNewLayout:function(){
-			if(lib.config.layout!='default') return true;
-			if(lib.config.layoutfixed.contains(lib.config.mode)) return true;
+			if(game.layout!='default') return true;
 			return false;
 		},
         isPhoneLayout:function(){
             if(!lib.config.phonelayout) return false;
-            return (lib.config.layout=='mobile'||lib.config.layout=='long'||lib.config.layout=='long2');
+            return (game.layout=='mobile'||game.layout=='long'||game.layout=='long2');
         },
 		isSingleHandcard:function(){
-			if(game.singleHandcard||lib.config.layout=='mobile'||lib.config.layout=='long'||lib.config.layout=='long2'){
-				return true;
-			}
-			if(lib.config.layout=='default'&&lib.config.layoutfixed.contains(lib.config.mode)){
+			if(game.singleHandcard||game.layout=='mobile'||game.layout=='long'||game.layout=='long2'){
 				return true;
 			}
 			return false;
@@ -4023,15 +4019,14 @@
 				lib.init.css(lib.assetURL+'layout/default','menu');
 				var layout=lib.config.layout;
                 if(lib.config.layoutfixed.indexOf(lib.config.mode)!==-1){
-					if(layout=='default'){
-						layout='mobile';
-					}
+					layout='mobile';
 				}
                 if(layout=='phone'){
                     layout='mobile';
                     game.saveConfig('layout','mobile');
                     game.saveConfig('phonelayout',true);
                 }
+                game.layout=layout;
                 if(lib.config.image_background!='default'&&lib.config.image_background!='custom'&&lib.config.theme=='simple'){
                     document.documentElement.style.backgroundImage='url("image/background/'+lib.config.image_background+'.jpg")';
                 }
@@ -4918,10 +4913,11 @@
 			},
 			layout:function(layout,nosave){
 				if(!nosave) game.saveConfig('layout',layout);
+                game.layout=layout;
 				ui.arena.hide();
 				setTimeout(function(){
-					ui.css.layout.href=lib.assetURL+'layout/'+lib.config.layout+'/layout.css';
-					if(lib.config.layout=='mobile'||lib.config.layout=='long'){
+					ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+					if(game.layout=='mobile'||game.layout=='long'){
 						ui.arena.classList.add('mobile');
 						if(game.me&&game.me.node.handcards2.childNodes.length){
 							while(game.me.node.handcards2.childNodes.length){
@@ -4932,25 +4928,25 @@
 					else{
 						ui.arena.classList.remove('mobile');
 					}
-					if(lib.config.layout=='default'){
+					if(game.layout=='default'){
 						ui.arena.classList.add('oldlayout');
 					}
 					else{
 						ui.arena.classList.remove('oldlayout');
 					}
-					if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
+					if(game.layout=='default'&&lib.config.hp_style=='official'){
 						ui.arena.classList.add('hpimage');
 					}
 					else{
 						ui.arena.classList.remove('hpimage');
 					}
-                    if(lib.config.cardshape=='oblong'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                    if(lib.config.cardshape=='oblong'&&(game.layout=='long'||game.layout=='mobile')){
                         ui.arena.classList.add('oblongcard');
                     }
                     else{
                         ui.arena.classList.remove('oblongcard');
                     }
-                    if(lib.config.textequip=='text'&&(lib.config.layout=='long'||lib.config.layout=='mobile')){
+                    if(lib.config.textequip=='text'&&(game.layout=='long'||game.layout=='mobile')){
                         ui.arena.classList.add('textequip');
                     }
                     else{
@@ -4978,13 +4974,13 @@
                             }
                         }
                     }
-                    if(lib.config.layout=='long'||lib.config.layout=='long2'){
+                    if(game.layout=='long'||game.layout=='long2'){
                         ui.arena.classList.add('long');
                     }
                     else{
                         ui.arena.classList.remove('long');
                     }
-                    if(lib.config.player_border!='wide'||lib.config.layout=='long'||lib.config.layout=='long2'){
+                    if(lib.config.player_border!='wide'||game.layout=='long'||game.layout=='long2'){
                         ui.arena.classList.add('slim_player');
                     }
                     else{
@@ -9472,7 +9468,7 @@
 					if(this.maxHp==Infinity){
 						hp.innerHTML='∞';
 					}
-					else if(lib.config.layout=='default'&&this.maxHp>14){
+					else if(game.layout=='default'&&this.maxHp>14){
 						hp.innerHTML=this.hp+'/'+this.maxHp;
 						hp.classList.add('text');
 					}
@@ -9480,7 +9476,7 @@
 					(
 						this.maxHp>9||
 						(this.maxHp>5&&this.classList.contains('minskin'))||
-						((lib.config.layout=='mobile'||lib.config.layout=='long')&&this.dataset.position==0&&this.maxHp>7)
+						((game.layout=='mobile'||game.layout=='long')&&this.dataset.position==0&&this.maxHp>7)
 					)){
 						hp.innerHTML=this.hp+'<br>/<br>'+this.maxHp;
 						hp.classList.add('text');
@@ -20181,8 +20177,8 @@
             });
         },
         switchMode:function(name,configx){
-            if(lib.config.layout=='default'&&lib.config.layoutfixed.contains(lib.config.mode)&&!lib.config.layoutfixed.contains(name)){
-                lib.init.layout('default');
+            if(lib.config.layout!=game.layout&&!lib.config.layoutfixed.contains(name)){
+                lib.init.layout(lib.config.layout);
             }
             window.mode={};
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
@@ -28264,29 +28260,29 @@
                     }
                 }
 
-				if(lib.config.layout=='mobile'||lib.config.layout=='long'){
+				if(game.layout=='mobile'||game.layout=='long'){
 					ui.arena.classList.add('mobile');
 				}
-                if(lib.config.layout=='long'||lib.config.layout=='long2'){
+                if(game.layout=='long'||game.layout=='long2'){
 					ui.arena.classList.add('long');
 				}
-				if(lib.config.layout=='default'){
+				if(game.layout=='default'){
 					ui.arena.classList.add('oldlayout');
 				}
 				if(lib.config.low_performance){
 					ui.arena.classList.add('low_performance');
 				}
-                if(lib.config.player_border!='wide'||lib.config.layout=='long'||lib.config.layout=='long2'){
+                if(lib.config.player_border!='wide'||game.layout=='long'||game.layout=='long2'){
                     ui.arena.classList.add('slim_player');
                 }
                 if(lib.config.player_border=='slim'){
                     ui.arena.classList.add('uslim_player');
                 }
 				ui.window.dataset.radius_size=lib.config.radius_size||'default';
-				if(lib.config.layout=='default'&&lib.config.hp_style=='official'){
+				if(game.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
-                if(lib.config.layout=='long'||lib.config.layout=='mobile'){
+                if(game.layout=='long'||game.layout=='mobile'){
                     if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
                     if(lib.config.cardshape=='oblong') ui.arena.classList.add('oblongcard');
                 }
@@ -28610,7 +28606,7 @@
                     var left2='calc(100% - 245px)';
                     var top1='210px';
                     var top2='calc(100% - 245px)';
-                    if(lib.config.layout=='default'){
+                    if(game.layout=='default'){
                         left1='265px';
                         top1='160px';
                         left2='calc(100% - 330px)';
@@ -31736,7 +31732,7 @@
 						ui.dialog.classList.remove('nobutton');
 					}
 				}
-				if(false&&lib.config.layout=='mobile'){
+				if(false&&game.layout=='mobile'){
 					ui.dialog.style.height='';
 					if(ui.dialog.contentContainer.offsetHeight>=ui.dialog.content.offsetHeight){
 						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
@@ -31781,7 +31777,7 @@
             linked2:function(player){
                 if(lib.config.link_style=='mark') return true;
                 if(game.chess) return false;
-                if(lib.config.layout=='long'||lib.config.layout=='long2') return true;
+                if(game.layout=='long'||game.layout=='long2') return true;
                 if(player.dataset.position=='0'){
                     return ui.arena.classList.contains('oblongcard');
                 }

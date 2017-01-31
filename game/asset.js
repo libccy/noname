@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.6.1',
+    '1.9.6.6',
     'image/background/huangtian_bg.jpg',
     'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
@@ -21,6 +21,7 @@ window.noname_asset_list=[
     'image/card/chilongya.png',
     'image/card/chiyuxi.png',
     'image/card/chuansongmen.png',
+    'image/card/chunbing.png',
     'image/card/cixiong.png',
     'image/card/daihuofenglun.png',
     'image/card/dawan.png',
@@ -36,6 +37,7 @@ window.noname_asset_list=[
     'image/card/fengxueren.png',
     'image/card/fengyinzhidan.png',
     'image/card/fudichouxin.png',
+    'image/card/fulingbing.png',
     'image/card/fuxiqin.png',
     'image/card/fuxiqin2.png',
     'image/card/gouhunluo.png',

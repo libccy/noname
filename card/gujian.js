@@ -2,11 +2,15 @@
 card.gujian={
     card:{
         chunbing:{
-            fullskin:true
+            fullskin:true,
+        },
+        fulingbing:{
+            fullskin:true,
         }
     },
     skill:{},
     translate:{
-        chunbing:'春饼'
+        chunbing:'春饼',
+        fulingbing:'茯苓饼',
     }
 };

@@ -2232,7 +2232,7 @@ character.hearth={
 				}
 			},
 			mark:true,
-			marktext:'封',
+			marktext:'瘴',
 			intro:{
 				content:'下个回合无法使用锦囊牌'
 			}
