@@ -1704,8 +1704,8 @@
 							if(this.innerHTML!='已隐藏'){
 								this.innerHTML='已隐藏';
 								game.saveConfig('hiddenModePack',['stone','chess','boss','tafang']);
-								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth']);
-								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','boss','ow','old']);
+								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth','gujian']);
+								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','boss','ow']);
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='隐藏非官方扩展包';

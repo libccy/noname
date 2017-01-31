@@ -1,6 +1,7 @@
 window.noname_source_list=[
     'card/basic.js',
     'card/extra.js',
+    'card/gujian.js',
     'card/guozhan.js',
     'card/hearth.js',
     'card/naxx.js',

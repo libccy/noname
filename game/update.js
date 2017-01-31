@@ -1,15 +1,17 @@
 window.noname_update={
-    version:'1.9.6.5',
-    update:'1.9.6.4',
+    version:'1.9.6.6',
+    update:'1.9.6.5',
     changeLog:[
         'bug修复',
     ],
     files:[
         'game/game.js',
-        // 'game/package.js',
-        // 'game/asset.js',
+        'game/package.js',
+        'game/asset.js',
+        'game/source.js',
         // 'card/hearth.js',
         'card/swd.js',
+        'card/gujian.js',
         // 'card/sp.js',
         // 'card/guozhan.js',
         // 'character/rank.js',

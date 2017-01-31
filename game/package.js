@@ -27,6 +27,7 @@ card.pack={
     zhenfa:'阵法',
     yunchou:'运筹帷幄',
     swd:'轩辕剑',
+    gujian:'古剑奇谭',
     hearth:'炉石传说',
 };
 card.hearthpack={
