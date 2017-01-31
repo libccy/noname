@@ -286,8 +286,6 @@ window.config={
 	bannedpile:{},
 	customcardpile:{},
 	addedpile:{},
-	customCharacterPack:{},
-	customCardPack:{},
 
 	mode:'identity',
 	mode_config:{

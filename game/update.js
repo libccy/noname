@@ -3,6 +3,7 @@ window.noname_update={
     update:'1.9.6.5',
     changeLog:[
         'bug修复',
+        '牌堆设置改进（旧版牌堆设置将被清除）',
     ],
     files:[
         'game/game.js',

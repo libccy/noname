@@ -65,8 +65,6 @@
 		canvasUpdates:[],
 		video:[],
 		_onDB:[],
-		customCharacters:[],
-		customCards:[],
 		skilllist:[],
 		characterPack:{},
 		cardPack:{},
@@ -98,37 +96,6 @@
 			else{
 				lib._onDB.push(func);
 			}
-		},
-		setTranslate:function(name){
-			if(name.indexOf('|')==-1){
-				lib.translate[name]=name;
-			}
-			else{
-				if(name.lastIndexOf('|')>name.indexOf('|')){
-					lib.translate[name]=name.slice(name.indexOf('|')+1,name.lastIndexOf('|'));
-				}
-				else{
-					lib.translate[name]=name.slice(name.indexOf('|')+1);
-				}
-			}
-		},
-		checkCharacterName:function(name){
-			if(lib.character[name]){
-				if(!lib.customCharacters.contains(name)) return true;
-				for(var i in lib.config.customCharacterPack){
-					if(lib.config.customCharacterPack[i].character.contains(name)) return true;
-				}
-			}
-			return false;
-		},
-		checkSkillName:function(name){
-			if(lib.skill[name]){
-				if(!lib.skill[name].createInfo) return true;
-				for(var i in lib.config.customCharacterPack){
-					if(lib.config.customCharacterPack[i].skill.contains(name)) return true;
-				}
-			}
-			return false;
 		},
 		listenEnd:function(node){
 			if(!node._listeningEnd){
@@ -5337,7 +5304,7 @@
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
-		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)&&!lib.customCharacters.contains(i)) console.log(i);
+		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(i);
 		        }
 		    },
 			h:function(player){
@@ -16568,50 +16535,7 @@
 			}
 		},
 		import:function(type,obj){
-			if(type=='character'){
-				if(lib.config.customCharacterPack[obj.name]){
-					alert('武将包已存在');
-					return;
-				}
-				var pack={
-					name:obj.name,
-					character:[],
-					skill:[],
-				};
-				for(var i in obj.character){
-					if(lib.checkCharacterName(i)){
-						alert('武将名重复：'+i);
-						continue;
-					}
-					game.putDB('character',i,obj.character[i]);
-					lib.character[i]=obj.character[i];
-					lib.customCharacters.add(i);
-					pack.character.push(i);
-					lib.setTranslate(i);
-				}
-				for(var i in obj.skill){
-					if(lib.checkSkillName(i)){
-						alert('技能名重复：'+i);
-						continue;
-					}
-					var info=obj.skill[i];
-					try{
-						eval('lib.skill["'+info.name+'"]={'+info.content+'}');
-					}
-					catch(e){
-						console.log(e);
-						lib.skill[info.name]={};
-					}
-					lib.skill[info.name].createInfo=info;
-					lib.setTranslate(i);
-					lib.translate[info.name+'_info']=info.description;
-					game.putDB('skill',info.name,info);
-					pack.skill.push(i);
-				}
-				lib.config.customCharacterPack[obj.name]=pack;
-				game.saveConfig('customCharacterPack',lib.config.customCharacterPack);
-			}
-			else if(type=='extension'){
+			if(type=='extension'){
                 lib.extensionMenu['extension_'+obj.name]={
                     enable:{
                         name:'开启',
@@ -16946,88 +16870,6 @@
 				downloadLink.innerHTML = "Download File";
 				downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
 				downloadLink.click();
-			}
-		},
-		exportCharacters:function(packname,list,callback){
-			var zipReady=function(){
-				var zip=new JSZip();
-				var imageLoaded=0;
-				var character={
-					name:packname||'noname',
-					character:{},
-					skill:{},
-				};
-				var load=function(img){
-					var blob = zip.generate({type:"blob"});
-					var fileNameToSaveAs = packname||'noname';
-					fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'.');
-					fileNameToSaveAs+='.zip';
-
-					if(lib.device){
-						var directory;
-						if(lib.device=='android'){
-							directory=cordova.file.externalDataDirectory;
-						}
-						else{
-							directory=cordova.file.documentsDirectory;
-						}
-						window.resolveLocalFileSystemURL(directory,function(entry){
-							entry.getFile(fileNameToSaveAs,{create:true},function(fileEntry){
-								fileEntry.createWriter(function(fileWriter){
-									fileWriter.onwriteend=function(){
-										alert('文件已导出至'+directory+fileNameToSaveAs);
-									}
-									fileWriter.write(blob)
-								});
-							});
-						});
-					}
-					else{
-						var downloadLink = document.createElement("a");
-						downloadLink.download = fileNameToSaveAs;
-						downloadLink.innerHTML = "Download File";
-						downloadLink.href = window.URL.createObjectURL(blob);
-						downloadLink.click();
-					}
-
-					if(typeof callback=='function'){
-						callback(character);
-					}
-				};
-				for(var i=0;i<lib.customCharacters.length;i++){
-					var name=lib.customCharacters[i];
-					if(lib.checkCharacterName(name)){
-						imageLoaded++;
-						continue;
-					}
-					if(list&&!list.contains(name)){
-						imageLoaded++;
-						continue;
-					}
-					character.character[name]=lib.character[name];
-					for(var j=0;j<lib.character[name][3].length;j++){
-						var skillname=lib.character[name][3][j];
-						if(lib.skill[skillname].createInfo){
-							character.skill[skillname]=lib.skill[skillname].createInfo;
-						}
-					}
-					(function(name){
-						game.getDB('image','character:'+name,function(img){
-							imageLoaded++;
-							zip.file(name+'.jpg',img.slice(img.indexOf('base64,')+7),{base64:true});
-							if(imageLoaded==lib.customCharacters.length){
-								load();
-							}
-						});
-					}(name));
-				}
-				zip.file('pack.js','game.import("character",'+lib.init.stringify(character)+')');
-			}
-			if(!window.JSZip){
-				lib.init.js(lib.assetURL+'game','jszip',zipReady);
-			}
-			else{
-				zipReady();
 			}
 		},
         multiDownload:function(list,onsuccess,onerror,onfinish,process,dev){
@@ -22571,7 +22413,6 @@
 							if(node.link){
 								if(node.mode.indexOf('mode_')==0) continue;
 								if(node.mode=='custom') continue;
-								if(lib.config.customCharacterPack[node.mode]) continue;
                                 if(connectMenu){
                                     if(!lib.config.connect_characters.contains(node.mode)){
     									node.classList.remove('off');
@@ -22661,7 +22502,7 @@
 							init:lib.config.characters.contains(mode),
 							onclick:togglePack
 						});
-						if(mode.indexOf('mode_')!=0&&!lib.config.customCharacterPack[mode]){
+						if(mode.indexOf('mode_')!=0){
 							page.appendChild(cfgnode);
 						}
                         else{
@@ -22707,57 +22548,7 @@
                         }
 						page.classList.add('menu-buttons');
                         if(!connectMenu){
-                            if(lib.config.customCharacterPack[mode]){
-    							ui.create.div('.config.more','编辑武将包',page,function(){
-    								if(this.innerHTML=='编辑武将包'){
-    									this.innerHTML='确认编辑';
-    									var that=this;
-    									setTimeout(function(){
-    										that.innerHTML='编辑武将包';
-    									},1000);
-    								}
-    								else{
-    									var pack=lib.config.customCharacterPack[mode];
-    									delete lib.config.customCharacterPack[mode];
-    									game.saveConfig('customCharacterPack',lib.config.customCharacterPack);
-    									page.remove();
-    									node.remove();
-    									lib.recreateCustomCharacters();
-
-    									var active=ui.customCharacter;
-    									active.classList.add('active');
-    									rightPane.appendChild(active.link);
-    								}
-    							});
-    							ui.create.div('.config.more','删除武将包',page,function(){
-    								if(this.innerHTML=='删除武将包'){
-    									this.innerHTML='确认删除';
-    									var that=this;
-    									setTimeout(function(){
-    										that.innerHTML='删除武将包';
-    									},1000);
-    								}
-    								else{
-    									var pack=lib.config.customCharacterPack[mode];
-    									delete lib.config.customCharacterPack[mode];
-    									game.saveConfig('customCharacterPack',lib.config.customCharacterPack);
-    									page.remove();
-    									node.remove();
-    									for(var i=0;i<pack.character.length;i++){
-    										lib.customCharacters.remove(pack.character[i]);
-    										delete lib.character[pack.character[i]];
-    										game.deleteDB('character',pack.character[i]);
-    										game.deleteDB('image','character:'+pack.character[i]);
-    										lib.config.banned.remove(pack.character[i])
-    									}
-    									game.saveConfig('banned',lib.config.banned,true);
-    									for(var i=0;i<pack.skill.length;i++){
-    										game.deleteDB('skill',pack.skill[i]);
-    									}
-    								}
-    							}).style.marginTop='5px';
-    						}
-    						else if(mode.indexOf('mode_')!=0){
+                            if(mode.indexOf('mode_')!=0){
     							ui.create.div('.config.more','隐藏武将包',page,function(){
     								if(this.innerHTML=='隐藏武将包'){
     									this.innerHTML='武将包将在重启后隐藏';
@@ -22804,634 +22595,6 @@
                         active.classList.add('active');
                     }
 					rightPane.appendChild(active.link);
-
-					lib.onDB(function(){
-                        if(connectMenu||true) return;
-						var page=ui.create.div('.menu-buttons');
-                        var node=ui.create.div('.menubutton.large','自定义',clickMode);
-						ui.customCharacter=node;
-						start.firstChild.insertBefore(node,start.firstChild.querySelector('.lefttext'));
-						node.link=page;
-						node.mode='custom';
-
-						var currentEditing=null;
-						var packExporting=false;
-
-						var clickButton=function(){
-							if(packExporting){
-								this.classList.toggle('selected');
-								return;
-							}
-							resetImport();
-							resetEditor();
-							if(currentEditing==this){
-								currentEditing=null;
-								return;
-							}
-							else{
-								currentEditing=this;
-							}
-							toggle.classList.add('on');
-							newCharacter.style.display='';
-							fakeme.classList.add('inited');
-							delete fakeme.image;
-							fakeme.setBackground(this.link,'character');
-							newCharacter.querySelector('.new_name').value=this.link;
-							var info=lib.character[this.link];
-							newCharacter.querySelector('.new_hp').value=info[2];
-							sexes.value=info[0];
-							groups.value=info[1];
-							if(info[4]){
-								for(var i=0;i<options.childNodes.length-1;i++){
-									if(info[4].contains(options.childNodes[i].lastChild.name)){
-										options.childNodes[i].lastChild.checked=true;
-									}
-								}
-							}
-
-							var skills=info[3];
-							for(var i=0;i<skills.length;i++){
-								var node=ui.create.div(skillList.firstChild);
-								node.skill=skills[i];
-								ui.create.div('',lib.translate[skills[i]],node,editnode);
-								ui.create.div('','×',node,deletenode);
-								if(lib.skill[skills[i]].createInfo){
-									node.createInfo=lib.skill[skills[i]].createInfo;
-								}
-							}
-
-							toggle.innerHTML='编辑武将 <div>&gt;</div>';
-							var confirm=newCharacter.querySelector('.menubutton.large');
-							confirm.innerHTML='编辑武将';
-							confirm._origin=this;
-							var button=this;
-							var delnodefunc=function(){
-								button.remove();
-								lib.customCharacters.remove(button.link);
-								game.deleteDB('character',button.link);
-								game.deleteDB('image','character:'+button.link);
-								var skills=lib.character[button.link][3];
-								delete lib.character[button.link];
-								for(var i=0;i<skills.length;i++){
-									if(!lib.checkSkillName(skills[i])){
-										var keep=false;
-										for(var j=0;j<lib.customCharacters.length;j++){
-											if(lib.customCharacters[j]==button.link) continue;
-											if(lib.character[lib.customCharacters[j]][3].contains(skills[i])){
-												keep=true;break;
-											}
-										}
-										if(!keep){
-											game.deleteDB('skill',skills[i]);
-										}
-									}
-								}
-								resetEditor();
-							};
-							var delnode=ui.create.div('.menubutton.large','删除',confirm.parentNode,delnodefunc);
-							delnode.style.marginLeft='25px';
-						}
-
-						var createButton=function(name){
-							var button=ui.create.button(name,'character');
-							button.listen(clickButton);
-							button.classList.add('noclick');
-							page.insertBefore(button,page.firstChild);
-						}
-
-						var cl=function(){
-							for(var i in lib.config.customCharacterPack){
-								lib.characterPack[i]={};
-								lib.translate[i+'_character_config']=i;
-								for(var j=0;j<lib.config.customCharacterPack[i].character.length;j++){
-									var namej=lib.config.customCharacterPack[i].character[j];
-									lib.characterPack[i][namej]=lib.character[namej];
-								}
-								createModeConfig(i,start.firstChild,node);
-							}
-							for(var i=0;i<lib.customCharacters.length;i++){
-								var clname=lib.customCharacters[i];
-								for(var j=0;j<lib.character[clname][3].length;j++){
-									if(!lib.skill[lib.character[clname][3][j]]){
-										lib.character[clname][3].splice(j--,1);
-									}
-								}
-								if(!lib.checkCharacterName(clname))
-								createButton(clname);
-							}
-						}
-						if(_status.characterLoaded){
-							cl();
-						}
-						else{
-							lib.onCharacterLoad=cl;
-						}
-						lib.recreateCustomCharacters=function(){
-							var buttons=page.querySelectorAll('.button.character');
-							var list=[];
-							for(var i=0;i<buttons.length;i++){
-								list.push(buttons[i]);
-							}
-							for(var i=0;i<list.length;i++){
-								list[i].remove();
-							}
-							for(var i=0;i<lib.customCharacters.length;i++){
-								if(!lib.checkCharacterName(lib.customCharacters[i]))
-								createButton(lib.customCharacters[i]);
-							}
-							resetEditor();
-							resetImport();
-							resetExport();
-						}
-
-						var importCharacter;
-						var toggle3=ui.create.div('.config.more','导入武将包 <div>&gt;</div>',page,function(){
-							this.classList.toggle('on');
-							if(this.classList.contains('on')){
-								importCharacter.style.display='';
-								resetEditor();
-								resetExport();
-								currentEditing=null;
-							}
-							else{
-								importCharacter.style.display='none';
-							}
-						});
-						var resetImport=function(){
-							importCharacter.style.display='none';
-							toggle3.classList.remove('on')
-						}
-						importCharacter=ui.create.div('.new_character.export.import',page);
-						importCharacter.style.display='none';
-						ui.create.div('','<input type="file" accept="application/zip"><button>确定</button>',importCharacter);
-						importCharacter.firstChild.lastChild.onclick=function(){
-							var fileToLoad=this.previousSibling.files[0];
-							if(fileToLoad){
-								var zipReady=function(){
-									var fileReader = new FileReader();
-									fileReader.onload = function(fileLoadedEvent)
-									{
-										var data = fileLoadedEvent.target.result;
-										var zip=new JSZip();
-										zip.load(data);
-										var str=zip.file('pack.js').asText();
-										try{
-											eval(str);
-											if(!game.importedPack) throw('err');
-											for(var i in game.importedPack.character){
-												var buttons=page.querySelectorAll('.button.character');
-												for(var j=0;j<buttons.length;j++){
-													if(buttons[j].link==i){
-														buttons[j].remove();
-														break;
-													}
-												}
-												var str=zip.file(i+'.jpg').asArrayBuffer();
-												if(str){
-													var blob=new Blob([str]);
-													var fileReader=new FileReader();
-													fileReader.onload = (function(i){
-														return function(fileLoadedEvent)
-														{
-															var data = fileLoadedEvent.target.result;
-															game.putDB('image','character:'+i,data);
-														};
-													}(i))
-
-													fileReader.readAsDataURL(blob, "UTF-8");
-												}
-											}
-
-											var name=game.importedPack.name;
-											setTimeout(function(){
-												lib.characterPack[name]={};
-												lib.translate[name+'_character_config']=name;
-												for(var j=0;j<lib.config.customCharacterPack[name].character.length;j++){
-													var namej=lib.config.customCharacterPack[name].character[j];
-													lib.characterPack[name][namej]=lib.character[namej];
-												}
-												clickMode.call(createModeConfig(name,start.firstChild,node));
-											},500);
-
-											delete game.importedPack;
-										}
-										catch(e){
-											console.log(e);
-											alert('导入失败');
-										}
-										resetImport();
-									};
-									fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-								}
-								if(!window.JSZip){
-									lib.init.js(lib.assetURL+'game','jszip',zipReady);
-								}
-								else{
-									zipReady();
-								}
-							}
-						}
-
-						var exportCharacter;
-						var toggle2=ui.create.div('.config.more','导出武将包 <div>&gt;</div>',page,function(){
-							this.classList.toggle('on');
-							if(this.classList.contains('on')){
-								exportCharacter.style.display='';
-								resetEditor();
-								resetImport();
-								currentEditing=null;
-								packExporting=true;
-							}
-							else{
-								resetExport();
-							}
-						});
-						var resetExport=function(){
-							packExporting=false;
-							exportCharacter.style.display='none';
-							toggle2.classList.remove('on');
-							var selected=page.querySelectorAll('.button.character.selected');
-							var list=[];
-							for(var i=0;i<selected.length;i++){
-								list.push(selected[i]);
-							}
-							for(var i=0;i<list.length;i++){
-								list[i].classList.remove('selected');
-							}
-						}
-						exportCharacter=ui.create.div('.new_character.export',page);
-						exportCharacter.style.display='none';
-						ui.create.div('','名称：<input type="text"><button>确定</button>',exportCharacter);
-						exportCharacter.firstChild.lastChild.onclick=function(){
-							var name=this.previousSibling.value;
-							var selected=page.querySelectorAll('.button.character.selected');
-							var list=[];
-							var list2=[];
-							for(var i=0;i<selected.length;i++){
-								list.push(selected[i].link);
-								list2.push(selected[i]);
-							}
-							for(var i=0;i<list2.length;i++){
-								list2[i].classList.remove('selected');
-							}
-							if(name) game.exportCharacters(name,list.length?list:null,function(result){
-								game.import('character',result);
-								for(var i in result.character){
-									var buttons=page.querySelectorAll('.button.character');
-									for(var j=0;j<buttons.length;j++){
-										if(buttons[j].link==i){
-											buttons[j].remove();
-											break;
-										}
-									}
-								}
-
-								lib.characterPack[name]={};
-								lib.translate[name+'_character_config']=name;
-								for(var j=0;j<lib.config.customCharacterPack[name].character.length;j++){
-									var namej=lib.config.customCharacterPack[name].character[j];
-									lib.characterPack[name][namej]=lib.character[namej];
-								}
-								clickMode.call(createModeConfig(name,start.firstChild,node));
-								resetExport();
-
-								delete game.importedPack;
-							});
-						}
-
-						var newCharacter;
-						var toggle=ui.create.div('.config.more','创建武将 <div>&gt;</div>',page,function(){
-							this.classList.toggle('on');
-							if(this.classList.contains('on')){
-								newCharacter.style.display='';
-								resetExport();
-								resetImport();
-							}
-							else{
-								newCharacter.style.display='none';
-							}
-						});
-						var resetEditor=function(){
-							toggle.classList.remove('on');
-							newCharacter.style.display='none';
-							fakeme.classList.remove('inited');
-							delete fakeme.image;
-							fakeme.style.backgroundImage='';
-							var inputs=newCharacter.querySelectorAll('input');
-							for(var i=0;i<inputs.length;i++){
-								inputs[i].value='';
-							}
-							inputs=newCharacter.querySelectorAll('textarea');
-							for(var i=0;i<inputs.length;i++){
-								inputs[i].value='';
-							}
-							skillList.firstChild.innerHTML='';
-							toggle.innerHTML='创建武将 <div>&gt;</div>';
-							var node=newCharacter.querySelector('.menubutton.large');
-							node.innerHTML='创建武将';
-							delete node._origin;
-							if(node.nextSibling){
-								node.nextSibling.remove();
-							}
-						}
-
-						newCharacter=ui.create.div('.new_character',page);
-						newCharacter.style.display='none';
-
-						var fakeme=ui.create.div('.avatar',newCharacter);
-
-						var input=document.createElement('input');
-						input.type='file';
-						input.accept='image/jpeg';
-						input.onchange=function(){
-							var fileToLoad=input.files[0];
-							if(fileToLoad){
-								var fileReader = new FileReader();
-								fileReader.onload = function(fileLoadedEvent)
-								{
-									var data = fileLoadedEvent.target.result;
-									fakeme.image=data;
-									fakeme.style.backgroundImage='url('+data+')';
-									fakeme.classList.add('inited');
-								};
-								fileReader.readAsDataURL(fileToLoad, "UTF-8");
-							}
-						}
-						fakeme.appendChild(input);
-
-						ui.create.div('.select_avatar','选择头像',fakeme);
-
-						ui.create.div('.indent','姓名：<input class="new_name" type="text">',newCharacter).style.paddingTop='10px';
-						ui.create.div('.indent','体力：<input class="new_hp" type="text">',newCharacter).style.paddingTop='10px';
-						var sexes=ui.create.selectlist([
-							['male','男'],
-							['female','女'],
-							['none','无'],
-						],null,ui.create.div('.indent','性别：',newCharacter));
-						var groups=ui.create.selectlist([
-							['wei','魏'],
-							['shu','蜀'],
-							['wu','吴'],
-							['qun','群'],
-						],null,ui.create.div('.indent','势力：',newCharacter));
-						var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>AI禁选<input type="checkbox" name="forbidai"></span><br>',newCharacter);
-						var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
-						var list=[];
-						for(var i in lib.character){
-							if(!lib.customCharacters.contains(i)&&lib.character[i][3].length)
-							list.push([i,lib.translate[i]]);
-						}
-						list.sort(function(a,b){
-							a=a[0];b=b[0];
-							var aa=a,bb=b;
-							if(aa.indexOf('_')!=-1){
-								aa=aa.slice(aa.indexOf('_')+1);
-							}
-							if(bb.indexOf('_')!=-1){
-								bb=bb.slice(bb.indexOf('_')+1);
-							}
-							if(aa!=bb){
-								return aa>bb?1:-1;
-							}
-							return a>b?1:-1;
-						});
-						var list2=[];
-						var skills=lib.character[list[0][0]][3];
-						for(var i=0;i<skills.length;i++){
-							list2.push([skills[i],lib.translate[skills[i]]]);
-						}
-						var selectname=ui.create.selectlist(list,list[0],addSkill);
-						selectname.onchange=function(){
-							var skills=lib.character[this.value][3];
-							skillopt.innerHTML='';
-							for(var i=0;i<skills.length;i++){
-								var option=document.createElement('option');
-								option.value=skills[i];
-								option.innerHTML=lib.translate[skills[i]];
-								skillopt.appendChild(option);
-							}
-						};
-						selectname.style.maxWidth='85px';
-						var skillopt=ui.create.selectlist(list2,list2[0],addSkill);
-						var editSkillButton=document.createElement('button');
-						editSkillButton.innerHTML='引用';
-						editSkillButton.style.marginRight='3px';
-						addSkill.appendChild(editSkillButton);
-						var addSkillButton=document.createElement('button');
-						addSkillButton.innerHTML='添加';
-						addSkill.appendChild(addSkillButton);
-						var deletenode=function(){
-							this.parentNode.remove();
-						}
-						var editnode=function(){
-							var info=this.parentNode.createInfo;
-							if(info){
-								createSkill.lastChild.classList.remove('hidden');
-								createSkill.firstChild.innerHTML='创建技能';
-								skillList.style.top='435px';
-
-								createSkill.lastChild.querySelector('.skillname').value=info.name;
-								createSkill.lastChild.querySelector('.skilldescription').value=info.description;
-								createSkill.lastChild.querySelector('textarea').value=info.content;
-							}
-						};
-						editSkillButton.onclick=function(){
-							var name=skillopt.value;
-							var info=lib.skill[name];
-							if(info){
-								createSkill.lastChild.classList.remove('hidden');
-								createSkill.firstChild.innerHTML='创建技能';
-								skillList.style.top='435px';
-
-								createSkill.lastChild.querySelector('.skillname').value='skill|'+lib.translate[name]+'|'+name;
-								createSkill.lastChild.querySelector('.skilldescription').value=lib.translate[name+'_info'];
-								createSkill.lastChild.querySelector('textarea').value=lib.init.stringifySkill(info);
-							}
-						};
-						addSkillButton.onclick=function(){
-							for(var i=0;i<skillList.firstChild.childNodes.length;i++){
-								if(skillList.firstChild.childNodes[i].skill==skillopt.value) return;
-							}
-							var node=ui.create.div(skillList.firstChild);
-							node.skill=skillopt.value;
-							ui.create.div('',lib.translate[skillopt.value],node,editnode);
-							ui.create.div('','×',node,deletenode);
-							if(lib.skill[skillopt.value].createInfo){
-								node.createInfo=lib.skill[skillopt.value].createInfo;
-							}
-						};
-
-						var createSkill=ui.create.div('.add_skill.create','<div>创建技能...</div><br><div class="hidden"></div>',newCharacter);
-						createSkill.firstChild.listen(function(){
-							createSkill.lastChild.classList.toggle('hidden');
-							if(createSkill.lastChild.classList.contains('hidden')){
-								this.innerHTML='创建技能...';
-								skillList.style.top='';
-							}
-							else{
-								this.innerHTML='创建技能';
-								skillList.style.top='435px';
-							}
-						});
-						var newSkill=document.createElement('textarea');
-						createSkill.lastChild.appendChild(newSkill);
-						createSkill.lastChild.innerHTML+='<br>';
-						ui.create.div('','技能名称：<input class="skillname" type="text">',createSkill.lastChild);
-						createSkill.lastChild.innerHTML+='<br>';
-						ui.create.div('','技能描述：<input class="skilldescription" type="text"><br><button>确定</button><button>取消</button>',createSkill.lastChild);
-						createSkill.lastChild.lastChild.lastChild.previousSibling.style.marginTop='5px';
-						createSkill.lastChild.lastChild.lastChild.previousSibling.style.marginRight='3px';
-						createSkill.lastChild.lastChild.lastChild.previousSibling.onclick=function(){
-							var node;
-							var name=createSkill.lastChild.querySelector('.skillname').value;
-							var description=createSkill.lastChild.querySelector('.skilldescription').value;
-							var content=createSkill.lastChild.querySelector('textarea').value;
-							if(!name||!description) return;
-							if(lib.checkSkillName(name)){
-								alert('技能名重复');
-								return;
-							}
-							for(var i=0;i<skillList.firstChild.childNodes.length;i++){
-								if(skillList.firstChild.childNodes[i].skill==name){
-									node=skillList.firstChild.childNodes[i];
-								}
-							}
-							if(!node){
-								node=ui.create.div(skillList.firstChild);
-								node.skill=name;
-								var name2=name;
-								if(name.indexOf('|')!=-1){
-									if(name2.lastIndexOf('|')>name2.indexOf('|')){
-										name2=name2.slice(name2.indexOf('|')+1,name2.lastIndexOf('|'));
-									}
-									else{
-										name2=name2.slice(name2.indexOf('|')+1);
-									}
-								}
-								ui.create.div('',name2,node,editnode);
-								ui.create.div('','×',node,deletenode);
-							}
-							node.createInfo={
-								name:name,
-								description:description,
-								content:content
-							}
-							createSkill.lastChild.querySelector('.skillname').value='';
-							createSkill.lastChild.querySelector('.skilldescription').value='';
-							createSkill.lastChild.querySelector('textarea').value='';
-
-							createSkill.lastChild.classList.add('hidden');
-							createSkill.firstChild.innerHTML='创建技能...';
-							skillList.style.top='';
-						}
-						createSkill.lastChild.lastChild.lastChild.onclick=function(){
-							createSkill.lastChild.querySelector('.skillname').value='';
-							createSkill.lastChild.querySelector('.skilldescription').value='';
-							createSkill.lastChild.querySelector('textarea').value='';
-
-							createSkill.lastChild.classList.add('hidden');
-							createSkill.firstChild.innerHTML='创建技能...';
-							skillList.style.top='';
-						};
-						var skillList=ui.create.div('.skill_list',newCharacter);
-						ui.create.div(skillList);
-						ui.create.div('.menubutton.large','创建武将',ui.create.div(skillList),function(){
-							var image=fakeme.image;if(!image&&this.innerHTML!='编辑武将') return;
-							var name=newCharacter.querySelector('.new_name').value;if(!name) return;
-							if(lib.checkCharacterName(name)){
-								alert('武将名重复');return;
-							}
-							var hp=newCharacter.querySelector('.new_hp').value;
-							hp=parseInt(hp);
-							if(!hp) hp=1;
-							var skills=[];
-							var dontcreate=false;
-							if(this.innerHTML=='编辑武将'&&this._origin&&this._origin.link!=name){
-								dontcreate=true;
-								var origin=this._origin;
-								game.getDB('image','character:'+this._origin.link,function(data){
-									if(data){
-										game.putDB('image','character:'+name,data);
-										origin.remove();
-										lib.customCharacters.remove(origin.link);
-										game.deleteDB('character',origin.link);
-										game.deleteDB('image','character:'+origin.link);
-										if(lib.character[origin.link]){
-											var skills=lib.character[origin.link][3];
-											delete lib.character[origin.link];
-											for(var i=0;i<skills.length;i++){
-												if(!lib.checkSkillName(skills[i])){
-													var keep=false;
-													for(var j=0;j<lib.customCharacters.length;j++){
-														if(lib.customCharacters[j]==origin.link) continue;
-														if(lib.character[lib.customCharacters[j]][3].contains(skills[i])){
-															keep=true;break;
-														}
-													}
-													if(!keep){
-														game.deleteDB('skill',skills[i]);
-													}
-												}
-											}
-										}
-									}
-									createButton(name);
-								});
-							}
-							else{
-								if(image){
-									game.putDB('image','character:'+name,image);
-								}
-							}
-
-							for(var i=0;i<skillList.firstChild.childNodes.length;i++){
-								if(skillList.firstChild.childNodes[i].createInfo&&
-									lib.checkSkillName(skillList.firstChild.childNodes[i].skill)) continue;
-								skills.add(skillList.firstChild.childNodes[i].skill);
-								var info=skillList.firstChild.childNodes[i].createInfo;
-								if(info){
-									try{
-										eval('lib.skill["'+info.name+'"]={'+info.content+'}');
-									}
-									catch(e){
-										console.log(e);
-										lib.skill[info.name]={};
-									}
-									lib.skill[info.name].createInfo=info;
-									lib.setTranslate(info.name);
-									lib.translate[info.name+'_info']=info.description;
-									game.putDB('skill',info.name,info);
-								}
-							}
-							var tags=[];
-							for(var i=0;i<options.childNodes.length-1;i++){
-								if(options.childNodes[i].lastChild.checked){
-									tags.push(options.childNodes[i].lastChild.name);
-								}
-							}
-							if(tags.contains('boss')){
-								tags.add('bossallowed');
-							}
-							var charinfo=[sexes.value,groups.value,hp,skills,tags];
-							game.putDB('character',name,charinfo);
-							lib.character[name]=charinfo;
-							lib.customCharacters.add(name);
-							lib.setTranslate(name);
-							if(this.innerHTML=='编辑武将'){
-								var buttons=page.querySelectorAll('.button.character');
-								for(var i=0;i<buttons.length;i++){
-									if(buttons[i].link==name){
-										buttons[i].remove();
-										break;
-									}
-								}
-							}
-							if(!dontcreate) createButton(name);
-							resetEditor();
-							currentEditing=null;
-							delete this._origin;
-						});
-					});
 
                     if(!connectMenu){
                         var node1=ui.create.div('.lefttext','全部开启',start.firstChild,function(){
@@ -23625,7 +22788,7 @@
 							}
 						}
 						page.classList.add('menu-buttons');
-						if(!connectMenu&&mode.indexOf('mode_')!=0&&!lib.config.customCardPack[mode]){
+						if(!connectMenu&&mode.indexOf('mode_')!=0){
 							ui.create.div('.config.more','隐藏卡牌包',page,function(){
 								if(this.innerHTML=='隐藏卡牌包'){
 									this.innerHTML='卡牌包将在重启后隐藏';
@@ -24557,8 +23720,9 @@
     						var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
     						var list=[];
     						for(var i in lib.character){
-    							if(!lib.customCharacters.contains(i)&&lib.character[i][3].length)
-    							list.push([i,lib.translate[i]]);
+    							if(lib.character[i][3].length){
+                                    list.push([i,lib.translate[i]]);
+                                }
     						}
     						list.sort(function(a,b){
     							a=a[0];b=b[0];
@@ -27345,7 +26509,6 @@
                     for(var i in lib.characterPack){
                         if(lib.characterPack[i][name]) return i;
                     }
-                    if(lib.customCharacters.contains(name)) return 'custom';
                     return null;
                 }
                 var packs={};
@@ -27467,9 +26630,6 @@
 				}
 				var namecapt=[];
 				var getCapt=function(str){
-					if(lib.customCharacters.contains(str)){
-						return '自定义';
-					}
 					var capt;
 					if(str.indexOf('_')==-1){
 						capt=str[0];
@@ -27785,17 +26945,6 @@
                         }
                         span.innerHTML=lib.translate[packlist[i]+'_character_config'];
                         span.link=packlist[i];
-                        span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
-                        newlined2.appendChild(span);
-                    }
-                    if(lib.customCharacters.length){
-                        var span=document.createElement('div');
-                        span.style.display='inline-block';
-                        span.style.width='auto';
-                        span.style.margin='5px';
-                        // span.style.fontSize='20px';
-                        span.innerHTML='自定义';
-                        span.link='自定义';
                         span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
                         newlined2.appendChild(span);
                     }
@@ -34412,13 +33561,13 @@
                 else if(modeimage){
                     src='image/mode/'+modeimage+'/character/'+name+ext;
                 }
-				else if(type=='character'&&lib.customCharacters.contains(name)){
-					src="";
-					var node=this;
-					game.getDB('image','character:'+name,function(src){
-						node.style.backgroundImage="url('"+src+"')";
-					});
-				}
+				// else if(type=='character'&&lib.customCharacters.contains(name)){
+				// 	src="";
+				// 	var node=this;
+				// 	game.getDB('image','character:'+name,function(src){
+				// 		node.style.backgroundImage="url('"+src+"')";
+				// 	});
+				// }
 				else if(type=='character'&&lib.config.skin[name]){
 					src='image/skin/'+name+'/'+lib.config.skin[name]+ext;
 				}
