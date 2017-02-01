@@ -29,6 +29,7 @@ window.noname_update={
         // 'character/yxs.js',
         'character/yijiang.js',
         // 'mode/boss.js',
+        'mode/chess.js',
         'mode/versus.js',
         'mode/guozhan.js',
         'mode/identity.js',

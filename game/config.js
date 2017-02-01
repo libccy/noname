@@ -25,7 +25,7 @@ window.config={
 	},
 	forbidchess:['hetaihou','swd_kangnalishi'],
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
-	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','jg_simayi','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
+	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	all:{
 		diymode:['stone','chess','boss','tafang'],
 		diycharacter:['diy','yxs','hearth','swd','gujian','xianjian','boss','ow'],

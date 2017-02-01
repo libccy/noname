@@ -16888,7 +16888,9 @@
                     else{
                         current2=current;
                     }
-                    game.print(current);
+                    if(!lib.config.dev){
+                        game.print(current.slice(current.lastIndexOf('/')+1));
+                    }
                     game.download(current,current2,function(){
                         if(onsuccess) onsuccess(list.length);
                         download();
@@ -25556,6 +25558,7 @@
     											var button=document.createElement('button');
     											button.innerHTML='重新启动';
     											button.onclick=game.reload;
+                                                button.style.marginTop='8px';
     											p.appendChild(button);
     										}
                                             game.multiDownload(updates,function(){
@@ -25718,6 +25721,9 @@
                                                 skipcard=skipcard.concat(pack);
                                             }
                                         }
+                                        if(lib.cardPack.mode_derivation){
+                                            skipcard=skipcard.concat(lib.cardPack.mode_derivation);
+                                        }
                                     }
                                     for(var i=0;i<updates.length;i++){
                                         switch(updates[i].slice(0,5)){
@@ -25727,7 +25733,9 @@
                                                 }
                                                 else if(!lib.config.asset_full){
                                                     if(updates[i].indexOf('image/character')==0){
-                                                        if(skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
+                                                        var skipname=updates[i].slice(16,updates[i].lastIndexOf('.'));
+                                                        if(skipcharacter.contains(skipname)||skipname.indexOf('pal_')==0||skipname.indexOf('swd_')==0||
+                                                            skipname.indexOf('ow_')==0||skipname.indexOf('gjqt_')==0||skipname.indexOf('hs_')==0||skipname.indexOf('diy_')==0){
                                                             updates.splice(i--,1);
                                                         }
                                                     }
@@ -25784,6 +25792,19 @@
                                         span1.remove();
                                         span2.remove();
                                         span2_check.remove();
+                                        span3.remove();
+                                        span3_check.remove();
+                                        span4.remove();
+                                        span4_check.remove();
+                                        span5.remove();
+                                        span5_check.remove();
+                                        span6.remove();
+                                        span6_check.remove();
+                                        br1.remove();
+                                        br2.remove();
+                                        br3.remove();
+                                        br4.remove();
+                                        br5.remove();
     									p.appendChild(span);
     									var finish=function(){
     										if(n1==n2){
@@ -25794,6 +25815,7 @@
     										var button=document.createElement('button');
     										button.innerHTML='重新启动';
     										button.onclick=game.reload;
+                                            button.style.marginTop='8px';
     										p.appendChild(button);
     									}
                                         game.multiDownload(updates,function(){
@@ -25870,7 +25892,8 @@
                         })
                         li2.lastChild.appendChild(span1);
 
-                        li2.lastChild.appendChild(ui.create.node('br'));
+                        var br5=ui.create.node('br');
+                        li2.lastChild.appendChild(br5);
 
                         var span5=ui.create.div('','图片素材');
                         span5.style.fontSize='small';
@@ -25885,7 +25908,8 @@
                             game.saveConfig('asset_image',this.checked);
                         }
                         li2.lastChild.appendChild(span5_check);
-                        li2.lastChild.appendChild(ui.create.node('br'));
+                        var br1=ui.create.node('br');
+                        li2.lastChild.appendChild(br1);
 
                         var span4=ui.create.div('','字体素材');
                         span4.style.fontSize='small';
@@ -25900,7 +25924,8 @@
                             game.saveConfig('asset_font',this.checked);
                         }
                         li2.lastChild.appendChild(span4_check);
-                        li2.lastChild.appendChild(ui.create.node('br'));
+                        var br2=ui.create.node('br');
+                        li2.lastChild.appendChild(br2);
 
                         var span3=ui.create.div('','音效素材');
                         span3.style.fontSize='small';
@@ -25915,7 +25940,8 @@
                             game.saveConfig('asset_audio',this.checked);
                         }
                         li2.lastChild.appendChild(span3_check);
-                        li2.lastChild.appendChild(ui.create.node('br'));
+                        var br3=ui.create.node('br');
+                        li2.lastChild.appendChild(br3);
 
                         var span2=ui.create.div('','皮肤素材');
                         span2.style.fontSize='small';
@@ -25930,7 +25956,8 @@
                             game.saveConfig('asset_skin',this.checked);
                         }
                         li2.lastChild.appendChild(span2_check);
-                        li2.lastChild.appendChild(ui.create.node('br'));
+                        var br4=ui.create.node('br');
+                        li2.lastChild.appendChild(br4);
 
                         var span6=ui.create.div('','图片素材（完整）');
                         span6.style.fontSize='small';
