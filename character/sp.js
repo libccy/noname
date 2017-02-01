@@ -411,6 +411,9 @@ character.sp={
 			filter:function(event,player){
 				return event.target.num('he')>0;
 			},
+			check:function(event,player){
+				return ai.get.attitude(player,event.target)<0;
+			},
 			content:function(){
 				trigger.target.chooseToDiscard('he',true,2);
 			}

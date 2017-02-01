@@ -203,6 +203,9 @@ mode.guozhan={
 			if(lib.configOL.banned.length){
 				last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
 			}
+			if(lib.configOL.bannedcards.length){
+				last=uiintro.add('<div class="text chat">禁用卡牌：'+get.translation(lib.configOL.bannedcards));
+			}
 			last.style.paddingBottom='8px';
 		},
 		addRecord:function(bool){

@@ -15028,7 +15028,7 @@
 					// else{
                     //     trigger.start=trigger.source||trigger.player;
                     // }
-					var str=get.translation(trigger.player.name)+'濒死，是否帮助？';
+					var str=get.translation(trigger.player.name)+'濒死，是否帮助？<br><div class="text center">当前体力：'+trigger.player.hp+'</div>';
 					_status.dying=event.dying;
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
 						event._result={bool:false}
@@ -20148,6 +20148,7 @@
                             lib.configOL.cardPack.remove(lib.config.connect_cards[i]);
                         }
                         lib.configOL.banned=lib.config['connect_'+name+'_banned'];
+                        lib.configOL.bannedcards=lib.config['connect_'+name+'_bannedcards'];
                     }
                     for(var i in lib.cardPackList){
                         if(lib.configOL.cardPack.contains(i)){
@@ -21619,6 +21620,7 @@
                                             config.cardPack.remove(lib.config.connect_cards[i]);
                                         }
                                         config.banned=lib.config['connect_'+active.mode+'_banned'];
+                                        config.bannedcards=lib.config['connect_'+active.mode+'_bannedcards'];
                                         game.send('server','enter',_status.roomindex,lib.config.connect_nickname,lib.config.connect_avatar,config,active.mode);
                                     }
                                     else{
@@ -21861,6 +21863,9 @@
                             if(!lib.mode[modeorder[i]].connect) continue;
                             if(!lib.config['connect_'+modeorder[i]+'_banned']){
                                 lib.config['connect_'+modeorder[i]+'_banned']=[];
+                            }
+                            if(!lib.config['connect_'+modeorder[i]+'_bannedcards']){
+                                lib.config['connect_'+modeorder[i]+'_bannedcards']=[];
                             }
                         }
                         if(lib.config.all.mode.contains(modeorder[i])){
@@ -22551,9 +22556,9 @@
                                 }
                             }
                         }
-                        createModeConfig('mode_banned',start.firstChild).link;
+                        var bannednode=createModeConfig('mode_banned',start.firstChild);
                         if(get.is.empty(lib.characterPack.mode_banned)){
-                            ui.bannedCharacter.node.style.display='none';
+                            bannednode.style.display='none';
                         }
                         delete lib.characterPack.mode_banned;
                     }
@@ -22740,37 +22745,23 @@
 						if(mode.indexOf('mode_')!=0){
 							page.appendChild(cfgnode);
 						}
-						var banCard=function(){
-                            if(connectMenu) return;
+                        var banCard=function(e){
 							if(_status.clicked){
 								_status.clicked=false;
 								return;
 							}
-							if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0){
+							if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0&&mode!='mode_banned'){
 								return;
 							}
-							this.classList.toggle('unselectable');
-							if(this.classList.contains('unselectable')){
-								lib.config.bannedcards.add(this.link[2]);
-								this.node.info._innerHTML=this.node.info.innerHTML;
-								this.node.info.innerHTML='已禁用';
-							}
-							else{
-								lib.config.bannedcards.remove(this.link[2]);
-								this.node.info.innerHTML=this.node.info._innerHTML;
-								this.node.info.style.top='';
-							}
-							game.saveConfig('bannedcards',lib.config.bannedcards,true);
+							this._banning=connectMenu?'online':'offline';
+                            ui.click.intro.call(this,e);
+                            _status.clicked=false;
+                            delete this._banning;
 						};
 						var buttons=ui.create.buttons(list,'vcard',page);
 						for(var i=0;i<buttons.length;i++){
 							buttons[i].classList.add('noclick');
 							buttons[i].listen(banCard);
-							if(!connectMenu&&lib.config.bannedcards.contains(buttons[i].link[2])){
-								buttons[i].classList.add('unselectable');
-								buttons[i].node.info._innerHTML=buttons[i].node.info.innerHTML;
-								buttons[i].node.info.innerHTML='已禁用';
-							}
 						}
 						page.classList.add('menu-buttons');
 						if(!connectMenu&&mode.indexOf('mode_')!=0){
@@ -22922,6 +22913,22 @@
 						}
                         return node;
                     };
+                    if(!connectMenu&&lib.config.show_ban_menu){
+                        lib.cardPack.mode_banned=[];
+                        for(var i=0;i<lib.config.all.mode.length;i++){
+                            var banned=lib.config[lib.config.all.mode[i]+'_bannedcards'];
+                            if(banned){
+                                for(var j=0;j<banned.length;j++){
+                                    lib.cardPack.mode_banned.push(banned[j]);
+                                }
+                            }
+                        }
+                        var bannednode=createModeConfig('mode_banned',start.firstChild);
+                        if(lib.cardPack.mode_banned.length==0){
+                            bannednode.style.display='none';
+                        }
+                        delete lib.cardPack.mode_banned;
+                    }
                     for(var i=0;i<lib.config.all.cards.length;i++){
                         if(connectMenu&&!lib.connectCardPack.contains(lib.config.all.cards[i])) continue;
                         createModeConfig(lib.config.all.cards[i],start.firstChild);
@@ -22936,6 +22943,9 @@
 					var active=start.firstChild.querySelector('.active');
                     if(!active){
                         active=start.firstChild.firstChild;
+                        if(active.style.display=='none'){
+                            active=active.nextSibling;
+                        }
                         active.classList.add('active');
                     }
 					rightPane.appendChild(active.link);
@@ -28260,7 +28270,12 @@
 				}
 				for(var i=0;i<lib.card.list.length;i++){
 					if(lib.card[lib.card.list[i][2]]){
-						if(lib.config.bannedcards.contains(lib.card.list[i][2])) continue;
+                        if(!_status.connectMode){
+                            if(lib.config.bannedcards.contains(lib.card.list[i][2])) continue;
+                        }
+						else{
+                            if(lib.configOL.bannedcards.contains(lib.card.list[i][2])) continue;
+                        }
 						if(game.bannedcards&&game.bannedcards.contains(lib.card.list[i][2])) continue;
                         lib.inpile.add(lib.card.list[i][2]);
 						ui.create.card(ui.cardPile).init(lib.card.list[i]);
@@ -32691,40 +32706,91 @@
 				else{
 					uiintro.add(get.translation(node));
 				}
-				if(lib.translate[name+'_info']){
-					if(get.subtype(node)=='equip1'){
-						var added=false;
-						if(lib.card[node.name]&&lib.card[node.name].distance){
-							var dist=lib.card[node.name].distance;
-							if(dist.attackFrom){
-								added=true;
-								uiintro.add('<div class="text center">攻击范围：'+(-dist.attackFrom+1)+'</div>');
-							}
-						}
-						if(!added){
-							uiintro.add('<div class="text center">攻击范围：1</div>');
-						}
-					}
-                    else if(get.type(node)=='equip'){
-                        uiintro.add('<div class="text center">'+get.translation(get.subtype(node))+'</div>');
-                    }
-					else if(lib.card[name]&&lib.card[name].addinfomenu){
-						uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
-					}
-					else if(lib.card[name]&&lib.card[name].derivation){
-                        if(typeof lib.card[name].derivation=='string'){
-                            uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivation)+'</div>');
+                if(node._banning){
+                    var clickBanned=function(){
+                        var banned=lib.config[this.bannedname]||[];
+                        if(banned.contains(name)){
+                            banned.remove(name);
                         }
-						else if(lib.card[name].derivationpack){
-                            uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
+                        else{
+                            banned.push(name);
                         }
-					}
-                    else{
-                        uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
+                        game.saveConfig(this.bannedname,banned);
+                        this.classList.toggle('on');
+                    };
+                    var modeorder=lib.config.modeorder||[];
+					for(var i in lib.mode){
+                        modeorder.add(i);
                     }
-                    uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
-				}
-				uiintro.add(ui.create.div('.placeholder.slim'));
+                    var list=[];
+                    uiintro.contentContainer.listen(function(e){
+                        e.stopPropagation();
+                    });
+                    for(var i=0;i<modeorder.length;i++){
+                        if(node._banning=='online'){
+                            if(!lib.mode[modeorder[i]].connect) continue;
+                        }
+                        else if(modeorder[i]=='connect'||modeorder[i]=='brawl'){
+                            continue;
+                        }
+                        if(lib.config.all.mode.contains(modeorder[i])){
+							list.push(modeorder[i]);
+						}
+                    }
+                    var page=ui.create.div('.menu-buttons.configpopped',uiintro.content);
+                    for(var i=0;i<list.length;i++){
+    	                var cfg=ui.create.div('.config',lib.translate[list[i]]+'模式',page);
+                        cfg.classList.add('toggle');
+                        if(node._banning=='offline'){
+                            cfg.bannedname=list[i]+'_bannedcards';
+                        }
+                        else{
+                            cfg.bannedname='connect_'+list[i]+'_bannedcards';
+                        }
+                        cfg.listen(clickBanned);
+                        ui.create.div(ui.create.div(cfg));
+                        var banned=lib.config[cfg.bannedname]||[];
+                        if(!banned.contains(name)){
+                            cfg.classList.add('on');
+                        }
+                    }
+                }
+                else{
+                    if(lib.translate[name+'_info']){
+    					if(get.subtype(node)=='equip1'){
+    						var added=false;
+    						if(lib.card[node.name]&&lib.card[node.name].distance){
+    							var dist=lib.card[node.name].distance;
+    							if(dist.attackFrom){
+    								added=true;
+    								uiintro.add('<div class="text center">攻击范围：'+(-dist.attackFrom+1)+'</div>');
+    							}
+    						}
+    						if(!added){
+    							uiintro.add('<div class="text center">攻击范围：1</div>');
+    						}
+    					}
+                        else if(get.type(node)=='equip'){
+                            uiintro.add('<div class="text center">'+get.translation(get.subtype(node))+'</div>');
+                        }
+    					else if(lib.card[name]&&lib.card[name].addinfomenu){
+    						uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
+    					}
+    					else if(lib.card[name]&&lib.card[name].derivation){
+                            if(typeof lib.card[name].derivation=='string'){
+                                uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivation)+'</div>');
+                            }
+    						else if(lib.card[name].derivationpack){
+                                uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
+                            }
+    					}
+                        else{
+                            uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
+                        }
+                        uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
+    				}
+    				uiintro.add(ui.create.div('.placeholder.slim'));
+                }
 			}
 			else if(node.classList.contains('character')){
 				var character=node.link;

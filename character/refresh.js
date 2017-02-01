@@ -874,7 +874,7 @@ character.refresh={
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-1];
-						if(get.tag(card,'damage')&&player!=target) return [1,1];
+						if(get.tag(card,'damage')&&player!=target) return [1,0.6];
 					}
 				}
 			}

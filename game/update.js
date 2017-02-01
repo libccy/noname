@@ -3,7 +3,7 @@ window.noname_update={
     update:'1.9.6.5',
     changeLog:[
         'bug修复',
-        '禁将设置改进（旧设置将被清除）',
+        '联机可禁卡',
     ],
     files:[
         'game/game.js',
@@ -20,9 +20,9 @@ window.noname_update={
         // 'character/extra.js',
         'character/ow.js',
         // 'character/hearth.js',
-        // 'character/refresh.js',
+        'character/refresh.js',
         // 'character/shenhua.js',
-        // 'character/sp.js',
+        'character/sp.js',
         // 'character/xianjian.js',
         'character/swd.js',
         // 'character/yxs.js',
