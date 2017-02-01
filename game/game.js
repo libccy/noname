@@ -1676,9 +1676,9 @@
 						onclick:function(){
 							if(this.innerHTML!='已隐藏'){
 								this.innerHTML='已隐藏';
-								game.saveConfig('hiddenModePack',['stone','chess','boss','tafang']);
-								game.saveConfig('hiddenCardPack',['zhenfa','yunchou','swd','shenqi','hearth','gujian']);
-								game.saveConfig('hiddenCharacterPack',['diy','yxs','hearth','swd','gujian','xianjian','boss','ow']);
+								game.saveConfig('hiddenModePack',lib.config.all.diymode);
+								game.saveConfig('hiddenCardPack',lib.config.all.diycard);
+								game.saveConfig('hiddenCharacterPack',lib.config.all.diycharacter);
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='隐藏非官方扩展包';
@@ -3793,11 +3793,13 @@
 				lib.config.all.plays=[];
 				lib.config.all.mode=[];
 
-                lib.init.js(lib.assetURL+'game','asset',function(){
-                    lib.skin=window.noname_skin_list;
-                    delete window.noname_skin_list;
-                    delete window.noname_asset_list;
-                });
+                if(lib.config.dev){
+                    lib.init.js(lib.assetURL+'game','asset',function(){
+                        lib.skin=window.noname_skin_list;
+                        delete window.noname_skin_list;
+                        delete window.noname_asset_list;
+                    });
+                }
 
                 if(window.isNonameServer){
                     lib.config.mode='connect';
@@ -4091,7 +4093,7 @@
                         else{
                             url=get.url()+url;
                         }
-                        if(lib.config.debug) game.print(url);
+                        if(lib.config.dev) game.print(url);
                         var dir=folder.split('/');
                         var str='';
                         var download=function(){
@@ -4217,7 +4219,7 @@
                             else{
                                 url=get.url()+url;
                             }
-                            if(lib.config.debug) game.print(url);
+                            if(lib.config.dev) game.print(url);
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
@@ -4261,9 +4263,6 @@
                     game.documentZoom=1;
                     game.deviceZoom=1;
                 }
-                // if(lib.config.debug&&window.require){
-                //     window.require('remote').getCurrentWindow().openDevTools();
-                // }
 				ui.background=ui.create.div('.background');
 				ui.background.style.backgroundSize="cover";
 				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background!='custom'){
@@ -25484,7 +25483,6 @@
                             ui.updatep2.style.display='none';
                         }
     					var button1,button2,button3;
-                        var span1,includeskin;
 
     					game.checkForUpdate=function(forcecheck,dev){
     						if(!dev&&button1.disabled){
@@ -25705,13 +25703,59 @@
                                     var skins=window.noname_skin_list;
                                     delete window.noname_skin_list;
     								var asset_version=updates.shift();
-    								if(asset_version==lib.config.asset_version&&lib.config.exclude_skin){
-    									alert('素材已是最新');
-    									button2.disabled=false;
-    									button2.innerHTML='检查素材更新';
-    									return;
-    								}
-                                    if(!lib.config.exclude_skin){
+
+                                    var skipcharacter=[],skipcard=[];
+                                    if(!lib.config.asset_full){
+                                        for(var i=0;i<lib.config.all.diycharacter.length;i++){
+                                            var pack=lib.characterPack[lib.config.all.diycharacter[i]];
+                                            for(var j in pack){
+                                                skipcharacter.add(j);
+                                            }
+                                        }
+                                        for(var i=0;i<lib.config.all.diycard.length;i++){
+                                            var pack=lib.cardPack[lib.config.all.diycard[i]];
+                                            if(pack){
+                                                skipcard=skipcard.concat(pack);
+                                            }
+                                        }
+                                    }
+                                    for(var i=0;i<updates.length;i++){
+                                        switch(updates[i].slice(0,5)){
+                                            case 'image':{
+                                                if(!lib.config.asset_image){
+                                                    updates.splice(i--,1);
+                                                }
+                                                else if(!lib.config.asset_full){
+                                                    if(updates[i].indexOf('image/character')==0){
+                                                        if(skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
+                                                            updates.splice(i--,1);
+                                                        }
+                                                    }
+                                                    else if(updates[i].indexOf('image/card')==0){
+                                                        if(skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
+                                                            updates.splice(i--,1);
+                                                        }
+                                                    }
+                                                    else if(updates[i].indexOf('image/mode/stone')==0){
+                                                        updates.splice(i--,1);
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                            case 'audio':{
+                                                if(!lib.config.asset_audio){
+                                                    updates.splice(i--,1);
+                                                }
+                                                break;
+                                            }
+                                            case 'font/':{
+                                                if(!lib.config.asset_font){
+                                                    updates.splice(i--,1);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if(lib.config.asset_skin){
                                         for(var i in skins){
                                             for(var j=1;j<=skins[i];j++){
                                                 updates.push('image/skin/'+i+'/'+j+'.jpg');
@@ -25738,7 +25782,8 @@
     									var n2=updates.length;
     									span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
                                         span1.remove();
-                                        includeskin.remove();
+                                        span2.remove();
+                                        span2_check.remove();
     									p.appendChild(span);
     									var finish=function(){
     										if(n1==n2){
@@ -25784,7 +25829,7 @@
     					button3.onclick=function(){
                             game.checkForUpdate(null,true);
                         };
-    					if(lib.config.debug){
+    					if(lib.config.dev){
                             li1.lastChild.appendChild(button3);
                         }
 
@@ -25793,22 +25838,124 @@
     					button2.onclick=game.checkForAssetUpdate;
     					li2.lastChild.appendChild(button2);
 
-                        var span1=document.createElement('span');
-                        span1.innerHTML='包含皮肤';
+                        var span1=ui.create.div('.config.more','选项 <div>&gt;</div>');
                         span1.style.fontSize='small';
-                        span1.style.marginLeft='10px';
+                        span1.style.display='inline';
+                        span1.listen(function(){
+                            this.classList.toggle('on');
+                            if(!this.classList.contains('on')){
+                                span2.style.display='none';
+                                span2_check.style.display='none';
+                                span3.style.display='none';
+                                span3_check.style.display='none';
+                                span4.style.display='none';
+                                span4_check.style.display='none';
+                                span5.style.display='none';
+                                span5_check.style.display='none';
+                                span6.style.display='none';
+                                span6_check.style.display='none';
+                            }
+                            else{
+                                span2.style.display='';
+                                span2_check.style.display='';
+                                span3.style.display='';
+                                span3_check.style.display='';
+                                span4.style.display='';
+                                span4_check.style.display='';
+                                span5.style.display='';
+                                span5_check.style.display='';
+                                span6.style.display='';
+                                span6_check.style.display='';
+                            }
+                        })
                         li2.lastChild.appendChild(span1);
 
-                        var includeskin=document.createElement('input');
-                        includeskin.type='checkbox';
-                        includeskin.name='包含皮肤';
-                        if(!lib.config.exclude_skin){
-                            includeskin.checked=true;
+                        li2.lastChild.appendChild(ui.create.node('br'));
+
+                        var span5=ui.create.div('','图片素材');
+                        span5.style.fontSize='small';
+                        li2.lastChild.appendChild(span5);
+                        var span5_check=document.createElement('input');
+                        span5_check.type='checkbox';
+                        span5_check.style.marginLeft='5px';
+                        if(lib.config.asset_image){
+                            span5_check.checked=true;
                         }
-                        includeskin.onchange=function(){
-                            game.saveConfig('exclude_skin',!this.checked);
+                        span5_check.onchange=function(){
+                            game.saveConfig('asset_image',this.checked);
                         }
-                        li2.lastChild.appendChild(includeskin);
+                        li2.lastChild.appendChild(span5_check);
+                        li2.lastChild.appendChild(ui.create.node('br'));
+
+                        var span4=ui.create.div('','字体素材');
+                        span4.style.fontSize='small';
+                        li2.lastChild.appendChild(span4);
+                        var span4_check=document.createElement('input');
+                        span4_check.type='checkbox';
+                        span4_check.style.marginLeft='5px';
+                        if(lib.config.asset_font){
+                            span4_check.checked=true;
+                        }
+                        span4_check.onchange=function(){
+                            game.saveConfig('asset_font',this.checked);
+                        }
+                        li2.lastChild.appendChild(span4_check);
+                        li2.lastChild.appendChild(ui.create.node('br'));
+
+                        var span3=ui.create.div('','音效素材');
+                        span3.style.fontSize='small';
+                        li2.lastChild.appendChild(span3);
+                        var span3_check=document.createElement('input');
+                        span3_check.type='checkbox';
+                        span3_check.style.marginLeft='5px';
+                        if(lib.config.asset_audio){
+                            span3_check.checked=true;
+                        }
+                        span3_check.onchange=function(){
+                            game.saveConfig('asset_audio',this.checked);
+                        }
+                        li2.lastChild.appendChild(span3_check);
+                        li2.lastChild.appendChild(ui.create.node('br'));
+
+                        var span2=ui.create.div('','皮肤素材');
+                        span2.style.fontSize='small';
+                        li2.lastChild.appendChild(span2);
+                        var span2_check=document.createElement('input');
+                        span2_check.type='checkbox';
+                        span2_check.style.marginLeft='5px';
+                        if(lib.config.asset_skin){
+                            span2_check.checked=true;
+                        }
+                        span2_check.onchange=function(){
+                            game.saveConfig('asset_skin',this.checked);
+                        }
+                        li2.lastChild.appendChild(span2_check);
+                        li2.lastChild.appendChild(ui.create.node('br'));
+
+                        var span6=ui.create.div('','图片素材（完整）');
+                        span6.style.fontSize='small';
+                        li2.lastChild.appendChild(span6);
+                        var span6_check=document.createElement('input');
+                        span6_check.type='checkbox';
+                        span6_check.style.marginLeft='5px';
+                        if(lib.config.asset_full){
+                            span6_check.checked=true;
+                        }
+                        span6_check.onchange=function(){
+                            game.saveConfig('asset_full',this.checked);
+                        }
+                        li2.lastChild.appendChild(span6_check);
+
+                        span2.style.display='none';
+                        span2_check.style.display='none';
+                        span3.style.display='none';
+                        span3_check.style.display='none';
+                        span4.style.display='none';
+                        span4_check.style.display='none';
+                        span5.style.display='none';
+                        span5_check.style.display='none';
+                        span6.style.display='none';
+                        span6_check.style.display='none';
 
     					ul.appendChild(li1);
                         ul.appendChild(li2);

@@ -4,6 +4,7 @@ window.noname_update={
     changeLog:[
         'bug修复',
         '联机可禁卡',
+        '素材下载改进',
     ],
     files:[
         'game/game.js',
