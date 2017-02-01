@@ -4093,7 +4093,6 @@
                         else{
                             url=get.url()+url;
                         }
-                        if(lib.config.dev) game.print(url);
                         var dir=folder.split('/');
                         var str='';
                         var download=function(){
@@ -4219,7 +4218,6 @@
                             else{
                                 url=get.url()+url;
                             }
-                            if(lib.config.dev) game.print(url);
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
@@ -9180,6 +9178,7 @@
                         this.node.hp.innerHTML='';
                         this.roomfull=false;
                         this.roomgaming=false;
+                        this.versionOL=null;
                         if(info=='server'){
                             this.serving=true;
                             this.node.serving.show();
@@ -16026,6 +16025,12 @@
                 if(lib.node&&lib.node.fs){
                     lib.node.fs.access(__dirname+'/'+updates[i],(function(entry){
                         return function(err){
+                            if(!err){
+                                var stat=lib.node.fs.statSync(__dirname+'/'+entry);
+                                if(stat.size==0){
+                                    err=true;
+                                }
+                            }
                             if(err){
                                 n--;
                                 if(n==0){
@@ -16878,6 +16883,7 @@
 		},
         multiDownload:function(list,onsuccess,onerror,onfinish,process,dev){
             list=list.slice(0);
+            if(lib.config.dev) game.print(get.url());
             var download=function(){
                 if(list.length){
                     var current=list.shift();
@@ -16888,7 +16894,13 @@
                     else{
                         current2=current;
                     }
-                    if(!lib.config.dev){
+                    if(current.indexOf('theme')==0){
+                        game.print(current.slice(6));
+                    }
+                    else if(current.indexOf('image/skin')==0){
+                        game.print(current.slice(11));
+                    }
+                    else{
                         game.print(current.slice(current.lastIndexOf('/')+1));
                     }
                     game.download(current,current2,function(){
@@ -25740,7 +25752,8 @@
                                                         }
                                                     }
                                                     else if(updates[i].indexOf('image/card')==0){
-                                                        if(skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
+                                                        var skipname=updates[i].slice(11,updates[i].lastIndexOf('.'));
+                                                        if(skipcard.contains(skipname)||skipname.indexOf('hs')==0||skipname.indexOf('tuteng')==0){
                                                             updates.splice(i--,1);
                                                         }
                                                     }
@@ -30202,7 +30215,10 @@
                                 alert('房间已满');
                             }
                             else if(this.roomgaming&&!game.onlineID){
-                                alert('房间不允许旁观')
+                                alert('房间不允许旁观');
+                            }
+                            else if(this.versionOL!=lib.versionOL){
+                                alert('版本不匹配');
                             }
                             else if(this.hasOwnProperty('roomindex')){
                                 if(!_status.enteringroom){
