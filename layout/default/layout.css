@@ -1007,6 +1007,8 @@ margin-bottom: 5px;
 .config>div>div{position: relative;padding-right: 10px;height:20px}
 .dialog>.content>.config{width:300px;left:calc(50% - 150px);}
 .toggle{right: 16px;left: auto !important;min-width: 16px;text-align: right !important;}
+.menu-buttons.configpopped{margin-top: 10px}
+.menu-buttons.configpopped>.toggle{text-align: left !important;margin-left: 21px !important;width: calc(100% - 15px) !important;overflow: visible;}
 .switcher{width: 88%;position: relative;}
 .dialog.popped .caption{transition: all 0s;}
 .caption{padding-top: 8px;font-size: 20px;display: block;}

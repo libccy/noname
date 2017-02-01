@@ -399,7 +399,11 @@ mode.versus={
 			}
 			uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
 			uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
-			uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭')).style.paddingBottom='8px';
+			var last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
+			if(lib.configOL.banned.length){
+				last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
+			}
+			last.style.paddingBottom='8px';
 		},
 		getVideoName:function(){
 			var str=get.translation(game.me.name);

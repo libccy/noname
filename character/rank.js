@@ -495,6 +495,7 @@ window.characterRank={
         'zhangliang',
         'xiaoqiao',
         'xiahouyuan',
+        'yanwen',
     ],
     c:[
         'old_xusheng',
@@ -507,7 +508,6 @@ window.characterRank={
         'caohong',
         'caocao',
         'lvbu',
-        'yanwen',
         'yujin',
     ],
     d:[
