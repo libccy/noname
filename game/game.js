@@ -1501,6 +1501,7 @@
 						name:'音效音量',
 						init:8,
 						item:{
+                            '0':'〇',
 							'1':'一',
 							'2':'二',
 							'3':'三',
@@ -1518,6 +1519,7 @@
 						name:'音乐音量',
 						init:8,
 						item:{
+                            '0':'〇',
 							'1':'一',
 							'2':'二',
 							'3':'三',
@@ -4353,9 +4355,6 @@
 						get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
 					}
 					lib.init.start=mode[lib.config.mode].start;
-                    if(typeof mode[lib.config.mode].init=='function'){
-                        mode[lib.config.mode].init();
-                    }
 					if(game.onwash){
 						lib.onwash.push(game.onwash);
 						delete game.onwash;
@@ -4383,6 +4382,9 @@
 							lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
 						}
 					}
+                    if(typeof mode[lib.config.mode].init=='function'){
+                        (lib.init.eval(mode[lib.config.mode].init))();
+                    }
 
                     var connectCharacterPack=[];
                     var connectCardPack=[];
@@ -5094,6 +5096,9 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+            o:function(){
+                ui.arena.classList.remove('observe');
+            },
             p:function(name,i){
                 var list=['swd','hs','pal','gjqt','ow'];
                 if(!lib.character[name]){
@@ -9178,7 +9183,7 @@
                         this.node.hp.innerHTML='';
                         this.roomfull=false;
                         this.roomgaming=false;
-                        this.versionOL=null;
+                        this.version=null;
                         if(info=='server'){
                             this.serving=true;
                             this.node.serving.show();
@@ -9206,6 +9211,7 @@
                         this.maxHp=parseInt(config.number);
                         this.hp=info[3];
                         this.update();
+                        this.version=config.version;
                         if(this.hp==this.maxHp&&!config.gameStarted){
                             this.roomfull=true;
                         }
@@ -19217,7 +19223,7 @@
 			dialog.add(ui.create.div('.placeholder'));
 
             for(var i=0;i<game.players.length;i++){
-                if(game.players[i].isUnderControl(true)) continue;
+                if(!_status.connectMode&&game.players[i].isUnderControl(true)) continue;
                 var hs=game.players[i].get('h');
                 if(hs.length){
                     dialog.add('<div class="text center">'+get.translation(game.players[i])+'</div>');
@@ -20162,6 +20168,7 @@
                         }
                         lib.configOL.banned=lib.config['connect_'+name+'_banned'];
                         lib.configOL.bannedcards=lib.config['connect_'+name+'_bannedcards'];
+                        lib.configOL.version=lib.versionOL;
                     }
                     for(var i in lib.cardPackList){
                         if(lib.configOL.cardPack.contains(i)){
@@ -22565,7 +22572,9 @@
                             var banned=lib.config[lib.config.all.mode[i]+'_banned'];
                             if(banned){
                                 for(var j=0;j<banned.length;j++){
-                                    lib.characterPack.mode_banned[banned[j]]=lib.character[banned[j]];
+                                    if(lib.character[banned[j]]){
+                                        lib.characterPack.mode_banned[banned[j]]=lib.character[banned[j]];
+                                    }
                                 }
                             }
                         }
@@ -30217,8 +30226,13 @@
                             else if(this.roomgaming&&!game.onlineID){
                                 alert('房间不允许旁观');
                             }
-                            else if(this.versionOL!=lib.versionOL){
-                                alert('版本不匹配');
+                            else if(this.version&&this.version!=lib.versionOL){
+                                if(this.version>lib.versionOL){
+                                    alert('加入失败：你的游戏版本过低');
+                                }
+                                else{
+                                    alert('加入失败：房主的游戏版本过低');
+                                }
                             }
                             else if(this.hasOwnProperty('roomindex')){
                                 if(!_status.enteringroom){
@@ -31207,36 +31221,26 @@
             }
             return parseInt(num)||2;
         },
-        benchmark:function(func1,func2,arg,iteration){
+        benchmark:function(func1,func2,iteration,arg){
             var tic,toc;
+            if(!arg) arg=[];
             if(Array.isArray(func2)){
-                tic=get.utc();
-                for(var i=0;i<iteration;i++){
-                    func1[func2[0]](arg.randomGet());
-                }
-                toc=get.utc();
-                console.log('time1: '+(toc-tic));
-                tic=get.utc();
-                for(var i=0;i<iteration;i++){
-                    func1[func2[1]](arg.randomGet());
-                }
-                toc=get.utc();
-                console.log('time2: '+(toc-tic));
+                var key1=func2[0],key2=func2[1];
+                func2=func1[key2];
+                func1=func1[key1];
             }
-            else{
-                tic=get.utc();
-                for(var i=0;i<iteration;i++){
-                    func1(arg.randomGet());
-                }
-                toc=get.utc();
-                console.log('time1: '+(toc-tic));
-                tic=get.utc();
-                for(var i=0;i<iteration;i++){
-                    func2(arg.randomGet());
-                }
-                toc=get.utc();
-                console.log('time2: '+(toc-tic));
+            tic=get.utc();
+            for(var i=0;i<iteration;i++){
+                func1(arg.randomGet());
             }
+            toc=get.utc();
+            console.log('time1: '+(toc-tic));
+            tic=get.utc();
+            for(var i=0;i<iteration;i++){
+                func2(arg.randomGet());
+            }
+            toc=get.utc();
+            console.log('time2: '+(toc-tic));
         },
         stringify:function(obj,level){
             level=level||0;

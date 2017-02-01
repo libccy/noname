@@ -186,55 +186,69 @@
 #window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
     border-radius: 16px !important;
 }
-#arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     border-radius: 8px 8px 0 0 !important;
     height: calc(50% + 14px) !important;
     -webkit-clip-path: polygon(-10px -10px, 116px -10px, 116px 92px, 106px 92px, 0px 114px, -10px 114px);
 }
-#arena[data-player_height='default']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#arena[data-player_height='default']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena[data-player_height='default']>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     -webkit-clip-path: polygon(-10px -10px, 116px -10px, 116px 82px, 106px 82px, 0px 104px, -10px 104px);
 }
-#arena[data-player_height='short']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#arena[data-player_height='short']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena[data-player_height='short']>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     -webkit-clip-path: polygon(-10px -10px, 116px -10px, 116px 72px, 106px 72px, 0px 94px, -10px 94px);
 }
-#arena.uslim_player>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#arena.uslim_player>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena.uslim_player>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     height: calc(50% + 18px) !important;
     -webkit-clip-path: polygon(-10px -10px, 124px -10px, 124px 96px, 114px 96px, 0px 118px, -10px 118px);
 }
-#arena.uslim_player[data-player_height='default']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#arena.uslim_player[data-player_height='default']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena.uslim_player[data-player_height='default']>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     -webkit-clip-path: polygon(-10px -10px, 124px -10px, 124px 86px, 114px 86px, 0px 108px, -10px 108px);
 }
-#arena.uslim_player[data-player_height='short']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#arena.uslim_player[data-player_height='short']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena.uslim_player[data-player_height='short']>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     -webkit-clip-path: polygon(-10px -10px, 124px -10px, 124px 76px, 114px 76px, 0px 98px, -10px 98px);
 }
-#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     border-radius: 4px 4px 0 0 !important;
 }
-#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     border-radius: 0 0 0 0 !important;
 }
-#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar{
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     border-radius: 16px 16px 0 0 !important;
 }
-#arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2{
+#arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2,
+#arena>.player.fullskin2:not(.minskin).unseen[data-position='0']>.avatar2{
     border-radius: 0 0 8px 8px !important;
     top: calc(50% - 21px) !important;
     height: calc(50% + 14px) !important;
     background-position: 0 10px !important;
     -webkit-clip-path: polygon(-10px 32px, 0 32px, 106px 10px, 116px 10px, 116px 134px, -10px 134px);
 }
-#arena.uslim_player>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2{
+#arena.uslim_player>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2,
+#arena.uslim_player>.player.fullskin2:not(.minskin).unseen[data-position='0']>.avatar2{
     top: calc(50% - 21px) !important;
     height: calc(50% + 18px) !important;
     -webkit-clip-path: polygon(-10px 32px, 0 32px, 114px 10px, 124px 10px, 124px 138px, -10px 138px);
 }
-#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2{
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2,
+#window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin).unseen[data-position='0']>.avatar2{
     border-radius: 0 0 4px 4px !important;
 }
-#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2{
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2,
+#window[data-radius_size='off'] #arena>.player.fullskin2:not(.minskin).unseen[data-position='0']>.avatar2{
     border-radius: 0 0 0 0 !important;
 }
-#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2{
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2,
+#window[data-radius_size='increase'] #arena>.player.fullskin2:not(.minskin).unseen[data-position='0']>.avatar2{
     border-radius: 0 0 16px 16px !important;
 }
 #arena>.player.fullskin2:not(.minskin)>.avatar2{

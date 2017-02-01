@@ -436,18 +436,30 @@ card.guozhan={
 				var content;
 				var str=get.translation(target)+'的';
 				if(result.control){
-					if(result.control=='手牌') content=[str+'手牌',target.get('h')];
-					else if(result.control=='主将') content=[str+'主将',[[target.name1],'character']];
-					else content=[str+'副将',[[target.name2],'character']];
+					if(result.control=='手牌'){
+						content=[str+'手牌',target.get('h')];
+						game.log(player,'观看了',target,'的手牌');
+					}
+					else if(result.control=='主将'){
+						content=[str+'主将',[[target.name1],'character']];
+						game.log(player,'观看了',target,'的主将');
+					}
+					else{
+						content=[str+'副将',[[target.name2],'character']];
+						game.log(player,'观看了',target,'的副将');
+					}
 				}
 				else if(target.get('h').length){
 					content=[str+'手牌',target.get('h')];
+					game.log(player,'观看了',target,'的手牌');
 				}
 				else if(target.classList.contains('unseen')){
 					content=[str+'主将',[[target.name1],'character']];
+					game.log(player,'观看了',target,'的主将');
 				}
 				else{
 					content=[str+'副将',[[target.name2],'character']];
+					game.log(player,'观看了',target,'的副将');
 				}
 				player.chooseControl('ok').set('dialog',content);
 			},

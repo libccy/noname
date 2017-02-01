@@ -78,7 +78,7 @@ mode.boss={
 		var list=[];
 		for(var i in lib.character){
 			var info=lib.character[i];
-			if(info[4].contains('boss')&&!lib.config.banned.contains(i)){
+			if(info[4].contains('boss')&&get.config(i+'_boss_config')){
 				var cfg=i+'_bossconfig';
 				if(get.config(cfg)==undefined){
 					game.saveConfig(cfg,true,true);
@@ -422,6 +422,15 @@ mode.boss={
 			boss_huatuo:['male','qun',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['boss','bossallowed'],'wu'],
 			boss_dongzhuo:['male','qun',20,['jiuchi','boss_qiangzheng','boss_baolin'],['boss','bossallowed'],'shu'],
 			// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
+		}
+	},
+	init:function(){
+		for(var i in lib.characterPack.mode_boss){
+			lib.mode.boss.config[i+'_boss_config']={
+				name:get.translation(i),
+				init:true,
+				unfrequent:true,
+			}
 		}
 	},
 	game:{
