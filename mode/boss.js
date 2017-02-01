@@ -386,8 +386,6 @@ mode.boss={
 		mode_boss:{
 			boss_zhangchunhua:['female','wei',4,['jueqing','wuxin','shangshix'],['boss','bossallowed'],'wei'],
 			boss_zhenji:['female','wei',4,['tashui','lingbo','jiaoxia','fanghua'],['boss','bossallowed'],'wei'],
-			// boss_liubei:['male','shu',5,['lingfeng'],['boss','bossallowed'],'qun'],
-			// boss_zhugeliang:['male','shu',4,[],['boss','bossallowed'],'qun'],
 			boss_huangyueying:['female','shu',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['boss','bossallowed'],'wei'],
 			boss_pangtong:['male','shu',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['boss','bossallowed'],'zhu'],
 			boss_zhaoyun:['male','shu',1,['boss_juejing','longhun','zhanjiang'],['boss','bossallowed'],'qun'],
@@ -417,15 +415,23 @@ mode.boss={
 			boss_caiwenji:['female','qun',4,['beige','boss_hujia','boss_guihan'],['boss','bossallowed'],'wei'],
 			boss_zhangjiao:['male','qun',8,['boss_leiji','tiandao','jidian'],['boss','bossallowed'],'shu'],
 			boss_zuoci:['male','qun',0,['huanhua'],['boss','bossallowed'],'shu'],
+
 			// boss_yuji:['male','qun',8,[],['boss','bossallowed'],'nei'],
 			boss_diaochan:['female','qun',4,['fengwu','yunshen','lianji','boss_wange','yuehun'],['boss','bossallowed'],'qun'],
 			boss_huatuo:['male','qun',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['boss','bossallowed'],'wu'],
 			boss_dongzhuo:['male','qun',20,['jiuchi','boss_qiangzheng','boss_baolin'],['boss','bossallowed'],'shu'],
 			// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
+			// boss_sunshangxiang:['male','qun',8,[],['boss','bossallowed'],'wei'],
+
+			// boss_liubei:['male','shu',5,['lingfeng'],['boss','bossallowed'],'qun'],
+			// boss_zhugeliang:['male','shu',4,[],['boss','bossallowed'],'qun'],
+			// boss_guojia:['male','wei',4,[],['boss','bossallowed'],'zhu'],
+			// boss_caocao:['male','wei',4,[],['boss','bossallowed'],'wei'],
 		}
 	},
 	init:function(){
 		for(var i in lib.characterPack.mode_boss){
+			if(lib.characterPack.mode_boss[i][4].contains('hiddenboss')) continue;
 			lib.mode.boss.config[i+'_boss_config']={
 				name:get.translation(i),
 				init:true,
@@ -3037,6 +3043,8 @@ mode.boss={
 		boss_zhenji:'洛水仙子',
 		boss_diaochan:'绝代妖姬',
 		boss_zhaoyun:'高达一号',
+		boss_guojia:'世之奇士',
+		boss_caocao:'魏武大帝',
 
 		jiaoxia:'皎霞',
 		jiaoxia_info:'每当你成为红色牌的目标，你可以摸一张牌',

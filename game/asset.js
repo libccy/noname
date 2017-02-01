@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.6.6',
+    '1.9.7',
     'image/background/huangtian_bg.jpg',
     'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
@@ -758,9 +758,11 @@ window.noname_asset_list=[
     'image/mode/stone/career/warrior.png',
     'image/mode/boss/character/boss_baiwuchang.jpg',
     'image/mode/boss/character/boss_caiwenji.jpg',
+    'image/mode/boss/character/boss_caocao.jpg',
     'image/mode/boss/character/boss_chi.jpg',
     'image/mode/boss/character/boss_diaochan.jpg',
     'image/mode/boss/character/boss_dongzhuo.jpg',
+    'image/mode/boss/character/boss_guojia.jpg',
     'image/mode/boss/character/boss_heiwuchang.jpg',
     'image/mode/boss/character/boss_huangyueying.jpg',
     'image/mode/boss/character/boss_huatuo.jpg',
