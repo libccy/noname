@@ -8281,8 +8281,7 @@
 						if(player==game.me){
 							cards[num].classList.add('drawinghidden');
 						}
-
-						if(lib.isSingleHandcard()||sort>0) frag1.appendChild(cards[num]);
+						if(lib.isSingleHandcard()||sort>1) frag1.appendChild(cards[num]);
 						else frag2.appendChild(cards[num]);
 					}
 					var addv=function(){
