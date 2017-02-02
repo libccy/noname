@@ -1,5 +1,87 @@
 card.swd={
 	card:{
+		dujian:{
+			fullskin:true,
+			type:'basic',
+			enable:true,
+			filterTarget:function(card,player,target){
+				return target.num('h')>0;
+			},
+			content:function(){
+				"step 0"
+				if(target.num('h')==0||player.num('h')==0){
+					event.finish();
+					return;
+				}
+				player.chooseCard(true);
+				"step 1"
+				event.card1=result.cards[0];
+				var rand=Math.random()<0.5;
+				target.chooseCard(true).ai=function(card){
+					if(rand) return Math.random();
+					return ai.get.value(card);
+				};
+				"step 2"
+				event.card2=result.cards[0];
+				ui.arena.classList.add('thrownhighlight');
+				game.addVideo('thrownhighlight1');
+				player.$compare(event.card1,target,event.card2);
+				game.delay(4);
+				"step 3"
+				game.log(player,'展示了',event.card1);
+				game.log(target,'展示了',event.card2);
+				if(get.color(event.card2)==get.color(event.card1)){
+					player.discard(event.card1).animate=false;
+					target.$gain2(event.card2);
+					var clone=event.card1.clone;
+					if(clone){
+						clone.style.transition='all 0.5s';
+						clone.style.transform='scale(1.2)';
+						clone.delete();
+						game.addVideo('deletenode',player,get.cardsInfo([clone]));
+					}
+					target.loseHp();
+				}
+				else{
+					player.$gain2(event.card1);
+					target.$gain2(event.card2);
+					target.addTempSkill('dujian2','phaseBegin');
+				}
+				ui.arena.classList.remove('thrownhighlight');
+				game.addVideo('thrownhighlight2');
+			},
+			ai:{
+				basic:{
+					order:2,
+					value:3,
+					useful:1,
+				},
+				result:{
+					player:function(player,target){
+						if(player.num('h')<=Math.min(5,Math.max(2,player.hp))&&_status.event.name=='chooseToUse'){
+							if(typeof _status.event.filterCard=='function'&&
+								_status.event.filterCard({name:'dujian'})){
+								return -10;
+							}
+							if(_status.event.skill){
+								var viewAs=get.info(_status.event.skill).viewAs;
+								if(viewAs=='dujian') return -10;
+								if(viewAs&&viewAs.name=='dujian') return -10;
+							}
+						}
+						return 0;
+					},
+					target:function(player,target){
+						if(target.hasSkill('dujian2')||target.num('h')==0) return 0;
+						if(player.num('h')<=1) return 0;
+						return -1.5;
+					}
+				},
+				tag:{
+					loseHp:1
+				}
+			}
+		},
 		yangpijuan:{
 			fullskin:true,
 			type:'trick',
@@ -605,6 +687,8 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			nomod:true,
+			equipDelay:false,
+			loseDelay:false,
 			onEquip:function(){
 				player.markSkill('lianyaohu_skill');
 			},
@@ -1503,6 +1587,9 @@ card.swd={
 				if(target==_status.event.getParent(2).dying||target==_status.dying) target.recover();
 				else{
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
+					if(cards&&cards.length){
+						card=cards[0];
+					}
 					if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
 						card.clone.moveDelete(target);
 						game.addVideo('gain2',target,get.cardsInfo([card]));
@@ -1794,6 +1881,8 @@ card.swd={
 					}
 				}
 			},
+			equipDelay:false,
+			loseDelay:false,
 			onLose:function(){
 				player.storage.nigong=0;
 				player.unmarkSkill('nigong');
@@ -1807,6 +1896,8 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			skills:['xujin'],
+			equipDelay:false,
+			loseDelay:false,
 			onLose:function(){
 				player.storage.xujin=0;
 			},
@@ -1872,6 +1963,7 @@ card.swd={
 		},
 	},
 	skill:{
+		dujian2:{},
 		_yuchan_swap:{
 			trigger:{player:'useCardAfter'},
 			forced:true,
@@ -4887,6 +4979,8 @@ card.swd={
 		nvwashi_bg:'石',
 		kongxin:'控心',
 		lianhua:'炼化',
+		dujian:'毒箭',
+		dujian_info:'出牌阶段，对一名有手牌或装备牌的角色使用，令其展示一张手牌，若与你选择的手牌颜色相同，其流失一点体力',
 		lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		shouna:'收纳',
 		shouna_info:'出牌阶段限一次，你可以弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶',
@@ -5038,5 +5132,9 @@ card.swd={
 		['club',6,'yuchanli'],
 		['diamond',7,'yuchangen'],
 		['heart',8,'yuchandui'],
+
+		['spade',3,'dujian','poison'],
+		['club',11,'dujian','poison'],
+		['club',12,'dujian','poison'],
 	],
 }

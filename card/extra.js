@@ -25,6 +25,9 @@ card.extra={
 					}
 				}
 				else{
+					if(cards&&cards.length){
+						card=cards[0];
+					}
 					game.broadcastAll(function(target,card,gain2){
 						target.addSkill('jiu');
 						if(!target.node.jiu&&lib.config.jiu_effect){

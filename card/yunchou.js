@@ -586,88 +586,6 @@ card.yunchou={
 				}
 			}
 		},
-		dujian:{
-			fullskin:true,
-			type:'basic',
-			enable:true,
-			filterTarget:function(card,player,target){
-				return target.num('h')>0;
-			},
-			content:function(){
-				"step 0"
-				if(target.num('h')==0||player.num('h')==0){
-					event.finish();
-					return;
-				}
-				player.chooseCard(true);
-				"step 1"
-				event.card1=result.cards[0];
-				var rand=Math.random()<0.5;
-				target.chooseCard(true).ai=function(card){
-					if(rand) return Math.random();
-					return ai.get.value(card);
-				};
-				"step 2"
-				event.card2=result.cards[0];
-				ui.arena.classList.add('thrownhighlight');
-				game.addVideo('thrownhighlight1');
-				player.$compare(event.card1,target,event.card2);
-				game.delay(4);
-				"step 3"
-				game.log(player,'展示了',event.card1);
-				game.log(target,'展示了',event.card2);
-				if(get.color(event.card2)==get.color(event.card1)){
-					player.discard(event.card1).animate=false;
-					target.$gain2(event.card2);
-					var clone=event.card1.clone;
-					if(clone){
-						clone.style.transition='all 0.5s';
-						clone.style.transform='scale(1.2)';
-						clone.delete();
-						game.addVideo('deletenode',player,get.cardsInfo([clone]));
-					}
-					target.loseHp();
-				}
-				else{
-					player.$gain2(event.card1);
-					target.$gain2(event.card2);
-					target.addTempSkill('dujian2','phaseBegin');
-				}
-				ui.arena.classList.remove('thrownhighlight');
-				game.addVideo('thrownhighlight2');
-			},
-			ai:{
-				basic:{
-					order:2,
-					value:3,
-					useful:1,
-				},
-				result:{
-					player:function(player,target){
-						if(player.num('h')<=Math.min(5,Math.max(2,player.hp))&&_status.event.name=='chooseToUse'){
-							if(typeof _status.event.filterCard=='function'&&
-								_status.event.filterCard({name:'dujian'})){
-								return -10;
-							}
-							if(_status.event.skill){
-								var viewAs=get.info(_status.event.skill).viewAs;
-								if(viewAs=='dujian') return -10;
-								if(viewAs&&viewAs.name=='dujian') return -10;
-							}
-						}
-						return 0;
-					},
-					target:function(player,target){
-						if(target.hasSkill('dujian2')||target.num('h')==0) return 0;
-						if(player.num('h')<=1) return 0;
-						return -1.5;
-					}
-				},
-				tag:{
-					loseHp:1
-				}
-			}
-		},
 		qiankundai:{
 			fullskin:true,
 			type:'equip',
@@ -738,7 +656,6 @@ card.yunchou={
 				},trigger.player,-1).targetRequired=true;
 			}
 		},
-		dujian2:{},
 		qiankundai:{
 			mod:{
 				maxHandcard:function(player,num){
@@ -812,8 +729,6 @@ card.yunchou={
 		hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力，X至少为1',
 		liuxinghuoyu:'流星火羽',
 		liuxinghuoyu_info:'出牌阶段，对一名角色使用，令目标弃置2张牌，或受到一点火焰伤害',
-		dujian:'毒箭',
-		dujian_info:'出牌阶段，对一名有手牌或装备牌的角色使用，令其展示一张手牌，若与你选择的手牌颜色相同，其流失一点体力',
 		qiankundai:'乾坤袋',
 		qiankundai_info:'你的手牌上限+1。当你失去该装备时，你摸取一张牌。',
 		hufu:'虎符',
@@ -832,9 +747,6 @@ card.yunchou={
 		['diamond',3,'liuxinghuoyu','fire'],
 		['heart',6,'liuxinghuoyu','fire'],
 		['heart',9,'liuxinghuoyu','fire'],
-		['spade',3,'dujian','poison'],
-		['club',11,'dujian','poison'],
-		['club',12,'dujian','poison'],
 		['heart',3,'yihuajiemu'],
 		["diamond",3,'guohe'],
 
