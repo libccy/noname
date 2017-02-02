@@ -1,43 +1,5 @@
 "use strict";
 (function(){
-    if(window.cordovaLoadTimeout){
-        clearTimeout(window.cordovaLoadTimeout);
-        delete window.cordovaLoadTimeout;
-    }
-    window.resetGameTimeout=setTimeout(function(){
-        if(window.inSplash) return;
-        if(window.resetExtension){
-            if(confirm('游戏似乎未正常载入，是否禁用扩展并重新打开？')){
-                window.resetExtension();
-                window.location.reload();
-            }
-        }
-        else{
-            if(confirm('游戏似乎未正常载入，是否重置游戏？')){
-				var noname_inited=localStorage.getItem('noname_inited');
-                localStorage.clear();
-				if(noname_inited){
-					localStorage.setItem('noname_inited',noname_inited);
-				}
-                if(indexedDB) indexedDB.deleteDatabase('noname_0.9_data');
-                window.location.reload();
-            }
-        }
-    },5000);
-    var links=document.head.querySelectorAll('link');
-    for(var i=0;i<links.length;i++){
-        if(links[i].href.indexOf('app/color.css')!=-1){
-            links[i].remove();
-            break;
-        }
-    }
-    var index=window.location.href.indexOf('index.html?server=');
-    if(index!=-1){
-        window.isNonameServer=window.location.href.slice(index+18);
-        window.indexedDB=null;
-    }
-}());
-(function(){
 	var _status={
 		paused:false,
 		paused2:false,
@@ -3761,6 +3723,48 @@
 		},
 		init:{
             bind:function(){
+                if(window.cordovaLoadTimeout){
+                    clearTimeout(window.cordovaLoadTimeout);
+                    delete window.cordovaLoadTimeout;
+                }
+                window.resetGameTimeout=setTimeout(function(){
+                    if(window.inSplash) return;
+                    if(window.resetExtension){
+                        if(confirm('游戏似乎未正常载入，是否禁用扩展并重新打开？')){
+                            window.resetExtension();
+                            window.location.reload();
+                        }
+                    }
+                    else{
+                        if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+            				var noname_inited=localStorage.getItem('noname_inited');
+                            localStorage.clear();
+            				if(noname_inited){
+            					localStorage.setItem('noname_inited',noname_inited);
+            				}
+                            if(indexedDB) indexedDB.deleteDatabase('noname_0.9_data');
+                            window.location.reload();
+                        }
+                    }
+                },5000);
+                var links=document.head.querySelectorAll('link');
+                for(var i=0;i<links.length;i++){
+                    if(links[i].href.indexOf('app/color.css')!=-1){
+                        links[i].remove();
+                        break;
+                    }
+                }
+                var index=window.location.href.indexOf('index.html?server=');
+                if(index!=-1){
+                    window.isNonameServer=window.location.href.slice(index+18);
+                    window.indexedDB=null;
+                }
+
+                lib.get=get;
+                lib.ui=ui;
+                lib.ai=ai;
+                lib.game=game;
+
                 HTMLDivElement.prototype.animate=function(name,time){
                     var that;
                     if(lib.isMobileMe(this)&&name=='target'){
@@ -34241,10 +34245,6 @@
 			}
 		},
 	};
-    lib.get=get;
-    lib.ui=ui;
-    lib.ai=ai;
-    lib.game=game;
     lib.init.bind();
     lib.init.init();
 }());
