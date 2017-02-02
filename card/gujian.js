@@ -81,13 +81,43 @@ card.gujian={
             selectTarget:-1,
             modTarget:true,
         },
+        yuanbaorou:{
+            fullskin:true,
+            type:'food',
+            enable:true,
+            filterTarget:function(card,player,target){
+                return target==player;
+            },
+            selectTarget:-1,
+            modTarget:true,
+        },
+        molicha:{
+            fullskin:true,
+            type:'food',
+            enable:true,
+            filterTarget:function(card,player,target){
+                return target==player;
+            },
+            selectTarget:-1,
+            modTarget:true,
+        },
+        mapodoufu:{
+            fullskin:true,
+            type:'food',
+            enable:true,
+            filterTarget:function(card,player,target){
+                return target==player;
+            },
+            selectTarget:-1,
+            modTarget:true,
+        },
     },
     skill:{},
     cardType:{
         food:0.3
     },
     translate:{
-        food:'食品',
+        food:'食物',
         chunbing:'春饼',
         gudonggeng:'骨董羹',
         yougeng:'酉羹',
@@ -96,5 +126,10 @@ card.gujian={
         xiajiao:'虾饺',
         tanhuadong:'昙花冻',
         qingtuan:'青团',
+
+        luyugeng:'鲈鱼羹',
+        yuanbaorou:'元宝肉',
+        molicha:'茉莉茶',
+        mapodoufu:'麻婆豆腐',
     }
 };
