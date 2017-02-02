@@ -367,18 +367,33 @@ card.swd={
 		yuchankan:{
 			fullskin:true,
 			type:'jiqi',
-			autoViewAs:'xiangyuye',
-			addinfo:'叶',
+			autoViewAs:'shenmiguo',
+			addinfo:'果',
 			ai:{
+				order:1,
+				useful:4,
 				value:6,
-				useful:1
+				result:{
+					player:function(){
+						var cardname=_status.event.cardname;
+						if(cardname=='tiesuo') return 0;
+						if(cardname=='jiu') return 0;
+						if(cardname=='tianxianjiu') return 0;
+						if(cardname=='toulianghuanzhu') return 0;
+						if(cardname=='shijieshu') return 0;
+						if(cardname=='xietianzi') return 0;
+						if(cardname=='huogong') return 0;
+						if(cardname=='shandianjian') return 0;
+						return 1;
+					}
+				},
 			}
 		},
 		yuchanli:{
 			fullskin:true,
 			type:'jiqi',
-			autoViewAs:'dujian',
-			addinfo:'箭',
+			autoViewAs:'tianxianjiu',
+			addinfo:'仙',
 			ai:{
 				value:6,
 				useful:1
@@ -1517,7 +1532,7 @@ card.swd={
 				}
 			}
 		},
-		huanpodan:{
+		huanpodan_old:{
 			type:'basic',
 			enable:function(){return game.dead.length>0},
 			notarget:true,
@@ -1643,6 +1658,37 @@ card.swd={
 							}
 						}
 						return 0;
+					},
+				},
+			}
+		},
+		huanpodan:{
+			fullskin:true,
+			type:'basic',
+			enable:true,
+			logv:false,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('huanpodan_skill');
+			},
+			content:function(){
+				target.addSkill('huanpodan_skill');
+				if(cards&&cards.length){
+					card=cards[0];
+				}
+				if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
+					card.clone.moveDelete(target);
+					game.addVideo('gain2',target,get.cardsInfo([card]));
+				}
+			},
+			ai:{
+				basic:{
+					value:8,
+					useful:4,
+				},
+				order:2,
+				result:{
+					target:function(player,target){
+						return 1/Math.sqrt(1+target.hp);
 					},
 				},
 			}
@@ -1963,12 +2009,32 @@ card.swd={
 		},
 	},
 	skill:{
+		huanpodan_skill:{
+			mark:true,
+			intro:{
+				content:'防止一次死亡，改为弃置所有牌，将体力值变为1并摸一张牌'
+			},
+			trigger:{player:'dieBefore'},
+			forced:true,
+			content:function(){
+				'step 0'
+				trigger.untrigger();
+				trigger.finish();
+				player.discard(player.get('he'));
+				player.removeSkill('huanpodan_skill');
+				'step 1'
+				player.changeHp(1-player.hp);
+				'step 2'
+				player.draw();
+			}
+		},
 		dujian2:{},
 		_yuchan_swap:{
 			trigger:{player:'useCardAfter'},
 			forced:true,
 			popup:false,
 			silent:true,
+			priority:-1,
 			content:function(){
 				var hs=player.get('h');
 				var list=['yuchanqian','yuchankun','yuchanzhen','yuchanxun','yuchangen','yuchanli','yuchankan','yuchandui'];
@@ -2105,6 +2171,7 @@ card.swd={
 				if(event.parent.parent.name!='phaseUse') return false;
 				if(!event.targets||!event.card) return false;
 				if(event.card.name=='shenmiguo') return false;
+				if(event.card.name=='yuchankan') return false;
 				if(player.hasSkill('shenmiguo2')) return false;
 				var type=get.type(event.card);
 				if(type!='basic'&&type!='trick') return false;
@@ -2116,10 +2183,12 @@ card.swd={
 					}
 				}
 				if(player.num('h','shenmiguo')) return true;
+				if(player.num('h','yuchankan')) return true;
 				var mn=player.get('e','5');
 				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){
 					for(var i=0;i<mn.cards.length;i++){
 						if(mn.cards[i].name=='shenmiguo') return true;
+						if(mn.cards[i].name=='yuchankan') return true;
 					}
 				}
 				return false;
@@ -2129,7 +2198,7 @@ card.swd={
 				var card=game.createCard(trigger.card.name,trigger.card.suit,trigger.card.number,trigger.card.nature);
 				player.storage.shenmiguo=[card,trigger.targets];
 				player.chooseToUse('是否使用神秘果？',function(card,player){
-					if(card.name!='shenmiguo') return false;
+					if(card.name!='shenmiguo'&&card.name!='yuchankan') return false;
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
 					if(mod!='unchanged') return mod;
 					return true;
@@ -4689,9 +4758,9 @@ card.swd={
 		yuchanxun:'巽玉蝉',
 		yuchanxun_info:'在你行动时可当作桃使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchankan:'坎玉蝉',
-		yuchankan_info:'在你行动时可当作翔羽叶使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
+		yuchankan_info:'在你行动时可当作神秘果使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchanli:'离玉蝉',
-		yuchanli_info:'在你行动时可当作毒箭使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
+		yuchanli_info:'在你行动时可当作天仙酒使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchangen:'艮玉蝉',
 		yuchangen_info:'在你行动时可当作还魄丹使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchandui:'兑玉蝉',
@@ -4876,11 +4945,14 @@ card.swd={
 		tianxianjiu:'天仙酒',
 		tianxianjiu_bg:'仙',
 		tianxianjiu_info:'出牌阶段对自己使用，你使用的下一张杀造成伤害后可以摸两张牌；濒死阶段，对自己使用，回复1点体力',
-		xiangyuye:'翔羽叶',
-		xiangyuye_info:'出牌阶段，对一名攻击范围外的角色使用，令其弃置一张黑色手牌或流失一点体力',
+		// xiangyuye:'翔羽叶',
+		// xiangyuye_info:'出牌阶段，对一名攻击范围外的角色使用，令其弃置一张黑色手牌或流失一点体力',
 		huanpodan:'还魄丹',
 		huanpodan_bg:'魄',
-		huanpodan_info:'出牌阶段对一名已死亡角色使用，令其复活，将体力值变为1，并摸一张牌',
+		huanpodan_info:'出牌阶段对一名角色使用，在目标即将死亡时防止其死亡，改为令其弃置所有牌，将体力值回复至1并摸一张牌',
+		huanpodan_skill:'还魄丹',
+		huanpodan_skill_bg:'丹',
+		huanpodan_skill_info:'防止一次死亡，改为弃置所有牌，将体力值变为1并摸一张牌',
 		ximohu:'吸魔壶',
 		ximohu_bg:'魔',
 		// ximohu_info:'锁定技，你将即将受到的雷属性伤害转化为你的体力值',
@@ -4979,8 +5051,8 @@ card.swd={
 		nvwashi_bg:'石',
 		kongxin:'控心',
 		lianhua:'炼化',
-		dujian:'毒箭',
-		dujian_info:'出牌阶段，对一名有手牌或装备牌的角色使用，令其展示一张手牌，若与你选择的手牌颜色相同，其流失一点体力',
+		// dujian:'毒箭',
+		// dujian_info:'出牌阶段，对一名有手牌或装备牌的角色使用，令其展示一张手牌，若与你选择的手牌颜色相同，其流失一点体力',
 		lianhua_info:'出牌阶段限一次，你可以弃置两张炼妖壶中的牌，从牌堆中获得一张与弃置的牌类别均不相同的牌',
 		shouna:'收纳',
 		shouna_info:'出牌阶段限一次，你可以弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶',
@@ -5004,7 +5076,7 @@ card.swd={
 
 		['diamond',2,'xiayuncailing'],
 //		['heart',2,'pantao'],
-		// ['club',2,'huanpodan'],
+		['heart',2,'huanpodan'],
 
 		['club',3,'caoyao'],
 		['diamond',3,'chilongya','fire'],
@@ -5026,11 +5098,11 @@ card.swd={
 		['spade',7,'guilingzhitao'],
 
 		['spade',8,'zhufangshenshi'],
-		['club',8,'xiangyuye','poison'],
+		// ['club',8,'xiangyuye','poison'],
 
 		['spade',9,'yangpijuan'],
 		['club',9,'guiyoujie'],
-		['diamond',9,'xiangyuye','poison'],
+		// ['diamond',9,'xiangyuye','poison'],
 
 		// ['diamond',9,'tianxianjiu'],
 		['heart',9,'tianxianjiu'],
@@ -5043,7 +5115,7 @@ card.swd={
 		//['diamond',10,'xiangyuye','poison'],
 		['club',7,'yangpijuan'],
 
-		['spade',11,'xiangyuye','poison'],
+		// ['spade',11,'xiangyuye','poison'],
 
 		['spade',12,'guiyanfadao','poison'],
 
@@ -5133,8 +5205,8 @@ card.swd={
 		['diamond',7,'yuchangen'],
 		['heart',8,'yuchandui'],
 
-		['spade',3,'dujian','poison'],
-		['club',11,'dujian','poison'],
-		['club',12,'dujian','poison'],
+		// ['spade',3,'dujian','poison'],
+		// ['club',11,'dujian','poison'],
+		// ['club',12,'dujian','poison'],
 	],
 }
