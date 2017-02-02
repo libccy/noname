@@ -1,19 +1,17 @@
 window.noname_update={
-    version:'1.9.7',
+    version:'1.9.7.1',
     update:'1.9.7',
     changeLog:[
         'bug修复',
-        '联机可禁卡',
-        '素材下载改进',
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
         // 'game/config.js',
         // 'game/package.js',
         // 'game/asset.js',
         // 'game/source.js',
         // 'card/hearth.js',
-        // 'card/swd.js',
+        'card/swd.js',
         // 'card/gujian.js',
         // 'card/sp.js',
         // 'card/guozhan.js',
