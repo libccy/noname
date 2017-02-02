@@ -172,7 +172,7 @@ window.noname_asset_list=[
     'image/card/tiesuo.png',
     'image/card/tiesuo_mark.png',
     'image/card/toulianghuanzhu.png',
-    'image/card/tuhunsha.jpg',
+    'image/card/tuhunsha.png',
     'image/card/tuteng1.jpg',
     'image/card/tuteng2.jpg',
     'image/card/tuteng3.jpg',
