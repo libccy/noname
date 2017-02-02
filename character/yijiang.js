@@ -4990,6 +4990,7 @@ character.yijiang={
 				"step 2"
 				player.loseMaxHp();
 				player.addSkill('paiyi');
+				player.awakenSkill('zili');
 			}
 		},
 		paiyi:{
