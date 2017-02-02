@@ -129,12 +129,30 @@ card.gujian={
             fullskin:true,
             type:'basic',
         },
+        ziyangdan:{
+            fullskin:true,
+            type:'basic',
+        },
+        yunvyuanshen:{
+            fullskin:true,
+            type:'basic',
+        },
+        liuxiaxianniang:{
+            fullskin:true,
+            type:'basic',
+        },
     },
     skill:{},
     cardType:{
         food:0.3
     },
     translate:{
+        liuxiaxianniang:'流霞仙酿',
+        liuxiaxianniang_info:'流霞仙酿',
+        yunvyuanshen:'玉女元参',
+        yunvyuanshen_info:'玉女元参',
+        ziyangdan:'紫阳丹',
+        ziyangdan_info:'紫阳丹',
         yuheng:'玉衡',
         yuheng_info:'回合结束阶段，若场你的体力值不是全场最少，你失去一点体力并令玉衡获得一点力量；回合开始阶段，玉衡每有一点力量，你便可以获得一名其他角色的一张牌',
         shujinsan:'舒筋散',
