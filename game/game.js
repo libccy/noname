@@ -30276,7 +30276,7 @@
                             else if(this.roomgaming&&!game.onlineID){
                                 alert('房间不允许旁观');
                             }
-                            else if(this.version!=lib.versionOL){
+                            else if(!this.roomempty&&this.version!=lib.versionOL){
                                 if(this.version>lib.versionOL){
                                     alert('加入失败：你的游戏版本过低');
                                 }
