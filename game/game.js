@@ -428,7 +428,7 @@
 						else{
 							map.round_menu_func.show();
 						}
-                        if(lib.device=='ios'||lib.device=='android'){
+                        if(!lib.node&&lib.device!='ios'){
                             map.confirm_exit.show();
                         }
                         else{
@@ -3760,6 +3760,415 @@
 			}
 		},
 		init:{
+            bind:function(){
+                HTMLDivElement.prototype.animate=function(name,time){
+                    var that;
+                    if(lib.isMobileMe(this)&&name=='target'){
+                        that=ui.mebg;
+                    }
+                    else{
+            			that=this;
+                    }
+                    that.classList.add(name);
+                    setTimeout(function(){
+                        that.classList.remove(name);
+                    },time||1000);
+        			return this;
+        		};
+        		HTMLDivElement.prototype.hide=function(){
+        			this.classList.add('hidden');
+        			return this;
+        		};
+        		HTMLDivElement.prototype.unfocus=function(){
+        			this.classList.add('transparent');
+        			return this;
+        		};
+        		HTMLDivElement.prototype.refocus=function(){
+        			this.classList.remove('transparent');
+        			return this;
+        		};
+        		HTMLDivElement.prototype.show=function(){
+        			this.classList.remove('hidden');
+        			return this;
+        		};
+        		HTMLDivElement.prototype.delete=function(time,callback){
+        			if(this.timeout){
+        				clearTimeout(this.timeout);
+        				delete this.timeout;
+        			}
+        			if(!this._listeningEnd||this._transitionEnded){
+        				if(typeof time!='number') time=500;
+        				this.classList.add('removing');
+        				var that=this;
+        				this.timeout=setTimeout(function(){
+        					that.remove();
+        					that.classList.remove('removing');
+                            if(typeof callback=='function'){
+                                callback();
+                            }
+        				},time);
+        			}
+        			else{
+        				this._onEndDelete=true;
+        			}
+        			return this;
+        		};
+        		HTMLDivElement.prototype.goto=function(position,time){
+        			if(this.timeout){
+        				clearTimeout(this.timeout);
+        				delete this.timeout;
+        			}
+
+        			if(typeof time!='number') time=500;
+        			this.classList.add('removing');
+
+        			var that=this;
+        			this.timeout=setTimeout(function(){
+        				position.appendChild(that);
+        				that.classList.remove('removing');
+        				delete that.destiny;
+        			},time);
+        			this.destiny=position;
+        			return this;
+        		};
+        		HTMLDivElement.prototype.fix=function(){
+        			clearTimeout(this.timeout);
+        			delete this.timeout;
+        			delete this.destiny;
+        			this.classList.remove('removing');
+        			return this;
+        		};
+        		HTMLDivElement.prototype.setBackground=function(name,type,ext,subfolder){
+        			var src;
+        			ext=ext||'.jpg';
+        			subfolder=subfolder||'default'
+        			if(type){
+        				var dbimage=null,extimage=null,modeimage=null;
+                        var nameinfo;
+                        var mode=get.mode();
+                        if(type=='character'){
+                            if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
+                                modeimage=mode;
+                            }
+                            else if(lib.character[name]){
+                                nameinfo=lib.character[name];
+                            }
+                        }
+        				if(!modeimage&&nameinfo&&nameinfo[4]){
+        					for(var i=0;i<nameinfo[4].length;i++){
+                                if(nameinfo[4][i].indexOf('ext:')==0){
+                                    extimage=nameinfo[4][i];break;
+                                }
+        						else if(nameinfo[4][i].indexOf('db:')==0){
+        							dbimage=nameinfo[4][i];break;
+        						}
+                                else if(nameinfo[4][i].indexOf('mode:')==0){
+                                    modeimage=nameinfo[4][i].slice(5);break;
+                                }
+        					}
+        				}
+                        if(extimage){
+                            src=extimage.replace(/ext:/,'extension/');
+                        }
+        				else if(dbimage){
+        					this.setBackgroundDB(dbimage.slice(3));
+        					return this;
+        				}
+                        else if(modeimage){
+                            src='image/mode/'+modeimage+'/character/'+name+ext;
+                        }
+        				// else if(type=='character'&&lib.customCharacters.contains(name)){
+        				// 	src="";
+        				// 	var node=this;
+        				// 	game.getDB('image','character:'+name,function(src){
+        				// 		node.style.backgroundImage="url('"+src+"')";
+        				// 	});
+        				// }
+        				else if(type=='character'&&lib.config.skin[name]){
+        					src='image/skin/'+name+'/'+lib.config.skin[name]+ext;
+        				}
+        				else{
+        					if(type=='character'){
+        						src='image/character/'+name+ext;
+        					}
+        					else{
+        						src='image/'+type+'/'+subfolder+'/'+name+ext;
+        					}
+        				}
+        			}
+        			else{
+        				src='image/'+name+ext;
+        			}
+        			this.setBackgroundImage(src);
+        			this.style.backgroundSize="cover";
+        			return this;
+        		};
+        		HTMLDivElement.prototype.setBackgroundDB=function(img){
+        			var node=this;
+        			game.getDB('image',img,function(src){
+        				node.style.backgroundImage="url('"+src+"')";
+        				node.style.backgroundSize="cover";
+        			});
+        		};
+        		HTMLDivElement.prototype.setBackgroundImage=function(img){
+        			this.style.backgroundImage='url("'+lib.assetURL+img+'")';
+        		},
+        		HTMLDivElement.prototype.listen=function(func){
+        			this.addEventListener(lib.config.touchscreen?'touchend':'click',function(e){
+        				if(_status.dragged) return;
+        				func.call(this,e);
+        			})
+        			return this;
+        		};
+        		HTMLDivElement.prototype.setPosition=function(){
+        			var position;
+        			if(arguments.length==4){
+        				position=[];
+        				for(var i=0;i<arguments.length;i++) position.push(arguments[i]);
+        			}
+        			else if(arguments.length==1&&get.objtype(arguments[0])=='array'&&arguments[0].length==4){
+        				position=arguments[0];
+        			}
+        			else{
+        				return this;
+        			}
+        			var top='calc('+position[0]+'% ';
+        			if(position[1]>0) top+='+ '+position[1]+'px)';
+        			else top+='- '+Math.abs(position[1])+'px)';
+        			var left='calc('+position[2]+'% ';
+        			if(position[3]>0) left+='+ '+position[3]+'px)';
+        			else left+='- '+Math.abs(position[3])+'px)';
+        			this.style.top=top;
+        			this.style.left=left;
+        			return this;
+        		};
+        		HTMLDivElement.prototype.css=function(style){
+        			for(var i in style){
+        				if(i=='innerHTML'){
+        					this.innerHTML=style[i];
+        				}
+        				else{
+        					this.style[i]=style[i];
+        				}
+        			}
+        			return this;
+        		};
+        		HTMLDivElement.prototype.transform=function(transform){
+        			var str='';
+        			for(var i in transform){
+        				switch(i){
+        					case 'scale':str+='scale('+transform[i]+') ';break;
+        					case 'rotate':str+='rotate('+transform[i]+'deg) ';break;
+        				}
+        			}
+        			if(typeof transform=='object'){
+        				if(transform.left&&transform.top){
+        					str+='translate('+parseInt(transform.left)+'px,'+parseInt(transform.top)+'px) ';
+        				}
+        				else if(transform.left){
+        					str+='translate('+parseInt(transform.left)+'px) ';
+        				}
+        				else if(transform.top){
+        					str+='translate(0,'+parseInt(transform.top)+'px) ';
+        				}
+        			}
+        			this.style.transform=str;
+        			return this;
+        		};
+        		HTMLTableElement.prototype.get=function(row,col){
+        			if(row<this.childNodes.length){
+        				return this.childNodes[row].childNodes[col];
+        			}
+        		};
+        		Array.prototype.find=function(item){
+        			return this.indexOf(item);
+        		};
+        		Array.prototype.contains=function(item){
+        			return this.indexOf(item)!=-1;
+        		};
+        		Array.prototype.add=function(){
+        			for(var i=0;i<arguments.length;i++){
+        				if(this.contains(arguments[i])){
+        					return false;
+        				}
+        				this.push(arguments[i]);
+        			}
+        			return this;
+        		};
+                Array.prototype.addArray=function(arr){
+                    for(var i=0;i<arr.length;i++){
+                        this.add(arr[i]);
+                    }
+                    return this;
+                };
+        		Array.prototype.remove=function(item){
+        			if(get.objtype(item)=='array'){
+        				for(var i=0;i<item.length;i++) this.remove(item[i]);
+        				return;
+        			}
+        			var pos=this.find(item);
+        			if(pos==-1){
+        				return false;
+        			}
+        			this.splice(pos,1);
+        			return this;
+        		};
+        		Array.prototype.randomGet=function(){
+        			var arr=this.slice(0);
+        			for(var i=0;i<arguments.length;i++) arr.remove(arguments[i]);
+        			return arr[Math.floor(Math.random()*arr.length)];
+        		};
+        		Array.prototype.randomRemove=function(num){
+                    if(typeof num=='number'){
+                        var list=[];
+                        for(var i=0;i<num;i++){
+                            if(this.length){
+                                list.push(this.randomRemove());
+                            }
+                            else{
+                                break;
+                            }
+                        }
+                        return list;
+                    }
+                    else{
+            			return this.splice(Math.floor(Math.random()*this.length),1)[0];
+                    }
+        		};
+        		Array.prototype.randomSort=function(){
+        			var list=[];
+        			while(this.length){
+        				list.push(this.randomRemove());
+        			}
+        			for(var i=0;i<list.length;i++){
+        				this.push(list[i]);
+        			}
+        			return this;
+        		};
+        		Array.prototype.randomGets=function(num){
+        			if(num>this.length){
+        				num=this.length;
+        			}
+        			var arr=this.slice(0);
+        			var list=[];
+        			for(var i=0;i<num;i++){
+        				list.push(arr.splice(Math.floor(Math.random()*arr.length),1)[0]);
+        			}
+        			return list;
+        		};
+                if(!Array.from){
+                    Array.from=function(args){
+                        var list=[];
+                        if(args&&args.length){
+                            for(var i=0;i<args.length;i++){
+                                list.push(args[i]);
+                            }
+                        }
+                        return list;
+                    }
+                }
+        		window.onkeydown=function(e){
+        			if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
+                        if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
+            				if(e.shiftKey){
+            					if(confirm('是否重置游戏？')){
+            						var noname_inited=localStorage.getItem('noname_inited');
+            		                localStorage.clear();
+            						if(noname_inited){
+            							localStorage.setItem('noname_inited',noname_inited);
+            						}
+            						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+            						game.reload();
+            						return;
+            					}
+            				}
+            				else{
+            					game.reload();
+            				}
+            			}
+            			else if(e.keyCode==83&&(e.ctrlKey||e.metaKey)){
+                            if(window.saveNonameInput){
+                                window.saveNonameInput();
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
+            			}
+                    }
+                    else{
+                        game.closePopped();
+            			var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
+            			for(var i=0;i<dialogs.length;i++){
+            				dialogs[i].delete();
+            			}
+            			if(e.keyCode==32){
+            				var node=ui.window.querySelector('#paused');
+            				if(node){
+            					node.click();
+            				}
+            				else{
+            					ui.click.pause();
+            				}
+            			}
+            			else if(e.keyCode==65){
+            				if(ui.auto) ui.auto.click();
+            			}
+            			else if(e.keyCode==87){
+            				if(ui.wuxie&&ui.wuxie.style.display!='none'){
+            					ui.wuxie.classList.toggle('glow')
+            				}
+            				else if(ui.tempnowuxie){
+            					ui.tempnowuxie.classList.toggle('glow')
+            				}
+            			}
+            			else if(e.keyCode==73){
+            				// if(game.showIdentity){
+            				// 	game.showIdentity();
+            				// }
+            			}
+            			else if(e.keyCode==67){
+            				// var node=ui.window.querySelector('#click');
+            				// if(node){
+            				// 	node.click();
+            				// }
+            				// else{
+            				// 	ui.click.config();
+            				// }
+            			}
+            			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
+            				if(e.shiftKey){
+            					if(confirm('是否重置游戏？')){
+            						var noname_inited=localStorage.getItem('noname_inited');
+            		                localStorage.clear();
+            						if(noname_inited){
+            							localStorage.setItem('noname_inited',noname_inited);
+            						}
+            						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+            						game.reload();
+            						return;
+            					}
+            				}
+            				else{
+            					game.reload();
+            				}
+            			}
+            			else if(e.keyCode==83&&(e.ctrlKey||e.metaKey)){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
+            			}
+                    }
+        		};
+        		window.onload=function(){
+        			if(_status.packLoaded){
+        				delete _status.packLoaded;
+        				lib.init.onload();
+        			}
+        			else{
+        				_status.windowLoaded=true;
+        			}
+        		};
+            },
 			init:function(){
 				if(window.noname_update){
 					lib.version=window.noname_update.version;
@@ -4262,6 +4671,28 @@
 						};
 					}
 				}
+                if(!lib.config.touchscreen){
+                    document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
+        			document.onmousemove=ui.click.windowmousemove;
+        			document.onmousedown=ui.click.windowmousedown;
+        			document.onmouseup=ui.click.windowmouseup;
+        			document.oncontextmenu=ui.click.right;
+        		}
+        		else{
+        			document.ontouchstart=ui.click.windowtouchstart;
+        			document.ontouchend=ui.click.windowtouchend;
+        			document.ontouchmove=ui.click.windowtouchmove;
+        		}
+                if(!lib.device&&!lib.node){
+                    window.onbeforeunload=function(){
+            			if(lib.config.confirm_exit&&!_status.reloading){
+            				return '是否离开游戏？'
+            			}
+            			else{
+            				return null;
+            			}
+            		}
+                }
 			},
 			onload:function(){
 				if(lib.device){
@@ -33814,432 +34245,6 @@
     lib.ui=ui;
     lib.ai=ai;
     lib.game=game;
+    lib.init.bind();
     lib.init.init();
-		HTMLDivElement.prototype.animate=function(name,time){
-            var that;
-            if(lib.isMobileMe(this)&&name=='target'){
-                that=ui.mebg;
-            }
-            else{
-    			that=this;
-            }
-            that.classList.add(name);
-            setTimeout(function(){
-                that.classList.remove(name);
-            },time||1000);
-			return this;
-		};
-		HTMLDivElement.prototype.hide=function(){
-			this.classList.add('hidden');
-			return this;
-		};
-		HTMLDivElement.prototype.unfocus=function(){
-			this.classList.add('transparent');
-			return this;
-		};
-		HTMLDivElement.prototype.refocus=function(){
-			this.classList.remove('transparent');
-			return this;
-		};
-		HTMLDivElement.prototype.show=function(){
-			this.classList.remove('hidden');
-			return this;
-		};
-		HTMLDivElement.prototype.delete=function(time,callback){
-			if(this.timeout){
-				clearTimeout(this.timeout);
-				delete this.timeout;
-			}
-			if(!this._listeningEnd||this._transitionEnded){
-				if(typeof time!='number') time=500;
-				this.classList.add('removing');
-				var that=this;
-				this.timeout=setTimeout(function(){
-					that.remove();
-					that.classList.remove('removing');
-                    if(typeof callback=='function'){
-                        callback();
-                    }
-				},time);
-			}
-			else{
-				this._onEndDelete=true;
-			}
-			return this;
-		};
-		HTMLDivElement.prototype.goto=function(position,time){
-			if(this.timeout){
-				clearTimeout(this.timeout);
-				delete this.timeout;
-			}
-
-			if(typeof time!='number') time=500;
-			this.classList.add('removing');
-
-			var that=this;
-			this.timeout=setTimeout(function(){
-				position.appendChild(that);
-				that.classList.remove('removing');
-				delete that.destiny;
-			},time);
-			this.destiny=position;
-			return this;
-		};
-		HTMLDivElement.prototype.fix=function(){
-			clearTimeout(this.timeout);
-			delete this.timeout;
-			delete this.destiny;
-			this.classList.remove('removing');
-			return this;
-		};
-		HTMLDivElement.prototype.setBackground=function(name,type,ext,subfolder){
-			var src;
-			ext=ext||'.jpg';
-			subfolder=subfolder||'default'
-			if(type){
-				var dbimage=null,extimage=null,modeimage=null;
-                var nameinfo;
-                var mode=get.mode();
-                if(type=='character'){
-                    if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
-                        modeimage=mode;
-                    }
-                    else if(lib.character[name]){
-                        nameinfo=lib.character[name];
-                    }
-                }
-				if(!modeimage&&nameinfo&&nameinfo[4]){
-					for(var i=0;i<nameinfo[4].length;i++){
-                        if(nameinfo[4][i].indexOf('ext:')==0){
-                            extimage=nameinfo[4][i];break;
-                        }
-						else if(nameinfo[4][i].indexOf('db:')==0){
-							dbimage=nameinfo[4][i];break;
-						}
-                        else if(nameinfo[4][i].indexOf('mode:')==0){
-                            modeimage=nameinfo[4][i].slice(5);break;
-                        }
-					}
-				}
-                if(extimage){
-                    src=extimage.replace(/ext:/,'extension/');
-                }
-				else if(dbimage){
-					this.setBackgroundDB(dbimage.slice(3));
-					return this;
-				}
-                else if(modeimage){
-                    src='image/mode/'+modeimage+'/character/'+name+ext;
-                }
-				// else if(type=='character'&&lib.customCharacters.contains(name)){
-				// 	src="";
-				// 	var node=this;
-				// 	game.getDB('image','character:'+name,function(src){
-				// 		node.style.backgroundImage="url('"+src+"')";
-				// 	});
-				// }
-				else if(type=='character'&&lib.config.skin[name]){
-					src='image/skin/'+name+'/'+lib.config.skin[name]+ext;
-				}
-				else{
-					if(type=='character'){
-						src='image/character/'+name+ext;
-					}
-					else{
-						src='image/'+type+'/'+subfolder+'/'+name+ext;
-					}
-				}
-			}
-			else{
-				src='image/'+name+ext;
-			}
-			this.setBackgroundImage(src);
-			this.style.backgroundSize="cover";
-			return this;
-		};
-		HTMLDivElement.prototype.setBackgroundDB=function(img){
-			var node=this;
-			game.getDB('image',img,function(src){
-				node.style.backgroundImage="url('"+src+"')";
-				node.style.backgroundSize="cover";
-			});
-		};
-		HTMLDivElement.prototype.setBackgroundImage=function(img){
-			this.style.backgroundImage='url("'+lib.assetURL+img+'")';
-		},
-		HTMLDivElement.prototype.listen=function(func){
-			this.addEventListener(lib.config.touchscreen?'touchend':'click',function(e){
-				if(_status.dragged) return;
-				func.call(this,e);
-			})
-			return this;
-		};
-		HTMLDivElement.prototype.setPosition=function(){
-			var position;
-			if(arguments.length==4){
-				position=[];
-				for(var i=0;i<arguments.length;i++) position.push(arguments[i]);
-			}
-			else if(arguments.length==1&&get.objtype(arguments[0])=='array'&&arguments[0].length==4){
-				position=arguments[0];
-			}
-			else{
-				return this;
-			}
-			var top='calc('+position[0]+'% ';
-			if(position[1]>0) top+='+ '+position[1]+'px)';
-			else top+='- '+Math.abs(position[1])+'px)';
-			var left='calc('+position[2]+'% ';
-			if(position[3]>0) left+='+ '+position[3]+'px)';
-			else left+='- '+Math.abs(position[3])+'px)';
-			this.style.top=top;
-			this.style.left=left;
-			return this;
-		};
-		HTMLDivElement.prototype.css=function(style){
-			for(var i in style){
-				if(i=='innerHTML'){
-					this.innerHTML=style[i];
-				}
-				else{
-					this.style[i]=style[i];
-				}
-			}
-			return this;
-		};
-		HTMLDivElement.prototype.transform=function(transform){
-			var str='';
-			for(var i in transform){
-				switch(i){
-					case 'scale':str+='scale('+transform[i]+') ';break;
-					case 'rotate':str+='rotate('+transform[i]+'deg) ';break;
-				}
-			}
-			if(typeof transform=='object'){
-				if(transform.left&&transform.top){
-					str+='translate('+parseInt(transform.left)+'px,'+parseInt(transform.top)+'px) ';
-				}
-				else if(transform.left){
-					str+='translate('+parseInt(transform.left)+'px) ';
-				}
-				else if(transform.top){
-					str+='translate(0,'+parseInt(transform.top)+'px) ';
-				}
-			}
-			this.style.transform=str;
-			return this;
-		};
-		HTMLTableElement.prototype.get=function(row,col){
-			if(row<this.childNodes.length){
-				return this.childNodes[row].childNodes[col];
-			}
-		};
-		Array.prototype.find=function(item){
-			return this.indexOf(item);
-		};
-		Array.prototype.contains=function(item){
-			return this.indexOf(item)!=-1;
-		};
-		Array.prototype.add=function(){
-			for(var i=0;i<arguments.length;i++){
-				if(this.contains(arguments[i])){
-					return false;
-				}
-				this.push(arguments[i]);
-			}
-			return this;
-		};
-        Array.prototype.addArray=function(arr){
-            for(var i=0;i<arr.length;i++){
-                this.add(arr[i]);
-            }
-            return this;
-        };
-		Array.prototype.remove=function(item){
-			if(get.objtype(item)=='array'){
-				for(var i=0;i<item.length;i++) this.remove(item[i]);
-				return;
-			}
-			var pos=this.find(item);
-			if(pos==-1){
-				return false;
-			}
-			this.splice(pos,1);
-			return this;
-		};
-		Array.prototype.randomGet=function(){
-			var arr=this.slice(0);
-			for(var i=0;i<arguments.length;i++) arr.remove(arguments[i]);
-			return arr[Math.floor(Math.random()*arr.length)];
-		};
-		Array.prototype.randomRemove=function(num){
-            if(typeof num=='number'){
-                var list=[];
-                for(var i=0;i<num;i++){
-                    if(this.length){
-                        list.push(this.randomRemove());
-                    }
-                    else{
-                        break;
-                    }
-                }
-                return list;
-            }
-            else{
-    			return this.splice(Math.floor(Math.random()*this.length),1)[0];
-            }
-		};
-		Array.prototype.randomSort=function(){
-			var list=[];
-			while(this.length){
-				list.push(this.randomRemove());
-			}
-			for(var i=0;i<list.length;i++){
-				this.push(list[i]);
-			}
-			return this;
-		};
-		Array.prototype.randomGets=function(num){
-			if(num>this.length){
-				num=this.length;
-			}
-			var arr=this.slice(0);
-			var list=[];
-			for(var i=0;i<num;i++){
-				list.push(arr.splice(Math.floor(Math.random()*arr.length),1)[0]);
-			}
-			return list;
-		};
-        if(!Array.from){
-            Array.from=function(args){
-                var list=[];
-                if(args&&args.length){
-                    for(var i=0;i<args.length;i++){
-                        list.push(args[i]);
-                    }
-                }
-                return list;
-            }
-        }
-		window.onkeydown=function(e){
-			if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
-                if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
-    				if(e.shiftKey){
-    					if(confirm('是否重置游戏？')){
-    						var noname_inited=localStorage.getItem('noname_inited');
-    		                localStorage.clear();
-    						if(noname_inited){
-    							localStorage.setItem('noname_inited',noname_inited);
-    						}
-    						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-    						game.reload();
-    						return;
-    					}
-    				}
-    				else{
-    					game.reload();
-    				}
-    			}
-    			else if(e.keyCode==83&&(e.ctrlKey||e.metaKey)){
-                    if(window.saveNonameInput){
-                        window.saveNonameInput();
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-    			}
-            }
-            else{
-                game.closePopped();
-    			var dialogs=document.querySelectorAll('#window>.dialog.popped:not(.static)');
-    			for(var i=0;i<dialogs.length;i++){
-    				dialogs[i].delete();
-    			}
-    			if(e.keyCode==32){
-    				var node=ui.window.querySelector('#paused');
-    				if(node){
-    					node.click();
-    				}
-    				else{
-    					ui.click.pause();
-    				}
-    			}
-    			else if(e.keyCode==65){
-    				if(ui.auto) ui.auto.click();
-    			}
-    			else if(e.keyCode==87){
-    				if(ui.wuxie&&ui.wuxie.style.display!='none'){
-    					ui.wuxie.classList.toggle('glow')
-    				}
-    				else if(ui.tempnowuxie){
-    					ui.tempnowuxie.classList.toggle('glow')
-    				}
-    			}
-    			else if(e.keyCode==73){
-    				// if(game.showIdentity){
-    				// 	game.showIdentity();
-    				// }
-    			}
-    			else if(e.keyCode==67){
-    				// var node=ui.window.querySelector('#click');
-    				// if(node){
-    				// 	node.click();
-    				// }
-    				// else{
-    				// 	ui.click.config();
-    				// }
-    			}
-    			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
-    				if(e.shiftKey){
-    					if(confirm('是否重置游戏？')){
-    						var noname_inited=localStorage.getItem('noname_inited');
-    		                localStorage.clear();
-    						if(noname_inited){
-    							localStorage.setItem('noname_inited',noname_inited);
-    						}
-    						if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-    						game.reload();
-    						return;
-    					}
-    				}
-    				else{
-    					game.reload();
-    				}
-    			}
-    			else if(e.keyCode==83&&(e.ctrlKey||e.metaKey)){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-    			}
-            }
-		};
-		window.onload=function(){
-			if(_status.packLoaded){
-				delete _status.packLoaded;
-				lib.init.onload();
-			}
-			else{
-				_status.windowLoaded=true;
-			}
-		};
-		if(!lib.config.touchscreen){
-            document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
-			document.onmousemove=ui.click.windowmousemove;
-			document.onmousedown=ui.click.windowmousedown;
-			document.onmouseup=ui.click.windowmouseup;
-			document.oncontextmenu=ui.click.right;
-		}
-		else{
-			document.ontouchstart=ui.click.windowtouchstart;
-			document.ontouchend=ui.click.windowtouchend;
-			document.ontouchmove=ui.click.windowtouchmove;
-		}
-		// window.onbeforeunload=function(){
-		// 	if(lib.config.confirm_exit&&!_status.reloading){
-		// 		return '是否离开游戏？'
-		// 	}
-		// 	else{
-		// 		return null;
-		// 	}
-		// }
 }());
