@@ -25729,20 +25729,19 @@
 
                                     var skipcharacter=[],skipcard=[];
                                     if(!lib.config.asset_full){
-                                        for(var i=0;i<lib.config.all.diycharacter.length;i++){
-                                            var pack=lib.characterPack[lib.config.all.diycharacter[i]];
+                                        for(var i=0;i<lib.config.all.characters.length;i++){
+                                            if(lib.config.diycharacter.contains(lib.config.all.characters)[i]) continue;
+                                            var pack=lib.characterPack[lib.config.all.characters[i]];
                                             for(var j in pack){
                                                 skipcharacter.add(j);
                                             }
                                         }
-                                        for(var i=0;i<lib.config.all.diycard.length;i++){
-                                            var pack=lib.cardPack[lib.config.all.diycard[i]];
+                                        for(var i=0;i<lib.config.all.cards.length;i++){
+                                            if(lib.config.diycard.contains(lib.config.all.cards)[i]) continue;
+                                            var pack=lib.cardPack[lib.config.all.cards[i]];
                                             if(pack){
                                                 skipcard=skipcard.concat(pack);
                                             }
-                                        }
-                                        if(lib.cardPack.mode_derivation){
-                                            skipcard=skipcard.concat(lib.cardPack.mode_derivation);
                                         }
                                     }
                                     for(var i=0;i<updates.length;i++){
@@ -25753,15 +25752,12 @@
                                                 }
                                                 else if(!lib.config.asset_full){
                                                     if(updates[i].indexOf('image/character')==0){
-                                                        var skipname=updates[i].slice(16,updates[i].lastIndexOf('.'));
-                                                        if(skipcharacter.contains(skipname)||skipname.indexOf('pal_')==0||skipname.indexOf('swd_')==0||
-                                                            skipname.indexOf('ow_')==0||skipname.indexOf('gjqt_')==0||skipname.indexOf('hs_')==0||skipname.indexOf('diy_')==0){
+                                                        if(!skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
                                                             updates.splice(i--,1);
                                                         }
                                                     }
                                                     else if(updates[i].indexOf('image/card')==0){
-                                                        var skipname=updates[i].slice(11,updates[i].lastIndexOf('.'));
-                                                        if(skipcard.contains(skipname)||skipname.indexOf('hs')==0||skipname.indexOf('tuteng')==0){
+                                                        if(!skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
                                                             updates.splice(i--,1);
                                                         }
                                                     }
