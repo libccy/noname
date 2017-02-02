@@ -55,7 +55,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:16,
+        versionOL:17,
         sourceURL:'https://rawgit.com/libccy/noname/$version$/',
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',
@@ -1678,9 +1678,45 @@
 						onclick:function(){
 							if(this.innerHTML!='已隐藏'){
 								this.innerHTML='已隐藏';
-								game.saveConfig('hiddenModePack',lib.config.all.diymode);
-								game.saveConfig('hiddenCardPack',lib.config.all.diycard);
-								game.saveConfig('hiddenCharacterPack',lib.config.all.diycharacter);
+                                var pack=lib.config.all.cards.slice(0);
+                                if(Array.isArray(lib.config.hiddenCardPack)){
+                                    for(var i=0;i<lib.config.hiddenCardPack.length;i++){
+                                        pack.add(lib.config.hiddenCardPack[i]);
+                                    }
+                                }
+                                for(var i=0;i<pack.length;i++){
+                                    if(lib.config.all.sgscards.contains(pack[i])){
+                                        pack.splice(i--,1);
+                                    }
+                                }
+								game.saveConfig('hiddenCardPack',pack);
+
+                                var pack=lib.config.all.characters.slice(0);
+                                if(Array.isArray(lib.config.hiddenCharacterPack)){
+                                    for(var i=0;i<lib.config.hiddenCharacterPack.length;i++){
+                                        pack.add(lib.config.hiddenCharacterPack[i]);
+                                    }
+                                }
+                                for(var i=0;i<pack.length;i++){
+                                    if(lib.config.all.sgscharacters.contains(pack[i])){
+                                        pack.splice(i--,1);
+                                    }
+                                }
+								game.saveConfig('hiddenCharacterPack',pack);
+
+                                var pack=lib.config.all.mode.slice(0);
+                                if(Array.isArray(lib.config.hiddenModePack)){
+                                    for(var i=0;i<lib.config.hiddenModePack.length;i++){
+                                        pack.add(lib.config.hiddenModePack[i]);
+                                    }
+                                }
+                                for(var i=0;i<pack.length;i++){
+                                    if(lib.config.all.sgsmodes.contains(pack[i])){
+                                        pack.splice(i--,1);
+                                    }
+                                }
+								game.saveConfig('hiddenModePack',pack);
+
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='隐藏非官方扩展包';
@@ -22521,6 +22557,7 @@
                                 mode!='mode_favourite'&&mode!='mode_banned'){
 								return;
 							}
+                            ui.click.touchpop();
 							this._banning=connectMenu?'online':'offline';
                             ui.click.intro.call(this,e);
                             _status.clicked=false;
@@ -22774,6 +22811,7 @@
 							if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0&&mode!='mode_banned'){
 								return;
 							}
+                            ui.click.touchpop();
 							this._banning=connectMenu?'online':'offline';
                             ui.click.intro.call(this,e);
                             _status.clicked=false;
@@ -22940,7 +22978,7 @@
                             var banned=lib.config[lib.config.all.mode[i]+'_bannedcards'];
                             if(banned){
                                 for(var j=0;j<banned.length;j++){
-                                    lib.cardPack.mode_banned.push(banned[j]);
+                                    lib.cardPack.mode_banned.add(banned[j]);
                                 }
                             }
                         }
@@ -25727,18 +25765,16 @@
                                     delete window.noname_skin_list;
     								var asset_version=updates.shift();
 
-                                    var skipcharacter=[],skipcard=[];
+                                    var skipcharacter=[],skipcard=['tiesuo_mark'];
                                     if(!lib.config.asset_full){
-                                        for(var i=0;i<lib.config.all.characters.length;i++){
-                                            if(lib.config.diycharacter.contains(lib.config.all.characters)[i]) continue;
-                                            var pack=lib.characterPack[lib.config.all.characters[i]];
+                                        for(var i=0;i<lib.config.all.sgscharacters.length;i++){
+                                            var pack=lib.characterPack[lib.config.all.sgscharacters[i]];
                                             for(var j in pack){
                                                 skipcharacter.add(j);
                                             }
                                         }
-                                        for(var i=0;i<lib.config.all.cards.length;i++){
-                                            if(lib.config.diycard.contains(lib.config.all.cards)[i]) continue;
-                                            var pack=lib.cardPack[lib.config.all.cards[i]];
+                                        for(var i=0;i<lib.config.all.sgscards.length;i++){
+                                            var pack=lib.cardPack[lib.config.all.sgscards[i]];
                                             if(pack){
                                                 skipcard=skipcard.concat(pack);
                                             }
@@ -25803,6 +25839,7 @@
     									var p=button2.parentNode;
     									button2.remove();
     									var span=document.createElement('span');
+                                        span.style.whiteSpace='nowrap';
     									var n1=0;
     									var n2=updates.length;
     									span.innerHTML='正在下载素材（'+n1+'/'+n2+'）';
@@ -25823,6 +25860,16 @@
                                         br4.remove();
                                         br5.remove();
     									p.appendChild(span);
+
+                                        var br6=ui.create.node('br');
+                                        var span7=ui.create.div('','详细信息');
+                                        span7.style.marginTop='6px';
+                                        span7.listen(function(){
+                                            clickMode.call(ui.commandnode);
+                                        });
+                                        p.appendChild(br6);
+                                        p.appendChild(span7);
+
     									var finish=function(){
     										if(n1==n2){
     											game.saveConfig('asset_version',asset_version);
@@ -26217,6 +26264,7 @@
 					(function(){
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large','命令',start.firstChild,clickMode);
+                        ui.commandnode=node;
 						node.type='cmd';
 						node.link=page;
 						page.classList.add('menu-sym');
@@ -28475,6 +28523,15 @@
 			},
 		},
 		click:{
+            touchpop:function(forced){
+                if(lib.config.touchscreen||forced){
+                    _status.touchpopping=true;
+                    clearTimeout(_status.touchpoppingtimeout);
+                    _status.touchpoppingtimeout=setTimeout(function(){
+                        _status.touchpopping=false;
+                    },500);
+                }
+            },
             exit:function(){
                 if(game.servermode&&lib.config.reconnect_info&&_status.over){
                     if(!_status.roomtimeout){
@@ -28527,6 +28584,7 @@
                             if(i==ui.favouriteCharacter.childElementCount){
                                 ui.create.button(this.link,'character',ui.favouriteCharacter).listen(function(e){
                                     this._banning='offline';
+                                    ui.click.touchpop();
                                     ui.click.intro.call(this,e);
                                     _status.clicked=false;
                                     delete this._banning;
@@ -28977,12 +29035,7 @@
 				if(!this._poppedfunc){
 					return;
 				}
-				if(lib.config.touchscreen||this.forceclick){
-					_status.touchpopping=true;
-					setTimeout(function(){
-						_status.touchpopping=false;
-					},500);
-				}
+                ui.click.touchpop(this.forceclick);
 				var uiintro=this._poppedfunc();
 				if(!uiintro) return;
 				if(ui.currentpopped&&ui.currentpopped._uiintro){
@@ -30221,7 +30274,7 @@
                             else if(this.roomgaming&&!game.onlineID){
                                 alert('房间不允许旁观');
                             }
-                            else if(this.version&&this.version!=lib.versionOL){
+                            else if(this.version!=lib.versionOL){
                                 if(this.version>lib.versionOL){
                                     alert('加入失败：你的游戏版本过低');
                                 }
@@ -32913,6 +32966,7 @@
                     }
                     var list=[];
                     uiintro.contentContainer.listen(function(e){
+                        ui.click.touchpop();
                         e.stopPropagation();
                     });
                     for(var i=0;i<modeorder.length;i++){
@@ -33002,6 +33056,7 @@
                     }
                     var list=[];
                     uiintro.contentContainer.listen(function(e){
+                        ui.click.touchpop();
                         e.stopPropagation();
                     });
                     for(var i=0;i<modeorder.length;i++){

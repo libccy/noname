@@ -161,12 +161,14 @@ card.gujian={
 				target.chooseCard(true).ai=function(card){
                     var num=0;
                     if(get.color(card)=='red'){
-                        if(rand) num-=5;
+                        if(rand) num-=6;
                     }
                     else{
-                        if(!rand) num-=5;
+                        if(!rand) num-=6;
                     }
-					return num-ai.get.value(card);
+                    var value=ai.get.value(card);
+                    if(value>=8) return -100;
+					return num-value;
 				};
 				"step 2"
 				event.card2=result.cards[0];
@@ -371,17 +373,29 @@ card.gujian={
 
         // food:'食物',
         // chunbing:'春饼',
+        // chunbing_info:'春饼',
         // gudonggeng:'骨董羹',
+        // gudonggeng_info:'骨董羹',
         // yougeng:'酉羹',
+        // yougeng_info:'酉羹',
         // liyutang:'鲤鱼汤',
+        // liyutang_info:'鲤鱼汤',
         // mizhilianou:'蜜汁藕',
+        // mizhilianou_info:'蜜汁藕',
         // xiajiao:'虾饺',
+        // xiajiao_info:'虾饺',
         // tanhuadong:'昙花冻',
+        // tanhuadong_info:'昙花冻',
         // qingtuan:'青团',
+        // qingtuan_info:'青团',
         // luyugeng:'鲈鱼羹',
+        // luyugeng_info:'鲈鱼羹',
         // yuanbaorou:'元宝肉',
+        // yuanbaorou_info:'元宝肉',
         // molicha:'茉莉茶',
+        // molicha_info:'茉莉茶',
         // mapodoufu:'麻婆豆腐',
+        // mapodoufu_info:'麻婆豆腐',
     },
     list:[
         ['club',8,'feibiao','poison'],

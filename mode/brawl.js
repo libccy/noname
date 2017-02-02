@@ -418,7 +418,13 @@ mode.brawl={
                 var player1,player2;
                 if(init){
                     player1=ui.create.player(null,true).init('huangyueying');
-                    player2=ui.create.player(null,true).init('re_huangyueying');
+                    player2=ui.create.player(null,true);
+                    if(lib.character.re_huangyueying){
+                        player2.init('re_huangyueying');
+                    }
+                    else{
+                        player2.init('huangyueying');
+                    }
                     player1.style.left='20px';
                     player1.style.top='20px';
                     player1.style.transform='scale(0.9)';
