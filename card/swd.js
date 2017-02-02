@@ -441,10 +441,7 @@ card.swd={
 				event.num=1+cards.length;
 				'step 1'
 				var cards=[];
-				var list=[];
-				for(var i in lib.card){
-					if(lib.card[i].type=='jiguan') list.push(i);
-				}
+				var list=get.typeCard('jiguan');
 				if(list.length){
 					for(var i=0;i<event.num;i++){
 						cards.push(game.createCard(list.randomGet()));

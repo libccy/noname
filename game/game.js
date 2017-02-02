@@ -25783,22 +25783,24 @@
                                     for(var i=0;i<updates.length;i++){
                                         switch(updates[i].slice(0,5)){
                                             case 'image':{
-                                                if(!lib.config.asset_image){
-                                                    updates.splice(i--,1);
-                                                }
-                                                else if(!lib.config.asset_full){
-                                                    if(updates[i].indexOf('image/character')==0){
-                                                        if(!skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
-                                                            updates.splice(i--,1);
-                                                        }
-                                                    }
-                                                    else if(updates[i].indexOf('image/card')==0){
-                                                        if(!skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
-                                                            updates.splice(i--,1);
-                                                        }
-                                                    }
-                                                    else if(updates[i].indexOf('image/mode/stone')==0){
+                                                if(!lib.config.asset_full){
+                                                    if(!lib.config.asset_image){
                                                         updates.splice(i--,1);
+                                                    }
+                                                    else{
+                                                        if(updates[i].indexOf('image/character')==0){
+                                                            if(!skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
+                                                                updates.splice(i--,1);
+                                                            }
+                                                        }
+                                                        else if(updates[i].indexOf('image/card')==0){
+                                                            if(!skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
+                                                                updates.splice(i--,1);
+                                                            }
+                                                        }
+                                                        else if(updates[i].indexOf('image/mode/stone')==0){
+                                                            updates.splice(i--,1);
+                                                        }
                                                     }
                                                 }
                                                 break;
@@ -31373,6 +31375,7 @@
             var list=[];
             for(var i in lib.card){
                 if(typeof filter=='function'&&!filter(i)) continue;
+                if(!lib.translate[i+'_info']) continue;
                 if(type.indexOf('equip')==0&&type.length==6){
                     if(get.subtype(i)==type) list.push(i);
                 }
