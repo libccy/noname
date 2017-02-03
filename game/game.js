@@ -33438,6 +33438,7 @@
 						}
                     }
                     var page=ui.create.div('.menu-buttons.configpopped',uiintro.content);
+					var banall=false;
                     for(var i=0;i<list.length;i++){
     	                var cfg=ui.create.div('.config',lib.translate[list[i]]+'模式',page);
                         cfg.classList.add('toggle');
@@ -33452,8 +33453,28 @@
                         var banned=lib.config[cfg.bannedname]||[];
                         if(!banned.contains(name)){
                             cfg.classList.add('on');
+							banall=true;
                         }
                     }
+					ui.create.div('.menubutton',banall?'全部禁用':'全部启用',uiintro.content,function(){
+						if(this.innerHTML=='全部禁用'){
+							for(var i=0;i<page.childElementCount;i++){
+								if(page.childNodes[i].bannedname&&page.childNodes[i].classList.contains('on')){
+									clickBanned.call(page.childNodes[i]);
+								}
+							}
+							this.innerHTML='全部启用';
+						}
+						else{
+							for(var i=0;i<page.childElementCount;i++){
+								if(page.childNodes[i].bannedname&&!page.childNodes[i].classList.contains('on')){
+									clickBanned.call(page.childNodes[i]);
+								}
+							}
+							this.innerHTML='全部禁用';
+						}
+					}).style.marginTop='-10px';
+					ui.create.div('.placeholder.slim',uiintro.content);
                 }
                 else{
                     if(lib.translate[name+'_info']){
@@ -33531,6 +33552,7 @@
 						}
                     }
                     var page=ui.create.div('.menu-buttons.configpopped',uiintro.content);
+					var banall=false;
                     for(var i=0;i<list.length;i++){
     	                var cfg=ui.create.div('.config',lib.translate[list[i]]+'模式',page);
                         cfg.classList.add('toggle');
@@ -33545,8 +33567,28 @@
                         var banned=lib.config[cfg.bannedname]||[];
                         if(!banned.contains(character)){
                             cfg.classList.add('on');
+							banall=true;
                         }
                     }
+					ui.create.div('.menubutton',banall?'全部禁用':'全部启用',uiintro.content,function(){
+						if(this.innerHTML=='全部禁用'){
+							for(var i=0;i<page.childElementCount;i++){
+								if(page.childNodes[i].bannedname&&page.childNodes[i].classList.contains('on')){
+									clickBanned.call(page.childNodes[i]);
+								}
+							}
+							this.innerHTML='全部启用';
+						}
+						else{
+							for(var i=0;i<page.childElementCount;i++){
+								if(page.childNodes[i].bannedname&&!page.childNodes[i].classList.contains('on')){
+									clickBanned.call(page.childNodes[i]);
+								}
+							}
+							this.innerHTML='全部禁用';
+						}
+					}).style.marginTop='-10px';
+					ui.create.div('.placeholder.slim',uiintro.content);
                 }
                 else{
                     var infoitem=lib.character[character];
