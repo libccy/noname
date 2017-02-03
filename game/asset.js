@@ -264,7 +264,6 @@ window.noname_asset_list=[
     'image/character/diaochan.jpg',
     'image/character/dingfeng.jpg',
     'image/character/diy_caiwenji.jpg',
-    'image/character/diy_dianwei.jpg',
     'image/character/diy_feishi.jpg',
     'image/character/diy_huangzhong.jpg',
     'image/character/diy_liuyan.jpg',
