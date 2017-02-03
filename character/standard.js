@@ -318,7 +318,11 @@ character.standard={
 		tiandu:{
 			audio:4,
 			trigger:{player:'judgeEnd'},
-			frequent:true,
+			frequent:'check',
+			check:function(event){
+				if(event.result.card.name=='du') return false;
+				return true;
+			},
 			filter:function(event,player){
 				if(get.owner(event.result.card)){
 					return false;

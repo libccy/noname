@@ -3722,7 +3722,7 @@
 			}
 		},
 		init:{
-            bind:function(){
+            init:function(){
                 if(window.cordovaLoadTimeout){
                     clearTimeout(window.cordovaLoadTimeout);
                     delete window.cordovaLoadTimeout;
@@ -4172,8 +4172,7 @@
         				_status.windowLoaded=true;
         			}
         		};
-            },
-			init:function(){
+
 				if(window.noname_update){
 					lib.version=window.noname_update.version;
 					lib.changeLog=window.noname_update.changeLog;
@@ -5264,6 +5263,7 @@
 					proceed();
 				}
 				localStorage.removeItem(lib.configprefix+'directstart');
+                delete lib.init.init;
 			},
             startOnline:function(){
                 'step 0'
@@ -15502,7 +15502,7 @@
 					// else{
                     //     trigger.start=trigger.source||trigger.player;
                     // }
-					var str=get.translation(trigger.player.name)+'濒死，是否帮助？<br><div class="text center">当前体力：'+trigger.player.hp+'</div>';
+					var str=get.translation(trigger.player.name)+'濒死，是否帮助？<br><div class="text center" style="margin-top:10px">当前体力：'+trigger.player.hp+'</div>';
 					_status.dying=event.dying;
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
 						event._result={bool:false}
@@ -23238,6 +23238,9 @@
 						if(mode.indexOf('mode_')!=0){
 							page.appendChild(cfgnode);
 						}
+                        else{
+                            page.style.paddingTop='8px';
+                        }
                         var banCard=function(e){
 							if(_status.clicked){
 								_status.clicked=false;
@@ -33092,10 +33095,26 @@
 					}
 					break;
 				}
+				case 'character':case 'characters':{
+					if(typeof content=='string'){
+						content=[content];
+					}
+					if(dialog&&Array.isArray(content)){
+                        dialog.addAuto([content,'character']);
+						return false;
+					}
+					else{
+						if(content&&content.length){
+							return get.translation(content);
+						}
+						return false;
+					}
+					break;
+				}
 				default:{
 					if(typeof type=='string'){
                         type=type.replace(/#/g,content);
-                        type.replace(/\$/g,get.cnNumber(content));
+                        type.replace(/&/g,get.cnNumber(content));
 						return type;
 					}
 					else if(typeof type=='function'){
@@ -34245,6 +34264,5 @@
 			}
 		},
 	};
-    lib.init.bind();
     lib.init.init();
 }());

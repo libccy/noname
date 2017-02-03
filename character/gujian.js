@@ -218,6 +218,9 @@ character.gujian={
 						}
 						event.finish();
 					}
+					else if(info.notarget){
+						player.useCard(card);
+					}
 					else{
 						var next=player.chooseTarget('选择'+get.translation(name)+'的目标');
 						next._get_card=card;
@@ -716,6 +719,7 @@ character.gujian={
 			filter:function(event,player){
 				return event.source&&event.source!=player&&event.source.num('h')>0;
 			},
+			logTarget:'source',
 			content:function(){
 				"step 0"
 				trigger.source.chooseCard('交给'+get.translation(player)+'一张手牌',true).ai=function(card){
@@ -1637,7 +1641,7 @@ character.gujian={
 		yanjia:'偃甲',
 		yanjia_info:'出牌阶段，你可以将两张装备牌合成为一张强化装备',
 		xiuhua:'袖花',
-		xiuhua_info:'每当一件装备因被替换或弃置进入弃牌堆，你可以获得之',
+		xiuhua_info:'每当一件其他角色的装备因被替换或弃置进入弃牌堆，你可以获得之',
 		liuying:'流影',
 		liuying_info:'每当你使用一张杀，你可以指定一名不是此杀目标的角色并进行一次判定，若结果是黑色，将其追加为杀的额外目标并可以再次判定',
 		boyun:'拨云',

@@ -5,8 +5,6 @@ play.boss={
 			lib.characterPack.mode_extension_boss={
 				boss_zhangchunhua:['female','wei',4,['jueqing','wuxin','shangshix'],['boss','bossallowed'],'wei'],
 				boss_zhenji:['female','wei',4,['tashui','lingbo','jiaoxia','fanghua'],['boss','bossallowed'],'wei'],
-				// boss_liubei:['male','shu',5,['lingfeng'],['boss','bossallowed'],'qun'],
-				// boss_zhugeliang:['male','shu',4,[],['boss','bossallowed'],'qun'],
 				boss_huangyueying:['female','shu',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['boss','bossallowed'],'wei'],
 				boss_pangtong:['male','shu',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['boss','bossallowed'],'zhu'],
 				boss_zhaoyun:['male','shu',1,['boss_juejing','longhun','zhanjiang'],['boss','bossallowed'],'qun'],
@@ -41,6 +39,12 @@ play.boss={
 				boss_huatuo:['male','qun',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['boss','bossallowed'],'wu'],
 				boss_dongzhuo:['male','qun',20,['jiuchi','boss_qiangzheng','boss_baolin'],['boss','bossallowed'],'shu'],
 				// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
+
+
+				boss_liubei:['male','shu',12,['xiaoxiong','boss_zhangwu'],['boss','bossallowed'],'qun'],
+				boss_zhugeliang:['male','shu',Infinity,['xiangxing','yueyin','fengqi','gaiming'],['boss','bossallowed'],'qun'],
+				boss_guojia:['male','wei',4,['tiandu','boss_guimou','boss_yuance','boss_qizuo'],['boss','bossallowed'],'zhu'],
+				boss_caocao:['male','wei',12,['boss_guixin','xiongcai'],['boss','bossallowed'],'wei'],
 			};
 			for(var i in lib.characterPack.mode_extension_boss){
 				lib.characterPack.mode_extension_boss[i][4].push('mode:boss');

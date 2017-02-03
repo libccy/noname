@@ -4073,7 +4073,7 @@ character.swd={
 				var att=ai.get.attitude(player,trigger.player);
 				var nh=player.num('h');
 				var next=player.chooseToDiscard(get.prompt('susheng',trigger.player));
-				next.logSkill='susheng';
+				next.logSkill=['susheng',trigger.player];
 				next.ai=function(card){
 					if(att>3||(att>1&&nh>2)){
 						return ai.get.unuseful2(card);

@@ -248,7 +248,7 @@ character.ow={
             unique:true,
             init2:function(player){
                 if(!player.storage.zhongdun){
-                    player.changeHujia(game.players.length);
+                    player.changeHujia(8);
                     player.storage.zhongdun=true;
                 }
             },
@@ -2973,7 +2973,7 @@ character.ow={
         mengji:'猛击',
         mengji_info:'锁定技，若你已发动重盾，当你没有护甲时，你的杀造成的伤害+1',
         zhongdun:'重盾',
-        zhongdun_info:'游戏开始时，你获得等同于游戏人数护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
+        zhongdun_info:'游戏开始时，你获得8点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
         paotai:'炮台',
         paotai2:'炮台',
         paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；回合结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到一点伤害，炮台降低一级',
