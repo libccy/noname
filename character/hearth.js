@@ -16,8 +16,8 @@ character.hearth={
 		hs_magni:['male','shu',4,['zhongjia','dunji']],
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
-		// hs_khadgar:['male','shu',3,['s_tuteng']],
-		// hs_tyrande:['female','wei',3,['yuelu','xingluo']],
+		hs_khadgar:['male','shu',3,['s_tuteng']],
+		hs_tyrande:['female','wei',3,['yuelu','xingluo']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu']],
 		hs_wvelen:['male','qun',3,['shengyan','xianzhi']],
@@ -98,6 +98,102 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		xingluo:{
+			trigger:{player:'phaseBegin'},
+			direct:true,
+			filter:function(event,player){
+				var nh=player.num('h');
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].num('h')>nh){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				var nh=player.num('h');
+				var num=0;
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].num('h')>nh){
+						num++;
+					}
+				}
+				player.chooseTarget(get.prompt('xingluo'),[1,num],function(card,player,target){
+					return target.num('h')>nh;
+				}).ai=function(target){
+					return 0.5-ai.get.attitude(player,target);
+				}
+				'step 1'
+				if(result.bool){
+					event.cards=[];
+					event.list=result.targets.slice(0);
+					event.list.sort(lib.sort.seat);
+					player.logSkill('xingluo',result.targets);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(event.list.length){
+					event.list.shift().chooseToDiscard('h',true);
+				}
+				else{
+					event.goto(4);
+				}
+				'step 3'
+				if(result.bool&&result.cards.length){
+					event.cards.push(result.cards[0]);
+				}
+				event.goto(2);
+				'step 4'
+				if(event.cards.length){
+					player.chooseCardButton('选择一张加入手牌',event.cards).ai=function(button){
+						return ai.get.value(button.link);
+					};
+				}
+				else{
+					event.finish();
+				}
+				'step 5'
+				if(result.bool){
+					player.gain(result.links,'gain2');
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		yuelu:{
+			enable:'chooseToUse',
+			filter:function(event,player){
+				return event.type=='dying'&&player.num('he',{color:'black'});
+			},
+			filterCard:{color:'black'},
+			position:'he',
+			check:function(card){
+				return 11-ai.get.value(card);
+			},
+			filterTarget:function(card,player,target){
+				return target==_status.event.dying;
+			},
+			selectTarget:-1,
+			content:function(){
+				target.recover();
+				target.changeHujia();
+			},
+			ai:{
+				order:10,
+				skillTagFilter:function(player){
+					if(player.num('he',{color:'black'})==0) return false;
+				},
+				save:true,
+				result:{
+					target:3
+				},
+				threaten:2
+			},
+		},
 		yushou:{
 			enable:'phaseUse',
 			filterCard:true,
@@ -5386,10 +5482,10 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
-		yuelu:'月印',
-		yuelu_info:'出牌阶段限一次，你可以弃置一张红桃牌令一名角色回复一点体力并获得一点护甲',
+		yuelu:'月露',
+		yuelu_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力并获得一点护甲',
 		xingluo:'星落',
-		xingluo_info:'星落',
+		xingluo_info:'回合开始阶段，你可以令任意名手牌数多于你的角色各弃置一张手牌，然后你从弃置的牌中选择一张加入手牌',
 		yushou:'御兽',
 		yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，效果持续到你的下一回合开始',
 		yushou_misha:'米莎',

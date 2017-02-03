@@ -888,6 +888,8 @@ mode.boss={
 					}
 				}
 				var rand=Math.random()<0.5?'选项一':'选项二';
+				var sourcename=get.translation(trigger.source);
+				var playername=get.translation(trigger.player);
 				player.chooseControl('选项一','选项二','cancel2',function(){
 					if(att1==0&&att2==0) return rand;
 					if(att1*att2>=0){
@@ -912,7 +914,7 @@ mode.boss={
 						return rand;
 					}
 				}).set('prompt',get.prompt('boss_yuance')+
-				'<br><br><div class="text">选项一：若结果为黑色，受伤害角色失去一点体力，否则伤害来源失去一点体力</div><br><div class="text">选项二：若结果为红色，受伤害角色回复一点体力，否则伤害来源回复一点体力</div>');
+				'<br><br><div class="text">选项一：若判定结果为黑色，'+playername+'失去一点体力，否则'+sourcename+'失去一点体力</div><br><div class="text">选项二：若判定结果为红色，'+playername+'回复一点体力，否则'+sourcename+'回复一点体力</div>');
 				'step 1'
 				var att1=ai.get.attitude(player,trigger.player);
 				var att2=ai.get.attitude(player,trigger.source);

@@ -35,9 +35,36 @@ character.xianjian={
 		pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
 		pal_muchanglan:['female','wu',3,['feixia','lueying']],
 		// pal_xia:['male','wei',4,[]],
-		// pal_jiangcheng:['male','wei',4,[]],
+		// pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 	},
 	skill:{
+		yanzhan:{
+			enable:'phaseUse',
+			viewAs:{name:'sha',nature:'fire'},
+			usable:1,
+			viewAsFilter:function(player){
+				if(!player.num('h',{color:'red'})) return false;
+			},
+			filterCard:{color:'red'},
+			ai:{
+				order:3.15
+			},
+			group:'yanzhan2'
+		},
+		yanzhan2:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			popup:false,
+			filter:function(event){
+				return event.parent.skill=='yanzhan';
+			},
+			content:function(){
+				player.getStat().card.sha--;
+			}
+		},
+		fenshi:{
+
+		},
 		feixia:{
 			enable:'phaseUse',
 			usable:1,
@@ -2391,6 +2418,12 @@ character.xianjian={
 		pal_changqing:'长卿',
 		pal_xuanxiao:'玄霄',
 
+		longhuo:'龙火',
+		longhuo_info:'回合结束阶段，你可以对所有角色各造成一点火焰伤害',
+		fenshi:'焚世',
+		fenshi_info:'觉醒技，回合开始阶段，若你没有牌，你回复一点体力并摸三张牌，并获得技能龙火',
+		yanzhan:'炎斩',
+		yanzhan_info:'出牌阶段限一次，你可以将一张红色手牌当作火杀使用，若造成了伤害，此杀不计入出牌次数',
 		feixia:'飞霞',
 		feixia_info:'出牌阶段限一次，你可以弃置一张红色牌视为对一名随机敌人使用一张不计入出杀次数的杀',
 		lueying:'掠影',

@@ -19,7 +19,7 @@ window.noname_update={
         // 'character/rank.js',
         // 'character/extra.js',
         'character/ow.js',
-        // 'character/hearth.js',
+        'character/hearth.js',
         // 'character/refresh.js',
         // 'character/shenhua.js',
         'character/standard.js',

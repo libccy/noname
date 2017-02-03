@@ -8791,8 +8791,11 @@
 						},700);
 					}
 					else if(event.animate=='gain2'||event.animate=='draw2'){
-						player.$gain2(cards);
-						game.delayx(1,500);
+						var gain2t=300;
+						if(player.$gain2(cards)){
+							gain2t=500;
+						}
+						game.delayx(1,gain2t);
 						setTimeout(function(){
 							addv();
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
@@ -8800,7 +8803,7 @@
 							player.update();
 							if(player==game.me) ui.updatehl();
                             broadcast();
-						},500);
+						},gain2t);
 					}
 					else{
 						addv();
@@ -13619,7 +13622,10 @@
 					if(list2.length){
 						game.addVideo('gain2',this,get.cardsInfo(list2));
 					}
-					if(list.length) this.$draw(list,'nobroadcast');
+					if(list.length){
+						this.$draw(list,'nobroadcast');
+						return true;
+					}
 				},
 				$skill:function(name,type,color){
 					if(typeof type!='string') type='legend';
@@ -20808,6 +20814,17 @@
                 if(card.filterTarget&&card.selectTarget==undefined){
                     card.selectTarget=1;
                 }
+				if(card.autoViewAs){
+					if(!card.ai){
+						card.ai={};
+					}
+					if(!card.ai.order){
+						card.ai.order=lib.card[card.autoViewAs].ai.order;
+						if(!card.ai.order&&lib.card[card.autoViewAs].ai.basic){
+							card.ai.order=lib.card[card.autoViewAs].ai.basic.order;
+						}
+					}
+				}
 				if(card.type=='equip'){
 					if(card.enable==undefined) card.enable=true;
 					if(card.selectTarget==undefined) card.selectTarget=-1;
