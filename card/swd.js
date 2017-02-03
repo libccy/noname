@@ -252,17 +252,17 @@ card.swd={
 			},
 		},
 		fengyinzhidan:{
-			type:'trick',
+			type:'basic',
 			enable:true,
 			fullskin:true,
-			notarget:true,
+			filterTarget:true,
 			content:function(){
 				'step 0'
 				event.num=3;
 				var list=[];
 				event.list=list;
 				for(var i=0;i<lib.inpile.length;i++){
-					if(lib.filter.filterCard({name:lib.inpile[i]},player)){
+					if(lib.filter.filterCard({name:lib.inpile[i]},target)){
 						var info=lib.card[lib.inpile[i]];
 						if(info.type=='trick'&&!info.multitarget&&!info.notarget){
 							if(Array.isArray(info.selectTarget)){
@@ -276,7 +276,6 @@ card.swd={
 						}
 					}
 				}
-				list.remove('fengyinzhidan');
 				'step 1'
 				var list=event.list;
 				while(list.length){
@@ -284,14 +283,14 @@ card.swd={
 					var info=get.info(card);
 					var targets=[];
 					for(var i=0;i<game.players.length;i++){
-						if(lib.filter.filterTarget(card,player,game.players[i])){
+						if(lib.filter.filterTarget(card,target,game.players[i])){
 							targets.push(game.players[i]);
 						}
 					}
 					if(targets.length){
 						targets.sort(lib.sort.seat);
 						if(info.selectTarget==-1){
-							player.useCard(card,targets);
+							target.useCard(card,targets);
 						}
 						else{
 							var num=info.selectTarget;
@@ -302,7 +301,7 @@ card.swd={
 							else{
 								if(targets.length<num) continue;
 							}
-							player.useCard(card,targets.randomGets(num),'noai');
+							target.useCard(card,targets.randomGets(num),'noai');
 						}
 						if(--event.num>0){
 							event.redo();
@@ -316,7 +315,7 @@ card.swd={
 				value:8,
 				useful:3,
 				result:{
-					player:1
+					target:1
 				}
 			}
 		},
@@ -402,8 +401,8 @@ card.swd={
 		yuchangen:{
 			fullskin:true,
 			type:'jiqi',
-			addinfo:'丹',
-			autoViewAs:'huanpodan',
+			addinfo:'蛋',
+			autoViewAs:'fengyinzhidan',
 			ai:{
 				value:6,
 				useful:1
@@ -4759,20 +4758,20 @@ card.swd={
 		yuchanli:'离玉蝉',
 		yuchanli_info:'在你行动时可当作天仙酒使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchangen:'艮玉蝉',
-		yuchangen_info:'在你行动时可当作还魄丹使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
+		yuchangen_info:'在你行动时可当作封印之蛋使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yuchandui:'兑玉蝉',
 		yuchandui_info:'在你行动时可当作雪肌冰鲍使用；可用于煅造装备；在你使用一张牌后，此牌会随机切换形态',
 		yangpijuan:'羊皮卷',
 		yangpijuan_info:'出牌阶段对自己使用，选择一种卡牌类别，从3张随机该类别的卡牌中选择一张加入手牌',
-		pantao:'蟠桃',
-		pantao_info:'出牌阶段对自己使用，或对濒死角色使用，目标回复两点体力并获得一点护甲',
+		// pantao:'蟠桃',
+		// pantao_info:'出牌阶段对自己使用，或对濒死角色使用，目标回复两点体力并获得一点护甲',
 		shencaojie:'神草结',
 		shencaojie_info:'你的锦囊牌即将造成伤害时对目标使用，令此伤害+1',
 		yuruyi:'玉如意',
 		yuruyi_ab:'如意',
 		yuruyi_info:'你有更高的机率摸到好牌',
 		fengyinzhidan:'封印之蛋',
-		fengyinzhidan_info:'随机使用三张非延时锦囊牌（随机指定目标）',
+		fengyinzhidan_info:'出牌阶段对任意角色使用，目标随机使用三张非延时锦囊牌（随机指定目标）',
 		shuchui:'鼠槌',
 		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，若杀造成了伤害，你摸一张牌',
 		zhiluxiaohu:'指路小狐',
@@ -4944,12 +4943,12 @@ card.swd={
 		tianxianjiu_info:'出牌阶段对自己使用，你使用的下一张杀造成伤害后可以摸两张牌；濒死阶段，对自己使用，回复1点体力',
 		// xiangyuye:'翔羽叶',
 		// xiangyuye_info:'出牌阶段，对一名攻击范围外的角色使用，令其弃置一张黑色手牌或流失一点体力',
-		huanpodan:'还魄丹',
-		huanpodan_bg:'魄',
-		huanpodan_info:'出牌阶段对一名角色使用，在目标即将死亡时防止其死亡，改为令其弃置所有牌，将体力值回复至1并摸一张牌',
-		huanpodan_skill:'还魄丹',
-		huanpodan_skill_bg:'丹',
-		huanpodan_skill_info:'防止一次死亡，改为弃置所有牌，将体力值变为1并摸一张牌',
+		// huanpodan:'还魄丹',
+		// huanpodan_bg:'魄',
+		// huanpodan_info:'出牌阶段对一名角色使用，在目标即将死亡时防止其死亡，改为令其弃置所有牌，将体力值回复至1并摸一张牌',
+		// huanpodan_skill:'还魄丹',
+		// huanpodan_skill_bg:'丹',
+		// huanpodan_skill_info:'防止一次死亡，改为弃置所有牌，将体力值变为1并摸一张牌',
 		ximohu:'吸魔壶',
 		ximohu_bg:'魔',
 		// ximohu_info:'锁定技，你将即将受到的雷属性伤害转化为你的体力值',
@@ -5072,8 +5071,8 @@ card.swd={
 		['heart',1,'daihuofenglun','fire'],
 
 		['diamond',2,'xiayuncailing'],
-//		['heart',2,'pantao'],
-		['heart',2,'huanpodan'],
+		// ['heart',2,'pantao'],
+		// ['heart',2,'huanpodan'],
 
 		['club',3,'caoyao'],
 		['diamond',3,'chilongya','fire'],
@@ -5081,7 +5080,7 @@ card.swd={
 
 		['club',4,'caoyao'],
 		['spade',4,'zhufangshenshi'],
-		['spade',4,'huanpodan'],
+		// ['spade',4,'huanpodan'],
 
 		['club',5,'caoyao'],
 		['spade',5,'xixueguizhihuan'],

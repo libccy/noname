@@ -8792,7 +8792,7 @@
 					}
 					else if(event.animate=='gain2'||event.animate=='draw2'){
 						var gain2t=300;
-						if(player.$gain2(cards)){
+						if(player.$gain2(cards)&&player==game.me){
 							gain2t=500;
 						}
 						game.delayx(1,gain2t);

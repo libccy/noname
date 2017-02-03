@@ -702,7 +702,7 @@ card.hearth={
 		zhaomingdan:'照明弹',
 		zhaomingdan_info:'观看一名其他角色的手牌，并重置其区域内的一张牌，然后摸一张牌',
 		jihuocard:'激活',
-		jihuocard_info:'摸一张牌，本回合手牌上限+1',
+		jihuocard_info:'摸一张牌，本回合手牌上限+2',
 	},
 	list:[
 		// ['heart',2,'shenenshu'],

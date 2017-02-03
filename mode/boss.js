@@ -1253,7 +1253,6 @@ mode.boss={
 							default:return 0;
 						}
 					}
-					if(rand3&&name=='fengyinzhidan') return 1.5;
 					if(rand4&&player.num('h')<=1){
 						switch(name){
 							case 'zengbin':return 1;
