@@ -1,10 +1,13 @@
 card.yunchou={
 	card:{
+		youdishenru:{
+			fullskin:true,
+			type:'trick',
+		},
 		wangmeizhike:{
 			fullskin:true,
 			type:'trick',
 			enable:true,
-			cardimage:'shushangkaihua',
 			filterTarget:function(card,player,target){
 				return (target.isLeastHp()&&target.isDamaged())||target.isLeastHandcard();
 			},
@@ -741,6 +744,8 @@ card.yunchou={
 		},
 	},
 	translate:{
+		youdishenru:'诱敌深入',
+		youdishenru_info:'当以你为目标的【杀】生效前，对此【杀】使用。抵消此【杀】，然后此【杀】的使用者需对你使用【杀】（在此【杀】结算结束之后，若此【杀】未对你造成伤害，其重复此流程），否则受到你造成的1点伤害',
 		suolianjia:'锁链甲',
 		suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
 		suolianjia_bg:'链',
@@ -799,8 +804,8 @@ card.yunchou={
 		['club',10,'toulianghuanzhu'],
 		['spade',11,'toulianghuanzhu'],
 		['spade',13,'guohe'],
-		['heart',6,'shushangkaihua'],
-		['club',1,'shushangkaihua'],
+		['heart',6,'wangmeizhike'],
+		['club',1,'wangmeizhike'],
 		['diamond',6,'chenhuodajie'],
 		['diamond',9,'chenhuodajie'],
 		['club',3,'chenhuodajie'],
