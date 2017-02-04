@@ -5587,6 +5587,14 @@
                     target=game.me.next;
                 }
                 target.init(name);
+				if(i===true){
+					if(lib.config.layout=='long2'){
+						lib.init.layout('mobile');
+					}
+					else{
+						lib.init.layout('long2');
+					}
+				}
             },
             e:function(){
                 var cards=[],target;

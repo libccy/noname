@@ -17,6 +17,13 @@ character.diy={
 		diy_zhenji:['female','wei',3,['diy_jiaoxia','yiesheng']],
 		// diy_menghuo:['male','shu',4,['huoshou','zaiqix']],
 		re_huangyueying:['female','shu',3,['rejizhi','qicai']],
+
+		diy_liufu:['male','shu',3,[]],
+		diy_xizhenxihong:['male','shu',3,[]],
+		diy_liuzan:['male','shu',3,[]],
+		diy_zaozhirenjun:['male','shu',3,[]],
+		diy_yangyi:['male','shu',3,[]],
+		diy_tianyu:['male','shu',3,[]],
 	},
 	perfectPair:{
 		yuji:['zuoci']
@@ -662,6 +669,13 @@ character.diy={
 		},
 	},
 	translate:{
+		diy_liufu:'刘馥',
+		diy_xizhenxihong:'习珍习宏',
+		diy_liuzan:'留赞',
+		diy_zaozhirenjun:'枣祗任峻',
+		diy_yangyi:'杨仪',
+		diy_tianyu:'田豫',
+
 		// diy_caocao:'曹操',
 		diy_menghuo:'孟获',
 		diy_huangzhong:'黄汉升',
