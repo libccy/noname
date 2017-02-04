@@ -1,5 +1,41 @@
 card.yunchou={
 	card:{
+		wangmeizhike:{
+			fullskin:true,
+			type:'trick',
+			enable:true,
+			cardimage:'shushangkaihua',
+			filterTarget:function(card,player,target){
+				return (target.isLeastHp()&&target.isDamaged())||target.isLeastHandcard();
+			},
+			content:function(){
+				'step 0'
+				if(target.isLeastHandcard()) target.draw(2);
+				'step 1'
+				if(target.isLeastHp()) target.recover();
+			},
+			ai:{
+				order:2,
+				value:6,
+				result:{
+					target:function(player,target){
+						var num=0;
+						if(target.isLeastHp()&&ai.get.recoverEffect(target)>0){
+							if(target.hp==1){
+								num+=3;
+							}
+							else{
+								num+=2;
+							}
+						}
+						if(target.isLeastHandcard()){
+							num+=2;
+						}
+						return num;
+					}
+				}
+			}
+		},
 		suolianjia:{
 			fullskin:true,
 			type:"equip",
@@ -719,8 +755,8 @@ card.yunchou={
 		fudichouxin_info:'与一名角色进行拼点，若成功则获得双方拼点牌',
 		shuiyanqijun:'水攻',
 		shuiyanqijun_info:'令所有有装备的角色各弃置一张装备牌',
-		shushangkaihua:'树上开花',
-		shushangkaihua_info:'使用者与手牌数最少的所有角色各摸一张牌',
+		wangmeizhike:'望梅止渴',
+		wangmeizhike_info:'出牌阶段对一名角色使用，若没有角色手牌比目标少，目标摸两张牌；若没有角色体力比目标少，目标回复一点体力',
 		chenhuodajie:'趁火打劫',
 		chenhuodajie_info:'任意一名其他角色受到伤害时对其使用，获得其一张牌',
 		huoshan:'火山',
@@ -730,7 +766,7 @@ card.yunchou={
 		liuxinghuoyu:'流星火羽',
 		liuxinghuoyu_info:'出牌阶段，对一名角色使用，令目标弃置2张牌，或受到一点火焰伤害',
 		qiankundai:'乾坤袋',
-		qiankundai_info:'你的手牌上限+1。当你失去该装备时，你摸取一张牌。',
+		qiankundai_info:'你的手牌上限+1。当你失去该装备时，你摸一张牌。',
 		hufu:'虎符',
 		hufu_bg:'符',
 		_hufu_sha:'符杀',

@@ -12550,6 +12550,29 @@
                 isHealthy:function(){
                     return this.hp==this.maxHp;
                 },
+				isLeastHp:function(equal){
+					for(var i=0;i<game.players.length;i++){
+						if(equal){
+							if(game.players[i].hp<=this.hp) return false;
+						}
+						else{
+							if(game.players[i].hp<this.hp) return false;
+						}
+					}
+					return true;
+				},
+				isLeastHandcard:function(equal){
+					var nh=this.num('h');
+					for(var i=0;i<game.players.length;i++){
+						if(equal){
+							if(game.players[i].num('h')<=nh) return false;
+						}
+						else{
+							if(game.players[i].num('h')<nh) return false;
+						}
+					}
+					return true;
+				},
 				isLinked:function(){
                     if(get.is.linked2(this)){
                         return this.classList.contains('linked2');

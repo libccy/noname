@@ -7,7 +7,7 @@ character.diy={
 		// diy_luxun:['male','wu',3,['shaoying','zonghuo']],
 		diy_yuji:['male','qun',3,['diyguhuo','diychanyuan']],
 		// diy_zhouyu:['male','wu',3,['jieyan','honglian']],
-		diy_zhouyu:['male','wu',3,['xiongzi','yaliang']],
+		// diy_zhouyu:['male','wu',3,['xiongzi','yaliang']],
 		diy_caiwenji:['female','qun',3,['beige','guihan']],
 		diy_lukang:['male','wu',4,['luweiyan','qianxun']],
 		diy_xuhuang:['male','wei',4,['diyduanliang']],
