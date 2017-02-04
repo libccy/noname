@@ -18,7 +18,7 @@ character.diy={
 		// diy_menghuo:['male','shu',4,['huoshou','zaiqix']],
 		re_huangyueying:['female','shu',3,['rejizhi','qicai']],
 
-		diy_liufu:['male','shu',3,[]],
+		diy_liufu:['male','wei',3,['zhucheng','duoqi']],
 		diy_xizhenxihong:['male','shu',3,[]],
 		diy_liuzan:['male','shu',3,[]],
 		diy_zaozhirenjun:['male','shu',3,[]],
@@ -29,6 +29,132 @@ character.diy={
 		yuji:['zuoci']
 	},
 	skill:{
+		duoqi:{
+			trigger:{global:'discardAfter'},
+			filter:function(event,player){
+				if(_status.currentPhase==player) return false;
+				if(!player.storage.zhucheng||!player.storage.zhucheng.length) return false;
+				var evt=event.getParent('phaseUse');
+				if(evt&&evt.name=='phaseUse') return true;
+				return false;
+			},
+			direct:true,
+			content:function(){
+				'step 0'
+				var bool=false;
+				if(ai.get.attitude(player,trigger.player)<0&&trigger.player.needsToDiscard()){
+					bool=true;
+				}
+				player.chooseCardButton(get.prompt('zhucheng',_status.currentPhase),player.storage.zhucheng).ai=function(button){
+					return bool?1:0;
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('zhucheng',_status.currentPhase);
+					player.$throw(result.links[0]);
+					player.storage.zhucheng.remove(result.links[0]);
+					ui.discardPile.appendChild(result.links[0]);
+					player.syncStorage('zhucheng');
+					if(player.storage.zhucheng.length==0){
+						player.unmarkSkill('zhucheng');
+					}
+					else{
+						player.updateMarks();
+					}
+					var evt=trigger.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		zhucheng:{
+			trigger:{player:'phaseEnd'},
+			filter:function(event,player){
+				return !player.storage.zhucheng||!player.storage.zhucheng.length;
+			},
+			check:function(event,player){
+				if(player.storage.zhucheng&&player.storage.zhucheng.length){
+					if(!player.hasShan()) return false;
+					if(player.storage.zhucheng.length>=2) return false;
+				}
+				return true;
+			},
+			intro:{
+				content:'cards'
+			},
+			content:function(){
+				if(player.storage.zhucheng&&player.storage.zhucheng.length){
+					player.gain(player.storage.zhucheng,'gain2');
+					delete player.storage.zhucheng;
+					player.unmarkSkill('zhucheng');
+				}
+				else{
+					var cards=get.cards(Math.max(1,player.maxHp-player.hp));
+					player.$gain2(cards);
+					player.storage.zhucheng=cards;
+					player.markSkill('zhucheng');
+				}
+			},
+			ai:{
+				target:function(card,player,target,current){
+					if(card.name=='sha'&&player.storage.zhucheng&&player.storage.zhucheng.length){
+						if(player.storage.zhucheng.length>=2){
+							if(!player.hasFriend()&&player.num('he')-2<player.storage.zhucheng.length) return 'zeroplayertarget';
+							return 0.1;
+						}
+						else{
+							var he=player.get('he');
+							var sha=false;
+							for(var i=0;i<he.length;i++){
+								if(he[i]=='sha'&&!sha){
+									sha=true;
+								}
+								else{
+									if(ai.get.value(he[i])<=6){
+										return [1,0,1,-0.5];
+									}
+								}
+							}
+							return 'zeroplayertarget';
+						}
+					}
+				}
+			},
+			group:'zhucheng2'
+		},
+		zhucheng2:{
+			trigger:{target:'shaBefore'},
+			check:function(event,player){
+				if(ai.get.attitude(event.player,player)<=0) return true;
+				return ai.get.effect(player,event.card,event.player,player)<=0;
+			},
+			filter:function(event,player){
+				return player.storage.zhucheng&&player.storage.zhucheng.length>0;
+			},
+			content:function(){
+				'step 0'
+				var bool=false;
+				if(ai.get.effect(player,trigger.card,trigger.player,trigger.player)>=0){
+					bool=true;
+				}
+				var num=player.storage.zhucheng.length;
+				trigger.player.chooseToDiscard('弃置'+get.cnNumber(num)+'张牌，或令杀无效',num).ai=function(card){
+					if(bool){
+						return 7-ai.get.value(card);
+					}
+					return 0;
+				}
+				'step 1'
+				if(!result.bool){
+					trigger.untrigger();
+					trigger.finish();
+				}
+			}
+		},
 		diy_jiaoxia:{
 			audio:['jiaoxia',2],
 			trigger:{target:'useCardToBegin'},
@@ -477,11 +603,11 @@ character.diy={
 				else if(att==0&&trigger.player.num('he')==0){
 					bool=1;
 				}
-				trigger.player.chooseControl('draw_card','discard_card').ai=function(){
+				trigger.player.chooseControl(function(){
 					return bool;
-				};
+				}).set('prompt','率言').set('choiceList',['令'+get.translation(player)+'摸一张牌','令'+get.translation(player)+'弃置你一张牌']);
 				"step 1"
-				if(result.control=='draw_card'){
+				if(result.control=='选项一'){
 					player.draw();
 					event.finish();
 				}
@@ -694,6 +820,13 @@ character.diy={
 		diy_lukang:'陆抗',
 		diy_caiwenji:'蔡昭姬',
 		diy_zhenji:'甄宓',
+
+		zhucheng:'筑城',
+		zhucheng2:'筑城',
+		zhucheng_info:'①结束阶段开始时，若没有“筑”，你可以将牌堆顶的X张牌置于你的武将牌上〔称为“筑”〕（X为你已损失的体力值与1中的较大值），否则你可以获取所有“筑”。②当你成为杀的目标时，若有“筑”，你可以令此杀的使用者弃置X张牌（X为“筑”的数量），否则杀对你无效',
+		duoqi:'夺气',
+		duoqi_info:'当一名角色于除你之外的角色的出牌阶段内因弃置而失去牌后，你可以将一张“筑”置入弃牌堆，结束此出牌阶段',
+
 		siji:'伺机',
 		ciqiu:'刺酋',
 		ciqiu2:'刺酋',
@@ -708,8 +841,6 @@ character.diy={
 		jieyan:'劫焰',
 		honglian:'红莲',
 		xiongzi:'雄姿',
-		yaliang:'雅量',
-		yaliang_info:'每当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可与该角色各摸一张牌。',
 		luweiyan:'围堰',
 		guihan:'归汉',
 		diyduanliang:'断粮',
@@ -721,6 +852,8 @@ character.diy={
 		batu:'霸图',
 		zaiqix:'再起',
 		diy_jiaoxia:'皎霞',
+		yaliang:'雅量',
+		yaliang_info:'每当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可与该角色各摸一张牌。',
 		diy_jiaoxia_info:'每当你成为红色牌的目标，你可以摸一张牌',
 		zaiqix_info:'摸牌阶段，若你已受伤，你可以放弃摸牌并展示牌堆顶的X+1张牌，X为你已损失的体力值，其中每有一张♥牌，你回复1点体力，然后弃掉这些♥牌，将其余的牌收入手牌。',
 		batu_info:'回合结束阶段，你可以将手牌数补至X，X为现存的势力数',
@@ -741,7 +874,7 @@ character.diy={
 		geju_info:'准备阶段开始时，你可以摸X张牌（X为攻击范围内不含有你的势力数）。',
 		siji_info:'弃牌阶段结束后，你可以摸2X张牌（X为你于此阶段内弃置的【杀】的数量）。',
 		ciqiu_info:'锁定技，每当你使用【杀】对目标角色造成伤害时，若该角色未受伤，你令此伤害+1；锁定技，每当未受伤的角色因受到你使用【杀】造成的伤害而扣减体力后，若该角色的体力值为0，你令其死亡，然后你失去“刺酋”。 ',
-		shuaiyan_info:'每当其他角色于你的回合外回复体力后，你可以令该角色选择一项：1.令你摸一张牌；2.令你弃置其一张牌。 ',
+		shuaiyan_info:'每当其他角色于你的回合外回复体力后，你可以令该角色选择一项：1.令你摸一张牌；2.令你弃置其一张牌。',
 		moshou_info:'锁定技，你不能成为乐不思蜀和兵粮寸断的目标。',
 		xicai_info:'你可以立即获得对你造成伤害的牌',
 		diyjianxiong_info:'锁定技，在身份局中，在你回合内死亡的角色均视为反贼，国战中，在你回合内死亡的角色若与你势力相同则随机改为另一个势力',

@@ -16,7 +16,7 @@ character.hearth={
 		hs_magni:['male','shu',4,['zhongjia','dunji']],
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
-		hs_khadgar:['male','shu',3,['midian','jinzhou']],
+		hs_khadgar:['male','shu',3,['midian','fuwen','jinzhou']],
 		hs_tyrande:['female','wei',3,['yuelu','xingluo']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu']],
@@ -98,6 +98,21 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		fuwen:{
+			trigger:{player:'phaseDiscardEnd'},
+			frequent:true,
+			filter:function(event,player){
+				if(event.cards){
+					for(var i=0;i<event.cards.length;i++){
+						if(get.type(event.cards[i],'trick')=='trick') return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				player.changeHujia();
+			},
+		},
 		jinzhou:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -135,14 +150,14 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h',{type:'trick'})>0;
+				return player.num('h',{type:['trick','delay']})>0;
 			},
-			filterCard:{type:'trick'},
+			filterCard:{type:['trick','delay']},
 			check:function(card){
 				return 10-ai.get.value(card);
 			},
 			content:function(){
-				var list=get.inpile('trick');
+				var list=get.inpile('trick','trick');
 				var list2=[];
 				for(var i=0;i<3;i++){
 					list2.push(game.createCard(list.randomGet()));
@@ -1374,11 +1389,7 @@ character.hearth={
 				if(num<1){
 					num=1;
 				}
-				var list=['hslingjian_zhongxinghujia','hslingjian_xuanfengzhiren','hslingjian_yinmilichang',
-				'hslingjian_shengxiuhaojiao','hslingjian_xingtigaizao','hslingjian_shijianhuisu'];
-				// if(get.mode()=='stone'){
-				// 	list.remove('hslingjian_jinjilengdong');
-				// }
+				var list=get.typeCard('hslingjian');
 				var cards=[];
 				while(num--){
 					cards.push(game.createCard(list.randomGet()));
@@ -5541,10 +5552,12 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
+		fuwen:'符文',
+		fuwen_info:'若你弃牌阶段弃置了锦囊牌，你可以获得一点护甲',
 		jinzhou:'禁咒',
 		jinzhou_info:'回合结束阶段，若你手牌中有黑桃牌，你可以令一名其他角色的非锁定技失效直到其下一回合结束',
 		midian:'秘典',
-		midian_info:'出牌阶段限一次，你可以弃置一张非延时锦囊牌，然后获得三张随机的非延时锦囊牌',
+		midian_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后随机获得三张锦囊牌',
 		yuelu:'月露',
 		yuelu_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力并获得一点护甲',
 		xingluo:'星落',
@@ -5616,7 +5629,7 @@ character.hearth={
 		zengli:'赠礼',
 		zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
 		xiubu:'修补',
-		xiubu_info:'每当你装备一把未强化的武器，你可以获得数量等同于武器攻击范围的随机零件（冰冻零件除外）',
+		xiubu_info:'每当你装备一把未强化的武器，你可以获得数量等同于武器攻击范围的随机零件',
 		mobao:'魔爆',
 		mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害',
 		xianji:'献祭',

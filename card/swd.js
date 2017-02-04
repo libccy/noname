@@ -255,7 +255,11 @@ card.swd={
 			type:'basic',
 			enable:true,
 			fullskin:true,
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			modTarget:true,
 			content:function(){
 				'step 0'
 				event.num=3;
@@ -1269,8 +1273,11 @@ card.swd={
 				return !target.isTurnedOver()&&target!=player;
 			},
 			content:function(){
-				target.draw(2);
+				'step 0'
+				target.changeHujia(2);
 				target.turnOver();
+				'step 1'
+				target.addTempSkill('qianxing',{player:'turnOverAfter'});
 			},
 			ai:{
 				order:9,
@@ -4771,7 +4778,7 @@ card.swd={
 		yuruyi_ab:'如意',
 		yuruyi_info:'你有更高的机率摸到好牌',
 		fengyinzhidan:'封印之蛋',
-		fengyinzhidan_info:'出牌阶段对任意角色使用，目标随机使用三张非延时锦囊牌（随机指定目标）',
+		fengyinzhidan_info:'随机使用三张非延时锦囊牌（随机指定目标）',
 		shuchui:'鼠槌',
 		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，若杀造成了伤害，你摸一张牌',
 		zhiluxiaohu:'指路小狐',
@@ -4919,7 +4926,7 @@ card.swd={
 		hslingjian_zhongxinghujia:'重型护甲',
 		hslingjian_zhongxinghujia_info:'可用于煅造装备；令一名角色装备一件随机防具，然后随机弃置其一张手牌',
 		hslingjian_jinjilengdong:'紧急冷冻',
-		hslingjian_jinjilengdong_info:'可用于煅造装备；令一名武将牌正面朝上的其他角色摸两张牌并翻面',
+		hslingjian_jinjilengdong_info:'可用于煅造装备；令一名武将牌正面朝上的其他角色获得两点护甲并翻面，然后获得技能潜行直到武将牌翻回正面',
 		hslingjian_yinmilichang:'隐秘力场',
 		hslingjian_yinmilichang_info:'可用于煅造装备；令一名其他角色获得技能潜行，直到其下一回合开始',
 		hslingjian_xingtigaizao:'型体改造',

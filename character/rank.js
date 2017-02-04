@@ -61,6 +61,8 @@ window.characterRank={
         'gjqt_ouyangshaogong',
     ],
     a:[
+        'hs_khadgar',
+        'hs_tyrande',
         'pal_muchanglan',
         'hs_aya',
         'ow_heiying',

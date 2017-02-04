@@ -6037,6 +6037,10 @@
     		_lianhuan2:'连环',
             qianxing:'潜行',
             fengyin:'封印',
+
+			pause:'暂停',
+			config:'选项',
+			auto:'托管'
 		},
 		element:{
 			content:{
@@ -14489,12 +14493,13 @@
                     if(!parent) return {};
                     if(typeof level=='number'){
                         for(var i=1;i<level;i++){
+							if(!parent) return {};
                             parent=parent.parent;
-                            if(!parent) return {};
                         }
                     }
                     else if(typeof level=='string'){
                         for(var i=0;i<20;i++){
+							if(!parent) return {};
                             if(parent.name==level) return parent;
                             parent=parent.parent;
                         }
@@ -15383,7 +15388,7 @@
             zhuSkill:{},
             fengyin:{
                 init:function(player,skill){
-                    var skills=player.get('s');
+                    var skills=player.get('s',true,false);
                     for(var i=0;i<skills.length;i++){
                         if(get.is.locked(skills[i])){
                             skills.splice(i--,1);
@@ -15394,6 +15399,7 @@
                 onremove:function(player,skill){
                     player.enableSkill(skill);
                 },
+				locked:true,
                 mark:true,
                 intro:{
                     content:function(storage,player,skill){

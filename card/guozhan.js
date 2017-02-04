@@ -25,15 +25,9 @@ card.guozhan={
 			},
 			selectTarget:-1,
 			content:function(){
-				var evt=_status.event;
-				for(var i=0;i<10;i++){
-					if(evt&&evt.getParent){
-						evt=evt.getParent();
-					}
-					if(evt.name=='phaseUse'){
-						evt.skipped=true;
-						break;
-					}
+				var evt=_status.event.getParent('phaseUse');
+				if(evt&&evt.name=='phaseUse'){
+					evt.skipped=true;
 				}
 				target.addSkill('xietianzi');
 			},

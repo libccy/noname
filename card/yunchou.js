@@ -170,7 +170,7 @@ card.yunchou={
 						var hs=player.get('h');
 						for(var i=0;i<hs.length;i++){
 							var value=ai.get.value(hs[i]);
-							if(event.torespond.length){
+							if(!_status.event.hasTarget){
 								if(hs[i].number>=8&&value<=7) return true;
 								if(value<=3) return true;
 							}
@@ -180,7 +180,7 @@ card.yunchou={
 							}
 						}
 						return false;
-					}).set('source',target);
+					}).set('source',target).set('hasTarget',event.torespond.length>0);
 				}
 				else{
 					event.goto(3);
@@ -238,18 +238,21 @@ card.yunchou={
 			notarget:true,
 			content:function(){
 				'step 0'
-				event.source=event.getParent(3).source;
-				if(!event.source){
+				var info=event.getParent(2).youdiinfo||event.getParent(3).youdiinfo;
+				if(!info){
 					event.finish();
 					return;
 				}
-				var evt=event.getParent(3)._trigger;
-				evt.untrigger();
-				evt.finish();
+				info.evt.untrigger();
+				info.evt.finish();
+				event.source=info.source;
 				event.source.storage.youdishenru=player;
 				event.source.addSkill('youdishenru');
 				'step 1'
-				event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害');
+				var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害');
+				next.ai2=function(){
+					return 1;
+				};
 				'step 2'
 				if(result.bool){
 					if(event.source.storage.youdishenru){
@@ -270,7 +273,10 @@ card.yunchou={
 				order:1,
 				result:{
 					player:function(player){
-						if(ai.get.attitude(player,_status.event.parent.source)<=0) return 1;
+						if(_status.event.parent.youdiinfo&&
+							ai.get.attitude(player,_status.event.parent.youdiinfo.source)<=0){
+							return 1;
+						}
 						return 0;
 					}
 				}
@@ -964,7 +970,10 @@ card.yunchou={
 				return player.hasCard('youdishenru');
 			},
 			content:function(){
-				event.source=trigger.player;
+				event.youdiinfo={
+					source:trigger.player,
+					evt:trigger
+				};
 				player.chooseToUse({name:'youdishenru'},'是否使用诱敌深入？');
 			}
 		},
