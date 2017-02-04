@@ -7125,6 +7125,7 @@
                         player.animate('target');
                         event.card2=event.list2.shift();
     					game.log(event.current,'的拼点牌为',event.card2);
+						player.line(event.current);
                         player.$compare(event.card1,event.current,event.card2);
                         game.delay(4);
                     }
@@ -7253,7 +7254,7 @@
 					}
 					else{
 						event.result.bool=false;
-						if(get.number(event.card1)>get.number(event.card2)){
+						if(get.number(event.card1)==get.number(event.card2)){
 							event.result.tie=true;
 							setTimeout(function(){
                                 var str=get.translation(player.name)+'拼点失败';
@@ -7271,7 +7272,13 @@
 						}
 						else{
 							setTimeout(function(){
-								event.dialog=ui.create.dialog(get.translation(player.name)+'拼点失败');
+								var str=get.translation(player.name)+'拼点失败';
+                                game.broadcast(function(str,id){
+                                    var dialog=ui.create.dialog(str);
+                                    dialog.videoId=id;
+                                    dialog.classList.add('center');
+                                },str,event.dialogid);
+								event.dialog=ui.create.dialog(str);
 								event.dialog.classList.add('center');
 								player.popup('负');
 								target.popup('胜');

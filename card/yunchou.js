@@ -3,8 +3,36 @@ card.yunchou={
 		caochuanjiejian:{
 			fullskin:true,
 			type:'trick',
+			enable:true,
 			filterTarget:function(card,player,target){
 				return target.num('h')>0&&target!=player;
+			},
+			content:function(){
+				'step 0'
+				if(target.num('h','sha')){
+					target.chooseControl().set('prompt',get.translation('caochuanjiejian')).set('choiceList',[
+						'将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀','令你观看并弃置其一张手牌'
+					],function(){
+						if(ai.get.effect(player,{name:'sha'},target,target)<0) return 1;
+						if(target.num('h','sha')>=3) return 1;
+						return 0;
+					});
+				}
+				else{
+					event.directfalse=true;
+				}
+				'step 1'
+				if(event.directfalse||result.control=='选项二'){
+					player.discardPlayerCard(target,'h',true,'visible');
+					event.finish();
+				}
+				else{
+					var hs=target.get('h','sha');
+					player.gain(hs,target);
+					target.$give(hs,player);
+				}
+				'step 2'
+				target.useCard({name:'sha'},player);
 			},
 			ai:{
 				order:4,
@@ -19,18 +47,189 @@ card.yunchou={
 		xiaolicangdao:{
 			fullskin:true,
 			type:'trick',
+			enable:true,
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			content:function(){
+				'step 0'
+				if(cards&&cards.length){
+					target.gain(cards,player);
+					target.$gain2(cards);
+					if(cards.length==1){
+						event.card1=cards[0];
+					}
+				}
+				'step 1'
+				event.card2=target.get('h').randomGet();
+				if(event.card2){
+					target.discard(event.card2);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(event.card1&&event.card1.name==event.card2.name){
+					target.damage();
+				}
+			},
+			ai:{
+				order:6,
+				result:{
+					target:function(player,target){
+						return -2/Math.sqrt(1+target.num('h'));
+					},
+				},
+				tag:{
+					damage:1,
+					discard:1,
+					loseCard:1,
+				}
+			}
 		},
 		geanguanhuo:{
 			fullskin:true,
 			type:'trick',
+			enable:true,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('h')>0;
+			},
+			multitarget:true,
+			multiline:true,
+			content:function(){
+				'step 0'
+				targets[0].chooseToCompare(targets[1]);
+				'step 1'
+				if(!result.tie){
+					if(result.bool){
+						targets[0].discardPlayerCard(targets[1],true);
+						targets[0].line(targets[1]);
+					}
+					else{
+						targets[1].discardPlayerCard(targets[0],true);
+						targets[1].line(targets[0]);
+					}
+					event.finish();
+				}
+				'step 2'
+				targets[0].discardPlayerCard(player,true);
+				targets[0].line(player);
+				'step 3'
+				targets[1].discardPlayerCard(player,true);
+				targets[1].line(player);
+			},
+			selectTarget:2,
+			ai:{
+				order:5,
+				result:{
+					target:-1,
+				}
+			}
 		},
 		shezhanqunru:{
 			fullskin:true,
 			type:'trick',
+			enable:function(card,player){
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=player&&game.players[i].num('h')) return true;
+				}
+				return false;
+			},
+			filterTarget:function(card,player,target){
+				return target==player;
+			},
+			selectTarget:-1,
+			modTarget:true,
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]!=target&&game.players[i].num('h')){
+						list.push(game.players[i]);
+					}
+				}
+				if(!list.length){
+					event.finish();
+				}
+				else{
+					lib.tempSortSeat=target;
+					list.sort(lib.sort.seat);
+					delete lib.tempSortSeat;
+					event.list=list;
+					event.torespond=[];
+				}
+				'step 1'
+				if(event.list.length){
+					event.current=event.list.shift();
+					event.current.chooseBool('是否响应'+get.translation(player)+'的舌战群儒？',function(event,player){
+						if(ai.get.attitude(player,_status.event.source)>=0) return false;
+						var hs=player.get('h');
+						for(var i=0;i<hs.length;i++){
+							var value=ai.get.value(hs[i]);
+							if(event.torespond.length){
+								if(hs[i].number>=8&&value<=7) return true;
+								if(value<=3) return true;
+							}
+							else{
+								if(hs[i].number>=11&&value<=5) return true;
+								if(value<0) return true;
+							}
+						}
+						return false;
+					}).set('source',target);
+				}
+				else{
+					event.goto(3);
+				}
+				'step 2'
+				if(result.bool){
+					event.torespond.push(event.current);
+					event.current.line(target,'green');
+					event.current.popup('响应');
+					game.log(event.current,'响应了舌战群儒');
+					game.delayx(0.5);
+				}
+				event.goto(1);
+				'step 3'
+				if(event.torespond.length==0){
+					event.num=1;
+				}
+				else{
+					event.num=0;
+					player.chooseToCompare(event.torespond).callback=lib.card.shezhanqunru.callback;
+				}
+				'step 4'
+				if(event.num>0){
+					player.draw(3);
+				}
+			},
+			callback:function(){
+				if(event.card1.number>event.card2.number){
+					event.parent.parent.num++;
+				}
+				else{
+					event.parent.parent.num--;
+				}
+			},
+			ai:{
+				order:8.5,
+				result:{
+					target:function(player,target){
+						var hs=target.get('h');
+						for(var i=0;i<hs.length;i++){
+							var value=ai.get.value(hs[i]);
+							if(hs[i].number>=7&&value<=6) return 1;
+							if(value<=3) return 1;
+						}
+						return 0;
+					}
+				}
+			}
 		},
 		youdishenru:{
 			fullskin:true,
 			type:'trick',
+			enable:true,
 		},
 		wangmeizhike:{
 			fullskin:true,
@@ -845,5 +1044,8 @@ card.yunchou={
 		['club',3,'chenhuodajie'],
 
 		['club',13,'suolianjia'],
+
+		['club',3,'caochuanjiejian'],
+		['spade',7,'caochuanjiejian'],
 	],
 }

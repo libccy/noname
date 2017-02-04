@@ -8,7 +8,7 @@ window.noname_update={
         'game/game.js',
         'game/config.js',
         // 'game/package.js',
-        // 'game/asset.js',
+        'game/asset.js',
         // 'game/source.js',
         'card/hearth.js',
         'card/swd.js',
