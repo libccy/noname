@@ -5570,6 +5570,27 @@
             o:function(){
                 ui.arena.classList.remove('observe');
             },
+			q:function(){
+				if(lib.config.layout!='mobile') lib.init.layout('mobile');
+				if(arguments.length==0){
+					var style=ui.css.card_style;
+					if(lib.config.card_style!='simple'){
+						lib.config.card_style='simple';
+						ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card','simple');
+					}
+					else{
+						lib.config.card_style='default';
+						ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card','default');
+					}
+					style.remove();
+				}
+				else{
+					for(var i=0;i<arguments.length;i++){
+						cheat.g(arguments[i]);
+					}
+				}
+				ui.arena.classList.remove('selecting');
+			},
             p:function(name,i){
                 var list=['swd','hs','pal','gjqt','ow'];
                 if(!lib.character[name]){

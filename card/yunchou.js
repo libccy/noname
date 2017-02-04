@@ -1,5 +1,21 @@
 card.yunchou={
 	card:{
+		caochuanjiejian:{
+			fullskin:true,
+			type:'trick',
+		},
+		xiaolicangdao:{
+			fullskin:true,
+			type:'trick',
+		},
+		geanguanhuo:{
+			fullskin:true,
+			type:'trick',
+		},
+		shezhanqunru:{
+			fullskin:true,
+			type:'trick',
+		},
 		youdishenru:{
 			fullskin:true,
 			type:'trick',
@@ -744,13 +760,19 @@ card.yunchou={
 		},
 	},
 	translate:{
+		caochuanjiejian:'草船借箭',
+		caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或令你观看并弃置其一张手牌',
+		xiaolicangdao:'笑里藏刀',
+		xiaolicangdao_info:'出牌阶段，对一名其他角色使用。你将此【笑里藏刀】交给目标，然后弃置其一张手牌，若这两张牌牌名相同，你对其造成1点伤害',
+		shezhanqunru:'舌战群儒',
+		shezhanqunru_info:'出牌阶段，对你使用。你请求所有有手牌的其他角色响应，然后同时与响应的角色拼点。若有角色响应且结果中你赢的次数更多，或若没有角色响应，你摸三张牌',
 		youdishenru:'诱敌深入',
 		youdishenru_info:'当以你为目标的【杀】生效前，对此【杀】使用。抵消此【杀】，然后此【杀】的使用者需对你使用【杀】（在此【杀】结算结束之后，若此【杀】未对你造成伤害，其重复此流程），否则受到你造成的1点伤害',
 		suolianjia:'锁链甲',
 		suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
 		suolianjia_bg:'链',
 		geanguanhuo:'隔岸观火',
-		geanguanhuo_info:'指定任意两名角色进行拚点，拚点输的一方掉1点血；若点数一样则使用该锦囊的角色掉1点血。拚点的牌不用丢弃。',
+		geanguanhuo_info:'出牌阶段对两名其他角色使用，令目标拼点，赢的角色须弃置输的角色一张牌，若点数相同，目标各弃置你一张牌',
 		toulianghuanzhu:'偷梁换柱',
 		toulianghuanzhu_info:'令一名角色获得另一名角色的两张手牌，然后还回两张手牌',
 		toulianghuanzhu_bg:'柱',
