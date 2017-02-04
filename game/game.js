@@ -7092,6 +7092,9 @@
                             return;
                         }
                     }
+					if(!event.multitarget){
+						targets.sort(lib.sort.seat);
+					}
                     game.log(player,'对',targets,'发起拼点');
                     "step 1"
                     event.list=targets.slice(0);
@@ -7128,6 +7131,32 @@
 						player.line(event.current);
                         player.$compare(event.card1,event.current,event.card2);
                         game.delay(4);
+						setTimeout(function(){
+							var str;
+							if(event.card1.number>event.card2.number){
+								player.popup('胜');
+								event.current.popup('负');
+								str=get.translation(player.name)+'拼点成功';
+							}
+							else{
+								if(event.card1.number==event.card2.number){
+									player.popup('平');
+									event.current.popup('平');
+								}
+								else{
+									player.popup('负');
+									event.current.popup('胜');
+								}
+								str=get.translation(player.name)+'拼点失败';
+							}
+							game.broadcastAll(function(str){
+								var dialog=ui.create.dialog(str);
+								dialog.classList.add('center');
+								setTimeout(function(){
+									dialog.close();
+								},500);
+							},str);
+						},1500);
                     }
                     else{
                         event.finish();
@@ -12802,6 +12831,16 @@
     				if(this.hasSkillTag('respondShan',true)) return true;
     				return false;
     			},
+				hasCard:function(name){
+					if(this.num('h',name)) return true;
+					var mn=this.get('e','5');
+					if(mn&&mn.name.indexOf('muniu')==0&&mn.cards&&mn.cards.length){
+						for(var i=0;i<mn.cards.length;i++){
+							if(mn.cards[i].name==name) return true;
+						}
+					}
+					return false;
+				},
 				getJudge:function(name){
 					var judges=this.node.judges.childNodes;
 					for(var i=0;i<judges.length;i++){

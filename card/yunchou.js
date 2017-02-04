@@ -36,6 +36,7 @@ card.yunchou={
 			},
 			ai:{
 				order:4,
+				value:[5,1],
 				result:{
 					target:function(player,target){
 						if(player.hasShan()) return -1;
@@ -75,6 +76,7 @@ card.yunchou={
 			},
 			ai:{
 				order:6,
+				value:[4,1],
 				result:{
 					target:function(player,target){
 						return -2/Math.sqrt(1+target.num('h'));
@@ -121,6 +123,8 @@ card.yunchou={
 			selectTarget:2,
 			ai:{
 				order:5,
+				value:[7,1],
+				useful:[4,1],
 				result:{
 					target:-1,
 				}
@@ -161,7 +165,7 @@ card.yunchou={
 				'step 1'
 				if(event.list.length){
 					event.current=event.list.shift();
-					event.current.chooseBool('是否响应'+get.translation(player)+'的舌战群儒？',function(event,player){
+					event.current.chooseBool('是否响应'+get.translation(target)+'的舌战群儒？',function(event,player){
 						if(ai.get.attitude(player,_status.event.source)>=0) return false;
 						var hs=player.get('h');
 						for(var i=0;i<hs.length;i++){
@@ -196,11 +200,11 @@ card.yunchou={
 				}
 				else{
 					event.num=0;
-					player.chooseToCompare(event.torespond).callback=lib.card.shezhanqunru.callback;
+					target.chooseToCompare(event.torespond).callback=lib.card.shezhanqunru.callback;
 				}
 				'step 4'
 				if(event.num>0){
-					player.draw(3);
+					target.draw(3);
 				}
 			},
 			callback:function(){
@@ -213,6 +217,8 @@ card.yunchou={
 			},
 			ai:{
 				order:8.5,
+				value:[6,1],
+				useful:[3,1],
 				result:{
 					target:function(player,target){
 						var hs=target.get('h');
@@ -229,7 +235,46 @@ card.yunchou={
 		youdishenru:{
 			fullskin:true,
 			type:'trick',
-			enable:true,
+			notarget:true,
+			content:function(){
+				'step 0'
+				event.source=event.getParent(3).source;
+				if(!event.source){
+					event.finish();
+					return;
+				}
+				var evt=event.getParent(3)._trigger;
+				evt.untrigger();
+				evt.finish();
+				event.source.storage.youdishenru=player;
+				event.source.addSkill('youdishenru');
+				'step 1'
+				event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害');
+				'step 2'
+				if(result.bool){
+					if(event.source.storage.youdishenru){
+						event.goto(1);
+					}
+					else{
+						event.source.removeSkill('youdishenru');
+					}
+				}
+				else{
+					event.source.damage(player);
+					event.source.removeSkill('youdishenru');
+				}
+			},
+			ai:{
+				value:[5,1],
+				useful:[5,1],
+				order:1,
+				result:{
+					player:function(player){
+						if(ai.get.attitude(player,_status.event.parent.source)<=0) return 1;
+						return 0;
+					}
+				}
+			}
 		},
 		wangmeizhike:{
 			fullskin:true,
@@ -504,8 +549,8 @@ card.yunchou={
 				wuxie:function(){
 					return 0;
 				},
-				useful:3,
-				value:4
+				useful:[3,1],
+				value:[4,1]
 			}
 		},
 		hufu:{
@@ -897,6 +942,32 @@ card.yunchou={
 			}
 		},
 		toulianghuanzhu2:{},
+		youdishenru:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			popup:false,
+			silent:true,
+			onremove:function(player){
+				delete player.storage.youdishenru;
+			},
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&event.player==player.storage.youdishenru;
+			},
+			content:function(){
+				delete player.storage.youdishenru;
+			}
+		},
+		_youdishenru:{
+			trigger:{target:'shaBefore'},
+			direct:true,
+			filter:function(event,player){
+				return player.hasCard('youdishenru');
+			},
+			content:function(){
+				event.source=trigger.player;
+				player.chooseToUse({name:'youdishenru'},'是否使用诱敌深入？');
+			}
+		},
 		_chenhuodajie:{
 			trigger:{global:'damageEnd'},
 			direct:true,
@@ -904,14 +975,7 @@ card.yunchou={
 				if(event.player==player) return false;
 				if(!event.player.num('he')) return false;
 				if(!lib.filter.targetEnabled({name:'chenhuodajie'},player,event.player)) return false;
-				if(player.num('h','chenhuodajie')) return true;
-				var mn=player.get('e','5');
-				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){
-					for(var i=0;i<mn.cards.length;i++){
-						if(mn.cards[i].name=='chenhuodajie') return true;
-					}
-				}
-				return false;
+				return player.hasCard('chenhuodajie');
 			},
 			content:function(){
 				player.chooseToUse(get.prompt('chenhuodajie',trigger.player).replace(/发动/,'使用'),function(card,player){
@@ -1035,7 +1099,6 @@ card.yunchou={
 		['spade',9,'shuiyanqijun'],
 		['heart',9,'toulianghuanzhu'],
 		['club',10,'toulianghuanzhu'],
-		['spade',11,'toulianghuanzhu'],
 		['spade',13,'guohe'],
 		['heart',6,'wangmeizhike'],
 		['club',1,'wangmeizhike'],
@@ -1047,5 +1110,14 @@ card.yunchou={
 
 		['club',3,'caochuanjiejian'],
 		['spade',7,'caochuanjiejian'],
+		['spade',5,'xiaolicangdao'],
+		['diamond',11,'xiaolicangdao'],
+		['heart',1,'geanguanhuo'],
+		['spade',6,'geanguanhuo'],
+		['heart',4,'shezhanqunru'],
+		['club',8,'shezhanqunru'],
+		['heart',12,'youdishenru'],
+		['club',2,'youdishenru'],
+		['spade',9,'youdishenru'],
 	],
 }
