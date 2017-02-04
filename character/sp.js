@@ -714,10 +714,10 @@ character.sp={
 						}
 					}
 				}
-				target.chooseControl('选项一','选项二',function(){
+				target.chooseControl(function(){
 					if(_status.event.goon) return '选项二';
 					return '选项一';
-				}).set('goon',goon).set('prompt','定叛<br><br><div class="text">选项一：令'+get.translation(player)+'弃置你装备区里的一张牌</div><br><div class="text">选项二：获得你装备区内的所有牌并受到一点伤害</div>');
+				}).set('goon',goon).set('prompt','定叛').set('choiceList',['令'+get.translation(player)+'弃置你装备区里的一张牌','获得你装备区内的所有牌并受到一点伤害']);
 				'step 2'
 				if(result.control=='选项一'){
 					player.discardPlayerCard(target,true,'e');

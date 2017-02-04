@@ -132,6 +132,8 @@ play.boss={
 				boss_diaochan:'绝代妖姬',
 				boss_zhaoyun:'高达一号',
 				boss_zhuoguiquxie:'捉鬼驱邪',
+				boss_caocao:'魏武大帝',
+				boss_guojia:'世之奇士',
 
 				boss_liedixuande:'烈帝玄德',
 				boss_gongshenyueying:'工神月英',

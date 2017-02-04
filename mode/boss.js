@@ -913,8 +913,10 @@ mode.boss={
 						if(stop) return 'cancel2';
 						return rand;
 					}
-				}).set('prompt',get.prompt('boss_yuance')+
-				'<br><br><div class="text">选项一：若判定结果为黑色，'+playername+'失去一点体力，否则'+sourcename+'失去一点体力</div><br><div class="text">选项二：若判定结果为红色，'+playername+'回复一点体力，否则'+sourcename+'回复一点体力</div>');
+				}).set('prompt',get.prompt('boss_yuance')).set('choiceList',[
+					'若判定结果为黑色，'+playername+'失去一点体力，否则'+sourcename+'失去一点体力',
+					'若判定结果为红色，'+playername+'回复一点体力，否则'+sourcename+'回复一点体力'
+				]);
 				'step 1'
 				var att1=ai.get.attitude(player,trigger.player);
 				var att2=ai.get.attitude(player,trigger.source);

@@ -3,6 +3,18 @@ card.yunchou={
 		caochuanjiejian:{
 			fullskin:true,
 			type:'trick',
+			filterTarget:function(card,player,target){
+				return target.num('h')>0&&target!=player;
+			},
+			ai:{
+				order:4,
+				result:{
+					target:function(player,target){
+						if(player.hasShan()) return -1;
+						return 0;
+					}
+				}
+			}
 		},
 		xiaolicangdao:{
 			fullskin:true,

@@ -7645,8 +7645,15 @@
 				chooseControl:function(){
 					"step 0"
 					if(event.controls.length==0){
-						event.finish();
-						return;
+						if(event.choiceList){
+							for(var i=0;i<event.choiceList.length;i++){
+								event.controls.push('选项'+get.cnNumber(i+1,true));
+							}
+						}
+						else{
+							event.finish();
+							return;
+						}
 					}
 					if(event.isMine()){
                         if(event.dialogcontrol){
@@ -7658,7 +7665,7 @@
                             }
                             event.dialog.open();
                         }
-                        else{
+						else{
                             event.controlbar=ui.create.control(event.controls);
     						if(event.dialog){
                                 if(Array.isArray(event.dialog)){
@@ -7666,6 +7673,13 @@
                                 }
     							event.dialog.open();
     						}
+							else if(event.choiceList){
+								event.dialog=ui.create.dialog(event.prompt||'选择一项');
+								for(var i=0;i<event.choiceList.length;i++){
+									event.dialog.add('<div class="popup text" style="width:calc(100% - 10px);display:inline-block">选项'+
+									get.cnNumber(i+1,true)+'：'+event.choiceList[i]+'</div>');
+								}
+							}
     						else if(event.prompt){
     							event.dialog=ui.create.dialog(event.prompt);
     						}

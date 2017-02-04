@@ -119,7 +119,8 @@ character.ow={
         qinru:{
             trigger:{player:'useCardToBegin'},
             filter:function(event,player){
-                return event.target!=player&&event.targets&&event.targets.length==1;
+                return event.target!=player&&event.targets&&
+                event.targets.length==1&&!event.target.hasSkill('fengyin');
             },
             logTarget:'target',
             check:function(event,player){

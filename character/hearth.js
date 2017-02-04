@@ -16,7 +16,7 @@ character.hearth={
 		hs_magni:['male','shu',4,['zhongjia','dunji']],
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
-		hs_khadgar:['male','shu',3,['s_tuteng']],
+		hs_khadgar:['male','shu',3,['midian','jinzhou']],
 		hs_tyrande:['female','wei',3,['yuelu','xingluo']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu']],
@@ -98,6 +98,65 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		jinzhou:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h',{suit:'spade'})>0;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('jinzhou'),function(card,player,target){
+					return target!=player&&!target.hasSkill('fengyin');
+				}).ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(att>=0) return 0;
+					var skills=target.get('s');
+					for(var i=0;i<skills.length;i++){
+						if(!get.is.locked(skills[i])){
+							if(target.hasSkillTag('maixie')) return 2;
+							return ai.get.threaten(target);
+						}
+					}
+					return 0;
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('jinzhou',result.targets);
+					result.targets[0].addTempSkill('fengyin',{player:'phaseAfter'});
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.4
+			}
+		},
+		midian:{
+			enable:'phaseUse',
+			usable:1,
+			filter:function(event,player){
+				return player.num('h',{type:'trick'})>0;
+			},
+			filterCard:{type:'trick'},
+			check:function(card){
+				return 10-ai.get.value(card);
+			},
+			content:function(){
+				var list=get.inpile('trick');
+				var list2=[];
+				for(var i=0;i<3;i++){
+					list2.push(game.createCard(list.randomGet()));
+				}
+				player.gain(list2,'draw');
+			},
+			ai:{
+				order:9.8,
+				threaten:1.8,
+				result:{
+					player:1
+				}
+			}
+		},
 		xingluo:{
 			trigger:{player:'phaseBegin'},
 			direct:true,
@@ -5482,6 +5541,10 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
+		jinzhou:'禁咒',
+		jinzhou_info:'回合结束阶段，若你手牌中有黑桃牌，你可以令一名其他角色的非锁定技失效直到其下一回合结束',
+		midian:'秘典',
+		midian_info:'出牌阶段限一次，你可以弃置一张非延时锦囊牌，然后获得三张随机的非延时锦囊牌',
 		yuelu:'月露',
 		yuelu_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力并获得一点护甲',
 		xingluo:'星落',

@@ -1193,9 +1193,10 @@ character.yijiang={
 				player.gain(target.get('h').randomGet(),target);
 				target.$give(1,player);
 				'step 1'
-				player.chooseControl('选项一','选项二',function(){
+				var name=get.translation(target.name);
+				player.chooseControl(function(){
 					return Math.random()<0.5?'选项一':'选项二';
-				}).set('prompt','督粮<br><br><div class="text">选项一：令其观看牌堆顶的两张牌，然后获得其中的基本牌</div><br><div class="text">选项二：令其于下个摸牌阶段额外摸一张牌</div>');
+				}).set('prompt','督粮').set('choiceList',['令'+name+'观看牌堆顶的两张牌，然后获得其中的基本牌','令'+name+'于下个摸牌阶段额外摸一张牌']);
 				'step 2'
 				if(result.control=='选项一'){
 					var cards=get.cards(2);

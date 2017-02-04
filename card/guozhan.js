@@ -213,21 +213,22 @@ card.guozhan={
 				return target.isUnseen();
 			},
 			selectTarget:-1,
-			content:function(){
-				'step 0'
-				if(target.num('he',{type:'equip'})){
-					target.chooseControl('选项一','选项二','选项三',function(){
-						return Math.random()<0.5?'选项一':'选项二';
-					}).set('prompt','敕令<br><br><div class="text">选项一：明置一张武将牌，然后摸一张牌</div><br><div class="text">选项二：失去1点体力</div><br><div class="text">选项三：弃置一张装备牌</div>');
+			chooseai:function(event,player){
+				if(_status.event.controls.contains('选项三')){
+					return Math.random()<0.5?'选项一':'选项三';
 				}
 				else{
-					target.chooseControl('选项一','选项二',function(){
-						if(_status.event.player.hp>=3&&Math.random()<=0.3){
-							return '选项二';
-						}
-						return '选项一';
-					}).set('prompt','敕令<br><br><div class="text">选项一：明置一张武将牌，然后摸一张牌</div><br><div class="text">选项二：失去1点体力</div>');
+					if(player.hasSkillTag('maixie')||player.hp<=2) return '选项一';
+					return Math.random()<0.5?'选项一':'选项二';
 				}
+			},
+			content:function(){
+				'step 0'
+				var choiceList=['明置一张武将牌，然后摸一张牌','失去1点体力'];
+				if(target.num('he',{type:'equip'})){
+					choiceList.push('弃置一张装备牌');
+				}
+				target.chooseControl(lib.card.chiling.chooseai).set('prompt','敕令').set('choiceList',choiceList);
 				'step 1'
 				if(result.control=='选项一'){
 					target.showCharacter(2);
@@ -688,19 +689,12 @@ card.guozhan={
 				if(event.targets.length){
 					var target=event.targets.shift();
 					event.current=target;
+
+					var choiceList=['明置一张武将牌，然后摸一张牌','失去1点体力'];
 					if(target.num('he',{type:'equip'})){
-						target.chooseControl('选项一','选项二','选项三',function(){
-							return Math.random()<0.5?'选项一':'选项三';
-						}).set('prompt','敕令<br><br><div class="text">选项一：明置一张武将牌，然后摸一张牌</div><br><div class="text">选项二：失去1点体力</div><br><div class="text">选项三：弃置一张装备牌</div>');
+						choiceList.push('弃置一张装备牌');
 					}
-					else{
-						target.chooseControl('选项一','选项二',function(){
-							if(_status.event.player.hp>=3&&Math.random()<=0.3){
-								return '选项二';
-							}
-							return '选项一';
-						}).set('prompt','敕令<br><br><div class="text">选项一：明置一张武将牌，然后摸一张牌</div><br><div class="text">选项二：失去1点体力</div>');
-					}
+					target.chooseControl(lib.card.chiling.chooseai).set('prompt','敕令').set('choiceList',choiceList);
 				}
 				else{
 					event.finish();
