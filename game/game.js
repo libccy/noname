@@ -33249,7 +33249,7 @@
 				default:{
 					if(typeof type=='string'){
                         type=type.replace(/#/g,content);
-                        type.replace(/&/g,get.cnNumber(content));
+                        type=type.replace(/\$/g,get.cnNumber(content));
 						return type;
 					}
 					else if(typeof type=='function'){

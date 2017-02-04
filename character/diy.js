@@ -20,15 +20,115 @@ character.diy={
 
 		diy_liufu:['male','wei',3,['zhucheng','duoqi']],
 		diy_xizhenxihong:['male','shu',3,[]],
-		diy_liuzan:['male','shu',3,[]],
+		diy_liuzan:['male','wu',4,['kangyin']],
 		diy_zaozhirenjun:['male','shu',3,[]],
 		diy_yangyi:['male','shu',3,[]],
-		diy_tianyu:['male','shu',3,[]],
+		diy_tianyu:['male','wei',4,['chezhen','youzhan']],
 	},
 	perfectPair:{
 		yuji:['zuoci']
 	},
 	skill:{
+		chezhen:{
+			mod:{
+				globalFrom:function(from,to,distance){
+					if(from.num('e')) return distance-1;
+				},
+				globalTo:function(from,to,distance){
+					if(!to.num('e')) return distance+1;
+				}
+			}
+		},
+		youzhan:{
+			trigger:{global:'shaBefore'},
+			direct:true,
+			filter:function(event,player){
+				return get.distance(player,event.target)<=1&&player.num('he',{type:'equip'});
+			},
+			content:function(){
+				'step 0'
+				var bool=(ai.get.attitude(player,trigger.player)<0&&ai.get.attitude(player,trigger.target)>0);
+				var next=player.chooseToDiscard('he',{type:'equip'},get.prompt('youzhan',trigger.target));
+				next.ai=function(card){
+					if(bool){
+						return 7-ai.get.value(card);
+					}
+					return 0;
+				};
+				next.logSkill=['youzhan',trigger.target];
+				'step 1'
+				if(result.bool){
+					event.youdiinfo={
+						source:trigger.player,
+						evt:trigger
+					}
+					trigger.target.useCard({name:'youdishenru'});
+				}
+			}
+		},
+		kangyin:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('he')>0;
+			},
+			content:function(){
+				'step 0'
+				player.loseHp();
+				'step 1'
+				player.discardPlayerCard(target,true);
+				'step 2'
+				if(player.isDamaged()&&result.links&&result.links.length){
+					if(get.type(result.links[0])=='basic'){
+						player.chooseTarget([1,player.maxHp-player.hp],
+						'选择至多'+get.cnNumber(player.maxHp-player.hp)+'名角色各摸一张牌').ai=function(target){
+							return ai.get.attitude(player,target);
+						}
+					}
+					else{
+						player.storage.kangyin2=player.maxHp-player.hp;
+						player.addTempSkill('kangyin2','phaseAfter');
+						event.finish();
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 3'
+				if(result.targets&&result.targets.length){
+					result.targets.sort(lib.sort.seat);
+					player.line(result.targets,'green');
+					game.asyncDraw(result.targets);
+				}
+			},
+			ai:{
+				order:7,
+				result:{
+					target:function(player,target){
+						if(player.hp>=4) return -1;
+						if(player.hp==3&&!player.needsToDiscard()) return -1;
+						return 0;
+					}
+				}
+			}
+		},
+		kangyin2:{
+			mark:true,
+			intro:{
+				content:'到其他角色的距离-#；使用【杀】的额外目标数上限+#'
+			},
+			onremove:function(player){
+				delete player.storage.kangyin2;
+			},
+			mod:{
+				globalFrom:function(from,to,distance){
+					return distance-from.storage.kangyin2;
+				},
+				selectTarget:function(card,player,range){
+					if(card.name=='sha'&&range[1]!=-1) range[1]+=player.storage.kangyin2;
+				},
+			}
+		},
 		duoqi:{
 			trigger:{global:'discardAfter'},
 			filter:function(event,player){
@@ -821,6 +921,13 @@ character.diy={
 		diy_caiwenji:'蔡昭姬',
 		diy_zhenji:'甄宓',
 
+		chezhen:'车阵',
+		chezhen_info:'锁定技。若你的装备区里：没有牌，其他角色到你的距离+1；有牌，你到其他角色的距离-1',
+		youzhan:'诱战',
+		youzhan_info:'当以你距离不大于1的角色为目标的【杀】的使用结算开始时，你可以弃置一张装备牌，令该角色视为使用【诱敌深入】',
+		kangyin:'亢音',
+		kangyin2:'亢音',
+		kangyin_info:'出牌阶段限一次，你可以失去1点体力并选择一名其他角色，弃置该角色的一张牌。若此牌：为基本牌，你可以令一至X名角色各摸一张牌；不为基本牌，于此回合内：你到其他角色的距离-X，且你使用杀的额外目标数上限+X。（X为你已损失的体力值）',
 		zhucheng:'筑城',
 		zhucheng2:'筑城',
 		zhucheng_info:'①结束阶段开始时，若没有“筑”，你可以将牌堆顶的X张牌置于你的武将牌上〔称为“筑”〕（X为你已损失的体力值与1中的较大值），否则你可以获取所有“筑”。②当你成为杀的目标时，若有“筑”，你可以令此杀的使用者弃置X张牌（X为“筑”的数量），否则杀对你无效',

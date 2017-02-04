@@ -236,6 +236,7 @@ card.yunchou={
 			fullskin:true,
 			type:'trick',
 			notarget:true,
+			wuxieable:true,
 			content:function(){
 				'step 0'
 				var info=event.getParent(2).youdiinfo||event.getParent(3).youdiinfo;
@@ -271,6 +272,9 @@ card.yunchou={
 				value:[5,1],
 				useful:[5,1],
 				order:1,
+				wuxie:function(target,card,player,current,state){
+					return -state*ai.get.attitude(player,current);
+				},
 				result:{
 					player:function(player){
 						if(_status.event.parent.youdiinfo&&
