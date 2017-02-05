@@ -8328,7 +8328,7 @@ character.swd={
 						event.targets.push(game.players[i]);
 					}
 				}
-				get.sort(event.targets,'seat',event.target);
+				get.sortSeat(event.targets,event.target);
 				event.targets.unshift(player);
 				"step 1"
 				if(event.targets.length){

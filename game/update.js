@@ -5,13 +5,13 @@ window.noname_update={
         '新武将、卡牌',
     ],
     files:[
-        'game/game.js',
-        'game/config.js',
+        // 'game/game.js',
+        // 'game/config.js',
         // 'game/package.js',
-        'game/asset.js',
+        // 'game/asset.js',
         // 'game/source.js',
-        'card/*',
-        'character/*',
+        // 'card/*',
+        // 'character/*',
         // 'card/hearth.js',
         // 'card/swd.js',
         // 'card/gujian.js',
@@ -44,6 +44,6 @@ window.noname_update={
         // 'layout/mobile/layout.css',
         // 'layout/newlayout/global.css',
         // 'layout/mode/stone.css',
-        'extension/boss/extension.js',
+        // 'extension/boss/extension.js',
     ]
 }

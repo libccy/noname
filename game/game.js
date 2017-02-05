@@ -31853,6 +31853,12 @@
 				}
 			}
 		},
+		sortSeat:function(arr,target){
+			lib.tempSortSeat=target;
+			arr.sort(lib.sort.seat);
+			delete lib.tempSortSeat;
+			return arr;
+		},
         prompt:function(skill,target,player){
             player=player||_status.event.player;
             if(target){

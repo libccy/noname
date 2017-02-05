@@ -165,7 +165,7 @@ card.yunchou={
 					event.finish();
 				}
 				else{
-					get.sort(list,'seat',target);
+					get.sortSeat(list,target);
 					event.list=list;
 					event.torespond=[];
 				}

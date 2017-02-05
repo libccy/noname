@@ -4277,7 +4277,7 @@ character.yijiang={
 						event.players.push(game.players[i]);
 					}
 				}
-				get.sort(event.players,'seat',target);
+				get.sortSeat(event.players,target);
 				"step 1"
 				if(event.players.length){
 					event.current=event.players.shift();

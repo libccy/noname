@@ -40,9 +40,104 @@ character.diy={
 			},
 			content:function(){
 				'step 0'
-				event.cards=get.cards(Math.floor(game.players.length)/2);
 				event.list=game.players.slice(0);
-				get.sort(list,'seat',target);
+				get.sortSeat(event.list,target);
+				var cards=get.cards(Math.floor(game.players.length)/2);
+				var dialog=ui.create.dialog('筹度',cards,true);
+				_status.dieClose.push(dialog);
+				dialog.videoId=lib.status.videoId++;
+				game.addVideo('cardDialog',null,['筹度',get.cardsInfo(cards),dialog.videoId]);
+				event.dialog=dialog;
+				game.delay();
+				game.log(player,'亮出了',cards);
+				'step 1'
+				if(event.list.length){
+					event.current=event.list.shift();
+					if(event.current.isAlive()&&event.current.num('h')){
+						if(event.current.isUnderControl(true)){
+							event.dialog.setCaption('选择一张亮出的牌并用一张手牌替换之');
+						}
+						var maxValue=0;
+						for(var i=0;i<event.dialog.buttons.length;i++){
+							maxValue=Math.max(maxValue,ai.get.value(event.dialog.buttons[i].link));
+						}
+						var next=event.current.chooseButton(event.dialog);
+						next.ai=function(button){
+							return maxValue-ai.get.value(button.link);
+						};
+						next.set('closeDialog',false);
+						next.set('dialogdisplay',true);
+					}
+					else{
+						event.redo();
+					}
+				}
+				else{
+					event.goto(5);
+				}
+				'step 2'
+				event.dialog.setCaption('筹度');
+				if(result.bool){
+					event.currentButton=result.buttons[0];
+					event.current.chooseCard('用一张牌牌替换'+get.translation(result.links),true).ai=function(card){
+						return -ai.get.value(card);
+					}
+				}
+				else{
+					event.goto(1);
+				}
+				'step 3'
+				if(result.bool){
+					event.current.lose(result.cards,ui.special);
+					event.current.$throw(result.cards);
+
+					game.log(event.current,'用',result.cards,'替换了',event.currentButton.link);
+					event.current.gain(event.currentButton.link,'gain2');
+					event.dialog.buttons.remove(event.currentButton);
+					event.dialog.buttons.push(ui.create.button(result.cards[0],'card',event.currentButton.parentNode));
+					event.currentButton.remove();
+				}
+				'step 4'
+				game.delay();
+				event.goto(1);
+				'step 5'
+				var att=ai.get.attitude(player,player.nextSeat);
+				event.dialog.setCaption('将任意张牌以任意顺序置于牌堆顶（先选择的在上）');
+				player.chooseButton([1,event.dialog.buttons.length],event.dialog).ai=function(button){
+					if(player!=target&&ui.selected.buttons.length==0){
+						return ai.get.value(button.link,player.nextSeat)-5;
+					}
+					else{
+						if(att>0){
+							return ai.get.value(button.link,player.nextSeat)-5;
+						}
+						else{
+							return 5-ai.get.value(button.link,player.nextSeat);
+						}
+					}
+				}
+				'step 6'
+				if(result&&result.bool&&result.links&&result.links.length){
+					for(var i=0;i<result.buttons.length;i++){
+						event.dialog.buttons.remove(result.buttons[i]);
+					}
+					var cards=result.links.slice(0);
+					while(cards.length){
+						ui.cardPile.insertBefore(cards.pop(),ui.cardPile.firstChild);
+					}
+					game.log(player,'将'+get.cnNumber(result.links.length)+'张牌置于牌堆顶');
+				}
+				for(var i=0;i<event.dialog.buttons.length;i++){
+					ui.discardPile.appendChild(event.dialog.buttons[i].link);
+				}
+				'step 7'
+				var dialog=event.dialog;
+				dialog.close();
+				_status.dieClose.remove(dialog);
+				game.addVideo('cardDialog',null,dialog.videoId);
+				if(player!=target){
+					player.draw();
+				}
 			},
 			ai:{
 				order:2,
