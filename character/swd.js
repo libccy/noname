@@ -2596,7 +2596,9 @@ character.swd={
 				player.storage.pozhou=0;
 			},
 			content:function(){
-				player.storage.pozhou+=trigger.num;
+				if(typeof trigger.num=='number'){
+					player.storage.pozhou+=trigger.num;
+				}
 				if(player.storage.pozhou){
 					player.markSkill('pozhou');
 				}

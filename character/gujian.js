@@ -273,7 +273,19 @@ character.gujian={
 				return ai.get.attitude(player,event.player)<0;
 			},
 			content:function(){
-				trigger.target.loseHp();
+				'step 0'
+				if(get.info(trigger.card).multitarget){
+					event.list=trigger.targets.slice(0);
+				}
+				else{
+					trigger.target.loseHp();
+					event.finish();
+				}
+				'step 1'
+				if(event.list.length){
+					event.list.shift().loseHp();
+					event.redo();
+				}
 			},
 			ai:{
 				effect:{

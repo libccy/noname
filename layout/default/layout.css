@@ -873,9 +873,14 @@ div:not(.handcards)>.card>.info>span,
 	transform:scale(0.8);
 	transform-origin:top left;
 }
-.buttons.smallzoom .card.button>.name{
+/*.buttons.smallzoom .card.button>.name,
+.buttons.smallzoom .card.button>.info{
 	transform: scale(0.8) !important;
 }
+.buttons.smallzoom .card.button>.range{
+	transform: scale(0.8);
+	transform-origin: bottom right;
+}*/
 .buttons .card.button>.info{
 	transform:scale(0.8);
 	transform-origin:top right;

@@ -11922,7 +11922,9 @@
 						game.addVideo('markSkill',this,[name]);
 					}
                     game.broadcastAll(function(storage,player,name,info,card){
-                        player.storage[name]=storage;
+						if(storage!=undefined){
+							player.storage[name]=storage;
+						}
                         if(!info){
     						if(player.marks[name]){
     							player.updateMarks();
