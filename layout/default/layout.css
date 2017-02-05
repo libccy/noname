@@ -2222,7 +2222,7 @@ div:hover>.wunature{
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
-	min-height:240px;
+	min-height:200px;
 }
 #window[data-radius_size='reduce'] .dialog.scroll1,
 #window[data-radius_size='reduce'] .dialog.scroll2,

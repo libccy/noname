@@ -1331,7 +1331,7 @@ character.refresh={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseTarget('选择令'+get.translation(trigger.card)+'无效的目标',
+				player.chooseTarget(get.prompt('fenwei'),
 					[1,trigger.targets.length],function(card,player,target){
 					return _status.event.getTrigger().targets.contains(target);
 				}).set('ai',function(target){

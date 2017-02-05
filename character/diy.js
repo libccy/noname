@@ -21,14 +21,109 @@ character.diy={
 		diy_liufu:['male','wei',3,['zhucheng','duoqi']],
 		diy_xizhenxihong:['male','shu',3,['fuchou','jinyan']],
 		diy_liuzan:['male','wu',4,['kangyin']],
-		diy_zaozhirenjun:['male','shu',3,[]],
+		diy_zaozhirenjun:['male','shu',3,['liangce','jianbi','juntun']],
 		diy_yangyi:['male','shu',3,['choudu','liduan']],
-		diy_tianyu:['male','wei',4,['chezhen','youzhan']],
+		diy_tianyu:['male','wei',3,['chezhen','youzhan']],
 	},
 	perfectPair:{
 		yuji:['zuoci']
 	},
 	skill:{
+		liangce:{
+			enable:'phaseUse',
+			viewAs:{name:'wugu'},
+			filterCard:{type:'basic'},
+			filter:function(event,player){
+				return player.num('h',{type:'basic'})>0;
+			},
+			check:function(card){
+				return 6-ai.get.value(card);
+			}
+		},
+		jianbi:{
+			trigger:{global:'useCard'},
+			priority:5,
+			filter:function(event,player){
+				if(get.type(event.card)!='trick') return false;
+				if(get.info(event.card).multitarget) return false;
+				if(event.targets.length<2) return false;
+				if(!event.targets.contains(player)) return false;
+				return true;
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('jianbi'),
+					[1,1+player.maxHp-player.hp],function(card,player,target){
+					return _status.event.getTrigger().targets.contains(target);
+				}).set('ai',function(target){
+					var trigger=_status.event.getTrigger();
+					return -ai.get.effect(target,trigger.card,trigger.player,_status.event.player);
+				});
+				"step 1"
+				if(result.bool){
+					event.targets=result.targets;
+					if(event.isMine()){
+						player.logSkill('jianbi',event.targets);
+						event.finish();
+					}
+					for(var i=0;i<result.targets.length;i++){
+						trigger.targets.remove(result.targets[i]);
+					}
+					game.delay();
+				}
+				"step 2"
+				player.logSkill('jianbi',event.targets);
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(get.tag(card,'multitarget')&&!get.info(card).multitarget){
+							return [1,1];
+						}
+					}
+				}
+			}
+		},
+		juntun:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('he',{type:'equip'})>0;
+			},
+			filterCard:{type:'equip'},
+			check:function(card){
+				var player=_status.event.player;
+				var he=player.get('he');
+				var subtype=get.subtype(card);
+				var value=ai.get.equipValue(card);
+				for(var i=0;i<he.length;i++){
+					if(he[i]!=card&&get.subtype(he[i])==subtype&&ai.get.equipValue(he[i])>=value){
+						return 10;
+					}
+				}
+				if(!player.needsToDiscard()){
+					return 4-ai.get.equipValue(card);
+				}
+				return 0;
+			},
+			content:function(){
+				player.draw();
+			},
+			discard:false,
+			prompt:'将一张装备牌置于弃牌堆并摸一张牌',
+			delay:0.5,
+			prepare:function(cards,player){
+				player.$throw(cards,1000);
+			},
+			ai:{
+				basic:{
+					order:8.5
+				},
+				result:{
+					player:1,
+				},
+			}
+		},
 		choudu:{
 			enable:'phaseUse',
 			usable:1,
@@ -1123,6 +1218,12 @@ character.diy={
 		diy_caiwenji:'蔡昭姬',
 		diy_zhenji:'甄宓',
 
+		liangce:'粮策',
+		liangce_info:'①出牌阶段限一次，你可以将一张基本牌当【五谷丰登】使用。②当因执行【五谷丰登】的效果而亮出的牌因效果执行完毕而置入弃牌堆后，你可以选择一名角色，令该角色获取之',
+		jianbi:'坚壁',
+		jianbi_info:'当你成为锦囊牌的目标时，若此牌的目标包括其他角色，你可以令此牌对一至X+1个目标无效（X为你已损失的体力值）',
+		juntun:'军屯',
+		juntun_info:'出牌阶段，你可以重铸装备牌',
 		choudu:'筹度',
 		choudu_info:'出牌阶段限一次，你可以弃置一张牌，并指定一名角色视为其使用一张调兵遣将',
 		liduan:'立断',

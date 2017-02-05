@@ -53,6 +53,7 @@ card.yunchou={
 					}
 				}
 				else{
+					target.popup('不换');
 					event.finish();
 				}
 				"step 2"

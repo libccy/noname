@@ -497,7 +497,7 @@
 .dialog.withbg{
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
-	min-height:240px;
+	min-height:200px;
 }
 .dialog>.bar{
 	display:none !important;

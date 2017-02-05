@@ -96,6 +96,9 @@
     height:calc(100% - 280px);
     bottom:80px;
 }
+#arena.choose-character>.dialog.scroll3{
+    height:calc(100% - 240px);
+}
 #arena.phone.choose-character>.dialog{
     bottom:93px;
 }

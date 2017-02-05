@@ -73,6 +73,10 @@
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
 	border-radius:8px;
 }
+#arena.chess>.dialog{
+    height: calc(50% - 20px);
+    max-height: 240px;
+}
 #window[data-radius_size='reduce']>.dialog{
 	border-radius:4px;
 }

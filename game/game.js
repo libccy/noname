@@ -27355,7 +27355,8 @@
 				var dialog=ui.create.dialog('hidden');
                 dialog.classList.add('noupdate');
                 dialog.classList.add('scroll1');
-                dialog.classList.add('scroll2');
+				dialog.classList.add('scroll2');
+                dialog.classList.add('scroll3');
                 list.sort(lib.sort.character);
                 dialog.classList.add('character');
                 var getPack=function(name){
@@ -27848,7 +27849,8 @@
 				dialog=ui.create.dialog('hidden');
                 dialog.classList.add('noupdate');
                 dialog.classList.add('scroll1');
-                dialog.classList.add('scroll2');
+				dialog.classList.add('scroll2');
+                dialog.classList.add('scroll3');
                 dialog.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
                     _status.clicked2=true;
                 });
@@ -31771,34 +31773,29 @@
 						ui.dialog.classList.remove('nobutton');
 					}
 				}
-				if(false&&game.layout=='mobile'){
-					ui.dialog.style.height='';
-					if(ui.dialog.contentContainer.offsetHeight>=ui.dialog.content.offsetHeight){
-						ui.dialog.style.height=ui.dialog.content.offsetHeight+'px';
-					}
-					else{
-						ui.dialog.style.height='';
-					}
-					if(ui.dialog.content.offsetHeight<240){
-						ui.dialog.classList.add('slim');
-						ui.dialog.classList.remove('scroll1');
-						ui.dialog.classList.remove('scroll2');
-					}
-					else{
-						ui.dialog.classList.remove('slim');
-						ui.dialog.classList.add('scroll1');
-						ui.dialog.classList.add('scroll2');
+				var height1=ui.dialog.content.offsetHeight;
+				var height2=ui.dialog.contentContainer.offsetHeight;
+				if(game.chess){
+					if(height1<240){
+						ui.dialog.style.height=height1+'px';
 					}
 				}
 				else{
-					if(ui.dialog.content.offsetHeight<=240||
-						ui.dialog.contentContainer.offsetHeight>=ui.dialog.content.offsetHeight){
+					if(height1<=190||(height2>=height1&&height2>=210)){
 						ui.dialog.classList.remove('scroll1');
 						ui.dialog.classList.remove('scroll2');
 					}
 					else{
 						ui.dialog.classList.add('scroll1');
 						ui.dialog.classList.add('scroll2');
+					}
+					if(lib.config.layout=='long2'){
+						if(height1+240>=ui.arena.offsetHeight){
+							ui.dialog.classList.add('scroll3');
+						}
+						else{
+							ui.dialog.classList.remove('scroll3');
+						}
 					}
 				}
 			}
