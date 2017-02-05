@@ -244,8 +244,7 @@ character.refresh={
 			content:function(){
 				"step 0"
 				var cards=get.cards();
-				player.gain(cards,'gain2');
-				game.log(player,'获得了',cards);
+				player.gain(cards,'gain2','log');
 				if(get.type(cards[0])!='basic'){
 					event.finish();
 				}
@@ -805,9 +804,8 @@ character.refresh={
 				}
 				else if(result.targets){
 					player.line(result.targets,'green');
-					result.targets[0].gain(event.card);
+					result.targets[0].gain(event.card,'log');
 					event.node.moveDelete(result.targets[0]);
-					game.log(result.targets[0],'获得了',event.card);
 					game.addVideo('gain2',result.targets[0],[get.cardInfo(event.node)]);
 					game.broadcast(function(card,target){
 						ui.arena.classList.remove('thrownhighlight');

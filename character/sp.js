@@ -628,15 +628,13 @@ character.sp={
 				var undone=false;
 				if(num==0){
 					if(event.basic.length){
-						result.targets[0].gain(event.basic,'gain2');
-						game.log(result.targets[0],'获得了',event.basic);
+						result.targets[0].gain(event.basic,'gain2','log');
 					}
 				}
 				else{
 					if(result.bool){
 						if(event.basic.length){
-							player.gain(event.basic,'gain2');
-							game.log(player,'获得了',event.basic);
+							player.gain(event.basic,'gain2','log');
 						}
 					}
 					else{
@@ -652,8 +650,7 @@ character.sp={
 				}
 				'step 3'
 				if(player.storage.zhaolie.isAlive()){
-					game.log(player.storage.zhaolie,'获得了',event.basic);
-					player.storage.zhaolie.gain(event.basic,'gain2');
+					player.storage.zhaolie.gain(event.basic,'gain2','log');
 				}
 				else{
 					for(var i=0;i<event.basic.length;i++){
@@ -2463,10 +2460,9 @@ character.sp={
 			forced:true,
 			content:function(){
 				var cards=player.storage.yanxiao2.concat(player.get('j'));
-				player.gain(cards,'gain2');
+				player.gain(cards,'gain2','log');
 				delete player.storage.yanxiao2;
 				player.removeSkill('yanxiao2');
-				game.log(player,'获得了',cards);
 			},
 			ai:{
 				effect:{
@@ -2955,9 +2951,8 @@ character.sp={
 					}
 					else{
 						var target=result.targets[0];
-						game.log(target,'获得了',player.storage.yinbing);
 						target.recover();
-						target.gain(player.storage.yinbing.slice(0),'gain2');
+						target.gain(player.storage.yinbing.slice(0),'gain2','log');
 						target.draw(player.storage.yinbing.length);
 						player.storage.yinbing.length=0;
 					}
@@ -3931,8 +3926,7 @@ character.sp={
 				'step 1'
 				if(result.bool){
 					player.logSkill('bushi');
-					game.log(player,'获得了',result.links);
-					trigger.player.gain(result.links[0],'draw2');
+					trigger.player.gain(result.links[0],'draw2','log');
 					player.storage.yishe.remove(result.links[0]);
 					player.syncStorage('yishe');
 					if(player.storage.yishe.length==0){
@@ -4496,8 +4490,7 @@ character.sp={
 				}
 				"step 2"
 				if(result.bool){
-					game.log(player,'获得了',event.cards);
-					player.gain(event.cards,'gain2');
+					player.gain(event.cards,'gain2','log');
 				}
 			},
 			ai:{

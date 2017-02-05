@@ -1029,6 +1029,7 @@ character.shenhua={
 					}
 				}
 			},
+			locked:false,
 			ai:{
 				effect:{
 					target:function(card,player,target,current){

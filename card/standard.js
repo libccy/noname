@@ -533,8 +533,16 @@ card.standard={
 			contentAfter:function(){
 				for(var i=0;i<ui.dialogs.length;i++){
 					if(ui.dialogs[i].videoId==event.preResult){
-						ui.dialogs[i].close();
-						_status.dieClose.remove(ui.dialogs[i]);
+						var dialog=ui.dialogs[i];
+						dialog.close();
+						_status.dieClose.remove(dialog);
+						if(dialog.buttons.length){
+							event.remained=[];
+							for(var i=0;i<dialog.buttons.length;i++){
+								event.remained.push(dialog.buttons[i].link);
+							}
+							event.trigger('wuguRemained');
+						}
 						break;
 					}
 				}

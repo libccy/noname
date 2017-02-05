@@ -8896,6 +8896,9 @@
 						if(player==game.me) ui.updatehl();
                         broadcast();
 					}
+					if(event.log){
+						game.log(player,'获得了',cards);
+					}
 				},
 				lose:function(){
 					"step 0"
@@ -11357,6 +11360,9 @@
 						}
 						else if(get.itemtype(arguments[i])=='card'){
 							next.cards=[arguments[i]];
+						}
+						else if(arguments[i]==='log'){
+							next.log=true;
 						}
 						else if(typeof arguments[i]=='string'){
 							next.animate=arguments[i];

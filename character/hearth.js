@@ -1894,9 +1894,8 @@ character.hearth={
 					}
 					cards2.push(game.createCard(list.randomGet()));
 				}
-				player.gain(cards2);
+				player.gain(cards2,'log');
 				player.$draw(cards2);
-				game.log(player,'获得了',cards2);
 			},
 			ai:{
 				order:8,
@@ -1996,8 +1995,7 @@ character.hearth={
 				};
 				'step 1'
 				if(result.bool){
-					player.gain(player.storage.xunbao2,'gain2');
-					game.log(player,'获得了',player.storage.xunbao2);
+					player.gain(player.storage.xunbao2,'gain2','log');
 					delete player.storage.xunbao2;
 					player.removeSkill('xunbao2');
 				}
@@ -3343,8 +3341,7 @@ character.hearth={
 					return get.type(card)==type;
 				});
 				if(card){
-					player.gain(card,'gain2');
-					game.log(player,'获得了',card);
+					player.gain(card,'gain2','log');
 				}
 			},
 			ai:{

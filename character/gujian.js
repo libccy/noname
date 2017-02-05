@@ -329,8 +329,7 @@ character.gujian={
 					}
 				}
 				if(cards.length){
-					player.gain(cards,'gain2');
-					game.log(player,'获得了',cards);
+					player.gain(cards,'gain2','log');
 				}
 			}
 		},

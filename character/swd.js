@@ -1671,7 +1671,7 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('fzhenwei');
+					player.logSkill('fzhenwei',result.targets);
 					game.log(result.targets[0],'获得了',event.cards);
 					result.targets[0].gain(event.cards,'gain2');
 				}

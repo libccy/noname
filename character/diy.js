@@ -21,7 +21,7 @@ character.diy={
 		diy_liufu:['male','wei',3,['zhucheng','duoqi']],
 		diy_xizhenxihong:['male','shu',3,['fuchou','jinyan']],
 		diy_liuzan:['male','wu',4,['kangyin']],
-		diy_zaozhirenjun:['male','shu',3,['liangce','jianbi','juntun']],
+		diy_zaozhirenjun:['male','wei',3,['liangce','jianbi','juntun']],
 		diy_yangyi:['male','shu',3,['choudu','liduan']],
 		diy_tianyu:['male','wei',3,['chezhen','youzhan']],
 	},
@@ -32,12 +32,41 @@ character.diy={
 		liangce:{
 			enable:'phaseUse',
 			viewAs:{name:'wugu'},
+			usable:1,
 			filterCard:{type:'basic'},
 			filter:function(event,player){
 				return player.num('h',{type:'basic'})>0;
 			},
 			check:function(card){
 				return 6-ai.get.value(card);
+			},
+			group:'liangce2'
+		},
+		liangce2:{
+			trigger:{global:'wuguRemained'},
+			direct:true,
+			filter:function(event){
+				return event.remained.length>0;
+			},
+			content:function(){
+				'step 0'
+				var du=0;
+				for(var i=0;i<trigger.remained.length;i++){
+					if(trigger.remained[i].name=='du') du++;
+				}
+				var dialog=ui.create.dialog(get.prompt('liangce'),trigger.remained,'hidden');
+				dialog.classList.add('noselect');
+				player.chooseTarget(dialog).ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(du>=trigger.remained.length/2) return -att;
+					return att;
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('liangce',result.targets);
+					result.targets[0].gain(trigger.remained.slice(0),'gain2','log');
+					trigger.remained.length=0;
+				}
 			}
 		},
 		jianbi:{
@@ -72,14 +101,25 @@ character.diy={
 					}
 					game.delay();
 				}
+				else{
+					event.finish();
+				}
 				"step 2"
 				player.logSkill('jianbi',event.targets);
 			},
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(get.tag(card,'multitarget')&&!get.info(card).multitarget){
-							return [1,1];
+						if(get.tag(card,'multitarget')){
+							var info=get.info(card);
+							if(info.selectTarget==-1&&!info.multitarget){
+								if(get.tag(card,'multineg')){
+									return 0;
+								}
+								else{
+									return [1,Math.min(3,1+target.maxHp-target.hp)];
+								}
+							}
 						}
 					}
 				}
