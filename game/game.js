@@ -13757,7 +13757,10 @@
 						}
 					}
 				},
-				$gain2:function(cards){
+				$gain2:function(cards,log){
+					if(log===true){
+						game.log(this,'获得了',cards);
+					}
                     game.broadcast(function(player,cards){
                         player.$gain2(cards);
                     },this,cards);

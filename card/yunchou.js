@@ -1,5 +1,139 @@
 card.yunchou={
 	card:{
+		diaobingqianjiang:{
+			fullskin:true,
+			type:'trick',
+			enable:true,
+			selectTarget:-1,
+			filterTarget:true,
+			contentBefore:function(){
+				"step 0"
+				game.delay();
+				player.draw();
+				"step 1"
+				ui.clear();
+				var cards=get.cards(Math.floor(game.players.length/2));
+				var dialog=ui.create.dialog('调兵遣将',cards,true);
+				_status.dieClose.push(dialog);
+				dialog.videoId=lib.status.videoId++;
+				game.addVideo('cardDialog',null,['调兵遣将',get.cardsInfo(cards),dialog.videoId]);
+				event.getParent().preResult=dialog.videoId;
+			},
+			content:function(){
+				"step 0"
+				for(var i=0;i<ui.dialogs.length;i++){
+					if(ui.dialogs[i].videoId==event.preResult){
+						event.dialog=ui.dialogs[i];break;
+					}
+				}
+				if(!event.dialog||!target.num('h')){
+					event.finish();
+					return;
+				}
+				var minValue=20;
+				var hs=target.get('h');
+				for(var i=0;i<hs.length;i++){
+					minValue=Math.min(minValue,ai.get.value(hs[i]));
+				}
+				if(target.isUnderControl(true)){
+					event.dialog.setCaption('选择一张牌并用一张手牌替换之');
+				}
+				var next=target.chooseButton(function(button){
+					return ai.get.value(button.link,_status.event.player)-minValue;
+				});
+				next.set('dialog',event.preResult);
+				next.set('closeDialog',false);
+				next.set('dialogdisplay',true);
+				"step 1"
+				event.dialog.setCaption('调兵遣将');
+				if(result.bool){
+					event.button=result.buttons[0];
+					target.chooseCard('用一张牌牌替换'+get.translation(result.links),true).ai=function(card){
+						return -ai.get.value(card);
+					}
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.bool){
+					target.lose(result.cards,ui.special);
+					target.$throw(result.cards);
+
+					game.log(target,'用',result.cards,'替换了',event.button.link);
+					target.gain(event.button.link);
+					target.$gain2(event.button.link);
+					event.dialog.buttons.remove(event.button);
+					event.dialog.buttons.push(ui.create.button(result.cards[0],'card',event.button.parentNode));
+					event.button.remove();
+				}
+				"step 3"
+				game.delay(2);
+			},
+			contentAfter:function(){
+				'step 0'
+				event.dialog=get.idDialog(event.preResult);
+				if(!event.dialog){
+					event.finish();
+					return;
+				}
+				var att=ai.get.attitude(player,player.nextSeat);
+				if(player.isUnderControl(true)&&!_status.auto){
+					event.dialog.setCaption('将任意张牌以任意顺序置于牌堆顶（先选择的在上）');
+				}
+				var next=player.chooseButton([1,event.dialog.buttons.length],event.dialog);
+				next.ai=function(button){
+					if(att>0){
+						return ai.get.value(button.link,player.nextSeat)-5;
+					}
+					else{
+						return 5-ai.get.value(button.link,player.nextSeat);
+					}
+				}
+				next.set('closeDialog',false);
+				next.set('dialogdisplay',true);
+				'step 1'
+				if(result&&result.bool&&result.links&&result.links.length){
+					for(var i=0;i<result.buttons.length;i++){
+						event.dialog.buttons.remove(result.buttons[i]);
+					}
+					var cards=result.links.slice(0);
+					while(cards.length){
+						ui.cardPile.insertBefore(cards.pop(),ui.cardPile.firstChild);
+					}
+					game.log(player,'将'+get.cnNumber(result.links.length)+'张牌置于牌堆顶');
+				}
+				for(var i=0;i<event.dialog.buttons.length;i++){
+					ui.discardPile.appendChild(event.dialog.buttons[i].link);
+				}
+				'step 2'
+				var dialog=event.dialog;
+				dialog.close();
+				_status.dieClose.remove(dialog);
+				game.addVideo('cardDialog',null,event.preResult);
+			},
+			ai:{
+				wuxie:function(){
+					return 0;
+				},
+				basic:{
+					order:2,
+					useful:[3,1],
+					value:[5,1]
+				},
+				result:{
+					player:1,
+					target:function(player,target){
+						if(target.num('h')==0) return 0;
+						return (Math.sqrt(target.num('h'))-get.distance(player,target,'absolute')/game.players.length/3)/2;
+					}
+				},
+				tag:{
+					loseCard:1,
+					multitarget:1
+				}
+			}
+		},
 		caochuanjiejian:{
 			fullskin:true,
 			type:'trick',
@@ -1053,6 +1187,8 @@ card.yunchou={
 		},
 	},
 	translate:{
+		diaobingqianjiang:'调兵遣将',
+		diaobingqianjiang_info:'出牌阶段，对所有角色使用。你摸一张牌，然后亮出牌堆顶的X张牌（X为存活角色数的一半，向下取整），目标可以用一张手牌替换其中的一张牌。结算后，你可以将剩余的牌中的任意张以任意顺序置于牌堆顶',
 		caochuanjiejian:'草船借箭',
 		caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或展示手牌并令你弃置任意张',
 		xiaolicangdao:'笑里藏刀',
@@ -1134,6 +1270,8 @@ card.yunchou={
 		['spade',6,'geanguanhuo'],
 		['heart',4,'shezhanqunru'],
 		['club',8,'shezhanqunru'],
+		['diamond',1,'diaobingqianjiang'],
+		['spade',2,'diaobingqianjiang'],
 		['heart',12,'youdishenru'],
 		['club',2,'youdishenru'],
 		['spade',9,'youdishenru'],

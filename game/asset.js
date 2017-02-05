@@ -27,6 +27,7 @@ window.noname_asset_list=[
     'image/card/cixiong.png',
     'image/card/daihuofenglun.png',
     'image/card/dawan.png',
+    'image/card/diaobingqianjiang.png',
     'image/card/dilu.png',
     'image/card/diaohulishan.png',
     'image/card/donghuangzhong.png',

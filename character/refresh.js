@@ -1253,7 +1253,8 @@ character.refresh={
 					return target.sex=='male';
 				});
 				"step 2"
-				result.targets[0].$gain(event.card);
+				player.line(result.targets,'green');
+				result.targets[0].$gain2(event.card,true);
 				for(var i=0;i<cards.length-1;i++){
 					ui.discardPile.appendChild(cards[i]);
 				}

@@ -5135,7 +5135,7 @@ character.swd={
 				}
 				else{
 					game.delay(0,1000);
-					player.$gain(event.cards);
+					player.$gain2(event.cards,true);
 				}
 				"step 2"
 				player.gain(event.cards);
