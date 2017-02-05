@@ -22,13 +22,139 @@ character.diy={
 		diy_xizhenxihong:['male','shu',3,['fuchou','jinyan']],
 		diy_liuzan:['male','wu',4,['kangyin']],
 		diy_zaozhirenjun:['male','shu',3,[]],
-		diy_yangyi:['male','shu',3,[]],
+		diy_yangyi:['male','shu',3,['choudu','liduan']],
 		diy_tianyu:['male','wei',4,['chezhen','youzhan']],
 	},
 	perfectPair:{
 		yuji:['zuoci']
 	},
 	skill:{
+		choudu:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:true,
+			filterCard:true,
+			position:'he',
+			check:function(card){
+				return 5-ai.get.value(card);
+			},
+			content:function(){
+				'step 0'
+				event.cards=get.cards(Math.floor(game.players.length)/2);
+				event.list=game.players.slice(0);
+				get.sort(list,'seat',target);
+			},
+			ai:{
+				order:2,
+				result:{
+					target:function(player,target){
+						var num=Math.sqrt(target.num('h'));
+						if(target==player){
+							num/=2;
+						}
+						return num;
+					}
+				}
+			}
+		},
+		liduan:{
+			trigger:{global:'gainAfter'},
+			filter:function(event,player){
+				if(event.player==player) return false;
+				if(_status.currentPhase==event.player) return false;
+				if(event.cards.length!=1) return false;
+				return get.type(event.cards[0])=='equip'&&get.position(event.cards[0])=='h';
+			},
+			logTarget:'player',
+			check:function(event,player){
+				var att=ai.get.attitude(player,event.player);
+				var subtype=get.subtype(event.cards[0]);
+				if(att>0){
+					if(event.player.num('h')>=player.num('h')+2) return true;
+					return event.player.num('e',{subtype:subtype})==0;
+				}
+				else{
+					return event.player.num('e',{subtype:subtype})>0;
+				}
+			},
+			content:function(){
+				'step 0'
+				var bool=false;
+				var subtype=get.subtype(trigger.cards[0]);
+				var current=trigger.player.get('e',subtype[5]);
+				var att=ai.get.attitude(trigger.player,player);
+				if(current){
+					if(att>0){
+						bool=true;
+					}
+					else{
+						if(ai.get.equipValue(current)>ai.get.equipValue(trigger.cards[0])){
+							bool=true;
+						}
+					}
+				}
+				trigger.player.chooseCard('立断：将一张手牌交给'+get.translation(player)+'，或取消并使用'+get.translation(trigger.cards)).ai=function(card){
+					if(bool){
+						if(att>0){
+							return 8-ai.get.value(card);
+						}
+						else{
+							return 4-ai.get.value(card);
+						}
+					}
+					else{
+						if(att<=0) return -ai.get.value(card);
+						return 0;
+					}
+				}
+				'step 1'
+				if(result.bool){
+					player.gain(result.cards,trigger.player);
+					trigger.player.$give(1,player);
+				}
+				else{
+					trigger.player.useCard(trigger.cards,trigger.player);
+				}
+			}
+		},
+		jinyan:{
+			mod:{
+				cardEnabled:function(card,player){
+					if(_status.event.skill!='jinyan'&&player.hp<=2&&get.type(card,'trick')=='trick'&&get.color(card)=='black') return false;
+				},
+				cardUsable:function(card,player){
+					if(_status.event.skill!='jinyan'&&player.hp<=2&&get.type(card,'trick')=='trick'&&get.color(card)=='black') return false;
+				},
+				cardRespondable:function(card,player){
+					if(_status.event.skill!='jinyan'&&player.hp<=2&&get.type(card,'trick')=='trick'&&get.color(card)=='black') return false;
+				},
+				cardSavable:function(card,player){
+					if(_status.event.skill!='jinyan'&&player.hp<=2&&get.type(card,'trick')=='trick'&&get.color(card)=='black') return false;
+				},
+			},
+			enable:['chooseToUse','chooseToRespond'],
+			filterCard:function(card){
+				return get.type(card,'trick')=='trick'&&get.color(card)=='black';
+			},
+			viewAsFilter:function(player){
+				if(player.hp>2) return false;
+				if(!player.hasCard(function(card){
+					return get.type(card,'trick')=='trick'&&get.color(card)=='black';
+				})) return false;
+			},
+			viewAs:{name:'sha'},
+			prompt:'将一张黑色锦囊牌当作杀使用或打出',
+			check:function(){return 1},
+			ai:{
+				respondSha:true,
+				skillTagFilter:function(player){
+					if(player.hp>2) return false;
+					if(!player.hasCard(function(card){
+						return get.type(card,'trick')=='trick'&&get.color(card)=='black';
+					})) return false;
+				}
+			}
+		},
 		fuchou:{
 			trigger:{target:'shaBefore'},
 			filter:function(event,player){
@@ -995,6 +1121,10 @@ character.diy={
 		diy_caiwenji:'蔡昭姬',
 		diy_zhenji:'甄宓',
 
+		choudu:'筹度',
+		choudu_info:'出牌阶段限一次，你可以弃置一张牌，并亮出等同于存活角色数一半（向下取整）的牌，你选择一名角色，从该角色开始，每名角色可以用一张手牌替换其中的一张牌；结算后你可以将剩余的牌中的任意张以任意顺序置于牌堆顶；若你选择的角色不是你，你在结算后摸一张牌',
+		liduan:'立断',
+		liduan_info:'当一名其他角色于其回合外获得牌后，若其此次获得的牌数为1且为装备牌（无论是否可见），你可以令该角色选择一项：1.使用此牌；2.将一张手牌交给你',
 		fuchou:'负仇',
 		fuchou2:'负仇',
 		fuchou_info:'当你成为【杀】的目标时，你可以将一张牌交给此【杀】的使用者，令此【杀】对你无效且你到其的距离于当前回合内视为1，若如此做，此回合的结束阶段开始时，其令你摸一张牌，然后你需对其使用【杀】，否则失去1点体力',

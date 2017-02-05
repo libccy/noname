@@ -12867,12 +12867,21 @@
     				if(this.hasSkillTag('respondShan',true)) return true;
     				return false;
     			},
-				hasCard:function(name){
-					if(this.num('h',name)) return true;
-					var mn=this.get('e','5');
-					if(mn&&mn.name.indexOf('muniu')==0&&mn.cards&&mn.cards.length){
-						for(var i=0;i<mn.cards.length;i++){
-							if(mn.cards[i].name==name) return true;
+				hasCard:function(name,position){
+					position=position||'h';
+					if(typeof name=='function'){
+						var hs=this.get(position);
+						for(var i=0;i<hs.length;i++){
+							if(name(hs[i])) return true;
+						}
+					}
+					else{
+						if(this.num(position,name)) return true;
+						var mn=this.get('e','5');
+						if(mn&&mn.name.indexOf('muniu')==0&&mn.cards&&mn.cards.length){
+							for(var i=0;i<mn.cards.length;i++){
+								if(mn.cards[i].name==name) return true;
+							}
 						}
 					}
 					return false;
@@ -31834,6 +31843,16 @@
                 return Math.floor(Math.random()*num);
             }
         },
+		sort:function(arr,method){
+			switch(method){
+				case 'seat':{
+					lib.tempSortSeat=arguments[2];
+					arr.sort(lib.sort.seat);
+					delete lib.tempSortSeat;
+					return arr;
+				}
+			}
+		},
         prompt:function(skill,target,player){
             player=player||_status.event.player;
             if(target){

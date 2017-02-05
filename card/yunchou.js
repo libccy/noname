@@ -10,8 +10,9 @@ card.yunchou={
 			content:function(){
 				'step 0'
 				if(target.num('h','sha')){
+					var name=get.translation(player.name);
 					target.chooseControl().set('prompt',get.translation('caochuanjiejian')).set('choiceList',[
-						'将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀','令你观看并弃置其一张手牌'
+						'将手牌中的所有杀交给'+name+'，并视为对'+name+'使用一张杀','展示手牌并令'+name+'弃置任意一张'
 					],function(){
 						if(ai.get.effect(player,{name:'sha'},target,target)<0) return 1;
 						if(target.num('h','sha')>=3) return 1;
@@ -23,7 +24,15 @@ card.yunchou={
 				}
 				'step 1'
 				if(event.directfalse||result.control=='选项二'){
-					player.discardPlayerCard(target,'h',true,'visible');
+					if(target.num('h')){
+						if(!player.isUnderControl(true)){
+							target.showHandcards();
+						}
+						else{
+							game.log(target,'展示了',target.get('h'));
+						}
+						player.discardPlayerCard(target,'h',true,'visible');
+					}
 					event.finish();
 				}
 				else{
@@ -156,9 +165,7 @@ card.yunchou={
 					event.finish();
 				}
 				else{
-					lib.tempSortSeat=target;
-					list.sort(lib.sort.seat);
-					delete lib.tempSortSeat;
+					get.sort(list,'seat',target);
 					event.list=list;
 					event.torespond=[];
 				}
@@ -1047,7 +1054,7 @@ card.yunchou={
 	},
 	translate:{
 		caochuanjiejian:'草船借箭',
-		caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或令你观看并弃置其一张手牌',
+		caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或展示手牌并令你弃置任意张',
 		xiaolicangdao:'笑里藏刀',
 		xiaolicangdao_info:'出牌阶段，对一名其他角色使用。你将此【笑里藏刀】交给目标，然后弃置其一张手牌，若这两张牌牌名相同，你对其造成1点伤害',
 		shezhanqunru:'舌战群儒',

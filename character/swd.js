@@ -8328,10 +8328,8 @@ character.swd={
 						event.targets.push(game.players[i]);
 					}
 				}
-				lib.tempSortSeat=event.target;
-				event.targets.sort(lib.sort.seat);
+				get.sort(event.targets,'seat',event.target);
 				event.targets.unshift(player);
-				delete lib.tempSortSeat;
 				"step 1"
 				if(event.targets.length){
 					var current=event.targets.shift();

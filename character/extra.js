@@ -448,16 +448,16 @@ character.extra={
 		wushen:{
 			mod:{
 				cardEnabled:function(card,player){
-					if(card.name!='sha'&&get.suit(card)=='heart') return false;
+					if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
 				},
 				cardUsable:function(card,player){
-					if(card.name!='sha'&&get.suit(card)=='heart') return false;
+					if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
 				},
 				cardRespondable:function(card,player){
-					if(card.name!='sha'&&get.suit(card)=='heart') return false;
+					if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
 				},
 				cardSavable:function(card,player){
-					if(card.name!='sha'&&get.suit(card)=='heart') return false;
+					if(_status.event.skill!='wushen'&&card.name!='sha'&&get.suit(card)=='heart') return false;
 				},
 				targetInRange:function(card){
 					if(get.suit(card)=='heart'||_status.event.skill=='wushen') return true;

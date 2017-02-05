@@ -4277,9 +4277,7 @@ character.yijiang={
 						event.players.push(game.players[i]);
 					}
 				}
-				lib.tempSortSeat=target;
-				event.players.sort(lib.sort.seat);
-				delete lib.tempSortSeat;
+				get.sort(event.players,'seat',target);
 				"step 1"
 				if(event.players.length){
 					event.current=event.players.shift();
