@@ -85,30 +85,6 @@ character.xiake={
 				}
 			},
         },
-        zuijian:{
-			enable:'phaseUse',
-			filterCard:true,
-            position:'he',
-			viewAs:{name:'jiu'},
-			viewAsFilter:function(player){
-				if(!player.num('he')) return false;
-			},
-			prompt:'将一张手牌或装备牌当酒使用',
-			check:function(card){
-				return 4-ai.get.value(card);
-			},
-            mod:{
-				attackFrom:function(from,to,distance){
-					if(from.hasSkill('jiu')) return distance-1;
-				}
-			},
-			ai:{
-				skillTagFilter:function(player){
-					return player.num('he')>0;
-				},
-				threaten:1.2
-			}
-		},
         zitong:{
             trigger:{player:'useCard'},
             frequent:true,
@@ -139,8 +115,6 @@ character.xiake={
         gzhenji_info:'你使用杀造成伤害后，可以摸一张牌，并且本回合内可以额外使用一张杀',
         rouquan:'柔拳',
         rouquan_info:'你可以重铸装备区内的牌；当你没有武器牌时，你的杀可以指定任意个目标',
-        zuijian:'醉剑',
-        zuijian_info:'出牌阶段，你可以将一张手牌或装备牌当酒使用；当你使用酒后，你的攻击范围+1',
         zitong:'通悟',
         zitong_info:'当你于自己的回合内使用第三张牌时，你可以将一张传送门置于你的手牌',
     },

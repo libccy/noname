@@ -7,7 +7,9 @@ card.hearth={
 			enable:true,
 			filterTarget:true,
 			content:function(){
+				'step 0'
 				target.damage('fire');
+				'step 1'
 				var hs=player.get('h');
 				if(hs.length){
 					player.discard(hs.randomGet());

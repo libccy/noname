@@ -593,7 +593,9 @@ mode.stone={
 			enable:function(event,player){
 				return player.canAddFellow();
 			},
-			chongzhu:true,
+			chongzhu:function(event,player){
+				return !player.isMin()&&!player.canAddFellow();
+			},
 			notarget:true,
 			content:function(){
 				"step 0"
@@ -726,7 +728,7 @@ mode.stone={
 					game.addVideo('updateActCount',this,[used,this.actcount,this.getActCount()]);
 				}
 				var maxcount,overflow2;
-				if(lib.config.layout=='default'||used=='outphase'||_status.currentPhase!=this){
+				if(game.layout=='default'||used=='outphase'||_status.currentPhase!=this){
 					maxcount=this.actcount;
 				}
 				else{

@@ -15757,14 +15757,17 @@
 				filter:function(event,player){
 					return (player.num('h',function(card){
                         var info=get.info(card);
-                        if(info.type=='stonecharacter'&&lib.config.mode=='stone') return !player.isMin()&&!player.canAddFellow();
+						if(typeof info.chongzhu=='function'){
+							return info.chongzhu(event,player);
+						}
 						return info.chongzhu;
 					})>0);
 				},
 				filterCard:function(card){
                     var info=get.info(card);
-                    var player=_status.event.player;
-                    if(info.type=='stonecharacter'&&lib.config.mode=='stone') return !player.isMin()&&!player.canAddFellow();
+					if(typeof info.chongzhu=='function'){
+						return info.chongzhu(event,_status.event.player);
+					}
 					return info.chongzhu;
 				},
 				prepare:function(cards,player){
@@ -19483,6 +19486,11 @@
 			ui.control.show();
 			ui.clear();
             game.stopCountChoose();
+			if(game.layout=='long2'){
+				ui.arena.classList.add('choose-character');
+				ui.me.hide();
+				ui.autonode.hide();
+			}
             if(game.online){
                 var dialog=ui.create.dialog();
                 dialog.content.innerHTML=result;
@@ -19867,7 +19875,7 @@
 			dialog.add(ui.create.div('.placeholder'));
 
             for(var i=0;i<game.players.length;i++){
-                if(!_status.connectMode&&game.players[i].isUnderControl(true)) continue;
+                if(!_status.connectMode&&game.players[i].isUnderControl(true)&&game.layout!='long2') continue;
                 var hs=game.players[i].get('h');
                 if(hs.length){
                     dialog.add('<div class="text center">'+get.translation(game.players[i])+'</div>');
@@ -31795,7 +31803,7 @@
 						ui.dialog.classList.add('scroll1');
 						ui.dialog.classList.add('scroll2');
 					}
-					if(lib.config.layout=='long2'){
+					if(game.layout=='long2'){
 						if(height1+240>=ui.arena.offsetHeight){
 							ui.dialog.classList.add('scroll3');
 						}

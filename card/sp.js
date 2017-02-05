@@ -61,6 +61,9 @@ card.sp={
 				if(hs.length==1&&hs[0]!=card) return true;
 				return false;
 			},
+			chongzhu:function(){
+				return game.players.length<=2;
+			},
             type:'trick',
 			selectTarget:2,
 			multitarget:true,
@@ -619,7 +622,7 @@ card.sp={
 		du:'毒',
 		du_info:'当你因使用、打出或弃置而失去此牌时，你失去一点体力',
         shengdong:'声东击西',
-		shengdong_info:'出牌阶段，对一名其他角色使用。你交给目标角色一张手牌，若如此做，其将两张牌交给另一名由你选择的其他角色',
+		shengdong_info:'出牌阶段，对一名其他角色使用。你交给目标角色一张手牌，若如此做，其将两张牌交给另一名由你选择的其他角色（存活角色不超过2时可重铸）',
         zengbin:'增兵减灶',
         zengbin_info:'出牌阶段，对一名角色使用。目标角色摸三张牌，然后选择一项：1.弃置一张非基本牌；2.弃置两张牌',
         caomu:'草木皆兵',

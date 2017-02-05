@@ -1120,7 +1120,7 @@ mode.versus={
 				if(lib.isPhoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
 				}
-				else if(lib.config.layout=='newlayout'){
+				else if(game.layout=='newlayout'){
 					ui.control.style.top='calc(100% - 30px)';
 				}
 				else{

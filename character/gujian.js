@@ -4,7 +4,7 @@ character.gujian={
 		gjqt_fengqingxue:['female','wu',3,['qinglan','yuehua','swd_wuxie']],
 		gjqt_xiangling:['female','wu',3,['qianhuan','meihu','xidie']],
 		gjqt_fanglansheng:['male','wu',3,['fanyin','mingkong','fumo']],
-		gjqt_yinqianshang:['male','qun',4,['zhongji','zuizhan']],
+		gjqt_yinqianshang:['male','qun',4,['zuiji','zuizhan']],
 		gjqt_hongyu:['female','shu',4,['jianwu','meiying']],
 
 		gjqt_yuewuyi:['male','wei',4,['yanjia','xiuhua','liuying']],
@@ -16,6 +16,22 @@ character.gujian={
 		gjqt_ouyangshaogong:['male','shu',3,['yunyin','shishui','duhun']],
 	},
 	skill:{
+		zuiji:{
+			enable:'phaseUse',
+			filterCard:true,
+            position:'he',
+			viewAs:{name:'jiu'},
+			viewAsFilter:function(player){
+				if(!player.num('he')) return false;
+			},
+			prompt:'将一张手牌或装备牌当酒使用',
+			check:function(card){
+				return 5-ai.get.value(card);
+			},
+			ai:{
+				threaten:1.2
+			}
+		},
 		manwu:{
 			trigger:{global:'phaseEnd'},
 			check:function(event,player){
@@ -621,28 +637,6 @@ character.gujian={
 					trigger.targets.push(event.target);
 					player.draw();
 				}
-			}
-		},
-		zhongji:{
-			trigger:{source:'damageBegin'},
-			direct:true,
-			content:function(){
-				"step 0"
-				var next=player.chooseToDiscard('是否弃置一张黑色牌使伤害+1？',{color:'black'});
-				next.logSkill='zhongji';
-				next.ai=function(card){
-					if(ai.get.attitude(player,trigger.player)<0){
-						return 7-ai.get.value(card);
-					}
-					return -1;
-				}
-				"step 1"
-				if(result.bool){
-					trigger.num++;
-				}
-			},
-			ai:{
-				threaten:1.3
 			}
 		},
 		meiying_old:{
@@ -1591,6 +1585,8 @@ character.gujian={
 		gjqt_xiayize:'夏夷则',
 		gjqt_aruan:'阿阮',
 
+        zuiji:'醉饮',
+        zuiji_info:'出牌阶段，你可以将一张手牌或装备牌当酒使用',
 		manwu:'曼舞',
 		manwu_info:'在一名角色的回合结束阶段，若其手牌数为全场最少或之一，你可以令其摸一张牌',
 		xfanghua:'芳华',
@@ -1613,9 +1609,7 @@ character.gujian={
 		jianwu_info:'锁定技，攻击范围不含你的角色无法闪避你的杀',
 		meiying:'魅影',
 		meiying_info:'一名其他角色的回合结束时，若其未于此回合内使用过指定另一名角色为目标的牌，你可以弃置一张红色牌视为对其使用一张杀',
-		zhongji:'重击',
-		zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1',
-		zuizhan:'醉斩',
+		zuizhan:'乱斩',
 		zuizhan_info:'每当你使用一张杀，可以摸一张牌，然后此杀随机增加一个额外目标',
 		qianhuan:'千幻',
 		qianhuan_info:'回合结束后，若你已受伤，你可以回复一点体力并将武将牌翻面。若你的武将牌背面朝上，你不能使用卡牌，也不能成为卡牌的目标',

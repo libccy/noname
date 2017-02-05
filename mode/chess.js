@@ -1900,9 +1900,6 @@ mode.chess={
 				if(lib.isPhoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
 				}
-				else if(lib.config.layout=='newlayout'){
-					ui.control.style.top='calc(100% - 30px)';
-				}
 				else{
 					ui.control.style.top='calc(100% - 70px)';
 				}
@@ -3446,9 +3443,6 @@ mode.chess={
 
 				if(lib.isPhoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
-				}
-				else if(lib.config.layout=='newlayout'){
-					ui.control.style.top='calc(100% - 30px)';
 				}
 				else{
 					ui.control.style.top='calc(100% - 70px)';

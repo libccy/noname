@@ -80,7 +80,7 @@ character.hearth={
 		// hs_yashaji:['male','wei',3,[]],
 		// hs_wolazi:['male','wei',3,[]],
 
-		// hs_tanghangu:['male','wei',3,[]],
+		hs_tanghangu:['male','shu',5,['zhongji']],
 		hs_aya:['female','wu',3,['ayuling','qingzun']],
 		// hs_barnes:['male','wei',3,[]],
 		// hs_nuogefu:['male','wei',3,[]],
@@ -98,6 +98,31 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		zhongji:{
+			trigger:{source:'damageBegin'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h',{color:'black'})>0;
+			},
+			content:function(){
+				"step 0"
+				var next=player.chooseToDiscard(get.prompt('zhongji',trigger.player),{color:'black'});
+				next.logSkill=['zhongji',trigger.player];
+				next.ai=function(card){
+					if(ai.get.attitude(player,trigger.player)<0){
+						return 7-ai.get.value(card);
+					}
+					return -1;
+				}
+				"step 1"
+				if(result.bool){
+					trigger.num++;
+				}
+			},
+			ai:{
+				threaten:1.3
+			}
+		},
 		fuwen:{
 			trigger:{player:'phaseDiscardEnd'},
 			frequent:true,
@@ -5549,6 +5574,8 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
+		zhongji:'重击',
+		zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1',
 		fuwen:'符文',
 		fuwen_info:'若你弃牌阶段弃置了锦囊牌，你可以获得一点护甲',
 		jinzhou:'禁咒',

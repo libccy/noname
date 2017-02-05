@@ -12,7 +12,7 @@ card.yunchou={
 				player.draw();
 				"step 1"
 				ui.clear();
-				var cards=get.cards(Math.floor(game.players.length/2));
+				var cards=get.cards(Math.ceil(game.players.length/2));
 				var dialog=ui.create.dialog('调兵遣将',cards,true);
 				_status.dieClose.push(dialog);
 				dialog.videoId=lib.status.videoId++;
@@ -33,7 +33,7 @@ card.yunchou={
 				var minValue=20;
 				var hs=target.get('h');
 				for(var i=0;i<hs.length;i++){
-					minValue=Math.min(minValue,ai.get.value(hs[i]));
+					minValue=Math.min(minValue,ai.get.value(hs[i],target));
 				}
 				if(target.isUnderControl(true)){
 					event.dialog.setCaption('选择一张牌并用一张手牌替换之');
@@ -78,17 +78,18 @@ card.yunchou={
 					event.finish();
 					return;
 				}
-				var att=ai.get.attitude(player,player.nextSeat);
+				var nextSeat=_status.currentPhase.next;
+				var att=ai.get.attitude(player,nextSeat);
 				if(player.isUnderControl(true)&&!_status.auto){
 					event.dialog.setCaption('将任意张牌以任意顺序置于牌堆顶（先选择的在上）');
 				}
 				var next=player.chooseButton([1,event.dialog.buttons.length],event.dialog);
 				next.ai=function(button){
 					if(att>0){
-						return ai.get.value(button.link,player.nextSeat)-5;
+						return ai.get.value(button.link,nextSeat)-5;
 					}
 					else{
-						return 5-ai.get.value(button.link,player.nextSeat);
+						return 5-ai.get.value(button.link,nextSeat);
 					}
 				}
 				next.set('closeDialog',false);
@@ -277,12 +278,7 @@ card.yunchou={
 		shezhanqunru:{
 			fullskin:true,
 			type:'trick',
-			enable:function(card,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')) return true;
-				}
-				return false;
-			},
+			enable:true,
 			filterTarget:function(card,player,target){
 				return target==player;
 			},
@@ -297,6 +293,7 @@ card.yunchou={
 					}
 				}
 				if(!list.length){
+					target.draw(3);
 					event.finish();
 				}
 				else{
@@ -1189,7 +1186,7 @@ card.yunchou={
 	},
 	translate:{
 		diaobingqianjiang:'调兵遣将',
-		diaobingqianjiang_info:'出牌阶段，对所有角色使用。你摸一张牌，然后亮出牌堆顶的X张牌（X为存活角色数的一半，向下取整），目标可以用一张手牌替换其中的一张牌。结算后，你可以将剩余的牌中的任意张以任意顺序置于牌堆顶',
+		diaobingqianjiang_info:'出牌阶段，对所有角色使用。你摸一张牌，然后亮出牌堆顶的X张牌（X为存活角色数的一半，向上取整），目标可以用一张手牌替换其中的一张牌。结算后，你可以将剩余的牌中的任意张以任意顺序置于牌堆顶',
 		caochuanjiejian:'草船借箭',
 		caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或展示手牌并令你弃置任意张',
 		xiaolicangdao:'笑里藏刀',

@@ -994,6 +994,8 @@ card.swd={
 			},
 			ai:{
 				order:10,
+				value:6,
+				useful:1,
 				result:{
 					target:function(player,target){
 						if(target==player&&target.num('h',{type:'equip'})) return 2.5;
