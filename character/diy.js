@@ -19,11 +19,11 @@ character.diy={
 		re_huangyueying:['female','shu',3,['rejizhi','qicai']],
 
 		diy_liufu:['male','wei',3,['zhucheng','duoqi']],
-		diy_xizhenxihong:['male','shu',3,['fuchou','jinyan']],
+		diy_xizhenxihong:['male','shu',4,['fuchou','jinyan']],
 		diy_liuzan:['male','wu',4,['kangyin']],
 		diy_zaozhirenjun:['male','wei',3,['liangce','jianbi','juntun']],
 		diy_yangyi:['male','shu',3,['choudu','liduan']],
-		diy_tianyu:['male','wei',3,['chezhen','youzhan']],
+		diy_tianyu:['male','wei',4,['chezhen','youzhan']],
 	},
 	perfectPair:{
 		yuji:['zuoci']
@@ -110,15 +110,13 @@ character.diy={
 			ai:{
 				effect:{
 					target:function(card,player,target){
+						if(get.tag(card,'multineg')){
+							return 'zerotarget';
+						}
 						if(get.tag(card,'multitarget')){
 							var info=get.info(card);
 							if(info.selectTarget==-1&&!info.multitarget){
-								if(get.tag(card,'multineg')){
-									return 0;
-								}
-								else{
-									return [1,Math.min(3,1+target.maxHp-target.hp)];
-								}
+								return [1,Math.min(3,1+target.maxHp-target.hp)];
 							}
 						}
 					}
@@ -130,6 +128,7 @@ character.diy={
 			filter:function(event,player){
 				return player.num('he',{type:'equip'})>0;
 			},
+			position:'he',
 			filterCard:{type:'equip'},
 			check:function(card){
 				var player=_status.event.player;

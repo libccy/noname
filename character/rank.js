@@ -63,6 +63,7 @@ window.characterRank={
     a:[
         'hs_khadgar',
         'hs_tyrande',
+        'diy_zaozhirenjun',
         'pal_muchanglan',
         'hs_aya',
         'ow_heiying',
@@ -361,14 +362,12 @@ window.characterRank={
         'sunjian',
         'pangtong',
         'caochun',
-        'diy_tianyu',
         'diy_liuzan',
-        'diy_zaozhirenjun',
         'diy_yangyi',
     ],
     b:[
         'diy_liufu',
-        'diy_xizhenxihong',
+        'diy_tianyu',
         'old_zhuran',
         'old_lingtong',
         'sp_pangde',
@@ -450,6 +449,7 @@ window.characterRank={
         'madai',
     ],
     bm:[
+        'diy_xizhenxihong',
         'yxs_tangbohu',
         'zhuzhi',
         'old_caozhen',
