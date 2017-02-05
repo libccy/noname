@@ -82,9 +82,7 @@ character.ow={
                     if(from==to.storage.liangou2) return -Infinity;
                 }
 			},
-            onremove:function(player){
-                delete player.storage.liangou2;
-            },
+            onremove:true,
             trigger:{player:'damageBegin'},
             usable:1,
             forced:true,

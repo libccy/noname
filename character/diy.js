@@ -19,7 +19,7 @@ character.diy={
 		re_huangyueying:['female','shu',3,['rejizhi','qicai']],
 
 		diy_liufu:['male','wei',3,['zhucheng','duoqi']],
-		diy_xizhenxihong:['male','shu',3,[]],
+		diy_xizhenxihong:['male','shu',3,['fuchou','jinyan']],
 		diy_liuzan:['male','wu',4,['kangyin']],
 		diy_zaozhirenjun:['male','shu',3,[]],
 		diy_yangyi:['male','shu',3,[]],
@@ -29,6 +29,82 @@ character.diy={
 		yuji:['zuoci']
 	},
 	skill:{
+		fuchou:{
+			trigger:{target:'shaBefore'},
+			filter:function(event,player){
+				return player.num('he')>0;
+			},
+			direct:true,
+			content:function(){
+				'step 0'
+				var bool=false;
+				if(!player.hasShan()&&ai.get.effect(player,trigger.card,trigger.player,player)<0){
+					bool=true;
+				}
+				player.chooseCard('he',get.prompt('fuchou',trigger.player)).ai=function(card){
+					if(bool){
+						if(player.hp<=1){
+							if(get.tag(card,'save')) return 0;
+							return 8-ai.get.value(card);
+						}
+						return 6-ai.get.value(card);
+					}
+					return -ai.get.value(card);
+				}
+				'step 1'
+				if(result.bool){
+					trigger.untrigger();
+					trigger.finish();
+					player.logSkill('fuchou',trigger.player);
+					trigger.player.gain(result.cards,player);
+					if(get.position(result.cards[0])=='h'){
+						player.$give(1,trigger.player);
+					}
+					else{
+						player.$give(result.cards,trigger.player);
+					}
+					player.storage.fuchou2.add(trigger.player);
+				}
+			},
+			group:'fuchou2'
+		},
+		fuchou2:{
+			init:function(player){
+				player.storage.fuchou2=[];
+			},
+			forced:true,
+			trigger:{global:'phaseAfter'},
+			filter:function(event,player){
+				for(var i=0;i<player.storage.fuchou2.length;i++){
+					if(player.storage.fuchou2[i].isAlive()) return true;
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				if(player.storage.fuchou2.length){
+					var target=player.storage.fuchou2.shift();
+					if(target.isAlive()){
+						player.draw();
+						if(player.canUse('sha',target,false)&&player.hasSha()){
+							player.chooseToUse({name:'sha'},target,-1,'对'+get.translation(target)+'使用一张杀，或失去一点体力');
+						}
+						else{
+							player.loseHp();
+							event.redo();
+						}
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 1'
+				if(!result.bool){
+					player.loseHp();
+				}
+				event.goto(0);
+			}
+		},
 		chezhen:{
 			mod:{
 				globalFrom:function(from,to,distance){
@@ -117,9 +193,7 @@ character.diy={
 			intro:{
 				content:'到其他角色的距离-#；使用【杀】的额外目标数上限+#'
 			},
-			onremove:function(player){
-				delete player.storage.kangyin2;
-			},
+			onremove:true,
 			mod:{
 				globalFrom:function(from,to,distance){
 					return distance-from.storage.kangyin2;
@@ -921,6 +995,11 @@ character.diy={
 		diy_caiwenji:'蔡昭姬',
 		diy_zhenji:'甄宓',
 
+		fuchou:'负仇',
+		fuchou2:'负仇',
+		fuchou_info:'当你成为【杀】的目标时，你可以将一张牌交给此【杀】的使用者，令此【杀】对你无效且你到其的距离于当前回合内视为1，若如此做，此回合的结束阶段开始时，其令你摸一张牌，然后你需对其使用【杀】，否则失去1点体力',
+		jinyan:'噤言',
+		jinyan_info:'锁定技。若你的体力值不大于2，你的黑色锦囊牌视为【杀】',
 		chezhen:'车阵',
 		chezhen_info:'锁定技。若你的装备区里：没有牌，其他角色到你的距离+1；有牌，你到其他角色的距离-1',
 		youzhan:'诱战',

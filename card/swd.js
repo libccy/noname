@@ -2303,9 +2303,7 @@ card.swd={
 			trigger:{source:'damageEnd'},
 			forced:true,
 			popup:false,
-			onremove:function(player){
-				delete player.storage.shuchui2;
-			},
+			onremove:true,
 			filter:function(event,player){
 				return event.card&&event.card.name=='sha'&&!player.storage.shuchui2;
 			},

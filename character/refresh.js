@@ -38,10 +38,7 @@ character.refresh={
 				if(player.storage.rerende2&&player.storage.rerende2.contains(target)) return false;
 				return player!=target;
 			},
-			onremove:function(player){
-				delete player.storage.rerende;
-				delete player.storage.rerende2;
-			},
+			onremove:['rerende','rerende2'],
 			check:function(card){
 				if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
 				if(!ui.selected.cards.length&&card.name=='du') return 20;

@@ -917,9 +917,7 @@ character.sp={
 					if(card.name=='sha'&&player.storage.tuifeng3) return num+player.storage.tuifeng3;
 				}
 			},
-			onremove:function(player){
-				delete player.storage.tuifeng3;
-			}
+			onremove:true
 		},
 		weidi:{
 			trigger:{global:['gameStart','zhuUpdate']},
@@ -4381,9 +4379,7 @@ character.sp={
 				}
 			},
 			mark:true,
-			onremove:function(player){
-				delete player.storage.jilei2;
-			},
+			onremove:true,
 			mod:{
 				cardDiscardable:function(card,player){
 					if(player.storage.jilei2==get.type(card,'trick')) return false;

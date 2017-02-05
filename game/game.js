@@ -12409,7 +12409,39 @@
                         var info=lib.skill[skill];
                         if(info){
                             if(info.onremove){
-        						info.onremove(this,skill);
+								if(typeof info.onremove=='function'){
+									info.onremove(this,skill);
+								}
+        						else if(typeof info.onremove=='string'){
+									if(info.onremove=='storage'){
+										delete this.storage[skill];
+									}
+									else{
+										var cards=this.storage[skill];
+										if(get.itemtype(cards)=='card'){
+											cards=[cards];
+										}
+										if(get.itemtype(cards)=='cards'){
+											if(this.onremove=='discard'){
+												this.$throw(cards);
+											}
+											if(this.onremove=='discard'||this.onremove=='lose'){
+												for(var i=0;i<cards.length;i++){
+													ui.discardPile.appendChild(cards[i]);
+												}
+												delete this.storage[skill];
+											}
+										}
+									}
+								}
+								else if(Array.isArray(info.onremove)){
+									for(var i=0;i<info.onremove.length;i++){
+										delete this.storage[info.onremove[i]];
+									}
+								}
+								else if(info.onremove===true){
+									delete this.storage[skill];
+								}
         					}
                             this.removeSkillTrigger(skill);
                             if(!info.keepSkill){

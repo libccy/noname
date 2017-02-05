@@ -426,9 +426,7 @@ character.shenhua={
 			}
 		},
 		qimou2:{
-			onremove:function(player){
-				delete player.storage.qimou2;
-			},
+			onremove:true,
 			mod:{
 				cardUsable:function(card,player,num){
 					if(typeof player.storage.qimou2=='number'&&card.name=='sha'){

@@ -4144,10 +4144,7 @@ character.swd={
 				if(!player.storage.kunlunjing) return false;
 				return player.hp<player.storage.kunlunjing2;
 			},
-			onremove:function(player){
-				delete player.storage.kunlunjing;
-				delete player.storage.kunlunjing2;
-			},
+			onremove:['kunlunjing','kunlunjing2'],
 			check:function(event,player){
 				var storage=player.storage.kunlunjing;
 				var num=0;

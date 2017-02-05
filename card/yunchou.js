@@ -957,9 +957,7 @@ card.yunchou={
 			forced:true,
 			popup:false,
 			silent:true,
-			onremove:function(player){
-				delete player.storage.youdishenru;
-			},
+			onremove:true,
 			filter:function(event,player){
 				return event.card&&event.card.name=='sha'&&event.player==player.storage.youdishenru;
 			},

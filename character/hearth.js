@@ -1708,7 +1708,7 @@ character.hearth={
 				return [list,map];
 			},
 			onremove:function(player){
-				delete player.additionalSkills.maoxian;
+				player.removeAdditionalSkill('maoxian');
 			},
 			content:function(){
 				'step 0'
