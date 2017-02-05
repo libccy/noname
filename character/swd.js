@@ -559,8 +559,7 @@ character.swd={
 			forced:true,
 			popup:false,
 			content:function(){
-				player.gain(player.storage.lmazui2,'gain2');
-				game.log(player,'获得了',player.storage.lmazui2);
+				player.gain(player.storage.lmazui2,'gain2','log');
 				player.removeSkill('lmazui3');
 				delete player.storage.lmazui2;
 			}
@@ -1672,8 +1671,7 @@ character.swd={
 				"step 1"
 				if(result.bool){
 					player.logSkill('fzhenwei',result.targets);
-					game.log(result.targets[0],'获得了',event.cards);
-					result.targets[0].gain(event.cards,'gain2');
+					result.targets[0].gain(event.cards,'gain2','log');
 				}
 			},
 			ai:{
@@ -4755,9 +4753,8 @@ character.swd={
 					}
 				}
 				var cards=player.storage.yishan.splice(0,2);
-				player.gain(cards);
+				player.gain(cards,'log');
 				player.$gain2(cards);
-				game.log(player,'获得了',cards);
 			},
 			ai:{
 				maixie:true,
@@ -5135,10 +5132,10 @@ character.swd={
 				}
 				else{
 					game.delay(0,1000);
-					player.$gain2(event.cards,true);
+					player.$gain2(event.cards);
 				}
 				"step 2"
-				player.gain(event.cards);
+				player.gain(event.cards,'log');
 			},
 			ai:{
 				result:{
@@ -5817,8 +5814,7 @@ character.swd={
 				"step 0"
 				var cards=get.cards(1);
 				event.card=cards[0];
-				player.gain(cards,'gain2');
-				game.log(player,'获得了',event.card);
+				player.gain(cards,'gain2','log');
 				"step 1"
 				var gained=event.card;
 				if(lib.filter.filterCard(gained)){
@@ -8266,8 +8262,7 @@ character.swd={
 			mark:'card',
 			content:function(){
 				player.recover();
-				player.gain(player.storage.zhenjiu2,'gain2');
-				game.log(player,'获得了',player.storage.zhenjiu2);
+				player.gain(player.storage.zhenjiu2,'gain2','log');
 				player.removeSkill('zhenjiu2');
 				delete player.storage.zhenjiu2;
 			},

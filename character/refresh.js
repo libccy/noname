@@ -1252,13 +1252,13 @@ character.refresh={
 				});
 				"step 2"
 				player.line(result.targets,'green');
-				result.targets[0].$gain2(event.card,true);
+				result.targets[0].$gain2(event.card);
 				for(var i=0;i<cards.length-1;i++){
 					ui.discardPile.appendChild(cards[i]);
 				}
 				game.delay(0,1000);
 				"step 3"
-				result.targets[0].gain(event.card);
+				result.targets[0].gain(event.card,'log');
 
 			},
 			ai:{

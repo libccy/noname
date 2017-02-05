@@ -6512,8 +6512,7 @@ character.sp={
 				if(result.bool&&!event.directfalse){
 					player.storage.bifa[1].gain(result.cards,player);
 					player.$give(result.cards,player.storage.bifa[1]);
-					player.gain(player.storage.bifa[0],'draw2');
-					game.log(player,'获得了',player.storage.bifa[0]);
+					player.gain(player.storage.bifa[0],'draw2','log');
 				}
 				else{
 					ui.discardPile.appendChild(player.storage.bifa[0]);

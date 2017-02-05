@@ -1065,8 +1065,8 @@ character.extra={
 					cards2.push(result.buttons[i].link);
 					cards.remove(result.buttons[i].link);
 				}
-				player.gain(cards2);
-				if(cards2.length) player.$gain2(cards2,true);
+				player.gain(cards2,'log');
+				if(cards2.length) player.$gain2(cards2);
 				for(var i=0;i<cards.length;i++){
 					ui.discardPile.appendChild(cards[i]);
 				}
