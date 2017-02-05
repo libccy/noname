@@ -51,17 +51,17 @@ mode.boss={
 			bosslist._scrollnum=10;
 			bosslist.onmousewheel=ui.click.mousewheel;
 		}
-		var bosslistlinks={};
-		var toggleBoss=function(bool){
-			game.saveConfig(this._link.config._name,bool,true);
-			var node=bosslistlinks[this._link.config._name];
-			if(bool){
-				node.style.display='';
-			}
-			else{
-				node.style.display='none';
-			}
-		};
+		// var bosslistlinks={};
+		// var toggleBoss=function(bool){
+		// 	game.saveConfig(this._link.config._name,bool,true);
+		// 	var node=bosslistlinks[this._link.config._name];
+		// 	if(bool){
+		// 		node.style.display='';
+		// 	}
+		// 	else{
+		// 		node.style.display='none';
+		// 	}
+		// };
 		var onpause=function(){
 			ui.window.classList.add('bosspaused');
 		}
@@ -80,17 +80,16 @@ mode.boss={
 			var info=lib.character[i];
 			if(info[4].contains('boss')){
 				if(lib.characterPack.mode_boss[i]&&!get.config(i+'_boss_config')) continue;
-				var cfg=i+'_bossconfig';
-				if(get.config(cfg)==undefined){
-					game.saveConfig(cfg,true,true);
-				}
-				lib.translate[cfg+'_config']=lib.translate[i];
-				lib.config.current_mode.push([cfg,get.config(cfg),toggleBoss]);
-				lib.mode.boss.config[cfg]={
-					name:get.translation(i),
-					onclick:toggleBoss,
-					init:true,
-				}
+				// var cfg=i+'_bossconfig';
+				// if(get.config(cfg)==undefined){
+				// 	game.saveConfig(cfg,true,true);
+				// }
+				// lib.translate[cfg+'_config']=lib.translate[i];
+				// lib.mode.boss.config[cfg]={
+				// 	name:get.translation(i),
+				// 	onclick:toggleBoss,
+				// 	init:true,
+				// }
 				var player=ui.create.player(bosslist).init(i);
 				if(player.hp==0){
 					player.node.hp.style.display='none';
@@ -104,7 +103,7 @@ mode.boss={
 				}
 				player.setIdentity(player.name);
 				player.node.identity.dataset.color=info[5];
-				bosslistlinks[cfg]=player;
+				// bosslistlinks[cfg]=player;
 				player.classList.add('bossplayer');
 
 				if(lib.storage.current==i){
@@ -112,9 +111,9 @@ mode.boss={
 					player.classList.add('highlight');
 				}
 
-				if(!get.config(cfg)){
-					player.style.display='none';
-				}
+				// if(!get.config(cfg)){
+				// 	player.style.display='none';
+				// }
 			}
 		}
 		if(!list.length){

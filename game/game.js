@@ -4833,7 +4833,6 @@
 						lib.onover.push(game.onover);
 						delete game.onover;
 					}
-					lib.config.current_mode=mode[lib.config.mode].config||[];
 					lib.config.banned=lib.config[lib.config.mode+'_banned']||[];
 					lib.config.bannedcards=lib.config[lib.config.mode+'_bannedcards']||[];
 
@@ -4887,14 +4886,6 @@
 										character[i][j][k][4].contains('hiddenboss')){
 										lib.config.forbidai.add(k);
 									}
-									// if(lib.config.banned.contains(k)&&lib.config.mode!='connect'){
-									// 	if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
-									// 		lib.hiddenCharacters.push(k);
-									// 	}
-									// 	else{
-									// 		continue;
-									// 	}
-									// }
 									for(var l=0;l<character[i][j][k][3].length;l++){
 										lib.skilllist.add(character[i][j][k][3][l]);
 									}
@@ -6163,14 +6154,6 @@
     									character[i][j][k][4].contains('hiddenboss')){
     									lib.config.forbidai.add(k);
     								}
-    								// if(lib.config.banned.contains(k)){
-    								// 	if(lib.config.mode=='chess'&&get.config('chess_mode')=='leader'){
-    								// 		lib.hiddenCharacters.push(k);
-    								// 	}
-    								// 	else{
-    								// 		continue;
-    								// 	}
-    								// }
     								for(var l=0;l<character[i][j][k][3].length;l++){
     									lib.skilllist.add(character[i][j][k][3][l]);
     								}
@@ -20756,7 +20739,6 @@
                     lib.onover.push(game.onover);
                     delete game.onover;
                 }
-                lib.config.current_mode=mode[lib.config.mode].config||[];
                 lib.config.banned=lib.config[lib.config.mode+'_banned']||[];
                 lib.config.bannedcards=lib.config[lib.config.mode+'_bannedcards']||[];
 

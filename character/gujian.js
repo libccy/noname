@@ -1586,7 +1586,7 @@ character.gujian={
 		gjqt_aruan:'阿阮',
 
         zuiji:'醉饮',
-        zuiji_info:'出牌阶段，你可以将一张手牌或装备牌当酒使用',
+        zuiji_info:'出牌阶段，你可以将一张手牌或装备牌当作酒使用',
 		manwu:'曼舞',
 		manwu_info:'在一名角色的回合结束阶段，若其手牌数为全场最少或之一，你可以令其摸一张牌',
 		xfanghua:'芳华',
