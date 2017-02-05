@@ -3332,8 +3332,7 @@ mode.versus={
                 }
                 if(event.cards2.length){
 					player.line(event.target,'green');
-					game.log(event.target,'获得了',event.cards2);
-                    event.target.gain(event.cards2,'gain2');
+                    event.target.gain(event.cards2,'gain2','log');
                 }
             },
             ai:{

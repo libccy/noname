@@ -5617,8 +5617,7 @@ character.yijiang={
 					game.delay();
 				}
 				else{
-					event.target.gain(cards,'gain2');
-					game.log(event.target,'获得了',card);
+					event.target.gain(cards,'gain2','log');
 				}
 				"step 3"
 				switch(event.effect){
@@ -6979,9 +6978,8 @@ character.yijiang={
 				"step 3"
 				game.broadcastAll('closeDialog',event.videoId);
 				var cards2=event.cards2;
-				player.gain(cards2);
+				player.gain(cards2,'log');
 				player.$draw(cards2);
-				game.log(player,'获得了',cards2)
 				game.delay();
 			},
 			ai:{

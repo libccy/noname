@@ -1592,9 +1592,8 @@ character.xianjian={
 				}
 				if(cards.length){
 					var card=cards.randomGet();
-					player.gain(card);
+					player.gain(card,'log');
 					player.$gain2(card);
-					game.log(player,'获得了',card);
 					player.addTempSkill('jubao2','phaseAfter');
 				}
 			},

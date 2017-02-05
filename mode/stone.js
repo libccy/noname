@@ -2188,8 +2188,7 @@ mode.stone={
 			content:function(){
 				'step 0'
 				event.card=player.getDeckCards()[0];
-				player.gain(event.card,'gain2');
-				game.log(player,'获得了',event.card);
+				player.gain(event.card,'gain2','log');
 				'step 1'
 				var num=lib.card[event.card.name].stoneact;
 				if(num&&typeof num=='number'){
