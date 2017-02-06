@@ -33334,7 +33334,8 @@
 				default:{
 					if(typeof type=='string'){
                         type=type.replace(/#/g,content);
-                        type=type.replace(/\$/g,get.cnNumber(content));
+						type=type.replace(/&/g,get.cnNumber(content));
+                        type=type.replace(/\$/g,get.translation(content));
 						return type;
 					}
 					else if(typeof type=='function'){
@@ -33589,26 +33590,30 @@
 				if(typeof info.mark=='function'){
 					var stint=info.mark(uiintro,player.storage[node.skill],player);
 					if(stint){
-						if(stint.length<=100){
-							uiintro.add('<div class="text center">'+stint+'</div>');
-						}
-						else{
-							uiintro.add('<div class="text">'+stint+'</div>');
-						}
+						uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+stint+'</div>');
+						// if(stint.length<=100){
+						// 	uiintro.add('<div class="text center">'+stint+'</div>');
+						// }
+						// else{
+						// 	uiintro.add('<div class="text">'+stint+'</div>');
+						// }
 					}
 				}
 				else{
 					var stint=get.storageintro(info.content,player.storage[node.skill],player,uiintro,node.skill);
 					if(stint){
-						if(stint[0]=='$'){
+						if(stint[0]=='@'){
 							uiintro.add('<div class="caption">'+stint.slice(1)+'</div>');
 						}
-						else if(stint.length<=100){
-							uiintro.add('<div class="text center">'+stint+'</div>');
-						}
 						else{
-							uiintro.add('<div class="text">'+stint+'</div>');
+							uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+stint+'</div>');
 						}
+						// else if(stint.length<=100){
+						// 	uiintro.add('<div class="text center">'+stint+'</div>');
+						// }
+						// else{
+						// 	uiintro.add('<div class="text">'+stint+'</div>');
+						// }
 					}
 				}
 				uiintro.add(ui.create.div('.placeholder.slim'));

@@ -114,12 +114,33 @@ card.gujian={
         heilonglinpian:{
             fullskin:true,
             type:'trick',
+            enable:true,
+            filterTarget:function(card,player,target){
+                return target==player;
+            },
+            selectTarget:-1,
+            modTarget:true,
+            content:function(){
+                target.changeHujia();
+                target.addTempSkill('heilonglinpian',{player:'phaseBegin'});
+            },
+            ai:{
+                value:[5.5,1],
+                useful:1,
+                order:2,
+                result:{
+                    target:1
+                }
+            }
         },
         mutoumianju:{
             fullskin:true,
             type:'equip',
             subtype:'equip2',
-            skills:['mutoumianju_skill']
+            skills:['mutoumianju_skill'],
+            ai:{
+                equipValue:4
+            }
         },
         yuheng:{
             fullskin:true,
@@ -433,6 +454,18 @@ card.gujian={
         },
     },
     skill:{
+        heilonglinpian:{
+            mark:true,
+            marktext:'鳞',
+            intro:{
+                content:'计算其他角色与你的距离时始终+1'
+            },
+            mod:{
+                globalTo:function(from,to,distance){
+                    return distance+1
+                }
+            }
+        },
         mutoumianju_skill:{
 			enable:'chooseToUse',
 			filterCard:true,
@@ -678,8 +711,8 @@ card.gujian={
         mutoumianju_info:'你可以将一张手牌当作杀使用',
         mutoumianju_skill:'木杀',
         mutoumianju_skill_info:'你可以将一张手牌当作杀使用',
-        // heilonglinpian:'黑龙鳞片',
-        // heilonglinpian_info:'对自己使用，获得一点护甲，直到下一回合开始，计算其他角色与你的距离时始终+1',
+        heilonglinpian:'黑龙鳞片',
+        heilonglinpian_info:'对自己使用，获得一点护甲，直到下一回合开始，计算其他角色与你的距离时始终+1',
 
         // food:'食物',
         // chunbing:'春饼',
@@ -722,6 +755,7 @@ card.gujian={
 
         ['spade',7,'yuheng'],
         ['club',4,'mutoumianju'],
+        ['spade',2,'heilonglinpian'],
 
         ['diamond',6,'shujinsan'],
         ['spade',2,'shujinsan'],

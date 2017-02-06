@@ -154,9 +154,7 @@ character.xianjian={
 			},
 			mark:true,
 			intro:{
-				content:function(storage){
-					return '已累计摸'+storage+'次牌';
-				}
+				content:'已累计摸#次牌'
 			},
 			trigger:{player:'drawBegin'},
 			forced:true,
@@ -180,9 +178,7 @@ character.xianjian={
 			},
 			mark:true,
 			intro:{
-				content:function(storage){
-					return '已累计受到'+storage+'次伤害';
-				}
+				content:'已累计受到#次伤害'
 			},
 			trigger:{player:'damageBegin'},
 			filter:function(event,player){
@@ -210,9 +206,7 @@ character.xianjian={
 			},
 			mark:true,
 			intro:{
-				content:function(storage){
-					return '已累计造成'+storage+'次伤害';
-				}
+				content:'已累计造成#次伤害'
 			},
 			trigger:{source:'damageBegin'},
 			forced:true,
@@ -1510,11 +1504,11 @@ character.xianjian={
 					player.logSkill('changnian',target);
 					target.marks.changnian=target.markCharacter(player,{
 						name:'长念',
-						content:'$<div><div class="skill">【追思】</div><div>锁定技，结束阶段，你摸一张牌</div></div>'
+						content:'@<div><div class="skill">【追思】</div><div>锁定技，结束阶段，你摸一张牌</div></div>'
 					});
 					game.addVideo('markCharacter',target,{
 						name:'长念',
-						content:'$<div><div class="skill">【追思】</div><div>锁定技，结束阶段，你摸一张牌</div></div>',
+						content:'@<div><div class="skill">【追思】</div><div>锁定技，结束阶段，你摸一张牌</div></div>',
 						id:'changnian',
 						target:player.dataset.position
 					});

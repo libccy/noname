@@ -1369,9 +1369,7 @@ character.ow={
         bingqiang2:{
             mark:true,
             intro:{
-                content:function(storage){
-                    return '防御距离+'+storage;
-                }
+                content:'防御距离+#'
             },
             mod:{
 				globalTo:function(from,to,distance){
@@ -1382,9 +1380,7 @@ character.ow={
         bingqiang3:{
             mark:true,
             intro:{
-                content:function(storage){
-                    return '防御距离-'+storage;
-                }
+                content:'防御距离-#'
             },
             mod:{
 				globalTo:function(from,to,distance){
@@ -1395,9 +1391,7 @@ character.ow={
         bingqiang4:{
             mark:true,
             intro:{
-                content:function(storage){
-                    return '进攻距离+'+storage;
-                }
+                content:'进攻距离+#'
             },
             mod:{
 				globalFrom:function(from,to,distance){
@@ -1408,9 +1402,7 @@ character.ow={
         bingqiang5:{
             mark:true,
             intro:{
-                content:function(storage){
-                    return '进攻距离-'+storage;
-                }
+                content:'进攻距离-#'
             },
             mod:{
 				globalFrom:function(from,to,distance){
@@ -1557,9 +1549,7 @@ character.ow={
                 player.storage.jijia2=0;
             },
             intro:{
-                content:function(storage){
-                    return '机甲体力值：'+storage;
-                }
+                content:'机甲体力值：#'
             },
             mod:{
                 maxHandcard:function(player,num){
