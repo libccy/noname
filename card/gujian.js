@@ -1,6 +1,29 @@
 'use strict';
 card.gujian={
     card:{
+        luyugeng:{
+            fullskin:true,
+            type:'food',
+            enable:true,
+            markimage:'-14%',
+            filterTarget:function(card,player,target){
+                return !target.hasSkill('luyugeng');
+            },
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.luyugeng=card;
+                target.storage.luyugeng_markcount=2;
+                target.addSkill('luyugeng');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:1
+                }
+            }
+        },
         jinlianzhu:{
             type:'trick',
 			fullskin:true,
@@ -32,16 +55,39 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
+            markimage:'-13%',
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('chunbing');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.chunbing=card;
+                target.storage.chunbing_markcount=5;
+                target.addSkill('chunbing');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        var num=target.needsToDiscard();
+                        if(num){
+                            if(target==player&&num>1){
+                                return num;
+                            }
+                            return Math.sqrt(num);
+                        }
+                        return 0;
+                    }
+                }
+            }
         },
         gudonggeng:{
             fullskin:true,
             type:'food',
             enable:true,
+            markimage:'-18%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('gudonggeng');
             },
@@ -82,8 +128,8 @@ card.gujian={
                 value:4,
                 result:{
                     target:function(player,target){
-                        if(player==target&&target.isLeastHp()) return 2;
-                        if(target.isLeastHp()) return 1.5;
+                        if(player==target&&target.isLowestHp()) return 2;
+                        if(target.isLowestHp()) return 1.5;
                         return 1/Math.max(1,target.hp);
                     }
                 }
@@ -93,21 +139,60 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
+            markimage:'-16%',
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('mizhilianou');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.mizhilianou=card;
+                target.storage.mizhilianou_markcount=3;
+                target.addSkill('mizhilianou');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        if(target==player){
+                            if(target.num('he',{suit:'heart'})){
+                                if(target.isDamaged()) return 1.5;
+                            }
+                            else{
+                                return 0.2;
+                            }
+                        }
+                        else if(target.isDamaged()){
+                            return 1;
+                        }
+                        return 0.5;
+                    }
+                }
+            }
         },
         xiajiao:{
             fullskin:true,
             type:'food',
             enable:true,
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('xiajiao');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.xiajiao=card;
+                target.storage.xiajiao_markcount=3;
+                target.addSkill('xiajiao');
+                target.addTempSkill('xiajiao3','phaseAfter');
+            },
+            ai:{
+                order:2,
+                value:5,
+                result:{
+                    target:1
+                }
+            }
         },
         tanhuadong:{
             fullskin:true,
@@ -135,6 +220,7 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
+            markimage:'-18%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('mapodoufu');
             },
@@ -159,6 +245,7 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
+            markimage:'-16%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('qingtuan');
             },
@@ -192,6 +279,7 @@ card.gujian={
             fullskin:true,
             type:'food',
             enable:true,
+            markimage:'-16%',
             filterTarget:function(card,player,target){
                 return !target.hasSkill('yougeng');
             },
@@ -208,7 +296,7 @@ card.gujian={
                 result:{
                     target:function(player,target){
                         if(target.isHealthy()) return player.needsToDiscard?0.1:0;
-                        if(target.isLeastHp()) return 1.5;
+                        if(target.isLowestHp()) return 1.5;
                         return 1/Math.max(1,target.hp);
                     }
                 }
@@ -815,6 +903,152 @@ card.gujian={
         },
     },
     skill:{
+        luyugeng:{
+            mark:'card',
+            trigger:{player:'phaseBegin'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '准备阶段，你对一名体力值全场最高的随机敌人造成一点雷属性伤害（剩余'+player.storage.luyugeng_markcount+'回合）'
+                }
+            },
+            content:function(){
+                var list=player.getEnemies();
+                for(var i=0;i<list.length;i++){
+                    if(!list[i].isHighestHp()){
+                        list.splice(i--,1);
+                    }
+                }
+                if(list.length){
+                    var target=list.randomGet();
+                    player.logSkill('luyugeng',target,'thunder');
+                    target.damage('thunder');
+                }
+                player.storage.luyugeng_markcount--;
+                if(player.storage.luyugeng_markcount==0){
+                    delete player.storage.luyugeng;
+                    delete player.storage.luyugeng_markcount;
+                    player.removeSkill('luyugeng');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+        },
+        xiajiao:{
+            mark:'card',
+            trigger:{player:['phaseUseBefore','phaseEnd']},
+            direct:true,
+            nopop:true,
+            filter:function(event,player){
+                return !player.hasSkill('xiajiao3');
+            },
+            intro:{
+                content:function(storage,player){
+                    return '你在摸牌阶段额外摸一张牌，并在摸牌阶段时弃置一张牌（剩余'+player.storage.xiajiao_markcount+'回合）'
+                }
+            },
+            content:function(){
+                player.storage.xiajiao_markcount--;
+                if(player.storage.xiajiao_markcount==0){
+                    delete player.storage.xiajiao;
+                    delete player.storage.xiajiao_markcount;
+                    player.removeSkill('xiajiao');
+                }
+                else{
+                    player.updateMarks();
+                }
+                player.addTempSkill('xiajiao3','phaseAfter');
+            },
+            group:'xiajiao_draw',
+            subSkill:{
+                draw:{
+                    trigger:{player:'phaseDrawBegin'},
+                    forced:true,
+                    content:function(){
+                        trigger.num++;
+                        player.addTempSkill('xiajiao2','phaseAfter');
+                    }
+                }
+            }
+        },
+        xiajiao2:{
+            trigger:{player:'phaseDrawAfter'},
+            forced:true,
+            popup:false,
+            silent:true,
+            content:function(){
+                player.chooseToDiscard('he',true);
+            }
+        },
+        xiajiao3:{},
+        mizhilianou:{
+            mark:'card',
+            trigger:{player:'phaseAfter'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '你可以将一张红桃牌当作桃使用（剩余'+player.storage.mizhilianou_markcount+'回合）'
+                }
+            },
+            content:function(){
+                player.storage.mizhilianou_markcount--;
+                if(player.storage.mizhilianou_markcount==0){
+                    delete player.storage.mizhilianou;
+                    delete player.storage.mizhilianou_markcount;
+                    player.removeSkill('mizhilianou');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+            group:'mizhilianou_use',
+            subSkill:{
+                use:{
+                    enable:'chooseToUse',
+        			filterCard:{suit:'heart'},
+        			position:'he',
+        			viewAs:{name:'tao'},
+        			prompt:'将一张红桃牌当桃使用',
+        			check:function(card){return 10-ai.get.value(card)},
+        			ai:{
+        				skillTagFilter:function(player){
+        					return player.num('he',{suit:'heart'})>0;
+        				},
+        				save:true,
+        			}
+                }
+            }
+        },
+        chunbing:{
+            mark:'card',
+            trigger:{player:'phaseAfter'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '你的手牌上限+1（剩余'+player.storage.chunbing_markcount+'回合）'
+                }
+            },
+            mod:{
+				maxHandcard:function(player,num){
+					return num+1;
+				}
+			},
+            content:function(){
+                player.storage.chunbing_markcount--;
+                if(player.storage.chunbing_markcount==0){
+                    delete player.storage.chunbing;
+                    delete player.storage.chunbing_markcount;
+                    player.removeSkill('chunbing');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+        },
         gudonggeng:{
             mark:'card',
             trigger:{player:'phaseBegin'},
@@ -904,7 +1138,7 @@ card.gujian={
                 }
             },
             content:function(){
-                if(player.isLeastHp()){
+                if(player.isLowestHp()){
                     player.logSkill('liyutang');
                     player.changeHujia();
                 }
@@ -930,7 +1164,7 @@ card.gujian={
                 }
             },
             content:function(){
-                if(player.isDamaged()&&player.isLeastHp()){
+                if(player.isDamaged()&&player.isLowestHp()){
                     player.logSkill('yougeng');
                     player.recover();
                 }
@@ -1372,24 +1606,24 @@ card.gujian={
         heilonglinpian_info:'对自己使用，获得一点护甲，直到下一回合开始，你的防御距离+1',
 
         food:'食物',
-        // chunbing:'春饼',
-        // chunbing_info:'春饼',
+        chunbing:'春饼',
+        chunbing_info:'你的手牌上限+1，持续五回合',
         gudonggeng:'骨董羹',
         gudonggeng_info:'你受到杀造成的伤害时有50%的机率令伤害-1，持续三回合',
         yougeng:'酉羹',
         yougeng_info:'准备阶段，若你的体力值为全场最少或之一，你回复一点体力，持续两回合',
         liyutang:'鲤鱼汤',
         liyutang_info:'结束阶段，若你的体力值为全场最少或之一，你获得一点护甲，持续两回合',
-        // mizhilianou:'蜜汁藕',
-        // mizhilianou_info:'蜜汁藕',
-        // xiajiao:'虾饺',
-        // xiajiao_info:'虾饺',
+        mizhilianou:'蜜汁藕',
+        mizhilianou_info:'你可以将一张红桃牌当作桃使用，持续三回合',
+        xiajiao:'虾饺',
+        xiajiao_info:'你在摸牌阶段额外摸一张牌，并在摸牌阶段时弃置一张牌，持续三回合',
         tanhuadong:'昙花冻',
         tanhuadong_info:'结束阶段，你有50%的机率摸一张牌，持续三回合',
         qingtuan:'青团',
         qingtuan_info:'你在回合内使用首张杀时摸一张牌，持续两回合',
-        // luyugeng:'鲈鱼羹',
-        // luyugeng_info:'鲈鱼羹',
+        luyugeng:'鲈鱼羹',
+        luyugeng_info:'准备阶段，你对一名体力值全场最高的随机敌人造成一点雷属性伤害，持续两回合',
         yuanbaorou:'元宝肉',
         yuanbaorou_info:'你在出牌阶段可以额外使用一张杀，持续三回合',
         molicha:'茉莉茶',

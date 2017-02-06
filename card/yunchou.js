@@ -430,13 +430,13 @@ card.yunchou={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				return (target.isLeastHp()&&target.isDamaged())||target.isLeastHandcard();
+				return (target.isLowestHp()&&target.isDamaged())||target.isFewestHandcard();
 			},
 			content:function(){
 				'step 0'
-				if(target.isLeastHandcard()) target.draw(2);
+				if(target.isFewestHandcard()) target.draw(2);
 				'step 1'
-				if(target.isLeastHp()) target.recover();
+				if(target.isLowestHp()) target.recover();
 			},
 			ai:{
 				order:2,
@@ -444,7 +444,7 @@ card.yunchou={
 				result:{
 					target:function(player,target){
 						var num=0;
-						if(target.isLeastHp()&&ai.get.recoverEffect(target)>0){
+						if(target.isLowestHp()&&ai.get.recoverEffect(target)>0){
 							if(target.hp==1){
 								num+=3;
 							}
@@ -452,7 +452,7 @@ card.yunchou={
 								num+=2;
 							}
 						}
-						if(target.isLeastHandcard()){
+						if(target.isFewestHandcard()){
 							num+=2;
 						}
 						return num;

@@ -12082,6 +12082,9 @@
 							node=name.copy('mark',this.node.marks);
 							node.suit=name.suit;
 							node.number=name.number;
+							if(name.name&&lib.card[name.name]&&lib.card[name.name].markimage){
+								node.node.image.style.left=lib.card[name.name].markimage;
+							}
 							name=name.name;
 						}
 						else{
@@ -12695,7 +12698,18 @@
                 isHealthy:function(){
                     return this.hp==this.maxHp;
                 },
-				isLeastHp:function(equal){
+				isHighestHp:function(equal){
+					for(var i=0;i<game.players.length;i++){
+						if(equal){
+							if(game.players[i].hp>=this.hp) return false;
+						}
+						else{
+							if(game.players[i].hp>this.hp) return false;
+						}
+					}
+					return true;
+				},
+				isLowestHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
 						if(equal){
 							if(game.players[i].hp<=this.hp) return false;
@@ -12706,7 +12720,19 @@
 					}
 					return true;
 				},
-				isLeastHandcard:function(equal){
+				isMostHandcard:function(equal){
+					var nh=this.num('h');
+					for(var i=0;i<game.players.length;i++){
+						if(equal){
+							if(game.players[i].num('h')>=nh) return false;
+						}
+						else{
+							if(game.players[i].num('h')>nh) return false;
+						}
+					}
+					return true;
+				},
+				isFewestHandcard:function(equal){
 					var nh=this.num('h');
 					for(var i=0;i<game.players.length;i++){
 						if(equal){
