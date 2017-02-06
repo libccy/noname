@@ -18,6 +18,7 @@ character.old={
         old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
         old_caozhen:['male','wei',4,['sidi']],
         old_quancong:['male','wu',4,['zhenshan']],
+        old_yuanshu:['male','qun',4,['yongsi','weidi']],
     },
     skill:{
         zhenshan:{
@@ -426,6 +427,7 @@ character.old={
 		},
     },
     translate:{
+        old_yuanshu:'旧袁术',
         old_xusheng:'旧徐盛',
         old_lingtong:'旧凌统',
         old_zhuran:'旧朱然',

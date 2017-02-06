@@ -5993,7 +5993,7 @@
 			draw_card:'摸牌',
             discard_card:'弃牌',
 			take_damage:'受伤害',
-			reset_character:'重置武将牌',
+			reset_character:'复原武将牌',
 			recover_hp:'回复体力',
 			lose_hp:'流失体力',
 			get_damage:'受伤害',
@@ -15738,7 +15738,7 @@
 			_chongzhu:{
 				enable:'phaseUse',
                 logv:false,
-				prompt:'将要重铸的牌置于弃牌堆并摸一张牌',
+				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
 				filter:function(event,player){
 					return (player.num('h',function(card){
                         var info=get.info(card);

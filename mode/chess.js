@@ -5169,7 +5169,7 @@ mode.chess={
 		leader_mouduan_info:'其他友方角色回合内的行动范围+1',
 
 		tongshuai:'统率',
-		tongshuai_info:'回合开始和结束阶段，你可以选择一名未上场的已方武将的一个技能作为你的技能',
+		tongshuai_info:'准备阶段和结束阶段，你可以选择一名未上场的已方武将的一个技能作为你的技能',
 		leader_zhaoxiang:'招降',
 		leader_zhaoxiang_info:'出牌阶段限一次，你可以尝试对相邻敌方武将进行招降，若成功，你获得该武将并立即结束本局游戏，若失败，你受到一点伤害。每发动一次消耗10招募令',
 
@@ -5190,9 +5190,9 @@ mode.chess={
 		arenaAdd_info:'出牌阶段限一次，你可以令一名未出场的已方角色加入战场。战斗结束后，该角色无论是否存活均不能再次出场',
 
 		pianyi:'翩仪',
-		pianyi_info:'回合结束阶段，若你没有于本回合内造成伤害，你获得一次移动机会',
+		pianyi_info:'结束阶段，若你没有于本回合内造成伤害，你获得一次移动机会',
 		lingdong:'灵动',
-		lingdong_info:'回合结束阶段，你可以移动X个格，X为你回合内出杀的次数',
+		lingdong_info:'结束阶段，你可以移动X个格，X为你回合内出杀的次数',
 		lianshe:'箭舞',
 		lianshe_info:'当你于一个回合中首次使用杀时，你可以摸一张牌；在你的回合内，每当你使用一张不是杀的牌，你可以额外使用一张杀',
 		zhiming:'穿杨',
@@ -5203,10 +5203,10 @@ mode.chess={
 		guanchuan_info:'当你使用杀指定惟一的目标后，可将攻击射线内的其他角色也加入目标',
 
 		boss_stoneqiangzheng:'强征',
-		boss_stoneqiangzheng_info:'锁定技，回合结束阶段，你获得每个其他角色的一张手牌',
+		boss_stoneqiangzheng_info:'锁定技，结束阶段，你获得每个其他角色的一张手牌',
 		boss_stonebaolin:'暴凌',
 		boss_moyan:'魔焰',
-		boss_moyan_info:'锁定技，回合结束阶段，你对场上所有角色造成一点火焰伤害',
+		boss_moyan_info:'锁定技，结束阶段，你对场上所有角色造成一点火焰伤害',
 
 		cangming:'颠动沧溟',
 		cangming_info:'出牌阶段限一次，你可弃置四张花色不同的手牌并将武将牌翻至背面，然后令所有其他角色进入混乱状态直到你的下一回合开始',
@@ -5217,7 +5217,7 @@ mode.chess={
 		boss_tenglong:'腾龙八齐',
 		boss_tenglong_info:'你没有装备区；出牌阶段限一次，你可以弃置一张装备牌对一名距离你2以内的其他角色造成3点火焰伤害',
 		boss_wushang:'神天并地',
-		boss_wushang_info:'锁定技，回合开始阶段，距离你5以内的所有其他角色需交给你一张手牌',
+		boss_wushang_info:'锁定技，准备阶段，距离你5以内的所有其他角色需交给你一张手牌',
 		boss_wuying:'无影',
 		boss_wuying_info:'锁定技，你回合内的移动距离-1；计算其他角色与你的距离时始终+2',
 

@@ -412,7 +412,7 @@ mode.brawl={
         daozhiyueying:{
             name:'导师月英',
             mode:'identity',
-            intro:'牌堆中所有非延时锦囊牌数量翻倍；移除拥有集智技能的角色',
+            intro:'牌堆中所有通常锦囊牌数量翻倍；移除拥有集智技能的角色',
             showcase:function(init){
                 var node=this;
                 var player1,player2;

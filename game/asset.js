@@ -465,6 +465,7 @@ window.noname_asset_list=[
     'image/character/old_quancong.jpg',
     'image/character/old_wangyi.jpg',
     'image/character/old_xusheng.jpg',
+    'image/character/old_yuanshu.jpg',
     'image/character/old_zhonghui.jpg',
     'image/character/old_zhuran.jpg',
     'image/character/ow_liekong.jpg',

@@ -6831,7 +6831,7 @@ mode.stone={
 			forced:true,
 			mark:true,
 			intro:{
-				content:'在你的下一回合开始时，令所有友方随从增加一点体力和体力上限并摸一张牌'
+				content:'在你的下一准备阶段，令所有友方随从增加一点体力和体力上限并摸一张牌'
 			},
 			content:function(){
 				player.removeSkill('paladin_zhengqianghaosheng');
@@ -6850,7 +6850,7 @@ mode.stone={
 			mark:true,
 			intro:{
 				content:function(storage){
-					return '回合开始阶段，'+get.translation(storage)+'从牌库中获得一张牌';
+					return '准备阶段，'+get.translation(storage)+'从牌库中获得一张牌';
 				}
 			},
 			filter:function(event,player){
@@ -7038,7 +7038,7 @@ mode.stone={
 			},
 			mark:true,
 			intro:{
-				content:'回合开始阶段，摸三张牌'
+				content:'准备阶段，摸三张牌'
 			},
 			group:'shaman_shihuawuqi2'
 		},
@@ -9350,7 +9350,7 @@ mode.stone={
 		stone_shixu:'时序',
 		stone_shixu_info:'你出场的回合内，己方主将获得4点行动值',
 		stone_chenshui:'沉睡',
-		stone_chenshui_info:'在你的回合结束阶段，令己方主将获得一张梦境牌',
+		stone_chenshui_info:'在你的结束阶段，令己方主将获得一张梦境牌',
 		stone_mowang:'魔网',
 		stone_mowang_info:'己方法术对主将伤害+2，对随从伤害+4',
 
@@ -9585,11 +9585,11 @@ mode.stone={
 		spell_yongshizhufu_info:'令一名随从的手牌数翻倍',
 		spell_zhengqianghaosheng:'争强好胜',
 		paladin_zhengqianghaosheng:'争强好胜',
-		paladin_zhengqianghaosheng_info:'在你的下一回合开始时，令所有友方随从增加一点体力和体力上限并摸一张牌',
-		spell_zhengqianghaosheng_info:'在你的下一回合开始时，令所有友方随从增加一点体力和体力上限并摸一张牌',
+		paladin_zhengqianghaosheng_info:'在你的下一准备阶段，令所有友方随从增加一点体力和体力上限并摸一张牌',
+		spell_zhengqianghaosheng_info:'在你的下一准备阶段，令所有友方随从增加一点体力和体力上限并摸一张牌',
 		spell_zhihuizhufu:'智慧祝福',
 		paladin_zhihuizhufu:'智慧祝福',
-		spell_zhihuizhufu_info:'选择一名随从，每当其回合开始时，你从牌库中获得一张牌',
+		spell_zhihuizhufu_info:'选择一名随从，在其每个准备阶段，你从牌库中获得一张牌',
 
 		spell_fengnu:'风怒',
 		shaman_fengnu:'风怒',
@@ -9599,8 +9599,8 @@ mode.stone={
 		spell_rongyanbaolie_info:'造成三点火焰伤害，流失一点体力',
 		spell_shihuawuqi:'石化武器',
 		shaman_shihuawuqi:'充能',
-		shaman_shihuawuqi_info:'回合开始阶段，你摸三张牌',
-		spell_shihuawuqi_info:'令一名友方随从获得技能充能（回合开始阶段，你摸三张牌），直到你的下一回合开始',
+		shaman_shihuawuqi_info:'准备阶段，你摸三张牌',
+		spell_shihuawuqi_info:'令一名友方随从获得技能充能（准备阶段，你摸三张牌），直到你的下一回合开始',
 		spell_xianzuzhaohuan:'先祖召唤',
 		spell_xianzuzhaohuan_info:'双方各将手牌中的一张随机随从牌置入战场',
 		spell_xianzuzhihun:'先祖之魂',
@@ -9686,7 +9686,7 @@ mode.stone={
 		priest_suoxiao:'缩小',
 		priest_suoxiao_info:'你出场时，己方主将可令一名其他随从减少两点体力上限（不能小于1)',
 		priest_shengshui:'圣水',
-		priest_shengshui_info:'你跳过摸牌阶段；在你的回合开始阶段，令一名随机友方角色回复两点体力',
+		priest_shengshui_info:'你跳过摸牌阶段；在你的准备阶段，令一名随机友方角色回复两点体力',
 		priest_muguang:'暮光',
 		priest_muguang_info:'你出场时，若主将手牌中有随从牌，则增加一点体力和体力上限',
 		priest_shixin:'蚀心',
@@ -9723,7 +9723,7 @@ mode.stone={
 		rogue_duxing:'独行',
 		rogue_duxing_info:'每当敌方主将召唤一名随从，便获得潜行',
 		rogue_shoudao:'授道',
-		rogue_shoudao_info:'在己方主将的回合结束阶段，令一名随机友方随从增加一点体力和体力上限并摸一张牌',
+		rogue_shoudao_info:'在己方主将的结束阶段，令一名随机友方随从增加一点体力和体力上限并摸一张牌',
 		rogue_lifa:'理发',
 		rogue_lifa_info:'为己方主将装备一把武器，若已有武器，改为对敌方主将造成一点伤害',
 		rogue_fusheng:'复生',
@@ -9762,7 +9762,7 @@ mode.stone={
 		stone_zhifuzhe:'掷斧者',
 
 		warrior_heiyao:'黑曜',
-		warrior_heiyao_info:'在己方主将的回合结束阶段，召唤一只圣甲虫',
+		warrior_heiyao_info:'在己方主将的结束阶段，召唤一只圣甲虫',
 		warrior_peilian:'陪练',
 		warrior_peilian_info:'你出场时，己方主将可令一名其他随从获得嘲讽',
 		warrior_fenyong:'奋勇',
@@ -10014,15 +10014,15 @@ mode.stone={
 		shaman_huoshe_info:'其他友方随从造成的伤害始终+1',
 
 		shaman_jili:'激励',
-		shaman_jili_info:'己方主将回合结束时，所有友方图腾摸一张牌',
+		shaman_jili_info:'己方主将的结束阶段，所有友方图腾摸一张牌',
 		shaman_tuteng:'图腾',
 		shaman_tuteng_info:'你跳过摸牌阶段',
 		shaman_fali:'空气',
-		shaman_fali_info:'已方主将的回合结束阶段，令所有手牌数不大于1的友方随从摸一张牌',
+		shaman_fali_info:'已方主将的结束阶段，令所有手牌数不大于1的友方随从摸一张牌',
 		shaman_zhiliao:'治疗',
-		shaman_zhiliao_info:'在你的回合结束阶段，令所有友方随从回复一点体力',
+		shaman_zhiliao_info:'在你的结束阶段，令所有友方随从回复一点体力',
 		shaman_zhuore:'灼热',
-		shaman_zhuore_info:'已方主将的回合结束阶段，对一名随机敌方随从造成一点伤害',
+		shaman_zhuore_info:'已方主将的结束阶段，对一名随机敌方随从造成一点伤害',
 
 		_shaman_skill:'图腾',
 		_shaman_skill_info:'召唤一个随机图腾',
@@ -10068,7 +10068,7 @@ mode.stone={
 		stone_kutongsiseng:'苦痛侍僧',
 		stone_kutongsiseng1:'苦痛',
 		stone_kutongsiseng2:'苦痛',
-		stone_kutongsiseng1_info:'你出场时，己方主将于本回合结束阶段摸一张牌',
+		stone_kutongsiseng1_info:'你出场时，己方主将于本结束阶段摸一张牌',
 		stone_yuanguanying:'远古暗影',
 		stone_yuanguanying1:'暗影',
 		stone_yuanguanying1_info:'你出场时，己方主将可视为对一名敌方角色使用一张杀',
@@ -10096,7 +10096,7 @@ mode.stone={
 
 		stone_fennuxiaoji:'愤怒小鸡',
 		stone_fennuxiaoji1:'暴怒',
-		stone_fennuxiaoji1_info:'回合开始阶段，若你没有手牌，你摸两张牌',
+		stone_fennuxiaoji1_info:'准备阶段，若你没有手牌，你摸两张牌',
 		stone_juxingchanchu:'巨型蟾蜍',
 		stone_juxingchanchu1:'毒液',
 		stone_juxingchanchu1_info:'你死亡时，己方主将可令一名敌方随从失去1点体力',
@@ -10111,7 +10111,7 @@ mode.stone={
 		stone_mingguangjisi:'明光祭司',
 		stone_nianqingjisi:'年轻祭司',
 		stone_zhufu:'祝福',
-		stone_zhufu_info:'己方主将的回合结束阶段，你令一名随机的受伤友方随从回复一点体力',
+		stone_zhufu_info:'己方主将的结束阶段，你令一名随机的受伤友方随从回复一点体力',
 		stone_aomishouwei:'奥秘守卫',
 		stone_yanjingshe:'眼镜蛇',
 		stone_yanjingshe1:'毒噬',
@@ -10124,7 +10124,7 @@ mode.stone={
 		stone_mafengzhuru1_info:'杀死你的随从失去一点体力',
 		stone_fatiaozhuru:'发条侏儒',
 		stone_fatiaozhuru1:'发条',
-		stone_fatiaozhuru1_info:'回合结束阶段，若你没有手牌，你摸两张牌',
+		stone_fatiaozhuru1_info:'结束阶段，若你没有手牌，你摸两张牌',
 
 		stonesha:'进攻',
 		stonesha_info:'锁定技，你的装备牌均视为杀',
@@ -10198,8 +10198,8 @@ mode.stone={
 		'<li>德鲁伊：视为使用一张不计入出杀次数的杀</ul>'+
 		'<div style="margin:10px">怒气值</div><ul style="margin-top:0"><li>每当友方随从受到伤害获得3点怒气值，主将受到伤害获得6点怒气值'+
 		'<li>每有一个友方随从死亡，获得10点怒气值，主将死亡获得20点怒气值'+
-		'<li>回合结束阶段，若己方随从数少于对方会获得10X点怒气值，X为随从数之差'+
-		'<li>怒气值达到100时不再增加。回合开始阶段，若怒气值己满，可消耗全部怒气值和4点行动值并召唤一名传说随从</ul>'+
+		'<li>结束阶段，若己方随从数少于对方会获得10X点怒气值，X为随从数之差'+
+		'<li>怒气值达到100时不再增加。准备阶段，若怒气值己满，可消耗全部怒气值和4点行动值并召唤一名传说随从</ul>'+
 		'<div style="margin:10px">战斗</div><ul style="margin-top:0"><li>场上有两名主将进行对抗，主将的体力上限+1'+
 		'<li>游戏牌堆移除了乐不思蜀等跳过出牌阶段以及包含翻面功能的卡牌'+
 		'<li>主将出牌阶段的出牌数量（行动值）有上限，从1开始递增，后手的首个回合有一点额外行动值，装备牌不计入出牌上限<li>游戏每进行一轮，主将的出牌上限+1，直到增加至6'+
