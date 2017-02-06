@@ -249,20 +249,20 @@ card.yunchou={
 				'step 1'
 				if(!result.tie){
 					if(result.bool){
-						targets[0].discardPlayerCard(targets[1],true);
+						targets[0].gainPlayerCard(targets[1],true);
 						targets[0].line(targets[1]);
 					}
 					else{
-						targets[1].discardPlayerCard(targets[0],true);
+						targets[1].gainPlayerCard(targets[0],true);
 						targets[1].line(targets[0]);
 					}
 					event.finish();
 				}
 				'step 2'
-				targets[0].discardPlayerCard(player,true);
+				targets[0].discardPlayerCard(player);
 				targets[0].line(player);
 				'step 3'
-				targets[1].discardPlayerCard(player,true);
+				targets[1].discardPlayerCard(player);
 				targets[1].line(player);
 			},
 			selectTarget:2,
@@ -1199,7 +1199,7 @@ card.yunchou={
 		suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
 		suolianjia_bg:'链',
 		geanguanhuo:'隔岸观火',
-		geanguanhuo_info:'出牌阶段对两名其他角色使用，令目标拼点，赢的角色须弃置输的角色一张牌，若点数相同，目标各弃置你一张牌',
+		geanguanhuo_info:'出牌阶段对两名其他角色使用，令目标拼点，赢的角色获得另一方的一张牌；若点数相同，两名目标可分别弃置你一张牌',
 		toulianghuanzhu:'偷梁换柱',
 		toulianghuanzhu_info:'令一名角色获得另一名角色的两张手牌，然后还回两张手牌',
 		toulianghuanzhu_bg:'柱',

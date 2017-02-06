@@ -96,7 +96,11 @@
     display: none;
 }
 #arena.choose-character>.dialog .placeholder{
+    margin-bottom: 4px;
+}
+#arena.choose-character>.dialog.noupdate .placeholder{
     margin-bottom: 0;
+    height: 0;
 }
 #arena.choose-character>.dialog{
     height:calc(100% - 280px);

@@ -1,6 +1,33 @@
 'use strict';
 card.gujian={
     card:{
+        jinlianzhu:{
+            type:'trick',
+			fullskin:true,
+            filterTarget:true,
+            content:function(){
+                var evt=event.getParent(3)._trigger;
+                evt.untrigger();
+                evt.finish();
+                if(evt.source){
+                    evt.source.draw();
+                }
+            },
+            ai:{
+                order:1,
+                value:[5,1],
+                useful:[6,1],
+                result:{
+                    target:function(player,target){
+                        var evt=_status.event.getTrigger();
+                        var eff=ai.get.damageEffect(target,evt.source,target,evt.nature);
+                        if(eff>0) return -1;
+                        if(eff<0) return 2;
+                        return 0;
+                    }
+                }
+            }
+        },
         chunbing:{
             fullskin:true,
             type:'food',
@@ -249,7 +276,13 @@ card.gujian={
         bingpotong:{
             fullskin:true,
 			type:'jiguan',
-			enable:true,
+			enable:function(card,player){
+                if(player.hasSkill('bingpotong')&&player.storage.bingpotong.contains(card)){
+                    return false;
+                }
+                return true;
+            },
+            wuxieable:true,
 			filterTarget:function(card,player,target){
 				return target.num('h')>0;
 			},
@@ -295,20 +328,23 @@ card.gujian={
 						game.addVideo('deletenode',player,get.cardsInfo([clone]));
 					}
 					target.loseHp();
+                    event.finish();
 				}
 				else{
 					player.$gain2(event.card1);
-                    target.discard(event.card2).animate=false;
-					var clone=event.card2.clone;
-					if(clone){
-						clone.style.transition='all 0.5s';
-						clone.style.transform='scale(1.2)';
-						clone.delete();
-						game.addVideo('deletenode',target,get.cardsInfo([clone]));
-					}
+                    target.$gain2(event.card2);
+                    game.delay();
 				}
 				ui.arena.classList.remove('thrownhighlight');
 				game.addVideo('thrownhighlight2');
+                "step 4"
+                if(cards&&cards.length){
+                    player.gain(cards,'gain2');
+                    if(!player.hasSkill('bingpotong')){
+                        player.addSkill('bingpotong');
+                    }
+                    player.storage.bingpotong=player.storage.bingpotong.concat(cards);
+                }
 			},
 			ai:{
 				basic:{
@@ -345,6 +381,7 @@ card.gujian={
             type:'jiguan',
 			enable:true,
 			fullskin:true,
+            wuxieable:true,
 			filterTarget:function(card,player,target){
 				return get.distance(player,target)>1;
 			},
@@ -383,6 +420,51 @@ card.gujian={
             type:'jiguan',
 			enable:true,
 			fullskin:true,
+            wuxieable:true,
+            filterTarget:function(card,player,target){
+                return target!=player&&target.num('he')>0;
+            },
+            changeTarget:function(player,targets){
+				var target=targets[0];
+				for(var i=0;i<game.players.length;i++){
+					if(get.distance(target,game.players[i],'pure')==1&&game.players[i].num('he')){
+						targets.push(game.players[i]);
+					}
+				}
+			},
+            content:function(){
+                var he=target.get('he');
+                if(he.length){
+                    target.discard(he.randomGet()).delay=false;
+                }
+            },
+            contentAfter:function(){
+                game.delay(0.5);
+            },
+            ai:{
+                order:7,
+                tag:{
+                    loseCard:1,
+                    discard:1,
+                },
+                result:{
+                    player:function(player,target){
+                        var num=0;
+                        for(var i=0;i<game.players.length;i++){
+        					if(game.players[i]==target||(get.distance(target,game.players[i],'pure')==1&&game.players[i].num('he'))){
+        						var att=ai.get.attitude(player,game.players[i]);
+                                if(att>0){
+                                    num--;
+                                }
+                                else if(att<0){
+                                    num++;
+                                }
+        					}
+        				}
+                        return num;
+                    }
+                }
+            }
         },
         wenhuangsan:{
             type:'jiguan',
@@ -413,11 +495,116 @@ card.gujian={
             type:'jiguan',
 			enable:true,
 			fullskin:true,
+            filterTarget:true,
+            wuxieable:true,
+            content:function(){
+                var list=[1,2,3,4,5,6];
+                if(player.getEnemies().contains(target)){
+                    if(target.num('he')==0){
+                        list.remove(1);
+                    }
+                    if(target.isLinked()){
+                        list.remove(4);
+                    }
+                    if(target.hasSkill('fengyin')){
+                        list.remove(5);
+                    }
+                    switch(list.randomGet()){
+                        case 1:target.discard(target.get('he').randomGet());break;
+                        case 2:target.loseHp();break;
+                        case 3:target.damage();break;
+                        case 4:if(!target.isLinked()) target.link();break;
+                        case 5:target.addTempSkill('fengyin',{player:'phaseAfter'});break;
+                        case 6:{
+                            var list=[];
+            				for(var i=0;i<lib.inpile.length;i++){
+            					var info=lib.card[lib.inpile[i]];
+            					if(info.type=='delay'&&!info.cancel&&!target.hasJudge(lib.inpile[i])){
+            						list.push(lib.inpile[i]);
+            					}
+            				}
+            				if(list.length){
+            					var card=game.createCard(list.randomGet());
+            					target.addJudge(card);
+            					target.$draw(card);
+            					game.delay();
+            				}
+                            break;
+                        }
+                    }
+                }
+                else{
+                    if(target.isHealthy()){
+                        list.remove(2);
+                    }
+                    if(!target.num('j')){
+                        list.remove(5);
+                    }
+                    if(!target.isLinked()&&!target.isTurnedOver()){
+                        list.remove(6);
+                    }
+                    if(target.hasSkill('qianxing')){
+                        list.remove(4);
+                    }
+                    switch(list.randomGet()){
+                        case 1:target.draw();break;
+                        case 2:target.recover();break;
+                        case 3:target.changeHujia();break;
+                        case 4:target.addTempSkill('qianxing',{player:'phaseBegin'});break;
+                        case 5:target.discard(target,get('j'));break;
+                        case 6:{
+                            if(target.isLinked()) target.link();
+                            if(target.isTurnedOver()) target.turnOver();
+                            break;
+                        }
+                    }
+                }
+            },
+            ai:{
+                order:4,
+                value:5,
+                result:{
+                    player:function(player,target){
+                        if(ai.get.attitude(player,target)==0) return 0;
+                        return 1;
+                    }
+                }
+            }
         },
         liufengsan:{
-            type:'jiguan',
+            type:'trick',
 			enable:true,
 			fullskin:true,
+            filterTarget:true,
+            content:function(){
+                var list=[];
+                for(var i=0;i<2;i++){
+                    list.push(game.createCard('shan','red'));
+                }
+                target.gain(list,'gain2');
+            },
+            ai:{
+                order:1,
+                result:{
+                    target:function(player,target){
+                        if(target==player){
+                            if(!target.hasShan()) return 2;
+                            var num=target.needsToDiscard(2);
+                            if(num==0) return 1.5;
+                            if(num==1) return 1;
+                            return 0.5;
+                        }
+                        else{
+                            switch(target.num('h')){
+                                case 0:return 2;
+                                case 1:return 1.5;
+                                case 2:return 1;
+                                default:return 0.5;
+                            }
+                        }
+                    }
+                }
+            }
         },
         shihuifen:{
             type:'trick',
@@ -447,13 +634,21 @@ card.gujian={
                 }
             }
         },
-        jinlianzhu:{
-            type:'jiguan',
-			enable:true,
-			fullskin:true,
-        },
     },
     skill:{
+        bingpotong:{
+            trigger:{player:'phaseAfter'},
+            forced:true,
+            popup:false,
+            silent:true,
+            onremove:true,
+            init:function(player){
+                player.storage.bingpotong=[];
+            },
+            content:function(){
+                player.removeSkill('bingpotong');
+            }
+        },
         heilonglinpian:{
             mark:true,
             marktext:'鳞',
@@ -656,34 +851,50 @@ card.gujian={
 				},trigger.player,-1).targetRequired=true;
 			}
 		},
+        _jinlianzhu:{
+			trigger:{global:'damageBefore'},
+			direct:true,
+			filter:function(event,player){
+				if(!lib.filter.targetEnabled({name:'jinlianzhu'},player,event.player)) return false;
+				return player.hasCard('jinlianzhu');
+			},
+			content:function(){
+				player.chooseToUse(get.prompt('jinlianzhu',trigger.player).replace(/发动/,'使用'),function(card,player){
+					if(card.name!='jinlianzhu') return false;
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					if(mod!='unchanged') return mod;
+					return true;
+				},trigger.player,-1).targetRequired=true;
+			}
+		},
     },
     cardType:{
         food:0.3
     },
     translate:{
-        // jinlianzhu:'金莲珠',
-        // jinlianzhu_info:'金莲珠',
+        jinlianzhu:'金莲珠',
+        jinlianzhu_info:'对一名即将受到伤害的角色使用，防止此伤害，并令伤害来源摸一张牌',
         shihuifen:'石灰粉',
         shihuifen_info:'在一名其他角色的出牌阶段开始时对其使用，目标需打出一张闪，否则此阶段使用卡牌无法指定其他角色为目标',
-        // liufengsan:'流风散',
-        // liufengsan_info:'流风散',
-        // liutouge:'六骰格',
-        // liutouge_info:'六骰格',
+        liufengsan:'流风散',
+        liufengsan_info:'出牌阶段对一名角色使用，目标获得两张闪',
+        liutouge:'六骰格',
+        liutouge_info:'出牌阶段对一名角色使用，若目标是敌人，对目标施加一个随机的负面效果；否则对目标施加一个随机的正面效果',
         // longxugou:'龙须钩',
         // longxugou_info:'龙须钩',
-        // mianlijinzhen:'棉里针',
-        // mianlijinzhen_info:'棉里针',
+        mianlijinzhen:'棉里针',
+        mianlijinzhen_info:'令一名角色摸一张牌并展示，若不是黑桃，你对其造成一点伤害',
         // shenhuofeiya:'神火飞鸦',
         // shenhuofeiya_info:'神火飞鸦',
         // tuhunsha:'土魂砂',
         // tuhunsha_info:'土魂砂',
         // wenhuangsan:'瘟癀伞',
         // wenhuangsan_info:'瘟癀伞',
-        // qiankunbiao:'乾坤镖',
-        // qiankunbiao_info:'乾坤镖',
+        qiankunbiao:'乾坤镖',
+        qiankunbiao_info:'随机弃置一名其他角色和其相邻角色的一张牌',
 
         bingpotong:'冰魄筒',
-        bingpotong_info:'出牌阶段，对一名有手牌的角色使用，你与其同时展示一张手牌，若颜色相同，你弃置展示的牌，目标流失一点体力；若颜色不同，目标弃置展示的牌',
+        bingpotong_info:'出牌阶段，对一名有手牌的角色使用，你与其同时展示一张手牌，若颜色相同，你弃置展示的牌，目标流失一点体力；若颜色不同，你收回此牌且本回合内不可再使用',
         feibiao:'飞镖',
         feibiao_info:'出牌阶段，对一名距离1以外的角色使用，令其弃置一张黑色手牌或流失一点体力',
 
@@ -746,7 +957,6 @@ card.gujian={
         ['spade',11,'feibiao','poison'],
 
         ['spade',3,'bingpotong','poison'],
-		['club',11,'bingpotong','poison'],
 		['club',12,'bingpotong','poison'],
 
         ['club',5,'shihuifen'],
@@ -759,5 +969,19 @@ card.gujian={
 
         ['diamond',6,'shujinsan'],
         ['spade',2,'shujinsan'],
+
+        ['spade',9,'qiankunbiao'],
+        ['club',13,'qiankunbiao'],
+
+        ['heart',9,'jinlianzhu'],
+        ['spade',7,'jinlianzhu'],
+
+        ['heart',6,'liutouge'],
+        ['club',6,'liutouge'],
+
+        ['club',6,'liufengsan'],
+        ['club',3,'liufengsan'],
+
+        ['spade',1,'mianlijinzhen'],
     ]
 };

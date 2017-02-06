@@ -6822,7 +6822,7 @@ character.yijiang={
 				return event.player.hp<=0&&event.player.num('h')>0;
 			},
 			check:function(event,player){
-				if(event.player==player){
+				if(event.player.isUnderControl(true,player)){
 					return event.player.get('h',function(card){
 						return get.type(card)!='basic';
 					}).length>0;
@@ -6848,7 +6848,7 @@ character.yijiang={
 				player.choosePlayerCard(trigger.player,get.prompt('buyi',trigger.player),'h').set('ai',function(button){
 					if(!_status.event.check) return 0;
 					if(_status.event.target.isUnderControl(true,_status.event.player)){
-						if(get.type(card)!='basic'){
+						if(get.type(button.link)!='basic'){
 							return 10-ai.get.value(button.link);
 						}
 						return 0;

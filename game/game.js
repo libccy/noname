@@ -2128,7 +2128,8 @@
 							map.choice_nei.hide();
 							map.choice_fan.hide();
                             map.ban_identity.hide();
-                            map.ban_identity2.hide();
+							map.ban_identity2.hide();
+                            map.ban_identity3.hide();
 						}
 						else{
 							map.player_number.show();
@@ -2151,6 +2152,12 @@
                             else{
                                 map.ban_identity2.show();
                             }
+							if(config.ban_identity=='off'||config.ban_identity2=='off'){
+								map.ban_identity3.hide();
+							}
+							else{
+								map.ban_identity3.show();
+							}
 						}
 					},
 					identity_mode:{
@@ -8654,7 +8661,13 @@
 						cards=cards.concat(player.getDeckCards(event.drawDeck));
 					}
 					if(event.animate!=false){
-						player.gain(cards,'draw');
+						if(event.visible){
+							player.gain(cards,'gain2');
+							game.log(player,'摸了'+get.cnNumber(num)+'张牌（',cards,'）');
+						}
+						else{
+							player.gain(cards,'draw');
+						}
 					}
 					else{
 						player.gain(cards);
@@ -11228,6 +11241,9 @@
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
+						else if(arguments[i]=='visible'){
+							next.visible=true;
+						}
 						else if(typeof arguments[i]=='object'&&arguments[i].drawDeck!=undefined){
 							next.drawDeck=arguments[i].drawDeck;
 						}
@@ -12763,8 +12779,9 @@
                     }
                     return false;
                 },
-                needsToDiscard:function(){
-                    return Math.max(0,this.num('h')-this.getHandcardLimit());
+                needsToDiscard:function(num){
+					if(typeof num!='number') num=0;
+                    return Math.max(0,num+this.num('h')-this.getHandcardLimit());
                 },
                 distanceTo:function(target,method){
                     return get.distance(this,target,method);
@@ -19926,6 +19943,7 @@
                     dialog.addSmall(hs);
                 }
             }
+			dialog.add(ui.create.div('.placeholder.slim'));
             var clients=game.players.concat(game.dead);
             for(var i=0;i<clients.length;i++){
                 if(clients[i].isOnline2()){
