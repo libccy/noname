@@ -816,7 +816,8 @@ character.swd={
 			check:function(card){return 5-ai.get.value(card)},
 			ai:{
 				order:3.1,
-				skillTagFilter:function(player){
+				skillTagFilter:function(player,tag,arg){
+					if(arg!='use') return false;
 					if(!player.num('he',{color:'red'})) return false;
 				},
 			},

@@ -284,7 +284,6 @@ card.guozhan={
 			fullskin:true,
 			type:"equip",
 			subtype:"equip2",
-			nomod:true,
 			skills:['huxinjing'],
 			ai:{
 				basic:{
@@ -756,8 +755,8 @@ card.guozhan={
 			forced:true,
 			popup:false,
 			content:function(){
-				var card=player.get('e','2');
-				if(card&&card.name.indexOf('huxinjing')==0){
+				var card=player.getEquip('huxinjing');
+				if(card){
 					player.discard(card);
 				}
 			}

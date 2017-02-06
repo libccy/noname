@@ -1073,7 +1073,7 @@ character.refresh={
 				}).set('ai',function(card){
 					var num=_status.event.num;
 					if(num==0) return 0;
-					if(card.name=='shan') return num>1;
+					if(card.name=='shan') return num>1?2:0;
 					return 8-ai.get.value(card);
 				}).set('num',num).set('suit',suit);
 				"step 2"

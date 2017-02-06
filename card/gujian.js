@@ -119,15 +119,99 @@ card.gujian={
             fullskin:true,
             type:'equip',
             subtype:'equip2',
+            skills:['mutoumianju_skill']
         },
         yuheng:{
             fullskin:true,
             type:'equip',
             subtype:'equip5',
+            nopower:true,
+            nomod:true,
+            skills:['yuheng_skill'],
+            ai:{
+                equipValue:function(card,player){
+                    if(player.hp>=4) return 5;
+                    if(player.hp>=3) return 4;
+                    if(player.hp>=2) return 2;
+                    return 1;
+                }
+            }
+        },
+        yuheng_plus:{
+            fullskin:true,
+            type:'equip',
+            subtype:'equip5',
+            nopower:true,
+            nomod:true,
+            epic:true,
+            cardimage:'yuheng',
+            skills:['yuheng_plus_skill'],
+            ai:{
+                equipValue:function(card,player){
+                    if(player.hp>=4) return 7;
+                    if(player.hp>=3) return 6;
+                    if(player.hp>=2) return 2.5;
+                    return 1;
+                }
+            }
+        },
+        yuheng_pro:{
+            fullskin:true,
+            type:'equip',
+            subtype:'equip5',
+            nopower:true,
+            nomod:true,
+            legend:true,
+            cardimage:'yuheng',
+            skills:['yuheng_pro_skill'],
+            ai:{
+                equipValue:function(card,player){
+                    if(player.hp>=4) return 7.5;
+                    if(player.hp>=3) return 6;
+                    if(player.hp>=2) return 2.5;
+                    return 1;
+                }
+            }
         },
         shujinsan:{
             fullskin:true,
             type:'basic',
+            enable:true,
+            filterTarget:function(card,player,target){
+                return target.num('he')>0;
+            },
+            content:function(){
+                'step 0'
+                target.chooseToDiscard('he',[1,target.num('he')],'弃置任意张牌并摸等量的牌').ai=function(card){
+                    return 6-ai.get.value(card);
+                }
+                'step 1'
+                if(result.bool){
+                    target.draw(result.cards.length);
+                }
+            },
+            ai:{
+                order:1.5,
+                value:[4,1],
+                result:{
+                    target:function(player,target){
+                        if(target==player){
+                            var cards=player.get('he');
+                            var num=-1;
+                            for(var i=0;i<cards.length;i++){
+                                if(ai.get.value(cards[i])<6) num++;
+                            }
+                            if(player.needsToDiscard()&&num<1){
+                                num=1;
+                            }
+                            return Math.max(0,num);
+                        }
+                        else{
+                            return target.num('he')/2;
+                        }
+                    }
+                }
+            }
         },
         ziyangdan:{
             fullskin:true,
@@ -315,9 +399,32 @@ card.gujian={
 			fullskin:true,
         },
         shihuifen:{
-            type:'jiguan',
-			enable:true,
+            type:'trick',
 			fullskin:true,
+            filterTarget:true,
+            content:function(){
+                'step 0'
+                _status.currentPhase.chooseToRespond({name:'shan'});
+                'step 1'
+                if(!result.bool){
+                    _status.currentPhase.addTempSkill('shihuifen','phaseUseAfter');
+                }
+            },
+            ai:{
+                order:1,
+                value:[5,1],
+                useful:[5,1],
+                tag:{
+                    respond:1,
+					respondShan:1,
+                },
+                result:{
+                    target:function(player,target){
+                        if(target.num('h')>=3||target.needsToDiscard()) return -1.5;
+                        return 0;
+                    }
+                }
+            }
         },
         jinlianzhu:{
             type:'jiguan',
@@ -325,15 +432,206 @@ card.gujian={
 			fullskin:true,
         },
     },
-    skill:{},
+    skill:{
+        mutoumianju_skill:{
+			enable:'chooseToUse',
+			filterCard:true,
+			viewAs:{name:'sha'},
+			viewAsFilter:function(player){
+				if(!player.num('h')) return false;
+			},
+			prompt:'将一张手牌当杀使用',
+			check:function(card){return 5-ai.get.value(card)},
+			ai:{
+				order:3.1,
+                skillTagFilter:function(player,tag,arg){
+					if(arg!='use') return false;
+					if(!player.num('h')) return false;
+				},
+			},
+		},
+        yuheng_skill:{
+            enable:'phaseUse',
+            usable:1,
+            filterTarget:function(card,player,target){
+                return target!=player&&target.num('h')>0;
+            },
+            content:function(){
+                'step 0'
+                player.loseHp();
+                'step 1'
+                var hs=target.get('h');
+                if(hs.length){
+                    var card=hs.randomGet();
+                    player.gain(card,target);
+                    target.$give(card,player);
+                    if(get.suit(card)=='spade'){
+                        event.bool=true;
+                    }
+                }
+                'step 2'
+                if(event.bool){
+                    target.loseHp();
+                }
+                var card=player.getEquip('yuheng');
+                if(card){
+                    if(typeof card.storage.yuheng!='number'){
+                        card.storage.yuheng=1;
+                    }
+                    else{
+                        card.storage.yuheng++;
+                    }
+                    if(card.storage.yuheng>=3){
+                        card.init([card.suit,card.number,'yuheng_plus',card.nature]);
+                        player.addTempSkill('yuheng_plus_temp','phaseAfter');
+                    }
+                }
+            },
+            ai:{
+                order:6,
+                result:{
+                    target:function(player,target){
+                        if(ai.get.attitude(player,target)>=0) return 0;
+                        var nh=target.num('h');
+                        var num=-1/Math.sqrt(1+nh);
+                        if(player.hp>=4) return num;
+                        if(player.hp>=3&&nh<=2) return num;
+                        if(player.hp>=2&&target.hp==1&&nh<=2) return num;
+                        return 0;
+                    }
+                }
+            }
+        },
+        yuheng_plus_temp:{},
+        yuheng_plus_skill:{
+            enable:'phaseUse',
+            usable:1,
+            filter:function(event,player){
+                return !player.hasSkill('yuheng_plus_temp');
+            },
+            filterTarget:function(card,player,target){
+                return target!=player&&target.num('h')>0;
+            },
+            content:function(){
+                'step 0'
+                player.loseHp();
+                'step 1'
+                var hs=target.get('h');
+                if(hs.length){
+                    var card=hs.randomGet();
+                    player.gain(card,target);
+                    target.$give(card,player);
+                    if(get.color(card)=='black'){
+                        event.bool=true;
+                    }
+                }
+                'step 2'
+                if(event.bool){
+                    target.loseHp();
+                }
+                var card=player.getEquip('yuheng_plus');
+                if(card){
+                    if(typeof card.storage.yuheng!='number'){
+                        card.storage.yuheng=1;
+                    }
+                    else{
+                        card.storage.yuheng++;
+                    }
+                    if(card.storage.yuheng>=7){
+                        card.init([card.suit,card.number,'yuheng_pro',card.nature]);
+                    }
+                }
+            },
+            ai:{
+                order:6,
+                result:{
+                    target:function(player,target){
+                        if(ai.get.attitude(player,target)>=0) return 0;
+                        var nh=target.num('h');
+                        var num=-1/Math.sqrt(1+nh);
+                        if(player.hp>=4) return num;
+                        if(player.hp>=3&&nh<=2) return num;
+                        if(player.hp>=2&&target.hp==1&&nh<=2) return num;
+                        return 0;
+                    }
+                }
+            }
+        },
+        yuheng_pro_skill:{
+            enable:'phaseUse',
+            filterTarget:function(card,player,target){
+                return target!=player&&target.num('h')>0;
+            },
+            content:function(){
+                'step 0'
+                player.loseHp();
+                'step 1'
+                var hs=target.get('h');
+                if(hs.length){
+                    var card=hs.randomGet();
+                    player.gain(card,target);
+                    target.$give(card,player);
+                    if(get.color(card)=='black'){
+                        event.bool=true;
+                    }
+                }
+                'step 2'
+                if(event.bool){
+                    target.loseHp();
+                }
+            },
+            ai:{
+                order:6,
+                result:{
+                    target:function(player,target){
+                        if(ai.get.attitude(player,target)>=0) return 0;
+                        var nh=target.num('h');
+                        var num=-1/Math.sqrt(1+nh);
+                        if(player.hp>=4) return num;
+                        if(player.hp>=3&&nh<=2) return num;
+                        if(player.hp>=2&&target.hp==1&&nh<=2) return num;
+                        return 0;
+                    }
+                }
+            }
+        },
+        shihuifen:{
+            mark:true,
+            intro:{
+                content:'使用卡牌无法指定其他角色为目标'
+            },
+            mod:{
+                playerEnabled:function(card,player,target){
+                    if(player!=target) return false;
+                }
+            }
+        },
+        _shihuifen:{
+			trigger:{global:'phaseUseBegin'},
+			direct:true,
+			filter:function(event,player){
+				if(event.player==player) return false;
+				if(!lib.filter.targetEnabled({name:'shihuifen'},player,event.player)) return false;
+				return player.hasCard('shihuifen');
+			},
+			content:function(){
+				player.chooseToUse(get.prompt('shihuifen',trigger.player).replace(/发动/,'使用'),function(card,player){
+					if(card.name!='shihuifen') return false;
+					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player.get('s'));
+					if(mod!='unchanged') return mod;
+					return true;
+				},trigger.player,-1).targetRequired=true;
+			}
+		},
+    },
     cardType:{
         food:0.3
     },
     translate:{
         // jinlianzhu:'金莲珠',
         // jinlianzhu_info:'金莲珠',
-        // shihuifen:'石灰粉',
-        // shihuifen_info:'石灰粉',
+        shihuifen:'石灰粉',
+        shihuifen_info:'在一名其他角色的出牌阶段开始时对其使用，目标需打出一张闪，否则此阶段使用卡牌无法指定其他角色为目标',
         // liufengsan:'流风散',
         // liufengsan_info:'流风散',
         // liutouge:'六骰格',
@@ -362,12 +660,24 @@ card.gujian={
         // yunvyuanshen_info:'玉女元参',
         // ziyangdan:'紫阳丹',
         // ziyangdan_info:'紫阳丹',
-        // yuheng:'玉衡',
-        // yuheng_info:'结束阶段，若场你的体力值不是全场最少，你失去一点体力并令玉衡获得一点力量；准备阶段，玉衡每有一点力量，你便可以获得一名其他角色的一张牌',
-        // shujinsan:'舒筋散',
-        // shujinsan_info:'对任意角色使用，目标可弃置任意张牌，并摸等量的牌',
-        // mutoumianju:'木头面具',
-        // mutoumianju_info:'装备后视为拥有技能龙胆',
+        yuheng:'玉衡',
+        yuheng_plus:'玉衡',
+        yuheng_pro:'玉衡',
+        yuheng_skill:'玉衡',
+        yuheng_plus_skill:'玉衡',
+        yuheng_pro_skill:'玉衡',
+        yuheng_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的一张手牌并展示，若为黑桃牌，该角色也失去一点体力（此牌不可被其它牌强化；此牌在本局游戏中第三次和第七次发动效果后，分别获得一次强化）',
+        yuheng_plus_info:'由普通玉衡强化得到，将玉衡技能描述中的“黑桃牌”改为”黑色牌',
+        yuheng_pro_info:'由普通玉衡二次强化得到，将玉横技能描述中的“黑桃牌”改为”黑色牌，并去掉使用次数限制',
+        yuheng_skill_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的手牌并展示，若为黑桃牌，该角色也失去一点体力',
+        yuheng_plus_skill_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的手牌并展示，若为黑色牌，该角色也失去一点体力',
+        yuheng_pro_skill_info:'出牌阶段，你可以失去一点体力，然后获得一名其他角色的手牌并展示，若为黑色牌，该角色也失去一点体力',
+        shujinsan:'舒筋散',
+        shujinsan_info:'对任意角色使用，目标可弃置任意张牌，并摸等量的牌',
+        mutoumianju:'木头面具',
+        mutoumianju_info:'你可以将一张手牌当作杀使用',
+        mutoumianju_skill:'木杀',
+        mutoumianju_skill_info:'你可以将一张手牌当作杀使用',
         // heilonglinpian:'黑龙鳞片',
         // heilonglinpian_info:'对自己使用，获得一点护甲，直到下一回合开始，计算其他角色与你的距离时始终+1',
 
@@ -405,5 +715,15 @@ card.gujian={
         ['spade',3,'bingpotong','poison'],
 		['club',11,'bingpotong','poison'],
 		['club',12,'bingpotong','poison'],
+
+        ['club',5,'shihuifen'],
+        ['club',1,'shihuifen'],
+        ['spade',13,'shihuifen'],
+
+        ['spade',7,'yuheng'],
+        ['club',4,'mutoumianju'],
+
+        ['diamond',6,'shujinsan'],
+        ['spade',2,'shujinsan'],
     ]
 };

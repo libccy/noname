@@ -5561,6 +5561,12 @@
             o:function(){
                 ui.arena.classList.remove('observe');
             },
+			pt:function(){
+				var list=Array.from(arguments);
+				while(list.length){
+					ui.cardPile.insertBefore(cheat.gn(list.pop()),ui.cardPile.firstChild);
+				}
+			},
 			q:function(){
 				if(lib.config.layout!='mobile') lib.init.layout('mobile');
 				if(arguments.length==0){
@@ -5626,7 +5632,7 @@
                     if(card){
                         console.log(card);
                         ui.discardPile.appendChild(card);
-                        target.clearEquipTrigger(card);
+                        target.removeEquipTrigger(card);
                     }
                     target.$equip(cards[i]);
                 }
@@ -5827,6 +5833,13 @@
             },
 			gx:function(name,target){
 				target=target||game.me;
+				var card=cheat.gn(name);
+				target.node.handcards1.appendChild(card);
+				game.check();
+				target.update();
+				ui.updatehl();
+			},
+			gn:function(name){
 				var nature=null;
 				var suit=null;
 				var suits=['club','spade','diamond','heart'];
@@ -5854,11 +5867,7 @@
 					name='sha';
 					nature='thunder';
 				}
-				var card=game.createCard(name,suit,null,nature);
-				target.node.handcards1.appendChild(card);
-				game.check();
-				target.update();
-				ui.updatehl();
+				return game.createCard(name,suit,null,nature);
 			},
 			ge:function(target){
                 if(target){
@@ -5922,32 +5931,26 @@
 				cheat.g('juedou');
 			},
 			z:function(name){
+				switch(name){
+					case 'cc':name='re_caocao';break;
+					case 'lb':name='re_liubei';break;
+					case 'sq':name='sunquan';break;
+					case 'dz':name='dongzhuo';break;
+					case 'ys':name='re_yuanshao';break;
+					case 'zj':name='sp_zhangjiao';break;
+					case 'ls':name='liushan';break;
+					case 'sc':name='sunce';break;
+					case 'cp':name='caopi';break;
+					case 'cr':name='caorui';break;
+					case 'sx':name='sunxiu';break;
+					case 'lc':name='liuchen';break;
+					case 'sh':name='sunhao';break;
+				}
 				game.zhu.init(name);
 				game.zhu.maxHp++;
 				game.zhu.hp++;
 				game.zhu.update();
 			},
-			cp:function(){
-				cheat.z('caopi');
-			},
-			cc:function(){
-				cheat.z('re_caocao');
-			},
-			ls:function(){
-				cheat.z('liushan');
-			},
-			zj:function(){
-				cheat.z('sp_zhangjiao');
-			},
-			sc:function(){
-				cheat.z('sunce');
-			},
-			lc:function(){
-				cheat.z('liushan');
-			},
-			lb:function(){
-				cheat.z('re_liubei');
-			}
 		},
 		translate:{
 			'default':"默认",
@@ -8956,12 +8959,9 @@
 					"step 1"
 					if(num<cards.length){
 						if(cards[num].original=='e'){
+							event.loseEquip=true;
+							player.removeEquipTrigger(cards[num]);
 							var info=get.info(cards[num]);
-                            if(info.skills){
-                                for(var i=0;i<info.skills.length;i++){
-                                    player.removeSkillTrigger(info.skills[i]);
-                                }
-                            }
 							if(info.onLose&&(!info.filterLose||info.filterLose(cards[num],player))){
 								event.goto(2);
 								return;
@@ -8971,6 +8971,9 @@
 						event.redo();
 					}
 					else{
+						if(event.loseEquip){
+							player.addEquipTrigger();
+						}
 						event.finish();
 					}
 					"step 2"
@@ -9237,7 +9240,7 @@
 					for(var i in player.tempSkills){
                         player.removeSkill(i);
 					}
-                    player.clearEquipTrigger();
+                    player.removeEquipTrigger();
                     // for(var i in lib.skill.globalmap){
                     //     if(lib.skill.globalmap[i].contains(player)){
                     //         lib.skill.globalmap[i].remove(player);
@@ -12315,7 +12318,23 @@
 					}
 					return this;
 				},
-                clearEquipTrigger:function(card){
+				addEquipTrigger:function(card){
+					if(card){
+                        var info=get.info(card);
+                        if(info.skills){
+                            for(var j=0;j<info.skills.length;j++){
+                                this.addSkillTrigger(info.skills[j]);
+                            }
+                        }
+                    }
+                    else{
+                        var es=this.get('e');
+                        for(var i=0;i<es.length;i++){
+							this.addEquipTrigger(es[i]);
+                        }
+                    }
+				},
+                removeEquipTrigger:function(card){
                     if(card){
                         var info=get.info(card);
                         if(info.skills){
@@ -12327,12 +12346,7 @@
                     else{
                         var es=this.get('e');
                         for(var i=0;i<es.length;i++){
-                            var info=get.info(es[i]);
-                            if(info.skills){
-                                for(var j=0;j<info.skills.length;j++){
-                                    this.removeSkillTrigger(info.skills[j]);
-                                }
-                            }
+							this.removeEquipTrigger(es[i]);
                         }
                     }
                 },
@@ -12868,14 +12882,25 @@
 					}
 					else{
 						if(this.num(position,name)) return true;
-						var mn=this.get('e','5');
-						if(mn&&mn.name.indexOf('muniu')==0&&mn.cards&&mn.cards.length){
+						var mn=this.getEquip('muniu');
+						if(mn&&mn.cards&&mn.cards.length){
 							for(var i=0;i<mn.cards.length;i++){
 								if(mn.cards[i].name==name) return true;
 							}
 						}
 					}
 					return false;
+				},
+				getEquip:function(name){
+					var es=this.get('e');
+					for(var i=0;i<es.length;i++){
+						if(es[i].name==name) return es[i];
+						var source=get.info(es[i]).source;
+						if(Array.isArray(source)&&source.contains(name)){
+							return es[i];
+						}
+					}
+					return null;
 				},
 				getJudge:function(name){
 					var judges=this.node.judges.childNodes;
@@ -14366,8 +14391,13 @@
 				aiexclude:function(){
 					_status.event.aiexclude.add(this);
 				},
-                getState:function(){
-
+                getSource:function(name){
+					if(this.name==name) return true;
+					var info=lib.card[this.name];
+					if(info&&Array.isArray(info.source)){
+						return info.source.contains(name);
+					}
+					return false;
                 },
 				moveDelete:function(player){
 					this.fixed=true;

@@ -24,6 +24,17 @@ card.sp={
 			},
 			onLose:function(){
 				player.unmarkSkill('muniu_skill6');
+				if(event.parent.type!='equip'&&card&&card.cards&&card.cards.length){
+					player.$throw(card.cards,1000);
+					player.popup('muniu');
+					game.log(card,'掉落了',card.cards);
+					while(card.cards.length){
+						var card2=card.cards.shift();
+						if(card2.parentNode.id=='special'){
+							ui.discardPile.appendChild(card2);
+						}
+					}
+				}
 			},
 			equipDelay:false,
 			loseDelay:false,
@@ -522,41 +533,6 @@ card.sp={
 				}
 				return false;
 			},
-		},
-		_muliu:{
-			trigger:{player:'loseEnd'},
-			forced:true,
-			popup:false,
-			filter:function(event,player){
-				if(event.type=='equip') return false;
-				for(var i=0;i<event.cards.length;i++){
-					if(event.cards[i].name.indexOf('muniu')==0&&event.cards[i].original=='e'){
-						return true;
-					}
-				}
-				return false;
-			},
-			content:function(){
-				for(var i=0;i<trigger.cards.length;i++){
-					if(trigger.cards[i].name.indexOf('muniu')==0&&trigger.cards[i].original=='e'){
-						var card=trigger.cards[i];
-						var card2;
-						if(card.cards&&card.cards.length){
-							player.$throw(card.cards,1000);
-							player.popup('muniu');
-							game.log('木牛流马掉落了',card.cards);
-							while(card.cards.length){
-								card2=card.cards.shift();
-								if(card2.parentNode.id=='special'){
-									ui.discardPile.appendChild(card2);
-								}
-							}
-						}
-
-						break;
-					}
-				}
-			}
 		},
 		_du:{
 			trigger:{player:['useCardAfter','respondAfter','discardAfter']},

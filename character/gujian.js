@@ -455,6 +455,7 @@ character.gujian={
 						modTarget:true,
 						content:lib.element.content.equipCard,
 						legend:true,
+						source:[cards[0].name,cards[1].name],
 						onEquip:[],
 						onLose:[],
 						skills:[],

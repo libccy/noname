@@ -701,7 +701,6 @@ card.swd={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
-			nomod:true,
 			equipDelay:false,
 			loseDelay:false,
 			onEquip:function(){
@@ -1012,7 +1011,7 @@ card.swd={
 			enable:function(card,player){
 				var es=player.get('e');
 				for(var i=0;i<es.length;i++){
-					if(lib.inpile.contains(es[i].name)) return true;
+					if(lib.inpile.contains(es[i].name)&&!lib.card[es[i].name].nopower) return true;
 				}
 				return false;
 			},
@@ -1026,6 +1025,7 @@ card.swd={
 			},
 			selectTarget:-1,
 			content:function(){
+				'step 0'
 				var es=target.get('e');
 				var list=get.typeCard('hslingjian');
 				var list2=get.typeCard('jiqi');
@@ -1048,14 +1048,14 @@ card.swd={
 				var cards=[];
 				var time=0;
 				for(var i=0;i<es.length;i++){
-					if(!lib.inpile.contains(es[i].name)){
+					if(!lib.inpile.contains(es[i].name)||lib.card[es[i].name].nopower){
 						es.splice(i--,1);
 					}
 				}
 				var num=get.rand(es.length);
 				var card;
+				target.removeEquipTrigger();
 				for(var i=0;i<es.length;i++){
-					target.clearEquipTrigger(es[i]);
 					if(i==num){
 						card=game.createCard(list2.randomGet());
 					}
@@ -1064,27 +1064,24 @@ card.swd={
 					}
 					cards.push(card);
 					time+=200;
-					setTimeout((function(card,name){
+					setTimeout((function(card,name,last){
 						return function(){
 							ui.discardPile.appendChild(game.createCard(card));
 							card.init([card.suit,card.number,name,card.nature]);
 							card.style.transform='scale(1.1)';
 							card.classList.add('glow');
-							var info=get.info(card);
-		                    if(info.skills){
-		                        for(var i=0;i<info.skills.length;i++){
-		                            target.addSkillTrigger(info.skills[i]);
-		                        }
-		                    }
+							if(last) game.resume();
 							setTimeout(function(){
 								card.style.transform='';
 								card.classList.remove('glow');
 							},500);
 						}
-					}(es[i],lib.skill._lingjianduanzao.process([card,es[i]]))),i*200);
+					}(es[i],lib.skill._lingjianduanzao.process([card,es[i]]),i==es.length-1)),i*200);
 				}
 				target.$gain2(cards);
-				game.delay(0,time)
+				game.pause();
+				'step 1'
+				target.addEquipTrigger();
 			},
 			ai:{
 				value:7,
@@ -1971,7 +1968,6 @@ card.swd={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
-			nomod:true,
 			skills:['yiluan'],
 			ai:{
 				basic:{
@@ -2122,14 +2118,14 @@ card.swd={
 			mark:true,
 			intro:{
 				content:function(storage,player){
-					var card=player.get('e','5');
+					var card=player.getEquip('lianyaohu');
 					if(card&&card.storage.shouna&&card.storage.shouna.length){
 						return '共有'+get.cnNumber(card.storage.shouna.length)+'张牌';
 					}
 					return '共有〇张牌';
 				},
 				mark:function(dialog,storage,player){
-					var card=player.get('e','5');
+					var card=player.getEquip('lianyaohu');
 					if(card&&card.storage.shouna&&card.storage.shouna.length){
 						dialog.addAuto(card.storage.shouna);
 					}
@@ -2138,7 +2134,7 @@ card.swd={
 					}
 				},
 				markcount:function(storage,player){
-					var card=player.get('e','5');
+					var card=player.getEquip('lianyaohu');
 					if(card&&card.storage.shouna) return card.storage.shouna.length;
 					return 0;
 				}
@@ -2149,13 +2145,7 @@ card.swd={
 			direct:true,
 			filter:function(event,player){
 				if(get.type(event.card)!='trick') return false;
-				if(player.num('h','shencaojie')) return true;
-				var mn=player.get('e','5');
-				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){
-					for(var i=0;i<mn.cards.length;i++){
-						if(mn.cards[i].name=='shencaojie') return true;
-					}
-				}
+				if(player.hasCard('shencaojie')) return true;
 				return false;
 			},
 			content:function(){
@@ -2187,15 +2177,8 @@ card.swd={
 						return false;
 					}
 				}
-				if(player.num('h','shenmiguo')) return true;
-				if(player.num('h','yuchankan')) return true;
-				var mn=player.get('e','5');
-				if(mn&&mn.name=='muniu'&&mn.cards&&mn.cards.length){
-					for(var i=0;i<mn.cards.length;i++){
-						if(mn.cards[i].name=='shenmiguo') return true;
-						if(mn.cards[i].name=='yuchankan') return true;
-					}
-				}
+				if(player.hasCard('shenmiguo')) return true;
+				if(player.hasCard('yuchankan')) return true;
 				return false;
 			},
 			content:function(){
@@ -2750,7 +2733,7 @@ card.swd={
 		lianhua:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				var hu=player.get('e','5');
+				var hu=player.getEquip('lianyaohu');
 				if(hu&&hu.storage.shouna&&hu.storage.shouna.length>1){
 					return true;
 				}
@@ -2760,7 +2743,7 @@ card.swd={
 			delay:false,
 			content:function(){
 				"step 0"
-				event.hu=player.get('e','5');
+				event.hu=player.getEquip('lianyaohu');
 				player.chooseCardButton('弃置两张壶中的牌，然后从牌堆中获得一张类别不同的牌',2,event.hu.storage.shouna).ai=function(){
 					return 1;
 				}
@@ -2807,7 +2790,7 @@ card.swd={
 			},
 			content:function(){
 				var card=target.get('h').randomGet();
-				var hu=player.get('e','5');
+				var hu=player.getEquip('lianyaohu');
 				if(card&&hu){
 					if(!hu.storage.shouna){
 						hu.storage.shouna=[];
@@ -2848,7 +2831,7 @@ card.swd={
 						cards.splice(i,1);i--;
 					}
 				}
-				var hu=player.get('e','5');
+				var hu=player.getEquip('lianyaohu');
 				if(cards.length&&hu){
 					if(!hu.storage.shouna){
 						hu.storage.shouna=[];
@@ -3049,7 +3032,7 @@ card.swd={
 					player.popup('收化成功');
 					game.log(player,'将',target,'收化');
 					target.dataset.position=event.position;
-					var card=player.get('e','5');
+					var card=player.getEquip('lianyaohu');
 					if(!card.storage.shouhua) card.storage.shouhua=[];
 					card.storage.shouhua.push(target);
 					game.removePlayer(target);
@@ -3287,14 +3270,14 @@ card.swd={
 			usable:1,
 			filter:function(event,player){
 				if(player!=game.me) return false;
-				var card=player.get('e','5');
+				var card=player.getEquip('lianyaohu');
 				if(card.storage.shouhua&&card.storage.shouhua.length) return true;
 				return false;
 			},
 			content:function(){
 				"step 0"
 				var list=[];
-				var card=player.get('e','5');
+				var card=player.getEquip('lianyaohu');
 				for(var i=0;i<card.storage.shouhua.length;i++){
 					list.push(card.storage.shouhua[i].name);
 				}
@@ -3388,7 +3371,7 @@ card.swd={
 					// target.draw();
 				}
 				else{
-					var e5=player.get('e','5');
+					var e5=player.getEquip('sifeizhenmian');
 					if(e5){
 						player.discard(e5);
 					}
@@ -3961,7 +3944,10 @@ card.swd={
 			},
 			filterCard:function(card){
 				var type=get.type(card);
-				if(type=='equip'&&!lib.inpile.contains(card.name)) return false;
+				if(type=='equip'){
+					if(!lib.inpile.contains(card.name)) return false;
+					if(lib.card[card.name].nopower) return false;
+				}
 				if(ui.selected.cards.length){
 					var type2=get.type(ui.selected.cards[0]);
 					if(type2=='equip'){
@@ -3997,6 +3983,7 @@ card.swd={
 				lib.card[name]=get.copy(lib.card[equip.name]);
 				lib.card[name].cardimage=lib.card[name].cardimage||equip.name;
 				lib.card[name].vanish=true;
+				lib.card[name].source=[equip.name,cards[0].name];
 				if(type=='jiqi'){
 					lib.card[name].legend=true;
 				}

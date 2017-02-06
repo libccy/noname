@@ -519,6 +519,7 @@ character.xianjian={
 						lib.card[name].subtype=result.control;
 						lib.card[name].epic=true;
 						lib.card[name].cardimage=trigger.card.name;
+						lib.card[name].source=[trigger.card.name];
 						lib.translate[name]=lib.translate[trigger.card.name];
 						lib.translate[name+'_info']=lib.translate[trigger.card.name+'_info'];
 					}
