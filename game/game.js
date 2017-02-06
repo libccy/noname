@@ -3596,7 +3596,8 @@
 		},
 		placePoppedDialog:function(dialog,e){
             if(dialog._place_text){
-                if(dialog._place_text.firstChild.offsetWidth>=190){
+                if(dialog._place_text.firstChild.offsetWidth>=190||
+					dialog._place_text.firstChild.offsetHeight>=30){
                     dialog._place_text.style.textAlign='left';
                     dialog._place_text.style.marginLeft='14px';
                 }
@@ -12232,6 +12233,11 @@
                                 if(typeof intro=='function'){
                                     intro=intro(this.storage[skill],this);
                                 }
+								else if(typeof intro=='string'){
+									intro=intro.replace(/#/g,this.storage[skill]);
+									intro=intro.replace(/&/g,get.cnNumber(this.storage[skill]));
+									intro=intro.replace(/\$/g,get.translation(this.storage[skill]));
+								}
                                 this.markSkillCharacter(skill,this.storage[skill],get.translation(skill),intro);
 							}
 							else{

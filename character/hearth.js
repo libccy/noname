@@ -1570,9 +1570,7 @@ character.hearth={
 		xianji3:{
 			mark:'character',
 			intro:{
-				content:function(storage,player){
-					return '每当'+get.translation(storage)+'对你使用一张牌，你摸一张牌';
-				}
+				content:'每当$对你使用一张牌，你摸一张牌'
 			},
 			trigger:{target:'useCardToBegin'},
 			filter:function(event,player){
