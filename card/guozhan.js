@@ -902,7 +902,7 @@ card.guozhan={
 		sanjian_skill:'三尖两刃刀',
 		jingfanma_bg:'-马',
 		jingfanma:'惊帆',
-		jingfanma_info:'其他角色与你的距离-1',
+		jingfanma_info:'你的进攻距离+1',
 		huxinjing_bg:'镜',
 		huxinjing:'护心镜',
 		huxinjing_info:'抵消一点伤害',

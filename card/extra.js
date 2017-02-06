@@ -527,7 +527,7 @@ card.extra={
 		bingliang_bg:'粮',
 		bingliang_info:'目标角色判定阶段进行判定：若判定结果不为梅花，则跳过该角色的摸牌阶段。',
 		hualiu_bg:'+马',
-		hualiu_info:'其他角色与你的距离+1',
+		hualiu_info:'你的防御距离+1',
 		zhuque_bg:'扇',
 		zhuque_skill:'朱雀羽扇',
 		zhuque_info:'你可以将一张普通【杀】当具火焰伤害的【杀】使用。',

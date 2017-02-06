@@ -159,7 +159,7 @@ character.jiange={
                 }
                 "step 1"
                 if(event.num>0){
-                    player.chooseTarget('选择至多'+get.cnNumber(event.num)+'名角色令其与其他角色的距离－1',[1,event.num],function(card,player,target){
+                    player.chooseTarget('选择至多'+get.cnNumber(event.num)+'名角色令其进攻距离+1',[1,event.num],function(card,player,target){
                         return player!=target;
                     }).ai=function(target){
                         return ai.get.attitude(player,target);
@@ -573,7 +573,7 @@ character.jiange={
         chiying_info:'每当一名角色受到多于1伤害时，你可以令其防止其余伤害，然后令伤害来源摸一张牌',
         jingfan:'惊帆',
         jingfan2:'惊帆',
-        jingfan_info:'回合内，每当你使用一张卡牌，你与其他角色的距离－1；出牌阶段结束时，你可以将手牌数补至X，并指定至多X名角色令其与其他角色的距离－1直到其下一回合结束，X为你回合内使用的卡牌数',
+        jingfan_info:'回合内，每当你使用一张卡牌，你的进攻距离+1；出牌阶段结束时，你可以将手牌数补至X，并指定至多X名角色令其进攻距离+1直到其下一回合结束，X为你回合内使用的卡牌数',
 
     },
 }

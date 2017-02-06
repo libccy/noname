@@ -267,7 +267,34 @@ card.gujian={
         },
         yunvyuanshen:{
             fullskin:true,
-            type:'basic',
+			type:'basic',
+			enable:true,
+			logv:false,
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('yunvyuanshen_skill');
+			},
+			content:function(){
+				target.addSkill('yunvyuanshen_skill');
+				if(cards&&cards.length){
+					card=cards[0];
+				}
+				if(target==targets[0]&&card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
+					card.clone.moveDelete(target);
+					game.addVideo('gain2',target,get.cardsInfo([card]));
+				}
+			},
+			ai:{
+				basic:{
+					value:9,
+					useful:4,
+				},
+				order:2,
+				result:{
+					target:function(player,target){
+						return 1/Math.sqrt(1+target.hp);
+					},
+				},
+			}
         },
         liuxiaxianniang:{
             fullskin:true,
@@ -349,7 +376,7 @@ card.gujian={
 			ai:{
 				basic:{
 					order:2,
-					value:5,
+					value:[5,1],
 					useful:1,
 				},
 				result:{
@@ -485,6 +512,31 @@ card.gujian={
             type:'jiguan',
 			enable:true,
 			fullskin:true,
+            filterTarget:function(card,player,target){
+                return target!=player;
+            },
+            content:function(){
+                'step 0'
+                target.draw('visible');
+                'step 1'
+                if(Array.isArray(result)&&get.suit(result[0])=='spade'){
+                    return;
+                }
+                else{
+                    target.damage();
+                }
+            },
+            ai:{
+                order:2,
+                value:[5,1],
+                useful:1,
+                result:{
+                    target:-1.5
+                },
+                tag:{
+                    damage:1
+                }
+            }
         },
         longxugou:{
             type:'jiguan',
@@ -636,6 +688,29 @@ card.gujian={
         },
     },
     skill:{
+        yunvyuanshen_skill:{
+			mark:true,
+            marktext:'参',
+			intro:{
+				content:'防止一次死亡，改为弃置所有牌，将体力值变为1并摸一张牌'
+			},
+			trigger:{player:'dieBefore'},
+			forced:true,
+            filter:function(event,player){
+                return player.maxHp>0;
+            },
+			content:function(){
+				'step 0'
+				trigger.untrigger();
+				trigger.finish();
+				player.discard(player.get('he'));
+				player.removeSkill('yunvyuanshen_skill');
+				'step 1'
+				player.changeHp(1-player.hp);
+				'step 2'
+				player.draw();
+			}
+		},
         bingpotong:{
             trigger:{player:'phaseAfter'},
             forced:true,
@@ -900,8 +975,9 @@ card.gujian={
 
         // liuxiaxianniang:'流霞仙酿',
         // liuxiaxianniang_info:'流霞仙酿',
-        // yunvyuanshen:'玉女元参',
-        // yunvyuanshen_info:'玉女元参',
+        yunvyuanshen:'玉女元参',
+        yunvyuanshen_skill:'玉女元参',
+        yunvyuanshen_info:'出牌阶段对一名角色使用，在目标即将死亡时防止其死亡，改为令其弃置所有牌，将体力值变为1并摸一张牌',
         // ziyangdan:'紫阳丹',
         // ziyangdan_info:'紫阳丹',
         yuheng:'玉衡',
@@ -952,9 +1028,13 @@ card.gujian={
         // mapodoufu_info:'麻婆豆腐',
     },
     list:[
+        ['spade',7,'yuheng'],
+        ['club',4,'mutoumianju'],
+        ['spade',2,'heilonglinpian'],
+        ['spade',1,'mianlijinzhen'],
+
         ['club',8,'feibiao','poison'],
         ['diamond',9,'feibiao','poison'],
-        ['spade',11,'feibiao','poison'],
 
         ['spade',3,'bingpotong','poison'],
 		['club',12,'bingpotong','poison'],
@@ -962,10 +1042,6 @@ card.gujian={
         ['club',5,'shihuifen'],
         ['club',1,'shihuifen'],
         ['spade',13,'shihuifen'],
-
-        ['spade',7,'yuheng'],
-        ['club',4,'mutoumianju'],
-        ['spade',2,'heilonglinpian'],
 
         ['diamond',6,'shujinsan'],
         ['spade',2,'shujinsan'],
@@ -982,6 +1058,6 @@ card.gujian={
         ['club',6,'liufengsan'],
         ['club',3,'liufengsan'],
 
-        ['spade',1,'mianlijinzhen'],
+        ['heart',13,'yunvyuanshen'],
     ]
 };
