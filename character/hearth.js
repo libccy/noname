@@ -646,7 +646,8 @@ character.hearth={
 							}
 							targets.push(target);
 						}
-						player.useCard(game.createCard({name:name,suit:get.suit(card),number:card.number}),targets);
+						player.useCard(game.createCard({name:name,suit:get.suit(card),number:card.number}),targets,'noai');
+						player.addExpose(0.2);
 						event.redo();
 					}
 				},

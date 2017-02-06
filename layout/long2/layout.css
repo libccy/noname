@@ -92,6 +92,12 @@
 	height:calc(100% - 370px);
     bottom:170px;
 }
+#arena.choose-character>.dialog .placeholder+.placeholder{
+    display: none;
+}
+#arena.choose-character>.dialog .placeholder{
+    margin-bottom: 0;
+}
 #arena.choose-character>.dialog{
     height:calc(100% - 280px);
     bottom:80px;

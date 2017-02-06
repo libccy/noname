@@ -3573,6 +3573,7 @@ mode.boss={
 			filter:function(event,player){
 				if(!get.config('single_control')) return false;
 				if(event.autochoose&&event.autochoose()) return false;
+				if(lib.filter.wuxieSwap(event)) return false;
 				return player.isUnderControl();
 			},
 			content:function(){

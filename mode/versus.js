@@ -3587,6 +3587,7 @@ mode.versus={
 			popup:false,
 			filter:function(event,player){
 				if(event.autochoose&&event.autochoose()) return false;
+				if(lib.filter.wuxieSwap(event)) return false;
 				return !_status.auto&&player!=game.me&&player.side==game.me.side;
 			},
 			content:function(){

@@ -6734,7 +6734,7 @@
                             }
                             if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
                                 var tw=event.getTrigger().parent;
-                                if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1){
+                                if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1&&!tw.noai){
                                     event.result={
                                         bool:false
                                     }
@@ -11102,7 +11102,6 @@
 					var next=game.createEvent('useCard');
 					next.player=this;
 					next.num=0;
-                    var noai=false;
 					for(var i=0;i<arguments.length;i++){
 						if(get.itemtype(arguments[i])=='cards'){
 							next.cards=arguments[i];
@@ -11121,7 +11120,7 @@
 						}
 						else if(typeof arguments[i]=='string'){
                             if(arguments[i]=='noai'){
-                                noai=true;
+                                next.noai=true;
                             }
                             else{
                                 next.skill=arguments[i];
@@ -11160,7 +11159,7 @@
 							this.ai.tempIgnore.add(next.targets[i]);
 						}
 					}
-					if(typeof this.logAi=='function'&&!noai){
+					if(typeof this.logAi=='function'&&!next.noai){
                         var postAi=get.info(next.card).postAi;
                         if(postAi&&postAi(next.targets)){
                             next.postAi=true;
@@ -15373,6 +15372,30 @@
 			autoRespondShan:function(){
                 return !this.player.hasShan();
 			},
+			wuxieSwap:function(event){
+				if(event.type=='wuxie'){
+					if(ui.wuxie&&ui.wuxie.classList.contains('glow')){
+						return true;
+					}
+					if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&event.state>0){
+						var triggerevent=event.getTrigger();
+						if(triggerevent){
+							if(ui.tempnowuxie._origin==triggerevent.parent.id){
+								return true;
+							}
+						}
+						else if(ui.tempnowuxie._origin==_status.event.id2){
+							return true;
+						}
+					}
+					if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
+						var tw=event.getTrigger().parent;
+						if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1&&!tw.noai){
+							return true;
+						}
+					}
+				}
+			}
 		},
 		sort:{
             character:function(a,b){

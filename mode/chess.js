@@ -4910,6 +4910,7 @@ mode.chess={
 			filter:function(event,player){
 				if(event.autochoose&&event.autochoose()) return false;
 				if(lib.config.mode=='chess'&&_status.mode=='combat'&&!get.config('single_control')) return false;
+				if(lib.filter.wuxieSwap(event)) return false;
 				return player.isUnderControl();
 			},
 			content:function(){

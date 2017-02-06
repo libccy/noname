@@ -637,6 +637,7 @@ mode.identity={
 								_status.tempNoButton=false;
 							},500);
 							if(game.zhu.name){
+								_status.event.parent.fixedseat=get.distance(game.me,game.zhu,'absolute');
 								game.zhu.uninit();
 								delete game.zhu.isZhu;
 								delete game.zhu.identityShown;
@@ -651,7 +652,12 @@ mode.identity={
 							}
 							var link=this.link;
 							if(link=='random'){
-								link=['zhu','zhong','nei','fan'].randomGet();
+								if(event.zhongmode){
+									link=['zhu','zhong','nei','fan','mingzhong'].randomGet();
+								}
+								else{
+									link=['zhu','zhong','nei','fan'].randomGet();
+								}
 								for(var i=0;i<this.parentNode.childElementCount;i++){
 									if(this.parentNode.childNodes[i].link==link){
 										this.parentNode.childNodes[i].classList.add('thundertext');
@@ -681,7 +687,7 @@ mode.identity={
 							_status.event=_status.event.parent;
 							_status.event.step=0;
 							_status.event.identity=link;
-							if(link!='zhu'){
+							if(link!=(event.zhongmode?'mingzhong':'zhu')){
 								seats.previousSibling.style.display='';
 								seats.style.display='';
 							}
@@ -756,6 +762,14 @@ mode.identity={
 				if(event.identity){
 					identityList.remove(event.identity);
 					identityList.unshift(event.identity);
+					if(event.fixedseat){
+						var zhuIdentity=(_status.mode=='zhong')?'mingzhong':'zhu';
+						if(zhuIdentity!=event.identity){
+							identityList.remove(zhuIdentity);
+							identityList.splice(event.fixedseat,0,zhuIdentity);
+						}
+						delete event.fixedseat;
+					}
 					delete event.identity;
 				}
 				else if(_status.mode!='zhong'&&(!_status.brawl||!_status.brawl.identityShown)){

@@ -294,7 +294,7 @@ card.swd={
 					if(targets.length){
 						targets.sort(lib.sort.seat);
 						if(info.selectTarget==-1){
-							target.useCard(card,targets);
+							target.useCard(card,targets,'noai');
 						}
 						else{
 							var num=info.selectTarget;
@@ -4583,7 +4583,7 @@ card.swd={
 				trigger.finish();
 			},
 			intro:{
-				content:'已积攒'+storage+'点力量'
+				content:'已积攒#点力量'
 			},
 			group:['xujin2']
 		},
