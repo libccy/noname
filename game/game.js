@@ -5791,6 +5791,10 @@
 				}
 				game.reload();
 			},
+			uj:function(){
+				cheat.ge('qilin');
+				game.me.next.useCard({name:'jiedao'},[game.me,game.me.previous]);
+			},
 			u:function(){
 				var card={name:'sha'},source=game.me.next,targets=[];
 				for(var i=0;i<arguments.length;i++){

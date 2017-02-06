@@ -43,20 +43,51 @@ card.gujian={
             type:'food',
             enable:true,
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('gudonggeng');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.gudonggeng=card;
+                target.storage.gudonggeng_markcount=3;
+                target.addSkill('gudonggeng');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        if(player==target&&!player.hasShan()) return 2;
+                        return 1/Math.max(1,target.hp);
+                    }
+                }
+            }
         },
         liyutang:{
             fullskin:true,
             type:'food',
             enable:true,
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('liyutang');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.liyutang=card;
+                target.storage.liyutang_markcount=2;
+                target.addSkill('liyutang');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        if(player==target&&target.isLeastHp()) return 2;
+                        if(target.isLeastHp()) return 1.5;
+                        return 1/Math.max(1,target.hp);
+                    }
+                }
+            }
         },
         mizhilianou:{
             fullskin:true,
@@ -100,15 +131,62 @@ card.gujian={
                 }
             }
         },
+        mapodoufu:{
+            fullskin:true,
+            type:'food',
+            enable:true,
+            filterTarget:function(card,player,target){
+                return !target.hasSkill('mapodoufu');
+            },
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.mapodoufu=card;
+                target.storage.mapodoufu_markcount=3;
+                target.addSkill('mapodoufu');
+            },
+            ai:{
+                order:2,
+                value:5,
+                result:{
+                    target:function(player,target){
+                        return player==target?2:1;
+                    }
+                }
+            }
+        },
         qingtuan:{
             fullskin:true,
             type:'food',
             enable:true,
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('qingtuan');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.qingtuan=card;
+                target.storage.qingtuan_markcount=2;
+                target.addSkill('qingtuan');
+            },
+            ai:{
+                order:4,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        if(target==player){
+                            if(target.hasSha()) return 2;
+                        }
+                        else{
+                            var nh=target.num('h');
+                            if(nh>=3) return 1;
+                            if(target.hasSha()) return 1;
+                            if(num&&Math.random()<0.5) return 1;
+                        }
+                        return player.needsToDiscard?0.2:0;
+                    }
+                }
+            }
         },
         yougeng:{
             fullskin:true,
@@ -129,7 +207,8 @@ card.gujian={
                 value:4,
                 result:{
                     target:function(player,target){
-                        if(target.isHealthy()) return 0;
+                        if(target.isHealthy()) return player.needsToDiscard?0.1:0;
+                        if(target.isLeastHp()) return 1.5;
                         return 1/Math.max(1,target.hp);
                     }
                 }
@@ -180,24 +259,19 @@ card.gujian={
                 value:4,
                 result:{
                     target:function(player,target){
-                        if(target.hasSha()){
-                            if(target==player) return 2;
-                            return 1;
+                        if(target==player){
+                            if(target.hasSha()) return 2;
                         }
-                        return 0.2;
+                        else{
+                            var nh=target.num('h');
+                            if(nh>=3) return 1;
+                            if(target.hasSha()) return 1;
+                            if(num&&Math.random()<0.5) return 1;
+                        }
+                        return player.needsToDiscard?0.2:0;
                     }
                 }
             }
-        },
-        mapodoufu:{
-            fullskin:true,
-            type:'food',
-            enable:true,
-            filterTarget:function(card,player,target){
-                return target==player;
-            },
-            selectTarget:-1,
-            modTarget:true,
         },
         heilonglinpian:{
             fullskin:true,
@@ -741,6 +815,110 @@ card.gujian={
         },
     },
     skill:{
+        gudonggeng:{
+            mark:'card',
+            trigger:{player:'phaseBegin'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '你受到杀造成的伤害时有50%的机率令伤害-1（剩余'+player.storage.gudonggeng_markcount+'回合）'
+                }
+            },
+            content:function(){
+                player.storage.gudonggeng_markcount--;
+                if(player.storage.gudonggeng_markcount==0){
+                    delete player.storage.gudonggeng;
+                    delete player.storage.gudonggeng_markcount;
+                    player.removeSkill('gudonggeng');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+            group:'gudonggeng_damage',
+            subSkill:{
+                damage:{
+                    trigger:{player:'damageBegin'},
+                    filter:function(event,player){
+                        return event.card&&event.card.name=='sha'&&event.num>0&&Math.random()<0.5;
+                    },
+                    forced:true,
+                    content:function(){
+                        trigger.num--;
+                    }
+                }
+            },
+            ai:{
+                effect:{
+                    target:function(card,player,target){
+                        if(card.name=='sha'&&ai.get.attitude(player,target)<0) return 0.5;
+                    }
+                }
+            }
+        },
+        qingtuan:{
+            mark:'card',
+            trigger:{player:'phaseAfter'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '你在回合内使用首张杀时摸一张牌（剩余'+player.storage.qingtuan_markcount+'回合）'
+                }
+            },
+            content:function(){
+                player.storage.qingtuan_markcount--;
+                if(player.storage.qingtuan_markcount==0){
+                    delete player.storage.qingtuan;
+                    delete player.storage.qingtuan_markcount;
+                    player.removeSkill('qingtuan');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+            group:'qingtuan_draw',
+            subSkill:{
+                draw:{
+                    trigger:{player:'useCard'},
+                    filter:function(event,player){
+                        return event.card.name=='sha'&&_status.currentPhase==player;
+                    },
+                    usable:1,
+                    forced:true,
+                    content:function(){
+                        player.draw();
+                    }
+                }
+            }
+        },
+        liyutang:{
+            mark:'card',
+            trigger:{player:'phaseEnd'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '结束阶段，若你的体力值为全场最少或之一，你获得一点护甲（剩余'+player.storage.liyutang_markcount+'回合）'
+                }
+            },
+            content:function(){
+                if(player.isLeastHp()){
+                    player.logSkill('liyutang');
+                    player.changeHujia();
+                }
+                player.storage.liyutang_markcount--;
+                if(player.storage.liyutang_markcount==0){
+                    delete player.storage.liyutang;
+                    delete player.storage.liyutang_markcount;
+                    player.removeSkill('liyutang');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+        },
         yougeng:{
             mark:'card',
             trigger:{player:'phaseBegin'},
@@ -774,7 +952,7 @@ card.gujian={
             nopop:true,
             intro:{
                 content:function(storage,player){
-                    return '不能成为延时锦囊牌的目标（剩余'+player.storage.molicha_markcount+'回合）'
+                    return '你不能成为延时锦囊牌的目标（剩余'+player.storage.molicha_markcount+'回合）'
                 }
             },
             mod:{
@@ -812,7 +990,7 @@ card.gujian={
             nopop:true,
             intro:{
                 content:function(storage,player){
-                    return '在出牌阶段可以额外使用一张杀（剩余'+player.storage.yuanbaorou_markcount+'回合）'
+                    return '你在出牌阶段可以额外使用一张杀（剩余'+player.storage.yuanbaorou_markcount+'回合）'
                 }
             },
             mod:{
@@ -839,7 +1017,7 @@ card.gujian={
             nopop:true,
             intro:{
                 content:function(storage,player){
-                    return '结束阶段有50%机率摸一张牌（剩余'+player.storage.tanhuadong_markcount+'回合）'
+                    return '结束阶段有，你50%机率摸一张牌（剩余'+player.storage.tanhuadong_markcount+'回合）'
                 }
             },
             content:function(){
@@ -852,6 +1030,40 @@ card.gujian={
                     delete player.storage.tanhuadong;
                     delete player.storage.tanhuadong_markcount;
                     player.removeSkill('tanhuadong');
+                }
+                else{
+                    player.updateMarks();
+                }
+            }
+        },
+        mapodoufu:{
+            mark:'card',
+            trigger:{player:'phaseEnd'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '结束阶段，你有75%的机率弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'
+                }
+            },
+            content:function(){
+                if(Math.random()<0.75){
+                    var list=player.getEnemies();
+                    for(var i=0;i<list.length;i++){
+                        if(!list[i].num('he')){
+                            list.splice(i--,1);
+                        }
+                    }
+                    var target=list.randomGet();
+                    player.logSkill('mapodoufu',target);
+                    target.discard(target.get('he').randomGet());
+                    target.addExpose(0.2);
+                }
+                player.storage.mapodoufu_markcount--;
+                if(player.storage.mapodoufu_markcount==0){
+                    delete player.storage.mapodoufu;
+                    delete player.storage.mapodoufu_markcount;
+                    player.removeSkill('mapodoufu');
                 }
                 else{
                     player.updateMarks();
@@ -1162,28 +1374,28 @@ card.gujian={
         food:'食物',
         // chunbing:'春饼',
         // chunbing_info:'春饼',
-        // gudonggeng:'骨董羹',
-        // gudonggeng_info:'骨董羹',
+        gudonggeng:'骨董羹',
+        gudonggeng_info:'你受到杀造成的伤害时有50%的机率令伤害-1，持续三回合',
         yougeng:'酉羹',
         yougeng_info:'准备阶段，若你的体力值为全场最少或之一，你回复一点体力，持续两回合',
-        // liyutang:'鲤鱼汤',
-        // liyutang_info:'鲤鱼汤',
+        liyutang:'鲤鱼汤',
+        liyutang_info:'结束阶段，若你的体力值为全场最少或之一，你获得一点护甲，持续两回合',
         // mizhilianou:'蜜汁藕',
         // mizhilianou_info:'蜜汁藕',
         // xiajiao:'虾饺',
         // xiajiao_info:'虾饺',
         tanhuadong:'昙花冻',
-        tanhuadong_info:'结束阶段，有50%的机率摸一张牌，持续三回合',
-        // qingtuan:'青团',
-        // qingtuan_info:'青团',
+        tanhuadong_info:'结束阶段，你有50%的机率摸一张牌，持续三回合',
+        qingtuan:'青团',
+        qingtuan_info:'你在回合内使用首张杀时摸一张牌，持续两回合',
         // luyugeng:'鲈鱼羹',
         // luyugeng_info:'鲈鱼羹',
         yuanbaorou:'元宝肉',
-        yuanbaorou_info:'在出牌阶段可以额外使用一张杀，持续三回合',
+        yuanbaorou_info:'你在出牌阶段可以额外使用一张杀，持续三回合',
         molicha:'茉莉茶',
-        molicha_info:'弃置判定区内的所有牌；不能成为延时锦囊牌的目标，持续五回合',
-        // mapodoufu:'麻婆豆腐',
-        // mapodoufu_info:'麻婆豆腐',
+        molicha_info:'弃置判定区内的所有牌；你不能成为延时锦囊牌的目标，持续五回合',
+        mapodoufu:'麻婆豆腐',
+        mapodoufu_info:'结束阶段，你有75%的机率弃置一名随机敌人的一张随机牌，持续三回合',
     },
     list:[
         ['heart',2,'tanhuadong'],
