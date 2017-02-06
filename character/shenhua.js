@@ -693,10 +693,7 @@ character.shenhua={
 			filter:function(event,player){
 				if(!player.hasZhuSkill('ruoyu'))return false;
 				if(player.storage.ruoyu) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hp<player.hp) return false;
-				}
-				return true;
+				return player.isLowestHp();
 			},
 			content:function(){
 				player.storage.ruoyu=true;
@@ -2393,10 +2390,7 @@ character.shenhua={
 				return false;
 			},
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].hp<player.hp) return true;
-				}
-				return false;
+				return !player.isLowestHp();
 			},
 			content:function(){
 				"step 0"

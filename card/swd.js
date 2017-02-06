@@ -4190,11 +4190,7 @@ card.swd={
 			trigger:{player:'phaseEnd'},
 			frequent:true,
 			filter:function(event,player){
-				if(player.hp==player.maxHp) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(player.hp>game.players[i].hp) return false;
-				}
-				return true;
+				return player.isLowestHp();
 			},
 			content:function(){
 				player.recover();

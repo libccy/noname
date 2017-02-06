@@ -214,11 +214,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				var nh=player.num('h');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')<nh) return false;
-				}
-				return true;
+				return player.isFewestHandcard();
 			},
 			filterTarget:function(card,player,target){
 				return target!=player&&target.num('h')>0;

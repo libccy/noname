@@ -38,13 +38,7 @@ character.gujian={
 				return ai.get.attitude(player,event.player)>0;
 			},
 			filter:function(event,player){
-				var nh=event.player.num('h');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=event.player&&game.players[i].num('h')<nh){
-						return false;
-					}
-				}
-				return true;
+				return event.player.isFewestHandcard();
 			},
 			logTarget:'player',
 			content:function(){
@@ -815,23 +809,12 @@ character.gujian={
 					if(target.isTurnedOver()) return true;
 					if(target.num('j')) return true;
 					if(target.hp==target.maxHp) return false;
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].hp<target.hp){
-							return false;
-						}
-					}
-					return true;
+					return target.isLowestHp();
 				}).ai=function(target){
 					var num=0;
 					var att=ai.get.attitude(player,target);
 					if(att>0){
-						var min=true;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].hp<target.hp){
-								min=false;break;
-							}
-						}
-						if(min){
+						if(target.isLowestHp()){
 							num+=5;
 						}
 						if(target.isTurnedOver()){
@@ -871,13 +854,7 @@ character.gujian={
 					event.target.discard(cards);
 				}
 				"step 5"
-				var min=true;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hp<event.target.hp){
-						min=false;break;
-					}
-				}
-				if(min){
+				if(event.target.isLowestHp()){
 					event.target.recover();
 				}
 			},
