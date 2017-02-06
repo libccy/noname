@@ -4150,9 +4150,7 @@ card.swd={
 			},
 			mark:true,
 			intro:{
-				content:function(storage){
-					return '手牌上限-'+storage;
-				}
+				content:'手牌上限-#'
 			},
 			trigger:{player:'phaseEnd'},
 			forced:true,
@@ -4516,9 +4514,7 @@ card.swd={
 				}
 			},
 			intro:{
-				content:function(storage){
-					return '已积攒'+storage+'点伤害';
-				}
+				content:'已积攒#点伤害'
 			}
 		},
 		nigong2:{
@@ -4587,9 +4583,7 @@ card.swd={
 				trigger.finish();
 			},
 			intro:{
-				content:function(storage){
-					return '已积攒'+storage+'点力量';
-				}
+				content:'已积攒'+storage+'点力量'
 			},
 			group:['xujin2']
 		},

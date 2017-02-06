@@ -218,9 +218,7 @@ character.yijiang={
 				}
 			},
 			intro:{
-				content:function(color){
-					return '不能使用或打出'+get.translation(color)+'的牌';
-				}
+				content:'不能使用或打出$的牌'
 			}
 		},
 		taoluan:{

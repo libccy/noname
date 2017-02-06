@@ -3161,9 +3161,7 @@ character.hearth={
 		guozai2:{
 			mark:true,
 			intro:{
-				content:function(storage){
-					return '需弃置'+get.cnNumber(storage)+'张牌';
-				}
+				content:'结束阶段需弃置&张牌'
 			},
 			trigger:{player:'phaseUseEnd'},
 			forced:true,
@@ -3199,9 +3197,7 @@ character.hearth={
 		guozaix2:{
 			mark:true,
 			intro:{
-				content:function(storage){
-					return '需弃置'+get.cnNumber(storage)+'张牌';
-				}
+				content:'结束阶段需弃置&张牌'
 			},
 			trigger:{player:'phaseUseEnd'},
 			forced:true,
