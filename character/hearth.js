@@ -4836,7 +4836,7 @@ character.hearth={
 			mark:'image',
 			nopop:true,
 			intro:{
-				content:'当计算你与其它角色的距离时，始终-1'
+				content:'进攻距离+1'
 			},
 			mod:{
 				globalFrom:function(from,to,distance){
@@ -5871,7 +5871,7 @@ character.hearth={
 		tuteng7:'活力图腾',
 		tuteng7_info:'结束阶段，你令一名其他角色回复一点体力',
 		tuteng8:'图腾魔像',
-		tuteng8_info:'当计算你与其它角色的距离时，始终-1',
+		tuteng8_info:'你的进攻距离+1',
 		tzhenji:'震击',
 		tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成1点雷电伤害，并随机弃置其一张牌，每回合限发动一次',
 		fenliu:'分流',

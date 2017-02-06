@@ -458,7 +458,7 @@ card.gujian={
             mark:true,
             marktext:'鳞',
             intro:{
-                content:'计算其他角色与你的距离时始终+1'
+                content:'防御距离+1'
             },
             mod:{
                 globalTo:function(from,to,distance){
@@ -712,7 +712,7 @@ card.gujian={
         mutoumianju_skill:'木杀',
         mutoumianju_skill_info:'你可以将一张手牌当作杀使用',
         heilonglinpian:'黑龙鳞片',
-        heilonglinpian_info:'对自己使用，获得一点护甲，直到下一回合开始，计算其他角色与你的距离时始终+1',
+        heilonglinpian_info:'对自己使用，获得一点护甲，直到下一回合开始，你的防御距离+1',
 
         // food:'食物',
         // chunbing:'春饼',

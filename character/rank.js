@@ -523,7 +523,6 @@ window.characterRank={
         'huanggai',
         'xiahoudun',
         'zhangbao',
-        'gongsunzan',
         'pangde',
         'zhangfei',
         'old_huaxiong',

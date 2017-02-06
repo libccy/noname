@@ -6,7 +6,6 @@ character.sp={
 		chenlin:['male','wei',3,['bifa','songci']],
 		caohong:['male','wei',4,['yuanhu']],
 		xiahouba:['male','shu',4,['baobian']],
-		gongsunzan:['male','qun',4,['yicong']],
 		yuanshu:['male','qun',4,['xinyongsi','yjixi']],
 		sp_diaochan:['female','qun',3,['lihun','biyue']],
 		sp_zhaoyun:['male','qun',3,['longdan','chongzhen']],
@@ -7631,7 +7630,7 @@ character.sp={
 		bifa_info:'结束阶段开始时，你可以将一张手牌移出游戏并指定一名其他角色。该角色的准备阶段，其观看你移出游戏的牌并选择一项：交给你一张与此牌同类型的手牌并获得此牌；或将此牌置入弃牌堆，然后失去1点体力。',
 		songci_info:'出牌阶段，你可以选择一项：令一名手牌数小于其体力值的角色摸两张牌；或令一名手牌数大于其体力值的角色弃置两张牌。此技能对每名角色只能使用一次。',
 		yongsi_info:'锁定技，摸牌阶段，你额外摸X张牌，X为场上现存势力数。弃牌阶段，你至少须弃置等同于场上现存势力数的牌（不足则全弃）。',
-		yicong_info:'锁定技，只要你的体力值大于2点，你计算与其他角色的距离时，始终-1；只要你的体力值为2点或更低，其他角色计算与你的距离时，始终+1。',
+		yicong_info:'锁定技，只要你的体力值大于2点，你的进攻距离+1；只要你的体力值为2点或更低，你的防御距离+1',
 		baobian_info:'锁定技，若你的体力值为3或更少，你视为拥有技能“挑衅”；若你的体力值为2或更少；你视为拥有技能“咆哮”；若你的体力值为1，你视为拥有技能“神速”。',
 	},
 }

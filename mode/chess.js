@@ -5219,7 +5219,7 @@ mode.chess={
 		boss_wushang:'神天并地',
 		boss_wushang_info:'锁定技，准备阶段，距离你5以内的所有其他角色需交给你一张手牌',
 		boss_wuying:'无影',
-		boss_wuying_info:'锁定技，你回合内的移动距离-1；计算其他角色与你的距离时始终+2',
+		boss_wuying_info:'锁定技，你回合内的移动距离-1；你的防御距离+2',
 
 		mode_chess_character_config:'战棋模式',
 		mode_chess_card_config:'战棋模式',

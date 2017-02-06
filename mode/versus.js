@@ -2597,7 +2597,7 @@ mode.versus={
 		boss_tianyun:'天陨',
 		boss_tianyun_info:'结束阶段，你可以失去1点体力，然后令一名敌方角色受到2点火焰伤害并弃置其装备区里的所有牌',
 		boss_zhenwei:'镇卫',
-		boss_zhenwei_info:'锁定技，对方角色计算与其他己方角色的距离时，始终+1',
+		boss_zhenwei_info:'锁定技，其他己方角色的防御距离+1',
 		boss_benlei:'奔雷',
 		boss_benlei_info:'锁定技，准备阶段，对敌方攻城器械造成2点雷电伤害',
 		boss_nailuo:'奈落',
@@ -2645,7 +2645,7 @@ mode.versus={
 		boss_chiying:'持盈',
 		boss_chiying_info:'锁定技，每当己方角色受到多于1伤害时，你防止其余伤害',
 		boss_jingfan:'惊帆',
-		boss_jingfan_info:'锁定技，己方其他角色计算与敌方角色距离时，始终-1',
+		boss_jingfan_info:'锁定技，己方其他角色的进攻距离+1',
 	},
 	skill:{
 		boss_didongjg:{
