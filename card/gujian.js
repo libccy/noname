@@ -48,16 +48,6 @@ card.gujian={
             selectTarget:-1,
             modTarget:true,
         },
-        yougeng:{
-            fullskin:true,
-            type:'food',
-            enable:true,
-            filterTarget:function(card,player,target){
-                return target==player;
-            },
-            selectTarget:-1,
-            modTarget:true,
-        },
         liyutang:{
             fullskin:true,
             type:'food',
@@ -93,10 +83,22 @@ card.gujian={
             type:'food',
             enable:true,
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('tanhuadong');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.tanhuadong=card;
+                target.storage.tanhuadong_markcount=3;
+                target.addSkill('tanhuadong');
+            },
+            ai:{
+                order:2,
+                value:5,
+                result:{
+                    target:1
+                }
+            }
         },
         qingtuan:{
             fullskin:true,
@@ -108,25 +110,84 @@ card.gujian={
             selectTarget:-1,
             modTarget:true,
         },
-        yuanbaorou:{
+        yougeng:{
             fullskin:true,
             type:'food',
             enable:true,
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('yougeng');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.yougeng=card;
+                target.storage.yougeng_markcount=2;
+                target.addSkill('yougeng');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        if(target.isHealthy()) return 0;
+                        return 1/Math.max(1,target.hp);
+                    }
+                }
+            }
         },
         molicha:{
             fullskin:true,
             type:'food',
             enable:true,
             filterTarget:function(card,player,target){
-                return target==player;
+                return !target.hasSkill('molicha');
             },
-            selectTarget:-1,
-            modTarget:true,
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.discard(target.get('j'));
+                target.storage.molicha=card;
+                target.storage.molicha_markcount=5;
+                target.addSkill('molicha');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        if(target.num('j')) return 2;
+                        return 1;
+                    }
+                }
+            }
+        },
+        yuanbaorou:{
+            fullskin:true,
+            type:'food',
+            enable:true,
+            filterTarget:function(card,player,target){
+                return !target.hasSkill('yuanbaorou');
+            },
+            range:{global:1},
+            content:function(){
+                target.$gain2(cards);
+                target.storage.yuanbaorou=card;
+                target.storage.yuanbaorou_markcount=3;
+                target.addSkill('yuanbaorou');
+            },
+            ai:{
+                order:2,
+                value:4,
+                result:{
+                    target:function(player,target){
+                        if(target.hasSha()){
+                            if(target==player) return 2;
+                            return 1;
+                        }
+                        return 0.2;
+                    }
+                }
+            }
         },
         mapodoufu:{
             fullskin:true,
@@ -303,15 +364,10 @@ card.gujian={
         bingpotong:{
             fullskin:true,
 			type:'jiguan',
-			enable:function(card,player){
-                if(player.hasSkill('bingpotong')&&player.storage.bingpotong.contains(card)){
-                    return false;
-                }
-                return true;
-            },
+			enable:true,
             wuxieable:true,
 			filterTarget:function(card,player,target){
-				return target.num('h')>0;
+				return target.num('h')>0&&!target.hasSkill('bingpotong');
 			},
 			content:function(){
 				"step 0"
@@ -367,10 +423,7 @@ card.gujian={
                 "step 4"
                 if(cards&&cards.length){
                     player.gain(cards,'gain2');
-                    if(!player.hasSkill('bingpotong')){
-                        player.addSkill('bingpotong');
-                    }
-                    player.storage.bingpotong=player.storage.bingpotong.concat(cards);
+                    target.addTempSkill('bingpotong','phaseAfter');
                 }
 			},
 			ai:{
@@ -688,6 +741,123 @@ card.gujian={
         },
     },
     skill:{
+        yougeng:{
+            mark:'card',
+            trigger:{player:'phaseBegin'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '准备阶段，若你的体力值为全场最少或之一，你回复一点体力（剩余'+player.storage.yougeng_markcount+'回合）'
+                }
+            },
+            content:function(){
+                if(player.isDamaged()&&player.isLeastHp()){
+                    player.logSkill('yougeng');
+                    player.recover();
+                }
+                player.storage.yougeng_markcount--;
+                if(player.storage.yougeng_markcount==0){
+                    delete player.storage.yougeng;
+                    delete player.storage.yougeng_markcount;
+                    player.removeSkill('yougeng');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+        },
+        molicha:{
+            mark:'card',
+            trigger:{player:'phaseAfter'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '不能成为延时锦囊牌的目标（剩余'+player.storage.molicha_markcount+'回合）'
+                }
+            },
+            mod:{
+				targetEnabled:function(card){
+					if(get.type(card)=='delay'){
+						return false;
+					}
+				}
+			},
+            content:function(){
+                player.storage.molicha_markcount--;
+                if(player.storage.molicha_markcount==0){
+                    delete player.storage.molicha;
+                    delete player.storage.molicha_markcount;
+                    player.removeSkill('molicha');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+            ai:{
+                effect:{
+                    target:function(card){
+                        if(get.type(card)=='delay'){
+    						return 'zeroplayertarget';
+    					}
+                    }
+                }
+            }
+        },
+        yuanbaorou:{
+            mark:'card',
+            trigger:{player:'phaseAfter'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '在出牌阶段可以额外使用一张杀（剩余'+player.storage.yuanbaorou_markcount+'回合）'
+                }
+            },
+            mod:{
+                cardUsable:function(card,player,num){
+					if(card.name=='sha') return num+1;
+				}
+			},
+            content:function(){
+                player.storage.yuanbaorou_markcount--;
+                if(player.storage.yuanbaorou_markcount==0){
+                    delete player.storage.yuanbaorou;
+                    delete player.storage.yuanbaorou_markcount;
+                    player.removeSkill('yuanbaorou');
+                }
+                else{
+                    player.updateMarks();
+                }
+            },
+        },
+        tanhuadong:{
+            mark:'card',
+            trigger:{player:'phaseEnd'},
+            direct:true,
+            nopop:true,
+            intro:{
+                content:function(storage,player){
+                    return '结束阶段有50%机率摸一张牌（剩余'+player.storage.tanhuadong_markcount+'回合）'
+                }
+            },
+            content:function(){
+                if(Math.random()<0.5){
+                    player.logSkill('tanhuadong');
+                    player.draw();
+                }
+                player.storage.tanhuadong_markcount--;
+                if(player.storage.tanhuadong_markcount==0){
+                    delete player.storage.tanhuadong;
+                    delete player.storage.tanhuadong_markcount;
+                    player.removeSkill('tanhuadong');
+                }
+                else{
+                    player.updateMarks();
+                }
+            }
+        },
         yunvyuanshen_skill:{
 			mark:true,
             marktext:'参',
@@ -711,19 +881,7 @@ card.gujian={
 				player.draw();
 			}
 		},
-        bingpotong:{
-            trigger:{player:'phaseAfter'},
-            forced:true,
-            popup:false,
-            silent:true,
-            onremove:true,
-            init:function(player){
-                player.storage.bingpotong=[];
-            },
-            content:function(){
-                player.removeSkill('bingpotong');
-            }
-        },
+        bingpotong:{},
         heilonglinpian:{
             mark:true,
             marktext:'鳞',
@@ -968,8 +1126,8 @@ card.gujian={
         qiankunbiao:'乾坤镖',
         qiankunbiao_info:'随机弃置一名其他角色和其相邻角色的一张牌',
 
-        bingpotong:'冰魄筒',
-        bingpotong_info:'出牌阶段，对一名有手牌的角色使用，你与其同时展示一张手牌，若颜色相同，你弃置展示的牌，目标流失一点体力；若颜色不同，你收回此牌且本回合内不可再使用',
+        bingpotong:'冰魄针',
+        bingpotong_info:'出牌阶段，对一名有手牌的角色使用，你与其同时展示一张手牌，若颜色相同，你弃置展示的牌，目标流失一点体力；若颜色不同，你收回此牌且本回合内再对该目标使用',
         feibiao:'飞镖',
         feibiao_info:'出牌阶段，对一名距离1以外的角色使用，令其弃置一张黑色手牌或流失一点体力',
 
@@ -1001,37 +1159,41 @@ card.gujian={
         heilonglinpian:'黑龙鳞片',
         heilonglinpian_info:'对自己使用，获得一点护甲，直到下一回合开始，你的防御距离+1',
 
-        // food:'食物',
+        food:'食物',
         // chunbing:'春饼',
         // chunbing_info:'春饼',
         // gudonggeng:'骨董羹',
         // gudonggeng_info:'骨董羹',
-        // yougeng:'酉羹',
-        // yougeng_info:'酉羹',
+        yougeng:'酉羹',
+        yougeng_info:'准备阶段，若你的体力值为全场最少或之一，你回复一点体力，持续两回合',
         // liyutang:'鲤鱼汤',
         // liyutang_info:'鲤鱼汤',
         // mizhilianou:'蜜汁藕',
         // mizhilianou_info:'蜜汁藕',
         // xiajiao:'虾饺',
         // xiajiao_info:'虾饺',
-        // tanhuadong:'昙花冻',
-        // tanhuadong_info:'昙花冻',
+        tanhuadong:'昙花冻',
+        tanhuadong_info:'结束阶段，有50%的机率摸一张牌，持续三回合',
         // qingtuan:'青团',
         // qingtuan_info:'青团',
         // luyugeng:'鲈鱼羹',
         // luyugeng_info:'鲈鱼羹',
-        // yuanbaorou:'元宝肉',
-        // yuanbaorou_info:'元宝肉',
-        // molicha:'茉莉茶',
-        // molicha_info:'茉莉茶',
+        yuanbaorou:'元宝肉',
+        yuanbaorou_info:'在出牌阶段可以额外使用一张杀，持续三回合',
+        molicha:'茉莉茶',
+        molicha_info:'弃置判定区内的所有牌；不能成为延时锦囊牌的目标，持续五回合',
         // mapodoufu:'麻婆豆腐',
         // mapodoufu_info:'麻婆豆腐',
     },
     list:[
+        ['heart',2,'tanhuadong'],
+        ['club',1,'molicha'],
+
         ['spade',7,'yuheng'],
         ['club',4,'mutoumianju'],
         ['spade',2,'heilonglinpian'],
         ['spade',1,'mianlijinzhen'],
+        ['heart',13,'yunvyuanshen'],
 
         ['club',8,'feibiao','poison'],
         ['diamond',9,'feibiao','poison'],
@@ -1058,6 +1220,5 @@ card.gujian={
         ['club',6,'liufengsan'],
         ['club',3,'liufengsan'],
 
-        ['heart',13,'yunvyuanshen'],
     ]
 };

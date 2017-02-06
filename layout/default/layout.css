@@ -1569,6 +1569,9 @@ margin-bottom: 5px;
 #arena.selecting:not(.video) #me .card:not(.selectable)>.addinfo,
 #arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick),
 .dead,.likedead{opacity: 0.6;}
+#arena.selecting:not(.video) .player[data-position='0'] .marks>.card:not(.selectable)>.image{
+	opacity: 1;
+}
 .unselectable:not(.selected):not(.removing){opacity: 0.6 !important}
 .unselectable2{opacity: 0.4 !important}
 .mark>.background{opacity: 1 !important;}

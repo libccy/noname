@@ -4003,7 +4003,6 @@ character.swd={
 		},
 		huanjian:{
 			enable:'phaseUse',
-			usable:1,
 			filterCard:function(card){
 				return get.color(card)=='black';
 			},
@@ -4015,7 +4014,7 @@ character.swd={
 			viewAsFilter:function(player){
 				if(!player.num('he',{color:'black'})) return false;
 			},
-			prompt:'将一张黑色牌当作冰魄筒使用',
+			prompt:'将一张黑色牌当作冰魄针使用',
 			check:function(card){return 5-ai.get.value(card)},
 			ai:{
 				threaten:1.1
@@ -8872,7 +8871,7 @@ character.swd={
 		shengshou:'圣手',
 		huanjian:'幻箭',
 		yuhuo:'浴火',
-		huanjian_info:'出牌阶段限一次，你可以将一张黑色牌当作冰魄筒使用',
+		huanjian_info:'出牌阶段，你可以将一张黑色牌当作冰魄针使用',
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',

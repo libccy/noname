@@ -10104,8 +10104,8 @@
 				},
 				updateMarks:function(){
 					for(var i in this.marks){
-						if(i=='ghujia'||(!this.marks[i].querySelector('.image')&&lib.skill[i]&&
-							lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
+						if(i=='ghujia'||((!this.marks[i].querySelector('.image')||this.storage[i+'_markcount'])&&
+							lib.skill[i]&&lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
                             (this.storage[i]||lib.skill[i].intro.markcount))){
 							this.marks[i].classList.add('overflowmark')
 							var num=0;
