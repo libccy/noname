@@ -27631,6 +27631,9 @@
     						dialog.currentcapt=null;
     						dialog.currentcaptnode=null;
     						this.classList.remove('thundertext');
+							if(this.touchlink){
+								this.touchlink.classList.remove('active');
+							}
     						for(var i=0;i<dialog.buttons.length;i++){
     							if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
     								dialog.buttons[i].classList.add('nodisplay');
@@ -27646,10 +27649,16 @@
     					else{
     						if(dialog.currentcaptnode){
     							dialog.currentcaptnode.classList.remove('thundertext');
+								if(dialog.currentcaptnode.touchlink){
+									dialog.currentcaptnode.touchlink.classList.remove('active');
+								}
     						}
     						dialog.currentcapt=this.link;
     						dialog.currentcaptnode=this;
     						this.classList.add('thundertext');
+							if(this.touchlink){
+								this.touchlink.classList.add('active');
+							}
     						for(var i=0;i<dialog.buttons.length;i++){
     							if(dialog.buttons[i].capt!=dialog.getCurrentCapt(dialog.buttons[i].link,dialog.buttons[i].capt)){
     								dialog.buttons[i].classList.add('nodisplay');
@@ -27669,13 +27678,18 @@
 					else{
                         if(newlined2){
                             newlined2.style.display='none';
-                            packsource.innerHTML='武将包';
                             packsource.classList.remove('thundertext');
+							if(!get.is.phoneLayout()){
+								packsource.innerHTML='武将包';
+							}
                         }
                         if(this.classList.contains('thundertext')){
                             dialog.currentcapt2=null;
                             dialog.currentcaptnode2=null;
                             this.classList.remove('thundertext');
+							if(this.touchlink){
+								this.touchlink.classList.remove('active');
+							}
                             for(var i=0;i<dialog.buttons.length;i++){
                                 if(dialog.currentgroup&&dialog.buttons[i].group!=dialog.currentgroup){
                                     dialog.buttons[i].classList.add('nodisplay');
@@ -27691,11 +27705,17 @@
                         else{
                             if(dialog.currentcaptnode2){
                                 dialog.currentcaptnode2.classList.remove('thundertext');
+								if(dialog.currentcaptnode2.touchlink){
+									dialog.currentcaptnode2.touchlink.classList.remove('active');
+								}
                             }
                             dialog.currentcapt2=this.link;
                             dialog.currentcaptnode2=this;
                             this.classList.add('thundertext');
-                            if(this.parentNode==newlined2){
+							if(this.touchlink){
+								this.touchlink.classList.add('active');
+							}
+                            else if(this.parentNode==newlined2){
                                 packsource.innerHTML=this.innerHTML;
                                 packsource.classList.add('thundertext');
                             }
@@ -27725,6 +27745,14 @@
 								dialog.seperate[i].style.display='';
 								dialog.seperate[i].nextSibling.style.display='';
 							}
+						}
+					}
+					if(filternode){
+						if(filternode.querySelector('.active')){
+							packsource.classList.add('thundertext');
+						}
+						else{
+							packsource.classList.remove('thundertext');
 						}
 					}
 					if(e) e.stopPropagation();
@@ -27833,8 +27861,32 @@
                     packsource=document.createElement('span');
                     packsource.style.margin='3px';
                     newlined.appendChild(packsource);
+					var filternode=null;
+					var clickCaptNode=function(e){
+						delete _status.filterCharacter;
+						ui.window.classList.remove('shortcutpaused');
+						filternode.remove();
+						clickCapt.call(this.link,e);
+					};
 					if(get.is.phoneLayout()){
+						newlined.style.marginTop='';
 						packsource.innerHTML='筛选';
+						filternode=ui.create.div('.popup-container.filter-character');
+						ui.create.div(filternode);
+						filternode.listen(function(e){
+							delete _status.filterCharacter;
+							ui.window.classList.remove('shortcutpaused');
+							this.remove();
+							e.stopPropagation();
+						});
+						for(var i=0;i<node.childElementCount;i++){
+							if(node.childNodes[i].tagName.toLowerCase()=='span'){
+								node.childNodes[i].style.display='none';
+								node.childNodes[i].touchlink=ui.create.div(filternode.firstChild,clickCaptNode,'.menubutton.large.capt',node.childNodes[i].innerHTML);
+								node.childNodes[i].touchlink.link=node.childNodes[i];
+							}
+						}
+						ui.create.node('br',filternode.firstChild);
 					}
                     else{
 						packsource.innerHTML='武将包';
@@ -27855,12 +27907,24 @@
 
                     packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
                         if(_status.dragged) return;
-                        if(newlined2.style.display=='none'){
-                            newlined2.style.display='block';
-                        }
-                        else{
-                            newlined2.style.display='none';
-                        }
+						if(get.is.phoneLayout()){
+							_status.filterCharacter=true;
+							ui.window.classList.add('shortcutpaused');
+							ui.window.appendChild(filternode);
+							ui.refresh(filternode);
+							var dh=filternode.offsetHeight-filternode.firstChild.offsetHeight;
+							if(dh>0){
+								filternode.firstChild.style.top=(dh/2)+'px';
+							}
+						}
+						else{
+							if(newlined2.style.display=='none'){
+	                            newlined2.style.display='block';
+	                        }
+	                        else{
+	                            newlined2.style.display='none';
+	                        }
+						}
                     });
                     var packlist=[];
                     for(var i=0;i<lib.config.all.characters.length;i++){
@@ -27887,6 +27951,10 @@
                         span.link=packlist[i];
                         span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
                         newlined2.appendChild(span);
+						if(filternode){
+							span.touchlink=ui.create.div(filternode.firstChild,clickCaptNode,'.menubutton.large',span.innerHTML);
+							span.touchlink.link=span;
+						}
                     }
                 }
 
@@ -30122,7 +30190,7 @@
 						_status.justdragged=false;
 					},500);
 				}
-				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging&&_status._swipeorigin.touches){
+				else if(_status._swipeorigin&&!_status.paused2&&!_status.mousedragging&&_status._swipeorigin.touches&&!_status.filterCharacter){
 					 if(get.utc()-_status._swipeorigin.time<500){
 						var dx=_status._swipeorigin.touches.clientX/game.documentZoom-_status._swipeorigin.clientX/game.documentZoom;
 						var dy=_status._swipeorigin.touches.clientY/game.documentZoom-_status._swipeorigin.clientY/game.documentZoom;

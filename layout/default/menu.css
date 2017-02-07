@@ -13,6 +13,32 @@
 .popup-container{
 	z-index:10;
 }
+.popup-container.filter-character{
+	text-align: center;
+	overflow: scroll;
+}
+.popup-container.filter-character>div{
+	left: 0;
+	top:0;
+	left: 0;
+	width: 100%;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	transition: all 0s;
+	position: relative;
+}
+.popup-container.filter-character>div>div{
+	position: relative;
+	margin: 10px;
+}
+.popup-container.filter-character>div>.capt{
+	width: 80px;
+	height: 80px;
+	padding: 0;
+	font-size: 60px;
+	line-height: 90px;
+}
 
 .menu-container,.popup-container{
 	width:100%;
