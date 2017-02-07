@@ -717,6 +717,13 @@ table{table-layout: fixed;}
 	position: absolute;
 	overflow: scroll;
 }
+.dialog.choose-character>.content-container{
+	width: calc(100% - 106px);
+	left: 106px;
+}
+.dialog.choose-character>.packnode{
+	width: 106px;
+}
 .dialog.character>.packnode>div{
 	/*box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));

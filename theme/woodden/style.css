@@ -9,6 +9,17 @@ html{
 	border-radius: 8px;
 }
 
+.dialog.choose-character>.packnode>div{
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
+	color: white;
+	text-shadow: black 0 0 2px;
+}
+.dialog.choose-character>.packnode>div.active{
+	box-shadow: rgba(27, 63, 95, 0.8) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+}
+
 .button-downloading>.button-progress{
 	background: rgba(77,224,100,0.45);
 }

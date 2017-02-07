@@ -943,8 +943,7 @@
                         item:{
                             '收藏':'收藏',
                             '最近':'最近',
-                            // '自创':'自创',
-                            all:'全部'
+                            'all':'全部'
                         },
                         unfrequent:true,
                     },
@@ -27458,15 +27457,15 @@
             characterDialog2:function(filter){
                 var list=[];
                 for(var i in lib.character){
-                    if(lib.character[i][4].contains('minskin')) continue;
-                    if(lib.character[i][4].contains('boss')||lib.character[i][4].contains('hiddenboss')){
-                        if(lib.config.mode=='boss') continue;
-                        if(!lib.character[i][4].contains('bossallowed')) continue;
-                    }
+					if(lib.character[i][4].contains('minskin')) continue;
+					if(lib.character[i][4].contains('boss')||lib.character[i][4].contains('hiddenboss')){
+						if(lib.config.mode=='boss') continue;
+						if(!lib.character[i][4].contains('bossallowed')) continue;
+					}
 
-                    if(lib.character[i][4].contains('stonehidden')) continue;
-                    if(lib.config.banned.contains(i)) continue;
-                    if(filter&&filter(i)) continue;
+					if(lib.character[i][4].contains('stonehidden')) continue;
+					if(lib.config.banned.contains(i)) continue;
+					if(filter&&filter(i)) continue;
                     list.push(i);
                 }
 				var dialog=ui.create.dialog('hidden');
@@ -27475,7 +27474,8 @@
 				dialog.classList.add('scroll2');
                 dialog.classList.add('scroll3');
                 list.sort(lib.sort.character);
-                dialog.classList.add('character');
+				dialog.classList.add('character');
+                dialog.classList.add('choose-character');
                 var getPack=function(name){
                     for(var i in lib.characterPack){
                         if(lib.characterPack[i][name]) return i;
@@ -27483,82 +27483,63 @@
                     return null;
                 }
                 var packs={};
-                for(var i=0;i<list.length;i++){
-                    var pack=getPack(list[i]);
-                    if(pack){
-                        if(!packs[pack]){
-                            packs[pack]=[];
-                        }
-                        packs[pack].push(list[i]);
-                    }
-                }
                 var packnode=ui.create.div('.packnode',dialog);
                 lib.setScroll(packnode);
                 var clickCapt=function(){
                     var active=this.parentNode.querySelector('.active');
                     if(active){
-                        active.buttonnode.remove();
                         active.classList.remove('active');
                     }
                     this.classList.add('active');
-                    dialog.content.appendChild(this.buttonnode);
-                    dialog.buttons=this.buttons;
-                    game.uncheck();
-                    game.check();
+                    for(var i=0;i<dialog.buttons.length;i++){
+						if(this.pack&&!this.pack.contains(dialog.buttons[i].link)){
+							dialog.buttons[i].classList.add('nodisplay');
+						}
+						else{
+							dialog.buttons[i].classList.remove('nodisplay');
+						}
+					}
                 }
                 var createNode=function(packname){
                     var translate;
-                    if(packname=='custom'){
-                        translate='自定义';
+					var pack=null;
+                    if(packname=='最近'){
+                        pack=lib.config.recentCharacter;
                     }
-                    else if(packname=='recent'){
-                        translate='最近';
-                        packs[packname]=lib.config.recentCharacter;
+                    else if(packname=='收藏'){
+                        pack=lib.config.favouriteCharacter;
                     }
-                    else if(packname=='favourite'){
-                        translate='收藏';
-                        packs[packname]=lib.config.favouriteCharacter;
-                        packs[packname].sort(lib.sort.character);
-                    }
-                    else{
-                        translate=lib.translate[packname+'_character_config'];
-                    }
-                    var node=ui.create.div('.dialogbutton.menubutton.large',translate,packnode,clickCapt);
-                    node.buttonnode=ui.create.div('.buttons');
-                    node.buttons=ui.create.buttons(packs[packname],'character',node.buttonnode);
+                    var node=ui.create.div('.dialogbutton.menubutton.large',packname,packnode,clickCapt);
+					node.pack=pack;
                     return node;
                 }
+				dialog.add([list,'character']);
                 var bool=true;
+				var node;
                 if(lib.config.recentCharacter.length){
-                    var node=createNode('recent');
+                    node=createNode('最近');
                     if(lib.config.character_dialog_tool=='最近'){
                         clickCapt.call(node);
                         bool=false;
                     }
                 }
                 if(lib.config.favouriteCharacter.length){
-                    var node=createNode('favourite');
+                    node=createNode('收藏');
                     if(lib.config.character_dialog_tool=='收藏'){
                         clickCapt.call(node);
                         bool=false;
                     }
                 }
-                if(packs.custom){
-                    var node=createNode('custom');
-                    if(lib.config.character_dialog_tool=='自创'){
-                        clickCapt.call(node);
-                        bool=false;
-                    }
-                }
-                for(var i=0;i<lib.config.all.characters.length;i++){
-                    var packname=lib.config.all.characters[i];
-                    if(packs[packname]){
-                        createNode(packname);
-                    }
-                }
+				var node=createNode('全部');
+				if(lib.config.character_dialog_tool=='all'){
+					clickCapt.call(node);
+					bool=false;
+				}
                 if(bool){
                     clickCapt.call(packnode.firstChild);
                 }
+
+				var node=ui.create.div('.dialogbutton.menubutton.large','筛选',packnode);
                 return dialog;
             },
 			characterDialog:function(){
