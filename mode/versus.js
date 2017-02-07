@@ -46,6 +46,9 @@ mode.versus={
 		else if(_status.mode=='two'){
 			game.prepareArena(4);
 		}
+		else if(_status.mode=='three'){
+			ui.wuxie.hide();
+		}
 		else{
 			if(lib.storage.choice==undefined) game.save('choice',20);
 			if(lib.storage.zhu==undefined) game.save('zhu',true);
@@ -172,6 +175,9 @@ mode.versus={
 				game.players[i].getId();
 			}
 			game.chooseCharacterJiange();
+		}
+		else if(_status.mode=='three'){
+			game.chooseCharacterThree();
 		}
 		else{
 			game.chooseCharacter();
@@ -1032,6 +1038,261 @@ mode.versus={
 				setTimeout(function(){
 					ui.control.style.transitionDuration='';
 				},500);
+			});
+		},
+		chooseCharacterThree:function(){
+			var next=game.createEvent('chooseCharacter',false);
+			next.setContent(function(){
+				'step 0'
+				event.nodes=[];
+				event.avatars=[];
+				event.list=[];
+				event.friend=[];
+				event.enemy=[];
+				event.blank=[];
+				for(var i in lib.character){
+					if(lib.filter.characterDisabled(i)) continue;
+					if(get.config('enable_all_three')||lib.choiceThree.contains(i)){
+						event.list.push(i);
+					}
+				}
+				for(var i=0;i<32;i++){
+					event.nodes.push(ui.create.div('.shadowed.reduce_radius'));
+					event.nodes[i].style.left='50%';
+					event.nodes[i].style.top='50%';
+				}
+				event.moveAvatar=function(node,i){
+					event.moveNode(node,i);
+					if(node.linknode){
+						if(!node.moved){
+							event.blank.push(node.linknode.index);
+						}
+						node.linknode.show();
+					}
+					node.linknode=event.nodes[i];
+					node.linknode.hide();
+				};
+				event.aiMove=function(){
+					var list=[];
+					for(var i=0;i<event.avatars.length;i++){
+						if(!event.avatars[i].moved){
+							list.push(event.avatars[i]);
+						}
+					}
+					for(var i=0;i<list.length;i++){
+						if(Math.random()<0.7||i==list.length-1){
+							event.moveAvatar(list[i],event.enemy.length);
+							event.enemy.push(list[i]);
+							list[i].moved=true;
+							break;
+						}
+					}
+				};
+				event.promptbar=ui.create.div('.hidden',ui.window);
+				event.promptbar.style.width='100%';
+				event.promptbar.style.left=0;
+				if(get.is.phoneLayout()){
+					event.promptbar.style.top='20px';
+				}
+				else{
+					event.promptbar.style.top='58px';
+				}
+				event.promptbar.style.pointerEvents='none';
+				event.promptbar.style.textAlign='center';
+				event.promptbar.style.zIndex='2';
+				ui.create.div('.shadowed.reduce_radius',event.promptbar);
+				event.promptbar.firstChild.style.fontSize='18px';
+				event.promptbar.firstChild.style.padding='6px 10px';
+				event.promptbar.firstChild.style.position='relative';
+				event.prompt=function(str){
+					event.promptbar.firstChild.innerHTML=str;
+					event.promptbar.show();
+				};
+				event.moveNode=function(node,i){
+					var width=event.width,height=event.height,margin=event.margin;
+					var left=-(width+10)*4+5+(i%8)*(width+10);
+					var top=-(height+10)*2+5+Math.floor(i/8)*(height+10)+margin/2;
+					node.style.transform='translate('+left+'px,'+top+'px)';
+					node.index=i;
+				};
+				event.resize=function(){
+					var margin=0;
+					if(!get.is.phoneLayout()){
+						margin=38;
+					}
+					var height=(ui.window.offsetHeight-50-margin)/4;
+					var width=(ui.window.offsetWidth-90)/8;
+					if(width*1.2<height){
+						height=width*1.2;
+					}
+					else{
+						width=height/1.2;
+					}
+					event.width=width;
+					event.height=height;
+					event.margin=margin;
+					for(var i=0;i<32;i++){
+						event.moveNode(event.nodes[i],i);
+						event.nodes[i].style.width=width+'px';
+						event.nodes[i].style.height=height+'px';
+						if(event.avatars[i]){
+							event.moveNode(event.avatars[i],i+8);
+							event.avatars[i].style.width=width+'px';
+							event.avatars[i].style.height=height+'px';
+							event.avatars[i].linknode=event.nodes[i+8];
+							event.nodes[i+8].hide();
+						}
+					}
+				};
+				lib.onresize.push(event.resize);
+				event.clickAvatar=function(){
+					if(this.moved) return;
+					if(!_status.imchoosing) return;
+					event.moveAvatar(this,event.friend.length+24);
+					event.friend.push(this.link);
+					this.moved=true;
+					game.resume();
+				};
+				event.replacenode=ui.create.system('换将',function(){
+					while(event.avatars.length){
+						event.avatars.shift().remove();
+					}
+					for(var i=0;i<32;i++){
+						event.nodes[i].show();
+					}
+					delete event.list2;
+					event.friend.length=0;
+					event.enemy.length=0;
+					event.blank.length=0;
+					event.redoing=true;
+					if(_status.imchoosing){
+						game.resume();
+					}
+				},true);
+				event.reselectnode=ui.create.system('重选',function(){
+					for(var i=0;i<32;i++){
+						event.nodes[i].show();
+					}
+					event.list2=event.list2.concat(event.friend).concat(event.enemy);
+					event.friend.length=0;
+					event.enemy.length=0;
+					for(var i=0;i<event.avatars.length;i++){
+						if(event.avatars[i].moved){
+							event.moveAvatar(event.avatars[i],event.blank.randomRemove());
+							delete event.avatars[i].moved;
+						}
+					}
+					event.redoing=true;
+					if(_status.imchoosing){
+						game.resume();
+					}
+				},true);
+				event.checkredo=function(){
+					if(event.redoing){
+						event.goto(1);
+						delete event.redoing;
+						return true;
+					}
+				};
+				if(ui.cardPileButton) ui.cardPileButton.style.display='none';
+				event.resize();
+				for(var i=0;i<32;i++){
+					ui.window.appendChild(event.nodes[i]);
+				}
+				'step 1'
+				if(Math.random()<0.5){
+					_status.side=true;
+					event.side=1;
+				}
+				else{
+					_status.side=false;
+					event.side=3;
+				}
+				if(!event.list2){
+					event.list2=event.list.randomGets(16);
+					for(var i=0;i<16;i++){
+						event.avatars.push(ui.create.div('.shadowed.reduce_radius',event.clickAvatar));
+						var name=event.list2[i];
+						event.avatars[i].setBackground(name,'character');
+						event.avatars[i].link=name;
+						event.avatars[i].style.left='50%';
+						event.avatars[i].style.top='50%';
+					}
+					event.resize();
+					for(var i=0;i<16;i++){
+						ui.window.appendChild(event.avatars[i]);
+					}
+					event.avatars.sort(function(a,b){
+						return get.rank(b.link,true)-get.rank(a.link,true);
+					})
+				}
+				game.delay();
+				'step 2'
+				if(event.checkredo()) return;
+				if(event.side<2){
+					_status.imchoosing=true;
+					if(event.side==0){
+						event.prompt('请选择两名武将');
+					}
+					else{
+						event.prompt('请选择一名武将');
+					}
+					game.pause();
+				}
+				else{
+					event.prompt('敌方正在选将');
+					event.aiMove();
+					game.delay(2);
+				}
+				'step 3'
+				delete _status.imchoosing;
+				if(event.checkredo()) return;
+				if(event.friend.length+event.enemy.length<15){
+					if(event.side==1){
+						game.delay(2);
+					}
+					event.side++;
+					if(event.side>3){
+						event.side=0;
+					}
+					event.goto(2);
+				}
+				else{
+					event.promptbar.delete();
+					event.side++;
+					if(event.side>3){
+						event.side=0;
+					}
+					if(event.side>=2){
+						game.delay(2)
+					}
+				}
+				'step 4'
+				if(event.checkredo()) return;
+				event.replacenode.delete();
+				event.reselectnode.delete();
+				for(var i=0;i<event.avatars.length;i++){
+					if(!event.avatars[i].moved){
+						if(event.side<2){
+							event.moveAvatar(event.avatars[i],event.friend.length+24);
+							event.friend.push(event.avatars[i]);
+						}
+						else{
+							event.moveAvatar(event.avatars[i],event.enemy.length);
+							event.enemy.push(event.avatars[i]);
+						}
+						event.avatars[i].moved=true;
+					}
+				}
+				'step 5'
+				if(event.checkredo()) return;
+				console.log(111);
+				game.pause();
+				'step 6'
+				if(event.checkredo()) return;
+				if(ui.cardPileButton) ui.cardPileButton.style.display='';
+				lib.onresize.remove(event.resize);
+				ui.wuxie.show();
 			});
 		},
 		chooseCharacter:function(){
@@ -2452,21 +2713,37 @@ mode.versus={
 			boss_lieshiyazi:['male','wei',4,['boss_jiguan','boss_nailuo'],['jiangemech','hiddenboss','bossallowed'],'wei'],
 		}
 	},
-	choiceFour:[
-		'sunquan','re_ganning','re_lvmeng','re_zhouyu','re_luxun','sunshangxiang',
-		're_liubei','re_guanyu','re_zhangfei','zhugeliang','re_zhaoyun','re_machao','huangyueying','re_xushu',
+	choiceThree:[
+		'sunquan','re_ganning','re_huanggai','re_zhouyu','re_daqiao','re_luxun','sunshangxiang',
+		're_liubei','re_zhangfei','zhugeliang','re_zhaoyun','re_machao','huangyueying',
 		're_caocao','re_simayi','re_zhangliao','re_xuzhu','re_guojia','zhenji','re_lidian',
+		're_gongsunzan','diaochan','re_huatuo',
+		'xiaoqiao',
+		'dianwei',
+		'xuhuang','sunjian',
+		'dengai','jiangwei','sunce',
+		'masu','lingtong','xusheng','chengong',
+		'xunyou','wangyi',
+		'guyong','caifuren',
+		'zhugejin','dingfeng',
+	],
+	choiceFour:[
+		'sunquan','re_ganning','re_lvmeng','re_zhouyu','re_daqiao','re_luxun','sunshangxiang',
+		're_liubei','re_guanyu','re_zhangfei','zhugeliang','re_zhaoyun','re_machao','huangyueying','re_xushu',
+		're_caocao','re_simayi','re_xiahoudun','re_zhangliao','re_xuzhu','re_guojia','zhenji','re_lidian',
 		're_lvbu','diaochan','re_huatuo',
 		'xiahouyuan','huangzhong','xiaoqiao',
 		'dianwei','pangtong','sp_zhugeliang','taishici','pangde','yanwen',
 		'xuhuang','sunjian','jiaxu','dongzhuo',
 		'zhanghe','dengai','jiangwei','liushan','sunce',
-		'caozhi','zhangchunhua','masu','fazheng','xushu','lingtong','wuguotai','xusheng','chengong','gaoshun',
+		'caozhi','zhangchunhua','masu','xin_fazheng','xin_xushu','lingtong','wuguotai','xusheng','chengong','gaoshun',
 		'xunyou','wangyi','zhonghui','madai','liaohua','chengpu','handang','bulianshi',
-		'jianyong','panzhangmazhong','yufan','liru','fuhuanghou',
+		'jianyong','panzhangmazhong','yufan','xin_liru','fuhuanghou',
 		'caozhen','chenqun','hanhaoshihuan','wuyi','zhoucang','guyong','sunluban','jushou','caifuren',
 		'caoxiu','liuchen','gongsunyuan',
-		'guohuanghou','liyan','cenhun','liuyu'
+		'guohuanghou','liyan','cenhun','liuyu',
+		'sp_caiwenji','yuejin','sp_jiangwei','simalang','chengyu','caoang','wangji','wenpin',
+		'zhugedan','mizhu','mayunlu','zhugeke','zumao','dingfeng','sunhao','zhanglu','hetaihou'
 	],
 	translate:{
 		zhu:'主',

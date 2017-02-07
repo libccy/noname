@@ -1678,6 +1678,9 @@ div:hover>.intro{opacity: 1;}
 #window[data-radius_size='increase'] .shadowed{
 	border-radius:16px;
 }
+#window[data-radius_size='default'] .shadowed.reduce_radius{
+	border-radius:4px;
+}
 .underline,.underlinenode{
 	padding:3px;
 	width:auto;

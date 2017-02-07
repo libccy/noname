@@ -2802,6 +2802,12 @@
 							map.four_assign.hide();
                             map.expand_dialog.hide();
 						}
+						if(config.versus_mode=='three'){
+							map.enable_all_three.show();
+						}
+						else{
+							map.enable_all_three.hide();
+						}
                         if(config.versus_mode=='jiange'||config.versus_mode=='two'){
                             map.free_choose.show();
                         }
@@ -2850,6 +2856,12 @@
                         frequent:true,
                     },
 					enable_all:{
+						name:'启用全部武将',
+						init:false,
+						frequent:true,
+						restart:true,
+					},
+					enable_all_three:{
 						name:'启用全部武将',
 						init:false,
 						frequent:true,

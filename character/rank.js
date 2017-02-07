@@ -229,6 +229,7 @@ window.characterRank={
         'hs_kazhakusi',
         'swd_yeyaxi',
         'dianwei',
+        're_lidian',
     ],
     bp:[
         'sp_zhangjiao',
@@ -410,7 +411,6 @@ window.characterRank={
         'ganfuren',
         'hs_huzhixiannv',
         'sp_sunshangxiang',
-        're_lidian',
         'jiangqing',
         'hs_lrexxar',
         'diy_huangzhong',
