@@ -25825,7 +25825,7 @@
                                 }
                                 else{
                                     dashes.content.node.code='function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-                                    dashes.precontent.node.code='function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n*\/';
+                                    dashes.precontent.node.code='function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
                                     dashes.config.node.code='config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
                                     dashes.help.node.code='help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
                                 }
@@ -25950,7 +25950,7 @@
                             };
                             page.content={}
                             createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-                            createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n*\/');
+                            createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
                             createCode('选','选项代码',page,clickCode,'config','config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
                             createCode('帮','帮助代码',page,clickCode,'help','help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
 
@@ -32070,7 +32070,19 @@
                 }
                 else{
                     try{
-                        str=JSON.stringify(obj)||'';
+						if(Array.isArray(obj)&&obj.contains(Infinity)){
+							obj=obj.slice(0);
+							var rand=get.id();
+							for(var i=0;i<obj.length;i++){
+								if(obj[i]===Infinity){
+									obj[i]=parseInt(rand);
+								}
+							}
+							str=JSON.stringify(obj).replace(new RegExp(rand,'g'),'Infinity');
+						}
+						else{
+							str=JSON.stringify(obj)||'';
+						}
                     }
                     catch(e){
                         str='';
