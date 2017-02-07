@@ -1034,13 +1034,6 @@ character.shenhua={
 						if(get.tag(card,'loseCard')&&_status.currentPhase!=target&&target.num('he')){
 							return [0.5,Math.max(2,target.num('h'))];
 						}
-						var hasfriend=false;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-								hasfriend=true;break;
-							}
-						}
-						if(!hasfriend) return;
 						if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
 							if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
 							if(target.num('h')==0) return 2;

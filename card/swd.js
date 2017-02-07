@@ -1120,6 +1120,7 @@ card.swd={
 					return 0;
 				},
 				order:10.1,
+				value:[5,1],
 				result:{
 					target:function(player,target){
 						if(target.hasSkill('jiguanyaoshu_skill')) return 0.5;

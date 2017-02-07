@@ -9,7 +9,6 @@ window.characterRank={
         'swd_guyue',
         'swd_murongshi',
         'swd_cheyun',
-        'swd_huanyuanzhi',
         'swd_tuobayuer',
         'swd_yuxiaoxue',
         'gjqt_bailitusu',
@@ -18,6 +17,7 @@ window.characterRank={
         'pal_liumengli',
     ],
     ap:[
+        'swd_huanyuanzhi',
         'pal_xiahoujinxuan',
         'swd_huiyan',
         'hs_medivh',

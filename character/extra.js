@@ -718,10 +718,8 @@ character.extra={
 					var length=result.targets.length;
 					for(var i=0;i<length;i++){
 						result.targets[i].addSkill('dawu2');
-						result.targets[i].popup('dawu');
 					}
 					player.logSkill('dawu',result.targets,'thunder');
-					game.log(player,'对',result.targets,'发动了大雾')
 					player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.storage.qixing,true);
 				}
 				else{
@@ -800,7 +798,6 @@ character.extra={
 					var length=result.targets.length;
 					for(var i=0;i<length;i++){
 						result.targets[i].addSkill('kuangfeng2');
-						result.targets[i].popup('kuangfeng');
 					}
 					player.logSkill('kuangfeng',result.targets,'fire');
 					player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.storage.qixing,true);

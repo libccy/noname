@@ -268,7 +268,7 @@ card.gujian={
                             var nh=target.num('h');
                             if(nh>=3) return 1;
                             if(target.hasSha()) return 1;
-                            if(num&&Math.random()<0.5) return 1;
+                            if(nh&&Math.random()<0.5) return 1;
                         }
                         return player.needsToDiscard?0.2:0;
                     }
@@ -354,7 +354,7 @@ card.gujian={
                             var nh=target.num('h');
                             if(nh>=3) return 1;
                             if(target.hasSha()) return 1;
-                            if(num&&Math.random()<0.5) return 1;
+                            if(nh&&Math.random()<0.5) return 1;
                         }
                         return player.needsToDiscard?0.2:0;
                     }
@@ -1632,8 +1632,18 @@ card.gujian={
         mapodoufu_info:'结束阶段，你有75%的机率弃置一名随机敌人的一张随机牌，持续三回合',
     },
     list:[
-        ['heart',2,'tanhuadong'],
+        ['spade',2,'tanhuadong'],
         ['club',1,'molicha'],
+        ['club',3,'chunbing'],
+        ['heart',12,'yougeng'],
+        ['heart',8,'gudonggeng'],
+        ['heart',1,'liyutang'],
+        ['diamond',4,'mizhilianou'],
+        ['diamond',6,'xiajiao'],
+        ['spade',3,'qingtuan'],
+        ['club',11,'luyugeng'],
+        ['heart',4,'mapodoufu'],
+        ['spade',8,'yuanbaorou'],
 
         ['spade',7,'yuheng'],
         ['club',4,'mutoumianju'],

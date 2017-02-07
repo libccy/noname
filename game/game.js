@@ -1739,7 +1739,7 @@
                 },
                 tao:{
                     name:'桃',
-                    init:'0.5',
+                    init:'0',
                     item:{
                         '1':'补充全部',
                         '0.5':'补充一半',
@@ -1748,7 +1748,7 @@
                 },
                 jiu:{
                     name:'酒',
-                    init:'0.5',
+                    init:'0',
                     item:{
                         '1':'补充全部',
                         '0.5':'补充一半',
@@ -27113,7 +27113,7 @@
 							else{
 								this.parentNode.previousSibling.remove();
 								this.parentNode.remove();
-								delete lib.config.gameRecord[this.parentNode.link];
+								lib.config.gameRecord[this.parentNode.link]={data:{}};
 								game.saveConfig('gameRecord',lib.config.gameRecord);
 							}
 						}

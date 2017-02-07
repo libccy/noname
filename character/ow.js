@@ -21,7 +21,7 @@ character.ow={
         // ow_baolei:['male','qun',4,[]],
         ow_banzang:['male','qun',4,['fengshi','yinbo']],
         ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
-        ow_luba:['male','shu',4,['liangou','xiyang']],
+        ow_luba:['male','shu',5,['liangou','xiyang']],
         // ow_wensidun:['male','shu',4,[]],
         // ow_zhaliya:['female','shu',4,['pingzhang','lichang']],
         ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
@@ -31,7 +31,7 @@ character.ow={
             enable:'phaseUse',
             usable:1,
             filterTarget:function(card,player,target){
-                return target!=player&&target.hp>=2;
+                return target!=player;
             },
             filterCard:true,
             position:'he',
@@ -41,7 +41,7 @@ character.ow={
             content:function(){
                 'step 0'
                 player.judge(function(card){
-                    return get.color(card)=='black'?1:-1;
+                    return get.suit(card)!='heart'?1:-1;
                 });
                 'step 1'
                 if(result.bool){
@@ -66,18 +66,18 @@ character.ow={
         },
         liangou2:{
             mod:{
-				cardEnabled:function(card,player){
-					return false;
-				},
-				cardUsable:function(card,player){
-					return false;
-				},
-				cardRespondable:function(card,player){
-					return false;
-				},
-				cardSavable:function(card,player){
-					return false;
-				},
+				// cardEnabled:function(card,player){
+				// 	return false;
+				// },
+				// cardUsable:function(card,player){
+				// 	return false;
+				// },
+				// cardRespondable:function(card,player){
+				// 	return false;
+				// },
+				// cardSavable:function(card,player){
+				// 	return false;
+				// },
                 globalTo:function(from,to){
                     if(from==to.storage.liangou2) return -Infinity;
                 }
@@ -90,14 +90,14 @@ character.ow={
             content:function(){
                 trigger.num++;
             },
-            ai:{
-                effect:{
-                    target:function(card,player,target){
-                        if(get.tag(card,'damage')) return [1,-2];
-                        if(get.tag(card,'respond')) return [1,-1];
-                    }
-                }
-            }
+            // ai:{
+            //     effect:{
+            //         target:function(card,player,target){
+            //             if(get.tag(card,'damage')) return [1,-2];
+            //             if(get.tag(card,'respond')) return [1,-1];
+            //         }
+            //     }
+            // }
         },
         xiyang:{
             trigger:{player:'phaseEnd'},
@@ -2947,7 +2947,7 @@ character.ow={
     },
     translate:{
         liangou:'链钩',
-        liangou_info:'出牌阶段限一次，你可以弃置一张牌，指定一名体力值不小于2的角色并进行一次判定，若结果为黑色，该角色不能使用或打出卡牌、与你距离为1且受到的首次伤害+1直到回合结束',
+        liangou_info:'出牌阶段限一次，你可以弃置一张牌，指定一名其他角色并进行一次判定，若结果不为红桃，该角色与你距离为1且受到的首次伤害+1直到回合结束',
         xiyang:'吸氧',
         xiyang_info:'结束阶段，若你武将牌正面朝上，你可以翻面并回复两点体力',
         qinru:'侵入',

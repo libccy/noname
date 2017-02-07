@@ -394,13 +394,10 @@ character.refresh={
 				player.showCards(event.cards,'裸衣');
 				"step 2"
 				for(var i=0;i<cards.length;i++){
-					if(get.type(cards[i],'trick')=='trick'&&cards[i].name!='juedou'){
+					if(get.type(cards[i])!='basic'&&cards[i].name!='juedou'&&
+						(get.type(cards[i])!='equip'||get.subtype(cards[i])!='equip1')){
 						ui.discardPile.appendChild(cards[i]);
-						cards.splice(i,1);i--;
-					}
-					else if(get.type(cards[i])=='equip'&&get.subtype(cards[i])!='equip1'){
-						ui.discardPile.appendChild(cards[i]);
-						cards.splice(i,1);i--;
+						cards.splice(i--,1);
 					}
 				}
 				player.gain(cards,'gain2');

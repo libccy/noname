@@ -286,9 +286,15 @@ character.swd={
 						trigger.result={bool:true,card:{name:'shan'}}
 					},
 					ai:{
-						effect:{
-							target:function(card,player,target,effect){
-								if(get.tag(card,'respondShan')) return 0.1;
+						target:function(card,player,target,current){
+							if(!player.isLinked()&&current<0) return 1.5;
+							if(!target.hasFriend()) return;
+							if(get.tag(card,'loseCard')&&_status.currentPhase!=target&&target.num('he')){
+								return [0.5,Math.max(2,target.num('h'))];
+							}
+							if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
+								if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
+								return [0.5,target.num('h','sha')+target.num('h','shan')];
 							}
 						}
 					}
@@ -479,9 +485,41 @@ character.swd={
 			}
 		},
 		hjifeng:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				if(!player.num('h')) return false;
+				if(player.num('h',{type:'jiqi'})) return false;
+				return true;
+			},
+			discard:false,
+			prepare:'throw2',
+			usable:1,
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			filterCard:true,
+			content:function(){
+				var name=get.suit(cards[0]);
+				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
+				switch(name){
+					case 'spade':name='qinglongzhigui';break;
+					case 'club':name='baishouzhihu';break;
+					case 'diamond':name='zhuquezhizhang';break;
+					case 'heart':name='xuanwuzhihuang';break;
+				}
+				player.gain(get.cardPile(name)||game.createCard(name),'draw');
+			},
+			ai:{
+				order:4,
+				result:{
+					player:1
+				}
+			}
+		},
+		hjifeng_old:{
 			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
-				if(!player.num('e')) return false;
+				if(!player.num('he',{type:'equip'})) return false;
 				if(player.num('h',{type:'jiqi'})) return false;
 				if(get.cardPile(function(card){return get.type(card)=='jiqi'})) return true;
 				return false;
@@ -489,7 +527,7 @@ character.swd={
 			direct:true,
 			content:function(){
 				'step 0'
-				player.chooseToDiscard('e','祭风：是否弃置一张装备牌并获得一张祭器牌？').set('ai',function(card){
+				player.chooseToDiscard('he','祭风：是否弃置一张装备牌并获得一张祭器牌？',{type:'equip'}).set('ai',function(card){
 					return 6-ai.get.value(card);
 				}).logSkill='hjifeng';
 				'step 1'
@@ -7429,6 +7467,7 @@ character.swd={
 			forceunique:true,
 			skillAnimation:true,
 			filter:function(event,player){
+				if(get.mode()=='identity'&&_status.mode=='zhong'&&game.zhu&&!game.zhu.isZhu) return false;
 				return !player.storage.duijue;
 			},
 			filterTarget:function(card,player,target){
@@ -8714,7 +8753,7 @@ character.swd={
 		mufeng:'沐风',
 		mufeng_info:'在一名角色的结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
 		hjifeng:'祭风',
-		hjifeng_info:'结束阶段，若你手牌中没有祭器牌，你可以弃置一张装备区内的牌，并从牌堆中获得一张随机祭器',
+		hjifeng_info:'出牌阶段限一次，若你手牌中没有祭器牌，你可以将一张手牌置于牌堆顶，并根据其花色获得对应祭器。黑桃：青龙之圭；梅花：白兽之琥；方片：朱雀之璋；红桃：玄武之璜',
 		mufeng_old_info:'锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0',
 		lexue:'乐学',
 		lexue_info:'回合内，你随机获得制衡、集智、缔盟、驱虎中的一个技能；回合外，你随机获得遗计、急救、鬼道、反馈中的一个技能',
