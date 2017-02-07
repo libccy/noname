@@ -1897,7 +1897,7 @@ mode.chess={
 				delete window.characterRank;
 
 				ui.control.style.transition='all 0s';
-				if(lib.isPhoneLayout()){
+				if(get.is.phoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
 				}
 				else{
@@ -3441,7 +3441,7 @@ mode.chess={
 				}
 				ui.control.style.transition='all 0s';
 
-				if(lib.isPhoneLayout()){
+				if(get.is.phoneLayout()){
 					ui.control.style.top='calc(100% - 80px)';
 				}
 				else{
