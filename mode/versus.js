@@ -314,16 +314,7 @@ mode.versus={
 				_status.round=0;
 				if(lib.storage.single_control){
 					game.addGlobalSkill('versus_swap');
-					ui.autoreplace=ui.create.div('.caption.normal');
-					ui.autoreplace.innerHTML='<div class="underline">自动换人</div>';
-					ui.autoreplace.style.textAlign='center';
-					if(lib.storage.autoreplaceinnerhtml){
-						ui.autoreplace.classList.add('on')
-					}
-					ui.autoreplace.listen(game.switchAutoreplace);
 
-					// ui.versusreplace=ui.create.system('换人',null,true);
-					// lib.setPopped(ui.versusreplace,game.versusHoverReplace);
 					if(game.players.length>2&&lib.config.show_handcardbutton){
 						ui.versushs=ui.create.system('手牌',null,true);
 						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
@@ -2216,48 +2207,6 @@ mode.versus={
 				game.modeSwapPlayer(this.link);
 			}
 		},
-		versusCheckHandcards:function(){
-			_status.clicked=true;
-			if(ui.intro){
-				ui.intro.close();
-				if(ui.intro.source=='versusCheckHandcards'){
-					delete ui.intro;
-					ui.control.show();
-					game.resume2();
-					return;
-				}
-			}
-			game.pause2();
-			ui.control.hide();
-			ui.intro=ui.create.dialog();
-			ui.intro.source='versusCheckHandcards';
-
-			ui.intro.add(ui.autoreplace);
-			var players=[];
-			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].side==game.me.side){
-					players.push(game.players[i]);
-				}
-			}
-			ui.intro.add(players,true);
-			var buttons=ui.intro.querySelectorAll('.button');
-			for(var i=0;i<buttons.length;i++){
-				buttons[i].addEventListener(lib.config.touchscreen?'touchend':'click',game.versusClickToSwap);
-			}
-
-			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
-					ui.intro.add(get.translation(game.players[i]));
-					var cards=game.players[i].get('h');
-					if(cards.length){
-						ui.intro.add(cards,true);
-					}
-					else{
-						ui.intro.add('（无）');
-					}
-				}
-			}
-		},
 		versusHoverEnemy:function(){
 			var uiintro=ui.create.dialog('hidden');
 
@@ -2290,24 +2239,6 @@ mode.versus={
 			}
 			else{
 				uiintro.add('（无）')
-			}
-
-			return uiintro;
-		},
-		versusHoverReplace:function(){
-			var uiintro=ui.create.dialog('hidden');
-
-			uiintro.add(ui.autoreplace);
-			var players=[];
-			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].side==game.me.side){
-					players.push(game.players[i]);
-				}
-			}
-			uiintro.add(players,true);
-			var buttons=uiintro.querySelectorAll('.button');
-			for(var i=0;i<buttons.length;i++){
-				buttons[i].addEventListener(lib.config.touchscreen?'touchend':'click',game.versusClickToSwap);
 			}
 
 			return uiintro;
@@ -3591,31 +3522,7 @@ mode.versus={
 				return !_status.auto&&player!=game.me&&player.side==game.me.side;
 			},
 			content:function(){
-				"step 0"
-				if(ui.autoreplace.innerHTML=='询问切换'){
-					game.me.chooseBool('是否切换到'+get.translation(player)+'？')
-				}
-				else{
-					if(ui.autoreplace.classList.contains('on')){
-						if(trigger.name!='phase'){
-							game.modeSwapPlayer(player);
-							if(ui.dialog){
-								ui.dialog.style.display='';
-							}
-						}
-					}
-					else if(trigger.name=='phase'){
-						game.modeSwapPlayer(player);
-					}
-					event.finish();
-				}
-				"step 1"
-				if(result.bool){
-					game.modeSwapPlayer(player);
-					if(ui.dialog){
-						ui.dialog.style.display='';
-					}
-				}
+				game.modeSwapPlayer(player);
 			},
 		},
 		versus_ladder:{

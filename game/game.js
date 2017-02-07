@@ -2792,7 +2792,6 @@
                             map.enable_all.show();
                             map.four_assign.show();
 							map.expand_dialog.show();
-                            // map.four_cross.show();
 						}
 						else{
 							map.change_choice.show();
@@ -2801,8 +2800,7 @@
                             map.ladder_reset.hide();
 							map.enable_all.hide();
 							map.four_assign.hide();
-                            map.expand_dialog.show();
-                            // map.four_cross.hide();
+                            map.expand_dialog.hide();
 						}
                         if(config.versus_mode=='jiange'||config.versus_mode=='two'){
                             map.free_choose.show();
@@ -2831,7 +2829,8 @@
 						name:'游戏模式',
 						init:'standard',
 						item:{
-							standard:'标准',
+							standard:'自由',
+							three:'统率',
 							jiange:'剑阁',
                             two:'<span style="display:inline-block;width:100%;text-align:center">2v2</span>',
 							four:'<span style="display:inline-block;width:100%;text-align:center">4v4</span>'
@@ -2862,12 +2861,6 @@
 						frequent:true,
 						restart:true,
 					},
-					// four_cross:{
-					// 	name:'交叉座位',
-					// 	init:false,
-					// 	frequent:true,
-					// 	restart:true,
-					// },
 					free_choose:{
 						name:'自由选将',
 						init:true,
@@ -27944,7 +27937,8 @@
 					var clickCaptNode=function(e){
 						delete _status.filterCharacter;
 						ui.window.classList.remove('shortcutpaused');
-						filternode.remove();
+						filternode.delete();
+						filternode.classList.remove('shown');
 						clickCapt.call(this.link,e);
 					};
 					if(get.is.phoneLayout()){
@@ -27953,9 +27947,11 @@
 						filternode=ui.create.div('.popup-container.filter-character');
 						ui.create.div(filternode);
 						filternode.listen(function(e){
+							if(this.classList.contains('removing')) return;
 							delete _status.filterCharacter;
 							ui.window.classList.remove('shortcutpaused');
-							this.remove();
+							this.delete();
+							this.classList.remove('shown');
 							e.stopPropagation();
 						});
 						for(var i=0;i<node.childElementCount;i++){
@@ -27986,14 +27982,18 @@
 
                     packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
                         if(_status.dragged) return;
-						if(get.is.phoneLayout()){
+						if(get.is.phoneLayout()&&filternode){
 							_status.filterCharacter=true;
 							ui.window.classList.add('shortcutpaused');
 							ui.window.appendChild(filternode);
 							ui.refresh(filternode);
+							filternode.classList.add('shown');
 							var dh=filternode.offsetHeight-filternode.firstChild.offsetHeight;
 							if(dh>0){
 								filternode.firstChild.style.top=(dh/2)+'px';
+							}
+							else{
+								filternode.firstChild.style.top='';
 							}
 						}
 						else{

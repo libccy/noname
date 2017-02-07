@@ -16,6 +16,14 @@
 .popup-container.filter-character{
 	text-align: center;
 	overflow: scroll;
+	opacity: 0;
+	transition: all 0.3s;
+}
+.popup-container.filter-character.shown{
+	opacity: 1;
+}
+.popup-container.filter-character.removing>div{
+	pointer-events: none;
 }
 .popup-container.filter-character>div{
 	left: 0;
