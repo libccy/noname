@@ -1585,6 +1585,7 @@ margin-bottom: 5px;
 #arena.selecting:not(.video) #me .card:not(.selectable){
 	opacity:0.8
 }
+.button.character.banned,.button.card.banned{opacity: 0.5}
 
 .card.selectable>.background,
 .card.selectable>.name,

@@ -1628,7 +1628,9 @@
 						onclick:function(){
 							var data={};
 							for(var i in localStorage){
-								data[i]=localStorage[i];
+								if(i.indexOf(lib.configprefix)==0){
+									data[i]=localStorage[i];
+								}
 							}
 							game.export(lib.init.encode(JSON.stringify(data)),'无名杀 - 数据 - '+(new Date()).toLocaleString());
 						},
@@ -22262,6 +22264,7 @@
 	                }
 	                return node;
 	            };
+				var updateActive,updateActiveCard;
                 var menuUpdates=[];
 				menuContainer=ui.create.div('.menu-container.hidden',ui.window,clickContainer);
                 var menux;
@@ -22424,6 +22427,10 @@
 						active=this;
 						this.classList.add('active');
 						rightPane.appendChild(this.link);
+						if(connectMenu){
+							if(updateActive) updateActive();
+							if(updateActiveCard) updateActiveCard();
+						}
 					};
 
 					var createModeConfig=function(mode,position){
@@ -23155,7 +23162,21 @@
 							active.link.remove();
 						}
 						this.classList.add('active');
+						updateActive(this);
 						rightPane.appendChild(this.link);
+					};
+					updateActive=function(node){
+						if(!node){
+							node=start.firstChild.querySelector('.active');
+							if(!node){
+								return;
+							}
+						}
+						for(var i=0;i<node.link.childElementCount;i++){
+							if(node.link.childNodes[i].updateBanned){
+								node.link.childNodes[i].updateBanned();
+							}
+						}
 					};
 					var updateNodes=function(){
 						for(var i=0;i<start.firstChild.childNodes.length;i++){
@@ -23274,12 +23295,33 @@
                             _status.clicked=false;
                             delete this._banning;
 						};
+						var updateBanned=function(){
+							var list;
+							if(connectMenu){
+								var mode=menux.pages[0].firstChild.querySelector('.active');
+								if(mode&&mode.mode){
+									list=lib.config['connect_'+mode.mode+'_banned'];
+								}
+							}
+							else{
+								list=lib.config[get.mode()+'_banned'];
+							}
+							if(list&&list.contains(this.link)){
+								this.classList.add('banned');
+							}
+							else{
+								this.classList.remove('banned');
+							}
+						};
 						var buttons=ui.create.buttons(list,'character',page);
                         for(var i=0;i<buttons.length;i++){
                             buttons[i].classList.add('noclick');
                             buttons[i].listen(banCharacter);
                             buttons[i].node.hp.style.transition='all 0s';
                             buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
+							if(mode!='mode_banned'){
+								buttons[i].updateBanned=updateBanned;
+							}
                         }
 						page.classList.add('menu-buttons');
 						page.classList.add('leftbutton');
@@ -23353,6 +23395,7 @@
                             }
                         }
                         active.classList.add('active');
+						updateActive(active);
                     }
 					rightPane.appendChild(active.link);
 
@@ -23385,7 +23428,21 @@
 						active.link.remove();
 						active=this;
 						this.classList.add('active');
+						updateActiveCard(this);
 						rightPane.appendChild(this.link);
+					};
+					updateActiveCard=function(node){
+						if(!node){
+							node=start.firstChild.querySelector('.active');
+							if(!node){
+								return;
+							}
+						}
+						for(var i=0;i<node.link.childElementCount;i++){
+							if(node.link.childNodes[i].updateBanned){
+								node.link.childNodes[i].updateBanned();
+							}
+						}
 					};
 					var updateNodes=function(){
 						for(var i=0;i<start.firstChild.childNodes.length;i++){
@@ -23532,10 +23589,31 @@
                             _status.clicked=false;
                             delete this._banning;
 						};
+						var updateBanned=function(){
+							var list;
+							if(connectMenu){
+								var mode=menux.pages[0].firstChild.querySelector('.active');
+								if(mode&&mode.mode){
+									list=lib.config['connect_'+mode.mode+'_bannedcards'];
+								}
+							}
+							else{
+								list=lib.config[get.mode()+'_bannedcards'];
+							}
+							if(list&&list.contains(this.link[2])){
+								this.classList.add('banned');
+							}
+							else{
+								this.classList.remove('banned');
+							}
+						};
 						var buttons=ui.create.buttons(list,'vcard',page);
 						for(var i=0;i<buttons.length;i++){
 							buttons[i].classList.add('noclick');
 							buttons[i].listen(banCard);
+							if(mode!='mode_banned'){
+								buttons[i].updateBanned=updateBanned;
+							}
 						}
 						page.classList.add('menu-buttons');
 						page.classList.add('leftbutton');
@@ -23722,6 +23800,7 @@
                             active=active.nextSibling;
                         }
                         active.classList.add('active');
+						updateActiveCard(active);
                     }
 					rightPane.appendChild(active.link);
 
@@ -33801,6 +33880,9 @@
                         }
                         game.saveConfig(this.bannedname,banned);
                         this.classList.toggle('on');
+						if(node.updateBanned){
+							node.updateBanned();
+						}
                     };
                     var modeorder=lib.config.modeorder||[];
 					for(var i in lib.mode){
@@ -33912,6 +33994,9 @@
                         }
                         game.saveConfig(this.bannedname,banned);
                         this.classList.toggle('on');
+						if(node.updateBanned){
+							node.updateBanned();
+						}
                     };
                     var modeorder=lib.config.modeorder||[];
 					for(var i in lib.mode){

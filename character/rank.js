@@ -454,7 +454,6 @@ window.characterRank={
         'diy_xizhenxihong',
         'yxs_tangbohu',
         'zhuzhi',
-        'old_caozhen',
         'tadun',
         'guohuai',
         'sunluban',
@@ -501,6 +500,7 @@ window.characterRank={
     ],
     c:[
         'old_xusheng',
+        'old_caozhen',
         'old_caoxiu',
         'old_madai',
         'liaohua',
