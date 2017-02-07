@@ -23300,6 +23300,7 @@
                             buttons[i].node.hp._innerHTML=buttons[i].node.hp.innerHTML;
                         }
 						page.classList.add('menu-buttons');
+						page.classList.add('leftbutton');
                         if(!connectMenu){
                             if(mode.indexOf('mode_')!=0){
     							ui.create.div('.config.more','隐藏武将包',page,function(){
@@ -23555,6 +23556,7 @@
 							buttons[i].listen(banCard);
 						}
 						page.classList.add('menu-buttons');
+						page.classList.add('leftbutton');
 						if(!connectMenu&&mode.indexOf('mode_')!=0){
 							ui.create.div('.config.more','隐藏卡牌包',page,function(){
 								if(this.innerHTML=='隐藏卡牌包'){
@@ -26882,7 +26884,7 @@
 						var nodex4=ui.create.div('.menubutton','四',row2,clickrow2);
 						var nodex5=ui.create.div('.menubutton','五',row2,clickrow2);
 
-						var row3=ui.create.div('.menu-buttons',page);
+						var row3=ui.create.div('.menu-buttons.leftbutton',page);
 						row3.style.marginTop='3px';
 						var clickrow3=function(){
 							this.classList.toggle('glow');
@@ -26937,7 +26939,7 @@
 						var caption=ui.create.div('','选择一个换人目标',page);
 						caption.style.margin='5px';
 						caption.style.marginTop='6px';
-						var row3=ui.create.div('.menu-buttons',page);
+						var row3=ui.create.div('.menu-buttons.leftbutton',page);
 						row3.style.marginTop='3px';
 
 						var currentrow3=null;

@@ -26,6 +26,11 @@
 	width: calc(100% - 10px) !important;
 	padding-right: 5px !important;
 }
+.menu-buttons.leftbutton{
+	text-align: left;
+	margin-left: 10px;
+    width: calc(100% - 20px) !important;
+}
 .menu-buttons div{
 	position: absolute;
 }
