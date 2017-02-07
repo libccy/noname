@@ -1052,6 +1052,10 @@ card.swd={
 						es.splice(i--,1);
 					}
 				}
+				if(!es.length){
+					event.finish();
+					return;
+				}
 				var num=get.rand(es.length);
 				var card;
 				target.removeEquipTrigger();
@@ -4070,7 +4074,7 @@ card.swd={
 				if(!player.num('h',{type:['hslingjian','jiqi']})) return false;
 				var es=player.get('he',{type:'equip'});
 				for(var i=0;i<es.length;i++){
-					if(lib.inpile.contains(es[i].name)) return true;
+					if(lib.inpile.contains(es[i].name)&&!lib.card[es[i].name].nopower) return true;
 				}
 				return false;
 			},
@@ -4191,7 +4195,7 @@ card.swd={
 			trigger:{player:'phaseEnd'},
 			frequent:true,
 			filter:function(event,player){
-				return player.isLowestHp();
+				return player.isLowestHp()&&player.isDamaged();
 			},
 			content:function(){
 				player.recover();

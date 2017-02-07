@@ -732,6 +732,7 @@ character.yxs={
 		sanbanfu:{
 			trigger:{player:'shaBegin'},
 			filter:function(event,player){
+				if(player.storage.sanbanfu||player.storage.sanbanfu2) return false;
 				return !event.directHit;
 			},
 			check:function(event,player){
@@ -765,17 +766,18 @@ character.yxs={
 			trigger:{player:'shaAfter'},
 			forced:true,
 			popup:false,
-			filter:function(event,player){
-				return player.storage.sanbanfu;
-			},
+			silent:true,
 			content:function(){
-				player.damage(trigger.target);
+				if(player.storage.sanbanfu) player.damage(trigger.target);
+				delete player.storage.sanbanfu;
+				delete player.storage.sanbanfu2;
 			}
 		},
 		sanbanfu3:{
 			trigger:{source:'damageBegin'},
 			forced:true,
 			popup:false,
+			silent:true,
 			filter:function(event,player){
 				return event.card&&event.card.name=='sha'&&player.storage.sanbanfu2;
 			},
@@ -1766,13 +1768,7 @@ character.yxs={
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
 							if(player.hasSkill('jueqing')) return [1,-2];
-							var hasfriend=false;
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-									hasfriend=true;break;
-								}
-							}
-							if(!hasfriend) return;
+							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,2];
 							if(target.hp==3) return [1,1.5];
 							if(target.hp==2) return [1,0.5];

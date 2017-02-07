@@ -498,13 +498,7 @@ character.extra={
 					target:function(card,player,target,current){
 						if(target.hp<=1&&get.tag(card,'damage')){
 							if(player.hasSkill('jueqing')) return [1,-5];
-							var hasfriend=false;
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-									hasfriend=true;break;
-								}
-							}
-							if(!hasfriend) return;
+							if(!target.hasFriend()) return;
 							if(player.hp>2&&ai.get.attitude(player,target)<=0) return [0,2];
 							return [1,0,0,-player.hp];
 						}
@@ -930,13 +924,7 @@ character.extra={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'recover')&&target.hp>=1) return [0,0];
-						var hasfriend=false;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-								hasfriend=true;break;
-							}
-						}
-						if(!hasfriend) return;
+						if(!target.hasFriend()) return;
 						if((get.tag(card,'damage')==1||get.tag(card,'loseHp'))&&target.hp>1) return [0,1];
 					}
 				},

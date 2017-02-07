@@ -630,6 +630,7 @@ character.refresh={
 			},
 			ai:{
 				effect:function(card,player,target){
+					if(!target.hasFriend()) return;
 					if(get.type(card,'trick')=='trick'&&ui.selected.targets.length==0) return [1,1];
 				},
 			},

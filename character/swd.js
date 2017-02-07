@@ -1991,14 +1991,7 @@ character.swd={
 							}
 						}
 						else{
-							var hasFriend=false;
-							for(var i=0;i<game.players.length;i++){
-								if(get.distance(player,game.players[i],'attack')>1&&
-								player!=game.players[i]&&ai.get.attitude(player,game.players[i]>0)){
-									hasFriend=true;break;
-								}
-							}
-							if(!hasFriend) return;
+							if(!target.hasFriend()) return;
 							var hs=target.num('h');
 							if(get.tag(card,'respondShan')){
 								var shans=target.num('h','shan');
@@ -8753,7 +8746,7 @@ character.swd={
 		mufeng:'沐风',
 		mufeng_info:'在一名角色的结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
 		hjifeng:'祭风',
-		hjifeng_info:'出牌阶段限一次，若你手牌中没有祭器牌，你可以将一张手牌置于牌堆顶，并根据其花色获得对应祭器。黑桃：青龙之圭；梅花：白兽之琥；方片：朱雀之璋；红桃：玄武之璜',
+		hjifeng_info:'出牌阶段限一次，若你手牌中没有祭器牌，你可以将一张手牌置于牌堆顶，并根据其花色获得对应祭器：黑桃-青龙之圭；梅花-白兽之琥；方片-朱雀之璋；红桃-玄武之璜',
 		mufeng_old_info:'锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0',
 		lexue:'乐学',
 		lexue_info:'回合内，你随机获得制衡、集智、缔盟、驱虎中的一个技能；回合外，你随机获得遗计、急救、鬼道、反馈中的一个技能',

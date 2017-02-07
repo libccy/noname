@@ -13293,6 +13293,16 @@
 					},200);
 				},
 				$throw:function(card,time,init){
+					if(typeof card=='number'){
+						var tmp=card;
+						card=[];
+						while(tmp--){
+							var cardx=ui.create.card();
+							cardx.classList.add('infohidden');
+							cardx.classList.add('infoflip');
+							card.push(cardx);
+						}
+					}
 					if(init!==false){
                         if(init!=='nobroadcast'){
                             game.broadcast(function(player,card,time,init){
@@ -32285,6 +32295,9 @@
 			return num/list.length;
 		},
 		rank:function(name,num){
+			if(typeof name=='object'&&name.name){
+				name=name.name;
+			}
             if(num==true) num=9;
             if(typeof num!='number') num=false;
 			if(name==_status.lord) return num?Math.round(7*(num-1)/8+1):'ap';
@@ -32355,16 +32368,18 @@
                 var info=JSON.parse(info.slice(13));
                 var id=info.shift();
                 if(!id){
-                    card=ui.create.card().init(info);
+                    card=ui.create.card();
+					if(info&&info[2]) card.init(info);
                 }
                 else if(lib.cardOL[id]){
                     if(lib.cardOL[id].name!=info[2]){
-                        lib.cardOL[id].init(info);
+                        if(info&&info[2]) lib.cardOL[id].init(info);
                     }
                     card=lib.cardOL[id];
                 }
                 else if(game.online){
-                    card=ui.create.card().init(info);
+                    card=ui.create.card();
+					if(info&&info[2]) card.init(info);
                     lib.cardOL[id]=card;
                     card.cardid=id;
                 }

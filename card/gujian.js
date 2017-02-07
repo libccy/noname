@@ -147,7 +147,7 @@ card.gujian={
             content:function(){
                 target.$gain2(cards);
                 target.storage.mizhilianou=card;
-                target.storage.mizhilianou_markcount=3;
+                target.storage.mizhilianou_markcount=4;
                 target.addSkill('mizhilianou');
             },
             ai:{
@@ -270,7 +270,7 @@ card.gujian={
                             if(target.hasSha()) return 1;
                             if(nh&&Math.random()<0.5) return 1;
                         }
-                        return player.needsToDiscard?0.2:0;
+                        return player.needsToDiscard()?0.2:0;
                     }
                 }
             }
@@ -295,7 +295,7 @@ card.gujian={
                 value:4,
                 result:{
                     target:function(player,target){
-                        if(target.isHealthy()) return player.needsToDiscard?0.1:0;
+                        if(target.isHealthy()) return player.needsToDiscard()?0.1:0;
                         if(target.isLowestHp()) return 1.5;
                         return 1/Math.max(1,target.hp);
                     }
@@ -356,7 +356,7 @@ card.gujian={
                             if(target.hasSha()) return 1;
                             if(nh&&Math.random()<0.5) return 1;
                         }
-                        return player.needsToDiscard?0.2:0;
+                        return player.needsToDiscard()?0.2:0;
                     }
                 }
             }
@@ -1277,11 +1277,11 @@ card.gujian={
             nopop:true,
             intro:{
                 content:function(storage,player){
-                    return '结束阶段，你有75%的机率弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'
+                    return '结束阶段，你有70%的机率弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'
                 }
             },
             content:function(){
-                if(Math.random()<0.75){
+                if(Math.random()<0.7){
                     var list=player.getEnemies();
                     for(var i=0;i<list.length;i++){
                         if(!list[i].num('he')){
@@ -1615,7 +1615,7 @@ card.gujian={
         liyutang:'鲤鱼汤',
         liyutang_info:'结束阶段，若你的体力值为全场最少或之一，你获得一点护甲，持续两回合',
         mizhilianou:'蜜汁藕',
-        mizhilianou_info:'你可以将一张红桃牌当作桃使用，持续三回合',
+        mizhilianou_info:'你可以将一张红桃牌当作桃使用，持续四回合',
         xiajiao:'虾饺',
         xiajiao_info:'你在摸牌阶段额外摸一张牌，并在摸牌阶段时弃置一张牌，持续三回合',
         tanhuadong:'昙花冻',
@@ -1629,7 +1629,7 @@ card.gujian={
         molicha:'茉莉茶',
         molicha_info:'弃置判定区内的所有牌；你不能成为延时锦囊牌的目标，持续五回合',
         mapodoufu:'麻婆豆腐',
-        mapodoufu_info:'结束阶段，你有75%的机率弃置一名随机敌人的一张随机牌，持续三回合',
+        mapodoufu_info:'结束阶段，你有70%的机率弃置一名随机敌人的一张随机牌，持续三回合',
     },
     list:[
         ['spade',2,'tanhuadong'],

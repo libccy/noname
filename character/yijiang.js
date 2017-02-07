@@ -4947,13 +4947,7 @@ character.yijiang={
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
 							if(player.hasSkill('jueqing')) return [1,-2];
-							var hasfriend=false;
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-									hasfriend=true;break;
-								}
-							}
-							if(!hasfriend) return;
+							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
 							if(!target.hasSkill('paiyi')&&target.hp>1) return [0.5,get.tag(card,'damage')*1.5];
 							if(target.hp==3) return [0.5,get.tag(card,'damage')*1.5];
@@ -6608,13 +6602,7 @@ character.yijiang={
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-1.5];
-						var hasfriend=false;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-								hasfriend=true;break;
-							}
-						}
-						if(!hasfriend) return;
+						if(!target.hasFriend()) return;
 						if(get.tag(card,'damage')) return [1,0,0,-0.7];
 					}
 				}
@@ -6641,13 +6629,7 @@ character.yijiang={
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-2];
-						var hasfriend=false;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-								hasfriend=true;break;
-							}
-						}
-						if(!hasfriend) return;
+						if(!target.hasFriend()) return;
 						if(get.tag(card,'damage')) return [1,0,0,-1];
 					}
 				}
@@ -6987,13 +6969,7 @@ character.yijiang={
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
 							if(player.hasSkill('jueqing')) return [1,-2];
-							var hasfriend=false;
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-									hasfriend=true;break;
-								}
-							}
-							if(!hasfriend) return;
+							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,2];
 							if(target.hp==3) return [1,1.5];
 							if(target.hp==2) return [1,0.5];

@@ -1155,13 +1155,7 @@ character.shenhua={
 				maixie:true,
 				effect:{
 					target:function(card,player,target){
-						var hasfriend=false;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-								hasfriend=true;break;
-							}
-						}
-						if(!hasfriend) return;
+						if(!target.hasFriend()) return;
 						if(get.tag(card,'damage')==1&&target.hp==2&&!target.isTurnedOver()&&
                         _status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
 					}
@@ -1415,13 +1409,7 @@ character.shenhua={
 				},
 				effect:{
 					target:function(card,player,target,current){
-						var hasfriend=false;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-								hasfriend=true;break;
-							}
-						}
-						if(!hasfriend) return;
+						if(!target.hasFriend()) return;
 						if(target.hp<=1&&get.tag(card,'damage')) return [1,0,0,-2];
 					}
 				}
@@ -1904,8 +1892,8 @@ character.shenhua={
 						if(get.tag(card,'damage')){
 							if(player.hasSkill('jueqing')) return [1,-2];
 							if(target.hp<=1) return;
+							if(!target.hasFriend()) return;
 							var hastarget=false;
-							var hasfriend=false;
 							var turnfriend=false;
 							for(var i=0;i<game.players.length;i++){
 								if(ai.get.attitude(target,game.players[i])<0&&!game.players[i].isTurnedOver()){
@@ -1915,12 +1903,8 @@ character.shenhua={
 									hastarget=true;
 									turnfriend=true;
 								}
-								if(game.players[i]!=target&&ai.get.attitude(game.players[i],target)>=0){
-									hasfriend=true;
-								}
 							}
 							if(ai.get.attitude(player,target)>0&&!hastarget) return;
-							if(!hasfriend) return;
 							if(turnfriend||target.hp==target.maxHp) return [0.5,1];
 							if(target.hp>1) return [1,1];
 						}
