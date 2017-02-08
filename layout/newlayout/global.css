@@ -491,6 +491,10 @@
 	width: calc(100% - 300px);
 	left:150px;
 }
+.controltop{
+	top:auto;
+	left:150px;
+}
 .popup{z-index:6}
 .dialog.scroll1,
 .dialog.scroll2,

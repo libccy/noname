@@ -8,7 +8,11 @@
     bottom:150px;
     height: 40px;
 }
-#arena.phone #control{
+.controltop{
+    bottom:150px;
+}
+#arena.phone #control,
+#arena.phone .controltop{
     bottom:160px;
 }
 #arena:not(.chess)>#me,

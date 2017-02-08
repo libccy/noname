@@ -74,9 +74,11 @@ character.refresh={
 					player.storage.rerende+=cards.length;
 					if(player.storage.rerende>=2){
 						var list=[];
-						for(var i=0;i<game.players.length;i++){
-							if(player.canUse('sha',game.players[i],true,true)){
-								list.push('sha');break;
+						if(lib.filter.cardUsable({name:'sha'},player,event.getParent('chooseToUse'))){
+							for(var i=0;i<game.players.length;i++){
+								if(player.canUse('sha',game.players[i])){
+									list.push('sha');break;
+								}
 							}
 						}
 						if(player.canUse('tao',player,true,true)){

@@ -5,10 +5,12 @@
 #arena.oblongcard:not(.chess):not(.nome){
     height: calc(97% + 10px);
 }
-#arena.mobile>#control{
+#arena.mobile>#control,
+#arena.mobile>.controltop{
     top:calc(100% - 205px);
 }
-#arena.chess.mobile>#control{
+#arena.chess.mobile>#control,
+#arena.chess.mobile>.controltop{
     top:calc(100% - 175px);
 }
 #control>div,#system>div>div{

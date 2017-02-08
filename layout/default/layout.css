@@ -1076,6 +1076,10 @@ margin-bottom: 5px;
 	position: absolute;
 	left: 50%;
 }
+.controltop{
+	z-index: 5;
+	top: calc(200% / 3);
+}
 /*--------角色--------*/
 .player>.avatar>.action{
 	margin: 5px;

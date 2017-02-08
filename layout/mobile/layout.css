@@ -22,12 +22,9 @@
     bottom:150px;
     height: 40px;
 }
-/*#control>div{
-    height: 40px;
-    font-family: 'xinwei';
-    font-size: 30px;
-    line-height: 34px;
-}*/
+.controltop{
+    bottom: 150px;
+}
 #arena:not(.chess)>#me,
 #arena:not(.chess)>#mebg,
 #arena:not(.chess)>#autonode{

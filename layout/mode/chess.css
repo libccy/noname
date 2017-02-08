@@ -89,12 +89,9 @@
 #arena>.dialog.slim:not(.center){
     top:40px;
 }
-#control{
+#control,.controltop{
     top:calc(100% - 155px);
 }
-/*#arena.mobile #control{
-    top:calc(100% - 170px);
-}*/
 .fakeme{
     width:120px;
     height:120px;
