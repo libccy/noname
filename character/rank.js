@@ -369,6 +369,7 @@ window.characterRank={
         'diy_yangyi',
         're_yuanshu',
         'yuanshu',
+        're_guojia',
     ],
     b:[
         'diy_liufu',
@@ -407,7 +408,6 @@ window.characterRank={
         'fuwan',
         'hs_jinglinglong',
         're_xuzhu',
-        're_guojia',
         'ganfuren',
         'hs_huzhixiannv',
         'sp_sunshangxiang',

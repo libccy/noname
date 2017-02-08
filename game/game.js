@@ -3867,6 +3867,11 @@
                             else if(lib.character[name]){
                                 nameinfo=lib.character[name];
                             }
+							else if(name.indexOf('::')!=-1){
+								name=name.split('::');
+								modeimage=name[0];
+								name=name[1];
+							}
                         }
         				if(!modeimage&&nameinfo&&nameinfo[4]){
         					for(var i=0;i<nameinfo[4].length;i++){
@@ -3891,13 +3896,6 @@
                         else if(modeimage){
                             src='image/mode/'+modeimage+'/character/'+name+ext;
                         }
-        				// else if(type=='character'&&lib.customCharacters.contains(name)){
-        				// 	src="";
-        				// 	var node=this;
-        				// 	game.getDB('image','character:'+name,function(src){
-        				// 		node.style.backgroundImage="url('"+src+"')";
-        				// 	});
-        				// }
         				else if(type=='character'&&lib.config.skin[name]){
         					src='image/skin/'+name+'/'+lib.config.skin[name]+ext;
         				}
@@ -6742,7 +6740,13 @@
                         }
                     }
                     _status.noclearcountdown=true;
-					if(event.isMine()){
+					if(event.player.isUnderControl()){
+						event.result={
+							bool:false
+						}
+						return;
+					}
+					else if(event.isMine()){
                         if(event.type=='wuxie'){
                             if(ui.wuxie&&ui.wuxie.classList.contains('glow')){
                                 event.result={
@@ -12827,6 +12831,7 @@
 					}
                     if(_status.connectMode) return false;
 					if(lib.config.mode=='versus'){
+						if(_status.mode=='three') return this.side==me.side;
 						if(_status.mode=='four'||_status.mode=='jiange') return false;
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==me.side;
@@ -18234,7 +18239,6 @@
 				}
 			},
 			deletenode:function(player,cards,method){
-                console.log(method);
 				if(cards){
 					var nodeList=document.querySelectorAll('#arena>.card,#chess>.card');
 					var nodes=[];
@@ -19641,9 +19645,10 @@
 			ui.control.show();
 			ui.clear();
             game.stopCountChoose();
-			if(game.layout=='long2'){
+			if(game.layout=='long2'&&!game.chess){
 				ui.arena.classList.add('choose-character');
 				ui.me.hide();
+				ui.mebg.hide()
 				ui.autonode.hide();
 			}
             if(game.online){
@@ -20073,9 +20078,18 @@
 					name2:game.me.name2,
 					time:lib.getUTC(new Date())
 				};
+				var modecharacters=lib.characterPack['mode_'+get.mode()];
+				if(modecharacters){
+					if(modecharacters[newvid.name1]){
+						newvid.name1=get.mode()+'::'+newvid.name1;
+					}
+					if(modecharacters[newvid.name2]){
+						newvid.name2=get.mode()+'::'+newvid.name2;
+					}
+				}
 				lib.videos.unshift(newvid);
 				store.put(newvid);
-				lib.createVideoNode(newvid,true);
+				ui.create.videoNode(newvid,true);
 			}
 			// _status.auto=false;
 			if(ui.auto){
@@ -20121,7 +20135,7 @@
     			else if(lib.config.mode=='versus'){
     				if(_status.mode=='standard'||_status.mode=='three'){
     					ui.create.control('再战',function(){
-    						game.saveConfig('continue_name_versus',{
+    						game.saveConfig('continue_name_versus'+(_status.mode=='three'?'_three':''),{
     							friend:_status.friendBackup,
     							enemy:_status.enemyBackup,
     							color:_status.color
@@ -27312,9 +27326,11 @@
 									var createNode=function(video,before){
 										var node=ui.create.div('.videonode.menubutton.large',clickcapt);
 										node.link=video;
-										ui.create.div('.menubutton.videoavatar',node).setBackground(video.name1,'character');
+										var nodename1=ui.create.div('.menubutton.videoavatar',node);
+										nodename1.setBackground(video.name1,'character');
 										if(video.name2){
-											ui.create.div('.menubutton.videoavatar2',node).setBackground(video.name2,'character');
+											var nodename2=ui.create.div('.menubutton.videoavatar2',node);
+											nodename2.setBackground(video.name2,'character');
 										}
 										var date=new Date(video.time);
 										var str=date.getFullYear()+'.'+(date.getMonth()+2)+'.'+(date.getDay()+1)+' '+
@@ -27344,7 +27360,7 @@
 									for(var i=0;i<lib.videos.length;i++){
 										createNode(lib.videos[i]);
 									}
-									lib.createVideoNode=createNode;
+									ui.create.videoNode=createNode;
 									var importVideoNode=ui.create.div('.config.switcher',
 									'<span class="underlinenode slim">导入录像...</span>',function(){
 										this.nextSibling.classList.toggle('hidden');

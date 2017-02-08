@@ -376,7 +376,7 @@ mode.tafang={
 		treasures:[],
 		obstacles:[],
 		getVideoName:function(){
-			return [get.translation(game.me.name),'塔防'];
+			return [get.translation(game.me.name),'塔防模式'];
 		},
 		addOverDialog:function(dialog){
 			dialog.classList.add('center');

@@ -5402,6 +5402,9 @@ character.yijiang={
 			filterCard:function(card){
 				return card.name=='sha'||get.type(card)=='equip';
 			},
+			filter:function(event,player){
+				return player.num('h','sha')>0||player.num('he',{type:'equip'})>0;
+			},
 			check:function(card){return 8-ai.get.value(card)},
 			selectTarget:2,
 			multitarget:true,
@@ -5658,6 +5661,7 @@ character.yijiang={
 				if(result.bool){
 					result.targets[0].gain(result.cards,event.player);
 					event.player.$give(result.cards.length,result.targets[0]);
+					player.line(result.targets,'green');
 				}
 			},
 			ai:{
