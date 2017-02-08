@@ -1019,8 +1019,8 @@ character.xianjian={
 				if(result.bool){
 					player.gain(event.card,target);
 					target.gain(result.cards,player);
-					player.$give(1,target);
-					target.$give(1,player);
+					player.$giveAuto(result.cards,target);
+					target.$giveAuto(event.card,player);
 					game.log(player,'与',target,'交换了一张手牌');
 				}
 			},

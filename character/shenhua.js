@@ -801,11 +801,15 @@ character.shenhua={
 				}
 				"step 2"
 				for(var i=0;i<event.targets.length;i++){
-					player.gain(event.targets[i].get('h').randomGet(),event.targets[i]);
-					event.targets[i].$give(1,player);
+					var gainedcard=event.targets[i].get('h').randomGet();
+					player.gain(gainedcard,event.targets[i]).delay=false;
+					event.targets[i].$giveAuto(gainedcard,player);
 				}
 				trigger.finish();
 				trigger.untrigger();
+				game.delay();
+				"step 3"
+				game.delay();
 			},
 			ai:{
 				expose:0.2

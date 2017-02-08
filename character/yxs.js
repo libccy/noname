@@ -1123,8 +1123,9 @@ character.yxs={
 				'step 1'
 				if(result.bool){
 					player.logSkill('xiadao',result.targets);
-					result.targets[0].gain(trigger.player.get('h').randomGet(),trigger.player);
-					trigger.player.$give(1,result.targets[0]);
+					var card=trigger.player.get('h').randomGet();
+					result.targets[0].gain(card,trigger.player);
+					trigger.player.$giveAuto(card,result.targets[0]);
 				}
 			},
 			ai:{
@@ -1638,11 +1639,18 @@ character.yxs={
 				}
 				"step 2"
 				if(event.targets.length){
-					var target=event.targets.shift();
-					player.gain(target.get('h').randomGet(),target);
-					target.$give(1,player);
-					event.redo();
+					for(var i=0;i<event.targets.length;i++){
+						var gainedcard=event.targets[i].get('h').randomGet();
+						player.gain(gainedcard,event.targets[i]).delay=false;
+						event.targets[i].$giveAuto(gainedcard,player);
+					}
+					game.delay();
 				}
+				else{
+					event.finish();
+				}
+				"step 3"
+				game.delay();
 			}
 		},
 		seyou:{

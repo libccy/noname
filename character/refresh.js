@@ -272,11 +272,18 @@ character.refresh={
 				if(result.bool){
 					player.logSkill('retuxi',result.targets);
 					for(var i=0;i<result.targets.length;i++){
-						player.gain(result.targets[i].get('h').randomGet(),result.targets[i]);
-						result.targets[i].$give(1,player);
+						var card=result.targets[i].get('h').randomGet();
+						player.gain(card,result.targets[i]).delay=false;
+						result.targets[i].$giveAuto(card,player);
 					}
-					trigger.num-=result.targets.length
+					trigger.num-=result.targets.length;
+					game.delay();
 				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(trigger.num<=0) game.delay();
 			},
 			ai:{
 				threaten:1.6,

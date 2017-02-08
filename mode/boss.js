@@ -2596,13 +2596,15 @@ mode.boss={
 				var players=get.players(player);
 				players.remove(player);
 				event.players=players;
+				player.line(players,'green');
 				"step 1"
 				if(event.players.length){
 					var current=event.players.shift();
 					var hs=current.get('h')
 					if(hs.length){
-						player.gain(hs.randomGet(),current);
-						current.$give(1,player);
+						var card=hs.randomGet();
+						player.gain(card,current);
+						current.$giveAuto(card,player);
 					}
 					event.redo();
 				}

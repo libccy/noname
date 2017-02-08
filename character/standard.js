@@ -270,14 +270,19 @@ character.standard={
 				if(result.bool){
 					player.logSkill('tuxi',result.targets);
 					for(var i=0;i<result.targets.length;i++){
-						player.gain(result.targets[i].get('h').randomGet(),result.targets[i]);
-						result.targets[i].$give(1,player);
+						var card=result.targets[i].get('h').randomGet();
+						player.gain(card,result.targets[i]).set('delay',false);
+						result.targets[i].$giveAuto(card,player);
 					}
 					trigger.finish();
 					trigger.untrigger();
+					game.delay();
+				}
+				else{
+					event.finish();
 				}
 				"step 2"
-				if(result.bool) game.delay();
+				game.delay();
 			},
 			ai:{
 				threaten:2,

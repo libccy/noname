@@ -8128,20 +8128,25 @@
 						cards.push(event.result.links[i]);
 					}
 					event.cards=cards;
-					var hs=[],oths=[];
-					for(var i=0;i<cards.length;i++){
-						if(get.position(cards[i])=='h'){
-							hs.push(cards[i]);
-						}
-						else{
-							oths.push(cards[i]);
-						}
+					if(!_status.connectMode&&(target.isUnderControl(true)||player.isUnderControl(true))){
+						target.$give(cards,player);
 					}
-					if(hs.length){
-						target.$give(hs.length,player);
-					}
-					if(oths.length){
-						target.$give(oths,player);
+					else{
+						var hs=[],oths=[];
+						for(var i=0;i<cards.length;i++){
+							if(get.position(cards[i])=='h'){
+								hs.push(cards[i]);
+							}
+							else{
+								oths.push(cards[i]);
+							}
+						}
+						if(hs.length){
+							target.$give(hs.length,player);
+						}
+						if(oths.length){
+							target.$give(oths,player);
+						}
 					}
 					"step 4"
 					player.gain(event.cards,target);
@@ -13677,6 +13682,19 @@
 					// node.style.transform=trans||'';
 					lib.listenEnd(node);
 					return node;
+				},
+				$giveAuto:function(card,player){
+					var args=Array.from(arguments);
+					if(_status.connectMode||(!this.isUnderControl(true)&&!player.isUnderControl(true))){
+						if(Array.isArray(card)){
+							card=card.length;
+						}
+						else{
+							card=1;
+						}
+						args[0]=card;
+					}
+					return this.$give.apply(this,args);
 				},
 				$give:function(card,player,log,init){
 					if(init!==false){

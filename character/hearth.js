@@ -3732,10 +3732,10 @@ character.hearth={
 				if(result.bool){
 					player.logSkill('shijie',result.targets);
 					var target=result.targets[0];
-					player.gain(target.get('h').randomGet(),target);
+					var card=target.get('h').randomGet()
+					player.gain(card,target);
 					event.target=target;
-					target.$give(1,player);
-					game.delay();
+					target.$giveAuto(card,player);
 					event.target.draw();
 				}
 			},

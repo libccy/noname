@@ -6767,8 +6767,9 @@ character.sp={
 				return event.target.num('h')>0;
 			},
 			content:function(){
-				player.gain(trigger.target.get('h').randomGet(),trigger.target);
-				trigger.target.$give(1,player);
+				var card=trigger.target.get('h').randomGet();
+				player.gain(card,trigger.target);
+				trigger.target.$giveAuto(card,player);
 				game.delay();
 			}
 		},
@@ -6780,8 +6781,9 @@ character.sp={
 				return event.source&&event.source.num('h')>0;
 			},
 			content:function(){
-				player.gain(trigger.source.get('h').randomGet(),trigger.source);
-				trigger.source.$give(1,player);
+				var card=trigger.source.get('h').randomGet();
+				player.gain(card,trigger.source);
+				trigger.source.$giveAuto(card,player);
 				game.delay();
 			}
 		},
