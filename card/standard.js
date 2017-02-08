@@ -453,6 +453,26 @@ card.standard={
 				"step 0"
 				game.delay();
 				"step 1"
+				if(get.is.versus()){
+					player.chooseControl('顺时针','逆时针',function(event,player){
+						if(player.next.side==player.side) return '逆时针';
+						return '顺时针';
+					}).set('prompt','选择'+get.translation(card)+'的结算方向');
+				}
+				else{
+					event.goto(3);
+				}
+				"step 2"
+				if(result&&result.control=='顺时针'){
+					var evt=event.getParent();
+					evt.fixedSeat=true;
+					get.sortSeat(evt.targets);
+					evt.targets.reverse();
+					if(evt.targets[evt.targets.length-1]==player){
+						evt.targets.unshift(evt.targets.pop());
+					}
+				}
+				"step 3"
 				ui.clear();
 				var cards=get.cards(game.players.length);
 				var dialog=ui.create.dialog('五谷丰登',cards,true);
@@ -565,6 +585,10 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
+						if(get.is.versus()){
+							if(target==player) return 1.5;
+							return 1;
+						}
 						var num=0;
 						for(var i=0;i<game.players.length;i++){
 							if(game.players[i].ai.shown==0) num++;
@@ -585,6 +609,7 @@ card.standard={
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
+			reverseOrder:true,
 			filterTarget:function(card,player,target){
 				return target.hp<target.maxHp;
 			},
@@ -617,6 +642,7 @@ card.standard={
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
+			reverseOrder:true,
 			content:function(){
 				"step 0"
 				var next=target.chooseToRespond({name:'sha'});
@@ -675,6 +701,7 @@ card.standard={
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
+			reverseOrder:true,
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
@@ -741,6 +768,18 @@ card.standard={
 			},
 			modTarget:true,
 			content:function(){
+				if(get.is.versus()){
+					if(game.friend.contains(target)){
+						if(game.friend.length<game.enemy.length){
+							target.draw(3);return;
+						}
+					}
+					else{
+						if(game.friend.length>game.enemy.length){
+							target.draw(3);return;
+						}
+					}
+				}
 				target.draw(2);
 			},
 			ai:{
@@ -1325,7 +1364,12 @@ card.standard={
 		zhuge_skill:{
 			mod:{
 				cardUsable:function(card,player,num){
-					if(card.name=='sha') return Infinity;
+					if(card.name=='sha'){
+						if(get.is.versus()){
+							return num+3;
+						}
+						return Infinity;
+					}
 				}
 			},
 		},

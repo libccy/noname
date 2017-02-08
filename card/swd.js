@@ -593,6 +593,7 @@ card.swd={
 			enable:true,
 			wuxieable:true,
 			selectTarget:-1,
+			reverseOrder:true,
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
@@ -1452,6 +1453,7 @@ card.swd={
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
+			reverseOrder:true,
 			filterTarget:function(card,player,target){
 				return target.isDamaged();
 			},
@@ -1791,6 +1793,7 @@ card.swd={
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
+			reverseOrder:true,
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
@@ -1853,6 +1856,7 @@ card.swd={
 			type:'trick',
 			enable:true,
 			selectTarget:-1,
+			reverseOrder:true,
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},

@@ -6332,19 +6332,29 @@ character.sp={
 					}
 					check=(num>=2);
 				}
-				player.chooseTarget(get.prompt('hongyuan'),[1,2],function(card,player,target){
-					return player!=target;
-				},
-				function(target){
-					if(!_status.event.check) return 0;
-					return ai.get.attitude(_status.event.player,target);
-				}).set('check',check);
+				if(get.is.versus()){
+					event.versus=true;
+					player.chooseBool(get.prompt('hongyuan'));
+				}
+				else{
+					player.chooseTarget(get.prompt('hongyuan'),[1,2],function(card,player,target){
+						return player!=target;
+					},function(target){
+						if(!_status.event.check) return 0;
+						return ai.get.attitude(_status.event.player,target);
+					}).set('check',check);
+				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('hongyuan',result.targets);
-					// for(var i=0;i<result.targets.length;i++){
-					// 	result.targets[i].draw();
-					// }
+					var targets;
+					if(event.versus){
+						targets=game.friend.slice(0);
+						targets.remove(player);
+					}
+					else{
+						targets=result.target;
+					}
+					player.logSkill('hongyuan',targets);
 					game.asyncDraw(result.targets);
 					trigger.num--;
 				}

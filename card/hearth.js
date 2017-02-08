@@ -597,6 +597,7 @@ card.hearth={
 			enable:true,
 			selectTarget:-1,
 			filterTarget:true,
+			reverseOrder:true,
 			content:function(){
 				"step 0"
 				target.chooseToDiscard([1,2],'he').ai=function(card){

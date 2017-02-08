@@ -44,6 +44,9 @@ table{table-layout: fixed;}
 	position: absolute;
 	transition: all 1s;
 }
+#window.modepaused>div:not(.modenopause):not(#arena):not(.popped){opacity: 0.3;}
+#window.modepaused>#arena>#roundmenu{opacity: 0.3;}
+#window.shortcutpaused.modepaused>.modenopause.popup-container:not(.filter-character){opacity: 0.3;}
 #window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(.dialog):not(.centermenu):not(.popup-container){opacity: 0.3 !important}
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden):not(#autonode){opacity: 0.3 !important}
 #window.systempaused>#system{opacity: 0.3 !important;}
@@ -1669,6 +1672,9 @@ div:hover>.intro{opacity: 1;}
 	border-radius:8px;
 	color: white !important;
 }
+.shadowed2{
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+}
 #window[data-radius_size='reduce'] .shadowed{
 	border-radius:4px;
 }
@@ -2214,6 +2220,16 @@ div:hover>.wunature{
 .glow3{
 	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0) 0 0 40px, rgba(0, 133, 255, 0.8) 0 0 60px !important
 }
+.selectedx3{
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(255, 0, 0, 0.8) 0 0 10px, rgba(255, 0, 0, 0) 0 0 40px, rgba(255, 0, 0, 0.8) 0 0 60px !important
+}
+.glow4{
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0) 0 0 40px, rgba(0, 133, 255, 0.8) 0 0 40px !important
+}
+.selectedx4{
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(255, 0, 0, 0.6) 0 0 10px, rgba(255, 0, 0, 0) 0 0 40px, rgba(255, 0, 0, 0.8) 0 0 40px !important
+}
+
 .player:not(.glow_phase)>.avatar.glow2,
 .button.glow2:not(.selected){
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px, rgba(10, 155, 67, 1) 0 0 10px !important

@@ -1122,6 +1122,11 @@
                         init:true,
                         unfrequent:true,
                     },
+					seperate_control:{
+						name:'分离选项条',
+						init:true,
+						unfrequent:true,
+					},
 					blur_ui:{
 						name:'模糊效果',
 						init:false,
@@ -2804,11 +2809,13 @@
 						}
 						if(config.versus_mode=='three'){
 							map.enable_all_three.show();
+							map.enable_all_cards.show();
 						}
 						else{
 							map.enable_all_three.hide();
+							map.enable_all_cards.hide();
 						}
-                        if(config.versus_mode=='jiange'||config.versus_mode=='two'){
+                        if(config.versus_mode=='jiange'||config.versus_mode=='two'||config.versus_mode=='three'){
                             map.free_choose.show();
                         }
                         else{
@@ -2863,6 +2870,12 @@
 					},
 					enable_all_three:{
 						name:'启用全部武将',
+						init:false,
+						frequent:true,
+						restart:true,
+					},
+					enable_all_cards:{
+						name:'启用全部卡牌',
 						init:false,
 						frequent:true,
 						restart:true,
@@ -6039,6 +6052,31 @@
 		},
 		element:{
 			content:{
+				reverseOrder:function(){
+					"step 0"
+					game.delay();
+					"step 1"
+					var choice;
+					if(get.tag(card,'multineg')){
+						choice=(player.previous.side==player.side)?'逆时针':'顺时针';
+					}
+					else{
+						choice=(player.next.side==player.side)?'逆时针':'顺时针';
+					}
+					player.chooseControl('顺时针','逆时针',function(event,player){
+						return _status.event.choice||'逆时针';
+					}).set('prompt','选择'+get.translation(card)+'的结算方向').set('choice',choice);
+					"step 2"
+					if(result&&result.control=='顺时针'){
+						var evt=event.getParent();
+						evt.fixedSeat=true;
+						get.sortSeat(evt.targets);
+						evt.targets.reverse();
+						if(evt.targets[evt.targets.length-1]==player){
+							evt.targets.unshift(evt.targets.pop());
+						}
+					}
+				},
                 addJudgeCard:function(){
                     target.addJudge(card,cards);
                 },
@@ -7693,7 +7731,15 @@
                             event.dialog.open();
                         }
 						else{
-                            event.controlbar=ui.create.control(event.controls);
+							if(event.seperate||lib.config.seperate_control){
+								event.controlbars=[];
+								for(var i=0;i<event.controls.length;i++){
+									event.controlbars.push(ui.create.control([event.controls[i]]));
+								}
+							}
+							else{
+								event.controlbar=ui.create.control(event.controls);
+							}
     						if(event.dialog){
                                 if(Array.isArray(event.dialog)){
                                     event.dialog=ui.create.dialog.apply(this,event.dialog);
@@ -7736,6 +7782,11 @@
 					_status.imchoosing=false;
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 					if(event.controlbar) event.controlbar.close();
+					if(event.controlbars){
+						for(var i=0;i<event.controlbars.length;i++){
+							event.controlbars[i].close();
+						}
+					}
 				},
 				chooseBool:function(){
 					"step 0"
@@ -8321,9 +8372,18 @@
 						}
 					}
 					"step 1"
-					if(get.info(card).contentBefore){
+					var info=get.info(card);
+					if(info.contentBefore){
 						var next=game.createEvent(card.name+'ContentBefore');
-						next.setContent(get.info(card).contentBefore);
+						next.setContent(info.contentBefore);
+						next.targets=targets;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+					}
+					else if(info.reverseOrder&&get.is.versus){
+						var next=game.createEvent(card.name+'ContentBefore');
+						next.setContent('reverseOrder');
 						next.targets=targets;
 						next.card=card;
 						next.cards=cards;
@@ -8351,9 +8411,9 @@
                     }
 					if(num==0&&next.targets.length>1){
 						if(!info.multitarget){
-							lib.tempSortSeat=player;
-							targets.sort(lib.sort.seat);
-							delete lib.tempSortSeat;
+							if(!event.fixedSeat){
+								get.sortSeat(targets,player);
+							}
 							for(var i=0;i<targets.length;i++){
 								targets[i].animate('target');
 							}
@@ -10859,11 +10919,16 @@
 					var next=game.createEvent('chooseControl');
 					next.controls=[];
 					for(var i=0;i<arguments.length;i++){
-                        if(arguments[i]=='dialogcontrol'){
-                            next.dialogcontrol=true;
-                        }
-						else if(typeof arguments[i]=='string'){
-							next.controls.push(arguments[i]);
+                        if(typeof arguments[i]=='string'){
+							if(arguments[i]=='dialogcontrol'){
+	                            next.dialogcontrol=true;
+	                        }
+							else if(arguments[i]=='seperate'){
+								next.seperate=true;
+							}
+							else{
+								next.controls.push(arguments[i]);
+							}
 						}
 						else if(get.objtype(arguments[i])=='array'){
 							next.controls=next.controls.concat(arguments[i]);
@@ -20054,7 +20119,7 @@
     				});
     			}
     			else if(lib.config.mode=='versus'){
-    				if(_status.mode=='standard'){
+    				if(_status.mode=='standard'||_status.mode=='three'){
     					ui.create.control('再战',function(){
     						game.saveConfig('continue_name_versus',{
     							friend:_status.friendBackup,
@@ -27956,7 +28021,7 @@
 					if(get.is.phoneLayout()){
 						newlined.style.marginTop='';
 						packsource.innerHTML='筛选';
-						filternode=ui.create.div('.popup-container.filter-character');
+						filternode=ui.create.div('.popup-container.filter-character.modenopause');
 						ui.create.div(filternode);
 						filternode.listen(function(e){
 							if(this.classList.contains('removing')) return;
@@ -32055,6 +32120,9 @@
 	};
 	var get={
         is:{
+			versus:function(){
+				return !_status.connectMode&&get.mode()=='versus'&&_status.mode=='three';
+			},
 			mobileMe:function(player){
 				return (game.layout=='mobile'||game.layout=='long')&&!game.chess&&player.dataset.position==0;
 			},

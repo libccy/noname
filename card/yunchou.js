@@ -11,6 +11,26 @@ card.yunchou={
 				game.delay();
 				player.draw();
 				"step 1"
+				if(get.is.versus()){
+					player.chooseControl('顺时针','逆时针',function(event,player){
+						if(player.next.side==player.side) return '逆时针';
+						return '顺时针';
+					}).set('prompt','选择'+get.translation(card)+'的结算方向');
+				}
+				else{
+					event.goto(3);
+				}
+				"step 2"
+				if(result&&result.control=='顺时针'){
+					var evt=event.getParent();
+					evt.fixedSeat=true;
+					get.sortSeat(evt.targets);
+					evt.targets.reverse();
+					if(evt.targets[evt.targets.length-1]==player){
+						evt.targets.unshift(evt.targets.pop());
+					}
+				}
+				"step 3"
 				ui.clear();
 				var cards=get.cards(Math.ceil(game.players.length/2));
 				var dialog=ui.create.dialog('调兵遣将',cards,true);
@@ -627,6 +647,7 @@ card.yunchou={
 			content:function(){
 				if(target.num('e')) target.chooseToDiscard('e',true);
 			},
+			reverseOrder:true,
 			ai:{
 				order:9,
 				result:{
