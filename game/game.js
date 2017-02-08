@@ -1103,6 +1103,11 @@
 							}
 						}
 					},
+					wuxie_right:{
+						name:'无懈按钮靠右',
+						init:true,
+						unfrequent:true,
+					},
 					show_discardpile:{
 						name:'暂停时显示弃牌堆',
 						init:false,
@@ -21073,25 +21078,58 @@
 			else next.num=num;
 			next.setContent('gameDraw');
 		},
-		chooseCharacterDouble:function(config,list){
+		chooseCharacterDouble:function(){
 			var next=game.createEvent('chooseCharacter',false);
-			if(Array.isArray(config)||typeof config=='function'||!config){
+			var config,width,num,ratio,func,update,list,first;
+			for(var i=0;i<arguments.length;i++){
+				if(typeof arguments[i]=='number'){
+					if(!width){
+						width=arguments[i];
+					}
+					else if(!num){
+						num=arguments[i];
+					}
+					else{
+						ratio=arguments[i];
+					}
+				}
+				else if(typeof arguments[i]=='function'){
+					if(!func){
+						func=arguments[i];
+					}
+					else{
+						update=arguments[i];
+					}
+				}
+				else if(Array.isArray(arguments[i])){
+					list=arguments[i];
+				}
+				else if(get.objtype(arguments[i])=='object'){
+					config=arguments[i];
+				}
+			}
+			if(!config){
 				list=config;
 				config={};
 			}
-			config.width=config.width||8;
+			config.width=config.width||width||8;
 			config.height=4;
 			config.size=config.width*config.height;
-			config.num=config.num||3;
-			config.ratio=config.ratio||1.2;
+			config.num=config.num||num||3;
+			config.ratio=config.ratio||ratio||1.2;
+			config.update=config.update||update;
 			if(!config.hasOwnProperty('first')){
-				config.first='rand';
+				if(typeof first=='boolean'){
+					config.first=first;
+				}
+				else{
+					config.first='rand';
+				}
 			}
-			if(!Array.isArray(list)){
-				var func=list;
+			if(!list){
 				list=[];
 				for(var i in lib.character){
-					if(typeof func=='function'){
+					if(typeof func){
 						if(!func(i)) continue;
 					}
 					else{
@@ -32342,19 +32380,75 @@
 			var length=0;
 			var controls=[];
 			var widths=[];
-			for(var i=0;i<ui.control.childNodes.length;i++){
-				if(ui.control.childNodes[i].classList.contains('removing')) continue;
-				var thiswidth=parseInt(ui.control.childNodes[i].style.width);
+			var add=function(node){
+				var thiswidth=parseInt(node.style.width);
 				if(thiswidth){
 					thiswidth+=8;
 					length+=thiswidth;
 					widths.push(thiswidth);
 				}
 				else{
-					length+=ui.control.childNodes[i].offsetWidth;
-					widths.push(ui.control.childNodes[i].offsetWidth);
+					length+=node.offsetWidth;
+					widths.push(node.offsetWidth);
 				}
-				controls.push(ui.control.childNodes[i]);
+				controls.push(node);
+			}
+			var hasWuxie=false;
+			for(var i=0;i<ui.control.childNodes.length;i++){
+				if(ui.control.childNodes[i].classList.contains('removing')) continue;
+				if(lib.config.wuxie_right&&ui.control.childNodes[i]==ui.tempnowuxie){
+					hasWuxie=true;
+				}
+				else{
+					add(ui.control.childNodes[i]);
+				}
+				// if(game.layout!='default'&&game.layout!='newlayout'){
+				// 	if(game.layout=='long'||game.layout=='long2'||game.chess||parseInt(ui.arena.dataset.number)<=5){
+				// 		ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-8;
+				// 	}
+				// 	else{
+				// 		ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-162;
+				// 	}
+				// 	ui.tempnowuxie.style.transform='translateX('+ui.tempnowuxie._offset+'px)';
+				// 	continue;
+				// }
+			}
+			if(hasWuxie){
+				var fullwidth=0;
+				var fullright=(game.layout=='long'||game.layout=='long2'||game.chess||parseInt(ui.arena.dataset.number)<=5);
+				for(var i=0;i<widths.length;i++){
+					fullwidth+=widths[i]+6;
+					if(get.is.phoneLayout()) fullwidth+=6;
+				}
+				fullwidth/=2;
+				fullwidth+=ui.tempnowuxie.offsetWidth;
+				if(get.is.phoneLayout()){
+					fullwidth+=20;
+				}
+				else{
+					fullwidth+=14;
+				}
+				if(get.mode()=='stone'){
+					fullwidth+=124;
+				}
+				else if(!fullright){
+					fullwidth+=154;
+				}
+				if(game.layout!='default'&&game.layout!='newlayout'&&fullwidth<=ui.arena.offsetWidth/2){
+					if(get.mode()=='stone'){
+						ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-132;
+					}
+					else if(fullright){
+						ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-8;
+					}
+					else{
+						ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-162;
+					}
+					ui.tempnowuxie.style.transform='translateX('+ui.tempnowuxie._offset+'px)';
+				}
+				else{
+					add(ui.tempnowuxie);
+				}
 			}
 			if(!controls.length) return;
 			var offset=-length/2;

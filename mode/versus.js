@@ -1081,11 +1081,7 @@ mode.versus={
 					event.goto(2);
 				}
 				else{
-					game.chooseCharacterDouble({
-						update:function(i){
-							return i==1?'主帅':'前锋';
-						}
-					},function(i){
+					game.chooseCharacterDouble(function(i){
 						if(get.config('enable_all_three')){
 							if(lib.filter.characterDisabled(i)) return false;
 							return !lib.filter.characterDisabled(i);
@@ -1093,6 +1089,8 @@ mode.versus={
 						else{
 							return lib.choiceThree.contains(i);
 						}
+					},function(i){
+						return i==1?'主帅':'前锋';
 					});
 				}
 				"step 1"

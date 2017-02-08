@@ -89,7 +89,7 @@
 #arena>.dialog.slim:not(.center){
     top:40px;
 }
-#control,.controltop{
+#control{
     top:calc(100% - 155px);
 }
 .fakeme{

@@ -22,9 +22,6 @@
     bottom:150px;
     height: 40px;
 }
-.controltop{
-    bottom: 150px;
-}
 #arena:not(.chess)>#me,
 #arena:not(.chess)>#mebg,
 #arena:not(.chess)>#autonode{
