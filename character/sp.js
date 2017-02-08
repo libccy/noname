@@ -6348,14 +6348,18 @@ character.sp={
 				if(result.bool){
 					var targets;
 					if(event.versus){
-						targets=game.friend.slice(0);
-						targets.remove(player);
+						targets=[];
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i]!=player&&game.players[i].side==player.side){
+								targets.push(game.players[i]);
+							}
+						}
 					}
 					else{
 						targets=result.target;
 					}
 					player.logSkill('hongyuan',targets);
-					game.asyncDraw(result.targets);
+					game.asyncDraw(targets);
 					trigger.num--;
 				}
 			},
