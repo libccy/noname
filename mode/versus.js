@@ -1091,7 +1091,10 @@ mode.versus={
 				event.blank=[];
 				for(var i in lib.character){
 					if(lib.filter.characterDisabled(i)) continue;
-					if(get.config('enable_all_three')||lib.choiceThree.contains(i)){
+					if(lib.choiceThree.contains(i)){
+						event.list.push(i);
+					}
+					else if(get.config('enable_all_three')&&!lib.filter.characterDisabled(i)){
 						event.list.push(i);
 					}
 				}
@@ -1468,7 +1471,23 @@ mode.versus={
 				game.delay();
 				'step 5'
 				event.prompt('选择三名出场武将');
-				event.enemylist=event.enemy.randomGets(3);
+				event.enemylist=[];
+				var rand=[];
+				for(var i=0;i<8;i++){
+					for(var j=0;j<8-i;j++){
+						rand.push(i);
+					}
+				}
+				for(var i=0;i<3;i++){
+					var rand2=rand.randomGet();
+					for(var j=0;j<rand.length;j++){
+						if(rand[j]==rand2){
+							rand.splice(j--,1);
+						}
+					}
+					event.enemylist.push(event.enemy[rand2]);
+				}
+				event.enemylist.randomSort();
 				event.friendlist=[];
 				event.deciding=true;
 				for(var i=0;i<32;i++){

@@ -673,7 +673,7 @@ character.shenhua={
 			}
 		},
 		fangquan3:{
-			trigger:{player:'phaseAfter'},
+			trigger:{player:['phaseAfter','phaseCancelled']},
 			forced:true,
 			popup:false,
 			audio:false,

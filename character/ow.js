@@ -2282,7 +2282,7 @@ character.ow={
             trigger:{player:'phaseEnd'},
             direct:true,
             filter:function(event,player){
-                return player.num('he',{suit:'spade'})>0&&!player.hasSkill('yihun2');
+                return player.num('he',{color:'black'})>0&&!player.hasSkill('yihun2');
             },
             content:function(){
                 'step 0'
@@ -2290,7 +2290,7 @@ character.ow={
                     prompt:get.prompt('yihun'),
                     position:'he',
                     filterCard:function(card,player){
-                        return get.suit(card)=='spade'&&lib.filter.cardDiscardable(card,player);
+                        return get.color(card)=='black'&&lib.filter.cardDiscardable(card,player);
                     },
                     ai1:function(card){
                         return 7-ai.get.value(card);
@@ -3057,7 +3057,7 @@ character.ow={
         xiandan:'霰弹',
         xiandan_info:'每当你使用一张杀，你可以弃置一张红色牌令此杀不可闪避，或弃置一张黑色牌令此杀伤害+1',
         yihun:'移魂',
-        yihun_info:'结束阶段，你可以弃置一张黑桃牌并指定一名其他角色，你在该角色下一准备阶段视为对其使用一张杀；在此之前，你不能使用卡牌，也不能成为卡牌的目标',
+        yihun_info:'结束阶段，你可以弃置一张黑色牌并指定一名其他角色，你在该角色下一准备阶段视为对其使用一张杀；在此之前，你不能使用卡牌，也不能成为卡牌的目标',
         feidan:'飞弹',
         feidan_info:'你的杀只能对距离1以外的角色使用；每当你使用杀造成伤害后，你可以弃置一张牌对距离目标1以内的其他角色各造成一点伤害',
         huoyu:'火雨',

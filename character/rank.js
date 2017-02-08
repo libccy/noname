@@ -140,6 +140,7 @@ window.characterRank={
         'hs_alleria',
         'old_wangyi',
         're_lusu',
+        'hs_fuding',
     ],
     am:[
         'swd_duanmeng',
@@ -153,7 +154,6 @@ window.characterRank={
         'ow_falaozhiying',
         'hs_bolvar',
         'lifeng',
-        'hs_fuding',
         'zhugeguo',
         'sp_caiwenji',
         'yxs_yingzheng',

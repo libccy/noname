@@ -2062,7 +2062,7 @@ card.swd={
 				var skills=player.get('s');
 				for(var i=0;i<skills.length;i++){
 					if(skills[i].indexOf('yuchan')==0&&skills[i].indexOf('_equip')!=-1){
-						return true;
+						return player.num('h',{type:'basic'})>0;
 					}
 				}
 				return false;
