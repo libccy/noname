@@ -8390,7 +8390,7 @@
 						next.cards=cards;
 						next.player=player;
 					}
-					else if(info.reverseOrder&&get.is.versus){
+					else if(info.reverseOrder&&get.is.versus()&&targets.length>1){
 						var next=game.createEvent(card.name+'ContentBefore');
 						next.setContent('reverseOrder');
 						next.targets=targets;

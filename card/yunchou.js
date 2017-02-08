@@ -328,18 +328,18 @@ card.yunchou={
 						if(ai.get.attitude(player,_status.event.source)>=0) return false;
 						var hs=player.get('h');
 						for(var i=0;i<hs.length;i++){
-							var value=ai.get.value(hs[i]);
+							var value=ai.get.value(hs[i],player);
+							if(value<0) return true;
 							if(!_status.event.hasTarget){
 								if(hs[i].number>=8&&value<=7) return true;
 								if(value<=3) return true;
 							}
-							else{
-								if(hs[i].number>=11&&value<=5) return true;
-								if(value<0) return true;
+							else if(_status.event.hasTarget%2==1){
+								if(hs[i].number>=11&&value<=6) return true;
 							}
 						}
 						return false;
-					}).set('source',target).set('hasTarget',event.torespond.length>0);
+					}).set('source',target).set('hasTarget',event.torespond.length);
 				}
 				else{
 					event.goto(3);
