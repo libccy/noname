@@ -2812,7 +2812,7 @@
 							map.four_assign.hide();
                             map.expand_dialog.hide();
 						}
-						if(config.versus_mode=='three'){
+						if(config.versus_mode=='three'||config.versus_mode=='one'){
 							map.enable_all_three.show();
 							map.enable_all_cards.show();
 						}
@@ -2820,7 +2820,7 @@
 							map.enable_all_three.hide();
 							map.enable_all_cards.hide();
 						}
-                        if(config.versus_mode=='jiange'||config.versus_mode=='two'||config.versus_mode=='three'){
+                        if(config.versus_mode=='jiange'||config.versus_mode=='two'||config.versus_mode=='three'||config.versus_mode=='one'){
                             map.free_choose.show();
                         }
                         else{
@@ -2850,6 +2850,7 @@
 							standard:'自由',
 							three:'统率',
 							jiange:'剑阁',
+                            // one:'<span style="display:inline-block;width:100%;text-align:center">1v1</span>',
                             two:'<span style="display:inline-block;width:100%;text-align:center">2v2</span>',
 							four:'<span style="display:inline-block;width:100%;text-align:center">4v4</span>'
 						},
@@ -12842,7 +12843,7 @@
                     if(_status.connectMode) return false;
 					if(lib.config.mode=='versus'){
 						if(_status.mode=='three') return this.side==me.side;
-						if(_status.mode=='four'||_status.mode=='jiange') return false;
+						if(_status.mode=='four'||_status.mode=='jiange'||_status.mode=='one') return false;
 						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
 							this.side==me.side;
 					}
@@ -32434,7 +32435,7 @@
 				else if(!fullright){
 					fullwidth+=154;
 				}
-				if(game.layout!='default'&&game.layout!='newlayout'&&fullwidth<=ui.arena.offsetWidth/2){
+				if(game.layout!='default'&&game.layout!='newlayout'&ui.arena.offsetWidth/2>=fullwidth){
 					if(get.mode()=='stone'){
 						ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-132;
 					}

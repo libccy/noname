@@ -5681,6 +5681,7 @@ character.yijiang={
 			filter:function(event,player){
 				return event.player!=player&&event.card&&(event.card.name=='sha'||get.type(event.card)=='trick');
 			},
+			logTarget:'player',
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)>0){
 					return false;

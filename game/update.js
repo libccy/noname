@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.8',
-    update:'1.9.8',
+    version:'1.9.8.1',
+    update:'1.9.8.1',
     changeLog:[
-        '新武将、卡牌',
+        '统率三军',
     ],
     files:[
         // 'game/game.js',

@@ -1384,7 +1384,7 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				trigger.target.chooseToDiscard().set('ai',function(card){
+				trigger.target.chooseToDiscard('弃置一张手牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
 					var trigger=_status.event.getTrigger();
 					return -ai.get.attitude(trigger.target,trigger.player)-ai.get.value(card);
 				});

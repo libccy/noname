@@ -6370,6 +6370,7 @@ character.sp={
 			filter:function(event,player){
 				return player.num('he')>0;
 			},
+			logTarget:'player',
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)<=0) return false;
 				var cards=player.get('he');
