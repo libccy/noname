@@ -1687,6 +1687,22 @@ div:hover>.intro{opacity: 1;}
 #window[data-radius_size='default'] .shadowed.reduce_radius{
 	border-radius:4px;
 }
+
+#window>.choosedouble{
+	left: 50%;
+	top: 50%;
+}
+#window>.choosedouble:not(.character){
+	transition-duration:0.2s;
+}
+#window>.choosedouble.character{
+	transform-origin: top left;
+}
+#window>.choosedouble.character>.name{
+	left: 6%;
+	top: 8%;
+}
+
 .underline,.underlinenode{
 	padding:3px;
 	width:auto;

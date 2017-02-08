@@ -21073,6 +21073,448 @@
 			else next.num=num;
 			next.setContent('gameDraw');
 		},
+		chooseCharacterDouble:function(config,list){
+			var next=game.createEvent('chooseCharacter',false);
+			if(Array.isArray(config)||typeof config=='function'||!config){
+				list=config;
+				config={};
+			}
+			config.width=config.width||8;
+			config.height=4;
+			config.size=config.width*config.height;
+			config.num=config.num||3;
+			config.ratio=config.ratio||1.2;
+			if(!config.hasOwnProperty('first')){
+				config.first='rand';
+			}
+			if(!Array.isArray(list)){
+				var func=list;
+				list=[];
+				for(var i in lib.character){
+					if(typeof func=='function'){
+						if(!func(i)) continue;
+					}
+					else{
+						if(lib.filter.characterDisabled(i)) continue;
+					}
+					list.push(i);
+				}
+			}
+			next.config=config;
+			next.list=list;
+			next.setContent(function(){
+				'step 0'
+				event.nodes=[];
+				event.avatars=[];
+				event.friend=[];
+				event.enemy=[];
+				event.blank=[];
+				for(var i=0;i<event.config.size;i++){
+					event.nodes.push(ui.create.div('.shadowed.reduce_radius.choosedouble'));
+				}
+				event.moveAvatar=function(node,i){
+					if(!node.moved){
+						event.blank.push(node.index);
+					}
+					event.nodes[node.index].style.display='';
+					event.nodes[node.index].show();
+					clearTimeout(event.nodes[node.index].choosetimeout);
+					event.moveNode(node,i);
+					var nodex=event.nodes[node.index];
+					nodex.choosetimeout=setTimeout(function(){
+						nodex.hide();
+						nodex.choosetimeout=setTimeout(function(){
+							nodex.show();
+							nodex.style.display='none';
+						},300);
+					},400);
+				};
+				event.aiMove=function(){
+					var list=[];
+					for(var i=0;i<event.avatars.length;i++){
+						if(!event.avatars[i].moved){
+							list.push(event.avatars[i]);
+						}
+					}
+					for(var i=0;i<list.length;i++){
+						if(Math.random()<0.7||i==list.length-1){
+							event.moveAvatar(list[i],event.enemy.length);
+							event.enemy.push(list[i]);
+							list[i].moved=true;
+							break;
+						}
+					}
+				};
+				event.promptbar=ui.create.div('.hidden',ui.window);
+				event.promptbar.style.width='100%';
+				event.promptbar.style.left=0;
+				if(get.is.phoneLayout()){
+					event.promptbar.style.top='20px';
+				}
+				else{
+					event.promptbar.style.top='58px';
+				}
+				event.promptbar.style.pointerEvents='none';
+				event.promptbar.style.textAlign='center';
+				event.promptbar.style.zIndex='2';
+				ui.create.div('.shadowed.reduce_radius',event.promptbar);
+				event.promptbar.firstChild.style.fontSize='18px';
+				event.promptbar.firstChild.style.padding='6px 10px';
+				event.promptbar.firstChild.style.position='relative';
+				event.prompt=function(str){
+					event.promptbar.firstChild.innerHTML=str;
+					event.promptbar.show();
+				};
+				event.moveNode=function(node,i){
+					var width=event.width,height=event.height,margin=event.margin;
+					var left=-(width+10)*event.config.width/2+5+(i%event.config.width)*(width+10);
+					var top=-(height+10)*event.config.height/2+5+Math.floor(i/event.config.width)*(height+10)+margin/2;
+					node.style.transform='translate('+left+'px,'+top+'px)';
+					node.index=i;
+				};
+				event.resize=function(){
+					var margin=0;
+					if(!get.is.phoneLayout()){
+						margin=38;
+					}
+					var height=(ui.window.offsetHeight-10*(event.config.height+1)-margin)/event.config.height;
+					var width=(ui.window.offsetWidth-10*(event.config.width+1))/event.config.width;
+					if(width*event.config.ratio<height){
+						height=width*event.config.ratio;
+					}
+					else{
+						width=height/event.config.ratio;
+					}
+					event.width=width;
+					event.height=height;
+					event.margin=margin;
+					for(var i=0;i<event.config.size;i++){
+						event.moveNode(event.nodes[i],i);
+						event.nodes[i].style.width=width+'px';
+						event.nodes[i].style.height=height+'px';
+						if(event.avatars[i]){
+							event.moveNode(event.avatars[i],event.avatars[i].index);
+							event.avatars[i].style.width=width+'px';
+							event.avatars[i].style.height=height+'px';
+							event.avatars[i].nodename.style.fontSize=Math.max(14,Math.round(width/5.6))+'px';
+						}
+					}
+				};
+				lib.onresize.push(event.resize);
+				event.clickAvatar=function(){
+					if(event.deciding){
+						if(event.friendlist.contains(this)){
+							event.friendlist.remove(this);
+							event.moveNode(this,this.index);
+							this.nodename.innerHTML=get.slimName(this.link);
+						}
+						else{
+							event.friendlist.push(this);
+						}
+						if(event.friendlist.length==event.config.num){
+							event.deciding=false;
+							event.prompt('比赛即将开始');
+							setTimeout(game.resume,1000);
+						}
+						if(event.config.update){
+							for(var i=0;i<event.friendlist.length;i++){
+								event.friendlist[i].nodename.innerHTML=event.config.update(i,event.friendlist.length)||event.friendlist[i].nodename.innerHTML;
+							}
+						}
+						var str='px,'+(event.margin/2-event.height*0.5)+'px)';
+						for(var i=0;i<event.friendlist.length;i++){
+							event.friendlist[i].style.transform='scale(1.2) translate('+(-(event.width+14)*event.friendlist.length/2+7+i*(event.width+14))+str;
+						}
+					}
+					else{
+						if(this.moved) return;
+						if(!event.imchoosing) return;
+						if(event.replacing){
+							this.link=event.replacing;
+							this.setBackground(event.replacing,'character');
+							delete event.replacing;
+						}
+						event.moveAvatar(this,event.friend.length+event.config.width*(event.config.height-1));
+						event.friend.push(this.link);
+						this.moved=true;
+						game.resume();
+					}
+				};
+				if(get.config('change_choice')){
+					event.replacenode=ui.create.system('换将',function(){
+						event.promptbar.hide();
+						while(event.avatars.length){
+							event.avatars.shift().remove();
+						}
+						for(var i=0;i<event.config.size;i++){
+							event.nodes[i].show();
+							event.nodes[i].style.display='';
+							clearTimeout(event.nodes[i].choosetimeout);
+						}
+						delete event.list2;
+						event.friend.length=0;
+						event.enemy.length=0;
+						event.blank.length=0;
+						event.redoing=true;
+						if(event.imchoosing){
+							game.resume();
+						}
+					},true);
+				}
+				if(get.config('change_choice')){
+					event.reselectnode=ui.create.system('重选',function(){
+						event.promptbar.hide();
+						event.list2=event.list2.concat(event.friend).concat(event.enemy);
+						event.friend.length=0;
+						event.enemy.length=0;
+						for(var i=0;i<event.avatars.length;i++){
+							if(event.avatars[i].moved){
+								event.moveAvatar(event.avatars[i],event.blank.randomRemove());
+								delete event.avatars[i].moved;
+							}
+						}
+						event.redoing=true;
+						if(event.imchoosing){
+							game.resume();
+						}
+					},true);
+				}
+				if(get.config('free_choose')){
+					event.freechoosedialog=ui.create.characterDialog();
+					event.freechoosedialog.style.height='80%';
+					event.freechoosedialog.style.top='10%';
+					event.freechoosedialog.style.transform='scale(0.8)';
+					event.freechoosedialog.style.transition='all 0.3s';
+					event.freechoosedialog.listen(function(e){
+						if(!event.replacing){
+							event.dialoglayer.clicked=true;
+						}
+					});
+					event.dialoglayer=ui.create.div('.popup-container.hidden',function(e){
+						if(this.classList.contains('removing')) return;
+						if(this.clicked){
+							this.clicked=false;
+							return;
+						}
+						ui.window.classList.remove('modepaused');
+						this.delete();
+						e.stopPropagation();
+						event.freechoosedialog.style.transform='scale(0.8)';
+						if(event.replacing){
+							event.prompt('用'+get.translation(event.replacing)+'替换一名未选择武将');
+						}
+						else{
+							if(event.side==0){
+								event.prompt('请选择两名武将');
+							}
+							else{
+								event.prompt('请选择一名武将');
+							}
+						}
+					});
+					event.dialoglayer.classList.add('modenopause');
+					event.dialoglayer.appendChild(event.freechoosedialog);
+					event.custom.replace.button=function(button){
+						event.replacing=button.link;
+					};
+					event.custom.add.window=function(){
+						if(event.replacing){
+							delete event.replacing;
+							if(event.side==0){
+								event.prompt('请选择两名武将');
+							}
+							else{
+								event.prompt('请选择一名武将');
+							}
+						}
+					};
+					event.freechoosenode=ui.create.system('自由选将',function(){
+						if(!event.imchoosing){
+							event.prompt('请等待敌方选将');
+							return;
+						}
+						delete event.replacing;
+						ui.window.classList.add('modepaused');
+						ui.window.appendChild(event.dialoglayer);
+						ui.refresh(event.dialoglayer);
+						event.dialoglayer.show();
+						event.freechoosedialog.style.transform='scale(1)';
+						event.promptbar.hide();
+					},true)
+				}
+				event.checkredo=function(){
+					if(event.redoing){
+						event.goto(1);
+						delete event.redoing;
+						return true;
+					}
+				};
+				if(ui.cardPileButton) ui.cardPileButton.style.display='none';
+				ui.auto.hide();
+				ui.wuxie.hide();
+				event.resize();
+				for(var i=0;i<event.config.size;i++){
+					ui.window.appendChild(event.nodes[i]);
+				}
+				'step 1'
+				var rand=event.config.first;
+				if(rand=='rand'){
+					rand=(Math.random()<0.5);
+				}
+				if(rand){
+					_status.color=true;
+					event.side=1;
+				}
+				else{
+					_status.color=false;
+					event.side=3;
+				}
+				if(!event.list2){
+					event.list2=event.list.randomGets(event.config.width*2);
+					for(var i=0;i<event.config.width*2;i++){
+						event.avatars.push(ui.create.div('.shadowed.shadowed2.reduce_radius.character.choosedouble',event.clickAvatar));
+						var name=event.list2[i];
+						event.avatars[i].setBackground(name,'character');
+						event.avatars[i].link=name;
+						event.avatars[i].nodename=ui.create.div('.name',event.avatars[i],get.slimName(name));
+						event.avatars[i].nodename.style.fontFamily=lib.config.name_font;
+						event.avatars[i].index=i+event.config.width;
+						event.avatars[i].animate('start');
+						event.nodes[event.avatars[i].index].style.display='none';
+						switch(lib.character[name][1]){
+							case 'wei':event.avatars[i].nodename.dataset.nature='watermm';break;
+							case 'shu':event.avatars[i].nodename.dataset.nature='soilmm';break;
+							case 'wu':event.avatars[i].nodename.dataset.nature='woodmm';break;
+							case 'qun':event.avatars[i].nodename.dataset.nature='metalmm';break;
+						}
+						if(lib.config.touchscreen){
+							lib.setLongPress(event.avatars[i],ui.click.intro);
+						}
+						else{
+							if(lib.config.hover_all){
+								lib.setHover(event.avatars[i],ui.click.hoverplayer);
+							}
+							if(lib.config.right_info){
+								event.avatars[i].oncontextmenu=ui.click.rightplayer;
+							}
+						}
+					}
+					event.resize();
+					for(var i=0;i<event.avatars.length;i++){
+						ui.window.appendChild(event.avatars[i]);
+					}
+					event.avatars.sort(function(a,b){
+						return get.rank(b.link,true)-get.rank(a.link,true);
+					})
+				}
+				game.delay();
+				'step 2'
+				if(event.checkredo()) return;
+				if(event.side<2){
+					event.imchoosing=true;
+					if(event.side==0){
+						event.prompt('请选择两名武将');
+					}
+					else{
+						event.prompt('请选择一名武将');
+						event.fast=get.time();
+					}
+					game.pause();
+				}
+				else{
+					event.aiMove();
+					game.delay();
+				}
+				'step 3'
+				if(typeof event.fast=='number'&&get.time()-event.fast<=1000){
+					event.fast=true;
+				}
+				else{
+					event.fast=false;
+				}
+				delete event.imchoosing;
+				if(event.checkredo()) return;
+				if(event.friend.length+event.enemy.length<event.config.width*2-1){
+					if(event.side==1){
+						game.delay(event.fast?1:2);
+						event.promptbar.hide();
+					}
+					event.side++;
+					if(event.side>3){
+						event.side=0;
+					}
+					event.goto(2);
+				}
+				else{
+					event.promptbar.hide();
+					event.side++;
+					if(event.side>3){
+						event.side=0;
+					}
+					if(event.side>=2){
+						game.delay()
+					}
+				}
+				'step 4'
+				if(event.checkredo()) return;
+				if(event.replacenode) event.replacenode.delete();
+				if(event.reselectnode) event.reselectnode.delete();
+				if(event.freechoosenode) event.freechoosenode.delete();
+				for(var i=0;i<event.avatars.length;i++){
+					if(!event.avatars[i].moved){
+						if(event.side<2){
+							event.moveAvatar(event.avatars[i],event.friend.length+event.config.width*(event.config.height-1));
+							event.friend.push(event.avatars[i]);
+						}
+						else{
+							event.moveAvatar(event.avatars[i],event.enemy.length);
+							event.enemy.push(event.avatars[i]);
+						}
+						event.avatars[i].moved=true;
+					}
+				}
+				game.delay();
+				'step 5'
+				event.prompt('选择'+get.cnNumber(event.config.num)+'名出场武将');
+				event.enemylist=[];
+				var rand=[];
+				for(var i=0;i<event.config.width;i++){
+					for(var j=0;j<event.config.width-i;j++){
+						rand.push(i);
+					}
+				}
+				for(var i=0;i<event.config.num;i++){
+					var rand2=rand.randomGet();
+					for(var j=0;j<rand.length;j++){
+						if(rand[j]==rand2){
+							rand.splice(j--,1);
+						}
+					}
+					event.enemylist.push(event.enemy[rand2]);
+				}
+				event.enemylist.randomSort();
+				event.friendlist=[];
+				event.deciding=true;
+				for(var i=0;i<event.config.size;i++){
+					event.nodes[i].hide();
+				}
+				game.pause();
+				'step 6'
+				event.promptbar.delete();
+				if(ui.cardPileButton) ui.cardPileButton.style.display='';
+				lib.onresize.remove(event.resize);
+				ui.wuxie.show();
+				ui.auto.show();
+				for(var i=0;i<event.avatars.length;i++){
+					event.avatars[i].delete();
+				}
+				event.result={friend:[],enemy:[]};
+				for(var i=0;i<event.config.num;i++){
+					event.result.friend[i]=event.friendlist[i].link;
+					event.result.enemy[i]=event.enemylist[i].link;
+				}
+			});
+		},
 		asyncDraw:function(players,num,drawDeck){
 			for(var i=0;i<players.length;i++){
 				var num2=1;

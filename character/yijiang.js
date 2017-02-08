@@ -4607,7 +4607,7 @@ character.yijiang={
 				player.showHandcards();
 				"step 1"
 				var num=player.num('h');
-				player.chooseTarget('选择至多'+num+'名角色各摸一张牌',[1,num],function(card,player,target){
+				player.chooseTarget('选择至多'+get.cnNumber(num)+'名角色各摸一张牌',[1,num],function(card,player,target){
 					return true;
 				}).set('ai',function(target){
 					return ai.get.attitude(_status.event.player,target);
@@ -5422,7 +5422,6 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				targets[0].gain(cards,player);
-				game.delay();
 				"step 1"
 				targets[0].chooseControl('draw_card','出杀',function(){
 					var player=_status.event.player;

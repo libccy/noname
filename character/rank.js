@@ -370,6 +370,7 @@ window.characterRank={
         're_yuanshu',
         'yuanshu',
         're_guojia',
+        'cuiyan',
     ],
     b:[
         'diy_liufu',
@@ -384,7 +385,6 @@ window.characterRank={
         'weiyan',
         'sp_xiahoudun',
         'jsp_huangyueying',
-        'cuiyan',
         'sp_zhangfei',
         'hs_nozdormu',
         'yxs_lishimin',
