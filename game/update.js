@@ -1,7 +1,8 @@
 window.noname_update={
-    version:'1.9.8.1',
-    update:'1.9.8.1',
+    version:'1.9.8.2',
+    update:'1.9.8.2',
     changeLog:[
+        'bug修复',
         '统率三军',
     ],
     files:[
