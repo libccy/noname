@@ -133,7 +133,7 @@
 						init:true,
 					},
 					tao_enemy:{
-						name:'不对敌将使用桃',
+						name:'不对敌方使用桃',
 						init:false,
 					},
 					touchscreen:{
@@ -6754,41 +6754,18 @@
 					}
 					else if(event.isMine()){
                         if(event.type=='wuxie'){
-                            if(ui.wuxie&&ui.wuxie.classList.contains('glow')){
-                                event.result={
+							if(ui.tempnowuxie){
+								var triggerevent=event.getTrigger();
+								if(triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
+									ui.tempnowuxie.close();
+								}
+							}
+							if(lib.filter.wuxieSwap(event)){
+								event.result={
                                     bool:false
                                 }
                                 return;
-                            }
-                            if(ui.tempnowuxie&&ui.tempnowuxie.classList.contains('glow')&&event.state>0){
-                                var triggerevent=event.getTrigger();
-                                if(triggerevent){
-                                    if(ui.tempnowuxie._origin==triggerevent.parent.id){
-                                        event.result={
-                                            bool:false
-                                        }
-                                        if(triggerevent.targets&&triggerevent.num==triggerevent.targets.length-1){
-                                            ui.tempnowuxie.close();
-                                        }
-                                        return;
-                                    }
-                                }
-                                else if(ui.tempnowuxie._origin==_status.event.id2){
-                                    event.result={
-                                        bool:false
-                                    }
-                                    return;
-                                }
-                            }
-                            if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
-                                var tw=event.getTrigger().parent;
-                                if(tw.player.isUnderControl(true)&&tw.targets&&tw.targets.length==1&&!tw.noai){
-                                    event.result={
-                                        bool:false
-                                    }
-                                    return;
-                                }
-                            }
+							}
                         }
                         var ok=game.check();
 						if(!ok||!lib.config.auto_confirm){
@@ -12844,8 +12821,7 @@
 					if(lib.config.mode=='versus'){
 						if(_status.mode=='three') return this.side==me.side;
 						if(_status.mode=='four'||_status.mode=='jiange'||_status.mode=='one') return false;
-						return ui.autoreplace&&ui.autoreplace.classList.contains('on')&&
-							this.side==me.side;
+						return lib.storage.single_control&&this.side==me.side;
 					}
 					else if(lib.config.mode=='boss'){
 						return this.side==me.side&&get.config('single_control');
@@ -15620,6 +15596,23 @@
             others:{},
             zhu:{},
             zhuSkill:{},
+			autoswap:{
+				trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
+				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
+				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
+				forced:true,
+				priority:100,
+				popup:false,
+				filter:function(event,player){
+					if(event.autochoose&&event.autochoose()) return false;
+					if(lib.filter.wuxieSwap(event)) return false;
+					if(_status.auto||!player.isUnderControl()) return false;
+					return true;
+				},
+				content:function(){
+					game.modeSwapPlayer(player);
+				},
+			},
             fengyin:{
                 init:function(player,skill){
                     var skills=player.get('s',true,false);

@@ -75,8 +75,11 @@ html{
 .dialog.popped .yellowtext{
 	color:#631515;
 }
-.dialog.popped .greentext{
+.dialog.popped .greentext,.control span.greentext{
 	color:#00312d;
+}
+.control span.firetext{
+	color:#631515;
 }
 .legendtext.legendauto{
 	color: rgba(106, 27, 154, 1);

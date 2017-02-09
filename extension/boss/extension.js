@@ -172,7 +172,7 @@ play.boss={
 						lib.translate[i]=lib.translate[i]||mode.versus.translate[i];
 					}
 					for(var i in mode.versus.skill){
-						if(i!='versus_swap'&&i!='versus_ladder'){
+						if(i!='versus_ladder'){
 							lib.skill[i]=lib.init.eval(mode.versus.skill[i]);
 							game.finishSkill(i);
 						}
@@ -188,10 +188,8 @@ play.boss={
 					lib.translate[i]=lib.translate[i]||mode.boss.translate[i];
 				}
 				for(var i in mode.boss.skill){
-					if(i!='_bossswap'){
-						lib.skill[i]=lib.init.eval(mode.boss.skill[i]);
-						game.finishSkill(i);
-					}
+					lib.skill[i]=lib.init.eval(mode.boss.skill[i]);
+					game.finishSkill(i);
 				}
 				delete window.mode;
 				loadversus();

@@ -295,7 +295,7 @@ mode.versus={
 					firstAct=game.friendZhu;
 				}
 				game.gameDraw(firstAct,4);
-				game.addGlobalSkill('versus_swap');
+				game.addGlobalSkill('autoswap');
 				if(lib.config.show_handcardbutton){
 					ui.versushs=ui.create.system('手牌',null,true);
 					lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
@@ -343,8 +343,7 @@ mode.versus={
 				_status.first_less=true;
 				_status.round=0;
 				if(lib.storage.single_control){
-					game.addGlobalSkill('versus_swap');
-
+					game.addGlobalSkill('autoswap');
 					if(game.players.length>2&&lib.config.show_handcardbutton){
 						ui.versushs=ui.create.system('手牌',null,true);
 						lib.setPopped(ui.versushs,game.versusHoverHandcards,220);
@@ -3887,22 +3886,6 @@ mode.versus={
 			ai:{
 				threaten:2
 			}
-		},
-		versus_swap:{
-			trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
-			'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
-			'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
-			forced:true,
-			priority:100,
-			popup:false,
-			filter:function(event,player){
-				if(event.autochoose&&event.autochoose()) return false;
-				if(lib.filter.wuxieSwap(event)) return false;
-				return !_status.auto&&player!=game.me&&player.side==game.me.side;
-			},
-			content:function(){
-				game.modeSwapPlayer(player);
-			},
 		},
 		versus_ladder:{
 			trigger:{global:['damageEnd','recoverEnd','dieEnd','gainEnd','phaseDiscardEnd']},

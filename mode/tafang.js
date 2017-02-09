@@ -26,7 +26,7 @@ mode.tafang={
 		for(var i=0;i<toLoad.length;i++){
 			game[toLoad[i]]=lib.init.eval(result.game[toLoad[i]]);
 		}
-		toLoad=['_attackmove','_phasequeue','_chessswap','_chessmove','_chesscenter'];
+		toLoad=['_attackmove','_phasequeue','_chessmove','_chesscenter'];
 		for(var i=0;i<toLoad.length;i++){
 			lib.skill[toLoad[i]]=lib.init.eval(result.skill[toLoad[i]]);
 		}
@@ -61,6 +61,7 @@ mode.tafang={
         }
 		ui.create.cards();
 		game.finishCards();
+		game.addGlobalSkill('autoswap');
 		ui.chessContainer=ui.create.div('#chess-container',ui.arena);
 		lib.setScroll(ui.chessContainer);
 		ui.chess=ui.create.div('#chess',ui.chessContainer);

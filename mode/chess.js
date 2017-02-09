@@ -42,6 +42,7 @@ mode.chess={
 		}
 		ui.create.cards();
 		game.finishCards();
+		game.addGlobalSkill('autoswap');
 		ui.chessContainer=ui.create.div('#chess-container',ui.arena);
 		lib.setScroll(ui.chessContainer);
 		ui.chess=ui.create.div('#chess',ui.chessContainer);
@@ -4901,23 +4902,6 @@ mode.chess={
 					}
 				}
 			}
-		},
-		_chessswap:{
-			trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
-			'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
-			'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
-			forced:true,
-			priority:100,
-			popup:false,
-			filter:function(event,player){
-				if(event.autochoose&&event.autochoose()) return false;
-				if(lib.config.mode=='chess'&&_status.mode=='combat'&&!get.config('single_control')) return false;
-				if(lib.filter.wuxieSwap(event)) return false;
-				return player.isUnderControl();
-			},
-			content:function(){
-				game.modeSwapPlayer(player);
-			},
 		},
 		_chesscenter:{
 			trigger:{player:['phaseBegin','useCardBegin','useSkillBegin','respondBegin','damageBegin','loseHpBegin'],

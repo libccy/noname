@@ -130,6 +130,7 @@ mode.boss={
 		lib.translate.boss_pangtong='涅槃凤雏';
 		ui.create.cards();
 		game.finishCards();
+		game.addGlobalSkill('autoswap');
 		ui.arena.setNumber(8);
 		ui.control.style.transitionProperty='opacity';
 		ui.control.classList.add('bosslist');
@@ -3564,23 +3565,6 @@ mode.boss={
 					}
 				}
 			}
-		},
-		_bossswap:{
-			trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
-			'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
-			'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin']},
-			forced:true,
-			priority:100,
-			popup:false,
-			filter:function(event,player){
-				if(!get.config('single_control')) return false;
-				if(event.autochoose&&event.autochoose()) return false;
-				if(lib.filter.wuxieSwap(event)) return false;
-				return player.isUnderControl();
-			},
-			content:function(){
-				game.modeSwapPlayer(player);
-			},
 		},
 	},
 	translate:{

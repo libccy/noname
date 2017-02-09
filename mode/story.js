@@ -391,7 +391,6 @@ mode.story={
                 game.isChessNeighbour=result.game.isChessNeighbour;
                 get.chessDistance=result.get.chessDistance;
                 lib.skill._chessmove=result.skill._chessmove;
-                lib.skill._chessswap=result.skill._chessswap;
                 lib.skill._chesscenter=result.skill._chesscenter;
                 lib.skill._phasequeue=result.skill._phasequeue;
                 'step 2'
