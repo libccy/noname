@@ -1289,9 +1289,11 @@ card.gujian={
                         }
                     }
                     var target=list.randomGet();
-                    player.logSkill('mapodoufu',target);
-                    target.discard(target.get('he').randomGet());
-                    target.addExpose(0.2);
+                    if(target){
+                        player.logSkill('mapodoufu',target);
+                        target.discard(target.get('he').randomGet());
+                        target.addExpose(0.2);
+                    }
                 }
                 player.storage.mapodoufu_markcount--;
                 if(player.storage.mapodoufu_markcount==0){

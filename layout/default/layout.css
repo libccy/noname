@@ -1714,6 +1714,9 @@ div:hover>.intro{opacity: 1;}
 #window>.choosedouble.character{
 	transform-origin: top left;
 }
+#window>.choosedouble.character.moved{
+	z-index: 1;
+}
 #window>.choosedouble.character>.name{
 	left: 6%;
 	top: 8%;

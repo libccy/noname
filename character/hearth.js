@@ -800,7 +800,7 @@ character.hearth={
 			}
 		},
 		peiyu:{
-			trigger:{player:['phaseBegin','phaseEnd']},
+			trigger:{player:['phaseBegin']},
 			direct:true,
 			content:function(){
 				'step 0'
@@ -5627,7 +5627,7 @@ character.hearth={
 		yingxi:'影袭',
 		yingxi_info:'结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用，若目标未受到伤害，此杀不可闪避',
 		peiyu:'培育',
-		peiyu_info:'准备阶段和结束阶段，你可以令一名没有图腾的角色获得一个随机图腾直到其首次受到伤害',
+		peiyu_info:'准备阶段，你可以令一名没有图腾的角色获得一个随机图腾直到其首次受到伤害',
 		peiyu_old_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾',
 		wzhanyi:'战意',
 		wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌并展示之，将摸到的装备牌置于装备区，然后可以使用手牌中的杀',

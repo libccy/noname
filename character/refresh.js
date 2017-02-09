@@ -1438,6 +1438,10 @@ character.refresh={
 				if(event.player==player) return ai.get.attitude(player,event.source)>-3;
 				return ai.get.attitude(player,event.player)>-3;
 			},
+			logTarget:function(event,player){
+				if(event.player==player) return event.source;
+				return event.player;
+			},
 			content:function(){
 				"step 0"
 				game.asyncDraw([trigger.player,trigger.source],trigger.num);

@@ -21202,7 +21202,7 @@
 					event.nodes.push(ui.create.div('.shadowed.reduce_radius.choosedouble'));
 				}
 				event.moveAvatar=function(node,i){
-					if(!node.moved){
+					if(!node.classList.contains('moved')){
 						event.blank.push(node.index);
 					}
 					event.nodes[node.index].style.display='';
@@ -21221,7 +21221,7 @@
 				event.aiMove=function(){
 					var list=[];
 					for(var i=0;i<event.avatars.length;i++){
-						if(!event.avatars[i].moved){
+						if(!event.avatars[i].classList.contains('moved')){
 							list.push(event.avatars[i]);
 						}
 					}
@@ -21229,7 +21229,7 @@
 						if(Math.random()<0.7||i==list.length-1){
 							event.moveAvatar(list[i],event.enemy.length);
 							event.enemy.push(list[i]);
-							list[i].moved=true;
+							list[i].classList.add('moved');
 							break;
 						}
 					}
@@ -21316,16 +21316,19 @@
 						}
 					}
 					else{
-						if(this.moved) return;
 						if(!event.imchoosing) return;
 						if(event.replacing){
 							this.link=event.replacing;
 							this.setBackground(event.replacing,'character');
 							delete event.replacing;
+							if(this.classList.contains('moved')){
+								event.custom.add.window();
+							}
 						}
+						if(this.classList.contains('moved')) return;
 						event.moveAvatar(this,event.friend.length+event.config.width*(event.config.height-1));
 						event.friend.push(this.link);
-						this.moved=true;
+						this.classList.add('moved');
 						game.resume();
 					}
 				};
@@ -21357,9 +21360,9 @@
 						event.friend.length=0;
 						event.enemy.length=0;
 						for(var i=0;i<event.avatars.length;i++){
-							if(event.avatars[i].moved){
+							if(event.avatars[i].classList.contains('moved')){
 								event.moveAvatar(event.avatars[i],event.blank.randomRemove());
-								delete event.avatars[i].moved;
+								delete event.avatars[i].classList.remove('moved');
 							}
 						}
 						event.redoing=true;
@@ -21390,7 +21393,7 @@
 						e.stopPropagation();
 						event.freechoosedialog.style.transform='scale(0.8)';
 						if(event.replacing){
-							event.prompt('用'+get.translation(event.replacing)+'替换一名未选择武将');
+							event.prompt('用'+get.translation(event.replacing)+'替换一名武将');
 						}
 						else{
 							if(event.side==0){
@@ -21550,7 +21553,7 @@
 				if(event.reselectnode) event.reselectnode.delete();
 				if(event.freechoosenode) event.freechoosenode.delete();
 				for(var i=0;i<event.avatars.length;i++){
-					if(!event.avatars[i].moved){
+					if(!event.avatars[i].classList.contains('moved')){
 						if(event.side<2){
 							event.moveAvatar(event.avatars[i],event.friend.length+event.config.width*(event.config.height-1));
 							event.friend.push(event.avatars[i]);
@@ -21559,7 +21562,7 @@
 							event.moveAvatar(event.avatars[i],event.enemy.length);
 							event.enemy.push(event.avatars[i]);
 						}
-						event.avatars[i].moved=true;
+						event.avatars[i].classList.add('moved');
 					}
 				}
 				game.delay();
