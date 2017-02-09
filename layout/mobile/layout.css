@@ -240,17 +240,14 @@
 }
 
 #arena:not(.chess) .player[data-position='0']>.judges{
-    transform: rotate(-90deg);
-    left: -12px;
-    top: -5px;
-    transform-origin: top center;
+    left: 6px;
+    top: -16px;
 }
 #arena:not(.chess) .player[data-position='0']>.marks {
-    transform: rotate(90deg);
-    right: -12px;
+    right: -6px;
     left:auto;
-    top: -5px;
-    transform-origin: top center;
+    top: -16px;
+    transform: none;
 }
 
 #arena:not(.chess) .player[data-position='0'].linked{

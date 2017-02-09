@@ -943,8 +943,7 @@ div:not(.handcards)>.card>.info>span,
 }
 #arena.oldlayout .player:not(.linked2) .marks>div:first-child,
 #arena.oldlayout .player .marks .removing{
-	margin-left: -12px;
-	margin-right:-12px;
+	transform: scale(0.2);
 	opacity:0;
 	pointer-events: none;
 }
@@ -1248,10 +1247,11 @@ margin-bottom: 5px;
 	-webkit-animation:equip_hover2 1s;
 	-webkit-animation-fill-mode: forwards;
 }*/
-.judges{height: 24px;left: 14px;top: -18px;}
-.marks{height: 24px;left: 14px;top: 112px;}
+#arena.oldlayout .marks{left: 14px}
+.judges{left: 14px;top: -18px;}
+.marks{left: 14px;top: 112px;}
 .player>.marks{z-index: 4}
-.judges>div,.marks>div{width: 24px;height: 24px;margin-left: 0;margin-top: 0;margin-right: 4px;opacity: 1;position: absolute;}
+.judges>div,.marks>div{width: 24px;height: 24px;margin: 0;left: 0;top: 0;opacity: 1;position: absolute;}
 .hp{left: 18px;top:14px;width: 72px;line-height: 14px;text-align: left;}
 .hp.text{top:18px;}
 

@@ -151,24 +151,17 @@
 	padding-bottom:10px;
 }
 .player .marks{
-	left:-24px;
+	left:-21px;
 	top:14px;
 	height:auto;
-	max-height:160px;
 }
 .player .judges{
-	right:-24px;
+	right:-33px;
 	top:26px;
-	height:auto;
-	max-height:148px;
 	left:auto;
 }
-.player.noidentity .judges{
-	top:14px;
-}
 .player:not(.linked2) .marks>div:first-child{
-	margin-top: -12px;
-	margin-bottom:-12px;
+	transform: scale(0.2);
 	opacity:0;
 	pointer-events: none;
 }
@@ -283,6 +276,10 @@
 }
 .player.linked{
 	transform:rotate(-90deg);
+}
+.player.linked>.judges,
+.player.linked>.marks{
+	transform:rotate(90deg) translateX(10px);
 }
 #arena[data-target_shake='shake'] .linked.target{transform: rotate(-93deg);}
 #arena[data-target_shake='shake'] .linked.target2{transform: rotate(-87deg);}

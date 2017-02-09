@@ -177,9 +177,7 @@
 #arena.chess.uslim_player .player.minskin.linked .equips{
 	transform:rotate(90deg) translate(-99px,-6px) scale(0.73);
 }
-.player:not([data-position='0']).linked div:not(.equips) .card,
 .player:not([data-position='0']).linked .identity,
-#arena.chess .player.linked div:not(.equips) .card,
 #arena.chess .player.linked .identity{
 	transform:rotate(90deg);
 }

@@ -87,7 +87,7 @@ character.hearth={
 		hs_kazhakusi:['male','shu',3,['lianjin']],
 		// hs_lazi:['male','wei',3,[]],
 		hs_shaku:['male','wei',3,['shouji']],
-		hs_laxiao:['male','shu',3,['guimou','yingxi']],
+		hs_laxiao:['male','shu',3,['guimou','yingxi','longyi']],
 		// hs_xiangyaqishi:['male','wei',3,[]],
 		// hs_fenjie:['male','shu',3,['guimou','yingxi']],
 	},
@@ -98,6 +98,19 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		longyi:{
+			mod:{
+				maxHandcard:function(player,num){
+					var hs=player.get('h');
+					for(var i=0;i<hs.length;i++){
+						if(get.color(hs[i])=='black'){
+							num++;
+						}
+					}
+					return num;
+				},
+			},
+		},
 		zhongji:{
 			trigger:{source:'damageBegin'},
 			direct:true,
@@ -5569,6 +5582,8 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
+		longyi:'龙裔',
+		longyi_info:'锁定技，你的黑色牌不占用手牌上限',
 		zhongji:'重击',
 		zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1',
 		fuwen:'符文',

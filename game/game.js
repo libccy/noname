@@ -5438,6 +5438,8 @@
                     else{
                         ui.arena.classList.remove('uslim_player');
                     }
+					ui.updatej();
+					ui.updatem();
 					setTimeout(function(){
 						ui.arena.show();
 						if(game.me) game.me.update();
@@ -5912,6 +5914,13 @@
 				cheat.g('lebu');
 				cheat.g('bingliang');
 				cheat.g('guiyoujie');
+			},
+			gf:function(){
+				for(var i in lib.card){
+					if(lib.card[i].type=='food'){
+						cheat.g(i);
+					}
+				}
 			},
 			d:function(num,target){
 				if(num==undefined) num=1;
@@ -8977,6 +8986,7 @@
 						}
 					}
 					if(player==game.me) ui.updatehl();
+					ui.updatej(player);
                     game.broadcast(function(player,cards,num){
                         for(var i=0;i<cards.length;i++){
                             cards[i].classList.remove('glow');
@@ -8997,6 +9007,7 @@
         					}
                             ui.updatehl();
                         }
+						ui.updatej(player);
                         _status.cardPileNum=num;
                     },player,cards,ui.cardPile.childNodes.length);
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
@@ -9446,14 +9457,6 @@
                         }
                     }
 					"step 1"
-					// if(lib.config.background_audio){
-					// 	game.playAudio('effect','judge');
-					// }
-                    // game.broadcast(function(){
-                    //     if(lib.config.background_audio){
-    				// 		game.playAudio('effect','judge');
-    				// 	}
-                    // });
 					cards[0].fix();
 					cards[0].style.transform='';
 					cards[0].classList.remove('drawinghidden');
@@ -9463,11 +9466,13 @@
 					}
 					else{
 						cards[0].style.transform='';
+						cards[0].classList.add('drawinghidden');
 						player.node.judges.insertBefore(cards[0],player.node.judges.firstChild);
+						ui.updatej(player);
                         game.broadcast(function(player,card,viewAs){
                             card.fix();
         					card.style.transform='';
-        					card.classList.remove('drawinghidden');
+        					card.classList.add('drawinghidden');
                             card.viewAs=viewAs;
                             if(viewAs&&viewAs!=card.name&&card.classList.contains('fullskin')){
                                 card.classList.add('fakejudge');
@@ -9477,6 +9482,7 @@
                                 card.classList.remove('fakejudge');
                             }
                             player.node.judges.insertBefore(card,player.node.judges.firstChild);
+							ui.updatej(player);
                             if(card.clone&&(card.clone.parentNode==player.parentNode||card.clone.parentNode==ui.arena)){
     							card.clone.moveDelete(player);
     							game.addVideo('gain2',player,get.cardsInfo([card]));
@@ -9604,6 +9610,8 @@
 					else{
                         player.classList.toggle('linked');
                     }
+					ui.updatej(player);
+					ui.updatem(player);
                     game.broadcast(function(player,linked){
                         player.classList.remove('target');
                         if(get.is.linked2(player)){
@@ -9622,6 +9630,8 @@
                                 player.classList.remove('linked');
                             }
                         }
+						ui.updatej(player);
+						ui.updatem(player);
                     },player,player.isLinked());
 					game.addVideo('link',player,player.isLinked());
 				},
@@ -9857,6 +9867,7 @@
 					for(var mark in this.marks){
 						this.marks[mark].remove();
 					}
+					ui.updatem(this);
 
 					this.skipList=[];
 					this.skills=[];
@@ -12026,12 +12037,16 @@
                     game.broadcast(function(player,name){
                         if(player.marks[name]){
                             player.marks[name].delete();
+							player.marks[name].style.transform+=' scale(0.2)';
                             delete player.marks[name];
+							ui.updatem(player);
                         }
                     },this,name);
 					if(this.marks[name]){
 						this.marks[name].delete();
+						this.marks[name].style.transform+=' scale(0.2)';
 						delete this.marks[name];
+						ui.updatem(this);
 						var info=lib.skill[name];
 						if(info&&info.intro&&info.intro.onunmark){
 							if(info.intro.onunmark=='throw'){
@@ -12089,7 +12104,8 @@
 						name=name.name;
 					}
 					if(!lib.character[name]) return this;
-					var node=ui.create.div('.card.mark',this.node.marks).setBackground(name,'character');
+					var node=ui.create.div('.card.mark.drawinghidden').setBackground(name,'character');
+					this.node.marks.insertBefore(node,this.node.marks.childNodes[1]);
 					node.name=name+'_charactermark';
 					if(!info){
 						info={};
@@ -12112,6 +12128,7 @@
 							node.oncontextmenu=ui.click.rightplayer;
 						}
 					}
+					ui.updatem(this);
 					return node;
 				},
 				mark:function(name,info,skill){
@@ -12125,7 +12142,9 @@
 					else{
 						var node;
 						if(get.itemtype(name)=='card'){
-							node=name.copy('mark',this.node.marks);
+							node=name.copy('mark');
+							node.classList.add('drawinghidden');
+							this.node.marks.insertBefore(node,this.node.marks.childNodes[1]);
 							node.suit=name.suit;
 							node.number=name.number;
 							if(name.name&&lib.card[name.name]&&lib.card[name.name].markimage){
@@ -12134,7 +12153,8 @@
 							name=name.name;
 						}
 						else{
-							node=ui.create.div('.card.mark',this.node.marks);
+							node=ui.create.div('.card.mark.drawinghidden');
+							this.node.marks.insertBefore(node,this.node.marks.childNodes[1]);
 							var str=lib.translate[name+'_bg'];
 							if(!str||str[0]=='+'||str[0]=='-'){
 								str=get.translation(name)[0];
@@ -12163,6 +12183,7 @@
 							}
 						}
 						this.updateMarks();
+						ui.updatem(this);
 						return node;
 					}
 				},
@@ -12181,6 +12202,8 @@
 							if(this.node.marks.childNodes[i].name==name&&
 								(!info||this.node.marks.childNodes[i].markidentifer==info)){
 								this.node.marks.childNodes[i].delete();
+								this.node.marks.childNodes[i].style.transform+=' scale(0.2)';
+								ui.updatem(this);
 								return;
 							}
 						}
@@ -16639,6 +16662,7 @@
                                 }
                                 player.node.judges.appendChild(info.judges[i]);
                             }
+							ui.updatej(player);
                             if(!player.setModeState){
                                 if(!game.getIdentityList&&info.identityNode){
                                     player.node.identity.innerHTML=info.identityNode[0];
@@ -18340,7 +18364,9 @@
 			unmark:function(player,name){
 				if(player&&player.marks&&player.marks[name]){
 					player.marks[name].delete();
+					player.marks[name].style.transform+=' scale(0.2)';
 					delete player.marks[name];
+					ui.updatem(this);
 				}
 			},
 			flame:function(player,type){
@@ -18536,7 +18562,9 @@
                         card.classList.add('fakejudge');
                         card.node.background.innerHTML=lib.translate[card.viewAs+'_bg']||get.translation(card.viewAs)[0]
                     }
+					card.classList.add('drawinghidden');
 					player.node.judges.insertBefore(card,player.node.judges.firstChild);
+					ui.updatej(player);
 				}
 				else{
 					console.log(player);
@@ -32477,6 +32505,57 @@
 			ui.updatehl();
 			for(var i=0;i<lib.onresize.length;i++){
 				lib.onresize[i]();
+			}
+		},
+		updatejm:function(player,nodes,start,inv){
+			if(typeof start!='number'){
+				start=0;
+			}
+			var str;
+			if(get.is.mobileMe(player)||game.layout=='default'||player.classList.contains('linked')){
+				str='translateX(';
+				if(inv){
+					str+='-';
+				}
+			}
+			else{
+				str='translateY(';
+			}
+			var num=0;
+			for(var i=0;i<nodes.childElementCount;i++){
+				var node=nodes.childNodes[i];
+				if(i<start){
+					node.style.transform='';
+				}
+				else if(node.classList.contains('removing')){
+					start++;
+				}
+				else{
+					ui.refresh(node);
+					node.classList.remove('drawinghidden');
+					node._transform=str+((i-start)*28)+'px)';
+					node.style.transform=node._transform;
+				}
+			}
+		},
+		updatem:function(player){
+			if(player){
+				ui.updatejm(player,player.node.marks,player.classList.contains('linked2')?0:1,get.is.mobileMe(player));
+			}
+			else{
+				for(var i=0;i<game.players.length;i++){
+					ui.updatem(game.players[i]);
+				}
+			}
+		},
+		updatej:function(player){
+			if(player){
+				ui.updatejm(player,player.node.judges);
+			}
+			else{
+				for(var i=0;i<game.players.length;i++){
+					ui.updatej(game.players[i]);
+				}
 			}
 		},
 		updatehl:function(){

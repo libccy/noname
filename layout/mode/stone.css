@@ -46,6 +46,9 @@
     transform: none !important;
 }
 
+.player.minskin .judges{
+	top:14px;
+}
 .player>.identity.menubutton.round{
     padding: 0;
     transform: scale(1.2) translate(-2px,2px);

@@ -124,7 +124,6 @@
 #arena.uslim_player .player.minskin.linked .equips{
 	transform:rotate(90deg) translate(-99px,-6px) scale(0.73);
 }
-.player.linked div:not(.equips) .card,
 .player.linked .identity{
 	transform:rotate(90deg);
 }
