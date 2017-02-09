@@ -1231,7 +1231,7 @@
                                 linked=true;
                             }
                             game.saveConfig('cardshape',item);
-                            if(item=='oblong'&&(game.layout=='long'||game.layout=='mobile')){
+                            if(item=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2')){
                                 ui.arena.classList.add('oblongcard');
                             }
                             else{
@@ -1374,12 +1374,13 @@
                         }
                         else{
                             map.textequip.hide();
-                            map.cardshape.hide();
                             if(lib.config.layout=='long2'){
                                 map.phonelayout.show();
+								map.cardshape.show();
                             }
                             else{
                                 map.phonelayout.hide();
+								map.cardshape.hide();
                             }
                         }
                         if(config.show_log!='off'){
@@ -5387,7 +5388,7 @@
 					else{
 						ui.arena.classList.remove('hpimage');
 					}
-                    if(lib.config.cardshape=='oblong'&&(game.layout=='long'||game.layout=='mobile')){
+                    if(lib.config.cardshape=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2')){
                         ui.arena.classList.add('oblongcard');
                     }
                     else{
@@ -12118,10 +12119,8 @@
 						info.content=get.skillintro(name,learn,learn2)
 					}
 					node.info=info;
-					if(lib.config.touchscreen){
-						lib.setLongPress(node,ui.click.intro);
-					}
-					else{
+					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
+					if(!lib.config.touchscreen){
 						if(lib.config.hover_all){
 							lib.setHover(node,ui.click.hoverplayer);
 						}
@@ -12171,11 +12170,8 @@
 						else if(typeof info=='string'){
 							node.markidentifer=info;
 						}
-
-						if(lib.config.touchscreen){
-							lib.setLongPress(node,ui.click.intro);
-						}
-						else{
+						node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
+						if(!lib.config.touchscreen){
 							if(lib.config.hover_all){
 								lib.setHover(node,ui.click.hoverplayer);
 							}
@@ -29134,7 +29130,7 @@
 				if(game.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
-                if(game.layout=='long'||game.layout=='mobile'){
+                if(game.layout=='long'||game.layout=='long2'||game.layout=='mobile'){
                     if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
                     if(lib.config.cardshape=='oblong') ui.arena.classList.add('oblongcard');
                 }
