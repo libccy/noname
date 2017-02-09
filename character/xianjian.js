@@ -114,7 +114,7 @@ character.xianjian={
 					trigger.target.$give(card,player);
 				}
 				else{
-					trigger.target.$give(1,player);
+					trigger.target.$giveAuto(card,player);
 				}
 				'step 1'
 				if(game.players.length>2){

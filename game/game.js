@@ -30205,6 +30205,10 @@
                     var nodes=[];
     				_status.clickingidentity=[this.parentNode,nodes];
     				var num=1;
+					var dy=30;
+					if(get.is.phoneLayout()){
+						dy=40;
+					}
     				for(var i in list){
     					if(this.firstChild.innerHTML!=list[i]){
     						var node=ui.create.div('.identity.hidden',this.parentNode,ui.click.identity2);
@@ -30212,7 +30216,7 @@
     						node.dataset.color=i;
     						ui.refresh(node);
     						node.show();
-    						var transstr='translateY('+((num++)*30)+'px)';
+    						var transstr='translateY('+((num++)*dy)+'px)';
     						if(get.is.phoneLayout()){
     							transstr+=' scale(1.3)';
     						}

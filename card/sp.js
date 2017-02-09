@@ -66,12 +66,7 @@ card.sp={
 		},
 		shengdong:{
             fullskin:true,
-            enable:function(card,player){
-				var hs=player.get('h');
-				if(hs.length>1) return true;
-				if(hs.length==1&&hs[0]!=card) return true;
-				return false;
-			},
+            enable:true,
 			chongzhu:function(){
 				return game.players.length<=2;
 			},
@@ -127,6 +122,7 @@ card.sp={
 					target:function(player,target){
 						var ok=false;
 						var hs=player.get('h');
+						if(hs.length<=1) return 0;
 						for(var i=0;i<hs.length;i++){
 							if(ai.get.value(hs[i])<=5){
 								ok=true;

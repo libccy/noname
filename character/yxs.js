@@ -856,7 +856,7 @@ character.yxs={
 				if(hs.length){
 					event.card=hs.randomGet();
 					player.gain(event.card,target);
-					target.$give(1,player);
+					target.$giveAuto(event.card,player);
 				}
 				else{
 					event.finish();

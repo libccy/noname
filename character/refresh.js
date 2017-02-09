@@ -355,25 +355,10 @@ character.refresh={
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
-				return (event.source&&event.source.num('he'));
+				return (event.source&&event.source.num('he')&&event.num>0&&event.source!=player);
 			},
 			content:function(){
-				"step 0"
-				event.num=trigger.num;
-				"step 1"
-				if(num==0||trigger.source.num('he')==0){
-					event.finish();
-					return;
-				}
-				event.num--;
-				player.choosePlayerCard(get.prompt('refankui',trigger.source),trigger.source,ai.get.buttonValue,'he');
-				"step 2"
-				if(result.bool){
-					player.logSkill('refankui',trigger.source);
-					player.gain(result.links[0],trigger.source);
-					trigger.source.$give(1,player);
-					event.goto(1);
-				}
+				player.gainPlayerCard([1,trigger.num],get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
 			},
 			ai:{
 				effect:{

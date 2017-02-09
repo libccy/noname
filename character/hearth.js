@@ -783,7 +783,7 @@ character.hearth={
 						event.redo();
 					}
 					else{
-						trigger.source.$give(1,player);
+						trigger.source.$giveAuto(card,player);
 					}
 					game.delay(0.5);
 				}

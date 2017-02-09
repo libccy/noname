@@ -602,7 +602,7 @@ character.yijiang={
 						player.$give(card,trigger.source);
 					}
 					else{
-						player.$give(1,trigger.source);
+						player.$giveAuto(card,trigger.source);
 					}
 					trigger.untrigger();
 					trigger.finish();
@@ -1188,8 +1188,9 @@ character.yijiang={
 			audio:2,
 			content:function(){
 				'step 0'
-				player.gain(target.get('h').randomGet(),target);
-				target.$give(1,player);
+				var card=target.get('h').randomGet();
+				player.gain(card,target);
+				target.$giveAuto(card,player);
 				'step 1'
 				var name=get.translation(target.name);
 				player.chooseControl(function(){

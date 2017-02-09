@@ -550,7 +550,7 @@ character.extra={
 						var card=hej.randomGet();
 						player.gain(card,event.targets[num]);
 						if(get.position(card)=='h'){
-							event.targets[num].$give(1,player);
+							event.targets[num].$giveAuto(card,player);
 						}
 						else{
 							event.targets[num].$give(card,player);

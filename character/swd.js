@@ -4719,8 +4719,7 @@ character.swd={
 					else{
 						player.gain(result.buttons[0].link,event.target);
 					}
-					event.target.$give(1,player);
-					game.delay();
+					event.target.$giveAuto(result.buttons[0].link,player);
 				}
 			},
 		},
@@ -7735,8 +7734,7 @@ character.swd={
 				"step 1"
 				if(result.bool){
 					player.gain(result.links[0],target);
-					target.$give(1,player);
-					game.delay(0,500);
+					target.$giveAuto(result.links[0],player);
 				}
 			},
 			ai:{

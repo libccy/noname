@@ -4288,8 +4288,11 @@ card.swd={
 				});
 				"step 1"
 				if(result.bool){
-					player.gain(target.get('h').randomGet(),target);
-					target.$give(1,player);
+					var card=target.get('h').randomGet();
+					if(card){
+						player.gain(card,target);
+						target.$giveAuto(card,player);
+					}
 				}
 			},
 			ai:{

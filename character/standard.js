@@ -124,17 +124,10 @@ character.standard={
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
-				return (event.source&&event.source.num('he'));
+				return (event.source&&event.source.num('he')&&event.source!=player);
 			},
 			content:function(){
-				"step 0"
-				player.choosePlayerCard(get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he');
-				"step 1"
-				if(result.bool){
-					player.logSkill('fankui',trigger.source);
-					player.gain(result.links[0],trigger.source);
-					trigger.source.$give(1,player);
-				}
+				player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
 			},
 			ai:{
 				effect:{
