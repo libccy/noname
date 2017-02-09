@@ -5802,7 +5802,7 @@
 				game.reload();
 			},
 			uj:function(){
-				cheat.ge('qilin');
+				cheat.e('qilin');
 				game.me.next.useCard({name:'jiedao'},[game.me,game.me.previous]);
 			},
 			u:function(){
@@ -8297,7 +8297,10 @@
 								(card.classList&&card.classList.contains('thunder'))){
 								config.color='thunder';
 							}
-							if(get.info(card).multitarget&&targets.length>1&&!get.info(card).multiline){
+							if(event.addedTarget){
+								player.line2(targets.concat(event.addedTargets),config);
+							}
+							else if(get.info(card).multitarget&&targets.length>1&&!get.info(card).multiline){
 								player.line2(targets,config);
 							}
 							else{
@@ -8337,10 +8340,20 @@
 						}
 						str+='使用了';
 						if(cards.length&&(cards.length>1||cards[0]!=card)){
-							game.log(player,str,card,'（',cards,'）');
+							if(event.addedTarget){
+								game.log(player,str,card,'（',cards,'，指向',event.addedTargets,'）');
+							}
+							else{
+								game.log(player,str,card,'（',cards,'）');
+							}
 						}
 						else{
-							game.log(player,str,card);
+							if(event.addedTarget){
+								game.log(player,str,card,'（指向',event.addedTargets,'）');
+							}
+							else{
+								game.log(player,str,card);
+							}
 						}
                         if(card.name=='wuxie'){
                             game.logv(player,[card,cards],[event.getTrigger().card]);
@@ -8409,6 +8422,10 @@
 					next.skill=event.skill;
 					next.multitarget=info.multitarget;
 					next.preResult=event.preResult;
+					if(event.addedTargets){
+						next.addedTargets=event.addedTargets;
+						next.addedTarget=event.addedTarget;
+					}
                     if(info.targetDelay===false){
                         event.targetDelay=false;
                     }
@@ -11226,9 +11243,21 @@
 					if(!next.targets){
 						next.targets=[];
 					}
-                    if(next.card&&get.info(next.card)&&get.info(next.card).changeTarget){
-                        get.info(next.card).changeTarget(next.player,next.targets);
-                    }
+					if(next.card){
+						var info=get.info(next.card);
+						if(info){
+							if(info.changeTarget){
+		                        info.changeTarget(next.player,next.targets);
+		                    }
+							if(info.singleCard){
+								next.target=next.targets[0];
+								next.addedTargets=next.targets.splice(1);
+								if(next.addedTargets.length){
+									next.addedTarget=next.addedTargets[0];
+								}
+							}
+						}
+					}
 					for(var i=0;i<next.targets.length;i++){
 						if(ai.get.attitude(this,next.targets[i])>=-1&&ai.get.attitude(this,next.targets[i])<0){
 							if(!this.ai.tempIgnore) this.ai.tempIgnore=[];
@@ -15437,11 +15466,14 @@
 			},
 			targetEnabled:function(card,player,target){
 				if(card==undefined) return false;
-				var filter=get.info(card).filterTarget;
+				var info=get.info(card);
+				var filter=info.filterTarget;
 				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player.get('s'));
 				if(mod==false) return false;
-				var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target.get('s'));
-				if(mod!='unchanged') return mod;
+				if(!info.singleCard||ui.selected.targets.length==0){
+					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target.get('s'));
+					if(mod!='unchanged') return mod;
+				}
 				if(typeof filter=='boolean') return filter;
 				if(typeof filter=='function') return filter(card,player,target);
 			},

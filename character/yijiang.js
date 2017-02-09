@@ -4578,7 +4578,7 @@ character.yijiang={
 			position:'he',
 			filterCard:true,
 			selectCard:2,
-			prompt:'弃置任意张牌并摸等量的牌',
+			prompt:'弃置两张牌并摸一张牌',
 			check:function(card){return 4-ai.get.useful(card)},
 			content:function(){
 				player.draw();
@@ -6002,9 +6002,8 @@ character.yijiang={
 					}
 				}
 				if(cards.length){
-					player.gain(cards);
+					player.gain(cards,'log');
 					player.$gain2(cards);
-					game.log(player,'发动','【落英】','，获得了',cards);
 				}
 			},
 		},
@@ -6021,7 +6020,7 @@ character.yijiang={
 				return (get.suit(event.result.card)=='club');
 			},
 			content:function(){
-				player.gain(trigger.result.card);
+				player.gain(trigger.result.card,'log');
 				player.$gain2(trigger.result.card);
 			}
 		},

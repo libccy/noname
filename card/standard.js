@@ -1029,6 +1029,7 @@ card.standard={
 			type:'trick',
 			enable:true,
 			selectTarget:2,
+			singleCard:true,
 			multitarget:true,
 			targetprompt:['被借刀','出杀目标'],
 			filterTarget:function(card,player,target){
@@ -1041,12 +1042,12 @@ card.standard={
 			},
 			content:function(){
 				"step 0"
-				if(!targets[0].hasSha()){
+				if(!target.hasSha()){
 					event.directfalse=true;
 				}
 				else{
-					targets[0].chooseToUse('对'+get.translation(targets[1])+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
-						{name:'sha'},targets[1],-1).set('targetRequired',true);
+					target.chooseToUse('对'+get.translation(event.addedTarget)+'使用一张杀，或令'+get.translation(player)+'获得你的武器牌',
+						{name:'sha'},event.addedTarget,-1).set('targetRequired',true);
 				}
 				"step 1"
 				if(event.directfalse||result.bool==false){

@@ -263,27 +263,25 @@ card.yunchou={
 			},
 			multitarget:true,
 			multiline:true,
+			singleCard:true,
 			content:function(){
 				'step 0'
-				targets[0].chooseToCompare(targets[1]);
+				target.chooseToCompare(event.addedTarget);
 				'step 1'
 				if(!result.tie){
 					if(result.bool){
-						targets[0].gainPlayerCard(targets[1],true);
-						targets[0].line(targets[1]);
+						target.gainPlayerCard(event.addedTarget,true);
+						target.line(targets[1]);
 					}
 					else{
-						targets[1].gainPlayerCard(targets[0],true);
-						targets[1].line(targets[0]);
+						event.addedTarget.gainPlayerCard(target,true);
+						event.addedTarget.line(target);
 					}
 					event.finish();
 				}
 				'step 2'
-				targets[0].discardPlayerCard(player);
-				targets[0].line(player);
-				'step 3'
-				targets[1].discardPlayerCard(player);
-				targets[1].line(player);
+				target.discardPlayerCard(player);
+				target.line(player);
 			},
 			selectTarget:2,
 			ai:{
@@ -560,6 +558,7 @@ card.yunchou={
 			fullskin:true,
 			type:'trick',
 			enable:true,
+			singleCard:true,
 			filterTarget:function(card,player,target){
 				if(target.isMin()) return false;
 				if(ui.selected.targets.length){
@@ -572,9 +571,9 @@ card.yunchou={
 			selectTarget:2,
 			multitarget:true,
 			content:function(){
-				if(targets[0].get('e','5')){
-					targets[0].$give(targets[0].get('e','5'),targets[1]);
-					targets[1].equip(targets[0].get('e','5'));
+				if(target.get('e','5')){
+					target.$give(target.get('e','5'),event.addedTarget);
+					event.addedTarget.equip(target.get('e','5'));
 					game.delay();
 				}
 			},
@@ -671,33 +670,35 @@ card.yunchou={
 			},
 			selectTarget:2,
 			multitarget:true,
+			singleCard:true,
 			targetprompt:['被拿牌','得牌'],
 			content:function(){
 				"step 0"
-				targets[0].addTempSkill('toulianghuanzhu2','phaseAfter');
-				var hs=targets[0].get('h');
+				target.addTempSkill('toulianghuanzhu2','phaseAfter');
+				var hs=target.get('h');
 				event.num=Math.min(2,hs.length);
 				if(event.num){
-					targets[1].gain(hs.randomGets(event.num),targets[0]);
-					targets[0].$give(event.num,targets[1]);
+					var gived=hs.randomGets(event.num);
+					event.addedTarget.gain(gived,target);
+					target.$giveAuto(gived,event.addedTarget);
 					game.delay();
 				}
 				else{
 					event.finish();
 				}
 				"step 1"
-				if(targets[1].num('h')){
-					if(_status.auto&&targets[1]==game.me){
+				if(event.addedTarget.num('h')){
+					if(_status.auto&&event.addedTarget==game.me){
 						game.delay();
 					}
-					targets[1].chooseCard(true,event.num,'选择'+get.cnNumber(event.num)+'张手牌还给'+get.translation(targets[0])).ai=ai.get.disvalue;
+					event.addedTarget.chooseCard(true,event.num,'选择'+get.cnNumber(event.num)+'张手牌还给'+get.translation(target)).ai=ai.get.disvalue;
 				}
 				else{
 					event.finish();
 				}
 				"step 2"
-				targets[0].gain(result.cards,targets[1]);
-				targets[1].$give(event.num,targets[0]);
+				target.gain(result.cards,event.addedTarget);
+				event.addedTarget.$give(event.num,target);
 			},
 			ai:{
 				order:6.5,
@@ -1220,12 +1221,12 @@ card.yunchou={
 		suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
 		suolianjia_bg:'链',
 		geanguanhuo:'隔岸观火',
-		geanguanhuo_info:'出牌阶段对两名其他角色使用，令目标拼点，赢的角色获得另一方的一张牌；若点数相同，两名目标可分别弃置你一张牌',
+		geanguanhuo_info:'出牌阶段对一名其他角色使用，令目标与一名你指定的另一名角色拼点，赢的角色获得对方的一张牌；若点数相同，目标可弃置你一张牌',
 		toulianghuanzhu:'偷梁换柱',
-		toulianghuanzhu_info:'令一名角色获得另一名角色的两张手牌，然后还回两张手牌',
+		toulianghuanzhu_info:'出牌阶段对一名有手牌的角色使用，选择另一名角色获得目标两张手牌（不足则全拿），然后还给其等量手牌',
 		toulianghuanzhu_bg:'柱',
 		yihuajiemu:'移花接木',
-		yihuajiemu_info:'将一名角色的宝物牌转移至另一名角色',
+		yihuajiemu_info:'对一名装备区内有宝物的角色使用，将其宝物牌转移至另一名角色',
 		fudichouxin:'釜底抽薪',
 		fudichouxin_info:'与一名角色进行拼点，若成功则获得双方拼点牌',
 		shuiyanqijun:'水攻',

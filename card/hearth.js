@@ -413,58 +413,45 @@ card.hearth={
 		tanshezhiren:{
 			fullskin:true,
 			type:'trick',
-			enable:function(card,player){
-				if(game.players.length<3) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')) return true;
-				}
-				return false;
-			},
+			enable:true,
 			chongzhu:true,
 			filterTarget:function(card,player,target){
-				return target.num('h')>0&&target!=player;
+				return target==player;
 			},
 			selectTarget:-1,
-			multitarget:true,
-			multiline:true,
+			modTarget:true,
 			content:function(){
 				'step 0'
-				for(var i=0;i<targets.length;i++){
-					if(!targets[i].num('h')) targets.splice(i--,1);
+				event.current=target;
+				event.num=game.players.length;
+				if(event.num%2==0){
+					event.num--;
 				}
-				if(targets.contains(player)){
-					event.current=player;
-				}
-				else{
-					event.current=targets.randomGet();
-				}
-				if(!targets.length) event.finish();
-				event.num=0;
 				'step 1'
-				var current;
-				if(targets.length>1){
-					current=targets.randomGet(event.current);
-					event.current.line(current);
-				}
-				else{
-					current=targets[0];
-				}
-				var hs=current.get('h');
-				if(hs.length){
-					current.discard(hs.randomGet());
-				}
-				if(hs.length>1){
-					event.current=current;
-					event.num++;
-					if(event.num<10){
+				if(event.num){
+					var enemies=event.current.getEnemies();
+					for(var i=0;i<enemies.length;i++){
+						if(!enemies[i].num('h')){
+							enemies.splice(i--,1);
+						}
+					}
+					if(enemies.length){
+						var enemy=enemies.randomGet();
+						event.current.line(enemy);
+						enemy.discard(enemy.get('h').randomGet());
+						event.current=enemy;
+						event.num--;
 						event.redo();
 					}
 				}
 			},
 			ai:{
-				order:8,
+				order:1.5,
+				wuxie:function(){
+					return 0;
+				},
 				result:{
-					target:-1
+					player:1
 				},
 				tag:{
 					multineg:1,
@@ -689,7 +676,7 @@ card.hearth={
 		xingjiegoutong:'星界沟通',
 		xingjiegoutong_info:'增加一点体力上限并回复一点体力，弃置你的所有手牌',
 		tanshezhiren:'弹射之刃',
-		tanshezhiren_info:'限场存活角色不小于3时使用，弃置一名随机角色（不含你）的手牌，重复此过程直到有一名角色失去最后一张手牌（最多重复10次）',
+		tanshezhiren_info:'出牌阶段对自己使用，第一次结算时随机弃置一名使用者的敌人的一张手牌，从第二次结算开始，每次随机弃置一名上一次被弃牌角色的敌人的一张手牌，共结算X次，X为存活角色数，若X为偶数，改为X-1',
 		chuansongmen:'传送门',
 		chuansongmen_info:'摸一张牌并展示，若发生在出牌阶段，你可以立即使用摸到的牌，若如此做，你将传送门收回手牌（每阶段最多收回2张传送门）',
 		dunpaigedang:'盾牌格挡',
