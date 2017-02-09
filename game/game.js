@@ -12869,8 +12869,8 @@
                     if(_status.connectMode) return false;
 					if(lib.config.mode=='versus'){
 						if(_status.mode=='three') return this.side==me.side;
-						if(_status.mode=='four'||_status.mode=='jiange'||_status.mode=='one') return false;
-						return lib.storage.single_control&&this.side==me.side;
+						if(_status.mode=='standard') return lib.storage.single_control&&this.side==me.side;
+						return false;
 					}
 					else if(lib.config.mode=='boss'){
 						return this.side==me.side&&get.config('single_control');
