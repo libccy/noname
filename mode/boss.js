@@ -3236,16 +3236,21 @@ mode.boss={
 			},
 			content:function(){
 				"step 0"
-				player.chooseToDiscard(2,'hj',function(card){
-					if(ui.selected.cards.length==0) return true;
-					if(get.position(ui.selected.cards[0])=='h'){
+				var next=player.discardPlayerCard(player,2,'hj','是否一张手牌来弃置一张花色相同的判定牌？');
+				next.filterButton=function(button){
+					var card=button.link;
+					if(!lib.filter.cardDiscardable(card,player)) return false;
+					if(ui.selected.buttons.length==0) return true;
+					if(get.position(ui.selected.buttons[0].link)=='h'){
 						if(get.position(card)!='j') return false;
 					}
-					if(get.position(ui.selected.cards[0])=='j'){
+					if(get.position(ui.selected.buttons[0].link)=='j'){
 						if(get.position(card)!='h') return false;
 					}
-					return get.suit(card)==get.suit(ui.selected.cards[0])
-				},'是否一张手牌来弃置一张花色相同的判定牌？').ai=function(card){
+					return get.suit(card)==get.suit(ui.selected.buttons[0].link)
+				};
+				next.ai=function(button){
+					var card=button.link;
 					if(get.position(card)=='h'){
 						return 11-ai.get.value(card);
 					}
@@ -3253,11 +3258,8 @@ mode.boss={
 					if(card.name=='bingliang') return 4;
 					if(card.name=='guiyoujie') return 3;
 					return 2;
-				}
-				"step 1"
-				if(result.bool){
-					player.logSkill('xiuluo');
-				}
+				};
+				next.logSkill='xiuluo';
 			}
 		},
 		shangshix2:{

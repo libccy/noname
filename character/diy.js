@@ -884,7 +884,14 @@ character.diy={
 				"step 0"
 				player.draw(2);
 				"step 1"
-				player.chooseToDiscard('hej',2,true);
+				next=player.discardPlayerCard(player,'hej',2,true);
+				next.ai=function(button){
+					if(get.position(button.link)=='j') return 10;
+					return -ai.get.value(button.link);
+				};
+				next.filterButton=function(button){
+					return lib.filter.cardDiscardable(button.link,player);
+				}
 			},
 			ai:{
 				effect:{

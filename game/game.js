@@ -31595,6 +31595,12 @@
 				if(_status.clicked) return;
 				if(ui.intro) return;
 				_status.clicked=true;
+				if(this.parentNode&&arguments[0]&&(this.parentNode.classList.contains('judges')||this.parentNode.classList.contains('marks'))){
+					ui.click.touchpop();
+					ui.click.intro.call(this,arguments[0]);
+					_status.clicked=false;
+					return;
+				}
 				var custom=_status.event.custom;
 				if(custom.replace.card){
 					custom.replace.card(this);
