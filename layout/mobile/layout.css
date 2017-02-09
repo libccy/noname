@@ -252,12 +252,6 @@
     top: -5px;
     transform-origin: top center;
 }
-#arena:not(.chess) .player[data-position='0']>.judges>.card{
-    transform: rotate(90deg);
-}
-#arena:not(.chess) .player[data-position='0']>.marks>div{
-    transform: rotate(-90deg);
-}
 
 #arena:not(.chess) .player[data-position='0'].linked{
     transform: none;

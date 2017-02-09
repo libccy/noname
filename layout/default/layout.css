@@ -1251,7 +1251,7 @@ margin-bottom: 5px;
 .judges{height: 24px;left: 14px;top: -18px;}
 .marks{height: 24px;left: 14px;top: 112px;}
 .player>.marks{z-index: 4}
-.judges>div,.marks>div{width: 24px;height: 24px;margin-left: 0;margin-top: 0;margin-right: 4px;opacity: 1;}
+.judges>div,.marks>div{width: 24px;height: 24px;margin-left: 0;margin-top: 0;margin-right: 4px;opacity: 1;position: absolute;}
 .hp{left: 18px;top:14px;width: 72px;line-height: 14px;text-align: left;}
 .hp.text{top:18px;}
 
@@ -1479,7 +1479,7 @@ margin-bottom: 5px;
 
 
 /*--------动画--------*/
-.start,.equips>.card,.judges>.card,.marks>.card,.popup{
+.start,.equips>.card,.popup{
 	animation: game_start 0.5s;
 	-webkit-animation: game_start 0.5s;
 }
@@ -1520,6 +1520,11 @@ margin-bottom: 5px;
 #me>div>div>.card.drawinghidden{
 	opacity: 0;
 	transform: scale(0.2) !important;
+}
+.marks>.card.drawinghidden,
+.judges>.card.drawinghidden{
+	opacity: 0;
+	transform: scale(0.2);
 }
 
 #me>.fakeme.avatar{

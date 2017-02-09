@@ -166,35 +166,12 @@
 .player.noidentity .judges{
 	top:14px;
 }
-.player .marks>div,
-.player .judges>div{
-	margin-right:0;
-	margin-bottom:4px;
-	margin-left:6px;
-	line-height:20px;
-	position:relative;
-	display:block;
-	animation:card_start2xx 0.5s;
-	-webkit-animation:card_start2xx 0.5s;
-}
-.player .marks>.removing,
-.player .judges>.removing{
-	margin-top: -12px;
-	margin-bottom:-12px
-}
 .player:not(.linked2) .marks>div:first-child{
 	margin-top: -12px;
 	margin-bottom:-12px;
 	opacity:0;
 	pointer-events: none;
 }
-
-
-.player .judges>.card.removing,
-.player .marks>.card.removing{
-	/*margin-top: -12px;margin-bottom:-12px;*/
-}
-
 
 .player .hp>div{
 	width:10px;
