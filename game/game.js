@@ -32374,18 +32374,33 @@
 			var length=0;
 			var controls=[];
 			var widths=[];
-			var add=function(node){
+			var add=function(node,first){
 				var thiswidth=parseInt(node.style.width);
 				if(thiswidth){
 					thiswidth+=8;
 					length+=thiswidth;
-					widths.push(thiswidth);
+					if(first){
+						widths.unshift(thiswidth);
+					}
+					else{
+						widths.push(thiswidth);
+					}
 				}
 				else{
 					length+=node.offsetWidth;
-					widths.push(node.offsetWidth);
+					if(first){
+						widths.unshift(node.offsetWidth);
+					}
+					else{
+						widths.push(node.offsetWidth);
+					}
 				}
-				controls.push(node);
+				if(first){
+					controls.unshift(node);
+				}
+				else{
+					controls.push(node);
+				}
 			}
 			var hasWuxie=false;
 			for(var i=0;i<ui.control.childNodes.length;i++){
@@ -32417,31 +32432,28 @@
 				fullwidth/=2;
 				fullwidth+=ui.tempnowuxie.offsetWidth;
 				if(get.is.phoneLayout()){
-					fullwidth+=20;
+					fullwidth+=18;
 				}
 				else{
-					fullwidth+=14;
+					fullwidth+=12;
 				}
-				if(get.mode()=='stone'){
+				if(fullright){
 					fullwidth+=124;
 				}
-				else if(!fullright){
+				else{
 					fullwidth+=154;
 				}
-				if(game.layout!='default'&&game.layout!='newlayout'&ui.arena.offsetWidth/2>=fullwidth){
-					if(get.mode()=='stone'){
-						ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-132;
-					}
-					else if(fullright){
-						ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-8;
+				if(game.layout!='default'&&game.layout!='newlayout'&&ui.arena.offsetWidth/2>=fullwidth){
+					if(fullright){
+						ui.tempnowuxie._offset=-ui.arena.offsetWidth/2+135;
 					}
 					else{
-						ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-162;
+						ui.tempnowuxie._offset=-ui.arena.offsetWidth/2+165;
 					}
 					ui.tempnowuxie.style.transform='translateX('+ui.tempnowuxie._offset+'px)';
 				}
 				else{
-					add(ui.tempnowuxie);
+					add(ui.tempnowuxie,true);
 				}
 			}
 			if(!controls.length) return;
