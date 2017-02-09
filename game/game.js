@@ -21362,7 +21362,7 @@
 						for(var i=0;i<event.avatars.length;i++){
 							if(event.avatars[i].classList.contains('moved')){
 								event.moveAvatar(event.avatars[i],event.blank.randomRemove());
-								delete event.avatars[i].classList.remove('moved');
+								event.avatars[i].classList.remove('moved');
 							}
 						}
 						event.redoing=true;
@@ -31626,9 +31626,13 @@
 				if(_status.clicked) return;
 				if(ui.intro) return;
 				_status.clicked=true;
-				if(this.parentNode&&arguments[0]&&(this.parentNode.classList.contains('judges')||this.parentNode.classList.contains('marks'))){
+				if(this.parentNode&&(this.parentNode.classList.contains('judges')||this.parentNode.classList.contains('marks'))){
+					var rect=this.getBoundingClientRect();
 					ui.click.touchpop();
-					ui.click.intro.call(this,arguments[0]);
+					ui.click.intro.call(this,{
+						clientX:rect.left+18,
+						clientY:rect.top+12
+					});
 					_status.clicked=false;
 					return;
 				}
