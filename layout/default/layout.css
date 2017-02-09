@@ -1251,7 +1251,16 @@ margin-bottom: 5px;
 .judges{left: 14px;top: -18px;}
 .marks{left: 14px;top: 112px;}
 .player>.marks{z-index: 4}
-.judges>div,.marks>div{width: 24px;height: 24px;margin: 0;left: 0;top: 0;opacity: 1;position: absolute;}
+.judges>div,.marks>div{
+	width: 24px;
+	height: 24px;
+	margin: 0;
+	left: 0;
+	top: 0;
+	opacity: 1;
+	position: absolute;
+	line-height:20px;
+}
 .hp{left: 18px;top:14px;width: 72px;line-height: 14px;text-align: left;}
 .hp.text{top:18px;}
 

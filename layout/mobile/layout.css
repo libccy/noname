@@ -242,6 +242,7 @@
 #arena:not(.chess) .player[data-position='0']>.judges{
     left: 6px;
     top: -16px;
+    transform: none;
 }
 #arena:not(.chess) .player[data-position='0']>.marks {
     right: -6px;

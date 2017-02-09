@@ -1214,6 +1214,7 @@
                                     list[i].classList.remove('linked2');
                                 }
                             }
+							ui.updatem();
                         }
                     },
                     cardshape:{
@@ -5763,7 +5764,7 @@
 				}
 			},
 			gs:function(name,act){
-				var card=game.createCard('spell_'+name);
+				var card=game.createCard('spell_'+(name||'yexinglanghun'));
 				game.me.node.handcards1.appendChild(card);
 				if(!act){
 					game.me.actused=-99;
@@ -5772,7 +5773,7 @@
 				setTimeout(game.check,300);
 			},
 			gc:function(name,act){
-				var card=game.createCard('stone_'+name+'_stonecharacter');
+				var card=game.createCard('stone_'+(name||'falifulong')+'_stonecharacter');
 				game.me.node.handcards1.appendChild(card);
 				if(!act){
 					game.me.actused=-99;
@@ -34413,6 +34414,7 @@
                     var es=node.get('e');
                     for(var i=0;i<es.length;i++){
                         uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+lib.translate[es[i].name+'_info']+'</div></div>');
+						uiintro.content.lastChild.querySelector('.skill>.card').style.transform='';
                     }
                     var js=node.get('j');
                     for(var i=0;i<js.length;i++){
@@ -34422,6 +34424,7 @@
                         else{
                             uiintro.add('<div><div class="skill">'+js[i].outerHTML+'</div><div>'+lib.translate[js[i].name+'_info']+'</div></div>');
                         }
+						uiintro.content.lastChild.querySelector('.skill>.card').style.transform='';
                     }
                 }
                 var modepack=lib.characterPack['mode_'+get.mode()];
