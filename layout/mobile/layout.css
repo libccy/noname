@@ -319,3 +319,8 @@
     top: 10px;
     background-position-x: -3px;
 }
+
+
+#arena.phone.oblongcard:not(.chess):not(.nome){
+    height: calc(97% + 10px);
+}

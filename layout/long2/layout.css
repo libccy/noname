@@ -21,6 +21,32 @@
     border-radius:0 !important;
     height:120px;
 }
+#arena.oblongcard:not(.chess)>#me,
+#arena.oblongcard:not(.chess)>#mebg,
+#arena.oblongcard:not(.chess)>#autonode{
+    height: 140px;
+}
+#arena.oblongcard:not(.chess)>.card,
+#arena.oblongcard:not(.chess) .handcards>.card{
+    height: 120px;
+}
+#arena.oblongcard:not(.chess)>.card>.image,
+#arena.oblongcard:not(.chess) .handcards>.card>.image{
+    height: 110px;
+    top: 10px;
+    background-position-x: -3px;
+}
+#arena.oblongcard:not(.chess) #handcards1{
+    height: 100%;
+    top: 2px;
+}
+#arena.oblongcard:not(.chess):not(.choose-character) #control{
+    bottom:165px;
+}
+#arena.phone.oblongcard:not(.chess):not(.choose-character) #control{
+    bottom:180px;
+}
+
 #arena:not(.chess)>#autonode{
     width: calc(5000% / 47 - 240px);
     left:calc(-150% / 47 + 120px);

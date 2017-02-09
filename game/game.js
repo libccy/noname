@@ -1104,7 +1104,7 @@
 						}
 					},
 					wuxie_right:{
-						name:'无懈按钮靠右',
+						name:'无懈按钮靠左',
 						init:true,
 						unfrequent:true,
 					},
@@ -3107,7 +3107,7 @@
 						name:'游戏模式',
 						init:'combat',
 						item:{
-							combat:'对战',
+							combat:'自由',
 							leader:'君主',
 						},
 						restart:true,

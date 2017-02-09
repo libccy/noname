@@ -2,9 +2,6 @@
     height: calc(97% + 30px);
     top:3%
 }
-#arena.oblongcard:not(.chess):not(.nome){
-    height: calc(97% + 10px);
-}
 #arena.mobile>#control{
     top:calc(100% - 205px);
 }
