@@ -1624,7 +1624,7 @@ card.standard={
 						if(translation.length>=4){
 							translation=lib.translate[card.name+'_ab']||translation.slice(0,2);
 						}
-						ui.tempnowuxie=ui.create.control('不无懈'+translation,ui.click.tempnowuxie);
+						ui.tempnowuxie=ui.create.control('不无懈'+translation,ui.click.tempnowuxie,'stayleft');
 						ui.tempnowuxie._origin=id2;
 					}
 					var next=player.chooseToUse({

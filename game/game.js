@@ -17,7 +17,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:17,
+        versionOL:18,
         sourceURL:'https://rawgit.com/libccy/noname/$version$/',
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',
@@ -29042,6 +29042,9 @@
 					else if(controls[i]=='nozoom'){
 						nozoom=true;
 					}
+					else if(controls[i]=='stayleft'){
+						control.stayleft=true;
+					}
 					else{
 						control.add(controls[i]);
 					}
@@ -29070,6 +29073,8 @@
 					ui.refresh(control);
 					control.style.transition='';
 				}
+
+				control.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control2);
 				ui.updatec();
 				return control;
 			},
@@ -31995,6 +32000,11 @@
 				}
 				game.check();
 			},
+			control2:function(){
+				if(this.childNodes.length==1&&!this._doubleclick){
+					ui.click.control.call(this.firstChild);
+				}
+			},
 			control:function(){
 				if(_status.dragged) return;
 				if(ui.control.classList.contains('hidden')) return;
@@ -32579,27 +32589,17 @@
 					controls.push(node);
 				}
 			}
-			var hasWuxie=false;
+			var stayleft=null;
 			for(var i=0;i<ui.control.childNodes.length;i++){
 				if(ui.control.childNodes[i].classList.contains('removing')) continue;
-				if(lib.config.wuxie_right&&ui.control.childNodes[i]==ui.tempnowuxie){
-					hasWuxie=true;
+				if(!stayleft&&lib.config.wuxie_right&&ui.control.childNodes[i].stayleft){
+					stayleft=ui.control.childNodes[i];
 				}
 				else{
 					add(ui.control.childNodes[i]);
 				}
-				// if(game.layout!='default'&&game.layout!='newlayout'){
-				// 	if(game.layout=='long'||game.layout=='long2'||game.chess||parseInt(ui.arena.dataset.number)<=5){
-				// 		ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-8;
-				// 	}
-				// 	else{
-				// 		ui.tempnowuxie._offset=ui.arena.offsetWidth/2-ui.tempnowuxie.offsetWidth-162;
-				// 	}
-				// 	ui.tempnowuxie.style.transform='translateX('+ui.tempnowuxie._offset+'px)';
-				// 	continue;
-				// }
 			}
-			if(hasWuxie){
+			if(stayleft){
 				var fullwidth=0;
 				var fullright=(game.layout=='long'||game.layout=='long2'||game.chess||parseInt(ui.arena.dataset.number)<=5);
 				for(var i=0;i<widths.length;i++){
@@ -32607,7 +32607,7 @@
 					if(get.is.phoneLayout()) fullwidth+=6;
 				}
 				fullwidth/=2;
-				fullwidth+=ui.tempnowuxie.offsetWidth;
+				fullwidth+=stayleft.offsetWidth;
 				if(get.is.phoneLayout()){
 					fullwidth+=18;
 				}
@@ -32622,15 +32622,15 @@
 				}
 				if(game.layout!='default'&&game.layout!='newlayout'&&ui.arena.offsetWidth/2>=fullwidth){
 					if(fullright){
-						ui.tempnowuxie._offset=-ui.arena.offsetWidth/2+135;
+						stayleft._offset=-ui.arena.offsetWidth/2+135;
 					}
 					else{
-						ui.tempnowuxie._offset=-ui.arena.offsetWidth/2+165;
+						stayleft._offset=-ui.arena.offsetWidth/2+165;
 					}
-					ui.tempnowuxie.style.transform='translateX('+ui.tempnowuxie._offset+'px)';
+					stayleft.style.transform='translateX('+stayleft._offset+'px)';
 				}
 				else{
-					add(ui.tempnowuxie,true);
+					add(stayleft,true);
 				}
 			}
 			if(!controls.length) return;

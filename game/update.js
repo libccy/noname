@@ -1,9 +1,8 @@
 window.noname_update={
-    version:'1.9.8.2',
-    update:'1.9.8.2',
+    version:'1.9.8.3',
+    update:'1.9.8.3',
     changeLog:[
         'bug修复',
-        '统率三军',
     ],
     files:[
         // 'game/game.js',
