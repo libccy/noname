@@ -20512,15 +20512,15 @@
 						!event._targetChoice&&!firstCheck&&window.Map){
 						event._targetChoice=new Map();
 						for(var i=0;i<event._cardChoice.length;i++){
-							var targets=[];
 							if(!lib.card[event._cardChoice[i].name].complexTarget){
+								var targets=[];
 								for(var j=0;j<game.players.length;j++){
 									if(event.filterTarget(event._cardChoice[i],player,game.players[j])){
 										targets.push(game.players[j]);
 									}
 								}
+								event._targetChoice.set(event._cardChoice[i],targets);
 							}
-							event._targetChoice.set(event._cardChoice[i],targets);
 						}
 					}
                     var selectableCards=false;
