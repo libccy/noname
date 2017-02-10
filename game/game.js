@@ -5771,6 +5771,9 @@
 					game.me.actused=-99;
 				}
 				ui.updatehl();
+				delete _status.event._cardChoice;
+				delete _status.event._targetChoice;
+				delete _status.event._skillChoice;
 				setTimeout(game.check,300);
 			},
 			gc:function(name,act){
@@ -5780,6 +5783,9 @@
 					game.me.actused=-99;
 				}
 				ui.updatehl();
+				delete _status.event._cardChoice;
+				delete _status.event._targetChoice;
+				delete _status.event._skillChoice;
 				setTimeout(game.check,300);
 			},
 			aa:function(){
@@ -5857,6 +5863,9 @@
 				target=target||game.me;
 				var card=cheat.gn(name);
 				target.node.handcards1.appendChild(card);
+				delete _status.event._cardChoice;
+				delete _status.event._targetChoice;
+				delete _status.event._skillChoice;
 				game.check();
 				target.update();
 				ui.updatehl();
@@ -5930,6 +5939,9 @@
 				for(var i=0;i<num;i++){
 					var card=cards[i];
 					game.me.node.handcards1.appendChild(card);
+					delete _status.event._cardChoice;
+					delete _status.event._targetChoice;
+					delete _status.event._skillChoice;
 					game.check();
 					game.me.update();
 					ui.updatehl();
@@ -5939,6 +5951,9 @@
                 for(var i=0;i<arguments.length;i++){
                     game.me.addSkill(arguments[i],true);
                 }
+				delete _status.event._cardChoice;
+				delete _status.event._targetChoice;
+				delete _status.event._skillChoice;
 				game.check();
 			},
 			t:function(num){
@@ -10597,7 +10612,7 @@
 						next.filterCard=lib.filter.filterCard;
 					}
 					if(next.selectCard==undefined){
-						next.selectCard=lib.filter.selectCard;
+						next.selectCard=[1,1];
 					}
 					if(next.filterTarget==undefined){
 						next.filterTarget=lib.filter.filterTarget;
@@ -14763,6 +14778,11 @@
 						forced:this.forced,
 						aiexclude:this.aiexclude,
                         complexSelect:this.complexSelect,
+						complexCard:this.complexCard,
+						complexTarget:this.complexTarget,
+						_cardChoice:this._cardChoice,
+						_targetChoice:this._targetChoice,
+						_skillChoice:this._skillChoice,
                         ai1:this.ai1,
                         ai2:this.ai2,
 					}
@@ -14780,6 +14800,8 @@
 							if(info.position!=undefined) this.position=info.position;
                             if(info.forced!=undefined) this.forced=info.forced;
 							if(info.complexSelect!=undefined) this.complexSelect=info.complexSelect;
+							if(info.complexCard!=undefined) this.complexCard=info.complexCard;
+							if(info.complexTarget!=undefined) this.complexTarget=info.complexTarget;
                             if(info.ai1!=undefined) this.ai1=info.ai1;
 							if(info.ai2!=undefined) this.ai2=info.ai2;
 						}
@@ -14793,10 +14815,15 @@
 							this.position=info.position;
                             this.forced=info.forced;
 							this.complexSelect=info.complexSelect;
+							this.complexCard=info.complexCard;
+							this.complexTarget=info.complexTarget;
                             if(info.ai1!=undefined) this.ai1=info.ai1;
 							if(info.ai2!=undefined) this.ai2=info.ai2;
 						}
 					}
+					delete this._cardChoice;
+					delete this._targetChoice;
+					delete this._skillChoice;
 				},
 				restore:function(){
 					if(this._backup){
@@ -14809,9 +14836,14 @@
 						this.position=this._backup.position;
 						this.forced=this._backup.forced;
                         this.aiexclude=this._backup.aiexclude;
-                        this.complexSelect=this._backup.complexSelect;
+						this.complexSelect=this._backup.complexSelect;
+						this.complexCard=this._backup.complexCard;
+                        this.complexTarget=this._backup.complexTarget;
                         this.ai1=this._backup.ai1;
 						this.ai2=this._backup.ai2;
+						this._cardChoice=this._backup._cardChoice;
+						this._targetChoice=this._backup._targetChoice;
+						this._skillChoice=this._backup._skillChoice;
 					}
 					delete this.skill;
 				},
@@ -20470,31 +20502,61 @@
 				}
 				else{
 					var cards=player.get(event.position||'h');
+					var firstCheck=false;
 					range=get.select(event.selectCard);
+					if(!event._cardChoice&&typeof event.selectCard!='function'){
+						if(range[0]==1&&range[1]==1){
+							event._cardChoice=[];
+						}
+						else if(typeof event.filterCard!='function'){
+							event._cardChoice=[];
+						}
+						else if(!event.complexCard){
+							event._cardChoice=[];
+						}
+						if(event._cardChoice){
+							firstCheck=true;
+						}
+					}
                     var selectableCards=false;
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<cards.length;i++){
-						if(event.filterCard(cards[i],player)&&
-							lib.filter.cardAiIncluded(cards[i])&&
-							(player.isOut()==false||event.includeOutCard)&&
-							lib.filter.cardRespondable(cards[i],player)&&
-                            !cards[i].classList.contains('uncheck')){
-							if(ui.selected.cards.length<range[1]){
-								cards[i].classList.add('selectable');
-							}
-							else if(range[1]==-1){
-								cards[i].classList.add('selected');
-								ui.selected.cards.add(cards[i]);
+						if(event._cardChoice&&!firstCheck){
+							if(ui.selected.cards.length>=range[1]||
+							!event._cardChoice.contains(cards[i])||
+							!lib.filter.cardAiIncluded(cards[i])){
+								cards[i].classList.remove('selectable');
 							}
 							else{
-								cards[i].classList.remove('selectable');
+								cards[i].classList.add('selectable');
 							}
 						}
 						else{
-							cards[i].classList.remove('selectable');
-							if(range[1]==-1){
-								cards[i].classList.remove('selected');
-								ui.selected.cards.remove(cards[i]);
+							if(event.filterCard(cards[i],player)&&
+							lib.filter.cardAiIncluded(cards[i])&&
+							(player.isOut()==false||event.includeOutCard)&&
+							lib.filter.cardRespondable(cards[i],player)&&
+	                        !cards[i].classList.contains('uncheck')){
+								if(ui.selected.cards.length<range[1]){
+									cards[i].classList.add('selectable');
+									if(event._cardChoice){
+										event._cardChoice.push(cards[i]);
+									}
+								}
+								else if(range[1]==-1){
+									cards[i].classList.add('selected');
+									ui.selected.cards.add(cards[i]);
+								}
+								else{
+									cards[i].classList.remove('selectable');
+								}
+							}
+							else{
+								cards[i].classList.remove('selectable');
+								if(range[1]==-1){
+									cards[i].classList.remove('selected');
+									ui.selected.cards.remove(cards[i]);
+								}
 							}
 						}
 						if(cards[i].classList.contains('selected')){
@@ -20586,25 +20648,39 @@
 			}
 			if(!event.skill&&get.noSelected()&&!_status.noconfirm){
 				var skills=[],enable,info;
-				var skills2=game.filterSkills(player.get('s',true,true,false).concat(lib.skill.global),player);
-				game.expandSkills(skills2);
-				for(i=0;i<skills2.length;i++){
-					info=get.info(skills2[i]);
-					enable=false;
-					if(typeof info.enable=='function') enable=info.enable(event);
-					else if(typeof info.enable=='object') enable=info.enable.contains(event.name);
-					else if(info.enable=='phaseUse') enable=(event.getParent().name=='phaseUse');
-					else if(typeof info.enable=='string') enable=(info.enable==event.name);
-					if(enable){
-						if(info.filter&&!info.filter(event,player)) enable=false;
-						if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player)) enable=false;
-						if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
-						if(!event.isMine()&&event.aiexclude.contains(skills2[i])) enable=false;
-						if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
-                        if(info.chooseButton&&_status.event.noButton) enable=false;
+				var skills2;
+				if(event._skillChoice){
+					skills2=event._skillChoice;
+					for(var i=0;i<skills2.length;i++){
+						if(event.isMine()||!event.aiexclude.contains(skills2[i])){
+							skills.push(skills2[i]);
+						}
 					}
-					if(enable){
-						skills.add(skills2[i]);
+				}
+				else{
+					var skills2=game.filterSkills(player.get('s',true,true,false).concat(lib.skill.global),player);
+					event._skillChoice=[];
+					game.expandSkills(skills2);
+					for(i=0;i<skills2.length;i++){
+						info=get.info(skills2[i]);
+						enable=false;
+						if(typeof info.enable=='function') enable=info.enable(event);
+						else if(typeof info.enable=='object') enable=info.enable.contains(event.name);
+						else if(info.enable=='phaseUse') enable=(event.getParent().name=='phaseUse');
+						else if(typeof info.enable=='string') enable=(info.enable==event.name);
+						if(enable){
+							if(info.filter&&!info.filter(event,player)) enable=false;
+							if(info.viewAs&&event.filterCard&&!event.filterCard(info.viewAs,player)) enable=false;
+							if(info.viewAs&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
+							if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
+	                        if(info.chooseButton&&_status.event.noButton) enable=false;
+						}
+						if(enable){
+							if(event.isMine()||!event.aiexclude.contains(skills2[i])){
+								skills.add(skills2[i]);
+							}
+							event._skillChoice.add(skills2[i]);
+						}
 					}
 				}
 
@@ -32276,6 +32352,9 @@
 				if(game.onresume){
 					game.onresume();
 				}
+				delete _status.event._cardChoice;
+				delete _status.event._targetChoice;
+				delete _status.event._skillChoice;
 				return false;
 			},
 			config:function(){

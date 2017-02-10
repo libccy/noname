@@ -285,6 +285,7 @@ character.zhuogui={
                 }
                 return true;
             },
+            complexCard:true,
             selectCard:3,
             position:'he',
             filterTarget:function(card,player,target){

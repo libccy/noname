@@ -855,6 +855,7 @@ character.extra={
 				}
 				return true;
 			},
+			complexCard:true,
 			mark:true,
 			selectCard:[0,4],
 			line:'fire',

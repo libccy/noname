@@ -4435,6 +4435,7 @@ character.swd={
 				}
 				return true;
 			},
+			complexCard:true,
 			selectCard:[1,4],
 			check:function(card){
 				return 7-ai.get.value(card)
@@ -6984,6 +6985,8 @@ character.swd={
 				}
 				return true;
 			},
+			complexCard:true,
+			complexTarget:true,
 			selectCard:[1,Infinity],
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
@@ -7124,39 +7127,6 @@ character.swd={
 					}
 				},
 				order:5
-			}
-		},
-		swd_xiuluo:{
-			audio:2,
-			trigger:{player:'phaseBegin'},
-			direct:true,
-			filter:function(event,player){
-				return player.num('j')>0;
-			},
-			content:function(){
-				"step 0"
-				player.chooseToDiscard(2,'hj',function(card){
-					if(ui.selected.cards.length==0) return true;
-					if(get.position(ui.selected.cards[0])=='h'){
-						if(get.position(card)!='j') return false;
-					}
-					if(get.position(ui.selected.cards[0])=='j'){
-						if(get.position(card)!='h') return false;
-					}
-					return get.suit(card)==get.suit(ui.selected.cards[0])
-				},'是否一张手牌来弃置一张花色相同的判定牌？').ai=function(card){
-					if(get.position(card)=='h'){
-						return 11-ai.get.value(card);
-					}
-					if(card.name=='lebu') return 5;
-					if(card.name=='bingliang') return 4;
-					if(card.name=='guiyoujie') return 3;
-					return 2;
-				}
-				"step 1"
-				if(result.bool){
-					player.logSkill('swd_xiuluo');
-				}
 			}
 		},
 		guxing:{

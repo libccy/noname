@@ -781,7 +781,7 @@ character.gujian={
 						return get.color(card)==get.color(ui.selected.cards[0]);
 					}
 					return player.num('h',{color:get.color(card)})>1;
-				}).ai=function(card){
+				}).set('complexCard',true).ai=function(card){
 					if(ai.get.damageEffect(trigger.source,player,player,'thunder')>0){
 						return 8-ai.get.value(card);
 					}

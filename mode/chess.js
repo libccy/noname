@@ -4430,6 +4430,7 @@ mode.chess={
 				}
 				return true;
 			},
+			complexCard:true,
 			selectCard:4,
 			check:function(card){
 				return 10-ai.get.value(card);

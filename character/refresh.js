@@ -1358,6 +1358,7 @@ character.refresh={
 				}
 				return target.num('he')>0;
 			},
+			complexTarget:true,
 			filter:function(event,player){
 				return player.num('he')>0;
 			},
@@ -1389,16 +1390,17 @@ character.refresh={
 		xunxun:{
 			audio:2,
 			trigger:{player:'phaseDrawBefore'},
-			direct:true,
+			check:function(event,player){
+				return !player.hasSkill('reyiji2');
+			},
 			content:function(){
 				"step 0"
+				trigger.untrigger();
+				trigger.finish();
 				event.cards=get.cards(4);
 				player.chooseCardButton(event.cards,2,'选择获得两张牌').set('ai',ai.get.buttonValue);
 				"step 1"
 				if(result.bool){
-					player.logSkill('xunxun');
-					trigger.untrigger();
-					trigger.finish();
 					var choice=[];
 					for(var i=0;i<result.links.length;i++){
 						choice.push(result.links[i]);

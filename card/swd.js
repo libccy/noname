@@ -4074,6 +4074,7 @@ card.swd={
 				return name;
 			},
 			selectCard:2,
+			complexCard:true,
 			filter:function(event,player){
 				if(!player.num('h',{type:['hslingjian','jiqi']})) return false;
 				var es=player.get('he',{type:'equip'});

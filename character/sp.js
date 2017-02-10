@@ -897,6 +897,7 @@ character.sp={
 				}
 				return get.number(card)+num<=13;
 			},
+			complexCard:true,
 			selectCard:function(){
 				var num=0;
 				for(var i=0;i<ui.selected.cards.length;i++){
@@ -1075,6 +1076,7 @@ character.sp={
 			init:function(player){
 				player.storage.jianshu=false;
 			},
+			complexTarget:true,
 			filterTarget:function(card,player,target){
 				if(ui.selected.targets.length){
 					return target.num('h')>0&&target.distanceTo(ui.selected.targets[0])<=1;

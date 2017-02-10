@@ -1903,6 +1903,7 @@ character.hearth={
 				}
 				return true;
 			},
+			complexCard:true,
 			position:'he',
 			check:function(card){
 				return 8-ai.get.value(card);

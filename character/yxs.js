@@ -515,6 +515,7 @@ character.yxs={
 				}
 				return true;
 			},
+			complexCard:true,
 			usable:1,
 			selectCard:2,
 			check:function(card){
@@ -794,6 +795,7 @@ character.yxs={
 				}
 				return true;
 			},
+			complexCard:true,
 			selectCard:2,
 			check:function(card){
 				return 8-ai.get.value(card);
@@ -1339,6 +1341,7 @@ character.yxs={
 					}
 					return get.color(card)=='black'||card.name=='jiu';
 				};
+				next.complexCard=true,
 				next.logSkill=['zhensha',trigger.player];
 				next.selectCard=function(){
 					if(ui.selected.cards.length){
@@ -2333,6 +2336,7 @@ character.yxs={
 				return 7-ai.get.value(card);
 			},
 			multitarget:true,
+			complexTarget:true,
 			targetprompt:['被移走','移动目标'],
 			filterTarget:function(card,player,target){
 				if(ui.selected.targets.length){

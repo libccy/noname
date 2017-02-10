@@ -1398,7 +1398,7 @@ character.yijiang={
 							return 1;
 						}
 						return 2;
-					}).set('nontrick',n2.length>=2);
+					}).set('nontrick',n2.length>=2).set('complexCard',true);
 				}
 				else{
 					if(n1.length){
@@ -5337,6 +5337,7 @@ character.yijiang={
 				return false;
 			},
 			selectTarget:2,
+			complexTarget:true,
 			content:function(){
 				'step 0'
 				var gainner,giver;
@@ -5418,6 +5419,7 @@ character.yijiang={
 			selectTarget:2,
 			multitarget:true,
 			discard:false,
+			complexTarget:true,
 			targetprompt:['得到牌','出杀目标'],
 			prepare:'give',
 			filterTarget:function(card,player,target){
@@ -6750,6 +6752,7 @@ character.yijiang={
 				return Math.abs(ui.selected.targets[0].num('e')-target.num('e'))<=player.maxHp-player.hp;
 			},
 			multitarget:true,
+			complexTarget:true,
 			content:function(){
 				"step 0"
 				event.cards=[targets[0].get('e'),targets[1].get('e')];

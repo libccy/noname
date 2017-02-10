@@ -953,6 +953,7 @@ character.ow={
                 }
                 return true;
             },
+            complexCard:true,
             filterTarget:function(card,player,target){
                 return target!=player&&target.num('h')>0;
             },
@@ -1195,6 +1196,7 @@ character.ow={
                 return true;
             },
             selectCard:[1,Infinity],
+            complexCard:true,
             filterTarget:function(card,player,target){
                 return !target.hasSkill('bingqiang2')&&!target.hasSkill('bingqiang5')&&
                 !target.next.hasSkill('bingqiang2')&&!target.next.hasSkill('bingqiang5')&&

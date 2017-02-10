@@ -1032,6 +1032,7 @@ card.standard={
 			singleCard:true,
 			multitarget:true,
 			targetprompt:['被借刀','出杀目标'],
+			complexTarget:true,
 			filterTarget:function(card,player,target){
 				if(ui.selected.targets.length==0){
 					return (player!=target&&target.get('e',{subtype:'equip1'}).length);
