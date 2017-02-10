@@ -1408,23 +1408,19 @@ div:not(.handcards)>.card>.info>span,
 	overflow: hidden;
 	border-radius: 2px;
 }
-
 .config>div {
 	text-align: left;
 	left: 0;
 }
-
 .config>div>div {
 	position: relative;
 	padding-right: 10px;
 	height: 20px
 }
-
 .dialog>.content>.config {
 	width: 300px;
 	left: calc(50% - 150px);
 }
-
 .toggle {
 	right: 16px;
 	left: auto !important;
@@ -1435,7 +1431,6 @@ div:not(.handcards)>.card>.info>span,
 .menu-buttons.configpopped {
 	margin-top: 10px
 }
-
 .menu-buttons.configpopped>.toggle {
 	text-align: left !important;
 	margin-left: 21px !important;
@@ -1447,59 +1442,47 @@ div:not(.handcards)>.card>.info>span,
 	width: 88%;
 	position: relative;
 }
-
 .dialog.popped .caption {
 	transition: all 0s;
 }
-
 .caption {
 	padding-top: 8px;
 	font-size: 20px;
 	display: block;
 }
-
 .caption:only-child {
 	padding-bottom: 8px;
 }
-
 .caption:not(.normal)>div {
 	text-align: left;
 	display: block;
 	width: 100%;
 }
-
 .caption>div {
 	position: relative;
 }
-
 .caption>.text {
 	font-size: 16px;
 	text-align: left
 }
-
 .caption>.text.center {
 	text-align: center
 }
-
 .caption>.text.chat {
 	word-break: break-all;
 	margin-bottom: 3px;
 	margin-left: 10px;
 	width: calc(100% - 20px)
 }
-
 .caption>.text.textlink {
 	margin-left: 10px;
 }
-
 .caption>.text.textlink:not(*:first-child) {
 	margin-top: 6px;
 }
-
 .caption>.text.textlink:hover {
 	text-decoration: underline;
 }
-
 .caption>div>div {
 	font-size: 16px;
 	position: relative;
@@ -1513,7 +1496,6 @@ div:not(.handcards)>.card>.info>span,
 	left: 0 !important;
 	width: 70px !important;
 }
-
 .skill>.card {
 	transform: scale(0.56);
 	transform-origin: top left;
@@ -1521,7 +1503,6 @@ div:not(.handcards)>.card>.info>span,
 	margin-top: 6px;
 	margin-bottom: -52px
 }
-
 .caption>.ctext {
 	text-align: center;
 	font-size: 16px;
@@ -1533,23 +1514,19 @@ div:not(.handcards)>.card>.info>span,
 	position: relative;
 	margin: 6px;
 }
-
 .button.card {
 	font-size: 14px;
 }
-
 .button.character>.name {
 	left: 5px;
 	top: 22px;
 	max-height: 68px;
 	overflow: hidden;
 }
-
 .button.character>.hp {
 	left: 5px;
 	top: 3px;
 }
-
 .button.character>.hp.text {
 	top: 8px;
 	left: 6px;
@@ -1557,20 +1534,16 @@ div:not(.handcards)>.card>.info>span,
 	font-size: 20px;
 	letter-spacing: 3px;
 }
-
 .button.nodisplay {
 	display: none;
 }
-
 .dialog .content>.nodisplay {
 	display: none;
 }
-
 .button.character>.intro {
 	top: 71px;
 	left: 0;
 }
-
 .button.character>.identity {
 	top: -6px;
 	left: 72px;
@@ -1584,22 +1557,18 @@ div:not(.handcards)>.card>.info>span,
 	width: calc(90% - 480px);
 	pointer-events: none
 }
-
 #control>* {
 	pointer-events: auto;
 }
-
 #control.nozoom>div {
 	transition-property: opacity
 }
-
 .control {
 	padding-top: 2px;
 	padding-bottom: 2px;
 	padding-left: 4px;
 	padding-right: 4px;
 }
-
 .control {
 	font-size: 18px;
 	white-space: nowrap;
@@ -1610,13 +1579,11 @@ div:not(.handcards)>.card>.info>span,
 .control.removing.removing2 {
 	transform: scale(0.2)
 }
-
 .control>div {
 	position: relative;
 	padding: 3px;
 	margin: 0
 }
-
 #control>div {
 	position: absolute;
 	left: 50%;
@@ -1630,30 +1597,24 @@ div:not(.handcards)>.card>.info>span,
 	right: 5px;
 	text-align: right;
 }
-
 .player>.avatar.hidden,
 .player>.avatar2.hidden {
 	pointer-events: none !important;
 }
-
 .player>.avatar>.action:not(.freecolor) {
 	text-shadow: black 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px;
 }
-
 .player:not(.current_action) .avatar>.action {
 	opacity: 0
 }
-
 #arena.chess:not(.selecting) .player.current_action .avatar>.action {
 	opacity: 0
 }
-
 .player.controlfakeme {
 	width: 100px;
 	height: 120px;
 	top: calc(100% - 140px)
 }
-
 .player.controlfakeme>.avatar {
 	width: 100%;
 	height: 100%;
@@ -1661,22 +1622,18 @@ div:not(.handcards)>.card>.info>span,
 	left: 0;
 	top: 0
 }
-
 .player {
 	z-index: 2;
 	width: 240px;
 	height: 120px;
 }
-
 .player.minskin {
 	width: 120px;
 }
-
 .player.replaceme {
 	animation: replaceme 0.5s;
 	-webkit-animation: replaceme 0.5s
 }
-
 .player.replaceenemy {
 	animation: replaceenemy 0.5s;
 	-webkit-animation: replaceenemy 0.5s
@@ -1685,7 +1642,6 @@ div:not(.handcards)>.card>.info>span,
 .player>div {
 	z-index: 2;
 }
-
 .player.dead,.player.likedead,.grayscale1 {
 	z-index: 1;
 	filter: grayscale(1);
@@ -1720,18 +1676,15 @@ div:not(.handcards)>.card>.info>span,
 	text-align: center;
 	/*opacity: 0;*/
 }
-
 .player:hover>.nameol {
 	opacity: 1;
 }
-
 .player>.name {
 	left: 16px;
 	top: 24px;
 	font-size: 20px;
 	font-family: 'xinwei';
 }
-
 .player>.name.name2 {
 	left: 81px
 }
@@ -1740,7 +1693,6 @@ div:not(.handcards)>.card>.info>span,
 	left: 13px;
 	top: 21px;
 }
-
 #arena.slim_player .player>.name.name2 {
 	left: 78px
 }
@@ -1765,7 +1717,6 @@ div:not(.handcards)>.card>.info>span,
 .button.character>.name {
 	font-family: 'xinwei'
 }
-
 .player>.intro {
 	top: 87px;
 	left: 18px;
@@ -1785,32 +1736,26 @@ div:not(.handcards)>.card>.info>span,
 	z-index: 5;
 	pointer-events: none;
 }
-
 #window>.damage {
 	transform: scale(2);
 	font-size: 120px;
 }
-
 .damage.normal-font {
 	font-family: xinwei;
 	font-size: 30px;
 	top: calc(50% - 15px);
 }
-
 .player.minskin>.damage.normal-font {
 	font-size: 26px;
 	top: calc(50% - 13px);
 }
-
 .player[data-position='0']>.damage.dieidentity,
 .player:not(.dead)>.damage.dieidentity {
 	opacity: 0 !important
 }
-
 .player>.damage.dieidentity {
 	transition-property: opacity;
 }
-
 .player>.cardeffect {
 	font-family: 'huangcao','xinwei';
 	font-size: 108px;
@@ -1823,17 +1768,14 @@ div:not(.handcards)>.card>.info>span,
 	animation-fill-mode: forwards;
 	-webkit-animation-fill-mode: forwards;
 }
-
 .player>.damage.damageadded,
 #window>.damage.damageadded {
 	opacity: 1;
 	transform: scale(1);
 }
-
 .player.linked>.damage {
 	transform: scale(0.7) rotate(90deg);
 }
-
 .player.linked>.damage.damageadded {
 	transform: scale(1) rotate(90deg);
 }
@@ -1845,7 +1787,6 @@ div:not(.handcards)>.card>.info>span,
 	top: 10px;
 	overflow: hidden;
 }
-
 .avatar2 {
 	width: 42px;
 	height: 42px;
@@ -1860,45 +1801,37 @@ div:not(.handcards)>.card>.info>span,
 	right: 14px;
 	top: 12px;
 }
-
 .equips>div {
 	width: 42px;
 	height: 42px;
 	margin: 0;
 	position: absolute;
 }
-
 .equips>.equip1 {
 	top: 0;
 	left: 0;
 }
-
 .equips>.equip2 {
 	top: 0;
 	right: 0;
 }
-
 .equips>.equip3 {
 	bottom: 0;
 	left: 0;
 }
-
 .equips>.equip4 {
 	bottom: 0;
 	right: 0;
 }
-
 .equips>.equip5 {
 	top: calc(50% - 21px);
 	left: calc(50% - 21px);
 	border-radius: 21px;
 	z-index: 1
 }
-
 .equips>div>div:not(.image),.judges>div>div:not(.image),.marks>div>div:not(.image) {
 	display: none;
 }
-
 .equips>div>.image,.judges>div>.image,.marks>div>.image {
 	width: 120%;
 	height: 120%;
@@ -1923,16 +1856,13 @@ div:not(.handcards)>.card>.info>span,
 	left: 14px;
 	top: -18px;
 }
-
 .marks {
 	left: 14px;
 	top: 112px;
 }
-
 .player>.marks {
 	z-index: 4
 }
-
 .judges>div,.marks>div {
 	width: 24px;
 	height: 24px;
@@ -1951,11 +1881,9 @@ div:not(.handcards)>.card>.info>span,
 	line-height: 14px;
 	text-align: left;
 }
-
 .hp.text {
 	top: 18px;
 }
-
 .hp>div {
 	width: 8px;
 	height: 8px;
@@ -1968,7 +1896,6 @@ div:not(.handcards)>.card>.info>span,
 	-webkit-filter: brightness(1.5);
 	transition: all 0.5s;
 }
-
 .button .hp>div {
 	width: 6px;
 	height: 6px;
@@ -1976,64 +1903,52 @@ div:not(.handcards)>.card>.info>span,
 	box-shadow: 0px 1px 1px rgba(0,0,0,0.5);
 	border: 1px solid #fff;
 }
-
 .hp[data-condition="high"]>div:not(.lost) {
 	background: rgba(57, 123, 4,1);
 	border: 1px solid rgba(39, 79, 7, 1);
 }
-
 .hp[data-condition="mid"]>div:not(.lost) {
 	background: rgba(166, 140, 6,1);
 	border: 1px solid rgba(79, 64, 7, 1);
 }
-
 .hp[data-condition="low"]>div:not(.lost) {
 	background: rgba(148, 27, 27,1);
 	border: 1px solid rgba(79, 7, 7, 1);
 }
-
 .hp.actcount>div:not(.lost) {
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(31, 82, 131, 1);
 }
-
 .treasure>.hp>div:not(.lost) {
 	background: rgba(63, 119, 173,1) !important;
 	border: 1px solid rgba(31, 82, 131, 1) !important;
 }
-
 .hp.actcount>div.overflow:not(.lost) {
 	background: rgb(154, 154, 154);
 	border: 1px solid rgb(109, 109, 109);
 }
-
 .hp.actcount.overflow2>div.overflow:not(.lost) {
 	background: rgb(173, 129, 63);
 	border: 1px solid rgb(131, 109, 31);
 }
-
 .hp.actcount>.lost {
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(31, 82, 131, 1);
 	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 }
-
 .hp>.lost {
 	background: rgba(57, 123, 4,1);
 	border: 1px solid rgba(39, 79, 7, 1);
 	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 }
-
 .hp.text[data-condition="low"] {
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px
 }
-
 .hp.text[data-condition="mid"] {
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px
 }
-
 .hp.text[data-condition="high"] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 10px
 }
@@ -2075,29 +1990,24 @@ div:not(.handcards)>.card>.info>span,
 .count.p2 {
 	right: 174px;
 }
-
 .count {
 	right: 140px;
 	top: 86px;
 	text-align: right;
 	font-size: 14px;
 }
-
 .player.minskin .count {
 	right: 20px;
 }
-
 .identity {
 	left: 90px;
 	top: 5px;
 }
-
 .identity {
 	text-align: center;
 	width: 22px;
 	height: 22px;
 }
-
 .identity>div {
 	position: relative;
 	top: 2px;
@@ -2118,27 +2028,21 @@ div:not(.handcards)>.card>.info>span,
 .player>.name_seat {
 	opacity: 0;
 }
-
 .player:not([data-position='0']).unseen.unseen2>.name_seat {
 	opacity: 1 !important;
 }
-
 .linked>.avatar,.linked>.avatar2 {
 	transform: rotate(-90deg);
 }
-
 .linked>.avatar2 {
 	top: 5px;
 }
-
 .linked>.identity {
 	top: 88px;
 }
-
 .linked>.count {
 	right: 154px;
 }
-
 .acted>.identity {
 	transform: rotate(180deg);
 }
@@ -2491,12 +2395,10 @@ div:not(.handcards)>.card>.info>span,
 	top: calc(100% - 130px);
 	left: calc(50% - 120px);
 }
-
 .card[data-position='0'] {
 	top: calc(100% - 130px);
 	left: calc(50% - 52px);
 }
-
 .popup[data-position='0'] {
 	top: calc(100% - 176px);
 	left: calc(50% - 106px);
@@ -2506,97 +2408,78 @@ div:not(.handcards)>.card>.info>span,
 	left: calc(25% - 120px);
 	top: calc(300% / 7 - 155px);
 }
-
 #window>.player.connect[data-position='1'] {
 	left: calc(50% - 60px);
 	top: calc(300% / 7 - 155px);
 }
-
 #window>.player.connect[data-position='2'] {
 	left: calc(75% - 0px);
 	top: calc(300% / 7 - 155px);
 }
-
 #window>.player.connect[data-position='3'] {
 	left: calc(25% - 120px);
 	top: calc(400% / 7 - 75px);
 }
-
 #window>.player.connect[data-position='4'] {
 	left: calc(75% - 0px);
 	top: calc(400% / 7 - 75px);
 }
-
 #window>.player.connect[data-position='5'] {
 	left: calc(25% - 120px);
 	top: calc(500% / 7 + 5px);
 }
-
 #window>.player.connect[data-position='6'] {
 	left: calc(50% - 60px);
 	top: calc(500% / 7 + 5px);
 }
-
 #window>.player.connect[data-position='7'] {
 	left: calc(75% - 0px);
 	top: calc(500% / 7 + 5px);
 }
-
 #window>.player.connect[data-position='c0'] {
 	left: calc(50% - 120px);
 	top: calc(50% - 200px)
 }
-
 #window>.player.connect[data-position='c1'] {
 	left: calc(50% - 120px);
 	top: calc(50% - 60px)
 }
-
 #window>.player.connect[data-position='c2'] {
 	left: calc(50% - 120px);
 	top: calc(50% + 80px)
 }
-
 #window>.player.connect[data-position='c0'] {
 	left: calc(50% - 140px);
 	top: calc(50% - 200px)
 }
-
 #window>.player.connect[data-position='c1'] {
 	left: calc(50% - 140px);
 	top: calc(50% - 60px)
 }
-
 #window>.player.connect[data-position='c2'] {
 	left: calc(50% - 140px);
 	top: calc(50% + 80px)
 }
-
 #window>.player.connect[data-position='c3'] {
 	left: calc(50% + 20px);
 	top: calc(50% - 200px)
 }
-
 #window>.player.connect[data-position='c4'] {
 	left: calc(50% + 20px);
 	top: calc(50% - 60px)
 }
-
 #window>.player.connect[data-position='c5'] {
 	left: calc(50% + 20px);
 	top: calc(50% + 80px)
 }
-
 #window>.player.connect {
 	width: 120px;
 }
-
 .connectbutton {
 	top: calc(400% / 7 - 35px);
 	width: 130px;
 	left: calc(50% - 70px);
 }
-
 
 /*--------动画--------*/
 .start,.equips>.card,.popup {
@@ -2730,19 +2613,15 @@ div:not(.handcards)>.card>.info>span,
 .unselectable:not(.selected):not(.removing) {
 	opacity: 0.6 !important
 }
-
 .unselectable2 {
 	opacity: 0.4 !important
 }
-
 .mark>.background {
 	opacity: 1 !important;
 }
-
 #arena.selecting:not(.video) #me .card:not(.selectable) {
 	opacity: 0.8
 }
-
 .button.character.banned,.button.card.banned {
 	opacity: 0.5
 }
@@ -2760,45 +2639,35 @@ div:not(.handcards)>.card>.info>span,
 	color: rgba(0,0,0,0.3);
 	text-shadow: none;
 }
-
 .fire {
 	color: rgba(255,0,0,0.3);
 }
-
 .thunder {
 	color: rgba(0,80,255,0.3);
 }
-
 .poison {
 	color: rgba(30, 133, 51,0.4);
 }
-
 .brown {
 	color: rgba(133, 92, 30, 0.4);
 }
-
 .purple {
 	color: rgba(177, 62, 177,0.4);
 }
-
 .player,.button.character {
 	color: white;
 	text-shadow: black 0 0 2px;
 }
-
 .turnedover>div {
 	opacity: 0.3;
 }
-
 .intro:not(.showintro) {
 	opacity: 0;
 	display: none !important
 }
-
 .intro.showintro {
 	white-space: nowrap
 }
-
 div:hover>.intro {
 	opacity: 1;
 }
@@ -2812,11 +2681,9 @@ div:hover>.intro {
 .player .identity {
 	z-index: 4
 }
-
 .info {
 	border-radius: 10px;
 }
-
 .dialog>.bar {
 	position: absolute;
 	width: 100%;
@@ -2824,15 +2691,12 @@ div:hover>.intro {
 	left: 0;
 	opacity: 0;
 }
-
 .dialog>.bar.top {
 	top: 0;
 }
-
 .dialog>.bar.bottom {
 	bottom: 0;
 }
-
 .dialog>.content-container {
 	width: 100%;
 	height: calc(100% - 0px);
@@ -2862,19 +2726,15 @@ div:hover>.intro {
 .target {
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.5) 0 0 12px, rgba(255, 0, 0, 0.8) 0 0 15px !important
 }
-
 #mebg.target {
 	transform: none !important;
 }
-
 #arena[data-target_shake='shake'] .target {
 	transform: rotate(-3deg);
 }
-
 #arena[data-target_shake='shake'] .target2 {
 	transform: rotate(3deg);
 }
-
 #arena[data-target_shake='zoom'] .target,
 #arena[data-target_shake='zoom'] .target2 {
 	transform: scale(1.03);
@@ -2883,11 +2743,9 @@ div:hover>.intro {
 .content>.config.line2 {
 	transform: translateX(-5px);
 }
-
 #sidebar2>.config:not(.line2) {
 	transform: translateX(5px);
 }
-
 .popup {
 	background: rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px;
@@ -2901,23 +2759,18 @@ div:hover>.intro {
 	border-radius: 8px;
 	color: white !important;
 }
-
 .shadowed2 {
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
-
 #window[data-radius_size='reduce'] .shadowed {
 	border-radius: 4px;
 }
-
 #window[data-radius_size='off'] .shadowed {
 	border-radius: 0px;
 }
-
 #window[data-radius_size='increase'] .shadowed {
 	border-radius: 16px;
 }
-
 #window[data-radius_size='default'] .shadowed.reduce_radius {
 	border-radius: 4px;
 }
@@ -2926,19 +2779,15 @@ div:hover>.intro {
 	left: 50%;
 	top: 50%;
 }
-
 #window>.choosedouble:not(.character) {
 	transition-duration: 0.2s;
 }
-
 #window>.choosedouble.character {
 	transform-origin: top left;
 }
-
 #window>.choosedouble.character.moved {
 	z-index: 1;
 }
-
 #window>.choosedouble.character>.name {
 	left: 6%;
 	top: 8%;
@@ -2952,19 +2801,15 @@ div:hover>.intro {
 	border-style: solid;
 	border-color: transparent;
 }
-
 .underlinenode.slim {
 	padding-bottom: 0;
 }
-
 .on>.underline,.underlinenode.on {
 	border-color: rgb(0, 133, 255);
 }
-
 .config.underlined {
 	overflow: visible;
 }
-
 .config.underlined>div {
 	border-width: 0 0 2px;
 	border-style: solid;
@@ -2976,7 +2821,6 @@ div:hover>.intro {
 	width: calc(100% - 16px);
 	display: flex;
 }
-
 .newgame>div {
 	padding: 3px;
 	position: relative;
@@ -2991,35 +2835,27 @@ div:hover>.intro {
 	display: inline-flex;
 	transition: all 0.2s;
 }
-
 #arena[data-identity_font='xiaozhuan'] .player .identity>div {
 	font-family: 'xiaozhuan';
 }
-
 #arena[data-identity_font='lishu'] .player .identity>div {
 	font-family: 'lishu';
 }
-
 #arena[data-identity_font='xinwei'] .player .identity>div {
 	font-family: 'xinwei';
 }
-
 #arena[data-identity_font='huangcao'] .player .identity>div {
 	font-family: 'huangcao','xinwei';
 }
-
 #arena[data-cardtext_font='xiaozhuan'] .card div:not(.info):not(.background) {
 	font-family: 'xiaozhuan';
 }
-
 #arena[data-cardtext_font='lishu'] .card div:not(.info):not(.background) {
 	font-family: 'lishu';
 }
-
 #arena[data-cardtext_font='xinwei'] .card div:not(.info):not(.background) {
 	font-family: 'xinwei';
 }
-
 #arena[data-cardtext_font='huangcao'] .card div:not(.info):not(.background) {
 	font-family: 'huangcao','xinwei';
 }
@@ -3031,12 +2867,10 @@ div:hover>.intro {
 	font-size: 24px;
 	top: 0;
 }
-
 .player .identity.animate {
 	animation: identity 0.8s;
 	-webkit-animation: identity 0.8s;
 }
-
 .player .identity[data-color="zhu"],
 .player .identity[data-color="truezhu"],
 .player .identity[data-color="enemy"],
@@ -3052,6 +2886,10 @@ span[data-nature='firem'] {
 		rgba(232, 53, 53,1) 0 0 5px,black 0 0 1px;
 }
 
+.player .identity[data-color="mingzhong"] {
+	text-shadow: black 0 0 1px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 10px,
+		rgba(255, 120, 0,1) 0 0 10px
+}
 .player .identity[data-color="zhong"],
 .player .identity[data-color="qun"],
 .player .identity[data-color="neutral"],
@@ -3061,18 +2899,11 @@ span[data-nature='metal'] {
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px,
 		rgba(255, 203, 0,1) 0 0 10px
 }
-
-.player .identity[data-color="mingzhong"] {
-	text-shadow: black 0 0 1px,rgba(255, 120, 0,1) 0 0 2px,rgba(255, 120, 0,1) 0 0 5px,rgba(255, 120, 0,1) 0 0 10px,
-		rgba(255, 120, 0,1) 0 0 10px
-}
-
 div[data-nature='metalm'],
 span[data-nature='metalm'] {
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 5px,
 		rgba(255, 203, 0,1) 0 0 5px,black 0 0 1px;
 }
-
 div[data-nature='metalmm'],
 span[data-nature='metalmm'] {
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 2px,
@@ -3086,7 +2917,6 @@ span[data-nature='thunder'] {
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 10px,
 		rgba(100, 74, 139,1) 0 0 10px,rgba(100, 74, 139,1) 0 0 20px,rgba(100, 74, 139,1) 0 0 20px,black 0 0 1px;
 }
-
 div[data-nature='thunderm'],
 span[data-nature='thunderm'] {
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 5px,
@@ -3100,13 +2930,11 @@ span[data-nature='wood'] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 10px,
 		rgba(57, 123, 4,1) 0 0 10px,rgba(57, 123, 4,1) 0 0 20px,rgba(57, 123, 4,1) 0 0 20px,black 0 0 1px;
 }
-
 div[data-nature='woodm'],
 span[data-nature='woodm'] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 5px,
 		rgba(57, 123, 4,1) 0 0 5px,black 0 0 1px;
 }
-
 div[data-nature='woodmm'],
 span[data-nature='woodmm'] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,
@@ -3123,13 +2951,11 @@ span[data-nature='water'] {
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 10px,
 		rgba(78, 117, 140,1) 0 0 10px,rgba(78, 117, 140,1) 0 0 20px,rgba(78, 117, 140,1) 0 0 20px,black 0 0 1px;
 }
-
 div[data-nature='waterm'],
 span[data-nature='waterm'] {
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 5px,
 		rgba(78, 117, 140,1) 0 0 5px,black 0 0 1px;
 }
-
 div[data-nature='watermm'],
 span[data-nature='watermm'] {
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 2px,
