@@ -55,7 +55,7 @@ character.shenhua={
 			},
 			selectCard:[0,Infinity],
 			selectTarget:2,
-			complexTarget:true,
+			complexCard:true,
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				if(ui.selected.targets.length==0) return true;
@@ -887,7 +887,6 @@ character.shenhua={
 							return target.num('ej')>0;
 						}
 					},
-					complexTarget:true,
 					selectTarget:2,
 					filterCard:lib.filter.cardDiscardable,
 					prompt:'是否发动巧变跳过出牌阶段？',
@@ -2079,7 +2078,7 @@ character.shenhua={
 			},
 			selectCard:[0,Infinity],
 			selectTarget:2,
-			complexTarget:true,
+			complexCard:true,
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				if(ui.selected.targets.length==0) return true;

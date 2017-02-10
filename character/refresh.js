@@ -1358,7 +1358,6 @@ character.refresh={
 				}
 				return target.num('he')>0;
 			},
-			complexTarget:true,
 			filter:function(event,player){
 				return player.num('he')>0;
 			},

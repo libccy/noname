@@ -6986,7 +6986,6 @@ character.swd={
 				return true;
 			},
 			complexCard:true,
-			complexTarget:true,
 			selectCard:[1,Infinity],
 			filterTarget:function(card,player,target){
 				if(player==target) return false;

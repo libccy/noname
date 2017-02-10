@@ -2336,7 +2336,6 @@ character.yxs={
 				return 7-ai.get.value(card);
 			},
 			multitarget:true,
-			complexTarget:true,
 			targetprompt:['被移走','移动目标'],
 			filterTarget:function(card,player,target){
 				if(ui.selected.targets.length){

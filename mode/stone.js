@@ -4170,7 +4170,6 @@ mode.stone={
 				}
 				return true;
 			},
-			complexTarget:true,
 			selectTarget:2,
 			multitarget:true,
 			multiline:true,

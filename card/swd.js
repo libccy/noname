@@ -1187,16 +1187,36 @@ card.swd={
 				}
 			},
 			ai:{
-				order:1,
+				order:4,
 				result:{
 					target:function(player,target){
 						if(target.get('e','2')){
-							if(target.num('h')) return -0.6;
+							if(target.num('h')&&!target.hasSkillTag('noe')) return -0.6;
 							return 0;
 						}
 						else{
-							if(target.num('h')) return 0.5;
-							return 1;
+							var hs=target.get('h');
+							var num=0;
+							if(target.hasSkillTag('noe')){
+								num=1;
+							}
+							if(player==target){
+								if(hs.length==2) return num;
+								if(hs.length==1) return num+1;
+								if(hs.length<=4){
+									for(var i=0;i<hs.length;i++){
+										if(ai.get.value(hs[i])>6) return num;
+									}
+								}
+								if(hs.length>4) return num+0.5;
+							}
+							else{
+								if(hs.length){
+									if(hs.length<=3) return num;
+									return num+0.5;
+								}
+							}
+							return num+1;
 						}
 					}
 				},
@@ -1229,7 +1249,7 @@ card.swd={
 				order:9,
 				result:{
 					target:function(player,target){
-						if(target.num('h')<target.hp) return 1;
+						if(!player.needsToDiscard()) return 1;
 						return 0;
 					}
 				},
@@ -1257,7 +1277,19 @@ card.swd={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('noe')) return target.num('e')*2;
-						return -target.num('e');
+						var num=0;
+						var es=target.get('e');
+						for(var i=0;i<es.length;i++){
+							var subtype=get.subtype(es[i]);
+							if(subtype=='equip1'||subtype=='equip3'){
+								num++;
+							}
+						}
+						var mn=target.getEquip('muniu');
+						if(mn&&mn.cards&&mn.cards.length){
+							num+=mn.cards.length;
+						}
+						return -num;
 					}
 				},
 				useful:[2,0.5],
@@ -1285,7 +1317,7 @@ card.swd={
 				target.addTempSkill('qianxing',{player:'turnOverAfter'});
 			},
 			ai:{
-				order:9,
+				order:2,
 				result:{
 					target:-1,
 				},
@@ -4110,10 +4142,7 @@ card.swd={
 				}
 			},
 			ai:{
-				order:function(card,player){
-					if(player.num('h',{type:'hslingjian'})) return 8.5;
-					return 1;
-				},
+				order:1,
 				result:{
 					player:1,
 				}

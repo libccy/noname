@@ -1536,7 +1536,6 @@ character.standard={
 			check:function(card){return 10-ai.get.value(card)},
 			filterCard:true,
 			position:'he',
-			complexTarget:true,
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
 				if(target.sex!='male') return false;

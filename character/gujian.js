@@ -776,21 +776,21 @@ character.gujian={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseToDiscard(get.prompt('fumo',trigger.source),2,function(card){
+				var next=player.chooseToDiscard(get.prompt('fumo',trigger.source),2,function(card){
 					if(ui.selected.cards.length){
 						return get.color(card)==get.color(ui.selected.cards[0]);
 					}
 					return player.num('h',{color:get.color(card)})>1;
-				}).set('complexCard',true).ai=function(card){
+				}).set('complexCard',true);
+				next.ai=function(card){
 					if(ai.get.damageEffect(trigger.source,player,player,'thunder')>0){
 						return 8-ai.get.value(card);
 					}
 					return 0;
 				};
+				next.logSkill=['fumo',trigger.source,'thunder'];
 				"step 1"
 				if(result.bool){
-					player.logSkill('fumo',trigger.source,'thunder');
-					// player.line(trigger.source,'thunder');
 					trigger.source.damage('thunder');
 				}
 			},

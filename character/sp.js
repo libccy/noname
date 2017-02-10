@@ -1076,7 +1076,6 @@ character.sp={
 			init:function(player){
 				player.storage.jianshu=false;
 			},
-			complexTarget:true,
 			filterTarget:function(card,player,target){
 				if(ui.selected.targets.length){
 					return target.num('h')>0&&target.distanceTo(ui.selected.targets[0])<=1;
@@ -6483,6 +6482,7 @@ character.sp={
 			position:'he',
 			selectCard:[1,Infinity],
 			complexSelect:true,
+			complexCard:true,
 			filterTarget:function(card,player,target){
 				return target!=player&&get.distance(player,target,'attack')<=1&&ui.selected.cards.length==target.hp;
 			},

@@ -20504,59 +20504,63 @@
 					var cards=player.get(event.position||'h');
 					var firstCheck=false;
 					range=get.select(event.selectCard);
-					if(!event._cardChoice&&typeof event.selectCard!='function'){
-						if(range[0]==1&&range[1]==1){
-							event._cardChoice=[];
-						}
-						else if(typeof event.filterCard!='function'){
-							event._cardChoice=[];
-						}
-						else if(!event.complexCard){
-							event._cardChoice=[];
-						}
-						if(event._cardChoice){
-							firstCheck=true;
-						}
+					if(!event._cardChoice&&typeof event.selectCard!='function'&&!event.complexCard&&range[1]!=-1){
+						event._cardChoice=[];
+						firstCheck=true;
 					}
+					// if(event.name=='chooseToUse'&&event.parent.name=='phaseUse'&&!event.skill&&
+					// 	!event._targetChoice&&event._cardChoice&&event._cardChoice.length){
+					// 	event._targetChoice=new Map();
+					// 	var tmpselect=ui.selected;
+					// 	for(var i=0;i<event._cardChoice.length;i++){
+					// 		var targets=[];
+					// 		if(!lib.card[event._cardChoice[i].name].complexTarget){
+					// 			ui.selected={buttons:[],cards:[event._cardChoice[i]],targets:[]};
+					// 			for(var j=0;j<game.players.length;j++){
+					// 				if(event.filterTarget(event._cardChoice[i],,game.players[i]))
+					// 			}
+					// 		}
+					// 	}
+					// }
                     var selectableCards=false;
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<cards.length;i++){
-						if(event._cardChoice&&!firstCheck){
-							if(ui.selected.cards.length>=range[1]||
-							!event._cardChoice.contains(cards[i])||
-							!lib.filter.cardAiIncluded(cards[i])){
-								cards[i].classList.remove('selectable');
-							}
-							else{
-								cards[i].classList.add('selectable');
+						var nochess=true;
+						if(!lib.filter.cardAiIncluded(cards[i])){
+							nochess=false;
+						}
+						else if(event._cardChoice&&!firstCheck){
+							if(!event._cardChoice.contains(cards[i])){
+								nochess=false;
 							}
 						}
 						else{
-							if(event.filterCard(cards[i],player)&&
-							lib.filter.cardAiIncluded(cards[i])&&
-							(player.isOut()==false||event.includeOutCard)&&
-							lib.filter.cardRespondable(cards[i],player)&&
-	                        !cards[i].classList.contains('uncheck')){
-								if(ui.selected.cards.length<range[1]){
-									cards[i].classList.add('selectable');
-									if(event._cardChoice){
-										event._cardChoice.push(cards[i]);
-									}
+							if(player.isOut()||!lib.filter.cardRespondable(cards[i],player)||
+	                        cards[i].classList.contains('uncheck')||
+							!event.filterCard(cards[i],player)){
+								nochess=false;
+							}
+						}
+						if(nochess){
+							if(ui.selected.cards.length<range[1]){
+								cards[i].classList.add('selectable');
+								if(event._cardChoice){
+									event._cardChoice.push(cards[i]);
 								}
-								else if(range[1]==-1){
-									cards[i].classList.add('selected');
-									ui.selected.cards.add(cards[i]);
-								}
-								else{
-									cards[i].classList.remove('selectable');
-								}
+							}
+							else if(range[1]==-1){
+								cards[i].classList.add('selected');
+								ui.selected.cards.add(cards[i]);
 							}
 							else{
 								cards[i].classList.remove('selectable');
-								if(range[1]==-1){
-									cards[i].classList.remove('selected');
-									ui.selected.cards.remove(cards[i]);
-								}
+							}
+						}
+						else{
+							cards[i].classList.remove('selectable');
+							if(range[1]==-1){
+								cards[i].classList.remove('selected');
+								ui.selected.cards.remove(cards[i]);
 							}
 						}
 						if(cards[i].classList.contains('selected')){
@@ -20582,20 +20586,33 @@
 				}
 				else{
 					var card=get.card();
+					var firstCheck=false;
 					range=get.select(event.selectTarget);
                     var selectableTargets=false;
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<game.players.length;i++){
 						var nochess=true;
-						if(game.chess&&!event.chessForceAll){
-							if(player&&get.distance(player,game.players[i],'pure')>7){
+						if(game.chess&&!event.chessForceAll&&player&&get.distance(player,game.players[i],'pure')>7){
+							nochess=false;
+						}
+						else if(game.players[i].isOut()){
+							nochess=false;
+						}
+						else if(event._targetChoice){
+							var targetChoice=event.targetChoice.get(card);
+							if(!Array.isArray(targetChoice)||!targetChoice.contains(game.players[i])){
 								nochess=false;
 							}
 						}
-						if(event.filterTarget(card,player,game.players[i])&&!game.players[i].forceout&&
-							(game.players[i].isOut()==false||event.includeOutTarget)&&nochess){
+						else if(!event.filterTarget(card,player,game.players[i])){
+							nochess=false;
+						}
+						if(nochess){
 							if(ui.selected.targets.length<range[1]){
 								game.players[i].classList.add('selectable');
+								if(Array.isArray(event._targetChoice)){
+									event._targetChoice.push(game.players[i]);
+								}
 							}
 							else if(range[1]==-1){
 								game.players[i].classList.add('selected');
@@ -20615,9 +20632,9 @@
 						if(game.players[i].classList.contains('selected')){
 							game.players[i].classList.add('selectable');
 						}
-                        else if(!selectableTargets&&game.players[i].classList.contains('selectable')){
-                            selectableTargets=true;
-                        }
+						else if(!selectableTargets&&game.players[i].classList.contains('selectable')){
+							selectableTargets=true;
+						}
 						if(game.players[i].instance){
 							if(game.players[i].classList.contains('selected')){
 								game.players[i].instance.classList.add('selected');
@@ -32906,6 +32923,23 @@
 	};
 	var get={
         is:{
+			node:function(obj){
+				var str=Object.prototype.toString.call(obj);
+				if(str&&str.indexOf('[object HTML')) return true;
+				return false;
+			},
+			div:function(obj){
+				return Object.prototype.toString.call(obj) === '[object HTMLDivElement]';
+			},
+			map:function(obj){
+				return Object.prototype.toString.call(obj) === '[object Map]';
+			},
+			set:function(obj){
+				return Object.prototype.toString.call(obj) === '[object Set]';
+			},
+			object:function(obj){
+				return Object.prototype.toString.call(obj) === '[object Object]';
+			},
 			singleSelect:function(func){
 				if(typeof func=='function') return false;
 				var select=get.select(func);
