@@ -32827,6 +32827,11 @@
 	};
 	var get={
         is:{
+			singleSelect:function(func){
+				if(typeof func=='function') return false;
+				var select=get.select(func);
+				return select[0]==1&&select[1]==1;
+			},
 			versus:function(){
 				return !_status.connectMode&&get.mode()=='versus'&&_status.mode=='three';
 			},
@@ -32940,27 +32945,42 @@
         },
         benchmark:function(func1,func2,iteration,arg){
             var tic,toc;
+			var key1,key2;
             if(!arg) arg=[];
             if(Array.isArray(func2)){
-                var key1=func2[0],key2=func2[1];
-                func2=func1[key2];
-                func1=func1[key1];
+                key1=func2[0];
+				key2=func2[1];
             }
-			if(typeof func2=='number'){
+			else if(typeof func2=='string'){
+				key1=func2;
+				func2=iteration||100;
+			}
+			else if(typeof func2=='number'){
+				arg=iteration||arg;
 				iteration=func2;
 			}
             tic=get.utc();
             for(var i=0;i<iteration;i++){
-                func1(arg.randomGet());
+				if(key1){
+					func1[key1](arg.randomGet());
+				}
+				else{
+					func1(arg.randomGet());
+				}
             }
             toc=get.utc();
-            console.log('time1: '+(toc-tic));
 			if(typeof func2=='number'){
 				return toc-tic;
 			}
+            console.log('time1: '+(toc-tic));
             tic=get.utc();
             for(var i=0;i<iteration;i++){
-                func2(arg.randomGet());
+				if(key2){
+					func1[key2](arg.randomGet());
+				}
+				else{
+					func2(arg.randomGet());
+				}
             }
             toc=get.utc();
             console.log('time2: '+(toc-tic));
