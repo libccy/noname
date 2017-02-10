@@ -42,12 +42,10 @@ table {
 	transition-property: opacity;
 	overflow: hidden
 }
-
 #window.ipad {
 	height: calc(100% - 15px);
 	top: 15px;
 }
-
 #window>.tutorial_tap {
 	width: 30px;
 	height: 30px;
@@ -59,39 +57,30 @@ table {
 	position: absolute;
 	transition: all 1s;
 }
-
 #window.modepaused>div:not(.modenopause):not(#arena):not(.popped) {
 	opacity: 0.3;
 }
-
 #window.modepaused>#arena>#roundmenu {
 	opacity: 0.3;
 }
-
 #window.shortcutpaused.modepaused>.modenopause.popup-container:not(.filter-character) {
 	opacity: 0.3;
 }
-
 #window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(.dialog):not(.centermenu):not(.popup-container) {
 	opacity: 0.3 !important
 }
-
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden):not(#autonode) {
 	opacity: 0.3 !important
 }
-
 #window.systempaused>#system {
 	opacity: 0.3 !important;
 }
-
 #window.noclick_important * {
 	pointer-events: none !important;
 }
-
 #window.noclick_important .noclick_click_important div {
 	pointer-events: auto !important
 }
-
 #window.blur_ui #arena.paused,
 #window.blur_ui #arena.menupaused,
 #window.blur_ui #historybar.paused,
@@ -103,12 +92,10 @@ table {
 	filter: blur(3px);
 	-webkit-filter: blur(3px);
 }
-
 #window.blur_ui #arena.menupaused,
 #window.blur_ui #historybar.menupaused {
 	opacity: 0.6;
 }
-
 #window.blur_ui #arena.thrownhighlight>.card.thrown:not(.thrownhighlight) {
 	filter: blur(2px);
 	-webkit-filter: blur(2px);
@@ -126,7 +113,6 @@ table {
 	display: block;
 	font-family: 'xinwei'
 }
-
 #shortcut {
 	width: 100%;
 	height: 100%;
@@ -136,7 +122,6 @@ table {
 	z-index: 10;
 	/*background-color: rgba(0, 0, 0, 0.6);*/
 }
-
 #shortcut>div {
 	width: 80px;
 	height: 80px;
@@ -150,7 +135,6 @@ table {
 	letter-spacing: -6px;
 	transform: scale(1.3);
 }
-
 #shortcut>div:not(.menubutton) {
 	width: 100%;
 	height: 80px;
@@ -159,55 +143,44 @@ table {
 	left: 0;
 	top: 0;
 }
-
 #shortcut>div>span {
 	width: 200px;
 	left: -63px;
 	position: relative;
 	display: inline-block;
 }
-
 #shortcut>div[data-position="1"] {
 	left: calc(50% - 50px);
 	top: calc(50% - 190px);
 }
-
 #shortcut.hidden>div[data-position="1"] {
 	transform: scale(1) translateY(150px);
 }
-
 #shortcut>div[data-position="2"] {
 	left: calc(50% + 100px);
 	top: calc(50% - 40px);
 }
-
 #shortcut.hidden>div[data-position="2"] {
 	transform: scale(1) translateX(-150px);
 }
-
 #shortcut>div[data-position="3"] {
 	left: calc(50% - 50px);
 	top: calc(50% + 110px);
 }
-
 #shortcut.hidden>div[data-position="3"] {
 	transform: scale(1) translateY(-150px);
 }
-
 #shortcut>div[data-position="4"] {
 	left: calc(50% - 200px);
 	top: calc(50% - 40px);
 }
-
 #shortcut.hidden>div[data-position="4"] {
 	transform: scale(1) translateX(150px);
 }
-
 #shortcut>div[data-position="5"] {
 	left: calc(50% - 50px);
 	top: calc(50% - 50px);
 }
-
 #shortcut.hidden {
 	pointer-events: none;
 	transition: opacity 0.3s;
@@ -225,11 +198,9 @@ table {
 	overflow-x: scroll;
 	white-space: nowrap;
 }
-
 #splash.removing {
 	pointer-events: none;
 }
-
 #splash>div {
 	width: 100px;
 	height: 300px;
@@ -239,37 +210,29 @@ table {
 	position: relative;
 	transition: all 0.8s;
 }
-
 #splash>div:first-child {
 	margin-left: 20px;
 }
-
 #splash>div:last-child {
 	margin-right: 20px;
 }
-
 #splash:not(.touch)>div:hover:not(.clicked) {
 	transform: translateY(-20px);
 }
-
 #splash>div.clicked {
 	transform: translateY(-20px) scale(1.5);
 	transition: all 0.3s;
 	opacity: 0;
 }
-
 #splash>div.hidden {
 	transform: translateY(-300px) scale(0.5);
 }
-
 #splash.low_performance>div.hidden {
 	transform: scale(0.8);
 }
-
 #splash.low_performance>div {
 	transition: all 0.5s;
 }
-
 #splash>div>.splashtext {
 	font-family: 'huangcao','xinwei';
 	font-size: 50px;
@@ -278,7 +241,6 @@ table {
 	bottom: 7px;
 	z-index: 1;
 }
-
 #splash>div>.avatar {
 	width: 86px;
 	height: calc(100% - 14px);
@@ -290,15 +252,12 @@ table {
 #arena[data-global_font='xiaozhuan'] {
 	font-family: 'xiaozhuan';
 }
-
 #arena[data-global_font='lishu'] {
 	font-family: 'lishu';
 }
-
 #arena[data-global_font='xinwei'] {
 	font-family: 'xinwei';
 }
-
 #arena[data-global_font='huangcao'] {
 	font-family: 'huangcao','xinwei';
 }
@@ -320,11 +279,9 @@ table {
 #arena.chess>#arenalog {
 	display: none !important;
 }
-
 #arena.observe .handcards>.card>div {
 	opacity: 0 !important;
 }
-
 #arenalog {
 	width: calc(50% - 210px);
 	height: calc(100% - 370px);
@@ -332,29 +289,23 @@ table {
 	top: 200px;
 	overflow: hidden;
 }
-
 #arenalog.withdialog {
 	opacity: 0.5;
 }
-
 #arena:not(.oldlayout)>#arenalog[data-position="center"] {
 	left: calc(25% + 105px);
 }
-
 #arena:not(.oldlayout)>#arenalog[data-position="left"] {
 	left: 150px;
 }
-
 #arena.oldlayout>#arenalog {
 	top: 160px;
 	width: calc(50% - 300px);
 	height: calc(100% - 325px);
 }
-
 #arena.oldlayout>#arenalog[data-position="center"] {
 	left: calc(25% + 150px);
 }
-
 #arena.oldlayout>#arenalog[data-position="left"] {
 	left: 240px;
 }
@@ -366,7 +317,6 @@ table {
 	left: 20px;
 	line-height: 18px;
 }
-
 #arena:not(.low_performance) #arenalog>div {
 	-webkit-animation: game_start 0.5s;
 }
@@ -388,34 +338,27 @@ table {
 	top: calc(5% + 10px);
 	left: 3%;
 }
-
 #arena.right:not(.noleft) {
 	left: 240px;
 	opacity: 0.6;
 }
-
 #arena.left:not(.noleft) {
 	left: calc(10% - 240px);
 	opacity: 0.6;
 }
-
 #window.leftbar #arena:not(.chess) {
 	left: calc(3% + 50px);
 	width: calc(94% - 50px);
 }
-
 #window.rightbar #arena:not(.chess) {
 	width: calc(94% - 50px);
 }
-
 #arena.top {
 	top: -100%;
 }
-
 #arena.paused,#arena.unfocus,#historybar.paused {
 	opacity: 0.3 !important;
 }
-
 #arena.paused2 {
 	opacity: 0.1 !important;
 }
@@ -434,17 +377,14 @@ table {
 	opacity: 0 !important;
 	pointer-events: none !important;
 }
-
 #arena>canvas {
 	z-index: 10;
 	pointer-events: none;
 	position: absolute;
 }
-
 #arena.playerfocus>div:not(#timer):not(.playerfocus):not(#chess-container):not(.removing):not(#autonode) {
 	opacity: 0.3 !important;
 }
-
 #arena.playerfocus #chess>div:not(.playerfocus):not(.removing) {
 	opacity: 0.3 !important;
 }
@@ -461,11 +401,9 @@ table {
 	z-index: 2;
 	transition-property: opacity,visibility;
 }
-
 #historybar.hidden {
 	pointer-events: none;
 }
-
 #historybar>div {
 	width: 42px;
 	height: 42px;
@@ -474,12 +412,10 @@ table {
 	display: block;
 	position: relative;
 }
-
 #historybar>div:not(.nozoom) {
 	animation: history_start 0.5s;
 	-webkit-animation: history_start 0.5s;
 }
-
 #historybar>div>.card {
 	transform: scale(0.403846);
 	transform-origin: top left;
@@ -488,7 +424,6 @@ table {
 	top: 4px;
 	position: absolute;
 }
-
 #historybar>div>.avatar {
 	padding: 0;
 	margin: 0;
@@ -499,7 +434,6 @@ table {
 	height: 42px;
 	border-radius: 3.230768px;
 }
-
 #historybar>div>.avatar>div {
 	position: absolute;
 	margin: 0;
@@ -512,13 +446,11 @@ table {
 	text-align: center;
 	width: 100%;
 }
-
 #historybar>div>.avatar>.avatarbg {
 	bottom: 0;
 	height: 100%;
 	background-size: cover;
 }
-
 #historybar>div>.avatar2 {
 	width: 20px;
 	height: 20px;
@@ -552,26 +484,21 @@ table {
 	left: 0;
 	text-align: center;
 }
-
 .player:not(.treasure).playerfocus {
 	transform: scale(1.1);
 }
-
 .player.linked:not(.treasure).playerfocus {
 	transform: scale(1.1) rotate(-90deg);
 }
-
 .player.connect>div:not(.avatar):not(.name):not(.nameol):not(.hp.room):not(.gaming) {
 	display: none !important;
 }
-
 .player.connect>.gaming {
 	left: 16px;
 	top: auto;
 	bottom: 16px;
 	font-family: 'xinwei'
 }
-
 #arena #me>div>div>.card {
 	position: absolute;
 	left: 8px;
@@ -590,11 +517,9 @@ table {
 	transition-property: opacity;
 	overflow: hidden;
 }
-
 #arena:not(.phone) #roundmenu {
 	display: none !important;
 }
-
 #roundmenu>div {
 	width: 26px;
 	height: 4px;
@@ -604,7 +529,6 @@ table {
 	border-radius: 2px;
 	box-shadow: black 0 0 2px;
 }
-
 #roundmenu.clock>div:nth-of-type(1) {
 	width: 2px;
 	height: 2px;
@@ -612,7 +536,6 @@ table {
 	top: 2px;
 	opacity: 1;
 }
-
 #roundmenu.clock>div:nth-of-type(2) {
 	width: 2px;
 	height: 2px;
@@ -620,7 +543,6 @@ table {
 	top: 46px;
 	opacity: 1;
 }
-
 #roundmenu.clock>div:nth-of-type(3) {
 	width: 2px;
 	height: 2px;
@@ -628,7 +550,6 @@ table {
 	left: 2px;
 	opacity: 1;
 }
-
 #roundmenu.clock>div:nth-of-type(4) {
 	width: 2px;
 	height: 2px;
@@ -636,7 +557,6 @@ table {
 	left: 46px;
 	opacity: 1;
 }
-
 #roundmenu.clock>div:nth-of-type(5) {
 	width: 2px;
 	height: 2px;
@@ -646,7 +566,6 @@ table {
 	transform: rotate(30deg);
 	transform-origin: 1px 23px;
 }
-
 #roundmenu.clock>div:nth-of-type(9) {
 	width: 2px;
 	height: 2px;
@@ -656,7 +575,6 @@ table {
 	transform: rotate(60deg);
 	transform-origin: 1px 23px;
 }
-
 #roundmenu.clock>div:nth-of-type(6) {
 	width: 2px;
 	height: 2px;
@@ -666,7 +584,6 @@ table {
 	transform: rotate(30deg);
 	transform-origin: 1px -23px;
 }
-
 #roundmenu.clock>div:nth-of-type(10) {
 	width: 2px;
 	height: 2px;
@@ -676,7 +593,6 @@ table {
 	transform: rotate(60deg);
 	transform-origin: 1px -23px;
 }
-
 #roundmenu.clock>div:nth-of-type(7) {
 	width: 2px;
 	height: 2px;
@@ -686,7 +602,6 @@ table {
 	transform: rotate(30deg);
 	transform-origin: 23px 1px;
 }
-
 #roundmenu.clock>div:nth-of-type(11) {
 	width: 2px;
 	height: 2px;
@@ -696,7 +611,6 @@ table {
 	transform: rotate(60deg);
 	transform-origin: 23px 1px;
 }
-
 #roundmenu.clock>div:nth-of-type(8) {
 	width: 2px;
 	height: 2px;
@@ -706,7 +620,6 @@ table {
 	transform: rotate(30deg);
 	transform-origin: -23px 1px;
 }
-
 #roundmenu.clock>div:nth-of-type(12) {
 	width: 2px;
 	height: 2px;
@@ -716,7 +629,6 @@ table {
 	transform: rotate(60deg);
 	transform-origin: -23px 1px;
 }
-
 #roundmenu.clock>div:nth-of-type(13) {
 	width: 22px;
 	height: 2px;
@@ -725,7 +637,6 @@ table {
 	transform-origin: 1px 1px;
 	border-radius: 4px 40px 40px 4px/4px 4px 4px 4px;
 }
-
 #roundmenu.clock>div:nth-of-type(14) {
 	width: 16px;
 	height: 4px;
@@ -734,7 +645,6 @@ table {
 	transform-origin: 2px 2px;
 	border-radius: 4px 23px 23px 4px/4px 4px 4px 4px;
 }
-
 #roundmenu.clock>div:nth-of-type(15) {
 	width: 80%;
 	height: 80%;
@@ -761,7 +671,6 @@ table {
 #roundmenu.clock[data-watchface="simple"]>div:nth-of-type(12) {
 	opacity: 0;
 }
-
 #roundmenu.clock[data-watchface="simple"]>div:nth-of-type(15) {
 	opacity: 1;
 }
@@ -770,7 +679,6 @@ table {
 	width: 20px;
 	left: 18px;
 }
-
 #roundmenu:not(.clock)>div:nth-of-type(odd) {
 	width: 4px;
 }
@@ -811,18 +719,15 @@ table {
 	box-shadow: rgba(0,0,0,0.5) 0 0 2px;
 	transform-origin: top center;
 }
-
 #me,#mebg {
 	width: 100%;
 	height: 140px;
 	top: calc(100% - 140px);
 	left: 0;
 }
-
 #mebg {
 	z-index: -1
 }
-
 #autonode {
 	z-index: 10;
 	width: 100%;
@@ -835,20 +740,16 @@ table {
 	font-family: 'xinwei';
 	text-shadow: black 0 0 10px
 }
-
 #arena:not(.chess):not(.mobile)>#autonode {
 	display: none
 }
-
 #arena:not(.auto)>#autonode {
 	opacity: 0;
 	pointer-events: none
 }
-
 #arena.auto #handcards1,#arena.auto #handcards2 {
 	opacity: 0.5
 }
-
 #autonode>div {
 	display: table-cell;
 	vertical-align: middle;
@@ -861,24 +762,20 @@ table {
 	padding: 10px;
 	text-align: left;
 }
-
 #handcards1,#handcards2 {
 	white-space: nowrap;
 	overflow-x: visible;
 	overflow-y: visible;
 	display: block;
 }
-
 #handcards1.scrollh,#handcards2.scrollh {
 	overflow-x: scroll;
 	overflow-y: hidden
 }
-
 #handcards1 {
 	left: 0;
 	top: calc(100% - 140px);
 }
-
 #handcards2 {
 	left: calc(50% + 120px);
 	top: calc(100% - 140px);
@@ -891,21 +788,17 @@ table {
 	margin-left: 2px;
 	margin-right: 10px;
 }
-
 #arena:not(.mobile):not(.single-handcard):not(.chess) #handcards1>div,
 #arena:not(.mobile):not(.single-handcard):not(.chess) #handcards2>div {
 	left: -10px;
 }
-
 #arena.single-handcard #handcards1 {
 	width: calc(100% - 120px);
 	left: 120px;
 }
-
 #arena:not(.mobile).single-handcard #handcards1 {
 	width: calc(100% - 140px);
 }
-
 #arena.single-handcard #handcards2 {
 	display: none;
 }
@@ -917,23 +810,19 @@ table {
 	z-index: 3;
 	pointer-events: none
 }
-
 #system>div {
 	height: 100%;
 	position: relative;
 	margin: 0;
 	padding: 0;
 }
-
 #system>div>div {
 	pointer-events: auto
 }
-
 #system>div:last-child {
 	text-align: right;
 	float: right
 }
-
 #system>div>div {
 	position: relative;
 	padding-top: 6px;
@@ -952,13 +841,11 @@ table {
 	height: 100%;
 	z-index: 5;
 }
-
 #paused2 {
 	font-size: 30px;
 	top: calc(50% - 17px);
 	left: calc(50% - 45px);
 }
-
 #sidebar,#sidebar2,#sidebar3 {
 	left: 0;
 	top: 0;
@@ -969,15 +856,12 @@ table {
 	overflow-y: scroll;
 	z-index: 6;
 }
-
 #sidebar3 {
 	text-align: right
 }
-
 #paused>#sidebar.right,#sidebar2.right,#sidebar3 {
 	left: calc(100% - 240px);
 }
-
 #sidebar3.left {
 	left: 0;
 	text-align: left;
@@ -987,22 +871,18 @@ table {
 .dialog.popped #sidebar2 {
 	padding: 0;
 }
-
 .dialog .poppedpile {
 	width: 100%;
 	padding-bottom: 10px;
 }
-
 .dialog .poppedpile>div {
 	display: block;
 	position: relative;
 }
-
 .dialog.character>.content-container {
 	width: calc(100% - 136px);
 	left: 136px;
 }
-
 .dialog.character>.packnode {
 	width: 136px;
 	left: 0;
@@ -1010,16 +890,13 @@ table {
 	position: absolute;
 	overflow: scroll;
 }
-
 .dialog.choose-character>.content-container {
 	width: calc(100% - 106px);
 	left: 106px;
 }
-
 .dialog.choose-character>.packnode {
 	width: 106px;
 }
-
 .dialog.character>.packnode>div {
 	/*box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
@@ -1037,7 +914,6 @@ table {
 	white-space: nowrap;
 	position: relative;
 }
-
 .dialog.character>.packnode>div:last-child {
 	margin-bottom: 9px;
 }
@@ -1048,23 +924,18 @@ table {
 	display: block;
 	min-height: 5px;
 }
-
 #scrollzone1 {
 	left: 0;
 }
-
 #scrollzone2 {
 	left: calc(50% - 140px);
 }
-
 #scrollzone3 {
 	right: calc(50% - 140px);
 }
-
 #scrollzone4 {
 	right: 0;
 }
-
 .scrollzone {
 	width: 20px;
 	height: 140px;
@@ -1074,11 +945,9 @@ body>.background.paused {
 	filter: blur(3px);
 	-webkit-filter: blur(3px);
 }
-
 body>.background {
 	z-index: -5
 }
-
 body>.background.upper {
 	z-index: -4
 }
@@ -1086,11 +955,9 @@ body>.background.upper {
 .popup {
 	padding: 5px;
 }
-
 .forcehide {
 	display: none !important;
 }
-
 .removing,.hidden {
 	opacity: 0 !important;
 }
@@ -1098,15 +965,12 @@ body>.background.upper {
 #system>div>div.hidden {
 	opacity: 0.5 !important;
 }
-
 .opaque {
 	opacity: 0 !important;
 }
-
 .transparent {
 	opacity: 0.3 !important;
 }
-
 .transparent2 {
 	opacity: 0.6 !important;
 }
@@ -1116,59 +980,46 @@ body>.background.upper {
 	filter: blur(3px);
 	-webkit-filter: blur(3px)
 }
-
 .blurbg {
 	filter: blur(3px) !important;
 	-webkit-filter: blur(3px) !important;
 	transform: scale(1.2);
 }
-
 .blur {
 	filter: blur(3px) !important;
 	-webkit-filter: blur(3px) !important;
 }
-
 .blur2 {
 	filter: blur(6px) !important;
 	-webkit-filter: blur(6px) !important;
 }
-
 .invert-color {
 	-webkit-filter: invert(1);
 }
-
 .zoominanim {
 	-webkit-animation: zoomin 0.5s;
 }
-
 .zoomin {
 	transform: scale(1.05) !important;
 }
-
 .zoomout {
 	transform: scale(0.95) !important;
 }
-
 .zoomin2 {
 	transform: scale(2) !important;
 }
-
 .zoomin3 {
 	transform: scale(3) !important;
 }
-
 .zoomout2 {
 	transform: scale(0.5) !important;
 }
-
 .zoomout3 {
 	transform: scale(0.3) !important;
 }
-
 .rotateleft {
 	transform: rotate(-3deg) !important;
 }
-
 .rotateright {
 	transform: rotate(3deg) !important;
 }
@@ -1176,12 +1027,10 @@ body>.background.upper {
 .exclude {
 	opacity: 0.6 !important;
 }
-
 .button.buttonclick {
 	animation: buttonclick 0.8s;
 	-webkit-animation: buttonclick 0.8s
 }
-
 .background {
 	width: 100%;
 	height: 100%;
@@ -1191,7 +1040,6 @@ body>.background.upper {
 	padding: 0;
 	display: inline-block !important;
 }
-
 .background2 {
 	width: 90%;
 	height: 90%;
@@ -1201,24 +1049,20 @@ body>.background.upper {
 	padding: 0;
 	display: inline-block !important;
 }
-
 .background,.button,.avatar,.avatar2 {
 	transition-property: top,box-shadow,opacity,transform;
 	transition-duration: 0.5s;
 }
-
 .intro {
 	width: 20px;
 	height: 20px;
 }
-
 #systembutton {
 	left: calc(-150% / 47 + 15px);
 	bottom: calc(-100% / 18 + 135px);
 	top: auto;
 	margin: 0;
 }
-
 #arena:not(.mobile)>#systembutton {
 	display: none !important;
 }
@@ -1316,11 +1160,9 @@ div:not(.handcards)>.card>.info>span,
 .button.card.button>.intro {
 	top: 69px;
 }
-
 .buttons.smallzoom {
 	zoom: 0.65
 }
-
 .buttons .card.button>.name {
 	transform: scale(0.8);
 	transform-origin: top left;
@@ -1337,7 +1179,6 @@ div:not(.handcards)>.card>.info>span,
 	transform: scale(0.8);
 	transform-origin: top right;
 }
-
 .buttons .card.button>.addinfo {
 	transform: scale(0.8);
 	transform-origin: bottom left;
@@ -1348,22 +1189,18 @@ div:not(.handcards)>.card>.info>span,
 	height: 108px;
 	background-size: cover;
 }
-
 .dialog .buttons>.button.character>.name,
 .button.character.longcharacter>.name {
 	overflow: visible;
 }
-
 .dialog .buttons>.button.character>.name.long {
 	transform: scale(0.95);
 	transform-origin: top left;
 }
-
 .card.center {
 	top: calc(50% - 52px);
 	left: calc(50% - 52px);
 }
-
 .card>.background {
 	font-size: 80px;
 	height: 80px;
@@ -1376,7 +1213,6 @@ div:not(.handcards)>.card>.info>span,
 	height: 36px;
 	padding-top: 3px;
 }
-
 #arena.low_performance .player .equips,
 #arena.low_performance .player .name {
 	transition: all 0s
@@ -1387,11 +1223,9 @@ div:not(.handcards)>.card>.info>span,
 	height: 20px;
 	padding-top: 3px;
 }
-
 .judges>.card.fakejudge.fullskin>.image {
 	display: none !important
 }
-
 .judges>.card.fakejudge.fullskin>.background {
 	display: block !important;
 	font-family: 'huangcao' !important;
@@ -1403,24 +1237,19 @@ div:not(.handcards)>.card>.info>span,
 	height: 68px;
 	padding-top: 12px;
 }
-
 .card>.background {
 	font-family: 'xiaozhuan'
 }
-
 .card>.background.tight {
 	letter-spacing: -0.2em
 }
-
 .marks>.card>.background.skillmark {
 	font-family: 'huangcao','xinwei';
 	padding-top: 4px;
 }
-
 .marks>.card.overflowmark {
 	overflow: visible;
 }
-
 .marks>div>.markcount.menubutton {
 	font-family: 'xinwei';
 	font-size: 9px;
@@ -1448,51 +1277,41 @@ div:not(.handcards)>.card>.info>span,
 	z-index: 4;
 	transition-property: opacity,background,box-shadow;
 }
-
 .dialog {
 	width: calc(90% - 420px);
 	height: calc(100% / 3 - 160px / 3 + 120px);
 }
-
 .dialog.fullheight {
 	height: calc(100% - 80px) !important;
 	top: 40px !important
 }
-
 .dialog.fullwidth {
 	left: calc(5% + 60px) !important;
 	width: calc(90% - 120px) !important
 }
-
 .dialog.halfleft,.dialog.halfright {
 	width: 43% !important;
 	opacity: 1 !important
 }
-
 .dialog.halfleft {
 	left: 5% !important
 }
-
 .dialog.halfright {
 	left: 52% !important
 }
-
 .dialog {
 	top: calc(100% / 3 - 100px / 3);
 	left: calc(5% + 210px);
 }
-
 .dialog.nobutton {
 	width: 400px;
 	left: calc(50% - 200px);
 	bottom: auto !important;
 	min-height: 0px !important;
 }
-
 .dialog.nobutton .content>div:last-child {
 	padding-bottom: 8px;
 }
-
 #window>.dialog.popped {
 	z-index: 5;
 	width: 220px;
@@ -1501,23 +1320,18 @@ div:not(.handcards)>.card>.info>span,
 	border-radius: 6px;
 	transition: opacity 0.3s;
 }
-
 #window[data-radius_size='reduce']>.dialog.popped {
 	border-radius: 4px;
 }
-
 #window[data-radius_size='off']>.dialog.popped {
 	border-radius: 0px;
 }
-
 #window[data-radius_size='increase']>.dialog.popped {
 	border-radius: 12px;
 }
-
 #window>.dialog.popped>.bar {
 	display: none !important;
 }
-
 #window>.dialog.popped>.content-container {
 	height: 100%;
 	top: 0;
@@ -1526,30 +1340,24 @@ div:not(.handcards)>.card>.info>span,
 .content>table {
 	width: 100%
 }
-
 .content>div {
 	position: relative;
 	margin: 8px;
 }
-
 .content>.config {
 	height: 20px;
 	line-height: 20px;
 }
-
 .content>.config.removing {
 	margin-top: -28px;
 }
-
 .config>.configinfo {
 	margin-top: 28px;
 }
-
 .config>.configinfo>ul {
 	margin: 0;
 	padding-left: 20px
 }
-
 .config>.configinfo>.dashedline {
 	border-bottom: 1px dashed white;
 	display: block;
@@ -1557,45 +1365,36 @@ div:not(.handcards)>.card>.info>span,
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
-
 .content>.placeholder {
 	display: block;
 	height: 5px;
 }
-
 .content>.placeholder.slim {
 	margin: 1px;
 }
-
 .content>.placeholder.removing {
 	margin-top: -13px;
 }
-
 .content {
 	display: block;
 	width: 100%;
 }
-
 .dialog:not(.popped) .content {
 	vertical-align: top;
 }
-
 .dialog:not(.popped) .content>.config {
 	width: 200px;
 	left: 0;
 	margin-left: 20px;
 	display: inline-block;
 }
-
 .dialog:not(.popped) .content>.config>.switcher {
 	position: absolute;
 }
-
 .dialog .content>.volumn {
 	margin: 0;
 	font-family: 'xinwei';
 }
-
 .dialog .content>.volumn>span {
 	margin-left: 2px;
 	margin-right: 2px;
