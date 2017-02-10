@@ -2804,6 +2804,10 @@ div:hover>.intro {
 .underlinenode.slim {
 	padding-bottom: 0;
 }
+.underlinenode.gray:not(.on){
+	border-color: rgb(133, 133, 133);
+	opacity: 0.5;
+}
 .on>.underline,.underlinenode.on {
 	border-color: rgb(0, 133, 255);
 }

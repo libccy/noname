@@ -958,6 +958,11 @@
                         },
                         unfrequent:true
                     },
+					filternode_button:{
+						name:'触屏筛选按钮',
+                        init:true,
+                        unfrequent:true,
+					},
                     show_favourite:{
                         name:'显示添加收藏',
                         init:true,
@@ -1356,6 +1361,7 @@
                         if(get.is.phoneLayout()){
                             map.remember_round_button.show();
                             map.reset_round_button.show();
+							map.filternode_button.show();
                             map.show_pause.hide();
                             map.show_auto.hide();
                             map.show_replay.hide();
@@ -1366,6 +1372,7 @@
                             map.show_replay.show();
                             map.remember_round_button.hide();
                             map.reset_round_button.hide();
+							map.filternode_button.hide();
                         }
                         if(lib.config.layout=='long'||lib.config.layout=='mobile'){
                             map.textequip.show();
@@ -28496,7 +28503,7 @@
                         if(newlined2){
                             newlined2.style.display='none';
                             packsource.classList.remove('thundertext');
-							if(!get.is.phoneLayout()){
+							if(!get.is.phoneLayout()||!lib.config.filternode_button){
 								packsource.innerHTML='武将包';
 							}
                         }
@@ -28686,7 +28693,7 @@
 						filternode.classList.remove('shown');
 						clickCapt.call(this.link,e);
 					};
-					if(get.is.phoneLayout()){
+					if(get.is.phoneLayout()&&lib.config.filternode_button){
 						newlined.style.marginTop='';
 						packsource.innerHTML='筛选';
 						filternode=ui.create.div('.popup-container.filter-character.modenopause');
@@ -28727,7 +28734,7 @@
 
                     packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
                         if(_status.dragged) return;
-						if(get.is.phoneLayout()&&filternode){
+						if(get.is.phoneLayout()&&lib.config.filternode_button&&filternode){
 							_status.filterCharacter=true;
 							ui.window.classList.add('shortcutpaused');
 							ui.window.appendChild(filternode);
@@ -32019,9 +32026,9 @@
 							node._doubleclick=false;
 						},500);
 					}
+					if(node.classList.contains('hidden')) return;
+					if(node.classList.contains('removing')) return;
 				}
-				if(this.parentNode.classList.contains('hidden')) return;
-				if(this.parentNode.classList.contains('removing')) return;
 				if(ui.intro){
 					ui.intro.close();
 					delete ui.intro;
@@ -32497,6 +32504,18 @@
                 }
                 game.saveConfig('autoskilllist',list);
             },
+			autoskill2:function(e){
+				this.classList.toggle('on');
+				if(this.classList.contains('on')){
+					lib.config.autoskilllist.remove(this.link);
+				}
+				else{
+					lib.config.autoskilllist.add(this.link);
+				}
+				game.saveConfig('autoskilllist',lib.config.autoskilllist);
+				ui.click.touchpop();
+				e.stopPropagation();
+			},
             rightplayer:function(e){
 				if(this._nopup) return false;
 				if(_status.clickedplayer){
@@ -34577,6 +34596,15 @@
                         else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])){
                             uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+lib.translate[skills[i]+'_info']+'</div></div>');
                         }
+						else if(lib.skill[skills[i]].frequent){
+							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
+							var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
+							if(lib.config.autoskilllist.contains(skills[i])){
+								underlinenode.classList.remove('on');
+							}
+							underlinenode.link=skills[i];
+							underlinenode.listen(ui.click.autoskill2);
+						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
 						}
