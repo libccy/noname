@@ -4603,20 +4603,27 @@ character.yijiang={
 				}
 				return true;
 			},
+			direct:true,
 			content:function(){
 				"step 0"
-				player.showHandcards();
-				"step 1"
-				var num=player.num('h');
-				player.chooseTarget('选择至多'+get.cnNumber(num)+'名角色各摸一张牌',[1,num],function(card,player,target){
+				player.chooseTarget(get.prompt('bingyi'),[1,player.num('h')],function(card,player,target){
 					return true;
 				}).set('ai',function(target){
 					return ai.get.attitude(_status.event.player,target);
 				});
-				"step 2"
+				"step 1"
 				if(result.bool){
-					player.line(result.targets,'green');
-					game.asyncDraw(result.targets);
+					player.logSkill('bingyi');
+					player.showHandcards(get.translation(player)+'发动了【秉壹】');
+					event.targets=result.targets;
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(targets&&targets.length){
+					player.line(targets,'green');
+					game.asyncDraw(targets);
 				}
 			},
 			ai:{
@@ -5114,13 +5121,14 @@ character.yijiang={
 			content:function(){
 				"step 0"
 				if(trigger.player.num('e')){
-					player.choosePlayerCard(trigger.player,'e','选择装备一张装备牌，或摸一张牌');
+					player.choosePlayerCard(trigger.player,'e','选择装备一张装备牌，或取消并摸一张牌');
 				}
 				"step 1"
 				if(result&&result.links&&result.links.length){
 					game.delay(2);
 					trigger.player.$give(result.links[0],player);
 					player.equip(result.links[0]);
+					player.line(trigger.player);
 				}
 				else{
 					player.draw();

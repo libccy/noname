@@ -8153,6 +8153,9 @@
 					}
 					var cards=player.get('h');
 					var str=get.translation(player.name)+'的手牌';
+					if(typeof event.prompt=='string'){
+						str=event.prompt;
+					}
 					event.dialog=ui.create.dialog(str,cards);
                     event.dialogid=lib.status.videoId++;
                     event.dialog.videoId=event.dialogid;
@@ -11128,9 +11131,12 @@
                     next._args=Array.from(arguments);
 					return next;
 				},
-				showHandcards:function(){
+				showHandcards:function(str){
 					var next=game.createEvent('showHandcards');
 					next.player=this;
+					if(typeof str=='string'){
+						next.prompt=str;
+					}
                     next.setContent('showHandcards');
                     next._args=Array.from(arguments);
                     return next;
@@ -32940,12 +32946,18 @@
                 func2=func1[key2];
                 func1=func1[key1];
             }
+			if(typeof func2=='number'){
+				iteration=func2;
+			}
             tic=get.utc();
             for(var i=0;i<iteration;i++){
                 func1(arg.randomGet());
             }
             toc=get.utc();
             console.log('time1: '+(toc-tic));
+			if(typeof func2=='number'){
+				return toc-tic;
+			}
             tic=get.utc();
             for(var i=0;i<iteration;i++){
                 func2(arg.randomGet());
