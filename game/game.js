@@ -20508,20 +20508,21 @@
 						event._cardChoice=[];
 						firstCheck=true;
 					}
-					// if(event.name=='chooseToUse'&&event.parent.name=='phaseUse'&&!event.skill&&
-					// 	!event._targetChoice&&event._cardChoice&&event._cardChoice.length){
-					// 	event._targetChoice=new Map();
-					// 	var tmpselect=ui.selected;
-					// 	for(var i=0;i<event._cardChoice.length;i++){
-					// 		var targets=[];
-					// 		if(!lib.card[event._cardChoice[i].name].complexTarget){
-					// 			ui.selected={buttons:[],cards:[event._cardChoice[i]],targets:[]};
-					// 			for(var j=0;j<game.players.length;j++){
-					// 				if(event.filterTarget(event._cardChoice[i],,game.players[i]))
-					// 			}
-					// 		}
-					// 	}
-					// }
+					if(event.isMine()&&event.name=='chooseToUse'&&event.parent.name=='phaseUse'&&!event.skill&&
+						!event._targetChoice&&!firstCheck&&window.Map){
+						event._targetChoice=new Map();
+						for(var i=0;i<event._cardChoice.length;i++){
+							var targets=[];
+							if(!lib.card[event._cardChoice[i].name].complexTarget){
+								for(var j=0;j<game.players.length;j++){
+									if(event.filterTarget(event._cardChoice[i],player,game.players[j])){
+										targets.push(game.players[j]);
+									}
+								}
+							}
+							event._targetChoice.set(event._cardChoice[i],targets);
+						}
+					}
                     var selectableCards=false;
 					if(range[0]!=range[1]||range[0]>1) auto=false;
 					for(i=0;i<cards.length;i++){
@@ -20544,7 +20545,7 @@
 						if(nochess){
 							if(ui.selected.cards.length<range[1]){
 								cards[i].classList.add('selectable');
-								if(event._cardChoice){
+								if(event._cardChoice&&firstCheck){
 									event._cardChoice.push(cards[i]);
 								}
 							}
@@ -20598,8 +20599,8 @@
 						else if(game.players[i].isOut()){
 							nochess=false;
 						}
-						else if(event._targetChoice){
-							var targetChoice=event.targetChoice.get(card);
+						else if(event._targetChoice&&event._targetChoice.has(card)){
+							var targetChoice=event._targetChoice.get(card);
 							if(!Array.isArray(targetChoice)||!targetChoice.contains(game.players[i])){
 								nochess=false;
 							}

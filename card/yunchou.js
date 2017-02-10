@@ -570,6 +570,7 @@ card.yunchou={
 			},
 			selectTarget:2,
 			multitarget:true,
+			complexTarget:true,
 			content:function(){
 				if(target.get('e','5')){
 					target.$give(target.get('e','5'),event.addedTarget);
@@ -1223,7 +1224,7 @@ card.yunchou={
 		geanguanhuo:'隔岸观火',
 		geanguanhuo_info:'出牌阶段对一名其他角色使用，令目标与一名你指定的另一名角色拼点，赢的角色获得对方的一张牌；若点数相同，目标可弃置你一张牌',
 		toulianghuanzhu:'偷梁换柱',
-		toulianghuanzhu_info:'出牌阶段对一名有手牌的角色使用，选择另一名角色获得目标两张手牌（不足则全拿），然后还给其等量手牌',
+		toulianghuanzhu_info:'出牌阶段对一名有手牌的角色使用，选择另一名有手牌的角色获得目标两张手牌（不足则全拿），然后还给其等量手牌',
 		toulianghuanzhu_bg:'柱',
 		yihuajiemu:'移花接木',
 		yihuajiemu_info:'对一名装备区内有宝物的角色使用，将其宝物牌转移至另一名角色',
