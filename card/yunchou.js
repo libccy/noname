@@ -147,7 +147,7 @@ card.yunchou={
 					player:1,
 					target:function(player,target){
 						if(target.num('h')==0) return 0;
-						return (Math.sqrt(target.num('h'))-get.distance(player,target,'absolute')/countPlayer()/3)/2;
+						return (Math.sqrt(target.num('h'))-get.distance(player,target,'absolute')/game.countPlayer()/3)/2;
 					}
 				},
 				tag:{

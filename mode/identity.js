@@ -390,6 +390,7 @@ mode.identity={
 		showIdentity:function(me){
 			for(var i=0;i<game.players.length;i++){
 				// if(me===false&&game.players[i]==game.me) continue;
+				game.players[i].node.identity.classList.remove('guessing');
 				game.players[i].identityShown=true;
 				game.players[i].ai.shown=1;
 				game.players[i].setIdentity(game.players[i].identity);
@@ -800,6 +801,7 @@ mode.identity={
 						game.players[i].identityShown=true;
 					}
 					else{
+						game.players[i].node.identity.classList.add('guessing');
 						game.players[i].identity=identityList[i];
 						game.players[i].setIdentity('cai');
 						if(event.zhongmode){
@@ -823,7 +825,9 @@ mode.identity={
 					game.zhu.setIdentity();
 					game.zhu.identityShown=true;
 					game.zhu.isZhu=(game.zhu.identity=='zhu');
+					game.zhu.node.identity.classList.remove('guessing');
 					game.me.setIdentity();
+					game.me.node.identity.classList.remove('guessing');
 				}
 				for(i in lib.character){
 					if(chosen.contains(i)) continue;
@@ -1093,6 +1097,7 @@ mode.identity={
 				for(i=0;i<game.players.length;i++){
 					game.players[i].identity=identityList[i];
 					game.players[i].setIdentity('cai');
+					game.players[i].node.identity.classList.add('guessing');
 					if(event.zhongmode){
 						if(identityList[i]=='mingzhong'){
 							game.zhu=game.players[i];
@@ -1111,17 +1116,22 @@ mode.identity={
 				game.zhu.setIdentity();
 				game.zhu.identityShown=true;
 				game.zhu.isZhu=(game.zhu.identity=='zhu');
+				game.zhu.node.identity.classList.remove('guessing');
 				game.me.setIdentity();
+				game.me.node.identity.classList.remove('guessing');
 
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].send(function(zhu,zhuid,me,identity){
 						for(var i in lib.playerOL){
 							lib.playerOL[i].setIdentity('cai');
+							lib.playerOL[i].node.identity.classList.add('guessing');
 						}
 						zhu.identityShown=true;
 						zhu.identity=zhuid;
 						zhu.setIdentity();
+						zhu.node.identity.classList.remove('guessing');
 						me.setIdentity(identity);
+						me.node.identity.classList.remove('guessing');
 						ui.arena.classList.add('choose-character');
 					},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
 				}
@@ -1312,6 +1322,7 @@ mode.identity={
 					game.broadcastAll(function(player){
 						player.setIdentity(player.identity);
 						player.identityShown=true;
+						player.node.identity.classList.remove('guessing');
 					},this);
 				}
 				game.checkResult();
@@ -1336,6 +1347,7 @@ mode.identity={
 						game.zhu.ai.shown=1;
 						game.zhu.setIdentity();
 						game.zhu.isZhu=true;
+						game.zhu.node.identity.classList.remove('guessing');
 						if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
 						delete game.zhong;
 						if(_status.clickingidentity&&_status.clickingidentity[0]==game.zhu){

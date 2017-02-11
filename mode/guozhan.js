@@ -612,6 +612,7 @@ mode.guozhan={
 					if(game.players[i]!=game.me){
 						game.players[i].node.identity.firstChild.innerHTML='猜';
 						game.players[i].node.identity.dataset.color='unknown';
+						game.players[i].node.identity.classList.add('guessing');
 					}
 					game.players[i].hiddenSkills=lib.character[game.players[i].name][3].slice(0);
 					var hiddenSkills2=lib.character[game.players[i].name2][3];
@@ -760,6 +761,7 @@ mode.guozhan={
 						if(game.players[i]!=game.me){
 							game.players[i].node.identity.firstChild.innerHTML='猜';
 							game.players[i].node.identity.dataset.color='unknown';
+							game.players[i].node.identity.classList.add('guessing');
 						}
 						game.players[i].group='unknown';
 						game.players[i].sex='unknown';
@@ -865,10 +867,12 @@ mode.guozhan={
 				this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[this.name].slice(0,3)),this);
 				if(info.identityShown){
 					this.setIdentity(info.identity);
+					this.node.identity.classList.remove('guessing');
 				}
 				else if(this!=game.me){
 					this.node.identity.firstChild.innerHTML='猜';
 					this.node.identity.dataset.color='unknown';
+					this.node.identity.classList.add('guessing');
 				}
 			},
 			dieAfter:function(source){
@@ -919,6 +923,7 @@ mode.guozhan={
 					// this.node.identity.dataset.color=this.identity;
 					this.setIdentity(this.identity);
 					this.ai.shown=1;
+					this.node.identity.classList.remove('guessing');
 
 					if(_status.clickingidentity&&_status.clickingidentity[0]==this){
 						for(var i=0;i<_status.clickingidentity[1].length;i++){
@@ -958,6 +963,7 @@ mode.guozhan={
 					player.identityShown=true;
 					player.name=name;
 					player.sex=sex;
+					player.node.identity.classList.remove('guessing');
 					switch(num){
 						case 0:player.classList.remove('unseen');break;
 						case 1:player.classList.remove('unseen2');break;

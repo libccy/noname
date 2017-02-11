@@ -335,6 +335,10 @@
 	line-height:25px;
 	position:relative;
 }
+#window:not(.nopointer) .config.switcher>div,
+#window:not(.nopointer) .config.toggle>div{
+	cursor: pointer;
+}
 .config.switcher>div,
 .config.toggle>div{
 	position:absolute;

@@ -22,6 +22,17 @@
 	transform:scale(0.73);
 	transform-origin:bottom left;
 }
+
+
+#arena:not(.chess).textequip .player[data-position='0'] .equips>.card::after,
+#arena:not(.chess).textequip .player[data-position='0'] .equips>.card::before,
+.player:not([data-position='0']) .equips>.card::after,
+.player:not([data-position='0']) .equips>.card::before,
+#arena.chess .player .equips>.card::after,
+#arena.chess .player .equips>.card::before{
+	visibility: hidden;
+}
+
 #arena:not(.chess).textequip .player[data-position='0'] .equips>.card,
 .player:not([data-position='0']) .equips>.card,
 #arena.chess .player .equips>.card{

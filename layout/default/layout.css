@@ -2613,7 +2613,13 @@ div:not(.handcards)>.card>.info>span,
 }
 
 #window:not(.nopointer) .player .judges>.card,
-#window:not(.nopointer) .player .marks>.card,
+#window:not(.nopointer) .player .marks>.card{
+	cursor: context-menu;
+}
+#window:not(.nopointer) .player .identity.guessing{
+	cursor: help;
+}
+
 #window:not(.nopointer) #system>div>div:not(.hidden),
 #window:not(.nopointer) .choosedouble.character,
 #window:not(.nopointer) .pointernode div,
@@ -2628,7 +2634,7 @@ div:not(.handcards)>.card>.info>span,
 	cursor: pointer;
 }
 #arena.dragging{
-	cursor: move;
+	cursor: -webkit-grabbing;
 }
 
 #arena.selecting:not(.video) .player[data-position='0'] .marks>.card:not(.selectable)>.image,

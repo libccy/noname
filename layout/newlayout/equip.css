@@ -17,6 +17,10 @@
 	transform:scale(0.73);
 	transform-origin:bottom left;
 }
+.player .equips>.card::after,
+.player .equips>.card::before{
+	visibility: hidden;
+}
 .player .equips>.card{
 	position:relative;
 	width:100%;
