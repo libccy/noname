@@ -13,7 +13,8 @@
 		ai:{},
 		lastdragchange:[],
 		skillaudio:[],
-		dieClose:[]
+		dieClose:[],
+		dragline:[],
 	};
 	var lib={
 		configprefix:'noname_0.9_',
@@ -19254,6 +19255,7 @@
 			var opacity=1;
 			var color=[255,255,255];
 			var dashed=false;
+			var drag=false;
 			if(typeof arguments[1]=='object'){
 				for(var i in arguments[1]){
 					switch(i){
@@ -19276,11 +19278,33 @@
 			else if(color=='green'){
 				color=[141, 255, 216];
 			}
-			var node=ui.create.div('.linexy.hidden');
-			node.style.transitionDuration=(total/3000)+'s';
-			node.style.left=from[0]+'px';
-			node.style.top=from[1]+'px';
-			node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
+			var node;
+			if(arguments[1]=='drag'){
+				color=[236, 201, 71];
+				drag=true;
+				if(arguments[2]){
+					node=arguments[2]
+				}
+				else{
+					node=ui.create.div('.linexy.drag');
+					node.style.left=from[0]+'px';
+					node.style.top=from[1]+'px';
+					node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
+					if(game.chess){
+						ui.chess.appendChild(node);
+					}
+					else{
+						ui.arena.appendChild(node);
+					}
+				}
+			}
+			else{
+				node=ui.create.div('.linexy.hidden');
+				node.style.left=from[0]+'px';
+				node.style.top=from[1]+'px';
+				node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
+				node.style.transitionDuration=(total/3000)+'s';
+			}
 			var dy=to[1]-from[1];
 			var dx=to[0]-from[0];
 			var deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
@@ -19300,23 +19324,30 @@
 					deg+=270;
 				}
 			}
-			node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
-			node.style.height=get.xyDistance(from,to)+'px';
-			if(game.chess){
-				ui.chess.appendChild(node);
+			if(drag){
+				node.style.transform='rotate('+(-deg)+'deg)';
+				node.style.height=get.xyDistance(from,to)+'px';
 			}
 			else{
-				ui.arena.appendChild(node);
+				node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
+				node.style.height=get.xyDistance(from,to)+'px';
+				if(game.chess){
+					ui.chess.appendChild(node);
+				}
+				else{
+					ui.arena.appendChild(node);
+				}
+				ui.refresh(node);
+				node.show();
+				node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
+				node.listenTransition(function(){
+					setTimeout(function(){
+	                    if(node.classList.contains('removing')) return;
+						node.delete();
+					},total/3);
+				});
 			}
-			ui.refresh(node);
-			node.show();
-			node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
-			node.listenTransition(function(){
-				setTimeout(function(){
-                    if(node.classList.contains('removing')) return;
-					node.delete();
-				},total/3);
-			});
+			return node;
 		},
 		_linexy:function(path){
 			var from=[path[0],path[1]];
@@ -20898,6 +20929,9 @@
     		ui.canvas.height=ui.arena.offsetHeight;
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].unprompt();
+			}
+			while(_status.dragline.length){
+				_status.dragline.shift().delete();
 			}
 		},
 		swapSeat:function(player1,player2,prompt,behind){
@@ -30832,8 +30866,9 @@
 
 				if(_status.mousedragging&&e.touches.length){
 					e.preventDefault();
-					var item=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
-					while(item){
+					var items=document.elementsFromPoint(e.touches[0].clientX,e.touches[0].clientY);
+					for(var i=0;i<items.length;i++){
+						var item=items[i];
 						if(lib.config.enable_touchdragline&&_status.mouseleft&&!game.chess){
 							ui.canvas.width=ui.arena.offsetWidth;
 							ui.canvas.height=ui.arena.offsetHeight;
@@ -30974,7 +31009,6 @@
 							}
 							return;
 						}
-						item=item.parentNode;
 					}
 					_status.mouseleft=true;
 					_status.dragstatuschanged=null;
@@ -31164,44 +31198,70 @@
 					dialogs[i].delete();
 				}
 				var node=_status.currentmouseenter;
-				var sourceitem=document.elementFromPoint(e.clientX,e.clientY);
+				var items=document.elementsFromPoint(e.clientX,e.clientY);
 				if(_status.mousedragging){
 					e.preventDefault();
 					if(lib.config.enable_dragline){
-						ui.canvas.width=ui.arena.offsetWidth;
-						ui.canvas.height=ui.arena.offsetHeight;
-						var ctx=ui.ctx;
-						ctx.shadowBlur=5;
-						ctx.shadowColor='rgba(0,0,0,0.3)';
-						ctx.strokeStyle='white';
-						ctx.lineWidth=3;
-						ctx.setLineDash([8,2]);
-
-						ctx.beginPath();
-
-						ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
+						var i=0;
+						var startPoint0=[_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop];
+						var startPoint=startPoint0;
+						var endPoint;
 						if(_status.multitarget){
-							for(var i=0;i<_status.lastdragchange.length;i++){
+							for(;i<_status.lastdragchange.length;i++){
 								var exy=_status.lastdragchange[i]._lastdragchange;
-								ctx.lineTo(exy[0],exy[1]);
+								endPoint=[exy[0],exy[1]];
+								_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
+								startPoint=endPoint;
 							}
 						}
 						if(!_status.selectionfull){
-							ctx.lineTo(e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop);
+							endPoint=[e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop];
+							_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
+							startPoint=endPoint;
+							i++;
 						}
-						ctx.stroke();
 						if(!_status.multitarget){
-							for(var i=0;i<_status.lastdragchange.length;i++){
-								ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
+							for(;i<_status.lastdragchange.length;i++){
 								var exy=_status.lastdragchange[i]._lastdragchange;
-								ctx.lineTo(exy[0],exy[1]);
-								ctx.stroke();
+								_status.dragline[i]=game.linexy(startPoint0.concat([exy[0],exy[1]]),'drag',_status.dragline[i]);
 							}
 						}
+						_status.dragline.splice(i);
+
+						// ui.canvas.width=ui.arena.offsetWidth;
+						// ui.canvas.height=ui.arena.offsetHeight;
+						// var ctx=ui.ctx;
+						// ctx.shadowBlur=5;
+						// ctx.shadowColor='rgba(0,0,0,0.3)';
+						// ctx.strokeStyle='white';
+						// ctx.lineWidth=3;
+						// ctx.setLineDash([8,2]);
+						//
+						// ctx.beginPath();
+						//
+						// ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
+						// if(_status.multitarget){
+						// 	for(var i=0;i<_status.lastdragchange.length;i++){
+						// 		var exy=_status.lastdragchange[i]._lastdragchange;
+						// 		ctx.lineTo(exy[0],exy[1]);
+						// 	}
+						// }
+						// if(!_status.selectionfull){
+						// 	ctx.lineTo(e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop);
+						// }
+						// ctx.stroke();
+						// if(!_status.multitarget){
+						// 	for(var i=0;i<_status.lastdragchange.length;i++){
+						// 		ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
+						// 		var exy=_status.lastdragchange[i]._lastdragchange;
+						// 		ctx.lineTo(exy[0],exy[1]);
+						// 		ctx.stroke();
+						// 	}
+						// }
 					}
 
-					var item=sourceitem;
-					while(item){
+					for(var i=0;i<items.length;i++){
+						var item=items[i];
 						if(item==_status.mousedragorigin){
 							if(_status.mouseleft){
 								_status.mousedragging=null;
@@ -31260,14 +31320,13 @@
 							}
 							return;
 						}
-						item=item.parentNode;
 					}
 					_status.mouseleft=true;
 					_status.dragstatuschanged=null;
 				}
 				else{
-					var item=sourceitem;
-					while(item){
+					for(var i=0;i<items.length;i++){
+						var item=items[i];
 						if(item==node&&!node._mouseentercreated){
 							ui.click.mouseentercancel();
 							var hoveration;
@@ -31303,7 +31362,6 @@
 							},hoveration);
 							break;
 						}
-						item=item.parentNode;
 					}
 					if(_status.draggingdialog){
 						var ddialog=_status.draggingdialog;
@@ -31334,9 +31392,9 @@
 				for(var i=0;i<dialogs.length;i++){
 					dialogs[i].delete();
 				}
-				var sourceitem=document.elementFromPoint(e.clientX,e.clientY);
-				var item=sourceitem;
-				while(item){
+				var items=document.elementsFromPoint(e.clientX,e.clientY);
+				for(var i=0;i<items.length;i++){
+					var item=items[i];
 					var itemtype=get.itemtype(item);
 					if(itemtype=='button') break;
 					if(itemtype=='dialog'&&
@@ -31358,7 +31416,6 @@
 						}
 						return;
 					}
-					item=item.parentNode;
 				}
 
 				var evt=_status.event;
@@ -31366,8 +31423,8 @@
 				if(!ui.arena.classList.contains('selecting')) return;
 				if(!evt.isMine()) return;
 
-				item=sourceitem;
-				while(item){
+				for(var i=0;i<items.length;i++){
+					var item=items[i];
 					var itemtype=get.itemtype(item);
 					if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
 						if(item.classList.contains('selectable')&&
@@ -31385,7 +31442,6 @@
 						}
 						return;
 					}
-					item=item.parentNode;
 				}
 			},
 			cardtouchstart:function(e){
