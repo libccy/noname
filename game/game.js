@@ -12932,6 +12932,7 @@
                 },
 				isHighestHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()) continue;
 						if(equal){
 							if(game.players[i].hp>=this.hp) return false;
 						}
@@ -12943,6 +12944,7 @@
 				},
 				isLowestHp:function(equal){
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()) continue;
 						if(equal){
 							if(game.players[i].hp<=this.hp) return false;
 						}
@@ -12955,6 +12957,7 @@
 				isMostHandcard:function(equal){
 					var nh=this.num('h');
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()) continue;
 						if(equal){
 							if(game.players[i].num('h')>=nh) return false;
 						}
@@ -12967,6 +12970,7 @@
 				isFewestHandcard:function(equal){
 					var nh=this.num('h');
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()) continue;
 						if(equal){
 							if(game.players[i].num('h')<=nh) return false;
 						}

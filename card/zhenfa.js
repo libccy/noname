@@ -8,9 +8,9 @@ card.zhenfa={
 			selectTarget:-1,
 			multitarget:true,
 			content:function(){
-				var n=game.players.length;
+				var n=targets.length;
 				while(n--){
-					game.swapSeat(game.players.randomGet(),game.players.randomGet());
+					game.swapSeat(targets.randomGet(),targets.randomGet());
 				}
 			},
 			mode:['guozhan'],
@@ -53,10 +53,9 @@ card.zhenfa={
 			type:'zhenfa',
 			chongzhu:true,
 			enable:function(){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isMajor()) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.isMajor();
+				});
 			},
 			filterTarget:function(card,player,target){
 				return target.isMajor()&&target.num('he')>0;
@@ -80,10 +79,9 @@ card.zhenfa={
 			type:'zhenfa',
 			chongzhu:true,
 			enable:function(){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isMinor()) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.isMinor();
+				});
 			},
 			multitarget:true,
 			multiline:true,
@@ -193,10 +191,9 @@ card.zhenfa={
 			enable:function(card,player){
 				if(player.identity=='unknown'||player.identity=='ye') return false;
 				if(get.population(player.identity)<=1) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].identity==player.identity&&!player.inline(game.players[i])) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.identity==player.identity&&!player.inline(current);
+				});
 			},
 			filterTarget:function(card,player,target){
 				return target.identity==player.identity;

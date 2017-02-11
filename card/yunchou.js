@@ -32,7 +32,7 @@ card.yunchou={
 				}
 				"step 3"
 				ui.clear();
-				var cards=get.cards(Math.ceil(game.players.length/2));
+				var cards=get.cards(Math.ceil(game.countPlayer()/2));
 				var dialog=ui.create.dialog('调兵遣将',cards,true);
 				_status.dieClose.push(dialog);
 				dialog.videoId=lib.status.videoId++;
@@ -147,7 +147,7 @@ card.yunchou={
 					player:1,
 					target:function(player,target){
 						if(target.num('h')==0) return 0;
-						return (Math.sqrt(target.num('h'))-get.distance(player,target,'absolute')/game.players.length/3)/2;
+						return (Math.sqrt(target.num('h'))-get.distance(player,target,'absolute')/countPlayer()/3)/2;
 					}
 				},
 				tag:{
@@ -304,12 +304,9 @@ card.yunchou={
 			modTarget:true,
 			content:function(){
 				'step 0'
-				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=target&&game.players[i].num('h')){
-						list.push(game.players[i]);
-					}
-				}
+				var list=game.filterPlayer(function(current){
+					return current!=target&&current.num('h');
+				});
 				if(!list.length){
 					target.draw(3);
 					event.finish();
@@ -524,11 +521,7 @@ card.yunchou={
 			multitarget:true,
 			multiline:true,
 			filterTarget:function(card,player,target){
-				var num=target.num('h');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('h')<num) return false;
-				}
-				return true;
+				return target.isFewestHandcard();
 			},
 			content:function(){
 				var num=[];
@@ -756,11 +749,12 @@ card.yunchou={
 			effect:function(){
 				if(result.judge){
 					player.damage(2,'fire','nosource');
-					var players=get.players();
-					for(var i=0;i<game.players.length;i++){
-						if(get.distance(player,game.players[i])<=1&&player!=game.players[i]){
-							game.players[i].damage(1,'fire','nosource');
-						}
+					var players=game.filterPlayer(function(current){
+						return get.distance(player,current)<=1&&player!=current;
+					});
+					players.sort(lib.sort.seat);
+					for(var i=0;i<players.length;i++){
+						players[i].damage(1,'fire','nosource');
 					}
 				}
 				else{
@@ -826,42 +820,7 @@ card.yunchou={
 				order:1,
 				result:{
 					target:function(player,target){
-						var rejudge,num=0;
-						for(var i=0;i<game.players.length;i++){
-							for(var j=0;j<game.players[i].skills.length;j++){
-								rejudge=get.tag(game.players[i].skills[j],'rejudge',game.players[i]);
-								if(rejudge!=undefined){
-									if(ai.get.attitude(target,game.players[i])>0&&
-										ai.get.attitude(game.players[i],target)>0) num+=rejudge;
-									else num-=rejudge;
-								}
-							}
-						}
-						if(num>0) return num;
-						if(num==0){
-							if(lib.config.mode=='identity'){
-								if(target.identity=='nei') return 1;
-								var situ=ai.get.situation();
-								if(target.identity=='fan'){
-									if(situ>1) return 1;
-								}
-								else{
-									if(situ<-1) return 1;
-								}
-							}
-							else if(lib.config.mode=='guozhan'){
-								if(target.identity=='ye') return 1;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].identity=='unknown') return -1;
-								}
-								if(get.population(target.identity)==1){
-									if(target.maxHp>2&&target.hp<2) return 1;
-									if(game.players.length<3) return -1;
-									if(target.hp<=2&&target.num('he')<=3) return 1;
-								}
-							}
-						}
-						return -1;
+						return lib.card.shandian.ai.result.target(player,target);
 					}
 				},
 				tag:{
@@ -969,41 +928,7 @@ card.yunchou={
 				order:1,
 				result:{
 					target:function(player,target){
-						var rejudge,num=0;
-						for(var i=0;i<game.players.length;i++){
-							for(var j=0;j<game.players[i].skills.length;j++){
-								rejudge=get.tag(game.players[i].skills[j],'rejudge',game.players[i]);
-								if(rejudge!=undefined){
-									if(ai.get.attitude(target,game.players[i])>0&&
-										ai.get.attitude(game.players[i],target)>0) num+=rejudge;
-									else num-=rejudge;
-								}
-							}
-						}
-						if(num>0) return num;
-						if(num==0){
-							if(lib.config.mode=='identity'){
-								if(target.identity=='nei') return 1;
-								var situ=ai.get.situation();
-								if(target.identity=='fan'){
-									if(situ>0) return 1;
-								}
-								else{
-									if(situ<0) return 1;
-								}
-							}
-							else if(lib.config.mode=='guozhan'){
-								if(game.players.length<=2) return -1;
-								if(target.identity=='ye') return 1;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].identity=='unknown') return -1;
-								}
-								if(get.population(target.identity)==1){
-									return 1;
-								}
-							}
-						}
-						return -1;
+						return lib.card.shandian.ai.result.target.call(player,target);
 					}
 				},
 			}

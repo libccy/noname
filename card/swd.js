@@ -1827,11 +1827,7 @@ card.swd={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nofire')) return 0;
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0) num++;
-						}
-						if(num>1) return 0;
+						if(player.hasUnknown(2)) return 0;
 						var nh=target.num('h');
 						if(lib.config.mode=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
