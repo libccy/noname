@@ -1320,8 +1320,6 @@ character.shenhua={
 			direct:true,
 			content:function(){
 				"step 0"
-				game.delay();
-				"step 1"
 				event.cards=trigger.cards.slice(0);
 				for(var i=0;i<event.cards.length;i++){
 					if(get.position(event.cards[i])!='d'){
@@ -1339,8 +1337,9 @@ character.shenhua={
 					}
 					return 0;
 				}).set('check',check);
-				"step 2"
+				"step 1"
 				if(result.bool){
+					game.delay(0.5);
 					player.logSkill('guzheng',trigger.player);
 					trigger.player.gain(result.links[0]);
 					trigger.player.$gain2(result.links[0]);
