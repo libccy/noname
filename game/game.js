@@ -13032,6 +13032,7 @@
 				},
 				hasFriend:function(){
 					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOut()) continue;
 						if(game.players[i]!=this&&ai.get.attitude(game.players[i],this)>0){
 							return true;
 						}
@@ -22667,6 +22668,7 @@
 		},
 		hasPlayer:function(func){
 			for(var i=0;i<game.players.length;i++){
+				if(game.players[i].isOut()) continue;
 				if(func(game.players[i])) return true;
 			}
 			return false;
@@ -22674,6 +22676,7 @@
 		countPlayer:function(func){
 			var num=0;
 			for(var i=0;i<game.players.length;i++){
+				if(game.players[i].isOut()) continue;
 				if(func(game.players[i])) num++;
 			}
 			return num;
@@ -22681,6 +22684,7 @@
 		filterPlayer:function(func){
 			var list=[];
 			for(var i=0;i<game.players.length;i++){
+				if(game.players[i].isOut()) continue;
 				if(func(game.players[i])){
 					list.push(game.players[i]);
 				}
@@ -22689,6 +22693,7 @@
 		},
         findPlayer:function(func){
 			for(var i=0;i<game.players.length;i++){
+				if(game.players[i].isOut()) continue;
 				if(func(game.players[i])){
 					return game.players[i];
 				}
