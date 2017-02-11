@@ -34058,6 +34058,17 @@
 			if(method=='attack') return m;
 			return n;
 		},
+		cardUsable:function(player,card){
+			var info=get.info(card);
+			if(info.autoViewAs){
+				card={name:info.autoViewAs,suit:card.suit,number:card.number};
+			}
+			var num=get.info(card).usable;
+			if(typeof num=='function') num=num(card,player);
+			num=game.checkMod(card,player,num,'cardUsable',player.get('s'));
+			if(typeof num!='number') return Infinity;
+			else return num-get.cardCount(card,player);
+		},
 		attackRange:function(player){
 			var range=0;
 			range=game.checkMod(player,player,range,'globalFrom',player.get('s'));

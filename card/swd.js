@@ -1584,22 +1584,34 @@ card.swd={
 						if(lib.config.mode=='stone'&&!player.isMin()){
 							if(player.getActCount()+1>=player.actcount) return false;
 						}
-						var shas=target.get('h','sha');
-						var ok=false;
+						var shas=player.get('h','sha');
+						if(shas.length>1){
+							if(player.num('e','zhuge')) return 0;
+							if(player.hasSkill('paoxiao')) return 0;
+							if(player.hasSkill('fengnu')) return 0;
+							if(!player.getStat().card.sha){
+								if(player.hasSkill('tanlin3')) return 0;
+								if(player.hasSkill('zhaxiang2')) return 0;
+							}
+						}
+						var card;
 						if(shas.length){
 							for(var i=0;i<shas.length;i++){
 								if(lib.filter.filterCard(shas[i],target)){
-									ok=true;break;
+									card=shas[i];break;
 								}
 							}
 						}
-						if(ok){
-							var card=target.get('h','sha',0);
-							for(var i=0;i<game.players.length;i++){
-								if(ai.get.attitude(target,game.players[i])<0&&
-								target.canUse(card,game.players[i],true,true)){
-									if(ai.get.effect(game.players[i],card,target)>0) return 1;
-								}
+						else if(player.hasSha()){
+							card={name:'sha'};
+						}
+						if(card){
+							if(game.hasPlayer(function(current){
+								return (ai.get.attitude(target,current)<0&&
+									target.canUse(card,current,true,true)&&
+									ai.get.effect(current,card,target)>0);
+							})){
+								return 1;
 							}
 						}
 						return 0;

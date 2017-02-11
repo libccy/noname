@@ -91,6 +91,9 @@ card.extra={
 								}
 							}
 						}
+						else if(player.hasSha()){
+							card={name:'sha'};
+						}
 						if(card){
 							if(game.hasPlayer(function(current){
 								return (ai.get.attitude(target,current)<0&&
