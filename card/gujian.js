@@ -667,11 +667,9 @@ card.gujian={
                 return target!=player&&target.num('he')>0;
             },
             changeTarget:function(player,targets){
-                game.countPlayer(function(current){
-                    if(get.distance(targets[0],current,'pure')==1&&current.num('he')){
-						targets.push(current);
-					}
-                });
+                game.filterPlayer(function(current){
+                    return get.distance(targets[0],current,'pure')==1&&current.num('he');
+                },targets);
 			},
             content:function(){
                 var he=target.get('he');

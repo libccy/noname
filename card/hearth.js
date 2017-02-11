@@ -423,7 +423,7 @@ card.hearth={
 			content:function(){
 				'step 0'
 				event.current=target;
-				event.num=game.players.length;
+				event.num=game.countPlayer(lib.filter.all);
 				if(event.num%2==0){
 					event.num--;
 				}
@@ -619,11 +619,7 @@ card.hearth={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nothunder')) return 0;
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0) num++;
-						}
-						if(num>1) return 0;
+						if(player.hasUnknown()) return 0;
 						var nh=target.num('he');
 						if(target==player) nh--;
 						if(nh==2) return -2.5;

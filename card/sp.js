@@ -68,7 +68,7 @@ card.sp={
             fullskin:true,
             enable:true,
 			chongzhu:function(){
-				return game.players.length<=2;
+				return game.countPlayer(lib.filter.all)<=2;
 			},
 			singleCard:true,
             type:'trick',
@@ -200,25 +200,23 @@ card.sp={
 				},
 				result:{
 					player:function(player,target){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(get.distance(target,game.players[i])<=1&&game.players[i]!=target){
-								var att=ai.get.attitude(player,game.players[i]);
+						return game.countPlayer(function(current){
+							if(get.distance(target,current)<=1&&current!=target){
+								var att=ai.get.attitude(player,current);
 								if(att>3){
-									num+=1.1;
+									return 1.1;
 								}
 								else if(att>0){
-									num++;
+									return 1;
 								}
 								else if(att<-3){
-									num-=1.1;
+									return -1.1;
 								}
 								else if(att<0){
-									num--;
+									return -1;
 								}
 							}
-						}
-						return num;
+						});
 					},
 					target:-1
 				},
@@ -304,14 +302,12 @@ card.sp={
 				game.broadcast(function(muniu,cards){
 					muniu.cards=cards;
 				},muniu,muniu.cards);
-				var players=[];
-				for(var i=0;i<game.players.length;i++){
-					if(!game.players[i].get('e','5')&&game.players[i]!=player&&
-						!game.players[i].isTurnedOver()&&
-						ai.get.attitude(player,game.players[i])>=3&&ai.get.attitude(game.players[i],player)>=3){
-						players.push(game.players[i]);
+				var players=game.filterPlayer(function(current){
+					if(!current.get('e','5')&&current!=player&&!current.isTurnedOver()&&
+						ai.get.attitude(player,current)>=3&&ai.get.attitude(current,player)>=3){
+						return true;
 					}
-				}
+				});
 				players.sort(lib.sort.seat);
 				var choice=players[0];
 				var next=player.chooseTarget('是否移动木牛流马？',function(card,player,target){

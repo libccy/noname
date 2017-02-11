@@ -89,21 +89,18 @@ card.guozhan={
 			fullskin:true,
 			type:'trick',
 			enable:function(card,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isMajor()) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.isMajor();
+				});
 			},
 			mode:['guozhan'],
 			filterTarget:true,
 			chongzhu:true,
 			changeTarget:function(player,targets){
 				var target=targets[0];
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isMajor()==target.isMajor()&&game.players[i]!=target){
-						targets.push(game.players[i]);
-					}
-				}
+				game.filterPlayer(function(current){
+					return current.isMajor()==target.isMajor()&&current!=target;
+				},targets);
 			},
 			content:function(){
 				if(target.isLinked()){
@@ -122,18 +119,16 @@ card.guozhan={
 				},
 				result:{
 					player:function(player,target){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(target.isMajor()==game.players[i].isMajor()){
-								if(game.players[i].isLinked()){
-									num+=ai.get.attitude(player,target);
+						return game.countPlayer(function(current){
+							if(target.isMajor()==current.isMajor()){
+								if(current.isLinked()){
+									return ai.get.attitude(player,target);
 								}
 								else{
-									num-=ai.get.attitude(player,target)*0.8;
+									return -ai.get.attitude(player,target)*0.8;
 								}
 							}
-						}
-						return num;
+						});
 					}
 				}
 			}
@@ -152,11 +147,9 @@ card.guozhan={
 				var target=targets[0];
 				targets.push(player);
 				if(target.identity!='ye'){
-					for(var i=0;i<game.players.length;i++){
-						if(target!=game.players[i]&&target.identity==game.players[i].identity){
-							targets.push(game.players[i]);
-						}
-					}
+					game.filterPlayer(function(current){
+						return target!=current&&target.identity==current.identity;
+					},targets);
 				}
 			},
 			content:function(){
@@ -264,15 +257,14 @@ card.guozhan={
 					player:function(player,target){
 						var att=ai.get.attitude(player,target);
 						if(target.hp==1&&att<0) return 0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]==target) continue;
-							if(ai.get.attitude(player,game.players[i])<att){
-								var num=1;
-								if(target==player.next||target==player.previous){
-									num+=0.5;
-								}
-								return num;
+						if(game.hasPlayer(function(current){
+							return ai.get.attitude(player,current)<att;
+						})){
+							var num=1;
+							if(target==player.next||target==player.previous){
+								num+=0.5;
 							}
+							return num;
 						}
 						return 0;
 					}
@@ -301,36 +293,28 @@ card.guozhan={
 					return target==next||target.inline(next);
 				}
 				if(player==target) return false;
-				var link=false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isLinked()&&game.players[i]!=player){
-						link=true;break;
-					}
-				}
-				if(link){
+				if(game.hasPlayer(function(current){
+					return current.isLinked()&&current!=player;
+				})){
 					if(!target.isLinked()) return false;
 					var distance=get.distance(player,target,'absolute');
-					for(var i=0;i<game.players.length;i++){
-						if(target!=game.players[i]&&
-							game.players[i]!=player&&
-							game.players[i].isLinked()){
-							if(get.distance(player,game.players[i],'absolute')<distance){
-								return false;
+					return !game.hasPlayer(function(current){
+						if(target!=current&&current!=player&&current.isLinked()){
+							var dist=get.distance(player,current,'absolute');
+							if(dist<distance){
+								return true;
 							}
-							if(get.distance(player,game.players[i],'absolute')==distance&&
-								parseInt(game.players[i].dataset.position)<parseInt(target.dataset.position)){
-								return false;
+							if(dist==distance&&parseInt(current.dataset.position)<parseInt(target.dataset.position)){
+								return true;
 							}
 						}
-					}
-					return true;
+					});
 				}
 				else{
 					var dist=get.distance(player,target);
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i]!=player&&get.distance(player,game.players[i])<dist) return false;
-					}
-					return true;
+					return !game.hasPlayer(function(current){
+						return current!=player&&get.distance(player,current)<dist
+					});
 				}
 			},
 			enable:true,
@@ -353,19 +337,11 @@ card.guozhan={
 						if(!target.isLinked()){
 							return ai.get.damageEffect(target,player,target,'fire');
 						}
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].isLinked()){
-								var eff=ai.get.damageEffect(game.players[i],player,target,'fire');
-								if(eff>0){
-									num++;
-								}
-								else if(eff<0){
-									num--;
-								}
+						return game.countPlayer(function(current){
+							if(current.isLinked()){
+								return get.sgn(ai.get.damageEffect(current,player,target,'fire'));
 							}
-						}
-						return num;
+						});
 					}
 				}
 			}
@@ -527,11 +503,9 @@ card.guozhan={
 				basic:{
 					equipValue:function(card,player){
 						if(player.identity=='unknown'||player.identity=='ye') return 2.5;
-						var num=2;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].identity==player.identity) num+=0.5;
-						}
-						return num;
+						return 2+game.countPlayer(function(current){
+							return current.identity==player.identity;
+						})/2;
 					}
 				}
 			},
@@ -574,10 +548,9 @@ card.guozhan={
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(player.canUse({name:'zhibi'},game.players[i])) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return player.canUse('zhibi',current);
+				});
 			},
 			content:function(){
 				'step 0'
@@ -810,13 +783,12 @@ card.guozhan={
 		_wuliu_skill2:{
 			mod:{
 				attackFrom:function(from,to,distance){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i]==from) continue;
-						if(game.players[i].identity=='unknown'||game.players[i].identity=='ye') continue;
-						if(game.players[i].identity!=from.identity) continue;
-						if(game.players[i].num('e','wuliu')) distance--;
-					}
-					return distance;
+					return distance-game.countPlayer(function(current){
+						if(current==from) return false;
+						if(current.identity=='unknown'||current.identity=='ye') return false;
+						if(current.identity!=from.identity) return false;
+						if(current.hasSkill('wuliu_skill')) return true;
+					});
 				}
 			}
 		},
@@ -828,11 +800,9 @@ card.guozhan={
 				if(player.num('h')==0) return false;
 				if(!event.card) return false;
 				if(event.card.name!='sha') return false;
-				var num=0;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=event.player&&get.distance(event.player,game.players[i])<=1) num++;
-				}
-				return num>0;
+				return game.hasPlayer(function(current){
+					return current!=event.player&&get.distance(event.player,current)<=1;
+				});
 			},
 			content:function(){
 				"step 0"

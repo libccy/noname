@@ -22687,12 +22687,14 @@
 			}
 			return num;
 		},
-		filterPlayer:function(func){
-			var list=[];
+		filterPlayer:function(func,list){
+			if(!Array.isArray(list)){
+				list=[];
+			}
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].isOut()) continue;
 				if(func(game.players[i])){
-					list.push(game.players[i]);
+					list.add(game.players[i]);
 				}
 			}
 			return list;
@@ -33150,6 +33152,11 @@
     			return false;
     		},
         },
+		sgn:function(num){
+			if(num>0) return 1;
+			if(num<0) return -1;
+			return 0;
+		},
         rand:function(num,num2){
             if(typeof num2=='number'){
                 return num+Math.floor(Math.random()*(num2-num+1));

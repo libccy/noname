@@ -752,7 +752,7 @@ table {
 	opacity: 0;
 	pointer-events: none;
 }
-#arena.auto #me .card{
+#arena.auto #me .handcards{
 	opacity: 0.5
 }
 #autonode>div {

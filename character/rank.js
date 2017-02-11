@@ -74,7 +74,6 @@ window.characterRank={
         'hs_laxiao',
         'hs_shaku',
         'hs_fandral',
-        'hs_totemic',
         'sundeng',
         'hs_xialikeer',
         'hs_sainaliusi',
@@ -144,6 +143,7 @@ window.characterRank={
     ],
     am:[
         'old_wangyi',
+        'hs_totemic',
         'swd_duanmeng',
         'pal_wenhui',
         'gjqt_xunfang',
