@@ -134,92 +134,6 @@ card.swd={
 				}
 			}
 		},
-		pantao:{
-			fullskin:true,
-			type:'basic',
-			enable:function(card,player){
-				return player.hp<player.maxHp;
-			},
-			savable:true,
-			selectTarget:-1,
-			filterTarget:function(card,player,target){
-				return target==player&&target.hp<target.maxHp;
-			},
-			modTarget:function(card,player,target){
-				return target.hp<target.maxHp;
-			},
-			content:function(){
-				target.recover(2);
-				target.changeHujia();
-			},
-			ai:{
-				basic:{
-					order:function(card,player){
-						if(player.hasSkillTag('pretao')) return 5;
-						return 2;
-					},
-					useful:11,
-					value:11,
-				},
-				result:{
-					target:function(player,target){
-						// if(player==target&&player.hp<=0) return 2;
-						var nh=target.num('h');
-						var keep=false;
-						if(nh<=target.hp){
-							keep=true;
-						}
-						else if(nh==target.hp+1&&target.hp>=2&&target.num('h','tao')<=1){
-							keep=true;
-						}
-						var mode=get.mode();
-						if(target.hp>=2&&keep&&target.hasFriend()){
-							if(target.hp>2) return 0;
-							if(target.hp==2){
-								for(var i=0;i<game.players.length;i++){
-									if(target!=game.players[i]&&ai.get.attitude(target,game.players[i])>=3){
-										if(game.players[i].hp<=1) return 0;
-										if(mode=='identity'&&game.players[i].isZhu&&game.players[i].hp<=2) return 0;
-									}
-								}
-							}
-						}
-						if(target.hp<0&&target!=player&&target.identity!='zhu') return 0;
-						var att=ai.get.attitude(player,target);
-						if(att<3&&att>=0&&player!=target) return 0;
-						var tri=_status.event.getTrigger();
-						if(mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
-							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
-								var num=0;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].identity=='fan'){
-										num+=game.players[i].num('h','tao');
-										if(num>2) return 2;
-									}
-								}
-								if(num>1&&player==target) return 2;
-								return 0;
-							}
-						}
-						if(mode=='identity'&&player.identity=='zhu'&&target.identity=='nei'){
-							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='zhong'){
-								return 0;
-							}
-						}
-						if(mode=='stone'&&target.isMin()&&
-						player!=target&&tri&&tri.name=='dying'&&player.side==target.side&&
-						tri.source!=target.getEnemy()){
-							return 0;
-						}
-						return 2;
-					},
-				},
-				tag:{
-					recover:2,
-					save:2,
-				}
-			}
-		},
 		shencaojie:{
 			fullskin:true,
 			type:'trick',
@@ -285,12 +199,9 @@ card.swd={
 				while(list.length){
 					var card={name:list.randomRemove()};
 					var info=get.info(card);
-					var targets=[];
-					for(var i=0;i<game.players.length;i++){
-						if(lib.filter.filterTarget(card,target,game.players[i])){
-							targets.push(game.players[i]);
-						}
-					}
+					var targets=game.filterPlayer(function(current){
+						return lib.filter.filterTarget(card,target,current);
+					});
 					if(targets.length){
 						targets.sort(lib.sort.seat);
 						if(info.selectTarget==-1){
@@ -633,11 +544,7 @@ card.swd={
 				},
 				result:{
 					target:function(player,target){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0) num++;
-						}
-						if(num>1) return 0;
+						if(player.hasUnknown(2)) return 0;
 						var nh=target.num('h');
 						if(get.mode()=='identity'){
 							if(target.isZhu&&nh<=1&&target.hp<=1) return -100;
@@ -885,13 +792,10 @@ card.swd={
 				},
 				result:{
 					target:function(player,target){
-						var players=[];
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=player&&!game.players[i].isTurnedOver()&&
-								ai.get.attitude(player,game.players[i])>=3&&ai.get.attitude(game.players[i],player)>=3){
-								players.push(game.players[i]);
-							}
-						}
+						var players=game.filterPlayer(function(current){
+							return (current!=player&&!current.isTurnedOver()&&
+								ai.get.attitude(player,current)>=3&&ai.get.attitude(current,player)>=3)
+						});
 						players.sort(lib.sort.seat);
 						if(target==players[0]) return 2;
 						return 0.5;
