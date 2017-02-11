@@ -1,10 +1,8 @@
 window.noname_source_list=[
-    'card/basic.js',
     'card/extra.js',
     'card/gujian.js',
     'card/guozhan.js',
     'card/hearth.js',
-    'card/naxx.js',
     'card/sp.js',
     'card/standard.js',
     'card/swd.js',
@@ -68,7 +66,6 @@ window.noname_source_list=[
     'extension/cardpile/extension.js',
     'extension/character/extension.js',
     'extension/coin/extension.js',
-    'extension/hsmod/extension.js',
     'extension/soldier/extension.js',
     'extension/weather/extension.js',
     'extension/wuxing/extension.js',
