@@ -182,9 +182,10 @@ character.gujian={
 				player.chooseButton(dialog).ai=function(button){
 					var name=button.link[2];
 					var taoyuan=0,nanman=0;
-					for(var i=0;i<game.players.length;i++){
-						var eff1=ai.get.effect(game.players[i],{name:'taoyuan'},player,player);
-						var eff2=ai.get.effect(game.players[i],{name:'nanman'},player,player);
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						var eff1=ai.get.effect(players[i],{name:'taoyuan'},player,player);
+						var eff2=ai.get.effect(players[i],{name:'nanman'},player,player);
 						if(eff1>0){
 							taoyuan++;
 						}
@@ -216,12 +217,9 @@ character.gujian={
 					var info=lib.card[name];
 					var card={name:name};
 					if(info.selectTarget==-1){
-						var targets=[];
-						for(var i=0;i<game.players.length;i++){
-							if(lib.filter.filterTarget(card,player,game.players[i])){
-								targets.push(game.players[i]);
-							}
-						}
+						var targets=game.filterPlayer(function(current){
+							return lib.filter.filterTarget(card,player,current);
+						});
 						if(targets.length){
 							targets.sort(lib.sort.seat);
 							player.useCard(card,targets);
@@ -359,24 +357,18 @@ character.gujian={
 			trigger:{player:'useCard'},
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
-				for(var i=0;i<game.players.length;i++){
-					if(event.targets.contains(game.players[i])==false&&game.players[i]!=player&&
-					lib.filter.targetEnabled(event.card,player,game.players[i])){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(){
+					return (event.targets.contains(current)==false&&current!=player&&
+					lib.filter.targetEnabled(event.card,player,current))
+				});
 			},
 			direct:true,
 			content:function(){
 				'step 0'
-				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(trigger.targets.contains(game.players[i])==false&&game.players[i]!=player&&
-					lib.filter.targetEnabled(trigger.card,player,game.players[i])){
-						list.push(game.players[i]);
-					}
-				}
+				var list=game.filterPlayer(function(current){
+					return (trigger.targets.contains(current)==false&&current!=player&&
+					lib.filter.targetEnabled(trigger.card,player,current))
+				});
 				event.list=list;
 				'step 1'
 				if(event.list.length){
@@ -619,24 +611,16 @@ character.gujian={
 			popup:false,
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
-				for(var i=0;i<game.players.length;i++){
-					if(event.targets.contains(game.players[i])==false&&
-					game.players[i]!=player&&
-					lib.filter.targetEnabled(event.card,player,game.players[i])){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return (event.targets.contains(current)==false&&current!=player&&
+					lib.filter.targetEnabled(event.card,player,current))
+				});
 			},
 			content:function(){
-				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(trigger.targets.contains(game.players[i])==false&&
-					game.players[i]!=player&&
-					lib.filter.targetEnabled(trigger.card,player,game.players[i])){
-						list.push(game.players[i]);
-					}
-				}
+				var list=game.filterPlayer(function(current){
+					return (trigger.targets.contains(current)==false&&current!=player&&
+					lib.filter.targetEnabled(trigger.card,player,current))
+				});
 				if(list.length){
 					event.target=list.randomGet();
 					player.line(event.target,'green');
@@ -1176,21 +1160,16 @@ character.gujian={
 				if(event.targets.length!=1) return false;
 				if(!player.num('he')) return false;
 				var target=event.targets[0];
-				for(var i=0;i<game.players.length;i++){
-					if(player!=game.players[i]&&target!=game.players[i]&&get.distance(target,game.players[i])<=1){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return player!=current&&target!=current&&get.distance(target,current)<=1;
+				});
 			},
 			content:function(){
 				"step 0"
-				event.targets=[];
-				for(var i=0;i<game.players.length;i++){
-					if(player!=game.players[i]&&trigger.targets[0]!=game.players[i]&&get.distance(trigger.targets[0],game.players[i])<=1){
-						event.targets.push(game.players[i]);
-					}
-				}
+				event.targets=game.filterPlayer(function(current){
+					var target=trigger.targets[0];
+					return player!=current&&target!=current&&get.distance(target,current)<=1;
+				});
 				var num=0;
 				for(var i=0;i<event.targets.length;i++){
 					num+=ai.get.effect(event.targets[i],{name:'sha'},player,player);
@@ -1373,12 +1352,9 @@ character.gujian={
 				}
 				else{
 					player.removeSkill('yangming2');
-					var num=0
-					for(var i=0;i<game.players.length;i++){
-						if(get.distance(player,game.players[i])<=1&&game.players[i].hp<game.players[i].maxHp){
-							num++;
-						}
-					}
+					var num=game.countPlayer(function(current){
+						return get.distance(player,current)<=1&&current.isDamaged();
+					});
 					if(num==0){
 						event.finish();
 					}
