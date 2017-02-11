@@ -39,6 +39,15 @@
     width:20px;
     position:relative;
 }
+#window:not(.nopointer) #bosslist>.player{
+    cursor: pointer;
+}
+.dialog.bosscharacter .buttons .button.selectable{
+	cursor: pointer;
+}
+.dialog.bosscharacter .buttons .button:not(.selectable){
+    opacity: 0.6
+}
 
 .player.bossplayer.bossing{
     position:absolute;

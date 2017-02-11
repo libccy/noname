@@ -412,6 +412,7 @@ mode.guozhan={
 				var addSetting=function(dialog){
 					dialog.add('选择座位');
 					var seats=document.createElement('table');
+					seats.classList.add('pointertable');
 					seats.style.margin='0 auto';
 					seats.style.maxWidth=(60*parseInt(get.config('player_number')))+'px';
 					var tr=document.createElement('tr');
@@ -422,7 +423,7 @@ mode.guozhan={
 						td.style.width='40px';
 						td.style.fontSize='25px';
 						td.style.fontFamily='xinwei';
-						td.innerHTML=get.cnNumber(i,true);
+						td.innerHTML='<span>'+get.cnNumber(i,true)+'</span>';
 						td.link=i-1;
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 							if(_status.dragged) return;

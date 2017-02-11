@@ -6357,7 +6357,7 @@ character.sp={
 						}
 					}
 					else{
-						targets=result.target;
+						targets=result.targets;
 					}
 					player.logSkill('hongyuan',targets);
 					game.asyncDraw(targets);

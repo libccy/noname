@@ -1194,6 +1194,24 @@
 							ui.arena.dataset.target_shake=bool;
 						}
 					},
+					cursor_style:{
+						name:'指针样式',
+						init:'auto',
+						unfrequent:true,
+						item:{
+							auto:'自动',
+							pointer:'指针'
+						},
+						onclick:function(item){
+							game.saveConfig('cursor_style',item);
+							if(item=='pointer'){
+								ui.window.classList.add('nopointer');
+							}
+							else{
+								ui.window.classList.remove('nopointer');
+							}
+						}
+					},
                     link_style:{
                         name:'横置样式',
                         init:'rotate',
@@ -1416,6 +1434,12 @@
                                 map.player_height.hide();
                             }
                         }
+						if(config.touchscreen){
+							map.cursor_style.hide();
+						}
+						else{
+							map.cursor_style.show();
+						}
 						// if(config.theme=='woodden'&&config.image_background=='default'){
 						// 	map.background_color_wood.show();
 						// }
@@ -5597,7 +5621,8 @@
 			pt:function(){
 				var list=Array.from(arguments);
 				while(list.length){
-					ui.cardPile.insertBefore(cheat.gn(list.pop()),ui.cardPile.firstChild);
+					var card=cheat.gn(list.pop());
+					if(card) ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
 				}
 			},
 			q:function(){
@@ -5877,6 +5902,7 @@
 			gx:function(name,target){
 				target=target||game.me;
 				var card=cheat.gn(name);
+				if(!card) return;
 				target.node.handcards1.appendChild(card);
 				delete _status.event._cardChoice;
 				delete _status.event._targetChoice;
@@ -5912,6 +5938,9 @@
 				else if(name=='leisha'){
 					name='sha';
 					nature='thunder';
+				}
+				if(!lib.card[name]){
+					return null;
 				}
 				return game.createCard(name,suit,null,nature);
 			},
@@ -20933,6 +20962,7 @@
 			for(var i=0;i<_status.dragline.length;i++){
 				if(_status.dragline[i]) _status.dragline[i].remove();
 			}
+			ui.arena.classList.remove('dragging');
 			_status.dragline.length=0;
 		},
 		swapSeat:function(player1,player2,prompt,behind){
@@ -28425,7 +28455,7 @@
 				}
 				var list=[];
 				var dialog;
-				var node=ui.create.div('.caption');
+				var node=ui.create.div('.caption.pointerspan');
 				if(get.is.phoneLayout()){
 					node.style.fontSize='30px';
 				}
@@ -28765,6 +28795,7 @@
                     newlined2.style.marginTop='5px';
                     newlined2.style.display='none';
                     newlined2.style.fontFamily='xinwei';
+					newlined2.classList.add('pointernode');
                     if(get.is.phoneLayout()){
                         newlined2.style.fontSize='32px';
                     }
@@ -29349,6 +29380,9 @@
 				ui.backgroundMusic.autoplay=true;
 				ui.backgroundMusic.addEventListener('ended',game.playBackgroundMusic);
 				ui.window.appendChild(ui.backgroundMusic);
+				if(lib.config.cursor_style=='pointer'){
+					ui.window.classList.add('nopointer');
+				}
 
 				ui.arenalog=ui.create.div('#arenalog',ui.arena);
 				if(lib.config.show_log=='off'){
@@ -30448,7 +30482,7 @@
                     }
                 }
 				for(var k=0;k<rows;k++){
-					var node=ui.create.div('.newgame');
+					var node=ui.create.div('.newgame.pointernode');
 					for(var i=0;i<3&&i+k*3<modes.length;i++){
 						var thismode=modes[i+k*3];
 						var div=ui.create.div(thismode==(_status.sourcemode||lib.config.mode)?'.underlinenode.on':'.underlinenode',node);
@@ -31015,203 +31049,6 @@
 					_status.dragstatuschanged=null;
 				}
 			},
-			windowtouchmove_tmp:function(e){
-				e.preventDefault();
-				if(window.inSplash) return;
-				if(_status.draggingroundmenu){
-					delete _status._swipeorigin;
-					if(ui.roundmenu._dragorigin&&ui.roundmenu._dragtransform&&e.touches.length){
-						var translate=ui.roundmenu._dragtransform.slice(0);
-						var dx=e.touches[0].clientX/game.documentZoom-ui.roundmenu._dragorigin.clientX/game.documentZoom;
-						var dy=e.touches[0].clientY/game.documentZoom-ui.roundmenu._dragorigin.clientY/game.documentZoom;
-						translate[0]+=dx;
-						translate[1]+=dy;
-						if(dx*dx+dy*dy>100){
-							if(ui.roundmenu._resetTimeout){
-								clearTimeout(ui.roundmenu._resetTimeout);
-								delete ui.roundmenu._resetTimeout;
-							}
-						}
-						ui.roundmenu._dragtouches=e.touches[0];
-						ui.click.checkroundtranslate(translate);
-					}
-					_status.clicked=true;
-				}
-				else if(_status.draggingtouchdialog){
-					delete _status._swipeorigin;
-					if(_status.draggingtouchdialog._dragorigin&&_status.draggingtouchdialog._dragtransform&&e.touches.length){
-						var translate=_status.draggingtouchdialog._dragtransform.slice(0);
-						var dx=e.touches[0].clientX/game.documentZoom-_status.draggingtouchdialog._dragorigin.clientX/game.documentZoom;
-						var dy=e.touches[0].clientY/game.documentZoom-_status.draggingtouchdialog._dragorigin.clientY/game.documentZoom;
-						translate[0]+=dx;
-						translate[1]+=dy;
-						_status.draggingtouchdialog._dragtouches=e.touches[0];
-						ui.click.checkdialogtranslate(translate,_status.draggingtouchdialog);
-					}
-					_status.clicked=true;
-				}
-				else if(_status._swipeorigin&&e.touches[0]){
-					_status._swipeorigin.touches=e.touches[0];
-				}
-
-				if(_status.mousedragging&&e.touches.length){
-					e.preventDefault();
-
-					var items,item,iwhile,item0;
-					if(document.elementsFromPoint){
-						items=document.elementsFromPoint(e.touches[0].clientX,e.touches[0].clientY);
-					}
-					else{
-						item0=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);
-					}
-
-					if(items){
-						iwhile=0;
-						item=items[0];
-					}
-					else{
-						item=item0;
-					}
-					while(item){
-						if(lib.config.enable_touchdragline&&_status.mouseleft&&!game.chess){
-							var i=0;
-							var startPoint0=[_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop];
-							var startPoint=startPoint0;
-							var endPoint;
-							if(_status.multitarget){
-								for(;i<_status.lastdragchange.length;i++){
-									var exy=_status.lastdragchange[i]._lastdragchange;
-									endPoint=[exy[0],exy[1]];
-									_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
-									startPoint=endPoint;
-								}
-							}
-							if(!_status.selectionfull){
-								endPoint=[e.touches[0].clientX/game.documentZoom-ui.arena.offsetLeft,e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop];
-								_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
-								startPoint=endPoint;
-								i++;
-							}
-							if(!_status.multitarget){
-								for(;i<_status.lastdragchange.length;i++){
-									var exy=_status.lastdragchange[i]._lastdragchange;
-									_status.dragline[i]=game.linexy(startPoint0.concat([exy[0],exy[1]]),'drag',_status.dragline[i]);
-								}
-							}
-							var remained=_status.dragline.splice(i);
-							while(remained.length){
-								remained.shift().remove();
-							}
-							// ui.canvas.width=ui.arena.offsetWidth;
-							// ui.canvas.height=ui.arena.offsetHeight;
-							// var ctx=ui.ctx;
-							// ctx.shadowBlur=5;
-							// ctx.shadowColor='rgba(0,0,0,0.3)';
-							// ctx.strokeStyle='white';
-							// ctx.lineWidth=3;
-							// ctx.setLineDash([8,2]);
-							//
-							// ctx.beginPath();
-							//
-							// ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
-							//
-							// if(_status.multitarget){
-							// 	for(var i=0;i<_status.lastdragchange.length;i++){
-							// 		var exy=_status.lastdragchange[i]._lastdragchange;
-							// 		ctx.lineTo(exy[0],exy[1]);
-							// 	}
-							// }
-							// if(!_status.selectionfull){
-							// 	ctx.lineTo(e.touches[0].clientX/game.documentZoom-ui.arena.offsetLeft,e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop);
-							// }
-							// ctx.stroke();
-							// if(!_status.multitarget){
-							// 	for(var i=0;i<_status.lastdragchange.length;i++){
-							// 		ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
-							// 		var exy=_status.lastdragchange[i]._lastdragchange;
-							// 		ctx.lineTo(exy[0],exy[1]);
-							// 		ctx.stroke();
-							// 	}
-							// }
-						}
-
-						if(item==_status.mousedragorigin){
-							if(_status.mouseleft){
-								_status.mousedragging=null;
-								_status.mousedragorigin=null;
-								_status.clicked=false;
-								game.uncheck();
-								game.check();
-								_status.clicked=true;
-							}
-							return;
-						}
-						var itemtype=get.itemtype(item);
-						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
-							if(items) _status.mouseleft=true;
-							var ex=e.touches[0].clientX/game.documentZoom-ui.arena.offsetLeft;
-							var ey=e.touches[0].clientY/game.documentZoom-ui.arena.offsetTop;
-							var exx=ex,eyy=ey;
-							if(game.chess){
-								ex-=-ui.chessContainer.scrollLeft+ui.chess.offsetLeft;
-								ey-=-ui.chessContainer.scrollTop+ui.chess.offsetTop;
-							}
-							if(itemtype!='player'||(ex>item.offsetLeft&&ex<item.offsetLeft+item.offsetWidth&&
-								ey>item.offsetTop&&ey<item.offsetTop+item.offsetHeight)){
-								var targetfixed=false;
-								if(itemtype=='player'){
-									if(get.select(_status.event.selectTarget)[1]==-1){
-										targetfixed=true;
-									}
-								}
-								if(!targetfixed&&item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
-									if(items) _status.mouseleft=true;
-									_status.dragstatuschanged=item;
-									_status.clicked=false;
-									_status.dragged=false;
-									var notbefore=itemtype=='player'&&!item.classList.contains('selected');
-									ui.click[itemtype].call(item);
-									if(item.classList.contains('selected')){
-										if(notbefore){
-											_status.lastdragchange.push(item);
-											item._lastdragchange=[exx,eyy];
-										}
-									}
-									else{
-										_status.lastdragchange.remove(item);
-										for(var i=0;i<ui.touchlines.length;i++){
-											if(ui.touchlines[i]._origin==item){
-												ui.touchlines[i].delete();
-												ui.touchlines.splice(i--,1);
-											}
-										}
-									}
-									_status.selectionfull=true;
-									if(_status.event.filterButton&&ui.selected.buttons.length<get.select(_status.event.selectButton)[1]){
-										_status.selectionfull=false;
-									}
-									else if(_status.event.filterCard&&ui.selected.cards.length<get.select(_status.event.selectCard)[1]){
-										_status.selectionfull=false;
-									}
-									else if(_status.event.filterTarget&&ui.selected.targets.length<get.select(_status.event.selectTarget)[1]){
-										_status.selectionfull=false;
-									}
-								}
-							}
-							return;
-						}
-						if(items){
-							iwhile++
-							item=items[iwhile];
-						}
-						else{
-							item=item.parentNode;
-						}
-					}
-					if(items) _status.mouseleft=true;
-					_status.dragstatuschanged=null;
-				}
-			},
 			windowtouchend:function(e){
 				if(window.inSplash) return;
 				if(e.touches.length==1&&!_status.dragged&&!_status.draggingtouchdialog){
@@ -31396,88 +31233,76 @@
 					dialogs[i].delete();
 				}
 				var node=_status.currentmouseenter;
-				var items,item,iwhile,item0;
-				if(document.elementsFromPoint){
-					items=document.elementsFromPoint(e.clientX,e.clientY);
-				}
-				else{
-					item0=document.elementFromPoint(e.clientX,e.clientY);
-				}
+				var sourceitem=document.elementFromPoint(e.clientX,e.clientY);
+				var item=sourceitem;
 				if(_status.mousedragging){
 					e.preventDefault();
 					if(lib.config.enable_dragline){
-						var i=0;
-						var startPoint0=[_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop];
-						var startPoint=startPoint0;
-						var endPoint;
-						if(_status.multitarget){
-							for(;i<_status.lastdragchange.length;i++){
-								var exy=_status.lastdragchange[i]._lastdragchange;
-								endPoint=[exy[0],exy[1]];
-								_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
-								startPoint=endPoint;
-							}
-						}
-						if(!_status.selectionfull){
-							endPoint=[e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop];
-							_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
-							startPoint=endPoint;
-							i++;
-						}
-						if(!_status.multitarget){
-							for(var j=0;j<_status.lastdragchange.length;j++){
-								i+=j;
-								var exy=_status.lastdragchange[j]._lastdragchange;
-								_status.dragline[i]=game.linexy(startPoint0.concat([exy[0],exy[1]]),'drag',_status.dragline[i]);
-							}
-						}
-						var remained=_status.dragline.splice(i+1);
-						for(var j=0;j<remained.length;j++){
-							if(remained[j]) remained[j].remove();
-						}
-
-						// ui.canvas.width=ui.arena.offsetWidth;
-						// ui.canvas.height=ui.arena.offsetHeight;
-						// var ctx=ui.ctx;
-						// ctx.shadowBlur=5;
-						// ctx.shadowColor='rgba(0,0,0,0.3)';
-						// ctx.strokeStyle='white';
-						// ctx.lineWidth=3;
-						// ctx.setLineDash([8,2]);
-						//
-						// ctx.beginPath();
-						//
-						// ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
+						// var i=0;
+						// var startPoint0=[_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop];
+						// var startPoint=startPoint0;
+						// var endPoint;
 						// if(_status.multitarget){
-						// 	for(var i=0;i<_status.lastdragchange.length;i++){
+						// 	for(;i<_status.lastdragchange.length;i++){
 						// 		var exy=_status.lastdragchange[i]._lastdragchange;
-						// 		ctx.lineTo(exy[0],exy[1]);
+						// 		endPoint=[exy[0],exy[1]];
+						// 		_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
+						// 		startPoint=endPoint;
 						// 	}
 						// }
 						// if(!_status.selectionfull){
-						// 	ctx.lineTo(e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop);
+						// 	endPoint=[e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop];
+						// 	_status.dragline[i]=game.linexy(startPoint.concat(endPoint),'drag',_status.dragline[i]);
+						// 	startPoint=endPoint;
+						// 	i++;
 						// }
-						// ctx.stroke();
 						// if(!_status.multitarget){
-						// 	for(var i=0;i<_status.lastdragchange.length;i++){
-						// 		ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
-						// 		var exy=_status.lastdragchange[i]._lastdragchange;
-						// 		ctx.lineTo(exy[0],exy[1]);
-						// 		ctx.stroke();
+						// 	for(var j=0;j<_status.lastdragchange.length;j++){
+						// 		i+=j;
+						// 		var exy=_status.lastdragchange[j]._lastdragchange;
+						// 		_status.dragline[i]=game.linexy(startPoint0.concat([exy[0],exy[1]]),'drag',_status.dragline[i]);
 						// 	}
 						// }
+						// var remained=_status.dragline.splice(i+1);
+						// for(var j=0;j<remained.length;j++){
+						// 	if(remained[j]) remained[j].remove();
+						// }
+
+						ui.canvas.width=ui.arena.offsetWidth;
+						ui.canvas.height=ui.arena.offsetHeight;
+						var ctx=ui.ctx;
+						ctx.shadowBlur=5;
+						ctx.shadowColor='rgba(0,0,0,0.3)';
+						ctx.strokeStyle='white';
+						ctx.lineWidth=3;
+						ctx.setLineDash([8,2]);
+
+						ctx.beginPath();
+
+						ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
+						if(_status.multitarget){
+							for(var i=0;i<_status.lastdragchange.length;i++){
+								var exy=_status.lastdragchange[i]._lastdragchange;
+								ctx.lineTo(exy[0],exy[1]);
+							}
+						}
+						if(!_status.selectionfull){
+							ctx.lineTo(e.clientX/game.documentZoom-ui.arena.offsetLeft,e.clientY/game.documentZoom-ui.arena.offsetTop);
+						}
+						ctx.stroke();
+						if(!_status.multitarget){
+							for(var i=0;i<_status.lastdragchange.length;i++){
+								ctx.moveTo(_status.mousedragging.clientX/game.documentZoom-ui.arena.offsetLeft,_status.mousedragging.clientY/game.documentZoom-ui.arena.offsetTop);
+								var exy=_status.lastdragchange[i]._lastdragchange;
+								ctx.lineTo(exy[0],exy[1]);
+								ctx.stroke();
+							}
+						}
 					}
 
-					if(items){
-						iwhile=0;
-						item=items[0];
-					}
-					else{
-						item=item0;
-					}
 					while(item){
 						if(item==_status.mousedragorigin){
-							if((items&&_status.mouseleft)||(!items&&get.utc()-_status.lastmouseutc>=1000)){
+							if(_status.mouseleft){
 								_status.mousedragging=null;
 								_status.mousedragorigin=null;
 								_status.clicked=false;
@@ -31489,7 +31314,7 @@
 						}
 						var itemtype=get.itemtype(item);
 						if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
-							if(items) _status.mouseleft=true;
+							_status.mouseleft=true;
 							var ex=e.clientX/game.documentZoom-ui.arena.offsetLeft;
 							var ey=e.clientY/game.documentZoom-ui.arena.offsetTop;
 							var exx=ex,eyy=ey;
@@ -31506,7 +31331,7 @@
 									}
 								}
 								if(!targetfixed&&item.classList.contains('selectable')&&_status.dragstatuschanged!=item){
-									if(items) _status.mouseleft=true;
+									_status.mouseleft=true;
 									_status.dragstatuschanged=item;
 									_status.clicked=false;
 									var notbefore=itemtype=='player'&&!item.classList.contains('selected');
@@ -31534,25 +31359,12 @@
 							}
 							return;
 						}
-						if(items){
-							iwhile++;
-							item=items[iwhile];
-						}
-						else{
-							item=item.parentNode;
-						}
+						item=item.parentNode;
 					}
-					if(items) _status.mouseleft=true;
+					_status.mouseleft=true;
 					_status.dragstatuschanged=null;
 				}
 				else{
-					if(items){
-						iwhile=0;
-						item=items[0];
-					}
-					else{
-						item=item0;
-					}
 					while(item){
 						if(item==node&&!node._mouseentercreated){
 							ui.click.mouseentercancel();
@@ -31589,13 +31401,7 @@
 							},hoveration);
 							break;
 						}
-						if(items){
-							iwhile++;
-							item=items[iwhile];
-						}
-						else{
-							item=item.parentNode;
-						}
+						item=item.parentNode;
 					}
 					if(_status.draggingdialog){
 						var ddialog=_status.draggingdialog;
@@ -31626,21 +31432,8 @@
 				for(var i=0;i<dialogs.length;i++){
 					dialogs[i].delete();
 				}
-				var items,item,iwhile,item0;
-				if(document.elementsFromPoint){
-					items=document.elementsFromPoint(e.clientX,e.clientY);
-				}
-				else{
-					item=document.elementFromPoint(e.clientX,e.clientY);
-					item0=item;
-				}
-				if(items){
-					iwhile=0;
-					item=items[0];
-				}
-				else{
-					item=item0;
-				}
+				var sourceitem=document.elementFromPoint(e.clientX,e.clientY);
+				var item=sourceitem;
 				while(item){
 					var itemtype=get.itemtype(item);
 					if(itemtype=='button') break;
@@ -31663,13 +31456,7 @@
 						}
 						return;
 					}
-					if(items){
-						iwhile++;
-						item=items[iwhile];
-					}
-					else{
-						item=item.parentNode;
-					}
+					item=item.parentNode;
 				}
 
 				var evt=_status.event;
@@ -31677,13 +31464,7 @@
 				if(!ui.arena.classList.contains('selecting')) return;
 				if(!evt.isMine()) return;
 
-				if(items){
-					iwhile=0;
-					item=items[0];
-				}
-				else{
-					item=item0;
-				}
+				item=sourceitem;
 				while(item){
 					var itemtype=get.itemtype(item);
 					if(itemtype=='card'||itemtype=='button'||itemtype=='player'){
@@ -31699,17 +31480,12 @@
 								_status.selectionfull=false;
 								_status.multitarget=false;
 								_status.lastmouseutc=get.utc();
+								ui.arena.classList.add('dragging');
 							}
 						}
 						return;
 					}
-					if(items){
-						iwhile++;
-						item=items[iwhile];
-					}
-					else{
-						item=item.parentNode;
-					}
+					item=item.parentNode;
 				}
 			},
 			cardtouchstart:function(e){
@@ -31795,7 +31571,7 @@
 				else{
 					var tmpflag=false;
 					_status.mousedown=false;
-					if(_status.mousedragging&&(_status.mouseleft||!document.elementsFromPoint)){
+					if(_status.mousedragging&&_status.mouseleft){
 						if(game.check()){
 							if(ui.confirm){
 								ui.confirm.close();
@@ -31823,6 +31599,7 @@
 					}
 					// ui.updatehl();
 				}
+				ui.arena.classList.remove('dragging');
 			},
 			mousemove:function(){
 				if(!lib.config.hover_handcard&&this.parentNode&&this.parentNode.parentNode==ui.me){
