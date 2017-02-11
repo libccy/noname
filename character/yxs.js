@@ -905,7 +905,7 @@ character.yxs={
 			trigger:{player:'shaBegin'},
 			forced:true,
 			content:function(){
-				var range=get.attackRange(player);
+				var range=player.getAttackRange();
 				if(range>trigger.target.hp){
 					trigger.directHit=true;
 				}

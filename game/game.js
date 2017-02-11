@@ -12789,6 +12789,70 @@
 						}
 					},time)
 				},
+				getCardUsable:function(card){
+					var player=this;
+					if(typeof card=='string'){
+						card={name:card};
+					}
+					var info=get.info(card);
+					if(info.autoViewAs){
+						card={name:info.autoViewAs,suit:card.suit,number:card.number};
+					}
+					var num=get.info(card).usable;
+					if(typeof num=='function') num=num(card,player);
+					num=game.checkMod(card,player,num,'cardUsable',player.get('s'));
+					if(typeof num!='number') return Infinity;
+					if(_status.currentPhase==player){
+						return num-get.cardCount(card,player);
+					}
+					return num;
+				},
+				getAttackRange:function(){
+					var player=this;
+					var range=0;
+					range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
+					range=game.checkMod(player,player,range,'attackFrom',player.get('s'));
+					var equips=player.get('e');
+					for(var i=0;i<equips.length;i++){
+						var info=get.info(equips[i]).distance;
+						if(!info) continue;
+						if(info.globalFrom){
+							range+=info.globalFrom;
+						}
+						if(info.attackFrom){
+							range+=info.attackFrom;
+						}
+					}
+					return (1-range);
+				},
+				getGlobalFrom:function(){
+					var player=this;
+					var range=0;
+					range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
+					var equips=player.get('e');
+					for(var i=0;i<equips.length;i++){
+						var info=get.info(equips[i]).distance;
+						if(!info) continue;
+						if(info.globalFrom){
+							range+=info.globalFrom;
+						}
+					}
+					return (-range);
+				},
+				getGlobalTo:function(){
+					var player=this;
+					var range=0;
+					range=game.checkMod(player,player,range,'globalTo',player.get('s'));
+					var equips=player.get('e');
+					for(var i=0;i<equips.length;i++){
+						var info=get.info(equips[i]).distance;
+						if(!info) continue;
+						if(info.globalTo){
+							range+=info.globalTo;
+						}
+					}
+					return (range);
+				},
                 getHandcardLimit:function(){
                     return game.checkMod(this,this.hp,'maxHandcard',this.get('s'))
                 },
@@ -31933,10 +31997,10 @@
                     var range=get.info(this).range;
                     if(range){
                         if(typeof range.attack==='number'){
-                            player.createRangeShadow(Math.min(8,get.attackRange(player)+range.attack-1));
+                            player.createRangeShadow(Math.min(8,player.getAttackRange()+range.attack-1));
                         }
                         else if(typeof range.global==='number'){
-                            player.createRangeShadow(Math.min(8,get.globalFrom(player)+range.global));
+                            player.createRangeShadow(Math.min(8,player.getGlobalFrom()+range.global));
                         }
                     }
                 }
@@ -34058,60 +34122,6 @@
 			if(method=='attack') return m;
 			return n;
 		},
-		cardUsable:function(player,card){
-			var info=get.info(card);
-			if(info.autoViewAs){
-				card={name:info.autoViewAs,suit:card.suit,number:card.number};
-			}
-			var num=get.info(card).usable;
-			if(typeof num=='function') num=num(card,player);
-			num=game.checkMod(card,player,num,'cardUsable',player.get('s'));
-			if(typeof num!='number') return Infinity;
-			else return num-get.cardCount(card,player);
-		},
-		attackRange:function(player){
-			var range=0;
-			range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
-			range=game.checkMod(player,player,range,'attackFrom',player.get('s'));
-			var equips=player.get('e');
-			for(var i=0;i<equips.length;i++){
-				var info=get.info(equips[i]).distance;
-				if(!info) continue;
-				if(info.globalFrom){
-					range+=info.globalFrom;
-				}
-				if(info.attackFrom){
-					range+=info.attackFrom;
-				}
-			}
-			return (1-range);
-		},
-		globalFrom:function(player){
-			var range=0;
-			range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
-			var equips=player.get('e');
-			for(var i=0;i<equips.length;i++){
-				var info=get.info(equips[i]).distance;
-				if(!info) continue;
-				if(info.globalFrom){
-					range+=info.globalFrom;
-				}
-			}
-			return (-range);
-		},
-		globalTo:function(player){
-			var range=0;
-			range=game.checkMod(player,player,range,'globalTo',player.get('s'));
-			var equips=player.get('e');
-			for(var i=0;i<equips.length;i++){
-				var info=get.info(equips[i]).distance;
-				if(!info) continue;
-				if(info.globalTo){
-					range+=info.globalTo;
-				}
-			}
-			return (range);
-		},
 		info:function(item){
 			if(typeof item=='string'){
 				return lib.skill[item];
@@ -34851,13 +34861,13 @@
 						tr=document.createElement('tr');
 						table.appendChild(tr);
 						td=document.createElement('td');
-						td.innerHTML=get.attackRange(node);
+						td.innerHTML=node.getAttackRange();
 						tr.appendChild(td);
 						td=document.createElement('td');
-						td.innerHTML=get.globalFrom(node);
+						td.innerHTML=node.getGlobalFrom();
 						tr.appendChild(td);
 						td=document.createElement('td');
-						td.innerHTML=get.globalTo(node);
+						td.innerHTML=node.getGlobalTo();
 						tr.appendChild(td);
 
 						uiintro.content.appendChild(table);

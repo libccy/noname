@@ -74,14 +74,8 @@ card.extra={
 							if(player.getActCount()+1>=player.actcount) return 0;
 						}
 						var shas=player.get('h','sha');
-						if(shas.length>1){
-							if(player.num('e','zhuge')) return 0;
-							if(player.hasSkill('paoxiao')) return 0;
-							if(player.hasSkill('fengnu')) return 0;
-							if(!player.getStat().card.sha){
-								if(player.hasSkill('tanlin3')) return 0;
-								if(player.hasSkill('zhaxiang2')) return 0;
-							}
+						if(shas.length>1&&player.getCardUsable('sha')>1){
+							return 0;
 						}
 						var card;
 						if(shas.length){

@@ -1585,14 +1585,8 @@ card.swd={
 							if(player.getActCount()+1>=player.actcount) return false;
 						}
 						var shas=player.get('h','sha');
-						if(shas.length>1){
-							if(player.num('e','zhuge')) return 0;
-							if(player.hasSkill('paoxiao')) return 0;
-							if(player.hasSkill('fengnu')) return 0;
-							if(!player.getStat().card.sha){
-								if(player.hasSkill('tanlin3')) return 0;
-								if(player.hasSkill('zhaxiang2')) return 0;
-							}
+						if(shas.length>1&&player.getCardUsable('sha')>1){
+							return 0;
 						}
 						var card;
 						if(shas.length){
@@ -1715,7 +1709,7 @@ card.swd={
 			chongzhu:true,
 			type:'trick',
 			enable:function(){
-				return game.players.length>2;
+				return game.countPlayer()>2;
 			},
 			filterTarget:function(card,player,target){
 				return player.next==target||player.previous==target;
@@ -1774,11 +1768,7 @@ card.swd={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nothunder')) return 0;
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0) num++;
-						}
-						if(num>1) return 0;
+						if(target.hasUnknown(2)) return 0;
 						var nh=target.num('h');
 						if(lib.config.mode=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -3191,12 +3181,11 @@ card.swd={
 					target:function(player,target){
 						if(player.num('h')<=1) return 0;
 						if(ai.get.attitude(player,target)>=0) return 0;
-						for(var i=0;i<game.players.length;i++){
-							if(player!=game.players[i]&&
-								target.canUse('sha',game.players[i])&&
-								ai.get.effect(game.players[i],{name:'sha'},target,player)>0){
-								return -1;
-							}
+						if(game.hasPlayer(function(current){
+							return (player!=current&&target.canUse('sha',current)&&
+								ai.get.effect(current,{name:'sha'},target,player)>0)
+						})){
+							return -1;
 						}
 						return 0;
 					}
@@ -4080,13 +4069,11 @@ card.swd={
 							if(player.hasSkill('hslingjian_chaofeng')) return;
 							if(card.name=='sha'){
 								if(target.hasSkill('hslingjian_chaofeng')) return;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].hasSkill('hslingjian_chaofeng')){
-										if(game.players[i].hp<game.players[i].num('h')&&
-											get.distance(player,game.players[i],'attack')<=1){
-											return false;
-										}
-									}
+								if(game.hasPlayer(function(current){
+									return (current.hasSkill('hslingjian_chaofeng')&&
+										current.hp<current.num('h')&&get.distance(player,current,'attack')<=1);
+								})){
+									return false;
 								}
 							}
 						}
@@ -4212,10 +4199,9 @@ card.swd={
 			filter:function(event,player){
 				var nh=player.num('h');
 				if(nh==0) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')>nh) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.num('h')>nh;
+				});
 			},
 			check:function(card){
 				return 8-ai.get.value(card);

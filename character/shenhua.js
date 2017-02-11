@@ -3363,7 +3363,7 @@ character.shenhua={
 			},
 			filter:function(event,player){
 				var length=event.target.num('h');
-				return (length>=player.hp||length<=get.attackRange(player));
+				return (length>=player.hp||length<=player.getAttackRange());
 			},
 			content:function(){
 				trigger.directHit=true;
