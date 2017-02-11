@@ -92,12 +92,13 @@ card.extra={
 							}
 						}
 						if(card){
-							for(var i=0;i<game.players.length;i++){
-								if(ai.get.attitude(target,game.players[i])<0&&
-									target.canUse(card,game.players[i],true,true)&&
-									!game.players[i].num('e','baiyin')){
-									if(ai.get.effect(game.players[i],card,target)>0) return 1;
-								}
+							if(game.hasPlayer(function(current){
+								return (ai.get.attitude(target,current)<0&&
+									target.canUse(card,current,true,true)&&
+									!current.num('e','baiyin')&&
+									ai.get.effect(current,card,target)>0);
+							})){
+								return 1;
 							}
 						}
 						return 0;
@@ -229,13 +230,11 @@ card.extra={
 					target:function(player,target){
 						if(target.isLinked()) return 1;
 						if(ai.get.attitude(player,target)>=0) return -1;
-						// if(player.isMin()) return -1;
 						if(ui.selected.targets.length) return -1;
-						for(var i=0;i<game.players.length;i++){
-							if(ai.get.attitude(player,game.players[i])<=-1&&
-								game.players[i]!=target&&!game.players[i].isLinked()){
-								return -1;
-							}
+						if(game.hasPlayer(function(current){
+							return ai.get.attitude(player,current)<=-1&&current!=target&&!current.isLinked();
+						})){
+							return -1;
 						}
 						return 0;
 					}
@@ -319,10 +318,9 @@ card.extra={
 						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
 						if(player.hasSkillTag('noDirectDamage')) return 10;
 						if(ai.get.damageEffect(player,player,player,'fire')>=0) return 10;
-						var num=3;
-						for(var i=0;i<game.players.length;i++){
-							if(ai.get.attitude(game.players[i],player)<0) num--;
-						}
+						var num=3-game.countPlayer(function(current){
+							return ai.get.attitude(current,player)<0;
+						});
 						if(player.hp==1) num+=4;
 						if(player.hp==2) num+=1;
 						if(player.hp==3) num--;

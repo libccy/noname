@@ -22677,7 +22677,13 @@
 			var num=0;
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].isOut()) continue;
-				if(func(game.players[i])) num++;
+				var result=func(game.players[i]);
+				if(typeof result=='number'){
+					num+=result;
+				}
+				else{
+					num++;
+				}
 			}
 			return num;
 		},
