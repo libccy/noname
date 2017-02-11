@@ -747,7 +747,7 @@ table {
 	opacity: 0;
 	pointer-events: none
 }
-#arena.auto #handcards1,#arena.auto #handcards2 {
+#arena.auto #me .card{
 	opacity: 0.5
 }
 #autonode>div {
@@ -2784,6 +2784,7 @@ div:hover>.intro {
 }
 #window>.choosedouble.character {
 	transform-origin: top left;
+	transition-property: opacity, transform;
 }
 #window>.choosedouble.character.moved {
 	z-index: 1;

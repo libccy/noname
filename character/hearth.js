@@ -468,8 +468,8 @@ character.hearth={
 						if(get.tag(card,'damage')){
 							if(player.hasSkill('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
-							if(target.hp>=4) return [1,get.tag(card,'damage')*1.5];
-							if(target.hp==3) return [1,get.tag(card,'damage')*1];
+							if(target.hp>=4) return [1,get.tag(card,'damage')*2];
+							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
 							if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
 						}
 					}

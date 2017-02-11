@@ -3947,6 +3947,22 @@
         			})
         			return this;
         		};
+				HTMLDivElement.prototype.listenTransition=function(func){
+					if(!Array.isArray(this._transitionlist)){
+						this._transitionList=[];
+					}
+					var id=get.id();
+					var that=this;
+					var callback=function(){
+						if(that._transitionList.contains(id)){
+							that._transitionList.remove(id);
+							func.call(that);
+						}
+					};
+					this._transitionList.push(id);
+					this.addEventListener('webkitTransitionEnd',callback);
+					setTimeout(callback,1000);
+				};
         		HTMLDivElement.prototype.setPosition=function(){
         			var position;
         			if(arguments.length==4){
