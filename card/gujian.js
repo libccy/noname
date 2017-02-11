@@ -667,12 +667,11 @@ card.gujian={
                 return target!=player&&target.num('he')>0;
             },
             changeTarget:function(player,targets){
-				var target=targets[0];
-				for(var i=0;i<game.players.length;i++){
-					if(get.distance(target,game.players[i],'pure')==1&&game.players[i].num('he')){
-						targets.push(game.players[i]);
+                game.countPlayer(function(current){
+                    if(get.distance(targets[0],current,'pure')==1&&current.num('he')){
+						targets.push(current);
 					}
-				}
+                });
 			},
             content:function(){
                 var he=target.get('he');
@@ -689,21 +688,22 @@ card.gujian={
                     loseCard:1,
                     discard:1,
                 },
+                wuxie:function(){
+                    return 0;
+                },
                 result:{
                     player:function(player,target){
-                        var num=0;
-                        for(var i=0;i<game.players.length;i++){
-        					if(game.players[i]==target||(get.distance(target,game.players[i],'pure')==1&&game.players[i].num('he'))){
-        						var att=ai.get.attitude(player,game.players[i]);
+                        return game.countPlayer(function(current){
+                            if(current==target||(get.distance(target,current,'pure')==1&&current.num('he'))){
+        						var att=ai.get.attitude(player,current);
                                 if(att>0){
-                                    num--;
+                                    return -1;
                                 }
                                 else if(att<0){
-                                    num++;
+                                    return 1;
                                 }
         					}
-        				}
-                        return num;
+                        });
                     }
                 }
             }

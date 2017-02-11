@@ -22681,7 +22681,7 @@
 				if(typeof result=='number'){
 					num+=result;
 				}
-				else{
+				else if(result){
 					num++;
 				}
 			}
