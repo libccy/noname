@@ -743,9 +743,10 @@ table {
 #arena:not(.chess):not(.mobile)>#autonode {
 	display: none
 }
-#arena:not(.auto)>#autonode {
+#arena:not(.auto)>#autonode,
+#autonode.hidden {
 	opacity: 0;
-	pointer-events: none
+	pointer-events: none;
 }
 #arena.auto #me .card{
 	opacity: 0.5

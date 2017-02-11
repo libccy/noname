@@ -62,7 +62,7 @@
 		listenEnd:function(node){
 			if(!node._listeningEnd){
 				node._listeningEnd=true;
-				node.addEventListener('webkitTransitionEnd',function(){
+				node.listenTransition(function(){
 					delete node._listeningEnd;
 					if(node._onEndMoveDelete){
 						node.moveDelete(node._onEndMoveDelete);
@@ -3947,21 +3947,17 @@
         			})
         			return this;
         		};
-				HTMLDivElement.prototype.listenTransition=function(func){
-					if(!Array.isArray(this._transitionlist)){
-						this._transitionList=[];
-					}
-					var id=get.id();
+				HTMLDivElement.prototype.listenTransition=function(func,time){
 					var that=this;
+					var done=false;
 					var callback=function(){
-						if(that._transitionList.contains(id)){
-							that._transitionList.remove(id);
+						if(!done){
 							func.call(that);
+							done=true;
 						}
 					};
-					this._transitionList.push(id);
 					this.addEventListener('webkitTransitionEnd',callback);
-					setTimeout(callback,1000);
+					setTimeout(callback,time||1000);
 				};
         		HTMLDivElement.prototype.setPosition=function(){
         			var position;
@@ -5224,7 +5220,6 @@
 				if(!mode[lib.config.mode]){
 					window.inSplash=true;
                     var clickedNode=false;
-                    var proceeded=false;
 					var clickNode=function(){
                         if(clickedNode) return;
                         this.classList.add('clicked');
@@ -5234,13 +5229,9 @@
 						splash.delete(1000);
 						delete window.inSplash;
 
-                        var proceed2=function(){
-                            if(proceeded) return;
-                            proceeded=true;
+                        this.listenTransition(function(){
                             lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
-                        };
-                        this.addEventListener('webkitTransitionEnd',proceed2);
-                        setTimeout(proceed2,500);
+                        },500);
 					}
                     var downNode=function(){
                         this.classList.add('glow');
@@ -8352,7 +8343,7 @@
 						if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
 							var waitingForTransition=get.time();
 							event.waitingForTransition=waitingForTransition;
-							cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+							cards[0].clone.listenTransition(function(){
 								if(_status.waitingForTransition==waitingForTransition&&_status.paused){
 									game.resume();
 								}
@@ -8592,7 +8583,7 @@
 							if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
 							    var waitingForTransition=get.time();
 							    event.waitingForTransition=waitingForTransition;
-							    cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+							    cards[0].clone.listenTransition(function(){
 							        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
 							            game.resume();
 							        }
@@ -8817,7 +8808,7 @@
 							if(event.delay!=false){
 								var waitingForTransition=get.time();
 							    event.waitingForTransition=waitingForTransition;
-							    cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+							    cards[0].clone.listenTransition(function(){
 							        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
 							            game.resume();
 							        }
@@ -8828,7 +8819,7 @@
 								delete event.getParent().discardTransition;
 								var waitingForTransition=get.time();
 							    event.getParent().waitingForTransition=waitingForTransition;
-							    cards[0].clone.addEventListener('webkitTransitionEnd',function(){
+							    cards[0].clone.listenTransition(function(){
 							        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
 							            game.resume();
 							        }
@@ -13231,7 +13222,7 @@
 					}
 					node.show();
 
-					node.addEventListener('webkitTransitionEnd',function(){
+					node.listenTransition(function(){
 						node.style.transitionDuration='0.5s';
 						ui.refresh(node);
 						node.delete();
@@ -13297,10 +13288,10 @@
 								node1.style.transform='';
 								node1.removeEventListener('webkitTransitionEnd',onEnd);
 							}
-							node1.addEventListener('webkitTransitionEnd',onEnd);
+							node1.listenTransition(onEnd);
 						},300);
 					};
-					node1.addEventListener('webkitTransitionEnd',onEnd01);
+					node1.listenTransition(onEnd01);
 
                     setTimeout(function(){
                         var left0=-targets.length*52-(targets.length-1)*8;
@@ -13345,10 +13336,10 @@
         									node2.style.transform='';
         									node2.removeEventListener('webkitTransitionEnd',onEnd);
         								}
-        								node2.addEventListener('webkitTransitionEnd',onEnd);
+        								node2.listenTransition(onEnd);
         							},200);
         						};
-        						node2.addEventListener('webkitTransitionEnd',onEnd02);
+        						node2.listenTransition(onEnd02);
                             }(targets[i],cards[i],i))
                         }
 					},200);
@@ -13390,10 +13381,10 @@
 								node1.style.transform='';
 								node1.removeEventListener('webkitTransitionEnd',onEnd);
 							}
-							node1.addEventListener('webkitTransitionEnd',onEnd);
+							node1.listenTransition(onEnd);
 						},300);
 					};
-					node1.addEventListener('webkitTransitionEnd',onEnd01);
+					node1.listenTransition(onEnd01);
 					setTimeout(function(){
 						var node2=target.$throwxy2(card2,
 							'calc(50% + 10px)','calc(50% - 52px)','perspective(600px) rotateY(180deg)',true
@@ -13425,10 +13416,10 @@
 									node2.style.transform='';
 									node2.removeEventListener('webkitTransitionEnd',onEnd);
 								}
-								node2.addEventListener('webkitTransitionEnd',onEnd);
+								node2.listenTransition(onEnd);
 							},200);
 						};
-						node2.addEventListener('webkitTransitionEnd',onEnd02);
+						node2.listenTransition(onEnd02);
 					},200);
 				},
 				$throw:function(card,time,init){
@@ -13847,7 +13838,7 @@
 							// node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
 							// node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
 
-							node.addEventListener('webkitTransitionEnd',function(){
+							node.listenTransition(function(){
 								var dx=player.offsetLeft+player.offsetWidth/2-52-node.offsetLeft;
 								var dy=player.offsetTop+player.offsetHeight/2-52-node.offsetTop;
 								if(node.style.transform&&node.style.transform!='none'&&node.style.transform.indexOf('translate')==-1){
@@ -14237,7 +14228,7 @@
 						this.appendChild(node);
 						ui.refresh(node);
 						node.classList.add('damageadded');
-						node.addEventListener('webkitTransitionEnd',function(){
+						node.listenTransition(function(){
 							setTimeout(function(){
 								node.delete();
 							},200);
@@ -14363,7 +14354,7 @@
 					if(lib.config.low_performance&&card&&card.clone){
 					    var waitingForTransition=get.time();
 					    _status.waitingForTransition=waitingForTransition;
-					    card.clone.addEventListener('webkitTransitionEnd',function(){
+					    card.clone.listenTransition(function(){
 					        if(_status.waitingForTransition==waitingForTransition&&_status.paused){
 					            game.resume();
 					        }
@@ -19320,7 +19311,7 @@
 			ui.refresh(node);
 			node.show();
 			node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
-			node.addEventListener('webkitTransitionEnd',function(){
+			node.listenTransition(function(){
 				setTimeout(function(){
                     if(node.classList.contains('removing')) return;
 					node.delete();

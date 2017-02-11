@@ -2263,8 +2263,7 @@ mode.chess={
 							},150);
 						}
 					};
-					// node.addEventListener('transitionEnd',onEnd);
-					node.addEventListener('webkitTransitionEnd',onEnd);
+					node.listenTransition(onEnd);
 				};
 				var zhaomu2=function(){
 					if(_status.qianfan||_status.kaibao) return;
@@ -2993,8 +2992,7 @@ mode.chess={
 								},150);
 							}
 						};
-						// node.addEventListener('transitionEnd',onEnd);
-						node.addEventListener('webkitTransitionEnd',onEnd);
+						node.listenTransition(onEnd);
 					};
 					setTimeout(function(){
 						nodes[0].delete();

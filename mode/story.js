@@ -592,7 +592,7 @@ mode.story={
                         node.style.transition='all ease-out 0.4s';
 						node.style.transform='perspective(1600px) rotateY(180deg) scale(1)'
 					};
-					node.addEventListener('webkitTransitionEnd',onEnd);
+					node.listenTransition(onEnd);
                 }
                 ui.click.scene=clickScene;
                 var restoreScene=function(node,forced){
@@ -618,7 +618,7 @@ mode.story={
                         node.style.transition='all ease-out 0.4s';
 						node.style.transform='perspective(1600px) rotateY(0deg) scale(0.7)'
 					};
-					node.addEventListener('webkitTransitionEnd',onEnd);
+					node.listenTransition(onEnd);
                 }
                 ui.click.scene2=restoreScene;
                 var switchScene=function(){
