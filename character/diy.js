@@ -176,7 +176,7 @@ character.diy={
 			},
 			content:function(){
 				// if(player!=target) player.draw();
-				var list=game.players.slice(0);
+				var list=game.filterPlayer();
 				get.sortSeat(list,target);
 				target.useCard({name:'diaobingqianjiang'},list);
 			},
@@ -185,12 +185,9 @@ character.diy={
 				result:{
 					player:function(player,target){
 						if(ai.get.attitude(player,target)<=1) return 0;
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							num+=ai.get.effect(game.players[i],{name:'diaobingqianjiang'},target,player);
-						}
-						// if(player==target) return num/2;
-						return num;
+						return game.countPlayer(function(current){
+							return ai.get.effect(current,{name:'diaobingqianjiang'},target,player);
+						});
 					}
 				}
 			}
@@ -660,22 +657,24 @@ character.diy={
 			trigger:{player:'phaseEnd'},
 			frequent:true,
 			filter:function(event,player){
-				var num=0;
 				var list=['wei','shu','wu','qun'];
-				for(var i=0;i<game.players.length&&list.length;i++){
-					if(list.contains(game.players[i].group)){
-						list.remove(game.players[i].group);
+				var players=game.filterPlayer();
+				var num=0;
+				for(var i=0;i<players.length&&list.length;i++){
+					if(list.contains(players[i].group)){
+						list.remove(players[i].group);
 						num++;
 					}
 				}
 				return player.num('h')<num;
 			},
 			content:function(){
-				var num=0;
 				var list=['wei','shu','wu','qun'];
-				for(var i=0;i<game.players.length&&list.length;i++){
-					if(list.contains(game.players[i].group)){
-						list.remove(game.players[i].group);
+				var players=game.filterPlayer();
+				var num=0;
+				for(var i=0;i<players.length&&list.length;i++){
+					if(list.contains(players[i].group)){
+						list.remove(players[i].group);
 						num++;
 					}
 				}
@@ -1165,14 +1164,15 @@ character.diy={
 			frequent:true,
 			filter:function(event,player){
 				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(player!=game.players[i]) list.add(game.players[i].group);
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(player!=players[i]) list.add(players[i].group);
 				}
 				list.remove('unknown');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player){
-						if(lib.filter.targetInRange({name:'sha'},game.players[i],player)){
-							list.remove(game.players[i].group);
+				for(var i=0;i<players.length;i++){
+					if(players[i]!=player){
+						if(lib.filter.targetInRange({name:'sha'},players[i],player)){
+							list.remove(players[i].group);
 						}
 					}
 				}
@@ -1180,14 +1180,15 @@ character.diy={
 			},
 			content:function(){
 				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(player!=game.players[i]) list.add(game.players[i].group);
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(player!=players[i]) list.add(players[i].group);
 				}
 				list.remove('unknown');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player){
-						if(lib.filter.targetInRange({name:'sha'},game.players[i],player)){
-							list.remove(game.players[i].group);
+				for(var i=0;i<players.length;i++){
+					if(players[i]!=player){
+						if(lib.filter.targetInRange({name:'sha'},players[i],player)){
+							list.remove(players[i].group);
 						}
 					}
 				}
