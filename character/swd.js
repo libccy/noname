@@ -3758,7 +3758,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('是否弃置两张手牌将'+get.translation(trigger.card)+'反弹？',2);
+				var next=player.chooseToDiscard(get.prompt('yihua',trigger.player),2);
 				next.ai=function(card){
 					if(ai.get.effect(player,trigger.card)<0){
 						if(card.name=='liuxinghuoyu') return 7-ai.get.value(card);
@@ -3766,7 +3766,7 @@ character.swd={
 					}
 					return 0;
 				}
-				next.logSkill='yihua';
+				next.logSkill=['yihua',trigger.player];
 				"step 1"
 				if(result.bool){
 					// player.discard(result.cards);
@@ -6390,6 +6390,39 @@ character.swd={
 		},
 		funiao:{
 			enable:'phaseUse',
+			usable:1,
+			prepare:'give2',
+			filterTarget:function(card,player,target){
+				if(player==target) return false;
+				return true;
+			},
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			filterCard:true,
+			check:function(card){
+				if(card.name=='du') return 20;
+				return 7-ai.get.value(card);
+			},
+			discard:false,
+			content:function(){
+				target.gain(cards,player).delay=false;
+				player.draw();
+			},
+			ai:{
+				result:{
+					target:function(player,target){
+						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							return -1;
+						}
+						return 1;
+					},
+				},
+				order:2
+			}
+		},
+		funiao_old:{
+			enable:'phaseUse',
 			discard:false,
 			prepare:'give2',
 			filterTarget:function(card,player,target){
@@ -7432,7 +7465,8 @@ character.swd={
 				return !player.storage.duijue;
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&target!=game.zhu;
+				if(target.identity=='zhu') return false;
+				return player!=target;
 			},
 			content:function(){
 				player.storage.duijue=true;
@@ -7449,6 +7483,28 @@ character.swd={
 				}
 				player.storage.duijue3=target;
 				player.addSkill('duijue3');
+			},
+			duijueLoop:function(){
+				'step 0'
+				targets[0].phase();
+				'step 1'
+				if(targets[0].isDead()||targets[1].isDead()){
+					event.goto(3);
+				}
+				else{
+					targets[1].phase();
+				}
+				'step 2'
+				if(targets[0].isDead()||targets[1].isDead()){
+					event.goto(3);
+				}
+				else{
+					event.goto(0);
+				}
+				'step 3'
+				for(var i=0;i<event.backup.length;i++){
+					event.backup[i].in('duijue');
+				}
 			},
 			init:function(player){
 				player.storage.duijue=false;
@@ -7471,33 +7527,24 @@ character.swd={
 			trigger:{player:'phaseAfter'},
 			forced:true,
 			popup:false,
+			priority:-50,
 			content:function(){
-				'step 0'
-				event.target=player.storage.duijue3;
+				var target=player.storage.duijue3;
 				delete player.storage.duijue3;
 				player.removeSkill('duijue3');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i]!=event.target){
-						game.players[i].addSkill('duijue2');
-					}
+				if(!target.isAlive()){
+					event.finish();
+					return;
 				}
-				'step 1'
-				target.phase();
-				'step 2'
-				if(target.isAlive()){
-					player.phase();
-				}
-				else{
-					event.goto(4);
-				}
-				'step 3'
-				if(target.isAlive()){
-					event.goto(1);
-				}
-				'step 4'
+				var next=game.createEvent('duijueLoop');
+				next.targets=[target,player];
+				next.num=0;
+				next.setContent(lib.skill.duijue.duijueLoop);
+				next.backup=[];
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i]!=player&&game.players[i]!=target){
-						game.players[i].removeSkill('duijue2');
+						game.players[i].out('duijue');
+						next.backup.push(game.players[i]);
 					}
 				}
 			}
@@ -7523,7 +7570,13 @@ character.swd={
 			intro:{
 				content:'不计入距离的计算且不能使用牌且不是牌的合法目标'
 			},
-			group:'undist'
+			group:'undist',
+			trigger:{global:'dieAfter'},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.removeSkill('duijue2');
+			}
 		},
 		yueren:{
 			trigger:{player:'shaBegin'},
@@ -8880,7 +8933,7 @@ character.swd={
 		xuying_info:'锁定技，每当你即将受到伤害，你防止此伤害，若你此时有手牌，你流失一点体力',
 		yinguo_info:'除你之外的任意一名角色即将受到受到伤害时，若有伤害来源，你可以弃置一张牌将伤害来源和目标对调',
 		yueren_info:'每当你使用一张杀，可以进行一次判定，若结果为黑色，你弃置目标一张牌，若结果为红色，你将此杀收回，每回合限发动一次',
-		duijue_info:'限定技，出牌阶段，你可以指定一名非主公的其他角色，你结束出牌阶段，然后该角色与你轮流进行回合，直到一方死亡为止；在此之前，所有其他角色不计入距离的计算且不能使用牌且不是牌的合法目标',
+		duijue_info:'限定技，出牌阶段，你可以指定一名非主公的其他角色，你结束出牌阶段，并在回合结束后将所有其他角色移出游戏，然后该角色与你轮流进行回合，直到有一方死亡为止',
 		wuying_info:'锁定技，你的杀和单体x锦囊目标锁定为范围内的所有角色',
 		xiehun_info:'锁定技，受到来自你伤害的角色进入混乱状态，行为不受控制，且会攻击队友，直到你的下一回合开始',
 		jumo_info:'锁定技，结束阶段，你摸X-1张牌，X为未进入混乱状态的角色数与进入混乱状态的角色数之差（若为双将则改为X）',
@@ -8919,7 +8972,8 @@ character.swd={
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
-		funiao_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
+		funiao_info:'出牌阶段限一次，你可以将一张手牌交给一名其他角色，然后摸一张牌',
+		funiao_old_info:'出牌阶段，你可以交给一名角色一张手牌，然后观看其手牌，每个阶段对一名角色只能发动一次',
 		xuehuang_info:'出牌阶段限一次，你可以弃置一张红色手牌令距离你一以内的所有角色受到一点火焰伤害',
 		zhuyu_info:'每当有横置的角色即将受到非火焰伤害，你可以弃置一张红色牌使其额外受到一点火焰伤害',
 		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则改为将其翻面',

@@ -11827,16 +11827,24 @@
                     next.setContent('turnOver');
                     return next;
 				},
-				out:function(bool){
-					if(this.lockOut) return;
-					if(this.isOut()){
-						game.log(this,'进入游戏');
+				out:function(skill){
+					if(!this.storage.out){
+						this.storage.out=[];
 					}
-					else{
+					this.storage.out.add(skill);
+					if(!this.classList.contains('out')){
+						this.classList.add('out');
 						game.log(this,'离开游戏');
 					}
-					this.classList.toggle('out');
-					if(bool) this.lockOut=bool;
+				},
+				in:function(skill){
+					if(this.isOut()){
+						this.storage.out.remove(skill);
+						if(this.storage.out.length==0){
+							this.classList.remove('out');
+							game.log(this,'进入游戏');
+						}
+					}
 				},
 				link:function(){
 					var next=game.createEvent('link');
@@ -14544,6 +14552,10 @@
                         }
 						this.node.addinfo.innerHTML=info.addinfo;
 					}
+					else if(this.node.addinfo){
+						this.node.addinfo.remove();
+						delete this.node.addinfo;
+					}
 					if(card[0]=='heart'||card[0]=='diamond'){
 						this.node.info.classList.add('red');
 					}
@@ -14589,7 +14601,7 @@
 						}
 					}
 					if(typeof info.init=='function') info.init();
-
+					this.node.range.innerHTML='';
 					switch(get.subtype(this)){
 						case 'equip1':
 							var added=false;

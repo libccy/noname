@@ -1259,8 +1259,12 @@ character.gujian={
 				}
 				return false;
 			},
+			logTarget:'source',
 			content:function(){
-				player.discardPlayerCard(trigger.source,ai.get.buttonValue,'he',true);
+				var he=trigger.source.get('he');
+				if(he.length){
+					trigger.source.discard(he.randomGet());
+				}
 				player.storage.xuanning--;
 				if(!player.storage.xuanning){
 					player.unmarkSkill('xuanning');
@@ -1641,7 +1645,7 @@ character.gujian={
 		liuguang:'流光',
 		yangming:'养命',
 		yangming2:'养命',
-		xuanning_info:'出牌阶段，你可以弃置一基本牌，获得至多3个玄凝标记。当你受到伤害时，若你有玄凝标记，你须弃置一个玄凝标记并弃置伤害来源一张牌',
+		xuanning_info:'出牌阶段，你可以弃置一基本牌，获得至多3个玄凝标记。当你受到伤害时，你失去一枚玄凝标记，伤害来源随机弃置一张牌',
 		liuguang_info:'准备阶段，若你有玄凝标记，你可以弃置一枚玄凝标记，选择至多三名角色依次令其选择一项：弃置一张牌，或受到一点伤害，并终止流光结算',
 		yangming_info:'出牌阶段，你可以弃置一张红色牌，并在下个出牌阶段结束时令距离1以内的任意名角色回复一点体力，在此之前不可再次发动',
 		zhaolu:'朝露',

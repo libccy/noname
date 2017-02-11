@@ -31,7 +31,9 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 	background-image: linear-gradient(#6c7989, #434b55);
 }
 
-
+.marks>.card.fullskin>.markcount.menubutton{
+	background: url('wood3.png');
+}
 
 
 /*.player.current_action{
