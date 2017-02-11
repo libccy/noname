@@ -224,23 +224,25 @@ card.standard={
 				result:{
 					target:function(player,target){
 						// if(player==target&&player.hp<=0) return 2;
-						var nh=target.num('h');
+						var nd=player.needsToDiscard();
 						var keep=false;
-						if(nh<=target.hp){
+						if(nd<=0){
 							keep=true;
 						}
-						else if(nh==target.hp+1&&target.hp>=2&&target.num('h','tao')<=1){
+						else if(nd==1&&target.hp>=2&&target.num('h','tao')<=1){
 							keep=true;
 						}
 						var mode=get.mode();
 						if(target.hp>=2&&keep&&target.hasFriend()){
-							if(target.hp>2) return 0;
+							if(target.hp>2||nd==0) return 0;
 							if(target.hp==2){
-								for(var i=0;i<game.players.length;i++){
-									if(target!=game.players[i]&&ai.get.attitude(target,game.players[i])>=3){
-										if(game.players[i].hp<=1) return 0;
-										if(mode=='identity'&&game.players[i].isZhu&&game.players[i].hp<=2) return 0;
+								if(game.hasPlayer(function(current){
+									if(target!=current&&ai.get.attitude(target,current)>=3){
+										if(current.hp<=1) return true;
+										if((mode=='identity'||mode=='versus'||mode=='chess')&&current.identity=='zhu'&&current.hp<=2) return true;
 									}
+								})){
+									return 0;
 								}
 							}
 						}
@@ -250,13 +252,11 @@ card.standard={
 						var tri=_status.event.getTrigger();
 						if(mode=='identity'&&player.identity=='fan'&&target.identity=='fan'){
 							if(tri&&tri.name=='dying'&&tri.source&&tri.source.identity=='fan'&&tri.source!=target){
-								var num=0;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].identity=='fan'){
-										num+=game.players[i].num('h','tao');
-										if(num>2) return 2;
+								var num=game.countPlayer(function(current){
+									if(current.identity=='fan'){
+										return current.num('h','tao');
 									}
-								}
+								});
 								if(num>1&&player==target) return 2;
 								return 0;
 							}
@@ -334,17 +334,14 @@ card.standard={
 			ai:{
 				basic:{
 					equipValue:function(card,player){
-						var num=1,i,no_target=true;
-						for(i=0;i<game.players.length;i++){
-							if(player.canUse({name:'sha'},game.players[i])) {
-								if(ai.get.attitude(player,game.players[i])<0){
-									no_target=false;break;
-								}
-							}
+						if(!game.hasPlayer(function(current){
+							return player.canUse('sha',current)&&ai.get.effect(current,{name:'sha'},player,player)<0;
+						})){
+							return 1;
 						}
-						if(no_target) return 1;
-						num+=player.get('h','sha').length;
-						return num+1;
+						var num=player.num('h','sha');
+						if(num>1) return 4+num;
+						return 2+num;
 					}
 				}
 			},
@@ -474,7 +471,7 @@ card.standard={
 				}
 				"step 3"
 				ui.clear();
-				var cards=get.cards(game.players.length);
+				var cards=get.cards(game.countPlayer());
 				var dialog=ui.create.dialog('五谷丰登',cards,true);
 				_status.dieClose.push(dialog);
 				dialog.videoId=lib.status.videoId++;
@@ -589,12 +586,10 @@ card.standard={
 							if(target==player) return 1.5;
 							return 1;
 						}
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0) num++;
+						if(player.hasUnknown(2)){
+							return 0;
 						}
-						if(num>1) return 0;
-						return 2-2*get.distance(player,target,'absolute')/game.players.length;
+						return 2-2*get.distance(player,target,'absolute')/game.countPlayer();
 					}
 				},
 				tag:{
@@ -672,11 +667,7 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0) num++;
-						}
-						if(num>1) return 0;
+						if(player.hasUnknown(2)) return 0;
 						var nh=target.num('h');
 						if(get.mode()=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -734,11 +725,7 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0) num++;
-						}
-						if(num>1) return 0;
+						if(player.hasUnknown(2)) return 0;
 						var nh=target.num('h');
 						if(get.mode()=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -1233,17 +1220,21 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
-						var rejudge,num=0;
-						for(var i=0;i<game.players.length;i++){
-							for(var j=0;j<game.players[i].skills.length;j++){
-								rejudge=get.tag(game.players[i].skills[j],'rejudge',game.players[i]);
+						var num=game.countPlayer(function(current){
+							var skills=current.get('s');
+							for(var j=0;j<current.skills.length;j++){
+								var rejudge=get.tag(current.skills[j],'rejudge',current);
 								if(rejudge!=undefined){
-									if(ai.get.attitude(target,game.players[i])>0&&
-										ai.get.attitude(game.players[i],target)>0) num+=rejudge;
-									else num-=rejudge;
+									if(ai.get.attitude(target,current)>0&&
+									ai.get.attitude(current,target)>0){
+										return rejudge;
+									}
+									else{
+										return -rejudge;
+									}
 								}
 							}
-						}
+						});
 						if(num>0) return num;
 						if(num==0){
 							var mode=get.mode();
@@ -1259,12 +1250,14 @@ card.standard={
 							}
 							else if(mode=='guozhan'){
 								if(target.identity=='ye') return 1;
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i].identity=='unknown') return -1;
+								if(game.hasPlayer(function(current){
+									return current.identity=='unknown';
+								})){
+									return -1;
 								}
 								if(get.population(target.identity)==1){
 									if(target.maxHp>2&&target.hp<2) return 1;
-									if(game.players.length<3) return -1;
+									if(game.countPlayer()<3) return -1;
 									if(target.hp<=2&&target.num('he')<=3) return 1;
 								}
 							}
@@ -1701,14 +1694,11 @@ card.standard={
 					}
 				};
 				'step 1'
-				var list=[];
+				var list=game.filterPlayer(function(current){
+					return current.hasWuxie();
+				});
 				event.list=list;
 				event.id=get.id();
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hasWuxie()){
-						list.push(game.players[i]);
-					}
-				}
 				list.sort(function(a,b){
 					return get.distance(event.source,a,'absolute')-get.distance(event.source,b,'absolute');
 				});

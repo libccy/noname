@@ -13039,12 +13039,18 @@
 					}
 					return false;
 				},
-                hasUnknown:function(){
+                hasUnknown:function(num){
                     var mode=get.mode();
+					if(typeof num!='number'){
+						num=0;
+					}
                     if(mode=='identity'||mode=='guozhan'){
                         for(var i=0;i<game.players.length;i++){
                             if(game.players[i].ai.shown==0&&game.players[i]!=this){
-                                return true;
+                                num--;
+								if(num<=0){
+									return true;
+								}
                             }
                         }
                     }
@@ -22675,6 +22681,9 @@
 		},
 		countPlayer:function(func){
 			var num=0;
+			if(typeof func!='function'){
+				func=lib.filter.all;
+			}
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].isOut()) continue;
 				var result=func(game.players[i]);
@@ -22690,6 +22699,9 @@
 		filterPlayer:function(func,list){
 			if(!Array.isArray(list)){
 				list=[];
+			}
+			if(typeof func!='function'){
+				func=lib.filter.all;
 			}
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].isOut()) continue;

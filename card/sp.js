@@ -68,7 +68,7 @@ card.sp={
             fullskin:true,
             enable:true,
 			chongzhu:function(){
-				return game.countPlayer(lib.filter.all)<=2;
+				return game.countPlayer()<=2;
 			},
 			singleCard:true,
             type:'trick',

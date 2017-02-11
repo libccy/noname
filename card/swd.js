@@ -3175,7 +3175,7 @@ card.swd={
 			},
 			ai:{
 				tag:{
-					rejudge:10
+					rejudge:1
 				}
 			}
 		},
