@@ -52,10 +52,9 @@ character.standard={
 				if(player.storage.hujiaing) return false;
 				if(!player.hasZhuSkill('hujia')) return false;
 				if(event.filterCard({name:'shan'})==false) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].group=='wei') return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.group=='wei';
+				});
 			},
 			check:function(event,player){
 				if(ai.get.damageEffect(player,event.player,player)>=0) return false;
@@ -243,13 +242,9 @@ character.standard={
 			content:function(){
 				"step 0"
 				var check;
-				var i,num=0;
-				for(i=0;i<game.players.length;i++){
-					if(player!=game.players[i]){
-						if(ai.get.attitude(player,game.players[i])<=0&&
-							game.players[i].num('h')) num++;
-					}
-				}
+				var i,num=game.countPlayer(function(current){
+					return current!=player&&current.num('h')&&ai.get.attitude(player,current)<=0;
+				});
 				check=(num>=2);
 				player.chooseTarget(get.prompt('tuxi'),[1,2],function(card,player,target){
 					return target.num('h')>0&&player!=target;
@@ -286,17 +281,11 @@ character.standard={
 			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
-				var i,cancel=true;
 				if(player.num('h')<3) return false;
-				if(player.get('h','sha').length==0) return false;
-				cancel=true;
-				for(i=0;i<game.players.length;i++){
-					if(ai.get.attitude(player,game.players[i])<0&&
-						player.canUse('sha',game.players[i])){
-						return true;
-					}
-				}
-				return false;
+				if(!player.hasSha()) return false;
+				return game.hasPlayer(function(current){
+					return ai.get.attitude(player,current)<0&&player.canUse('sha',current);
+				});
 			},
 			content:function(){
 				player.addTempSkill('luoyi2','phaseEnd');
@@ -485,12 +474,13 @@ character.standard={
 					if(ui.selected.cards.length){
 						return -1;
 					}
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].get('s').contains('haoshi')&&
-							!game.players[i].isTurnedOver()&&
-							!game.players[i].num('j','lebu')&&
-							ai.get.attitude(player,game.players[i])>=3&&
-							ai.get.attitude(game.players[i],player)>=3){
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(players[i].get('s').contains('haoshi')&&
+							!players[i].isTurnedOver()&&
+							!players[i].num('j','lebu')&&
+							ai.get.attitude(player,players[i])>=3&&
+							ai.get.attitude(players[i],player)>=3){
 							return 11-ai.get.value(card);
 						}
 					}
@@ -538,8 +528,9 @@ character.standard={
 					target:function(card,player,target){
 						if(player==target&&get.type(card)=='equip'){
 							if(player.num('e',{subtype:get.subtype(card)})){
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>0){
+								var players=game.filterPlayer();
+								for(var i=0;i<players.length;i++){
+									if(players[i]!=player&&ai.get.attitude(player,players[i])>0){
 										return 0;
 									}
 								}
@@ -573,10 +564,9 @@ character.standard={
 				if(player.storage.jijianging) return false;
 				if(!player.hasZhuSkill('jijiang')) return false;
 				if(event.filterCard({name:'sha'},player,event)==false) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].group=='shu') return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.group=='shu';
+				});
 			},
 			content:function(){
 				"step 0"
@@ -624,12 +614,10 @@ character.standard={
 				if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
 				if(!player.hasZhuSkill('jijiang')) return false;
 				if(player.hasSkill('jijiang3')) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].group=='shu'&&game.players[i]!=player){
-						return lib.filter.cardUsable({name:'sha'},player);
-					}
-				}
-				return false;
+				if(!lib.filter.cardUsable({name:'sha'},player)) return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.group=='shu';
+				});
 			},
 			filterTarget:function(card,player,target){
 				if(_status.event._backup&&
@@ -745,7 +733,7 @@ character.standard={
 				if(player.isUnderControl()){
 					game.modeSwapPlayer(player);
 				}
-				var cards=get.cards(Math.min(5,game.players.length));
+				var cards=get.cards(Math.min(5,game.countPlayer()));
 				event.cards=cards;
 				var switchToAuto=function(){
 					_status.imchoosing=false;
@@ -1232,13 +1220,10 @@ character.standard={
 			priority:5,
 			filter:function(event,player){
 				if(player.num('he')==0) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(get.distance(player,game.players[i],'attack')<=1&&
-						game.players[i]!=event.player&&game.players[i]!=player){
-						if(player.canUse(event.card,game.players[i])) return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return get.distance(player,current,'attack')<=1&&current!=event.player&&
+						current!=player&&lib.filter.targetEnabled(event.card,event.player,current);
+				});
 			},
 			content:function(){
 				"step 0"
@@ -1298,13 +1283,14 @@ character.standard={
 						var min=1;
 						var friend=ai.get.attitude(player,target)>0;
 						var vcard={name:'shacopy',nature:card.nature,suit:card.suit};
-						for(var i=0;i<game.players.length;i++){
-							if(player!=game.players[i]&&
-								ai.get.attitude(target,game.players[i])<0&&
-								target.canUse(card,game.players[i])){
+						var players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(player!=players[i]&&
+								ai.get.attitude(target,players[i])<0&&
+								target.canUse(card,players[i])){
 								if(!friend) return 0;
-								if(ai.get.effect(game.players[i],vcard,player,player)>0){
-									if(!player.canUse(card,game.players[0])){
+								if(ai.get.effect(players[i],vcard,player,player)>0){
+									if(!player.canUse(card,players[0])){
 										return [0,0.1];
 									}
 									min=0;
@@ -1527,11 +1513,9 @@ character.standard={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				var num=0;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].sex=='male'&&game.players[i]!=player) num++
-				}
-				return (num>1)
+				return game.countPlayer(function(current){
+					return current!=player&&current.sex=='male';
+				})>1;
 			},
 			check:function(card){return 10-ai.get.value(card)},
 			filterCard:true,
