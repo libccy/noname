@@ -851,7 +851,7 @@ character.yijiang={
 										recover++;
 									}
 									else if(ai.get.attitude(player,players[i])<0){
-										if(game.players[i].hp<2){
+										if(players[i].hp<2){
 											lose++;
 											recover-=0.5;
 										}
@@ -2042,11 +2042,12 @@ character.yijiang={
 				if(ai.get.attitude(player,event.player)>=0) return false;
 				if(event.player.num('e','zhuge')) return false;
 				if(event.player.hasSkill('paoxiao')) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(event.player.canUse('sha',game.players[i])&&
-					ai.get.attitude(player,game.players[i])>0) break;
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(event.player.canUse('sha',players[i])&&
+					ai.get.attitude(player,players[i])>0) break;
 				}
-				if(i==game.players.length) return false;
+				if(i==players.length) return false;
 				var nh=event.player.num('h');
 				var nsha=event.player.num('h','sha');
 				if(nh<2) return false;
@@ -2322,10 +2323,10 @@ character.yijiang={
 			check:function(event,player){
 				if(ai.get.attitude(player,_status.currentPhase)>0) return true;
 				var nh=_status.currentPhase.num('h')+1;
-				var hasshan=(player.num('h','shan')>0);
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('h')>nh){
-						if(!hasshan||ai.get.attitude(player,game.players[i])<=0) return true;
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].num('h')>nh){
+						if(!player.hasShan()||ai.get.attitude(player,players[i])<=0) return true;
 					}
 				}
 				return false;
@@ -2338,15 +2339,16 @@ character.yijiang={
 				var nh=_status.currentPhase.num('h');
 				var nmax=nh+1;
 				var targets=[];
-				for(var i=0;i<game.players.length;i++){
-					var nh2=game.players[i].num('h');
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					var nh2=players[i].num('h');
 					if(nh2>nmax){
 						nmax=nh2;
 						targets.length=0;
-						targets.push(game.players[i]);
+						targets.push(players[i]);
 					}
 					else if(nh2==nmax){
-						targets.push(game.players[i]);
+						targets.push(players[i]);
 					}
 				}
 				if(targets.length==1){
@@ -2383,8 +2385,9 @@ character.yijiang={
 					target:function(card,player,target,current){
 						if(get.tag(card,'respondShan')&&current<0){
 							var nh=player.num('h');
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].num('h')>nh) return 0.4;
+							var players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								if(players[i].num('h')>nh) return 0.4;
 							}
 						}
 					}
@@ -2464,10 +2467,9 @@ character.yijiang={
 			filter:function(event,player){
 				if(player.hasSkill('yaoming2')) return false;
 				var nh=player.num('h');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('h')!=nh) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.num('h')!=nh;
+				});
 			},
 			content:function(){
 				'step 0'
@@ -2509,9 +2511,9 @@ character.yijiang={
 				player.choosePlayerCard(target,'e',true);
 				'step 1'
 				if(result.links){
-					var num=0;
-					for(var i=0;i<game.players.length;i++){
-						if(get.distance(target,game.players[i],'attack')<=1){
+					var num=0,players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(get.distance(target,players[i],'attack')<=1){
 							num++;
 						}
 					}
@@ -2522,9 +2524,9 @@ character.yijiang={
 					event.finish();
 				}
 				'step 2'
-				var num2=0;
-				for(var i=0;i<game.players.length;i++){
-					if(get.distance(target,game.players[i],'attack')<=1){
+				var num2=0,players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(get.distance(target,players[i],'attack')<=1){
 						num2++;
 					}
 				}
@@ -2553,10 +2555,11 @@ character.yijiang={
 			mod:{
 				attackTo:function(from,to,distance){
 					if(from.group!='wu') return;
-					for(var i=0;i<game.players.length;i++){
-						if(from!=game.players[i]&&to!=game.players[i]&&
-							game.players[i].hasZhuSkill('zhaofu',from)){
-							if(get.distance(game.players[i],to)<=1) return distance-100;
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(from!=players[i]&&to!=players[i]&&
+							players[i].hasZhuSkill('zhaofu',from)){
+							if(get.distance(players[i],to)<=1) return distance-100;
 						}
 					}
 				}
@@ -2948,19 +2951,19 @@ character.yijiang={
 				if(!player.hasZhuSkill('qinwang')) return false;
 				if(!player.num('he')) return false;
 				if(event.filterCard({name:'sha'},player,event)==false) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].group=='shu') return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.group=='shu';
+				});
 			},
 			direct:true,
 			content:function(){
 				"step 0"
 				var yep=false;
 				if(!player.storage.jijianging){
-					for(var i=0;i<game.players.length;i++){
-						var nh=game.players[i].num('h');
-						if(game.players[i].group=='shu'&&ai.get.attitude(game.players[i],player)>1&&(nh>=4||(nh>=3&&game.players[i].num('h','sha')))){
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						var nh=players[i].num('h');
+						if(players[i].group=='shu'&&ai.get.attitude(players[i],player)>1&&(nh>=4||(nh>=3&&players[i].num('h','sha')))){
 							yep=true;break;
 						}
 					}
@@ -3020,20 +3023,18 @@ character.yijiang={
 			filter:function(event,player){
 				if(event.filterCard&&!event.filterCard({name:'sha'},player,event)) return false;
 				if(!player.hasZhuSkill('qinwang')) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].group=='shu'&&game.players[i]!=player){
-						return lib.filter.cardUsable({name:'sha'},player);
-					}
-				}
-				return false;
+				if(!lib.filter.cardUsable({name:'sha'},player)) return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.group=='shu';
+				});
 			},
 			filterCard:true,
 			position:'he',
 			check:function(card){
-				var player=_status.event.player;
-				for(var i=0;i<game.players.length;i++){
-					var nh=game.players[i].num('h');
-					if(game.players[i].group=='shu'&&ai.get.attitude(game.players[i],player)>1&&(nh>=4||(nh>=3&&game.players[i].num('h','sha')))){
+				var player=_status.event.player,players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					var nh=players[i].num('h');
+					if(players[i].group=='shu'&&ai.get.attitude(players[i],player)>1&&(nh>=4||(nh>=3&&players[i].num('h','sha')))){
 						return 5-ai.get.value(card);
 					}
 				}
@@ -3363,184 +3364,6 @@ character.yijiang={
 				save:true,
 			},
 		},
-		huomo_sha_old:{
-			enable:'phaseUse',
-			discard:false,
-			prepare:'throw',
-			filter:function(event,player){
-				if(!player.storage.huomo) player.storage.huomo={};
-				if(player.storage.huomo.sha) return false;
-				if(!lib.filter.filterCard({name:'sha'},player,event)){
-					return false;
-				}
-				var hs=player.get('he',{color:'black'});
-				for(var i=0;i<hs.length;i++){
-					if(get.type(hs[i])!='basic'){
-						break;
-					}
-				}
-				if(i==hs.length) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(player.canUse('sha',game.players[i])) return true;
-				}
-				return false;
-			},
-			position:'he',
-			filterCard:function(card){
-				return get.type(card)!='basic'&&get.color(card)=='black';
-			},
-			filterTarget:function(card,player,target){
-				return player.canUse('sha',target);
-			},
-			check:function(card){
-				return 6-ai.get.value(card);
-			},
-			content:function(){
-				game.log(player,'将',cards,'置于牌堆顶');
-				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
-				player.useCard({name:'sha'},targets);
-			},
-			ai:{
-				order:2,
-				result:{
-					target:function(player,target){
-						return ai.get.effect(target,{name:'sha'},player,target);
-					}
-				}
-			}
-		},
-		huomo_tao_old:{
-			enable:'chooseToUse',
-			discard:false,
-			prepare:'throw',
-			filter:function(event,player){
-				if(!player.storage.huomo) player.storage.huomo={};
-				if(player.storage.huomo.tao) return false;
-				var hs=player.get('he',{color:'black'});
-				for(var i=0;i<hs.length;i++){
-					if(get.type(hs[i])!='basic'){
-						break;
-					}
-				}
-				if(i==hs.length) return false;
-				if(event.type=='dying'){
-					return event.filterCard({name:'tao'},player);
-				}
-				if(event.getParent().name!='phaseUse') return false;
-				if(!lib.filter.filterCard({name:'tao'},player,event)){
-					return false;
-				}
-				return player.hp<player.maxHp;
-			},
-			position:'he',
-			filterCard:function(card){
-				return get.type(card)!='basic'&&get.color(card)=='black';
-			},
-			filterTarget:function(card,player,target){
-				if(_status.event.type=='dying'){
-					return target==_status.event.dying;
-				}
-				return player==target;
-			},
-			selectTarget:-1,
-			check:function(card){
-				return 8-ai.get.value(card);
-			},
-			content:function(){
-				game.log(player,'将',cards,'置于牌堆顶');
-				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
-				player.useCard({name:'tao'},targets).delayx=false;
-			},
-			ai:{
-				skillTagFilter:function(player){
-					if(!player.storage.huomo) player.storage.huomo={};
-					if(player.storage.huomo.tao) return false;
-					var hs=player.get('he',{color:'black'});
-					for(var i=0;i<hs.length;i++){
-						if(get.type(hs[i])!='basic'){
-							return true;
-						}
-					}
-					return false;
-				},
-				threaten:1.5,
-				save:true,
-				order:9,
-				result:{
-					target:function(player,target){
-						return ai.get.effect(target,{name:'tao'},player,target);
-					}
-				}
-			}
-		},
-		huomo_jiu_old:{
-			enable:'chooseToUse',
-			discard:false,
-			prepare:'throw',
-			filter:function(event,player){
-				if(!lib.filter.filterCard({name:'jiu'},player,event)){
-					return false;
-				}
-				if(player.storage.huomo.jiu) return false;
-				var hs=player.get('he',{color:'black'});
-				for(var i=0;i<hs.length;i++){
-					if(get.type(hs[i])!='basic'){
-						break;
-					}
-				}
-				if(i==hs.length) return false;
-				if(event.type=='dying'){
-					return event.filterCard({name:'jiu'},player);
-				}
-				if(event.getParent().name!='phaseUse') return false;
-				return true;
-			},
-			position:'he',
-			filterCard:function(card){
-				return get.type(card)!='basic'&&get.color(card)=='black';
-			},
-			filterTarget:function(card,player,target){
-				if(_status.event.type=='dying'){
-					return target==_status.event.dying;
-				}
-				return player==target;
-			},
-			selectTarget:-1,
-			check:function(card){
-				if(_status.event.type=='dying'){
-					return 8-ai.get.value(card);
-				}
-				return 6-ai.get.value(card);
-			},
-			content:function(){
-				game.log(player,'将',cards,'置于牌堆顶');
-				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
-				player.useCard({name:'jiu'},targets).delayx=false;
-			},
-			ai:{
-				save:true,
-				skillTagFilter:function(player){
-					if(!player.storage.huomo) player.storage.huomo={};
-					if(player.storage.huomo.jiu) return false;
-					if(player.hp>0) return false;
-					var hs=player.get('he',{color:'black'});
-					for(var i=0;i<hs.length;i++){
-						if(get.type(hs[i])!='basic'){
-							return true;
-						}
-					}
-					return false;
-				},
-				order:function(){
-					return lib.card.sha.ai.order+0.2;
-				},
-				result:{
-					target:function(player,target){
-						return ai.get.effect(target,{name:'jiu'},player,target);
-					}
-				}
-			}
-		},
 		taoxi:{
 			audio:2,
 			trigger:{player:'useCardToBegin'},
@@ -3642,10 +3465,9 @@ character.yijiang={
 				if(player.storage.xingshuai) return false;
 				if(player.hp>0) return false;
 				if(!player.hasZhuSkill('xingshuai')) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].group=='wei') return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.group=='wei';
+				});
 			},
 			init:function(player){
 				if(player.hasZhuSkill('xingshuai')){
@@ -3661,7 +3483,7 @@ character.yijiang={
 				'step 0'
 				player.storage.xingshuai=true;
 				player.awakenSkill('xingshuai');
-				var targets=get.players();
+				var targets=game.filterPlayer();
 				targets.remove(player);
 				event.targets=targets;
 				event.damages=[];
@@ -4128,19 +3950,19 @@ character.yijiang={
 				order:1,
 				result:{
 					player:function(player){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(player!=game.players[i]&&ai.get.damageEffect(game.players[i],player,game.players[i],'fire')<0){
-								var att=ai.get.attitude(player,game.players[i]);
+						var num=0,players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(player!=players[i]&&ai.get.damageEffect(players[i],player,players[i],'fire')<0){
+								var att=ai.get.attitude(player,players[i]);
 								if(att>0){
-									num-=Math.max(1,game.players[i].num('e'));
+									num-=Math.max(1,players[i].num('e'));
 								}
 								else if(att<0){
-									num+=Math.max(1,game.players[i].num('e'));
+									num+=Math.max(1,players[i].num('e'));
 								}
 							}
 						}
-						if(game.players.length<5){
+						if(players.length<5){
 							return num-1;
 						}
 						else{
@@ -4272,12 +4094,9 @@ character.yijiang={
 				"step 0"
 				player.awakenSkill('jiefan');
 				player.storage.jiefan=true;
-				event.players=[];
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=target&&get.distance(game.players[i],target,'attack')<=1){
-						event.players.push(game.players[i]);
-					}
-				}
+				event.players=game.filterPlayer(function(current){
+					return current!=target&&get.distance(current,target,'attack')<=1;
+				});
 				get.sortSeat(event.players,target);
 				"step 1"
 				if(event.players.length){
@@ -4311,9 +4130,9 @@ character.yijiang={
 						if(player.hp>2){
 							if(game.phaseNumber<game.players.length*2) return 0;
 						}
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=target&&get.distance(game.players[i],target,'attack')<=1){
+						var num=0,players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(players[i]!=target&&get.distance(players[i],target,'attack')<=1){
 								num++;
 							}
 						}
@@ -4444,10 +4263,7 @@ character.yijiang={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hp>target.hp) return false;
-				}
-				return true;
+				return target.isHighestHp();
 			},
 			check:function(card){return 7-ai.get.value(card);},
 			position:'he',
@@ -4525,8 +4341,9 @@ character.yijiang={
 				var goon=false;
 				var info=get.info(trigger.card);
 				if(trigger.targets&&!info.multitarget){
-					for(var i=0;i<game.players.length;i++){
-						if(lib.filter.targetEnabled2(trigger.card,player,game.players[i])&&!trigger.targets.contains(game.players[i])){
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(lib.filter.targetEnabled2(trigger.card,player,players[i])&&!trigger.targets.contains(players[i])){
 							goon=true;break;
 						}
 					}
@@ -5095,9 +4912,9 @@ character.yijiang={
 				result:{
 					target:1,
 					player:function(player){
-						var bool=true;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>2&&ai.get.attitude(game.players[i],player)>2 ){
+						var bool=true,players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(players[i]!=player&&ai.get.attitude(player,players[i])>2&&ai.get.attitude(players[i],player)>2){
 								bool=false;break;
 							}
 						}
@@ -5224,8 +5041,9 @@ character.yijiang={
 				effect:{
 					target:function(card,player,target){
 						if(card.name!='sha') return;
-						for(var i=0;i<game.players.length;i++){
-							var target2=game.players[i];
+						var players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							var target2=players[i];
 							if(player!=target2&&target!=target2&&player.canUse(card,target2,false)&&
 								ai.get.effect(target2,{name:'shacopy',nature:card.nature,suit:card.suit},player,target)<0){
 								if(target.hp==target.maxHp) return [0,1];
@@ -5332,8 +5150,9 @@ character.yijiang={
 				if(ui.selected.targets.length){
 					return num<ui.selected.targets[0].num('h');
 				}
-				for(var i=0;i<game.players.length;i++){
-					if(num>game.players[i].num('h')) return true;
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(num>players[i].num('h')) return true;
 				}
 				return false;
 			},
@@ -5389,9 +5208,10 @@ character.yijiang={
 						var att=ai.get.attitude(player,target);
 						if(ui.selected.targets.length==0){
 							if(att>0) return -1;
-							for(var i=0;i<game.players.length;i++){
-								var num2=game.players[i].num('h');
-								var att2=ai.get.attitude(player,game.players[i]);
+							var players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								var num2=players[i].num('h');
+								var att2=ai.get.attitude(player,players[i]);
 								if(att2>=0&&num2<num) return -1;
 							}
 							return 0;
@@ -5452,8 +5272,9 @@ character.yijiang={
 			ai:{
 				result:{
 					player:function(player){
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>1&&ai.get.attitude(game.players[i],player)>1){
+						var players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(players[i]!=player&&ai.get.attitude(player,players[i])>1&&ai.get.attitude(players[i],player)>1){
 								return 1;
 							}
 						}
@@ -6070,10 +5891,11 @@ character.yijiang={
 							if(!player.num('h','sha')) return 0;
 							var targets=[];
 							var target;
-							for(var i=0;i<game.players.length;i++){
-								if(ai.get.attitude(player,game.players[i])<0){
-									if(player.canUse('sha',game.players[i],true,true)){
-										targets.push(game.players[i]);
+							var players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								if(ai.get.attitude(player,players[i])<0){
+									if(player.canUse('sha',players[i],true,true)){
+										targets.push(players[i]);
 									}
 								}
 							}
@@ -6340,20 +6162,20 @@ character.yijiang={
 				},
 				check:function(button){
 					var player=_status.event.player;
-					var recover=0,lose=1;
-					for(var i=0;i<game.players.length;i++){
-						if(!game.players[i].isOut()){
-							if(game.players[i].hp<game.players[i].maxHp){
-								if(ai.get.attitude(player,game.players[i])>0){
-									if(game.players[i].hp<2){
+					var recover=0,lose=1,players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(!players[i].isOut()){
+							if(players[i].hp<players[i].maxHp){
+								if(ai.get.attitude(player,players[i])>0){
+									if(players[i].hp<2){
 										lose--;
 										recover+=0.5;
 									}
 									lose--;
 									recover++;
 								}
-								else if(ai.get.attitude(player,game.players[i])<0){
-									if(game.players[i].hp<2){
+								else if(ai.get.attitude(player,players[i])<0){
+									if(players[i].hp<2){
 										lose++;
 										recover-=0.5;
 									}
@@ -6362,10 +6184,10 @@ character.yijiang={
 								}
 							}
 							else{
-								if(ai.get.attitude(player,game.players[i])>0){
+								if(ai.get.attitude(player,players[i])>0){
 									lose--;
 								}
-								else if(ai.get.attitude(player,game.players[i])<0){
+								else if(ai.get.attitude(player,players[i])<0){
 									lose++;
 								}
 							}
@@ -6697,15 +6519,16 @@ character.yijiang={
 				return get.suit(card)=='heart';
 			},
 			filterTarget:function(card,player,target){
-				if(game.players.length==2) return false;
+				if(game.countPlayer()==2) return false;
 				return player!=target;
 			},
 			check:function(card){
 				var player=get.owner(card);
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>3) break;
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i]!=player&&ai.get.attitude(player,players[i])>3) break;
 				}
-				if(i==game.players.length) return -1;
+				if(i==players.length) return -1;
 				return 5-ai.get.value(card);
 			},
 			content:function(){
@@ -6775,9 +6598,10 @@ character.yijiang={
 						var list1=[];
 						var list2=[];
 						var num=player.maxHp-player.hp;
-						for(var i=0;i<game.players.length;i++){
-							if(ai.get.attitude(player,game.players[i])>0) list1.push(game.players[i]);
-							else if(ai.get.attitude(player,game.players[i])<0) list2.push(game.players[i]);
+						var players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(ai.get.attitude(player,players[i])>0) list1.push(players[i]);
+							else if(ai.get.attitude(player,players[i])<0) list2.push(players[i]);
 						}
 						list1.sort(function(a,b){
 							return a.num('e')-b.num('e');
@@ -7144,21 +6968,19 @@ character.yijiang={
 			audio:2,
 			forceaudio:true,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].storage.xiansi){
-						return game.players[i].storage.xiansi.length>1&&player.canUse('sha',game.players[i],true,true);
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].storage.xiansi){
+						return players[i].storage.xiansi.length>1&&player.canUse('sha',players[i],true,true);
 					}
 				}
 				return false;
 			},
 			content:function(){
 				"step 0"
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].storage.xiansi){
-						event.target=game.players[i];
-						break;
-					}
-				}
+				event.target=game.findPlayer(function(current){
+					return current.storage.xiansi;
+				});
 				if(event.target){
 					player.chooseCardButton(2,event.target.storage.xiansi).set('ai',function(){
 						return 1;
@@ -7190,13 +7012,9 @@ character.yijiang={
 				order:3.1,
 				result:{
 					player:function(player){
-						var target;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].storage.xiansi){
-								target=game.players[i];
-								break;
-							}
-						}
+						var target=game.findPlayer(function(current){
+							return current.storage.xiansi;
+						});
 						if(target){
 							return ai.get.effect(target,{name:'sha'},player,player);
 						}

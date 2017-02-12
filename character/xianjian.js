@@ -1779,7 +1779,7 @@ character.xianjian={
 				"step 0"
 				var ainum=0;
 				var num=3-player.storage.xuanning;
-				var players=[];
+				var players=game.filterPlayer();
 				event.targets=[];
 				for(var i=0;i<players.length;i++){
 					if(players[i]!=player&&!players[i].isOut()&&
