@@ -436,14 +436,12 @@ character.sp={
 					return 6-ai.get.value(card);
 				}
 				else if(type=='equip'){
-					if(player.hasSha()){
-						for(var i=0;i<game.players.length;i++){
-							if(player.canUse('sha',game.players[i])&&
-							ai.get.attitude(player,game.players[i])<0&&
-							ai.get.effect(game.players[i],{name:'sha'},player,player)>0){
-								return 6-ai.get.value(card);
-							}
-						}
+					if(player.hasSha()&&game.hasPlayer(function(current){
+						return (player.canUse('sha',current)&&
+							ai.get.attitude(player,current)<0&&
+							ai.get.effect(current,{name:'sha'},player,player)>0)
+					})){
+						return 6-ai.get.value(card);
 					}
 				}
 				return 0;
@@ -658,15 +656,12 @@ character.sp={
 		zhaolie:{
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&
-					get.distance(player,game.players[i],'attack')<=1&&
-					ai.get.attitude(player,game.players[i])<=0&&
-					ai.get.damageEffect(game.players[i],player,player)>0){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return (current!=player&&
+						get.distance(player,current,'attack')<=1&&
+						ai.get.attitude(player,current)<=0&&
+						ai.get.damageEffect(current,player,player)>0);
+				});
 			},
 			direct:true,
 			content:function(){
@@ -935,12 +930,11 @@ character.sp={
 			},
 			ai:{
 				order:function(skill,player){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].hp<game.players[i].maxHp&&
-							game.players[i]!=player&&
-							ai.get.recoverEffect(game.players[i],player,player)>0){
-							return 10;
-						}
+					if(game.hasPlayer(function(current){
+						return (current.hp<current.maxHp&&current!=player&&
+							ai.get.recoverEffect(current,player,player)>0);
+					})){
+						return 10;
 					}
 					return 1;
 				},
@@ -1259,12 +1253,9 @@ character.sp={
 				order:7,
 				result:{
 					target:function(player,target){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(ai.get.attitude(player,game.players[i])<0&&game.players[i]!=player&&game.players[i].num('h')){
-								num++;
-							}
-						}
+						var num=game.countPlayer(function(current){
+							return ai.get.attitude(player,current)<0&&current!=player&&current.num('h');
+						});
 						if(num>3) num=3;
 						var hs=player.get('h');
 						for(var i=0;i<hs.length;i++){
@@ -2633,185 +2624,24 @@ character.sp={
 				}
 			}
 		},
+		luoyan_tianxiang:{
+			inherit:'tianxiang',
+			filter:function(event,player){
+				if(!player.storage.xingwu||!player.storage.xingwu.length) return false;
+				if(player.hasSkill('tianxiang')) return false;
+				return lib.skill.tianxiang.filter(event,player);
+			},
+		},
+		luoyan_liuli:{
+			inherit:'liuli',
+			filter:function(event,player){
+				if(!player.storage.xingwu||!player.storage.xingwu.length) return false;
+				if(player.hasSkill('liuli')) return false;
+				return lib.skill.liuli.filter(event,player);
+			},
+		},
 		luoyan:{
 			group:['luoyan_tianxiang','luoyan_liuli'],
-			subSkill:{
-				tianxiang:{
-					audio:2,
-					trigger:{player:'damageBefore'},
-					direct:true,
-					filter:function(event,player){
-						if(!player.storage.xingwu) return false;
-						if(!player.storage.xingwu.length) return false;
-						return player.num('h',{suit:'heart'})>0&&event.num>0;
-					},
-					content:function(){
-						"step 0"
-						player.chooseCardTarget({
-							filterCard:function(card,player){
-								return get.suit(card)=='heart'&&lib.filter.cardDiscardable(card,player);
-							},
-							filterTarget:function(card,player,target){
-								return player!=target;
-							},
-							ai1:function(card){
-								return 10-ai.get.value(card);
-							},
-							ai2:function(target){
-								var att=ai.get.attitude(_status.event.player,target);
-								var trigger=_status.event.getTrigger();
-								var da=0;
-								if(_status.event.player.hp==1){
-									da=10;
-								}
-								if(trigger.num>1){
-									if(target.maxHp>5&&target.hp>1) return -att/10+da;
-									return -att+da;
-								}
-								var eff=ai.get.damageEffect(target,trigger.source,target,trigger.nature);
-								if(att==0) return 0.1+da;
-								if(eff>=0&&trigger.num==1){
-									return att+da;
-								}
-								if(target.hp==target.maxHp) return -att+da;
-								if(target.hp==1){
-									if(target.maxHp<=4&&!target.hasSkillTag('maixie')){
-										if(target.maxHp<=3){
-											return -att+da;
-										}
-										return -att/2+da;
-									}
-									return da;
-								}
-								if(target.hp==target.maxHp-1){
-									if(target.hp>2||target.hasSkillTag('maixie')) return att/5+da;
-									if(att>0) return 0.02+da;
-									return 0.05+da;
-								}
-								return att/2+da;
-							},
-							prompt:'天香：弃置一张红桃牌转移伤害'
-						});
-						"step 1"
-						if(result.bool){
-							player.logSkill('tianxiang',result.targets);
-							trigger.untrigger();
-							trigger.player=result.targets[0];
-							trigger.player.addSkill('tianxiang2');
-							player.discard(result.cards[0]);
-						}
-						else{
-							event.finish();
-						}
-						"step 2"
-						trigger.trigger('damageBefore');
-					},
-					ai:{
-						effect:{
-							target:function(card,player,target){
-								if(player.hasSkill('jueqing')) return;
-								if(get.tag(card,'damage')&&target.num('h')>1) return 0.7;
-							}
-						},
-						threaten:function(player,target){
-							if(target.num('h')==0) return 2;
-						}
-					}
-				},
-				liuli:{
-					audio:2,
-					trigger:{target:'shaBefore'},
-					direct:true,
-					priority:5,
-					filter:function(event,player){
-						if(!player.storage.xingwu) return false;
-						if(!player.storage.xingwu.length) return false;
-						if(player.num('he')==0) return false;
-						for(var i=0;i<game.players.length;i++){
-							if(get.distance(player,game.players[i],'attack')<=1&&
-								game.players[i]!=event.player&&game.players[i]!=player){
-								if(player.canUse(event.card,game.players[i])) return true;
-							}
-						}
-						return false;
-					},
-					content:function(){
-						"step 0"
-						var next=player.chooseCardTarget({
-							position:'he',
-							filterCard:lib.filter.cardDiscardable,
-							filterTarget:function(card,player,target){
-								var trigger=_status.event.getTrigger();
-								if(get.distance(player,target,'attack')<=1&&
-									target!=trigger.player&&target!=player){
-									if(player.canUse(trigger.card,target)) return true;
-								}
-								return false;
-							},
-							ai1:function(card){
-								return ai.get.unuseful(card)+9;
-							},
-							ai2:function(target){
-								if(_status.event.player.num('h','shan')){
-									return -ai.get.attitude(_status.event.player,target);
-								}
-								if(ai.get.attitude(_status.event.player,target)<5){
-									return 6-ai.get.attitude(_status.event.player,target);
-								}
-								if(_status.event.player.hp==1&&player.num('h','shan')==0){
-									return 10-ai.get.attitude(_status.event.player,target);
-								}
-								if(_status.event.player.hp==2&&player.num('h','shan')==0){
-									return 8-ai.get.attitude(_status.event.player,target);
-								}
-								return -1;
-							},
-							prompt:get.prompt('liuli')
-						});
-						"step 1"
-						if(result.bool){
-							player.discard(result.cards);
-							player.logSkill('liuli',result.targets);
-							trigger.target=result.targets[0];
-							trigger.targets.remove(player);
-							trigger.targets.push(result.targets[0]);
-						}
-						else{
-							event.finish();
-						}
-						"step 2"
-						trigger.untrigger();
-						trigger.trigger('useCardToBefore');
-						trigger.trigger('shaBefore');
-						game.delay();
-					},
-					ai:{
-						effect:{
-							target:function(card,player,target){
-								if(target.num('he')==0) return;
-								if(card.name!='sha') return;
-								var min=1;
-								var friend=ai.get.attitude(player,target)>0;
-								var vcard={name:'shacopy',nature:card.nature,suit:card.suit};
-								for(var i=0;i<game.players.length;i++){
-									if(player!=game.players[i]&&
-										ai.get.attitude(target,game.players[i])<0&&
-										target.canUse(card,game.players[i])){
-										if(!friend) return 0;
-										if(ai.get.effect(game.players[i],vcard,player,player)>0){
-											if(!player.canUse(card,game.players[0])){
-												return [0,0.1];
-											}
-											min=0;
-										}
-									}
-								}
-								return min;
-							}
-						}
-					}
-				}
-			}
 		},
 		xingwu:{
 			audio:2,
@@ -2867,15 +2697,11 @@ character.sp={
 				}).set('ai',function(card){
 					var player=_status.event.player;
 					if(player.storage.xingwu.length==2){
-						var notarget=true;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=player&&game.players[i].sex=='male'&&
-							ai.get.damageEffect(game.players[i],player,player)>0&&
-							ai.get.attitude(player,game.players[i])<0){
-								notarget=false;break;
-							}
-						}
-						if(notarget) return 0;
+						if(!game.hasPlayer(function(current){
+							return (current!=player&&current.sex=='male'&&
+								ai.get.damageEffect(current,player,player)>0&&
+								ai.get.attitude(player,current)<0)
+						})) return 0;
 					}
 					return 7-ai.get.value(card);
 				});
