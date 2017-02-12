@@ -4482,26 +4482,18 @@ character.hearth={
 			forced:true,
 			unique:true,
 			content:function(){
-				var rand=['tuteng2','tuteng4','tuteng5','tuteng6','tuteng7','tuteng8'];
-				if(player.storage.s_tuteng){
-					var rand2=player.storage.s_tuteng;
-					for(var i=0;i<3;i++){
-						rand.remove(rand2[i]);
+				var rand=['tuteng1','tuteng2','tuteng3','tuteng4','tuteng5','tuteng6','tuteng7','tuteng8'];
+				var rand2=[];
+				for(var i=0;i<rand.length;i++){
+					if(player.skills.contains(rand[i])){
+						rand2.push(rand[i]);
+						rand.splice(i--,1);
 					}
-					player.removeSkill(rand2.randomRemove());
-					var totem=rand.randomGet();
-					rand2.push(totem);
-					player.addSkill(totem);
 				}
-				else{
-					for(var i=0;i<3;i++){
-						rand.randomRemove();
-					}
-					for(var i=0;i<3;i++){
-						player.addSkill(rand[i]);
-					}
-					player.storage.s_tuteng=rand;
+				if(rand2.length>=3){
+					player.removeSkill(rand2.randomGet());
 				}
+				player.addSkill(rand.randomGet('tuteng1','tuteng3'));
 			},
 			ai:{
 				threaten:2
@@ -4718,15 +4710,12 @@ character.hearth={
 			mark:'image',
 			nopop:true,
 			intro:{
-				content:'每当你造成一点伤害，你摸一张牌'
-			},
-			filter:function(event){
-				return event.num>0;
+				content:'每当你造成一次伤害，你摸一张牌'
 			},
 			trigger:{source:'damageAfter'},
 			forced:true,
 			content:function(){
-				player.draw(trigger.num);
+				player.draw();
 			}
 		},
 		tuteng3:{
@@ -5419,49 +5408,49 @@ character.hearth={
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 		tuteng2:{
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 		tuteng3:{
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 		tuteng4:{
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 		tuteng5:{
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 		tuteng6:{
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 		tuteng7:{
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 		tuteng8:{
 			noname:true,
 			fullimage:true,
 			type:'hstuteng',
-			// derivation:'hs_sthrall'
+			derivation:'hs_sthrall'
 		},
 	},
 	translate:{
@@ -5761,7 +5750,7 @@ character.hearth={
 		chongsheng_bg:'生',
 		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动2次',
 		s_tuteng:'神谕',
-		s_tuteng_info:'在你首个准备阶段，你获得三个随机图腾；在此后的每个准备阶段，你随机替换其中的一个图腾',
+		s_tuteng_info:'锁定技，准备阶段，你随机获得一个图腾，若你已有至少3个图腾，则改为随机替换一个图腾',
 		guozai:'过载',
 		guozai2:'过载',
 		guozai2_bg:'载',
@@ -5844,7 +5833,7 @@ character.hearth={
 		tuteng1:'治疗图腾',
 		tuteng1_info:'结束阶段，你回复一点体力',
 		tuteng2:'灼热图腾',
-		tuteng2_info:'每当你造成一点伤害，你摸一张牌',
+		tuteng2_info:'每当你造成一次伤害，你摸一张牌',
 		tuteng3:'石爪图腾',
 		tuteng3_info:'你受到的伤害-1',
 		tuteng4:'空气之怒图腾',

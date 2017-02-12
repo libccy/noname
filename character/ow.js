@@ -2386,7 +2386,7 @@ character.ow={
             }
 		},
         yuedong:{
-            trigger:{player:'phaseEnd'},
+            trigger:{player:'phaseUseEnd'},
             direct:true,
             content:function(){
                 'step 0'
@@ -2400,7 +2400,17 @@ character.ow={
                     if(player.storage.yuedong_recover){
                         return ai.get.recoverEffect(target,player,player);
                     }
-                    return ai.get.attitude(player,target)/Math.sqrt(2+target.num('h'));
+                    var att=ai.get.attitude(player,target)/Math.sqrt(2+target.num('h'));
+                    if(player==target){
+                        var num2=player.needsToDiscard(num);
+                        if(num2>1) return att/5;
+                        if(num2==1){
+                            if(num>1) return att/3;
+                            return att/4;
+                        }
+                        return att;
+                    }
+                    return att;
                 });
                 'step 1'
                 if(result.bool){
@@ -3004,7 +3014,7 @@ character.ow={
         huoyu:'火雨',
         huoyu_info:'限定技，出牌阶段，你可以弃置两张红色牌，视为使用两张炽羽袭',
         yuedong:'乐动',
-        yuedong_info:'结束阶段，你可以令一名角色摸一张牌',
+        yuedong_info:'出牌阶段结束时，你可以令一名角色摸一张牌',
         kuoyin:'扩音',
         kuoyin_info:'出牌阶段，你可以弃置一张牌令本回合乐动的目标数改为3，或弃置两张牌令本回合乐动的摸牌量改为2',
         huhuan:'互换',
