@@ -1182,7 +1182,7 @@ character.ow={
             check:function(card){
                 if(ui.selected.cards.length) return 0;
                 var player=_status.event.player;
-                var max=0,min=0,players=game.filterPlayer;
+                var max=0,min=0,players=game.filterPlayer();
                 for(var i=0;i<players.length;i++){
                     if(!lib.skill.bingqiang.filterTarget(null,player,players[i])) continue;
                     var num=lib.skill.bingqiang.ai.result.playerx(player,players[i]);

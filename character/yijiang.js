@@ -253,6 +253,7 @@ character.yijiang={
 				},
 				check:function(button){
 					var player=_status.event.player;
+					var players=game.filterPlayer();
 					if(player.num('h',button.link)) return 0;
 					if(button.link=='wuzhong'){
 						if(player.num('h')<player.hp){
@@ -273,8 +274,8 @@ character.yijiang={
 						return 2+Math.random();
 					}
 					if(button.link=='shunshou'){
-						for(var i=0;i<game.players.length;i++){
-							if(player.canUse('shunshou',game.players[i])&&ai.get.attitude(player,game.players[i])<0){
+						for(var i=0;i<players.length;i++){
+							if(player.canUse('shunshou',players[i])&&ai.get.attitude(player,players[i])<0){
 								return 2+Math.random();
 							}
 						}
@@ -291,9 +292,9 @@ character.yijiang={
 					}
 					if(button.link=='nanman'||button.link=='wanjian'||button.link=='taoyuan'||button.link=='wugu'){
 						var eff=0;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i]!=player){
-								eff+=ai.get.effect(game.players[i],{name:button.link},player,player);
+						for(var i=0;i<players.length;i++){
+							if(players[i]!=player){
+								eff+=ai.get.effect(players[i],{name:button.link},player,player);
 							}
 						}
 						if(eff>0){
@@ -323,12 +324,12 @@ character.yijiang={
 				order:4,
 				result:{
 					player:function(player){
-						var allshown=true;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].ai.shown==0){
+						var allshown=true,players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(players[i].ai.shown==0){
 								allshown=false;
 							}
-							if(game.players[i]!=player&&game.players[i].num('h')&&ai.get.attitude(player,game.players[i])>0){
+							if(players[i]!=player&&players[i].num('h')&&ai.get.attitude(player,players[i])>0){
 								return 1;
 							}
 						}
@@ -396,9 +397,9 @@ character.yijiang={
 				return true;
 			},
 			check:function(event,player){
-				var allshown=true;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')>1&&ai.get.attitude(player,game.players[i])>0){
+				var allshown=true,players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i]!=player&&players[i].num('h')>1&&ai.get.attitude(player,players[i])>0){
 						return 1;
 					}
 				}
@@ -478,20 +479,15 @@ character.yijiang={
             direct:true,
             filter:function(event,player){
 				if(player.num('h')) return false;
-                for(var i=0;i<game.players.length;i++){
-                    if(!game.players[i].isLinked()){
-                        return true;
-                    }
-                }
+				return game.hasPlayer(function(current){
+					return !current.isLinked();
+				});
             },
             content:function(){
                 "step 0"
-                var num=0;
-                for(var i=0;i<game.players.length;i++){
-                    if(!game.players[i].isLinked()){
-                        num++;
-                    }
-                }
+                var num=game.countPlayer(function(current){
+					return !current.isLinked();
+				});
                 player.chooseTarget(get.prompt('jishe'),[1,Math.min(num,player.hp)],function(card,player,target){
                     return !target.isLinked();
                 }).set('ai',function(target){
@@ -617,10 +613,12 @@ character.yijiang={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				if(!game.zhu||!game.zhu.isZhu) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]==game.zhu||game.players[i]==player) continue;
-					if(get.distance(game.players[i],game.zhu,'attack')<=1&&game.players[i].num('he')){
+				var zhu=get.zhu(player);
+				if(!zhu||!zhu.isZhu) return false;
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i]==zhu||players[i]==player) continue;
+					if(get.distance(players[i],zhu,'attack')<=1&&players[i].num('he')){
 						return true;
 					}
 				}
@@ -629,8 +627,8 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('qinqing'),function(card,player,target){
-					if(target==player||target==game.zhu) return false;
-					return get.distance(target,game.zhu,'attack')<=1&&target.num('he')>0;
+					if(target==player||target==get.zhu(player)) return false;
+					return get.distance(target,get.zhu(player),'attack')<=1&&target.num('he')>0;
 				}).set('ai',function(target){
 					var player=_status.event.player;
 					var zhu=_status.event.zhu;
@@ -640,7 +638,7 @@ character.yijiang={
 					if(nh>nh2) return 2;
 					if(nh==nh2&&target.num('e')) return 1.5;
 					return 1;
-				}).set('zhu',game.zhu);
+				}).set('zhu',get.zhu(player));
 				'step 1'
 				if(result.bool){
 					event.target=result.targets[0];
@@ -653,7 +651,7 @@ character.yijiang={
 				'step 2'
 				event.target.draw();
 				'step 3'
-				if(event.target.num('h')>game.zhu.num('h')){
+				if(event.target.num('h')>get.zhu(player).num('h')){
 					player.draw();
 				}
 			},
@@ -840,19 +838,19 @@ character.yijiang={
 							return button.link=='sha'?1:0;
 						}
 						var player=_status.event.player;
-						var recover=0,lose=1;
-						for(var i=0;i<game.players.length;i++){
-							if(!game.players[i].isOut()&&game.players[i]!=player){
-								if(game.players[i].hp<game.players[i].maxHp){
-									if(ai.get.attitude(player,game.players[i])>0){
-										if(game.players[i].hp<2){
+						var recover=0,lose=1,players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(!players[i].isOut()&&players[i]!=player){
+								if(players[i].hp<players[i].maxHp){
+									if(ai.get.attitude(player,players[i])>0){
+										if(players[i].hp<2){
 											lose--;
 											recover+=0.5;
 										}
 										lose--;
 										recover++;
 									}
-									else if(ai.get.attitude(player,game.players[i])<0){
+									else if(ai.get.attitude(player,players[i])<0){
 										if(game.players[i].hp<2){
 											lose++;
 											recover-=0.5;
@@ -862,10 +860,10 @@ character.yijiang={
 									}
 								}
 								else{
-									if(ai.get.attitude(player,game.players[i])>0){
+									if(ai.get.attitude(player,players[i])>0){
 										lose--;
 									}
-									else if(ai.get.attitude(player,game.players[i])<0){
+									else if(ai.get.attitude(player,players[i])<0){
 										lose++;
 									}
 								}
@@ -1298,10 +1296,10 @@ character.yijiang={
 				order:1,
 				result:{
 					player:function(player){
-						var num=0;
-						for(var i=0;i<game.players.length;i++){
-							if(player!=game.players[i]&&ai.get.damageEffect(game.players[i],player,game.players[i],'fire')<0){
-								var att=ai.get.attitude(player,game.players[i]);
+						var num=0,players=game.filterPlayer();
+						for(var i=0;i<players.length;i++){
+							if(player!=players[i]&&ai.get.damageEffect(players[i],player,players[i],'fire')<0){
+								var att=ai.get.attitude(player,players[i]);
 								if(att>0){
 									num--;
 								}
@@ -1946,8 +1944,9 @@ character.yijiang={
 				return _status.currentPhase==player;
 			},
 			content:function(){
-				for(var i=0;i<game.players.length;i++){
-					if(get.distance(player,game.players[i])>1){
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(get.distance(player,players[i])>1){
 						player.removeSkill('unequip');
 						return;
 					}
@@ -1964,8 +1963,9 @@ character.yijiang={
 				selectTarget:function(card,player,range){
 					if(_status.currentPhase==player){
 						if(card.name=='sha'&&range[1]!=-1){
-							for(var i=0;i<game.players.length;i++){
-								if(get.distance(player,game.players[i])>1) return;
+							var players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								if(get.distance(player,players[i])>1) return;
 							}
 							range[1]++;
 						}
@@ -1985,8 +1985,9 @@ character.yijiang={
 			content:function(){
 				player.storage.benxi=!player.hasSkill('unequip');
 				if(player.storage.benxi){
-					for(var i=0;i<game.players.length;i++){
-						if(get.distance(player,game.players[i])>1){
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(get.distance(player,players[i])>1){
 							return;
 						}
 					}
