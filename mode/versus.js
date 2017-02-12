@@ -3016,12 +3016,9 @@ mode.versus={
 		boss_mojianjg:{
 			trigger:{player:'phaseUseBegin'},
 			content:function(){
-				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(player.canUse('wanjian',game.players[i])&&game.players[i].isEnemyOf(player)){
-						list.push(game.players[i]);
-					}
-				}
+				var list=game.filterPlayer(function(current){
+					return player.canUse('wanjian',current)&&current.isEnemyOf(player);
+				});
 				list.sort(lib.sort.seat);
 				player.useCard({name:'wanjian'},list);
 			},
@@ -3035,11 +3032,9 @@ mode.versus={
 			direct:true,
 			filter:function(event,player){
 				if(get.suit(event.card)=='club'){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isFriendOf(player)&&game.players[i].hp<game.players[i].maxHp){
-							return true;
-						}
-					}
+					return game.hasPlayer(function(current){
+						return current.isFriendOf(player)&&current.isDamaged();
+					});
 				}
 				return false;
 			},
@@ -3079,16 +3074,13 @@ mode.versus={
 			trigger:{player:'phaseEnd'},
             forced:true,
             filter:function(event,player){
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i].isEnemyOf(player)&&!game.players[i].isLinked()){
-                        return true;
-                    }
-                }
-                return false;
+				return game.hasPlayer(function(current){
+					return current.isEnemyOf(player)&&!current.isLinked();
+				});
             },
             content:function(){
                 "step 0"
-                event.targets=game.players.slice(0);
+                event.targets=game.filterPlayer();
                 event.targets.sort(lib.sort.seat);
                 "step 1"
                 if(event.targets.length){
@@ -3125,18 +3117,16 @@ mode.versus={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isFriendOf(player)&&game.players[i].isTurnedOver()){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.isFriendOf(player)&&current.isTurnedOver();
+				});
 			},
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('boss_huodi'),function(card,player,target){
 					return !target.isFriendOf(player);
 				}).ai=function(target){
+					if(target.isTurnedOver()) return 0;
 					return -ai.get.attitude(player,target);
 				};
 				"step 1"
@@ -3221,19 +3211,15 @@ mode.versus={
             trigger:{player:'phaseBegin'},
             forced:true,
             filter:function(event,player){
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i].isEnemyOf(player)&&game.players[i].num('j')) return true;
-                }
-                return false;
+				return game.hasPlayer(function(current){
+					return current.isEnemyOf(player)&&current.num('j');
+				});
             },
             content:function(){
                 "step 0"
-                event.targets=[];
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i].isEnemyOf(player)&&game.players[i].num('j')){
-                        event.targets.push(game.players[i]);
-                    }
-                }
+                event.targets=game.filterPlayer(function(current){
+					return current.isEnemyOf(player)&&current.num('j');
+				});
                 event.targets.sort(lib.sort.seat);
 				player.line(event.targets,'thunder');
                 "step 1"
@@ -3270,12 +3256,9 @@ mode.versus={
 			forced:true,
 			content:function(){
 				'step 0'
-				var targets=[];
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].side!=player.side){
-						targets.push(game.players[i]);
-					}
-				}
+				var targets=game.filterPlayer(function(current){
+					return current.isEnemyOf(player);
+				});
 				targets.sort(lib.sort.seat);
 				event.targets=targets;
 				player.line(targets,'thunder');
@@ -3316,9 +3299,10 @@ mode.versus={
 			mod:{
 				globalFrom:function(from,to,distance){
 					if(to.isEnemyOf(from)) return;
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].hasSkill('boss_jingfan')&&
-							game.players[i].isFriendOf(from)&&game.players[i]!=from){
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(players[i].hasSkill('boss_jingfan')&&
+							players[i].isFriendOf(from)&&players[i]!=from){
 							return distance-1;
 						}
 					}
@@ -3329,11 +3313,11 @@ mode.versus={
 			trigger:{player:'phaseEnd'},
 			check:function(event,player){
 				if(player.isTurnedOver()) return true;
-				var num=0;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hp<game.players[i].maxHp&&
-						game.players[i].isFriendOf(player)&&ai.get.recoverEffect(game.players[i])>0){
-						if(game.players[i].hp==1){
+				var num=0,players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].hp<players[i].maxHp&&
+						players[i].isFriendOf(player)&&ai.get.recoverEffect(players[i])>0){
+						if(players[i].hp==1){
 							return true;
 						}
 						num++;
@@ -3346,12 +3330,9 @@ mode.versus={
 				'step 0'
 				player.turnOver();
 				'step 1'
-				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hp<game.players[i].maxHp&&game.players[i].isFriendOf(player)){
-						list.push(game.players[i]);
-					}
-				}
+				var list=game.filterPlayer(function(current){
+					return current.isDamaged()&&current.isFriendOf(player);
+				});
 				player.line(list,'green');
 				event.targets=list;
 				'step 2'
@@ -3379,9 +3360,10 @@ mode.versus={
 			mod:{
 				globalTo:function(from,to,distance){
 					if(to.isFriendOf(from)) return;
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].hasSkill('boss_zhenwei')&&
-							game.players[i].isFriendOf(to)&&game.players[i]!=to){
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(players[i].hasSkill('boss_zhenwei')&&
+							players[i].isFriendOf(to)&&players[i]!=to){
 							return distance+1;
 						}
 					}
@@ -3394,19 +3376,17 @@ mode.versus={
 			forced:true,
 			filter:function(event,player){
 				if(_status.mode!='jiange') return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].type=='mech'&&game.players[i].isEnemyOf(player)){
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].type=='mech'&&players[i].isEnemyOf(player)){
 						return true;
 					}
 				}
 			},
 			content:function(){
-				var target;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].type=='mech'&&game.players[i].isEnemyOf(player)){
-						target=game.players[i];break;
-					}
-				}
+				var target=game.findPlayer(function(current){
+					return current.type=='mech'&&current.isEnemyOf(player);
+				});
 				if(target){
 					player.line(target,'thunder');
 					target.damage(2,'thunder');
@@ -3429,10 +3409,10 @@ mode.versus={
 			trigger:{player:'phaseEnd'},
 			check:function(event,player){
 				if(player.isTurnedOver()) return true;
-				var num=0;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isEnemyOf(player)){
-						var es=game.players[i].get('e');
+				var num=0,players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].isEnemyOf(player)){
+						var es=players[i].get('e');
 						for(var j=0;j<es.length;j++){
 							switch(get.subtype(es[j])){
 								case 'equip1':num+=1;break;
@@ -3445,8 +3425,8 @@ mode.versus={
 					}
 				}
 				if(_status.mode=='jiange'){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isFriendOf(player)&&game.players[i].hasSkill('huodi')){
+					for(var i=0;i<players.length;i++){
+						if(players[i].isFriendOf(player)&&players[i].hasSkill('huodi')){
 							return num>0;
 						}
 					}
@@ -3454,8 +3434,9 @@ mode.versus={
 				return num>=4;
 			},
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isEnemyOf(player)&&game.players[i].num('e')){
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].isEnemyOf(player)&&players[i].num('e')){
 						return true;
 					}
 				}
@@ -3505,22 +3486,16 @@ mode.versus={
 			forced:true,
 			filter:function(event,player){
 				var nh=player.num('h');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isEnemyOf(player)&&game.players[i].num('h')>nh){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.isEnemyOf(player)&&current.num('h')>nh;
+				});
 			},
 			content:function(){
 				'step 0'
-				var targets=[];
 				var nh=player.num('h');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isEnemyOf(player)&&game.players[i].num('h')>nh){
-						targets.push(game.players[i]);
-					}
-				}
+				var targets=game.filterPlayer(function(current){
+					return current.isEnemyOf(player)&&current.num('h')>nh;
+				});
 				targets.sort(lib.sort.seat);
 				event.targets=targets;
 				'step 1'
@@ -3547,27 +3522,28 @@ mode.versus={
 			mode:['versus'],
 			filter:function(event,player){
 				if(_status.mode!='jiange') return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].type=='mech'){
-						if(game.players[i].isEnemyOf(player)) return true;
-						if(game.players[i].hp<game.players[i].maxHp) return true;
+				var players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].type=='mech'){
+						if(players[i].isEnemyOf(player)) return true;
+						if(players[i].hp<players[i].maxHp) return true;
 					}
 				}
 				return false;
 			},
 			content:function(){
-				var enemy;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].type=='mech'){
-						if(game.players[i].isFriendOf(player)){
-							if(game.players[i].hp<game.players[i].maxHp){
-								player.line(game.players[i],'green');
-								game.players[i].recover();
+				var enemy,players=game.filterPlayer();
+				for(var i=0;i<players.length;i++){
+					if(players[i].type=='mech'){
+						if(players[i].isFriendOf(player)){
+							if(players[i].hp<players[i].maxHp){
+								player.line(players[i],'green');
+								players[i].recover();
 								return;
 							}
 						}
 						else{
-							enemy=game.players[i];
+							enemy=players[i];
 						}
 					}
 				}
@@ -3695,25 +3671,25 @@ mode.versus={
                     return -1;
                 });
                 "step 1"
-				var targets=[];
+				var targets=[],players=game.filterPlayer();
                 if(result.color=='red'){
 					game.trySkillAudio('boss_biantianx2');
-					for(var i=0;i<game.players.length;i++){
-						if(!game.players[i].isFriendOf(player)){
-							game.players[i].addSkill('boss_biantian3');
-							game.players[i].popup('kuangfeng');
-							targets.push(game.players[i]);
+					for(var i=0;i<players.length;i++){
+						if(!players[i].isFriendOf(player)){
+							players[i].addSkill('boss_biantian3');
+							players[i].popup('kuangfeng');
+							targets.push(players[i]);
 						}
 					}
 					player.logSkill('kuangfeng',targets,'fire');
                 }
                 else if(result.suit=='spade'){
 					game.trySkillAudio('boss_biantianx1');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isFriendOf(player)){
-							game.players[i].addSkill('boss_biantian2');
-							game.players[i].popup('dawu');
-							targets.push(game.players[i]);
+					for(var i=0;i<players.length;i++){
+						if(players[i].isFriendOf(player)){
+							players[i].addSkill('boss_biantian2');
+							players[i].popup('dawu');
+							targets.push(players[i]);
 						}
 					}
 					player.logSkill('dawu',targets,'thunder');
@@ -3778,20 +3754,14 @@ mode.versus={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isFriendOf(player)&&game.players[i].hp<game.players[i].maxHp){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.isFriendOf(player)&&current.isDamaged();
+				});
 			},
 			content:function(){
-				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].isFriendOf(player)&&game.players[i].hp<game.players[i].maxHp){
-						list.push(game.players[i]);
-					}
-				}
+				var list=game.filterPlayer(function(current){
+					return current.isFriendOf(player)&&current.isDamaged();
+				});
 				if(list.length){
 					player.line(list,'green');
 					game.asyncDraw(list);

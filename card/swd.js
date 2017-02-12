@@ -4446,7 +4446,7 @@ card.swd={
 			},
 			ai:{
 				effect:function(card,player,target){
-					if(get.tag(card,'damage')) return [1,0.5];
+					if(get.tag(card,'damage')&&!target.hujia) return [1,0.5];
 				}
 			},
 			intro:{

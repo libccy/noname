@@ -1009,6 +1009,9 @@ card.gujian={
         			filterCard:{suit:'heart'},
         			position:'he',
         			viewAs:{name:'tao'},
+                    viewAsFilter:function(player){
+                        return player.num('he',{suit:'heart'})>0;
+                    },
         			prompt:'将一张红桃牌当桃使用',
         			check:function(card){return 10-ai.get.value(card)},
         			ai:{

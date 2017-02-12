@@ -1588,7 +1588,7 @@ character.hearth={
 				player.chooseToUse();
 				'step 2'
 				if(result.bool){
-					event.goto(1);
+					player.chooseToUse();
 				}
 			}
 		},
@@ -2995,7 +2995,11 @@ character.hearth={
 				'step 0'
 				player.loseHp();
 				'step 1'
-				event.target=game.players.randomGet(player);
+				event.target=game.filterPlayer().randomGet(player);
+				if(!event.target){
+					event.finish();
+					return;
+				}
 				player.line(event.target,'fire');
 				game.delayx();
 				'step 2'
@@ -5641,7 +5645,7 @@ character.hearth={
 		maoxian2:'冒险',
 		maoxian_info:'出牌阶段限两次，你可以从三个随机技能中选择一个作为你的技能',
 		tanmi:'探秘',
-		tanmi_info:'在一名其他角色的结束阶段，若你没有手牌，你可以摸两张牌并可以使用摸到的牌',
+		tanmi_info:'在一名其他角色的结束阶段，若你没有手牌，你可以摸两张牌并可以使用两张牌',
 		yiwen:'轶闻',
 		yiwen_info:'锁定技，每当其他角色于回合内首次使用卡牌指定你为惟一目标，你获得一张此牌的复制',
 		tanbao_old:'探宝',

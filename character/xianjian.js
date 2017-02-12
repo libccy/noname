@@ -1,7 +1,7 @@
 'use strict';
 character.xianjian={
 	character:{
-		pal_lixiaoyao:['male','qun',4,['xiaoyao','yujian']],
+		pal_lixiaoyao:['male','qun',4,['tianjian','yufeng']],
 		pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 		pal_linyueru:['female','wei',3,['guiyuan','qijian']],
 
@@ -62,8 +62,28 @@ character.xianjian={
 				player.getStat().card.sha--;
 			}
 		},
-		fenshi:{
-
+		yufeng:{
+			trigger:{player:'loseEnd'},
+			frequent:true,
+			usable:2,
+			filter:function(event,player){
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].original=='h') return player.num('h')<2;
+				}
+				return false;
+			},
+			content:function(){
+				player.draw(2-player.num('h'));
+			},
+			ai:{
+				noh:true,
+				skillTagFilter:function(player,tag){
+					var nh=player.num('h');
+					if(tag=='noh'&&(nh>2||nh==0)){
+						return false;
+					}
+				}
+			}
 		},
 		feixia:{
 			enable:'phaseUse',
@@ -137,14 +157,28 @@ character.xianjian={
 				expose:0.2,
 			}
 		},
-		yujian:{
+		tianjian:{
 			enable:'phaseUse',
 			viewAs:{name:'wanjian'},
 			filterCard:{name:'sha'},
 			filter:function(event,player){
 				return player.num('h','sha')>0;
 			},
-			usable:1
+			usable:1,
+			group:'tianjian_discard',
+			subSkill:{
+				discard:{
+					trigger:{source:'damageEnd'},
+					forced:true,
+					filter:function(event){
+						return event.parent.skill=='tianjian'&&event.player.num('he');
+					},
+					popup:false,
+					content:function(){
+						trigger.player.discard(trigger.player.get('he').randomGet());
+					}
+				}
+			}
 		},
 		feng:{
 			unique:true,
@@ -756,13 +790,9 @@ character.xianjian={
 				if(event.card.name!='sha') return false;
 				if(event.targets.length!=1) return false;
 				var target=event.targets[0];
-				var players;
-				if(get.mode()=='chess'){
-					players=target.getNeighbours();
-				}
-                else{
-					players=[target.next,target.previous];
-				}
+				var players=game.filterPlayer(function(current){
+					return get.distance(target,current,'pure')==1;
+				});
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
 						return true;
@@ -773,13 +803,9 @@ character.xianjian={
 			prompt:function(event,player){
                 var targets=[];
                 var target=event.targets[0];
-				var players;
-				if(get.mode()=='chess'){
-					players=target.getNeighbours();
-				}
-                else{
-					players=[target.next,target.previous];
-				}
+				var players=game.filterPlayer(function(current){
+					return get.distance(target,current,'pure')==1;
+				});
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
 						targets.push(players[i]);
@@ -790,13 +816,9 @@ character.xianjian={
             check:function(event,player){
                 var target=event.targets[0];
                 var num=0;
-				var players;
-				if(get.mode()=='chess'){
-					players=target.getNeighbours();
-				}
-                else{
-					players=[target.next,target.previous];
-				}
+				var players=game.filterPlayer(function(current){
+					return get.distance(target,current,'pure')==1;
+				});
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
 						num+=ai.get.effect(players[i],{name:'sha'},player,player);
@@ -807,13 +829,9 @@ character.xianjian={
 			content:function(){
 				"step 0"
                 var target=trigger.targets[0];
-				var players;
-				if(get.mode()=='chess'){
-					players=target.getNeighbours();
-				}
-                else{
-					players=[target.next,target.previous];
-				}
+				var players=game.filterPlayer(function(current){
+					return get.distance(target,current,'pure')==1;
+				});
 				for(var i=0;i<players.length;i++){
 					if(player!=players[i]&&target!=players[i]&&player.canUse('sha',players[i],false)){
 						trigger.targets.push(players[i]);
@@ -2246,20 +2264,17 @@ character.xianjian={
 				threaten:1.5
 			}
 		},
-		xiaoyao:{
+		tuoqiao:{
 			direct:true,
 			filter:function(event,player){
 				if(event.player==player) return false;
-				if(event.cards&&event.cards.length==1){
-					return player.num('h',{suit:get.suit(event.cards[0])})>0;
-				}
-				return false;
+				return player.num('h')>0;
 			},
 			trigger:{target:'useCardToBefore'},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard('逍遥：是否弃置一张牌使'+get.translation(trigger.card)+'失效？',{suit:get.suit(trigger.cards[0])});
-				next.logSkill='xiaoyao';
+				var next=player.chooseToDiscard(get.prompt('tuoqiao'));
+				next.logSkill='tuoqiao';
 				next.ai=function(card){
 					if(ai.get.effect(player,trigger.card,trigger.player,player)<0){
 						return 7-ai.get.value(card);
@@ -2268,12 +2283,21 @@ character.xianjian={
 				}
 				"step 1"
 				if(result.bool){
+					player.judge(function(card){
+						return get.suit(card)=='heart'?-1:1;
+					});
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.suit!='heart'){
 					trigger.untrigger();
 					trigger.finish();
 				}
 			}
 		},
-		tuoqiao:{
+		tuoqiao_old:{
 			filter:function(event,player){
 				return game.players.length>3&&(event.player==player.next||event.player==player.previous);
 			},
@@ -2304,7 +2328,7 @@ character.xianjian={
 				}
 			}
 		},
-		yujian_old:{
+		tianjian_old:{
 			enable:'phaseUse',
 			usable:1,
 			changeSeat:true,
@@ -2439,7 +2463,7 @@ character.xianjian={
 		zhangmu:'障目',
 		zhangmu_info:'每回合限一次，当你需要使用或打出一张闪时，你可以展示一张闪，视为使用或打出了此闪',
 		feizhua:'飞爪',
-		feizhua_info:'当你使用一张杀时，你可以将目标两侧的角色追加为额外目标',
+		feizhua_info:'当你使用一张杀时，你可以将与目标相邻的角色追加为额外目标',
 		leiyu:'雷狱',
 		leiyu_info:'结束阶段，你可以弃置一张黑色牌，视为对本回合内所有成为过你的卡牌目标的角色使用一张惊雷闪',
 		lingxue:'灵血',
@@ -2524,11 +2548,13 @@ character.xianjian={
 		tannang:'探囊',
 		tannang_info:'出牌阶段限一次，你可以将一张梅花手牌当顺手牵羊使用；你的顺手牵羊无距离限制',
 		tuoqiao:'脱壳',
-		tuoqiao_info:'每当你成为身边角色的卡牌的目标，你可以将座位后移一位，然后取消之',
+		tuoqiao_info:'当你成为其他角色卡牌的目标时，你可以弃置一张手牌并进行一次判定，若不为红桃，则取消之',
 		xiaoyao:'逍遥',
 		xiaoyao_info:'每当你成为其他角色的卡牌目标，你可以弃置一张与之花色相同的手牌取消之',
-		yujian:'御剑',
-		yujian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用',
+		tianjian:'天剑',
+		tianjian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用，受到伤害的角色随机弃置一张牌',
+		yufeng:'御风',
+		yufeng_info:'当你失去手牌后，若手牌数少于2，可将手牌数补至2（每回合最多发动两次）',
 		huimeng:'回梦',
 		huimeng_info:'每当你回复一点体力，可以摸两张牌',
 		tianshe:'天蛇',

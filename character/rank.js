@@ -18,6 +18,7 @@ window.characterRank={
         'hs_medivh',
     ],
     ap:[
+        'pal_lixiaoyao',
         'swd_huanyuanzhi',
         'pal_xiahoujinxuan',
         'swd_huiyan',
@@ -362,7 +363,6 @@ window.characterRank={
         'hs_anomalus',
         'mifuren',
         'hanba',
-        'pal_lixiaoyao',
         'sunjian',
         'pangtong',
         'caochun',

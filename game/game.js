@@ -5627,6 +5627,23 @@
 				window.lib=lib;
 				window._status=_status;
 			},
+			cfg:function(){
+				var mode=lib.config.all.mode.slice(0);
+				mode.remove('connect');
+				mode.remove('brawl');
+				var banned=['yxs_luzhishen','xuhuang','zhenji','shen_guanyu','zhurong',
+					'daqiao','lingcao','liuzan','lusu','luxun','yanwen'];
+				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui'];
+				for(var i=0;i<mode.length;i++){
+					game.saveConfig(mode[i]+'_banned',banned);
+					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
+				}
+				game.saveConfig('tao_enemy',true);
+				game.saveConfig('layout','long2');
+				game.saveConfig('background_music','music_off');
+				game.saveConfig('background_audio',false);
+				game.saveConfig('background_ogg',false);
+			},
             o:function(){
                 ui.arena.classList.remove('observe');
             },
@@ -27409,7 +27426,7 @@
     								if(update.version!=lib.version||dev){
                                         var files=null;
                                         var version=lib.version;
-                                        if(Array.isArray(update.files)&&update.update&&!dev){
+                                        if(Array.isArray(update.files)&&update.update){
                                             var version1=version.split('.');
                                             var version2=update.update.split('.');
                                             for(var i=0;i<version1.length&&i<version2.length;i++){
