@@ -331,7 +331,7 @@
 						unfrequent:true,
 					},
 					update:function(config,map){
-						if(document.hasOwnProperty('ontouchstart')){
+						if('ontouchstart' in document){
 							map.touchscreen.show();
 						}
 						else{
@@ -4408,7 +4408,7 @@
 				delete window.music;
 				delete window.font;
 
-				if(document.hasOwnProperty('ontouchstart')){
+				if('ontouchstart' in document){
 					if(!lib.config.totouched){
 						game.saveConfig('totouched',true);
 						game.saveConfig('touchscreen',true);
