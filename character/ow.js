@@ -184,7 +184,7 @@ character.ow={
             filter:function(event,player){
                 if(player.storage.qinru){
                     for(var i=0;i<player.storage.qinru.length;i++){
-                        if(player.storage.qinru[i].isAlive()&&player.storage.qinru[i].num('he')) return true;
+                        if(player.storage.qinru[i].isIn()&&player.storage.qinru[i].num('he')) return true;
                     }
                 }
             },
@@ -192,7 +192,7 @@ character.ow={
                 var list=[];
                 if(player.storage.qinru){
                     for(var i=0;i<player.storage.qinru.length;i++){
-                        if(player.storage.qinru[i].isAlive()&&player.storage.qinru[i].num('he')){
+                        if(player.storage.qinru[i].isIn()&&player.storage.qinru[i].num('he')){
                             list.push(player.storage.qinru[i]);
                         }
                     }
@@ -204,7 +204,7 @@ character.ow={
                 var list=[];
                 if(player.storage.qinru){
                     for(var i=0;i<player.storage.qinru.length;i++){
-                        if(player.storage.qinru[i].isAlive()&&player.storage.qinru[i].num('he')){
+                        if(player.storage.qinru[i].In()&&player.storage.qinru[i].num('he')){
                             list.push(player.storage.qinru[i]);
                         }
                     }
@@ -776,25 +776,17 @@ character.ow={
             },
             ai:{
                 order:function(skill,player){
-                    var num=0;
-                    var nh=player.num('h',{color:'black'});
-                    for(var i=0;i<game.players.length;i++){
-                        if(ai.get.attitude(player,game.players[i])<0){
-                            num++;
-                        }
-                    }
+                    var num=game.countPlayer(function(current){
+                        return ai.get.attitude(player,current)<0;
+                    });
+                    var nh=player.num('he',{color:'black'});
                     if(nh==1&&num>1) return 0;
                     if(nh>num) return 1;
                     return 11;
                 },
                 result:{
                     target:function(player,target){
-                        var mode=get.mode();
-						if(mode=='identity'||mode=='guozhan'){
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].ai.shown<=0) return 0;
-							}
-						}
+                        if(player.hasUnknown()) return 0;
                         return -1;
                     }
                 }
@@ -976,13 +968,13 @@ character.ow={
                         if(target.num('h')<=1&&get.distance(player,target,'attack')<=1) return 0;
                         var min=[];
                         var num=0;
-                        for(var i=0;i<game.players.length;i++){
-                            if(game.players[i]!=player&&
-                                player.canUse('sha',game.players[i],false)){
-                                var eff=ai.get.effect(target,{name:'sha'},player,player);
+                        var players=game.filterPlayer();
+                        for(var i=0;i<players.length;i++){
+                            if(players[i]!=player&&player.canUse('sha',players[i],false)){
+                                var eff=ai.get.effect(players[i],{name:'sha'},player,player);
                                 if(eff>num){
                                     min.length=0;
-                                    min.push(game.players[i]);
+                                    min.push(players[i]);
                                     num=eff;
                                 }
                             }
@@ -1190,10 +1182,10 @@ character.ow={
             check:function(card){
                 if(ui.selected.cards.length) return 0;
                 var player=_status.event.player;
-                var max=0,min=0;
-                for(var i=0;i<game.players.length;i++){
-                    if(!lib.skill.bingqiang.filterTarget(null,player,game.players[i])) continue;
-                    var num=lib.skill.bingqiang.ai.result.playerx(player,game.players[i]);
+                var max=0,min=0,players=game.filterPlayer;
+                for(var i=0;i<players.length;i++){
+                    if(!lib.skill.bingqiang.filterTarget(null,player,players[i])) continue;
+                    var num=lib.skill.bingqiang.ai.result.playerx(player,players[i]);
                     if(num>max){
                         max=num;
                     }
@@ -1485,9 +1477,9 @@ character.ow={
             unique:true,
             filter:function(event,player){
                 if(player.storage.jijia>0){
-                    for(var i=0;i<game.players.length;i++){
-                        if(get.distance(player,game.players[i])>1) return true;
-                    }
+                    return game.hasPlayer(function(current){
+                        return get.distance(player,current)>1
+                    });
                 }
                 return false;
             },
@@ -1607,13 +1599,14 @@ character.ow={
                 result:{
                     player:function(player){
                         var num=0;
-                        for(var i=0;i<game.players.length;i++){
-                            if(game.players[i]==player||game.players[i].hasSkillTag('nofire')||get.distance(player,game.players[i])>2) continue;
-                            var nh=game.players[i].num('h');
-                            var att=ai.get.attitude(player,game.players[i]);
+                        var players=game.filterPlayer();
+                        for(var i=0;i<players.length;i++){
+                            if(players[i]==player||players[i].hasSkillTag('nofire')||get.distance(player,players[i])>2) continue;
+                            var nh=players[i].num('h');
+                            var att=ai.get.attitude(player,players[i]);
                             if(nh<player.storage.jijia){
                                 if(att<0){
-                                    if(game.players[i].hp<=2){
+                                    if(players[i].hp<=2){
                                         num+=2;
                                     }
                                     else{
@@ -1621,7 +1614,7 @@ character.ow={
                                     }
                                 }
                                 else if(att>0){
-                                    if(game.players[i].hp<=2){
+                                    if(players[i].hp<=2){
                                         num-=2;
                                     }
                                     else{
@@ -1909,7 +1902,7 @@ character.ow={
                 if(get.suit(event.card)!='spade') return false;
 				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
 				for(var i=0;i<event.targets.length;i++){
-					if(!event.targets[i].isAlive()) return false;
+					if(!event.targets[i].isIn()) return false;
 					if(!player.canUse({name:event.card.name},event.targets[i],false,false)){
 						return false;
 					}
@@ -2194,13 +2187,13 @@ character.ow={
                         var eff=ai.get.recoverEffect(target,player,target);
                         if(player.hp==1) return eff;
                         if(player.hasUnknown()) return 0;
-                        var num1=0,num2=0,num3=0;
-                        for(var i=0;i<game.players.length;i++){
-                            if(ai.get.attitude(player,game.players[i])>0){
+                        var num1=0,num2=0,num3=0,players=game.filterPlayer();
+                        for(var i=0;i<players.length;i++){
+                            if(ai.get.attitude(player,players[i])>0){
                                 num1++;
-                                if(game.players[i].isDamaged()){
+                                if(players[i].isDamaged()){
                                     num2++;
-                                    if(game.players[i].hp<=1){
+                                    if(players[i].hp<=1){
                                         num3++;
                                     }
                                 }
@@ -2227,41 +2220,6 @@ character.ow={
             mod:{
                 targetEnabled:function(card,player,target){
                     if(player!=target) return false;
-                }
-            }
-        },
-        xiandan_old:{
-            mod:{
-                selectTarget:function(card,player,range){
-                    if(card.name=='sha'&&range[1]!=-1){
-                        var num=0;
-                        var attack=false;
-                        for(var i=0;i<game.players.length;i++){
-                            if(player!=game.players[i]){
-                                if(get.distance(player,game.players[i])<=1){
-                                    num++;
-                                }
-                                else if(get.distance(player,game.players[i],'attack')<=1){
-                                    attack=true;
-                                }
-                            }
-                        }
-                        if(!attack){
-                            num--;
-                        }
-                        if(num>0){
-                            range[1]+=num;
-                        }
-                    }
-                },
-                playerEnabled:function(card,player,target){
-                    if(card.name=='sha'&&get.distance(player,target)>1){
-                        for(var i=0;i<ui.selected.targets.length;i++){
-                            if(get.distance(player,ui.selected.targets[i])>1){
-                                return false;
-                            }
-                        }
-                    }
                 }
             }
         },
@@ -2316,7 +2274,7 @@ character.ow={
                 return event.player==player.storage.yihun2;
             },
             content:function(){
-                if(player.storage.yihun2.isAlive()){
+                if(player.storage.yihun2.isIn()){
                     player.useCard({name:'sha'},player.storage.yihun2);
                 }
                 player.removeSkill('yihun2');
@@ -2387,23 +2345,21 @@ character.ow={
 				if(player.num('he')==0) return false;
 				if(!event.card) return false;
 				if(event.card.name!='sha') return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=event.player&&get.distance(event.player,game.players[i])<=1) return true;
-				}
-				return false;
+                return game.hasPlayer(function(current){
+                    return current!=event.player&&get.distance(event.player,current)<=1
+                });
 			},
 			content:function(){
 				"step 0"
                 var eff=0;
-                var targets=[];
-                event.targets=targets;
-                for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=trigger.player&&get.distance(trigger.player,game.players[i])<=1){
-                        eff+=ai.get.damageEffect(game.players[i],player,player);
-                        targets.push(game.players[i]);
+                var targets=game.filterPlayer(function(current){
+                    if(current!=trigger.player&&get.distance(trigger.player,current)<=1){
+                        eff+=ai.get.damageEffect(current,player,player);
+                        return true;
                     }
-				}
-                player.chooseToDiscard(get.prompt('feidan')).set('ai',function(card){
+                });
+                event.targets=targets;
+                player.chooseToDiscard(get.prompt('feidan',targets)).set('ai',function(card){
                     if(eff>0) return 7-ai.get.value(card);
                     return 0;
                 }).set('logSkill',['feidan',targets]);
@@ -2484,13 +2440,13 @@ character.ow={
                 order:10.2,
                 result:{
                     player:function(player){
-                        var num1=0,num2=0;
-                        for(var i=0;i<game.players.length;i++){
-                            if(ai.get.attitude(player,game.players[i])>0){
+                        var num1=0,num2=0,players=game.filterPlayer();
+                        for(var i=0;i<players.length;i++){
+                            if(ai.get.attitude(player,players[i])>0){
                                 num2++;
-                                if(game.players[i].hp<=2&&game.players[i].maxHp>2){
+                                if(players[i].hp<=2&&players[i].maxHp>2){
                                     num1++;
-                                    if(game.players[i].hp==1){
+                                    if(players[i].hp==1){
                                         num1++;
                                     }
                                 }
@@ -2519,11 +2475,11 @@ character.ow={
             },
             check:function(card){
                 var player=_status.event.player;
-                var num1=0,num2=0;
-                for(var i=0;i<game.players.length;i++){
-                    if(ai.get.attitude(player,game.players[i])>0){
+                var num1=0,num2=0,players=game.filterPlayer();
+                for(var i=0;i<players.length;i++){
+                    if(ai.get.attitude(player,players[i])>0){
                         num2++;
-                        if(game.players[i].hp<=2&&game.players[i].maxHp>2){
+                        if(players[i].hp<=2&&players[i].maxHp>2){
                             num1++;
                         }
                     }
@@ -2580,11 +2536,9 @@ character.ow={
                 var player=_status.event.player;
                 var suit=get.suit(card);
                 if(suit=='heart'){
-                    for(var i=0;i<game.players.length;i++){
-                        if(game.players[i].hp==1&&ai.get.attitude(player,game.players[i])>0){
-                            return 8-ai.get.value(card);
-                        }
-                    }
+                    if(game.hasPlayer(function(current){
+                        return current.hp==1&&ai.get.attitude(player,current)>0
+                    }));
                 }
                 else if(suit=='spade'){
                     return 7-ai.get.value(card);

@@ -23,7 +23,7 @@ character.extra={
 					// event.count=trigger.cards.length-1;
 					event.count=1;
 				}
-				var recover=0,lose=0,players=game.filterPlayer;
+				var recover=0,lose=0,players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
 					if(players[i].hp<players[i].maxHp){
 						if(ai.get.attitude(player,players[i])>0){

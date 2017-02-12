@@ -34155,7 +34155,7 @@
 		player:function(){
 			return _status.event.player;
 		},
-		players:function(sort,dead){
+		players:function(sort,dead,out){
 			var players=game.players.slice(0);
 			if(sort!=false){
 				if(typeof sort=='function'){
@@ -34170,6 +34170,11 @@
 				}
 			}
 			if(dead) players=players.concat(game.dead);
+			if(!out){
+				for(var i=0;i<players.length;i++){
+					if(players[i].isOut()) players.splice(i--,1);
+				}
+			}
 			return players;
 		},
 		position:function(card){
