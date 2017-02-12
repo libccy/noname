@@ -1616,15 +1616,9 @@ mode.chess={
 			next.player=player;
 			next.setContent(function(){
 				"step 0"
-				var passed=false;
-				for(var i=0;i<game.players.length;i++){
-					if(!game.players[i].classList.contains('acted')){
-						if(game.players[i].side==player.side){
-							passed=true;break;
-						}
-					}
-				}
-				if(!passed){
+				if(!game.hasPlayer(function(current){
+					return current.side==player.side&&!current.classList.contains('acted');
+				})){
 					var num1=0;
 					var next=null;
 					for(var i=0;i<game.players.length;i++){
@@ -1654,9 +1648,11 @@ mode.chess={
 						nevt.ai=function(target){
 							return Math.max(1,10-target.num('h'));
 						};
+						nevt.includeOut=true;
 						nevt.chessForceAll=true;
 					}
 					else{
+						game.delay();
 						event.goto(2);
 					}
 				}
@@ -1668,7 +1664,6 @@ mode.chess={
 					game.asyncDraw(result.targets);
 				}
 				"step 2"
-				var players=[];
 				if(player.side==game.me.side){
 					player=game.me;
 				}
@@ -1679,18 +1674,15 @@ mode.chess={
 						}
 					}
 				}
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].side==player.side){
-						if(!game.players[i].classList.contains('acted')){
-							players.push(game.players[i]);
-						}
-					}
-				}
+				var players=game.filterPlayer(function(current){
+					return player.side==current.side&&!current.classList.contains('acted');
+				});
 				if(players.length>1){
 					var nevt=player.chooseTarget('选择下一个行动的角色',function(card,player,target){
 						return target.side==player.side&&!target.classList.contains('acted');
 					},true);
 					nevt.chessForceAll=true;
+					nevt.includeOut=true;
 					nevt.ai=function(target){
 						var nj=target.num('j');
 						if(nj){
@@ -1699,8 +1691,14 @@ mode.chess={
 						return Math.max(0,10-target.hp);
 					}
 				}
-				else{
+				else if(players.length){
 					event.decided=players[0];
+				}
+				else{
+					event.player=game.findPlayer(function(current){
+						return current.side!=player.side;
+					});
+					event.goto(0);
 				}
 				"step 3"
 				if(event.decided){
