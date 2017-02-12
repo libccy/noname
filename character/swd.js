@@ -2039,7 +2039,7 @@ character.swd={
 				player.storage.shouyin=true;
 				player.turnOver();
 				"step 1"
-				event.targets=game.players.slice(0);
+				event.targets=game.filterPlayer();
 				event.targets.sort(lib.sort.seat);
 				"step 2"
 				if(event.targets.length){
@@ -3506,7 +3506,7 @@ character.swd={
 			content:function(){
 				"step 0"
 				event.num=0;
-				event.targets=game.players.slice(0);
+				event.targets=game.filterPlayer();
 				event.targets.remove(player);
 				for(var i=0;i<event.targets.length;i++){
 					event.targets.sort(lib.sort.random);
@@ -3528,7 +3528,7 @@ character.swd={
 			content:function(){
 				"step 0"
 				event.num=0;
-				event.targets=game.players.slice(0);
+				event.targets=game.filterPlayer();
 				"step 1"
 				if(event.num<event.targets.length){
 					if(event.targets[event.num].num('he')){
@@ -6704,7 +6704,7 @@ character.swd={
 					event.finish();
 				}
 				else if(event.control=='discard_card'){
-					event.targets=game.players.slice(0);
+					event.targets=game.filterPlayer();
 					event.targets.sort(lib.sort.seat);
 				}
 				else{

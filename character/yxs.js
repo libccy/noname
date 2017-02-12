@@ -1675,7 +1675,7 @@ character.yxs={
 				"step 0"
 				player.awakenSkill('seyou');
 				player.storage.seyou=true;
-				event.targets=game.players.slice(0);
+				event.targets=game.filterPlayer();
 				event.targets.remove(player);
 				event.targets.remove(target);
 				for(var i=0;i<event.targets.length;i++){
@@ -2143,7 +2143,7 @@ character.yxs={
 			},
 			content:function(){
 				"step 0"
-				event.targets=game.players.slice(0);
+				event.targets=game.filterPlayer();
 				event.targets.remove(player);
 				"step 1"
 				if(event.targets.length){

@@ -2193,7 +2193,7 @@ character.xianjian={
 			silent:true,
 			content:function(){
 				"step 0"
-				event.players=game.players.slice(0);
+				event.players=game.filterPlayer();
 				event.num=0;
 				"step 1"
 				if(event.num<event.players.length){

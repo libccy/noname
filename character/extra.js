@@ -67,7 +67,7 @@ character.extra={
 					player.logSkill('qinyin');
 					event.bool=(result.control=='回复体力');
 					event.num=0;
-					event.players=game.players.slice(0);
+					event.players=game.filterPlayer();
 				}
 				"step 2"
 				if(event.num<event.players.length){
@@ -149,7 +149,7 @@ character.extra={
 				player.awakenSkill('shenfen');
 				player.storage.shenfen=true;
 				player.storage.baonu-=6;
-				event.targets=game.players.slice(0);
+				event.targets=game.filterPlayer();
 				event.targets.remove(player);
 				event.targets.sort(lib.sort.seat);
 				event.targets2=event.targets.slice(0);
@@ -528,11 +528,12 @@ character.extra={
 			},
 			content:function(){
 				"step 0"
-				var targets=game.players.slice(0);
+				var targets=game.filterPlayer();
 				targets.remove(player);
 				targets.sort(lib.sort.seat);
 				event.targets=targets;
 				event.num=0;
+				player.line(targets,'green');
 				"step 1"
 				if(num<event.targets.length){
 					var hej=event.targets[num].get('hej')

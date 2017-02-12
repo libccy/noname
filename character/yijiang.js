@@ -791,7 +791,7 @@ character.yijiang={
 					event.target=player;
 				}
 				else{
-					var targets=game.players.slice(0);
+					var targets=game.filterPlayer();
 					targets.remove(player);
 					targets.sort(function(a,b){
 						return Math.max(1,get.distance(player,a))-Math.max(1,get.distance(player,b));
@@ -988,13 +988,13 @@ character.yijiang={
 			content:function(){
 				'step 0'
 				player.storage.zongzuo=true;
-				var list=['wei','shu','wu','qun'],num=0;
-				for(var i=0;i<game.players.length&&list.length;i++){
-					if(list.contains(game.players[i].group)){
-						list.remove(game.players[i].group);
-						num++;
+				var list=['wei','shu','wu','qun'];
+				var num=game.countPlayer(function(current){
+					if(list.contains(current.group)){
+						list.remove(current.group);
+						return true;
 					}
-				}
+				});
 				player.gainMaxHp(num);
 				event.num=num;
 				'step 1'
@@ -1010,10 +1010,10 @@ character.yijiang={
 					filter:function(event,player){
 						var list=['wei','shu','wu','qun'];
 						if(!list.contains(event.player.group)) return false;
-						for(var i=0;i<game.players.length;i++){
-							if(game.players[i].group==event.player.group){
-								return false;
-							}
+						if(game.hasPlayer(function(current){
+							return current.group==event.player.group;
+						})){
+							return false;
 						}
 						return true;
 					},
@@ -6154,13 +6154,13 @@ character.yijiang={
 			mod:{
 				maxHandcard:function(player,num){
 					var list=['wei','shu','wu','qun'];
-					for(var i=0;i<game.players.length&&list.length;i++){
-						if(list.contains(game.players[i].group)){
-							list.remove(game.players[i].group);
-							num++;
+					var num2=game.countPlayer(function(current){
+						if(list.contains(current.group)){
+							list.remove(current.group);
+							return true;
 						}
-					}
-					return num;
+					});
+					return num+num2;
 				}
 			}
 		},
@@ -6171,16 +6171,15 @@ character.yijiang={
 				return player.num('h')<=player.maxHp||player.skipList.contains('phaseUse');
 			},
 			content:function(){
-				var list=['wei','shu','wu','qun'],num=0;
-				for(var i=0;i<game.players.length&&list.length;i++){
-					if(list.contains(game.players[i].group)){
-						list.remove(game.players[i].group);
-						num++;
+				var list=['wei','shu','wu','qun'];
+				var num=game.countPlayer(function(current){
+					if(list.contains(current.group)){
+						list.remove(current.group);
+						return true;
 					}
-				}
+				});
 				trigger.num+=num;
 				player.addTempSkill('zishou2','phaseAfter');
-				// player.skip('phaseUse');
 
 			},
 			ai:{

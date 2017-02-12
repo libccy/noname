@@ -499,6 +499,9 @@ table {
 	bottom: 16px;
 	font-family: 'xinwei'
 }
+.player.connect[data-cursor_style="forbidden"]{
+	opacity: 0.5;
+}
 #arena #me>div>div>.card {
 	position: absolute;
 	left: 8px;
@@ -2631,8 +2634,18 @@ div:not(.handcards)>.card>.info>span,
 #window:not(.nopointer) #arena.selecting #me .card.selectable,
 #window:not(.nopointer) #arena.selecting .button.selectable,
 #window:not(.nopointer) #arena.selecting .player.selectable,
-#window:not(.nopointer) .menubutton.round{
+#window:not(.nopointer) .menubutton.round,
+*[data-cursor_style="pointer"]{
 	cursor: pointer;
+}
+*[data-cursor_style="forbidden"]{
+	cursor: not-allowed;
+}
+*[data-cursor_style="menu"]{
+	cursor: context-menu;
+}
+*[data-cursor_style="zoom"]{
+	cursor: -webkit-zoom-in;
 }
 #arena.dragging{
 	cursor: -webkit-grabbing;

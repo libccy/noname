@@ -331,6 +331,12 @@
 						unfrequent:true,
 					},
 					update:function(config,map){
+						if(document.hasOwnProperty('ontouchstart')){
+							map.touchscreen.show();
+						}
+						else{
+							map.touchscreen.hide();
+						}
 						if(config.touchscreen){
 							map.mousewheel.hide();
 							map.hover_all.hide();
@@ -4396,16 +4402,22 @@
 				delete window.music;
 				delete window.font;
 
-                if(!lib.config.totouched&&(lib.device=='ios'||lib.device=='android')){
-                    game.saveConfig('totouched',true);
-                    game.saveConfig('touchscreen',true);
-                    game.saveConfig('confirmtouch',true);
-                    game.saveConfig('low_performance',true);
-                    game.saveConfig('confirm_exit',true);
-                    if(!lib.ipad){
-                        game.saveConfig('phonelayout',true);
-                    }
-                }
+				if(document.hasOwnProperty('ontouchstart')){
+					if(!lib.config.totouched){
+						game.saveConfig('totouched',true);
+						game.saveConfig('touchscreen',true);
+						if(lib.device=='ios'||lib.device=='android'){
+		                    game.saveConfig('low_performance',true);
+		                    game.saveConfig('confirm_exit',true);
+						}
+						if(!lib.ipad){
+							game.saveConfig('phonelayout',true);
+						}
+	                }
+				}
+                else if(lib.config.touchscreen){
+					game.saveConfig('touchscreen',false);
+				}
                 delete lib.ipad;
 				if(lib.config.extensions.length){
 					window.resetExtension=function(){
@@ -9888,32 +9900,46 @@
                         }
                         this.node.gaming.hide();
                         this.node.waiting.hide();
+						this.dataset.cursor_style='menu';
                     }
                     else{
                         this.roomempty=false;
                         var config=info[2];
                         this.initOL(get.modetrans(config),info[1]);
+                        this.version=config.version;
                         if(config.gameStarted){
                             this.node.gaming.show();
                             this.node.waiting.hide();
+							if(config.observe&&config.observeReady){
+								this.dataset.cursor_style='zoom';
+							}
+							else{
+								this.dataset.cursor_style='forbidden';
+							}
                         }
                         else{
                             this.node.gaming.hide();
                             this.node.waiting.show();
+							if(this.version!=lib.versionOL){
+								this.dataset.cursor_style='forbidden';
+							}
+							else{
+								this.dataset.cursor_style='pointer';
+							}
                         }
                         this.node.serving.hide();
                         this.setNickname(info[0]);
                         this.maxHp=parseInt(config.number);
                         this.hp=info[3];
                         this.update();
-                        this.version=config.version;
+						this.config=config;
                         if(this.hp==this.maxHp&&!config.gameStarted){
                             this.roomfull=true;
                         }
                         else{
                             this.roomfull=false;
                         }
-                        if(config.gameStarted&&!config.observe){
+                        if(config.gameStarted&&(!config.observe||!config.observeReady)){
                             this.roomgaming=true;
                         }
                         else{
@@ -15989,6 +16015,10 @@
 					game.phaseNumber++;
                     game.syncState();
 					game.addVideo('phaseChange',player);
+					if(game.phaseNumber==1&&lib.configOL.observe){
+						lib.configOL.observeReady=true;
+						game.send('server','config',lib.configOL);
+					}
 					game.log();
 					game.log(player,'的回合开始');
 					player._noVibrate=true;
@@ -21890,6 +21920,12 @@
             if(lib.translate[i+'_info_'+mode]){
                 lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
             }
+			else if(lib.translate[i+'_info_zhu']&&(mode=='identity'||(mode=='guozhan'&&_status.mode=='four'))){
+				lib.translate[i+'_info']=lib.translate[i+'_info_zhu'];
+			}
+			else if(lib.translate[i+'_info_combat']&&get.is.versus()){
+				lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
+			}
             if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(mode)){
                 lib.skill[i]={};
                 if(lib.translate[i+'_info']){
@@ -29695,19 +29731,6 @@
 				if(!lib.config.show_cardpile||_status.connectMode){
 					ui.cardPileButton.style.display='none';
 				}
-				if(lib.config.touchscreen&&!lib.config.confirmtouch){
-					var backtomouse=ui.create.system('返回鼠标模式');
-					backtomouse.addEventListener('click',function(){
-						game.saveConfig('touchscreen',false);
-						game.reload();
-					});
-					var keeptouch=ui.create.system('确认触屏');
-					keeptouch.addEventListener('touchend',function(){
-						game.saveConfig('confirmtouch',true);
-						keeptouch.remove();
-						backtomouse.remove();
-					});
-				}
 				ui.playerids=ui.create.system('显示身份',function(){
 					if(game.showIdentity){
 						game.showIdentity();
@@ -32113,7 +32136,12 @@
                                 alert('房间已满');
                             }
                             else if(this.roomgaming&&!game.onlineID){
-                                alert('房间不允许旁观');
+								if(this.config&&this.config.observe){
+									alert('房间暂时不可旁观');
+								}
+                                else{
+									alert('房间不允许旁观');
+								}
                             }
                             else if(!this.roomempty&&this.version!=lib.versionOL){
                                 if(this.version>lib.versionOL){

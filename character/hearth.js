@@ -2325,7 +2325,7 @@ character.hearth={
 			forced:true,
 			content:function(){
 				'step 0'
-				var targets=game.players.slice(0);
+				var targets=game.filterPlayer();
 				targets.remove(player);
 				targets.sort(lib.sort.seat);
 				event.targets=targets;
@@ -3244,7 +3244,7 @@ character.hearth={
 				}
 				if(!event.parent.parent.bingshi_logv){
 					event.parent.parent.bingshi_logv=true;
-					game.logv(trigger.player,'bingshi',game.players.slice(0),event.parent.parent);
+					game.logv(trigger.player,'bingshi',game.filterPlayer(),event.parent.parent);
 				}
 			}
 		},
