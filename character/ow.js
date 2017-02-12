@@ -263,10 +263,10 @@ character.ow={
             position:'he',
             check:function(card){
                 var player=_status.event.player;
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i].hp==1&&ai.get.attitude(player,game.players[i])>2){
-                        return 7-ai.get.value(card);
-                    }
+                if(game.hasPlayer(function(current){
+                    return current.hp==1&&ai.get.attitude(player,current)>2;
+                })){
+                    return 7-ai.get.value(card);
                 }
                 return 5-ai.get.value(card);
             },
@@ -611,40 +611,25 @@ character.ow={
         liudan:{
 			trigger:{player:'useCard'},
             check:function(event,player){
-                var list=[];
-                for(var i=0;i<game.players.length;i++){
-					if(event.targets.contains(game.players[i])==false&&
-					game.players[i]!=player&&
-					lib.filter.targetEnabled(event.card,player,game.players[i])){
-						list.push(game.players[i]);
-					}
-				}
-				var num=0;
-                for(var i=0;i<list.length;i++){
-                    num+=ai.get.effect(list[i],event.card,player,player);
-                }
-                return num>=0;
+                return game.countPlayer(function(current){
+                    if(event.targets.contains(current)==false&&current!=player&&
+                    lib.filter.targetEnabled(event.card,player,current)){
+                        return ai.get.effect(current,event.card,player,player);
+                    }
+                })>=0;
             },
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
-				for(var i=0;i<game.players.length;i++){
-					if(event.targets.contains(game.players[i])==false&&
-					game.players[i]!=player&&
-					lib.filter.targetEnabled(event.card,player,game.players[i])){
-						return true;
-					}
-				}
-				return false;
+                return game.hasPlayer(function(current){
+                    return (event.targets.contains(current)==false&&current!=player&&
+                    lib.filter.targetEnabled(event.card,player,current));
+                });
 			},
 			content:function(){
-				var list=[];
-				for(var i=0;i<game.players.length;i++){
-					if(trigger.targets.contains(game.players[i])==false&&
-					game.players[i]!=player&&
-					lib.filter.targetEnabled(trigger.card,player,game.players[i])){
-						list.push(game.players[i]);
-					}
-				}
+				var list=game.filterPlayer(function(current){
+                    return (trigger.targets.contains(current)==false&&current!=player&&
+                    lib.filter.targetEnabled(trigger.card,player,current));
+                });
 				if(list.length){
                     var list2=[];
                     for(var i=0;i<list.length;i++){
