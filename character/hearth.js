@@ -2223,16 +2223,16 @@ character.hearth={
 			forced:true,
 			content:function(){
 				'step 0'
-				var players=get.players();
+				var players=game.filterPlayer();
 				var list=[];
 				for(var i in lib.card){
 					if(!lib.translate[i+'_info']) continue;
 					if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
 					if(lib.card[i].type=='trick') list.push(i);
 				}
-				for(var i=0;i<game.players.length;i++){
-					game.players[i].gain(game.createCard(list.randomGet()));
-					game.players[i].$draw();
+				for(var i=0;i<players.length;i++){
+					players[i].gain(game.createCard(list.randomGet()));
+					players[i].$draw();
 				}
 			}
 		},
@@ -3060,10 +3060,11 @@ character.hearth={
 				threaten:1.8,
 				order:function(name,player){
 					var max=true,num=0;
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i]==player) continue;
-						var att=ai.get.attitude(player,game.players[i]);
-						var dh=player.num('h')-game.players[i].num('h');
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(players[i]==player) continue;
+						var att=ai.get.attitude(player,players[i]);
+						var dh=player.num('h')-players[i].num('h');
 						if(att*dh>num){
 							if(att>0){
 								max=true;
@@ -3368,13 +3369,11 @@ character.hearth={
 			filter:function(event,player){
 				var nh=player.num('h');
 				var nm=1;
-				for(var i=0;i<game.players.length;i++){
-					var target=game.players[i];
-					if(target!=player&&Math.abs(target.num('h')-nh)<=nm){
+				return game.hasPlayer(function(current){
+					if(current!=player&&Math.abs(current.num('h')-nh)<=nm){
 						return true;
 					}
-				}
-				return false;
+				});
 			},
 			content:function(){
 				'step 0'
@@ -3708,12 +3707,9 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.num('h');
+				});
 			},
 			content:function(){
 				'step 0'
@@ -3986,12 +3982,9 @@ character.hearth={
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
 				if(!player.num('h',{suit:'spade'})) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('j','shandian')){
-						return false;
-					}
-				}
-				return true;
+				return !game.hasPlayer(function(current){
+					return current.hasJudge('shandian');
+				});
 			},
 			forced:true,
 			check:function(){
@@ -4162,12 +4155,9 @@ character.hearth={
 			usable:1,
 			filter:function(event,player){
 				if(event.responded) return false;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.num('h');
+				});
 			},
 			content:function(){
 				"step 0"
@@ -4429,12 +4419,9 @@ character.hearth={
 				effect_old:{
 					target:function(card,player,target){
 						if(get.tag(card,'respondShan')){
-							var hastarget=false;
-							for(var i=0;i<game.players.length;i++){
-								if(ai.get.attitude(target,game.players[i])<0){
-									hastarget=true;break;
-								}
-							}
+							var hastarget=game.hasPlayer(function(current){
+								return ai.get.attitude(player,current)<0;
+							});
 							var ns=target.num('h','shan');
 							var nh=target.num('h');
 							if(ns>1){
@@ -4806,12 +4793,9 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].hp<game.players[i].maxHp){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.isDamaged();
+				});
 			},
 			content:function(){
 				'step 0'
