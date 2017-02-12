@@ -214,23 +214,14 @@ character.hearth={
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			filter:function(event,player){
-				var nh=player.num('h');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('h')>nh){
-						return true;
-					}
-				}
-				return false;
+				return !player.isMostHandcard();
 			},
 			content:function(){
 				'step 0'
 				var nh=player.num('h');
-				var num=0;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('h')>nh){
-						num++;
-					}
-				}
+				var num=game.countPlayer(function(current){
+					return current.num('h')>nh;
+				});
 				player.chooseTarget(get.prompt('xingluo'),[1,num],function(card,player,target){
 					return target.num('h')>nh;
 				}).ai=function(target){
@@ -645,12 +636,9 @@ character.hearth={
 						var info=lib.card[name];
 						var targets=[];
 						if(get.select(info.selectTarget)[0]==-1&&!info.modTarget){
-							var targets=[];
-							for(var i=0;i<game.players.length;i++){
-								if(player.canUse(name,game.players[i])){
-									targets.push(game.players[i]);
-								}
-							}
+							var targets=game.filterPlayer(function(current){
+								return player.canUse(name,current);
+							});
 							targets.sort(lib.sort.seat);
 						}
 						else{
@@ -972,13 +960,13 @@ character.hearth={
 			forced:true,
 			popup:false,
 			content:function(){
-				for(var i=0;i<game.players.length;i++){
-					for(var j in game.players[i].storage.peiyu){
-						if(game.players[i].storage.peiyu[j]==player){
-							game.players[i].removeSkill(j);
+				game.countPlayer(function(current){
+					for(var j in current.storage.peiyu){
+						if(current.storage.peiyu[j]==player){
+							current.removeSkill(j);
 						}
 					}
-				}
+				});
 			}
 		},
 		wzhanyi:{
@@ -1090,33 +1078,32 @@ character.hearth={
 				check:function(button){
 					var player=_status.event.player;
 					var recover=0,lose=1;
-					for(var i=0;i<game.players.length;i++){
-						if(!game.players[i].isOut()){
-							if(game.players[i].hp<game.players[i].maxHp){
-								if(ai.get.attitude(player,game.players[i])>0){
-									if(game.players[i].hp<2){
-										lose--;
-										recover+=0.5;
-									}
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(players[i].hp<players[i].maxHp){
+							if(ai.get.attitude(player,players[i])>0){
+								if(players[i].hp<2){
 									lose--;
-									recover++;
+									recover+=0.5;
 								}
-								else if(ai.get.attitude(player,game.players[i])<0){
-									if(game.players[i].hp<2){
-										lose++;
-										recover-=0.5;
-									}
-									lose++;
-									recover--;
-								}
+								lose--;
+								recover++;
 							}
-							else{
-								if(ai.get.attitude(player,game.players[i])>0){
-									lose--;
-								}
-								else if(ai.get.attitude(player,game.players[i])<0){
+							else if(ai.get.attitude(player,players[i])<0){
+								if(players[i].hp<2){
 									lose++;
+									recover-=0.5;
 								}
+								lose++;
+								recover--;
+							}
+						}
+						else{
+							if(ai.get.attitude(player,players[i])>0){
+								lose--;
+							}
+							else if(ai.get.attitude(player,players[i])<0){
+								lose++;
 							}
 						}
 					}
@@ -1182,33 +1169,32 @@ character.hearth={
 				check:function(button){
 					var player=_status.event.player;
 					var recover=0,lose=1;
-					for(var i=0;i<game.players.length;i++){
-						if(!game.players[i].isOut()){
-							if(game.players[i].hp<game.players[i].maxHp){
-								if(ai.get.attitude(player,game.players[i])>0){
-									if(game.players[i].hp<2){
-										lose--;
-										recover+=0.5;
-									}
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(players[i].hp<players[i].maxHp){
+							if(ai.get.attitude(player,players[i])>0){
+								if(players[i].hp<2){
 									lose--;
-									recover++;
+									recover+=0.5;
 								}
-								else if(ai.get.attitude(player,game.players[i])<0){
-									if(game.players[i].hp<2){
-										lose++;
-										recover-=0.5;
-									}
-									lose++;
-									recover--;
-								}
+								lose--;
+								recover++;
 							}
-							else{
-								if(ai.get.attitude(player,game.players[i])>0){
-									lose--;
-								}
-								else if(ai.get.attitude(player,game.players[i])<0){
+							else if(ai.get.attitude(player,players[i])<0){
+								if(players[i].hp<2){
 									lose++;
+									recover-=0.5;
 								}
+								lose++;
+								recover--;
+							}
+						}
+						else{
+							if(ai.get.attitude(player,players[i])>0){
+								lose--;
+							}
+							else if(ai.get.attitude(player,players[i])<0){
+								lose++;
 							}
 						}
 					}
@@ -1339,12 +1325,9 @@ character.hearth={
 						while(list.length){
 							var card={name:list.randomRemove()};
 							var info=get.info(card);
-							var targets=[];
-							for(var i=0;i<game.players.length;i++){
-								if(lib.filter.filterTarget(card,player,game.players[i])){
-									targets.push(game.players[i]);
-								}
-							}
+							var targets=game.filterPlayer(function(current){
+								return lib.filter.filterTarget(card,player,current);
+							});
 							if(targets.length){
 								targets.sort(lib.sort.seat);
 								if(info.selectTarget==-1){
@@ -1548,19 +1531,16 @@ character.hearth={
 			filter:function(event,player){
 				if(player.hasSkill('xianji')) return false;
 				if(player.hasSkill('xianji3')) return true;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hasSkill('xianji')) return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.hasSkill('xianji');
+				});
 			},
 			content:function(){
 				'step 0'
 				player.removeSkill('xianji3');
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].hasSkill('xianji')){
-						event.target=game.players[i];break;
-					}
-				}
+				event.target=game.findPlayer(function(current){
+					return current.hasSkill('xianji');
+				});
 				if(event.target){
 					player.chooseToDiscard([1,2],'献祭：是否弃置1~2张手牌并令'+get.translation(event.target)+'摸等量的牌？').set('ai',function(card){
 						if(ai.get.attitude(_status.event.player,_status.event.getParent().target)>1){
