@@ -28,10 +28,9 @@ character.old={
 				if(!event.filterCard({name:'shan'})&&!!event.filterCard({name:'sha'})) return false;
 				if(player.hasSkill('zhenshan2')) return false;
                 var nh=player.num('h');
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('h')<nh) return true;
-                }
-                return false;
+                return game.hasPlayer(function(current){
+                    return current!=player&&current.num('h')<nh;
+                });
 			},
 			direct:true,
 			content:function(){
@@ -79,10 +78,9 @@ character.old={
 			viewAsFilter:function(player){
                 if(player.hasSkill('zhenshan2')) return false;
                 var nh=player.num('h');
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('h')<nh) return true;
-                }
-                return false;
+                return game.hasPlayer(function(current){
+                    return current!=player&&current.num('h')<nh;
+                });
 			},
 			precontent:function(){
 				'step 0'
@@ -118,18 +116,17 @@ character.old={
 				skillTagFilter:function(player,tag,arg){
                     if(player.hasSkill('zhenshan2')) return false;
                     var nh=player.num('h');
-                    for(var i=0;i<game.players.length;i++){
-                        if(game.players[i]!=player&&game.players[i].num('h')<nh) return true;
-                    }
-                    return false;
+                    return game.hasPlayer(function(current){
+                        return current!=player&&current.num('h')<nh;
+                    });
 				},
 				order:function(){
                     var player=_status.event.player;
                     var nh=player.num('h');
-                    for(var i=0;i<game.players.length;i++){
-                        if(ai.get.attitude(player,game.players[i])>0&&game.players[i].num('h')<nh){
-                            return 2.9;
-                        }
+                    if(game.hasPlayer(function(current){
+                        return ai.get.attitude(player,current)>0&&current.num('h')<nh;
+                    })){
+                        return 2.9;
                     }
                     return 0;
                 },
@@ -142,10 +139,9 @@ character.old={
             viewAsFilter:function(player){
                 if(player.hasSkill('zhenshan2')) return false;
                 var nh=player.num('h');
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('h')<nh) return true;
-                }
-                return false;
+                return game.hasPlayer(function(current){
+                    return current!=player&&current.num('h')<nh;
+                });
 			},
             log:false,
 			precontent:function(){
@@ -182,18 +178,17 @@ character.old={
                 skillTagFilter:function(player,tag,arg){
                     if(player.hasSkill('zhenshan2')) return false;
                     var nh=player.num('h');
-                    for(var i=0;i<game.players.length;i++){
-                        if(game.players[i]!=player&&game.players[i].num('h')<nh) return true;
-                    }
-                    return false;
+                    return game.hasPlayer(function(current){
+                        return current!=player&&current.num('h')<nh;
+                    });
 				},
 				order:function(){
                     var player=_status.event.player;
                     var nh=player.num('h');
-                    for(var i=0;i<game.players.length;i++){
-                        if(ai.get.attitude(player,game.players[i])>0&&game.players[i].num('h')<nh){
-                            return _status.event.type=='dying'?0.5:4;
-                        }
+                    if(game.hasPlayer(function(current){
+                        return ai.get.attitude(player,current)>0&&current.num('h')<nh;
+                    })){
+                        return _status.event.type=='dying'?0.5:4;
                     }
                     return 0;
                 },
@@ -206,10 +201,9 @@ character.old={
             viewAsFilter:function(player){
                 if(player.hasSkill('zhenshan2')) return false;
                 var nh=player.num('h');
-                for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('h')<nh) return true;
-                }
-                return false;
+                return game.hasPlayer(function(current){
+                    return current!=player&&current.num('h')<nh;
+                });
 			},
             log:false,
 			precontent:function(){
@@ -246,10 +240,9 @@ character.old={
                 skillTagFilter:function(player,tag,arg){
                     if(player.hasSkill('zhenshan2')) return false;
                     var nh=player.num('h');
-                    for(var i=0;i<game.players.length;i++){
-                        if(game.players[i]!=player&&game.players[i].num('h')<nh) return true;
-                    }
-                    return false;
+                    return game.hasPlayer(function(current){
+                        return current!=player&&current.num('h')<nh;
+                    });
 				},
 				order:0,
 				save:true,
