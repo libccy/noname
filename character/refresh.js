@@ -45,12 +45,13 @@ character.refresh={
 				var player=get.owner(card);
 				if(ui.selected.cards.length>=Math.max(2,player.num('h')-player.hp)) return 0;
 				if(player.hp==player.maxHp||player.storage.rerende<0||player.num('h')<=1){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].get('s').contains('haoshi')&&
-							!game.players[i].isTurnedOver()&&
-							!game.players[i].num('j','lebu')&&
-							ai.get.attitude(player,game.players[i])>=3&&
-							ai.get.attitude(game.players[i],player)>=3){
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(players[i].get('s').contains('haoshi')&&
+							!players[i].isTurnedOver()&&
+							!players[i].num('j','lebu')&&
+							ai.get.attitude(player,players[i])>=3&&
+							ai.get.attitude(players[i],player)>=3){
 							return 11-ai.get.value(card);
 						}
 					}
@@ -75,10 +76,10 @@ character.refresh={
 					if(player.storage.rerende>=2){
 						var list=[];
 						if(lib.filter.cardUsable({name:'sha'},player,event.getParent('chooseToUse'))){
-							for(var i=0;i<game.players.length;i++){
-								if(player.canUse('sha',game.players[i])){
-									list.push('sha');break;
-								}
+							if(game.hasPlayer(function(current){
+								return player.canUse('sha',current);
+							})){
+								list.push('sha');
 							}
 						}
 						if(player.canUse('tao',player,true,true)){
@@ -94,9 +95,10 @@ character.refresh={
 								var player=_status.event.player;
 								if(controls.contains('tao')) return 'tao';
 								if(controls.contains('sha')){
-									for(var i=0;i<game.players.length;i++){
-										if(player.canUse('sha',game.players[i],true,true)){
-											if(ai.get.effect(game.players[i],{name:'sha'},player,player)>0){
+									var players=game.filterPlayer();
+									for(var i=0;i<players.length;i++){
+										if(player.canUse('sha',players[i],true,true)){
+											if(ai.get.effect(players[i],{name:'sha'},player,player)>0){
 												return 'sha';
 											}
 										}
@@ -165,10 +167,10 @@ character.refresh={
 					target:function(card,player,target){
 						if(player==target&&get.type(card)=='equip'){
 							if(player.num('e',{subtype:get.subtype(card)})){
-								for(var i=0;i<game.players.length;i++){
-									if(game.players[i]!=player&&ai.get.attitude(player,game.players[i])>0){
-										return 0;
-									}
+								if(game.hasPlayer(function(current){
+									return current!=player&&ai.get.attitude(player,current)>0;
+								})){
+									return 0;
 								}
 							}
 						}
@@ -1213,10 +1215,9 @@ character.refresh={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].sex=='male') return true;
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current.sex=='male';
+				});
 			},
 			content:function(){
 				"step 0"

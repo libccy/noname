@@ -2622,6 +2622,7 @@ div:not(.handcards)>.card>.info>span,
 
 #window:not(.nopointer) #system>div>div:not(.hidden),
 #window:not(.nopointer) .choosedouble.character,
+#window:not(.nopointer) .pointerdiv,
 #window:not(.nopointer) .pointernode div,
 #window:not(.nopointer) .pointerspan span,
 #window:not(.nopointer) .pointertable td>span,
