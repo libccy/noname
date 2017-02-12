@@ -85,8 +85,10 @@ card.extra={
 								}
 							}
 						}
-						else if(player.hasSha()){
-							card={name:'sha'};
+						else if(player.hasSha()&&player.needsToDiscard()){
+							if(player.num('h','hufu')!=1){
+								card={name:'sha'};
+							}
 						}
 						if(card){
 							if(game.hasPlayer(function(current){

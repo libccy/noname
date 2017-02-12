@@ -1277,10 +1277,10 @@ character.shenhua={
 			audio:2,
 			unique:true,
 			gainable:true,
-			trigger:{global:'phaseDiscardEnd'},
+			trigger:{global:'discardAfter'},
 			filter:function(event,player){
 				if(event.player!=player&&event.player.classList.contains('dead')==false&&
-				event.cards&&event.cards.length){
+				event.cards&&event.cards.length&&event.getParent(2).name=='phaseDiscard'){
 					for(var i=0;i<event.cards.length;i++){
 						if(get.position(event.cards[i])=='d'){
 							return true;

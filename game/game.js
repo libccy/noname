@@ -10160,7 +10160,12 @@
     				else if(this.name==name){
     					node=this.node.avatar;
     				}
-                    if(node) node.setBackground(name2,'character');
+                    if(node){
+						node.setBackground(name2,'character');
+						if(this==game.me&&ui.fakeme){
+							ui.fakeme.style.backgroundImage=node.style.backgroundImage;
+						}
+					}
                 },
 				update:function(){
 					if(_status.video&&arguments.length==0) return;
@@ -14783,7 +14788,11 @@
 				moveDelete:function(player){
 					this.fixed=true;
 					if(!this._listeningEnd||this._transitionEnded){
-						this.moveTo(player).delete();
+						this.moveTo(player);
+						var that=this;
+						setTimeout(function(){
+							that.delete();
+						},200);
 					}
 					else{
 						this._onEndMoveDelete=player;
@@ -15567,7 +15576,7 @@
                         }
                     }
                     else{
-                        game.saveConfig('reconnect_info');
+                        // game.saveConfig('reconnect_info');
                     }
                     game.online=false;
                     game.ws=null;
@@ -29501,8 +29510,10 @@
 				if(game.layout=='default'&&lib.config.hp_style=='official'){
 					ui.arena.classList.add('hpimage');
 				}
-                if(game.layout=='long'||game.layout=='long2'||game.layout=='mobile'){
+                if(game.layout=='long'||game.layout=='mobile'){
                     if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
+                }
+                if(game.layout=='long'||game.layout=='long2'||game.layout=='mobile'){
                     if(lib.config.cardshape=='oblong') ui.arena.classList.add('oblongcard');
                 }
 				if(lib.config.blur_ui){
