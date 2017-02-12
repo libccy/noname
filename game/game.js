@@ -27443,7 +27443,7 @@
     								if(update.version!=lib.version||dev){
                                         var files=null;
                                         var version=lib.version;
-                                        if(Array.isArray(update.files)&&update.update){
+                                        if(Array.isArray(update.files)&&update.update&&!dev){
                                             var version1=version.split('.');
                                             var version2=update.update.split('.');
                                             for(var i=0;i<version1.length&&i<version2.length;i++){
