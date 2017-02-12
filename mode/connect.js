@@ -106,7 +106,7 @@ mode.connect={
             },220);
         }
         if(window.isNonameServer){
-            game.connect('localhost');
+            game.connect(window.isNonameServerIp||'localhost');
         }
         else if(lib.config.reconnect_info){
             var info=lib.config.reconnect_info;

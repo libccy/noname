@@ -3815,6 +3815,11 @@
                     window.isNonameServer=window.location.href.slice(index+18);
                     window.indexedDB=null;
                 }
+				// index=localStorage.getItem(lib.configprefix+'asserver');
+				// if(index){
+				// 	window.isNonameServer=index;
+				// 	window.isNonameServerIp=lib.hallURL;
+				// }
 
                 lib.get=get;
                 lib.ui=ui;
@@ -3899,6 +3904,7 @@
         			return this;
         		};
         		HTMLDivElement.prototype.setBackground=function(name,type,ext,subfolder){
+					if(!name) return;
         			var src;
         			ext=ext||'.jpg';
         			subfolder=subfolder||'default'
@@ -20391,13 +20397,15 @@
 						break;
 					}
 				}
+				var me=game.me||game.players[0];
+				if(!me) return;
 				var newvid={
 					name:game.getVideoName(),
 					mode:lib.config.mode,
 					video:lib.video,
 					win:result=='战斗胜利',
-					name1:game.me.name1||game.me.name,
-					name2:game.me.name2,
+					name1:me.name1||me.name,
+					name2:me.name2,
 					time:lib.getUTC(new Date())
 				};
 				var modecharacters=lib.characterPack['mode_'+get.mode()];
