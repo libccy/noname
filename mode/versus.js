@@ -2255,6 +2255,7 @@ mode.versus={
 				var target=event.swap(player);
 				var swap=[],swap2=[];
 				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isOut()) continue;
 					if(!game.players[i].classList.contains('acted')){
 						if(game.players[i].side==target.side){
 							swap.push(game.players[i]);
@@ -2271,11 +2272,12 @@ mode.versus={
 					}
 					else{
 						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].isOut()) continue;
 							game.players[i].classList.remove('acted');
-							if(game.players[i].side==target.side){
-								swap.push(game.players[i]);
-							}
 						}
+						event.redo();
+						game.delay();
+						return;
 					}
 				}
 				if(swap.length==1){
@@ -2283,9 +2285,12 @@ mode.versus={
 				}
 				else{
 					var rand=Math.random();
-					target.chooseTarget('选择行动的角色',true,function(card,player,target2){
+					var next=target.chooseTarget('选择行动的角色',true,function(card,player,target2){
 						return target2.side==target.side&&!target2.classList.contains('acted');
-					}).ai=function(target2){
+					});
+					next._triggered=null;
+					next.includeOut=true;
+					next.ai=function(target2){
 						var num=0;
 						if(target2.num('j')){
 							num-=5;
@@ -2339,7 +2344,7 @@ mode.versus={
 					}
 					var list=(_status.currentSide==game.me.side)?game.friend.slice(0):game.enemy.slice(0);
 					for(var i=0;i<list.length;i++){
-						if(list[i].classList.contains('acted')){
+						if(list[i].classList.contains('acted')||list[i].isOut()){
 							list.splice(i,1);i--;
 						}
 					}
@@ -2355,7 +2360,7 @@ mode.versus={
 					else{
 						game.me.chooseTarget('选择要行动的角色',true,function(card,player,target){
 							return (target.classList.contains('acted')==false&&target.side==game.me.side);
-						})
+						}).includeOut=true;
 					}
 				}
 				else{

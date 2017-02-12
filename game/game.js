@@ -11828,19 +11828,35 @@
                     return next;
 				},
 				out:function(skill){
-					if(!this.storage.out){
-						this.storage.out=[];
+					if(typeof skill=='number'){
+						this.outCount++;
 					}
-					this.storage.out.add(skill);
+					else if(typeof skill=='string'){
+						this.outSkill=skill;
+					}
 					if(!this.classList.contains('out')){
 						this.classList.add('out');
 						game.log(this,'离开游戏');
 					}
+					if(!game.countPlayer()){
+						game.over();
+					}
 				},
 				in:function(skill){
 					if(this.isOut()){
-						this.storage.out.remove(skill);
-						if(this.storage.out.length==0){
+						if(typeof skill=='string'){
+							if(this.outSkill==skill){
+								delete this.outSkill;
+							}
+						}
+						else{
+							if(typeof skill!='number'){
+								skill=1;
+							}
+							this.outCount-=skill;
+						}
+						if(this.outCount<=0&&!this.outSkill){
+							this.outCount=0;
 							this.classList.remove('out');
 							game.log(this,'进入游戏');
 						}
@@ -15930,10 +15946,10 @@
 				forced:true,
 				priority:20,
 				popup:false,
-				// filter:function(event,player){
-				// 	return player.isTurnedOver();
-				// },
 				content:function(){
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].in();
+					}
 					if(player.isTurnedOver()){
 						trigger.untrigger();
 						trigger.finish();
@@ -15944,29 +15960,6 @@
 						player.phaseSkipped=false;
 					}
 				},
-			},
-			_out:{
-				trigger:{target:'useCardToBefore',player:['damageBefore','phaseBefore']},
-				forced:true,
-				popup:false,
-				priority:20,
-				filter:function(event,player){
-					return player.isOut();
-				},
-				content:function(){
-					trigger.untrigger();
-					trigger.finish();
-				},
-				ai:{
-					effect:{
-						target:function(card,player,target){
-							if(target.isOut()) return 0;
-						}
-					},
-					threaten:function(player,target){
-						if(target.isOut()) return 0;
-					}
-				}
 			},
 			_phasebegin:{
 				trigger:{player:'phaseBegin'},
@@ -20541,7 +20534,7 @@
 					else if(player&&player.removed&&event.name!='phaseLoop'){
 						event.finish();
 					}
-					else if(player&&player.isOut()&&event.name!='phaseLoop'){
+					else if(player&&player.isOut()&&event.name!='phaseLoop'&&!event.includeOut){
 						event.finish();
 					}
 					else{
@@ -30115,6 +30108,7 @@
 				node.marks={};
 				node.ai={friend:[],enemy:[],neutral:[],handcards:{global:[],source:[],viewed:[]}};
 				node.queueCount=0;
+				node.outCount=0;
 
 				for(var i in lib.element.player){
 					node[i]=lib.element.player[i];
