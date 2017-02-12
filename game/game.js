@@ -5638,7 +5638,8 @@
 				mode.remove('connect');
 				mode.remove('brawl');
 				var banned=['yxs_luzhishen','xuhuang','zhenji','shen_guanyu','zhurong',
-					'daqiao','lingcao','liuzan','lusu','luxun','yanwen'];
+					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','xiahouyuan',
+					'zhuzhi','old_caozhen','guojia','simayi'];
 				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui'];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);

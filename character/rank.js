@@ -372,6 +372,7 @@ window.characterRank={
         'yuanshu',
         're_guojia',
         'cuiyan',
+        'sp_zhugeliang',
     ],
     b:[
         'diy_liufu',
@@ -465,7 +466,6 @@ window.characterRank={
         'mayunlu',
         'yxs_mingchenghuanghou',
         'yxs_libai',
-        'sp_zhugeliang',
         'shen_guanyu',
         'jiangfei',
         're_caocao',
