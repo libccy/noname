@@ -3,6 +3,7 @@ window.noname_update={
     update:'1.9.8.4',
     changeLog:[
         'bug修复',
+        '注意：可能有更多bug'
     ],
     files:[
         // 'game/game.js',
