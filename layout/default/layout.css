@@ -1658,6 +1658,10 @@ div:not(.handcards)>.card>.info>span,
 	filter: grayscale(1);
 	-webkit-filter: grayscale(1);
 }
+.grayscale{
+	filter: grayscale(1);
+	-webkit-filter: grayscale(1);
+}
 
 #arena[data-name_font='xiaozhuan'] .player>.name,
 #arena[data-name_font='xiaozhuan'] .button.character>.name {

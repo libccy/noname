@@ -24077,61 +24077,6 @@
 					for(var i in lib.configMenu){
                         createModeConfig(i,start.firstChild);
                     }
-                    for(var i in lib.help){
-						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large',i,start.firstChild,clickMode);
-                        node.type='help';
-						node.link=page;
-                        node.style.display='none';
-						page.classList.add('menu-help');
-						page.innerHTML=lib.help[i];
-					}
-
-                    if(!connectMenu){
-                        var node=ui.create.div('.menubutton.large','帮助',start.firstChild,function(){
-                            var activex=start.firstChild.querySelector('.active');
-                            if(this.innerHTML=='帮助'){
-                                this.innerHTML='返回';
-                                for(var i=0;i<start.firstChild.childElementCount;i++){
-                                    var nodex=start.firstChild.childNodes[i];
-                                    if(nodex==node) continue;
-                                    if(nodex.type=='help'){
-                                        nodex.style.display='';
-                                        if(activex&&activex.type!='help'){
-                                            activex.classList.remove('active');
-                                            activex.link.remove();
-                                            activex=null;
-                    						nodex.classList.add('active');
-                    						rightPane.appendChild(nodex.link);
-                                        }
-                                    }
-                                    else{
-                                        nodex.style.display='none';
-                                    }
-                                }
-                            }
-                            else{
-                                this.innerHTML='帮助';
-                                for(var i=0;i<start.firstChild.childElementCount;i++){
-                                    var nodex=start.firstChild.childNodes[i];
-                                    if(nodex==node) continue;
-                                    if(nodex.type!='help'){
-                                        nodex.style.display='';
-                                        if(activex&&activex.type=='help'){
-                                            activex.classList.remove('active');
-                                            activex.link.remove();
-                                            activex=null;
-                    						nodex.classList.add('active');
-                    						rightPane.appendChild(nodex.link);
-                                        }
-                                    }
-                                    else{
-                                        nodex.style.display='none';
-                                    }
-                                }
-                            }
-    					});
-                    }
 
 					var active=start.firstChild.querySelector('.active');
                     if(!active){
@@ -27286,8 +27231,10 @@
 						if(active===this){
 							return;
 						}
-						active.classList.remove('active');
-						active.link.remove();
+						if(active){
+							active.classList.remove('active');
+							active.link.remove();
+						}
 						active=this;
 						this.classList.add('active');
 						rightPane.appendChild(this.link);
@@ -27843,8 +27790,53 @@
     					page.appendChild(ul);
                     }());
 					(function(){
+						var norow2=function(){
+							var node=currentrow1;
+							if(!node) return false;
+							return node.innerHTML=='横置'||node.innerHTML=='翻面'||node.innerHTML=='换人'||node.innerHTML=='复活';
+						};
 						var checkCheat=function(){
-							if(currentrow1&&currentrow2&&row3.querySelector('.glow')){
+							if(norow2()){
+								for(var i=0;i<row2.childElementCount;i++){
+									row2.childNodes[i].classList.remove('selectedx');
+									row2.childNodes[i].classList.add('unselectable');
+								}
+							}
+							else{
+								for(var i=0;i<row2.childElementCount;i++){
+									row2.childNodes[i].classList.remove('unselectable');
+								}
+							}
+							if(currentrow1&&currentrow1.innerHTML=='复活'){
+								for(var i=0;i<row3.childNodes.length;i++){
+									if(row3.childNodes[i].dead){
+										row3.childNodes[i].style.display='';
+									}
+									else{
+										row3.childNodes[i].style.display='none';
+										row3.childNodes[i].classList.remove('glow');
+									}
+									row3.childNodes[i].classList.remove('unselectable');
+								}
+							}
+							else{
+								for(var i=0;i<row3.childElementCount;i++){
+									if(currentrow1&&currentrow1.innerHTML=='换人'&&row3.childNodes[i].link==game.me){
+										row3.childNodes[i].classList.add('unselectable');
+									}
+									else{
+										row3.childNodes[i].classList.remove('unselectable');
+									}
+									if(!row3.childNodes[i].dead){
+										row3.childNodes[i].style.display='';
+									}
+									else{
+										row3.childNodes[i].style.display='none';
+										row3.childNodes[i].classList.remove('glow');
+									}
+								}
+							}
+							if(currentrow1&&(currentrow2||norow2())&&row3.querySelector('.glow')){
 								cheatButton.classList.add('glowing');
 								return true;
 							}
@@ -27856,12 +27848,14 @@
 						cheatButton.listen(function(){
 							if(checkCheat()){
 								var num;
-								switch(currentrow2.innerHTML){
-									case '一':num=1;break;
-									case '二':num=2;break;
-									case '三':num=3;break;
-									case '四':num=4;break;
-									case '五':num=5;break;
+								if(currentrow2){
+									switch(currentrow2.innerHTML){
+										case '一':num=1;break;
+										case '二':num=2;break;
+										case '三':num=3;break;
+										case '四':num=4;break;
+										case '五':num=5;break;
+									}
 								}
 								var targets=[];
 								var buttons=row3.querySelectorAll('.glow');
@@ -27874,12 +27868,27 @@
 										case '伤害':target.damage(num,'nosource');break;
 										case '回复':target.recover(num,'nosource');break;
 										case '摸牌':target.draw(num);break;
-										case '弃牌':
-											var hs=target.get('he');
-											if(hs.length){
-												target.discard(hs.randomGets(num));
+										case '弃牌':target.discard(target.get('he').randomGets(num));break;
+										case '横置':target.link();break;
+										case '翻面':target.turnOver();break;
+										case '复活':target.revive(target.maxHp);break;
+										case '换人':{
+											if(_status.event.isMine()){
+												if(!ui.auto.classList.contains('hidden')){
+													setTimeout(function(){
+														ui.click.auto();
+														setTimeout(function(){
+															ui.click.auto();
+															game.swapPlayer(target);
+														},500);
+													});
+												}
+											}
+											else{
+												game.swapPlayer(target);
 											}
 											break;
+										}
 									}
 								}
 								if(ui.coin){
@@ -27890,7 +27899,7 @@
 						});
 
 						var page=ui.create.div('');
-						var node=ui.create.div('.menubutton.large','作弊',start.firstChild,clickMode);
+						var node=ui.create.div('.menubutton.large','控制',start.firstChild,clickMode);
 						node.link=page;
 						node.type='cheat';
 						page.classList.add('menu-sym');
@@ -27898,16 +27907,22 @@
 						var currentrow1=null;
 						var row1=ui.create.div('.menu-cheat',page);
 						var clickrow1=function(){
+							if(this.classList.contains('unselectable')) return;
 							if(currentrow1==this){
-								this.classList.remove('selecting');
+								this.classList.remove('selectedx');
 								currentrow1=null;
 							}
 							else{
-								this.classList.add('selecting');
+								this.classList.add('selectedx');
 								if(currentrow1){
-									currentrow1.classList.remove('selecting');
+									currentrow1.classList.remove('selectedx');
 								}
 								currentrow1=this;
+								if(this.innerHTML=='换人'){
+									for(var i=0;i<row3.childNodes.length;i++){
+										row3.childNodes[i].classList.remove('glow');
+									}
+								}
 							}
 							checkCheat();
 						};
@@ -27915,18 +27930,26 @@
 						var noderecover=ui.create.div('.menubutton','回复',row1,clickrow1);
 						var nodedraw=ui.create.div('.menubutton','摸牌',row1,clickrow1);
 						var nodediscard=ui.create.div('.menubutton','弃牌',row1,clickrow1);
+						var nodelink=ui.create.div('.menubutton','横置',row1,clickrow1);
+						var nodeturnover=ui.create.div('.menubutton','翻面',row1,clickrow1);
+						var noderevive=ui.create.div('.menubutton','复活',row1,clickrow1);
+						var nodereplace=ui.create.div('.menubutton','换人',row1,clickrow1);
+						if(lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
+							nodereplace.classList.add('unselectable');
+						}
 
 						var currentrow2=null;
 						var row2=ui.create.div('.menu-cheat',page);
 						var clickrow2=function(){
+							if(this.classList.contains('unselectable')) return;
 							if(currentrow2==this){
-								this.classList.remove('selecting');
+								this.classList.remove('selectedx');
 								currentrow2=null;
 							}
 							else{
-								this.classList.add('selecting');
+								this.classList.add('selectedx');
 								if(currentrow2){
-									currentrow2.classList.remove('selecting');
+									currentrow2.classList.remove('selectedx');
 								}
 								currentrow2=this;
 							}
@@ -27941,7 +27964,18 @@
 						var row3=ui.create.div('.menu-buttons.leftbutton',page);
 						row3.style.marginTop='3px';
 						var clickrow3=function(){
+							if(this.classList.contains('unselectable')) return;
 							this.classList.toggle('glow');
+							if(currentrow1&&currentrow1.innerHTML=='换人'&&this.classList.contains('glow')){
+								if(this.link==game.me){
+									this.classList.remove('glow');
+								}
+								for(var i=0;i<row3.childElementCount;i++){
+									if(row3.childNodes[i]!=this){
+										row3.childNodes[i].classList.remove('glow');
+									}
+								}
+							}
 							checkCheat();
 						};
 						menuUpdates.push(function(){
@@ -27962,11 +27996,13 @@
 							}
 							var list=[];
 							for(var i=0;i<game.players.length;i++){
-								if(lib.character[game.players[i].name]&&game.players[i].isAlive()){
+								if(lib.character[game.players[i].name]||game.players[i].name1){
 									list.push(game.players[i]);
 								}
-								else if(game.players[i]==game.me&&game.me.name1){
-									list.push(game.me);
+							}
+							for(var i=0;i<game.dead.length;i++){
+								if(lib.character[game.dead[i].name]||game.dead[i].name1){
+									list.push(game.dead[i]);
 								}
 							}
 							if(list.length){
@@ -27976,16 +28012,38 @@
 								var buttons=ui.create.buttons(list,'player',row3,true);
 								for(var i=0;i<buttons.length;i++){
 									buttons[i].listen(clickrow3);
+									if(game.dead.contains(buttons[i].link)){
+										buttons[i].dead=true;
+									}
 								}
+								checkCheat();
 							}
 							else{
 								row1.hide();
 								row2.hide();
 							}
+							if(lib.config.mode=='identity'||lib.config.mode=='guozhan'){
+								if(!game.phaseNumber){
+									nodereplace.classList.add('unselectable');
+								}
+								else if(_status.event.isMine()&&ui.auto.classList.contains('hidden')){
+									nodereplace.classList.add('unselectable');
+								}
+								else{
+									nodereplace.classList.remove('unselectable');
+								}
+							}
+							if(game.dead.length==0){
+								noderevive.classList.add('unselectable');
+							}
+							else{
+								noderevive.classList.remove('unselectable');
+							}
 							checkCheat();
 						});
 					}());
 					(function(){
+						if(true) return;
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large','换人',start.firstChild,clickMode);
 						node.link=page;
@@ -28373,6 +28431,68 @@
 					        };
 						});
 					}());
+
+
+					for(var i in lib.help){
+						var page=ui.create.div('');
+						var node=ui.create.div('.menubutton.large',i,start.firstChild,clickMode);
+                        node.type='help';
+						node.link=page;
+                        node.style.display='none';
+						page.classList.add('menu-help');
+						page.innerHTML=lib.help[i];
+					}
+
+                    if(!connectMenu){
+                        var node=ui.create.div('.menubutton.large','帮助',start.firstChild,function(){
+                            var activex=start.firstChild.querySelector('.active');
+                            if(this.innerHTML=='帮助'){
+								cheatButton.style.display='none';
+								runButton.style.display='none';
+								playButton.style.display='none';
+								saveButton.style.display='none';
+								deleteButton.style.display='none';
+
+                                this.innerHTML='返回';
+                                for(var i=0;i<start.firstChild.childElementCount;i++){
+                                    var nodex=start.firstChild.childNodes[i];
+                                    if(nodex==node) continue;
+                                    if(nodex.type=='help'){
+                                        nodex.style.display='';
+                                        if(activex&&activex.type!='help'){
+                                            activex.classList.remove('active');
+                                            activex.link.remove();
+                                            activex=null;
+                    						nodex.classList.add('active');
+                    						rightPane.appendChild(nodex.link);
+                                        }
+                                    }
+                                    else{
+                                        nodex.style.display='none';
+                                    }
+                                }
+                            }
+                            else{
+                                this.innerHTML='帮助';
+                                for(var i=0;i<start.firstChild.childElementCount;i++){
+                                    var nodex=start.firstChild.childNodes[i];
+                                    if(nodex==node) continue;
+                                    if(nodex.type!='help'){
+                                        nodex.style.display='';
+                                        if(activex&&activex.type=='help'){
+                                            activex.classList.remove('active');
+                                            activex.link.remove();
+                                            activex=null;
+											clickMode.call(nodex);
+                                        }
+                                    }
+                                    else{
+                                        nodex.style.display='none';
+                                    }
+                                }
+                            }
+    					});
+                    }
 
 					var active=start.firstChild.querySelector('.active');
 					if(!active){

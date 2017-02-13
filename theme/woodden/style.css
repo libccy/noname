@@ -88,6 +88,9 @@ html{
 #arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg{
 	background: url('wood.jpg');
 }
+.cardbg.button{
+	background: url('wood.png');
+}
 #arena.observe .handcards>.card{
 	background: url('wood.jpg') !important;
 }
