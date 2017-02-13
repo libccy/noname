@@ -8550,6 +8550,7 @@
 					if(event.addedTargets){
 						next.addedTargets=event.addedTargets;
 						next.addedTarget=event.addedTarget;
+						next._targets=event._targets;
 					}
                     if(info.targetDelay===false){
                         event.targetDelay=false;
@@ -11403,6 +11404,7 @@
 		                        info.changeTarget(next.player,next.targets);
 		                    }
 							if(info.singleCard){
+								next._targets=next.targets.slice(0);
 								next.target=next.targets[0];
 								next.addedTargets=next.targets.splice(1);
 								if(next.addedTargets.length){
@@ -24110,7 +24112,7 @@
                         if(i!='others') createModeConfig(i,start.firstChild);
                     }
 					(function(){
-						if(!lib.device&&!lib.node) return;
+						if(!game.download||!lib.device) return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','文件',start.firstChild,clickMode);
 						node.link=page;
@@ -24147,11 +24149,12 @@
                         importExtension.style.width='100%';
                         importExtension.style.textAlign='left';
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
-						var promptnode=ui.create.div('','<div style="width:153px;font-size:small;margin-top:8px">正在导入',importExtension);
+						var promptnode=ui.create.div('','<div style="width:153px;font-size:small;margin-top:8px">',importExtension);
 						promptnode.style.display='none';
 						importExtension.firstChild.lastChild.onclick=function(){
 							if(promptnode.style.display!='none') return;
 							promptnode.style.display='';
+							promptnode.firstChild.innerHTML='正在导入...';
                             var fileToLoad=this.previousSibling.files[0];
                             if(fileToLoad){
                                 var fileReader = new FileReader();
@@ -24171,8 +24174,131 @@
 									var loadData=function(){
 										var zip=new JSZip();
 										zip.load(data);
-										console.log(zip.files);
-										window.z=zip;
+										var images=[],audios=[],fonts=[],directories={},directorylist=[];
+										for(var i in zip.files){
+											var ext=i.slice(i.lastIndexOf('.')+1);
+											if(i.indexOf('audio/')==0&&(ext=='mp3'||ext=='ogg')){
+												audios.push(i);
+											}
+											else if(i.indexOf('font/')==0&&ext=='ttf'){
+												fonts.push(i);
+											}
+											else if(i.indexOf('image/')==0&&(ext=='jpg'||ext=='png')){
+												images.push(i);
+											}
+											else{
+												continue;
+											}
+											var index=i.lastIndexOf('/');
+											var str=i.slice(0,index);
+											if(!directories[str]){
+												directories[str]=[];
+												directorylist.push(str);
+											}
+											directories[str].push(i.slice(index+1));
+										}
+										if(audios.length||fonts.length||images.length){
+											var str='';
+											if(audios.length){
+												str+=audios.length+'个音频文件';
+											}
+											if(fonts.length){
+												if(str.length) str+='、'
+												str+=fonts.length+'个字体文件';
+											}
+											if(images.length){
+												if(str.length) str+='、'
+												str+=images.length+'个图片文件';
+											}
+											var filelist=audios.concat(fonts).concat(images);
+											if(filelist.length>500){
+												str+='，导入时间可能较长';
+											}
+											var assetLoaded=function(){
+												promptnode.firstChild.innerHTML='导入成功。<span style="text-decoration:underline">重新启动</span><span style="float:right">×</span>';
+												promptnode.querySelectorAll('span')[0].onclick=game.reload;
+												promptnode.querySelectorAll('span')[1].onclick=function(){
+													promptnode.style.display='none';
+												}
+											};
+											if(confirm('本次将导入'+str+'，是否继续？')){
+												if(lib.node&&lib.node.fs){
+													var access=function(str,dir,callback){
+														if(!dir.length){
+															callback();
+															str+='/'+dir[0];
+														}
+														else{
+															str+='/'+dir.shift();
+															lib.node.fs.access(__dirname+str,function(e){
+							                                    if(e){
+							                                        try{
+							                                            lib.node.fs.mkdir(__dirname+str,function(){
+																			access(str,dir,callback);
+																		});
+							                                        }
+							                                        catch(e){
+							                                            console.log(e);
+							                                        }
+							                                    }
+							                                    else{
+							                                        access(str,dir,callback);
+							                                    }
+							                                });
+														}
+													}
+													var writeFile=function(){
+														if(filelist.length){
+															var str=filelist.shift();
+															lib.node.fs.writeFile(__dirname+'/'+str,zip.files[str].asNodeBuffer(),null,writeFile);
+														}
+														else{
+															assetLoaded();
+														}
+													};
+													var createDirectory=function(){
+														if(directorylist.length){
+															access('',directorylist.shift().split('/'),createDirectory);
+														}
+														else{
+															writeFile();
+														}
+													};
+													createDirectory();
+						                        }
+												else{
+													var getDirectory=function(){
+														if(directorylist.length){
+															var dir=directorylist.shift();
+															var filelist=directories[dir];
+															game.print(dir);
+															window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
+																if(filelist.length){
+																	var filename=filelist.shift();
+																	game.print(filename);
+																	entry.getFile(filename,{create:true},function(fileEntry){
+																		fileEntry.createWriter(function(fileWriter){
+																			fileWriter.onwriteend=writeFile;
+																			fileWriter.write(zip.files[dir+'/'+filename].asArrayBuffer());
+																		});
+																	});
+																}
+																else{
+																	getDirectory();
+																}
+								                            });
+														}
+														else{
+															assetLoaded();
+														}
+													};
+													getDirectory();
+												}
+											}
+											else{
+												promptnode.style.display='none';
+											}
+										}
 									}
 									if(!window.JSZip){
 										lib.init.js(lib.assetURL+'game','jszip',loadData);
@@ -24242,7 +24368,7 @@
                             return page;
                         }());
                         createDash('图','图片文件',dash1);
-                        createDash('音','音乐文件',dash2);
+                        createDash('音','音频文件',dash2);
                         createDash('字','字体文件',dash3);
                         createDash('全','全部文件',dash4);
 					}());

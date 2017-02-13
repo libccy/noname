@@ -832,11 +832,12 @@ mode.boss={
 				if(!event.targets||!event.card) return false;
 				if(event.card&&event.card.name=='wuxie') return false;
 				var type=get.type(event.card);
-				if(type!='trick') return false;
+				if(type!='basic'&&type!='trick') return false;
 				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
-				for(var i=0;i<event.targets.length;i++){
-					if(!event.targets[i].isAlive()) return false;
-					if(!player.canUse({name:event.card.name},event.targets[i],false,false)){
+				var targets=event._targets||event.targets;
+				for(var i=0;i<targets.length;i++){
+					if(!targets[i].isIn()) return false;
+					if(!player.canUse({name:event.card.name},targets[i],false,false)){
 						return false;
 					}
 				}
@@ -848,7 +849,7 @@ mode.boss={
 			},
 			content:function(){
 				var card=game.createCard(trigger.card.name,trigger.card.suit,trigger.card.number,trigger.card.nature);
-				player.useCard(card,trigger.targets);
+				player.useCard(card,(trigger._targets||trigger.targets).slice(0));
 			},
 			ai:{
 				threaten:1.3
