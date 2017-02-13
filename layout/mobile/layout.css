@@ -135,6 +135,9 @@
     border-radius: 0 !important;
     pointer-events: none;
 }
+#arena:not(.chess) .player[data-position='0']>.turned{
+    width: 120px;
+}
 #arena:not(.chess) .player[data-position='0']>.chain{
     width: 120px
 }

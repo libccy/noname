@@ -24103,8 +24103,67 @@
                     };
 
 					for(var i in lib.configMenu){
-                        createModeConfig(i,start.firstChild);
+                        if(i!='others') createModeConfig(i,start.firstChild);
                     }
+					(function(){
+						if(!lib.device&&!lib.node) return;
+                        var page=ui.create.div('#create-extension');
+                        var node=ui.create.div('.menubutton.large','文件',start.firstChild,clickMode);
+						node.link=page;
+						node.mode='create';
+                        var pageboard=ui.create.div(page);
+                        var inputExtLine=ui.create.div(pageboard);
+                        inputExtLine.style.padding='10px';
+                        inputExtLine.style.height='22px';
+                        inputExtLine.style.lineHeight='22px';
+                        inputExtLine.style.whiteSpace='nowrap';
+                        inputExtLine.style.overflow='visible';
+                        var inputExtSpan=document.createElement('span');
+                        inputExtSpan.innerHTML='扩展名：';
+                        inputExtLine.appendChild(inputExtSpan);
+
+                        var dashboard=ui.create.div(pageboard);
+                        var clickDash=function(){
+                            ui.create.templayer();
+                            pageboard.hide();
+                            this.link.show();
+                            if(this.link.init){
+                                this.link.init();
+                            }
+                        };
+                        var createDash=function(str1,str2,node){
+                            var dash=ui.create.div('.menubutton.large.dashboard');
+                            dashboard.appendChild(dash);
+                            page.appendChild(node);
+                            dash.link=node;
+                            node.link=dash;
+                            dash.listen(clickDash);
+                            lib.setScroll(node);
+                            ui.create.div('',str1,dash);
+                            ui.create.div('',str2,dash);
+                        };
+                        var dash1=(function(){
+							var page=ui.create.div('.hidden.menu-buttons');
+                            return page;
+                        }());
+                        var dash2=(function(){
+							var page=ui.create.div('.hidden.menu-buttons');
+                            return page;
+                        }());
+                        var dash3=(function(){
+							var page=ui.create.div('.hidden.menu-buttons');
+                            return page;
+                        }());
+                        var dash4=(function(){
+                            var page=ui.create.div('.hidden.menu-buttons');
+                            return page;
+                        }());
+                        createDash('将','编辑武将',dash1);
+                        createDash('卡','编辑卡牌',dash2);
+                        createDash('技','编辑技能',dash3);
+                        createDash('码','编辑代码',dash4);
+					});
+					createModeConfig('others',start.firstChild);
 
 					var active=start.firstChild.querySelector('.active');
                     if(!active){

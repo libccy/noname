@@ -1741,12 +1741,12 @@ div:not(.handcards)>.card>.info>span,
 	font-family: 'xinwei';
 	width: 100%;
 	height: 100%;
-	line-height: 68px;
+	line-height: 50px;
 	left: 0;
 	margin: 0;
 	padding: 0;
 	text-align: center;
-	font-size: 70px;
+	font-size: 50px;
 	opacity: 0;
 	pointer-events: none;
 	text-shadow: none;
@@ -1757,7 +1757,7 @@ div:not(.handcards)>.card>.info>span,
 	text-shadow: none;
 }
 .player>.turned>div{
-	top:calc(50% - 68px);
+	top:calc(50% - 50px);
     width: 100%;
     left: 0;
 }
