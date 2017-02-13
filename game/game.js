@@ -24112,7 +24112,7 @@
                         if(i!='others') createModeConfig(i,start.firstChild);
                     }
 					(function(){
-						if(!game.download||!lib.device) return;
+						if(!game.download&&!lib.device) return;
                         var page=ui.create.div('#create-extension');
                         var node=ui.create.div('.menubutton.large','文件',start.firstChild,clickMode);
 						node.link=page;
@@ -24153,23 +24153,13 @@
 						promptnode.style.display='none';
 						importExtension.firstChild.lastChild.onclick=function(){
 							if(promptnode.style.display!='none') return;
-							promptnode.style.display='';
-							promptnode.firstChild.innerHTML='正在导入...';
                             var fileToLoad=this.previousSibling.files[0];
                             if(fileToLoad){
+								promptnode.style.display='';
+								promptnode.firstChild.innerHTML='正在解压...';
                                 var fileReader = new FileReader();
                                 fileReader.onload = function(fileLoadedEvent)
                                 {
-                                    var finishLoad=function(){
-                                        extensionnode.innerHTML='导入成功，3秒后将重启';
-                                        setTimeout(function(){
-                                            extensionnode.innerHTML='导入成功，2秒后将重启';
-                                            setTimeout(function(){
-                                                extensionnode.innerHTML='导入成功，1秒后将重启';
-                                                setTimeout(game.reload,1000);
-                                            },1000);
-                                        },1000);
-                                    };
                                     var data = fileLoadedEvent.target.result;
 									var loadData=function(){
 										var zip=new JSZip();
@@ -24211,7 +24201,7 @@
 												str+=images.length+'个图片文件';
 											}
 											var filelist=audios.concat(fonts).concat(images);
-											if(filelist.length>500){
+											if(filelist.length>200){
 												str+='，导入时间可能较长';
 											}
 											var assetLoaded=function(){
@@ -24222,6 +24212,8 @@
 												}
 											};
 											if(confirm('本次将导入'+str+'，是否继续？')){
+												promptnode.firstChild.innerHTML='正在导入... <span style="text-decoration:underline">详细信息</span><span style="float:right">×</span>';
+												promptnode.querySelectorAll('span').onclick=ui.click.consoleMenu;
 												if(lib.node&&lib.node.fs){
 													var access=function(str,dir,callback){
 														if(!dir.length){
@@ -24271,21 +24263,26 @@
 														if(directorylist.length){
 															var dir=directorylist.shift();
 															var filelist=directories[dir];
-															game.print(dir);
 															window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
-																if(filelist.length){
-																	var filename=filelist.shift();
-																	game.print(filename);
-																	entry.getFile(filename,{create:true},function(fileEntry){
-																		fileEntry.createWriter(function(fileWriter){
-																			fileWriter.onwriteend=writeFile;
-																			fileWriter.write(zip.files[dir+'/'+filename].asArrayBuffer());
+																var writeFile=function(){
+																	if(filelist.length){
+																		var filename=filelist.shift();
+																		game.print(filename);
+																		entry.getFile(filename,{create:true},function(fileEntry){
+																			fileEntry.createWriter(function(fileWriter){
+																				fileWriter.onwriteend=writeFile;
+																				fileWriter.onerror = function(e) {
+																					game.print('Write failed: ' + e.toString());
+																				};
+																				fileWriter.write(zip.files[dir+'/'+filename].asArrayBuffer());
+																			});
 																		});
-																	});
-																}
-																else{
-																	getDirectory();
-																}
+																	}
+																	else{
+																		getDirectory();
+																	}
+																};
+																writeFile();
 								                            });
 														}
 														else{
@@ -24298,6 +24295,9 @@
 											else{
 												promptnode.style.display='none';
 											}
+										}
+										else{
+											alert('没有检测到素材');
 										}
 									}
 									if(!window.JSZip){
@@ -27521,6 +27521,7 @@
 					var saveButton=ui.create.div('.menubutton.round.highlight','存',start);
 					saveButton.style.display='none';
 
+
 					var clickMode=function(){
 						if(this.classList.contains('off')) return;
 						var active=this.parentNode.querySelector('.active');
@@ -27556,6 +27557,11 @@
 							saveButton.style.display='none';
 							deleteButton.style.display='none';
 						}
+					};
+
+					ui.click.consoleMenu=function(){
+						ui.click.menuTab('其它');
+						clickMode.call(ui.commandnode);
 					};
                     (function(){
                         var page=ui.create.div('');
@@ -27906,9 +27912,7 @@
                                         var br6=ui.create.node('br');
                                         var span7=ui.create.div('','详细信息');
                                         span7.style.marginTop='6px';
-                                        span7.listen(function(){
-                                            clickMode.call(ui.commandnode);
-                                        });
+                                        span7.listen(ui.click.consoleMenu);
                                         p.appendChild(br6);
                                         p.appendChild(span7);
 
