@@ -928,7 +928,7 @@ card.yunchou={
 				order:1,
 				result:{
 					target:function(player,target){
-						return lib.card.shandian.ai.result.target.call(player,target);
+						return lib.card.shandian.ai.result.target(player,target);
 					}
 				},
 			}
