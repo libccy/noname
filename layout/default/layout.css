@@ -2705,6 +2705,7 @@ div:not(.handcards)>.card>.info>span,
 #window:not(.nopointer) .choosedouble.character,
 #window:not(.nopointer) .config.more,
 #window:not(.nopointer) .dashboard,
+#window:not(.nopointer) .hrefnode,
 #window:not(.nopointer) .pointerdiv,
 #window:not(.nopointer) .pointernode div,
 #window:not(.nopointer) .pointerspan span,
@@ -2921,6 +2922,9 @@ div:hover>.intro {
 	top: 8%;
 }
 
+.hrefnode{
+	text-decoration: underline;
+}
 .underline,.underlinenode {
 	padding: 3px;
 	width: auto;

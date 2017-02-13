@@ -24205,15 +24205,15 @@
 												str+='，导入时间可能较长';
 											}
 											var assetLoaded=function(){
-												promptnode.firstChild.innerHTML='导入成功。<span style="text-decoration:underline">重新启动</span><span style="float:right">×</span>';
-												promptnode.querySelectorAll('span')[0].onclick=game.reload;
-												promptnode.querySelectorAll('span')[1].onclick=function(){
+												promptnode.firstChild.innerHTML='导入成功。<span class="hrefnode">重新启动</span><span style="float:right">×</span>';
+												promptnode.firstChild.querySelectorAll('span')[0].onclick=game.reload;
+												promptnode.firstChild.querySelectorAll('span')[1].onclick=function(){
 													promptnode.style.display='none';
 												}
 											};
 											if(confirm('本次将导入'+str+'，是否继续？')){
-												promptnode.firstChild.innerHTML='正在导入... <span style="text-decoration:underline">详细信息</span><span style="float:right">×</span>';
-												promptnode.querySelectorAll('span').onclick=ui.click.consoleMenu;
+												promptnode.firstChild.innerHTML='正在导入... <span class="hrefnode">详细信息</span>';
+												promptnode.firstChild.querySelector('span.hrefnode').onclick=ui.click.consoleMenu;
 												if(lib.node&&lib.node.fs){
 													var access=function(str,dir,callback){
 														if(!dir.length){
@@ -24242,6 +24242,7 @@
 													var writeFile=function(){
 														if(filelist.length){
 															var str=filelist.shift();
+															game.print(str.slice(str.lastIndexOf('/')+1));
 															lib.node.fs.writeFile(__dirname+'/'+str,zip.files[str].asNodeBuffer(),null,writeFile);
 														}
 														else{
@@ -24331,6 +24332,11 @@
                             ui.create.div('',str1,dash);
                             ui.create.div('',str2,dash);
                         };
+						var getFileList=function(dir,callback){
+							if(lib.node&&lib.node.fs){
+
+							}
+						};
                         var dash1=(function(){
 							var page=ui.create.div('.hidden.menu-buttons');
 							ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
@@ -24338,6 +24344,9 @@
                                 page.hide();
                                 pageboard.show();
                             });
+							page.init=function(){
+								console.log(1);
+							};
                             return page;
                         }());
                         var dash2=(function(){
@@ -25504,7 +25513,7 @@
                         exportExtLine.style.width='calc(100% - 40px)';
                         exportExtLine.style.textAlign='left';
                         exportExtLine.style.marginBottom='5px';
-                        exportExtLine.innerHTML='重启后生效。<span style="text-decoration:underline">立即重启</span><span style="float:right">×</span>';
+                        exportExtLine.innerHTML='重启后生效。<span class="hrefnode">立即重启</span><span style="float:right">×</span>';
                         exportExtLine.querySelectorAll('span')[0].onclick=game.reload;
                         exportExtLine.querySelectorAll('span')[1].onclick=function(){
                             exportExtLine.style.display='none';
