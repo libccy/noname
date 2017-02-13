@@ -17,7 +17,7 @@ character.hearth={
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
 		hs_khadgar:['male','shu',3,['midian','fuwen','jinzhou']],
-		hs_tyrande:['female','qun',3,['yuelu','xingluo']],
+		hs_tyrande:['female','wei',3,['yuelu','xingluo']],
 
 		hs_neptulon:['male','wu',4,['liechao','qingliu']],
 		hs_wvelen:['male','qun',3,['shengyan','xianzhi']],

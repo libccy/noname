@@ -2885,7 +2885,7 @@
 					},
 					versus_mode:{
 						name:'游戏模式',
-						init:'standard',
+						init:'three',
 						item:{
 							standard:'自由',
 							three:'统率',
@@ -9022,7 +9022,7 @@
                     };
 					if(event.animate=='draw'){
 						player.$draw(cards.length);
-						game.delayx(1,500);
+						game.pause();
 						setTimeout(function(){
 							addv();
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
@@ -9030,11 +9030,12 @@
 							player.update();
 							if(player==game.me) ui.updatehl();
                             broadcast();
-						},500);
+							game.resume();
+						},get.delayx(500,500));
 					}
 					else if(event.animate=='gain'){
 						player.$gain(cards);
-						game.delayx(1,700);
+						game.pause();
 						setTimeout(function(){
 							addv();
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
@@ -9042,14 +9043,15 @@
 							player.update();
 							if(player==game.me) ui.updatehl();
                             broadcast();
-						},700);
+							game.resume();
+						},get.delayx(700,700));
 					}
 					else if(event.animate=='gain2'||event.animate=='draw2'){
 						var gain2t=300;
 						if(player.$gain2(cards)&&player==game.me){
 							gain2t=500;
 						}
-						game.delayx(1,gain2t);
+						game.pause();
 						setTimeout(function(){
 							addv();
 							player.node.handcards1.insertBefore(frag1,player.node.handcards1.firstChild);
@@ -9057,7 +9059,8 @@
 							player.update();
 							if(player==game.me) ui.updatehl();
                             broadcast();
-						},gain2t);
+							game.resume();
+						},get.delayx(gain2t,gain2t));
 					}
 					else{
 						addv();
@@ -9066,10 +9069,13 @@
 						player.update();
 						if(player==game.me) ui.updatehl();
                         broadcast();
+						event.finish();
 					}
 					if(event.log){
 						game.log(player,'获得了',cards);
 					}
+					"step 4"
+					game.delayx();
 				},
 				lose:function(){
 					"step 0"
@@ -15574,7 +15580,7 @@
                         delete _status.connectCallback;
                     }
                     if(game.online||game.onlineroom){
-                        if(game.servermode&&_status.over){
+                        if((game.servermode||game.onlinehall)&&_status.over){
 
                         }
                         else{
@@ -16592,6 +16598,7 @@
                 },
                 roomlist:function(list){
                     game.online=true;
+					game.onlinehall=true;
                     lib.config.recentIP.remove(_status.ip);
                     lib.config.recentIP.unshift(_status.ip);
                     lib.config.recentIP.splice(5);
@@ -16742,7 +16749,7 @@
                             if(mode.game){
                                 game.getIdentityList=lib.init.eval(mode.game.getIdentityList);
                                 game.updateState=lib.init.eval(mode.game.updateState);
-                                game.getRoomInfo=lib.init.eval(mode.game.getRoomInfo);
+								game.getRoomInfo=lib.init.eval(mode.game.getRoomInfo);
                             }
                             if(mode.element&&mode.element.player){
                                 for(var i in mode.element.player){
@@ -20018,12 +20025,14 @@
     				ui.tempnowuxie.close();
     				delete ui.tempnowuxie;
     			}
+				if(ui.auto) ui.auto.hide();
+				if(ui.wuxie) ui.wuxie.hide();
                 if(game.getIdentityList){
                     for(var i=0;i<game.players.length;i++){
                         game.players[i].setIdentity();
                     }
                 }
-                return;
+				return;
             }
 			if(lib.config.background_audio){
 				if(result===true){
@@ -20380,7 +20389,7 @@
             }
 			game.addVideo('over',null,dialog.content.innerHTML);
 			var vinum=parseInt(lib.config.video);
-			if(!_status.video&&vinum&&game.getVideoName&&window.indexedDB&&!game.online){
+			if(!_status.video&&vinum&&game.getVideoName&&window.indexedDB&&_status.videoInited){
 				var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
 				var videos=lib.videos.slice(0);
 				for(var i=0;i<videos.length;i++){
@@ -33319,6 +33328,18 @@
 			arr.sort(lib.sort.seat);
 			delete lib.tempSortSeat;
 			return arr;
+		},
+		delayx:function(num,max){
+			if(typeof num!='number') num=1;
+			if(typeof max!='number') max=Infinity;
+			switch(lib.config.game_speed){
+				case 'vslow':return Math.min(max,2.5*num);
+				case 'slow':return Math.min(max,1.5*num);
+				case 'fast':return Math.min(max,0.7*num);
+				case 'vfast':return Math.min(max,0.4*num);
+				case 'vvfast':return Math.min(max,0.2*num);
+				default:return Math.min(max,num);
+			}
 		},
         prompt:function(skill,target,player){
             player=player||_status.event.player;

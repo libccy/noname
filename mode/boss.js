@@ -3069,6 +3069,7 @@ mode.boss={
                     var target=event.targets.shift();
                     if(!target.isLinked()){
                         target.link();
+						player.line(target,'green');
                     }
                     event.redo();
                 }
