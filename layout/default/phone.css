@@ -74,6 +74,11 @@
     left: 10px !important;
 }
 
+#system{
+    width: calc(100% - 12px) !important;
+    left: 0 !important;
+}
+
 #arena.phonetop{
     top:80px !important;
 }

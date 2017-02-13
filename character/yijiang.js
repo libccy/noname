@@ -95,8 +95,24 @@ character.yijiang={
 		jyzongshi:{
 			audio:2,
 			trigger:{player:['chooseToCompareAfter','compareMultipleAfter'],target:['chooseToCompareAfter','compareMultipleAfter']},
-			filter:function(event){
-				return !event.preserve;
+			filter:function(event,player){
+				if(event.preserve) return false;
+				if(player==event.player){
+					if(event.card1.number>event.card2.number){
+						return !get.owner(event.card2);
+					}
+					else{
+						return !get.owner(event.card1);
+					}
+				}
+				else{
+					if(event.card1.number<event.card2.number){
+						return !get.owner(event.card1);
+					}
+					else{
+						return !get.owner(event.card2);
+					}
+				}
 			},
 			check:function(event,player){
 				if(player==event.player){
@@ -4329,8 +4345,7 @@ character.yijiang={
 		},
 		qiaoshui3:{
 			trigger:{player:'useCard'},
-			forced:true,
-			popup:false,
+			direct:true,
 			filter:function(event,player){
 				var type=get.type(event.card);
 				return type=='basic'||type=='trick';
@@ -4359,6 +4374,11 @@ character.yijiang={
 						return ai.get.effect(target,trigger.card,player,player);
 					});
 				}
+				else{
+					if(!info.multitarget&&trigger.targets&&trigger.targets.length>1){
+						event.goto(3);
+					}
+				}
 				'step 1'
 				if(result.bool){
 					game.delay(0.5);
@@ -4372,6 +4392,31 @@ character.yijiang={
 					player.logSkill('qiaoshui',event.target);
 					trigger.targets.add(event.target);
 				}
+				event.finish();
+				'step 3'
+				player.chooseTarget('巧说：是否减少一名'+get.translation(trigger.card)+'的目标？',function(card,player,target){
+					return _status.event.getTrigger().targets.contains(target);
+				}).set('ai',function(target){
+					var trigger=_status.event.getTrigger();
+					return -ai.get.effect(target,trigger.card,trigger.player,_status.event.player);
+				});
+				'step 4'
+				if(result.bool){
+					event.targets=result.targets;
+					if(event.isMine()){
+						player.logSkill('qiaoshui',event.targets);
+						event.finish();
+					}
+					for(var i=0;i<result.targets.length;i++){
+						trigger.targets.remove(result.targets[i]);
+					}
+					game.delay();
+				}
+				else{
+					event.finish();
+				}
+				'step 5'
+				player.logSkill('qiaoshui',event.targets);
 			}
 		},
 		jyzongshi_old:{

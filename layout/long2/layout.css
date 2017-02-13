@@ -54,6 +54,25 @@
 #arena:not(.mobile).single-handcard #handcards1{
     width: calc(100% - 120px);
 }
+#window.rightbar #system,
+#window.leftbar #system{
+    width: calc(100% - 62px);
+}
+#window.leftbar #system{
+    left: 50px;
+}
+#window.rightbar #historybar{
+    left: calc(100% - 50px);
+    border-radius: 0;
+    top: 0;
+    height: 100%;
+}
+#window.leftbar #historybar{
+    left: 0;
+    border-radius: 0;
+    top: 0;
+    height: 100%;
+}
 #window.leftbar #arena:not(.chess)>#me,
 #window.leftbar #arena:not(.chess)>#mebg,
 #window.leftbar #arena:not(.chess)>#autonode{
