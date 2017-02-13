@@ -160,7 +160,8 @@
 	top:26px;
 	left:auto;
 }
-.player:not(.linked2) .marks>div:first-child{
+.player:not(.linked2) .marks>div:first-child,
+#arena:not(.nolink) .player .marks>div:first-child{
 	transform: scale(0.2);
 	opacity:0;
 	pointer-events: none;

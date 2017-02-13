@@ -1274,6 +1274,7 @@ div:not(.handcards)>.card>.info>span,
 }
 
 #arena.oldlayout .player:not(.linked2) .marks>div:first-child,
+#arena.oldlayout:not(.nolink) .player .marks>div:first-child,
 #arena.oldlayout .player .marks .removing {
 	transform: scale(0.2);
 	opacity: 0;
@@ -1736,7 +1737,80 @@ div:not(.handcards)>.card>.info>span,
 	top: 87px;
 	left: 18px;
 }
-
+.player>.turned{
+	font-family: 'xinwei';
+	width: 100%;
+	height: 100%;
+	line-height: 68px;
+	left: 0;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	font-size: 70px;
+	opacity: 0;
+	pointer-events: none;
+	text-shadow: none;
+	background: black;
+	top: 0;
+	border-radius: 8px;
+	color: rgba(255,255,255,0.8);
+	text-shadow: none;
+}
+.player>.turned>div{
+	top:calc(50% - 68px);
+    width: 100%;
+    left: 0;
+}
+.player>.chain{
+	top: calc(50% - 10px);
+	left: 0;
+	height: 20px;
+	width: 100%;
+	overflow-x: hidden;
+	overflow-y: visible;
+	white-space: nowrap;
+	padding: 0;
+	margin: 0;
+	z-index: 3;
+	pointer-events: none;
+}
+.player>.chain>div{
+	overflow: visible;
+	left: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+}
+.player:not(.linked2)>.chain>div{
+	opacity: 0;
+	transform: translateX(-40px);
+}
+#arena.nolink .player>.chain{
+	display: none;
+}
+.player>.chain>div>div{
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	left: 0;
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px,rgba(0, 0, 0, 0.4) 0 0 2px;
+}
+.player>.chain>div>div:nth-child(odd){
+	height: 8px;
+	width: 10px;
+	border-radius: 2px;
+	top: 6px;
+}
+.player>.chain>div>div:nth-child(even){
+	width: 10px;
+	height: 2px;
+	top: 9px;
+	z-index: 1;
+	border-radius: 2px;
+}
+#arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{
+	opacity: 0.2;
+}
 .player>.damage,
 #window>.damage {
 	font-family: 'huangcao','xinwei';
@@ -3497,6 +3571,7 @@ div:hover>.wunature {
 #window[data-radius_size='reduce'] #mebg,
 #window[data-radius_size='reduce'] .control,
 #window[data-radius_size='reduce'] .player,
+#window[data-radius_size='reduce'] .player>.turned,
 #window[data-radius_size='reduce'] .player::after,
 #window[data-radius_size='reduce'] .card,
 #window[data-radius_size='reduce'] .card::after,
@@ -3516,6 +3591,7 @@ div:hover>.wunature {
 #window[data-radius_size='off'] #mebg,
 #window[data-radius_size='off'] .control,
 #window[data-radius_size='off'] .player,
+#window[data-radius_size='off'] .player>.turned,
 #window[data-radius_size='off'] .player::after,
 #window[data-radius_size='off'] .card,
 #window[data-radius_size='off'] .card::after,
@@ -3535,6 +3611,7 @@ div:hover>.wunature {
 #window[data-radius_size='increase'] #mebg,
 #window[data-radius_size='increase'] .control,
 #window[data-radius_size='increase'] .player,
+#window[data-radius_size='increase'] .player>.turned,
 #window[data-radius_size='increase'] .player::after,
 #window[data-radius_size='increase'] .card,
 #window[data-radius_size='increase'] .card::after,

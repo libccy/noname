@@ -135,6 +135,9 @@
     border-radius: 0 !important;
     pointer-events: none;
 }
+#arena:not(.chess) .player[data-position='0']>.chain{
+    width: 120px
+}
 #arena.oblongcard:not(.chess) .player[data-position='0']{
     height: 140px;
 }
