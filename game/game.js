@@ -9495,12 +9495,13 @@
                         }
 
                         if(lib.config.background_speak){
-    						if(lib.character[player.name]&&
-    						lib.character[player.name][4].contains('die_audio')){
+    						if(lib.character[player.name]&&lib.character[player.name][4].contains('die_audio')){
     							game.playAudio('die',player.name);
     						}
     						else if(lib.config.background_ogg){
-    							game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
+    							game.playAudio('die',player.name,function(){
+									game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
+								});
     						}
     					}
                     },player,event.cards);
@@ -17521,9 +17522,13 @@
 		playAudio:function(){
 			if(_status.video&&arguments[1]!='video') return;
 			var str='';
+			var onerror=null;
 			for(var i=0;i<arguments.length;i++){
 				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
 					str+='/'+arguments[i];
+				}
+				else if(typeof arguments[i]=='function'){
+					onerror=arguments[i]
 				}
 				if(_status.video) break;
 			}
@@ -17543,6 +17548,9 @@
 			audio.onerror=function(){
 				if(this._changed){
 					this.remove();
+					if(onerror){
+						onerror();
+					}
 				}
 				else{
 					this.src=lib.assetURL+'audio'+str+'.ogg';
@@ -24333,9 +24341,26 @@
                             ui.create.div('',str2,dash);
                         };
 						var getFileList=function(dir,callback){
+							var files=[],folders=[];
 							if(lib.node&&lib.node.fs){
-
+								dir=__dirname+'/'+dir;
+								lib.node.fs.readdir(dir,function(err,filelist){
+									for(var i=0;i<filelist.length;i++){
+										if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
+											if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
+												folders.push(filelist[i]);
+											}
+											else{
+												files.push(filelist[i]);
+											}
+										}
+									}
+									callback(folders,files);
+								});
 							}
+						};
+						var createFolder=function(dir,node){
+
 						};
                         var dash1=(function(){
 							var page=ui.create.div('.hidden.menu-buttons');
@@ -24345,7 +24370,9 @@
                                 pageboard.show();
                             });
 							page.init=function(){
-								console.log(1);
+								getFileList('image',function(folders,files){
+									console.log(folders,files);
+								});
 							};
                             return page;
                         }());
