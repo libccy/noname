@@ -1112,6 +1112,7 @@ mode.versus={
 				}
 				game.singleHandcard=true;
 				ui.arena.classList.add('single-handcard');
+				ui.window.classList.add('single-handcard');
 				ui.fakeme=ui.create.div('.fakeme.avatar');
 				_status.prepareArena=true;
 				ui.create.me();
@@ -1514,6 +1515,7 @@ mode.versus={
 					}
 					game.singleHandcard=true;
 					ui.arena.classList.add('single-handcard');
+					ui.window.classList.add('single-handcard');
 					ui.fakeme=ui.create.div('.fakeme.avatar');
 					// ui.fakeme.line=lib.element.player.line;
 					// ui.fakemebg=ui.create.div('.avatar',ui.fakeme).hide();

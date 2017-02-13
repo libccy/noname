@@ -1154,9 +1154,6 @@ character.xianjian={
 		},
 		luanjian:{
 			enable:'phaseUse',
-			filter:function(event,player){
-				return player.num('h','sha')>1&&lib.filter.filterCard({name:'sha'},player);
-			},
 			filterCard:{name:'sha'},
 			selectCard:2,
 			check:function(card){
@@ -1172,50 +1169,19 @@ character.xianjian={
 				}
 				return 0;
 			},
+			viewAs:{name:'sha'},
 			selectTarget:[1,Infinity],
-			discard:false,
-			line:false,
-			multiline:true,
-			prepare:'throw',
 			filterTarget:function(card,player,target){
 				return lib.filter.targetEnabled({name:'sha'},player,target);
 			},
-			content:function(){
-				"step 0"
-				if(!player.hasSkill('unequip')){
-					event.added=true;
-					player.skills.push('unequip');
-				}
-				targets.sort(lib.sort.seat);
-				player.useCard({name:'sha'},cards,targets,'luanjian').animate=false;
-				"step 1"
-				if(event.added){
-					player.skills.remove('unequip');
-				}
-			},
-			multitarget:true,
 			ai:{
 				order:function(){
 					return lib.card.sha.ai.order+0.1;
 				},
-				result:{
-					target:function(player,target){
-						var added=false;
-						if(!player.hasSkill('unequip')){
-							added=true;
-							player.skills.push('unequip');
-						}
-						var eff=ai.get.effect(target,{name:'sha'},player,target);
-						if(added){
-							player.skills.remove('unequip');
-						}
-						return eff;
-					}
-				},
 				effect:{
 					player:function(card,player){
 						if(_status.currentPhase!=player) return;
-						if(card.name=='sha'&&player.num('h','sha')<2&&player.num('h')<=player.hp){
+						if(card.name=='sha'&&player.num('h','sha')<2&&!player.needsToDiscard()){
 							var num=0;
 							var player=_status.event.player;
 							var players=game.filterPlayer();
@@ -1229,6 +1195,18 @@ character.xianjian={
 						}
 					}
 				},
+			},
+			group:'luanjian2'
+		},
+		luanjian2:{
+			trigger:{source:'damageBegin'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&event.parent.skill=='luanjian';
+			},
+			content:function(){
+				if(Math.random()<0.5) trigger.num++;
 			}
 		},
 		tianfu:{
@@ -2496,7 +2474,7 @@ character.xianjian={
 		xfenxin2:'焚心',
 		xfenxin_info:'锁定技，每当你的体力值发生改变，你摸等量的牌；每当你杀死一名角色，你增加一点体力上限并回复一点体力',
 		luanjian:'乱剑',
-		luanjian_info:'你可以将两张杀当杀使用，此杀无视距离和防具，且可以指定任意名目标',
+		luanjian_info:'出牌阶段，你可以将两张杀当杀使用，此杀无视距离，可以指定任意名目标且有50%的机率伤害+1',
 		tianfu:'天符',
 		tianfu2:'天符',
 		tianfu3:'天符',

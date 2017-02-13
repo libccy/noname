@@ -1278,11 +1278,11 @@ card.gujian={
             nopop:true,
             intro:{
                 content:function(storage,player){
-                    return '结束阶段，你有70%的机率弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'
+                    return '结束阶段，你有65%的机率弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'
                 }
             },
             content:function(){
-                if(Math.random()<0.7){
+                if(Math.random()<0.65){
                     var list=player.getEnemies();
                     for(var i=0;i<list.length;i++){
                         if(!list[i].num('he')){
@@ -1632,7 +1632,7 @@ card.gujian={
         molicha:'茉莉茶',
         molicha_info:'弃置判定区内的所有牌；你不能成为延时锦囊牌的目标，持续五回合',
         mapodoufu:'麻婆豆腐',
-        mapodoufu_info:'结束阶段，你有70%的机率弃置一名随机敌人的一张随机牌，持续三回合',
+        mapodoufu_info:'结束阶段，你有65%的机率弃置一名随机敌人的一张随机牌，持续三回合',
     },
     list:[
         ['spade',2,'tanhuadong'],

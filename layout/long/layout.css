@@ -1,7 +1,39 @@
 @import "../mobile/layout.css";
+
+
+#window.rightbar #system,
+#window.leftbar #system{
+    width: calc(100% - 62px);
+}
+#window.leftbar #system{
+    left: 50px;
+}
+#window.rightbar #historybar{
+    left: calc(100% - 50px);
+}
+#window.leftbar #historybar{
+    left: 0;
+}
+#historybar{
+    left: calc(100% - 50px);
+    border-radius: 0;
+    top: 0;
+    height: calc(100% - 121px);
+}
+#window.oblongcard #historybar{
+    height: calc(100% - 141px);
+}
+
+
 #arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0']){
     width: 120px !important;
     height: 220px !important;
+}
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.marks{
+    left: -15px;
+}
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.judges{
+    right: -27px;
 }
 #arena:not(.fewplayer)[data-player_height='default']>.player:not(.minskin):not(*[data-position='0']){
     height: 200px !important;

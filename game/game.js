@@ -985,6 +985,11 @@
                         init:true,
                         unfrequent:true
                     },
+					right_range:{
+						name:'显示距离信息',
+						init:true,
+						unfrequent:true
+					},
 					hide_card_image:{
 						name:'隐藏卡牌背景',
 						init:false,
@@ -18110,6 +18115,7 @@
 						}
 						game.singleHandcard=true;
 						ui.arena.classList.add('single-handcard');
+						ui.window.classList.add('single-handcard');
 						ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
 					}
 					ui.arena.style.display='';
@@ -18120,6 +18126,7 @@
 					if(!players.boss){
 						game.singleHandcard=true;
 						ui.arena.classList.add('single-handcard');
+						ui.window.classList.add('single-handcard');
 						ui.fakeme=ui.create.div('.fakeme.avatar',ui.me);
 					}
                     ui.arena.setNumber(8);
@@ -27418,7 +27425,13 @@
                                         }
     								}
     								game.saveConfig('check_version',update.version);
-    								if(update.version!=lib.version||dev){
+									var goon=true;
+									if(!dev){
+										if(update.version.indexOf('beta')!=-1||update.version==lib.version){
+											goon=false;
+										}
+									}
+    								if(goon){
                                         var files=null;
                                         var version=lib.version;
 										if(Array.isArray(update.dev)&&dev){
@@ -29676,7 +29689,10 @@
                     if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
                 }
                 if(game.layout=='long'||game.layout=='long2'||game.layout=='mobile'){
-                    if(lib.config.cardshape=='oblong') ui.arena.classList.add('oblongcard');
+                    if(lib.config.cardshape=='oblong'){
+						ui.window.classList.add('oblongcard');
+						ui.arena.classList.add('oblongcard');
+					}
                 }
 				if(lib.config.blur_ui){
                     ui.window.classList.add('blur_ui');
@@ -30310,7 +30326,8 @@
 					handcards1:ui.create.div('.handcards'),
 					handcards2:ui.create.div('.handcards'),
 				};
-				for(var i=0;i<40;i++){
+				var chainlength=game.layout=='default'?64:40;
+				for(var i=0;i<chainlength;i++){
 					ui.create.div(node.node.chain.firstChild,'.cardbg').style.transform='translateX('+(i*5-5)+'px)';
 				}
 				node.node.action=ui.create.div('.action',node.node.avatar);
@@ -35060,6 +35077,45 @@
                         }
                     }
                 }
+
+				if(lib.config.right_range){
+					uiintro.add(ui.create.div('.placeholder'));
+					var table,tr,td;
+					table=document.createElement('table');
+					tr=document.createElement('tr');
+					table.appendChild(tr);
+					td=document.createElement('td');
+					td.innerHTML='攻击';
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='进攻';
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='防御';
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='手牌';
+					tr.appendChild(td);
+
+					tr=document.createElement('tr');
+					table.appendChild(tr);
+					td=document.createElement('td');
+					td.innerHTML=node.getAttackRange();
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=node.getGlobalFrom();
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=node.getGlobalTo();
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=node.num('h');
+					tr.appendChild(td);
+					table.style.width='calc(100% - 20px)';
+					table.style.marginLeft='10px';
+
+					uiintro.content.appendChild(table);
+				}
                 if(!simple||get.is.phoneLayout()){
                     var es=node.get('e');
                     for(var i=0;i<es.length;i++){
@@ -35091,38 +35147,7 @@
                     addFavourite.listen(ui.click.favouriteCharacter)
                     uiintro.add(addFavourite);
                 }
-
 				if(!simple||get.is.phoneLayout()){
-					if(lib.falseitem){
-						uiintro.add(ui.create.div('.placeholder'));
-						var table,tr,td;
-						table=document.createElement('table');
-						tr=document.createElement('tr');
-						table.appendChild(tr);
-						td=document.createElement('td');
-						td.innerHTML='攻击范围';
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML='进攻距离';
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML='防御距离';
-						tr.appendChild(td);
-
-						tr=document.createElement('tr');
-						table.appendChild(tr);
-						td=document.createElement('td');
-						td.innerHTML=node.getAttackRange();
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML=node.getGlobalFrom();
-						tr.appendChild(td);
-						td=document.createElement('td');
-						td.innerHTML=node.getGlobalTo();
-						tr.appendChild(td);
-
-						uiintro.content.appendChild(table);
-					}
 					if(lib.config.change_skin&&(!node.classList.contains('unseen')||!node.classList.contains('unseen2'))){
 						var num=1;
 						var introadded=false;
