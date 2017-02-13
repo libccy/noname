@@ -357,7 +357,7 @@ character.gujian={
 			trigger:{player:'useCard'},
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
-				return game.hasPlayer(function(){
+				return game.hasPlayer(function(current){
 					return (event.targets.contains(current)==false&&current!=player&&
 					lib.filter.targetEnabled(event.card,player,current))
 				});

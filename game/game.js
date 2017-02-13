@@ -24340,6 +24340,16 @@
                             ui.create.div('',str1,dash);
                             ui.create.div('',str2,dash);
                         };
+                        var createDash2=function(str1,str2,path,page){
+                            var dash=ui.create.div('.menubutton.large.dashboard.dashboard2');
+                            page.appendChild(dash);
+                            dash.listen(function(){
+								page.path=path;
+								enterDirectory(page,path);
+							});
+                            ui.create.div('',str1,dash);
+                            ui.create.div('',str2,dash);
+                        };
 						var getFileList=function(dir,callback){
 							var files=[],folders=[];
 							if(lib.node&&lib.node.fs){
@@ -24359,21 +24369,41 @@
 								});
 							}
 						};
-						var createFolder=function(dir,node){
-
+						var enterDirectory=function(page,path){
+							page.innerHTML='';
+							page.currentpath=path;
+							ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>'+(path==page.path?'返回':'上一级'),page,function(){
+								if(page.path==path){
+									page.reset();
+								}
+								else{
+									enterDirectory(page,path.slice(0,path.lastIndexOf('/')));
+								}
+							});
+							getFileList(path,function(folders,files){
+								for(var i=0;i<files.length;i++){
+									ui.create.div('.fileentry','<span>'+files[i],page);
+								}
+								// console.log(folders,files);
+							});
 						};
                         var dash1=(function(){
 							var page=ui.create.div('.hidden.menu-buttons');
-							ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                ui.create.templayer();
-                                page.hide();
-                                pageboard.show();
-                            });
-							page.init=function(){
-								getFileList('image',function(folders,files){
-									console.log(folders,files);
-								});
+							page.reset=function(){
+								page.innerHTML='';
+								ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+	                                ui.create.templayer();
+	                                page.hide();
+	                                pageboard.show();
+	                            });
+								createDash2('将','武将图片','image/character',page);
+								createDash2('卡','卡牌图片','image/card',page);
+								createDash2('景','背景图片','image/background',page);
+								createDash2('肤','皮肤图片','image/skin',page);
+								createDash2('模','模式图片','image/mode',page);
+								createDash2('始','开始图片','image/splash',page);
 							};
+							page.reset();
                             return page;
                         }());
                         var dash2=(function(){

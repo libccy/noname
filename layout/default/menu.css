@@ -780,11 +780,39 @@
 	top:0;
 }
 
+.menu-buttons .fileentry{
+	position: relative;
+	left: 0;
+	display: block;
+	margin: 12px;
+	margin-bottom: 15px;
+	white-space: nowrap;
+	text-decoration: underline;
+	text-align: left;
+}
+.menu-buttons .fileentry>span{
+	cursor: pointer;
+}
+
 .menubutton.large.dashboard{
 	width: 80px;
 	height: 80px;
 	margin: 6px;
 	position: relative !important;
+}
+.menubutton.large.dashboard.dashboard2{
+	width: 60px;
+	height: 60px;
+	margin: 5px;
+	margin-top: 10px;
+}
+.menubutton.large.dashboard.dashboard2>div:first-child{
+	font-size: 40px;
+	line-height: 40px;
+}
+.menubutton.large.dashboard.dashboard2>div:last-child{
+	font-size: 16px;
+	white-space: nowrap;
 }
 .menubutton.large.dashboard>div:first-child{
 	font-family: 'lishu','xiaozhuan';
