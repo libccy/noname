@@ -4644,9 +4644,7 @@
                         else{
                             url=get.url()+url;
                         }
-                        var dir=folder.split('/');
-                        var str='';
-                        var download=function(){
+						game.ensureDirectory(folder,function(){
                             try{
                                 var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
                             }
@@ -4660,30 +4658,53 @@
                                 stream.on('finish',onsuccess);
                                 stream.on('error',onerror);
                             });
-                        }
-                        var access=function(){
-                            if(dir.length<=1){
-                                download();
-                            }
-                            else{
-                                str+='/'+dir.shift();
-                                lib.node.fs.access(__dirname+str,function(e){
-                                    if(e){
-                                        try{
-                                            lib.node.fs.mkdir(__dirname+str,access);
-                                        }
-                                        catch(e){
-                                            onerror();
-                                        }
-                                    }
-                                    else{
-                                        access();
-                                    }
-                                });
-                            }
-                        }
-                        access();
+                        },true);
                     }
+					game.ensureDirectory=function(list,callback,file){
+						var directorylist;
+						var num=0;
+						if(file){
+							num=1;
+						}
+						if(typeof list=='string'){
+							directorylist=[list];
+						}
+						else{
+							var directorylist=list.slice(0);
+						}
+						var access=function(str,dir,callback){
+							if(dir.length<=num){
+								callback();
+							}
+							else{
+								str+='/'+dir.shift();
+								lib.node.fs.access(__dirname+str,function(e){
+									if(e){
+										try{
+											lib.node.fs.mkdir(__dirname+str,function(){
+												access(str,dir,callback);
+											});
+										}
+										catch(e){
+											console.log(e);
+										}
+									}
+									else{
+										access(str,dir,callback);
+									}
+								});
+							}
+						}
+						var createDirectory=function(){
+							if(directorylist.length){
+								access('',directorylist.shift().split('/'),createDirectory);
+							}
+							else{
+								callback();
+							}
+						};
+						createDirectory();
+					};
                 }
 				lib.cardSelectObserver=new MutationObserver(function(mutations){
 					for(var i=0;i<mutations.length;i++){
@@ -4773,6 +4794,45 @@
 							folder=lib.assetURL+folder;
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
 						};
+						game.ensureDirectory=function(list,callback,file){
+							var directorylist;
+							var num=0;
+							if(file){
+								num=1;
+							}
+							if(typeof list=='string'){
+								directorylist=[list];
+							}
+							else{
+								var directorylist=list.slice(0);
+							}
+							window.resolveLocalFileSystemURL(lib.assetURL,function(rootEntry){
+								var access=function(entry,dir,callback){
+									if(dir.length<=num){
+										callback();
+									}
+									else{
+										var str=dir.shift();
+										entry.getDirectory(str,{create:false},function(entry){
+					                        access(entry,dir,callback);
+					                    },function(){
+					                        entry.getDirectory(str,{create:true},function(entry){
+												access(entry,dir,callback);
+											});
+					                    });
+									}
+								}
+								var createDirectory=function(){
+									if(directorylist.length){
+										access(rootEntry,directorylist.shift().split('/'),createDirectory);
+									}
+									else{
+										callback();
+									}
+								};
+								createDirectory();
+							});
+						}
 					}
 				}
                 if(!lib.config.touchscreen){
@@ -5673,6 +5733,7 @@
 				game.saveConfig('background_music','music_off');
 				game.saveConfig('background_audio',false);
 				game.saveConfig('background_ogg',false);
+				game.saveConfig('debug',true);
 				game.reload();
 			},
             o:function(){
@@ -24198,30 +24259,6 @@
 												promptnode.firstChild.innerHTML='正在导入... <span class="hrefnode">详细信息</span>';
 												promptnode.firstChild.querySelector('span.hrefnode').onclick=ui.click.consoleMenu;
 												if(lib.node&&lib.node.fs){
-													var access=function(str,dir,callback){
-														if(!dir.length){
-															callback();
-															str+='/'+dir[0];
-														}
-														else{
-															str+='/'+dir.shift();
-															lib.node.fs.access(__dirname+str,function(e){
-							                                    if(e){
-							                                        try{
-							                                            lib.node.fs.mkdir(__dirname+str,function(){
-																			access(str,dir,callback);
-																		});
-							                                        }
-							                                        catch(e){
-							                                            console.log(e);
-							                                        }
-							                                    }
-							                                    else{
-							                                        access(str,dir,callback);
-							                                    }
-							                                });
-														}
-													}
 													var writeFile=function(){
 														if(filelist.length){
 															var str=filelist.shift();
@@ -24232,15 +24269,8 @@
 															assetLoaded();
 														}
 													};
-													var createDirectory=function(){
-														if(directorylist.length){
-															access('',directorylist.shift().split('/'),createDirectory);
-														}
-														else{
-															writeFile();
-														}
-													};
-													createDirectory();
+													game.ensureDirectory(directorylist,writeFile);
+
 						                        }
 												else{
 													var getDirectory=function(){
@@ -24273,7 +24303,7 @@
 															assetLoaded();
 														}
 													};
-													getDirectory();
+													game.ensureDirectory(directorylist,getDirectory);
 												}
 											}
 											else{
@@ -24343,6 +24373,33 @@
 									callback(folders,files);
 								});
 							}
+							else{
+								window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
+									var dirReader=entry.createReader();
+									var entries=[];
+									var readEntries=function(){
+										dirReader.readEntries(function(results){
+											if(!results.length){
+												entries.sort();
+												for(var i=0;i<entries.length;i++){
+													if(entries[i].isDirectory){
+														folders.push(entries[i].name);
+													}
+													else{
+														files.push(entries[i].name);
+													}
+												}
+												callback(folders,files);
+											}
+											else{
+												entries=entries.concat(Array.from(results));
+												readEntries();
+											}
+										});
+									};
+									readEntries();
+	                            });
+							}
 						};
 						var removeFile=function(selected,page){
 							if(lib.node&&lib.node.fs){
@@ -24356,18 +24413,75 @@
 								}
 								unlink();
 							}
+							else{
+								window.resolveLocalFileSystemURL(lib.assetURL+page.currentpath,function(entry){
+									var unlink=function(){
+										if(selected.length){
+											entry.getFile(selected.shift().filename,{create:false},function(fileEntry){
+												fileEntry.remove(unlink);
+											});
+										}
+										else{
+											enterDirectory(page,page.currentpath);
+										}
+									}
+									unlink();
+								});
+							}
 						};
 						var clickDirectory=function(){
+							if(_status.dragged) return;
 							var page=this.parentNode.parentNode.parentNode;
 							if(page.deletebutton.classList.contains('glow')){
-								if(confirm('确认删除'+this.innerHTML+'？（此操作不可撤销）')){
-									removeFile([this],page);
+								if(confirm('确认删除'+this.innerHTML+'文件夹？（此操作不可撤销）')){
+									if(lib.node&&lib.node.fs){
+					                    try{
+											var removeDirectory=function(path,callback){
+												lib.node.fs.readdir(__dirname+'/'+path,function(err,list){
+						                            if(err){
+														console.log(err);
+						                                return;
+						                            }
+						                            var removeFile=function(){
+						                                if(list.length){
+						                                    var filename=list.shift();
+															var url=__dirname+'/'+path+'/'+filename;
+															if(lib.node.fs.statSync(url).isDirectory()){
+																removeDirectory(path+'/'+filename,removeFile);
+															}
+															else{
+																lib.node.fs.unlink(url,removeFile);
+															}
+						                                }
+						                                else{
+															lib.node.fs.rmdir(__dirname+'/'+path,callback);
+						                                }
+						                            }
+						                            removeFile();
+						                        });
+											};
+											removeDirectory(this.path,function(){
+												enterDirectory(page,page.currentpath);
+											});
+					                    }
+					                    catch(e){
+											console.log(e);
+										}
+					                }
+					                else{
+					                    window.resolveLocalFileSystemURL(lib.assetURL+this.path,function(entry){
+					                        entry.removeRecursively(function(){
+												enterDirectory(page,page.currentpath);
+											});
+					                    });
+					                }
 								}
 								return;
 							}
 							enterDirectory(page,this.path);
 						};
 						var clickFile=function(){
+							if(_status.dragged) return;
 							var page=this.parentNode.parentNode.parentNode;
 							if(page.deletebutton.classList.contains('glow')){
 								if(confirm('确认删除'+this.innerHTML+'？（此操作不可撤销）')){
@@ -24377,12 +24491,6 @@
 							}
 							this.classList.toggle('thundertext');
 							page.clicked=true;
-							// if(page.querySelector('span.thundertext')){
-							// 	page.deletebutton.show();
-							// }
-							// else{
-							// 	page.deletebutton.hide();
-							// }
 							if(this.ext=='jpg'||this.ext=='png'){
 								if(this.classList.contains('thundertext')){
 									if(!this.previewnode){
@@ -24427,7 +24535,6 @@
 										delete selected[i].previewnode;
 									}
 								}
-								this.parentNode.deletebutton.classList.remove('glow');
 							}
 						};
 						var enterDirectory=function(page,path){
@@ -24460,8 +24567,8 @@
 							addbutton.style.bottom='80px';
 
 							var deletebutton=ui.create.div('.menubutton.round','删',page,function(){
+								if(!this.parentNode) return;
 								if(!this.classList.contains('glow')){
-									// page.clicked=true;
 									var selected=Array.from(filelist.querySelectorAll('span.thundertext'));
 									if(selected.length){
 										if(confirm('一共要删除'+selected.length+'个文件，此操作不可撤销，是否确定？')){
@@ -24486,17 +24593,25 @@
 							var filelist=ui.create.div(page);
 							filelist.classList.add('file-container');
 							filelist.listen(clickFileList);
+							lib.setScroll(filelist);
 							getFileList(path,function(folders,files){
 								for(var i=0;i<folders.length;i++){
+									if(!page.path&&folders[i]=='app') continue;
 									var entry=ui.create.div('','<span>'+folders[i],filelist);
 									entry.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',clickDirectory);
 									entry.firstChild.path=path+'/'+folders[i]
 								}
 								for(var i=0;i<files.length;i++){
+									if(!page.path){
+										if(files[i]=='app.html') continue;
+										if(files[i]=='main.js') continue;
+										if(files[i]=='package.json') continue;
+									}
 									var entry=ui.create.div('','<span>'+files[i],filelist);
 									entry.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',clickFile);
 									entry.firstChild.ext=files[i].slice(files[i].lastIndexOf('.')+1);
-									entry.firstChild.path=path+'/'+files[i]
+									entry.firstChild.path=path+'/'+files[i];
+									entry.firstChild.filename=files[i];
 								}
 							});
 						};
@@ -24546,7 +24661,9 @@
 								page.hide();
 								pageboard.show();
 							};
-							enterDirectory(page,'font');
+							page.init=function(){
+								enterDirectory(page,'font');
+							};
                             return page;
                         }());
                         var dash4=(function(){
@@ -24557,7 +24674,9 @@
 								page.hide();
 								pageboard.show();
 							};
-							enterDirectory(page,'');
+							page.init=function(){
+								enterDirectory(page,'');
+							};
                             return page;
                         }());
                         createDash('图','图片文件',dash1);
@@ -28139,7 +28258,8 @@
     							},function(){
                                     alert('连接失败');
                                     button2.disabled=false;
-    								button2.innerHTML='检查游戏更新';
+    								button2.innerHTML='检查素材更新';
+									game.print(script.src);
     								script.remove();
                                 });
     						}

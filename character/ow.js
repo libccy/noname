@@ -204,7 +204,7 @@ character.ow={
                 var list=[];
                 if(player.storage.qinru){
                     for(var i=0;i<player.storage.qinru.length;i++){
-                        if(player.storage.qinru[i].In()&&player.storage.qinru[i].num('he')){
+                        if(player.storage.qinru[i].isIn()&&player.storage.qinru[i].num('he')){
                             list.push(player.storage.qinru[i]);
                         }
                     }
