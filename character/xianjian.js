@@ -722,7 +722,7 @@ character.xianjian={
 				var num=0;
                 var num2=0;
                 for(var i=0;i<player.storage.leiyu.length;i++){
-					if(player.storage.leiyu[i].isDead()) continue;
+					if(!player.storage.leiyu[i].isIn()) continue;
                     var eff=ai.get.effect(player.storage.leiyu[i],{name:'jingleishan',nature:'thunder'},player,player);
                     num+=eff;
                     if(eff>0){
@@ -733,7 +733,7 @@ character.xianjian={
                     }
                 }
                 var next=player.chooseToDiscard(get.prompt('leiyu',player.storage.leiyu),{color:'black'});
-				next.ai=function(){
+				next.ai=function(card){
 					if(num>0&&num2>=2){
 						return 7-ai.get.value(card);
 					}

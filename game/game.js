@@ -1497,7 +1497,7 @@
 				name:'音效',
 				config:{
 					update:function(config,map){
-						if(lib.config.background_music=='music_custom'&&lib.db){
+						if(lib.config.background_music=='music_custom'&&(lib.device||lib.node)){
 							map.import_music.show();
 						}
 						else{
@@ -4399,9 +4399,6 @@
 					}
 				    lib.configMenu.audio.config.background_music.item.music_random='随机';
 				    lib.configMenu.audio.config.background_music.item.music_off='关闭';
-					if(lib.config.touchscreen){
-						delete lib.configMenu.audio.config.background_music.item.music_custom;
-					}
 				}
                 if(theme&&theme.pack){
                     for(i in theme.pack){
@@ -17541,7 +17538,12 @@
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			audio.src=lib.assetURL+'audio'+str+'.mp3';
+			if(str.indexOf('.mp3')!=-1||str.indexOf('.ogg')!=-1){
+				audio.src=lib.assetURL+'audio'+str;
+			}
+			else{
+				audio.src=lib.assetURL+'audio'+str+'.mp3';
+			}
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
@@ -17558,6 +17560,7 @@
 				}
 			};
 			ui.window.appendChild(audio);
+			return audio;
 		},
 		trySkillAudio:function(skill,player,directaudio){
             game.broadcast(game.trySkillAudio,skill,player,directaudio);
@@ -17671,23 +17674,8 @@
 				}
 				_status.currentMusic=music;
 				if(music=='music_custom'){
-					if(_status.background_music_src){
-						ui.backgroundMusic.src=_status.background_music_src;
-					}
-					else if(lib.db){
-						game.getDB('audio','background',function(fileToLoad){
-							if(!fileToLoad) return;
-							var fileReader = new FileReader();
-							fileReader.onload = function(fileLoadedEvent)
-							{
-								var data = fileLoadedEvent.target.result;
-								if(data){
-									_status.background_music_src=data;
-									ui.backgroundMusic.src=_status.background_music_src;
-								}
-							};
-							fileReader.readAsDataURL(fileToLoad, "UTF-8");
-						});
+					if(lib.config.background_music_src){
+						ui.backgroundMusic.src=lib.config.background_music_src;
 					}
 				}
 				else{
@@ -24057,23 +24045,10 @@
 								}
 								else if(j=='import_music'){
 									cfgnode.querySelector('button').onclick=function(){
-										delete _status.background_music_src;
 										var fileToLoad=this.previousSibling.files[0];
 										if(fileToLoad){
-											game.putDB('audio','background',fileToLoad);
-											var fileReader = new FileReader();
-											fileReader.onload = function(fileLoadedEvent)
-											{
-												var data = fileLoadedEvent.target.result;
-												_status.background_music_src=data;
-												game.playBackgroundMusic();
-											};
-											fileReader.readAsDataURL(fileToLoad, "UTF-8");
-										}
-										else{
-											game.deleteDB('audio','background');
-											delete _status.background_music_src;
-											ui.backgroundMusic.src='';
+											game.saveConfig('background_music_src',fileToLoad.path);
+											game.playBackgroundMusic();
 										}
 									}
 								}
@@ -24369,22 +24344,160 @@
 								});
 							}
 						};
+						var removeFile=function(selected,page){
+							if(lib.node&&lib.node.fs){
+								var unlink=function(){
+									if(selected.length){
+										lib.node.fs.unlink(__dirname+'/'+selected.shift().path,unlink);
+									}
+									else{
+										enterDirectory(page,page.currentpath);
+									}
+								}
+								unlink();
+							}
+						};
+						var clickDirectory=function(){
+							var page=this.parentNode.parentNode.parentNode;
+							if(page.deletebutton.classList.contains('glow')){
+								if(confirm('确认删除'+this.innerHTML+'？（此操作不可撤销）')){
+									removeFile([this],page);
+								}
+								return;
+							}
+							enterDirectory(page,this.path);
+						};
+						var clickFile=function(){
+							var page=this.parentNode.parentNode.parentNode;
+							if(page.deletebutton.classList.contains('glow')){
+								if(confirm('确认删除'+this.innerHTML+'？（此操作不可撤销）')){
+									removeFile([this],page);
+								}
+								return;
+							}
+							this.classList.toggle('thundertext');
+							page.clicked=true;
+							// if(page.querySelector('span.thundertext')){
+							// 	page.deletebutton.show();
+							// }
+							// else{
+							// 	page.deletebutton.hide();
+							// }
+							if(this.ext=='jpg'||this.ext=='png'){
+								if(this.classList.contains('thundertext')){
+									if(!this.previewnode){
+										this.previewnode=document.createElement('img');
+										this.previewnode.src=lib.assetURL+this.path;
+										this.previewnode.width='60';
+										this.parentNode.appendChild(this.previewnode);
+									}
+								}
+								else{
+									if(this.previewnode){
+										this.previewnode.remove();
+										delete this.previewnode;
+									}
+								}
+							}
+							else if(this.ext=='mp3'||this.ext=='ogg'){
+								if(this.classList.contains('thundertext')){
+									if(!this.previewnode){
+										this.previewnode=game.playAudio(this.path.slice(6));
+									}
+								}
+								else{
+									if(this.previewnode){
+										this.previewnode.remove();
+										delete this.previewnode;
+									}
+								}
+							}
+						};
+						var clickFileList=function(){
+							if(!this.parentNode) return;
+							if(this.parentNode.clicked){
+								this.parentNode.clicked=false;
+							}
+							else{
+								var selected=Array.from(this.querySelectorAll('span.thundertext'));
+								for(var i=0;i<selected.length;i++){
+									selected[i].classList.remove('thundertext');
+									if(selected[i].previewnode){
+										selected[i].previewnode.remove();
+										delete selected[i].previewnode;
+									}
+								}
+								this.parentNode.deletebutton.classList.remove('glow');
+							}
+						};
 						var enterDirectory=function(page,path){
 							page.innerHTML='';
 							page.currentpath=path;
-							ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>'+(path==page.path?'返回':'上一级'),page,function(){
+							var backbutton=ui.create.div('.menubutton.round','返',page,function(){
+								page.clicked=false;
+								clickFileList.call(filelist);
 								if(page.path==path){
 									page.reset();
 								}
 								else{
-									enterDirectory(page,path.slice(0,path.lastIndexOf('/')));
+									if(path.indexOf('/')==-1){
+										enterDirectory(page,'');
+									}
+									else{
+										enterDirectory(page,path.slice(0,path.lastIndexOf('/')));
+									}
 								}
 							});
-							getFileList(path,function(folders,files){
-								for(var i=0;i<files.length;i++){
-									ui.create.div('.fileentry','<span>'+files[i],page);
+							backbutton.style.zIndex=1;
+							backbutton.style.right='10px';
+							backbutton.style.bottom='15px';
+
+							var addbutton=ui.create.div('.menubutton.round','添',page,function(){
+
+							});
+							addbutton.style.zIndex=1;
+							addbutton.style.right='10px';
+							addbutton.style.bottom='80px';
+
+							var deletebutton=ui.create.div('.menubutton.round','删',page,function(){
+								if(!this.classList.contains('glow')){
+									// page.clicked=true;
+									var selected=Array.from(filelist.querySelectorAll('span.thundertext'));
+									if(selected.length){
+										if(confirm('一共要删除'+selected.length+'个文件，此操作不可撤销，是否确定？')){
+											removeFile(selected,page);
+										}
+									}
+									else{
+										this.classList.add('glow');
+									}
 								}
-								// console.log(folders,files);
+								else{
+									this.classList.remove('glow');
+								}
+							});
+							deletebutton.style.zIndex=1;
+							deletebutton.style.right='10px';
+							deletebutton.style.bottom='145px';
+
+							page.backbutton=backbutton;
+							page.addbutton=addbutton;
+							page.deletebutton=deletebutton;
+							var filelist=ui.create.div(page);
+							filelist.classList.add('file-container');
+							filelist.listen(clickFileList);
+							getFileList(path,function(folders,files){
+								for(var i=0;i<folders.length;i++){
+									var entry=ui.create.div('','<span>'+folders[i],filelist);
+									entry.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',clickDirectory);
+									entry.firstChild.path=path+'/'+folders[i]
+								}
+								for(var i=0;i<files.length;i++){
+									var entry=ui.create.div('','<span>'+files[i],filelist);
+									entry.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',clickFile);
+									entry.firstChild.ext=files[i].slice(files[i].lastIndexOf('.')+1);
+									entry.firstChild.path=path+'/'+files[i]
+								}
 							});
 						};
                         var dash1=(function(){
@@ -24397,40 +24510,54 @@
 	                                pageboard.show();
 	                            });
 								createDash2('将','武将图片','image/character',page);
-								createDash2('卡','卡牌图片','image/card',page);
-								createDash2('景','背景图片','image/background',page);
 								createDash2('肤','皮肤图片','image/skin',page);
+								createDash2('卡','卡牌图片','image/card',page);
 								createDash2('模','模式图片','image/mode',page);
 								createDash2('始','开始图片','image/splash',page);
+								createDash2('景','背景图片','image/background',page);
 							};
 							page.reset();
                             return page;
                         }());
                         var dash2=(function(){
 							var page=ui.create.div('.hidden.menu-buttons');
-							ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                ui.create.templayer();
-                                page.hide();
-                                pageboard.show();
-                            });
+							page.reset=function(){
+								page.innerHTML='';
+								ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+	                                ui.create.templayer();
+	                                page.hide();
+	                                pageboard.show();
+	                            });
+								createDash2('技','技能配音','audio/skill',page);
+								createDash2('卡','男性卡牌','audio/card/male',page);
+								createDash2('牌','女性卡牌','audio/card/female',page);
+								createDash2('亡','阵亡配音','audio/die',page);
+								createDash2('效','游戏音效','audio/effect',page);
+								createDash2('景','背景音乐','audio/background',page);
+							};
+							page.reset();
                             return page;
                         }());
                         var dash3=(function(){
 							var page=ui.create.div('.hidden.menu-buttons');
-							ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                ui.create.templayer();
-                                page.hide();
-                                pageboard.show();
-                            });
+							page.path='font';
+							page.reset=function(){
+								ui.create.templayer();
+								page.hide();
+								pageboard.show();
+							};
+							enterDirectory(page,'font');
                             return page;
                         }());
                         var dash4=(function(){
                             var page=ui.create.div('.hidden.menu-buttons');
-							ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
-                                ui.create.templayer();
-                                page.hide();
-                                pageboard.show();
-                            });
+							page.path='';
+							page.reset=function(){
+								ui.create.templayer();
+								page.hide();
+								pageboard.show();
+							};
+							enterDirectory(page,'');
                             return page;
                         }());
                         createDash('图','图片文件',dash1);
@@ -27578,6 +27705,9 @@
                     cheatButton.style.display='none';
 					var runButton=ui.create.div('.menubutton.round.highlight','执',start);
 					runButton.style.display='none';
+					var clearButton=ui.create.div('.menubutton.round.highlight','清',start);
+					clearButton.style.display='none';
+					clearButton.style.left='275px';
 					var playButton=ui.create.div('.menubutton.round.highlight','播',start);
 					playButton.style.display='none';
 					playButton.style.left='215px';
@@ -27609,9 +27739,11 @@
 						}
 						if(this.type=='cmd'){
 							runButton.style.display='';
+							clearButton.style.display='';
 						}
 						else{
 							runButton.style.display='none';
+							clearButton.style.display='none';
 						}
 						if(this.type=='video'){
 							playButton.style.display='';
@@ -28594,6 +28726,9 @@
                             text.scrollTop=text.scrollHeight;
 						}
 						runButton.listen(runCommand);
+						clearButton.listen(function(){
+							text.innerHTML='';
+						});
 					}());
 					(function(){
 						var page=ui.create.div('');
@@ -28824,6 +28959,7 @@
                             if(this.innerHTML=='帮助'){
 								cheatButton.style.display='none';
 								runButton.style.display='none';
+								clearButton.style.display='none';
 								playButton.style.display='none';
 								saveButton.style.display='none';
 								deleteButton.style.display='none';

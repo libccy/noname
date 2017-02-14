@@ -780,18 +780,32 @@
 	top:0;
 }
 
-.menu-buttons .fileentry{
+.menu-buttons .file-container{
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: scroll;
+}
+.menu-buttons .file-container>div{
 	position: relative;
 	left: 0;
 	display: block;
 	margin: 12px;
 	margin-bottom: 15px;
 	white-space: nowrap;
-	text-decoration: underline;
 	text-align: left;
 }
-.menu-buttons .fileentry>span{
+.menu-buttons .file-container>div>span{
 	cursor: pointer;
+	text-decoration: underline;
+}
+.menu-buttons .file-container>div>img{
+	display: block;
+	margin-top: 5px;
 }
 
 .menubutton.large.dashboard{
