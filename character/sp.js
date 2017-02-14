@@ -962,7 +962,8 @@ character.sp={
 			trigger:{global:'gameStart'},
 			forced:true,
 			content:function(){
-				player.draw(player.maxHp);
+				player.draw(player.maxHp,false);
+				player.$draw(player.maxHp);
 			}
 		},
 		tuifeng:{
