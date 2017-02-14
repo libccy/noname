@@ -17942,48 +17942,18 @@
                             }
                         }
                         if(lib.node&&lib.node.fs){
-                            var access=function(){
-                                var dirname=__dirname+'/extension/'+extname;
-                                var finish=function(){
-                                    dirname+='/';
-                                    var writeFile=function(){
-                                        if(filelist.length){
-                                            var filename=filelist.shift();
-                                            lib.node.fs.writeFile(dirname+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
-                                        }
-                                        else{
-                                            finishLoad();
-                                        }
-                                    }
-                                    writeFile();
-                                };
-                                lib.node.fs.access(dirname,function(e){
-                                    if(e){
-                                        try{
-                                            lib.node.fs.mkdir(dirname,finish);
-                                        }
-                                        catch(e){
-                                            throw('err');
-                                        }
-                                    }
-                                    else{
-                                        finish();
-                                    }
-                                });
-                            };
-                            lib.node.fs.access(__dirname+'/extension',function(e){
-                                if(e){
-                                    try{
-                                        lib.node.fs.mkdir(__dirname+'/extension',access);
-                                    }
-                                    catch(e){
-                                        throw('err');
-                                    }
-                                }
-                                else{
-                                    access();
-                                }
-                            });
+							game.ensureDirectory('extension/'+extname,function(){
+								var writeFile=function(){
+									if(filelist.length){
+										var filename=filelist.shift();
+										lib.node.fs.writeFile(__dirname+'/extension/'+extname+'/'+filename,zip.files[filename].asNodeBuffer(),null,writeFile);
+									}
+									else{
+										finishLoad();
+									}
+								}
+								writeFile();
+							});
                         }
                         else{
                             window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
@@ -27597,7 +27567,7 @@
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
 
-                        if(!game.download){
+                        if(!game.download||true){
                             extensionnode.classList.add('on');
                             importExtension.style.display='';
                             importextensionexpanded=true;
@@ -27744,7 +27714,7 @@
                         };
 
                         node.update=function(){
-                            if(!game.download||this.updated) return;
+                            if(!game.download||this.updated||true) return;
                             if(!window.JSZip){
                 				lib.init.js(lib.assetURL+'game','jszip');
                 			}
