@@ -7227,6 +7227,9 @@
 									if(event.position=='e') str+='装备';
 									str+='牌';
 								}
+								if(event.prompt2){
+									str+='<br><br><div class="text center">'+event.prompt2;
+								}
 								event.dialog=ui.create.dialog(str);
                                 if(Array.isArray(event.selectCard)){
                                     event.dialog.add('0/'+get.numStr(event.selectCard[1]));
@@ -30804,6 +30807,7 @@
 
 				if(lib.config.test_game){
 					ui.arena.style.display='none';
+					ui.historybar.style.display='none';
 					lib.storage.test=true;
 					setTimeout(function(){
 						var node=ui.create.pause().animate('start');

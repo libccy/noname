@@ -834,11 +834,37 @@ character.diy={
 			filterCard:{type:'equip'},
 			position:'he',
 			filter:function(event,player){
-				return player.num('he',{type:'equip'}>0);
+				return player.num('he',{type:'equip'})>0;
 			},
 			viewAs:{name:'shuiyanqijun'},
 			prompt:'将一张装备牌当水淹七军使用',
 			check:function(card){return 8-ai.get.equipValue(card)},
+			group:'luweiyan2'
+		},
+		luweiyan2:{
+			trigger:{player:'useCardAfter'},
+			direct:true,
+			filter:function(event,player){
+				if(event.skill!='luweiyan') return false;
+				for(var i=0;i<event.targets.length;i++){
+					if(player.canUse('sha',event.targets[i])){
+						return true;
+					}
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget('是否视为使用一张杀？',function(card,player,target){
+					return trigger.targets.contains(target)&&player.canUse('sha',target,false);
+				}).ai=function(target){
+					return ai.get.effect(target,{name:'sha'},player,player);
+				}
+				'step 1'
+				if(result.bool){
+					player.useCard({name:'sha'},result.targets,false);
+				}
+			}
 		},
 		yaliang:{
 			inherit:'wangxi'
@@ -1330,7 +1356,7 @@ character.diy={
 		diyqiangxi_info:'出牌阶段，你可以自减一点体力或弃一张武器牌，然后你对你攻击范围内的一名角色造成一点伤害并弃置其一张牌，每回合限一次。',
 		diyduanliang_info:'出牌阶段限一次，你可以将一张黑色的基本牌当兵粮寸断对一名角色使用，然后摸一张牌。你的兵粮寸断可以指定距离2以内的角色作为目标',
 		guihan_info:'限定技，当你进入濒死状态时，可以指定一名男性角色与其各回复一点体力并摸两张牌',
-		luweiyan_info:'你可以将一张装备牌当水淹七军使用',
+		luweiyan_info:'你可以将一张装备牌当作水攻使用；结算后你可以视为对其中一个目标使用一张不计入出杀次数的杀',
 		xiongzi_info:'锁定技，你于摸牌阶段额外摸X+1张牌，X为你装备区牌数的一半，向下取整',
 		honglian_info:'每当你受到来自其他角色的伤害，可以弃置伤害来源的所有红色牌',
 		jieyan_info:'出牌阶段限一次，你可以弃置一张红色手牌令场上所有角色受到一点火焰伤害',

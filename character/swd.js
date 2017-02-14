@@ -2524,6 +2524,57 @@ character.swd={
 		},
 		jilve:{
 			enable:'phaseUse',
+			usable:3,
+			onChooseToUse:function(event){
+				var cards=[];
+				if(ui.cardPile.childNodes.length<3){
+					var discardcards=get.cards(3);
+					for(var i=0;i<discardcards.length;i++){
+						ui.discardPile.appendChild(discardcards[i]);
+					}
+				}
+				for(var i=0;i<3;i++){
+					cards.push(ui.cardPile.childNodes[i]);
+				}
+				event.set('jilvecards',cards);
+			},
+			chooseButton:{
+				dialog:function(event,player){
+					return ui.create.dialog('极略：选择一张基本牌或锦囊牌使用',event.jilvecards);
+				},
+				filter:function(button,player){
+					var evt=_status.event.getParent();
+					if(evt&&evt.filterCard){
+						var type=get.type(button.link,'trick');
+						return type!='equip'&evt.filterCard(button.link,player,evt);
+					}
+					return false;
+				},
+				check:function(button){
+					if(button.link.name=='du') return 0;
+					return 1;
+				},
+				backup:function(links,player){
+					return {
+						filterCard:function(){return false},
+						selectCard:-1,
+						viewAs:links[0],
+					}
+				},
+				prompt:function(links,player){
+					return '选择'+get.translation(links)+'的目标';
+				}
+			},
+			ai:{
+				order:12,
+				result:{
+					player:1
+				},
+				threaten:1.7
+			}
+		},
+		jilve_old:{
+			enable:'phaseUse',
 			group:'jilve6',
 			direct:true,
 			usable:3,
@@ -2966,12 +3017,12 @@ character.swd={
 				for(var i=0;i<trigger.targets.length;i++){
 					effect+=ai.get.effect(trigger.targets[i],trigger.card,trigger.player,player);
 				}
-				var str='是否弃置一张装备牌令'+get.translation(trigger.player);
+				var str='弃置一张装备牌令'+get.translation(trigger.player);
 				if(trigger.targets&&trigger.targets.length){
 					str+='对'+get.translation(trigger.targets);
 				}
-				str+='的'+get.translation(trigger.card)+'失效？'
-				var next=player.chooseToDiscard('he',{type:'equip'},str);
+				str+='的'+get.translation(trigger.card)+'失效'
+				var next=player.chooseToDiscard('he',{type:'equip'},get.prompt('gongshen')).prompt2=str;
 				next.logSkill='gongshen';
 				next.ai=function(card){
 					if(effect<0){
@@ -8690,8 +8741,9 @@ character.swd={
 		xuanyuan:'轩辕',
 		xuanyuan_info:'锁定技，你无视轩辕剑的装备条件；失去轩辕剑时不流失体力',
 		jilve:'极略',
+		jilve_backup:'极略',
 		jilve2:'极略',
-		jilve_info:'回合内，你可以观看牌堆顶的两张牌，然后使用其中的基本牌或锦囊牌。每回合最多发动三次',
+		jilve_info:'出牌阶段，你可以观看牌堆顶的三张牌，然后使用其中的非装备牌。每回合最多发动三次',
 		gongshen:'工神',
 		gongshen_info:'任意一名其他角色使用一张基本牌或锦囊牌指定目标后，你可以弃置一张装备牌令其失效',
 

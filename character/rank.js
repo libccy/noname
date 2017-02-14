@@ -376,6 +376,7 @@ window.characterRank={
     ],
     b:[
         'diy_liufu',
+        'diy_lukang',
         'diy_tianyu',
         'old_zhuran',
         'old_lingtong',
@@ -485,7 +486,6 @@ window.characterRank={
         'tianfeng',
         'sunce',
         'hs_guldan',
-        'diy_lukang',
         'old_zhonghui',
         'xusheng',
         'liru',

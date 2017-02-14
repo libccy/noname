@@ -340,7 +340,7 @@ character.gujian={
 			frequent:true,
 			content:function(){
 				"step 0"
-				game.delay();
+				if(trigger.delay==false) game.delay();
 				"step 1"
 				var cards=[];
 				for(var i=0;i<trigger.cards.length;i++){

@@ -2,7 +2,7 @@ window.noname_update={
     version:'1.9.9',
     update:'1.9.9',
     changeLog:[
-        '文件管理器（测试）',
+        '文件管理器',
     ],
     files:[
         // 'game/game.js',

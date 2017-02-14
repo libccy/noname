@@ -1187,7 +1187,7 @@ character.shenhua={
 					event.forced=true;
 				}
 				"step 1"
-				if(!event.forced&&!result.bool){
+				if(!event.forced&&result.bool){
 					game.log(target,'拒绝了拼点');
 					target.chat('拒绝');
 					event.finish();
