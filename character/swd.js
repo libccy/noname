@@ -4184,27 +4184,19 @@ character.swd={
 				game.addVideo('skill',event.player,'kunlunjing');
 				"step 2"
 				var storage=event.player.storage.kunlunjing;
+				for(var i=0;i<storage.length;i++){
+					var player=storage[i].player;
+					if(player.isIn()){
+						player.lose(player.get('hej'))._triggered=null;
+					}
+				}
+				"step 3"
+				var storage=event.player.storage.kunlunjing;
 				var player,frag;
 				var i,j;
 				for(i=0;i<storage.length;i++){
-					if(game.players.contains(storage[i].player)){
-						player=storage[i].player;
-						while(player.node.handcards1.childNodes.length)
-						ui.discardPile.appendChild(player.node.handcards1.firstChild);
-
-						while(player.node.handcards2.childNodes.length)
-						ui.discardPile.appendChild(player.node.handcards2.firstChild);
-
-						while(player.node.judges.childNodes.length)
-						ui.discardPile.appendChild(player.node.judges.firstChild);
-
-						while(player.node.equips.childNodes.length)
-						ui.discardPile.appendChild(player.node.equips.firstChild);
-					}
-				}
-				for(i=0;i<storage.length;i++){
-					if(game.players.contains(storage[i].player)){
-						player=storage[i].player;
+					player=storage[i].player;
+					if(player.isIn()){
 						for(j=0;j<storage[i].handcards1.length;j++){
 							if(storage[i].handcards1[j].parentNode==ui.discardPile||
 							storage[i].handcards1[j].parentNode==ui.cardPile){
@@ -4261,7 +4253,7 @@ character.swd={
 					}
 				}
 				game.addVideo('skill',event.player,['kunlunjing',data]);
-				"step 3"
+				"step 4"
 				ui.window.show();
 				ui.window.classList.remove('zoomin3');
 				setTimeout(function(){
@@ -4269,7 +4261,7 @@ character.swd={
 					game.resume();
 				},500);
 				game.pause();
-				'step 4'
+				'step 5'
 				ui.updatehl();
 			}
 		},

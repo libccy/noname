@@ -24589,11 +24589,19 @@
 							var page=ui.create.div('.hidden.menu-buttons');
 							page.reset=function(){
 								page.innerHTML='';
-								ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+								var backbutton=ui.create.div('.menubutton.round','返',page,function(){
 	                                ui.create.templayer();
 	                                page.hide();
 	                                pageboard.show();
 	                            });
+								backbutton.style.zIndex=1;
+								backbutton.style.right='10px';
+								backbutton.style.bottom='15px';
+								var placeholder=ui.create.div('.placeholder',page);
+								placeholder.style.position='relative';
+								placeholder.style.display='block';
+								placeholder.style.width='100%';
+								placeholder.style.height='14px';
 								createDash2('将','武将图片','image/character',page);
 								createDash2('肤','皮肤图片','image/skin',page);
 								createDash2('卡','卡牌图片','image/card',page);
@@ -24608,11 +24616,19 @@
 							var page=ui.create.div('.hidden.menu-buttons');
 							page.reset=function(){
 								page.innerHTML='';
-								ui.create.div('.config.more.margin-bottom','<div style="transform:none;margin-right:3px">←</div>返回',page,function(){
+								var backbutton=ui.create.div('.menubutton.round','返',page,function(){
 	                                ui.create.templayer();
 	                                page.hide();
 	                                pageboard.show();
 	                            });
+								backbutton.style.zIndex=1;
+								backbutton.style.right='10px';
+								backbutton.style.bottom='15px';
+								var placeholder=ui.create.div('.placeholder',page);
+								placeholder.style.position='relative';
+								placeholder.style.display='block';
+								placeholder.style.width='100%';
+								placeholder.style.height='14px';
 								createDash2('技','技能配音','audio/skill',page);
 								createDash2('卡','男性卡牌','audio/card/male',page);
 								createDash2('牌','女性卡牌','audio/card/female',page);
