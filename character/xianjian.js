@@ -34,7 +34,7 @@ character.xianjian={
 
 		pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
 		pal_muchanglan:['female','wu',3,['feixia','lueying']],
-		pal_xia:['male','wei',4,[]],
+		// pal_xia:['male','wei',4,[]],
 		// pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 	},
 	skill:{
