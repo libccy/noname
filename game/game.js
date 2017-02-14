@@ -23096,6 +23096,10 @@
 				var startButton;
 				var popupContainer;
 	            var closeMenu=function(){
+					if(popupContainer.noclose){
+						popupContainer.noclose=false;
+						return;
+					}
 	                popupContainer.classList.add('hidden');
 	                if(popupContainer.onclose){
 	                    popupContainer.onclose();
@@ -24402,7 +24406,7 @@
 						var clickDirectory=function(){
 							if(_status.dragged) return;
 							var page=this.parentNode.parentNode.parentNode;
-							if(page.deletebutton.classList.contains('glow')){
+							if(page.deletebutton.classList.contains('active')){
 								if(confirm('确认删除'+this.innerHTML+'文件夹？（此操作不可撤销）')){
 									if(lib.node&&lib.node.fs){
 					                    try{
@@ -24453,7 +24457,7 @@
 						var clickFile=function(){
 							if(_status.dragged) return;
 							var page=this.parentNode.parentNode.parentNode;
-							if(page.deletebutton.classList.contains('glow')){
+							if(page.deletebutton.classList.contains('active')){
 								if(confirm('确认删除'+this.innerHTML+'？（此操作不可撤销）')){
 									removeFile([this],page);
 								}
@@ -24467,6 +24471,7 @@
 										this.previewnode=document.createElement('img');
 										this.previewnode.src=lib.assetURL+this.path;
 										this.previewnode.width='60';
+										this.previewnode.style.maxHeight='120px';
 										this.parentNode.appendChild(this.previewnode);
 									}
 								}
@@ -24529,16 +24534,136 @@
 							backbutton.style.right='10px';
 							backbutton.style.bottom='15px';
 
-							var addbutton=ui.create.div('.menubutton.round','添',page,function(){
 
+							var refresh=function(){
+								enterDirectory(page,path);
+							};
+							var addbutton=ui.create.div('.menubutton.round','添',page,function(){
+								var pos1=this.getBoundingClientRect();
+								var pos2=ui.window.getBoundingClientRect();
+								openMenu(this.menu,{
+			                        x:pos1.left+pos1.width+5-pos2.left,
+			                        y:pos1.top-pos2.top
+			                    });
 							});
+							addbutton.menu=ui.create.div('.menu');
+							ui.create.div('','添加文件',addbutton.menu,function(){
+								popupContainer.noclose=true;
+							});
+							var createDir=function(str){
+								if(lib.node&&lib.node.fs){
+									lib.node.fs.mkdir(__dirname+'/'+path+'/'+str,refresh);
+								}
+								else{
+									window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
+										entry.getDirectory(str,{create:true},refresh);
+									});
+								}
+							};
+							ui.create.div('','添加目录',addbutton.menu,function(){
+								ui.create.templayer();
+								try{
+									var str=prompt('输入目录名称');
+									createDir(str);
+								}
+								catch(e){
+									ui.window.classList.add('shortcutpaused');
+									ui.window.classList.add('systempaused');
+
+									var promptcontainer=ui.create.div('.popup-container',ui.window);
+									var bar=ui.create.div(promptcontainer);
+									bar.style.width='100%';
+									bar.style.height='26px';
+									bar.style.left='calc(50% - 150px)';
+									bar.style.top='calc(50% - 13px)';
+									bar.style.textAlign='left';
+
+									var input=document.createElement('input');
+									input.type='text';
+									input.style.width='200px';
+									input.style.height='26px';
+									input.style.resize='none';
+									input.style.padding=0;
+									input.style.border='none';
+									input.style.borderRadius='2px';
+									input.style.boxShadow='rgba(0,0,0,0.2) 0 0 0 1px';
+									input.style.position='absolute';
+									input.style.left=0;
+									bar.appendChild(input);
+									input.focus();
+
+									var unprompt=function(){
+										ui.window.classList.remove('shortcutpaused');
+										ui.window.classList.remove('systempaused');
+										promptcontainer.remove();
+									}
+									input.onkeydown=function(e){
+										if(e.keyCode==13&&input.value){
+											unprompt();
+											createDir(input.value);
+										}
+									}
+
+									var confirm=ui.create.div('.menubutton',bar,'确定',function(){
+										unprompt();
+										if(input.value){
+											createDir(input.value);
+										}
+									});
+									var cancel=ui.create.div('.menubutton',bar,'取消',unprompt);
+
+									confirm.style.marginLeft='210px';
+									cancel.style.marginLeft='10px';
+									confirm.style.position='relative';
+									cancel.style.position='relative';
+								}
+							});
+							var input=document.createElement('input');
+							input.type='file';
+							input.style.position='absolute';
+							input.style.margin=0;
+							input.style.padding=0;
+							input.style.left=0;
+							input.style.top=0;
+							input.style.width='100%';
+							input.style.height='100%';
+							input.style.opacity=0;
+							input.style.outline='none';
+							input.onchange=function(){
+								var fileToLoad=input.files[0];
+								game.print(fileToLoad.name);
+								if(fileToLoad){
+									var fileReader = new FileReader();
+									fileReader.onload = function(e){
+										if(lib.node&&lib.node.fs){
+											get.zip(function(zip){
+												zip.file('i',e.target.result);
+												lib.node.fs.writeFile(__dirname+'/'+path+'/'+fileToLoad.name,zip.files.i.asNodeBuffer(),null,refresh);
+											});
+										}
+										else{
+											game.print(lib.assetURL+path);
+											window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
+												entry.getFile(fileToLoad.name,{create:true},function(fileEntry){
+	                                                fileEntry.createWriter(function(fileWriter){
+	                                                    fileWriter.onwriteend=refresh;
+	                                                    fileWriter.write(e.target.result);
+	                                                });
+	                                            });
+				                            });
+										}
+									};
+									fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+								}
+							};
+							addbutton.menu.firstChild.appendChild(input);
 							addbutton.style.zIndex=1;
 							addbutton.style.right='10px';
 							addbutton.style.bottom='80px';
 
 							var deletebutton=ui.create.div('.menubutton.round','删',page,function(){
 								if(!this.parentNode) return;
-								if(!this.classList.contains('glow')){
+								if(!this.classList.contains('active')){
 									var selected=Array.from(filelist.querySelectorAll('span.thundertext'));
 									if(selected.length){
 										if(confirm('一共要删除'+selected.length+'个文件，此操作不可撤销，是否确定？')){
@@ -24546,11 +24671,11 @@
 										}
 									}
 									else{
-										this.classList.add('glow');
+										this.classList.add('active');
 									}
 								}
 								else{
-									this.classList.remove('glow');
+									this.classList.remove('active');
 								}
 							});
 							deletebutton.style.zIndex=1;
@@ -24565,11 +24690,15 @@
 							filelist.listen(clickFileList);
 							lib.setScroll(filelist);
 							getFileList(path,function(folders,files){
+								var parent=path;
+								if(parent){
+									parent+='/';
+								}
 								for(var i=0;i<folders.length;i++){
 									if(!page.path&&folders[i]=='app') continue;
 									var entry=ui.create.div('','<span>'+folders[i],filelist);
 									entry.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',clickDirectory);
-									entry.firstChild.path=path+'/'+folders[i]
+									entry.firstChild.path=parent+folders[i]
 								}
 								for(var i=0;i<files.length;i++){
 									if(!page.path){
@@ -24580,7 +24709,7 @@
 									var entry=ui.create.div('','<span>'+files[i],filelist);
 									entry.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',clickFile);
 									entry.firstChild.ext=files[i].slice(files[i].lastIndexOf('.')+1);
-									entry.firstChild.path=path+'/'+files[i];
+									entry.firstChild.path=parent+files[i];
 									entry.firstChild.filename=files[i];
 								}
 							});
@@ -34093,6 +34222,16 @@
 			arr.sort(lib.sort.seat);
 			delete lib.tempSortSeat;
 			return arr;
+		},
+		zip:function(callback){
+			if(!window.JSZip){
+                lib.init.js(lib.assetURL+'game','jszip',function(){
+                    callback(new JSZip());
+                });
+            }
+			else{
+				callback(new JSZip());
+			}
 		},
 		delayx:function(num,max){
 			if(typeof num!='number') num=1;
