@@ -1372,6 +1372,7 @@ card.standard={
 			trigger:{player:'shaBegin'},
 			priority:5,
 			audio:true,
+			logTarget:'target',
 			filter:function(event,player){
 				if(player.sex=='male'&&event.target.sex=='female') return true;
 				if(player.sex=='female'&&event.target.sex=='male') return true;

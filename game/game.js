@@ -8089,6 +8089,7 @@
                         else ui.click.cancel();
                     }
 					event.dialog.close();
+					event.result.cards=event.result.links.slice(0);
 				},
 				discardPlayerCard:function(){
 					"step 0"
@@ -8193,6 +8194,7 @@
 						for(var i=0;i<event.result.links.length;i++){
 							cards.push(event.result.links[i]);
 						}
+						event.result.cards=event.result.links.slice(0);
 						target.discard(cards);
 					}
 				},
@@ -8303,6 +8305,7 @@
 					for(var i=0;i<event.result.links.length;i++){
 						cards.push(event.result.links[i]);
 					}
+					event.result.cards=event.result.links.slice(0);
 					event.cards=cards;
 					if(!_status.connectMode&&(target.isUnderControl(true)||player.isUnderControl(true))){
 						target.$give(cards,player);

@@ -35,21 +35,79 @@ character.xianjian={
 		pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
 		pal_muchanglan:['female','wu',3,['feixia','lueying']],
 		// pal_xia:['male','wei',4,[]],
-		// pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
+		pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 	},
 	skill:{
+		fenshi:{
+			unique:true,
+			skillAnimation:true,
+			animationColor:'fire',
+			trigger:{player:'dyingAfter'},
+			forced:true,
+			mark:true,
+			intro:{
+				content:'limited'
+			},
+			content:function(){
+				player.awakenSkill('fenshi');
+				player.changeHujia(2);
+				player.draw(2);
+				player.addSkill('longhuo');
+			},
+			ai:{
+				threaten:0.7
+			}
+		},
+		longhuo:{
+			unique:true,
+			trigger:{player:'phaseEnd'},
+			check:function(event,player){
+				if(player.hp==1&&player.hujia==0) return false;
+				var num=game.countPlayer(function(current){
+					var eff=get.sgn(ai.get.damageEffect(current,player,player,'fire'));
+					if(current.hp==1&&current.hujia==0) eff*=1.5;
+					return eff;
+				});
+				return num>0;
+			},
+			content:function(){
+				'step 0'
+				event.targets=get.players(lib.sort.seat);
+				'step 1'
+				if(event.targets.length){
+					var current=event.targets.shift();
+					if(current.isIn()){
+						player.line(current,'fire');
+						current.damage('fire');
+						event.redo();
+					}
+				}
+			}
+		},
 		yanzhan:{
 			enable:'phaseUse',
 			viewAs:{name:'sha',nature:'fire'},
 			usable:1,
+			position:'he',
 			viewAsFilter:function(player){
-				if(!player.num('h',{color:'red'})) return false;
+				if(!player.num('he',{color:'red'})) return false;
 			},
 			filterCard:{color:'red'},
+			check:function(card){
+				if(get.suit(card)=='heart') return 7-ai.get.value(card);
+				return 5-ai.get.value(card);
+			},
+			onuse:function(result){
+				if(result.targets){
+					for(var i=0;i<result.targets.length;i++){
+						result.targets[i].addTempSkill('yanzhan3','phaseAfter');
+					}
+				}
+			},
+			group:'yanzhan2',
 			ai:{
 				order:3.15
 			},
-			group:'yanzhan2'
 		},
 		yanzhan2:{
 			trigger:{source:'damageEnd'},
@@ -60,6 +118,15 @@ character.xianjian={
 			},
 			content:function(){
 				player.getStat().card.sha--;
+			}
+		},
+		yanzhan3:{
+			mod:{
+				cardRespondable:function(card,player){
+					console.log(_status.event.parent.skill,_status.event.parent.name)
+					if(_status.event.parent.skill=='yanzhan'&&
+					get.suit(card)!=get.suit(_status.event.parent.cards[0])) return false;
+				}
 			}
 		},
 		yufeng:{
@@ -2415,9 +2482,9 @@ character.xianjian={
 		longhuo:'龙火',
 		longhuo_info:'结束阶段，你可以对所有角色各造成一点火焰伤害',
 		fenshi:'焚世',
-		fenshi_info:'觉醒技，准备阶段，若你没有牌，你回复一点体力并摸三张牌，并获得技能龙火',
+		fenshi_info:'觉醒技，当你解除濒死状态时，你获得两点护甲，摸两张牌，然后获得技能龙火',
 		yanzhan:'炎斩',
-		yanzhan_info:'出牌阶段限一次，你可以将一张红色手牌当作火杀使用，若造成了伤害，此杀不计入出牌次数',
+		yanzhan_info:'出牌阶段限一次，你可以将一张红色牌当作火杀使用，此杀只能用与之花色相同的闪响应；若此杀造成了伤害，则不计入出杀次数',
 		feixia:'飞霞',
 		feixia_info:'出牌阶段限一次，你可以弃置一张红色牌视为对一名随机敌人使用一张不计入出杀次数的杀',
 		lueying:'掠影',

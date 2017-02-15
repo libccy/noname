@@ -40,6 +40,10 @@ character.yxs={
 		yxs_tangbohu:['male','qun',3,['luobi','fengliu']],
 		yxs_zhangsanfeng:['male','wei',4,['zbudao','taiji']],
 		yxs_nandinggeer:['female','shu',3,['huli','xianqu','yixin']],
+
+		// yxs_weizhongxian:['male','qun',3,['zhuxin','wlianhuan']],
+		// yxs_meixi:['female','shu',3,['liebo','yaoji']],
+		// yxs_lanlinwang:['male','shu',4,['guimian','yuxue']],
 	},
 	skill:{
 		huli:{
@@ -2358,61 +2362,67 @@ character.yxs={
 				threaten:1.2
 			}
 		},
+		miaobix:{
+			filterCard:true,
+			selectCard:1,
+			popname:true,
+		},
 		miaobi:{
 			enable:'phaseUse',
-			viewAs:{name:'wugu'},
-			filterCard:{suit:'heart'},
-			filter:function(event,player){
-				return !player.getStat('skill').miaobi&&player.num('h',{suit:'heart'})>0;
-			},
-			check:function(card){
-				return 5-ai.get.value(card);
-			}
-		},
-		zhexian:{
-			unique:true,
-			enable:'chooseToUse',
-			mark:true,
-			skillAnimation:true,
-			animationStr:'谪仙',
-			animationColor:'metal',
-			init:function(player){
-				player.storage.zhexian=false;
-			},
-			filter:function(event,player){
-				if(event.type!='dying') return false;
-				if(player!=event.dying) return false;
-				if(player.storage.zhexian) return false;
-				return true;
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('he')>0;
 			},
 			content:function(){
 				'step 0'
-				player.hp=Math.min(3,player.maxHp);
-				player.discard(player.get('hej'));
-				player.draw(3);
-				player.awakenSkill('zhexian');
-				player.storage.zhexian=true;
+				player.discardPlayerCard(target,true);
 				'step 1'
-				if(player.isLinked()) player.link();
+				if(result.bool){
+					var type=get.type(result.cards[0]);
+					if(type!='basic'&&type!='trick'){
+						player.chooseToDiscard('he',true);
+						event.finish();
+					}
+					else{
+						event.card=result.cards[0];
+					}
+				}
+				else{
+					event.finish();
+				}
 				'step 2'
-				if(player.isTurnedOver()) player.turnOver();
-			},
-			ai:{
-				order:1,
-				skillTagFilter:function(player){
-					if(player.storage.zhexian) return false;
-					if(player.hp>0) return false;
-				},
-				save:true,
-				result:{
-					player:10
-				},
-				threaten:function(player,target){
-					if(!target.storage.zhexian) return 0.6;
+				var card=event.card;
+				card={name:card.name,nature:card.nature,suit:card.suit,number:card.number};
+				if(lib.filter.cardEnabled(card)){
+					if(game.hasPlayer(function(current){
+						return player.canUse(card,current);
+					})){
+						lib.skill.miaobix.viewAs=card;
+						var next=player.chooseToUse();
+						next.logSkill='miaobi';
+						next.set('openskilldialog','妙笔：将一张手牌当'+get.translation(card)+'使用');
+						next.set('norestore',true);
+						next.set('_backupevent','miaobix');
+						next.backup('miaobix');
+					}
 				}
 			},
-			intro:{
-				content:'limited'
+			ai:{
+				order:9,
+				result:{
+					target:-1
+				}
+			}
+		},
+		zhexian:{
+			trigger:{player:'loseEnd'},
+			usable:1,
+			filter:function(event,player){
+				return _status.currentPhase!=player;
+			},
+			frequent:true,
+			content:function(){
+				player.draw();
 			}
 		},
 		guifu:{
@@ -2540,6 +2550,18 @@ character.yxs={
 		yxs_zhangsanfeng:'张三丰',
 		yxs_nandinggeer:'南丁格尔',
 
+		zhuxin:'诛心',
+		zhuxin_info:'出牌阶段限一次，你可以与一名其他角色拼点，若你赢，你对其造成一点伤害',
+		wlianhuan:'连环',
+		wlianhuan_info:'你使用杀造成伤害时，可以弃置一张装备区内的牌并令伤害+1',
+		liebo:'裂帛',
+		liebo_info:'出牌阶段限一次，你可以使用任意张手牌与一名其他角色交换对应数量的手牌，或与一名其他角色交换全部手牌（牌差不能超过1）',
+		yaoji:'妖姬',
+		yaoji_info:'每当你受到一次伤害，你可以将一张乐不思蜀置入伤害来源的判定区',
+		guimian:'鬼面',
+		guimian_info:'锁定技，每当你在出牌阶段使用杀造成伤害，本阶段内出杀次数上限+1',
+		yuxue:'浴血',
+		yuxue_info:'锁定技，每当你造成一次伤害，若目标没有浴血标记，你令其获得一个浴血标记；准备阶段，若场上浴血标记的数量不少于存活角色数的一半，你清空浴血标记并令所有有标记的角色流失一点体力',
 		huli:'护理',
 		huli_info:'出牌阶段，你可以将一张红桃手牌当作桃对距离1以内的角色使用',
 		yixin:'医心',
@@ -2639,9 +2661,9 @@ character.yxs={
 		lshengong:'神工',
 		lshengong_info:'出牌阶段限一次，你可以选定场上任意一名角色的装备区的牌，出自己的一张手牌复制该装备，然后可以选择装备上自己或者别的角色的装备区',
 		zhexian:'谪仙',
-		zhexian_info:'限定技，当你处于濒死状态时，你可以丢弃你所有的牌和你判定区里的牌，并复原你的武将牌，然后摸三张牌且体力回复至3点。',
+		zhexian_info:'当你于一名其他角色的回合内首次失去牌时，你可以摸一张牌',
 		miaobi:'妙笔',
-		miaobi_info:'出牌阶段限一次，你可以将一张红桃牌当作五谷丰登使用',
+		miaobi_info:'出牌阶段限一次，你可以弃置一名其他角色的一张牌，若此牌是基本牌或通常锦囊，你可以将一张手牌当此牌使用；否则你须弃置一张牌',
 		cike:'刺客',
 		cike_info:'你对别的角色出【杀】时可以选择做一次判定：若判定牌为红色花色，则此【杀】不可回避，直接命中；若判定牌为黑色花色，你可以选择弃掉对方一张牌。',
 		qiangyun:'强运',

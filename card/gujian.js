@@ -904,7 +904,8 @@ card.gujian={
         luyugeng:{
             mark:'card',
             trigger:{player:'phaseBegin'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -937,7 +938,8 @@ card.gujian={
         xiajiao:{
             mark:'card',
             trigger:{player:['phaseUseBefore','phaseEnd']},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             filter:function(event,player){
                 return !player.hasSkill('xiajiao3');
@@ -984,7 +986,8 @@ card.gujian={
         mizhilianou:{
             mark:'card',
             trigger:{player:'phaseAfter'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1026,7 +1029,8 @@ card.gujian={
         chunbing:{
             mark:'card',
             trigger:{player:'phaseAfter'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1053,7 +1057,8 @@ card.gujian={
         gudonggeng:{
             mark:'card',
             trigger:{player:'phaseBegin'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1095,7 +1100,8 @@ card.gujian={
         qingtuan:{
             mark:'card',
             trigger:{player:'phaseAfter'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1131,7 +1137,8 @@ card.gujian={
         liyutang:{
             mark:'card',
             trigger:{player:'phaseEnd'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1157,7 +1164,8 @@ card.gujian={
         yougeng:{
             mark:'card',
             trigger:{player:'phaseBegin'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1183,7 +1191,8 @@ card.gujian={
         molicha:{
             mark:'card',
             trigger:{player:'phaseAfter'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1221,7 +1230,8 @@ card.gujian={
         yuanbaorou:{
             mark:'card',
             trigger:{player:'phaseAfter'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1248,7 +1258,8 @@ card.gujian={
         tanhuadong:{
             mark:'card',
             trigger:{player:'phaseEnd'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
@@ -1274,7 +1285,8 @@ card.gujian={
         mapodoufu:{
             mark:'card',
             trigger:{player:'phaseEnd'},
-            direct:true,
+            forced:true,
+            popup:false,
             nopop:true,
             intro:{
                 content:function(storage,player){
