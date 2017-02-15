@@ -109,9 +109,11 @@
 						init:false,
 						onclick:function(bool){
 							game.saveConfig('compatiblemode',bool);
-							if(bool){
-								alert('开启此选项可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭');
-							}
+							setTimeout(function(){
+								if(lib.config.compatiblemode){
+									alert('开启此选项可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭');
+								}
+							},100);
 						}
 					},
 					confirm_exit:{
@@ -9410,7 +9412,7 @@
 				},
 				doubleDraw:function(){
 					"step 0"
-					player.chooseBool('你的武将牌上有单独的阴阳鱼，是否摸一张牌？');
+					player.chooseBool('你的主副将体力上限之和是奇数，是否摸一张牌？');
 					"step 1"
 					if(result.bool){
 						player.draw();
