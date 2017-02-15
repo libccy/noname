@@ -36,6 +36,7 @@ mode.boss={
 				}
 			}
 		}
+		lib.translate.restart='返回';
 		lib.init.css(lib.assetURL+'layout/mode','boss');
 		game.delay(0.1);
 		"step 1"

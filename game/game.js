@@ -3172,6 +3172,7 @@
 						init:'combat',
 						item:{
 							combat:'自由',
+							three:'统率',
 							leader:'君主',
 						},
 						restart:true,
@@ -21577,7 +21578,7 @@
 			if(!list){
 				list=[];
 				for(var i in lib.character){
-					if(typeof func){
+					if(typeof func=='function'){
 						if(!func(i)) continue;
 					}
 					else{
@@ -35814,31 +35815,36 @@
 					tr=document.createElement('tr');
 					table.appendChild(tr);
 					td=document.createElement('td');
-					td.innerHTML='攻击';
+					td.innerHTML='范围';
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML='进攻';
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML='防御';
+					td.innerHTML='距离';
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML='手牌';
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML='轮数';
 					tr.appendChild(td);
 
 					tr=document.createElement('tr');
 					table.appendChild(tr);
 					td=document.createElement('td');
-					td.innerHTML=node.getAttackRange();
+					td.innerHTML=get.numStr(node.getAttackRange());
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=node.getGlobalFrom();
-					tr.appendChild(td);
-					td=document.createElement('td');
-					td.innerHTML=node.getGlobalTo();
+					if(node==game.me||!game.me){
+						td.innerHTML='-';
+					}
+					else if(game.me){
+						td.innerHTML=get.numStr(Math.max(1,game.me.distanceTo(node)));
+					}
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=node.num('h');
+					tr.appendChild(td);
+					td=document.createElement('td');
+					td.innerHTML=node.stat.length-1;
 					tr.appendChild(td);
 					table.style.width='calc(100% - 20px)';
 					table.style.marginLeft='10px';

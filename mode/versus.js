@@ -2237,7 +2237,7 @@ mode.versus={
 				else{
 					return game.me;
 				}
-			},
+			};
 			next.setContent(function(){
 				'step 0'
 				player.classList.add('acted');
@@ -2299,8 +2299,8 @@ mode.versus={
 						}
 						if(target2.identity!='zhu'){
 							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].identity!='zhu'&&game.players[i]!=target&&
-								game.players[i].side==target.side){
+								if(game.players[i].identity!='zhu'&&game.players[i]!=target2&&
+								game.players[i].side==target2.side&&game.players[i].num('j')){
 									num-=2;
 								}
 							}

@@ -79,6 +79,28 @@ mode.chess={
 					game.leaderView();
 					break;
 				}
+				case 'three':{
+					if(lib.config.continue_name_chess){
+						event._result={
+							friend:lib.config.continue_name_versus_three.friend,
+							enemy:lib.config.continue_name_versus_three.enemy,
+						}
+						_status.color=lib.config.continue_name_versus_three.color;
+						game.saveConfig('continue_name_chess');
+					}
+					else{
+						game.chooseCharacterDouble({
+							update:function(i){
+								switch(i){
+									case 0:return '主帅';
+									case 1:return '副帅';
+									default:return '前锋';
+								}
+							}
+						});
+					}
+					break;
+				}
 				case 'combat':{
 					if(lib.storage.test){
 						lib.config.game_speed='vfast';
@@ -98,6 +120,10 @@ mode.chess={
 		}
 		"step 2"
 		ui.arena.classList.add('chess');
+		if(_status.mode=='three'){
+			_status.mylist=result.friend;
+			_status.enemylist=result.enemy;
+		}
 		var mylistmap,enemylistmap;
 		if(event.video){
 			var videocontent;
@@ -129,7 +155,10 @@ mode.chess={
 		var	num=Math.round((_status.mylist.length+_status.enemylist.length)/2);
 		var friend,enemy;
 		var side;
-		if(_status.mode=='leader'){
+		if(_status.mode=='three'){
+			side=!_status.color;
+		}
+		else if(_status.mode=='leader'){
 			side=true;
 		}
 		else{
@@ -391,7 +420,7 @@ mode.chess={
 		ui.create.me();
 		ui.create.fakeme();
 
-		if(!event.video&&_status.mode=='combat'&&get.config('zhu')&&!_status.vsboss&&game.players.length>2){
+		if(!event.video&&((_status.mode=='combat'&&get.config('zhu')&&!_status.vsboss&&game.players.length>2)||_status.mode=='three')){
 			game.friendZhu=event.friendZhu;
 			game.friendZhu.hp++;
 			game.friendZhu.maxHp++;
@@ -409,7 +438,7 @@ mode.chess={
 				}
 			}
 
-			if(get.config('main_zhu')&&event.friendViceZhu){
+			if((get.config('main_zhu')||_status.mode=='three')&&event.friendViceZhu){
 				game.friendViceZhu=event.friendViceZhu;
 				game.friendViceZhu.node.identity.firstChild.innerHTML='仕';
 				for(var i=0;i<game.players.length;i++){
@@ -480,7 +509,10 @@ mode.chess={
 		event.trigger('gameStart');
 		game.gameDraw(p);
 		game.me.classList.add('current_action');
-		if(_status.mode=='leader'){
+		if(_status.mode=='three'){
+			game.phaseLoopThree(_status.color?game.enemyZhu:game.friendZhu);
+		}
+		else if(_status.mode=='leader'){
 			game.phaseLoopOrdered(p);
 		}
 		else if(get.config('seat_order')=='指定'){
@@ -1575,6 +1607,18 @@ mode.chess={
 			}
 		},
 		controlOver:function(){
+			if(_status.mode=='three'){
+				ui.create.control('再战',function(){
+					game.saveConfig('continue_name_chess',{
+						friend:_status.friendBackup,
+						enemy:_status.enemyBackup,
+						color:_status.color
+					});
+					game.saveConfig('mode',lib.config.mode);
+					localStorage.setItem(lib.configprefix+'directstart',true);
+					game.reload();
+				});
+			}
 			ui.create.control('返回',game.reload);
 			if(_status.mode!='leader') return;
 			if(_status.enterArena){
@@ -1610,6 +1654,105 @@ mode.chess={
 					}
 				}
 			}
+		},
+		phaseLoopThree:function(player){
+			var next=game.createEvent('phaseLoop');
+			next.player=player;
+			next.swap=function(player){
+				if(player.side==game.me.side){
+					return game.enemyZhu;
+				}
+				else{
+					return game.me;
+				}
+			},
+			next.setContent(function(){
+				'step 0'
+				player.classList.add('acted');
+				player.phase();
+				'step 1'
+				if(player!=game.friendZhu&&player!=game.enemyZhu){
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].side==player.side&&game.players[i]!=game.friendZhu&&
+							game.players[i]!=game.enemyZhu&&
+							game.players[i]!=player&&!game.players[i].classList.contains('acted')){
+							game.players[i].classList.add('acted');
+							game.players[i].phase();
+							break;
+						}
+					}
+				}
+				'step 2'
+				var target=event.swap(player);
+				var swap=[],swap2=[];
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i].isOut()) continue;
+					if(!game.players[i].classList.contains('acted')){
+						if(game.players[i].side==target.side){
+							swap.push(game.players[i]);
+						}
+						else{
+							swap2.push(game.players[i]);
+						}
+					}
+				}
+				if(swap.length==0){
+					if(swap2.length){
+						target=event.swap(target);
+						swap=swap2;
+					}
+					else{
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].isOut()) continue;
+							game.players[i].classList.remove('acted');
+						}
+						event.redo();
+						game.delay();
+						return;
+					}
+				}
+				if(swap.length==1){
+					event.directresult=swap[0];
+				}
+				else{
+					var rand=Math.random();
+					var next=target.chooseTarget('选择行动的角色',true,function(card,player,target2){
+						return target2.side==target.side&&!target2.classList.contains('acted');
+					});
+					next._triggered=null;
+					next.includeOut=true;
+					next.ai=function(target2){
+						var num=0;
+						if(target2.num('j')){
+							num-=5;
+						}
+						if(target2!=game.friendZhu&&target2!=game.enemyZhu){
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i]!=game.friendZhu&&game.players[i]!=game.enemyZhu&&
+									game.players[i]!=target2&&game.players[i].side==target2.side&&game.players[i].num('j')){
+									num-=2;
+								}
+							}
+						}
+						if(rand<1/3){
+							num+=1/(target2.hp+1);
+						}
+						else if(rand<2/3){
+							num+=target2.num('h')/5;
+						}
+						return num;
+					}
+				}
+				'step 3'
+				if(event.directresult){
+					event.player=event.directresult;
+					delete event.directresult;
+				}
+				else if(result.bool){
+					event.player=result.targets[0];
+				}
+				event.goto(0);
+			});
 		},
 		phaseLoopOrdered:function(player){
 			var next=game.createEvent('phaseLoop');
