@@ -141,6 +141,7 @@ window.characterRank={
         're_lusu',
         'hs_fuding',
         'wangji',
+        're_luxun',
     ],
     am:[
         'old_wangyi',
@@ -156,7 +157,6 @@ window.characterRank={
         'ow_zhixuzhiguang',
         'ow_falaozhiying',
         'hs_bolvar',
-        'zhugeguo',
         'sp_caiwenji',
         'yxs_yingzheng',
         'caorui',
@@ -185,7 +185,6 @@ window.characterRank={
         'hs_wvelen',
         'swd_yuchiyanhong',
         'swd_zidashu',
-        're_luxun',
         'pal_hanlingsha',
         'hs_jaina',
         'diy_liuyan',
@@ -236,6 +235,7 @@ window.characterRank={
     ],
     bp:[
         'lifeng',
+        'zhugeguo',
         'xiaoqiao',
         'sp_zhangjiao',
         'hs_tanghangu',
