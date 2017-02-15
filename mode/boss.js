@@ -833,7 +833,7 @@ mode.boss={
 				if(!event.targets||!event.card) return false;
 				if(event.card&&event.card.name=='wuxie') return false;
 				var type=get.type(event.card);
-				if(type!='basic'&&type!='trick') return false;
+				if(type!='trick') return false;
 				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
 				var targets=event._targets||event.targets;
 				for(var i=0;i<targets.length;i++){

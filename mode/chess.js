@@ -89,13 +89,16 @@ mode.chess={
 						game.saveConfig('continue_name_chess');
 					}
 					else{
-						game.chooseCharacterDouble({
-							update:function(i){
-								switch(i){
-									case 0:return '主帅';
-									case 1:return '副帅';
-									default:return '前锋';
-								}
+						game.chooseCharacterDouble(function(i){
+							if(lib.character[i][4].contains('chessboss')){
+								return false;
+							}
+							return !lib.filter.characterDisabled(i);
+						},function(i){
+							switch(i){
+								case 0:return '主帅';
+								case 1:return '副帅';
+								default:return '前锋';
 							}
 						});
 					}
@@ -916,6 +919,9 @@ mode.chess={
 											break;
 									}
 								}
+							}
+							else if(_status.mode=='three'){
+								source.draw(2);
 							}
 							else if(source.side!=player.side){
 								source.draw();
