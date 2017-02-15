@@ -249,7 +249,7 @@ card.guozhan={
 			ai:{
 				order:10,
 				value:4,
-				useful:2,
+				useful:[2,1],
 				wuxie:function(){
 					return 0;
 				},

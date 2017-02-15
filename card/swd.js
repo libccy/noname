@@ -393,8 +393,9 @@ card.swd={
 					target2.addExpose(0.2);
 					target.useCard({name:'sha'},target2);
 				}
+				player.addSkill('zhiluxiaohu');
 				'step 1'
-				target.draw();
+				player.removeSkill('zhiluxiaohu');
 			},
 			ai:{
 				value:6,
@@ -1706,29 +1707,32 @@ card.swd={
 		},
 		zhufangshenshi:{
 			fullskin:true,
-			chongzhu:true,
 			type:'trick',
-			enable:function(){
-				return game.countPlayer()>2;
-			},
-			filterTarget:function(card,player,target){
-				return player.next==target||player.previous==target;
-			},
+			enable:true,
+			filterTarget:true,
 			content:function(){
-				game.swapSeat(player,target);
+				player.storage.zhufangshenshi=target;
+				player.addTempSkill('zhufangshenshi','phaseAfter');
 			},
 			ai:{
+				value:4,
+				wuxie:function(){
+					return 0;
+				},
+				useful:[2,1],
 				basic:{
 					order:7,
 				},
 				result:{
-					target:function(player,target){
-						if(player.next==target) return -1;
-						if(player.previous==target) return 1;
+					player:function(player,target){
+						if(ai.get.attitude(player,target)<0){
+							if(get.distance(player,target)>1) return 1;
+							return 0.6;
+						}
+						return 0.3;
 					}
 				}
 			},
-			mode:['identity','guozhan'],
 		},
 		jingleishan:{
 			fullskin:true,
@@ -1953,6 +1957,40 @@ card.swd={
 		},
 	},
 	skill:{
+		zhiluxiaohu:{
+			trigger:{source:'damageAfter'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&event.getParent(3).name=='zhiluxiaohu';
+			},
+			content:function(){
+				player.draw();
+			}
+		},
+		zhufangshenshi:{
+			mod:{
+				targetInRange:function(card,player,target,now){
+					if(player.storage.zhufangshenshi==target) return true;
+				},
+			},
+			mark:true,
+			intro:{
+				content:'player'
+			},
+			onremove:true,
+		},
+		_zhufangshenshi:{
+			trigger:{player:'useCardAfter'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return event.card.name=='zhufangshenshi';
+			},
+			content:function(){
+				player.draw();
+			}
+		},
 		huanpodan_skill:{
 			mark:true,
 			intro:{
@@ -4701,7 +4739,7 @@ card.swd={
 		shuchui:'鼠槌',
 		shuchui_info:'出牌阶段限一次，你可以指定一名攻击范围内的角色，依次将手牌中的至多3张杀对该角色使用，若杀造成了伤害，你摸一张牌',
 		zhiluxiaohu:'指路小狐',
-		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机敌方角色使用一张杀，然后摸一张牌',
+		zhiluxiaohu_info:'出牌阶段对自己使用，视为对一名随机敌方角色使用一张杀，若此杀造成伤害，你摸一张牌',
 		xuejibingbao:'雪肌冰鲍',
 		xuejibingbao_info:'出牌阶段对一名角色使用，该角色摸牌阶段摸牌数+1，持续2个回合',
 		gouhunluo:'勾魂锣',
@@ -4938,7 +4976,7 @@ card.swd={
 		xixue:'吸血',
 		xixue_info:'锁定技，每当你使用杀造成一点伤害，你回复一点体力',
 		zhufangshenshi:'祠符',
-		zhufangshenshi_info:'出牌阶段，对一名相邻角色使用，与其交换位置',
+		zhufangshenshi_info:'出牌阶段，对一名其他角色使用，本回合内对其使用卡牌无视距离，结算后摸一张牌',
 		jingleishan:'惊雷闪',
 		jingleishan_info:'出牌阶段，对所有其他角色使用。每名目标角色需打出一张【杀】，否则受到1点雷电伤害。',
 		chiyuxi:'炽羽袭',

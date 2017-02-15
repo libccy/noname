@@ -843,17 +843,24 @@ character.yijiang={
 						list[i]=['锦囊','',list[i]];
 					}
 				}
-				var att=ai.get.attitude(event.target,player);
-				event.target.chooseButton(['矫诏',[list,'vcard']],true).set('ai',function(button){
-					var att=_status.event.att;
-					if(att<=0){
-						return button.link=='shan'?1:0;
+				var choice;
+				if(ai.get.attitude(event.target,player)<=0){
+					choice='shan';
+				}
+				else{
+					if(!player.storage.jiaozhao1){
+						var nh=player.num('h');
+						if(nh>=5){
+							choice='jiu';
+						}
+						else if(nh<=2){
+							choice='sha';
+						}
+						else{
+							choice=Math.random()<0.5?'sha':'jiu';
+						}
 					}
 					else{
-						if(!_status.event.trick){
-							return button.link=='sha'?1:0;
-						}
-						var player=_status.event.player;
 						var recover=0,lose=1,players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
 							if(!players[i].isOut()&&players[i]!=player){
@@ -885,15 +892,25 @@ character.yijiang={
 								}
 							}
 						}
-						if(lose>recover&&lose>0) return (button.link[2]=='nanman')?1:-1;
-						if(lose<recover&&recover>0) return (button.link[2]=='taoyuan')?1:-1;
-						return (button.link[2]=='shunshou')?1:-1;
+						if(lose>recover&&lose>0){
+							choice=Math.random()<0.7?'nanman':'wanjian';
+						}
+						else if(lose<recover&&recover>0){
+							choice='taoyuan';
+						}
+						else{
+							choice=Math.random()<0.5?'wuzhong':'shunshou';
+						}
 					}
-				}).set('att',att).set('trick',player.storage.jiaozhao1);
+				}
+				event.target.chooseButton(['矫诏',[list,'vcard']],true).set('ai',function(button){
+					return button.link[2]==_status.event.choice?1:0;
+				}).set('choice',choice);
 				'step 3'
-				event.target.showCards(game.createCard(result.links[0]),get.translation(event.target)+'声明了'+get.translation(result.links[0][2]));
+				var chosen=result.links[0][2];
+				event.target.showCards(game.createCard({name:chosen,suit:cards[0].suit,number:cards[0].number}),get.translation(event.target)+'声明了'+get.translation(chosen));
 				player.storage.jiaozhao=cards[0];
-				player.storage.jiaozhao_card=result.links[0][2];
+				player.storage.jiaozhao_card=chosen;
 				game.broadcastAll(function(name){
 					lib.skill.jiaozhao2.viewAs={name:name};
 				},result.links[0][2]);
