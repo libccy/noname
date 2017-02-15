@@ -4224,20 +4224,6 @@
             					ui.tempnowuxie.classList.toggle('glow')
             				}
             			}
-            			else if(e.keyCode==73){
-            				// if(game.showIdentity){
-            				// 	game.showIdentity();
-            				// }
-            			}
-            			else if(e.keyCode==67){
-            				// var node=ui.window.querySelector('#click');
-            				// if(node){
-            				// 	node.click();
-            				// }
-            				// else{
-            				// 	ui.click.config();
-            				// }
-            			}
             			else if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
             				if(e.shiftKey){
             					if(confirm('是否重置游戏？')){
@@ -30531,45 +30517,10 @@
 				ui.arena.appendChild(ui.canvas);
 				ui.canvas.id='canvas';
 				ui.ctx=ui.canvas.getContext('2d');
-				ui.configbg=ui.create.div("#click");
-				ui.configbg.listen(ui.click.config2);
-				if(!lib.config.touchscreen){
-					ui.configbg.oncontextmenu=ui.click.config2;
-				}
-				ui.config=ui.create.div('#sidebar2.content');
-				ui.config.listen(function(){
-					if(_status.reloading) return;
-					if(_status.choosing){
-						if(!_status.choosing.expand){
-							_status.choosing.parentNode.style.height='';
-							_status.choosing.nextSibling.delete();
-							_status.choosing.previousSibling.show();
-							delete _status.choosing;
-						}
-					}
-					_status.clicked=true;
-					if(ui.arena.classList.contains('selecting')){
-						game.check();
-					}
-				});
-				if(!lib.config.touchscreen){
-					ui.config.oncontextmenu=function(e){
-						e.stopPropagation();
-						return false;
-					};
-				}
 
 				ui.sidebar.ontouchstart=ui.click.touchStart;
-				ui.config.ontouchstart=ui.click.touchStart;
 				ui.sidebar.ontouchmove = ui.click.touchScroll;
-				ui.config.ontouchmove = ui.click.touchScroll;
 				ui.sidebar.style.WebkitOverflowScrolling='touch';
-				ui.config.style.WebkitOverflowScrolling='touch';
-				if(false&&lib.config.right_sidebar){
-					ui.sidebar.classList.add('right');
-					ui.sidebar3.classList.add('left');
-					ui.config.classList.add('right');
-				}
 
                 var zoom;
 				switch(lib.config.ui_zoom){
@@ -33585,33 +33536,6 @@
 				ui.click.configMenu();
 				ui.system1.classList.remove('shown');
 				ui.system2.classList.remove('shown');
-			},
-			config2:function(e){
-				_status.clicked=true;
-				ui.system.show();
-				ui.arena.classList.remove('right');
-				ui.arena.classList.remove('left');
-				ui.arena.classList.remove('paused2');
-				// ui.arena.classList.remove('paused');
-				this.remove();
-				if(ui.gameviewdialog){
-					if(ui.gameviewdialog.popped){
-						ui.gameviewdialog.popped.delete();
-						delete ui.gameviewdialog.popped;
-					}
-					ui.gameviewdialog.close();
-					delete ui.gameviewdialog;
-					ui.currentgameview.classList.remove('thundertext');
-				}
-				ui.config.delete();
-				if(_status.config2){
-					game.resume2();
-				}
-				// e.stopPropagation();
-				if(game.onresume2){
-					game.onresume2();
-				}
-				return false;
 			},
 			swap:function(){
 				if(_status.dragged) return;

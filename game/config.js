@@ -115,7 +115,6 @@ window.config={
 	skill_animation:true,
 	paused:false,
 	title:false,
-	right_sidebar:false,
 	button_press:true,
 	damage_shake:true,
 	log_highlight:true,

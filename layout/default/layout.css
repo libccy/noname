@@ -845,7 +845,7 @@ table {
 	transition: all 0.1s
 }
 
-.pausedbg,#click {
+.pausedbg {
 	left: 0;
 	top: 0;
 	width: 100%;
@@ -857,7 +857,7 @@ table {
 	top: calc(50% - 17px);
 	left: calc(50% - 45px);
 }
-#sidebar,#sidebar2,#sidebar3 {
+#sidebar,#sidebar3 {
 	left: 0;
 	top: 0;
 	width: 200px;
@@ -870,7 +870,7 @@ table {
 #sidebar3 {
 	text-align: right
 }
-.pausedbg>#sidebar.right,#sidebar2.right,#sidebar3 {
+.pausedbg>#sidebar.right,#sidebar3 {
 	left: calc(100% - 240px);
 }
 #sidebar3.left {
@@ -878,8 +878,7 @@ table {
 	text-align: left;
 }
 
-.dialog.popped #sidebar,
-.dialog.popped #sidebar2 {
+.dialog.popped #sidebar {
 	padding: 0;
 }
 .dialog .poppedpile {
@@ -2874,9 +2873,6 @@ div:hover>.intro {
 
 .content>.config.line2 {
 	transform: translateX(-5px);
-}
-#sidebar2>.config:not(.line2) {
-	transform: translateX(5px);
 }
 .popup {
 	background: rgba(0,0,0,0.2);
