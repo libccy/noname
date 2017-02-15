@@ -104,6 +104,16 @@
 							}
 						}
 					},
+					compatiblemode:{
+						name:'兼容模式',
+						init:false,
+						onclick:function(bool){
+							game.saveConfig('compatiblemode',bool);
+							if(bool){
+								alert('兼容模式开启后可令部分不兼容的扩展强制运行，可能产生未知结果，详情参见游戏帮助');
+							}
+						}
+					},
 					confirm_exit:{
 						name:'确认退出',
 						init:false,
@@ -3646,8 +3656,8 @@
             globalId:0,
 		},
 		help:{
-			'游戏选项':'<ul><li>控制台命令<br>开启后可用浏览器控制台控制游戏<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
-			'触屏模式<br>可消除iOS等设备上300ms的点击延迟，但开启后无法使用鼠标<li>滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
+			'游戏选项':'<ul><li>兼容模式<br>开启后可令部分不兼容的扩展强制执行，但会略微影响游戏速度。可能产生未知的结果，建议在开启后留意菜单-其它-游戏命令中的错误提示，并关闭扩展中的出错部分<li>开发者模式<br>开启后可用浏览器控制台控制游戏，或更新到开发版<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
+			'滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
 			'<table><tr><td>a<td>切换托管<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
@@ -20660,10 +20670,22 @@
 						event.finish();
 					}
 					else{
-                        event.content(event,step,source,player,target,targets,
-                            card,cards,skill,forced,num,trigger,result,
-                            _status,lib,game,ui,get,ai);
-						// eval(lib.init.parse(event.content))();
+						if(lib.config.compatiblemode){
+							try{
+								event.content(event,step,source,player,target,targets,
+		                            card,cards,skill,forced,num,trigger,result,
+		                            _status,lib,game,ui,get,ai);
+							}
+							catch(e){
+								game.print('游戏出错：'+event.name);
+								game.print(e.toString());
+							}
+						}
+						else{
+							event.content(event,step,source,player,target,targets,
+	                            card,cards,skill,forced,num,trigger,result,
+	                            _status,lib,game,ui,get,ai);
+						}
 					}
 					event.step++;
 				}
