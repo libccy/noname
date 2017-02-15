@@ -21656,6 +21656,7 @@
 				lib.onresize.push(event.resize);
 				event.clickAvatar=function(){
 					if(event.deciding){
+						if(this.index<event.config.width) return;
 						if(event.friendlist.contains(this)){
 							event.friendlist.remove(this);
 							event.moveNode(this,this.index);
@@ -21933,6 +21934,11 @@
 				'step 5'
 				event.prompt('选择'+get.cnNumber(event.config.num)+'名出场武将');
 				event.enemylist=[];
+				for(var i=0;i<event.avatars.length;i++){
+					if(event.avatars[i].index>event.config.width){
+						event.avatars[i].classList.add('selecting');
+					}
+				}
 				var rand=[];
 				for(var i=0;i<event.config.width;i++){
 					for(var j=0;j<event.config.width-i;j++){

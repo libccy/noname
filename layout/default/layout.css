@@ -2917,6 +2917,9 @@ div:hover>.intro {
 #window>.choosedouble.character.moved {
 	z-index: 1;
 }
+#window:not(.nopointer)>.choosedouble.character.moved:not(.selecting){
+	cursor: default;
+}
 #window>.choosedouble.character>.name {
 	left: 6%;
 	top: 8%;

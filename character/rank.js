@@ -496,6 +496,7 @@ window.characterRank={
         're_xiahoudun',
         'zhangliang',
         'xiahouyuan',
+        'pangde',
         'yanwen',
     ],
     c:[
@@ -523,7 +524,6 @@ window.characterRank={
         'huanggai',
         'xiahoudun',
         'zhangbao',
-        'pangde',
         'zhangfei',
         'old_huaxiong',
     ],

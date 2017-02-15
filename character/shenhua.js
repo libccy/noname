@@ -19,7 +19,7 @@ character.shenhua={
 		taishici:['male','wu',4,['tianyi']],
 		yanwen:['male','qun',4,['shuangxiong']],
 		re_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
-		pangde:['male','qun',4,['mashu','mengjin']],
+		pangde:['male','qun',4,['mashu','jianchu']],
 
         menghuo:['male','shu',4,['huoshou','zaiqi']],
 		zhurong:['female','shu',4,['juxiang','lieren']],
@@ -44,6 +44,33 @@ character.shenhua={
 		menghuo:['zhurong'],
 	},
 	skill:{
+		jianchu:{
+			trigger:{player:'shaBegin'},
+			filter:function(event){
+				return event.target.num('he')>0;
+			},
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)<=0;
+			},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.discardPlayerCard(trigger.target,get.prompt('jianchu',trigger.target)).set('ai',function(button){
+					if(!_status.event.att) return 0;
+					if(get.position(button.link)=='e') return ai.get.value(button.link);
+					return 1;
+				}).set('logSkill',['jianchu',trigger.target]).set('att',ai.get.attitude(player,trigger.target)<=0);
+				'step 1'
+				if(result.links.length){
+					if(get.type(result.links[0])=='equip'){
+						trigger.directHit=true;
+					}
+					else if(trigger.cards){
+						trigger.target.gain(trigger.cards,'gain2','log');
+					}
+				}
+			}
+		},
 		redimeng:{
 			audio:'dimeng',
 			enable:'phaseUse',
@@ -3900,6 +3927,8 @@ character.shenhua={
 		re_yuanshao:'袁绍',
 		re_lusu:'鲁肃',
 
+		jianchu:'鞬出',
+		jianchu_info:'当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若以此法弃置的牌为装备牌，此【杀】不可被【闪】响应，若不为装备牌，该角色获得此【杀】',
 		redimeng:'缔盟',
 		redimeng_info:'出牌阶段限一次，你可以弃置X张牌选择两名其他角色（X为这两名角色的手牌差），你混合他们的手牌，然后令其中一名角色获得其中的一张牌，并令另一名角色获得其中的一张牌，然后重复此流程，直到这些牌均被获得为止',
 		reluanji:'乱击',
