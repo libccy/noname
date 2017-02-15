@@ -30763,8 +30763,8 @@
 					setTimeout(function(){
 						var node=ui.create.pause().animate('start');
 						node.appendChild(ui.sidebar);
-						ui.historybar.classList.add('paused');
-						ui.system.hide();
+						node.firstChild.innerHTML='正在测试';
+						node.removeEventListener('click',ui.click.resume);
 					},500);
 				}
 			},
