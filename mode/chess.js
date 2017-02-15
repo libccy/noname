@@ -573,6 +573,7 @@ mode.chess={
 									grid.listen(move);
 								}
 								else if(move){
+									grid.classList.add('pointerdiv');
 									grid.listen(ui.click.playergrid);
 									ui.movegrids.push(grid);
 								}

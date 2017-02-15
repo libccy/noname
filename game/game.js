@@ -31465,7 +31465,7 @@
 					}
     				for(var i in list){
     					if(this.firstChild.innerHTML!=list[i]){
-    						var node=ui.create.div('.identity.hidden',this.parentNode,ui.click.identity2);
+    						var node=ui.create.div('.identity.hidden.pointerdiv',this.parentNode,ui.click.identity2);
     						ui.create.div(node).innerHTML=list[i];
     						node.dataset.color=i;
     						ui.refresh(node);
