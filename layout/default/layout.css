@@ -57,6 +57,9 @@ table {
 	position: absolute;
 	transition: all 1s;
 }
+#window.testing>div:not(.pausedbg){
+	display: none !important;
+}
 #window.modepaused>div:not(.modenopause):not(#arena):not(.popped) {
 	opacity: 0.3;
 }
@@ -842,14 +845,14 @@ table {
 	transition: all 0.1s
 }
 
-#paused,#click {
+.pausedbg,#click {
 	left: 0;
 	top: 0;
 	width: 100%;
 	height: 100%;
 	z-index: 5;
 }
-#paused2 {
+.pausedbg>div:first-child {
 	font-size: 30px;
 	top: calc(50% - 17px);
 	left: calc(50% - 45px);
@@ -867,7 +870,7 @@ table {
 #sidebar3 {
 	text-align: right
 }
-#paused>#sidebar.right,#sidebar2.right,#sidebar3 {
+.pausedbg>#sidebar.right,#sidebar2.right,#sidebar3 {
 	left: calc(100% - 240px);
 }
 #sidebar3.left {

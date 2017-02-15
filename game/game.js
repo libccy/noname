@@ -4205,7 +4205,7 @@
             				dialogs[i].delete();
             			}
             			if(e.keyCode==32){
-            				var node=ui.window.querySelector('#paused');
+            				var node=ui.window.querySelector('pausedbg');
             				if(node){
             					node.click();
             				}
@@ -30807,8 +30807,7 @@
 
 
 				if(lib.config.test_game){
-					ui.arena.style.display='none';
-					ui.historybar.style.display='none';
+					ui.window.classList.add('testing');
 					lib.storage.test=true;
 					setTimeout(function(){
 						var node=ui.create.pause().animate('start');
@@ -30843,7 +30842,7 @@
 			pause:function(){
 				if(_status.pausing) return;
                 ui.click.shortcut(false);
-				var node=ui.create.div("#paused",ui.window);
+				var node=ui.create.div(".pausedbg",ui.window);
 				_status.pausing=true;
 				setTimeout(function(){
 					_status.pausing=false;
@@ -30860,7 +30859,7 @@
 					node.oncontextmenu=ui.click.resume;
 				}
 
-				var node2=ui.create.div('#paused2',node);
+				var node2=ui.create.div(node);
                 if(_status.connectMode){
                     node2.innerHTML='';
                 }
