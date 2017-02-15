@@ -110,7 +110,7 @@
 						onclick:function(bool){
 							game.saveConfig('compatiblemode',bool);
 							if(bool){
-								alert('兼容模式开启后可令部分不兼容的扩展强制运行，可能产生未知结果，详情参见游戏帮助');
+								alert('开启此选项可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭');
 							}
 						}
 					},
@@ -3656,7 +3656,7 @@
             globalId:0,
 		},
 		help:{
-			'游戏选项':'<ul><li>兼容模式<br>开启后可令部分不兼容的扩展强制执行，但会略微影响游戏速度。可能产生未知的结果，建议在开启后留意菜单-其它-游戏命令中的错误提示，并关闭扩展中的出错部分<li>开发者模式<br>开启后可用浏览器控制台控制游戏，或更新到开发版<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
+			'游戏选项':'<ul><li>兼容模式<br>开启后可增加游戏对旧扩展的兼容性，但可能产生未知的结果，同时对游戏速度有一定影响。在菜单-其它-命令中可看到错误提示<li>开发者模式<br>开启后可用浏览器控制台控制游戏，或更新到开发版<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
 			'滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
@@ -15165,7 +15165,7 @@
                         _status.gameStarted=true;
                         game.showHistory();
                     }
-                    if(!lib.hookmap[name]) return;
+                    if(!lib.hookmap[name]&&!lib.config.compatiblemode) return;
                     var event=this;
                     var start=event.player||game.me||game.players[0];
                     if(!game.players.contains(start)){
@@ -15213,34 +15213,77 @@
                                 }
 							}
 						}
-                        for(var i=0;i<roles.length;i++){
-                            if(event[roles[i]]==player){
-                                var triggername=player.playerid+'_'+roles[i]+'_'+name;
-                                if(lib.hook[triggername]){
-                                    for(var j=0;j<lib.hook[triggername].length;j++){
-                                        addList(lib.hook[triggername][j],player);
-                                    }
-                                }
-                                triggername=roles[i]+'_'+name;
-                                if(lib.hook.globalskill[triggername]){
-                                    for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
-                                        addList(lib.hook.globalskill[triggername][j],player);
-                                    }
-                                }
-                            }
-                        }
-                        if(lib.hook.globalskill[globalskill]){
-                            for(var j=0;j<lib.hook.globalskill[globalskill].length;j++){
-                                addList(lib.hook.globalskill[globalskill][j],player);
-                            }
-                        }
-                        for(var i in lib.hook.globaltrigger[name]){
-                            if(map[i]==player){
-                                for(var j=0;j<lib.hook.globaltrigger[name][i].length;j++){
-                                    addList(lib.hook.globaltrigger[name][i][j],map[i]);
-                                }
-                            }
-                        }
+						if(lib.config.compatiblemode){
+							(function(){
+								var skills=player.get('s',true).concat(lib.skill.global);
+	    						game.expandSkills(skills);
+	    						for(var i=0;i<skills.length;i++){
+	    							var trigger=get.info(skills[i]).trigger;
+	    							if(trigger){
+	    								var add=false;
+	    								if(player==event.player&&trigger.player){
+	    									if(typeof trigger.player=='string'){
+	    										if(trigger.player==name) add=true;
+	    									}
+	    									else if(trigger.player.contains(name)) add=true;
+	    								}
+	    								if((player==event.target||
+	    									(event.multitarget&&event.targets&&event.targets.contains(player)))&&
+	    									trigger.target){
+	    									if(typeof trigger.target=='string'){
+	    										if(trigger.target==name) add=true;
+	    									}
+	    									else if(trigger.target.contains(name)) add=true;
+	    								}
+	    								if(player==event.source&&trigger.source){
+	    									if(typeof trigger.source=='string'){
+	    										if(trigger.source==name) add=true;
+	    									}
+	    									else if(trigger.source.contains(name)) add=true;
+	    								}
+	    								if(trigger.global){
+	    									if(typeof trigger.global=='string'){
+	    										if(trigger.global==name) add=true;
+	    									}
+	    									else if(trigger.global.contains(name)) add=true;
+	    								}
+	    								if(add){
+											addList(skills[i],player);
+										}
+	    							}
+	    						}
+							}());
+						}
+						else{
+							for(var i=0;i<roles.length;i++){
+	                            if(event[roles[i]]==player){
+	                                var triggername=player.playerid+'_'+roles[i]+'_'+name;
+	                                if(lib.hook[triggername]){
+	                                    for(var j=0;j<lib.hook[triggername].length;j++){
+	                                        addList(lib.hook[triggername][j],player);
+	                                    }
+	                                }
+	                                triggername=roles[i]+'_'+name;
+	                                if(lib.hook.globalskill[triggername]){
+	                                    for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
+	                                        addList(lib.hook.globalskill[triggername][j],player);
+	                                    }
+	                                }
+	                            }
+	                        }
+	                        if(lib.hook.globalskill[globalskill]){
+	                            for(var j=0;j<lib.hook.globalskill[globalskill].length;j++){
+	                                addList(lib.hook.globalskill[globalskill][j],player);
+	                            }
+	                        }
+	                        for(var i in lib.hook.globaltrigger[name]){
+	                            if(map[i]==player){
+	                                for(var j=0;j<lib.hook.globaltrigger[name][i].length;j++){
+	                                    addList(lib.hook.globaltrigger[name][i][j],map[i]);
+	                                }
+	                            }
+	                        }
+						}
 						player=player.next;
 						if(!player||player==start){
 							break;
@@ -15255,94 +15298,6 @@
 						}
 					}
                 },
-				triggerx:function(name){
-					if(_status.video) return;
-                    if(name=='gameStart'){
-                        _status.gameStarted=true;
-                        game.showHistory();
-                    }
-					var event=this;
-					var i,j,iwhile,next,add;
-					var totalPopulation=game.players.length+game.dead.length+1;
-					if(event.player&&event.player.removed) return;
-					if(!event.player&&name!='gameStart') return;
-					event._endTrigger=event.player||game.me;
-
-					if(!game.players.contains(event._endTrigger)){
-						event._endTrigger=game.findNext(event._endTrigger);
-					}
-
-					var player=event._endTrigger;
-					var list=[];
-					for(i=0;i<game.players.length;i++){
-						for(j in game.players[i].tempSkills){
-							var expire=game.players[i].tempSkills[j];
-							if(expire==name||
-								(get.objtype(expire)=='array'&&expire.contains(name))||
-								(typeof expire=='function'&&expire(event,game.players[i],name))){
-								delete game.players[i].tempSkills[j];
-								game.players[i].removeSkill(j);
-							}
-							else if(typeof expire=='object'){
-								if(expire.player==name&&event.player==game.players[i]||
-									expire.target==name&&event.target==game.players[i]||
-									expire.source==name&&event.source==game.players[i]){
-									delete game.players[i].tempSkills[j];
-									game.players[i].removeSkill(j);
-								}
-							}
-						}
-					}
-					for(iwhile=0;iwhile<totalPopulation;iwhile++){
-                        if(!player.isOut()){
-                            var skills=player.get('s',true).concat(lib.skill.global);
-    						game.expandSkills(skills);
-    						for(i=0;i<skills.length;i++){
-    							var trigger=get.info(skills[i]).trigger;
-    							if(trigger){
-    								add=false;
-    								if(player==event.player&&trigger.player){
-    									if(typeof trigger.player=='string'){
-    										if(trigger.player==name) add=true;
-    									}
-    									else if(trigger.player.contains(name)) add=true;
-    								}
-    								if((player==event.target||
-    									(event.multitarget&&event.targets&&event.targets.contains(player)))&&
-    									trigger.target){
-    									if(typeof trigger.target=='string'){
-    										if(trigger.target==name) add=true;
-    									}
-    									else if(trigger.target.contains(name)) add=true;
-    								}
-    								if(player==event.source&&trigger.source){
-    									if(typeof trigger.source=='string'){
-    										if(trigger.source==name) add=true;
-    									}
-    									else if(trigger.source.contains(name)) add=true;
-    								}
-    								if(trigger.global){
-    									if(typeof trigger.global=='string'){
-    										if(trigger.global==name) add=true;
-    									}
-    									else if(trigger.global.contains(name)) add=true;
-    								}
-    								if(add) list.push([skills[i],player]);
-    							}
-    						}
-                        }
-						player=player.next;
-						if(!player||player==event._endTrigger){
-							break;
-						}
-					}
-					if(list.length){
-						list.sort(lib.sort.priority);
-						for(i=0;i<list.length;i++){
-							game.createTrigger(name,list[i][0],list[i][1],event);
-						}
-					}
-				},
 				untrigger:function(all,player){
 					if(all){
 						this.next.length=0;
@@ -20805,12 +20760,13 @@
 					var cards=player.get(event.position||'h');
 					var firstCheck=false;
 					range=get.select(event.selectCard);
-					if(!event._cardChoice&&typeof event.selectCard!='function'&&!event.complexCard&&range[1]!=-1){
+					if(!event._cardChoice&&typeof event.selectCard!='function'&&
+						!event.complexCard&&range[1]!=-1&&!lib.config.compatiblemode){
 						event._cardChoice=[];
 						firstCheck=true;
 					}
 					if(event.isMine()&&event.name=='chooseToUse'&&event.parent.name=='phaseUse'&&!event.skill&&
-						!event._targetChoice&&!firstCheck&&window.Map){
+						!event._targetChoice&&!firstCheck&&window.Map&&!lib.config.compatiblemode){
 						event._targetChoice=new Map();
 						for(var i=0;i<event._cardChoice.length;i++){
 							if(!lib.card[event._cardChoice[i].name].complexTarget){
