@@ -968,6 +968,7 @@ body>.background.upper {
 }
 .removing,.hidden {
 	opacity: 0 !important;
+	pointer-events: none;
 }
 
 #system>div>div.hidden {

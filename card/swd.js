@@ -2898,8 +2898,8 @@ card.swd={
 				return !player.hasSkill('xuanyuan')&&player.hp<=2
 			},
 			content:function(){
-				var e1=player.get('e','1');
-				if(e1&&e1.name.indexOf('xuanyuanjian')==0){
+				var e1=player.getEquip('xuanyuanjian');
+				if(e1){
 					player.discard(e1);
 				}
 			},

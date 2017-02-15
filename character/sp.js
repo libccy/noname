@@ -6053,7 +6053,7 @@ character.sp={
 		aocai2:{
 			enable:'chooseToUse',
 			filter:function(event,player){
-				return _status.currentPhase!==player&&event.type!='wuxie'&&event.getParent().name!='_chenhuodajie';
+				return _status.currentPhase!==player&&event.type!='wuxie'&&event.type!='trickuse';
 			},
 			onChooseToUse:function(event){
 				if(!game.online){

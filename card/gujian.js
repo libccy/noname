@@ -816,7 +816,7 @@ card.gujian={
                         case 2:target.recover();break;
                         case 3:target.changeHujia();break;
                         case 4:target.addTempSkill('qianxing',{player:'phaseBegin'});break;
-                        case 5:target.discard(target,get('j'));break;
+                        case 5:target.discard(target.get('j'));break;
                         case 6:{
                             if(target.isLinked()) target.link();
                             if(target.isTurnedOver()) target.turnOver();

@@ -253,7 +253,7 @@ card.sp={
 				if(card.name=='du') return 20;
 				var player=_status.event.player;
 				var nh=player.num('h');
-				if(nh<=player.hp){
+				if(!player.needsToDiscard()){
 					if(nh<3) return 0;
 					if(nh==3) return 5-ai.get.value(card);
 					return 7-ai.get.value(card);

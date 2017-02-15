@@ -10,7 +10,7 @@ character.swd={
 			swd_nicole:['female','qun',3,['huanjian','lingwu','minjing']],
 			swd_wangsiyue:['female','wei',3,['duishi','biyue']],
 			swd_weida:['female','qun',3,['yueren','zhenlie','duijue']],
-			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian']],
+			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian','xuanyuan']],
 
 			swd_chenjingchou:['male','wu',3,['youyin','yihua']],
 			swd_duguningke:['female','qun',3,['nlianji','touxi']],
@@ -2494,32 +2494,39 @@ character.swd={
 			}
 		},
 		xuanyuan:{
-			trigger:{global:'discardAfter'},
+			trigger:{player:'phaseBegin'},
+			unique:true,
 			filter:function(event,player){
-				if(event.player==player) return false;
-				for(var i=0;i<event.cards.length;i++){
-					if(event.cards[i].name=='xuanyuanjian'&&get.position(event.cards[i])=='d'){
-						return true;
-					}
-				}
-				return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.num('e','xuanyuanjian');
+				});
 			},
-			frequent:true,
 			content:function(){
-				"step 0"
-				if(trigger.delay==false) game.delay();
-				"step 1"
-				var cards=[];
-				for(var i=0;i<trigger.cards.length;i++){
-					if(event.cards[i].name=='xuanyuanjian'&&get.position(trigger.cards[i])=='d'){
-						cards.push(trigger.cards[i]);
+				var target=game.findPlayer(function(current){
+					return current!=player&&current.num('e','xuanyuanjian');
+				});
+				if(target){
+					var card=target.get('e','xuanyuanjian');
+					player.gain(card,target);
+					target.$give(card,player);
+					player.line(target,'green');
+				}
+			},
+			global:'xuanyuan_ai'
+		},
+		xuanyuan_ai:{
+			ai:{
+				effect:{
+					player:function(card,player){
+						if(player.hasSkill('xuanyuan')) return;
+						if(card.name=='xuanyuanjian'&&game.hasPlayer(function(current){
+							return current.hasSkill('xuanyuan')&&ai.get.attitude(player,current)<=0;
+						})){
+							return [0,0,0,0];
+						}
 					}
-				}
-				if(cards.length){
-					player.gain(cards);
-					player.$gain2(cards);
-					game.log(player,'发动','【轩辕】','，获得了',cards);
-				}
+				},
+				threaten:2.2
 			},
 		},
 		jilve:{
@@ -3786,6 +3793,7 @@ character.swd={
 			popup:false,
 			direct:true,
 			filter:function(event,player){
+				if(event.addedTargets) return false;
 				// return event.card&&get.color(event.card)=='red'&&event.player!=player;
 				return event.targets.length==1&&event.player!=player&&player.num('h')>=2;
 			},
@@ -3798,7 +3806,8 @@ character.swd={
 						return 5-ai.get.value(card);
 					}
 					return 0;
-				}
+				};
+				next.prompt2='反弹'+get.translation(trigger.player)+'的'+get.translation(trigger.card);
 				next.logSkill=['yihua',trigger.player];
 				"step 1"
 				if(result.bool){
@@ -7046,13 +7055,13 @@ character.swd={
 				return false;
 			},
 			prompt:function(event,player){
-				var list=game.hasPlayer(function(current){
+				var list=game.filterPlayer(function(current){
 					return current.hp<=player.hp&&current.isDamaged();
 				});
 				return get.prompt('lanzhi',list);
 			},
 			check:function(event,player){
-				var list=game.hasPlayer(function(current){
+				var list=game.filterPlayer(function(current){
 					return current.hp<=player.hp&&current.isDamaged();
 				});
 				var num=0;
@@ -7069,7 +7078,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				var list=game.hasPlayer(function(current){
+				var list=game.filterPlayer(function(current){
 					return current.hp<=player.hp&&current.isDamaged();
 				});
 				player.line(list,'green');
@@ -8739,7 +8748,7 @@ character.swd={
 		huajian:'化剑',
 		huajian_info:'出牌阶段结束时，你可以弃置一张牌，视为对一张角色使用一张杀',
 		xuanyuan:'轩辕',
-		xuanyuan_info:'锁定技，你无视轩辕剑的装备条件；失去轩辕剑时不流失体力',
+		xuanyuan_info:'锁定技，你无视【轩辕剑】的装备条件及流失体力的效果；准备阶段，如果其他角色的装备区内有【轩辕剑】，你可以获得之',
 		jilve:'极略',
 		jilve_backup:'极略',
 		jilve2:'极略',
