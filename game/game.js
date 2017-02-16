@@ -79,21 +79,10 @@
 			general:{
 				name:'通用',
 				config:{
-                    // game:{
-                    //     name:'游戏模式',
-                    //     init:'sgs',
-                    //     item:{
-                    //         sgs:'三国杀',
-                    //         hs:'炉石传说',
-                    //     },
-                    //     onclick:function(item){
-                    //         game.saveConfig('game',item);
-                    //         game.reload();
-                    //     }
-                    // },
 					low_performance:{
 						name:'流畅模式',
 						init:false,
+						intro:'减少部分游戏特效，提高游戏速度',
 						onclick:function(bool){
 							game.saveConfig('low_performance',bool);
 							if(bool){
@@ -107,6 +96,7 @@
 					compatiblemode:{
 						name:'兼容模式',
 						init:false,
+						intro:'提高对旧扩展的兼容性，但可能产生未知结果',
 						onclick:function(bool){
 							game.saveConfig('compatiblemode',bool);
 							setTimeout(function(){
@@ -119,46 +109,55 @@
 					confirm_exit:{
 						name:'确认退出',
 						init:false,
-						unfrequent:true
+						unfrequent:true,
+						intro:'离开游戏前弹出确认对话框',
 					},
 					auto_confirm:{
 						name:'自动确认',
 						init:true,
 						unfrequent:true,
+						intro:'当候选目标只有1个时，点击目标后无需再点击确认',
 					},
 					enable_drag:{
 						name:'启用拖拽',
 						init:true,
+						intro:'按住卡牌后可将卡牌拖至目标',
 						unfrequent:true,
 					},
 					enable_dragline:{
 						name:'拖拽指示线',
 						init:true,
 						unfrequent:true,
+						intro:'拖拽时显示虚线，可能降低游戏速度',
 					},
 					enable_touchdragline:{
 						name:'拖拽指示线',
 						init:false,
 						unfrequent:true,
+						intro:'拖拽时显示虚线，可能降低游戏速度',
 					},
 					wuxie_self:{
 						name:'不无懈自己',
 						init:true,
+						intro:'自己使用的单目标通常锦囊即将生效时，不询问无懈',
 					},
 					tao_enemy:{
 						name:'不对敌方使用桃',
 						init:false,
+						intro:'双方阵营明确的模式中（如对决），敌方角色濒死时不询问出桃',
 					},
 					touchscreen:{
 						name:'触屏模式',
 						init:false,
 						restart:true,
 						unfrequent:true,
+						intro:'开启后可使触屏设备反应更快',
 					},
 					swipe:{
 						name:'滑动手势',
 						init:true,
 						unfrequent:true,
+						intro:'在非滚动区域向四个方向滑动可执行对应操作',
 					},
 					swipe_down:{
 						name:'下划操作',
@@ -225,11 +224,13 @@
 					},
 					show_splash:{
 						name:'显示开始界面',
+						intro:'游戏开始前进入模式选择画面',
 						init:false,
 					},
 					game_speed:{
 						name:'游戏速度',
 						init:'mid',
+						intro:'',
 						item:{
 							vslow:'慢',
 							slow:'较慢',
@@ -238,18 +239,22 @@
 							vfast:'快',
 							vvfast:'很快',
 						},
+						intro:'设置不同游戏操作间的时间间隔'
 					},
 					sync_speed:{
 						name:'限制结算速度',
+						intro:'在动画结算完成前不执行下一步操作，开启后操作的间隔更长但画面更浏畅，在游戏较卡时建议开启',
 						init:true
 					},
 					enable_vibrate:{
 						name:'开启震动',
+						intro:'回合开始时使手机震动',
 						init:false
 					},
 					right_click:{
 						name:'右键功能',
 						init:'pause',
+						intro:'在空白区域点击右键时的操作',
 						unfrequent:true,
 						item:{
 							pause:'暂停',
@@ -303,6 +308,7 @@
 						name:'滚轮控制手牌',
 						init:true,
 						unfrequent:true,
+						intro:'开启后滚轮可使手牌横向滚动，在mac等可横向滚动的设备上建议关闭',
 						onclick:function(bool){
 							game.saveConfig('mousewheel',bool);
 							if(lib.config.touchscreen) return;
@@ -318,11 +324,13 @@
 					},
 					auto_check_update:{
 						name:'自动检查游戏更新',
+						intro:'进入游戏时检查更新',
 						init:false,
 						unfrequent:true
 					},
 					dev:{
 						name:'开发者模式',
+						intro:'开启后可使用浏览器控制台控制游戏，同时可更新到开发版',
 						init:false,
 						onclick:function(bool){
                             game.saveConfig('dev',bool);
@@ -23230,6 +23238,12 @@
 				var createConfig=function(config,position){
 	                var node=ui.create.div('.config',config.name);
 					node._link={config:config};
+					if(config.intro){
+						lib.setIntro(node,function(uiintro){
+							uiintro.style.width='160px';
+							uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
+						});
+					}
 	                if(config.item){
 	                    if(Array.isArray(config.init)){
 
