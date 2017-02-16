@@ -513,40 +513,6 @@ card.yunchou={
 				}
 			}
 		},
-		shushangkaihua:{
-			fullskin:true,
-			type:'trick',
-			enable:true,
-			selectTarget:-1,
-			multitarget:true,
-			multiline:true,
-			filterTarget:function(card,player,target){
-				return target.isFewestHandcard();
-			},
-			content:function(){
-				var num=[];
-				for(var i=0;i<targets.length;i++){
-					if(targets[i]==player){
-						num.push(2);
-					}
-					else{
-						num.push(1);
-					}
-				}
-				if(!targets.contains(player)){
-					targets.add(player);
-				}
-				game.asyncDraw(targets,num);
-			},
-			ai:{
-				order:1,
-				value:5,
-				result:{
-					target:1,
-					player:0.1,
-				}
-			}
-		},
 		yihuajiemu:{
 			fullskin:true,
 			type:'trick',

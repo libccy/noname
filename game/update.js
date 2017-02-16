@@ -14,7 +14,7 @@ window.noname_update={
         'mode/versus.js',
         // 'mode/guozhan.js',
         // 'mode/identity.js',
-        // 'mode/stone.js',
+        'mode/stone.js',
         // 'theme/simple/style.css',
         'layout/default/layout.css',
         // 'layout/long/layout.css',

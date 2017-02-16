@@ -2108,6 +2108,10 @@ mode.stone={
 			multiline:true,
 			content:function(){
 				'step 0'
+				if(!targets.length){
+					event.finish();
+					return;
+				}
 				var maxf=[],maxe=[];
 				for(var i=0;i<targets.length;i++){
 					if(targets[i].side==player.side){
@@ -3191,6 +3195,10 @@ mode.stone={
 			multiline:true,
 			content:function(){
 				'step 0'
+				if(!targets.length){
+					event.finish();
+					return;
+				}
 				var map=[];
 				for(var i=0;i<targets.length;i++){
 					map.push(0);
@@ -3349,18 +3357,22 @@ mode.stone={
 			selectTarget:-1,
 			content:function(){
 				'step 0'
-				var hs=targets[0].get('h',function(card){
-					return get.type(card)=='stonecharacter';
-				});
-				if(hs.length&&targets[0].canAddFellow()){
-					targets[0].useCard(targets[0],hs.randomGet(),false).noActCount=true;
+				if(targets[0]){
+					var hs=targets[0].get('h',function(card){
+						return get.type(card)=='stonecharacter';
+					});
+					if(hs.length&&targets[0].canAddFellow()){
+						targets[0].useCard(targets[0],hs.randomGet(),false).noActCount=true;
+					}
 				}
 				'step 1'
-				var hs=targets[1].get('h',function(card){
-					return get.type(card)=='stonecharacter';
-				});
-				if(hs.length&&targets[1].canAddFellow()){
-					targets[1].useCard(targets[1],hs.randomGet(),false).noActCount=true;
+				if(targets[1]){
+					var hs=targets[1].get('h',function(card){
+						return get.type(card)=='stonecharacter';
+					});
+					if(hs.length&&targets[1].canAddFellow()){
+						targets[1].useCard(targets[1],hs.randomGet(),false).noActCount=true;
+					}
 				}
 			},
 			ai:{
@@ -4664,6 +4676,10 @@ mode.stone={
 			multiline:true,
 			content:function(){
 				'step 0'
+				if(!targets.length){
+					event.finish();
+					return;
+				}
 				var map=[];
 				for(var i=0;i<targets.length;i++){
 					map.push(0);

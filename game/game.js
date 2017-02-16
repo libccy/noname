@@ -151,7 +151,7 @@
 						init:false,
 						restart:true,
 						unfrequent:true,
-						intro:'开启后可使触屏设备反应更快',
+						intro:'开启后可使触屏设备反应更快，但无法使用鼠标操作',
 					},
 					swipe:{
 						name:'滑动手势',
@@ -163,6 +163,7 @@
 						name:'下划操作',
 						init:'menu',
 						unfrequent:true,
+						intro:'向下滑动时执行的操作',
 						item:{
 							system:'显示按钮',
 							menu:'打开菜单',
@@ -174,6 +175,7 @@
 					},
 					swipe_up:{
 						name:'上划操作',
+						intro:'向上滑动时执行的操作',
 						init:'auto',
 						unfrequent:true,
 						item:{
@@ -187,6 +189,7 @@
 					},
 					swipe_left:{
 						name:'左划操作',
+						intro:'向左滑动时执行的操作',
 						init:'system',
 						unfrequent:true,
 						item:{
@@ -200,6 +203,7 @@
 					},
 					swipe_right:{
 						name:'右划操作',
+						intro:'向右滑动时执行的操作',
 						init:'chat',
 						unfrequent:true,
 						item:{
@@ -213,6 +217,7 @@
 					},
 					round_menu_func:{
 						name:'触屏按钮操作',
+						intro:'点击屏幕中圆形按钮时执行的操作',
 						init:'system',
 						unfrequent:true,
 						item:{
@@ -242,7 +247,7 @@
 					},
 					sync_speed:{
 						name:'限制结算速度',
-						intro:'在动画结算完成前不执行下一步操作，开启后操作的间隔更长但画面更浏畅，在游戏较卡时建议开启',
+						intro:'在动画结算完成前不执行下一步操作，开启后游戏操作的间隔更长但画面更浏畅，在游戏较卡时建议开启',
 						init:true
 					},
 					enable_vibrate:{
@@ -284,6 +289,7 @@
 					hoveration:{
 						name:'悬停菜单弹出时间',
 						unfrequent:true,
+						intro:'鼠标移至目标到弹出菜单的时间间隔',
 						init:'1000',
 						item:{
 							'500':'0.5秒',
@@ -468,6 +474,7 @@
 					},
                     fewplayer:{
                         name:'启用人数',
+						intro:'设置启用新版布局的最小人数（不足时切换至默认布局）',
                         init:'3',
                         // unfrequent:true,
                         item:{
@@ -652,7 +659,7 @@
 					change_skin:{
 						name:'开启换肤',
 						init:true,
-						intro:'双点头像或在右键菜单中换肤，皮肤可在image/skin文件夹中添加'
+						intro:'双点头像或在右键菜单中换肤，皮肤可在选项-文件-图片文件-皮肤文件中添加'
 					},
 					change_skin_auto:{
 						name:'自动换肤',
@@ -675,6 +682,7 @@
 					card_style:{
 						name:'卡牌样式',
 						init:'default',
+						intro:'设置正面朝上的卡牌的样式',
 						item:{
 							default:'默认',
 							wood:'木纹',
@@ -692,6 +700,7 @@
 					},
 					cardback_style:{
 						name:'卡背样式',
+						intro:'设置背面朝上的卡牌的样式',
 						init:'default',
 						item:{
 							default:'默认',
@@ -734,6 +743,7 @@
 					show_history:{
 						name:'出牌记录栏',
 						init:'off',
+						intro:'在屏幕左侧或右侧显示出牌记录',
 						unfrequent:true,
 						item:{
 							off:'关闭',
@@ -761,6 +771,7 @@
 					show_log:{
 						name:'历史记录栏',
 						init:'off',
+						intro:'在屏幕中部显示出牌文字记录',
 						unfrequent:true,
 						item:{
 							off:'关闭',
@@ -784,16 +795,19 @@
                         name:'自动清除历史记录',
                         init:false,
 						unfrequent:true,
+						intro:'开启后将定时清除历史记录栏的条目（而不是等记录栏满后再清除）'
                     },
 					log_highlight:{
 						name:'历史记录高亮',
 						init:true,
 						unfrequent:true,
+						intro:'开启后历史记录不同类别的信息将以不同颜色显示',
 					},
 					glow_phase:{
 						name:'当前回合角色高亮',
 						unfrequent:true,
 						init:'yellow',
+						intro:'设置当前回合角色的边框颜色',
 						item:{
 							none:'无',
 							yellow:'黄色',
@@ -825,6 +839,7 @@
 					player_border:{
 						name:'边框宽度',
 						init:'normal',
+						intro:'设置角色的边框宽度',
 						unfrequent:true,
                         item:{
                             slim:'窄',
@@ -864,6 +879,7 @@
                     },
                     show_time:{
 						name:'显示时间',
+						intro:'在屏幕顶部显示当前时间',
 						init:false,
 						unfrequent:true,
 						onclick:function(bool){
@@ -878,6 +894,7 @@
 					},
                     show_time2:{
 						name:'显示时间',
+						intro:'在触屏按钮处显示当前时间',
 						init:true,
 						unfrequent:true,
 						onclick:function(bool){
@@ -905,26 +922,31 @@
                     },
 					show_card_prompt:{
 						name:'显示出牌信息',
+						intro:'出牌时在使用者上显示卡牌名称',
 						init:true,
 						unfrequent:true,
 					},
 					hide_card_prompt_basic:{
 						name:'隐藏基本牌信息',
+						intro:'不显示基本牌名称',
 						init:false,
 						unfrequent:true,
 					},
 					hide_card_prompt_equip:{
 						name:'隐藏装备牌信息',
+						intro:'不显示装备牌名称',
 						init:false,
 						unfrequent:true,
 					},
 					show_phase_prompt:{
 						name:'显示阶段信息',
+						intro:'在当前回合不同阶段开始时显示阶段名称',
 						init:true,
 						unfrequent:true,
 					},
                     show_phaseuse_prompt:{
                         name:'出牌阶段提示',
+						intro:'在你出牌时显示提示文字',
                         init:true,
                         unfrequent:true,
                     },
@@ -935,21 +957,25 @@
 					},
                     fold_mode:{
                         name:'折叠模式菜单',
+						intro:'关闭后模式菜单中“更多”内的项目将直接展开',
                         init:true,
                         unfrequent:true,
                     },
 					auto_popped_config:{
 						name:'自动弹出选项',
+						intro:'鼠标移至选项按钮时弹出模式选择菜单',
 						init:true,
 						unfrequent:true,
 					},
 					auto_popped_history:{
 						name:'自动弹出历史',
+						intro:'鼠标移至暂停按钮时弹出历史记录菜单',
 						init:false,
 						unfrequent:true,
 					},
 					remember_dialog:{
 						name:'记住对话框位置',
+						intro:'移动对话框后新的对话框也将在移动后的位置显示',
 						init:false,
 						unfrequent:true,
 					},
@@ -975,6 +1001,7 @@
 					},
 					remember_round_button:{
 						name:'记住按钮位置',
+						intro:'重新开始后触屏按钮将保存的上一局的位置',
 						init:false,
 						unfrequent:true,
 					},
@@ -988,6 +1015,7 @@
 					},
                     character_dialog_tool:{
                         name:'自由选将显示',
+						intro:'点击自由选将时默认显示的条目',
                         init:'最近',
                         item:{
                             '收藏':'收藏',
@@ -998,6 +1026,7 @@
                     },
                     recent_character_number:{
                         name:'最近使用武将',
+						intro:'自由选将对话框中最近使用武将的数量',
                         init:'12',
                         item:{
                             '6':'6',
@@ -1009,31 +1038,37 @@
                     },
 					filternode_button:{
 						name:'触屏筛选按钮',
+						intro:'设置自由选将对话框中筛选按钮的样式',
                         init:true,
                         unfrequent:true,
 					},
                     show_favourite:{
                         name:'显示添加收藏',
+						intro:'在角色的右键菜单中显示添加收藏',
                         init:true,
                         unfrequent:true
                     },
                     show_favourite_menu:{
                         name:'显示收藏菜单',
+						intro:'在选项-武将中显示收藏一栏',
                         init:true,
                         unfrequent:true
                     },
                     show_ban_menu:{
                         name:'显示禁将菜单',
+						intro:'在选项-武将中显示禁将一栏',
                         init:true,
                         unfrequent:true
                     },
 					right_range:{
 						name:'显示距离信息',
+						intro:'在角色的右键菜单中显示距离等信息',
 						init:true,
 						unfrequent:true
 					},
 					hide_card_image:{
 						name:'隐藏卡牌背景',
+						intro:'所有卡牌将使用文字作为背景',
 						init:false,
 						unfrequent:true,
 						restart:true,
@@ -1149,7 +1184,8 @@
 						}
 					},
 					show_wuxie:{
-						name:'显示不询问无懈',
+						name:'显示无懈按钮',
+						intro:'在右上角显示不询问无懈',
 						init:false,
 						unfrequent:true,
 						onclick:function(bool){
@@ -1190,9 +1226,11 @@
 						name:'分离选项条',
 						init:true,
 						unfrequent:true,
+						intro:'开启后玩家在进行选择时不同的选项将分开，而不是连在一起',
 					},
 					blur_ui:{
 						name:'模糊效果',
+						intro:'在暂停或打开菜单时开启模糊效果',
 						init:false,
 						unfrequent:true,
 						onclick:function(bool){
@@ -1207,11 +1245,13 @@
 					},
 					damage_shake:{
 						name:'伤害抖动',
+						intro:'角色受到伤害时的抖动效果',
 						init:true,
 						unfrequent:true,
 					},
 					button_press:{
 						name:'按钮效果',
+						intro:'选项条被按下时将有按下效果',
 						init:true,
 						unfrequent:true,
 					},
@@ -1222,19 +1262,23 @@
 					},
 					die_flip:{
 						name:'阵亡效果',
+						intro:'阵亡后武将位置会随机移动',
 						init:true,
 						unfrequent:true,
 					},
 					animation:{
 						name:'游戏特效',
+						intro:'开启后属性伤害等会显示动画',
 						init:true,
 					},
 					skill_animation:{
 						name:'技能特效',
+						intro:'开启后觉醒技、限定技将显示全屏文字',
 						init:true,
 					},
 					target_shake:{
 						name:'目标特效',
+						intro:'一名玩家成为目标时的显示效果',
 						init:'off',
 						item:{
 							off:'关闭',
@@ -1249,6 +1293,7 @@
 					},
 					turned_style:{
 						name:'翻面文字',
+						intro:'角色被翻面时显示“翻面”',
 						init:true,
 						unfrequent:true,
 						onclick:function(bool){
@@ -1263,6 +1308,7 @@
 					},
                     link_style2:{
                         name:'横置样式',
+						intro:'设置角色被横置时的样式',
                         init:'chain',
                         unfrequent:true,
                         item:{
@@ -1299,6 +1345,7 @@
                     },
                     cardshape:{
                         name:'手牌显示',
+						intro:'将手牌设置为正方形或长方形',
                         init:'default',
                         unfrequent:true,
                         item:{
@@ -1348,12 +1395,13 @@
                         }
                     },
 					cursor_style:{
-						name:'指针样式',
+						name:'鼠标指针',
 						init:'auto',
+						intro:'设置为固定后鼠标指针将不随移动到的区域而变化',
 						unfrequent:true,
 						item:{
 							auto:'自动',
-							pointer:'指针'
+							pointer:'固定'
 						},
 						onclick:function(item){
 							game.saveConfig('cursor_style',item);
@@ -1577,10 +1625,6 @@
 					background_speak:{
 						name:'人物配音',
 						init:true,
-					},
-					background_ogg:{
-						name:'补全配音',
-						init:true
 					},
 					volumn_audio:{
 						name:'音效音量',
@@ -5767,7 +5811,6 @@
 				game.saveConfig('layout','long2');
 				game.saveConfig('background_music','music_off');
 				game.saveConfig('background_audio',false);
-				game.saveConfig('background_ogg',false);
 				game.saveConfig('debug',true);
 				game.reload();
 			},
@@ -8481,7 +8524,7 @@
                             if(lib.config.background_audio){
                                 var sex=player.sex=='female'?'female':'male';
                                 var audioinfo=lib.card[card.name].audio;
-        						if(audioinfo||lib.config.background_ogg){
+        						if(audioinfo||true){
         							if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder')){
         								game.playAudio('card',sex,card.name+'_'+card.nature);
         							}
@@ -9054,7 +9097,7 @@
                             if(lib.config.background_audio){
     							var sex=player.sex=='female'?'female':'male';
                                 var audioinfo=lib.card[card.name].audio;
-    							if(audioinfo||lib.config.background_ogg){
+    							if(audioinfo||true){
                                     if(typeof audioinfo=='string'&&audioinfo.indexOf('ext:')==0){
                                         game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
                                     }
@@ -9599,7 +9642,7 @@
     						if(lib.character[player.name]&&lib.character[player.name][4].contains('die_audio')){
     							game.playAudio('die',player.name);
     						}
-    						else if(lib.config.background_ogg){
+    						else if(true){
     							game.playAudio('die',player.name,function(){
 									game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
 								});
@@ -17679,7 +17722,7 @@
 				else if(audioinfo){
 					game.playAudio('skill',audioname);
 				}
-				else if(lib.config.background_ogg&&info.audio!==false){
+				else if(true&&info.audio!==false){
 					game.playSkillAudio(audioname);
 				}
 			}
@@ -23268,13 +23311,14 @@
 				var createConfig=function(config,position){
 	                var node=ui.create.div('.config',config.name);
 					node._link={config:config};
-					if(config.intro){
-						lib.setIntro(node,function(uiintro){
-							if(lib.config.touchscreen) _status.dragged=true;
-							uiintro.style.width='160px';
-							uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
-						});
+					if(!config.intro){
+						config.intro='设置'+config.name;
 					}
+					lib.setIntro(node,function(uiintro){
+						if(lib.config.touchscreen) _status.dragged=true;
+						uiintro.style.width='160px';
+						uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
+					});
 	                if(config.item){
 	                    if(Array.isArray(config.init)){
 
