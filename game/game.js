@@ -23311,14 +23311,22 @@
 				var createConfig=function(config,position){
 	                var node=ui.create.div('.config',config.name);
 					node._link={config:config};
-					if(!config.intro){
-						config.intro='设置'+config.name;
+					if(!config.clear){
+						if(config.name!='开启'){
+							if(!config.intro){
+								config.intro='设置'+config.name;
+							}
+							lib.setIntro(node,function(uiintro){
+								if(lib.config.touchscreen) _status.dragged=true;
+								uiintro.style.width='160px';
+								uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
+							});
+						}
 					}
-					lib.setIntro(node,function(uiintro){
-						if(lib.config.touchscreen) _status.dragged=true;
-						uiintro.style.width='160px';
-						uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
-					});
+					else{
+						node.innerHTML='<span>'+config.name+'</span>';
+						node.classList.add('pointerspan');
+					}
 	                if(config.item){
 	                    if(Array.isArray(config.init)){
 
@@ -23659,7 +23667,7 @@
                                 }
                             }
                             if(!connectMenu){
-                                var move=ui.create.div('.auto-hide.config','<div style="margin-right:10px">上移↑</div><div>下移↓</div>');
+                                var move=ui.create.div('.auto-hide.config','<div style="margin-right:10px" class="pointerdiv">上移↑</div><div class="pointerdiv">下移↓</div>');
                                 move.firstChild.listen(function(){
                                     if(node.previousSibling){
                                         node.parentNode.insertBefore(node,node.previousSibling);
@@ -23834,7 +23842,8 @@
 								name:lib.translate[i+'_noconf']||lib.translate[i],
 								init:true,
 								type:'autoskill',
-								onclick:clickAutoSkill
+								onclick:clickAutoSkill,
+								intro:lib.translate[i+'_info']
 							}
 						}
 					}
@@ -23857,6 +23866,7 @@
 						var skip=false;
 						var str='';
 						var str2='';
+						var str3='';
 						for(var j=0;j<forbid[i].length;j++){
 							if(!lib.skilllist.contains(forbid[i][j])){
 								skip=true;
@@ -23864,6 +23874,10 @@
 							}
 							str+=get.translation(forbid[i][j])+'+';
 							str2+=forbid[i][j]+'+';
+							str3+=get.translation(forbid[i][j])+'：'+lib.translate[forbid[i][j]+'_info'];
+							if(j<forbid[i].length-1){
+								str3+='<div class="placeholder slim" style="display:block;height:8px"></div>';
+							}
 						}
 						if(skip) continue;
 						str=str.slice(0,str.length-1);
@@ -23873,7 +23887,8 @@
 							name:str,
 							init:true,
 							type:'banskill',
-							onclick:clickBanSkill
+							onclick:clickBanSkill,
+							intro:str3
 						}
 					}
 
@@ -29067,6 +29082,7 @@
 								var item=ui.create.div('.config.indent',lib.config.gameRecord[lib.config.all.mode[i]].str+'<span>重置</span>',page);
 								item.style.height='auto';
 								item.lastChild.addEventListener('click',reset);
+								item.lastChild.classList.add('pointerdiv');
 								item.link=lib.config.all.mode[i];
 							}
 						}
@@ -29147,8 +29163,8 @@
 										createNode(lib.videos[i]);
 									}
 									ui.create.videoNode=createNode;
-									var importVideoNode=ui.create.div('.config.switcher',
-									'<span class="underlinenode slim">导入录像...</span>',function(){
+									var importVideoNode=ui.create.div('.config.switcher.pointerspan',
+									'<span class="underlinenode slim ">导入录像...</span>',function(){
 										this.nextSibling.classList.toggle('hidden');
 									},page);
 									importVideoNode.style.marginLeft='12px';
