@@ -2241,6 +2241,7 @@
 						},
 						restart:true,
 						frequent:true,
+						intro:'明忠模式详见帮助'
 					},
 		            connect_player_number:{
 		                name:'游戏人数',
@@ -2262,6 +2263,7 @@
 						init:false,
 						restart:true,
                         frequent:true,
+						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
 		            connect_double_character:{
 		                name:'双将模式',
@@ -2283,6 +2285,7 @@
 						name:'加强主公',
 						init:false,
 						restart:true,
+						intro:'为主公增加一个额外技能'
 					},
                 },
 		        config:{
@@ -2338,6 +2341,7 @@
 						},
 						restart:true,
 						frequent:true,
+						intro:'明忠模式详见帮助'
 					},
 		            player_number:{
 		                name:'游戏人数',
@@ -2359,6 +2363,7 @@
 						init:false,
 						restart:true,
                         frequent:true,
+						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
 		            double_character:{
 		                name:'双将模式',
@@ -2402,11 +2407,13 @@
 								_status.identityShown=true;
 								game.showIdentity(false);
 							}
-						}
+						},
+						intro:'游戏进行若干轮将自动显示所有角色的身份',
 					},
 					auto_mark_identity:{
 						name:'自动标记身份',
 						init:true,
+						intro:'根据角色的出牌行为自动标记可能的身份',
 					},
 		            ban_weak:{
 		                name:'屏蔽弱将',
@@ -2422,6 +2429,7 @@
 						name:'加强主公',
 						init:false,
 						restart:true,
+						intro:'为主公增加一个额外技能'
 					},
 					free_choose:{
 						name:'自由选将',
@@ -2489,7 +2497,8 @@
 								ui.continue_game.close();
 								delete ui.continue_game;
 							}
-						}
+						},
+						intro:'游戏结束后可选择用相同的武将再进行一局游戏'
 					},
 					dierestart:{
 						name:'死亡后显示重来',
@@ -2567,6 +2576,7 @@
 							ai_strategy_5:'天使',
 							ai_strategy_6:'仇主',
 						},
+						intro:'设置内奸对主忠反的态度'
 					},
 					difficulty:{
 						name:'AI对人类态度',
@@ -2658,11 +2668,13 @@
 						},
 						init:'2',
 						frequent:true,
+						intro:'第一个明置身份牌的角色可获得摸牌奖励'
 					},
 					connect_zhulian:{
 						name:'珠联璧合',
 						init:true,
 						frequent:true,
+						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
 					},
 		            connect_ban_weak:{
 		                name:'屏蔽弱将',
@@ -2709,11 +2721,13 @@
 						},
 						init:'2',
 						frequent:true,
+						intro:'第一个明置身份牌的角色可获得摸牌奖励'
 					},
 					zhulian:{
 						name:'珠联璧合',
 						init:true,
 						frequent:true,
+						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
 					},
 		            double_hp:{
 		                name:'双将体力上限',
@@ -2792,6 +2806,7 @@
 					continue_game:{
 						name:'显示再战',
 						init:true,
+						intro:'游戏结束后可选择用相同的武将再进行一局游戏',
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
 							if(get.config('continue_game')){
@@ -2907,6 +2922,7 @@
                         name:'末位可换牌',
                         init:true,
                         frequent:true,
+						intro:'最后行动的角色可在开局时重铸一次手牌'
                     },
                     connect_choice_num:{
                         name:'侯选武将数',
@@ -3104,14 +3120,17 @@
                         name:'末位可换牌',
                         init:true,
                         frequent:true,
+						intro:'最后行动的角色可在开局时重铸一次手牌'
                     },
                     replace_character_two:{
                         name:'替补模式',
                         init:false,
                         frequent:true,
+						intro:'每个额外选择一名武将，死亡后用该武将代替重新上场，替补武将用完时失败'
                     },
                     expand_dialog:{
                         name:'默认展开选将框',
+						intro:'选将框打开时直接显示全部武将（可能使游戏在开始时卡顿）',
                         init:false,
                     },
 					ban_weak:{
@@ -3243,6 +3262,7 @@
 								}
 							}
 						},
+						intro:'只控制一名角色，其他角色由AI控制'
 					},
 					ban_weak:{
 						name:'屏蔽弱将',
@@ -3420,6 +3440,7 @@
 					chessscroll_speed:{
 						name:'边缘滚动速度',
 						init:'20',
+						intro:'鼠标移至屏幕边缘时自动滚屏',
 						item:{
 							'0':'不滚动',
 							'10':'10格/秒',
@@ -3483,6 +3504,7 @@
 		            },
 					chessscroll_speed:{
 						name:'边缘滚动速度',
+						intro:'鼠标移至屏幕边缘时自动滚屏',
 						init:'20',
 						item:{
 							'0':'不滚动',
@@ -3531,60 +3553,6 @@
                         init:true,
                         frequent:true
                     }
-                }
-            },
-            story:{
-                name:'群侠',
-                config:{
-                    save:{
-						name:'选择历程',
-						init:'save1',
-						item:{
-							save1:'一',
-							save2:'二',
-							save3:'三',
-							save4:'四',
-                            save5:'五',
-							save6:'六',
-						},
-						restart:true,
-						frequent:true,
-					},
-					clear:{
-						name:'清除进度',
-						onclick:function(){
-							var node=this;
-							if(node._clearing){
-								game.save(get.config('save'),null);
-								game.reload();
-								return;
-							}
-							node._clearing=true;
-							node.innerHTML='单击以确认 (3)';
-							setTimeout(function(){
-								node.innerHTML='单击以确认 (2)';
-								setTimeout(function(){
-									node.innerHTML='单击以确认 (1)';
-									setTimeout(function(){
-										node.innerHTML='清除进度';
-										delete node._clearing;
-									},1000);
-								},1000);
-							},1000);
-						},
-						clear:true,
-						frequent:true,
-					},
-                    chessscroll_speed:{
-						name:'边缘滚动速度',
-						init:'20',
-						item:{
-							'0':'不滚动',
-							'10':'10格/秒',
-							'20':'20格/秒',
-							'30':'30格/秒',
-						}
-					},
                 }
             },
 			stone:{
@@ -3738,11 +3706,8 @@
             globalId:0,
 		},
 		help:{
-			'游戏选项':'<ul><li>兼容模式<br>开启后可增加游戏对旧扩展的兼容性，但可能产生未知的结果，同时对游戏速度有一定影响。在菜单-其它-命令中可看到错误提示<li>开发者模式<br>开启后可用浏览器控制台控制游戏，或更新到开发版<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
-			'滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
-			'<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
 			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
-			'<table><tr><td>a<td>切换托管<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
+			'<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆</ul>',
 			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
 			'<li>玩家<br>game.me<li>玩家的上/下家<br>game.me.previous/next'+
 			'<li>玩家的上/下家（含阵亡）<br>game.me.previousSeat/<br>nextSeat'+
@@ -23313,7 +23278,13 @@
 					node._link={config:config};
 					if(!config.clear){
 						if(config.name!='开启'){
-							if(!config.intro){
+							if(config.name=='屏蔽弱将'){
+								config.intro='强度过低的武将（孙策除外）不会出现在选将框，也不会被AI选择'
+							}
+							else if(config.name=='屏蔽强将'){
+								config.intro='强度过高的武将不会出现在选将框，也不会被AI选择'
+							}
+							else if(!config.intro){
 								config.intro='设置'+config.name;
 							}
 							lib.setIntro(node,function(uiintro){
