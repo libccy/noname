@@ -111,7 +111,7 @@
 							game.saveConfig('compatiblemode',bool);
 							setTimeout(function(){
 								if(lib.config.compatiblemode){
-									alert('开启此选项可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭');
+									alert('开启兼容模式可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭');
 								}
 							},500);
 						}
@@ -10911,7 +10911,12 @@
 							next.filterCard=get.filter(arguments[i]);
 						}
 						else if(typeof arguments[i]=='string'){
-							next.prompt=arguments[i];
+							if(next.prompt){
+								next.prompt2=arguments[i];
+							}
+							else{
+								next.prompt=arguments[i];
+							}
 						}
                         if(arguments[i]===null){
                             for(var i=0;i<arguments.length;i++){
@@ -15171,6 +15176,7 @@
                         game.showHistory();
                     }
                     if(!lib.hookmap[name]&&!lib.config.compatiblemode) return;
+					if(!game.players||!game.players.length) return;
                     var event=this;
                     var start=event.player||game.me||game.players[0];
                     if(!game.players.contains(start)){
@@ -21470,7 +21476,7 @@
             });
         },
 		loadMode:function(mode){
-			var next=game.createEvent('loadMode');
+			var next=game.createEvent('loadMode',false);
 			next.mode=mode;
 			next.setContent('loadMode');
 		},

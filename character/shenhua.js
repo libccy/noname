@@ -3531,7 +3531,7 @@ character.shenhua={
 				});
 				"step 1"
 				if(result.bool){
-					player.logSkill('tianxiang',result.targets);
+					player.logSkill('xintianxiang',result.targets);
 					trigger.untrigger();
 					trigger.player=result.targets[0];
 					trigger.player.addSkill('xintianxiang2');

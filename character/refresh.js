@@ -360,7 +360,7 @@ character.refresh={
 				return (event.source&&event.source.num('he')&&event.num>0&&event.source!=player);
 			},
 			content:function(){
-				player.gainPlayerCard([1,trigger.num],get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
+				player.gainPlayerCard([1,trigger.num],get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he').set('logSkill',['refankui',trigger.source]);
 			},
 			ai:{
 				effect:{

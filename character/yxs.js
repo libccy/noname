@@ -41,11 +41,59 @@ character.yxs={
 		yxs_zhangsanfeng:['male','wei',4,['zbudao','taiji']],
 		yxs_nandinggeer:['female','shu',3,['huli','xianqu','yixin']],
 
-		// yxs_weizhongxian:['male','qun',3,['zhuxin','wlianhuan']],
+		yxs_weizhongxian:['male','qun',3,['zhuxin','wlianhuan']],
 		// yxs_meixi:['female','shu',3,['liebo','yaoji']],
 		// yxs_lanlinwang:['male','shu',4,['guimian','yuxue']],
 	},
 	skill:{
+		zhuxin:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('h');
+			},
+			filter:function(event,player){
+				return player.num('h');
+			},
+			content:function(){
+				'step 0'
+				player.chooseToCompare(target);
+				'step 1'
+				if(result.bool){
+					target.damage();
+				}
+			},
+			ai:{
+				order:8,
+				result:{
+					target:function(player,target){
+						return ai.get.damageEffect(target,player,target);
+					}
+				}
+			}
+		},
+		wlianhuan:{
+			trigger:{source:'damageBegin'},
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&player.num('e');
+			},
+			direct:true,
+			content:function(){
+				'step 0'
+				var next=player.chooseToDiscard('e',get.prompt('wlianhuan',trigger.player),'弃置一张装备区内的牌使伤害+1');
+				next.ai=function(card){
+					if(ai.get.attitude(player,trigger.player)<0){
+						return 7-ai.get.value(card);
+					}
+					return 0;
+				}
+				next.logSkill=['wlianhuan',trigger.player];
+				'step 1'
+				if(result.bool){
+					trigger.num++;
+				}
+			}
+		},
 		huli:{
 			enable:'phaseUse',
 			filterCard:{suit:'heart'},
@@ -2549,6 +2597,9 @@ character.yxs={
 		yxs_tangbohu:'唐伯虎',
 		yxs_zhangsanfeng:'张三丰',
 		yxs_nandinggeer:'南丁格尔',
+		yxs_weizhongxian:'魏忠贤',
+		yxs_lanlinwang:'兰陵王',
+		yxs_meixi:'妹喜',
 
 		zhuxin:'诛心',
 		zhuxin_info:'出牌阶段限一次，你可以与一名其他角色拼点，若你赢，你对其造成一点伤害',

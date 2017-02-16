@@ -1709,7 +1709,9 @@ card.swd={
 			fullskin:true,
 			type:'trick',
 			enable:true,
-			filterTarget:true,
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
 			content:function(){
 				player.storage.zhufangshenshi=target;
 				player.addTempSkill('zhufangshenshi','phaseAfter');
