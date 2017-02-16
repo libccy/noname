@@ -22376,7 +22376,7 @@
 			}
 		},
         logv:function(player,card,targets,event,forced,logvid){
-            var node=ui.create.div();
+            var node=ui.create.div('.hidden');
             node.node={};
             logvid=logvid||get.id();
             if(!player){
@@ -22501,15 +22501,32 @@
                     node.targets=targets;
                 }
             }
-            if(lib.config.low_performance||ui.historybar.scrollTop>0){
-                node.classList.add('nozoom');
-            }
+			var fullheight=ui.historybar.offsetHeight;
+			var num=Math.round((fullheight-8)/50);
+			var margin=(fullheight-42*num)/(num+1);
+			node.style.transform='scale(0.8)';
             ui.historybar.insertBefore(node,ui.historybar.firstChild);
-            if(ui.historybar.childElementCount>20){
-                ui.historybar.lastChild.remove();
-            }
+			ui.refresh(node);
+			node.classList.remove('hidden');
+			for(var i=0;i<ui.historybar.childElementCount;i++){
+				var current=ui.historybar.childNodes[i];
+				if(i<num){
+					current.style.transform='scale(1) translateY('+(margin+i*(42+margin)-4)+'px)';
+				}
+				else{
+					if(!current.removetimeout){
+						current.style.opacity=0;
+						current.style.transform='scale(1) translateY('+fullheight+'px)';
+						current.removetimeout=setTimeout((function(current){
+							return function(){
+								current.remove();
+							};
+						}(current)),500);
+					}
+				}
+			}
             if(lib.config.touchscreen){
-                node.listen(ui.click.intro);
+                node.addEventListener('touchstart',ui.click.intro);
             }
             else{
                 node.addEventListener('mouseenter',ui.click.intro);

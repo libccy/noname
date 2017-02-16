@@ -400,7 +400,7 @@ table {
 	border-radius: 4px;
 	visibility: hidden;
 	opacity: 0;
-	overflow: scroll;
+	overflow: hidden;
 	z-index: 2;
 	transition-property: opacity,visibility;
 }
@@ -413,11 +413,7 @@ table {
 	margin: 0;
 	padding: 4px;
 	display: block;
-	position: relative;
-}
-#historybar>div:not(.nozoom) {
-	animation: history_start 0.5s;
-	-webkit-animation: history_start 0.5s;
+	position: absolute;
 }
 #historybar>div>.card {
 	transform: scale(0.403846);
@@ -1590,7 +1586,6 @@ div:not(.handcards)>.card>.info>span,
 	overflow: hidden;
 	opacity: 0
 }
-/*.control:not(.nozoom){width:0}*/
 .control.removing.removing2 {
 	transform: scale(0.2)
 }
