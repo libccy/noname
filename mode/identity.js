@@ -149,11 +149,6 @@ mode.identity={
 			_status.new_tutorial();
 		}
 		delete _status.new_tutorial;
-		if(lib.storage.test){
-			lib.config.game_speed='vfast';
-			_status.auto=true;
-			ui.auto.classList.add('glow');
-		}
 		if(_status.connectMode){
 			game.waitForPlayer(function(){
 				if(lib.configOL.identity_mode=='zhong'){
@@ -241,13 +236,6 @@ mode.identity={
 					player.storage.enhance_zhu=skill;
 				},game.zhu,skill);
 			}
-		}
-		if(lib.storage.test){
-			if(typeof lib.storage.test=='string'){
-				if(Math.random()<0.5) game.me.next.init(lib.storage.test);
-				else game.me.init(lib.storage.test);
-			}
-			game.showIdentity();
 		}
 		game.syncState();
 		event.trigger('gameStart');

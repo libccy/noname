@@ -164,7 +164,7 @@ mode.boss={
 				target.classList.add('highlight');
 			});
 		}
-		if(lib.storage.test){
+		if(lib.config.test_game){
 			event.current.classList.remove('highlight');
 			if(event.current.nextSibling&&event.current.nextSibling.classList.contains('player')){
 				event.current=event.current.nextSibling;
@@ -172,9 +172,6 @@ mode.boss={
 			else{
 				event.current=event.current.parentNode.childNodes[1];
 			}
-			lib.config.game_speed='vfast';
-			_status.auto=true;
-			ui.auto.classList.add('glow');
 			game.save('current',event.current.name);
 		}
 		"step 2"

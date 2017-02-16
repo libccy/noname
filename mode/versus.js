@@ -6,7 +6,7 @@ mode.versus={
 		if(_status.brawl&&_status.brawl.submode){
 			_status.mode=_status.brawl.submode;
 		}
-		if(lib.storage.test){
+		if(lib.config.test_game){
 			_status.mode='standard';
 		}
 		"step 1"
@@ -1321,10 +1321,7 @@ mode.versus={
 				}
 				if(!ui.cheat&&get.config('change_choice'))
 				ui.create.cheat();
-				if(lib.storage.test){
-					lib.config.game_speed='vfast';
-					_status.auto=true;
-					ui.auto.classList.add('glow');
+				if(lib.config.test_game){
 					setTimeout(function(){
 						event.switchToAuto();
 					},500);

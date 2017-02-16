@@ -57,7 +57,7 @@ table {
 	position: absolute;
 	transition: all 1s;
 }
-#window.testing>div:not(.pausedbg){
+#window.testing>*:not(.pausedbg){
 	display: none !important;
 }
 #window.modepaused>div:not(.modenopause):not(#arena):not(.popped) {

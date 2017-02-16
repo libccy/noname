@@ -417,11 +417,6 @@ mode.stone={
 			game.players[i].classList.add('noidentity');
 		}
 		game.enemy=game.me.next;
-		if(lib.storage.test){
-			lib.config.game_speed='vfast';
-			_status.auto=true;
-			ui.auto.classList.add('glow');
-		}
 		game.chooseCharacter();
 		"step 2"
 		if(_status.mode=='deck'){

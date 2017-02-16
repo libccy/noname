@@ -5,7 +5,7 @@ mode.chess={
 	start:function(){
 		"step 0"
 		_status.mode=get.config('chess_mode');
-		if(lib.storage.test){
+		if(lib.config.test_game){
 			_status.mode='combat';
 		}
 		if(_status.mode=='combat'){
@@ -105,14 +105,6 @@ mode.chess={
 					break;
 				}
 				case 'combat':{
-					if(lib.storage.test){
-						lib.config.game_speed='vfast';
-						_status.auto=true;
-						setTimeout(function(){
-							ui.updatehl();
-						},500);
-						ui.auto.classList.add('glow');
-					}
 					game.chooseCharacter();
 					break;
 				}

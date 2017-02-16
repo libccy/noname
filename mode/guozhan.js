@@ -46,12 +46,6 @@ mode.guozhan={
 			});
 		}
 		else{
-			if(lib.storage.test){
-				lib.config.game_speed='vfast';
-				lib.config.low_performance=true;
-				_status.auto=true;
-				ui.auto.classList.add('glow');
-			}
 			for(var i=0;i<game.players.length;i++){
 				game.players[i].node.name.hide();
 				game.players[i].node.name2.hide();

@@ -3735,7 +3735,7 @@
 			}
 			node._customintro=func;
 		},
-		setPopped:function(node,func,width,height,forceclick){
+		setPopped:function(node,func,width,height,forceclick,paused2){
 			node._poppedfunc=func;
 			node._poppedwidth=width;
 			node._poppedheight=height;
@@ -3748,6 +3748,9 @@
 			else{
 				node.addEventListener('mouseenter',ui.click.hoverpopped);
 				// node.addEventListener('mouseleave',ui.click.hoverpopped_leave);
+			}
+			if(paused2){
+				node._paused2=true;
 			}
 		},
 		placePoppedDialog:function(dialog,e){
@@ -5326,7 +5329,7 @@
                     if(window.isNonameServer){
                         lib.cheat.i();
                     }
-					else if(lib.config.dev&&!lib.storage.test&&(!_status.connectMode||lib.config.debug)){
+					else if(lib.config.dev&&(!_status.connectMode||lib.config.debug)){
                         lib.cheat.i();
                     }
 					lib.config.sort_card=get.sortCard(lib.config.sort);
@@ -5992,24 +5995,26 @@
 				delete _status.event._skillChoice;
 				setTimeout(game.check,300);
 			},
-			aa:function(){
-				game.saveConfig('test_game',!lib.config.test_game);
-				game.reload();
-			},
-			a:function(name){
-				if(lib.storage.test&&!name){
-					game.save('test',false);
-                    if(lib.config.mode=='identity'){
-                        game.saveConfig('double_character',false,true);
-                    }
+			a:function(bool){
+				if(lib.config.test_game){
+					game.saveConfig('test_game');
 				}
 				else{
-					game.save('test',name||true);
-                    if(lib.config.mode=='identity'){
-                        game.saveConfig('double_character',true,true);
-                    }
+					if(bool){
+						game.saveConfig('test_game','single');
+					}
+					else{
+						game.saveConfig('test_game',true);
+					}
 				}
 				game.reload();
+			},
+			as:function(){
+				ui.window.classList.remove('testing');
+				var bg=ui.window.querySelector('.pausedbg');
+				if(bg){
+					bg.remove();
+				}
 			},
 			uj:function(){
 				cheat.e('qilin');
@@ -20508,8 +20513,8 @@
 			}
 			if(ui.wuxie) ui.wuxie.hide();
 
-			if(lib.storage.test&&!_status.connectMode){
-				if(lib.config.test_game){
+			if(lib.config.test_game&&!_status.connectMode){
+				if(lib.config.test_game!='single'){
 					switch(lib.config.mode){
 						case 'identity':game.saveConfig('mode','guozhan');break;
 						case 'guozhan':game.saveConfig('mode','versus');break;
@@ -30635,7 +30640,7 @@
 				ui.pause=ui.create.system('暂停',ui.click.pause);
                 ui.pause.id='pausebutton';
 				if(!lib.config.touchscreen){
-					lib.setPopped(ui.pause,ui.click.pausehistory,220,400);
+					lib.setPopped(ui.pause,ui.click.pausehistory,220,400,null,true);
 				}
 				if(!lib.config.show_pause){
 					ui.pause.style.display='none';
@@ -30829,11 +30834,13 @@
 				delete window.resetExtension;
                 localStorage.removeItem(lib.configprefix+'disable_extension',true);
 
-
-
 				if(lib.config.test_game){
 					ui.window.classList.add('testing');
-					lib.storage.test=true;
+					lib.config.game_speed='vfast';
+					lib.config.low_performance=true;
+					lib.config.animation=false;
+					_status.auto=true;
+					ui.auto.classList.add('glow');
 					setTimeout(function(){
 						var node=ui.create.pause().animate('start');
 						node.appendChild(ui.sidebar);
@@ -31964,6 +31971,23 @@
                 if(uiintro._onopen){
                     uiintro._onopen();
                 }
+				if(this._paused2&&!lib.config.touchscreen){
+					game.pause2();
+					uiintro.classList.add('static');
+					var layer=ui.create.div('.poplayer',ui.window);
+					var clicklayer=function(e){
+						uiintro.delete();
+						layer.remove();
+						game.resume2();
+						e.stopPropagation();
+						return false;
+					}
+					uiintro.style.zIndex=21;
+					layer.onclick=clicklayer;
+					layer.oncontextmenu=clicklayer;
+					uiintro.addEventListener('mouseleave',clicklayer);
+					uiintro.addEventListener('click',clicklayer);
+				}
 			},
 			hoverpopped_leave:function(){
 				this._poppedalready=false;
