@@ -230,7 +230,6 @@
 					game_speed:{
 						name:'游戏速度',
 						init:'mid',
-						intro:'',
 						item:{
 							vslow:'慢',
 							slow:'较慢',
@@ -266,18 +265,21 @@
 						name:'右键显示信息',
 						init:true,
 						unfrequent:true,
-						restart:true
+						restart:true,
+						intro:'右键点击后弹出菜单',
 					},
 					hover_all:{
 						name:'悬停显示信息',
 						init:true,
 						unfrequent:true,
 						restart:true,
+						intro:'悬停后弹出菜单',
 					},
 					hover_handcard:{
 						name:'悬停手牌显示信息',
 						init:true,
 						unfrequent:true,
+						intro:'悬停手牌后弹出菜单',
 					},
 					hoveration:{
 						name:'悬停菜单弹出时间',
@@ -294,6 +296,7 @@
 					video:{
 						name:'保存录像',
 						init:'20',
+						intro:'游戏结束后保存录像在最大条数，超过后将从最早的录像开始删除（已收藏的录像不计入条数）',
 						item:{
 							'0':'关闭',
 							'5':'五局',
@@ -3669,7 +3672,7 @@
 			'游戏选项':'<ul><li>兼容模式<br>开启后可增加游戏对旧扩展的兼容性，但可能产生未知的结果，同时对游戏速度有一定影响。在菜单-其它-命令中可看到错误提示<li>开发者模式<br>开启后可用浏览器控制台控制游戏，或更新到开发版<li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。<li>自动确认<br>开启后当候选目标仅有1个时点击目标无需再点击确定<li>'+
 			'滚轮控制手牌<br>开启后滚轮可控制手牌的左右滚动，建议Mac等具备横向滚动功能的设备关闭此选项'+
 			'<li>游戏玩法<br>为游戏增加不同玩法，开启后可在帮助中查看介绍',
-			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击（需在设置中开启）显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
+			'游戏操作':'<ul><li>长按/鼠标悬停/右键单击显示信息<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管<li>键盘快捷键<br>'+
 			'<table><tr><td>a<td>切换托管<tr><td>w<td>切换不询问无懈<tr><td>▭<td>暂停</ul>',
 			'游戏命令':'<div style="margin:10px">变量名</div><ul style="margin-top:0"><li>场上角色<br>game.players<li>阵亡角色<br>game.dead'+
 			'<li>玩家<br>game.me<li>玩家的上/下家<br>game.me.previous/next'+
@@ -8097,7 +8100,9 @@
                         else ui.click.cancel();
                     }
 					event.dialog.close();
-					event.result.cards=event.result.links.slice(0);
+					if(event.result.links){
+						event.result.cards=event.result.links.slice(0);
+					}
 				},
 				discardPlayerCard:function(){
 					"step 0"
@@ -23240,6 +23245,7 @@
 					node._link={config:config};
 					if(config.intro){
 						lib.setIntro(node,function(uiintro){
+							_status.dragged=true;
 							uiintro.style.width='160px';
 							uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
 						});
