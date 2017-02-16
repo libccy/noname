@@ -23270,7 +23270,7 @@
 					node._link={config:config};
 					if(config.intro){
 						lib.setIntro(node,function(uiintro){
-							_status.dragged=true;
+							if(lib.config.touchscreen) _status.dragged=true;
 							uiintro.style.width='160px';
 							uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
 						});
