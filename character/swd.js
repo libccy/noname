@@ -5846,6 +5846,10 @@ character.swd={
 			content:function(){
 				"step 0"
 				var card=target.get('h').randomGet();
+				if(!card){
+					event.finish();
+					return;
+				}
 				target.discard(card);
 				var color=get.color(card);
 				var suit=get.suit(card);
@@ -7552,6 +7556,7 @@ character.swd={
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
 			},
+			logTarget:'target',
 			content:function(){
 				"step 0"
 				player.judge(function(){

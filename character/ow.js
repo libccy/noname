@@ -1859,14 +1859,13 @@ character.ow={
             }
         },
         feiren:{
-			trigger:{player:'useCard'},
+            trigger:{source:'damageBegin'},
 			forced:true,
-			priority:10,
-			filter:function(event){
-				return event.card.name=='sha';
+			filter:function(event,player){
+				return event.card&&event.card.name=='sha'&&get.suit(event.card)=='spade'&&event.notLink();
 			},
 			content:function(){
-				player.addTempSkill('unequip','useCardAfter');
+				trigger.num++;
 			},
             mod:{
                 targetInRange:function(card){
@@ -1878,22 +1877,10 @@ character.ow={
                     }
                 },
             },
-            group:['feiren2'],
             ai:{
                 threaten:1.4
             }
 		},
-        feiren2:{
-            trigger:{source:'damageBegin'},
-			forced:true,
-            popup:false,
-			filter:function(event,player){
-				return event.card&&event.card.name=='sha'&&get.suit(event.card)=='spade';
-			},
-			content:function(){
-				trigger.num++;
-			}
-        },
         feiren3:{
 			trigger:{player:'useCardAfter'},
 			filter:function(event,player){
@@ -2993,7 +2980,7 @@ character.ow={
         mujing_old_info:'每当你对攻击范围不含你的角色使用一张牌，你可以弃置目标一张牌；若你的手牌数不多于目标，你摸一张牌',
         feiren:'飞刃',
         feiren2:'飞刃',
-        feiren_info:'你的杀无视距离和防具；你的黑桃杀造成的伤害+1，梅花杀可以额外指定一个目标',
+        feiren_info:'你的杀无视距离；你的黑桃杀造成的伤害+1，梅花杀可以额外指定一个目标',
         zhanlong:'斩龙',
         zhanlong_info:'限定技，准备阶段，若你体力值为1，你可以弃置所有牌（至少一张），然后将三张杀置入你的手牌，若如此做，你本回合使用杀无次数限制',
         xie:'谐',

@@ -20061,6 +20061,9 @@
 				ui.me.hide();
 				ui.mebg.hide()
 				ui.autonode.hide();
+				if(lib.config.radius_size!='off'){
+					ui.historybar.style.borderRadius='0 0 0 4px';
+				}
 			}
             if(game.online){
                 var dialog=ui.create.dialog();
