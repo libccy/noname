@@ -650,8 +650,27 @@
                         }
                     },
 					change_skin:{
-						name:'双击换肤',
+						name:'开启换肤',
 						init:true,
+						intro:'双点头像或在右键菜单中换肤，皮肤可在image/skin文件夹中添加'
+					},
+					change_skin_auto:{
+						name:'自动换肤',
+						init:'60000',
+						item:{
+							'off':'关闭',
+							'30000':'半分钟',
+							'60000':'一分钟',
+							'120000':'两分钟',
+							'300000':'五分钟',
+						},
+						intro:'游戏每进行一段时间自动为一个随机角色更换皮肤',
+						onclick:function(item){
+							clearTimeout(_status.skintimeout);
+							if(item!='off'){
+								_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(item));
+							}
+						}
 					},
 					card_style:{
 						name:'卡牌样式',
@@ -1412,6 +1431,12 @@
                             map.show_time.show();
                             map.watchface.hide();
                         }
+						if(config.change_skin){
+							map.change_skin_auto.show();
+						}
+						else{
+							map.change_skin_auto.hide();
+						}
 						if(lib.config.image_background=='default'){
 							map.image_background_blur.hide();
 						}
@@ -30439,6 +30464,9 @@
 				if(lib.config.link_style2!='chain'){
 					ui.arena.classList.add('nolink');
 				}
+				if(lib.config.change_skin_auto!='off'){
+					_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
+				}
 
 				ui.arenalog=ui.create.div('#arenalog',ui.arena);
 				if(lib.config.show_log=='off'){
@@ -31241,6 +31269,101 @@
 			},
 		},
 		click:{
+			autoskin:function(){
+				if(!lib.config.change_skin) return;
+				var players=game.filterPlayer();
+				var change=function(player,num,callback){
+					if(num=='1'){
+						ui.click.skin(player.node.avatar,player.name,callback);
+					}
+					else{
+						ui.click.skin(player.node.avatar2,player.name2,callback);
+					}
+				};
+				var finish=function(){
+					if(lib.config.change_skin_auto!='off'){
+						_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
+					}
+				};
+				var autoskin=function(){
+					if(players.length){
+						var player=players.randomRemove();
+						var list=[];
+						if(player.name&&!player.classList.contains('unseen')){
+							list.push('1');
+						}
+						if(player.name2&&!player.classList.contains('unseen2')){
+							list.push('2');
+						}
+						if(list.length){
+							change(player,list.randomRemove(),function(bool){
+								if(bool){
+									finish();
+								}
+								else if(list.length){
+									change(player,list[0],function(bool){
+										if(bool){
+											finish();
+										}
+										else{
+											autoskin();
+										}
+									});
+								}
+								else{
+									autoskin();
+								}
+							});
+						}
+						else{
+							autoskin();
+						}
+					}
+				}
+				autoskin();
+			},
+			skin:function(avatar,name,callback){
+				var num=1;
+				if(lib.config.skin[name]){
+					num=lib.config.skin[name]+1;
+				}
+				var fakeavatar=avatar.cloneNode(true);
+				var finish=function(bool){
+					var player=avatar.parentNode;
+					if(bool){
+						fakeavatar.style.boxShadow='none';
+						player.insertBefore(fakeavatar,avatar.nextSibling);
+						setTimeout(function(){
+							fakeavatar.delete();
+						},100);
+					}
+					if(bool&&lib.config.animation&&!lib.config.low_performance){
+						player.$rare();
+					}
+					if(callback){
+						callback(bool);
+					}
+				}
+				var img=new Image();
+				img.onload=function(){
+					lib.config.skin[name]=num;
+					game.saveConfig('skin',lib.config.skin);
+					avatar.style.backgroundImage='url("'+img.src+'")';
+					finish(true);
+				}
+				img.onerror=function(){
+					if(lib.config.skin[name]){
+						finish(true);
+					}
+					else{
+						finish(false);
+					}
+					delete lib.config.skin[name];
+					game.saveConfig('skin',lib.config.skin);
+					avatar.setBackground(name,'character');
+				}
+				img.src=lib.assetURL+'image/skin/'+name+'/'+num+'.jpg';
+			},
             touchpop:function(forced){
                 if(lib.config.touchscreen||forced){
                     _status.touchpopping=true;
@@ -32952,30 +33075,7 @@
 					},500);
 					return;
 				}
-				var num=1;
-				if(lib.config.skin[player.name]){
-					num=lib.config.skin[player.name]+1;
-				}
-				var img=new Image();
-				img.onload=function(){
-					lib.config.skin[player.name]=num;
-					game.saveConfig('skin',lib.config.skin);
-					avatar.style.backgroundImage='url("'+img.src+'")';
-					if(lib.config.animation&&!lib.config.low_performance){
-						player.$rare();
-					}
-				}
-				img.onerror=function(){
-					if(lib.config.skin[player.name]){
-						if(lib.config.animation&&!lib.config.low_performance){
-							player.$rare();
-						}
-					}
-					delete lib.config.skin[player.name];
-					game.saveConfig('skin',lib.config.skin);
-					avatar.setBackground(player.name,'character');
-				}
-				img.src=lib.assetURL+'image/skin/'+player.name+'/'+num+'.jpg';
+				ui.click.skin(this,player.name);
 			},
 			avatar2:function(){
 				if(!lib.config.change_skin) return;
@@ -32990,30 +33090,7 @@
 					},500);
 					return;
 				}
-				var num=1;
-				if(lib.config.skin[player.name2]){
-					num=lib.config.skin[player.name2]+1;
-				}
-				var img=new Image();
-				img.onload=function(){
-					lib.config.skin[player.name2]=num;
-					game.saveConfig('skin',lib.config.skin);
-					avatar.style.backgroundImage='url("'+img.src+'")';
-					if(lib.config.animation&&!lib.config.low_performance){
-						player.$rare();
-					}
-				}
-				img.onerror=function(){
-					if(lib.config.skin[player.name2]){
-						if(lib.config.animation&&!lib.config.low_performance){
-							player.$rare();
-						}
-					}
-					delete lib.config.skin[player.name2];
-					game.saveConfig('skin',lib.config.skin);
-					avatar.setBackground(player.name2,'character');
-				}
-				img.src=lib.assetURL+'image/skin/'+player.name2+'/'+num+'.jpg';
+				ui.click.skin(this,player.name2);
 			},
 			player:function(){
 				return ui.click.target.apply(this,arguments);
