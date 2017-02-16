@@ -235,6 +235,7 @@ window.characterRank={
         'yxs_libai',
     ],
     bp:[
+        'yxs_weizhongxian',
         'pal_jiangcheng',
         'lifeng',
         'zhugeguo',
