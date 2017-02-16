@@ -123,7 +123,6 @@ character.xianjian={
 		yanzhan3:{
 			mod:{
 				cardRespondable:function(card,player){
-					console.log(_status.event.parent.skill,_status.event.parent.name)
 					if(_status.event.parent.skill=='yanzhan'&&
 					get.suit(card)!=get.suit(_status.event.parent.cards[0])) return false;
 				}

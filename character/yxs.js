@@ -453,7 +453,7 @@ character.yxs={
 				return !player.hasSkill('tongyu_guiyin')&&!player.getStat('damage');
 			},
 			content:function(){
-				player.recover();
+				player.draw();
 				player.setAvatar('yxs_luobinhan','yxs_handingdun');
 				player.removeSkill('lguiyin');
 				player.removeSkill('sheshu');
@@ -1218,14 +1218,9 @@ character.yxs={
 						}
 					}
 					target.gain(cards);
-					if(event.isMine()){
-						target.$draw(cards);
-					}
-					else{
-						target.$gain2(cards);
-					}
+					target.$gain2(cards);
 					if(target==game.me){
-						game.delay();
+						game.delayx();
 					}
 				}
 			},
@@ -2693,7 +2688,7 @@ character.yxs={
 		tongyu:'统御',
 		tongyu_info:'出牌阶段，你可以弃置一张牌，并转变为罗宾汉（每回合只能转变一次）',
 		lguiyin:'归隐',
-		lguiyin_info:'出牌阶段，若你本回合内未造成伤害，你可以回复一点体力，并转变为汉丁顿伯爵（每回合只能转变一次）',
+		lguiyin_info:'出牌阶段，若你本回合内未造成伤害，你可以摸一张牌，并转变为汉丁顿伯爵（每回合只能转变一次）',
 		lzhangyi:'仗义',
 		lzhangyi_info:'你可以将你弃置的卡牌交给一名其他角色',
 		yizhuang:'易装',

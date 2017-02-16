@@ -2360,7 +2360,7 @@ character.sp={
 					player.chooseTarget(true,function(card,player,target){
 						return player!=target;
 					}).set('ai',function(target){
-						return -ai.get.attitude(_status.event.player,target);
+						return -ai.get.attitude(_status.event.player,target)/Math.sqrt(1+target.hp);
 					});
 				}
 				else{
@@ -5056,14 +5056,9 @@ character.sp={
 						}
 					}
 					target.gain(cards);
-					if(event.isMine()){
-						target.$draw(cards);
-					}
-					else{
-						target.$gain2(cards);
-					}
+					target.$gain2(cards);
 					if(target==game.me){
-						game.delay();
+						game.delayx();
 					}
 				}
 			},
