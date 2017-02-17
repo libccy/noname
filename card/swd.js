@@ -1033,8 +1033,7 @@ card.swd={
 				value:[5,1],
 				result:{
 					target:function(player,target){
-						if(target.hasSkill('jiguanyaoshu_skill')) return 0.5;
-						return 1;
+						return 1/(1+target.num('e'));
 					}
 				}
 			}

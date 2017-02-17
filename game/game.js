@@ -12738,15 +12738,16 @@
                 },
                 removeAdditionalSkill:function(skill){
                     if(this.additionalSkills[skill]){
-                        if(typeof this.additionalSkills[skill]=='string'){
-                            this.removeSkill(this.additionalSkills[skill]);
+						var additionalSkills=this.additionalSkills[skill];
+                        delete this.additionalSkills[skill];
+                        if(typeof additionalSkills=='string'){
+                            this.removeSkill(additionalSkills);
                         }
-                        else if(Array.isArray(this.additionalSkills[skill])){
-                            for(var i=0;i<this.additionalSkills[skill].length;i++){
-                                this.removeSkill(this.additionalSkills[skill][i]);
+                        else if(Array.isArray(additionalSkills)){
+                            for(var i=0;i<additionalSkills.length;i++){
+                                this.removeSkill(additionalSkills[i]);
                             }
                         }
-                        delete this.additionalSkills[skill];
                     }
                 },
                 awakenSkill:function(skill,nounmark){

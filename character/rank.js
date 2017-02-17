@@ -33,7 +33,6 @@ window.characterRank={
         'old_yuanshu',
         'xunyu',
         'pal_murongziying',
-        'diaochan',
         'swd_jiliang',
         'swd_shuijing',
         'shen_caocao',
@@ -67,6 +66,7 @@ window.characterRank={
     a:[
         'hs_khadgar',
         'hs_tyrande',
+        'diaochan',
         'diy_zaozhirenjun',
         'pal_muchanglan',
         'ow_heiying',
@@ -98,7 +98,6 @@ window.characterRank={
         'gjqt_xiayize',
         'hs_yngvar',
         're_huanggai',
-        're_zhangliao',
         'hs_aedwin',
         'hs_antonidas',
         'chenlin',
@@ -142,6 +141,7 @@ window.characterRank={
     ],
     am:[
         'old_wangyi',
+        're_zhangliao',
         'jianyong',
         'zhoutai',
         'zhugejin',
@@ -419,6 +419,7 @@ window.characterRank={
         'yxs_yujix',
         'swd_jialanduo',
         'swd_jiting',
+        //......
         'sp_machao',
         're_zhaoyun',
         'fuwan',
