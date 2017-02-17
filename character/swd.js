@@ -86,7 +86,7 @@ character.swd={
 		// swd_zhanglie:['male','qun',4,['huajin','poxiao']],
 
 
-			swd_hanluo:['male','qun',5,['hzhenwei']],
+			swd_hanluo:['male','qun',5,['tiebi']],
 			swd_fu:['male','qun',5,['yudun']],
 			swd_linyue:['male','wei',3,['zhenjiu','lmazui']],
 			swd_zidashu:['male','wu',3,['shoulie','hudun']],
@@ -143,6 +143,31 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		tiebi:{
+			trigger:{global:'shaBegin'},
+			filter:function(event,player){
+				return player.num('h',{color:'black'})&&!event.target.hujia&&get.distance(player,event.target)<=1;
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				var next=player.chooseToDiscard(get.prompt('tiebi',trigger.target),{color:'black'});
+				next.ai=function(card){
+					if(ai.get.attitude(player,trigger.target)>0){
+						if(trigger.target.hp==1) return 10-ai.get.value(card);
+						return 7-ai.get.value(card);
+					}
+				};
+				next.logSkill=['tiebi',trigger.target];
+				"step 1"
+				if(result.bool){
+					trigger.target.changeHujia();
+				}
+			},
+			ai:{
+				threaten:1.1
+			}
+		},
 		shenyan:{
 			trigger:{source:'damageBegin'},
 			skillAnimation:true,
@@ -8512,6 +8537,8 @@ character.swd={
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
 
+		tiebi:'铁壁',
+		tiebi_info:'当距离你1以内的一名角色成为杀的目标时，若其没有护甲，你可以弃置一张黑色手牌使其获得一点护甲',
 		shenyan:'神炎',
 		shenyan_info:'限定技，当你即将造成火焰伤害时，你可以令此伤害+1，并对目标距离1以内的所有其他角色各造成一点火焰伤害',
 		xuanying:'旋影',

@@ -1591,6 +1591,7 @@ character.yxs={
 		nichang:{
 			trigger:{player:'phaseDrawBefore'},
 			check:function(event,player){
+				if(player.skipList.contains('phaseUse')) return true;
 				var suits=['spade','heart','diamond','club'];
 				var cards=player.get('h');
 				for(var i=0;i<cards.length;i++){
