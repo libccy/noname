@@ -379,6 +379,8 @@ window.characterRank={
         'sp_zhugeliang',
         'hs_guldan',
         're_ganning',
+        'caiwenji',
+        're_xushu',
     ],
     b:[
         'diy_liufu',
@@ -426,8 +428,6 @@ window.characterRank={
         'diy_weiyan',
         're_simayi',
         'shen_simayi',
-        'caiwenji',
-        're_xushu',
         'swd_hanluo',
         'swd_zhanggao',
         'simalang',

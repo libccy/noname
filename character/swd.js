@@ -8219,15 +8219,15 @@ character.swd={
 			content:function(){
 				"step 0"
 				player.chooseTarget(function(card,player,target){
-					return player.canUse(trigger.card,target);
+					return player.canUse('sha',target);
 				},get.prompt('lxianglong')).ai=function(target){
-					return ai.get.effect(target,trigger.card,player);
+					return ai.get.effect(target,{name:'sha'},player,player);
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('lxianglong');
-					player.line(result.targets);
-					player.useCard(trigger.card,trigger.cards,result.targets).animate=false;
+					player.logSkill('lxianglong',result.targets);
+					player.useCard({name:'sha'},trigger.cards,result.targets).animate=false;
+					game.delay();
 				}
 			},
 			ai:{
@@ -8609,8 +8609,8 @@ character.swd={
 		zhenjiu_info:'出牌阶段限一次，你可以将一张红色手牌置于一名角色的武将牌上，该角色于下一个准备阶段回复一点体力，然后获得此牌',
 		ljifeng:'疾风',
 		ljifeng_info:'锁定技，你的攻击范围+X，杀可以额外指定X个目标，X为你已损失的体力值',
-		lxianglong_info:'每当你闪避一张杀，可以将此杀对攻击范围内的一名角色使用',
 		lxianglong:'翔龙',
+		lxianglong_info:'每当你闪避一张杀，你可以视为使用一张杀',
 		shangxi:'伤袭',
 		shangxi_info:'准备阶段，你可以弃置一张牌，并对攻击范围内一名体力值不小于你的其他角色造成一点伤害',
 		fzhenwei:'镇威',
