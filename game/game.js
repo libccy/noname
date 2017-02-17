@@ -4258,6 +4258,12 @@
                             e.stopPropagation();
                             return false;
             			}
+						else if(e.keyCode==74&&(e.ctrlKey||e.metaKey)&&lib.node){
+							lib.node.debug();
+						}
+						else if(e.keyCode==27){
+							ui.click.configMenu();
+						}
                     }
                     else{
                         game.closePopped();
@@ -4307,6 +4313,12 @@
                             e.stopPropagation();
                             return false;
             			}
+						else if(e.keyCode==74&&(e.ctrlKey||e.metaKey)&&lib.node){
+							lib.node.debug();
+						}
+						else if(e.keyCode==27){
+							ui.click.config();
+						}
                     }
         		};
         		window.onload=function(){
@@ -36780,7 +36792,7 @@
 			},
 			equipResult:function(player,target,name){
 				var card=get.card();
-				if(card==undefined){
+				if(!card||card.name!=name){
 					card={name:name};
 				}
 				var value1=ai.get.value(card,target);
