@@ -73,11 +73,11 @@ character.sp={
 		zhuling:['male','wei',4,['zhanyi']],
 		dongbai:['female','qun',3,['lianzhu','xiehui']],
 
-		zhaoxiang:['female','shu',3,[]],
-		mazhong:['male','shu',4,[]],
-		dongyun:['male','shu',3,[]],
-		kanze:['male','wu',3,[]],
-		heqi:['male','wu',4,[]],
+		zhaoxiang:['female','shu',4,['fanghun','fuhan']],
+		// mazhong:['male','shu',4,[]],
+		// dongyun:['male','shu',3,[]],
+		// kanze:['male','wu',3,[]],
+		// heqi:['male','wu',4,[]],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
@@ -104,6 +104,157 @@ character.sp={
 		dongbai:['dongzhuo']
 	},
 	skill:{
+		fuhan:{
+			trigger:{player:'phaseBefore'},
+			unique:true,
+			skillAnimation:true,
+			forceunique:true,
+			filter:function(event,player){
+				return player.storage.fanghun2>0;
+			},
+			prompt:function(event,player){
+				var num=player.storage.fanghun2;
+				var mode=get.mode();
+				if(mode!='chess'&&mode!='tafang'&&mode!='stone'){
+					num=Math.min(num,game.players.length+game.dead.length);
+				}
+				return get.prompt('fuhan')+'（体力上限：'+num+'）';
+			},
+			check:function(event,player){
+				if(player.storage.fanghun2==1) return false;
+				if(player.hp<=1) return true;
+				if(player.storage.fanghun2==2) return false;
+				if(player.storage.fanghun2==3) return player.hp<3&&player.isLowestHp();
+				return true;
+			},
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i in lib.character){
+					if(!lib.filter.characterDisabled(i)&&lib.character[i][1]=='shu'){
+						list.push(i);
+					}
+				}
+				lib.remove('zhaoxiang');
+				var dialog=ui.create.dialog('将武将牌替换为一名角色','hidden');
+				dialog.add([list.randomGets(5),'character']);
+				player.chooseButton(dialog,true).ai=function(button){
+					return get.rank(button.link,true)-lib.character[button.link][2];
+				};
+				player.awakenSkill('fuhan');
+				'step 1'
+				var num=player.storage.fanghun2;
+				var mode=get.mode();
+				if(mode!='chess'&&mode!='tafang'&&mode!='stone'){
+					num=Math.min(num,game.players.length+game.dead.length);
+				}
+				player.reinit('zhaoxiang',result.links[0],num);
+			}
+		},
+		fanghun:{
+			init:function(player){
+				player.storage.fanghun=0;
+				player.storage.fanghun2=0;
+			},
+			intro:{
+				content:'mark'
+			},
+			trigger:{source:'damageAfter'},
+			forced:true,
+			filter:function(event){
+				return event.card&&event.card.name=='sha';
+			},
+			content:function(){
+				player.storage.fanghun++;
+				player.markSkill('fanghun');
+			},
+			group:['fanghun_sha','fanghun_shan','fanghun_draw'],
+			subSkill:{
+				draw:{
+					trigger:{player:['useCard','respond']},
+					forced:true,
+					popup:false,
+					filter:function(event){
+						return event.skill=='fanghun_sha'||event.skill=='fanghun_shan';
+					},
+					content:function(){
+						player.draw();
+						player.storage.fanghun2++;
+					}
+				},
+				sha:{
+					enable:['chooseToUse','chooseToRespond'],
+					filterCard:{name:'shan'},
+					viewAs:{name:'sha'},
+					viewAsFilter:function(player){
+						if(!player.storage.fanghun) return false;
+						if(!player.num('h','shan')) return false;
+					},
+					prompt:'将一张闪当杀使用或打出',
+					onuse:function(result,player){
+						player.storage.fanghun--;
+						if(!player.storage.fanghun){
+							player.unmarkSkill('fanghun');
+						}
+						else{
+							player.updateMarks();
+						}
+					},
+					check:function(){return 1},
+					ai:{
+						effect:{
+							target:function(card,player,target,current){
+								if(get.tag(card,'respondSha')&&current<0) return 0.6
+							}
+						},
+						respondSha:true,
+						skillTagFilter:function(player){
+							if(!player.storage.fanghun) return false;
+							if(!player.num('h','shan')) return false;
+						},
+						order:3.1,
+						useful:-1,
+						value:-1
+					}
+				},
+				shan:{
+					enable:['chooseToRespond'],
+					filterCard:{name:'sha'},
+					viewAs:{name:'shan'},
+					prompt:'将一张杀当闪打出',
+					viewAsFilter:function(player){
+						if(!player.storage.fanghun) return false;
+						if(!player.num('h','shan')) return false;
+					},
+					onrespond:function(result,player){
+						player.storage.fanghun--;
+						if(!player.storage.fanghun){
+							player.unmarkSkill('fanghun');
+						}
+						else{
+							player.updateMarks();
+						}
+					},
+					check:function(){return 1},
+					ai:{
+						respondShan:true,
+						skillTagFilter:function(player){
+							if(!player.storage.fanghun) return false;
+							if(!player.num('h','sha')) return false;
+						},
+						effect:{
+							target:function(card,player,target,current){
+								if(!player.storage.fanghun) return false;
+								if(get.tag(card,'respondShan')&&current<0) return 0.6
+							}
+						},
+						order:4,
+						useful:-1,
+						value:-1
+					}
+				}
+			}
+		},
 		yjixi:{
 			init:function(player){
 				player.storage.yjixi=0;
@@ -6557,9 +6708,10 @@ character.sp={
 			audio:2,
 			trigger:{player:'shaBefore'},
 			filter:function(event,player){
-				if(event.skill!='longdan_sha') return false;
+				if(event.skill!='longdan_sha'&&event.skill!='fanghun_sha') return false;
 				return event.target.num('h')>0;
 			},
+			logTarget:'target',
 			content:function(){
 				var card=trigger.target.get('h').randomGet();
 				player.gain(card,trigger.target);
@@ -6571,9 +6723,11 @@ character.sp={
 			audio:2,
 			trigger:{player:'respond'},
 			filter:function(event,player){
-				if(event.skill!='longdan_shan'&&event.skill!='longdan_sha') return false;
+				if(event.skill!='longdan_shan'&&event.skill!='longdan_sha'&&
+				event.skill!='fanghun_shan'&&event.skill!='fanghun_sha') return false;
 				return event.source&&event.source.num('h')>0;
 			},
+			logTarget:'source',
 			content:function(){
 				var card=trigger.source.get('h').randomGet();
 				player.gain(card,trigger.source);
@@ -7090,7 +7244,16 @@ character.sp={
 		sp_liubei:'sp刘备',
 		caochun:'曹纯',
 		dongbai:'董白',
+		zhaoxiang:'赵襄',
+		heqi:'贺齐',
+		kanze:'阚泽',
+		dongyun:'董允',
+		mazhong:'马忠',
 
+		fanghun:'芳魂',
+		fanghun_info:'当你使用【杀】造成伤害后，你获得1个“梅影”标记；你可以移去1个“梅影”标记来发动“龙胆”并摸一张牌',
+		fuhan:'扶汉',
+		fuhan_info:'限定技，回合开始时，你可以移去所有“梅影”标记，随机观看五名未登场的蜀势力角色，将武将牌替换为其中一名角色，并将体力上限数调整为本局游戏中移去“梅影”标记的数量（至多为游戏开始时的角色数），然后若你是体力值最低的角色，你回复1点体力',
 		yjixi:'觊玺',
 		yjixi_info:'觉醒技，结束阶段，若你连续三回合没有失去过体力，则你增加1点体力上限并回复1点体力，然后选择一项：获得技能“妄尊”或摸两张牌并获得当前主公的主公技',
 		xinyongsi:'庸肆',

@@ -420,6 +420,7 @@ window.characterRank={
         'swd_jialanduo',
         'swd_jiting',
         //......
+        'zhaoxiang',
         'sp_machao',
         're_zhaoyun',
         'fuwan',

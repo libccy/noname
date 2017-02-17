@@ -977,6 +977,9 @@ character.standard={
 					viewAs:{name:'shan'},
 					prompt:'将一张杀当闪打出',
 					check:function(){return 1},
+					viewAsFilter:function(player){
+						if(!player.num('h','sha')) return false;
+					},
 					ai:{
 						respondShan:true,
 						skillTagFilter:function(player){

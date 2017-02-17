@@ -9523,13 +9523,18 @@
 					"step 0"
 					game.log(player,'失去了'+get.cnNumber(num)+'点体力上限');
 					if(!event.forced&&typeof player.singleHp==='boolean'){
-						if(player.singleHp){
-							player.singleHp=false;
-							player.maxHp-=num-1;
+						if(num%2==1){
+							if(player.singleHp){
+								player.singleHp=false;
+								player.maxHp-=(num-1)/2;
+							}
+							else{
+								player.singleHp=true;
+								player.maxHp-=(num+1)/2;
+							}
 						}
 						else{
-							player.singleHp=true;
-							player.maxHp-=num;
+							player.maxHp-=num/2;
 						}
 					}
 					else{
@@ -9550,13 +9555,18 @@
 					"step 0"
 					game.log(player,'获得了'+get.cnNumber(num)+'点体力上限');
 					if(!event.forced&&typeof player.singleHp==='boolean'){
-						if(player.singleHp){
-							player.singleHp=false;
-							player.maxHp+=num;
+						if(num%2==1){
+							if(player.singleHp){
+								player.singleHp=false;
+								player.maxHp+=(num+1)/2;
+							}
+							else{
+								player.singleHp=true;
+								player.maxHp+=(num-1)/2;
+							}
 						}
 						else{
-							player.singleHp=true;
-							player.maxHp+=num-1;
+							player.maxHp+=num/2;
 						}
 					}
 					else{
@@ -10168,6 +10178,49 @@
                     }
                     return this;
                 },
+				reinit:function(from,to,maxHp){
+					var info1=lib.character[from];
+					var info2=lib.character[to];
+					if(this.name==from){
+						this.name=to;
+						this.sex=info2[0];
+						this.node.avatar.setBackground(to,'character');
+					}
+					else if(this.name2==from){
+						this.name2=to;
+						if(this.classList.contains('unseen')){
+							this.sex=info2[0];
+						}
+						this.node.avatar2.setBackground(to,'character');
+					}
+					else{
+						return this;
+					}
+					for(var i=0;i<info1[3].length;i++){
+						this.removeSkill(info1[3][i]);
+					}
+					for(var i=0;i<info2[3].length;i++){
+						this.addSkill(info2[3][i]);
+					}
+					var num=(maxHp||info2[2])-info1[2];
+					if(typeof this.singleHp=='boolean'){
+						if(this.singleHp){
+							this.maxHp+=(num+1)/2;
+							this.singleHp=false;
+						}
+						else{
+							this.maxHp+=(num-1)/2;
+							this.singleHp=true;
+						}
+					}
+					else{
+						this.maxHp+=num;
+					}
+					this.update();
+					if(this.singleHp===true&&!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
+						this.doubleDraw();
+					}
+				},
 				uninit:function(){
 					this.node.avatar.hide();
 					this.node.count.hide();
