@@ -6915,7 +6915,7 @@ character.yijiang={
 			trigger:{player:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.num('h')>0&&player.isDamaged();
 			},
 			content:function(){
 				"step 0"

@@ -3177,6 +3177,7 @@ character.hearth={
 		malymowang:{
 			trigger:{source:'damageBegin'},
 			forced:true,
+			usable:1,
 			filter:function(event){
 				return event.card&&get.type(event.card)=='trick'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
@@ -3192,7 +3193,23 @@ character.hearth={
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
 			content:function(){
-				player.gain(game.createCard(get.inpile('trick').randomGet()),'draw');
+				'step 0'
+				var list=get.inpile('trick');
+				list=list.randomGets(3);
+				for(var i=0;i<list.length;i++){
+					list[i]=['锦囊','',list[i]];
+				}
+				var dialog=ui.create.dialog('选择一张锦囊牌加入你的手牌',[list,'vcard'],'hidden');
+				player.chooseButton(dialog,true).ai=function(button){
+					var card={name:button.link[2]};
+					var value=ai.get.value(card);
+					if(get.tag(card,'damage')) value++;
+					return value;
+				};
+				'step 1'
+				if(result.bool){
+					player.gain(game.createCard(result.buttons[0].link[2]),'draw');
+				}
 			}
 		},
 		lingzhou:{
@@ -6013,7 +6030,7 @@ character.hearth={
 		liehun_info:'锁定技，结束阶段，你获得手牌中所有非基本牌的复制',
 		malymowang:'魔网',
 		malymowang2:'魔网',
-		malymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你随机获得一张锦囊牌',
+		malymowang_info:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你从3张随机锦囊中选择一张加入手牌',
 		lingzhou:'灵咒',
 		lingzhou_info:'每当你使用一张锦囊牌，可令一名角色摸一张牌或回复一点体力',
 		mieshi:'灭世',

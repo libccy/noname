@@ -69,15 +69,15 @@ card.hearth={
 			content:function(){
 				'step 0'
 				if(target.num('hej')){
-					player.choosePlayerCard('hej','重铸'+get.translation(target)+'的一张牌',target,true).visible=true;
+					var next=player.discardPlayerCard('hej',target,true);
+					next.visible=true;
+					next.delay=false;
 				}
 				else{
 					event.goto(2);
 				}
 				'step 1'
 				if(result.bool){
-					target.$throw(result.links,1000);
-					target.lose(result.links);
 					game.delay(0.5);
 				}
 				'step 2'
@@ -686,7 +686,7 @@ card.hearth={
 		shijieshu:'视界术',
 		shijieshu_info:'目标随机装备两张装备牌，然后弃置一张手牌',
 		zhaomingdan:'照明弹',
-		zhaomingdan_info:'观看一名其他角色的手牌，并重置其区域内的一张牌，然后摸一张牌',
+		zhaomingdan_info:'观看一名其他角色的手牌，并弃置其区域内的一张牌，然后其与你各摸一张牌',
 		jihuocard:'激活',
 		jihuocard_info:'摸一张牌，本回合手牌上限+2',
 	},

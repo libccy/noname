@@ -378,6 +378,7 @@ window.characterRank={
         'cuiyan',
         'sp_zhugeliang',
         'hs_guldan',
+        're_ganning',
     ],
     b:[
         'diy_liufu',
@@ -451,7 +452,6 @@ window.characterRank={
         'zhangyi',
         'yxs_baosi',
         'lingju',
-        're_ganning',
         'xin_yujin',
         'diy_feishi',
         'yxs_lvzhi',

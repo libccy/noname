@@ -462,16 +462,7 @@ character.gujian={
 							},
 							result:{
 								target:function(player,target){
-		    						var card=get.card();
-		    						if(card==undefined){
-		                                card={name:name};
-		                            }
-		    						var value1=ai.get.value(card,target);
-		    						var value2=0;
-		    						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card){
-										value2=ai.get.value(target[get.subtype(card)],target);
-									}
-		                            return Math.max(0,value1-value2)/5;
+									return ai.get.equipResult(player,target,name);
 		    					}
 							}
 						}

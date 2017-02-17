@@ -8278,7 +8278,10 @@
 							cards.push(event.result.links[i]);
 						}
 						event.result.cards=event.result.links.slice(0);
-						target.discard(cards);
+						var next=target.discard(cards);
+						if(event.delay===false){
+							next.delay=event.delay;
+						}
 					}
 				},
 				gainPlayerCard:function(){
@@ -22229,16 +22232,7 @@
 					}
 					card.ai.result.target=(function(name){
                         return (function(player,target){
-    						var card=get.card();
-    						if(card==undefined){
-                                card={name:name};
-                            }
-    						var value1=ai.get.value(card,target);
-    						var value2=0;
-    						if(target[get.subtype(card)]&&target[get.subtype(card)]!=card){
-                                value2=ai.get.value(target[get.subtype(card)],target);
-                            }
-                            return Math.max(0,value1-value2)/5;
+							return ai.get.equipResult(player,target,name);
     					});
                     }(i));
 				}
@@ -36771,6 +36765,22 @@
 					return value[value.length-1];
 				}
 				return 0;
+			},
+			equipResult:function(player,target,name){
+				var card=get.card();
+				if(card==undefined){
+					card={name:name};
+				}
+				var value1=ai.get.value(card,target);
+				var value2=0;
+				var current=target.get('e',get.subtype(card)[5]);
+				if(current&&current!=card){
+					value2=ai.get.value(current,target);
+					if(value2>0&&!target.needsToDiscard()){
+						return 0;
+					}
+				}
+				return Math.max(0,value1-value2)/5;
 			},
 			equipValue:function(card,player){
 				if(player==undefined||get.itemtype(player)!='player') player=get.owner(card);
