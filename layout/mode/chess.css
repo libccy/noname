@@ -91,6 +91,7 @@
 }
 #arena>.dialog.slim:not(.center){
     top:40px;
+    pointer-events: none;
 }
 #control{
     top:calc(100% - 155px);

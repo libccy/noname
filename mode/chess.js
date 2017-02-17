@@ -82,8 +82,8 @@ mode.chess={
 				case 'three':{
 					if(lib.config.continue_name_chess){
 						event._result={
-							friend:lib.config.continue_name_versus_three.friend,
-							enemy:lib.config.continue_name_versus_three.enemy,
+							friend:lib.config.continue_name_chess.friend,
+							enemy:lib.config.continue_name_chess.enemy,
 						}
 						_status.color=lib.config.continue_name_versus_three.color;
 						game.saveConfig('continue_name_chess');

@@ -21,7 +21,7 @@ window.noname_update={
         // 'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
         // 'layout/newlayout/global.css',
-        // 'layout/mode/stone.css',
+        'layout/mode/chess.css',
         // 'extension/boss/extension.js',
     ]
 }
