@@ -31249,6 +31249,18 @@
 				for(var i=0;i<num;i++){
 					ui.arena.appendChild(players[i]);
 				}
+				// ui.arena.classList.add('glass');
+				// for(var i=0;i<num;i++){
+				// 	var bg=ui.create.div('.glassbg');
+				// 	var bg2=ui.create.div(bg);
+				// 	ui.create.div(bg);
+				// 	var rect=players[i].getBoundingClientRect();
+				// 	bg2.style.backgroundImage='url("image/background/huangtian_bg.jpg")';
+				// 	bg2.style.width=ui.window.offsetWidth+'px';
+				// 	bg2.style.height=ui.window.offsetHeight+'px';
+				// 	bg2.style.transform='translate('+(-rect.left)+'px,'+(-rect.top)+'px)';
+				// 	players[i].insertBefore(bg,players[i].firstChild);
+				// }
 				return players;
 			},
 			me:function(hasme){

@@ -152,3 +152,32 @@ body{
 	background: rgba(0,0,0,0.3);
 	box-shadow: rgba(0,0,0,0.6) 0 0 5px inset;
 }
+
+.player>.glassbg{
+	left: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	border-radius: 8px;
+	box-shadow: none;
+	z-index: 1;
+	pointer-events: none;
+}
+.player>.glassbg>div:last-child{
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.4);
+}
+.player>.glassbg>div:first-child{
+	left: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+	transition-property: transform;
+	transition-duration: 0s;
+	background-size: cover;
+	-webkit-filter: blur(3px);
+}
