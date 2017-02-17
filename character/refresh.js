@@ -93,7 +93,7 @@ character.refresh={
 							player.chooseControl(list,function(){
 								var controls=_status.event.controls;
 								var player=_status.event.player;
-								if(controls.contains('tao')) return 'tao';
+								if(controls.contains('tao')&&(player.hp<=1||(player.hp==2&&!player.hasShan()))) return 'tao';
 								if(controls.contains('sha')){
 									var players=game.filterPlayer();
 									for(var i=0;i<players.length;i++){
@@ -104,6 +104,8 @@ character.refresh={
 										}
 									}
 								}
+								if(controls.contains('tao')) return 'tao';
+								if(controls.contains('jiu')) return 'jiu';
 								return 'cancel2';
 							}).set('prompt','是否视为使用一张基本牌？');
 						}

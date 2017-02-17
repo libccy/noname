@@ -659,7 +659,7 @@
 					change_skin:{
 						name:'开启换肤',
 						init:true,
-						intro:'双点头像或在右键菜单中换肤，皮肤可在选项-文件-图片文件-皮肤文件中添加'
+						intro:'双点头像或在右键菜单中换肤，皮肤可在选项-文件-图片文件-皮肤图片中添加'
 					},
 					change_skin_auto:{
 						name:'自动换肤',
@@ -673,6 +673,7 @@
 						},
 						intro:'游戏每进行一段时间自动为一个随机角色更换皮肤',
 						onclick:function(item){
+                            game.saveConfig('change_skin_auto',item);
 							clearTimeout(_status.skintimeout);
 							if(item!='off'){
 								_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(item));
@@ -6039,7 +6040,38 @@
                 targets.add(game.me);
 				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),targets);
 			},
-			r:function(){
+			r:function(bool){
+				var list=['s','ap','a','am','bp','b','bm','c','d'];
+				var str='';
+				for(var i=0;i<list.length;i++){
+					if(str) str+=' 、 ';
+					str+=list[i]+'-'+lib.rank[list[i]].length;
+				}
+				console.log(str);
+				for(var i in lib.characterPack){
+					if(!bool&&lib.config.all.sgscharacters.contains(i)) continue;
+					var map={};
+					var str='';
+					for(var j in lib.characterPack[i]){
+						var rank=get.rank(j);
+						if(!map[rank]){
+							map[rank]=1;
+						}
+						else{
+							map[rank]++;
+						}
+					}
+					for(var j=0;j<list.length;j++){
+						if(map[list[j]]){
+							if(str) str+=' 、 ';
+							str+=list[j]+'-'+map[list[j]];
+						}
+					}
+					if(str){
+						console.log(lib.translate[i+'_character_config']+'：'+str);
+					}
+				}
+
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){

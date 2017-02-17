@@ -6,7 +6,7 @@ character.hearth={
 		hs_wuther:['male','qun',4,['fengxian','jieming']],
 		hs_jgarrosh:['male','shu',4,['zhanhou','qiangxi']],
 		hs_malfurion:['male','wu',4,['jihuo']],
-		hs_guldan:['male','wei',3,['fenliu','hongxi']],
+		hs_guldan:['male','wei',3,['moxie','fuhua','hongxi']],
 		hs_anduin:['male','qun',3,['shengguang','shijie','anying']],
 		hs_sthrall:['male','wu',4,['tuteng','guozai','zuling']],
 		hs_waleera:['female','shu',3,['jianren','mengun','wlianji']],
@@ -47,7 +47,7 @@ character.hearth={
 		hs_kcthun:['male','qun',4,['luanji','xianji']],
 		hs_anomalus:['male','wei',4,['mobao']],
 		hs_blingtron:['male','shu',3,['zengli','xiubu']],
-		hs_yogg:['male','wu',4,['kuangluan']],
+		hs_yogg:['male','wu',3,['kuangluan','qianhou']],
 		hs_xialikeer:['female','shu',3,['duxin']],
 
 		hs_zhishigushu:['male','shu',4,['jiaohui']],
@@ -98,6 +98,264 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		fuhua:{
+			enable:'phaseUse',
+			filterCard:{name:'du'},
+			check:function(){return 1},
+			filterTarget:function(card,player,target){
+				return !target.hasSkill('moxie')&&!target.storage.fuhua_failed;
+			},
+			filter:function(event,player){
+				return player.num('h','du');
+			},
+			discard:false,
+			prepare:'give',
+			content:function(){
+				'step 0'
+				target.gain(cards,player);
+				var choice=1;
+				if(ai.get.attitude(target,player)>0||(target.hp<=1&&!target.hasSha())){
+					choice=0;
+				}
+				target.chooseControl(function(){
+					return choice;
+				}).set('choiceList',['获得技能魔血，每个出牌阶段开始时需交给'+get.translation(player)+'一张牌',
+				'视为'+get.translation(player)+'对你使用一张决斗，若你赢，本局不能再成为腐化目标']);
+				'step 1'
+				if(result.index==0){
+					target.storage.fuhua2=player;
+					target.addSkill('fuhua2');
+					target.addSkill('moxie');
+				}
+				else{
+					player.useCard({name:'juedou'},target);
+				}
+			},
+			ai:{
+				threaten:2,
+				order:8,
+				expos:0.2,
+				result:{
+					player:function(player,target){
+						if(ai.get.attitude(target,player)>0) return 1;
+						if(ai.get.effect(target,{name:'juedou'},player,player)>0) return 1.5;
+						return 0;
+					}
+				}
+			},
+			group:'fuhua3'
+		},
+		fuhua2:{
+			trigger:{player:'phaseUseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return player.storage.fuhua2.isIn()&&player.num('he')>0;
+			},
+			mark:'character',
+			intro:{
+				content:function(storage){
+					return '每个出牌阶段开始时需交给'+get.translation(storage)+'一张牌';
+				}
+			},
+			content:function(){
+				'step 0'
+				player.chooseCard('he',true,'交给'+player.storage.fuhua2+'一张牌');
+				'step 1'
+				if(result.bool){
+					player.storage.fuhua2.gain(result.cards,player);
+					player.$give(result.cards,player.storage.fuhua2);
+					player.line(player.storage.fuhua2,'green');
+				}
+			},
+			group:'fuhua2_remove',
+			onremove:true,
+			subSkill:{
+				remove:{
+					trigger:{global:'dieAfter'},
+					forced:true,
+					popup:false,
+					filter:function(event,player){
+						return event.player==player.storage.fuhua2;
+					},
+					content:function(){
+						player.removeSkill('fuhua2');
+					}
+				}
+			}
+		},
+		fuhua3:{
+			trigger:{player:'damageBefore'},
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				var evt=event.getParent(3);
+				return evt.name=='fuhua'&&evt.target==event.source;
+			},
+			content:function(){
+				trigger.getParent(3).target.storage.fuhua_failed=true;
+			}
+		},
+		moxie:{
+			trigger:{player:'duBegin'},
+			forced:true,
+			content:function(){
+				player.draw(2);
+			},
+			ai:{
+				threaten:1.2,
+				nodu:true,
+				usedu:true,
+			},
+			group:'moxie2'
+		},
+		moxie2:{
+			trigger:{player:'phaseEnd'},
+			forced:true,
+			content:function(){
+				var hs=player.get('h');
+				for(var i=0;i<hs.length;i++){
+					if(hs[i].name=='du'){
+						hs.splice(i--,1);
+					}
+				}
+				if(hs.length){
+					var card=hs.randomGet();
+					card.init([card.suit,card.number,'du']);
+					game.log(player,'将一张手牌转化为',{name:'du'});
+				}
+			}
+		},
+		moxue_old:{
+			trigger:{player:'phaseEnd'},
+			filter:function(event,player){
+				return game.hasPlayer(function(current){
+					return current.hp>player.hp;
+				});
+			},
+			logTarget:function(event,player){
+				return game.filterPlayer(function(current){
+					return current.hp>player.hp;
+				});
+			},
+			content:function(){
+				'step 0'
+				event.targets=game.filterPlayer(function(current){
+					return current.hp>player.hp;
+				});
+				get.sortSeat(event.targets);
+				'step 1'
+				if(event.targets.length){
+					event.target=event.targets.shift();
+					if(event.target.num('he',{color:'black'})){
+						event.target.chooseCard('he','交给'+get.translation(player)+'一张黑色牌，或失去一点体力',{color:'black'}).ai=function(card){
+							if(ai.get.attitude(event.target,player)>0) return 10-ai.get.value(card);
+							return 7-ai.get.value(card);
+						}
+					}
+					else{
+						event.target.loseHp();
+						event.redo();
+					}
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					player.gain(result.cards,event.target);
+					if(get.position(result.cards[0])=='e'){
+						event.target.$give(result.cards,player);
+					}
+					else{
+						event.target.$give(result.cards.length,player);
+					}
+				}
+				else{
+					event.target.loseHp();
+				}
+				event.goto(1);
+			}
+		},
+		gfuhun:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h')>0&&!player.isTurnedOver();
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('gfuhun'),function(card,player,target){
+					return target!=player&&target.num('h')>0;
+				}).ai=function(target){
+					return -ai.get.attitude(player,target);
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('gfuhun',result.targets);
+					event.target=result.targets[0];
+					player.chooseToCompare(event.target);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					event.target.goMad({player:'phaseAfter'});
+					if(!player.isTurnedOver()) player.turnOver();
+				}
+			},
+			ai:{
+				expose:0.2,
+				threaten:1.5
+			}
+		},
+		qianhou:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			content:function(){
+				var list=[];
+				for(var i=0;i<lib.inpile.length;i++){
+					if(lib.filter.filterCard({name:lib.inpile[i]},player)){
+						var info=lib.card[lib.inpile[i]];
+						if(info.type=='trick'&&!info.multitarget&&!info.notarget){
+							if(Array.isArray(info.selectTarget)){
+								if(info.selectTarget[0]>0&&info.selectTarget[1]>=info.selectTarget[0]){
+									list.push(lib.inpile[i]);
+								}
+							}
+							else if(typeof info.selectTarget=='number'){
+								list.push(lib.inpile[i]);
+							}
+						}
+					}
+				}
+				while(list.length){
+					var card={name:list.randomRemove()};
+					var info=get.info(card);
+					var targets=game.filterPlayer(function(current){
+						return lib.filter.filterTarget(card,player,current);
+					});
+					if(targets.length){
+						targets.sort(lib.sort.seat);
+						if(info.selectTarget==-1){
+							player.useCard(card,targets,'noai');
+						}
+						else{
+							var num=info.selectTarget;
+							if(Array.isArray(num)){
+								if(targets.length<num[0]) continue;
+								num=num[0]+Math.floor(Math.random()*(num[1]-num[0]+1));
+							}
+							else{
+								if(targets.length<num) continue;
+							}
+							player.useCard(card,targets.randomGets(num),'noai');
+						}
+						break;
+					}
+				}
+			}
+		},
 		longyi:{
 			mod:{
 				maxHandcard:function(player,num){
@@ -1356,23 +1614,23 @@ character.hearth={
 			forced:true,
 			priority:10,
 			filter:function(event,player){
-				return event.source&&event.source.isAlive()&&event.source!=player;
+				return event.source&&event.source.isIn()&&event.source!=player;
 			},
 			intro:{
 				content:'players'
 			},
 			content:function(){
 				trigger.source.goMad('phaseAfter');
-				if(!player.storage.kuangluan){
-					player.storage.kuangluan=[];
-				}
-				player.storage.kuangluan.add(trigger.source);
-				player.markSkill('kuangluan');
+				// if(!player.storage.kuangluan){
+				// 	player.storage.kuangluan=[];
+				// }
+				// player.storage.kuangluan.add(trigger.source);
+				// player.markSkill('kuangluan');
 			},
 			ai:{
 				threaten:0.3
 			},
-			group:['kuangluan2','kuangluan3']
+			// group:['kuangluan2','kuangluan3']
 		},
 		kuangluan2:{
 			trigger:{player:'phaseBegin'},
@@ -3080,14 +3338,15 @@ character.hearth={
 							else if(att<0){
 								max=false;
 							}
+							num=att*dh;
 						}
 					}
 					if(max) return 10;
 					return 0.5;
 				},
 				result:{
-					target:function(player,target){
-						return player.num('h')-target.num('h');
+					player:function(player,target){
+						return (player.num('h')-target.num('h'))*ai.get.attitude(player,target);
 					}
 				},
 				expose:0.2
@@ -4853,6 +5112,13 @@ character.hearth={
 				threaten:1.2
 			}
 		},
+		fenliu2:{
+			mod:{
+				maxHandcard:function(player,num){
+					return num+1;
+				}
+			}
+		},
 		hongxi:{
 			trigger:{global:'dieAfter'},
 			filter:function(event,player){
@@ -5544,6 +5810,14 @@ character.hearth={
 		hs_tyrande:'泰兰德',
 		hs_fenjie:'芬杰',
 
+		fuhua:'腐化',
+		fuhua2:'腐化',
+		fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个出牌阶段开始时需交给你一张牌；2. 视为你对其使用一张决斗，若你因此受到伤害，本局不能再对其发动腐化',
+		moxie:'魔血',
+		moxie2:'魔血',
+		moxie_info:'锁定技，你失去毒时不流失体力；你使用毒时摸两张牌；结束阶段，你将一张随机手牌转化为毒',
+		gfuhun:'附魂',
+		gfuhun_info:'结束阶段，若你未翻面，你可以和一名其他角色拼点，若你赢，你将武将牌翻至背面，该角色进入混乱状态直到下一回合结束',
 		longyi:'龙裔',
 		longyi_info:'锁定技，你的黑色牌不占用手牌上限',
 		zhongji:'重击',
@@ -5621,7 +5895,7 @@ character.hearth={
 		kuangluan:'狂乱',
 		kuangluan2:'狂乱',
 		// kuangluan_info:'锁定技，每当你于回合内使用一张通常锦囊牌，便于出牌阶段结束时随机使用一张通常锦囊牌（随机指定目标）',
-		kuangluan_info:'锁定技，每当一名其他角色对你造成伤害，该角色进入混乱状态直到当前回合结束；准备阶段，若上轮有至少两名不同角色因你而进入混乱状态，你回复全部体力并进入混乱状态进到本回合结束',
+		kuangluan_info:'锁定技，每当一名其他角色对你造成伤害，该角色进入混乱状态直到当前回合结束',
 		zengli:'赠礼',
 		zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
 		xiubu:'修补',
@@ -5793,6 +6067,8 @@ character.hearth={
 		aoshu:'奥术',
 		aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用',
 
+		qianhou:'千喉',
+		qianhou_info:'锁定技，准备阶段，你视为使用一张随机锦囊（随机指定目标）',
 		fengxing:'风行',
 		fengxing_info:'每当你于回合外首次失去牌，你可以弃置一张牌并摸两张牌',
 		xinci:'心刺',

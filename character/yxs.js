@@ -928,6 +928,7 @@ character.yxs={
 				if(result.bool){
 					result.targets[0].gain(card,player);
 					player.$give(1,result.targets[0]);
+					player.line(result.targets,'green');
 					game.delay();
 				}
 			},
@@ -1051,13 +1052,17 @@ character.yxs={
 				return _status.currentPhase!=player;
 			},
 			content:function(){
-				player.addTempSkill('chajue2',['phaseAfter','phaseBefore']);
+				player.addTempSkill('chajue2',{player:'phaseBegin'});
 			}
 		},
 		chajue2:{
 			trigger:{target:'useCardToBefore'},
 			forced:true,
 			priority:15,
+			mark:true,
+			intro:{
+				content:'杀或通常锦囊牌对你无效'
+			},
 			filter:function(event,player){
 				return get.type(event.card)=='trick'||event.card.name=='sha';
 			},
@@ -1077,7 +1082,7 @@ character.yxs={
 		tiewan:{
 			trigger:{global:'useCardAfter'},
 			filter:function(event,player){
-				return (event.card.viewAs||event.card.name)=='lebu'&&event.player!=player;
+				return get.type(event.card.viewAs||event.card.name)=='delay'&&event.player!=player;
 			},
 			direct:true,
 			content:function(){
@@ -1101,6 +1106,9 @@ character.yxs={
 					player.logSkill('tiewan');
 					player.useCard({name:'lebu'},result.cards,result.targets);
 				}
+			},
+			ai:{
+				threaten:1.5
 			}
 		},
 		qianglue:{
@@ -2674,9 +2682,9 @@ character.yxs={
 		heqin_info:'限定技，你可以与场上一名男性角色形成【和亲】状态，你与该男性角色于摸牌阶段摸牌数+1。你或者男性角色阵亡，【和亲】状态消失',
 		chajue:'察觉',
 		chajue2:'察觉',
-		chajue_info:'锁定技，你的回合外，你每受到一次伤害，任何【杀】或通常锦囊牌均对你无效，直到该回合结束。',
+		chajue_info:'锁定技，你的回合外，你每受到一次伤害，任何【杀】或通常锦囊牌均对你无效，直到你的回合开始',
 		tiewan:'铁腕',
-		tiewan_info:'每当其他角色使用乐不思蜀时，你可以立即将一张红色牌当作乐不思蜀使用',
+		tiewan_info:'每当其他角色使用延时类锦囊牌时，你可以立即将一张红色牌当作乐不思蜀使用',
 		qianglue:'强掠',
 		qianglue_info:'每当你的杀被闪避时，你可以进行一次判定，若结果为黑色，你可以获得对方的一张牌',
 		xiadao:'侠盗',

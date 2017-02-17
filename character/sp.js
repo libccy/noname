@@ -1731,6 +1731,7 @@ character.sp={
 				if(_status.currentPhase!=player) return false;
 				var type=get.type(event.card,'trick');
 				if(type!='basic'&&type!='trick') return false;
+				if(event.noai) return false;
 				return game.hasPlayer(function(target){
 					return !event.targets.contains(target)&&target.num('he')>0;
 				});

@@ -1920,7 +1920,7 @@ card.swd={
 			skills:['yiluan'],
 			ai:{
 				basic:{
-					equipValue:7
+					equipValue:6
 				}
 			},
 		},
@@ -3341,24 +3341,23 @@ card.swd={
 			check:function(card){
 				return 6-ai.get.value(card);
 			},
+			filter:function(event,player){
+				return !player.isTurnedOver();
+			},
 			filterTarget:function(card,player,target){
-				return target.num('h')<player.num('h');
+				return target!=player&&!target.isMad();
 			},
 			content:function(){
 				'step 0'
-				var card=get.cards(0);
-				ui.discardPile.appendChild(card);
-				player.showCards('意乱',card);
-				event.bool=(get.color(card)=='black');
+				player.judge(function(card){
+					return get.color(card)=='black'?1:0;
+				});
 				'step 1'
-				if(!event.bool){
-					// target.draw();
+				if(result.color=='red'){
+					game.asyncDraw([player,target]);
 				}
 				else{
-					var e5=player.getEquip('sifeizhenmian');
-					if(e5){
-						player.discard(e5);
-					}
+					if(!player.isTurnedOver()) player.turnOver();
 					target.goMad({player:'phaseAfter'});
 				}
 			},
@@ -3366,8 +3365,7 @@ card.swd={
 				order:10,
 				result:{
 					target:function(player,target){
-						if(target.isMad()) return 0;
-						return -1;
+						return -target.num('h');
 					}
 				}
 			}
@@ -4987,9 +4985,9 @@ card.swd={
 		guangshatianyi_bg:'纱',
 		guangshatianyi_info:'锁定技，每当你即将受到伤害，有三分之一的概率令伤害减一',
 		sifeizhenmian:'四非真面',
-		sifeizhenmian_info:'出牌阶段限一次，你可以弃置一张牌并指定一名手牌数少于你的角色，你亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束',
+		sifeizhenmian_info:'出牌阶段限一次，若你没翻面，你可以弃置一张牌并指定一名其他角色进行判定，若结果为黑色，你翻面，该角色进入混乱状态直到下一回合结束；若结果为红色，你与其各摸一张牌',
 		yiluan:'意乱',
-		yiluan_info:'出牌阶段限一次，你可以弃置一张牌并指定一名手牌数少于你的角色，你亮出牌堆顶的一张牌，若此牌为黑色，你弃置四非真面，该角色进入混乱状态直到下一回合结束',
+		yiluan_info:'出牌阶段限一次，若你没翻面，你可以弃置一张牌并指定一名其他角色进行判定，若结果为黑色，你翻面，该角色进入混乱状态直到下一回合结束；若结果为红色，你与其各摸一张牌',
 		donghuangzhong:'东皇钟',
 		xuanyuanjian:'轩辕剑',
 		xuanyuanjian2:'轩辕剑',

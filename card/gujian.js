@@ -741,7 +741,7 @@ card.gujian={
             },
             ai:{
                 order:2,
-                value:[5,1],
+                value:[4,1],
                 useful:1,
                 result:{
                     target:-1.5

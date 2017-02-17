@@ -54,6 +54,13 @@ card.sp={
 			ai:{
 				value:-5,
 				useful:6,
+				result:{
+					player:function(player,target){
+						if(player.hasSkillTag('usedu')) return 5;
+						return -1;
+					}
+				},
+				order:7.5
 			},
 			enable:true,
 			modTarget:true,
@@ -532,6 +539,7 @@ card.sp={
 			popup:false,
 			forced:true,
 			filter:function(event,player){
+				if(player.hasSkillTag('nodu')) return false;
 				if(event.cards){
 					for(var i=0;i<event.cards.length;i++){
 						if(event.cards[i].name=='du'&&event.cards[i].original!='j') return true;

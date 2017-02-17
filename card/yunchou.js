@@ -241,7 +241,7 @@ card.yunchou={
 			},
 			ai:{
 				order:6,
-				value:[4,1],
+				value:[3,1],
 				result:{
 					target:function(player,target){
 						return -2/Math.sqrt(1+target.num('h'));
@@ -322,8 +322,10 @@ card.yunchou={
 					event.current.chooseBool('是否响应'+get.translation(target)+'的舌战群儒？',function(event,player){
 						if(ai.get.attitude(player,_status.event.source)>=0) return false;
 						var hs=player.get('h');
+						var dutag=player.hasSkillTag('nodu');
 						for(var i=0;i<hs.length;i++){
 							var value=ai.get.value(hs[i],player);
+							if(hs[i].name=='du'&&dutag) continue;
 							if(value<0) return true;
 							if(!_status.event.hasTarget){
 								if(hs[i].number>=8&&value<=7) return true;
