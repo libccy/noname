@@ -85,8 +85,9 @@ mode.chess={
 							friend:lib.config.continue_name_chess.friend,
 							enemy:lib.config.continue_name_chess.enemy,
 						}
-						_status.color=lib.config.continue_name_versus_three.color;
+						_status.color=lib.config.continue_name_chess.color;
 						game.saveConfig('continue_name_chess');
+						game.delay(0.5);
 					}
 					else{
 						game.chooseCharacterDouble(function(i){
@@ -118,6 +119,8 @@ mode.chess={
 		if(_status.mode=='three'){
 			_status.mylist=result.friend;
 			_status.enemylist=result.enemy;
+			_status.friendBackup=_status.mylist.slice(0);
+			_status.enemyBackup=_status.enemylist.slice(0);
 		}
 		var mylistmap,enemylistmap;
 		if(event.video){

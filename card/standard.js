@@ -810,14 +810,14 @@ card.standard={
 						if(target.hasSkillTag('notrick')) return 0;
 						if(event.player==target){
 							if(player.hasSkill('naman')) return -1;
-							if(ai.get.attitude(target,player)<0){
+							if(ai.get.attitude(target,player)<0||event.player.hp<=1){
 								return ai.get.unuseful2(card)
 							}
 							return -1;
 						}
 						else{
 							if(target.hasSkill('naman')) return -1;
-							if(ai.get.attitude(player,target)<0){
+							if(ai.get.attitude(player,target)<0||event.player.hp<=1){
 								return ai.get.unuseful2(card)
 							}
 							return -1;

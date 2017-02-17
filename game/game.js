@@ -12870,6 +12870,7 @@
                     }
                 },
 				removeSkill:function(skill){
+					if(!skill) return;
                     if(Array.isArray(skill)){
                         for(var i=0;i<skill.length;i++){
                             this.removeSkill(skill[i]);

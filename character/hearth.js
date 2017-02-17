@@ -584,13 +584,30 @@ character.hearth={
 				}
 				var skill=list.randomGet();
 				var name='yushou_'+skill;
-				player.addTempSkill(name,{player:'phaseBegin'});
+				player.addSkill(name);
 				player.markSkillCharacter(name,'stone_'+skill,lib.translate[name],lib.translate[name+'_info']);
 			},
 			ai:{
 				order:9.5,
 				result:{
 					player:1
+				}
+			},
+			group:'yushou_lose'
+		},
+		yushou_lose:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			popup:false,
+			silent:true,
+			content:function(){
+				var list=['yushou_misha','yushou_huofu','yushou_leiouke'];
+				var skills=player.get('s');
+				for(var i=0;i<list.length;i++){
+					if(!skills.contains(list[i])) list.splice(i--,1);
+				}
+				if(list.length){
+					player.removeSkill(list.randomGet());
 				}
 			}
 		},
@@ -604,6 +621,8 @@ character.hearth={
 			content:function(){
 				if(trigger.num>=1){
 					trigger.num--;
+					// player.removeSkill('yushou_misha');
+					// player.draw();
 				}
 			},
 			ai:{
@@ -5850,7 +5869,7 @@ character.hearth={
 		xingluo:'星落',
 		xingluo_info:'准备阶段，你可以令任意名手牌数多于你的角色各弃置一张手牌，然后你可以从弃置的牌中选择一张加入手牌',
 		yushou:'御兽',
-		yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，效果持续到你的下一回合开始',
+		yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，回合开始阶段，你随机失去一个宠物',
 		yushou_misha:'米莎',
 		yushou_misha_info:'你每回合受到的首次伤害-1',
 		yushou_huofu:'霍弗',

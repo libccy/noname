@@ -771,6 +771,7 @@ character.xianjian={
             trigger:{player:'phaseEnd'},
 			direct:true,
             filter:function(event,player){
+				if(!player.num('h',{color:'black'})) return false;
 				if(player.storage.leiyu){
 					for(var i=0;i<player.storage.leiyu.length;i++){
 						if(player.storage.leiyu[i].isAlive()) return true;
@@ -2509,7 +2510,7 @@ character.xianjian={
 		feizhua:'飞爪',
 		feizhua_info:'当你使用一张杀时，你可以将与目标相邻的角色追加为额外目标',
 		leiyu:'雷狱',
-		leiyu_info:'结束阶段，你可以弃置一张黑色牌，视为对本回合内所有成为过你的卡牌目标的角色使用一张惊雷闪',
+		leiyu_info:'结束阶段，你可以弃置一张黑色手牌，视为对本回合内所有成为过你的卡牌目标的角色使用一张惊雷闪',
 		lingxue:'灵血',
 		lingxue_info:'锁定技，每当你回复一点体力，你获得一点护甲',
 		zhaoyao:'招摇',

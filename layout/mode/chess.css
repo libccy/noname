@@ -27,6 +27,9 @@
 #window:not(.nopointer) .dialog.fullheight .buttons .button.character:not(.squarebutton):not(.selectable){
     cursor: default;
 }
+#window:not(.nopointer) .obstacle.glow{
+    cursor: pointer;
+}
 #chess-container{
     width:100%;
     height :calc(100% - 120px);
