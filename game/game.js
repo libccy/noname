@@ -12676,6 +12676,10 @@
                         if(!info) return;
 						this.skills.add(skill);
 						this.addSkillTrigger(skill);
+						if(this.awakenedSkills.contains(skill)){
+							this.awakenSkill(skill);
+							return;
+						}
 						if(info.init2){
 							info.init2(this,skill);
 						}
@@ -12752,7 +12756,7 @@
                 },
                 awakenSkill:function(skill,nounmark){
                     if(!nounmark) this.unmarkSkill(skill);
-                    this.disableSkill(skill,skill);
+                    this.disableSkill(skill+'_awake',skill);
                     this.awakenedSkills.add(skill);
                 },
                 disableSkill:function(skill,skills){
@@ -12924,6 +12928,7 @@
                                 this.removeAdditionalSkill(skill);
                             }
                         }
+						this.enableSkill(skill+'_awake');
                     }
 					return skill;
 				},
@@ -35893,7 +35898,11 @@
                     skills.addArray(node.hiddenSkills);
                 }
                 if(node.awakenedSkills.length){
-                    skills.addArray(node.awakenedSkills);
+					for(var i=0;i<node.awakenedSkills.length;i++){
+						if(node.disabledSkills[node.awakenedSkills[i]]){
+							skills.push(node.awakenedSkills[i]);
+						}
+					}
                 }
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;

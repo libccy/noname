@@ -73,6 +73,11 @@ character.sp={
 		zhuling:['male','wei',4,['zhanyi']],
 		dongbai:['female','qun',3,['lianzhu','xiehui']],
 
+		zhaoxiang:['female','shu',3,[]],
+		mazhong:['male','shu',4,[]],
+		dongyun:['male','shu',3,[]],
+		kanze:['male','wu',3,[]],
+		heqi:['male','wu',4,[]],
 	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
