@@ -20762,9 +20762,9 @@
                 }
 				_status.paused=false;
 				delete _status.waitingForTransition;
-				// delete _status.event._cardChoice;
-				// delete _status.event._targetChoice;
-				// delete _status.event._skillChoice;
+				delete _status.event._cardChoice;
+				delete _status.event._targetChoice;
+				delete _status.event._skillChoice;
 				game.loop();
 			}
 		},
