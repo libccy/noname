@@ -314,13 +314,15 @@ character.sp={
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('bingzheng'),function(card,player,target){
-					return target!=player&&target.num('h')!=target.hp;
+					return target.num('h')!=target.hp;
 				}).set('ai',function(target){
 					var player=_status.event.player;
 					var att=ai.get.attitude(player,target);
 					if(att>0&&target.num('h')==target.hp-1){
+						if(player==target) return att+1;
 						return att+2;
 					}
+					if(player==target&&player.needsToDiscard()) return att/3;
 					return att;
 				});
 				'step 1'
@@ -329,6 +331,7 @@ character.sp={
 					event.target=result.targets[0];
 					if(event.target.num('h')){
 						event.target.chooseToDiscard('弃置一张手牌，或取消并摸一张牌').set('ai',function(card){
+							if(_status.event.player==_status.event.getParent().player) return 0;
 							if(card.name=='du') return 0;
 							if(_status.event.goon) return 6-ai.get.value(card);
 							return 0;
@@ -352,6 +355,10 @@ character.sp={
 				'step 3'
 				if(event.target.num('h')==event.target.hp){
 					player.draw();
+					if(event.target==player){
+						event.finish();
+						return;
+					}
 					var next=player.chooseCard('是否交给'+get.translation(event.target)+'一张牌？','he');
 					next.set('ai',function(card){
 						if(get.position(card)!='h') return 0;
@@ -532,7 +539,7 @@ character.sp={
 				player.addTempSkill('fenxun2','phaseAfter');
 			},
 			check:function(card){
-				if(card.name=='sha'&&_status.event.player.num('h','sha')==0) return 0;
+				if(card.name=='sha'&&_status.event.player.num('h','sha')<=1) return 0;
 				return 6-ai.get.value(card);
 			},
 			filterCard:true,
