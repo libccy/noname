@@ -1532,6 +1532,7 @@ card.gujian={
 			trigger:{global:'phaseUseBegin'},
 			direct:true,
 			filter:function(event,player){
+                if(event.player.hasSkill('shihuifen')) return false;
 				if(event.player==player) return false;
 				if(!lib.filter.targetEnabled({name:'shihuifen'},player,event.player)) return false;
 				return player.hasCard('shihuifen');

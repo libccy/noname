@@ -13536,7 +13536,6 @@
                 hasShan:function(){
     				if(this.num('h','shan')) return true;
     				if(this.num('h','hufu')) return true;
-    				if(this.num('h','yuchankun')) return true;
     				if(this.hasSkillTag('respondShan',true)) return true;
     				return false;
     			},

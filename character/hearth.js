@@ -159,7 +159,7 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				player.chooseCard('he',true,'交给'+player.storage.fuhua2+'一张牌');
+				player.chooseCard('he',true,'交给'+get.translation(player.storage.fuhua2)+'一张牌');
 				'step 1'
 				if(result.bool){
 					player.storage.fuhua2.gain(result.cards,player);
@@ -5896,7 +5896,7 @@ character.hearth={
 		lianjin:'炼金',
 		lianjin_info:'出牌阶段限两次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水',
 		shouji:'收集',
-		shouji_info:'每回合限发动一次，每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制',
+		shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制；每回合限各限一次',
 		guimou:'鬼谋',
 		guimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程',
 		yingxi:'影袭',
