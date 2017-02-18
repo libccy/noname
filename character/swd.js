@@ -52,7 +52,7 @@ character.swd={
 			swd_jialanduo:['male','qun',4,['xianyin','mailun']],
 			swd_rongshuang:['female','wu',3,['suiyan','duanxing']],
 			swd_zhuoshanzhu:['male','wu',4,['suiyan','wanjun']],
-			swd_jiting:['female','wei',4,['guanhu','chuanyang']],
+			swd_jiting:['female','wei',4,['guanhu','lingshi']],
 
 			swd_sikongyu:['male','wu',4,['sliufeng','linyun','hutian']],
 			swd_muyue:['female','wei',3,['xingzhui','lingxian','shouyin']],
@@ -143,6 +143,39 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		lingshi:{
+			mod:{
+				attackFrom:function(from,to,distance){
+					return distance-from.num('e')*2;
+				},
+				cardUsable:function(card,player,num){
+					if(card.name=='sha'&&player.get('e','5')) return num+1;
+				}
+			},
+			group:['lingshi_hit','lingshi_draw'],
+			subSkill:{
+				hit:{
+					trigger:{player:'shaBegin'},
+					filter:function(event,player){
+						return player.get('e','1')||player.get('e','2');
+					},
+					forced:true,
+					content:function(){
+						trigger.directHit=true;
+					}
+				},
+				draw:{
+					trigger:{player:'phaseDrawBegin'},
+					filter:function(event,player){
+						return player.get('e','3')||player.get('e','4');
+					},
+					forced:true,
+					content:function(){
+						trigger.num++;
+					}
+				}
+			}
+		},
 		tiebi:{
 			trigger:{global:'shaBegin'},
 			filter:function(event,player){
@@ -4922,7 +4955,16 @@ character.swd={
 				return ai.get.attitude(player,event.player)<0;
 			},
 			content:function(){
-				player.discardPlayerCard(trigger.player).logSkill=['guanhu',trigger.player];
+				var num=1;
+				if(trigger.player.num('e')&&trigger.player.num('h')){
+					num=2;
+				}
+				var next=player.discardPlayerCard(trigger.player,[1,num],get.prompt('guanhu',trigger.player));
+				next.logSkill=['guanhu',trigger.player];
+				next.filterButton=function(button){
+					if(ui.selected.buttons.length) return get.position(button.link)!=get.position(ui.selected.buttons[0].link);
+					return true;
+				}
 			},
 			ai:{
 				expose:0.2
@@ -8538,6 +8580,8 @@ character.swd={
 		swd_quxian:'屈娴',
 		swd_xiyan:'犀衍',
 
+		lingshi:'灵矢',
+		lingshi_info:'你的装备区内每有一张牌，你的攻击范围+2；当你的装备区内有武器牌或防具牌时，你的杀不可闪避；当你的装备区内有马时，你摸牌阶段额外摸一张牌；当你的装备内的宝物牌时，你回合内可以额外使用一张杀',
 		tiebi:'铁壁',
 		tiebi_info:'当距离你1以内的一名角色成为杀的目标时，若其没有护甲，你可以弃置一张黑色手牌使其获得一点护甲',
 		shenyan:'神炎',
@@ -8808,7 +8852,7 @@ character.swd={
 		ningxian:'凝霰',
 		ningxian_info:'每当你受到一次伤害，你可以弃置任意张黑色牌并选择等量其他角色对其各造成一点伤害',
 		guanhu:'贯鹄',
-		guanhu_info:'每当你使用杀造成伤害，你可以弃置对方一张牌',
+		guanhu_info:'每当你使用杀造成伤害，你可以弃置对方一张手牌和一张装备牌',
 		chuanyang:'穿杨',
 		chuanyang_info:'每当你使用一张杀，若你不在目标的攻击范围，你可以令此杀不可闪避',
 		fengming:'凤鸣',

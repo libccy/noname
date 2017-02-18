@@ -22706,6 +22706,8 @@
             }
             else{
                 node.addEventListener('mouseenter',ui.click.intro);
+				// node.addEventListener('mousemove',ui.click.logv);
+				// node.addEventListener('mouseleave',ui.click.logvleave);
             }
             node.logvid=logvid;
             node.added=[];
@@ -33677,6 +33679,23 @@
 				}
 				game.resume();
 			},
+			logv:function(e){
+				if(_status.currentlogv){
+					clearTimeout(_status.currentlogv.logvtimeout);
+					delete _status.currentlogv.logvtimeout;
+				}
+				var that=this;
+				_status.currentlogv=that;
+				that.logvtimeout=setTimeout(function(){
+					ui.click.intro.call(that,e);
+				},200);
+			},
+			logvleave:function(){
+				if(_status.currentlogv){
+					clearTimeout(_status.currentlogv.logvtimeout);
+					delete _status.currentlogv.logvtimeout;
+				}
+			},
 			intro:function(e){
 				if(_status.dragged) return;
 				_status.clicked=true;
@@ -36129,6 +36148,9 @@
 					table.style.marginLeft='10px';
 
 					uiintro.content.appendChild(table);
+					if(!lib.config.show_favourite){
+						table.style.paddingBottom='5px'
+					}
 				}
                 if(!simple||get.is.phoneLayout()){
                     var es=node.get('e');

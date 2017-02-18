@@ -6124,6 +6124,9 @@ character.yijiang={
 		olddanshou:{
 			trigger:{source:'damageEnd'},
 			priority:9,
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)<=0;
+			},
 			content:function(){
 				"step 0"
 				player.draw();

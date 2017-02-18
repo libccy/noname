@@ -385,6 +385,9 @@ window.characterRank={
         'huatuo',
         'sunhao',
         'dongyun',
+        'swd_jiting',
+        'hs_nozdormu',
+        //...
     ],
     b:[
         'diy_liufu',
@@ -403,9 +406,7 @@ window.characterRank={
         'sp_xiahoudun',
         'jsp_huangyueying',
         'sp_zhangfei',
-        'hs_nozdormu',
         'yxs_lishimin',
-        'hs_ruanniguai',
         'daxiaoqiao',
         'pal_linyueru',
         'zhuran',
@@ -419,8 +420,6 @@ window.characterRank={
         'yxs_chengyaojin',
         'yxs_yujix',
         'swd_jialanduo',
-        'swd_jiting',
-        //......
         'kanze',
         'mazhong',
         'zhaoxiang',

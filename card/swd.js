@@ -1184,6 +1184,8 @@ card.swd={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('noe')) return target.num('e')*2;
+						if(target.getEquip('baiyin')&&target.isDamaged()) return 2;
+						if(target.getEquip('xuanyuanjian')||target.getEquip('qiankundai')) return 1;
 						var num=0;
 						var es=target.get('e');
 						for(var i=0;i<es.length;i++){
@@ -4191,6 +4193,7 @@ card.swd={
 			filter:function(event,player){
 				return !event.target.isTurnedOver();
 			},
+			logTarget:'target',
 			content:function(){
 				trigger.unhurt=true;
 				trigger.target.turnOver();
