@@ -139,7 +139,7 @@
 					wuxie_self:{
 						name:'不无懈自己',
 						init:true,
-						intro:'自己使用的单目标通常锦囊即将生效时，不询问无懈',
+						intro:'自己使用的单目标普通锦囊即将生效时，不询问无懈',
 					},
 					tao_enemy:{
 						name:'不对敌方使用桃',
@@ -12703,7 +12703,7 @@
                                 }
                             }
                         }
-                        if(this.initedSkills.contains(skill)) return;
+                        if(this.initedSkills.contains(skill)) return this;
                         this.initedSkills.push(skill);
                         if(info.init){
                             info.init(this,skill);
@@ -12741,6 +12741,7 @@
                             }
                         }
                     }
+					return this;
                 },
 				addSkill:function(skill,checkConflict){
 					if(get.objtype(skill)=='array'){
@@ -12817,25 +12818,36 @@
                         this.additionalSkills[skill].push(skills[i]);
                     }
                     this.checkConflict();
+					return this;
                 },
-                removeAdditionalSkill:function(skill){
+                removeAdditionalSkill:function(skill,target){
                     if(this.additionalSkills[skill]){
 						var additionalSkills=this.additionalSkills[skill];
-                        delete this.additionalSkills[skill];
-                        if(typeof additionalSkills=='string'){
-                            this.removeSkill(additionalSkills);
-                        }
-                        else if(Array.isArray(additionalSkills)){
-                            for(var i=0;i<additionalSkills.length;i++){
-                                this.removeSkill(additionalSkills[i]);
-                            }
-                        }
+						if(Array.isArray(additionalSkills)&&typeof target=='string'){
+							if(additionalSkills.contains(target)){
+								additionalSkills.remove(target);
+								this.removeSkill(target);
+							}
+						}
+						else{
+	                        delete this.additionalSkills[skill];
+	                        if(typeof additionalSkills=='string'){
+	                            this.removeSkill(additionalSkills);
+	                        }
+	                        else if(Array.isArray(additionalSkills)){
+	                            for(var i=0;i<additionalSkills.length;i++){
+	                                this.removeSkill(additionalSkills[i]);
+	                            }
+	                        }
+						}
                     }
+					return this;
                 },
                 awakenSkill:function(skill,nounmark){
                     if(!nounmark) this.unmarkSkill(skill);
                     this.disableSkill(skill+'_awake',skill);
                     this.awakenedSkills.add(skill);
+					return this;
                 },
                 disableSkill:function(skill,skills){
                     if(typeof skills=='string'){
@@ -12885,6 +12897,7 @@
 							this.addEquipTrigger(es[i]);
                         }
                     }
+					return this;
 				},
                 removeEquipTrigger:function(card){
                     if(card){
@@ -12901,6 +12914,7 @@
 							this.removeEquipTrigger(es[i]);
                         }
                     }
+					return this;
                 },
                 removeSkillTrigger:function(skill,triggeronly){
                     var info=lib.skill[skill];
@@ -12951,6 +12965,7 @@
                             }
                         }
                     }
+					return this;
                 },
 				removeSkill:function(skill){
 					if(!skill) return;

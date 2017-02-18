@@ -421,6 +421,7 @@ window.characterRank={
         'swd_jiting',
         //......
         'zhaoxiang',
+        'heqi',
         'sp_machao',
         're_zhaoyun',
         'fuwan',

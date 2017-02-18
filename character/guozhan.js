@@ -12,7 +12,7 @@ character.guozhan={
 		jiangqing:['male','wu',4,['shangyi']],
 		hetaihou:['female','qun',3,['zhendu','qiluan']],
 		kongrong:['male','qun',3,['lirang','mingshi']],
-		dingfeng:['male','wu',4,['fenxun']],
+		dingfeng:['male','wu',4,['fenxun','duanbing']],
 		panfeng:['male','qun',4,['kuangfu']],
 	},
 };
