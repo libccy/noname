@@ -901,6 +901,9 @@ card.swd={
 				order:10,
 				value:6,
 				useful:1,
+				tag:{
+					draw:2
+				},
 				result:{
 					target:function(player,target){
 						if(target==player&&target.num('h',{type:'equip'})) return 2.5;

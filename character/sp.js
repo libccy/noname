@@ -76,7 +76,7 @@ character.sp={
 		zhaoxiang:['female','shu',4,['fanghun','fuhan']],
 		mazhong:['male','shu',4,['fuman']],
 		dongyun:['male','shu',3,['bingzheng','sheyan']],
-		// kanze:['male','wu',3,[]],
+		kanze:['male','wu',3,['xiashu','kuanshi']],
 		heqi:['male','wu',4,['qizhou','shanxi']],
 	},
 	perfectPair:{
@@ -104,6 +104,174 @@ character.sp={
 		dongbai:['dongzhuo']
 	},
 	skill:{
+		kuanshi:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('kuanshi')).set('ai',function(target){
+					if(ai.get.attitude(_status.event.player,target)>0){
+						return 1/Math.sqrt(target.hp+1);
+					}
+					return 0;
+				});
+				'step 1'
+				if(result.bool){
+					var target=result.targets[0];
+					player.logSkill('kuanshi',target);
+					target.storage.kuanshi2=player;
+					target.addSkill('kuanshi2');
+				}
+			}
+		},
+		kuanshi2:{
+			mark:'character',
+			intro:{
+				content:'下一次受到超过1点的伤害时，防止此伤害，然后$跳过下个回合的摸牌阶段'
+			},
+			trigger:{player:'damageBegin'},
+			forced:true,
+			filter:function(event,player){
+				return event.num>1;
+			},
+			priority:-11,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+				player.storage.kuanshi2.skip('phaseDraw');
+				player.removeSkill('kuanshi2');
+			},
+			group:'kuanshi2_remove',
+			onremove:true,
+			subSkill:{
+				remove:{
+					trigger:{global:['phaseBegin','dieAfter']},
+					forced:true,
+					popup:false,
+					filter:function(event,player){
+						return event.player==player.storage.kuanshi2;
+					},
+					content:function(){
+						player.removeSkill('kuanshi2');
+					}
+				}
+			}
+		},
+		xiashu:{
+			trigger:{player:'phaseUseBegin'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			content:function(){
+				'step 0'
+				var maxval=0;
+				var hs=player.get('h');
+				for(var i=0;i<hs.length;i++){
+					maxval=Math.max(maxval,ai.get.value(hs[i]));
+				}
+				player.chooseTarget(get.prompt('xiashu'),lib.filter.notMe).set('ai',function(target){
+					var player=_status.event.player;
+					var maxval=_status.event.maxval;
+					var dh=target.num('h')-player.num('h');
+					var att=ai.get.attitude(player,target);
+					if(target.hasSkill('qingjian')) return false;
+					if(dh<=0) return 0;
+					if(att>0) return 0.1;
+					if(maxval>=8) return 0;
+					if(att==0) return 0.2;
+					if(dh>=3) return dh;
+					if(dh==2){
+						if(maxval<=7) return dh;
+					}
+					if(maxval<=6) return dh;
+					return 0;
+
+				}).set('maxval',maxval);
+				'step 1'
+				if(result.bool){
+					player.logSkill('xiashu',result.targets);
+					event.target=result.targets[0];
+					var hs=player.get('h');
+					event.target.gain(hs,player);
+					player.$give(hs.length,event.target);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				var hs=event.target.get('h');
+				if(!hs.length){
+					event.finish();
+					return;
+				}
+				hs.sort(function(a,b){
+					return ai.get.value(b,player,'raw')-ai.get.value(a,player,'raw');
+				});
+				event.target.chooseCard([1,hs.length],'展示至少一张手牌',true).set('ai',function(card){
+					var rand=_status.event.rand;
+					var list=_status.event.list;
+					if(_status.event.att){
+						if(ui.selected.cards.length>=Math.ceil(list.length/2)) return 0;
+						var value=ai.get.value(card);
+						if(_status.event.getParent().player.isHealthy()){
+							value+=(get.tag(card,'damage')?1.5:0)+(get.tag(card,'draw'?2:0));
+						}
+						return value;
+					}
+					if(ui.selected.cards.length>=Math.floor(list.length/2)) return 0;
+					return (list.indexOf(card)%2==rand)?1:0;
+				}).set('rand',(Math.random()<0.6)?1:0).set('list',hs).set('att',ai.get.attitude(event.target,player)>0);
+				'step 3'
+				event.target.showCards(result.cards);
+				event.cards1=result.cards;
+				event.cards2=event.target.get('h',function(card){
+					return !event.cards1.contains(card);
+				});
+				'step 4'
+				var choice;
+				var num1=event.cards1.length;
+				var num2=event.cards2.length;
+				if(ai.get.attitude(event.target,player)>0&&num1>=num2){
+					choice=0;
+				}
+				else if(num1==num2){
+					choice=(Math.random()<0.45)?0:1;
+				}
+				else if(num1>num2){
+					if(num1-num2==1){
+						choice=(Math.random()<0.6)?0:1;
+					}
+					else{
+						choice=0;
+					}
+				}
+				else{
+					if(num2-num1==1){
+						choice=(Math.random()<0.6)?1:0;
+					}
+					else{
+						choice=1;
+					}
+				}
+				player.chooseControl(function(event,player){
+					return _status.event.choice;
+				}).set('choiceList',['获得'+get.translation(event.target)+'展示的牌',
+				'获得'+get.translation(event.target)+'未展示的牌']).set('choice',choice);
+				'step 5'
+				if(result.index==0){
+					player.gain(event.cards1,target);
+					target.$give(event.cards1,player);
+				}
+				else{
+					player.gain(event.cards2,target);
+					target.$giveAuto(event.cards2,player);
+				}
+			},
+			ai:{
+				expose:0.1
+			}
+		},
 		sheyan:{
 			trigger:{global:'useCard'},
 			filter:function(event,player){
@@ -135,6 +303,9 @@ character.sp={
 				'step 2'
 				player.logSkill('sheyan',event.target);
 				trigger.targets.push(event.target);
+			},
+			ai:{
+				expose:0.2
 			}
 		},
 		bingzheng:{
@@ -181,8 +352,9 @@ character.sp={
 				'step 3'
 				if(event.target.num('h')==event.target.hp){
 					player.draw();
-					var next=player.chooseCard('交给'+get.translation(event.target)+'一张牌','he');
+					var next=player.chooseCard('是否交给'+get.translation(event.target)+'一张牌？','he');
 					next.set('ai',function(card){
+						if(get.position(card)!='h') return 0;
 						if(_status.event.shan){
 							return card.name=='shan'?1:0;
 						}
@@ -209,6 +381,7 @@ character.sp={
 				}
 			},
 			ai:{
+				expose:0.2,
 				threaten:1.4
 			}
 		},
@@ -7598,6 +7771,11 @@ character.sp={
 		dongyun:'董允',
 		mazhong:'马忠',
 
+		xiashu:'下书',
+		xiashu_info:'出牌阶段开始时，你可以将所有手牌交给一名其他角色，然后该角色亮出任意数量的手牌（至少一张），令你选择一项：1.获得其亮出的手牌；2.获得其未亮出的手牌',
+		kuanshi:'宽释',
+		kuanshi2:'宽释',
+		kuanshi_info:'结束阶段，你可以选择一名角色。直到你的下回合开始，该角色下一次受到超过1点的伤害时，防止此伤害，然后你跳过下个回合的摸牌阶段',
 		bingzheng:'秉正',
 		bingzheng_info:'出牌阶段结束时，你可以令手牌数不等于体力值的一名角色弃置一张手牌或摸一张牌。然后若其手牌数等于体力值，你摸一张牌，且可以交给该角色一张牌',
 		sheyan:'舍宴',

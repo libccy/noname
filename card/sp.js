@@ -175,6 +175,9 @@ card.sp={
 				order:7,
 				useful:4,
 				value:10,
+				tag:{
+					draw:2
+				},
 				result:{
 					target:function(player,target){
 						if(target.num('j','lebu')) return 0;

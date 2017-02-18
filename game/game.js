@@ -6087,7 +6087,7 @@
 		        var list=lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 		            concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 		        for(var i in lib.character){
-		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(i);
+		            if(i!='zuoci'&&i.indexOf('boss_')!=0&&i.indexOf('tafang_')!=0&&!list.contains(i)) console.log(get.translation(i));
 		        }
 		    },
 			h:function(player){
@@ -16011,10 +16011,16 @@
 					lib.filter.targetInRange(card,player,target));
 			},
 			notMe:function(card,player,target){
-				return (player!=target)
+				return player!=target;
 			},
 			isMe:function(card,player,target){
-				return (player==target)
+				return player==target;
+			},
+			attackFrom:function(card,player,target){
+				return get.distance(player,target,'attack')<=1;
+			},
+			globalFrom:function(card,player,target){
+				return get.distance(player,target)<=1;
 			},
 			selectCard:function(){
 				return [1,1];

@@ -375,6 +375,9 @@ card.yunchou={
 				order:8.5,
 				value:[6,1],
 				useful:[3,1],
+				tag:{
+					draw:1
+				},
 				result:{
 					target:function(player,target){
 						var hs=target.get('h');

@@ -3114,8 +3114,9 @@ character.hearth={
 				'step 0'
 				player.chooseTarget(get.prompt('jiaohui')).ai=function(target){
 					var att=ai.get.attitude(player,target);
-					if(att>1&&target.hp<=1){
-						att+=2;
+					if(att>1){
+						if(target.hp<=1) att+=2;
+						if(target.hp<=2) att++;
 					}
 					return att;
 				};
@@ -3908,11 +3909,13 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
+				if(!event.isMine()) game.delay(0.5);
+				'step 1'
 				player.addTempSkill('fengxing2','phaseAfter');
 				player.chooseToDiscard('he',get.prompt('fengxing')).set('ai',function(card){
 					return 7-ai.get.value(card);
 				}).logSkill='fengxing';
-				'step 1'
+				'step 2'
 				if(result.bool){
 					player.draw(2);
 				}

@@ -384,6 +384,7 @@ window.characterRank={
         'hs_lrexxar',
         'huatuo',
         'sunhao',
+        'dongyun',
     ],
     b:[
         'diy_liufu',
@@ -420,6 +421,8 @@ window.characterRank={
         'swd_jialanduo',
         'swd_jiting',
         //......
+        'kanze',
+        'mazhong',
         'zhaoxiang',
         'heqi',
         'sp_machao',
