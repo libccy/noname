@@ -153,6 +153,7 @@ character.extra={
 				event.targets.remove(player);
 				event.targets.sort(lib.sort.seat);
 				event.targets2=event.targets.slice(0);
+				player.line(event.targets,'green');
 				"step 1"
 				if(event.targets.length){
 					event.targets.shift().damage();

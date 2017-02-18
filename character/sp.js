@@ -135,7 +135,12 @@ character.sp={
 						list.push(i);
 					}
 				}
-				lib.remove('zhaoxiang');
+				var players=game.players.concat(game.dead);
+				for(var i=0;i<players.length;i++){
+					list.remove(players[i].name);
+					list.remove(players[i].name1);
+					list.remove(players[i].name2);
+				}
 				var dialog=ui.create.dialog('将武将牌替换为一名角色','hidden');
 				dialog.add([list.randomGets(5),'character']);
 				player.chooseButton(dialog,true).ai=function(button){
@@ -148,7 +153,9 @@ character.sp={
 				if(mode!='chess'&&mode!='tafang'&&mode!='stone'){
 					num=Math.min(num,game.players.length+game.dead.length);
 				}
-				player.reinit('zhaoxiang',result.links[0],num);
+				game.broadcastAll(function(player,name,num){
+					player.reinit('zhaoxiang',name,num);
+				},player,result.links[0],num);
 			}
 		},
 		fanghun:{
@@ -224,7 +231,7 @@ character.sp={
 					prompt:'将一张杀当闪打出',
 					viewAsFilter:function(player){
 						if(!player.storage.fanghun) return false;
-						if(!player.num('h','shan')) return false;
+						if(!player.num('h','sha')) return false;
 					},
 					onrespond:function(result,player){
 						player.storage.fanghun--;
@@ -1874,7 +1881,7 @@ character.sp={
 			mod:{
 				globalFrom:function(from,to,distance){
 					return distance-game.countPlayer(function(current){
-						return current.sex=='male';
+						return current.sex=='female';
 					});
 				}
 			}

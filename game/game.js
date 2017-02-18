@@ -18,7 +18,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:18,
+        versionOL:19,
         sourceURL:'https://rawgit.com/libccy/noname/$version$/',
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',
@@ -7153,6 +7153,7 @@
                         }
                     }
                     "step 2"
+					event.resume();
                     if(event.result){
                         if(event.result.skill){
                             var info=get.info(event.result.skill);
@@ -7257,6 +7258,7 @@
                         }
                     }
                     "step 2"
+					event.resume();
 					if(event.result.bool&&!game.online){
                         var info=get.info(event.result.skill);
                         if(info&&info.onrespond){
@@ -7366,6 +7368,7 @@
                         }
                     }
                     "step 2"
+					event.resume();
 					if(event.promptdiscard){
 						event.promptdiscard.close();
 					}
@@ -7692,6 +7695,7 @@
                     if(event.callback){
                         event.callback(event.player,event.result);
                     }
+					event.resume();
 				},
                 chooseCardOL:function(){
                     'step 0'
@@ -7881,6 +7885,7 @@
 						}
                     }
                     "step 2"
+					event.resume();
                     if(event.glow_result&&event.result.cards){
                         for(var i=0;i<event.result.cards.length;i++){
                             event.result.cards[i].classList.add('glow');
@@ -7937,6 +7942,7 @@
 						}
 					}
 					if(event.dialog) event.dialog.close();
+					event.resume();
 				},
 				chooseCardTarget:function(){
 					"step 0"
@@ -7973,6 +7979,7 @@
 						}
                     }
                     "step 2"
+					event.resume();
 					if(event.result.bool){
 						for(var i=0;i<event.result.targets.length;i++){
 							event.result.targets[i].animate('target');
@@ -8060,6 +8067,7 @@
 							event.controlbars[i].close();
 						}
 					}
+					event.resume();
 				},
 				chooseBool:function(){
 					"step 0"
@@ -8101,6 +8109,7 @@
 					_status.imchoosing=false;
                     event.choosing=false;
 					if(event.dialog) event.dialog.close();
+					event.resume();
 				},
 				choosePlayerCard:function(){
 					"step 0"
@@ -8185,6 +8194,7 @@
 					if(event.result.links){
 						event.result.cards=event.result.links.slice(0);
 					}
+					event.resume();
 				},
 				discardPlayerCard:function(){
 					"step 0"
@@ -8276,6 +8286,7 @@
                     }
 					event.dialog.close();
 					"step 2"
+					event.resume();
 					if(event.result.bool&&event.result.buttons&&!game.online){
 						if(event.logSkill){
 							if(typeof event.logSkill=='string'){
@@ -8387,6 +8398,7 @@
                     }
 					event.dialog.close();
                     "step 2"
+					event.resume();
                     if(game.online||!event.result.bool){
                         event.finish();
                     }
@@ -10181,10 +10193,11 @@
 				reinit:function(from,to,maxHp){
 					var info1=lib.character[from];
 					var info2=lib.character[to];
-					if(this.name==from){
+					if(this.name==from&&!this.classList.contains('unseen')){
 						this.name=to;
 						this.sex=info2[0];
 						this.node.avatar.setBackground(to,'character');
+						this.node.name.innerHTML=get.slimName(to);
 					}
 					else if(this.name2==from){
 						this.name2=to;
@@ -10192,9 +10205,29 @@
 							this.sex=info2[0];
 						}
 						this.node.avatar2.setBackground(to,'character');
+						this.node.name2.innerHTML=get.slimName(to);
 					}
 					else{
 						return this;
+					}
+					var num=(maxHp||info2[2])-info1[2];
+					if(typeof this.singleHp=='boolean'){
+						if(num%2==1){
+							if(this.singleHp){
+								this.maxHp+=(num+1)/2;
+								this.singleHp=false;
+							}
+							else{
+								this.maxHp+=(num-1)/2;
+								this.singleHp=true;
+							}
+						}
+						else{
+							this.maxHp+=num/2;
+						}
+					}
+					else{
+						this.maxHp+=num;
 					}
 					for(var i=0;i<info1[3].length;i++){
 						this.removeSkill(info1[3][i]);
@@ -10202,20 +10235,12 @@
 					for(var i=0;i<info2[3].length;i++){
 						this.addSkill(info2[3][i]);
 					}
-					var num=(maxHp||info2[2])-info1[2];
-					if(typeof this.singleHp=='boolean'){
-						if(this.singleHp){
-							this.maxHp+=(num+1)/2;
-							this.singleHp=false;
-						}
-						else{
-							this.maxHp+=(num-1)/2;
-							this.singleHp=true;
-						}
-					}
-					else{
-						this.maxHp+=num;
-					}
+					game.addVideo('reinit3',this,{
+						from:from,
+						to:to,
+						hp:this.maxHp,
+						avatar2:this.name2==to
+					});
 					this.update();
 					if(this.singleHp===true&&!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
 						this.doubleDraw();
@@ -15206,6 +15231,11 @@
                     this.player.wait();
                     game.pause();
                 },
+				resume:function(){
+					delete this._cardChoice;
+					delete this._targetChoice;
+					delete this._skillChoice;
+				},
                 getParent:function(level){
                     var parent;
                     if(this._modparent&&game.online){
@@ -18317,10 +18347,10 @@
 						game.players[i].identity='unknown';
 
 						lib.translate[game.players[i].name]=players[i].translate;
-						game.players[i].init(players[i].name1,players[i].name2,false);
+						game.players[i].init(players[i].name1,players[i].name2);
 
-						game.players[i].classList.add('unseen');
-						game.players[i].classList.add('unseen2');
+						game.players[i].classList.add('unseen_v');
+						game.players[i].classList.add('unseen2_v');
 						if(game.players[i]!=game.me){
 							game.players[i].node.identity.firstChild.innerHTML='猜';
 							game.players[i].node.identity.dataset.color='unknown';
@@ -18564,6 +18594,34 @@
 					console.log(source);
 				}
 			},
+			reinit3:function(source,content){
+				if(source&&content){
+					var info1=lib.character[content.from];
+					var info2=lib.character[content.to];
+					if(content.avatar2){
+						source.name2=content.to;
+						if(source.classList.contains('unseen')){
+							source.sex=info2[0];
+						}
+						source.node.avatar2.setBackground(content.to,'character');
+						source.node.name2.innerHTML=get.slimName(content.to);
+					}
+					else{
+						source.name=content.to;
+						source.sex=info2[0];
+						source.node.avatar.setBackground(content.to,'character');
+						source.node.name.innerHTML=get.slimName(content.to);
+					}
+					source.maxHp=content.hp;
+					this.update();
+					for(var i=0;i<info1[3].length;i++){
+						source.removeSkill(info1[3][i]);
+					}
+					for(var i=0;i<info2[3].length;i++){
+						source.addSkill(info2[3][i]);
+					}
+				}
+			},
 			skill:function(player,content){
 				if(typeof content=='string'){
 					lib.skill[content].video(player);
@@ -18599,14 +18657,14 @@
 				if(player&&player.classList){
 					switch(num){
 						case 0:
-						player.classList.remove('unseen');
+						player.classList.remove('unseen_v');
 						break;
 						case 1:
-						player.classList.remove('unseen2');
+						player.classList.remove('unseen2_v');
 						break;
 						case 2:
-						player.classList.remove('unseen');
-						player.classList.remove('unseen2');
+						player.classList.remove('unseen_v');
+						player.classList.remove('unseen2_v');
 						break;
 					}
 				}
@@ -20797,7 +20855,7 @@
 						event.finish();
 					}
 					else{
-						if(lib.config.compatiblemode){
+						if(lib.config.compatiblemode||_status.connectMode){
 							try{
 								event.content(event,step,source,player,target,targets,
 		                            card,cards,skill,forced,num,trigger,result,
@@ -20834,9 +20892,6 @@
                 }
 				_status.paused=false;
 				delete _status.waitingForTransition;
-				delete _status.event._cardChoice;
-				delete _status.event._targetChoice;
-				delete _status.event._skillChoice;
 				game.loop();
 			}
 		},
