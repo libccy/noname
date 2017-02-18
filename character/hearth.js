@@ -12,7 +12,7 @@ character.hearth={
 		hs_waleera:['female','shu',3,['jianren','mengun','wlianji']],
 
 		hs_medivh:['male','wei',3,['jingxiang','zuzhou','mdzhoufu']],
-		hs_alleria:['male','wu',3,['fengxing','xinliegong']],
+		hs_alleria:['female','wu',3,['fengxing','xinliegong']],
 		hs_magni:['male','shu',4,['zhongjia','dunji']],
 		hs_liadrin:['female','shu',4,['xueren']],
 		hs_morgl:['male','wu',3,['s_tuteng']],
