@@ -157,6 +157,113 @@
 	overflow:hidden;
 	padding:0;
 }
+.removing>.menubg.charactercard{
+	transform: scale(0.8);
+	opacity: 0;
+	transition: all 0.3s;
+}
+.menubg.charactercard{
+	width: 500px;
+	height: 300px;
+	left: calc(50% - 250px);
+	top: calc(50% - 150px);
+	animation: dialog_start2 0.3s;
+	-webkit-animation: dialog_start2 0.3s;
+}
+.menubg.charactercard>.menubutton.large.ava{
+	width: 180px;
+	height: 240px;
+	left: 10px;
+	top: 10px;
+	overflow: hidden;
+}
+.menubg.charactercard>.menubutton.large{
+	width: 85px;
+	height: 30px;
+	bottom: 10px;
+	line-height: 30px;
+	padding: 0;
+	font-size: 20px;
+}
+.menubg.charactercard>.menubutton.ban{
+	left: 10px;
+}
+.menubg.charactercard>.menubutton.fav{
+	left: 105px;
+}
+.menubg.charactercard>.ava>.changeskin{
+	bottom: 6px;
+	left: 6px;
+	font-family: 'xinwei';
+	font-size: 16px;
+	z-index: 2;
+	color: white;
+	text-shadow: black 0 0 2px;
+	height: 16px;
+	line-height: 16px;
+	pointer-events: none;
+	opacity: 0.6;
+}
+#window:not(.nopointer) .menubg.charactercard .menubutton:not(.ava),
+#window:not(.nopointer) .menubg.charactercard>.ava>.avatars>div{
+	cursor: pointer;
+}
+.menubg.charactercard>.ava>.avatars{
+	opacity: 0;
+	pointer-events: none;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+    line-height: 0;
+	text-align: left;
+	transform: scale(0.8);
+}
+.menubg.charactercard>.ava>.avatars.scroll{
+	overflow: scroll;
+}
+.menubg.charactercard>.ava>.avatars>div{
+	position: relative;
+	margin:3px;
+	width: 81px;
+	height: 111px;
+	border-radius: 4px;
+	background-size: cover;
+	background-position: 50% 0;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px
+}
+.menubg.charactercard>.ava>.avatars>div:first-child,
+.menubg.charactercard>.ava>.avatars>div:first-child+div{
+	margin-top: 6px;
+}
+.menubg.charactercard>.ava>.avatars>div:nth-of-type(odd){
+	margin-left: 6px;
+}
+.menubg.charactercard>.ava.scroll>.avatars{
+	opacity: 1;
+	pointer-events: auto;
+	transform: scale(1);
+}
+.menubg.charactercard>.ava.scroll>.changeskin{
+	opacity: 0;
+}
+.menubg.charactercard>.ava.scroll>.avatar{
+	transform: translateX(-200px);
+	pointer-events: none;
+}
+.menubg.charactercard>.ava>.avatar{
+	left: 3px;
+	top: 3px;
+	width: calc(100% - 6px);
+	height: calc(100% - 6px);
+	background-position: 50% 0;
+	border-radius: 4px !important;
+	z-index: 1;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px;
+}
 .menu.main>.menu-tab{
 	height:37px;
 	text-align:center;

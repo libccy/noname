@@ -1043,6 +1043,12 @@
                         init:true,
                         unfrequent:true,
 					},
+					show_charactercard:{
+						name:'显示武将资料',
+						intro:'在武将界面单击时弹出武将资料卡',
+						init:true,
+						unfrequent:true
+					},
                     show_favourite:{
                         name:'显示添加收藏',
 						intro:'在角色的右键菜单中显示添加收藏',
@@ -3994,6 +4000,9 @@
         		HTMLDivElement.prototype.setBackground=function(name,type,ext,subfolder){
 					if(!name) return;
         			var src;
+					if(ext=='noskin'){
+						ext='.jpg';
+					}
         			ext=ext||'.jpg';
         			subfolder=subfolder||'default'
         			if(type){
@@ -4036,7 +4045,7 @@
                         else if(modeimage){
                             src='image/mode/'+modeimage+'/character/'+name+ext;
                         }
-        				else if(type=='character'&&lib.config.skin[name]){
+        				else if(type=='character'&&lib.config.skin[name]&&arguments[2]!='noskin'){
         					src='image/skin/'+name+'/'+lib.config.skin[name]+ext;
         				}
         				else{
@@ -4401,7 +4410,7 @@
 				lib.config.all.plays=[];
 				lib.config.all.mode=[];
 
-                if(lib.config.dev){
+                if(lib.config.debug){
                     lib.init.js(lib.assetURL+'game','asset',function(){
                         lib.skin=window.noname_skin_list;
                         delete window.noname_skin_list;
@@ -10015,12 +10024,7 @@
 					this.maxHp=info[2];
 					this.hujia=0;
 					this.node.intro.innerHTML=lib.config.intro;
-					switch(this.group){
-						case 'wei':this.node.name.dataset.nature='watermm';break;
-						case 'shu':this.node.name.dataset.nature='soilmm';break;
-						case 'wu':this.node.name.dataset.nature='woodmm';break;
-						case 'qun':this.node.name.dataset.nature='metalmm';break;
-					}
+					this.node.name.dataset.nature=get.groupnature(this.group);
 					if(lib.config.touchscreen){
 						lib.setLongPress(this,ui.click.intro);
 					}
@@ -22083,12 +22087,7 @@
 						event.avatars[i].index=i+event.config.width;
 						event.avatars[i].animate('start');
 						event.nodes[event.avatars[i].index].style.display='none';
-						switch(lib.character[name][1]){
-							case 'wei':event.avatars[i].nodename.dataset.nature='watermm';break;
-							case 'shu':event.avatars[i].nodename.dataset.nature='soilmm';break;
-							case 'wu':event.avatars[i].nodename.dataset.nature='woodmm';break;
-							case 'qun':event.avatars[i].nodename.dataset.nature='metalmm';break;
-						}
+						event.avatars[i].nodename.dataset.nature=get.groupnature(lib.character[name][1]);
 						if(lib.config.touchscreen){
 							lib.setLongPress(event.avatars[i],ui.click.intro);
 						}
@@ -25212,7 +25211,12 @@
 							}
                             ui.click.touchpop();
 							this._banning=connectMenu?'online':'offline';
-                            ui.click.intro.call(this,e);
+							if(!connectMenu&&lib.config.show_charactercard){
+								ui.click.charactercard(this.link,this);
+							}
+							else{
+								ui.click.intro.call(this,e);
+							}
                             _status.clicked=false;
                             delete this._banning;
 						};
@@ -33696,6 +33700,138 @@
 					delete _status.currentlogv.logvtimeout;
 				}
 			},
+			charactercard:function(name,sourcenode){
+				if(_status.dragged) return;
+				ui.window.classList.add('shortcutpaused');
+				ui.window.classList.add('systempaused');
+				if(lib.config.blur_ui){
+					ui.arena.classList.add('blur');
+					ui.system.classList.add('blur');
+					ui.menuContainer.classList.add('blur');
+				}
+				var layer=ui.create.div('.popup-container');
+				var clicklayer=function(e){
+                    if(_status.touchpopping) return;
+					if(_status.dragged) return;
+					ui.window.classList.remove('shortcutpaused');
+					ui.window.classList.remove('systempaused');
+					ui.arena.classList.remove('blur');
+					ui.system.classList.remove('blur');
+					ui.menuContainer.classList.remove('blur');
+					this.delete();
+					e.stopPropagation();
+					return false;
+				}
+				var uiintro=ui.create.div('.menubg.charactercard',layer);
+				var playerbg=ui.create.div('.menubutton.large.ava',uiintro);
+				var bg=ui.create.div('.avatar',playerbg,function(){
+					if(changeskinfunc){
+						changeskinfunc();
+					}
+				}).setBackground(name,'character');
+				var changeskinfunc=null;
+				var changeskin=function(){
+					var node=ui.create.div('.changeskin','可换肤',playerbg);
+					var avatars=ui.create.div('.avatars',playerbg);
+					changeskinfunc=function(){
+						playerbg.classList.add('scroll');
+						if(node._created){
+							return;
+						}
+						node._created=true;
+                        var createButtons=function(num){
+                            if(!num) return;
+							if(num>=4){
+								avatars.classList.add('scroll');
+							}
+                            for(var i=0;i<=num;i++){
+                                var button=ui.create.div(avatars,function(){
+                                    playerbg.classList.remove('scroll');
+									if(this._link){
+                                        lib.config.skin[name]=this._link;
+                                        bg.style.backgroundImage=this.style.backgroundImage;
+										sourcenode.style.backgroundImage=this.style.backgroundImage;
+                                        game.saveConfig('skin',lib.config.skin);
+                                    }
+                                    else{
+                                        delete lib.config.skin[name];
+										bg.setBackground(name,'character');
+                                        sourcenode.setBackground(name,'character');
+                                        game.saveConfig('skin',lib.config.skin);
+                                    }
+                                });
+                                button._link=i;
+                                if(i){
+                                    button.setBackgroundImage('image/skin/'+name+'/'+i+'.jpg');
+                                }
+                                else{
+                                    button.setBackground(name,'character','noskin');
+                                }
+                            }
+                        };
+						var num=1;
+    					var loadImage=function(){
+    						var img=new Image();
+    						img.onload=function(){
+    							num++;
+    							loadImage();
+    						}
+    						img.onerror=function(){
+    							num--;
+    							createButtons(num);
+    						}
+    						img.src=lib.assetURL+'image/skin/'+name+'/'+num+'.jpg';
+    					}
+                        if(lib.config.change_skin){
+							loadImage();
+                        }
+    					else{
+                            createButtons(lib.skin[name]);
+                        }
+					};
+				};
+				if(lib.config.change_skin){
+					var img=new Image();
+					img.onload=changeskin;
+					img.src=lib.assetURL+'image/skin/'+name+'/1.jpg';
+				}
+				else if(lib.config.debug&&lib.skin[name]){
+					changeskin();
+				}
+				var ban=ui.create.div('.menubutton.large.ban.character',uiintro,'禁用',function(e){
+					ui.click.touchpop();
+					ui.click.intro.call(this,e);
+					_status.clicked=true;
+				});
+				ban.link=name;
+				ban._banning='offline';
+				ban.updateBanned=function(){
+					if(lib.config[get.mode()+'_banned']&&lib.config[get.mode()+'_banned'].contains(name)){
+						ban.classList.add('active');
+					}
+					else{
+						ban.classList.remove('active');
+					}
+				};
+				ban.updateBanned();
+				var fav=ui.create.div('.menubutton.large.fav',uiintro,'收藏',function(){
+					this.classList.toggle('active');
+					if(this.classList.contains('active')){
+						lib.config.favouriteCharacter.add(name);
+					}
+					else{
+						lib.config.favouriteCharacter.remove(name);
+					}
+					game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
+				});
+				if(lib.config.favouriteCharacter.contains(name)){
+					fav.classList.add('active');
+				}
+
+				uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.touchpop);
+				layer.addEventListener(lib.config.touchscreen?'touchend':'click',clicklayer);
+				ui.window.appendChild(layer);
+			},
 			intro:function(e){
 				if(_status.dragged) return;
 				_status.clicked=true;
@@ -34493,6 +34629,15 @@
     			return false;
     		},
         },
+		groupnature:function(group){
+			switch(group){
+				case 'wei':return 'watermm';
+				case 'shu':return 'soilmm';
+				case 'wu':return 'woodmm';
+				case 'qun':return 'metalmm';
+				default:return '';
+			}
+		},
 		sgn:function(num){
 			if(num>0) return 1;
 			if(num<0) return -1;
@@ -36184,9 +36329,50 @@
                     uiintro.add(addFavourite);
                 }
 				if(!simple||get.is.phoneLayout()){
-					if(lib.config.change_skin&&(!node.classList.contains('unseen')||!node.classList.contains('unseen2'))){
+					if((lib.config.change_skin||lib.skin)&&(!node.classList.contains('unseen')||!node.classList.contains('unseen2'))){
 						var num=1;
 						var introadded=false;
+						var createButtons=function(num,avatar2){
+							if(!introadded){
+								introadded=true;
+								uiintro.add('<div class="text center">更改皮肤</div>');
+							}
+							var buttons=ui.create.div('.buttons.smallzoom');
+							for(var i=0;i<=num;i++){
+								var button=ui.create.div('.button.character',buttons,function(){
+									if(this._link){
+										if(avatar2){
+											lib.config.skin[node.name2]=this._link;
+											node.node.avatar2.style.backgroundImage=this.style.backgroundImage;
+										}
+										else{
+											lib.config.skin[node.name]=this._link;
+											node.node.avatar.style.backgroundImage=this.style.backgroundImage;
+										}
+										game.saveConfig('skin',lib.config.skin);
+									}
+									else{
+										if(avatar2){
+											delete lib.config.skin[node.name2];
+											node.node.avatar2.setBackground(node.name2,'character');
+										}
+										else{
+											delete lib.config.skin[node.name];
+											node.node.avatar.setBackground(node.name,'character');
+										}
+										game.saveConfig('skin',lib.config.skin);
+									}
+								});
+								button._link=i;
+								if(i){
+									button.setBackgroundImage('image/skin/'+(avatar2?node.name2:node.name)+'/'+i+'.jpg');
+								}
+								else{
+									button.setBackground((avatar2?node.name2:node.name),'character','noskin');
+								}
+							}
+							uiintro.add(buttons);
+						};
 						var loadImage=function(avatar2){
 							var img=new Image();
 							img.onload=function(){
@@ -36196,45 +36382,7 @@
 							img.onerror=function(){
 								num--;
 								if(num){
-									if(!introadded){
-										introadded=true;
-										uiintro.add('<div class="text center">更改皮肤</div>');
-									}
-									var buttons=ui.create.div('.buttons.smallzoom');
-									for(var i=0;i<=num;i++){
-										var button=ui.create.div('.button.character',buttons,function(){
-											if(this._link){
-												if(avatar2){
-													lib.config.skin[node.name2]=this._link;
-													node.node.avatar2.style.backgroundImage=this.style.backgroundImage;
-												}
-												else{
-													lib.config.skin[node.name]=this._link;
-													node.node.avatar.style.backgroundImage=this.style.backgroundImage;
-												}
-												game.saveConfig('skin',lib.config.skin);
-											}
-											else{
-												if(avatar2){
-													delete lib.config.skin[node.name2];
-													node.node.avatar2.setBackground(node.name2,'character');
-												}
-												else{
-													delete lib.config.skin[node.name];
-													node.node.avatar.setBackground(node.name,'character');
-												}
-												game.saveConfig('skin',lib.config.skin);
-											}
-										});
-										button._link=i;
-										if(i){
-											button.setBackgroundImage('image/skin/'+(avatar2?node.name2:node.name)+'/'+i+'.jpg');
-										}
-										else{
-											button.setBackgroundImage('image/character/'+(avatar2?node.name2:node.name)+'.jpg');
-										}
-									}
-									uiintro.add(buttons);
+									createButtons(num,avatar2);
 								}
 								if(!avatar2){
 									if(!node.classList.contains('unseen2')&&node.name2){
@@ -36245,12 +36393,24 @@
 							}
 							img.src=lib.assetURL+'image/skin/'+(avatar2?node.name2:node.name)+'/'+num+'.jpg';
 						}
-						if(!node.classList.contains('unseen')){
-							loadImage();
+						if(lib.config.change_skin){
+							if(!node.classList.contains('unseen')){
+								loadImage();
+							}
+	                        else{
+	                            loadImage(true);
+	                        }
 						}
-                        else{
-                            loadImage(true);
-                        }
+						else{
+							setTimeout(function(){
+								if(!node.classList.contains('unseen')&&lib.skin[node.name]){
+									createButtons(lib.skin[node.name]);
+								}
+								if(!node.classList.contains('unseen2')&&lib.skin[node.name2]){
+									createButtons(lib.skin[node.name2],true);
+								}
+							});
+						}
 					}
 				}
 
@@ -36525,7 +36685,7 @@
     					}
     				}
                     var modepack=lib.characterPack['mode_'+get.mode()];
-                    if((node.parentNode.classList.contains('menu-buttons')||lib.config.show_favourite)&&
+                    if(lib.config.show_favourite&&
                     lib.character[node.link]&&(!modepack||!modepack[node.link])&&(!simple||get.is.phoneLayout())){
                         var addFavourite=ui.create.div('.text.center');
                         addFavourite.link=node.link;
@@ -36542,7 +36702,14 @@
                     else{
                         uiintro.add(ui.create.div('.placeholder.slim'));
                     }
-                    if((lib.config.change_skin||(lib.skin&&node.parentNode.classList.contains('menu-buttons')))&&(!simple||get.is.phoneLayout())){
+					var addskin=false;
+					if(node.parentNode.classList.contains('menu-buttons')){
+						addskin=!lib.config.show_charactercard;
+					}
+					else{
+						addskin=lib.config.change_skin||lib.skin;
+					}
+                    if(addskin&&(!simple||get.is.phoneLayout())){
     					var num=1;
     					var introadded=false;
                         var createButtons=function(num){
@@ -36570,7 +36737,7 @@
                                     button.setBackgroundImage('image/skin/'+node.link+'/'+i+'.jpg');
                                 }
                                 else{
-                                    button.setBackgroundImage('image/character/'+node.link+'.jpg');
+                                    button.setBackground(node.link,'character','noskin');
                                 }
                             }
                             uiintro.add(buttons);
@@ -36596,7 +36763,9 @@
                             }
                         }
     					else{
-                            createButtons(lib.skin[node.link]);
+							setTimeout(function(){
+								createButtons(lib.skin[node.link]);
+							});
                         }
     				}
                 }
