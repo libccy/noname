@@ -1040,6 +1040,7 @@ character.gujian={
 			enable:'chooseToUse',
 			skillAnimation:true,
 			animationColor:'fire',
+			derivation:'juejing',
 			filter:function(event,player){
 				return !player.storage.shahun&&player.hp<=0;
 			},

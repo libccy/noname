@@ -472,6 +472,7 @@ character.swd={
 		hxunzhi:{
 			unique:true,
 			enable:'phaseUse',
+			derivation:['wusheng','paoxiao'],
 			filter:function(event,player){
 				return !player.storage.hxunzhi;
 			},

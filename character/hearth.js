@@ -4110,6 +4110,7 @@ character.hearth={
 			enable:'phaseUse',
 			skillAnimation:'epic',
 			animationColor:'thunder',
+			derivation:'xinci',
 			filter:function(event,player){
 				return !player.storage.anying&&player.num('he',{color:'black'})>1;
 			},

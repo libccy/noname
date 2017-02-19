@@ -3910,6 +3910,7 @@ character.yijiang={
 			selectCard:2,
 			position:'h',
 			audio:2,
+			derivation:['wusheng','paoxiao'],
 			viewAs:{name:'sha'},
 			prompt:'将两张手牌当杀使用或打出',
 			check:function(card){
@@ -7216,6 +7217,7 @@ character.yijiang={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			unique:true,
+			derivation:['zyexin','zzili'],
 			init:function(player){
 				player.storage.zbaijiang=false;
 			},
@@ -7294,6 +7296,7 @@ character.yijiang={
 			init:function(player){
 				player.storage.zzili=false;
 			},
+			derivation:'zpaiyi',
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
 				return player.storage.zyexin.length>=4&&!player.storage.zzili;

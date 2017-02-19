@@ -28,6 +28,9 @@ character.standard={
 		lvbu:['male','qun',4,['wushuang']],
 		diaochan:['female','qun',3,['lijian','biyue']],
 	},
+	characterIntro:{
+		chenlin:'hhh'
+	},
 	perfectPair:{
 		xiahoudun:['xiahouyuan'],
 		zhenji:['caopi'],

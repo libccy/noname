@@ -458,6 +458,7 @@ character.refresh={
 			skillAnimation:true,
 			audio:2,
 			unique:true,
+			derivation:'gongxin',
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
@@ -1203,6 +1204,7 @@ character.refresh={
 			unique:true,
 			trigger:{source:'damageAfter'},
 			forced:true,
+			derivation:'jianyan',
 			filter:function(event,player){
 				return player.hp<player.maxHp;
 			},

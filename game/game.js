@@ -29,6 +29,7 @@
 		video:[],
 		_onDB:[],
 		skilllist:[],
+		characterIntro:{},
 		characterPack:{},
 		cardPack:{},
 		onresize:[],
@@ -33826,6 +33827,40 @@
 				});
 				if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
+				}
+				var intro=ui.create.div('.characterintro',uiintro,lib.characterIntro[name]||'123');
+				var intro2=ui.create.div('.characterintro.intro2',uiintro);
+
+				var list=lib.character[name][3];
+				var skills=ui.create.div('.characterskill',uiintro);
+				if(lib.config.mousewheel){
+					skills.onmousewheel=ui.click.mousewheel;
+				}
+				var clickSkill=function(){
+					var current=this.parentNode.querySelector('.active');
+					if(current){
+						current.classList.remove('active');
+					}
+					this.classList.add('active');
+					intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+lib.translate[this.link+'_info'];
+					var info=get.info(this.link);
+					if(info.derivation){
+						var derivation=info.derivation;
+						if(typeof derivation=='string'){
+							derivation=[derivation];
+						}
+						for(var i=0;i<derivation.length;i++){
+							intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+lib.translate[derivation[i]+'_info'];
+						}
+					}
+					//trySkillAudio
+				}
+				for(var i=0;i<list.length;i++){
+					var current=ui.create.div('.menubutton.large',skills,clickSkill,get.translation(list[i]));
+					current.link=list[i];
+					if(i==0){
+						clickSkill.call(current);
+					}
 				}
 
 				uiintro.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.touchpop);

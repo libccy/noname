@@ -804,6 +804,7 @@ character.sp={
 				player.storage.yjixi=0;
 				player.storage.yjixi2=false;
 			},
+			derivation:'wangzun',
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
@@ -3808,6 +3809,7 @@ character.sp={
 			audio:2,
 			skillAnimation:true,
 			animationColor:'fire',
+			derivation:'xintan',
 			filter:function(event,player){
 				return player.storage.fentian&&player.storage.fentian.length>=3&&!player.storage.zhiri;
 			},
@@ -4906,6 +4908,7 @@ character.sp={
 			skillAnimation:true,
 			unique:true,
 			audio:2,
+			derivation:'tiaoxin',
 			trigger:{player:'dying'},
 			priority:10,
 			forced:true,
@@ -5682,6 +5685,7 @@ character.sp={
 			audio:2,
 			unique:true,
 			forceunique:true,
+			derivation:'xiaoji',
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
 				if(player.storage.fanxiang) return false;
@@ -6131,6 +6135,7 @@ character.sp={
 			unique:true,
 			enable:'phaseUse',
 			mark:true,
+			derivation:'yongjue',
 			filter:function(event,player){
 				return !player.storage.cunsi&&player.num('h')&&!player.isTurnedOver();
 			},
@@ -7532,6 +7537,7 @@ character.sp={
 		juyi:{
 			skillAnimation:true,
 			audio:true,
+			derivation:['benghuai','weizhong'],
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
 				return player.maxHp>game.players.length&&player.hp<player.maxHp&&!player.storage.juyi;
@@ -7915,7 +7921,7 @@ character.sp={
 		fentian:'焚天',
 		fentian_info:'锁定技，结束阶段开始时，若你的手牌数少于体力值，你须选择一名攻击范围内的角色，将其一张牌置于你的武将牌上，称为“焚”。锁定技，你的攻击范围+X（X为“焚”的数量）',
 		zhiri:'炙日',
-		zhiri_info:'觉醒技，准备阶段开始时，若“焚”数不小于3，你减1点体力上限，然后获得技能“心惔”（出牌阶段限一次，你可以移去两张“焚”并选择一名角色，该角色失去一点体力）',
+		zhiri_info:'觉醒技，准备阶段开始时，若“焚”数不小于3，你减1点体力上限，然后获得技能“心惔”',
 		meibu:'魅步',
 		meibu_info:'一名其他角色的出牌阶段开始时，若你不在其攻击范围内，你可以令该角色的锦囊牌均视为【杀】，直到该角色以此法使用了一张【杀】或回合结束。若如此做，则直到回合结束，视为你在其攻击范围内',
 		mumu:'穆穆',

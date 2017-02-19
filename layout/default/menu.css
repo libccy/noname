@@ -176,6 +176,7 @@
 	left: 10px;
 	top: 10px;
 	overflow: hidden;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important;
 }
 .menubg.charactercard>.menubutton.large{
 	width: 85px;
@@ -204,9 +205,45 @@
 	pointer-events: none;
 	opacity: 0.6;
 }
-#window:not(.nopointer) .menubg.charactercard .menubutton:not(.ava),
+#window:not(.nopointer) .menubg.charactercard .menubutton:not(.ava):not(.intro),
 #window:not(.nopointer) .menubg.charactercard>.ava>.avatars>div{
 	cursor: pointer;
+}
+.menubg.charactercard>.characterskill{
+	left: 191px;
+    padding-left: 9px;
+    padding-right: 10px;
+    width: 290px;
+    top: 125px;
+    height: 50px;
+    white-space: nowrap;
+    overflow-x: scroll;
+}
+.menubg.charactercard>.characterskill>.menubutton.large{
+	height: 20px;
+	line-height: 20px;
+	padding: 5px;
+	margin-top: 10px;
+	position: relative;
+	font-size: 20px;
+	margin-right: 10px;
+}
+.menubg.charactercard .characterintro{
+	left: 200px;
+	width: 280px;
+	height: 105px;
+	padding: 5px;
+	overflow: scroll;
+	border-radius: 4px;
+	box-shadow: rgba(0,0,0,0.2) 0 0 0 1px;
+}
+.menubg.charactercard .characterintro:not(.intro2){
+	top: 10px;
+	bottom: auto;
+}
+.menubg.charactercard .characterintro.intro2{
+	top: auto;
+	bottom: 10px;
 }
 .menubg.charactercard>.ava>.avatars{
 	opacity: 0;
@@ -255,14 +292,14 @@
 	pointer-events: none;
 }
 .menubg.charactercard>.ava>.avatar{
-	left: 3px;
-	top: 3px;
-	width: calc(100% - 6px);
-	height: calc(100% - 6px);
-	background-position: 50% 0;
-	border-radius: 4px !important;
-	z-index: 1;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px;
+	left: 0;
+    top: 0;
+    width: calc(100% - 0px);
+    height: calc(100% - 0px);
+    background-position: 50% 0;
+    border-radius: 0px !important;
+    z-index: 1;
+    box-shadow: none;
 }
 .menu.main>.menu-tab{
 	height:37px;

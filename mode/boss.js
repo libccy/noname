@@ -2867,6 +2867,7 @@ mode.boss={
 			unique:true,
 			enable:'chooseToUse',
 			mark:true,
+			derivation:['tinqin','boss_huixin'],
 			init:function(player){
 				player.storage.boss_guihan=false;
 			},
@@ -3039,6 +3040,7 @@ mode.boss={
 			trigger:{player:'niepanAfter'},
 			forced:true,
 			unique:true,
+			derivation:['shenwei','zhuyu'],
 			content:function(){
 				player.addSkill('kanpo');
 				player.addSkill('shenwei');

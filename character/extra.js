@@ -187,6 +187,7 @@ character.extra={
 		wuqian:{
 			audio:2,
 			enable:'phaseUse',
+			derivation:'wushuang',
 			filter:function(event,player){
 				return player.storage.baonu>=2&&!player.hasSkill('wushuang');
 			},

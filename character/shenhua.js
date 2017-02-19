@@ -574,6 +574,7 @@ character.shenhua={
 			audio:2,
 			unique:true,
 			priority:-10,
+			derivation:'guanxing',
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
@@ -710,6 +711,7 @@ character.shenhua={
 			unique:true,
 			zhuSkill:true,
 			keepSkill:true,
+			derivation:'jijiang',
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
@@ -1010,6 +1012,7 @@ character.shenhua={
 				}
 				return false;
 			},
+			derivation:'jixi',
 			content:function(){
 				"step 0"
 				player.judge(function(card){
@@ -1156,6 +1159,7 @@ character.shenhua={
 		hunzi:{
 			skillAnimation:true,
 			audio:2,
+			derivation:['reyingzi','yinghun'],
 			unique:true,
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){

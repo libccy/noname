@@ -45,6 +45,7 @@ character.xianjian={
 			trigger:{player:'dyingAfter'},
 			forced:true,
 			mark:true,
+			derivation:'longhuo',
 			intro:{
 				content:'limited'
 			},
@@ -1542,6 +1543,7 @@ character.xianjian={
 			trigger:{player:'dieBegin'},
 			direct:true,
 			unique:true,
+			derivation:'changnian2',
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('changnian'),function(card,player,target){
@@ -1582,6 +1584,7 @@ character.xianjian={
 		changnian2:{
 			trigger:{player:'phaseEnd'},
 			forced:true,
+			nopop:true,
 			content:function(){
 				player.draw();
 			},
@@ -2556,6 +2559,7 @@ character.xianjian={
 		wangyou_info:'其他角色的结束阶段，你可以弃置一张牌，令此回合内受过伤害的所有角色各摸一张牌',
 		changnian:'长念',
 		changnian2:'追思',
+		changnian2_info:'锁定技，结束阶段，你摸一张牌',
 		changnian_info:'你死亡时，可以将所有牌交给一名其他角色，令其获得技能【追思】',
 		sajin:'洒金',
 		sajin_info:'出牌阶段限一次，你可以弃置一张手牌并指定任意名角色进行判定，若判定颜色与你弃置的牌相同，该角色回复一点体力',
