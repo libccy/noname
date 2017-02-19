@@ -25,6 +25,10 @@ character.refresh={
 		re_huatuo:['male','qun',3,['chulao','jijiu']],
 		re_liubei:['male','shu',4,['rerende','jijiang'],['zhu']],
 	},
+	characterIntro:{
+		re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
+		re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
+	},
 	skill:{
 		rerende:{
 			audio:2,
