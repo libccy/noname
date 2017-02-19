@@ -211,3 +211,6 @@ html{
 	background: url('wood2.png');
 	box-shadow: rgba(0,0,0,0.5) 0 0 5px inset;
 }
+.menubg.charactercard>.ava>.avatar{
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px;
+}
