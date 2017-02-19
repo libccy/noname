@@ -33828,7 +33828,7 @@
 				if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
 				}
-				var intro=ui.create.div('.characterintro',uiintro,lib.characterIntro[name]||'123');
+				var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
 				var intro2=ui.create.div('.characterintro.intro2',uiintro);
 
 				var list=lib.character[name][3];
@@ -34664,6 +34664,14 @@
     			return false;
     		},
         },
+		characterIntro:function(name){
+			if(lib.characterIntro[name]) return lib.characterIntro[name];
+			if(name.indexOf('_')!=-1){
+				name=name.slice(name.indexOf('_')+1);
+			}
+			if(lib.characterIntro[name]) return lib.characterIntro[name];
+			return '暂无武将介绍';
+		},
 		groupnature:function(group){
 			switch(group){
 				case 'wei':return 'watermm';

@@ -79,6 +79,10 @@ character.sp={
 		kanze:['male','wu',3,['xiashu','kuanshi']],
 		heqi:['male','wu',4,['qizhou','shanxi']],
 	},
+	characterIntro:{
+		re_yuanshu:'字公路，汝南汝阳人，袁绍之弟。初为虎贲中郎将。董卓进京后以袁术为后将军，袁术因畏祸而出奔南阳。初平元年与袁绍、曹操等同时起兵，共讨董卓。后与袁绍对立，被袁绍、曹操击败，率馀众奔九江，割据扬州。建安二年称帝，建号仲氏。',
+		
+	},
 	perfectPair:{
 		zhugejin:['zhugeke'],
 		guanyinping:['guanyu'],
@@ -460,6 +464,7 @@ character.sp={
 			trigger:{player:['phaseBefore','equipAfter','loseAfter']},
 			forced:true,
 			popup:false,
+			derivation:['mashu','reyingzi','duanbing','fenwei'],
 			filter:function(event,player){
 				if(player.equiping) return false;
 				var suits=[];
@@ -7189,6 +7194,7 @@ character.sp={
 			forced:true,
 			popup:false,
 			unique:true,
+			derivation:['tiaoxin','paoxiao','xinshensu'],
 			content:function(){
 				player.removeAdditionalSkill('baobian');
 				var list=[];

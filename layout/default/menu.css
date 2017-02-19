@@ -176,7 +176,7 @@
 	left: 10px;
 	top: 10px;
 	overflow: hidden;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px !important;
 }
 .menubg.charactercard>.menubutton.large{
 	width: 85px;
@@ -292,14 +292,14 @@
 	pointer-events: none;
 }
 .menubg.charactercard>.ava>.avatar{
-	left: 0;
-    top: 0;
-    width: calc(100% - 0px);
-    height: calc(100% - 0px);
-    background-position: 50% 0;
-    border-radius: 0px !important;
-    z-index: 1;
-    box-shadow: none;
+	left: 5px;
+	top: 5px;
+	width: calc(100% - 10px);
+	height: calc(100% - 10px);
+	background-position: 50% 0;
+	border-radius: 4px !important;
+	z-index: 1;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px;
 }
 .menu.main>.menu-tab{
 	height:37px;
