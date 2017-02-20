@@ -5150,8 +5150,8 @@ card.swd={
 
 		['club',6,'shuchui'],
 
-		['club',1,'fengyinzhidan'],
-		['diamond',1,'fengyinzhidan'],
+		// ['club',1,'fengyinzhidan'],
+		// ['diamond',1,'fengyinzhidan'],
 		['heart',1,'fengyinzhidan'],
 		['spade',1,'fengyinzhidan'],
 

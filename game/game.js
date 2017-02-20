@@ -5798,11 +5798,19 @@
 					game.saveConfig(mode[i]+'_banned',banned);
 					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
 				}
+				game.saveConfig('change_skin',false);
+				game.saveConfig('show_favourite',false);
+				game.saveConfig('characters',lib.config.all.characters);
+				game.saveConfig('cards',lib.config.all.cards);
+				game.saveConfig('plays',['cardpile']);
+				game.saveConfig('hiddenCardPack',['zhenfa']);
+				game.saveConfig('hiddenPlayPack',['character', 'soldier', 'weather']);
 				game.saveConfig('tao_enemy',true);
 				game.saveConfig('layout','long2');
 				game.saveConfig('background_music','music_off');
 				game.saveConfig('background_audio',false);
 				game.saveConfig('debug',true);
+				game.saveConfig('dev',true);
 				game.reload();
 			},
             o:function(){
