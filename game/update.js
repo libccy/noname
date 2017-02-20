@@ -2,7 +2,7 @@ window.noname_update={
     version:'1.9.9.6',
     // update:'1.9.9',
     changeLog:[
-        '武将资料',
+        '武将介绍',
     ],
     files:[
         // 'game/game.js',

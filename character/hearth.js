@@ -624,7 +624,7 @@ character.hearth={
 				result:{
 					target:3
 				},
-				threaten:2
+				threaten:2.5
 			},
 		},
 		yushou:{
@@ -1938,6 +1938,14 @@ character.hearth={
 				'step 2'
 				if(result.bool){
 					player.chooseToUse();
+				}
+			},
+			ai:{
+				noh:true,
+				skillTagFilter:function(player,tag){
+					if(tag=='noh'){
+						if(player.num('h')!=1) return false;
+					}
 				}
 			}
 		},
