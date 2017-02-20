@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.9.6',
+    version:'1.9.9.5',
     // update:'1.9.9',
     changeLog:[
-        '新武将资料卡',
+        'bug修复',
     ],
     files:[
         // 'game/game.js',
