@@ -26306,6 +26306,11 @@
                                             options.childNodes[i].lastChild.checked=false;
                                         }
     								}
+									for(var i=0;i<info[4].length;i++){
+										if(info[4][i].indexOf('des:')==0){
+											newCharacter.querySelector('.new_des').value=info[4][i].slice(4);
+										}
+									}
     							}
 
     							var skills=info[3];
@@ -26493,8 +26498,9 @@
 
     						ui.create.div('.select_avatar','选择头像',fakeme);
 
-    						ui.create.div('.indent','姓名：<input class="new_name" type="text">',newCharacter).style.paddingTop='10px';
-    						ui.create.div('.indent','体力：<input class="new_hp" type="text">',newCharacter).style.paddingTop='10px';
+							ui.create.div('.indent','姓名：<input class="new_name" type="text">',newCharacter).style.paddingTop='8px';
+    						ui.create.div('.indent','介绍：<input class="new_des" type="text">',newCharacter).style.paddingTop='8px';
+    						ui.create.div('.indent','体力：<input class="new_hp" type="text">',newCharacter).style.paddingTop='8px';
                             newCharacter.querySelector('input.new_name').onblur=updateButton;
     						var sexes=ui.create.selectlist([
     							['male','男'],
@@ -26664,6 +26670,10 @@
                                 if(tags.contains('boss')){
                                     tags.add('bossallowed');
                                 }
+								var des=page.querySelector('input.new_des').value;
+								if(des){
+									tags.add('des:'+des);
+								}
 
                                 page.content.pack.translate[name]=translate;
                                 page.content.pack.character[name]=[sexes.value,groups.value,hp,skills,tags];
@@ -34739,6 +34749,14 @@
         },
 		characterIntro:function(name){
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
+			var tags=lib.character[name][4];
+			if(tags){
+				for(var i=0;i<tags.length;i++){
+					if(tags[i].indexOf('des:')==0){
+						return tags[i].slice(4);
+					}
+				}
+			}
 			if(name.indexOf('_')!=-1){
 				name=name.slice(name.indexOf('_')+1);
 			}

@@ -597,7 +597,7 @@
 	left:12px;
 	position: absolute;
 	width: 100px;
-	height: 120px;
+	height: 130px;
 	margin: 0;
 }
 .menu-buttons>.new_character>.card{
@@ -640,7 +640,7 @@
 	width: 100%;
 	height: 20px;
 	line-height: 20px;
-	top:50px;
+	top:55px;
 	left:0;
 	text-align: center;
 }
@@ -669,13 +669,13 @@
 .menu-buttons>.new_character>.add_skill{
 	position: absolute;
 	left: 12px;
-	top:170px;
+	top:180px;
 	text-align: left;
 	line-height: 20px;
 	white-space: nowrap;
 }
 .menu-buttons>.new_character>.add_skill.options{
-	top:145px;
+	top:155px;
 }
 .menu-buttons>.new_character>.add_skill.options>span{
 	margin-right: 10px;
@@ -1023,7 +1023,7 @@
 	transform: translateX(200px);
 }
 #create-extension>.menu-buttons>.new_character>.skill_list{
-    top: 210px;
+    top: 220px;
 }
 #create-extension>.menu-buttons>.new_character>.skill_list>div:first-child{
 	transition: all 0s;
