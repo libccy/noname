@@ -2170,8 +2170,6 @@ window.noname_asset_list=[
     'audio/skill/tiandao.mp3',
     'audio/skill/tiandu1.mp3',
     'audio/skill/tiandu2.mp3',
-    'audio/skill/tiandu3.mp3',
-    'audio/skill/tiandu4.mp3',
     'audio/skill/tianming1.mp3',
     'audio/skill/tianming2.mp3',
     'audio/skill/tianxiang1.mp3',

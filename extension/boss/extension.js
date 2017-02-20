@@ -82,6 +82,14 @@ play.boss={
 						lib.config.forbidai.push(i);
 					}
 				}
+				lib.characterIntro.boss_liedixuande=lib.characterIntro.liubei;
+				lib.characterIntro.boss_gongshenyueying=lib.characterIntro.huangyueying;
+				lib.characterIntro.boss_tianhoukongming=lib.characterIntro.shen_zhugeliang;
+				lib.characterIntro.boss_yuhuoshiyuan=lib.characterIntro.pangtong;
+				lib.characterIntro.boss_qiaokuijunyi=lib.characterIntro.zhanghe;
+				lib.characterIntro.boss_jiarenzidan=lib.characterIntro.caozhen;
+				lib.characterIntro.boss_duanyuzhongda=lib.characterIntro.simayi;
+				lib.characterIntro.boss_juechenmiaocai=lib.characterIntro.xiahouyuan;
 			}
 			else if(_status.mode!='jiange'){
 				for(var i in list2){

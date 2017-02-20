@@ -17869,7 +17869,7 @@
 				}
 			}
 		},
-		playSkillAudio:function(name){
+		playSkillAudio:function(name,index){
 			if(_status.video&&arguments[1]!='video') return;
 			if(_status.skillaudio.contains(name)) return;
 			game.addVideo('playSkillAudio',null,name);
@@ -17888,6 +17888,9 @@
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
+			if(typeof index!='number'){
+				index=Math.ceil(Math.random()*2);
+			}
 			audio._changed=1;
 			audio.onerror=function(){
 				switch(this._changed){
@@ -17897,12 +17900,12 @@
 						break;
 					}
 					case 2:{
-						audio.src=lib.assetURL+str+name+Math.ceil(Math.random()*2)+'.mp3';
+						audio.src=lib.assetURL+str+name+index+'.mp3';
 						this._changed=3;
 						break;
 					}
 					case 3:{
-						audio.src=lib.assetURL+str+name+Math.ceil(Math.random()*2)+'.ogg';
+						audio.src=lib.assetURL+str+name+index+'.ogg';
 						this._changed=4;
 						break;
 					}
@@ -25218,6 +25221,9 @@
 							}
 							if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0&&
                                 mode!='mode_favourite'&&mode!='mode_banned'){
+								if(!connectMenu&&lib.config.show_charactercard){
+									ui.click.charactercard(this.link,this,true);
+								}
 								return;
 							}
                             ui.click.touchpop();
@@ -33711,7 +33717,7 @@
 					delete _status.currentlogv.logvtimeout;
 				}
 			},
-			charactercard:function(name,sourcenode){
+			charactercard:function(name,sourcenode,noedit){
 				if(_status.dragged) return;
 				ui.window.classList.add('shortcutpaused');
 				ui.window.classList.add('systempaused');
@@ -33810,6 +33816,7 @@
 					changeskin();
 				}
 				var ban=ui.create.div('.menubutton.large.ban.character',uiintro,'禁用',function(e){
+					if(this.classList.contains('unselectable')) return;
 					ui.click.touchpop();
 					ui.click.intro.call(this,e);
 					_status.clicked=true;
@@ -33817,6 +33824,7 @@
 				ban.link=name;
 				ban._banning='offline';
 				ban.updateBanned=function(){
+					if(noedit) return;
 					if(lib.config[get.mode()+'_banned']&&lib.config[get.mode()+'_banned'].contains(name)){
 						ban.classList.add('active');
 					}
@@ -33826,6 +33834,7 @@
 				};
 				ban.updateBanned();
 				var fav=ui.create.div('.menubutton.large.fav',uiintro,'收藏',function(){
+					if(this.classList.contains('unselectable')) return;
 					this.classList.toggle('active');
 					if(this.classList.contains('active')){
 						lib.config.favouriteCharacter.add(name);
@@ -33835,7 +33844,11 @@
 					}
 					game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
 				});
-				if(lib.config.favouriteCharacter.contains(name)){
+				if(noedit){
+					fav.classList.add('unselectable');
+					ban.classList.add('unselectable');
+				}
+				else if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
 				}
 				var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
@@ -33846,7 +33859,7 @@
 				if(lib.config.mousewheel){
 					skills.onmousewheel=ui.click.mousewheel;
 				}
-				var clickSkill=function(){
+				var clickSkill=function(e){
 					var current=this.parentNode.querySelector('.active');
 					if(current){
 						current.classList.remove('active');
@@ -33863,13 +33876,63 @@
 							intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+lib.translate[derivation[i]+'_info'];
 						}
 					}
-					//trySkillAudio
+					if(lib.config.background_speak&&e!=='init'){
+						var audioname=this.link;
+						var audioinfo=info.audio;
+						var that=this;
+						var getIndex=function(i){
+							if(typeof that.audioindex!='number'){
+								that.audioindex=i;
+							}
+							that.audioindex++;
+							if(that.audioindex>i){
+								that.audioindex=1;
+							}
+							return that.audioindex;
+						};
+						if(typeof audioinfo=='string'){
+		                    if(audioinfo.indexOf('ext:')==0){
+		                        audioinfo=audioinfo.split(':');
+		                        if(audioinfo.length==3){
+		                            if(audioinfo[2]=='true'){
+		                                game.playAudio('..','extension',audioinfo[1],audioname);
+		                            }
+		                            else{
+		                                audioinfo[2]=parseInt(audioinfo[2]);
+		                                if(audioinfo[2]){
+		                                    game.playAudio('..','extension',audioinfo[1],audioname+getIndex(audioinfo[2]));
+		                                }
+		                            }
+		                        }
+		                        return;
+		                    }
+		                    else{
+		                        audioname=audioinfo;
+		    					if(lib.skill[audioinfo]){
+		    						audioinfo=lib.skill[audioinfo].audio;
+		    					}
+		                    }
+						}
+						else if(Array.isArray(audioinfo)){
+							audioname=audioinfo[0];
+							audioinfo=audioinfo[1];
+						}
+						if(typeof audioinfo=='number'){
+							game.playAudio('skill',audioname+getIndex(audioinfo));
+						}
+						else if(audioinfo){
+							game.playAudio('skill',audioname);
+						}
+						else if(true&&info.audio!==false){
+							game.playSkillAudio(audioname,getIndex(2));
+						}
+					}
 				}
 				for(var i=0;i<list.length;i++){
 					var current=ui.create.div('.menubutton.large',skills,clickSkill,get.translation(list[i]));
 					current.link=list[i];
 					if(i==0){
-						clickSkill.call(current);
+						clickSkill.call(current,'init');
 					}
 				}
 

@@ -331,7 +331,7 @@ character.standard={
 			}
 		},
 		tiandu:{
-			audio:4,
+			audio:2,
 			trigger:{player:'judgeEnd'},
 			frequent:'check',
 			check:function(event){
