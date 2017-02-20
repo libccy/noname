@@ -962,7 +962,7 @@ character.swd={
 			filterCard:{suit:'spade'},
 			viewAs:{name:'fengyinzhidan'},
 			check:function(card){
-				return 6-ai.get.value(card);
+				return 7-ai.get.value(card);
 			},
 			ai:{
 				order:2,

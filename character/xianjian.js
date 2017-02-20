@@ -37,6 +37,43 @@ character.xianjian={
 		// pal_xia:['male','wei',4,[]],
 		pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 	},
+	characterIntro:{
+		pal_lixiaoyao:'一个天资聪颖的乡下客栈店小二，因一壶酒被酒剑仙传授了蜀山仙剑派剑术，在仙灵岛与赵灵儿相遇，自此经历重重磨难成长为一代旷世奇侠。灵儿牺牲以后他悲痛欲绝。后出任蜀山掌门，取道号一贫，从此御剑行遍天下，行侠仗义、斩妖除魔。多年后因魔教之乱，故引咎卸职，成为蜀山七圣之一。而后虽心力交瘁，但仍竭力保护天下苍生。',
+		pal_zhaoliner:'',
+		pal_linyueru:'',
+
+		pal_wangxiaohu:'',
+		pal_sumei:'',
+		pal_shenqishuang:'',
+
+		pal_jingtian:'',
+		pal_xuejian:'',
+		pal_longkui:'',
+		pal_zixuan:'',
+		pal_changqing:'',
+
+		pal_nangonghuang:'',
+		pal_wenhui:'',
+		pal_wangpengxu:'',
+		pal_xingxuan:'',
+		pal_leiyuange:'',
+
+		pal_yuntianhe:'',
+		pal_hanlingsha:'',
+		pal_liumengli:'',
+		pal_murongziying:'',
+		pal_xuanxiao:'',
+
+		pal_jiangyunfan:'',
+		pal_tangyurou:'',
+		pal_longyou:'',
+		pal_xiaoman:'',
+
+		pal_xiahoujinxuan:'',
+		pal_muchanglan:'',
+		pal_xia:'',
+		pal_jiangcheng:'',
+	},
 	skill:{
 		fenshi:{
 			unique:true,
