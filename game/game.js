@@ -5809,6 +5809,8 @@
 				game.saveConfig('layout','long2');
 				game.saveConfig('background_music','music_off');
 				game.saveConfig('background_audio',false);
+				game.saveConfig('background_speak',false);
+				game.saveConfig('show_volumn',false);
 				game.saveConfig('debug',true);
 				game.saveConfig('dev',true);
 				game.reload();
