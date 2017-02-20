@@ -1473,7 +1473,7 @@ card.swd={
 					useful:[7,2],
 					value:[7,2],
 				},
-				order:7,
+				order:2.2,
 				result:{
 					target:2
 				},

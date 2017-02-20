@@ -1968,7 +1968,7 @@ character.shenhua={
 							}
 							if(ai.get.attitude(player,target)>0&&!hastarget) return;
 							if(turnfriend||target.hp==target.maxHp) return [0.5,1];
-							if(target.hp>1) return [1,1];
+							if(target.hp>1) return [1,0.5];
 						}
 					}
 				}

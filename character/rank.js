@@ -228,6 +228,7 @@ window.characterRank={
     ],
     bp:[
         'yanbaihu',
+        'dongyun',
         'sunziliufang',
         'shen_zhouyu',
         'yj_jushou',
@@ -368,7 +369,6 @@ window.characterRank={
         'hs_lrexxar',
         'huatuo',
         'sunhao',
-        'dongyun',
         'swd_jiting',
         'hs_nozdormu',
     ],

@@ -377,28 +377,33 @@ character.sp={
 				}).set('ai',function(target){
 					var player=_status.event.player;
 					var att=ai.get.attitude(player,target);
-					if(att>0&&target.num('h')==target.hp-1){
-						if(player==target) return att+1;
-						return att+2;
+					var nh=target.num('h');
+					if(att>0){
+						if(nh==target.hp-1){
+							if(player==target) return att+1;
+							return att+2;
+						}
+						if(player==target&&player.needsToDiscard()) return att/3;
+						return att;
 					}
-					if(player==target&&player.needsToDiscard()) return att/3;
-					return att;
+					else{
+						if(nh==target.hp+1) return -att;
+						if(nh==0) return 0;
+						return -att/2;
+					}
 				});
 				'step 1'
 				if(result.bool){
 					player.logSkill('bingzheng',result.targets);
 					event.target=result.targets[0];
 					if(event.target.num('h')){
-						event.target.chooseToDiscard('弃置一张手牌，或取消并摸一张牌').set('ai',function(card){
-							if(_status.event.player==_status.event.getParent().player) return 0;
-							if(card.name=='du') return 0;
-							if(_status.event.goon) return 6-ai.get.value(card);
+						player.chooseControl(function(event,player){
+							var target=event.target;
+							if(ai.get.attitude(player,target)<0) return 1;
+							if(target.num('h')==target.hp+1) return 1;
 							return 0;
-						}).set('goon',(
-							event.target.num('h')==event.target.hp+1&&
-							ai.get.attitude(event.target,player)>1&&
-							!player.needsToDiscard()&&player.num('h')<event.target.num('h')
-						));
+						}).set('choiceList',['令'+get.translation(event.target)+'摸一张牌',
+						'令'+get.translation(event.target)+'弃置一张手牌']);
 					}
 					else{
 						event.directfalse=true;
@@ -408,8 +413,11 @@ character.sp={
 					event.finish();
 				}
 				'step 2'
-				if(event.directfalse||!result.bool){
+				if(event.directfalse||result.index==0){
 					event.target.draw();
+				}
+				else{
+					event.target.chooseToDiscard('h',true);
 				}
 				'step 3'
 				if(event.target.num('h')==event.target.hp){
@@ -427,7 +435,7 @@ character.sp={
 						if(_status.event.goon){
 							return 10-ai.get.value(card);
 						}
-						return 0;
+						return -ai.get.value(card,_status.event.player,'raw');
 					});
 					if(ai.get.attitude(player,event.target)>1&&
 						player.num('h','shan')>1&&player.num('h')>event.target.num('h')){

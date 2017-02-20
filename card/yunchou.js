@@ -459,7 +459,7 @@ card.yunchou={
 				if(target.isLowestHp()) target.recover();
 			},
 			ai:{
-				order:2,
+				order:2.5,
 				value:6,
 				result:{
 					target:function(player,target){
