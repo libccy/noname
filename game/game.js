@@ -33910,9 +33910,14 @@
 				}
 				var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
 				var intro2=ui.create.div('.characterintro.intro2',uiintro);
-
 				var list=lib.character[name][3];
 				var skills=ui.create.div('.characterskill',uiintro);
+				if(lib.config.touchscreen){
+					lib.setScroll(intro);
+					lib.setScroll(intro2);
+					lib.setScroll(skills);
+				}
+
 				if(lib.config.mousewheel){
 					skills.onmousewheel=ui.click.mousewheel;
 				}
