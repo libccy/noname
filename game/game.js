@@ -7011,6 +7011,7 @@
                     if(!lib.config.show_phaseuse_prompt){
                         next.set('prompt',false);
                     }
+					next.set('type','phase');
 					"step 1"
 					if(result.bool&&!event.skipped){
 						event.goto(0);
@@ -7049,6 +7050,24 @@
                         }
                     }
                     _status.noclearcountdown=true;
+					if(event.type=='phase'){
+						if(event.isMine()){
+							event.endButton=ui.create.control('结束回合','stayleft',function(){
+								if(_status.event.skill){
+									ui.click.cancel();
+								}
+								ui.click.cancel();
+							});
+							event.forced=true;
+						}
+						else{
+							if(event.endButton){
+								event.endButton.close();
+								delete event.endButton;
+							}
+							event.forced=false;
+						}
+					}
 					if(event.player.isUnderControl()){
 						event.result={
 							bool:false
@@ -7173,6 +7192,10 @@
                         }
                     }
                     "step 2"
+					if(event.endButton){
+						event.endButton.close();
+						delete event.endButton;
+					}
 					event.resume();
                     if(event.result){
                         if(event.result.skill){
@@ -7209,6 +7232,7 @@
                             }
                         }
                         else{
+							ui.control.animate('nozoom',100);
                             event.aiexclude.add(event.buttoned);
                         }
                         event.goto(0);
@@ -21206,7 +21230,7 @@
 						enable=false;
 						if(typeof info.enable=='function') enable=info.enable(event);
 						else if(typeof info.enable=='object') enable=info.enable.contains(event.name);
-						else if(info.enable=='phaseUse') enable=(event.getParent().name=='phaseUse');
+						else if(info.enable=='phaseUse') enable=(event.type=='phase');
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
 							if(info.filter&&!info.filter(event,player)) enable=false;
@@ -21306,12 +21330,15 @@
 						}
 					}
 				}
-				if(ok&&auto&&lib.config.auto_confirm&&(!_status.mousedragging||!_status.mouseleft)&&
+				if(ok&&auto&&(lib.config.auto_confirm||(skillinfo&&skillinfo.direct))&&(!_status.mousedragging||!_status.mouseleft)&&
 				!_status.mousedown&&!_status.touchnocheck){
 					if(ui.confirm){
 						if(!skillinfo||!skillinfo.preservecancel){
 							ui.confirm.close();
 						}
+					}
+					if(skillinfo&&skillinfo.preservecancel&&!ui.confirm){
+						ui.create.confirm('c');
 					}
 					if(event.skillDialog==true) event.skillDialog=false;
 					ui.click.ok();
@@ -21330,7 +21357,7 @@
 					}
 				}
 				if(ui.confirm&&ui.confirm.lastChild.link=='cancel'){
-					if(_status.event.getParent().name=='phaseUse'&&!_status.event.skill){
+					if(_status.event.type=='phase'&&!_status.event.skill){
 						ui.confirm.lastChild.innerHTML='结束';
 					}
 					else{
@@ -22443,7 +22470,8 @@
                 if(nodes[i]==ui.control) continue;
                 if(nodes[i]==ui.arenalog) continue;
                 if(nodes[i]==ui.roundmenu) continue;
-                if(nodes[i]==ui.timer) continue;
+				if(nodes[i]==ui.timer) continue;
+                if(nodes[i]==ui.autonode) continue;
                 nodes[i].remove();
             }
             ui.sidebar.innerHTML='';
@@ -30432,7 +30460,7 @@
 				return caption;
 			},
 			control:function(){
-				var nc=(ui.control.childNodes.length==0);
+				var nc=!ui.control.querySelector('div:not(.removing):not(.stayleft)');
 				// for(var i=0;i<ui.control.childNodes.length;i++){
 				// 	if(ui.control.childNodes[i].classList.contains('removing')){
 				// 		var that=ui.control.childNodes[i];
@@ -30460,6 +30488,7 @@
 					}
 					else if(controls[i]=='stayleft'){
 						control.stayleft=true;
+						control.classList.add('stayleft');
 					}
 					else{
 						control.add(controls[i]);
@@ -30484,7 +30513,9 @@
 					// 	control.style.transform='scale(0.8)';
 					// }
 					ui.refresh(control);
-					control.style.transform='translateX(-'+(control.offsetWidth/2)+'px)';
+					if(!control.stayleft){
+						control.style.transform='translateX(-'+(control.offsetWidth/2)+'px)';
+					}
 					control.style.opacity=1;
 					ui.refresh(control);
 					control.style.transition='';
@@ -32753,6 +32784,9 @@
 								_status.mousedragging=null;
 								_status.mousedragorigin=null;
 								_status.clicked=false;
+								if(_status.event.type=='phase'&&!_status.event.skill&&ui.confirm){
+									ui.confirm.classList.add('removing');
+								}
 								game.uncheck();
 								game.check();
 								_status.clicked=true;
@@ -32808,7 +32842,10 @@
 						}
 						item=item.parentNode;
 					}
-					_status.mouseleft=true;
+					if(!_status.mouseleft){
+						_status.mouseleft=true;
+						game.check();
+					}
 					_status.dragstatuschanged=null;
 				}
 				else{
@@ -33684,6 +33721,9 @@
 					}
 					if(typeof event.dialog=='string'&&event.isMine()){
 						event.dialog=ui.create.dialog(event.dialog);
+					}
+					if(_status.event.type=='phase'&&ui.confirm){
+						ui.confirm.classList.add('removing');
 					}
 					event.restore();
                     var cards=event.player.get('hej');

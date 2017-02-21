@@ -4187,6 +4187,9 @@ mode.chess={
 				event.custom.replace.confirm=game.resume;
 				event.switchToAuto=game.resume;
 				"step 1"
+				if(ui.confirm){
+					ui.confirm.classList.add('removing');
+				}
 				_status.imchoosing=false;
 				event.dialog.close();
 				if(event.choice){
@@ -4928,6 +4931,9 @@ mode.chess={
 					};
 				}
 				'step 1'
+				if(ui.confirm){
+					ui.confirm.classList.add('removing');
+				}
 				_status.imchoosing=false;
 				if(!event.cancelled){
 					if(!event.obstacle){
@@ -4985,6 +4991,9 @@ mode.chess={
 				move=game.checkMod(player,move,'chessMove',player.get('s'));
 				player.chooseToMove(move).phasing=true;
 				"step 1"
+				if(ui.confirm){
+					ui.confirm.classList.add('removing');
+				}
 				if(!result.bool){
 					var skill=player.getStat().skill;
 					skill._chessmove--;

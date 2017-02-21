@@ -1572,7 +1572,10 @@ div:not(.handcards)>.card>.info>span,
 	cursor:pointer;
 }
 #control.nozoom>div {
-	transition-property: opacity
+	transition-property: opacity;
+}
+#control>div.stayleft{
+	transition-property: opacity !important;
 }
 .control {
 	padding-top: 2px;
