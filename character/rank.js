@@ -13,10 +13,10 @@ window.characterRank={
         'swd_yuxiaoxue',
         'gjqt_bailitusu',
         'swd_huanglei',
-        'pal_liumengli',
         'hs_medivh',
     ],
     ap:[
+        'pal_liumengli',
         'pal_yuntianhe',
         'pal_lixiaoyao',
         'swd_huanyuanzhi',

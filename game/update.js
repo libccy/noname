@@ -8,6 +8,7 @@ window.noname_update={
         'game/game.js',
         // 'game/asset.js',
         // 'card/*',
+        'character/rank.js',
         // 'character/*',
         // 'mode/boss.js',
         'mode/chess.js',

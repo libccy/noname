@@ -1340,12 +1340,9 @@ mode.chess={
 							}
 						}
 						else{
-							var targets=[];
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].side!=player.side){
-									targets.push(game.players[i]);
-								}
-							}
+							var targets=game.filterPlayer(function(current){
+								return current.side!=player.side&&current.isIn();
+							});
 							targets.sort(function(a,b){
 								return get.distance(player,a)-get.distance(player,b);
 							});

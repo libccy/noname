@@ -7058,14 +7058,14 @@
 								}
 								ui.click.cancel();
 							});
-							event.forced=true;
+							event.fakeforce=true;
 						}
 						else{
 							if(event.endButton){
 								event.endButton.close();
 								delete event.endButton;
 							}
-							event.forced=false;
+							event.fakeforce=false;
 						}
 					}
 					if(event.player.isUnderControl()){
@@ -15327,6 +15327,7 @@
 						selectCard:this.selectCard,
 						position:this.position,
 						forced:this.forced,
+						fakeforce:this.fakeforce,
 						aiexclude:this.aiexclude,
                         complexSelect:this.complexSelect,
 						complexCard:this.complexCard,
@@ -15371,6 +15372,7 @@
                             if(info.ai1!=undefined) this.ai1=info.ai1;
 							if(info.ai2!=undefined) this.ai2=info.ai2;
 						}
+						delete this.fakeforce;
 					}
 					delete this._cardChoice;
 					delete this._targetChoice;
@@ -15386,6 +15388,7 @@
 						this.selectCard=this._backup.selectCard;
 						this.position=this._backup.position;
 						this.forced=this._backup.forced;
+						this.fakeforce=this._backup.fakeforce;
                         this.aiexclude=this._backup.aiexclude;
 						this.complexSelect=this._backup.complexSelect;
 						this.complexCard=this._backup.complexCard;
@@ -21351,7 +21354,7 @@
 						if(!_status.mousedown||_status.mouseleft){
 							var str='';
 							if(ok) str+='o';
-							if(!event.forced&&get.noSelected()) str+='c';
+							if(!event.forced&&!event.fakeforce&&get.noSelected()) str+='c';
 							ui.create.confirm(str);
 						}
 					}
@@ -33725,6 +33728,7 @@
 					if(_status.event.type=='phase'&&ui.confirm){
 						ui.confirm.classList.add('removing');
 					}
+					ui.control.animate('nozoom',100);
 					event.restore();
                     var cards=event.player.get('hej');
                     for(var i=0;i<cards.length;i++){
