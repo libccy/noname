@@ -11670,12 +11670,6 @@
 					else if(next.card==undefined){
 						if(next.cards){
 							next.card=next.cards[0];
-                            if(!next.skill){
-                                var info=get.info(next.card);
-                                if(info.autoViewAs){
-                                    next.card={name:info.autoViewAs,suit:next.card.suit,number:next.card.number};
-                                }
-                            }
 						}
 					}
 					if(!next.targets){
@@ -11683,17 +11677,24 @@
 					}
 					if(next.card){
 						var info=get.info(next.card);
-						if(info){
-							if(info.changeTarget){
-		                        info.changeTarget(next.player,next.targets);
-		                    }
-							if(info.singleCard){
-								next._targets=next.targets.slice(0);
-								next.target=next.targets[0];
-								next.addedTargets=next.targets.splice(1);
-								if(next.addedTargets.length){
-									next.addedTarget=next.addedTargets[0];
-								}
+						if(info.autoViewAs){
+							next.card={
+								name:info.autoViewAs,
+								suit:next.card.suit,
+								number:next.card.number,
+								nature:next.card.nature
+							};
+							info=get.info(next.card);
+						}
+						if(info.changeTarget){
+	                        info.changeTarget(next.player,next.targets);
+	                    }
+						if(info.singleCard){
+							next._targets=next.targets.slice(0);
+							next.target=next.targets[0];
+							next.addedTargets=next.targets.splice(1);
+							if(next.addedTargets.length){
+								next.addedTarget=next.addedTargets[0];
 							}
 						}
 					}
