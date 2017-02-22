@@ -3249,11 +3249,13 @@ character.sp={
 				'step 0'
 				player.choosePlayerCard('hej',target,true);
 				'step 1'
-				target.$give(result.links,player);
-				target.lose(result.links,ui.special);
-				player.storage.yinling.push(result.links[0]);
-				player.markSkill('yinling');
-				player.syncStorage('yinling');
+				if(result.bool&&result.links&&result.links.length){
+					target.$give(result.links,player);
+					target.lose(result.links,ui.special);
+					player.storage.yinling.push(result.links[0]);
+					player.markSkill('yinling');
+					player.syncStorage('yinling');
+				}
 			},
 			ai:{
 				order:10.1,
