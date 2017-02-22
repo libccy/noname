@@ -610,60 +610,6 @@ character.xianjian={
 				}
 			}
 		},
-		lingyan:{
-			trigger:{player:'useCardToBegin'},
-			filter:function(event,player){
-				if(player.num('e')==5) return false;
-				return lib.skill.lingyan.filterx(event.card,player)&&event.target==player;
-			},
-			direct:true,
-			filterx:function(card,player){
-				if(!lib.inpile.contains(card.name)) return false;
-				var info=get.info(card);
-				if(info.type!='equip') return false;
-				if(info.nomod) return false;
-				if(!info.subtype) return false;
-				if(!player.get('e',info.subtype[5])) return false;
-				return true;
-			},
-			content:function(){
-				'step 0'
-				var list=['equip1','equip2','equip3','equip4','equip5'];
-				for(var i=0;i<list.length;i++){
-					if(player.get('e',list[i][5])){
-						list.splice(i--,1);
-					}
-				}
-				list.push('cancel2');
-				player.chooseControl(list,function(){
-					return list.randomGet();
-				}).prompt='灵砚：是否改变'+get.translation(trigger.card.name)+'的装备类型？';
-				'step 1'
-				if(result.control&&result.control!='cancel2'){
-					player.logSkill('lingyan');
-					var name=trigger.card.name+'_lingyan_'+result.control;
-					if(!lib.card[name]){
-						lib.card[name]=get.copy(get.info(trigger.card));
-						lib.card[name].subtype=result.control;
-						lib.card[name].epic=true;
-						lib.card[name].cardimage=trigger.card.name;
-						lib.card[name].source=[trigger.card.name];
-						lib.translate[name]=lib.translate[trigger.card.name];
-						lib.translate[name+'_info']=lib.translate[trigger.card.name+'_info'];
-					}
-					trigger.card.init([trigger.card.suit,trigger.card.number,name,trigger.card.nature]);
-				}
-			},
-			ai:{
-				effect:{
-					target:function(card,player,target,current){
-						if(target==player&&lib.skill.lingyan.filterx(card,target)&&target.num('e')<5){
-							return [1,3];
-						}
-					}
-				}
-			}
-		},
 		sheling:{
 			trigger:{global:['useCardAfter','respondAfter','discardAfter']},
 			filter:function(event,player){
@@ -2521,8 +2467,6 @@ character.xianjian={
 		huxi_info:'你可以失去一点体力并获得一点护甲，视为使用一张杀',
 		xuanmo:'玄墨',
 		xuanmo_info:'出牌阶段限一次，你可以将一张手牌置于牌堆顶并随机获得两张与之类别相同的牌',
-		lingyan:'灵砚',
-		lingyan_info:'每当你即将替换一件装备时，你可以永久改变新装备的装备类型，使其装备在装备区的空余位置',
 		danqing:'丹青',
 		danqing_info:'当你累计使用了4张花色不同的牌后，你可以选择至多4名角色分别获得以下4种效果中的随机一个：1、摸一张牌；2、获得一点护甲；3、装备一件随机装备；4、获得潜行直到下一回合开始',
 		zhangmu:'障目',
