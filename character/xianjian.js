@@ -1029,6 +1029,7 @@ character.xianjian={
 			filter:function(){
 				return Math.random()<0.5;
 			},
+			derivation:['diesha','guijiang'],
 			content:function(){
 				if(player.storage.fenxing){
 					player.storage.fenxing=false;
@@ -2356,7 +2357,7 @@ character.xianjian={
 			content:function(){
 				"step 0"
 				var next=player.chooseToDiscard(get.prompt('tuoqiao'));
-				next.logSkill='tuoqiao';
+				next.logSkill=event.name;
 				next.ai=function(card){
 					if(ai.get.effect(player,trigger.card,trigger.player,player)<0){
 						return 7-ai.get.value(card);

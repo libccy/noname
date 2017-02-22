@@ -3603,12 +3603,12 @@ character.swd={
 				}
 				"step 1"
 				if(result.bool){
-					targets[0].gain(cards);
+					targets[0].gain(cards,'log');
 					targets[0].$gain2(cards);
 					targets[1].damage(targets[0]);
 				}
 				else{
-					targets[1].gain(cards);
+					targets[1].gain(cards,'log');
 					targets[1].$gain2(cards);
 					targets[0].damage(targets[1]);
 				}

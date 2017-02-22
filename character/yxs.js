@@ -495,6 +495,7 @@ character.yxs={
 			filter:function(event,player){
 				return !player.hasSkill('tongyu_guiyin')&&!player.getStat('damage');
 			},
+			derivation:['lzhangyi','jimin','tongyu'],
 			content:function(){
 				player.draw();
 				player.setAvatar('yxs_luobinhan','yxs_handingdun');

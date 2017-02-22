@@ -870,7 +870,6 @@ character.sp={
 		yjixi:{
 			init:function(player){
 				player.storage.yjixi=0;
-				player.storage.yjixi2=false;
 			},
 			derivation:'wangzun',
 			trigger:{player:'phaseEnd'},
@@ -929,7 +928,6 @@ character.sp={
 					silent:true,
 					content:function(){
 						player.storage.yjixi++;
-						player.storage.yjixi2=false;
 					}
 				},
 				count2:{
@@ -937,12 +935,8 @@ character.sp={
 					forced:true,
 					popup:false,
 					silent:true,
-					filter:function(event,player){
-						return !player.storage.yjixi2;
-					},
 					content:function(){
-						player.storage.yjixi--;
-						player.storage.yjixi2=true;
+						player.storage.yjixi=0;
 					}
 				}
 			}
