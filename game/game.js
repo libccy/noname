@@ -34420,16 +34420,22 @@
 				}
 				if(fullright){
 					fullwidth+=124;
+					if(game.layout=='long2'&&ui.arena.dataset.number=='8'){
+						fullwidth+=game.me.offsetLeft;
+					}
 				}
 				else{
 					fullwidth+=154;
 				}
 				if(game.layout!='default'&&game.layout!='newlayout'&&ui.arena.offsetWidth/2>=fullwidth){
 					if(fullright){
-						stayleft._offset=-ui.arena.offsetWidth/2+135;
+						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+135;
+						if(game.layout=='long2'&&ui.arena.dataset.number=='8'){
+							stayleft._offset+=game.me.offsetLeft;
+						}
 					}
 					else{
-						stayleft._offset=-ui.arena.offsetWidth/2+165;
+						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+165;
 					}
 					stayleft.style.transform='translateX('+stayleft._offset+'px)';
 				}

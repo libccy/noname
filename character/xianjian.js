@@ -2348,35 +2348,17 @@ character.xianjian={
 			}
 		},
 		tuoqiao:{
-			direct:true,
-			filter:function(event,player){
-				if(event.player==player) return false;
-				return player.num('h')>0;
+			enable:'chooseToUse',
+			filterCard:{color:'black'},
+			position:'he',
+			viewAs:{name:'shihuifen'},
+			viewAsFilter:function(player){
+				return player.num('he',{color:'black'})>0;
 			},
-			trigger:{target:'useCardToBefore'},
-			content:function(){
-				"step 0"
-				var next=player.chooseToDiscard(get.prompt('tuoqiao'));
-				next.logSkill=event.name;
-				next.ai=function(card){
-					if(ai.get.effect(player,trigger.card,trigger.player,player)<0){
-						return 7-ai.get.value(card);
-					}
-					return 0;
-				}
-				"step 1"
-				if(result.bool){
-					player.judge(function(card){
-						return get.suit(card)=='heart'?-1:1;
-					});
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				if(result.suit!='heart'){
-					trigger.untrigger();
-					trigger.finish();
+			ai:{
+				shihuifen:true,
+				skillTagFilter:function(player){
+					return player.num('he',{color:'black'})>0;
 				}
 			}
 		},
@@ -2632,7 +2614,7 @@ character.xianjian={
 		tannang:'探囊',
 		tannang_info:'出牌阶段限一次，你可以将一张梅花手牌当顺手牵羊使用；你的顺手牵羊无距离限制',
 		tuoqiao:'脱壳',
-		tuoqiao_info:'当你成为其他角色卡牌的目标时，你可以弃置一张手牌并进行一次判定，若不为红桃，则取消之',
+		tuoqiao_info:'你可以将一张黑色牌当作石灰粉使用',
 		xiaoyao:'逍遥',
 		xiaoyao_info:'每当你成为其他角色的卡牌目标，你可以弃置一张与之花色相同的手牌取消之',
 		tianjian:'天剑',

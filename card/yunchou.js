@@ -408,6 +408,7 @@ card.yunchou={
 				event.source=info.source;
 				event.source.storage.youdishenru=player;
 				event.source.addSkill('youdishenru');
+				player.line(event.source,'green');
 				'step 1'
 				var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害');
 				next.ai2=function(){

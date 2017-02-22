@@ -1535,7 +1535,7 @@ card.gujian={
                 if(event.player.hasSkill('shihuifen')) return false;
 				if(event.player==player) return false;
 				if(!lib.filter.targetEnabled({name:'shihuifen'},player,event.player)) return false;
-				return player.hasCard('shihuifen');
+				return player.hasCard('shihuifen')||player.hasSkillTag('shihuifen');
 			},
 			content:function(){
 				player.chooseToUse(get.prompt('shihuifen',trigger.player).replace(/发动/,'使用'),function(card,player){

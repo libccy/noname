@@ -4744,7 +4744,39 @@ character.swd={
 			}
 		},
 		dunxing:{
-			inherit:'tuoqiao'
+			direct:true,
+			filter:function(event,player){
+				if(event.player==player) return false;
+				return player.num('he')>0;
+			},
+			trigger:{target:'useCardToBefore'},
+			content:function(){
+				"step 0"
+				var next=player.chooseToDiscard('he',get.prompt(event.name));
+				next.logSkill=event.name;
+				next.ai=function(card){
+					if(get.tag(trigger.card,'multitarget')&&!get.tag(card,'multineg')) return 0;
+					if(ai.get.effect(player,trigger.card,trigger.player,player)<0){
+						return 7-ai.get.value(card);
+					}
+					return 0;
+				}
+				next.prompt2='弃置一张牌并进行一次判定，若结果不为红桃则'+get.translation(trigger.card)+'失效';
+				"step 1"
+				if(result.bool){
+					player.judge(function(card){
+						return get.suit(card)=='heart'?-1:1;
+					});
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.suit!='heart'){
+					trigger.untrigger();
+					trigger.finish();
+				}
+			}
 		},
 		qiaoxie:{
 			group:['qiaoxie2','qiaoxie3'],
@@ -8966,7 +8998,7 @@ character.swd={
 		wanjun:'万钧',
 		wanjun_info:'你可以将一张装备牌当作南蛮入侵使用',
 		dunxing:'遁形',
-		// dunxing_info:'锁定技，体力值比你多的角色无法在回合内对你使用卡牌',
+		dunxing_info:'当你成为其他角色卡牌的目标时，你可以弃置一张牌并进行一次判定，若不为红桃，则取消之',
 		guiying:'鬼影',
 		guiying_info:'你可以将一张黑色牌当偷梁换柱使用',
 		shehun:'摄魂',
