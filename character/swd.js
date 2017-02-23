@@ -22,7 +22,7 @@ character.swd={
 		swd_jiliang:['male','wu',3,['yunchou','gongxin','jqimou']],
 		swd_shuijing:['female','qun',4,['mojian','duanyue','tuzhen']],
 		swd_quxian:['female','qun',3,['mojian','huanxia']],
-		swd_xiyan:['male','qun',3,['zaowu','daofa']],
+		swd_xiyan:['male','qun',3,['zaowu']],
 		swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
 		swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
 		swd_murongshi:['female','shu',4,['duanyi','guxing']],
@@ -1013,16 +1013,15 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('he',{suit:'spade'})>0;
+				return player.num('h',{suit:['spade','heart']})>0;
 			},
-			position:'he',
-			filterCard:{suit:'spade'},
+			filterCard:{suit:['spade','heart']},
 			viewAs:{name:'fengyinzhidan'},
 			check:function(card){
 				return 7-ai.get.value(card);
 			},
 			ai:{
-				order:2,
+				order:8.5,
 			}
 		},
 		huanxia:{
@@ -1424,11 +1423,13 @@ character.swd={
 		},
 		heihuo2:{},
 		yaotong:{
+			alter:true,
 			group:['yaotong1','yaotong2','yaotong3'],
 			ai:{
 				respondSha:true,
 				respondShan:true,
-				skillTagFilter:function(player){
+				skillTagFilter:function(player,tag){
+					if(tag=='respondShan'&&get.is.altered('yaotong')) return false;
 					if(player.num('h')%2==0) return false;
 				},
 			},
@@ -1451,6 +1452,7 @@ character.swd={
 			filterCard:true,
 			viewAs:{name:'shan'},
 			filter:function(event,player){
+				if(get.is.altered('yaotong')) return false;
 				var num=player.num('h');
 				if(num==0) return false;
 				return num%2==1;
@@ -2230,11 +2232,14 @@ character.swd={
 				if(event.targets.length){
 					var target=event.targets.shift();
 					if(target.hp<target.maxHp){
-						target.recover(target.maxHp-target.hp);
+						var num=target.maxHp-target.hp;
+						if(get.is.altered('shouyin')) num=Math.min(2,num);
+						target.recover(num);
 					}
 					event.redo();
 				}
 			},
+			alter:true,
 			ai:{
 				skillTagFilter:function(player){
 					if(player.storage.shouyin) return false;
@@ -2251,6 +2256,7 @@ character.swd={
 						for(var i=0;i<players.length;i++){
 							var att=ai.get.attitude(player,players[i]);
 							var del=players[i].maxHp-players[i].hp;
+							if(get.is.altered('shouyin')) del=Math.min(2,del);
 							if(att>0){
 								num+=del;
 							}
@@ -7018,87 +7024,34 @@ character.swd={
 				for(var i=1;i<cards.length;i++){
 					if(get.color(cards[i])!=color) return false;
 				}
-				return true;
+				if(player.isDamaged()) return true;
+				return game.hasPlayer(function(current){
+					return current.num('j');
+				});
 			},
-			direct:true,
+			check:function(event,player){
+				if(player.isDamaged()) return true;
+				return game.countPlayer(function(current){
+					if(current.num('j')) return get.sgn(ai.get.attitude(player,current));
+				})>0;
+			},
 			content:function(){
-				"step 0"
-				var todiscard=[];
-				var ainum=0;
-				var cards;
-				var att;
-				var filter={color:get.color(player.get('h')[0])=='red'?'black':'red'};
-				var players=game.filterPlayer();
-				for(var i=0;i<players.length;i++){
-					att=ai.get.attitude(player,players[i]);
-
-					cards=players[i].get('e',filter);
-					if(att>0){
-						ainum-=cards.length;
+				'step 0'
+				player.showHandcards();
+				'step 1'
+				player.recover();
+				event.targets=game.filterPlayer(function(current){
+					return current.num('j');
+				});
+				get.sortSeat(event.targets);
+				'step 2'
+				if(event.targets.length){
+					var current=event.targets.shift();
+					var js=current.get('j');
+					if(js.length){
+						current.discard(js);
+						player.line(current,'green');
 					}
-					else if(att<0){
-						ainum+=cards.length;
-					}
-					todiscard=todiscard.concat(cards);
-
-					cards=players[i].get('j',filter);
-					if(att>0){
-						ainum+=cards.length;
-					}
-					else if(att<0){
-						ainum-=cards.length;
-					}
-					todiscard=todiscard.concat(cards);
-				}
-				var choice=[];
-				if(player.hp<player.maxHp){
-					choice.push('recover_hp');
-				}
-				if(todiscard.length){
-					choice.push('discard_card');
-				}
-				choice.push('cancel2');
-				if(choice.length>1){
-					if(event.isMine()){
-						event.dialog=ui.create.dialog(get.prompt('xielv'));
-					}
-					player.chooseControl(choice).ai=function(){
-						if(choice.contains('recover_hp')) return 'recover_hp';
-						else if(ainum>0) return 'discard_card';
-						else return 'cancel2';
-					}
-					event.todiscard=todiscard;
-					event.filter=filter;
-				}
-				else{
-					event.finish();
-				}
-				"step 1"
-				if(event.dialog) event.dialog.close();
-				event.control=result.control;
-				if(event.control!='recover_hp'&&event.control!='discard_card'){
-					event.finish();
-				}
-				else{
-					player.showHandcards();
-					player.logSkill('xielv');
-				}
-				"step 2"
-				if(event.control=='recover_hp'){
-					player.recover();
-					event.finish();
-				}
-				else if(event.control=='discard_card'){
-					event.targets=game.filterPlayer();
-					event.targets.sort(lib.sort.seat);
-				}
-				else{
-					event.finish();
-				}
-				"step 3"
-				if(event.targets&&event.targets.length){
-					var target=event.targets.shift();
-					target.discard(target.get('ej',event.filter));
 					event.redo();
 				}
 			},
@@ -8930,6 +8883,7 @@ character.swd={
 		yaotong3:'妖瞳',
 		yaotong4:'妖瞳',
 		yaotong_info:'当你的手牌数为奇数时，你可以将一张手牌当作杀或闪使用或打出，当你的手牌数为偶数时，你可以将一张手牌当作无懈可击使用',
+		yaotong_info_alter:'当你的手牌数为奇数时，你可以将一张手牌当作杀使用或打出，当你的手牌数为偶数时，你可以将一张手牌当作无懈可击使用',
 		pojian:'破茧',
 		pojian_info:'每当你失去最后一张手牌，可以从牌堆中获得一张装备牌并装备之',
 		huajin:'化金',
@@ -8990,6 +8944,7 @@ character.swd={
 		lingxian_info:'每当你于回合外使用或打出一张手牌，你可以选择攻击范围外的一名其他角色与你各摸一张牌',
 		shouyin:'守印',
 		shouyin_info:'限定技，当任意一名角色处于濒死状态时，若你的武将牌正朝上，可以将武将牌翻面，然后令场上所有存活角色将体力回复至体力上限',
+		shouyin_info_alter:'限定技，当任意一名角色处于濒死状态时，若你的武将牌正朝上，可以将武将牌翻面，然后令场上所有存活角色回复两点体力',
 		bofeng:'搏风',
 		bofeng_info:'锁定技，体力值不大于你的角色视为在你的攻击范围；当你使用杀指定目标时，可令目标额外打出一张闪，否则此杀不可闪避且造成的伤害+1',
 		hutian:'护天',
@@ -9307,7 +9262,7 @@ character.swd={
 		yunchou_info_alter:'出牌阶段限一次，你可以弃置一张基本牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
 		tianshu_old_info:'结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
 		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
-		zaowu_info:'出牌阶段限一次，你可以将一张黑桃牌当作封印之蛋使用',
+		zaowu_info:'出牌阶段限一次，你可以将一张黑桃或红桃手牌当作封印之蛋使用',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',
 		yulin_info:'每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害',
@@ -9317,6 +9272,6 @@ character.swd={
 		zhuyu_info:'每当有横置的角色即将受到非火焰伤害，你可以弃置一张红色牌使其额外受到一点火焰伤害',
 		ningshuang_info:'每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则改为将其翻面',
 		zaowu_old_info:'出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之',
-		xielv_info:'弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后选择一项：1、回复一点体力；2、弃置场上所有与你手牌颜色不同的牌',
+		xielv_info:'弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后回复一点体力并弃置场上的所有判定牌',
 	},
 }
