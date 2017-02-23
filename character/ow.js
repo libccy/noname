@@ -594,9 +594,7 @@ character.ow={
 				player.removeSkill('shoujia2');
                 game.addVideo('storage',player,['shoujia',null]);
 				game.addVideo('storage',player,['shoujia2',null]);
-				if(!player.isTurnedOver()){
-                    player.turnOver();
-                }
+                player.turnOver(true);
 			},
 			intro:{
 				mark:function(dialog,content,player){
@@ -2829,9 +2827,7 @@ character.ow={
                 player.removeSkill('shanxian2');
                 player.markSkill('shanxian');
 				"step 2"
-				if(!player.isTurnedOver()){
-					player.turnOver();
-				}
+				player.turnOver(true);
 				delete player.storage.shanxian;
 			},
 			mod:{

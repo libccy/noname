@@ -7925,9 +7925,7 @@ character.swd={
 				'step 1'
 				if(result.bool){
 					player.recover(1-player.hp);
-					if(!player.isTurnedOver()){
-						player.turnOver();
-					}
+					player.turnOver(true);
 				}
 			},
 			ai:{
