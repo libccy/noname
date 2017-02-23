@@ -5677,6 +5677,7 @@ character.swd={
 			trigger:{player:['loseEnd','phaseBegin']},
 			direct:true,
 			usable:1,
+			alter:true,
 			filter:function(event,player){
 				if(event.name=='phase') return true;
 				if(player.num('h')) return false;
@@ -9011,6 +9012,7 @@ character.swd={
 		jikong:'亟空',
 		jikong2:'亟空',
 		jikong_info:'准备阶段，你可以指定一名角色视为对其使用一张雷杀；每当你失去最后一张手牌，你可以指定一名角色视为对其使用一张雷杀（每回合限发动一次）',
+		jikong_info_alter:'准备阶段，你可以指定一名角色视为对其使用一张雷杀',
 		xiangu:'仙骨',
 		xiangu_info:'锁定技，你的手牌上限不会因体力值的减少而减少。',
 		yiesheng:'回雪',

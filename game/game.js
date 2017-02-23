@@ -23538,7 +23538,11 @@
 							lib.setIntro(node,function(uiintro){
 								if(lib.config.touchscreen) _status.dragged=true;
 								uiintro.style.width='160px';
-								uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+config.intro+'</div>');
+								var str=config.intro;
+								if(typeof str=='function'){
+									str=str();
+								}
+								uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+str+'</div>');
 							});
 						}
 					}
@@ -25213,8 +25217,20 @@
 						node.mode=mode;
                         page.node=node;
 						var list=[];
+						var alterableSkills=[];
+						var alterableCharacters=[];
+						var charactersToAlter=[];
 						for(var i in info){
 							list.push(i);
+							for(var j=0;j<info[i][3].length;j++){
+								if(lib.skill[info[i][3][j]].alter){
+									alterableSkills.add(info[i][3][j]);
+									alterableCharacters.add(i);
+									if(!lib.config.alteredSkills.contains(info[i][3][j])){
+										charactersToAlter.add(i);
+									}
+								}
+							}
 						}
                         var groupSort=function(name){
                             if(info[name][1]=='wei') return 0;
@@ -25245,6 +25261,29 @@
 						});
 						if(mode.indexOf('mode_')!=0){
 							page.appendChild(cfgnode);
+							if(alterableCharacters.length){
+								var cfgnode2=createConfig({
+									name:'平衡强度',
+									_name:mode,
+									init:charactersToAlter.length==0,
+									intro:'以下武将将被调整: '+get.translation(alterableCharacters),
+									onclick:function(bool){
+										if(bool){
+											for(var i=0;i<alterableSkills.length;i++){
+												lib.config.alteredSkills.add(alterableSkills[i]);
+											}
+										}
+										else{
+											for(var i=0;i<alterableSkills.length;i++){
+												lib.config.alteredSkills.remove(alterableSkills[i]);
+											}
+										}
+										game.saveConfig('alteredSkills',lib.config.alteredSkills);
+									}
+								});
+								cfgnode2.style.marginTop='0px';
+								page.appendChild(cfgnode2);
+							}
 						}
                         else{
                             page.style.paddingTop='8px';
