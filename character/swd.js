@@ -1301,6 +1301,7 @@ character.swd={
 			trigger:{global:'damageEnd'},
 			forced:true,
 			logv:false,
+			alter:true,
 			check:function(event,player){
 				return game.hasPlayer(function(current){
 					return ai.get.attitude(player,current)>2&&current.num('h')==1
@@ -1328,8 +1329,12 @@ character.swd={
 				event.cards=cards;
 				var dialog=ui.create.dialog('聒噪：选择一个目标将手牌替换',cards,'hidden');
 				dialog.classList.add('noselect');
+				var dist=2;
+				if(get.is.altered('guozao')){
+					dist=1;
+				}
 				var next=player.chooseTarget(true,dialog,function(card,player,target){
-					return target.num('h')>0&&get.distance(player,target)<=2;
+					return target.num('h')>0&&get.distance(player,target)<=dist;
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					var hs=target.get('h');
@@ -4413,6 +4418,7 @@ character.swd={
 		susheng2:{},
 		kunlunjing:{
 			unique:true,
+			alter:true,
 			group:['kunlunjing1','kunlunjing2'],
 			video:function(player,data){
 				if(data){
@@ -4460,6 +4466,7 @@ character.swd={
 			},
 			onremove:['kunlunjing','kunlunjing2'],
 			check:function(event,player){
+				if(get.is.altered('kunlunjing')) return false;
 				var storage=player.storage.kunlunjing;
 				var num=0;
 				for(var i=0;i<storage.length;i++){
@@ -4567,6 +4574,9 @@ character.swd={
 				game.pause();
 				'step 5'
 				ui.updatehl();
+				if(get.is.altered('kunlunjing')){
+					player.loseHp();
+				}
 			}
 		},
 		kunlunjing2:{
@@ -8898,6 +8908,7 @@ character.swd={
 		bingfeng_info:'限定技，出牌阶段，你可以指定至多三个目标与其一同翻面，且处于翻面状态时不能使用或打出手牌；若如此做，你失去技能玄咒并减少一点体力上限',
 		guozao:'聒噪',
 		guozao_info:'锁定技，每当距离你1以内的角色受到一次伤害，若伤害来源不你，你须观看牌堆顶的三张牌，然后指定距离2以内的一名有手牌角色将手牌与这些牌交换',
+		guozao_info_alter:'锁定技，每当距离你1以内的角色受到一次伤害，若伤害来源不你，你须观看牌堆顶的三张牌，然后指定距离1以内的一名有手牌角色将手牌与这些牌交换',
 		heihuo:'黑火',
 		heihuo_info:'出牌阶段，你可以弃置一张装备牌，令你的手牌数加倍；若你的手牌因此达到8张或更多，你立即受到3点火焰伤害且本回合内不能再次发动黑火',
 		yaotong:'妖瞳',
@@ -9229,6 +9240,7 @@ character.swd={
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
 		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
 		kunlunjing_info:'准备阶段，若你的体力值小于上回合结束时的体力值，你可以将场上所有牌还原到你上一回合结束时的位置',
+		kunlunjing_info_alter:'准备阶段，若你的体力值小于上回合结束时的体力值，你可以将场上所有牌还原到你上一回合结束时的位置，然后流失一点体力',
 		swd_xiuluo_info:'准备阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',
 		xianyin_info:'出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌',
 		qiaoxie_info:'每当你装备一张牌，可摸一张牌；每当你失去一张装备牌（不含替换），你可以弃置其他角色的一张牌',

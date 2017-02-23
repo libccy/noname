@@ -1894,8 +1894,9 @@ character.ow={
         feiren:{
             trigger:{source:'damageBegin'},
 			forced:true,
+            alter:true,
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha'&&get.suit(event.card)=='spade'&&event.notLink();
+				return !get.is.altered('feiren')&&event.card&&event.card.name=='sha'&&get.suit(event.card)=='spade'&&event.notLink();
 			},
 			content:function(){
 				trigger.num++;
@@ -2769,6 +2770,7 @@ character.ow={
 				return ai.get.attitude(player,event.player)<0&&
 				((player.num('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
 			},
+            alter:true,
             intro:{
                 content:function(storage,player){
                     var str='';
@@ -2815,8 +2817,10 @@ character.ow={
             logTarget:'player',
 			content:function(){
                 "step 0"
-                player.draw(false);
-                player.$draw();
+                if(!get.is.altered('shanxian')){
+                    player.draw(false);
+                    player.$draw();
+                }
 				"step 1"
                 player.storage.shanxian_h=player.get('h');
                 player.storage.shanxian_e=player.get('e');
@@ -3015,6 +3019,7 @@ character.ow={
         feiren:'飞刃',
         feiren2:'飞刃',
         feiren_info:'你的杀无视距离；你的黑桃杀造成的伤害+1，梅花杀可以额外指定一个目标',
+        feiren_info_alter:'你的杀无视距离；你的梅花杀可以额外指定一个目标',
         zhanlong:'斩龙',
         zhanlong_info:'限定技，准备阶段，若你体力值为1，你可以弃置所有牌（至少一张），然后将三张杀置入你的手牌，若如此做，你本回合使用杀无次数限制',
         xie:'谐',
@@ -3052,6 +3057,7 @@ character.ow={
         shouhu_info:'你不能使用杀；出牌阶段，你可以弃置一张杀令一名其他角色回复一点体力',
         shanxian:'闪现',
         shanxian_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以摸一张牌并进行一个额外回合，并在回合结束后将武将牌翻至背面。若如此做，你对其使用卡牌无视距离直到回合结束。',
+        shanxian_info_alter:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以进行一个额外回合，并在回合结束后将武将牌翻至背面。若如此做，你对其使用卡牌无视距离直到回合结束。',
         shanhui:'闪回',
         shanhui_info:'当你造成或受到伤害后，你可以将你的牌重置为上次发动闪现时的状态，若你的牌数因此而减少，你回复一点体力',
         ow_liekong:'猎空',

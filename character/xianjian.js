@@ -1182,8 +1182,14 @@ character.xianjian={
 			filter:function(event){
 				return event.num!=0;
 			},
+			alter:true,
 			content:function(){
-				player.draw(Math.abs(trigger.num));
+				if(get.is.altered('xfenxin')){
+					player.draw();
+				}
+				else{
+					player.draw(Math.abs(trigger.num));
+				}
 			},
 			ai:{
 				effect:{
@@ -1200,6 +1206,9 @@ character.xianjian={
 		xfenxin2:{
 			trigger:{source:'dieAfter'},
 			forced:true,
+			filter:function(){
+				return !get.is.altered('xfenxin');
+			},
 			content:function(){
 				player.gainMaxHp();
 				player.recover();
@@ -1826,6 +1835,7 @@ character.xianjian={
 			filter:function(event,player){
 				return player.storage.xuanning&&player.num('he')+player.storage.xuanning>=3;
 			},
+			alter:true,
 			content:function(){
 				"step 0"
 				var ainum=0;
@@ -1863,7 +1873,9 @@ character.xianjian={
 				if(result.bool){
 					player.storage.xuanning=0;
 					player.unmarkSkill('xuanning');
-					player.addTempSkill('qianfang2','phaseAfter');
+					if(!get.is.altered('qianfang')){
+						player.addTempSkill('qianfang2','phaseAfter');
+					}
 					if(!event.logged) player.logSkill('qianfang');
 					player.useCard({name:'wanjian'},event.targets);
 				}
@@ -1889,13 +1901,14 @@ character.xianjian={
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0&&event.player.num('he')>1;
 			},
+			alter:true,
 			filter:function(event,player){
 				return player.storage.xuanning>0&&event.player.num('he')>0;
 			},
 			direct:true,
 			content:function(){
 				"step 0"
-				player.discardPlayerCard(trigger.player,'he',get.prompt('poyun'),[1,2]).logSkill=['poyun',trigger.player];
+				player.discardPlayerCard(trigger.player,'he',get.prompt('poyun',trigger.player),[1,get.is.altered('poyun')?1:2]).logSkill=['poyun',trigger.player];
 				"step 1"
 				if(result.bool){
 					player.storage.xuanning--;
@@ -2522,6 +2535,7 @@ character.xianjian={
 		xfenxin:'焚心',
 		xfenxin2:'焚心',
 		xfenxin_info:'锁定技，每当你的体力值发生改变，你摸等量的牌；每当你杀死一名角色，你增加一点体力上限并回复一点体力',
+		xfenxin_info_alter:'锁定技，每当你的体力值发生改变，你摸一张牌',
 		luanjian:'乱剑',
 		luanjian_info:'出牌阶段，你可以将两张杀当杀使用，此杀无视距离，可以指定任意名目标且有50%的机率伤害+1',
 		tianfu:'天符',
@@ -2556,8 +2570,10 @@ character.xianjian={
 		qijian_info:'弃牌阶段结束时，你可以指定至多X名目标视为使用一张杀，X为你于此阶段弃置的卡牌数',
 		poyun:'破云',
 		poyun_info:'每当你造成一次伤害，你可以弃置一枚玄凝标记，然后弃置对方两张牌',
+		poyun_info_alter:'每当你造成一次伤害，你可以弃置一枚玄凝标记，然后弃置对方一张牌',
 		qianfang:'千方',
 		qianfang_info:'准备阶段，若你有玄凝标记，可以弃置3-X张牌和所有玄凝标记，视为使用了一张【万箭齐发】，若如此做，你本回合的摸牌阶段摸牌数+1。X为你的玄凝标记数',
+		qianfang_info_alter:'准备阶段，若你有玄凝标记，可以弃置3-X张牌和所有玄凝标记，视为使用了一张【万箭齐发】，X为你的玄凝标记数',
 		longxi:'龙息',
 		longxi2:'龙息',
 		longxi_info:'锁定技，在回合外每当你需要使用或打出一张卡牌时，若牌堆顶的前两张中有可使用或打出的牌，你立即获得之',
