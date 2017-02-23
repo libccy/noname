@@ -26,7 +26,7 @@ window.config={
 	forbidboss:['caiwenji','gjqt_aruan','pal_xuanxiao','swd_hupo'],
 	forbiddouble:['zhugedan','swd_kangnalishi','dongzhuo','wutugu','hs_siwangzhiyi','hs_ronghejuren','hs_shanlingjuren'],
 	all:{
-		sgscharacters:['standard','shenhua','refresh','yijiang','sp','extra','guozhan','old'],
+		sgscharacters:['standard','shenhua','refresh','yijiang','sp','extra','old'],
 		sgscards:['standard','extra','sp','guozhan'],
 		sgsmodes:['identity','guozhan','versus','brawl','connect'],
 		stockmode:['identity','guozhan','versus','boss','chess','stone','connect','brawl','tafang','hearthstone'],

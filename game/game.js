@@ -2684,6 +2684,11 @@
 						frequent:true,
 						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
 					},
+					connect_onlyguozhan:{
+						name:'只开启国战武将',
+						init:true,
+						frequent:true,
+					},
 		            connect_ban_weak:{
 		                name:'屏蔽弱将',
 						init:false,
@@ -2736,6 +2741,11 @@
 						init:true,
 						frequent:true,
 						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
+					},
+					onlyguozhan:{
+						name:'只开启国战武将',
+						init:true,
+						frequent:true,
 					},
 		            double_hp:{
 		                name:'双将体力上限',
@@ -4012,7 +4022,14 @@
                         var mode=get.mode();
                         if(type=='character'){
                             if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
-                                modeimage=mode;
+								if(mode=='guozhan'){
+									if(lib.character[name.slice(3)]){
+										name=name.slice(3);
+									}
+								}
+                                else{
+									modeimage=mode;
+								}
                             }
                             else if(lib.character[name]){
                                 nameinfo=lib.character[name];

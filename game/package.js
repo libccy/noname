@@ -5,7 +5,6 @@ character.pack={
     yijiang:'一将成名',
     sp:'SP',
     extra:'神将',
-    guozhan:'国战',
     old:'怀旧',
     diy:'DIY',
     yxs:'英雄杀',

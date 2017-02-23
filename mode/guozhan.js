@@ -29,6 +29,15 @@ mode.guozhan={
 			game.delay();
 			game.showChangeLog();
 		}
+		for(var i in lib.characterPack.mode_guozhan){
+			lib.character[i]=lib.characterPack.mode_guozhan[i];
+			if(!lib.character[i][4]){
+				lib.character[i][4]=[];
+			}
+			if(!lib.translate[i]){
+				lib.translate[i]=lib.translate[i.slice(3)];
+			}
+		}
 		if(!_status.connectMode){
 			_status.mode=get.config('guozhan_mode');
 			if(_status.brawl&&_status.brawl.submode){
@@ -109,6 +118,24 @@ mode.guozhan={
 			}
 		}
 		game.phaseLoop(player);
+	},
+	characterPack:{
+		mode_guozhan:{
+			gz_caocao:['male','wei',4,['jianxiong']],
+			gz_simayi:['male','wei',3,['fankui','guicai']],
+			gz_xiahoudun:['male','wei',4,['ganglie']],
+			gz_zhangliao:['male','wei',4,['tuxi']],
+			gz_xuzhu:['male','wei',4,['luoyi']],
+			gz_guojia:['male','wei',4,['tiandu','yiji']],
+			gz_zhenji:['female','wei',4,['luoshen','qingguo']],
+			gz_xiahouyuan:['male','wei',4,['shensu']],
+			gz_zhanghe:['male','wei',4,['qiaobian']],
+			gz_xuhuang:['male','wei',4,['duanliang']],
+			gz_caoren:['male','wei',4,['jushou']],
+			gz_dianwei:['male','wei',4,['qiangxi']],
+			gz_xunyu:['male','wei',3,['quhu','jieming']],
+			gz_caopi:['male','wei',3,['xingshang','fangzhu']],
+		}
 	},
 	game:{
 		getCharacterChoice:function(list,num){
@@ -465,6 +492,12 @@ mode.guozhan={
 				for(i in lib.character){
 					if(chosen.contains(i)) continue;
 					if(lib.filter.characterDisabled(i)) continue;
+					if(get.config('onlyguozhan')){
+
+					}
+					else{
+
+					}
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);
 				}
@@ -792,7 +825,6 @@ mode.guozhan={
 		}
 	},
 	translate:{
-		change_identity_config:'自由选择座位',
 		ye:'野',
 		ye2:'野心家',
 		wei2:'魏国',
@@ -812,6 +844,7 @@ mode.guozhan={
 		mingzhizhujiang:'明置主将',
 		mingzhifujiang:'明置副将',
 		tongshimingzhi:'同时明置',
+		mode_guozhan_character_config:'国战武将',
 	},
 	element:{
 		content:{

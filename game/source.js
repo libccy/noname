@@ -11,7 +11,6 @@ window.noname_source_list=[
     'character/diy.js',
     'character/extra.js',
     'character/gujian.js',
-    'character/guozhan.js',
     'character/hearth.js',
     'character/old.js',
     'character/ow.js',
