@@ -15928,11 +15928,11 @@
                     }
                     if(lib.configOL.ban_weak){
                         if(lib.config.forbidall.contains(i)) return true;
-                        if(!double_character&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))){
+                        if(!double_character&&get.rank(i,true)<=2){
                             return true;
                         }
                     }
-                    if(lib.configOL.ban_strong&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))){
+                    if(lib.configOL.ban_strong&&get.rank(i,true)>=8){
                         return true;
                     }
                 }
@@ -15954,11 +15954,11 @@
                     }
                     if(get.config('ban_weak')){
                         if(lib.config.forbidall.contains(i)) return true;
-                        if(!double_character&&(lib.rank.c.contains(i)||lib.rank.d.contains(i))){
+                        if(!double_character&&get.rank(i,true)<=2){
                             return true;
                         }
                     }
-                    if(get.config('ban_strong')&&(lib.rank.s.contains(i)||lib.rank.ap.contains(i))){
+                    if(get.config('ban_strong')&&get.rank(i,true)>=8){
                         return true;
                     }
                 }
@@ -22286,8 +22286,12 @@
         finishSkill:function(i){
             var j;
             var mode=get.mode();
-			if(lib.config.alteredSkills.contains(i)){
-				lib.translate[i+'_info']=lib.translate[i+'_info_alter'];
+			var info=lib.skill[i];
+			if(info.alter){
+				lib.translate[i+'_info_origin']=lib.translate[i+'_info'];
+				if(lib.config.alteredSkills.contains(i)){
+					lib.translate[i+'_info']=lib.translate[i+'_info_alter'];
+				}
 			}
             else if(lib.translate[i+'_info_'+mode]){
                 lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
@@ -22298,7 +22302,6 @@
 			else if(lib.translate[i+'_info_combat']&&get.is.versus()){
 				lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
 			}
-			var info=lib.skill[i];
             if(info.forbid&&info.forbid.contains(mode)){
                 lib.skill[i]={};
                 if(lib.translate[i+'_info']){
@@ -23537,7 +23540,7 @@
 							}
 							lib.setIntro(node,function(uiintro){
 								if(lib.config.touchscreen) _status.dragged=true;
-								uiintro.style.width='160px';
+								uiintro.style.width='170px';
 								var str=config.intro;
 								if(typeof str=='function'){
 									str=str();
@@ -25266,16 +25269,18 @@
 									name:'平衡强度',
 									_name:mode,
 									init:charactersToAlter.length==0,
-									intro:'以下武将将被调整: '+get.translation(alterableCharacters),
+									intro:'以下武将将被调整：'+get.translation(alterableCharacters),
 									onclick:function(bool){
 										if(bool){
 											for(var i=0;i<alterableSkills.length;i++){
 												lib.config.alteredSkills.add(alterableSkills[i]);
+												lib.translate[alterableSkills[i]+'_info']=lib.translate[alterableSkills[i]+'_info_alter'];
 											}
 										}
 										else{
 											for(var i=0;i<alterableSkills.length;i++){
 												lib.config.alteredSkills.remove(alterableSkills[i]);
+												lib.translate[alterableSkills[i]+'_info']=lib.translate[alterableSkills[i]+'_info_origin'];
 											}
 										}
 										game.saveConfig('alteredSkills',lib.config.alteredSkills);
@@ -35285,6 +35290,12 @@
             if(typeof num!='number') num=false;
 			if(name==_status.lord) return num?Math.round(7*(num-1)/8+1):'ap';
 			var rank=lib.rank;
+			var skills=lib.character[name][3];
+			for(var i=0;i<skills.length;i++){
+				if(lib.config.alteredSkills.contains(skills[i])){
+					name=lib.rank.a[0];break;
+				}
+			}
 			if(rank.s.contains(name)) return num?Math.round(8*(num-1)/8+1):'s';
 			if(rank.ap.contains(name)) return num?Math.round(7*(num-1)/8+1):'ap';
 			if(rank.a.contains(name)) return num?Math.round(6*(num-1)/8+1):'a';

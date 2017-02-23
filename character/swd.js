@@ -5680,6 +5680,7 @@ character.swd={
 			alter:true,
 			filter:function(event,player){
 				if(event.name=='phase') return true;
+				if(lib.config.alteredSkills.contains('jikong')) return false;
 				if(player.num('h')) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].original=='h') return true;
