@@ -22286,7 +22286,10 @@
         finishSkill:function(i){
             var j;
             var mode=get.mode();
-            if(lib.translate[i+'_info_'+mode]){
+			if(lib.config.alteredSkills.contains(i)){
+				lib.translate[i+'_info']=lib.translate[i+'_info_alter'];
+			}
+            else if(lib.translate[i+'_info_'+mode]){
                 lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
             }
 			else if(lib.translate[i+'_info_zhu']&&(mode=='identity'||(mode=='guozhan'&&_status.mode=='four'))){
@@ -22295,32 +22298,33 @@
 			else if(lib.translate[i+'_info_combat']&&get.is.versus()){
 				lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
 			}
-            if(lib.skill[i].forbid&&lib.skill[i].forbid.contains(mode)){
+			var info=lib.skill[i];
+            if(info.forbid&&info.forbid.contains(mode)){
                 lib.skill[i]={};
                 if(lib.translate[i+'_info']){
                     lib.translate[i+'_info']='此模式下不可用';
                 }
                 return;
             }
-            if(lib.skill[i].mode&&lib.skill[i].mode.contains(mode)==false){
+            if(info.mode&&info.mode.contains(mode)==false){
                 lib.skill[i]={};
                 if(lib.translate[i+'_info']){
                     lib.translate[i+'_info']='此模式下不可用';
                 }
                 return;
             }
-            if(lib.skill[i].viewAs){
-                if(typeof lib.skill[i].viewAs=='string'){
-                    lib.skill[i].viewAs={name:lib.skill[i].viewAs};
+            if(info.viewAs){
+                if(typeof info.viewAs=='string'){
+                    info.viewAs={name:info.viewAs};
                 }
-                if(lib.skill[i].ai==undefined) lib.skill[i].ai={};
-                var skill=lib.skill[i].ai;
-                if(!lib.card[lib.skill[i].viewAs.name]){
+                if(!lib.card[info.viewAs.name]){
                     lib.skill[i]={};
                     lib.translate[i+'_info']='技能不可用';
                     return;
                 }
-                var card=lib.card[lib.skill[i].viewAs.name].ai;
+                if(info.ai==undefined) info.ai={};
+                var skill=info.ai;
+                var card=lib.card[info.viewAs.name].ai;
                 for(j in card){
                     if(skill[j]==undefined) skill[j]=card[j];
                     else if(typeof skill[j]=='object'){
@@ -22330,34 +22334,34 @@
                     }
                 }
             }
-            if(lib.skill[i].inherit){
-                var skill=lib.skill[lib.skill[i].inherit];
+            if(info.inherit){
+                var skill=lib.skill[info.inherit];
                 for(j in skill){
-                    if(lib.skill[i][j]==undefined) lib.skill[i][j]=skill[j];
+                    if(info[j]==undefined) info[j]=skill[j];
                 }
                 if(lib.translate[i+'_info']==undefined){
-                    lib.translate[i+'_info']=lib.translate[lib.skill[i].inherit+'_info'];
+                    lib.translate[i+'_info']=lib.translate[info.inherit+'_info'];
                 }
             }
-            if(lib.skill[i].subSkill){
-                for(var j in lib.skill[i].subSkill){
-                    lib.skill[i+'_'+j]=lib.skill[i].subSkill[j];
-                    if(lib.skill[i].subSkill[j].name){
-                        lib.translate[i+'_'+j]=lib.skill[i].subSkill[j].name;
+            if(info.subSkill){
+                for(var j in info.subSkill){
+                    lib.skill[i+'_'+j]=info.subSkill[j];
+                    if(info.subSkill[j].name){
+                        lib.translate[i+'_'+j]=info.subSkill[j].name;
                     }
                     else{
                         lib.translate[i+'_'+j]=lib.translate[i];
                     }
-                    if(lib.skill[i].subSkill[j].description){
-                        lib.translate[i+'_'+j+'_info']=lib.skill[i].subSkill[j].description;
+                    if(info.subSkill[j].description){
+                        lib.translate[i+'_'+j+'_info']=info.subSkill[j].description;
                     }
-                    if(lib.skill[i].subSkill[j].marktext){
-                        lib.translate[i+'_'+j+'_bg']=lib.skill[i].subSkill[j].marktext;
+                    if(info.subSkill[j].marktext){
+                        lib.translate[i+'_'+j+'_bg']=info.subSkill[j].marktext;
                     }
                 }
             }
-            if(lib.skill[i].marktext){
-                lib.translate[i+'_bg']=lib.skill[i].marktext;
+            if(info.marktext){
+                lib.translate[i+'_bg']=info.marktext;
             }
             if(i[0]=='_'){
                 game.addGlobalSkill(i);

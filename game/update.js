@@ -6,6 +6,7 @@ window.noname_update={
     ],
     files:[
         'game/game.js',
+        'game/config.js',
         // 'game/asset.js',
         // 'card/*',
         'character/rank.js',
