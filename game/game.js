@@ -34472,7 +34472,7 @@
 				}
 				if(fullright){
 					fullwidth+=124;
-					if(game.layout=='long2'&&ui.arena.dataset.number=='8'){
+					if(game.layout=='long2'&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
 						fullwidth+=game.me.offsetLeft;
 					}
 				}
@@ -34482,7 +34482,7 @@
 				if(game.layout!='default'&&game.layout!='newlayout'&&ui.arena.offsetWidth/2>=fullwidth){
 					if(fullright){
 						stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+135;
-						if(game.layout=='long2'&&ui.arena.dataset.number=='8'){
+						if(game.layout=='long2'&&ui.arena.dataset.number=='8'&&get.mode()!='boss'){
 							stayleft._offset+=game.me.offsetLeft;
 						}
 					}
