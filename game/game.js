@@ -5793,7 +5793,7 @@
 				var banned=['yxs_luzhishen','xuhuang','zhenji','shen_guanyu','zhurong',
 					'daqiao','lingcao','liuzan','lusu','luxun','yanwen','zhouyu','xiahouyuan',
 					'zhuzhi','old_caozhen','guojia','simayi','sp_pangde'];
-				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui'];
+				var bannedcards=['zengbin','toulianghuanzhu','huoshan','hongshui','guiyoujie'];
 				for(var i=0;i<mode.length;i++){
 					game.saveConfig(mode[i]+'_banned',banned);
 					game.saveConfig(mode[i]+'_bannedcards',bannedcards);
@@ -12195,7 +12195,15 @@
                     next.setContent('judge');
                     return next;
 				},
-				turnOver:function(){
+				turnOver:function(bool){
+					if(typeof bool=='boolean'){
+						if(bool){
+							if(this.isTurnedOver()) return;
+						}
+						else{
+							if(!this.isTurnedOver()) return;
+						}
+					}
 					var next=game.createEvent('turnOver');
 					next.player=this;
                     next.setContent('turnOver');
@@ -12241,6 +12249,14 @@
 					}
 				},
 				link:function(){
+					if(typeof bool=='boolean'){
+						if(bool){
+							if(this.isLinked()) return;
+						}
+						else{
+							if(!this.isLinked()) return;
+						}
+					}
 					var next=game.createEvent('link');
 					next.player=this;
                     next.setContent('link');

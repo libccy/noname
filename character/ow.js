@@ -780,6 +780,7 @@ character.ow={
             selectTarget:function(){
                 return [1,_status.event.player.num('he',{color:'black'})];
             },
+            alter:true,
             content:function(){
                 'step 0'
                 if(target==targets[0]){
@@ -789,15 +790,18 @@ character.ow={
                     player.discard(player.get('he',{color:'black'}));
                 }
                 'step 1'
-                var he=target.get('he');
-                if(he.length){
-                    target.discard(he.randomGet());
+                if(!get.is.altered('baoxue')){
+                    var he=target.get('he');
+                    if(he.length){
+                        target.discard(he.randomGet());
+                    }
                 }
                 'step 2'
-                if(!target.isTurnedOver()){
-                    target.turnOver();
+                target.turnOver(true);
+                'step 3'
+                if(get.is.altered('baoxue')&&target==targets[targets.length-1]){
+                    player.turnOver(true);
                 }
-
             },
             ai:{
                 order:function(skill,player){
@@ -1436,12 +1440,13 @@ character.ow={
             filter:function(event,player){
                 return player.hp==1&&!player.isTurnedOver();
             },
+            alter:true,
             content:function(){
                 'step 0'
                 player.turnOver();
                 player.recover(2);
                 'step 1'
-                if(player.isTurnedOver()){
+                if(player.isTurnedOver()&&!get.is.altered('jidong')){
                     player.addTempSkill('jidong2',{player:'turnOverAfter'});
                 }
             },
@@ -1599,15 +1604,20 @@ character.ow={
 			skillAnimation:true,
 			animationColor:'fire',
             line:'fire',
+            alter:true,
             content:function(){
                 'step 0'
-                target.chooseToDiscard(player.storage.jijia,'he','弃置'+get.cnNumber(player.storage.jijia)+'张牌，或受到2点火焰伤害').ai=function(card){
+                var num=player.storage.jijia;
+                if(get.is.altered('zihui')){
+                    num=Math.max(1,Math.min(num,target.num('he')));
+                }
+                target.chooseToDiscard(num,'he','弃置'+get.cnNumber(num)+'张牌，或受到2点火焰伤害').ai=function(card){
                     if(target.hasSkillTag('nofire')) return 0;
                     if(get.type(card)!='basic') return 11-ai.get.value(card);
                     if(target.hp>4) return 7-ai.get.value(card);
-                    if(target.hp==4&&player.storage.jijia>=3) return 7-ai.get.value(card);
-                    if(target.hp==3&&player.storage.jijia>=4) return 7-ai.get.value(card);
-                    if(player.storage.hujia>1) return 8-ai.get.value(card);
+                    if(target.hp==4&&num>=3) return 7-ai.get.value(card);
+                    if(target.hp==3&&num>=4) return 7-ai.get.value(card);
+                    if(num>1) return 8-ai.get.value(card);
                     return 10-ai.get.value(card);
                 };
                 'step 1'
@@ -2975,6 +2985,7 @@ character.ow={
         shuangqiang_info:'每当你对一名未翻面的角色造成伤害，你可以令伤害-1，然后令受伤害角色翻面',
         baoxue:'暴雪',
         baoxue_info:'限定技，出牌阶段，你可以展示并弃置你的所有黑色牌，然后令至多X名其他角色随机弃置一张牌并将武将牌翻至背面，X为你的弃牌数',
+        baoxue_info_alter:'限定技，出牌阶段，你可以展示并弃置你的所有黑色牌，并选择等量其他角色将武将牌翻至背面，结算后你将武将牌翻至背面',
         bingqiang:'冰墙',
         bingqiang2:'冰墙',
         bingqiang2_bg:'墙',
@@ -2987,10 +2998,12 @@ character.ow={
         bingqiang_info:'出牌阶段，你可以弃置X张红色牌令一名角色和其相邻角色的防御离+X，或弃置X张黑色牌令一名角色和其相邻角色的进攻离-X，效果持续到你的下个回合开始',
         jidong:'急冻',
         jidong_info:'在一名角色的结束阶段，若你的体力值为1，你可以翻面并回复两点体力，在你的武将牌翻至正面前，你防止所有伤害，也不能成为其他角色卡牌的目标',
+        jidong_info_alter:'在一名角色的结束阶段，若你的体力值为1，你可以翻面并回复两点体力',
         jijia:'机甲',
         jijia_info:'锁定技，游戏开始时，你获得一个体力为4的机甲；你的手牌上限为你和机甲的体力之和；你受到的伤害由机甲承担',
         zihui:'自毁',
         zihui_info:'出牌阶段，你可以令距离2以内的所有其他角色选择一项：弃置数量等同你机甲体力值的牌，或受到2点火焰伤害，并在结算完毕后摧毁你的机甲',
+        zihui_info_alter:'出牌阶段，你可以令距离2以内的所有其他角色选择一项：1. 弃置数量等同你机甲体力值的牌（不足则全弃，至少弃1张）；2. 或受到2点火焰伤害，并在结算完毕后摧毁你的机甲',
         tuijin:'推进',
         tuijin_info:'出牌阶段限一次，若你有机甲，你可以指定一名角色，本回合内视为与其距离为1',
         chongzhuang:'重装',

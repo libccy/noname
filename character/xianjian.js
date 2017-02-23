@@ -430,7 +430,7 @@ character.xianjian={
 			}
 		},
 		danqing:{
-			trigger:{player:'useCardAfter'},
+			trigger:{player:'phaseEnd'},
 			init:function(player){
 				player.storage.danqing=[];
 			},
@@ -457,13 +457,12 @@ character.xianjian={
 			ai:{
 				threaten:1.2,
 			},
-			skillAnimation:true,
-			animationColor:'wood',
+			alter:true,
 			content:function(){
 				'step 0'
 				player.storage.danqing.length=0;
 				player.updateMarks();
-				player.chooseTarget(get.prompt('danqing'),[1,4]).ai=function(target){
+				player.chooseTarget(get.prompt('danqing'),[1,get.is.altered('danqing')?2:4]).ai=function(target){
 					return ai.get.attitude(player,target);
 				}
 				'step 1'
@@ -2486,7 +2485,8 @@ character.xianjian={
 		xuanmo:'玄墨',
 		xuanmo_info:'出牌阶段限一次，你可以将一张手牌置于牌堆顶并随机获得两张与之类别相同的牌',
 		danqing:'丹青',
-		danqing_info:'当你累计使用了4张花色不同的牌后，你可以选择至多4名角色分别获得以下4种效果中的随机一个：1、摸一张牌；2、获得一点护甲；3、装备一件随机装备；4、获得潜行直到下一回合开始',
+		danqing_info:'结束阶段，若你累计使用了4张花色不同的牌，你可以选择至多4名角色分别获得以下4种效果中的随机一个：1、摸一张牌；2、获得一点护甲；3、装备一件随机装备；4、获得潜行直到下一回合开始',
+		danqing_info_alter:'结束阶段，若你累计使用了4张花色不同的牌，你可以选择至多2名角色分别获得以下4种效果中的随机一个：1、摸一张牌；2、获得一点护甲；3、装备一件随机装备；4、获得潜行直到下一回合开始',
 		zhangmu:'障目',
 		zhangmu_info:'每回合限一次，当你需要使用或打出一张闪时，你可以展示一张闪，视为使用或打出了此闪',
 		feizhua:'飞爪',

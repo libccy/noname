@@ -604,6 +604,7 @@ character.swd={
 			filter:function(event,player){
 				return !player.storage.hxunzhi;
 			},
+			alter:true,
 			init:function(player){
 				player.storage.hxunzhi=false;
 			},
@@ -617,11 +618,13 @@ character.swd={
 				'step 0'
 				player.awakenSkill('hxunzhi');
 				player.storage.hxunzhi=true;
-				var targets=game.filterPlayer(function(current){
-					return player.canUse('wanjian',current);
-				});
-				targets.sort(lib.sort.seat);
-                player.useCard({name:'wanjian'},targets);
+				if(!get.is.altered('hxunzhi')){
+					var targets=game.filterPlayer(function(current){
+						return player.canUse('wanjian',current);
+					});
+					targets.sort(lib.sort.seat);
+	                player.useCard({name:'wanjian'},targets);
+				}
 				'step 1'
 				player.addSkill('wusheng');
 				player.addSkill('paoxiao');
@@ -8857,6 +8860,7 @@ character.swd={
 		lingfeng_info:'结束阶段，若你本回合内使用了至少X张牌，你可以选择一项：获得一点护甲，或对攻击范围内的一名角色造成一点伤害（X为你当前的体力值且最多为3）',
 		hxunzhi:'殉志',
 		hxunzhi_info:'限定技，出牌阶段，你可以视为使用一张万箭齐发并获得技能武圣、咆哮，若如此做，你在此阶段结束时死亡',
+		hxunzhi_info_alter:'限定技，出牌阶段，你可以获得技能武圣、咆哮，若如此做，你在此阶段结束时死亡',
 		lmazui:'麻醉',
 		lmazui2:'麻醉',
 		lmazui_info:'出牌阶段限一次，你可以将一张黑色手牌置于一名角色的武将牌上，该角色造成的下一次伤害-1，然后获得此牌',
