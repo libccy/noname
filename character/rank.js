@@ -25,7 +25,6 @@ window.characterRank={
         'ow_dva',
         'ow_mei',
         'ow_yuanshi',
-        'swd_xuanyuanjianxian',
         'swd_yuwentuo',
         'pal_xuanxiao',
         'swd_jipeng',
@@ -59,6 +58,7 @@ window.characterRank={
     ],
     a:[
         'hs_khadgar',
+        'swd_xuanyuanjianxian',
         'liuxie',
         'shen_lvbu',
         'liufeng',

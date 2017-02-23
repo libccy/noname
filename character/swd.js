@@ -3559,11 +3559,22 @@ character.swd={
 		mufeng:{
 			trigger:{player:'phaseEnd'},
 			frequent:true,
+			alter:true,
 			filter:function(event,player){
-				return player.num('h')<player.maxHp;
+				if(get.is.altered('mufeng')){
+					return player.num('h')<player.hp;
+				}
+				else{
+					return player.num('h')<player.maxHp;
+				}
 			},
 			content:function(){
-				player.draw(player.maxHp-player.num('h'));
+				if(get.is.altered('mufeng')){
+					player.draw(player.hp-player.num('h'));
+				}
+				else{
+					player.draw(player.maxHp-player.num('h'));
+				}
 			}
 		},
 		mufeng_old2:{
@@ -9051,6 +9062,7 @@ character.swd={
 		jqimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并可以使用一张牌',
 		mufeng:'沐风',
 		mufeng_info:'结束阶段，你可以将手牌数补至体力上限',
+		mufeng_info_alter:'结束阶段，你可以将手牌数补至当前体力值',
 		mufeng_old2_info:'在一名角色的结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
 		hjifeng:'祭风',
 		hjifeng_info:'出牌阶段限一次，若你手牌中没有祭器牌，你可以将一张手牌置于牌堆顶，并根据其花色获得对应祭器：黑桃-青龙之圭；梅花-白兽之琥；方片-朱雀之璋；红桃-玄武之璜',
@@ -9080,7 +9092,7 @@ character.swd={
 		yiesheng:'回雪',
 		yiesheng_info:'出牌阶段，你可以弃置任意数量的黑色手牌，然后摸等量的牌。',
 		huajian:'化剑',
-		huajian_info:'出牌阶段结束时，你可以弃置一张牌，视为对一张角色使用一张杀',
+		huajian_info:'出牌阶段结束时，你可以将一张牌当作杀对任意一名角色使用',
 		xuanyuan:'轩辕',
 		xuanyuan_info:'锁定技，你无视【轩辕剑】的装备条件及流失体力的效果；准备阶段，如果其他角色的装备区内有【轩辕剑】，你可以获得之',
 		jilve:'极略',
