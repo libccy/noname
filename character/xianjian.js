@@ -265,6 +265,7 @@ character.xianjian={
 			filter:function(event,player){
 				return player.num('h','sha')>0;
 			},
+			alter:true,
 			usable:1,
 			group:'tianjian_discard',
 			subSkill:{
@@ -272,6 +273,7 @@ character.xianjian={
 					trigger:{source:'damageEnd'},
 					forced:true,
 					filter:function(event){
+						if(get.is.altered('tianjian')) return false;
 						return event.parent.skill=='tianjian'&&event.player.num('he');
 					},
 					popup:false,
@@ -1924,15 +1926,23 @@ character.xianjian={
 		poyun3:{},
 		zhuyue:{
 			enable:'phaseUse',
+			alter:true,
 			filter:function(event,player){
-				return player.num('he',{type:'basic'})<player.num('he');
+				if(get.is.altered('zhuyue')){
+					return player.num('h',{type:['trick','delay','equip'],color:'black'})>0;
+				}
+				return player.num('h',{type:'basic'})<player.num('he');
 			},
-			// position:'he',
 			init:function(player){
 				player.storage.zhuyue=[];
 			},
 			filterCard:function(card){
-				return get.type(card)!='basic';
+				if(get.is.altered('zhuyue')){
+					return ['trick','delay','equip'].contains(get.type(card))&&get.color(card)=='black';
+				}
+				else{
+					return get.type(card)!='basic';
+				}
 			},
 			selectTarget:[1,2],
 			filterTarget:function(card,player,target){
@@ -2172,6 +2182,7 @@ character.xianjian={
 			locked:true,
 			unique:true,
 			gainable:true,
+			alter:true,
 			group:'zhimeng3',
 			content:function(){
 				"step 0"
@@ -2195,12 +2206,16 @@ character.xianjian={
 				"step 1"
 				if(result.bool){
 					var target=result.targets[0];
-					var card=get.cards()[0];
-					target.$draw(card);
-					target.storage.zhimeng2=card;
-					game.addVideo('storage',target,['zhimeng2',get.cardInfo(card),'card']);
-					target.addSkill('zhimeng2');
-					event.finish();
+					if(get.is.altered('zhimeng')){
+						target.draw();
+					}
+					else{
+						var card=get.cards()[0];
+						target.$draw(card);
+						target.storage.zhimeng2=card;
+						game.addVideo('storage',target,['zhimeng2',get.cardInfo(card),'card']);
+						target.addSkill('zhimeng2');
+					}
 					player.logSkill('zhimeng',target);
 				}
 			},
@@ -2548,6 +2563,7 @@ character.xianjian={
 		longxi_info:'锁定技，在回合外每当你需要使用或打出一张卡牌时，若牌堆顶的前两张中有可使用或打出的牌，你立即获得之',
 		zhuyue:'逐月',
 		zhuyue_info:'出牌阶段限一次，你可以弃置一张非基本牌并指定至多两个目标各随机弃置一张牌，若如此做，你本回使用的杀须指定选中角色为目标',
+		zhuyue_info_alter:'出牌阶段限一次，你可以弃置一张黑色锦囊牌或装备牌并指定至多两个目标各随机弃置一张牌，若如此做，你本回使用的杀须指定选中角色为目标',
 		guanri:'贯日',
 		guanri_info:'限制技，你可以弃置两张红色手牌并流失一点体力，然后对一名体力值不少于你的其他角色造成两点火焰伤害并弃置其所有装备牌',
 		tianxian:'天弦',
@@ -2555,7 +2571,8 @@ character.xianjian={
 		zhimeng:'织梦',
 		zhimeng2:'织梦',
 		zhimeng3:'织梦',
-		zhimeng_info:'结束阶段，你可以选择一名其他角色将牌堆顶的一张牌置于该角色的武将牌上，直到你的下个回合开始将其收入手牌。当一名角色武将牌上有织梦牌时，每当其成为与此牌类型相同的卡牌的目标，可以摸一张牌',
+		zhimeng_info:'结束阶段，你可以选择一名其他角色将牌堆顶的一张牌置于该角色的武将牌上，直到你的下个准备阶段将其收入手牌。当一名角色武将牌上有织梦牌时，每当其成为与此牌类型相同的卡牌的目标，可以摸一张牌',
+		zhimeng_info_alter:'结束阶段，你可以令一名其他角色摸一张牌',
 		runxin:'润心',
 		runxin_info:'每当你使用或打出一张红桃牌，你可以令一名角色回复一点体力',
 		tannang:'探囊',
@@ -2566,6 +2583,7 @@ character.xianjian={
 		xiaoyao_info:'每当你成为其他角色的卡牌目标，你可以弃置一张与之花色相同的手牌取消之',
 		tianjian:'天剑',
 		tianjian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用，受到伤害的角色随机弃置一张牌',
+		tianjian_info_alter:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用',
 		yufeng:'御风',
 		yufeng_info:'当你失去手牌后，若手牌数少于2，可将手牌数补至2（每回合最多发动两次）',
 		huimeng:'回梦',

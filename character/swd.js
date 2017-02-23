@@ -24,7 +24,7 @@ character.swd={
 		swd_quxian:['female','qun',3,['mojian','huanxia']],
 		swd_xiyan:['male','qun',3,['zaowu','daofa']],
 		swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
-		swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','hjifeng']],
+		swd_huanyuanzhi:['male','qun',3,['tianshu','lanzhi','mufeng']],
 		swd_murongshi:['female','shu',4,['duanyi','guxing']],
 		swd_jipeng:['male','wu',3,['reyingzi','guozao']],
 		swd_qi:['male','qun',3,['yaotong','heihuo','pojian']],
@@ -3557,6 +3557,16 @@ character.swd={
 			}
         },
 		mufeng:{
+			trigger:{player:'phaseEnd'},
+			frequent:true,
+			filter:function(event,player){
+				return player.num('h')<player.maxHp;
+			},
+			content:function(){
+				player.draw(player.maxHp-player.num('h'));
+			}
+		},
+		mufeng_old2:{
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
 				return !player.hasSkill('mufeng2')&&event.player!=player&&
@@ -6376,7 +6386,7 @@ character.swd={
     						else{
     							translation=translation.slice(0,2);
     						}
-    						var item=dialog.add('<div class="popup" style="width:50%;display:inline-block"><div class="skill">【'+
+    						var item=dialog.add('<div class="popup pointerdiv" style="width:50%;display:inline-block"><div class="skill">【'+
     						translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
     						item.firstChild.addEventListener('click',clickItem);
     						item.firstChild.link=list[i];
@@ -6436,8 +6446,8 @@ character.swd={
 			filterCard:function(card){
 				return get.type(card,'trick')=='trick';
 			},
-			discard:false,
-			prepare:'give',
+			// discard:false,
+			// prepare:'give',
 			filter:function(event,player){
 				return player.num('h',{type:['trick','delay']})>0;
 			},
@@ -6499,7 +6509,7 @@ character.swd={
 						else{
 							translation=translation.slice(0,2);
 						}
-						var item=dialog.add('<div class="popup" style="width:50%;display:inline-block"><div class="skill">【'+
+						var item=dialog.add('<div class="popup pointerdiv" style="width:50%;display:inline-block"><div class="skill">【'+
 						translation+'】</div><div>'+lib.translate[list[i]+'_info']+'</div></div>');
 						item.firstChild.addEventListener('click',clickItem);
 						item.firstChild.link=list[i];
@@ -6513,7 +6523,7 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				target.gain(cards,player);
+				// target.gain(cards,player);
 				event.skillai=function(list){
 					return list.randomGet();
 				};
@@ -6546,13 +6556,7 @@ character.swd={
 				order:1,
 				result:{
 					player:function(player,target){
-						if(ai.get.attitude(player,target)<0) return 0;
 						if(player.num('h')>player.hp) return 1;
-						return 0;
-					},
-					target:function(player,target){
-						if(ai.get.attitude(player,target)<0) return 0;
-						if(player.num('h')>target.num('h')) return 1;
 						return 0;
 					}
 				}
@@ -8193,7 +8197,7 @@ character.swd={
 					}
 					for(var i=0;i<8;i++){
 						if(i==0&&player.maxHp==6) continue;
-						var item=event.dialog.add('<div class="popup" style="width:70%;display:inline-block"><div class="skill">【'+
+						var item=event.dialog.add('<div class="popup pointerdiv" style="width:70%;display:inline-block"><div class="skill">【'+
 						get.cnNumber(i+1,true)+'】</div><div>'+effects[i]+'</div></div>');
 						item.addEventListener('click',clickItem);
 						item.link=i+1;
@@ -9046,7 +9050,8 @@ character.swd={
 		jqimou:'奇谋',
 		jqimou_info:'每当你于回合外受到一次伤害，你可以摸一张牌，并可以使用一张牌',
 		mufeng:'沐风',
-		mufeng_info:'在一名角色的结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
+		mufeng_info:'结束阶段，你可以将手牌数补至体力上限',
+		mufeng_old2_info:'在一名角色的结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次',
 		hjifeng:'祭风',
 		hjifeng_info:'出牌阶段限一次，若你手牌中没有祭器牌，你可以将一张手牌置于牌堆顶，并根据其花色获得对应祭器：黑桃-青龙之圭；梅花-白兽之琥；方片-朱雀之璋；红桃-玄武之璜',
 		mufeng_old_info:'锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0',
@@ -9257,7 +9262,7 @@ character.swd={
 		pozhen_info_alter:'每当你受到一次伤害，若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你对其造成一点伤害，否则该角色可弃置你一张牌',
 		tianshu_old_info:'结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
-		tianshu_info:'出牌阶段，你可以交给一名其他角色一张锦囊牌，然后获得该角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
+		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
 		zaowu_info:'出牌阶段限一次，你可以将一张黑桃牌当作封印之蛋使用',
 		luomei_info:'每当你使用或打出一张梅花花色的牌，你可以摸一张牌',
 		xingdian_info:'出牌阶段限一次，你可以弃置一张手牌，然后指定至多两名角色令其各弃置一张牌',

@@ -478,6 +478,9 @@ card.gujian={
                             return Math.max(0,num);
                         }
                         else{
+                            if(!player.needsToDiscard()&&target.num('he')<=3){
+                                return 0;
+                            }
                             return target.num('he')/2;
                         }
                     }

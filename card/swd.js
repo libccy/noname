@@ -724,9 +724,8 @@ card.swd={
 					event.finish();
 				}
 				"step 2"
-				if(target.isAlive()){
-					target.loseHp();
-					player.loseHp();
+				if(target.isAlive()&&!target.hasSkill('fengyin')){
+					target.addTempSkill('fengyin',{player:'phaseBegin'});
 				}
 			},
 			ai:{
@@ -736,13 +735,6 @@ card.swd={
 					value:6.5,
 				},
 				result:{
-					player:function(player,target){
-						if(ai.get.attitude(player,target)>=0){
-							return -10;
-						}
-						if(player.hp==1) return -2;
-						return -0.5;
-					},
 					target:-2,
 				},
 				tag:{
@@ -4809,7 +4801,7 @@ card.swd={
 		guisheqi:'龟蛇旗',
 		guisheqi_info:'出牌阶段对一名角色使用，目标获得一点护甲',
 		jiguanfeng:'机关蜂',
-		jiguanfeng_info:'出牌阶段对一名其他角色使用，目标需打出一张闪，否则受到一点伤害，然后与你各流失一点体力',
+		jiguanfeng_info:'出牌阶段对一名其他角色使用，目标需打出一张闪，否则受到一点伤害，然后非锁定技失效直到下一回合开始',
 		jiguanyuan:'机关鸢',
 		jiguanyuan_info:'出牌阶段对一名其他角色使用，你将此牌和一张其它牌置于一名其他角色的武将牌上，然后摸一张牌；该角色于下一结束阶段获得武将牌上的牌',
 		jiguantong:'机关火筒',

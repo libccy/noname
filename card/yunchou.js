@@ -261,6 +261,9 @@ card.yunchou={
 			filterTarget:function(card,player,target){
 				return target!=player&&target.num('h')>0;
 			},
+			chongzhu:function(){
+				return game.countPlayer()<=2;
+			},
 			multitarget:true,
 			multiline:true,
 			singleCard:true,
@@ -1118,7 +1121,7 @@ card.yunchou={
 		suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
 		suolianjia_bg:'链',
 		geanguanhuo:'隔岸观火',
-		geanguanhuo_info:'出牌阶段对一名其他角色使用，令目标与一名你指定的另一名角色拼点，赢的角色获得对方的一张牌；若点数相同，目标可弃置你一张牌',
+		geanguanhuo_info:'出牌阶段对一名其他角色使用，令目标与一名你指定的另一名角色拼点，赢的角色获得对方的一张牌；若点数相同，目标可弃置你一张牌（存活角色不超过2时可重铸）',
 		toulianghuanzhu:'偷梁换柱',
 		toulianghuanzhu_info:'出牌阶段对一名有手牌的角色使用，选择另一名有手牌的角色获得目标两张手牌（不足则全拿），然后还给其等量手牌',
 		toulianghuanzhu_bg:'柱',
