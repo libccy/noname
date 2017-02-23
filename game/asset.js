@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.9.5',
+    '1.9.9.8',
     'image/background/huangtian_bg.jpg',
     'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
@@ -2519,6 +2519,7 @@ window.noname_skin_list={
     re_xiahoudun:1,
     re_xushu:3,
     re_xuzhu:2,
+    re_yuanshao:1,
     re_zhangfei:1,
     re_zhangliao:1,
     re_zhaoyun:3,
@@ -2562,6 +2563,7 @@ window.noname_skin_list={
     xuzhu:1,
     yangxiu:2,
     yj_jushou:2,
+    yuanshao:1,
     yuanshu:4,
     yuejin:3,
     yufan:1,

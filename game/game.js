@@ -8617,7 +8617,7 @@
                         },player,card);
 					}
 					if(event.animate!=false){
-						if(card.name=='wuxie'&&event.getParent().source){
+						if((card.name=='wuxie'||card.name=='youdishenru')&&event.getParent().source){
 							var lining=event.getParent().sourcex||event.getParent().source2||event.getParent().source;
                             if(lining==player&&event.getParent().sourcex2){
                                 lining=event.getParent().sourcex2;
