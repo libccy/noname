@@ -989,6 +989,7 @@ character.gujian={
 			filter:function(event,player){
 				return player.maxHp>player.hp&&player.num('he',{color:'red'})>0;
 			},
+			alter:true,
 			content:function(){
 				"step 0"
 				player.chooseCardTarget({
@@ -1011,8 +1012,12 @@ character.gujian={
 				if(result.bool){
 					event.target=result.targets[0];
 					player.logSkill('xuelu',event.target,'fire');
-					event.num=Math.ceil((player.maxHp-player.hp)/2);
-					if(event.num>2) event.num=2;
+					if(get.is.altered('xuelu')){
+						event.num=1;
+					}
+					else{
+						event.num=Math.min(2,Math.ceil((player.maxHp-player.hp)/2));
+					}
 					player.discard(result.cards);
 				}
 				else{
@@ -1057,6 +1062,7 @@ character.gujian={
 			skillAnimation:true,
 			animationColor:'fire',
 			derivation:'juejing',
+			alter:true,
 			filter:function(event,player){
 				return !player.storage.shahun&&player.hp<=0;
 			},
@@ -1064,7 +1070,6 @@ character.gujian={
 				"step 0"
 				var cards=player.get('hej');
 				player.discard(cards);
-				event.num=Math.max(3,cards.length);
 				"step 1"
 				if(player.isLinked()) player.link();
 				"step 2"
@@ -1075,7 +1080,12 @@ character.gujian={
 				player.recover(1-player.hp);
 				player.removeSkill('fanshi');
 				player.addSkill('juejing');
-				player.storage.shahun=3;
+				if(get.is.altered('shahun')){
+					player.storage.shahun=2;
+				}
+				else{
+					player.storage.shahun=3;
+				}
 				player.markSkill('shahun');
 				game.addVideo('storage',player,['shahun',player.storage.shahun]);
 			},
@@ -1603,11 +1613,13 @@ character.gujian={
 		yuehua_info:'每当你于回合外使用、打出或弃置红色牌，你可以摸一张牌',
 		xuelu:'血戮',
 		xuelu_info:'结束阶段，你可以弃置一张红色牌并对一名其他角色造成X点火焰伤害，X为你已损失体力值的一半，向上取整且不超过2',
+		xuelu_info_alter:'结束阶段，你可以弃置一张红色牌并对一名其他角色造成一点火焰伤害',
 		fanshi:'反噬',
 		fanshi_info:'锁定技，弃牌阶段结束时，若你本回合内造成过伤害，你流失一点体力并摸一张牌',
 		shahun:'煞魂',
 		shahun2:'煞魂',
 		shahun_info:'限定技，濒死阶段，你可以复原武将牌，弃置所有牌并摸三张牌，然后将体力回复至1；若如此做，你失去技能【反噬】，获得技能【绝境】，并于三回合后立即死亡',
+		shahun_info_alter:'限定技，濒死阶段，你可以复原武将牌，弃置所有牌并摸三张牌，然后将体力回复至1；若如此做，你失去技能【反噬】，获得技能【绝境】，并于两回合后立即死亡',
 
 		yanjia:'偃甲',
 		yanjia_info:'出牌阶段，你可以将两张装备牌合成为一张强化装备',

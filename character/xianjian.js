@@ -724,6 +724,9 @@ character.xianjian={
 					trigger.result={bool:true,card:{name:'shan'}}
 					player.addSkill('zhangmu_ai');
 				}
+				else{
+					player.storage.counttrigger.zhangmu--;
+				}
 			},
 			ai:{
 				effect:{

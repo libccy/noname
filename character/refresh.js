@@ -526,6 +526,9 @@ character.refresh={
 					}
 					if(event.cards.length) event.goto(1);
 				}
+				else{
+					player.storage.counttrigger.qingjian--;
+				}
 			},
 			ai:{
 				expose:0.3

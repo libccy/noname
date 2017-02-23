@@ -4604,6 +4604,7 @@ character.hearth={
 			trigger:{player:'chooseToRespondBegin'},
 			direct:true,
 			usable:1,
+			alter:true,
 			filter:function(event,player){
 				if(event.responded) return false;
 				return game.hasPlayer(function(current){
@@ -4613,7 +4614,13 @@ character.hearth={
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('jingxiang'),function(card,player,target){
-					return target!=player&&target.num('h')>0;
+					if(target==player) return false;
+					var nh=target.num('h');
+					if(nh==0) return false;
+					if(get.is.altered('jingxiang')){
+						return nh<=player.num('h');
+					}
+					return true;
 				}).ai=function(target){
 					return 1-ai.get.attitude(player,target);
 				};
@@ -4640,6 +4647,9 @@ character.hearth={
 					trigger.responded=true;
 					result.buttons[0].link.remove();
 					trigger.result={bool:true,card:result.buttons[0].link}
+				}
+				else{
+					player.storage.counttrigger.jingxiang--;
 				}
 			},
 			ai:{
@@ -6292,6 +6302,7 @@ character.hearth={
 		zuzhou_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其流失一点体力',
 		jingxiang:'镜像',
 		jingxiang_info:'每回合限一次，当你需要打出卡牌时，你可以观看一名角色的手牌并将其视为你的手牌打出',
+		jingxiang_info_alter:'每回合限一次，当你需要打出卡牌时，你可以观看一名手牌数不多于你的角色的手牌并将其视为你的手牌打出',
 		tuteng:'图腾',
 		tuteng_info:'出牌阶段，你可以获得一个随机图腾；每当你受到一次伤害，你随机失去一个图腾',
 		zuling:'祖灵',

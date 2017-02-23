@@ -2719,15 +2719,20 @@ character.swd={
 		jilve:{
 			enable:'phaseUse',
 			usable:3,
+			alter:true,
 			onChooseToUse:function(event){
 				var cards=[];
-				if(ui.cardPile.childNodes.length<3){
-					var discardcards=get.cards(3);
+				var num=3;
+				if(get.is.altered('jilve')){
+					num=2;
+				}
+				if(ui.cardPile.childNodes.length<num){
+					var discardcards=get.cards(num);
 					for(var i=0;i<discardcards.length;i++){
 						ui.discardPile.appendChild(discardcards[i]);
 					}
 				}
-				for(var i=0;i<3;i++){
+				for(var i=0;i<num;i++){
 					cards.push(ui.cardPile.childNodes[i]);
 				}
 				event.set('jilvecards',cards);
@@ -3079,11 +3084,14 @@ character.swd={
 					if(card.name=='sha'&&get.color(card)=='black') return true;
 				},
 				cardUsable:function(card){
+					if(get.is.altered('poyue')) return;
 					if(card.name=='sha'&&get.color(card)=='red') return Infinity;
 				}
 			},
+			alter:true,
 			trigger:{player:'useCard'},
 			filter:function(event,player){
+				if(get.is.altered('poyue')) return false;
 				return event.card.name=='sha'&&get.color(event.card)=='red';
 			},
 			forced:true,
@@ -3586,8 +3594,19 @@ character.swd={
 		touxi:{
 			trigger:{global:'phaseEnd'},
 			check:function(event,player){
-				return ai.get.damageEffect(event.player,player,player,'thunder')>0;
+				if(ai.get.damageEffect(event.player,player,player,'thunder')>0){
+					if(get.is.altered('touxi')){
+						if(ai.get.attitude(player,event.player)<0&&event.player.hp==1&&player.hp>1){
+							return true;
+						}
+					}
+					else{
+						return true;
+					}
+				}
+				return false;
 			},
+			alter:true,
 			filter:function(event,player){
 				return event.player!=player&&!player.hasSkill('touxi2')&&event.player.isAlive();
 			},
@@ -3605,12 +3624,17 @@ character.swd={
 					event.finish();
 				}
 				else{
-					if(player.num('he')){
-                        var att=ai.get.attitude(trigger.player,player);
-						trigger.player.discardPlayerCard(player,'he',function(button){
-                            if(att>0) return 0;
-                            return ai.get.buttonValue(button);
-                        });
+					if(get.is.altered('touxi')){
+						player.damage(trigger.player);
+					}
+					else{
+						if(player.num('he')){
+	                        var att=ai.get.attitude(trigger.player,player);
+							trigger.player.discardPlayerCard(player,'he',function(button){
+	                            if(att>0) return 0;
+	                            return ai.get.buttonValue(button);
+	                        });
+						}
 					}
 				}
 			},
@@ -3933,16 +3957,25 @@ character.swd={
 				}
 				return false;
 			},
+			alter:true,
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('wangchen')).ai=function(target){
+					if(get.is.altered('wangchen')){
+						return -ai.get.attitude(player,target)/Math.sqrt(target.hp);
+					}
 					return ai.get.attitude(player,target)*(target.isTurnedOver()?1:-1);
 				}
 				"step 1"
 				if(result.bool){
 					var target=result.targets[0]
 					player.logSkill('wangchen',target);
-					target.turnOver();
+					if(get.is.altered('wangchen')){
+						target.loseHp();
+					}
+					else{
+						target.turnOver();
+					}
 				}
 			},
 			ai:{
@@ -5263,9 +5296,14 @@ character.swd={
 				return ai.get.attitude(player,event.player)>0;
 			},
 			logTarget:'player',
+			alter:true,
 			content:function(){
 				"step 0"
-				if(trigger.player!=player&&trigger.player.num('h')>=player.num('h')){
+				if(get.is.altered('yinyue')){
+					trigger.player.draw();
+					event.finish();
+				}
+				else if(trigger.player!=player&&trigger.player.num('h')>=player.num('h')){
 					game.asyncDraw([trigger.player,player]);
 				}
 				else{
@@ -5511,11 +5549,13 @@ character.swd={
 		},
 		xianjiang:{
 			enable:'phaseUse',
+			alter:true,
 			filterCard:function(card){
 				return get.type(card,'trick')=='trick';
 			},
 			usable:1,
 			filter:function(event,player){
+				if(get.is.altered('xianjiang')&&player.num('e')) return false;
 				if(player.num('h',{type:'trick'})) return true;
 				if(player.num('h',{type:'delay'})) return true;
 				return false;
@@ -5699,6 +5739,9 @@ character.swd={
 				if(result.bool){
 					player.logSkill('jikong');
 					player.useCard({name:'sha',nature:'thunder'},result.targets,false);
+				}
+				else{
+					player.storage.counttrigger.jikong--;
 				}
 			},
 			ai:{
@@ -7369,6 +7412,7 @@ character.swd={
 		duanyi:{
 			enable:'phaseUse',
 			usable:1,
+			alter:true,
 			filter:function(event,player){
 				return player.num('h','sha')>1;
 			},
@@ -7383,6 +7427,9 @@ character.swd={
 			content:function(){
 				"step 0"
 				target.damage();
+				if(get.is.altered('duanyi')){
+					event.finish();
+				}
 				"step 1"
 				var he=target.get('he');
 				target.discard(he.randomGets(target.maxHp-target.hp));
@@ -8780,7 +8827,7 @@ character.swd={
 
 
 		gaizao:'改造',
-		gaizao_info:'每当你即将替换一件装备，你可以永久改变新装备的装备类型使用其装备在装备区内的空余位置',
+		gaizao_info:'每当你即将替换一件装备，你可以永久改变新装备的装备类型使其装备在装备区内的空余位置',
 		lingshi:'灵矢',
 		lingshi_info:'你的装备区内每有一张牌，你的攻击范围+2；当你的装备区内有武器牌或防具牌时，你的杀不可闪避；当你的装备区内有马时，你摸牌阶段额外摸一张牌；当你的装备内的宝物牌时，你回合内可以额外使用一张杀',
 		tiebi:'铁壁',
@@ -8959,6 +9006,7 @@ character.swd={
 		fushen2:'附身',
 		wangchen:'忘尘',
 		wangchen_info:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
+		wangchen_info_alter:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
 		guiyin:'归隐',
 		guiyin_info:'若你于弃牌阶段弃置了至少两张牌，你可以摸两张牌',
 		shejie:'设界',
@@ -8967,6 +9015,7 @@ character.swd={
 		shejie2_info:'不能使用或打出手牌，直到下一回合开始',
 		yinyue:'引月',
 		yinyue_info:'每当有一名角色回复一次体力，你可以令其摸一张牌，若你的手牌数不大于该角色，你也摸一张牌',
+		yinyue_info_alter:'每当有一名角色回复一次体力，你可以令其摸一张牌',
 		mohua2:'魔化',
 		mohua2_info:'锁定技，当你进入濒死状态时，你立即变身为撒旦，将体力回复至２，然后摸两张牌',
 		liexin:'裂心',
@@ -8991,6 +9040,7 @@ character.swd={
 
 		touxi:'偷袭',
 		touxi_info:'在其他角色的结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以弃置你的一张牌',
+		touxi_info_alter:'在其他角色的结束阶段，你可以进行一次判定，若结果为黑色，你对其造成一点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方对你造成一点伤害',
 		minjing:'明镜',
 		minjing_info:'若你没有防具牌，你视为装备了光纱天衣',
 		jqimou:'奇谋',
@@ -9032,13 +9082,15 @@ character.swd={
 		jilve_backup:'极略',
 		jilve2:'极略',
 		jilve_info:'出牌阶段，你可以观看牌堆顶的三张牌，然后使用其中的非装备牌。每回合最多发动三次',
+		jilve_info_alter:'出牌阶段，你可以观看牌堆顶的两张牌，然后使用其中的非装备牌。每回合最多发动三次',
 		gongshen:'工神',
 		gongshen_info:'任意一名其他角色使用一张基本牌或锦囊牌指定目标后，你可以弃置一张装备牌令其失效',
 
 		liuhong:'流虹',
 		liuhong_info:'每当你使用一张杀，可以摸一张牌',
 		poyue:'破月',
-		poyue_info:'锁定技，你的黑杀无视距离，红色不计入回合内的出杀限制且不可闪避',
+		poyue_info:'锁定技，你的黑杀无视距离，红色杀不计入回合内的出杀限制且不可闪避',
+		poyue_info_alter:'锁定技，你的黑杀无视距离，红色杀不可闪避',
 		mojian:'墨剑',
 		mojian_info:'每当你使用杀并指定目标后，你可以令其摸一张牌，然后你回复一点体力',
 		duanyue:'断月',
@@ -9175,6 +9227,7 @@ character.swd={
 		mohua_info:'锁定技，在身份局中，当你进入濒死状态时，你立即变身为撒旦，体力上限变为现存角色数（至少为4），并成为其他所有角色的共同敌人',
 		miles_xueyi_info:'锁定技，你防止即将受到的伤害，然后流失一点体力',
 		duanyi_info:'出牌阶段限一次，你可以弃置两张杀，对一名角色造成一点伤害，然后其随机弃置X张牌，X为其已损失的体力值',
+		duanyi_info_alter:'出牌阶段限一次，你可以弃置两张杀，并对一名角色造成一点伤害',
 		guxing_info:'出牌阶段，你可以将最后至多X张手牌当杀使用，此杀无视距离且可以指定至多3个目标，每造成一次伤害，你摸一张牌，Ｘ为你已损失的体力值且至少为１。',
 		tianlun_info:'任意一名角色的判定生效前，你可以弃置一张场上角色的判定牌代替之',
 		hlongyin_info:'出牌阶段，你可以弃置任意张颜色相同且点数不同的牌，并获得逆时针座位距离与卡牌点数相同的角色区域内的一张牌。每阶段限一次',
@@ -9194,6 +9247,7 @@ character.swd={
 		qingcheng_info:'结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
 		xianjiang_old_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
 		xianjiang_info:'出牌阶段限一次，你可以弃置一张锦囊牌并随机装备一件装备',
+		xianjiang_info_alter:'出牌阶段限一次，若你装备内没有牌，你可以弃置一张锦囊牌并随机装备一件装备',
 		shengong_info:'每当你需要打出一张杀或闪时，你可以弃置一名其他角色装备区内的一张武器牌或防具牌，视为打出一张杀或闪，然后该角色摸一张牌，你弃一张牌',
 		ningjian_info:'你可以将一张红色牌当闪、黑色牌当杀使用或打出',
 		taixu_info:'限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1为其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1',
