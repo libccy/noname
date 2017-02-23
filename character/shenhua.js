@@ -1091,10 +1091,15 @@ character.shenhua={
 				effect:{
 					target:function(card,player,target,current){
 						if(!target.hasFriend()) return;
-						if(get.tag(card,'loseCard')&&_status.currentPhase!=target&&target.num('he')){
+						if(_status.currentPhase==target) return;
+						if(get.tag(card,'loseCard')&&target.num('he')){
 							return [0.5,Math.max(2,target.num('h'))];
 						}
-						if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
+						if(target.isUnderControl(true,player)){
+							if(get.tag(card,'respondSha')&&player.num('h','sha')) return [0.5,1];
+							if(get.tag(card,'respondShan')&&player.num('h','shan')) return [0.5,1];
+						}
+						else if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
 							if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
 							if(target.num('h')==0) return 2;
 							return [0.5,target.num('h','sha')+target.num('h','shan')];

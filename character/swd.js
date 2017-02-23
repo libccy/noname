@@ -6198,7 +6198,13 @@ character.swd={
 			filterTarget:function(card,player,target){
 				return player!=target&&target.num('h');
 			},
-			filterCard:true,
+			filterCard:function(card){
+				if(get.is.altered('yunchou')){
+					return get.type(card)=='basic';
+				}
+				return true;
+			},
+			alter:true,
 			content:function(){
 				"step 0"
 				var card=target.get('h').randomGet();
@@ -6212,11 +6218,10 @@ character.swd={
 				}
 				"step 1"
 				if(event.bool){
-					target.damage();
+					player.draw();
 				}
 				else if(player.num('he')){
-					target.line(player,'green');
-					target.discardPlayerCard(player,'he');
+					target.draw();
 				}
 			},
 			check:function(card){
@@ -6226,7 +6231,7 @@ character.swd={
 				order:5,
 				result:{
 					target:function(player,target){
-						if(ai.get.damageEffect(target,player,target)>=0) return 0;
+						if(target.hasSkillTag('noh')) return 0;
 						return -1;
 					}
 				},
@@ -9286,7 +9291,8 @@ character.swd={
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		pozhen_info_alter:'每当你受到一次伤害，若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
-		yunchou_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你对其造成一点伤害，否则该角色可弃置你一张牌',
+		yunchou_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
+		yunchou_info_alter:'出牌阶段限一次，你可以弃置一张基本牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
 		tianshu_old_info:'结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
 		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
 		zaowu_info:'出牌阶段限一次，你可以将一张黑桃牌当作封印之蛋使用',
