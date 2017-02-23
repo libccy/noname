@@ -845,14 +845,7 @@ card.swd={
 				result:{
 					player:function(){
 						var cardname=_status.event.cardname;
-						if(cardname=='tiesuo') return 0;
-						if(cardname=='jiu') return 0;
-						if(cardname=='tianxianjiu') return 0;
-						if(cardname=='toulianghuanzhu') return 0;
-						if(cardname=='shijieshu') return 0;
-						if(cardname=='xietianzi') return 0;
-						if(cardname=='huogong') return 0;
-						if(cardname=='shandianjian') return 0;
+						if(get.tag({name:cardname},'norepeat')) return 0;
 						return 1;
 					}
 				},
@@ -1528,7 +1521,9 @@ card.swd={
 		tianxianjiu:{
 			fullskin:true,
 			type:'basic',
-			enable:true,
+			enable:function(event,player){
+				return !player.hasSkill('tianxianjiu');
+			},
 			savable:function(card,player){
 				return _status.event.dying==player;
 			},
@@ -2148,6 +2143,7 @@ card.swd={
 				if(event.card.name=='yuchankan') return false;
 				if(player.hasSkill('shenmiguo2')) return false;
 				if(get.info(event.card).complexTarget) return false;
+				if(!lib.filter.cardEnabled(event.card,player,event.parent)) return false;
 				var type=get.type(event.card);
 				if(type!='basic'&&type!='trick') return false;
 				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);

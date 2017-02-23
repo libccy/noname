@@ -2967,6 +2967,7 @@ character.hearth={
 				if(event.parent.parent.name!='phaseUse') return false;
 				if(!event.targets||!event.card) return false;
 				if(get.info(event.card).complexTarget) return false;
+				if(!lib.filter.cardEnabled(event.card,player,event.parent)) return false;
 				var type=get.type(event.card);
 				if(type!='basic'&&type!='trick') return false;
 				var card=game.createCard(event.card.name,event.card.suit,event.card.number,event.card.nature);
@@ -2980,12 +2981,7 @@ character.hearth={
 				return true;
 			},
 			check:function(event,player){
-				if(event.card.name=='tiesuo') return false;
-				if(event.card.name=='jiu') return false;
-				if(event.card.name=='tianxianjiu') return false;
-				if(event.card.name=='toulianghuanzhu') return false;
-				if(event.card.name=='shijieshu') return false;
-				if(event.card.name=='xietianzi') return false;
+				if(get.tag({name:event.card.name},'norepeat')) return false;
 				return true;
 			},
 			content:function(){
@@ -6038,7 +6034,7 @@ character.hearth={
 		midian_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后随机获得三张锦囊牌',
 		yuelu:'月露',
 		yuelu_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力并获得一点护甲',
-		yuelu_info_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力',
+		yuelu_info_alter:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力',
 		xingluo:'星落',
 		xingluo_info:'准备阶段，你可以令任意名手牌数多于你的角色各弃置一张手牌，然后你可以从弃置的牌中选择一张加入手牌',
 		yushou:'御兽',

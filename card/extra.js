@@ -5,7 +5,9 @@ card.extra={
 			audio:true,
 			fullskin:true,
 			type:"basic",
-			enable:true,
+			enable:function(event,player){
+				return !player.hasSkill('jiu');
+			},
 			lianheng:true,
 			logv:false,
 			savable:function(card,player,dying){
@@ -202,6 +204,7 @@ card.extra={
 					damage:1,
 					fireDamage:1,
 					natureDamage:1,
+					norepeat:1
 				}
 			}
 		},
@@ -241,6 +244,7 @@ card.extra={
 				tag:{
 					multitarget:1,
 					multineg:1,
+					norepeat:1
 				}
 			}
 		},

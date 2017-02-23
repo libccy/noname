@@ -173,6 +173,9 @@ card.hearth={
 					target:function(player,target){
 						return Math.max(0,2-target.num('e'))+(target.num('h')?0:0.5);
 					},
+				},
+				tag:{
+					norepeat:1
 				}
 			}
 		},
@@ -267,6 +270,7 @@ card.hearth={
 					damage:1,
 					thunderDamage:1,
 					natureDamage:1,
+					norepeat:1
 				}
 			}
 		},
@@ -407,6 +411,9 @@ card.hearth={
 				useful:3,
 				result:{
 					target:1
+				},
+				tag:{
+					norepeat:1
 				}
 			}
 		},

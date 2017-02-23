@@ -673,7 +673,8 @@ card.yunchou={
 				tag:{
 					loseCard:1,
 					multitarget:1,
-					multineg:1
+					multineg:1,
+					norepeat:1,
 				},
 				result:{
 					target:function(player,target){

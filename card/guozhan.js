@@ -18,6 +18,7 @@ card.guozhan={
 			lianheng:true,
 			enable:function(card,player){
 				if(get.mode()=='guozhan'&&!player.isMajor()) return false;
+				if(player.hasSkill('xietianzi')) return false;
 				return _status.event.getParent().name=='phaseUse';
 			},
 			filterTarget:function(card,player,target){
