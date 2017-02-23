@@ -496,6 +496,7 @@ character.ow={
         aqianghua:{
             enable:'phaseUse',
             usable:1,
+            alter:true,
             filter:function(event,player){
                 return player.num('h')>=1;
             },
@@ -508,7 +509,7 @@ character.ow={
             prepare:'give',
             content:function(){
                 target.gain(cards);
-                target.changeHujia();
+                if(!get.is.altered('aqianghua')) target.changeHujia();
                 target.addSkill('aqianghua2');
             },
             ai:{
@@ -2495,12 +2496,15 @@ character.ow={
             enable:'phaseUse',
             filterCard:true,
             selectCard:function(){
+                if(get.is.altered('kuoyin')) return 1;
                 if(_status.event.player.storage.yuedong_eff) return 1;
                 if(_status.event.player.storage.yuedong_num) return 2;
                 return [1,2];
             },
             position:'he',
+            alter:true,
             filter:function(event,player){
+                if(get.is.altered('kuoyin')&&player.storage.yuedong_num) return false;
                 if(player.storage.yuedong_eff&&player.storage.yuedong_num) return false;
                 return player.num('he')>0;
             },
@@ -2967,6 +2971,7 @@ character.ow={
         aqianghua:'强化',
         aqianghua2:'强化',
         aqianghua_info:'出牌阶段限一次，你可以将你的全部手牌（至少一张）交给一名其他角色，该角色获得一点护甲且下一次造成的伤害+1',
+        aqianghua_info_alter:'出牌阶段限一次，你可以将你的全部手牌（至少一张）交给一名其他角色，该角色下一次造成的伤害+1',
         zhiyuan:'支援',
         zhiyuan_info:'每当你即将造成伤害，你可以防止此伤害，改为令目标回复等量的体力',
         juji:'狙击',
@@ -3043,6 +3048,7 @@ character.ow={
         yuedong_info:'出牌阶段结束时，你可以令一名角色摸一张牌',
         kuoyin:'扩音',
         kuoyin_info:'出牌阶段，你可以弃置一张牌令本回合乐动的目标数改为3，或弃置两张牌令本回合乐动的摸牌量改为2',
+        kuoyin_info_alter:'出牌阶段，你可以弃置一张牌令本回合乐动的目标数改为3',
         huhuan:'互换',
         huhuan_info:'出牌阶段，你可以弃置两张牌令本回合乐动的摸牌效果改为回复等量体力',
         guangshu:'光枢',

@@ -91,6 +91,7 @@ character.gujian={
 				if(player.num('h')==0) return false;
 				return true;
 			},
+			alter:true,
 			filterTarget:function(card,player,target){
 				return target!=player&&target.num('h')>0&&target.hp>0&&target.hp<=player.maxHp;
 			},
@@ -108,6 +109,9 @@ character.gujian={
 				}
 				'step 2'
 				player.changeHp(event.num);
+				if(get.is.altered('duhun')){
+					event.finish();
+				}
 				'step 3'
 				event.target.changeHp(-event.num);
 				'step 4'
@@ -1615,6 +1619,7 @@ character.gujian={
 		shishui_info:'锁定技，每当你使用一张红色牌，你令目标流失一点体力',
 		duhun:'渡魂',
 		duhun_info:'濒死阶段，你可以与一名体力值不超过你的体力上限的角色拼点，若你赢，你失去一点体力上限并与该角色交换体力值；若你没赢，你立即死亡',
+		duhun_info_alter:'濒死阶段，你可以与一名体力值不超过你的体力上限的角色拼点，若你赢，你失去一点体力上限并将体力值回复至与该角色相同；若你没赢，你立即死亡',
 		chizhen:'驰阵',
 		chizhen_info:'出牌阶段开始时，你可以摸X张牌并弃置X张牌，若你弃置了杀，可以视为使用一张决斗（X为你已损失的体力值且至少为1）',
 		xidie:'戏蝶',

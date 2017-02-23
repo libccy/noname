@@ -602,6 +602,7 @@ character.hearth={
 			filter:function(event,player){
 				return event.type=='dying'&&player.num('he',{color:'black'});
 			},
+			alter:true,
 			filterCard:{color:'black'},
 			position:'he',
 			check:function(card){
@@ -613,7 +614,7 @@ character.hearth={
 			selectTarget:-1,
 			content:function(){
 				target.recover();
-				target.changeHujia();
+				if(!get.is.altered('yuelu')) target.changeHujia();
 			},
 			ai:{
 				order:10,
@@ -734,6 +735,7 @@ character.hearth={
 			}
 		},
 		qingzun:{
+			alter:true,
 			subSkill:{
 				count:{
 					trigger:{player:'useCard'},
@@ -751,6 +753,7 @@ character.hearth={
 				draw1:{
 					trigger:{player:'phaseBegin'},
 					filter:function(event,player){
+						if(get.is.altered('qingzun')) return player.storage.qingzun>=3;
 						return player.storage.qingzun>=2;
 					},
 					frequent:true,
@@ -761,6 +764,7 @@ character.hearth={
 				draw2:{
 					trigger:{player:'phaseEnd'},
 					filter:function(event,player){
+						if(get.is.altered('qingzun')) return player.storage.qingzun>=9;
 						return player.storage.qingzun>=6;
 					},
 					frequent:true,
@@ -3278,6 +3282,7 @@ character.hearth={
 			trigger:{source:'damageBegin'},
 			forced:true,
 			usable:1,
+			alter:true,
 			filter:function(event){
 				return event.card&&get.type(event.card)=='trick'&&event.parent.name!='_lianhuan'&&event.parent.name!='_lianhuan2';
 			},
@@ -3294,6 +3299,11 @@ character.hearth={
 			forced:true,
 			content:function(){
 				'step 0'
+				if(get.is.altered('malymowang')){
+					player.gain(game.createCard(get.inpile('trick').randomGet()),'draw');
+					event.finish();
+					return;
+				}
 				var list=get.inpile('trick');
 				list=list.randomGets(3);
 				for(var i=0;i<list.length;i++){
@@ -3411,7 +3421,9 @@ character.hearth={
 		xshixin:{
 			trigger:{source:'damageEnd'},
 			forced:true,
+			alter:true,
 			filter:function(event,player){
+				if(get.is.altered('xshixin')&&event.player.hp<player.hp) return false;
 				return event.player.isAlive()&&event.player!=player;
 			},
 			content:function(){
@@ -3679,9 +3691,10 @@ character.hearth={
 					return Infinity;
 				},
 				targetInRange:function(){
-					return true;
+					if(!get.is.altered('fengnu')) return true;
 				}
 			},
+			alter:true,
 			trigger:{player:'useCard'},
 			filter:function(event,player){
 				if(_status.currentPhase!=player) return false;
@@ -6025,6 +6038,7 @@ character.hearth={
 		midian_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后随机获得三张锦囊牌',
 		yuelu:'月露',
 		yuelu_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力并获得一点护甲',
+		yuelu_info_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复一点体力',
 		xingluo:'星落',
 		xingluo_info:'准备阶段，你可以令任意名手牌数多于你的角色各弃置一张手牌，然后你可以从弃置的牌中选择一张加入手牌',
 		yushou:'御兽',
@@ -6049,6 +6063,7 @@ character.hearth={
 		ayuling_info:'每当你受到一次伤害，你可以获得一张随机青玉牌',
 		qingzun:'青樽',
 		qingzun_info:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用六张青玉牌后，你可以于结束阶段摸一张牌',
+		qingzun_info_alter:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用三张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用九张青玉牌后，你可以于结束阶段摸一张牌',
 		lianjin:'炼金',
 		lianjin_info:'出牌阶段限两次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水',
 		shouji:'收集',
@@ -6209,12 +6224,14 @@ character.hearth={
 		malymowang:'魔网',
 		malymowang2:'魔网',
 		malymowang_info:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你从3张随机锦囊中选择一张加入手牌',
+		malymowang_info_alter:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，随机获得一张普通锦牌牌',
 		lingzhou:'灵咒',
 		lingzhou_info:'每当你使用一张锦囊牌，可令一名角色摸一张牌或回复一点体力',
 		mieshi:'灭世',
 		mieshi_info:'锁定技，结束阶段，你流失一点体力，并对一名随机的其他角色造成一点火焰伤害',
 		xshixin:'蚀心',
 		xshixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各流失一点体力',
+		xshixin_info_alter:'锁定技，每当你对一名其他角色造成一次伤害，若受伤害角色体力值不小于你，其与你各流失一点体力',
 		xmojian:'魔箭',
 		xmojian_info:'每当你的武将牌翻至正面时，你可以指定一名角色视为对其使用了一张杀',
 		enze:'恩泽',
@@ -6242,6 +6259,7 @@ character.hearth={
 		huanwu_info:'出牌阶段限一次，你可以令一名角色增加一点体力上限，回复一点体力，并摸两张牌（每名角色限发动一次）',
 		fengnu:'风怒',
 		fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用同名卡牌时，你摸一张牌（每回合最多以此法摸3张牌）',
+		fengnu_info_alter:'锁定技，你使用的任何卡牌无数量限制；当你于回合内重复使用同名卡牌时，你摸一张牌（每回合最多以此法摸3张牌）',
 		shengdun:'圣盾',
 		shengdun2:'圣盾',
 		shengdun_info:'锁定技，准备阶段，若你没有护甲，你获得一点护甲',

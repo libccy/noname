@@ -4245,19 +4245,6 @@ character.swd={
 				target.damage('thunder');
 			}
 		},
-		// zhanlu:{
-		// 	enable:'phaseUse',
-		// 	filterCard:function(card){
-		// 		return get.suit(card)=='heart';
-		// 	},
-		// 	position:'he',
-		// 	viewAs:{name:'taoyuan'},
-		// 	prompt:'将一张红桃牌当作桃园结义使用',
-		// 	check:function(card){return 6-ai.get.value(card)},
-		// 	ai:{
-		// 		threaten:1.2
-		// 	}
-		// },
 		zhanlu:{
 			enable:'phaseUse',
 			filterCard:function(card){var suit=get.suit(card); return suit=='spade';},
@@ -4395,17 +4382,25 @@ character.swd={
 		susheng:{
 			trigger:{global:'dieBefore'},
 			direct:true,
+			alter:true,
 			check:function(event,player){
 				return player.attitudeTo(event.player)>3;
 			},
 			filter:function(event,player){
+				if(get.is.altered('susheng')&&!player.num('h',{color:'red'})) return false;
 				return player.num('h')>0&&!player.hasSkill('susheng2');
 			},
 			content:function(){
 				"step 0"
 				var att=ai.get.attitude(player,trigger.player);
 				var nh=player.num('h');
-				var next=player.chooseToDiscard(get.prompt('susheng',trigger.player));
+				var next;
+				if(get.is.altered('susheng')){
+					next=player.chooseToDiscard(get.prompt('susheng',trigger.player),{color:'red'});
+				}
+				else{
+					next=player.chooseToDiscard(get.prompt('susheng',trigger.player));
+				}
 				next.logSkill=['susheng',trigger.player];
 				next.ai=function(card){
 					if(att>3||(att>1&&nh>2)){
@@ -9210,7 +9205,8 @@ character.swd={
 		huanjian_info:'出牌阶段，你可以将一张黑色牌当作冰魄针使用',
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
-		zhanlu_info:'出牌阶段，你可以弃置一张黑桃牌令至多３名角色各回复一点体力',
+		susheng_info_alter:'在任意一名角色即将死亡时，你可以弃置一张红色手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
+		zhanlu_info:'出牌阶段限一次，你可以弃置一张黑桃牌令至多3名角色各回复一点体力',
 		kunlunjing_info:'准备阶段，若你的体力值小于上回合结束时的体力值，你可以将场上所有牌还原到你上一回合结束时的位置',
 		kunlunjing_info_alter:'准备阶段，若你的体力值小于上回合结束时的体力值，你可以将场上所有牌还原到你上一回合结束时的位置，然后流失一点体力',
 		swd_xiuluo_info:'准备阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）',

@@ -1355,8 +1355,10 @@ character.xianjian={
 			init:function(player){
 				player.storage.shuiyun=[];
 			},
+			alter:true,
 			filter:function(event,player){
 				if(player.storage.shuiyun.length>=3) return false;
+				if(player.storage.shuiyun.length>=2&&get.is.altered('shuiyun')) return false;
 				var types=[];
 				for(var i=0;i<player.storage.shuiyun.length;i++){
 					types.add(get.type(player.storage.shuiyun[i],'trick'));
@@ -1412,6 +1414,7 @@ character.xianjian={
 				effect:{
 					player:function(card,player){
 						if(_status.currentPhase!=player) return;
+						if(get.is.altered('shuiyun')) return;
 						if(card.name=='wuzhong'||card.name=='yiyi'||
 							card.name=='yuanjiao'||card.name=='shunshou') return;
 						if(player.num('h')<=player.hp){
@@ -2548,6 +2551,7 @@ character.xianjian={
 		shuiyun5:'水蕴',
 		shuiyun3:'水蕴',
 		shuiyun_info:'结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力',
+		shuiyun_info_alter:'结束阶段，你可以将一张与武将牌上的牌类别均不相同的手牌置于武将牌上称为“蕴”（不能超过2张）；任意一名角色进入濒死状态时，你可以弃置一张“蕴”令其回复1点体力',
 		wangyou:'忘忧',
 		wangyou_info:'其他角色的结束阶段，你可以弃置一张牌，令此回合内受过伤害的所有角色各摸一张牌',
 		changnian:'长念',
