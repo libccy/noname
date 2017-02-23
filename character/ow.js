@@ -213,6 +213,7 @@ character.ow={
                     }
                 }
             },
+            alter:true,
             logTarget:function(event,player){
                 var list=[];
                 if(player.storage.qinru){
@@ -249,7 +250,7 @@ character.ow={
                     event.redo();
                 }
                 'step 2'
-                if(event.bool){
+                if(event.bool&&!get.is.altered('maichong')){
                     player.draw();
                 }
             },
@@ -270,9 +271,10 @@ character.ow={
         },
         zhongdun:{
             unique:true,
+            alter:true,
             init2:function(player){
                 if(!player.storage.zhongdun){
-                    player.changeHujia(6);
+                    player.changeHujia(get.is.altered('zhongdun')?6:8);
                     player.storage.zhongdun=true;
                 }
             },
@@ -312,6 +314,11 @@ character.ow={
         maoding:{
             trigger:{player:'damageEnd',source:'damageEnd'},
             frequent:true,
+            filter:function(event,player){
+                if(get.is.altered('maoding')&&event.source!=player) return false;
+                return true;
+            },
+            alter:true,
             content:function(){
                 player.gain(game.createCard(get.typeCard('hslingjian').randomGet()),'gain2');
             },
@@ -420,11 +427,14 @@ character.ow={
         fengshi:{
             trigger:{player:'shaBegin'},
             forced:true,
+            alter:true,
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
 			},
 			filter:function(event,player){
-				return Math.random()<0.2*get.cardCount(true,player);
+                var num=0.2;
+                if(get.is.altered('fengshi')) num=0.15;
+				return Math.random()<num*get.cardCount(true,player);
 			},
 			content:function(){
 				trigger.directHit=true;
@@ -443,7 +453,9 @@ character.ow={
 				return ai.get.attitude(player,event.target)<=0;
 			},
             filter:function(event,player){
-                return event.card&&event.card.name=='sha'&&Math.random()<0.2*get.cardCount(true,player);
+                var num=0.2;
+                if(get.is.altered('fengshi')) num=0.15;
+                return event.card&&event.card.name=='sha'&&Math.random()<num*get.cardCount(true,player);
             },
             content:function(){
                 trigger.num++;
@@ -2670,8 +2682,10 @@ character.ow={
             trigger:{global:'phaseEnd'},
             direct:true,
             filter:function(event,player){
+                if(get.is.altered('ziyu')) return game.phaseNumber%6==0;
                 return game.phaseNumber%4==0;
             },
+            alter:true,
             content:function(){
                 "step 0"
 				var controls=['draw_card'];
@@ -2933,22 +2947,26 @@ character.ow={
 		yinshen_info:'结束阶段，你可以弃置一张装备牌并获得潜行直到下一回合开始',
         maichong:'脉冲',
         maichong_info:'准备阶段，你可以令最近两名被你侵入的角色各随机弃置一张牌，若弃置的牌中有非基本牌，你摸一张牌',
+        maichong_info_alter:'准备阶段，你可以令最近两名被你侵入的角色各随机弃置一张牌',
         lichang:'力场',
         lichang2:'力场',
         lichang_info:'结束阶段，你可以弃置一张红色牌，若如此做，你可以在下个准备阶段令一名距离1以内的角色回复一点体力或摸两张牌',
         mengji:'猛击',
         mengji_info:'锁定技，若你已发动重盾，当你没有护甲时，你的杀造成的伤害+1',
         zhongdun:'重盾',
-        zhongdun_info:'游戏开始时，你获得6点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
+        zhongdun_info:'游戏开始时，你获得8点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
+        zhongdun_info_alter:'游戏开始时，你获得6点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
         paotai:'炮台',
         paotai2:'炮台',
         paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到一点伤害，炮台降低一级',
         maoding:'铆钉',
         maoding2:'铆钉',
-        maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌限阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
+        maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
+        maoding_info_alter:'每当你造成一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
         fengshi:'风矢',
         fengshi2:'风矢',
         fengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加20%的概率强制命中；你的杀造成伤害后增加20%的概率令伤害+1',
+        fengshi_info_alter:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加15%的概率强制命中；你的杀造成伤害后增加15%的概率令伤害+1',
         yinbo:'音波',
         yinbo_info:'出牌阶段限一次，你可以弃置一张黑桃牌，然后随机弃置三名敌人各一张牌',
         liudan:'榴弹',
@@ -3059,6 +3077,7 @@ character.ow={
         guangshu_info:'出牌阶段，你可以弃置一张牌，并指定一名角色，根据弃置牌的花色执行如下效果：♥该角色下次受到伤害时回复一点体力；♦︎该角色下次造成伤害时摸两张牌；♣该角色无法使用杀直到下一回合结束；♠该角色于下个结束阶段受到一点无来源的雷电伤害',
         ziyu:'自愈',
         ziyu_info:'在一名角色的结束阶段，你可以回复一点体力或摸一张牌，每隔四回合发动一次',
+        ziyu_info_alter:'在一名角色的结束阶段，你可以回复一点体力或摸一张牌，每隔六回合发动一次',
         shouhu:'守护',
         shouhu_info:'你不能使用杀；出牌阶段，你可以弃置一张杀令一名其他角色回复一点体力',
         shanxian:'闪现',

@@ -37,7 +37,6 @@ window.characterRank={
         'shen_caocao',
         'hs_neptulon',
         'gjqt_aruan',
-        'swd_sikongyu',
         'swd_muyue',
         'swd_qi',
         'zhangliao',
@@ -55,6 +54,7 @@ window.characterRank={
     ],
     a:[
         'hs_khadgar',
+        'swd_sikongyu',
         'swd_huzhongxian',
         'swd_anka',
         'swd_kangnalishi',

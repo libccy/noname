@@ -12248,7 +12248,7 @@
 						}
 					}
 				},
-				link:function(){
+				link:function(bool){
 					if(typeof bool=='boolean'){
 						if(bool){
 							if(this.isLinked()) return;
@@ -25255,6 +25255,7 @@
 								}
 							}
 						}
+						alterableCharacters.sort();
                         var groupSort=function(name){
                             if(info[name][1]=='wei') return 0;
                             if(info[name][1]=='shu') return 1;
@@ -33796,7 +33797,7 @@
 					if(_status.event.type=='phase'&&ui.confirm){
 						ui.confirm.classList.add('removing');
 					}
-					ui.control.animate('nozoom',100);
+					// ui.control.animate('nozoom',100);
 					event.restore();
                     var cards=event.player.get('hej');
                     for(var i=0;i<cards.length;i++){

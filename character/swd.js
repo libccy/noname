@@ -2379,7 +2379,6 @@ character.swd={
 		hutian:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
-			alter:true,
 			filter:function(event,player){
 				return player.num('h')>0&&!player.storage.hutian;
 			},
@@ -2390,7 +2389,7 @@ character.swd={
 						return target.maxHp>=ui.selected.cards.length;
 					},
 					filterCard:true,
-					selectCard:[1,get.is.altered('hutian')?1:Infinity],
+					selectCard:[1,player.num('he')],
 					ai1:function(card){
 						var useful=ai.get.useful(card);
 						if(card.name=='du'){
@@ -6209,7 +6208,15 @@ character.swd={
 			},
 			filterCard:function(card){
 				if(get.is.altered('yunchou')){
-					return get.type(card)=='basic';
+					return get.type(card)!='basic';
+				}
+				return true;
+			},
+			filter:function(event,player){
+				if(get.is.altered('yunchou')){
+					return player.hasCard(function(card){
+						return get.type(card)!='basic';
+					});
 				}
 				return true;
 			},
@@ -8946,7 +8953,6 @@ character.swd={
 		hutian2:'护天',
 		hutian3:'护天',
 		hutian_info:'结束阶段，你可以将任意张牌置于一名角色的武将牌上，则该角色的体力值始终不能小于“护天”牌数；在你的下一个结束阶段，该角色获得武将牌上的“护天”牌（在此回合不能再次发动）',
-		hutian_info_alter:'结束阶段，你可以将一张牌置于一名角色的武将牌上，则该角色的体力值始终不能小于1；在你的下一个结束阶段，该角色获得武将牌上的“护天”牌（在此回合不能再次发动）',
 		linyun:'凌云',
 		linyun_info:'你可以将两张牌当作杀使用，此杀需要额外一张闪才能闪避',
 		sliufeng:'流风',
@@ -9255,7 +9261,7 @@ character.swd={
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		pozhen_info_alter:'每当你受到一次伤害，若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
-		yunchou_info_alter:'出牌阶段限一次，你可以弃置一张基本牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
+		yunchou_info_alter:'出牌阶段限一次，你可以弃置一张非基本牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你摸一张牌，否则对方摸一张牌',
 		tianshu_old_info:'结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
 		tianshu_info:'出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',
 		zaowu_info:'出牌阶段限一次，你可以将一张黑桃或红桃手牌当作封印之蛋使用',

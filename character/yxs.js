@@ -568,11 +568,17 @@ character.yxs={
 		dili:{
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
+			alter:true,
 			filter:function(event,player){
 				return player.hp<player.maxHp;
 			},
 			content:function(){
-				trigger.num+=player.maxHp-player.hp;
+				if(get.is.altered('dili')){
+					trigger.num+=Math.ceil((player.maxHp-player.hp))/2;
+				}
+				else{
+					trigger.num+=player.maxHp-player.hp;
+				}
 			},
 			ai:{
 				threaten:function(player,target){
@@ -697,9 +703,16 @@ character.yxs={
 			}
 		},
 		xiushen:{
-			trigger:{player:'phaseEnd'},
+			trigger:{player:['phaseEnd','phaseUseEnd']},
 			forced:true,
+			alter:true,
 			filter:function(event,player){
+				if(get.is.altered('xiushen')){
+					if(event.name!='phaseUse') return false;
+				}
+				else{
+					if(event.name!='phase') return false;
+				}
 				return game.hasPlayer(function(current){
 					return current.isLinked();
 				});
@@ -2689,6 +2702,7 @@ character.yxs={
 		kuangchan_info:'锁定技，你做主公时，不增加体力上限',
 		dili:'底力',
 		dili_info:'锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值',
+		dili_info_alter:'锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值的一半，向上取整',
 		chujia:'初嫁',
 		chujia_info:'出牌阶段限一次，你可以弃置两张相同颜色的手牌，指定任意一名角色摸X张牌。(X为该角色已损失的体力值) ',
 		zhijie:'知节',
@@ -2699,6 +2713,7 @@ character.yxs={
 		yinyang_info:'出牌阶段限一次，你可以弃置两张手牌并选择3名角色，分别横置或重置这些角色',
 		xiushen:'修身',
 		xiushen_info:'锁定技，结束阶段，若场上有横置角色，你摸两张牌',
+		xiushen_info_alter:'锁定技，出牌阶段结束时，若场上有横置角色，你摸两张牌',
 		yanyi:'演绎',
 		yanyi_info:'出牌阶段限一次，你可以弃置一张黑色牌，指定1名角色和1种花色，若被指定角色的手牌中含有此花色，则受到1点伤害',
 		jiean:'结案',
