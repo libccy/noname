@@ -2688,6 +2688,7 @@
 						name:'只开启国战武将',
 						init:true,
 						frequent:true,
+						restart:true,
 					},
 		            connect_ban_weak:{
 		                name:'屏蔽弱将',
@@ -2746,6 +2747,7 @@
 						name:'只开启国战武将',
 						init:true,
 						frequent:true,
+						restart:true,
 					},
 		            double_hp:{
 		                name:'双将体力上限',

@@ -30,6 +30,9 @@ mode.guozhan={
 			game.showChangeLog();
 		}
 		for(var i in lib.characterPack.mode_guozhan){
+			if(!get.config('onlyguozhan')){
+				if(lib.character[i.slice(3)]) continue;
+			}
 			lib.character[i]=lib.characterPack.mode_guozhan[i];
 			if(!lib.character[i][4]){
 				lib.character[i][4]=[];
@@ -274,7 +277,7 @@ mode.guozhan={
 			}
 		},
 		getRoomInfo:function(uiintro){
-			var num;
+			var num,last;
 			if(lib.configOL.initshow_draw=='0'){
 				num='关闭'
 			}
@@ -284,13 +287,16 @@ mode.guozhan={
 			uiintro.add('<div class="text chat">首亮摸牌：'+num);
 			uiintro.add('<div class="text chat">珠联璧合：'+(lib.configOL.zhulian?'开启':'关闭'));
 			uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
-			uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
-			var last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
-			if(lib.configOL.banned.length){
-				last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
-			}
-			if(lib.configOL.bannedcards.length){
-				last=uiintro.add('<div class="text chat">禁用卡牌：'+get.translation(lib.configOL.bannedcards));
+			last=uiintro.add('<div class="text chat">国战武将：'+(lib.configOL.onlyguozhan?'开启':'关闭'));
+			if(!lib.configOL.onlyguozhan){
+				uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
+				last=uiintro.add('<div class="text chat">屏蔽强将：'+(lib.configOL.ban_strong?'开启':'关闭'));
+				if(lib.configOL.banned.length){
+					last=uiintro.add('<div class="text chat">禁用武将：'+get.translation(lib.configOL.banned));
+				}
+				if(lib.configOL.bannedcards.length){
+					last=uiintro.add('<div class="text chat">禁用卡牌：'+get.translation(lib.configOL.bannedcards));
+				}
 			}
 			last.style.paddingBottom='8px';
 		},
@@ -557,12 +563,7 @@ mode.guozhan={
 				for(i in lib.character){
 					if(chosen.contains(i)) continue;
 					if(lib.filter.characterDisabled(i)) continue;
-					if(get.config('onlyguozhan')){
-
-					}
-					else{
-
-					}
+					if(get.config('onlyguozhan')&&!lib.characterPack.mode_guozhan[i]) continue;
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);
 				}
@@ -611,8 +612,14 @@ mode.guozhan={
 						event.ai(game.me,list);
 						ui.arena.classList.remove('selecting');
 					};
-
-					event.dialogxx=ui.create.characterDialog();
+					if(get.config('onlyguozhan')){
+						event.dialogxx=ui.create.characterDialog(function(i){
+							if(!lib.characterPack.mode_guozhan[i]) return true;
+						},'expandall');
+					}
+					else{
+						event.dialogxx=ui.create.characterDialog();
+					}
 					ui.create.cheat2=function(){
 						ui.cheat2=ui.create.control('自由选将',function(){
 							if(this.dialog==_status.event.dialog){
@@ -740,7 +747,16 @@ mode.guozhan={
 				game.broadcastAll(function(){
 					ui.arena.classList.add('choose-character');
 				});
-				var list=get.charactersOL();
+				var list;
+				if(lib.configOL.onlyguozhan){
+					list=[];
+					for(var i in lib.characterPack.mode_guozhan){
+						list.push(i);
+					}
+				}
+				else{
+					list=get.charactersOL();
+				}
 				event.list=list.slice(0);
 				var list2=[];
 				var num;
