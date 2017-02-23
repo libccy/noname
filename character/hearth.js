@@ -3955,11 +3955,12 @@ character.hearth={
 		liechao:{
 			enable:'phaseUse',
 			usable:1,
+			alter:true,
 			filter:function(event,player){
 				return !player.isTurnedOver()&&player.num('h')<=player.hp;
 			},
 			content:function(){
-				player.draw(4);
+				player.draw(get.is.altered('liechao')?3:4);
 				player.turnOver();
 				player.skip('phaseDiscard');
 			},
@@ -6260,6 +6261,7 @@ character.hearth={
 		qingliu_info:'锁定技，你防止即将受到的火焰伤害',
 		liechao:'猎潮',
 		liechao_info:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸四张牌，若如此做，你跳过本回合的弃牌阶段',
+		liechao_info_info:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸三张牌，若如此做，你跳过本回合的弃牌阶段',
 		aoshu:'奥术',
 		aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用',
 

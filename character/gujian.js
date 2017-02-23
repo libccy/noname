@@ -1400,7 +1400,6 @@ character.gujian={
 			check:function(){
 				return false;
 			},
-			forbid:['infinity'],
 			init:function(player){
 				player.storage.zhaolu=Math.min(5,game.players.length);
 				game.addVideo('storage',player,['zhaolu',player.storage.zhaolu]);
@@ -1428,6 +1427,34 @@ character.gujian={
 			},
 		},
 		jiehuo:{
+			unique:true,
+			skillAnimation:true,
+			animationColor:'fire',
+			enable:'phaseUse',
+			line:'fire',
+			filterTarget:function(card,player,target){
+				return player!=target;
+			},
+			content:function(){
+				'step 0'
+				target.damage(2,'fire');
+				player.awakenSkill('jiehuo');
+				'step 1'
+				player.die();
+			},
+			ai:{
+				order:1,
+				result:{
+					player:function(player,target){
+						if(player.hp>1) return false;
+						if(target.hp>2) return false;
+						if(ai.get.attitude(player,target)>=0) return false;
+						return ai.get.damageEffect(target,player,player,'fire');
+					}
+				}
+			}
+		},
+		jiehuo_old:{
 			unique:true,
 			forbid:['infinity'],
 			skillAnimation:true,
@@ -1473,6 +1500,7 @@ character.gujian={
 			intro:{
 				content:'time'
 			},
+			alter:true,
 			ai:{
 				noh:true,
 				threaten:0.8,
@@ -1534,7 +1562,9 @@ character.gujian={
 			mod:{
 				cardEnabled:function(card,player){
 					if(_status.currentPhase!=player) return;
-					if(get.cardCount(true,player)>=player.maxHp+2) return false;
+					var num=2;
+					if(get.is.altered('yuling')) num=1;
+					if(get.cardCount(true,player)>=player.maxHp+num) return false;
 				}
 			}
 		},
@@ -1652,7 +1682,8 @@ character.gujian={
 		yuling3:'御灵',
 		yuling4:'御灵',
 		zhaolu_info:'锁定技，每隔X回合，你流失一点体力上限，每当你受到一点伤害或有人死亡，视为减少两个回合，X为现存角色数且至多为5',
-		jiehuo_info:'限定技，出牌阶段，你可以令所有其他角色受到X点火焰伤害，并在此阶段结束后死亡，X为你的体力上限且不超过该角色的当前体力值',
+		jiehuo_info:'限定技，出牌阶段，你可以对一名其他角色造成两点火焰伤害，然后死亡',
 		yuling_info:'锁定技，你没有摸牌和弃牌阶段，你的手牌数始终为5，你在一个出牌阶段最多使用X+2张牌，X为你的体力上限',
+		yuling_info_alter:'锁定技，你没有摸牌和弃牌阶段，你的手牌数始终为5，你在一个出牌阶段最多使用X+1张牌，X为你的体力上限',
 	},
 }

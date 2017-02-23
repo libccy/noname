@@ -20,7 +20,7 @@ character.swd={
 		swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue']],
 
 		swd_jiliang:['male','wu',3,['yunchou','gongxin','jqimou']],
-		swd_shuijing:['female','qun',4,['mojian','duanyue']],
+		swd_shuijing:['female','qun',4,['mojian','duanyue','tuzhen']],
 		swd_quxian:['female','qun',3,['mojian','huanxia']],
 		swd_xiyan:['male','qun',3,['zaowu','daofa']],
 		swd_cheyun:['female','wu',3,['shengong','xianjiang','qiaoxie']],
@@ -2373,6 +2373,7 @@ character.swd={
 		hutian:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
+			alter:true,
 			filter:function(event,player){
 				return player.num('h')>0&&!player.storage.hutian;
 			},
@@ -2383,7 +2384,7 @@ character.swd={
 						return target.maxHp>=ui.selected.cards.length;
 					},
 					filterCard:true,
-					selectCard:[1,Infinity],
+					selectCard:[1,get.is.altered('hutian')?1:Infinity],
 					ai1:function(card){
 						var useful=ai.get.useful(card);
 						if(card.name=='du'){
@@ -2399,6 +2400,7 @@ character.swd={
 						}
 						return ai.get.attitude(player,target);
 					},
+					position:'he',
 					prompt:get.prompt('hutian')
 				});
 				"step 1"
@@ -3032,32 +3034,38 @@ character.swd={
 				return player!=target;
 			},
 			content:function(){
-				"step 0"
 				target.damage();
-				"step 1"
-				if(target.isAlive()){
-					var cards=target.get('h');
-					event.num=cards.length;
-					target.discard(cards);
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				if(event.num>=2){
-					player.loseHp();
-				}
 			},
 			ai:{
 				order:9.5,
 				expose:0.2,
 				result:{
-					target:function(player,target){
-						if(ai.get.damageEffect(target,player)<0){
-							return -target.num('h')-(target.hp==1?1:0);
-						}
+					player:function(player,target){
+						return ai.get.damageEffect(target,player,player);
 					}
 				}
+			}
+		},
+		tuzhen:{
+			trigger:{source:'damageAfter'},
+			filter:function(event,player){
+				return event.player.isIn()&&event.player!=player&&event.player.hasCard(function(card){
+					return get.type(card)!='basic';
+				});
+			},
+			alter:true,
+			logTarget:'player',
+			check:function(event,player){
+				return ai.get.attitude(player,event.player)<0;
+			},
+			content:function(){
+				var hs=trigger.player.get('h',function(card){
+					return get.type(card)!='basic';
+				});
+				if(get.is.altered('tuzhen')){
+					hs=hs.randomGet();
+				}
+				trigger.player.discard(hs);
 			}
 		},
 		mojian:{
@@ -8987,7 +8995,8 @@ character.swd={
 		hutian:'护天',
 		hutian2:'护天',
 		hutian3:'护天',
-		hutian_info:'结束阶段，你可以将X张牌置于一名角色的武将牌上，则该角色的体力值始终不能小于X；在你的下一个结束阶段，该角色获得武将牌上的牌（在此回合不能再次发动）',
+		hutian_info:'结束阶段，你可以将任意张牌置于一名角色的武将牌上，则该角色的体力值始终不能小于“护天”牌数；在你的下一个结束阶段，该角色获得武将牌上的“护天”牌（在此回合不能再次发动）',
+		hutian_info_alter:'结束阶段，你可以将一张牌置于一名角色的武将牌上，则该角色的体力值始终不能小于1；在你的下一个结束阶段，该角色获得武将牌上的“护天”牌（在此回合不能再次发动）',
 		linyun:'凌云',
 		linyun_info:'你可以将两张牌当作杀使用，此杀需要额外一张闪才能闪避',
 		sliufeng:'流风',
@@ -9129,7 +9138,10 @@ character.swd={
 		mojian:'墨剑',
 		mojian_info:'每当你使用杀并指定目标后，你可以令其摸一张牌，然后你回复一点体力',
 		duanyue:'断月',
-		duanyue_info:'出牌阶段限一次，你可以弃置一张装备牌，对一名其他角色造成一点伤害，并弃其所有手牌。若弃置的手牌数有两张或更多，你流失一点体力',
+		duanyue_info:'出牌阶段限一次，你可以弃置一张装备牌，对一名其他角色造成一点伤害',
+		tuzhen:'突阵',
+		tuzhen_info:'当你造成一次伤害后，你可以弃置对方手牌中的非基本牌',
+		tuzhen_info_alter:'当你造成一次伤害后，你可以弃置对方手牌中的一张非基本牌',
 		fengmo:'封魔',
 		fengmo_info:'出牌阶段限一次，你可以弃置场所有武器牌（至少两张），然后令一名未翻面的角色摸等量的牌并翻面',
 		pozhou:'破咒',
