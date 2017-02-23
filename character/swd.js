@@ -4728,6 +4728,7 @@ character.swd={
 				if(get.itemtype(event.cards)!='cards') return false;
 				return player.num('he',{suit:get.suit(event.cards)})>0;
 			},
+			alter:true,
 			content:function(){
 				"step 0"
 				player.storage.liaoyuan=0;
@@ -4752,7 +4753,7 @@ character.swd={
 					}
 					player.discard(result.cards);
 					event.num++;
-					if(player.num('he',{suit:event.suit})>1){
+					if(player.num('he',{suit:event.suit})>1&&!get.is.altered('liaoyuan')){
 						event.goto(1);
 					}
 				}
@@ -5680,7 +5681,7 @@ character.swd={
 			alter:true,
 			filter:function(event,player){
 				if(event.name=='phase') return true;
-				if(lib.config.alteredSkills.contains('jikong')) return false;
+				if(get.is.altered('jikong')) return false;
 				if(player.num('h')) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].original=='h') return true;
@@ -5892,8 +5893,13 @@ character.swd={
 		pozhen:{
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
-				return event.source&&event.source.num('h')!=player.num('h');
+				if(!event.source) return false;
+				if(get.is.altered('pozhen')){
+					return event.source.num('h')>player.num('h');
+				}
+				return event.source.num('h')!=player.num('h');
 			},
+			alter:true,
 			// check:function(event,player){
 			// 	return ai.get.attitude(player,event.source)<0;
 			// },
@@ -5942,7 +5948,7 @@ character.swd={
 							if(num>0){
 								return [1,0,0,-num/2];
 							}
-							if(num<0){
+							if(num<0&&!get.is.altered('pozhen')){
 								return [1,0,0,-0.5];
 							}
 						}
@@ -6015,7 +6021,7 @@ character.swd={
 						var num=target.num('h');
 						if(num>cards.length+3&&player.hp>1) return -2;
 						if(num>cards.length+1&&player.hp>1) return -1;
-						if(num==cards.length-1&&player.hp>1) return -1;
+						if(num==cards.length-1&&player.hp>1&&!get.is.altered('pozhen')) return -1;
 						for(var i=0;i<cards.length;i++){
 							if(cards[i].number>9) return num==1?-1:-0.5;
 						}
@@ -9179,6 +9185,7 @@ character.swd={
 		luomu_info:'锁定技，每当你造成伤害时，受伤害角色随机弃置一张牌',
 		poxing_info:'锁定技，每当你即将造成伤害，若目标的体力值大于你，你令伤害+1',
 		liaoyuan_info:'每当你使用一张杀指定目标后，你可以弃置任意张与此杀花色相同的牌，若如此做，目标需额外打出等量的闪，每少打出一张闪，此杀的伤害+1',
+		liaoyuan_info_alter:'每当你使用一张杀指定目标后，你可以弃置一张与此杀花色相同的牌，若如此做，目标需额外打出一张闪，若目标没打出闪，此杀的伤害+1',
 		yuhuo_info:'限定技，濒死阶段，你可以重置角色牌，减少一点体力上限，然后将体力回复至体力上限',
 		yishan_info:'每当你受到一次伤害，你可以重新获得最近失去的两张牌',
 		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
@@ -9193,6 +9200,7 @@ character.swd={
 		duoren_info:'每当你闪避一张杀，你可以立即获得来源的武器牌',
 		tanlin_info:'出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得对方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的一点伤害。',
 		pozhen_info:'每当你受到一次伤害，若你的手牌数大于伤害来源，你可以弃置X张手牌对其造成一点伤害；若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
+		pozhen_info_alter:'每当你受到一次伤害，若你的手牌数小于伤害来源，你可以弃置其X张手牌。X为你与伤害来源的手牌数之差。',
 		yunchou_info:'出牌阶段限一次，你可以弃置一张手牌，并弃置一名其他角色的一张手牌，若两张牌颜色相同，你对其造成一点伤害，否则该角色可弃置你一张牌',
 		tianshu_old_info:'结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能',
 		tianshu_info:'出牌阶段，你可以交给一名其他角色一张锦囊牌，然后获得该角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）',

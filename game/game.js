@@ -12223,6 +12223,10 @@
 								delete this.outSkill;
 							}
 						}
+						else if(skill===true){
+							delete this.outSkill;
+							this.outCount=0;
+						}
 						else{
 							if(typeof skill!='number'){
 								skill=1;
@@ -25269,7 +25273,7 @@
 									name:'平衡强度',
 									_name:mode,
 									init:charactersToAlter.length==0,
-									intro:'以下武将将被调整：'+get.translation(alterableCharacters),
+									intro:'以下武将将被削弱：'+get.translation(alterableCharacters),
 									onclick:function(bool){
 										if(bool){
 											for(var i=0;i<alterableSkills.length;i++){
@@ -34786,6 +34790,9 @@
 	};
 	var get={
         is:{
+			altered:function(skill){
+				return lib.config.alteredSkills.contains(skill);
+			},
 			node:function(obj){
 				var str=Object.prototype.toString.call(obj);
 				if(str&&str.indexOf('[object HTML')) return true;

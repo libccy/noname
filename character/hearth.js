@@ -3427,15 +3427,22 @@ character.hearth={
 			filterTarget:function(card,player,target){
 				return player.num('h')!=target.num('h');
 			},
+			alter:true,
 			content:function(){
 				var num=player.num('h')-target.num('h');
 				if(num>0){
 					if(num>3){
 						num=3;
 					}
+					if(get.is.altered('enze')&&num>2){
+						num=2;
+					}
 					target.draw(num);
 				}
 				else if(num<0){
+					if(get.is.altered('enze')&&num<-2){
+						num=-2;
+					}
 					target.chooseToDiscard(-num,true);
 				}
 			},
@@ -3518,14 +3525,15 @@ character.hearth={
 		guozai:{
 			enable:'phaseUse',
 			usable:1,
+			alter:true,
 			filter:function(event,player){
-				return player.num('h')<4;
+				return player.num('h')<(get.is.altered('guozai')?3:4);
 			},
 			init:function(player){
 				player.storage.guozai2=0;
 			},
 			content:function(){
-				var num=4-player.num('h');
+				var num=(get.is.altered('guozai')?3:4)-player.num('h');
 				player.draw(num);
 				player.addSkill('guozai2');
 				player.storage.guozai2+=num;
@@ -6199,7 +6207,8 @@ character.hearth={
 		xmojian:'魔箭',
 		xmojian_info:'每当你的武将牌翻至正面时，你可以指定一名角色视为对其使用了一张杀',
 		enze:'恩泽',
-		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（至多摸三张牌）',
+		enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（最多摸三张牌）',
+		enze_info_alter:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（最多摸或弃两张牌）',
 		chongsheng:'重生',
 		chongsheng_bg:'生',
 		chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸X张牌，X为你本局发动此技能的次数。每局最多发动2次',
@@ -6209,6 +6218,7 @@ character.hearth={
 		guozai2:'过载',
 		guozai2_bg:'载',
 		guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
+		guozai_info_alter:'出牌阶段限一次，你可将手牌补至三张，并于此阶段结束时弃置等量的牌',
 		guozaix:'重载',
 		guozaix2:'重载',
 		guozaix2_bg:'载',

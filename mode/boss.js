@@ -3369,6 +3369,7 @@ mode.boss={
 					for(var j in game.players[i].tempSkills){
 						game.players[i].removeSkill(j);
 					}
+					game.players[i].in(true);
 				}
 				_status.paused=false;
 				_status.event.player=player;
