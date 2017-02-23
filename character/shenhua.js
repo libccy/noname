@@ -2731,9 +2731,9 @@ character.shenhua={
 				player.awakenSkill('niepan');
 				player.storage.niepan=true;
 				'step 1'
-				if(player.isLinked()) player.link();
+				player.link(false);
 				'step 2'
-				if(player.isTurnedOver()) player.turnOver();
+				player.turnOver(false);
 			},
 			ai:{
 				order:1,
@@ -2751,6 +2751,59 @@ character.shenhua={
 				},
 				threaten:function(player,target){
 					if(!target.storage.niepan) return 0.6;
+				}
+			},
+			intro:{
+				content:'limited'
+			}
+		},
+		oldniepan:{
+			audio:'niepan',
+			unique:true,
+			enable:'chooseToUse',
+			mark:true,
+			skillAnimation:true,
+			animationStr:'涅盘',
+			animationColor:'fire',
+			init:function(player){
+				player.storage.oldniepan=false;
+			},
+			filter:function(event,player){
+				if(player.storage.oldniepan) return false;
+				if(event.type=='dying'){
+					if(player!=event.dying) return false;
+					return true;
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.hp=Math.min(3,player.maxHp);
+				player.discard(player.get('hej'));
+				player.draw(3);
+				player.awakenSkill('oldniepan');
+				player.storage.oldniepan=true;
+				'step 1'
+				player.link(false);
+				'step 2'
+				player.turnOver(false);
+			},
+			ai:{
+				order:1,
+				skillTagFilter:function(player){
+					if(player.storage.oldniepan) return false;
+					if(player.hp>0) return false;
+				},
+				save:true,
+				result:{
+					player:function(player){
+						if(player.hp==0) return 10;
+						if(player.hp<=2&&player.num('he')<=1) return 10;
+						return 0;
+					}
+				},
+				threaten:function(player,target){
+					if(!target.storage.oldniepan) return 0.6;
 				}
 			},
 			intro:{
@@ -4120,6 +4173,7 @@ character.shenhua={
 		lianhuan3:'连环',
 		lianhuan2:'连铸',
 		niepan:'涅槃',
+		oldniepan:'涅槃',
 		quhu:'驱虎',
 		jieming:'节命',
 		qiangxi:'强袭',
@@ -4135,6 +4189,7 @@ character.shenhua={
 		kanpo_info:'你可以将你的任意一张♠或♣手牌当【无懈可击】使用。',
 		lianhuan_info:'出牌阶段，你可以将你任意一张梅花手牌当【铁索连环】使用或重铸。',
 		niepan_info:'限定技，出牌阶段或当你处于濒死状态时，你可以丢弃你所有的牌和你判定区里的牌，并复原你的武将牌，然后摸三张牌且体力回复至3点。',
+		oldniepan_info:'限定技，当你处于濒死状态时，你可以丢弃你所有的牌和你判定区里的牌，并复原你的武将牌，然后摸三张牌且体力回复至3点。',
 		quhu_info:'出牌阶段，你可以与一名体力比你多的角色拼点，若你赢，则该角色对其攻击范围内另一名由你指定的角色造成1点伤害。若你没赢，他/她对你造成一点伤害。每回合限用一次。',
 		jieming_info:'你每受到1点伤害，可令任意一名角色将手牌补至其体力上限的张数(不能超过五张)。',
 		qiangxi_info:'出牌阶段，你可以自减一点体力或弃一张武器牌，然后你对你攻击范围内的一名角色造成一点伤害，每回合限一次。',
