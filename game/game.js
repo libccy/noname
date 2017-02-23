@@ -18,7 +18,7 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:19,
+        versionOL:20,
         sourceURL:'https://rawgit.com/libccy/noname/$version$/',
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',
@@ -25339,7 +25339,7 @@
 							if(mode.indexOf('mode_')==0&&mode.indexOf('mode_extension_')!=0&&
                                 mode!='mode_favourite'&&mode!='mode_banned'){
 								if(!connectMenu&&lib.config.show_charactercard){
-									ui.click.charactercard(this.link,this,true);
+									ui.click.charactercard(this.link,this,mode=='mode_guozhan'?'guozhan':true);
 								}
 								return;
 							}
@@ -33957,14 +33957,31 @@
 				}
 				var ban=ui.create.div('.menubutton.large.ban.character',uiintro,'禁用',function(e){
 					if(this.classList.contains('unselectable')) return;
-					ui.click.touchpop();
-					ui.click.intro.call(this,e);
-					_status.clicked=true;
+					if(typeof noedit=='string'){
+						this.classList.toggle('active');
+						var bannedname=noedit+'_banned';
+						if(!lib.config[bannedname]){
+							lib.config[bannedname]=[];
+						}
+						if(this.classList.contains('active')){
+							lib.config[bannedname].add(name);
+						}
+						else{
+							lib.config[bannedname].remove(name);
+						}
+						game.saveConfig(bannedname,lib.config[bannedname]);
+						ban.updateBanned();
+					}
+					else{
+						ui.click.touchpop();
+						ui.click.intro.call(this,e);
+						_status.clicked=true;
+					}
 				});
 				ban.link=name;
 				ban._banning='offline';
 				ban.updateBanned=function(){
-					if(noedit) return;
+					if(noedit===true) return;
 					if(lib.config[get.mode()+'_banned']&&lib.config[get.mode()+'_banned'].contains(name)){
 						ban.classList.add('active');
 					}
@@ -33987,7 +34004,7 @@
 					}
 					game.saveConfig('favouriteCharacter',lib.config.favouriteCharacter);
 				});
-				if(noedit){
+				if(noedit===true){
 					fav.classList.add('unselectable');
 					ban.classList.add('unselectable');
 				}
