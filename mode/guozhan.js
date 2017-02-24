@@ -201,7 +201,7 @@ mode.guozhan={
 			gz_caiwenji:['female','qun',3,['beige','gzduanchang']],
 			gz_mateng:['male','qun',4,['mashu','xiongyi']],
 			gz_kongrong:['male','qun',3,['mingshi','lirang']],
-			gz_jiling:['male','qun',4,[]],
+			gz_jiling:['male','qun',4,['shuangren']],
 			gz_tianfeng:['male','qun',3,['sijian','suishi']],
 			gz_panfeng:['male','qun',4,['kuangfu']],
 			gz_zoushi:['female','qun',3,['huoshui','qingcheng']],
@@ -947,6 +947,8 @@ mode.guozhan={
 		tongshimingzhi:'同时明置',
 		mode_guozhan_character_config:'国战武将',
 
+		shuangren:'双刃',
+		shuangren_info:'出牌阶段开始时，你可以与一名角色拼点。若你赢，你视为对其或与其势力相同的另一名角色使用一张【杀】（此【杀】不计入限制的次数）；若你没赢，你结束出牌阶段',
 		gzduanchang:'断肠',
 		gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌的所有技能',
 		gzweimu:'帷幕',
@@ -1469,6 +1471,69 @@ mode.guozhan={
 		}
 	},
 	skill:{
+		shuangren:{
+			trigger:{player:'phaseUseBegin'},
+			direct:true,
+			content:function(){
+				'step 0'
+				var goon;
+				if(player.needsToDiscard()>1){
+					goon=player.hasCard(function(card){
+						return card.number>10&&ai.get.value(card)<=5;
+					});
+				}
+				else{
+					goon=player.hasCard(function(card){
+						return card.number>=9&&ai.get.value(card)<=5||ai.get.value(card)<=3;
+					});
+				}
+				player.chooseTarget(get.prompt('shuangren'),function(card,player,target){
+					return target!=player;
+				}).set('ai',function(target){
+					var player=_status.event.player;
+					if(_status.event.goon&&ai.get.attitude(player,target)<0){
+						return ai.get.effect(target,{name:'sha'},player,player);
+					}
+					return 0;
+				}).set('goon',goon);
+				'step 1'
+				if(result.bool){
+					var target=result.targets[0];
+					event.target=target;
+					player.logSkill('shuangren',target);
+					player.chooseToCompare(target);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					var target=event.target;
+					if(target.identity!='ye'&&target.identity!='unknown'&&game.hasPlayer(function(current){
+						return target.identity==current.identity&&target!=current&&player.canUse('sha',current,false);
+					})){
+						player.chooseTarget('对一名'+get.translation(target.identity)+'势力的角色使用一张杀',true,function(card,player,target){
+							return target.identity==_status.event.identity;
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							return ai.get.effect(target,{name:'sha'},player,player);
+						}).set('identity',target.identity);
+					}
+					else{
+						player.useCard({name:'sha'},target,false);
+					}
+				}
+				else{
+					trigger.finish();
+					trigger.untrigger();
+					event.finish();
+				}
+				'step 3'
+				if(result.bool){
+					player.useCard({name:'sha'},result.targets[0],false);
+				}
+			}
+		},
 		gzduanchang:{
 			audio:'duanchang',
 			trigger:{player:'dieBegin'},
