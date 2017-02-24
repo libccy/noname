@@ -7782,6 +7782,12 @@ character.sp={
 		},
 	},
 	translate:{
+		zhangren:'张任',
+		zoushi:'邹氏',
+		zangba:'臧霸',
+		jiling:'纪灵',
+		gz_sp_dongzhuo:'董卓',
+		gz_zhangjiao:'张角',
 		litong:'李通',
 		mizhu:'糜竺',
 		buzhi:'步骘',

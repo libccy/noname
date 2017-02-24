@@ -20792,11 +20792,21 @@
 				};
 				var modecharacters=lib.characterPack['mode_'+get.mode()];
 				if(modecharacters){
-					if(modecharacters[newvid.name1]){
-						newvid.name1=get.mode()+'::'+newvid.name1;
+					if(get.mode()=='guozhan'){
+						if(modecharacters[newvid.name1]){
+							newvid.name1=newvid.name1.slice(3);
+						}
+						if(modecharacters[newvid.name2]){
+							newvid.name2=newvid.name2.slice(3);
+						}
 					}
-					if(modecharacters[newvid.name2]){
-						newvid.name2=get.mode()+'::'+newvid.name2;
+					else{
+						if(modecharacters[newvid.name1]){
+							newvid.name1=get.mode()+'::'+newvid.name1;
+						}
+						if(modecharacters[newvid.name2]){
+							newvid.name2=get.mode()+'::'+newvid.name2;
+						}
 					}
 				}
 				lib.videos.unshift(newvid);
