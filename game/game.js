@@ -4025,9 +4025,7 @@
                         if(type=='character'){
                             if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
 								if(mode=='guozhan'){
-									if(lib.character[name.slice(3)]){
-										name=name.slice(3);
-									}
+									name=name.slice(3);
 								}
                                 else{
 									modeimage=mode;

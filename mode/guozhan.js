@@ -138,7 +138,7 @@ mode.guozhan={
 			gz_dianwei:['male','wei',4,['qiangxi']],
 			gz_xunyu:['male','wei',3,['quhu','jieming']],
 			gz_caopi:['male','wei',3,['xingshang','fangzhu']],
-			gz_yuejin:['male','wei',4,[]],
+			gz_yuejin:['male','wei',4,['gzxiaoguo']],
 
 			gz_liubei:['male','shu',4,['rende']],
 			gz_guanyu:['male','shu',5,['wusheng']],
@@ -162,7 +162,7 @@ mode.guozhan={
 			gz_huanggai:['male','wu',4,['kurou']],
 			gz_zhouyu:['male','wu',3,['yingzi','fanjian']],
 			gz_daqiao:['female','wu',3,['guose','liuli']],
-			gz_luxun:['male','wu',3,[]],
+			gz_luxun:['male','wu',3,['qianxun','duoshi']],
 			gz_sunshangxiang:['female','wu',3,['jieyin','xiaoji']],
 			gz_sunjian:['male','wu',4,['yinghun']],
 			gz_xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
@@ -179,13 +179,13 @@ mode.guozhan={
 			gz_jiaxu:['male','qun',3,['wansha','luanwu','weimu']],
 			gz_pangde:['male','qun',4,['mashu','mengjin']],
 			gz_zhangjiao:['male','qun',3,['leiji','guidao']],
-			gz_caiwenji:['female','qun',3,['beige','duanchang']],
+			gz_caiwenji:['female','qun',3,[]],
 			gz_mateng:['male','qun',4,['mashu','xiongyi']],
 			gz_kongrong:['male','qun',3,['mingshi','lirang']],
-			// gz_jiling:['male','qun',4,[]],
+			gz_jiling:['male','qun',4,[]],
 			gz_tianfeng:['male','qun',3,['sijian','suishi']],
 			gz_panfeng:['male','qun',4,['kuangfu']],
-			// gz_zoushi:['female','qun',3,[]],
+			gz_zoushi:['female','qun',3,[]],
 
 			gz_dengai:['male','wei',4,[]],
 			gz_caohong:['male','wei',4,[]],
@@ -196,13 +196,13 @@ mode.guozhan={
 			gz_hetaihou:['female','qun',3,['zhendu','qiluan']],
 
 			gz_re_lidian:['male','wei',3,['xunxun','wangxi']],
-			// gz_zangba:['male','wei',4,[]],
+			gz_zangba:['male','wei',4,[]],
 			gz_madai:['male','shu',4,[]],
 			gz_mifuren:['female','shu',3,[]],
 			gz_sunce:['male','wu',4,[]],
 			gz_chendong:['male','wu',4,['duanxie','fenming']],
 			gz_sp_dongzhuo:['male','qun',4,[]],
-			// gz_zhangren:['male','qun',4,[]],
+			gz_zhangren:['male','qun',4,[]],
 		}
 	},
 	game:{
@@ -926,6 +926,11 @@ mode.guozhan={
 		mingzhifujiang:'明置副将',
 		tongshimingzhi:'同时明置',
 		mode_guozhan_character_config:'国战武将',
+
+		duoshi:'度势',
+		duoshi_info:'出牌阶段限四次，你可以将一张红色手牌当【以逸待劳】使用。',
+		gzxiaoguo:'骁果',
+		gzxiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
 	},
 	element:{
 		content:{
@@ -1238,6 +1243,65 @@ mode.guozhan={
 		}
 	},
 	skill:{
+		duoshi:{
+			enable:'chooseToUse',
+			viewAs:{name:'yiyi'},
+			usable:4,
+			filterCard:{color:'red'},
+			viewAsFilter:function(player){
+				return player.num('h',{color:'red'})>0;
+			},
+			check:function(card){
+				return 5-ai.get.value(card);
+			}
+		},
+		gzxiaoguo:{
+			audio:'xiaoguo',
+			trigger:{global:'phaseEnd'},
+			check:function(event,player){
+				return ai.get.damageEffect(event.player,player,player)>0;
+			},
+			filter:function(event,player){
+				return event.player.isAlive()&&event.player!=player&&player.num('h',{type:'basic'});
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				var nono=(Math.abs(ai.get.attitude(player,trigger.player))<3);
+				if(ai.get.damageEffect(trigger.player,player,player)<=0){
+					nono=true;
+				}
+				var next=player.chooseToDiscard(get.prompt('gzxiaoguo',trigger.player),{type:'basic'});
+				next.set('ai',function(card){
+					if(_status.event.nono) return 0;
+					return 8-ai.get.useful(card);
+				});
+				next.set('logSkill',['gzxiaoguo',trigger.player]);
+				next.set('nono',nono);
+				"step 1"
+				if(result.bool){
+					var nono=(ai.get.damageEffect(trigger.player,player,trigger.player)>=0);
+					trigger.player.chooseToDiscard('he',{type:'equip'}).set('ai',function(card){
+						if(_status.event.nono){
+							return 0;
+						}
+						if(_status.event.player.hp==1) return 10-ai.get.value(card);
+						return 9-ai.get.value(card);
+					}).set('nono',nono);
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(!result.bool){
+					trigger.player.damage();
+				}
+			},
+			ai:{
+				expose:0.3,
+				threaten:1.3
+			}
+		},
 		_mingzhi1:{
 			trigger:{player:'phaseBegin'},
 			priority:19,

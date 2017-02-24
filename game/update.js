@@ -3,6 +3,7 @@ window.noname_update={
     update:'1.9.9.6',
     changeLog:[
         'bug修复',
+        // '国战武将',
     ],
     files:[
         'game/game.js',
