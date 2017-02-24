@@ -5695,7 +5695,6 @@ character.yijiang={
 				return (get.type(event.card)=='trick');
 			},
 			content:function(){
-				game.log(player,'发动了无言，',trigger.card,'对',trigger.target,'失效');
 				trigger.untrigger();
 				trigger.finish();
 			},

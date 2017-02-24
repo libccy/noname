@@ -6050,7 +6050,12 @@ character.sp={
 				return player.storage.qiluan?true:false;
 			},
 			content:function(){
-				player.draw(3*player.storage.qiluan);
+				if(get.mode()=='guozhan'){
+					player.draw(3);
+				}
+				else{
+					player.draw(3*player.storage.qiluan);
+				}
 				player.storage.qiluan=0;
 			}
 		},
@@ -8214,6 +8219,7 @@ character.sp={
 		qiangwu_info:'出牌阶段，你可以进行一次判定。若如此做，则直到回合结束，你使用点数小于判定牌的 【杀】时不受距离限制，且你使用点数大于判定牌的【杀】时不计入出牌阶段的使用次数。',
 		shenxian_info:'每名角色的回合限一次，你的回合外，每当有其他角色因弃置而失去牌时，若其中有基本牌，你可以摸一张牌。',
 		qiluan_info:'每当你杀死一名角色后，可以在此回合结束时摸三张牌。',
+		qiluan_info_guozhan:'当你杀死一名角色后，你可于此回合结束后摸三张牌',
 		zhendu_info:'其他角色的出牌阶段开始时，你可以弃置一张手牌，视为该角色使用一张【酒】，然后你对其造成一点伤害。',
 		shangyi_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后弃置其中的一张黑色牌',
 		shoucheng_info:'每当一名其他角色在其回合外失去最后的手牌时，你可令该角色摸一张牌。',

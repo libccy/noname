@@ -2681,14 +2681,21 @@
 					connect_zhulian:{
 						name:'珠联璧合',
 						init:true,
-						frequent:true,
+						// frequent:true,
 						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
 					},
-					connect_onlyguozhan:{
-						name:'只开启国战武将',
+					connect_guozhanpile:{
+						name:'使用国战牌堆',
 						init:true,
 						frequent:true,
 						restart:true,
+					},
+					connect_onlyguozhan:{
+						name:'使用国战武将',
+						init:true,
+						frequent:true,
+						restart:true,
+						intro:'开启后将禁用非国战专属武将'
 					},
 		            connect_ban_weak:{
 		                name:'屏蔽弱将',
@@ -2740,14 +2747,21 @@
 					zhulian:{
 						name:'珠联璧合',
 						init:true,
-						frequent:true,
+						// frequent:true,
 						intro:'主将和副将都明置后，若为特定组合，可摸两张牌或回复一点体力'
 					},
-					onlyguozhan:{
-						name:'只开启国战武将',
+					guozhanpile:{
+						name:'使用国战牌堆',
 						init:true,
 						frequent:true,
 						restart:true,
+					},
+					onlyguozhan:{
+						name:'使用国战武将',
+						init:true,
+						frequent:true,
+						restart:true,
+						intro:'开启后将禁用非国战专属武将'
 					},
 		            double_hp:{
 		                name:'双将体力上限',
@@ -6605,7 +6619,10 @@
     					var hidden=player.hiddenSkills.slice(0);
     					game.expandSkills(hidden);
     					if(hidden.contains(event.skill)){
-                            if(!info.direct){
+							if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
+								event.finish();
+							}
+                            else if(!info.direct){
                                 event.trigger('triggerHidden');
                             }
     						else{
@@ -9667,7 +9684,7 @@
 					game.log(player,'濒死')
 					"step 1"
 					if(_status.dying==player) delete _status.dying;
-					if(player.hp<=0) player.die(event.reason);
+					if(player.hp<=0&&!player.nodying) player.die(event.reason);
 				},
 				die:function(){
                     game.logv(player,'die',source);
@@ -12074,6 +12091,7 @@
 					return next;
 				},
 				dying:function(reason){
+					if(this.nodying) return;
 					var next=game.createEvent('dying');
 					next.player=this;
 					next.reason=reason;
@@ -13529,8 +13547,12 @@
                     }
                     return false;
                 },
-				hasSkillTag:function(tag,hidden,arg){
-					var skills=game.expandSkills(this.get('s',hidden));
+				hasSkillTag:function(tag,hidden,arg,globalskill){
+					var skills=this.get('s',hidden);
+					if(globalskill){
+						skills.addArray(lib.skill.global);
+					}
+					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
 						if(info&&info.ai){
@@ -16531,7 +16553,7 @@
 					}
 					"step 2"
 					if(result.bool){
-						if(trigger.player.hp<=0&&trigger.player.isAlive()&&!trigger.player.isOut()&&!trigger.player.removed) event.goto(0);
+						if(trigger.player.hp<=0&&!trigger.player.nodying&&trigger.player.isAlive()&&!trigger.player.isOut()&&!trigger.player.removed) event.goto(0);
 						else trigger.untrigger();
 					}
 					else{
@@ -21299,7 +21321,14 @@
 					}
 				}
 				else{
-					var skills2=game.filterSkills(player.get('s',true,true,false).concat(lib.skill.global),player);
+					var skills2;
+					if(get.mode()=='guozhan'&&player.hasSkillTag('nomingzhi',false,null,true)){
+						skills2=player.get('s',false,true,false);
+					}
+					else{
+						skills2=player.get('s',true,true,false);
+					}
+					skills2=game.filterSkills(skills2.concat(lib.skill.global),player);
 					event._skillChoice=[];
 					game.expandSkills(skills2);
 					for(i=0;i<skills2.length;i++){
@@ -22414,7 +22443,14 @@
             if(info.inherit){
                 var skill=lib.skill[info.inherit];
                 for(j in skill){
-                    if(info[j]==undefined) info[j]=skill[j];
+                    if(info[j]==undefined){
+						if(j=='audio'){
+							info[j]=info.inherit;
+						}
+						else{
+							info[j]=skill[j];
+						}
+					}
                 }
                 if(lib.translate[i+'_info']==undefined){
                     lib.translate[i+'_info']=lib.translate[info.inherit+'_info'];

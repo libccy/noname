@@ -3746,6 +3746,115 @@ character.shenhua={
 				}
 			}
 		},
+		gzbuqu:{
+			audio:'buqu',
+			trigger:{player:'changeHp'},
+			filter:function(event,player){
+				return player.hp<=0&&event.num<0;
+			},
+			init:function(player){
+				player.storage.gzbuqu=[];
+			},
+			priority:-15,
+			intro:{
+				content:'cards'
+			},
+			group:'gzbuqu_recover',
+			locked:true,
+			frequent:true,
+			ondisable:true,
+			onremove:function(player){
+				if(player.storage.gzbuqu.length){
+					delete player.nodying;
+					player.hp=1-player.storage.gzbuqu.length;
+					game.log(player,'移去了不屈牌',player.storage.gzbuqu);
+					while(player.storage.gzbuqu.length){
+						ui.discardPile.appendChild(player.storage.gzbuqu.shift());
+					}
+					player.unmarkSkill('gzbuqu');
+					player.dying({});
+				}
+			},
+			process:function(player){
+				delete player.nodying;
+				player.markSkill('gzbuqu');
+				player.syncStorage('gzbuqu');
+				var nums=[];
+				var cards=player.storage.gzbuqu;
+				for(var i=0;i<cards.length;i++){
+					if(nums.contains(cards[i].number)){
+						return;
+					}
+					else{
+						nums.push(cards[i].number);
+					}
+				}
+				player.nodying=true;
+				if(player.hp<0){
+					player.hp=0;
+					player.update();
+				}
+			},
+			subSkill:{
+				recover:{
+					trigger:{player:'changeHp'},
+					filter:function(event,player){
+						return player.storage.gzbuqu.length>0&&event.num>0;
+					},
+					forced:true,
+					popup:false,
+					content:function(){
+						'step 0'
+						if(player.hp>=player.storage.gzbuqu.length){
+							player.hp-=player.storage.gzbuqu.length-1;
+							player.update();
+							while(player.storage.gzbuqu.length){
+								ui.discardPile.appendChild(player.storage.gzbuqu.shift());
+							}
+							player.unmarkSkill('gzbuqu');
+							delete player.nodying;
+							event.finish();
+						}
+						else{
+							player.chooseCardButton('移去'+get.cnNumber(player.hp)+'张不屈牌',true,player.hp,player.storage.gzbuqu).set('ai',function(button){
+								var buttons=get.selectableButtons();
+								for(var i=0;i<buttons.length;i++){
+									if(buttons[i]!=button&&
+										buttons[i].link.number==button.link.number&&
+										!ui.selected.buttons.contains(buttons[i])){
+										return 1;
+									}
+								}
+								return 0;
+							});
+							player.hp=0;
+							player.update();
+						}
+						'step 1'
+						for(var i=0;i<result.links.length;i++){
+							ui.discardPile.appendChild(result.links[i]);
+							player.storage.gzbuqu.remove(result.links[i]);
+						}
+						player.$throw(result.links);
+						game.log(player,'移去了不屈牌',result.links);
+						lib.skill.gzbuqu.process(player);
+					}
+				}
+			},
+			content:function(){
+				'step 0'
+				var num=-player.hp;
+				if(!player.storage.gzbuqu.length){
+					num++;
+				}
+				player.storage.gzbuqu.addArray(get.cards(num));
+				player.showCards(get.translation(player)+'的不屈牌',player.storage.gzbuqu);
+				player.hp=0;
+				player.update();
+				'step 1'
+				lib.skill.gzbuqu.process(player);
+			}
+		},
 		buqu:{
 			audio:2,
 			trigger:{player:'dieBefore'},
@@ -4231,6 +4340,8 @@ character.shenhua={
 		tiangong2:'天公',
 		xinliegong:'烈弓',
 		xinkuanggu:'狂骨',
+		gzbuqu:'不屈',
+		gzbuqu_info:'当你扣减1点体力时，若你的体力值为0，你可以将牌堆顶的一张牌置于你的武将牌上：若此牌的点数与你武将牌上的其他牌均不同，你不会死亡；若你的武将牌上有点数相同的牌，你进入濒死状态',
 		xinkuanggu_info:'当你对距离1以内的一名角色造成1点伤害后，你可以回复1点体力或摸一张牌',
 		xinliegong_info:'你使用【杀】可以选择你距离不大于此【杀】点数的角色为目标；当你使用【杀】指定一个目标后，你可以根据下列条件执行相应的效果：1.其手牌数小于等于你的手牌数，此【杀】不可被【闪】响应 2.其体力值大于等于你的体力值，此【杀】伤害+1',
 		jiewei_info:'每当你翻面，你可以使用一张锦囊牌或装备牌，若如此做，此牌结算后，你可以弃置场上一张同类型的牌',
