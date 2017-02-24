@@ -1463,11 +1463,12 @@ character.shenhua={
 			trigger:{player:'dieBegin'},
 			forced:true,
 			filter:function(event){
-				return event.source!=undefined;
+				return event.source&&event.source.isIn();
 			},
 			content:function(){
 				trigger.source.clearSkills();
 			},
+			logTarget:'source',
 			ai:{
 				threaten:function(player,target){
 					if(target.hp==1) return 0.2;

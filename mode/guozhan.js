@@ -1227,11 +1227,13 @@ mode.guozhan={
 						case 1:player.classList.add('unseen2');break;
 					}
 					for(var i=0;i<skills.length;i++){
+						if(!player.skills.contains(skills[i])) continue;
 						player.hiddenSkills.add(skills[i]);
 						player.skills.remove(skills[i]);
 					}
 				},this,this.name,this.sex,num,skills);
 				for(var i=0;i<skills.length;i++){
+					if(!this.skills.contains(skills[i])) continue;
 					this.hiddenSkills.add(skills[i]);
 					var info=get.info(skills[i]);
 					if(info.ondisable&&info.onremove){
@@ -1242,6 +1244,12 @@ mode.guozhan={
 				this.checkConflict();
 			},
 			showCharacter:function(num,log){
+				if(num==0&&!this.classList.contains('unseen')){
+					return;
+				}
+				if(num==1&&!this.classList.contains('unseen2')){
+					return;
+				}
 				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
 					return;
 				}
@@ -1462,7 +1470,47 @@ mode.guozhan={
 	},
 	skill:{
 		gzduanchang:{
-
+			audio:'duanchang',
+			trigger:{player:'dieBegin'},
+			forced:true,
+			silent:true,
+			filter:function(event,player){
+				return event.source&&event.source.isIn()&&event.source!=player;
+			},
+			content:function(){
+				'step 0'
+				player.chooseControl('主将','副将',function(){
+					return Math.random()<0.5?'主将':'副将';
+				}).set('prompt','令'+get.translation(trigger.source)+'失去一张武将牌的所有技能');
+				'step 1'
+				var skills;
+				if(result.control=='主将'){
+					trigger.source.showCharacter(0);
+					trigger.source.node.avatar.classList.add('disabled');
+					skills=lib.character[trigger.source.name];
+					game.log(trigger.source,'失去了主将技能');
+				}
+				else{
+					trigger.source.showCharacter(1);
+					trigger.source.node.avatar2.classList.add('disabled');
+					skills=lib.character[trigger.source.name2];
+					game.log(trigger.source,'失去了副将技能');
+				}
+				trigger.source.disableSkill('gzduanchang',skills);
+			},
+			logTarget:'source',
+			ai:{
+				threaten:function(player,target){
+					if(target.hp==1) return 0.2;
+					return 1.5;
+				},
+				effect:{
+					target:function(card,player,target,current){
+						if(!target.hasFriend()) return;
+						if(target.hp<=1&&get.tag(card,'damage')) return [1,0,0,-2];
+					}
+				}
+			}
 		},
 		gzweimu:{
 			audio:'weimu',

@@ -36653,10 +36653,10 @@
 					td.innerHTML=get.numStr(node.getAttackRange());
 					tr.appendChild(td);
 					td=document.createElement('td');
-					if(node==game.me||!game.me){
+					if(node==game.me||!game.me||!game.me.isIn()){
 						td.innerHTML='-';
 					}
-					else if(game.me){
+					else{
 						td.innerHTML=get.numStr(Math.max(1,game.me.distanceTo(node)));
 					}
 					tr.appendChild(td);

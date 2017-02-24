@@ -1614,6 +1614,10 @@ div:not(.handcards)>.card>.info>span,
 .player>.avatar2.hidden {
 	pointer-events: none !important;
 }
+.player>.avatar.disabled{
+	-webkit-filter: grayscale(1);
+	opacity: 0.8;
+}
 .player>.avatar>.action:not(.freecolor) {
 	text-shadow: black 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px;
 }
