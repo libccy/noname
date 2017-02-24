@@ -10208,7 +10208,7 @@
                         if(config.gameStarted){
                             this.node.gaming.show();
                             this.node.waiting.hide();
-							if(config.observe&&config.observeReady){
+							if(config.observe&&config.observeReady&&this.version==lib.versionOL){
 								this.dataset.cursor_style='zoom';
 							}
 							else{
@@ -12819,7 +12819,7 @@
                     }
 					return this;
                 },
-				addSkill:function(skill,checkConflict){
+				addSkill:function(skill,checkConflict,nobroadcast){
 					if(get.objtype(skill)=='array'){
 						for(var i=0;i<skill.length;i++){
 							this.addSkill(skill[i]);
@@ -12829,6 +12829,11 @@
 						if(this.skills.contains(skill)) return;
                         var info=lib.skill[skill];
                         if(!info) return;
+						if(!nobroadcast){
+							game.broadcast(function(player,skill){
+								player.skills.add(skill);
+							},this,skill);
+						}
 						this.skills.add(skill);
 						this.addSkillTrigger(skill);
 						if(this.awakenedSkills.contains(skill)){
@@ -12889,7 +12894,7 @@
                         skills=[skills];
                     }
                     for(var i=0;i<skills.length;i++){
-                        this.addSkill(skills[i]);
+                        this.addSkill(skills[i],null,true);
                         this.skills.remove(skills[i]);
                         this.additionalSkills[skill].push(skills[i]);
                     }
@@ -13052,6 +13057,9 @@
                     }
                     else{
                         this.unmarkSkill(skill);
+						game.broadcast(function(player,skill){
+							player.skills.remove(skill);
+						},this,skill);
     					this.skills.remove(skill);
     					this.checkConflict(skill);
                         delete this.tempSkills[skill];
@@ -13103,7 +13111,7 @@
 				},
 				addTempSkill:function(skill,expire,checkConflict){
 					if(this.hasSkill(skill)&&this.tempSkills[skill]==undefined) return;
-					this.addSkill(skill,checkConflict);
+					this.addSkill(skill,checkConflict,true);
                     this.skills.remove(skill);
 					this.tempSkills[skill]=expire;
 
@@ -18767,6 +18775,25 @@
 						case 2:
 						player.classList.remove('unseen_v');
 						player.classList.remove('unseen2_v');
+						break;
+					}
+				}
+				else{
+					console.log(num);
+				}
+			},
+			hideCharacter:function(player,num){
+				if(player&&player.classList){
+					switch(num){
+						case 0:
+						player.classList.add('unseen_v');
+						break;
+						case 1:
+						player.classList.add('unseen2_v');
+						break;
+						case 2:
+						player.classList.add('unseen_v');
+						player.classList.add('unseen2_v');
 						break;
 					}
 				}

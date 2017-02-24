@@ -29,33 +29,46 @@ mode.guozhan={
 			game.delay();
 			game.showChangeLog();
 		}
-		for(var i in lib.characterPack.mode_guozhan){
-			if(!get.config('onlyguozhan')){
-				if(lib.character[i.slice(3)]) continue;
-			}
-			lib.character[i]=lib.characterPack.mode_guozhan[i];
-			if(!lib.character[i][4]){
-				lib.character[i][4]=[];
-			}
-			if(!lib.translate[i]){
-				lib.translate[i]=lib.translate[i.slice(3)];
-			}
-		}
 		if(!_status.connectMode){
 			_status.mode=get.config('guozhan_mode');
 			if(_status.brawl&&_status.brawl.submode){
 				_status.mode=_status.brawl.submode;
 			}
+			for(var i in lib.characterPack.mode_guozhan){
+				if(!get.config('onlyguozhan')){
+					if(lib.character[i.slice(3)]) continue;
+				}
+				lib.character[i]=lib.characterPack.mode_guozhan[i];
+				if(!lib.character[i][4]){
+					lib.character[i][4]=[];
+				}
+				if(!lib.translate[i]){
+					lib.translate[i]=lib.translate[i.slice(3)];
+				}
+			}
 		}
 		"step 1"
 		if(_status.connectMode){
 			game.randomMapOL();
-			game.broadcastAll(function(){
+			game.broadcastAll(function(pack){
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].node.name.hide();
 					game.players[i].node.name2.hide();
 				}
-			});
+				lib.characterPack.mode_guozhan=pack;
+				for(var i in pack){
+					if(!lib.configOL.onlyguozhan){
+						if(lib.character[i.slice(3)]) continue;
+					}
+					lib.character[i]=pack[i];
+					if(!lib.character[i][4]){
+						lib.character[i][4]=[];
+					}
+					if(!lib.translate[i]){
+						lib.translate[i]=lib.translate[i.slice(3)];
+					}
+				}
+			},lib.characterPack.mode_guozhan);
 		}
 		else{
 			for(var i=0;i<game.players.length;i++){
@@ -1027,6 +1040,44 @@ mode.guozhan={
 				}
 				return false;
 			},
+			hideCharacter:function(num,log){
+				if(this.classList.contains('unseen')||this.classList.contains('unseen2')){
+					return;
+				}
+				game.addVideo('hideCharacter',this,num);
+				var skills;
+				switch(num){
+					case 0:
+					if(log!==false) game.log(this,'暗置了主将'+get.translation(this.name1));
+					skills=lib.character[this.name][3];
+					this.name=this.name2;
+					this.sex=lib.character[this.name2][0];
+					this.classList.add('unseen');
+					break;
+					case 1:
+					if(log!==false) game.log(this,'暗置了副将'+get.translation(this.name2));
+					skills=lib.character[this.name2][3];
+					this.classList.add('unseen2');
+					break;
+				}
+				game.broadcast(function(player,name,sex,num,skills){
+					player.name=name;
+					player.sex=sex;
+					switch(num){
+						case 0:player.classList.add('unseen');break;
+						case 1:player.classList.add('unseen2');break;
+					}
+					for(var i=0;i<skills.length;i++){
+						player.hiddenSkills.add(skills[i]);
+						player.skills.remove(skills[i]);
+					}
+				},this,this.name,this.sex,num,skills);
+				for(var i=0;i<skills.length;i++){
+					this.hiddenSkills.add(skills[i]);
+					this.skills.remove(skills[i]);
+				}
+				this.checkConflict();
+			},
 			showCharacter:function(num,log){
 				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
 					return;
@@ -1111,7 +1162,8 @@ mode.guozhan={
 					this.addSkill(skills[i]);
 				}
 				this.checkConflict();
-				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
+				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')&&!this._mingzhied){
+					this._mingzhied=true;
 					if(this.singleHp){
 						this.doubleDraw();
 					}
@@ -1121,7 +1173,6 @@ mode.guozhan={
 						next.setContent('zhulian');
 					}
 				}
-				game.tryResult();
 			},
 			perfectPair:function(){
 				if(!get.config('zhulian')) return false;
@@ -1247,6 +1298,12 @@ mode.guozhan={
 		}
 	},
 	skill:{
+		huoshui:{
+
+		},
+		qingcheng:{
+
+		},
 		duoshi:{
 			enable:'chooseToUse',
 			viewAs:{name:'yiyi'},
