@@ -208,6 +208,11 @@
 }
 
 
+#arena>.player:not(.minskin)>.name.name2{
+    left: auto !important;
+    right: 13px;
+}
+
 #arena>.player:not(.minskin){
     width: 120px !important;
     height: 220px !important;

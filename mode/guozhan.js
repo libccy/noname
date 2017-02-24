@@ -1,5 +1,19 @@
 'use strict';
 mode.guozhan={
+	startBefore:function(){
+		for(var i in lib.characterPack.mode_guozhan){
+			if(!get.config('onlyguozhan')){
+				if(lib.character[i.slice(3)]) continue;
+			}
+			lib.character[i]=lib.characterPack.mode_guozhan[i];
+			if(!lib.character[i][4]){
+				lib.character[i][4]=[];
+			}
+			if(!lib.translate[i]){
+				lib.translate[i]=lib.translate[i.slice(3)];
+			}
+		}
+	},
 	start:function(){
 		"step 0"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
@@ -36,18 +50,6 @@ mode.guozhan={
 			_status.mode=get.config('guozhan_mode');
 			if(_status.brawl&&_status.brawl.submode){
 				_status.mode=_status.brawl.submode;
-			}
-			for(var i in lib.characterPack.mode_guozhan){
-				if(!get.config('onlyguozhan')){
-					if(lib.character[i.slice(3)]) continue;
-				}
-				lib.character[i]=lib.characterPack.mode_guozhan[i];
-				if(!lib.character[i][4]){
-					lib.character[i][4]=[];
-				}
-				if(!lib.translate[i]){
-					lib.translate[i]=lib.translate[i.slice(3)];
-				}
 			}
 		}
 		"step 1"
@@ -143,12 +145,21 @@ mode.guozhan={
 	},
 	characterPack:{
 		mode_guozhan:{
+			gz_shibing1wei:['male','wei',0,[],['unseen']],
+			gz_shibing2wei:['female','wei',0,[],['unseen']],
+			gz_shibing1shu:['male','shu',0,[],['unseen']],
+			gz_shibing2shu:['female','shu',0,[],['unseen']],
+			gz_shibing1wu:['male','wu',0,[],['unseen']],
+			gz_shibing2wu:['female','wu',0,[],['unseen']],
+			gz_shibing1qun:['male','qun',0,[],['unseen']],
+			gz_shibing2qun:['female','qun',0,[],['unseen']],
+
 			gz_caocao:['male','wei',4,['jianxiong']],
 			gz_simayi:['male','wei',3,['fankui','guicai']],
 			gz_xiahoudun:['male','wei',4,['ganglie']],
 			gz_zhangliao:['male','wei',4,['tuxi']],
 			gz_xuzhu:['male','wei',4,['luoyi']],
-			gz_guojia:['male','wei',4,['tiandu','yiji']],
+			gz_guojia:['male','wei',3,['tiandu','yiji']],
 			gz_zhenji:['female','wei',4,['luoshen','qingguo']],
 			gz_xiahouyuan:['male','wei',4,['shensu']],
 			gz_zhanghe:['male','wei',4,['qiaobian']],
@@ -581,6 +592,7 @@ mode.guozhan={
 				var i;
 				event.list=[];
 				for(i in lib.character){
+					if(i.indexOf('gz_shibing')==0) continue;
 					if(chosen.contains(i)) continue;
 					if(lib.filter.characterDisabled(i)) continue;
 					if(get.config('onlyguozhan')&&!lib.characterPack.mode_guozhan[i]) continue;
@@ -634,6 +646,7 @@ mode.guozhan={
 					};
 					if(get.config('onlyguozhan')){
 						event.dialogxx=ui.create.characterDialog(function(i){
+							if(i.indexOf('gz_shibing')==0) return true;
 							if(!lib.characterPack.mode_guozhan[i]) return true;
 						},'expandall');
 					}
@@ -771,6 +784,7 @@ mode.guozhan={
 				if(lib.configOL.onlyguozhan){
 					list=[];
 					for(var i in lib.characterPack.mode_guozhan){
+						if(i.indexOf('gz_shibing')==0) continue;
 						list.push(i);
 					}
 				}
@@ -947,6 +961,14 @@ mode.guozhan={
 		tongshimingzhi:'同时明置',
 		mode_guozhan_character_config:'国战武将',
 
+		gz_shibing1wei:'魏兵',
+		gz_shibing2wei:'魏兵',
+		gz_shibing1shu:'蜀兵',
+		gz_shibing2shu:'蜀兵',
+		gz_shibing1wu:'吴兵',
+		gz_shibing2wu:'吴兵',
+		gz_shibing1qun:'群兵',
+		gz_shibing2qun:'群兵',
 		shuangren:'双刃',
 		shuangren_info:'出牌阶段开始时，你可以与一名角色拼点。若你赢，你视为对其或与其势力相同的另一名角色使用一张【杀】（此【杀】不计入限制的次数）；若你没赢，你结束出牌阶段',
 		gzduanchang:'断肠',
@@ -1245,6 +1267,16 @@ mode.guozhan={
 				}
 				this.checkConflict();
 			},
+			removeVice:function(){
+				var info=lib.character[this.name2];
+				if(!info) return;
+				game.broadcastAll(function(player,to){
+					player.reinit(player.name2,to,false);
+				},this,'gz_shibing'+(info[0]=='male'?1:2)+info[1]);
+				if(this.classList.contains('unseen2')){
+					this.showCharacter(1);
+				}
+			},
 			showCharacter:function(num,log){
 				if(num==0&&!this.classList.contains('unseen')){
 					return;
@@ -1474,6 +1506,7 @@ mode.guozhan={
 		shuangren:{
 			trigger:{player:'phaseUseBegin'},
 			direct:true,
+			priority:15,
 			content:function(){
 				'step 0'
 				var goon;
@@ -1521,6 +1554,7 @@ mode.guozhan={
 					}
 					else{
 						player.useCard({name:'sha'},target,false);
+						event.finish();
 					}
 				}
 				else{
@@ -1529,7 +1563,7 @@ mode.guozhan={
 					event.finish();
 				}
 				'step 3'
-				if(result.bool){
+				if(result.bool&&result.targets&&result.targets.length){
 					player.useCard({name:'sha'},result.targets[0],false);
 				}
 			}

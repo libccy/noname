@@ -24,6 +24,10 @@
     height: calc(100% - 141px);
 }
 
+#arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.name.name2{
+    left: auto;
+    right: 13px;
+}
 
 #arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0']){
     width: 120px !important;

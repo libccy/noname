@@ -4039,7 +4039,12 @@
                         if(type=='character'){
                             if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
 								if(mode=='guozhan'){
-									name=name.slice(3);
+									if(name.indexOf('gz_shibing')==0){
+										name=name.slice(3,11);
+									}
+									else{
+										name=name.slice(3);
+									}
 								}
                                 else{
 									modeimage=mode;
@@ -4716,6 +4721,10 @@
 							lib._onDB[i]();
 						}
                         if(_status.waitingForDB){
+							if(lib.init.startBefore){
+								lib.init.startBefore();
+								delete lib.init.startBefore;
+							}
                             ui.create.arena();
     						game.createEvent('game',false).setContent(lib.init.start);
     						delete lib.init.start;
@@ -5087,6 +5096,7 @@
 						get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
 					}
 					lib.init.start=mode[lib.config.mode].start;
+					lib.init.startBefore=mode[lib.config.mode].startBefore;
 					if(game.onwash){
 						lib.onwash.push(game.onwash);
 						delete game.onwash;
@@ -5108,6 +5118,7 @@
 						if(i=='get') continue;
 						if(i=='config') continue;
 						if(i=='start') continue;
+						if(i=='startBefore') continue;
 						if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
 						for(j in mode[lib.config.mode][i]){
 							lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
@@ -5437,6 +5448,10 @@
 						_status.waitingForDB=true;
 					}
 					else{
+						if(lib.init.startBefore){
+							lib.init.startBefore();
+							delete lib.init.startBefore;
+						}
                         ui.create.arena();
 						game.createEvent('game',false).setContent(lib.init.start);
 						delete lib.init.start;
@@ -10148,6 +10163,7 @@
 
 						// var name=get.translation(character2);
 						this.node.name2.innerHTML=get.slimName(character2);
+						// this.node.name2.dataset.nature=get.groupnature(info2[1]);
 						if(!lib.config.show_name){
 							this.node.name2.style.display='none';
 						}
@@ -10283,7 +10299,13 @@
 					else{
 						return this;
 					}
-					var num=(maxHp||info2[2])-info1[2];
+					var num;
+					if(maxHp===false){
+						num=0;
+					}
+					else{
+						num=(maxHp||info2[2])-info1[2];
+					}
 					if(typeof this.singleHp=='boolean'){
 						if(num%2==1){
 							if(this.singleHp){
@@ -10315,8 +10337,10 @@
 						avatar2:this.name2==to
 					});
 					this.update();
-					if(this.singleHp===true&&!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
-						this.doubleDraw();
+					if(!game.online){
+						if(this.singleHp===true&&!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
+							this.doubleDraw();
+						}
 					}
 				},
 				uninit:function(){
@@ -13075,10 +13099,10 @@
                     }
                     else{
                         this.unmarkSkill(skill);
-						game.broadcast(function(player,skill){
+						game.broadcastAll(function(player,skill){
 							player.skills.remove(skill);
+							player.hiddenSkills.remove(skill);
 						},this,skill);
-    					this.skills.remove(skill);
     					this.checkConflict(skill);
                         delete this.tempSkills[skill];
                         var info=lib.skill[skill];
@@ -20816,10 +20840,20 @@
 				if(modecharacters){
 					if(get.mode()=='guozhan'){
 						if(modecharacters[newvid.name1]){
-							newvid.name1=newvid.name1.slice(3);
+							if(newvid.name1.indexOf('gz_shibing')==0){
+								newvid.name1=newvid.name1.slice(3,11);
+							}
+							else{
+								newvid.name1=newvid.name1.slice(3);
+							}
 						}
 						if(modecharacters[newvid.name2]){
-							newvid.name2=newvid.name2.slice(3);
+							if(newvid.name2.indexOf('gz_shibing')==0){
+								newvid.name2=newvid.name2.slice(3,11);
+							}
+							else{
+								newvid.name2=newvid.name2.slice(3);
+							}
 						}
 					}
 					else{
@@ -21770,7 +21804,8 @@
                     if(i=='ui') continue;
                     if(i=='get') continue;
                     if(i=='config') continue;
-                    if(i=='start') continue;
+					if(i=='start') continue;
+                    if(i=='startBefore') continue;
                     if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
                     for(j in mode[lib.config.mode][i]){
                         lib[i][j]=lib.init.eval(mode[lib.config.mode][i][j]);
@@ -25334,6 +25369,7 @@
 						var alterableCharacters=[];
 						var charactersToAlter=[];
 						for(var i in info){
+							if(info[i][4]&&info[i][4].contains('unseen')) continue;
 							list.push(i);
 							for(var j=0;j<info[i][3].length;j++){
 								if(lib.skill[info[i][3][j]].alter){
@@ -25351,6 +25387,7 @@
                             if(info[name][1]=='shu') return 1;
                             if(info[name][1]=='wu') return 2;
                             if(info[name][1]=='qun') return 3;
+							return 4;
                         }
                         list.sort(function(a,b){
                             var del=groupSort(a)-groupSort(b);
