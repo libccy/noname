@@ -185,7 +185,7 @@ mode.guozhan={
 			gz_jiling:['male','qun',4,[]],
 			gz_tianfeng:['male','qun',3,['sijian','suishi']],
 			gz_panfeng:['male','qun',4,['kuangfu']],
-			gz_zoushi:['female','qun',3,[]],
+			gz_zoushi:['female','qun',3,['huoshui','qingcheng']],
 
 			gz_dengai:['male','wei',4,[]],
 			gz_caohong:['male','wei',4,[]],
@@ -927,6 +927,10 @@ mode.guozhan={
 		tongshimingzhi:'同时明置',
 		mode_guozhan_character_config:'国战武将',
 
+		huoshui:'祸水',
+		huoshui_info:'出牌阶段，你可以明置此武将牌;你的回合内，若此武将牌处于明置状态，其他角色不能明置其武将牌',
+		qingcheng:'倾城',
+		qingcheng_info:'出牌阶段，你可以弃置一张装备牌并选择一名两张武将牌均明置的其他角色，你暗置其一张武将牌',
 		duoshi:'度势',
 		duoshi_info:'出牌阶段限四次，你可以将一张红色手牌当【以逸待劳】使用。',
 		gzxiaoguo:'骁果',

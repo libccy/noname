@@ -65,7 +65,7 @@ character.swd={
 		// swd_libai:['female','qun',3,['miaobi','zhexian']],
 		// swd_kendi:['male','qun',3,['guanxing','jianyan']],
 		// swd_lijing:['male','qun',4,['tianyi','zhuhai']],
-		swd_lilian:['female','qun',3,['swd_wuxie','qingcheng']],
+		swd_lilian:['female','qun',3,['swd_wuxie','lqingcheng']],
 		// swd_linming:['male','qun',3,['shelie','bifa']],
 		// swd_philis:['male','qun',4,['yicong','wangxi']],
 		// swd_pepin:['male','qun',4,['rejianxiong','quhu']],
@@ -5437,7 +5437,7 @@ character.swd={
 				}
 			}
 		},
-		qingcheng:{
+		lqingcheng:{
 			trigger:{player:'phaseEnd'},
 			frequent:true,
 			content:function(){
@@ -5457,7 +5457,7 @@ character.swd={
 						}
 						event.finish();
 					}
-					else if(lib.config.autoskilllist.contains('qingcheng')){
+					else if(lib.config.autoskilllist.contains('lqingcheng')){
 						player.chooseBool('是否再次发动？');
 					}
 					else{
@@ -9135,7 +9135,7 @@ character.swd={
 		yishan:'异闪',
 		yishan2:'异闪',
 		swd_wuxie:'无邪',
-		qingcheng:'倾城',
+		lqingcheng:'倾城',
 		xianjiang:'仙匠',
 		xianjiang3:'仙匠',
 		shengong:'神工',
@@ -9249,7 +9249,7 @@ character.swd={
 		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
 		daixing_info:'结束阶段，你可以任意张牌并获得等量的护甲，这些护甲将在你的下个准备阶段消失',
 		swd_wuxie_info:'锁定技，你不能成为其他角色的延时锦囊的目标',
-		qingcheng_info:'结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
+		lqingcheng_info:'结束阶段，你可以进行判定，若为红色则可以继续判定，最多判定3次，判定结束后将判定成功的牌收入手牌',
 		xianjiang_old_info:'出牌阶段，你可以将一张装备牌永久转化为任意一张其它装备牌，一张牌在一个阶段只能转化一次',
 		xianjiang_info:'出牌阶段限一次，你可以弃置一张锦囊牌并随机装备一件装备',
 		xianjiang_info_alter:'出牌阶段限一次，若你装备内没有牌，你可以弃置一张锦囊牌并随机装备一件装备',

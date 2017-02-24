@@ -10,7 +10,7 @@ character.xianjian={
 		// pal_shenqishuang:['female','wei',3,[]],
 
 		pal_jingtian:['male','wu',3,['sajin','jubao']],
-		pal_xuejian:['female','shu',3,['shuangren','shenmu','duci']],
+		pal_xuejian:['female','shu',3,['xshuangren','shenmu','duci']],
 		pal_longkui:['female','qun',3,['fenxing','diewu','lingyu']],
 		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
 		pal_changqing:['male','wei',4,['luanjian','tianfu']],
@@ -1698,7 +1698,7 @@ character.xianjian={
 				}
 			}
 		},
-		shuangren:{
+		xshuangren:{
 			trigger:{player:['loseEnd']},
 			filter:function(event,player){
 				if(!player.equiping) return false;
@@ -1715,25 +1715,25 @@ character.xianjian={
 					}
 				}
 				if(card){
-					if(player.storage.shuangren){
-						player.unmark(player.storage.shuangren,'shuangren');
-						player.discard(player.storage.shuangren);
-						game.addVideo('unmarkId',player,[get.cardInfo(player.storage.shuangren),'shuangren']);
+					if(player.storage.xshuangren){
+						player.unmark(player.storage.xshuangren,'xshuangren');
+						player.discard(player.storage.xshuangren);
+						game.addVideo('unmarkId',player,[get.cardInfo(player.storage.xshuangren),'xshuangren']);
 					}
 					if(card.clone){
 						card.clone.moveDelete(player);
 						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
-						player.mark(card,'shuangren');
-						game.addVideo('markId',player,[get.cardInfo(card),'shuangren']);
+						player.mark(card,'xshuangren');
+						game.addVideo('markId',player,[get.cardInfo(card),'xshuangren']);
 					}
 					ui.special.appendChild(card);
-					player.storage.shuangren=card;
+					player.storage.xshuangren=card;
 					var info=get.info(card);
 					if(info.skills){
-						player.addAdditionalSkill('shuangren',info.skills);
+						player.addAdditionalSkill('xshuangren',info.skills);
 					}
 					else{
-						player.removeAdditionalSkill('shuangren');
+						player.removeAdditionalSkill('xshuangren');
 					}
 				}
 
@@ -1748,20 +1748,20 @@ character.xianjian={
 			intro:{
 				content:'card'
 			},
-			group:'shuangren2'
+			group:'xshuangren2'
 		},
-		shuangren2:{
+		xshuangren2:{
 			trigger:{player:'dieBegin'},
 			forced:true,
 			popup:false,
 			silent:true,
 			filter:function(event,player){
-				return player.storage.shuangren?true:false;
+				return player.storage.xshuangren?true:false;
 			},
 			content:function(){
-				if(player.storage.shuangren){
-					ui.discardPile.appendChild(player.storage.shuangren);
-					player.$throw(player.storage.shuangren);
+				if(player.storage.xshuangren){
+					ui.discardPile.appendChild(player.storage.xshuangren);
+					player.$throw(player.storage.xshuangren);
 				}
 			}
 		},
@@ -2564,8 +2564,8 @@ character.xianjian={
 		jubao_info:'当其他角色于你的回合外首次弃置非基本牌时，你可以获得其中的随机一张',
 		guiyuan:'归元',
 		guiyuan_info:'出牌阶段限一次，你可以弃置一张杀并回复一点体力',
-		shuangren:'双刃',
-		shuangren_info:'当你的武器牌被替换时，你可以将其置于你的武将牌上，并获得此装备的武器效果（不含距离）',
+		xshuangren:'双刃',
+		xshuangren_info:'当你的武器牌被替换时，你可以将其置于你的武将牌上，并获得此装备的武器效果（不含距离）',
 		duci:'毒刺',
 		duci_info:'每当你失去一次装备牌，可以对距离1以内的一名其他角色造成一点伤害',
 		shenmu:'神木',
