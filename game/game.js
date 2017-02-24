@@ -9591,9 +9591,11 @@
 					if(num>player.maxHp-player.hp) num=player.maxHp-player.hp;
 					if(num>0){
 						player.changeHp(num,false);
-						if(lib.config.animation&&!lib.config.low_performance){
-							player.$recover();
-						}
+						game.broadcastAll(function(player){
+	                        if(lib.config.animation&&!lib.config.low_performance){
+	                            player.$recover();
+	                        }
+	                    },player);
 						player.$damagepop(num,'wood');
 						game.log(player,'回复了'+get.cnNumber(num)+'点体力')
 					}
@@ -14785,11 +14787,6 @@
 						top+this.offsetHeight-30,700,'dust');
 				},
 				$recover:function(){
-                    game.broadcast(function(player){
-                        if(!lib.config.low_performance){
-                            player.$recover();
-                        }
-                    },this);
 					game.addVideo('flame',this,'recover');
 					var left,top;
 					if(game.chess){
