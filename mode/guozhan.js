@@ -211,7 +211,7 @@ mode.guozhan={
 			gz_zhangjiao:['male','qun',3,['leiji','guidao']],
 			gz_caiwenji:['female','qun',3,['beige','gzduanchang']],
 			gz_mateng:['male','qun',4,['mashu','xiongyi']],
-			gz_kongrong:['male','qun',3,['mingshi','lirang']],
+			gz_kongrong:['male','qun',3,['gzmingshi','lirang']],
 			gz_jiling:['male','qun',4,['shuangren']],
 			gz_tianfeng:['male','qun',3,['sijian','suishi']],
 			gz_panfeng:['male','qun',4,['kuangfu']],
@@ -236,6 +236,29 @@ mode.guozhan={
 		}
 	},
 	skill:{
+		gzmingshi:{
+			trigger:{player:'damageBegin'},
+			forced:true,
+			filter:function(event,player){
+				return event.num>0&&event.source&&(event.source.classList.contains('unseen')||event.source.classList.contains('unseen2'));
+			},
+			content:function(){
+				trigger.num--;
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target){
+						if(player.hasSkill('jueqing')) return;
+						if(!player.classList.contains('unseen')&&!player.classList.contains('unseen2')) return;
+						var num=get.tag(card,'damage');
+						if(num){
+							if(num>1) return 0.5;
+							return 0;
+						}
+					}
+				}
+			},
+		},
 		hunshang:{
 			init:function(player){
 				if(player.hasViceSkill('hunshang')){
@@ -468,7 +491,7 @@ mode.guozhan={
 				return player!=target;
 			},
 			check:function(card){
-				if(ui.selected.cards.length>1) return 0;
+				if(ui.selected.cards.length>2) return 0;
 				if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
 				if(!ui.selected.cards.length&&card.name=='du') return 20;
 				var player=get.owner(card);
@@ -1570,6 +1593,8 @@ mode.guozhan={
 		tongshimingzhi:'同时明置',
 		mode_guozhan_character_config:'国战武将',
 
+		gzmingshi:'名士',
+		gzmingshi_info:'锁定技，当你受到伤害时，若伤害来源有暗置的武将牌，此伤害-1',
 		chuanxin:'锋矢',
 		chuanxin_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，可令该角色弃置装备区里的一张牌',
 		fengshi:'穿心',

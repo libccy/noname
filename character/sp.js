@@ -5823,29 +5823,61 @@ character.sp={
 			content:function(){
 				"step 0"
 				if(trigger.delay==false) game.delay();
+				event.cards=[];
+				for(var i=0;i<trigger.cards.length;i++){
+					if(get.position(trigger.cards[i])=='d'){
+						event.cards.push(trigger.cards[i]);
+						ui.special.appendChild(trigger.cards[i]);
+					}
+				}
 				"step 1"
-				player.chooseTarget(get.prompt('lirang'),function(card,player,target){
-					return player!=target
-				}).set('ai',function(target){
-					var att=ai.get.attitude(_status.event.player,target);
-					if(_status.event.du) return -att;
-					return att;
-				}).set('du',(trigger.cards.length==1&&trigger.cards[0].name=='du'));
+				if(event.cards.length){
+					player.chooseCardButton(get.prompt('lirang'),event.cards,[1,event.cards.length]).set('ai',function(button){
+						if(!_status.event.goon||ui.selected.buttons.length) return 0;
+						return 1;
+					}).set('goon',game.hasPlayer(function(current){
+						return Math.abs(ai.get.attitude(player,current))>1;
+					}));
+				}
+				else{
+					event.finish();
+				}
 				"step 2"
 				if(result.bool){
-					var target=result.targets[0];
-					player.logSkill('lirang',target);
-					var cards=[];
-					for(var i=0;i<trigger.cards.length;i++){
-						if(get.position(trigger.cards[i])=='d'){
-							cards.push(trigger.cards[i]);
+					event.togive=result.links.slice(0);
+					player.chooseTarget('将'+get.translation(result.links)+'交给一名角色',true,function(card,player,target){
+						return target!=player;
+					}).set('ai',function(target){
+						var att=ai.get.attitude(_status.event.player,target);
+						if(_status.event.enemy){
+							return -att;
 						}
+						else{
+							return att/Math.sqrt(1+target.num('h'));
+						}
+					}).set('enemy',ai.get.value(event.togive[0])<0);
+				}
+				else{
+					for(var i=0;i<event.cards.length;i++){
+						ui.discardPile(event.cards[i]);
 					}
-					target.gain(cards);
-					target.$gain2(cards);
-					if(target==game.me){
-						game.delayx();
+					event.finish();
+				}
+				"step 3"
+				if(result.bool){
+					player.logSkill('lirang',result.targets);
+					for(var i=0;i<event.togive.length;i++){
+						event.cards.remove(event.togive[i]);
 					}
+					result.targets[0].gain(event.togive,player);
+					result.targets[0].$gain2(event.togive);
+					event.goto(1);
+				}
+				else{
+					for(var i=0;i<event.cards.length;i++){
+						ui.discardPile(event.cards[i]);
+					}
+					event.finish();
 				}
 			},
 			ai:{
@@ -6610,8 +6642,31 @@ character.sp={
 				player.awakenSkill('xiongyi');
 				game.asyncDraw(targets,3);
 				"step 1"
-				if(targets.length<=2){
-					player.recover();
+				if(player.isDamaged()){
+					if(get.mode()=='guozhan'){
+						if(player.identity=='ye'){
+							player.recover();
+						}
+						else{
+							var groups={
+								wei:0,
+								shu:0,
+								wu:0,
+								qun:0
+							}
+							game.countPlayer(function(current){
+								if(groups.hasOwnProperty(current.identity)){
+									groups[current.identity]++;
+								}
+							});
+							if(groups.qun<=groups.wei&&groups.qun<=groups.shu&&groups.qun<=groups.wu){
+								player.recover();
+							}
+						}
+					}
+					else if(targets.length<=2){
+						player.recover();
+					}
 				}
 			},
 			intro:{
@@ -8211,7 +8266,7 @@ character.sp={
 		kaikang_info:'每当你距离1以内的角色成为杀的目标后，你可以摸一张牌。若如此做，你交给其一张牌并展示之，若该牌为装备牌，该角色可以使用此牌。',
 		liangzhu_info:'当一名角色于其出牌阶段内回复体力时，你可以选择一项：1、摸一张牌；2、令该角色摸两张牌 ',
 		mingshi_info:'当你即将受到伤害时，若伤害来源的体力值大于你，你可以弃置一张黑色手牌令伤害-1 ',
-		lirang_info:'你可以将你弃置的卡牌交给一名其他角色 ',
+		lirang_info:'当你的牌因弃置而置入弃牌堆时，你可以将其中的任意张牌交给其他角色',
 		moukui_info:'当你使用【杀】指定一名角色为目标后，你可以选择一项：摸一张牌，或弃置其一张牌。若如此做，此【杀】被【闪】抵消时，该角色弃置你的一张牌。 ',
 		qiangwu_info:'出牌阶段，你可以进行一次判定。若如此做，则直到回合结束，你使用点数小于判定牌的 【杀】时不受距离限制，且你使用点数大于判定牌的【杀】时不计入出牌阶段的使用次数。',
 		shenxian_info:'每名角色的回合限一次，你的回合外，每当有其他角色因弃置而失去牌时，若其中有基本牌，你可以摸一张牌。',
