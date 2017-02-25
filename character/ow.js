@@ -19,7 +19,7 @@ character.ow={
 
         ow_tuobiang:['male','shu',3,['paotai','maoding']],
         // ow_baolei:['male','qun',4,[]],
-        ow_banzang:['male','qun',4,['fengshi','yinbo']],
+        ow_banzang:['male','qun',4,['bfengshi','yinbo']],
         ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
         ow_luba:['male','shu',4,['liangou','xiyang']],
         // ow_wensidun:['male','shu',4,[]],
@@ -424,7 +424,7 @@ character.ow={
                 }
             }
         },
-        fengshi:{
+        bfengshi:{
             trigger:{player:'shaBegin'},
             forced:true,
             alter:true,
@@ -433,7 +433,7 @@ character.ow={
 			},
 			filter:function(event,player){
                 var num=0.2;
-                if(get.is.altered('fengshi')) num=0.15;
+                if(get.is.altered('bfengshi')) num=0.15;
 				return Math.random()<num*get.cardCount(true,player);
 			},
 			content:function(){
@@ -444,9 +444,9 @@ character.ow={
                     return distance-get.cardCount(true,from);
                 }
             },
-            group:'fengshi2'
+            group:'bfengshi2'
         },
-        fengshi2:{
+        bfengshi2:{
             trigger:{source:'damageBegin'},
             forced:true,
 			check:function(event,player){
@@ -454,7 +454,7 @@ character.ow={
 			},
             filter:function(event,player){
                 var num=0.2;
-                if(get.is.altered('fengshi')) num=0.15;
+                if(get.is.altered('bfengshi')) num=0.15;
                 return event.card&&event.card.name=='sha'&&Math.random()<num*get.cardCount(true,player);
             },
             content:function(){
@@ -2963,10 +2963,10 @@ character.ow={
         maoding2:'铆钉',
         maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
         maoding_info_alter:'每当你造成一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
-        fengshi:'风矢',
-        fengshi2:'风矢',
-        fengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加20%的概率强制命中；你的杀造成伤害后增加20%的概率令伤害+1',
-        fengshi_info_alter:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加15%的概率强制命中；你的杀造成伤害后增加15%的概率令伤害+1',
+        bfengshi:'风矢',
+        bfengshi2:'风矢',
+        bfengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加20%的概率强制命中；你的杀造成伤害后增加20%的概率令伤害+1',
+        bfengshi_info_alter:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的杀增加15%的概率强制命中；你的杀造成伤害后增加15%的概率令伤害+1',
         yinbo:'音波',
         yinbo_info:'出牌阶段限一次，你可以弃置一张黑桃牌，然后随机弃置三名敌人各一张牌',
         liudan:'榴弹',

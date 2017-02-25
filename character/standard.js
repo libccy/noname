@@ -1292,7 +1292,7 @@ character.standard={
 				"step 1"
 				if(result.bool){
 					player.discard(result.cards);
-					player.logSkill('liuli',result.targets);
+					player.logSkill(event.name,result.targets);
 					trigger.target=result.targets[0];
 					trigger.targets.remove(player);
 					trigger.targets.push(result.targets[0]);

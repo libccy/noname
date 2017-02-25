@@ -13,7 +13,7 @@ character.xianjian={
 		pal_xuejian:['female','shu',3,['xshuangren','shenmu','duci']],
 		pal_longkui:['female','qun',3,['fenxing','diewu','lingyu']],
 		pal_zixuan:['female','wei',3,['shuiyun','wangyou','changnian']],
-		pal_changqing:['male','wei',4,['luanjian','tianfu']],
+		pal_changqing:['male','wei',4,['luanjian','ctianfu']],
 
 		pal_nangonghuang:['male','wei',3,['zhaoyao','sheling','zhangmu']],
 		pal_wenhui:['female','shu',4,['huxi','longxiang']],
@@ -1271,7 +1271,7 @@ character.xianjian={
 				if(Math.random()<0.5) trigger.num++;
 			}
 		},
-		tianfu:{
+		ctianfu:{
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.num('h','shan')>0;
@@ -1281,17 +1281,17 @@ character.xianjian={
 			discard:false,
 			prepare:'give',
 			filterTarget:function(card,player,target){
-				return target!=player&&!target.hasSkill('tianfu2');
+				return target!=player&&!target.hasSkill('ctianfu2');
 			},
 			check:function(card){
 				if(_status.event.player.hp>=3) return 8-ai.get.value(card);
 				return 7-ai.get.value(card);
 			},
 			content:function(){
-				target.storage.tianfu2=cards[0];
-				target.storage.tianfu3=player;
-				game.addVideo('storage',target,['tianfu2',get.cardInfo(cards[0]),'card']);
-				target.addSkill('tianfu2');
+				target.storage.ctianfu2=cards[0];
+				target.storage.ctianfu3=player;
+				game.addVideo('storage',target,['ctianfu2',get.cardInfo(cards[0]),'card']);
+				target.addSkill('ctianfu2');
 			},
 			ai:{
 				order:2,
@@ -1305,18 +1305,18 @@ character.xianjian={
 				expose:0.2
 			}
 		},
-		tianfu2:{
+		ctianfu2:{
 			trigger:{source:'damageAfter'},
 			forced:true,
 			mark:'card',
 			filter:function(event,player){
-				return player.storage.tianfu2&&player.storage.tianfu3;
+				return player.storage.ctianfu2&&player.storage.ctianfu3;
 			},
 			content:function(){
 				"step 0"
-				if(player.storage.tianfu3&&player.storage.tianfu3.isAlive()){
-					player.damage(player.storage.tianfu3);
-					player.storage.tianfu3.line(player,'thunder');
+				if(player.storage.ctianfu3&&player.storage.ctianfu3.isAlive()){
+					player.damage(player.storage.ctianfu3);
+					player.storage.ctianfu3.line(player,'thunder');
 				}
 				else{
 					player.damage('nosource');
@@ -1327,26 +1327,26 @@ character.xianjian={
 					player.discard(he.randomGet());
 				}
 				"step 2"
-				player.$throw(player.storage.tianfu2);
-				ui.discardPile.appendChild(player.storage.tianfu2);
-				delete player.storage.tianfu2;
-				delete player.storage.tianfu3;
-				player.removeSkill('tianfu2');
+				player.$throw(player.storage.ctianfu2);
+				ui.discardPile.appendChild(player.storage.ctianfu2);
+				delete player.storage.ctianfu2;
+				delete player.storage.ctianfu3;
+				player.removeSkill('ctianfu2');
 			},
-			group:'tianfu3',
+			group:'ctianfu3',
 			intro:{
 				content:'card'
 			}
 		},
-		tianfu3:{
+		ctianfu3:{
 			trigger:{player:'dieBegin'},
 			forced:true,
 			popup:false,
 			content:function(){
-				ui.discardPile.appendChild(player.storage.tianfu2);
-				delete player.storage.tianfu2;
-				delete player.storage.tianfu3;
-				player.removeSkill('tianfu2');
+				ui.discardPile.appendChild(player.storage.ctianfu2);
+				delete player.storage.ctianfu2;
+				delete player.storage.ctianfu3;
+				player.removeSkill('ctianfu2');
 			}
 		},
 		shuiyun:{
@@ -2541,10 +2541,10 @@ character.xianjian={
 		xfenxin_info_alter:'锁定技，每当你的体力值发生改变，你摸一张牌',
 		luanjian:'乱剑',
 		luanjian_info:'出牌阶段，你可以将两张杀当杀使用，此杀无视距离，可以指定任意名目标且有50%的机率伤害+1',
-		tianfu:'天符',
-		tianfu2:'天符',
-		tianfu3:'天符',
-		tianfu_info:'出牌阶段，你可以将一张闪置于一名其他角色的武将牌上，该角色在下一次造成伤害时受到来自你的一点雷属性伤害并随机弃置一张牌，然后移去此牌',
+		ctianfu:'天符',
+		ctianfu2:'天符',
+		ctianfu3:'天符',
+		ctianfu_info:'出牌阶段，你可以将一张闪置于一名其他角色的武将牌上，该角色在下一次造成伤害时受到来自你的一点雷属性伤害并随机弃置一张牌，然后移去此牌',
 		shuiyun:'水蕴',
 		shuiyun_bg:'蕴',
 		shuiyun2:'水蕴',

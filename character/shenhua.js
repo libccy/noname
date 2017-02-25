@@ -2227,71 +2227,6 @@ character.shenhua={
 				}
 			}
 		},
-		yinghun_old:{
-			audio:2,
-			audioname:['sunce'],
-			trigger:{player:'phaseBegin'},
-			filter:function(event,player){
-				return player.hp<player.maxHp;
-			},
-			direct:true,
-			content:function(){
-				"step 0"
-				player.chooseTarget(get.prompt('yinghun'),function(card,player,target){
-					return player!=target;
-				}).set('ai',function(target){
-					var player=_status.event.player;
-					if(player.maxHp-player.hp==1&&target.num('he')==0){
-						return 0;
-					}
-					if(ai.get.attitude(_status.event.player,target)>0){
-						return 10+ai.get.attitude(_status.event.player,target);
-					}
-					if(player.maxHp-player.hp==1){
-						return -1;
-					}
-					return 1;
-				});
-				"step 1"
-				if(result.bool){
-					player.logSkill('yinghun',result.targets);
-					event.target=result.targets[0];
-					player.chooseControl('yinghun_true','yinghun_false',function(event,player){
-						if(ai.get.attitude(player,event.target)>0) return 'yinghun_true';
-						return 'yinghun_false';
-					})
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				if(result.control=='yinghun_true'){
-					event.target.draw(player.maxHp-player.hp);
-					event.target.chooseToDiscard(true,'he');
-				}
-				else{
-					event.target.draw();
-					event.target.chooseToDiscard(player.maxHp-player.hp,true,'he');
-				}
-			},
-			ai:{
-				threaten:function(player,target){
-					if(target.hp==1) return 2;
-					if(target.hp==2) return 1.5;
-					return 0.5;
-				},
-				maixie:true,
-				effect:{
-					target:function(card,player,target){
-						if(target.maxHp<=3) return;
-						if(get.tag(card,'damage')){
-							if(target.hp==target.maxHp) return [0,1];
-						}
-						if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];
-					}
-				}
-			}
-		},
 		yinghun:{
 			audio:2,
 			audioname:['sunce'],
@@ -2353,6 +2288,81 @@ character.shenhua={
 			ai:{
 				threaten:function(player,target){
 					if(target.hp==1||target.num('e')>=target.hp) return 2;
+					if(target.hp==target.maxHp) return 0.5;
+					if(target.hp==2) return 1.5;
+					return 0.5;
+				},
+				maixie:true,
+				effect:{
+					target:function(card,player,target){
+						if(target.maxHp<=3) return;
+						if(get.tag(card,'damage')){
+							if(target.hp==target.maxHp) return [0,1];
+						}
+						if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];
+					}
+				}
+			}
+		},
+		gzyinghun:{
+			audio:'yinghun',
+			audioname:['sunce'],
+			trigger:{player:'phaseBegin'},
+			filter:function(event,player){
+				return player.hp<player.maxHp;
+			},
+			direct:true,
+			content:function(){
+				"step 0"
+				player.chooseTarget(get.prompt('yinghun'),function(card,player,target){
+					return player!=target;
+				}).set('ai',function(target){
+					var player=_status.event.player;
+					if(player.maxHp-player.hp==1&&target.num('he')==0){
+						return 0;
+					}
+					if(ai.get.attitude(_status.event.player,target)>0){
+						return 10+ai.get.attitude(_status.event.player,target);
+					}
+					if(player.maxHp-player.hp==1){
+						return -1;
+					}
+					return 1;
+				});
+				"step 1"
+				if(result.bool){
+					event.num=player.maxHp-player.hp;
+					player.logSkill(event.name,result.targets);
+					event.target=result.targets[0];
+					if(event.num==1){
+						event.directcontrol=true;
+					}
+					else{
+						var str1='摸'+get.cnNumber(event.num,true)+'弃一';
+						var str2='摸一弃'+get.cnNumber(event.num,true);
+						player.chooseControl(str1,str2,function(event,player){
+							return _status.event.choice;
+						}).set('choice',ai.get.attitude(player,event.target)>0?str1:str2);
+						event.str=str1;
+					}
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(event.directcontrol||result.control==event.str){
+					event.target.draw(event.num);
+					event.target.chooseToDiscard(true,'he');
+				}
+				else{
+					event.target.draw();
+					event.target.chooseToDiscard(event.num,true,'he');
+				}
+			},
+			ai:{
+				threaten:function(player,target){
+					if(target.hp==target.maxHp) return 0.5;
+					if(target.hp==1) return 2;
 					if(target.hp==2) return 1.5;
 					return 0.5;
 				},
@@ -3536,7 +3546,7 @@ character.shenhua={
 				});
 				"step 1"
 				if(result.bool){
-					player.logSkill('tianxiang',result.targets);
+					player.logSkill(event.name,result.targets);
 					trigger.untrigger();
 					trigger.player=result.targets[0];
 					trigger.player.addSkill('tianxiang2');
@@ -3628,7 +3638,7 @@ character.shenhua={
 				});
 				"step 1"
 				if(result.bool){
-					player.logSkill('xintianxiang',result.targets);
+					player.logSkill(event.name,result.targets);
 					trigger.untrigger();
 					trigger.player=result.targets[0];
 					trigger.player.addSkill('xintianxiang2');
@@ -4149,6 +4159,8 @@ character.shenhua={
 		xinshensu_info:'你可以选择一至三项：1. 跳过判定阶段和摸牌阶段；2. 跳过出牌阶段并弃置一张装备牌；3. 跳过弃牌阶段并将你的武将牌翻面。你每选择一项，视为你对一名其他角色使用一张【杀】',
 		yinghun:'英魂',
 		yinghun_info:'准备阶段开始时，若你已受伤，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值，若你装备区里牌的数量不小于你的体力值，则X改为你的体力上限）',
+		gzyinghun:'英魂',
+		gzyinghun_info:'准备阶段开始时，若你已受伤，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）',
 
         tiaoxin:'挑衅',
 		zhiji:'志继',
@@ -4235,8 +4247,6 @@ character.shenhua={
 		duanliang1:'断粮',
 		haoshi:'好施',
 		dimeng:'缔盟',
-		yinghun_true:'摸X弃1',
-		yinghun_false:'摸1弃X',
 		jiuchi:'酒池',
 		roulin:'肉林',
 		benghuai:'崩坏',

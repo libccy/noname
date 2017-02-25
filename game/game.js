@@ -10284,19 +10284,25 @@
 				reinit:function(from,to,maxHp){
 					var info1=lib.character[from];
 					var info2=lib.character[to];
-					if(this.name==from&&!this.classList.contains('unseen')){
-						this.name=to;
-						this.sex=info2[0];
-						this.node.avatar.setBackground(to,'character');
-						this.node.name.innerHTML=get.slimName(to);
-					}
-					else if(this.name2==from){
+					if(this.name2==from){
 						this.name2=to;
-						if(this.classList.contains('unseen')){
+						if(this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
 							this.sex=info2[0];
+							this.name=to;
 						}
 						this.node.avatar2.setBackground(to,'character');
 						this.node.name2.innerHTML=get.slimName(to);
+					}
+					else if(this.name==from||this.name1==from){
+						if(this.name1==from){
+							this.name1=to;
+						}
+						if(!this.classList.contains('unseen2')){
+							this.name=to;
+							this.sex=info2[0];
+						}
+						this.node.avatar.setBackground(to,'character');
+						this.node.name.innerHTML=get.slimName(to);
 					}
 					else{
 						return this;
@@ -22418,7 +22424,7 @@
 				players[i].$draw(num2);
 			}
 		},
-        finishSkill:function(i){
+        finishSkill:function(i,sub){
             var j;
             var mode=get.mode();
 			var info=lib.skill[i];
@@ -22476,7 +22482,7 @@
                 var skill=lib.skill[info.inherit];
                 for(j in skill){
                     if(info[j]==undefined){
-						if(j=='audio'){
+						if(j=='audio'&&(typeof info[j]=='number'||typeof info[j]=='boolean')){
 							info[j]=info.inherit;
 						}
 						else{
@@ -22484,11 +22490,14 @@
 						}
 					}
                 }
+                if(lib.translate[i]==undefined){
+                    lib.translate[i]=lib.translate[info.inherit];
+                }
                 if(lib.translate[i+'_info']==undefined){
                     lib.translate[i+'_info']=lib.translate[info.inherit+'_info'];
                 }
             }
-            if(info.subSkill){
+            if(info.subSkill&&!sub){
                 for(var j in info.subSkill){
                     lib.skill[i+'_'+j]=info.subSkill[j];
                     if(info.subSkill[j].name){
@@ -22503,6 +22512,7 @@
                     if(info.subSkill[j].marktext){
                         lib.translate[i+'_'+j+'_bg']=info.subSkill[j].marktext;
                     }
+					game.finishSkill(i+'_'+j,true);
                 }
             }
             if(info.marktext){
@@ -22690,9 +22700,23 @@
 				else if(typeof arguments[i]=='object'){
 					str+=get.translation(arguments[i]);
 				}
-				else if(typeof arguments[i]=='string'&&arguments[i][0]=='【'&&arguments[i][arguments[i].length-1]=='】'){
+				else if(typeof arguments[i]=='string'){
 					if(lib.config.log_highlight){
-						str+='<span class="greentext">'+get.translation(arguments[i])+'</span>';
+						if(arguments[i][0]=='【'&&arguments[i][arguments[i].length-1]=='】'){
+							str+='<span class="greentext">'+get.translation(arguments[i])+'</span>';
+						}
+						else if(arguments[i][0]=='#'){
+							var color='';
+							switch(arguments[i][1]){
+								case 'b':color='blue';break;
+								case 'y':color='yellow';break;
+								case 'g':color='green';break;
+							}
+							str+='<span class="'+color+'text">'+arguments[i].slice(2)+'</span>';
+						}
+						else{
+							str+=get.translation(arguments[i]);
+						}
 					}
 					else{
 						str+=get.translation(arguments[i]);
