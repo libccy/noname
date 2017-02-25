@@ -18747,7 +18747,7 @@
 					var info2=lib.character[content.to];
 					if(content.avatar2){
 						source.name2=content.to;
-						if(source.classList.contains('unseen')){
+						if(source.isUnseen(0)){
 							source.sex=info2[0];
 						}
 						source.node.avatar2.setBackground(content.to,'character');
@@ -22781,10 +22781,10 @@
                     if(!lib.translate[card]) return;
                 }
                 var avatar;
-                if(!player.classList.contains('unseen')){
+                if(!player.isUnseen(0)){
                     avatar=player.node.avatar.cloneNode();
                 }
-                else if(!player.classList.contains('unseen2')){
+                else if(!player.isUnseen(1)){
                     avatar=player.node.avatar2.cloneNode();
                 }
                 else{
@@ -22811,10 +22811,10 @@
                     node.source=targets;
                     var avatar;
                     player=targets;
-                    if(!player.classList.contains('unseen')){
+                    if(!player.isUnseen(0)){
                         avatar=player.node.avatar.cloneNode();
                     }
-                    else if(!player.classList.contains('unseen2')){
+                    else if(!player.isUnseen(1)){
                         avatar=player.node.avatar2.cloneNode();
                     }
                     else if(get.mode()=='guozhan'&&player.node&&player.node.name_seat){
@@ -22856,10 +22856,10 @@
                     card.init(info);
                 }
                 var avatar;
-                if(!player.classList.contains('unseen')){
+                if(!player.isUnseen(0)){
                     avatar=player.node.avatar.cloneNode();
                 }
-                else if(!player.classList.contains('unseen2')){
+                else if(!player.isUnseen(1)){
                     avatar=player.node.avatar2.cloneNode();
                 }
                 else if(get.mode()=='guozhan'&&player.node&&player.node.name_seat){
@@ -31804,10 +31804,10 @@
 					if(players.length){
 						var player=players.randomRemove();
 						var list=[];
-						if(player.name&&!player.classList.contains('unseen')){
+						if(player.name&&!player.isUnseen(0)){
 							list.push('1');
 						}
-						if(player.name2&&!player.classList.contains('unseen2')){
+						if(player.name2&&!player.isUnseen(1)){
 							list.push('2');
 						}
 						if(list.length){
@@ -33602,7 +33602,7 @@
 			},
 			avatar:function(){
 				if(!lib.config.change_skin) return;
-				if(this.parentNode.classList.contains('unseen')) return;
+				if(this.parentNode.isUnseen(0)) return;
                 if(!this.parentNode.name) return;
 				var avatar=this;
 				var player=this.parentNode;
@@ -36762,7 +36762,7 @@
                     uiintro.add(addFavourite);
                 }
 				if(!simple||get.is.phoneLayout()){
-					if((lib.config.change_skin||lib.skin)&&(!node.classList.contains('unseen')||!node.classList.contains('unseen2'))){
+					if((lib.config.change_skin||lib.skin)&&!node.isUnseen()){
 						var num=1;
 						var introadded=false;
 						var createButtons=function(num,avatar2){
@@ -36827,7 +36827,7 @@
 							img.src=lib.assetURL+'image/skin/'+(avatar2?node.name2:node.name)+'/'+num+'.jpg';
 						}
 						if(lib.config.change_skin){
-							if(!node.classList.contains('unseen')){
+							if(!node.isUnseen(0)){
 								loadImage();
 							}
 	                        else{
@@ -36836,10 +36836,10 @@
 						}
 						else{
 							setTimeout(function(){
-								if(!node.classList.contains('unseen')&&lib.skin[node.name]){
+								if(!node.isUnseen(0)&&lib.skin[node.name]){
 									createButtons(lib.skin[node.name]);
 								}
-								if(!node.classList.contains('unseen2')&&lib.skin[node.name2]){
+								if(!node.isUnseen(1)&&lib.skin[node.name2]){
 									createButtons(lib.skin[node.name2],true);
 								}
 							});
@@ -37188,7 +37188,7 @@
     						img.src=lib.assetURL+'image/skin/'+node.link+'/'+num+'.jpg';
     					}
                         if(lib.config.change_skin){
-                            if(!node.classList.contains('unseen')){
+                            if(!node.isUnseen(0)){
     							loadImage();
     						}
                             else{
