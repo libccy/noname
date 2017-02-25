@@ -6449,7 +6449,7 @@
     						numx=num(player);
     					}
     					player.directgain(get.cards(numx));
-    					if(player.singleHp===true&&lib.config.mode!='guozhan'){
+    					if(player.singleHp===true&&get.mode()!='guozhan'){
     						player.doubleDraw();
     					}
     					player=player.next;
@@ -9626,6 +9626,7 @@
 							else{
 								player.singleHp=true;
 								player.maxHp-=(num+1)/2;
+								event.changed=true;
 							}
 						}
 						else{
@@ -9641,8 +9642,7 @@
 						player.die();
 					}
 					"step 2"
-					if(!event.forced&&player.singleHp===true&&
-						!player.classList.contains('unseen')&&!player.classList.contains('unseen2')){
+					if(!event.forced&&event.changed&&!player.isUnseen(2)){
 						player.doubleDraw();
 					}
 				},
@@ -9658,6 +9658,7 @@
 							else{
 								player.singleHp=true;
 								player.maxHp+=(num-1)/2;
+								event.changed=true;
 							}
 						}
 						else{
@@ -9669,7 +9670,7 @@
 					}
 					player.update();
 					"step 1"
-					if(player.singleHp===true&&!player.classList.contains('unseen')&&!player.classList.contains('unseen2')){
+					if(!event.forced&&event.changed&&!player.isUnseen(2)){
 						player.doubleDraw();
 					}
 				},
@@ -10274,7 +10275,7 @@
 					var info2=lib.character[to];
 					if(this.name2==from){
 						this.name2=to;
-						if(this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
+						if(this.isUnseen(0)&&!this.isUnseen(1)){
 							this.sex=info2[0];
 							this.name=to;
 						}
@@ -10311,6 +10312,9 @@
 							else{
 								this.maxHp+=(num-1)/2;
 								this.singleHp=true;
+								if(!game.online){
+									this.doubleDraw();
+								}
 							}
 						}
 						else{
@@ -10333,11 +10337,6 @@
 						avatar2:this.name2==to
 					});
 					this.update();
-					if(!game.online){
-						if(this.singleHp===true&&!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
-							this.doubleDraw();
-						}
-					}
 				},
 				uninit:function(){
 					this.node.avatar.hide();

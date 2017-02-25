@@ -1870,7 +1870,7 @@ mode.guozhan={
 				}
 				game.tryResult();
 			},
-			isUnseen:function(){
+			isUnseen:function(num){
 				switch(num){
 					case 0:return this.classList.contains('unseen');
 					case 1:return this.classList.contains('unseen2');

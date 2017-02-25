@@ -6366,9 +6366,9 @@ character.swd={
                 // var target=trigger.targets[0];
                 // var names=[];
                 // var list=[];
-                // if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
-                // if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
-                // if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
+                // if(target.name&&!target.isUnseen(0)) names.add(target.name);
+                // if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
+                // if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
                 // var pss=player.get('s');
                 // for(var i=0;i<names.length;i++){
                 //     var info=lib.character[names[i]];
@@ -6491,16 +6491,14 @@ character.swd={
 			filterCard:function(card){
 				return get.type(card,'trick')=='trick';
 			},
-			// discard:false,
-			// prepare:'give',
 			filter:function(event,player){
 				return player.num('h',{type:['trick','delay']})>0;
 			},
 			filterTarget:function(card,player,target){
 				var names=[];
-				if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
-				if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
-				if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
+				if(target.name&&!target.isUnseen(0)) names.add(target.name);
+				if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
+				if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
 				var pss=player.get('s');
 				for(var i=0;i<names.length;i++){
 					var info=lib.character[names[i]];
@@ -6520,9 +6518,9 @@ character.swd={
 			createDialog:function(player,target,onlylist){
 				var names=[];
 				var list=[];
-				if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
-				if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
-				if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
+				if(target.name&&!target.isUnseen(0)) names.add(target.name);
+				if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
+				if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
 				var pss=player.get('s');
 				for(var i=0;i<names.length;i++){
 					var info=lib.character[names[i]];
@@ -6644,9 +6642,9 @@ character.swd={
 						var target=result.targets[0];
 						var names=[];
 						var list=[];
-						if(target.name&&!target.classList.contains('unseen')) names.add(target.name);
-						if(target.name1&&!target.classList.contains('unseen')) names.add(target.name1);
-						if(target.name2&&!target.classList.contains('unseen2')) names.add(target.name2);
+						if(target.name&&!target.isUnseen(0)) names.add(target.name);
+						if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
+						if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
 						var pss=player.get('s');
 						for(var i=0;i<names.length;i++){
 							var info=lib.character[names[i]];
