@@ -243,7 +243,7 @@ mode.guozhan={
 			trigger:{player:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				return event.num>0&&event.source&&(event.source.classList.contains('unseen')||event.source.classList.contains('unseen2'));
+				return event.num>0&&event.source&&event.source.isUnseen(2);
 			},
 			content:function(){
 				trigger.num--;
@@ -252,7 +252,7 @@ mode.guozhan={
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return;
-						if(!player.classList.contains('unseen')&&!player.classList.contains('unseen2')) return;
+						if(!player.isUnseen(2)) return;
 						var num=get.tag(card,'damage');
 						if(num){
 							if(num>1) return 0.5;
@@ -590,8 +590,8 @@ mode.guozhan={
 			unique:true,
 			forceunique:true,
 			filter:function(event,player){
-				if(player.name1=='gz_zoushi') return player.classList.contains('unseen');
-				return player.classList.contains('unseen2');
+				if(player.name1=='gz_zoushi') return player.isUnseen(0);
+				return player.isUnseen(1);
 			},
 			content:function(){
 				if(player.name1=='gz_zoushi') player.showCharacter(0);
@@ -610,13 +610,13 @@ mode.guozhan={
 			enable:'phaseUse',
 			filter:function(event,player){
 				return player.num('he',{type:'equip'})&&game.hasPlayer(function(current){
-					return current!=player&&!current.classList.contains('unseen')&&!current.classList.contains('unseen2');
+					return current!=player&&!current.isUnseen(2);
 				});
 			},
 			filterCard:{type:'equip'},
 			position:'he',
 			filterTarget:function(card,player,target){
-				return !target.classList.contains('unseen')&&!target.classList.contains('unseen2');
+				return !target.isUnseen(2);
 			},
 			check:function(card){
 				return 6-ai.get.value(card,_status.event.player);
@@ -767,10 +767,10 @@ mode.guozhan={
 				}
 				else{
 					if(Math.random()<0.5) choice=0;
-					if(player.classList.contains('unseen')){
+					if(player.isUnseen(0)){
 						player.chooseControl('bumingzhi','明置'+get.translation(player.name1),true).choice=choice;
 					}
-					else if(player.classList.contains('unseen2')){
+					else if(player.isUnseen(1)){
 						player.chooseControl('bumingzhi','明置'+get.translation(player.name2),true).choice=choice;
 					}
 					else{
@@ -1834,8 +1834,8 @@ mode.guozhan={
 		player:{
 			getModeState:function(){
 				return {
-					unseen:this.classList.contains('unseen'),
-					unseen2:this.classList.contains('unseen2'),
+					unseen:this.isUnseen(0),
+					unseen2:this.isUnseen(1),
 				}
 			},
 			setModeState:function(info){
@@ -1885,14 +1885,14 @@ mode.guozhan={
                 }
 				if(game.expandSkills(this.get('s')).contains(skill)) return false;
 				if(lib.skill.global.contains(skill)) return false;
-				if(this.classList.contains('unseen')){
+				if(this.isUnseen(0)){
 					var skills=game.expandSkills(lib.character[this.name1][3].slice(0));
 					if(skills.contains(skill)){
 						this.showCharacter(0);
 						return true;
 					}
 				}
-				if(this.classList.contains('unseen2')){
+				if(this.isUnseen(1)){
 					var skills=game.expandSkills(lib.character[this.name2][3].slice(0));
 					if(skills.contains(skill)){
 						this.showCharacter(1);
@@ -1923,7 +1923,7 @@ mode.guozhan={
 				}
 			},
 			hideCharacter:function(num,log){
-				if(this.classList.contains('unseen')||this.classList.contains('unseen2')){
+				if(this.isUnseen(2)){
 					return;
 				}
 				game.addVideo('hideCharacter',this,num);
@@ -1979,13 +1979,13 @@ mode.guozhan={
 				},this,'gz_shibing'+(info[0]=='male'?1:2)+info[1],num);
 			},
 			showCharacter:function(num,log){
-				if(num==0&&!this.classList.contains('unseen')){
+				if(num==0&&!this.isUnseen(0)){
 					return;
 				}
-				if(num==1&&!this.classList.contains('unseen2')){
+				if(num==1&&!this.isUnseen(1)){
 					return;
 				}
-				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')){
+				if(!this.isUnseen(2)){
 					return;
 				}
 				game.addVideo('showCharacter',this,num);
@@ -2068,7 +2068,7 @@ mode.guozhan={
 					this.addSkill(skills[i]);
 				}
 				this.checkConflict();
-				if(!this.classList.contains('unseen')&&!this.classList.contains('unseen2')&&!this._mingzhied){
+				if(!this.isUnseen(2)&&!this._mingzhied){
 					this._mingzhied=true;
 					if(this.singleHp){
 						this.doubleDraw();
