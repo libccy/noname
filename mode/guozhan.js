@@ -14,6 +14,21 @@ mode.guozhan={
 			}
 		}
 	},
+	onreinit:function(){
+		var pack=lib.characterPack.mode_guozhan;
+		for(var i in pack){
+			if(!lib.configOL.onlyguozhan){
+				if(lib.character[i.slice(3)]) continue;
+			}
+			lib.character[i]=pack[i];
+			if(!lib.character[i][4]){
+				lib.character[i][4]=[];
+			}
+			if(!lib.translate[i]){
+				lib.translate[i]=lib.translate[i.slice(3)];
+			}
+		}
+	},
 	start:function(){
 		"step 0"
 		var playback=localStorage.getItem(lib.configprefix+'playback');
@@ -232,7 +247,7 @@ mode.guozhan={
 			gz_sunce:['male','wu',4,['jiang','yingyang','hunshang']],
 			gz_chendong:['male','wu',4,['duanxie','fenming']],
 			gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
-			// gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
+			gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
 		}
 	},
 	characterIntro:{
@@ -242,6 +257,195 @@ mode.guozhan={
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
+		_zhenfazhaohuan:{
+			enable:'phaseUse',
+			usable:1,
+			getConfig:function(player){
+				var n1,n2,p1,p2;
+				var config={
+					inline:false,
+					siege:false
+				};
+				var config2={};
+				n1=player.getNext();
+				p1=player.getPrevious();
+				if(n1){
+					if(n1.isUnseen()){
+						config.inline=true;
+					}
+					n2=n1.getNext();
+					if(n2&&n2.isUnseen()){
+						config.siege=true;
+					}
+				}
+				if(p1){
+					if(p1.isUnseen()){
+						config.inline=true;
+					}
+					p2=p1.getNext();
+					if(p2&&p2.isUnseen()){
+						config.siege=true;
+					}
+				}
+				if(config.inline||config.siege){
+					var skills=player.get('s');
+					for(var i=0;i<skills.length;i++){
+						var info=get.info(skills[i]).zhenfa;
+						if(info&&config[info]){
+							config2[info]=true;
+						}
+					}
+				}
+				return config2;
+			},
+			filter:function(event,player){
+				if(game.countPlayer()<4) return false;
+				if(player.hasSkill('undist')) return false;
+				var config=lib.skill._zhenfazhaohuan.getConfig(player);
+				return config.inline||config.siege;
+			},
+			content:function(){
+				'step 0'
+				var config=lib.skill._zhenfazhaohuan.getConfig(player);
+				if(config.siege){
+					event.siege=true;
+				}
+				if(!config.inline){
+					event.goto(3);
+				}
+				event.asked=[];
+				event.current=player;
+				event.dir=true;
+				event.askPlayer=function(){
+					event.directfalse=false;
+					if(event.current&&event.current.isUnseen()&&!event.asked.contains(event.current)){
+						event.asked.push(event.current);
+						if(lib.character[event.current.name1][1]==player.identity){
+							event.current.chooseControl([
+								'明置'+get.translation(event.current.name1),
+								'明置'+get.translation(event.current.name1),
+								'不明置'
+							],function(){
+								return Math.floor(Math.random()*3);
+							}).set('prompt',get.translation(player)+'发了阵法召唤，你可以明置一个武将');
+						}
+						else{
+							event.directfalse=true;
+							if(_status.connectMode){
+								event.current.chooseControl(
+									'不明置'
+								).set('prompt',get.translation(player)+'发了阵法召唤（你与其势力不同，无法明置武将）');
+							}
+						}
+					}
+					else{
+						event.directfalse=true;
+					}
+				};
+				event.checkResult=function(result,num){
+					if(!event.directfalse&&result.control!='不明置'){
+						if(result.index==0){
+							event.current.showCharacter(0);
+						}
+						else{
+							event.current.showCharacter(1);
+						}
+						event.goto(num);
+					}
+					else if(event.dir){
+						event.dir=false;
+						event.current=player;
+						event.goto(num);
+					}
+				}
+				'step 1'
+				if(event.dir){
+					event.current=event.current.getNext();
+				}
+				else{
+					event.current=event.current.getPrevious();
+				}
+				event.askPlayer();
+				'step 2'
+				event.checkResult(result,1);
+				'step 3'
+				if(!event.siege){
+					event.finish();
+					return;
+				}
+				event.dir=true;
+				'step 4'
+				var current;
+				if(event.dir){
+					event.current=player.getNext();
+					if(event.current){
+						event.current=event.current.getNext();
+					}
+				}
+				else{
+					event.current=player.getPrevious();
+					if(event.current){
+						event.current=event.current.getPrevious();
+					}
+				}
+				event.askPlayer();
+				'step 5'
+				event.checkResult(result,4);
+			},
+			ai:{
+				order:5,
+				result:{
+					player:1
+				}
+			}
+		},
+		fengshi:{
+			zhenfa:'siege'
+		},
+		_fengshi:{
+			trigger:{player:'shaBegin'},
+			filter:function(event,player){
+				if(game.countPlayer()<4) return false;
+				return player.siege(event.target)&&game.hasPlayer(function(current){
+					return current.hasSkill('fengshi')&&current.siege(event.target);
+				})&&event.target.num('e');
+			},
+			logTarget:'target',
+			content:function(){
+				trigger.target.chooseToDiscard('e',true);
+			}
+		},
+		chuanxin:{
+			trigger:{source:'damageBefore'},
+			filter:function(event,player){
+				return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.player.identity!='qun'&&
+				!event.player.isUnseen()&&event.player.hasViceCharacter();
+			},
+			logTarget:'player',
+			content:function(){
+				'step 0'
+				trigger.untrigger();
+				trigger.finish();
+				if(trigger.player.num('e')){
+					trigger.player.chooseControl(function(event,player){
+						if(player.hp==1) return 1;
+						if(player.hp==2&&player.num('e')>=2) return 1;
+						return 0;
+					}).set('choiceList',['弃置装备区内的所有牌并失去一点体力','移除副将牌']);
+				}
+				else{
+					event._result={index:1};
+				}
+				'step 1'
+				if(result.index==1){
+					trigger.player.removeCharacter(1);
+				}
+				else{
+					trigger.player.discard(trigger.player.get('e'));
+					trigger.player.loseHp();
+				}
+			}
+		},
 		gzguixiu:{
 			init2:function(player){
 				player.logSkill('guixiu');
@@ -1799,12 +2003,15 @@ mode.guozhan={
 		tongshimingzhi:'同时明置',
 		mode_guozhan_character_config:'国战武将',
 
+		_zhenfazhaohuan:'阵法召唤',
+		_zhenfazhaohuan_info:'由拥有阵法技的角色发起，满足此阵法技条件的未确定势力角色均可按逆时针顺序一次明置其一张武将牌(响应阵法召唤)，以发挥阵法技的效果',
 		gzmingshi:'名士',
 		gzmingshi_info:'锁定技，当你受到伤害时，若伤害来源有暗置的武将牌，此伤害-1',
-		chuanxin:'锋矢',
-		chuanxin_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，可令该角色弃置装备区里的一张牌',
-		fengshi:'穿心',
-		fengshi_info:'当你于出牌阶段内使用【杀】或【决斗】对目标角色造成伤害时，若其与你势力不同且有副将，你可以防止此伤害。若如此做，该角色选择一项：1.弃置装备区里的所有牌，若如此做，其失去1点体力；2.移除副将',
+		fengshi:'锋矢',
+		_fengshi:'锋矢',
+		fengshi_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，可令该角色弃置装备区里的一张牌',
+		chuanxin:'穿心',
+		chuanxin_info:'当你于出牌阶段内使用【杀】或【决斗】对目标角色造成伤害时，若其与你势力不同且有副将，你可以防止此伤害。若如此做，该角色选择一项：1.弃置装备区里的所有牌，若如此做，其失去1点体力；2.移除副将',
 		baoling:'暴凌',
 		baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，并获得“崩坏”',
 		yingyang:'鹰扬',
@@ -2336,15 +2543,20 @@ mode.guozhan={
 					return player.sieged()&&(player.getNext()==this||player.getPrevious()==this);
 				}
 			},
-			sieged:function(){
+			sieged:function(player){
 				if(this.identity=='unknown') return false;
-				var next=this.getNext();
-				var previous=this.getPrevious();
-				if(next&&previous&&next!=previous){
-					if(next.identity=='unknown'||next.identity=='ye'||next.identity==this.identity) return false;
-					return next.identity==previous.identity;
+				if(player){
+					return player.siege(this);
 				}
-				return false;
+				else{
+					var next=this.getNext();
+					var previous=this.getPrevious();
+					if(next&&previous&&next!=previous){
+						if(next.identity=='unknown'||next.identity=='ye'||next.identity==this.identity) return false;
+						return next.identity==previous.identity;
+					}
+					return false;
+				}
 			},
 			inline:function(){
 				if(this.identity=='unknown'||this.identity=='ye'||this.hasSkill('undist')) return false;
@@ -2372,7 +2584,7 @@ mode.guozhan={
 				}
 				if(!list.length) return false;
 				for(var i=0;i<arguments.length;i++){
-					if(!list.contains(arguments[i])) return false;
+					if(!list.contains(arguments[i])&&arguments[i]!=this) return false;
 				}
 				return true;
 			},

@@ -5096,7 +5096,7 @@
 						get[i]=lib.init.eval(mode[lib.config.mode].get[i]);
 					}
 					lib.init.start=mode[lib.config.mode].start;
-					lib.init.startBefore=mode[lib.config.mode].startBefore;
+					lib.init.startBefore=lib.init.eval(mode[lib.config.mode].startBefore);
 					if(game.onwash){
 						lib.onwash.push(game.onwash);
 						delete game.onwash;
@@ -5117,6 +5117,7 @@
 						if(i=='ui') continue;
 						if(i=='get') continue;
 						if(i=='config') continue;
+						if(i=='onreinit') continue;
 						if(i=='start') continue;
 						if(i=='startBefore') continue;
 						if(lib[i]==undefined) lib[i]=(get.objtype(mode[lib.config.mode][i])=='array')?[]:{};
@@ -17264,6 +17265,14 @@
                                 lib.skill[i]=lib.init.eval(mode.skill[i]);
                             }
                         }
+						if(mode.characterPack){
+							for(var i in mode.characterPack){
+								lib.characterPack[i]=mode.characterPack[i];
+							}
+						}
+						if(mode.onreinit){
+							(lib.init.eval(mode.onreinit))();
+						}
                         state=get.parsedResult(state);
                         game.players=[];
                         game.dead=[];
@@ -20441,6 +20450,7 @@
             if(game.online){
                 var dialog=ui.create.dialog();
                 dialog.content.innerHTML=result;
+				dialog.buttons=Array.from(dialog.querySelectorAll('.button'));
                 var result2=arguments[1];
                 if(result2==true){
                     dialog.content.firstChild.innerHTML='战斗胜利';
@@ -31942,7 +31952,9 @@
                     }
                 }
                 else{
-                    game.saveConfig('reconnect_info');
+					if(typeof game.roomId!='number'){
+	                    game.saveConfig('reconnect_info');
+					}
                 }
                 game.reload();
             },

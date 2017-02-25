@@ -64,7 +64,7 @@ mode.connect={
             ui.window.appendChild(text);
             ui.iptext=text;
 
-            var button=ui.create.div('.menubutton.highlight.large','连接',connect);
+            var button=ui.create.div('.menubutton.highlight.large.pointerdiv','连接',connect);
             button.style.width='70px';
             button.style.left='calc(50% - 35px)';
             button.style.top='calc(50% + 60px)';
