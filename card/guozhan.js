@@ -386,9 +386,7 @@ card.guozhan={
 			chongzhu:true,
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
-				return (target.get('h').length||
-					target.classList.contains('unseen')||
-					target.classList.contains('unseen2'))
+				return (target.get('h').length||target.isUnseen(2));
 			},
 			content:function(){
 				"step 0"
@@ -398,8 +396,8 @@ card.guozhan={
 				player.storage.zhibi.add(target);
 				var controls=[];
 				if(target.get('h').length) controls.push('手牌');
-				if(target.classList.contains('unseen')) controls.push('主将');
-				if(target.classList.contains('unseen2')) controls.push('副将');
+				if(target.isUnseen(0)) controls.push('主将');
+				if(target.isUnseen(1)) controls.push('副将');
 				if(controls.length>1){
 					player.chooseControl(controls);
 				}
@@ -425,7 +423,7 @@ card.guozhan={
 					content=[str+'手牌',target.get('h')];
 					game.log(player,'观看了',target,'的手牌');
 				}
-				else if(target.classList.contains('unseen')){
+				else if(target.isUnseen(0)){
 					content=[str+'主将',[[target.name1],'character']];
 					game.log(player,'观看了',target,'的主将');
 				}

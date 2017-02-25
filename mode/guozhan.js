@@ -236,6 +236,9 @@ mode.guozhan={
 		}
 	},
 	skill:{
+		// baoling:{
+		// 	trigger:{player:'phaseEnd'},
+		// },
 		gzmingshi:{
 			trigger:{player:'damageBegin'},
 			forced:true,
@@ -1868,7 +1871,12 @@ mode.guozhan={
 				game.tryResult();
 			},
 			isUnseen:function(){
-				return (this.classList.contains('unseen')&&this.classList.contains('unseen2'));
+				switch(num){
+					case 0:return this.classList.contains('unseen');
+					case 1:return this.classList.contains('unseen2');
+					case 2:return this.classList.contains('unseen')||this.classList.contains('unseen2');
+					default:return this.classList.contains('unseen')&&this.classList.contains('unseen2');
+				}
 			},
 			checkShow:function(skill){
 				var sourceSkill=get.info(skill);
