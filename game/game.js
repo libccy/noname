@@ -7514,52 +7514,62 @@
                         event.list[i].lose(result[i].cards);
                         cards.push(result[i].cards[0]);
                     }
-                    event.list2=cards;
+                    event.cardlist=cards;
                     event.card1=result[0].cards[0];
-                    event.result={player:event.card1,targets:cards.slice(0)};
-                    event.list.shift();
+					event.num1=event.card1.number;
+					event.iwhile=0;
+                    event.result={
+						player:event.card1,
+						targets:event.cardlist.slice(0),
+						num1:[],
+						num2:[],
+					};
 					game.log(player,'的拼点牌为',event.card1);
                     "step 3"
-                    if(event.list.length){
-                        event.current=event.list.shift();
-                        event.current.animate('target');
+                    if(event.iwhile<targets.length){
+                        event.target=targets[event.iwhile];
+                        event.target.animate('target');
                         player.animate('target');
-                        event.card2=event.list2.shift();
-    					game.log(event.current,'的拼点牌为',event.card2);
-						player.line(event.current);
-                        player.$compare(event.card1,event.current,event.card2);
-                        game.delay(4);
-						setTimeout(function(){
-							var str;
-							if(event.card1.number>event.card2.number){
-								player.popup('胜');
-								event.current.popup('负');
-								str=get.translation(player.name)+'拼点成功';
-							}
-							else{
-								if(event.card1.number==event.card2.number){
-									player.popup('平');
-									event.current.popup('平');
-								}
-								else{
-									player.popup('负');
-									event.current.popup('胜');
-								}
-								str=get.translation(player.name)+'拼点失败';
-							}
-							game.broadcastAll(function(str){
-								var dialog=ui.create.dialog(str);
-								dialog.classList.add('center');
-								setTimeout(function(){
-									dialog.close();
-								},500);
-							},str);
-						},1500);
+                        event.card2=event.cardlist[event.iwhile];
+						event.num2=event.card2.number;
+    					game.log(event.target,'的拼点牌为',event.card2);
+						player.line(event.target);
+                        player.$compare(event.card1,event.target,event.card2);
+						event.trigger('compare');
+                        game.delay(0,1500);
                     }
                     else{
                         event.finish();
                     }
-                    "step 4"
+					"step 4"
+					event.result.num1[event.iwhile]=event.num1;
+					event.result.num2[event.iwhile]=event.num2;
+					var str;
+					if(event.num1>event.num2){
+                        str=get.translation(player.name)+'拼点成功';
+						player.popup('胜');
+						target.popup('负');
+					}
+					else{
+						str=get.translation(player.name)+'拼点失败';
+						if(event.num1==event.num2){
+							player.popup('平');
+							target.popup('平');
+						}
+						else{
+							player.popup('负');
+							target.popup('胜');
+						}
+					}
+					game.broadcastAll(function(str){
+						var dialog=ui.create.dialog(str);
+						dialog.classList.add('center');
+						setTimeout(function(){
+							dialog.close();
+						},1000);
+					},str);
+					game.delay(2);
+                    "step 5"
                     if(event.callback){
                         game.broadcastAll(function(card1,card2){
                             if(card1.clone) card1.clone.style.opacity=0.5;
@@ -7567,13 +7577,16 @@
                         },event.card1,event.card2);
                         var next=game.createEvent('compareMultiple');
                         next.player=player;
-                        next.target=event.current;
+                        next.target=event.target;
                         next.card1=event.card1;
                         next.card2=event.card2;
+                        next.num1=event.num1;
+                        next.num2=event.num2;
                         next.setContent(event.callback);
                     }
-                    "step 5"
+                    "step 6"
                     game.broadcastAll(ui.clear);
+					event.iwhile++;
                     event.goto(3);
                 },
 				chooseToCompare:function(){
@@ -7658,76 +7671,52 @@
 					player.$compare(event.card1,target,event.card2);
 					game.log(player,'的拼点牌为',event.card1);
 					game.log(target,'的拼点牌为',event.card2);
+					event.num1=event.card1.number;
+					event.num2=event.card2.number;
+					event.trigger('compare');
+					game.delay(0,1500);
+					"step 6"
 					event.result={
 						player:event.card1,
 						target:event.card2,
+						num1:event.num1,
+						num2:event.num2
 					}
-                    event.dialogid=lib.status.videoId++;
-					if(get.number(event.card1)>get.number(event.card2)){
+					var str;
+					if(event.num1>event.num2){
 						event.result.bool=true;
-						setTimeout(function(){
-                            var str=get.translation(player.name)+'拼点成功';
-                            game.broadcast(function(str,id){
-                                var dialog=ui.create.dialog(str);
-                                dialog.videoId=id;
-                                dialog.classList.add('center');
-                            },str,event.dialogid);
-							event.dialog=ui.create.dialog(str);
-							event.dialog.classList.add('center');
-							player.popup('胜');
-							target.popup('负');
-							game.resume();
-						},1500);
+                        str=get.translation(player.name)+'拼点成功';
+						player.popup('胜');
+						target.popup('负');
 					}
 					else{
 						event.result.bool=false;
-						if(get.number(event.card1)==get.number(event.card2)){
+						str=get.translation(player.name)+'拼点失败';
+						if(event.num1==event.num2){
 							event.result.tie=true;
-							setTimeout(function(){
-                                var str=get.translation(player.name)+'拼点失败';
-                                game.broadcast(function(str,id){
-                                    var dialog=ui.create.dialog(str);
-                                    dialog.videoId=id;
-                                    dialog.classList.add('center');
-                                },str,event.dialogid);
-								event.dialog=ui.create.dialog(str);
-								event.dialog.classList.add('center');
-								player.popup('平');
-								target.popup('平');
-								game.resume();
-							},1500);
+							player.popup('平');
+							target.popup('平');
 						}
 						else{
-							setTimeout(function(){
-								var str=get.translation(player.name)+'拼点失败';
-                                game.broadcast(function(str,id){
-                                    var dialog=ui.create.dialog(str);
-                                    dialog.videoId=id;
-                                    dialog.classList.add('center');
-                                },str,event.dialogid);
-								event.dialog=ui.create.dialog(str);
-								event.dialog.classList.add('center');
-								player.popup('负');
-								target.popup('胜');
-								game.resume();
-							},1500);
+							player.popup('负');
+							target.popup('胜');
 						}
 					}
-					game.pause();
-					"step 6"
+					game.broadcastAll(function(str){
+						var dialog=ui.create.dialog(str);
+						dialog.classList.add('center');
+						setTimeout(function(){
+							dialog.close();
+						},1000);
+					},str);
 					game.delay(2);
 					"step 7"
 					if(typeof event.target.ai.shown=='number'&&event.target.ai.shown<=0.85&&event.addToAI){
 						event.target.ai.shown+=0.1;
 					}
-					ui.arena.classList.remove('thrownhighlight');
-                    game.broadcast(function(id){
-                        var dialog=get.idDialog(id);
-                        if(dialog){
-                            dialog.close();
-                        }
+                    game.broadcastAll(function(){
                         ui.arena.classList.remove('thrownhighlight');
-                    },event.dialogid);
+                    });
 					game.addVideo('thrownhighlight2');
 					if(event.clear!==false){
                         game.broadcastAll(ui.clear);
@@ -7741,7 +7730,6 @@
                     else if(event.preserve=='lose'){
                         event.preserve=!event.result.bool;
                     }
-					event.dialog.close();
 				},
 				chooseButton:function(){
 					"step 0"

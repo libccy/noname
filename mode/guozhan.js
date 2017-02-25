@@ -261,7 +261,18 @@ mode.guozhan={
 			}
 		},
 		yingyang:{
-
+			trigger:{player:'compare',target:'compare'},
+			filter:function(event){
+				return !event.iwhile;
+			},
+			content:function(){
+				if(player==trigger.player){
+					trigger.num1+=3;
+				}
+				else{
+					trigger.num2+=3;
+				}
+			}
 		},
 		gzqianxi:{
 			audio:'qianxi',

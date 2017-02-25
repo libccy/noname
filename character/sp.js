@@ -1993,24 +1993,6 @@ character.sp={
 			chat:['粗鄙之语','天地不容','谄谀之臣','皓首匹夫，苍髯老贼','二臣贼子','断脊之犬','我从未见过有如此厚顔无耻之人！'],
 			callback:function(){
 				'step 0'
-				event.num1=event.card1.number;
-				event.num2=event.card2.number;
-				if(player.hasSkill('jici')&&event.num1<=player.storage.gushe){
-					player.chooseBool(get.prompt('jici'));
-				}
-				else{
-					event.goto(2);
-				}
-				'step 1'
-				if(result.bool){
-					if(event.num1<player.storage.gushe){
-						event.num1+=player.storage.gushe;
-					}
-					else{
-						player.getStat().skill.gushe--;
-					}
-				}
-				'step 2'
 				if(event.num1>event.num2){
 					target.chooseToDiscard('he','弃置一张牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
 						if(_status.event.goon) return 6-ai.get.value(card);
@@ -2030,7 +2012,7 @@ character.sp={
 						event.finish();
 					}
 				}
-				'step 3'
+				'step 1'
 				if(!result.bool){
 					player.draw();
 				}
@@ -2059,7 +2041,20 @@ character.sp={
 				}
 			}
 		},
-		jici:{},
+		jici:{
+			trigger:{player:'compare'},
+			filter:function(event,player){
+				return event.getParent().name=='gushe'&&!event.iwhile&&event.num1<=player.storage.gushe;
+			},
+			content:function(){
+				if(trigger.num1<player.storage.gushe){
+					trigger.num1+=player.storage.gushe;
+				}
+				else{
+					player.getStat().skill.gushe--;
+				}
+			}
+		},
 		juesi:{
 			enable:'phaseUse',
 			filter:function(event,player){
