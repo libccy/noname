@@ -1753,7 +1753,7 @@ character.yijiang={
 							return 9;
 						}
 					}
-					return lib.card.sha.ai.order-1;
+					return ai.get.order({name:'sha'})-1;
 				},
 				result:{
 					player:function(player){
@@ -3201,7 +3201,7 @@ character.yijiang={
 					}
 				},
 				order:function(){
-					return lib.card.sha.ai.order-0.1;
+					return ai.get.order({name:'sha'})-0.1;
 				},
 			}
 		},
@@ -7140,7 +7140,9 @@ character.yijiang={
 				}
 			},
 			ai:{
-				order:3.1,
+				order:function(){
+                    return ai.get.order({name:'sha'})+0.05;
+                },
 				result:{
 					player:function(player){
 						var target=game.findPlayer(function(current){

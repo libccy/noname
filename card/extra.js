@@ -67,7 +67,7 @@ card.extra={
 					},
 				},
 				order:function(){
-					return lib.card.sha.ai.order+0.2;
+					return ai.get.order({name:'sha'})+0.2;
 				},
 				result:{
 					target:function(player,target){

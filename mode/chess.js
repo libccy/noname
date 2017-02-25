@@ -4763,7 +4763,7 @@ mode.chess={
 			multitarget:true,
 			ai:{
 				order:function(){
-					return lib.card.sha.ai.order+0.1;
+					return ai.get.order({name:'sha'})+0.1;
 				},
 				result:{
 					target:function(player,target){

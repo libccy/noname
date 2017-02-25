@@ -116,7 +116,10 @@ card.standard={
 					useful:[5,1],
 					value:[5,1],
 				},
-				order:3,
+				order:function(){
+					if(_status.event.player.hasGlobalTag('presha')) return 10;
+					return 3;
+				},
 				result:{
 					target:function(player,target){
 						if(player.hasSkill('jiu')&&!target.num('e','baiyin')){

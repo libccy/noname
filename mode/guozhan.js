@@ -226,9 +226,9 @@ mode.guozhan={
 			gz_hetaihou:['female','qun',3,['zhendu','qiluan']],
 
 			gz_re_lidian:['male','wei',3,['xunxun','wangxi']],
-			// gz_zangba:['male','wei',4,['hengjiang']],
+			gz_zangba:['male','wei',4,['hengjiang']],
 			gz_madai:['male','shu',4,['mashu','gzqianxi']],
-			// gz_mifuren:['female','shu',3,['gzguixiu','gzcunsi']],
+			gz_mifuren:['female','shu',3,['gzguixiu','gzcunsi']],
 			gz_sunce:['male','wu',4,['jiang','yingyang','hunshang']],
 			gz_chendong:['male','wu',4,['duanxie','fenming']],
 			gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
@@ -236,10 +236,170 @@ mode.guozhan={
 		}
 	},
 	characterIntro:{
+		zangba:'其父臧戒，有二子臧艾与臧舜。年少时曾召集数人将获罪的父亲救出，此后四处流亡。后来成为陶谦麾下的骑都尉，负责募兵抵抗黄巾军。与孙观、尹礼等人拥兵驻屯于开阳，自成一股独立势力，后跟随吕布。吕布战败后，投降了曹操。后与袁绍、孙权等的战役里战功赫赫，官至镇东将军。',
+		zhangren:'刘璋的属下，以忠勇著称。刘备入蜀时，张任曾劝刘璋提防刘备，但刘璋没有听从。魏延舞剑想趁机除掉刘璋时，张任出面对舞，解救刘璋。后在刘备进攻时于落凤坡射死了庞统。',
 		jiling:'东汉末年袁术帐下将领，勇猛非常，曾奉命率军攻打小沛的刘备，在吕布辕门射戟的调停下撤兵。',
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
+		gzguixiu:{
+			init2:function(player){
+				player.logSkill('guixiu');
+				player.draw(2);
+			},
+			onremove:function(player){
+				if(player.isDamaged()){
+					player.logSkill('guixiu');
+					player.recover();
+				}
+			}
+		},
+		gzcunsi:{
+			derivation:'gzyongjue',
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.checkMainSkill('gzcunsi',false)||player.checkViceSkill('gzcunsi',false);
+			},
+			unique:true,
+			forceunique:true,
+			filterTarget:true,
+			skillAnimation:true,
+			content:function(){
+				'step 0'
+				if(player.checkMainSkill('gzcunsi',false)){
+					player.removeCharacter(0);
+				}
+				else{
+					player.removeCharacter(1);
+				}
+				'step 1'
+				target.addSkill('gzyongjue');
+				if(target!=player){
+					target.draw(2);
+				}
+			},
+			ai:{
+				order:9,
+				result:{
+					player:function(player,target){
+						var num=0;
+						if(player.isDamaged()&&target.isFriendOf(player)){
+							num++;
+							if(target.hasSkill('kanpo')) num+=0.5;
+							if(target.hasSkill('liegong')) num+=0.5;
+							if(target.hasSkill('tieji')) num+=0.5;
+							if(target.hasSkill('gzrende')) num+=1.2;
+							if(target.hasSkill('longdan')) num+=1.2;
+							if(target.hasSkill('paoxiao')) num+=1.2;
+							if(target!=player) num+=0.5;
+						}
+						return num;
+					}
+				}
+			}
+		},
+		gzyongjue:{
+			trigger:{global:'useCardAfter'},
+			filter:function(event,player){
+				if(event.gzyongjue==player){
+					for(var i=0;i<event.cards.length;i++){
+						if(get.position(event.cards[i])=='d'){
+							return true;
+						}
+					}
+				}
+				return false;
+			},
+			content:function(){
+				var cards=[];
+				for(var i=0;i<trigger.cards.length;i++){
+					if(get.position(trigger.cards[i])=='d'){
+						cards.push(trigger.cards[i]);
+					}
+				}
+				player.gain(cards,'gain2');
+			},
+			subSkill:{
+				count:{
+					trigger:{global:'useCard'},
+					filter:function(event,player){
+						return event.card.name=='sha'&&event.cards.length&&
+							event.player.isFriendOf(player)&&get.cardCount(true,event.player)==1;
+					},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:function(){
+						trigger.gzyongjue=player;
+					}
+				}
+			},
+			group:'gzyongjue_count',
+			global:'gzyongjue_ai'
+		},
+		gzyongjue_ai:{
+			ai:{
+				presha:true,
+				skillTagFilter:function(player){
+					if(!game.hasPlayer(function(current){
+						return current.isFriendOf(player)&&current.hasSkill('gzyongjue');
+					})){
+						return false;
+					}
+				}
+			}
+		},
+		hengjiang:{
+			trigger:{player:'damageEnd'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.source)<0||!event.source.needsToDiscard(2);
+			},
+			filter:function(event){
+				return event.source&&event.source.isIn()&&event.num>0;
+			},
+			logTarget:'source',
+			content:function(){
+				var source=trigger.source;
+				if(source.hasSkill('hengjiang2')){
+					source.storage.hengjiang3+=trigger.num;
+					source.updateMarks();
+				}
+				else{
+					source.storage.hengjiang2=player;
+					source.storage.hengjiang3=trigger.num;
+					source.addTempSkill('hengjiang2','phaseAfter');
+				}
+			}
+		},
+		hengjiang2:{
+			mark:'character',
+			intro:{
+				content:function(storage,player){
+					return '手牌上限-'+player.storage.hengjiang3;
+				},
+				markcount:function(storage,player){
+					return player.storage.hengjiang3;
+				}
+			},
+			mod:{
+				maxHandcard:function(player,num){
+					return num-player.storage.hengjiang3;
+				}
+			},
+			onremove:function(player){
+				delete player.storage.hengjiang2;
+				delete player.storage.hengjiang3;
+			},
+			trigger:{player:'phaseDiscardEnd'},
+			filter:function(event,player){
+				return player.storage.hengjiang2.isIn()&&(!event.cards||event.cards.length==0);
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.storage.hengjiang2.draw();
+			}
+		},
 		baoling:{
 			trigger:{player:'phaseUseEnd'},
 			init:function(player){
@@ -1647,9 +1807,11 @@ mode.guozhan={
 		hunshang:'魂殇',
 		hunshang_info:'副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值为1，则你本回合获得“英姿”和“英魂”',
 		gzguixiu:'闺秀',
-		gzguixiu_info:'当你明置此武将牌时，你可以摸两张牌；当你移除此武将牌时，你可以回复1点体力',
+		gzguixiu_info:'当你明置此武将牌时，你摸两张牌；当你失去此技能时，你回复1点体力',
 		gzcunsi:'存嗣',
-		gzcunsi_info:'出牌阶段，你可以移除此武将牌并选择一名角色，然后其获得技能“勇决”（若与你势力相同的一名角色于其回合内使用的第一张牌为【杀】，则该角色可以在此【杀】结算完成后获得之），若你没有获得“勇决”，则获得“勇决”的角色摸两张牌',
+		gzcunsi_info:'出牌阶段，你可以移除此武将牌并选择一名角色，然后其获得技能“勇决”，若你没有获得“勇决”，则获得“勇决”的角色摸两张牌',
+		gzyongjue:'勇决',
+		gzyongjue_info:'若与你势力相同的一名角色于其回合内使用的第一张牌为【杀】，则该角色可以在此【杀】结算完成后获得之',
 		hengjiang:'横江',
 		hengjiang_info:'当你受到1点伤害后，你可以令当前回合角色本回合的手牌上限-1。然后若其弃牌阶段内没有弃牌，则你摸一张牌',
 		gzqianxi:'潜袭',
@@ -1931,23 +2093,27 @@ mode.guozhan={
 				}
 				return false;
 			},
-			checkViceSkill:function(skill){
+			checkViceSkill:function(skill,disable){
 				if(game.expandSkills(lib.character[this.name2][3].slice(0)).contains(skill)){
 					return true;
 				}
 				else{
-					this.disableSkill(skill,skill);
-					this.awakenedSkills.add(skill);
+					if(disable!==false){
+						this.disableSkill(skill,skill);
+						this.awakenedSkills.add(skill);
+					}
 					return false;
 				}
 			},
-			checkMainSkill:function(skill){
+			checkMainSkill:function(skill,disable){
 				if(game.expandSkills(lib.character[this.name1][3].slice(0)).contains(skill)){
 					return true;
 				}
 				else{
-					this.disableSkill(skill,skill);
-					this.awakenedSkills.add(skill);
+					if(disable!==false){
+						this.disableSkill(skill,skill);
+						this.awakenedSkills.add(skill);
+					}
 					return false;
 				}
 			},
@@ -2075,7 +2241,7 @@ mode.guozhan={
 					this.classList.remove('unseen2');
 					break;
 					case 2:
-					if(log!==false) game.log(this,'展示了主将','#b'+get.translation(this.name1)+'、副将','#b'+get.translation(this.name2));
+					if(log!==false) game.log(this,'展示了主将','#b'+get.translation(this.name1),'、副将','#b'+get.translation(this.name2));
 					this.name=this.name1;
 					skills=lib.character[this.name][3].concat(lib.character[this.name2][3]);
 					this.sex=lib.character[this.name][0];

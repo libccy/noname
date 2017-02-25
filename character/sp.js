@@ -846,7 +846,9 @@ character.sp={
 							if(!player.storage.fanghun) return false;
 							if(!player.num('h','shan')) return false;
 						},
-						order:3.1,
+						order:function(){
+		                    return ai.get.order({name:'sha'})+0.1;
+		                },
 						useful:-1,
 						value:-1
 					}
@@ -4876,7 +4878,7 @@ character.sp={
 			viewAs:{name:'sha',nature:'thunder'},
 			ai:{
 				order:function(){
-					return lib.card.sha.ai.order+0.1;
+					return ai.get.order({name:'sha'})+0.1;
 				}
 			}
 		},

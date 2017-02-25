@@ -1037,7 +1037,9 @@ character.swd={
 			prompt:'将一张红色牌当杀使用',
 			check:function(card){return 5-ai.get.value(card)},
 			ai:{
-				order:3.1,
+				order:function(){
+                    return ai.get.order({name:'sha'})+0.1;
+                },
 				skillTagFilter:function(player,tag,arg){
 					if(arg!='use') return false;
 					if(!player.num('he',{color:'red'})) return false;
@@ -1277,7 +1279,9 @@ character.swd={
 					if(player.num('h',{type:['trick','delay']})<2) return false;
 				},
 				respondSha:true,
-				order:3.1,
+				order:function(){
+                    return ai.get.order({name:'sha'})+0.1;
+                },
 				useful:-1,
 				value:-1
 			},
@@ -2294,7 +2298,7 @@ character.swd={
 			},
 			ai:{
 				order:function(){
-					return lib.card.sha.ai.order+0.1;
+					return ai.get.order({name:'sha'})+0.1;
 				}
 			},
 			group:['linyun2']
@@ -3171,7 +3175,7 @@ character.swd={
 			},
 			ai:{
 				order:function(){
-					return lib.card.sha.ai.order+0.1;
+					return ai.get.order({name:'sha'})+0.1;
 				},
 				result:{
 					target:function(player,target){
@@ -7474,7 +7478,7 @@ character.swd={
 			ai:{
 				order:function(){
 					if(_status.event.player.num('h')==1) return 10;
-					return lib.card.sha.ai.order+0.1;
+					return ai.get.order({name:'sha'})+0.1;
 				},
 				result:{
 					target:function(player,target){
@@ -8703,7 +8707,7 @@ character.swd={
 			},
 			ai:{
 				order:function(){
-					return lib.card.sha.ai.order+0.1;
+					return ai.get.order({name:'sha'})+0.1;
 				},
 				effect:{
 					target:function(card,player){

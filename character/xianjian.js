@@ -141,7 +141,9 @@ character.xianjian={
 			},
 			group:'yanzhan2',
 			ai:{
-				order:3.15
+				order:function(){
+                    return ai.get.order({name:'sha'})+0.15;
+                },
 			},
 		},
 		yanzhan2:{
@@ -1238,7 +1240,7 @@ character.xianjian={
 			},
 			ai:{
 				order:function(){
-					return lib.card.sha.ai.order+0.1;
+					return ai.get.order({name:'sha'})+0.1;
 				},
 				effect:{
 					player:function(card,player){

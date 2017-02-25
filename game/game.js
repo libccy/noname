@@ -6634,7 +6634,7 @@
     					var hidden=player.hiddenSkills.slice(0);
     					game.expandSkills(hidden);
     					if(hidden.contains(event.skill)){
-							if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
+							if(!info.silent&&player.hasGlobalTag('nomingzhi')){
 								event.finish();
 							}
                             else if(!info.direct){
@@ -8880,9 +8880,6 @@
 						event.finish();
 					}
 					"step 6"
-					if(event.card.name!='wuxie'){
-                        game.broadcastAll(ui.clear);
-                    }
                     event._oncancel();
 				},
 				useSkill:function(){
@@ -13353,7 +13350,7 @@
 					return (range);
 				},
                 getHandcardLimit:function(){
-                    return game.checkMod(this,this.hp,'maxHandcard',this.get('s'))
+                    return Math.max(0,game.checkMod(this,this.hp,'maxHandcard',this.get('s')));
                 },
                 getEnemies:function(func){
                     var player=this;
@@ -13407,13 +13404,13 @@
 					return !this.isFriendOf.apply(this,arguments);
 				},
 				isFriendOf:function(player){
-					if(typeof this.side=='boolean'&&typeof player.side=='boolean'){
-						return this.side==player.side;
-					}
-					if(lib.config.mode=='guozhan'){
+					if(get.mode()=='guozhan'){
 						if(this.identity=='unknown'||this.identity=='ye') return false;
 						if(player.identity=='unknown'||player.identity=='ye') return false;
 						return this.identity==player.identity;
+					}
+					if(typeof this.side=='boolean'&&typeof player.side=='boolean'){
+						return this.side==player.side;
 					}
 					return this==player;
 				},
@@ -13579,6 +13576,24 @@
                     }
                     return false;
                 },
+				hasGlobalTag:function(tag,arg){
+					var skills=lib.skill.global.slice(0);
+					game.expandSkills(skills);
+					for(var i=0;i<skills.length;i++){
+						var info=lib.skill[skills[i]];
+						if(info&&info.ai){
+							if(info.ai.skillTagFilter&&
+                                info.ai.skillTagFilter(this,tag,arg)===false) continue;
+                            if(typeof info.ai[tag]=='string'){
+                                if(info.ai[tag]==arg) return true;
+                            }
+                            else if(info.ai[tag]){
+                                return true;
+                            }
+						}
+					}
+					return false;
+				},
 				hasSkillTag:function(tag,hidden,arg,globalskill){
 					var skills=this.get('s',hidden);
 					if(globalskill){
@@ -16477,6 +16492,21 @@
 					player.ai.tempIgnore=[];
 					player.stat.push({card:{},skill:{}});
 				},
+			},
+			_usecard:{
+                trigger:{global:'useCardAfter'},
+                forced:true,
+                popup:false,
+                priority:-100,
+				filter:function(event){
+					return !event._cleared&&event.card.name!='wuxie';
+				},
+				content:function(){
+					game.broadcastAll(function(){
+						ui.clear();
+					});
+					event._cleared=true;
+				}
 			},
             _discard:{
                 trigger:{global:'discardAfter'},
@@ -21359,7 +21389,7 @@
 				}
 				else{
 					var skills2;
-					if(get.mode()=='guozhan'&&player.hasSkillTag('nomingzhi',false,null,true)){
+					if(get.mode()=='guozhan'&&player.hasGlobalTag('nomingzhi')){
 						skills2=player.get('s',false,true,false);
 					}
 					else{
@@ -25393,6 +25423,10 @@
 							if(info[i][4]&&info[i][4].contains('unseen')) continue;
 							list.push(i);
 							for(var j=0;j<info[i][3].length;j++){
+								if(!lib.skill[info[i][3][j]]){
+									console.log(info[i][3][j]);
+									continue;
+								}
 								if(lib.skill[info[i][3][j]].alter){
 									alterableSkills.add(info[i][3][j]);
 									alterableCharacters.add(i);

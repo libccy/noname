@@ -1368,7 +1368,9 @@ card.gujian={
 			prompt:'将一张手牌当杀使用',
 			check:function(card){return 5-ai.get.value(card)},
 			ai:{
-				order:3.1,
+				order:function(){
+                    return ai.get.order({name:'sha'})+0.1;
+                },
                 skillTagFilter:function(player,tag,arg){
 					if(arg!='use') return false;
 					if(!player.num('h')) return false;

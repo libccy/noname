@@ -708,7 +708,7 @@ character.standard={
 					}
 				},
 				order:function(){
-					return lib.card.sha.ai.order-0.1;
+					return ai.get.order({name:'sha'})-0.1;
 				},
 			}
 		},
@@ -993,7 +993,9 @@ character.standard={
 						skillTagFilter:function(player){
 							if(!player.num('h','shan')) return false;
 						},
-						order:3.1,
+						order:function(){
+		                    return ai.get.order({name:'sha'})+0.1;
+		                },
 						useful:-1,
 						value:-1
 					}

@@ -402,7 +402,9 @@ card.swd={
 				result:{
 					target:1
 				},
-				order:3.1
+				order:function(){
+                    return ai.get.order({name:'sha'})+0.1;
+                },
 			}
 		},
 		xuejibingbao:{
@@ -1568,7 +1570,7 @@ card.swd={
 					},
 				},
 				order:function(){
-					return lib.card.sha.ai.order+0.2;
+					return ai.get.order({name:'sha'})+0.2;
 				},
 				result:{
 					target:function(player,target){
@@ -2253,7 +2255,9 @@ card.swd={
 				}
 			},
 			ai:{
-				order:3.11,
+				order:function(){
+                    return ai.get.order({name:'sha'})+0.11;
+                },
 				result:{
 					target:function(player,target){
 						return ai.get.effect(target,{name:'sha'},player,target);

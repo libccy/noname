@@ -3098,7 +3098,7 @@ character.shenhua={
 							return 9;
 						}
 					}
-					return lib.card.sha.ai.order-1;
+					return ai.get.order({name:'sha'})-1;
 				},
 				result:{
 					player:function(player){
