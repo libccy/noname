@@ -231,14 +231,32 @@ mode.guozhan={
 			// gz_mifuren:['female','shu',3,['gzguixiu','gzcunsi']],
 			gz_sunce:['male','wu',4,['jiang','yingyang','hunshang']],
 			gz_chendong:['male','wu',4,['duanxie','fenming']],
-			// gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
+			gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
 			// gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
 		}
 	},
 	skill:{
-		// baoling:{
-		// 	trigger:{player:'phaseEnd'},
-		// },
+		baoling:{
+			trigger:{player:'phaseUseEnd'},
+			init:function(player){
+				player.checkMainSkill('baoling');
+			},
+			forced:true,
+			filter:function(event,player){
+				return player.hasViceCharacter();
+			},
+			content:function(){
+				'step 0'
+				player.removeCharacter(1);
+				'step 1'
+				player.awakenSkill('baoling');
+				player.gainMaxHp(3,true);
+				'step 2'
+				player.recover(3);
+				player.addSkill('benghuai');
+			},
+			derivation:'benghuai'
+		},
 		gzmingshi:{
 			trigger:{player:'damageBegin'},
 			forced:true,
@@ -264,12 +282,8 @@ mode.guozhan={
 		},
 		hunshang:{
 			init:function(player){
-				if(player.hasViceSkill('hunshang')){
+				if(player.checkViceSkill('hunshang')){
 					player.removeMaxHp();
-				}
-				else{
-					player.disableSkill('hunshang',['hunshang','hunshang_yingzi','hunshang_yinghun']);
-					player.awakenedSkills.add('hunshang');
 				}
 			},
 			group:['hunshang_yingzi','hunshang_yinghun'],
@@ -393,28 +407,48 @@ mode.guozhan={
 			forced:true,
 			silent:true,
 			filter:function(event,player){
-				return event.source&&event.source.isIn()&&event.source!=player;
+				return event.source&&event.source.isIn()&&event.source!=player&&
+				(event.source.hasMainCharacter()||event.source.hasViceCharacter());
 			},
 			content:function(){
 				'step 0'
-				player.chooseControl('主将','副将',function(){
-					return Math.random()<0.5?'主将':'副将';
-				}).set('prompt','令'+get.translation(trigger.source)+'失去一张武将牌的所有技能');
+				if(!trigger.source.hasViceCharacter()){
+					event._result={control:'主将'}
+				}
+				else if(!trigger.source.hasMainCharacter()){
+					event._result={control:'副将'}
+				}
+				else{
+					player.chooseControl('主将','副将',function(){
+						return Math.random()<0.5?'主将':'副将';
+					}).set('prompt','令'+get.translation(trigger.source)+'失去一张武将牌的所有技能');
+				}
 				'step 1'
 				var skills;
 				if(result.control=='主将'){
 					trigger.source.showCharacter(0);
 					trigger.source.node.avatar.classList.add('disabled');
-					skills=lib.character[trigger.source.name];
+					skills=lib.character[trigger.source.name][3];
 					game.log(trigger.source,'失去了主将技能');
 				}
 				else{
 					trigger.source.showCharacter(1);
 					trigger.source.node.avatar2.classList.add('disabled');
-					skills=lib.character[trigger.source.name2];
+					skills=lib.character[trigger.source.name2][3];
 					game.log(trigger.source,'失去了副将技能');
 				}
-				trigger.source.disableSkill('gzduanchang',skills);
+				var list=[];
+				for(var i=0;i<skills.length;i++){
+					list.add(skills[i]);
+					var info=lib.skill[skills[i]];
+					if(typeof info.derivation=='string'){
+						list.add(info.derivation);
+					}
+					else if(Array.isArray(info.derivation)){
+						list.addArray(info.derivation);
+					}
+				}
+				trigger.source.disableSkill('gzduanchang',list);
 			},
 			logTarget:'source',
 			ai:{
@@ -1870,14 +1904,6 @@ mode.guozhan={
 				}
 				game.tryResult();
 			},
-			isUnseen:function(num){
-				switch(num){
-					case 0:return this.classList.contains('unseen');
-					case 1:return this.classList.contains('unseen2');
-					case 2:return this.classList.contains('unseen')||this.classList.contains('unseen2');
-					default:return this.classList.contains('unseen')&&this.classList.contains('unseen2');
-				}
-			},
 			checkShow:function(skill){
 				var sourceSkill=get.info(skill);
                 if(sourceSkill&&sourceSkill.sourceSkill){
@@ -1901,11 +1927,25 @@ mode.guozhan={
 				}
 				return false;
 			},
-			hasViceSkill:function(skill){
-				return game.expandSkills(lib.character[this.name2][3].slice(0)).contains(skill);
+			checkViceSkill:function(skill){
+				if(game.expandSkills(lib.character[this.name2][3].slice(0)).contains(skill)){
+					return true;
+				}
+				else{
+					this.disableSkill(skill,skill);
+					this.awakenedSkills.add(skill);
+					return false;
+				}
 			},
-			hasMainSkill:function(skill){
-				return game.expandSkills(lib.character[this.name1][3].slice(0)).contains(skill);
+			checkMainSkill:function(skill){
+				if(game.expandSkills(lib.character[this.name1][3].slice(0)).contains(skill)){
+					return true;
+				}
+				else{
+					this.disableSkill(skill,skill);
+					this.awakenedSkills.add(skill);
+					return false;
+				}
 			},
 			removeMaxHp:function(){
 				if(game.online) return;
@@ -1977,6 +2017,12 @@ mode.guozhan={
 						player.showCharacter(num,false);
 					}
 				},this,'gz_shibing'+(info[0]=='male'?1:2)+info[1],num);
+			},
+			hasMainCharacter:function(){
+				return this.name1.indexOf('gz_shibing')!=0;
+			},
+			hasViceCharacter:function(){
+				return this.name2.indexOf('gz_shibing')!=0;
 			},
 			showCharacter:function(num,log){
 				if(num==0&&!this.isUnseen(0)){

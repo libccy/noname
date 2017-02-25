@@ -12974,6 +12974,10 @@
                             this.disabledSkills[skills]=[];
                         }
                         this.disabledSkills[skills].add(skill);
+						var group=lib.skill[skills].group;
+						if(typeof group=='string'||Array.isArray(group)){
+							this.disableSkill(skill,group);
+						}
                     }
                     else if(Array.isArray(skills)){
                         for(var i=0;i<skills.length;i++){
@@ -13494,6 +13498,14 @@
 				},
 				isIn:function(){
 					return this.classList.contains('dead')==false&&this.classList.contains('out')==false&&!this.removed;
+				},
+				isUnseen:function(num){
+					switch(num){
+						case 0:return this.classList.contains('unseen');
+						case 1:return this.classList.contains('unseen2');
+						case 2:return this.classList.contains('unseen')||this.classList.contains('unseen2');
+						default:return this.classList.contains('unseen')&&this.classList.contains('unseen2');
+					}
 				},
 				isUnderControl:function(self,me){
                     me=me||game.me;
@@ -36003,8 +36015,8 @@
 				if(card){
 					card=get.copy(card);
 					card.cards=ui.selected.cards.slice(0);
+					return card;
 				}
-				return card;
 			}
             if(_status.event._get_card){
                 return _status.event._get_card;
@@ -36624,7 +36636,8 @@
                 }
                 if(node.awakenedSkills.length){
 					for(var i=0;i<node.awakenedSkills.length;i++){
-						if(node.disabledSkills[node.awakenedSkills[i]]){
+						if(node.disabledSkills[node.awakenedSkills[i]]&&
+							node.disabledSkills[node.awakenedSkills[i]].length==1){
 							skills.push(node.awakenedSkills[i]);
 						}
 					}

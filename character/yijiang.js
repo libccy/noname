@@ -7766,7 +7766,7 @@ character.yijiang={
 		yaowu:'耀武',
 		qianxi:'潜袭',
 		qianxi2:'潜袭',
-		qianxi2_bg:'潜袭',
+		qianxi2_bg:'袭',
 		fuli:'伏枥',
 		jiefan:'解烦',
 		juece:'绝策',
