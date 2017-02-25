@@ -11724,12 +11724,6 @@
 					else if(next.card==undefined){
 						if(next.cards){
 							next.card=next.cards[0];
-                            if(!next.skill){
-                                var info=get.info(next.card);
-                                if(info.autoViewAs){
-                                    next.card={name:info.autoViewAs,suit:next.card.suit,number:next.card.number};
-                                }
-                            }
 						}
 					}
 					if(!next.targets){
@@ -11737,18 +11731,23 @@
 					}
 					if(next.card){
 						var info=get.info(next.card);
-						if(info){
-							if(info.changeTarget){
-		                        info.changeTarget(next.player,next.targets);
-		                    }
-							if(info.singleCard){
-								next._targets=next.targets.slice(0);
-								next.target=next.targets[0];
-								next.addedTargets=next.targets.splice(1);
-								if(next.addedTargets.length){
-									next.addedTarget=next.addedTargets[0];
-								}
+						if(info.autoViewAs){
+							next.card={name:info.autoViewAs};
+							info=get.info(next.card);
+						}
+						if(info.changeTarget){
+	                        info.changeTarget(next.player,next.targets);
+	                    }
+						if(info.singleCard){
+							next._targets=next.targets.slice(0);
+							next.target=next.targets[0];
+							next.addedTargets=next.targets.splice(1);
+							if(next.addedTargets.length){
+								next.addedTarget=next.addedTargets[0];
 							}
+						}
+						if(get.itemtype(next.card)!='card'&&next.cards.length){
+							next.card.cards=next.cards.slice(0);
 						}
 					}
 					for(var i=0;i<next.targets.length;i++){
@@ -35836,6 +35835,9 @@
 				}
 				return suit;
 			}
+			else if(get.itemtype(card.cards)=='cards'){
+				return get.suit(card.cards);
+			}
 			else{
 				if(get.owner(card)){
 					return game.checkMod(card,card.suit,'suit',get.owner(card).get('s'));
@@ -35850,6 +35852,9 @@
 					if(get.color(card[i])!=color) return 'none';
 				}
 				return color;
+			}
+			else if(get.itemtype(card.cards)=='cards'){
+				return get.color(card.cards);
 			}
 			else{
 				if(get.suit(card)=='spade'||get.suit(card)=='club') return 'black';
@@ -35994,7 +35999,11 @@
 		card:function(original){
 			if(_status.event.skill){
 				var card=get.info(_status.event.skill).viewAs;
-				if(card) return card;
+				if(card){
+					card=get.copy(card);
+					card.cards=ui.selected.cards.slice(0);
+				}
+				return card;
 			}
             if(_status.event._get_card){
                 return _status.event._get_card;
@@ -36004,7 +36013,7 @@
             if(card){
                 var info=get.info(card);
                 if(info.autoViewAs){
-                    card={name:info.autoViewAs,suit:card.suit,number:card.number};
+                    card={name:info.autoViewAs,cards:ui.selected.cards.slice(0)};
                 }
             }
 			return card;
