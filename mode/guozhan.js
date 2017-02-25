@@ -319,6 +319,7 @@ mode.guozhan={
 				event.askPlayer=function(){
 					event.directfalse=false;
 					if(event.current&&event.current.isUnseen()&&!event.asked.contains(event.current)){
+						player.line(event.current,'green');
 						event.asked.push(event.current);
 						if(lib.character[event.current.name1][1]==player.identity){
 							event.current.chooseControl([

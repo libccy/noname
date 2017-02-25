@@ -3875,6 +3875,7 @@ card.swd={
 			position:'he',
 			discard:false,
 			losetrigger:false,
+			longprompt:true,
 			prompt:function(event){
 				var lingjians=[],types=[];
 				var hs=event.player.get('he');
@@ -3887,23 +3888,23 @@ card.swd={
 				}
 				var str='';
 				for(var i=0;i<lingjians.length;i++){
-						var color;
-						var type=get.type(lingjians[i]);
-						if(type=='jiqi'){
-							color='rgba(233, 131, 255,0.2);';
-						}
-						else{
-							color='rgba(117,186,255,0.2);';
-						}
-						str+='<div style="text-align:left;line-height:18px;border-radius:4px;margin-top:7px;margin-bottom:10px;position:relative;width:100%">';
-						str+='<div class="shadowed" style="position:absolute;left0;top:0;padding:5px;border-radius:4px;background:'+color+'">'+lib.translate[lingjians[i]]+'</div>';
-						for(var j=0;j<types.length;j++){
-							str+='<div class="shadowed" style="position:relative;left:85px;width:calc(100% - 95px);height:100%;padding:5px;border-radius: 4px;margin-bottom:10px">'+
-							(type!='jiqi'?(lib.translate[types[j]]+'：'):'')+
-							lib.translate[lingjians[i]+'_'+types[j]+'_info']+'</div>';
-							if(type=='jiqi') break;
-						}
-						str+='</div>';
+					var color;
+					var type=get.type(lingjians[i]);
+					if(type=='jiqi'){
+						color='rgba(233, 131, 255,0.2);';
+					}
+					else{
+						color='rgba(117,186,255,0.2);';
+					}
+					str+='<div style="text-align:left;line-height:18px;border-radius:4px;margin-top:7px;margin-bottom:10px;position:relative;width:100%">';
+					str+='<div class="shadowed" style="position:absolute;left0;top:0;padding:5px;border-radius:4px;background:'+color+'">'+lib.translate[lingjians[i]]+'</div>';
+					for(var j=0;j<types.length;j++){
+						str+='<div class="shadowed" style="position:relative;left:85px;width:calc(100% - 95px);height:100%;padding:5px;border-radius: 4px;margin-bottom:10px">'+
+						(type!='jiqi'?(lib.translate[types[j]]+'：'):'')+
+						lib.translate[lingjians[i]+'_'+types[j]+'_info']+'</div>';
+						if(type=='jiqi') break;
+					}
+					str+='</div>';
 				}
 				return str;
 			},

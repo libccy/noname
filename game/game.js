@@ -8090,6 +8090,7 @@
         						item.firstChild.listen(ui.click.dialogcontrol);
         						item.firstChild.link=event.controls[i];
                             }
+							event.dialog.forcebutton=true;
                             event.dialog.open();
                         }
 						else{
@@ -8109,7 +8110,9 @@
     							event.dialog.open();
     						}
 							else if(event.choiceList){
-								event.dialog=ui.create.dialog(event.prompt||'选择一项');
+								event.dialog=ui.create.dialog(event.prompt||'选择一项','hidden');
+								event.dialog.forcebutton=true;
+								event.dialog.open();
 								for(var i=0;i<event.choiceList.length;i++){
 									event.dialog.add('<div class="popup text" style="width:calc(100% - 10px);display:inline-block">选项'+
 									get.cnNumber(i+1,true)+'：'+event.choiceList[i]+'</div>');
@@ -20450,7 +20453,7 @@
             if(game.online){
                 var dialog=ui.create.dialog();
                 dialog.content.innerHTML=result;
-				dialog.buttons=Array.from(dialog.querySelectorAll('.button'));
+				dialog.forcebutton=true;
                 var result2=arguments[1];
                 if(result2==true){
                     dialog.content.firstChild.innerHTML='战斗胜利';
@@ -20514,6 +20517,7 @@
 			if(result===false) result='战斗失败';
 			if(result==undefined) result='战斗结束';
 			dialog=ui.create.dialog(result);
+			dialog.forcebutton=true;
 			if(game.addOverDialog){
 				game.addOverDialog(dialog,result);
 			}
@@ -33926,6 +33930,10 @@
 							str2=info.prompt;
 						}
 						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%;text-align:center">'+str2+'</div></div>');
+						if(info.longprompt){
+							event.skillDialog.forcebutton=true;
+							ui.update();
+						}
 					}
 					else if(info.promptfunc){
 						event.skillDialog=ui.create.dialog(str,'<div><div style="width:100%">'+info.promptfunc(event,event.player)+'</div></div>');
@@ -34947,7 +34955,7 @@
 					}
 				}
 				else{
-					if((!ui.dialog.buttons||!ui.dialog.buttons.length)&&ui.dialog.classList.contains('fullheight')==false){
+					if((!ui.dialog.buttons||!ui.dialog.buttons.length)&&!ui.dialog.forcebutton&&ui.dialog.classList.contains('fullheight')==false){
 						ui.dialog.classList.add('nobutton');
 						if(ui.dialog.content.offsetHeight<240){
 							if(!ui.dialog._heightset){
