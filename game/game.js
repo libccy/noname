@@ -35052,6 +35052,10 @@
 					}
 				}
 			}
+			if(name.indexOf('gz_')==0){
+				name=name.slice(3);
+				if(lib.characterIntro[name]) return lib.characterIntro[name];
+			}
 			if(name.indexOf('_')!=-1){
 				name=name.slice(name.indexOf('_')+1);
 			}

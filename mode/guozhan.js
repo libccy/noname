@@ -235,6 +235,10 @@ mode.guozhan={
 			// gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
 		}
 	},
+	characterIntro:{
+		jiling:'东汉末年袁术帐下将领，勇猛非常，曾奉命率军攻打小沛的刘备，在吕布辕门射戟的调停下撤兵。',
+		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
+	},
 	skill:{
 		baoling:{
 			trigger:{player:'phaseUseEnd'},
