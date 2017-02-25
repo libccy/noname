@@ -1769,7 +1769,7 @@ mode.guozhan={
 						event.dialogxx=ui.create.characterDialog(function(i){
 							if(i.indexOf('gz_shibing')==0) return true;
 							if(!lib.characterPack.mode_guozhan[i]) return true;
-						},'expandall');
+						},get.config('onlyguozhanexpand')?'expandall':undefined);
 					}
 					else{
 						event.dialogxx=ui.create.characterDialog();

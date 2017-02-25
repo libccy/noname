@@ -206,7 +206,7 @@ mode.boss={
 			game.saveConfig('continue_name_boss');
 		}
 		for(var i=0;i<result.links.length;i++){
-			var player=ui.create.player(ui.arena);
+			var player=ui.create.player();
 			player.getId();
 			player.init(result.links[i]).animate('start');
 			player.setIdentity('cai');
@@ -219,6 +219,7 @@ mode.boss={
 			else{
 				player.dataset.position=i+1;
 			}
+			ui.arena.appendChild(player);
 		}
 		if(result.boss){
 			game.players.unshift(boss);

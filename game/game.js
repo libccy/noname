@@ -50,7 +50,8 @@
                 return lib.config.favouriteCharacter.contains(name)?capt:null;
             },
             '最近':function(name,capt){
-                return lib.config.recentCharacter.contains(name)?capt:null;
+				var list=get.config('recentCharacter')||[];
+                return list.contains(name)?capt:null;
             }
         },
 		onDB:function(func){
@@ -2797,6 +2798,12 @@
 								delete ui.cheat2;
 							}
 						}
+					},
+					onlyguozhanexpand:{
+						name:'默认展开自由选将',
+						init:false,
+						restart:true,
+						intro:'开启后自由选将对话框将默认显示全部武将'
 					},
 					change_identity:{
 						name:'自由选择座位',
@@ -20375,17 +20382,18 @@
             }
         },
         addRecentCharacter:function(){
+			var list=get.config('recentCharacter')||[];
             for(var i=0;i<arguments.length;i++){
                 if(lib.character[arguments[i]]){
-                    lib.config.recentCharacter.remove(arguments[i]);
-                    lib.config.recentCharacter.unshift(arguments[i]);
+                    list.remove(arguments[i]);
+                    list.unshift(arguments[i]);
                 }
             }
             var num=parseInt(lib.config.recent_character_number);
-            if(lib.config.recentCharacter.length>num){
-                lib.config.recentCharacter.splice(num);
+            if(list.length>num){
+                list.splice(num);
             }
-            game.saveConfig('recentCharacter',lib.config.recentCharacter);
+            game.saveConfig('recentCharacter',list,true);
         },
 		createCard:function(name,suit,number,nature){
 			if(typeof name=='object'){
@@ -30015,7 +30023,7 @@
                     var translate;
 					var pack=null;
                     if(packname=='最近'){
-                        pack=lib.config.recentCharacter;
+                        pack=get.config('recentCharacter')||[];
                     }
                     else if(packname=='收藏'){
                         pack=lib.config.favouriteCharacter;
@@ -30027,7 +30035,8 @@
 				dialog.add([list,'character']);
                 var bool=true;
 				var node;
-                if(lib.config.recentCharacter.length){
+				var recent=get.config('recentCharacter');
+                if(recent&&recent.length){
                     node=createNode('最近');
                     if(lib.config.character_dialog_tool=='最近'){
                         clickCapt.call(node);

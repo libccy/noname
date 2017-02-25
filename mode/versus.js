@@ -1125,6 +1125,7 @@ mode.versus={
 					});
 				}
 				"step 1"
+				game.addRecentCharacter.apply(this,result.friend);
 				event.friendlist=result.friend;
 				event.enemylist=result.enemy;
 				"step 2"
