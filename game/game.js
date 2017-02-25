@@ -10745,6 +10745,7 @@
 					}
 				},
                 getNext:function(){
+					if(this.hasSkill('undist')) return null;
                     var target=this;
                     for(var i=0;i<game.players.length-1;i++){
                         target=target.next;
@@ -10755,6 +10756,7 @@
                     return null;
                 },
                 getPrevious:function(){
+					if(this.hasSkill('undist')) return null;
                     var target=this;
                     for(var i=0;i<game.players.length-1;i++){
                         target=target.previous;

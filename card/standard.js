@@ -1007,6 +1007,7 @@ card.standard={
 				},
 				tag:{
 					loseCard:1,
+					discard:1
 				}
 			}
 		},

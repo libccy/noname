@@ -129,7 +129,7 @@ card.zhenfa={
 			chongzhu:true,
 			enable:true,
 			filterTarget:function(card,player,target){
-				return target.sieging();
+				return target.siege();
 			},
 			selectTarget:-1,
 			content:function(){

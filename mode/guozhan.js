@@ -2095,37 +2095,55 @@ mode.guozhan={
 				return false;
 			},
 			siege:function(player){
-				if(game.players.length==2) return false;
-				if(this.identity=='unknown'||this.identity=='ye') return false;
-				if(player.identity=='unknown') return false;
-				if(player.identity==this.identity) return false;
-				if(player==this.next&&this.next.next.identity==this.identity) return true;
-				if(player==this.previous&&this.previous.previous.identity==this.identity) return true;
-				return false;
+				if(this.identity=='unknown'||this.identity=='ye'||this.hasSkill('undist')) return false;
+				if(!player){
+					var next=this.getNext();
+					if(next&&next.sieged()) return true;
+					var previous=this.getPrevious();
+					if(previous&&previous.sieged()) return true;
+					return false;
+				}
+				else{
+					return player.sieged()&&(player.getNext()==this||player.getPrevious()==this);
+				}
 			},
 			sieged:function(){
-				return this.next.siege(this)||this.previous.siege(this);
-			},
-			sieging:function(){
-				return this.siege(this.next)||this.siege(this.previous);
+				if(this.identity=='unknown') return false;
+				var next=this.getNext();
+				var previous=this.getPrevious();
+				if(next&&previous&&next!=previous){
+					if(next.identity=='unknown'||next.identity=='ye'||next.identity==this.identity) return false;
+					return next.identity==previous.identity;
+				}
+				return false;
 			},
 			inline:function(){
-				if(this.identity=='unknown'||this.identity=='ye') return false;
-				if(this.next.identity!=this.identity&&this.previous.identity!=this.identity) return false;
-				var pointer;
+				if(this.identity=='unknown'||this.identity=='ye'||this.hasSkill('undist')) return false;
+				var next=this,previous=this;
+				var list=[];
+				for(var i=0;next||previous;i++){
+					if(next){
+						next=next.getNext();
+						if(next.identity!=this.identity||next==this){
+							next=null;
+						}
+						else{
+							list.add(next);
+						}
+					}
+					if(previous){
+						previous=previous.getPrevious();
+						if(previous.identity!=this.identity||previous==this){
+							previous=null;
+						}
+						else{
+							list.add(previous);
+						}
+					}
+				}
+				if(!list.length) return false;
 				for(var i=0;i<arguments.length;i++){
-					if(arguments[i].identity!=this.identity) return false;
-					pointer=this.next;
-					while(pointer!=arguments[i]&&pointer.identity==this.identity){
-						pointer=pointer.next;
-					}
-					if(pointer==arguments[i]) continue;
-					pointer=this.previous;
-					while(pointer!=arguments[i]&&pointer.identity==this.identity){
-						pointer=pointer.previous;
-					}
-					if(pointer==arguments[i]) continue;
-					return false;
+					if(!list.contains(arguments[i])) return false;
 				}
 				return true;
 			},

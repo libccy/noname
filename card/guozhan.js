@@ -291,6 +291,7 @@ card.guozhan={
 			filterTarget:function(card,player,target){
 				if(get.mode()=='guozhan'){
 					var next=player.getNext();
+					if(!next) return false;
 					return target==next||target.inline(next);
 				}
 				if(player==target) return false;
@@ -492,8 +493,11 @@ card.guozhan={
 						return 1;
 					},
 				},
+				tag:{
+					loseCard:1,
+					discard:1
+				}
 			},
-			// mode:['guozhan'],
 		},
 		wuliu:{
 			fullskin:true,

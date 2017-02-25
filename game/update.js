@@ -1,9 +1,9 @@
 window.noname_update={
-    version:'1.9.9.7',
-    update:'1.9.9.6',
+    version:'1.9.9.8',
+    // update:'1.9.9.6',
     changeLog:[
         'bug修复',
-        // '国战武将',
+        '国战武将',
     ],
     files:[
         'game/game.js',

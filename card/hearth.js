@@ -636,8 +636,6 @@ card.hearth={
 					},
 				},
 				tag:{
-					respond:1,
-					respondSha:1,
 					damage:1,
 					natureDamage:1,
 					thunderDamage:1,

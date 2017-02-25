@@ -5881,8 +5881,15 @@ character.sp={
 				}
 			},
 			ai:{
-				threaten:0.9,
-				expose:0.1
+				expose:0.1,
+				effect:{
+					target:function(card,player,target,current){
+						if(target.hasFriend()&&get.tag(card,'discard')){
+							if(current<0) return 0;
+							return [1,1];
+						}
+					}
+				}
 			}
 		},
 		moukui:{
