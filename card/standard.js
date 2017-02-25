@@ -117,7 +117,7 @@ card.standard={
 					value:[5,1],
 				},
 				order:function(){
-					if(_status.event.player.hasGlobalTag('presha')) return 10;
+					if(_status.event.player.hasSkillTag('presha',true,null,true)) return 10;
 					return 3;
 				},
 				result:{

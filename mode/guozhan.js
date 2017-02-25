@@ -310,6 +310,11 @@ mode.guozhan={
 				}
 				return false;
 			},
+			mark:true,
+			nopop:true,
+			intro:{
+				content:'若与你势力相同的一名角色于其回合内使用的第一张牌为【杀】，则该角色可以在此【杀】结算完成后获得之'
+			},
 			content:function(){
 				var cards=[];
 				for(var i=0;i<trigger.cards.length;i++){
