@@ -237,7 +237,7 @@ mode.guozhan={
 			// gz_jiangfei:['male','shu',3,['shengxi','gzshoucheng']],
 			// gz_jiangwei:['male','shu',4,['tiaoxin','yizhi','tianfu']],
 			// gz_xusheng:['male','wu',4,['yicheng']],
-			// gz_jiangqing:['male','wu',4,['shangyi','niaoxiang']],
+			gz_jiangqing:['male','wu',4,['gzshangyi','niaoxiang']],
 			gz_hetaihou:['female','qun',3,['zhendu','qiluan']],
 
 			gz_re_lidian:['male','wei',3,['xunxun','wangxi']],
@@ -257,146 +257,79 @@ mode.guozhan={
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
-		_zhenfazhaohuan:{
+		gzshangyi:{
+			audio:'shangyi',
 			enable:'phaseUse',
 			usable:1,
-			getConfig:function(player){
-				var n1,n2,p1,p2;
-				var config={
-					inline:false,
-					siege:false
-				};
-				var config2={};
-				n1=player.getNext();
-				p1=player.getPrevious();
-				if(n1){
-					if(n1.isUnseen()){
-						config.inline=true;
-					}
-					n2=n1.getNext();
-					if(n2&&n2.isUnseen()){
-						config.siege=true;
-					}
-				}
-				if(p1){
-					if(p1.isUnseen()){
-						config.inline=true;
-					}
-					p2=p1.getNext();
-					if(p2&&p2.isUnseen()){
-						config.siege=true;
-					}
-				}
-				if(config.inline||config.siege){
-					var skills=player.get('s');
-					for(var i=0;i<skills.length;i++){
-						var info=get.info(skills[i]).zhenfa;
-						if(info&&config[info]){
-							config2[info]=true;
-						}
-					}
-				}
-				return config2;
-			},
 			filter:function(event,player){
-				if(game.countPlayer()<4) return false;
-				if(player.hasSkill('undist')) return false;
-				var config=lib.skill._zhenfazhaohuan.getConfig(player);
-				return config.inline||config.siege;
+				return player.num('h')>0;
+			},
+			filterTarget:function(card,player,target){
+				return player!=target&&(target.num('h')||target.isUnseen(2));
 			},
 			content:function(){
-				'step 0'
-				var config=lib.skill._zhenfazhaohuan.getConfig(player);
-				if(config.siege){
-					event.siege=true;
+				"step 0"
+				target.viewCards(player+'的手牌',player.get('h'));
+				"step 1"
+				if(!target.num('h')){
+					event._result={index:1};
 				}
-				if(!config.inline){
-					event.goto(3);
-				}
-				event.asked=[];
-				event.current=player;
-				event.dir=true;
-				event.askPlayer=function(){
-					event.directfalse=false;
-					if(event.current&&event.current.isUnseen()&&!event.asked.contains(event.current)){
-						player.line(event.current,'green');
-						event.asked.push(event.current);
-						if(lib.character[event.current.name1][1]==player.identity){
-							event.current.chooseControl([
-								'明置'+get.translation(event.current.name1),
-								'明置'+get.translation(event.current.name1),
-								'不明置'
-							],function(){
-								return Math.floor(Math.random()*3);
-							}).set('prompt',get.translation(player)+'发了阵法召唤，你可以明置一个武将');
-						}
-						else{
-							event.directfalse=true;
-							if(_status.connectMode){
-								event.current.chooseControl(
-									'不明置'
-								).set('prompt',get.translation(player)+'发了阵法召唤（你与其势力不同，无法明置武将）');
-							}
-						}
-					}
-					else{
-						event.directfalse=true;
-					}
-				};
-				event.checkResult=function(result,num){
-					if(!event.directfalse&&result.control!='不明置'){
-						if(result.index==0){
-							event.current.showCharacter(0);
-						}
-						else{
-							event.current.showCharacter(1);
-						}
-						event.goto(num);
-					}
-					else if(event.dir){
-						event.dir=false;
-						event.current=player;
-						event.goto(num);
-					}
-				}
-				'step 1'
-				if(event.dir){
-					event.current=event.current.getNext();
+				else if(!target.isUnseen(2)){
+					event._result={index:0};
 				}
 				else{
-					event.current=event.current.getPrevious();
+					player.chooseControl().set('choiceList',[
+						'观看'+get.translation(target)+'的手牌并可以弃置其中的一张黑色牌',
+						'观看'+get.translation(target)+'的所有暗置的武将牌',
+					]);
 				}
-				event.askPlayer();
-				'step 2'
-				event.checkResult(result,1);
-				'step 3'
-				if(!event.siege){
-					event.finish();
-					return;
-				}
-				event.dir=true;
-				'step 4'
-				var current;
-				if(event.dir){
-					event.current=player.getNext();
-					if(event.current){
-						event.current=event.current.getNext();
-					}
+				"step 2"
+				if(result.index==0){
+					player.discardPlayerCard(target,'h').set('filterButton',function(button){
+						return get.color(button.link)=='black';
+					}).set('visible',true);
 				}
 				else{
-					event.current=player.getPrevious();
-					if(event.current){
-						event.current=event.current.getPrevious();
-					}
+					player.viewCharacter(target,2);
 				}
-				event.askPlayer();
-				'step 5'
-				event.checkResult(result,4);
 			},
 			ai:{
-				order:5,
+				order:11,
 				result:{
-					player:1
+					target:function(player,target){
+						return -target.num('h');
+					}
+				},
+				threaten:1.1
+			},
+		},
+		niaoxiang:{
+			zhenfa:'siege'
+		},
+		_niaoxiang:{
+			trigger:{player:'shaBegin'},
+			filter:function(event,player){
+				if(game.countPlayer()<4) return false;
+				return player.siege(event.target)&&game.hasPlayer(function(current){
+					return current.hasSkill('niaoxiang')&&current.siege(event.target);
+				});
+			},
+			forced:true,
+			logTarget:'target',
+			content:function(){
+				"step 0"
+				var next=trigger.target.chooseToRespond({name:'shan'});
+				next.autochoose=lib.filter.autoRespondShan;
+				next.set('ai',function(card){
+					if(_status.event.player.num('h','shan')>1){
+						return ai.get.unuseful2(card);
+					}
+					return -1;
+				});
+				"step 1"
+				if(result.bool==false){
+					trigger.untrigger();
+					trigger.directHit=true;
 				}
 			}
 		},
@@ -1277,6 +1210,151 @@ mode.guozhan={
 				}
 			}
 		},
+		_zhenfazhaohuan:{
+			enable:'phaseUse',
+			usable:1,
+			getConfig:function(player){
+				var n1,n2,p1,p2;
+				var config={
+					inline:false,
+					siege:false
+				};
+				var config2={};
+				n1=player.getNext();
+				p1=player.getPrevious();
+				if(n1){
+					if(n1.isUnseen()){
+						config.inline=true;
+					}
+					else if(n1.identity!=player.identity){
+						n2=n1.getNext();
+						if(n2&&n2.isUnseen()){
+							config.siege=true;
+						}
+					}
+				}
+				if(p1){
+					if(p1.isUnseen()){
+						config.inline=true;
+					}
+					else if(p1.identity!=player.identity){
+						p2=p1.getPrevious();
+						if(p2&&p2.isUnseen()){
+							config.siege=true;
+						}
+					}
+				}
+				if(config.inline||config.siege){
+					var skills=player.get('s');
+					for(var i=0;i<skills.length;i++){
+						var info=get.info(skills[i]).zhenfa;
+						if(info&&config[info]){
+							config2[info]=true;
+						}
+					}
+				}
+				return config2;
+			},
+			filter:function(event,player){
+				if(game.countPlayer()<4) return false;
+				if(player.hasSkill('undist')) return false;
+				var config=lib.skill._zhenfazhaohuan.getConfig(player);
+				return config.inline||config.siege;
+			},
+			content:function(){
+				'step 0'
+				var config=lib.skill._zhenfazhaohuan.getConfig(player);
+				if(config.siege){
+					event.siege=true;
+				}
+				if(!config.inline){
+					event.goto(3);
+				}
+				event.asked=[];
+				event.current=player;
+				event.dir=true;
+				event.askPlayer=function(){
+					event.directfalse=false;
+					if(event.current&&event.current.isUnseen()&&!event.asked.contains(event.current)){
+						player.line(event.current,'green');
+						event.asked.push(event.current);
+						if(lib.character[event.current.name1][1]==player.identity){
+							event.current.chooseControl([
+								'明置'+get.translation(event.current.name1),
+								'明置'+get.translation(event.current.name2),
+								'不明置'
+							],function(){
+								return Math.floor(Math.random()*3);
+							}).set('prompt',get.translation(player)+'发了阵法召唤，你可以明置一个武将');
+						}
+						else{
+							event.directfalse=true;
+							if(_status.connectMode){
+								event.current.chooseControl(
+									'不明置'
+								).set('prompt',get.translation(player)+'发了阵法召唤（你与其势力不同，无法明置武将）');
+							}
+						}
+					}
+					else{
+						event.directfalse=true;
+					}
+				};
+				event.checkResult=function(result,num){
+					if(!event.directfalse&&result.control!='不明置'){
+						if(result.index==0){
+							event.current.showCharacter(0);
+						}
+						else{
+							event.current.showCharacter(1);
+						}
+						event.goto(num);
+					}
+					else if(event.dir){
+						event.dir=false;
+						event.current=player;
+						event.goto(num);
+					}
+				}
+				'step 1'
+				if(event.dir){
+					event.current=event.current.getNext();
+				}
+				else{
+					event.current=event.current.getPrevious();
+				}
+				event.askPlayer();
+				'step 2'
+				event.checkResult(result,1);
+				'step 3'
+				if(!event.siege){
+					event.finish();
+					return;
+				}
+				event.dir=true;
+				'step 4'
+				var str;
+				if(event.dir){
+					str='getNext';
+				}
+				else{
+					str='getPrevious';
+				}
+				event.current=player[str]();
+				if(event.current&&!event.current.isUnseen()&&event.current.identity!=player.identity){
+					event.current=event.current[str]();
+				}
+				event.askPlayer();
+				'step 5'
+				event.checkResult(result,4);
+			},
+			ai:{
+				order:5,
+				result:{
+					player:1
+				}
+			}
+		},
 	},
 	game:{
 		getCharacterChoice:function(list,num){
@@ -2032,6 +2110,7 @@ mode.guozhan={
 		gzshangyi:'尚义',
 		gzshangyi_info:'出牌阶段限一次，你可以令一名其他角色观看你的手牌。若如此做，你选择一项：1.观看其手牌并可以弃置其中的一张黑色牌；2.观看其所有暗置的武将牌',
 		niaoxiang:'鸟翔',
+		_niaoxiang:'鸟翔',
 		niaoxiang_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，你令该角色需依次使用两张【闪】才能抵消',
 		yicheng:'疑城',
 		yicheng_info:'当与你势力相同的一名角色成为【杀】的目标后，你可以令该角色摸一张牌然后弃置一张牌',
@@ -2282,6 +2361,34 @@ mode.guozhan={
 					else source.discard(source.get('he'));
 				}
 				game.tryResult();
+			},
+			viewCharacter:function(target,num){
+				if(num!=0&&num!=1){
+					num=2;
+				}
+				if(!target.isUnseen(num)){
+					return;
+				}
+				var next=game.createEvent('viewCharacter');
+				next.player=this;
+				next.target=target;
+				next.num=num;
+				next.setContent(function(){
+					var content,str=get.translation(target)+'的';
+					if(event.num==0||!target.isUnseen(1)){
+						content=[str+'主将',[[target.name1],'character']];
+						game.log(player,'观看了',target,'的主将');
+					}
+					else if(event.num==1||!target.isUnseen(0)){
+						content=[str+'副将',[[target.name2],'character']];
+						game.log(player,'观看了',target,'的副将');
+					}
+					else{
+						content=[str+'主将和副将',[[target.name1,target.name2],'character']];
+						game.log(player,'观看了',target,'的主将和副将');
+					}
+					player.chooseControl('ok').set('dialog',content);
+				})
 			},
 			checkShow:function(skill){
 				var sourceSkill=get.info(skill);

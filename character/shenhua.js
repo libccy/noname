@@ -3484,7 +3484,7 @@ character.shenhua={
 			trigger:{source:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return get.distance(player,event.player)<=1;
+				return get.distance(player,event.player)<=1&&player.isDamaged();
 			},
 			content:function(){
 				player.recover(trigger.num);
