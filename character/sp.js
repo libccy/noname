@@ -6651,24 +6651,8 @@ character.sp={
 				"step 1"
 				if(player.isDamaged()){
 					if(get.mode()=='guozhan'){
-						if(player.identity=='ye'){
+						if(player.isMinor()){
 							player.recover();
-						}
-						else{
-							var groups={
-								wei:0,
-								shu:0,
-								wu:0,
-								qun:0
-							}
-							game.countPlayer(function(current){
-								if(groups.hasOwnProperty(current.identity)){
-									groups[current.identity]++;
-								}
-							});
-							if(groups.qun<=groups.wei&&groups.qun<=groups.shu&&groups.qun<=groups.wu){
-								player.recover();
-							}
 						}
 					}
 					else if(targets.length<=2){

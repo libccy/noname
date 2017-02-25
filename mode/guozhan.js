@@ -2148,10 +2148,10 @@ mode.guozhan={
 				return true;
 			},
 			isMajor:function(){
-				if(this.identity=='ye'||this.identity=='unknown') return false;
+				if(!lib.group.contains(this.identity)) return false;
 				var list=[];
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].num('e','yuxi')){
+					if(game.players[i].getEquip('yuxi')){
 						if(game.players[i].identity!='ye'&&game.players[i].identity!='unknown'){
 							list.add(game.players[i].identity);
 						}
@@ -2160,17 +2160,32 @@ mode.guozhan={
 				if(list.length){
 					return list.contains(this.identity);
 				}
-				var wei=get.population('wei'),shu=get.population('shu'),wu=get.population('wu'),qun=get.population('qun');
-				if(wei<=1&&shu<=1&&wu<=1&&qun<=1) return false;
-				return get.population(this.identity)==Math.max(wei,shu,wu,qun);
+				var max=0;
+				for(var i=0;i<lib.group.length;i++){
+					max=Math.max(max,get.population(lib.group[i]));
+				}
+				if(max<=1) return false;
+				return get.population(this.identity)==max;
 			},
-			isMinor:function(){
+			isNotMajor:function(){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isMajor()){
 						return !this.isMajor();
 					}
 				}
 				return false;
+			},
+			isMinor:function(){
+				if(this.identity=='unknown') return false;
+				if(!lib.group.contains(this.identity)) return true;
+				var min=game.players.length;
+				for(var i=0;i<lib.group.length;i++){
+					var num=get.population(lib.group[i]);
+					if(num>0){
+						min=Math.min(min,num);
+					}
+				}
+				return get.population(this.identity)==min;
 			},
 			logAi:function(targets,card){
 				if(this.ai.shown==1||this.isMad()) return;

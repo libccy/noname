@@ -80,13 +80,13 @@ card.zhenfa={
 			chongzhu:true,
 			enable:function(){
 				return game.hasPlayer(function(current){
-					return current.isMinor();
+					return current.isNotMajor();
 				});
 			},
 			multitarget:true,
 			multiline:true,
 			filterTarget:function(card,player,target){
-				return target.isMinor();
+				return target.isNotMajor();
 			},
 			selectTarget:-1,
 			content:function(){
