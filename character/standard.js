@@ -761,7 +761,11 @@ character.standard={
 				if(player.isUnderControl()){
 					game.modeSwapPlayer(player);
 				}
-				var cards=get.cards(Math.min(5,game.countPlayer()));
+				var num=Math.min(5,game.countPlayer());
+				if(player.hasSkill('yizhi')&&player.hasSkill('guanxing')){
+					num=5;
+				}
+				var cards=get.cards(num);
 				event.cards=cards;
 				var switchToAuto=function(){
 					_status.imchoosing=false;

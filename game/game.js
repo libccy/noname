@@ -5857,7 +5857,6 @@
 				game.saveConfig('characters',lib.config.all.characters);
 				game.saveConfig('cards',lib.config.all.cards);
 				game.saveConfig('plays',['cardpile']);
-				game.saveConfig('hiddenCardPack',['zhenfa']);
 				game.saveConfig('hiddenPlayPack',['character', 'soldier', 'weather']);
 				game.saveConfig('tao_enemy',true);
 				game.saveConfig('layout','long2');
@@ -17200,6 +17199,7 @@
                                     lib.skill[i]=lib.init.eval(mode.skill[i]);
                                 }
                             }
+							game.finishCards();
                             _status.event={
                                 finished:true,
                                 next:[],
@@ -17275,6 +17275,7 @@
                                 lib.skill[i]=lib.init.eval(mode.skill[i]);
                             }
                         }
+						game.finishCards();
 						if(mode.characterPack){
 							for(var i in mode.characterPack){
 								lib.characterPack[i]=mode.characterPack[i];
@@ -21114,6 +21115,7 @@
 							catch(e){
 								game.print('游戏出错：'+event.name);
 								game.print(e.toString());
+								console.log(e);
 							}
 						}
 						else{
@@ -36701,14 +36703,11 @@
                 if(node==game.me&&node.hiddenSkills.length){
                     skills.addArray(node.hiddenSkills);
                 }
-                if(node.awakenedSkills.length){
-					for(var i=0;i<node.awakenedSkills.length;i++){
-						if(node.disabledSkills[node.awakenedSkills[i]]&&
-							node.disabledSkills[node.awakenedSkills[i]].length==1){
-							skills.push(node.awakenedSkills[i]);
-						}
+				for(var i in node.disabledSkills){
+					if(node.disabledSkills[i].length==1&&node.disabledSkills[i][0]==i+'_awake'){
+						skills.push(i);
 					}
-                }
+				}
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&lib.skill[skills[i]].nopop) continue;
 					if(lib.translate[skills[i]+'_info']){

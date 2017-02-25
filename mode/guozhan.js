@@ -72,7 +72,6 @@ mode.guozhan={
 			if(lib.configOL.guozhanpile){
 				lib.card.list=lib.guozhanPile.slice(0);
 			}
-			game.randomMapOL();
 			game.broadcastAll(function(pack){
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].node.name.hide();
@@ -92,6 +91,7 @@ mode.guozhan={
 					}
 				}
 			},lib.characterPack.mode_guozhan);
+			game.randomMapOL();
 		}
 		else{
 			for(var i=0;i<game.players.length;i++){
@@ -235,7 +235,7 @@ mode.guozhan={
 			// gz_dengai:['male','wei',4,['tuntian','ziliang','gzjixi']],
 			// gz_caohong:['male','wei',4,['huyuan','heyi']],
 			// gz_jiangfei:['male','shu',3,['shengxi','gzshoucheng']],
-			// gz_jiangwei:['male','shu',4,['tiaoxin','yizhi','tianfu']],
+			gz_jiangwei:['male','shu',4,['tiaoxin','yizhi','tianfu']],
 			// gz_xusheng:['male','wu',4,['yicheng']],
 			gz_jiangqing:['male','wu',4,['gzshangyi','niaoxiang']],
 			gz_hetaihou:['female','qun',3,['zhendu','qiluan']],
@@ -257,6 +257,27 @@ mode.guozhan={
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
+		tianfu:{
+			init:function(player){
+				player.checkMainSkill('tianfu');
+			},
+			inherit:'kanpo',
+			zhenfa:'inline',
+			viewAsFilter:function(player){
+				return _status.currentPhase.inline(player)&&!player.hasSkill('kanpo')&&player.num('h',{color:'black'})>0;
+			},
+		},
+		yizhi:{
+			init:function(player){
+				if(player.checkViceSkill('yizhi')){
+					player.removeMaxHp();
+				}
+			},
+			inherit:'guanxing',
+			filter:function(event,player){
+				return !player.hasSkill('guanxing');
+			}
+		},
 		gzshangyi:{
 			audio:'shangyi',
 			enable:'phaseUse',
@@ -1308,7 +1329,16 @@ mode.guozhan={
 						else{
 							event.current.showCharacter(1);
 						}
-						event.goto(num);
+						if(event.current.identity=='ye'||num!=1){
+							if(event.dir){
+								event.dir=false;
+								event.current=player;
+								event.goto(num);
+							}
+						}
+						else{
+							event.goto(num);
+						}
 					}
 					else if(event.dir){
 						event.dir=false;
@@ -2009,6 +2039,7 @@ mode.guozhan={
 						}
 					}
 					for(var j=0;j<game.players[i].hiddenSkills.length;j++){
+						game.players[i].name1=game.players[i].name;
 						game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
 					}
 				}
@@ -2419,8 +2450,7 @@ mode.guozhan={
 				}
 				else{
 					if(disable!==false){
-						this.disableSkill(skill,skill);
-						this.awakenedSkills.add(skill);
+						this.awakenSkill(skill);
 					}
 					return false;
 				}
@@ -2431,8 +2461,7 @@ mode.guozhan={
 				}
 				else{
 					if(disable!==false){
-						this.disableSkill(skill,skill);
-						this.awakenedSkills.add(skill);
+						this.awakenSkill(skill);
 					}
 					return false;
 				}

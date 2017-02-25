@@ -22,7 +22,7 @@ card.pack={
     extra:'军争',
     sp:'SP',
     guozhan:'国战',
-    // zhenfa:'阵法',
+    zhenfa:'阵法',
     yunchou:'运筹帷幄',
     swd:'轩辕剑',
     gujian:'古剑奇谭',

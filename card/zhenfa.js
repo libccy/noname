@@ -25,18 +25,33 @@ card.zhenfa={
 			type:'zhenfa',
 			chongzhu:true,
 			enable:function(card,player){
-				if(player.identity=='unknown') return false;
-				return player.next.identity==player.identity||player.previous.identity==player.identity;
+				if(player.inline()) return true;
+				if(player.identity=='unknown'||player.identity=='ye') return false;
+				return game.hasPlayer(function(current){
+					return current!=player&&current.isFriendOf(player);
+				});
 			},
 			filterTarget:function(card,player,target){
-				if(player==target) return player.inline();
-				return player.inline(target);
+				if(player.inline()) return player.inline(target);
+				if(!player.getNext()) return false;
+				var list=game.filterPlayer(function(current){
+					return current!=player&&current.isFriendOf(player);
+				});
+				list.sort(function(a,b){
+					return get.distance(player,a,'absolute')-get.distance(player,b,'absolute');
+				});
+				return target==list[0];
 			},
 			selectTarget:-1,
 			multitarget:true,
 			multiline:true,
 			content:function(){
-				game.asyncDraw(targets);
+				if(targets.length==1){
+					game.swapSeat(targets[0],game.me.getNext(),true,true);
+				}
+				else{
+					game.asyncDraw(targets);
+				}
 			},
 			mode:['guozhan'],
 			ai:{
@@ -149,33 +164,31 @@ card.zhenfa={
 			type:'zhenfa',
 			chongzhu:true,
 			enable:function(card,player){
-				if(player.identity=='unknown'||player.identity=='ye') return false;
-				return (get.population(player.identity)>1)
+				return player.siege()||player.sieged();
 			},
 			filterTarget:function(card,player,target){
-				return target.identity==player.identity;
+				return target==player;
 			},
-			multitarget:true,
 			selectTarget:-1,
 			content:function(){
-				lib.temp=targets[0];
-				targets.sort(lib.sort.seat);
-				var rest=game.players.slice(0);
-				rest.remove(targets);
-				rest.sort(function(a,b){
-					if(a.identity=='unknown') return 1;
-					else return -1;
-				})
-				lib.temp={};
-				if(targets.length>rest.length+1) targets.length=rest.length+1;
-				for(var i=1;i<targets.length;i++){
-					game.swapSeat(targets[i],targets[i-1].next.next,false);
-					game.swapSeat(rest[i-1],targets[i-1].next,false);
+				'step 0'
+				event.targets=game.filterPlayer(function(current){
+					return current.siege(player);
+				});
+				'step 1'
+				if(event.targets.length){
+					var current=event.targets.shift();
+					player.line(current,'green');
+					player.discardPlayerCard(current,true);
+					event.redo();
 				}
-				if(rest[targets.length-1]){
-					game.swapSeat(rest[targets.length-1],targets[targets.length-1].next,false);
+				'step 2'
+				var list=game.filterPlayer(function(current){
+					return current.sieged(player);
+				});
+				if(list.length){
+					player.useCard({name:'sha'},list,false);
 				}
-				game.log(get.translation(player.identity)+'势力角色摆成了七星阵')
 			},
 			mode:['guozhan'],
 			ai:{
@@ -354,15 +367,15 @@ card.zhenfa={
 		huyizhen:'虎翼阵',
 		niaoxiangzhen:'鸟翔阵',
 		niaoxiangzhen_info:'令所有非你阵营的队列的角色今次打出一张闪，或者受到一点伤害',
-		huyizhen_info:'将一张非基本牌当作杀对你围攻的角色使用',
-		longfeizhen_info:'弃置围攻你的角色各一张牌，然后摸一张牌',
-		qixingzhen_info:'令我方所有角色进入围攻状态',
-		shepanzhen_info:'令我方所有角色进入队列状态',
-		yunchuizhen_info:'令所有围攻角色获得技能【无双】，直到其首次造成伤害',
-		fengyangzhen_info:'令所有被围攻角色获得技能【飞影】，直到其首次受到伤害',
+		qixingzhen_info:'弃置所有围攻你的角色各一张牌，然后视为对所有你围攻的角色使用一张不计入出杀次数的杀',
+		// longfeizhen_info:'弃置围攻你的角色各一张牌，然后摸一张牌',
+		// qixingzhen_info:'令我方所有角色进入围攻状态',
+		// shepanzhen_info:'令我方所有角色进入队列状态',
+		// yunchuizhen_info:'令所有围攻角色获得技能【无双】，直到其首次造成伤害',
+		// fengyangzhen_info:'令所有被围攻角色获得技能【飞影】，直到其首次受到伤害',
 		dizaizhen_info:'所有小势力角色摸一张牌',
-		changshezhen_info:'与你同一队列的所有角色摸一张牌',
-		pozhenjue_info:'将所有角色的顺序随机重排',
+		changshezhen_info:'若你处于队列中，与你同一队列的所有角色摸一张牌，否则将与你逆时针距离最近的同势力角色移至你下家',
+		// pozhenjue_info:'将所有角色的顺序随机重排',
 		tianfuzhen_info:'所有大势力角色弃置一张牌'
 	},
 	list:[
@@ -392,24 +405,24 @@ card.zhenfa={
 		// ["heart",5,'zhonghuangzhen'],
 
 		// ["diamond",6,'huyizhen'],
-		["club",6,'huyizhen'],
-		["spade",6,'huyizhen'],
+		// ["club",6,'huyizhen'],
+		// ["spade",6,'huyizhen'],
 		// ["heart",6,'huyizhen'],
 
-		// ["diamond",7,'qixingzhen'],
-		// ["club",7,'qixingzhen'],
-		// ["spade",7,'qixingzhen'],
+		["diamond",7,'qixingzhen'],
+		["club",7,'qixingzhen'],
+		["spade",7,'qixingzhen'],
 		// ["heart",7,'qixingzhen'],
 
-		["diamond",8,'shepanzhen'],
+		// ["diamond",8,'shepanzhen'],
 		// ["club",8,'shepanzhen'],
 		// ["spade",8,'shepanzhen'],
-		["heart",8,'shepanzhen'],
+		// ["heart",8,'shepanzhen'],
 
 		// ["diamond",9,'longfeizhen'],
-		["club",9,'longfeizhen'],
+		// ["club",9,'longfeizhen'],
 		// ["spade",9,'longfeizhen'],
-		["heart",9,'longfeizhen'],
+		// ["heart",9,'longfeizhen'],
 
 		["diamond",11,'niaoxiangzhen'],
 		// ["club",11,'niaoxiangzhen'],
@@ -421,7 +434,7 @@ card.zhenfa={
 		// ["spade",12,'yunchuizhen'],
 		// ["heart",12,'yunchuizhen'],
 
-		["diamond",13,'pozhenjue'],
+		// ["diamond",13,'pozhenjue'],
 		// ["club",13,'pozhenjue'],
 		// ["spade",13,'pozhenjue'],
 		//["heart",13,'pozhenjue'],
