@@ -11793,7 +11793,7 @@
 						next.targets=[];
 					}
 					if(next.card){
-						next.card=get.autoViewAs(next.card,false);
+						next.card=get.autoViewAs(next.card,false,next.player);
 						var info=get.info(next.card);
 						if(info.changeTarget){
 	                        info.changeTarget(next.player,next.targets);
@@ -11955,7 +11955,7 @@
 						if(next.cards){
 							next.card=next.cards[0];
                             if(!next.skill){
-								next.card=get.autoViewAs(next.card);
+								next.card=get.autoViewAs(next.card,null,next.player);
                             }
 						}
 					}
@@ -13353,7 +13353,7 @@
 					if(typeof card=='string'){
 						card={name:card};
 					}
-					card=get.autoViewAs(card);
+					card=get.autoViewAs(card,null,player);
 					var num=get.info(card).usable;
 					if(typeof num=='function') num=num(card,player);
 					num=game.checkMod(card,player,num,'cardUsable',player.get('s'));
@@ -16134,7 +16134,7 @@
                 }
             },
 			cardEnabled:function(card,player,event){
-				card=get.autoViewAs(card);
+				card=get.autoViewAs(card,null,player);
 				if(player==undefined) player=_status.event.player;
 				var filter=get.info(card).enable;
 				if(!filter) return;
@@ -16151,7 +16151,7 @@
 				return true;
 			},
 			cardUsable:function(card,player,event){
-				card=get.autoViewAs(card);
+				card=get.autoViewAs(card,null,player);
 				if(player!=_status.event.player) return true;
 				event=event||_status.event;
 				if(event.getParent().name!='phaseUse') return true;
@@ -36189,7 +36189,7 @@
 			if(_status.event.skill){
 				var card=get.info(_status.event.skill).viewAs;
 				if(card){
-					return get.autoViewAs(card);
+					return get.autoViewAs(card,null,_status.event.player);
 				}
 			}
             if(_status.event._get_card){
@@ -36198,7 +36198,7 @@
             var card=ui.selected.cards[0];
             if(original) return card;
             if(card){
-				card=get.autoViewAs(card,ui.selected.cards);
+				card=get.autoViewAs(card,ui.selected.cards,_status.event.player);
             }
 			return card;
 		},
