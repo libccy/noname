@@ -69,7 +69,8 @@ table {
 #window.shortcutpaused.modepaused>.modenopause.popup-container:not(.filter-character) {
 	opacity: 0.3;
 }
-#window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(.dialog):not(.centermenu):not(.popup-container) {
+#window.shortcutpaused>div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):
+not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopaque) {
 	opacity: 0.3 !important
 }
 #window.shortcutpaused>#arena>div:not(#timer):not(.removing):not(.hidden):not(#autonode) {

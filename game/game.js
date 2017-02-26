@@ -665,7 +665,7 @@
 					},
 					change_skin_auto:{
 						name:'自动换肤',
-						init:'60000',
+						init:'off',
 						item:{
 							'off':'关闭',
 							'30000':'半分钟',
@@ -34112,7 +34112,8 @@
 			charactercard:function(name,sourcenode,noedit){
 				if(_status.dragged) return;
 				ui.window.classList.add('shortcutpaused');
-				ui.window.classList.add('systempaused');
+				// ui.window.classList.add('systempaused');
+				ui.menuContainer.classList.add('forceopaque');
 				if(lib.config.blur_ui){
 					ui.arena.classList.add('blur');
 					ui.system.classList.add('blur');
@@ -34123,7 +34124,8 @@
                     if(_status.touchpopping) return;
 					if(_status.dragged) return;
 					ui.window.classList.remove('shortcutpaused');
-					ui.window.classList.remove('systempaused');
+					// ui.window.classList.remove('systempaused');
+					ui.menuContainer.classList.remove('forceopaque');
 					ui.arena.classList.remove('blur');
 					ui.system.classList.remove('blur');
 					ui.menuContainer.classList.remove('blur');
@@ -34156,6 +34158,9 @@
                             if(!num) return;
 							if(num>=4){
 								avatars.classList.add('scroll');
+								if(lib.config.touchscreen){
+									lib.setScroll(avatars);
+								}
 							}
                             for(var i=0;i<=num;i++){
                                 var button=ui.create.div(avatars,function(){
