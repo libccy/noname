@@ -8,12 +8,26 @@ card.guozhan={
 			type:'equip',
 			subtype:'equip1',
 			distance:{attackFrom:-1},
+			skills:['feilongduofeng','feilongduofeng2'],
+			ai:{
+				equipValue:9
+			}
 		},
 		taipingyaoshu:{
 			mode:['guozhan'],
 			fullskin:true,
 			type:'equip',
 			subtype:'equip2',
+			skills:['taipingyaoshu'],
+			ai:{
+				equipValue:9
+			},
+			onLose:function(){
+				'step 0'
+				player.loseHp();
+				'step 1'
+				player.draw(2);
+			}
 		},
 		yuxi:{
 			mode:['guozhan'],
@@ -549,6 +563,85 @@ card.guozhan={
 		},
 	},
 	skill:{
+		_feilongduofeng_ai:{
+			ai:{
+				effect:{
+					player:function(card,player){
+						if(player.hasSkill('zhangwu')) return;
+						if(card.name=='feilongduofeng'&&game.hasPlayer(function(current){
+							return current.hasSkill('zhangwu')&&ai.get.attitude(player,current)<=0;
+						})){
+							return [0,0,0,0];
+						}
+					}
+				}
+			}
+		},
+		_taipingyaoshu_ai:{
+			ai:{
+				effect:{
+					player:function(card,player){
+						if(player.hasSkill('wendao')) return;
+						if(card.name=='taipingyaoshu'&&game.hasPlayer(function(current){
+							return current.hasSkill('wendao')&&ai.get.attitude(player,current)<=0;
+						})){
+							return [0,0,0,0];
+						}
+					}
+				}
+			}
+		},
+		feilongduofeng:{
+			trigger:{player:'shaBegin'},
+			priority:5,
+			logTarget:'target',
+			filter:function(event,player){
+				return event.target.num('he');
+			},
+			content:function(){
+				trigger.target.chooseToDiscard('he',true);
+			},
+		},
+		feilongduofeng2:{
+
+		},
+		taipingyaoshu:{
+			trigger:{player:'damageBefore'},
+			filter:function(event){
+				if(event.source&&event.source.num('s','unequip')) return;
+				if(event.nature) return true;
+			},
+			forced:true,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				nofire:true,
+				nothunder:true,
+				effect:{
+					target:function(card,player,target,current){
+						if(get.tag(card,'natureDamage')) return 'zerotarget';
+						if(card.name=='tiesuo'){
+							return [0,0];
+						}
+					}
+				}
+			}
+		},
+		_taipingyaoshu:{
+			mod:{
+				maxHandcard:function(player,num){
+					if(game.hasPlayer(function(current){
+						return current.hasSkill('taipingyaoshu')&&current.isFriendOf(player);
+					})){
+						return num+game.countPlayer(function(current){
+							return current.isFriendOf(player);
+						});
+					}
+				}
+			},
+		},
 		yuxi_skill:{
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
@@ -850,6 +943,7 @@ card.guozhan={
 	},
 	translate:{
 		feilongduofeng:'飞龙夺凤',
+		feilongduofeng2:'飞龙夺凤',
 		feilongduofeng_info:'当你使用【杀】指定一名角色为目标后，你可令该角色弃置一张牌。你使用【杀】杀死一名角色后，若你所属的势力是全场最少的（或之一），你可令该角色的使用者选择是否从未使用的武将牌中选择一张与你势力相同的武将牌重新加入游戏',
 		taipingyaoshu:'太平要术',
 		taipingyaoshu_info:'锁定技，防止你受到的所有属性伤害；全场每有一名与你势力相同的角色存活，所有此势力角色的手牌上限便+1；当你失去装备区里的【太平要术】时，你失去1点体力，然后摸两张牌',

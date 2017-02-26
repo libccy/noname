@@ -71,7 +71,7 @@ character.swd={
 		// swd_pepin:['male','qun',4,['rejianxiong','quhu']],
 		swd_kangnalishi:['male','qun',1,['busi','xuying','yinguo']],
 		swd_xuanyuanjiantong:['male','qun',3,['chengjian','huanling']],
-		swd_huiyan:['male','qun',4,['wendao','lingfeng','hxunzhi']],
+		swd_huiyan:['male','qun',4,['hwendao','lingfeng','hxunzhi']],
 
 		// swd_chenfu:['male','qun',4,['xuanzhou','bingfeng']],
 		// swd_chengyaojin:['male','qun',4,['jiuchi','jufu']],
@@ -534,7 +534,7 @@ character.swd={
 				}
 			}
 		},
-		wendao:{
+		hwendao:{
 			trigger:{player:['useCardAfter','respondAfter',]},
 			check:function(event,player){
 				return ai.get.attitude(player,_status.currentPhase)<=0;
@@ -2732,7 +2732,6 @@ character.swd={
 						}
 					}
 				},
-				threaten:2.2
 			},
 		},
 		jilve:{
@@ -8833,8 +8832,8 @@ character.swd={
 		shenyan_info:'限定技，当你即将造成火焰伤害时，你可以令此伤害+1，并对目标距离1以内的所有其他角色各造成一点火焰伤害',
 		xuanying:'旋影',
 		xuanying_info:'你可以横置你的武将牌，视为使用一张无视距离的杀；每当你于回合外失去牌，你可以竖置你的武将牌，视为使用一张无视距离的杀',
-		wendao:'问道',
-		wendao_info:'每当你于回合外使用或打出一张牌，你可以令当前回合角色弃置一张与之花色相同的牌，否则你获得其一张牌',
+		hwendao:'问道',
+		hwendao_info:'每当你于回合外使用或打出一张牌，你可以令当前回合角色弃置一张与之花色相同的牌，否则你获得其一张牌',
 		lingfeng:'凌锋',
 		lingfeng_info:'结束阶段，若你本回合内使用了至少X张牌，你可以选择一项：获得一点护甲，或对攻击范围内的一名角色造成一点伤害（X为你当前的体力值且最多为3）',
 		hxunzhi:'殉志',
