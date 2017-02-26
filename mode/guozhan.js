@@ -251,7 +251,7 @@ mode.guozhan={
 			gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
 
 			gz_jun_liubei:['male','shu',4,['zhangwu','jizhao','shouyue','wuhujiangdaqi']],
-			gz_jun_zhangjiao:['male','qun',4,[]],
+			gz_jun_zhangjiao:['male','qun',4,['wuxin','hongfa','wendao','huangjintianbingfu']],
 		}
 	},
 	characterIntro:{
@@ -261,7 +261,232 @@ mode.guozhan={
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
+		_hongfa2:{
+			trigger:{player:'chooseToRespondBegin'},
+			direct:true,
+			filter:function(event,player){
+				if(event.responded) return false;
+				if(!event.filterCard({name:'sha'})) return false;
+				var zhu=get.zhu(player,'hongfa');
+				if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
+					return true;
+				}
+				return false;
+			},
+			content:function(){
+				"step 0"
+				var zhu=get.zhu(player,'hongfa');
+				player.chooseCardButton(get.prompt('huangjintianbingfu'),zhu.storage.huangjintianbingfu).set('ai',function(){
+					if(_status.event.goon) return 1;
+					return 0;
+				}).set('goon',player.num('h','sha')==0);
+				"step 1"
+				if(result.bool){
+					var card=result.links[0];
+					trigger.untrigger();
+					trigger.responded=true;
+					trigger.result={bool:true,card:{name:'sha'},cards:[card]};
+					var zhu=get.zhu(player,'hongfa');
+					zhu.storage.huangjintianbingfu.remove(card);
+					zhu.syncStorage('huangjintianbingfu');
+					zhu.updateMarks('huangjintianbingfu');
+					player.logSkill('_hongfa2');
+				}
+			}
+		},
+		_hongfa:{
+			enable:'chooseToUse',
+			filter:function(event,player){
+				var zhu=get.zhu(player,'hongfa');
+				if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
+					return true;
+				}
+				return false;
+			},
+			chooseButton:{
+				dialog:function(event,player){
+					var zhu=get.zhu(player,'hongfa');
+					return ui.create.dialog('黄巾天兵符',zhu.storage.huangjintianbingfu,'hidden');
+				},
+				backup:function(links,player){
+					return {
+						filterCard:function(){return false},
+						selectCard:-1,
+						viewAs:{name:'sha'},
+						cards:links,
+						onuse:function(result,player){
+							result.cards=lib.skill[result.skill].cards;
+							var card=result.cards[0];
+							var zhu=get.zhu(player,'hongfa');
+							zhu.storage.huangjintianbingfu.remove(card);
+							zhu.syncStorage('huangjintianbingfu');
+							zhu.updateMarks('huangjintianbingfu');
+							player.logSkill('_hongfa',result.targets);
+						}
+					}
+				},
+				prompt:function(links,player){
+					return '选择杀的目标';
+				}
+			},
+			ai:{
+				respondSha:true,
+				skillTagFilter:function(player){
+					var zhu=get.zhu(player,'hongfa');
+					if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
+						return true;
+					}
+					return false;
+				},
+				order:function(){
+					return ai.get.order({name:'sha'})-0.1;
+				},
+				result:{
+					player:function(player){
+						if(player.num('h','sha')) return 0;
+						return 1;
+					}
+				}
+			}
+		},
+		hongfa:{
+			init:function(player){
+				player.storage.huangjintianbingfu=[];
+			},
+			derivation:'huangjintianbingfu',
+			unique:true,
+			forceunique:true,
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return player.storage.huangjintianbingfu.length==0;
+			},
+			content:function(){
+				player.storage.huangjintianbingfu.addArray(get.cards(get.population('qun')));
+				player.syncStorage('huangjintianbingfu');
+				player.updateMarks('huangjintianbingfu');
+			},
+			group:'hongfa_hp',
+			subSkill:{
+				hp:{
+					trigger:{player:'loseHpBefore'},
+					filter:function(event,player){
+						return player.storage.huangjintianbingfu.length>0;
+					},
+					direct:true,
+					content:function(){
+						'step 0'
+						player.chooseCardButton(get.prompt('hongfa'),player.storage.huangjintianbingfu).set('ai',function(){
+							return 1;
+						});
+						'step 1'
+						if(result.bool){
+							var card=result.links[0];
+							ui.discardPile.appendChild(card);
+							player.storage.huangjintianbingfu.remove(card);
+							player.$throw(card,1000);
+							player.updateMarks('huangjintianbingfu');
+							player.syncStorage('huangjintianbingfu');
+							trigger.untrigger();
+							trigger.finish();
+							player.logSkill('hongfa');
+							game.delay();
+						}
+					}
+				}
+			}
+		},
+		wendao:{
+			unique:true,
+			forceunique:true,
+			enable:'phaseUse',
+			filterCard:{color:'red'},
+			position:'he',
+			check:function(card){
+				return 6-ai.get.value(card);
+			},
+			filter:function(event,player){
+				for(var i=0;i<ui.discardPile.childElementCount;i++){
+					if(ui.discardPile.childNodes[i].name=='taipingyaoshu') return true;
+				}
+				return game.hasPlayer(function(current){
+					return current!=player&&current.num('ej','taipingyaoshu');
+				});
+			},
+			content:function(){
+				var list=[];
+				for(var i=0;i<ui.discardPile.childElementCount;i++){
+					if(ui.discardPile.childNodes[i].name=='taipingyaoshu'){
+						list.add(ui.discardPile.childNodes[i]);
+					}
+				}
+				game.countPlayer(function(current){
+					if(current!=player){
+						var ej=current.get('ej','taipingyaoshu');
+						if(ej.length){
+							list.addArray(ej);
+						}
+					}
+				});
+				if(list.length){
+					var card=list.randomGet();
+					var owner=get.owner(card);
+					if(owner){
+						player.gain(card,owner);
+						owner.$give(card,player);
+						player.line(owner,'green');
+					}
+					else{
+						player.gain(card,'log');
+						player.$draw(card);
+					}
+				}
+			},
+			ai:{
+				order:8.5,
+				result:{
+					player:1
+				}
+			}
+		},
+		huangjintianbingfu:{
+			nopop:true,
+			mark:true,
+			intro:{
+				content:'cards',
+				mark:function(dialog,content,player){
+					if(content&&content.length){
+						dialog.addSmall(content);
+					}
+					dialog.addText('<ul style="margin-top:5px;padding-left:22px;"><li>当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<li>每当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<li>与你势力相同的角色可将一张“天兵”当【杀】使用或打出。',false)
+				},
+			}
+		},
+		wuxin:{
+			unique:true,
+			trigger:{player:'phaseDrawBegin'},
+			frequent:true,
+			content:function(){
+				'step 0'
+				var num=get.population('qun');
+				if(player.hasSkill('huangjintianbingfu')){
+					num+=player.storage.huangjintianbingfu.length;
+				}
+				player.chooseCardButton(num,true,get.cards(num),'按顺将卡牌置于牌堆顶（先选择的在上）').set('ai',function(button){
+					return ai.get.value(button.link);
+				});
+				'step 1'
+				if(result.bool){
+					var list=result.links.slice(0);
+					while(list.length){
+						ui.cardPile.insertBefore(list.pop(),ui.cardPile.firstChild);
+					}
+				}
+			}
+		},
 		zhangwu:{
+			unique:true,
+			forceunique:true,
 			group:['zhangwu_gain','zhangwu_draw','zhangwu_clear','zhangwu_count'],
 			subSkill:{
 				gain:{
@@ -2482,6 +2707,17 @@ mode.guozhan={
 		gz_jun_liubei:'君刘备',
 		gz_jun_zhangjiao:'君张角',
 
+		wuxin:'悟心',
+		wuxin_info:'摸牌阶段开始时，你可以观看牌堆顶的X张牌（X为群势力角色的数量），然后将这些牌以任意顺序置于牌堆顶',
+		hongfa:'弘法',
+		_hongfa:'天兵',
+		_hongfa2:'天兵',
+		hongfa_info:'君主技，锁定技，当此武将牌明置时，你获得“黄巾天兵符”；准备阶段开始时，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）',
+		wendao:'问道',
+		wendao_info:'出牌阶段限一次，你可以弃置一张红色牌，获得弃牌堆里或场上的一张【太平要术】',
+		huangjintianbingfu:'黄巾天兵符',
+		huangjintianbingfu_bg:'符',
+		huangjintianbingfu_info:'锁定技 ：当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>每当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当【杀】使用或打出。',
 		wuhujiangdaqi:'五虎将大旗',
 		wuhujiangdaqi_bg:'旗',
 		wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你每发动一次‘龙胆’便摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“若结果为红色”改为“若结果不为黑桃”',

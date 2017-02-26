@@ -10700,7 +10700,13 @@
 					this.updateMarks();
 					return this;
 				},
-				updateMarks:function(){
+				updateMarks:function(connect){
+					if(typeof connect=='string'&&_status.connectMode&&!game.online){
+						game.broadcast(function(player,storage,skill){
+							player.storage[skill]=storage;
+							player.updateMarks();
+						},this,this.storage[connect],connect);
+					}
 					for(var i in this.marks){
 						if(i=='ghujia'||((!this.marks[i].querySelector('.image')||this.storage[i+'_markcount'])&&
 							lib.skill[i]&&lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
@@ -13726,14 +13732,14 @@
                 hasSha:function(respond){
                     if(this.num('h','sha')) return true;
     				if(this.num('h','hufu')) return true;
-    				if(this.num('h','yuchanqian')) return true;
-    				if(this.hasSkillTag('respondSha',true,respond?'respond':'use')) return true;
+    				// if(this.num('h','yuchanqian')) return true;
+    				if(this.hasSkillTag('respondSha',true,respond?'respond':'use',true)) return true;
     				return false;
                 },
                 hasShan:function(){
     				if(this.num('h','shan')) return true;
     				if(this.num('h','hufu')) return true;
-    				if(this.hasSkillTag('respondShan',true)) return true;
+    				if(this.hasSkillTag('respondShan',true,null,true)) return true;
     				return false;
     			},
 				hasCard:function(name,position){
@@ -37023,10 +37029,10 @@
 							setTimeout(function(){
 								var nameskin1=node.name;
 								var nameskin2=node.name2;
-								if(nameskin1.indexOf('gz_')==0){
+								if(nameskin1&&nameskin1.indexOf('gz_')==0){
 									nameskin1=nameskin1.slice(3);
 								}
-								if(nameskin2.indexOf('gz_')==0){
+								if(nameskin2&&nameskin2.indexOf('gz_')==0){
 									nameskin2=nameskin2.slice(3);
 								}
 								if(!node.isUnseen(0)&&lib.skin[nameskin1]){

@@ -1152,7 +1152,6 @@ character.shenhua={
 						viewAs:{name:'shunshou'},
 						cards:links,
 						onuse:function(result,player){
-							console.log(result.skill);
 							result.cards=lib.skill[result.skill].cards;
 							var card=result.cards[0];
 							player.storage.tuntian.remove(card);

@@ -1205,6 +1205,13 @@ div:not(.handcards)>.card>.info>span,
 	transform: scale(0.95);
 	transform-origin: top left;
 }
+.dialog .buttons>.card>.name{
+	font-size: 14px;
+	line-height: 16px;
+}
+.dialog .buttons>.card>.name.long{
+	top: 3px;
+}
 .card.center {
 	top: calc(50% - 52px);
 	left: calc(50% - 52px);

@@ -755,11 +755,15 @@ card.guozhan={
 		_taipingyaoshu:{
 			mod:{
 				maxHandcard:function(player,num){
-					if(game.hasPlayer(function(current){
+					var source=game.findPlayer(function(current){
 						return current.hasSkill('taipingyaoshu')&&current.isFriendOf(player);
-					})){
+					});
+					if(source){
+						if(source.hasSkill('huangjintianbingfu')){
+							num+=source.storage.huangjintianbingfu.length;
+						}
 						return num+game.countPlayer(function(current){
-							return current.isFriendOf(player);
+							return current.isFriendOf(source);
 						});
 					}
 				}
