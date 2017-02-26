@@ -42,6 +42,8 @@ character.shenhua={
 	perfectPair:{
 		yuanshao:['yanwen'],
 		menghuo:['zhurong'],
+		sp_zhugeliang:['pangtong'],
+		sunce:['zhouyu','taishici','daqiao']
 	},
 	characterIntro:{
 		huangzhong:'字汉升，今河南南阳人。汉末三国时期蜀汉名将。本为刘表部下中郎将，后归刘备，并助刘备攻益州刘璋，在定军山一战中阵斩曹操部下名将夏侯渊。备称汉中王后改封后将军，赐关内侯。',

@@ -61,13 +61,15 @@ character.standard={
 		zhenji:['caopi'],
 		caocao:['xuzhu','dianwei'],
 		huangzhong:['weiyan'],
-		zhugeliang:['huangyueying','pangtong'],
+		zhugeliang:['huangyueying'],
 		liubei:['guanyu','zhangfei','ganfuren'],
 		zhaoyun:['liushan'],
 		daqiao:['xiaoqiao'],
 		zhouyu:['huanggai','xiaoqiao'],
 		sunquan:['zhoutai'],
-		lvbu:['diaochan']
+		lvbu:['diaochan'],
+		machao:['madai','mayunlu'],
+		zhangliao:['zangba']
 	},
 	skill:{
 		hujia:{
@@ -1696,7 +1698,7 @@ character.standard={
 		mashu_info:'锁定技，你的进攻距离+1',
 		feiying_info:'锁定技，你的防御距离+1',
 		tieji_info:'当你使用一张[杀]时，可进行一次判定，若为红色则此[杀]不可闪避',
-		jizhi_info:'每当你使用或打出一张普通锦囊牌，可以摸一张牌',
+		jizhi_info:'每当你使用或打出一张非转化的普通锦囊牌，可以摸一张牌',
 		qicai_info:'锁定技，你使用的锦囊牌无距离限制',
 		zhiheng_info:'出牌阶段，你可以弃置任意张牌并摸等量的牌，每阶段限1次',
 		jiuyuan_info:'主公技，锁定技，濒死阶段，吴势力角色对你使用的[桃]额外回复一点体力',

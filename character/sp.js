@@ -161,6 +161,7 @@ character.sp={
 		zhangliang:'东汉末年黄巾起义首领之一，张角的三弟。中平元年（184）随兄起义，号称“人公将军”。遭到朝廷所派左中郎将皇甫嵩进攻时，他率军在广宗（今河北威县）进行反击。后因警戒疏忽，遭到汉军夜袭，兵败身亡。',
 	},
 	perfectPair:{
+		yuejin:['re_lidian'],
 		zhugejin:['zhugeke'],
 		guanyinping:['guanyu'],
 		zhangxingcai:['liushan'],
@@ -179,7 +180,6 @@ character.sp={
 		cuiyan:['caocao'],
 		guansuo:['guanyu'],
 		mateng:['machao','madai','mayunlu'],
-		madai:['mayunlu'],
 		chengpu:['zhouyu'],
 		hanba:['swd_muyun'],
 		dongbai:['dongzhuo']

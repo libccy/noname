@@ -1911,6 +1911,7 @@ mode.guozhan={
 					event.list.push(i);
 				}
 				_status.characterlist=event.list.slice(0);
+				_status.yeidentity=[];
 				if(_status.brawl&&_status.brawl.chooseCharacterFilter){
 					event.list=_status.brawl.chooseCharacterFilter(event.list);
 				}
@@ -2115,6 +2116,7 @@ mode.guozhan={
 					list=get.charactersOL();
 				}
 				_status.characterlist=list.slice(0);
+				_status.yeidentity=[];
 				event.list=list.slice(0);
 				var list2=[];
 				var num;
@@ -2568,6 +2570,21 @@ mode.guozhan={
 			},
 			dieAfter:function(source){
 				this.showCharacter(2);
+				if(get.is.jun(this.name1)){
+					var yelist=[];
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].identity==this.identity){
+							yelist.push(game.players[i]);
+						}
+					}
+					game.broadcastAll(function(list){
+						for(var i=0;i<list.length;i++){
+							list[i].identity='ye';
+							list[i].setIdentity();
+						}
+					},yelist);
+					_status.yeidentity.add(this.identity);
+				}
 				if(source&&source.identity!='unknown'){
 					if(this.identity=='ye') source.draw(1);
 					else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
@@ -2735,7 +2752,7 @@ mode.guozhan={
 				game.addVideo('showCharacter',this,num);
 				if(this.identity=='unknown'){
 					this.group=lib.character[this.name1][1];
-					if(get.is.jun(this.name1)){
+					if(get.is.jun(this.name1)&&this.isAlive()){
 						this.identity=this.group;
 						var yelist=[];
 						for(var i=0;i<game.players.length;i++){
@@ -2750,8 +2767,12 @@ mode.guozhan={
 							}
 						},yelist,this.group);
 					}
-					else if(get.totalPopulation(this.group)+1>get.population()/2) this.identity='ye';
-					else this.identity=this.group;
+					else if(_status.yeidentity.contains(this.group)||get.totalPopulation(this.group)+1>get.population()/2){
+						this.identity='ye';
+					}
+					else{
+						this.identity=this.group;
+					}
 					this.setIdentity(this.identity);
 					this.ai.shown=1;
 					this.node.identity.classList.remove('guessing');
@@ -2842,7 +2863,8 @@ mode.guozhan={
 				var name1=this.name1;
 				var name2=this.name2;
 				if(lib.character[name1][1]!=lib.character[name2][1]) return false;
-				var list=['re','diy','sp','jsp','shen','jg','xin'];
+				if(get.is.jun(this.name1)) return true;
+				var list=['re','diy','sp','jsp','shen','jg','xin','old','gz'];
 				for(var i=0;i<list.length;i++){
 					if(name1.indexOf(list[i]+'_')==0){
 						name1=name1.slice(list[i].length+1);
@@ -3082,7 +3104,6 @@ mode.guozhan={
 					return Math.min(0,Math.random()-0.3)+difficulty;
 				}
 				return Math.min(0,Math.random()-0.5)+difficulty;
-
 			},
 		}
 	},

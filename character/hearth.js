@@ -3322,7 +3322,7 @@ character.hearth={
 			trigger:{player:'useCard'},
 			direct:true,
 			filter:function(event){
-				return get.type(event.card,'trick')=='trick';
+				return get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card;
 			},
 			content:function(){
 				"step 0"
@@ -6224,7 +6224,7 @@ character.hearth={
 		malymowang_info:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你从3张随机锦囊中选择一张加入手牌',
 		malymowang_info_alter:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，随机获得一张普通锦牌牌',
 		lingzhou:'灵咒',
-		lingzhou_info:'每当你使用一张锦囊牌，可令一名角色摸一张牌或回复一点体力',
+		lingzhou_info:'每当你使用一张非转化的锦囊牌，可令一名角色摸一张牌或回复一点体力',
 		mieshi:'灭世',
 		mieshi_info:'锁定技，结束阶段，你流失一点体力，并对一名随机的其他角色造成一点火焰伤害',
 		xshixin:'蚀心',
