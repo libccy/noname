@@ -8937,15 +8937,6 @@
 					}
 					if(info.discard!=false&&info.lose!=false&&!info.viewAs){
 						player.discard(cards).delay=false;
-						if(info.prepare){
-                            switch(info.prepare){
-                                case 'give':player.$give(cards,targets[0]);break;
-                                case 'give2':player.$give(cards.length,targets[0]);break;
-                                case 'throw':player.$throw(cards);break;
-                                case 'throw2':player.$throw(cards.length);break;
-                                default:info.prepare(cards,player,targets);
-                            }
-						}
 						if(lib.config.low_performance){
 							event.discardTransition=true;
 						}
@@ -8959,16 +8950,7 @@
                                 player.lose(cards,ui.special);
                             }
 						}
-						if(info.prepare){
-                            switch(info.prepare){
-                                case 'give':player.$give(cards,targets[0]);break;
-                                case 'give2':player.$give(cards.length,targets[0]);break;
-                                case 'throw':player.$throw(cards);break;
-                                case 'throw2':player.$throw(cards.length);break;
-                                default:info.prepare(cards,player,targets);
-                            }
-						}
-						else if(info.viewAs){
+						if(!info.prepare&&info.viewAs){
 							player.$throw(cards);
 							if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
 							    var waitingForTransition=get.time();
@@ -9041,6 +9023,15 @@
 					}
 					else{
 						player.stat[player.stat.length-1].allSkills++;
+					}
+					if(info.prepare){
+						switch(info.prepare){
+							case 'give':player.$give(cards,targets[0]);break;
+							case 'give2':player.$give(cards.length,targets[0]);break;
+							case 'throw':player.$throw(cards);break;
+							case 'throw2':player.$throw(cards.length);break;
+							default:info.prepare(cards,player,targets);
+						}
 					}
 					"step 1"
 					if(!event.skill){
@@ -9171,14 +9162,6 @@
 				},
 				discard:function(){
 					"step 0"
-					// if(lib.config.background_audio){
-					// 	game.playAudio('effect','discard');
-					// }
-                    // game.broadcast(function(){
-                    //     if(lib.config.background_audio){
-    				// 		game.playAudio('effect','discard');
-    				// 	}
-                    // });
 					game.log(player,'弃置了',cards);
 					player.lose(cards);
 					if(event.animate!=false){

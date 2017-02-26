@@ -7,6 +7,8 @@ card.guozhan={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip1',
+			nomod:true,
+			nopower:true,
 			distance:{attackFrom:-1},
 			skills:['feilongduofeng','feilongduofeng2'],
 			ai:{
@@ -18,6 +20,8 @@ card.guozhan={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip2',
+			nomod:true,
+			nopower:true,
 			skills:['taipingyaoshu'],
 			ai:{
 				equipValue:9

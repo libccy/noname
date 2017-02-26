@@ -262,7 +262,45 @@ mode.guozhan={
 	},
 	skill:{
 		zhangwu:{
+			trigger:{global:'loseEnd'},
+			forced:true,
+			filter:function(event,player){
+				if(event.parent.name=='useCard') return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].name=='feilongduofeng'&&get.position(event.cards[i])=='d'){
+						return true;
+					}
+				}
+			},
+			content:function(){
+				var cards=[];
+				for(var i=0;i<trigger.cards.length;i++){
+					if(trigger.cards[i].name=='feilongduofeng'&&get.position(trigger.cards[i])=='d'){
+						cards.push(trigger.cards[i]);
+						if(player==trigger.player){
+							ui.cardPile.appendChild(trigger.cards[i]);
+						}
+						if(trigger.parent.name=='discard'){
+							trigger.parent.cards.remove(trigger.cards[i]);
+						}
+					}
+				}
+				if(player==trigger.player){
+					player.showCards(get.translation(player)+'发动了【章武】',cards);
+				}
+				else{
+					player.gain(trigger.cards,'gain2');
+				}
+			},
+			subSkill:{
+				equip:{
 
+				},
+				gain:{
+
+				}
+			},
+			group:['zhangwu_equip','zhangwu_gain']
 		},
 		shouyue:{
 			derivationfixed:true,
@@ -598,6 +636,7 @@ mode.guozhan={
 							if(target.hasSkill('gzrende')) num+=1.2;
 							if(target.hasSkill('longdan')) num+=1.2;
 							if(target.hasSkill('paoxiao')) num+=1.2;
+							if(target.hasSkill('zhangwu')) num+=1.5;
 							if(target!=player) num+=0.5;
 						}
 						return num;
@@ -2313,7 +2352,7 @@ mode.guozhan={
 		wuhujiangdaqi:'五虎将大旗',
 		wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你每发动一次‘龙胆’便摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“若结果为红色”改为“若结果不为黑桃”',
 		zhangwu:'章武',
-		zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区时，你获得之。当你失去【飞龙夺风】时，展示之，然后将此牌置于牌堆底并摸两张牌',
+		zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区时，你获得之。当你失去【飞龙夺风】时，若其在弃牌堆或被其他角色获得，你展示之，然后将此牌置于牌堆底并摸两张牌',
 		shouyue:'授钺',
 		shouyue_info:'君主技。只要此武将牌处于明置状态，你便拥有“五虎将大旗”',
 		jizhao:'激诏',
