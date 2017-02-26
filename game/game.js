@@ -25541,10 +25541,10 @@
                             if(del!=0) return del;
                             var aa=a,bb=b;
                             if(a.indexOf('_')!=-1){
-                                a=a.slice(a.indexOf('_')+1);
+                                a=a.slice(a.lastIndexOf('_')+1);
                             }
                             if(b.indexOf('_')!=-1){
-                                b=b.slice(b.indexOf('_')+1);
+                                b=b.slice(b.lastIndexOf('_')+1);
                             }
                             if(a!=b){
                                 return a>b?1:-1;
@@ -30177,7 +30177,7 @@
 						capt=str[0];
 					}
 					else{
-						capt=str[str.indexOf('_')+1];
+						capt=str[str.lastIndexOf('_')+1];
 					}
 					capt=capt.toLowerCase();
 					if(!/[a-z]/i.test(capt)){
@@ -30605,10 +30605,10 @@
 					if(del!=0) return del;
 					var aa=a,bb=b;
 					if(a.indexOf('_')!=-1){
-						a=a.slice(a.indexOf('_')+1);
+						a=a.slice(a.lastIndexOf('_')+1);
 					}
 					if(b.indexOf('_')!=-1){
-						b=b.slice(b.indexOf('_')+1);
+						b=b.slice(b.lastIndexOf('_')+1);
 					}
 					if(a!=b){
 						return a>b?1:-1;
@@ -31978,6 +31978,9 @@
 			},
 			skin:function(avatar,name,callback){
 				var num=1;
+				if(name.indexOf('gz_')==0){
+					name=name.slice(3);
+				}
 				if(lib.config.skin[name]){
 					num=lib.config.skin[name]+1;
 				}
@@ -34151,6 +34154,10 @@
 					}
 				}).setBackground(name,'character');
 				var changeskinfunc=null;
+				var nameskin=name;
+				if(nameskin.indexOf('gz_')==0){
+					nameskin=nameskin.slice(3);
+				}
 				var changeskin=function(){
 					var node=ui.create.div('.changeskin','可换肤',playerbg);
 					var avatars=ui.create.div('.avatars',playerbg);
@@ -34169,24 +34176,24 @@
                                 var button=ui.create.div(avatars,function(){
                                     playerbg.classList.remove('scroll');
 									if(this._link){
-                                        lib.config.skin[name]=this._link;
+                                        lib.config.skin[nameskin]=this._link;
                                         bg.style.backgroundImage=this.style.backgroundImage;
 										sourcenode.style.backgroundImage=this.style.backgroundImage;
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                     else{
-                                        delete lib.config.skin[name];
-										bg.setBackground(name,'character');
-                                        sourcenode.setBackground(name,'character');
+                                        delete lib.config.skin[nameskin];
+										bg.setBackground(nameskin,'character');
+                                        sourcenode.setBackground(nameskin,'character');
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                 });
                                 button._link=i;
                                 if(i){
-                                    button.setBackgroundImage('image/skin/'+name+'/'+i+'.jpg');
+                                    button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
                                 }
                                 else{
-                                    button.setBackground(name,'character','noskin');
+                                    button.setBackground(nameskin,'character','noskin');
                                 }
                             }
                         };
@@ -34201,22 +34208,22 @@
     							num--;
     							createButtons(num);
     						}
-    						img.src=lib.assetURL+'image/skin/'+name+'/'+num+'.jpg';
+    						img.src=lib.assetURL+'image/skin/'+nameskin+'/'+num+'.jpg';
     					}
                         if(lib.config.change_skin){
 							loadImage();
                         }
     					else{
-                            createButtons(lib.skin[name]);
+                            createButtons(lib.skin[nameskin]);
                         }
 					};
 				};
 				if(lib.config.change_skin){
 					var img=new Image();
 					img.onload=changeskin;
-					img.src=lib.assetURL+'image/skin/'+name+'/1.jpg';
+					img.src=lib.assetURL+'image/skin/'+nameskin+'/1.jpg';
 				}
-				else if(lib.config.debug&&lib.skin[name]){
+				else if(lib.config.debug&&lib.skin[nameskin]){
 					changeskin();
 				}
 				var ban=ui.create.div('.menubutton.large.ban.character',uiintro,'禁用',function(e){
@@ -36934,37 +36941,40 @@
 								uiintro.add('<div class="text center">更改皮肤</div>');
 							}
 							var buttons=ui.create.div('.buttons.smallzoom');
+							var nameskin=(avatar2?node.name2:node.name);
+							if(nameskin.indexOf('gz_')==0){
+								nameskin=nameskin.slice(3);
+							}
 							for(var i=0;i<=num;i++){
-								var button=ui.create.div('.button.character',buttons,function(){
+								var button=ui.create.div('.button.character.pointerdiv',buttons,function(){
 									if(this._link){
 										if(avatar2){
-											lib.config.skin[node.name2]=this._link;
+											lib.config.skin[nameskin]=this._link;
 											node.node.avatar2.style.backgroundImage=this.style.backgroundImage;
 										}
 										else{
-											lib.config.skin[node.name]=this._link;
+											lib.config.skin[nameskin]=this._link;
 											node.node.avatar.style.backgroundImage=this.style.backgroundImage;
 										}
-										game.saveConfig('skin',lib.config.skin);
 									}
 									else{
 										if(avatar2){
-											delete lib.config.skin[node.name2];
-											node.node.avatar2.setBackground(node.name2,'character');
+											delete lib.config.skin[nameskin];
+											node.node.avatar2.setBackground(nameskin,'character');
 										}
 										else{
-											delete lib.config.skin[node.name];
-											node.node.avatar.setBackground(node.name,'character');
+											delete lib.config.skin[nameskin];
+											node.node.avatar.setBackground(nameskin,'character');
 										}
-										game.saveConfig('skin',lib.config.skin);
 									}
+									game.saveConfig('skin',lib.config.skin);
 								});
 								button._link=i;
 								if(i){
-									button.setBackgroundImage('image/skin/'+(avatar2?node.name2:node.name)+'/'+i+'.jpg');
+									button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
 								}
 								else{
-									button.setBackground((avatar2?node.name2:node.name),'character','noskin');
+									button.setBackground(nameskin,'character','noskin');
 								}
 							}
 							uiintro.add(buttons);
@@ -36987,7 +36997,11 @@
 									}
 								}
 							}
-							img.src=lib.assetURL+'image/skin/'+(avatar2?node.name2:node.name)+'/'+num+'.jpg';
+							var nameskin=(avatar2?node.name2:node.name);
+							if(nameskin.indexOf('gz_')==0){
+								nameskin=nameskin.slice(3);
+							}
+							img.src=lib.assetURL+'image/skin/'+nameskin+'/'+num+'.jpg';
 						}
 						if(lib.config.change_skin){
 							if(!node.isUnseen(0)){
@@ -36999,11 +37013,19 @@
 						}
 						else{
 							setTimeout(function(){
-								if(!node.isUnseen(0)&&lib.skin[node.name]){
-									createButtons(lib.skin[node.name]);
+								var nameskin1=node.name;
+								var nameskin2=node.name2;
+								if(nameskin1.indexOf('gz_')==0){
+									nameskin1=nameskin1.slice(3);
 								}
-								if(!node.isUnseen(1)&&lib.skin[node.name2]){
-									createButtons(lib.skin[node.name2],true);
+								if(nameskin2.indexOf('gz_')==0){
+									nameskin2=nameskin2.slice(3);
+								}
+								if(!node.isUnseen(0)&&lib.skin[nameskin1]){
+									createButtons(lib.skin[nameskin1]);
+								}
+								if(!node.isUnseen(1)&&lib.skin[nameskin2]){
+									createButtons(lib.skin[nameskin2],true);
 								}
 							});
 						}
@@ -37308,6 +37330,10 @@
                     if(addskin&&(!simple||get.is.phoneLayout())){
     					var num=1;
     					var introadded=false;
+						var nameskin=node.link;
+						if(nameskin.indexOf('gz_')==0){
+							nameskin=nameskin.slice(3);
+						}
                         var createButtons=function(num){
                             if(!num) return;
                             if(!introadded){
@@ -37316,24 +37342,24 @@
                             }
                             var buttons=ui.create.div('.buttons.smallzoom');
                             for(var i=0;i<=num;i++){
-                                var button=ui.create.div('.button.character',buttons,function(){
+                                var button=ui.create.div('.button.character.pointerdiv',buttons,function(){
                                     if(this._link){
-                                        lib.config.skin[node.link]=this._link;
+                                        lib.config.skin[nameskin]=this._link;
                                         node.style.backgroundImage=this.style.backgroundImage;
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                     else{
-                                        delete lib.config.skin[node.link];
-                                        node.setBackground(node.link,'character');
+                                        delete lib.config.skin[nameskin];
+                                        node.setBackground(nameskin,'character');
                                         game.saveConfig('skin',lib.config.skin);
                                     }
                                 });
                                 button._link=i;
                                 if(i){
-                                    button.setBackgroundImage('image/skin/'+node.link+'/'+i+'.jpg');
+                                    button.setBackgroundImage('image/skin/'+nameskin+'/'+i+'.jpg');
                                 }
                                 else{
-                                    button.setBackground(node.link,'character','noskin');
+                                    button.setBackground(nameskin,'character','noskin');
                                 }
                             }
                             uiintro.add(buttons);
@@ -37348,19 +37374,14 @@
     							num--;
     							createButtons(num);
     						}
-    						img.src=lib.assetURL+'image/skin/'+node.link+'/'+num+'.jpg';
+    						img.src=lib.assetURL+'image/skin/'+nameskin+'/'+num+'.jpg';
     					}
                         if(lib.config.change_skin){
-                            if(!node.isUnseen(0)){
-    							loadImage();
-    						}
-                            else{
-                                loadImage(true);
-                            }
+							loadImage();
                         }
     					else{
 							setTimeout(function(){
-								createButtons(lib.skin[node.link]);
+								createButtons(lib.skin[nameskin]);
 							});
                         }
     				}
