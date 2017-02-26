@@ -6641,7 +6641,7 @@
     					var hidden=player.hiddenSkills.slice(0);
     					game.expandSkills(hidden);
     					if(hidden.contains(event.skill)){
-							if(!info.silent&&player.hasGlobalTag('nomingzhi')){
+							if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
 								event.finish();
 							}
                             else if(!info.direct){
@@ -10277,7 +10277,7 @@
                     }
                     return this;
                 },
-				reinit:function(from,to,maxHp){
+				reinit:function(from,to,maxHp,online){
 					var info1=lib.character[from];
 					var info2=lib.character[to];
 					if(this.name2==from){
@@ -10302,6 +10302,15 @@
 					}
 					else{
 						return this;
+					}
+					if(online){
+						return;
+					}
+					for(var i=0;i<info1[3].length;i++){
+						this.removeSkill(info1[3][i]);
+					}
+					for(var i=0;i<info2[3].length;i++){
+						this.addSkill(info2[3][i]);
 					}
 					var num;
 					if(maxHp===false){
@@ -10331,12 +10340,10 @@
 					else{
 						this.maxHp+=num;
 					}
-					for(var i=0;i<info1[3].length;i++){
-						this.removeSkill(info1[3][i]);
-					}
-					for(var i=0;i<info2[3].length;i++){
-						this.addSkill(info2[3][i]);
-					}
+					game.broadcast(function(player,from,to,skills){
+						player.reinit(from,to,null,true);
+						player.applySkills(skills);
+					},this,from,to,get.skillState(this));
 					game.addVideo('reinit3',this,{
 						from:from,
 						to:to,
@@ -13415,6 +13422,7 @@
 				},
 				isFriendOf:function(player){
 					if(get.mode()=='guozhan'){
+						if(this==player) return true;
 						if(this.identity=='unknown'||this.identity=='ye') return false;
 						if(player.identity=='unknown'||player.identity=='ye') return false;
 						return this.identity==player.identity;
@@ -21106,7 +21114,7 @@
 						event.finish();
 					}
 					else{
-						if(lib.config.compatiblemode||_status.connectMode){
+						if(lib.config.compatiblemode||(_status.connectMode&&!lib.config.debug)){
 							try{
 								event.content(event,step,source,player,target,targets,
 		                            card,cards,skill,forced,num,trigger,result,
@@ -21413,7 +21421,7 @@
 				}
 				else{
 					var skills2;
-					if(get.mode()=='guozhan'&&player.hasGlobalTag('nomingzhi')){
+					if(get.mode()=='guozhan'&&player.hasSkillTag('nomingzhi',false,null,true)){
 						skills2=player.get('s',false,true,false);
 					}
 					else{
@@ -35413,12 +35421,13 @@
                 }
             }
         },
-        charactersOL:function(){
+        charactersOL:function(func){
             var list=[];
             var libCharacter={};
             for(var i=0;i<lib.configOL.characterPack.length;i++){
                 var pack=lib.characterPack[lib.configOL.characterPack[i]];
                 for(var j in pack){
+					if(typeof func=='function'&&func(j)) continue;
                     if(j=='zuoci') continue;
                     if(lib.character[j]) libCharacter[j]=pack[j];
                 }

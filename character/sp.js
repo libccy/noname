@@ -757,9 +757,16 @@ character.sp={
 			content:function(){
 				'step 0'
 				var list=[];
-				for(var i in lib.character){
-					if(!lib.filter.characterDisabled(i)&&lib.character[i][1]=='shu'){
-						list.push(i);
+				if(_status.connectMode){
+					list=get.charactersOL(function(i){
+						return lib.character[i][1]!='shu';
+					});
+				}
+				else{
+					for(var i in lib.character){
+						if(!lib.filter.characterDisabled(i)&&lib.character[i][1]=='shu'){
+							list.push(i);
+						}
 					}
 				}
 				var players=game.players.concat(game.dead);
@@ -780,9 +787,7 @@ character.sp={
 				if(mode!='chess'&&mode!='tafang'&&mode!='stone'){
 					num=Math.min(num,game.players.length+game.dead.length);
 				}
-				game.broadcastAll(function(player,name,num){
-					player.reinit('zhaoxiang',name,num);
-				},player,result.links[0],num);
+				player.reinit('zhaoxiang',result.links[0],num);
 			}
 		},
 		fanghun:{
@@ -6166,9 +6171,9 @@ character.sp={
 				}
 				return false;
 			},
+			logTarget:'player',
 			content:function(){
 				trigger.player.draw();
-				player.line(trigger.player,'green');
 			},
 			ai:{
 				threaten:1.3,

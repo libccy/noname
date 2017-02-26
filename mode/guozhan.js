@@ -234,9 +234,9 @@ mode.guozhan={
 
 			gz_dengai:['male','wei',4,['tuntian','ziliang','gzjixi']],
 			gz_caohong:['male','wei',4,['huyuan','heyi']],
-			// gz_jiangfei:['male','shu',3,['shengxi','gzshoucheng']],
+			gz_jiangfei:['male','shu',3,['shengxi','gzshoucheng']],
 			gz_jiangwei:['male','shu',4,['tiaoxin','yizhi','tianfu']],
-			// gz_xusheng:['male','wu',4,['yicheng']],
+			gz_xusheng:['male','wu',4,['yicheng']],
 			gz_jiangqing:['male','wu',4,['gzshangyi','niaoxiang']],
 			gz_hetaihou:['female','qun',3,['zhendu','qiluan']],
 
@@ -257,6 +257,31 @@ mode.guozhan={
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
+		gzshoucheng:{
+			inherit:'shoucheng',
+			filter:function(event,player){
+				if(event.player.num('h')) return false;
+				if(!event.player.isFriendOf(player)) return false;
+				if(_status.currentPhase==event.player) return false;
+				for(var i=0;i<event.cards.length;i++){
+					if(event.cards[i].original=='h') return true;
+				}
+				return false;
+			},
+		},
+		yicheng:{
+			trigger:{global:'shaBegin'},
+			filter:function(event,player){
+				return event.target.isFriendOf(player);
+			},
+			logTarget:'target',
+			content:function(){
+				'step 0'
+				trigger.target.draw();
+				'step 1'
+				trigger.target.chooseToDiscard('he',true);
+			}
+		},
 		gzjixi:{
 			inherit:'jixi',
 			init:function(player){
@@ -2218,9 +2243,16 @@ mode.guozhan={
 		mingzhifujiang:'明置副将',
 		tongshimingzhi:'同时明置',
 		mode_guozhan_character_config:'国战武将',
-
 		_zhenfazhaohuan:'阵法召唤',
 		_zhenfazhaohuan_info:'由拥有阵法技的角色发起，满足此阵法技条件的未确定势力角色均可按逆时针顺序一次明置其一张武将牌(响应阵法召唤)，以发挥阵法技的效果',
+
+		liefeng:'',
+		liefeng_info:'',
+		xuanlve:'',
+		xuanlve_info:'',
+
+		gzshoucheng:'守成',
+		gzshoucheng_info:'当与你势力相同的一名角色于其回合外失去最后手牌时，你可以令其摸一张牌',
 		gzmingshi:'名士',
 		gzmingshi_info:'锁定技，当你受到伤害时，若伤害来源有暗置的武将牌，此伤害-1',
 		fengshi:'锋矢',
@@ -2632,16 +2664,13 @@ mode.guozhan={
 				this.checkConflict();
 			},
 			removeCharacter:function(num){
-				var info=lib.character[this['name'+(num+1)]];
+				var name=this['name'+(num+1)];
+				var info=lib.character[name];
 				if(!info) return;
-				game.broadcastAll(function(player,to,num){
-					var name=player['name'+(num+1)];
-					game.log(player,'移除了'+(num?'副将':'主将'),'#b'+get.translation(name));
-					player.reinit(name,to,false);
-					if(!game.online){
-						player.showCharacter(num,false);
-					}
-				},this,'gz_shibing'+(info[0]=='male'?1:2)+info[1],num);
+				var to='gz_shibing'+(info[0]=='male'?1:2)+info[1];
+				game.log(this,'移除了'+(num?'副将':'主将'),'#b'+get.translation(name));
+				this.reinit(name,to,false);
+				this.showCharacter(num,false);
 			},
 			hasMainCharacter:function(){
 				return this.name1.indexOf('gz_shibing')!=0;
