@@ -249,6 +249,9 @@ mode.guozhan={
 			gz_chendong:['male','wu',4,['duanxie','fenming']],
 			gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
 			gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
+
+			gz_jun_liubei:['male','shu',4,[]],
+			gz_jun_zhangjiao:['male','qun',4,[]],
 		}
 	},
 	characterIntro:{
@@ -1717,7 +1720,7 @@ mode.guozhan={
 					}
 				}
 				else{
-					if(hasunknown){
+					if(hasunknown&&!get.zhu()){
 						var players=game.players.concat(game.dead);
 						var num=0;
 						for(var i=0;i<players.length;i++){
@@ -1883,7 +1886,15 @@ mode.guozhan={
 					if(i.indexOf('gz_shibing')==0) continue;
 					if(chosen.contains(i)) continue;
 					if(lib.filter.characterDisabled(i)) continue;
-					if(get.config('onlyguozhan')&&!lib.characterPack.mode_guozhan[i]) continue;
+					if(get.config('onlyguozhan')){
+						if(!lib.characterPack.mode_guozhan[i]) continue;
+						if(get.config('junzhu')){
+							if(lib.junList.contains(i.slice(3))) continue;
+						}
+						else{
+							if(lib.junList.contains(i.slice(7))) continue;
+						}
+					}
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);
 				}
@@ -1933,15 +1944,18 @@ mode.guozhan={
 						event.ai(game.me,list);
 						ui.arena.classList.remove('selecting');
 					};
-					if(get.config('onlyguozhan')){
-						event.dialogxx=ui.create.characterDialog(function(i){
-							if(i.indexOf('gz_shibing')==0) return true;
+					event.dialogxx=ui.create.characterDialog(function(i){
+						if(i.indexOf('gz_shibing')==0) return true;
+						if(get.config('onlyguozhan')){
 							if(!lib.characterPack.mode_guozhan[i]) return true;
-						},get.config('onlyguozhanexpand')?'expandall':undefined);
-					}
-					else{
-						event.dialogxx=ui.create.characterDialog();
-					}
+							if(get.config('junzhu')){
+								if(lib.junList.contains(i.slice(3))) return true;
+							}
+							else{
+								if(lib.junList.contains(i.slice(7))) return true;
+							}
+						}
+					},get.config('onlyguozhanexpand')?'expandall':undefined);
 					ui.create.cheat2=function(){
 						ui.cheat2=ui.create.control('自由选将',function(){
 							if(this.dialog==_status.event.dialog){
@@ -2258,10 +2272,8 @@ mode.guozhan={
 		_zhenfazhaohuan:'阵法召唤',
 		_zhenfazhaohuan_info:'由拥有阵法技的角色发起，满足此阵法技条件的未确定势力角色均可按逆时针顺序一次明置其一张武将牌(响应阵法召唤)，以发挥阵法技的效果',
 
-		liefeng:'',
-		liefeng_info:'',
-		xuanlve:'',
-		xuanlve_info:'',
+		gz_jun_liubei:'君刘备',
+		gz_jun_zhangjiao:'君张角',
 
 		gzshoucheng:'守成',
 		gzshoucheng_info:'当与你势力相同的一名角色于其回合外失去最后手牌时，你可以令其摸一张牌',
@@ -2338,6 +2350,7 @@ mode.guozhan={
 		gzxiaoguo:'骁果',
 		gzxiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
 	},
+	junList:['liubei','zhangjiao'],
 	guozhanPile:[
 		["spade",7,"sha"],
 		["spade",8,"sha"],
@@ -2704,10 +2717,23 @@ mode.guozhan={
 				game.addVideo('showCharacter',this,num);
 				if(this.identity=='unknown'){
 					this.group=lib.character[this.name1][1];
-					// this.node.identity.style.backgroundColor=get.translation(this.group+'Color');
-					if(get.totalPopulation(this.group)+1>get.population()/2) this.identity='ye';
+					if(get.is.jun(this.name1)){
+						this.identity=this.group;
+						var yelist=[];
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].identity=='ye'&&game.players[i]._group==this.group){
+								yelist.push(game.players[i]);
+							}
+						}
+						game.broadcastAll(function(list,group){
+							for(var i=0;i<list.length;i++){
+								list[i].identity=group;
+								list[i].setIdentity();
+							}
+						},yelist,this.group);
+					}
+					else if(get.totalPopulation(this.group)+1>get.population()/2) this.identity='ye';
 					else this.identity=this.group;
-					// this.node.identity.dataset.color=this.identity;
 					this.setIdentity(this.identity);
 					this.ai.shown=1;
 					this.node.identity.classList.remove('guessing');

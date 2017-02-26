@@ -2653,6 +2653,14 @@
 		    guozhan:{
 		        name:'国战',
                 connect:{
+					update:function(config,map){
+						if(config.connect_onlyguozhan){
+							map.connect_junzhu.show();
+						}
+						else{
+							map.connect_junzhu.hide();
+						}
+					},
                     connect_player_number:{
 		                name:'游戏人数',
 		                init:'8',
@@ -2698,6 +2706,13 @@
 						restart:true,
 						intro:'开启后将禁用非国战专属武将'
 					},
+					connect_junzhu:{
+						name:'替换君主',
+						init:true,
+						frequent:true,
+						restart:true,
+						intro:'开启后将使用国战君主替换原武将牌'
+					},
 		            connect_ban_weak:{
 		                name:'屏蔽弱将',
 						init:false,
@@ -2710,6 +2725,14 @@
 		            },
                 },
 		        config:{
+					update:function(config,map){
+						if(config.onlyguozhan){
+							map.junzhu.show();
+						}
+						else{
+							map.junzhu.hide();
+						}
+					},
 					guozhan_mode:{
 						name:'游戏模式',
 						init:'normal',
@@ -2763,6 +2786,13 @@
 						frequent:true,
 						restart:true,
 						intro:'开启后将禁用非国战专属武将'
+					},
+					junzhu:{
+						name:'替换君主',
+						init:true,
+						frequent:true,
+						restart:true,
+						intro:'开启后将使用国战君主替换原武将牌'
 					},
 		            double_hp:{
 		                name:'双将体力上限',
@@ -10070,6 +10100,11 @@
 			player:{
 				init:function(character,character2,skill){
 					if(!lib.character[character]) return;
+					if(get.is.jun(character2)){
+						var tmp=character;
+						character=character2;
+						character2=tmp;
+					}
 					if(character2==false){
 						skill=false;
 						character2=null;
@@ -35094,6 +35129,13 @@
 				if(typeof func=='function') return false;
 				var select=get.select(func);
 				return select[0]==1&&select[1]==1;
+			},
+			jun:function(name){
+				if(typeof name=='string'&&name.indexOf('gz_jun_')==0&&
+					lib.junList&&lib.junList.contains(name.slice(7))){
+					return true;
+				}
+				return false;
 			},
 			versus:function(){
 				return !_status.connectMode&&get.mode()=='versus'&&_status.mode=='three';
