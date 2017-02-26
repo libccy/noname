@@ -427,6 +427,8 @@ window.noname_asset_list=[
     'image/character/jsp_guanyu.jpg',
     'image/character/jsp_huangyueying.jpg',
     'image/character/jsp_zhaoyun.jpg',
+    'image/character/jun_liubei.jpg',
+    'image/character/jun_zhangjiao.jpg',
     'image/character/kanze.jpg',
     'image/character/kongrong.jpg',
     'image/character/liaohua.jpg',

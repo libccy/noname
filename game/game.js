@@ -5915,7 +5915,12 @@
                 else{
                     target=game.me.next;
                 }
-                target.init(name);
+				if(!lib.character[name]){
+					target.node.avatar.setBackground(name,'character');
+				}
+				else{
+					target.init(name);
+				}
 				if(i===true){
 					if(lib.config.layout=='long2'){
 						lib.init.layout('mobile');
@@ -10317,7 +10322,10 @@
 						num=0;
 					}
 					else{
-						num=(maxHp||info2[2])-info1[2];
+						if(typeof maxHp!='number'){
+							maxHp=info2[2];
+						}
+						num=maxHp-info1[2];
 					}
 					if(typeof this.singleHp=='boolean'){
 						if(num%2==1){
@@ -10996,6 +11004,11 @@
                             console.log(this.storage[skill]);
                         }
 					}
+				},
+				syncSkills:function(){
+					game.broadcast(function(player,skills){
+						player.applySkills(skills);
+					},this,get.skillState(this));
 				},
 				playerfocus:function(time){
 					time=time||1000;
@@ -12174,6 +12187,10 @@
 						if(ui.revive){
 							ui.revive.close();
 							delete ui.revive;
+						}
+						if(ui.exit){
+							ui.exit.close();
+							delete ui.exit;
 						}
 						if(ui.swap){
 							ui.swap.close();
@@ -18650,6 +18667,14 @@
 					console.log(player);
 				}
 			},
+			identityColor:function(player,str){
+				if(player&&str){
+					player.node.identity.dataset.color=str;
+				}
+				else{
+					console.log(player);
+				}
+			},
 			chessSwap:function(content){
 				var me=game.playerMap[content[0]];
 				var player=game.playerMap[content[1]];
@@ -22774,7 +22799,7 @@
 								case 'y':color='yellow';break;
 								case 'g':color='green';break;
 							}
-							str+='<span class="'+color+'text">'+arguments[i].slice(2)+'</span>';
+							str+='<span class="'+color+'text">'+get.translation(arguments[i].slice(2))+'</span>';
 						}
 						else{
 							str+=get.translation(arguments[i]);

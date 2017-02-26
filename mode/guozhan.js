@@ -887,13 +887,17 @@ mode.guozhan={
 				var skills;
 				if(result.control=='主将'){
 					trigger.source.showCharacter(0);
-					trigger.source.node.avatar.classList.add('disabled');
+					game.broadcastAll(function(player){
+						player.node.avatar.classList.add('disabled');
+					},trigger.source);
 					skills=lib.character[trigger.source.name][3];
 					game.log(trigger.source,'失去了主将技能');
 				}
 				else{
 					trigger.source.showCharacter(1);
-					trigger.source.node.avatar2.classList.add('disabled');
+					game.broadcastAll(function(player){
+						player.node.avatar2.classList.add('disabled');
+					},trigger.source);
 					skills=lib.character[trigger.source.name2][3];
 					game.log(trigger.source,'失去了副将技能');
 				}
@@ -909,6 +913,7 @@ mode.guozhan={
 					}
 				}
 				trigger.source.disableSkill('gzduanchang',list);
+				trigger.source.syncSkills();
 			},
 			logTarget:'source',
 			ai:{
@@ -1882,6 +1887,7 @@ mode.guozhan={
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
 					event.list.push(i);
 				}
+				_status.characterlist=event.list.slice(0);
 				if(_status.brawl&&_status.brawl.chooseCharacterFilter){
 					event.list=_status.brawl.chooseCharacterFilter(event.list);
 				}
@@ -2024,6 +2030,8 @@ mode.guozhan={
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].classList.add('unseen');
 					game.players[i].classList.add('unseen2');
+					_status.characterlist.remove(game.players[i].name);
+					_status.characterlist.remove(game.players[i].name2);
 					if(game.players[i]!=game.me){
 						game.players[i].node.identity.firstChild.innerHTML='猜';
 						game.players[i].node.identity.dataset.color='unknown';
@@ -2074,6 +2082,7 @@ mode.guozhan={
 				else{
 					list=get.charactersOL();
 				}
+				_status.characterlist=list.slice(0);
 				event.list=list.slice(0);
 				var list2=[];
 				var num;
@@ -2160,6 +2169,8 @@ mode.guozhan={
 				}
 
 				for(var i=0;i<game.players.length;i++){
+					_status.characterlist.remove(game.players[i].name);
+					_status.characterlist.remove(game.players[i].name2);
 					game.players[i].hiddenSkills=lib.character[game.players[i].name][3].slice(0);
 					var hiddenSkills2=lib.character[game.players[i].name2][3];
 					for(var j=0;j<hiddenSkills2.length;j++){
@@ -2670,7 +2681,7 @@ mode.guozhan={
 				var info=lib.character[name];
 				if(!info) return;
 				var to='gz_shibing'+(info[0]=='male'?1:2)+info[1];
-				game.log(this,'移除了'+(num?'副将':'主将'),'#b'+get.translation(name));
+				game.log(this,'移除了'+(num?'副将':'主将'),'#b'+name);
 				this.reinit(name,to,false);
 				this.showCharacter(num,false);
 			},
@@ -2713,21 +2724,21 @@ mode.guozhan={
 				var skills;
 				switch(num){
 					case 0:
-					if(log!==false) game.log(this,'展示了主将','#b'+get.translation(this.name1));
+					if(log!==false) game.log(this,'展示了主将','#b'+this.name1);
 					this.name=this.name1;
 					skills=lib.character[this.name][3];
 					this.sex=lib.character[this.name][0];
 					this.classList.remove('unseen');
 					break;
 					case 1:
-					if(log!==false) game.log(this,'展示了副将','#b'+get.translation(this.name2));
+					if(log!==false) game.log(this,'展示了副将','#b'+this.name2);
 					skills=lib.character[this.name2][3];
 					if(this.sex=='unknown') this.sex=lib.character[this.name2][0];
 					if(this.name.indexOf('unknown')==0) this.name=this.name2;
 					this.classList.remove('unseen2');
 					break;
 					case 2:
-					if(log!==false) game.log(this,'展示了主将','#b'+get.translation(this.name1),'、副将','#b'+get.translation(this.name2));
+					if(log!==false) game.log(this,'展示了主将','#b'+this.name1,'、副将','#b'+this.name2);
 					this.name=this.name1;
 					skills=lib.character[this.name][3].concat(lib.character[this.name2][3]);
 					this.sex=lib.character[this.name][0];

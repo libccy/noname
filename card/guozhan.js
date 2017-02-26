@@ -603,7 +603,112 @@ card.guozhan={
 			},
 		},
 		feilongduofeng2:{
-
+			trigger:{source:'dieAfter'},
+			filter:function(event,player){
+				return event.player.isDead()&&lib.group.contains(player.identity)&&player.isMinor();
+			},
+			logTarget:'player',
+			content:function(){
+				'step 0'
+				var list=[];
+				for(var i=0;i<_status.characterlist.length;i++){
+					var info=lib.character[_status.characterlist[i]];
+					if(info[4]&&info[4].contains('jun')) continue;
+					if(info[1]==player.identity){
+						list.push(_status.characterlist[i]);
+					}
+				}
+				event.identity=event.player.identity;
+				if(trigger.player==game.me&&!_status.auto){
+					event.dialog=ui.create.dialog('是否选择一名角色重新加入游戏？',[list,'character']);
+					event.filterButton=function(){return true};
+					event.player=game.me;
+					event.custom.replace.confirm=function(){
+						event.directresult=ui.selected.buttons[0].link;
+						event.dialog.close();
+						if(ui.confirm) ui.confirm.close();
+						delete event.player;
+						game.resume();
+					}
+					event.switchToAuto=function(){
+						event.directresult=list.randomGet();
+						event.dialog.close();
+						if(ui.confirm) ui.confirm.close();
+						delete event.player;
+					};
+					game.check();
+					game.pause();
+				}
+				else if(trigger.player.isOnline()){
+					trigger.player.send(function(player,list){
+						if(_status.auto){
+							_status.event._result=list.randomGet();
+						}
+						else{
+							var next=game.createEvent('replacePlayer');
+							next.source=player;
+							next.list=list;
+							next.setContent(function(){
+								event.dialog=ui.create.dialog('是否选择一名角色重新加入游戏？',[event.list,'character']);
+								event.filterButton=function(){return true};
+								event.player=event.source;
+								event.custom.replace.confirm=function(){
+									event.result=ui.selected.buttons[0].link;
+									event.dialog.close();
+									if(ui.confirm) ui.confirm.close();
+									delete event.player;
+									game.resume();
+									game.uncheck();
+								}
+								event.switchToAuto=function(){
+									event.result=list.randomGet();
+									event.dialog.close();
+									if(ui.confirm) ui.confirm.close();
+									delete event.player;
+									game.uncheck();
+								};
+								game.check();
+								game.pause();
+							});
+						}
+						game.resume();
+					},trigger.player,list);
+					trigger.player.wait();
+					game.pause();
+				}
+				else{
+					event.directresult=list.randomGet();
+				}
+				event.list=list;
+				'step 1'
+				game.uncheck();
+				if(!event.directresult){
+					if(event.resultOL){
+						event.directresult=event.resultOL[trigger.player.playerid];
+					}
+					if(!event.directresult||event.directresult=='ai'){
+						event.directresult=event.list.randomGet();
+					}
+				}
+				game.log(trigger.player,'重新加入游戏');
+				var name=event.directresult;
+				game.log(trigger.player,'将主将替换为','#b'+name);
+				_status.characterlist.remove(name);
+				game.broadcastAll(function(source,name,identity){
+					source.revive(2,false);
+					source.identity=identity;
+					source._group=identity;
+					source.setIdentity();
+					if(source==game.me){
+						ui.arena.classList.remove('selecting');
+					}
+				},trigger.player,name,event.identity);
+				trigger.player.draw();
+				trigger.player.reinit(trigger.player.name1,name,false);
+				trigger.player.removeCharacter(1);
+				trigger.getParent('damage').untrigger(false,trigger.player);
+				game.addVideo('setIdentity',trigger.player,event.identity);
+			}
 		},
 		taipingyaoshu:{
 			trigger:{player:'damageBefore'},
