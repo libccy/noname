@@ -250,7 +250,7 @@ mode.guozhan={
 			gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
 			gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
 
-			gz_jun_liubei:['male','shu',4,[]],
+			gz_jun_liubei:['male','shu',4,['zhangwu','shouyue','jizhao']],
 			gz_jun_zhangjiao:['male','qun',4,[]],
 		}
 	},
@@ -261,6 +261,19 @@ mode.guozhan={
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
+		zhangwu:{
+
+		},
+		shouyue:{
+			derivationfixed:true,
+			derivation:'wuhujiangdaqi',
+		},
+		wuhujiangdaqi:{
+
+		},
+		jizhao:{
+			derivation:'gzrende'
+		},
 		gzshoucheng:{
 			inherit:'shoucheng',
 			filter:function(event,player){
@@ -908,11 +921,13 @@ mode.guozhan={
 				for(var i=0;i<skills.length;i++){
 					list.add(skills[i]);
 					var info=lib.skill[skills[i]];
-					if(typeof info.derivation=='string'){
-						list.add(info.derivation);
-					}
-					else if(Array.isArray(info.derivation)){
-						list.addArray(info.derivation);
+					if(!info.derivationfixed){
+						if(typeof info.derivation=='string'){
+							list.add(info.derivation);
+						}
+						else if(Array.isArray(info.derivation)){
+							list.addArray(info.derivation);
+						}
 					}
 				}
 				trigger.source.disableSkill('gzduanchang',list);
@@ -2295,6 +2310,14 @@ mode.guozhan={
 		gz_jun_liubei:'君刘备',
 		gz_jun_zhangjiao:'君张角',
 
+		wuhujiangdaqi:'五虎将大旗',
+		wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你每发动一次‘龙胆’便摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“若结果为红色”改为“若结果不为黑桃”',
+		zhangwu:'章武',
+		zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区时，你获得之。当你失去【飞龙夺风】时，展示之，然后将此牌置于牌堆底并摸两张牌',
+		shouyue:'授钺',
+		shouyue_info:'君主技。只要此武将牌处于明置状态，你便拥有“五虎将大旗”',
+		jizhao:'激诏',
+		jizhao_info:'限定技。当你处于濒死状态时，你可以将手牌补至体力上限，体力回复至2点，失去技能“授钺”并获得技能“仁德”',
 		gzshoucheng:'守成',
 		gzshoucheng_info:'当与你势力相同的一名角色于其回合外失去最后手牌时，你可以令其摸一张牌',
 		gzmingshi:'名士',
