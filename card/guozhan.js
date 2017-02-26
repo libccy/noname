@@ -12,7 +12,15 @@ card.guozhan={
 			distance:{attackFrom:-1},
 			skills:['feilongduofeng','feilongduofeng2'],
 			ai:{
-				equipValue:9
+				equipValue:function(card,player){
+					if(player.hasSkill('zhangwu')) return 9;
+					if(game.hasPlayer(function(current){
+						return current.hasSkill('zhangwu')&&ai.get.attitude(player,current)<=0;
+					})){
+						return 1;
+					}
+					return 8;
+				}
 			}
 		},
 		taipingyaoshu:{
@@ -24,7 +32,15 @@ card.guozhan={
 			nopower:true,
 			skills:['taipingyaoshu'],
 			ai:{
-				equipValue:9
+				equipValue:function(card,player){
+					if(player.hasSkill('wendao')) return 9;
+					if(game.hasPlayer(function(current){
+						return current.hasSkill('wendao')&&ai.get.attitude(player,current)<=0;
+					})){
+						return 1;
+					}
+					return 6;
+				}
 			},
 			onLose:function(){
 				'step 0'
@@ -250,15 +266,26 @@ card.guozhan={
 				target.chooseControl(lib.card.chiling.chooseai).set('prompt','敕令').set('choiceList',choiceList);
 				'step 1'
 				if(result.control=='选项一'){
-					target.showCharacter(2);
-					target.draw();
+					target.chooseControl('主将','副将',function(){
+						return Math.floor(Math.random()*2);
+					}).set('prompt','选择要明置的武将牌');
 				}
 				else if(result.control=='选项二'){
 					target.loseHp();
+					event.finish();
 				}
 				else{
 					target.chooseToDiscard('he',{type:'equip'},true);
+					event.finish();
 				}
+				'step 2'
+				if(result.index==0){
+					target.showCharacter(0);
+				}
+				else{
+					target.showCharacter(1);
+				}
+				target.draw();
 			},
 			ai:{
 				order:6,
@@ -891,7 +918,6 @@ card.guozhan={
 				if(event.targets.length){
 					var target=event.targets.shift();
 					event.current=target;
-
 					var choiceList=['明置一张武将牌，然后摸一张牌','失去1点体力'];
 					if(target.num('he',{type:'equip'})){
 						choiceList.push('弃置一张装备牌');
@@ -904,16 +930,27 @@ card.guozhan={
 				'step 2'
 				var target=event.current;
 				if(result.control=='选项一'){
-					target.showCharacter(2);
-					target.draw();
+					target.chooseControl('主将','副将',function(){
+						return Math.floor(Math.random()*2);
+					}).set('prompt','选择要明置的武将牌');
 				}
 				else if(result.control=='选项二'){
 					target.loseHp();
+					event.goto(1);
 				}
 				else{
 					target.chooseToDiscard('he',{type:'equip'},true);
+					event.goto(1);
 				}
 				'step 3'
+				var target=event.current;
+				if(result.index==0){
+					target.showCharacter(0);
+				}
+				else{
+					target.showCharacter(1);
+				}
+				target.draw();
 				event.goto(1);
 			}
 		},

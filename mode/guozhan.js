@@ -297,6 +297,7 @@ mode.guozhan={
 		_hongfa:{
 			enable:'chooseToUse',
 			filter:function(event,player){
+				if(!event.filterCard({name:'sha'},player)) return false;
 				var zhu=get.zhu(player,'hongfa');
 				if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
 					return true;
@@ -365,6 +366,9 @@ mode.guozhan={
 				player.storage.huangjintianbingfu.addArray(get.cards(get.population('qun')));
 				player.syncStorage('huangjintianbingfu');
 				player.updateMarks('huangjintianbingfu');
+			},
+			ai:{
+				threaten:2,
 			},
 			group:'hongfa_hp',
 			subSkill:{
@@ -465,7 +469,14 @@ mode.guozhan={
 		wuxin:{
 			unique:true,
 			trigger:{player:'phaseDrawBegin'},
-			frequent:true,
+			// frequent:'check',
+			// check:function(event,player){
+			// 	var num=get.population('qun');
+			// 	if(player.hasSkill('huangjintianbingfu')){
+			// 		num+=player.storage.huangjintianbingfu.length;
+			// 	}
+			// 	return num>event.num;
+			// },
 			content:function(){
 				'step 0'
 				var num=get.population('qun');
@@ -487,6 +498,9 @@ mode.guozhan={
 		zhangwu:{
 			unique:true,
 			forceunique:true,
+			ai:{
+				threaten:2,
+			},
 			group:['zhangwu_gain','zhangwu_draw','zhangwu_clear','zhangwu_count'],
 			subSkill:{
 				gain:{
@@ -768,11 +782,12 @@ mode.guozhan={
 				"step 1"
 				if(result.bool){
 					var target=result.targets[0];
-					player.logSkill('yuanhu',target);
+					player.logSkill('huyuan',target);
 					target.equip(result.cards[0]);
 					if(target!=player){
 						player.$give(result.cards,target);
 					}
+					game.delay();
 					player.chooseTarget(true,'弃置一名角色的一张牌',function(card,player,target){
 						var source=_status.event.source;
 						return get.distance(source,target)<=1&&source!=target&&target.num('he');
@@ -836,7 +851,7 @@ mode.guozhan={
 			},
 			content:function(){
 				"step 0"
-				target.viewCards(player+'的手牌',player.get('h'));
+				target.viewCards(get.translation(player)+'的手牌',player.get('h'));
 				"step 1"
 				if(!target.num('h')){
 					event._result={index:1};
@@ -1666,7 +1681,7 @@ mode.guozhan={
 							return Math.random()<0.5?3:(Math.random()<0.5?2:1);
 						}
 						if(choice==0) return 0;
-						if(get.population(group)>0&&get.totalPopulation(group)+1<=get.population()/2){
+						if(get.population(group)>0&&player.wontYe()){
 							return Math.random()<0.2?(Math.random()<0.5?3:(Math.random()<0.5?2:1)):0;
 						}
 						var nming=0;
@@ -1725,7 +1740,7 @@ mode.guozhan={
 						if(popu>=2||(popu==1&&game.players.length<=4)){
 							return true;
 						}
-						if(get.population(group)>0&&get.totalPopulation(group)+1<=get.population()/2){
+						if(get.population(group)>0&&player.wontYe()){
 							return Math.random()<0.2?true:false;
 						}
 						var nming=0;
@@ -3200,14 +3215,11 @@ mode.guozhan={
 							}
 						},yelist,this.group);
 					}
-					else if(get.zhu(this)){
+					else if(this.wontYe()){
 						this.identity=this.group;
-					}
-					else if(_status.yeidentity.contains(this.group)||get.totalPopulation(this.group)+1>get.population()/2){
-						this.identity='ye';
 					}
 					else{
-						this.identity=this.group;
+						this.identity='ye';
 					}
 					this.setIdentity(this.identity);
 					this.ai.shown=1;
@@ -3293,6 +3305,12 @@ mode.guozhan={
 						next.setContent('zhulian');
 					}
 				}
+			},
+			wontYe:function(){
+				var group=lib.character[this.name1][1];
+				if(_status.yeidentity&&_status.yeidentity.contains(group)) return false;
+				if(get.zhu(this)) return true;
+				return get.totalPopulation(group)+1<=get.population()/2;
 			},
 			perfectPair:function(){
 				if(_status.connectMode){
@@ -3468,7 +3486,7 @@ mode.guozhan={
 					return 4+difficulty;
 				}
 				if(from.identity=='unknown'&&lib.character[from.name1][1]==toidentity){
-					if(get.totalPopulation(toidentity)+1<=get.population()/2) return 4+difficulty;
+					if(from.wontYe()) return 4+difficulty;
 				}
 				var groups=[];
 				for(var i=0;i<lib.group.length;i++){
@@ -3502,7 +3520,7 @@ mode.guozhan={
 				if(from==to) return 5+difficulty;
 				if(from.identity==to.identity&&from.identity!='unknown'&&from.identity!='ye') return 5+difficulty;
 				if(from.identity=='unknown'&&lib.character[from.name1][1]==to.identity){
-					if(get.totalPopulation(to.identity)+1<=get.population()/2) return 4+difficulty;
+					if(from.wontYe()) return 4+difficulty;
 				}
 				var toidentity=to.identity;
 				if(toidentity=='unknown'){

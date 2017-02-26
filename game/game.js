@@ -11064,7 +11064,12 @@
 				},
 				setIdentity:function(identity){
 					if(!identity) identity=this.identity;
-					this.node.identity.firstChild.innerHTML=get.translation(identity);
+					if(get.is.jun(this)){
+						this.node.identity.firstChild.innerHTML='君';
+					}
+					else{
+						this.node.identity.firstChild.innerHTML=get.translation(identity);
+					}
 					this.node.identity.dataset.color=identity;
 				},
 				phase:function(){
@@ -20527,6 +20532,10 @@
                 if(!ui.exit){
                     ui.exit=ui.create.control('退出联机',ui.click.exit);
                 }
+				if(ui.giveup){
+					ui.giveup.remove();
+					delete ui.giveup;
+				}
                 if(game.servermode){
                     ui.exit.firstChild.innerHTML='返回房间';
                     setTimeout(function(){
@@ -20973,6 +20982,10 @@
 				ui.auto.hide();
 			}
 			if(ui.wuxie) ui.wuxie.hide();
+			if(ui.giveup){
+				ui.giveup.remove();
+				delete ui.giveup;
+			}
 
 			if(lib.config.test_game&&!_status.connectMode){
 				if(lib.config.test_game!='single'){

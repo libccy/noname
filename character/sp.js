@@ -6637,7 +6637,19 @@ character.sp={
 			},
 			filterTarget:function(card,player,target){
 				if(get.mode()=='guozhan'){
-					if(player.identity=='unknown'||player.identity=='ye') return player==target;
+					if(player==target) return true;
+					if(player.identity=='ye') return false;
+					if(player.identity=='unknown'){
+						if(_status.yeidentity.contains(player._group)){
+							return false;
+						}
+						else if(get.zhu(player)||get.population(player._group)+1<=get.population()/2){
+							return player._group==target.identity;
+						}
+						else{
+							return false;
+						}
+					}
 					return player.identity==target.identity;
 				}
 				else{
