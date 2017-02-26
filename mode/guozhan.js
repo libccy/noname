@@ -1371,6 +1371,18 @@ mode.guozhan={
 				}
 			}
 		},
+		_mingzhi3:{
+			trigger:{player:'phaseBegin'},
+			priority:19.1,
+			forced:true,
+			popup:false,
+			filter:function(event,player){
+				return player.isUnseen(0)&&get.is.jun(player.name1);
+			},
+			content:function(){
+				player.showCharacter(0);
+			}
+		},
 		_zhenfazhaohuan:{
 			enable:'phaseUse',
 			usable:1,
@@ -1892,7 +1904,7 @@ mode.guozhan={
 							if(lib.junList.contains(i.slice(3))) continue;
 						}
 						else{
-							if(lib.junList.contains(i.slice(7))) continue;
+							if(get.is.jun(i)) continue;
 						}
 					}
 					if(lib.character[i][2]==3||lib.character[i][2]==4||lib.character[i][2]==5)
@@ -1952,7 +1964,7 @@ mode.guozhan={
 								if(lib.junList.contains(i.slice(3))) return true;
 							}
 							else{
-								if(lib.junList.contains(i.slice(7))) return true;
+								if(get.is.jun(i)) return true;
 							}
 						}
 					},get.config('onlyguozhanexpand')?'expandall':undefined);
@@ -2090,6 +2102,12 @@ mode.guozhan={
 					list=[];
 					for(var i in lib.characterPack.mode_guozhan){
 						if(i.indexOf('gz_shibing')==0) continue;
+						if(lib.configOL.junzhu){
+							if(lib.junList.contains(i.slice(3))) continue;
+						}
+						else{
+							if(get.is.jun(i)) continue;
+						}
 						list.push(i);
 					}
 				}

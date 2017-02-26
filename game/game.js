@@ -2684,7 +2684,7 @@
 							'3':'三张',
 						},
 						init:'2',
-						// frequent:true,
+						frequent:true,
 						intro:'第一个明置身份牌的角色可获得摸牌奖励'
 					},
 					connect_zhulian:{
@@ -2709,7 +2709,7 @@
 					connect_junzhu:{
 						name:'替换君主',
 						init:true,
-						frequent:true,
+						// frequent:true,
 						restart:true,
 						intro:'开启后将使用国战君主替换原武将牌'
 					},
@@ -2765,7 +2765,7 @@
 							'3':'三张',
 						},
 						init:'2',
-						// frequent:true,
+						frequent:true,
 						intro:'第一个明置身份牌的角色可获得摸牌奖励'
 					},
 					zhulian:{
@@ -2790,7 +2790,7 @@
 					junzhu:{
 						name:'替换君主',
 						init:true,
-						frequent:true,
+						// frequent:true,
 						restart:true,
 						intro:'开启后将使用国战君主替换原武将牌'
 					},
