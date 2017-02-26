@@ -783,11 +783,12 @@ mode.guozhan={
 				if(result.bool){
 					var target=result.targets[0];
 					player.logSkill('huyuan',target);
+					event.current=target;
 					target.equip(result.cards[0]);
 					if(target!=player){
 						player.$give(result.cards,target);
 					}
-					game.delay();
+					game.delay(2);
 					player.chooseTarget(true,'弃置一名角色的一张牌',function(card,player,target){
 						var source=_status.event.source;
 						return get.distance(source,target)<=1&&source!=target&&target.num('he');
@@ -800,6 +801,7 @@ mode.guozhan={
 				}
 				"step 2"
 				if(result.targets.length){
+					event.current.line(result.targets,'green');
 					player.discardPlayerCard(true,result.targets[0],'he');
 				}
 			},
