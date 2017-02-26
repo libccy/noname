@@ -2676,7 +2676,7 @@
 							'3':'三张',
 						},
 						init:'2',
-						frequent:true,
+						// frequent:true,
 						intro:'第一个明置身份牌的角色可获得摸牌奖励'
 					},
 					connect_zhulian:{
@@ -2742,7 +2742,7 @@
 							'3':'三张',
 						},
 						init:'2',
-						frequent:true,
+						// frequent:true,
 						intro:'第一个明置身份牌的角色可获得摸牌奖励'
 					},
 					zhulian:{
@@ -35513,12 +35513,20 @@
 				if(skill&&!game.zhu.get('s').contains(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}
-			else if(mode=='versus'&&_status.mode=='four'){
+			else if(mode=='guozhan'||(mode=='versus'&&_status.mode=='four')){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isZhu){
 						if(skill&&!(game.players[i].get('s').contains(skill))) continue;
-						if(!player||player.side==game.players[i].side){
-							return game.players[i];
+						if(!player) return game.players[i];
+						if(mode=='guozhan'){
+							if(player.identity==game.players[i].identity){
+								return game.players[i];
+							}
+						}
+						else{
+							if(player.side==game.players[i].side){
+								return game.players[i];
+							}
 						}
 					}
 				}

@@ -1,8 +1,9 @@
 'use strict';
 mode.guozhan={
 	startBefore:function(){
+		var playback=localStorage.getItem(lib.configprefix+'playback');
 		for(var i in lib.characterPack.mode_guozhan){
-			if(!get.config('onlyguozhan')){
+			if(!get.config('onlyguozhan')&&!playback){
 				if(lib.character[i.slice(3)]) continue;
 			}
 			lib.character[i]=lib.characterPack.mode_guozhan[i];
@@ -2391,7 +2392,7 @@ mode.guozhan={
 		["diamond",13,"zixin"],
 		["club",1,"zhuge"],
 		["diamond",1,"zhuge"],
-		["spade",2,"cixiong"],
+		["spade",2,"feilongduofeng"],
 		["spade",6,"qinggang"],
 		["spade",5,"qinglong"],
 		["spade",12,"zhangba"],
@@ -2465,6 +2466,7 @@ mode.guozhan={
 		['diamond',1,'xietianzi'],
 		['diamond',4,'xietianzi'],
 		['club',1,'yuxi'],
+		['heart',3,'taipingyaoshu'],
 	],
 	element:{
 		content:{

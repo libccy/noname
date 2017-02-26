@@ -7747,6 +7747,7 @@ character.swd={
 			},
 			filterTarget:function(card,player,target){
 				if(target.identity=='zhu') return false;
+				if(get.mode()=='guozhan'&&target.isZhu) return false;
 				return player!=target;
 			},
 			content:function(){

@@ -2,6 +2,19 @@
 card.guozhan={
 	connect:true,
 	card:{
+		feilongduofeng:{
+			mode:['guozhan'],
+			fullskin:true,
+			type:'equip',
+			subtype:'equip1',
+			distance:{attackFrom:-1},
+		},
+		taipingyaoshu:{
+			mode:['guozhan'],
+			fullskin:true,
+			type:'equip',
+			subtype:'equip2',
+		},
 		yuxi:{
 			mode:['guozhan'],
 			fullskin:true,
@@ -836,6 +849,10 @@ card.guozhan={
 		},
 	},
 	translate:{
+		feilongduofeng:'飞龙夺凤',
+		feilongduofeng_info:'当你使用【杀】指定一名角色为目标后，你可令该角色弃置一张牌。你使用【杀】杀死一名角色后，若你所属的势力是全场最少的（或之一），你可令该角色的使用者选择是否从未使用的武将牌中选择一张与你势力相同的武将牌重新加入游戏',
+		taipingyaoshu:'太平要术',
+		taipingyaoshu_info:'锁定技，防止你受到的所有属性伤害；全场每有一名与你势力相同的角色存活，所有此势力角色的手牌上限便+1；当你失去装备区里的【太平要术】时，你失去1点体力，然后摸两张牌',
 		yuxi_skill:'玉玺',
 		yuxi_skill2:'玉玺',
 		yuxi:'玉玺',
