@@ -232,8 +232,8 @@ mode.guozhan={
 			gz_panfeng:['male','qun',4,['kuangfu']],
 			gz_zoushi:['female','qun',3,['huoshui','qingcheng']],
 
-			// gz_dengai:['male','wei',4,['tuntian','ziliang','gzjixi']],
-			// gz_caohong:['male','wei',4,['huyuan','heyi']],
+			gz_dengai:['male','wei',4,['tuntian','ziliang','gzjixi']],
+			gz_caohong:['male','wei',4,['huyuan','heyi']],
 			// gz_jiangfei:['male','shu',3,['shengxi','gzshoucheng']],
 			gz_jiangwei:['male','shu',4,['tiaoxin','yizhi','tianfu']],
 			// gz_xusheng:['male','wu',4,['yicheng']],
@@ -257,6 +257,112 @@ mode.guozhan={
 		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
+		gzjixi:{
+			inherit:'jixi',
+			init:function(player){
+				if(player.checkMainSkill('gzjixi')){
+					player.removeMaxHp();
+				}
+			}
+		},
+		ziliang:{
+			trigger:{global:'damageEnd'},
+			filter:function(event,player){
+				return event.player.isFriendOf(player)&&player.storage.tuntian&&player.storage.tuntian.length;
+			},
+			init:function(player){
+				player.checkViceSkill('ziliang');
+			},
+			logTarget:'player',
+			content:function(){
+				'step 0'
+				player.chooseCardButton('将一张“田”交给'+get.translation(trigger.player),player.storage.tuntian).set('ai',function(button){
+					return ai.get.value(button.link);
+				});
+				'step 1'
+				if(result.bool){
+					var card=result.links[0];
+					player.storage.tuntian.remove(card);
+					player.syncStorage('tuntian');
+					if(!player.storage.tuntian.length){
+						player.unmarkSkill('tuntian');
+					}
+					else{
+						player.updateMarks();
+					}
+					trigger.player.gain(card);
+					if(trigger.player==player){
+						player.$draw(card);
+					}
+					else{
+						player.$give(card,trigger.player);
+					}
+				}
+			}
+		},
+		huyuan:{
+			audio:'yuanhu',
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return player.num('he',{type:'equip'})>0;
+			},
+			content:function(){
+				"step 0"
+				player.chooseCardTarget({
+					filterCard:function(card){
+						return get.type(card)=='equip';
+					},
+					position:'he',
+					filterTarget:function(card,player,target){
+						return !target.get('e',get.subtype(card)[5]);
+					},
+					ai1:function(card){
+						return 6-ai.get.value(card);
+					},
+					ai2:function(target){
+						return ai.get.attitude(_status.event.player,target)-3;
+					},
+					prompt:get.prompt('yuanhu')
+				});
+				"step 1"
+				if(result.bool){
+					var target=result.targets[0];
+					player.logSkill('yuanhu',target);
+					target.equip(result.cards[0]);
+					if(target!=player){
+						player.$give(result.cards,target);
+					}
+					player.chooseTarget(true,'弃置一名角色的一张牌',function(card,player,target){
+						var source=_status.event.source;
+						return get.distance(source,target)<=1&&source!=target&&target.num('he');
+					}).set('ai',function(target){
+						return -ai.get.attitude(_status.event.player,target);
+					}).set('source',target);
+				}
+				else{
+					event.finish();
+				}
+				"step 2"
+				if(result.targets.length){
+					player.discardPlayerCard(true,result.targets[0],'he');
+				}
+			},
+		},
+		heyi:{
+			zhenfa:'inline'
+		},
+		_heyi:{
+			mod:{
+				globalTo:function(from,to,distance){
+					if(game.hasPlayer(function(current){
+						return current.hasSkill('heyi')&&current.inline(to);
+					})){
+						return distance+1;
+					}
+				}
+			}
+		},
 		tianfu:{
 			init:function(player){
 				player.checkMainSkill('tianfu');

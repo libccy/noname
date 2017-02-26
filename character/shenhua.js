@@ -1090,19 +1090,24 @@ character.shenhua={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-						if(!target.hasFriend()) return;
+						if(!target.hasFriend()&&!player.hasUnknown()) return;
 						if(_status.currentPhase==target) return;
 						if(get.tag(card,'loseCard')&&target.num('he')){
+							if(target.hasSkill('ziliang')) return 0.7;
 							return [0.5,Math.max(2,target.num('h'))];
 						}
 						if(target.isUnderControl(true,player)){
-							if(get.tag(card,'respondSha')&&player.num('h','sha')) return [0.5,1];
-							if(get.tag(card,'respondShan')&&player.num('h','shan')) return [0.5,1];
+							if((get.tag(card,'respondSha')&&target.num('h','sha'))||
+								(get.tag(card,'respondShan')&&target.num('h','shan'))){
+								if(target.hasSkill('ziliang')) return 0.7;
+								return [0.5,1];
+							}
 						}
 						else if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
 							if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
 							if(target.num('h')==0) return 2;
-							return [0.5,target.num('h','sha')+target.num('h','shan')];
+							if(target.hasSkill('ziliang')) return 0.7;
+							return [0.5,Math.max(target.num('h')/4,target.num('h','sha')+target.num('h','shan'))];
 						}
 					}
 				},
@@ -1146,7 +1151,8 @@ character.shenhua={
 						viewAs:{name:'shunshou'},
 						cards:links,
 						onuse:function(result,player){
-							result.cards=lib.skill.jixi_backup.cards;
+							console.log(result.skill);
+							result.cards=lib.skill[result.skill].cards;
 							var card=result.cards[0];
 							player.storage.tuntian.remove(card);
 							player.syncStorage('tuntian');
@@ -1251,13 +1257,13 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				if(target.storage.hunzi){
-					target.chooseBool('是否拒绝制霸拼点？').set('choice',ai.get.attitude(target,player)<=0);
+					target.chooseControl('拒绝','不拒绝').set('prompt','是否拒绝制霸拼点？').set('choice',ai.get.attitude(target,player)<=0);
 				}
 				else{
 					event.forced=true;
 				}
 				"step 1"
-				if(!event.forced&&result.bool){
+				if(!event.forced&&result.control=='拒绝'){
 					game.log(target,'拒绝了拼点');
 					target.chat('拒绝');
 					event.finish();
@@ -3370,7 +3376,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				var check= player.num('h')>2;
-				player.chooseTarget(get.prompt('xinshensu'),function(card,player,target){
+				player.chooseTarget(get.prompt('shensu'),function(card,player,target){
 					if(player==target) return false;
 					return player.canUse({name:'sha'},target,false);
 				}).set('check',check).set('ai',function(target){
@@ -3397,7 +3403,7 @@ character.shenhua={
 				"step 0"
 				var check=player.needsToDiscard();
 				player.chooseCardTarget({
-					prompt:get.prompt('xinshensu'),
+					prompt:get.prompt('shensu'),
 					filterCard:function(card,player){
 						return get.type(card)=='equip'&&lib.filter.cardDiscardable(card,player)
 					},
@@ -3433,7 +3439,7 @@ character.shenhua={
 			content:function(){
 				"step 0"
 				var check=player.needsToDiscard()||player.isTurnedOver();
-				player.chooseTarget(get.prompt('xinshensu'),function(card,player,target){
+				player.chooseTarget(get.prompt('shensu'),function(card,player,target){
 					if(player==target) return false;
 					return player.canUse({name:'sha'},target,false);
 				}).set('check',check).set('ai',function(target){

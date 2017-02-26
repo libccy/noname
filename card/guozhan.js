@@ -773,6 +773,7 @@ card.guozhan={
 				result:{
 					player:function(player,target){
 						if(target.isUnseen()) return 0;
+						if(player.isMajor()) return 0;
 						return 0.5;
 					},
 					target:function(player,target){

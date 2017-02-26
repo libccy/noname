@@ -7533,9 +7533,6 @@ character.sp={
 					player.discardPlayerCard(true,result.targets[0],'hej');
 				}
 			},
-			ai:{
-				threaten:1.2
-			}
 		},
 		tianming:{
 			audio:2,
