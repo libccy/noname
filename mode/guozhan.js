@@ -250,7 +250,7 @@ mode.guozhan={
 			gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
 			gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
 
-			gz_jun_liubei:['male','shu',4,['zhangwu','shouyue','jizhao']],
+			gz_jun_liubei:['male','shu',4,['zhangwu','jizhao','shouyue','wuhujiangdaqi']],
 			gz_jun_zhangjiao:['male','qun',4,[]],
 		}
 	},
@@ -262,55 +262,190 @@ mode.guozhan={
 	},
 	skill:{
 		zhangwu:{
-			trigger:{global:'loseEnd'},
-			forced:true,
-			filter:function(event,player){
-				if(event.parent.name=='useCard') return false;
-				for(var i=0;i<event.cards.length;i++){
-					if(event.cards[i].name=='feilongduofeng'&&get.position(event.cards[i])=='d'){
-						return true;
-					}
-				}
-			},
-			content:function(){
-				var cards=[];
-				for(var i=0;i<trigger.cards.length;i++){
-					if(trigger.cards[i].name=='feilongduofeng'&&get.position(trigger.cards[i])=='d'){
-						cards.push(trigger.cards[i]);
-						if(player==trigger.player){
-							ui.cardPile.appendChild(trigger.cards[i]);
-						}
-						if(trigger.parent.name=='discard'){
-							trigger.parent.cards.remove(trigger.cards[i]);
-						}
-					}
-				}
-				if(player==trigger.player){
-					player.showCards(get.translation(player)+'发动了【章武】',cards);
-				}
-				else{
-					player.gain(trigger.cards,'gain2');
-				}
-			},
+			group:['zhangwu_gain','zhangwu_draw','zhangwu_clear','zhangwu_count'],
 			subSkill:{
-				equip:{
-
-				},
 				gain:{
-
+					trigger:{global:['discardAfter','respondAfter','useCardAfter','equipAfter']},
+					forced:true,
+					filter:function(event,player){
+						if(event.player==player) return false;
+						if(event.name=='equip'){
+							if(event.getParent(2).name=='useCard'){
+								return false;
+							}
+							return event.card.name=='feilongduofeng';
+						}
+						if(!event.cards) return false;
+						for(var i=0;i<event.cards.length;i++){
+							if(event.cards[i].name=='feilongduofeng'&&get.owner(event.cards[i])!=player){
+								return true;
+							}
+						}
+						return false;
+					},
+					content:function(){
+						'step 0'
+						if(trigger.delay==false) game.delay();
+						else if(trigger.name=='equip'||trigger.name=='respond') game.delay(0.5);
+						'step 1'
+						var list=[];
+						if(trigger.name=='equip'){
+							trigger.card.fix();
+							list.push(trigger.card);
+						}
+						else{
+							for(var i=0;i<trigger.cards.length;i++){
+								if(trigger.cards[i].name=='feilongduofeng'&&get.owner(trigger.cards[i])!=player){
+									trigger.cards[i].fix();
+									list.push(trigger.cards[i]);
+								}
+							}
+						}
+						player.gain(list);
+						var owner=get.owner(list[0]);
+						if(trigger.name!='respond'&&owner){
+							player.line(owner,'green');
+							owner.$give(list,player);
+						}
+						else{
+							player.$gain2(list,true);
+						}
+					}
+				},
+				draw:{
+					trigger:{global:'phaseEnd'},
+					forced:true,
+					filter:function(event,player){
+						if(player.storage.zhangwu){
+							for(var i=0;i<player.storage.zhangwu.length;i++){
+								var owner=get.owner(player.storage.zhangwu[i]);
+								if(owner&&owner!=player){
+									return true;
+								}
+							}
+						}
+						for(var i=0;i<ui.discardPile.childElementCount;i++){
+							if(ui.discardPile.childNodes[i].name=='feilongduofeng') return true;
+						}
+						return false;
+					},
+					content:function(){
+						'step 0'
+						var list=[];
+						for(var i=0;i<player.storage.zhangwu.length;i++){
+							var owner=get.owner(player.storage.zhangwu[i]);
+							if(owner&&owner!=player){
+								owner.lose(player.storage.zhangwu[i],ui.special);
+								list.add(player.storage.zhangwu[i]);
+							}
+						}
+						for(var i=0;i<ui.discardPile.childElementCount;i++){
+							if(ui.discardPile.childNodes[i].name=='feilongduofeng'){
+								list.add(ui.discardPile.childNodes[i]);
+							}
+						}
+						player.showCards(list);
+						event.list=list;
+						'step 1'
+						for(var i=0;i<event.list.length;i++){
+							ui.cardPile.appendChild(event.list[i]);
+						}
+						game.log(player,'将',event.list,'置于牌堆底');
+						player.draw(2);
+					}
+				},
+				count:{
+					trigger:{player:'loseAfter'},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:function(){
+						if(!player.storage.zhangwu){
+							player.storage.zhangwu=[];
+						}
+						for(var i=0;i<trigger.cards.length;i++){
+							if(trigger.cards[i].name=='feilongduofeng'){
+								player.storage.zhangwu.add(trigger.cards[i]);
+							}
+						}
+					}
+				},
+				clear:{
+					trigger:{global:'phaseAfter'},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:function(){
+						delete player.storage.zhangwu;
+					}
 				}
-			},
-			group:['zhangwu_equip','zhangwu_gain']
+			}
 		},
 		shouyue:{
-			derivationfixed:true,
+			unique:true,
+			forceunique:true,
+			group:'wuhujiangdaqi',
 			derivation:'wuhujiangdaqi',
+			mark:true,
 		},
 		wuhujiangdaqi:{
-
+			unique:true,
+			forceunique:true,
+			nopop:true,
+			mark:true,
+			intro:{
+				content:'@<div style="margin-top:-5px"><div class="skill">【武圣】</div><div>将“红色牌”改为“任意牌”</div><div class="skill">【咆哮】</div><div>增加描述“你使用的【杀】无视其他角色的防具”</div><div class="skill">【龙胆】</div><div>增加描述“你每发动一次‘龙胆’便摸一张牌”</div><div class="skill">【烈弓】</div><div>增加描述“你的攻击范围+1”</div><div class="skill">【铁骑】</div><div>将“若结果为红色”改为“若结果不为黑桃”</div></div>'
+			}
 		},
 		jizhao:{
-			derivation:'gzrende'
+			derivation:'gzrende',
+			unique:true,
+			enable:'chooseToUse',
+			mark:true,
+			skillAnimation:true,
+			animationColor:'fire',
+			init:function(player){
+				player.storage.jizhao=false;
+			},
+			filter:function(event,player){
+				if(player.storage.jizhao) return false;
+				if(event.type=='dying'){
+					if(player!=event.dying) return false;
+					return true;
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				player.awakenSkill('jizhao');
+				player.storage.jizhao=true;
+				var num=player.maxHp-player.num('h');
+				if(num>0){
+					player.draw(num);
+				}
+				'step 1'
+				if(player.hp<2){
+					player.recover(2-player.hp);
+				}
+				'step 2'
+				player.removeSkill('shouyue');
+				player.removeSkill('wuhujiangdaqi');
+				player.addSkill('gzrende');
+			},
+			ai:{
+				order:1,
+				skillTagFilter:function(player){
+					if(player.storage.jizhao) return false;
+					if(player.hp>0) return false;
+				},
+				save:true,
+				result:{
+					player:10
+				},
+			},
+			intro:{
+				content:'limited'
+			}
 		},
 		gzshoucheng:{
 			inherit:'shoucheng',
@@ -960,13 +1095,11 @@ mode.guozhan={
 				for(var i=0;i<skills.length;i++){
 					list.add(skills[i]);
 					var info=lib.skill[skills[i]];
-					if(!info.derivationfixed){
-						if(typeof info.derivation=='string'){
-							list.add(info.derivation);
-						}
-						else if(Array.isArray(info.derivation)){
-							list.addArray(info.derivation);
-						}
+					if(typeof info.derivation=='string'){
+						list.add(info.derivation);
+					}
+					else if(Array.isArray(info.derivation)){
+						list.addArray(info.derivation);
 					}
 				}
 				trigger.source.disableSkill('gzduanchang',list);
@@ -2350,12 +2483,14 @@ mode.guozhan={
 		gz_jun_zhangjiao:'君张角',
 
 		wuhujiangdaqi:'五虎将大旗',
+		wuhujiangdaqi_bg:'旗',
 		wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你每发动一次‘龙胆’便摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“若结果为红色”改为“若结果不为黑桃”',
 		zhangwu:'章武',
-		zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区时，你获得之。当你失去【飞龙夺风】时，若其在弃牌堆或被其他角色获得，你展示之，然后将此牌置于牌堆底并摸两张牌',
+		zhangwu_info:'锁定技。当一名其他角色使用、打出、弃置或装备【飞龙夺凤】时，你获得之；在一名角色的结束阶段，若弃牌堆中有【飞龙夺凤】，或本回合中你的【飞龙夺凤】被移到了一名其他角色的区域内，你展示并将其置于牌堆底，然后摸两张牌',
 		shouyue:'授钺',
 		shouyue_info:'君主技。只要此武将牌处于明置状态，你便拥有“五虎将大旗”',
 		jizhao:'激诏',
+		jizhao_bg:'诏',
 		jizhao_info:'限定技。当你处于濒死状态时，你可以将手牌补至体力上限，体力回复至2点，失去技能“授钺”并获得技能“仁德”',
 		gzshoucheng:'守成',
 		gzshoucheng_info:'当与你势力相同的一名角色于其回合外失去最后手牌时，你可以令其摸一张牌',
@@ -2814,7 +2949,7 @@ mode.guozhan={
 				game.addVideo('showCharacter',this,num);
 				if(this.identity=='unknown'){
 					this.group=lib.character[this.name1][1];
-					if(get.is.jun(this.name1)&&this.isAlive()){
+					if(get.is.jun(this)&&this.isAlive()){
 						this.identity=this.group;
 						var yelist=[];
 						for(var i=0;i<game.players.length;i++){
@@ -2828,6 +2963,9 @@ mode.guozhan={
 								list[i].setIdentity();
 							}
 						},yelist,this.group);
+					}
+					else if(get.zhu(this)){
+						this.identity=this.group;
 					}
 					else if(_status.yeidentity.contains(this.group)||get.totalPopulation(this.group)+1>get.population()/2){
 						this.identity='ye';
@@ -2921,7 +3059,12 @@ mode.guozhan={
 				}
 			},
 			perfectPair:function(){
-				if(!get.config('zhulian')) return false;
+				if(_status.connectMode){
+					if(!lib.configOL.zhulian) return false;
+				}
+				else{
+					if(!get.config('zhulian')) return false;
+				}
 				var name1=this.name1;
 				var name2=this.name2;
 				if(lib.character[name1][1]!=lib.character[name2][1]) return false;

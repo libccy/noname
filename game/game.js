@@ -34338,6 +34338,7 @@
 					}
 				}
 				for(var i=0;i<list.length;i++){
+					if(get.info(list[i]).nopop) continue;
 					var current=ui.create.div('.menubutton.large',skills,clickSkill,get.translation(list[i]));
 					current.link=list[i];
 					if(i==0){
@@ -35111,9 +35112,13 @@
 				return select[0]==1&&select[1]==1;
 			},
 			jun:function(name){
-				if(typeof name=='string'&&name.indexOf('gz_jun_')==0&&
-					lib.junList&&lib.junList.contains(name.slice(7))){
-					return true;
+				if(get.mode()=='guozhan'){
+					if(name&&typeof name=='object'){
+						name=name.name1;
+					}
+					if(typeof name=='string'&&name.indexOf('gz_jun_')==0){
+						return true;
+					}
 				}
 				return false;
 			},
@@ -35591,20 +35596,24 @@
 				if(skill&&!game.zhu.get('s').contains(skill)) return null;
 				if(game.zhu.isZhu) return game.zhu;
 			}
-			else if(mode=='guozhan'||(mode=='versus'&&_status.mode=='four')){
+			else if(mode=='versus'&&_status.mode=='four'){
 				for(var i=0;i<game.players.length;i++){
 					if(game.players[i].isZhu){
 						if(skill&&!(game.players[i].get('s').contains(skill))) continue;
 						if(!player) return game.players[i];
-						if(mode=='guozhan'){
-							if(player.identity==game.players[i].identity){
-								return game.players[i];
-							}
+						if(player.side==game.players[i].side){
+							return game.players[i];
 						}
-						else{
-							if(player.side==game.players[i].side){
-								return game.players[i];
-							}
+					}
+				}
+			}
+			else if(mode=='guozhan'){
+				for(var i=0;i<game.players.length;i++){
+					if(get.is.jun(game.players[i])){
+						if(skill&&!(game.players[i].get('s').contains(skill))) continue;
+						if(!player) return game.players[i];
+						if(player._group==game.players[i].identity){
+							return game.players[i];
 						}
 					}
 				}

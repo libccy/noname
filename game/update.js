@@ -4,7 +4,6 @@ window.noname_update={
     changeLog:[
         'bug修复',
         '国战武将',
-        '注：此版本为测试版'
     ],
     files:[
         'game/game.js',

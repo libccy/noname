@@ -729,7 +729,8 @@ character.standard={
 		wusheng:{
 			audio:3,
 			enable:['chooseToRespond','chooseToUse'],
-			filterCard:function(card){
+			filterCard:function(card,player){
+				if(get.zhu(player,'shouyue')) return true;
 				return get.color(card)=='red';
 			},
 			position:'he',
@@ -752,6 +753,15 @@ character.standard={
 					if(card.name=='sha') return Infinity;
 				}
 			},
+			trigger:{player:'useCard'},
+			forced:true,
+			priority:10,
+			filter:function(event,player){
+				return get.zhu(player,'shouyue')&&event.card.name=='sha';
+			},
+			content:function(){
+				player.addTempSkill('unequip','useCardAfter');
+			}
 		},
 		guanxing:{
 			audio:2,
@@ -977,8 +987,21 @@ character.standard={
 			content:function(){}
 		},
 		longdan:{
-			group:['longdan_sha','longdan_shan'],
+			group:['longdan_sha','longdan_shan','longdan_draw'],
 			subSkill:{
+				draw:{
+					trigger:{player:['useCard','respond']},
+					forced:true,
+					popup:false,
+					filter:function(event,player){
+						if(!get.zhu(player,'shouyue')) return false;
+						return event.skill=='longdan_sha'||event.skill=='longdan_shan';
+					},
+					content:function(){
+						player.draw();
+						player.storage.fanghun2++;
+					}
+				},
 				sha:{
 					audio:2,
 					enable:['chooseToUse','chooseToRespond'],
@@ -1056,7 +1079,12 @@ character.standard={
 			content:function(){
 				"step 0"
 				player.judge(function(card){
-					if(get.color(card)=='red') return 2;
+					if(get.zhu(_status.event.player,'shouyue')){
+						if(get.suit(card)!='spade') return 2;
+					}
+					else{
+						if(get.color(card)=='red') return 2;
+					}
 					return -0.5;
 				});
 				"step 1"

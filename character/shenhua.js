@@ -546,7 +546,6 @@ character.shenhua={
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
 			},
-			logTarget:'target',
 			filter:function(event,player){
 				if(event.target.num('h')<=player.num('h')) return true;
 				if(event.target.hp<=player.hp) return true;
@@ -3485,6 +3484,11 @@ character.shenhua={
 			},
 			content:function(){
 				trigger.directHit=true;
+			},
+			mod:{
+				attackFrom:function(from,to,distance){
+					if(get.zhu(from,'shouyue')) return distance-1;
+				}
 			}
 		},
 		kuanggu:{
