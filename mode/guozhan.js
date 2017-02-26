@@ -176,7 +176,7 @@ mode.guozhan={
 			gz_zhangliao:['male','wei',4,['tuxi']],
 			gz_xuzhu:['male','wei',4,['luoyi']],
 			gz_guojia:['male','wei',3,['tiandu','yiji']],
-			gz_zhenji:['female','wei',4,['luoshen','qingguo']],
+			gz_zhenji:['female','wei',3,['luoshen','qingguo']],
 			gz_xiahouyuan:['male','wei',4,['shensu']],
 			gz_zhanghe:['male','wei',4,['qiaobian']],
 			gz_xuhuang:['male','wei',4,['duanliang']],

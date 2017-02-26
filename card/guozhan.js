@@ -624,7 +624,12 @@ card.guozhan={
 					event.filterButton=function(){return true};
 					event.player=game.me;
 					event.custom.replace.confirm=function(){
-						event.directresult=ui.selected.buttons[0].link;
+						if(!ui.selected.buttons.length){
+							event.directresult='refuse';
+						}
+						else{
+							event.directresult=ui.selected.buttons[0].link;
+						}
 						event.dialog.close();
 						if(ui.confirm) ui.confirm.close();
 						delete event.player;
@@ -653,7 +658,12 @@ card.guozhan={
 								event.filterButton=function(){return true};
 								event.player=event.source;
 								event.custom.replace.confirm=function(){
-									event.result=ui.selected.buttons[0].link;
+									if(!ui.selected.buttons.length){
+										event.result='refuse';
+									}
+									else{
+										event.result=ui.selected.buttons[0].link;
+									}
 									event.dialog.close();
 									if(ui.confirm) ui.confirm.close();
 									delete event.player;
@@ -689,6 +699,10 @@ card.guozhan={
 					if(!event.directresult||event.directresult=='ai'){
 						event.directresult=event.list.randomGet();
 					}
+				}
+				if(event.directresult=='refuse'){
+					game.log(trigger.player,'拒绝重新加入游戏');
+					return;
 				}
 				game.log(trigger.player,'重新加入游戏');
 				var name=event.directresult;

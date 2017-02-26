@@ -33761,7 +33761,7 @@
                                 game.connectPlayers.indexOf(this),this.classList.contains('unselectable2'));
                             }
                         }
-                        else{
+                        else if(this.hasOwnProperty('roomindex')){
                             if(this.roomfull){
                                 alert('房间已满');
                             }
@@ -33781,7 +33781,7 @@
                                     alert('加入失败：房主的游戏版本过低');
                                 }
                             }
-                            else if(this.hasOwnProperty('roomindex')){
+                            else{
                                 if(!_status.enteringroom){
                                     _status.enteringroom=true;
                                     _status.enteringroomserver=this.serving;
