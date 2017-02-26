@@ -11793,11 +11793,8 @@
 						next.targets=[];
 					}
 					if(next.card){
+						next.card=get.autoViewAs(next.card,false);
 						var info=get.info(next.card);
-						if(info.autoViewAs){
-							next.card={name:info.autoViewAs};
-							info=get.info(next.card);
-						}
 						if(info.changeTarget){
 	                        info.changeTarget(next.player,next.targets);
 	                    }
@@ -11958,10 +11955,7 @@
 						if(next.cards){
 							next.card=next.cards[0];
                             if(!next.skill){
-                                var info=get.info(next.card);
-                                if(info.autoViewAs){
-                                    next.card={name:info.autoViewAs,suit:next.card.suit,number:next.card.number};
-                                }
+								next.card=get.autoViewAs(next.card);
                             }
 						}
 					}
@@ -13359,10 +13353,7 @@
 					if(typeof card=='string'){
 						card={name:card};
 					}
-					var info=get.info(card);
-					if(info.autoViewAs){
-						card={name:info.autoViewAs,suit:card.suit,number:card.number};
-					}
+					card=get.autoViewAs(card);
 					var num=get.info(card).usable;
 					if(typeof num=='function') num=num(card,player);
 					num=game.checkMod(card,player,num,'cardUsable',player.get('s'));
@@ -16143,10 +16134,7 @@
                 }
             },
 			cardEnabled:function(card,player,event){
-                var info=get.info(card);
-                if(info.autoViewAs){
-                    card={name:info.autoViewAs,suit:card.suit,number:card.number};
-                }
+				card=get.autoViewAs(card);
 				if(player==undefined) player=_status.event.player;
 				var filter=get.info(card).enable;
 				if(!filter) return;
@@ -16163,10 +16151,7 @@
 				return true;
 			},
 			cardUsable:function(card,player,event){
-                var info=get.info(card);
-                if(info.autoViewAs){
-                    card={name:info.autoViewAs,suit:card.suit,number:card.number};
-                }
+				card=get.autoViewAs(card);
 				if(player!=_status.event.player) return true;
 				event=event||_status.event;
 				if(event.getParent().name!='phaseUse') return true;
@@ -35189,6 +35174,37 @@
     			return false;
     		},
         },
+		autoViewAs:function(card,cards){
+			var info=get.info(card);
+			if(info.autoViewAs){
+				if(cards===false){
+					return {
+						name:info.autoViewAs
+					};
+				}
+				else if(Array.isArray(cards)){
+					return {
+						name:info.autoViewAs,
+						cards:cards.slice(0)
+					};
+				}
+				else if(get.itemtype(card)=='card'){
+					return {
+						name:info.autoViewAs,
+						cards:[card]
+					};
+				}
+				else{
+					return {
+						name:info.autoViewAs,
+						suit:card.suit,
+						number:card.number,
+						nature:card.nature
+					};
+				}
+			}
+			return card;
+		},
 		characterIntro:function(name){
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			var tags=lib.character[name][4];
@@ -36173,9 +36189,7 @@
 			if(_status.event.skill){
 				var card=get.info(_status.event.skill).viewAs;
 				if(card){
-					card=get.copy(card);
-					card.cards=ui.selected.cards.slice(0);
-					return card;
+					return get.autoViewAs(card);
 				}
 			}
             if(_status.event._get_card){
@@ -36184,10 +36198,7 @@
             var card=ui.selected.cards[0];
             if(original) return card;
             if(card){
-                var info=get.info(card);
-                if(info.autoViewAs){
-                    card={name:info.autoViewAs,cards:ui.selected.cards.slice(0)};
-                }
+				card=get.autoViewAs(card,ui.selected.cards);
             }
 			return card;
 		},
