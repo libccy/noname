@@ -12693,6 +12693,7 @@
 							}
 						}
 					}
+					return this;
 				},
 				markSkillCharacter:function(id,target,name,content){
 					if(typeof target=='object'){
@@ -12734,8 +12735,15 @@
 					if(typeof name=='object'){
 						name=name.name;
 					}
-					if(!lib.character[name]) return this;
-					var node=ui.create.div('.card.mark.drawinghidden').setBackground(name,'character');
+					var node;
+					if(name.indexOf('unknown')==0){
+						node=ui.create.div('.card.mark.drawinghidden');
+						ui.create.div('.background.skillmark',node).innerHTML=get.translation(name)[0];
+					}
+					else{
+						if(!lib.character[name]) return;
+						node=ui.create.div('.card.mark.drawinghidden').setBackground(name,'character');
+					}
 					this.node.marks.insertBefore(node,this.node.marks.childNodes[1]);
 					node.name=name+'_charactermark';
 					if(!info){

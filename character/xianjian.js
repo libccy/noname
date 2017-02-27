@@ -648,6 +648,7 @@ character.xianjian={
 				return event.player!=player&&event.player.num('h')>0&&player.num('h')>0;
 			},
 			check:function(event,player){
+				if(player.isUnseen()) return false;
 				if(ai.get.attitude(player,event.player)>=0) return false;
 				var hs=player.get('h');
 				if(hs.length<event.player.num('h')) return false;
@@ -696,6 +697,7 @@ character.xianjian={
 				}
 			},
 			ai:{
+				mingzhi:false,
 				expose:0.2
 			}
 		},
