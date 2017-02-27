@@ -3336,6 +3336,7 @@ character.yijiang={
 				}
 				return false;
 			},
+			prompt:'将一张黑色非基本牌置于牌堆顶，视为使用一张杀',
 			precontent:function(){
 				'step 0'
 				var card=event.result.cards[0];
@@ -3384,6 +3385,7 @@ character.yijiang={
 				return false;
 			},
 			position:'he',
+			prompt:'将一张黑色非基本牌置于牌堆顶，视为使用一张桃',
 			precontent:function(){
 				'step 0'
 				var card=event.result.cards[0];
@@ -3430,6 +3432,7 @@ character.yijiang={
 				}
 				return false;
 			},
+			prompt:'将一张黑色非基本牌置于牌堆顶，视为使用一张酒',
 			precontent:function(){
 				'step 0'
 				var card=event.result.cards[0];

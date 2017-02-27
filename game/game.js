@@ -9287,6 +9287,10 @@
 						event.finish();
 					}
 					"step 1"
+					if(cards.length==0){
+						event.finish();
+						return;
+					}
 					if(event.source&&event.delay!==false) game.delayx();
 					"step 2"
 					if(player.getStat().gain==undefined){
@@ -9834,6 +9838,11 @@
 					"step 0"
                     var owner=get.owner(card)
 					if(owner) owner.lose(card,ui.special).set('type','equip');
+					"step 1"
+					if(event.cancelled){
+						event.finish();
+						return;
+					}
 					if(card.clone){
                         game.broadcast(function(card,player){
                             if(card.clone){
@@ -9843,10 +9852,9 @@
 						card.clone.moveDelete(player);
 						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
 					}
-
 					player.equiping=true;
 					player.lose(player.get('e',{subtype:get.subtype(card)}),false);
-					"step 1"
+					"step 2"
 					if(player.isMin()){
 						event.finish();
 						ui.discardPile.appendChild(card);
@@ -9867,7 +9875,7 @@
                     }
 					game.addVideo('equip',player,get.cardInfo(card));
 					game.log(player,'装备了',card);
-					"step 2"
+					"step 3"
 					var info=get.info(card);
 					if(info.onEquip&&(!info.filterEquip||info.filterEquip(card,player))){
                         if(Array.isArray(info.onEquip)){
@@ -9887,7 +9895,7 @@
 						if(info.equipDelay!='false') game.delayx();
 					}
 					delete player.equiping;
-                    "step 3"
+                    "step 4"
                     if(event.draw){
                         game.delay();
                     }
@@ -36249,16 +36257,19 @@
 				if(card.destiny.classList.contains('equips')) return 'e';
 				if(card.destiny.classList.contains('judges')) return 'j';
 				if(card.destiny.classList.contains('handcards')) return 'h';
+				if(card.destiny.id=='cardPile') return 'c';
 				if(card.destiny.id=='discardPile') return 'd';
 				if(card.destiny.id=='special') return 's';
-				return;
+				return null;
 			}
 			if(!card.parentNode) return;
 			if(card.parentNode.classList.contains('equips')) return 'e';
 			if(card.parentNode.classList.contains('judges')) return 'j';
 			if(card.parentNode.classList.contains('handcards')) return 'h';
+			if(card.parentNode.id=='cardPile') return 'c';
 			if(card.parentNode.id=='discardPile') return 'd';
 			if(card.parentNode.id=='special') return 's';
+			return null;
 		},
         skillTranslation:function(str,player){
             var str2;
