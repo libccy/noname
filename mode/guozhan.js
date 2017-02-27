@@ -242,7 +242,6 @@ mode.guozhan={
 			gz_hetaihou:['female','qun',3,['zhendu','qiluan']],
 
 			gz_re_lidian:['male','wei',3,['xunxun','wangxi']],
-			gz_zangba:['male','wei',4,['hengjiang']],
 			gz_madai:['male','shu',4,['mashu','gzqianxi']],
 			gz_mifuren:['female','shu',3,['gzguixiu','gzcunsi']],
 			gz_sunce:['male','wu',4,['jiang','yingyang','hunshang']],
@@ -253,12 +252,6 @@ mode.guozhan={
 			gz_jun_liubei:['male','shu',4,['zhangwu','jizhao','shouyue','wuhujiangdaqi']],
 			gz_jun_zhangjiao:['male','qun',4,['wuxin','hongfa','wendao','huangjintianbingfu']],
 		}
-	},
-	characterIntro:{
-		zangba:'其父臧戒，有二子臧艾与臧舜。年少时曾召集数人将获罪的父亲救出，此后四处流亡。后来成为陶谦麾下的骑都尉，负责募兵抵抗黄巾军。与孙观、尹礼等人拥兵驻屯于开阳，自成一股独立势力，后跟随吕布。吕布战败后，投降了曹操。后与袁绍、孙权等的战役里战功赫赫，官至镇东将军。',
-		zhangren:'刘璋的属下，以忠勇著称。刘备入蜀时，张任曾劝刘璋提防刘备，但刘璋没有听从。魏延舞剑想趁机除掉刘璋时，张任出面对舞，解救刘璋。后在刘备进攻时于落凤坡射死了庞统。',
-		jiling:'东汉末年袁术帐下将领，勇猛非常，曾奉命率军攻打小沛的刘备，在吕布辕门射戟的调停下撤兵。',
-		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 	},
 	skill:{
 		_hongfa2:{
@@ -1176,57 +1169,6 @@ mode.guozhan={
 				}
 			}
 		},
-		hengjiang:{
-			trigger:{player:'damageEnd'},
-			check:function(event,player){
-				return ai.get.attitude(player,event.source)<0||!event.source.needsToDiscard(2);
-			},
-			filter:function(event){
-				return event.source&&event.source.isIn()&&event.num>0;
-			},
-			logTarget:'source',
-			content:function(){
-				var source=trigger.source;
-				if(source.hasSkill('hengjiang2')){
-					source.storage.hengjiang3+=trigger.num;
-					source.updateMarks();
-				}
-				else{
-					source.storage.hengjiang2=player;
-					source.storage.hengjiang3=trigger.num;
-					source.addTempSkill('hengjiang2','phaseAfter');
-				}
-			}
-		},
-		hengjiang2:{
-			mark:'character',
-			intro:{
-				content:function(storage,player){
-					return '手牌上限-'+player.storage.hengjiang3;
-				},
-				markcount:function(storage,player){
-					return player.storage.hengjiang3;
-				}
-			},
-			mod:{
-				maxHandcard:function(player,num){
-					return num-player.storage.hengjiang3;
-				}
-			},
-			onremove:function(player){
-				delete player.storage.hengjiang2;
-				delete player.storage.hengjiang3;
-			},
-			trigger:{player:'phaseDiscardEnd'},
-			filter:function(event,player){
-				return player.storage.hengjiang2.isIn()&&(!event.cards||event.cards.length==0);
-			},
-			forced:true,
-			popup:false,
-			content:function(){
-				player.storage.hengjiang2.draw();
-			}
-		},
 		baoling:{
 			trigger:{player:'phaseUseEnd'},
 			init:function(player){
@@ -1326,71 +1268,6 @@ mode.guozhan={
 					game.addVideo('storage',result.targets[0],['qianxi2',event.color]);
 				}
 			},
-		},
-		shuangren:{
-			trigger:{player:'phaseUseBegin'},
-			direct:true,
-			priority:15,
-			content:function(){
-				'step 0'
-				var goon;
-				if(player.needsToDiscard()>1){
-					goon=player.hasCard(function(card){
-						return card.number>10&&ai.get.value(card)<=5;
-					});
-				}
-				else{
-					goon=player.hasCard(function(card){
-						return card.number>=9&&ai.get.value(card)<=5||ai.get.value(card)<=3;
-					});
-				}
-				player.chooseTarget(get.prompt('shuangren'),function(card,player,target){
-					return target!=player;
-				}).set('ai',function(target){
-					var player=_status.event.player;
-					if(_status.event.goon&&ai.get.attitude(player,target)<0){
-						return ai.get.effect(target,{name:'sha'},player,player);
-					}
-					return 0;
-				}).set('goon',goon);
-				'step 1'
-				if(result.bool){
-					var target=result.targets[0];
-					event.target=target;
-					player.logSkill('shuangren',target);
-					player.chooseToCompare(target);
-				}
-				else{
-					event.finish();
-				}
-				'step 2'
-				if(result.bool){
-					var target=event.target;
-					if(target.identity!='ye'&&target.identity!='unknown'&&game.hasPlayer(function(current){
-						return target.identity==current.identity&&target!=current&&player.canUse('sha',current,false);
-					})){
-						player.chooseTarget('对一名'+get.translation(target.identity)+'势力的角色使用一张杀',true,function(card,player,target){
-							return target.identity==_status.event.identity;
-						}).set('ai',function(target){
-							var player=_status.event.player;
-							return ai.get.effect(target,{name:'sha'},player,player);
-						}).set('identity',target.identity);
-					}
-					else{
-						player.useCard({name:'sha'},target,false);
-						event.finish();
-					}
-				}
-				else{
-					trigger.finish();
-					trigger.untrigger();
-					event.finish();
-				}
-				'step 3'
-				if(result.bool&&result.targets&&result.targets.length){
-					player.useCard({name:'sha'},result.targets[0],false);
-				}
-			}
 		},
 		gzduanchang:{
 			audio:'duanchang',
@@ -2865,8 +2742,6 @@ mode.guozhan={
 		gzcunsi_info:'出牌阶段，你可以移除此武将牌并选择一名角色，然后其获得技能“勇决”，若你没有获得“勇决”，则获得“勇决”的角色摸两张牌',
 		gzyongjue:'勇决',
 		gzyongjue_info:'若与你势力相同的一名角色于其回合内使用的第一张牌为【杀】，则该角色可以在此【杀】结算完成后获得之',
-		hengjiang:'横江',
-		hengjiang_info:'当你受到1点伤害后，你可以令当前回合角色本回合的手牌上限-1。然后若其弃牌阶段内没有弃牌，则你摸一张牌',
 		gzqianxi:'潜袭',
 		gzqianxi_info:'准备阶段开始时，你可以进行判定，然后你选择距离为1的一名角色，直到回合结束，该角色不能使用或打出与结果颜色相同的手牌',
 		gzshangyi:'尚义',
@@ -2896,8 +2771,6 @@ mode.guozhan={
 		gz_shibing2wu:'吴兵',
 		gz_shibing1qun:'群兵',
 		gz_shibing2qun:'群兵',
-		shuangren:'双刃',
-		shuangren_info:'出牌阶段开始时，你可以与一名角色拼点。若你赢，你视为对其或与其势力相同的另一名角色使用一张【杀】（此【杀】不计入限制的次数）；若你没赢，你结束出牌阶段',
 		gzduanchang:'断肠',
 		gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌的所有技能',
 		gzweimu:'帷幕',

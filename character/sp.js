@@ -92,8 +92,15 @@ character.sp={
 		kongrong:['male','qun',3,['lirang','mingshi']],
 		dingfeng:['male','wu',4,['fenxun','duanbing']],
 		panfeng:['male','qun',4,['kuangfu']],
+
+		jiling:['male','qun',4,['shuangren']],
+		zangba:['male','wei',4,['hengjiang']],
 	},
 	characterIntro:{
+		zangba:'其父臧戒，有二子臧艾与臧舜。年少时曾召集数人将获罪的父亲救出，此后四处流亡。后来成为陶谦麾下的骑都尉，负责募兵抵抗黄巾军。与孙观、尹礼等人拥兵驻屯于开阳，自成一股独立势力，后跟随吕布。吕布战败后，投降了曹操。后与袁绍、孙权等的战役里战功赫赫，官至镇东将军。',
+		zhangren:'刘璋的属下，以忠勇著称。刘备入蜀时，张任曾劝刘璋提防刘备，但刘璋没有听从。魏延舞剑想趁机除掉刘璋时，张任出面对舞，解救刘璋。后在刘备进攻时于落凤坡射死了庞统。',
+		jiling:'东汉末年袁术帐下将领，勇猛非常，曾奉命率军攻打小沛的刘备，在吕布辕门射戟的调停下撤兵。',
+		zoushi:'军阀张济之妻，张绣之婶。张绣降曹后，邹氏遂被曹操霸占。贾诩献计趁机诛杀曹操，险些得手。曹操在损失爱将典韦、侄子曹安民和长子曹昂后方才逃出生天。',
 		ganfuren:'刘备起兵后，于沛城娶甘氏为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。',
 		jiangfei:'蒋琬，蜀四英之一。初随刘备入蜀，诸葛亮卒后封大将军，辅佐刘禅，主持朝政，统兵御魏。采取闭关息民政策，国力大增。官至大司马，安阳亭侯，谥号恭侯。费祎，蜀国著名政治家和武将，官至大将军。在一次回途的筵会中，被降将郭修刺杀而亡，谥号敬侯。',
 		mifuren:'刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。',
@@ -185,6 +192,130 @@ character.sp={
 		dongbai:['dongzhuo']
 	},
 	skill:{
+		hengjiang:{
+			trigger:{player:'damageEnd'},
+			check:function(event,player){
+				return ai.get.attitude(player,event.source)<0||!event.source.needsToDiscard(2);
+			},
+			filter:function(event){
+				return event.source&&event.source.isIn()&&event.num>0;
+			},
+			logTarget:'source',
+			content:function(){
+				var source=trigger.source;
+				if(source.hasSkill('hengjiang2')){
+					source.storage.hengjiang2+=trigger.num;
+					source.updateMarks();
+				}
+				else{
+					source.storage.hengjiang3=player;
+					source.storage.hengjiang2=trigger.num;
+					source.addTempSkill('hengjiang2','phaseAfter');
+				}
+			}
+		},
+		hengjiang2:{
+			mark:true,
+			intro:{
+				content:'手牌上限-#'
+			},
+			mod:{
+				maxHandcard:function(player,num){
+					return num-player.storage.hengjiang2;
+				}
+			},
+			onremove:function(player){
+				delete player.storage.hengjiang2;
+				delete player.storage.hengjiang3;
+			},
+			trigger:{player:'phaseDiscardEnd'},
+			filter:function(event,player){
+				return player.storage.hengjiang3.isIn()&&(!event.cards||event.cards.length==0);
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.storage.hengjiang3.draw();
+			}
+		},
+		shuangren:{
+			trigger:{player:'phaseUseBegin'},
+			direct:true,
+			priority:15,
+			content:function(){
+				'step 0'
+				var goon;
+				if(player.needsToDiscard()>1){
+					goon=player.hasCard(function(card){
+						return card.number>10&&ai.get.value(card)<=5;
+					});
+				}
+				else{
+					goon=player.hasCard(function(card){
+						return card.number>=9&&ai.get.value(card)<=5||ai.get.value(card)<=3;
+					});
+				}
+				player.chooseTarget(get.prompt('shuangren'),function(card,player,target){
+					return target!=player;
+				}).set('ai',function(target){
+					var player=_status.event.player;
+					if(_status.event.goon&&ai.get.attitude(player,target)<0){
+						return ai.get.effect(target,{name:'sha'},player,player);
+					}
+					return 0;
+				}).set('goon',goon);
+				'step 1'
+				if(result.bool){
+					var target=result.targets[0];
+					event.target=target;
+					player.logSkill('shuangren',target);
+					player.chooseToCompare(target);
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(result.bool){
+					var target=event.target;
+					if(target.identity!='ye'&&target.identity!='unknown'&&game.hasPlayer(function(current){
+						if(!player.canUse('sha',current,false)) return false;
+						if(target==current) return false;
+						if(get.mode()=='guozhan'){
+							return target.identity==current.identity;
+						}
+						return true;
+					})){
+						var str='对一名';
+						if(get.mode()=='guozhan'){
+							str+=get.translation(target.identity)+'势力的';
+						}
+						player.chooseTarget(str+'角色使用一张杀',true,function(card,player,target){
+							if(!player.canUse('sha',target,false)) return false;
+							if(get.mode()=='guozhan'){
+								return target.identity==_status.event.identity;
+							}
+							return true;
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							return ai.get.effect(target,{name:'sha'},player,player);
+						}).set('identity',target.identity);
+					}
+					else{
+						player.useCard({name:'sha'},target,false);
+						event.finish();
+					}
+				}
+				else{
+					trigger.finish();
+					trigger.untrigger();
+					event.finish();
+				}
+				'step 3'
+				if(result.bool&&result.targets&&result.targets.length){
+					player.useCard({name:'sha'},result.targets[0],false);
+				}
+			}
+		},
 		kuanshi:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -7939,6 +8070,12 @@ character.sp={
 		dongyun:'董允',
 		mazhong:'马忠',
 
+		hengjiang:'横江',
+		hengjiang2:'横江',
+		hengjiang_info:'当你受到1点伤害后，你可以令当前回合角色本回合的手牌上限-1。然后若其弃牌阶段内没有弃牌，则你摸一张牌',
+		shuangren:'双刃',
+		shuangren_info:'出牌阶段开始时，你可以与一名角色拼点。若你赢，你视为任意一名角色使用一张【杀】（此【杀】不计入限制的次数）；若你没赢，你结束出牌阶段',
+		shuangren_info_guozhan:'出牌阶段开始时，你可以与一名角色拼点。若你赢，你视为对其或与其势力相同的另一名角色使用一张【杀】（此【杀】不计入限制的次数）；若你没赢，你结束出牌阶段',
 		xiashu:'下书',
 		xiashu_info:'出牌阶段开始时，你可以将所有手牌交给一名其他角色，然后该角色亮出任意数量的手牌（至少一张），令你选择一项：1.获得其亮出的手牌；2.获得其未亮出的手牌',
 		kuanshi:'宽释',

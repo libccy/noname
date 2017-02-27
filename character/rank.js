@@ -227,6 +227,7 @@ window.characterRank={
         'diy_caiwenji',
     ],
     bp:[
+        'jiling',
         'yanbaihu',
         'dongyun',
         'sunziliufang',
@@ -459,6 +460,7 @@ window.characterRank={
         'caozhang',
     ],
     bm:[
+        'zangba',
         'diy_xizhenxihong',
         'tadun',
         'guohuai',

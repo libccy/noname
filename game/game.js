@@ -28935,7 +28935,7 @@
                                                     }
                                                     else{
                                                         if(updates[i].indexOf('image/character')==0){
-                                                            if(!skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
+                                                            if(updates[i].indexOf('jun_')!=16&&!skipcharacter.contains(updates[i].slice(16,updates[i].lastIndexOf('.')))){
                                                                 updates.splice(i--,1);
                                                             }
                                                         }
