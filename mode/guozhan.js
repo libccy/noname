@@ -229,7 +229,7 @@ mode.guozhan={
 			gz_mateng:['male','qun',4,['mashu','xiongyi']],
 			gz_kongrong:['male','qun',3,['gzmingshi','lirang']],
 			gz_jiling:['male','qun',4,['shuangren']],
-			gz_tianfeng:['male','qun',3,['sijian','suishi']],
+			gz_tianfeng:['male','qun',3,['sijian','gzsuishi']],
 			gz_panfeng:['male','qun',4,['kuangfu']],
 			gz_zoushi:['female','qun',3,['huoshui','qingcheng']],
 
@@ -254,6 +254,33 @@ mode.guozhan={
 		}
 	},
 	skill:{
+		gzsuishi:{
+			audio:'suishi',
+			trigger:{global:'dying'},
+			forced:true,
+			priority:6.5,
+			check:function(){
+				return false;
+			},
+			filter:function(event,player){
+				return event.player!=player&&event.parent.name=='damage'&&event.parent.source&&event.parent.source.isFriendOf(player);
+			},
+			content:function(){
+				player.draw();
+			},
+			group:'gzsuishi2'
+		},
+		gzsuishi2:{
+			audio:'suishi',
+			trigger:{global:'dieAfter'},
+			forced:true,
+			filter:function(event,player){
+				return event.player.isFriendOf(player);
+			},
+			content:function(){
+				player.loseHp();
+			}
+		},
 		_hongfa2:{
 			trigger:{player:'chooseToRespondBegin'},
 			direct:true,
@@ -2698,6 +2725,8 @@ mode.guozhan={
 		fengshi:'锋矢',
 		_fengshi:'锋矢',
 		fengshi_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，可令该角色弃置装备区里的一张牌',
+		gzsuishi:'随势',
+		gzsuishi_info:'锁定技，当其他角色进入濒死状态时，若伤害来源与你势力相同，你摸一张牌；当其他角色死亡时，若其与你势力相同，你失去1点体力',
 		baoling:'暴凌',
 		baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，并获得“崩坏”',
 		yingyang:'鹰扬',

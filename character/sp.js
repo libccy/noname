@@ -6700,7 +6700,7 @@ character.sp={
 			trigger:{global:'dying'},
 			forced:true,
 			popup:false,
-			priority:6,
+			priority:6.5,
 			check:function(){
 				return false;
 			},
