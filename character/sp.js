@@ -212,7 +212,7 @@ character.sp={
 			filter:function(event,player){
 				if(event.card&&(event.card.name=='sha'||event.card.name=='juedou')){
 					if(get.mode()=='guozhan'){
-						(event.player.identity!='qun'||player.identity=='ye')&&
+						return (event.player.identity!='qun'||player.identity=='ye')&&
 						!event.player.isUnseen()&&event.player.hasViceCharacter();
 					}
 					else{

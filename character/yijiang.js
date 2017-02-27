@@ -3814,6 +3814,7 @@ character.yijiang={
 				return event.target.hp>0&&event.target.num('he')>0;
 			},
 			audio:2,
+			logTarget:'target',
 			content:function(){
 				'step 0'
 				player.choosePlayerCard(trigger.target,'he',

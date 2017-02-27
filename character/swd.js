@@ -983,6 +983,7 @@ character.swd={
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<0;
 			},
+			logTarget:'target',
 			filter:function(event,player){
 				return event.target.num('he')>0;
 			},
@@ -3082,9 +3083,7 @@ character.swd={
 				if(ai.get.attitude(player,event.target)>0) return true;
 				return player.hp<player.maxHp;
 			},
-			// filter:function(event){
-			// 	return event.player.isAlive();
-			// },
+			logTarget:'target',
 			content:function(){
 				"step 0"
 				trigger.target.draw();

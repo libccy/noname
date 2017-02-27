@@ -849,6 +849,7 @@ character.yxs={
 				if(event.target.hasSkillTag('respondShan')&&event.target.num('h')>=3) return false;
 				return true;
 			},
+			logTarget:'target',
 			content:function(){
 				"step 0"
 				var next=trigger.target.chooseToRespond({name:'shan'});
@@ -2456,6 +2457,7 @@ character.yxs={
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
 			},
+			logTarget:'target',
 			content:function(){
 				"step 0"
 				player.judge();

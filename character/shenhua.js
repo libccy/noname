@@ -543,6 +543,7 @@ character.shenhua={
 			},
 			audio:'liegong',
 			trigger:{player:'shaBegin'},
+			logTarget:'target',
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
 			},
@@ -3477,6 +3478,7 @@ character.shenhua={
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
 			},
+			logTarget:'target',
 			filter:function(event,player){
 				var length=event.target.num('h');
 				return (length>=player.hp||length<=player.getAttackRange());
