@@ -1025,37 +1025,6 @@ mode.guozhan={
 				trigger.target.chooseToDiscard('e',true);
 			}
 		},
-		chuanxin:{
-			trigger:{source:'damageBefore'},
-			filter:function(event,player){
-				return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.player.identity!='qun'&&
-				!event.player.isUnseen()&&event.player.hasViceCharacter();
-			},
-			logTarget:'player',
-			content:function(){
-				'step 0'
-				trigger.untrigger();
-				trigger.finish();
-				if(trigger.player.num('e')){
-					trigger.player.chooseControl(function(event,player){
-						if(player.hp==1) return 1;
-						if(player.hp==2&&player.num('e')>=2) return 1;
-						return 0;
-					}).set('choiceList',['弃置装备区内的所有牌并失去一点体力','移除副将牌']);
-				}
-				else{
-					event._result={index:1};
-				}
-				'step 1'
-				if(result.index==1){
-					trigger.player.removeCharacter(1);
-				}
-				else{
-					trigger.player.discard(trigger.player.get('e'));
-					trigger.player.loseHp();
-				}
-			}
-		},
 		gzguixiu:{
 			init2:function(player){
 				player.logSkill('guixiu');
@@ -1320,7 +1289,7 @@ mode.guozhan={
 						list.addArray(info.derivation);
 					}
 				}
-				trigger.source.disableSkill('gzduanchang',list);
+				trigger.source.disableSkill('gzduanchang_disable',list);
 				trigger.source.syncSkills();
 			},
 			logTarget:'source',
@@ -2728,8 +2697,6 @@ mode.guozhan={
 		fengshi:'锋矢',
 		_fengshi:'锋矢',
 		fengshi_info:'阵法技，在同一个围攻关系中，若你是围攻角色，则你或另一名围攻角色使用【杀】指定被围攻角色为目标后，可令该角色弃置装备区里的一张牌',
-		chuanxin:'穿心',
-		chuanxin_info:'当你于出牌阶段内使用【杀】或【决斗】对目标角色造成伤害时，若其与你势力不同且有副将，你可以防止此伤害。若如此做，该角色选择一项：1.弃置装备区里的所有牌，若如此做，其失去1点体力；2.移除副将',
 		baoling:'暴凌',
 		baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，并获得“崩坏”',
 		yingyang:'鹰扬',

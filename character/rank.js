@@ -228,6 +228,7 @@ window.characterRank={
     ],
     bp:[
         'jiling',
+        'zhangren',
         'yanbaihu',
         'dongyun',
         'sunziliufang',

@@ -1076,6 +1076,7 @@ character.standard={
 			check:function(event,player){
 				return ai.get.attitude(player,event.target)<=0;
 			},
+			logTarget:'target',
 			content:function(){
 				"step 0"
 				player.judge(function(card){

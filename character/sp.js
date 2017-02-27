@@ -95,6 +95,7 @@ character.sp={
 
 		jiling:['male','qun',4,['shuangren']],
 		zangba:['male','wei',4,['hengjiang']],
+		zhangren:['male','qun',4,['chuanxin','zfengshi']],
 	},
 	characterIntro:{
 		zangba:'其父臧戒，有二子臧艾与臧舜。年少时曾召集数人将获罪的父亲救出，此后四处流亡。后来成为陶谦麾下的骑都尉，负责募兵抵抗黄巾军。与孙观、尹礼等人拥兵驻屯于开阳，自成一股独立势力，后跟随吕布。吕布战败后，投降了曹操。后与袁绍、孙权等的战役里战功赫赫，官至镇东将军。',
@@ -192,6 +193,88 @@ character.sp={
 		dongbai:['dongzhuo']
 	},
 	skill:{
+		zfengshi:{
+			trigger:{player:'shaBegin'},
+			filter:function(event,player){
+				return event.target.num('e');
+			},
+			logTarget:'target',
+			check:function(event,player){
+				if(event.target.hasSkillTag('noe')) return false;
+				return ai.get.attitude(player,event.target)<0;
+			},
+			content:function(){
+				trigger.target.chooseToDiscard('e',true);
+			}
+		},
+		chuanxin:{
+			trigger:{source:'damageBefore'},
+			filter:function(event,player){
+				if(event.card&&(event.card.name=='sha'||event.card.name=='juedou')){
+					if(get.mode()=='guozhan'){
+						(event.player.identity!='qun'||player.identity=='ye')&&
+						!event.player.isUnseen()&&event.player.hasViceCharacter();
+					}
+					else{
+						var info=lib.character[event.player.name];
+						if(!info) return false;
+						var skills=event.player.get('s');
+						for(var i=0;i<info[3].length;i++){
+							if(skills.contains(info[3][i])) return true;
+						}
+					}
+				}
+				return false;
+			},
+			logTarget:'player',
+			check:function(event,player){
+				if(ai.get.attitude(player,event.player)<0){
+					if(event.player.hp==1) return false;
+					return true;
+				}
+				return false;
+			},
+			content:function(){
+				'step 0'
+				trigger.untrigger();
+				trigger.finish();
+				if(trigger.player.num('e')){
+					trigger.player.chooseControl(function(event,player){
+						if(player.hp==1) return 1;
+						if(player.hp==2&&player.num('e')>=2) return 1;
+						return 0;
+					}).set('choiceList',['弃置装备区内的所有牌并失去一点体力',get.mode()=='guozhan'?'移除副将牌':'随机移除武将牌上的一个技能']);
+				}
+				else{
+					event._result={index:1};
+				}
+				'step 1'
+				if(result.index==1){
+					if(get.mode()!='guozhan'){
+						var info=lib.character[trigger.player.name];
+						var skills=trigger.player.get('s');
+						var list=[];
+						for(var i=0;i<info[3].length;i++){
+							if(skills.contains(info[3][i])){
+								list.push(info[3][i]);
+							}
+						}
+						if(list.length){
+							var skill=list.randomGet();
+							trigger.player.popup(skill);
+							trigger.player.disableSkill('chuanxin_disable',skill,true);
+						}
+					}
+					else{
+						trigger.player.removeCharacter(1);
+					}
+				}
+				else{
+					trigger.player.discard(trigger.player.get('e'));
+					trigger.player.loseHp();
+				}
+			}
+		},
 		hengjiang:{
 			trigger:{player:'damageEnd'},
 			check:function(event,player){
@@ -8070,6 +8153,11 @@ character.sp={
 		dongyun:'董允',
 		mazhong:'马忠',
 
+		zfengshi:'锋矢',
+		zfengshi_info:'你使用杀指定目标后，可以令目标弃置装备区内的一张牌',
+		chuanxin:'穿心',
+		chuanxin_info:'当你于出牌阶段内使用【杀】或【决斗】对目标角色造成伤害时，你可以防止此伤害。若如此做，该角色选择一项：1.弃置装备区里的所有牌，若如此做，其失去1点体力；2.随机移除主武将牌上的一个技能',
+		chuanxin_info_guozhan:'当你于出牌阶段内使用【杀】或【决斗】对目标角色造成伤害时，若其与你势力不同且有副将，你可以防止此伤害。若如此做，该角色选择一项：1.弃置装备区里的所有牌，若如此做，其失去1点体力；2.移除副将',
 		hengjiang:'横江',
 		hengjiang2:'横江',
 		hengjiang_info:'当你受到1点伤害后，你可以令当前回合角色本回合的手牌上限-1。然后若其弃牌阶段内没有弃牌，则你摸一张牌',
