@@ -1438,7 +1438,7 @@ character.shenhua={
 			check:function(event,player){
 				var att1=ai.get.attitude(player,event.player);
 				var att2=ai.get.attitude(player,event.source);
-				return att1>att2&&att1>=0;
+				return att1>0&&att2<0;
 			},
 			content:function(){
 				"step 0"
