@@ -34133,7 +34133,7 @@
 			},
 			charactercard:function(name,sourcenode,noedit){
 				if(_status.dragged) return;
-				ui.window.classList.add('shortcutpaused');
+				if(lib.config.theme!='simple') ui.window.classList.add('shortcutpaused');
 				// ui.window.classList.add('systempaused');
 				ui.menuContainer.classList.add('forceopaque');
 				if(lib.config.blur_ui){
