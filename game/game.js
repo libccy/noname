@@ -11797,18 +11797,6 @@
 					if(next.card){
 						next.card=get.autoViewAs(next.card,false,next.player);
 						var info=get.info(next.card);
-<<<<<<< HEAD
-=======
-						if(info.autoViewAs){
-							next.card={
-								name:info.autoViewAs,
-								suit:next.card.suit,
-								number:next.card.number,
-								nature:next.card.nature
-							};
-							info=get.info(next.card);
-						}
->>>>>>> origin/master
 						if(info.changeTarget){
 	                        info.changeTarget(next.player,next.targets);
 	                    }
