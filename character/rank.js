@@ -227,6 +227,7 @@ window.characterRank={
         'diy_caiwenji',
     ],
     bp:[
+        'zoushi',
         'jiling',
         'zhangren',
         'yanbaihu',

@@ -96,6 +96,7 @@ character.sp={
 		jiling:['male','qun',4,['shuangren']],
 		zangba:['male','wei',4,['hengjiang']],
 		zhangren:['male','qun',4,['chuanxin','zfengshi']],
+		zoushi:['female','qun',3,['zhuoshui','zqingcheng']],
 	},
 	characterIntro:{
 		zangba:'其父臧戒，有二子臧艾与臧舜。年少时曾召集数人将获罪的父亲救出，此后四处流亡。后来成为陶谦麾下的骑都尉，负责募兵抵抗黄巾军。与孙观、尹礼等人拥兵驻屯于开阳，自成一股独立势力，后跟随吕布。吕布战败后，投降了曹操。后与袁绍、孙权等的战役里战功赫赫，官至镇东将军。',
@@ -193,7 +194,56 @@ character.sp={
 		dongbai:['dongzhuo']
 	},
 	skill:{
+		zhuoshui:{
+			audio:'huoshui',
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			content:function(){
+				game.countPlayer(function(current){
+					if(current!=player&&!current.hasSkill('fengyin')){
+						player.line(current,'green');
+						current.addTempSkill('fengyin','phaseAfter');
+					}
+				});
+			}
+		},
+		zqingcheng:{
+			enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('he',{type:'equip'});
+			},
+			filterCard:{type:'equip'},
+			position:'he',
+			filterTarget:function(card,player,target){
+				return target!=player;
+			},
+			check:function(card){
+				var player=_status.event.player;
+				if(game.hasPlayer(function(current){
+					return ai.get.attitude(player,current)>2&&current.isTurnedOver();
+				})){
+					return 10-ai.get.value(card,player);
+				}
+				return 6-ai.get.value(card,player);
+			},
+			content:function(){
+				'step 0'
+				target.turnOver();
+				'step 1'
+				target.draw(2);
+			},
+			ai:{
+				order:8,
+				result:{
+					target:function(player,target){
+						if(target.isTurnedOver()) return 2;
+						return -0.5;
+					}
+				}
+			}
+		},
 		zfengshi:{
+			audio:'fengshi',
 			trigger:{player:'shaBegin'},
 			filter:function(event,player){
 				return event.target.num('e');
@@ -8153,6 +8203,10 @@ character.sp={
 		dongyun:'董允',
 		mazhong:'马忠',
 
+		zhuoshui:'祸水',
+		zhuoshui_info:'锁定技，准备阶段，你令所有其他角色的非锁定技失效直到回合结束',
+		zqingcheng:'倾城',
+		zqingcheng_info:'出牌阶段，你可以弃置一张装备牌，然后令一名角色翻面并摸两张牌',
 		zfengshi:'锋矢',
 		zfengshi_info:'你使用杀指定目标后，可以令目标弃置装备区内的一张牌',
 		chuanxin:'穿心',

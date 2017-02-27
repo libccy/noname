@@ -2704,7 +2704,7 @@
 						init:true,
 						frequent:true,
 						restart:true,
-						intro:'开启后将禁用非国战专属武将'
+						intro:'开启武将技能将替换为国战版本并禁用非国战武将'
 					},
 					connect_junzhu:{
 						name:'替换君主',
@@ -2785,7 +2785,7 @@
 						init:true,
 						frequent:true,
 						restart:true,
-						intro:'开启后将禁用非国战专属武将'
+						intro:'开启武将技能将替换为国战版本并禁用非国战武将'
 					},
 					junzhu:{
 						name:'替换君主',

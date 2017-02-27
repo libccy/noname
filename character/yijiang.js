@@ -4758,8 +4758,8 @@ character.yijiang={
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)>0;
 			},
+			logTarget:'player',
 			content:function(){
-				player.line(trigger.player,'green');
 				trigger.player.draw();
 			},
 			ai:{
