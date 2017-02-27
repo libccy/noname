@@ -6124,13 +6124,14 @@ character.sp={
 							return -att;
 						}
 						else{
-							return att/Math.sqrt(1+target.num('h'));
+							if(att>2) return att/Math.sqrt(1+target.num('h'));
+							return att/Math.sqrt(1+target.num('h'))/5;
 						}
 					}).set('enemy',ai.get.value(event.togive[0])<0);
 				}
 				else{
 					for(var i=0;i<event.cards.length;i++){
-						ui.discardPile(event.cards[i]);
+						ui.discardPile.appendChild(event.cards[i]);
 					}
 					event.finish();
 				}
@@ -6146,7 +6147,7 @@ character.sp={
 				}
 				else{
 					for(var i=0;i<event.cards.length;i++){
-						ui.discardPile(event.cards[i]);
+						ui.discardPile.appendChild(event.cards[i]);
 					}
 					event.finish();
 				}

@@ -1622,7 +1622,8 @@ div:not(.handcards)>.card>.info>span,
 .player>.avatar2.hidden {
 	pointer-events: none !important;
 }
-.player>.avatar.disabled{
+.player>.avatar.disabled,
+.player>.avatar2.disabled{
 	-webkit-filter: grayscale(1);
 	opacity: 0.8;
 }

@@ -289,7 +289,7 @@ card.standard={
 			subtype:'equip2',
 			ai:{
 				basic:{
-					equipValue:8
+					equipValue:7.5
 				}
 			},
 			skills:['bagua_skill']
@@ -670,7 +670,7 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
-						if(player.hasUnknown(2)) return 0;
+						if(player.hasUnknown(2)&&get.mode()!='guozhan') return 0;
 						var nh=target.num('h');
 						if(get.mode()=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -728,7 +728,7 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
-						if(player.hasUnknown(2)) return 0;
+						if(player.hasUnknown(2)&&get.mode()!='guozhan') return 0;
 						var nh=target.num('h');
 						if(get.mode()=='identity'){
 							if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
@@ -1295,7 +1295,7 @@ card.standard={
 			skills:['renwang_skill'],
 			ai:{
 				basic:{
-					equipValue:8
+					equipValue:7.5
 				},
 			},
 		},

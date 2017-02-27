@@ -13042,6 +13042,10 @@
                     if(typeof skills=='string'){
                         if(!this.disabledSkills[skills]){
                             this.disabledSkills[skills]=[];
+							var info=get.info(skills);
+							if(info.ondisable&&info.onremove){
+								info.onremove(this);
+							}
                         }
                         this.disabledSkills[skills].add(skill);
 						var group=lib.skill[skills].group;

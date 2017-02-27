@@ -814,20 +814,21 @@ mode.guozhan={
 		ziliang:{
 			trigger:{global:'damageEnd'},
 			filter:function(event,player){
-				return event.player.isFriendOf(player)&&player.storage.tuntian&&player.storage.tuntian.length;
+				return event.player.isIn()&&event.player.isFriendOf(player)&&player.storage.tuntian&&player.storage.tuntian.length;
 			},
 			init:function(player){
 				player.checkViceSkill('ziliang');
 			},
-			logTarget:'player',
+			direct:true,
 			content:function(){
 				'step 0'
-				player.chooseCardButton('将一张“田”交给'+get.translation(trigger.player),player.storage.tuntian).set('ai',function(button){
+				player.chooseCardButton(get.prompt('ziliang',trigger.player),player.storage.tuntian).set('ai',function(button){
 					return ai.get.value(button.link);
 				});
 				'step 1'
 				if(result.bool){
 					var card=result.links[0];
+					player.logSkill('ziliang',trigger.player);
 					player.storage.tuntian.remove(card);
 					player.syncStorage('tuntian');
 					if(!player.storage.tuntian.length){
@@ -838,7 +839,7 @@ mode.guozhan={
 					}
 					trigger.player.gain(card);
 					if(trigger.player==player){
-						player.$draw(card);
+						player.$draw(card,true);
 					}
 					else{
 						player.$give(card,trigger.player);
