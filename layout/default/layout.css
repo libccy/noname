@@ -286,6 +286,11 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 #arena.observe .handcards>.card>div {
 	opacity: 0 !important;
 }
+#arena.hide_name .player>.name:not(.name_seat),
+#arena.hide_name .player>.name2,
+#arena.hide_name>.dialog .button.character>.name{
+	display: none !important;
+}
 #arenalog {
 	width: calc(50% - 210px);
 	height: calc(100% - 370px);

@@ -1089,15 +1089,11 @@
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_name',bool);
-							if(lib.config.show_name){
-								for(var i=0;i<game.players.length;i++){
-									game.players[i].node.name.style.display='';
-								}
+							if(bool){
+								ui.arena.classList.remove('hide_name');
 							}
 							else{
-								for(var i=0;i<game.players.length;i++){
-									game.players[i].node.name.style.display='none';
-								}
+								ui.arena.classList.add('hide_name');
 							}
 						}
 					},
@@ -10166,9 +10162,9 @@
                     if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
                         this.node.name.classList.add('long');
                     }
-					if(!lib.config.show_name){
-						this.node.name.style.display='none';
-					}
+					// if(!lib.config.show_name){
+					// 	this.node.name.style.display='none';
+					// }
 					// for(var i=0;i<name.length;i++){
 					// 	if(name[i]!='s'&&name[i]!='p')
 					// 	this.node.name.innerHTML+=name[i]+'<br/>';
@@ -10205,9 +10201,9 @@
 						// var name=get.translation(character2);
 						this.node.name2.innerHTML=get.slimName(character2);
 						// this.node.name2.dataset.nature=get.groupnature(info2[1]);
-						if(!lib.config.show_name){
-							this.node.name2.style.display='none';
-						}
+						// if(!lib.config.show_name){
+						// 	this.node.name2.style.display='none';
+						// }
 						// for(var i=0;i<name.length;i++){
 						// 	this.node.name2.innerHTML+=name[i]+'<br/>';
 						// }
@@ -31125,6 +31121,9 @@
 				if(lib.config.link_style2!='chain'){
 					ui.arena.classList.add('nolink');
 				}
+				if(lib.config.show_name==false){
+					ui.arena.classList.add('hide_name');
+				}
 				if(lib.config.change_skin_auto!='off'){
 					_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
 				}
@@ -31605,9 +31604,9 @@
 								ui.create.div('',node.node.hp);
 							}
 						}
-						if(!lib.config.show_name){
-							node.node.name.style.display='none';
-						}
+						// if(!lib.config.show_name){
+						// 	node.node.name.style.display='none';
+						// }
 						if(node.node.hp.childNodes.length==0){
 							node.node.name.style.top='8px';
 						}
