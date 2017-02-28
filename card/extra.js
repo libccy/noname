@@ -20,7 +20,7 @@ card.extra={
 				return target==player;
 			},
 			content:function(){
-				if(target==_status.event.getParent(2).dying||target==_status.dying){
+				if(target.isDying()){
 					target.recover();
 					if(_status.currentPhase==target){
 						target.getStat().card.jiu--;
@@ -71,7 +71,7 @@ card.extra={
 				},
 				result:{
 					target:function(player,target){
-						if(target&&target.hp<=0) return 2;
+						if(target&&target.isDying()) return 2;
 						if(lib.config.mode=='stone'&&!player.isMin()){
 							if(player.getActCount()+1>=player.actcount) return 0;
 						}

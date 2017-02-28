@@ -15,6 +15,7 @@
 		skillaudio:[],
 		dieClose:[],
 		dragline:[],
+		dying:[]
 	};
 	var lib={
 		configprefix:'noname_0.9_',
@@ -9714,11 +9715,21 @@
 				},
 				dying:function(){
 					"step 0"
-					_status.dying=player;
+					if(player.isDying()||player.hp>0){
+						event.finish();
+						return;
+					}
+					_status.dying.unshift(player);
+					game.broadcast(function(list){
+						_status.dying=list;
+					},_status.dying);
 					event.trigger('dying');
 					game.log(player,'濒死')
 					"step 1"
-					if(_status.dying==player) delete _status.dying;
+					_status.dying.remove(player);
+					game.broadcast(function(list){
+						_status.dying=list;
+					},_status.dying);
 					if(player.hp<=0&&!player.nodying) player.die(event.reason);
 				},
 				die:function(){
@@ -9780,6 +9791,7 @@
     					player.next.previous=player.previous;
     					game.players.remove(player);
     					game.dead.push(player);
+						_status.dying.remove(player);
 
                         for(var i=0;i<cards.length;i++){
 							cards[i].goto(ui.discardPile);
@@ -12169,7 +12181,7 @@
 					return next;
 				},
 				dying:function(reason){
-					if(this.nodying) return;
+					if(this.nodying||this.hp>0||this.isDying()) return;
 					var next=game.createEvent('dying');
 					next.player=this;
 					next.reason=reason;
@@ -13494,6 +13506,9 @@
 				},
 				isDead:function(){
 					return this.classList.contains('dead');
+				},
+				isDying:function(){
+					return _status.dying.contains(this)&&this.hp<=0&&this.isAlive();
 				},
 				isDamaged:function(){
 					return this.hp<this.maxHp;
@@ -16612,20 +16627,19 @@
 				forced:true,
 				popup:false,
 				filter:function(event,player){
-					if(event.player.hp>0) return false;
-					if(event.source&&event.source!=player) return false;
+					if(!event.player.isDying()) return false;
+					if(event.source&&event.source.isIn()&&event.source!=player) return false;
 					return true;
 				},
 				content:function(){
 					"step 0"
-					event.dying=_status.dying;
+					event.dying=trigger.player;
                     if(!event.acted) event.acted=[];
 					"step 1"
                     if(trigger.player.isDead()){
                         event.finish();
                         return;
                     }
-                    _status.dying=event.dying;
                     event.acted.push(player);
                     // else if(trigger.source&&trigger.source.isDead()){
                     //     trigger.start=game.findNext(trigger.source);
@@ -16634,7 +16648,6 @@
                     //     trigger.start=trigger.source||trigger.player;
                     // }
 					var str=get.translation(trigger.player.name)+'濒死，是否帮助？<br><div class="text center" style="margin-top:10px">当前体力：'+trigger.player.hp+'</div>';
-					_status.dying=event.dying;
 					if(lib.config.tao_enemy&&event.dying.side!=player.side&&lib.config.mode!='identity'&&lib.config.mode!='guozhan'){
 						event._result={bool:false}
 					}
@@ -17460,6 +17473,7 @@
                             next:[],
                         };
                         _status.paused=false;
+						_status.dying=get.parsedResult(state.dying)||[];
 
                         if(game.updateState){
                             game.updateState(state2);
@@ -35588,6 +35602,7 @@
                 number:ui.arena.dataset.number,
                 players:{},
                 mode:_status.mode,
+				dying:_status.dying,
                 servermode:window.isNonameServer,
                 roomId:game.roomId
             };

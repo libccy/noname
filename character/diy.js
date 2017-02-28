@@ -795,7 +795,7 @@ character.diy={
 			},
 			filter:function(event,player){
 				if(event.type!='dying') return false;
-				if(player!=_status.dying) return false;
+				if(player!=event.dying) return false;
 				if(player.storage.guihan) return false;
 				return true;
 			},

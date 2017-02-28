@@ -7218,7 +7218,7 @@ character.sp={
 				result:{
 					player:function(player){
 						if(player.tempSkills.aocai4) return 0;
-						if(_status.dying) return ai.get.attitude(player,_status.dying);
+						if(_status.event.dying) return ai.get.attitude(player,_status.event.dying);
 						return 1;
 					}
 				}

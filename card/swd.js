@@ -1538,7 +1538,7 @@ card.swd={
 			},
 			content:function(){
 				"step 0"
-				if(target==_status.event.getParent(2).dying||target==_status.dying) target.recover();
+				if(target.isDying()) target.recover();
 				else{
 					target.addTempSkill('tianxianjiu',['phaseAfter','shaAfter']);
 					if(cards&&cards.length){
@@ -1574,7 +1574,7 @@ card.swd={
 				},
 				result:{
 					target:function(player,target){
-						if(target&&target==_status.dying) return 2;
+						if(target&&target.isDying()) return 2;
 						if(lib.config.mode=='stone'&&!player.isMin()){
 							if(player.getActCount()+1>=player.actcount) return false;
 						}

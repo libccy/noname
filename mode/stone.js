@@ -5389,7 +5389,7 @@ mode.stone={
 				return target==player;
 			},
 			content:function(){
-				if(target==_status.dying){
+				if(target.isDying()){
 					target.recover();
 				}
 				else{

@@ -2874,7 +2874,7 @@ mode.boss={
 			},
 			filter:function(event,player){
 				if(event.type!='dying') return false;
-				if(player!=_status.dying) return false;
+				if(!player.isDying()) return false;
 				if(player.storage.boss_guihan) return false;
 				return true;
 			},

@@ -487,7 +487,7 @@ card.sp={
 				order:4,
 				result:{
 					player:function(player){
-						if(_status.dying) return ai.get.attitude(player,_status.dying);
+						if(_status.event.dying) return ai.get.attitude(player,_status.event.dying);
 						return 1;
 					}
 				},

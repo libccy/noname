@@ -2240,6 +2240,7 @@ character.swd={
 						var num=target.maxHp-target.hp;
 						if(get.is.altered('shouyin')) num=Math.min(2,num);
 						target.recover(num);
+						player.line(target,'green');
 					}
 					event.redo();
 				}
@@ -2253,7 +2254,7 @@ character.swd={
 				save:true,
 				result:{
 					player:function(player){
-						if(_status.dying!=player&&ai.get.attitude(player,_status.dying)<=0){
+						if(_status.event.dying!=player&&ai.get.attitude(player,_status.event.dying)<=0){
 							return 0;
 						}
 						var num=0;
@@ -2831,7 +2832,7 @@ character.swd={
 				result:{
 					player:function(player){
 						if(player.tempSkills.jilve3) return 0;
-						if(_status.dying) return ai.get.attitude(player,_status.dying);
+						if(_status.event.dying) return ai.get.attitude(player,_status.event.dying);
 						return 1;
 					}
 				},
@@ -5054,40 +5055,6 @@ character.swd={
 					event.target.$giveAuto(result.buttons[0].link,player);
 				}
 			},
-		},
-		yuhuo:{
-			enable:'chooseToUse',
-			filter:function(event,player){
-				if(event.type!='dying') return false;
-				if(player!=_status.dying) return false;
-				if(player.storage.yuhuo) return false;
-				return true;
-			},
-			content:function(){
-				player.maxHp--;
-				player.hp=player.maxHp;
-				player.discard(player.get('hej'));
-				if(player.isLinked()) player.link();
-				if(player.isTurnedOver()) player.turnOver();
-				player.storage.yuhuo=true;
-				// player.addSkill('guanhong');
-				// player.addSkill('yishan2');
-				player.update();
-			},
-			ai:{
-				result:{
-					player:10
-				},
-				threaten:function(player,target){
-					if(!target.storage.yuhuo) return 0.8;
-				}
-			},
-			init:function(player){
-				player.storage.yuhuo=false;
-			},
-			intro:{
-				content:'limited'
-			}
 		},
 		yishan:{
 			group:'yishan2',
@@ -9208,7 +9175,6 @@ character.swd={
 		susheng:'苏生',
 		shengshou:'圣手',
 		huanjian:'幻箭',
-		yuhuo:'浴火',
 		huanjian_info:'出牌阶段，你可以将一张黑色牌当作冰魄针使用',
 		shengshou_info:'你可以将一张黑色手牌当作草药使用',
 		susheng_info:'在任意一名角色即将死亡时，你可以弃置一张手牌防止其死亡，并将其体力回复至1，每回合限发动一次',
@@ -9245,7 +9211,6 @@ character.swd={
 		poxing_info:'锁定技，每当你即将造成伤害，若目标的体力值大于你，你令伤害+1',
 		liaoyuan_info:'每当你使用一张杀指定目标后，你可以弃置任意张与此杀花色相同的牌，若如此做，目标需额外打出等量的闪，每少打出一张闪，此杀的伤害+1',
 		liaoyuan_info_alter:'每当你使用一张杀指定目标后，你可以弃置一张与此杀花色相同的牌，若如此做，目标需额外打出一张闪，若目标没打出闪，此杀的伤害+1',
-		yuhuo_info:'限定技，濒死阶段，你可以重置角色牌，减少一点体力上限，然后将体力回复至体力上限',
 		yishan_info:'每当你受到一次伤害，你可以重新获得最近失去的两张牌',
 		huanhun_info:'当一名角色进入濒死状态时，你可以弃置一张红色牌并令其进行一次判定，若结果为红色，其回复一点体力',
 		daixing_info:'结束阶段，你可以任意张牌并获得等量的护甲，这些护甲将在你的下个准备阶段消失',
