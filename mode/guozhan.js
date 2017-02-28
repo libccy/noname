@@ -286,7 +286,6 @@ mode.guozhan={
 			direct:true,
 			filter:function(event,player){
 				if(event.responded) return false;
-				if(player.isUnseen()) return false;
 				if(!event.filterCard({name:'sha'})) return false;
 				var zhu=get.zhu(player,'hongfa');
 				if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
@@ -318,7 +317,6 @@ mode.guozhan={
 		_hongfa:{
 			enable:'chooseToUse',
 			filter:function(event,player){
-				if(player.isUnseen()) return false;
 				if(!event.filterCard({name:'sha'},player)) return false;
 				var zhu=get.zhu(player,'hongfa');
 				if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
@@ -2141,7 +2139,9 @@ mode.guozhan={
 					}
 				}
 				else{
-					if(hasunknown&&!get.zhu()){
+					if(hasunknown&&!game.hasPlayer(function(current){
+						return get.is.jun(current);
+					})){
 						var players=game.players.concat(game.dead);
 						var num=0;
 						for(var i=0;i<players.length;i++){
@@ -3287,7 +3287,7 @@ mode.guozhan={
 			wontYe:function(){
 				var group=lib.character[this.name1][1];
 				if(_status.yeidentity&&_status.yeidentity.contains(group)) return false;
-				if(get.zhu(this)) return true;
+				if(get.zhu(this,null,true)) return true;
 				return get.totalPopulation(group)+1<=get.population()/2;
 			},
 			perfectPair:function(){
