@@ -32144,13 +32144,19 @@
                 var node=this.node.name;
                 if(node.offsetHeight<node.scrollHeight){
                     var that=this;
+					var num=40;
                     that.buttonscrollinterval=setInterval(function(){
                         if(node.scrollTop+node.offsetHeight>=node.scrollHeight){
                             clearInterval(that.buttonscrollinterval);
                             delete that.buttonscrollinterval;
                         }
                         else{
-                            node.scrollTop+=2;
+							if(num>0){
+								num--;
+							}
+							else{
+								node.scrollTop+=2;
+							}
                         }
                     },16);
                 }
