@@ -885,6 +885,7 @@ character.sp={
 		fenxun:{
 			enable:'phaseUse',
 			usable:1,
+			position:'he',
 			filterTarget:function(card,player,target){
 				return target!=player;
 			},
