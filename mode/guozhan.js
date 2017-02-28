@@ -286,6 +286,7 @@ mode.guozhan={
 			direct:true,
 			filter:function(event,player){
 				if(event.responded) return false;
+				if(player.isUnseen()) return false;
 				if(!event.filterCard({name:'sha'})) return false;
 				var zhu=get.zhu(player,'hongfa');
 				if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
@@ -317,6 +318,7 @@ mode.guozhan={
 		_hongfa:{
 			enable:'chooseToUse',
 			filter:function(event,player){
+				if(player.isUnseen()) return false;
 				if(!event.filterCard({name:'sha'},player)) return false;
 				var zhu=get.zhu(player,'hongfa');
 				if(zhu&&zhu.storage.huangjintianbingfu&&zhu.storage.huangjintianbingfu.length>0){
@@ -1527,23 +1529,28 @@ mode.guozhan={
 			},
 			content:function(){
 				'step 0'
-				var choice='主将';
-				var skills=lib.character[target.name2][3];
-				for(var i=0;i<skills.length;i++){
-					var info=get.info(skills[i]);
-					if(info&&info.ai&&info.ai.maixie){
-						choice='副将';break;
+				if(get.is.jun(target)){
+					event._result={control:'副将'};
+				}
+				else{
+					var choice='主将';
+					var skills=lib.character[target.name2][3];
+					for(var i=0;i<skills.length;i++){
+						var info=get.info(skills[i]);
+						if(info&&info.ai&&info.ai.maixie){
+							choice='副将';break;
+						}
 					}
+					if(target.name=='gz_zhoutai'){
+						choice='主将';
+					}
+					else if(target.name2=='gz_zhoutai'){
+						choice='副将';
+					}
+					player.chooseControl('主将','副将',function(){
+						return _status.event.choice;
+					}).set('prompt','暗置'+get.translation(target)+'的一张武将牌').set('choice',choice);
 				}
-				if(target.name=='gz_zhoutai'){
-					choice='主将';
-				}
-				else if(target.name2=='gz_zhoutai'){
-					choice='副将';
-				}
-				player.chooseControl('主将','副将',function(){
-					return _status.event.choice;
-				}).set('prompt','暗置'+get.translation(target)+'的一张武将牌').set('choice',choice);
 				'step 1'
 				if(result.control=='主将'){
 					target.hideCharacter(0);

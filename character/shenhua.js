@@ -1109,6 +1109,7 @@ character.shenhua={
 							if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
 							if(target.num('h')==0) return 2;
 							if(target.hasSkill('ziliang')) return 0.7;
+							if(get.mode()=='guozhan') return 0.5;
 							return [0.5,Math.max(target.num('h')/4,target.num('h','sha')+target.num('h','shan'))];
 						}
 					}

@@ -736,13 +736,23 @@ character.standard={
 			position:'he',
 			viewAs:{name:'sha'},
 			viewAsFilter:function(player){
-				if(!player.num('he',{color:'red'})) return false;
+				if(get.zhu(player,'shouyue')){
+					if(!player.num('he')) return false;
+				}
+				else{
+					if(!player.num('he',{color:'red'})) return false;
+				}
 			},
 			prompt:'将一张红色牌当杀使用或打出',
 			check:function(card){return 4-ai.get.value(card)},
 			ai:{
 				skillTagFilter:function(player){
-					if(!player.num('he',{color:'red'})) return false;
+					if(get.zhu(player,'shouyue')){
+						if(!player.num('he')) return false;
+					}
+					else{
+						if(!player.num('he',{color:'red'})) return false;
+					}
 				},
 				respondSha:true,
 			}
