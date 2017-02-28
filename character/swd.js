@@ -313,11 +313,14 @@ character.swd={
 			content:function(){
 				"step 0"
 				var next=player.chooseToDiscard(get.prompt('tiebi',trigger.target),{color:'black'});
+				var goon=(ai.get.attitude(player,trigger.target)>2&&
+					ai.get.damageEffect(trigger.target,trigger.player,player)<0);
 				next.ai=function(card){
-					if(ai.get.attitude(player,trigger.target)>0){
+					if(goon){
 						if(trigger.target.hp==1) return 10-ai.get.value(card);
 						return 7-ai.get.value(card);
 					}
+					return 0;
 				};
 				next.logSkill=['tiebi',trigger.target];
 				"step 1"
@@ -7696,8 +7699,7 @@ character.swd={
 				return !player.storage.duijue;
 			},
 			filterTarget:function(card,player,target){
-				if(target.identity=='zhu') return false;
-				if(get.mode()=='guozhan'&&target.isZhu) return false;
+				if(target.identity=='zhu'||get.is.jun(target)) return false;
 				return player!=target;
 			},
 			content:function(){

@@ -3312,6 +3312,7 @@ card.swd={
 			forced:true,
 			priority:15,
 			filter:function(event,player){
+				if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
 				return get.type(event.card,'trick')=='trick';
 			},
 			content:function(){
@@ -3322,6 +3323,7 @@ card.swd={
 				notrick:true,
 				effect:{
 					target:function(card,player,target,current){
+						if(player.hasSkillTag('unequip',false,card)) return;
 						if(get.type(card)=='trick'&&get.tag(card,'damage')){
 							return 'zeroplayertarget';
 						}

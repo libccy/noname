@@ -989,6 +989,7 @@ card.guozhan={
 			priority:10,
 			forced:true,
 			filter:function(event){
+				if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
 				return event.num>0;
 			},
 			content:function(){
