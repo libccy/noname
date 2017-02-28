@@ -389,7 +389,7 @@ character.sp={
 					});
 				}
 				player.chooseTarget(get.prompt('shuangren'),function(card,player,target){
-					return target!=player;
+					return target!=player&&target.num('h');
 				}).set('ai',function(target){
 					var player=_status.event.player;
 					if(_status.event.goon&&ai.get.attitude(player,target)<0){
