@@ -4462,9 +4462,8 @@ card.swd={
 			trigger:{player:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				if(event.source&&event.source.num('s','unequip')) return false;
+				if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return false;
 				if(Math.random()>1/3) return false;
-				if(event.parent.player.num('s','unequip')) return false;
 				return true;
 			},
 			content:function(){

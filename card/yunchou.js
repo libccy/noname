@@ -992,7 +992,7 @@ card.yunchou={
 		suolianjia:{
 			trigger:{player:'damageBefore'},
 			filter:function(event){
-				if(event.source&&event.source.num('s','unequip')) return;
+				if(event.source&&event.source.hasSkillTag('unequip',false,event.card)) return;
 				if(event.nature) return true;
 			},
 			forced:true,
@@ -1005,6 +1005,7 @@ card.yunchou={
 				nothunder:true,
 				effect:{
 					target:function(card,player,target,current){
+						if(player.hasSkillTag('unequip',false,card)) return;
 						if(get.tag(card,'natureDamage')) return 'zerotarget';
 						if(card.name=='tiesuo'){
 							return [0,0];

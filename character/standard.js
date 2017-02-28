@@ -763,14 +763,13 @@ character.standard={
 					if(card.name=='sha') return Infinity;
 				}
 			},
-			trigger:{player:'useCard'},
-			forced:true,
-			priority:10,
-			filter:function(event,player){
-				return get.zhu(player,'shouyue')&&event.card.name=='sha';
-			},
-			content:function(){
-				player.addTempSkill('unequip','useCardAfter');
+			ai:{
+				unequip:true,
+				skillTagFilter:function(player,tag,arg){
+					if(!get.zhu(player,'shouyue')) return false;
+					if(arg&&arg.name=='sha') return true;
+					return false;
+				}
 			}
 		},
 		guanxing:{

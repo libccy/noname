@@ -771,6 +771,7 @@ card.guozhan={
 				nothunder:true,
 				effect:{
 					target:function(card,player,target,current){
+						if(player.hasSkillTag('unequip',false,card)) return;
 						if(get.tag(card,'natureDamage')) return 'zerotarget';
 						if(card.name=='tiesuo'){
 							return [0,0];

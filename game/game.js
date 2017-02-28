@@ -35639,7 +35639,7 @@
         id:function(){
             return (Math.floor(1000000+9000000*Math.random())).toString()+(10+lib.status.globalId++);
         },
-		zhu:function(player,skill){
+		zhu:function(player,skill,unseen){
 			if(typeof player=='string'){
 				skill=player;
 				player=null;
@@ -35662,10 +35662,13 @@
 			}
 			else if(mode=='guozhan'){
 				for(var i=0;i<game.players.length;i++){
-					if(get.is.jun(game.players[i])){
-						if(skill&&!(game.players[i].get('s').contains(skill))) continue;
+					if(get.is.jun(game.players[i])&&!game.players[i].isUnseen()){
+						if(skill&&!game.players[i].get('s').contains(skill)) continue;
 						if(!player) return game.players[i];
-						if(player._group==game.players[i].identity){
+						if(player.identity==game.players[i].identity){
+							return game.players[i];
+						}
+						else if(unseen&&player._group==game.players[i].identity){
 							return game.players[i];
 						}
 					}

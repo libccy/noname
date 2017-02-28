@@ -5885,6 +5885,9 @@ character.yijiang={
 			ai:{
 				effect:{
 					target:function(card,player,target){
+						if(player==target&&get.subtype(card)=='equip2'){
+							if(ai.get.equipValue(card)<=8) return 0;
+						}
 						if(target.get('e','2')) return;
 						if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
 					}

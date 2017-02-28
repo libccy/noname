@@ -2642,8 +2642,7 @@ character.shenhua={
 			audio:2,
 			inherit:'bagua_skill',
 			filter:function(event,player){
-				if(!event.filterCard({name:'shan'})) return false;
-				if(event.getParent().player.num('s','unequip')) return false;
+				if(!lib.skill.bagua_skill.filter(event,player)) return false;
 				if(player.get('e','2')) return false;
 				return true;
 			},
@@ -2651,10 +2650,10 @@ character.shenhua={
 				effect:{
 					target:function(card,player,target){
 						if(player==target&&get.subtype(card)=='equip2'){
-							if(ai.get.equipValue(card)<=8) return 0;
+							if(ai.get.equipValue(card)<=7.5) return 0;
 						}
 						if(target.get('e','2')) return;
-						if(player.hasSkill('unequip')) return;
+						if(player.hasSkillTag('unequip',false,card)) return;
 						if(get.tag(card,'respondShan')) return [0.5,0];
 					}
 				}
