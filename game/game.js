@@ -16386,11 +16386,11 @@
 			global:[],
             globalmap:{},
 			storage:{},
-			unequip:{},
             undist:{},
             others:{},
             zhu:{},
             zhuSkill:{},
+			unequip:{ai:{unequip:true}},
 			autoswap:{
 				trigger:{player:['phaseBegin','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
 				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',

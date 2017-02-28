@@ -1736,7 +1736,6 @@ character.yijiang={
 				if(result.bool){
 					player.storage.xianzhen=target;
 					player.addTempSkill('xianzhen2','phaseAfter');
-					player.addTempSkill('unequip','phaseAfter');
 				}
 				else{
 					player.addTempSkill('xianzhen3','phaseAfter');
@@ -1783,6 +1782,9 @@ character.yijiang={
 					if(card.name=='sha') return Infinity;
 				}
 			},
+			ai:{
+				unequip:true
+			}
 		},
 		xianzhen3:{
 			mod:{
@@ -2034,25 +2036,6 @@ character.yijiang={
 			}
 		},
 		benxi:{
-			trigger:{player:['useCardAfter','useSkillAfter']},
-			forced:true,
-			popup:false,
-			silent:true,
-			filter:function(event,player){
-				if(!player.storage.benxi) return false;
-				return _status.currentPhase==player;
-			},
-			content:function(){
-				var players=game.filterPlayer();
-				for(var i=0;i<players.length;i++){
-					if(get.distance(player,players[i])>1){
-						player.removeSkill('unequip');
-						return;
-					}
-				}
-				player.addSkill('unequip');
-			},
-			group:['benxi2','benxi3'],
 			mod:{
                 globalFrom:function(from,to,distance){
                     if(_status.currentPhase==from){
@@ -2062,47 +2045,23 @@ character.yijiang={
 				selectTarget:function(card,player,range){
 					if(_status.currentPhase==player){
 						if(card.name=='sha'&&range[1]!=-1){
-							var players=game.filterPlayer();
-							for(var i=0;i<players.length;i++){
-								if(get.distance(player,players[i])>1) return;
+							if(!game.hasPlayer(function(current){
+								return get.distance(player,current)>1;
+							})){
+								range[1]++;
 							}
-							range[1]++;
 						}
 					}
-				},
-            },
-		},
-		benxi2:{
-			trigger:{player:'phaseBegin'},
-			forced:true,
-			popup:false,
-			silent:true,
-			priority:5,
-			filter:function(event,player){
-				return player.hasSkill('benxi');
-			},
-			content:function(){
-				player.storage.benxi=!player.hasSkill('unequip');
-				if(player.storage.benxi){
-					var players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(get.distance(player,players[i])>1){
-							return;
-						}
-					}
-					player.addSkill('unequip');
 				}
-			}
-		},
-		benxi3:{
-			trigger:{player:'phaseAfter'},
-			forced:true,
-			popup:false,
-			silent:true,
-			content:function(){
-				if(player.storage.benxi){
-					player.storage.benxi=false;
-					player.removeSkill('unequip');
+            },
+			ai:{
+				unequip:true,
+				skillTagFilter:function(player){
+					if(game.hasPlayer(function(current){
+						return get.distance(player,current)>1;
+					})){
+						return false;
+					}
 				}
 			}
 		},

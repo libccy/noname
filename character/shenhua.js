@@ -2653,8 +2653,7 @@ character.shenhua={
 							if(ai.get.equipValue(card)<=7.5) return 0;
 						}
 						if(target.get('e','2')) return;
-						if(player.hasSkillTag('unequip',false,card)) return;
-						if(get.tag(card,'respondShan')) return [0.5,0];
+						return lib.skill.bagua_skill.ai.effect.target.apply(this,arguments);
 					}
 				}
 			}

@@ -4767,16 +4767,7 @@ mode.chess={
 				},
 				result:{
 					target:function(player,target){
-						var added=false;
-						if(!player.hasSkill('unequip')){
-							added=true;
-							player.skills.push('unequip');
-						}
-						var eff=ai.get.effect(target,{name:'sha'},player,target);
-						if(added){
-							player.skills.remove('unequip');
-						}
-						return eff;
+						return ai.get.effect(target,{name:'sha'},player,target);
 					}
 				},
 				effect:{

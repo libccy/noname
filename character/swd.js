@@ -2603,7 +2603,6 @@ character.swd={
 		},
 		suiyan:{
 			trigger:{source:'damageEnd'},
-			// group:'unequip',
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0;
 			},
@@ -3160,17 +3159,12 @@ character.swd={
 			},
 			content:function(){
 				"step 0"
-				if(!player.hasSkill('unequip')){
-					event.added=true
-					player.skills.push('unequip');
-				}
+				player.addAdditionalSkill('jianji','unequip');
 				player.draw();
 				player.useCard({name:'sha'},cards,targets,'jianji',false).animate=false;
 				player.line(targets,'fire');
 				"step 1"
-				if(event.added){
-					player.skills.remove('unequip');
-				}
+				player.removeAdditionalSkill('jianji');
 			},
 			ai:{
 				order:function(){
@@ -3178,15 +3172,9 @@ character.swd={
 				},
 				result:{
 					target:function(player,target){
-						var added=false;
-						if(!player.hasSkill('unequip')){
-							added=true;
-							player.skills.push('unequip');
-						}
+						player.addAdditionalSkill('jianji_ai','unequip');
 						var eff=ai.get.effect(target,{name:'sha'},player,target);
-						if(added){
-							player.skills.remove('unequip');
-						}
+						player.removeAdditionalSkill('jianji_ai');
 						return eff;
 					}
 				},
@@ -3625,9 +3613,7 @@ character.swd={
 			forced:true,
 			filter:function(event,player){
 				if(player.get('e','2')) return false;
-				if(event.source&&event.source.num('s','unequip')) return;
-				if(Math.random()>1/3) return false;
-				return true;
+				return lib.skill.guangshatianyi.filter(event,player);
 			},
 			content:function(){
 				trigger.num--;
@@ -5710,7 +5696,6 @@ character.swd={
 		},
 		polang:{
 			trigger:{source:'damageEnd'},
-			// group:'unequip',
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0;
 			},
