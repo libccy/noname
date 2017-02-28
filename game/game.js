@@ -36867,7 +36867,9 @@
                     skills.addArray(node.hiddenSkills);
                 }
 				for(var i in node.disabledSkills){
-					if(node.disabledSkills[i].length==1&&node.disabledSkills[i][0]==i+'_awake'){
+					if(node.disabledSkills[i].length==1&&
+						node.disabledSkills[i][0]==i+'_awake'&&
+						!node.hiddenSkills.contains(i)){
 						skills.push(i);
 					}
 				}
