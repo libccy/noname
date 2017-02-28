@@ -25533,7 +25533,6 @@
 							list.push(i);
 							for(var j=0;j<info[i][3].length;j++){
 								if(!lib.skill[info[i][3][j]]){
-									console.log(info[i][3][j]);
 									continue;
 								}
 								if(lib.skill[info[i][3][j]].alter){

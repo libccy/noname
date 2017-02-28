@@ -385,7 +385,7 @@ mode.boss={
 	},
 	characterPack:{
 		mode_boss:{
-			boss_zhangchunhua:['female','wei',4,['jueqing','wuxin','shangshix'],['boss','bossallowed'],'wei'],
+			boss_zhangchunhua:['female','wei',4,['jueqing','boss_wuxin','shangshix'],['boss','bossallowed'],'wei'],
 			boss_zhenji:['female','wei',4,['tashui','lingbo','jiaoxia','fanghua'],['boss','bossallowed'],'wei'],
 			boss_huangyueying:['female','shu',4,['boss_gongshen','boss_jizhi','qicai','boss_guiyin'],['boss','bossallowed'],'wei'],
 			boss_pangtong:['male','shu',4,['boss_tianyu','qiwu','niepan','boss_yuhuo'],['boss','bossallowed'],'zhu'],
@@ -3247,9 +3247,15 @@ mode.boss={
 				}
 			}
 		},
-		wuxin:{
-			inherit:'miles_xueyi',
-			group:'swd_wuxie',
+		boss_wuxin:{
+			trigger:{player:'damageBefore'},
+			forced:true,
+			priority:10,
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+				player.loseHp();
+			},
 			audio:2,
 		},
 		shenwei:{
@@ -3778,8 +3784,8 @@ mode.boss={
 		tashui:'踏水',
 		tashui_info:'每当你使用或打出一张黑色牌，你可以令一名其他角色翻面',
 
-		wuxin:'无心',
-		wuxin_info:'锁定技，你防止即将受到的伤害，改为流失一点体力；你不能成为其他角色的延时锦囊的目标',
+		boss_wuxin:'无心',
+		boss_wuxin_info:'锁定技，你防止即将受到的伤害，改为流失一点体力；你不能成为其他角色的延时锦囊的目标',
 		shangshix:'伤逝',
 		shangshix2:'伤逝',
 		shangshix_info:'锁定技，你的手牌数至少为4，结束阶段，若你的体力值大于1，你令场上所有角色流失一点体力',
