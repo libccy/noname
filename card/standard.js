@@ -1342,7 +1342,7 @@ card.standard={
 			priority:6,
 			audio:true,
 			filter:function(event){
-				if(event.player.num('s','unequip')) return false;
+				if(event.player.hasSkillTag('unequip',false,event.card)) return false;
 				return (event.card.name=='sha'&&get.color(event.card)=='black')
 			},
 			content:function(){
@@ -1352,9 +1352,7 @@ card.standard={
 			ai:{
 				effect:{
 					target:function(card,player){
-						var equip1=player.get('e','1');
-						if(equip1&&equip1.name=='qinggang') return 1;
-						if(player.num('s','unequip')) return;
+						if(player.hasSkillTag('unequip',false,card)) return;
 						if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
 					}
 				}
@@ -1393,14 +1391,12 @@ card.standard={
 			}
 		},
 		qinggang_skill:{
-			trigger:{player:'useCard'},
-			forced:true,
-			priority:10,
-			filter:function(event){
-				return event.card.name=='sha';
-			},
-			content:function(){
-				player.addTempSkill('unequip','useCardAfter');
+			ai:{
+				unequip:true,
+				skillTagFilter:function(player,tag,arg){
+					if(arg&&arg.name=='sha') return true;
+					return false;
+				}
 			}
 		},
 		qinglong_skill:{
@@ -1529,7 +1525,8 @@ card.standard={
 			filter:function(event,player){
 				if(event.responded) return false;
 				if(!event.filterCard({name:'shan'})) return false;
-				if(event.getParent().player.num('s','unequip')) return false;
+				var evt=event.getParent();
+				if(evt.player&&evt.player.hasSkillTag('unequip',false,evt.card)) return false;
 				return true;
 			},
 			audio:true,
@@ -1550,7 +1547,7 @@ card.standard={
 			ai:{
 				effect:{
 					target:function(card,player,target,effect){
-						if(player.num('s','unequip')) return;
+						if(player.hasSkillTag('unequip',false,card)) return;
 						if(get.tag(card,'respondShan')) return 0.5;
 					}
 				}
