@@ -42,7 +42,7 @@ character.yxs={
 		yxs_nandinggeer:['female','shu',3,['huli','xianqu','yixin']],
 		yxs_weizhongxian:['male','qun',3,['zhuxin','wlianhuan']],
 		yxs_meixi:['female','shu',3,['liebo','yaoji']],
-		// yxs_lanlinwang:['male','shu',4,['guimian','yuxue']],
+		yxs_lanlinwang:['male','shu',4,['guimian','lyuxue']],
 	},
 	characterIntro:{
 		yxs_wuzetian:'中国历史上唯一一个正统的女皇帝，也是继位年龄最大的皇帝（67岁即位），又是寿命最长的皇帝之一（终年82岁）。唐高宗时为皇后（655—683）、唐中宗和唐睿宗时为皇太后（683—690），后自立为武周皇帝（690—705），改国号“唐”为“周”，定都洛阳，并号其为“神都”。史称“武周”或“南周”，705年退位。武则天也是一位女诗人和政治家。',
@@ -89,6 +89,65 @@ character.yxs={
 		yxs_lanlinwang:'高长恭（541年―573年），又名高孝瓘、高肃，祖籍渤海调蓨（今河北省景县），神武帝高欢之孙，文襄帝高澄第四子，生母不详，南北朝时期北齐宗室、将领，封爵兰陵郡王。高长恭貌柔心壮，音容兼美。为将躬勤细事，每得甘美，虽一瓜数果，必与将士分享。累次升任至并州刺史。突厥攻入晋阳，高长恭奋力将其击退。邙山之战，高长恭为中军，率领五百骑兵再入周军包围圈，直至金墉城下，因高长恭戴着头盔，城中的人不确定是敌军或是我军，直到高长恭把头盔脱下来城上的人才知道是高长恭，派弓箭手开始放箭保护他，之后高长恭成功替金墉解围，高长恭在此次战中威名大振，士兵们为此战而讴歌他，即后来知名的《兰陵王入阵曲》。',
 	},
 	skill:{
+		guimian:{
+            trigger:{source:'damageEnd'},
+            forced:true,
+            filter:function(event,player){
+                return event.card&&event.card.name=='sha'&&_status.currentPhase==player;
+            },
+            content:function(){
+                player.getStat().card.sha--;
+            }
+        },
+		lyuxue:{
+			trigger:{source:'damageEnd'},
+			forced:true,
+			logTarget:'player',
+			filter:function(event,player){
+				return event.player.isIn()&&!event.player.hasSkill('lyuxue2');
+			},
+			content:function(){
+				trigger.player.addSkill('lyuxue2');
+			},
+			subSkill:{
+				clear:{
+					trigger:{player:['phaseBegin','dieBegin']},
+					forced:true,
+					filter:function(event,player){
+						var num=game.countPlayer(function(current){
+							return current.hasSkill('lyuxue2');
+						});
+						if(!num) return false;
+						if(event.name=='die') return true;
+						return num>=Math.floor(game.countPlayer()/2);
+					},
+					content:function(){
+						'step 0'
+						var list=game.filterPlayer(function(current){
+							return current.hasSkill('lyuxue2');
+						});
+						get.sortSeat(list);
+						event.list=list;
+						player.line(list,'green');
+						'step 1'
+						if(event.list.length){
+							event.list.shift().removeSkill('lyuxue2');
+							event.redo();
+						}
+					}
+				}
+			},
+			group:'lyuxue_clear',
+		},
+		lyuxue2:{
+			mark:true,
+			intro:{
+				content:'已获得浴血标记'
+			},
+			onremove:function(player){
+				player.loseHp();
+			}
+		},
 		yaoji:{
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
@@ -2736,8 +2795,9 @@ character.yxs={
 		yaoji_info:'每当你受到一次伤害，你可以将一张乐不思蜀置入伤害来源的判定区',
 		guimian:'鬼面',
 		guimian_info:'锁定技，每当你在出牌阶段使用杀造成伤害，本阶段内出杀次数上限+1',
-		yuxue:'浴血',
-		yuxue_info:'锁定技，每当你造成一次伤害，若目标没有浴血标记，你令其获得一个浴血标记；准备阶段，若场上浴血标记的数量不少于存活角色数的一半，你清空浴血标记并令所有有标记的角色流失一点体力',
+		lyuxue:'浴血',
+		lyuxue2:'浴血',
+		lyuxue_info:'锁定技，每当你造成一次伤害，若目标没有浴血标记，你令其获得一个浴血标记；当一名角色失去浴血标记时，其流失一点体力；准备阶段，若场上浴血标记的数量不少于存活角色数的一半（向下取整），你清空浴血标记；当你即将死亡时，你清空浴血标记',
 		huli:'护理',
 		huli_info:'出牌阶段，你可以将一张红桃手牌当作桃对距离1以内的角色使用',
 		yixin:'医心',
