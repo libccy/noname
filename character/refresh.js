@@ -281,13 +281,8 @@ character.refresh={
 				"step 1"
 				if(result.bool){
 					player.logSkill('retuxi',result.targets);
-					for(var i=0;i<result.targets.length;i++){
-						var card=result.targets[i].get('h').randomGet();
-						player.gain(card,result.targets[i]).delay=false;
-						result.targets[i].$giveAuto(card,player);
-					}
+					player.gainMultiple(result.targets);
 					trigger.num-=result.targets.length;
-					game.delay();
 				}
 				else{
 					event.finish();

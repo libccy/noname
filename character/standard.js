@@ -287,14 +287,9 @@ character.standard={
 				"step 1"
 				if(result.bool){
 					player.logSkill('tuxi',result.targets);
-					for(var i=0;i<result.targets.length;i++){
-						var card=result.targets[i].get('h').randomGet();
-						player.gain(card,result.targets[i]).set('delay',false);
-						result.targets[i].$giveAuto(card,player);
-					}
+					player.gainMultiple(result.targets);
 					trigger.finish();
 					trigger.untrigger();
-					game.delay();
 				}
 				else{
 					event.finish();

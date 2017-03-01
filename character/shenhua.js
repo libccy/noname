@@ -860,14 +860,9 @@ character.shenhua={
 					event.finish();
 				}
 				"step 2"
-				for(var i=0;i<event.targets.length;i++){
-					var gainedcard=event.targets[i].get('h').randomGet();
-					player.gain(gainedcard,event.targets[i]).delay=false;
-					event.targets[i].$giveAuto(gainedcard,player);
-				}
+				player.gainMultiple(event.targets);
 				trigger.finish();
 				trigger.untrigger();
-				game.delay();
 				"step 3"
 				game.delay();
 			},

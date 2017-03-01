@@ -89,6 +89,62 @@ character.yxs={
 		yxs_lanlinwang:'高长恭（541年―573年），又名高孝瓘、高肃，祖籍渤海调蓨（今河北省景县），神武帝高欢之孙，文襄帝高澄第四子，生母不详，南北朝时期北齐宗室、将领，封爵兰陵郡王。高长恭貌柔心壮，音容兼美。为将躬勤细事，每得甘美，虽一瓜数果，必与将士分享。累次升任至并州刺史。突厥攻入晋阳，高长恭奋力将其击退。邙山之战，高长恭为中军，率领五百骑兵再入周军包围圈，直至金墉城下，因高长恭戴着头盔，城中的人不确定是敌军或是我军，直到高长恭把头盔脱下来城上的人才知道是高长恭，派弓箭手开始放箭保护他，之后高长恭成功替金墉解围，高长恭在此次战中威名大振，士兵们为此战而讴歌他，即后来知名的《兰陵王入阵曲》。',
 	},
 	skill:{
+		liebo:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return Math.abs(target.num('h')-player.num('h'))<=1;
+			},
+			content:function(){
+				var cards0=target.get('h');
+				var cards1=player.get('h');
+				target.gain(cards1,player);
+				player.gain(cards0,target);
+				target.$giveAuto(cards0,player);
+				player.$giveAuto(cards1,target);
+			},
+			ai:{
+				order:function(){
+					var player=_status.event.player;
+					if(player.hasCard(function(card){
+						return ai.get.value(card)>=8;
+					})){
+						return 0;
+					}
+					var nh=player.num('h');
+					if(game.hasPlayer(function(current){
+						return ai.get.attitude(player,current)<=0&&current.num('h')==nh+1;
+					})){
+						return 9;
+					}
+					return 1;
+				},
+				result:{
+					player:function(player,target){
+						var att=ai.get.attitude(player,target);
+						if(att>0) return 0;
+						if(player.hasCard(function(card){
+							return ai.get.value(card)>=8;
+						})){
+							return 0;
+						}
+						var n1=target.num('h'),n2=player.num('h');
+						var num=0;
+						if(n1-n2==1){
+							num=1;
+						}
+						if(player.num('h','du')){
+							if(n1==n2) num=0.5;
+							else num=0.1;
+						}
+						if(att==0){
+							num/=2;
+						}
+						return num;
+					}
+				}
+			}
+		},
 		zhuxin:{
 			enable:'phaseUse',
 			usable:1,
@@ -1753,12 +1809,7 @@ character.yxs={
 				}
 				"step 2"
 				if(event.targets.length){
-					for(var i=0;i<event.targets.length;i++){
-						var gainedcard=event.targets[i].get('h').randomGet();
-						player.gain(gainedcard,event.targets[i]).delay=false;
-						event.targets[i].$giveAuto(gainedcard,player);
-					}
-					game.delay();
+					player.gainMultiple(event.targets);
 				}
 				else{
 					event.finish();
@@ -2669,7 +2720,7 @@ character.yxs={
 		wlianhuan:'连环',
 		wlianhuan_info:'你使用杀造成伤害时，可以弃置一张装备区内的牌并令伤害+1',
 		liebo:'裂帛',
-		liebo_info:'出牌阶段限一次，你可以使用任意张手牌与一名其他角色交换对应数量的手牌',
+		liebo_info:'出牌阶段限一次，你可以将你的手牌与一名其他角色交换（手牌数之差不能多于1）',
 		yaoji:'妖姬',
 		yaoji_info:'每当你受到一次伤害，你可以将一张乐不思蜀置入伤害来源的判定区',
 		guimian:'鬼面',

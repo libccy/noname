@@ -12001,6 +12001,23 @@
                     },this,cards);
 					return this;
 				},
+				gainMultiple:function(targets,position){
+					var delayed=false;
+					for(var i=0;i<targets.length;i++){
+						var current=targets[i];
+						var card=current.get(position||'h').randomGet();
+						if(!card) continue;
+						if(current==game.me){
+							this.gain(card,current);
+							delayed=true;
+						}
+						else{
+							this.gain(card,current).set('delay',false);
+						}
+						current.$giveAuto(card,this);
+					}
+					if(!delayed) game.delay();
+				},
 				gain:function(){
 					var next=game.createEvent('gain');
 					next.player=this;

@@ -170,6 +170,39 @@ character.hearth={
 		hs_malfurion:['hs_malorne'],
 	},
 	skill:{
+		kuixin:{
+			trigger:{player:'phaseEnd'},
+			direct:true,
+			filter:function(event,player){
+				return game.hasPlayer(function(current){
+					var nh=current.num('h');
+					return nh&&nh>=player.num('h');
+				});
+			},
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('kuixin'),function(card,player,target){
+					var nh=target.num('h');
+					return nh&&nh>=player.num('h');
+				}).ai=function(target){
+					var att=ai.get.attitude(player,target);
+					if(target.hasSkillTag('noe')){
+						att/=3;
+					}
+					return -att;
+				}
+				'step 1'
+				if(result.bool){
+					var target=result.targets[0];
+					var card=target.get('h').randomGet();
+					if(card){
+						player.logSkill('kuixin',target);
+						player.gain(card,target);
+						target.$giveAuto(card,player);
+					}
+				}
+			}
+		},
 		fuhua:{
 			enable:'phaseUse',
 			filterCard:{name:'du'},
@@ -3766,62 +3799,6 @@ character.hearth={
 				threaten:1.1
 			}
 		},
-		kuixin:{
-			enable:'phaseUse',
-			usable:1,
-			filterTarget:function(card,player,target){
-				return Math.abs(target.num('h')-player.num('h'))<=1;
-			},
-			content:function(){
-				var cards0=target.get('h');
-				var cards1=player.get('h');
-				target.gain(cards1,player);
-				player.gain(cards0,target);
-				target.$giveAuto(cards0,player);
-				player.$giveAuto(cards1,target);
-			},
-			ai:{
-				order:function(){
-					var player=_status.event.player;
-					if(player.hasCard(function(card){
-						return ai.get.value(card)>=8;
-					})){
-						return 0;
-					}
-					var nh=player.num('h');
-					if(game.hasPlayer(function(current){
-						return ai.get.attitude(player,current)<=0&&current.num('h')==nh+1;
-					})){
-						return 9;
-					}
-					return 1;
-				},
-				result:{
-					player:function(player,target){
-						var att=ai.get.attitude(player,target);
-						if(att>0) return 0;
-						if(player.hasCard(function(card){
-							return ai.get.value(card)>=8;
-						})){
-							return 0;
-						}
-						var n1=target.num('h'),n2=player.num('h');
-						var num=0;
-						if(n1-n2==1){
-							num=1;
-						}
-						if(player.num('h','du')){
-							if(n1==n2) num=0.5;
-							else num=0.1;
-						}
-						if(att==0){
-							num/=2;
-						}
-						return num;
-					}
-				}
-			}
-		},
 		kuixin_old:{
 			trigger:{player:'phaseEnd'},
 			direct:true,
@@ -6265,7 +6242,7 @@ character.hearth={
 		jingmeng:'镜梦',
 		jingmeng_info:'每当你于回合内使用第一张牌时，你可以从牌堆中随机获得一张与之类型相同的牌',
 		kuixin:'窥心',
-		kuixin_info:'出牌阶段限一次，你可以将你的手牌与一名其他角色交换（手牌数之差不能多于1）',
+		kuixin_info:'结束阶段，你可以获得一名手牌数不少于你的角色的一张手牌',
 		lianzhan:'连斩',
 		lianzhan_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
 		yanshu:'炎舞',
