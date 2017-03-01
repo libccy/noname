@@ -2146,16 +2146,7 @@ character.shenhua={
 			multitarget:true,
 			multiline:true,
 			content:function(){
-				'step 0'
-				event.cards0=targets[0].get('h');
-				event.cards1=targets[1].get('h');
-				targets[0].lose(event.cards0,ui.special);
-				targets[1].lose(event.cards1,ui.special);
-				'step 1'
-				targets[0].gain(event.cards1,targets[1]);
-				targets[1].gain(event.cards0,targets[0]);
-				targets[0].$give(event.cards0.length,targets[1]);
-				targets[1].$give(event.cards1.length,targets[0]);
+				targets[0].swapHandcards(targets[1]);
 			},
 			check:function(card){
 				var list=[],player=_status.event.player;

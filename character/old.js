@@ -52,21 +52,8 @@ character.old={
                     }
 					player.logSkill('zhenshan',result.targets);
 					player.addTempSkill('zhenshan2','phaseAfter');
-                    event.target=result.targets[0];
-                    event.cards0=player.get('h');
-    				event.cards1=event.target.get('h');
-    				player.lose(event.cards0,ui.special);
-    				event.target.lose(event.cards1,ui.special);
+                    player.swapHandcards(result.targets[0]);
 				}
-				else{
-					event.finish();
-				}
-                "step 2"
-                player.gain(event.cards1,event.target);
-				event.target.gain(event.cards0,player);
-				player.$give(event.cards0.length,event.target);
-				event.target.$give(event.cards1.length,player);
-                game.delay();
 			},
 			group:['zhenshan_sha','zhenshan_tao','zhenshan_jiu']
 		},
@@ -93,20 +80,8 @@ character.old={
                 'step 1'
 				if(result.bool){
                     player.logSkill('zhenshan_sha',result.targets);
-                    event.target=result.targets[0];
-                    event.cards0=player.get('h');
-    				event.cards1=event.target.get('h');
-    				player.lose(event.cards0,ui.special);
-    				event.target.lose(event.cards1,ui.special);
+                    player.swapHandcards(result.targets[0]);
 				}
-				else{
-					event.finish();
-				}
-                'step 2'
-                player.gain(event.cards1,event.target);
-				event.target.gain(event.cards0,player);
-				player.$give(event.cards0.length,event.target);
-				event.target.$give(event.cards1.length,player);
 			},
 			filterCard:function(card){
 				return false;
@@ -155,20 +130,8 @@ character.old={
                 'step 1'
 				if(result.bool){
                     player.logSkill('zhenshan_tao',result.targets);
-                    event.target=result.targets[0];
-                    event.cards0=player.get('h');
-    				event.cards1=event.target.get('h');
-    				player.lose(event.cards0,ui.special);
-    				event.target.lose(event.cards1,ui.special);
+                    player.swapHandcards(result.targets[0]);
 				}
-				else{
-					event.finish();
-				}
-                'step 2'
-                player.gain(event.cards1,event.target);
-				event.target.gain(event.cards0,player);
-				player.$give(event.cards0.length,event.target);
-				event.target.$give(event.cards1.length,player);
 			},
 			filterCard:function(card){
 				return false;
@@ -217,20 +180,8 @@ character.old={
                 'step 1'
 				if(result.bool){
                     player.logSkill('zhenshan_jiu',result.targets);
-                    event.target=result.targets[0];
-                    event.cards0=player.get('h');
-    				event.cards1=event.target.get('h');
-    				player.lose(event.cards0,ui.special);
-    				event.target.lose(event.cards1,ui.special);
+                    player.swapHandcards(result.targets[0]);
 				}
-				else{
-					event.finish();
-				}
-                'step 2'
-                player.gain(event.cards1,event.target);
-				event.target.gain(event.cards0,player);
-				player.$give(event.cards0.length,event.target);
-				event.target.$give(event.cards1.length,player);
 			},
 			filterCard:function(card){
 				return false;

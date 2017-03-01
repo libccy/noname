@@ -175,6 +175,7 @@ character.hearth={
 			direct:true,
 			filter:function(event,player){
 				return game.hasPlayer(function(current){
+					if(current==player) return false;
 					var nh=current.num('h');
 					return nh&&nh>=player.num('h');
 				});
@@ -182,6 +183,7 @@ character.hearth={
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('kuixin'),function(card,player,target){
+					if(target==player) return false;
 					var nh=target.num('h');
 					return nh&&nh>=player.num('h');
 				}).ai=function(target){

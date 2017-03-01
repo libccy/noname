@@ -9272,6 +9272,36 @@
 					event.trigger('respond');
 					game.delayx(0.5);
 				},
+				swapHandcards:function(){
+					'step 0'
+					event.cards1=player.get('h');
+					event.cards2=target.get('h');
+					target.$giveAuto(event.cards1,player);
+					player.$giveAuto(event.cards2,target);
+					'step 1'
+					event.cards=event.cards1;
+					var next=player.lose(event.cards,ui.special).set('type','gain');
+					if(player==game.me){
+						event.delayed=true;
+					}
+					else{
+						next.delay=false;
+					}
+					'step 1'
+					event.cards=event.cards2;
+					var next=target.lose(event.cards,ui.special).set('type','gain');
+					if(target==game.me){
+						event.delayed=true;
+					}
+					else{
+						next.delay=false;
+					}
+					'step 2'
+					if(!event.delayed) game.delay();
+					'step 3'
+					player.gain(event.cards2,target);
+					target.gain(event.cards1,player);
+				},
 				gain:function(){
 					"step 0"
 					if(cards){
@@ -11970,6 +12000,14 @@
 						}
 					}
                     next.setContent('respond');
+					return next;
+				},
+				swapHandcards:function(target){
+					var next=game.createEvent('swapHandcards',false);
+					next.player=this;
+					next.target=target;
+					next.setContent('swapHandcards');
+					return next;
 				},
 				directgain:function(cards){
 					var hs=this.get('h');
@@ -12007,7 +12045,7 @@
 						var current=targets[i];
 						var card=current.get(position||'h').randomGet();
 						if(!card) continue;
-						if(current==game.me){
+						if(current==game.me||current.isOnline()){
 							this.gain(card,current);
 							delayed=true;
 						}
