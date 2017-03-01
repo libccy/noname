@@ -516,6 +516,9 @@ card.guozhan={
 					if(player.identity=='unknown'||player.identity=='ye') return player==target;
 					return player.identity==target.identity;
 				}
+				else if(get.is.versus()){
+					return player.side==target.side;
+				}
 				else{
 					return true;
 				}
@@ -1143,6 +1146,7 @@ card.guozhan={
 		zhibi_info:'出牌阶段对一名其他角色使用，观看其手牌或武将牌',
 		yiyi:'以逸待劳',
 		yiyi_info_guozhan:'对与自己势力相同的所有角色使用，摸两张牌然后弃置两张牌',
+		yiyi_info_combat:'对所有友方角色使用，摸两张牌然后弃置两张牌',
 		yiyi_info:'对与任意三名角色使用，摸两张牌然后弃置两张牌',
 		yiyi_bg:'逸',
 		wuliu:'吴六剑',

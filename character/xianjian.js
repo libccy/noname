@@ -1948,7 +1948,9 @@ character.xianjian={
 			alter:true,
 			filter:function(event,player){
 				if(get.is.altered('zhuyue')){
-					return player.num('h',{type:['trick','delay','equip'],color:'black'})>0;
+					return player.hasCard(function(card){
+						return get.color(card)=='black'&&get.type(card)!='basic';
+					});
 				}
 				return player.num('h',{type:'basic'})<player.num('he');
 			},
@@ -1957,7 +1959,7 @@ character.xianjian={
 			},
 			filterCard:function(card){
 				if(get.is.altered('zhuyue')){
-					return ['trick','delay','equip'].contains(get.type(card))&&get.color(card)=='black';
+					return get.type(card)!='basic'&&get.color(card)=='black';
 				}
 				else{
 					return get.type(card)!='basic';
@@ -2587,7 +2589,7 @@ character.xianjian={
 		longxi_info:'锁定技，在回合外每当你需要使用或打出一张卡牌时，若牌堆顶的前两张中有可使用或打出的牌，你立即获得之',
 		zhuyue:'逐月',
 		zhuyue_info:'出牌阶段限一次，你可以弃置一张非基本牌并指定至多两个目标各随机弃置一张牌，若如此做，你本回使用的杀须指定选中角色为目标',
-		zhuyue_info_alter:'出牌阶段限一次，你可以弃置一张黑色锦囊牌或装备牌并指定至多两个目标各随机弃置一张牌，若如此做，你本回使用的杀须指定选中角色为目标',
+		zhuyue_info_alter:'出牌阶段限一次，你可以弃置一张黑色非基本牌并指定至多两个目标各随机弃置一张牌，若如此做，你本回使用的杀须指定选中角色为目标',
 		guanri:'贯日',
 		guanri_info:'限制技，你可以弃置两张红色手牌并流失一点体力，然后对一名体力值不少于你的其他角色造成两点火焰伤害并弃置其所有装备牌',
 		tianxian:'天弦',

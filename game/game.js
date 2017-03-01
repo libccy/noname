@@ -22669,6 +22669,12 @@
                 if(lib.translate[i+'_info_'+mode]){
                     lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
                 }
+				else if(lib.translate[i+'_info_zhu']&&(mode=='identity'||(mode=='guozhan'&&_status.mode=='four'))){
+					lib.translate[i+'_info']=lib.translate[i+'_info_zhu'];
+				}
+				else if(lib.translate[i+'_info_combat']&&get.is.versus()){
+					lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
+				}
 				var card=lib.card[i];
                 if(card.filterTarget&&card.selectTarget==undefined){
                     card.selectTarget=1;
