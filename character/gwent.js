@@ -2,7 +2,7 @@ character.gwent={
 	character:{
 		gw_huoge:['male','qun',3,['quanzhang']],
 		gw_aisinie:['female','wu',3,['huihun']],
-		gw_gaier:['male','shu',3,['hunmo']],
+		// gw_gaier:['male','shu',3,['hunmo']],
 		gw_enxier:['male','wei',4,['gwbaquan']],
 
 		// gw_kuite:['male','qun',3,[]],
@@ -19,10 +19,10 @@ character.gwent={
 
 		gw_jieluote:['male','qun',6,['fayin']],
 		gw_yenaifa:['female','qun',3,['xuezhou']],
-		gw_telisi:['female','shu',3,['huandie']],
+		gw_telisi:['female','wei',3,['huandie']],
 		gw_xili:['female','qun',3,['fengjian']],
-		// gw_luoqi:['male','qun',3,[]],
-		// gw_yioufeisi:['male','qun',3,[]],
+		gw_luoqi:['male','wei',4,['gwzhanjiang']],
+		gw_yioufeisi:['male','wu',4,['gwchuanxin']],
 	},
 	characterIntro:{
 		gw_huoge:'那个老年痴呆?不知道他是活着还是已经被制成标本了!',
@@ -37,14 +37,93 @@ character.gwent={
 		gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个是一个',
 	},
 	skill:{
+		gwzhanjiang:{
+			trigger:{global:'phaseBegin'},
+			direct:true,
+			filter:function(event,player){
+				return !player.hasSkill('gwzhanjiang2')&&event.player!=player;
+			},
+			content:function(){
+				'step 0'
+				var bool=(ai.get.effect(trigger.player,{name:'sha'},player,player)>0&&game.hasPlayer(function(current){
+					return ai.get.attitude(current,player)>0&&current.hasSha();
+				}));
+				var next=player.chooseToDiscard(get.prompt('gwzhanjiang',trigger.player),'he');
+				next.ai=function(card){
+					if(bool) return 7-ai.get.value(card);
+					return 0;
+				};
+				next.logSkill=['gwzhanjiang',trigger.player];
+				'step 1'
+				if(result.bool){
+					player.addTempSkill('gwzhanjiang2',{player:'phaseBegin'});
+					event.targets=game.filterPlayer(function(current){
+						return current!=trigger.player;
+					});
+					event.targets.sortBySeat(trigger.player);
+					event.list=[];
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(event.targets.length){
+					event.current=event.targets.shift();
+					if(event.current.hasSha()){
+						event.current.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀？',trigger.player,-1);
+					}
+					else{
+						event.redo();
+					}
+				}
+				else{
+					event.goto(4);
+				}
+				'step 3'
+				if(result.bool){
+					event.list.push(event.current);
+				}
+				event.goto(2);
+				'step 4'
+				if(event.list.length){
+					game.asyncDrawAuto(event.list);
+				}
+			},
+			ai:{
+				expose:0.2
+			}
+		},
+		gwzhanjiang2:{},
+		gwchuanxin:{
+			trigger:{player:'shaAfter'},
+			filter:function(event,player){
+				return event.target.isAlive();
+			},
+			check:function(event,player){
+				return ai.get.effect(event.target,{name:'sha'},player,player)>0
+			},
+			logTarget:'target',
+			content:function(){
+				'step 0'
+				player.judge(function(card){
+					return get.color(card)=='black'?1:-1;
+				});
+				'step 1'
+				if(result.color=='black'){
+					player.useCard({name:'sha'},trigger.target,false);
+				}
+			}
+		},
 		fengjian:{
 			trigger:{player:'useCard'},
 			direct:true,
 			filter:function(event,player){
-				return get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card&&game.hasPlayer(function(current){
+				var type=get.type(event.card,'trick');
+				return (type=='trick'||type=='equip')&&game.hasPlayer(function(current){
 					return player.canUse('sha',current,false)&&!event.targets.contains(current);
 				});
 			},
+			usable:2,
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('fengjian'),function(card,player,target){
@@ -54,12 +133,8 @@ character.gwent={
 				}
 				"step 1"
 				if(result.bool){
-					player.logSkill('fengjian',result.targets);
-					player.draw(false);
-					player.$draw();
-					game.delay();
-					var next=player.useCard({name:'sha',nature:'thunder'},result.targets,false);
-					next.animate=false;
+					player.logSkill('fengjian');
+					player.useCard({name:'sha',nature:'thunder'},result.targets,false);
 				}
 			},
 			ai:{
@@ -96,7 +171,7 @@ character.gwent={
 					result.targets.sortBySeat();
 					result.targets.unshift(player);
 					player.logSkill('huandie',result.targets);
-					game.asyncDraw(result.targets,function(current){
+					game.asyncDrawAuto(result.targets,function(current){
 						return current==player?1:2;
 					});
 					player.addTempSkill('huandie_discard','phaseAfter');
@@ -143,10 +218,10 @@ character.gwent={
 				content:function(storage,player){
 					var name=get.translation(player);
 					if(storage==1){
-						return '每当一名角色（'+name+'除外）受到一次伤害，该角色失去一点体力，'+name+'回复一点体力'
+						return '每当一名角色（'+name+'除外）受到一次伤害，该角色失去一点体力，'+name+'回复一点体力';
 					}
 					else if(storage==2){
-						return '每当一名角色（'+name+'除外）造成一次伤害，该角色失去一点体力，'+name+'（若不是受伤害角色）回复一点体力'
+						return '每当一名角色（'+name+'除外）造成一次伤害，该角色失去一点体力，'+name+'（若不是受伤害角色）回复一点体力';
 					}
 					else{
 						return '未发动';
@@ -348,6 +423,9 @@ character.gwent={
 				}
 				player.gain(list,'gain2','log');
 			},
+			ai:{
+				threaten:1.8,
+			},
 			group:['huihun_count','huihun_count2'],
 			subSkill:{
 				count:{
@@ -456,8 +534,12 @@ character.gwent={
 		gw_luoqi:'罗契',
 		gw_yioufeisi:'伊欧菲斯',
 
+		gwzhanjiang:'斩将',
+		gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，结算后所有出杀的角色摸一张牌',
+		gwchuanxin:'穿心',
+		gwchuanxin_info:'每当你对一名角色使用杀结算完毕后，你可以进行一判定，若结果为黑色，视为对目标再使用一张杀',
 		fengjian:'风剑',
-		fengjian_info:'每当你使用一张非转化的锦囊牌，你可以摸一张牌并视为对一名不是此牌目标的角色使用一张雷杀；若此杀造成伤害，你获得潜行直到下一回合开始',
+		fengjian_info:'每当你使用一张锦囊牌或装备牌，你可以视为对一名不是此牌目标的角色使用一张雷杀；若此杀造成伤害，你获得潜行直到下一回合开始，每回合最多发动两次',
 		huandie:'幻蝶',
 		huandie_info:'准备阶段，你可以摸一张牌，并令任意名其他角色摸两张牌，若如此做，此回合结束时，所有手牌数大于体力值的角色需弃置两张手牌',
 		xuezhou:'血咒',
@@ -467,7 +549,7 @@ character.gwent={
 		gwbaquan:'霸权',
 		gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你获得的牌且该角色体力值不小于你，你对其造成一点伤害',
 		hunmo:'魂墨',
-		hunmo_info:'出牌阶段限一次，你可以选择任意名角色，令目标的手牌数变为你当前的体力值（最多为3），并视为对其中弃牌的角色使用一张杀（不计入出杀次数）',
+		hunmo_info:'出牌阶段限一次，你可以选择任意名角色，令目标的手牌数变为与你当前的体力值相同（最多为3），并视为对其中弃牌的角色使用一张杀（不计入出杀次数）',
 		huihun:'回魂',
 		huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 		quanzhang:'权杖',

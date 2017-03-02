@@ -1102,6 +1102,7 @@ character.shenhua={
 						}
 						else if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
 							if(ai.get.attitude(player,target)>0&&card.name=='juedou') return;
+							if(get.tag(card,'damage')&&target.hasSkillTag('maixie')) return;
 							if(target.num('h')==0) return 2;
 							if(target.hasSkill('ziliang')) return 0.7;
 							if(get.mode()=='guozhan') return 0.5;

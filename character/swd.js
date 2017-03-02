@@ -8960,7 +8960,7 @@ character.swd={
 		fushen2:'附身',
 		wangchen:'忘尘',
 		wangchen_info:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
-		wangchen_info_alter:'若你于弃牌阶段弃置了基本牌，可令一名角色翻面',
+		wangchen_info_alter:'若你于弃牌阶段弃置了基本牌，可令一名角色失去一点体力',
 		guiyin:'归隐',
 		guiyin_info:'若你于弃牌阶段弃置了至少两张牌，你可以摸两张牌',
 		shejie:'设界',
