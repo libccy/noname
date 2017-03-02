@@ -29,7 +29,7 @@ window.config={
 		sgscharacters:['standard','shenhua','refresh','yijiang','sp','extra','old'],
 		sgscards:['standard','extra','sp','guozhan'],
 		sgsmodes:['identity','guozhan','versus','brawl','connect'],
-		stockmode:['identity','guozhan','versus','boss','chess','stone','connect','brawl','tafang','hearthstone'],
+		stockmode:['identity','guozhan','versus','boss','chess','stone','connect','brawl','tafang'],
 		stockextension:['boss','cardpile','character','coin','soldier','weather','wuxing','hs_mod'],
 		layout:['default','newlayout'],
 		theme:['woodden','music','simple'],

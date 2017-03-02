@@ -1,13 +1,15 @@
 window.noname_update={
-    version:'1.9.10.3',
+    version:'1.9.10.3beta',
     update:'1.9.10.2',
     changeLog:[
         'bug修复',
     ],
     files:[
         'game/game.js',
-        // 'game/config.js',
-        // 'game/asset.js',
+        'game/package.js',
+        'game/config.js',
+        'game/source.js',
+        'game/asset.js',
         'card/guozhan.js',
         'character/*',
         // 'character/*',

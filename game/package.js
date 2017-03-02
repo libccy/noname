@@ -13,9 +13,7 @@ character.pack={
     swd:'轩辕剑',
     gujian:'古剑奇谭',
     xianjian:'仙剑',
-};
-character.hearthpack={
-    classic:'经典',
+    gwent:'昆特牌',
 };
 card.pack={
     standard:'标准',
@@ -28,11 +26,6 @@ card.pack={
     gujian:'古剑奇谭',
     hearth:'炉石传说',
 };
-card.hearthpack={
-    basic:'基本',
-    classic:'经典',
-    naxx:'纳克萨玛斯',
-};
 play.pack={
     boss:'剑阁挑战',
     cardpile:'牌堆补充',
@@ -41,9 +34,6 @@ play.pack={
     wuxing:'五行生克',
     weather:'天气变化',
     coin:'富甲天下',
-};
-play.hearthpack={
-    hsmod:'规则调整'
 };
 mode.pack={
     identity:'身份',

@@ -4563,10 +4563,6 @@
 				delete card.pack;
 				delete play.pack;
 				delete mode.pack;
-				delete character.hearthpack;
-				delete card.hearthpack;
-				delete play.hearthpack;
-				delete mode.hearthpack;
 				delete window.background;
 				delete window.music;
 				delete window.font;
@@ -5944,6 +5940,7 @@
                 }
 				if(!lib.character[name]){
 					target.node.avatar.setBackground(name,'character');
+					target.node.avatar.show();
 				}
 				else{
 					target.init(name);
