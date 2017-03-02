@@ -318,6 +318,9 @@ character.hearth={
 		moxie2:{
 			trigger:{player:'phaseEnd'},
 			forced:true,
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
 			content:function(){
 				var hs=player.get('h');
 				for(var i=0;i<hs.length;i++){

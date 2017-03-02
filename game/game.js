@@ -4300,6 +4300,12 @@
         			}
         			return list;
         		};
+				Array.prototype.sortBySeat=function(target){
+					lib.tempSortSeat=target;
+					this.sort(lib.sort.seat);
+					delete lib.tempSortSeat;
+					return this;
+				};
                 if(!Array.from){
                     Array.from=function(args){
                         var list=[];
@@ -11937,6 +11943,22 @@
 						next.drawDeck=1;
 					}
 					return next;
+				},
+				randomDiscard:function(){
+					var position='he',num=1;
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='number'){
+							num=arguments[i];
+						}
+						else if(get.itemtype(arguments[i])=='select'){
+							position=arguments[i];
+						}
+					}
+					var cards=this.get(position,num);
+					if(cards){
+						this.discard(cards);
+					}
+					return cards;
 				},
 				discard:function(){
 					var next=game.createEvent('discard');
@@ -22605,6 +22627,9 @@
 				}
 				else if(Array.isArray(num)){
 					num2=num[i];
+				}
+				else if(typeof num=='function'){
+					num2=num(players[i]);
 				}
 				if(drawDeck&&drawDeck.drawDeck){
 					players[i].draw(num2,false,drawDeck);
@@ -34372,7 +34397,7 @@
 				}
 				var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
 				var intro2=ui.create.div('.characterintro.intro2',uiintro);
-				var list=lib.character[name][3];
+				var list=get.character(name,3)||[];
 				var skills=ui.create.div('.characterskill',uiintro);
 				if(lib.config.touchscreen){
 					lib.setScroll(intro);
@@ -35313,9 +35338,27 @@
 			}
 			return card;
 		},
+		character:function(name,num){
+			var info=lib.character[name];
+			if(!info){
+				for(var i in lib.characterPack){
+					if(lib.characterPack[i][name]){
+						info=lib.characterPack[i][name];
+						break;
+					}
+				}
+			}
+			if(info){
+				if(typeof num=='number'){
+					return info[num];
+				}
+				return info;
+			}
+			return null;
+		},
 		characterIntro:function(name){
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
-			var tags=lib.character[name][4];
+			var tags=get.character(name,4);
 			if(tags){
 				for(var i=0;i<tags.length;i++){
 					if(tags[i].indexOf('des:')==0){
