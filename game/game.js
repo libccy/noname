@@ -6465,7 +6465,7 @@
 					if(result&&result.control=='顺时针'){
 						var evt=event.getParent();
 						evt.fixedSeat=true;
-						get.sortSeat(evt.targets);
+						evt.targets.sortBySeat();
 						evt.targets.reverse();
 						if(evt.targets[evt.targets.length-1]==player){
 							evt.targets.unshift(evt.targets.pop());
@@ -8857,7 +8857,7 @@
 					if(num==0&&next.targets.length>1){
 						if(!info.multitarget){
 							if(!event.fixedSeat){
-								get.sortSeat(targets,player);
+								targets.sortBySeat(player);
 							}
 							for(var i=0;i<targets.length;i++){
 								targets[i].animate('target');

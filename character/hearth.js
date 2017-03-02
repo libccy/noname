@@ -352,7 +352,7 @@ character.hearth={
 				event.targets=game.filterPlayer(function(current){
 					return current.hp>player.hp;
 				});
-				get.sortSeat(event.targets);
+				event.targets.sortBySeat();
 				'step 1'
 				if(event.targets.length){
 					event.target=event.targets.shift();

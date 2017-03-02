@@ -4160,7 +4160,7 @@ character.yijiang={
 				event.players=game.filterPlayer(function(current){
 					return current!=target&&get.distance(current,target,'attack')<=1;
 				});
-				get.sortSeat(event.players,target);
+				event.players.sortBySeat(target);
 				"step 1"
 				if(event.players.length){
 					event.current=event.players.shift();

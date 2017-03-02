@@ -24,7 +24,7 @@ card.yunchou={
 				if(result&&result.control=='顺时针'){
 					var evt=event.getParent();
 					evt.fixedSeat=true;
-					get.sortSeat(evt.targets);
+					evt.targets.sortBySeat();
 					evt.targets.reverse();
 					if(evt.targets[evt.targets.length-1]==player){
 						evt.targets.unshift(evt.targets.pop());
@@ -315,7 +315,7 @@ card.yunchou={
 					event.finish();
 				}
 				else{
-					get.sortSeat(list,target);
+					list.sortBySeat(target);
 					event.list=list;
 					event.torespond=[];
 				}

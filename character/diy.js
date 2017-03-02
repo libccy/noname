@@ -185,9 +185,8 @@ character.diy={
 				return 6-ai.get.value(card);
 			},
 			content:function(){
-				// if(player!=target) player.draw();
 				var list=game.filterPlayer();
-				get.sortSeat(list,target);
+				list.sortBySeat(target);
 				target.useCard({name:'diaobingqianjiang'},list);
 			},
 			ai:{

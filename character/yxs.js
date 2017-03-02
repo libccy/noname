@@ -126,7 +126,7 @@ character.yxs={
 						var list=game.filterPlayer(function(current){
 							return current.hasSkill('lyuxue2');
 						});
-						get.sortSeat(list);
+						list.sortBySeat();
 						event.list=list;
 						player.line(list,'green');
 						'step 1'

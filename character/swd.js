@@ -7000,7 +7000,7 @@ character.swd={
 				event.targets=game.filterPlayer(function(current){
 					return current.num('j');
 				});
-				get.sortSeat(event.targets);
+				event.targets.sortBySeat();
 				'step 2'
 				if(event.targets.length){
 					var current=event.targets.shift();
@@ -8595,7 +8595,7 @@ character.swd={
 				event.targets=game.filterPlayer(function(current){
 					return get.distance(target,current)<=1;
 				});
-				get.sortSeat(event.targets,event.target);
+				event.targets.sortBySeat(event.target);
 				event.targets.unshift(player);
 				"step 1"
 				if(event.targets.length){
