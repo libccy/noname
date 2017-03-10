@@ -35359,7 +35359,13 @@
 					};
 				}
 			}
-			return card;
+			else{
+				if(get.is.object(card)&&get.itemtype(cards)=='cards'&&!card.cards){
+					card=get.copy(card);
+					card.cards=cards.slice(0);
+				}
+				return card;
+			}
 		},
 		character:function(name,num){
 			var info=lib.character[name];
@@ -36371,7 +36377,7 @@
 			if(_status.event.skill){
 				var card=get.info(_status.event.skill).viewAs;
 				if(card){
-					return get.autoViewAs(card,null,_status.event.player);
+					return get.autoViewAs(card,ui.selected.cards,_status.event.player);
 				}
 			}
             if(_status.event._get_card){
