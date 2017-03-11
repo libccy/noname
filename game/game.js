@@ -22299,6 +22299,12 @@
 							event.avatars[i].nodename.style.fontSize=Math.max(14,Math.round(width/5.6))+'px';
 						}
 					}
+					if(event.deciding){
+						var str='px,'+(event.margin/2-event.height*0.5)+'px)';
+						for(var i=0;i<event.friendlist.length;i++){
+							event.friendlist[i].style.transform='scale(1.2) translate('+(-(event.width+14)*event.friendlist.length/2+7+i*(event.width+14))+str;
+						}
+					}
 				};
 				lib.onresize.push(event.resize);
 				event.clickAvatar=function(){

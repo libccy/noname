@@ -2,17 +2,19 @@ character.gwent={
 	character:{
 		gw_huoge:['male','qun',3,['quanzhang']],
 		gw_aisinie:['female','wu',3,['huihun']],
-		// gw_gaier:['male','shu',3,['hunmo']],
 		gw_enxier:['male','wei',4,['gwbaquan']],
 
-		// gw_kuite:['male','qun',3,[]],
+
+		gw_kaerweite:['male','shu',4,['gwjiquan']],
+		gw_falanxisika:['female','wu',3,['shewu']],
+		gw_haluo:['male','qun',4,['nuhou']],
+
+		// gw_gaier:['male','shu',3,['hunmo']],
 		// gw_dagong:['male','qun',3,[]],
+		// gw_kuite:['male','qun',3,[]],
 		// gw_airuiting:['male','qun',3,[]],
 		// gw_fuertaisite:['male','qun',3,[]],
-		// gw_falanxisika:['female','wu',3,[]],
-		// gw_haluo:['male','qun',3,[]],
 		// gw_hengsaite:['male','qun',3,[]],
-		// gw_kaerweite:['male','qun',3,[]],
 		// gw_bulanwang:['male','qun',3,[]],
 		// gw_fulisi:['male','qun',3,[]],
 		// gw_laduoweide:['male','qun',3,[]],
@@ -38,6 +40,127 @@ character.gwent={
 		gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个是一个',
 	},
 	skill:{
+		gwjiquan:{
+			enable:'phaseUse',
+			usable:1,
+			filterTarget:function(card,player,target){
+				return target!=player&&target.num('he');
+			},
+			selectTarget:[1,Infinity],
+			content:function(){
+				'step 0'
+				player.gainPlayerCard(target,'he',true);
+				'step 1'
+				target.useCard({name:'sha'},player);
+			},
+			ai:{
+				threaten:1.4,
+				order:7,
+				result:{
+					target:function(player,target){
+						if(player.getEquip('tengjia')||player.getEquip('bagua')) return -1;
+						if(ai.get.effect(target,{name:'sha'},player,player)>=0) return -1;
+						if(!player.hasShan()){
+							if(ui.selected.targets.length) return 0;
+							if(player.hp>=4) return -1;
+							if(player.hp>=3&&target.hp==1) return -1;
+							return 0;
+						}
+						var num=player.num('h','shan');
+						if(num<1){
+							num=1;
+						}
+						if(ui.selected.targets.length>=num){
+							return 0;
+						}
+						return -1;
+					}
+				}
+			}
+		},
+		nuhou:{
+			enable:'phaseUse',
+			usable:1,
+			position:'he',
+			filterCard:true,
+			check:function(card){
+				return 7-ai.get.value(card)
+			},
+			content:function(){
+				'step 0'
+				var list=player.getEnemies();
+				list.sortBySeat();
+				event.list=list;
+				'step 1'
+				if(event.list.length){
+					var current=event.list.shift();
+					var he=current.get('he');
+					player.line(current,'green');
+					if(he.length){
+						current.discard(he.randomGet());
+						current.addExpose(0.2);
+					}
+					event.redo();
+				}
+			},
+			ai:{
+				order:8.5,
+				result:{
+					player:1
+				},
+			},
+		},
+		shewu:{
+			enable:'phaseUse',
+			usable:1,
+			position:'he',
+			filterCard:true,
+			selectCard:[1,3],
+			check:function(card){
+				if(!ui.selected.cards.length){
+					return 6-ai.get.value(card)
+				}
+				var player=_status.event.player;
+				if(player.isDamaged()){
+					var hs=player.get('h');
+					var num=0;
+					for(var i=0;i<hs.length;i++){
+						if(ai.get.value(hs[i])<6){
+							num++;
+						}
+					}
+					if(num>=3){
+						return 6-ai.get.value(card);
+					}
+				}
+				return 0;
+			},
+			content:function(){
+				player.draw(3);
+				if(cards.length>=2){
+					player.addTempSkill('shewu_dist','phaseAfter');
+				}
+				if(cards.length==3){
+					player.recover();
+				}
+			},
+			ai:{
+				order:1,
+				result:{
+					player:1
+				},
+				threaten:1.6
+			},
+			subSkill:{
+				dist:{
+					mod:{
+						targetInRange:function(){
+							return true;
+						}
+					}
+				}
+			}
+		},
 		gwzhanjiang:{
 			trigger:{global:'phaseBegin'},
 			direct:true,
@@ -535,6 +658,12 @@ character.gwent={
 		gw_luoqi:'罗契',
 		gw_yioufeisi:'伊欧菲斯',
 
+		gwjiquan:'集权',
+		gwjiquan_info:'出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张杀',
+		nuhou:'怒吼',
+		nuhou_info:'出牌阶段限一次，你可以弃置一张牌，然后所有敌人随机弃置一张牌',
+		shewu:'蛇舞',
+		shewu_info:'出牌阶段限一次，你可以弃置1至3张牌然后摸3张牌；若你弃置了至少2张牌，你本回合使用卡牌无视距离；若你弃置了3张牌，你回复一点体力',
 		gwzhanjiang:'斩将',
 		gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，结算后所有出杀的角色摸一张牌',
 		gwchuanxin:'穿心',

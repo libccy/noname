@@ -62,6 +62,8 @@ window.characterRank={
         'gw_luoqi',
         'gw_enxier',
         'gw_aisinie',
+        'gw_falanxisika',
+        'gw_haluo',
         'hs_khadgar',
         'swd_sikongyu',
         'swd_huzhongxian',
@@ -146,6 +148,7 @@ window.characterRank={
         'hs_jaina',
     ],
     am:[
+        'gw_kaerweite',
         'yxs_napolun',
         'hs_aedwin',
         'ow_kuangshu',
