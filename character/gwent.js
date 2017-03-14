@@ -246,6 +246,7 @@ character.gwent={
 				return ai.get.effect(event.target,{name:'sha'},player,player)>0
 			},
 			logTarget:'target',
+			logLine:false,
 			content:function(){
 				'step 0'
 				player.judge(function(card){

@@ -6768,7 +6768,7 @@
     						game.log(player,'发动了','【'+get.skillTranslation(event.skill,player)+'】');
     					}
     					else{
-                            if(info.logTarget){
+                            if(info.logTarget&&info.logLine!==false){
                                 if(typeof info.logTarget=='string'){
                                     player.logSkill(event.skill,trigger[info.logTarget]);
                                 }
