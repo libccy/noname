@@ -208,7 +208,7 @@ mode.guozhan={
 			gz_huanggai:['male','wu',4,['kurou']],
 			gz_zhouyu:['male','wu',3,['yingzi','fanjian']],
 			gz_daqiao:['female','wu',3,['guose','liuli']],
-			gz_luxun:['male','wu',3,['qianxun','duoshi']],
+			gz_luxun:['male','wu',3,['gzqianxun','duoshi']],
 			gz_sunshangxiang:['female','wu',3,['jieyin','gzxiaoji']],
 			gz_sunjian:['male','wu',4,['gzyinghun']],
 			gz_xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
@@ -1357,6 +1357,29 @@ mode.guozhan={
 				}
 			}
 		},
+		gzqianxun:{
+			audio:'qianxun',
+			trigger:{target:'useCardToBefore'},
+			forced:true,
+			priority:15,
+			check:function(event,player){
+				return ai.get.effect(event.target,event.card,event.player,player)<0;
+			},
+			filter:function(event,player){
+				return event.card.name=='shunshou'||event.card.name=='lebu';
+			},
+			content:function(){
+				trigger.untrigger();
+				trigger.finish();
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(card.name=='shunshou'||card.name=='lebu') return 'zeroplayertarget';
+					},
+				}
+			}
+		},
 		gzkongcheng:{
 			audio:'kongcheng',
 			trigger:{target:'useCardToBefore'},
@@ -2377,7 +2400,7 @@ mode.guozhan={
 								if(get.is.jun(i)) return true;
 							}
 						}
-					},get.config('onlyguozhanexpand')?'expandall':undefined);
+					},get.config('onlyguozhanexpand')?'expandall':undefined,get.config('onlyguozhan')?'onlypack:mode_guozhan':undefined);
 					ui.create.cheat2=function(){
 						ui.cheat2=ui.create.control('自由选将',function(){
 							if(this.dialog==_status.event.dialog){
@@ -2779,6 +2802,8 @@ mode.guozhan={
 		gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌的所有技能',
 		gzweimu:'帷幕',
 		gzweimu_info:'锁定技，当你成为黑色锦囊牌的目标时，则取消之',
+		gzqianxun:'谦逊',
+		gzqianxun_info:'锁定技，当你成为顺手牵羊或乐不思蜀的目标时，则取消之',
 		gzkongcheng:'空城',
 		gzkongcheng_info:'锁定技，当你成为【杀】或【决斗】的目标时，若你没有手牌，则取消之',
 		gzxiaoji:'枭姬',

@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.10.5',
+    version:'1.9.10.6',
     update:'1.9.10.4',
     changeLog:[
         'bug修复',
@@ -13,10 +13,13 @@ window.noname_update={
         'card/swd.js',
         'character/rank.js',
         'character/gwent.js',
+        'character/swd.js',
+        'character/diy.js',
+        'character/extra.js',
         // 'mode/boss.js',
         // 'mode/chess.js',
         // 'mode/versus.js',
-        // 'mode/guozhan.js',
+        'mode/guozhan.js',
         // 'mode/identity.js',
         // 'mode/stone.js',
         // 'theme/simple/style.css',

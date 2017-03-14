@@ -926,7 +926,9 @@ character.extra={
 		longhun1:{
 			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
-			prompt:'将一张红桃牌当桃使用',
+			prompt:function(){
+				return '将'+get.cnNumber(Math.max(1,_status.event.player.hp))+'张红桃牌当作桃使用';
+			},
 			position:'he',
 			check:function(card,event){
 				if(_status.event.player.hp>1) return 0;
@@ -936,6 +938,9 @@ character.extra={
 				return Math.max(1,_status.event.player.hp);
 			},
 			viewAs:{name:'tao'},
+			filter:function(event,player){
+				return player.num('he',{suit:'heart'})>=player.hp;
+			},
 			filterCard:function(card){
 				return get.suit(card)=='heart';
 			}
@@ -943,7 +948,9 @@ character.extra={
 		longhun2:{
 			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
-			prompt:'将一张方片牌当火杀使用或打出',
+			prompt:function(){
+				return '将'+get.cnNumber(Math.max(1,_status.event.player.hp))+'张方片当作火杀使用或打出';
+			},
 			position:'he',
 			check:function(card,event){
 				if(_status.event.player.hp>1) return 0;
@@ -953,6 +960,9 @@ character.extra={
 				return Math.max(1,_status.event.player.hp);
 			},
 			viewAs:{name:'sha',nature:'fire'},
+			filter:function(event,player){
+				return player.num('he',{suit:'diamond'})>=player.hp;
+			},
 			filterCard:function(card){
 				return get.suit(card)=='diamond';
 			}
@@ -960,7 +970,9 @@ character.extra={
 		longhun3:{
 			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
-			prompt:'将一张黑桃牌当无懈可击使用',
+			prompt:function(){
+				return '将'+get.cnNumber(Math.max(1,_status.event.player.hp))+'张黑桃牌当作无懈可击使用';
+			},
 			position:'he',
 			check:function(card,event){
 				if(_status.event.player.hp>1) return 0;
@@ -980,7 +992,9 @@ character.extra={
 		longhun4:{
 			audio:true,
 			enable:['chooseToUse','chooseToRespond'],
-			prompt:'将一张梅花牌当闪打出',
+			prompt:function(){
+				return '将'+get.cnNumber(Math.max(1,_status.event.player.hp))+'张梅花牌当作闪打出';
+			},
 			position:'he',
 			check:function(card,event){
 				if(_status.event.player.hp>1) return 0;

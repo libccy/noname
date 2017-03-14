@@ -53,6 +53,7 @@ window.characterRank={
         'hs_tyrande',
     ],
     a:[
+        'gw_airuiting',
         'gw_huoge',
         'gw_xili',
         'gw_yenaifa',
@@ -240,6 +241,7 @@ window.characterRank={
     ],
     bp:[
         'zoushi',
+        'diy_lukang',
         'yxs_meixi',
         'yxs_lanlinwang',
         'jianyong',
@@ -402,7 +404,6 @@ window.characterRank={
         're_xuzhu',
         're_simayi',
         'yxs_mingchenghuanghou',
-        'diy_lukang',
         'diy_tianyu',
         'old_zhuran',
         'old_lingtong',

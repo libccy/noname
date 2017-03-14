@@ -30271,7 +30271,7 @@
                 //         return ui.create.characterDialog2.apply(this,arguments);
                 //     }
                 // }
-				var filter,str,noclick,thisiscard,seperate,expandall;
+				var filter,str,noclick,thisiscard,seperate,expandall,onlypack;
 				for(var i=0;i<arguments.length;i++){
 					if(arguments[i]==='thisiscard'){
 						thisiscard=true;
@@ -30279,6 +30279,9 @@
                     else if(arguments[i]==='expandall'){
                         expandall=true;
                     }
+					else if(typeof arguments[i]=='string'&&arguments[i].indexOf('onlypack:')==0){
+						onlypack=arguments[i].slice(9);
+					}
 					else if(typeof arguments[i]=='object'&&typeof arguments[i].seperate=='function'){
 						seperate=arguments[i].seperate;
 					}
@@ -30413,9 +30416,11 @@
 					else{
                         if(newlined2){
                             newlined2.style.display='none';
-                            packsource.classList.remove('thundertext');
-							if(!get.is.phoneLayout()||!lib.config.filternode_button){
-								packsource.innerHTML='武将包';
+							if(!packsource.onlypack){
+								packsource.classList.remove('thundertext');
+								if(!get.is.phoneLayout()||!lib.config.filternode_button){
+									packsource.innerHTML='武将包';
+								}
 							}
                         }
                         if(this.classList.contains('thundertext')){
@@ -30627,7 +30632,15 @@
 						ui.create.node('br',filternode.firstChild);
 					}
                     else{
-						packsource.innerHTML='武将包';
+						if(onlypack){
+							packsource.onlypack=true;
+							packsource.innerHTML=get.translation(onlypack+'_character_config');
+							packsource.style.display='none';
+							packsource.previousSibling.style.display='none';
+						}
+						else{
+							packsource.innerHTML='武将包';
+						}
 					}
 
                     newlined2=document.createElement('div');
@@ -30645,6 +30658,7 @@
                     node.appendChild(newlined2);
 
                     packsource.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+						if(packsource.onlypack) return;
                         if(_status.dragged) return;
 						if(get.is.phoneLayout()&&lib.config.filternode_button&&filternode){
 							_status.filterCharacter=true;
@@ -30694,7 +30708,7 @@
                         span.link=packlist[i];
                         span.addEventListener(lib.config.touchscreen?'touchend':'click',clickCapt);
                         newlined2.appendChild(span);
-						if(filternode){
+						if(filternode&&!onlypack){
 							span.touchlink=ui.create.div(filternode.firstChild,clickCaptNode,'.menubutton.large',span.innerHTML);
 							span.touchlink.link=span;
 						}
@@ -34508,6 +34522,7 @@
 				}
 				for(var i=0;i<list.length;i++){
 					if(get.info(list[i]).nopop) continue;
+					if(!lib.translate[list[i]]||!lib.translate[list[i]+'_info']) continue;
 					var current=ui.create.div('.menubutton.large',skills,clickSkill,get.translation(list[i]));
 					current.link=list[i];
 					if(i==0){

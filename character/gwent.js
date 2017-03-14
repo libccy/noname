@@ -9,13 +9,14 @@ character.gwent={
 		gw_falanxisika:['female','wu',3,['shewu']],
 		gw_haluo:['male','qun',4,['nuhou']],
 
-		// gw_gaier:['male','shu',3,['hunmo']],
-		// gw_dagong:['male','qun',3,[]],
+		gw_airuiting:['male','wei',4,['kuanglie']],
+
+		// gw_gaier:['male','shu',3,['gwyinhua']],
+		// gw_dagong:['male','qun',4,[]],
+		// gw_bulanwang:['male','qun',3,[]],
 		// gw_kuite:['male','qun',3,[]],
-		// gw_airuiting:['male','qun',3,[]],
 		// gw_fuertaisite:['male','qun',3,[]],
 		// gw_hengsaite:['male','qun',3,[]],
-		// gw_bulanwang:['male','qun',3,[]],
 		// gw_fulisi:['male','qun',3,[]],
 		// gw_laduoweide:['male','qun',3,[]],
 
@@ -40,6 +41,24 @@ character.gwent={
 		gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个是一个',
 	},
 	skill:{
+		kuanglie:{
+			trigger:{player:'useCardToBegin'},
+			filter:function(event,player){
+				return event.target!=player&&event.target.num('he')&&get.color(event.card)=='black';
+			},
+			init:function(player){
+				player.storage.kuanglie=0;
+			},
+			forced:true,
+			content:function(){
+				trigger.target.randomDiscard();
+				player.storage.kuanglie++;
+				if(player.storage.kuanglie%2==0){
+					player.draw();
+				}
+			}
+		},
+		kuanglie2:{},
 		gwjiquan:{
 			enable:'phaseUse',
 			usable:1,
@@ -658,6 +677,8 @@ character.gwent={
 		gw_luoqi:'罗契',
 		gw_yioufeisi:'伊欧菲斯',
 
+		kuanglie:'狂猎',
+		kuanglie_info:'锁定技，当一名其他角色成为你的黑色牌的目标后，该角色随机弃置一张牌；每当你发动两次“狂猎”，你摸一张牌',
 		gwjiquan:'集权',
 		gwjiquan_info:'出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张杀',
 		nuhou:'怒吼',
