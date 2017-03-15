@@ -12971,7 +12971,7 @@
                         }
                         if(this.initedSkills.contains(skill)) return this;
                         this.initedSkills.push(skill);
-                        if(info.init){
+                        if(info.init&&!_status.video){
                             info.init(this,skill);
                         }
                     }
@@ -13030,7 +13030,7 @@
 							this.awakenSkill(skill);
 							return;
 						}
-						if(info.init2){
+						if(info.init2&&!_status.video){
 							info.init2(this,skill);
 						}
 						if(info.mark){
