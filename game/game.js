@@ -866,6 +866,31 @@
                             }
 						}
 					},
+					player_border_long:{
+						name:'边框宽度',
+						init:'normal',
+						intro:'设置角色的边框宽度',
+						unfrequent:true,
+                        item:{
+                            slim:'窄',
+                            normal:'中',
+                        },
+						onclick:function(item){
+							game.saveConfig('player_border',item);
+                            if(item!='wide'||game.layout=='long'||game.layout=='long2'){
+                                ui.arena.classList.add('slim_player');
+                            }
+                            else{
+                                ui.arena.classList.remove('slim_player');
+                            }
+                            if(item=='slim'){
+                                ui.arena.classList.add('uslim_player');
+                            }
+                            else{
+                                ui.arena.classList.remove('uslim_player');
+                            }
+						}
+					},
                     radius_size:{
                         name:'圆角大小',
                         init:'default',
@@ -1490,6 +1515,14 @@
 						}
 						else{
 							map.change_skin_auto.hide();
+						}
+						if(game.layout=='long'||game.layout=='long2'){
+							map.player_border.hide();
+							map.player_border_long.show();
+						}
+						else{
+							map.player_border.show();
+							map.player_border_long.hide();
 						}
 						if(lib.config.image_background=='default'){
 							map.image_background_blur.hide();
