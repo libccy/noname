@@ -38,13 +38,13 @@ character.gwent={
 		gw_jieluote:'如果要付出这种代价才能拯救世界，那最好还是让世界消逝吧。',
 		gw_xili:'我想去哪，就去哪。',
 		gw_luoqi:'是个爱国者…还是个货真价实的王八蛋。',
-		gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个是一个',
+		gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 	},
 	skill:{
 		kuanglie:{
 			trigger:{player:'useCardToBegin'},
 			filter:function(event,player){
-				return event.target!=player&&event.target.num('he')&&get.color(event.card)=='black';
+				return event.target&&event.target!=player&&event.target.num('he')&&get.color(event.card)=='black';
 			},
 			init:function(player){
 				player.storage.kuanglie=0;

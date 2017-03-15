@@ -595,7 +595,7 @@ character.ow={
 			trigger:{player:'useCardToBegin'},
 			forced:true,
 			filter:function(event,player){
-				return get.suit(event.card)==get.suit(player.storage.shoujia)&&event.target!=player;
+				return get.suit(event.card)==get.suit(player.storage.shoujia)&&event.target&&event.target!=player;
 			},
 			content:function(){
 				'step 0'

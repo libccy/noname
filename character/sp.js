@@ -6102,12 +6102,22 @@ character.sp={
 				}
 				"step 1"
 				if(event.cards.length){
+					var goon=false;
+					for(var i=0;i<event.cards.length;i++){
+						if(event.cards[i].name=='du'){
+							goon=true;break;
+						}
+					}
+					if(!goon){
+						goon=game.hasPlayer(function(current){
+							return player!=current&&ai.get.attitude(player,current)>1;
+						});
+					}
 					player.chooseCardButton(get.prompt('lirang'),event.cards,[1,event.cards.length]).set('ai',function(button){
 						if(!_status.event.goon||ui.selected.buttons.length) return 0;
+						if(button.link.name=='du') return 2;
 						return 1;
-					}).set('goon',game.hasPlayer(function(current){
-						return Math.abs(ai.get.attitude(player,current))>1;
-					}));
+					}).set('goon',goon);
 				}
 				else{
 					event.finish();
