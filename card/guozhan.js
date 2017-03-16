@@ -806,6 +806,9 @@ card.guozhan={
 		yuxi_skill:{
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
+			filter:function(event,player){
+				return !player.isUnseen();
+			},
 			content:function(){
 				trigger.num++;
 			},
@@ -818,6 +821,7 @@ card.guozhan={
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
 			filter:function(event,player){
+				if(player.isUnseen()) return false;
 				return game.hasPlayer(function(current){
 					return player.canUse('zhibi',current);
 				});
