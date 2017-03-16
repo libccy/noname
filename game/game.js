@@ -5269,8 +5269,8 @@
     					if(pilecfg){
     						lib.config.bannedpile=pilecfg[0]||{};
     						lib.config.addedpile=pilecfg[1]||{};
-                            lib.config.bannedpile=JSON.parse(JSON.stringify(lib.config.bannedpile));
-                            lib.config.addedpile=JSON.parse(JSON.stringify(lib.config.addedpile));
+                            lib.config.bannedpile=get.copy(lib.config.bannedpile);
+                            lib.config.addedpile=get.copy(lib.config.addedpile);
     					}
                     }
                     else{
@@ -26116,7 +26116,7 @@
 							if(!lib.config.addedpile[mode]){
 								lib.config.addedpile[mode]=[];
 							}
-							ui.create.div('.config.more','编辑牌堆 <div>&gt;</div>',page,function(){
+							ui.create.div('.config.more.pile','编辑牌堆 <div>&gt;</div>',page,function(){
 								if(cardpileexpanded){
 									this.classList.remove('on');
 									for(var k=0;k<cardpileNodes.length;k++){
@@ -26131,13 +26131,26 @@
 								}
 								cardpileexpanded=!cardpileexpanded;
 							});
-							var cfgnode=createConfig({
-								name:'添加...',
-								clear:true,
-								onclick:function(){
-									this.nextSibling.classList.toggle('hidden');
+							var cfgnode=ui.create.div(page,'.config.pointerspan.cardpilecfg.toggle');
+							var cfgaddcard=ui.create.node('button','','添加卡牌',cfgnode,function(){
+								this.parentNode.nextSibling.classList.toggle('hidden');
+							});
+							var cfgbancard=ui.create.node('button','','全部关闭',cfgnode,function(){
+								for(var i=0;i<cardpileNodes.length;i++){
+									if(cardpileNodes[i].type=='defaultcards'&&cardpileNodes[i].classList.contains('on')){
+										clickToggle.call(cardpileNodes[i]);
+									}
 								}
 							});
+							var cfgenablecard=ui.create.node('button','','全部开启',cfgnode,function(){
+								for(var i=0;i<cardpileNodes.length;i++){
+									if(cardpileNodes[i].type=='defaultcards'&&!cardpileNodes[i].classList.contains('on')){
+										clickToggle.call(cardpileNodes[i]);
+									}
+								}
+							});
+							cfgbancard.style.marginLeft='5px';
+							cfgenablecard.style.marginLeft='5px';
 							cardpileNodes.push(cfgnode);
 							cfgnode.style.display='none';
 							cfgnode.classList.add('cardpilecfg');
@@ -26235,11 +26248,13 @@
 									init:!lib.config.bannedpile[mode].contains(i),
 									onclick:toggleCardPile
 								});
+								cfgnode.type='defaultcards';
 								cardpileNodes.push(cfgnode);
 								cfgnode.style.display='none';
 								cfgnode.classList.add('cardpilecfg');
 								page.appendChild(cfgnode);
 							}
+							ui.create.div('.menuplaceholder',page);
 						}
                         return node;
                     };
@@ -26289,25 +26304,27 @@
 						node.link=page;
 						node.mode='cardpile';
 
-						var updatePileConfig=function(){
-							var current=get.config('cardpilename');
-							for(var i=0;i<page.childNodes.length;i++){
-								if(page.childNodes[i].use){
-									if(page.childNodes[i].link==current){
-										page.childNodes[i].use.style.display='none';
-									}
-									else{
-										page.childNodes[i].use.style.display='';
-									}
-								}
-							}
-						};
+						// var updatePileConfig=function(){
+						// 	var current=get.config('cardpilename');
+						// 	for(var i=0;i<page.childNodes.length;i++){
+						// 		if(page.childNodes[i].use){
+						// 			if(page.childNodes[i].link==current){
+						// 				page.childNodes[i].use.style.display='none';
+						// 			}
+						// 			else{
+						// 				page.childNodes[i].use.style.display='';
+						// 			}
+						// 		}
+						// 	}
+						// };
 
-						var pileUse=function(){
-							game.saveConfig('cardpilename',this.parentNode.link,true);
-							restart.style.display='';
-							updatePileConfig();
-						};
+						var node=ui.create.div('.config.toggle.cardpilecfg.nomarginleft','选择牌堆');
+
+						// var pileUse=function(){
+						// 	game.saveConfig('cardpilename',this.parentNode.link,true);
+						// 	restart.style.display='';
+						// 	updatePileConfig();
+						// };
 						var pileDel=function(){
 							delete lib.config.customcardpile[this.parentNode.link];
 							this.parentNode.remove();
@@ -26322,36 +26339,36 @@
 						var createPileNode=function(name){
 							var node=ui.create.div('.config.toggle.cardpilecfg.nomarginleft',name);
 							node.link=name;
-							var edit=document.createElement('span');
-							edit.innerHTML='使用';
-							edit.classList.add('cardpiledelete');
-							edit.onclick=pileUse;
+							// var edit=document.createElement('span');
+							// edit.innerHTML='使用';
+							// edit.classList.add('cardpiledelete');
+							// edit.onclick=pileUse;
 							var del=document.createElement('span');
 							del.innerHTML='删除';
 							del.classList.add('cardpiledelete');
 							del.onclick=pileDel;
 							node.appendChild(del);
-							node.appendChild(edit);
-							node.use=edit;
+							// node.appendChild(edit);
+							// node.use=edit;
 							page.insertBefore(node,page.firstChild);
 						};
 						for(var i in lib.config.customcardpile){
 							createPileNode(i);
 						}
-						updatePileConfig();
+						// updatePileConfig();
 						var restart=ui.create.div('.config.more','重新启动',game.reload,page);
 						restart.style.display='none';
-						ui.create.div('.config.more','使用默认牌堆',function(){
-							this.innerHTML='已使用';
-							var that=this;
-							setTimeout(function(){
-								that.innerHTML='使用默认牌堆';
-							},1000);
-							game.saveConfig('cardpilename',null,true);
-							game.saveConfig('bannedpile',{});
-							game.saveConfig('addedpile',{});
-							updatePileConfig();
-						},page);
+						// ui.create.div('.config.more','使用默认牌堆',function(){
+						// 	this.innerHTML='已使用';
+						// 	var that=this;
+						// 	setTimeout(function(){
+						// 		that.innerHTML='使用默认牌堆';
+						// 	},1000);
+						// 	game.saveConfig('cardpilename',null,true);
+						// 	game.saveConfig('bannedpile',{});
+						// 	game.saveConfig('addedpile',{});
+						// 	updatePileConfig();
+						// },page);
 						var exportCardPile;
 						ui.create.div('.config.more','保存当前牌堆 <div>&gt;</div>',page,function(){
 							this.classList.toggle('on');
@@ -26386,7 +26403,7 @@
 							game.saveConfig('bannedpile',{});
 							game.saveConfig('addedpile',{});
 							createPileNode(name);
-							updatePileConfig();
+							// updatePileConfig();
 						};
 					}());
 

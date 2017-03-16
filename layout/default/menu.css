@@ -99,6 +99,9 @@
 	margin-bottom: 0 !important;
 	display: block;
 }
+.menu-buttons>.config.more.pile{
+	margin-top: 5px !important;
+}
 .menu-buttons>.toggle.cardpilecfgadd:not(.hidden){
 	margin-top: 0 !important;
 }
@@ -118,6 +121,19 @@
 	position: relative;
 	float: right;
 	margin-right: 4px;
+}
+.menu-buttons .menuplaceholder{
+	display: block;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 10px;
+}
+.menu-buttons .menuplaceholder.slim{
+	height: 5px;
+}
+#window:not(.nopointer) .cardpiledelete{
+	cursor: pointer;
 }
 .menu-help{
 	width: calc(100% - 30px) !important;
