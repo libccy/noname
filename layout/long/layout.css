@@ -49,6 +49,9 @@
     transform: scale(0.8);
     transform-origin: bottom left;
 }
+#arena:not(.fewplayer).lslim_player .player .equips{
+    left: 5px;
+}
 #arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.avatar,
 #arena:not(.fewplayer)>.player:not(.minskin):not(*[data-position='0'])>.avatar2{
     width: calc(100% - 14px) !important;
