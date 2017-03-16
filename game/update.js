@@ -27,10 +27,10 @@ window.noname_update={
         // 'theme/simple/style.css',
         // 'layout/default/layout.css',
         'layout/default/menu.css',
-        // 'layout/long/layout.css',
-        // 'layout/long2/layout.css',
+        'layout/long/layout.css',
+        'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
-        // 'layout/newlayout/global.css',
+        'layout/newlayout/global.css',
         // 'layout/mode/chess.css',
         // 'extension/boss/extension.js',
     ]

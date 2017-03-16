@@ -242,6 +242,12 @@
     height: calc(100% - 6px) !important;
     background-position: 50% !important;
 }
+#arena.lslim_player>.player:not(.minskin)>.avatar,
+#arena.lslim_player>.player:not(.minskin)>.avatar2{
+    width: calc(100% - 10px) !important;
+    height: calc(100% - 10px) !important;
+    background-position: 50% !important;
+}
 #arena>.player.fullskin2:not(.minskin)>.avatar,
 #arena>.player.fullskin2:not(.minskin)>.avatar2{
     height: 50% !important;
@@ -251,6 +257,10 @@
 #arena.uslim_player>.player.fullskin2:not(.minskin)>.avatar,
 #arena.uslim_player>.player.fullskin2:not(.minskin)>.avatar2{
     height: calc(50% + 4px) !important;
+}
+#arena.lslim_player>.player.fullskin2:not(.minskin)>.avatar,
+#arena.lslim_player>.player.fullskin2:not(.minskin)>.avatar2{
+    height: calc(50% + 2px) !important;
 }
 #window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin)>.avatar,
 #window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin)>.avatar2{
@@ -291,6 +301,19 @@
 #arena.uslim_player[data-player_height='short']>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     -webkit-clip-path: polygon(-10px -10px, 124px -10px, 124px 76px, 114px 76px, 0px 98px, -10px 98px);
 }
+#arena.lslim_player>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena.lslim_player>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
+    height: calc(50% + 16px) !important;
+    -webkit-clip-path: polygon(-10px -10px, 120px -10px, 120px 94px, 110px 94px, 0px 116px, -10px 116px);
+}
+#arena.lslim_player[data-player_height='default']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena.lslim_player[data-player_height='default']>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
+    -webkit-clip-path: polygon(-10px -10px, 120px -10px, 120px 84px, 110px 84px, 0px 106px, -10px 106px);
+}
+#arena.lslim_player[data-player_height='short']>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
+#arena.lslim_player[data-player_height='short']>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
+    -webkit-clip-path: polygon(-10px -10px, 120px -10px, 120px 74px, 110px 74px, 0px 96px, -10px 96px);
+}
 #window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin):not(.unseen2)>.avatar,
 #window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin).unseen2[data-position='0']>.avatar{
     border-radius: 4px 4px 0 0 !important;
@@ -316,6 +339,12 @@
     top: calc(50% - 21px) !important;
     height: calc(50% + 18px) !important;
     -webkit-clip-path: polygon(-10px 32px, 0 32px, 114px 10px, 124px 10px, 124px 138px, -10px 138px);
+}
+#arena.lslim_player>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2,
+#arena.lslim_player>.player.fullskin2:not(.minskin).unseen[data-position='0']>.avatar2{
+    top: calc(50% - 21px) !important;
+    height: calc(50% + 16px) !important;
+    -webkit-clip-path: polygon(-10px 32px, 0 32px, 110px 10px, 120px 10px, 120px 136px, -10px 136px);
 }
 #window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin):not(.unseen)>.avatar2,
 #window[data-radius_size='reduce'] #arena>.player.fullskin2:not(.minskin).unseen[data-position='0']>.avatar2{

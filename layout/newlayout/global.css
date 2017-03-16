@@ -22,6 +22,10 @@
 	left:3px;
 	top:3px;
 }
+#arena.lslim_player .player:not(.minskin):not(.fakeme) .avatar{
+	left:5px;
+	top:5px;
+}
 #arena:not(.mobile).uslim_player .player:not(.minskin):not(.fakeme) .avatar,
 #arena.mobile.uslim_player .player:not(.minskin):not(.fakeme):not(*[data-position='0']) .avatar{
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
@@ -53,6 +57,10 @@
 	left:3px;
 	top:3px;
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
+}
+#arena.uslim_player .player.minskin:not(.fakeme) .avatar:not(.fakeme){
+	left:5px;
+	top:5px;
 }
 .player.minskin .hp,
 .player.minskin .hp.text{
@@ -144,6 +152,10 @@
 	height: 174px;
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
 }
+#arena.lslim_player .player.fullskin2:not(.minskin) .avatar2{
+	top:5px;
+	right:5px;
+}
 .player .marks,
 .player .judges{
 	width:36px;
@@ -230,7 +242,9 @@
 }
 
 #arena.mobile.uslim_player .player:not([data-position='0'])>.count,
-#arena:not(.mobile).uslim_player .player>.count{
+#arena.mobile.lslim_player .player:not([data-position='0'])>.count,
+#arena:not(.mobile).uslim_player .player>.count,
+#arena:not(.mobile).lslim_player .player>.count{
     z-index: 3 !important;
     border-radius: 2px !important;
     text-align: center !important;
