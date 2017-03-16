@@ -639,7 +639,10 @@ card.guozhan={
 		feilongduofeng2:{
 			trigger:{source:'dieAfter'},
 			filter:function(event,player){
-				return event.player.isDead()&&lib.group.contains(player.identity)&&player.isMinor();
+				if(event.reason&&event.reason.card&&event.reason.card.name=='sha'){
+					return event.player.isDead()&&lib.group.contains(player.identity)&&player.isMinor();
+				}
+				return false;
 			},
 			logTarget:'player',
 			content:function(){

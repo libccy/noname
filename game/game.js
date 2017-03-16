@@ -26415,7 +26415,19 @@
 									}
 								}
 								lib.config.customcardpile[name]=[lib.config.bannedpile,lib.config.addedpile];
-								game.saveConfig('cardpilename',name,true);
+								delete lib.config.customcardpile['当前牌堆'];
+								for(var i in lib.mode){
+									if(lib.config.mode_config[i]&&
+										(lib.config.mode_config[i].cardpilename=='当前牌堆'||!lib.config.mode_config[i].cardpilename)){
+										game.saveConfig('cardpilename',name,i);
+									}
+								}
+								for(var i=0;i<page.childElementCount;i++){
+									if(page.childNodes[i].link=='当前牌堆'){
+										page.childNodes[i].remove();
+										break;
+									}
+								}
 								game.saveConfig('customcardpile',lib.config.customcardpile);
 								createPileNode(name);
 								createList();
