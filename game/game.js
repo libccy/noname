@@ -23976,17 +23976,26 @@
 	                }
 	                popupContainer.appendChild(node);
                     var rect=node.getBoundingClientRect();
-                    if(get.is.phoneLayout()&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
-                        node.style.top=(ui.window.offsetHeight-20-rect.height*1.3)/1.3+'px';
-                    }
-					else if(node.classList.contains('visual')){
+                    if(node.classList.contains('visual')){
 						node.style.top=(e.y-node.offsetHeight/2+30)+'px';
 						for(var i=0;i<node.childElementCount;i++){
 							if(node.childNodes[i].update){
 								node.childNodes[i].update();
 							}
 						}
+						if(node.childElementCount>9){
+							node.style.overflow='scroll';
+						}
+						else{
+							node.style.overflow='';
+						}
+						if(node.offsetTop<10){
+							node.style.top='10px';
+						}
 					}
+					else if(get.is.phoneLayout()&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
+                        node.style.top=(ui.window.offsetHeight-20-rect.height*1.3)/1.3+'px';
+                    }
 	                popupContainer.classList.remove('hidden');
 	                popupContainer.onclose=onclose;
 	            };

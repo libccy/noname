@@ -2495,8 +2495,8 @@ character.swd={
 			filter:function(event,player){
 				return event.source&&event.card&&event.card.name=='sha'&&event.source!=player;
 			},
+			logTarget:'source',
 			content:function(){
-                player.line(trigger.source,'green');
 				trigger.source.draw();
 			},
 			ai:{
