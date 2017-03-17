@@ -445,6 +445,12 @@
 						name:'主题',
 						init:'woodden',
 						item:{},
+						visualMenu:function(node,link){
+							if(!node.menu){
+								node.className='button character themebutton '+link;
+								node.menu=ui.create.div(node,'','<div></div><div></div><div></div><div></div>');
+							}
+						},
 						onclick:function(theme){
 							game.saveConfig('theme',theme);
 							ui.arena.hide();
@@ -465,6 +471,126 @@
 							mobile:'默认',
                             long:'新版',
                             long2:'手杀',
+						},
+						visualMenu:function(node,link){
+							node.className='button character themebutton '+lib.config.theme;
+							if(!node.created){
+								node.created=true;
+								node.style.overflow='hidden';
+								node.firstChild.style.display='none';
+								// node.firstChild.classList.add('shadowed');
+								// node.firstChild.style.width='16px';
+								// node.firstChild.style.height='auto';
+								// node.firstChild.style.padding='2px';
+								// node.firstChild.style.textAlign='center';
+								var me=ui.create.div(node);
+								me.style.top='auto';
+								if(link=='default'||link=='newlayout'){
+									me.style.width='calc(100% - 6px)';
+									me.style.left='3px';
+									me.style.bottom='3px';
+									me.style.height='25px';
+								}
+								else if(link=='long2'){
+									me.style.display='none';
+								}
+								else{
+									me.style.width='120%';
+									me.style.left='-10%';
+									me.style.bottom='0';
+									me.style.height='22px';
+								}
+								for(var i=0;i<4;i++){
+									var player=ui.create.div('.fakeplayer',node);
+									if(i!=3){
+										player.style.top='auto';
+									}
+									if(link=='default'){
+										player.style.height='19px';
+										player.style.width='38px';
+									}
+									else if(link=='mobile'||link=='newlayout'){
+										player.style.width='24px';
+										player.style.height='29px';
+									}
+									else{
+										player.style.width='20px';
+										player.style.height='34px';
+									}
+									if(i==1){
+										player.style.left='3px';
+									}
+									if(i==2){
+										player.style.left='auto';
+										player.style.right='3px';
+									}
+									if(i==3){
+										player.style.top='3px';
+									}
+									if(link=='default'){
+										if(i==0){
+											player.style.bottom='6px';
+										}
+										if(i==0||i==3){
+											player.style.left='calc(50% - 18px)';
+										}
+										if(i==1||i==2){
+											player.style.bottom='36px';
+										}
+									}
+									else if(link=='newlayout'){
+										if(i==0){
+											player.style.bottom='1px';
+										}
+										if(i==0||i==3){
+											player.style.left='calc(50% - 12px)';
+										}
+										if(i==1||i==2){
+											player.style.bottom='32px';
+										}
+									}
+									else if(link=='mobile'){
+										if(i==0||i==3){
+											player.style.left='calc(50% - 12px)';
+										}
+										if(i==1||i==2){
+											player.style.bottom='30px';
+										}
+										if(i==0){
+											player.style.borderRadius='0px';
+											player.style.left='-2px';
+											player.style.bottom='-7px';
+										}
+									}
+									else if(link=='long'){
+										if(i==0||i==3){
+											player.style.left='calc(50% - 10px)';
+										}
+										if(i==1||i==2){
+											player.style.bottom='30px';
+										}
+										if(i==0){
+											player.style.borderRadius='0px';
+											player.style.left='-2px';
+											player.style.width='24px';
+											player.style.height='29px';
+											player.style.bottom='-7px';
+										}
+									}
+									else if(link=='long2'){
+										if(i==0){
+											player.style.bottom='2px';
+											player.style.left='3px';
+										}
+										if(i==3){
+											player.style.left='calc(50% - 10px)';
+										}
+										if(i==1||i==2){
+											player.style.bottom='41px';
+										}
+									}
+								}
+							}
 						},
 						onclick:function(layout){
 							if(lib.layoutfixed.contains(lib.config.mode)){
@@ -578,6 +704,37 @@
 						item:{
 							default:'默认',
 							custom:'自定',
+						},
+						visualMenu:function(node,link,name,config){
+							node.className='button character';
+							node.style.backgroundImage='';
+							node.style.backgroundSize='';
+							if(link=='default'||link=='custom'){
+								if(lib.config.theme=='simple'){
+									node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
+								}
+								else{
+									node.style.backgroundImage='none';
+									node.classList.add('dashedmenubutton');
+								}
+								if(link=='custom'){
+									game.getDB('image','background',function(fileToLoad){
+										if(!fileToLoad) return;
+										var fileReader = new FileReader();
+										fileReader.onload = function(fileLoadedEvent)
+										{
+											var data = fileLoadedEvent.target.result;
+											node.style.backgroundImage='url('+data+')';
+											node.style.backgroundSize='cover';
+										};
+										fileReader.readAsDataURL(fileToLoad, "UTF-8");
+									});
+								}
+							}
+							else{
+								node.setBackgroundImage('image/background/'+link+'.jpg');
+								node.style.backgroundSize='cover';
+							}
 						},
 						onclick:function(background){
 							var animate=lib.config.image_background=='default';
@@ -23816,6 +23973,14 @@
                     if(get.is.phoneLayout()&&rect.top*1.3+rect.height*1.3+20>ui.window.offsetHeight){
                         node.style.top=(ui.window.offsetHeight-20-rect.height*1.3)/1.3+'px';
                     }
+					else if(node.classList.contains('visual')){
+						node.style.top=(e.y-node.offsetHeight/2+30)+'px';
+						for(var i=0;i<node.childElementCount;i++){
+							if(node.childNodes[i].update){
+								node.childNodes[i].update();
+							}
+						}
+					}
 	                popupContainer.classList.remove('hidden');
 	                popupContainer.onclose=onclose;
 	            };
@@ -23969,6 +24134,9 @@
 						node.classList.add('pointerspan');
 					}
 	                if(config.item){
+						if(typeof config.item=='function'){
+							config.item=config.item();
+						}
 	                    if(Array.isArray(config.init)){
 
 	                    }
@@ -23976,12 +24144,30 @@
 	                        node.classList.add('switcher');
 	                        node.listen(clickSwitcher);
 	                        ui.create.div('',config.item[config.init],node);
-	                        node._link.menu=ui.create.div('.menu');
+							node._link.menu=ui.create.div('.menu');
+							if(config.visualMenu){
+								node._link.menu.classList.add('visual');
+								for(var i in config.item){
+									var visualMenu=ui.create.div();
+									var updateVisual=function(){
+										config.visualMenu(this,this._link,config.item[this._link],config);
+									};
+									ui.create.div('.name',get.verticalStr(config.item[i]),visualMenu);
+									visualMenu._link=i;
+									if(config.visualMenu(visualMenu,i,config.item[i],config)!==false){
+										visualMenu.listen(clickMenuItem);
+									}
+									visualMenu.update=updateVisual;
+									node._link.menu.appendChild(visualMenu);
+		                        }
+							}
+	                        else{
+		                        for(var i in config.item){
+		                            ui.create.div('',config.item[i],node._link.menu,clickMenuItem)._link=i;
+		                        }
+							}
 							node._link.menu._link=node;
-	                        node._link.current=config.init;
-	                        for(var i in config.item){
-	                            ui.create.div('',config.item[i],node._link.menu,clickMenuItem)._link=i;
-	                        }
+							node._link.current=config.init;
 	                    }
 	                }
 	                else if(config.range){

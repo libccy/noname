@@ -51,7 +51,7 @@ background.pack={
     zhulin_bg:'竹林',
     shengshi_bg:'盛世',
     taoyuan_bg:'桃园',
-    september_bg:'九月',
+    zhanhuo_bg:'战火',
     yinxiang_bg:'印象',
     huangtian_bg:'黄天',
 };

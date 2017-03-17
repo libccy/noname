@@ -474,6 +474,10 @@
 	max-height: 400px;
 	transition-property: opacity;
 }
+.popup-container>.menu.visual{
+	padding: 5px;
+	max-width: 300px;
+}
 .popup-container>.menu>div{
 	padding-top:5px;
 	padding-bottom:5px;
@@ -482,6 +486,92 @@
     position: relative;
     display: block;
     transition: all 0s;
+}
+.popup-container>.menu.visual>.dashedmenubutton{
+	box-shadow: none !important;
+	width: 86px;
+	height: 86px;
+	border: 2px dashed rgb(40,40,40);
+}
+.themebutton>div{
+	width:50px;
+	height:76px;
+	top:7px;
+	right:7px;
+	border-radius:4px;
+}
+.themebutton>div>div{
+	width:calc(100% - 10px);
+	height:12px;
+	display:block;
+	margin-left:5px;
+	margin-top:6px;
+	position:relative;
+	border-radius:2px;
+	box-shadow:rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px;
+	transition: all 0s;
+}
+.themebutton>div:first-child{
+	z-index: 2;
+}
+.themebutton.woodden{
+	background:url('../../theme/woodden/grid.png'),linear-gradient(#6c7989, #434b55) fixed;
+}
+.themebutton.woodden>div:not(*:first-child){
+	background: url('../../theme/woodden/wood2.png');
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+}
+.themebutton.woodden>div.fakeplayer:not(*:first-child){
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0px 10px;
+}
+.themebutton.woodden>div>div{
+	background: url('../../theme/woodden/wood.png');
+}
+.themebutton.woodden>div>div:hover,.themebutton.woodden>div>div.active{
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
+}
+.themebutton.music{
+	background:url('../../theme/music/grid.png'),linear-gradient(#333333, #222222) fixed;
+}
+.themebutton.music>div:not(*:first-child){
+	background: linear-gradient(#4b4b4b, #464646);
+	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+}
+.themebutton.music>div>div{
+	background: linear-gradient(#4b4b4b, #464646);
+}
+.themebutton.simple{
+	background:url('../../image/background/shengshi_bg.jpg');
+	background-size: cover;
+}
+.themebutton.simple>div:not(*:first-child){
+	background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
+	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+}
+.themebutton.simple>div>div{
+	background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
+}
+.themebutton.simple>div>div:hover,
+.themebutton.simple>div>div.active,
+.themebutton.music>div>div:hover,
+.themebutton.music>div>div.active{
+	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
+}
+.themebutton>div>div:first-child{
+	margin-top:5px;
+}
+#window:not(.nopointer) .popup-container>.menu>div{
+	cursor: pointer;
+}
+.popup-container>.menu.visual>div{
+	display: inline-block;
+	margin:5px !important;
+	padding: 0 !important;
+	width: 90px;
+	height: 90px;
+}
+.popup-container>.menu.visual>.button.character>.name{
+	top: 10px;
 }
 .popup-container>.menu>div:first-child{
 	margin-top:5px;
@@ -814,7 +904,7 @@
 	box-shadow: rgba(51, 51, 51, 1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
 }
 
-.popup-container>.menu>div:hover{
+.popup-container>.menu:not(.visual)>div:hover{
     color:white;
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 	box-shadow: rgba(0,0,0,0.2) 0 0 0 1px;

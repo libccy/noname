@@ -33,6 +33,11 @@ html{
 	color:rgba(77, 60, 51,0.8);
 	text-shadow:none;
 }
+.popup-container>.menu.visual>.dashedmenubutton{
+	color:rgba(77, 60, 51,0.8);
+	text-shadow: none;
+	border-color:rgba(77, 60, 51,0.8);
+}
 .cardbg{
 	background-size: initial !important;
 }
@@ -144,6 +149,9 @@ html{
 .menubutton.round.active{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
 }
+.themebutton{
+	box-shadow: rgba(0, 0, 0, 0.45) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important;
+}
 .config.toggle>div>div{
 	background: url('wood.png');
 	box-shadow: rgba(151, 151, 151, 1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
@@ -160,7 +168,7 @@ html{
 	line-height: 26px;
 	font-family: 'xinwei'
 }
-.popup-container>.menu>div:hover{
+.popup-container>.menu:not(.visual)>div:hover{
     color:white;
 	background-image: linear-gradient(rgb(0, 133, 255), rgb(5, 119, 220));
 	box-shadow: none;
