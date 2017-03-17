@@ -452,7 +452,8 @@ mode.chess={
 		ui.chessinfo=ui.create.div('.fakeme.player',ui.me,function(e){
 			e.stopPropagation();
 		});
-		lib.setScroll(ui.chessinfo);
+		ui.create.div(ui.chessinfo);
+		lib.setScroll(ui.chessinfo.firstChild);
 
 		game.arrangePlayers();
 		"step 3"
@@ -1949,10 +1950,10 @@ mode.chess={
 					p=game.me;
 				}
 			}
-			ui.chessinfo.innerHTML='';
+			ui.chessinfo.firstChild.innerHTML='';
 			ui.phasequeue=[];
 			for(var i=0;i<game.players.length;i++){
-				var node=ui.create.div('.avatar',ui.chessinfo);
+				var node=ui.create.div('.avatar',ui.chessinfo.firstChild);
 				node.style.backgroundImage=p.node.avatar.style.backgroundImage;
 				node.link=p;
 				node.listen(ui.click.chessInfo);
@@ -4948,13 +4949,13 @@ mode.chess={
 			forced:true,
 			popup:false,
 			content:function(){
-				var current=ui.chessinfo.querySelector('.glow2');
+				var current=ui.chessinfo.firstChild.querySelector('.glow2');
 				if(current){
 					current.classList.remove('glow2');
 				}
 				if(player.instance){
 					player.instance.classList.add('glow2');
-					ui.chessinfo.scrollTop=player.instance.offsetTop-8;
+					ui.chessinfo.firstChild.scrollTop=player.instance.offsetTop-8;
 				}
 			}
 		},

@@ -166,6 +166,10 @@
     transition-duration: 0.5s;
     pointer-events: auto;
 }
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.avatar,
+#arena:not(.chess) .player[data-position='0']:not(.minskin)>.equips{
+    -webkit-clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
+}
 #arena:not(.chess) .player[data-position='0']:not(.minskin)>.identity{
     pointer-events: auto;
 }

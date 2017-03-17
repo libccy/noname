@@ -33,7 +33,7 @@
 }
 #chess-container{
     width:100%;
-    height :calc(100% - 120px);
+    height :calc(100% - 121px);
     left:0;
     top:0;
     overflow:scroll;
@@ -116,9 +116,9 @@
 }
 .fakeme.player{
     left:calc(100% - 120px);
-    overflow:scroll;
     text-align:center;
     transition: all 0s;
+    -webkit-clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
 }
 .fakeme.player.zoomed{
     width: 240px;
@@ -127,7 +127,16 @@
     top:calc(100% - 240px);
     background-size:200%;
 }
-.fakeme.player.zoomed>div{
+.fakeme.player>div{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: scroll;
+    left: 0;
+    top: 0;
+}
+.fakeme.player.zoomed>div>div{
     width: 90px;
     height: 90px;
     left: 0;
@@ -136,7 +145,7 @@
     margin-right: 8px;
     margin-bottom: 16px;
 }
-.fakeme.player>div{
+.fakeme.player>div>div{
     width:45px;
     height:45px;
     background-size:cover;
@@ -149,14 +158,17 @@
     margin-bottom: 8px;
     transition:box-shadow 0.5s;
 }
+#window:not(.nopointer) .fakeme.player>div>div{
+    cursor: pointer;
+}
 
-.fakeme.player>.selectable{
+.fakeme.player>div>.selectable{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 1) 0 0 5px, rgba(0, 133, 255, 1) 0 0 10px;
 }
-.fakeme.player>.selected{
+.fakeme.player>div>.selected{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(255, 0, 0, 1) 0 0 5px, rgba(255, 0, 0, 1) 0 0 10px !important;
 }
-.fakeme.player>.dead{
+.fakeme.player>div>.dead{
     filter:grayscale(1);
     -webkit-filter:grayscale(1);
     opacity:0.5;
