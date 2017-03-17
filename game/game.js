@@ -490,6 +490,10 @@
 									me.style.left='3px';
 									me.style.bottom='3px';
 									me.style.height='25px';
+									if(link=='newlayout'){
+										me.style.height='23px';
+										me.style.bottom='4px';
+									}
 								}
 								else if(link=='long2'){
 									me.style.display='none';
@@ -500,14 +504,19 @@
 									me.style.bottom='0';
 									me.style.height='22px';
 								}
+								me.style.borderRadius='2px';
+								var list=['re_caocao','re_liubei','sp_zhangjiao','sunquan'];
 								for(var i=0;i<4;i++){
 									var player=ui.create.div('.fakeplayer',node);
+									ui.create.div('.avatar',player).setBackground(list.randomRemove(),'character');
+									player.style.borderRadius='2px';
 									if(i!=3){
 										player.style.top='auto';
 									}
 									if(link=='default'){
 										player.style.height='19px';
 										player.style.width='38px';
+										player.classList.add('oldlayout')
 									}
 									else if(link=='mobile'||link=='newlayout'){
 										player.style.width='24px';
@@ -556,11 +565,6 @@
 										if(i==1||i==2){
 											player.style.bottom='30px';
 										}
-										if(i==0){
-											player.style.borderRadius='0px';
-											player.style.left='-2px';
-											player.style.bottom='-7px';
-										}
 									}
 									else if(link=='long'){
 										if(i==0||i==3){
@@ -568,13 +572,6 @@
 										}
 										if(i==1||i==2){
 											player.style.bottom='30px';
-										}
-										if(i==0){
-											player.style.borderRadius='0px';
-											player.style.left='-2px';
-											player.style.width='24px';
-											player.style.height='29px';
-											player.style.bottom='-7px';
 										}
 									}
 									else if(link=='long2'){
@@ -588,6 +585,15 @@
 										if(i==1||i==2){
 											player.style.bottom='41px';
 										}
+									}
+
+									if(i==0&&(link=='mobile'||link=='long')){
+										player.classList.add('me');
+										player.style.borderRadius='0px';
+										player.style.width='25px';
+										player.style.height='25px';
+										player.style.bottom='-3px';
+										player.style.left='-3px';
 									}
 								}
 							}

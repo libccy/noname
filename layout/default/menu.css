@@ -527,7 +527,7 @@
 .themebutton.woodden>div>div{
 	background: url('../../theme/woodden/wood.png');
 }
-.themebutton.woodden>div>div:hover,.themebutton.woodden>div>div.active{
+.themebutton.woodden>div>div:not(.avatar):hover,.themebutton.woodden>div>div.active{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 .themebutton.music{
@@ -551,14 +551,39 @@
 .themebutton.simple>div>div{
 	background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
 }
-.themebutton.simple>div>div:hover,
+.themebutton.simple>div>div:not(.avatar):hover,
 .themebutton.simple>div>div.active,
-.themebutton.music>div>div:hover,
+.themebutton.music>div>div:not(.avatar):hover,
 .themebutton.music>div>div.active{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 }
 .themebutton>div>div:first-child{
 	margin-top:5px;
+}
+.themebutton>.fakeplayer>.avatar{
+	width: calc(100% - 2px);
+	height: calc(100% - 2px);
+	left: 1px;
+	top: 1px;
+	border-radius: 2px;
+	position: absolute;
+	margin: 0 !important;
+	padding: 0;
+	box-shadow: rgba(0,0,0,0.2) 0 0 0 1px inset;
+}
+.themebutton>.fakeplayer.oldlayout>.avatar{
+	width: calc(50% - 2px);
+}
+.themebutton>.fakeplayer.me>.avatar{
+	width: 22px;
+	height: 22px;
+	left: 3px;
+	top: 0;
+	box-shadow: none;
+	border-radius: 0px;
+}
+.themebutton>.fakeplayer.me{
+	-webkit-clip-path: polygon(-10px 0, 32px 0, 32px 32px, -10px 32px);
 }
 #window:not(.nopointer) .popup-container>.menu>div{
 	cursor: pointer;

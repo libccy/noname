@@ -184,6 +184,7 @@
     top:0;
     left:0;
     background-size:cover;
+    -webkit-clip-path: polygon(-10px 0, 130px 0, 130px 130px, -10px 130px);
 }
 #window[data-radius_size='increase'] #me>.fakeme.avatar,
 #window[data-radius_size='reduce'] #me>.fakeme.avatar{
