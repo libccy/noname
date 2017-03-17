@@ -6821,6 +6821,12 @@ character.sp={
 				return ui.selected.cards.length;
 			},
 			check:function(card){
+				var player=_status.event.player;
+				if(ui.selected.cards.length>=game.countPlayer(function(current){
+					return ai.get.attitude(player,current)>0&&current.isDamaged();
+				})){
+					return -1;
+				}
 				if(get.color(card)=='black') return -1;
 				return 9-ai.get.value(card);
 			},

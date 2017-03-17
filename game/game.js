@@ -23255,8 +23255,9 @@
             else if(Array.isArray(card)){
                 node.cards=card[1];
                 card=card[0];
-                if(!Array.isArray(node.cards)){
-                    node.cards=[];
+				var info=[card.suit||'',card.number||'',card.name||'',card.nature||''];
+                if(!Array.isArray(node.cards)||!node.cards.length){
+                    node.cards=[ui.create.card(node,'noclick',true).init(info)];
                 }
                 if(card.name=='wuxie'){
                     if(ui.historybar.firstChild&&ui.historybar.firstChild.type=='wuxie'){
@@ -23273,7 +23274,6 @@
                     card.copy(node,false);
                 }
                 else{
-                    var info=[card.suit||'',card.number||'',card.name||'',card.nature||''];
                     card=ui.create.card(node,'noclick',true);
                     card.init(info);
                 }
@@ -23332,9 +23332,9 @@
                 node.addEventListener('touchstart',ui.click.intro);
             }
             else{
-                node.addEventListener('mouseenter',ui.click.intro);
-				// node.addEventListener('mousemove',ui.click.logv);
-				// node.addEventListener('mouseleave',ui.click.logvleave);
+                // node.addEventListener('mouseenter',ui.click.intro);
+				node.addEventListener('mousemove',ui.click.logv);
+				node.addEventListener('mouseleave',ui.click.logvleave);
             }
             node.logvid=logvid;
             node.added=[];
@@ -34502,19 +34502,36 @@
 			},
 			logv:function(e){
 				if(_status.currentlogv){
-					clearTimeout(_status.currentlogv.logvtimeout);
-					delete _status.currentlogv.logvtimeout;
+					if(_status.currentlogv==this) return;
+					if(_status.logvtimeout){
+						clearTimeout(_status.logvtimeout);
+					}
+					var that=this;
+					_status.logvtimeout=setTimeout(function(){
+						if(!_status.currentlogv){
+							_status.currentlogv=that;
+							ui.click.intro.call(that,e);
+						}
+					},200);
+					this.logvtimeout=_status.logvtimeout;
 				}
-				var that=this;
-				_status.currentlogv=that;
-				that.logvtimeout=setTimeout(function(){
-					ui.click.intro.call(that,e);
-				},200);
+				else{
+					_status.currentlogv=this;
+					ui.click.intro.call(this,e);
+				}
 			},
 			logvleave:function(){
-				if(_status.currentlogv){
-					clearTimeout(_status.currentlogv.logvtimeout);
-					delete _status.currentlogv.logvtimeout;
+				if(_status.currentlogv==this){
+					setTimeout(function(){
+						delete _status.currentlogv;
+					},150);
+				}
+				if(this.logvtimeout){
+					clearTimeout(this.logvtimeout);
+					if(_status.logvtimeout==this.logvtimeout){
+						delete _status.logvtimeout;
+					}
+					delete this.logvtimeout;
 				}
 			},
 			charactercard:function(name,sourcenode,noedit){
@@ -34811,6 +34828,7 @@
 					uiintro.delete();
 					this.remove();
                     ui.historybar.style.zIndex='';
+					delete _status.currentlogv;
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
 					e.stopPropagation();
 					return false;
@@ -34837,6 +34855,7 @@
 					layer.remove();
 					this.delete();
                     ui.historybar.style.zIndex='';
+					delete _status.currentlogv;
 					if(!ui.arena.classList.contains('menupaused')) game.resume2();
 				};
                 var currentpop=this;

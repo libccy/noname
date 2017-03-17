@@ -158,6 +158,7 @@ character.refresh={
 				result:{
 					target:function(player,target){
 						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							if(target.hasSkillTag('nodu')) return 0;
 							return -10;
 						}
 						if(target.num('j','lebu')) return 0;
@@ -503,6 +504,7 @@ character.refresh={
 					ai2:function(target){
 						var att=ai.get.attitude(_status.event.player,target);
 						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							if(target.hasSkillTag('nodu')) return 0;
 							return 1-att;
 						}
 						if(target.num('h')>_status.event.player.num('h')) return 0;
@@ -769,6 +771,7 @@ character.refresh={
 					player.chooseTarget('选择获得此牌的角色').set('ai',function(target){
 						var att=ai.get.attitude(_status.event.player,target);
 						if(_status.event.du){
+							if(target.hasSkillTag('nodu')) return 0;
 							return -att;
 						}
 						if(att>0){
@@ -902,6 +905,7 @@ character.refresh={
 					ai2:function(target){
 						var att=ai.get.attitude(_status.event.player,target);
 						if(ui.selected.cards.length&&ui.selected.cards[0].name=='du'){
+							if(target.hasSkillTag('nodu')) return 0;
 							return 1-att;
 						}
 						return att-4;
