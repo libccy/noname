@@ -23858,7 +23858,6 @@
 	            };
 				var clickContainer=function(){
 					menuContainer.classList.add('hidden');
-
                     if(connectMenu){
                         if(_status.enteringroom){
                             _status.enteringroom=false;
