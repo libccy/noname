@@ -46,12 +46,13 @@ body[data-background_color_music='blue'] #arena.mobile:not(.chess) .player[data-
 #arena:not(.long) .player.unseen .equips:not(*:empty),
 #arena.long .player.unseen2 .equips:not(*:empty){
 	border-radius:4px;
+	overflow: hidden;
 }
 
 #arena:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty)>.card,
-#arena:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card,
+#arena:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty)>.card:not(.selected),
 #arena.long.mobile:not(.oldlayout) .player.unseen2:not([data-position="0"]) .equips:not(*:empty)>.card,
-#arena.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty)>.card{
+#arena.long:not(.mobile):not(.oldlayout) .player.unseen2 .equips:not(*:empty)>.card:not(.selected){
 	background: none !important;
 }
 

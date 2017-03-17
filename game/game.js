@@ -9443,8 +9443,22 @@
 				lose:function(){
 					"step 0"
 					var hs=[],es=[],js=[];
+					var hej=player.get('hej');
+					event.stockcards=cards.slice(0);
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].parentNode){
+						cards[i].style.transform+=' scale(0.2)';
+                        cards[i].classList.remove('glow');
+                        cards[i].recheck();
+						if(event.position){
+							cards[i].goto(event.position);
+						}
+						else{
+							cards[i].delete();
+						}
+						if(!hej.contains(cards[i])){
+							cards.splice(i--,1);
+						}
+						else if(cards[i].parentNode){
 							if(cards[i].parentNode.classList.contains('equips')){
 								cards[i].original='e';
 								es.push(cards[i]);
@@ -9461,15 +9475,6 @@
 								cards[i].original=null;
 							}
 						}
-						cards[i].style.transform+=' scale(0.2)';
-                        cards[i].classList.remove('glow');
-                        cards[i].recheck();
-						if(event.position){
-							cards[i].goto(event.position);
-						}
-						else{
-							cards[i].delete();
-						}
 					}
 					if(player==game.me) ui.updatehl();
 					ui.updatej(player);
@@ -9479,18 +9484,6 @@
                             cards[i].delete();
                         }
                         if(player==game.me){
-                            for(var i=player.node.handcards1.childNodes.length-1;i>0;i--){
-        						if(player.node.handcards1.childNodes[i].classList.contains('removing')==false){
-        							player.node.handcards1.childNodes[i].animate('last');
-        							break;
-        						}
-        					}
-        					for(var i=player.node.handcards2.childNodes.length-1;i>0;i--){
-        						if(player.node.handcards2.childNodes[i].classList.contains('removing')==false){
-        							player.node.handcards2.childNodes[i].animate('last');
-        							break;
-        						}
-        					}
                             ui.updatehl();
                         }
 						ui.updatej(player);
@@ -9499,18 +9492,6 @@
 					game.addVideo('lose',player,[get.cardsInfo(hs),get.cardsInfo(es),get.cardsInfo(js)]);
 					player.update();
 					game.addVideo('loseAfter',player);
-					for(var i=player.node.handcards1.childNodes.length-1;i>0;i--){
-						if(player.node.handcards1.childNodes[i].classList.contains('removing')==false){
-							player.node.handcards1.childNodes[i].animate('last');
-							break;
-						}
-					}
-					for(var i=player.node.handcards2.childNodes.length-1;i>0;i--){
-						if(player.node.handcards2.childNodes[i].classList.contains('removing')==false){
-							player.node.handcards2.childNodes[i].animate('last');
-							break;
-						}
-					}
 					event.num=0;
 					"step 1"
 					if(num<cards.length){
@@ -12140,9 +12121,14 @@
 							next.position=arguments[i];
 						}
 					}
-					if(next.cards==undefined) _status.event.next.remove(next);
-					if(next.position==undefined) next.position=ui.discardPile;
-                    next.setContent('lose');
+					if(next.cards==undefined){
+						_status.event.next.remove(next);
+					}
+					else{
+						if(next.position==undefined) next.position=ui.discardPile;
+						next.cards=next.cards.slice(0);
+					}
+					next.setContent('lose');
 					return next;
 				},
 				damage:function(){
@@ -19582,18 +19568,6 @@
 				if(!player){
 					console.log('loseAfter');
 					return;
-				}
-				for(var i=player.node.handcards1.childNodes.length-1;i>0;i--){
-					if(player.node.handcards1.childNodes[i].classList.contains('removing')==false){
-						player.node.handcards1.childNodes[i].animate('last');
-						break;
-					}
-				}
-				for(var i=player.node.handcards2.childNodes.length-1;i>0;i--){
-					if(player.node.handcards2.childNodes[i].classList.contains('removing')==false){
-						player.node.handcards2.childNodes[i].animate('last');
-						break;
-					}
 				}
 			},
 			link:function(player,bool){

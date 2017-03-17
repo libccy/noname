@@ -651,9 +651,9 @@ mode.guozhan={
 						if(!player.storage.zhangwu){
 							player.storage.zhangwu=[];
 						}
-						for(var i=0;i<trigger.cards.length;i++){
-							if(trigger.cards[i].name=='feilongduofeng'){
-								player.storage.zhangwu.add(trigger.cards[i]);
+						for(var i=0;i<trigger.stockcards.length;i++){
+							if(trigger.stockcards[i].name=='feilongduofeng'){
+								player.storage.zhangwu.add(trigger.stockcards[i]);
 							}
 						}
 					}
@@ -665,8 +665,8 @@ mode.guozhan={
 						if(lib.skill.zhangwu_count1.filter(event,player)){
 							return false;
 						}
-						for(var i=0;i<event.cards.length;i++){
-							if(event.cards[i].name=='feilongduofeng'){
+						for(var i=0;i<event.stockcards.length;i++){
+							if(event.stockcards[i].name=='feilongduofeng'){
 								return true;
 							}
 						}
@@ -674,9 +674,9 @@ mode.guozhan={
 					content:function(){
 						'step 0'
 						var list=[];
-						for(var i=0;i<trigger.cards.length;i++){
-							if(trigger.cards[i].name=='feilongduofeng'){
-								list.add(trigger.cards[i]);
+						for(var i=0;i<trigger.stockcards.length;i++){
+							if(trigger.stockcards[i].name=='feilongduofeng'){
+								list.add(trigger.stockcards[i]);
 							}
 						}
 						if(list.length){

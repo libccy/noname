@@ -485,7 +485,7 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 	width: 100%;
 	height: 20px;
 	line-height: 20px;
-	top: 44px;
+	top: 37px;
 	left: 0;
 	text-align: center;
 }
