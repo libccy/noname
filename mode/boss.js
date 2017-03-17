@@ -1072,14 +1072,14 @@ mode.boss={
 				'step 0'
 				var target=trigger.source;
 				if(target.num('h')==0){
-					target.damage();
+					target.damage(2);
 					event.finish();
 				}
 				else{
 					target.chooseControl('discard_card','get_damage',function(){
 						if(ai.get.damageEffect(target,player,target)>=0) return 'get_damage';
 						var nh=target.num('h');
-						if(nh==1||target.hp<=2||target.hasSkillTag('noh')) return 'discard_card';
+						if(nh<=3||target.hp<=3||target.hasSkillTag('noh')) return 'discard_card';
 						return 'get_damage';
 					})
 				}
@@ -1089,7 +1089,7 @@ mode.boss={
 					target.discard(target.get('h'));
 				}
 				else{
-					target.damage();
+					target.damage(2);
 				}
 			},
 			ai:{
@@ -3604,7 +3604,7 @@ mode.boss={
 		xiaoxiong:'枭雄',
 		xiaoxiong_info:'锁定技，每当一名其他角色使用一张基本牌或锦囊牌，你获得一张与之同名的牌',
 		boss_zhangwu:'章武',
-		boss_zhangwu_info:'每当你受到一次伤害，你可以令伤害来源选择一项：弃置所有手牌，或受到一点伤害',
+		boss_zhangwu_info:'每当你受到一次伤害，你可以令伤害来源选择一项：弃置所有手牌（至少一张），或受到两点伤害',
 		xiangxing:'禳星',
 		xiangxing_info:'锁定技，游戏开始时，你获得7枚星；每当你累计扣减7点体力，你失去一枚星，并造成7点雷属性伤害，随机分配给其他角色；当你失去全部星后，你的体力上限变为3',
 		yueyin:'月隐',
