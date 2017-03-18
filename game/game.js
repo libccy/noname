@@ -1019,6 +1019,7 @@
 										lib.configMenu.appearence.config.card_style.onclick('default');
 										switcher.lastChild.innerHTML='默认';
 									}
+									button.classList.add('transparent');
 								}
 							});
 						},
@@ -1156,6 +1157,7 @@
 										lib.configMenu.appearence.config.cardback_style.onclick('default');
 										switcher.lastChild.innerHTML='默认';
 									}
+									button.classList.add('transparent');
 								}
 							});
 						},
