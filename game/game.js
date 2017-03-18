@@ -970,7 +970,7 @@
                             simple:'原版',
 							// new:'新版',
 						},
-						visualBar:function(node,item,create){
+						visualBar:function(node,item,create,switcher){
 							if(node.created){
 								node.lastChild.classList.remove('active');
 								return;
@@ -1015,6 +1015,10 @@
 									button.style.backgroundImage='none';
 									button.className='button character dashedmenubutton';
 									node.classList.remove('showdelete');
+									if(lib.config.card_style=='custom'){
+										lib.configMenu.appearence.config.card_style.onclick('default');
+										switcher.lastChild.innerHTML='默认';
+									}
 								}
 							});
 						},
@@ -1039,6 +1043,7 @@
 								case 'simple':node.setBackgroundImage('theme/simple/card.png');break;
 							}
 							if(link=='custom'){
+								node.classList.add('transparent');
 								game.getDB('image','card_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
@@ -1048,6 +1053,7 @@
 										node.style.backgroundImage='url('+data+')';
 										node.className='button card fullskin';
 										node.parentNode.lastChild.classList.add('showdelete');
+										node.classList.remove('transparent');
 									};
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
@@ -1092,7 +1098,7 @@
 							// feicheng:'废城',
 							liusha:'流沙',
 						},
-						visualBar:function(node,item,create){
+						visualBar:function(node,item,create,switcher){
 							if(node.created){
 								node.lastChild.classList.remove('active');
 								return;
@@ -1146,6 +1152,10 @@
 									button.className='button character dashedmenubutton';
 									node.classList.remove('showdelete');
 									node.classList.remove('hideadd');
+									if(lib.config.cardback_style=='custom'){
+										lib.configMenu.appearence.config.cardback_style.onclick('default');
+										switcher.lastChild.innerHTML='默认';
+									}
 								}
 							});
 						},
@@ -1171,6 +1181,7 @@
 								case 'music':node.className='button card fullskin';node.setBackgroundImage('theme/music/wood3.png');break;
 							}
 							if(link=='custom'){
+								node.classList.add('transparent');
 								game.getDB('image','cardback_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
@@ -1180,6 +1191,7 @@
 										node.style.backgroundImage='url('+data+')';
 										node.className='button character';
 										node.parentNode.lastChild.classList.add('showdelete');
+										node.classList.remove('transparent');
 										game.getDB('image','cardback_style2',function(file){
 											if(file){
 												node.parentNode.lastChild.classList.add('hideadd');
@@ -24658,9 +24670,9 @@
 										this.parentNode.parentNode.noclose=true;
 									});
 									node._link.menu.classList.add('withbar');
-									config.visualBar(visualBar,config.item,createNode);
+									config.visualBar(visualBar,config.item,createNode,node);
 									visualBar.update=function(){
-										config.visualBar(visualBar,config.item,createNode);
+										config.visualBar(visualBar,config.item,createNode,node);
 									}
 								}
 								for(var i in config.item){

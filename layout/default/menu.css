@@ -487,6 +487,9 @@
     display: block;
     transition: all 0s;
 }
+.popup-container>.menu.visual>.button.transparent{
+	pointer-events: none;
+}
 .popup-container>.menu.visual>.dashedmenubutton{
 	box-shadow: none !important;
 	width: 86px;
