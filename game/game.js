@@ -1058,6 +1058,23 @@
 							var style=ui.css.card_style;
 							ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
 							style.remove();
+							if(ui.css.card_stylesheet){
+								ui.css.card_stylesheet.remove();
+								delete ui.css.card_stylesheet;
+							}
+							if(layout=='custom'){
+								game.getDB('image','card_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.card_stylesheet){
+											ui.css.card_stylesheet.remove();
+										}
+										ui.css.card_stylesheet=lib.init.sheet('.card:not(*:empty){background-image:url('+fileLoadedEvent.target.result+')}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
 						},
 						unfrequent:true,
 					},
@@ -1178,6 +1195,38 @@
 							var style=ui.css.cardback_style;
 							ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
 							style.remove();
+							if(ui.css.cardback_stylesheet){
+								ui.css.cardback_stylesheet.remove();
+								delete ui.css.cardback_stylesheet;
+							}
+							if(ui.css.cardback_stylesheet2){
+								ui.css.cardback_stylesheet2.remove();
+								delete ui.css.cardback_stylesheet2;
+							}
+							if(layout=='custom'){
+								game.getDB('image','cardback_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.cardback_stylesheet){
+											ui.css.cardback_stylesheet.remove();
+										}
+										ui.css.cardback_stylesheet=lib.init.sheet('.card:empty,.card.infohidden{background-image:url('+fileLoadedEvent.target.result+')}');
+										game.getDB('image','cardback_style2',function(fileToLoad){
+											if(!fileToLoad) return;
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent){
+												if(ui.css.cardback_stylesheet2){
+													ui.css.cardback_stylesheet2.remove();
+												}
+												ui.css.cardback_stylesheet2=lib.init.sheet('.card.infohidden:not(.infoflip){background-image:url('+fileLoadedEvent.target.result+')}');
+											};
+											fileReader.readAsDataURL(fileToLoad, "UTF-8");
+										});
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
 						},
 						unfrequent:true,
 					},
@@ -5592,6 +5641,43 @@
 							fileReader.readAsDataURL(fileToLoad, "UTF-8");
 						});
 					}
+					if(lib.config.card_style=='custom'){
+						game.getDB('image','card_style',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.card_stylesheet){
+									ui.css.card_stylesheet.remove();
+								}
+								ui.css.card_stylesheet=lib.init.sheet('.card:not(*:empty){background-image:url('+fileLoadedEvent.target.result+')}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
+					if(lib.config.cardback_style=='custom'){
+						game.getDB('image','cardback_style',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.cardback_stylesheet){
+									ui.css.cardback_stylesheet.remove();
+								}
+								ui.css.cardback_stylesheet=lib.init.sheet('.card:empty,.card.infohidden{background-image:url('+fileLoadedEvent.target.result+')}');
+								game.getDB('image','cardback_style2',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.cardback_stylesheet2){
+											ui.css.cardback_stylesheet2.remove();
+										}
+										ui.css.cardback_stylesheet2=lib.init.sheet('.card.infohidden:not(.infoflip){background-image:url('+fileLoadedEvent.target.result+')}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
 				});
 
 				var proceed=function(){
@@ -6120,6 +6206,16 @@
                 });
                 client.send('opened');
             },
+			sheet:function(){
+				var style=document.createElement('style');
+				document.head.appendChild(style);
+				for(var i=0;i<arguments.length;i++){
+					if(typeof arguments[i]=='string'){
+						style.sheet.insertRule(arguments[i],0);
+					}
+				}
+				return style;
+			},
 			css:function(path,file,before){
 				var style = document.createElement("link");
 			    style.rel = "stylesheet";
