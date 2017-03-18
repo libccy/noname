@@ -1086,12 +1086,13 @@
 						item:{
 							default:'默认',
 							custom:'自定',
-							// wood:'木纹',
-							// music:'音乐',
+							wood:'木纹',
+							music:'音乐',
                             official:'原版',
 							// new:'新版',
 							// feicheng:'废城',
 							liusha:'流沙',
+							ol:'手杀',
 						},
 						visualBar:function(node,item,create,switcher){
 							if(node.created){
@@ -1167,6 +1168,7 @@
 								case 'feicheng':node.className='button character';node.setBackgroundImage('theme/style/cardback/image/feicheng.png');break;
 								case 'official':node.className='button character';node.setBackgroundImage('theme/style/cardback/image/official.png');break;
 								case 'liusha':node.className='button character';node.setBackgroundImage('theme/style/cardback/image/liusha.png');break;
+								case 'ol':node.className='button character';node.setBackgroundImage('theme/style/cardback/image/ol.png');break;
 								case 'wood':node.className='button card fullskin';node.setBackgroundImage('theme/woodden/wood.jpg');node.style.backgroundSize='initial';break;
 								case 'music':node.className='button card fullskin';node.setBackgroundImage('theme/music/wood3.png');break;
 							}

@@ -2463,6 +2463,8 @@ window.noname_asset_list=[
     'theme/style/cardback/image/new2.png',
     'theme/style/cardback/image/official.png',
     'theme/style/cardback/image/official2.png',
+    'theme/style/cardback/image/ol.png',
+    'theme/style/cardback/image/ol2.png',
     'theme/style/hp/image/emotion1.png',
     'theme/style/hp/image/emotion2.png',
     'theme/style/hp/image/emotion3.png',
