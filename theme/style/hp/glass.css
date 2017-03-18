@@ -1,26 +1,29 @@
 .hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){
-    background: url('image/official1.png');
+    background: url('image/glass1.png');
     box-shadow: none;
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    -webkit-filter:none;
 }
 .hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
-    background: url('image/official2.png');
+    background: url('image/glass2.png');
     box-shadow: none;
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    -webkit-filter:none;
 }
 .hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
-    background: url('image/official3.png');
+    background: url('image/glass3.png');
     box-shadow: none;
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    -webkit-filter:none;
 }
 .hp:not(.text):not(.actcount)>.lost{
-    background: url('image/official4.png');
+    background: url('image/glass4.png');
     box-shadow: none;
     border: none;
     background-size: cover;

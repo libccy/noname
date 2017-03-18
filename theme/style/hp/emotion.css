@@ -1,26 +1,29 @@
 .hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){
-    background: url('image/official1.png');
+    background: url('image/emotion1.png');
     box-shadow: none;
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    -webkit-filter:brightness(0.8) contrast(1.5);
 }
 .hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
-    background: url('image/official2.png');
+    background: url('image/emotion2.png');
     box-shadow: none;
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    -webkit-filter:brightness(0.8) contrast(1.5);
 }
 .hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
-    background: url('image/official3.png');
+    background: url('image/emotion3.png');
     box-shadow: none;
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    -webkit-filter:brightness(0.8) contrast(1.5);
 }
 .hp:not(.text):not(.actcount)>.lost{
-    background: url('image/official4.png');
+    background: url('image/emotion4.png');
     box-shadow: none;
     border: none;
     background-size: cover;

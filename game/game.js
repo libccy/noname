@@ -1004,18 +1004,14 @@
 						item:{
 							default:'默认',
 							official:'勾玉',
+							emotion:'表情',
+							glass:'手杀',
 						},
 						onclick:function(layout){
 							game.saveConfig('hp_style',layout);
 							var style=ui.css.hp_style;
 							ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
 							style.remove();
-							if(game.layout=='default'&&lib.config.hp_style=='official'){
-								ui.arena.classList.add('hpimage');
-							}
-							else{
-								ui.arena.classList.remove('hpimage');
-							}
 						},
 						unfrequent:true,
 					},
@@ -1557,11 +1553,13 @@
 						name:'游戏特效',
 						intro:'开启后属性伤害等会显示动画',
 						init:true,
+						unfrequent:true,
 					},
 					skill_animation:{
 						name:'技能特效',
 						intro:'开启后觉醒技、限定技将显示全屏文字',
 						init:true,
+						unfrequent:true,
 					},
 					target_shake:{
 						name:'目标特效',
@@ -6000,12 +5998,6 @@
 					}
 					else{
 						ui.arena.classList.remove('oldlayout');
-					}
-					if(game.layout=='default'&&lib.config.hp_style=='official'){
-						ui.arena.classList.add('hpimage');
-					}
-					else{
-						ui.arena.classList.remove('hpimage');
 					}
                     if(lib.config.cardshape=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2')){
                         ui.arena.classList.add('oblongcard');
@@ -31678,9 +31670,6 @@
 					ui.arena.classList.add('lslim_player');
 				}
 				ui.window.dataset.radius_size=lib.config.radius_size||'default';
-				if(game.layout=='default'&&lib.config.hp_style=='official'){
-					ui.arena.classList.add('hpimage');
-				}
                 if(game.layout=='long'||game.layout=='mobile'){
                     if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
                 }
