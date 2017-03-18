@@ -967,7 +967,8 @@
 							custom:'自定',
 							wood:'木纹',
 							music:'音乐',
-                            simple:'原版',
+							simple:'原版',
+                            ol:'手杀',
 							// new:'新版',
 						},
 						visualBar:function(node,item,create,switcher){
@@ -1033,6 +1034,7 @@
 									break;
 								}
 								case 'new':node.setBackgroundImage('theme/style/card/image/new.png');break;
+								case 'ol':node.setBackgroundImage('theme/style/card/image/ol.png');break;
 								case 'wood':node.setBackgroundImage('theme/woodden/wood.jpg');node.style.backgroundSize='initial';break;
 								case 'music':node.setBackgroundImage('theme/music/wood3.png');break;
 								case 'simple':node.setBackgroundImage('theme/simple/card.png');break;
@@ -1086,8 +1088,8 @@
 						item:{
 							default:'默认',
 							custom:'自定',
-							wood:'木纹',
-							music:'音乐',
+							// wood:'木纹',
+							// music:'音乐',
                             official:'原版',
 							// new:'新版',
 							// feicheng:'废城',

@@ -2455,6 +2455,7 @@ window.noname_asset_list=[
     'theme/woodden/wood2.jpg',
     'theme/woodden/wood2.png',
     'theme/style/card/image/new.png',
+    'theme/style/card/image/ol.png',
     'theme/style/cardback/image/feicheng.png',
     'theme/style/cardback/image/feicheng2.png',
     'theme/style/cardback/image/liusha.png',
