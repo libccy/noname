@@ -53,7 +53,7 @@ background.pack={
     taoyuan_bg:'桃园',
     zhanhuo_bg:'战火',
     huangtian_bg:'黄天',
-    september_bg:'印象',
+    september_bg:'九月',
     yinxiang_bg:'印象',
 };
 music.pack={

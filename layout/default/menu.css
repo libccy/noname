@@ -476,11 +476,7 @@
 }
 .popup-container>.menu.visual{
 	padding: 5px;
-	max-height: 310px;
 	overflow: scroll;
-}
-.popup-container>.menu.visual.withbar{
-	max-height: 350px;
 }
 .popup-container>.menu>div{
 	padding-top:5px;

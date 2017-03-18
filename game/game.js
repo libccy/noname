@@ -809,9 +809,7 @@
 										background='default';
 										this.lastChild.innerHTML='默认';
 									}
-									else{
-										return;
-									}
+									return;
 								}
 								else if(node.firstChild.innerHTML==get.verticalStr('删除背景')){
 									menu.parentNode.noclose=true;
@@ -826,9 +824,7 @@
 											background='default';
 											this.lastChild.innerHTML='默认';
 										}
-										else{
-											return;
-										}
+										return;
 									}
 								}
 							}
