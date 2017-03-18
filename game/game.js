@@ -972,7 +972,6 @@
 						},
 						visualBar:function(node,item,create,switcher){
 							if(node.created){
-								node.lastChild.classList.remove('active');
 								return;
 							}
 							var button;
@@ -1002,11 +1001,6 @@
 											fileReader.readAsDataURL(fileToLoad, "UTF-8");
 										});
 									});
-								}
-								else{
-									game.deleteDB('image','card_style');
-									button.style.backgroundImage='none';
-									button.className='button character dashedmenubutton';
 								}
 							});
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
@@ -1101,7 +1095,6 @@
 						},
 						visualBar:function(node,item,create,switcher){
 							if(node.created){
-								node.lastChild.classList.remove('active');
 								return;
 							}
 							var button;
@@ -1131,11 +1124,6 @@
 											fileReader.readAsDataURL(fileToLoad, "UTF-8");
 										});
 									});
-								}
-								else{
-									game.deleteDB('image','cardback_style');
-									button.style.backgroundImage='none';
-									button.className='button character dashedmenubutton';
 								}
 							});
 							ui.create.filediv('.menubutton.deletebutton.addbutton','添加翻转图片',node,function(file){
@@ -1252,6 +1240,107 @@
 							official:'勾玉',
 							emotion:'表情',
 							glass:'手杀',
+							custom:'自定',
+						},
+						visualBar:function(node,item,create,switcher){
+							if(node.created){
+								return;
+							}
+							var button;
+							for(var i=0;i<node.parentNode.childElementCount;i++){
+								if(node.parentNode.childNodes[i]._link=='custom'){
+									button=node.parentNode.childNodes[i];
+								}
+							}
+							if(!button){
+								return;
+							}
+							node.created=true;
+							var deletepic;
+							ui.create.filediv('.menubutton.addbutton','添加图片',node,function(file){
+								if(file&&node.currentDB){
+									game.putDB('image','hp_style'+node.currentDB,file,function(){
+										game.getDB('image','hp_style'+node.currentDB,function(fileToLoad){
+											if(!fileToLoad) return;
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent)
+											{
+												var data = fileLoadedEvent.target.result;
+												button.childNodes[node.currentDB-1].style.backgroundImage='url('+data+')';
+												node.classList.add('showdelete');
+												node.currentDB++;
+												if(node.currentDB>4){
+													node.classList.add('hideadd');
+													button.classList.remove('transparent');
+													delete node.currentDB;
+												}
+											};
+											fileReader.readAsDataURL(fileToLoad, "UTF-8");
+										});
+									});
+								}
+							});
+							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
+								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
+									game.deleteDB('image','hp_style1');
+									game.deleteDB('image','hp_style2');
+									game.deleteDB('image','hp_style3');
+									game.deleteDB('image','hp_style4');
+									for(var i=0;i<button.childElementCount;i++){
+										button.childNodes[i].style.backgroundImage='none';
+									}
+									node.classList.remove('showdelete');
+									node.classList.remove('hideadd');
+									if(lib.config.hp_style=='custom'){
+										lib.configMenu.appearence.config.hp_style.onclick('default');
+										switcher.lastChild.innerHTML='默认';
+									}
+									button.classList.add('transparent');
+									node.currentDB=1;
+								}
+							});
+						},
+						visualMenu:function(node,link,name,config){
+							node.className='button hpbutton dashedmenubutton';
+							node.innerHTML='';
+							for(var i=1;i<=4;i++){
+								var div=ui.create.div(node);
+								if(link=='default'){
+									ui.create.div(div);
+								}
+								else if(link!='custom'){
+									div.setBackgroundImage('theme/style/hp/image/'+link+i+'.png');
+								}
+								if(i==4){
+									div.style.webkitFilter='grayscale(1)';
+								}
+							}
+							if(link=='custom'){
+								node.classList.add('transparent');
+								var getDB=function(num){
+									node.parentNode.lastChild.currentDB=num;
+									game.getDB('image','hp_style'+num,function(fileToLoad){
+										if(!fileToLoad) return;
+										var fileReader = new FileReader();
+										fileReader.onload = function(fileLoadedEvent)
+										{
+											var data = fileLoadedEvent.target.result;
+											node.childNodes[num-1].style.backgroundImage='url('+data+')';
+											node.parentNode.lastChild.classList.add('showdelete');
+											if(num<4){
+												getDB(num+1);
+											}
+											else{
+												node.parentNode.lastChild.classList.add('hideadd');
+												node.classList.remove('transparent');
+												delete node.parentNode.firstChild.currentDB;
+											}
+										};
+										fileReader.readAsDataURL(fileToLoad, "UTF-8");
+									});
+								}
+								getDB(1);
+							}
 						},
 						onclick:function(layout){
 							game.saveConfig('hp_style',layout);
@@ -24654,18 +24743,18 @@
 								};
 								var createNode=function(i){
 									var visualMenu=ui.create.div();
-									ui.create.div('.name',get.verticalStr(config.item[i]),visualMenu);
-									visualMenu._link=i;
-									if(config.visualMenu(visualMenu,i,config.item[i],config)!==false){
-										visualMenu.listen(clickMenuItem);
-									}
-									visualMenu.update=updateVisual;
 									if(config.visualBar){
 										node._link.menu.insertBefore(visualMenu,node._link.menu.lastChild);
 									}
 									else{
 										node._link.menu.appendChild(visualMenu);
 									}
+									ui.create.div('.name',get.verticalStr(config.item[i]),visualMenu);
+									visualMenu._link=i;
+									if(config.visualMenu(visualMenu,i,config.item[i],config)!==false){
+										visualMenu.listen(clickMenuItem);
+									}
+									visualMenu.update=updateVisual;
 								};
 								if(config.visualBar){
 									var visualBar=ui.create.div(node._link.menu,function(){

@@ -496,6 +496,69 @@
 	height: 86px;
 	border: 2px dashed rgb(40,40,40);
 }
+.popup-container>.menu.visual>.hpbutton{
+	width: 60px;
+	height: 60px;
+	overflow: hidden;
+}
+.popup-container>.menu.visual>.hpbutton>div{
+	width: 30px;
+	height: 30px;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	background-size: 80%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(1){
+	left: 0;
+	top: 0;
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(2){
+	right: 0;
+	left: auto;
+	top: 0;
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(3){
+	left: 0;
+	bottom: 0;
+	top: auto;
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(4){
+	right: 0;
+	left: auto;
+	bottom: 0;
+	top: auto;
+}
+.popup-container>.menu.visual>.hpbutton>div>div{
+	width: 60%;
+	height: 60%;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	left: 20%;
+	top: 20%;
+	border-radius: 100%;
+	box-shadow: rgba(0,0,0,0.2) 1px -1px 2px inset, rgba(255,255,255,0.15) -1px 1px 5px inset;
+    -webkit-filter: brightness(1.5);
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(1)>div{
+	background: rgba(57, 123, 4,1);
+	border: 1px solid rgba(39, 79, 7, 1);
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(2)>div{
+	background: rgba(166, 140, 6,1);
+    border: 1px solid rgba(79, 64, 7, 1);
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(3)>div{
+	background: rgba(148, 27, 27,1);
+    border: 1px solid rgba(79, 7, 7, 1);
+}
+.popup-container>.menu.visual>.hpbutton>div:nth-child(4)>div{
+	background: rgba(57, 123, 4,1);
+    border: 1px solid rgba(39, 79, 7, 1);
+}
 .themebutton>div{
 	width:50px;
 	height:76px;
@@ -617,7 +680,7 @@
 .popup-container>.menu.visual.withbar>div.hideadd>.addbutton{
 	display: none;
 }
-.popup-container>.menu.visual.withbar>div.showdelete>div:first-child{
+.popup-container>.menu.visual.withbar>div.showdelete>div:first-child:not(.addbutton){
 	display: none;
 }
 #window:not(.nopointer) .popup-container>.menu.visual.withbar>div:last-child>div{

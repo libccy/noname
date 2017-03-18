@@ -1,0 +1,40 @@
+.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){
+    box-shadow: none;
+    border: none;
+    background-size: 100% 100%;
+    transform: scale(1.4) rotate(180deg);
+    -webkit-filter:none;
+}
+.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
+    box-shadow: none;
+    border: none;
+    background-size: 100% 100%;
+    transform: scale(1.4) rotate(180deg);
+    -webkit-filter:none;
+}
+.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
+    box-shadow: none;
+    border: none;
+    background-size: 100% 100%;
+    transform: scale(1.4) rotate(180deg);
+    -webkit-filter:none;
+}
+.hp:not(.text):not(.actcount)>.lost{
+    box-shadow: none;
+    border: none;
+    background-size: 100% 100%;
+    transform: scale(1.4) rotate(180deg);
+}
+
+#arena.oldlayout .player .hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){
+    transform: scale(1.6);
+}
+#arena.oldlayout .player .hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
+    transform: scale(1.6);
+}
+#arena.oldlayout .player .hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
+    transform: scale(1.6);
+}
+#arena.oldlayout .player .hp:not(.text):not(.actcount)>.lost{
+    transform: scale(1.6);
+}
