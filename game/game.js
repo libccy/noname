@@ -2104,58 +2104,58 @@
 						},
 						clear:true
 					},
-					trim_game:{
-						name:'隐藏非官方扩展包',
-						onclick:function(){
-							if(this.innerHTML!='已隐藏'){
-								this.innerHTML='已隐藏';
-                                var pack=lib.config.all.cards.slice(0);
-                                if(Array.isArray(lib.config.hiddenCardPack)){
-                                    for(var i=0;i<lib.config.hiddenCardPack.length;i++){
-                                        pack.add(lib.config.hiddenCardPack[i]);
-                                    }
-                                }
-                                for(var i=0;i<pack.length;i++){
-                                    if(lib.config.all.sgscards.contains(pack[i])){
-                                        pack.splice(i--,1);
-                                    }
-                                }
-								game.saveConfig('hiddenCardPack',pack);
-
-                                var pack=lib.config.all.characters.slice(0);
-                                if(Array.isArray(lib.config.hiddenCharacterPack)){
-                                    for(var i=0;i<lib.config.hiddenCharacterPack.length;i++){
-                                        pack.add(lib.config.hiddenCharacterPack[i]);
-                                    }
-                                }
-                                for(var i=0;i<pack.length;i++){
-                                    if(lib.config.all.sgscharacters.contains(pack[i])){
-                                        pack.splice(i--,1);
-                                    }
-                                }
-								game.saveConfig('hiddenCharacterPack',pack);
-
-                                var pack=lib.config.all.mode.slice(0);
-                                if(Array.isArray(lib.config.hiddenModePack)){
-                                    for(var i=0;i<lib.config.hiddenModePack.length;i++){
-                                        pack.add(lib.config.hiddenModePack[i]);
-                                    }
-                                }
-                                for(var i=0;i<pack.length;i++){
-                                    if(lib.config.all.sgsmodes.contains(pack[i])){
-                                        pack.splice(i--,1);
-                                    }
-                                }
-								game.saveConfig('hiddenModePack',pack);
-
-								var that=this;
-								setTimeout(function(){
-									that.innerHTML='隐藏非官方扩展包';
-								},500);
-							}
-						},
-						clear:true
-					}
+					// trim_game:{
+					// 	name:'隐藏非官方扩展包',
+					// 	onclick:function(){
+					// 		if(this.innerHTML!='已隐藏'){
+					// 			this.innerHTML='已隐藏';
+                    //             var pack=lib.config.all.cards.slice(0);
+                    //             if(Array.isArray(lib.config.hiddenCardPack)){
+                    //                 for(var i=0;i<lib.config.hiddenCardPack.length;i++){
+                    //                     pack.add(lib.config.hiddenCardPack[i]);
+                    //                 }
+                    //             }
+                    //             for(var i=0;i<pack.length;i++){
+                    //                 if(lib.config.all.sgscards.contains(pack[i])){
+                    //                     pack.splice(i--,1);
+                    //                 }
+                    //             }
+					// 			game.saveConfig('hiddenCardPack',pack);
+					//
+                    //             var pack=lib.config.all.characters.slice(0);
+                    //             if(Array.isArray(lib.config.hiddenCharacterPack)){
+                    //                 for(var i=0;i<lib.config.hiddenCharacterPack.length;i++){
+                    //                     pack.add(lib.config.hiddenCharacterPack[i]);
+                    //                 }
+                    //             }
+                    //             for(var i=0;i<pack.length;i++){
+                    //                 if(lib.config.all.sgscharacters.contains(pack[i])){
+                    //                     pack.splice(i--,1);
+                    //                 }
+                    //             }
+					// 			game.saveConfig('hiddenCharacterPack',pack);
+					//
+                    //             var pack=lib.config.all.mode.slice(0);
+                    //             if(Array.isArray(lib.config.hiddenModePack)){
+                    //                 for(var i=0;i<lib.config.hiddenModePack.length;i++){
+                    //                     pack.add(lib.config.hiddenModePack[i]);
+                    //                 }
+                    //             }
+                    //             for(var i=0;i<pack.length;i++){
+                    //                 if(lib.config.all.sgsmodes.contains(pack[i])){
+                    //                     pack.splice(i--,1);
+                    //                 }
+                    //             }
+					// 			game.saveConfig('hiddenModePack',pack);
+					//
+					// 			var that=this;
+					// 			setTimeout(function(){
+					// 				that.innerHTML='隐藏非官方扩展包';
+					// 			},500);
+					// 		}
+					// 	},
+					// 	clear:true
+					// }
 				}
 			}
 		},
