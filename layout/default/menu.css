@@ -476,9 +476,11 @@
 }
 .popup-container>.menu.visual{
 	padding: 5px;
-	/*max-width: 300px;*/
-	max-height: 305px;
-	overflow: hidden;
+	max-height: 310px;
+	overflow: scroll;
+}
+.popup-container>.menu.visual.withbar{
+	max-height: 350px;
 }
 .popup-container>.menu>div{
 	padding-top:5px;
@@ -596,6 +598,36 @@
 	padding: 0 !important;
 	width: 90px;
 	height: 90px;
+}
+.popup-container>.menu.visual.withbar>div:last-child{
+	display: block;
+	width: calc(100% - 10px);
+	text-align: center;
+	height: auto;
+	cursor: default !important;
+}
+.popup-container>.menu.visual.withbar>div:last-child>div{
+	display: inline-block;
+	position: relative;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+#window:not(.nopointer) .popup-container>.menu.visual.withbar>div:last-child>div{
+	cursor: pointer;
+}
+
+input.fileinput{
+	margin: 0 !important;
+	padding: 0 !important;
+	position: absolute !important;
+	width: 100% !important;
+	height: 100% !important;
+	left: 0 !important;
+	top: 0 !important;
+	opacity: 0 !important;
+}
+#window:not(.nopointer) input.fileinput{
+	cursor: pointer;
 }
 .popup-container>.menu.visual>.button.character>.name{
 	top: 10px;

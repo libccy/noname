@@ -709,13 +709,65 @@
 						init:'default',
 						item:{
 							default:'默认',
-							custom:'自定',
+						},
+						visualBar:function(node,item,create){
+							if(node.created){
+								node.lastChild.classList.remove('active');
+								return;
+							}
+							node.created=true;
+							ui.create.filediv('.menubutton','添加背景',node,function(file){
+								if(file){
+									var name=file.name;
+									if(name.indexOf('.')!=-1){
+										name=name.slice(0,name.indexOf('.'));
+									}
+									var link='custom_'+name;
+									item[link]=name;
+									game.putDB('image',link,file,function(){
+										create(link);
+										lib.config.customBackgroundPack.add(link);
+										game.saveConfig('customBackgroundPack',lib.config.customBackgroundPack);
+									});
+									if(node.lastChild.classList.contains('active')){
+										editbg.call(node.lastChild);
+									}
+								}
+							});
+							var editbg=function(){
+								this.classList.toggle('active');
+								var page=this.parentNode.parentNode;
+								for(var i=0;i<page.childElementCount;i++){
+									if(page.childNodes[i].classList.contains('button')){
+										var link=page.childNodes[i]._link;
+										if(link&&link!='default'){
+											var str;
+											if(this.classList.contains('active')){
+												if(link.indexOf('custom_')==0){
+													str='删除背景';
+												}
+												else{
+													str='隐藏背景';
+												}
+											}
+											else{
+												str=item[link];
+											}
+											page.childNodes[i].firstChild.innerHTML=get.verticalStr(str);
+										}
+									}
+								}
+							};
+							ui.create.div('.menubutton','编辑背景',node,editbg);
 						},
 						visualMenu:function(node,link,name,config){
 							node.className='button character';
 							node.style.backgroundImage='';
 							node.style.backgroundSize='';
-							if(link=='default'||link=='custom'){
+							if(node.firstChild){
+								node.firstChild.innerHTML=get.verticalStr(name);
+							}
+							if(link=='default'||link.indexOf('custom_')==0){
 								if(lib.config.theme=='simple'){
 									node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
 								}
@@ -723,8 +775,8 @@
 									node.style.backgroundImage='none';
 									node.classList.add('dashedmenubutton');
 								}
-								if(link=='custom'){
-									game.getDB('image','background',function(fileToLoad){
+								if(link.indexOf('custom_')==0){
+									game.getDB('image',link,function(fileToLoad){
 										if(!fileToLoad) return;
 										var fileReader = new FileReader();
 										fileReader.onload = function(fileLoadedEvent)
@@ -732,6 +784,7 @@
 											var data = fileLoadedEvent.target.result;
 											node.style.backgroundImage='url('+data+')';
 											node.style.backgroundSize='cover';
+											node.classList.remove('dashedmenubutton');
 										};
 										fileReader.readAsDataURL(fileToLoad, "UTF-8");
 									});
@@ -742,7 +795,43 @@
 								node.style.backgroundSize='cover';
 							}
 						},
-						onclick:function(background){
+						onclick:function(background,node){
+							if(node&&node.firstChild){
+								var menu=node.parentNode;
+								if(node.firstChild.innerHTML==get.verticalStr('隐藏背景')){
+									menu.parentNode.noclose=true;
+									node.remove();
+									menu.updateBr();
+									lib.config.hiddenBackgroundPack.add(background);
+									game.saveConfig('hiddenBackgroundPack',lib.config.hiddenBackgroundPack);
+									delete lib.configMenu.appearence.config.image_background.item[background];
+									if(lib.config.image_background==background){
+										background='default';
+										this.lastChild.innerHTML='默认';
+									}
+									else{
+										return;
+									}
+								}
+								else if(node.firstChild.innerHTML==get.verticalStr('删除背景')){
+									menu.parentNode.noclose=true;
+									if(confirm('是否删除此背景（此操作不可撤销）')){
+										node.remove();
+										menu.updateBr();
+										lib.config.customBackgroundPack.remove(background);
+										game.saveConfig('customBackgroundPack',lib.config.customBackgroundPack);
+										game.deleteDB('image',background);
+										delete lib.configMenu.appearence.config.image_background.item[background];
+										if(lib.config.image_background==background){
+											background='default';
+											this.lastChild.innerHTML='默认';
+										}
+										else{
+											return;
+										}
+									}
+								}
+							}
 							var animate=lib.config.image_background=='default';
 							game.saveConfig('image_background',background);
 							ui.background.delete();
@@ -765,9 +854,9 @@
                                 document.documentElement.style.backgroundImage='';
 								ui.background.style.backgroundImage="none";
 							}
-							else if(lib.config.image_background=='custom'){
+							else if(lib.config.image_background.indexOf('custom_')==0){
 								ui.background.style.backgroundImage="none";
-								game.getDB('image','background',function(fileToLoad){
+								game.getDB('image',lib.config.image_background,function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent)
@@ -784,12 +873,12 @@
 							ui.background.style.backgroundSize='cover';
 						},
 					},
-					import_background:{
-						name:'<div style="white-space:nowrap;width:calc(100% - 5px)">'+
-						'<input type="file" style="width:calc(100% - 40px)" accept="image/jpeg">'+
-						'<button style="width:40px">确定</button></div>',
-						clear:true,
-					},
+					// import_background:{
+					// 	name:'<div style="white-space:nowrap;width:calc(100% - 5px)">'+
+					// 	'<input type="file" style="width:calc(100% - 40px)" accept="image/jpeg">'+
+					// 	'<button style="width:40px">确定</button></div>',
+					// 	clear:true,
+					// },
 					image_background_random:{
 						name:'随机背景',
 						init:false
@@ -1667,7 +1756,7 @@
 						if(lib.config.image_background_random){
 							map.image_background_blur.show();
 							map.image_background.hide();
-							map.import_background.hide();
+							// map.import_background.hide();
 						}
 						else{
 							map.image_background.show();
@@ -1677,12 +1766,12 @@
 							else{
 								map.image_background_blur.show();
 							}
-							if(lib.config.image_background=='custom'&&lib.db){
-								map.import_background.show();
-							}
-							else{
-								map.import_background.hide();
-							}
+							// if(lib.config.image_background=='custom'&&lib.db){
+							// 	map.import_background.show();
+							// }
+							// else{
+							// 	map.import_background.hide();
+							// }
 						}
 						if(config.show_card_prompt){
 							map.hide_card_prompt_basic.show();
@@ -1942,6 +2031,7 @@
 								game.saveConfig('hiddenCharacterPack',[]);
 								game.saveConfig('hiddenCardPack',[]);
 								game.saveConfig('hiddenPlayPack',[]);
+								game.saveConfig('hiddenBackgroundPack',[]);
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='重置隐藏扩展包';
@@ -4716,7 +4806,12 @@
 				}
 				if(background&&background.pack){
 					for(i in background.pack){
+						if(lib.config.hiddenBackgroundPack.contains(i)) continue;
 						lib.configMenu.appearence.config.image_background.item[i]=background.pack[i];
+					}
+					for(var i=0;i<lib.config.customBackgroundPack.length;i++){
+						var link=lib.config.customBackgroundPack[i];
+						lib.configMenu.appearence.config.image_background.item[link]=link.slice(7);
 					}
 				}
 				if(music&&music.pack){
@@ -5260,9 +5355,9 @@
 				}
 
 				lib.onDB(function(){
-					if(lib.config.image_background=='custom'){
+					if(lib.config.image_background.indexOf('custom_')==0){
 						ui.background.style.backgroundImage="none";
-						game.getDB('image','background',function(fileToLoad){
+						game.getDB('image',lib.config.image_background,function(fileToLoad){
 							if(!fileToLoad) return;
 							var fileReader = new FileReader();
 							fileReader.onload = function(fileLoadedEvent)
@@ -23875,8 +23970,27 @@
 				if(listen) node.listen(listen);
 	            return node;
 			},
+			filediv:function(){
+				var args=Array.from(arguments);
+				var func=null;
+				for(var i=0;i<args.length;i++){
+					if(typeof args[i]=='function'){
+						func=args[i];
+						args.splice(i,1);
+						break;
+					}
+				}
+				var div=ui.create.div.apply(this,args);
+				var input=ui.create.node('input.fileinput');
+				input.type='file';
+				input.onchange=function(e){
+					func.call(this,this.files[0],e);
+				};
+				div.appendChild(input);
+				return div;
+			},
             node:function(){
-                var tagName,innerHTML,position,position2,style,divposition,listen;
+                var tagName,str,innerHTML,position,position2,style,divposition,listen;
 				for(var i=0;i<arguments.length;i++){
 					if(typeof arguments[i]=='string'){
 						if(typeof tagName=='string'){
@@ -23896,8 +24010,40 @@
 					else if(typeof arguments[i]=='object') style=arguments[i];
 					else if(typeof arguments[i]=='function') listen=arguments[i];
 				}
-				if(tagName==undefined) tagName='div';
+				if(tagName==undefined){
+					tagName='div';
+				}
+				else{
+					var i1=tagName.indexOf('.');
+					var i2=tagName.indexOf('#');
+					if(i1!=-1||i2!=-1){
+						if(i2!=-1&&i2<i1){
+							i1=i2;
+						}
+						str=tagName.slice(i1);
+						tagName=tagName.slice(0,i1);
+					}
+				}
 				var node=document.createElement(tagName);
+				if(str){
+					for(var i=0;i<str.length;i++){
+						if(str[i]=='.'){
+							if(node.className.length!=0){
+								node.className+=' ';
+							}
+							while(str[i+1]!='.'&&str[i+1]!='#'&&i+1<str.length){
+								node.className+=str[i+1];
+								i++;
+							}
+						}
+						else if(str[i]=='#'){
+							while(str[i+1]!='.'&&str[i+1]!='#'&&i+1<str.length){
+								node.id+=str[i+1];
+								i++;
+							}
+						}
+					}
+				}
 	            if(position){
 	            	if(typeof position2=='number'&&position.childNodes.length>position2){
 	            		position.insertBefore(node,position.childNodes[position2]);
@@ -23991,12 +24137,7 @@
 	                popupContainer.appendChild(node);
                     var rect=node.getBoundingClientRect();
                     if(node.classList.contains('visual')){
-						if(node.querySelectorAll('.menu.visual>div').length>9){
-							node.style.overflow='scroll';
-						}
-						else{
-							node.style.overflow='';
-						}
+						var num=node.querySelectorAll('.menu.visual>div').length;
 						node.style.top=(e.y-node.offsetHeight/2+30)+'px';
 						for(var i=0;i<node.childElementCount;i++){
 							if(node.childNodes[i].update){
@@ -24082,7 +24223,7 @@
 	                node._link.current=this.link;
 	                node.lastChild.innerHTML=config.item[this._link];
 	                if(config.onclick){
-	                    config.onclick.call(node,this._link);
+	                    config.onclick.call(node,this._link,this);
 	                }
 	                if(config.update){
 	                    config.update();
@@ -24184,29 +24325,54 @@
 							node._link.menu=ui.create.div('.menu');
 							if(config.visualMenu){
 								node._link.menu.classList.add('visual');
-								for(var i in config.item){
+								var updateVisual=function(){
+									config.visualMenu(this,this._link,config.item[this._link],config);
+								};
+								var createNode=function(i){
 									var visualMenu=ui.create.div();
-									var updateVisual=function(){
-										config.visualMenu(this,this._link,config.item[this._link],config);
-									};
 									ui.create.div('.name',get.verticalStr(config.item[i]),visualMenu);
 									visualMenu._link=i;
 									if(config.visualMenu(visualMenu,i,config.item[i],config)!==false){
 										visualMenu.listen(clickMenuItem);
 									}
 									visualMenu.update=updateVisual;
-									node._link.menu.appendChild(visualMenu);
-		                        }
-								lib.setScroll(node._link.menu);
-								var split=[];
-								for(var i=1;i<node._link.menu.childElementCount;i++){
-									if(i%3==0){
-										split.push(node._link.menu.childNodes[i]);
+									if(config.visualBar){
+										node._link.menu.insertBefore(visualMenu,node._link.menu.lastChild);
+									}
+									else{
+										node._link.menu.appendChild(visualMenu);
+									}
+								};
+								if(config.visualBar){
+									var visualBar=ui.create.div(node._link.menu,function(){
+										this.parentNode.parentNode.noclose=true;
+									});
+									node._link.menu.classList.add('withbar');
+									config.visualBar(visualBar,config.item,createNode);
+									visualBar.update=function(){
+										config.visualBar(visualBar,config.item,createNode);
 									}
 								}
-								for(var i=0;i<split.length;i++){
-									node._link.menu.insertBefore(ui.create.node('br'),split[i]);
+								for(var i in config.item){
+									createNode(i);
+		                        }
+								lib.setScroll(node._link.menu);
+								node._link.menu.updateBr=function(){
+									var br=Array.from(this.querySelectorAll('.menu.visual>br'));
+									while(br.length){
+										br.shift().remove();
+									}
+									var split=[];
+									for(var i=1;i<this.childElementCount;i++){
+										if(i%3==0){
+											split.push(this.childNodes[i]);
+										}
+									}
+									for(var i=0;i<split.length;i++){
+										this.insertBefore(ui.create.node('br'),split[i]);
+									}
 								}
+								node._link.menu.updateBr();
 							}
 	                        else{
 		                        for(var i in config.item){
@@ -25022,25 +25188,25 @@
 										}
 									}
 								}
-								else if(j=='import_background'){
-									cfgnode.querySelector('button').onclick=function(){
-										var fileToLoad=this.previousSibling.files[0];
-										if(fileToLoad){
-											game.putDB('image','background',fileToLoad);
-											var fileReader = new FileReader();
-											fileReader.onload = function(fileLoadedEvent)
-											{
-												var data = fileLoadedEvent.target.result;
-												ui.background.style.backgroundImage='url('+data+')';
-											};
-											fileReader.readAsDataURL(fileToLoad, "UTF-8");
-										}
-										else{
-											game.deleteDB('image','background');
-											ui.background.style.backgroundImage='none';
-										}
-									}
-								}
+								// else if(j=='import_background'){
+								// 	cfgnode.querySelector('button').onclick=function(){
+								// 		var fileToLoad=this.previousSibling.files[0];
+								// 		if(fileToLoad){
+								// 			game.putDB('image','background',fileToLoad);
+								// 			var fileReader = new FileReader();
+								// 			fileReader.onload = function(fileLoadedEvent)
+								// 			{
+								// 				var data = fileLoadedEvent.target.result;
+								// 				ui.background.style.backgroundImage='url('+data+')';
+								// 			};
+								// 			fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								// 		}
+								// 		else{
+								// 			game.deleteDB('image','background');
+								// 			ui.background.style.backgroundImage='none';
+								// 		}
+								// 	}
+								// }
 								else if(j=='import_music'){
 									cfgnode.querySelector('button').onclick=function(){
 										var fileToLoad=this.previousSibling.files[0];

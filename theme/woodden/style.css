@@ -146,7 +146,8 @@ html{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
 }
 .menubutton.large.active,
-.menubutton.round.active{
+.menubutton.round.active,
+.menubutton.active{
 	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 .themebutton{

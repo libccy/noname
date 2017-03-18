@@ -52,8 +52,9 @@ background.pack={
     shengshi_bg:'盛世',
     taoyuan_bg:'桃园',
     zhanhuo_bg:'战火',
-    yinxiang_bg:'印象',
     huangtian_bg:'黄天',
+    september_bg:'印象',
+    yinxiang_bg:'印象',
 };
 music.pack={
     music_diaochan:'貂蝉',

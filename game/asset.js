@@ -1,9 +1,9 @@
 window.noname_asset_list=[
-    '1.9.11',
+    '1.9.11.1',
     'image/background/huangtian_bg.jpg',
+    'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
     'image/background/taoyuan_bg.jpg',
-    'image/background/xueji_bg.jpg',
     'image/background/yinxiang_bg.jpg',
     'image/background/zhanhuo_bg.jpg',
     'image/background/zhulian_bg.jpg',
