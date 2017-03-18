@@ -718,9 +718,7 @@
 					image_background:{
 						name:'游戏背景',
 						init:'default',
-						item:{
-							default:'默认',
-						},
+						item:{},
 						visualBar:function(node,item,create){
 							if(node.created){
 								node.lastChild.classList.remove('active');
@@ -963,13 +961,13 @@
 						init:'default',
 						intro:'设置正面朝上的卡牌的样式',
 						item:{
-							default:'默认',
-							custom:'自定',
 							wood:'木纹',
 							music:'音乐',
 							simple:'原版',
                             ol:'手杀',
 							// new:'新版',
+							default:'默认',
+							custom:'自定',
 						},
 						visualBar:function(node,item,create,switcher){
 							if(node.created){
@@ -1086,8 +1084,6 @@
 						intro:'设置背面朝上的卡牌的样式',
 						init:'default',
 						item:{
-							default:'默认',
-							custom:'自定',
 							// wood:'木纹',
 							// music:'音乐',
                             official:'原版',
@@ -1095,6 +1091,8 @@
 							// feicheng:'废城',
 							liusha:'流沙',
 							ol:'手杀',
+							default:'默认',
+							custom:'自定',
 						},
 						visualBar:function(node,item,create,switcher){
 							if(node.created){
@@ -5249,6 +5247,7 @@
 						var link=lib.config.customBackgroundPack[i];
 						lib.configMenu.appearence.config.image_background.item[link]=link.slice(7);
 					}
+					lib.configMenu.appearence.config.image_background.item.default='默认';
 				}
 				if(music&&music.pack){
 					if(lib.device||typeof window.require=='function'){
