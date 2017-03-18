@@ -1237,9 +1237,11 @@
 						init:'default',
 						item:{
 							default:'默认',
-							official:'勾玉',
+							// official:'勾玉',
 							emotion:'表情',
-							glass:'手杀',
+							glass:'勾玉',
+							round:'国战',
+							ol:'手杀',
 							custom:'自定',
 						},
 						visualBar:function(node,item,create,switcher){

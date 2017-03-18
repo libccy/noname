@@ -2,7 +2,7 @@ window.noname_update={
     version:'1.9.12',
     // update:'1.9.11',
     changeLog:[
-        '新样式',
+        '新外观选项',
     ],
     files:[
         'game/game.js',

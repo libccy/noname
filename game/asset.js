@@ -2475,6 +2475,14 @@ window.noname_asset_list=[
     'theme/style/hp/image/official2.png',
     'theme/style/hp/image/official3.png',
     'theme/style/hp/image/official4.png',
+    'theme/style/hp/image/ol1.png',
+    'theme/style/hp/image/ol2.png',
+    'theme/style/hp/image/ol3.png',
+    'theme/style/hp/image/ol4.png',
+    'theme/style/hp/image/round1.png',
+    'theme/style/hp/image/round2.png',
+    'theme/style/hp/image/round3.png',
+    'theme/style/hp/image/round4.png',
 ];
 window.noname_skin_list={
     bulianshi:4,
