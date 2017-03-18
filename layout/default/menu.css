@@ -608,6 +608,15 @@
 	margin-left: 5px;
 	margin-right: 5px;
 }
+.popup-container>.menu.visual.withbar>div:not(.showdelete)>.deletebutton{
+	display: none;
+}
+.popup-container>.menu.visual.withbar>div.hideadd>.addbutton{
+	display: none;
+}
+.popup-container>.menu.visual.withbar>div.showdelete>div:first-child{
+	display: none;
+}
 #window:not(.nopointer) .popup-container>.menu.visual.withbar>div:last-child>div{
 	cursor: pointer;
 }
@@ -621,6 +630,9 @@ input.fileinput{
 	left: 0 !important;
 	top: 0 !important;
 	opacity: 0 !important;
+}
+input.fileinput::-webkit-file-upload-button {
+    cursor: pointer;
 }
 #window:not(.nopointer) input.fileinput{
 	cursor: pointer;
