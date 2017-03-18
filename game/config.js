@@ -76,6 +76,8 @@ window.config={
 	hiddenCharacterPack:[],
 	hiddenCardPack:[],
 	hiddenPlayPack:[],
+	hiddenBackgroundPack:[],
+	customBackgroundPack:[],
 	favouriteCharacter:[],
 	recentIP:[],
 	alteredSkills:[],

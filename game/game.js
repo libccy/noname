@@ -790,6 +790,10 @@
 						'<button style="width:40px">确定</button></div>',
 						clear:true,
 					},
+					image_background_random:{
+						name:'随机背景',
+						init:false
+					},
 					image_background_blur:{
 						name:'背景模糊',
 						init:false,
@@ -1660,25 +1664,25 @@
 						else{
 							map.change_skin_auto.hide();
 						}
-						// if(game.layout=='long'||game.layout=='long2'){
-						// 	map.player_border.hide();
-						// 	map.player_border_long.show();
-						// }
-						// else{
-						// 	map.player_border.show();
-						// 	map.player_border_long.hide();
-						// }
-						if(lib.config.image_background=='default'){
-							map.image_background_blur.hide();
-						}
-						else{
+						if(lib.config.image_background_random){
 							map.image_background_blur.show();
-						}
-						if(lib.config.image_background=='custom'&&lib.db){
-							map.import_background.show();
+							map.image_background.hide();
+							map.import_background.hide();
 						}
 						else{
-							map.import_background.hide();
+							map.image_background.show();
+							if(lib.config.image_background=='default'){
+								map.image_background_blur.hide();
+							}
+							else{
+								map.image_background_blur.show();
+							}
+							if(lib.config.image_background=='custom'&&lib.db){
+								map.import_background.show();
+							}
+							else{
+								map.import_background.hide();
+							}
 						}
 						if(config.show_card_prompt){
 							map.hide_card_prompt_basic.show();
@@ -4872,6 +4876,14 @@
                     game.saveConfig('phonelayout',true);
                 }
                 game.layout=layout;
+				if(lib.config.image_background_random){
+					var list=[];
+					for(var i in lib.configMenu.appearence.config.image_background.item){
+						if(i=='default') continue;
+						list.push(i);
+					}
+					game.saveConfig('image_background',list.randomGet(lib.config.image_background));
+				}
                 if(lib.config.image_background!='default'&&lib.config.image_background!='custom'&&lib.config.theme=='simple'){
                     document.documentElement.style.backgroundImage='url("image/background/'+lib.config.image_background+'.jpg")';
                 }

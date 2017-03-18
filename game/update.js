@@ -7,7 +7,7 @@ window.noname_update={
     files:[
         'game/game.js',
         // 'game/package.js',
-        // 'game/config.js',
+        'game/config.js',
         // 'game/source.js',
         // 'game/asset.js',
         // 'card/guozhan.js',
