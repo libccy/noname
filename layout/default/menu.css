@@ -476,7 +476,7 @@
 }
 .popup-container>.menu.visual{
 	padding: 5px;
-	max-width: 300px;
+	/*max-width: 300px;*/
 	max-height: 305px;
 	overflow: hidden;
 }

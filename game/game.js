@@ -1788,7 +1788,6 @@
 						init:true,
 						item:{
 							music_default:'默认',
-							music_custom:'自定',
 						},
 						onclick:function(item){
 							game.saveConfig('background_music',item);
@@ -4717,6 +4716,9 @@
 					}
 				}
 				if(music&&music.pack){
+					if(lib.device||typeof window.require=='function'){
+						lib.configMenu.audio.config.background_music.item.music_custom='自定';
+					}
 					for(i in music.pack){
 						lib.configMenu.audio.config.background_music.item[i]=music.pack[i];
 					}
@@ -23977,17 +23979,17 @@
 	                popupContainer.appendChild(node);
                     var rect=node.getBoundingClientRect();
                     if(node.classList.contains('visual')){
+						if(node.querySelectorAll('.menu.visual>div').length>9){
+							node.style.overflow='scroll';
+						}
+						else{
+							node.style.overflow='';
+						}
 						node.style.top=(e.y-node.offsetHeight/2+30)+'px';
 						for(var i=0;i<node.childElementCount;i++){
 							if(node.childNodes[i].update){
 								node.childNodes[i].update();
 							}
-						}
-						if(node.childElementCount>9){
-							node.style.overflow='scroll';
-						}
-						else{
-							node.style.overflow='';
 						}
 						if(node.offsetTop<10){
 							node.style.top='10px';
@@ -24017,7 +24019,15 @@
 	                if(this._link.menu){
 	                    var pos1=this.lastChild.getBoundingClientRect();
 	                    var pos2=ui.window.getBoundingClientRect();
-                        if(this._link.menu.childElementCount>10){
+						if(this._link.menu.classList.contains('visual')){
+							openMenu(this._link.menu,{
+		                        x:pos1.left+pos1.width+5-pos2.left,
+		                        y:pos1.top-pos2.top
+		                    },function(){
+		                        node.classList.remove('on');
+		                    });
+						}
+                        else if(this._link.menu.childElementCount>10){
                             openMenu(this._link.menu,{
 		                        x:pos1.left+pos1.width+5-pos2.left,
 		                        y:Math.min((ui.window.offsetHeight-400)/2,pos1.top-pos2.top)
@@ -24175,6 +24185,16 @@
 									visualMenu.update=updateVisual;
 									node._link.menu.appendChild(visualMenu);
 		                        }
+								lib.setScroll(node._link.menu);
+								var split=[];
+								for(var i=1;i<node._link.menu.childElementCount;i++){
+									if(i%3==0){
+										split.push(node._link.menu.childNodes[i]);
+									}
+								}
+								for(var i=0;i<split.length;i++){
+									node._link.menu.insertBefore(ui.create.node('br'),split[i]);
+								}
 							}
 	                        else{
 		                        for(var i in config.item){

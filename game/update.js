@@ -1,11 +1,11 @@
 window.noname_update={
-    version:'1.9.11',
-    // update:'1.9.10.7',
+    version:'1.9.11.1',
+    update:'1.9.11',
     changeLog:[
         'bug修复',
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',
@@ -26,7 +26,7 @@ window.noname_update={
         // 'mode/stone.js',
         // 'theme/simple/style.css',
         // 'layout/default/layout.css',
-        // 'layout/default/menu.css',
+        'layout/default/menu.css',
         // 'layout/long/layout.css',
         // 'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
