@@ -460,6 +460,17 @@
 								theme.remove();
 								setTimeout(function(){ui.arena.show();},100);
 							},500);
+							
+							if(lib.config.auto_style){
+								if(lib.config.theme=='simple'){
+									lib.configMenu.appearence.config.player_border.onclick('slim');
+									lib.configMenu.appearence.config.image_background.onclick('taoyuan_bg');
+								}
+								else{
+									lib.configMenu.appearence.config.player_border.onclick('normal');
+									lib.configMenu.appearence.config.image_background.onclick('default');
+								}
+							}
 						}
 					},
 					layout:{
@@ -723,6 +734,13 @@
 										name=name.slice(0,name.indexOf('.'));
 									}
 									var link='custom_'+name;
+									if(item[link]){
+										for(var i=1;i<1000;i++){
+											if(!item[link+'_'+i]){
+												link=link+'_'+i;break;
+											}
+										}
+									}
 									item[link]=name;
 									game.putDB('image',link,file,function(){
 										create(link);
@@ -809,11 +827,14 @@
 										background='default';
 										this.lastChild.innerHTML='默认';
 									}
-									return;
+									else{
+										this.lastChild.innerHTML=lib.configMenu.appearence.config.image_background.item[lib.config.image_background];
+										return;
+									}
 								}
 								else if(node.firstChild.innerHTML==get.verticalStr('删除背景')){
 									menu.parentNode.noclose=true;
-									if(confirm('是否删除此背景（此操作不可撤销）')){
+									if(confirm('是否删除此背景？（此操作不可撤销）')){
 										node.remove();
 										menu.updateBr();
 										lib.config.customBackgroundPack.remove(background);
@@ -824,7 +845,10 @@
 											background='default';
 											this.lastChild.innerHTML='默认';
 										}
-										return;
+										else{
+											this.lastChild.innerHTML=lib.configMenu.appearence.config.image_background.item[lib.config.image_background];
+											return;
+										}
 									}
 								}
 							}
@@ -847,7 +871,6 @@
 							document.body.insertBefore(ui.background,document.body.firstChild);
 							if(animate) ui.background.animate('start');
 							if(lib.config.image_background=='default'){
-                                document.documentElement.style.backgroundImage='';
 								ui.background.style.backgroundImage="none";
 							}
 							else if(lib.config.image_background.indexOf('custom_')==0){
@@ -2031,6 +2054,11 @@
 								var that=this;
 								setTimeout(function(){
 									that.innerHTML='重置隐藏扩展包';
+									setTimeout(function(){
+										if(confirm('是否重新启动使改变生效？')){
+											game.reload();
+										}
+									});
 								},500);
 							}
 						},
@@ -4759,6 +4787,17 @@
                         delete window.noname_skin_list;
                         delete window.noname_asset_list;
                     });
+					if(lib.config.auto_style){
+						if(lib.config.theme=='simple'){
+							lib.config.player_border='slim';
+							lib.config.image_background_random=true;
+						}
+						else{
+							lib.config.player_border='normal';
+							lib.config.image_background_random=false;
+							lib.config.image_background='default';
+						}
+					}
                 }
 
                 if(window.isNonameServer){
@@ -4975,8 +5014,9 @@
 					}
 					game.saveConfig('image_background',list.randomGet(lib.config.image_background));
 				}
-                if(lib.config.image_background!='default'&&lib.config.image_background!='custom'&&lib.config.theme=='simple'){
-                    document.documentElement.style.backgroundImage='url("image/background/'+lib.config.image_background+'.jpg")';
+                if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
+                    document.documentElement.style.backgroundImage='url("'+lib.assetURL+'image/background/'+lib.config.image_background+'.jpg")';
+					document.documentElement.style.backgroundSize='cover';
                 }
 				ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout');
                 ui.css.phone=lib.init.css();
@@ -5324,13 +5364,15 @@
                 }
 				ui.background=ui.create.div('.background');
 				ui.background.style.backgroundSize="cover";
-				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background!='custom'){
+				if(lib.config.image_background&&lib.config.image_background!='default'&&lib.config.image_background.indexOf('custom_')!=0){
 			        ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
                     if(lib.config.image_background_blur){
                         ui.background.style.filter='blur(8px)';
                         ui.background.style.webkitFilter='blur(8px)';
                         ui.background.style.transform='scale(1.05)';
                     }
+					document.documentElement.style.backgroundImage='';
+					document.documentElement.style.backgroundSize='';
 			    }
 				document.body.insertBefore(ui.background,document.body.firstChild);
 
@@ -6185,6 +6227,7 @@
 				game.saveConfig('show_volumn',false);
 				game.saveConfig('debug',true);
 				game.saveConfig('dev',true);
+				game.saveConfig('auto_style',true);
 				game.reload();
 			},
             o:function(){
