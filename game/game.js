@@ -369,7 +369,7 @@
 						else{
 							map.touchscreen.hide();
 						}
-						if(config.touchscreen){
+						if(lib.config.touchscreen){
 							map.mousewheel.hide();
 							map.hover_all.hide();
 							map.hover_handcard.hide();
@@ -377,7 +377,7 @@
 							map.right_info.hide();
 							map.right_click.hide();
 							map.swipe.show();
-							if(config.swipe){
+							if(lib.config.swipe){
 								map.swipe_up.show();
 								map.swipe_down.show();
 								map.swipe_left.show();
@@ -966,8 +966,8 @@
 							simple:'原版',
                             ol:'手杀',
 							// new:'新版',
-							default:'默认',
 							custom:'自定',
+							default:'默认',
 						},
 						visualBar:function(node,item,create,switcher){
 							if(node.created){
@@ -1091,8 +1091,8 @@
 							// feicheng:'废城',
 							liusha:'流沙',
 							ol:'手杀',
-							default:'默认',
 							custom:'自定',
+							default:'默认',
 						},
 						visualBar:function(node,item,create,switcher){
 							if(node.created){
@@ -1271,6 +1271,7 @@
 											{
 												var data = fileLoadedEvent.target.result;
 												button.childNodes[node.currentDB-1].style.backgroundImage='url('+data+')';
+												button.classList.add('shown');
 												node.classList.add('showdelete');
 												node.currentDB++;
 												if(node.currentDB>4){
@@ -1300,6 +1301,7 @@
 										switcher.lastChild.innerHTML='默认';
 									}
 									button.classList.add('transparent');
+									button.classList.remove('shown');
 									node.currentDB=1;
 								}
 							});
@@ -1330,6 +1332,7 @@
 										{
 											var data = fileLoadedEvent.target.result;
 											node.childNodes[num-1].style.backgroundImage='url('+data+')';
+											node.classList.add('shown');
 											node.parentNode.lastChild.classList.add('showdelete');
 											if(num<4){
 												getDB(num+1);
@@ -1416,102 +1419,7 @@
 						},
 						unfrequent:true,
 					},
-					show_history:{
-						name:'出牌记录栏',
-						init:'off',
-						intro:'在屏幕左侧或右侧显示出牌记录',
-						unfrequent:true,
-						item:{
-							off:'关闭',
-							left:'靠左',
-							right:'靠右',
-						},
-						onclick:function(bool){
-                            if(lib.config.show_history=='right') ui.window.animate('rightbar2');
-							game.saveConfig('show_history',bool);
-                            if(_status.video||!_status.prepareArena) return;
-                            if(bool=='left'){
-                                ui.window.classList.add('leftbar');
-                                ui.window.classList.remove('rightbar');
-                            }
-                            else if(bool=='right'){
-                                ui.window.classList.remove('leftbar');
-                                ui.window.classList.add('rightbar');
-                            }
-                            else{
-                                ui.window.classList.remove('leftbar');
-                                ui.window.classList.remove('rightbar');
-                            }
-						}
-					},
-					show_log:{
-						name:'历史记录栏',
-						init:'off',
-						intro:'在屏幕中部显示出牌文字记录',
-						unfrequent:true,
-						item:{
-							off:'关闭',
-							left:'靠左',
-							center:'居中',
-							right:'靠右',
-						},
-						onclick:function(bool){
-							game.saveConfig('show_log',bool);
-							if(lib.config.show_log!='off'){
-								ui.arenalog.style.display='';
-								ui.arenalog.dataset.position=bool;
-							}
-							else{
-								ui.arenalog.style.display='none';
-								ui.arenalog.innerHTML='';
-							}
-						}
-					},
-                    clear_log:{
-                        name:'自动清除历史记录',
-                        init:false,
-						unfrequent:true,
-						intro:'开启后将定时清除历史记录栏的条目（而不是等记录栏满后再清除）'
-                    },
-					log_highlight:{
-						name:'历史记录高亮',
-						init:true,
-						unfrequent:true,
-						intro:'开启后历史记录不同类别的信息将以不同颜色显示',
-					},
-					glow_phase:{
-						name:'当前回合角色高亮',
-						unfrequent:true,
-						init:'yellow',
-						intro:'设置当前回合角色的边框颜色',
-						item:{
-							none:'无',
-							yellow:'黄色',
-							green:'绿色',
-							purple:'紫色',
-						},
-						onclick:function(bool){
-							game.saveConfig('glow_phase',bool);
-							if(_status.currentPhase){
-								if(lib.config.glow_phase){
-									_status.currentPhase.classList.add('glow_phase');
-									ui.arena.dataset.glow_phase=lib.config.glow_phase;
-								}
-								else{
-									_status.currentPhase.classList.remove('glow_phase');
-								}
-							}
-						}
-					},
-                    mark_identity_style:{
-                        name:'标记身份操作',
-						unfrequent:true,
-						init:'menu',
-						item:{
-							menu:'菜单',
-							click:'单击',
-						},
-                    },
+
 					player_border:{
 						name:'边框宽度',
 						init:'normal',
@@ -1559,353 +1467,41 @@
                             ui.window.dataset.radius_size=item;
                         }
                     },
-                    show_time:{
-						name:'显示时间',
-						intro:'在屏幕顶部显示当前时间',
-						init:false,
+					glow_phase:{
+						name:'当前回合角色高亮',
 						unfrequent:true,
+						init:'yellow',
+						intro:'设置当前回合角色的边框颜色',
+						item:{
+							none:'无',
+							yellow:'黄色',
+							green:'绿色',
+							purple:'紫色',
+						},
 						onclick:function(bool){
-							game.saveConfig('show_time',bool);
-							if(bool){
-								ui.time.style.display='';
-							}
-							else{
-								ui.time.style.display='none';
+							game.saveConfig('glow_phase',bool);
+							if(_status.currentPhase){
+								if(lib.config.glow_phase){
+									_status.currentPhase.classList.add('glow_phase');
+									ui.arena.dataset.glow_phase=lib.config.glow_phase;
+								}
+								else{
+									_status.currentPhase.classList.remove('glow_phase');
+								}
 							}
 						}
 					},
-                    show_time2:{
-						name:'显示时间',
-						intro:'在触屏按钮处显示当前时间',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_time2',bool);
-							if(bool){
-								ui.roundmenu.classList.add('clock');
-							}
-							else{
-								ui.roundmenu.classList.remove('clock');
-							}
-						}
-					},
-                    watchface:{
-                        name:'表盘样式',
-                        init:'none',
-                        unfrequent:true,
-                        item:{
-                            none:'默认',
-                            simple:'简约',
-                        },
-                        onclick:function(item){
-                            game.saveConfig('watchface',item);
-                            ui.roundmenu.dataset.watchface=item;
-                        }
-                    },
-					show_card_prompt:{
-						name:'显示出牌信息',
-						intro:'出牌时在使用者上显示卡牌名称',
-						init:true,
-						unfrequent:true,
-					},
-					hide_card_prompt_basic:{
-						name:'隐藏基本牌信息',
-						intro:'不显示基本牌名称',
-						init:false,
-						unfrequent:true,
-					},
-					hide_card_prompt_equip:{
-						name:'隐藏装备牌信息',
-						intro:'不显示装备牌名称',
-						init:false,
-						unfrequent:true,
-					},
-					show_phase_prompt:{
-						name:'显示阶段信息',
-						intro:'在当前回合不同阶段开始时显示阶段名称',
-						init:true,
-						unfrequent:true,
-					},
-                    show_phaseuse_prompt:{
-                        name:'出牌阶段提示',
-						intro:'在你出牌时显示提示文字',
-                        init:true,
-                        unfrequent:true,
-                    },
 					fold_card:{
 						name:'折叠手牌',
 						init:true,
 						unfrequent:true,
 					},
-                    fold_mode:{
-                        name:'折叠模式菜单',
+	                fold_mode:{
+	                    name:'折叠模式菜单',
 						intro:'关闭后模式菜单中“更多”内的项目将直接展开',
-                        init:true,
-                        unfrequent:true,
-                    },
-					auto_popped_config:{
-						name:'自动弹出选项',
-						intro:'鼠标移至选项按钮时弹出模式选择菜单',
-						init:true,
-						unfrequent:true,
-					},
-					auto_popped_history:{
-						name:'自动弹出历史',
-						intro:'鼠标移至暂停按钮时弹出历史记录菜单',
-						init:false,
-						unfrequent:true,
-					},
-					remember_dialog:{
-						name:'记住对话框位置',
-						intro:'移动对话框后新的对话框也将在移动后的位置显示',
-						init:false,
-						unfrequent:true,
-					},
-					reset_dialog:{
-						name:'重置对话框位置',
-						clear:true,
-						unfrequent:true,
-						onclick:function(){
-							if(ui.dialog){
-								var dialog=ui.dialog;
-								dialog.style.transform='';
-								dialog._dragtransform=[0,0];
-								dialog.style.transition='all 0.3s';
-								dialog._dragtouches;
-								dialog._dragorigin;
-								dialog._dragorigintransform;
-								setTimeout(function(){
-									dialog.style.transition='';
-								},500);
-							}
-							game.saveConfig('dialog_transform',[0,0]);
-						}
-					},
-					remember_round_button:{
-						name:'记住按钮位置',
-						intro:'重新开始后触屏按钮将保存的上一局的位置',
-						init:false,
-						unfrequent:true,
-					},
-					reset_round_button:{
-						name:'重置按钮位置',
-						clear:true,
-						unfrequent:true,
-						onclick:function(){
-							ui.click.resetround();
-						}
-					},
-                    character_dialog_tool:{
-                        name:'自由选将显示',
-						intro:'点击自由选将时默认显示的条目',
-                        init:'最近',
-                        item:{
-                            '收藏':'收藏',
-                            '最近':'最近',
-                            'all':'全部'
-                        },
-                        unfrequent:true,
-                    },
-                    recent_character_number:{
-                        name:'最近使用武将',
-						intro:'自由选将对话框中最近使用武将的数量',
-                        init:'12',
-                        item:{
-                            '6':'6',
-                            '12':'12',
-                            '20':'24',
-                            '30':'36',
-                        },
-                        unfrequent:true
-                    },
-					filternode_button:{
-						name:'触屏筛选按钮',
-						intro:'设置自由选将对话框中筛选按钮的样式',
-                        init:true,
-                        unfrequent:true,
-					},
-					show_charactercard:{
-						name:'显示武将资料',
-						intro:'在武将界面单击时弹出武将资料卡',
-						init:true,
-						unfrequent:true
-					},
-                    show_favourite:{
-                        name:'显示添加收藏',
-						intro:'在角色的右键菜单中显示添加收藏',
-                        init:true,
-                        unfrequent:true
-                    },
-                    show_favourite_menu:{
-                        name:'显示收藏菜单',
-						intro:'在选项-武将中显示收藏一栏',
-                        init:true,
-                        unfrequent:true
-                    },
-                    show_ban_menu:{
-                        name:'显示禁将菜单',
-						intro:'在选项-武将中显示禁将一栏',
-                        init:true,
-                        unfrequent:true
-                    },
-					right_range:{
-						name:'显示距离信息',
-						intro:'在角色的右键菜单中显示距离等信息',
-						init:true,
-						unfrequent:true
-					},
-					hide_card_image:{
-						name:'隐藏卡牌背景',
-						intro:'所有卡牌将使用文字作为背景',
-						init:false,
-						unfrequent:true,
-						restart:true,
-					},
-					show_name:{
-						name:'显示武将名',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_name',bool);
-							if(bool){
-								ui.arena.classList.remove('hide_name');
-							}
-							else{
-								ui.arena.classList.add('hide_name');
-							}
-						}
-					},
-					show_replay:{
-						name:'显示重来按钮',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_replay',bool);
-							if(lib.config.show_replay){
-								ui.replay.style.display='';
-							}
-							else{
-								ui.replay.style.display='none';
-							}
-						}
-					},
-					show_playerids:{
-						name:'显示身份按钮',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_playerids',bool);
-							if(lib.config.show_playerids){
-								ui.playerids.style.display='';
-							}
-							else{
-								ui.playerids.style.display='none';
-							}
-						}
-					},
-					show_pause:{
-						name:'显示暂停按钮',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_pause',bool);
-							if(lib.config.show_pause){
-								ui.pause.style.display='';
-							}
-							else{
-								ui.pause.style.display='none';
-							}
-						}
-					},
-					show_auto:{
-						name:'显示托管按钮',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_auto',bool);
-							if(lib.config.show_auto){
-								ui.auto.style.display='';
-							}
-							else{
-								ui.auto.style.display='none';
-							}
-						}
-					},
-					show_volumn:{
-						name:'显示音量按钮',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_volumn',bool);
-							if(lib.config.show_volumn){
-								ui.volumn.style.display='';
-							}
-							else{
-								ui.volumn.style.display='none';
-							}
-						}
-					},
-					show_cardpile:{
-						name:'显示牌堆按钮',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_cardpile',bool);
-							if(lib.config.show_cardpile){
-								ui.cardPileButton.style.display='';
-							}
-							else{
-								ui.cardPileButton.style.display='none';
-							}
-						}
-					},
-					show_handcardbutton:{
-						name:'显示手牌按钮',
-						init:true,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_handcardbutton',bool);
-						}
-					},
-					show_wuxie:{
-						name:'显示无懈按钮',
-						intro:'在右上角显示不询问无懈',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('show_wuxie',bool);
-							if(lib.config.show_wuxie){
-								ui.wuxie.style.display='';
-							}
-							else{
-								ui.wuxie.style.display='none';
-							}
-						}
-					},
-					wuxie_right:{
-						name:'无懈按钮靠左',
-						init:true,
-						unfrequent:true,
-					},
-					show_discardpile:{
-						name:'暂停时显示弃牌堆',
-						init:false,
-						unfrequent:true,
-					},
-					title:{
-						name:'标题栏显示信息',
-						init:false,
-						unfrequent:true,
-						onclick:function(bool){
-							game.saveConfig('title',bool);
-							if(!lib.config.title) document.title='无名杀';
-						}
-					},
-                    show_extensionmaker:{
-                        name:'显示制作扩展',
-                        init:true,
-                        unfrequent:true,
-                    },
+	                    init:true,
+	                    unfrequent:true,
+	                },
 					seperate_control:{
 						name:'分离选项条',
 						init:true,
@@ -2155,17 +1751,7 @@
 					// 	}
 					// },
 					update:function(config,map){
-                        if(get.is.phoneLayout()){
-                            map.show_time2.show();
-                            map.show_time.hide();
-                            map.watchface.show();
-                        }
-                        else{
-                            map.show_time2.hide();
-                            map.show_time.show();
-                            map.watchface.hide();
-                        }
-						if(config.change_skin){
+						if(lib.config.change_skin){
 							map.change_skin_auto.show();
 						}
 						else{
@@ -2191,30 +1777,6 @@
 							// 	map.import_background.hide();
 							// }
 						}
-						if(config.show_card_prompt){
-							map.hide_card_prompt_basic.show();
-							map.hide_card_prompt_equip.show();
-						}
-						else{
-							map.hide_card_prompt_basic.hide();
-							map.hide_card_prompt_equip.hide();
-						}
-                        if(get.is.phoneLayout()){
-                            map.remember_round_button.show();
-                            map.reset_round_button.show();
-							map.filternode_button.show();
-                            map.show_pause.hide();
-                            map.show_auto.hide();
-                            map.show_replay.hide();
-                        }
-                        else{
-                            map.show_pause.show();
-                            map.show_auto.show();
-                            map.show_replay.show();
-                            map.remember_round_button.hide();
-                            map.reset_round_button.hide();
-							map.filternode_button.hide();
-                        }
                         if(lib.config.layout=='long'||lib.config.layout=='mobile'){
                             map.textequip.show();
                             map.cardshape.show();
@@ -2231,18 +1793,6 @@
 								map.cardshape.hide();
                             }
                         }
-                        if(config.show_log!='off'){
-                            map.clear_log.show();
-                        }
-                        else{
-                            map.clear_log.hide();
-                        }
-                        if(lib.config.mode=='versus'||lib.config.mode=='chess'||lib.config.mode=='tafang'||lib.config.mode=='boss'){
-                            map.show_handcardbutton.show();
-                        }
-                        else{
-                            map.show_handcardbutton.hide();
-                        }
                         if(lib.config.layout=='long'){
                             map.fewplayer.show();
                             map.player_height.show();
@@ -2256,31 +1806,475 @@
                                 map.player_height.hide();
                             }
                         }
-						if(config.touchscreen){
+						if(lib.config.touchscreen){
 							map.cursor_style.hide();
 						}
 						else{
 							map.cursor_style.show();
 						}
-						// if(config.theme=='woodden'&&config.image_background=='default'){
-						// 	map.background_color_wood.show();
-						// }
-						// else{
-						// 	map.background_color_wood.hide();
-						// }
-						// if(config.theme=='music'&&config.image_background=='default'){
-						// 	map.background_color_music.show();
-						// }
-						// else{
-						// 	map.background_color_music.hide();
-						// }
-						// if(config.theme=='music'){
-						// 	map.theme_color_music.show();
-						// }
-						// else{
-						// 	map.theme_color_music.hide();
-						// }
 					},
+				}
+			},
+			view:{
+				name:'显示',
+				config:{
+					update:function(config,map){
+						if(lib.config.mode=='versus'||lib.config.mode=='chess'||lib.config.mode=='tafang'||lib.config.mode=='boss'){
+							map.show_handcardbutton.show();
+						}
+						else{
+							map.show_handcardbutton.hide();
+						}
+						if(get.is.phoneLayout()){
+                            map.remember_round_button.show();
+                            map.reset_round_button.show();
+							map.filternode_button.show();
+                            map.show_pause.hide();
+                            map.show_auto.hide();
+                            map.show_replay.hide();
+                        }
+                        else{
+                            map.show_pause.show();
+                            map.show_auto.show();
+                            map.show_replay.show();
+                            map.remember_round_button.hide();
+                            map.reset_round_button.hide();
+							map.filternode_button.hide();
+                        }
+						if(lib.config.show_card_prompt){
+							map.hide_card_prompt_basic.show();
+							map.hide_card_prompt_equip.show();
+						}
+						else{
+							map.hide_card_prompt_basic.hide();
+							map.hide_card_prompt_equip.hide();
+						}
+						if(lib.config.show_log!='off'){
+                            map.clear_log.show();
+                        }
+                        else{
+                            map.clear_log.hide();
+                        }
+						if(get.is.phoneLayout()){
+                            map.show_time2.show();
+                            map.show_time.hide();
+                            map.watchface.show();
+                        }
+                        else{
+                            map.show_time2.hide();
+                            map.show_time.show();
+                            map.watchface.hide();
+                        }
+					},
+					show_history:{
+						name:'出牌记录栏',
+						init:'off',
+						intro:'在屏幕左侧或右侧显示出牌记录',
+						unfrequent:true,
+						item:{
+							off:'关闭',
+							left:'靠左',
+							right:'靠右',
+						},
+						onclick:function(bool){
+                            if(lib.config.show_history=='right') ui.window.animate('rightbar2');
+							game.saveConfig('show_history',bool);
+                            if(_status.video||!_status.prepareArena) return;
+                            if(bool=='left'){
+                                ui.window.classList.add('leftbar');
+                                ui.window.classList.remove('rightbar');
+                            }
+                            else if(bool=='right'){
+                                ui.window.classList.remove('leftbar');
+                                ui.window.classList.add('rightbar');
+                            }
+                            else{
+                                ui.window.classList.remove('leftbar');
+                                ui.window.classList.remove('rightbar');
+                            }
+						}
+					},
+					show_log:{
+						name:'历史记录栏',
+						init:'off',
+						intro:'在屏幕中部显示出牌文字记录',
+						unfrequent:true,
+						item:{
+							off:'关闭',
+							left:'靠左',
+							center:'居中',
+							right:'靠右',
+						},
+						onclick:function(bool){
+							game.saveConfig('show_log',bool);
+							if(lib.config.show_log!='off'){
+								ui.arenalog.style.display='';
+								ui.arenalog.dataset.position=bool;
+							}
+							else{
+								ui.arenalog.style.display='none';
+								ui.arenalog.innerHTML='';
+							}
+						}
+					},
+					clear_log:{
+                        name:'自动清除历史记录',
+                        init:false,
+						unfrequent:true,
+						intro:'开启后将定时清除历史记录栏的条目（而不是等记录栏满后再清除）'
+                    },
+					log_highlight:{
+						name:'历史记录高亮',
+						init:true,
+						unfrequent:true,
+						intro:'开启后历史记录不同类别的信息将以不同颜色显示',
+					},
+					show_time:{
+						name:'显示时间',
+						intro:'在屏幕顶部显示当前时间',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_time',bool);
+							if(bool){
+								ui.time.style.display='';
+							}
+							else{
+								ui.time.style.display='none';
+							}
+						}
+					},
+                    show_time2:{
+						name:'显示时间',
+						intro:'在触屏按钮处显示当前时间',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_time2',bool);
+							if(bool){
+								ui.roundmenu.classList.add('clock');
+							}
+							else{
+								ui.roundmenu.classList.remove('clock');
+							}
+						}
+					},
+                    watchface:{
+                        name:'表盘样式',
+                        init:'none',
+                        unfrequent:true,
+                        item:{
+                            none:'默认',
+                            simple:'简约',
+                        },
+                        onclick:function(item){
+                            game.saveConfig('watchface',item);
+                            ui.roundmenu.dataset.watchface=item;
+                        }
+                    },
+					show_card_prompt:{
+						name:'显示出牌信息',
+						intro:'出牌时在使用者上显示卡牌名称',
+						init:true,
+						unfrequent:true,
+					},
+					hide_card_prompt_basic:{
+						name:'隐藏基本牌信息',
+						intro:'不显示基本牌名称',
+						init:false,
+						unfrequent:true,
+					},
+					hide_card_prompt_equip:{
+						name:'隐藏装备牌信息',
+						intro:'不显示装备牌名称',
+						init:false,
+						unfrequent:true,
+					},
+					show_phase_prompt:{
+						name:'显示阶段信息',
+						intro:'在当前回合不同阶段开始时显示阶段名称',
+						init:true,
+						unfrequent:true,
+					},
+                    show_phaseuse_prompt:{
+                        name:'出牌阶段提示',
+						intro:'在你出牌时显示提示文字',
+                        init:true,
+                        unfrequent:true,
+                    },
+					auto_popped_config:{
+						name:'自动弹出选项',
+						intro:'鼠标移至选项按钮时弹出模式选择菜单',
+						init:true,
+						unfrequent:true,
+					},
+					auto_popped_history:{
+						name:'自动弹出历史',
+						intro:'鼠标移至暂停按钮时弹出历史记录菜单',
+						init:false,
+						unfrequent:true,
+					},
+					remember_dialog:{
+						name:'记住对话框位置',
+						intro:'移动对话框后新的对话框也将在移动后的位置显示',
+						init:false,
+						unfrequent:true,
+					},
+					reset_dialog:{
+						name:'重置对话框位置',
+						clear:true,
+						unfrequent:true,
+						onclick:function(){
+							if(ui.dialog){
+								var dialog=ui.dialog;
+								dialog.style.transform='';
+								dialog._dragtransform=[0,0];
+								dialog.style.transition='all 0.3s';
+								dialog._dragtouches;
+								dialog._dragorigin;
+								dialog._dragorigintransform;
+								setTimeout(function(){
+									dialog.style.transition='';
+								},500);
+							}
+							game.saveConfig('dialog_transform',[0,0]);
+						}
+					},
+					remember_round_button:{
+						name:'记住按钮位置',
+						intro:'重新开始后触屏按钮将保存的上一局的位置',
+						init:false,
+						unfrequent:true,
+					},
+					reset_round_button:{
+						name:'重置按钮位置',
+						clear:true,
+						unfrequent:true,
+						onclick:function(){
+							ui.click.resetround();
+						}
+					},
+					mark_identity_style:{
+                        name:'标记身份操作',
+						intro:'设置单击身份按钮时的操作',
+						unfrequent:true,
+						init:'menu',
+						item:{
+							menu:'菜单',
+							click:'单击',
+						},
+                    },
+					character_dialog_tool:{
+                        name:'自由选将显示',
+						intro:'点击自由选将时默认显示的条目',
+                        init:'最近',
+                        item:{
+                            '收藏':'收藏',
+                            '最近':'最近',
+                            'all':'全部'
+                        },
+                        unfrequent:true,
+                    },
+                    recent_character_number:{
+                        name:'最近使用武将',
+						intro:'自由选将对话框中最近使用武将的数量',
+                        init:'12',
+                        item:{
+                            '6':'6',
+                            '12':'12',
+                            '20':'24',
+                            '30':'36',
+                        },
+                        unfrequent:true
+                    },
+					filternode_button:{
+						name:'触屏筛选按钮',
+						intro:'设置自由选将对话框中筛选按钮的样式',
+                        init:true,
+                        unfrequent:true,
+					},
+					show_charactercard:{
+						name:'显示武将资料',
+						intro:'在武将界面单击时弹出武将资料卡',
+						init:true,
+						unfrequent:true
+					},
+                    show_favourite:{
+                        name:'显示添加收藏',
+						intro:'在角色的右键菜单中显示添加收藏',
+                        init:false,
+                        unfrequent:true
+                    },
+                    show_favourite_menu:{
+                        name:'显示收藏菜单',
+						intro:'在选项-武将中显示收藏一栏',
+                        init:true,
+                        unfrequent:true
+                    },
+                    show_ban_menu:{
+                        name:'显示禁将菜单',
+						intro:'在选项-武将中显示禁将一栏',
+                        init:true,
+                        unfrequent:true
+                    },
+					right_range:{
+						name:'显示距离信息',
+						intro:'在角色的右键菜单中显示距离等信息',
+						init:true,
+						unfrequent:true
+					},
+					hide_card_image:{
+						name:'隐藏卡牌背景',
+						intro:'所有卡牌将使用文字作为背景',
+						init:false,
+						unfrequent:true,
+						restart:true,
+					},
+					show_name:{
+						name:'显示角色名称',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_name',bool);
+							if(bool){
+								ui.arena.classList.remove('hide_name');
+							}
+							else{
+								ui.arena.classList.add('hide_name');
+							}
+						}
+					},
+					show_replay:{
+						name:'显示重来按钮',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_replay',bool);
+							if(lib.config.show_replay){
+								ui.replay.style.display='';
+							}
+							else{
+								ui.replay.style.display='none';
+							}
+						}
+					},
+					show_playerids:{
+						name:'显示身份按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_playerids',bool);
+							if(lib.config.show_playerids){
+								ui.playerids.style.display='';
+							}
+							else{
+								ui.playerids.style.display='none';
+							}
+						}
+					},
+					show_pause:{
+						name:'显示暂停按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_pause',bool);
+							if(lib.config.show_pause){
+								ui.pause.style.display='';
+							}
+							else{
+								ui.pause.style.display='none';
+							}
+						}
+					},
+					show_auto:{
+						name:'显示托管按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_auto',bool);
+							if(lib.config.show_auto){
+								ui.auto.style.display='';
+							}
+							else{
+								ui.auto.style.display='none';
+							}
+						}
+					},
+					show_volumn:{
+						name:'显示音量按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_volumn',bool);
+							if(lib.config.show_volumn){
+								ui.volumn.style.display='';
+							}
+							else{
+								ui.volumn.style.display='none';
+							}
+						}
+					},
+					show_cardpile:{
+						name:'显示牌堆按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_cardpile',bool);
+							if(lib.config.show_cardpile){
+								ui.cardPileButton.style.display='';
+							}
+							else{
+								ui.cardPileButton.style.display='none';
+							}
+						}
+					},
+					show_handcardbutton:{
+						name:'显示手牌按钮',
+						init:true,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_handcardbutton',bool);
+						}
+					},
+					show_wuxie:{
+						name:'显示无懈按钮',
+						intro:'在右上角显示不询问无懈',
+						init:false,
+						unfrequent:true,
+						onclick:function(bool){
+							game.saveConfig('show_wuxie',bool);
+							if(lib.config.show_wuxie){
+								ui.wuxie.style.display='';
+							}
+							else{
+								ui.wuxie.style.display='none';
+							}
+						}
+					},
+					wuxie_right:{
+						name:'无懈按钮靠左',
+						init:true,
+						unfrequent:true,
+					},
+					show_discardpile:{
+						name:'暂停时显示弃牌堆',
+						init:false,
+						unfrequent:true,
+					},
+					// title:{
+					// 	name:'标题栏显示信息',
+					// 	init:false,
+					// 	unfrequent:true,
+					// 	onclick:function(bool){
+					// 		game.saveConfig('title',bool);
+					// 		if(!lib.config.title) document.title='无名杀';
+					// 	}
+					// },
+                    show_extensionmaker:{
+                        name:'显示制作扩展',
+                        init:true,
+                        unfrequent:true,
+                    },
 				}
 			},
 			audio:{
@@ -23785,7 +23779,7 @@
                     game.logv(logvid,'<div class="text center">'+str+'</div>');
                 }
             }
-			if(lib.config.title) document.title=str;
+			// if(lib.config.title) document.title=str;
 			if(lib.config.show_log!='off'&&!game.chess){
                 var nodeentry=node.cloneNode(true);
 				ui.arenalog.insertBefore(nodeentry,ui.arenalog.firstChild);
@@ -25458,6 +25452,8 @@
 						}
 					}
 
+					var updateView=null;
+					var updateAppearence=null;
 					var createModeConfig=function(mode,position){
                         var info=lib.configMenu[mode];
                         var page=ui.create.div('');
@@ -25637,6 +25633,16 @@
 								page.style.paddingBottom='10px';
 							}
 							var config=lib.config;
+							if(mode=='appearence'){
+								updateAppearence=function(){
+									info.config.update(config,map);
+								};
+							}
+							else if(mode=='view'){
+								updateView=function(){
+									info.config.update(config,map);
+								};
+							}
                             for(var j in info.config){
                                 if(j==='update'){
                                     continue;
@@ -25661,9 +25667,21 @@
                                     };
                                 }
                                 if(info.config.update){
-                                    cfg.update=function(){
-                                        info.config.update(config,map);
-                                    };
+									if(mode=='appearence'||mode=='view'){
+										cfg.update=function(){
+											if(updateAppearence){
+												updateAppearence();
+											}
+											if(updateView){
+												updateView();
+											}
+										};
+									}
+									else{
+										cfg.update=function(){
+	                                        info.config.update(config,map);
+	                                    };
+									}
                                 }
                                 var cfgnode=createConfig(cfg);
 								if(cfg.type=='autoskill'){

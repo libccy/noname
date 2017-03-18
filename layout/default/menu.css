@@ -490,6 +490,9 @@
 .popup-container>.menu.visual>.button.transparent{
 	pointer-events: none;
 }
+.popup-container>.menu.visual>.button.transparent:not(.shown){
+	display: none;
+}
 .popup-container>.menu.visual>.dashedmenubutton{
 	box-shadow: none !important;
 	width: 86px;
