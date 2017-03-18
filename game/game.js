@@ -460,7 +460,7 @@
 								theme.remove();
 								setTimeout(function(){ui.arena.show();},100);
 							},500);
-							
+
 							if(lib.config.auto_style){
 								if(lib.config.theme=='simple'){
 									lib.configMenu.appearence.config.player_border.onclick('slim');
@@ -34773,9 +34773,14 @@
 			},
 			charactercard:function(name,sourcenode,noedit){
 				if(_status.dragged) return;
-				if(lib.config.theme!='simple') ui.window.classList.add('shortcutpaused');
-				// ui.window.classList.add('systempaused');
-				ui.menuContainer.classList.add('forceopaque');
+				if(lib.config.theme!='simple'){
+					ui.window.classList.add('shortcutpaused');
+					ui.menuContainer.classList.add('forceopaque');
+				}
+				else{
+					ui.window.classList.add('systempaused');
+					ui.menuContainer.classList.add('transparent2');
+				}
 				if(lib.config.blur_ui){
 					ui.arena.classList.add('blur');
 					ui.system.classList.add('blur');
@@ -34786,8 +34791,9 @@
                     if(_status.touchpopping) return;
 					if(_status.dragged) return;
 					ui.window.classList.remove('shortcutpaused');
-					// ui.window.classList.remove('systempaused');
+					ui.window.classList.remove('systempaused');
 					ui.menuContainer.classList.remove('forceopaque');
+					ui.menuContainer.classList.remove('transparent2');
 					ui.arena.classList.remove('blur');
 					ui.system.classList.remove('blur');
 					ui.menuContainer.classList.remove('blur');
