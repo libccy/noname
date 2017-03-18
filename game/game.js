@@ -1347,6 +1347,68 @@
 							var style=ui.css.hp_style;
 							ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
 							style.remove();
+							if(ui.css.hp_stylesheet1){
+								ui.css.hp_stylesheet1.remove();
+								delete ui.css.hp_stylesheet1;
+							}
+							if(ui.css.hp_stylesheet2){
+								ui.css.hp_stylesheet2.remove();
+								delete ui.css.hp_stylesheet2;
+							}
+							if(ui.css.hp_stylesheet3){
+								ui.css.hp_stylesheet3.remove();
+								delete ui.css.hp_stylesheet3;
+							}
+							if(ui.css.hp_stylesheet4){
+								ui.css.hp_stylesheet4.remove();
+								delete ui.css.hp_stylesheet4;
+							}
+							if(layout=='custom'){
+								game.getDB('image','hp_style1',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.hp_stylesheet1){
+											ui.css.hp_stylesheet1.remove();
+										}
+										ui.css.hp_stylesheet1=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+								game.getDB('image','hp_style2',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.hp_stylesheet2){
+											ui.css.hp_stylesheet2.remove();
+										}
+										ui.css.hp_stylesheet2=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+								game.getDB('image','hp_style3',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.hp_stylesheet3){
+											ui.css.hp_stylesheet3.remove();
+										}
+										ui.css.hp_stylesheet3=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+								game.getDB('image','hp_style4',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.hp_stylesheet4){
+											ui.css.hp_stylesheet4.remove();
+										}
+										ui.css.hp_stylesheet4=lib.init.sheet('.hp:not(.text):not(.actcount)>.lost{background-image:url('+fileLoadedEvent.target.result+')}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
 						},
 						unfrequent:true,
 					},
@@ -5766,17 +5828,63 @@
 									ui.css.cardback_stylesheet.remove();
 								}
 								ui.css.cardback_stylesheet=lib.init.sheet('.card:empty,.card.infohidden{background-image:url('+fileLoadedEvent.target.result+')}');
-								game.getDB('image','cardback_style2',function(fileToLoad){
-									if(!fileToLoad) return;
-									var fileReader = new FileReader();
-									fileReader.onload = function(fileLoadedEvent){
-										if(ui.css.cardback_stylesheet2){
-											ui.css.cardback_stylesheet2.remove();
-										}
-										ui.css.cardback_stylesheet2=lib.init.sheet('.card.infohidden:not(.infoflip){background-image:url('+fileLoadedEvent.target.result+')}');
-									};
-									fileReader.readAsDataURL(fileToLoad, "UTF-8");
-								});
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+						game.getDB('image','cardback_style2',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.cardback_stylesheet2){
+									ui.css.cardback_stylesheet2.remove();
+								}
+								ui.css.cardback_stylesheet2=lib.init.sheet('.card.infohidden:not(.infoflip){background-image:url('+fileLoadedEvent.target.result+')}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
+					if(lib.config.hp_style=='custom'){
+						game.getDB('image','hp_style1',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.hp_stylesheet1){
+									ui.css.hp_stylesheet1.remove();
+								}
+								ui.css.hp_stylesheet1=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+						game.getDB('image','hp_style2',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.hp_stylesheet2){
+									ui.css.hp_stylesheet2.remove();
+								}
+								ui.css.hp_stylesheet2=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+						game.getDB('image','hp_style3',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.hp_stylesheet3){
+									ui.css.hp_stylesheet3.remove();
+								}
+								ui.css.hp_stylesheet3=lib.init.sheet('.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url('+fileLoadedEvent.target.result+')}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+						game.getDB('image','hp_style4',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.hp_stylesheet4){
+									ui.css.hp_stylesheet4.remove();
+								}
+								ui.css.hp_stylesheet4=lib.init.sheet('.hp:not(.text):not(.actcount)>.lost{background-image:url('+fileLoadedEvent.target.result+')}');
 							};
 							fileReader.readAsDataURL(fileToLoad, "UTF-8");
 						});

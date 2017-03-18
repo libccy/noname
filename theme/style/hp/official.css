@@ -4,6 +4,7 @@
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    border-radius: 0px;
 }
 .hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){
     background: url('image/official2.png');
@@ -11,6 +12,7 @@
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    border-radius: 0px;
 }
 .hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){
     background: url('image/official3.png');
@@ -18,6 +20,7 @@
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    border-radius: 0px;
 }
 .hp:not(.text):not(.actcount)>.lost{
     background: url('image/official4.png');
@@ -25,6 +28,7 @@
     border: none;
     background-size: cover;
     transform: scale(1.4) rotate(180deg);
+    border-radius: 0px;
 }
 
 #arena.oldlayout .player .hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){
