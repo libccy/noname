@@ -2063,6 +2063,12 @@
 						init:'xinwei',
 						unfrequent:true,
 						item:{},
+						textMenu:function(node,link){
+							if(link!='default'){
+								node.style.fontFamily=link;
+							}
+							node.style.fontSize='20px';
+						},
 						onclick:function(font){
 							game.saveConfig('name_font',font);
 							ui.arena.dataset.name_font=font;
@@ -2073,6 +2079,12 @@
 						init:'huangcao',
 						unfrequent:true,
 						item:{},
+						textMenu:function(node,link){
+							if(link!='default'){
+								node.style.fontFamily=link;
+							}
+							node.style.fontSize='20px';
+						},
 						onclick:function(font){
 							game.saveConfig('identity_font',font);
 							ui.arena.dataset.identity_font=font;
@@ -2083,6 +2095,12 @@
 						init:'default',
 						unfrequent:true,
 						item:{},
+						textMenu:function(node,link){
+							if(link!='default'){
+								node.style.fontFamily=link;
+							}
+							node.style.fontSize='20px';
+						},
 						onclick:function(font){
 							game.saveConfig('cardtext_font',font);
 							ui.arena.dataset.cardtext_font=font;
@@ -2093,6 +2111,12 @@
 						init:'default',
 						unfrequent:true,
 						item:{},
+						textMenu:function(node,link){
+							if(link!='default'){
+								node.style.fontFamily=link;
+							}
+							node.style.fontSize='20px';
+						},
 						onclick:function(font){
 							game.saveConfig('global_font',font);
 							ui.arena.dataset.global_font=font;
@@ -25320,7 +25344,11 @@
 							}
 	                        else{
 		                        for(var i in config.item){
-		                            ui.create.div('',config.item[i],node._link.menu,clickMenuItem)._link=i;
+									var textMenu=ui.create.div('',config.item[i],node._link.menu,clickMenuItem);
+		                            textMenu._link=i;
+									if(config.textMenu){
+										config.textMenu(textMenu,i,config.item[i],config)
+									}
 		                        }
 							}
 							node._link.menu._link=node;
