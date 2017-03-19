@@ -200,7 +200,7 @@
 .player.playerblank{
     background: none;
 }
-.player.obstacle{
+#window .player.obstacle{
     background: repeating-linear-gradient(
       135deg,
       rgba(0,0,0,0.2),

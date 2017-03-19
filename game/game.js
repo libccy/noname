@@ -1527,6 +1527,10 @@
 									default:str='url("'+lib.assetURL+'theme/style/player/'+layout+'.png");background-size:100% 100%';break;
 								}
 								ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
+								if(['bronze','silver','gold'].contains(layout)){
+									ui.css.player_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'2.png")}',0);
+									ui.css.player_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'3.png")}',0);
+								}
 							}
 						},
 						unfrequent:true,
@@ -5806,6 +5810,10 @@
 						default:str='url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'.png");background-size:100% 100%';break;
 					}
 					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
+					if(['bronze','silver','gold'].contains(lib.config.player_style)){
+						ui.css.player_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'2.png")}',0);
+						ui.css.player_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'3.png")}',0);
+					}
 				}
 				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
 					var str='';
@@ -30345,10 +30353,6 @@
     								script.remove();
     								var update=window.noname_update;
     								delete window.noname_update;
-									if(update.version=='1.9.12'){
-										update.version='1.9.12修复';
-										// modify later
-									}
     								if(forcecheck===false){
                                         if(update.version==lib.config.check_version){
                                             return;
@@ -32603,7 +32607,7 @@
 				ui.arena=ui.create.div('#arena.nome',ui.window);
                 ui.arena.setNumber=function(num){
                     this.dataset.number=num;
-                    if(parseInt(num)<parseInt(lib.config.fewplayer)){
+                    if(game.layout=='long'&&parseInt(num)<parseInt(lib.config.fewplayer)){
                         this.classList.add('fewplayer');
                     }
                     else{
@@ -33245,6 +33249,7 @@
 				node.node={
 					avatar:ui.create.div('.avatar',node,ui.click.avatar).hide(),
 					avatar2:ui.create.div('.avatar2',node,ui.click.avatar2).hide(),
+					framebg:ui.create.div('.framebg',node),
 					intro:ui.create.div('.intro',node),
 					identity:ui.create.div('.identity',node),
 					hp:ui.create.div('.hp',node),

@@ -2487,8 +2487,14 @@ window.noname_asset_list=[
     'theme/style/hp/image/round3.png',
     'theme/style/hp/image/round4.png',
     'theme/style/player/bronze.png',
+    'theme/style/player/bronze2.png',
+    'theme/style/player/bronze3.png',
     'theme/style/player/gold.png',
+    'theme/style/player/gold2.png',
+    'theme/style/player/gold3.png',
     'theme/style/player/silver.png',
+    'theme/style/player/silver2.png',
+    'theme/style/player/silver3.png',
 ];
 window.noname_skin_list={
     bulianshi:4,

@@ -91,7 +91,7 @@ html{
 	color: rgba(106, 27, 154, 1);
 }
 .player,.card,.dialog>.bar,.cardbg,
-#arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg{
+#arena.mobile:not(.chess) .player[data-position='0'] .equips,.playerbg,#window .player.playerbg{
 	background: url('wood.jpg');
 }
 .cardbg.button{

@@ -449,7 +449,7 @@ mode.chess={
 			}
 		}
 
-		ui.chessinfo=ui.create.div('.fakeme.player',ui.me,function(e){
+		ui.chessinfo=ui.create.div('.fakeme.player.playerbg',ui.me,function(e){
 			e.stopPropagation();
 		});
 		ui.create.div(ui.chessinfo);
