@@ -5637,7 +5637,9 @@
 					if(lib.device||typeof window.require=='function'){
 						lib.configMenu.audio.config.background_music.item.music_custom='自定';
 					}
+					lib.config.all.background_music=['music_default'];
 					for(i in music.pack){
+						lib.config.all.background_music.push(i);
 						lib.configMenu.audio.config.background_music.item[i]=music.pack[i];
 					}
 				    lib.configMenu.audio.config.background_music.item.music_random='随机';
