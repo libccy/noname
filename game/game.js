@@ -1530,6 +1530,7 @@
 								if(['bronze','silver','gold'].contains(layout)){
 									ui.css.player_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'2.png")}',0);
 									ui.css.player_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'3.png")}',0);
+									ui.css.player_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 								}
 							}
 						},
@@ -5813,6 +5814,7 @@
 					if(['bronze','silver','gold'].contains(lib.config.player_style)){
 						ui.css.player_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'2.png")}',0);
 						ui.css.player_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'3.png")}',0);
+						ui.css.player_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 					}
 				}
 				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
