@@ -1537,7 +1537,9 @@
 									ui.css.player_stylesheet.sheet.insertRule('#window #arena>.player:not(.inited),#window #arena>.player.unseen,#window #arena>.player.unseen2{background-image:none}',0);
 									ui.css.player_stylesheet.sheet.insertRule('.turnedover:not(.unseen):not(.unseen2)>.avatar,.turnedover:not(.unseen):not(.unseen2)>.avatar2{opacity:0.5}',0);
 									ui.css.player_stylesheet.sheet.insertRule('#arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{opacity:0.3}',0);
-									ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{-webkit-filter:saturate(0.5)}',0);
+									if(lib.config.player_style=='gold'){
+										ui.css.player_stylesheet.sheet.insertRule('#window .player.turnedover{background-image:linear-gradient(rgb(175, 131, 57), rgb(178, 139, 66))}',0);
+									}
 								}
 							}
 						},
@@ -5828,7 +5830,9 @@
 						ui.css.player_stylesheet.sheet.insertRule('#window #arena>.player:not(.inited),#window #arena>.player.unseen,#window #arena>.player.unseen2{background-image:none}',0);
 						ui.css.player_stylesheet.sheet.insertRule('.turnedover:not(.unseen):not(.unseen2)>.avatar,.turnedover:not(.unseen):not(.unseen2)>.avatar2{opacity:0.5}',0);
 						ui.css.player_stylesheet.sheet.insertRule('#arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{opacity:0.3}',0);
-						ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{-webkit-filter:saturate(0.5)}',0);
+						if(lib.config.player_style=='gold'){
+							ui.css.player_stylesheet.sheet.insertRule('#window .player.turnedover{background-image:linear-gradient(rgb(175, 131, 57), rgb(178, 139, 66))}',0);
+						}
 					}
 				}
 				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
