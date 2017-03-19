@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.12',
+    version:'1.9.12beta',
     // update:'1.9.11',
     changeLog:[
         '新外观选项',

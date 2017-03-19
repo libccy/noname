@@ -1674,7 +1674,7 @@
 										if(ui.css.control_stylesheet){
 											ui.css.control_stylesheet.remove();
 										}
-										ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:url("'+fileLoadedEvent.target.result+'")}');
+										ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("'+fileLoadedEvent.target.result+'")}');
 									};
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
@@ -1686,7 +1686,12 @@
 									case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
 									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
 								}
-								ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
+								if(layout=='wood'){
+									ui.css.control_stylesheet=lib.init.sheet('#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
+								}
+								else{
+									ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:'+str+'}');
+								}
 							}
 						},
 						unfrequent:true,
@@ -1912,7 +1917,7 @@
 					},
 					animation:{
 						name:'游戏特效',
-						intro:'开启后属性伤害等会显示动画',
+						intro:'开启后出现属性伤害、回复体力等情况时会显示动画',
 						init:true,
 						unfrequent:true,
 					},
@@ -1923,8 +1928,8 @@
 						unfrequent:true,
 					},
 					target_shake:{
-						name:'目标特效',
-						intro:'一名玩家成为目标时的显示效果',
+						name:'目标效果',
+						intro:'一名玩家成为卡牌或技能的目标时的显示效果',
 						init:'off',
 						item:{
 							off:'关闭',
@@ -5791,7 +5796,12 @@
 						case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
 						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
 					}
-					ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
+					if(lib.config.control_style=='wood'){
+						ui.css.control_stylesheet=lib.init.sheet('#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
+					}
+					else{
+						ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:'+str+'}');
+					}
 				}
 				if(lib.config.menu_style!='default'&&lib.config.menu_style!='custom'){
 					var str='';
@@ -6291,7 +6301,7 @@
 								if(ui.css.control_stylesheet){
 									ui.css.control_stylesheet.remove();
 								}
-								ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:url("'+fileLoadedEvent.target.result+'")}');
+								ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("'+fileLoadedEvent.target.result+'")}');
 							};
 							fileReader.readAsDataURL(fileToLoad, "UTF-8");
 						});
