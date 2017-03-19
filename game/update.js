@@ -1,17 +1,10 @@
 window.noname_update={
     version:'1.9.12.1',
-    update:'1.9',
+    // update:'1.9',
     changeLog:[
         '新外观选项',
     ],
     files:[
-        'game/*',
-        'card/*',
-        'character/*',
-        'mode/*',
-        'game/../theme/*',
-        'layout/*',
-        'extension/*'
         // 'game/game.js',
         // 'game/package.js',
         // 'game/config.js',
