@@ -1524,7 +1524,10 @@
 									case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
 									case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
 									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
-									default:str='url("'+lib.assetURL+'theme/style/player/'+layout+'.png");background-size:100% 100%';break;
+									case 'bronze':str='linear-gradient(rgb(175, 131, 57), rgb(178, 139, 66))';break;
+									case 'silver':str='linear-gradient(rgb(241, 248, 255), rgb(230, 243, 253))';break;
+									case 'gold':str='linear-gradient(rgb(249, 220, 22), rgb(249, 220, 22))';break;
+									// default:str='url("'+lib.assetURL+'theme/style/player/'+layout+'.png");background-size:100% 100%';break;
 								}
 								ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
 								if(['bronze','silver','gold'].contains(layout)){
@@ -1534,7 +1537,7 @@
 									ui.css.player_stylesheet.sheet.insertRule('#window #arena>.player:not(.inited),#window #arena>.player.unseen,#window #arena>.player.unseen2{background-image:none}',0);
 									ui.css.player_stylesheet.sheet.insertRule('.turnedover:not(.unseen):not(.unseen2)>.avatar,.turnedover:not(.unseen):not(.unseen2)>.avatar2{opacity:0.5}',0);
 									ui.css.player_stylesheet.sheet.insertRule('#arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{opacity:0.3}',0);
-									// ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{opacity:0.5}',0);
+									ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{-webkit-filter:saturate(0.5)}',0);
 								}
 							}
 						},
@@ -5812,7 +5815,10 @@
 						case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
 						case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
 						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
-						default:str='url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'.png");background-size:100% 100%';break;
+						case 'bronze':str='linear-gradient(rgb(175, 131, 57), rgb(178, 139, 66))';break;
+						case 'silver':str='linear-gradient(rgb(241, 248, 255), rgb(230, 243, 253))';break;
+						case 'gold':str='linear-gradient(rgb(249, 220, 22), rgb(249, 220, 22))';break;
+						// default:str='url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'.png");background-size:100% 100%';break;
 					}
 					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
 					if(['bronze','silver','gold'].contains(lib.config.player_style)){
@@ -5822,7 +5828,7 @@
 						ui.css.player_stylesheet.sheet.insertRule('#window #arena>.player:not(.inited),#window #arena>.player.unseen,#window #arena>.player.unseen2{background-image:none}',0);
 						ui.css.player_stylesheet.sheet.insertRule('.turnedover:not(.unseen):not(.unseen2)>.avatar,.turnedover:not(.unseen):not(.unseen2)>.avatar2{opacity:0.5}',0);
 						ui.css.player_stylesheet.sheet.insertRule('#arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{opacity:0.3}',0);
-						// ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{opacity:0.5}',0);
+						ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{-webkit-filter:saturate(0.5)}',0);
 					}
 				}
 				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
