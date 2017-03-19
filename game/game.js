@@ -879,12 +879,6 @@
 							ui.background.style.backgroundSize='cover';
 						},
 					},
-					// import_background:{
-					// 	name:'<div style="white-space:nowrap;width:calc(100% - 5px)">'+
-					// 	'<input type="file" style="width:calc(100% - 40px)" accept="image/jpeg">'+
-					// 	'<button style="width:40px">确定</button></div>',
-					// 	clear:true,
-					// },
 					image_background_random:{
 						name:'随机背景',
 						init:false
@@ -26722,16 +26716,8 @@
 								}
 							});
 							var input=document.createElement('input');
+							input.className='fileinput';
 							input.type='file';
-							input.style.position='absolute';
-							input.style.margin=0;
-							input.style.padding=0;
-							input.style.left=0;
-							input.style.top=0;
-							input.style.width='100%';
-							input.style.height='100%';
-							input.style.opacity=0;
-							input.style.outline='none';
 							input.onchange=function(){
 								var fileToLoad=input.files[0];
 								game.print(fileToLoad.name);
@@ -28386,6 +28372,7 @@
     						var input=document.createElement('input');
     						input.type='file';
     						input.accept='image/jpeg';
+							input.className='fileinput';
     						input.onchange=function(){
     							var fileToLoad=input.files[0];
     							if(fileToLoad){
@@ -28870,6 +28857,7 @@
     						var input=document.createElement('input');
     						input.type='file';
     						input.accept='image/jpeg,image/png';
+							input.className='fileinput';
     						input.onchange=function(){
     							var fileToLoad=input.files[0];
     							if(fileToLoad){
