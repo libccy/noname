@@ -1527,10 +1527,10 @@
 							else if(layout!='default'){
 								var str='';
 								switch(layout){
-									case 'wood':str='url("theme/woodden/wood.jpg")';break;
+									case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
 									case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
 									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
-									default:str='url("theme/style/player/'+layout+'.png");background-size:100% 100%';break;
+									default:str='url("'+lib.assetURL+'theme/style/player/'+layout+'.png");background-size:100% 100%';break;
 								}
 								ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
 							}
@@ -1682,7 +1682,7 @@
 							else if(layout!='default'){
 								var str='';
 								switch(layout){
-									case 'wood':str='url("theme/woodden/wood.jpg")';break;
+									case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
 									case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
 									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
 								}
@@ -1812,7 +1812,7 @@
 							else if(layout!='default'){
 								var str='';
 								switch(layout){
-									case 'wood':str='url("theme/woodden/wood2.png")';break;
+									case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood2.png")';break;
 									case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
 									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
 								}
@@ -5779,20 +5779,20 @@
 				ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
 				ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
 				ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
-				if(lib.config.player_style!='default'&&lib.config.player_style!='custom'){
+				if(lib.config.player_style&&lib.config.player_style!='default'&&lib.config.player_style!='custom'){
 					var str='';
 					switch(lib.config.player_style){
-						case 'wood':str='url("theme/woodden/wood.jpg")';break;
+						case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
 						case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
 						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
-						default:str='url("theme/style/player/'+lib.config.player_style+'.png");background-size:100% 100%';break;
+						default:str='url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'.png");background-size:100% 100%';break;
 					}
 					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
 				}
-				if(lib.config.control_style!='default'&&lib.config.control_style!='custom'){
+				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
 					var str='';
 					switch(lib.config.control_style){
-						case 'wood':str='url("theme/woodden/wood.jpg")';break;
+						case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood.jpg")';break;
 						case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
 						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
 					}
@@ -5803,10 +5803,10 @@
 						ui.css.control_stylesheet=lib.init.sheet('#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:'+str+'}');
 					}
 				}
-				if(lib.config.menu_style!='default'&&lib.config.menu_style!='custom'){
+				if(lib.config.menu_style&&lib.config.menu_style!='default'&&lib.config.menu_style!='custom'){
 					var str='';
 					switch(lib.config.menu_style){
-						case 'wood':str='url("theme/woodden/wood2.png")';break;
+						case 'wood':str='url("'+lib.assetURL+'theme/woodden/wood2.png")';break;
 						case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
 						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
 					}
@@ -30263,7 +30263,7 @@
                                                 updates=files.concat(files2);
                                             }
                                             for(var i=0;i<updates.length;i++){
-                                                if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('style.css')==-1){
+                                                if(updates[i].indexOf('theme/')==0&&updates[i].indexOf('.css')==-1){
                                                     updates.splice(i--,1);
                                                 }
                                                 else if(updates[i].indexOf('node_modules/')==0&&!update.node){
@@ -30329,6 +30329,10 @@
     								script.remove();
     								var update=window.noname_update;
     								delete window.noname_update;
+									if(update.version=='1.9.12'){
+										update.version='1.9.12.1';
+										// modify later
+									}
     								if(forcecheck===false){
                                         if(update.version==lib.config.check_version){
                                             return;
