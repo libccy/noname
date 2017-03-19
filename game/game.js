@@ -460,17 +460,6 @@
 								theme.remove();
 								setTimeout(function(){ui.arena.show();},100);
 							},500);
-
-							if(lib.config.auto_style){
-								if(lib.config.theme=='simple'){
-									lib.configMenu.appearence.config.player_border.onclick('slim');
-									lib.configMenu.appearence.config.image_background.onclick('taoyuan_bg');
-								}
-								else{
-									lib.configMenu.appearence.config.player_border.onclick('normal');
-									lib.configMenu.appearence.config.image_background.onclick('default');
-								}
-							}
 						}
 					},
 					layout:{
@@ -1048,7 +1037,6 @@
 										node.style.backgroundImage='url('+data+')';
 										node.className='button card fullskin';
 										node.parentNode.lastChild.classList.add('showdelete');
-										node.classList.remove('transparent');
 									};
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
@@ -1183,7 +1171,6 @@
 										node.style.backgroundImage='url('+data+')';
 										node.className='button character';
 										node.parentNode.lastChild.classList.add('showdelete');
-										node.classList.remove('transparent');
 										game.getDB('image','cardback_style2',function(file){
 											if(file){
 												node.parentNode.lastChild.classList.add('hideadd');
@@ -1419,7 +1406,137 @@
 						},
 						unfrequent:true,
 					},
-
+					player_style:{
+						name:'边框样式',
+						init:'default',
+						intro:'设置角色边框的样式',
+						item:{
+							wood:'木纹',
+							music:'音乐',
+							simple:'简约',
+							gold:'金框',
+							silver:'银框',
+							bronze:'铜框',
+							custom:'自定',
+							default:'默认',
+						},
+						visualBar:function(node,item,create,switcher){
+							if(node.created){
+								return;
+							}
+							var button;
+							for(var i=0;i<node.parentNode.childElementCount;i++){
+								if(node.parentNode.childNodes[i]._link=='custom'){
+									button=node.parentNode.childNodes[i];
+								}
+							}
+							if(!button){
+								return;
+							}
+							node.created=true;
+							var deletepic;
+							ui.create.filediv('.menubutton','添加图片',node,function(file){
+								if(file){
+									game.putDB('image','player_style',file,function(){
+										game.getDB('image','player_style',function(fileToLoad){
+											if(!fileToLoad) return;
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent)
+											{
+												var data = fileLoadedEvent.target.result;
+												button.style.backgroundImage='url('+data+')';
+												button.className='button character';
+												button.style.backgroundSize='100% 100%';
+												node.classList.add('showdelete');
+											};
+											fileReader.readAsDataURL(fileToLoad, "UTF-8");
+										});
+									});
+								}
+							});
+							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
+								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
+									game.deleteDB('image','player_style');
+									button.style.backgroundImage='none';
+									button.className='button character dashedmenubutton';
+									node.classList.remove('showdelete');
+									if(lib.config.player_style=='custom'){
+										lib.configMenu.appearence.config.player_style.onclick('default');
+										switcher.lastChild.innerHTML='默认';
+									}
+									button.classList.add('transparent');
+								}
+							});
+						},
+						visualMenu:function(node,link,name,config){
+							node.className='button character';
+							node.style.backgroundSize='';
+							switch(link){
+								case 'default':case 'custom':{
+									if(lib.config.theme=='simple'){
+										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
+										node.className='button character';
+									}
+									else{
+										node.style.backgroundImage='none';
+										node.className='button character dashedmenubutton';
+									}
+									break;
+								}
+								case 'wood':node.setBackgroundImage('theme/woodden/wood.jpg');break;
+								case 'music':node.style.backgroundImage='linear-gradient(#4b4b4b, #464646)';break;
+								case 'simple':node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
+								default:node.setBackgroundImage('theme/style/player/'+link+'.png');node.style.backgroundSize='100% 100%';break;
+							}
+							if(link=='custom'){
+								node.classList.add('transparent');
+								game.getDB('image','player_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent)
+									{
+										var data = fileLoadedEvent.target.result;
+										node.style.backgroundImage='url('+data+')';
+										node.className='button character';
+										node.parentNode.lastChild.classList.add('showdelete');
+										node.style.backgroundSize='100% 100%';
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
+						},
+						onclick:function(layout){
+							game.saveConfig('player_style',layout);
+							if(ui.css.player_stylesheet){
+								ui.css.player_stylesheet.remove();
+								delete ui.css.player_stylesheet;
+							}
+							if(layout=='custom'){
+								game.getDB('image','player_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.player_stylesheet){
+											ui.css.player_stylesheet.remove();
+										}
+										ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:url("'+fileLoadedEvent.target.result+'");background-size:100% 100%;}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
+							else if(layout!='default'){
+								var str='';
+								switch(layout){
+									case 'wood':str='url("theme/woodden/wood.jpg")';break;
+									case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
+									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
+									default:str='url("theme/style/player/'+layout+'.png");background-size:100% 100%';break;
+								}
+								ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
+							}
+						},
+						unfrequent:true,
+					},
 					player_border:{
 						name:'边框宽度',
 						init:'normal',
@@ -1451,6 +1568,128 @@
 								ui.arena.classList.remove('lslim_player');
 							}
 						}
+					},
+					button_style:{
+						name:'按钮样式',
+						init:'default',
+						item:{
+							wood:'木纹',
+							music:'音乐',
+							simple:'简约',
+							custom:'自定',
+							default:'默认',
+						},
+						visualBar:function(node,item,create,switcher){
+							if(node.created){
+								return;
+							}
+							var button;
+							for(var i=0;i<node.parentNode.childElementCount;i++){
+								if(node.parentNode.childNodes[i]._link=='custom'){
+									button=node.parentNode.childNodes[i];
+								}
+							}
+							if(!button){
+								return;
+							}
+							node.created=true;
+							var deletepic;
+							ui.create.filediv('.menubutton','添加图片',node,function(file){
+								if(file){
+									game.putDB('image','button_style',file,function(){
+										game.getDB('image','button_style',function(fileToLoad){
+											if(!fileToLoad) return;
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent)
+											{
+												var data = fileLoadedEvent.target.result;
+												button.style.backgroundImage='url('+data+')';
+												button.className='button character controlbutton';
+												node.classList.add('showdelete');
+											};
+											fileReader.readAsDataURL(fileToLoad, "UTF-8");
+										});
+									});
+								}
+							});
+							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
+								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
+									game.deleteDB('image','control_style');
+									button.style.backgroundImage='none';
+									button.className='button character controlbutton dashedmenubutton';
+									node.classList.remove('showdelete');
+									if(lib.config.control_style=='custom'){
+										lib.configMenu.appearence.config.control_style.onclick('default');
+										switcher.lastChild.innerHTML='默认';
+									}
+									button.classList.add('transparent');
+								}
+							});
+						},
+						visualMenu:function(node,link,name,config){
+							node.className='button character controlbutton';
+							node.style.backgroundSize='';
+							switch(link){
+								case 'default':case 'custom':{
+									if(lib.config.theme=='simple'){
+										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
+									}
+									else{
+										node.style.backgroundImage='none';
+										node.classList.add('dashedmenubutton');
+									}
+									break;
+								}
+								case 'wood':node.setBackgroundImage('theme/woodden/wood2.jpg');break;
+								case 'music':node.style.backgroundImage='linear-gradient(#4b4b4b, #464646)';break;
+								case 'simple':node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
+							}
+							if(link=='custom'){
+								node.classList.add('transparent');
+								game.getDB('image','control_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent)
+									{
+										var data = fileLoadedEvent.target.result;
+										node.style.backgroundImage='url('+data+')';
+										node.className='button character controlbutton';
+										node.parentNode.lastChild.classList.add('showdelete');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
+						},
+						onclick:function(layout){
+							game.saveConfig('control_style',layout);
+							// if(ui.css.player_stylesheet){
+							// 	ui.css.player_stylesheet.remove();
+							// 	delete ui.css.player_stylesheet;
+							// }
+							// if(layout=='custom'){
+							// 	game.getDB('image','control_style',function(fileToLoad){
+							// 		if(!fileToLoad) return;
+							// 		var fileReader = new FileReader();
+							// 		fileReader.onload = function(fileLoadedEvent){
+							// 			if(ui.css.player_stylesheet){
+							// 				ui.css.player_stylesheet.remove();
+							// 			}
+							// 			ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:url("'+fileLoadedEvent.target.result+'");background-size:100% 100%;}');
+							// 		};
+							// 		fileReader.readAsDataURL(fileToLoad, "UTF-8");
+							// 	});
+							// }
+							// else if(layout!='default'){
+							// 	var str='';
+							// 	switch(layout){
+							// 		case 'wood':str='url("theme/woodden/wood.jpg")';break;
+							// 		case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
+							// 		case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
+							// 	}
+							// 	ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
+							// }
+						},
+						unfrequent:true,
 					},
                     radius_size:{
                         name:'圆角大小',
@@ -5180,17 +5419,6 @@
                         delete window.noname_skin_list;
                         delete window.noname_asset_list;
                     });
-					if(lib.config.auto_style){
-						if(lib.config.theme=='simple'){
-							lib.config.player_border='slim';
-							lib.config.image_background_random=true;
-						}
-						else{
-							lib.config.player_border='normal';
-							lib.config.image_background_random=false;
-							lib.config.image_background='default';
-						}
-					}
                 }
 
                 if(window.isNonameServer){
@@ -5421,6 +5649,16 @@
 				ui.css.card_style=lib.init.css(lib.assetURL+'theme/style/card',lib.config.card_style);
 				ui.css.cardback_style=lib.init.css(lib.assetURL+'theme/style/cardback',lib.config.cardback_style);
 				ui.css.hp_style=lib.init.css(lib.assetURL+'theme/style/hp',lib.config.hp_style);
+				if(lib.config.player_style!='default'&&lib.config.player_style!='custom'){
+					var str='';
+					switch(lib.config.player_style){
+						case 'wood':str='url("theme/woodden/wood.jpg")';break;
+						case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
+						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
+						default:str='url("theme/style/player/'+lib.config.player_style+'.png");background-size:100% 100%';break;
+					}
+					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
+				}
 
 				lib.config.duration=500;
 
@@ -5884,6 +6122,20 @@
 									ui.css.hp_stylesheet4.remove();
 								}
 								ui.css.hp_stylesheet4=lib.init.sheet('.hp:not(.text):not(.actcount)>.lost{background-image:url('+fileLoadedEvent.target.result+')}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
+					if(lib.config.player_style=='custom'){
+						ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:none;background-size:100% 100%;}');
+						game.getDB('image','player_style',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.player_stylesheet){
+									ui.css.player_stylesheet.remove();
+								}
+								ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:url("'+fileLoadedEvent.target.result+'");background-size:100% 100%;}');
 							};
 							fileReader.readAsDataURL(fileToLoad, "UTF-8");
 						});
@@ -6708,7 +6960,6 @@
 				game.saveConfig('show_volumn',false);
 				game.saveConfig('debug',true);
 				game.saveConfig('dev',true);
-				game.saveConfig('auto_style',true);
 				game.reload();
 			},
             o:function(){
