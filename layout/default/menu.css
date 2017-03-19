@@ -499,6 +499,30 @@
 	height: 86px;
 	border: 2px dashed rgb(40,40,40);
 }
+.popup-container>.menu.visual>.controlbutton{
+	height: 26px;
+	border-radius: 4px;
+}
+.popup-container>.menu.visual>.controlbutton.dashedmenubutton{
+	height: 22px;
+}
+.popup-container>.menu.visual>.controlbutton.dashedmenubutton>div{
+	line-height: 22px;
+}
+.popup-container>.menu.visual>.controlbutton>div{
+	width: 100%;
+	height: 100%;
+	left: 0 !important;
+	top: 0 !important;
+	font-size: 20px;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	line-height: 26px;
+}
+.popup-container>.menu.visual>.controlbutton>div>br{
+	display: none;
+}
 .popup-container>.menu.visual>.hpbutton{
 	width: 60px;
 	height: 60px;

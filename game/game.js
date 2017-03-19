@@ -1569,7 +1569,7 @@
 							}
 						}
 					},
-					button_style:{
+					control_style:{
 						name:'按钮样式',
 						init:'default',
 						item:{
@@ -1596,8 +1596,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton','添加图片',node,function(file){
 								if(file){
-									game.putDB('image','button_style',file,function(){
-										game.getDB('image','button_style',function(fileToLoad){
+									game.putDB('image','control_style',file,function(){
+										game.getDB('image','control_style',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -1640,7 +1640,7 @@
 									}
 									break;
 								}
-								case 'wood':node.setBackgroundImage('theme/woodden/wood2.jpg');break;
+								case 'wood':node.setBackgroundImage('theme/woodden/wood.jpg');break;
 								case 'music':node.style.backgroundImage='linear-gradient(#4b4b4b, #464646)';break;
 								case 'simple':node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
 							}
@@ -1662,32 +1662,157 @@
 						},
 						onclick:function(layout){
 							game.saveConfig('control_style',layout);
-							// if(ui.css.player_stylesheet){
-							// 	ui.css.player_stylesheet.remove();
-							// 	delete ui.css.player_stylesheet;
-							// }
-							// if(layout=='custom'){
-							// 	game.getDB('image','control_style',function(fileToLoad){
-							// 		if(!fileToLoad) return;
-							// 		var fileReader = new FileReader();
-							// 		fileReader.onload = function(fileLoadedEvent){
-							// 			if(ui.css.player_stylesheet){
-							// 				ui.css.player_stylesheet.remove();
-							// 			}
-							// 			ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:url("'+fileLoadedEvent.target.result+'");background-size:100% 100%;}');
-							// 		};
-							// 		fileReader.readAsDataURL(fileToLoad, "UTF-8");
-							// 	});
-							// }
-							// else if(layout!='default'){
-							// 	var str='';
-							// 	switch(layout){
-							// 		case 'wood':str='url("theme/woodden/wood.jpg")';break;
-							// 		case 'music':str='linear-gradient(#4b4b4b, #464646)';break;
-							// 		case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
-							// 	}
-							// 	ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
-							// }
+							if(ui.css.control_stylesheet){
+								ui.css.control_stylesheet.remove();
+								delete ui.css.control_stylesheet;
+							}
+							if(layout=='custom'){
+								game.getDB('image','control_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.control_stylesheet){
+											ui.css.control_stylesheet.remove();
+										}
+										ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:url("'+fileLoadedEvent.target.result+'")}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
+							else if(layout!='default'){
+								var str='';
+								switch(layout){
+									case 'wood':str='url("theme/woodden/wood.jpg")';break;
+									case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
+									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
+								}
+								ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
+							}
+						},
+						unfrequent:true,
+					},
+					menu_style:{
+						name:'菜单样式',
+						init:'default',
+						item:{
+							wood:'木纹',
+							music:'音乐',
+							simple:'简约',
+							custom:'自定',
+							default:'默认',
+						},
+						visualBar:function(node,item,create,switcher){
+							if(node.created){
+								return;
+							}
+							var button;
+							for(var i=0;i<node.parentNode.childElementCount;i++){
+								if(node.parentNode.childNodes[i]._link=='custom'){
+									button=node.parentNode.childNodes[i];
+								}
+							}
+							if(!button){
+								return;
+							}
+							node.created=true;
+							var deletepic;
+							ui.create.filediv('.menubutton','添加图片',node,function(file){
+								if(file){
+									game.putDB('image','menu_style',file,function(){
+										game.getDB('image','menu_style',function(fileToLoad){
+											if(!fileToLoad) return;
+											var fileReader = new FileReader();
+											fileReader.onload = function(fileLoadedEvent)
+											{
+												var data = fileLoadedEvent.target.result;
+												button.style.backgroundImage='url('+data+')';
+												button.style.backgroundSize='cover';
+												button.className='button character';
+												node.classList.add('showdelete');
+											};
+											fileReader.readAsDataURL(fileToLoad, "UTF-8");
+										});
+									});
+								}
+							});
+							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
+								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
+									game.deleteDB('image','menu_style');
+									button.style.backgroundImage='none';
+									button.style.backgroundSize='auto';
+									button.className='button character dashedmenubutton';
+									node.classList.remove('showdelete');
+									if(lib.config.menu_style=='custom'){
+										lib.configMenu.appearence.config.menu_style.onclick('default');
+										switcher.lastChild.innerHTML='默认';
+									}
+									button.classList.add('transparent');
+								}
+							});
+						},
+						visualMenu:function(node,link,name,config){
+							node.className='button character';
+							node.style.backgroundSize='auto';
+							switch(link){
+								case 'default':case 'custom':{
+									if(lib.config.theme=='simple'){
+										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
+									}
+									else{
+										node.style.backgroundImage='none';
+										node.classList.add('dashedmenubutton');
+									}
+									break;
+								}
+								case 'wood':node.setBackgroundImage('theme/woodden/wood2.png');break;
+								case 'music':node.style.backgroundImage='linear-gradient(#4b4b4b, #464646)';break;
+								case 'simple':node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
+							}
+							if(link=='custom'){
+								node.classList.add('transparent');
+								game.getDB('image','menu_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent)
+									{
+										var data = fileLoadedEvent.target.result;
+										node.style.backgroundImage='url('+data+')';
+										node.style.backgroundSize='cover';
+										node.className='button character';
+										node.parentNode.lastChild.classList.add('showdelete');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
+						},
+						onclick:function(layout){
+							game.saveConfig('menu_style',layout);
+							if(ui.css.menu_stylesheet){
+								ui.css.menu_stylesheet.remove();
+								delete ui.css.menu_stylesheet;
+							}
+							if(layout=='custom'){
+								game.getDB('image','menu_style',function(fileToLoad){
+									if(!fileToLoad) return;
+									var fileReader = new FileReader();
+									fileReader.onload = function(fileLoadedEvent){
+										if(ui.css.menu_stylesheet){
+											ui.css.menu_stylesheet.remove();
+										}
+										ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:url("'+fileLoadedEvent.target.result+'");background-size:cover}');
+									};
+									fileReader.readAsDataURL(fileToLoad, "UTF-8");
+								});
+							}
+							else if(layout!='default'){
+								var str='';
+								switch(layout){
+									case 'wood':str='url("theme/woodden/wood2.png")';break;
+									case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
+									case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
+								}
+								ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:'+str+'}');
+							}
 						},
 						unfrequent:true,
 					},
@@ -5659,6 +5784,24 @@
 					}
 					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
 				}
+				if(lib.config.control_style!='default'&&lib.config.control_style!='custom'){
+					var str='';
+					switch(lib.config.control_style){
+						case 'wood':str='url("theme/woodden/wood.jpg")';break;
+						case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
+						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
+					}
+					ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:'+str+'}');
+				}
+				if(lib.config.menu_style!='default'&&lib.config.menu_style!='custom'){
+					var str='';
+					switch(lib.config.menu_style){
+						case 'wood':str='url("theme/woodden/wood2.png")';break;
+						case 'music':str='linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px';break;
+						case 'simple':str='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px';break;
+					}
+					ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:'+str+'}');
+				}
 
 				lib.config.duration=500;
 
@@ -6136,6 +6279,32 @@
 									ui.css.player_stylesheet.remove();
 								}
 								ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:url("'+fileLoadedEvent.target.result+'");background-size:100% 100%;}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
+					if(lib.config.control_style=='custom'){
+						game.getDB('image','control_style',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.control_stylesheet){
+									ui.css.control_stylesheet.remove();
+								}
+								ui.css.control_stylesheet=lib.init.sheet('#window .control,#window #system>div>div,#window #system>div>.pressdown2{background-image:url("'+fileLoadedEvent.target.result+'")}');
+							};
+							fileReader.readAsDataURL(fileToLoad, "UTF-8");
+						});
+					}
+					if(lib.config.menu_style=='custom'){
+						game.getDB('image','menu_style',function(fileToLoad){
+							if(!fileToLoad) return;
+							var fileReader = new FileReader();
+							fileReader.onload = function(fileLoadedEvent){
+								if(ui.css.menu_stylesheet){
+									ui.css.menu_stylesheet.remove();
+								}
+								ui.css.menu_stylesheet=lib.init.sheet('html #window>.dialog.popped,html .menu,html .menubg{background-image:url("'+fileLoadedEvent.target.result+'");background-size:cover}');
 							};
 							fileReader.readAsDataURL(fileToLoad, "UTF-8");
 						});
