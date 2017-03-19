@@ -571,7 +571,7 @@
 											player.style.left='calc(50% - 10px)';
 										}
 										if(i==1||i==2){
-											player.style.bottom='30px';
+											player.style.bottom='45px';
 										}
 									}
 									else if(link=='long2'){
@@ -583,7 +583,7 @@
 											player.style.left='calc(50% - 10px)';
 										}
 										if(i==1||i==2){
-											player.style.bottom='41px';
+											player.style.bottom='45px';
 										}
 									}
 
@@ -30330,7 +30330,7 @@
     								var update=window.noname_update;
     								delete window.noname_update;
 									if(update.version=='1.9.12'){
-										update.version='1.9.12.1';
+										update.version='1.9.12修复';
 										// modify later
 									}
     								if(forcecheck===false){
