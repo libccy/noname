@@ -30265,7 +30265,7 @@
     							var goupdate=function(files,update){
     								if(game.download){
                                         lib.version=update.version;
-    									var script=lib.init.js(get.url('source'),'game/source',function(){
+    									var script=lib.init.js(get.url('source',true),'game/source',function(){
     										script.remove();
     										var updates=window.noname_source_list;
     										delete window.noname_source_list;
@@ -30349,7 +30349,7 @@
     							};
 
 
-    							var script=lib.init.js(get.url('version'),'game/update',function(){
+    							var script=lib.init.js(get.url('version',true),'game/update',function(){
     								script.remove();
     								var update=window.noname_update;
     								delete window.noname_update;
@@ -30463,7 +30463,7 @@
     						else if(game.download){
     							button2.innerHTML='正在检查更新';
     							button2.disabled=true;
-    							var script=lib.init.js(get.url('source'),'game/asset',function(){
+    							var script=lib.init.js(get.url('source',true),'game/asset',function(){
     								script.remove();
     								var updates=window.noname_asset_list;
     								delete window.noname_asset_list;
@@ -36956,19 +36956,23 @@
                 return '是否发动【'+get.skillTranslation(skill,player)+'】？';
             }
         },
-        url:function(tag){
+        url:function(tag,rand){
+			var str='';
+			if(rand){
+				str='?rand='+get.id();
+			}
             if(lib.config.debug){
                 switch(tag){
-                    case 'version':return lib.sourceURL.replace(/\$version\$/,'master');
-                    case 'source':return lib.sourceURL.replace(/\$version\$/,'master');
-                    default:return lib.updateURL.replace(/\$version\$/,'master');
+                    case 'version':return lib.sourceURL.replace(/\$version\$/,'master')+str;
+                    case 'source':return lib.sourceURL.replace(/\$version\$/,'master')+str;
+                    default:return lib.updateURL.replace(/\$version\$/,'master')+str;
                 }
             }
             else{
                 switch(tag){
-                    case 'version':return lib.sourceURL.replace(/\$version\$/,'master');
-                    case 'source':return lib.sourceURL.replace(/\$version\$/,'v'+lib.version);
-                    default:return lib.updateURL.replace(/\$version\$/,'v'+lib.version);
+                    case 'version':return lib.sourceURL.replace(/\$version\$/,'master')+str;
+                    case 'source':return lib.sourceURL.replace(/\$version\$/,'v'+lib.version)+str;
+                    default:return lib.updateURL.replace(/\$version\$/,'v'+lib.version)+str;
                 }
             }
         },
