@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.12.2',
+    version:'1.9.12.3',
     update:'1.9.12.1',
     changeLog:[
         'bug修复',
@@ -25,7 +25,7 @@ window.noname_update={
         // 'mode/identity.js',
         // 'mode/stone.js',
         // 'theme/woodden/style.css',
-        // 'layout/default/layout.css',
+        'layout/default/layout.css',
         // 'layout/default/phone.css',
         // 'layout/default/menu.css',
         // 'layout/long/layout.css',

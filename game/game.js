@@ -1480,7 +1480,7 @@
 								case 'wood':node.setBackgroundImage('theme/woodden/wood.jpg');break;
 								case 'music':node.style.backgroundImage='linear-gradient(#4b4b4b, #464646)';break;
 								case 'simple':node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';break;
-								default:node.setBackgroundImage('theme/style/player/'+link+'.png');node.style.backgroundSize='100% 100%';break;
+								default:node.setBackgroundImage('theme/style/player/'+link+'2.png');node.style.backgroundSize='100% 100%';break;
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
@@ -1531,6 +1531,10 @@
 									ui.css.player_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'2.png")}',0);
 									ui.css.player_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'3.png")}',0);
 									ui.css.player_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
+									ui.css.player_stylesheet.sheet.insertRule('#window #arena>.player:not(.inited),#window #arena>.player.unseen,#window #arena>.player.unseen2{background-image:none}',0);
+									ui.css.player_stylesheet.sheet.insertRule('.turnedover:not(.unseen):not(.unseen2)>.avatar,.turnedover:not(.unseen):not(.unseen2)>.avatar2{opacity:0.5}',0);
+									ui.css.player_stylesheet.sheet.insertRule('#arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{opacity:0.3}',0);
+									// ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{opacity:0.5}',0);
 								}
 							}
 						},
@@ -5815,7 +5819,10 @@
 						ui.css.player_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'2.png")}',0);
 						ui.css.player_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.player_style+'3.png")}',0);
 						ui.css.player_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
-						// ui.css.player_stylesheet.sheet.insertRule('#window #arena>.player{background-image:none}',0);
+						ui.css.player_stylesheet.sheet.insertRule('#window #arena>.player:not(.inited),#window #arena>.player.unseen,#window #arena>.player.unseen2{background-image:none}',0);
+						ui.css.player_stylesheet.sheet.insertRule('.turnedover:not(.unseen):not(.unseen2)>.avatar,.turnedover:not(.unseen):not(.unseen2)>.avatar2{opacity:0.5}',0);
+						ui.css.player_stylesheet.sheet.insertRule('#arena:not(.hide_turned):not(.oldlayout) .player.turnedover>.turned{opacity:0.3}',0);
+						// ui.css.player_stylesheet.sheet.insertRule('#arena>.player.turnedover,#chess>.player.turnedover{opacity:0.5}',0);
 					}
 				}
 				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
@@ -11511,6 +11518,10 @@
 						}
 					}
 					this.update();
+					var that=this;
+					setTimeout(function(){
+						that.classList.add('inited');
+					},500);
 					return this;
 				},
                 initOL:function(name,character){
@@ -33255,6 +33266,7 @@
 				node.node={
 					avatar:ui.create.div('.avatar',node,ui.click.avatar).hide(),
 					avatar2:ui.create.div('.avatar2',node,ui.click.avatar2).hide(),
+					turnedover:ui.create.div('.turned','<div>翻<br>面<div>',node),
 					framebg:ui.create.div('.framebg',node),
 					intro:ui.create.div('.intro',node),
 					identity:ui.create.div('.identity',node),
@@ -33264,7 +33276,6 @@
                     nameol:ui.create.div('.nameol',node),
 					count:ui.create.div('.count',node).hide(),
 					equips:ui.create.div('.equips',node).hide(),
-					turnedover:ui.create.div('.turned','<div>翻<br>面<div>',node),
 					judges:ui.create.div('.judges',node),
 					marks:ui.create.div('.marks',node),
 					chain:ui.create.div('.chain','<div></div>',node),

@@ -2826,6 +2826,12 @@ div:not(.handcards)>.card>.info>span,
 .turnedover>div {
 	opacity: 0.3;
 }
+.turnedover>.identity,
+.turnedover>.framebg,
+.turnedover>.marks,
+.turnedover>.judges {
+	opacity: 1;
+}
 .intro:not(.showintro) {
 	opacity: 0;
 	display: none !important
