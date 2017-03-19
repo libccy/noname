@@ -6914,6 +6914,9 @@
 				else{
 					var script=document.createElement('script');
 					script.src = path+'/'+file+".js";
+					if(path.indexOf('http')==0){
+						script.src+='?rand='+get.id();
+					}
 					document.head.appendChild(script);
 					if(typeof onload=='function'){
 						script.addEventListener('load',onload);
