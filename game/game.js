@@ -11010,15 +11010,15 @@
 						player.dying(event);
 					}
 					"step 2"
-					if(player.node.framebg.dataset.auto&&!player.node.framebg.dataset.decoration){
+					if(source&&source.node.framebg.dataset.auto&&!source.node.framebg.dataset.decoration){
 						var dnum=0;
-						for(var j=0;j<player.stat.length;j++){
-							if(player.stat[j].damage!=undefined) dnum+=player.stat[j].damage;
+						for(var j=0;j<source.stat.length;j++){
+							if(source.stat[j].damage!=undefined) dnum+=source.stat[j].damage;
 						}
-						switch(player.node.framebg.dataset.auto){
-							case 'gold':if(dnum>=9) player.node.framebg.dataset.decoration='gold';break;
-							case 'silver':if(dnum>=6) player.node.framebg.dataset.decoration='silver';break;
-							case 'bronze':if(dnum>=3) player.node.framebg.dataset.decoration='bronze';break;
+						switch(source.node.framebg.dataset.auto){
+							case 'gold':if(dnum>=9) source.node.framebg.dataset.decoration='gold';break;
+							case 'silver':if(dnum>=6) source.node.framebg.dataset.decoration='silver';break;
+							case 'bronze':if(dnum>=3) source.node.framebg.dataset.decoration='bronze';break;
 						}
 					}
 				},

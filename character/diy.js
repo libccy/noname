@@ -97,7 +97,11 @@ character.diy={
 					return _status.event.getTrigger().targets.contains(target);
 				}).set('ai',function(target){
 					var trigger=_status.event.getTrigger();
-					return -ai.get.effect(target,trigger.card,trigger.player,_status.event.player);
+					var eff=-ai.get.effect(target,trigger.card,trigger.player,_status.event.player);
+					if(trigger.card.name=='wugu'&&eff==0&&ai.get.attitude(player,target)<0){
+						return 0.01;
+					}
+					return eff;
 				});
 				"step 1"
 				if(result.bool){
