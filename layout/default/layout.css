@@ -1897,6 +1897,12 @@ div:not(.handcards)>.card>.info>span,
 	display: none;
 	pointer-events: none;
 }
+#arena.oldlayout .player>.framebg{
+	transform: rotate(90deg) translateY(-240px);
+    width: 120px;
+    height: 240px;
+    transform-origin: top left;
+}
 #window #arena.mobile:not(.chess) .player[data-position='0']>.framebg{
 	display: none;
 }

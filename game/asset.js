@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.12',
+    '1.9.12.3',
     'image/background/huangtian_bg.jpg',
     'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
@@ -2486,13 +2486,13 @@ window.noname_asset_list=[
     'theme/style/hp/image/round2.png',
     'theme/style/hp/image/round3.png',
     'theme/style/hp/image/round4.png',
-    'theme/style/player/bronze.png',
+    'theme/style/player/bronze1.png',
     'theme/style/player/bronze2.png',
     'theme/style/player/bronze3.png',
-    'theme/style/player/gold.png',
+    'theme/style/player/gold1.png',
     'theme/style/player/gold2.png',
     'theme/style/player/gold3.png',
-    'theme/style/player/silver.png',
+    'theme/style/player/silver1.png',
     'theme/style/player/silver2.png',
     'theme/style/player/silver3.png',
 ];
