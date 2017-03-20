@@ -1531,7 +1531,7 @@
 					border_style:{
 						name:'边框样式',
 						init:'default',
-						intro:'设置角色边框的样式',
+						intro:'设置角色边框的样式，当设为自动时，样式将随着一局游戏中伤害及击杀的数量自动改变',
 						item:{
 							gold:'金框',
 							silver:'银框',
@@ -11003,36 +11003,23 @@
                         },event.nature,player);
 						player.$damagepop(-num,event.nature);
 					}
-					// if(source){
-					// 	if(player._damagetimeout!=source){
-					// 		player.$damage(source);
-					// 		player._damagetimeout=source;
-					// 		setTimeout(function(){
-					// 			delete player._damagetimeout;
-					// 		},500);
-					// 	}
-					// 	if(player._damagepopup){
-					// 		player._damagepopup-=num;
-					// 		player._damagenature=event.nature;
-					// 	}
-					// 	else{
-					// 		player._damagepopup=-num;
-					// 		player._damagenature=event.nature;
-					// 		setTimeout(function(){
-					// 			player.popup(player._damagepopup,player._damagenature);
-					// 			delete player._damagepopup;
-					// 			delete player._damagenature;
-					// 		},300);
-					// 	}
-					// }
-					// else{
-					// 	player.$damage();
-					// }
 					event.trigger('damage');
 					"step 1"
 					if(player.hp<=0&&player.isAlive()){
 						game.delayx();
 						player.dying(event);
+					}
+					"step 2"
+					if(lib.config.border_style=='auto'&&player.node.framebg.dataset.auto&&!player.node.framebg.dataset.decoration){
+						var dnum=0;
+						for(var j=0;j<player.stat.length;j++){
+							if(player.stat[j].damage!=undefined) dnum+=player.stat[j].damage;
+						}
+						switch(player.node.framebg.dataset.auto){
+							case 'gold':if(dnum>=9) player.node.framebg.dataset.decoration='gold';break;
+							case 'silver':if(dnum>=6) player.node.framebg.dataset.decoration='silver';break;
+							case 'bronze':if(dnum>=3) player.node.framebg.dataset.decoration='bronze';break;
+						}
 					}
 				},
 				recover:function(){
@@ -11281,6 +11268,23 @@
 					if(typeof _status.coin=='number'&&source&&!_status.auto){
 						if(source==game.me||source.isUnderControl()){
 							_status.coin+=10;
+						}
+					}
+					if(source&&lib.config.border_style=='auto'){
+						switch(source.node.framebg.dataset.auto){
+							case 'gold':case 'silver':source.node.framebg.dataset.auto='gold';break;
+							case 'bronze':source.node.framebg.dataset.auto='silver';break;
+							default:source.node.framebg.dataset.auto='bronze';
+						}
+						var dnum=0;
+						for(var j=0;j<source.stat.length;j++){
+							if(source.stat[j].damage!=undefined) dnum+=source.stat[j].damage;
+						}
+						source.node.framebg.dataset.decoration='';
+						switch(source.node.framebg.dataset.auto){
+							case 'gold':if(dnum>=9) source.node.framebg.dataset.decoration='gold';break;
+							case 'silver':if(dnum>=6) source.node.framebg.dataset.decoration='silver';break;
+							case 'bronze':if(dnum>=3) source.node.framebg.dataset.decoration='bronze';break;
 						}
 					}
 				},

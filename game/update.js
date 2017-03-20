@@ -9,7 +9,7 @@ window.noname_update={
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',
-        // 'game/asset.js',
+        'game/asset.js',
         // 'card/guozhan.js',
         // 'character/rank.js',
         // 'character/gwent.js',

@@ -1907,6 +1907,34 @@ div:not(.handcards)>.card>.info>span,
 	display: none;
 }
 
+#window .player>.framebg[data-auto="gold"]{
+	display:block;
+	background-image:url('../../theme/style/player/gold1.png');
+}
+#window #arena.long:not(.fewplayer) .player>.framebg[data-auto="gold"],
+#arena.oldlayout .player>.framebg[data-auto="gold"]{
+	display:block;
+	background-image:url('../../theme/style/player/gold3.png');
+}
+#window .player>.framebg[data-auto="silver"]{
+	display:block;
+	background-image:url('../../theme/style/player/silver1.png');
+}
+#window #arena.long:not(.fewplayer) .player>.framebg[data-auto="silver"],
+#arena.oldlayout .player>.framebg[data-auto="silver"]{
+	display:block;
+	background-image:url('../../theme/style/player/silver3.png');
+}
+#window .player>.framebg[data-auto="bronze"]{
+	display:block;
+	background-image:url('../../theme/style/player/bronze1.png');
+}
+#window #arena.long:not(.fewplayer) .player>.framebg[data-auto="bronze"],
+#arena.oldlayout .player>.framebg[data-auto="bronze"]{
+	display:block;
+	background-image:url('../../theme/style/player/bronze3.png');
+}
+
 .avatar {
 	width: 100px;
 	height: 100px;
