@@ -1531,7 +1531,7 @@
 					border_style:{
 						name:'边框样式',
 						init:'default',
-						intro:'设置角色边框的样式，当设为自动时，样式将随着一局游戏中伤害及击杀的数量自动改变',
+						intro:'设置角色边框的样式，当设为自动时，样式将随着一局游戏中伤害或击杀的数量自动改变',
 						item:{
 							gold:'金框',
 							silver:'银框',
@@ -1665,6 +1665,16 @@
 								ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'3.png")}',0);
 								ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 							}
+						},
+						unfrequent:true,
+					},
+					autoborder_count:{
+						name:'边框升级方式',
+						intro:'每击杀一人，边框提升两级；每造成两点伤害，边框提升一级；升级顺序：铜框→玉龙→银框→银龙→金框→金龙',
+						init:'kill',
+						item:{
+							kill:'击杀',
+							damage:'伤害'
 						},
 						unfrequent:true,
 					},
@@ -2335,6 +2345,12 @@
 						}
 						else{
 							map.cursor_style.show();
+						}
+						if(lib.config.border_style=='auto'){
+							map.autoborder_count.show();
+						}
+						else{
+							map.autoborder_count.hide();
 						}
 					},
 				}
@@ -11009,16 +11025,31 @@
 						game.delayx();
 						player.dying(event);
 					}
-					"step 2"
-					if(source&&source.node.framebg.dataset.auto&&!source.node.framebg.dataset.decoration){
+					if(source&&lib.config.border_style=='auto'&&lib.config.autoborder_count=='damage'){
 						var dnum=0;
 						for(var j=0;j<source.stat.length;j++){
 							if(source.stat[j].damage!=undefined) dnum+=source.stat[j].damage;
 						}
-						switch(source.node.framebg.dataset.auto){
-							case 'gold':if(dnum>=9) source.node.framebg.dataset.decoration='gold';break;
-							case 'silver':if(dnum>=6) source.node.framebg.dataset.decoration='silver';break;
-							case 'bronze':if(dnum>=3) source.node.framebg.dataset.decoration='bronze';break;
+						if(dnum>=2){
+							source.node.framebg.dataset.decoration='';
+							if(dnum>=10){
+								source.node.framebg.dataset.auto='gold';
+								if(dnum>=12){
+									source.node.framebg.dataset.decoration='gold';
+								}
+							}
+							else if(dnum>=6){
+								source.node.framebg.dataset.auto='silver';
+								if(dnum>=8){
+									source.node.framebg.dataset.decoration='silver';
+								}
+							}
+							else{
+								source.node.framebg.dataset.auto='bronze';
+								if(dnum>=4){
+									source.node.framebg.dataset.decoration='bronze';
+								}
+							}
 						}
 					}
 				},
@@ -11270,22 +11301,13 @@
 							_status.coin+=10;
 						}
 					}
-					if(source&&lib.config.border_style=='auto'){
+					if(source&&lib.config.border_style=='auto'&&lib.config.autoborder_count=='kill'){
 						switch(source.node.framebg.dataset.auto){
 							case 'gold':case 'silver':source.node.framebg.dataset.auto='gold';break;
 							case 'bronze':source.node.framebg.dataset.auto='silver';break;
 							default:source.node.framebg.dataset.auto='bronze';
 						}
-						var dnum=0;
-						for(var j=0;j<source.stat.length;j++){
-							if(source.stat[j].damage!=undefined) dnum+=source.stat[j].damage;
-						}
-						source.node.framebg.dataset.decoration='';
-						switch(source.node.framebg.dataset.auto){
-							case 'gold':if(dnum>=9) source.node.framebg.dataset.decoration='gold';break;
-							case 'silver':if(dnum>=6) source.node.framebg.dataset.decoration='silver';break;
-							case 'bronze':if(dnum>=3) source.node.framebg.dataset.decoration='bronze';break;
-						}
+						source.node.framebg.dataset.decoration=source.node.framebg.dataset.auto;
 					}
 				},
 				equip:function(){
