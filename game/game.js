@@ -1404,7 +1404,7 @@
 					player_style:{
 						name:'角色背景',
 						init:'default',
-						intro:'设置角色边框的样式',
+						intro:'设置角色的背景图片',
 						item:{
 							wood:'木纹',
 							music:'音乐',
@@ -11010,7 +11010,7 @@
 						player.dying(event);
 					}
 					"step 2"
-					if(lib.config.border_style=='auto'&&player.node.framebg.dataset.auto&&!player.node.framebg.dataset.decoration){
+					if(player.node.framebg.dataset.auto&&!player.node.framebg.dataset.decoration){
 						var dnum=0;
 						for(var j=0;j<player.stat.length;j++){
 							if(player.stat[j].damage!=undefined) dnum+=player.stat[j].damage;
