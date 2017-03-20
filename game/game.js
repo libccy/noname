@@ -99,14 +99,15 @@
 					compatiblemode:{
 						name:'兼容模式',
 						init:false,
-						intro:'提高对旧扩展的兼容性，但可能产生未知结果',
+						intro:'开启兼容模式可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭',
 						onclick:function(bool){
 							game.saveConfig('compatiblemode',bool);
-							setTimeout(function(){
-								if(lib.config.compatiblemode){
-									alert('开启兼容模式可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭');
-								}
-							},500);
+							if(bool){
+								ui.window.classList.add('compatiblemode');
+							}
+							else{
+								ui.window.classList.remove('compatiblemode');
+							}
 						}
 					},
 					confirm_exit:{
@@ -32664,6 +32665,9 @@
                 }
 				if(lib.config.player_border=='normal'&&(game.layout=='long'||game.layout=='long2')){
 					ui.arena.classList.add('lslim_player');
+				}
+				if(lib.config.compatiblemode){
+					ui.window.classList.add('compatiblemode');
 				}
 				ui.window.dataset.radius_size=lib.config.radius_size||'default';
                 if(game.layout=='long'||game.layout=='mobile'){
