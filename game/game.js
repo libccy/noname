@@ -1670,11 +1670,12 @@
 					},
 					autoborder_count:{
 						name:'边框升级方式',
-						intro:'每击杀一人，边框提升两级；每造成两点伤害，边框提升一级；升级顺序：铜框→玉龙→银框→银龙→金框→金龙',
+						intro:'<strong>击杀</strong> 每击杀一人，边框提升两级<br><strong>伤害</strong> 每造成两点伤害，边框提升一级<br><strong>混合</strong> 击杀量决定边框颜色，伤害量决定边框装饰',
 						init:'kill',
 						item:{
 							kill:'击杀',
-							damage:'伤害'
+							damage:'伤害',
+							mix:'混合',
 						},
 						unfrequent:true,
 					},
@@ -11025,30 +11026,32 @@
 						game.delayx();
 						player.dying(event);
 					}
-					if(source&&lib.config.border_style=='auto'&&lib.config.autoborder_count=='damage'){
+					if(source&&lib.config.border_style=='auto'){
 						var dnum=0;
 						for(var j=0;j<source.stat.length;j++){
 							if(source.stat[j].damage!=undefined) dnum+=source.stat[j].damage;
 						}
-						if(dnum>=2){
+						if(lib.config.autoborder_count=='damage'){
 							source.node.framebg.dataset.decoration='';
 							if(dnum>=10){
 								source.node.framebg.dataset.auto='gold';
-								if(dnum>=12){
-									source.node.framebg.dataset.decoration='gold';
-								}
+								if(dnum>=12) source.node.framebg.dataset.decoration='gold';
 							}
 							else if(dnum>=6){
 								source.node.framebg.dataset.auto='silver';
-								if(dnum>=8){
-									source.node.framebg.dataset.decoration='silver';
-								}
+								if(dnum>=8) source.node.framebg.dataset.decoration='silver';
 							}
-							else{
+							else if(dnum>=2){
 								source.node.framebg.dataset.auto='bronze';
-								if(dnum>=4){
-									source.node.framebg.dataset.decoration='bronze';
-								}
+								if(dnum>=4) source.node.framebg.dataset.decoration='bronze';
+							}
+						}
+						else if(lib.config.autoborder_count=='mix'){
+							source.node.framebg.dataset.decoration='';
+							switch(source.node.framebg.dataset.auto){
+								case 'bronze':if(dnum>=4) source.node.framebg.dataset.decoration='bronze';break;
+								case 'silver':if(dnum>=8) source.node.framebg.dataset.decoration='silver';break;
+								case 'gold':if(dnum>=12) source.node.framebg.dataset.decoration='gold';break;
 							}
 						}
 					}
@@ -11301,13 +11304,27 @@
 							_status.coin+=10;
 						}
 					}
-					if(source&&lib.config.border_style=='auto'&&lib.config.autoborder_count=='kill'){
+					if(source&&lib.config.border_style=='auto'&&(lib.config.autoborder_count=='kill'||lib.config.autoborder_count=='mix')){
 						switch(source.node.framebg.dataset.auto){
 							case 'gold':case 'silver':source.node.framebg.dataset.auto='gold';break;
 							case 'bronze':source.node.framebg.dataset.auto='silver';break;
 							default:source.node.framebg.dataset.auto='bronze';
 						}
-						source.node.framebg.dataset.decoration=source.node.framebg.dataset.auto;
+						if(lib.config.autoborder_count=='kill'){
+							source.node.framebg.dataset.decoration=source.node.framebg.dataset.auto;
+						}
+						else{
+							var dnum=0;
+							for(var j=0;j<source.stat.length;j++){
+								if(source.stat[j].damage!=undefined) dnum+=source.stat[j].damage;
+							}
+							source.node.framebg.dataset.decoration='';
+							switch(source.node.framebg.dataset.auto){
+								case 'bronze':if(dnum>=4) source.node.framebg.dataset.decoration='bronze';break;
+								case 'silver':if(dnum>=8) source.node.framebg.dataset.decoration='silver';break;
+								case 'gold':if(dnum>=12) source.node.framebg.dataset.decoration='gold';break;
+							}
+						}
 					}
 				},
 				equip:function(){
