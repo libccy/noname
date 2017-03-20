@@ -3187,7 +3187,7 @@ div[data-decoration="gold"]::before,
 	left:-13px;
 	top:-19px;
 }
-div[data-decoration="gold"]::before{
+.button[data-decoration="gold"]::before{
 	transform:scale(0.75) translate(-3px,-3px);
 }
 div[data-decoration="gold"]::after,
@@ -3203,7 +3203,7 @@ div[data-decoration="gold"]::after,
 	right:-8px;
 	bottom:-8px;
 }
-div[data-decoration="gold"]::after{
+.button[data-decoration="gold"]::after{
 	transform: scale(0.75) translate(10px,2px);
 }
 
@@ -3218,7 +3218,7 @@ div[data-decoration="silver"]::before,
 	left:-13px;
 	top:-14px;
 }
-div[data-decoration="silver"]::before{
+.button[data-decoration="silver"]::before{
 	transform:scale(0.75) translate(-2px,-3px);
 }
 div[data-decoration="silver"]::after,
@@ -3234,7 +3234,7 @@ div[data-decoration="silver"]::after,
 	right:-8px;
 	bottom:-9px;
 }
-div[data-decoration="silver"]::after{
+.button[data-decoration="silver"]::after{
 	transform: scale(0.75) translate(10px,0px);
 }
 
@@ -3249,7 +3249,7 @@ div[data-decoration="bronze"]::before,
 	left:-13px;
 	top:-18px;
 }
-div[data-decoration="bronze"]::before{
+.button[data-decoration="bronze"]::before{
 	transform:scale(0.75) translate(-2px,-3px);
 }
 div[data-decoration="bronze"]::after,
@@ -3265,8 +3265,8 @@ div[data-decoration="bronze"]::after,
 	right: -8px;
 	bottom: -5px;
 }
-div[data-decoration="silver"]::bronze{
-	transform: scale(0.75) translate(10px,0px);
+.button[data-decoration="bronze"]::after{
+	transform:scale(0.75) translate(9px,2px);
 }
 
 

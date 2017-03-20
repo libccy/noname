@@ -1540,6 +1540,7 @@
 							dragon_silver:'银龙',
 							dragon_bronze:'玉龙',
 							custom:'自定',
+							auto:'自动',
 							default:'默认',
 						},
 						visualBar:function(node,item,create,switcher){
@@ -1595,7 +1596,7 @@
 							node.style.backgroundSize='';
 							node.style.height='108px';
 							node.dataset.decoration='';
-							if(link=='default'||link=='custom'){
+							if(link=='default'||link=='custom'||link=='auto'){
 								if(lib.config.theme=='simple'){
 									node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
 									node.className='button character';
@@ -1651,7 +1652,7 @@
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
 							}
-							else if(layout!='default'){
+							else if(layout!='default'&&layout!='auto'){
 								ui.css.border_stylesheet=lib.init.sheet();
 								if(layout.indexOf('dragon_')==0){
 									layout=layout.slice(7);
@@ -5944,7 +5945,7 @@
 					}
 					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:'+str+'}');
 				}
-				if(lib.config.border_style&&lib.config.border_style!='default'&&lib.config.border_style!='custom'){
+				if(lib.config.border_style&&lib.config.border_style!='default'&&lib.config.border_style!='custom'&&lib.config.border_style!='auto'){
 					ui.css.border_stylesheet=lib.init.sheet();
 					var bstyle=lib.config.border_style;
 					if(bstyle.indexOf('dragon_')==0){
