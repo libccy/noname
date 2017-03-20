@@ -32852,7 +32852,7 @@
 				if(lib.config.change_skin_auto!='off'){
 					_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
 				}
-				if(lib.config.border_style.indexOf('dragon_')==0){
+				if(lib.config.border_style&&lib.config.border_style.indexOf('dragon_')==0){
 					ui.arena.dataset.framedecoration=lib.config.border_style.slice(7);
 				}
 
