@@ -5610,15 +5610,16 @@ character.hearth={
 			selectTarget:-1,
 			content:function(){
 				player.recover();
-				var hs=target.get('h');
-				target.discard(hs);
-				var cs=[];
-				for(var i=0;i<hs.length;i++){
-					cs.push(game.createCard('wuzhong'));
-				}
-				target.gain(cs,'gain2');
-				target.storage.hsbaowu_huangjinyuanhou=cards[0];
-				target.addSkill('hsbaowu_huangjinyuanhou');
+				player.draw(3);
+				// var hs=target.get('h');
+				// target.discard(hs);
+				// var cs=[];
+				// for(var i=0;i<hs.length;i++){
+				// 	cs.push(game.createCard('wuzhong'));
+				// }
+				// target.gain(cs,'gain2');
+				// target.storage.hsbaowu_huangjinyuanhou=cards[0];
+				// target.addSkill('hsbaowu_huangjinyuanhou');
 			},
 			ai:{
 				order:10,
@@ -6131,7 +6132,7 @@ character.hearth={
 		hsshenqi_nengliangzhiguang_info:'限武将牌正面朝上时使用，令一名角色增加一点体力上限，回复一点体力，并摸四张牌；使用后将武将牌翻至背面',
 		hsbaowu:'宝物',
 		hsbaowu_huangjinyuanhou:'黄金猿猴',
-		hsbaowu_huangjinyuanhou_info:'回复一点体力并弃置所有手牌，然后获得等量的无中生有；直到下个回合开始，不能成为其他角色的卡牌目标',
+		hsbaowu_huangjinyuanhou_info:'摸三张牌并回复一点体力；直到下个回合开始，不能成为其他角色的卡牌目标',
 		hsbaowu_cangbaotu:'藏宝图',
 		hsbaowu_cangbaotu_info:'结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
 		hsyaoshui:'药水',
