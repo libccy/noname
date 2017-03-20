@@ -3177,7 +3177,7 @@ span[data-color="unknownm"] {
 }
 
 div[data-decoration="gold"]::before,
-#arena[data-framedecoration="gold"] .player>.framebg::before{
+#arena:not(.autoframe)[data-framedecoration="gold"] .player>.framebg::before{
 	content:"";
 	position:absolute;
 	background-image:url('../../theme/style/player/gold_d1.png');
@@ -3188,13 +3188,10 @@ div[data-decoration="gold"]::before,
 	top:-19px;
 }
 div[data-decoration="gold"]::before{
-	width: 31px;
-	height: 60px;
-	left: -10px;
-	top: -12px;
+	transform:scale(0.75) translate(-3px,-3px);
 }
 div[data-decoration="gold"]::after,
-#arena[data-framedecoration="gold"] .player>.framebg::after{
+#arena:not(.autoframe)[data-framedecoration="gold"] .player>.framebg::after{
 	content:"";
 	position:absolute;
 	background-image:url('../../theme/style/player/gold_d2.png');
@@ -3204,18 +3201,81 @@ div[data-decoration="gold"]::after,
 	left: auto;
 	top: auto;
 	right:-8px;
-	bottom:-10px;
+	bottom:-8px;
 }
 div[data-decoration="gold"]::after{
-	width: 56px;
-	height: 24px;
-	right: -7px;
-	bottom: -6px;
+	transform: scale(0.75) translate(10px,2px);
+}
+
+div[data-decoration="silver"]::before,
+#arena:not(.autoframe)[data-framedecoration="silver"] .player>.framebg::before{
+	content:"";
+	position:absolute;
+	background-image:url('../../theme/style/player/silver_d1.png');
+	background-size:100% 100%;
+	width:41px;
+	height:61px;
+	left:-13px;
+	top:-14px;
+}
+div[data-decoration="silver"]::before{
+	transform:scale(0.75) translate(-2px,-3px);
+}
+div[data-decoration="silver"]::after,
+#arena:not(.autoframe)[data-framedecoration="silver"] .player>.framebg::after{
+	content:"";
+	position:absolute;
+	background-image:url('../../theme/style/player/silver_d2.png');
+	background-size:100% 100%;
+	width:69px;
+	height:21px;
+	left: auto;
+	top: auto;
+	right:-8px;
+	bottom:-9px;
+}
+div[data-decoration="silver"]::after{
+	transform: scale(0.75) translate(10px,0px);
+}
+
+div[data-decoration="bronze"]::before,
+#arena:not(.autoframe)[data-framedecoration="bronze"] .player>.framebg::before{
+	content:"";
+	position:absolute;
+	background-image:url('../../theme/style/player/bronze_d1.png');
+	background-size:100% 100%;
+	width:40px;
+	height:80px;
+	left:-13px;
+	top:-18px;
+}
+div[data-decoration="bronze"]::before{
+	transform:scale(0.75) translate(-2px,-3px);
+}
+div[data-decoration="bronze"]::after,
+#arena:not(.autoframe)[data-framedecoration="bronze"] .player>.framebg::after{
+	content:"";
+	position:absolute;
+	background-image:url('../../theme/style/player/bronze_d2.png');
+	background-size:100% 100%;
+	width:69px;
+	height:21px;
+	left: auto;
+	top: auto;
+	right: -8px;
+	bottom: -5px;
+}
+div[data-decoration="silver"]::bronze{
+	transform: scale(0.75) translate(10px,0px);
 }
 
 
 div[data-decoration="gold"]::before,
-div[data-decoration="gold"]::after{
+div[data-decoration="gold"]::after,
+div[data-decoration="silver"]::before,
+div[data-decoration="silver"]::after,
+div[data-decoration="bronze"]::before,
+div[data-decoration="bronze"]::after{
 	opacity: 1;
 	z-index: 10;
 	box-shadow: none !important;
