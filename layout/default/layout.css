@@ -3176,6 +3176,51 @@ span[data-color="unknownm"] {
 		rgba(0,0,0,0.2) 0 0 5px,black 0 0 1px;
 }
 
+div[data-decoration="gold"]::before,
+#arena[data-framedecoration="gold"] .player>.framebg::before{
+	content:"";
+	position:absolute;
+	background-image:url('../../theme/style/player/gold_d1.png');
+	background-size:100% 100%;
+	width:41px;
+	height:80px;
+	left:-13px;
+	top:-19px;
+}
+div[data-decoration="gold"]::before{
+	width: 31px;
+	height: 60px;
+	left: -10px;
+	top: -12px;
+}
+div[data-decoration="gold"]::after,
+#arena[data-framedecoration="gold"] .player>.framebg::after{
+	content:"";
+	position:absolute;
+	background-image:url('../../theme/style/player/gold_d2.png');
+	background-size:100% 100%;
+	width:75px;
+	height:32px;
+	left: auto;
+	top: auto;
+	right:-8px;
+	bottom:-10px;
+}
+div[data-decoration="gold"]::after{
+	width: 56px;
+	height: 24px;
+	right: -7px;
+	bottom: -6px;
+}
+
+
+div[data-decoration="gold"]::before,
+div[data-decoration="gold"]::after{
+	opacity: 1;
+	z-index: 10;
+	box-shadow: none !important;
+}
+
 .card.fullskin>.background {
 	display: none !important
 }

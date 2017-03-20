@@ -2489,12 +2489,18 @@ window.noname_asset_list=[
     'theme/style/player/bronze1.png',
     'theme/style/player/bronze2.png',
     'theme/style/player/bronze3.png',
+    'theme/style/player/bronze_d1.png',
+    'theme/style/player/bronze_d2.png',
     'theme/style/player/gold1.png',
     'theme/style/player/gold2.png',
     'theme/style/player/gold3.png',
+    'theme/style/player/gold_d1.png',
+    'theme/style/player/gold_d2.png',
     'theme/style/player/silver1.png',
     'theme/style/player/silver2.png',
     'theme/style/player/silver3.png',
+    'theme/style/player/silver_d1.png',
+    'theme/style/player/silver_d2.png',
 ];
 window.noname_skin_list={
     bulianshi:4,

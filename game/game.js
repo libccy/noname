@@ -1536,6 +1536,9 @@
 							gold:'金框',
 							silver:'银框',
 							bronze:'铜框',
+							dragon_gold:'金龙',
+							dragon_silver:'银龙',
+							dragon_bronze:'玉龙',
 							custom:'自定',
 							default:'默认',
 						},
@@ -1591,19 +1594,24 @@
 							node.className='button character';
 							node.style.backgroundSize='';
 							node.style.height='108px';
-							switch(link){
-								case 'default':case 'custom':{
-									if(lib.config.theme=='simple'){
-										node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
-										node.className='button character';
-									}
-									else{
-										node.style.backgroundImage='none';
-										node.className='button character dashedmenubutton';
-									}
-									break;
+							node.dataset.decoration='';
+							if(link=='default'||link=='custom'){
+								if(lib.config.theme=='simple'){
+									node.style.backgroundImage='linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))';
+									node.className='button character';
 								}
-								default:node.setBackgroundImage('theme/style/player/'+link+'1.png');node.style.backgroundSize='100% 100%';break;
+								else{
+									node.style.backgroundImage='none';
+									node.className='button character dashedmenubutton';
+								}
+							}
+							else{
+								if(link.indexOf('dragon_')==0){
+									link=link.slice(7);
+									node.dataset.decoration=link;
+								}
+								node.setBackgroundImage('theme/style/player/'+link+'1.png');
+								node.style.backgroundSize='100% 100%';
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
@@ -1645,6 +1653,13 @@
 							}
 							else if(layout!='default'){
 								ui.css.border_stylesheet=lib.init.sheet();
+								if(layout.indexOf('dragon_')==0){
+									layout=layout.slice(7);
+									ui.arena.dataset.framedecoration=layout;
+								}
+								else{
+									ui.arena.dataset.framedecoration='';
+								}
 								ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'1.png")}',0);
 								ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'3.png")}',0);
 								ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
@@ -5931,8 +5946,12 @@
 				}
 				if(lib.config.border_style&&lib.config.border_style!='default'&&lib.config.border_style!='custom'){
 					ui.css.border_stylesheet=lib.init.sheet();
-					ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.border_style+'1.png")}',0);
-					ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+lib.config.border_style+'3.png")}',0);
+					var bstyle=lib.config.border_style;
+					if(bstyle.indexOf('dragon_')==0){
+						bstyle=bstyle.slice(7);
+					}
+					ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'1.png")}',0);
+					ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'3.png")}',0);
 					ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 				}
 				if(lib.config.control_style&&lib.config.control_style!='default'&&lib.config.control_style!='custom'){
@@ -32827,6 +32846,9 @@
 				}
 				if(lib.config.change_skin_auto!='off'){
 					_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
+				}
+				if(lib.config.border_style.indexOf('dragon_')==0){
+					ui.arena.dataset.framedecoration=lib.config.border_style.slice(7);
 				}
 
 				ui.arenalog=ui.create.div('#arenalog',ui.arena);
