@@ -1661,7 +1661,7 @@
 								else{
 									ui.arena.dataset.framedecoration='';
 								}
-								ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'1.png")}',0);
+								ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'1.png")}',0);
 								ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+layout+'3.png")}',0);
 								ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 							}
@@ -5968,7 +5968,7 @@
 					if(bstyle.indexOf('dragon_')==0){
 						bstyle=bstyle.slice(7);
 					}
-					ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'1.png")}',0);
+					ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'1.png")}',0);
 					ui.css.border_stylesheet.sheet.insertRule('#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("'+lib.assetURL+'theme/style/player/'+bstyle+'3.png")}',0);
 					ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 				}
@@ -24581,6 +24581,31 @@
                 avatar.style.transform='';
                 avatar.classList.add('avatar2');
                 node.appendChild(avatar);
+
+				if(targets&&targets.length==1&&targets[0]!=player&&get.itemtype(targets[0])=='player'){
+					(function(){
+						var avatar2;
+						var target=targets[0];
+		                if(!target.isUnseen(0)){
+		                    avatar2=target.node.avatar.cloneNode();
+		                }
+		                else if(!player.isUnseen(1)){
+		                    avatar2=target.node.avatar2.cloneNode();
+		                }
+		                else if(get.mode()=='guozhan'&&target.node&&target.node.name_seat){
+		                    avatar2=ui.create.div('.avatar.cardbg');
+		                    avatar2.innerHTML=target.node.name_seat.innerHTML[0];
+		                }
+		                else{
+		                    return;
+		                }
+		                node.node.avatar2=avatar2;
+		                avatar2.style.transform='';
+						avatar2.classList.add('avatar2');
+		                avatar2.classList.add('avatar3');
+		                node.insertBefore(avatar2,avatar);
+					}());
+				}
             }
             if(targets&&targets.length){
                 if(targets.length==1&&targets[0]==player){

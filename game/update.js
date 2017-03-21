@@ -25,7 +25,7 @@ window.noname_update={
         // 'mode/identity.js',
         // 'mode/stone.js',
         // 'theme/woodden/style.css',
-        // 'layout/default/layout.css',
+        'layout/default/layout.css',
         // 'layout/default/phone.css',
         // 'layout/default/menu.css',
         // 'layout/long/layout.css',

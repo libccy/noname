@@ -1208,9 +1208,11 @@ character.sp={
 				}
 				else{
 					player.draw(2);
-					player.addSkill(event.list);
-					player.popup(event.list[0]);
-					player.storage.zhuSkill_yjixi=event.list;
+					if(event.list){
+						player.addSkill(event.list);
+						player.popup(event.list[0]);
+						player.storage.zhuSkill_yjixi=event.list;
+					}
 				}
 			},
 			group:['yjixi_count1','yjixi_count2'],

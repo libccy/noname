@@ -467,6 +467,12 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 	line-height: 20px;
 	z-index: 1;
 }
+#historybar>div>.avatar2.avatar3{
+	left: 12px;
+	width: 14px;
+	top: 31px;
+	height: 14px;
+}
 
 #window.rightbar #historybar,
 #window.rightbar2:not(.leftbar) #historybar {
@@ -1904,10 +1910,12 @@ div:not(.handcards)>.card>.info>span,
     transform-origin: top left;
 }
 #window #arena.mobile:not(.chess) .player[data-position='0']>.framebg{
-	display: none;
+	/*display: none;*/
+	width: 120px;
 }
 
-#window .player>.framebg[data-auto="gold"]{
+#window .player>.framebg[data-auto="gold"],
+#window #arena.long.mobile:not(.fewplayer) .player[data-position='0']>.framebg[data-auto="gold"]{
 	display:block;
 	background-image:url('../../theme/style/player/gold1.png');
 }
@@ -1916,7 +1924,8 @@ div:not(.handcards)>.card>.info>span,
 	display:block;
 	background-image:url('../../theme/style/player/gold3.png');
 }
-#window .player>.framebg[data-auto="silver"]{
+#window .player>.framebg[data-auto="silver"],
+#window #arena.long.mobile:not(.fewplayer) .player[data-position='0']>.framebg[data-auto="silver"]{
 	display:block;
 	background-image:url('../../theme/style/player/silver1.png');
 }
@@ -1925,7 +1934,8 @@ div:not(.handcards)>.card>.info>span,
 	display:block;
 	background-image:url('../../theme/style/player/silver3.png');
 }
-#window .player>.framebg[data-auto="bronze"]{
+#window .player>.framebg[data-auto="bronze"],
+#window #arena.long.mobile:not(.fewplayer) .player[data-position='0']>.framebg[data-auto="bronze"]{
 	display:block;
 	background-image:url('../../theme/style/player/bronze1.png');
 }
