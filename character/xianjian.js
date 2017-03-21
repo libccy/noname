@@ -2603,7 +2603,7 @@ character.xianjian={
 		runxin_info:'每当你使用或打出一张红桃牌，你可以令一名角色回复一点体力',
 		tannang:'探囊',
 		tannang_info:'出牌阶段限一次，你可以将一张梅花手牌当顺手牵羊使用；你的顺手牵羊无距离限制',
-		tuoqiao:'脱壳',
+		tuoqiao:'烟瘴',
 		tuoqiao_info:'你可以将一张黑色牌当作石灰粉使用',
 		xiaoyao:'逍遥',
 		xiaoyao_info:'每当你成为其他角色的卡牌目标，你可以弃置一张与之花色相同的手牌取消之',

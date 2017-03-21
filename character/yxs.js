@@ -2171,6 +2171,7 @@ character.yxs={
 			content:function(){
 				trigger.source.chooseToDiscard(2,'he',true);
 			},
+			logTarget:'source',
 			ai:{
 				expose:0.3,
 				result:{

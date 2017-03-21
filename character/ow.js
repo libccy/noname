@@ -54,22 +54,46 @@ character.ow={
     skill:{
         pingzhang:{
             trigger:{global:'damageBegin'},
+            alter:true,
+            intro:{
+                content:function(storage,player){
+                    if(player.hasSkill('pingzhang2')){
+                        if(player.hasSkill('pingzhang3')){
+                            return '已对自已和其他角色发动屏障';
+                        }
+                        else{
+                            return '已对自已发动屏障';
+                        }
+                    }
+                    else{
+                        return '已对其他角色发动屏障';
+                    }
+                },
+                markcount:function(storage,player){
+                    if(player.hasSkill('pingzhang2')&&player.hasSkill('pingzhang3')){
+                        return 2;
+                    }
+                    return 1;
+                }
+            },
             filter:function(event,player){
                 if(event.num<=0) return false;
+                var position=get.is.altered('pingzhang')?'h':'he';
                 if(event.player==player){
                     if(player.hasSkill('pingzhang2')) return false;
-                    return player.num('he',{suit:'heart'});
+                    return player.num(position,{suit:'heart'});
                 }
                 else{
                     if(player.hasSkill('pingzhang3')) return false;
-                    return player.num('he',{suit:'spade'});
+                    return player.num(position,{suit:'spade'});
                 }
             },
             direct:true,
             content:function(){
                 'step 0'
+                var position=get.is.altered('pingzhang')?'h':'he';
                 var suit=(player==trigger.player)?'heart':'spade';
-                var next=player.chooseToDiscard('he',{suit:suit},get.prompt('pingzhang',trigger.player));
+                var next=player.chooseToDiscard(position,{suit:suit},get.prompt('pingzhang',trigger.player));
                 next.ai=function(card){
                     if(ai.get.damageEffect(trigger.player,trigger.source,player)<0){
                         return 8-ai.get.value(card);
@@ -86,6 +110,7 @@ character.ow={
                     else{
                         player.addSkill('pingzhang3');
                     }
+                    player.markSkill('pingzhang');
                 }
             },
             group:['pingzhang_count'],
@@ -105,6 +130,7 @@ character.ow={
                             player.storage.pingzhang++;
                             player.removeSkill('pingzhang3');
                         }
+                        player.unmarkSkill('pingzhang');
                     }
                 }
             },
@@ -3012,6 +3038,7 @@ character.ow={
     translate:{
         pingzhang:'屏障',
         pingzhang_info:'每轮各限一次，当你受到伤害时，你可以弃置一张红桃牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃牌令伤害-1',
+        pingzhang_info_alter:'每轮各限一次，当你受到伤害时，你可以弃置一张红桃手牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃手牌令伤害-1',
         liyong:'力涌',
         liyong_info:'锁定技，你摸牌阶段摸牌数+X，X为你上一轮发动屏障的次数',
         dianji:'电击',

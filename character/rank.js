@@ -16,6 +16,7 @@ window.characterRank={
         'hs_medivh',
     ],
     ap:[
+        'ow_zhaliya',
         'pal_liumengli',
         'pal_yuntianhe',
         'pal_lixiaoyao',
