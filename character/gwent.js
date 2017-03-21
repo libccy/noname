@@ -10,15 +10,15 @@ character.gwent={
 		gw_haluo:['male','qun',4,['nuhou']],
 
 		gw_airuiting:['male','wei',4,['kuanglie']],
+		gw_laduoweide:['male','wei',4,['gwxiaoshou']],
+		gw_dagong:['male','qun',4,['tianbian']],
 
-		// gw_gaier:['male','shu',3,['gwyinhua']],
-		// gw_dagong:['male','qun',4,[]],
 		// gw_bulanwang:['male','qun',3,[]],
 		// gw_kuite:['male','qun',3,[]],
 		// gw_fuertaisite:['male','qun',3,[]],
 		// gw_hengsaite:['male','qun',3,[]],
 		// gw_fulisi:['male','qun',3,[]],
-		// gw_laduoweide:['male','qun',3,[]],
+		// gw_gaier:['male','shu',3,['hunmo']],
 
 		gw_jieluote:['male','qun',6,['fayin']],
 		gw_yenaifa:['female','qun',3,['xuezhou']],
@@ -41,6 +41,101 @@ character.gwent={
 		gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 	},
 	skill:{
+		tianbian:{
+			trigger:{player:'phaseUseBegin'},
+			direct:true,
+			content:function(){
+				'step 0'
+				var num1=0,num2=0;
+				var choice;
+				if(player.hasUnknown(2)){
+					if(game.dead.length==0){
+						choice='选项二';
+					}
+					else{
+						choice='cancel2';
+					}
+				}
+				else{
+					game.countPlayer(function(current){
+						var att=ai.get.attitude(player,current);
+						if(att>0){
+							num1++;
+						}
+						else if(att<0){
+							num2++;
+						}
+					});
+					choice=(num1>num2)?'选项一':'选项二';
+				}
+				player.chooseControl('选项一','选项二','cancel2',function(){
+					return choice;
+				}).set('prompt',get.prompt('tianbian')).set('choiceList',['随机使用一张对全场有正面效果的牌','随机使用一张对全场有负面效果的牌']);
+				'step 1'
+				if(result.control!='cancel2'){
+					player.logSkill('tianbian');
+					var list=[];
+					for(var i in lib.card){
+						if(lib.inpile.contains(i)&&
+						lib.card[i].selectTarget==-1&&
+						lib.card[i].type!='equip'&&
+						lib.card[i].ai&&lib.card[i].ai.tag&&
+						lib.card[i].ai.tag.multitarget){
+							if(lib.card[i].ai.tag.multineg){
+								if(result.control=='选项二'){
+									list.push(i);
+								}
+							}
+							else{
+								if(result.control=='选项一'){
+									list.push(i);
+								}
+							}
+						}
+					}
+					var name=null;
+					while(list.length){
+						name=list.randomRemove();
+						if(game.hasPlayer(function(current){
+							return player.canUse(name,current)
+						})){
+							break;
+						}
+						else{
+							name=null;
+						}
+					}
+					if(name){
+						var targets=game.filterPlayer(function(current){
+							return player.canUse(name,current);
+						});
+						targets.sortBySeat();
+						player.useCard({name:name},targets);
+					}
+				}
+			}
+		},
+		gwxiaoshou:{
+			enable:'phaseUse',
+			usable:2,
+			filterTarget:function(card,player,target){
+				return target.isHighestHp();
+			},
+			check:function(card){return 7-ai.get.value(card);},
+			position:'he',
+			filterCard:true,
+			content:function(){
+				target.damage();
+			},
+			ai:{
+				result:{
+					target:function(player,target){
+						return ai.get.damageEffect(target,player);
+					},
+				},
+				order:7
+			}
+		},
 		kuanglie:{
 			trigger:{player:'useCardToBegin'},
 			filter:function(event,player){
@@ -514,15 +609,15 @@ character.gwent={
 				}
 			}
 		},
-		hunmo:{
+		hunmo_old:{
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target.num('h')!=Math.max(3,player.hp);
+				return target.num('h')!=Math.min(3,player.hp);
 			},
-			selectTarget:[1,Infinity],
+			selectTarget:[1,3],
 			content:function(){
-				var dh=Math.max(3,player.hp)-target.num('h');
+				var dh=Math.min(3,player.hp)-target.num('h');
 				if(dh>0){
 					target.draw(dh,false);
 					target.$draw(dh);
@@ -537,13 +632,47 @@ character.gwent={
 				order:11,
 				result:{
 					target:function(player,target){
-						var att=get.sgn(ai.get.attitude(player,target));
-						var dh=Math.max(3,player.hp)-target.num('h');
+						var dh=Math.min(3,player.hp)-target.num('h');
 						if(dh<0){
-							return att*dh+get.sgn(ai.get.effect(target,{name:'sha'},player,player));
+							dh+=get.sgn(ai.get.effect(target,{name:'sha'},player,target));
 						}
-						return att*dh;
+						return dh;
 					}
+				}
+			}
+		},
+		hunmo_old2:{
+			trigger:{player:['phaseBegin','phaseEnd']},
+			direct:true,
+			content:function(){
+				'step 0'
+				player.chooseTarget(get.prompt('hunmo'),[1,game.countPlayer()],function(card,player,target){
+					return target.num('h')!=Math.min(3,target.hp);
+				}).ai=function(target){
+					return ai.get.attitude(player,target)*(Math.min(3,target.hp)-target.num('h'));
+				}
+				'step 1'
+				if(result.bool){
+					player.logSkill('hunmo',result.targets);
+					event.targets=result.targets.slice(0);
+					event.targets.sortBySeat();
+				}
+				else{
+					event.finish();
+				}
+				'step 2'
+				if(event.targets.length){
+					var target=event.targets.shift();
+					var dh=Math.min(3,target.hp)-target.num('h');
+					if(dh>0){
+						target.draw(dh,false);
+						target.$draw(dh);
+					}
+					else if(dh<0){
+						target.chooseToDiscard(-dh,true).delay=false;
+					}
+					game.delay(0.5);
+					event.redo();
 				}
 			}
 		},
@@ -678,6 +807,10 @@ character.gwent={
 		gw_luoqi:'罗契',
 		gw_yioufeisi:'伊欧菲斯',
 
+		tianbian:'天变',
+		tianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
+		gwxiaoshou:'枭首',
+		gwxiaoshou_info:'出牌阶段限两次，你可以弃置一张牌对场上体力值最高（或之一）的一名角色造成一点伤害',
 		kuanglie:'狂猎',
 		kuanglie_info:'锁定技，当一名其他角色成为你的黑色牌的目标后，该角色随机弃置一张牌；每当你发动两次“狂猎”，你摸一张牌',
 		gwjiquan:'集权',
@@ -701,7 +834,7 @@ character.gwent={
 		gwbaquan:'霸权',
 		gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你获得的牌且该角色体力值不小于你，你对其造成一点伤害',
 		hunmo:'魂墨',
-		hunmo_info:'出牌阶段限一次，你可以选择任意名角色，令目标的手牌数变为与你当前的体力值相同（最多为3），并视为对其中弃牌的角色使用一张杀（不计入出杀次数）',
+		hunmo_info:'准备阶段和结束阶段，你可以令任意名角色的手牌数等于其当前体力值（最多为3）',
 		huihun:'回魂',
 		huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 		quanzhang:'权杖',

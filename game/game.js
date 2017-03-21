@@ -8960,7 +8960,14 @@
 							player.logSkill.apply(player,event.logSkill);
 						}
 					}
-					if(!game.online) player.discard(event.result.cards);
+					if(!game.online){
+						if(typeof event.delay=='boolean'){
+							player.discard(event.result.cards).set('delay',event.delay);
+						}
+						else{
+							player.discard(event.result.cards);
+						}
+					}
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
                 chooseToCompareMultiple:function(){

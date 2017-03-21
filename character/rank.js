@@ -150,6 +150,8 @@ window.characterRank={
         'hs_jaina',
     ],
     am:[
+        'gw_gaier',
+        'gw_laduoweide',
         'gw_kaerweite',
         'yxs_napolun',
         'hs_aedwin',
