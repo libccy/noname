@@ -5576,7 +5576,7 @@
 							lib.node.debug();
 						}
 						else if(e.keyCode==27){
-							ui.click.configMenu();
+							if(!ui.arena.classList.contains('paused')) ui.click.configMenu();
 						}
                     }
                     else{
@@ -5631,7 +5631,7 @@
 							lib.node.debug();
 						}
 						else if(e.keyCode==27){
-							ui.click.config();
+							if(!ui.arena.classList.contains('paused')) ui.click.config();
 						}
                     }
         		};

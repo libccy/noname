@@ -151,6 +151,7 @@ window.characterRank={
         'hs_jaina',
     ],
     am:[
+        'ow_baolei',
         'gw_gaier',
         'gw_laduoweide',
         'gw_kaerweite',

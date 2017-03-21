@@ -63,7 +63,7 @@ character.ow={
                         return '每当你使用一张杀，你摸一张牌或回复一点体力';
                     }
                     else if(player.hasSkill('bshaowei')&&player.storage.bshaowei){
-                        return '你的杀无视距离和防具并可额外指定一个目标；你使用杀无次数限制；你不能闪避杀';
+                        return '你的杀无视距离和防具、无数量限制且不可闪避；你不能闪避杀';
                     }
                     else{
                         return '无额外技能';
@@ -82,7 +82,20 @@ character.ow={
                     player.marks.zhencha.firstChild.innerHTML='侦';
                 }
                 player.addTempSkill('zhencha2','phaseAfter');
-            }
+            },
+            subSkill:{
+                sha:{
+                    trigger:{player:'shaBegin'},
+                    direct:true,
+                    filter:function(event,player){
+                        return player.storage.zhencha&&event.card&&event.card.name=='sha';
+                    },
+                    content:function(){
+                        player.chooseDrawRecover(get.prompt('zhencha')).logSkill='zhencha';
+                    }
+                }
+            },
+            group:'zhencha_sha'
         },
         bshaowei:{
             init:function(player){
@@ -105,6 +118,44 @@ character.ow={
                     player.marks.zhencha.firstChild.innerHTML='哨';
                 }
                 player.addTempSkill('zhencha2','phaseAfter');
+            },
+            subSkill:{
+                sha:{
+                    mod:{
+        				targetInRange:function(card,player,target,now){
+        					if(card.name=='sha'&&player.storage.bshaowei) return true;
+        				},
+                        cardUsable:function(card,player,num){
+        					if(card.name=='sha'&&player.storage.bshaowei) return Infinity;
+        				}
+        			},
+                    trigger:{target:'shaBegin',player:'shaBegin'},
+                    forced:true,
+                    filter:function(event,player){
+                        return player.storage.bshaowei;
+                    },
+                    check:function(){
+                        return false;
+                    },
+                    content:function(){
+                        trigger.directHit=true;
+                    },
+                    ai:{
+                        unequip:true,
+        				skillTagFilter:function(player,tag,arg){
+                            if(!player.storage.bshaowei) return false;
+        					if(arg&&arg.name=='sha') return true;
+        					return false;
+        				}
+                    }
+                }
+            },
+            group:'bshaowei_sha',
+            ai:{
+                function(player,target){
+                    if(target.storage.bshaowei) return 1.7;
+                    return 1;
+				}
             }
         },
         zhencha2:{},
@@ -3015,13 +3066,13 @@ character.ow={
         liyong:'力涌',
         liyong_info:'锁定技，你摸牌阶段摸牌数+X，X为你上一轮发动屏障的次数',
         dianji:'电击',
-        dianji_info:'出牌阶段，你可以将一张杀当作惊雷闪对距离2以内的角色使用',
+        dianji_info:'你可以将一张杀当作惊雷闪对距离2以内的角色使用',
         feitiao:'飞跳',
         feitiao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名其他角色，你与该角色的距离视为1直到回合结束，然后该角色随机弃置一张牌',
         bshaowei:'哨卫',
-        bshaowei_info:'结束阶段，你可以切换至哨卫模式。当处于时模式时，每当你使用一张杀，你摸一张牌或回复一点体力',
+        bshaowei_info:'结束阶段，你可以切换至哨卫模式。当处于此模式时，你的杀无视距离和防具、无数量限制且不可闪避；你不能闪避杀',
         zhencha:'侦查',
-        zhencha_info:'结束阶段，你可以切换至侦查模式，并获得一点护甲。当处于时模式时，你的杀无视距离和防具并可额外指定一个目标；你使用杀无次数限制；你不能闪避杀',
+        zhencha_info:'结束阶段，你可以切换至侦查模式。当处于此模式时，每当你使用一张杀，你摸一张牌或回复一点体力',
         liangou:'链钩',
         liangou_info:'出牌阶段限一次，你可以弃置一张牌，指定一名其他角色并进行一次判定，若结果不为红桃，该角色与你距离为1且受到的首次伤害+1直到回合结束',
         xiyang:'吸氧',
