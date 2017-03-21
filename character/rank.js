@@ -152,6 +152,7 @@ window.characterRank={
     ],
     am:[
         'ow_baolei',
+        'ow_wensidun',
         'gw_gaier',
         'gw_laduoweide',
         'gw_kaerweite',

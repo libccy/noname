@@ -22,7 +22,7 @@ character.ow={
         ow_banzang:['male','qun',4,['bfengshi','yinbo']],
         ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
         ow_luba:['male','shu',4,['liangou','xiyang']],
-        // ow_wensidun:['male','shu',4,[]],
+        ow_wensidun:['male','shu',4,['feitiao','dianji']],
         ow_zhaliya:['female','wei',4,['pingzhang','liyong']],
         ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
     },
@@ -52,6 +52,84 @@ character.ow={
         ow_heiying:'作为全世界最臭名昭著的黑客，“黑影”利用信息与情报操控权贵。早在她称自己为“黑影”之前，░░░░░░是千千万万在智械危机后变成孤儿的儿童之一。在家乡大部分基础设施都被摧毁的情况下，她依靠自己在黑客以及计算机方面的天赋活了下来。在黑客领域的一连串的胜利让░░░░░░对自己的实力过度自信，最终她在毫无防备的情况下，陷入了一张覆盖全球的阴谋网——并且也因此被人盯上了。由于自己的安全面临严重威胁，░░░░░░不得不删除关于自己的全部信息，从此销声匿迹。后来，她以“黑影”的身份再度出现，经过改造的她决心查出那张阴谋网背后的真相。',
     },
     skill:{
+        dianji:{
+            enable:'phaseUse',
+			filter:function(event,player){
+				return player.num('h')>0;
+			},
+			filterCard:true,
+            usable:1,
+			viewAs:{name:'jingleishan',nature:'thunder'},
+			check:function(card){
+				return 8-ai.get.value(card)
+			},
+			ai:{
+				order:8,
+				expose:0.2,
+				threaten:1.2
+			},
+            mod:{
+                playerEnabled:function(card,player,target){
+                    if(_status.event.skill=='dianji'&&get.distance(player,target)>2) return false;
+                }
+            }
+        },
+        feitiao:{
+            trigger:{player:'phaseUseBegin'},
+            direct:true,
+            filter:function(event,player){
+                return player.num('he')>0;
+            },
+            content:function(){
+                'step 0'
+                var next=player.chooseCardTarget({
+                    prompt:get.prompt('feitiao'),
+                    position:'he',
+                    filterCard:true,
+                    ai1:function(card){
+                        return 7-ai.get.value(card);
+                    },
+                    ai2:function(target){
+                        var att=ai.get.attitude(player,target);
+                        if(att>=0) return 0;
+                        if(!target.num('he')) return -0.01;
+                        var dist=get.distance(player,target);
+                        if(dist>2){
+                            att-=2;
+                        }
+                        else if(dist==2){
+                            att--;
+                        }
+                        return -att;
+                    },
+                    filterTarget:function(card,player,target){
+                        return player!=target;
+                    }
+                });
+                'step 1'
+                if(result.bool){
+                    player.discard(result.cards);
+                    var target=result.targets[0];
+                    player.logSkill('feitiao',target);
+                    player.storage.feitiao2=target;
+                    player.addTempSkill('feitiao2','phaseAfter');
+                    target.randomDiscard();
+                }
+
+            }
+        },
+        feitiao2:{
+            mod:{
+                globalFrom:function(from,to){
+                    if(to==from.storage.feitiao2) return -Infinity;
+                }
+            },
+            mark:'character',
+            intro:{
+                content:'与$的距离视为1直到回合结束'
+            },
+            onremove:true
+        },
         zhencha:{
             init:function(player){
                 player.storage.zhencha=true;
@@ -1735,8 +1813,7 @@ character.ow={
             },
             content:function(){
                 player.storage.tuijin2=target;
-                player.markSkillCharacter('tuijin2',target,'推进','与'+get.translation(target)+'的距离视为1，直到回合结束');
-                player.addSkill('tuijin2');
+                player.addTempSkill('tuijin2','phaseAfter');
             },
             ai:{
                 order:11,
@@ -1754,18 +1831,14 @@ character.ow={
         tuijin2:{
             mod:{
                 globalFrom:function(from,to){
-                    if(to==from.storage.tuijin2) return -Infinity;
+                    if(to==from.storage.feitiao2) return -Infinity;
                 }
             },
-            trigger:{player:'phaseEnd'},
-            priority:-1,
-            forced:true,
-            popup:false,
-            content:function(){
-                player.unmarkSkill('tuijin2');
-                player.removeSkill('tuijin2');
-                delete player.storage.tuijin2;
-            }
+            mark:'character',
+            intro:{
+                content:'与$的距离视为1直到回合结束'
+            },
+            onremove:true
         },
         jijia:{
             mark:true,
@@ -3066,9 +3139,10 @@ character.ow={
         liyong:'力涌',
         liyong_info:'锁定技，你摸牌阶段摸牌数+X，X为你上一轮发动屏障的次数',
         dianji:'电击',
-        dianji_info:'你可以将一张杀当作惊雷闪对距离2以内的角色使用',
+        dianji_info:'出牌阶段限一次，你可以将一张手牌当作惊雷闪对距离2以内的角色使用',
         feitiao:'飞跳',
-        feitiao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名其他角色，你与该角色的距离视为1直到回合结束，然后该角色随机弃置一张牌',
+        feitiao2:'飞跳',
+        feitiao_info:'出牌阶段开始时，你可以弃置一张牌并指定一名角色，你与该角色的距离视为1直到回合结束，然后该角色随机弃置一张牌',
         bshaowei:'哨卫',
         bshaowei_info:'结束阶段，你可以切换至哨卫模式。当处于此模式时，你的杀无视距离和防具、无数量限制且不可闪避；你不能闪避杀',
         zhencha:'侦查',
@@ -3164,6 +3238,7 @@ character.ow={
         zihui_info:'出牌阶段，你可以令距离2以内的所有其他角色选择一项：弃置数量等同你机甲体力值的牌，或受到2点火焰伤害，并在结算完毕后摧毁你的机甲',
         zihui_info_alter:'出牌阶段，你可以令距离2以内的所有其他角色选择一项：1. 弃置数量等同你机甲体力值的牌（不足则全弃，至少弃1张）；2. 或受到2点火焰伤害，并在结算完毕后摧毁你的机甲',
         tuijin:'推进',
+        tuijin2:'推进',
         tuijin_info:'出牌阶段限一次，若你有机甲，你可以指定一名角色，本回合内视为与其距离为1',
         chongzhuang:'重装',
         chongzhuang_info:'在你失去机甲后，当你累计造成了4点伤害时，你重新获得机甲',
