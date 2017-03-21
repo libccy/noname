@@ -5829,16 +5829,16 @@
 					game.saveConfig('touchscreen',false);
 				}
                 delete lib.ipad;
-				if(lib.config.extensions.length){
-					window.resetExtension=function(){
-						for(var i=0;i<lib.config.extensions.length;i++){
-							game.saveConfig('extension_'+lib.config.extensions[i]+'_enable',false);
-						}
-                        localStorage.setItem(lib.configprefix+'disable_extension',true);
-					}
-				}
                 var extensionlist=[];
                 if(!localStorage.getItem(lib.configprefix+'disable_extension')){
+					if(lib.config.extensions.length){
+						window.resetExtension=function(){
+							for(var i=0;i<lib.config.extensions.length;i++){
+								game.saveConfig('extension_'+lib.config.extensions[i]+'_enable',false);
+							}
+	                        localStorage.setItem(lib.configprefix+'disable_extension',true);
+						}
+					}
                     for(var i=0;i<lib.config.plays.length;i++){
                         if(lib.config.all.plays.indexOf(lib.config.plays[i])!=-1){
                             extensionlist.push(lib.config.plays[i]);
