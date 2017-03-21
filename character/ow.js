@@ -23,7 +23,7 @@ character.ow={
         ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
         ow_luba:['male','shu',4,['liangou','xiyang']],
         // ow_wensidun:['male','shu',4,[]],
-        // ow_zhaliya:['female','shu',4,[]],
+        ow_zhaliya:['female','wei',4,['pingzhang','liyong']],
         ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
     },
     characterIntro:{
@@ -52,6 +52,79 @@ character.ow={
         ow_heiying:'作为全世界最臭名昭著的黑客，“黑影”利用信息与情报操控权贵。早在她称自己为“黑影”之前，░░░░░░是千千万万在智械危机后变成孤儿的儿童之一。在家乡大部分基础设施都被摧毁的情况下，她依靠自己在黑客以及计算机方面的天赋活了下来。在黑客领域的一连串的胜利让░░░░░░对自己的实力过度自信，最终她在毫无防备的情况下，陷入了一张覆盖全球的阴谋网——并且也因此被人盯上了。由于自己的安全面临严重威胁，░░░░░░不得不删除关于自己的全部信息，从此销声匿迹。后来，她以“黑影”的身份再度出现，经过改造的她决心查出那张阴谋网背后的真相。',
     },
     skill:{
+        pingzhang:{
+            trigger:{global:'damageBegin'},
+            filter:function(event,player){
+                if(event.num<=0) return false;
+                if(event.player==player){
+                    if(player.hasSkill('pingzhang2')) return false;
+                    return player.num('he',{suit:'heart'});
+                }
+                else{
+                    if(player.hasSkill('pingzhang3')) return false;
+                    return player.num('he',{suit:'spade'});
+                }
+            },
+            direct:true,
+            content:function(){
+                'step 0'
+                var suit=(player==trigger.player)?'heart':'spade';
+                var next=player.chooseToDiscard('he',{suit:suit},get.prompt('pingzhang',trigger.player));
+                next.ai=function(card){
+                    if(ai.get.damageEffect(trigger.player,trigger.source,player)<0){
+                        return 8-ai.get.value(card);
+                    }
+                    return 0;
+                }
+                next.logSkill=['pingzhang',trigger.player];
+                'step 1'
+                if(result.bool){
+                    trigger.num--;
+                    if(player==trigger.player){
+                        player.addSkill('pingzhang2');
+                    }
+                    else{
+                        player.addSkill('pingzhang3');
+                    }
+                }
+            },
+            group:['pingzhang_count'],
+            subSkill:{
+                count:{
+                    trigger:{player:'phaseBegin'},
+                    forced:true,
+                    popup:false,
+                    silent:true,
+                    content:function(){
+                        player.storage.pingzhang=0;
+                        if(player.hasSkill('pingzhang2')){
+                            player.storage.pingzhang++;
+                            player.removeSkill('pingzhang2');
+                        }
+                        if(player.hasSkill('pingzhang3')){
+                            player.storage.pingzhang++;
+                            player.removeSkill('pingzhang3');
+                        }
+                    }
+                }
+            },
+            ai:{
+                expose:0.2,
+                threaten:1.5
+            }
+        },
+        pingzhang2:{},
+        pingzhang3:{},
+        liyong:{
+            trigger:{player:'phaseDrawBegin'},
+            forced:true,
+            filter:function(event,player){
+                return player.storage.pingzhang>0;
+            },
+            content:function(){
+                trigger.num+=player.storage.pingzhang;
+            }
+        },
         liangou:{
             enable:'phaseUse',
             usable:1,
@@ -2937,6 +3010,18 @@ character.ow={
         }
     },
     translate:{
+        pingzhang:'屏障',
+        pingzhang_info:'每轮各限一次，当你受到伤害时，你可以弃置一张红桃牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃牌令伤害-1',
+        liyong:'力涌',
+        liyong_info:'锁定技，你摸牌阶段摸牌数+X，X为你上一轮发动屏障的次数',
+        dianji:'电击',
+        dianji_info:'出牌阶段，你可以将一张杀当作惊雷闪对距离2以内的角色使用',
+        feitiao:'飞跳',
+        feitiao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名其他角色，你与该角色的距离视为1直到回合结束，然后该角色随机弃置一张牌',
+        bshaowei:'哨卫',
+        bshaowei_info:'结束阶段，你可以切换至此模式。当处于时模式时，每当你使用一张杀，你摸一张牌或回复一点体力',
+        zhencha:'侦查',
+        zhencha_info:'结束阶段，你可以切换至此模式，然后获得一点护甲。当处于时模式时，你的杀无视距离和防具并可额外指定一个目标；你使用杀无次数限制；你不能闪避杀',
         liangou:'链钩',
         liangou_info:'出牌阶段限一次，你可以弃置一张牌，指定一名其他角色并进行一次判定，若结果不为红桃，该角色与你距离为1且受到的首次伤害+1直到回合结束',
         xiyang:'吸氧',
