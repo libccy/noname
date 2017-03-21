@@ -528,6 +528,7 @@ character.yxs={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				expose:0.2,
 				effect:{
 					target:function(card,player,target){
@@ -890,7 +891,6 @@ character.yxs={
 				}
 			},
 			ai:{
-				maixie:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
@@ -2008,6 +2008,7 @@ character.yxs={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){

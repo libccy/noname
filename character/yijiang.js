@@ -4860,6 +4860,7 @@ character.yijiang={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				threaten:0.8,
 				effect:{
 					target:function(card,player,target){
@@ -6898,6 +6899,7 @@ character.yijiang={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){

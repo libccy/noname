@@ -2685,6 +2685,7 @@ character.swd={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:function(card,player,target){
 					if(get.tag(card,'damage')){
 						if(player.hasSkill('jueqing')) return [1,-0.5];
@@ -2899,6 +2900,7 @@ character.swd={
 			group:'pozhou2',
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
@@ -5076,6 +5078,7 @@ character.swd={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
@@ -7044,7 +7047,6 @@ character.swd={
 				}
 			},
 			ai:{
-				maixie:true,
 				effect:{
 					target:function(card,player,target,current){
 						if(card.name=='sha'&&(get.color(card)=='red')){

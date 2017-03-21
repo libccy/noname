@@ -1093,7 +1093,8 @@ mode.boss={
 				}
 			},
 			ai:{
-				maixie:true
+				maixie:true,
+				maixie_hp:true,
 			}
 		},
 		boss_zhangwu_ai:{

@@ -1958,6 +1958,7 @@ character.shenhua={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
@@ -2926,6 +2927,7 @@ character.shenhua={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'damage')&&target.hp>1){

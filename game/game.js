@@ -9689,6 +9689,56 @@
 					if(event.dialog) event.dialog.close();
 					event.resume();
 				},
+				chooseDrawRecover:function(){
+					'step 0'
+					if(player.isHealthy()&&event.forced){
+						player.draw(event.num1);
+						event.finish();
+						return;
+					}
+					var controls=['draw_card'];
+					if(player.isDamaged()){
+						event.num1=Math.min(event.num1,player.maxHp-player.hp);
+						controls.push('recover_hp');
+					}
+					if(!event.forced){
+						controls.push('cancel2');
+					}
+					var prompt=event.prompt;
+					if(!prompt){
+						if(player.isHealthy()){
+							prompt='是否摸'+get.cnNumber(event.num1)+'张牌？';
+						}
+						else{
+							prompt='摸'+get.cnNumber(event.num1)+'张牌或回复'+get.cnNumber(event.num2)+'点体力';
+						}
+					}
+					var func=event.ai;
+					if(typeof func!='function'){
+						var choice='draw_card';
+						var nh=player.num('h');
+						if(player.isDamaged()&&ai.get.recoverEffect(player)>0){
+							if(player.hp==1||player.needsToDiscard()||player.hasSkillTag('maixie_hp')){
+								choice='recover_hp';
+							}
+							else if(player.hp==2){
+								if(event.num2>event.num1){
+									choice='recover_hp';
+								}
+								else if(event.num2==event.num1){
+									if(nh>=2){
+										choice='recover_hp';
+									}
+								}
+							}
+							else{
+								if(event.num1<event.num2){
+									choice='recover_hp';
+								}
+							}
+						}
+					}
+				},
 				choosePlayerCard:function(){
 					"step 0"
 					if(!event.dialog) event.dialog=ui.create.dialog('hidden');
@@ -13051,6 +13101,35 @@
                     next.setContent('chooseBool');
                     next._args=Array.from(arguments);
 					return next;
+				},
+				chooseDrawRecover:function(){
+					var next=game.createEvent('chooseDrawRecover',false);
+					for(var i=0;i<arguments.length;i++){
+						if(typeof arguments[i]=='number'){
+							if(typeof next.num1=='number'){
+								next.num2=arguments[i];
+							}
+							else{
+								next.num1=arguments[i];
+							}
+						}
+						else if(typeof arguments[i]=='boolean'){
+							next.forced=arguments[i];
+						}
+						else if(typeof arguments[i]=='string'){
+							next.prompt=arguments[i];
+						}
+						else if(typeof arguments[i]=='function'){
+							next.ai=arguments[i];
+						}
+					}
+					if(typeof next.num1!='number'){
+						next.num1=1;
+					}
+					if(typeof next.num2!='number'){
+						next.num2=1;
+					}
+					next.setContent('chooseDrawRecover');
 				},
 				choosePlayerCard:function(){
 					var next=game.createEvent('choosePlayerCard');

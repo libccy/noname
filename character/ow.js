@@ -18,7 +18,7 @@ character.ow={
         ow_kuangshu:['male','shu',3,['liudan','shoujia','shihuo']],
 
         ow_tuobiang:['male','shu',3,['paotai','maoding']],
-        // ow_baolei:['male','qun',4,[]],
+        ow_baolei:['male','qun',4,['bshaowei','zhencha']],
         ow_banzang:['male','qun',4,['bfengshi','yinbo']],
         ow_laiyinhate:['male','qun',4,['zhongdun','mengji']],
         ow_luba:['male','shu',4,['liangou','xiyang']],
@@ -52,6 +52,62 @@ character.ow={
         ow_heiying:'作为全世界最臭名昭著的黑客，“黑影”利用信息与情报操控权贵。早在她称自己为“黑影”之前，░░░░░░是千千万万在智械危机后变成孤儿的儿童之一。在家乡大部分基础设施都被摧毁的情况下，她依靠自己在黑客以及计算机方面的天赋活了下来。在黑客领域的一连串的胜利让░░░░░░对自己的实力过度自信，最终她在毫无防备的情况下，陷入了一张覆盖全球的阴谋网——并且也因此被人盯上了。由于自己的安全面临严重威胁，░░░░░░不得不删除关于自己的全部信息，从此销声匿迹。后来，她以“黑影”的身份再度出现，经过改造的她决心查出那张阴谋网背后的真相。',
     },
     skill:{
+        zhencha:{
+            init:function(player){
+                player.storage.zhencha=true;
+            },
+            mark:true,
+            intro:{
+                content:function(storage,player){
+                    if(storage){
+                        return '每当你使用一张杀，你摸一张牌或回复一点体力';
+                    }
+                    else if(player.hasSkill('bshaowei')&&player.storage.bshaowei){
+                        return '你的杀无视距离和防具并可额外指定一个目标；你使用杀无次数限制；你不能闪避杀';
+                    }
+                    else{
+                        return '无额外技能';
+                    }
+                }
+            },
+            trigger:{player:'phaseEnd'},
+            filter:function(event,player){
+                if(player.hasSkill('zhencha2')) return false;
+                return !player.storage.zhencha;
+            },
+            content:function(){
+                player.storage.bshaowei=false;
+                player.storage.zhencha=true;
+                if(player.marks.zhencha){
+                    player.marks.zhencha.firstChild.innerHTML='侦';
+                }
+                player.addTempSkill('zhencha2','phaseAfter');
+            }
+        },
+        bshaowei:{
+            init:function(player){
+                player.storage.bshaowei=false;
+            },
+            trigger:{player:'phaseEnd'},
+            filter:function(event,player){
+                if(player.hasSkill('zhencha2')) return false;
+                return !player.storage.bshaowei;
+            },
+            check:function(event,player){
+                if(!player.hasShan()) return true;
+                if(!player.hasSha()) return false;
+                return Math.random()<0.5;
+            },
+            content:function(){
+                player.storage.bshaowei=true;
+                player.storage.zhencha=false;
+                if(player.marks.zhencha){
+                    player.marks.zhencha.firstChild.innerHTML='哨';
+                }
+                player.addTempSkill('zhencha2','phaseAfter');
+            }
+        },
+        zhencha2:{},
         pingzhang:{
             trigger:{global:'damageBegin'},
             alter:true,
@@ -3046,9 +3102,9 @@ character.ow={
         feitiao:'飞跳',
         feitiao_info:'出牌阶段限一次，你可以弃置一张牌并指定一名其他角色，你与该角色的距离视为1直到回合结束，然后该角色随机弃置一张牌',
         bshaowei:'哨卫',
-        bshaowei_info:'结束阶段，你可以切换至此模式。当处于时模式时，每当你使用一张杀，你摸一张牌或回复一点体力',
+        bshaowei_info:'结束阶段，你可以切换至哨卫模式。当处于时模式时，每当你使用一张杀，你摸一张牌或回复一点体力',
         zhencha:'侦查',
-        zhencha_info:'结束阶段，你可以切换至此模式，然后获得一点护甲。当处于时模式时，你的杀无视距离和防具并可额外指定一个目标；你使用杀无次数限制；你不能闪避杀',
+        zhencha_info:'结束阶段，你可以切换至侦查模式，并获得一点护甲。当处于时模式时，你的杀无视距离和防具并可额外指定一个目标；你使用杀无次数限制；你不能闪避杀',
         liangou:'链钩',
         liangou_info:'出牌阶段限一次，你可以弃置一张牌，指定一名其他角色并进行一次判定，若结果不为红桃，该角色与你距离为1且受到的首次伤害+1直到回合结束',
         xiyang:'吸氧',

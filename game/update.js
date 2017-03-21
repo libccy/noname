@@ -18,7 +18,7 @@ window.noname_update={
         // 'character/hearth.js',
         // 'character/extra.js',
         // 'character/sp.js',
-        // 'mode/boss.js',
+        'mode/boss.js',
         // 'mode/chess.js',
         // 'mode/versus.js',
         'mode/guozhan.js',

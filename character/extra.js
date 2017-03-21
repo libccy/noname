@@ -243,6 +243,7 @@ character.extra={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-2];
@@ -562,6 +563,7 @@ character.extra={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				threaten:function(player,target){
 					if(target.hp==1) return 2.5;
 					return 1;

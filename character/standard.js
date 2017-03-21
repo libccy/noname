@@ -140,6 +140,7 @@ character.standard={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player){
 						if(player.hasSkill('jueqing')) return [1,-1];
@@ -398,6 +399,7 @@ character.standard={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){

@@ -868,6 +868,7 @@ character.refresh={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-1];
@@ -946,6 +947,7 @@ character.refresh={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				result:{
 					effect:function(card,player,target){
 						if(get.tag(card,'damage')){

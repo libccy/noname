@@ -845,6 +845,7 @@ character.hearth={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
@@ -1169,6 +1170,7 @@ character.hearth={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(player.hasSkill('jueqing')) return [1,-2];
@@ -2841,6 +2843,7 @@ character.hearth={
 			},
 			ai:{
 				maixie:true,
+				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){

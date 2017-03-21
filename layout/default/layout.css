@@ -469,9 +469,9 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 }
 #historybar>div>.avatar2.avatar3{
 	left: 12px;
-	width: 14px;
 	top: 31px;
-	height: 14px;
+	transform: scale(0.7);
+	transform-origin: top left;
 }
 
 #window.rightbar #historybar,
