@@ -7826,6 +7826,7 @@
 			red:'红色',
 			black:'黑色',
 			ok:"确定",
+			ok2:"确定",
             cancel:"取消",
 			cancel2:"取消",
 			restart:"重新开始",
@@ -9698,7 +9699,7 @@
 					}
 					var controls=['draw_card'];
 					if(player.isDamaged()){
-						event.num1=Math.min(event.num1,player.maxHp-player.hp);
+						event.num2=Math.min(event.num2,player.maxHp-player.hp);
 						controls.push('recover_hp');
 					}
 					if(!event.forced){
@@ -9713,31 +9714,36 @@
 							prompt='摸'+get.cnNumber(event.num1)+'张牌或回复'+get.cnNumber(event.num2)+'点体力';
 						}
 					}
-					var func=event.ai;
-					if(typeof func!='function'){
-						var choice='draw_card';
-						var nh=player.num('h');
-						if(player.isDamaged()&&ai.get.recoverEffect(player)>0){
-							if(player.hp==1||player.needsToDiscard()||player.hasSkillTag('maixie_hp')){
-								choice='recover_hp';
-							}
-							else if(player.hp==2){
-								if(event.num2>event.num1){
-									choice='recover_hp';
-								}
-								else if(event.num2==event.num1){
-									if(nh>=2){
-										choice='recover_hp';
-									}
-								}
-							}
-							else{
-								if(event.num1<event.num2){
-									choice='recover_hp';
-								}
-							}
-						}
+					var next=player.chooseControl(controls);
+					next.set('prompt',prompt);
+					if(event.ai){
+						next.set('ai',event.ai);
 					}
+					else{
+						var choice;
+						if(player.isDamaged()&&ai.get.recoverEffect(player)>0&&(
+							player.hp==1||player.needsToDiscard()||
+							player.hasSkillTag('maixie_hp')||event.num2>event.num1||
+							(event.num2==event.num1&&player.needsToDiscard(1))
+						)){
+							choice='recover_hp';
+						}
+						else{
+							choice='draw_card';
+						}
+						next.set('ai',function(){
+							return _status.event.choice;
+						});
+						next.set('choice',choice);
+					}
+					'step 1'
+					if(result.control=='draw_card'){
+						player.draw(event.num1);
+					}
+					else if(result.control=='recover_hp'){
+						player.recover(event.num2);
+					}
+					event.result=result;
 				},
 				choosePlayerCard:function(){
 					"step 0"
