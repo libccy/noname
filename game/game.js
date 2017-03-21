@@ -9737,11 +9737,21 @@
 						next.set('choice',choice);
 					}
 					'step 1'
-					if(result.control=='draw_card'){
-						player.draw(event.num1);
-					}
-					else if(result.control=='recover_hp'){
-						player.recover(event.num2);
+					if(result.control!='cancel2'){
+						if(event.logSkill){
+	                        if(typeof event.logSkill=='string'){
+	                            player.logSkill(event.logSkill);
+	                        }
+	                        else if(Array.isArray(event.logSkill)){
+	                            player.logSkill.apply(player,event.logSkill);
+	                        }
+	                    }
+						if(result.control=='draw_card'){
+							player.draw(event.num1);
+						}
+						else{
+							player.recover(event.num2);
+						}
 					}
 					event.result=result;
 				},
