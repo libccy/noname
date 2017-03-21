@@ -5181,7 +5181,7 @@
             				if(noname_inited){
             					localStorage.setItem('noname_inited',noname_inited);
             				}
-                            if(indexedDB) indexedDB.deleteDatabase('noname_0.9_data');
+                            if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
                             window.location.reload();
                         }
                     }
