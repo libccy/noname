@@ -55,6 +55,7 @@ window.characterRank={
     ],
     a:[
         'gw_airuiting',
+        'gw_dagong',
         'gw_huoge',
         'gw_xili',
         'gw_yenaifa',

@@ -1931,9 +1931,6 @@ character.shenhua={
 			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
-			filter:function(event){
-				return event.num>0;
-			},
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('fangzhu'),function(card,player,target){
@@ -2908,9 +2905,6 @@ character.shenhua={
 			audio:2,
 			trigger:{player:'damageEnd'},
 			direct:true,
-			filter:function(event,player){
-				return event.num>0
-			},
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('jieming'),[1,trigger.num],function(card,player,target){

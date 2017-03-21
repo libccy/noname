@@ -11027,7 +11027,12 @@
                         },event.nature,player);
 						player.$damagepop(-num,event.nature);
 					}
-					event.trigger('damage');
+					if(num==0){
+						event._triggered=null;
+					}
+					else{
+						event.trigger('damage');
+					}
 					"step 1"
 					if(player.hp<=0&&player.isAlive()){
 						game.delayx();
@@ -18024,7 +18029,7 @@
                     delete player.storage.counttrigger;
                 }
             },
-			_recoverCheck:{
+			_recovercheck:{
 				trigger:{player:'recoverBefore'},
 				forced:true,
 				priority:20,
