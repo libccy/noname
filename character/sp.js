@@ -6993,28 +6993,7 @@ character.sp={
 				"step 1"
 				if(result.bool){
 					player.logSkill('shushen',result.targets);
-					event.target=result.targets[0];
-					if(event.target.hp==event.target.maxHp){
-						event.target.draw(2);
-						event.finish();
-					}
-					else{
-						event.target.chooseControl('draw_card','recover_hp',function(event,target){
-							if(target.hp>=2||target.hp>=target.maxHp-1) return 'draw_card';
-							if(target.hp==2&&target.num('h')==0) return 'draw_card';
-							return 'recover_hp';
-						});
-					}
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				if(result.control=='draw_card'){
-					target.draw(2);
-				}
-				else{
-					target.recover();
+					result.targets[0].chooseDrawRecover(2,true);
 				}
 			},
 			ai:{

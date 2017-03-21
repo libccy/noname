@@ -509,23 +509,9 @@ character.shenhua={
 				'step 0'
 				event.num=trigger.num;
 				'step 1'
-				var controls=['draw_card','cancel2'];
-				if(player.hp<player.maxHp) controls.unshift('recover_hp');
-				player.chooseControl(controls).set('prompt',get.prompt('xinkuanggu')).set('ai',function(event,player){
-					if(player.hp==player.maxHp) return 'draw_card';
-					if(player.hp>=3&&player.num('h')<player.hp) return 'draw_card';
-					if(player.hp==2&&player.num('h')==0) return 'draw_card';
-					return 'recover_hp';
-				});
+				player.chooseDrawRecover(get.prompt('xinkuanggu')).set('logSkill','xinkuanggu');
 				'step 2'
 				if(result.control!='cancel2'){
-					player.logSkill('xinkuanggu');
-					if(result.control=='draw_card'){
-						player.draw();
-					}
-					else{
-						player.recover();
-					}
 					event.num--;
 					if(event.num>0){
 						event.goto(1);

@@ -3021,27 +3021,9 @@ mode.guozhan={
 	element:{
 		content:{
 			zhulian:function(){
-				"step 0"
 				player.popup('珠联璧合');
 				game.log(player,'发动了【珠联璧合】');
-				if(player.hp==player.maxHp){
-					player.draw(2);
-					event.finish();
-				}
-				else{
-					player.chooseControl('draw_card','recover_hp',function(){
-						if(player.hp>=2||player.hp>=player.maxHp-1) return 'draw_card';
-						if(player.hp==2&&player.num('h')==0) return 'draw_card';
-						return 'recover_hp';
-					},ui.create.dialog('hidden','珠联璧合：选择一项奖励'));
-				}
-				"step 1"
-				if(result.control=='draw_card'){
-					player.draw(2);
-				}
-				else{
-					player.recover();
-				}
+				player.chooseDrawRecover(2,true,'珠联璧合：摸两张牌或回复一点体力');
 			}
 		},
 		player:{

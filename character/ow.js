@@ -1948,7 +1948,7 @@ character.ow={
             },
             content:function(){
                 'step 0'
-                player.chooseTarget('力场：令一名角色回复一点体力或摸两张牌',function(card,player,target){
+                player.chooseTarget(get.prompt('lichang'),function(card,player,target){
                     return get.distance(player,target)<=1;
                 }).ai=function(target){
                     var att=ai.get.attitude(player,target);
@@ -2821,71 +2821,9 @@ character.ow={
             },
             alter:true,
             content:function(){
-                "step 0"
-				var controls=['draw_card'];
-				if(player.hp<player.maxHp){
-					controls.push('recover_hp');
-				}
-				controls.push('cancel2');
-				player.chooseControl(controls).set('prompt',get.prompt('ziyu')).set('ai',function(event,player){
-					if(player.hp<player.maxHp) return 'recover_hp';
-					return 'draw_card';
-				});
-				"step 1"
-				if(result.control!='cancel2'){
-					player.logSkill('ziyu');
-					if(result.control=='draw_card'){
-						player.draw();
-					}
-					else{
-						player.recover();
-					}
-				}
+                player.chooseDrawRecover(get.prompt('ziyu')).logSkill='ziyu';
             }
         },
-        ziyu_old:{
-            trigger:{global:'phaseBegin'},
-            direct:true,
-			filter:function(event,player){
-                return event.player.hasSkill('ziyu3');
-			},
-			content:function(){
-				"step 0"
-				var controls=['draw_card'];
-				if(player.hp<player.maxHp){
-					controls.push('recover_hp');
-				}
-				controls.push('cancel2');
-				player.chooseControl(controls).set('prompt',get.prompt('ziyu')).set('ai',function(event,player){
-					if(player.hp<player.maxHp) return 'recover_hp';
-					return 'draw_card';
-				});
-				"step 1"
-				if(result.control!='cancel2'){
-					player.logSkill('ziyu');
-					if(result.control=='draw_card'){
-						player.draw();
-					}
-					else{
-						player.recover();
-					}
-				}
-			},
-            group:'ziyu2'
-        },
-        ziyu2:{
-            trigger:{global:'recoverEnd'},
-            forced:true,
-            popup:false,
-            silent:true,
-            filter:function(event,player){
-                return event.source==player&&event.player!=player;
-            },
-            content:function(){
-                trigger.player.addTempSkill('ziyu3',{player:'phaseEnd'});
-            }
-        },
-        ziyu3:{},
         shouhu:{
             mod:{
                 cardEnabled:function(card){

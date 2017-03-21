@@ -761,26 +761,7 @@ character.yijiang={
 				return false;
 			},
 			content:function(){
-				"step 0"
-				var controls=['draw_card'];
-				if(player.hp<player.maxHp){
-					controls.push('recover_hp');
-				}
-				controls.push('cancel2');
-				player.chooseControl(controls).set('prompt',get.prompt('guizao')).set('ai',function(event,player){
-					if(player.hp<player.maxHp) return 'recover_hp';
-					return 'draw_card';
-				});
-				"step 1"
-				if(result.control!='cancel2'){
-					player.logSkill('guizao');
-					if(result.control=='draw_card'){
-						player.draw();
-					}
-					else{
-						player.recover();
-					}
-				}
+				player.chooseDrawRecover(get.prompt('guizao')).logSkill='guizao';
 			},
 		},
 		jiyu:{
@@ -4887,18 +4868,11 @@ character.yijiang={
 			},
 			content:function(){
 				"step 0"
-				player.chooseControl('recover_hp','draw_card',function(event,player){
-					if(player.hp>=2) return 'draw_card';
-					return 'recover_hp';
+				player.chooseDrawRecover(2,true,function(event,player){
+					if(player.hp==1&&player.isDamaged()) return 'recover_hp';
+					return 'draw_card';
 				});
 				"step 1"
-				if(result.control=='draw_card'){
-					player.draw(2);
-				}
-				else{
-					player.recover();
-				}
-				"step 2"
 				player.loseMaxHp();
 				player.addSkill('paiyi');
 				player.awakenSkill('zili');
@@ -5270,26 +5244,7 @@ character.yijiang={
 				event.giver.$give(1,event.gainner);
 				'step 2'
 				if(event.gainner.num('h')==event.giver.num('h')){
-					if(player.hp<player.maxHp){
-						player.chooseControl('draw_card','recover_hp',function(event,player){
-							if(player.hp>=3&&player.num('h')<player.hp) return 'draw_card';
-							return 'recover_hp';
-						});
-					}
-					else{
-						player.draw();
-						event.finish();
-					}
-				}
-				else{
-					event.finish();
-				}
-				'step 3'
-				if(result.control=='draw_card'){
-					player.draw();
-				}
-				else{
-					player.recover();
+					player.chooseDrawRecover(true);
 				}
 			},
 			ai:{
@@ -6126,23 +6081,7 @@ character.yijiang={
 				return false;
 			},
 			content:function(){
-				"step 0"
-				if(trigger.source.hp<trigger.source.maxHp){
-					trigger.source.chooseControl('draw_card','recover_hp',function(event,target){
-						return 'recover_hp';
-					});
-				}
-				else{
-					trigger.source.draw();
-					event.finish();
-				}
-				"step 1"
-				if(result.control=='draw_card'){
-					trigger.source.draw();
-				}
-				else{
-					trigger.source.recover();
-				}
+				trigger.source.chooseDrawRecover(true);
 			},
 			ai:{
 				effect:{

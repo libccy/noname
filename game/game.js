@@ -13147,6 +13147,7 @@
 						next.num2=1;
 					}
 					next.setContent('chooseDrawRecover');
+					return next;
 				},
 				choosePlayerCard:function(){
 					var next=game.createEvent('choosePlayerCard');
