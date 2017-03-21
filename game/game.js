@@ -13110,6 +13110,7 @@
 				},
 				chooseDrawRecover:function(){
 					var next=game.createEvent('chooseDrawRecover',false);
+					next.player=this;
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='number'){
 							if(typeof next.num1=='number'){
