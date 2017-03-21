@@ -206,28 +206,11 @@ card.guozhan={
 					target.draw(targets.length-1);
 					event.finish();
 				}
-				else if(target.hp==target.maxHp){
-					event.directdraw=true;
-				}
 				else{
-					target.chooseControl('draw_card','recover_hp',function(event,target){
-						if(target.hp>=2||target.hp>=target.maxHp-1) return 'draw_card';
-						if(target.hp==2&&target.num('h')==0) return 'draw_card';
-						return 'recover_hp';
-					});
+					target.chooseDrawRecover(true);
 				}
 				'step 1'
-				if(!event.directdraw&&result&&result.control=='recover_hp'){
-					target.recover();
-					event.finish();
-				}
-				else{
-					target.draw();
-				}
-				'step 2'
-				if(target.isLinked()){
-					target.link();
-				}
+				target.link(false);
 			},
 			ai:{
 				order:3,

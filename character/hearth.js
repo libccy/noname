@@ -3245,27 +3245,7 @@ character.hearth={
 				if(result.bool){
 					event.target=result.targets[0];
 					player.logSkill('jiaohui',event.target);
-					if(event.target.hp<event.target.maxHp){
-						event.target.chooseControl('draw_card','recover_hp',function(event,target){
-							if(target.hp>=2||target.hp>=target.maxHp-1) return 'draw_card';
-							if(target.hp==2&&target.num('h')==0) return 'draw_card';
-							return 'recover_hp';
-						});
-					}
-					else{
-						event.target.draw();
-						event.finish();
-					}
-				}
-				else{
-					event.finish();
-				}
-				'step 2'
-				if(result.control=='draw_card'){
-					event.target.draw(2);
-				}
-				else{
-					event.target.recover();
+					event.target.chooseDrawRecover(true);
 				}
 			},
 		},
@@ -3385,28 +3365,7 @@ character.hearth={
 				"step 1"
 				if(result.bool){
 					player.logSkill('lingzhou',result.targets);
-					var target=result.targets[0];
-					if(target.hp<target.maxHp){
-						target.chooseControl('draw_card','recover_hp',function(event,target){
-							if(target.hp>=3&&target.num('h')<target.hp) return 'draw_card';
-							return 'recover_hp';
-						});
-						event.target=target;
-					}
-					else{
-						target.draw();
-						event.finish();
-					}
-				}
-				else{
-					event.finish();
-				}
-				"step 2"
-				if(result.control=='draw_card'){
-					event.target.draw();
-				}
-				else{
-					event.target.recover();
+					result.targets[0].chooseDrawRecover(true);
 				}
 			},
 			ai:{

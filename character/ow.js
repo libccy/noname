@@ -1961,28 +1961,7 @@ character.ow={
                 'step 1'
                 if(result.bool){
                     player.logSkill('lichang',result.targets);
-                    event.target=result.targets[0];
-                    if(event.target.isHealthy()){
-                        event.target.draw(2);
-                        event.finish();
-                    }
-                    else{
-                        event.target.chooseControl('draw_card','recover_hp',function(event,player){
-        					if(player.hp>=3&&player.num('h')<=player.hp) return 'draw_card';
-        					if(player.hp==2&&player.num('h')<=1) return 'draw_card';
-        					return 'recover_hp';
-        				});
-                    }
-                }
-                else{
-                    event.finish();
-                }
-                'step 2'
-                if(result.control=='draw_card'){
-                    event.target.draw(2);
-                }
-                else{
-                    event.target.recover();
+                    result.targets[0].chooseDrawRecover(2,true);
                 }
             }
         },
