@@ -24,7 +24,7 @@ window.noname_update={
         // 'layout/default/layout.css',
         // 'layout/default/phone.css',
         // 'layout/default/menu.css',
-        // 'layout/long/layout.css',
+        'layout/long/layout.css',
         // 'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
         // 'layout/newlayout/global.css',

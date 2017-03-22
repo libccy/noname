@@ -608,25 +608,25 @@
 							}
 						}
 					},
-                    fewplayer:{
-                        name:'启用人数',
-						intro:'设置启用新版布局的最小人数（不足时切换至默认布局）',
-                        init:'3',
-                        // unfrequent:true,
-                        item:{
-                            '2':'两人',
-                            '3':'三人',
-                            '4':'四人',
-                            '5':'五人',
-                            '6':'六人',
-                            '7':'七人',
-                            '8':'八人',
-                        },
-                        onclick:function(item){
-                            game.saveConfig('fewplayer',item);
-                            if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
-                        }
-                    },
+                    // fewplayer:{
+                    //     name:'启用人数',
+					// 	intro:'设置启用新版布局的最小人数（不足时切换至默认布局）',
+                    //     init:'3',
+                    //     // unfrequent:true,
+                    //     item:{
+                    //         '2':'两人',
+                    //         '3':'三人',
+                    //         '4':'四人',
+                    //         '5':'五人',
+                    //         '6':'六人',
+                    //         '7':'七人',
+                    //         '8':'八人',
+                    //     },
+                    //     onclick:function(item){
+                    //         game.saveConfig('fewplayer',item);
+                    //         if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
+                    //     }
+                    // },
                     player_height:{
                         name:'角色高度',
                         init:'long',
@@ -2329,11 +2329,11 @@
                             }
                         }
                         if(lib.config.layout=='long'){
-                            map.fewplayer.show();
+                            // map.fewplayer.show();
                             map.player_height.show();
                         }
                         else{
-                            map.fewplayer.hide();
+                            // map.fewplayer.hide();
                             if(lib.config.layout=='long2'){
                                 map.player_height.show();
                             }
@@ -32950,12 +32950,12 @@
 				ui.arena=ui.create.div('#arena.nome',ui.window);
                 ui.arena.setNumber=function(num){
                     this.dataset.number=num;
-                    if(game.layout=='long'&&parseInt(num)<parseInt(lib.config.fewplayer)){
-                        this.classList.add('fewplayer');
-                    }
-                    else{
-                        this.classList.remove('fewplayer');
-                    }
+                    // if(game.layout=='long'&&parseInt(num)<parseInt(lib.config.fewplayer)){
+                    //     this.classList.add('fewplayer');
+                    // }
+                    // else{
+                    //     this.classList.remove('fewplayer');
+                    // }
                 }
 
 				if(game.layout=='mobile'||game.layout=='long'){

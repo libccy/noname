@@ -19,6 +19,7 @@
     border-radius: 0;
     top: 0;
     height: calc(100% - 121px);
+    z-index: 1;
 }
 #window.oblongcard #historybar{
     height: calc(100% - 141px);
