@@ -8753,7 +8753,7 @@
                                 next.set('selectButton',info.chooseButton.select||1);
                                 event.buttoned=event.result.skill;
                             }
-                            else if(info&&info.precontent){
+                            else if(info&&info.precontent&&!game.online){
                                 var next=game.createEvent('pre_'+event.result.skill);
                                 next.setContent(info.precontent);
                                 next.set('result',event.result);
@@ -10184,10 +10184,10 @@
 						}
                         if(lib.skill[event.skill].log!=false){
                             player.logSkill(event.skill);
-    						if(get.info(event.skill).popname){
-    							player.popup({name:event.card.name,nature:event.card.nature},'metal');
-    						}
                         }
+						if(get.info(event.skill).popname){
+							player.popup({name:event.card.name,nature:event.card.nature},'metal');
+						}
 					}
 					else if(lib.config.show_card_prompt){
 						if(get.type(event.card)=='equip'&&lib.config.hide_card_prompt_equip);
@@ -10804,8 +10804,8 @@
 					'step 0'
 					event.cards1=player.get('h');
 					event.cards2=target.get('h');
-					target.$giveAuto(event.cards1,player);
-					player.$giveAuto(event.cards2,target);
+					player.$giveAuto(event.cards1,target);
+					target.$giveAuto(event.cards2,player);
 					'step 1'
 					event.cards=event.cards1;
 					var next=player.lose(event.cards,ui.special).set('type','gain');
@@ -16121,6 +16121,7 @@
 					return node;
 				},
 				$giveAuto:function(card,player){
+					if(Array.isArray(card)&&card.length==0) return;
 					var args=Array.from(arguments);
 					if(_status.connectMode||(!this.isUnderControl(true)&&!player.isUnderControl(true))){
 						if(Array.isArray(card)){

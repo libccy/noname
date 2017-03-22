@@ -1,6 +1,6 @@
 window.noname_update={
     version:'1.9.12.5',
-    update:'1.9.12.5',
+    update:'1.9.12.4',
     changeLog:[
         'bug修复',
     ],
@@ -12,11 +12,7 @@ window.noname_update={
         'game/asset.js',
         // 'card/standard.js',
         // 'character/*',
-        // 'character/xianjian.js',
-        // 'character/ow.js',
-        // 'character/yxs.js',
-        // 'character/hearth.js',
-        // 'character/extra.js',
+        'character/old.js',
         'character/yijiang.js',
         // 'mode/boss.js',
         // 'mode/chess.js',

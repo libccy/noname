@@ -25,7 +25,7 @@ character.old={
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
-				if(!event.filterCard({name:'shan'})&&!!event.filterCard({name:'sha'})) return false;
+				if(!event.filterCard({name:'shan'},player,event)&&!!event.filterCard({name:'sha'},player,event)) return false;
 				if(player.hasSkill('zhenshan2')) return false;
                 var nh=player.num('h');
                 return game.hasPlayer(function(current){
@@ -55,39 +55,110 @@ character.old={
                     player.swapHandcards(result.targets[0]);
 				}
 			},
-			group:['zhenshan_sha','zhenshan_tao','zhenshan_jiu']
+			group:'zhenshan_use'
 		},
 		zhenshan2:{},
-		zhenshan_sha:{
+        zhenshan_use:{
 			enable:'chooseToUse',
-			viewAs:{name:'sha'},
-            log:false,
-			viewAsFilter:function(player){
+			filter:function(event,player){
                 if(player.hasSkill('zhenshan2')) return false;
                 var nh=player.num('h');
-                return game.hasPlayer(function(current){
+                if(!game.hasPlayer(function(current){
                     return current!=player&&current.num('h')<nh;
-                });
-			},
-			precontent:function(){
-				'step 0'
-                player.chooseTarget('选择交换手牌的目标',function(card,player,target){
-                    return target.num('h')<player.num('h')
-                },true).ai=function(target){
-                    return ai.get.attitude(player,target);
+                })){
+                    return false;
                 }
-				player.addTempSkill('zhenshan2','phaseAfter');
-                'step 1'
-				if(result.bool){
-                    player.logSkill('zhenshan_sha',result.targets);
-                    player.swapHandcards(result.targets[0]);
+                return event.filterCard({name:'sha'},player,event)||
+                    event.filterCard({name:'jiu'},player,event)||
+                    event.filterCard({name:'tao'},player,event);
+			},
+			chooseButton:{
+				dialog:function(event,player){
+					var list=[];
+					if(event.filterCard({name:'sha'},player,event)){
+						list.push(['基本','','sha']);
+						list.push(['基本','','sha','fire']);
+						list.push(['基本','','sha','thunder']);
+					}
+					if(event.filterCard({name:'tao'},player,event)){
+						list.push(['基本','','tao']);
+					}
+					if(event.filterCard({name:'jiu'},player,event)){
+						list.push(['基本','','jiu']);
+					}
+					return ui.create.dialog('振赡',[list,'vcard'],'hidden');
+				},
+				check:function(button){
+					var player=_status.event.player;
+					var card={name:button.link[2],nature:button.link[3]};
+                    if(card.name=='jiu') return 0;
+					if(game.hasPlayer(function(current){
+						return player.canUse(card,current)&&ai.get.effect(current,card,player,player)>0;
+					})){
+                        if(card.name=='sha'){
+                            if(card.nature=='fire') return 2.95;
+                            else if(card.nature=='fire') return 2.92;
+                            else return 2.9;
+                        }
+                        else if(card.name=='tao'){
+                            return 4;
+                        }
+					}
+					return 0;
+				},
+				backup:function(links,player){
+					return {
+						filterCard:function(){return false},
+						viewAs:{name:links[0][2],nature:links[0][3]},
+                        selectCard:-1,
+						popname:true,
+                        log:false,
+						precontent:function(){
+                            'step 0'
+                            player.chooseTarget('选择交换手牌的目标',function(card,player,target){
+                                return target.num('h')<player.num('h')
+                            },true).ai=function(target){
+                                return ai.get.attitude(player,target);
+                            }
+            				player.addTempSkill('zhenshan2','phaseAfter');
+                            'step 1'
+            				if(result.bool){
+                                player.logSkill('zhenshan',result.targets);
+                                player.swapHandcards(result.targets[0]);
+            				}
+						},
+					}
+				},
+				prompt:function(links,player){
+					return '选择'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'的目标';
 				}
 			},
-			filterCard:function(card){
-				return false;
-			},
-            selectCard:-1,
 			ai:{
+				order:function(){
+					var player=_status.event.player;
+					var event=_status.event;
+                    var nh=player.num('h');
+                    if(game.hasPlayer(function(current){
+                        return ai.get.attitude(player,current)>0&&current.num('h')<nh;
+                    })){
+                        if(event.type=='dying'){
+                            if(event.filterCard({name:'tao'},player,event)){
+                                return 0.5;
+                            }
+                        }
+                        else{
+                            if(event.filterCard({name:'tao'},player,event)){
+                                return 4;
+                            }
+                            if(event.filterCard({name:'sha'},player,event)){
+                                return 2.9;
+                            }
+                        }
+                    }
+					return 0;
+				},
+				save:true,
+				respondSha:true,
 				skillTagFilter:function(player,tag,arg){
                     if(player.hasSkill('zhenshan2')) return false;
                     var nh=player.num('h');
@@ -95,109 +166,10 @@ character.old={
                         return current!=player&&current.num('h')<nh;
                     });
 				},
-				order:function(){
-                    var player=_status.event.player;
-                    var nh=player.num('h');
-                    if(game.hasPlayer(function(current){
-                        return ai.get.attitude(player,current)>0&&current.num('h')<nh;
-                    })){
-                        return 2.9;
-                    }
-                    return 0;
-                },
-				respondSha:true,
-			},
-		},
-		zhenshan_tao:{
-			enable:'chooseToUse',
-			viewAs:{name:'tao'},
-            viewAsFilter:function(player){
-                if(player.hasSkill('zhenshan2')) return false;
-                var nh=player.num('h');
-                return game.hasPlayer(function(current){
-                    return current!=player&&current.num('h')<nh;
-                });
-			},
-            log:false,
-			precontent:function(){
-				'step 0'
-                player.chooseTarget('选择交换手牌的目标',function(card,player,target){
-                    return target.num('h')<player.num('h')
-                },true).ai=function(target){
-                    return ai.get.attitude(player,target);
-                }
-				player.addTempSkill('zhenshan2','phaseAfter');
-                'step 1'
-				if(result.bool){
-                    player.logSkill('zhenshan_tao',result.targets);
-                    player.swapHandcards(result.targets[0]);
+				result:{
+					player:1
 				}
-			},
-			filterCard:function(card){
-				return false;
-			},
-            selectCard:-1,
-			ai:{
-                skillTagFilter:function(player,tag,arg){
-                    if(player.hasSkill('zhenshan2')) return false;
-                    var nh=player.num('h');
-                    return game.hasPlayer(function(current){
-                        return current!=player&&current.num('h')<nh;
-                    });
-				},
-				order:function(){
-                    var player=_status.event.player;
-                    var nh=player.num('h');
-                    if(game.hasPlayer(function(current){
-                        return ai.get.attitude(player,current)>0&&current.num('h')<nh;
-                    })){
-                        return _status.event.type=='dying'?0.5:4;
-                    }
-                    return 0;
-                },
-				save:true,
-			},
-		},
-		zhenshan_jiu:{
-            enable:'chooseToUse',
-			viewAs:{name:'jiu'},
-            viewAsFilter:function(player){
-                if(player.hasSkill('zhenshan2')) return false;
-                var nh=player.num('h');
-                return game.hasPlayer(function(current){
-                    return current!=player&&current.num('h')<nh;
-                });
-			},
-            log:false,
-			precontent:function(){
-				'step 0'
-                player.chooseTarget('选择交换手牌的目标',function(card,player,target){
-                    return target.num('h')<player.num('h')
-                },true).ai=function(target){
-                    return ai.get.attitude(player,target);
-                }
-				player.addTempSkill('zhenshan2','phaseAfter');
-                'step 1'
-				if(result.bool){
-                    player.logSkill('zhenshan_jiu',result.targets);
-                    player.swapHandcards(result.targets[0]);
-				}
-			},
-			filterCard:function(card){
-				return false;
-			},
-            selectCard:-1,
-			ai:{
-                skillTagFilter:function(player,tag,arg){
-                    if(player.hasSkill('zhenshan2')) return false;
-                    var nh=player.num('h');
-                    return game.hasPlayer(function(current){
-                        return current!=player&&current.num('h')<nh;
-                    });
-				},
-				order:0,
-				save:true,
-			},
+			}
 		},
         oldzhenlie:{
 			audio:'zhenlie',
@@ -383,10 +355,10 @@ character.old={
         old_quancong:'旧全琮',
 
         zhenshan:'振赡',
-        zhenshan_sha:'赡杀',
-        zhenshan_tao:'赡桃',
-        zhenshan_jiu:'赡酒',
+        zhenshan_use:'振赡',
+        zhenshan_use_backup:'振赡',
         zhenshan_info:'每名角色的回合限一次，每当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌。若如此做，视为你使用或打出了此牌',
+        zhenshan_use_info:'每名角色的回合限一次，每当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌。若如此做，视为你使用或打出了此牌',
         oldzhenlie:'贞烈',
         oldzhenlie_info:'在你的判定牌生效前，你可以亮出牌堆顶的一张牌代替之',
         oldmiji:'秘计',
