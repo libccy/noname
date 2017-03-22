@@ -8636,7 +8636,14 @@
 						}
 						if(!ok){
 							if(typeof event.prompt=='string'){
-								event.dialog=ui.create.dialog(event.prompt);
+								if(event.openskilldialog){
+									event.skillDialog=ui.create.dialog(event.openskilldialog);
+									delete event.openskilldialog;
+									event.dialog=event.prompt;
+								}
+								else{
+									event.dialog=ui.create.dialog(event.prompt);
+								}
 							}
 							else if(event.prompt=='function'){
 								event.dialog=ui.create.dialog(event.prompt(event));
