@@ -2622,6 +2622,7 @@ character.sp={
 				if(!event.targets) return false;
 				if(event.player==player) return false;
 				if(event.targets.contains(player)) return false;
+				if(get.info(event.card).multitarget) return false;
 				var type=get.type(event.card);
 				if(type!='basic'&&type!='trick') return false;
 				if(lib.filter.targetEnabled2(event.card,event.player,player)){

@@ -151,6 +151,7 @@ window.characterRank={
         'hs_jaina',
     ],
     am:[
+        'ow_orisa',
         'ow_baolei',
         'ow_wensidun',
         'gw_gaier',

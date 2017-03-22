@@ -152,7 +152,6 @@ character.ow={
                 effect:{
                     target:function(card,player,target){
                         if(_status.woliu2_temp) return;
-                        if(target.hp==1&&!target.hasShan()) return;
                         if(card.name=='sha'&&target.storage.woliu2){
                             _status.woliu2_temp=true;
                             var num=game.countPlayer(function(current){
@@ -164,6 +163,7 @@ character.ow={
                             if(target.hasSkill('qianggu2')&&ai.get.attitude(player,target)>0){
                                 return [0,num];
                             }
+                            if(target.hp==1&&!target.hasShan()) return;
                             return [1,num];
                         }
                     }
@@ -231,6 +231,7 @@ character.ow={
 					target:function(card,player,target,current){
 						if(card.name=='sha'){
 							if(_status.event.name=='qianggu2') return;
+                            if(ai.get.attitude(player,target)>0) return;
 							var bs=player.get('h',{type:'basic'});
 							if(bs.length<2) return 0;
 							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
