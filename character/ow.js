@@ -427,7 +427,7 @@ character.ow={
             },
             group:'bshaowei_sha',
             ai:{
-                function(player,target){
+                threaten:function(player,target){
                     if(target.storage.bshaowei) return 1.7;
                     return 1;
 				}
