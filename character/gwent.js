@@ -283,7 +283,9 @@ character.gwent={
 			},
 			content:function(){
 				'step 0'
-				var bool=(ai.get.effect(trigger.player,{name:'sha'},player,player)>0&&game.hasPlayer(function(current){
+				var bool=(ai.get.effect(trigger.player,{name:'sha'},player,player)>0&&
+					Math.abs(ai.get.attitude(player,trigger.player))>1&&
+					game.hasPlayer(function(current){
 					return ai.get.attitude(current,player)>0&&current.hasSha();
 				}));
 				var next=player.chooseToDiscard(get.prompt('gwzhanjiang',trigger.player),'he');

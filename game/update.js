@@ -18,6 +18,7 @@ window.noname_update={
         'character/yijiang.js',
         'character/refresh.js',
         'character/sp.js',
+        'character/gwent.js',
         'character/rank.js',
         // 'mode/boss.js',
         // 'mode/chess.js',
