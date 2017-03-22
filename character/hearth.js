@@ -5135,7 +5135,7 @@ character.hearth={
 			mark:'image',
 			nopop:true,
 			intro:{
-				content:'你受到的伤害-1'
+				content:'你受到下一次伤害时，令伤害-1，然后失去此图腾'
 			},
 			trigger:{player:'damageBegin'},
 			forced:true,
@@ -5144,6 +5144,7 @@ character.hearth={
 			},
 			content:function(){
 				trigger.num--;
+				player.removeSkill('tuteng3');
 			},
 		},
 		tuteng4:{
@@ -6276,7 +6277,7 @@ character.hearth={
 		tuteng2:'灼热图腾',
 		tuteng2_info:'每当你造成一次伤害，你摸一张牌',
 		tuteng3:'石爪图腾',
-		tuteng3_info:'你受到的伤害-1',
+		tuteng3_info:'你受到下一次伤害时，令伤害-1，然后失去此图腾',
 		tuteng4:'空气之怒图腾',
 		tuteng4_info:'在你的回合内，你的锦囊牌造成的首次伤害+1',
 		tuteng5:'法力之潮图腾',

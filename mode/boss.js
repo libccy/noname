@@ -1545,7 +1545,7 @@ mode.boss={
 			}
 		},
 		mazui3:{
-			trigger:{source:'damageEnd'},
+			trigger:{source:['damageEnd','damageZero']},
 			forced:true,
 			popup:false,
 			content:function(){

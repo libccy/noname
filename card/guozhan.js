@@ -991,7 +991,7 @@ card.guozhan={
 			}
 		},
 		huxinjing2:{
-			trigger:{player:'damageEnd'},
+			trigger:{player:['damageEnd','damageZero']},
 			priority:10,
 			forced:true,
 			popup:false,
@@ -1000,6 +1000,7 @@ card.guozhan={
 				if(card){
 					player.discard(card);
 				}
+				player.removeSkill('huxinjing2');
 			}
 		},
 		_lianheng:{

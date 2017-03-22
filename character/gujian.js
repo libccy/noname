@@ -885,7 +885,7 @@ character.gujian={
 			},
 		},
 		mingkong2:{
-			trigger:{source:'damageEnd'},
+			trigger:{source:['damageEnd','damageZero']},
 			forced:true,
 			popup:false,
 			audio:false,

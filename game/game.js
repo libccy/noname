@@ -11109,6 +11109,7 @@
 						player.$damagepop(-num,event.nature);
 					}
 					if(num==0){
+						event.trigger('damageZero');
 						event._triggered=null;
 					}
 					else{
