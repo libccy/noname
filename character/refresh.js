@@ -83,35 +83,40 @@ character.refresh={
 							if(game.hasPlayer(function(current){
 								return player.canUse('sha',current);
 							})){
-								list.push('sha');
+								list.push(['基本','','sha']);
+								list.push(['基本','','sha','fire']);
+								list.push(['基本','','sha','thunder']);
 							}
 						}
 						if(player.canUse('tao',player,true,true)){
-							list.push('tao');
+							list.push(['基本','','tao']);
 						}
 						if(player.canUse('jiu',player,true,true)){
-							list.push('jiu');
+							list.push(['基本','','jiu']);
 						}
 						if(list.length){
-							list.push('cancel2');
-							player.chooseControl(list,function(){
-								var controls=_status.event.controls;
+							player.chooseButton(['是否视为使用一张基本牌？',[list,'vcard']]).set('ai',function(button){
 								var player=_status.event.player;
-								if(controls.contains('tao')&&(player.hp<=1||(player.hp==2&&!player.hasShan()))) return 'tao';
-								if(controls.contains('sha')){
-									var players=game.filterPlayer();
-									for(var i=0;i<players.length;i++){
-										if(player.canUse('sha',players[i],true,true)){
-											if(ai.get.effect(players[i],{name:'sha'},player,player)>0){
-												return 'sha';
-											}
-										}
+								var card={name:button.link[2],nature:button.link[3]};
+								if(card.name=='tao'){
+									if(player.hp==1||(player.hp==2&&!player.hasShan())||player.needsToDiscard()){
+										return 5;
+									}
+									return 1;
+								}
+								if(card.name=='sha'){
+									if(game.hasPlayer(function(current){
+										return ai.get.effect(current,card,player,player)>0
+									})){
+										if(card.nature=='fire') return 2.95;
+										if(card.nature=='thunder') return 2.92;
+										return 2.9;
 									}
 								}
-								if(controls.contains('tao')) return 'tao';
-								if(controls.contains('jiu')) return 'jiu';
-								return 'cancel2';
-							}).set('prompt','是否视为使用一张基本牌？');
+								if(card.name=='jiu'){
+									return 0.5;
+								}
+							});
 						}
 						else{
 							event.finish();
@@ -126,17 +131,19 @@ character.refresh={
 					event.finish();
 				}
 				'step 1'
-				if(result&&result.control&&result.control!='cancel2'){
-					if(result.control=='sha'){
+				if(result&&result.bool&&result.links[0]){
+					var card={name:result.links[0][2],nature:result.links[0][3]};
+					if(card.name=='sha'){
+						event.fakecard=card;
 						player.chooseTarget(function(card,player,target){
-							return player.canUse({name:'sha'},target,true,true);
+							return player.canUse(_status.event.fakecard,target,true,true);
 						},true,'选择出杀目标').set('ai',function(target){
 							var player=_status.event.player;
-							return ai.get.effect(target,{name:'sha'},player,player);
-						});
+							return ai.get.effect(target,_status.event.fakecard,player,player);
+						}).set('fakecard',card);
 					}
 					else{
-						player.useCard({name:result.control},player);
+						player.useCard(card,player);
 						event.finish();
 					}
 				}
@@ -145,7 +152,7 @@ character.refresh={
 				}
 				'step 2'
 				if(result.bool&&result.targets&&result.targets.length){
-					player.useCard({name:'sha'},result.targets);
+					player.useCard(event.fakecard,result.targets);
 				}
 			},
 			ai:{

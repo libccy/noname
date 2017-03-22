@@ -14,6 +14,7 @@ window.noname_update={
         // 'character/*',
         'character/old.js',
         'character/yijiang.js',
+        'character/refresh.js',
         // 'mode/boss.js',
         // 'mode/chess.js',
         // 'mode/versus.js',
