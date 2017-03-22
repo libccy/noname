@@ -24,9 +24,12 @@ character.ow={
         ow_luba:['male','shu',4,['liangou','xiyang']],
         ow_wensidun:['male','shu',4,['feitiao','dianji']],
         ow_zhaliya:['female','wei',4,['pingzhang','liyong']],
+
         ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
+        ow_orisa:['female','wu',4,['qianggu','woliu']],
     },
     characterIntro:{
+        ow_orisa:'奥丽莎是用在努巴尼昙花一现的OR15防御机器人的零件组装而成的，她是这座城市的新一代守护者，但依然有很大的成长空间',
         ow_liekong:'莉娜·奥克斯顿（代号：“猎空”）是守望先锋原型机试飞计划的最年轻成员。但在第一次试飞过程中，原型机的传送阵列出现故障，包括飞行员在内完全失踪。莉娜在几个月后再次出现，不过她身上的分子却无法和时间流同步。这种被称为“时间解离”的症状使她彻底变成了一个“活生生”的幽灵，时隐时现。直到一位名叫温斯顿的科学家设计出了“时间加速器”，一台可以让“猎空”维持在当前时间的装置。不仅如此，这一装置还让“猎空”有能力控制她自己的时间流，使她可以任意加速或减慢时间。有了这一全新的能力，她成了守望先锋最强大的特工之一。守望先锋解散后，“猎空”依旧选择为了正义而战，守护无辜。',
         ow_sishen:'关于这个黑袍恐怖分子的传闻并不多，只知道大家都称他为“死神”。虽然没人知道他的真实身份和动机，但有一点是可以肯定的，他的出现意味着死亡。“死神”是一名极其不稳定、残暴、冷酷的雇佣兵，在世界各地犯下多起恐怖袭击案件。在过去的数十年间，他参与了许多武装冲突，但其本人却不属于任何组织。在多年的追踪后，“死神”神秘的面纱终于被慢慢揭开。据信，“死神”正在追杀前守望先锋特工并系统地逐一消灭。',
         ow_tianshi:'齐格勒是瑞士一家顶尖医院的手术部门负责人。正是她在医学领域的成就，引起了守望先锋的注意。由于齐格勒的双亲都被战争夺走了生命，因此她从一开始就极其反对该组织通过军事手段进行维和。但最终，她意识到守望先锋给她提供了一个可以拯救更多人生命的机会。作为守望先锋医学研究部门的负责人，安吉拉致力于更好地在前线治疗受到致命伤的病员。尽管她对守望先锋做出了巨大的贡献，但齐格勒博士经常质疑她的上司以及守望先锋的长远目标。而当守望先锋解散之后，齐格勒博士便致力于帮助那些受战争波及的受难者。',
@@ -52,6 +55,199 @@ character.ow={
         ow_heiying:'作为全世界最臭名昭著的黑客，“黑影”利用信息与情报操控权贵。早在她称自己为“黑影”之前，░░░░░░是千千万万在智械危机后变成孤儿的儿童之一。在家乡大部分基础设施都被摧毁的情况下，她依靠自己在黑客以及计算机方面的天赋活了下来。在黑客领域的一连串的胜利让░░░░░░对自己的实力过度自信，最终她在毫无防备的情况下，陷入了一张覆盖全球的阴谋网——并且也因此被人盯上了。由于自己的安全面临严重威胁，░░░░░░不得不删除关于自己的全部信息，从此销声匿迹。后来，她以“黑影”的身份再度出现，经过改造的她决心查出那张阴谋网背后的真相。',
     },
     skill:{
+        woliu:{
+            trigger:{player:'phaseEnd'},
+            direct:true,
+            unique:true,
+            forceunique:true,
+            content:function(){
+                'step 0'
+                player.chooseTarget(get.prompt('woliu'),lib.filter.notMe,[1,2]).ai=function(target){
+                    if(ai.get.attitude(player,target)<0){
+                        return ai.get.effect(target,{name:'sha'},player,player);
+                    }
+                    return 0;
+                }
+                'step 1'
+                if(result.bool){
+                    player.logSkill('woliu',result.targets);
+                    var list=[player].concat(result.targets);
+                    for(var i=0;i<list.length;i++){
+                        list[i].storage.woliu2=list.slice(0);
+                        list[i].addSkill('woliu2');
+                    }
+                }
+            },
+            group:'woliu_clear',
+            subSkill:{
+                clear:{
+                    trigger:{player:['dieBegin','phaseBegin']},
+                    forced:true,
+                    popup:false,
+                    content:function(){
+                        for(var i=0;i<game.players.length;i++){
+                            game.players[i].removeSkill('woliu2');
+                        }
+                    }
+                }
+            }
+        },
+        woliu2:{
+            mark:true,
+            intro:{
+                content:'players'
+            },
+            trigger:{global:'useCard'},
+            forced:true,
+            popup:false,
+            onremove:function(player){
+                delete player.storage.woliu2;
+                for(var i=0;i<game.players.length;i++){
+                    var current=game.players[i];
+                    if(Array.isArray(current.storage.woliu2)&&current.storage.woliu2.contains(player)){
+                        current.storage.woliu2.remove(player);
+                        current.updateMarks();
+                    }
+                }
+            },
+            filter:function(event,player){
+                if(event.card.name!='sha') return false;
+                if(!event.targets.contains(player)) return false;
+                if(!player.storage.woliu2) return false;
+                for(var i=0;i<player.storage.woliu2.length;i++){
+                    var current=player.storage.woliu2[i];
+                    if(current.isIn()&&event.player!=current&&!event.targets.contains(current)){
+                        return true;
+                    }
+                }
+                return false;
+            },
+            content:function(){
+                'step 0'
+                game.delayx();
+                'step 1'
+                var list=[];
+                for(var i=0;i<player.storage.woliu2.length;i++){
+                    var current=player.storage.woliu2[i];
+                    if(current.isIn()&&trigger.player!=current&&!trigger.targets.contains(current)){
+                        list.push(current);
+                    }
+                }
+                player.logSkill('woliu2',list);
+                trigger.targets.addArray(list);
+            },
+            group:'woliu2_die',
+            subSkill:{
+                die:{
+                    trigger:{player:'dieBegin'},
+                    forced:true,
+                    popup:false,
+                    silent:true,
+                    content:function(){
+                        player.removeSkill('woliu2');
+                    }
+                }
+            },
+            ai:{
+                effect:{
+                    target:function(card,player,target){
+                        if(_status.woliu2_temp) return;
+                        if(target.hp==1&&!target.hasShan()) return;
+                        if(card.name=='sha'&&target.storage.woliu2){
+                            _status.woliu2_temp=true;
+                            var num=game.countPlayer(function(current){
+                                if(current!=player&&current!=target&&target.storage.woliu2.contains(current)){
+                                    return get.sgn(ai.get.effect(current,card,player,target));
+                                }
+                            });
+                            delete _status.woliu2_temp;
+                            if(target.hasSkill('qianggu2')&&ai.get.attitude(player,target)>0){
+                                return [0,num];
+                            }
+                            return [1,num];
+                        }
+                    }
+                }
+            }
+        },
+        qianggu:{
+			enable:'phaseUse',
+			usable:1,
+			filterCard:true,
+			selectCard:2,
+            position:'he',
+			check:function(card){
+				return 8-ai.get.value(card);
+			},
+			filter:function(event,player){
+				return player.num('he')>=2;
+			},
+			content:function(){
+				player.changeHujia(2);
+                player.addTempSkill('qianggu2',{player:'phaseBegin'});
+			},
+			ai:{
+				result:{
+					player:1
+				},
+				order:2.5
+			}
+		},
+        qianggu2:{
+            trigger:{target:'useCardToBefore'},
+			forced:true,
+			filter:function(event,player){
+				return event.card.name=='sha';
+			},
+            mark:true,
+            intro:{
+                content:'其他角色对你使用杀时需要弃置一张基本牌，否则杀对你无效'
+            },
+			content:function(){
+				"step 0"
+				var eff;
+                if(player.hasSkill('woliu2')){
+                    eff=-ai.get.attitude(trigger.player,player);
+                }
+                else{
+                    eff=ai.get.effect(player,trigger.card,trigger.player,trigger.player);
+                }
+				trigger.player.chooseToDiscard(function(card){
+					return get.type(card)=='basic';
+				}).set('ai',function(card){
+					if(_status.event.eff>0){
+						return 10-ai.get.value(card);
+					}
+					return 0;
+				}).set('eff',eff);
+				"step 1"
+				if(result.bool==false){
+					trigger.finish();
+					trigger.untrigger();
+				}
+			},
+			ai:{
+				effect:{
+					target:function(card,player,target,current){
+						if(card.name=='sha'){
+							if(_status.event.name=='qianggu2') return;
+							var bs=player.get('h',{type:'basic'});
+							if(bs.length<2) return 0;
+							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
+							if(bs.length<=3&&player.num('h','sha')<=1){
+								for(var i=0;i<bs.length;i++){
+									if(bs[i].name!='sha'&&ai.get.value(bs[i])<7){
+										return [1,0,1,-0.5];
+									}
+								}
+								return 0;
+							}
+							return [1,0,1,-0.5];
+						}
+					}
+				}
+			}
+        },
         dianji:{
             enable:'phaseUse',
 			filter:function(event,player){
@@ -3133,6 +3329,14 @@ character.ow={
         }
     },
     translate:{
+        woliu:'涡流',
+        woliu2:'涡流',
+        woliu_info:'结束阶段，你可以选择至多两名角色，当你或目标中的任意一名角色成为杀的目标时，其余角色也将被追加为目标，直到你死亡或下一回合开始',
+        qianggu:'强固',
+        qianggu_info:'出牌阶段限一次，你可以弃置两张牌并获得两点护甲，若如此做，直到你的下个回合开始，其他角色对你使用杀时需要弃置一张基本牌，否则杀对你无效',
+        qianggu2:'强固',
+        qianggu2_bg:'固',
+        qianggu2_info:'其他角色对你使用杀时需要弃置一张基本牌，否则杀对你无效',
         pingzhang:'屏障',
         pingzhang_info:'每轮各限一次，当你受到伤害时，你可以弃置一张红桃牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃牌令伤害-1',
         pingzhang_info_alter:'每轮各限一次，当你受到伤害时，你可以弃置一张红桃手牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃手牌令伤害-1',
@@ -3319,5 +3523,6 @@ character.ow={
         ow_wensidun:'温斯顿',
         ow_zhaliya:'查莉娅',
         ow_heiying:'黑影',
+        ow_orisa:'奥丽莎',
     }
 };

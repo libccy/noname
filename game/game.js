@@ -7602,7 +7602,7 @@
 						card={name:arguments[i]}
 					}
 				}
-                targets.add(game.me);
+                if(!targets.length) targets.push(game.me);
 				source.useCard(game.createCard(card.name,card.suit,card.number,card.nature),targets);
 			},
 			r:function(bool){
