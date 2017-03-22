@@ -7097,6 +7097,14 @@
 					return script;
 				}
 			},
+			req:function(str,onload,onerror){
+				var sScriptURL=get.url()+str;
+				var oReq=new XMLHttpRequest();
+				if(onload) oReq.addEventListener("load",onload);
+				if(onerror) oReq.addEventListener("error",onerror);
+				oReq.open("GET", sScriptURL);
+				oReq.send();
+			},
 			layout:function(layout,nosave){
 				if(!nosave) game.saveConfig('layout',layout);
                 game.layout=layout;
@@ -30608,8 +30616,19 @@
     							var goupdate=function(files,update){
     								if(game.download){
                                         lib.version=update.version;
-    									var script=lib.init.js(get.url('source'),'game/source',function(){
-    										script.remove();
+    									lib.init.req('game/source.js',function(){
+											try{
+												eval(this.responseText);
+												if(!window.noname_source_list){
+													throw('err');
+												}
+											}
+											catch(e){
+												alert('更新地址有误');
+												console.log(e);
+												return;
+											}
+
     										var updates=window.noname_source_list;
     										delete window.noname_source_list;
                                             if(Array.isArray(files)){
@@ -30691,9 +30710,19 @@
     								}
     							};
 
+    							lib.init.req('game/update.js',function(){
+									try{
+										eval(this.responseText);
+										if(!window.noname_update){
+											throw('err');
+										}
+									}
+									catch(e){
+										alert('更新地址有误');
+										console.log(e);
+										return;
+									}
 
-    							var script=lib.init.js(get.url('version'),'game/update',function(){
-    								script.remove();
     								var update=window.noname_update;
     								delete window.noname_update;
     								if(forcecheck===false){
@@ -30795,7 +30824,6 @@
     								button1.innerHTML='检查游戏更新';
                                     button3.disabled=false;
     								button3.innerHTML='更新到开发版';
-    								script.remove();
                                 });
     						}
     					};
@@ -30806,8 +30834,19 @@
     						else if(game.download){
     							button2.innerHTML='正在检查更新';
     							button2.disabled=true;
-    							var script=lib.init.js(get.url('source'),'game/asset',function(){
-    								script.remove();
+    							lib.init.req('game/asset.js',function(){
+									try{
+										eval(this.responseText);
+										if(!window.noname_asset_list||!window.noname_skin_list){
+											throw('err');
+										}
+									}
+									catch(e){
+										alert('更新地址有误');
+										console.log(e);
+										return;
+									}
+
     								var updates=window.noname_asset_list;
     								delete window.noname_asset_list;
                                     var skins=window.noname_skin_list;
@@ -30946,7 +30985,6 @@
                                     button2.disabled=false;
     								button2.innerHTML='检查素材更新';
 									game.print(script.src);
-    								script.remove();
                                 });
     						}
     						else{
@@ -37305,20 +37343,12 @@
                 return '是否发动【'+get.skillTranslation(skill,player)+'】？';
             }
         },
-        url:function(tag){
+        url:function(){
             if(lib.config.debug){
-                switch(tag){
-                    case 'version':return lib.sourceURL.replace(/\$version\$/,'master');
-                    case 'source':return lib.sourceURL.replace(/\$version\$/,'master');
-                    default:return lib.updateURL.replace(/\$version\$/,'master');
-                }
+                return lib.updateURL.replace(/\$version\$/,'master');
             }
             else{
-                switch(tag){
-                    case 'version':return lib.sourceURL.replace(/\$version\$/,'master');
-                    case 'source':return lib.sourceURL.replace(/\$version\$/,'v'+lib.version);
-                    default:return lib.updateURL.replace(/\$version\$/,'v'+lib.version);
-                }
+                return lib.updateURL.replace(/\$version\$/,'master');
             }
         },
         round:function(num,f){
