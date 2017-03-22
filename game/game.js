@@ -20,7 +20,8 @@
 	var lib={
 		configprefix:'noname_0.9_',
         versionOL:21,
-        updateURL:'https://raw.githubusercontent.com/libccy/noname',
+		updateURL:'https://raw.githubusercontent.com/libccy/noname',
+        updateURL2:'https://coding.net/u/libccy/p/noname/git/raw',
 		assetURL:'',
         hallURL:'websha.cn',
 		changeLog:[],
@@ -30607,6 +30608,9 @@
 							if(str==lib.updateURL){
 								return 'GitHub';
 							}
+							if(str==lib.updateURL2){
+								return 'Coding';
+							}
 							var index;
 							index=str.indexOf('://');
 							if(index!=-1){
@@ -31072,22 +31076,38 @@
 									game.saveConfig('updateURL',str);
 									li3.querySelector('span').innerHTML=trimurl(str);
 									button5.style.display='';
+									button6.style.display='none';
 								}
 							});
 						};
                         li3.lastChild.appendChild(button4);
 
+						var button6=document.createElement('button');
+    					button6.innerHTML='设为国内镜像';
+                        button6.style.marginLeft='5px';
+    					button6.onclick=function(){
+							game.saveConfig('updateURL',lib.updateURL2);
+							button5.style.display='';
+							button6.style.display='none';
+							li3.querySelector('span').innerHTML='Coding';
+						};
+                        li3.lastChild.appendChild(button6);
+
 						button5=document.createElement('button');
-    					button5.innerHTML='恢复默认';
+    					button5.innerHTML='恢复默认地址';
                         button5.style.marginLeft='5px';
     					button5.onclick=function(){
 							game.saveConfig('updateURL');
 							button5.style.display='none';
+							button6.style.display='';
 							li3.querySelector('span').innerHTML=trimurl(lib.updateURL);
 						};
                         li3.lastChild.appendChild(button5);
 						if(!lib.config.updateURL){
 							button5.style.display='none';
+						}
+						else{
+							button6.style.display='none';
 						}
 
     					button2=document.createElement('button');
