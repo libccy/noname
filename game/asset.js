@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-    '1.9.13',
+    '1.9.13.1',
     'image/background/huangtian_bg.jpg',
     'image/background/september_bg.jpg',
     'image/background/shengshi_bg.jpg',
@@ -506,6 +506,7 @@ window.noname_asset_list=[
     'image/character/ow_falaozhiying.jpg',
     'image/character/ow_heiying.jpg',
     'image/character/ow_luxiao.jpg',
+    'image/character/ow_orisa.jpg',
     'image/character/ow_shibing.jpg',
     'image/character/ow_tianshi.jpg',
     'image/character/ow_maikelei.jpg',
