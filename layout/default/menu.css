@@ -1386,3 +1386,60 @@ input.fileinput::-webkit-file-upload-button {
 .new_character.new_skill>.menubutton.large.new_card_delete{
 	left: 155px;
 }
+
+.popup-container>.prompt-container{
+	display: table;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+}
+.popup-container>.prompt-container>div{
+	height: auto;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	position: relative;
+}
+.popup-container>.prompt-container>div>div{
+	position: relative;
+}
+.popup-container>.prompt-container>div>div>div{
+	display: block;
+	width: calc(100% - 10px);
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-right: 10px;
+	margin-bottom: 0;
+	text-align: center;
+	position: relative;
+	width: 230px;
+}
+.popup-container>.prompt-container>div>div>div:first-child{
+	text-align: left;
+}
+.popup-container>.prompt-container>div>div>div:last-child{
+	margin-bottom: 10px;
+}
+.popup-container>.prompt-container>div>div>div>input{
+	text-align: left;
+	width: 100%;
+	resize: none;
+	border: none;
+	border-radius: 2px;
+	height: 20px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 0px 1px;
+}
+.popup-container>.prompt-container>div>div>div>.menubutton{
+	position: relative;
+	margin-left: 6px;
+	margin-right: 6px;
+	font-size: 24px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+#window:not(.nopointer) .popup-container>.prompt-container>div>div>div>.menubutton{
+	cursor: pointer;
+}

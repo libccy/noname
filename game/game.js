@@ -19,8 +19,8 @@
 	};
 	var lib={
 		configprefix:'noname_0.9_',
-        versionOL:20,
-        updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
+        versionOL:21,
+        updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		assetURL:'',
         hallURL:'websha.cn',
 		changeLog:[],
@@ -5574,9 +5574,9 @@
 						else if(e.keyCode==74&&(e.ctrlKey||e.metaKey)&&lib.node){
 							lib.node.debug();
 						}
-						else if(e.keyCode==27){
-							if(!ui.arena.classList.contains('paused')) ui.click.configMenu();
-						}
+						// else if(e.keyCode==27){
+						// 	if(!ui.arena.classList.contains('paused')) ui.click.configMenu();
+						// }
                     }
                     else{
                         game.closePopped();
@@ -5629,9 +5629,9 @@
 						else if(e.keyCode==74&&(e.ctrlKey||e.metaKey)&&lib.node){
 							lib.node.debug();
 						}
-						else if(e.keyCode==27){
-							if(!ui.arena.classList.contains('paused')) ui.click.config();
-						}
+						// else if(e.keyCode==27){
+						// 	if(!ui.arena.classList.contains('paused')) ui.click.config();
+						// }
                     }
         		};
         		window.onload=function(){
@@ -21392,6 +21392,77 @@
 				navigator.vibrate(time||500);
 			}
 		},
+		prompt:function(){
+			var str,forced,callback;
+			for(var i=0;i<arguments.length;i++){
+				if(typeof arguments[i]=='string'){
+					str=arguments[i];
+				}
+				else if(typeof arguments[i]=='boolean'){
+					forced=arguments[i];
+				}
+				else if(typeof arguments[i]=='function'){
+					callback=arguments[i];
+				}
+			}
+			if(!callback){
+				return;
+			}
+			try{
+				var result=prompt(str);
+				callback(result);
+			}
+			catch(e){
+				var promptContainer=ui.create.div('.popup-container',ui.window,function(){
+					if(this.clicked){
+						this.clicked=false;
+					}
+					else{
+						clickCancel();
+					}
+				});
+				var dialogContainer=ui.create.div('.prompt-container',promptContainer);
+				var dialog=ui.create.div('.menubg',ui.create.div(dialogContainer),function(){
+					promptContainer.clicked=true;
+				});
+				var strnode=ui.create.div('',str||'',dialog);
+				var input=ui.create.node('input',ui.create.div(dialog));
+				var controls=ui.create.div(dialog);
+				var clickConfirm=function(){
+					if(input.value){
+						callback(input.value);
+						promptContainer.remove();
+					}
+				}
+				var clickCancel=function(){
+					if(!forced){
+						callback(false);
+						promptContainer.remove();
+					}
+				}
+				var confirmNode=ui.create.div('.menubutton.large.disabled','确定',controls,clickConfirm);
+				if(!forced){
+					ui.create.div('.menubutton.large','取消',controls,clickCancel);
+				}
+				input.onkeydown=function(e){
+					if(e.keyCode==13){
+						clickConfirm();
+					}
+					else if(e.keyCode==27){
+						clickCancel();
+					}
+				}
+				input.onkeyup=function(){
+					if(input.value){
+						confirmNode.classList.remove('disabled');
+					}
+					else{
+						confirmNode.classList.remove('disabled');
+					}
+				}
+				input.focus();
+			}
+		},
 		animate:{
 			flame:function(x,y,duration,type){
 				var particles=[];
@@ -27045,61 +27116,11 @@
 							};
 							ui.create.div('','添加目录',addbutton.menu,function(){
 								ui.create.templayer();
-								try{
-									var str=prompt('输入目录名称');
-									createDir(str);
-								}
-								catch(e){
-									ui.window.classList.add('shortcutpaused');
-									ui.window.classList.add('systempaused');
-
-									var promptcontainer=ui.create.div('.popup-container',ui.window);
-									var bar=ui.create.div(promptcontainer);
-									bar.style.width='100%';
-									bar.style.height='26px';
-									bar.style.left='calc(50% - 150px)';
-									bar.style.top='calc(50% - 13px)';
-									bar.style.textAlign='left';
-
-									var input=document.createElement('input');
-									input.type='text';
-									input.style.width='200px';
-									input.style.height='26px';
-									input.style.resize='none';
-									input.style.padding=0;
-									input.style.border='none';
-									input.style.borderRadius='2px';
-									input.style.boxShadow='rgba(0,0,0,0.2) 0 0 0 1px';
-									input.style.position='absolute';
-									input.style.left=0;
-									bar.appendChild(input);
-									input.focus();
-
-									var unprompt=function(){
-										ui.window.classList.remove('shortcutpaused');
-										ui.window.classList.remove('systempaused');
-										promptcontainer.remove();
+								game.prompt('输入目录名称',function(str){
+									if(str){
+										createDir(str);
 									}
-									input.onkeydown=function(e){
-										if(e.keyCode==13&&input.value){
-											unprompt();
-											createDir(input.value);
-										}
-									}
-
-									var confirm=ui.create.div('.menubutton',bar,'确定',function(){
-										unprompt();
-										if(input.value){
-											createDir(input.value);
-										}
-									});
-									var cancel=ui.create.div('.menubutton',bar,'取消',unprompt);
-
-									confirm.style.marginLeft='210px';
-									cancel.style.marginLeft='10px';
-									confirm.style.position='relative';
-									cancel.style.position='relative';
-								}
+								});
 							});
 							var input=document.createElement('input');
 							input.className='fileinput';
@@ -30581,15 +30602,53 @@
     					var ul=document.createElement('ul');
     					var li1=document.createElement('li');
                         var li2=document.createElement('li');
+                        var li3=document.createElement('li');
+						var trimurl=function(str){
+							if(str==lib.updateURL){
+								return 'GitHub';
+							}
+							var index;
+							index=str.indexOf('://');
+							if(index!=-1){
+								str=str.slice(index+3);
+							}
+							index=str.indexOf('/');
+							if(index!=-1){
+								str=str.slice(0,index);
+							}
+							if(str.length>15){
+								var list=str.split('.');
+								if(list.length>1){
+									list.shift();
+								}
+								str=list[0];
+								for(var i=1;i<list.length;i++){
+									str+='.'+list[i];
+								}
+							}
+							if(str.length>15){
+								var list=str.split('.');
+								if(list.length>1){
+									list.pop();
+								}
+								str=list[0];
+								for(var i=1;i<list.length;i++){
+									str+='.'+list[i];
+								}
+							}
+							return str;
+						}
     					li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px;white-space:nowrap"></p>';
     					li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
+						li3.innerHTML='更新地址：<span>'+trimurl(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
+						li3.style.whiteSpace='nowrap';
                         ui.updatep1=li1.querySelector('p');
                         ui.updatep2=li2;
                         if(!game.download){
                             ui.updatep1.style.display='none';
                             ui.updatep2.style.display='none';
                         }
-    					var button1,button2,button3;
+    					var button1,button2,button3,button4,button5;
 
     					game.checkForUpdate=function(forcecheck,dev){
     						if(!dev&&button1.disabled){
@@ -31005,6 +31064,32 @@
                             li1.lastChild.appendChild(button3);
                         }
 
+						button4=document.createElement('button');
+    					button4.innerHTML='设置更新地址';
+    					button4.onclick=function(){
+							game.prompt('设置更新地址',function(str){
+								if(str){
+									game.saveConfig('updateURL',str);
+									li3.querySelector('span').innerHTML=trimurl(str);
+									button5.style.display='';
+								}
+							});
+						};
+                        li3.lastChild.appendChild(button4);
+
+						button5=document.createElement('button');
+    					button5.innerHTML='恢复默认';
+                        button5.style.marginLeft='5px';
+    					button5.onclick=function(){
+							game.saveConfig('updateURL');
+							button5.style.display='none';
+							li3.querySelector('span').innerHTML=trimurl(lib.updateURL);
+						};
+                        li3.lastChild.appendChild(button5);
+						if(!lib.config.updateURL){
+							button5.style.display='none';
+						}
+
     					button2=document.createElement('button');
     					button2.innerHTML='检查素材更新';
     					button2.onclick=game.checkForAssetUpdate;
@@ -31134,8 +31219,9 @@
                         span6.style.display='none';
                         span6_check.style.display='none';
 
+						ul.appendChild(li3);
     					ul.appendChild(li1);
-                        ul.appendChild(li2);
+						ul.appendChild(li2);
     					page.appendChild(ul);
                     }());
 					(function(){
@@ -37342,11 +37428,15 @@
             }
         },
         url:function(master){
+			var url=lib.config.updateURL||lib.updateURL;
+			if(url[url.length-1]!='/'){
+				url+='/';
+			}
             if(lib.config.debug||master){
-                return lib.updateURL.replace(/\$version\$/,'master');
+                return url+'master/';
             }
             else{
-                return lib.updateURL.replace(/\$version\$/,'v'+lib.version);
+                return url+'v'+lib.version+'/';
             }
         },
         round:function(num,f){

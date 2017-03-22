@@ -1,7 +1,8 @@
 window.noname_update={
-    version:'1.9.12.5',
-    update:'1.9.12.4',
+    version:'1.9.13',
+    update:'1.9.13',
     changeLog:[
+        '更新源设置',
         'bug修复',
     ],
     files:[
@@ -29,7 +30,7 @@ window.noname_update={
         // 'theme/woodden/style.css',
         'layout/default/layout.css',
         // 'layout/default/phone.css',
-        // 'layout/default/menu.css',
+        'layout/default/menu.css',
         'layout/long/layout.css',
         // 'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
