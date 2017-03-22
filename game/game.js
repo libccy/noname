@@ -10178,7 +10178,7 @@
                         if(lib.skill[event.skill].log!=false){
                             player.logSkill(event.skill);
     						if(get.info(event.skill).popname){
-    							player.popup(event.card.name);
+    							player.popup({name:event.card.name,nature:event.card.nature},'metal');
     						}
                         }
 					}

@@ -3232,7 +3232,7 @@ character.yijiang={
 					ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
 				}
 			},
-			group:['huomo_count','huomo_count2','huomo_sha','huomo_jiu','huomo_tao']
+			group:['huomo_count','huomo_count2','huomo_use']
 		},
 		huomo2:{},
 		huomo_count:{
@@ -3258,6 +3258,109 @@ character.yijiang={
 					case 'sha':player.storage.huomo.sha=true;break;
 					case 'tao':player.storage.huomo.tao=true;break;
 					case 'jiu':player.storage.huomo.jiu=true;break;
+				}
+			}
+		},
+		huomo_use:{
+			enable:'chooseToUse',
+			filter:function(event,player){
+				if(!player.storage.huomo) player.storage.huomo={};
+				if((!player.storage.huomo.sha&&event.filterCard({name:'sha'},player,event))||
+					(!player.storage.huomo.jiu&&event.filterCard({name:'jiu'},player,event))||
+					(!player.storage.huomo.tao&&event.filterCard({name:'tao'},player,event))){
+					return player.hasCard(function(card){
+						return get.color(card)=='black'&&get.type(card)!='basic';
+					},'he');
+				}
+				return false;
+			},
+			chooseButton:{
+				dialog:function(event,player){
+					var list=[];
+					if(!player.storage.huomo.sha&&event.filterCard({name:'sha'},player,event)){
+						list.push(['基本','','sha']);
+						list.push(['基本','','sha','fire']);
+						list.push(['基本','','sha','thunder']);
+					}
+					if(!player.storage.huomo.tao&&event.filterCard({name:'tao'},player,event)){
+						list.push(['基本','','tao']);
+					}
+					if(!player.storage.huomo.jiu&&event.filterCard({name:'jiu'},player,event)){
+						list.push(['基本','','jiu']);
+					}
+					return ui.create.dialog('活墨',[list,'vcard'],'hidden');
+				},
+				check:function(button){
+					var player=_status.event.player;
+					var card={name:button.link[2],nature:button.link[3]};
+					if(game.hasPlayer(function(current){
+						return player.canUse(card,current)&&ai.get.effect(current,card,player,player)>0;
+					})){
+						switch(button.link[2]){
+							case 'tao':return 5;
+							case 'jiu':return 3.01;
+							case 'sha':
+								if(button.link[3]=='fire') return 2.95;
+								else if(button.link[3]=='fire') return 2.92;
+								else return 2.9;
+						}
+					}
+					return 0;
+				},
+				backup:function(links,player){
+					return {
+						filterCard:function(card){
+							return get.type(card)!='basic'&&get.color(card)=='black';
+						},
+						viewAs:{name:links[0][2],nature:links[0][3]},
+						position:'he',
+						popname:true,
+						precontent:function(){
+							'step 0'
+							var card=event.result.cards[0];
+							event.card=card;
+							player.$throw(card,1000);
+							game.log(player,'将',card,'置于牌堆顶');
+							event.result.cards.length=0;
+							player.lose(card);
+							'step 1'
+							game.delay();
+							'step 2'
+							ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+						},
+					}
+				},
+				prompt:function(links,player){
+					return '将一张黑色非基本牌置于牌堆顶并视为使用一张'+get.translation(links[0][3]||'')+get.translation(links[0][2]);
+				}
+			},
+			ai:{
+				order:function(){
+					var player=_status.event.player;
+					var event=_status.event;
+					if(!player.storage.huomo.jiu&&event.filterCard({name:'jiu'},player,event)&&ai.get.effect(player,{name:'jiu'})>0){
+						return 3.1;
+					}
+					return 2.9;
+				},
+				save:true,
+				respondSha:true,
+				skillTagFilter:function(player,tag,arg){
+					if(player.hasCard(function(card){
+						return get.color(card)=='black'&&get.type(card)!='basic';
+					},'he')){
+						if(!player.storage.huomo) player.storage.huomo={};
+						if(tag=='respondSha'){
+							if(arg!='use') return false;
+							if(player.storage.huomo.sha) return false;
+						}
+						else{
+							if(player.storage.huomo.tao&&player.storage.huomo.jiu) return false;
+						}
+					}
+				},
+				result:{
+					player:1
 				}
 			}
 		},
@@ -3295,18 +3398,9 @@ character.yijiang={
 			},
 			ai:{
 				skillTagFilter:function(player,tag,arg){
-					if(arg!='use') return false;
-					if(!player.storage.huomo) player.storage.huomo={};
-					if(player.storage.huomo.sha) return false;
-					var hs=player.get('he',{color:'black'});
-					for(var i=0;i<hs.length;i++){
-						if(get.type(hs[i])!='basic'){
-							return true;
-						}
-					}
-					return false;
+
 				},
-				order:2.9,
+				order:3.1,
 				respondSha:true,
 			},
 		},
@@ -7528,7 +7622,10 @@ character.yijiang={
 		huomo_shan:'墨闪',
 		huomo_tao:'墨桃',
 		huomo_jiu:'墨酒',
+		huomo_use:'活墨',
+		huomo_use_backup:'活墨',
 		huomo_info:'每当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
+		huomo_use_info:'每当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
 		zuoding:'佐定',
 		zuoding_info:'每当一名其他角色于其回合内使用♠牌指定目标后，若本回合没有角色受到过伤害，则你可以令其中一名目标角色摸一张牌',
 		taoxi:'讨袭',
