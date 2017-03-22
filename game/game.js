@@ -8634,28 +8634,28 @@
 								game.vibrate();
 							}
 						}
-						if(typeof event.prompt=='string'){
-							if(!ok) event.dialog=ui.create.dialog(event.prompt);
-						}
-						else if(event.prompt=='function'){
-							if(!ok) event.dialog=ui.create.dialog(event.prompt(event));
-						}
-						else if(event.prompt==undefined){
-							var str;
-							if(typeof event.filterCard=='object'){
-								var filter=event.filterCard;
-								str='请使用'+get.cnNumber(event.selectCard[0])+'张'
-								if(filter.name){
-									str+=get.translation(filter.name);
+						if(!ok){
+							if(typeof event.prompt=='string'){
+								event.dialog=ui.create.dialog(event.prompt);
+							}
+							else if(event.prompt=='function'){
+								event.dialog=ui.create.dialog(event.prompt(event));
+							}
+							else if(event.prompt==undefined){
+								var str;
+								if(typeof event.filterCard=='object'){
+									var filter=event.filterCard;
+									str='请使用'+get.cnNumber(event.selectCard[0])+'张'
+									if(filter.name){
+										str+=get.translation(filter.name);
+									}
+									else{
+										str+='牌';
+									}
 								}
 								else{
-									str+='牌';
+									str='请选择要使用的牌';
 								}
-							}
-							else{
-								str='请选择要使用的牌';
-							}
-							if(!ok){
 								if(event.openskilldialog){
 									event.skillDialog=ui.create.dialog(event.openskilldialog);
 									delete event.openskilldialog;
