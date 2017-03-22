@@ -20,7 +20,6 @@
 	var lib={
 		configprefix:'noname_0.9_',
         versionOL:20,
-        sourceURL:'https://rawgit.com/libccy/noname/$version$/',
         updateURL:'https://raw.githubusercontent.com/libccy/noname/$version$/',
 		assetURL:'',
         hallURL:'websha.cn',
@@ -6073,12 +6072,12 @@
                         ui.updatep1.style.display='';
                         ui.updatep2.style.display='';
                     }
-                    game.download=function(url,folder,onsuccess,onerror){
+                    game.download=function(url,folder,onsuccess,onerror,dev){
                         if(url.indexOf('web/')==0){
                             url='http://'+lib.hallURL+'/'+url;
                         }
                         else{
-                            url=get.url()+url;
+                            url=get.url(dev)+url;
                         }
 						game.ensureDirectory(folder,function(){
                             try{
@@ -6219,12 +6218,12 @@
                             ui.updatep1.style.display='';
                             ui.updatep2.style.display='';
                         }
-						game.download=function(url,folder,onsuccess,onerror){
+						game.download=function(url,folder,onsuccess,onerror,dev){
                             if(url.indexOf('web/')==0){
                                 url='http://'+lib.hallURL+'/'+url;
                             }
                             else{
-                                url=get.url()+url;
+                                url=get.url(dev)+url;
                             }
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
@@ -7097,8 +7096,8 @@
 					return script;
 				}
 			},
-			req:function(str,onload,onerror){
-				var sScriptURL=get.url()+str;
+			req:function(str,onload,onerror,master){
+				var sScriptURL=get.url(master)+str;
 				var oReq=new XMLHttpRequest();
 				if(onload) oReq.addEventListener("load",onload);
 				if(onerror) oReq.addEventListener("error",onerror);
@@ -30824,7 +30823,7 @@
     								button1.innerHTML='检查游戏更新';
                                     button3.disabled=false;
     								button3.innerHTML='更新到开发版';
-                                });
+                                },true);
     						}
     					};
     					game.checkForAssetUpdate=function(type){
@@ -30984,8 +30983,7 @@
                                     alert('连接失败');
                                     button2.disabled=false;
     								button2.innerHTML='检查素材更新';
-									game.print(script.src);
-                                });
+                                },true);
     						}
     						else{
     							alert('此版本不支持游戏内更新素材，请手动更新');
@@ -37343,12 +37341,12 @@
                 return '是否发动【'+get.skillTranslation(skill,player)+'】？';
             }
         },
-        url:function(){
-            if(lib.config.debug){
+        url:function(master){
+            if(lib.config.debug||master){
                 return lib.updateURL.replace(/\$version\$/,'master');
             }
             else{
-                return lib.updateURL.replace(/\$version\$/,'master');
+                return lib.updateURL.replace(/\$version\$/,'v'+lib.version);
             }
         },
         round:function(num,f){
