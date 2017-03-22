@@ -301,7 +301,6 @@ character.gwent={
 						return current!=trigger.player;
 					});
 					event.targets.sortBySeat(trigger.player);
-					event.list=[];
 				}
 				else{
 					event.finish();
@@ -310,6 +309,7 @@ character.gwent={
 				if(event.targets.length){
 					event.current=event.targets.shift();
 					if(event.current.hasSha()){
+						event.current.addTempSkill('gwzhanjiang3','gwzhanjiangAfter');
 						event.current.chooseToUse({name:'sha'},'是否对'+get.translation(trigger.player)+'使用一张杀？',trigger.player,-1);
 					}
 					else{
@@ -320,20 +320,24 @@ character.gwent={
 					event.goto(4);
 				}
 				'step 3'
-				if(result.bool){
-					event.list.push(event.current);
-				}
 				event.goto(2);
-				'step 4'
-				if(event.list.length){
-					game.asyncDrawAuto(event.list);
-				}
 			},
 			ai:{
 				expose:0.2
-			}
+			},
 		},
 		gwzhanjiang2:{},
+		gwzhanjiang3:{
+			trigger:{player:'useCard'},
+			filter:function(event){
+				return event.card.name=='sha'&&event.getParent(2).name=='gwzhanjiang';
+			},
+			forced:true,
+			popup:false,
+			content:function(){
+				player.draw();
+			}
+		},
 		gwchuanxin:{
 			trigger:{player:'shaAfter'},
 			filter:function(event,player){
@@ -822,7 +826,7 @@ character.gwent={
 		shewu:'蛇舞',
 		shewu_info:'出牌阶段限一次，你可以弃置1至3张牌然后摸3张牌；若你弃置了至少2张牌，你本回合使用卡牌无视距离；若你弃置了3张牌，你回复一点体力',
 		gwzhanjiang:'斩将',
-		gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，结算后所有出杀的角色摸一张牌',
+		gwzhanjiang_info:'在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，出杀的角色在响应时摸一张牌（每轮限一次，首轮不能发动）',
 		gwchuanxin:'穿心',
 		gwchuanxin_info:'每当你对一名角色使用杀结算完毕后，你可以进行一判定，若结果为黑色，视为对目标再使用一张杀',
 		fengjian:'风剑',
