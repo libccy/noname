@@ -1529,7 +1529,7 @@
 						unfrequent:true,
 					},
 					border_style:{
-						name:'边框样式',
+						name:'角色边框',
 						init:'default',
 						intro:'设置角色边框的样式，当设为自动时，样式将随着一局游戏中伤害或击杀的数量自动改变',
 						item:{
@@ -1712,7 +1712,7 @@
 						}
 					},
 					control_style:{
-						name:'按钮样式',
+						name:'按钮背景',
 						init:'default',
 						item:{
 							wood:'木纹',
@@ -1839,7 +1839,7 @@
 						unfrequent:true,
 					},
 					menu_style:{
-						name:'菜单样式',
+						name:'菜单背景',
 						init:'default',
 						item:{
 							wood:'木纹',
