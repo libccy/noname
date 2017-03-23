@@ -1,6 +1,6 @@
 window.noname_update={
-    version:'1.9.13.1',
-    // update:'1.9.13.1',
+    version:'1.9.13.2',
+    update:'1.9.13.1',
     changeLog:[
         'bug修复',
     ],
@@ -23,6 +23,7 @@ window.noname_update={
         // 'layout/default/layout.css',
         // 'layout/default/phone.css',
         'layout/default/menu.css',
+        'theme/style/cardback/*',
         // 'layout/long/layout.css',
         // 'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
