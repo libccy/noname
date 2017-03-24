@@ -6011,7 +6011,8 @@
                     };
                     if(ui.updatep1){
                         ui.updatep1.style.display='';
-                        ui.updatep2.style.display='';
+						ui.updatep2.style.display='';
+                        ui.updatep3.style.display='';
                     }
                     game.download=function(url,folder,onsuccess,onerror,dev){
                         if(url.indexOf('web/')==0){
@@ -6157,7 +6158,8 @@
 						}
                         if(ui.updatep1){
                             ui.updatep1.style.display='';
-                            ui.updatep2.style.display='';
+							ui.updatep2.style.display='';
+                            ui.updatep3.style.display='';
                         }
 						game.download=function(url,folder,onsuccess,onerror,dev){
                             if(url.indexOf('web/')==0){
@@ -7043,6 +7045,26 @@
 				if(onload) oReq.addEventListener("load",onload);
 				if(onerror) oReq.addEventListener("error",onerror);
 				oReq.open("GET", sScriptURL);
+				oReq.send();
+			},
+			json:function(url,onload,onerror){
+				var oReq=new XMLHttpRequest();
+				if(onload) oReq.addEventListener("load",function(){
+					var result;
+					try{
+						result=JSON.parse(this.responseText);
+						if(!result){
+							throw('err');
+						}
+					}
+					catch(e){
+						onerror();
+						return;
+					}
+					onload(result);
+				});
+				if(onerror) oReq.addEventListener("error",onerror);
+				oReq.open("GET", url);
 				oReq.send();
 			},
 			layout:function(layout,nosave){
@@ -19799,7 +19821,7 @@
 					name:'删除此扩展',
 					clear:true,
 					onclick:function(){
-						if(this.innerHTML=='确认删除'){
+						if(this.innerHTML=='<span>确认删除</span>'){
 							var prefix='extension_'+obj.name;
 							var page=this.parentNode;
                             var start=page.parentNode.previousSibling;
@@ -19826,10 +19848,10 @@
 							}
 						}
 						else{
-							this.innerHTML='确认删除';
+							this.innerHTML='<span>确认删除</span>';
 							var that=this;
 							setTimeout(function(){
-								that.innerHTML='删除'+obj.name;
+								that.innerHTML='<span>删除此扩展</span>';
 							},1000);
 						}
 					}
@@ -30254,13 +30276,13 @@
                         ui.create.div('','<input type="file" accept="application/zip" style="width:153px"><button>确定</button>',importExtension);
 
 
-                        if(!game.download||true){
+                        if(!game.download||typeof window.fetch!='function'){
                             extensionnode.classList.add('on');
                             importExtension.style.display='';
                             importextensionexpanded=true;
                         }
 
-                        var reloadnode=ui.create.div('.config.toggle','重新启动',page,game.reload);
+                        var reloadnode=ui.create.div('.config.toggle.pointerdiv','重新启动',page,game.reload);
                         reloadnode.style.display='none';
                         var placeholder=ui.create.div('.config.toggle',page);
                         placeholder.style.height=0;
@@ -30292,12 +30314,12 @@
                         }
 
                         var clickExtension=function(){
-                            var active=this.parentNode.querySelector('.videonode.active');
+                            var active=this.parentNode.querySelector('.videonode.current');
                             if(active){
-                                active.classList.remove('active');
+                                active.classList.remove('current');
                             }
                             if(active!=this){
-                                this.classList.add('active');
+                                this.classList.add('current');
                             }
                         };
                         var importExtensionf=function(extname,extversion,noasset,onsuccess,onerror){
@@ -30343,65 +30365,77 @@
                             }
                         };
                         var downloadExtension=function(e){
-                            if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展'&&this.innerHTML!='更新素材')||!window.JSZip) return;
+                            if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展')||!window.JSZip) return;
                             if(e){
                                 e.stopPropagation();
                             }
                             node.updated=true;
                             var that=this;
                             var list=[];
-                            var noasset=false;
-                            if(this.files.length){
-                                if(!lib.config.no_extension_asset||this.innerHTML=='更新素材'){
-                                    for(var i=0;i<this.files.length;i++){
-                                        list.push('web/'+this.link+'/'+this.files[i]);
-                                    }
-                                }
-                                else{
-                                    noasset=true;
-                                }
-                            }
-                            this.classList.add('button-downloading');
-                            this.innerHTML='<span>正在下载</span><div>正在下载</div>';
-                            var progress=ui.create.div('.button-progress',this);
-                            list.push('web/'+this.link+'/extension.js');
-                            game.checkFileList(list,function(){
-                                game.multiDownload(list,function(num){
-                                    var length=100*(list.length-num)/list.length;
-                                    progress.style.width=length+'%';
-                                    if(length<10){
-                                        var width=8-progress.offsetWidth;
-                                        progress.style.transition='all 0s';
-                                        progress.style.height='calc(100% - '+width/2+'px)';
-                                        progress.style.top=width/4+'px';
-                                    }
-                                    else{
-                                        progress.style.transition='';
-                                        progress.style.height='';
-                                        progress.style.top='';
-                                    }
-                                },function(){
-                                    that.innerHTML='下载失败';
-                                },function(){
-                                    if(that.innerHTML=='下载失败') return;
-                                    progress.style.width='100%';
-                                    importExtensionf(that.name,that.version,noasset,function(){
-                                        that.childNodes[0].innerHTML='安装成功';
-                                        that.childNodes[1].innerHTML='安装成功';
-                                        // that.classList.remove('active');
-                                        // that.classList.add('highlight');
-                                        reloadnode.style.display='';
-                                    },function(){
-                                        that.innerHTML='安装失败';
-                                    });
-                                },function(str){
-                                    return 'extension/'+that.name+'/'+str.slice(str.lastIndexOf('/')+1);
-                                });
-                            });
+
+							this.innerHTML='正在下载';
+							window.fetch(lib.extensionURL+this.info[0]+'.zip').then(function(response){
+								if(response.status === 200 || response.status === 0){
+									return Promise.resolve(response.arrayBuffer())
+								}else{
+									that.innerHTML='下载失败';
+									that.classList.add('nopointer');
+									return Promise.reject(new Error(response.statusText));
+								}
+							}).then(function(data){
+								if(game.importExtension(data,function(){
+									reloadnode.style.display='';
+								})!==false){
+									game.saveConfig('extension_'+that.info[0]+'_version',that.info[3]);
+									that.innerHTML='安装成功';
+								}
+								else{
+									that.innerHTML='安装失败';
+								}
+								that.classList.add('nopointer');
+							});
+							// console.log();
+                            // this.classList.add('button-downloading');
+                            // this.innerHTML='<span>正在下载</span><div>正在下载</div>';
+                            // var progress=ui.create.div('.button-progress',this);
+                            // list.push('web/'+this.link+'/extension.js');
+                            // game.checkFileList(list,function(){
+                            //     game.multiDownload(list,function(num){
+                            //         var length=100*(list.length-num)/list.length;
+                            //         progress.style.width=length+'%';
+                            //         if(length<10){
+                            //             var width=8-progress.offsetWidth;
+                            //             progress.style.transition='all 0s';
+                            //             progress.style.height='calc(100% - '+width/2+'px)';
+                            //             progress.style.top=width/4+'px';
+                            //         }
+                            //         else{
+                            //             progress.style.transition='';
+                            //             progress.style.height='';
+                            //             progress.style.top='';
+                            //         }
+                            //     },function(){
+                            //         that.innerHTML='下载失败';
+                            //     },function(){
+                            //         if(that.innerHTML=='下载失败') return;
+                            //         progress.style.width='100%';
+                            //         importExtensionf(that.name,that.version,noasset,function(){
+                            //             that.childNodes[0].innerHTML='安装成功';
+                            //             that.childNodes[1].innerHTML='安装成功';
+                            //             // that.classList.remove('active');
+                            //             // that.classList.add('highlight');
+                            //             reloadnode.style.display='';
+                            //         },function(){
+                            //             that.innerHTML='安装失败';
+                            //         });
+                            //     },function(str){
+                            //         return 'extension/'+that.name+'/'+str.slice(str.lastIndexOf('/')+1);
+                            //     });
+                            // });
                         };
 
                         node.update=function(){
-                            if(!game.download||this.updated||true) return;
+                            if(this.updated||!game.download||typeof window.fetch!='function') return;
                             if(!window.JSZip){
                 				lib.init.js(lib.assetURL+'game','jszip');
                 			}
@@ -30414,36 +30448,21 @@
                             for(var i=0;i<toremove.length;i++){
                                 toremove[i].remove();
                             }
+
                             var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-                            var script=lib.init.js('http://'+lib.hallURL,'web/list',function(){
-                                loading.remove();
-                                script.remove();
-                                var list=window.noname_extension_list;
-                                delete window.noname_extension_list;
-                                var cfgnode=createConfig({
-        							name:'不下载素材',
-        							init:lib.config.no_extension_asset,
-        							onclick:function(bool){
-                                        game.saveConfig('no_extension_asset',bool);
-                                    }
-        						});
-                                cfgnode.classList.add('loading');
-                                cfgnode.style.marginBottom='10px';
-        						page.appendChild(cfgnode);
-                                for(var i in list){
-                                    var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
-                                    ui.create.div('.caption',list[i].name,node);
-                                    ui.create.div('.text.author','作者：'+list[i].author,node);
-                                    ui.create.div('.text',list[i].description,node);
+							lib.init.json(lib.extensionURL2,function(list){
+								loading.style.display='none';
+								for(var i=0;i<list.length;i++){
+									var info=list[i];
+									var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
+                                    ui.create.div('.caption',list[i][0],node);
+                                    ui.create.div('.text.author','作者：'+list[i][1]);
+                                    ui.create.div('.text',list[i][2],node);
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,downloadExtension);
-                                    if(lib.config.extensions.contains(list[i].name)){
+                                    if(lib.config.extensions.contains(list[i][0])){
                                         download.classList.remove('active');
-                                        if(lib.config['extension_'+list[i].name+'_version']!=list[i].version){
+                                        if(lib.config['extension_'+list[i][0]+'_version']!=list[i][3]){
                                             download.innerHTML='更新扩展';
-                                            download.classList.add('highlight');
-                                        }
-                                        else if(lib.config['extension_'+list[i].name+'_noasset']){
-                                            download.innerHTML='更新素材';
                                             download.classList.add('highlight');
                                         }
                                         else{
@@ -30452,16 +30471,11 @@
                                             download.innerHTML='已安装';
                                         }
                                     }
-                                    download.link=i;
-                                    download.name=list[i].name;
-                                    download.files=list[i].files||[];
-                                    if(list[i].version){
-                                        download.version=list[i].version;
-                                    }
-                                }
-                            },function(){
-                                loading.innerHTML='连接失败';
-                            });
+                                    download.info=list[i];
+								}
+							},function(){
+								loading.innerHTML='连接失败';
+							});
                         };
                     }());
 					var active=start.firstChild.querySelector('.active');
@@ -30589,10 +30603,12 @@
 						li3.innerHTML='更新地址：<span>'+trimurl(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
 						li3.style.whiteSpace='nowrap';
                         ui.updatep1=li1.querySelector('p');
-                        ui.updatep2=li2;
+						ui.updatep2=li2;
+                        ui.updatep3=li3;
                         if(!game.download){
                             ui.updatep1.style.display='none';
-                            ui.updatep2.style.display='none';
+							ui.updatep2.style.display='none';
+                            ui.updatep3.style.display='none';
                         }
     					var button1,button2,button3,button4,button5;
 

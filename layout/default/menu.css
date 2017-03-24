@@ -1101,7 +1101,7 @@ input.fileinput::-webkit-file-upload-button {
 	height: auto;
 	max-height: 90px;
 }
-.videonode.menubutton.extension.active{
+.videonode.menubutton.extension.current{
 	max-height: 200px;
 }
 .videonode.menubutton>div{
@@ -1110,6 +1110,9 @@ input.fileinput::-webkit-file-upload-button {
 .videonode.menubutton.extension>div{
 	position: relative;
 	display: block;
+}
+#window:not(.nopointer) .videonode.menubutton.extension>.caption>.menubutton:not(.transparent2):not(.nopointer){
+	cursor: pointer;
 }
 .videonode.menubutton.extension>.caption>.menubutton{
 	position: relative;
