@@ -3103,6 +3103,7 @@
                 intro:{
                     name:'将杀闪等牌在牌堆中的比例维持在与军争牌堆相同，防止开启扩展包后重要的牌被过多地稀释',
                     clear:true,
+					nopointer:true,
                 },
     			sha:{
     			    name:'杀',
@@ -3231,6 +3232,7 @@
     			intro:{
     			    name:'在非挑战模式中使用剑阁和挑战模式的武将',
                     clear:true,
+					nopointer:true,
     			},
                 enableai:{
                     name:'AI可选',
@@ -3255,6 +3257,7 @@
                 intro:{
                     name:'牌堆中随机加入5%的技能牌；使用技能牌可获得额外技能',
                     clear:true,
+					nopointer:true,
                 },
     			num:{
     			    name:'卡牌比例',
@@ -3285,6 +3288,7 @@
                 intro:{
                     name:'每名角色在游戏开始时获得3个士兵，每个士兵对应一个技能',
                     clear:true,
+					nopointer:true,
                 },
     			hide:{
     			    name:'隐藏此扩展',
@@ -3305,6 +3309,7 @@
                 intro:{
                     name:'每名角色和部分卡牌在游戏开始时随机获得一个属性',
                     clear:true,
+					nopointer:true,
                 },
                 num:{
     			    name:'带属性卡牌',
@@ -3408,6 +3413,7 @@
                 intro:{
                     name:'每完成一次对局，可获得一定数量的金币；金币可用于购买游戏特效',
                     clear:true,
+					nopointer:true,
                 },
     			display:{
     			    name:'金币显示',
@@ -25704,7 +25710,9 @@
 					}
 					else{
 						node.innerHTML='<span>'+config.name+'</span>';
-						node.classList.add('pointerspan');
+						if(!config.nopointer){
+							node.classList.add('pointerspan');
+						}
 					}
 	                if(config.item){
 						if(typeof config.item=='function'){
