@@ -22,8 +22,10 @@
         versionOL:21,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
         updateURL2:'https://coding.net/u/libccy/p/noname/git/raw',
-		assetURL:'',
+		extensionURL:'https://coding.net/u/libccy/p/noname-extension/git/raw/master/',
+		extensionURL2:'https://coding.net/u/libccy/p/noname-extension-list/git/raw/master/list.json',
         hallURL:'websha.cn',
+		assetURL:'',
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -37468,7 +37470,12 @@
             if(get.objtype(obj)=='object'){
                 str='{\n';
                 for(var i in obj){
-                    str+=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
+					if(/[^a-zA-Z]/.test(i)){
+						str+=indent+'    "'+i+'":'+get.stringify(obj[i],level+1)+',\n';
+					}
+                    else{
+						str+=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
+					}
                 }
                 str+=indent+'}';
                 return str;
