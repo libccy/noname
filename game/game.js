@@ -2407,6 +2407,12 @@
                             map.show_time.show();
                             map.watchface.hide();
                         }
+						if(lib.config.show_extensionmaker){
+							map.show_extensionshare.show();
+						}
+						else{
+							map.show_extensionshare.hide();
+						}
 					},
 					show_history:{
 						name:'出牌记录栏',
@@ -2803,20 +2809,16 @@
 						init:false,
 						unfrequent:true,
 					},
-					// title:{
-					// 	name:'标题栏显示信息',
-					// 	init:false,
-					// 	unfrequent:true,
-					// 	onclick:function(bool){
-					// 		game.saveConfig('title',bool);
-					// 		if(!lib.config.title) document.title='无名杀';
-					// 	}
-					// },
                     show_extensionmaker:{
                         name:'显示制作扩展',
                         init:true,
                         unfrequent:true,
                     },
+					show_extensionshare:{
+						name:'显示分享扩展',
+                        init:true,
+                        unfrequent:true,
+					}
 				}
 			},
 			audio:{
@@ -28464,7 +28466,9 @@
                         buttonExport.style.display='none';
                         buttonExport.onclick=function(){
                             processExtension(true);
-							shareExtLine.style.display='';
+							if(lib.config.show_extensionshare){
+								shareExtLine.style.display='';
+							}
                         };
                         inputExtLine.appendChild(buttonExport);
                         var exportExtLine=ui.create.div(pageboard);
