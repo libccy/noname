@@ -3250,58 +3250,6 @@
     				}
     			},
             },
-            character:{
-                enable:{
-    			    name:'开启',
-    			    init:false,
-    			    restart:true,
-    			},
-                intro:{
-                    name:'牌堆中随机加入5%的技能牌；使用技能牌可获得额外技能',
-                    clear:true,
-					nopointer:true,
-                },
-    			num:{
-    			    name:'卡牌比例',
-    			    init:'0.05',
-    			    item:{
-    			        '0.02':'2%',
-    			        '0.05':'5%',
-    			        '0.1':'10%',
-    			        '0.2':'20%',
-    			    }
-    			},
-    			hide:{
-    			    name:'隐藏此扩展',
-    			    clear:true,
-    			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('character');
-    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-    				}
-    			},
-            },
-            soldier:{
-                enable:{
-    			    name:'开启',
-    			    init:false,
-    			    restart:true,
-    			},
-                intro:{
-                    name:'每名角色在游戏开始时获得3个士兵，每个士兵对应一个技能',
-                    clear:true,
-					nopointer:true,
-                },
-    			hide:{
-    			    name:'隐藏此扩展',
-    			    clear:true,
-    			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('soldier');
-    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-    				}
-    			},
-            },
             wuxing:{
                 enable:{
     			    name:'开启',

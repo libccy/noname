@@ -29,8 +29,6 @@ card.pack={
 play.pack={
     boss:'剑阁挑战',
     cardpile:'牌堆补充',
-    character:'技能卡牌',
-    soldier:'士兵模式',
     wuxing:'五行生克',
     coin:'富甲天下',
 };

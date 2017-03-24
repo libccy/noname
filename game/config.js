@@ -30,7 +30,7 @@ window.config={
 		sgscards:['standard','extra','sp','guozhan'],
 		sgsmodes:['identity','guozhan','versus','brawl','connect'],
 		stockmode:['identity','guozhan','versus','boss','chess','stone','connect','brawl','tafang'],
-		stockextension:['boss','cardpile','character','coin','soldier','wuxing','hs_mod'],
+		stockextension:['boss','cardpile','coin','wuxing','hs_mod'],
 		layout:['default','newlayout'],
 		theme:['woodden','music','simple'],
 		card_font:['xiaozhuan','huangcao','caoshu','xingshu'],
