@@ -1123,6 +1123,17 @@ input.fileinput::-webkit-file-upload-button {
 	width: 80px;
 	font-family:'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif;
 }
+.videonode.menubutton.extension>.caption>.menubutton>a{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	opacity: 0;
+	cursor: pointer;
+	position: absolute;
+}
 .videonode.menubutton>.videoavatar{
 	width: 56px;
 	height: 56px;
