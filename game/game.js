@@ -30322,48 +30322,6 @@
                                 this.classList.add('current');
                             }
                         };
-                        var importExtensionf=function(extname,extversion,noasset,onsuccess,onerror){
-                            try{
-                                if(lib.config.all.plays.contains(extname)){
-                                    throw('err');
-                                }
-                                _status.importingExtension=true;
-                                var deletegame=false;
-                                if(!window.game){
-                                    window.game=game;
-                                    deletegame=true;
-                                }
-                                lib.init.js(lib.assetURL+'extension/'+extname,'extension',function(){
-                                    if(deletegame) delete window.game;
-                                    _status.importingExtension=false;
-                                    if(!game.importedPack) throw('err');
-                                    if(extversion){
-                                        game.saveConfig('extension_'+extname+'_version',extversion);
-                                    }
-                                    game.saveConfig('extension_'+extname+'_noasset',noasset);
-                                    if(!lib.config.extensions.contains(extname)){
-                                        lib.config.extensions.add(extname);
-                                        game.saveConfig('extensions',lib.config.extensions);
-                                        game.saveConfig('extension_'+extname+'_enable',true);
-                                        for(var i in game.importedPack.config){
-                                            if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
-                                                game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
-                                            }
-                                        }
-                                    }
-                                    delete game.importedPack;
-                                    onsuccess();
-                                },function(){
-                                    if(deletegame) delete window.game;
-                                    _status.importingExtension=false;
-                                    onerror();
-                                });
-                            }
-                            catch(e){
-                                console.log(e);
-                                onerror();
-                            }
-                        };
                         var downloadExtension=function(e){
                             if((this.innerHTML!='下载扩展'&&this.innerHTML!='更新扩展')||!window.JSZip) return;
                             if(e){
@@ -30394,44 +30352,6 @@
 								}
 								that.classList.add('nopointer');
 							});
-							// console.log();
-                            // this.classList.add('button-downloading');
-                            // this.innerHTML='<span>正在下载</span><div>正在下载</div>';
-                            // var progress=ui.create.div('.button-progress',this);
-                            // list.push('web/'+this.link+'/extension.js');
-                            // game.checkFileList(list,function(){
-                            //     game.multiDownload(list,function(num){
-                            //         var length=100*(list.length-num)/list.length;
-                            //         progress.style.width=length+'%';
-                            //         if(length<10){
-                            //             var width=8-progress.offsetWidth;
-                            //             progress.style.transition='all 0s';
-                            //             progress.style.height='calc(100% - '+width/2+'px)';
-                            //             progress.style.top=width/4+'px';
-                            //         }
-                            //         else{
-                            //             progress.style.transition='';
-                            //             progress.style.height='';
-                            //             progress.style.top='';
-                            //         }
-                            //     },function(){
-                            //         that.innerHTML='下载失败';
-                            //     },function(){
-                            //         if(that.innerHTML=='下载失败') return;
-                            //         progress.style.width='100%';
-                            //         importExtensionf(that.name,that.version,noasset,function(){
-                            //             that.childNodes[0].innerHTML='安装成功';
-                            //             that.childNodes[1].innerHTML='安装成功';
-                            //             // that.classList.remove('active');
-                            //             // that.classList.add('highlight');
-                            //             reloadnode.style.display='';
-                            //         },function(){
-                            //             that.innerHTML='安装失败';
-                            //         });
-                            //     },function(str){
-                            //         return 'extension/'+that.name+'/'+str.slice(str.lastIndexOf('/')+1);
-                            //     });
-                            // });
                         };
 
                         node.update=function(){
