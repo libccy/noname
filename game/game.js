@@ -5176,11 +5176,7 @@
                     }
                     else{
                         if(confirm('游戏似乎未正常载入，是否重置游戏？')){
-            				var noname_inited=localStorage.getItem('noname_inited');
                             localStorage.clear();
-            				if(noname_inited){
-            					localStorage.setItem('noname_inited',noname_inited);
-            				}
                             if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
                             window.location.reload();
                         }
