@@ -30282,6 +30282,7 @@
                             var list=[];
 
 							this.innerHTML='正在下载';
+							this.classList.add('nopointer');
 							var url=lib.extensionURL+this.info[0]+'.zip';
 							if(typeof window.fetch!='function'){
 								game.download(encodeURI(url),this.info[0]+'.zip',function(){
@@ -30311,7 +30312,8 @@
 									else{
 										that.innerHTML='安装失败';
 									}
-									that.classList.add('nopointer');
+									that.classList.remove('active');
+									that.classList.remove('highlight');
 								});
 							}
                         };
