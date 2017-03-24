@@ -3567,7 +3567,10 @@ div[data-decoration="bronze"]::after{
 	pointer-events: none;
 }
 .player .wunature {
+	left: 14px;
 	display: none;
+	top: auto;
+	bottom: 14px;
 }
 #arena>.player .wunature,
 #chess>.player .wunature {
@@ -3593,10 +3596,6 @@ div:hover>.wunature {
 	margin-bottom: 3px;
 	animation: game_start 0.5s;
 	-webkit-animation: game_start 0.5s;
-}
-.player .wunature {
-	top: 77px;
-	left: 14px;
 }
 
 .player {

@@ -80,12 +80,6 @@
 .player .avatar2{
 	transition-property:opacity;
 }
-.player .wunature{
-	top:137px;
-}
-.player.minskin .wunature{
-	top:80px;
-}
 .player .actcount.hp{
 	top: 18px;
 	left: 15px;
