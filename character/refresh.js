@@ -106,16 +106,18 @@ character.refresh={
 								}
 								if(card.name=='sha'){
 									if(game.hasPlayer(function(current){
-										return ai.get.effect(current,card,player,player)>0
+										return player.canUse(card,current)&&ai.get.effect(current,card,player,player)>0
 									})){
 										if(card.nature=='fire') return 2.95;
 										if(card.nature=='thunder') return 2.92;
 										return 2.9;
 									}
+									return 0;
 								}
 								if(card.name=='jiu'){
 									return 0.5;
 								}
+								return 0;
 							});
 						}
 						else{

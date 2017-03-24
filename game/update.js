@@ -13,6 +13,7 @@ window.noname_update={
         // 'card/*',
         // 'card/guozhan.js',
         // 'character/*',
+        'character/refresh.js',
         // 'mode/boss.js',
         // 'mode/chess.js',
         // 'mode/versus.js',
