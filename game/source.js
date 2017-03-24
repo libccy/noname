@@ -64,7 +64,6 @@ window.noname_source_list=[
     'extension/character/extension.js',
     'extension/coin/extension.js',
     'extension/soldier/extension.js',
-    'extension/weather/extension.js',
     'extension/wuxing/extension.js',
     'theme/music/grid.png',
     'theme/music/style.css',

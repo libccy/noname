@@ -1,11 +1,11 @@
 window.noname_update={
     version:'1.9.14',
-    update:'1.9.13.1',
+    // update:'1.9.13.1',
     changeLog:[
         '游戏内下载扩展',
     ],
     files:[
-        'game/game.js',
+        // 'game/game.js',
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',
@@ -13,7 +13,7 @@ window.noname_update={
         // 'card/*',
         // 'card/guozhan.js',
         // 'character/*',
-        'character/refresh.js',
+        // 'character/refresh.js',
         // 'mode/boss.js',
         // 'mode/chess.js',
         // 'mode/versus.js',
@@ -23,8 +23,8 @@ window.noname_update={
         // 'theme/woodden/style.css',
         // 'layout/default/layout.css',
         // 'layout/default/phone.css',
-        'layout/default/menu.css',
-        'theme/style/cardback/*',
+        // 'layout/default/menu.css',
+        // 'theme/style/cardback/*',
         // 'layout/long/layout.css',
         // 'layout/long2/layout.css',
         // 'layout/mobile/layout.css',

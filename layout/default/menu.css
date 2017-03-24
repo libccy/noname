@@ -1341,6 +1341,7 @@ input.fileinput::-webkit-file-upload-button {
 	left: 0;
 	padding: 7px;
 	font-size: 24px;
+	cursor: pointer;
 }
 .popup-container.editor>div>.editbutton:first-child{
 	left: auto;

@@ -3331,70 +3331,6 @@
     				}
     			},
             },
-			weather:{
-                enable:{
-    			    name:'开启',
-    			    init:false,
-    			    restart:true,
-    			},
-    			noqing:{
-    			    name:'异常天气出现概率',
-    			    init:'0.5',
-    			    item:{
-    			        '0.1':'10%',
-    			        '0.3':'30%',
-    			        '0.5':'50%',
-    			        '0.7':'70%',
-    			        '0.9':'90%',
-    			    }
-    			},
-    			chance:{
-    			    name:'天气效果触发概率',
-    			    init:'0.5',
-    			    item:{
-    			        '0.1':'10%',
-    			        '0.2':'20%',
-    			        '0.3':'30%',
-    			        '0.5':'50%',
-    			        '0.8':'80%',
-    			    },
-    			    onclick:function(item){
-    			        game.saveConfig('weather_chance_playpackconfig',item);
-    			        _status.weatherchance=parseFloat(lib.config.weather_chance_playpackconfig)||0;
-    			    }
-    			},
-    			duration:{
-    			    name:'异常天气持续时间',
-    			    init:'[4,4]',
-    			    item:{
-    			        '[2,4]':'1~3回合',
-    			        '[4,4]':'3~6回合',
-    			        '[4,7]':'3~9回合',
-    			        '[7,4]':'6~9回合',
-    			        '[7,7]':'6~12回合',
-    			    }
-    			},
-    			qingduration:{
-    			    name:'晴朗天气持续时间',
-    			    init:'[2,4]',
-    			    item:{
-    			        '[2,4]':'1~3回合',
-    			        '[4,4]':'3~6回合',
-    			        '[4,7]':'3~9回合',
-    			        '[7,4]':'6~9回合',
-    			        '[7,7]':'6~12回合',
-    			    }
-    			},
-    			hide:{
-    			    name:'隐藏此扩展',
-    			    clear:true,
-    			    onclick:function(){
-                        this.innerHTML='此扩展将在重启后隐藏';
-    					lib.config.hiddenPlayPack.add('weather');
-    					game.saveConfig('hiddenPlayPack',lib.config.hiddenPlayPack);
-    				}
-    			},
-            },
             coin:{
                 enable:{
     			    name:'开启',
@@ -7341,7 +7277,6 @@
 				game.saveConfig('characters',lib.config.all.characters);
 				game.saveConfig('cards',lib.config.all.cards);
 				game.saveConfig('plays',['cardpile']);
-				game.saveConfig('hiddenPlayPack',['character', 'soldier', 'weather']);
 				game.saveConfig('tao_enemy',true);
 				game.saveConfig('layout','long2');
 				game.saveConfig('background_music','music_off');
