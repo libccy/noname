@@ -2,7 +2,7 @@ window.noname_update={
     version:'1.9.14',
     // update:'1.9.13.1',
     changeLog:[
-        '游戏内下载扩展',
+        '下载扩展',
     ],
     files:[
         // 'game/game.js',
