@@ -6157,16 +6157,16 @@
 				}
                 if(!lib.config.touchscreen){
                     document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
-        			document.onmousemove=ui.click.windowmousemove;
-        			document.onmousedown=ui.click.windowmousedown;
-        			document.onmouseup=ui.click.windowmouseup;
-        			document.oncontextmenu=ui.click.right;
+        			document.addEventListener('mousemove',ui.click.windowmousemove);
+        			document.addEventListener('mousedown',ui.click.windowmousedown);
+        			document.addEventListener('mouseup',ui.click.windowmouseup);
+        			document.addEventListener('contextmenu',ui.click.right);
         		}
         		else{
 					document.addEventListener('touchstart',ui.click.touchconfirm);
-        			document.ontouchstart=ui.click.windowtouchstart;
-        			document.ontouchend=ui.click.windowtouchend;
-        			document.ontouchmove=ui.click.windowtouchmove;
+        			document.addEventListener('touchstart',ui.click.windowtouchstart);
+        			document.addEventListener('touchend',ui.click.windowtouchend);
+        			document.addEventListener('touchmove',ui.click.windowtouchmove);
         		}
                 if(!lib.device&&!lib.node){
                     window.onbeforeunload=function(){
@@ -36778,7 +36778,7 @@
 				ui.click.longpresscancel.call(this);
 				return false;
 			},
-			right:function(){
+			right:function(e){
 				if(window.inSplash) return false;
 				if(lib.config.touchscreen) return;
 				if(_status.noright){
@@ -36795,6 +36795,7 @@
 					case 'auto':ui.click.auto();break;
 					case 'config':ui.click.config();break;
 				}
+				e.preventDefault();
 				return false;
 			}
 		},
