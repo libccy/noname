@@ -31099,10 +31099,9 @@
                         var span6_br=ui.create.node('br');
                         li2.lastChild.appendChild(span6_br);
 
-                        var span5=ui.create.div('','图片素材');
+                        var span5=ui.create.div('','图片素材（精简）');
 						span5.style.fontSize='small';
                         span5.style.lineHeight='16px';
-                        li2.lastChild.appendChild(span5);
                         var span5_check=document.createElement('input');
                         span5_check.type='checkbox';
                         span5_check.style.marginLeft='5px';
@@ -31112,9 +31111,7 @@
                         span5_check.onchange=function(){
                             game.saveConfig('asset_image',this.checked);
                         }
-                        li2.lastChild.appendChild(span5_check);
                         var span2_br=ui.create.node('br');
-                        li2.lastChild.appendChild(span2_br);
 
                         var span4=ui.create.div('','字体素材');
                         span4.style.fontSize='small';
@@ -31166,6 +31163,11 @@
                         li2.lastChild.appendChild(span2_check);
                         var span5_br=ui.create.node('br');
                         li2.lastChild.appendChild(span5_br);
+
+
+                        li2.lastChild.appendChild(span5);
+                        li2.lastChild.appendChild(span5_check);
+                        li2.lastChild.appendChild(span2_br);
 
                         var span6=ui.create.div('','图片素材（完整）');
                         span6.style.fontSize='small';
