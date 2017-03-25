@@ -246,7 +246,7 @@ character.extra={
 				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
-						if(player.hasSkill('jueqing')) return [1,-2];
+						if(player.hasSkillTag('jueqing')) return [1,-2];
 						if(get.tag(card,'damage')){
 							if(target.hp==target.maxHp){
 								if(!target.hasSkill('jilue')){
@@ -499,7 +499,7 @@ character.extra={
 				effect:{
 					target:function(card,player,target,current){
 						if(target.hp<=1&&get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-5];
+							if(player.hasSkillTag('jueqing')) return [1,-5];
 							if(!target.hasFriend()) return;
 							if(player.hp>2&&ai.get.attitude(player,target)<=0) return [0,2];
 							return [1,0,0,-player.hp];
@@ -571,7 +571,7 @@ character.extra={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(target.hp==1) return 0.8;
 							if(target.isTurnedOver()) return [0,3];
 							var num=game.countPlayer(function(current){

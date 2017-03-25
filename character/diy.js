@@ -960,7 +960,7 @@ character.diy={
 				result:{
 					target:function(card,player,target,current){
 						if(target.hp<=1&&get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-5];
+							if(player.hasSkillTag('jueqing')) return [1,-5];
 							return [1,0,0,-2];
 						}
 					}

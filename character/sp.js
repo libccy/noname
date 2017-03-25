@@ -1669,7 +1669,7 @@ character.sp={
 				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(ai.get.attitude(player,target)>0) return [0,0];
 							var eff=ai.get.damageEffect(target.storage.shichou_target,player,target);
 							if(eff>0){

@@ -1948,7 +1948,7 @@ character.shenhua={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(target.hp<=1) return;
 							if(!target.hasFriend()) return;
 							var hastarget=false;
@@ -2862,7 +2862,7 @@ character.shenhua={
 						return 0;
 					},
 					player:function(player,target){
-						if(target.hasSkill('jueqing')) return -10;
+						if(target.hasSkillTag('jueqing')) return -10;
 						var mn=1;
 						var hs=player.get('h');
 						for(var i=0;i<hs.length;i++){
@@ -2917,7 +2917,7 @@ character.shenhua={
 				effect:{
 					target:function(card,player,target,current){
 						if(get.tag(card,'damage')&&target.hp>1){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							var max=0;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
@@ -3545,7 +3545,7 @@ character.shenhua={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(player.hasSkill('jueqing')) return;
+						if(player.hasSkillTag('jueqing')) return;
 						if(get.tag(card,'damage')&&target.num('h')>1) return 0.7;
 					}
 				},
@@ -3638,7 +3638,7 @@ character.shenhua={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(player.hasSkill('jueqing')) return;
+						if(player.hasSkillTag('jueqing')) return;
 						if(get.tag(card,'damage')&&target.num('he')>1) return 0.7;
 					}
 				},

@@ -143,7 +143,7 @@ character.standard={
 				maixie_hp:true,
 				effect:{
 					target:function(card,player){
-						if(player.hasSkill('jueqing')) return [1,-1];
+						if(player.hasSkillTag('jueqing')) return [1,-1];
 						if(get.tag(card,'damage')) return [1,0.5];
 					}
 				}
@@ -163,7 +163,7 @@ character.standard={
 				effect:{
 					target:function(card,player,target){
 						if(player.num('he')>1&&get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-1.5];
+							if(player.hasSkillTag('jueqing')) return [1,-1.5];
 							if(ai.get.attitude(target,player)<0) return [1,1];
 						}
 					}
@@ -260,7 +260,7 @@ character.standard={
 			ai:{
 				result:{
 					target:function(card,player,target){
-						if(player.hasSkill('jueqing')) return [1,-1];
+						if(player.hasSkillTag('jueqing')) return [1,-1];
 						if(get.tag(card,'damage')&&ai.get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
 					}
 				}
@@ -403,7 +403,7 @@ character.standard={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,get.tag(card,'damage')*2];
 							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];

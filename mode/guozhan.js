@@ -1199,7 +1199,7 @@ mode.guozhan={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(player.hasSkill('jueqing')) return;
+						if(player.hasSkillTag('jueqing')) return;
 						if(!player.isUnseen(2)) return;
 						var num=get.tag(card,'damage');
 						if(num){

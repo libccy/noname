@@ -377,7 +377,7 @@ character.refresh={
 				effect:{
 					target:function(card,player,target){
 						if(player.num('he')>1&&get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-1.5];
+							if(player.hasSkillTag('jueqing')) return [1,-1.5];
 							if(ai.get.attitude(target,player)<0) return [1,1];
 						}
 					}
@@ -880,7 +880,7 @@ character.refresh={
 				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
-						if(player.hasSkill('jueqing')) return [1,-1];
+						if(player.hasSkillTag('jueqing')) return [1,-1];
 						if(get.tag(card,'damage')&&player!=target) return [1,0.6];
 					}
 				}
@@ -960,7 +960,7 @@ character.refresh={
 				result:{
 					effect:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(player.hp>=4) return [1,get.tag(card,'damage')*2];
 							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
 							if(target.hp==2) return [1,get.tag(card,'damage')*0.5];
@@ -1162,7 +1162,7 @@ character.refresh={
 				},
 				effect:function(card,player){
 					if(get.tag(card,'damage')){
-						if(player.hasSkill('jueqing')) return [1,1];
+						if(player.hasSkillTag('jueqing')) return [1,1];
 						return 1.2;
 					}
 					if(get.tag(card,'loseHp')){

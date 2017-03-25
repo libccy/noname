@@ -533,7 +533,7 @@ character.yxs={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
@@ -894,7 +894,7 @@ character.yxs={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,get.tag(card,'damage')*2];
 							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
@@ -2012,7 +2012,7 @@ character.yxs={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,2];
 							if(target.hp==3) return [1,1.5];
@@ -2178,7 +2178,7 @@ character.yxs={
 				result:{
 					target:function(card,player,target){
 						if(player.num('he')>1&&get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-1];
+							if(player.hasSkillTag('jueqing')) return [1,-1];
 							if(ai.get.attitude(target,player)<0) return [1,0,0,-1.5];
 						}
 					}

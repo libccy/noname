@@ -740,7 +740,7 @@ character.hearth={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return;
+							if(player.hasSkillTag('jueqing')) return;
 							return 0.5;
 						}
 					}
@@ -849,7 +849,7 @@ character.hearth={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
 							if(target.hp>=4) return [1,get.tag(card,'damage')*2];
 							if(target.hp==3) return [1,get.tag(card,'damage')*1.5];
@@ -1177,7 +1177,7 @@ character.hearth={
 				maixie_hp:true,
 				effect:{
 					target:function(card,player,target){
-						if(player.hasSkill('jueqing')) return [1,-2];
+						if(player.hasSkillTag('jueqing')) return [1,-2];
 						if(!target.hasFriend()) return false;
 						if(get.tag(card,'damage')&&player.num('h')>1) return [1,0,0,-1];
 					}
@@ -2851,7 +2851,7 @@ character.hearth={
 				effect:{
 					target:function(card,player,target){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-2];
+							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
 							var nh=target.num('h');
 							if(nh>5) return [1,-1];
@@ -3975,7 +3975,7 @@ character.hearth={
 				effect:{
 					target:function(card,player){
 						if(get.tag(card,'damage')){
-							if(player.hasSkill('jueqing')) return [1,-1];
+							if(player.hasSkillTag('jueqing')) return [1,-1];
 							return 0.8;
 						}
 					}
@@ -4892,7 +4892,7 @@ character.hearth={
 			ai:{
 				effect:function(card,player){
 					if(get.tag(card,'damage')){
-						if(player.hasSkill('jueqing')) return [1,1];
+						if(player.hasSkillTag('jueqing')) return [1,1];
 						return 1.2;
 					}
 				},
@@ -5047,7 +5047,7 @@ character.hearth={
 				},
 				effect:function(card,player){
 					if(get.tag(card,'damage')){
-						if(player.hasSkill('jueqing')) return;
+						if(player.hasSkillTag('jueqing')) return;
 						return 1.2;
 					}
 				},
