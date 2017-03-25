@@ -5548,9 +5548,6 @@
                     }
                     else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1){
                         lib.device='ios';
-                        if(ua.indexOf('ipad')!=-1){
-                            lib.ipad=true;
-                        }
                     }
 					lib.assetURL=noname_inited;
 				}
@@ -5701,23 +5698,35 @@
 				delete window.music;
 				delete window.font;
 
+				var ua=navigator.userAgent.toLowerCase();
 				if('ontouchstart' in document){
 					if(!lib.config.totouched){
 						game.saveConfig('totouched',true);
-						game.saveConfig('touchscreen',true);
-						if(lib.device=='ios'||lib.device=='android'){
+						if(lib.device){
 		                    game.saveConfig('low_performance',true);
 		                    game.saveConfig('confirm_exit',true);
+							game.saveConfig('touchscreen',true);
+							if(ua.indexOf('ipad')==-1){
+								game.saveConfig('phonelayout',true);
+							}
 						}
-						if(!lib.ipad){
-							game.saveConfig('phonelayout',true);
+						else if(confirm('是否切换到触屏模式？（触屏模式可提高触屏设备的响应速度，但无法使用鼠标）')){
+							game.saveConfig('touchscreen',true);
+							if(ua.indexOf('iphone')!=-1||ua.indexOf('android')!=-1){
+								game.saveConfig('phonelayout',true);
+							}
+							game.reload();
 						}
 	                }
 				}
                 else if(lib.config.touchscreen){
 					game.saveConfig('touchscreen',false);
 				}
-                delete lib.ipad;
+				if(!lib.config.toscrolled&&ua.indexOf('macintosh')!=-1){
+					game.saveConfig('toscrolled',true);
+					game.saveConfig('mousewheel',false);
+				}
+
                 var extensionlist=[];
                 if(!localStorage.getItem(lib.configprefix+'disable_extension')){
 					if(lib.config.extensions.length){
@@ -5886,25 +5895,6 @@
 				}
 
 				lib.config.duration=500;
-
-				var ua=navigator.userAgent.toLowerCase();
-                if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('android')!=-1){
-					if(!lib.config.totouched&&!lib.config.touchscreen){
-						var totouch=window.confirm('您似乎在使用触屏设备，是否切换到触屏模式？');
-						game.saveConfig('totouched',true);
-						if(totouch){
-							game.saveConfig('touchscreen',true);
-							game.saveConfig('low_performance',true);
-                            game.saveConfig('phonelayout',true);
-							game.saveConfig('confirm_exit',true);
-							game.reload();
-						}
-					}
-				}
-				else if(ua.indexOf('macintosh')!=-1&&!lib.config.toscrolled){
-					game.saveConfig('toscrolled',true);
-					game.saveConfig('mousewheel',false);
-				}
 
 				if(window.indexedDB){
 					var request = window.indexedDB.open(lib.configprefix+'data',3);
