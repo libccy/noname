@@ -3383,9 +3383,16 @@ div[data-decoration="bronze"]::after{
 	color: rgb(233, 131, 255);
 	/*color: rgb(117,186,0);*/
 }
-/*.card.fullskin.fire>.image{
-	-webkit-filter:saturate(2);
-}*/
+.card.fullskin.gold>.name {
+	color: white;
+    text-shadow: black 0 0 1px, rgba(0,0,0,0.5) 0 0 1px;
+	background: rgba(234, 158, 0, 0.6);
+    border: 1px solid rgb(134, 87, 1);
+	box-shadow: rgba(255, 149, 0, 0.4) 0 0 10px inset;
+}
+.card.fullskin.gold>.name2 {
+	color: rgb(255,235,59);
+}
 .card.fullskin>.info {
 	top: 8px;
 	right: 6px;

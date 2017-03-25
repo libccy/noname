@@ -6157,16 +6157,16 @@
 				}
                 if(!lib.config.touchscreen){
                     document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
-        			document.addEventListener('mousemove',ui.click.windowmousemove);
-        			document.addEventListener('mousedown',ui.click.windowmousedown);
-        			document.addEventListener('mouseup',ui.click.windowmouseup);
-        			document.addEventListener('contextmenu',ui.click.right);
+        			document.onmousemove=ui.click.windowmousemove;
+        			document.onmousedown=ui.click.windowmousedown;
+        			document.onmouseup=ui.click.windowmouseup;
+        			document.oncontextmenu=ui.click.right;
         		}
         		else{
 					document.addEventListener('touchstart',ui.click.touchconfirm);
-        			document.addEventListener('touchstart',ui.click.windowtouchstart);
-        			document.addEventListener('touchend',ui.click.windowtouchend);
-        			document.addEventListener('touchmove',ui.click.windowtouchmove);
+        			document.ontouchstart=ui.click.windowtouchstart;
+        			document.ontouchend=ui.click.windowtouchend;
+        			document.ontouchmove=ui.click.windowtouchmove;
         		}
                 if(!lib.device&&!lib.node){
                     window.onbeforeunload=function(){
@@ -16683,7 +16683,8 @@
                     var info=lib.card[card[2]];
                     if(this.name){
                         this.classList.remove('epic');
-                        this.classList.remove('legend');
+						this.classList.remove('legend');
+                        this.classList.remove('unique');
                         var subtype=get.subtype(this);
                         if(subtype){
                             this.classList.remove(subtype);
@@ -16695,6 +16696,9 @@
                     else if(info.legend){
                         this.classList.add('legend');
                     }
+					else if(info.unique){
+						this.classList.add('unique');
+					}
 					var bg=card[2];
                     if(info.cardimage){
                         bg=info.cardimage;
@@ -20252,6 +20256,9 @@
                     else if(content.epic){
                         lib.card[content.name].epic=true;
                     }
+					else if(content.unique){
+						lib.card[content.name].unique=true;
+					}
                 }
             },
 			playAudio:function(str){
