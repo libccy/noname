@@ -11062,6 +11062,9 @@
 								source.node.framebg.dataset.auto='bronze';
 								if(dnum>=4) source.node.framebg.dataset.decoration='bronze';
 							}
+							if(dnum>=2){
+								source.classList.add('topcount');
+							}
 						}
 						else if(lib.config.autoborder_count=='mix'){
 							source.node.framebg.dataset.decoration='';
@@ -11342,6 +11345,7 @@
 								case 'gold':if(dnum>=12) source.node.framebg.dataset.decoration='gold';break;
 							}
 						}
+						source.classList.add('topcount');
 					}
 				},
 				equip:function(){
