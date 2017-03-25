@@ -2787,6 +2787,7 @@ div:not(.handcards)>.card>.info>span,
 #window:not(.nopointer) .dashboard,
 #window:not(.nopointer) .textlink,
 #window:not(.nopointer) .hrefnode,
+#window:not(.nopointer) .closenode,
 #window:not(.nopointer) .pointerdiv,
 #window:not(.nopointer) .pointernode div,
 #window:not(.nopointer) .pointerspan span,
@@ -3011,6 +3012,9 @@ div:hover>.intro {
 
 .hrefnode{
 	text-decoration: underline;
+}
+.closenode{
+	float: right;
 }
 .underline,.underlinenode {
 	padding: 3px;

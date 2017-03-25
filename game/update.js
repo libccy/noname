@@ -22,7 +22,7 @@ window.noname_update={
         // 'mode/stone.js',
         'mode/tafang.js',
         // 'theme/woodden/style.css',
-        // 'layout/default/layout.css',
+        'layout/default/layout.css',
         // 'layout/default/phone.css',
         // 'layout/default/menu.css',
         // 'theme/style/cardback/*',

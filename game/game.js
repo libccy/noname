@@ -21,7 +21,7 @@
 		configprefix:'noname_0.9_',
         versionOL:21,
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
-        updateURL2:'https://coding.net/u/libccy/p/noname/git/raw',
+        mirrorURL:'https://coding.net/u/libccy/p/noname/git/raw',
 		extensionURL:'https://coding.net/u/libccy/p/noname-extension/git/raw/master/',
         hallURL:'websha.cn',
 		assetURL:'',
@@ -5959,11 +5959,8 @@
                             require('electron').remote.getCurrentWindow().toggleDevTools();
                         }
                     };
-                    if(ui.updatep1){
-                        ui.updatep1.style.display='';
-						ui.updatep2.style.display='';
-                        ui.updatep3.style.display='';
-						ui.updatep4.innerHTML='更新';
+                    if(ui.updateUpdate){
+                        ui.updateUpdate();
                     }
                     game.download=function(url,folder,onsuccess,onerror,dev){
                         if(url.indexOf('http')!=0){
@@ -6104,12 +6101,9 @@
 								}
 							});
 						}
-                        if(ui.updatep1){
-                            ui.updatep1.style.display='';
-							ui.updatep2.style.display='';
-                            ui.updatep3.style.display='';
-							ui.updatep4.innerHTML='更新';
-                        }
+						if(ui.updateUpdate){
+	                        ui.updateUpdate();
+	                    }
 						game.download=function(url,folder,onsuccess,onerror,dev){
                             if(url.indexOf('http')!=0){
                                 url=get.url(dev)+url;
@@ -26735,7 +26729,7 @@
 												str+='，导入时间可能较长';
 											}
 											var assetLoaded=function(){
-												promptnode.firstChild.innerHTML='导入成功。<span class="hrefnode">重新启动</span><span style="float:right">×</span>';
+												promptnode.firstChild.innerHTML='导入成功。<span class="hrefnode">重新启动</span><span class="closenode">×</span>';
 												promptnode.firstChild.querySelectorAll('span')[0].onclick=game.reload;
 												promptnode.firstChild.querySelectorAll('span')[1].onclick=function(){
 													promptnode.style.display='none';
@@ -28480,7 +28474,7 @@
                         exportExtLine.style.width='calc(100% - 40px)';
                         exportExtLine.style.textAlign='left';
                         exportExtLine.style.marginBottom='5px';
-                        exportExtLine.innerHTML='重启后生效。<span class="hrefnode">立即重启</span><span style="float:right">×</span>';
+                        exportExtLine.innerHTML='重启后生效。<span class="hrefnode">立即重启</span><span class="closenode">×</span>';
                         exportExtLine.querySelectorAll('span')[0].onclick=game.reload;
                         exportExtLine.querySelectorAll('span')[1].onclick=function(){
                             exportExtLine.style.display='none';
@@ -28492,7 +28486,7 @@
                         shareExtLine.style.width='calc(100% - 40px)';
                         shareExtLine.style.textAlign='left';
                         shareExtLine.style.marginBottom='5px';
-                        shareExtLine.innerHTML='已导出扩展。<span class="hrefnode">分享扩展</span><span style="float:right">×</span>';
+                        shareExtLine.innerHTML='已导出扩展。<span class="hrefnode">分享扩展</span><span class="closenode">×</span>';
                         shareExtLine.querySelectorAll('span')[0].onclick=function(){
 							ui.create.iframe('https://tieba.baidu.com/p/5037850317');
 						};
@@ -30540,7 +30534,7 @@
 							if(str==lib.updateURL){
 								return 'GitHub';
 							}
-							if(str==lib.updateURL2){
+							if(str==lib.mirrorURL){
 								return 'Coding';
 							}
 							var index;
@@ -30578,16 +30572,7 @@
     					li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
 						li3.innerHTML='更新地址：<span>'+trimurl(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
 						li3.style.whiteSpace='nowrap';
-                        ui.updatep1=li1.querySelector('p');
-						ui.updatep2=li2;
-                        ui.updatep3=li3;
-						ui.updatep4=node;
-                        if(!game.download){
-                            ui.updatep1.style.display='none';
-							ui.updatep2.style.display='none';
-							ui.updatep3.style.display='none';
-                            ui.updatep4.innerHTML='关于';
-                        }
+
     					var button1,button2,button3,button4,button5;
 
     					game.checkForUpdate=function(forcecheck,dev){
@@ -30920,11 +30905,11 @@
                                         span5_check.remove();
                                         span6.remove();
                                         span6_check.remove();
-                                        br1.remove();
-                                        br2.remove();
-                                        br3.remove();
-                                        br4.remove();
-                                        br5.remove();
+                                        span2_br.remove();
+                                        span3_br.remove();
+                                        span4_br.remove();
+                                        span5_br.remove();
+                                        span6_br.remove();
     									p.appendChild(span);
 
                                         var br6=ui.create.node('br');
@@ -30982,6 +30967,39 @@
                             li1.lastChild.appendChild(button3);
                         }
 
+						(function(){
+							var updatep1=li1.querySelector('p');
+							var updatep2=li2;
+	                        var updatep3=li3;
+							var updatep4=node;
+							var updatepx=ui.create.node('p');
+							li1.appendChild(updatepx);
+							updatepx.style.display='none';
+							updatepx.style.whiteSpace='nowrap';
+							updatepx.style.marginTop='8px';
+							var buttonx=ui.create.node('button','访问GitHub',function(){
+								ui.create.iframe('https://github.com/libccy/noname');
+							});
+							updatepx.appendChild(buttonx);
+							ui.updateUpdate=function(){
+								if(!game.download){
+		                            updatep1.style.display='none';
+									updatep2.style.display='none';
+									updatep3.style.display='none';
+									updatepx.style.display='';
+		                            updatep4.innerHTML='关于';
+		                        }
+								else{
+									updatep1.style.display='';
+									updatep2.style.display='';
+			                        updatep3.style.display='';
+									updatepx.style.display='none';
+									updatep4.innerHTML='更新';
+								}
+							}
+							ui.updateUpdate();
+						}());
+
 						button4=document.createElement('button');
     					button4.innerHTML='设置更新地址';
     					button4.onclick=function(){
@@ -31000,10 +31018,10 @@
     					button6.innerHTML='设为国内镜像';
                         // button6.style.marginLeft='5px';
     					button6.onclick=function(){
-							game.saveConfig('updateURL',lib.updateURL2);
+							game.saveConfig('updateURL',lib.mirrorURL);
 							button5.style.display='';
 							button6.style.display='none';
-							li3.querySelector('span').innerHTML='Coding';
+							li3.querySelector('span').innerHTML=trimurl(lib.mirrorURL);
 						};
                         li3.lastChild.appendChild(button6);
 
@@ -31036,43 +31054,43 @@
                             this.classList.toggle('on');
                             if(!this.classList.contains('on')){
                                 span2.style.display='none';
-								br1.style.display='none';
+								span2_br.style.display='none';
                                 span2_check.style.display='none';
                                 span3.style.display='none';
-								br2.style.display='none';
+								span3_br.style.display='none';
                                 span3_check.style.display='none';
                                 span4.style.display='none';
-								br3.style.display='none';
+								span4_br.style.display='none';
                                 span4_check.style.display='none';
                                 span5.style.display='none';
-								br4.style.display='none';
+								span5_br.style.display='none';
                                 span5_check.style.display='none';
                                 span6.style.display='none';
-								br5.style.display='none';
+								span6_br.style.display='none';
                                 span6_check.style.display='none';
                             }
                             else{
 								span2.style.display='';
-                                br1.style.display='';
+                                span2_br.style.display='';
                                 span2_check.style.display='';
 								span3.style.display='';
-                                br2.style.display='';
+                                span3_br.style.display='';
                                 span3_check.style.display='';
 								span4.style.display='';
-                                br3.style.display='';
+                                span4_br.style.display='';
                                 span4_check.style.display='';
 								span5.style.display='';
-                                br4.style.display='';
+                                span5_br.style.display='';
                                 span5_check.style.display='';
 								span6.style.display='';
-                                br5.style.display='';
+                                span6_br.style.display='';
                                 span6_check.style.display='';
                             }
                         })
                         li2.lastChild.appendChild(span1);
 
-                        var br5=ui.create.node('br');
-                        li2.lastChild.appendChild(br5);
+                        var span6_br=ui.create.node('br');
+                        li2.lastChild.appendChild(span6_br);
 
                         var span5=ui.create.div('','图片素材');
                         span5.style.fontSize='small';
@@ -31087,8 +31105,8 @@
                             game.saveConfig('asset_image',this.checked);
                         }
                         li2.lastChild.appendChild(span5_check);
-                        var br1=ui.create.node('br');
-                        li2.lastChild.appendChild(br1);
+                        var span2_br=ui.create.node('br');
+                        li2.lastChild.appendChild(span2_br);
 
                         var span4=ui.create.div('','字体素材');
                         span4.style.fontSize='small';
@@ -31103,8 +31121,8 @@
                             game.saveConfig('asset_font',this.checked);
                         }
                         li2.lastChild.appendChild(span4_check);
-                        var br2=ui.create.node('br');
-                        li2.lastChild.appendChild(br2);
+                        var span3_br=ui.create.node('br');
+                        li2.lastChild.appendChild(span3_br);
 
                         var span3=ui.create.div('','音效素材');
                         span3.style.fontSize='small';
@@ -31119,8 +31137,8 @@
                             game.saveConfig('asset_audio',this.checked);
                         }
                         li2.lastChild.appendChild(span3_check);
-                        var br3=ui.create.node('br');
-                        li2.lastChild.appendChild(br3);
+                        var span4_br=ui.create.node('br');
+                        li2.lastChild.appendChild(span4_br);
 
                         var span2=ui.create.div('','皮肤素材');
                         span2.style.fontSize='small';
@@ -31135,8 +31153,8 @@
                             game.saveConfig('asset_skin',this.checked);
                         }
                         li2.lastChild.appendChild(span2_check);
-                        var br4=ui.create.node('br');
-                        li2.lastChild.appendChild(br4);
+                        var span5_br=ui.create.node('br');
+                        li2.lastChild.appendChild(span5_br);
 
                         var span6=ui.create.div('','图片素材（完整）');
                         span6.style.fontSize='small';
@@ -31152,20 +31170,25 @@
                         }
                         li2.lastChild.appendChild(span6_check);
 
-                        span2.style.display='none';
+						span2.style.display='none';
+                        span2_br.style.display='none';
                         span2_check.style.display='none';
-                        span3.style.display='none';
+						span3.style.display='none';
+                        span3_br.style.display='none';
                         span3_check.style.display='none';
-                        span4.style.display='none';
+						span4.style.display='none';
+                        span4_br.style.display='none';
                         span4_check.style.display='none';
-                        span5.style.display='none';
+						span5.style.display='none';
+                        span5_br.style.display='none';
                         span5_check.style.display='none';
-                        span6.style.display='none';
+						span6.style.display='none';
+                        span6_br.style.display='none';
                         span6_check.style.display='none';
 
-						ul.appendChild(li3);
     					ul.appendChild(li1);
 						ul.appendChild(li2);
+						ul.appendChild(li3);
     					page.appendChild(ul);
                     }());
 					(function(){
