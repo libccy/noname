@@ -1704,7 +1704,7 @@
                             else{
                                 ui.arena.classList.remove('uslim_player');
                             }
-							if(item=='normal'&&(game.layout=='long'||game.layout=='long2')){
+							if(item=='normal'&&lib.config.mode!='brawl'&&(game.layout=='long'||game.layout=='long2')){
 								ui.arena.classList.add('lslim_player');
 							}
 							else{
@@ -4909,7 +4909,7 @@
 			'<div style="margin:10px">角色操作</div><ul style="margin-top:0"><li>受到伤害<br>player.damage(source,<br>num)'+
 			'<li>回复体力<br>player.recover(num)<li>摸牌<br>player.draw(num)<li>获得牌<br>player.gain(cards)<li>弃牌<br>player.discard(cards)'+
 			'<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>'+
-			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>游戏结束<br>game.over(bool)'+
+			'<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>上一条/下一条输入的内容<br>up/down<li>游戏结束<br>game.over(bool)'+
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 		},
 		setIntro:function(node,func){
@@ -7095,7 +7095,7 @@
                     else{
                         ui.arena.classList.remove('slim_player');
                     }
-					if(lib.config.player_border=='normal'&&(game.layout=='long'||game.layout=='long2')){
+					if(lib.config.player_border=='normal'&&lib.config.mode!='brawl'&&(game.layout=='long'||game.layout=='long2')){
 						ui.arena.classList.add('lslim_player');
 					}
 					else{
@@ -23526,9 +23526,16 @@
             });
         },
         switchMode:function(name,configx){
-            if(lib.config.layout!=game.layout&&!lib.layoutfixed.contains(name)){
-                lib.init.layout(lib.config.layout);
-            }
+			if(!lib.layoutfixed.contains(name)){
+				if(lib.config.layout!=game.layout){
+	                lib.init.layout(lib.config.layout);
+	            }
+				else if(lib.config.mode=='brawl'){
+					if(lib.config.player_border=='normal'&&(game.layout=='long'||game.layout=='long2')){
+						ui.arena.classList.add('lslim_player');
+					}
+				}
+			}
             window.mode={};
             var script=lib.init.js(lib.assetURL+'mode',name,function(){
                 script.remove();
@@ -31598,13 +31605,36 @@
                         var logindex=-1;
                         var cheat=lib.cheat;
                         var runCommand=function(e){
-                            if(text2.value){
+                            if(text2.value&&!['up','down'].contains(text2.value)){
                                 logindex=-1;
                                 logs.unshift(text2.value);
                             }
                             if(text2.value=='cls'){
                                 text.innerHTML='';
+	                            text2.value='';
                             }
+							else if(text2.value=='up'){
+								if(logindex+1<logs.length){
+                                    text2.value=logs[++logindex];
+                                }
+								else{
+		                            text2.value='';
+								}
+							}
+							else if(text2.value=='down'){
+								if(logindex>=0){
+                                    logindex--;
+                                    if(logindex<0){
+                                        text2.value='';
+                                    }
+                                    else{
+                                        text2.value=logs[logindex];
+                                    }
+                                }
+								else{
+		                            text2.value='';
+								}
+							}
                             else{
                                 try{
                                     var result=eval(text2.value);
@@ -31613,8 +31643,8 @@
                                 catch(e){
                                     game.print(e);
                                 }
+	                            text2.value='';
                             }
-                            text2.value='';
                         }
                         text2.addEventListener('keydown',function(e){
                             if(e.keyCode==13){
@@ -33095,7 +33125,7 @@
                 if(lib.config.player_border=='slim'){
                     ui.arena.classList.add('uslim_player');
                 }
-				if(lib.config.player_border=='normal'&&(game.layout=='long'||game.layout=='long2')){
+				if(lib.config.player_border=='normal'&&lib.config.mode!='brawl'&&(game.layout=='long'||game.layout=='long2')){
 					ui.arena.classList.add('lslim_player');
 				}
 				if(lib.config.compatiblemode){
@@ -33588,6 +33618,19 @@
 					}
 					if(item.nature){
 						node.classList.add(item.nature);
+					}
+					if(!noclick){
+						if(lib.config.touchscreen){
+							lib.setLongPress(node,ui.click.intro);
+						}
+						else{
+							if(lib.config.hover_all){
+								lib.setHover(node,ui.click.hoverplayer);
+							}
+							if(lib.config.right_info){
+								node.oncontextmenu=ui.click.rightplayer;
+							}
+						}
 					}
 					break;
 
@@ -39245,6 +39288,9 @@
                     return;
                 }
 				var name=node.name;
+				if(node.link&&node.link.name&&lib.card[node.link.name]){
+					name=node.link.name;
+				}
 				if(get.position(node)=='j'&&node.viewAs&&node.viewAs!=name){
 					uiintro.add(get.translation(node.viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(node)+'）</div>');
 					name=node.viewAs;
@@ -39371,7 +39417,12 @@
 								uiintro.add('<div class="text center">特殊装备</div>').style.marginTop='-5px';
 							}
 						}
-                        uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
+						if(lib.translate[name+'_info']){
+							var placetext=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
+							if(lib.translate[name+'_info'].indexOf('<div class="skill"')!=0){
+								uiintro._place_text=placetext;
+							}
+						}
     				}
     				uiintro.add(ui.create.div('.placeholder.slim'));
                 }
