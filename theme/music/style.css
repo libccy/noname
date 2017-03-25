@@ -15,6 +15,13 @@ html{
 	background: linear-gradient(#4b4b4b, #464646) !important;
 }
 
+.videonode.menubutton.extension.current>div:first-child{
+	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 5px,
+		rgba(255, 203, 0,1) 0 0 5px,black 0 0 1px
+}
+.videonode.menubutton.extension.current>div:first-child>div{
+	text-shadow: black 0 0 2px;
+}
 body[data-background_color_music='blue'] #system>div>div,
 body[data-background_color_music='blue'] #mebg,
 body[data-background_color_music='blue'] .control,

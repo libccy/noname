@@ -1174,6 +1174,16 @@ input.fileinput::-webkit-file-upload-button {
 	top: 0;
 	margin-left: 5px;
 }
+.videonode.menubutton.extension>.text.author>span{
+	float: right;
+	transform: translateY(2px) scale(0.7);
+	width: 80px;
+	text-align: center;
+	opacity: 0;
+}
+.videonode.menubutton.extension.current>.text.author>span{
+	opacity: 1;
+}
 .videonode.menubutton>.victory{
 	font-family: 'huangcao','xinwei';
 	font-size: 25px;
