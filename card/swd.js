@@ -581,6 +581,8 @@ card.swd={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip1',
+			nomod:true,
+			nopower:true,
 			skills:['xuanyuanjian','xuanyuanjian2','xuanyuanjian3'],
 			enable:function(card,player){
 				return player.hasSkill('xuanyuan')||player.hp>2;
@@ -3036,10 +3038,9 @@ card.swd={
 		haotianta:{
 			trigger:{global:'judgeBefore'},
 			direct:true,
-			usable:1,
 			content:function(){
 				"step 0"
-				event.cards=get.cards(3);
+				event.cards=get.cards(2);
 				player.chooseCardButton(true,event.cards,'昊天塔：选择一张牌作为'+get.translation(trigger.player)+'的'+trigger.judgestr+'判定结果').ai=function(button){
 					if(ai.get.attitude(player,trigger.player)>0){
 						return 1+trigger.judge(button.link);
@@ -5015,9 +5016,9 @@ card.swd={
 		shouna:'收纳',
 		shouna_info:'出牌阶段限一次，你可以弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶',
 		donghuangzhong_info:'结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机单体延时锦囊置入其判定区',
-		xuanyuanjian_info:'装备时获得一点护甲；每当你即将造成一次伤害，你令此伤害加一并变为雷属性，并在伤害结算后流失一点体力。任何时候，若你体力值不超过2，则立即失去轩辕剑',
+		xuanyuanjian_info:'装备时获得一点护甲；每当你即将造成一次伤害，你令此伤害加一并变为雷属性，并在伤害结算后流失一点体力。任何时候，若你体力值不超过2，则立即失去轩辕剑（此牌不可被复制或强化）',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
-		haotianta_info:'锁定技，任意一名角色进行判定前，你观看牌堆顶的3张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能。每回合最多发动一次',
+		haotianta_info:'锁定技，任意一名角色进行判定前，你观看牌堆顶的2张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',
 		shennongding_info:'出牌阶段，你可以弃置两张手牌，然后回复一点体力。每阶段限一次',
 		kongdongyin_info:'令你抵挡一次死亡，将体力回复至1，并摸一张牌，发动后进入弃牌堆',
 		kunlunjingc_info:'出牌阶段限一次，你可以观看牌堆顶的三张牌，然后用一张手牌替换其中的一张',

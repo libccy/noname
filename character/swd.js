@@ -2709,19 +2709,33 @@ character.swd={
 			trigger:{player:'phaseBegin'},
 			unique:true,
 			filter:function(event,player){
+				for(var i=0;i<ui.discardPile.childElementCount;i++){
+					if(ui.discardPile.childNodes[i].name=='xuanyuanjian') return true;
+				}
 				return game.hasPlayer(function(current){
 					return current!=player&&current.num('e','xuanyuanjian');
 				});
 			},
 			content:function(){
-				var target=game.findPlayer(function(current){
-					return current!=player&&current.num('e','xuanyuanjian');
-				});
-				if(target){
-					var card=target.get('e','xuanyuanjian');
-					player.gain(card,target);
-					target.$give(card,player);
-					player.line(target,'green');
+				var card;
+				for(var i=0;i<ui.discardPile.childElementCount;i++){
+					if(ui.discardPile.childNodes[i].name=='xuanyuanjian'){
+						card=ui.discardPile.childNodes[i];
+					}
+				}
+				if(card){
+					player.gain(card,'gain2');
+				}
+				else{
+					var target=game.findPlayer(function(current){
+						return current!=player&&current.num('e','xuanyuanjian');
+					});
+					if(target){
+						var card=target.get('e','xuanyuanjian');
+						player.gain(card,target);
+						target.$give(card,player);
+						player.line(target,'green');
+					}
 				}
 			},
 			global:'xuanyuan_ai'
@@ -9036,7 +9050,7 @@ character.swd={
 		huajian:'化剑',
 		huajian_info:'出牌阶段结束时，你可以将一张牌当作杀对任意一名角色使用',
 		xuanyuan:'轩辕',
-		xuanyuan_info:'锁定技，你无视【轩辕剑】的装备条件及流失体力的效果；准备阶段，如果其他角色的装备区内有【轩辕剑】，你可以获得之',
+		xuanyuan_info:'锁定技，你无视【轩辕剑】的装备条件及流失体力的效果；准备阶段，你可以从场上或弃牌堆中获得【轩辕剑】',
 		jilve:'极略',
 		jilve_backup:'极略',
 		jilve2:'极略',
