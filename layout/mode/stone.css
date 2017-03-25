@@ -151,6 +151,11 @@
     white-space: nowrap;
     transition: all 0s;
 }
+#window:not(.nopointer) .deckitem,
+#window:not(.nopointer) #deck-builder>.shadowed.list>.menubutton.large.create,
+#window:not(.nopointer) #deck-builder>.controls>div:not(*:last-child){
+    cursor: pointer;
+}
 .dialog .deckitem{
     margin-left: 8px;
     margin-right: 9px;
