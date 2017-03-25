@@ -2524,6 +2524,7 @@ window.noname_skin_list={
     fuhuanghou:3,
     fuwan:1,
     ganfuren:1,
+    ganning:2,
     guanping:2,
     guanyinping:2,
     guanyu:2,
@@ -2642,7 +2643,7 @@ window.noname_skin_list={
     zhugedan:1,
     zhugejin:3,
     zhugeke:1,
-    zhugeliang:4,
+    zhugeliang:5,
     zhuran:1,
     zhurong:3,
     zuoci:3

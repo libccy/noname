@@ -7297,7 +7297,7 @@
 				}
 				ui.arena.classList.remove('selecting');
 			},
-            p:function(name,i){
+            p:function(name,i,skin){
                 var list=['swd','hs','pal','gjqt','ow'];
                 if(!lib.character[name]){
                     for(var j=0;j<list.length;j++){
@@ -7306,6 +7306,9 @@
                         }
                     }
                 }
+				if(skin){
+					lib.config.skin[name]=skin
+				}
                 var target;
                 if(typeof i=='number'){
                     target=game.players[i];
