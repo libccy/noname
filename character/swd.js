@@ -1,7 +1,7 @@
 'use strict';
 character.swd={
 	character:{
-		swd_huzhongxian:['male','wu',3,['daofa','xielv','xiangu']],
+		swd_huzhongxian:['male','wu',3,['daofa','xielv','hujing']],
 
 		swd_anka:['male','qun',3,['songci','anlianying']],
 		swd_septem:['male','qun',4,['jiying','liaoyuan','yishan']],
@@ -217,6 +217,26 @@ character.swd={
 		swd_luchengxuan:['swd_xiarou'],
 	},
 	skill:{
+		hujing:{
+			trigger:{player:'phaseBegin'},
+			forced:true,
+			filter:function(event,player){
+				return get.cardPile('lianyaohu')?true:false;
+			},
+			content:function(){
+				var card=get.cardPile('lianyaohu');
+				if(card){
+					player.equip(card);
+					player.$gain2(card);
+					game.delayx();
+				}
+			},
+			mod:{
+				maxHandcard:function(player,num){
+					if(player.getEquip('lianyaohu')) return num+2;
+				}
+			},
+		},
 		gaizao:{
 			trigger:{player:'useCardToBegin'},
 			filter:function(event,player){
@@ -9047,6 +9067,8 @@ character.swd={
 		jikong_info_alter:'准备阶段，你可以指定一名角色视为对其使用一张雷杀',
 		xiangu:'仙骨',
 		xiangu_info:'锁定技，你的手牌上限不会因体力值的减少而减少。',
+		hujing:'壶境',
+		hujing_info:'锁定技，准备阶段，若牌堆或弃牌堆中有炼妖壶，你装备之；当你的装备区内有炼妖壶时，你的手牌上限+2',
 		yiesheng:'回雪',
 		yiesheng_info:'出牌阶段，你可以弃置任意数量的黑色手牌，然后摸等量的牌。',
 		huajian:'化剑',
