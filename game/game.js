@@ -31100,7 +31100,8 @@
                         li2.lastChild.appendChild(span6_br);
 
                         var span5=ui.create.div('','图片素材');
-                        span5.style.fontSize='small';
+						span5.style.fontSize='small';
+                        span5.style.lineHeight='16px';
                         li2.lastChild.appendChild(span5);
                         var span5_check=document.createElement('input');
                         span5_check.type='checkbox';
@@ -31117,6 +31118,7 @@
 
                         var span4=ui.create.div('','字体素材');
                         span4.style.fontSize='small';
+                        span4.style.lineHeight='16px';
                         li2.lastChild.appendChild(span4);
                         var span4_check=document.createElement('input');
                         span4_check.type='checkbox';
@@ -31133,6 +31135,7 @@
 
                         var span3=ui.create.div('','音效素材');
                         span3.style.fontSize='small';
+                        span3.style.lineHeight='16px';
                         li2.lastChild.appendChild(span3);
                         var span3_check=document.createElement('input');
                         span3_check.type='checkbox';
@@ -31149,6 +31152,7 @@
 
                         var span2=ui.create.div('','皮肤素材');
                         span2.style.fontSize='small';
+                        span2.style.lineHeight='16px';
                         li2.lastChild.appendChild(span2);
                         var span2_check=document.createElement('input');
                         span2_check.type='checkbox';
@@ -31165,6 +31169,7 @@
 
                         var span6=ui.create.div('','图片素材（完整）');
                         span6.style.fontSize='small';
+                        span6.style.lineHeight='16px';
                         li2.lastChild.appendChild(span6);
                         var span6_check=document.createElement('input');
                         span6_check.type='checkbox';
