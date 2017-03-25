@@ -9,6 +9,7 @@ card.guozhan={
 			subtype:'equip1',
 			nomod:true,
 			nopower:true,
+            unique:true,
 			distance:{attackFrom:-1},
 			skills:['feilongduofeng','feilongduofeng2'],
 			ai:{
@@ -30,6 +31,7 @@ card.guozhan={
 			subtype:'equip2',
 			nomod:true,
 			nopower:true,
+            unique:true,
 			skills:['taipingyaoshu'],
 			ai:{
 				equipValue:function(card,player){

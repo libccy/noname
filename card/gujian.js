@@ -398,6 +398,7 @@ card.gujian={
             subtype:'equip5',
             nopower:true,
             nomod:true,
+            unique:true,
             skills:['yuheng_skill'],
             ai:{
                 equipValue:function(card,player){
@@ -413,6 +414,7 @@ card.gujian={
             type:'equip',
             subtype:'equip5',
             nopower:true,
+            unique:true,
             nomod:true,
             epic:true,
             cardimage:'yuheng',
@@ -431,6 +433,7 @@ card.gujian={
             type:'equip',
             subtype:'equip5',
             nopower:true,
+            unique:true,
             nomod:true,
             legend:true,
             cardimage:'yuheng',
@@ -1611,7 +1614,7 @@ card.gujian={
         yuheng_skill:'玉衡',
         yuheng_plus_skill:'玉衡',
         yuheng_pro_skill:'玉衡',
-        yuheng_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的一张手牌并展示，若为黑桃牌，该角色也失去一点体力（此牌不可被复制或被其它牌强化；此牌在本局游戏中第三次和第七次发动效果后，分别获得一次强化）',
+        yuheng_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的一张手牌并展示，若为黑桃牌，该角色也失去一点体力（此牌在本局游戏中第三次和第七次发动效果后，分别自动获得一次强化）',
         yuheng_plus_info:'由普通玉衡强化得到，将玉衡技能描述中的“黑桃牌”改为“黑色牌”',
         yuheng_pro_info:'由普通玉衡二次强化得到，将玉横技能描述中的“黑桃牌”改为“黑色牌”，并去掉使用次数限制',
         yuheng_skill_info:'出牌阶段限一次，你可以失去一点体力，然后获得一名其他角色的手牌并展示，若为黑桃牌，该角色也失去一点体力',

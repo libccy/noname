@@ -1098,10 +1098,14 @@ character.hearth={
 					frequent:true,
 					usable:1,
 					filter:function(event){
-						return event.target.num('e')>0;
+						return event.target.num('e',function(card){
+							return !get.info(card).unique;
+						})>0;
 					},
 					content:function(){
-						player.gain(game.createCard(trigger.target.get('e').randomGet()),'draw');
+						player.gain(game.createCard(trigger.target.get('e',function(card){
+							return !get.info(card).unique;
+						}).randomGet()),'draw');
 					}
 				}
 			}
@@ -2184,7 +2188,7 @@ character.hearth={
 			filter:function(event,player){
 				return event.targets&&event.targets.length==1&&
 				event.target!=event.player&&_status.currentPhase==event.player&&
-				!event.player.hasSkill('yiwen2');
+				!event.player.hasSkill('yiwen2')&&!get.info(event.card).unique;
 			},
 			forced:true,
 			content:function(){
@@ -2892,12 +2896,16 @@ character.hearth={
 				if(event.parent.parent.name=='phaseDraw') return false;
 				if(event.parent.name=='fenlie') return false;
 				if(!event.cards) return false;
-				return true;
+				for(var i=0;i<event.cards.length;i++){
+					if(!get.info(event.cards[i]).unique) return true;
+				}
+				return false;
 			},
 			usable:2,
 			content:function(){
 				var cards=[];
 				for(var i=0;i<trigger.cards.length;i++){
+					if(get.info(trigger.cards[i]).unique) continue;
 					cards.push(game.createCard(trigger.cards[i]));
 				}
 				player.gain(cards,'draw');
@@ -3266,12 +3274,14 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('h',{type:'basic'})<player.num('h');
+				return player.hasCard(function(card){
+					return get.type(card)!='basic'&&!get.info(card).unique;
+				});
 			},
 			content:function(){
 				var hs=player.get('h');
 				for(var i=0;i<hs.length;i++){
-					if(get.type(hs[i])=='basic'){
+					if(get.type(hs[i])=='basic'||get.info(hs[i]).unique){
 						hs.splice(i--,1);
 					}
 				}
@@ -6011,7 +6021,7 @@ character.hearth={
 		lianjin:'炼金',
 		lianjin_info:'出牌阶段限两次，你可以将一张手牌永久转化为一张由三张随机牌组成的药水',
 		shouji:'收集',
-		shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机装备牌的复制；每回合限各限一次',
+		shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机非特殊装备牌的复制；每回合限各限一次',
 		guimou:'鬼谋',
 		guimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程',
 		yingxi:'影袭',
@@ -6068,7 +6078,7 @@ character.hearth={
 		tanmi:'探秘',
 		tanmi_info:'在一名其他角色的结束阶段，若你没有手牌，你可以摸两张牌并可以使用两张牌',
 		yiwen:'轶闻',
-		yiwen_info:'锁定技，每当其他角色于回合内首次使用卡牌指定你为惟一目标，你获得一张此牌的复制',
+		yiwen_info:'锁定技，每当其他角色于回合内首次使用非特殊卡牌指定你为惟一目标，你获得一张此牌的复制',
 		tanbao_old:'探宝',
 		tanbao_old_info:'出牌阶段限一次，你可以弃置三张牌，然后展示牌堆顶的三张牌，然后获得其中任意张类别不同的牌；若三张牌类别均不相同，你回复全部体力值',
 		qianghuax:'强化',
@@ -6124,7 +6134,7 @@ character.hearth={
 		hhudun:'护盾',
 		hhudun_info:'锁定技，准备阶段，若你的护甲值小于3，你获得一点护甲',
 		fenlie:'分裂',
-		fenlie_info:'锁定技，每当你于摸牌阶段外获得卡牌，你获得一张此牌的复制，每回合最多发动两次',
+		fenlie_info:'锁定技，每当你于摸牌阶段外获得非特殊卡牌，你获得一张此牌的复制，每回合最多发动两次',
 		nianfu:'粘附',
 		nianfu_info:'出牌阶段限一次，你可以指定一名其他角色，随机弃置其1~2张装备牌',
 		shixu:'时序',
@@ -6164,7 +6174,7 @@ character.hearth={
 		xjumo:'聚魔',
 		xjumo_info:'锁定技，你的手牌上限+3；若你已受伤，改为+5',
 		liehun:'裂魂',
-		liehun_info:'锁定技，结束阶段，你获得手牌中所有非基本牌的复制',
+		liehun_info:'锁定技，结束阶段，你获得手牌中所有非基本、非特殊牌的复制',
 		malymowang:'魔网',
 		malymowang2:'魔网',
 		malymowang_info:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你从3张随机锦囊中选择一张加入手牌',

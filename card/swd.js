@@ -583,6 +583,7 @@ card.swd={
 			subtype:'equip1',
 			nomod:true,
 			nopower:true,
+            unique:true,
 			skills:['xuanyuanjian','xuanyuanjian2','xuanyuanjian3'],
 			enable:function(card,player){
 				return player.hasSkill('xuanyuan')||player.hp>2;
@@ -908,7 +909,11 @@ card.swd={
 			enable:function(card,player){
 				var es=player.get('e');
 				for(var i=0;i<es.length;i++){
-					if(lib.inpile.contains(es[i].name)&&!lib.card[es[i].name].nopower) return true;
+					if(lib.inpile.contains(es[i].name)&&
+						!lib.card[es[i].name].nopower&&
+						!lib.card[es[i].name].unique){
+						return true;
+					}
 				}
 				return false;
 			},
@@ -945,7 +950,7 @@ card.swd={
 				var cards=[];
 				var time=0;
 				for(var i=0;i<es.length;i++){
-					if(!lib.inpile.contains(es[i].name)||lib.card[es[i].name].nopower){
+					if(!lib.inpile.contains(es[i].name)||lib.card[es[i].name].nopower||lib.card[es[i].name].unique){
 						es.splice(i--,1);
 					}
 				}
@@ -3928,6 +3933,7 @@ card.swd={
 				if(type=='equip'){
 					if(!lib.inpile.contains(card.name)) return false;
 					if(lib.card[card.name].nopower) return false;
+					if(lib.card[card.name].unique) return false;
 				}
 				if(ui.selected.cards.length){
 					var type2=get.type(ui.selected.cards[0]);
@@ -4051,7 +4057,11 @@ card.swd={
 				if(!player.num('h',{type:['hslingjian','jiqi']})) return false;
 				var es=player.get('he',{type:'equip'});
 				for(var i=0;i<es.length;i++){
-					if(lib.inpile.contains(es[i].name)&&!lib.card[es[i].name].nopower) return true;
+					if(lib.inpile.contains(es[i].name)&&
+						!lib.card[es[i].name].nopower&&
+						!lib.card[es[i].name].unique){
+						return true;
+					}
 				}
 				return false;
 			},
@@ -5016,7 +5026,7 @@ card.swd={
 		shouna:'收纳',
 		shouna_info:'出牌阶段限一次，你可以弃置一张手牌，并将一名其他角色的一张手牌置入炼妖壶',
 		donghuangzhong_info:'结束阶段，你可以弃置一张手牌，并选择一名角色将一张随机单体延时锦囊置入其判定区',
-		xuanyuanjian_info:'装备时获得一点护甲；每当你即将造成一次伤害，你令此伤害加一并变为雷属性，并在伤害结算后流失一点体力。任何时候，若你体力值不超过2，则立即失去轩辕剑（此牌不可被复制或强化）',
+		xuanyuanjian_info:'装备时获得一点护甲；每当你即将造成一次伤害，你令此伤害加一并变为雷属性，并在伤害结算后流失一点体力。任何时候，若你体力值不超过2，则立即失去轩辕剑',
 		pangufu_info:'锁定技，每当你造成一次伤害，受伤角色须弃置一张牌',
 		haotianta_info:'锁定技，任意一名角色进行判定前，你观看牌堆顶的2张牌，并选择一张作为判定结果，此结果不可被更改，也不能触发技能',
 		shennongding_info:'出牌阶段，你可以弃置两张手牌，然后回复一点体力。每阶段限一次',

@@ -429,7 +429,7 @@ character.gujian={
 				var num=0;
 				for(var i=0;i<he.length;i++){
 					var info=lib.card[he[i].name];
-					if(info.type=='equip'&&!info.nomod&&lib.inpile.contains(he[i].name)){
+					if(info.type=='equip'&&!info.nomod&&!info.unique&&lib.inpile.contains(he[i].name)){
 						num++;
 						if(num>=2) return true;
 					}
@@ -437,7 +437,7 @@ character.gujian={
 			},
 			filterCard:function(card){
 				var info=get.info(card);
-				return info.type=='equip'&&!info.nomod&&lib.inpile.contains(card.name);
+				return info.type=='equip'&&!info.nomod&&!info.unique&&lib.inpile.contains(card.name);
 			},
 			selectCard:2,
 			position:'he',
@@ -1657,7 +1657,7 @@ character.gujian={
 		shahun_info_alter:'限定技，濒死阶段，你可以复原武将牌，弃置所有牌并摸三张牌，然后将体力回复至1；若如此做，你失去技能【反噬】，获得技能【绝境】，并于两回合后立即死亡',
 
 		yanjia:'偃甲',
-		yanjia_info:'出牌阶段，你可以将两张装备牌合成为一张强化装备',
+		yanjia_info:'出牌阶段，你可以将两张非特殊装备牌合成为一张强化装备',
 		xiuhua:'袖花',
 		xiuhua_info:'每当一件其他角色的装备因被替换或弃置进入弃牌堆，你可以获得之',
 		liuying:'流影',

@@ -2684,7 +2684,9 @@ character.yxs={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('e')>0;
+				return player!=target&&target.num('e',function(card){
+					return !get.info(card).unique;
+				});
 			},
 			check:function(card){
 				return 6-ai.get.value(card);
@@ -2698,7 +2700,11 @@ character.yxs={
 			lose:false,
 			content:function(){
 				'step 0'
-				player.choosePlayerCard(target,'e',true).ai=ai.get.buttonValue;
+				var next=player.choosePlayerCard(target,'e',true);
+				next.ai=ai.get.buttonValue;
+				next.filterButton=function(button){
+					return !get.info(button.link).unique;
+				}
 				'step 1'
 				if(result.links[0]){
 					cards[0].init([result.links[0].suit,result.links[0].number,result.links[0].name,result.links[0].nature]);
@@ -2899,7 +2905,7 @@ character.yxs={
 		guifu:'鬼斧',
 		guifu_info:'出牌阶段限一次，你可以指定一名角色装备区内的一张牌，将其弃掉，自己和对方同时摸取一张牌',
 		lshengong:'神工',
-		lshengong_info:'出牌阶段限一次，你可以选定场上任意一名角色的装备区的牌，出自己的一张手牌复制该装备，然后可以选择装备上自己或者别的角色的装备区',
+		lshengong_info:'出牌阶段限一次，你可以选定场上任意一名角色的装备区的非特殊牌，出自己的一张手牌复制该装备，然后可以选择装备上自己或者别的角色的装备区',
 		zhexian:'谪仙',
 		zhexian_info:'当你于一名其他角色的回合内首次失去牌时，你可以摸一张牌',
 		miaobi:'妙笔',
