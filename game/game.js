@@ -39347,8 +39347,16 @@
                             }
     					}
                         else{
-                            uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
+							if(lib.card[name].unique){
+								uiintro.add('<div class="text center">特殊'+get.translation(lib.card[name].type)+'牌</div>');
+							}
+                            else{
+								uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
+							}
                         }
+						if(lib.card[name].unique&&lib.card[name].type=='equip'){
+							uiintro.add('<div class="text center">专属装备</div>').style.marginTop='-5px';
+						}
                         uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
     				}
     				uiintro.add(ui.create.div('.placeholder.slim'));
