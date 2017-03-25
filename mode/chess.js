@@ -5,6 +5,9 @@ mode.chess={
 	start:function(){
 		"step 0"
 		_status.mode=get.config('chess_mode');
+		if(_status.mode=='leader'){
+			_status.mode='combat';
+		}
 		if(lib.config.test_game){
 			_status.mode='combat';
 		}

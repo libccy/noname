@@ -2554,7 +2554,7 @@ window.noname_skin_list={
     liushan:2,
     liuxie:3,
     lusu:1,
-    luxun:1,
+    luxun:2,
     lvbu:1,
     lvmeng:1,
     machao:1,

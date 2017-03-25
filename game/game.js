@@ -4474,7 +4474,7 @@
 						item:{
 							combat:'自由',
 							three:'统率',
-							leader:'君主',
+							// leader:'君主',
 						},
 						restart:true,
 						frequent:true,
