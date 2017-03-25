@@ -30434,6 +30434,11 @@
                                     ui.create.div('.caption',list[i][0],node);
                                     ui.create.div('.text.author','作者：'+list[i][1],node);
                                     ui.create.div('.text',list[i][2],node);
+									if(list[i][4]){
+										ui.create.div('.text','<span class="hrefnode">下载配音素材',node,function(){
+											ui.create.iframe(this.link);
+										}).link=list[i][4];
+									}
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild);
 									if(game.download){
 										download.listen(downloadExtension);
