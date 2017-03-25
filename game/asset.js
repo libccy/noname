@@ -2537,6 +2537,7 @@ window.noname_skin_list={
     hetaihou:2,
     huanggai:1,
     huangyueying:2,
+    huangzhong:1,
     huatuo:4,
     jiangqing:1,
     jiangwei:4,
