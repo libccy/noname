@@ -572,6 +572,9 @@ card.swd={
 			fullskin:true,
 			type:'equip',
 			subtype:'equip5',
+			nomod:true,
+			nopower:true,
+            unique:true,
 			skills:['donghuangzhong'],
 			ai:{
 				equipValue:7
@@ -606,6 +609,9 @@ card.swd={
 			type:'equip',
 			subtype:'equip1',
 			skills:['pangufu'],
+			nomod:true,
+			nopower:true,
+            unique:true,
 			distance:{attackFrom:-3},
 			ai:{
 				equipValue:8
@@ -617,6 +623,9 @@ card.swd={
 			subtype:'equip5',
 			equipDelay:false,
 			loseDelay:false,
+			nomod:true,
+			nopower:true,
+            unique:true,
 			onEquip:function(){
 				player.markSkill('lianyaohu_skill');
 			},
@@ -633,6 +642,9 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			skills:['haotianta'],
+			nomod:true,
+			nopower:true,
+            unique:true,
 			ai:{
 				equipValue:7
 			}
@@ -642,6 +654,9 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			skills:['kongxin'],
+			nomod:true,
+			nopower:true,
+            unique:true,
 			ai:{
 				equipValue:6
 			}
@@ -651,6 +666,9 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			skills:['shennongding'],
+			nomod:true,
+			nopower:true,
+            unique:true,
 			ai:{
 				equipValue:6
 			}
@@ -660,6 +678,9 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			skills:['kongdongyin'],
+			nomod:true,
+			nopower:true,
+            unique:true,
 			ai:{
 				basic:{
 					equipValue:function(card,player){
@@ -675,6 +696,9 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			skills:['kunlunjingc'],
+			nomod:true,
+			nopower:true,
+            unique:true,
 			ai:{
 				equipValue:6
 			}
@@ -684,6 +708,9 @@ card.swd={
 			type:'equip',
 			subtype:'equip5',
 			skills:['nvwashi'],
+			nomod:true,
+			nopower:true,
+            unique:true,
 			ai:{
 				equipValue:5
 			}

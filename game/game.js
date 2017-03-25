@@ -39355,7 +39355,12 @@
 							}
                         }
 						if(lib.card[name].unique&&lib.card[name].type=='equip'){
-							uiintro.add('<div class="text center">专属装备</div>').style.marginTop='-5px';
+							if(lib.cardPile.guozhan&&lib.cardPack.guozhan.contains(name)){
+								uiintro.add('<div class="text center">专属装备</div>').style.marginTop='-5px';
+							}
+							else{
+								uiintro.add('<div class="text center">特殊装备</div>').style.marginTop='-5px';
+							}
 						}
                         uiintro._place_text=uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_info']+'</div>');
     				}
