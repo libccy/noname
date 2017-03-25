@@ -5959,9 +5959,6 @@
                             require('electron').remote.getCurrentWindow().toggleDevTools();
                         }
                     };
-                    if(ui.updateUpdate){
-                        ui.updateUpdate();
-                    }
                     game.download=function(url,folder,onsuccess,onerror,dev){
                         if(url.indexOf('http')!=0){
                             url=get.url(dev)+url;
@@ -6027,6 +6024,9 @@
 						};
 						createDirectory();
 					};
+                    if(ui.updateUpdate){
+                        ui.updateUpdate();
+                    }
                 }
 				lib.cardSelectObserver=new MutationObserver(function(mutations){
 					for(var i=0;i<mutations.length;i++){
@@ -6101,9 +6101,6 @@
 								}
 							});
 						}
-						if(ui.updateUpdate){
-	                        ui.updateUpdate();
-	                    }
 						game.download=function(url,folder,onsuccess,onerror,dev){
                             if(url.indexOf('http')!=0){
                                 url=get.url(dev)+url;
@@ -6151,6 +6148,9 @@
 								createDirectory();
 							});
 						}
+						if(ui.updateUpdate){
+	                        ui.updateUpdate();
+	                    }
 					}
 				}
                 if(!lib.config.touchscreen){
