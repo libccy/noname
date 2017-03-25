@@ -1,11 +1,11 @@
 window.noname_update={
-    version:'1.9.14',
-    // update:'1.9.13.1',
+    version:'1.9.14.1',
+    update:'1.9.14',
     changeLog:[
-        '下载扩展',
+        'bug修复',
     ],
     files:[
-        // 'game/game.js',
+        'game/game.js',
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',
@@ -20,6 +20,7 @@ window.noname_update={
         // 'mode/guozhan.js',
         // 'mode/identity.js',
         // 'mode/stone.js',
+        'mode/tafang.js',
         // 'theme/woodden/style.css',
         // 'layout/default/layout.css',
         // 'layout/default/phone.css',
@@ -29,7 +30,7 @@ window.noname_update={
         // 'layout/long2/layout.css',
         // 'layout/mobile/layout.css',
         // 'layout/newlayout/global.css',
-        // 'layout/mode/chess.css',
+        'layout/mode/chess.css',
         // 'extension/boss/extension.js',
     ]
 }

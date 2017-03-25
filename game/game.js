@@ -5963,6 +5963,7 @@
                         ui.updatep1.style.display='';
 						ui.updatep2.style.display='';
                         ui.updatep3.style.display='';
+						ui.updatep4.innerHTML='更新';
                     }
                     game.download=function(url,folder,onsuccess,onerror,dev){
                         if(url.indexOf('http')!=0){
@@ -6107,6 +6108,7 @@
                             ui.updatep1.style.display='';
 							ui.updatep2.style.display='';
                             ui.updatep3.style.display='';
+							ui.updatep4.innerHTML='更新';
                         }
 						game.download=function(url,folder,onsuccess,onerror,dev){
                             if(url.indexOf('http')!=0){
@@ -30364,14 +30366,10 @@
 								game.download(encodeURI(url),this.info[0]+'.zip',function(){
 									if(window.resolveLocalFileSystemURL){
 										window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
-											game.print(entry);
 											entry.getFile(that.info[0]+'.zip',{},function(fileEntry){
-												game.print(fileEntry);
 												fileEntry.file(function(fileToLoad){
-													game.print(123);
 													var fileReader = new FileReader();
 													fileReader.onload = function(e){
-														game.print(456);
 														importExtensionf(e.target.result,fileEntry);
 													};
 													fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
@@ -30426,7 +30424,7 @@
 									var info=list[i];
 									var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
                                     ui.create.div('.caption',list[i][0],node);
-                                    ui.create.div('.text.author','作者：'+list[i][1]);
+                                    ui.create.div('.text.author','作者：'+list[i][1],node);
                                     ui.create.div('.text',list[i][2],node);
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild);
 									if(game.download){
@@ -30583,10 +30581,12 @@
                         ui.updatep1=li1.querySelector('p');
 						ui.updatep2=li2;
                         ui.updatep3=li3;
+						ui.updatep4=node;
                         if(!game.download){
                             ui.updatep1.style.display='none';
 							ui.updatep2.style.display='none';
-                            ui.updatep3.style.display='none';
+							ui.updatep3.style.display='none';
+                            ui.updatep4.innerHTML='关于';
                         }
     					var button1,button2,button3,button4,button5;
 
@@ -30994,11 +30994,11 @@
 								}
 							});
 						};
-                        li3.lastChild.appendChild(button4);
+                        // li3.lastChild.appendChild(button4);
 
 						var button6=document.createElement('button');
     					button6.innerHTML='设为国内镜像';
-                        button6.style.marginLeft='5px';
+                        // button6.style.marginLeft='5px';
     					button6.onclick=function(){
 							game.saveConfig('updateURL',lib.updateURL2);
 							button5.style.display='';
@@ -31008,7 +31008,7 @@
                         li3.lastChild.appendChild(button6);
 
 						button5=document.createElement('button');
-    					button5.innerHTML='恢复默认地址';
+    					button5.innerHTML='设为默认镜像';
                         button5.style.marginLeft='5px';
     					button5.onclick=function(){
 							game.saveConfig('updateURL');
@@ -31036,26 +31036,36 @@
                             this.classList.toggle('on');
                             if(!this.classList.contains('on')){
                                 span2.style.display='none';
+								br1.style.display='none';
                                 span2_check.style.display='none';
                                 span3.style.display='none';
+								br2.style.display='none';
                                 span3_check.style.display='none';
                                 span4.style.display='none';
+								br3.style.display='none';
                                 span4_check.style.display='none';
                                 span5.style.display='none';
+								br4.style.display='none';
                                 span5_check.style.display='none';
                                 span6.style.display='none';
+								br5.style.display='none';
                                 span6_check.style.display='none';
                             }
                             else{
-                                span2.style.display='';
+								span2.style.display='';
+                                br1.style.display='';
                                 span2_check.style.display='';
-                                span3.style.display='';
+								span3.style.display='';
+                                br2.style.display='';
                                 span3_check.style.display='';
-                                span4.style.display='';
+								span4.style.display='';
+                                br3.style.display='';
                                 span4_check.style.display='';
-                                span5.style.display='';
+								span5.style.display='';
+                                br4.style.display='';
                                 span5_check.style.display='';
-                                span6.style.display='';
+								span6.style.display='';
+                                br5.style.display='';
                                 span6_check.style.display='';
                             }
                         })

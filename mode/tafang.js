@@ -246,7 +246,8 @@ mode.tafang={
 		ui.chessinfo=ui.create.div('.fakeme.player',ui.me,function(e){
 			e.stopPropagation();
 		});
-		lib.setScroll(ui.chessinfo);
+		ui.create.div(ui.chessinfo);
+		lib.setScroll(ui.chessinfo.firstChild);
 
 		game.arrangePlayers();
 		"step 4"
