@@ -5263,10 +5263,21 @@
         			this.style.backgroundImage='url("'+lib.assetURL+img+'")';
         		},
         		HTMLDivElement.prototype.listen=function(func){
-        			this.addEventListener(lib.config.touchscreen?'touchend':'click',function(e){
-        				if(_status.dragged) return;
-        				func.call(this,e);
-        			})
+					if(lib.config.touchscreen){
+						this.addEventListener('touchend',function(e){
+							if(!_status.dragged){
+								func.call(this,e);
+							}
+						});
+						this.addEventListener('click',function(e){
+							if(!_status.touchconfirmed){
+								func.call(this,e);
+							}
+						});
+					}
+					else{
+						this.addEventListener('click',func);
+					}
         			return this;
         		};
 				HTMLDivElement.prototype.listenTransition=function(func,time){
@@ -6148,15 +6159,16 @@
 				}
                 if(!lib.config.touchscreen){
                     document.addEventListener('mousewheel',ui.click.windowmousewheel,{passive:true});
-        			document.onmousemove=ui.click.windowmousemove;
-        			document.onmousedown=ui.click.windowmousedown;
-        			document.onmouseup=ui.click.windowmouseup;
-        			document.oncontextmenu=ui.click.right;
+        			document.addEventListener('mousemove',ui.click.windowmousemove);
+        			document.addEventListener('mousedown',ui.click.windowmousedown);
+        			document.addEventListener('mouseup',ui.click.windowmouseup);
+        			document.addEventListener('contextmenu',ui.click.right);
         		}
         		else{
-        			document.ontouchstart=ui.click.windowtouchstart;
-        			document.ontouchend=ui.click.windowtouchend;
-        			document.ontouchmove=ui.click.windowtouchmove;
+					document.addEventListener('touchstart',ui.click.touchconfirm);
+        			document.addEventListener('touchstart',ui.click.windowtouchstart);
+        			document.addEventListener('touchend',ui.click.windowtouchend);
+        			document.addEventListener('touchmove',ui.click.windowtouchmove);
         		}
                 if(!lib.device&&!lib.node){
                     window.onbeforeunload=function(){
@@ -33430,10 +33442,7 @@
 				var node=ui.create.div(right?ui.system2:ui.system1);
 				node.innerHTML=str;
 				if(func){
-					node.addEventListener(lib.config.touchscreen?'touchend':'click',function(e){
-						if(_status.dragged) return;
-						func.call(this,e);
-					});
+					node.listen(func);
 				}
 				if(lib.config.button_press){
 					node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(e){
@@ -34659,6 +34668,10 @@
 			dieswap2:function(){
 				if(_status.dragged) return;
 				game.swapPlayer(this.link);
+			},
+			touchconfirm:function(){
+				_status.touchconfirmed=true;
+				document.removeEventListener('touchstart',ui.click.touchconfirm);
 			},
 			windowtouchstart:function(e){
 				if(window.inSplash) return;
