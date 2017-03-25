@@ -1,5 +1,5 @@
 window.noname_update={
-    version:'1.9.14.1',
+    version:'1.9.14.2',
     update:'1.9.14',
     changeLog:[
         'bug修复',
@@ -9,7 +9,7 @@ window.noname_update={
         // 'game/package.js',
         // 'game/config.js',
         // 'game/source.js',
-        // 'game/asset.js',
+        'game/asset.js',
         // 'card/*',
         // 'card/guozhan.js',
         // 'character/*',
