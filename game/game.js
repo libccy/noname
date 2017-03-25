@@ -30978,7 +30978,7 @@
 							updatepx.style.whiteSpace='nowrap';
 							updatepx.style.marginTop='8px';
 							var buttonx=ui.create.node('button','访问GitHub',function(){
-								ui.create.iframe('https://github.com/libccy/noname');
+								window.open('https://github.com/libccy/noname');
 							});
 							updatepx.appendChild(buttonx);
 							ui.updateUpdate=function(){
