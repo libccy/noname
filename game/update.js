@@ -28,7 +28,7 @@ window.noname_update={
         // 'theme/style/cardback/*',
         // 'layout/long/layout.css',
         // 'layout/long2/layout.css',
-        // 'layout/mobile/layout.css',
+        'layout/mobile/layout.css',
         // 'layout/newlayout/global.css',
         'layout/mode/chess.css',
         // 'extension/boss/extension.js',

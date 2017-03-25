@@ -16,6 +16,9 @@
 #historybar{
     height: calc(95% - 160px);
 }
+#window.oblongcard #historybar{
+    height: calc(95% - 180px);
+}
 #control{
     width: calc(5000% / 47 - 240px);
     left:calc(-150% / 47 + 120px);

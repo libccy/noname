@@ -2154,9 +2154,11 @@
                             game.saveConfig('cardshape',item);
                             if(item=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2')){
                                 ui.arena.classList.add('oblongcard');
+								ui.window.classList.add('oblongcard');
                             }
                             else{
                                 ui.arena.classList.remove('oblongcard');
+								ui.window.classList.remove('oblongcard');
                             }
                             if(linked){
                                 if(get.is.linked2(game.me)){
@@ -7047,9 +7049,11 @@
 					}
                     if(lib.config.cardshape=='oblong'&&(game.layout=='long'||game.layout=='mobile'||game.layout=='long2')){
                         ui.arena.classList.add('oblongcard');
+						ui.window.classList.add('oblongcard');
                     }
                     else{
                         ui.arena.classList.remove('oblongcard');
+						ui.window.classList.remove('oblongcard');
                     }
                     if(lib.config.textequip=='text'&&(game.layout=='long'||game.layout=='mobile')){
                         ui.arena.classList.add('textequip');
