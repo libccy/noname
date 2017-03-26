@@ -371,6 +371,12 @@
 						else{
 							map.touchscreen.hide();
 						}
+						if(lib.device){
+							map.enable_vibrate.show();
+						}
+						else{
+							map.enable_vibrate.hide();
+						}
 						if(lib.config.touchscreen){
 							map.mousewheel.hide();
 							map.hover_all.hide();
@@ -2369,6 +2375,27 @@
 						else{
 							map.show_handcardbutton.hide();
 						}
+						if(lib.device){
+							if(lib.device=='android'){
+								map.show_statusbar_android.show();
+								map.show_statusbar_ios.hide();
+							}
+							else if(lib.device=='ios'){
+								map.show_statusbar_ios.show();
+								map.show_statusbar_android.hide();
+							}
+							if(!game.download){
+								setTimeout(function(){
+									if(!window.StatusBar){
+										map.show_statusbar.hide();
+									}
+								},5000);
+							}
+						}
+						else{
+							map.show_statusbar_ios.hide();
+							map.show_statusbar_android.hide();
+						}
 						if(get.is.phoneLayout()){
                             map.remember_round_button.show();
                             map.reset_round_button.show();
@@ -2497,7 +2524,7 @@
                     show_time2:{
 						name:'显示时间',
 						intro:'在触屏按钮处显示当前时间',
-						init:true,
+						init:false,
 						unfrequent:true,
 						onclick:function(bool){
 							game.saveConfig('show_time2',bool);
@@ -2522,6 +2549,56 @@
                             ui.roundmenu.dataset.watchface=item;
                         }
                     },
+					show_statusbar_android:{
+						name:'显示状态栏',
+						init:false,
+						unfrequent:true,
+						content:function(bool){
+							game.saveConfig('show_statusbar',bool);
+							if(window.StatusBar&&lib.device=='android'){
+								if(bool){
+									window.StatusBar.overlaysWebView(false);
+									window.StatusBar.backgroundColorByName('black');
+									window.StatusBar.show();
+								}
+								else{
+									ui.window.classList.remove('statusbar');
+									window.StatusBar.hide();
+								}
+							}
+						}
+					},
+					show_statusbar_ios:{
+						name:'显示状态栏',
+						init:'off',
+						unfrequent:true,
+						item:{
+							default:'默认',
+							overlay:'嵌入',
+							off:'关闭'
+						},
+						onclick:function(bool){
+							game.saveConfig('show_statusbar_ios',bool);
+							if(window.StatusBar&&lib.device=='ios'){
+								if(bool!='off'){
+									if(lib.config.show_statusbar_ios=='default'){
+										window.StatusBar.overlaysWebView(false);
+										ui.window.classList.remove('statusbar');
+									}
+									else{
+										window.StatusBar.overlaysWebView(true);
+										ui.window.classList.add('statusbar');
+									}
+									window.StatusBar.backgroundColorByName('black');
+									window.StatusBar.show();
+								}
+								else{
+									ui.window.classList.remove('statusbar');
+									window.StatusBar.hide();
+								}
+							}
+						}
+					},
 					show_card_prompt:{
 						name:'显示出牌信息',
 						intro:'出牌时在使用者上显示卡牌名称',
@@ -6153,6 +6230,29 @@
 						if(ui.updateUpdate){
 	                        ui.updateUpdate();
 	                    }
+						if(window.StatusBar){
+							if(lib.device=='android'){
+								if(lib.config.show_statusbar_android){
+									window.StatusBar.overlaysWebView(false);
+									window.StatusBar.backgroundColorByName('black');
+									window.StatusBar.show();
+								}
+							}
+							else if(lib.device=='ios'){
+								if(lib.config.show_statusbar_ios!='off'){
+									if(lib.config.show_statusbar_ios=='default'){
+										window.StatusBar.overlaysWebView(false);
+										ui.window.classList.remove('statusbar');
+									}
+									else{
+										window.StatusBar.overlaysWebView(true);
+										ui.window.classList.add('statusbar');
+									}
+									window.StatusBar.backgroundColorByName('black');
+									window.StatusBar.show();
+								}
+							}
+						}
 					}
 				}
                 if(!lib.config.touchscreen){
@@ -6210,6 +6310,7 @@
                                     break;
                                 }
                             }
+							game.metaZoom=zoom;
                         }
                     }
                     game.documentZoom=1;

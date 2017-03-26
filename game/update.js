@@ -1,8 +1,8 @@
 window.noname_update={
-    version:'1.9.15',
+    version:'1.9.16',
     // update:'1.9.14',
     changeLog:[
-        'bug修复',
+        '状态栏选项（需更新ios/android客户端）',
     ],
     files:[
         'game/game.js',
@@ -22,8 +22,8 @@ window.noname_update={
         // 'mode/tafang.js',
         'mode/stone.js',
         // 'theme/woodden/style.css',
-        // 'layout/default/layout.css',
-        // 'layout/default/phone.css',
+        'layout/default/layout.css',
+        'layout/default/phone.css',
         // 'layout/default/menu.css',
         // 'theme/style/cardback/*',
         // 'layout/long/layout.css',
