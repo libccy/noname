@@ -5643,6 +5643,17 @@
                     }
         		};
         		window.onload=function(){
+					if(lib.device){
+						var script=document.createElement('script');
+						script.src='cordova.js';
+						document.body.appendChild(script);
+						document.addEventListener('deviceready',function(){
+							if(lib.init.cordovaReady){
+								lib.init.cordovaReady();
+								delete lib.init.cordovaReady;
+							}
+						});
+					}
         			if(_status.packLoaded){
         				delete _status.packLoaded;
         				lib.init.onload();
@@ -6428,17 +6439,6 @@
                 }
 			},
 			onload:function(){
-				if(lib.device){
-					var script=document.createElement('script');
-					script.src='cordova.js';
-					document.body.appendChild(script);
-					document.addEventListener('deviceready',function(){
-						if(lib.init.cordovaReady){
-							lib.init.cordovaReady();
-							delete lib.init.cordovaReady;
-						}
-					});
-				}
                 if(navigator.userAgent.toLowerCase().indexOf('crosswalk')!=-1){
                     lib.crosswalk=true;
                 }
@@ -20362,16 +20362,29 @@
             }
             download();
         },
-		multiDownload:function(list){
+		multiDownload:function(list,onsuccess,onerror,onfinish,process,dev){
 			var args=Array.from(arguments);
 			if(list.length<=3){
 				game.multiDownload2.apply(this,args);
 			}
 			else{
 				var num=Math.round(list.length/3);
-				args[0]=list.slice(0,num);game.multiDownload2.apply(this,args);
-				args[0]=list.slice(num,2*num);game.multiDownload2.apply(this,args);
-				args[0]=list.slice(2*num);game.multiDownload2.apply(this,args);
+				var left=3;
+				args[3]=function(){
+					left--;
+					if(left==0){
+						onfinish();
+					}
+				};
+				setTimeout(function(){
+					args[0]=list.slice(0,num);game.multiDownload2.apply(game,args);
+				});
+				setTimeout(function(){
+					args[0]=list.slice(num,2*num);game.multiDownload2.apply(this,args);
+				},200);
+				setTimeout(function(){
+					args[0]=list.slice(2*num);game.multiDownload2.apply(this,args);
+				},400);
 			}
 		},
 		fetch:function(url,onload,onerror,onprogress){
