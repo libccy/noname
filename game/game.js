@@ -6062,7 +6062,6 @@
 									var streamInterval=setInterval(function(){
 										if(stream.closed){
 											clearInterval(streamInterval);
-											onprogress(-1);
 										}
 										else{
 											onprogress(stream.bytesWritten);
@@ -30560,7 +30559,17 @@
 							var progress=ui.create.div('.button-progress',this);
 							ui.create.div(progress);
 							var url=lib.extensionURL+this.info[0]+'.zip';
+							var onprogress=function(byte,total){
+								if(total){
+									size=total;
+								}
+								if(byte==-1){
+									byte=size;
+								}
+								progress.firstChild.style.width=Math.round(100*byte/size)+'%';
+							};
 							game.fetch(url,function(data){
+								onprogress(-1);
 								if(game.importExtension(data,function(){
 									reloadnode.style.display='';
 								})!==false){
@@ -30576,15 +30585,7 @@
 							},function(){
 								that.innerHTML='下载失败';
 								that.classList.add('nopointer');
-							},function(byte,total){
-								if(total){
-									size=total;
-								}
-								if(byte==-1){
-									byte=size;
-								}
-								progress.firstChild.style.width=Math.round(100*byte/size)+'%';
-							});
+							},onprogress);
                         };
 
                         node.update=function(){
