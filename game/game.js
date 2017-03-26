@@ -6207,12 +6207,18 @@
 								}
 							});
 						}
-						game.download=function(url,folder,onsuccess,onerror,dev){
+						game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
                             if(url.indexOf('http')!=0){
                                 url=get.url(dev)+url;
                             }
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
+							game.print(typeof onprogress);
+							if(onprogress){
+								fileTransfer.onprogress=function(progressEvent){
+								    onprogress(progressEvent.loaded,progressEvent.total);
+								};
+							}
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
 						};
 						game.readFile=function(filename,callback,onerror){
@@ -20263,7 +20269,8 @@
             download();
         },
 		fetch:function(url,onload,onerror,onprogress){
-			var tmpName=get.id();
+			var tmpName='_tmp_'+get.id();
+			game.saveConfig('downloadedFile',true);
 			game.download(encodeURI(url),tmpName,function(){
 				game.readFile(tmpName,function(data){
 					onload(data);
@@ -30569,7 +30576,10 @@
 							},function(){
 								that.innerHTML='下载失败';
 								that.classList.add('nopointer');
-							},function(byte){
+							},function(byte,total){
+								if(total){
+									size=total;
+								}
 								if(byte==-1){
 									byte=size;
 								}
