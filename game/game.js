@@ -5146,11 +5146,40 @@
                         }
                     }
                     else{
-                        if(confirm('游戏似乎未正常载入，是否重置游戏？')){
-                            localStorage.clear();
-                            if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-                            window.location.reload();
-                        }
+						if(lib.device){
+							if(navigator.notification){
+								navigator.notification.confirm(
+									'游戏似乎未正常载入，是否重置游戏？',
+									 function(index){
+										 if(index==2){
+											 localStorage.removeItem('noname_inited');
+											 window.location.reload();
+										 }
+										 else if(index==3){
+											localStorage.clear();
+											localStorage.setItem('noname_inited',true);
+											if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+											window.location.reload();
+										 }
+									 },
+									'确认退出',
+									['取消','重新下载','重置设置']
+								);
+							}
+							else{
+								if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+		                            localStorage.removeItem('noname_inited');
+		                            window.location.reload();
+		                        }
+							}
+						}
+						else{
+							if(confirm('游戏似乎未正常载入，是否重置游戏？')){
+	                            localStorage.clear();
+	                            if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+	                            window.location.reload();
+	                        }
+						}
                     }
                 },5000);
                 var links=document.head.querySelectorAll('link');
@@ -6045,7 +6074,6 @@
                         if(url.indexOf('http')!=0){
                             url=get.url(dev)+url;
                         }
-						game.saveConfig('downloadedFile',true);
 						game.ensureDirectory(folder,function(){
                             try{
                                 var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
@@ -6238,7 +6266,6 @@
                             if(url.indexOf('http')!=0){
                                 url=get.url(dev)+url;
                             }
-							game.saveConfig('downloadedFile',true);
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
 							game.print(typeof onprogress);
@@ -20349,6 +20376,7 @@
 		},
 		fetch:function(url,onload,onerror,onprogress){
 			var tmpName='~tmp'+get.id();
+			game.saveConfig('downloadedFile',true);
 			game.download(encodeURI(url),tmpName,function(){
 				game.readFile(tmpName,function(data){
 					onload(data);
