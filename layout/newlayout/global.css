@@ -500,8 +500,8 @@
 	box-shadow:black 0 0 2px;
 }
 
-#arena.low_performance .player:not([data-position='0']) .equips>.card,
-#arena.chess.low_performance .player .equips>.card{
+#window.low_performance #arena .player:not([data-position='0']) .equips>.card,
+#window.low_performance #arena.chess .player .equips>.card{
 	animation: game_start 0.5s !important;
 	-webkit-animation: game_start 0.5s !important;
 }

@@ -447,11 +447,16 @@
     left:12px !important;
 	width: calc(100% - 32px) !important;
 }
-.menu.main>.menu-content>div>.right.pane>div:not(.expanded)>.config.auto-hide,
-.menu.main>.menu-content>div>.right.pane>div>.config.hidden{
+#window:not(.low_performance) .menu.main>.menu-content>div>.right.pane>div:not(.expanded)>.config.auto-hide,
+#window:not(.low_performance) .menu.main>.menu-content>div>.right.pane>div>.config.hidden{
 	margin-top:-25px;
 	opacity:0;
 	z-index:-1;
+}
+#window.low_performance .menu.main>.menu-content>div>.right.pane>div:not(.expanded)>.config.auto-hide,
+#window.low_performance .menu.main>.menu-content>div>.right.pane>div>.config.hidden{
+	display: none;
+	transition-property: transform;
 }
 .menu.main>.menu-content>div>.menubutton.round{
 	left:335px;

@@ -90,10 +90,10 @@
 						onclick:function(bool){
 							game.saveConfig('low_performance',bool);
 							if(bool){
-								ui.arena.classList.add('low_performance');
+								ui.window.classList.add('low_performance');
 							}
 							else{
-								ui.arena.classList.remove('low_performance');
+								ui.window.classList.remove('low_performance');
 							}
 						}
 					},
@@ -5796,6 +5796,7 @@
 		                    game.saveConfig('low_performance',true);
 		                    game.saveConfig('confirm_exit',true);
 							game.saveConfig('touchscreen',true);
+							game.saveConfig('fold_mode',true);
 							if(ua.indexOf('ipad')==-1){
 								game.saveConfig('phonelayout',true);
 							}
@@ -33221,6 +33222,9 @@
                     // }
                 }
 
+				if(lib.config.low_performance){
+					ui.window.classList.add('low_performance');
+				}
 				if(game.layout=='mobile'||game.layout=='long'){
 					ui.arena.classList.add('mobile');
 				}
@@ -33229,9 +33233,6 @@
 				}
 				if(game.layout=='default'){
 					ui.arena.classList.add('oldlayout');
-				}
-				if(lib.config.low_performance){
-					ui.arena.classList.add('low_performance');
 				}
                 if(lib.config.player_border!='wide'||game.layout=='long'||game.layout=='long2'){
                     ui.arena.classList.add('slim_player');

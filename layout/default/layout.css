@@ -336,7 +336,7 @@ not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(.forceopa
 	left: 20px;
 	line-height: 18px;
 }
-#arena:not(.low_performance) #arenalog>div {
+#window:not(.low_performance) #arena #arenalog>div {
 	-webkit-animation: game_start 0.5s;
 }
 /*#arena[data-font_size='14']{
@@ -1249,8 +1249,8 @@ div:not(.handcards)>.card>.info>span,
 	height: 36px;
 	padding-top: 3px;
 }
-#arena.low_performance .player .equips,
-#arena.low_performance .player .name {
+#window.low_performance #arena .player .equips,
+#window.low_performance #arena .player .name {
 	transition: all 0s
 }
 
