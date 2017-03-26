@@ -1,8 +1,9 @@
 window.noname_update={
-    version:'1.9.16',
+    version:'1.9.16.1',
     update:'1.9.15',
     changeLog:[
         '状态栏选项（需更新ios/android客户端）',
+        'ios优化'
     ],
     files:[
         'game/game.js',

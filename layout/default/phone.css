@@ -49,7 +49,7 @@
 #system>div:not(.shown){
     transform: translateY(-80px);
 }
-#window.statusbar #system>div:not(.shown){
+.statusbar #system>div:not(.shown){
     transform: translateY(-120px);
 }
 #system>#system1{

@@ -2562,7 +2562,6 @@
 									window.StatusBar.show();
 								}
 								else{
-									ui.window.classList.remove('statusbar');
 									window.StatusBar.hide();
 								}
 							}
@@ -2583,17 +2582,17 @@
 								if(bool!='off'){
 									if(lib.config.show_statusbar_ios=='default'){
 										window.StatusBar.overlaysWebView(false);
-										ui.window.classList.remove('statusbar');
+										document.body.classList.remove('statusbar');
 									}
 									else{
 										window.StatusBar.overlaysWebView(true);
-										ui.window.classList.add('statusbar');
+										document.body.classList.add('statusbar');
 									}
 									window.StatusBar.backgroundColorByName('black');
 									window.StatusBar.show();
 								}
 								else{
-									ui.window.classList.remove('statusbar');
+									document.body.classList.remove('statusbar');
 									window.StatusBar.hide();
 								}
 							}
@@ -6315,8 +6314,8 @@
 							game.metaZoom=zoom;
 							var barHeight=Math.round(20/zoom);
 							lib.init.sheet(
-								'#window.statusbar{top:'+barHeight+'px;height:calc(100% - '+barHeight+'px)}',
-								'#window.statusbar::before{top:-'+barHeight+'px;height:-'+barHeight+'px)}'
+								'.statusbar #window{top:'+barHeight+'px;height:calc(100% - '+barHeight+'px)}',
+								'.statusbar #statusbg{height:'+barHeight+'px}'
 							);
                         }
                     }
@@ -33205,6 +33204,7 @@
 			arena:function(){
 				var i,j;
 				ui.window=ui.create.div('#window.hidden',document.body);
+				ui.create.div('#statusbg',document.body);
 				ui.refresh(ui.window);
 				if(!localStorage.getItem(lib.configprefix+'playback')){
 					ui.window.show();
@@ -33267,7 +33267,7 @@
                 }
 
 				if(lib.config.show_statusbar_ios=='overlay'){
-					ui.window.classList.add('statusbar');
+					document.body.classList.add('statusbar');
 				}
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){

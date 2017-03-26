@@ -1180,7 +1180,10 @@ input.fileinput::-webkit-file-upload-button {
 	margin-left: 5px;
 }
 .videonode.menubutton.extension>.text.author>span{
-	float: right;
+	/*float: right;*/
+	position: absolute;
+	right: 0;
+	top: 0;
 	transform: translateY(2px) scale(0.7);
 	width: 80px;
 	text-align: center;
