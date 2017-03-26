@@ -6045,6 +6045,7 @@
                         if(url.indexOf('http')!=0){
                             url=get.url(dev)+url;
                         }
+						game.saveConfig('downloadedFile',true);
 						game.ensureDirectory(folder,function(){
                             try{
                                 var file = lib.node.fs.createWriteStream(__dirname+'/'+folder);
@@ -6083,6 +6084,23 @@
 					};
 					game.removeFile=function(filename,callback){
 						lib.node.fs.unlink(__dirname+'/'+filename);
+					};
+					game.getFileList=function(dir,callback){
+						var files=[],folders=[];
+						dir=__dirname+'/'+dir;
+						lib.node.fs.readdir(dir,function(err,filelist){
+							for(var i=0;i<filelist.length;i++){
+								if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
+									if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
+										folders.push(filelist[i]);
+									}
+									else{
+										files.push(filelist[i]);
+									}
+								}
+							}
+							callback(folders,files);
+						});
 					};
 					game.ensureDirectory=function(list,callback,file){
 						var directorylist;
@@ -6132,6 +6150,16 @@
                     if(ui.updateUpdate){
                         ui.updateUpdate();
                     }
+					if(lib.config.downloadedFile){
+						game.saveConfig('downloadedFile');
+						game.getFileList('',function(folders,files){
+							for(var i=0;i<files.length;i++){
+								if(files[i].indexOf('~tmp')==0){
+									game.removeFile(files[i]);
+								}
+							}
+						});
+					}
                 }
 				lib.cardSelectObserver=new MutationObserver(function(mutations){
 					for(var i=0;i<mutations.length;i++){
@@ -6210,6 +6238,7 @@
                             if(url.indexOf('http')!=0){
                                 url=get.url(dev)+url;
                             }
+							game.saveConfig('downloadedFile',true);
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
 							game.print(typeof onprogress);
@@ -6242,6 +6271,34 @@
 									}
 								});
 							});
+						};
+						game.getFileList=function(dir,callback){
+							var files=[],folders=[];
+							window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
+								var dirReader=entry.createReader();
+								var entries=[];
+								var readEntries=function(){
+									dirReader.readEntries(function(results){
+										if(!results.length){
+											entries.sort();
+											for(var i=0;i<entries.length;i++){
+												if(entries[i].isDirectory){
+													folders.push(entries[i].name);
+												}
+												else{
+													files.push(entries[i].name);
+												}
+											}
+											callback(folders,files);
+										}
+										else{
+											entries=entries.concat(Array.from(results));
+											readEntries();
+										}
+									});
+								};
+								readEntries();
+                            });
 						};
 						game.ensureDirectory=function(list,callback,file){
 							var directorylist;
@@ -6305,6 +6362,17 @@
 									window.StatusBar.show();
 								}
 							}
+						}
+						if(lib.config.downloadedFile){
+							game.saveConfig('downloadedFile');
+							game.getFileList('',function(folders,files){
+								console.log(files);
+								for(var i=0;i<files.length;i++){
+									if(files[i].indexOf('~tmp')==0){
+										game.removeFile(files[i]);
+									}
+								}
+							});
 						}
 					}
 				}
@@ -20231,7 +20299,7 @@
 				downloadLink.click();
 			}
 		},
-        multiDownload:function(list,onsuccess,onerror,onfinish,process,dev){
+        multiDownload2:function(list,onsuccess,onerror,onfinish,process,dev){
             list=list.slice(0);
             if(lib.config.dev) game.print(get.url());
             var download=function(){
@@ -20267,9 +20335,20 @@
             }
             download();
         },
+		multiDownload:function(list){
+			var args=Array.from(arguments);
+			if(list.length<=3){
+				game.multiDownload2.apply(this,args);
+			}
+			else{
+				var num=Math.round(list.length/3);
+				args[0]=list.slice(0,num);game.multiDownload2.apply(this,args);
+				args[0]=list.slice(num,2*num);game.multiDownload2.apply(this,args);
+				args[0]=list.slice(2*num);game.multiDownload2.apply(this,args);
+			}
+		},
 		fetch:function(url,onload,onerror,onprogress){
-			var tmpName='_tmp_'+get.id();
-			game.saveConfig('downloadedFile',true);
+			var tmpName='~tmp'+get.id();
 			game.download(encodeURI(url),tmpName,function(){
 				game.readFile(tmpName,function(data){
 					onload(data);
@@ -27042,52 +27121,6 @@
                             ui.create.div('',str1,dash);
                             ui.create.div('',str2,dash);
                         };
-						var getFileList=function(dir,callback){
-							var files=[],folders=[];
-							if(lib.node&&lib.node.fs){
-								dir=__dirname+'/'+dir;
-								lib.node.fs.readdir(dir,function(err,filelist){
-									for(var i=0;i<filelist.length;i++){
-										if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
-											if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
-												folders.push(filelist[i]);
-											}
-											else{
-												files.push(filelist[i]);
-											}
-										}
-									}
-									callback(folders,files);
-								});
-							}
-							else{
-								window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
-									var dirReader=entry.createReader();
-									var entries=[];
-									var readEntries=function(){
-										dirReader.readEntries(function(results){
-											if(!results.length){
-												entries.sort();
-												for(var i=0;i<entries.length;i++){
-													if(entries[i].isDirectory){
-														folders.push(entries[i].name);
-													}
-													else{
-														files.push(entries[i].name);
-													}
-												}
-												callback(folders,files);
-											}
-											else{
-												entries=entries.concat(Array.from(results));
-												readEntries();
-											}
-										});
-									};
-									readEntries();
-	                            });
-							}
-						};
 						var removeFile=function(selected,page){
 							if(lib.node&&lib.node.fs){
 								var unlink=function(){
@@ -27344,7 +27377,7 @@
 							filelist.classList.add('file-container');
 							filelist.listen(clickFileList);
 							lib.setScroll(filelist);
-							getFileList(path,function(folders,files){
+							game.getFileList(path,function(folders,files){
 								var parent=path;
 								if(parent){
 									parent+='/';
@@ -35535,6 +35568,7 @@
 			},
 			windowmousedown:function(e){
 				if(window.inSplash) return;
+				if(!ui.window) return;
 				if(e.button==2) return;
 				_status.mousedown=true;
 				var dialogs=ui.window.querySelectorAll('#window>.dialog.popped:not(.static)');
