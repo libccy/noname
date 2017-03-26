@@ -181,7 +181,7 @@
 					swipe_up:{
 						name:'上划操作',
 						intro:'向上滑动时执行的操作',
-						init:'auto',
+						init:'pause',
 						unfrequent:true,
 						item:{
 							system:'显示按钮',
@@ -36884,11 +36884,20 @@
 				this.startX=e.touches[0].clientX/game.documentZoom;
 				this.startY=e.touches[0].clientY/game.documentZoom;
 				_status.dragged=false;
+				if(lib.device=='ios'){
+					var startY=e.touches[0].pageY;
+					var startTopScroll=this.scrollTop;
+
+					if(startTopScroll<=0){
+						this.scrollTop=1;
+					}
+					else if(startTopScroll&&startTopScroll+this.offsetHeight>=this.scrollHeight){
+						this.scrollTop=this.scrollHeight-this.offsetHeight-1;
+					}
+				}
 			},
 			dialogtouchStart:function(e){
-				this.startX=e.touches[0].clientX/game.documentZoom;
-				this.startY=e.touches[0].clientY/game.documentZoom;
-				_status.dragged=false;
+				ui.click.touchStart.call(this,e);
 				_status.dialogtouched=true;
 			},
 			touchScroll:function(e) {
@@ -36900,13 +36909,18 @@
 						_status.dragged=true;
 					}
 				}
-				if(this.scrollWidth<=this.offsetWidth+5&&
-					this.scrollHeight<=this.offsetHeight+5){
+				if((this==ui.handcards1Container||this==ui.handcards2Container)&&!this.classList.contains('scrollh')){
 					e.preventDefault();
 				}
 				else{
-					delete _status._swipeorigin;
-					e.stopPropagation();
+					if(this.scrollWidth<=this.offsetWidth+5&&
+						this.scrollHeight<=this.offsetHeight+5){
+						e.preventDefault();
+					}
+					else{
+						delete _status._swipeorigin;
+						e.stopPropagation();
+					}
 				}
 			},
             autoskill:function(bool,node){
@@ -37174,7 +37188,7 @@
 			}
 			else{
 				offset1=Math.min(112,(ui.handcards1Container.offsetWidth-128)/(hs1.length-1));
-				if(offset1<32){
+				if(hs1.length>1&&offset1<32){
 					offset1=32;
 					ui.handcards1Container.classList.add('scrollh');
 				}
@@ -37211,7 +37225,7 @@
 			}
 			else{
 				offset2=Math.min(112,(ui.handcards2Container.offsetWidth-128)/(hs2.length-1));
-				if(offset2<32){
+				if(hs2.length>1&&offset2<32){
 					offset2=32;
 					ui.handcards2Container.classList.add('scrollh');
 				}
