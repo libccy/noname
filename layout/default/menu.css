@@ -1220,10 +1220,19 @@ input.fileinput::-webkit-file-upload-button {
 	opacity: 1
 }
 .button-downloading>.button-progress{
-	width: 0;
+	width: 100%;
 	border-radius: 4px;
-	background: linear-gradient(rgb(29,206,68),rgb(1,148,46));
 	z-index: 1;
+	overflow: hidden;
+}
+.button-downloading>.button-progress>div{
+	width: 0;
+	height: 100%;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	border-radius: 0px;
+	background: linear-gradient(rgb(29,206,68),rgb(1,148,46));
 }
 .button-downloading>div:not(.button-progress){
 	width: 100% !important;

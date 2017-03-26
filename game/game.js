@@ -6041,7 +6041,7 @@
                             require('electron').remote.getCurrentWindow().toggleDevTools();
                         }
                     };
-                    game.download=function(url,folder,onsuccess,onerror,dev){
+                    game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
                         if(url.indexOf('http')!=0){
                             url=get.url(dev)+url;
                         }
@@ -6058,6 +6058,17 @@
                                 var stream=response.pipe(file);
                                 stream.on('finish',onsuccess);
                                 stream.on('error',onerror);
+								if(onprogress){
+									var streamInterval=setInterval(function(){
+										if(stream.closed){
+											clearInterval(streamInterval);
+											onprogress(-1);
+										}
+										else{
+											onprogress(stream.bytesWritten);
+										}
+									},200);
+								}
                             });
                         },true);
                     };
@@ -20251,14 +20262,14 @@
             }
             download();
         },
-		fetch:function(url,onload,onerror){
+		fetch:function(url,onload,onerror,onprogress){
 			var tmpName=get.id();
 			game.download(encodeURI(url),tmpName,function(){
 				game.readFile(tmpName,function(data){
 					onload(data);
 					game.removeFile(tmpName);
 				},onerror);
-			},onerror);
+			},onerror,null,onprogress);
 		},
 		playVideo:function(time,mode){
 			if(!_status.replayvideo){
@@ -30526,16 +30537,29 @@
                             node.updated=true;
                             var that=this;
                             var list=[];
+							var size=parseFloat(this.info[4])||0;
+							if(size){
+								if(this.info[4].indexOf('MB')!=-1){
+									size*=1024*1024;
+								}
+								else if(this.info[4].indexOf('KB')!=-1){
+									size*=1024;
+								}
+							}
 
-							this.innerHTML='正在下载';
+							this.innerHTML='<span>正在下载</span><div>正在下载</div>';
 							this.classList.add('nopointer');
+                            this.classList.add('button-downloading');
+							var progress=ui.create.div('.button-progress',this);
+							ui.create.div(progress);
 							var url=lib.extensionURL+this.info[0]+'.zip';
 							game.fetch(url,function(data){
 								if(game.importExtension(data,function(){
 									reloadnode.style.display='';
 								})!==false){
 									game.saveConfig('extension_'+that.info[0]+'_version',that.info[3]);
-									that.innerHTML='安装成功';
+									that.childNodes[0].innerHTML='安装成功';
+									that.childNodes[1].innerHTML='安装成功';
 								}
 								else{
 									that.innerHTML='安装失败';
@@ -30545,6 +30569,11 @@
 							},function(){
 								that.innerHTML='下载失败';
 								that.classList.add('nopointer');
+							},function(byte){
+								if(byte==-1){
+									byte=size;
+								}
+								progress.firstChild.style.width=Math.round(100*byte/size)+'%';
 							});
                         };
 
