@@ -21,7 +21,7 @@ window.noname_update={
         // 'mode/chess.js',
         // 'mode/tafang.js',
         'mode/stone.js',
-        // 'theme/woodden/style.css',
+        'theme/music/style.css',
         'layout/default/layout.css',
         'layout/default/phone.css',
         'layout/default/menu.css',

@@ -5796,9 +5796,12 @@
 		                    game.saveConfig('low_performance',true);
 		                    game.saveConfig('confirm_exit',true);
 							game.saveConfig('touchscreen',true);
-							game.saveConfig('fold_mode',true);
+							game.saveConfig('fold_mode',false);
 							if(ua.indexOf('ipad')==-1){
 								game.saveConfig('phonelayout',true);
+							}
+							else if(lib.device=='ios'){
+								game.saveConfig('show_statusbar_ios','overlay');
 							}
 						}
 						else if(confirm('是否切换到触屏模式？（触屏模式可提高触屏设备的响应速度，但无法使用鼠标）')){
@@ -6243,11 +6246,9 @@
 								if(lib.config.show_statusbar_ios!='off'){
 									if(lib.config.show_statusbar_ios=='default'){
 										window.StatusBar.overlaysWebView(false);
-										ui.window.classList.remove('statusbar');
 									}
 									else{
 										window.StatusBar.overlaysWebView(true);
-										ui.window.classList.add('statusbar');
 									}
 									window.StatusBar.backgroundColorByName('black');
 									window.StatusBar.show();
@@ -6312,6 +6313,11 @@
                                 }
                             }
 							game.metaZoom=zoom;
+							var barHeight=Math.round(20/zoom);
+							lib.init.sheet(
+								'#window.statusbar{top:'+barHeight+'px;height:calc(100% - '+barHeight+'px)}',
+								'#window.statusbar::before{top:-'+barHeight+'px;height:-'+barHeight+'px)}'
+							);
                         }
                     }
                     game.documentZoom=1;
@@ -33259,6 +33265,10 @@
 				if(lib.config.blur_ui){
                     ui.window.classList.add('blur_ui');
                 }
+
+				if(lib.config.show_statusbar_ios=='overlay'){
+					ui.window.classList.add('statusbar');
+				}
 				// var themeentry='background_color_'+lib.config.theme;
 				// if(lib.config[themeentry]){
 				// 	document.body.dataset[themeentry]=lib.config[themeentry];
