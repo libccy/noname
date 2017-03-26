@@ -1,6 +1,6 @@
 window.noname_update={
     version:'1.9.16',
-    // update:'1.9.14',
+    update:'1.9.15',
     changeLog:[
         '状态栏选项（需更新ios/android客户端）',
     ],

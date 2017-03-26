@@ -21364,6 +21364,19 @@
                 navigator.app.exitApp();
             }
         },
+		open:function(url){
+			if(lib.device){
+				if(cordova.InAppBrowser){
+					cordova.InAppBrowser.open(url,'_system');
+				}
+				else{
+					ui.create.iframe(url);
+				}
+			}
+			else{
+				window.open(url);
+			}
+		},
 		reloadCurrent:function(){
 			game.saveConfig('continue_name',[game.me.name1||game.me.name,game.me.name2]);
 			game.saveConfig('mode',lib.config.mode);
@@ -25510,8 +25523,8 @@
 
 				var webview=document.createElement('iframe');
 				webview.src=src;
-				webview.width='100%';
-				webview.height='100%';
+				webview.style.width='100%';
+				webview.style.height='100%';
 				webview.style.left='0px';
 				webview.style.top='0px';
 				webview.style.position='absolute';
@@ -28614,7 +28627,7 @@
                         shareExtLine.style.marginBottom='5px';
                         shareExtLine.innerHTML='已导出扩展。<span class="hrefnode">分享扩展</span><span class="closenode">×</span>';
                         shareExtLine.querySelectorAll('span')[0].onclick=function(){
-							ui.create.iframe('https://tieba.baidu.com/p/5037850317');
+							game.open('https://tieba.baidu.com/p/5037850317');
 						};
                         shareExtLine.querySelectorAll('span')[1].onclick=function(){
                             shareExtLine.style.display='none';
@@ -30548,7 +30561,7 @@
                                     ui.create.div('.text',list[i][2],node);
 									if(list[i][5]){
 										ui.create.div('.text','<span class="hrefnode">下载配音素材',node,function(){
-											ui.create.iframe(this.link);
+											game.open(this.link);
 										}).link=list[i][5];
 									}
                                     var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild);
@@ -31158,7 +31171,7 @@
 
 						button5=document.createElement('button');
     					button5.innerHTML='设为默认镜像';
-                        button5.style.marginLeft='5px';
+                        // button5.style.marginLeft='5px';
     					button5.onclick=function(){
 							game.saveConfig('updateURL');
 							button5.style.display='none';
