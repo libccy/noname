@@ -6058,12 +6058,22 @@
                                 var stream=response.pipe(file);
                                 stream.on('finish',onsuccess);
                                 stream.on('error',onerror);
-								stream.on('progress',function(arg1,arg2){
-									console.log(arg1,arg2);
-								});
                             });
                         },true);
-                    }
+                    };
+					game.readFile=function(filename,callback,onerror){
+						lib.node.fs.readFile(__dirname+'/'+filename,function(err,data){
+							if(err){
+								onerror(err);
+							}
+							else{
+								callback(data);
+							}
+						});
+					};
+					game.removeFile=function(filename,callback){
+						lib.node.fs.unlink(__dirname+'/'+filename);
+					};
 					game.ensureDirectory=function(list,callback,file){
 						var directorylist;
 						var num=0;
@@ -6194,7 +6204,7 @@
 							folder=lib.assetURL+folder;
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
 						};
-						game.readFile=function(filename,callback){
+						game.readFile=function(filename,callback,onerror){
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(filename,{},function(fileEntry){
 									fileEntry.file(function(fileToLoad){
@@ -6203,14 +6213,17 @@
 											callback(e.target.result);
 										};
 										fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-									});
-								});
-							});
+									},onerror);
+								},onerror);
+							},onerror);
 						};
-						game.removeFile=function(dir){
+						game.removeFile=function(dir,callback){
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(dir,{},function(fileEntry){
 									fileEntry.remove();
+									if(callback){
+										callback();
+									}
 								});
 							});
 						};
@@ -30517,7 +30530,7 @@
 							this.innerHTML='正在下载';
 							this.classList.add('nopointer');
 							var url=lib.extensionURL+this.info[0]+'.zip';
-							var importExtensionf=function(data){
+							game.fetch(url,function(data){
 								if(game.importExtension(data,function(){
 									reloadnode.style.display='';
 								})!==false){
@@ -30529,27 +30542,10 @@
 								}
 								that.classList.remove('active');
 								that.classList.remove('highlight');
-							};
-							if(typeof window.fetch!='function'){
-								game.fetch(url,function(data){
-									importExtensionf(data);
-								},function(){
-									that.innerHTML='下载失败';
-									that.classList.add('nopointer');
-								});
-							}
-							else{
-								window.fetch(url).then(function(response){
-									if(response.status === 200 || response.status === 0){
-										return Promise.resolve(response.arrayBuffer())
-									}
-									else{
-										that.innerHTML='下载失败';
-										that.classList.add('nopointer');
-										return Promise.reject(new Error(response.statusText));
-									}
-								}).then(importExtensionf);
-							}
+							},function(){
+								that.innerHTML='下载失败';
+								that.classList.add('nopointer');
+							});
                         };
 
                         node.update=function(){
