@@ -6058,6 +6058,9 @@
                                 var stream=response.pipe(file);
                                 stream.on('finish',onsuccess);
                                 stream.on('error',onerror);
+								stream.on('progress',function(arg1,arg2){
+									console.log(arg1,arg2);
+								});
                             });
                         },true);
                     }
@@ -6190,6 +6193,26 @@
 							var fileTransfer = new FileTransfer();
 							folder=lib.assetURL+folder;
 							fileTransfer.download(encodeURI(url),encodeURI(folder),onsuccess,onerror);
+						};
+						game.readFile=function(filename,callback){
+							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+								entry.getFile(filename,{},function(fileEntry){
+									fileEntry.file(function(fileToLoad){
+										var fileReader = new FileReader();
+										fileReader.onload = function(e){
+											callback(e.target.result);
+										};
+										fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
+									});
+								});
+							});
+						};
+						game.removeFile=function(dir){
+							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
+								entry.getFile(dir,{},function(fileEntry){
+									fileEntry.remove();
+								});
+							});
 						};
 						game.ensureDirectory=function(list,callback,file){
 							var directorylist;
@@ -20215,6 +20238,15 @@
             }
             download();
         },
+		fetch:function(url,onload,onerror){
+			var tmpName=get.id();
+			game.download(encodeURI(url),tmpName,function(){
+				game.readFile(tmpName,function(data){
+					onload(data);
+					game.removeFile(tmpName);
+				},onerror);
+			},onerror);
+		},
 		playVideo:function(time,mode){
 			if(!_status.replayvideo){
 				localStorage.setItem(lib.configprefix+'playbackmode',lib.config.mode);
@@ -30485,7 +30517,7 @@
 							this.innerHTML='正在下载';
 							this.classList.add('nopointer');
 							var url=lib.extensionURL+this.info[0]+'.zip';
-							var importExtensionf=function(data,fileEntry){
+							var importExtensionf=function(data){
 								if(game.importExtension(data,function(){
 									reloadnode.style.display='';
 								})!==false){
@@ -30497,33 +30529,14 @@
 								}
 								that.classList.remove('active');
 								that.classList.remove('highlight');
-								if(fileEntry&&fileEntry.remove){
-									fileEntry.remove();
-								}
 							};
 							if(typeof window.fetch!='function'){
-								game.download(encodeURI(url),this.info[0]+'.zip',function(){
-									if(window.resolveLocalFileSystemURL){
-										window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
-											entry.getFile(that.info[0]+'.zip',{},function(fileEntry){
-												fileEntry.file(function(fileToLoad){
-													var fileReader = new FileReader();
-													fileReader.onload = function(e){
-														importExtensionf(e.target.result,fileEntry);
-													};
-													fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-												});
-											});
-										});
-									}
-									else{
-										that.innerHTML='下载完成';
-										that.parentNode.parentNode.lastChild.innerHTML='已将扩展下载至游戏目录，请在“导入扩展”一栏中选择并安装';
-									}
+								game.fetch(url,function(data){
+									importExtensionf(data);
 								},function(){
 									that.innerHTML='下载失败';
 									that.classList.add('nopointer');
-								})
+								});
 							}
 							else{
 								window.fetch(url).then(function(response){
