@@ -1628,6 +1628,9 @@ div:not(.handcards)>.card>.info>span,
 	padding: 3px;
 	margin: 0
 }
+.control.disabled{
+	opacity: 0.6 !important;
+}
 #control>div {
 	position: absolute;
 	left: 50%;

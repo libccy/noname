@@ -66,6 +66,7 @@ window.config={
 	skin:{},
 	gameRecord:{},
 	extensionInfo:{},
+	autoskilllist:[],
 	hiddenModePack:[],
 	hiddenCharacterPack:[],
 	hiddenCardPack:[],

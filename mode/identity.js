@@ -895,7 +895,7 @@ mode.identity={
 					}
 				}
 				if(!event.chosen.length){
-					game.me.chooseButton(dialog,true).selectButton=function(){
+					game.me.chooseButton(dialog,true).set('onfree',true).selectButton=function(){
 						if(_status.brawl&&_status.brawl.doubleCharacter) return 2;
 						return get.config('double_character')?2:1
 					};
@@ -958,7 +958,18 @@ mode.identity={
 					});
 					delete _status.createControl;
 				};
-				event.dialogxx=ui.create.characterDialog();
+				if(lib.onfree){
+					lib.onfree.push(function(){
+						event.dialogxx=ui.create.characterDialog();
+						if(ui.cheat2){
+							ui.cheat2.classList.remove('disabled');
+						}
+					});
+				}
+				else{
+					event.dialogxx=ui.create.characterDialog();
+				}
+
 				ui.create.cheat2=function(){
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){
@@ -972,7 +983,7 @@ mode.identity={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=1;
+								ui.cheat.classList.remove('disabled');
 							}
 						}
 						else{
@@ -987,10 +998,13 @@ mode.identity={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=0.6;
+								ui.cheat.classList.add('disabled');
 							}
 						}
 					});
+					if(lib.onfree){
+						ui.cheat2.classList.add('disabled');
+					}
 				}
 				if(!_status.brawl||!_status.brawl.chooseCharacterFixed){
 					if(!ui.cheat&&get.config('change_choice'))

@@ -40,6 +40,7 @@
 		onover:[],
         chatHistory:[],
 		arenaReady:[],
+		onfree:[],
         inpile:[],
         extensions:[],
         extensionPack:{},
@@ -2982,11 +2983,11 @@
 							if(map[i]._link.config.type=='autoskill'){
 								if(!lib.config.autoskilllist.contains(i)){
 									map[i].classList.add('on');
-									ui.autoskill[i].lastChild.classList.add('on');
+									// ui.autoskill[i].lastChild.classList.add('on');
 								}
 								else{
 									map[i].classList.remove('on');
-									ui.autoskill[i].lastChild.classList.remove('on');
+									// ui.autoskill[i].lastChild.classList.remove('on');
 								}
 							}
 							else if(map[i]._link.config.type=='banskill'){
@@ -7150,6 +7151,19 @@
                 }
                 event.goto(0);
             },
+			onfree:function(){
+				if(lib.onfree){
+					var onfree=lib.onfree;
+					delete lib.onfree;
+					var loop=function(){
+						if(onfree.length){
+							(onfree.shift())();
+						}
+						setTimeout(loop,200);
+					};
+					setTimeout(loop,500);
+				}
+			},
             connection:function(ws){
                 var client={
                     ws:ws,
@@ -9445,6 +9459,9 @@
                     }
 					else{
                         event.result='ai';
+					}
+					if(event.onfree){
+						lib.init.onfree();
 					}
 					"step 1"
                     if(event.result=='ai'){
@@ -33544,22 +33561,22 @@
                 game.documentZoom=game.deviceZoom*zoom;
                 document.documentElement.style.zoom=game.documentZoom;
 
-				var autoskill={};
-				ui.autoskill=autoskill;
-
-				if(!lib.config.autoskilllist){
-					lib.config.autoskilllist=[];
-				}
-				var nodex;
-				for(i in lib.skill){
-					if(lib.skill[i].frequent&&lib.translate[i]){
-						lib.translate[i+'_forbid_config']=lib.translate[i+'_noconf']||lib.translate[i];
-						nodex=ui.create.switcher(i+'_forbid',
-							!lib.config.autoskilllist.contains(i),ui.click.autoskill);
-						nodex.link=i;
-						autoskill[i]=nodex;
-					}
-				}
+				// var autoskill={};
+				// ui.autoskill=autoskill;
+				//
+				// if(!lib.config.autoskilllist){
+				// 	lib.config.autoskilllist=[];
+				// }
+				// var nodex;
+				// for(i in lib.skill){
+				// 	if(lib.skill[i].frequent&&lib.translate[i]){
+				// 		lib.translate[i+'_forbid_config']=lib.translate[i+'_noconf']||lib.translate[i];
+				// 		nodex=ui.create.switcher(i+'_forbid',
+				// 			!lib.config.autoskilllist.contains(i),ui.click.autoskill);
+				// 		nodex.link=i;
+				// 		autoskill[i]=nodex;
+				// 	}
+				// }
 
 				ui.system1=ui.create.div('#system1',ui.system);
 				ui.system2=ui.create.div('#system2',ui.system);
@@ -33567,6 +33584,8 @@
 				ui.replay=ui.create.system('重来',game.reload,true);
                 ui.replay.id='restartbutton';
 				ui.config2=ui.create.system('选项',ui.click.config);
+				ui.config2.classList.add('hidden');
+				ui.config2.style.transition='all 0.5s';
 				ui.pause=ui.create.system('暂停',ui.click.pause);
                 ui.pause.id='pausebutton';
 				if(!lib.config.touchscreen){
@@ -33718,7 +33737,13 @@
                 setTimerPosition.call(ui.timer);
                 ui.arena.appendChild(ui.timer);
 
-                ui.create.menu();
+                lib.onfree.push(function(){
+					ui.create.menu();
+					ui.config2.classList.remove('hidden');
+					setTimeout(function(){
+						ui.config2.style.transition='';
+					},500);
+				});
 
 				lib.status.date=new Date();
 				lib.status.dateDelayed=0;
@@ -36288,6 +36313,7 @@
 					}
 					if(node.classList.contains('hidden')) return;
 					if(node.classList.contains('removing')) return;
+					if(node.classList.contains('disabled')) return;
 				}
 				if(ui.intro){
 					ui.intro.close();
@@ -36959,6 +36985,7 @@
 				return false;
 			},
 			config:function(){
+				if(!ui.click.configMenu) return;
 				if(_status.paused2) _status.config2=false;
 				else _status.config2=true;
 
