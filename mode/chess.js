@@ -3710,10 +3710,21 @@ mode.chess={
 					ui.cheat=ui.create.control('更换',event.changeDialog);
 					delete _status.createControl;
 				};
-				event.dialogxx=ui.create.characterDialog();
-				event.dialogxx.classList.add('fullwidth');
-				event.dialogxx.classList.add('fullheight');
-				event.dialogxx.classList.add('fixed');
+				var createCharacterDialog=function(){
+					event.dialogxx=ui.create.characterDialog();
+					event.dialogxx.classList.add('fullwidth');
+					event.dialogxx.classList.add('fullheight');
+					event.dialogxx.classList.add('fixed');
+					if(ui.cheat2){
+						ui.cheat2.classList.remove('disabled');
+					}
+				};
+				if(lib.onfree){
+					lib.onfree.push(createCharacterDialog);
+				}
+				else{
+					createCharacterDialog();
+				}
 				ui.create.cheat2=function(){
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){
@@ -3746,6 +3757,9 @@ mode.chess={
 							}
 						}
 					});
+					if(lib.onfree){
+						ui.cheat2.classList.add('disabled');
+					}
 				}
 				if(!ui.cheat&&get.config('change_choice'))
 				ui.create.cheat();

@@ -1495,7 +1495,17 @@ mode.stone={
 					ui.cheat=ui.create.control('更换',event.changeDialog);
 					delete _status.createControl;
 				};
-				event.dialogxx=ui.create.characterDialog();
+				if(lib.onfree){
+					lib.onfree.push(function(){
+						event.dialogxx=ui.create.characterDialog();
+						if(ui.cheat2){
+							ui.cheat2.classList.remove('disabled');
+						}
+					});
+				}
+				else{
+					event.dialogxx=ui.create.characterDialog();
+				}
 				ui.create.cheat2=function(){
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){
@@ -1528,6 +1538,9 @@ mode.stone={
 							}
 						}
 					});
+					if(lib.onfree){
+						ui.cheat2.classList.add('disabled');
+					}
 				}
 				if(!ui.cheat&&get.config('change_choice'))
 				ui.create.cheat();
