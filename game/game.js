@@ -23631,12 +23631,19 @@
 					}
 				}
 			}
-			if(arguments.length==0){
-				while(document.getElementsByClassName('selectable').length>0){
-					document.getElementsByClassName('selectable')[0].classList.remove('selectable');
+			var argc=arguments.length;
+			var args=new Array(argc);
+			for(var i=0;i<argc;i++){
+				args[i]=arguments[i];
+			}
+			if(args.length==0){
+				var selectable=document.getElementsByClassName('selectable');
+				var selected=document.getElementsByClassName('selected');
+				while(selectable.length>0){
+					selectable[0].classList.remove('selectable');
 				}
-				while(document.getElementsByClassName('selected').length>0){
-					document.getElementsByClassName('selected')[0].classList.remove('selected');
+				while(selected.length>0){
+					selected[0].classList.remove('selected');
 				}
 				if(_status.event.player){
 					var cards=_status.event.player.get('hej');
@@ -23650,8 +23657,8 @@
 				ui.selected.targets.length=0;
 			}
 			else{
-				for(i=0;i<arguments.length;i++){
-					if(arguments[i]=='target'){
+				for(i=0;i<args.length;i++){
+					if(args[i]=='target'){
 						for(j=0;j<game.players.length;j++){
 							game.players[j].classList.remove('selected');
 							game.players[j].classList.remove('selectable');
@@ -23662,7 +23669,7 @@
 						}
 						ui.selected.targets.length=0;
 					}
-					else if(arguments[i]=='card'){
+					else if(args[i]=='card'){
 						var cards=_status.event.player.get('hej');
 						for(j=0;j<cards.length;j++){
 							cards[j].classList.remove('selected');
@@ -23672,7 +23679,7 @@
 					}
 				}
 			}
-			if(arguments[0]!='target'&&arguments[0]!='card'&&arguments[0]!='button'){
+			if(args[0]!='target'&&args[0]!='card'&&args[0]!='button'){
 				ui.arena.classList.remove('selecting');
 				_status.imchoosing=false;
 				_status.lastdragchange.length=0;
