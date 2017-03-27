@@ -47,7 +47,7 @@
         cardType:{},
         hook:{globaltrigger:{},globalskill:{}},
         hookmap:{},
-        layoutfixed:['chess','stone'],
+        layoutfixed:['chess','tafang','stone'],
         characterDialogGroup:{
             '收藏':function(name,capt){
                 return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -33612,6 +33612,16 @@
 					lib.setPopped(ui.config2,ui.click.pauseconfig,170);
 				}
 				ui.auto=ui.create.system('托管',ui.click.auto);
+				if(!game.syncMenu){
+					ui.auto.style.opacity=0.5;
+					ui.auto.style.transition='all 0.5s';
+					lib.onfree.push(function(){
+						ui.auto.style.opacity='';
+						setTimeout(function(){
+							ui.auto.style.transition='';
+						},500);
+					});
+				}
                 ui.auto.id='autobutton';
                 ui.autonode=ui.create.div('#autonode','<div>托管中...</div>',ui.arena);
                 ui.autonode.listen(ui.click.auto);

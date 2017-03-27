@@ -300,6 +300,7 @@ mode.tafang={
 				_status.tafangend.push(tafangdes.toString());
 			}
 		}
+		lib.init.onfree();
         event.trigger('gameStart');
 		game.phaseLoopTafang();
 	},
