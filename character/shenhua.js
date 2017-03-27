@@ -420,7 +420,7 @@ character.shenhua={
 			animationColor:'metal',
 			content:function(){
 				'step 0'
-				var shas=player.get('h','sha');
+				var shas=player.getCards('h','sha');
 				var num;
 				if(player.hp>=4&&shas.length>=3){
 					num=3;
@@ -455,7 +455,7 @@ character.shenhua={
 				result:{
 					player:function(player){
 						if(player.hp==1) return 0;
-						var shas=player.get('h','sha');
+						var shas=player.getCards('h','sha');
 						if(!shas.length) return 0;
 						var card=shas[0];
 						if(!lib.filter.cardEnabled(card,player)) return 0;
@@ -655,7 +655,7 @@ character.shenhua={
 					target:function(card,player,target,current){
 						if(card.name=='sha'){
 							if(_status.event.name=='xiangle') return;
-							var bs=player.get('h',{type:'basic'});
+							var bs=player.getCards('h',{type:'basic'});
 							if(bs.length<2) return 0;
 							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
 							if(bs.length<=3&&player.num('h','sha')<=1){
@@ -893,11 +893,11 @@ character.shenhua={
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
 									if(ai.get.attitude(player,players[i])>0){
-										if((target.get('e','1')&&!players[i].get('e','1'))||
-										(target.get('e','2')&&!players[i].get('e','2'))||
-										(target.get('e','3')&&!players[i].get('e','3'))||
-										(target.get('e','4')&&!players[i].get('e','4'))||
-										(target.get('e','5')&&!players[i].get('e','5'))) return -ai.get.attitude(player,target);
+										if((target.getEquip(1)&&!players[i].getEquip(1))||
+										(target.getEquip(2)&&!players[i].getEquip(2))||
+										(target.getEquip(3)&&!players[i].getEquip(3))||
+										(target.getEquip(4)&&!players[i].getEquip(4))||
+										(target.getEquip(5)&&!players[i].getEquip(5))) return -ai.get.attitude(player,target);
 									}
 								}
 							}
@@ -914,11 +914,11 @@ character.shenhua={
 								if(!target.hasJudge(judges[i].viewAs||judges[i].name)) return true;
 							}
 							if(target.isMin()) return false;
-							if((from.get('e','1')&&!target.get('e','1'))||
-								(from.get('e','2')&&!target.get('e','2'))||
-								(from.get('e','3')&&!target.get('e','3'))||
-								(from.get('e','4')&&!target.get('e','4'))||
-								(from.get('e','5')&&!target.get('e','5'))) return true;
+							if((from.getEquip(1)&&!target.getEquip(1))||
+								(from.getEquip(2)&&!target.getEquip(2))||
+								(from.getEquip(3)&&!target.getEquip(3))||
+								(from.getEquip(4)&&!target.getEquip(4))||
+								(from.getEquip(5)&&!target.getEquip(5))) return true;
 							return false;
 						}
 						else{
@@ -2617,7 +2617,7 @@ character.shenhua={
 			inherit:'bagua_skill',
 			filter:function(event,player){
 				if(!lib.skill.bagua_skill.filter(event,player)) return false;
-				if(player.get('e','2')) return false;
+				if(player.getEquip(2)) return false;
 				return true;
 			},
 			ai:{
@@ -2626,7 +2626,7 @@ character.shenhua={
 						if(player==target&&get.subtype(card)=='equip2'){
 							if(ai.get.equipValue(card)<=7.5) return 0;
 						}
-						if(target.get('e','2')) return;
+						if(target.getEquip(2)) return;
 						return lib.skill.bagua_skill.ai.effect.target.apply(this,arguments);
 					}
 				}
@@ -2966,13 +2966,13 @@ character.shenhua={
 				order:8,
 				result:{
 					player:function(player,target){
-						if(player.get('e','1')) return 0;
+						if(player.getEquip(1)) return 0;
 						if(player.hp>=target.hp) return -0.9;
 						if(player.hp<=2) return -10;
 						return -2;
 					},
 					target:function(player,target){
-						if(!player.get('e','1')){
+						if(!player.getEquip(1)){
 							if(player.hp<2) return 0;
 							if(player.hp==2&&target.hp>=2) return 0;
 							if(target.hp>player.hp) return 0;

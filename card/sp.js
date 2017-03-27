@@ -299,7 +299,7 @@ card.sp={
 				for(var i=0;i<cards.length;i++){
 					ui.special.appendChild(cards[i]);
 				}
-				var muniu=player.get('e','5');
+				var muniu=player.getEquip(5);
 				if(!muniu){
 					for(var i=0;i<cards.length;i++){
 						ui.discardPile.appendChild(cards[i]);
@@ -313,7 +313,7 @@ card.sp={
 					muniu.cards=cards;
 				},muniu,muniu.cards);
 				var players=game.filterPlayer(function(current){
-					if(!current.get('e','5')&&current!=player&&!current.isTurnedOver()&&
+					if(!current.getEquip(5)&&current!=player&&!current.isTurnedOver()&&
 						ai.get.attitude(player,current)>=3&&ai.get.attitude(current,player)>=3){
 						return true;
 					}
@@ -321,7 +321,7 @@ card.sp={
 				players.sort(lib.sort.seat);
 				var choice=players[0];
 				var next=player.chooseTarget('是否移动木牛流马？',function(card,player,target){
-					return !target.isMin()&&player!=target&&!target.get('e','5');
+					return !target.isMin()&&player!=target&&!target.getEquip(5);
 				});
 				next.set('ai',function(target){
 					return target==_status.event.choice?1:-1;
@@ -329,7 +329,7 @@ card.sp={
 				next.set('choice',choice);
 				"step 1"
 				if(result.bool){
-					var card=player.get('e','5');
+					var card=player.getEquip(5);
 					result.targets[0].equip(card);
 					player.$give(card,result.targets[0]);
 					player.line(result.targets,'green');
@@ -344,7 +344,7 @@ card.sp={
 				respondSha:true,
 				respondShan:true,
 				skillTagFilter:function(player,tag){
-					var muniu=player.get('e','5');
+					var muniu=player.getEquip(5);
 					if(!muniu||!muniu.cards) return false;
 					for(var i=0;i<muniu.cards.length;i++){
 						switch(tag){
@@ -375,7 +375,7 @@ card.sp={
 			trigger:{player:'chooseToRespondBegin'},
 			filter:function(event,player){
 				if(event.responded) return false;
-				var muniu=player.get('e','5');
+				var muniu=player.getEquip(5);
 				if(!muniu.cards) return false;
 				lib.skill.muniu_skill.sync(muniu);
 				for(var i=0;i<muniu.cards.length;i++){
@@ -386,7 +386,7 @@ card.sp={
 			direct:true,
 			content:function(){
 				"step 0"
-				player.chooseButton(['木牛流马',player.get('e','5').cards]).set('filterButton',function(button){
+				player.chooseButton(['木牛流马',player.getEquip(5).cards]).set('filterButton',function(button){
 					var evt=_status.event.getTrigger();
 					if(evt&&evt.filterCard){
 						return evt.filterCard(button.link,_status.event.player,evt);
@@ -408,7 +408,7 @@ card.sp={
 					trigger.untrigger();
 					trigger.responded=true;
 					trigger.result={bool:true,card:result.links[0]};
-					var muniu=player.get('e','5');
+					var muniu=player.getEquip(5);
 					muniu.cards.remove(result.links[0]);
 					lib.skill.muniu_skill.sync(muniu);
 					player.updateMarks();
@@ -423,7 +423,7 @@ card.sp={
 		muniu_skill4:{
 			enable:'chooseToUse',
 			filter:function(event,player){
-				var muniu=player.get('e','5');
+				var muniu=player.getEquip(5);
 				if(!muniu.cards) return false;
 				lib.skill.muniu_skill.sync(muniu);
 				for(var i=0;i<muniu.cards.length;i++){
@@ -433,7 +433,7 @@ card.sp={
 			},
 			chooseButton:{
 				dialog:function(event,player){
-					return ui.create.dialog('木牛流马',player.get('e','5').cards,'hidden');
+					return ui.create.dialog('木牛流马',player.getEquip(5).cards,'hidden');
 				},
 				filter:function(button,player){
 					var evt=_status.event.getParent();
@@ -449,7 +449,7 @@ card.sp={
 					if(get.select(get.info(button.link).selectTarget)[1]==-1){
 						if(get.type(button.link)=='delay') return -1;
 						if(get.type(button.link)=='equip'){
-							var current=player.get('e',{subtype:get.subtype(button.link)})[0];
+							var current=player.getCards('e',{subtype:get.subtype(button.link)})[0];
 							if(current&&ai.get.equipValue(current)>=ai.get.equipValue(button.link)) return -1;
 							return 1;
 						}
@@ -470,7 +470,7 @@ card.sp={
 						selectCard:-1,
 						viewAs:links[0],
 						onuse:function(result,player){
-							var muniu=player.get('e','5');
+							var muniu=player.getEquip(5);
 							if(muniu&&muniu.cards){
 								muniu.cards.remove(result.card);
 								lib.skill.muniu_skill.sync(muniu);
@@ -499,7 +499,7 @@ card.sp={
 			mark:true,
 			intro:{
 				content:function(storage,player){
-					var muniu=player.get('e','5');
+					var muniu=player.getEquip(5);
 					if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
 					if(player.isUnderControl(true)){
 						return get.translation(muniu.cards);
@@ -509,7 +509,7 @@ card.sp={
 					}
 				},
 				mark:function(dialog,storage,player){
-					var muniu=player.get('e','5');
+					var muniu=player.getEquip(5);
 					if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
 					if(player.isUnderControl(true)){
 						dialog.addAuto(muniu.cards);
@@ -519,7 +519,7 @@ card.sp={
 					}
 				},
 				markcount:function(storage,player){
-					var muniu=player.get('e','5');
+					var muniu=player.getEquip(5);
 					if(muniu&&muniu.cards) return muniu.cards.length;
 					return 0;
 				}
@@ -528,7 +528,7 @@ card.sp={
 		muniu_skill7:{
 			filter:function(){return false},
 			hiddenCard:function(player,name){
-				var muniu=player.get('e','5');
+				var muniu=player.getEquip(5);
 				if(!muniu.cards) return false;
 				lib.skill.muniu_skill.sync(muniu);
 				for(var i=0;i<muniu.cards.length;i++){

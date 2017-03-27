@@ -1851,7 +1851,7 @@ character.hearth={
 				result:{
 					player:1,
 					target:function(player,target){
-						if(target.get('e','1')) return 0;
+						if(target.getEquip(1)) return 0;
 						return 1;
 					}
 				}
@@ -4707,10 +4707,10 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.get('e','1')?true:false;
+				return player.getEquip(1)?true:false;
 			},
 			filterCard:function(card,player){
-				return card==player.get('e','1');
+				return card==player.getEquip(1);
 			},
 			position:'e',
 			filterTarget:function(card,player,target){

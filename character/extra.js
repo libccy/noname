@@ -206,7 +206,7 @@ character.extra={
 				result:{
 					player:function(player){
 						if(!player.storage.shenfen) return 0;
-						var cards=player.get('h','sha');
+						var cards=player.getCards('h','sha');
 						if(cards.length){
 							if(game.hasPlayer(function(current){
 								return (player.canUse('sha',current)&&

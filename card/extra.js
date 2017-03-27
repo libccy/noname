@@ -75,7 +75,7 @@ card.extra={
 						if(lib.config.mode=='stone'&&!player.isMin()){
 							if(player.getActCount()+1>=player.actcount) return 0;
 						}
-						var shas=player.get('h','sha');
+						var shas=player.getCards('h','sha');
 						if(shas.length>1&&player.getCardUsable('sha')>1){
 							return 0;
 						}
@@ -439,7 +439,7 @@ card.extra={
 						if(player.hasSkillTag('unequip',false,card)) return;
 						if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
 						if(card.name=='sha'){
-    						var equip1=player.get('e','1');
+    						var equip1=player.getEquip(1);
     						if(equip1&&equip1.name=='zhuque') return 2;
     						if(equip1&&equip1.name=='qinggang') return 1;
 							if(!card.nature) return 'zerotarget';

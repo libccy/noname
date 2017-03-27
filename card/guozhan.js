@@ -1010,7 +1010,7 @@ card.guozhan={
 			enable:'phaseUse',
 			prompt:'将可连横的牌交给一名与你势力不同的角色，或未确定势力的角色，若你交给与你势力不同的角色，则你摸一张牌',
 			filter:function(event,player){
-				return (player.get('h',function(card){
+				return (player.getCards('h',function(card){
 					return get.info(card).lianheng;
 				}).length);
 			},

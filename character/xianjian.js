@@ -563,7 +563,7 @@ character.xianjian={
 							return !event.targets.contains(target);
 						}).ai=function(target){
 							var att=ai.get.attitude(player,target);
-							if(att>0&&!target.get('e','5')){
+							if(att>0&&!target.getEquip(5)){
 								return att;
 							}
 							return 0;
@@ -1814,7 +1814,7 @@ character.xianjian={
 			},
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)<=0) return false;
-				var cards=player.get('h',{color:'red'});
+				var cards=player.getCards('h',{color:'red'});
 				for(var i=0;i<cards.length;i++){
 					if(cards[i].name=='tao') return false;
 					if(ai.get.value(cards[i])>7&&cards.length>2) return false;
@@ -1824,7 +1824,7 @@ character.xianjian={
 				"step 0"
 				player.showHandcards();
 				"step 1"
-				var cards=player.get('h',{color:'red'});
+				var cards=player.getCards('h',{color:'red'});
 				event.num=cards.length;
 				player.discard(cards);
 				"step 2"

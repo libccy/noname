@@ -192,7 +192,7 @@ card.yunchou={
 					event.finish();
 				}
 				else{
-					var hs=target.get('h','sha');
+					var hs=target.getCards('h','sha');
 					player.gain(hs,target);
 					target.$give(hs,player);
 				}
@@ -529,19 +529,19 @@ card.yunchou={
 			filterTarget:function(card,player,target){
 				if(target.isMin()) return false;
 				if(ui.selected.targets.length){
-					return target.get('e',{subtype:'equip5'}).length==0;
+					return target.getCards('e',{subtype:'equip5'}).length==0;
 				}
 				else{
-					return target.get('e',{subtype:'equip5'}).length>0;
+					return target.getCards('e',{subtype:'equip5'}).length>0;
 				}
 			},
 			selectTarget:2,
 			multitarget:true,
 			complexTarget:true,
 			content:function(){
-				if(target.get('e','5')){
-					target.$give(target.get('e','5'),event.addedTarget);
-					event.addedTarget.equip(target.get('e','5'));
+				if(target.getEquip(5)){
+					target.$give(target.getEquip(5),event.addedTarget);
+					event.addedTarget.equip(target.getEquip(5));
 					game.delay();
 				}
 			},
@@ -549,7 +549,7 @@ card.yunchou={
 				order:1,
 				result:{
 					target:function(player,target){
-						if(target.get('e',{subtype:'equip5'}).length){
+						if(target.getCards('e',{subtype:'equip5'}).length){
 							if(ai.get.attitude(target,player)>0){
 								return -0.5;
 							}

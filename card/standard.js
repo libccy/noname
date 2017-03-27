@@ -868,8 +868,8 @@ card.standard={
 						if(ai.get.damageEffect(target,player,target)>0&&ai.get.attitude(player,target)>0&&ai.get.attitude(target,player)>0){
 							return 0;
 						}
-						var hs1=target.get('h','sha');
-						var hs2=player.get('h','sha');
+						var hs1=target.getCards('h','sha');
+						var hs2=player.getCards('h','sha');
 						if(hs1.length>hs2.length+1){
 							return -2;
 						}
@@ -1026,7 +1026,7 @@ card.standard={
 			complexTarget:true,
 			filterTarget:function(card,player,target){
 				if(ui.selected.targets.length==0){
-					return (player!=target&&target.get('e',{subtype:'equip1'}).length);
+					return (player!=target&&target.getCards('e',{subtype:'equip1'}).length);
 				}
 				else{
 					return lib.filter.filterTarget({name:'sha'},ui.selected.targets[0],target);
@@ -1043,8 +1043,8 @@ card.standard={
 				}
 				"step 1"
 				if(event.directfalse||result.bool==false){
-					player.gain(targets[0].get('e',{subtype:'equip1'}),targets[0]);
-					targets[0].$give(targets[0].get('e',{subtype:'equip1'}),player);
+					player.gain(targets[0].getCards('e',{subtype:'equip1'}),targets[0]);
+					targets[0].$give(targets[0].getCards('e',{subtype:'equip1'}),player);
 				}
 			},
 			ai:{
@@ -1056,7 +1056,7 @@ card.standard={
 				result:{
 					target:-1.5,
 					player:function(player){
-						if(player.get('he',{subtype:'equip1'}).length) return 0;
+						if(player.getCards('he',{subtype:'equip1'}).length) return 0;
 						return 1.5;
 					},
 				},
@@ -1459,7 +1459,7 @@ card.standard={
 			content:function(){
 				"step 0"
 				var next=player.chooseToDiscard(get.prompt('guanshi'),2,'he',function(card){
-					return _status.event.player.get('e',{subtype:'equip1'}).contains(card)==false;
+					return _status.event.player.getCards('e',{subtype:'equip1'}).contains(card)==false;
 				});
 				next.logSkill='guanshi_skill';
 				next.set('ai',function(card){
@@ -1499,7 +1499,7 @@ card.standard={
 		qilin_skill:{
 			trigger:{player:'shaHit'},
 			filter:function(event,player){
-				return event.target.get('e',{subtype:['equip3','equip4']}).length>0
+				return event.target.getCards('e',{subtype:['equip3','equip4']}).length>0
 			},
 			direct:true,
 			audio:true,
@@ -1508,7 +1508,7 @@ card.standard={
 				var att=(ai.get.attitude(player,trigger.target)<=0);
 				var next=player.chooseButton();
 				next.set('att',att);
-				next.set('createDialog',['选择要弃置的马',trigger.target.get('e',{subtype:['equip3','equip4']})]);
+				next.set('createDialog',['选择要弃置的马',trigger.target.getCards('e',{subtype:['equip3','equip4']})]);
 				next.set('ai',function(button){
 					if(_status.event.att) return ai.get.buttonValue(button);
 					return 0;

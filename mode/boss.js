@@ -2220,7 +2220,7 @@ mode.boss={
 			forced:true,
 			priority:6,
 			filter:function(event,player){
-                if(player.get('e','2')) return false;
+                if(player.getEquip(2)) return false;
 				return lib.skill.tengjia1.filter(event,player);
 			},
 			content:function(){
@@ -2230,7 +2230,7 @@ mode.boss={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-                        if(target.get('e','2')) return;
+                        if(target.getEquip(2)) return;
 						return lib.skill.tengjia1.ai.effect.target.apply(this,arguments);
 					}
 				}
@@ -2239,7 +2239,7 @@ mode.boss={
 		boss_manjia2:{
 			trigger:{player:'damageBegin'},
 			filter:function(event,player){
-                if(player.get('e','2')) return false;
+                if(player.getEquip(2)) return false;
 				if(event.nature=='fire') return true;
 			},
 			forced:true,
@@ -2252,7 +2252,7 @@ mode.boss={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-                        if(target.get('e','2')) return;
+                        if(target.getEquip(2)) return;
 						return lib.skill.tengjia2.ai.effect.target.apply(this,arguments);
 					}
 				}
@@ -2452,7 +2452,7 @@ mode.boss={
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
 					if(players[i]!=player){
-						var e=players[i].get('e','qinggang');
+						var e=players[i].getEquip('qinggang');
 						if(e.length){
 							player.gain(e,players[i]);
 							players[i].$give(e,player);
@@ -3292,11 +3292,11 @@ mode.boss={
 			mod:{
 				selectTarget:function(card,player,range){
 					if(range[1]==-1) return;
-					if(player.get('e','1')) return;
+					if(player.getEquip(1)) return;
 					if(card.name=='sha') range[1]+=2;
 				},
 				cardUsable:function(card,player,num){
-					if(player.get('e','1')) return;
+					if(player.getEquip(1)) return;
 					if(card.name=='sha') return num+1;
 				}
 			},
@@ -3507,7 +3507,7 @@ mode.boss={
 				else{
 					player.chooseControl(list,function(){
 						if(!player.getStat().skill.qiangxi){
-							if(player.hasSkill('qiangxi')&&player.get('e','1')&&list.contains('xuanfeng')) return 'xuanfeng';
+							if(player.hasSkill('qiangxi')&&player.getEquip(1)&&list.contains('xuanfeng')) return 'xuanfeng';
 							if(list.contains('wansha')||list.contains('qiangxi')){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
@@ -3532,7 +3532,7 @@ mode.boss={
 				order:function(){
 					var player=_status.event.player;
 					if(!player.getStat().skill.qiangxi){
-						if(player.hasSkill('qiangxi')&&player.get('e','1')&&!player.hasSkill('xuanfeng')) return 10;
+						if(player.hasSkill('qiangxi')&&player.getEquip(1)&&!player.hasSkill('xuanfeng')) return 10;
 						if(player.hasSkill('wansha')) return 1;
 						var players=game.filterPlayer();
 						for(var i=0;i<players.length;i++){
@@ -3544,7 +3544,7 @@ mode.boss={
 				result:{
 					player:function(player){
 						if(!player.getStat().skill.qiangxi){
-							if(player.hasSkill('qiangxi')&&player.get('e','1')&&!player.hasSkill('xuanfeng')) return 1;
+							if(player.hasSkill('qiangxi')&&player.getEquip(1)&&!player.hasSkill('xuanfeng')) return 1;
 							if(!player.hasSkill('wansha')||!player.hasSkill('qiangxi')){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){

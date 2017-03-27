@@ -3375,7 +3375,7 @@ mode.stone={
 			content:function(){
 				'step 0'
 				if(targets[0]){
-					var hs=targets[0].get('h',function(card){
+					var hs=targets[0].getCards('h',function(card){
 						return get.type(card)=='stonecharacter';
 					});
 					if(hs.length&&targets[0].canAddFellow()){
@@ -3384,7 +3384,7 @@ mode.stone={
 				}
 				'step 1'
 				if(targets[1]){
-					var hs=targets[1].get('h',function(card){
+					var hs=targets[1].getCards('h',function(card){
 						return get.type(card)=='stonecharacter';
 					});
 					if(hs.length&&targets[1].canAddFellow()){
@@ -3398,7 +3398,7 @@ mode.stone={
 				useful:5,
 				result:{
 					player:function(player){
-						var hs=player.get('h',function(card){
+						var hs=player.getCards('h',function(card){
 							return get.type(card)=='stonecharacter';
 						});
 						if(hs.length==0) return 0;
@@ -4549,7 +4549,7 @@ mode.stone={
 			type:'stonecard',
 			fullimage:true,
 			enable:function(event,player){
-				return player.get('e','1')?true:false;
+				return player.getEquip(1)?true:false;
 			},
 			stoneact:2,
 			career:'rogue',
@@ -4558,7 +4558,7 @@ mode.stone={
 			},
 			selectTarget:-1,
 			contentBefore:function(){
-				player.discard(player.get('e','1'));
+				player.discard(player.getEquip(1));
 			},
 			content:function(){
 				if(typeof player.storage.spell_modaoyou=='number'){
@@ -5830,7 +5830,7 @@ mode.stone={
 			content:function(){
 				game.delay();
 				player.removeSkill('warlock_zhaohuan2');
-				var hs=player.get('h',function(card){
+				var hs=player.getCards('h',function(card){
 					return get.type(card)=='stonecharacter';
 				});
 				if(hs.length&&player.canAddFellow()){
@@ -6333,7 +6333,7 @@ mode.stone={
 			content:function(){
 				'step 0'
 				var target=player.getLeader();
-				if(target.get('e','1')){
+				if(target.getEquip(1)){
 					target=target.getEnemy();
 					player.line(target,'green');
 					target.damage();
@@ -8412,7 +8412,7 @@ mode.stone={
 			},
 			ai:{
 				order:function(skill,player){
-					if(!player.get('e','1')&&player.countCards('e')<2){
+					if(!player.getEquip(1)&&player.countCards('e')<2){
 						if(player.num('h','sha')&&player.getActCount()+3<=player.actcount){
 							return 4;
 						}

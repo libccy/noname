@@ -97,8 +97,8 @@ card.swd={
 					choice='basic';
 				}
 				else{
-					var e2=target.get('e','2');
-					var e3=target.get('e','3');
+					var e2=target.getEquip(2);
+					var e3=target.getEquip(3);
 					if((e2&&e3)||((e2||e3)&&target.needsToDiscard()<=1)||Math.random()<0.5){
 						choice='trick';
 					}
@@ -346,7 +346,7 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				var cards=target.get('h',function(card){
+				var cards=target.getCards('h',function(card){
 					return get.type(card)!='basic';
 				});
 				if(cards.length){
@@ -1117,7 +1117,7 @@ card.swd={
 				order:4,
 				result:{
 					target:function(player,target){
-						if(target.get('e','2')){
+						if(target.getEquip(2)){
 							if(target.countCards('h')&&!target.hasSkillTag('noe')) return -0.6;
 							return 0;
 						}
@@ -1611,7 +1611,7 @@ card.swd={
 						if(lib.config.mode=='stone'&&!player.isMin()){
 							if(player.getActCount()+1>=player.actcount) return false;
 						}
-						var shas=player.get('h','sha');
+						var shas=player.getCards('h','sha');
 						if(shas.length>1&&player.getCardUsable('sha')>1){
 							return 0;
 						}
@@ -2265,7 +2265,7 @@ card.swd={
 				player.storage.shuchui2=false;
 				event.num=0;
 				'step 1'
-				var card=player.get('h','sha')[0];
+				var card=player.getCards('h','sha')[0];
 				if(card){
 					player.useCard(card,target);
 				}
@@ -2407,7 +2407,7 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				player.showCards(get.translation(player)+'发动了【青龙之圭】',player.get('h','qinglongzhigui'));
+				player.showCards(get.translation(player)+'发动了【青龙之圭】',player.getCards('h','qinglongzhigui'));
 				player.draw(2);
 				'step 1'
 				player.chooseToDiscard('he',true);
@@ -2429,7 +2429,7 @@ card.swd={
 				};
 				"step 1"
 				if(result.bool){
-					player.showCards(get.translation(player)+'发动了【白兽之琥】',player.get('h','baishouzhihu'));
+					player.showCards(get.translation(player)+'发动了【白兽之琥】',player.getCards('h','baishouzhihu'));
 					player.logSkill('_baishouzhihu',result.targets);
 					player.discardPlayerCard(result.targets[0],'he',true);
 				}
@@ -2450,7 +2450,7 @@ card.swd={
 			},
 			content:function(){
 				'step 0'
-				player.showCards(get.translation(player)+'发动了【朱雀之璋】',player.get('h','zhuquezhizhang'));
+				player.showCards(get.translation(player)+'发动了【朱雀之璋】',player.getCards('h','zhuquezhizhang'));
 				trigger.source.damage('fire');
 				'step 1'
 				game.delay();
@@ -2463,7 +2463,7 @@ card.swd={
 				return player.num('h','xuanwuzhihuang')>0&&event.num>0&&player.hp<player.maxHp;
 			},
 			content:function(){
-				player.showCards(get.translation(player)+'发动了【玄武之璜】',player.get('h','xuanwuzhihuang'));
+				player.showCards(get.translation(player)+'发动了【玄武之璜】',player.getCards('h','xuanwuzhihuang'));
 				player.recover(trigger.num);
 			}
 		},
@@ -2474,7 +2474,7 @@ card.swd={
 				return !player.hujia&&player.num('h','huanglinzhicong')>0;
 			},
 			content:function(){
-				player.showCards(get.translation(player)+'发动了【黄麟之琮】',player.get('h','huanglinzhicong'));
+				player.showCards(get.translation(player)+'发动了【黄麟之琮】',player.getCards('h','huanglinzhicong'));
 				player.changeHujia();
 				player.update();
 			},
@@ -2496,7 +2496,7 @@ card.swd={
 				};
 				'step 1'
 				if(result.bool){
-					player.showCards(get.translation(player)+'发动了【苍螭之璧】',player.get('h','cangchizhibi'));
+					player.showCards(get.translation(player)+'发动了【苍螭之璧】',player.getCards('h','cangchizhibi'));
 					player.logSkill('_cangchizhibi',result.targets);
 					for(var i=0;i<result.targets.length;i++){
 						result.targets[i].link();
@@ -3186,7 +3186,7 @@ card.swd={
 				trigger.finish();
 				player.hp=1;
 				player.draw();
-				player.discard(player.get('e',{subtype:'equip5'}));
+				player.discard(player.getCards('e',{subtype:'equip5'}));
 				game.delay();
 			}
 		},
@@ -3487,7 +3487,7 @@ card.swd={
 		hslingjian_zhongxinghujia_equip1:{
 			trigger:{source:'damageEnd'},
 			check:function(event,player){
-				return !player.get('e','2');
+				return !player.getEquip(2);
 			},
 			filter:function(event){
 				return event.card&&event.card.name=='sha';
@@ -3505,24 +3505,24 @@ card.swd={
 				return ai.get.attitude(player,event.source)<0;
 			},
 			filter:function(event){
-				return event.card&&event.card.name=='sha'&&event.source&&event.source.get('e','2');
+				return event.card&&event.card.name=='sha'&&event.source&&event.source.getEquip(2);
 			},
 			content:function(){
 				player.line(trigger.source,'green');
-				trigger.source.discard(trigger.source.get('e','2'));
+				trigger.source.discard(trigger.source.getEquip(2));
 			}
 		},
 		hslingjian_zhongxinghujia_equip3:{
 			mod:{
 				globalTo:function(from,to,distance){
-					if(to.get('e','2')) return distance+1;
+					if(to.getEquip(2)) return distance+1;
 				}
 			}
 		},
 		hslingjian_zhongxinghujia_equip4:{
 			mod:{
 				globalFrom:function(from,to,distance){
-					if(from.get('e','2')) return distance-1;
+					if(from.getEquip(2)) return distance-1;
 				}
 			}
 		},
@@ -3549,7 +3549,7 @@ card.swd={
 				order:1,
 				result:{
 					target:function(player,target){
-						if(target.get('e','2')) return 0;
+						if(target.getEquip(2)) return 0;
 						return 1;
 					}
 				}
@@ -4082,7 +4082,7 @@ card.swd={
 			complexCard:true,
 			filter:function(event,player){
 				if(!player.num('h',{type:['hslingjian','jiqi']})) return false;
-				var es=player.get('he',{type:'equip'});
+				var es=player.getCards('he',{type:'equip'});
 				for(var i=0;i<es.length;i++){
 					if(lib.inpile.contains(es[i].name)&&
 						!lib.card[es[i].name].nopower&&
@@ -4321,7 +4321,7 @@ card.swd={
 				trigger.finish();
 				player.hp=1;
 				player.draw();
-				player.discard(player.get('e',{subtype:'equip5'}));
+				player.discard(player.getCards('e',{subtype:'equip5'}));
 				game.delay();
 			}
 		},

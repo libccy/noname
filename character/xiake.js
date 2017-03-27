@@ -26,7 +26,7 @@ character.xiake={
         rouquan:{
             mod:{
 				selectTarget:function(card,player,range){
-					if(card.name=='sha'&&!player.get('e','1')&&range[1]!=-1) range[1]=Infinity;
+					if(card.name=='sha'&&!player.getEquip(1)&&range[1]!=-1) range[1]=Infinity;
 				}
 			},
             enable:'phaseUse',
@@ -41,7 +41,7 @@ character.xiake={
             check:function(card,player){
                 var val=ai.get.equipValue(card);
                 var player=_status.event.player;
-                var cards=player.get('h',{subtype:get.subtype(card)});
+                var cards=player.getCards('h',{subtype:get.subtype(card)});
                 for(var i=0;i<cards.length;i++){
                     if(ai.get.equipValue(cards[i])>=val){
                         return 1;

@@ -446,7 +446,7 @@ mode.guozhan={
 				}
 				game.countPlayer(function(current){
 					if(current!=player){
-						var ej=current.get('ej','taipingyaoshu');
+						var ej=current.getCards('ej','taipingyaoshu');
 						if(ej.length){
 							list.addArray(ej);
 						}
@@ -561,7 +561,7 @@ mode.guozhan={
 						var list=[];
 						game.countPlayer(function(current){
 							if(current!=player){
-								var es=current.get('e','feilongduofeng');
+								var es=current.getEquip('feilongduofeng');
 								if(es.length){
 									list.addArray(es);
 								}

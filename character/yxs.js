@@ -574,7 +574,7 @@ character.yxs={
 		zyhufu:{
 			trigger:{player:'phaseDrawBegin'},
 			filter:function(event,player){
-				return !player.get('e','2');
+				return !player.getEquip(2);
 			},
 			forced:true,
 			content:function(){
@@ -585,7 +585,7 @@ character.yxs={
 			},
 			mod:{
 				maxHandcard:function(player,num){
-					if(player.get('e','2')) return num+5;
+					if(player.getEquip(2)) return num+5;
 				}
 			}
 		},
@@ -593,7 +593,7 @@ character.yxs={
 			trigger:{player:'shaBegin'},
 			forced:true,
 			filter:function(event,player){
-				if(player.get('e','3')||player.get('e','4')) return true;
+				if(player.getEquip(3)||player.getEquip(4)) return true;
 				return false;
 			},
 			content:function(){
@@ -1132,7 +1132,7 @@ character.yxs={
 		hanqiang:{
 			mod:{
 				attackFrom:function(from,to,distance){
-					if(!from.get('e','1')) return distance-1
+					if(!from.getEquip(1)) return distance-1
 				}
 			}
 		},
@@ -2049,7 +2049,7 @@ character.yxs={
 					if(trigger.target.hasSkill('shejie2')) return 0;
 					if(trigger.target.hasSkill('shanguang2')) return 0;
 
-					var equip=trigger.target.get('e','2');
+					var equip=trigger.target.getEquip(2);
 					if(equip&&equip.name=='bagua') return 1;
 					return trigger.target.countCards('h')<2?0:1;
 				};
@@ -2481,11 +2481,11 @@ character.yxs={
 						if(!target.hasJudge(judges[i].viewAs||judges[i].name)) return true;
 					}
 					if(target.isMin()) return false;
-					if((from.get('e','1')&&!target.get('e','1'))||
-						(from.get('e','2')&&!target.get('e','2'))||
-						(from.get('e','3')&&!target.get('e','3'))||
-						(from.get('e','4')&&!target.get('e','4'))||
-						(from.get('e','5')&&!target.get('e','5'))) return true;
+					if((from.getEquip(1)&&!target.getEquip(1))||
+						(from.getEquip(2)&&!target.getEquip(2))||
+						(from.getEquip(3)&&!target.getEquip(3))||
+						(from.getEquip(4)&&!target.getEquip(4))||
+						(from.getEquip(5)&&!target.getEquip(5))) return true;
 					return false;
 				}
 				else{
@@ -2534,11 +2534,11 @@ character.yxs={
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
 									if(ai.get.attitude(player,players[i])>0){
-										if((target.get('e','1')&&!players[i].get('e','1'))||
-											(target.get('e','2')&&!players[i].get('e','2'))||
-											(target.get('e','3')&&!players[i].get('e','3'))||
-											(target.get('e','4')&&!players[i].get('e','4'))||
-											(target.get('e','5')&&!players[i].get('e','5')))
+										if((target.getEquip(1)&&!players[i].getEquip(1))||
+											(target.getEquip(2)&&!players[i].getEquip(2))||
+											(target.getEquip(3)&&!players[i].getEquip(3))||
+											(target.getEquip(4)&&!players[i].getEquip(4))||
+											(target.getEquip(5)&&!players[i].getEquip(5)))
 											return -1;
 									}
 								}

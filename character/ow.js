@@ -232,7 +232,7 @@ character.ow={
 						if(card.name=='sha'){
 							if(_status.event.name=='qianggu2') return;
                             if(ai.get.attitude(player,target)>0) return;
-							var bs=player.get('h',{type:'basic'});
+							var bs=player.getCards('h',{type:'basic'});
 							if(bs.length<2) return 0;
 							if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
 							if(bs.length<=3&&player.num('h','sha')<=1){
@@ -1279,7 +1279,7 @@ character.ow={
                     player.storage.baoxue=true;
                     player.awakenSkill('baoxue');
                     player.showHandcards();
-                    player.discard(player.get('he',{color:'black'}));
+                    player.discard(player.getCards('he',{color:'black'}));
                 }
                 'step 1'
                 if(!get.is.altered('baoxue')){

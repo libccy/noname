@@ -570,7 +570,7 @@ character.sp={
 				'step 3'
 				event.target.showCards(result.cards);
 				event.cards1=result.cards;
-				event.cards2=event.target.get('h',function(card){
+				event.cards2=event.target.getCards('h',function(card){
 					return !event.cards1.contains(card);
 				});
 				'step 4'
@@ -903,7 +903,7 @@ character.sp={
 				result:{
 					player:function(player,target){
 						if(get.distance(player,target)<=1) return 0;
-						var hs=player.get('h','shunshou');
+						var hs=player.getCards('h','shunshou');
 						if(hs.length&&player.canUse(hs[0],target,false)){
 							return 1;
 						}
@@ -2357,8 +2357,8 @@ character.sp={
 							if(player.countCards('h')>player.hp) return -0.1;
 							return 0;
 						}
-						var hs1=target.get('h','sha');
-						var hs2=player.get('h','sha');
+						var hs1=target.getCards('h','sha');
+						var hs2=player.getCards('h','sha');
 						if(hs1.length>hs2.length){
 							return 0;
 						}
@@ -3013,7 +3013,7 @@ character.sp={
 			inherit:'bagua_skill',
 			filter:function(event,player){
 				if(!lib.skill.bagua_skill.filter(event,player)) return false;
-				if(player.get('e','2')) return false;
+				if(player.getEquip(2)) return false;
 				return true;
 			},
 			ai:{
@@ -3022,18 +3022,18 @@ character.sp={
 						if(player==target&&get.subtype(card)=='equip2'){
 							if(ai.get.equipValue(card)<=7.5) return 0;
 						}
-						if(target.get('e','2')) return;
+						if(target.getEquip(2)) return;
 						return lib.skill.bagua_skill.ai.effect.target.apply(this,arguments);
 					}
 				}
 			},
 			mod:{
 				maxHandcard:function(player,num){
-					if(player.get('e','3')||player.get('e','4')) return;
+					if(player.getEquip(3)||player.getEquip(4)) return;
 					return num+1;
 				},
 				targetInRange:function(card,player,target,now){
-					if(player.get('e','5')) return;
+					if(player.getEquip(5)) return;
 					var type=get.type(card);
 					if(type=='trick'||type=='delay') return true;
 				}
@@ -3137,7 +3137,7 @@ character.sp={
 				var save=false;
 				if(ai.get.attitude(player,trigger.target)>2){
 					if(trigger.card.name=='sha'){
-						if(player.num('h','shan')||player.get('e','2')||
+						if(player.num('h','shan')||player.getEquip(2)||
 						trigger.target.hp==1||player.hp>trigger.target.hp+1){
 							if(!trigger.target.num('h','shan')||trigger.target.countCards('h')<player.countCards('h')){
 								save=true;
@@ -3958,7 +3958,7 @@ character.sp={
 			logTarget:'player',
 			check:function(event,player){
 				if(ai.get.attitude(player,event.player)>=0) return false;
-				var e2=player.get('e','2');
+				var e2=player.getEquip(2);
 				if(e2){
 					if(e2.name=='tengjia') return true;
 					if(e2.name=='bagua') return	true;
@@ -4058,17 +4058,17 @@ character.sp={
 			},
 			filterTarget:function(card,player,target){
 				if(target==player) return false;
-				return target.get('e','1')||target.get('e','2');
+				return target.getEquip(1)||target.getEquip(2);
 			},
 			content:function(){
 				'step 0'
-				var e1=target.get('e','1');
-				var e2=target.get('e','2');
+				var e1=target.getEquip(1);
+				var e2=target.getEquip(2);
 				event.e1=e1;
 				event.e2=e2;
 				if(e1&&e2){
 					player.chooseControl('武器牌','防具牌').set('ai',function(){
-						if(_status.event.player.get('e','2')){
+						if(_status.event.player.getEquip(2)){
 							return '武器牌';
 						}
 						return '防具牌';
@@ -4099,7 +4099,7 @@ character.sp={
 				order:8,
 				result:{
 					target:function(player,target){
-						if(target.get('e','2')&&!player.get('e','2')){
+						if(target.getEquip(2)&&!player.getEquip(2)){
 							return -2;
 						}
 						return -1;
@@ -5802,7 +5802,7 @@ character.sp={
 			check:function(event,player){
 				if(player.isTurnedOver()) return true;
 				var num=game.countPlayer(function(current){
-					return current.get('e','1');
+					return current.getEquip(1);
 				});
 				return num>1;
 			},
@@ -5811,7 +5811,7 @@ character.sp={
 				player.turnOver();
 				"step 1"
 				var num=game.countPlayer(function(current){
-					return current.get('e','1');
+					return current.getEquip(1);
 				});
 				player.draw(2+num);
 				player.addSkill('kuiwei2');
@@ -5830,7 +5830,7 @@ character.sp={
 			audio:false,
 			content:function(){
 				var num=game.countPlayer(function(current){
-					return current.get('e','1');
+					return current.getEquip(1);
 				});
 				if(num>=player.countCards('he')){
 					player.discard(player.getCards('he'));
@@ -5956,7 +5956,7 @@ character.sp={
 				"step 2"
 				if(!trigger.target.isMin()){
 					trigger.target.chooseBool('是否装备'+get.translation(event.card)+'？').set('ai',function(){
-						var current=_status.event.player.get('e',{subtype:get.subtype(_status.event.card)});
+						var current=_status.event.player.getCards('e',{subtype:get.subtype(_status.event.card)});
 						if(current&&current.length){
 							return ai.get.equipValue(event.card)>ai.get.equipValue(current[0]);
 						}

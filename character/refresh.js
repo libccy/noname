@@ -579,7 +579,7 @@ character.refresh={
 				target.gain(cards[0],player);
 				"step 1"
 				target.chooseControl('refanjian_card','refanjian_hp').ai=function(event,player){
-					var cards=player.get('he',{suit:get.suit(player.storage.refanjian)});
+					var cards=player.getCards('he',{suit:get.suit(player.storage.refanjian)});
 					if(cards.length==1) return 0;
 					if(cards.length>=2){
 						for(var i=0;i<cards.length;i++){
@@ -603,7 +603,7 @@ character.refresh={
 					event.finish();
 				}
 				"step 3"
-				target.discard(target.get('he',{suit:get.suit(target.storage.refanjian)}))
+				target.discard(target.getCards('he',{suit:get.suit(target.storage.refanjian)}))
 				delete target.storage.refanjian;
 			},
 			ai:{

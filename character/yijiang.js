@@ -1448,11 +1448,11 @@ character.yijiang={
 				player.showCards(cards);
 				'step 1'
 				ui.cardPile.insertBefore(cards[0],ui.cardPile.firstChild);
-				var n1=target.get('he',function(card){
+				var n1=target.getCards('he',function(card){
 					if(!lib.filter.cardDiscardable(card,player)) return false;
 					return get.type(card,'trick')=='trick';
 				});
-				var n2=target.get('he',function(card){
+				var n2=target.getCards('he',function(card){
 					if(!lib.filter.cardDiscardable(card,player)) return false;
 					return get.type(card,'trick')!='trick';
 				});
@@ -1507,12 +1507,12 @@ character.yijiang={
 				return ai.get.attitude(player,event.player)<0;
 			},
 			filter:function(event,player){
-				return event.card&&event.card.name=='sha'&&player.get('e','1');
+				return event.card&&event.card.name=='sha'&&player.getEquip(1);
 			},
 			content:function(){
 				'step 0'
 				var num=1;
-				var info=get.info(player.get('e','1'));
+				var info=get.info(player.getEquip(1));
 				if(info&&info.distance&&info.distance.attackFrom){
 					num-=info.distance.attackFrom;
 				}
@@ -1540,7 +1540,7 @@ character.yijiang={
 				}
 				'step 1'
 				if(!event.directfalse&&result.bool){
-					var e1=player.get('e','1');
+					var e1=player.getEquip(1);
 					if(e1){
 						player.discard(e1);
 					}
@@ -2455,10 +2455,10 @@ character.yijiang={
 				'step 2'
 				var cards;
 				if(event.control=='红色'){
-					cards=player.get('h',{color:'red'});
+					cards=player.getCards('h',{color:'red'});
 				}
 				else{
-					cards=player.get('h',{color:'black'});
+					cards=player.getCards('h',{color:'black'});
 				}
 				player.discard(cards);
 				event.num=cards.length;
@@ -2578,8 +2578,8 @@ character.yijiang={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('noe')) return 1;
-						if(target.get('e','1')||target.get('e','4')) return -1;
-						if(target.get('e','2')) return -0.7;
+						if(target.getEquip(1)||target.getEquip(4)) return -1;
+						if(target.getEquip(2)) return -0.7;
 						return -0.5;
 					}
 				}
@@ -3189,7 +3189,7 @@ character.yijiang={
 				if(!event.filterCard({name:'shan'})) return false;
 				if(player.hasSkill('huomo2')) return false;
 				if(event.parent.name!='sha') return false;
-				var hs=player.get('he',{color:'black'});
+				var hs=player.getCards('he',{color:'black'});
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])!='basic'){
 						break;
@@ -3664,7 +3664,7 @@ character.yijiang={
 		duodao:{
 			trigger:{player:'damageEnd'},
 			filter:function(event,player){
-				return player.countCards('he')>0&&event.source&&event.source.get('e','1')!=undefined&&
+				return player.countCards('he')>0&&event.source&&event.source.getEquip(1)!=undefined&&
 					event.card&&event.card.name=='sha';
 			},
 			check:function(event,player){
@@ -3685,8 +3685,8 @@ character.yijiang={
 				});
 				'step 1'
 				if(result.bool){
-					trigger.source.$give(trigger.source.get('e','1'),player);
-					player.gain(trigger.source.get('e','1'),trigger.source);
+					trigger.source.$give(trigger.source.getEquip(1),player);
+					player.gain(trigger.source.getEquip(1),trigger.source);
 				}
 			},
 		},
@@ -5748,7 +5748,7 @@ character.yijiang={
 			forced:true,
 			audio:2,
 			filter:function(event,player){
-				if(player.get('e','2')) return false;
+				if(player.getEquip(2)) return false;
 				return (event.card.name=='sha'&&get.color(event.card)=='black')
 			},
 			content:function(){
@@ -5761,7 +5761,7 @@ character.yijiang={
 						if(player==target&&get.subtype(card)=='equip2'){
 							if(ai.get.equipValue(card)<=8) return 0;
 						}
-						if(target.get('e','2')) return;
+						if(target.getEquip(2)) return;
 						if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
 					}
 				}
@@ -5925,7 +5925,7 @@ character.yijiang={
 								}
 							}
 							if(num<=0) return 0;
-							var e2=target.get('e','2');
+							var e2=target.getEquip(2);
 							if(e2){
 								if(e2.name=='tengjia'){
 									if(!player.num('h',{name:'sha',nature:'fire'})&&!player.num('e','zhuque')) return 0;
@@ -6639,7 +6639,7 @@ character.yijiang={
 			},
 			check:function(event,player){
 				if(event.player.isUnderControl(true,player)){
-					return event.player.get('h',function(card){
+					return event.player.getCards('h',function(card){
 						return get.type(card)!='basic';
 					}).length>0;
 				}

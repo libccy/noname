@@ -112,7 +112,7 @@ character.zhuogui={
 			forced:true,
 			priority:6,
 			filter:function(event,player){
-                if(player.get('e','2')) return false;
+                if(player.getEquip(2)) return false;
 				if(event.player.num('s','unequip')) return false;
 				if(event.card.name=='nanman') return true;
 				if(event.card.name=='wanjian') return true;
@@ -125,11 +125,11 @@ character.zhuogui={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-                        if(target.get('e','2')) return;
+                        if(target.getEquip(2)) return;
 						if(player.num('s','unequip')) return;
 						if(card.name=='nanman'||card.name=='wanjian') return 0;
 						if(card.name=='sha'){
-    						var equip1=player.get('e','1');
+    						var equip1=player.getEquip(1);
     						if(equip1&&equip1.name=='zhuque') return 2;
     						if(equip1&&equip1.name=='qinggang') return 1;
 							if(!card.nature) return 0;
@@ -141,7 +141,7 @@ character.zhuogui={
 		manjia2:{
 			trigger:{player:'damageBegin'},
 			filter:function(event,player){
-                if(player.get('e','2')) return false;
+                if(player.getEquip(2)) return false;
 				if(event.nature=='fire') return true;
 			},
 			forced:true,
@@ -154,7 +154,7 @@ character.zhuogui={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-                        if(target.get('e','2')) return;
+                        if(target.getEquip(2)) return;
 						if(card.name=='sha'){
 							if(card.nature=='fire'||player.hasSkill('zhuque_skill')) return 2;
 						}

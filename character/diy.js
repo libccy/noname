@@ -229,7 +229,7 @@ character.diy={
 				'step 0'
 				var bool=false;
 				var subtype=get.subtype(trigger.cards[0]);
-				var current=trigger.player.get('e',subtype[5]);
+				var current=trigger.player.getEquip('e',parseInt(subtype[5]));
 				var att=ai.get.attitude(trigger.player,player);
 				if(current){
 					if(att>0){
@@ -746,7 +746,7 @@ character.diy={
 			usable:1,
 			discard:false,
 			filter:function(event,player){
-				var cards=player.get('he',{color:'black'});
+				var cards=player.getCards('he',{color:'black'});
 				for(var i=0;i<cards.length;i++){
 					var type=get.type(cards[i]);
 					if(type=='basic') return true;
@@ -903,7 +903,7 @@ character.diy={
 				return event.source&&event.source!=player&&event.source.num('he',{color:'red'})>0;
 			},
 			content:function(){
-				trigger.source.discard(trigger.source.get('he',{color:'red'}));
+				trigger.source.discard(trigger.source.getCards('he',{color:'red'}));
 			},
 			ai:{
 				expose:0.1,

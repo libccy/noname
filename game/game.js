@@ -11635,7 +11635,7 @@
 						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
 					}
 					player.equiping=true;
-					player.lose(player.get('e',{subtype:get.subtype(card)}),false);
+					player.lose(player.getCards('e',{subtype:get.subtype(card)}),false);
 					"step 2"
 					if(player.isMin()){
 						event.finish();
@@ -13812,8 +13812,8 @@
 							position=arguments[i];
 						}
 					}
-					var cards=this.get(position,num);
-					if(cards){
+					var cards=this.getCards(position).randomGets(num);
+					if(cards.length){
 						this.discard(cards);
 					}
 					return cards;
