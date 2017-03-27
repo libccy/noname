@@ -13920,7 +13920,7 @@
 					var delayed=false;
 					for(var i=0;i<targets.length;i++){
 						var current=targets[i];
-						var card=current.get(position||'h').randomGet();
+						var card=current.getCards(position).randomGet();
 						if(!card) continue;
 						if(current==game.me||current.isOnline()){
 							this.gain(card,current);
@@ -15713,15 +15713,14 @@
     				return false;
     			},
 				hasCard:function(name,position){
-					position=position||'h';
 					if(typeof name=='function'){
-						var hs=this.get(position);
+						var hs=this.getCards(position);
 						for(var i=0;i<hs.length;i++){
 							if(name(hs[i])) return true;
 						}
 					}
 					else{
-						if(this.num(position,name)) return true;
+						if(this.countCards(position,name)) return true;
 						var mn=this.getEquip('muniu');
 						if(mn&&mn.cards&&mn.cards.length){
 							for(var i=0;i<mn.cards.length;i++){
