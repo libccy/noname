@@ -19485,13 +19485,16 @@
 	var game={
         online:false,
         onlineID:null,
-        showHistory:function(){
+        showHistory:function(pause){
             if(lib.config.show_history=='left'){
                 ui.window.classList.add('leftbar');
             }
             else if(lib.config.show_history=='right'){
                 ui.window.classList.add('rightbar');
             }
+			if(pause!=false&&ui.pause){
+				ui.pause.show();
+			}
         },
         createBackground:function(src,blur){
             var current=document.body.querySelector('.background.upper');
@@ -24776,7 +24779,7 @@
 		},
 		prepareArena:function(num){
             _status.prepareArena=true;
-            game.showHistory();
+            game.showHistory(false);
 			ui.create.players(num);
 			ui.create.me();
 			ui.create.cardsAsync();
@@ -33599,6 +33602,9 @@
 				ui.config2.style.transition='all 0.5s';
 				ui.pause=ui.create.system('暂停',ui.click.pause);
                 ui.pause.id='pausebutton';
+				if(!_status.video){
+					ui.pause.hide();
+				}
 				if(!lib.config.touchscreen){
 					lib.setPopped(ui.pause,ui.click.pausehistory,220,400,null,true);
 				}
