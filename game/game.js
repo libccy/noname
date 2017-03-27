@@ -12601,6 +12601,90 @@
                     }
                     return null;
                 },
+				getCards:function(arg1,arg2){
+					arg1=arg1||'he';
+					var cards=[],cards1=[];
+					var i,j;
+					for(i=0;i<arg1.length;i++){
+						if(arg1[i]=='h'){
+							for(j=0;j<this.node.handcards1.childElementCount;j++){
+								if(!this.node.handcards1.childNodes[j].classList.contains('removing')){
+									cards.push(this.node.handcards1.childNodes[j]);
+								}
+							}
+							for(j=0;j<this.node.handcards2.childElementCount;j++){
+								if(!this.node.handcards2.childNodes[j].classList.contains('removing')){
+									cards.push(this.node.handcards2.childNodes[j]);
+								}
+							}
+						}
+						else if(arg1[i]=='e'){
+							for(j=0;j<this.node.equips.childElementCount;j++){
+								if(!this.node.equips.childNodes[j].classList.contains('removing')){
+									cards.push(this.node.equips.childNodes[j]);
+								}
+							}
+						}
+						else if(arg1[i]=='j'){
+							for(j=0;j<this.node.judges.childElementCount;j++){
+								if(!this.node.judges.childNodes[j].classList.contains('removing')){
+									cards.push(this.node.judges.childNodes[j]);
+									if(this.node.judges.childNodes[j].viewAs&&arguments.length>1){
+										this.node.judges.childNodes[j].tempJudge=this.node.judges.childNodes[j].name;
+										this.node.judges.childNodes[j].name=this.node.judges.childNodes[j].viewAs;
+										cards1.push(this.node.judges.childNodes[j]);
+									}
+								}
+							}
+						}
+					}
+					if(arguments.length==1){
+						return cards;
+					}
+					if(arg2){
+						if(typeof arg2=='string'){
+							for(i=0;i<cards.length;i++){
+								if(cards[i].name!=arg2){
+									cards.splice(i,1);i--;
+								}
+							}
+						}
+						else if(typeof arg2=='object'){
+							for(i=0;i<cards.length;i++){
+								for(j in arg2){
+									var value;
+									if(j=='type'||j=='subtype'||j=='color'||j=='suit'||j=='number'){
+										value=get[j](cards[i]);
+									}
+									else{
+										value=cards[i][j];
+									}
+									if((typeof arg2[j]=='string'&&value!=arg2[j])||
+										(Array.isArray(arg2[j])&&!arg2[j].contains(value))){
+										cards.splice(i--,1);break;
+									}
+								}
+							}
+						}
+						else if(typeof arg2=='function'){
+							for(i=0;i<cards.length;i++){
+								if(!arg2(cards[i])){
+									cards.splice(i--,1);
+								}
+							}
+						}
+					}
+					for(i=0;i<cards1.length;i++){
+						if(cards1[i].tempJudge){
+							cards1[i].name=cards1[i].tempJudge;
+							delete cards1[i].tempJudge;
+						}
+					}
+					return cards;
+				},
+				countCards:function(arg1,arg2){
+					return this.getCards(arg1,arg2).length;
+				},
 				get:function(arg1,arg2,arg3,arg4){
 					var i,j;
 					if(arg1=='s'){
@@ -15646,12 +15730,19 @@
 					return false;
 				},
 				getEquip:function(name){
-					var es=this.get('e');
+					var es=this.getCards('e');
 					for(var i=0;i<es.length;i++){
-						if(es[i].name==name) return es[i];
-						var source=get.info(es[i]).source;
-						if(Array.isArray(source)&&source.contains(name)){
-							return es[i];
+						if(typeof name==='number'){
+							if(get.info(es[i]).subtype==='equip'+name){
+								return es[i];
+							}
+						}
+						else{
+							if(es[i].name===name) return es[i];
+							var source=get.info(es[i]).source;
+							if(Array.isArray(source)&&source.contains(name)){
+								return es[i];
+							}
 						}
 					}
 					return null;
