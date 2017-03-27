@@ -17764,6 +17764,7 @@
 
 					if(lib.config.button_press){
 						node.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
+							if(node.parentNode.classList.contains('disabled')) return;
 							// node.classList.add('controlthundertext');
 							node.parentNode.classList.add('controlpressdown');
 							node.parentNode.classList.add('controlpressdownx');

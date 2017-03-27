@@ -1509,7 +1509,7 @@ mode.stone={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=1;
+								ui.cheat.classList.remove('disabled');
 							}
 						}
 						else{
@@ -1524,7 +1524,7 @@ mode.stone={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=0.6;
+								ui.cheat.classList.add('disabled');
 							}
 						}
 					});

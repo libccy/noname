@@ -1630,6 +1630,7 @@ div:not(.handcards)>.card>.info>span,
 }
 .control.disabled{
 	opacity: 0.6 !important;
+	cursor: default !important;
 }
 #control>div {
 	position: absolute;
