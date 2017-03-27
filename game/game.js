@@ -18667,13 +18667,13 @@
                 logv:false,
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
 				filter:function(event,player){
-					return (player.hasCard(function(card){
+					return player.hasCard(function(card){
                         var info=get.info(card);
 						if(typeof info.chongzhu=='function'){
 							return info.chongzhu(event,player);
 						}
 						return info.chongzhu;
-					})>0);
+					});
 				},
 				filterCard:function(card){
                     var info=get.info(card);

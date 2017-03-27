@@ -182,7 +182,7 @@ character.refresh={
 				effect:{
 					target:function(card,player,target){
 						if(player==target&&get.type(card)=='equip'){
-							if(player.num('e',{subtype:get.subtype(card)})){
+							if(player.countCards('e',{subtype:get.subtype(card)})){
 								if(game.hasPlayer(function(current){
 									return current!=player&&ai.get.attitude(player,current)>0;
 								})){

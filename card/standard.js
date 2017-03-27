@@ -122,7 +122,7 @@ card.standard={
 				},
 				result:{
 					target:function(player,target){
-						if(player.hasSkill('jiu')&&!target.num('e','baiyin')){
+						if(player.hasSkill('jiu')&&!target.getEquip('baiyin')){
 							if(ai.get.attitude(player,target)>0){
 								return -6;
 							}

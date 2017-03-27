@@ -2527,7 +2527,7 @@ mode.boss={
 									hastarget=true;break;
 								}
 							}
-							var be=target.num('e',{color:'black'});
+							var be=target.countCards('e',{color:'black'});
 							if(target.countCards('h','shan')&&be){
 								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.countCards('he')/2:0];

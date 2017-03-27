@@ -219,10 +219,10 @@ character.diy={
 				var subtype=get.subtype(event.cards[0]);
 				if(att>0){
 					if(event.player.countCards('h')>=player.countCards('h')+2) return true;
-					return event.player.num('e',{subtype:subtype})==0;
+					return event.player.countCards('e',{subtype:subtype})==0;
 				}
 				else{
-					return event.player.num('e',{subtype:subtype})>0;
+					return event.player.countCards('e',{subtype:subtype})>0;
 				}
 			},
 			content:function(){

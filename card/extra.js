@@ -96,7 +96,7 @@ card.extra={
 							if(game.hasPlayer(function(current){
 								return (ai.get.attitude(target,current)<0&&
 									target.canUse(card,current,true,true)&&
-									!current.num('e','baiyin')&&
+									!current.getEquip('baiyin')&&
 									ai.get.effect(current,card,target)>0);
 							})){
 								return 1;

@@ -1482,7 +1482,7 @@ mode.guozhan={
 				effect:{
 					target:function(card,player,target){
 						if(player==target&&get.type(card)=='equip'){
-							if(player.num('e',{subtype:get.subtype(card)})){
+							if(player.countCards('e',{subtype:get.subtype(card)})){
 								var players=game.filterPlayer();
 								for(var i=0;i<players.length;i++){
 									if(players[i]!=player&&ai.get.attitude(player,players[i])>0){

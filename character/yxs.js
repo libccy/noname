@@ -2712,7 +2712,7 @@ character.yxs={
 					player.chooseTarget('选择一个角色装备'+get.translation(result.links),function(card,player,target){
 						return !target.isMin();
 					}).ai=function(target){
-						if(!target.num('e',{subtype:get.subtype(event.card)})){
+						if(!target.countCards('e',{subtype:get.subtype(event.card)})){
 							return ai.get.attitude(player,target);
 						}
 						return 0;

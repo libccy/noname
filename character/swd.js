@@ -2718,7 +2718,7 @@ character.swd={
 								return;
 							}
 						}
-						if(target.countCards('h')>2||target.num('e',{color:'black'})){
+						if(target.countCards('h')>2||target.countCards('e',{color:'black'})){
 							return [1,0,0,-1];
 						}
 						return [1,-0.5];
@@ -3224,7 +3224,7 @@ character.swd={
 					player:function(card,player){
 						if(_status.currentPhase!=player) return;
 						if(get.type(card)=='equip'&&
-							player.num('e',{subtype:get.subtype(card)})&&
+							player.countCards('e',{subtype:get.subtype(card)})&&
 							lib.filter.filterCard({name:'sha'},player)){
 							return 0;
 						}
@@ -7133,7 +7133,7 @@ character.swd={
 					event.finish();
 				}
 				"step 5"
-				var renum=event.current.num('e',{color:event.color});
+				var renum=event.current.countCards('e',{color:event.color});
 				if(renum){
 					event.current.recover();
 				}

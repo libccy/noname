@@ -253,7 +253,7 @@ character.shenhua={
 					return current!=player&&ai.get.attitude(player,current)>3;
 				});
 				var player=_status.event.player;
-				var num=player.num('he',function(card){
+				var num=player.countCards('he',function(card){
 					return ai.get.value(card)<7;
 				});
 				var count=null;
@@ -964,7 +964,7 @@ character.shenhua={
 							return !targets1.hasJudge(button.link.viewAs||button.link.name);
 						}
 						else{
-							return !targets1.num('e',{subtype:get.subtype(button.link)});
+							return !targets1.countCards('e',{subtype:get.subtype(button.link)});
 						}
 					});
 				}
@@ -3310,7 +3310,7 @@ character.shenhua={
 							var hastarget=game.hasPlayer(function(current){
 								return ai.get.attitude(target,current)<0;
 							});
-							var be=target.num('e',{color:'black'});
+							var be=target.countCards('e',{color:'black'});
 							if(target.countCards('h','shan')&&be){
 								if(!target.hasSkill('guidao')) return 0;
 								return [0,hastarget?target.countCards('he')/2:0];
@@ -3952,7 +3952,7 @@ character.shenhua={
 							var hastarget=game.hasPlayer(function(current){
 								return ai.get.attitude(target,current)<0;
 							});
-							if(target.countCards('h','shan')&&target.num('e',{suit:'spade'})){
+							if(target.countCards('h','shan')&&target.countCards('e',{suit:'spade'})){
 								return [0,hastarget?target.countCards('he')/2:0];
 							}
 							if(target.countCards('h','shan')){
