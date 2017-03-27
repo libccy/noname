@@ -59,7 +59,7 @@ mode.guozhan={
 				lib.card.list=lib.guozhanPile.slice(0);
 			}
 			game.prepareArena();
-			game.delay();
+			// game.delay();
 			game.showChangeLog();
 		}
 		if(!_status.connectMode){

@@ -124,7 +124,10 @@ mode.versus={
 				game.finishCards();
 			}
 		}
-		game.delay();
+		// game.delay();
+		if(_status.mode=='four'){
+			game.delay(0.5);
+		}
 		"step 2"
 		if(_status.connectMode){
 			if(lib.configOL.versus_mode=='1v1'){
