@@ -37191,17 +37191,17 @@
 				this.startX=e.touches[0].clientX/game.documentZoom;
 				this.startY=e.touches[0].clientY/game.documentZoom;
 				_status.dragged=false;
-				if(lib.device=='ios'){
-					var startY=e.touches[0].pageY;
-					var startTopScroll=this.scrollTop;
-
-					if(startTopScroll<=0){
-						this.scrollTop=1;
-					}
-					else if(startTopScroll&&startTopScroll+this.offsetHeight>=this.scrollHeight){
-						this.scrollTop=this.scrollHeight-this.offsetHeight-1;
-					}
-				}
+				// if(lib.device=='ios'){
+				// 	var startY=e.touches[0].pageY;
+				// 	var startTopScroll=this.scrollTop;
+				//
+				// 	if(startTopScroll<=0){
+				// 		this.scrollTop=1;
+				// 	}
+				// 	else if(startTopScroll&&startTopScroll+this.offsetHeight>=this.scrollHeight){
+				// 		this.scrollTop=this.scrollHeight-this.offsetHeight-1;
+				// 	}
+				// }
 			},
 			dialogtouchStart:function(e){
 				ui.click.touchStart.call(this,e);
