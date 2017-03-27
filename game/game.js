@@ -24770,7 +24770,18 @@
             game.showHistory();
 			ui.create.players(num);
 			ui.create.me();
-			ui.create.cards();
+			if(lib.onfree){
+				_status.waitingForCards=true;
+				lib.onfree.push(function(){
+					if(_status.waitingForCards){
+						ui.create.cards();
+						delete _status.waitingForCards;
+					}
+				});
+			}
+			else{
+				ui.create.cards();
+			}
 			game.finishCards();
 		},
         clearArena:function(){
@@ -38532,6 +38543,10 @@
 			return card.nature;
 		},
 		cards:function(num){
+			if(_status.waitingForCards){
+				ui.create.cards();
+				delete _status.waitingForCards;
+			}
 			var list=[];
 			var card=false;
 			if(typeof num!='number') num=1;
