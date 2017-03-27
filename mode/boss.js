@@ -129,14 +129,7 @@ mode.boss={
 		}
 		ui.create.div(bosslist);
 		lib.translate.boss_pangtong='涅槃凤雏';
-		if(lib.onfree){
-			lib.onfree.push(function(){
-				ui.create.cards();
-			});
-		}
-		else{
-			ui.create.cards();
-		}
+		ui.create.cardsAsync();
 		game.finishCards();
 		game.addGlobalSkill('autoswap');
 		ui.arena.setNumber(8);

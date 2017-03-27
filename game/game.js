@@ -24770,18 +24770,7 @@
             game.showHistory();
 			ui.create.players(num);
 			ui.create.me();
-			if(lib.onfree){
-				_status.waitingForCards=true;
-				lib.onfree.push(function(){
-					if(_status.waitingForCards){
-						ui.create.cards();
-						delete _status.waitingForCards;
-					}
-				});
-			}
-			else{
-				ui.create.cards();
-			}
+			ui.create.cardsAsync();
 			game.finishCards();
 		},
         clearArena:function(){
@@ -34268,16 +34257,30 @@
 				}
 				return node;
 			},
-			cards:function(random){
+			cardsAsync:function(){
+				if(lib.onfree){
+					_status.waitingForCards=Array.from(arguments);
+					lib.onfree.push(function(){
+						if(_status.waitingForCards){
+							ui.create.cards.apply(ui.create,_status.waitingForCards);
+							delete _status.waitingForCards;
+						}
+					});
+				}
+				else{
+					ui.create.cards.apply(ui.create,arguments);
+				}
+			},
+			cards:function(ordered){
                 if(_status.brawl){
                     if(_status.brawl.cardPile){
                         lib.card.list=_status.brawl.cardPile(lib.card.list);
                     }
                     if(_status.brawl.orderedPile){
-                        random=true;
+                        ordered=true;
                     }
                 }
-				if(!random){
+				if(!ordered){
 					lib.card.list.randomSort();
 				}
 				for(var i=0;i<lib.card.list.length;i++){
@@ -34688,36 +34691,36 @@
 					}
 					uiintro.add(node);
 				}
-				if(_status.video) return uiintro;
-
-				var auto=null;
-				var ng=null;
-				var sks=[];
-				var autoskill=ui.autoskill;
-				if(game.players){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i]==game.me||game.players[i].isUnderControl()){
-							sks=sks.concat(game.expandSkills(game.players[i].get('s')));
-						}
-					}
-				}
-				for(var i=0;i<sks.length;i++){
-					if(autoskill[sks[i]]){
-						if(!auto){
-							ng=ui.create.div('.text');
-							ng.style.marginBottom=0;
-							ng.innerHTML='新游戏';
-							uiintro.content.insertBefore(ng,uiintro.content.firstChild);
-
-							auto=ui.create.div('.text');
-							auto.style.marginBottom=0;
-							auto.innerHTML='自动发动';
-							uiintro.add(auto);
-						}
-						autoskill[sks[i]].style.display='';
-						uiintro.add(autoskill[sks[i]]);
-					}
-				}
+				// if(_status.video) return uiintro;
+				//
+				// var auto=null;
+				// var ng=null;
+				// var sks=[];
+				// var autoskill=ui.autoskill;
+				// if(game.players){
+				// 	for(var i=0;i<game.players.length;i++){
+				// 		if(game.players[i]==game.me||game.players[i].isUnderControl()){
+				// 			sks=sks.concat(game.expandSkills(game.players[i].get('s')));
+				// 		}
+				// 	}
+				// }
+				// for(var i=0;i<sks.length;i++){
+				// 	if(autoskill[sks[i]]){
+				// 		if(!auto){
+				// 			ng=ui.create.div('.text');
+				// 			ng.style.marginBottom=0;
+				// 			ng.innerHTML='新游戏';
+				// 			uiintro.content.insertBefore(ng,uiintro.content.firstChild);
+				//
+				// 			auto=ui.create.div('.text');
+				// 			auto.style.marginBottom=0;
+				// 			auto.innerHTML='自动发动';
+				// 			uiintro.add(auto);
+				// 		}
+				// 		autoskill[sks[i]].style.display='';
+				// 		uiintro.add(autoskill[sks[i]]);
+				// 	}
+				// }
 
 				return uiintro;
 			},
@@ -38544,7 +38547,7 @@
 		},
 		cards:function(num){
 			if(_status.waitingForCards){
-				ui.create.cards();
+				ui.create.cards.apply(ui.create,_status.waitingForCards);
 				delete _status.waitingForCards;
 			}
 			var list=[];

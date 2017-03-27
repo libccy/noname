@@ -43,7 +43,7 @@ mode.chess={
 		if(get.config('chess_card')){
 			lib.card.list=lib.card.list.concat(lib.chess_cardlist);
 		}
-		ui.create.cards();
+		ui.create.cardsAsync();
 		game.finishCards();
 		game.addGlobalSkill('autoswap');
 		ui.chessContainer=ui.create.div('#chess-container',ui.arena);

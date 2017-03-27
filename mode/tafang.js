@@ -59,7 +59,7 @@ mode.tafang={
                 lib.character[i][4]=[];
             }
         }
-		ui.create.cards();
+		ui.create.cardsAsync();
 		game.finishCards();
 		game.addGlobalSkill('autoswap');
 		ui.chessContainer=ui.create.div('#chess-container',ui.arena);

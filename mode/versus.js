@@ -83,14 +83,7 @@ mode.versus={
 				lib.translate.zhuge_info='锁定技，出牌阶段，你使用杀的次数上限+3';
 				lib.card.list=lib.cardsThree;
 			}
-			if(lib.onfree){
-				lib.onfree.push(function(){
-					ui.create.cards();
-				});
-			}
-			else{
-				ui.create.cards();
-			}
+			ui.create.cardsAsync();
 			game.finishCards();
 		}
 		else{
@@ -112,14 +105,7 @@ mode.versus={
 			}
 			game.save('only_zhu',true);
 			ui.wuxie.hide();
-			if(lib.onfree){
-				lib.onfree.push(function(){
-					ui.create.cards();
-				});
-			}
-			else{
-				ui.create.cards();
-			}
+			ui.create.cardsAsync();
 			game.finishCards();
 		}
 		// game.delay();
