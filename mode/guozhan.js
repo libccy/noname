@@ -879,7 +879,7 @@ mode.guozhan={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -1536,7 +1536,7 @@ mode.guozhan={
 		qingcheng:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})&&game.hasPlayer(function(current){
+				return player.countCards('he',{type:'equip'})&&game.hasPlayer(function(current){
 					return current!=player&&!current.isUnseen(2);
 				});
 			},

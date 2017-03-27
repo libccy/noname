@@ -210,7 +210,7 @@ character.sp={
 		zqingcheng:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('he',{type:'equip'});
+				return player.countCards('he',{type:'equip'});
 			},
 			filterCard:{type:'equip'},
 			position:'he',
@@ -2974,11 +2974,11 @@ character.sp={
 			trigger:{player:'phaseUseBegin'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			content:function(){
 				'step 0'
-				player.chooseToDiscard(get.prompt('jiqiao'),[1,player.num('he',{type:'equip'})],'he',function(card){
+				player.chooseToDiscard(get.prompt('jiqiao'),[1,player.countCards('he',{type:'equip'})],'he',function(card){
 					return get.type(card)=='equip';
 				}).set('ai',function(card){
 					if(card.name=='bagua') return 10;
@@ -3518,7 +3518,7 @@ character.sp={
 				onunmark:'throw'
 			},
 			filter:function(event,player){
-				return player.num('he',{color:'black'})>0&&player.storage.yinling.length<4;
+				return player.countCards('he',{color:'black'})>0&&player.storage.yinling.length<4;
 			},
 			filterTarget:function(card,player,target){
 				return target.countCards('he')>0&&target!=player;
@@ -3578,7 +3578,7 @@ character.sp={
 			},
 			position:'he',
 			filter:function(event,player){
-				return player.num('he',{suit:'diamond'})>0;
+				return player.countCards('he',{suit:'diamond'})>0;
 			},
 			discard:false,
 			prepare:'give',
@@ -3821,12 +3821,12 @@ character.sp={
 				player.storage.yinbing=[];
 			},
 			filter:function(event,player){
-				return player.num('he',{type:'basic'})<player.countCards('he');
+				return player.countCards('he',{type:'basic'})<player.countCards('he');
 			},
 			marktext:'兵',
 			content:function(){
 				"step 0"
-				player.chooseCard([1,player.countCards('he')-player.num('he',{type:'basic'})],'he',get.prompt('yinbing'),function(card){
+				player.chooseCard([1,player.countCards('he')-player.countCards('he',{type:'basic'})],'he',get.prompt('yinbing'),function(card){
 					return get.type(card)!='basic';
 				}).set('ai',function(card){
 					return 6-ai.get.value(card);
@@ -4479,7 +4479,7 @@ character.sp={
 			trigger:{player:'phaseUseBefore'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -7052,7 +7052,7 @@ character.sp={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.hp<player.maxHp&&player.num('he',{color:'red'})>0;
+				return player.hp<player.maxHp&&player.countCards('he',{color:'red'})>0;
 			},
 			filterTarget:function(card,player,target){
 				return player!=target&&get.distance(player,target,'attack')<=1;
@@ -7743,7 +7743,7 @@ character.sp={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			content:function(){
 				"step 0"

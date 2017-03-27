@@ -5121,13 +5121,13 @@ mode.chess={
 			},
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 12-ai.get.equipValue(card);
 				}
 				return 8-ai.get.equipValue(card);
 			},
 			filter:function(event,player){
-				return player.num('he',{type:'equip'});
+				return player.countCards('he',{type:'equip'});
 			},
 			filterTarget:function(card,player,target){
 				return player!=target&&get.distance(player,target)<=2;

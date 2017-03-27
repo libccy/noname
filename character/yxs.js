@@ -1759,7 +1759,7 @@ character.yxs={
 			prompt:'将一张装备区内的牌当南蛮入侵使用',
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				if(player.countCards('h')<player.hp){
@@ -2396,7 +2396,7 @@ character.yxs={
 			filter:function(event,player){
 				if(get.position(event.card)!='d') return false;
 				if(player.hasSkill('jieyong2')) return false;
-				return player.num('he',{color:'black'})>0;
+				return player.countCards('he',{color:'black'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -2440,7 +2440,7 @@ character.yxs={
 			filter:function(event,player){
 				return _status.currentPhase!=player&&event.player!=player&&get.type(event.card)=='trick'&&
 					get.position(event.card)=='d'&&!player.hasSkill('zhulu2')&&
-					get.itemtype(event.card)=='card'&&player.num('he',{suit:get.suit(event.card)})>0;
+					get.itemtype(event.card)=='card'&&player.countCards('he',{suit:get.suit(event.card)})>0;
 			},
 			content:function(){
 				"step 0"

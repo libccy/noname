@@ -356,7 +356,7 @@ character.hearth={
 				'step 1'
 				if(event.targets.length){
 					event.target=event.targets.shift();
-					if(event.target.num('he',{color:'black'})){
+					if(event.target.countCards('he',{color:'black'})){
 						event.target.chooseCard('he','交给'+get.translation(player)+'一张黑色牌，或失去一点体力',{color:'black'}).ai=function(card){
 							if(ai.get.attitude(event.target,player)>0) return 10-ai.get.value(card);
 							return 7-ai.get.value(card);
@@ -638,7 +638,7 @@ character.hearth={
 		yuelu:{
 			enable:'chooseToUse',
 			filter:function(event,player){
-				return event.type=='dying'&&player.num('he',{color:'black'});
+				return event.type=='dying'&&player.countCards('he',{color:'black'});
 			},
 			alter:true,
 			filterCard:{color:'black'},
@@ -657,7 +657,7 @@ character.hearth={
 			ai:{
 				order:10,
 				skillTagFilter:function(player){
-					if(player.num('he',{color:'black'})==0) return false;
+					if(player.countCards('he',{color:'black'})==0) return false;
 				},
 				save:true,
 				result:{
@@ -753,7 +753,7 @@ character.hearth={
 			filterCard:{color:'black'},
 			position:'he',
 			viewAsFilter:function(player){
-				if(!player.num('he',{color:'black'})) return false;
+				if(!player.countCards('he',{color:'black'})) return false;
 			},
 			check:function(card){
 				return 6-ai.get.value(card);
@@ -868,7 +868,7 @@ character.hearth={
 			},
 			viewAs:{name:'wuzhong'},
 			viewAsFilter:function(player){
-				if(!player.num('he',{suit:'spade'})) return false;
+				if(!player.countCards('he',{suit:'spade'})) return false;
 			},
 			prompt:'将一张黑桃手牌当作无中生有使用',
 			check:function(card){return 7-ai.get.value(card)},
@@ -1114,7 +1114,7 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return !player.getStat('damage')&&player.num('he',{color:'black'})>0;
+				return !player.getStat('damage')&&player.countCards('he',{color:'black'})>0;
 			},
 			content:function(){
 				'step 0'
@@ -1544,7 +1544,7 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('he',{color:'red'})>0
+				return player.countCards('he',{color:'red'})>0
 			},
 			init:function(player){
 				player.storage.nuyan=[];
@@ -4065,7 +4065,7 @@ character.hearth={
 			enable:['chooseToRespond'],
 			filterCard:{type:'equip'},
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			viewAs:{name:'shan'},
 			position:'he',
@@ -4074,7 +4074,7 @@ character.hearth={
 			ai:{
 				respondShan:true,
 				skillTagFilter:function(player){
-					if(!player.num('he',{type:'equip'})) return false;
+					if(!player.countCards('he',{type:'equip'})) return false;
 				}
 			}
 		},
@@ -4099,7 +4099,7 @@ character.hearth={
 			filterCard:{subtype:'equip2'},
 			position:'he',
 			filter:function(event,player){
-				return player.num('he',{subtype:'equip2'})>0;
+				return player.countCards('he',{subtype:'equip2'})>0;
 			},
 			check:function(card){
 				return 7-ai.get.value(card);
@@ -4153,7 +4153,7 @@ character.hearth={
 			enable:'phaseUse',
 			filterCard:{color:'red'},
 			filter:function(event,player){
-				return player.num('he',{color:'red'})>0;
+				return player.countCards('he',{color:'red'})>0;
 			},
 			position:'he',
 			usable:1,
@@ -4191,7 +4191,7 @@ character.hearth={
 			enable:'phaseUse',
 			filterCard:{color:'black'},
 			filter:function(event,player){
-				return player.num('he',{color:'black'})>0;
+				return player.countCards('he',{color:'black'})>0;
 			},
 			position:'he',
 			usable:1,
@@ -4222,7 +4222,7 @@ character.hearth={
 			animationColor:'thunder',
 			derivation:'xinci',
 			filter:function(event,player){
-				return !player.storage.anying&&player.num('he',{color:'black'})>1;
+				return !player.storage.anying&&player.countCards('he',{color:'black'})>1;
 			},
 			selectCard:2,
 			filterCard:{color:'black'},

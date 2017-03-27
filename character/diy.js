@@ -140,7 +140,7 @@ character.diy={
 		juntun:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			position:'he',
 			filterCard:{type:'equip'},
@@ -393,7 +393,7 @@ character.diy={
 			trigger:{global:'shaBefore'},
 			direct:true,
 			filter:function(event,player){
-				return get.distance(player,event.target)<=1&&player.num('he',{type:'equip'});
+				return get.distance(player,event.target)<=1&&player.countCards('he',{type:'equip'});
 			},
 			content:function(){
 				'step 0'
@@ -850,9 +850,9 @@ character.diy={
 			},
 			position:'he',
 			filter:function(event,player){
-				return player.num('he',function(card){
+				return player.hasCard(function(card){
 					return get.type(card)!='basic';
-				})>0;
+				},'he');
 			},
 			viewAs:{name:'shuiyanqijun'},
 			prompt:'将一张非基本牌当水淹七军使用',
@@ -900,7 +900,7 @@ character.diy={
 				return ai.get.attitude(player,event.player)<0;
 			},
 			filter:function(event,player){
-				return event.source&&event.source!=player&&event.source.num('he',{color:'red'})>0;
+				return event.source&&event.source!=player&&event.source.countCards('he',{color:'red'})>0;
 			},
 			content:function(){
 				trigger.source.discard(trigger.source.getCards('he',{color:'red'}));
@@ -911,7 +911,7 @@ character.diy={
 					threaten:0.8,
 					target:function(card,player,target){
 						if(get.tag(card,'damage')&&ai.get.attitude(target,player)<0){
-							return [1,0,0,-player.num('he',{color:'red'})];
+							return [1,0,0,-player.countCards('he',{color:'red'})];
 						}
 					}
 				}

@@ -4668,7 +4668,7 @@ character.yijiang={
 			audio:2,
 			trigger:{player:'damageBegin'},
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})&&event.source&&event.source.sex=='male';
+				return player.countCards('he',{type:'equip'})&&event.source&&event.source.sex=='male';
 			},
 			direct:true,
 			content:function(){
@@ -5088,7 +5088,7 @@ character.yijiang={
 			check:function(card){
 				if(get.type(card)!='equip') return 0;
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				return 6-ai.get.equipValue(card);
@@ -5239,7 +5239,7 @@ character.yijiang={
 				return card.name=='sha'||get.type(card)=='equip';
 			},
 			filter:function(event,player){
-				return player.countCards('h','sha')>0||player.num('he',{type:'equip'})>0;
+				return player.countCards('h','sha')>0||player.countCards('he',{type:'equip'})>0;
 			},
 			check:function(card){return 8-ai.get.value(card)},
 			selectTarget:2,
@@ -5624,7 +5624,7 @@ character.yijiang={
 			direct:true,
 			audio:2,
 			filter:function(event,player){
-				return player.countCards('he')>player.num('he',{type:'basic'});
+				return player.countCards('he')>player.countCards('he',{type:'basic'});
 			},
 			content:function(){
 				"step 0"
@@ -6818,7 +6818,7 @@ character.yijiang={
 			audio:3,
 			priority:6,
 			filter:function(event,player){
-				return event.player!=player&&event.player.hp==1&&player.num('he',{type:'equip'})>0;
+				return event.player!=player&&event.player.hp==1&&player.countCards('he',{type:'equip'})>0;
 			},
 			direct:true,
 			content:function(){

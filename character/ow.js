@@ -667,7 +667,7 @@ character.ow={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -948,7 +948,7 @@ character.ow={
             filterCard:{suit:'spade'},
             position:'he',
             filter:function(event,player){
-                return player.num('he',{suit:'spade'})>0;
+                return player.countCards('he',{suit:'spade'})>0;
             },
             check:function(card){
                 return 7-ai.get.value(card);
@@ -1199,7 +1199,7 @@ character.ow={
             filterCard:{suit:'diamond'},
             position:'he',
             filter:function(event,player){
-                return player.num('he',{suit:'diamond'})>0;
+                return player.countCards('he',{suit:'diamond'})>0;
             },
             filterTarget:function(card,player,target){
                 return target!=player&&get.distance(player,target,'attack')<=1;
@@ -1264,13 +1264,13 @@ character.ow={
             animationColor:'water',
             line:'thunder',
             filter:function(event,player){
-                return !player.storage.baoxue&&player.num('he',{color:'black'})>0;
+                return !player.storage.baoxue&&player.countCards('he',{color:'black'})>0;
             },
             filterTarget:function(card,player,target){
                 return target!=player;
             },
             selectTarget:function(){
-                return [1,_status.event.player.num('he',{color:'black'})];
+                return [1,_status.event.player.countCards('he',{color:'black'})];
             },
             alter:true,
             content:function(){
@@ -1300,7 +1300,7 @@ character.ow={
                     var num=game.countPlayer(function(current){
                         return ai.get.attitude(player,current)<0;
                     });
-                    var nh=player.num('he',{color:'black'});
+                    var nh=player.countCards('he',{color:'black'});
                     if(nh==1&&num>1) return 0;
                     if(nh>num) return 1;
                     return 11;
@@ -2217,13 +2217,13 @@ character.ow={
 			position:'he',
 			viewAs:{name:'sha'},
 			viewAsFilter:function(player){
-				if(!player.num('he',{color:'black'})) return false;
+				if(!player.countCards('he',{color:'black'})) return false;
 			},
 			prompt:'将一张黑色牌当杀使用或打出',
 			check:function(card){return 4-ai.get.value(card)},
 			ai:{
 				skillTagFilter:function(player){
-					if(!player.num('he',{color:'black'})) return false;
+					if(!player.countCards('he',{color:'black'})) return false;
 				},
 				respondSha:true,
 			},
@@ -2245,7 +2245,7 @@ character.ow={
 			trigger:{player:'phaseEnd'},
 			direct:true,
             filter:function(event,player){
-                return player.num('he',{color:'red'})>0;
+                return player.countCards('he',{color:'red'})>0;
             },
 			content:function(){
 				"step 0"
@@ -2716,7 +2716,7 @@ character.ow={
             trigger:{player:'phaseEnd'},
             direct:true,
             filter:function(event,player){
-                return player.num('he',{color:'black'})>0&&!player.hasSkill('yihun2');
+                return player.countCards('he',{color:'black'})>0&&!player.hasSkill('yihun2');
             },
             content:function(){
                 'step 0'
@@ -2789,7 +2789,7 @@ character.ow={
 			},
 			filter:function(event,player){
 				if(player.storage.huoyu) return false;
-                if(player.num('he',{color:'red'})<2) return false;
+                if(player.countCards('he',{color:'red'})<2) return false;
                 return true;
 			},
             filterTarget:function(card,player,target){

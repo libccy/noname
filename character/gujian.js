@@ -573,7 +573,7 @@ character.gujian={
 			globalSilent:true,
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
-				return event.player!=player&&!event.player.tempSkills.meiying3&&event.player.isAlive()&&player.num('he',{color:'red'})>0;
+				return event.player!=player&&!event.player.tempSkills.meiying3&&event.player.isAlive()&&player.countCards('he',{color:'red'})>0;
 			},
 			direct:true,
 			content:function(){
@@ -992,7 +992,7 @@ character.gujian={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.maxHp>player.hp&&player.num('he',{color:'red'})>0;
+				return player.maxHp>player.hp&&player.countCards('he',{color:'red'})>0;
 			},
 			alter:true,
 			content:function(){
@@ -1128,7 +1128,7 @@ character.gujian={
 		yanjia_old:{
 			enable:'chooseToUse',
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			filterCard:function(card){
 				return get.type(card)=='equip';
@@ -1138,7 +1138,7 @@ character.gujian={
 			prompt:'将一张装备牌当无中生有使用',
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				if(player.countCards('h')<player.hp){

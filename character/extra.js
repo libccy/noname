@@ -895,15 +895,15 @@ character.extra={
 				skillTagFilter:function(player,tag){
 					switch(tag){
 						case 'respondSha':{
-							if(player.num('he',{suit:'diamond'})<Math.max(1,player.hp)) return false;
+							if(player.countCards('he',{suit:'diamond'})<Math.max(1,player.hp)) return false;
 							break;
 						}
 						case 'respondShan':{
-							if(player.num('he',{suit:'club'})<Math.max(1,player.hp)) return false;
+							if(player.countCards('he',{suit:'club'})<Math.max(1,player.hp)) return false;
 							break;
 						}
 						case 'save':{
-							if(player.num('he',{suit:'heart'})<Math.max(1,player.hp)) return false;
+							if(player.countCards('he',{suit:'heart'})<Math.max(1,player.hp)) return false;
 							break;
 						}
 					}
@@ -941,7 +941,7 @@ character.extra={
 			},
 			viewAs:{name:'tao'},
 			filter:function(event,player){
-				return player.num('he',{suit:'heart'})>=player.hp;
+				return player.countCards('he',{suit:'heart'})>=player.hp;
 			},
 			filterCard:function(card){
 				return get.suit(card)=='heart';
@@ -963,7 +963,7 @@ character.extra={
 			},
 			viewAs:{name:'sha',nature:'fire'},
 			filter:function(event,player){
-				return player.num('he',{suit:'diamond'})>=player.hp;
+				return player.countCards('he',{suit:'diamond'})>=player.hp;
 			},
 			filterCard:function(card){
 				return get.suit(card)=='diamond';
@@ -985,7 +985,7 @@ character.extra={
 			},
 			viewAs:{name:'wuxie'},
 			viewAsFilter:function(player){
-				return player.num('he',{suit:'spade'})>=player.hp;
+				return player.countCards('he',{suit:'spade'})>=player.hp;
 			},
 			filterCard:function(card){
 				return get.suit(card)=='spade';

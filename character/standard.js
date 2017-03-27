@@ -739,7 +739,7 @@ character.standard={
 					if(!player.countCards('he')) return false;
 				}
 				else{
-					if(!player.num('he',{color:'red'})) return false;
+					if(!player.countCards('he',{color:'red'})) return false;
 				}
 			},
 			prompt:'将一张红色牌当杀使用或打出',
@@ -750,7 +750,7 @@ character.standard={
 						if(!player.countCards('he')) return false;
 					}
 					else{
-						if(!player.num('he',{color:'red'})) return false;
+						if(!player.countCards('he',{color:'red'})) return false;
 					}
 				},
 				respondSha:true,
@@ -1173,7 +1173,7 @@ character.standard={
 			position:'he',
 			viewAs:{name:'guohe'},
 			viewAsFilter:function(player){
-				if(!player.num('he',{color:'black'})) return false;
+				if(!player.countCards('he',{color:'black'})) return false;
 			},
 			prompt:'将一张黑色牌当过河拆桥使用',
 			check:function(card){return 4-ai.get.value(card)}
@@ -1275,7 +1275,7 @@ character.standard={
 		guose:{
 			audio:1,
 			filter:function(event,player){
-				return player.num('he',{suit:'diamond'})>0;
+				return player.countCards('he',{suit:'diamond'})>0;
 			},
 			enable:'chooseToUse',
 			filterCard:function(card){
@@ -1520,7 +1520,7 @@ character.standard={
 			check:function(card){return 15-ai.get.value(card)},
 			ai:{
 				skillTagFilter:function(player){
-					return player.num('he',{color:'red'})>0&&_status.currentPhase!=player;
+					return player.countCards('he',{color:'red'})>0&&_status.currentPhase!=player;
 				},
 				threaten:1.5,
 				save:true,

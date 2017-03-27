@@ -2539,7 +2539,7 @@ card.swd={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{color:'black'})>0&&player.hujia==0
+				return player.countCards('he',{color:'black'})>0&&player.hujia==0
 			},
 			content:function(){
 				'step 0'
@@ -2570,7 +2570,7 @@ card.swd={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{color:'red'})>0&&player.hp<player.maxHp;
+				return player.countCards('he',{color:'red'})>0&&player.hp<player.maxHp;
 			},
 			content:function(){
 				'step 0'
@@ -2602,7 +2602,7 @@ card.swd={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{color:'red'})>0;
+				return player.countCards('he',{color:'red'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -4461,7 +4461,7 @@ card.swd={
 				return get.subtype(card)=='equip1';
 			},
 			filter:function(event,player){
-				return player.num('he',{subtype:'equip1'})>0;
+				return player.countCards('he',{subtype:'equip1'})>0;
 			},
 			discard:false,
 			prepare:'give',

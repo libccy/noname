@@ -245,7 +245,7 @@ card.guozhan={
 			content:function(){
 				'step 0'
 				var choiceList=['明置一张武将牌，然后摸一张牌','失去1点体力'];
-				if(target.num('he',{type:'equip'})){
+				if(target.countCards('he',{type:'equip'})){
 					choiceList.push('弃置一张装备牌');
 				}
 				target.chooseControl(lib.card.chiling.chooseai).set('prompt','敕令').set('choiceList',choiceList);
@@ -915,7 +915,7 @@ card.guozhan={
 					var target=event.targets.shift();
 					event.current=target;
 					var choiceList=['明置一张武将牌，然后摸一张牌','失去1点体力'];
-					if(target.num('he',{type:'equip'})){
+					if(target.countCards('he',{type:'equip'})){
 						choiceList.push('弃置一张装备牌');
 					}
 					target.chooseControl(lib.card.chiling.chooseai).set('prompt','敕令').set('choiceList',choiceList);

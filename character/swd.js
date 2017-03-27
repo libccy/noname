@@ -731,7 +731,7 @@ character.swd={
 		hjifeng_old:{
 			trigger:{player:'phaseEnd'},
 			filter:function(event,player){
-				if(!player.num('he',{type:'equip'})) return false;
+				if(!player.countCards('he',{type:'equip'})) return false;
 				if(player.countCards('h',{type:'jiqi'})) return false;
 				if(get.cardPile(function(card){return get.type(card)=='jiqi'})) return true;
 				return false;
@@ -1023,7 +1023,7 @@ character.swd={
 			usable:1,
 			viewAs:{name:'taoyuan'},
 			filter:function(event,player){
-				return player.num('he',{color:'black'})>0;
+				return player.countCards('he',{color:'black'})>0;
 			},
 			audio:true,
 			prompt:'将一张黑色牌当作桃园结义使用',
@@ -1057,7 +1057,7 @@ character.swd={
 			position:'he',
 			viewAs:{name:'sha'},
 			viewAsFilter:function(player){
-				if(!player.num('he',{color:'red'})) return false;
+				if(!player.countCards('he',{color:'red'})) return false;
 			},
 			prompt:'将一张红色牌当杀使用',
 			check:function(card){return 5-ai.get.value(card)},
@@ -1067,7 +1067,7 @@ character.swd={
                 },
 				skillTagFilter:function(player,tag,arg){
 					if(arg!='use') return false;
-					if(!player.num('he',{color:'red'})) return false;
+					if(!player.countCards('he',{color:'red'})) return false;
 				},
 			},
 			group:['huanxia_expire','huanxia_draw','huanxia_gain'],
@@ -1416,7 +1416,7 @@ character.swd={
 		heihuo:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.countCards('h')>0&&player.num('he',{type:'equip'})>0&&!player.hasSkill('heihuo2');
+				return player.countCards('h')>0&&player.countCards('he',{type:'equip'})>0&&!player.hasSkill('heihuo2');
 			},
 			filterCard:function(card){
 				return get.type(card)=='equip';
@@ -1429,7 +1429,7 @@ character.swd={
 				if(nh<2) return 0;
 				if(nh>4) return 0;
 				if(nh==4&&pos=='e') return 0;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card)+(pos=='e'?0.4:0);
 				}
 				return 5.5-ai.get.value(card)+(pos=='e'?0.4:0);
@@ -1636,7 +1636,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('he',{color:'black',name:'sha'})>0;
+				return player.countCards('he',{color:'black',name:'sha'})>0;
 			},
 			filterCard:function(card){
 				return card.name=='sha'&&get.color(card)=='black';
@@ -1671,7 +1671,7 @@ character.swd={
 			trigger:{global:'phaseUseBefore'},
 			direct:true,
 			filter:function(event,player){
-				return event.player!=player&&player.num('he',{type:'basic'})<player.countCards('he');
+				return event.player!=player&&player.countCards('he',{type:'basic'})<player.countCards('he');
 			},
 			content:function(){
 				"step 0"
@@ -2657,7 +2657,7 @@ character.swd={
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{color:'black'})>0;
+				return player.countCards('he',{color:'black'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -2669,7 +2669,7 @@ character.swd={
 					filterTarget:function(card,player,target){
 						return player!=target;
 					},
-					selectCard:[1,player.num('he',{color:'black'})],
+					selectCard:[1,player.countCards('he',{color:'black'})],
 					selectTarget:function(){
 						if(ui.selected.targets.length>ui.selected.cards.length){
 							game.uncheck('target');
@@ -3073,13 +3073,13 @@ character.swd={
 			filterCard:{type:'equip'},
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 12-ai.get.equipValue(card);
 				}
 				return 8-ai.get.equipValue(card);
 			},
 			filter:function(event,player){
-				return player.num('he',{type:'equip'});
+				return player.countCards('he',{type:'equip'});
 			},
 			filterTarget:function(card,player,target){
 				return player!=target;
@@ -3181,14 +3181,14 @@ character.swd={
 		jianji:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0&&lib.filter.cardEnabled({name:'sha'},player);
+				return player.countCards('he',{type:'equip'})>0&&lib.filter.cardEnabled({name:'sha'},player);
 			},
 			usable:1,
 			filterCard:{type:'equip'},
 			position:'he',
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				return 6-ai.get.equipValue(card);
@@ -3237,7 +3237,7 @@ character.swd={
 			enable:'phaseUse',
 			filter:function(event,player){
 				if(!lib.card.chiyuxi) return false;
-				return !player.getStat('skill').huangyu&&player.num('he',{color:'red'})>1;
+				return !player.getStat('skill').huangyu&&player.countCards('he',{color:'red'})>1;
 			},
 			filterCard:{color:'red'},
 			selectCard:2,
@@ -3263,7 +3263,7 @@ character.swd={
 			filter:function(event,player){
 				var type=get.type(event.card,'trick');
 				if(type!='basic'&&type!='trick') return false;
-				return event.player!=player&&player.num('he',{type:'equip'})>0&&
+				return event.player!=player&&player.countCards('he',{type:'equip'})>0&&
 					event.targets&&event.targets.length>0;
 			},
 			direct:true,
@@ -3531,7 +3531,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('he',{suit:'club'})>0;
+				return player.countCards('he',{suit:'club'})>0;
 			},
 			position:'he',
 			filterCard:{suit:'club'},
@@ -4281,7 +4281,7 @@ character.swd={
 			position:'he',
 			usable:1,
 			filter:function(event,player){
-				return player.num('he',{suit:'spade'})>0;
+				return player.countCards('he',{suit:'spade'})>0;
 			},
 			check:function(card){
 				return 10-ai.get.value(card)
@@ -4314,7 +4314,7 @@ character.swd={
 			},
 			viewAs:{name:'liuxinghuoyu'},
 			viewAsFilter:function(player){
-				if(!player.num('he',{suit:'heart'})) return false;
+				if(!player.countCards('he',{suit:'heart'})) return false;
 			},
 			prompt:'将一张红桃手牌当作流星火羽使用',
 			check:function(card){return 6-ai.get.value(card)},
@@ -4361,7 +4361,7 @@ character.swd={
 				return player.countCards('h',{color:'black'})>0;
 			},
 			viewAsFilter:function(player){
-				if(!player.num('he',{color:'black'})) return false;
+				if(!player.countCards('he',{color:'black'})) return false;
 			},
 			prompt:'将一张黑色牌当作冰魄针使用',
 			check:function(card){return 5-ai.get.value(card)},
@@ -4832,7 +4832,7 @@ character.swd={
 			direct:true,
 			filter:function(event,player){
 				if(get.itemtype(event.cards)!='cards') return false;
-				return player.num('he',{suit:get.suit(event.cards)})>0;
+				return player.countCards('he',{suit:get.suit(event.cards)})>0;
 			},
 			alter:true,
 			content:function(){
@@ -4859,7 +4859,7 @@ character.swd={
 					}
 					player.discard(result.cards);
 					event.num++;
-					if(player.num('he',{suit:event.suit})>1&&!get.is.altered('liaoyuan')){
+					if(player.countCards('he',{suit:event.suit})>1&&!get.is.altered('liaoyuan')){
 						event.goto(1);
 					}
 				}
@@ -6749,7 +6749,7 @@ character.swd={
 			trigger:{player:'damageBefore'},
 			priority:-10,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'});
+				return player.countCards('he',{type:'equip'});
 			},
 			direct:true,
 			content:function(){
@@ -6897,7 +6897,7 @@ character.swd={
 			filter:function(event,player){
 				if(!event.player.isLinked()) return false;
 				if(event.nature=='fire') return false;
-				if(player.num('he',{color:'red'})) return true;
+				if(player.countCards('he',{color:'red'})) return true;
 				return false;
 			},
 			direct:true,
@@ -6927,7 +6927,7 @@ character.swd={
 				if(!event.player) return false;
 				if(event.player==player) return false;
 				if(event.player.isLinked()&&event.player.isTurnedOver()) return false;
-				if(player.num('he',{color:'black'})) return true;
+				if(player.countCards('he',{color:'black'})) return true;
 				return false;
 			},
 			direct:true,
@@ -7232,7 +7232,7 @@ character.swd={
 			usable:1,
 			discard:false,
 			filter:function(event,player){
-				return player.num('he',{type:'trick'})>0;
+				return player.countCards('he',{type:'trick'})>0;
 			},
 			prepare:'throw',
 			position:'he',
@@ -8365,7 +8365,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			filterCard:{type:'equip'},
 			position:'he',
@@ -8390,7 +8390,7 @@ character.swd={
 		wanjun:{
 			enable:'chooseToUse',
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			filterCard:function(card){
 				return get.type(card)=='equip';
@@ -8400,7 +8400,7 @@ character.swd={
 			prompt:'将一张装备牌当南蛮入侵使用',
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				if(player.countCards('h')<player.hp){
@@ -8617,7 +8617,7 @@ character.swd={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('he',{suit:'spade'});
+				return player.countCards('he',{suit:'spade'});
 			},
 			filterTarget:function(card,player,target){
 				return player!=target;
@@ -8688,7 +8688,7 @@ character.swd={
 			enable:'chooseToUse',
 			filterCard:{type:'equip'},
 			filter:function(event,player){
-				return player.num('he',{type:'equip'});
+				return player.countCards('he',{type:'equip'});
 			},
 			position:'he',
 			viewAs:{name:'sha'},

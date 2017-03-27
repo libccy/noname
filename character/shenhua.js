@@ -1306,7 +1306,7 @@ character.shenhua={
 			},
 			check:function(card){
 				var player=_status.currentPhase;
-				if(player.num('he',{subtype:get.subtype(card)})>1){
+				if(player.countCards('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
 				return 6-ai.get.value(card);
@@ -2025,7 +2025,7 @@ character.shenhua={
 				return get.color(card)=='black';
 			},
 			filter:function(event,player){
-				return player.num('he',{type:['basic','equip'],color:'black'})
+				return player.countCards('he',{type:['basic','equip'],color:'black'})
 			},
 			position:'he',
 			viewAs:{name:'bingliang'},
@@ -2991,7 +2991,7 @@ character.shenhua={
 					return !player.hasSkill('xinqiangxi3');
 				}
 				else if(player.hasSkill('xinqiangxi3')){
-					return !player.hasSkill('xinqiangxi2')&&player.num('he',{type:'equip'})>0;
+					return !player.hasSkill('xinqiangxi2')&&player.countCards('he',{type:'equip'})>0;
 				}
 				else{
 					return true;
@@ -3032,7 +3032,7 @@ character.shenhua={
 				order:8.5,
 				result:{
 					target:function(player,target){
-						if(player.hasSkill('xinqiangxi2')||!player.num('he',{type:'equip'})){
+						if(player.hasSkill('xinqiangxi2')||!player.countCards('he',{type:'equip'})){
 							if(player.hp<2) return 0;
 							if(target.hp>=player.hp) return 0;
 						}
@@ -3369,7 +3369,7 @@ character.shenhua={
 			trigger:{player:'phaseUseBefore'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{type:'equip'})>0;
+				return player.countCards('he',{type:'equip'})>0;
 			},
 			content:function(){
 				"step 0"
@@ -3570,7 +3570,7 @@ character.shenhua={
 			trigger:{player:'damageBefore'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he',{suit:'heart'})>0&&event.num>0&&!player.hasSkill('xintianxiang3');
+				return player.countCards('he',{suit:'heart'})>0&&event.num>0&&!player.hasSkill('xintianxiang3');
 			},
 			content:function(){
 				"step 0"
@@ -3968,7 +3968,7 @@ character.shenhua={
 			audio:2,
 			trigger:{global:'judge'},
 			filter:function(event,player){
-				return player.num('he',{color:'black'})>0;
+				return player.countCards('he',{color:'black'})>0;
 			},
 			direct:true,
 			content:function(){

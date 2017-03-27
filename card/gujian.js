@@ -156,7 +156,7 @@ card.gujian={
                 result:{
                     target:function(player,target){
                         if(target==player){
-                            if(target.num('he',{suit:'heart'})){
+                            if(target.countCards('he',{suit:'heart'})){
                                 if(target.isDamaged()) return 1.5;
                             }
                             else{
@@ -1021,13 +1021,13 @@ card.gujian={
         			position:'he',
         			viewAs:{name:'tao'},
                     viewAsFilter:function(player){
-                        return player.num('he',{suit:'heart'})>0;
+                        return player.countCards('he',{suit:'heart'})>0;
                     },
         			prompt:'将一张红桃牌当桃使用',
         			check:function(card){return 10-ai.get.value(card)},
         			ai:{
         				skillTagFilter:function(player){
-        					return player.num('he',{suit:'heart'})>0;
+        					return player.countCards('he',{suit:'heart'})>0;
         				},
         				save:true,
         			}

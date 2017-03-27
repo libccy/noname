@@ -125,7 +125,7 @@ character.xianjian={
 			usable:1,
 			position:'he',
 			viewAsFilter:function(player){
-				if(!player.num('he',{color:'red'})) return false;
+				if(!player.countCards('he',{color:'red'})) return false;
 			},
 			filterCard:{color:'red'},
 			check:function(card){
@@ -194,7 +194,7 @@ character.xianjian={
 			filterCard:{color:'red'},
 			position:'he',
 			filter:function(event,player){
-				return player.num('he',{color:'red'})>0;
+				return player.countCards('he',{color:'red'})>0;
 			},
 			check:function(card){
 				return 7-ai.get.value(card);
@@ -2338,12 +2338,12 @@ character.xianjian={
 			position:'he',
 			viewAs:{name:'shihuifen'},
 			viewAsFilter:function(player){
-				return player.num('he',{color:'black'})>0;
+				return player.countCards('he',{color:'black'})>0;
 			},
 			ai:{
 				shihuifen:true,
 				skillTagFilter:function(player){
-					return player.num('he',{color:'black'})>0;
+					return player.countCards('he',{color:'black'})>0;
 				}
 			}
 		},

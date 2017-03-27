@@ -1037,7 +1037,7 @@ character.refresh={
 						if(target.countCards('h')>target.hp+1&&ai.get.recoverEffect(target)>0){
 							return 1;
 						}
-						if(player.canUse('sha',target)&&(player.countCards('h','sha')||player.num('he',{color:'red'}))){
+						if(player.canUse('sha',target)&&(player.countCards('h','sha')||player.countCards('he',{color:'red'}))){
 							return -2;
 						}
 						return -0.5;
@@ -1290,7 +1290,7 @@ character.refresh={
 			usable:1,
 			discard:false,
 			filter:function(event,player){
-				return player.num('he',{suit:'diamond'})>0;
+				return player.countCards('he',{suit:'diamond'})>0;
 			},
 			prepare:'throw',
 			position:'he',
