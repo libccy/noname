@@ -8,7 +8,7 @@ mode.stone={
 		var playback=localStorage.getItem(lib.configprefix+'playback');
 
 		if(!playback&&_status.mode=='deck'){
-			(function(){
+			var createCardDialog=function(){
 				ui.deckBuilder=ui.create.div('.popup-container#deck-builder',function(){
 					if(careerList.classList.contains('shown')){
 						careerList.classList.remove('shown');
@@ -362,9 +362,11 @@ mode.stone={
 					deckitem.name=i;
 				}
 				var deckContainer=ui.create.div('.list-container.deck',deckList);
-			}());
+				ui.deckcontrol.show();
+			};
 
 			ui.deckcontrol=ui.create.system('卡组管理',function(){
+				if(this.classList.contains('hidden')) return;
 				// if(lib.config.low_performance){
 				// 	ui.arena.style.transform='translateY('+ui.window.offsetHeight+'px)';
 				// }
@@ -386,6 +388,13 @@ mode.stone={
 				ui.historybar.hide();
 			},true);
 
+			if(lib.onfree){
+				ui.deckcontrol.hide();
+				lib.onfree.push(createCardDialog);
+			}
+			else{
+				createCardDialog();
+			}
 		}
 
 		if(playback){
@@ -408,7 +417,7 @@ mode.stone={
 		}
 		else{
 			game.prepareArena(2);
-			game.delay();
+			// game.delay();
 		}
 		ui.arena.classList.add('stone');
 		"step 1"
@@ -1460,7 +1469,7 @@ mode.stone={
 				dialog.add([list.slice(0,get.config('battle_number')*2+5),'character']);
 				dialog.open();
 
-				var next=game.me.chooseButton(dialog,true);
+				var next=game.me.chooseButton(dialog,true).set('onfree',true);
 				next.selectButton=function(){
 					return (get.config('double_character')?2:1)*get.config('battle_number');
 				};

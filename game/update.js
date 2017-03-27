@@ -1,9 +1,8 @@
 window.noname_update={
-    version:'1.9.16.1',
+    version:'1.9.17',
     update:'1.9.15',
     changeLog:[
-        'bug修复',
-        '提高文件下载速度'
+        '提高载入速度',
     ],
     files:[
         'game/game.js',

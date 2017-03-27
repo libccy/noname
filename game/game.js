@@ -24288,40 +24288,44 @@
 					},true);
 				}
 				if(get.config('free_choose')){
-					event.freechoosedialog=ui.create.characterDialog();
-					event.freechoosedialog.style.height='80%';
-					event.freechoosedialog.style.top='10%';
-					event.freechoosedialog.style.transform='scale(0.8)';
-					event.freechoosedialog.style.transition='all 0.3s';
-					event.freechoosedialog.listen(function(e){
-						if(!event.replacing){
-							event.dialoglayer.clicked=true;
-						}
-					});
-					event.dialoglayer=ui.create.div('.popup-container.hidden',function(e){
-						if(this.classList.contains('removing')) return;
-						if(this.clicked){
-							this.clicked=false;
-							return;
-						}
-						ui.window.classList.remove('modepaused');
-						this.delete();
-						e.stopPropagation();
+					var createCharacterDialog=function(){
+						event.freechoosedialog=ui.create.characterDialog();
+						event.freechoosedialog.style.height='80%';
+						event.freechoosedialog.style.top='10%';
 						event.freechoosedialog.style.transform='scale(0.8)';
-						if(event.replacing){
-							event.prompt('用'+get.translation(event.replacing)+'替换一名武将');
-						}
-						else{
-							if(event.side==0){
-								event.prompt('请选择两名武将');
+						event.freechoosedialog.style.transition='all 0.3s';
+						event.freechoosedialog.listen(function(e){
+							if(!event.replacing){
+								event.dialoglayer.clicked=true;
+							}
+						});
+						event.dialoglayer=ui.create.div('.popup-container.hidden',function(e){
+							if(this.classList.contains('removing')) return;
+							if(this.clicked){
+								this.clicked=false;
+								return;
+							}
+							ui.window.classList.remove('modepaused');
+							this.delete();
+							e.stopPropagation();
+							event.freechoosedialog.style.transform='scale(0.8)';
+							if(event.replacing){
+								event.prompt('用'+get.translation(event.replacing)+'替换一名武将');
 							}
 							else{
-								event.prompt('请选择一名武将');
+								if(event.side==0){
+									event.prompt('请选择两名武将');
+								}
+								else{
+									event.prompt('请选择一名武将');
+								}
 							}
-						}
-					});
-					event.dialoglayer.classList.add('modenopause');
-					event.dialoglayer.appendChild(event.freechoosedialog);
+						});
+						event.dialoglayer.classList.add('modenopause');
+						event.dialoglayer.appendChild(event.freechoosedialog);
+						event.freechoosenode.classList.remove('hidden');
+					}
+
 					event.custom.replace.button=function(button){
 						event.replacing=button.link;
 					};
@@ -24337,6 +24341,7 @@
 						}
 					};
 					event.freechoosenode=ui.create.system('自由选将',function(){
+						if(this.classList.contains('hidden')) return;
 						if(!event.imchoosing){
 							event.prompt('请等待敌方选将');
 							return;
@@ -24348,7 +24353,14 @@
 						event.dialoglayer.show();
 						event.freechoosedialog.style.transform='scale(1)';
 						event.promptbar.hide();
-					},true)
+					},true);
+					if(lib.onfree){
+						event.freechoosenode.classList.add('hidden');
+						lib.onfree.push(createCharacterDialog);
+					}
+					else{
+						createCharacterDialog();
+					}
 				}
 				event.checkredo=function(){
 					if(event.redoing){
@@ -33581,7 +33593,9 @@
 				ui.replay=ui.create.system('重来',game.reload,true);
                 ui.replay.id='restartbutton';
 				ui.config2=ui.create.system('选项',ui.click.config);
-				ui.config2.classList.add('hidden');
+				if(!game.syncMenu){
+					ui.config2.classList.add('hidden');
+				}
 				ui.config2.style.transition='all 0.5s';
 				ui.pause=ui.create.system('暂停',ui.click.pause);
                 ui.pause.id='pausebutton';
@@ -33734,13 +33748,18 @@
                 setTimerPosition.call(ui.timer);
                 ui.arena.appendChild(ui.timer);
 
-                lib.onfree.push(function(){
+				if(!game.syncMenu){
+					lib.onfree.push(function(){
+						ui.create.menu();
+						ui.config2.classList.remove('hidden');
+						setTimeout(function(){
+							ui.config2.style.transition='';
+						},500);
+					});
+				}
+                else{
 					ui.create.menu();
-					ui.config2.classList.remove('hidden');
-					setTimeout(function(){
-						ui.config2.style.transition='';
-					},500);
-				});
+				}
 
 				lib.status.date=new Date();
 				lib.status.dateDelayed=0;

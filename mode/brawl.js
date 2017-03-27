@@ -1,5 +1,8 @@
 'use strict';
 mode.brawl={
+    game:{
+        syncMenu:true,
+    },
     start:function(){
         ui.auto.hide();
         if(!lib.storage.scene){
@@ -360,6 +363,7 @@ mode.brawl={
             game.save('directStage');
             clickStart(directStage);
         }
+            console.log(lib.onfree[0]);
     },
     brawl:{
         duzhansanguo:{
