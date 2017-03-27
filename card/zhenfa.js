@@ -73,7 +73,7 @@ card.zhenfa={
 				});
 			},
 			filterTarget:function(card,player,target){
-				return target.isMajor()&&target.num('he')>0;
+				return target.isMajor()&&target.countCards('he')>0;
 			},
 			selectTarget:-1,
 			content:function(){
@@ -237,7 +237,7 @@ card.zhenfa={
 				return player.next.siege(player);
 			},
 			filterTarget:function(card,player,target){
-				if(target.get('he').length==0) return false;
+				if(target.getCards('he').length==0) return false;
 				return target==player.next||target==player.previous;
 			},
 			selectTarget:-1,

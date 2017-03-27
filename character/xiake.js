@@ -32,7 +32,7 @@ character.xiake={
             enable:'phaseUse',
             position:'e',
             filter:function(event,player){
-                return player.num('e')>0;
+                return player.countCards('e')>0;
             },
             filterCard:true,
             prompt:'将要重铸的牌置入弃牌堆并摸一张牌',

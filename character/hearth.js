@@ -176,16 +176,16 @@ character.hearth={
 			filter:function(event,player){
 				return game.hasPlayer(function(current){
 					if(current==player) return false;
-					var nh=current.num('h');
-					return nh&&nh>=player.num('h');
+					var nh=current.countCards('h');
+					return nh&&nh>=player.countCards('h');
 				});
 			},
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('kuixin'),function(card,player,target){
 					if(target==player) return false;
-					var nh=target.num('h');
-					return nh&&nh>=player.num('h');
+					var nh=target.countCards('h');
+					return nh&&nh>=player.countCards('h');
 				}).ai=function(target){
 					var att=ai.get.attitude(player,target);
 					if(target.hasSkillTag('noe')){
@@ -196,7 +196,7 @@ character.hearth={
 				'step 1'
 				if(result.bool){
 					var target=result.targets[0];
-					var card=target.get('h').randomGet();
+					var card=target.getCards('h').randomGet();
 					if(card){
 						player.logSkill('kuixin',target);
 						player.gain(card,target);
@@ -256,7 +256,7 @@ character.hearth={
 			trigger:{player:'phaseUseBegin'},
 			forced:true,
 			filter:function(event,player){
-				return player.storage.fuhua2.isIn()&&player.num('he')>0;
+				return player.storage.fuhua2.isIn()&&player.countCards('he')>0;
 			},
 			mark:'character',
 			intro:{
@@ -319,10 +319,10 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.countCards('h')>0;
 			},
 			content:function(){
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				for(var i=0;i<hs.length;i++){
 					if(hs[i].name=='du'){
 						hs.splice(i--,1);
@@ -390,12 +390,12 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h')>0&&!player.isTurnedOver();
+				return player.countCards('h')>0&&!player.isTurnedOver();
 			},
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('gfuhun'),function(card,player,target){
-					return target!=player&&target.num('h')>0;
+					return target!=player&&target.countCards('h')>0;
 				}).ai=function(target){
 					return -ai.get.attitude(player,target);
 				}
@@ -469,7 +469,7 @@ character.hearth={
 		longyi:{
 			mod:{
 				maxHandcard:function(player,num){
-					var hs=player.get('h');
+					var hs=player.getCards('h');
 					for(var i=0;i<hs.length;i++){
 						if(get.color(hs[i])=='black'){
 							num++;
@@ -586,12 +586,12 @@ character.hearth={
 			},
 			content:function(){
 				'step 0'
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				var num=game.countPlayer(function(current){
-					return current.num('h')>nh;
+					return current.countCards('h')>nh;
 				});
 				player.chooseTarget(get.prompt('xingluo'),[1,num],function(card,player,target){
-					return target.num('h')>nh;
+					return target.countCards('h')>nh;
 				}).ai=function(target){
 					return 0.5-ai.get.attitude(player,target);
 				}
@@ -1053,7 +1053,7 @@ character.hearth={
 							if(!info) return 0;
 							if(!Array.isArray(info.names)) return 0;
 							var names=info.names;
-							if(names.contains('xingjiegoutong')&&target.num('h')>=3) return -1;
+							if(names.contains('xingjiegoutong')&&target.countCards('h')>=3) return -1;
 							var num=0;
 							for(var i=0;i<names.length;i++){
 								var info2=lib.card[names[i]];
@@ -1087,10 +1087,10 @@ character.hearth={
 					frequent:true,
 					usable:1,
 					filter:function(event){
-						return event.target.num('h')>0;
+						return event.target.countCards('h')>0;
 					},
 					content:function(){
-						player.gain(game.createCard(trigger.target.get('h').randomGet()),'draw');
+						player.gain(game.createCard(trigger.target.getCards('h').randomGet()),'draw');
 					}
 				},
 				miss:{
@@ -1156,10 +1156,10 @@ character.hearth={
 				return ai.get.attitude(player,event.source)<=0;
 			},
 			filter:function(event,player){
-				return event.source&&event.source.isAlive()&&event.source!=player&&event.source.num('h')>0;
+				return event.source&&event.source.isAlive()&&event.source!=player&&event.source.countCards('h')>0;
 			},
 			content:function(){
-				var card=trigger.source.get('h').randomGet();
+				var card=trigger.source.getCards('h').randomGet();
 				if(card){
 					player.gain(card,trigger.source);
 					if(get.color(card)=='black'){
@@ -1179,7 +1179,7 @@ character.hearth={
 					target:function(card,player,target){
 						if(player.hasSkillTag('jueqing')) return [1,-2];
 						if(!target.hasFriend()) return false;
-						if(get.tag(card,'damage')&&player.num('h')>1) return [1,0,0,-1];
+						if(get.tag(card,'damage')&&player.countCards('h')>1) return [1,0,0,-1];
 					}
 				}
 			}
@@ -1369,7 +1369,7 @@ character.hearth={
 		wzhanyi:{
 			trigger:{player:'phaseUseBefore'},
 			check:function(event,player){
-				return player.num('h')+2<=player.hp;
+				return player.countCards('h')+2<=player.hp;
 			},
 			content:function(){
 				'step 0'
@@ -1975,7 +1975,7 @@ character.hearth={
 		tanmi:{
 			trigger:{global:'phaseEnd'},
 			filter:function(event,player){
-				return player.num('h')==0&&event.player!=player;
+				return player.countCards('h')==0&&event.player!=player;
 			},
 			frequent:true,
 			content:function(){
@@ -1992,7 +1992,7 @@ character.hearth={
 				noh:true,
 				skillTagFilter:function(player,tag){
 					if(tag=='noh'){
-						if(player.num('h')!=1) return false;
+						if(player.countCards('h')!=1) return false;
 					}
 				}
 			}
@@ -2205,7 +2205,7 @@ character.hearth={
 			usable:1,
 			filter:function(event,player){
 				if(player.hp==player.maxHp) return false;
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				if(hs.length==0) return false;
 				var types=[];
 				for(var i=0;i<hs.length;i++){
@@ -2223,7 +2223,7 @@ character.hearth={
 				'step 0'
 				player.showHandcards();
 				'step 1'
-				player.recover(player.num('h'));
+				player.recover(player.countCards('h'));
 			},
 			ai:{
 				order:10,
@@ -2245,7 +2245,7 @@ character.hearth={
 			},
 			selectCard:3,
 			filter:function(event,player){
-				return player.num('he')>=3;
+				return player.countCards('he')>=3;
 			},
 			content:function(){
 				'step 0'
@@ -2403,7 +2403,7 @@ character.hearth={
 			direct:true,
 			trigger:{player:'phaseBegin'},
 			filter:function(event,player){
-				var hs=player.get('he');
+				var hs=player.getCards('he');
 				for(var i=0;i<hs.length;i++){
 					if(hs[i].number==player.storage.xunbao2.number) return true;
 				}
@@ -2484,7 +2484,7 @@ character.hearth={
 		fbeifa:{
 			trigger:{player:'loseEnd'},
 			filter:function(event,player){
-				if(player.num('h')) return false;
+				if(player.countCards('h')) return false;
 				if(player.storage.fbeifa>=3) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].original=='h') return true;
@@ -2581,7 +2581,7 @@ character.hearth={
 			usable:1,
 			filter:function(event,player){
 				if(!lib.card.chiyuxi||!lib.card.jingleishan) return false;
-				return player.num('he')>0;
+				return player.countCards('he')>0;
 			},
 			filterTarget:function(card,player,target){
 				if(get.color(card)=='red'){
@@ -2645,7 +2645,7 @@ character.hearth={
 			trigger:{player:'useCardToBegin'},
 			direct:true,
 			filter:function(event,player){
-				return event.target&&event.target!=player&&get.distance(player,event.target)>1&&event.target.num('he')>0;
+				return event.target&&event.target!=player&&get.distance(player,event.target)>1&&event.target.countCards('he')>0;
 			},
 			content:function(){
 				player.discardPlayerCard(trigger.target,get.prompt('yuanzheng',trigger.target),'hej').logSkill=['yuanzheng',trigger.target];
@@ -2738,7 +2738,7 @@ character.hearth={
 				player.unmarkSkill('byuhuo');
 				'step 1'
 				if(num<event.targets.length){
-					// if(event.targets[num].num('hej')){
+					// if(event.targets[num].countCards('hej')){
 					// 	player.gainPlayerCard(event.targets[num],'hej',true);
 					// }
 					player.line(event.targets[num],'fire');
@@ -2774,8 +2774,8 @@ character.hearth={
 				order:10,
 				result:{
 					target:function(player,target){
-						if(target.num('j')) return 2;
-						switch(target.num('he')){
+						if(target.countCards('j')) return 2;
+						switch(target.countCards('he')){
 							case 0:return 0;
 							case 1:return 0.5;
 							case 2:return 0.8;
@@ -2803,7 +2803,7 @@ character.hearth={
 				player.chooseTarget(get.prompt('duzhang'),function(card,player,target){
 					return target!=player;
 				}).ai=function(target){
-					return -ai.get.attitude(player,target)*Math.sqrt(target.num('h'));
+					return -ai.get.attitude(player,target)*Math.sqrt(target.countCards('h'));
 				}
 				'step 1'
 				if(result.bool){
@@ -2828,11 +2828,11 @@ character.hearth={
 			trigger:{player:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.countCards('h')>0;
 			},
 			content:function(){
 				'step 0'
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				if(nh){
 					player.draw(nh);
 				}
@@ -2840,7 +2840,7 @@ character.hearth={
 					event.finish();
 				}
 				'step 1'
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				if(hs.length>10&&hs.length>player.hp){
 					player.discard(hs.randomGets(hs.length-player.hp));
 				}
@@ -2853,7 +2853,7 @@ character.hearth={
 						if(get.tag(card,'damage')){
 							if(player.hasSkillTag('jueqing')) return [1,-2];
 							if(!target.hasFriend()) return;
-							var nh=target.num('h');
+							var nh=target.countCards('h');
 							if(nh>5) return [1,-1];
 							if(nh<=1) return [1,-0.1];
 							if(nh==2){
@@ -2924,15 +2924,15 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('e')>0;
+				return player!=target&&target.countCards('e')>0;
 			},
 			filter:function(event,player){
 				return game.hasPlayer(function(target){
-					return target!=player&&target.num('e');
+					return target!=player&&target.countCards('e');
 				});
 			},
 			content:function(){
-				var es=target.get('e');
+				var es=target.getCards('e');
 				if(es.length>1){
 					es=es.randomGets(Math.ceil(Math.random()*2));
 				}
@@ -2942,7 +2942,7 @@ character.hearth={
 				order:9.5,
 				result:{
 					target:function(player,target){
-						var ne=target.num('e');
+						var ne=target.countCards('e');
 						if(ne>1) return -1.5;
 						return -1;
 					}
@@ -2982,7 +2982,7 @@ character.hearth={
 					},
 					filter:function(event,player){
 						return typeof event.player.storage.shixu=='number'&&
-							event.player.storage.shixu>3000&&event.player.num('he')>0&&event.player.isAlive();
+							event.player.storage.shixu>3000&&event.player.countCards('he')>0&&event.player.isAlive();
 					},
 					content:function(){
 						player.line(trigger.player,'green');
@@ -3108,7 +3108,7 @@ character.hearth={
 				'step 1'
 				if(event.targets.length){
 					var target=event.targets.shift();
-					if(!target.isTurnedOver()&&target.num('he')){
+					if(!target.isTurnedOver()&&target.countCards('he')){
 						target.chooseToDiscard(true);
 					}
 					event.redo();
@@ -3151,17 +3151,17 @@ character.hearth={
 			trigger:{player:'damageEnd'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('he')>0||(event.source&&event.source.num('he')>0);
+				return player.countCards('he')>0||(event.source&&event.source.countCards('he')>0);
 			},
 			content:function(){
 				'step 0'
-				var hs=player.get('he');
+				var hs=player.getCards('he');
 				if(hs.length){
 					player.discard(hs.randomGet())
 				}
 				'step 1'
 				if(trigger.source){
-					var hs=trigger.source.get('he');
+					var hs=trigger.source.getCards('he');
 					if(hs.length){
 						trigger.source.discard(hs.randomGet())
 					}
@@ -3279,7 +3279,7 @@ character.hearth={
 				});
 			},
 			content:function(){
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				for(var i=0;i<hs.length;i++){
 					if(get.type(hs[i])=='basic'||get.info(hs[i]).unique){
 						hs.splice(i--,1);
@@ -3443,11 +3443,11 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return player.num('h')!=target.num('h');
+				return player.countCards('h')!=target.countCards('h');
 			},
 			alter:true,
 			content:function(){
-				var num=player.num('h')-target.num('h');
+				var num=player.countCards('h')-target.countCards('h');
 				if(num>0){
 					if(num>3){
 						num=3;
@@ -3472,7 +3472,7 @@ character.hearth={
 					for(var i=0;i<players.length;i++){
 						if(players[i]==player) continue;
 						var att=ai.get.attitude(player,players[i]);
-						var dh=player.num('h')-players[i].num('h');
+						var dh=player.countCards('h')-players[i].countCards('h');
 						if(att*dh>num){
 							if(att>0){
 								max=true;
@@ -3488,7 +3488,7 @@ character.hearth={
 				},
 				result:{
 					player:function(player,target){
-						return (player.num('h')-target.num('h'))*ai.get.attitude(player,target);
+						return (player.countCards('h')-target.countCards('h'))*ai.get.attitude(player,target);
 					}
 				},
 				expose:0.2
@@ -3511,7 +3511,7 @@ character.hearth={
 			content:function(){
 				'step 0'
 				player.hp=Math.min(player.storage.chongsheng,player.maxHp);
-				player.discard(player.get('hej'));
+				player.discard(player.getCards('hej'));
 				player.draw(player.storage.chongsheng);
 				player.storage.chongsheng--;
 				if(player.storage.chongsheng<=0){
@@ -3545,13 +3545,13 @@ character.hearth={
 			usable:1,
 			alter:true,
 			filter:function(event,player){
-				return player.num('h')<(get.is.altered('guozai')?3:4);
+				return player.countCards('h')<(get.is.altered('guozai')?3:4);
 			},
 			init:function(player){
 				player.storage.guozai2=0;
 			},
 			content:function(){
-				var num=(get.is.altered('guozai')?3:4)-player.num('h');
+				var num=(get.is.altered('guozai')?3:4)-player.countCards('h');
 				player.draw(num);
 				player.addSkill('guozai2');
 				player.storage.guozai2+=num;
@@ -3581,13 +3581,13 @@ character.hearth={
 			enable:'phaseUse',
 			usable:2,
 			filter:function(event,player){
-				return player.num('h')<4;
+				return player.countCards('h')<4;
 			},
 			init:function(player){
 				player.storage.guozaix2=0;
 			},
 			content:function(){
-				var num=4-player.num('h');
+				var num=4-player.countCards('h');
 				player.draw(num);
 				player.addSkill('guozaix2');
 				player.storage.guozaix2+=num;
@@ -3780,17 +3780,17 @@ character.hearth={
 			trigger:{player:'phaseEnd'},
 			direct:true,
 			filter:function(event,player){
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				var nm=1;
 				return game.hasPlayer(function(current){
-					if(current!=player&&Math.abs(current.num('h')-nh)<=nm){
+					if(current!=player&&Math.abs(current.countCards('h')-nh)<=nm){
 						return true;
 					}
 				});
 			},
 			content:function(){
 				'step 0'
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				var nm=1;
 				var check=true;
 				if(player.num('h','tao')){
@@ -3800,11 +3800,11 @@ character.hearth={
 					check=false;
 				}
 				player.chooseTarget(get.prompt('kuixin'),function(card,player,target){
-					return target!=player&&Math.abs(target.num('h')-nh)<=nm;
+					return target!=player&&Math.abs(target.countCards('h')-nh)<=nm;
 				}).ai=function(target){
 					if(!check) return 0;
 					if(ai.get.attitude(player,target)<0){
-						return target.num('h')-nh;
+						return target.countCards('h')-nh;
 					}
 					return 0;
 				};
@@ -3812,8 +3812,8 @@ character.hearth={
 				if(result.bool){
 					var target=result.targets[0];
 					player.logSkill('kuixin',result.targets);
-					var cards0=target.get('h');
-					var cards1=player.get('h');
+					var cards0=target.getCards('h');
+					var cards1=player.getCards('h');
 					target.gain(cards1,player);
 					player.gain(cards0,target);
 					target.$give(cards0.length,player);
@@ -3875,7 +3875,7 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h',{type:'basic'})<player.num('h');
+				return player.num('h',{type:'basic'})<player.countCards('h');
 			},
 			filterCard:function(card){
 				return get.type(card)!='basic';
@@ -3922,7 +3922,7 @@ character.hearth={
 			usable:1,
 			alter:true,
 			filter:function(event,player){
-				return !player.isTurnedOver()&&player.num('h')<=player.hp;
+				return !player.isTurnedOver()&&player.countCards('h')<=player.hp;
 			},
 			content:function(){
 				player.draw(get.is.altered('liechao')?3:4);
@@ -3967,7 +3967,7 @@ character.hearth={
 			ai:{
 				nohujia:true,
 				skillTagFilter:function(player){
-					return player.hp>player.num('h');
+					return player.hp>player.countCards('h');
 				},
 				threaten:function(player,target){
 					if(!target.hujia) return 0.8;
@@ -4015,7 +4015,7 @@ character.hearth={
 			trigger:{player:'loseEnd'},
 			direct:true,
 			filter:function(event,player){
-				return _status.currentPhase!=player&&!player.hasSkill('fengxing2')&&player.num('he')>0;
+				return _status.currentPhase!=player&&!player.hasSkill('fengxing2')&&player.countCards('he')>0;
 			},
 			content:function(){
 				'step 0'
@@ -4039,7 +4039,7 @@ character.hearth={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target.num('h')>0;
+				return target.countCards('h')>0;
 			},
 			selectTarget:-1,
 			content:function(){
@@ -4049,7 +4049,7 @@ character.hearth={
 				order:8,
 				result:{
 					target:function(player,target){
-						var nh=target.num('h');
+						var nh=target.countCards('h');
 						switch(nh){
 							case 0:return 0;
 							case 1:return -1.5;
@@ -4083,10 +4083,10 @@ character.hearth={
 			forced:true,
 			priority:-1,
 			filter:function(event,player){
-				return player.num('he')>0;
+				return player.countCards('he')>0;
 			},
 			content:function(){
-				player.discard(player.get('he'));
+				player.discard(player.getCards('he'));
 				player.removeSkill('hsmengjing_mengye');
 			},
 			mark:'image',
@@ -4124,13 +4124,13 @@ character.hearth={
 			direct:true,
 			filter:function(event,player){
 				return game.hasPlayer(function(current){
-					return current!=player&&current.num('h');
+					return current!=player&&current.countCards('h');
 				});
 			},
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('shijie'),function(card,player,target){
-					return player!=target&&target.num('h')>0;
+					return player!=target&&target.countCards('h')>0;
 				}).ai=function(target){
 					return 11-ai.get.attitude(player,target);
 				};
@@ -4138,7 +4138,7 @@ character.hearth={
 				if(result.bool){
 					player.logSkill('shijie',result.targets);
 					var target=result.targets[0];
-					var card=target.get('h').randomGet()
+					var card=target.getCards('h').randomGet()
 					player.gain(card,target);
 					event.target=target;
 					target.$giveAuto(card,player);
@@ -4179,7 +4179,7 @@ character.hearth={
 					target:function(player,target){
 						if(player.storage.anying) return -1;
 						if(target.hp==1) return 5;
-						if(player==target&&player.num('h')>player.hp) return 5;
+						if(player==target&&player.countCards('h')>player.hp) return 5;
 						return 2;
 					}
 				},
@@ -4252,7 +4252,7 @@ character.hearth={
 				if(!event.targets) return false;
 				if(event.targets.length!=1) return false;
 				if(event.targets[0]==event.player) return false;
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				for(var i=0;i<hs.length;i++){
 					if(hs[i].name!=event.card.name){
 						var card=hs[i];
@@ -4574,17 +4574,17 @@ character.hearth={
 			filter:function(event,player){
 				if(event.responded) return false;
 				return game.hasPlayer(function(current){
-					return current!=player&&current.num('h');
+					return current!=player&&current.countCards('h');
 				});
 			},
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('jingxiang'),function(card,player,target){
 					if(target==player) return false;
-					var nh=target.num('h');
+					var nh=target.countCards('h');
 					if(nh==0) return false;
 					if(get.is.altered('jingxiang')){
-						return nh<=player.num('h');
+						return nh<=player.countCards('h');
 					}
 					return true;
 				}).ai=function(target){
@@ -4595,7 +4595,7 @@ character.hearth={
 					var target=result.targets[0];
 					player.logSkill('jingxiang',target);
 					event.target=target;
-					var cards=target.get('h');
+					var cards=target.getCards('h');
 					player.chooseCardButton('选择'+get.translation(target)+'的一张卡手牌打出',cards).filterButton=function(button){
 						return trigger.filterCard(button.link);
 					}
@@ -4733,7 +4733,7 @@ character.hearth={
 		jihuo:{
 			trigger:{player:'phaseAfter'},
 			filter:function(event,player){
-				return !player.storage.jihuo&&player.num('h')>0;
+				return !player.storage.jihuo&&player.countCards('h')>0;
 			},
 			direct:true,
 			priority:-50,
@@ -4783,7 +4783,7 @@ character.hearth={
 					game.delay(0.5);
 					var target=result.targets[0];
 					player.logSkill('tzhenji',target,'thunder');
-					var cs=target.get('he');
+					var cs=target.getCards('he');
 					if(cs.length){
 						target.discard(cs.randomGet());
 					}
@@ -4796,7 +4796,7 @@ character.hearth={
 				expose:0.3,
 				effect:{
 					target:function(card,player,target){
-						if(get.tag(card,'loseCard')&&target.num('he')){
+						if(get.tag(card,'loseCard')&&target.countCards('he')){
 							return 0.7;
 						}
 					}
@@ -4830,11 +4830,11 @@ character.hearth={
 				}
 				else{
 					event.target.damage('thunder');
-					var cs=event.target.get('he');
+					var cs=event.target.getCards('he');
 					if(cs.length){
 						event.target.discard(cs.randomGet());
 					}
-					cs=player.get('he');
+					cs=player.getCards('he');
 					if(cs.length){
 						player.discard(cs.randomGet());
 					}
@@ -4850,7 +4850,7 @@ character.hearth={
 								return ai.get.attitude(player,current)<0;
 							});
 							var ns=target.num('h','shan');
-							var nh=target.num('h');
+							var nh=target.countCards('h');
 							if(ns>1){
 								return [0,hastarget?1:0];
 							}
@@ -5254,7 +5254,7 @@ character.hearth={
 				order:4,
 				result:{
 					player:function(player){
-						var nh=player.num('h');
+						var nh=player.countCards('h');
 						if(nh>=player.hp) return -1;
 						if(player.hp<=2){
 							if(player.hp==2&&nh==0) return 1;
@@ -5310,12 +5310,12 @@ character.hearth={
 			enable:true,
 			derivation:'hs_aya',
 			filterTarget:function(card,player,target){
-				return target.num('he')>0;
+				return target.countCards('he')>0;
 			},
 			content:function(){
 				var cards=[];
-				var hs=target.get('h');
-				var es=target.get('e');
+				var hs=target.getCards('h');
+				var es=target.getCards('e');
 				if(hs.length) cards.push(hs.randomGet());
 				if(es.length) cards.push(es.randomGet());
 				target.discard(cards);
@@ -5327,8 +5327,8 @@ character.hearth={
 				result:{
 					target:function(player,target){
 						var num=0;
-						if(target.num('h')) num--;
-						if(target.num('e')) num--;
+						if(target.countCards('h')) num--;
+						if(target.countCards('e')) num--;
 						return num;
 					},
 				},
@@ -5429,17 +5429,17 @@ character.hearth={
 			enable:true,
 			derivation:'hs_xialikeer',
 			filterTarget:function(card,player,target){
-				return target.num('e')>0;
+				return target.countCards('e')>0;
 			},
 			content:function(){
-				target.discard(target.get('e').randomGets(2));
+				target.discard(target.getCards('e').randomGets(2));
 			},
 			ai:{
 				order:5,
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('noe')) return 0;
-						if(target.num('e')>1) return -1.5;
+						if(target.countCards('e')>1) return -1.5;
 						return -1;
 					},
 				},
@@ -5468,7 +5468,7 @@ character.hearth={
 							num=1.5;
 						}
 						if(target.hp==1) return 2*num;
-						if(target.hp==2&&target.num('h')<=2) return 1.2*num;
+						if(target.hp==2&&target.countCards('h')<=2) return 1.2*num;
 						return num;
 					}
 				},
@@ -5539,7 +5539,7 @@ character.hearth={
 				result:{
 					target:function(player,target){
 						if(target.hp>1){
-							if(target.num('h')>2) return 1;
+							if(target.countCards('h')>2) return 1;
 							return 0.5;
 						}
 						return 0.2;
@@ -5584,7 +5584,7 @@ character.hearth={
 			content:function(){
 				player.recover();
 				player.draw(3);
-				// var hs=target.get('h');
+				// var hs=target.getCards('h');
 				// target.discard(hs);
 				// var cs=[];
 				// for(var i=0;i<hs.length;i++){
@@ -5598,7 +5598,7 @@ character.hearth={
 				order:10,
 				result:{
 					player:function(player){
-						if(player.num('h')>1) return 1;
+						if(player.countCards('h')>1) return 1;
 						if(player.hp==1) return 1;
 						return 0;
 					}
@@ -5631,7 +5631,7 @@ character.hearth={
 				result:{
 					target:function(player,target){
 						if(target.hp<=1) return 2;
-						if(target.num('h')<target.hp||target.hp==2) return 1.5;
+						if(target.countCards('h')<target.hp||target.hp==2) return 1.5;
 						return 1;
 					}
 				},
@@ -5682,11 +5682,11 @@ character.hearth={
 			},
 			derivation:'hs_lafamu',
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('hej')>0;
+				return target!=player&&target.countCards('hej')>0;
 			},
 			selectTarget:-1,
 			content:function(){
-				if(target.num('hej')) player.gainPlayerCard(target,'hej',true,Math.ceil(Math.random()*2));
+				if(target.countCards('hej')) player.gainPlayerCard(target,'hej',true,Math.ceil(Math.random()*2));
 			},
 			contentAfter:function(){
 				if(!player.isTurnedOver()){
@@ -5740,7 +5740,7 @@ character.hearth={
 			selectTarget:-1,
 			content:function(){
 				target.loseHp();
-				var he=target.get('he');
+				var he=target.getCards('he');
 				if(he.length){
 					target.discard(he.randomGets(2));
 				}
@@ -5772,7 +5772,7 @@ character.hearth={
 				result:{
 					target:function(player,target){
 						if(target.hasSkill('hsmengjing_mengye')) return 0.5;
-						return -target.num('he');
+						return -target.countCards('he');
 					}
 				}
 			}
@@ -5784,11 +5784,11 @@ character.hearth={
 			enable:true,
 			derivation:'hs_ysera',
 			filterTarget:function(card,player,target){
-				return !target.num('j','lebu')||target.num('e')>0;
+				return !target.num('j','lebu')||target.countCards('e')>0;
 			},
 			content:function(){
 				'step 0'
-				var es=target.get('e');
+				var es=target.getCards('e');
 				if(es.length){
 					target.gain(es,'gain2');
 				}
@@ -5803,7 +5803,7 @@ character.hearth={
 				value:10,
 				result:{
 					target:function(player,target){
-						var num=target.hp-target.num('he')-2;
+						var num=target.hp-target.countCards('he')-2;
 						if(num>-1) return -1;
 						if(target.hp<3) num--;
 						if(target.hp<2) num--;

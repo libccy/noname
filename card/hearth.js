@@ -10,7 +10,7 @@ card.hearth={
 				'step 0'
 				target.damage('fire');
 				'step 1'
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				if(hs.length){
 					player.discard(hs.randomGet());
 				}
@@ -24,8 +24,8 @@ card.hearth={
 				result:{
 					player:function(player,target){
 						if(player==target) return -1;
-						if(player.num('h')>=player.hp) return -0.1;
-						if(player.num('h')>1) return -0.5;
+						if(player.countCards('h')>=player.hp) return -0.1;
+						if(player.countCards('h')>1) return -0.5;
 						return 0;
 					},
 					target:-1
@@ -64,11 +64,11 @@ card.hearth={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('hej')>0;
+				return player!=target&&target.countCards('hej')>0;
 			},
 			content:function(){
 				'step 0'
-				if(target.num('hej')){
+				if(target.countCards('hej')){
 					var next=player.discardPlayerCard('hej',target,true);
 					next.visible=true;
 					next.delay=false;
@@ -93,15 +93,15 @@ card.hearth={
 				useful:3,
 				result:{
 					target:function(player,target){
-						var es=target.get('e');
-						var nh=target.num('h');
+						var es=target.getCards('e');
+						var nh=target.countCards('h');
 						var noe=(es.length==0||target.hasSkillTag('noe'));
 						var noe2=(es.length==1&&es[0].name=='baiyin'&&target.hp<target.maxHp);
 						var noh=(nh==0||target.hasSkillTag('noh'));
 						if(noh&&noe) return 0;
 						if(noh&&noe2) return 0.01;
-						if(ai.get.attitude(player,target)<=0) return (target.num('he'))?-1.5:1.5;
-						var js=target.get('j');
+						if(ai.get.attitude(player,target)<=0) return (target.countCards('he'))?-1.5:1.5;
+						var js=target.getCards('j');
 						if(js.length){
 							var jj=js[0].viewAs?{name:js[0].viewAs}:js[0];
 							if(jj.name=='zhaomingdan') return 3;
@@ -161,7 +161,7 @@ card.hearth={
 				'step 2'
 				game.delay(0.5);
 				'step 3'
-				if(target.num('h')){
+				if(target.countCards('h')){
 					target.chooseToDiscard('h',true);
 				}
 			},
@@ -171,7 +171,7 @@ card.hearth={
 				useful:2,
 				result:{
 					target:function(player,target){
-						return Math.max(0,2-target.num('e'))+(target.num('h')?0:0.5);
+						return Math.max(0,2-target.countCards('e'))+(target.countCards('h')?0:0.5);
 					},
 				},
 				tag:{
@@ -184,12 +184,12 @@ card.hearth={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				if(player!=game.me&&player.num('h')<2) return false;
-				return target.num('h')>0;
+				if(player!=game.me&&player.countCards('h')<2) return false;
+				return target.countCards('h')>0;
 			},
 			content:function(){
 				"step 0"
-				if(target.get('h').length==0){
+				if(target.countCards('h')==0){
 					event.finish();
 					return;
 				}
@@ -234,7 +234,7 @@ card.hearth={
 				},
 				result:{
 					player:function(player){
-						var nh=player.num('h');
+						var nh=player.countCards('h');
 						if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
 							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'shandianjian'})){
@@ -249,8 +249,8 @@ card.hearth={
 						return 0;
 					},
 					target:function(player,target){
-						if(target.hasSkill('huogong2')||target.num('h')==0) return 0;
-						if(player.num('h')<=1) return 0;
+						if(target.hasSkill('huogong2')||target.countCards('h')==0) return 0;
+						if(player.countCards('h')<=1) return 0;
 						if(target==player){
 							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'shandianjian'})){
@@ -307,17 +307,17 @@ card.hearth={
 			enable:true,
 			type:'trick',
 			filterTarget:function(card,player,target){
-				return player!=target&&target.num('h')>0;
+				return player!=target&&target.countCards('h')>0;
 			},
 			selectTarget:1,
 			content:function(){
 				'step 0'
-				var hs=target.get('h');
+				var hs=target.getCards('h');
 				if(hs.length){
 					target.discard(hs.randomGet());
 				}
 				'step 1'
-				if(!target.num('h')){
+				if(!target.countCards('h')){
 					player.draw();
 				}
 			},
@@ -328,7 +328,7 @@ card.hearth={
 				result:{
 					target:-1,
 					player:function(player,target){
-						if(target.num('h')==1) return 1;
+						if(target.countCards('h')==1) return 1;
 					}
 				}
 			}
@@ -438,14 +438,14 @@ card.hearth={
 				if(event.num){
 					var enemies=event.current.getEnemies();
 					for(var i=0;i<enemies.length;i++){
-						if(!enemies[i].num('h')){
+						if(!enemies[i].countCards('h')){
 							enemies.splice(i--,1);
 						}
 					}
 					if(enemies.length){
 						var enemy=enemies.randomGet();
 						event.current.line(enemy);
-						enemy.discard(enemy.get('h').randomGet());
+						enemy.discard(enemy.getCards('h').randomGet());
 						event.current=enemy;
 						event.num--;
 						event.redo();
@@ -476,7 +476,7 @@ card.hearth={
 			content:function(){
 				target.gainMaxHp();
 				target.recover();
-				target.discard(target.get('h'));
+				target.discard(target.getCards('h'));
 			},
 			ai:{
 				basic:{
@@ -487,7 +487,7 @@ card.hearth={
 				result:{
 					target:function(player,target){
 						if(target.num('h','tao')) return 0;
-						var nh=target.num('h');
+						var nh=target.countCards('h');
 						if(nh<=2) return 1;
 						if(target.hp==1&&target.maxHp>2) return 1;
 						return 0;
@@ -506,7 +506,7 @@ card.hearth={
 			},
 			type:'trick',
 			content:function(){
-				var num=player.num('h')-target.num('h');
+				var num=player.countCards('h')-target.countCards('h');
 				if(num<-3) num=-3;
 				if(num>3) num=3;
 				if(num>0){
@@ -525,7 +525,7 @@ card.hearth={
 				useful:2,
 				result:{
 					target:function(player,target){
-						var nh=player.num('h')-target.num('h');
+						var nh=player.countCards('h')-target.countCards('h');
 						if(!player.hasSkill('jizhi')){
 							nh--;
 						}
@@ -534,7 +534,7 @@ card.hearth={
 						return 0;
 					},
 					player:function(player,target){
-						var nh=target.num('h')-player.num('h');
+						var nh=target.countCards('h')-player.countCards('h');
 						if(!player.hasSkill('jizhi')){
 							nh++;
 						}
@@ -627,7 +627,7 @@ card.hearth={
 					target:function(player,target){
 						if(target.hasSkillTag('nothunder')) return 0;
 						if(player.hasUnknown(2)) return 0;
-						var nh=target.num('he');
+						var nh=target.countCards('he');
 						if(target==player) nh--;
 						if(nh==2) return -2.5;
 						if(nh==1) return -3;

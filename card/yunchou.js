@@ -46,12 +46,12 @@ card.yunchou={
 						event.dialog=ui.dialogs[i];break;
 					}
 				}
-				if(!event.dialog||!target.num('h')){
+				if(!event.dialog||!target.countCards('h')){
 					event.finish();
 					return;
 				}
 				var minValue=20;
-				var hs=target.get('h');
+				var hs=target.getCards('h');
 				for(var i=0;i<hs.length;i++){
 					minValue=Math.min(minValue,ai.get.value(hs[i],target));
 				}
@@ -146,8 +146,8 @@ card.yunchou={
 				result:{
 					player:1,
 					target:function(player,target){
-						if(target.num('h')==0) return 0;
-						return (Math.sqrt(target.num('h'))-get.distance(player,target,'absolute')/game.countPlayer()/3)/2;
+						if(target.countCards('h')==0) return 0;
+						return (Math.sqrt(target.countCards('h'))-get.distance(player,target,'absolute')/game.countPlayer()/3)/2;
 					}
 				},
 				tag:{
@@ -161,7 +161,7 @@ card.yunchou={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				return target.num('h')>0&&target!=player;
+				return target.countCards('h')>0&&target!=player;
 			},
 			content:function(){
 				'step 0'
@@ -180,12 +180,12 @@ card.yunchou={
 				}
 				'step 1'
 				if(event.directfalse||result.control=='选项二'){
-					if(target.num('h')){
+					if(target.countCards('h')){
 						if(!player.isUnderControl(true)){
 							target.showHandcards();
 						}
 						else{
-							game.log(target,'展示了',target.get('h'));
+							game.log(target,'展示了',target.getCards('h'));
 						}
 						player.discardPlayerCard(target,'h',true,'visible');
 					}
@@ -227,7 +227,7 @@ card.yunchou={
 					}
 				}
 				'step 1'
-				event.card2=target.get('h').randomGet();
+				event.card2=target.getCards('h').randomGet();
 				if(event.card2){
 					target.discard(event.card2);
 				}
@@ -244,7 +244,7 @@ card.yunchou={
 				value:[3,1],
 				result:{
 					target:function(player,target){
-						return -2/Math.sqrt(1+target.num('h'));
+						return -2/Math.sqrt(1+target.countCards('h'));
 					},
 				},
 				tag:{
@@ -259,7 +259,7 @@ card.yunchou={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('h')>0;
+				return target!=player&&target.countCards('h')>0;
 			},
 			chongzhu:function(){
 				return game.countPlayer()<=2;
@@ -308,7 +308,7 @@ card.yunchou={
 			content:function(){
 				'step 0'
 				var list=game.filterPlayer(function(current){
-					return current!=target&&current.num('h');
+					return current!=target&&current.countCards('h');
 				});
 				if(!list.length){
 					target.draw(3);
@@ -324,7 +324,7 @@ card.yunchou={
 					event.current=event.list.shift();
 					event.current.chooseBool('是否响应'+get.translation(target)+'的舌战群儒？',function(event,player){
 						if(ai.get.attitude(player,_status.event.source)>=0) return false;
-						var hs=player.get('h');
+						var hs=player.getCards('h');
 						var dutag=player.hasSkillTag('nodu');
 						for(var i=0;i<hs.length;i++){
 							var value=ai.get.value(hs[i],player);
@@ -383,7 +383,7 @@ card.yunchou={
 				},
 				result:{
 					target:function(player,target){
-						var hs=target.get('h');
+						var hs=target.getCards('h');
 						for(var i=0;i<hs.length;i++){
 							var value=ai.get.value(hs[i]);
 							if(hs[i].number>=7&&value<=6) return 1;
@@ -505,7 +505,7 @@ card.yunchou={
 			type:'trick',
 			filterTarget:true,
 			content:function(){
-				if(target.num('he')){
+				if(target.countCards('he')){
 					player.gainPlayerCard('he',target,true);
 				}
 			},
@@ -568,7 +568,7 @@ card.yunchou={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				return player!=target&&target.get('h').length;
+				return player!=target&&target.countCards('h');
 			},
 			content:function(){
 				"step 0"
@@ -590,11 +590,11 @@ card.yunchou={
 				order:4,
 				result:{
 					target:function(player){
-						if(player.get('h').length<=1) return 0;
+						if(player.countCards('h')<=1) return 0;
 						return -1;
 					},
 					player:function(player){
-						if(player.get('h').length<=1) return 0;
+						if(player.countCards('h')<=1) return 0;
 						return 0.5;
 					}
 				},
@@ -608,18 +608,18 @@ card.yunchou={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				return target.num('e');
+				return target.countCards('e');
 			},
 			selectTarget:-1,
 			content:function(){
-				if(target.num('e')) target.chooseToDiscard('e',true);
+				if(target.countCards('e')) target.chooseToDiscard('e',true);
 			},
 			reverseOrder:true,
 			ai:{
 				order:9,
 				result:{
 					target:function(player,target){
-						if(target.num('e')) return -1;
+						if(target.countCards('e')) return -1;
 						return 0;
 					}
 				},
@@ -634,7 +634,7 @@ card.yunchou={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				return target.num('h')>0;
+				return target.countCards('h')>0;
 			},
 			selectTarget:2,
 			multitarget:true,
@@ -643,7 +643,7 @@ card.yunchou={
 			content:function(){
 				"step 0"
 				target.addTempSkill('toulianghuanzhu2','phaseAfter');
-				var hs=target.get('h');
+				var hs=target.getCards('h');
 				event.num=Math.min(2,hs.length);
 				if(event.num){
 					var gived=hs.randomGets(event.num);
@@ -655,7 +655,7 @@ card.yunchou={
 					event.finish();
 				}
 				"step 1"
-				if(event.addedTarget.num('h')){
+				if(event.addedTarget.countCards('h')){
 					if(_status.auto&&event.addedTarget==game.me){
 						game.delay();
 					}
@@ -679,7 +679,7 @@ card.yunchou={
 				result:{
 					target:function(player,target){
 						if(ui.selected.targets.length){
-							if(target==player&&target.num('h')<=1) return 0;
+							if(target==player&&target.countCards('h')<=1) return 0;
 							return 0.5;
 						}
 						if(target.hasSkill('toulianghuanzhu2')) return 0;
@@ -824,15 +824,15 @@ card.yunchou={
 			fullskin:true,
 			effect:function(){
 				if(result.judge){
-					if(player.num('he')==0) player.loseHp();
+					if(player.countCards('he')==0) player.loseHp();
 					else{
-						player.discard(player.get('he').randomGets(3));
+						player.discard(player.getCards('he').randomGets(3));
 					}
 					var players=get.players();
 					for(var i=0;i<players.length;i++){
 						var dist=get.distance(player,players[i]);
 						if(dist<=2&&player!=players[i]){
-							var cs=players[i].get('he');
+							var cs=players[i].getCards('he');
 							if(cs.length==0) players[i].loseHp();
 							else{
 								players[i].discard(cs.randomGets(3-Math.max(1,dist)));
@@ -915,7 +915,7 @@ card.yunchou={
 			filterTarget:true,
 			content:function(){
 				"step 0"
-				if(target.num('he')<2){
+				if(target.countCards('he')<2){
 					event.directfalse=true;
 				}
 				else{
@@ -949,7 +949,7 @@ card.yunchou={
 						if(ai.get.damageEffect(target,player,player)<0&&ai.get.attitude(player,target)>0){
 							return -2;
 						}
-						var nh=target.num('he');
+						var nh=target.countCards('he');
 						if(target==player) nh--;
 						switch(nh){
 							case 0:case 1:return -2;
@@ -1047,7 +1047,7 @@ card.yunchou={
 			direct:true,
 			filter:function(event,player){
 				if(event.player==player) return false;
-				if(!event.player.num('he')) return false;
+				if(!event.player.countCards('he')) return false;
 				if(!lib.filter.targetEnabled({name:'chenhuodajie'},player,event.player)) return false;
 				return player.hasCard('chenhuodajie');
 			},

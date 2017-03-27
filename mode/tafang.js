@@ -224,7 +224,7 @@ mode.tafang={
 					if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
 						added=true;
 						uiintro.add(get.translation(game.players[i]));
-						var cards=game.players[i].get('h');
+						var cards=game.players[i].getCards('h');
 						if(cards.length){
 							uiintro.addSmall(cards,true);
 						}
@@ -1122,7 +1122,7 @@ mode.tafang={
 				'step 1'
 				if(event.list.length){
 					var target=event.list.shift();
-					var he=target.get('he');
+					var he=target.getCards('he');
 					if(he.length){
 						target.discard(he.randomGets(Math.ceil(Math.random()*2)));
 					}
@@ -1151,7 +1151,7 @@ mode.tafang={
 					var target=list.randomGet();
 					player.line(target,'fire');
 					target.damage('fire','nosource');
-					var he=target.get('he');
+					var he=target.getCards('he');
 					if(he.length){
 						target.discard(he.randomGet());
 					}

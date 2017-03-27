@@ -38,7 +38,7 @@ character.gujian={
             position:'he',
 			viewAs:{name:'jiu'},
 			viewAsFilter:function(player){
-				if(!player.num('he')) return false;
+				if(!player.countCards('he')) return false;
 			},
 			prompt:'将一张手牌或装备牌当酒使用',
 			check:function(card){
@@ -88,12 +88,12 @@ character.gujian={
 				if(event.type!='dying') return false;
 				if(player!=event.dying) return false;
 				if(player.maxHp<=1) return false;
-				if(player.num('h')==0) return false;
+				if(player.countCards('h')==0) return false;
 				return true;
 			},
 			alter:true,
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('h')>0&&target.hp>0&&target.hp<=player.maxHp;
+				return target!=player&&target.countCards('h')>0&&target.hp>0&&target.hp<=player.maxHp;
 			},
 			content:function(){
 				'step 0'
@@ -124,7 +124,7 @@ character.gujian={
 				skillTagFilter:function(player){
 					if(player.maxHp<=1) return false;
 					if(player.hp>0) return false;
-					if(player.num('h')==0) return false;
+					if(player.countCards('h')==0) return false;
 				},
 				save:true,
 				result:{
@@ -168,7 +168,7 @@ character.gujian={
 			},
 			filter:function(event,player){
 				if(!player.storage.yunyin) return true;
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				for(var i=0;i<hs.length;i++){
 					if(!player.storage.yunyin.contains(get.suit(hs[i]))) return true;
 				}
@@ -223,7 +223,7 @@ character.gujian={
 						if(taoyuan>nanman) return name=='taoyuan'?1:0;
 						return name=='nanman'?1:0;
 					}
-					if(player.num('h')<player.hp&&player.hp>=2){
+					if(player.countCards('h')<player.hp&&player.hp>=2){
 						return name=='wuzhong'?1:0;
 					}
 					if(player.hp<player.maxHp&&player.hp<3){
@@ -425,7 +425,7 @@ character.gujian={
 		yanjia:{
 			enable:'phaseUse',
 			filter:function(event,player){
-				var he=player.get('he');
+				var he=player.getCards('he');
 				var num=0;
 				for(var i=0;i<he.length;i++){
 					var info=lib.card[he[i].name];
@@ -648,7 +648,7 @@ character.gujian={
 			},
 			check:function(event,player){
 				return ai.get.attitude(player,event.player)<0&&
-				((player.num('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
+				((player.countCards('h')>player.hp&&player.num('h','lebu')==0)||get.distance(player,event.player)>1);
 			},
 			logTarget:'player',
 			content:function(){
@@ -679,11 +679,11 @@ character.gujian={
 			trigger:{player:'phaseBegin'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h')>player.hp;
+				return player.countCards('h')>player.hp;
 			},
 			content:function(){
 				"step 0"
-				var next=player.chooseToDiscard(get.prompt('xidie'),[1,Math.min(3,player.num('h')-player.hp)]);
+				var next=player.chooseToDiscard(get.prompt('xidie'),[1,Math.min(3,player.countCards('h')-player.hp)]);
 				next.ai=function(card){
 					return 6-ai.get.value(card);
 				}
@@ -712,7 +712,7 @@ character.gujian={
 				return ai.get.attitude(player,event.source)<4;
 			},
 			filter:function(event,player){
-				return event.source&&event.source!=player&&event.source.num('h')>0;
+				return event.source&&event.source!=player&&event.source.countCards('h')>0;
 			},
 			logTarget:'source',
 			content:function(){
@@ -802,7 +802,7 @@ character.gujian={
 					if(player==target) return false;
 					if(target.isLinked()) return true;
 					if(target.isTurnedOver()) return true;
-					if(target.num('j')) return true;
+					if(target.countCards('j')) return true;
 					if(target.hp==target.maxHp) return false;
 					return target.isLowestHp();
 				}).ai=function(target){
@@ -815,7 +815,7 @@ character.gujian={
 						if(target.isTurnedOver()){
 							num+=5;
 						}
-						if(target.num('j')){
+						if(target.countCards('j')){
 							num+=2;
 						}
 						if(target.isLinked()){
@@ -844,7 +844,7 @@ character.gujian={
 					event.target.turnOver();
 				}
 				"step 4"
-				var cards=event.target.get('j');
+				var cards=event.target.getCards('j');
 				if(cards.length){
 					event.target.discard(cards);
 				}
@@ -862,7 +862,7 @@ character.gujian={
 			trigger:{player:'damageBegin'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('h')==0&&event.num>=1;
+				return player.countCards('h')==0&&event.num>=1;
 			},
 			content:function(){
 				if(trigger.num>=1){
@@ -876,7 +876,7 @@ character.gujian={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(get.tag(card,'damage')&&target.num('h')==0){
+						if(get.tag(card,'damage')&&target.countCards('h')==0){
 							if(player.hasSkillTag('jueqing')) return;
 							return 0.1;
 						}
@@ -921,7 +921,7 @@ character.gujian={
 		qinglan:{
 			trigger:{global:'damageBefore'},
 			filter:function(event,player){
-				return event.nature&&player.num('he')>0;
+				return event.nature&&player.countCards('he')>0;
 			},
 			direct:true,
 			priority:-5,
@@ -1072,7 +1072,7 @@ character.gujian={
 			},
 			content:function(){
 				"step 0"
-				var cards=player.get('hej');
+				var cards=player.getCards('hej');
 				player.discard(cards);
 				"step 1"
 				if(player.isLinked()) player.link();
@@ -1140,7 +1140,7 @@ character.gujian={
 				if(player.num('he',{subtype:get.subtype(card)})>1){
 					return 11-ai.get.equipValue(card);
 				}
-				if(player.num('h')<player.hp){
+				if(player.countCards('h')<player.hp){
 					return 6-ai.get.value(card);
 				}
 				return 2-ai.get.equipValue(card);
@@ -1180,7 +1180,7 @@ character.gujian={
 			filter:function(event,player){
 				if(event.card.name!='sha') return false;
 				if(event.targets.length!=1) return false;
-				if(!player.num('he')) return false;
+				if(!player.countCards('he')) return false;
 				var target=event.targets[0];
 				return game.hasPlayer(function(current){
 					return player!=current&&target!=current&&get.distance(target,current)<=1;
@@ -1240,7 +1240,7 @@ character.gujian={
 			ai:{
 				result:{
 					player:function(player){
-						var num=player.num('h');
+						var num=player.countCards('h');
 						if(num>player.hp+1) return 1;
 						if(player.storage.xuanning>=2) return 0;
 						if(num>player.hp) return 1
@@ -1256,13 +1256,13 @@ character.gujian={
 			forced:true,
 			filter:function(event,player){
 				if(player.storage.xuanning){
-					return (event.source&&event.source.num('he')>0);
+					return (event.source&&event.source.countCards('he')>0);
 				}
 				return false;
 			},
 			logTarget:'source',
 			content:function(){
-				var he=trigger.source.get('he');
+				var he=trigger.source.getCards('he');
 				if(he.length){
 					trigger.source.discard(he.randomGet());
 				}
@@ -1311,7 +1311,7 @@ character.gujian={
 						return 8-ai.get.value(card);
 					};
 					next.autochoose=function(){
-						return this.player.num('he')==0;
+						return this.player.countCards('he')==0;
 					};
 					event.current=target;
 				}
@@ -1351,7 +1351,7 @@ character.gujian={
 			ai:{
 				result:{
 					player:function(player){
-						if(player.num('h')<=player.hp&&player.hp==player.maxHp){
+						if(player.countCards('h')<=player.hp&&player.hp==player.maxHp){
 							return 0;
 						}
 						return 1;
@@ -1513,7 +1513,7 @@ character.gujian={
 						if(card.name=='bingliang') return 0;
 						if(card.name=='lebu') return 1.5;
 						if(card.name=='guohe'){
-							if(!target.num('e')) return 0;
+							if(!target.countCards('e')) return 0;
 							return 0.5;
 						}
 						if(card.name=='liuxinghuoyu') return 0;
@@ -1537,15 +1537,15 @@ character.gujian={
 		yuling2:{
 			trigger:{player:['loseEnd','drawEnd'],global:'gameDrawAfter'},
 			check:function(event,player){
-				return player.num('h')<2;
+				return player.countCards('h')<2;
 			},
 			priority:10,
 			forced:true,
 			filter:function(event,player){
-				return player.num('h')<5;
+				return player.countCards('h')<5;
 			},
 			content:function(){
-				player.draw(5-player.num('h'));
+				player.draw(5-player.countCards('h'));
 			}
 		},
 		yuling3:{
@@ -1553,13 +1553,13 @@ character.gujian={
 			priority:10,
 			forced:true,
 			filter:function(event,player){
-				return player.num('h')>5;
+				return player.countCards('h')>5;
 			},
 			check:function(event,player){
-				return player.num('h')<2;
+				return player.countCards('h')<2;
 			},
 			content:function(){
-				player.chooseToDiscard(true,player.num('h')-5);
+				player.chooseToDiscard(true,player.countCards('h')-5);
 			}
 		},
 		yuling4:{

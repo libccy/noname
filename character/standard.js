@@ -154,7 +154,7 @@ character.standard={
 			trigger:{player:'damageEnd'},
 			direct:true,
 			filter:function(event,player){
-				return (event.source&&event.source.num('he')&&event.source!=player);
+				return (event.source&&event.source.countCards('he')&&event.source!=player);
 			},
 			content:function(){
 				player.gainPlayerCard(get.prompt('fankui',trigger.source),trigger.source,ai.get.buttonValue,'he').set('logSkill',['fankui',trigger.source]);
@@ -162,7 +162,7 @@ character.standard={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(player.num('he')>1&&get.tag(card,'damage')){
+						if(player.countCards('he')>1&&get.tag(card,'damage')){
 							if(player.hasSkillTag('jueqing')) return [1,-1.5];
 							if(ai.get.attitude(target,player)<0) return [1,1];
 						}
@@ -175,7 +175,7 @@ character.standard={
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.countCards('h')>0;
 			},
 			content:function(){
 				"step 0"
@@ -274,11 +274,11 @@ character.standard={
 				"step 0"
 				var check;
 				var i,num=game.countPlayer(function(current){
-					return current!=player&&current.num('h')&&ai.get.attitude(player,current)<=0;
+					return current!=player&&current.countCards('h')&&ai.get.attitude(player,current)<=0;
 				});
 				check=(num>=2);
 				player.chooseTarget(get.prompt('tuxi'),[1,2],function(card,player,target){
-					return target.num('h')>0&&player!=target;
+					return target.countCards('h')>0&&player!=target;
 				},function(target){
 					if(!_status.event.aicheck) return 0;
 					var att=ai.get.attitude(_status.event.player,target);
@@ -307,7 +307,7 @@ character.standard={
 			audio:2,
 			trigger:{player:'phaseDrawBegin'},
 			check:function(event,player){
-				if(player.num('h')<3) return false;
+				if(player.countCards('h')<3) return false;
 				if(!player.hasSha()) return false;
 				return game.hasPlayer(function(current){
 					return ai.get.attitude(player,current)<0&&player.canUse('sha',current);
@@ -374,7 +374,7 @@ character.standard={
 					ai1:function(card){
 						if(ui.selected.cards.length>0) return -1;
 						if(card.name=='du') return 20;
-						return (_status.event.player.num('h')-_status.event.player.hp);
+						return (_status.event.player.countCards('h')-_status.event.player.hp);
 					},
 					ai2:function(target){
 						var att=ai.get.attitude(_status.event.player,target);
@@ -498,7 +498,7 @@ character.standard={
 				if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
 				if(!ui.selected.cards.length&&card.name=='du') return 20;
 				var player=get.owner(card);
-				if(player.hp==player.maxHp||player.storage.rende<0||player.num('h')<=1){
+				if(player.hp==player.maxHp||player.storage.rende<0||player.countCards('h')<=1){
 					if(ui.selected.cards.length){
 						return -1;
 					}
@@ -512,8 +512,8 @@ character.standard={
 							return 11-ai.get.value(card);
 						}
 					}
-					if(player.num('h')>player.hp) return 10-ai.get.value(card);
-					if(player.num('h')>2) return 6-ai.get.value(card);
+					if(player.countCards('h')>player.hp) return 10-ai.get.value(card);
+					if(player.countCards('h')>2) return 6-ai.get.value(card);
 					return -1;
 				}
 				return 10-ai.get.value(card);
@@ -533,7 +533,7 @@ character.standard={
 			},
 			ai:{
 				order:function(skill,player){
-					if(player.hp<player.maxHp&&player.storage.rende<2&&player.num('h')>1){
+					if(player.hp<player.maxHp&&player.storage.rende<2&&player.countCards('h')>1){
 						return 10;
 					}
 					return 1;
@@ -545,9 +545,9 @@ character.standard={
 							return -10;
 						}
 						if(target.num('j','lebu')) return 0;
-						var nh=target.num('h');
-						var np=player.num('h');
-						if(player.hp==player.maxHp||player.storage.rende<0||player.num('h')<=1){
+						var nh=target.countCards('h');
+						var np=player.countCards('h');
+						if(player.hp==player.maxHp||player.storage.rende<0||player.countCards('h')<=1){
 							if(nh>=np-1&&np<=player.hp&&!target.get('s').contains('haoshi')) return 0;
 						}
 						return Math.max(1,5-nh);
@@ -736,7 +736,7 @@ character.standard={
 			viewAs:{name:'sha'},
 			viewAsFilter:function(player){
 				if(get.zhu(player,'shouyue')){
-					if(!player.num('he')) return false;
+					if(!player.countCards('he')) return false;
 				}
 				else{
 					if(!player.num('he',{color:'red'})) return false;
@@ -747,7 +747,7 @@ character.standard={
 			ai:{
 				skillTagFilter:function(player){
 					if(get.zhu(player,'shouyue')){
-						if(!player.num('he')) return false;
+						if(!player.countCards('he')) return false;
 					}
 					else{
 						if(!player.num('he',{color:'red'})) return false;
@@ -966,7 +966,7 @@ character.standard={
 		kongcheng:{
 			mod:{
 				targetEnabled:function(card,player,target,now){
-					if(target.num('h')==0){
+					if(target.countCards('h')==0){
 						if(card.name=='sha'||card.name=='juedou') return false;
 					}
 				}
@@ -976,7 +976,7 @@ character.standard={
 				noh:true,
 				skillTagFilter:function(player,tag){
 					if(tag=='noh'){
-						if(player.num('h')!=1) return false;
+						if(player.countCards('h')!=1) return false;
 					}
 				}
 			}
@@ -986,7 +986,7 @@ character.standard={
 			trigger:{player:'loseEnd'},
 			forced:true,
 			filter:function(event,player){
-				if(player.num('h')) return false;
+				if(player.countCards('h')) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].original=='h') return true;
 				}
@@ -1205,7 +1205,7 @@ character.standard={
 				},
 				result:{
 					player:function(player){
-						if(player.num('h')>=player.hp-1) return -1;
+						if(player.countCards('h')>=player.hp-1) return -1;
 						if(player.hp<3) return -1;
 						return 1;
 					}
@@ -1228,7 +1228,7 @@ character.standard={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.countCards('h')>0;
 			},
 			filterTarget:function(card,player,target){
 				return player!=target;
@@ -1247,7 +1247,7 @@ character.standard={
 				game.log(target,'选择了'+get.translation(result.control));
 				event.choice=result.control;
 				target.popup(event.choice);
-				event.card=player.get('h').randomGet();
+				event.card=player.getCards('h').randomGet();
 				target.gain(event.card,player);
 				player.$give(event.card,target);
 				game.delay();
@@ -1261,11 +1261,11 @@ character.standard={
 						var eff=ai.get.damageEffect(target,player);
 						if(eff>=0) return 1+eff;
 						var value=0,i;
-						var cards=player.get('h');
+						var cards=player.getCards('h');
 						for(i=0;i<cards.length;i++){
 							value+=ai.get.value(cards[i]);
 						}
-						value/=player.num('h');
+						value/=player.countCards('h');
 						if(target.hp==1) return Math.min(0,value-7);
 						return Math.min(0,value-5);
 					}
@@ -1295,7 +1295,7 @@ character.standard={
 			direct:true,
 			priority:5,
 			filter:function(event,player){
-				if(player.num('he')==0) return false;
+				if(player.countCards('he')==0) return false;
 				return game.hasPlayer(function(current){
 					return get.distance(player,current,'attack')<=1&&current!=event.player&&
 						current!=player&&lib.filter.targetEnabled(event.card,event.player,current);
@@ -1354,7 +1354,7 @@ character.standard={
 			ai:{
 				effect:{
 					target:function(card,player,target){
-						if(target.num('he')==0) return;
+						if(target.countCards('he')==0) return;
 						if(card.name!='sha') return;
 						var min=1;
 						var friend=ai.get.attitude(player,target)>0;
@@ -1390,7 +1390,7 @@ character.standard={
 			trigger:{player:'loseEnd'},
 			frequent:true,
 			filter:function(event,player){
-				if(player.num('h')) return false;
+				if(player.countCards('h')) return false;
 				for(var i=0;i<event.cards.length;i++){
 					if(event.cards[i].original=='h') return true;
 				}
@@ -1409,7 +1409,7 @@ character.standard={
 				noh:true,
 				skillTagFilter:function(player,tag){
 					if(tag=='noh'){
-						if(player.num('h')!=1) return false;
+						if(player.countCards('h')!=1) return false;
 					}
 				}
 			}
@@ -1448,7 +1448,7 @@ character.standard={
 			selectCard:2,
 			check:function(card){
 				var player=get.owner(card);
-				if(player.num('h')>player.hp)
+				if(player.countCards('h')>player.hp)
 					return 8-ai.get.value(card)
 				if(player.hp<player.maxHp)
 					return 6-ai.get.value(card)
@@ -1470,7 +1470,7 @@ character.standard={
 				result:{
 					player:function(player){
 						if(player.hp<player.maxHp) return 4;
-						if(player.num('h')>player.hp) return 0
+						if(player.countCards('h')>player.hp) return 0
 						return -1;
 					},
 					target:4
@@ -1498,7 +1498,7 @@ character.standard={
 				result:{
 					target:function(player,target){
 						if(target.hp==1) return 5;
-						if(player==target&&player.num('h')>player.hp) return 5;
+						if(player==target&&player.countCards('h')>player.hp) return 5;
 						return 2;
 					}
 				},
@@ -1579,7 +1579,7 @@ character.standard={
 			ai:{
 				result:{
 					target:function(card,player,target){
-						if(card.name=='juedou'&&target.num('h')>0) return [1,0,0,-1];
+						if(card.name=='juedou'&&target.countCards('h')>0) return [1,0,0,-1];
 					}
 				}
 			}

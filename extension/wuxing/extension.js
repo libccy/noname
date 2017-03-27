@@ -69,7 +69,7 @@ play.wuxing={
 					case 'metal':
 					switch(player.wunature){
 						case 'wood':
-							if(player.num('he')){
+							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被金属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('金克木')};return;
 						case 'water':
@@ -81,7 +81,7 @@ play.wuxing={
 					case 'wood':
 					switch(player.wunature){
 						case 'soil':
-							if(player.num('he')){
+							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被木属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('木克土')};return;
 						case 'fire':
@@ -93,7 +93,7 @@ play.wuxing={
 					case 'water':
 					switch(player.wunature){
 						case 'fire':
-							if(player.num('he')){
+							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被水属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('水克火')};return;
 						case 'wood':
@@ -105,7 +105,7 @@ play.wuxing={
 					case 'fire':
 					switch(player.wunature){
 						case 'metal':
-							if(player.num('he')){
+							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被火属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('火克金')};return;
 						case 'soil':
@@ -117,7 +117,7 @@ play.wuxing={
 					case 'soil':
 					switch(player.wunature){
 						case 'water':
-							if(player.num('he')){
+							if(player.countCards('he')){
 							game.log(player,'被'+get.translation(trigger.card.wunature)+'属性的卡牌克制');
 							player.chooseToDiscard('你被土属性卡牌克制，需弃置一张牌',true,'he').ai=ai.get.disvalue;player.popup('土克水')};return;
 						case 'metal':

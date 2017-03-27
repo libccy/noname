@@ -204,15 +204,15 @@ character.zhuogui={
             trigger:{player:'phaseJudgeBegin'},
             forced:true,
             content:function(){
-                player.discard(player.get('j').randomGet());
+                player.discard(player.getCards('j').randomGet());
             },
             filter:function(event ,player){
-                return player.num('j')>0;
+                return player.countCards('j')>0;
             },
             ai:{
                 effect:{
                     target:function(card,player,target,current){
-                        if(get.type(card)=='delay'&&target.num('j')==0) return 0.1;
+                        if(get.type(card)=='delay'&&target.countCards('j')==0) return 0.1;
                     }
                 }
             }
@@ -224,21 +224,21 @@ character.zhuogui={
             forced:true,
             filter:function(event,player){
                 for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('h')) return true;
+                    if(game.players[i]!=player&&game.players[i].countCards('h')) return true;
                 }
                 return false;
             },
             content:function(){
                 "step 0"
                 player.chooseTarget('获得一名角色的一张手牌',true,function(card,player,target){
-                    return player!=target&&target.num('h')>0;
+                    return player!=target&&target.countCards('h')>0;
                 }).ai=function(target){
                     return -ai.get.attitude(player,target);
                 };
                 "step 1"
                 if(result.targets&&result.targets.length){
                     player.logSkill('qiangzheng',result.targets);
-                    player.gain(result.targets[0].get('h').randomGet(),result.targets[0]);
+                    player.gain(result.targets[0].getCards('h').randomGet(),result.targets[0]);
                     result.targets[0].$give(1,player);
                     game.delay();
                 }

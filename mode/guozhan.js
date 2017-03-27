@@ -777,7 +777,7 @@ mode.guozhan={
 				'step 0'
 				player.awakenSkill('jizhao');
 				player.storage.jizhao=true;
-				var num=player.maxHp-player.num('h');
+				var num=player.maxHp-player.countCards('h');
 				if(num>0){
 					player.draw(num);
 				}
@@ -808,7 +808,7 @@ mode.guozhan={
 		gzshoucheng:{
 			inherit:'shoucheng',
 			filter:function(event,player){
-				if(event.player.num('h')) return false;
+				if(event.player.countCards('h')) return false;
 				if(!event.player.isFriendOf(player)) return false;
 				if(_status.currentPhase==event.player) return false;
 				for(var i=0;i<event.cards.length;i++){
@@ -911,7 +911,7 @@ mode.guozhan={
 					game.delay(2);
 					player.chooseTarget(true,'弃置一名角色的一张牌',function(card,player,target){
 						var source=_status.event.source;
-						return get.distance(source,target)<=1&&source!=target&&target.num('he');
+						return get.distance(source,target)<=1&&source!=target&&target.countCards('he');
 					}).set('ai',function(target){
 						return -ai.get.attitude(_status.event.player,target);
 					}).set('source',target);
@@ -966,16 +966,16 @@ mode.guozhan={
 			enable:'phaseUse',
 			usable:1,
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.countCards('h')>0;
 			},
 			filterTarget:function(card,player,target){
-				return player!=target&&(target.num('h')||target.isUnseen(2));
+				return player!=target&&(target.countCards('h')||target.isUnseen(2));
 			},
 			content:function(){
 				"step 0"
-				target.viewCards(get.translation(player)+'的手牌',player.get('h'));
+				target.viewCards(get.translation(player)+'的手牌',player.getCards('h'));
 				"step 1"
-				if(!target.num('h')){
+				if(!target.countCards('h')){
 					event._result={index:1};
 				}
 				else if(!target.isUnseen(2)){
@@ -1001,7 +1001,7 @@ mode.guozhan={
 				order:11,
 				result:{
 					target:function(player,target){
-						return -target.num('h');
+						return -target.countCards('h');
 					}
 				},
 				threaten:1.1
@@ -1046,7 +1046,7 @@ mode.guozhan={
 				if(game.countPlayer()<4) return false;
 				return player.siege(event.target)&&game.hasPlayer(function(current){
 					return current.hasSkill('fengshi')&&current.siege(event.target);
-				})&&event.target.num('e');
+				})&&event.target.countCards('e');
 			},
 			logTarget:'target',
 			content:function(){
@@ -1389,7 +1389,7 @@ mode.guozhan={
 				return ai.get.effect(event.target,event.card,event.player,player)<0;
 			},
 			filter:function(event,player){
-				return player.num('h')==0&&(event.card.name=='sha'||event.card.name=='juedou');
+				return player.countCards('h')==0&&(event.card.name=='sha'||event.card.name=='juedou');
 			},
 			content:function(){
 				trigger.untrigger();
@@ -1398,7 +1398,7 @@ mode.guozhan={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-						if(target.num('h')==0&&(card.name=='sha'||card.name=='juedou')) return 'zeroplayertarget';
+						if(target.countCards('h')==0&&(card.name=='sha'||card.name=='juedou')) return 'zeroplayertarget';
 					},
 				}
 			}
@@ -1425,7 +1425,7 @@ mode.guozhan={
 				if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
 				if(!ui.selected.cards.length&&card.name=='du') return 20;
 				var player=get.owner(card);
-				if(player.hp==player.maxHp||player.storage.gzrende<0||player.num('h')+player.storage.gzrende<=2){
+				if(player.hp==player.maxHp||player.storage.gzrende<0||player.countCards('h')+player.storage.gzrende<=2){
 					if(ui.selected.cards.length){
 						return -1;
 					}
@@ -1439,8 +1439,8 @@ mode.guozhan={
 							return 11-ai.get.value(card);
 						}
 					}
-					if(player.num('h')>player.hp) return 10-ai.get.value(card);
-					if(player.num('h')>2) return 6-ai.get.value(card);
+					if(player.countCards('h')>player.hp) return 10-ai.get.value(card);
+					if(player.countCards('h')>2) return 6-ai.get.value(card);
 					return -1;
 				}
 				return 10-ai.get.value(card);
@@ -1460,7 +1460,7 @@ mode.guozhan={
 			},
 			ai:{
 				order:function(skill,player){
-					if(player.hp==player.maxHp||player.storage.gzrende<0||player.num('h')+player.storage.gzrende<=2){
+					if(player.hp==player.maxHp||player.storage.gzrende<0||player.countCards('h')+player.storage.gzrende<=2){
 						return 1;
 					}
 					return 10;
@@ -1471,9 +1471,9 @@ mode.guozhan={
 							return -10;
 						}
 						if(target.num('j','lebu')) return 0;
-						var nh=target.num('h');
-						var np=player.num('h');
-						if(player.hp==player.maxHp||player.storage.gzrende<0||player.num('h')+player.storage.gzrende<=2){
+						var nh=target.countCards('h');
+						var np=player.countCards('h');
+						if(player.hp==player.maxHp||player.storage.gzrende<0||player.countCards('h')+player.storage.gzrende<=2){
 							if(nh>=np-1&&np<=player.hp&&!target.get('s').contains('haoshi')) return 0;
 						}
 						return Math.max(1,5-nh);
@@ -3092,7 +3092,7 @@ mode.guozhan={
 				if(source&&source.identity!='unknown'){
 					if(this.identity=='ye') source.draw(1);
 					else if(this.identity!=source.identity) source.draw(get.population(this.identity)+1);
-					else source.discard(source.get('he'));
+					else source.discard(source.getCards('he'));
 				}
 				game.tryResult();
 			},

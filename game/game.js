@@ -7840,7 +7840,7 @@
 		        }
 		    },
 			h:function(player){
-				console.log(get.translation(player.get('h')));
+				console.log(get.translation(player.getCards('h')));
 			},
 			g:function(){
 				for(var i=0;i<arguments.length;i++){
@@ -7968,7 +7968,7 @@
 					return;
 				}
 				var player=game.players[num];
-				var cards=player.get('hej');
+				var cards=player.getCards('hej');
 				for(var i=0;i<cards.length;i++){
 					ui.discardPile.appendChild(cards[i]);
 				}
@@ -8172,7 +8172,7 @@
     					if(game.changeCoin){
     						game.changeCoin(-3);
     					}
-    					var hs=game.me.get('h');
+    					var hs=game.me.getCards('h');
     					for(var i=0;i<hs.length;i++){
     						ui.discardPile.appendChild(hs[i]);
     					}
@@ -8615,7 +8615,7 @@
                     }
                     'step 1'
                     if(result&&result.bool){
-                        var hs=game.me.get('h')
+                        var hs=game.me.getCards('h')
                         for(var i=0;i<hs.length;i++){
                             ui.discardPile.appendChild(hs[i]);
                         }
@@ -8630,7 +8630,7 @@
                     };
                     var sendback=function(result,player){
                         if(result&&result.bool){
-                            var hs=player.get('h')
+                            var hs=player.getCards('h')
                             game.broadcastAll(function(player,hs){
                                 for(var i=0;i<hs.length;i++){
                                     ui.discardPile.appendChild(hs[i]);
@@ -8759,7 +8759,7 @@
 				},
 				phaseDiscard:function(){
 					"step 0"
-					event.num=player.num('h')-player.getHandcardLimit();
+					event.num=player.countCards('h')-player.getHandcardLimit();
 					if(event.num<=0) event.finish();
 					else{
 						if(lib.config.show_phase_prompt){
@@ -9176,13 +9176,13 @@
 				},
                 chooseToCompareMultiple:function(){
                     "step 0"
-                    if(player.num('h')==0){
+                    if(player.countCards('h')==0){
                         event.result={cancelled:true,bool:false}
                         event.finish();
                         return;
                     }
                     for(var i=0;i<targets.length;i++){
-                        if(targets[i].num('h')==0){
+                        if(targets[i].countCards('h')==0){
                             event.result={cancelled:true,bool:false}
                             event.finish();
                             return;
@@ -9196,7 +9196,7 @@
                     event.list=targets.slice(0);
                     event.list.unshift(player);
                     player.chooseCardOL(event.list,'请选择拼点牌',true).set('ai',event.ai).set('source',player).aiCard=function(target){
-                        var hs=target.get('h');
+                        var hs=target.getCards('h');
                         var event=_status.event;
                         event.player=target;
                         hs.sort(function(a,b){
@@ -9289,7 +9289,7 @@
                 },
 				chooseToCompare:function(){
 					"step 0"
-					if(player.num('h')==0||target.num('h')==0){
+					if(player.countCards('h')==0||target.countCards('h')==0){
 						event.result={cancelled:true,bool:false}
 						event.finish();
 						return;
@@ -9354,7 +9354,7 @@
                         return;
                     }
 					if(event.card2.number>=10||event.card2.number<=4){
-						if(target.num('h')>2){
+						if(target.countCards('h')>2){
 							event.addToAI=true;
 						}
 					}
@@ -9975,9 +9975,9 @@
 					}
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'&&target.num('h')){
+						if(event.position[i]=='h'&&target.countCards('h')){
 							event.dialog.add('手牌');
-							var hs=target.get('h');
+							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
@@ -9987,14 +9987,14 @@
 								event.dialog.add([hs,'blank']);
 							}
 						}
-						else if(event.position[i]=='e'&&target.num('e')){
+						else if(event.position[i]=='e'&&target.countCards('e')){
 							event.dialog.add('装备牌');
-							event.dialog.add(target.get('e'));
+							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
-						else if(event.position[i]=='j'&&target.num('j')){
+						else if(event.position[i]=='j'&&target.countCards('j')){
 							event.dialog.add('判定牌');
-							event.dialog.add(target.get('j'));
+							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
 					}
@@ -10069,9 +10069,9 @@
 					}
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'&&target.num('h')){
+						if(event.position[i]=='h'&&target.countCards('h')){
 							event.dialog.add('手牌');
-							var hs=target.get('h');
+							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
@@ -10081,14 +10081,14 @@
 								event.dialog.add([hs,'blank']);
 							}
 						}
-						else if(event.position[i]=='e'&&target.num('e')){
+						else if(event.position[i]=='e'&&target.countCards('e')){
 							event.dialog.add('装备牌');
-							event.dialog.add(target.get('e'));
+							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
-						else if(event.position[i]=='j'&&target.num('j')){
+						else if(event.position[i]=='j'&&target.countCards('j')){
 							event.dialog.add('判定牌');
-							event.dialog.add(target.get('j'));
+							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
 					}
@@ -10180,9 +10180,9 @@
 					}
                     var directh=true;
 					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'&&target.num('h')){
+						if(event.position[i]=='h'&&target.countCards('h')){
 							event.dialog.add('手牌');
-							var hs=target.get('h');
+							var hs=target.getCards('h');
 							hs.randomSort();
 							if(event.visible||target.isUnderControl(true)){
 								event.dialog.add(hs);
@@ -10192,14 +10192,14 @@
 								event.dialog.add([hs,'blank']);
 							}
 						}
-						else if(event.position[i]=='e'&&target.num('e')){
+						else if(event.position[i]=='e'&&target.countCards('e')){
 							event.dialog.add('装备牌');
-							event.dialog.add(target.get('e'));
+							event.dialog.add(target.getCards('e'));
                             directh=false;
 						}
-						else if(event.position[i]=='j'&&target.num('j')){
+						else if(event.position[i]=='j'&&target.countCards('j')){
 							event.dialog.add('判定牌');
-							event.dialog.add(target.get('j'));
+							event.dialog.add(target.getCards('j'));
                             directh=false;
 						}
 					}
@@ -10292,11 +10292,11 @@
 				},
 				showHandcards:function(){
 					"step 0"
-					if(player.num('h')==0){
+					if(player.countCards('h')==0){
 						event.finish();
 						return;
 					}
-					var cards=player.get('h');
+					var cards=player.getCards('h');
 					var str=get.translation(player.name)+'的手牌';
 					if(typeof event.prompt=='string'){
 						str=event.prompt;
@@ -11001,8 +11001,8 @@
 				},
 				swapHandcards:function(){
 					'step 0'
-					event.cards1=player.get('h');
-					event.cards2=target.get('h');
+					event.cards1=player.getCards('h');
+					event.cards2=target.getCards('h');
 					player.$giveAuto(event.cards1,target);
 					target.$giveAuto(event.cards2,player);
 					'step 1'
@@ -11057,7 +11057,7 @@
 					var sort;
 					var frag1=document.createDocumentFragment();
 					var frag2=document.createDocumentFragment();
-					var hs=player.get('h');
+					var hs=player.getCards('h');
 					for(var i=0;i<cards.length;i++){
 						if(hs.contains(cards[i])){
 							cards.splice(i--,1);
@@ -11145,7 +11145,7 @@
 				lose:function(){
 					"step 0"
 					var hs=[],es=[],js=[];
-					var hej=player.get('hej');
+					var hej=player.getCards('hej');
 					event.stockcards=cards.slice(0);
 					for(var i=0;i<cards.length;i++){
 						cards[i].style.transform+=' scale(0.2)';
@@ -11493,8 +11493,8 @@
 					else{
 						game.log(player,'阵亡')
 					}
-					event.cards=player.get('hej');
-					event.playerCards=player.get('he');
+					event.cards=player.getCards('hej');
+					event.playerCards=player.getCards('he');
 					if(event.cards.length){
 						player.$throw(event.cards,1000);
 						game.log(player,'弃置了',event.cards);
@@ -12329,9 +12329,9 @@
                         name:this.name,
                         name1:this.name1,
                         name2:this.name2,
-                        handcards:this.get('h'),
-                        equips:this.get('e'),
-                        judges:this.get('j'),
+                        handcards:this.getCards('h'),
+                        equips:this.getCards('e'),
+                        judges:this.getCards('j'),
                         views:[],
                         position:parseInt(this.dataset.position),
                         hujia:this.hujia,
@@ -12449,7 +12449,7 @@
 					setTimeout(function(){
 						hp.style.transition='';
 					});
-					var numh=this.num('h');
+					var numh=this.countCards('h');
 					if(_status.video){
 						numh=arguments[0];
 					}
@@ -12479,7 +12479,7 @@
 						}
 					}
 					if(!_status.video){
-						game.addVideo('update',this,[this.num('h'),this.hp,this.maxHp,this.hujia]);
+						game.addVideo('update',this,[this.countCards('h'),this.hp,this.maxHp,this.hujia]);
 					}
 					if(this.node.jiu&&!this.hasSkill('jiu')){
 						this.node.jiu.delete();
@@ -12603,7 +12603,7 @@
                 },
 				getCards:function(arg1,arg2){
 					if(typeof arg1!='string'){
-						arg1='he';
+						arg1='h';
 					}
 					var cards=[],cards1=[];
 					var i,j;
@@ -13887,7 +13887,7 @@
 					return next;
 				},
 				directgain:function(cards){
-					var hs=this.get('h');
+					var hs=this.getCards('h');
 					for(var i=0;i<cards.length;i++){
 						if(hs.contains(cards[i])){
 							cards.splice(i--,1);
@@ -15034,7 +15034,7 @@
                         }
                     }
                     else{
-                        var es=this.get('e');
+                        var es=this.getCards('e');
                         for(var i=0;i<es.length;i++){
 							this.addEquipTrigger(es[i]);
                         }
@@ -15051,7 +15051,7 @@
                         }
                     }
                     else{
-                        var es=this.get('e');
+                        var es=this.getCards('e');
                         for(var i=0;i<es.length;i++){
 							this.removeEquipTrigger(es[i]);
                         }
@@ -15327,7 +15327,7 @@
 					var range=0;
 					range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
 					range=game.checkMod(player,player,range,'attackFrom',player.get('s'));
-					var equips=player.get('e');
+					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
 						if(!info) continue;
@@ -15344,7 +15344,7 @@
 					var player=this;
 					var range=0;
 					range=game.checkMod(player,player,range,'globalFrom',player.get('s'));
-					var equips=player.get('e');
+					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
 						if(!info) continue;
@@ -15358,7 +15358,7 @@
 					var player=this;
 					var range=0;
 					range=game.checkMod(player,player,range,'globalTo',player.get('s'));
-					var equips=player.get('e');
+					var equips=player.getCards('e');
 					for(var i=0;i<equips.length;i++){
 						var info=get.info(equips[i]).distance;
 						if(!info) continue;
@@ -15474,27 +15474,27 @@
 					return true;
 				},
 				isMostHandcard:function(equal){
-					var nh=this.num('h');
+					var nh=this.countCards('h');
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isOut()) continue;
 						if(equal){
-							if(game.players[i].num('h')>=nh) return false;
+							if(game.players[i].countCards('h')>=nh) return false;
 						}
 						else{
-							if(game.players[i].num('h')>nh) return false;
+							if(game.players[i].countCards('h')>nh) return false;
 						}
 					}
 					return true;
 				},
 				isFewestHandcard:function(equal){
-					var nh=this.num('h');
+					var nh=this.countCards('h');
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].isOut()) continue;
 						if(equal){
-							if(game.players[i].num('h')<=nh) return false;
+							if(game.players[i].countCards('h')<=nh) return false;
 						}
 						else{
-							if(game.players[i].num('h')<nh) return false;
+							if(game.players[i].countCards('h')<nh) return false;
 						}
 					}
 					return true;
@@ -15571,7 +15571,7 @@
                 },
                 needsToDiscard:function(num){
 					if(typeof num!='number') num=0;
-                    return Math.max(0,num+this.num('h')-this.getHandcardLimit());
+                    return Math.max(0,num+this.countCards('h')-this.getHandcardLimit());
                 },
                 distanceTo:function(target,method){
                     return get.distance(this,target,method);
@@ -18218,7 +18218,7 @@
 				return range;
 			},
 			judge:function(card,player,target){
-				var judges=target.get('j');
+				var judges=target.getCards('j');
 				for(var i=0;i<judges.length;i++){
 					if((judges[i].viewAs||judges[i].name)==card.name) return false;
 				}
@@ -21213,7 +21213,7 @@
 					console.log('diex');
 					return;
 				}
-				var cards=player.get('hej');
+				var cards=player.getCards('hej');
 				for(var i=0;i<cards.length;i++){
 					cards[i].goto(ui.discardPile);
 				}
@@ -21454,7 +21454,7 @@
 			lose:function(player,info){
 				if(player&&info){
 					var hs=info[0],es=info[1],js=info[2];
-					var phs=player.get('h'),pes=player.get('e'),pjs=player.get('j');
+					var phs=player.getCards('h'),pes=player.getCards('e'),pjs=player.getCards('j');
 					var checkMatch=function(l1,l2){
 						for(var i=0;i<l1.length;i++){
 							for(var j=0;j<l2.length;j++){
@@ -22994,7 +22994,7 @@
 
             for(var i=0;i<game.players.length;i++){
                 if(!_status.connectMode&&game.players[i].isUnderControl(true)&&game.layout!='long2') continue;
-                var hs=game.players[i].get('h');
+                var hs=game.players[i].getCards('h');
                 if(hs.length){
                     dialog.add('<div class="text center">'+get.translation(game.players[i])+'</div>');
                     dialog.addSmall(hs);
@@ -23739,7 +23739,7 @@
 					selected[0].classList.remove('selected');
 				}
 				if(_status.event.player){
-					var cards=_status.event.player.get('hej');
+					var cards=_status.event.player.getCards('hej');
 					for(j=0;j<cards.length;j++){
 						cards[j].classList.remove('selected');
 						cards[j].classList.remove('selectable');
@@ -23763,7 +23763,7 @@
 						ui.selected.targets.length=0;
 					}
 					else if(args[i]=='card'){
-						var cards=_status.event.player.get('hej');
+						var cards=_status.event.player.getCards('hej');
 						for(j=0;j<cards.length;j++){
 							cards[j].classList.remove('selected');
 							cards[j].classList.remove('selectable');
@@ -23845,7 +23845,7 @@
 			}
 			else{
 				if(player==game.me) return;
-				game.addVideo('swapPlayer',player,get.cardsInfo(player.get('h')));
+				game.addVideo('swapPlayer',player,get.cardsInfo(player.getCards('h')));
 				var pos=parseInt(player.dataset.position);
 				var num=game.players.length+game.dead.length;
 				var players=game.players.concat(game.dead);
@@ -23905,7 +23905,7 @@
 			ui.handcards1Container.insertBefore(ui.handcards1,ui.handcards1Container.firstChild);
 			ui.handcards2Container.insertBefore(ui.handcards2,ui.handcards2Container.firstChild);
 			ui.updatehl();
-			game.addVideo('swapControl',player,get.cardsInfo(player.get('h')));
+			game.addVideo('swapControl',player,get.cardsInfo(player.getCards('h')));
 
 			if(game.me.isAlive()){
 				if(ui.auto) ui.auto.show();
@@ -31683,7 +31683,7 @@
 										case '伤害':target.damage(num,'nosource');break;
 										case '回复':target.recover(num,'nosource');break;
 										case '摸牌':target.draw(num);break;
-										case '弃牌':target.discard(target.get('he').randomGets(num));break;
+										case '弃牌':target.discard(target.getCards('he').randomGets(num));break;
 										case '横置':target.link();break;
 										case '翻面':target.turnOver();break;
 										case '复活':target.revive(target.maxHp);break;
@@ -36581,7 +36581,7 @@
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();
 					}
-                    var cards=event.player.get('hej');
+                    var cards=event.player.getCards('hej');
                     for(var i=0;i<cards.length;i++){
                         cards[i].recheck('useSkill');
                     }
@@ -36613,7 +36613,7 @@
 					}
 					// ui.control.animate('nozoom',100);
 					event.restore();
-                    var cards=event.player.get('hej');
+                    var cards=event.player.getCards('hej');
                     for(var i=0;i<cards.length;i++){
                         cards[i].recheck('useSkill');
                     }
@@ -38779,7 +38779,7 @@
 			m=n;
 			m=game.checkMod(from,to,m,'attackFrom',from.get('s'));
 			m=game.checkMod(from,to,m,'attackTo',to.get('s'));
-			var equips1=from.get('e'),equips2=to.get('e');
+			var equips1=from.getCards('e'),equips2=to.getCards('e');
 			for(i=0;i<equips1.length;i++){
 				var info=get.info(equips1[i]).distance;
 				if(!info) continue;
@@ -39001,7 +39001,7 @@
 		},
 		selectableCards:function(sort){
 			if(!_status.event.player) return[];
-			var cards=_status.event.player.get('hej');
+			var cards=_status.event.player.getCards('hej');
 			var selectable=[];
 			for(var i=0;i<cards.length;i++){
 				if(cards[i].classList.contains('selectable')&&
@@ -39145,7 +39145,7 @@
 		},
 		owner:function(card,method){
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].get('hej').contains(card)) return game.players[i];
+				if(game.players[i].getCards('hej').contains(card)) return game.players[i];
                 if(game.players[i].judging[0]==card&&method!='judge') return game.players[i];
 			}
 			for(var i=0;i<game.players.length;i++){
@@ -39429,10 +39429,10 @@
 				uiintro.add(capt);
 
                 if(node.isUnderControl()){
-                    var hs=node.get('h');
+                    var hs=node.getCards('h');
                     if(hs.length){
                         uiintro.add('<div class="text center">手牌</div>');
-                        uiintro.addSmall(node.get('h'));
+                        uiintro.addSmall(node.getCards('h'));
                     }
                 }
 
@@ -39537,7 +39537,7 @@
 					}
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=node.num('h');
+					td.innerHTML=node.countCards('h');
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=node.stat.length-1;
@@ -39551,12 +39551,12 @@
 					}
 				}
                 if(!simple||get.is.phoneLayout()){
-                    var es=node.get('e');
+                    var es=node.getCards('e');
                     for(var i=0;i<es.length;i++){
                         uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+lib.translate[es[i].name+'_info']+'</div></div>');
 						uiintro.content.lastChild.querySelector('.skill>.card').style.transform='';
                     }
-                    var js=node.get('j');
+                    var js=node.getCards('j');
                     for(var i=0;i<js.length;i++){
                         if(js[i].viewAs&&js[i].viewAs!=js[i].name){
                             uiintro.add('<div><div class="skill">'+js[i].outerHTML+'</div><div>'+lib.translate[js[i].viewAs]+'：'+lib.translate[js[i].viewAs+'_info']+'</div></div>');
@@ -40397,7 +40397,7 @@
 				if(get.objtype(value)=='array'){
 					if(method=='raw') return value[0];
 					var num=0,i;
-					var cards=player.get('h');
+					var cards=player.getCards('h');
 					for(i=0;i<cards.length;i++){
 						if(cards[i].name==card.name&&
 							cards[i]!=card&&
@@ -40599,13 +40599,13 @@
 					}
 					if(target.hp<=1) result2*=2;
 					if(target.hp==2) result2*=1.1;
-					if(target.num('h')==0){
+					if(target.countCards('h')==0){
 						result2*=1.1;
 						if(get.tag(card,'respondSha')||get.tag(card,'respondShan')) result2*=1.4;
 					}
-					if(target.num('h')==1) result2*=1.05;
-					if(target.num('h')==2) result2*=1.02;
-					if(target.num('h')>3) result2*=0.9;
+					if(target.countCards('h')==1) result2*=1.05;
+					if(target.countCards('h')==2) result2*=1.02;
+					if(target.countCards('h')>3) result2*=0.9;
 					if(target.hp==4) result2*=0.9;
 					if(target.hp==5) result2*=0.8;
 					if(target.hp>5) result2*=0.6;
@@ -40651,13 +40651,13 @@
 				var card=button.link;
 				var player=get.owner(card);
 				if(!player) player=_status.event.player;
-				if(player.get('j').contains(card)){
+				if(player.getCards('j').contains(card)){
 					var efff=ai.get.effect(player,card,player,player);
 					if(efff>0) return 0.5;
 					if(efff==0) return 0;
 					return -1.5;
 				}
-				if(player.get('e').contains(card)){
+				if(player.getCards('e').contains(card)){
                     var evalue=ai.get.equipValue(card);
                     if(player.hasSkillTag('noe')){
                         if(evalue>=7){
@@ -40668,7 +40668,7 @@
 					return evalue/3;
 				}
                 if(player.hasSkillTag('noh')) return 0.1;
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				switch(nh){
 					case 1:return 2;
 					case 2:return 1.6;

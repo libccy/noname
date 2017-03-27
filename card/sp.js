@@ -87,7 +87,7 @@ card.sp={
 			},
 			content:function(){
 				'step 0'
-				if(!player.num('h')){
+				if(!player.countCards('h')){
 					event.finish();
 				}
 				else{
@@ -99,11 +99,11 @@ card.sp={
 				player.$giveAuto(result.cards,event.target1);
 				event.target1.gain(result.cards,player);
 				'step 2'
-				if(!event.target1.num('h')){
+				if(!event.target1.countCards('h')){
 					event.finish();
 				}
 				else{
-					var he=event.target1.get('he');
+					var he=event.target1.getCards('he');
 					if(he.length<=2){
 						event.directresult=he;
 					}
@@ -128,7 +128,7 @@ card.sp={
 				result:{
 					target:function(player,target){
 						var ok=false;
-						var hs=player.get('h');
+						var hs=player.getCards('h');
 						if(hs.length<=1) return 0;
 						for(var i=0;i<hs.length;i++){
 							if(ai.get.value(hs[i])<=5){
@@ -138,7 +138,7 @@ card.sp={
 						}
 						if(!ok) return 0;
 						if(ui.selected.targets.length==1) return 2;
-						if(target.num('he')==0) return 0;
+						if(target.countCards('he')==0) return 0;
 						if(player.hasFriend()) return -1;
 						return 0;
 					}
@@ -154,7 +154,7 @@ card.sp={
 				'step 0'
 				target.draw(3);
 				'step 1'
-				if(target.num('he',{type:'basic'})<target.num('he')){
+				if(target.num('he',{type:'basic'})<target.countCards('he')){
 					target.chooseToDiscard('弃置一张非基本牌（或取消并弃置两张牌）','he',function(card){
 						return get.type(card)!='basic';
 					}).set('ai',function(card){
@@ -181,7 +181,7 @@ card.sp={
 				result:{
 					target:function(player,target){
 						if(target.num('j','lebu')) return 0;
-						return Math.max(1,2-target.num('h')/10);
+						return Math.max(1,2-target.countCards('h')/10);
 					}
 				}
 			}
@@ -262,7 +262,7 @@ card.sp={
 			check:function(card){
 				if(card.name=='du') return 20;
 				var player=_status.event.player;
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				if(!player.needsToDiscard()){
 					if(nh<3) return 0;
 					if(nh==3) return 5-ai.get.value(card);
@@ -289,7 +289,7 @@ card.sp={
 				},muniu,muniu.cards);
 			},
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.countCards('h')>0;
 			},
 			prepare:function(cards,player){
 				player.$give(1,player,false);
@@ -445,7 +445,7 @@ card.sp={
 				check:function(button){
 					if(button.link.name=='du') return -2;
 					var player=_status.event.player;
-					if(button.link.name=='xingjiegoutong'&&player.num('h')>1) return -2;
+					if(button.link.name=='xingjiegoutong'&&player.countCards('h')>1) return -2;
 					if(get.select(get.info(button.link).selectTarget)[1]==-1){
 						if(get.type(button.link)=='delay') return -1;
 						if(get.type(button.link)=='equip'){

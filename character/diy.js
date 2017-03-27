@@ -146,7 +146,7 @@ character.diy={
 			filterCard:{type:'equip'},
 			check:function(card){
 				var player=_status.event.player;
-				var he=player.get('he');
+				var he=player.getCards('he');
 				var subtype=get.subtype(card);
 				var value=ai.get.equipValue(card);
 				for(var i=0;i<he.length;i++){
@@ -218,7 +218,7 @@ character.diy={
 				var att=ai.get.attitude(player,event.player);
 				var subtype=get.subtype(event.cards[0]);
 				if(att>0){
-					if(event.player.num('h')>=player.num('h')+2) return true;
+					if(event.player.countCards('h')>=player.countCards('h')+2) return true;
 					return event.player.num('e',{subtype:subtype})==0;
 				}
 				else{
@@ -306,7 +306,7 @@ character.diy={
 		fuchou:{
 			trigger:{target:'shaBefore'},
 			filter:function(event,player){
-				return player.num('he')>0;
+				return player.countCards('he')>0;
 			},
 			direct:true,
 			content:function(){
@@ -382,10 +382,10 @@ character.diy={
 		chezhen:{
 			mod:{
 				globalFrom:function(from,to,distance){
-					if(from.num('e')) return distance-1;
+					if(from.countCards('e')) return distance-1;
 				},
 				globalTo:function(from,to,distance){
-					if(!to.num('e')) return distance+1;
+					if(!to.countCards('e')) return distance+1;
 				}
 			}
 		},
@@ -420,7 +420,7 @@ character.diy={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('he')>0;
+				return target!=player&&target.countCards('he')>0;
 			},
 			content:function(){
 				'step 0'
@@ -551,11 +551,11 @@ character.diy={
 				target:function(card,player,target,current){
 					if(card.name=='sha'&&player.storage.zhucheng&&player.storage.zhucheng.length){
 						if(player.storage.zhucheng.length>=2){
-							if(!player.hasFriend()&&player.num('he')-2<player.storage.zhucheng.length) return 'zeroplayertarget';
+							if(!player.hasFriend()&&player.countCards('he')-2<player.storage.zhucheng.length) return 'zeroplayertarget';
 							return 0.1;
 						}
 						else{
-							var he=player.get('he');
+							var he=player.getCards('he');
 							var sha=false;
 							for(var i=0;i<he.length;i++){
 								if(he[i]=='sha'&&!sha){
@@ -629,7 +629,7 @@ character.diy={
 					return false;
 				}
 				else if(1+player.maxHp-player.hp==2){
-					return player.num('h')>=2;
+					return player.countCards('h')>=2;
 				}
 				return true;
 			},
@@ -679,7 +679,7 @@ character.diy={
 						num++;
 					}
 				}
-				return player.num('h')<num;
+				return player.countCards('h')<num;
 			},
 			content:function(){
 				var list=['wei','shu','wu','qun'];
@@ -691,7 +691,7 @@ character.diy={
 						num++;
 					}
 				}
-				player.draw(num-player.num('h'));
+				player.draw(num-player.countCards('h'));
 			},
 			ai:{
 				threaten:1.3
@@ -891,7 +891,7 @@ character.diy={
 			trigger:{player:'phaseDrawBegin'},
 			forced:true,
 			content:function(){
-				trigger.num+=1+Math.floor(player.num('e')/2);
+				trigger.num+=1+Math.floor(player.countCards('e')/2);
 			}
 		},
 		honglian:{
@@ -921,7 +921,7 @@ character.diy={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				return player.num('hej')>0;
+				return player.countCards('hej')>0;
 			},
 			content:function(){
 				"step 0"
@@ -1085,10 +1085,10 @@ character.diy={
 				var att=ai.get.attitude(trigger.player,player);
 				var bool=0;
 				if(att<0){
-					if(trigger.player.num('e')==0&&trigger.player.num('h')>2) bool=1;
-					else if(trigger.player.num('he')==0) bool=1;
+					if(trigger.player.countCards('e')==0&&trigger.player.countCards('h')>2) bool=1;
+					else if(trigger.player.countCards('he')==0) bool=1;
 				}
-				else if(att==0&&trigger.player.num('he')==0){
+				else if(att==0&&trigger.player.countCards('he')==0){
 					bool=1;
 				}
 				trigger.player.chooseControl(function(){
@@ -1099,7 +1099,7 @@ character.diy={
 					player.draw();
 					event.finish();
 				}
-				else if(trigger.player.num('he')){
+				else if(trigger.player.countCards('he')){
 					player.discardPlayerCard(trigger.player,true,'he');
 				}
 				else{
@@ -1258,7 +1258,7 @@ character.diy={
 				"step 1"
 				target.damage();
 				"step 2"
-				if(target.isAlive()&&target.num('he')){
+				if(target.isAlive()&&target.countCards('he')){
 					player.discardPlayerCard(target);
 				}
 			},

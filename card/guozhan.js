@@ -87,7 +87,7 @@ card.guozhan={
 				useful:2,
 				result:{
 					target:function(player,target){
-						if(target.num('he')>=2) return 1;
+						if(target.countCards('he')>=2) return 1;
 						return 0;
 					}
 				}
@@ -97,7 +97,7 @@ card.guozhan={
 			fullskin:true,
 			type:'trick',
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('e')>0;
+				return target!=player&&target.countCards('e')>0;
 			},
 			enable:true,
 			content:function(){
@@ -106,14 +106,14 @@ card.guozhan={
 					if(ai.get.damageEffect(player,event.player,player,'thunder')>=0){
 						return 'take_damage';
 					}
-					if(player.hp>=3&&player.num('e')>=2){
+					if(player.hp>=3&&player.countCards('e')>=2){
 						return 'take_damage';
 					}
 					return 'discard_card';
 				});
 				'step 1'
 				if(result.control=='discard_card'){
-					target.discard(target.get('e'));
+					target.discard(target.getCards('e'));
 				}
 				else{
 					target.damage('thunder');
@@ -130,7 +130,7 @@ card.guozhan={
 				},
 				result:{
 					target:function(player,target){
-						return -target.num('e');
+						return -target.countCards('e');
 					}
 				}
 			}
@@ -378,7 +378,7 @@ card.guozhan={
 				result:{
 					target:function(player,target){
 						if(target.hasSkillTag('nofire')||target.hasSkillTag('nodamage')) return 0;
-						if(target.hasSkill('xuying')&&target.num('h')==0) return 0;
+						if(target.hasSkill('xuying')&&target.countCards('h')==0) return 0;
 						if(!target.isLinked()){
 							return ai.get.damageEffect(target,player,target,'fire');
 						}
@@ -429,7 +429,7 @@ card.guozhan={
 			chongzhu:true,
 			filterTarget:function(card,player,target){
 				if(player==target) return false;
-				return (target.get('h').length||target.isUnseen(2));
+				return (target.countCards('h')||target.isUnseen(2));
 			},
 			content:function(){
 				"step 0"
@@ -438,7 +438,7 @@ card.guozhan={
 				}
 				player.storage.zhibi.add(target);
 				var controls=[];
-				if(target.get('h').length) controls.push('手牌');
+				if(target.countCards('h')) controls.push('手牌');
 				if(target.isUnseen(0)) controls.push('主将');
 				if(target.isUnseen(1)) controls.push('副将');
 				if(controls.length>1){
@@ -450,7 +450,7 @@ card.guozhan={
 				var str=get.translation(target)+'的';
 				if(result.control){
 					if(result.control=='手牌'){
-						content=[str+'手牌',target.get('h')];
+						content=[str+'手牌',target.getCards('h')];
 						game.log(player,'观看了',target,'的手牌');
 					}
 					else if(result.control=='主将'){
@@ -462,8 +462,8 @@ card.guozhan={
 						game.log(player,'观看了',target,'的副将');
 					}
 				}
-				else if(target.get('h').length){
-					content=[str+'手牌',target.get('h')];
+				else if(target.countCards('h')){
+					content=[str+'手牌',target.getCards('h')];
 					game.log(player,'观看了',target,'的手牌');
 				}
 				else if(target.isUnseen(0)){
@@ -484,7 +484,7 @@ card.guozhan={
 				},
 				result:{
 					player:function(player,target){
-						if(player.num('h')<=player.hp) return 0;
+						if(player.countCards('h')<=player.hp) return 0;
 						if(player.storage.zhibi&&player.storage.zhibi.contains(target)) return 0;
 						return target.isUnseen()?1:0;
 					}
@@ -527,7 +527,7 @@ card.guozhan={
 				},
 				result:{
 					target:function(player,target){
-						var hs=target.get('h');
+						var hs=target.getCards('h');
 						if(hs.length<=1){
 							if(target==player&&hs[0].name=='yiyi'){
 								return 0;
@@ -615,7 +615,7 @@ card.guozhan={
 			priority:5,
 			logTarget:'target',
 			filter:function(event,player){
-				return event.target.num('he');
+				return event.target.countCards('he');
 			},
 			content:function(){
 				trigger.target.chooseToDiscard('he',true);
@@ -836,7 +836,7 @@ card.guozhan={
 			content:function(){
 				"step 0"
 				player.removeSkill('xietianzi');
-				if(player.num('he')>0){
+				if(player.countCards('he')>0){
 					player.chooseToDiscard('he','是否弃置一张牌并获得一个额外回合？').set('ai',function(card){
 						return 10-ai.get.value(card);
 					});
@@ -1069,7 +1069,7 @@ card.guozhan={
 			trigger:{source:'damageAfter'},
 			direct:true,
 			filter:function(event,player){
-				if(player.num('h')==0) return false;
+				if(player.countCards('h')==0) return false;
 				if(!event.card) return false;
 				if(event.card.name!='sha') return false;
 				return game.hasPlayer(function(current){

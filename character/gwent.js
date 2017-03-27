@@ -139,7 +139,7 @@ character.gwent={
 		kuanglie:{
 			trigger:{player:'useCardToBegin'},
 			filter:function(event,player){
-				return event.target&&event.target!=player&&event.target.num('he')&&get.color(event.card)=='black';
+				return event.target&&event.target!=player&&event.target.countCards('he')&&get.color(event.card)=='black';
 			},
 			init:function(player){
 				player.storage.kuanglie=0;
@@ -158,7 +158,7 @@ character.gwent={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('he');
+				return target!=player&&target.countCards('he');
 			},
 			selectTarget:[1,Infinity],
 			content:function(){
@@ -208,7 +208,7 @@ character.gwent={
 				'step 1'
 				if(event.list.length){
 					var current=event.list.shift();
-					var he=current.get('he');
+					var he=current.getCards('he');
 					player.line(current,'green');
 					if(he.length){
 						current.discard(he.randomGet());
@@ -236,7 +236,7 @@ character.gwent={
 				}
 				var player=_status.event.player;
 				if(player.isDamaged()){
-					var hs=player.get('h');
+					var hs=player.getCards('h');
 					var num=0;
 					for(var i=0;i<hs.length;i++){
 						if(ai.get.value(hs[i])<6){
@@ -439,18 +439,18 @@ character.gwent={
 					forced:true,
 					filter:function(event,player){
 						return game.hasPlayer(function(current){
-							return current.num('h')>current.hp;
+							return current.countCards('h')>current.hp;
 						});
 					},
 					logTarget:function(){
 						return game.filterPlayer(function(current){
-							return current.num('h')>current.hp;
+							return current.countCards('h')>current.hp;
 						}).sortBySeat();
 					},
 					content:function(){
 						'step 0'
 						var list=game.filterPlayer(function(current){
-							return current.num('h')>current.hp;
+							return current.countCards('h')>current.hp;
 						}).sortBySeat();
 						event.list=list;
 						'step 1'
@@ -540,7 +540,7 @@ character.gwent={
 			trigger:{player:'shaBegin'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('he')>0;
+				return player.countCards('he')>0;
 			},
 			content:function(){
 				'step 0'
@@ -573,11 +573,11 @@ character.gwent={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('h')>0;
+				return target!=player&&target.countCards('h')>0;
 			},
 			content:function(){
 				'step 0'
-				var hs=target.get('h');
+				var hs=target.getCards('h');
 				player.gain(hs,target);
 				target.$giveAuto(hs,player);
 				event.hs=hs;
@@ -618,7 +618,7 @@ character.gwent={
 				order:11,
 				result:{
 					target:function(player,target){
-						return -Math.sqrt(target.num('h'));
+						return -Math.sqrt(target.countCards('h'));
 					}
 				}
 			}
@@ -627,11 +627,11 @@ character.gwent={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target.num('h')!=Math.min(3,player.hp);
+				return target.countCards('h')!=Math.min(3,player.hp);
 			},
 			selectTarget:[1,3],
 			content:function(){
-				var dh=Math.min(3,player.hp)-target.num('h');
+				var dh=Math.min(3,player.hp)-target.countCards('h');
 				if(dh>0){
 					target.draw(dh,false);
 					target.$draw(dh);
@@ -646,7 +646,7 @@ character.gwent={
 				order:11,
 				result:{
 					target:function(player,target){
-						var dh=Math.min(3,player.hp)-target.num('h');
+						var dh=Math.min(3,player.hp)-target.countCards('h');
 						if(dh<0){
 							dh+=get.sgn(ai.get.effect(target,{name:'sha'},player,target));
 						}
@@ -661,9 +661,9 @@ character.gwent={
 			content:function(){
 				'step 0'
 				player.chooseTarget(get.prompt('hunmo'),[1,game.countPlayer()],function(card,player,target){
-					return target.num('h')!=Math.min(3,target.hp);
+					return target.countCards('h')!=Math.min(3,target.hp);
 				}).ai=function(target){
-					return ai.get.attitude(player,target)*(Math.min(3,target.hp)-target.num('h'));
+					return ai.get.attitude(player,target)*(Math.min(3,target.hp)-target.countCards('h'));
 				}
 				'step 1'
 				if(result.bool){
@@ -677,7 +677,7 @@ character.gwent={
 				'step 2'
 				if(event.targets.length){
 					var target=event.targets.shift();
-					var dh=Math.min(3,target.hp)-target.num('h');
+					var dh=Math.min(3,target.hp)-target.countCards('h');
 					if(dh>0){
 						target.draw(dh,false);
 						target.$draw(dh);

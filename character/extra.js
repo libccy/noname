@@ -168,7 +168,7 @@ character.extra={
 				"step 2"
 				if(event.targets2.length){
 					var cur=event.targets2.shift();
-					if(cur&&cur.num('he')){
+					if(cur&&cur.countCards('he')){
 						cur.chooseToDiscard('he',true,4);
 					}
 					event.redo();
@@ -304,7 +304,7 @@ character.extra={
 			trigger:{global:'judge'},
 			direct:true,
 			filter:function(event,player){
-				return player.num('h')>0&&player.storage.renjie>0;
+				return player.countCards('h')>0&&player.storage.renjie>0;
 			},
 			content:function(){
 				"step 0"
@@ -418,7 +418,7 @@ character.extra={
 				result:{
 					player:function(player){
 						var num=0;
-						var cards=player.get('he');
+						var cards=player.getCards('he');
 						for(var i=0;i<cards.length;i++){
 							if(ai.get.value(cards[i])<6){
 								num++;
@@ -525,10 +525,10 @@ character.extra={
 			check:function(event,player){
 				if(player.isTurnedOver()) return true;
 				var num=game.countPlayer(function(current){
-					if(current.num('he')&&current!=player&&ai.get.attitude(player,current)<=0){
+					if(current.countCards('he')&&current!=player&&ai.get.attitude(player,current)<=0){
 						return true;
 					}
-					if(current.num('j')&&current!=player&&ai.get.attitude(player,current)>0){
+					if(current.countCards('j')&&current!=player&&ai.get.attitude(player,current)>0){
 						return true;
 					}
 				});
@@ -544,7 +544,7 @@ character.extra={
 				player.line(targets,'green');
 				"step 1"
 				if(num<event.targets.length){
-					var hej=event.targets[num].get('hej')
+					var hej=event.targets[num].getCards('hej')
 					if(hej.length){
 						var card=hej.randomGet();
 						player.gain(card,event.targets[num]);
@@ -575,10 +575,10 @@ character.extra={
 							if(target.hp==1) return 0.8;
 							if(target.isTurnedOver()) return [0,3];
 							var num=game.countPlayer(function(current){
-								if(current.num('he')&&current!=player&&ai.get.attitude(player,current)<=0){
+								if(current.countCards('he')&&current!=player&&ai.get.attitude(player,current)<=0){
 									return true;
 								}
-								if(current.num('j')&&current!=player&&ai.get.attitude(player,current)>0){
+								if(current.countCards('j')&&current!=player&&ai.get.attitude(player,current)>0){
 									return true;
 								}
 							});
@@ -646,7 +646,7 @@ character.extra={
 			},
 			content:function(){
 				"step 0"
-				player.chooseCard('选择任意张手牌与星交换',[1,player.num('h')]).ai=function(card){
+				player.chooseCard('选择任意张手牌与星交换',[1,player.countCards('h')]).ai=function(card){
 					return 1;
 				};
 				"step 1"
@@ -699,7 +699,7 @@ character.extra={
 					var att=ai.get.attitude(player,target);
 					if(att>=4){
 						if(target.hp==1&&target.maxHp>2) return att;
-						if(target.hp==2&&target.maxHp>3&&target.num('he')==0) return att*0.7;
+						if(target.hp==2&&target.maxHp>3&&target.countCards('he')==0) return att*0.7;
 						return 0;
 					}
 					return -1;
@@ -1071,12 +1071,12 @@ character.extra={
 			enable:'phaseUse',
 			usable:1,
 			filterTarget:function(card,player,target){
-				return target!=player&&target.num('h');
+				return target!=player&&target.countCards('h');
 			},
 			content:function(){
 				"step 0"
 				event.videoId=lib.status.videoId++;
-				var cards=target.get('h');
+				var cards=target.getCards('h');
 				if(player.isOnline2()){
 					player.send(function(cards,id){
 						ui.create.dialog('攻心',cards).videoId=id;
@@ -1144,7 +1144,7 @@ character.extra={
 				threaten:1.5,
 				result:{
 					target:function(player,target){
-						return -target.num('h');
+						return -target.countCards('h');
 					}
 				},
 				order:10,

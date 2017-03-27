@@ -1339,7 +1339,7 @@ mode.identity={
 				}
 				if(this.identity=='fan'&&source) source.draw(3);
 				else if(this.identity=='zhong'&&source&&source.identity=='zhu'&&source.isZhu){
-					source.discard(source.get('he'));
+					source.discard(source.getCards('he'));
 				}
 				if(game.zhu&&game.zhu.storage.enhance_zhu&&get.population('fan')<3){
 					game.zhu.removeSkill(game.zhu.storage.enhance_zhu);
@@ -1608,7 +1608,7 @@ mode.identity={
 										}
 									}
 									if(fan){
-										if(to.hp>1&&to.hp>fan.hp&&to.num('he')>fan.num('he')){
+										if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
 											return -3;
 										}
 									}
@@ -1625,7 +1625,7 @@ mode.identity={
 										}
 									}
 									if(nei){
-										if(nei.hp>1&&nei.hp>to.hp&&nei.num('he')>to.num('he')){
+										if(nei.hp>1&&nei.hp>to.hp&&nei.countCards('he')>to.countCards('he')){
 											return 0;
 										}
 									}
@@ -1666,7 +1666,7 @@ mode.identity={
 										}
 									}
 									if(fan){
-										if(to.hp>1&&to.hp>fan.hp&&to.num('he')>fan.num('he')){
+										if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
 											return -3;
 										}
 									}
@@ -1762,7 +1762,7 @@ mode.identity={
 					else if(php>6){
 						php=6;
 					}
-					j=player.get('h').length+player.get('e').length*1.5+php*2;
+					j=player.countCards('h')+player.countCards('e')*1.5+php*2;
 					if(player.identity=='zhu'){
 						zhuzhong+=j*1.2+5;
 						total+=j*1.2+5;

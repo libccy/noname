@@ -399,7 +399,7 @@ mode.versus={
 		}
 		"step 4"
 		if(event.replaceCard&&result.bool){
-			var hs=game.me.get('h');
+			var hs=game.me.getCards('h');
 			for(var i=0;i<hs.length;i++){
 				ui.discardPile.appendChild(hs[i]);
 			}
@@ -2352,13 +2352,13 @@ mode.versus={
 					next.includeOut=true;
 					next.ai=function(target2){
 						var num=0;
-						if(target2.num('j')){
+						if(target2.countCards('j')){
 							num-=5;
 						}
 						if(target2.identity!='zhu'){
 							for(var i=0;i<game.players.length;i++){
 								if(game.players[i].identity!='zhu'&&game.players[i]!=target2&&
-								game.players[i].side==target2.side&&game.players[i].num('j')){
+								game.players[i].side==target2.side&&game.players[i].countCards('j')){
 									num-=2;
 								}
 							}
@@ -2367,7 +2367,7 @@ mode.versus={
 							num+=1/(target2.hp+1);
 						}
 						else if(rand<2/3){
-							num+=target2.num('h')/5;
+							num+=target2.countCards('h')/5;
 						}
 						return num;
 					}
@@ -2411,7 +2411,7 @@ mode.versus={
 					if(list.length==0) event.redo();
 					else if(list.length==1||(game.me!=game.friendZhu&&!lib.storage.single_control)||_status.currentSide!=game.me.side){
 						list.sort(function(a,b){
-							if(a.num('j')>b.num('j')) return 1;
+							if(a.countCards('j')>b.countCards('j')) return 1;
 							return a.hp-b.hp;
 						})
 						event.player=list[0];
@@ -2520,7 +2520,7 @@ mode.versus={
 			for(var i=0;i<game.players.length;i++){
 				if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
 					uiintro.add(get.translation(game.players[i]));
-					var cards=game.players[i].get('h');
+					var cards=game.players[i].getCards('h');
 					if(cards.length){
 						uiintro.addSmall(cards,true);
 					}
@@ -3251,13 +3251,13 @@ mode.versus={
             forced:true,
             filter:function(event,player){
 				return game.hasPlayer(function(current){
-					return current.isEnemyOf(player)&&current.num('j');
+					return current.isEnemyOf(player)&&current.countCards('j');
 				});
             },
             content:function(){
                 "step 0"
                 event.targets=game.filterPlayer(function(current){
-					return current.isEnemyOf(player)&&current.num('j');
+					return current.isEnemyOf(player)&&current.countCards('j');
 				});
                 event.targets.sort(lib.sort.seat);
 				player.line(event.targets,'thunder');
@@ -3451,7 +3451,7 @@ mode.versus={
 				var num=0,players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
 					if(players[i].isEnemyOf(player)){
-						var es=players[i].get('e');
+						var es=players[i].getCards('e');
 						for(var j=0;j<es.length;j++){
 							switch(get.subtype(es[j])){
 								case 'equip1':num+=1;break;
@@ -3475,7 +3475,7 @@ mode.versus={
 			filter:function(event,player){
 				var players=game.filterPlayer();
 				for(var i=0;i<players.length;i++){
-					if(players[i].isEnemyOf(player)&&players[i].num('e')){
+					if(players[i].isEnemyOf(player)&&players[i].countCards('e')){
 						return true;
 					}
 				}
@@ -3490,7 +3490,7 @@ mode.versus={
 				if(event.targets.length){
 					var current=event.targets.shift();
 					if(current.isEnemyOf(player)){
-						var es=current.get('e');
+						var es=current.getCards('e');
 						if(es.length){
 							current.discard(es);
 							player.line(current,'green');
@@ -3514,7 +3514,7 @@ mode.versus={
 				return false;
 			},
 			filter:function(event,player){
-				return player.num('h')>0;
+				return player.countCards('h')>0;
 			},
 			content:function(){
 				player.chooseToDiscard('h',true);
@@ -3524,16 +3524,16 @@ mode.versus={
 			trigger:{player:'phaseBegin'},
 			forced:true,
 			filter:function(event,player){
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				return game.hasPlayer(function(current){
-					return current.isEnemyOf(player)&&current.num('h')>nh;
+					return current.isEnemyOf(player)&&current.countCards('h')>nh;
 				});
 			},
 			content:function(){
 				'step 0'
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				var targets=game.filterPlayer(function(current){
-					return current.isEnemyOf(player)&&current.num('h')>nh;
+					return current.isEnemyOf(player)&&current.countCards('h')>nh;
 				});
 				targets.sort(lib.sort.seat);
 				event.targets=targets;
@@ -3649,7 +3649,7 @@ mode.versus={
 						if(att>0&&target.num('j','lebu')){
 							return 0.1;
 						}
-                        if(player.num('h')>player.hp){
+                        if(player.countCards('h')>player.hp){
                             if(target==player) return Math.max(1,att-2);
                         }
                         if(target==player) return att+5;
@@ -3873,7 +3873,7 @@ mode.versus={
 					if(ai.get.attitude(player,target)>-3) return 0;
 					var eff=ai.get.damageEffect(target,player,player,'fire');
 					if(eff>0){
-						return eff+target.num('e')/2;
+						return eff+target.countCards('e')/2;
 					}
 					return 0;
 				}
@@ -3892,7 +3892,7 @@ mode.versus={
 				}
 				"step 3"
 				if(event.target){
-					var es=event.target.get('e');
+					var es=event.target.getCards('e');
 					if(es.length){
 						event.target.discard(es);
 					}
@@ -4281,7 +4281,7 @@ mode.versus={
 						else if(source){
 							if(source.side==this.side){
 								if(source.identity=='zhu'){
-									source.discard(source.get('he'));
+									source.discard(source.getCards('he'));
 								}
 							}
 							else{
@@ -4308,7 +4308,7 @@ mode.versus={
 						else if(source){
 							if(source.side==this.side){
 								if(source.identity=='zhu'){
-									source.discard(source.get('he'));
+									source.discard(source.getCards('he'));
 								}
 							}
 							else{
@@ -4337,7 +4337,7 @@ mode.versus={
 							if(this.replacetwo){
 								if(source){
 									if(source.side==this.side){
-										var he=source.get('he');
+										var he=source.getCards('he');
 										if(he.length){
 											source.discard(he);
 										}
@@ -4352,7 +4352,7 @@ mode.versus={
 							else if(friend&&friend.replacetwo){
 								if(source){
 									if(source.side==this.side){
-										var he=source.get('he');
+										var he=source.getCards('he');
 										if(he.length){
 											source.discard(he);
 										}
@@ -4451,7 +4451,7 @@ mode.versus={
 							}
 							else{
 								if(lib.storage.versus_punish=='弃牌'){
-									source.discard(source.get('he'));
+									source.discard(source.getCards('he'));
 								}
 								else if(lib.storage.versus_punish=='摸牌'&&lib.storage.versus_reward){
 									source.draw(lib.storage.versus_reward);

@@ -27,16 +27,16 @@ character.old={
 				if(event.responded) return false;
 				if(!event.filterCard({name:'shan'},player,event)&&!!event.filterCard({name:'sha'},player,event)) return false;
 				if(player.hasSkill('zhenshan2')) return false;
-                var nh=player.num('h');
+                var nh=player.countCards('h');
                 return game.hasPlayer(function(current){
-                    return current!=player&&current.num('h')<nh;
+                    return current!=player&&current.countCards('h')<nh;
                 });
 			},
 			direct:true,
 			content:function(){
 				"step 0"
 				player.chooseTarget(get.prompt('zhenshan'),function(card,player,target){
-					return target.num('h')<player.num('h');
+					return target.countCards('h')<player.countCards('h');
 				}).set('ai',function(target){
 					return ai.get.attitude(player,target)
 				});
@@ -62,9 +62,9 @@ character.old={
 			enable:'chooseToUse',
 			filter:function(event,player){
                 if(player.hasSkill('zhenshan2')) return false;
-                var nh=player.num('h');
+                var nh=player.countCards('h');
                 if(!game.hasPlayer(function(current){
-                    return current!=player&&current.num('h')<nh;
+                    return current!=player&&current.countCards('h')<nh;
                 })){
                     return false;
                 }
@@ -116,7 +116,7 @@ character.old={
 						precontent:function(){
                             'step 0'
                             player.chooseTarget('选择交换手牌的目标',function(card,player,target){
-                                return target.num('h')<player.num('h')
+                                return target.countCards('h')<player.countCards('h')
                             },true).ai=function(target){
                                 return ai.get.attitude(player,target);
                             }
@@ -137,9 +137,9 @@ character.old={
 				order:function(){
 					var player=_status.event.player;
 					var event=_status.event;
-                    var nh=player.num('h');
+                    var nh=player.countCards('h');
                     if(game.hasPlayer(function(current){
-                        return ai.get.attitude(player,current)>0&&current.num('h')<nh;
+                        return ai.get.attitude(player,current)>0&&current.countCards('h')<nh;
                     })){
                         if(event.type=='dying'){
                             if(event.filterCard({name:'tao'},player,event)){
@@ -161,9 +161,9 @@ character.old={
 				respondSha:true,
 				skillTagFilter:function(player,tag,arg){
                     if(player.hasSkill('zhenshan2')) return false;
-                    var nh=player.num('h');
+                    var nh=player.countCards('h');
                     return game.hasPlayer(function(current){
-                        return current!=player&&current.num('h')<nh;
+                        return current!=player&&current.countCards('h')<nh;
                     });
 				},
 				result:{
@@ -209,7 +209,7 @@ character.old={
     				var dialog=ui.create.dialog('选择获得卡牌的目标',cards,'hidden');
     				dialog.classList.add('noselect');
     				player.chooseTarget(true,dialog).ai=function(target){
-                        return ai.get.attitude(player,target)/Math.sqrt(1+target.num('h'));
+                        return ai.get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
                     }
                 }
                 else{

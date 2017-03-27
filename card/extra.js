@@ -116,12 +116,12 @@ card.extra={
 			type:'trick',
 			enable:true,
 			filterTarget:function(card,player,target){
-				if(player!=game.me&&player.num('h')<2) return false;
-				return target.num('h')>0;
+				if(player!=game.me&&player.countCards('h')<2) return false;
+				return target.countCards('h')>0;
 			},
 			content:function(){
 				"step 0"
-				if(target.get('h').length==0){
+				if(target.countCards('h')==0){
 					event.finish();
 					return;
 				}
@@ -168,7 +168,7 @@ card.extra={
 				},
 				result:{
 					player:function(player){
-						var nh=player.num('h');
+						var nh=player.countCards('h');
 						if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
 							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'huogong'})){
@@ -183,8 +183,8 @@ card.extra={
 						return 0;
 					},
 					target:function(player,target){
-						if(target.hasSkill('huogong2')||target.num('h')==0) return 0;
-						if(player.num('h')<=1) return 0;
+						if(target.hasSkill('huogong2')||target.countCards('h')==0) return 0;
+						if(player.countCards('h')<=1) return 0;
 						if(target==player){
 							if(typeof _status.event.filterCard=='function'&&
 								_status.event.filterCard({name:'huogong'})){
@@ -273,7 +273,7 @@ card.extra={
 				},
 				result:{
 					target:function(player,target){
-						return -1-target.get('h').length;
+						return -1-target.countCards('h');
 					}
 				},
 				tag:{
@@ -402,7 +402,7 @@ card.extra={
 			filter:function(event){
 				if(event.parent.name=='_lianhuan'||event.parent.name=='_lianhuan2') return false;
 				if(event.card&&event.card.name=='sha'){
-					if(event.player.get('h').length==0) return true;
+					if(event.player.countCards('h')==0) return true;
 				}
 				return false;
 			},
@@ -413,7 +413,7 @@ card.extra={
 			ai:{
 				effect:{
 					target:function(card,player,target,current){
-						if(card.name=='sha'&&target.get('h').length==0) return [1,-2];
+						if(card.name=='sha'&&target.countCards('h')==0) return [1,-2];
 					}
 				}
 			}

@@ -62,7 +62,7 @@ character.jiange={
             forced:true,
             filter:function(event,player){
                 for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('j')) return true;
+                    if(game.players[i]!=player&&game.players[i].countCards('j')) return true;
                 }
                 return false;
             },
@@ -70,7 +70,7 @@ character.jiange={
                 "step 0"
                 event.targets=[];
                 for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('j')){
+                    if(game.players[i]!=player&&game.players[i].countCards('j')){
                         event.targets.push(game.players[i]);
                     }
                 }
@@ -86,7 +86,7 @@ character.jiange={
             trigger:{global:'phaseDrawBegin'},
             direct:true,
             filter:function(event,player){
-                return event.num>0&&event.player!=player&&event.player.hp<event.player.maxHp&&player.num('he');
+                return event.num>0&&event.player!=player&&event.player.hp<event.player.maxHp&&player.countCards('he');
             },
             content:function(){
                 "step 0"
@@ -117,7 +117,7 @@ character.jiange={
 			content:function(){
 				"step 0"
                 player.chooseTarget(get.prompt('huodi'),function(card,player,target){
-                    return target.num('he')&&player!=target;
+                    return target.countCards('he')&&player!=target;
                 }).ai=function(target){
                     return -ai.get.attitude(player,target);
                 }
@@ -152,7 +152,7 @@ character.jiange={
             direct:true,
             content:function(){
                 "step 0"
-                var num=get.cardCount(true,player)-player.num('h');
+                var num=get.cardCount(true,player)-player.countCards('h');
                 event.num=num;
                 if(num>0){
                     player.draw(num);
@@ -235,7 +235,7 @@ character.jiange={
                 "step 0"
                 game.delay(0.5);
                 player.chooseTarget(get.prompt('juechen'),function(card,player,target){
-                    return player!=target&&!trigger.targets.contains(target)&&target.num('he')>0;
+                    return player!=target&&!trigger.targets.contains(target)&&target.countCards('he')>0;
                 }).ai=function(target){
                     return -ai.get.attitude(player,target);
                 }
@@ -265,7 +265,7 @@ character.jiange={
                 "step 1"
                 if(get.color(event.cards[0])!=get.color(event.cards[1])){
                     player.chooseTarget('是否弃置一名角色一张牌？',function(card,player,target){
-                        return player!=target&&target.num('he')>0;
+                        return player!=target&&target.countCards('he')>0;
                     }).ai=function(target){
                         return -ai.get.attitude(player,target);
                     }
@@ -383,7 +383,7 @@ character.jiange={
             trigger:{global:'useCardAfter'},
             direct:true,
             filter:function(event,player){
-                return event.player!=player&&event.card.name=='wuxie'&&event.player.num('he')>0;
+                return event.player!=player&&event.card.name=='wuxie'&&event.player.countCards('he')>0;
             },
             content:function(){
                 "step 0"
@@ -435,7 +435,7 @@ character.jiange={
                             if(target==player) return 0.1;
                         }
                         var att=ai.get.attitude(player,target);
-                        if(player.num('h')>player.hp){
+                        if(player.countCards('h')>player.hp){
                             if(target==player) return Math.max(1,att-2);
                         }
                         if(target==player) return att+5;

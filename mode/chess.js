@@ -333,7 +333,7 @@ mode.chess={
 					if(game.players[i].side==game.me.side&&game.players[i]!=game.me){
 						added=true;
 						uiintro.add(get.translation(game.players[i]));
-						var cards=game.players[i].get('h');
+						var cards=game.players[i].getCards('h');
 						if(cards.length){
 							uiintro.addSmall(cards,true);
 						}
@@ -909,7 +909,7 @@ mode.chess={
 								else{
 									switch(get.config('punish')){
 										case '弃牌':
-											var he=source.get('he');
+											var he=source.getCards('he');
 											if(he.length){
 												source.discard(he);
 											}
@@ -1726,13 +1726,13 @@ mode.chess={
 					next.includeOut=true;
 					next.ai=function(target2){
 						var num=0;
-						if(target2.num('j')){
+						if(target2.countCards('j')){
 							num-=5;
 						}
 						if(target2!=game.friendZhu&&target2!=game.enemyZhu){
 							for(var i=0;i<game.players.length;i++){
 								if(game.players[i]!=game.friendZhu&&game.players[i]!=game.enemyZhu&&
-									game.players[i]!=target2&&game.players[i].side==target2.side&&game.players[i].num('j')){
+									game.players[i]!=target2&&game.players[i].side==target2.side&&game.players[i].countCards('j')){
 									num-=2;
 								}
 							}
@@ -1741,7 +1741,7 @@ mode.chess={
 							num+=1/(target2.hp+1);
 						}
 						else if(rand<2/3){
-							num+=target2.num('h')/5;
+							num+=target2.countCards('h')/5;
 						}
 						return num;
 					}
@@ -1792,7 +1792,7 @@ mode.chess={
 							return target.side==next.side;
 						},[1,num2-num1]);
 						nevt.ai=function(target){
-							return Math.max(1,10-target.num('h'));
+							return Math.max(1,10-target.countCards('h'));
 						};
 						nevt.includeOut=true;
 						nevt.chessForceAll=true;
@@ -1830,7 +1830,7 @@ mode.chess={
 					nevt.chessForceAll=true;
 					nevt.includeOut=true;
 					nevt.ai=function(target){
-						var nj=target.num('j');
+						var nj=target.countCards('j');
 						if(nj){
 							return -nj;
 						}
@@ -3982,7 +3982,7 @@ mode.chess={
 				'step 1'
 				game.log('集气石发动');
 				player.recover('nosource');
-				var he=player.get('he');
+				var he=player.getCards('he');
 				if(he.length){
 					player.discard(he.randomGets(2));
 				}
@@ -4046,12 +4046,12 @@ mode.chess={
 			forced:true,
 			popup:false,
 			filter:function(event,player){
-				var nh=player.num('h');
+				var nh=player.countCards('h');
 				if(!nh) return false;
 				for(var i=0;i<game.treasures.length;i++){
 					if(game.treasures[i].name=='treasure_shenpanxianjing'){
 						for(var j=0;j<game.players.length;j++){
-							if(game.players[j].num('h')>nh) return false;
+							if(game.players[j].countCards('h')>nh) return false;
 						}
 						return true;
 					}
@@ -4082,7 +4082,7 @@ mode.chess={
 				}
 				'step 1'
 				game.log('审判之刃发动');
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				if(hs.length){
 					player.discard(hs.randomGet());
 				}
@@ -4256,7 +4256,7 @@ mode.chess={
 					case 2:chance=0.4;break;
 					default:chance=0.2;break;
 				}
-				switch(target.num('he')){
+				switch(target.countCards('he')){
 					case 0:break;
 					case 1:chance/=1.2;break;
 					case 2:chance/=1.4;break;
@@ -4575,7 +4575,7 @@ mode.chess={
 			filter:function(event,player){
 				if(player.isTurnedOver()) return false;
 				var suits=[];
-				var hs=player.get('h');
+				var hs=player.getCards('h');
 				for(var i=0;i<hs.length;i++){
 					suits.add(get.suit(hs[i]));
 					if(suits.length>=4) return true;
@@ -4617,7 +4617,7 @@ mode.chess={
 							}
 						}
 						if(num<=1) return;
-						if(_status.currentPhase==player&&player.num('h')<player.hp&&player.hp>=6){
+						if(_status.currentPhase==player&&player.countCards('h')<player.hp&&player.hp>=6){
 							if(typeof card=='string') return;
 							if(card.name=='wuzhong') return;
 							if(card.name=='shunshou') return;
@@ -4676,7 +4676,7 @@ mode.chess={
 			unique:true,
             filter:function(event,player){
                 for(var i=0;i<game.players.length;i++){
-                    if(game.players[i]!=player&&game.players[i].num('h')) return true;
+                    if(game.players[i]!=player&&game.players[i].countCards('h')) return true;
                 }
                 return false;
             },
@@ -4689,7 +4689,7 @@ mode.chess={
 				"step 1"
 				if(event.players.length){
 					var current=event.players.shift();
-					var hs=current.get('h')
+					var hs=current.getCards('h')
 					if(hs.length){
 						var card=hs.randomGet();
 						player.gain(card,current);
@@ -4791,7 +4791,7 @@ mode.chess={
 				effect:{
 					player:function(card,player){
 						if(_status.currentPhase!=player) return;
-						if(card.name=='sha'&&player.num('h','sha')<2&&player.num('h')<=player.hp){
+						if(card.name=='sha'&&player.num('h','sha')<2&&player.countCards('h')<=player.hp){
 							var num=0;
 							var player=_status.event.player;
 							for(var i=0;i<game.players.length;i++){
@@ -5018,7 +5018,7 @@ mode.chess={
 						if(get.mode()=='tafang'&&_status.enemies.contains(player)){
 							return 1;
 						}
-						var nh=player.num('h');
+						var nh=player.countCards('h');
 						if(!player.num('h','sha')&&
 						!player.num('h','shunshou')&&
 						!player.num('h','bingliang')){
@@ -5159,7 +5159,7 @@ mode.chess={
 			forced:true,
 			filter:function(event,player){
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')&&
+					if(game.players[i]!=player&&game.players[i].countCards('h')&&
 						get.distance(player,game.players[i])<=5){
 						return true;
 					}
@@ -5170,7 +5170,7 @@ mode.chess={
 				"step 0"
 				var players=[];
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]!=player&&game.players[i].num('h')&&
+					if(game.players[i]!=player&&game.players[i].countCards('h')&&
 						get.distance(player,game.players[i])<=5){
 						players.push(game.players[i]);
 					}
