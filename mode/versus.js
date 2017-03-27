@@ -83,8 +83,16 @@ mode.versus={
 				lib.translate.zhuge_info='锁定技，出牌阶段，你使用杀的次数上限+3';
 				lib.card.list=lib.cardsThree;
 			}
-			ui.create.cards();
-			game.finishCards();
+			if(lib.onfree){
+				lib.onfree.push(function(){
+					ui.create.cards();
+					game.finishCards();
+				});
+			}
+			else{
+				ui.create.cards();
+				game.finishCards();
+			}
 		}
 		else{
 			if(lib.storage.choice==undefined) game.save('choice',20);
@@ -105,8 +113,16 @@ mode.versus={
 			}
 			game.save('only_zhu',true);
 			ui.wuxie.hide();
-			ui.create.cards();
-			game.finishCards();
+			if(lib.onfree){
+				lib.onfree.push(function(){
+					ui.create.cards();
+					game.finishCards();
+				});
+			}
+			else{
+				ui.create.cards();
+				game.finishCards();
+			}
 		}
 		game.delay();
 		"step 2"
@@ -580,13 +596,24 @@ mode.versus={
 							});
 							delete _status.createControl;
 						}
-						event.dialogxx=ui.create.characterDialog(function(name){
-							if(lib.character[name][4]){
-								if(lib.character[name][4].contains('jiangeboss')) return true;
-								if(lib.character[name][4].contains('jiangemech')) return true;
+						var createCharacterDialog=function(){
+							event.dialogxx=ui.create.characterDialog(function(name){
+								if(lib.character[name][4]){
+									if(lib.character[name][4].contains('jiangeboss')) return true;
+									if(lib.character[name][4].contains('jiangemech')) return true;
+								}
+								if(lib.character[name][1]!=game.me.identity) return true;
+							});
+							if(ui.cheat2){
+								ui.cheat2.classList.remove('disabled');
 							}
-							if(lib.character[name][1]!=game.me.identity) return true;
-						});
+						};
+						if(lib.onfree){
+							lib.onfree.push(createCharacterDialog);
+						}
+						else{
+							createCharacterDialog();
+						}
 						ui.create.cheat2=function(){
 							ui.cheat2=ui.create.control('自由选将',function(){
 								if(this.dialog==_status.event.dialog){
@@ -600,7 +627,7 @@ mode.versus={
 									game.uncheck();
 									game.check();
 									if(ui.cheat){
-										ui.cheat.style.opacity=1;
+										ui.cheat.classList.remove('disabled');
 									}
 								}
 								else{
@@ -615,10 +642,13 @@ mode.versus={
 									game.uncheck();
 									game.check();
 									if(ui.cheat){
-										ui.cheat.style.opacity=0.6;
+										ui.cheat.classList.add('disabled');
 									}
 								}
 							});
+							if(lib.onfree){
+								ui.cheat2.classList.add('disabled');
+							}
 						}
 						if(!_status.brawl||!_status.brawl.chooseCharacterFixed){
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
@@ -637,7 +667,7 @@ mode.versus={
 						dialog=ui.create.dialog('选择角色',[list[game.me.identity+'boss'],'character']);
 						break;
 				}
-				game.me.chooseButton(dialog,true).selectButton=function(){
+				game.me.chooseButton(dialog,true).set('onfree',true).selectButton=function(){
 					if(get.config('double_character_jiange')) return [2,2];
 					return [1,1];
 				};
@@ -809,9 +839,10 @@ mode.versus={
 					game.me.chooseButton(true,dialog,2);
 					_status.replacetwo=true;
 					game.additionaldead=[];
+					lib.init.onfree();
 				}
 				else{
-					game.me.chooseButton(true,dialog);
+					game.me.chooseButton(true,dialog).set('onfree',true);
 				}
 				if(!_status.brawl||!_status.brawl.noAddSetting){
 					if(get.config('change_identity')){
@@ -839,7 +870,17 @@ mode.versus={
 					});
 					delete _status.createControl;
 				};
-				event.dialogxx=ui.create.characterDialog();
+				if(lib.onfree){
+					lib.onfree.push(function(){
+						event.dialogxx=ui.create.characterDialog();
+						if(ui.cheat2){
+							ui.cheat2.classList.remove('disabled');
+						}
+					});
+				}
+				else{
+					event.dialogxx=ui.create.characterDialog();
+				}
 				ui.create.cheat2=function(){
 					ui.cheat2=ui.create.control('自由选将',function(){
 						if(this.dialog==_status.event.dialog){
@@ -853,7 +894,7 @@ mode.versus={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=1;
+								ui.cheat.classList.remove('hidden');
 							}
 						}
 						else{
@@ -868,10 +909,11 @@ mode.versus={
 							game.uncheck();
 							game.check();
 							if(ui.cheat){
-								ui.cheat.style.opacity=0.6;
+								ui.cheat.classList.add('hidden');
 							}
 						}
 					});
+					ui.cheat2.classList.add('disabled');
 				}
 				if(!_status.brawl||!_status.brawl.chooseCharacterFixed){
 					if(!ui.cheat&&get.config('change_choice')){
@@ -1028,7 +1070,7 @@ mode.versus={
 							dialog.buttons[i].classList.add('noclick');
 						}
 					}
-					game.me.chooseButton(dialog,true).closeDialog=false;
+					game.me.chooseButton(dialog,true).set('onfree',true).closeDialog=false;
 					event.xdialog=dialog;
 					dialog.static=true;
 					event.current.classList.add('selectedx');
@@ -1110,6 +1152,7 @@ mode.versus={
 					game.additionaldead=[];
 					game.saveConfig('continue_name_versus_three');
 					event.goto(2);
+					lib.init.onfree();
 				}
 				else{
 					game.chooseCharacterDouble(function(i){
@@ -1509,6 +1552,7 @@ mode.versus={
 					}
 				};
 				game.pause();
+				lib.init.onfree();
 				"step 1"
 				_status.friendBackup=_status.friend.slice(0);
 				_status.enemyBackup=_status.enemy.slice(0);

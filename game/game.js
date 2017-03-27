@@ -24415,6 +24415,7 @@
 					})
 				}
 				game.delay();
+				lib.init.onfree();
 				'step 2'
 				if(event.checkredo()) return;
 				if(event.side<2){
