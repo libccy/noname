@@ -1313,7 +1313,7 @@ character.shenhua={
 			},
 			filterTarget:function(card,player,target){
 				if(target.isMin()) return false;
-				return player!=target&&!target.get('e',get.subtype(card)[5]);
+				return player!=target&&!target.getEquip(parseInt(get.subtype(card)[5]));
 			},
 			content:function(){
 				target.equip(cards[0]);

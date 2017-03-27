@@ -473,8 +473,9 @@ character.gujian={
 							value:function(card,player){
 								var value=0;
 								var info=get.info(card);
-								if(player.get('e',info.subtype[5])&&card!=player.get('e',info.subtype[5])){
-									value=ai.get.value(player.get('e',info.subtype[5]),player);
+								var current=player.getEquip(parseInt(info.subtype[5]));
+								if(current&&card!=current){
+									value=ai.get.value(current,player);
 								}
 								var equipValue=info.ai.equipValue||info.ai.basic.equipValue;
 								if(typeof equipValue=='function') return equipValue(card,player)-value;
